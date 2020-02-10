@@ -7,7 +7,6 @@ import util._
 class NestedCreateMutationInsideUpdateSpec extends FlatSpec with Matchers with ApiSpecBase with SchemaBaseV11 {
   override def runOnlyForCapabilities = Set(JoinRelationLinksCapability)
 
-
   //todo which tests to keep and which ones to delete???? Some do not really test the compound unique functionality
 
   "a P1! to C1! relation" should "error since old required parent relation would be broken" in {
@@ -29,13 +28,11 @@ class NestedCreateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
           |       id
           |    }
           |  }
-          |}""".stripMargin,
+          |}""",
           project
         )
 
       val parentId = res.pathAsString("data.createParent.id")
-
-      // ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(1) }
 
       server.queryThatMustFail(
         s"""
@@ -52,13 +49,12 @@ class NestedCreateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |    }
          |  }
          |}
-      """.stripMargin,
+      """,
         project,
         errorCode = 3042,
         errorContains = "The change you are trying to make would violate the required relation 'ChildToParent' between Child and Parent"
       )
 
-    // ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(1) }
     }
   }
 
@@ -81,13 +77,11 @@ class NestedCreateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
           |       id
           |    }
           |  }
-          |}""".stripMargin,
+          |}""",
           project
         )
 
       val parentId = res.pathAsString("data.createParent.id")
-
-      // ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(1) }
 
       val res2 = server.query(
         s"""
@@ -103,13 +97,11 @@ class NestedCreateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |    }
          |  }
          |}
-      """.stripMargin,
+      """,
         project
       )
 
       res2.toString should be("""{"data":{"updateParent":{"childReq":{"c":"SomeC"}}}}""")
-
-    // ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(1) }
 
     }
   }
@@ -133,13 +125,11 @@ class NestedCreateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
           |       id
           |    }
           |  }
-          |}""".stripMargin,
+          |}""",
           project
         )
 
       val parentId = res.pathAsString("data.createParent.id")
-
-      // ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(1) }
 
       val res2 = server.query(
         s"""
@@ -155,13 +145,11 @@ class NestedCreateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |    }
          |  }
          |}
-      """.stripMargin,
+      """,
         project
       )
 
       res2.toString should be("""{"data":{"updateParent":{"childOpt":{"c":"SomeC"}}}}""")
-
-    // ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(1) }
 
     }
   }
@@ -178,12 +166,10 @@ class NestedCreateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
           |  {
           |    id
           |  }
-          |}""".stripMargin,
+          |}""",
           project
         )
         .pathAsString("data.createParent.id")
-
-      // ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(0) }
 
       val res = server.query(
         s"""
@@ -199,13 +185,12 @@ class NestedCreateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |    }
          |  }
          |}
-      """.stripMargin,
+      """,
         project
       )
 
       res.toString should be("""{"data":{"updateParent":{"childOpt":{"c":"SomeC"}}}}""")
 
-    // ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(1) }
     }
   }
 
@@ -226,11 +211,9 @@ class NestedCreateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
         |       c
         |    }
         |  }
-        |}""".stripMargin,
+        |}""",
         project
       )
-
-      // ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(1) }
 
       val res = server.query(
         s"""
@@ -245,13 +228,11 @@ class NestedCreateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |    }
          |  }
          |}
-      """.stripMargin,
+      """,
         project
       )
 
       res.toString should be("""{"data":{"updateParent":{"childrenOpt":[{"c":"c1"},{"c":"c2"}]}}}""")
-
-    // ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(2) }
 
     }
   }
@@ -273,11 +254,9 @@ class NestedCreateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
         |       c
         |    }
         |  }
-        |}""".stripMargin,
+        |}""",
         project
       )
-
-      // ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(1) }
 
       server.queryThatMustFail(
         s"""
@@ -292,7 +271,7 @@ class NestedCreateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |    }
          |  }
          |}
-      """.stripMargin,
+      """,
         project,
         errorCode = 3042,
         errorContains = "The change you are trying to make would violate the required relation 'ChildToParent' between Child and Parent"
@@ -313,11 +292,9 @@ class NestedCreateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
           |  }){
           |    p
           |  }
-          |}""".stripMargin,
+          |}""",
         project
       )
-
-      // ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(0) }
 
       val res = server.query(
         s"""
@@ -332,13 +309,12 @@ class NestedCreateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
            |    }
            |  }
            |}
-      """.stripMargin,
+      """,
         project
       )
 
       res.toString should be("""{"data":{"updateParent":{"childOpt":{"c":"c1"}}}}""")
 
-    // ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(1) }
     }
   }
 
@@ -360,11 +336,9 @@ class NestedCreateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
           |       c
           |    }
           |  }
-          |}""".stripMargin,
+          |}""",
           project
         )
-
-      // ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(2) }
 
       val res = server.query(
         s"""
@@ -379,13 +353,11 @@ class NestedCreateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |    }
          |  }
          |}
-      """.stripMargin,
+      """,
         project
       )
 
       res.toString should be("""{"data":{"updateParent":{"childrenOpt":[{"c":"c1"},{"c":"c2"},{"c":"c3"}]}}}""")
-
-    // ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(3) }
 
     }
   }
@@ -407,11 +379,9 @@ class NestedCreateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
         |       c
         |    }
         |  }
-        |}""".stripMargin,
+        |}""",
         project
       )
-
-      // ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(1) }
 
       val res = server.query(
         s"""
@@ -426,13 +396,12 @@ class NestedCreateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |    }
          |  }
          |}
-      """.stripMargin,
+      """,
         project
       )
 
       res.toString should be("""{"data":{"updateParent":{"childReq":{"c":"c2"}}}}""")
 
-    // ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(1) }
     }
   }
 
@@ -453,11 +422,9 @@ class NestedCreateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
         |       c
         |    }
         |  }
-        |}""".stripMargin,
+        |}""",
         project
       )
-
-      // ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(1) }
 
       val res = server.query(
         s"""
@@ -472,7 +439,7 @@ class NestedCreateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |    }
          |  }
          |}
-      """.stripMargin,
+      """,
         project
       )
 
@@ -480,8 +447,6 @@ class NestedCreateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
 
       server.query(s"""query{children{c, parentsOpt{p}}}""", project).toString should be(
         """{"data":{"children":[{"c":"c1","parentsOpt":[]},{"c":"c2","parentsOpt":[{"p":"p1"}]}]}}""")
-
-    // ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(1) }
 
     }
   }
@@ -503,11 +468,9 @@ class NestedCreateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
         |       c
         |    }
         |  }
-        |}""".stripMargin,
+        |}""",
         project
       )
-
-      // ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(2) }
 
       val res = server.query(
         s"""
@@ -522,7 +485,7 @@ class NestedCreateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |    }
          |  }
          |}
-      """.stripMargin,
+      """,
         project
       )
 
@@ -531,7 +494,6 @@ class NestedCreateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
       server.query(s"""query{children{c, parentsOpt{p}}}""", project).toString should be(
         """{"data":{"children":[{"c":"c1","parentsOpt":[{"p":"p1"}]},{"c":"c2","parentsOpt":[{"p":"p1"}]},{"c":"c3","parentsOpt":[{"p":"p1"}]}]}}""")
 
-    // ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(3) }
     }
   }
 
@@ -557,7 +519,7 @@ class NestedCreateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
         |    id
         |  }
         |}
-      """.stripMargin,
+      """,
       project
     )
     val id = createResult.pathAsString("data.createTodo.id")
@@ -579,7 +541,7 @@ class NestedCreateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
         |    }
         |  }
         |}
-      """.stripMargin,
+      """,
       project
     )
 
@@ -609,7 +571,7 @@ class NestedCreateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
         |    id
         |  }
         |}
-      """.stripMargin,
+      """,
       project
     )
     val id = createResult.pathAsString("data.createComment.id")
@@ -633,7 +595,7 @@ class NestedCreateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
         |    }
         |  }
         |}
-      """.stripMargin,
+      """,
       project
     )
     mustBeEqual(result.pathAsString("data.updateComment.todo.title"), "todo1")
@@ -663,7 +625,7 @@ class NestedCreateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
         |    text
         |  }
         |}
-      """.stripMargin,
+      """,
       project
     )
 
@@ -686,7 +648,7 @@ class NestedCreateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |    }
          |  }
          |}
-      """.stripMargin,
+      """,
       project
     )
     mustBeEqual(result.pathAsString("data.updateComment.todo.title"), "todo1")

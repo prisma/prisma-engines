@@ -19,7 +19,7 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
           |  {
           |    id
           |  }
-          |}""".stripMargin,
+          |}""",
           project
         )
         .pathAsString("data.createParent.id")
@@ -42,7 +42,7 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    }
          |  }
          |}
-      """.stripMargin,
+      """,
         project,
         errorCode = 0,
         errorContains = """ Reason: 'childOpt.updateMany' Field 'updateMany' is not defined in the input model 'ChildUpdateOneWithoutParentOptInput'."""
@@ -57,8 +57,6 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
 
       setupData(project)
 
-      //ifConnectorIsActive { //dataResolver(project).countByTable("_ChildToParent").await should be(4) }
-
       server.query(
         s"""
          |mutation {
@@ -76,13 +74,9 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    }
          |  }
          |}
-      """.stripMargin,
+      """,
         project
       )
-
-      //ifConnectorIsActive { //dataResolver(project).countByTable("_ChildToParent").await should be(4) }
-      //dataResolver(project).countByTable(project.schema.getModelByName_!("Parent").dbName).await should be(2)
-      //dataResolver(project).countByTable(project.schema.getModelByName_!("Child").dbName).await should be(4)
 
       server.query("query{parents{p,childrenOpt{c, test}}}", project).toString() should be(
         """{"data":{"parents":[{"p":"p1","childrenOpt":[{"c":"c1","test":"updated"},{"c":"c2","test":"updated"}]},{"p":"p2","childrenOpt":[{"c":"c3","test":null},{"c":"c4","test":null}]}]}}""")
@@ -96,8 +90,6 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
 
       setupData(project)
 
-      //ifConnectorIsActive { //dataResolver(project).countByTable("_ChildToParent").await should be(4) }
-
       server.query(
         s"""
          |mutation {
@@ -115,13 +107,9 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    }
          |  }
          |}
-      """.stripMargin,
+      """,
         project
       )
-
-      //ifConnectorIsActive { //dataResolver(project).countByTable("_ChildToParent").await should be(4) }
-      //dataResolver(project).countByTable(project.schema.getModelByName_!("Parent").dbName).await should be(2)
-      //dataResolver(project).countByTable(project.schema.getModelByName_!("Child").dbName).await should be(4)
 
       server.query("query{parents{p,childrenOpt{c, test}}}", project).toString() should be(
         """{"data":{"parents":[{"p":"p1","childrenOpt":[{"c":"c1","test":"updated"},{"c":"c2","test":"updated"}]},{"p":"p2","childrenOpt":[{"c":"c3","test":null},{"c":"c4","test":null}]}]}}""")
@@ -135,8 +123,6 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
 
       setupData(project)
 
-      //ifConnectorIsActive { //dataResolver(project).countByTable("_ChildToParent").await should be(4) }
-
       server.query(
         s"""
          |mutation {
@@ -154,13 +140,9 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    }
          |  }
          |}
-      """.stripMargin,
+      """,
         project
       )
-
-      //ifConnectorIsActive { //dataResolver(project).countByTable("_ChildToParent").await should be(4) }
-      //dataResolver(project).countByTable(project.schema.getModelByName_!("Parent").dbName).await should be(2)
-      //dataResolver(project).countByTable(project.schema.getModelByName_!("Child").dbName).await should be(4)
 
       server.query("query{parents{p,childrenOpt{c, test}}}", project).toString() should be(
         """{"data":{"parents":[{"p":"p1","childrenOpt":[{"c":"c1","test":"updated"},{"c":"c2","test":"updated"}]},{"p":"p2","childrenOpt":[{"c":"c3","test":null},{"c":"c4","test":null}]}]}}""")
@@ -173,8 +155,6 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
       database.setup(project)
 
       setupData(project)
-
-      //ifConnectorIsActive { //dataResolver(project).countByTable("_ChildToParent").await should be(4) }
 
       server.query(
         s"""
@@ -199,13 +179,9 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    }
          |  }
          |}
-      """.stripMargin,
+      """,
         project
       )
-
-      //ifConnectorIsActive { //dataResolver(project).countByTable("_ChildToParent").await should be(4) }
-      //dataResolver(project).countByTable(project.schema.getModelByName_!("Parent").dbName).await should be(2)
-      //dataResolver(project).countByTable(project.schema.getModelByName_!("Child").dbName).await should be(4)
 
       server.query("query{parents{p,childrenOpt{c, test}}}", project).toString() should be(
         """{"data":{"parents":[{"p":"p1","childrenOpt":[{"c":"c1","test":"updated1"},{"c":"c2","test":"updated2"}]},{"p":"p2","childrenOpt":[{"c":"c3","test":null},{"c":"c4","test":null}]}]}}""")
@@ -218,8 +194,6 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
       database.setup(project)
 
       setupData(project)
-
-      //ifConnectorIsActive { //dataResolver(project).countByTable("_ChildToParent").await should be(4) }
 
       server.query(
         s"""
@@ -240,13 +214,9 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    }
          |  }
          |}
-      """.stripMargin,
+      """,
         project
       )
-
-      //ifConnectorIsActive { //dataResolver(project).countByTable("_ChildToParent").await should be(4) }
-      //dataResolver(project).countByTable(project.schema.getModelByName_!("Parent").dbName).await should be(2)
-      //dataResolver(project).countByTable(project.schema.getModelByName_!("Child").dbName).await should be(4)
 
       server.query("query{parents{p,childrenOpt{c, test}}}", project).toString() should be(
         """{"data":{"parents":[{"p":"p1","childrenOpt":[{"c":"c1","test":"updated1"},{"c":"c2","test":"updated1"}]},{"p":"p2","childrenOpt":[{"c":"c3","test":null},{"c":"c4","test":null}]}]}}""")
@@ -259,8 +229,6 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
       database.setup(project)
 
       setupData(project)
-
-      //ifConnectorIsActive { //dataResolver(project).countByTable("_ChildToParent").await should be(4) }
 
       server.query(
         s"""
@@ -285,13 +253,9 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    }
          |  }
          |}
-      """.stripMargin,
+      """,
         project
       )
-
-      //ifConnectorIsActive { //dataResolver(project).countByTable("_ChildToParent").await should be(4) }
-      //dataResolver(project).countByTable(project.schema.getModelByName_!("Parent").dbName).await should be(2)
-      //dataResolver(project).countByTable(project.schema.getModelByName_!("Child").dbName).await should be(4)
 
       server.query("query{parents{p,childrenOpt{c, test}}}", project).toString() should be(
         """{"data":{"parents":[{"p":"p1","childrenOpt":[{"c":"c1","test":null},{"c":"c2","test":null}]},{"p":"p2","childrenOpt":[{"c":"c3","test":null},{"c":"c4","test":null}]}]}}""")
@@ -306,8 +270,6 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
       database.setup(project)
 
       setupData(project)
-
-      //ifConnectorIsActive { //dataResolver(project).countByTable("_ChildToParent").await should be(4) }
 
       server.query(
         s"""
@@ -332,13 +294,9 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    }
          |  }
          |}
-      """.stripMargin,
+      """,
         project
       )
-
-      //ifConnectorIsActive { //dataResolver(project).countByTable("_ChildToParent").await should be(4) }
-      //dataResolver(project).countByTable(project.schema.getModelByName_!("Parent").dbName).await should be(2)
-      //dataResolver(project).countByTable(project.schema.getModelByName_!("Child").dbName).await should be(4)
 
       server.query("query{parents{p,childrenOpt(orderBy: id_ASC){c, test}}}", project).toString() should be(
         """{"data":{"parents":[{"p":"p1","childrenOpt":[{"c":"c1","test":"updated2"},{"c":"c2","test":"updated1"}]},{"p":"p2","childrenOpt":[{"c":"c3","test":null},{"c":"c4","test":null}]}]}}""")
@@ -358,7 +316,7 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         |       c
         |    }
         |  }
-        |}""".stripMargin,
+        |}""",
       project
     )
 
@@ -374,7 +332,7 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         |       c
         |    }
         |  }
-        |}""".stripMargin,
+        |}""",
       project
     )
   }

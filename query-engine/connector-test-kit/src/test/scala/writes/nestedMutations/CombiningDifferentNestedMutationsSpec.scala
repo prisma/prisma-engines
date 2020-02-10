@@ -36,7 +36,7 @@ class CombiningDifferentNestedMutationsSpec extends FlatSpec with Matchers with 
         |       c
         |    }
         |  }
-        |}""".stripMargin,
+        |}""",
         project
       )
 
@@ -56,7 +56,7 @@ class CombiningDifferentNestedMutationsSpec extends FlatSpec with Matchers with 
         |       c
         |    }
         |  }
-        |}""".stripMargin,
+        |}""",
         project
       )
 
@@ -87,7 +87,7 @@ class CombiningDifferentNestedMutationsSpec extends FlatSpec with Matchers with 
         |       c
         |    }
         |  }
-        |}""".stripMargin,
+        |}""",
         project
       )
 
@@ -107,7 +107,7 @@ class CombiningDifferentNestedMutationsSpec extends FlatSpec with Matchers with 
         |       c
         |    }
         |  }
-        |}""".stripMargin,
+        |}""",
         project
       )
 
@@ -138,7 +138,7 @@ class CombiningDifferentNestedMutationsSpec extends FlatSpec with Matchers with 
         |       c
         |    }
         |  }
-        |}""".stripMargin,
+        |}""",
         project
       )
 
@@ -158,7 +158,7 @@ class CombiningDifferentNestedMutationsSpec extends FlatSpec with Matchers with 
         |       c
         |    }
         |  }
-        |}""".stripMargin,
+        |}""",
         project
       )
 
@@ -189,7 +189,7 @@ class CombiningDifferentNestedMutationsSpec extends FlatSpec with Matchers with 
         |       c
         |    }
         |  }
-        |}""".stripMargin,
+        |}""",
         project
       )
 
@@ -215,7 +215,7 @@ class CombiningDifferentNestedMutationsSpec extends FlatSpec with Matchers with 
         |       c
         |    }
         |  }
-        |}""".stripMargin,
+        |}""",
         project
       )
 
@@ -245,7 +245,7 @@ class CombiningDifferentNestedMutationsSpec extends FlatSpec with Matchers with 
         |       c
         |    }
         |  }
-        |}""".stripMargin,
+        |}""",
         project
       )
 
@@ -265,7 +265,7 @@ class CombiningDifferentNestedMutationsSpec extends FlatSpec with Matchers with 
         |       c
         |    }
         |  }
-        |}""".stripMargin,
+        |}""",
         project
       )
 

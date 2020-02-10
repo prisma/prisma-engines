@@ -19,7 +19,7 @@ class NestedDeleteManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
           |  {
           |    id
           |  }
-          |}""".stripMargin,
+          |}""",
           project
         )
         .pathAsString("data.createParent.id")
@@ -40,7 +40,7 @@ class NestedDeleteManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    }
          |  }
          |}
-      """.stripMargin,
+      """,
         project,
         errorCode = 0,
         errorContains = """ Reason: 'childOpt.deleteMany' Field 'deleteMany' is not defined in the input model 'ChildUpdateOneWithoutParentOptInput'."""
@@ -54,8 +54,6 @@ class NestedDeleteManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
       database.setup(project)
 
       setupData(project)
-
-      // ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(4) }
 
       server.query(
         s"""
@@ -72,13 +70,9 @@ class NestedDeleteManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    }
          |  }
          |}
-      """.stripMargin,
+      """,
         project
       )
-
-      // ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(2) }
-      //dataResolver(project).countByTable(project.schema.getModelByName_!("Parent").dbName).await should be(2)
-      //dataResolver(project).countByTable(project.schema.getModelByName_!("Child").dbName).await should be(2)
 
       server.query("query{parents{p,childrenOpt{c, test}}}", project).toString() should be(
         """{"data":{"parents":[{"p":"p1","childrenOpt":[]},{"p":"p2","childrenOpt":[{"c":"c3","test":null},{"c":"c4","test":null}]}]}}""")
@@ -91,8 +85,6 @@ class NestedDeleteManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
       database.setup(project)
 
       setupData(project)
-
-      // ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(4) }
 
       server.query(
         s"""
@@ -109,13 +101,9 @@ class NestedDeleteManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    }
          |  }
          |}
-      """.stripMargin,
+      """,
         project
       )
-
-      // ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(2) }
-      //dataResolver(project).countByTable(project.schema.getModelByName_!("Parent").dbName).await should be(2)
-      //dataResolver(project).countByTable(project.schema.getModelByName_!("Child").dbName).await should be(2)
 
       server.query("query{parents{p,childrenOpt{c, test}}}", project).toString() should be(
         """{"data":{"parents":[{"p":"p1","childrenOpt":[]},{"p":"p2","childrenOpt":[{"c":"c3","test":null},{"c":"c4","test":null}]}]}}""")
@@ -128,8 +116,6 @@ class NestedDeleteManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
       database.setup(project)
 
       setupData(project)
-
-      // ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(4) }
 
       server.query(
         s"""
@@ -148,13 +134,9 @@ class NestedDeleteManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    }
          |  }
          |}
-      """.stripMargin,
+      """,
         project
       )
-
-      // ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(2) }
-      //dataResolver(project).countByTable(project.schema.getModelByName_!("Parent").dbName).await should be(2)
-      //dataResolver(project).countByTable(project.schema.getModelByName_!("Child").dbName).await should be(2)
 
       server.query("query{parents{p,childrenOpt{c, test}}}", project).toString() should be(
         """{"data":{"parents":[{"p":"p1","childrenOpt":[]},{"p":"p2","childrenOpt":[{"c":"c3","test":null},{"c":"c4","test":null}]}]}}""")
@@ -167,8 +149,6 @@ class NestedDeleteManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
       database.setup(project)
 
       setupData(project)
-
-      // ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(4) }
 
       server.query(
         s"""
@@ -191,13 +171,9 @@ class NestedDeleteManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    }
          |  }
          |}
-      """.stripMargin,
+      """,
         project
       )
-
-      // ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(2) }
-      //dataResolver(project).countByTable(project.schema.getModelByName_!("Parent").dbName).await should be(2)
-      //dataResolver(project).countByTable(project.schema.getModelByName_!("Child").dbName).await should be(2)
 
       server.query("query{parents{p,childrenOpt{c, test}}}", project).toString() should be(
         """{"data":{"parents":[{"p":"p1","childrenOpt":[]},{"p":"p2","childrenOpt":[{"c":"c3","test":null},{"c":"c4","test":null}]}]}}""")
@@ -211,8 +187,6 @@ class NestedDeleteManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
       database.setup(project)
 
       setupData(project)
-
-      // ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(4) }
 
       server.query(
         s"""
@@ -230,13 +204,9 @@ class NestedDeleteManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    }
          |  }
          |}
-      """.stripMargin,
+      """,
         project
       )
-
-      // ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(2) }
-      //dataResolver(project).countByTable(project.schema.getModelByName_!("Parent").dbName).await should be(2)
-      //dataResolver(project).countByTable(project.schema.getModelByName_!("Child").dbName).await should be(2)
 
       server.query("query{parents{p,childrenOpt{c, test}}}", project).toString() should be(
         """{"data":{"parents":[{"p":"p1","childrenOpt":[]},{"p":"p2","childrenOpt":[{"c":"c3","test":null},{"c":"c4","test":null}]}]}}""")
@@ -249,8 +219,6 @@ class NestedDeleteManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
       database.setup(project)
 
       setupData(project)
-
-      // ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(4) }
 
       server.query(
         s"""
@@ -273,13 +241,9 @@ class NestedDeleteManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    }
          |  }
          |}
-      """.stripMargin,
+      """,
         project
       )
-
-      // ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(4) }
-      //dataResolver(project).countByTable(project.schema.getModelByName_!("Parent").dbName).await should be(2)
-      //dataResolver(project).countByTable(project.schema.getModelByName_!("Child").dbName).await should be(4)
 
       server.query("query{parents{p,childrenOpt{c, test}}}", project).toString() should be(
         """{"data":{"parents":[{"p":"p1","childrenOpt":[{"c":"c1","test":null},{"c":"c2","test":null}]},{"p":"p2","childrenOpt":[{"c":"c3","test":null},{"c":"c4","test":null}]}]}}""")
@@ -299,7 +263,7 @@ class NestedDeleteManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         |       c
         |    }
         |  }
-        |}""".stripMargin,
+        |}""",
       project
     )
 
@@ -315,7 +279,7 @@ class NestedDeleteManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         |       c
         |    }
         |  }
-        |}""".stripMargin,
+        |}""",
       project
     )
   }

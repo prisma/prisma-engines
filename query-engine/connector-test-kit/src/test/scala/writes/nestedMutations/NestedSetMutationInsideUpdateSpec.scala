@@ -39,8 +39,6 @@ class NestedSetMutationInsideUpdateSpec extends FlatSpec with Matchers with ApiS
           project
         )
 
-      //ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(2) }
-
       // we are even resilient against multiple identical connects here -> twice connecting to c2
 
       val res = server.query(
@@ -62,7 +60,6 @@ class NestedSetMutationInsideUpdateSpec extends FlatSpec with Matchers with ApiS
 
       res.toString should be("""{"data":{"updateParent":{"childrenOpt":[{"c":"c1"},{"c":"c2"}]}}}""")
 
-    //ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(2) }
     }
   }
 
@@ -93,8 +90,6 @@ class NestedSetMutationInsideUpdateSpec extends FlatSpec with Matchers with ApiS
           project
         )
 
-      //ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(0) }
-
       val res = server.query(
         s"""
          |mutation {
@@ -114,7 +109,6 @@ class NestedSetMutationInsideUpdateSpec extends FlatSpec with Matchers with ApiS
 
       res.toString should be("""{"data":{"updateParent":{"childrenOpt":[{"c":"c1"}]}}}""")
 
-    //ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(1) }
     }
   }
 
@@ -155,8 +149,6 @@ class NestedSetMutationInsideUpdateSpec extends FlatSpec with Matchers with ApiS
         project
       )
 
-      //ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(4) }
-
       val res = server.query(
         s"""
          |mutation {
@@ -179,7 +171,6 @@ class NestedSetMutationInsideUpdateSpec extends FlatSpec with Matchers with ApiS
       server.query(s"""query{children{c, parentsOpt{p}}}""", project).toString should be(
         """{"data":{"children":[{"c":"c1","parentsOpt":[{"p":"p1"},{"p":"p2"}]},{"c":"c2","parentsOpt":[{"p":"p1"},{"p":"p2"}]},{"c":"c3","parentsOpt":[]},{"c":"c4","parentsOpt":[]}]}}""")
 
-    //ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(4) }
     }
   }
 
@@ -206,8 +197,6 @@ class NestedSetMutationInsideUpdateSpec extends FlatSpec with Matchers with ApiS
         project
       )
 
-      //ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(0) }
-
       val res = server.query(
         s"""
          |mutation {
@@ -229,7 +218,6 @@ class NestedSetMutationInsideUpdateSpec extends FlatSpec with Matchers with ApiS
 
       server.query(s"""query{children{parentsOpt{p}}}""", project).toString should be("""{"data":{"children":[{"parentsOpt":[{"p":"p1"}]}]}}""")
 
-    //ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(1) }
     }
   }
 
@@ -270,8 +258,6 @@ class NestedSetMutationInsideUpdateSpec extends FlatSpec with Matchers with ApiS
         project
       )
 
-      //ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(4) }
-
       val res = server.query(
         s"""
          |mutation {
@@ -294,7 +280,6 @@ class NestedSetMutationInsideUpdateSpec extends FlatSpec with Matchers with ApiS
       server.query(s"""query{children{c, parentsOpt{p}}}""", project).toString should be(
         """{"data":{"children":[{"c":"c1","parentsOpt":[{"p":"p1"}]},{"c":"c2","parentsOpt":[{"p":"p1"}]},{"c":"c3","parentsOpt":[]},{"c":"c4","parentsOpt":[]}]}}""")
 
-    //ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(2) }
     }
   }
 
@@ -477,8 +462,6 @@ class NestedSetMutationInsideUpdateSpec extends FlatSpec with Matchers with ApiS
       )
       .pathAsString("data.createParent.children.[0].id")
 
-    //ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(1) }
-
     val res = server.query(
       s"""
          |mutation {
@@ -498,8 +481,6 @@ class NestedSetMutationInsideUpdateSpec extends FlatSpec with Matchers with ApiS
 
     res.toString should be("""{"data":{"updateParent":{"children":[{"c":"c1"}]}}}""")
 
-    //ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(2) }
-
     server.query(
       s"""
          |mutation {
@@ -517,7 +498,6 @@ class NestedSetMutationInsideUpdateSpec extends FlatSpec with Matchers with ApiS
       project
     )
 
-    //ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(2) }
   }
 
   "Setting several times" should "not error and only connect the item once" in {
@@ -548,6 +528,4 @@ class NestedSetMutationInsideUpdateSpec extends FlatSpec with Matchers with ApiS
 
     server.query("""query{aUsers{name, posts{title}}}""", project).toString should be("""{"data":{"aUsers":[{"name":"Author","posts":[{"title":"Title"}]}]}}""")
   }
-
-  println(relationInlineDirective)
 }
