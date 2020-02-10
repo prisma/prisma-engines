@@ -20,7 +20,7 @@ case class TestServer() extends PlayJsonExtensions {
   }
 
   def batch(
-      queries: Array[String],
+      queries: Seq[String],
       project: Project,
   ): JsValue = {
     val result = queryBinaryCLI(
@@ -54,7 +54,7 @@ case class TestServer() extends PlayJsonExtensions {
     Json.obj("query" -> formattedQuery, "variables" -> Json.obj())
   }
 
-  def createMultiQuery(queries: Array[String]): JsValue = {
+  def createMultiQuery(queries: Seq[String]): JsValue = {
     Json.obj("batch" -> queries.map(createSingleQuery))
   }
 
