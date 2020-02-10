@@ -26,14 +26,12 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
           |       id
           |    }
           |  }
-          |}""".stripMargin,
+          |}""",
           project
         )
 
       val childId  = res.pathAsString("data.createParent.childOpt.id")
       val parentId = res.pathAsString("data.createParent.id")
-
-      //ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(1) }
 
       val res2 = server.query(
         s"""
@@ -49,13 +47,12 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    }
          |  }
          |}
-      """.stripMargin,
+      """,
         project
       )
 
       res2.toString should be("""{"data":{"updateParent":{"childOpt":null}}}""")
 
-    //ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(0) }
     }
   }
 
@@ -71,7 +68,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
           |  {
           |    id
           |  }
-          |}""".stripMargin,
+          |}""",
           project
         )
         .pathAsString("data.createChild.id")
@@ -83,12 +80,10 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
           |  {
           |    id
           |  }
-          |}""".stripMargin,
+          |}""",
           project
         )
         .pathAsString("data.createParent.id")
-
-      //ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(0) }
 
       val res = server.queryThatMustFail(
         s"""
@@ -104,12 +99,11 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    }
          |  }
          |}
-      """.stripMargin,
+      """,
         project,
         errorCode = 3041
       )
 
-    //ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(0) }
     }
   }
 
@@ -130,11 +124,9 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         |       c
         |    }
         |  }
-        |}""".stripMargin,
+        |}""",
         project
       )
-
-      //ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(1) }
 
       server.queryThatMustFail(
         s"""
@@ -149,12 +141,11 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    }
          |  }
          |}
-      """.stripMargin,
+      """,
         project,
         errorCode = 3042
       )
 
-    //ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(1) }
     }
   }
 
@@ -175,11 +166,9 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         |       c
         |    }
         |  }
-        |}""".stripMargin,
+        |}""",
         project
       )
-
-      //ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(1) }
 
       server.queryThatMustFail(
         s"""
@@ -194,13 +183,12 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    }
          |  }
          |}
-      """.stripMargin,
+      """,
         project,
         errorCode = 3042,
         errorContains = "The change you are trying to make would violate the required relation 'ChildToParent' between Child and Parent"
       )
 
-    //ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(1) }
     }
   }
 
@@ -222,11 +210,9 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
           |       c
           |    }
           |  }
-          |}""".stripMargin,
+          |}""",
           project
         )
-
-      //ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(2) }
 
       val res = server.query(
         s"""
@@ -241,13 +227,12 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    }
          |  }
          |}
-      """.stripMargin,
+      """,
         project
       )
 
       res.toString should be("""{"data":{"updateParent":{"childrenOpt":[{"c":"c1"}]}}}""")
 
-    //ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(1) }
     }
   }
 
@@ -268,11 +253,9 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         |       c
         |    }
         |  }
-        |}""".stripMargin,
+        |}""",
         project
       )
-
-      //ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(1) }
 
       val res = server.query(
         s"""
@@ -287,7 +270,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    }
          |  }
          |}
-      """.stripMargin,
+      """,
         project
       )
 
@@ -295,7 +278,6 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
 
       server.query(s"""query{children{c, parentsOpt{p}}}""", project).toString should be("""{"data":{"children":[{"c":"c1","parentsOpt":[]}]}}""")
 
-    //ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(0) }
     }
   }
 
@@ -317,7 +299,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         |       c
         |    }
         |  }
-        |}""".stripMargin,
+        |}""",
         project
       )
 
@@ -334,11 +316,9 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         |       c
         |    }
         |  }
-        |}""".stripMargin,
+        |}""",
         project
       )
-
-      //ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(4) }
 
       server.queryThatMustFail(
         s"""
@@ -353,7 +333,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    }
          |  }
          |}
-      """.stripMargin,
+      """,
         project,
         3041
       )
@@ -371,7 +351,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    }
          |  }
          |}
-      """.stripMargin,
+      """,
         project
       )
 
@@ -386,7 +366,6 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
       server.query(s"""query{child(where:{c:"otherChild"}){c, parentsOpt{p}}}""", project).toString should be(
         """{"data":{"child":{"c":"otherChild","parentsOpt":[{"p":"otherParent"}]}}}""")
 
-    //ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(3) }
     }
   }
 
@@ -407,7 +386,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         |       c
         |    }
         |  }
-        |}""".stripMargin,
+        |}""",
         project
       )
 
@@ -424,11 +403,9 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         |       c
         |    }
         |  }
-        |}""".stripMargin,
+        |}""",
         project
       )
-
-      //ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(4) }
 
       server.queryThatMustFail(
         s"""
@@ -443,7 +420,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    }
          |  }
          |}
-      """.stripMargin,
+      """,
         project,
         3041
       )
@@ -467,7 +444,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         |       c
         |    }
         |  }
-        |}""".stripMargin,
+        |}""",
         project
       )
 
@@ -484,11 +461,9 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         |       c
         |    }
         |  }
-        |}""".stripMargin,
+        |}""",
         project
       )
-
-      //ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(4) }
 
       val res = server.query(
         s"""
@@ -503,7 +478,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    }
          |  }
          |}
-      """.stripMargin,
+      """,
         project
       )
 
@@ -518,7 +493,6 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
       server.query(s"""query{child(where:{c:"otherChild"}){c, parentsOpt{p}}}""", project).toString should be(
         """{"data":{"child":{"c":"otherChild","parentsOpt":[{"p":"otherParent"}]}}}""")
 
-    //ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(3) }
     }
   }
 
@@ -550,7 +524,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         |    id
         |    comments { id }
         |  }
-        |}""".stripMargin,
+        |}""",
       project
     )
 
@@ -575,7 +549,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    }
          |  }
          |}
-      """.stripMargin,
+      """,
       project
     )
 
@@ -611,7 +585,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         |    id
         |    comments { id }
         |  }
-        |}""".stripMargin,
+        |}""",
       project
     )
     val todoId = createResult.pathAsString("data.createTodo.id")
@@ -633,7 +607,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    }
          |  }
          |}
-      """.stripMargin,
+      """,
       project
     )
 
@@ -668,7 +642,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         |    id
         |    comments { id }
         |  }
-        |}""".stripMargin,
+        |}""",
       project
     )
     val todoId    = createResult.pathAsString("data.createTodo.id")
@@ -690,7 +664,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    }
          |  }
          |}
-      """.stripMargin,
+      """,
       project
     )
     mustBeEqual(result.pathAsJsValue("data.updateComment").toString, """{"todo":null}""")
@@ -725,7 +699,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         |    id
         |    todo { id }
         |  }
-        |}""".stripMargin,
+        |}""",
       project
     )
     val noteId = createResult.pathAsString("data.createNote.id")
@@ -785,7 +759,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    }
          |  }
          |}
-      """.stripMargin,
+      """,
       project
     )
 
@@ -808,7 +782,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    }
          |  }
          |}
-      """.stripMargin,
+      """,
       project
     )
 
@@ -827,7 +801,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
                                               |  followersBack User[]  @relation(name: "UserFollowers")
                                               |  follows       User[]  @relation(name: "UserFollows" $listInlineArgument)
                                               |  followsBack   User[]  @relation(name: "UserFollows")
-                                              |}""".stripMargin }
+                                              |}""" }
     database.setup(project)
 
     server.query("""mutation { createUser(data: {username: "Paul", password: "1234", salt: "so salty"}){ id } }""", project)
@@ -851,7 +825,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    }
          |  }
          |}
-      """.stripMargin,
+      """,
       project
     )
 
@@ -875,7 +849,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    }
          |  }
          |}
-      """.stripMargin,
+      """,
       project
     )
 
@@ -894,7 +868,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
                                               |  followersBack User[]  @relation(name: "UserFollowers")
                                               |  follows       User[]  @relation(name: "UserFollows" $listInlineArgument)
                                               |  followsBack   User[]  @relation(name: "UserFollows")
-                                              |}""".stripMargin }
+                                              |}""" }
     database.setup(project)
 
     server.query("""mutation { createUser(data: {username: "Paul", password: "1234", salt: "so salty"}){ id } }""", project)
@@ -919,7 +893,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    }
          |  }
          |}
-      """.stripMargin,
+      """,
       project
     )
 
@@ -943,7 +917,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    }
          |  }
          |}
-      """.stripMargin,
+      """,
       project,
       errorCode = 3041
 //      ,
@@ -970,7 +944,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
                                              |  id         String   @id @default(cuid())
                                              |  nameBottom String   @unique
                                              |  middles    Middle[]
-                                             |}""".stripMargin }
+                                             |}""" }
     database.setup(project)
 
     val createMutation =
@@ -996,7 +970,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         |    }
         |  }) {id}
         |}
-      """.stripMargin
+      """
 
     server.query(createMutation, project)
 
@@ -1025,7 +999,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    }
          |  }
          |}
-      """.stripMargin
+      """
 
     val result = server.query(updateMutation, project)
 
@@ -1052,7 +1026,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
                                              |model Bottom {
                                              |  id         String @id @default(cuid())
                                              |  nameBottom String @unique
-                                             |}""".stripMargin }
+                                             |}""" }
     database.setup(project)
 
     val createMutation =
@@ -1078,7 +1052,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         |    }
         |  }) {id}
         |}
-      """.stripMargin
+      """
 
     server.query(createMutation, project)
 
@@ -1107,7 +1081,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    }
          |  }
          |}
-      """.stripMargin
+      """
 
     val result = server.query(updateMutation, project)
 
@@ -1136,7 +1110,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
                                              |  id         String  @id @default(cuid())
                                              |  nameBottom String  @unique
                                              |  middle     Middle?
-                                             |}""".stripMargin }
+                                             |}""" }
     database.setup(project)
 
     val createMutation =
@@ -1158,7 +1132,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         |    }
         |  }) {id}
         |}
-      """.stripMargin
+      """
 
     server.query(createMutation, project)
 
@@ -1187,7 +1161,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    }
          |  }
          |}
-      """.stripMargin
+      """
 
     val result = server.query(updateMutation, project)
 
@@ -1220,7 +1194,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
                                              |model Below {
                                              |  id        String @id @default(cuid())
                                              |  nameBelow String @unique
-                                             |}""".stripMargin }
+                                             |}""" }
     database.setup(project)
 
     val createMutation =
@@ -1240,7 +1214,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         |        }
         |  }) {id}
         |}
-      """.stripMargin
+      """
 
     server.query(createMutation, project)
 
@@ -1278,14 +1252,15 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    }
          |  }
          |}
-      """.stripMargin
+      """
 
     val result = server.query(updateMutation, project)
 
     result.toString should be(
       """{"data":{"updateTop":{"nameTop":"updated top","middle":{"nameMiddle":"updated middle","bottom":{"nameBottom":"updated bottom","below":[{"nameBelow":"second below"}]}}}}}""")
 
-    server.query("query{belows(orderBy: id_ASC){nameBelow}}", project).toString should be("""{"data":{"belows":[{"nameBelow":"below"},{"nameBelow":"second below"}]}}""")
+    server.query("query{belows(orderBy: id_ASC){nameBelow}}", project).toString should be(
+      """{"data":{"belows":[{"nameBelow":"below"},{"nameBelow":"second below"}]}}""")
   }
 
   "a deeply nested mutation" should "execute all levels of the mutation if there are only model edges on the path" in {
@@ -1306,7 +1281,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
                                              |  id         String  @id @default(cuid())
                                              |  middle     Middle?
                                              |  nameBottom String  @unique
-                                             |}""".stripMargin }
+                                             |}""" }
     database.setup(project)
 
     val createMutation =
@@ -1327,7 +1302,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         |    }
         |  }) {id}
         |}
-      """.stripMargin
+      """
 
     server.query(createMutation, project)
 
@@ -1357,7 +1332,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    }
          |  }
          |}
-      """.stripMargin
+      """
 
     val result = server.query(updateMutation, project)
 
@@ -1382,7 +1357,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
                                              |model Bottom {
                                              |  id         String @id @default(cuid())
                                              |  nameBottom String @unique
-                                             |}""".stripMargin }
+                                             |}""" }
     database.setup(project)
 
     val createMutation =
@@ -1403,7 +1378,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         |    }
         |  }) {id}
         |}
-      """.stripMargin
+      """
 
     server.query(createMutation, project)
 
@@ -1433,7 +1408,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    }
          |  }
          |}
-      """.stripMargin
+      """
 
     val result = server.query(updateMutation, project)
 

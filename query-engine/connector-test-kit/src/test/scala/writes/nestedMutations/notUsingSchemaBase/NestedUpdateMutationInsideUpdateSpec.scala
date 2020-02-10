@@ -1,4 +1,4 @@
-package writes.nestedMutations
+package writes.nestedMutations.notUsingSchemaBase
 
 import org.scalatest.{FlatSpec, Matchers}
 import util.ConnectorCapability.JoinRelationLinksCapability
@@ -19,7 +19,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
         | text String?
         | todo Todo
         |}
-      """.stripMargin
+      """
     }
     database.setup(project)
 
@@ -35,7 +35,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
         |    id
         |    comments { id }
         |  }
-        |}""".stripMargin,
+        |}""",
       project
     )
 
@@ -63,7 +63,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |    }
          |  }
          |}
-      """.stripMargin,
+      """,
       project
     )
 
@@ -84,7 +84,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
         | text  String?
         | todo  Todo
         |}
-      """.stripMargin
+      """
     }
     database.setup(project)
 
@@ -100,7 +100,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
         |    id
         |    comments { id }
         |  }
-        |}""".stripMargin,
+        |}""",
       project
     )
     val todoId = createResult.pathAsString("data.createTodo.id")
@@ -125,7 +125,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |    }
          |  }
          |}
-      """.stripMargin,
+      """,
       project
     )
 
@@ -145,7 +145,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
         | id         String @id @default(cuid())
         | todoUnique String @unique
         |}
-      """.stripMargin
+      """
     }
     database.setup(project)
 
@@ -162,7 +162,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
         |    listUnique
         |    todoes { todoUnique }
         |  }
-        |}""".stripMargin,
+        |}""",
       project
     )
     val result = server.query(
@@ -183,7 +183,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |    }
          |  }
          |}
-      """.stripMargin,
+      """,
       project
     )
 
@@ -203,7 +203,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
         | text String
         | todo Todo
         |}
-      """.stripMargin
+      """
     }
     database.setup(project)
 
@@ -219,7 +219,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
         |    id
         |    comments { id }
         |  }
-        |}""".stripMargin,
+        |}""",
       project
     )
     val todoId    = createResult.pathAsString("data.createTodo.id")
@@ -243,7 +243,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |    }
          |  }
          |}
-      """.stripMargin,
+      """,
       project
     )
     mustBeEqual(result.pathAsJsValue("data.updateComment.todo").toString, """{"title":"updated title"}""")
@@ -262,7 +262,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
         | text String?
         | todo Todo?
         |}
-      """.stripMargin
+      """
     }
     database.setup(project)
 
@@ -278,7 +278,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
         |    id
         |    todo { id }
         |  }
-        |}""".stripMargin,
+        |}""",
       project
     )
     val noteId = createResult.pathAsString("data.createNote.id")
@@ -302,7 +302,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |    }
          |  }
          |}
-      """.stripMargin,
+      """,
       project
     )
     mustBeEqual(result.pathAsJsValue("data.updateNote.todo").toString, """{"title":"updated title"}""")
@@ -322,7 +322,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
         | text   String?
         | todoes Todo[]
         |}
-      """.stripMargin
+      """
     }
     database.setup(project)
 
@@ -339,7 +339,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
         |    id
         |    todoes { id }
         |  }
-        |}""".stripMargin,
+        |}""",
       project
     )
     val noteId = createResult.pathAsString("data.createNote.id")
@@ -365,7 +365,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |    text
          |  }
          |}
-      """.stripMargin,
+      """,
       project,
       errorCode = 3039,
       errorContains = "No Node for the model Todo with value DOES NOT EXIST for id found."
@@ -388,7 +388,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
         | text   String?
         | todoes Todo[]
         |}
-      """.stripMargin
+      """
     }
     database.setup(project)
 
@@ -405,7 +405,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
         |    id
         |    todoes { id }
         |  }
-        |}""".stripMargin,
+        |}""",
       project
     )
     val noteId = createResult.pathAsString("data.createNote.id")
@@ -431,7 +431,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |    text
          |  }
          |}
-      """.stripMargin,
+      """,
       project,
       errorCode = 3039,
       errorContains = "No Node for the model Todo with value 5beea4aa6183dd734b2dbd9b for id found."
@@ -452,7 +452,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
         | unique String? @unique
         | notes  Note[]
         |}
-      """.stripMargin
+      """
     }
     database.setup(project)
 
@@ -470,7 +470,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
         |    id
         |    todos { id }
         |  }
-        |}""".stripMargin,
+        |}""",
       project
     )
 
@@ -497,7 +497,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |    }
          |  }
          |}
-      """.stripMargin,
+      """,
       project,
       errorCode = 3040,
       errorContains = "You provided a null value for the where clause on Todo."
@@ -522,7 +522,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
                                              |  id         String   @id @default(cuid())
                                              |  nameBottom String   @unique
                                              |  middles    Middle[]
-                                             |}""".stripMargin }
+                                             |}""" }
     database.setup(project)
 
     val createMutation =
@@ -548,7 +548,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
         |    }
         |  }) {id}
         |}
-      """.stripMargin
+      """
 
     server.query(createMutation, project)
 
@@ -579,7 +579,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |    }
          |  }
          |}
-      """.stripMargin
+      """
 
     val result = server.query(updateMutation, project)
 
@@ -603,7 +603,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
                                              |model Bottom {
                                              |  id         String @id @default(cuid())
                                              |  nameBottom String @unique
-                                             |}""".stripMargin }
+                                             |}""" }
     database.setup(project)
 
     val createMutation =
@@ -629,7 +629,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
         |    }
         |  }) {id}
         |}
-      """.stripMargin
+      """
 
     server.query(createMutation, project)
 
@@ -660,7 +660,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |    }
          |  }
          |}
-      """.stripMargin
+      """
 
     val result = server.query(updateMutation, project)
 
@@ -686,7 +686,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
                                              |  id         String @id @default(cuid())
                                              |  nameBottom String @unique
                                              |  middle     Middle?
-                                             |}""".stripMargin }
+                                             |}""" }
     database.setup(project)
 
     val createMutation =
@@ -708,7 +708,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
         |    }
         |  }) {id}
         |}
-      """.stripMargin
+      """
 
     server.query(createMutation, project)
 
@@ -737,7 +737,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |    }
          |  }
          |}
-      """.stripMargin
+      """
 
     val result = server.query(updateMutation, project)
 
@@ -767,7 +767,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
                                              |model Below {
                                              |  id        String @id @default(cuid())
                                              |  nameBelow String @unique
-                                             |}""".stripMargin }
+                                             |}""" }
     database.setup(project)
 
     val createMutation =
@@ -787,7 +787,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
         |        }
         |  }) {id}
         |}
-      """.stripMargin
+      """
 
     server.query(createMutation, project)
 
@@ -827,7 +827,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |    }
          |  }
          |}
-      """.stripMargin
+      """
 
     val result = server.query(updateMutation, project)
 
@@ -857,7 +857,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
                                              |model Below {
                                              |  id        String @id @default(cuid())
                                              |  nameBelow String @unique
-                                             |}""".stripMargin }
+                                             |}""" }
     database.setup(project)
 
     val createMutation =
@@ -877,7 +877,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
         |        }
         |  }) {id}
         |}
-      """.stripMargin
+      """
 
     server.query(createMutation, project)
 
@@ -898,7 +898,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
         |        }
         |  }) {id}
         |}
-      """.stripMargin
+      """
 
     server.query(createMutation2, project)
 
@@ -938,7 +938,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |    }
          |  }
          |}
-      """.stripMargin
+      """
 
     server.queryThatMustFail(
       updateMutation,
@@ -967,7 +967,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
                                              |  id         String @id @default(cuid())
                                              |  middle     Middle
                                              |  nameBottom String @unique
-                                             |}""".stripMargin }
+                                             |}""" }
     database.setup(project)
 
     val createMutation =
@@ -988,7 +988,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
         |    }
         |  }) {id}
         |}
-      """.stripMargin
+      """
 
     server.query(createMutation, project)
 
@@ -1018,7 +1018,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |    }
          |  }
          |}
-      """.stripMargin
+      """
 
     val result = server.query(updateMutation, project)
 
@@ -1042,7 +1042,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
                                              |model Bottom {
                                              |  id         String @id @default(cuid())
                                              |  nameBottom String @unique
-                                             |}""".stripMargin }
+                                             |}""" }
     database.setup(project)
 
     val createMutation =
@@ -1063,7 +1063,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
         |    }
         |  }) {id}
         |}
-      """.stripMargin
+      """
 
     server.query(createMutation, project)
 
@@ -1093,7 +1093,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |    }
          |  }
          |}
-      """.stripMargin
+      """
 
     val result = server.query(updateMutation, project)
 
@@ -1117,7 +1117,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
                                              |model Bottom {
                                              |  id         String @id @default(cuid())
                                              |  nameBottom String @unique
-                                             |}""".stripMargin }
+                                             |}""" }
     database.setup(project)
 
     val createMutation =
@@ -1130,7 +1130,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
         |    }
         |  }) {id}
         |}
-      """.stripMargin
+      """
 
     server.query(createMutation, project)
 
@@ -1160,7 +1160,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |    }
          |  }
          |}
-      """.stripMargin
+      """
 
     server.queryThatMustFail(
       updateMutation,
