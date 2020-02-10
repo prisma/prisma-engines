@@ -155,7 +155,7 @@ trait SchemaBaseV11 extends PlayJsonExtensions {
                                     childParams <- childId match {
                                                     case `simpleId`   => childUniqueParams :+ idParams
                                                     case `compoundId` => childUniqueParams :+ compoundIdParams
-                                                    case `noId`       => parentUniqueParams
+                                                    case `noId`       => childUniqueParams
                                                   })
       yield {
         val datamodel =
