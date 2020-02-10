@@ -69,7 +69,7 @@ where
     let mut idents: Vec<_> = selected_fields.types().collect();
     idents.extend(from_field.related_field().type_identifiers_with_arities());
     idents.extend(from_field.linking_fields().type_identifiers_with_arities());
-    idents.extend(from_field.linking_fields().type_identifiers_with_arities());
+    idents.extend(from_field.linking_fields().type_identifiers_with_arities()); // [DTODO] Why?
 
     let field_names: Vec<String> = selected_fields
         .db_names()

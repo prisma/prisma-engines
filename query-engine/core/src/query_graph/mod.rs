@@ -126,6 +126,7 @@ pub enum QueryGraphDependency {
     /// More specialized version of `ParentResult`
     /// Performs a transformation on the child node based on the requested IDs of the parent result (passed as RecordIdentifiers).
     /// Assumes that the parent result can be converted into the requested record identifiers, else a runtime error will occur.
+    /// The `ModelIdentifier` is used to determine the set of values to extract from the parent result.
     ParentIds(ModelIdentifier, ParentIdsFn),
 
     /// Only valid in the context of a `If` control flow node.
@@ -421,7 +422,7 @@ impl QueryGraph {
     ///
     /// This operation preserves all edges from the parents of `parent` to the node, while inserting new edges from all parents of
     /// `parent` to `child`, effectively "pushing the child in the middle" of `parent` and it's parents. The new edges are only expressing
-    /// exection order, and no node transformation like `ParentIds`.
+    /// exection order, and no node transformation.
     ///
     /// Any edge existing between `parent` and `child` will change direction and will point from `child` to `parent` instead.
     ///
@@ -454,7 +455,7 @@ impl QueryGraph {
     /// hence making it necessary to execute the child operation first.
     ///
     /// Applying the transformations step by step will change the graph as following:
-    /// (original edges marked with an ID to show how they're preserved, new edges marked with *)
+    /// (new edges created in a transformation step are marked with *)
     /// ```text
     ///         ┌───┐                 ┌───┐                                 ┌───┐                         ┌───┐
     ///         │ P │                 │ P │────────────────┐             ┌──│ P │──────────┐           ┌──│ P │────────┐
@@ -519,6 +520,7 @@ impl QueryGraph {
                             QueryGraphDependency::ExecutionOrder,
                         )?;
                         // FIXME: AUMFIDARR
+                        // [DTODO] Revert
                         //                        // ONLY if there is no edge already existing!
                         //                        let existing_edge = self
                         //                            .graph

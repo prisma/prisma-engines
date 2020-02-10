@@ -167,6 +167,7 @@ impl RecordIdentifier {
         return false;
     }
 
+    // [DTODO] Remove
     pub fn single_value(&self) -> PrismaValue {
         assert_eq!(self.pairs.len(), 1);
         self.pairs.iter().next().unwrap().1.clone()
@@ -296,18 +297,18 @@ impl Record {
                 model: String::new(),
             })
         })?;
+
+        // [DTODO] Revert to old code
+        // Ok(&self.values[index])
         match self.values.get(index) {
             Some(v) => Ok(v),
-            None => {
-                //panic!("boom")
-                Err(DomainError::FieldNotFound {
-                    name: field.to_owned(),
-                    model: format!(
-                        "Field not found in record {:?}. Field names were: {:?}",
-                        &self, &field_names
-                    ),
-                })
-            }
+            None => Err(DomainError::FieldNotFound {
+                name: field.to_owned(),
+                model: format!(
+                    "Field not found in record {:?}. Field names were: {:?}",
+                    &self, &field_names
+                ),
+            }),
         }
     }
 

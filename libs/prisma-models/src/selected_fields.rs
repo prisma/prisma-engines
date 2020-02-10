@@ -12,6 +12,7 @@ pub struct SelectedFields {
     pub relation: Vec<SelectedRelationField>,
 }
 impl SelectedFields {
+    // [DTODO] Remove
     pub fn only_scalar_and_inlined(&self) -> SelectedFields {
         SelectedFields {
             scalar: self.scalar.clone(),

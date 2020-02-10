@@ -92,6 +92,7 @@ fn handle_many_to_many(
 ///
 /// Example finalized (with swaps already performed) graph:
 /// ```text
+/// Without reload:             With reload:
 /// ┌────────────────┐             ┌────────────────┐
 /// │  Child Create  │          ┌──│  Child Create  │
 /// └────────────────┘          │  └────────────────┘

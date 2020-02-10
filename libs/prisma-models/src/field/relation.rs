@@ -125,7 +125,10 @@ impl RelationField {
     ///
     /// ## What is the model identifier of a relation field?
     /// The set of fields required by the relation (on the model of the relation field) to be able to link the related records.
-    /// Tbd examples
+    ///
+    /// In case of a many-to-many relation field, we can make the assumption that the primary identifier of the enclosing model
+    /// is the set of linking fields, as this is how Prisma many-to-many works and we only support implicit join tables (i.e. m:n)
+    /// in the Prisma style.
     pub fn linking_fields(&self) -> ModelIdentifier {
         if self.relation().is_many_to_many() {
             self.model().primary_identifier()
