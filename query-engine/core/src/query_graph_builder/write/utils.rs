@@ -6,7 +6,7 @@ use crate::{
 use connector::{Filter, QueryArguments, ScalarCompare, WriteArgs};
 use itertools::Itertools;
 use prisma_models::{ModelIdentifier, ModelRef, PrismaValue, RecordIdentifier, RelationFieldRef, SelectedFields};
-use std::{convert::TryInto, sync::Arc};
+use std::sync::Arc;
 
 pub trait IdFilter {
     fn filter(self) -> Filter;
@@ -202,7 +202,7 @@ pub fn insert_existing_1to1_related_model_checks(
     parent_node: &NodeRef,
     parent_relation_field: &RelationFieldRef,
 ) -> QueryGraphBuilderResult<()> {
-    let parent_model_identifier = parent_relation_field.model().primary_identifier();
+    // let parent_model_identifier = parent_relation_field.model().primary_identifier();
     let child_model_identifier = parent_relation_field.related_model().primary_identifier();
 
     let child_model = parent_relation_field.related_model();
@@ -215,7 +215,7 @@ pub fn insert_existing_1to1_related_model_checks(
         insert_find_children_by_parent_node(graph, &parent_node, &parent_relation_field, Filter::empty())?;
 
     let update_existing_child = update_records_node_placeholder(graph, Filter::empty(), child_model);
-    let relation_field = Arc::clone(parent_relation_field);
+    // let relation_field = Arc::clone(parent_relation_field);
     let if_node = graph.create_node(Flow::default_if());
 
     graph.create_edge(
@@ -384,8 +384,8 @@ pub fn insert_deletion_checks(
 /// └────────────────┘
 /// ```
 pub fn insert_node_reload(
-    graph: &mut QueryGraph,
-    parent_relation_field: &RelationFieldRef,
+    _graph: &mut QueryGraph,
+    _parent_relation_field: &RelationFieldRef,
     parent_node: NodeRef,
 ) -> QueryGraphBuilderResult<NodeRef> {
     // FIXME: AUMFIDARR
@@ -424,7 +424,7 @@ pub fn insert_node_reload(
     Ok(parent_node)
 }
 
-fn reload_node(graph: &mut QueryGraph, model: ModelRef, identifier: ModelIdentifier) -> NodeRef {
-    let read_query = read_ids_infallible(model, identifier, Filter::empty());
-    graph.create_node(read_query)
-}
+// fn reload_node(graph: &mut QueryGraph, model: ModelRef, identifier: ModelIdentifier) -> NodeRef {
+//     let read_query = read_ids_infallible(model, identifier, Filter::empty());
+//     graph.create_node(read_query)
+// }

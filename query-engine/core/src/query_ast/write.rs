@@ -36,7 +36,7 @@ impl WriteQuery {
     // Injects PrismaValues into the write arguments based the passed field.
     // If the underlying representation of the field takes multiple values, a compound field is injected.
     // If values are missing (e.g. empty vec passed), `PrismaValue::Null`(s) are written instead.
-    pub fn inject_field_arg(&mut self, key: String, mut value: PrismaValue) {
+    pub fn inject_field_arg(&mut self, key: String, value: PrismaValue) {
         let args = match self {
             Self::CreateRecord(ref mut x) => &mut x.args,
             Self::UpdateRecord(x) => &mut x.args,
@@ -55,13 +55,13 @@ impl WriteQuery {
         // from the primary ID is automatically not returned.
         // DeleteMany, Connect and Disconnect do not return anything.
         match self {
-            Self::CreateRecord(q) => returns_id,
-            Self::UpdateRecord(q) => returns_id,
-            Self::DeleteRecord(q) => returns_id,
-            Self::UpdateManyRecords(q) => returns_id,
-            Self::DeleteManyRecords(q) => false,
-            Self::ConnectRecords(q) => false,
-            Self::DisconnectRecords(q) => false,
+            Self::CreateRecord(_) => returns_id,
+            Self::UpdateRecord(_) => returns_id,
+            Self::DeleteRecord(_) => returns_id,
+            Self::UpdateManyRecords(_) => returns_id,
+            Self::DeleteManyRecords(_) => false,
+            Self::ConnectRecords(_) => false,
+            Self::DisconnectRecords(_) => false,
             Self::Raw {
                 query: _,
                 parameters: _,

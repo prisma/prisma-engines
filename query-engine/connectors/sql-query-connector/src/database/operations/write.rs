@@ -1,9 +1,8 @@
 use crate::{error::SqlError, query_builder::write, QueryExt, RawQuery};
 use connector_interface::*;
-use itertools::Itertools;
 use prisma_models::*;
 use prisma_value::PrismaValue;
-use quaint::error::{Error as QueryError, ErrorKind};
+use quaint::error::ErrorKind;
 use std::convert::TryFrom;
 use user_facing_errors::query_engine::DatabaseConstraint;
 
@@ -16,29 +15,21 @@ pub async fn create_record(conn: &dyn QueryExt, model: &ModelRef, args: WriteArg
             ErrorKind::UniqueConstraintViolation { constraint } => match constraint {
                 quaint::error::DatabaseConstraint::Index(name) => {
                     let constraint = DatabaseConstraint::Index(name.clone());
-                    return Err(SqlError::UniqueConstraintViolation {
-                        constraint,
-                    });
+                    return Err(SqlError::UniqueConstraintViolation { constraint });
                 }
                 quaint::error::DatabaseConstraint::Fields(fields) => {
                     let constraint = DatabaseConstraint::Fields(fields.clone());
-                    return Err(SqlError::UniqueConstraintViolation {
-                        constraint,
-                    });
+                    return Err(SqlError::UniqueConstraintViolation { constraint });
                 }
             },
             ErrorKind::NullConstraintViolation { constraint } => match constraint {
                 quaint::error::DatabaseConstraint::Index(name) => {
                     let constraint = DatabaseConstraint::Index(name.clone());
-                    return Err(SqlError::NullConstraintViolation {
-                        constraint,
-                    });
+                    return Err(SqlError::NullConstraintViolation { constraint });
                 }
                 quaint::error::DatabaseConstraint::Fields(fields) => {
                     let constraint = DatabaseConstraint::Fields(fields.clone());
-                    return Err(SqlError::NullConstraintViolation {
-                        constraint,
-                    });
+                    return Err(SqlError::NullConstraintViolation { constraint });
                 }
             },
             _ => return Err(SqlError::from(e)),

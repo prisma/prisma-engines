@@ -2,7 +2,7 @@ use super::*;
 use crate::{query_ast::*, query_graph::*, InputAssertions, ParsedInputValue};
 use connector::{Filter, ScalarCompare};
 use itertools::Itertools;
-use prisma_models::{GraphqlId, ModelRef, PrismaValue, PrismaValueExtensions, RelationFieldRef};
+use prisma_models::{ModelRef, PrismaValue, RelationFieldRef};
 use std::{collections::HashSet, convert::TryInto, iter::FromIterator, sync::Arc};
 
 /// Only for x-to-many relations.

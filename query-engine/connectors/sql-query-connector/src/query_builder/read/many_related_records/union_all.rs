@@ -1,7 +1,7 @@
 use super::*;
 use crate::ordering::Ordering;
 use connector_interface::SkipAndLimit;
-use prisma_models::{sql_ext::AsColumn, RecordIdentifier, SelectedFields};
+use prisma_models::{RecordIdentifier, SelectedFields};
 use quaint::ast::*;
 
 pub struct ManyRelatedRecordsWithUnionAll;

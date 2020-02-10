@@ -370,7 +370,7 @@ fn handle_one_to_one(
 
              // We ONLY inject creates here. Check doc comment for explanation.
              if let Node::Query(Query::Write(WriteQuery::CreateRecord(ref mut cr))) = child_node {
-                 for (dsf, value) in parent_id.pairs {
+                 for (_dsf, value) in parent_id.pairs {
                      // FIXME: use relation_field_name_pc works only if there's only one iteration in the loop
                     cr.args.insert(relation_field_name_pc.clone(), value);
                  }
