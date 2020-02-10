@@ -8,8 +8,10 @@ class NestedDeleteManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
   override def runOnlyForCapabilities = Set(JoinRelationLinksCapability)
 
   "A 1-n relation" should "error if trying to use nestedDeleteMany" in {
-    schemaP1optToC1opt.test { dataModel =>
-      val project = SchemaDsl.fromStringV11() { dataModel }
+    schemaWithRelation(onParent = ChildOpt, onChild = ParentOpt).test { t =>
+      val project = SchemaDsl.fromStringV11() {
+        t.datamodel
+      }
       database.setup(project)
 
       val parent1Id = server
@@ -49,8 +51,10 @@ class NestedDeleteManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
   }
 
   "a PM to C1!  relation " should "work" in {
-    schemaPMToC1req.test { dataModel =>
-      val project = SchemaDsl.fromStringV11() { dataModel }
+    schemaWithRelation(onParent = ChildList, onChild = ParentReq).test { t =>
+      val project = SchemaDsl.fromStringV11() {
+        t.datamodel
+      }
       database.setup(project)
 
       setupData(project)
@@ -80,8 +84,10 @@ class NestedDeleteManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
   }
 
   "a PM to C1  relation " should "work" in {
-    schemaPMToC1opt.test { dataModel =>
-      val project = SchemaDsl.fromStringV11() { dataModel }
+    schemaWithRelation(onParent = ChildList, onChild = ParentOpt).test { t =>
+      val project = SchemaDsl.fromStringV11() {
+        t.datamodel
+      }
       database.setup(project)
 
       setupData(project)
@@ -111,8 +117,10 @@ class NestedDeleteManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
   }
 
   "a PM to CM  relation " should "work" in {
-    schemaPMToCM.test { dataModel =>
-      val project = SchemaDsl.fromStringV11() { dataModel }
+    schemaWithRelation(onParent = ChildList, onChild = ParentList).test { t =>
+      val project = SchemaDsl.fromStringV11() {
+        t.datamodel
+      }
       database.setup(project)
 
       setupData(project)
@@ -144,8 +152,10 @@ class NestedDeleteManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
   }
 
   "a PM to C1!  relation " should "work with several deleteManys" in {
-    schemaPMToC1req.test { dataModel =>
-      val project = SchemaDsl.fromStringV11() { dataModel }
+    schemaWithRelation(onParent = ChildList, onChild = ParentReq).test { t =>
+      val project = SchemaDsl.fromStringV11() {
+        t.datamodel
+      }
       database.setup(project)
 
       setupData(project)
@@ -182,8 +192,10 @@ class NestedDeleteManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
   }
 
   "a PM to C1!  relation " should "work with empty Filter" in {
-    schemaPMToC1req.test { dataModel =>
-      val project = SchemaDsl.fromStringV11() { dataModel }
+    schemaWithRelation(onParent = ChildList, onChild = ParentReq).test { t =>
+      val project = SchemaDsl.fromStringV11() {
+        t.datamodel
+      }
       database.setup(project)
 
       setupData(project)
@@ -214,8 +226,10 @@ class NestedDeleteManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
   }
 
   "a PM to C1!  relation " should "not change anything when there is no hit" in {
-    schemaPMToC1req.test { dataModel =>
-      val project = SchemaDsl.fromStringV11() { dataModel }
+    schemaWithRelation(onParent = ChildList, onChild = ParentReq).test { t =>
+      val project = SchemaDsl.fromStringV11() {
+        t.datamodel
+      }
       database.setup(project)
 
       setupData(project)

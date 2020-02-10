@@ -20,8 +20,10 @@ class CombiningDifferentNestedMutationsSpec extends FlatSpec with Matchers with 
   // the error behavior would be interesting to test, which error is returned, does rollback work
 
   "A create followed by an update" should "work" in {
-    schemaPMToCM.test { dataModel =>
-      val project = SchemaDsl.fromStringV11() { dataModel }
+    schemaWithRelation(onParent = ChildList, onChild = ParentList).test { t =>
+      val project = SchemaDsl.fromStringV11() {
+        t.datamodel
+      }
       database.setup(project)
 
       val res = server.query(
@@ -71,8 +73,10 @@ class CombiningDifferentNestedMutationsSpec extends FlatSpec with Matchers with 
   }
 
   "A create followed by a delete" should "work" in {
-    schemaPMToCM.test { dataModel =>
-      val project = SchemaDsl.fromStringV11() { dataModel }
+    schemaWithRelation(onParent = ChildList, onChild = ParentList).test { t =>
+      val project = SchemaDsl.fromStringV11() {
+        t.datamodel
+      }
       database.setup(project)
 
       val res = server.query(
@@ -122,8 +126,10 @@ class CombiningDifferentNestedMutationsSpec extends FlatSpec with Matchers with 
   }
 
   "A create followed by a set" should "work" in {
-    schemaPMToCM.test { dataModel =>
-      val project = SchemaDsl.fromStringV11() { dataModel }
+    schemaWithRelation(onParent = ChildList, onChild = ParentList).test { t =>
+      val project = SchemaDsl.fromStringV11() {
+        t.datamodel
+      }
       database.setup(project)
 
       val res = server.query(
@@ -173,8 +179,10 @@ class CombiningDifferentNestedMutationsSpec extends FlatSpec with Matchers with 
   }
 
   "A create followed by an upsert" should "work" in {
-    schemaPMToCM.test { dataModel =>
-      val project = SchemaDsl.fromStringV11() { dataModel }
+    schemaWithRelation(onParent = ChildList, onChild = ParentList).test { t =>
+      val project = SchemaDsl.fromStringV11() {
+        t.datamodel
+      }
       database.setup(project)
 
       val res = server.query(
@@ -229,8 +237,10 @@ class CombiningDifferentNestedMutationsSpec extends FlatSpec with Matchers with 
   }
 
   "A create followed by a disconnect" should "work" in {
-    schemaPMToCM.test { dataModel =>
-      val project = SchemaDsl.fromStringV11() { dataModel }
+    schemaWithRelation(onParent = ChildList, onChild = ParentList).test { t =>
+      val project = SchemaDsl.fromStringV11() {
+        t.datamodel
+      }
       database.setup(project)
 
       val res = server.query(

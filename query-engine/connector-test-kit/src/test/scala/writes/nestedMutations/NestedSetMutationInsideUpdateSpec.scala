@@ -8,8 +8,10 @@ class NestedSetMutationInsideUpdateSpec extends FlatSpec with Matchers with ApiS
   override def runOnlyForCapabilities: Set[ConnectorCapability] = Set(JoinRelationLinksCapability)
 
   "a PM to C1  relation with the child already in a relation" should "be setable through a nested mutation by unique" in {
-    schemaPMToC1opt.test { dataModel =>
-      val project = SchemaDsl.fromStringV11() { dataModel }
+    schemaWithRelation(onParent = ChildList, onChild = ParentOpt).test { t =>
+      val project = SchemaDsl.fromStringV11() {
+        t.datamodel
+      }
       database.setup(project)
 
       server
@@ -64,8 +66,10 @@ class NestedSetMutationInsideUpdateSpec extends FlatSpec with Matchers with ApiS
   }
 
   "a PM to C1  relation with the child without a relation" should "be setable through a nested mutation by unique" in {
-    schemaPMToC1opt.test { dataModel =>
-      val project = SchemaDsl.fromStringV11() { dataModel }
+    schemaWithRelation(onParent = ChildList, onChild = ParentOpt).test { t =>
+      val project = SchemaDsl.fromStringV11() {
+        t.datamodel
+      }
       database.setup(project)
 
       server
@@ -113,8 +117,10 @@ class NestedSetMutationInsideUpdateSpec extends FlatSpec with Matchers with ApiS
   }
 
   "a PM to CM  relation with the children already in a relation" should "be setable through a nested mutation by unique" in {
-    schemaPMToCM.test { dataModel =>
-      val project = SchemaDsl.fromStringV11() { dataModel }
+    schemaWithRelation(onParent = ChildList, onChild = ParentList).test { t =>
+      val project = SchemaDsl.fromStringV11() {
+        t.datamodel
+      }
       database.setup(project)
 
       server.query(
@@ -175,8 +181,10 @@ class NestedSetMutationInsideUpdateSpec extends FlatSpec with Matchers with ApiS
   }
 
   "a PM to CM  relation with the child not already in a relation" should "be setable through a nested mutation by unique" in {
-    schemaPMToCM.test { dataModel =>
-      val project = SchemaDsl.fromStringV11() { dataModel }
+    schemaWithRelation(onParent = ChildList, onChild = ParentList).test { t =>
+      val project = SchemaDsl.fromStringV11() {
+        t.datamodel
+      }
       database.setup(project)
 
       server.query(
@@ -222,8 +230,10 @@ class NestedSetMutationInsideUpdateSpec extends FlatSpec with Matchers with ApiS
   }
 
   "a PM to CM  relation with the children already in a relation" should "be setable to empty" in {
-    schemaPMToCM.test { dataModel =>
-      val project = SchemaDsl.fromStringV11() { dataModel }
+    schemaWithRelation(onParent = ChildList, onChild = ParentList).test { t =>
+      val project = SchemaDsl.fromStringV11() {
+        t.datamodel
+      }
       database.setup(project)
 
       server.query(
