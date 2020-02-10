@@ -106,13 +106,15 @@ trait SchemaBaseV11 extends PlayJsonExtensions {
 
     val simple = true
 
-    val datamodelsWithParams = for (parentId <- if (simple) Vector(simpleId) else idOptions;
-                                    childId <- if (simple) Vector(simpleId) else idOptions;
+    val datamodelsWithParams = for (parentId <- if (simple) Vector(simpleId, noId) else idOptions;
+                                    childId <- if (simple) Vector(simpleId, noId) else idOptions;
                                     //based on Id and relation fields
                                     childReferences <- if (simple) {
                                                         parentId match {
                                                           case _ if onChild.isList && !onParent.isList => Vector(noRef)
-                                                          case _                                       => Vector(idReference)
+                                                          case `simpleId`                              => Vector(idReference)
+                                                          case `noId`                                  => Vector(pReference)
+                                                          case _                                       => ???
                                                         }
                                                       } else
                                                         parentId match {
@@ -122,9 +124,11 @@ trait SchemaBaseV11 extends PlayJsonExtensions {
                                                           case _                                       => commonParentReferences
                                                         };
                                     parentReferences <- if (simple) {
-                                                         parentId match {
-                                                           case _ if onChild.isList && !onParent.isList => Vector(idReference)
-                                                           case _                                       => Vector(noRef)
+                                                         childId match {
+                                                           case _ if childReferences != noRef => Vector(noRef)
+                                                           case `simpleId`                    => Vector(idReference)
+                                                           case `noId`                        => Vector(cReference)
+                                                           case _                             => ???
                                                          }
                                                        } else
                                                          (childId, childReferences) match {
@@ -143,20 +147,16 @@ trait SchemaBaseV11 extends PlayJsonExtensions {
                                                            case (_, _)                                           => Vector.empty
                                                          };
                                     //only based on id
-                                    parentParams <- if (simple) parentUniqueParams :+ idParams
-                                                   else
-                                                     parentId match {
-                                                       case `simpleId`   => parentUniqueParams :+ idParams
-                                                       case `compoundId` => parentUniqueParams :+ compoundIdParams
-                                                       case `noId`       => parentUniqueParams
-                                                     };
-                                    childParams <- if (simple) childUniqueParams :+ idParams
-                                                  else
-                                                    childId match {
-                                                      case `simpleId`   => childUniqueParams :+ idParams
-                                                      case `compoundId` => childUniqueParams :+ compoundIdParams
-                                                      case `noId`       => parentUniqueParams
-                                                    })
+                                    parentParams <- parentId match {
+                                                     case `simpleId`   => parentUniqueParams :+ idParams
+                                                     case `compoundId` => parentUniqueParams :+ compoundIdParams
+                                                     case `noId`       => parentUniqueParams
+                                                   };
+                                    childParams <- childId match {
+                                                    case `simpleId`   => childUniqueParams :+ idParams
+                                                    case `compoundId` => childUniqueParams :+ compoundIdParams
+                                                    case `noId`       => parentUniqueParams
+                                                  })
       yield {
         val datamodel =
           s"""
