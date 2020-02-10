@@ -105,14 +105,13 @@ pub fn connect_nested_update_many(
     value: ParsedInputValue,
     child_model: &ModelRef,
 ) -> QueryGraphBuilderResult<()> {
-    let child_model_identifier = parent_relation_field.related_model().primary_identifier();
-
     for value in utils::coerce_vec(value) {
         let mut map: ParsedInputMap = value.try_into()?;
         let where_arg = map.remove("where").unwrap();
         let data_value = map.remove("data").unwrap();
         let data_map: ParsedInputMap = data_value.try_into()?;
         let where_map: ParsedInputMap = where_arg.try_into()?;
+        let child_model_identifier = parent_relation_field.related_model().primary_identifier();
 
         let filter = extract_filter(where_map, child_model, true)?;
         let update_args = WriteArgsParser::from(&child_model, data_map)?;
@@ -128,7 +127,7 @@ pub fn connect_nested_update_many(
         });
 
         let update_many_node = graph.create_node(Query::Write(update_many));
-        let id_field = child_model.fields().find_singular_id().unwrap().upgrade().unwrap();
+        // let id_field = child_model.fields().find_singular_id().unwrap().upgrade().unwrap();
 
         graph.create_edge(
             &find_child_records_node,
@@ -137,11 +136,15 @@ pub fn connect_nested_update_many(
                 child_model_identifier.clone(),
                 Box::new(move |mut node, parent_ids| {
                     if let Node::Query(Query::Write(WriteQuery::UpdateManyRecords(ref mut ur))) = node {
-                        let as_prisma_values = parent_ids.iter().map(|x| x.single_value()).collect();
-                        let ids_filter = id_field.data_source_field().is_in(as_prisma_values);
-                        let new_filter = Filter::and(vec![ur.filter.clone(), ids_filter]);
+                        // let as_prisma_values = parent_ids.iter().map(|x| x.single_value()).collect();
+                        // let ids_filter = id_field.data_source_field().is_in(as_prisma_values);
+                        // let new_filter = Filter::and(vec![ur.filter.clone(), ids_filter]);
 
-                        ur.filter = new_filter;
+                        for parent_id in parent_ids {
+                            let assimilated = child_model_identifier.assimilate(parent_id)?;
+                            // [DTODO] Needs to be: [AND (Existing OR ((PID1 Cond) (PID2 Cond) (PID3 Cond))]
+                            ur.add_filter(assimilated.filter());
+                        }
                     }
 
                     Ok(node)
