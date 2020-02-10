@@ -37,8 +37,8 @@ async fn foreign_keys_to_indexes_being_renamed_must_work(api: &TestApi) -> TestR
         .value("name", "steve");
 
     let db = api.database();
-    db.execute(insert_user.into()).await?;
-    db.execute(insert_post.into()).await?;
+    db.query(insert_user.into()).await?;
+    db.query(insert_post.into()).await?;
 
     let dm2 = r#"
         model User {

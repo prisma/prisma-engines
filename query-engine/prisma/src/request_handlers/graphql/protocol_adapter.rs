@@ -41,7 +41,7 @@ impl GraphQLProtocolAdapter {
                 .map(|r| r.into_iter().flatten().collect::<Vec<Operation>>()),
         }?;
 
-        Ok(QueryDocument { operations })
+        Ok(QueryDocument { operations }.dedup_operations())
     }
 
     fn convert_definition(def: Definition) -> PrismaResult<Vec<Operation>> {

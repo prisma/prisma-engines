@@ -3,8 +3,8 @@ use crate::{
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
     QueryGraphBuilderError, QueryGraphBuilderResult,
 };
-use prisma_models::{PrismaValueExtensions, RelationFieldRef};
-use std::{convert::TryInto, sync::Arc};
+use prisma_models::RelationFieldRef;
+use std::sync::Arc;
 
 /// Only for many to many relations.
 ///
@@ -38,15 +38,17 @@ pub fn connect_records_node(
     graph: &mut QueryGraph,
     parent_node: &NodeRef,
     child_node: &NodeRef,
-    relation_field: &RelationFieldRef,
+    parent_relation_field: &RelationFieldRef,
     expected_connects: usize,
 ) -> QueryGraphBuilderResult<NodeRef> {
-    assert!(relation_field.relation().is_many_to_many());
+    assert!(parent_relation_field.relation().is_many_to_many());
+    let parent_model_id = parent_relation_field.model().primary_identifier();
+    let child_model_id = parent_relation_field.related_model().primary_identifier();
 
     let connect = WriteQuery::ConnectRecords(ConnectRecords {
         parent_id: None,
         child_ids: vec![],
-        relation_field: Arc::clone(relation_field),
+        relation_field: Arc::clone(parent_relation_field),
     });
 
     let connect_node = graph.create_node(Query::Write(connect));
@@ -55,44 +57,50 @@ pub fn connect_records_node(
     graph.create_edge(
         parent_node,
         &connect_node,
-        QueryGraphDependency::ParentIds(Box::new(|mut child_node, mut parent_ids| {
-            let len = parent_ids.len();
+        QueryGraphDependency::ParentIds(
+            parent_model_id,
+            Box::new(|mut child_node, mut parent_ids| {
+                let len = parent_ids.len();
 
-            if len == 0 {
-                return Err(QueryGraphBuilderError::AssertionError(format!(
-                    "Required exactly one parent ID to be present for connect query, found 0."
-                )));
-            }
+                if len == 0 {
+                    return Err(QueryGraphBuilderError::AssertionError(format!(
+                        "Required exactly one parent ID to be present for connect query, found 0."
+                    )));
+                }
 
-            if let Node::Query(Query::Write(WriteQuery::ConnectRecords(ref mut c))) = child_node {
-                let parent_id = parent_ids.pop().unwrap();
-                c.parent_id = Some(parent_id.into_graphql_id()?);
-            }
+                if let Node::Query(Query::Write(WriteQuery::ConnectRecords(ref mut c))) = child_node {
+                    let parent_id = parent_ids.pop().unwrap();
+                    c.parent_id = Some(parent_id);
+                }
 
-            Ok(child_node)
-        })),
+                Ok(child_node)
+            }),
+        ),
     )?;
 
     // Edge from child to connect.
     graph.create_edge(
         &child_node,
         &connect_node,
-        QueryGraphDependency::ParentIds(Box::new(move |mut child_node, parent_ids| {
-            let len = parent_ids.len();
+        QueryGraphDependency::ParentIds(
+            child_model_id,
+            Box::new(move |mut child_node, parent_ids| {
+                let len = parent_ids.len();
 
-            if len != expected_connects {
-                return Err(QueryGraphBuilderError::RecordNotFound(format!(
-                    "Expected {} records to be connected, found {}.",
-                    expected_connects, len,
-                )));
-            }
+                if len != expected_connects {
+                    return Err(QueryGraphBuilderError::RecordNotFound(format!(
+                        "Expected {} records to be connected, found only {}.",
+                        expected_connects, len,
+                    )));
+                }
 
-            if let Node::Query(Query::Write(WriteQuery::ConnectRecords(ref mut c))) = child_node {
-                c.child_ids = parent_ids.into_iter().map(|id| id.try_into().unwrap()).collect();
-            }
+                if let Node::Query(Query::Write(WriteQuery::ConnectRecords(ref mut c))) = child_node {
+                    c.child_ids = parent_ids;
+                }
 
-            Ok(child_node)
-        })),
+                Ok(child_node)
+            }),
+        ),
     )?;
 
     Ok(connect_node)

@@ -107,12 +107,8 @@ fn db_names_work() {
 
     let model = datamodel.assert_model("Test");
     let field = model.assert_scalar_field("field");
-    assert_eq!(
-        field.manifestation,
-        Some(FieldManifestation {
-            db_name: "my_column".to_string()
-        })
-    )
+
+    assert_eq!(field.data_source_field().name, "my_column".to_owned(),)
 }
 
 #[test]
@@ -514,9 +510,8 @@ impl ScalarFieldAssertions for ScalarField {
 }
 
 impl FieldAssertions for RelationField {
-    fn assert_type_identifier(&self, ti: TypeIdentifier) -> &Self {
-        assert_eq!(self.type_identifier, ti);
-        self
+    fn assert_type_identifier(&self, _ti: TypeIdentifier) -> &Self {
+        panic!("Can't assert type identifier of relation.")
     }
 
     fn assert_optional(&self) -> &Self {

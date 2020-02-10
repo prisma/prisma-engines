@@ -23,3 +23,6 @@ members = [
   "libs/prisma-models",
   "libs/prisma-value",
 ]
+
+[patch.crates-io]
+quaint = { git = "https://github.com/prisma/quaint.git", branch = "master", features = ["full", "tracing-log"] }

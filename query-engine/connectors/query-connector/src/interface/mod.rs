@@ -45,7 +45,7 @@ pub trait ReadOperations {
     fn get_related_records<'a>(
         &'a self,
         from_field: &'a RelationFieldRef,
-        from_record_ids: &'a [GraphqlId],
+        from_record_ids: &'a [RecordIdentifier],
         query_arguments: QueryArguments,
         selected_fields: &'a SelectedFields,
     ) -> crate::IO<'a, ManyRecords>;
@@ -55,9 +55,14 @@ pub trait ReadOperations {
 }
 
 pub trait WriteOperations {
-    fn create_record<'a>(&'a self, model: &'a ModelRef, args: WriteArgs) -> crate::IO<GraphqlId>;
+    fn create_record<'a>(&'a self, model: &'a ModelRef, args: WriteArgs) -> crate::IO<RecordIdentifier>;
 
-    fn update_records<'a>(&'a self, model: &'a ModelRef, where_: Filter, args: WriteArgs) -> crate::IO<Vec<GraphqlId>>;
+    fn update_records<'a>(
+        &'a self,
+        model: &'a ModelRef,
+        where_: Filter,
+        args: WriteArgs,
+    ) -> crate::IO<Vec<RecordIdentifier>>;
 
     fn delete_records<'a>(&'a self, model: &'a ModelRef, where_: Filter) -> crate::IO<usize>;
 
@@ -66,15 +71,15 @@ pub trait WriteOperations {
     fn connect<'a>(
         &'a self,
         field: &'a RelationFieldRef,
-        parent_id: &'a GraphqlId,
-        child_ids: &'a [GraphqlId],
+        parent_id: &'a RecordIdentifier,
+        child_ids: &'a [RecordIdentifier],
     ) -> crate::IO<()>;
 
     fn disconnect<'a>(
         &'a self,
         field: &'a RelationFieldRef,
-        parent_id: &'a GraphqlId,
-        child_ids: &'a [GraphqlId],
+        parent_id: &'a RecordIdentifier,
+        child_ids: &'a [RecordIdentifier],
     ) -> crate::IO<()>;
 
     fn execute_raw<'a>(&'a self, query: String, parameters: Vec<PrismaValue>) -> crate::IO<serde_json::Value>;

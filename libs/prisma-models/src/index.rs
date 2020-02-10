@@ -11,19 +11,7 @@ pub struct IndexTemplate {
 impl IndexTemplate {
     pub fn build(self, fields: &[ScalarFieldRef]) -> Index {
         let fields = match self.typ {
-            IndexType::Unique => self
-                .fields
-                .into_iter()
-                .map(|name| {
-                    let field = fields
-                        .iter()
-                        .find(|sf| sf.name == name)
-                        .expect(&format!("Unable to resolve scalar field '{}'", name));
-
-                    Arc::downgrade(field)
-                })
-                .collect(),
-
+            IndexType::Unique => Self::map_fields(self.fields, fields),
             IndexType::Normal => vec![],
         };
 
@@ -32,6 +20,20 @@ impl IndexTemplate {
             typ: self.typ,
             fields,
         }
+    }
+
+    fn map_fields(field_names: Vec<String>, fields: &[ScalarFieldRef]) -> Vec<ScalarFieldWeak> {
+        field_names
+            .into_iter()
+            .map(|name| {
+                let field = fields
+                    .iter()
+                    .find(|sf| sf.name == name)
+                    .expect(&format!("Unable to resolve scalar field '{}'", name));
+
+                Arc::downgrade(field)
+            })
+            .collect()
     }
 }
 

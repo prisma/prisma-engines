@@ -1,16 +1,16 @@
 use super::*;
-use crate::ordering::Ordering;
-use prisma_models::prelude::*;
-use quaint::ast::{row_number, Aliasable, Comparable, Conjuctive, Function, Select, Table};
 
 pub struct ManyRelatedRecordsWithRowNumber;
 
+use crate::{ordering::Ordering, query_builder};
+use prisma_models::{sql_ext::AsColumn, SelectedFields};
+use quaint::ast::*;
+
 impl ManyRelatedRecordsQueryBuilder for ManyRelatedRecordsWithRowNumber {
     fn with_pagination(base: ManyRelatedRecordsBaseQuery) -> Query {
-        let conditions = base
-            .from_field
-            .relation_column(true)
-            .in_selection(base.from_record_ids.to_owned())
+        let columns: Vec<_> = base.from_field.relation_columns(true).collect();
+
+        let conditions = query_builder::conditions(&columns, base.from_record_ids)
             .and(base.condition)
             .and(base.cursor);
 
@@ -45,5 +45,9 @@ impl ManyRelatedRecordsQueryBuilder for ManyRelatedRecordsWithRowNumber {
             .value(Table::from(Self::ROW_NUMBER_TABLE_ALIAS).asterisk())
             .so_that(Self::ROW_NUMBER_ALIAS.between(base.window_limits.0 as i64, base.window_limits.1 as i64))
             .into()
+    }
+
+    fn uses_row_number() -> bool {
+        true
     }
 }

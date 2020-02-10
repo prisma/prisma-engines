@@ -56,6 +56,7 @@ fn a_data_model_can_be_generated_from_a_schema() {
                         documentation: None,
                         is_generated: false,
                         is_updated_at: false,
+                        data_source_fields: vec![],
                     }
                 })
                 .collect(),
@@ -114,6 +115,7 @@ fn arity_is_preserved_when_generating_data_model_from_a_schema() {
                     documentation: None,
                     is_generated: false,
                     is_updated_at: false,
+                    data_source_fields: vec![],
                 },
                 Field {
                     name: "required".to_string(),
@@ -126,6 +128,7 @@ fn arity_is_preserved_when_generating_data_model_from_a_schema() {
                     documentation: None,
                     is_generated: false,
                     is_updated_at: false,
+                    data_source_fields: vec![],
                 },
                 Field {
                     name: "list".to_string(),
@@ -138,6 +141,7 @@ fn arity_is_preserved_when_generating_data_model_from_a_schema() {
                     documentation: None,
                     is_generated: false,
                     is_updated_at: false,
+                    data_source_fields: vec![],
                 },
             ],
             is_generated: false,
@@ -217,6 +221,7 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
                     documentation: None,
                     is_generated: false,
                     is_updated_at: false,
+                    data_source_fields: vec![],
                 },
                 Field {
                     name: "int_default".to_string(),
@@ -229,6 +234,7 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
                     documentation: None,
                     is_generated: false,
                     is_updated_at: false,
+                    data_source_fields: vec![],
                 },
                 Field {
                     name: "bool_default".to_string(),
@@ -241,6 +247,7 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
                     documentation: None,
                     is_generated: false,
                     is_updated_at: false,
+                    data_source_fields: vec![],
                 },
                 Field {
                     name: "float_default".to_string(),
@@ -253,6 +260,7 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
                     documentation: None,
                     is_generated: false,
                     is_updated_at: false,
+                    data_source_fields: vec![],
                 },
                 Field {
                     name: "string_default".to_string(),
@@ -265,6 +273,7 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
                     documentation: None,
                     is_generated: false,
                     is_updated_at: false,
+                    data_source_fields: vec![],
                 },
             ],
             is_generated: false,
@@ -362,6 +371,7 @@ fn primary_key_is_preserved_when_generating_data_model_from_a_schema() {
                     documentation: None,
                     is_generated: false,
                     is_updated_at: false,
+                    data_source_fields: vec![],
                 }],
                 is_generated: false,
                 indices: vec![],
@@ -384,6 +394,7 @@ fn primary_key_is_preserved_when_generating_data_model_from_a_schema() {
                     documentation: None,
                     is_generated: false,
                     is_updated_at: false,
+                    data_source_fields: vec![],
                 }],
                 is_generated: false,
                 indices: vec![],
@@ -406,6 +417,7 @@ fn primary_key_is_preserved_when_generating_data_model_from_a_schema() {
                     documentation: None,
                     is_generated: false,
                     is_updated_at: false,
+                    data_source_fields: vec![],
                 }],
                 is_generated: false,
                 indices: vec![],
@@ -507,6 +519,7 @@ fn uniqueness_is_preserved_when_generating_data_model_from_a_schema() {
                     documentation: None,
                     is_generated: false,
                     is_updated_at: false,
+                    data_source_fields: vec![],
                 },
                 Field {
                     name: "unique".to_string(),
@@ -519,6 +532,7 @@ fn uniqueness_is_preserved_when_generating_data_model_from_a_schema() {
                     documentation: None,
                     is_generated: false,
                     is_updated_at: false,
+                    data_source_fields: vec![],
                 },
             ],
             is_generated: false,
@@ -591,6 +605,7 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
                         documentation: None,
                         is_generated: false,
                         is_updated_at: false,
+                        data_source_fields: vec![],
                     },
                     Field {
                         name: "name".to_string(),
@@ -603,6 +618,7 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
                         documentation: None,
                         is_generated: false,
                         is_updated_at: false,
+                        data_source_fields: vec![],
                     },
                 ],
                 is_generated: false,
@@ -626,6 +642,7 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
                         documentation: None,
                         is_generated: false,
                         is_updated_at: false,
+                        data_source_fields: vec![],
                     },
                     Field {
                         name: "city-id".to_string(),
@@ -643,6 +660,7 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
                         documentation: None,
                         is_generated: false,
                         is_updated_at: false,
+                        data_source_fields: vec![],
                     },
                     Field {
                         name: "city-name".to_string(),
@@ -660,6 +678,7 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
                         documentation: None,
                         is_generated: false,
                         is_updated_at: false,
+                        data_source_fields: vec![],
                     },
                 ],
                 is_generated: false,
@@ -777,6 +796,7 @@ fn multi_field_uniques_are_preserved_when_generating_data_model_from_a_schema() 
                     documentation: None,
                     is_generated: false,
                     is_updated_at: false,
+                    data_source_fields: vec![],
                 },
                 Field {
                     name: "name".to_string(),
@@ -789,6 +809,7 @@ fn multi_field_uniques_are_preserved_when_generating_data_model_from_a_schema() 
                     documentation: None,
                     is_generated: false,
                     is_updated_at: false,
+                    data_source_fields: vec![],
                 },
                 Field {
                     name: "lastname".to_string(),
@@ -801,6 +822,7 @@ fn multi_field_uniques_are_preserved_when_generating_data_model_from_a_schema() 
                     documentation: None,
                     is_generated: false,
                     is_updated_at: false,
+                    data_source_fields: vec![],
                 },
             ],
             is_generated: false,
@@ -889,6 +911,7 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                         documentation: None,
                         is_generated: false,
                         is_updated_at: false,
+                        data_source_fields: vec![],
                     },
                     Field {
                         name: "name".to_string(),
@@ -901,6 +924,7 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                         documentation: None,
                         is_generated: false,
                         is_updated_at: false,
+                        data_source_fields: vec![],
                     },
                     Field {
                         name: "users".to_string(),
@@ -918,6 +942,7 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                         documentation: None,
                         is_generated: false,
                         is_updated_at: false,
+                        data_source_fields: vec![],
                     },
                 ],
                 is_generated: false,
@@ -941,6 +966,7 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                         documentation: None,
                         is_generated: false,
                         is_updated_at: false,
+                        data_source_fields: vec![],
                     },
                     Field {
                         name: "city_id".to_string(),
@@ -958,6 +984,7 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                         documentation: None,
                         is_generated: false,
                         is_updated_at: false,
+                        data_source_fields: vec![],
                     },
                 ],
                 is_generated: false,

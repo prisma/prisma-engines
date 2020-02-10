@@ -27,21 +27,27 @@ pub enum ComputationResult {
 /// `right` contains all elements that are in B but not in A.
 #[derive(Debug, Clone)]
 pub struct DiffResult {
-    pub left: Vec<GraphqlId>,
-    pub right: Vec<GraphqlId>,
+    pub left: Vec<RecordIdentifier>,
+    pub right: Vec<RecordIdentifier>,
 }
 
 impl ExpressionResult {
-    /// Attempts to transform the result into a vector of IDs (as PrismaValue).
-    pub fn as_ids(&self) -> InterpretationResult<Vec<PrismaValue>> {
+    /// Attempts to transform the result into a vector of record identifiers.
+    pub fn as_ids(&self, model_id: &ModelIdentifier) -> InterpretationResult<Vec<RecordIdentifier>> {
         let converted = match self {
             Self::Query(ref result) => match result {
-                QueryResult::Id(id) => Some(id.clone().map(|id| vec![id.into()]).unwrap_or_else(|| vec![])),
+                QueryResult::Id(id) => match id {
+                    Some(id)=> Some(vec![id.clone()]),
+                    // FIXME: AUMFIDARR
+//                    Some(id) if model_id.matches(id) => Some(vec![id.clone()]),
+//                    Some(_) => None,
+                    None => Some(vec![]),
+                },
 
                 // We always select IDs, the unwraps are safe.
                 QueryResult::RecordSelection(rs) => Some(
                     rs.scalars
-                        .collect_ids(rs.id_field.as_str())
+                        .identifiers(model_id)
                         .unwrap()
                         .into_iter()
                         .map(|val| val.into())
@@ -192,7 +198,7 @@ where
                         Query::Read(read) => {
                             self.log_line(level, || format!("READ {}", read));
 
-                            Ok(read::execute(&self.conn, read, &[])
+                            Ok(read::execute(&self.conn, read, None)
                                 .await
                                 .map(|res| ExpressionResult::Query(res))?)
                         }

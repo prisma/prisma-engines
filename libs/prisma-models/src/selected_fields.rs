@@ -1,14 +1,33 @@
-use crate::{ModelRef, RelationFieldRef, ScalarFieldRef, TypeIdentifier};
+use crate::{Field, ModelIdentifier, ModelRef, RelationFieldRef, ScalarFieldRef, TypeIdentifier};
 use datamodel::FieldArity;
+use itertools::Itertools;
 
 pub trait IntoSelectedFields {
     fn into_selected_fields(self, model: ModelRef) -> SelectedFields;
 }
 
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Default, Clone, PartialEq, Hash, Eq)]
 pub struct SelectedFields {
     pub scalar: Vec<SelectedScalarField>,
     pub relation: Vec<SelectedRelationField>,
+}
+impl SelectedFields {
+    pub fn only_scalar_and_inlined(&self) -> SelectedFields {
+        SelectedFields {
+            scalar: self.scalar.clone(),
+            relation: self
+                .relation
+                .iter()
+                .filter_map(|x| {
+                    if x.field.is_inlined_on_enclosing_model() {
+                        Some(SelectedRelationField { field: x.field.clone() })
+                    } else {
+                        None
+                    }
+                })
+                .collect(),
+        }
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -17,20 +36,34 @@ pub enum SelectedField {
     Relation(SelectedRelationField),
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Hash, Eq)]
 pub struct SelectedScalarField {
     pub field: ScalarFieldRef,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Hash, Eq)]
 pub struct SelectedRelationField {
     pub field: RelationFieldRef,
-    pub selected_fields: SelectedFields,
+}
+
+impl From<Field> for SelectedField {
+    fn from(field: Field) -> SelectedField {
+        match field {
+            Field::Scalar(sf) => sf.into(),
+            Field::Relation(rf) => rf.into(),
+        }
+    }
+}
+
+impl From<RelationFieldRef> for SelectedField {
+    fn from(field: RelationFieldRef) -> SelectedField {
+        SelectedField::Relation(SelectedRelationField { field })
+    }
 }
 
 impl From<ScalarFieldRef> for SelectedField {
-    fn from(sf: ScalarFieldRef) -> SelectedField {
-        SelectedField::Scalar(SelectedScalarField { field: sf })
+    fn from(field: ScalarFieldRef) -> SelectedField {
+        SelectedField::Scalar(SelectedScalarField { field })
     }
 }
 
@@ -44,6 +77,27 @@ impl From<Vec<ScalarFieldRef>> for SelectedFields {
     fn from(sfs: Vec<ScalarFieldRef>) -> SelectedFields {
         let fields = sfs.into_iter().map(SelectedField::from).collect();
 
+        SelectedFields::new(fields)
+    }
+}
+
+impl From<Vec<Field>> for SelectedFields {
+    fn from(fields: Vec<Field>) -> SelectedFields {
+        let fields = fields
+            .into_iter()
+            .map(|f| match f {
+                Field::Scalar(sf) => SelectedField::from(sf),
+                Field::Relation(rf) => SelectedField::from(rf),
+            })
+            .collect();
+
+        SelectedFields::new(fields)
+    }
+}
+
+impl From<ModelIdentifier> for SelectedFields {
+    fn from(id: ModelIdentifier) -> SelectedFields {
+        let fields = id.into_iter().map(SelectedField::from).collect();
         SelectedFields::new(fields)
     }
 }
@@ -73,24 +127,40 @@ impl SelectedFields {
         SelectedFields { scalar, relation }
     }
 
-    pub fn id(model: ModelRef) -> Self {
-        Self::from(model.fields().id())
+    pub fn add(&mut self, field: Field) {
+        match field {
+            Field::Scalar(sf) => self.add_scalar(sf),
+            Field::Relation(rf) => self.add_relation(rf),
+        }
     }
 
     pub fn add_scalar(&mut self, field: ScalarFieldRef) {
         self.scalar.push(SelectedScalarField { field });
     }
 
+    pub fn add_relation(&mut self, field: RelationFieldRef) {
+        self.relation.push(SelectedRelationField { field });
+    }
+
     pub fn names(&self) -> impl Iterator<Item = &str> {
         let scalar = self.scalar_fields().map(|f| f.name.as_str());
-        let relation = self.relation_inlined().map(|f| f.name.as_str());
+        let relation = self.relation_fields().map(|f| f.name.as_str());
+
+        scalar.chain(relation)
+    }
+
+    pub fn db_names(&self) -> impl Iterator<Item = &str> {
+        let scalar = self.scalar_fields().map(|f| f.data_source_field().name.as_str());
+        let relation = self
+            .relation_fields()
+            .flat_map(|f| f.data_source_fields().into_iter().map(|dsf| dsf.name.as_str()));
 
         scalar.chain(relation)
     }
 
     pub fn types<'a>(&'a self) -> impl Iterator<Item = (TypeIdentifier, FieldArity)> + 'a {
         let scalar = self.scalar_fields().map(|sf| sf.type_identifier_with_arity());
-        let relation = self.relation_inlined().map(|rf| rf.type_identifier_with_arity());
+        let relation = self.relation_fields().flat_map(|rf| rf.type_identifiers_with_arities());
 
         scalar.chain(relation)
     }
@@ -103,22 +173,35 @@ impl SelectedFields {
             .expect("Expected at least one field to be present.")
     }
 
-    pub(super) fn relation_inlined(&self) -> impl Iterator<Item = &RelationFieldRef> {
-        self.relation.iter().map(|rf| &rf.field).filter(|rf| {
-            let relation = rf.relation();
-            let is_inline = relation.is_inline_relation();
-            let is_self = relation.is_self_relation();
-
-            let is_intable = relation
-                .inline_manifestation()
-                .map(|mf| mf.in_table_of_model_name == rf.model().name)
-                .unwrap_or(false);
-
-            (is_inline && is_self && rf.relation_side.is_b()) || (is_inline && !is_self && is_intable)
-        })
-    }
-
     pub(super) fn scalar_fields(&self) -> impl Iterator<Item = &ScalarFieldRef> {
         self.scalar.iter().map(|sf| &sf.field)
+    }
+
+    pub(super) fn relation_fields(&self) -> impl Iterator<Item = &RelationFieldRef> {
+        self.relation.iter().map(|rf| &rf.field)
+    }
+
+    pub fn contains(&self, name: &str) -> bool {
+        self.names().find(|fname| fname == &name).is_some()
+    }
+
+    pub fn contains_all_db_names<'a>(&self, names: impl Iterator<Item = String>) -> bool {
+        let mut db_names: Vec<_> = self.db_names().collect();
+        let mut names: Vec<_> = names.collect();
+
+        if names.len() > db_names.len() {
+            false
+        } else {
+            db_names.sort();
+            names.sort();
+
+            db_names.into_iter().zip(names).all(|(a, b)| a == b)
+        }
+    }
+
+    pub fn deduplicate(mut self) -> Self {
+        self.scalar = self.scalar.into_iter().unique().collect();
+        self.relation = self.relation.into_iter().unique().collect();
+        self
     }
 }

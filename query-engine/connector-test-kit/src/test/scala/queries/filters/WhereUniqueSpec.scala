@@ -12,20 +12,24 @@ class WhereUniqueSpec extends FlatSpec with Matchers with ApiSpecBase {
                                                    |  email  String @unique
                                                    |}""" }
 
-  database.setup(project)
+  override protected def beforeAll(): Unit = {
+    super.beforeAll()
 
-  server
-    .query(
-      s"""mutation{createUser(
-         |  data: {
-         |    unique:2,
-         |    email: "test@test.com"
-         |})
-         |{id}
-         |}
-      """,
-      project
-    )
+    database.setup(project)
+
+    server
+      .query(
+        s"""mutation{createUser(
+           |  data: {
+           |    unique:2,
+           |    email: "test@test.com"
+           |})
+           |{id}
+           |}
+        """,
+        project
+      )
+  }
 
   // We cannot express that we expect exactly one field in the WhereUniqueInput in GraphQL, we therefore will error at runtime
   // and hint at the correct way to use the api

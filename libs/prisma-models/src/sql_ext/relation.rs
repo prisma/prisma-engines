@@ -1,44 +1,73 @@
-use crate::{AsColumn, AsTable, InlineRelation, Relation, RelationField, RelationLinkManifestation, RelationSide};
+use crate::{
+    AsColumns, AsTable, ColumnIterator, InlineRelation, Relation, RelationField, RelationLinkManifestation,
+    RelationSide,
+};
 use quaint::ast::{Column, Table};
 
 pub trait RelationExt {
-    fn column_for_relation_side(&self, side: RelationSide) -> Column<'static>;
-}
-
-trait RelationExtPrivate {
-    fn model_a_column(&self) -> Column<'static>;
-    fn model_b_column(&self) -> Column<'static>;
+    /// A helper function to decide actions based on the `Relation` type. Inline
+    /// relation will return columns for updates, a relation table gives back `None`.
+    fn inline_relation_columns(&self) -> Option<ColumnIterator>;
+    fn columns_for_relation_side(&self, side: RelationSide) -> ColumnIterator;
+    fn model_a_columns(&self) -> ColumnIterator;
+    fn model_b_columns(&self) -> ColumnIterator;
 }
 
 pub trait RelationFieldExt {
-    fn opposite_column(&self, alias: bool) -> Column<'static>;
+    fn opposite_columns(&self, alias: bool) -> ColumnIterator;
+    fn relation_columns(&self, alias: bool) -> ColumnIterator;
+
+    // legacy single column unique
     fn relation_column(&self, alias: bool) -> Column<'static>;
 }
 
-trait InlineRelationExtPrivate {
-    fn referencing_column(&self, table: Table<'static>) -> Column<'static>;
+pub trait InlineRelationExt {
+    fn referencing_columns(&self, table: Table<'static>) -> ColumnIterator;
 }
 
-impl InlineRelationExtPrivate for InlineRelation {
-    fn referencing_column(&self, table: Table<'static>) -> Column<'static> {
+impl InlineRelationExt for InlineRelation {
+    fn referencing_columns(&self, table: Table<'static>) -> ColumnIterator {
         let column = Column::from(self.referencing_column.clone());
-        column.table(table)
+        ColumnIterator::from(vec![column.table(table)])
     }
 }
 
 impl RelationFieldExt for RelationField {
-    fn opposite_column(&self, alias: bool) -> Column<'static> {
-        let col = self.relation().column_for_relation_side(self.relation_side.opposite());
+    fn opposite_columns(&self, alias: bool) -> ColumnIterator {
+        let cols = match self.relation_side {
+            RelationSide::A => self.relation().model_b_columns(),
+            RelationSide::B => self.relation().model_a_columns(),
+        };
 
         if alias && !self.relation_is_inlined_in_child() {
-            col.table(Relation::TABLE_ALIAS)
+            let count = cols.len();
+            let inner = cols.into_iter().map(|col| col.table(Relation::TABLE_ALIAS));
+
+            ColumnIterator::new(inner, count)
         } else {
-            col
+            cols
+        }
+    }
+
+    fn relation_columns(&self, alias: bool) -> ColumnIterator {
+        let cols = match self.relation_side {
+            RelationSide::A => self.relation().model_a_columns(),
+            RelationSide::B => self.relation().model_b_columns(),
+        };
+
+        if alias && !self.relation_is_inlined_in_child() {
+            let count = cols.len();
+            let inner = cols.into_iter().map(|col| col.table(Relation::TABLE_ALIAS));
+
+            ColumnIterator::new(inner, count)
+        } else {
+            cols
         }
     }
 
     fn relation_column(&self, alias: bool) -> Column<'static> {
-        let col = self.relation().column_for_relation_side(self.relation_side);
+        let mut col_iter = self.relation().columns_for_relation_side(self.relation_side);
+        let col = col_iter.next().unwrap();
 
         if alias && !self.relation_is_inlined_in_child() {
             col.table(Relation::TABLE_ALIAS)
@@ -71,46 +100,68 @@ impl AsTable for Relation {
 }
 
 impl RelationExt for Relation {
-    fn column_for_relation_side(&self, side: RelationSide) -> Column<'static> {
+    fn columns_for_relation_side(&self, side: RelationSide) -> ColumnIterator {
         match side {
-            RelationSide::A => self.model_a_column(),
-            RelationSide::B => self.model_b_column(),
+            RelationSide::A => self.model_a_columns(),
+            RelationSide::B => self.model_b_columns(),
         }
     }
-}
 
-impl RelationExtPrivate for Relation {
+    fn inline_relation_columns(&self) -> Option<ColumnIterator> {
+        if let Some(mani) = self.inline_manifestation() {
+            Some(ColumnIterator::from(vec![Column::from(
+                mani.referencing_column.clone(),
+            )
+            .table(self.as_table())]))
+        } else {
+            None
+        }
+    }
+
     #[allow(clippy::if_same_then_else)]
-    fn model_a_column(&self) -> Column<'static> {
+    fn model_a_columns(&self) -> ColumnIterator {
+        use crate::RelationLinkManifestation::*;
+
         match self.manifestation {
-            RelationLinkManifestation::RelationTable(ref m) => m.model_a_column.clone().into(),
-            RelationLinkManifestation::Inline(ref m) => {
+            RelationTable(ref m) => ColumnIterator::from(vec![m.model_a_column.clone().into()]),
+            Inline(ref m) => {
                 let model_a = self.model_a();
 
                 if self.is_self_relation() {
-                    m.referencing_column(self.as_table())
-                } else if m.in_table_of_model_name == model_a.name {
-                    model_a.fields().id().as_column()
+                    self.field_b().data_source_fields().as_columns()
+                } else if m.in_table_of_model_name == model_a.name && !self.is_self_relation() {
+                    let identifier = model_a.primary_identifier();
+                    let count = identifier.len();
+
+                    ColumnIterator::new(identifier.as_columns(), count)
                 } else {
-                    m.referencing_column(self.as_table())
+                    self.field_b().data_source_fields().as_columns()
                 }
             }
         }
     }
 
     #[allow(clippy::if_same_then_else)]
-    fn model_b_column(&self) -> Column<'static> {
+    fn model_b_columns(&self) -> ColumnIterator {
+        use crate::RelationLinkManifestation::*;
+
         match self.manifestation {
-            RelationLinkManifestation::RelationTable(ref m) => m.model_b_column.clone().into(),
-            RelationLinkManifestation::Inline(ref m) => {
+            RelationTable(ref m) => ColumnIterator::from(vec![m.model_b_column.clone().into()]),
+            Inline(ref m) => {
                 let model_b = self.model_b();
 
                 if self.is_self_relation() {
-                    model_b.fields().id().as_column()
+                    let identifier = model_b.primary_identifier();
+                    let count = identifier.len();
+
+                    ColumnIterator::new(identifier.as_columns(), count)
                 } else if m.in_table_of_model_name == model_b.name {
-                    model_b.fields().id().as_column()
+                    let identifier = model_b.primary_identifier();
+                    let count = identifier.len();
+
+                    ColumnIterator::new(identifier.as_columns(), count)
                 } else {
-                    m.referencing_column(self.as_table())
+                    self.field_a().data_source_fields().as_columns()
                 }
             }
         }

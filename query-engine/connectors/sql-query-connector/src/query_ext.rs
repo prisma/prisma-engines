@@ -9,6 +9,7 @@ use quaint::{
     connector::{self, Queryable},
     pooled::PooledConnection,
 };
+
 use serde_json::{Map, Number, Value};
 use std::{convert::TryFrom, panic::AssertUnwindSafe};
 
@@ -30,7 +31,7 @@ pub trait QueryExt: Queryable + Send + Sync {
         Ok(sql_rows)
     }
 
-    async fn raw_json<'a>(&'a self, q: RawQuery<'a>) -> Result<Value, crate::error::RawError> {
+    async fn raw_json<'a>(&'a self, q: RawQuery<'a>) -> std::result::Result<Value, crate::error::RawError> {
         if q.is_select() {
             let result_set = AssertUnwindSafe(self.query_raw(q.query(), q.parameters()))
                 .catch_unwind()
@@ -86,25 +87,36 @@ pub trait QueryExt: Queryable + Send + Sync {
         })?)
     }
 
-    /// Read the all columns as an `GraphqlId`
-    async fn filter_ids(&self, model: &ModelRef, filter: Filter) -> crate::Result<Vec<GraphqlId>> {
+    /// Read the all columns as a (primary) identifier.
+    async fn filter_ids(&self, model: &ModelRef, filter: Filter) -> crate::Result<Vec<RecordIdentifier>> {
+        let model_id = model.primary_identifier();
+        let id_cols: Vec<Column<'static>> = model_id.as_columns().collect();
+
         let select = Select::from_table(model.as_table())
-            .column(model.fields().id().as_column())
+            .columns(id_cols)
             .so_that(filter.aliased_cond(None));
 
-        self.select_ids(select).await
+        self.select_ids(select, model_id).await
     }
 
-    async fn select_ids(&self, select: Select<'_>) -> crate::Result<Vec<GraphqlId>> {
-        let mut rows = self
-            .filter(select.into(), &[(TypeIdentifier::GraphQLID, FieldArity::Required)])
-            .await?;
+    async fn select_ids(&self, select: Select<'_>, model_id: ModelIdentifier) -> crate::Result<Vec<RecordIdentifier>> {
+        let idents: Vec<_> = model_id
+            .fields()
+            .into_iter()
+            .flat_map(|f| match f {
+                Field::Scalar(sf) => vec![sf.type_identifier_with_arity()],
+                Field::Relation(rf) => rf.type_identifiers_with_arities(),
+            })
+            .collect();
+
+        let mut rows = self.filter(select.into(), &idents).await?;
         let mut result = Vec::new();
 
-        for mut row in rows.drain(0..) {
-            for value in row.values.drain(0..) {
-                result.push(value.into_graphql_id()?)
-            }
+        for row in rows.drain(0..) {
+            let tuples: Vec<_> = model_id.data_source_fields().zip(row.values.into_iter()).collect();
+            let record_id: RecordIdentifier = RecordIdentifier::new(tuples);
+
+            result.push(record_id);
         }
 
         Ok(result)

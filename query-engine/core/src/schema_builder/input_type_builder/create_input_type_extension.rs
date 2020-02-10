@@ -29,9 +29,9 @@ pub trait CreateInputTypeBuilderExtension<'a>: InputTypeBuilderBase<'a> {
             "Create",
             scalar_fields,
             |f: ScalarFieldRef| {
-                if f.is_required && f.default_value.is_none() && (f.is_created_at() || f.is_updated_at()) { //todo shouldnt these also be Default Value expressions at some point?
+                if f.is_required && f.default_value().is_none() && (f.is_created_at() || f.is_updated_at()) { //todo shouldnt these also be Default Value expressions at some point?
                     self.map_optional_input_type(f)
-                } else if f.is_required && f.default_value.is_none(){
+                } else if f.is_required && f.default_value().is_none(){
                     self.map_required_input_type(f)
                 } else {
                     self.map_optional_input_type(f)

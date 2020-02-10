@@ -108,6 +108,7 @@ pub struct PrismaOpt {
 
 #[tokio::main]
 async fn main() -> Result<(), AnyError> {
+    init_logger()?;
     let opts = PrismaOpt::from_args();
 
     match CliCommand::try_from(&opts) {
@@ -119,8 +120,6 @@ async fn main() -> Result<(), AnyError> {
             }
         }
         Err(_) => {
-            init_logger()?;
-
             let ip = opts.host.parse().expect("Host was not a valid IP address");
             let address = SocketAddr::new(ip, opts.port);
 

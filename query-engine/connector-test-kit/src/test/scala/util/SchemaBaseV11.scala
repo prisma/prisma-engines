@@ -109,16 +109,24 @@ trait SchemaBaseV11 extends PlayJsonExtensions {
     val datamodelsWithParams = for (parentId <- if (simple) Vector(simpleId) else idOptions;
                                     childId <- if (simple) Vector(simpleId) else idOptions;
                                     //based on Id and relation fields
-                                    childReferences <- if (simple) Vector(idReference)
-                                                      else
+                                    childReferences <- if (simple) {
+                                                        parentId match {
+                                                          case _ if onChild.isList && !onParent.isList => Vector(noRef)
+                                                          case _                                       => Vector(idReference)
+                                                        }
+                                                      } else
                                                         parentId match {
                                                           case _ if onChild.isList && !onParent.isList => Vector(`noRef`)
                                                           case `simpleId`                              => idReference +: commonParentReferences
                                                           case `compoundId`                            => compoundParentIdReference +: commonParentReferences
                                                           case _                                       => commonParentReferences
                                                         };
-                                    parentReferences <- if (simple) Vector(noRef)
-                                                       else
+                                    parentReferences <- if (simple) {
+                                                         parentId match {
+                                                           case _ if onChild.isList && !onParent.isList => Vector(idReference)
+                                                           case _                                       => Vector(noRef)
+                                                         }
+                                                       } else
                                                          (childId, childReferences) match {
                                                            case (_, _) if onParent.isList && !onChild.isList => Vector(`noRef`)
                                                            case (`simpleId`, `noRef`)                        => idReference +: commonChildReferences

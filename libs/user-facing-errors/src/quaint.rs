@@ -4,7 +4,7 @@ use quaint::{error::ErrorKind, prelude::ConnectionInfo};
 impl From<&quaint::error::DatabaseConstraint> for crate::query_engine::DatabaseConstraint {
     fn from(other: &quaint::error::DatabaseConstraint) -> Self {
         match other {
-            quaint::error::DatabaseConstraint::Fields(fields) => Self::Field(fields.to_vec().join(",")),
+            quaint::error::DatabaseConstraint::Fields(fields) => Self::Fields(fields.to_vec()),
             quaint::error::DatabaseConstraint::Index(index) => Self::Index(index.to_string()),
         }
     }
@@ -13,7 +13,7 @@ impl From<&quaint::error::DatabaseConstraint> for crate::query_engine::DatabaseC
 impl From<quaint::error::DatabaseConstraint> for crate::query_engine::DatabaseConstraint {
     fn from(other: quaint::error::DatabaseConstraint) -> Self {
         match other {
-            quaint::error::DatabaseConstraint::Fields(fields) => Self::Field(fields.to_vec().join(",")),
+            quaint::error::DatabaseConstraint::Fields(fields) => Self::Fields(fields.to_vec()),
             quaint::error::DatabaseConstraint::Index(index) => Self::Index(index.to_string()),
         }
     }

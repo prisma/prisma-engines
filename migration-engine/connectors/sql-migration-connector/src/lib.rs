@@ -160,12 +160,12 @@ impl SqlMigrationConnector {
                 }
                 ConnectionInfo::Sqlite { file_path, .. } => {
                     self.conn()
-                        .execute_raw("DETACH DATABASE ?", &[ParameterizedValue::from(self.schema_name())])
+                        .query_raw("DETACH DATABASE ?", &[ParameterizedValue::from(self.schema_name())])
                         .await
                         .ok();
                     std::fs::remove_file(file_path).ok(); // ignore potential errors
                     self.conn()
-                        .execute_raw(
+                        .query_raw(
                             "ATTACH DATABASE ? AS ?",
                             &[
                                 ParameterizedValue::from(file_path.as_str()),

@@ -1,15 +1,68 @@
-use super::{GraphqlId, PrismaValue};
-use crate::{DomainError, DomainResult};
+use super::{PrismaValue, TypeIdentifier};
+use crate::DomainError;
+use rust_decimal::prelude::ToPrimitive;
 
-use std::convert::TryFrom;
+// use std::convert::TryFrom;
 
 pub trait PrismaValueExtensions {
-    fn into_graphql_id(self) -> DomainResult<GraphqlId>;
+    fn coerce(self, to_type: TypeIdentifier) -> crate::Result<PrismaValue>;
 }
 
 impl PrismaValueExtensions for PrismaValue {
-    fn into_graphql_id(self) -> Result<GraphqlId, DomainError> {
-        let as_graphql_id = GraphqlId::try_from(self)?;
-        Ok(as_graphql_id)
+    // Todo this is not exhaustive for now.
+    fn coerce(self, to_type: TypeIdentifier) -> crate::Result<PrismaValue> {
+        let coerced = match (self, to_type) {
+            // Trivial cases
+            (PrismaValue::GraphqlId(_), _) => unreachable!("Do not use GraphqlId anymore."),
+            (val @ PrismaValue::Null, _) => val,
+            (val @ PrismaValue::String(_), TypeIdentifier::String) => val,
+            (val @ PrismaValue::Int(_), TypeIdentifier::Int) => val,
+            (val @ PrismaValue::Float(_), TypeIdentifier::Float) => val,
+            (val @ PrismaValue::Boolean(_), TypeIdentifier::Boolean) => val,
+            (val @ PrismaValue::DateTime(_), TypeIdentifier::DateTime) => val,
+            (val @ PrismaValue::Enum(_), TypeIdentifier::Enum) => val,
+            (val @ PrismaValue::Uuid(_), TypeIdentifier::UUID) => val,
+
+            // Valid String coercions
+            (PrismaValue::Int(i), TypeIdentifier::String) => PrismaValue::String(format!("{}", i)),
+            (PrismaValue::Float(f), TypeIdentifier::String) => PrismaValue::String(f.to_string()),
+            (PrismaValue::Boolean(b), TypeIdentifier::String) => PrismaValue::String(format!("{}", b)),
+            (PrismaValue::DateTime(dt), TypeIdentifier::String) => {
+                PrismaValue::String(prisma_value::stringify_date(&dt))
+            }
+            (PrismaValue::Enum(e), TypeIdentifier::String) => PrismaValue::String(e),
+            (PrismaValue::Uuid(u), TypeIdentifier::String) => PrismaValue::String(u.to_string()),
+
+            // Valid Int coersions
+            (PrismaValue::String(s), TypeIdentifier::Int) => match s.parse() {
+                Ok(i) => PrismaValue::Int(i),
+                Err(_) => {
+                    return Err(DomainError::ConversionFailure(
+                        format!("{:?}", s),
+                        format!("{:?}", to_type),
+                    ))
+                }
+            },
+            (PrismaValue::Float(f), TypeIdentifier::Int) => PrismaValue::Int(f.trunc().to_i64().unwrap()),
+
+            // Todo other coercions here
+
+            // Lists
+            (PrismaValue::List(list), typ) => PrismaValue::List(
+                list.into_iter()
+                    .map(|val| val.coerce(typ))
+                    .collect::<crate::Result<Vec<_>>>()?,
+            ),
+
+            // Invalid coercion
+            (val, typ) => {
+                return Err(DomainError::ConversionFailure(
+                    format!("{:?}", val),
+                    format!("{:?}", typ),
+                ))
+            }
+        };
+
+        Ok(coerced)
     }
 }

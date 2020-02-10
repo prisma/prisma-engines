@@ -53,7 +53,7 @@ pub enum ErrorKind {
     #[fail(display = "{}", _0)]
     DomainError(DomainError),
 
-    #[fail(display = "Record not found: {}", _0)]
+    #[fail(display = "Record not found: {:?}", _0)]
     RecordNotFoundForWhere(Filter),
 
     #[fail(

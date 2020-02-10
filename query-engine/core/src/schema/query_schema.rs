@@ -340,10 +340,6 @@ impl InputType {
     pub fn uuid() -> InputType {
         InputType::Scalar(ScalarType::UUID)
     }
-
-    pub fn id() -> InputType {
-        InputType::Scalar(ScalarType::ID)
-    }
 }
 
 #[derive(Debug)]
@@ -396,10 +392,6 @@ impl OutputType {
         OutputType::Scalar(ScalarType::UUID)
     }
 
-    pub fn id() -> OutputType {
-        OutputType::Scalar(ScalarType::ID)
-    }
-
     /// Attempts to recurse through the type until an object type is found.
     /// Returns Some(ObjectTypeStrongRef) if ab object type is found, None otherwise.
     pub fn as_object_type(&self) -> Option<ObjectTypeStrongRef> {
@@ -440,7 +432,6 @@ pub enum ScalarType {
     Json,
     JsonList,
     UUID,
-    ID,
 }
 
 impl From<EnumType> for OutputType {

@@ -56,13 +56,11 @@ lazy_static! {
 pub fn get_field_filters<'a>(field: &ModelField) -> Vec<&'a FilterArgument> {
     let args = &FILTER_ARGUMENTS;
 
-    if field.is_list() {
-        match field.type_identifier() {
-            TypeIdentifier::Relation => args.multi_relation.iter().collect(),
-            _ => vec![],
-        }
-    } else {
-        let filters = match field.type_identifier() {
+    let filters = match field {
+        ModelField::Relation(_) if field.is_list() => vec![&args.multi_relation],
+        ModelField::Scalar(_) if field.is_list() => vec![],
+        ModelField::Relation(_) => vec![&args.one_relation],
+        ModelField::Scalar(sf) => match sf.type_identifier {
             TypeIdentifier::UUID => vec![&args.base, &args.inclusion, &args.alphanumeric, &args.string],
             TypeIdentifier::GraphQLID => vec![&args.base, &args.inclusion, &args.alphanumeric, &args.string],
             TypeIdentifier::String => vec![&args.base, &args.inclusion, &args.alphanumeric, &args.string],
@@ -72,13 +70,13 @@ pub fn get_field_filters<'a>(field: &ModelField) -> Vec<&'a FilterArgument> {
             TypeIdentifier::Enum => vec![&args.base, &args.inclusion],
             TypeIdentifier::DateTime => vec![&args.base, &args.inclusion, &args.alphanumeric],
             TypeIdentifier::Json => vec![],
-            TypeIdentifier::Relation => vec![&args.one_relation],
-        };
+            TypeIdentifier::Relation => unreachable!(),
+        },
+    };
 
-        filters
-            .into_iter()
-            .map(|l| l.iter().collect::<Vec<&'a FilterArgument>>())
-            .flatten()
-            .collect()
-    }
+    filters
+        .into_iter()
+        .map(|l| l.iter().collect::<Vec<&'a FilterArgument>>())
+        .flatten()
+        .collect()
 }

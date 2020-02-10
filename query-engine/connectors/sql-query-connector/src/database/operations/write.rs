@@ -1,67 +1,43 @@
 use crate::{error::SqlError, query_builder::write, QueryExt, RawQuery};
 use connector_interface::*;
+use itertools::Itertools;
 use prisma_models::*;
 use prisma_value::PrismaValue;
-use quaint::error::{DatabaseConstraint, ErrorKind};
+use quaint::error::{Error as QueryError, ErrorKind};
 use std::convert::TryFrom;
+use user_facing_errors::query_engine::DatabaseConstraint;
 
-pub async fn create_record(conn: &dyn QueryExt, model: &ModelRef, args: WriteArgs) -> crate::Result<GraphqlId> {
-    let (insert, returned_id) = write::create_record(model, args.non_list_args().clone());
+pub async fn create_record(conn: &dyn QueryExt, model: &ModelRef, args: WriteArgs) -> crate::Result<RecordIdentifier> {
+    let (insert, returned_id) = write::create_record(model, args);
 
     let result_set = match conn.insert(insert).await {
         Ok(id) => id,
         Err(e) => match e.kind() {
             ErrorKind::UniqueConstraintViolation { constraint } => match constraint {
-                DatabaseConstraint::Index(_) => {
-                    let field_names = vec![format!("{}.{}", model.name, model.fields().id().name)];
-
+                quaint::error::DatabaseConstraint::Index(name) => {
+                    let constraint = DatabaseConstraint::Index(name.clone());
                     return Err(SqlError::UniqueConstraintViolation {
-                        constraint: field_names.into(),
+                        constraint,
                     });
                 }
-                DatabaseConstraint::Fields(fields) if fields.first().map(|s| s.as_str()) == Some("PRIMARY") => {
-                    let field_names = vec![format!("{}.{}", model.name, model.fields().id().name)];
-
+                quaint::error::DatabaseConstraint::Fields(fields) => {
+                    let constraint = DatabaseConstraint::Fields(fields.clone());
                     return Err(SqlError::UniqueConstraintViolation {
-                        constraint: field_names.into(),
-                    });
-                }
-
-                DatabaseConstraint::Fields(fields) => {
-                    let field_names: Vec<String> = fields
-                        .into_iter()
-                        .map(|field_name| format!("{}.{}", model.name, field_name))
-                        .collect();
-
-                    return Err(SqlError::UniqueConstraintViolation {
-                        constraint: field_names.into(),
+                        constraint,
                     });
                 }
             },
             ErrorKind::NullConstraintViolation { constraint } => match constraint {
-                DatabaseConstraint::Index(_) => {
-                    let field_names = vec![format!("{}.{}", model.name, model.fields().id().name)];
-
+                quaint::error::DatabaseConstraint::Index(name) => {
+                    let constraint = DatabaseConstraint::Index(name.clone());
                     return Err(SqlError::NullConstraintViolation {
-                        constraint: field_names.into(),
+                        constraint,
                     });
                 }
-                DatabaseConstraint::Fields(fields) if fields.first().map(|s| s.as_str()) == Some("PRIMARY") => {
-                    let field_names = vec![format!("{}.{}", model.name, model.fields().id().name)];
-
+                quaint::error::DatabaseConstraint::Fields(fields) => {
+                    let constraint = DatabaseConstraint::Fields(fields.clone());
                     return Err(SqlError::NullConstraintViolation {
-                        constraint: field_names.into(),
-                    });
-                }
-
-                DatabaseConstraint::Fields(fields) => {
-                    let field_names: Vec<String> = fields
-                        .into_iter()
-                        .map(|field_name| format!("{}.{}", model.name, field_name))
-                        .collect();
-
-                    return Err(SqlError::NullConstraintViolation {
-                        constraint: field_names.into(),
+                        constraint,
                     });
                 }
             },
@@ -69,19 +45,19 @@ pub async fn create_record(conn: &dyn QueryExt, model: &ModelRef, args: WriteArg
         },
     };
 
-    let last_id = result_set.last_insert_id();
-
-    match (returned_id, result_set.into_single(), last_id) {
-        // Id is already in the arguments
-        (Some(id), _, _) => Ok(id),
+    match (returned_id, result_set.len(), result_set.last_insert_id()) {
+        // All values provided in the write arrghs
+        (Some(identifier), _, _) if !identifier.misses_autogen_value() => Ok(identifier),
 
         // PostgreSQL with a working RETURNING statement
-        (_, Ok(row), _) => Ok(GraphqlId::try_from(row.into_single().unwrap()).unwrap()),
+        (_, n, _) if n > 0 => Ok(RecordIdentifier::try_from((&model.primary_identifier(), result_set))?),
 
         // We have an auto-incremented id that we got from MySQL or SQLite
-        (_, _, Some(num)) => Ok(GraphqlId::from(num)),
+        (Some(mut identifier), _, Some(num)) if identifier.misses_autogen_value() => {
+            identifier.add_autogen_value(num as i64);
+            Ok(identifier)
+        }
 
-        // Damn...
         (_, _, _) => panic!("Could not figure out an ID in create"),
     }
 }
@@ -91,7 +67,7 @@ pub async fn update_records(
     model: &ModelRef,
     where_: Filter,
     args: WriteArgs,
-) -> crate::Result<Vec<GraphqlId>> {
+) -> crate::Result<Vec<RecordIdentifier>> {
     let ids = conn.filter_ids(model, where_.clone()).await?;
 
     if ids.len() == 0 {
@@ -99,12 +75,12 @@ pub async fn update_records(
     }
 
     let updates = {
-        let ids: Vec<&GraphqlId> = ids.iter().map(|id| &*id).collect();
-        write::update_many(model, ids.as_slice(), args.non_list_args())?
+        let ids: Vec<&RecordIdentifier> = ids.iter().map(|id| &*id).collect();
+        write::update_many(model, ids.as_slice(), args)?
     };
 
     for update in updates {
-        conn.update(update).await?;
+        conn.query(update).await?;
     }
 
     Ok(ids)
@@ -112,7 +88,7 @@ pub async fn update_records(
 
 pub async fn delete_records(conn: &dyn QueryExt, model: &ModelRef, where_: Filter) -> crate::Result<usize> {
     let ids = conn.filter_ids(model, where_.clone()).await?;
-    let ids: Vec<&GraphqlId> = ids.iter().map(|id| &*id).collect();
+    let ids: Vec<&RecordIdentifier> = ids.iter().map(|id| &*id).collect();
     let count = ids.len();
 
     if count == 0 {
@@ -120,7 +96,7 @@ pub async fn delete_records(conn: &dyn QueryExt, model: &ModelRef, where_: Filte
     }
 
     for delete in write::delete_many(model, ids.as_slice()) {
-        conn.delete(delete).await?;
+        conn.query(delete).await?;
     }
 
     Ok(count)
@@ -129,23 +105,23 @@ pub async fn delete_records(conn: &dyn QueryExt, model: &ModelRef, where_: Filte
 pub async fn connect(
     conn: &dyn QueryExt,
     field: &RelationFieldRef,
-    parent_id: &GraphqlId,
-    child_ids: &[GraphqlId],
+    parent_id: &RecordIdentifier,
+    child_ids: &[RecordIdentifier],
 ) -> crate::Result<()> {
     let query = write::create_relation_table_records(field, parent_id, child_ids);
-    conn.query(query).await?;
 
+    conn.query(query).await?;
     Ok(())
 }
 
 pub async fn disconnect(
     conn: &dyn QueryExt,
     field: &RelationFieldRef,
-    parent_id: &GraphqlId,
-    child_ids: &[GraphqlId],
+    parent_id: &RecordIdentifier,
+    child_ids: &[RecordIdentifier],
 ) -> crate::Result<()> {
     let query = write::delete_relation_table_records(field, parent_id, child_ids);
-    conn.query(query).await?;
+    conn.delete(query).await?;
 
     Ok(())
 }

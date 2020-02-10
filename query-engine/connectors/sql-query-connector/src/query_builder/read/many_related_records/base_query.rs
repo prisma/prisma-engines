@@ -1,12 +1,12 @@
 use crate::{cursor_condition, filter_conversion::AliasedCondition};
 use connector_interface::{OrderDirections, QueryArguments, SkipAndLimit};
 use prisma_models::prelude::*;
-use quaint::ast::{Aliasable, Column, Comparable, ConditionTree, Joinable, Select};
+use quaint::ast::{Aliasable, Column, Comparable, ConditionTree, Joinable, Row, Select};
 
 pub struct ManyRelatedRecordsBaseQuery<'a> {
     pub from_field: &'a RelationFieldRef,
     pub columns: Vec<Column<'static>>,
-    pub from_record_ids: &'a [GraphqlId],
+    pub from_record_ids: &'a [RecordIdentifier],
     pub query: Select<'a>,
     pub order_directions: OrderDirections,
     pub condition: ConditionTree<'a>,
@@ -18,7 +18,7 @@ pub struct ManyRelatedRecordsBaseQuery<'a> {
 impl<'a> ManyRelatedRecordsBaseQuery<'a> {
     pub fn new(
         from_field: &'a RelationFieldRef,
-        from_record_ids: &'a [GraphqlId],
+        from_record_ids: &'a [RecordIdentifier],
         query_arguments: QueryArguments,
         columns: Vec<Column<'static>>,
     ) -> ManyRelatedRecordsBaseQuery<'a> {
@@ -37,16 +37,16 @@ impl<'a> ManyRelatedRecordsBaseQuery<'a> {
         let query = if from_field.relation_is_inlined_in_child() {
             columns.iter().fold(select, |acc, col| acc.column(col.clone()))
         } else {
+            let id_columns: Vec<Column<'static>> =
+                from_field.related_model().primary_identifier().as_columns().collect();
+
+            let opposite_columns: Vec<Column<'static>> = from_field.opposite_columns(true).collect();
+
             let join = from_field
                 .relation()
                 .as_table()
                 .alias(Relation::TABLE_ALIAS)
-                .on(from_field
-                    .related_model()
-                    .fields()
-                    .id()
-                    .as_column()
-                    .equals(from_field.opposite_column(true)));
+                .on(Row::from(id_columns).equals(Row::from(opposite_columns)));
 
             columns
                 .iter()

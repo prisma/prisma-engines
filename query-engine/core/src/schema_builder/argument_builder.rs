@@ -19,7 +19,7 @@ impl<'a> ArgumentBuilder<'a> {
 
     /// Builds "where" argument which input type is the where unique type of the input builder.
     pub fn where_unique_argument(&self, model: ModelRef) -> Option<Argument> {
-        let input_object_type = self.input_type_builder.into_arc().where_unique_object_type(model);
+        let input_object_type = self.input_type_builder.into_arc().where_unique_object_type(&model);
 
         if input_object_type.into_arc().is_empty() {
             None

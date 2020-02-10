@@ -1,19 +1,5 @@
-use crate::{ConversionFailure, GraphqlId, PrismaValue};
+use crate::{GraphqlId, PrismaValue};
 use quaint::ast::{DatabaseValue, ParameterizedValue};
-use std::convert::TryFrom;
-
-impl<'a> TryFrom<ParameterizedValue<'a>> for GraphqlId {
-    type Error = ConversionFailure;
-
-    fn try_from(pv: ParameterizedValue<'a>) -> Result<Self, Self::Error> {
-        match pv {
-            ParameterizedValue::Integer(i) => Ok(GraphqlId::Int(i as usize)),
-            ParameterizedValue::Text(s) => Ok(GraphqlId::String(s.into_owned())),
-            ParameterizedValue::Uuid(uuid) => Ok(GraphqlId::UUID(uuid)),
-            _ => Err(ConversionFailure::new("ParameterizedValue", "GraphqlId")),
-        }
-    }
-}
 
 impl<'a> From<GraphqlId> for ParameterizedValue<'a> {
     fn from(id: GraphqlId) -> Self {

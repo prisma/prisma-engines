@@ -73,6 +73,7 @@ impl<'a> QuerySchemaBuilder<'a> {
             true,
             capabilities,
             Arc::downgrade(&filter_object_type_builder),
+            Arc::downgrade(&input_type_builder),
         ));
 
         let argument_builder = ArgumentBuilder::new(

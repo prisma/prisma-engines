@@ -1,10 +1,10 @@
 use super::*;
 use crate::{
     query_document::{ParsedArgument, ParsedInputMap},
-    QueryGraphBuilderResult,
+    QueryGraphBuilderError, QueryGraphBuilderResult,
 };
 use connector::QueryArguments;
-use prisma_models::ModelRef;
+use prisma_models::{ModelRef, PrismaValue, ScalarFieldRef};
 use std::convert::TryInto;
 
 /// Expects the caller to know that it is structurally guaranteed that query arguments can be extracted,
@@ -32,12 +32,12 @@ pub fn extract_query_args(arguments: Vec<ParsedArgument>, model: &ModelRef) -> Q
                     }),
 
                     "after" => Ok(QueryArguments {
-                        after: arg.value.try_into()?,
+                        after: extract_cursor(arg.value, model)?,
                         ..res
                     }),
 
                     "before" => Ok(QueryArguments {
-                        before: arg.value.try_into()?,
+                        before: extract_cursor(arg.value, model)?,
                         ..res
                     }),
 
@@ -62,5 +62,49 @@ pub fn extract_query_args(arguments: Vec<ParsedArgument>, model: &ModelRef) -> Q
             } else {
                 result
             }
+        })
+}
+
+fn extract_cursor(
+    value: ParsedInputValue,
+    model: &ModelRef,
+) -> QueryGraphBuilderResult<Option<Vec<(ScalarFieldRef, PrismaValue)>>> {
+    if let Err(_) = value.assert_non_null() {
+        return Ok(None);
+    }
+
+    let map: ParsedInputMap = value.try_into()?;
+    map.assert_size(1)?;
+
+    let (field_name, value): (String, ParsedInputValue) = map.into_iter().nth(0).unwrap();
+
+    // Always try to resolve regular fields first. If that fails, try to resolve compound fields.
+    model
+        .fields()
+        .find_from_scalar(&field_name)
+        .map_err(|err| err.into())
+        .and_then(|field| {
+            // Clone necessary to satisfy closure move.
+            let value: PrismaValue = value.clone().try_into()?;
+            Ok(Some(vec![(field, value)]))
+        })
+        .or_else(|_: QueryGraphBuilderError| {
+            utils::resolve_compound_field(&field_name, &model)
+                .ok_or(QueryGraphBuilderError::AssertionError(format!(
+                    "Unable to resolve field {} to a scalar field or a set of scalar fields on model {}",
+                    field_name, model.name
+                )))
+                .and_then(|fields| {
+                    let mut compound_map: ParsedInputMap = value.try_into()?;
+                    let mut result = vec![];
+
+                    for field in fields {
+                        // Unwrap is safe because validation gurantees that the value is present.
+                        let value = compound_map.remove(&field.name).unwrap().try_into()?;
+                        result.push((field, value));
+                    }
+
+                    Ok(Some(result))
+                })
         })
 }

@@ -19,7 +19,7 @@ use crate::{interpreter::ExpressionResult, Query, QueryGraphBuilderResult};
 use guard::*;
 use invariance_rules::*;
 use petgraph::{graph::*, visit::EdgeRef as PEdgeRef, *};
-use prisma_models::{GraphqlId, PrismaValue};
+use prisma_models::{ModelIdentifier, RecordIdentifier};
 use std::{borrow::Borrow, collections::HashSet};
 
 pub type QueryGraphResult<T> = std::result::Result<T, QueryGraphError>;
@@ -79,8 +79,8 @@ impl Computation {
 }
 
 pub struct DiffNode {
-    pub left: HashSet<GraphqlId>,
-    pub right: HashSet<GraphqlId>,
+    pub left: HashSet<RecordIdentifier>,
+    pub right: HashSet<RecordIdentifier>,
 }
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
@@ -107,7 +107,9 @@ impl EdgeRef {
     }
 }
 
-pub type ParentIdsFn = Box<dyn FnOnce(Node, Vec<PrismaValue>) -> QueryGraphBuilderResult<Node> + Send + Sync + 'static>;
+pub type ParentIdsFn =
+    Box<dyn FnOnce(Node, Vec<RecordIdentifier>) -> QueryGraphBuilderResult<Node> + Send + Sync + 'static>;
+
 pub type ParentResultFn =
     Box<dyn FnOnce(Node, &ExpressionResult) -> QueryGraphBuilderResult<Node> + Send + Sync + 'static>;
 
@@ -122,9 +124,9 @@ pub enum QueryGraphDependency {
     ParentResult(ParentResultFn),
 
     /// More specialized version of `ParentResult`
-    /// Performs a transformation on the child node based on the IDs of the parent result (as PrismaValues).
-    /// Assumes that the parent result can be converted into IDs, else a runtime error will occur.
-    ParentIds(ParentIdsFn),
+    /// Performs a transformation on the child node based on the requested IDs of the parent result (passed as RecordIdentifiers).
+    /// Assumes that the parent result can be converted into the requested record identifiers, else a runtime error will occur.
+    ParentIds(ModelIdentifier, ParentIdsFn),
 
     /// Only valid in the context of a `If` control flow node.
     Then,
@@ -452,31 +454,31 @@ impl QueryGraph {
     /// hence making it necessary to execute the child operation first.
     ///
     /// Applying the transformations step by step will change the graph as following:
-    /// (original edges marked with an ID to show how they're preserved)
+    /// (original edges marked with an ID to show how they're preserved, new edges marked with *)
     /// ```text
-    ///      ┌───┐                 ┌───┐                                 ┌───┐                         ┌───┐
-    ///      │ P │                 │ P │────────────────┐             ┌──│ P │──────────┐           ┌──│ P │────────┐
-    ///      └───┘                 └───┘               1│             │  └───┘         1│           │  └───┘       1│
-    ///       1│                     │                  │            5│   6│            │          5│   6│          │
-    ///        ▼                     │                  │             │    ▼            │           │    ▼          │
-    ///      ┌───┐                   │                  │             │  ┌───┐          │           │  ┌───┐        │
-    ///      │ A │                  5│                  │             │  │ C │          │           │  │ C │───┐    │
-    ///      └───┘     ═(A, B)═▶     │                  │  ═(B, C)═▶  │  └───┘          │ ═(B, D)═▶ │  └───┘  7│    │
-    ///       2│                     │                  │             │   3│            │           │   3│     │    │
-    ///        ▼                     ▼                  │             │    ▼            │           │    │     ▼    │
-    ///      ┌───┐                 ┌───┐                │             │  ┌───┐          │           │    │   ┌───┐  │
-    ///   ┌──│ B │──┐           ┌──│ B │──┬────────┐    │             └─▶│ B │─────┐    │           │    │   │ D │  │
-    ///  3│  └───┘ 4│          3│  └───┘ 4│       2│    │                └───┘     │    │           │    │   └───┘  │
-    ///   │         │           │         │        │    │                 4│      2│    │           │    │    4│    │
-    ///   ▼         ▼           ▼         ▼        ▼    │                  ▼       ▼    │           │    ▼     │    │
-    /// ┌───┐     ┌───┐       ┌───┐     ┌───┐    ┌───┐  │                ┌───┐   ┌───┐  │           │  ┌───┐   │    │
-    /// │ C │     │ D │       │ C │     │ D │    │ A │◀─┘                │ D │   │ A │◀─┘           └─▶│ B │◀──┘    │
-    /// └───┘     └───┘       └───┘     └───┘    └───┘                   └───┘   └───┘                 └───┘        │
-    ///                                                                                                  │          │
-    ///                                                                                                  │          │
-    ///                                                                                                 2│   ┌───┐  │
-    ///                                                                                                  └──▶│ A │◀─┘
-    ///                                                                                                      └───┘
+    ///         ┌───┐                 ┌───┐                                 ┌───┐                         ┌───┐
+    ///         │ P │                 │ P │────────────────┐             ┌──│ P │──────────┐           ┌──│ P │────────┐
+    ///         └───┘                 └───┘               1│             │  └───┘         1│           │  └───┘       1│
+    ///          1│                     │                  │            5│    │ 6*         │          5│   6│          │
+    ///           ▼                     │                  │             │    ▼            │           │    ▼          │
+    ///         ┌───┐                   │                  │             │  ┌───┐          │           │  ┌───┐  7*    │
+    ///         │ A │                 5*│                  │             │  │ C │          │           │  │ C │───┐    │
+    ///         └───┘     ═(A, B)═▶     │                  │ ═(B, C)═▶   │  └───┘          │ ═(B, D)═▶ │  └───┘   │    │
+    ///          2│                     │                  │             │   3│            │           │   3│     │    │
+    ///           ▼                     ▼                  │             │    ▼            │           │    │     ▼    │
+    ///         ┌───┐                 ┌───┐                │             │  ┌───┐          │           │    │   ┌───┐  │
+    ///      ┌──│ B │──┐           ┌──│ B │──┬────────┐    │             └─▶│ B │─────┐    │           │    │   │ D │  │
+    ///     3│  └───┘ 4│          3│  └───┘ 4│       2│    │                └───┘     │    │           │    │   └───┘  │
+    ///      │         │           │         │        │    │                 4│      2│    │           │    │    4│    │
+    ///      ▼         ▼           ▼         ▼        ▼    │                  ▼       ▼    │           │    ▼     │    │
+    ///    ┌───┐     ┌───┐       ┌───┐     ┌───┐    ┌───┐  │                ┌───┐   ┌───┐  │           │  ┌───┐   │    │
+    ///    │ C │     │ D │       │ C │     │ D │    │ A │◀─┘                │ D │   │ A │◀─┘           └─▶│ B │◀──┘    │
+    ///    └───┘     └───┘       └───┘     └───┘    └───┘                   └───┘   └───┘                 └───┘        │
+    ///                                                                                                     │          │
+    ///                                                                                                     │          │
+    ///                                                                                                    2│   ┌───┐  │
+    ///                                                                                                     └──▶│ A │◀─┘
+    ///                                                                                                         └───┘
     /// ```
     /// todo put if flow exception illustration here.
     fn swap_marked(&mut self) -> QueryGraphResult<()> {
@@ -516,6 +518,20 @@ impl QueryGraph {
                             &child_node,
                             QueryGraphDependency::ExecutionOrder,
                         )?;
+                        // FIXME: AUMFIDARR
+                        //                        // ONLY if there is no edge already existing!
+                        //                        let existing_edge = self
+                        //                            .graph
+                        //                            .find_edge(parent_of_parent_node.node_ix, child_node.node_ix)
+                        //                            .map(|edge_ix| EdgeRef { edge_ix });
+                        //
+                        //                        if let None = existing_edge {
+                        //                            self.create_edge(
+                        //                                &parent_of_parent_node,
+                        //                                &child_node,
+                        //                                QueryGraphDependency::ExecutionOrder,
+                        //                            )?;
+                        //                        }
                     }
                 }
             }

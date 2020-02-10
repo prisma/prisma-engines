@@ -43,6 +43,10 @@ pub enum PrismaValue {
     List(PrismaListValue),
 }
 
+pub fn stringify_date(date: &DateTime<Utc>) -> String {
+    format!("{}", date.format("%Y-%m-%dT%H:%M:%S%.3fZ"))
+}
+
 impl TryFrom<serde_json::Value> for PrismaValue {
     type Error = crate::error::ConversionFailure;
 
@@ -74,7 +78,7 @@ fn serialize_date<S>(date: &DateTime<Utc>, serializer: S) -> Result<S::Ok, S::Er
 where
     S: Serializer,
 {
-    format!("{}", date.format("%Y-%m-%dT%H:%M:%S%.3fZ")).serialize(serializer)
+    format!("{}", stringify_date(date)).serialize(serializer)
 }
 
 fn serialize_decimal<S>(decimal: &Decimal, serializer: S) -> Result<S::Ok, S::Error>

@@ -8,19 +8,21 @@ use std::{
 #[derive(Debug)]
 pub struct Fields {
     pub all: Vec<Field>,
-    id: OnceCell<Weak<ScalarField>>,
-    scalar: OnceCell<Vec<Weak<ScalarField>>>,
-    relation: OnceCell<Vec<Weak<RelationField>>>,
+    id: OnceCell<Option<Vec<ScalarFieldWeak>>>,
+    id_field_names: Vec<String>,
+    scalar: OnceCell<Vec<ScalarFieldWeak>>,
+    relation: OnceCell<Vec<RelationFieldWeak>>,
     model: ModelWeakRef,
-    created_at: OnceCell<Option<Arc<ScalarField>>>,
-    updated_at: OnceCell<Option<Arc<ScalarField>>>,
+    created_at: OnceCell<Option<ScalarFieldRef>>,
+    updated_at: OnceCell<Option<ScalarFieldRef>>,
 }
 
 impl Fields {
-    pub fn new(all: Vec<Field>, model: ModelWeakRef) -> Fields {
+    pub fn new(all: Vec<Field>, model: ModelWeakRef, id_field_names: Vec<String>) -> Fields {
         Fields {
             all,
             id: OnceCell::new(),
+            id_field_names,
             scalar: OnceCell::new(),
             relation: OnceCell::new(),
             created_at: OnceCell::new(),
@@ -29,23 +31,18 @@ impl Fields {
         }
     }
 
-    pub fn id(&self) -> Arc<ScalarField> {
+    pub fn id(&self) -> Option<Vec<ScalarFieldRef>> {
         self.id
             .get_or_init(|| {
-                self.all
-                    .iter()
-                    .fold(None, |acc, field| match field {
-                        Field::Scalar(sf) if sf.is_id() => Some(Arc::downgrade(sf)),
-                        _ => acc,
-                    })
-                    .ok_or_else(|| format!("No id field defined! Model: {}", (self.model.upgrade().unwrap().name)))
-                    .unwrap()
+                self.find_singular_id()
+                    .map(|x| vec![x])
+                    .or_else(|| self.find_multipart_id())
             })
-            .upgrade()
-            .unwrap()
+            .clone()
+            .map(|fields| fields.into_iter().map(|x| x.upgrade().unwrap()).collect())
     }
 
-    pub fn created_at(&self) -> &Option<Arc<ScalarField>> {
+    pub fn created_at(&self) -> &Option<ScalarFieldRef> {
         self.created_at.get_or_init(|| {
             self.scalar_weak()
                 .iter()
@@ -54,7 +51,7 @@ impl Fields {
         })
     }
 
-    pub fn updated_at(&self) -> &Option<Arc<ScalarField>> {
+    pub fn updated_at(&self) -> &Option<ScalarFieldRef> {
         self.updated_at.get_or_init(|| {
             self.scalar_weak()
                 .iter()
@@ -63,19 +60,19 @@ impl Fields {
         })
     }
 
-    pub fn scalar(&self) -> Vec<Arc<ScalarField>> {
+    pub fn scalar(&self) -> Vec<ScalarFieldRef> {
         self.scalar_weak().iter().map(|f| f.upgrade().unwrap()).collect()
     }
 
-    pub fn scalar_non_list(&self) -> Vec<Arc<ScalarField>> {
+    pub fn scalar_non_list(&self) -> Vec<ScalarFieldRef> {
         self.scalar().into_iter().filter(|sf| !sf.is_list).collect()
     }
 
-    pub fn scalar_list(&self) -> Vec<Arc<ScalarField>> {
+    pub fn scalar_list(&self) -> Vec<ScalarFieldRef> {
         self.scalar().into_iter().filter(|sf| sf.is_list).collect()
     }
 
-    fn scalar_weak(&self) -> &[Weak<ScalarField>] {
+    fn scalar_weak(&self) -> &[ScalarFieldWeak] {
         self.scalar
             .get_or_init(|| self.all.iter().fold(Vec::new(), Self::scalar_filter))
             .as_slice()
@@ -110,7 +107,7 @@ impl Fields {
         self.all.iter().filter(|field| names.contains(field.name())).collect()
     }
 
-    pub fn find_many_from_scalar(&self, names: &BTreeSet<String>) -> Vec<Arc<ScalarField>> {
+    pub fn find_many_from_scalar(&self, names: &BTreeSet<String>) -> Vec<ScalarFieldRef> {
         self.scalar_weak()
             .iter()
             .filter(|field| names.contains(&field.upgrade().unwrap().name))
@@ -126,7 +123,7 @@ impl Fields {
             .collect()
     }
 
-    pub fn find_from_all(&self, name: &str) -> DomainResult<&Field> {
+    pub fn find_from_all(&self, name: &str) -> crate::Result<&Field> {
         self.all
             .iter()
             .find(|field| field.name() == name)
@@ -136,7 +133,7 @@ impl Fields {
             })
     }
 
-    pub fn find_from_scalar(&self, name: &str) -> DomainResult<Arc<ScalarField>> {
+    pub fn find_from_scalar(&self, name: &str) -> crate::Result<ScalarFieldRef> {
         self.scalar_weak()
             .iter()
             .map(|field| field.upgrade().unwrap())
@@ -151,7 +148,7 @@ impl Fields {
         self.model.upgrade().unwrap()
     }
 
-    pub fn find_from_relation_fields(&self, name: &str) -> DomainResult<Arc<RelationField>> {
+    pub fn find_from_relation_fields(&self, name: &str) -> crate::Result<Arc<RelationField>> {
         self.relation_weak()
             .iter()
             .map(|field| field.upgrade().unwrap())
@@ -162,7 +159,7 @@ impl Fields {
             })
     }
 
-    pub fn find_from_relation(&self, name: &str, side: RelationSide) -> DomainResult<Arc<RelationField>> {
+    pub fn find_from_relation(&self, name: &str, side: RelationSide) -> crate::Result<Arc<RelationField>> {
         self.relation_weak()
             .iter()
             .map(|field| field.upgrade().unwrap())
@@ -173,7 +170,7 @@ impl Fields {
             })
     }
 
-    fn scalar_filter(mut acc: Vec<Weak<ScalarField>>, field: &Field) -> Vec<Weak<ScalarField>> {
+    fn scalar_filter(mut acc: Vec<ScalarFieldWeak>, field: &Field) -> Vec<ScalarFieldWeak> {
         if let Field::Scalar(scalar_field) = field {
             acc.push(Arc::downgrade(scalar_field));
         };
@@ -187,5 +184,45 @@ impl Fields {
         };
 
         acc
+    }
+
+    pub fn find_singular_id(&self) -> Option<ScalarFieldWeak> {
+        self.scalar_weak().into_iter().find_map(|wsf| {
+            let sf = wsf.upgrade().unwrap();
+
+            if sf.is_id() {
+                Some(Weak::clone(wsf))
+            } else {
+                None
+            }
+        })
+    }
+
+    fn find_multipart_id(&self) -> Option<Vec<ScalarFieldWeak>> {
+        if self.id_field_names.len() > 0 {
+            let scalars = self.scalar();
+            let fields = self
+                .id_field_names
+                .iter()
+                .map(|f| {
+                    let id_field = scalars
+                        .iter()
+                        .find(|sf| &sf.name == f)
+                        .expect(&format!("Expected ID field {} to be present on the model", f));
+                    Arc::downgrade(id_field)
+                })
+                .collect();
+
+            Some(fields)
+        // Some(self.scalar().filter_map(|sf| x).collect())
+        } else {
+            None
+        }
+    }
+
+    pub fn db_names<'a>(&'a self) -> impl Iterator<Item = String> + 'a {
+        self.all
+            .iter()
+            .flat_map(|field| field.data_source_fields().into_iter().map(|dsf| dsf.name.clone()))
     }
 }

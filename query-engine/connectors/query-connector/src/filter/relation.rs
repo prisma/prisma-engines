@@ -91,7 +91,7 @@ impl RelationCompare for Arc<RelationField> {
 
 #[cfg(test)]
 mod tests {
-    use crate::{*, filter::*};
+    use crate::{filter::*, *};
 
     #[test]
     fn one_relation_is_null() {
@@ -101,9 +101,10 @@ mod tests {
         let filter = rel_field.one_relation_is_null();
 
         match filter {
-            Filter::OneRelationIsNull(OneRelationIsNullFilter { field }) =>
-                assert_eq!(String::from("sites"), field.name),
-            _ => unreachable!()
+            Filter::OneRelationIsNull(OneRelationIsNullFilter { field }) => {
+                assert_eq!(String::from("sites"), field.name)
+            }
+            _ => unreachable!(),
         };
     }
 
@@ -114,7 +115,13 @@ mod tests {
         let site = schema.find_model("Site").unwrap();
 
         let rel_field = user.fields().find_from_relation_fields("sites").unwrap();
-        let site_name = site.fields().find_from_scalar("name").unwrap();
+        let site_name = site
+            .fields()
+            .find_from_scalar("name")
+            .unwrap()
+            .data_source_field()
+            .clone();
+
         let filter = rel_field.no_related(site_name.equals("Blog"));
 
         match filter {
@@ -134,10 +141,10 @@ mod tests {
                         assert_eq!(String::from("name"), scalar_field.name);
                         assert_eq!(PrismaValue::from("Blog"), scalar_val);
                     }
-                    _ => unreachable!()
+                    _ => unreachable!(),
                 }
             }
-            _ => unreachable!()
+            _ => unreachable!(),
         }
     }
 
@@ -148,7 +155,13 @@ mod tests {
         let site = schema.find_model("Site").unwrap();
 
         let rel_field = user.fields().find_from_relation_fields("sites").unwrap();
-        let site_name = site.fields().find_from_scalar("name").unwrap();
+        let site_name = site
+            .fields()
+            .find_from_scalar("name")
+            .unwrap()
+            .data_source_field()
+            .clone();
+
         let filter = rel_field.to_one_related(site_name.equals("Blog"));
 
         match filter {
@@ -168,10 +181,10 @@ mod tests {
                         assert_eq!(String::from("name"), scalar_field.name);
                         assert_eq!(PrismaValue::from("Blog"), scalar_val);
                     }
-                    _ => unreachable!()
+                    _ => unreachable!(),
                 }
             }
-            _ => unreachable!()
+            _ => unreachable!(),
         }
     }
 
@@ -182,7 +195,13 @@ mod tests {
         let site = schema.find_model("Site").unwrap();
 
         let rel_field = user.fields().find_from_relation_fields("sites").unwrap();
-        let site_name = site.fields().find_from_scalar("name").unwrap();
+        let site_name = site
+            .fields()
+            .find_from_scalar("name")
+            .unwrap()
+            .data_source_field()
+            .clone();
+
         let filter = rel_field.at_least_one_related(site_name.equals("Blog"));
 
         match filter {
@@ -202,10 +221,10 @@ mod tests {
                         assert_eq!(String::from("name"), scalar_field.name);
                         assert_eq!(PrismaValue::from("Blog"), scalar_val);
                     }
-                    _ => unreachable!()
+                    _ => unreachable!(),
                 }
             }
-            _ => unreachable!()
+            _ => unreachable!(),
         }
     }
 
@@ -216,7 +235,13 @@ mod tests {
         let site = schema.find_model("Site").unwrap();
 
         let rel_field = user.fields().find_from_relation_fields("sites").unwrap();
-        let site_name = site.fields().find_from_scalar("name").unwrap();
+        let site_name = site
+            .fields()
+            .find_from_scalar("name")
+            .unwrap()
+            .data_source_field()
+            .clone();
+
         let filter = rel_field.every_related(site_name.equals("Blog"));
 
         match filter {
@@ -236,10 +261,10 @@ mod tests {
                         assert_eq!(String::from("name"), scalar_field.name);
                         assert_eq!(PrismaValue::from("Blog"), scalar_val);
                     }
-                    _ => unreachable!()
+                    _ => unreachable!(),
                 }
             }
-            _ => unreachable!()
+            _ => unreachable!(),
         }
     }
 }

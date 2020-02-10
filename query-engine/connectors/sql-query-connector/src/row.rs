@@ -41,11 +41,12 @@ impl ToSqlRow for ResultRow {
                         .map(|p_value| row_value_to_prisma_value(p_value, type_identifier))
                         .collect::<crate::Result<Vec<_>>>()
                         .map(|vec| PrismaValue::List(vec)),
+
                     ParameterizedValue::Null => Ok(PrismaValue::List(Vec::new())),
                     _ => {
                         let error = io::Error::new(
                             io::ErrorKind::InvalidData,
-                            "List field did not return an Array from database.",
+                            format!("List field did not return an Array from database. Type identifier was {:?}. Value was {:?}.", &type_identifier, &p_value),
                         );
                         return Err(SqlError::ConversionError(error.into()));
                     }
@@ -60,7 +61,7 @@ impl ToSqlRow for ResultRow {
     }
 }
 
-fn row_value_to_prisma_value(
+pub fn row_value_to_prisma_value(
     p_value: ParameterizedValue,
     type_identifier: TypeIdentifier,
 ) -> Result<PrismaValue, SqlError> {

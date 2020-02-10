@@ -1,6 +1,7 @@
 pub mod base;
 pub mod common;
 pub mod config;
+pub mod datasource_fields;
 pub mod directives;
 pub mod end_to_end;
 pub mod functions;

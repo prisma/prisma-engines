@@ -2,7 +2,9 @@ package util
 
 import play.api.libs.json._
 
+import scala.util.{Failure, Success, Try}
 import scala.sys.process.Process
+
 case class TestServer() extends PlayJsonExtensions {
   def query(
       query: String,
@@ -18,8 +20,8 @@ case class TestServer() extends PlayJsonExtensions {
   }
 
   def batch(
-     queries: Array[String],
-     project: Project,
+      queries: Array[String],
+      project: Project,
   ): JsValue = {
     val result = queryBinaryCLI(
       request = createMultiQuery(queries),
@@ -48,6 +50,7 @@ case class TestServer() extends PlayJsonExtensions {
 
   def createSingleQuery(query: String): JsValue = {
     val formattedQuery = query.stripMargin.replace("\n", "")
+    println(formattedQuery)
     Json.obj("query" -> formattedQuery, "variables" -> Json.obj())
   }
 
@@ -60,16 +63,47 @@ case class TestServer() extends PlayJsonExtensions {
 
     val response = project.isPgBouncer match {
       case true =>
-        Process(Seq(EnvVars.prismaBinaryPath, "--enable_raw_queries", "--always_force_transactions", "cli", "--execute_request", encoded_query),
-                None,
-                "PRISMA_DML" -> project.pgBouncerEnvVar).!!
+        Process(
+          Seq(
+            EnvVars.prismaBinaryPath,
+            "--enable_raw_queries",
+            "--always_force_transactions",
+            "cli",
+            "--execute_request",
+            encoded_query
+          ),
+          None,
+          "PRISMA_DML" -> project.pgBouncerEnvVar
+        ).!!
 
       case false => {
-        Process(Seq(EnvVars.prismaBinaryPath, "--enable_raw_queries", "cli", "--execute_request", encoded_query), None, "PRISMA_DML" -> project.envVar).!!
+        Process(
+          Seq(
+            EnvVars.prismaBinaryPath,
+            "--enable_raw_queries",
+            "cli",
+            "--execute_request",
+            encoded_query
+          ),
+          None,
+          "PRISMA_DML" -> project.envVar
+        ).!!
       }
     }
-    val decoded_response = UTF8Base64.decode(response)
-    println(decoded_response)
-    Json.parse(decoded_response)
+    val lines          = response.linesIterator.toVector
+    val responseMarker = "Response: " // due to race conditions the response can not always be found in the last line
+    val responseLine   = lines.find(_.startsWith(responseMarker)).get.stripPrefix(responseMarker).stripSuffix("\n")
+
+    println(response)
+    Try(UTF8Base64.decode(responseLine)) match {
+      case Success(decodedResponse) =>
+        println(decodedResponse)
+        Json.parse(decodedResponse)
+
+      case Failure(e) =>
+        println(s"Error while decoding this line: \n$responseLine")
+        throw e
+    }
+
   }
 }

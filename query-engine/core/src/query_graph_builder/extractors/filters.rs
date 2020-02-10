@@ -1,6 +1,6 @@
+use super::utils;
 use crate::{
     query_document::{ParsedInputMap, ParsedInputValue},
-    schema_builder::compound_field_name,
     QueryGraphBuilderError, QueryGraphBuilderResult,
 };
 use connector::{filter::Filter, RelationCompare, ScalarCompare};
@@ -138,14 +138,12 @@ pub fn extract_filter(
                             Field::Scalar(field) => handle_scalar_field(field, value, &op),
                             Field::Relation(field) => handle_relation_field(field, value, &op, match_suffix),
                         },
-                        Err(_) => find_index_fields(&field_name, &model)
-                            .and_then(|fields| handle_compound_field(fields, value))
-                            .map_err(|_| {
-                                QueryGraphBuilderError::AssertionError(format!(
-                                    "Unable to resolve field {} to a field or index on model {}",
-                                    field_name, model.name
-                                ))
-                            }),
+                        Err(_) => utils::resolve_compound_field(&field_name, &model)
+                            .ok_or(QueryGraphBuilderError::AssertionError(format!(
+                                "Unable to resolve field {} to a field or set of fields on model {}",
+                                field_name, model.name
+                            )))
+                            .and_then(|fields| handle_compound_field(fields, value)),
                     }
                 }
             }
@@ -161,23 +159,25 @@ fn handle_scalar_field(
     op: &FilterOp,
 ) -> QueryGraphBuilderResult<Filter> {
     let value: PrismaValue = value.try_into()?;
+    let dsf = field.data_source_field();
+
     Ok(match (op, value) {
-        (FilterOp::In, PrismaValue::Null) => field.equals(PrismaValue::Null),
-        (FilterOp::In, PrismaValue::List(values)) => field.is_in(values),
-        (FilterOp::NotIn, PrismaValue::Null) => field.not_equals(PrismaValue::Null),
-        (FilterOp::NotIn, PrismaValue::List(values)) => field.not_in(values),
-        (FilterOp::Not, val) => field.not_equals(val),
-        (FilterOp::Lt, val) => field.less_than(val),
-        (FilterOp::Lte, val) => field.less_than_or_equals(val),
-        (FilterOp::Gt, val) => field.greater_than(val),
-        (FilterOp::Gte, val) => field.greater_than_or_equals(val),
-        (FilterOp::Contains, val) => field.contains(val),
-        (FilterOp::NotContains, val) => field.not_contains(val),
-        (FilterOp::StartsWith, val) => field.starts_with(val),
-        (FilterOp::NotStartsWith, val) => field.not_starts_with(val),
-        (FilterOp::EndsWith, val) => field.ends_with(val),
-        (FilterOp::NotEndsWith, val) => field.not_ends_with(val),
-        (FilterOp::Field, val) => field.equals(val),
+        (FilterOp::In, PrismaValue::Null) => dsf.equals(PrismaValue::Null),
+        (FilterOp::In, PrismaValue::List(values)) => dsf.is_in(values),
+        (FilterOp::NotIn, PrismaValue::Null) => dsf.not_equals(PrismaValue::Null),
+        (FilterOp::NotIn, PrismaValue::List(values)) => dsf.not_in(values),
+        (FilterOp::Not, val) => dsf.not_equals(val),
+        (FilterOp::Lt, val) => dsf.less_than(val),
+        (FilterOp::Lte, val) => dsf.less_than_or_equals(val),
+        (FilterOp::Gt, val) => dsf.greater_than(val),
+        (FilterOp::Gte, val) => dsf.greater_than_or_equals(val),
+        (FilterOp::Contains, val) => dsf.contains(val),
+        (FilterOp::NotContains, val) => dsf.not_contains(val),
+        (FilterOp::StartsWith, val) => dsf.starts_with(val),
+        (FilterOp::NotStartsWith, val) => dsf.not_starts_with(val),
+        (FilterOp::EndsWith, val) => dsf.ends_with(val),
+        (FilterOp::NotEndsWith, val) => dsf.not_ends_with(val),
+        (FilterOp::Field, val) => dsf.equals(val),
         (_, _) => unreachable!(),
     })
 }
@@ -213,22 +213,9 @@ fn handle_compound_field(fields: Vec<ScalarFieldRef>, value: ParsedInputValue) -
         .into_iter()
         .map(|field| {
             let value: PrismaValue = value.remove(&field.name).unwrap().try_into()?;
-            Ok(field.equals(value))
+            Ok(field.data_source_field().equals(value))
         })
         .collect::<QueryGraphBuilderResult<Vec<_>>>()?;
 
     Ok(Filter::And(filters))
-}
-
-/// Attempts to match a given name to the (schema) name of a compound indexes on the model and returns the first match.
-fn find_index_fields(name: &str, model: &ModelRef) -> QueryGraphBuilderResult<Vec<ScalarFieldRef>> {
-    model
-        .unique_indexes()
-        .into_iter()
-        .find(|index| &compound_field_name(index) == name)
-        .map(|index| index.fields())
-        .ok_or(QueryGraphBuilderError::AssertionError(format!(
-            "Unable to resolve {} to an index on model {}",
-            name, model.name
-        )))
 }

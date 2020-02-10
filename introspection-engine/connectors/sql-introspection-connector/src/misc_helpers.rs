@@ -72,6 +72,7 @@ pub fn calculate_many_to_many_field(foreign_key: &ForeignKey, relation_name: Str
         documentation: None,
         is_generated: false,
         is_updated_at: false,
+        data_source_fields: vec![],
     }
 }
 
@@ -123,6 +124,7 @@ pub(crate) fn calculate_scalar_field(schema: &&SqlSchema, table: &&Table, column
         documentation: None,
         is_generated: false,
         is_updated_at: false,
+        data_source_fields: vec![],
     }
 }
 
@@ -177,6 +179,7 @@ pub(crate) fn calculate_relation_field(schema: &SqlSchema, table: &Table, foreig
             documentation: None,
             is_generated: false,
             is_updated_at: false,
+            data_source_fields: vec![],
         }
     }
 }
@@ -238,6 +241,7 @@ pub(crate) fn calculate_backrelation_field(
         documentation: None,
         is_generated: false,
         is_updated_at: false,
+        data_source_fields: vec![],
     }
 }
 

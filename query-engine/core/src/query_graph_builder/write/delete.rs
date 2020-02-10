@@ -30,15 +30,18 @@ pub fn delete_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedF
     graph.create_edge(
         &read_node,
         &delete_node,
-        QueryGraphDependency::ParentIds(Box::new(|node, parent_ids| {
-            if parent_ids.len() > 0 {
-                Ok(node)
-            } else {
-                Err(QueryGraphBuilderError::RecordNotFound(
-                    "Record to delete does not exist.".to_owned(),
-                ))
-            }
-        })),
+        QueryGraphDependency::ParentIds(
+            model.primary_identifier(),
+            Box::new(|node, parent_ids| {
+                if parent_ids.len() > 0 {
+                    Ok(node)
+                } else {
+                    Err(QueryGraphBuilderError::RecordNotFound(
+                        "Record to delete does not exist.".to_owned(),
+                    ))
+                }
+            }),
+        ),
     )?;
     graph.add_result_node(&read_node);
 
@@ -56,9 +59,10 @@ pub fn delete_many_records(
         None => Filter::empty(),
     };
 
-    let read_query = utils::read_ids_infallible(&model, filter.clone());
+    let model_id = model.primary_identifier();
+    let read_query = utils::read_ids_infallible(model.clone(), model_id, filter.clone());
     let delete_many = WriteQuery::DeleteManyRecords(DeleteManyRecords {
-        model: Arc::clone(&model),
+        model: model.clone(),
         filter,
     });
 

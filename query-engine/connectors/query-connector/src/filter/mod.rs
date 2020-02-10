@@ -9,7 +9,7 @@ mod relation;
 mod scalar;
 
 use prisma_models::prelude::*;
-use std::fmt;
+use prisma_models::{dml, DataSourceField};
 
 pub use list::*;
 pub use relation::*;
@@ -58,13 +58,6 @@ impl Filter {
     }
 }
 
-// WIP
-impl fmt::Display for Filter {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{:?}", self)
-    }
-}
-
 impl From<ScalarFilter> for Filter {
     fn from(sf: ScalarFilter) -> Self {
         Filter::Scalar(sf)
@@ -106,10 +99,14 @@ pub fn test_data_model() -> InternalDataModelRef {
             is_unique: false,
             is_id: false,
             is_auto_generated_int_id: false,
-            manifestation: None,
             behaviour: None,
-            default_value: None,
             internal_enum: None,
+            data_source_field: DataSourceField {
+                name: "id".to_owned(),
+                arity: dml::FieldArity::Optional,
+                field_type: dml::ScalarType::String,
+                default_value: None,
+            },
         }),
         FieldTemplate::Scalar(ScalarFieldTemplate {
             name: "name".to_owned(),
@@ -119,21 +116,25 @@ pub fn test_data_model() -> InternalDataModelRef {
             is_unique: false,
             is_id: false,
             is_auto_generated_int_id: false,
-            manifestation: None,
             behaviour: None,
-            default_value: None,
             internal_enum: None,
+            data_source_field: DataSourceField {
+                name: "name".to_owned(),
+                arity: dml::FieldArity::Optional,
+                field_type: dml::ScalarType::String,
+                default_value: None,
+            },
         }),
         FieldTemplate::Relation(RelationFieldTemplate {
             name: "sites".to_owned(),
-            type_identifier: TypeIdentifier::String,
             is_required: false,
             is_list: false,
             is_unique: false,
             is_auto_generated_int_id: false,
-            manifestation: None,
             relation_name: "bar".to_owned(),
             relation_side: RelationSide::A,
+            data_source_fields: vec![],
+            relation_info: dml::RelationInfo::new(""),
         }),
     ];
 
@@ -145,10 +146,14 @@ pub fn test_data_model() -> InternalDataModelRef {
         is_unique: false,
         is_id: false,
         is_auto_generated_int_id: false,
-        manifestation: None,
         behaviour: None,
-        default_value: None,
         internal_enum: None,
+        data_source_field: DataSourceField {
+            name: "name".to_owned(),
+            arity: dml::FieldArity::Optional,
+            field_type: dml::ScalarType::String,
+            default_value: None,
+        },
     })];
 
     let model_templates = vec![
@@ -157,6 +162,7 @@ pub fn test_data_model() -> InternalDataModelRef {
             is_embedded: false,
             fields: user_field_templates,
             manifestation: None,
+            id_field_names: vec![],
             indexes: vec![],
         },
         ModelTemplate {
@@ -164,6 +170,7 @@ pub fn test_data_model() -> InternalDataModelRef {
             is_embedded: false,
             fields: site_field_templates,
             manifestation: None,
+            id_field_names: vec![],
             indexes: vec![],
         },
     ];

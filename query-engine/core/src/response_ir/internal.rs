@@ -4,7 +4,7 @@ use crate::{
     CoreError, CoreResult, EnumType, QueryResult, RecordSelection,
 };
 use indexmap::IndexMap;
-use prisma_models::{GraphqlId, InternalEnum, PrismaValue, PrismaValueExtensions};
+use prisma_models::{InternalEnum, PrismaValue, RecordIdentifier};
 use rust_decimal::prelude::ToPrimitive;
 use std::{borrow::Borrow, collections::HashMap};
 
@@ -12,12 +12,12 @@ use std::{borrow::Borrow, collections::HashMap};
 /// The item implicitly holds the information of the type of item contained.
 /// E.g., if the output type of a field designates a single object, the item will be
 /// Item::Map(map), if it's a list, Item::List(list), etc. (hence "checked")
-type CheckedItemsWithParents = IndexMap<Option<GraphqlId>, Item>;
+type CheckedItemsWithParents = IndexMap<Option<RecordIdentifier>, Item>;
 
 /// A grouping of items to their parent record.
 /// As opposed to the checked mapping, this map isn't holding final information about
 /// the contained items, i.e. the Items are all unchecked.
-type UncheckedItemsWithParents = IndexMap<Option<GraphqlId>, Vec<Item>>;
+type UncheckedItemsWithParents = IndexMap<Option<RecordIdentifier>, Vec<Item>>;
 
 /// The query validation makes sure that the output selection already has the correct shape.
 /// This means that we can make the following assumptions:
@@ -149,13 +149,18 @@ fn serialize_objects(mut result: RecordSelection, typ: ObjectTypeStrongRef) -> C
 
     // Finally, serialize the objects based on the selected fields.
     let mut object_mapping = UncheckedItemsWithParents::with_capacity(result.scalars.records.len());
-    let scalar_field_names = result.scalars.field_names;
+    let scalar_db_field_names = result.scalars.field_names;
+
+    let model = result.model_id.model();
+    let field_names: Vec<_> = scalar_db_field_names
+        .iter()
+        .filter_map(|f| model.map_scalar_db_field_name(f).map(|x| x.name.clone()))
+        .collect();
 
     // Write all fields, nested and list fields unordered into a map, afterwards order all into the final order.
     // If nothing is written to the object, write null instead.
-
     for record in result.scalars.records.into_iter() {
-        let record_id = Some(record.collect_id(&scalar_field_names, &result.id_field)?);
+        let record_id = Some(record.identifier(&scalar_db_field_names, &result.model_id)?);
 
         if !object_mapping.contains_key(&record.parent_id) {
             object_mapping.insert(record.parent_id.clone(), Vec::new());
@@ -165,11 +170,11 @@ fn serialize_objects(mut result: RecordSelection, typ: ObjectTypeStrongRef) -> C
         let values = record.values;
         let mut object = HashMap::with_capacity(values.len());
 
-        for (val, field_name) in values.into_iter().zip(scalar_field_names.iter()) {
-            let field = typ.find_field(field_name).unwrap();
+        for (val, scalar_field_name) in values.into_iter().zip(field_names.iter()) {
+            let field = typ.find_field(scalar_field_name).unwrap();
 
             if !field.field_type.is_object() {
-                object.insert(field_name.to_owned(), serialize_scalar(val, &field.field_type)?);
+                object.insert(scalar_field_name.to_owned(), serialize_scalar(val, &field.field_type)?);
             }
         }
 
@@ -201,7 +206,7 @@ fn serialize_objects(mut result: RecordSelection, typ: ObjectTypeStrongRef) -> C
 
 /// Unwraps are safe due to query validation.
 fn write_nested_items(
-    record_id: &Option<GraphqlId>,
+    record_id: &Option<RecordIdentifier>,
     items_with_parent: &mut HashMap<String, CheckedItemsWithParents>,
     into: &mut HashMap<String, Item>,
     enclosing_type: &ObjectTypeStrongRef,
@@ -306,9 +311,6 @@ fn serialize_scalar(value: PrismaValue, typ: &OutputTypeRef) -> CoreResult<Item>
 fn convert_prisma_value(value: PrismaValue, st: &ScalarType) -> Result<PrismaValue, CoreError> {
     let item_value = match (st, value) {
         (ScalarType::String, PrismaValue::String(s)) => PrismaValue::String(s),
-
-        (ScalarType::ID, PrismaValue::GraphqlId(id)) => PrismaValue::GraphqlId(id),
-        (ScalarType::ID, val) => PrismaValue::GraphqlId(val.into_graphql_id()?),
 
         (ScalarType::Int, PrismaValue::Float(f)) => PrismaValue::Int(f.to_i64().unwrap()),
         (ScalarType::Int, PrismaValue::Int(i)) => PrismaValue::Int(i),

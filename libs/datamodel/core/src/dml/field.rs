@@ -1,8 +1,9 @@
 use super::*;
 use datamodel_connector::ScalarFieldType;
+use std::hash::{Hash, Hasher};
 
 /// Datamodel field arity.
-#[derive(Debug, PartialEq, Copy, Clone)]
+#[derive(Debug, PartialEq, Copy, Clone, Eq, Hash)]
 pub enum FieldArity {
     Required,
     Optional,
@@ -37,32 +38,68 @@ impl FieldType {
     }
 }
 
+/// Describes a singular field on a data source.
+/// This doesn't necessarily map 1:1 to fields in the datamodel, as some
+/// datamodel fields, notably relation fields, can be backed by multiple
+/// data source fields.
+#[derive(Debug, PartialEq, Clone)]
+pub struct DataSourceField {
+    /// Name of the backing data source field (e.g. SQL column name or document key).
+    pub name: String,
+    pub field_type: ScalarType,
+    pub arity: FieldArity,
+    pub default_value: Option<DefaultValue>,
+}
+
+impl Hash for DataSourceField {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.name.hash(state);
+        self.field_type.hash(state);
+        self.arity.hash(state);
+    }
+}
+
+impl Eq for DataSourceField {}
+
 /// Represents a field in a model.
 #[derive(Debug, PartialEq, Clone)]
 pub struct Field {
     /// Name of the field.
     pub name: String,
-    /// The field's arity.
-    pub arity: FieldArity,
+
     /// The field's type.
     pub field_type: FieldType,
+
+    // -------- todo this is duplicated from DataSourceField --------
+    /// The field's arity.
+    pub arity: FieldArity,
+
     /// The database internal name.
     pub database_names: Vec<String>,
+
     /// The default value.
     pub default_value: Option<DefaultValue>,
+    // -------- -------------------------------------------- --------
     /// Indicates if the field is unique.
     pub is_unique: bool,
+
     /// If set, signals that this field is an id field, or
     /// primary key.
     pub is_id: bool,
+
     /// Comments associated with this field.
     pub documentation: Option<String>,
+
     /// If set, signals that this field was internally generated
     /// and should never be displayed to the user.
     pub is_generated: bool,
+
     /// If set, signals that this field is updated_at and will be updated to now()
     /// automatically.
     pub is_updated_at: bool,
+
+    /// The data source field specifics, like backing fields and defaults.
+    pub data_source_fields: Vec<DataSourceField>,
 }
 
 impl WithName for Field {
@@ -122,6 +159,7 @@ impl Field {
             documentation: None,
             is_generated: false,
             is_updated_at: false,
+            data_source_fields: vec![],
         }
     }
     /// Creates a new field with the given name and type, marked as generated and optional.
@@ -137,6 +175,7 @@ impl Field {
             documentation: None,
             is_generated: true,
             is_updated_at: false,
+            data_source_fields: vec![],
         }
     }
 }

@@ -6,9 +6,9 @@ pub use base_query::*;
 pub use row_number::*;
 pub use union_all::*;
 
-use crate::ordering::Ordering;
-use prisma_models::*;
-use quaint::ast::{Comparable, Conjuctive, Query};
+use crate::{ordering::Ordering, query_builder};
+use prisma_models::sql_ext::RelationFieldExt;
+use quaint::ast::{Conjuctive, Query};
 
 pub trait ManyRelatedRecordsQueryBuilder {
     const BASE_TABLE_ALIAS: &'static str = "prismaBaseTableAlias";
@@ -18,19 +18,20 @@ pub trait ManyRelatedRecordsQueryBuilder {
     fn with_pagination<'a>(base: ManyRelatedRecordsBaseQuery<'a>) -> Query;
 
     fn without_pagination<'a>(base: ManyRelatedRecordsBaseQuery<'a>) -> Query {
-        let conditions = base
-            .from_field
-            .relation_column(true)
-            .in_selection(base.from_record_ids.to_owned())
+        let columns: Vec<_> = base.from_field.relation_columns(true).collect();
+
+        let conditions = query_builder::conditions(&columns, base.from_record_ids)
             .and(base.condition)
             .and(base.cursor);
 
-        let opposite_column = base.from_field.opposite_column(true);
-        let order_columns = Ordering::internal(opposite_column, base.order_directions);
+        let opposite_columns = base.from_field.opposite_columns(true);
+        let order_columns = Ordering::internal(opposite_columns, base.order_directions);
 
         order_columns
             .into_iter()
             .fold(base.query.so_that(conditions), |acc, ord| acc.order_by(ord))
             .into()
     }
+
+    fn uses_row_number() -> bool;
 }

@@ -1,7 +1,8 @@
 //! Write query AST
 use super::FilteredQuery;
-use connector::filter::Filter;
+use connector::{filter::Filter, WriteArgs};
 use prisma_models::prelude::*;
+use std::sync::Arc;
 
 #[derive(Debug, Clone)]
 pub enum WriteQuery {
@@ -12,7 +13,6 @@ pub enum WriteQuery {
     DeleteManyRecords(DeleteManyRecords),
     ConnectRecords(ConnectRecords),
     DisconnectRecords(DisconnectRecords),
-    ResetData(ResetData),
     Raw {
         query: String,
         parameters: Vec<PrismaValue>,
@@ -20,22 +20,69 @@ pub enum WriteQuery {
 }
 
 impl WriteQuery {
-    pub fn inject_non_list_arg(&mut self, key: String, value: PrismaValue) {
-        match self {
-            Self::CreateRecord(x) => {
-                x.args.insert(key, value);
-            }
+    pub fn inject_id_into_args(&mut self, record_id: RecordIdentifier) {
+        let keys = record_id.fields().map(|dsf| dsf.name.clone()).collect();
+        let values = record_id.values().map(|v| v.clone()).collect();
 
-            Self::UpdateRecord(x) => {
-                x.args.insert(key, value);
-            }
+        self.inject_values_into_args(keys, values);
+    }
 
-            Self::UpdateManyRecords(x) => {
-                x.args.insert(key, value);
-            }
+    pub fn inject_values_into_args(&mut self, keys: Vec<String>, values: Vec<PrismaValue>) {
+        keys.into_iter()
+            .zip(values)
+            .for_each(|(key, value)| self.inject_field_arg(key, value));
+    }
 
-            _ => (),
+    // Injects PrismaValues into the write arguments based the passed field.
+    // If the underlying representation of the field takes multiple values, a compound field is injected.
+    // If values are missing (e.g. empty vec passed), `PrismaValue::Null`(s) are written instead.
+    pub fn inject_field_arg(&mut self, key: String, mut value: PrismaValue) {
+        let args = match self {
+            Self::CreateRecord(ref mut x) => &mut x.args,
+            Self::UpdateRecord(x) => &mut x.args,
+            Self::UpdateManyRecords(x) => &mut x.args,
+
+            _ => return,
         };
+
+        args.insert(key, value)
+    }
+
+    pub fn returns(&self, ident: &ModelIdentifier) -> bool {
+        let returns_id = &self.model().primary_identifier() == ident;
+
+        // Write operations only return IDs at the moment, so anything different
+        // from the primary ID is automatically not returned.
+        // DeleteMany, Connect and Disconnect do not return anything.
+        match self {
+            Self::CreateRecord(q) => returns_id,
+            Self::UpdateRecord(q) => returns_id,
+            Self::DeleteRecord(q) => returns_id,
+            Self::UpdateManyRecords(q) => returns_id,
+            Self::DeleteManyRecords(q) => false,
+            Self::ConnectRecords(q) => false,
+            Self::DisconnectRecords(q) => false,
+            Self::Raw {
+                query: _,
+                parameters: _,
+            } => unimplemented!(),
+        }
+    }
+
+    fn model(&self) -> ModelRef {
+        match self {
+            Self::CreateRecord(q) => Arc::clone(&q.model),
+            Self::UpdateRecord(q) => Arc::clone(&q.model),
+            Self::DeleteRecord(q) => Arc::clone(&q.model),
+            Self::UpdateManyRecords(q) => Arc::clone(&q.model),
+            Self::DeleteManyRecords(q) => Arc::clone(&q.model),
+            Self::ConnectRecords(q) => q.relation_field.model(),
+            Self::DisconnectRecords(q) => q.relation_field.model(),
+            Self::Raw {
+                query: _,
+                parameters: _,
+            } => unimplemented!(),
+        }
     }
 }
 
@@ -75,7 +122,6 @@ impl std::fmt::Display for WriteQuery {
             Self::DeleteManyRecords(q) => write!(f, "DeleteManyRecords: {}", q.model.name),
             Self::ConnectRecords(_) => write!(f, "ConnectRecords"),
             Self::DisconnectRecords(_) => write!(f, "DisconnectRecords"),
-            Self::ResetData(_) => write!(f, "ResetData"),
             Self::Raw { query, parameters } => write!(f, "Raw: {} ({:?})", query, parameters),
         }
     }
@@ -84,21 +130,21 @@ impl std::fmt::Display for WriteQuery {
 #[derive(Debug, Clone)]
 pub struct CreateRecord {
     pub model: ModelRef,
-    pub args: PrismaArgs,
+    pub args: WriteArgs,
 }
 
 #[derive(Debug, Clone)]
 pub struct UpdateRecord {
     pub model: ModelRef,
     pub where_: Filter,
-    pub args: PrismaArgs,
+    pub args: WriteArgs,
 }
 
 #[derive(Debug, Clone)]
 pub struct UpdateManyRecords {
     pub model: ModelRef,
     pub filter: Filter,
-    pub args: PrismaArgs,
+    pub args: WriteArgs,
 }
 
 #[derive(Debug, Clone)]
@@ -115,21 +161,16 @@ pub struct DeleteManyRecords {
 
 #[derive(Debug, Clone)]
 pub struct ConnectRecords {
-    pub parent_id: Option<GraphqlId>,
-    pub child_ids: Vec<GraphqlId>,
+    pub parent_id: Option<RecordIdentifier>,
+    pub child_ids: Vec<RecordIdentifier>,
     pub relation_field: RelationFieldRef,
 }
 
 #[derive(Debug, Clone)]
 pub struct DisconnectRecords {
-    pub parent_id: Option<GraphqlId>,
-    pub child_ids: Vec<GraphqlId>,
+    pub parent_id: Option<RecordIdentifier>,
+    pub child_ids: Vec<RecordIdentifier>,
     pub relation_field: RelationFieldRef,
-}
-
-#[derive(Debug, Clone)]
-pub struct ResetData {
-    pub internal_data_model: InternalDataModelRef,
 }
 
 impl FilteredQuery for UpdateRecord {
