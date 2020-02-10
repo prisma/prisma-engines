@@ -69,12 +69,12 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    data:{
          |    childrenOpt: {updateMany: {
          |        where: {c_contains:"c"}
-         |        data: {test: "updated"}
+         |        data: {non_unique: "updated"}
          |    }}
          |  }){
          |    childrenOpt {
          |      c
-         |      test
+         |      non_unique
          |    }
          |  }
          |}
@@ -82,8 +82,8 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         project
       )
 
-      server.query("query{parents{p,childrenOpt{c, test}}}", project).toString() should be(
-        """{"data":{"parents":[{"p":"p1","childrenOpt":[{"c":"c1","test":"updated"},{"c":"c2","test":"updated"}]},{"p":"p2","childrenOpt":[{"c":"c3","test":null},{"c":"c4","test":null}]}]}}""")
+      server.query("query{parents{p,childrenOpt{c, non_unique}}}", project).toString() should be(
+        """{"data":{"parents":[{"p":"p1","childrenOpt":[{"c":"c1","non_unique":"updated"},{"c":"c2","non_unique":"updated"}]},{"p":"p2","childrenOpt":[{"c":"c3","non_unique":null},{"c":"c4","non_unique":null}]}]}}""")
     }
   }
 
@@ -104,12 +104,12 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    data:{
          |    childrenOpt: {updateMany: {
          |        where: {c_contains:"c"}
-         |        data: {test: "updated"}
+         |        data: {non_unique: "updated"}
          |    }}
          |  }){
          |    childrenOpt {
          |      c
-         |      test
+         |      non_unique
          |    }
          |  }
          |}
@@ -117,8 +117,8 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         project
       )
 
-      server.query("query{parents{p,childrenOpt{c, test}}}", project).toString() should be(
-        """{"data":{"parents":[{"p":"p1","childrenOpt":[{"c":"c1","test":"updated"},{"c":"c2","test":"updated"}]},{"p":"p2","childrenOpt":[{"c":"c3","test":null},{"c":"c4","test":null}]}]}}""")
+      server.query("query{parents{p,childrenOpt{c, non_unique}}}", project).toString() should be(
+        """{"data":{"parents":[{"p":"p1","childrenOpt":[{"c":"c1","non_unique":"updated"},{"c":"c2","non_unique":"updated"}]},{"p":"p2","childrenOpt":[{"c":"c3","non_unique":null},{"c":"c4","non_unique":null}]}]}}""")
     }
   }
 
@@ -139,12 +139,12 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    data:{
          |    childrenOpt: {updateMany: {
          |        where: {c_contains:"c"}
-         |        data: {test: "updated"}
+         |        data: {non_unique: "updated"}
          |    }}
          |  }){
          |    childrenOpt {
          |      c
-         |      test
+         |      non_unique
          |    }
          |  }
          |}
@@ -152,8 +152,8 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         project
       )
 
-      server.query("query{parents{p,childrenOpt{c, test}}}", project).toString() should be(
-        """{"data":{"parents":[{"p":"p1","childrenOpt":[{"c":"c1","test":"updated"},{"c":"c2","test":"updated"}]},{"p":"p2","childrenOpt":[{"c":"c3","test":null},{"c":"c4","test":null}]}]}}""")
+      server.query("query{parents{p,childrenOpt{c, non_unique}}}", project).toString() should be(
+        """{"data":{"parents":[{"p":"p1","childrenOpt":[{"c":"c1","non_unique":"updated"},{"c":"c2","non_unique":"updated"}]},{"p":"p2","childrenOpt":[{"c":"c3","non_unique":null},{"c":"c4","non_unique":null}]}]}}""")
     }
   }
 
@@ -175,17 +175,17 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    childrenOpt: {updateMany: [
          |    {
          |        where: {c_contains:"1"}
-         |        data: {test: "updated1"}
+         |        data: {non_unique: "updated1"}
          |    },
          |    {
          |        where: {c_contains:"2"}
-         |        data: {test: "updated2"}
+         |        data: {non_unique: "updated2"}
          |    }
          |    ]}
          |  }){
          |    childrenOpt {
          |      c
-         |      test
+         |      non_unique
          |    }
          |  }
          |}
@@ -193,8 +193,8 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         project
       )
 
-      server.query("query{parents{p,childrenOpt{c, test}}}", project).toString() should be(
-        """{"data":{"parents":[{"p":"p1","childrenOpt":[{"c":"c1","test":"updated1"},{"c":"c2","test":"updated2"}]},{"p":"p2","childrenOpt":[{"c":"c3","test":null},{"c":"c4","test":null}]}]}}""")
+      server.query("query{parents{p,childrenOpt{c, non_unique}}}", project).toString() should be(
+        """{"data":{"parents":[{"p":"p1","childrenOpt":[{"c":"c1","non_unique":"updated1"},{"c":"c2","non_unique":"updated2"}]},{"p":"p2","childrenOpt":[{"c":"c3","non_unique":null},{"c":"c4","non_unique":null}]}]}}""")
     }
   }
 
@@ -216,13 +216,13 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    childrenOpt: {updateMany: [
          |    {
          |        where: {}
-         |        data: {test: "updated1"}
+         |        data: {non_unique: "updated1"}
          |    }
          |    ]}
          |  }){
          |    childrenOpt {
          |      c
-         |      test
+         |      non_unique
          |    }
          |  }
          |}
@@ -230,8 +230,8 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         project
       )
 
-      server.query("query{parents{p,childrenOpt{c, test}}}", project).toString() should be(
-        """{"data":{"parents":[{"p":"p1","childrenOpt":[{"c":"c1","test":"updated1"},{"c":"c2","test":"updated1"}]},{"p":"p2","childrenOpt":[{"c":"c3","test":null},{"c":"c4","test":null}]}]}}""")
+      server.query("query{parents{p,childrenOpt{c, non_unique}}}", project).toString() should be(
+        """{"data":{"parents":[{"p":"p1","childrenOpt":[{"c":"c1","non_unique":"updated1"},{"c":"c2","non_unique":"updated1"}]},{"p":"p2","childrenOpt":[{"c":"c3","non_unique":null},{"c":"c4","non_unique":null}]}]}}""")
     }
   }
 
@@ -253,17 +253,17 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    childrenOpt: {updateMany: [
          |    {
          |        where: {c_contains:"3"}
-         |        data: {test: "updated3"}
+         |        data: {non_unique: "updated3"}
          |    },
          |    {
          |        where: {c_contains:"4"}
-         |        data: {test: "updated4"}
+         |        data: {non_unique: "updated4"}
          |    }
          |    ]}
          |  }){
          |    childrenOpt {
          |      c
-         |      test
+         |      non_unique
          |    }
          |  }
          |}
@@ -271,8 +271,8 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         project
       )
 
-      server.query("query{parents{p,childrenOpt{c, test}}}", project).toString() should be(
-        """{"data":{"parents":[{"p":"p1","childrenOpt":[{"c":"c1","test":null},{"c":"c2","test":null}]},{"p":"p2","childrenOpt":[{"c":"c3","test":null},{"c":"c4","test":null}]}]}}""")
+      server.query("query{parents{p,childrenOpt{c, non_unique}}}", project).toString() should be(
+        """{"data":{"parents":[{"p":"p1","childrenOpt":[{"c":"c1","non_unique":null},{"c":"c2","non_unique":null}]},{"p":"p2","childrenOpt":[{"c":"c3","non_unique":null},{"c":"c4","non_unique":null}]}]}}""")
     }
   }
 
@@ -296,17 +296,17 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    childrenOpt: {updateMany: [
          |    {
          |        where: {c_contains:"c"}
-         |        data: {test: "updated1"}
+         |        data: {non_unique: "updated1"}
          |    },
          |    {
          |        where: {c_contains:"c1"}
-         |        data: {test: "updated2"}
+         |        data: {non_unique: "updated2"}
          |    }
          |    ]}
          |  }){
          |    childrenOpt (orderBy: id_ASC){
          |      c
-         |      test
+         |      non_unique
          |    }
          |  }
          |}
@@ -314,8 +314,8 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         project
       )
 
-      server.query("query{parents{p,childrenOpt(orderBy: id_ASC){c, test}}}", project).toString() should be(
-        """{"data":{"parents":[{"p":"p1","childrenOpt":[{"c":"c1","test":"updated2"},{"c":"c2","test":"updated1"}]},{"p":"p2","childrenOpt":[{"c":"c3","test":null},{"c":"c4","test":null}]}]}}""")
+      server.query("query{parents{p,childrenOpt(orderBy: id_ASC){c, non_unique}}}", project).toString() should be(
+        """{"data":{"parents":[{"p":"p1","childrenOpt":[{"c":"c1","non_unique":"updated2"},{"c":"c2","non_unique":"updated1"}]},{"p":"p2","childrenOpt":[{"c":"c3","non_unique":null},{"c":"c4","non_unique":null}]}]}}""")
     }
   }
 
