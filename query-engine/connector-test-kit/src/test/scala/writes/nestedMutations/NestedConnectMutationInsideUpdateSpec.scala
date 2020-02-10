@@ -143,8 +143,6 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
       }
       database.setup(project)
 
-      println(t)
-
       val looseChildId = t.child.where(
         server
           .query(
