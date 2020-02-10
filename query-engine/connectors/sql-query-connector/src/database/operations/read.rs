@@ -99,8 +99,7 @@ where
             .collect::<Vec<_>>(),
     );
 
-    let query = if can_skip_joins && false {
-        // no optimizations for now
+    let query = if can_skip_joins {
         let model = from_field.related_model();
         let relation_columns: Vec<_> = from_field.relation_columns(true).collect();
         let select = read::get_records(&model, columns.into_iter(), query_arguments)
