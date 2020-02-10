@@ -8,8 +8,10 @@ class NestedDeleteManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
   override def runOnlyForCapabilities = Set(JoinRelationLinksCapability)
 
   "A 1-n relation" should "error if trying to use nestedDeleteMany" in {
-    schemaP1optToC1opt.test { dataModel =>
-      val project = SchemaDsl.fromStringV11() { dataModel }
+    schemaWithRelation(onParent = ChildOpt, onChild = ParentOpt).test { t =>
+      val project = SchemaDsl.fromStringV11() {
+        t.datamodel
+      }
       database.setup(project)
 
       val parent1Id = server
@@ -49,8 +51,10 @@ class NestedDeleteManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
   }
 
   "a PM to C1!  relation " should "work" in {
-    schemaPMToC1req.test { dataModel =>
-      val project = SchemaDsl.fromStringV11() { dataModel }
+    schemaWithRelation(onParent = ChildList, onChild = ParentReq).test { t =>
+      val project = SchemaDsl.fromStringV11() {
+        t.datamodel
+      }
       database.setup(project)
 
       setupData(project)
@@ -66,7 +70,6 @@ class NestedDeleteManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |  }){
          |    childrenOpt {
          |      c
-         |      test
          |    }
          |  }
          |}
@@ -74,14 +77,16 @@ class NestedDeleteManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         project
       )
 
-      server.query("query{parents{p,childrenOpt{c, test}}}", project).toString() should be(
-        """{"data":{"parents":[{"p":"p1","childrenOpt":[]},{"p":"p2","childrenOpt":[{"c":"c3","test":null},{"c":"c4","test":null}]}]}}""")
+      server.query("query{parents{p,childrenOpt{c}}}", project).toString() should be(
+        """{"data":{"parents":[{"p":"p1","childrenOpt":[]},{"p":"p2","childrenOpt":[{"c":"c3"},{"c":"c4"}]}]}}""")
     }
   }
 
   "a PM to C1  relation " should "work" in {
-    schemaPMToC1opt.test { dataModel =>
-      val project = SchemaDsl.fromStringV11() { dataModel }
+    schemaWithRelation(onParent = ChildList, onChild = ParentOpt).test { t =>
+      val project = SchemaDsl.fromStringV11() {
+        t.datamodel
+      }
       database.setup(project)
 
       setupData(project)
@@ -97,7 +102,7 @@ class NestedDeleteManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |  }){
          |    childrenOpt {
          |      c
-         |      test
+         |
          |    }
          |  }
          |}
@@ -105,14 +110,16 @@ class NestedDeleteManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         project
       )
 
-      server.query("query{parents{p,childrenOpt{c, test}}}", project).toString() should be(
-        """{"data":{"parents":[{"p":"p1","childrenOpt":[]},{"p":"p2","childrenOpt":[{"c":"c3","test":null},{"c":"c4","test":null}]}]}}""")
+      server.query("query{parents{p,childrenOpt{c}}}", project).toString() should be(
+        """{"data":{"parents":[{"p":"p1","childrenOpt":[]},{"p":"p2","childrenOpt":[{"c":"c3"},{"c":"c4"}]}]}}""")
     }
   }
 
   "a PM to CM  relation " should "work" in {
-    schemaPMToCM.test { dataModel =>
-      val project = SchemaDsl.fromStringV11() { dataModel }
+    schemaWithRelation(onParent = ChildList, onChild = ParentList).test { t =>
+      val project = SchemaDsl.fromStringV11() {
+        t.datamodel
+      }
       database.setup(project)
 
       setupData(project)
@@ -130,7 +137,7 @@ class NestedDeleteManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |  }){
          |    childrenOpt {
          |      c
-         |      test
+         |
          |    }
          |  }
          |}
@@ -138,14 +145,16 @@ class NestedDeleteManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         project
       )
 
-      server.query("query{parents{p,childrenOpt{c, test}}}", project).toString() should be(
-        """{"data":{"parents":[{"p":"p1","childrenOpt":[]},{"p":"p2","childrenOpt":[{"c":"c3","test":null},{"c":"c4","test":null}]}]}}""")
+      server.query("query{parents{p,childrenOpt{c}}}", project).toString() should be(
+        """{"data":{"parents":[{"p":"p1","childrenOpt":[]},{"p":"p2","childrenOpt":[{"c":"c3"},{"c":"c4"}]}]}}""")
     }
   }
 
   "a PM to C1!  relation " should "work with several deleteManys" in {
-    schemaPMToC1req.test { dataModel =>
-      val project = SchemaDsl.fromStringV11() { dataModel }
+    schemaWithRelation(onParent = ChildList, onChild = ParentReq).test { t =>
+      val project = SchemaDsl.fromStringV11() {
+        t.datamodel
+      }
       database.setup(project)
 
       setupData(project)
@@ -167,7 +176,6 @@ class NestedDeleteManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |  }){
          |    childrenOpt {
          |      c
-         |      test
          |    }
          |  }
          |}
@@ -175,15 +183,17 @@ class NestedDeleteManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         project
       )
 
-      server.query("query{parents{p,childrenOpt{c, test}}}", project).toString() should be(
-        """{"data":{"parents":[{"p":"p1","childrenOpt":[]},{"p":"p2","childrenOpt":[{"c":"c3","test":null},{"c":"c4","test":null}]}]}}""")
+      server.query("query{parents{p,childrenOpt{c}}}", project).toString() should be(
+        """{"data":{"parents":[{"p":"p1","childrenOpt":[]},{"p":"p2","childrenOpt":[{"c":"c3"},{"c":"c4"}]}]}}""")
 
     }
   }
 
   "a PM to C1!  relation " should "work with empty Filter" in {
-    schemaPMToC1req.test { dataModel =>
-      val project = SchemaDsl.fromStringV11() { dataModel }
+    schemaWithRelation(onParent = ChildList, onChild = ParentReq).test { t =>
+      val project = SchemaDsl.fromStringV11() {
+        t.datamodel
+      }
       database.setup(project)
 
       setupData(project)
@@ -200,7 +210,6 @@ class NestedDeleteManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |  }){
          |    childrenOpt {
          |      c
-         |      test
          |    }
          |  }
          |}
@@ -208,14 +217,16 @@ class NestedDeleteManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         project
       )
 
-      server.query("query{parents{p,childrenOpt{c, test}}}", project).toString() should be(
-        """{"data":{"parents":[{"p":"p1","childrenOpt":[]},{"p":"p2","childrenOpt":[{"c":"c3","test":null},{"c":"c4","test":null}]}]}}""")
+      server.query("query{parents{p,childrenOpt{c}}}", project).toString() should be(
+        """{"data":{"parents":[{"p":"p1","childrenOpt":[]},{"p":"p2","childrenOpt":[{"c":"c3"},{"c":"c4"}]}]}}""")
     }
   }
 
   "a PM to C1!  relation " should "not change anything when there is no hit" in {
-    schemaPMToC1req.test { dataModel =>
-      val project = SchemaDsl.fromStringV11() { dataModel }
+    schemaWithRelation(onParent = ChildList, onChild = ParentReq).test { t =>
+      val project = SchemaDsl.fromStringV11() {
+        t.datamodel
+      }
       database.setup(project)
 
       setupData(project)
@@ -237,7 +248,6 @@ class NestedDeleteManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |  }){
          |    childrenOpt {
          |      c
-         |      test
          |    }
          |  }
          |}
@@ -245,8 +255,8 @@ class NestedDeleteManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         project
       )
 
-      server.query("query{parents{p,childrenOpt{c, test}}}", project).toString() should be(
-        """{"data":{"parents":[{"p":"p1","childrenOpt":[{"c":"c1","test":null},{"c":"c2","test":null}]},{"p":"p2","childrenOpt":[{"c":"c3","test":null},{"c":"c4","test":null}]}]}}""")
+      server.query("query{parents{p,childrenOpt{c}}}", project).toString() should be(
+        """{"data":{"parents":[{"p":"p1","childrenOpt":[{"c":"c1"},{"c":"c2"}]},{"p":"p2","childrenOpt":[{"c":"c3"},{"c":"c4"}]}]}}""")
     }
   }
 
