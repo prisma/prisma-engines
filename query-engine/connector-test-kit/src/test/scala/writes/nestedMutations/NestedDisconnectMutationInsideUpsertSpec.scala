@@ -256,7 +256,7 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
   }
 
   "a P1 to CM  relation with the child already in a relation" should "be disconnectable through a nested mutation by unique" in {
-    schemaWithRelation(onParent = ChildList, onChild = ParentList).test { t =>
+    schemaWithRelation(onParent = ChildOpt, onChild = ParentList).test { t =>
       val project = SchemaDsl.fromStringV11() {
         t.datamodel
       }

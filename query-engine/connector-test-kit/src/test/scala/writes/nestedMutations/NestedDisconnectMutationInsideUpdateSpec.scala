@@ -514,6 +514,8 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
     }
   }
 
+  // OTHER DATAMODELS
+
   "a one to many relation" should "be disconnectable by id through a nested mutation" in {
     val project = SchemaDsl.fromStringV11() {
       s"""model Todo{

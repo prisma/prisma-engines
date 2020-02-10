@@ -70,7 +70,6 @@ class NestedDeleteManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |  }){
          |    childrenOpt {
          |      c
-         |      test
          |    }
          |  }
          |}
@@ -78,8 +77,8 @@ class NestedDeleteManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         project
       )
 
-      server.query("query{parents{p,childrenOpt{c, test}}}", project).toString() should be(
-        """{"data":{"parents":[{"p":"p1","childrenOpt":[]},{"p":"p2","childrenOpt":[{"c":"c3","test":null},{"c":"c4","test":null}]}]}}""")
+      server.query("query{parents{p,childrenOpt{c}}}", project).toString() should be(
+        """{"data":{"parents":[{"p":"p1","childrenOpt":[]},{"p":"p2","childrenOpt":[{"c":"c3"},{"c":"c4"}]}]}}""")
     }
   }
 
@@ -103,7 +102,7 @@ class NestedDeleteManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |  }){
          |    childrenOpt {
          |      c
-         |      test
+         |
          |    }
          |  }
          |}
@@ -111,8 +110,8 @@ class NestedDeleteManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         project
       )
 
-      server.query("query{parents{p,childrenOpt{c, test}}}", project).toString() should be(
-        """{"data":{"parents":[{"p":"p1","childrenOpt":[]},{"p":"p2","childrenOpt":[{"c":"c3","test":null},{"c":"c4","test":null}]}]}}""")
+      server.query("query{parents{p,childrenOpt{c}}}", project).toString() should be(
+        """{"data":{"parents":[{"p":"p1","childrenOpt":[]},{"p":"p2","childrenOpt":[{"c":"c3"},{"c":"c4"}]}]}}""")
     }
   }
 
@@ -138,7 +137,7 @@ class NestedDeleteManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |  }){
          |    childrenOpt {
          |      c
-         |      test
+         |
          |    }
          |  }
          |}
@@ -146,8 +145,8 @@ class NestedDeleteManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         project
       )
 
-      server.query("query{parents{p,childrenOpt{c, test}}}", project).toString() should be(
-        """{"data":{"parents":[{"p":"p1","childrenOpt":[]},{"p":"p2","childrenOpt":[{"c":"c3","test":null},{"c":"c4","test":null}]}]}}""")
+      server.query("query{parents{p,childrenOpt{c}}}", project).toString() should be(
+        """{"data":{"parents":[{"p":"p1","childrenOpt":[]},{"p":"p2","childrenOpt":[{"c":"c3"},{"c":"c4"}]}]}}""")
     }
   }
 
@@ -177,7 +176,6 @@ class NestedDeleteManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |  }){
          |    childrenOpt {
          |      c
-         |      test
          |    }
          |  }
          |}
@@ -185,8 +183,8 @@ class NestedDeleteManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         project
       )
 
-      server.query("query{parents{p,childrenOpt{c, test}}}", project).toString() should be(
-        """{"data":{"parents":[{"p":"p1","childrenOpt":[]},{"p":"p2","childrenOpt":[{"c":"c3","test":null},{"c":"c4","test":null}]}]}}""")
+      server.query("query{parents{p,childrenOpt{c}}}", project).toString() should be(
+        """{"data":{"parents":[{"p":"p1","childrenOpt":[]},{"p":"p2","childrenOpt":[{"c":"c3"},{"c":"c4"}]}]}}""")
 
     }
   }
@@ -212,7 +210,6 @@ class NestedDeleteManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |  }){
          |    childrenOpt {
          |      c
-         |      test
          |    }
          |  }
          |}
@@ -220,8 +217,8 @@ class NestedDeleteManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         project
       )
 
-      server.query("query{parents{p,childrenOpt{c, test}}}", project).toString() should be(
-        """{"data":{"parents":[{"p":"p1","childrenOpt":[]},{"p":"p2","childrenOpt":[{"c":"c3","test":null},{"c":"c4","test":null}]}]}}""")
+      server.query("query{parents{p,childrenOpt{c}}}", project).toString() should be(
+        """{"data":{"parents":[{"p":"p1","childrenOpt":[]},{"p":"p2","childrenOpt":[{"c":"c3"},{"c":"c4"}]}]}}""")
     }
   }
 
@@ -251,7 +248,6 @@ class NestedDeleteManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |  }){
          |    childrenOpt {
          |      c
-         |      test
          |    }
          |  }
          |}
@@ -259,8 +255,8 @@ class NestedDeleteManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         project
       )
 
-      server.query("query{parents{p,childrenOpt{c, test}}}", project).toString() should be(
-        """{"data":{"parents":[{"p":"p1","childrenOpt":[{"c":"c1","test":null},{"c":"c2","test":null}]},{"p":"p2","childrenOpt":[{"c":"c3","test":null},{"c":"c4","test":null}]}]}}""")
+      server.query("query{parents{p,childrenOpt{c}}}", project).toString() should be(
+        """{"data":{"parents":[{"p":"p1","childrenOpt":[{"c":"c1"},{"c":"c2"}]},{"p":"p2","childrenOpt":[{"c":"c3"},{"c":"c4"}]}]}}""")
     }
   }
 
