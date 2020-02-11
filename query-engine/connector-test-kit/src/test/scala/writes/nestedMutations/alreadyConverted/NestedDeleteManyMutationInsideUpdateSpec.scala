@@ -1,4 +1,4 @@
-package writes.nestedMutations
+package writes.nestedMutations.alreadyConverted
 
 import org.scalatest.{FlatSpec, Matchers}
 import util.ConnectorCapability.JoinRelationLinksCapability
@@ -14,23 +14,23 @@ class NestedDeleteManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
       }
       database.setup(project)
 
-      val parent1Id = server
+      val parentResult = server
         .query(
-          """mutation {
-          |  createParent(data: {p: "p1"})
+          s"""mutation {
+          |  createParent(data: {p: "p1", p_1: "p", p_2: "1"})
           |  {
-          |    id
+          |    ${t.parent.selection}
           |  }
           |}""",
           project
         )
-        .pathAsString("data.createParent.id")
+      val parentIdentifier = t.parent.where(parentResult, "data.createParent")
 
       val res = server.queryThatMustFail(
         s"""
          |mutation {
          |  updateParent(
-         |  where:{id: "$parent1Id"}
+         |  where: $parentIdentifier
          |  data:{
          |    p: "p2"
          |    childOpt: {deleteMany: {
@@ -264,7 +264,7 @@ class NestedDeleteManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
     server.query(
       """mutation {
         |  createParent(data: {
-        |    p: "p1"
+        |    p: "p1", p_1: "p", p_2: "1"
         |    childrenOpt: {
         |      create: [{c: "c1"},{c: "c2"}]
         |    }
@@ -280,7 +280,7 @@ class NestedDeleteManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
     server.query(
       """mutation {
         |  createParent(data: {
-        |    p: "p2"
+        |    p: "p2", p_1: "p", p_2: "2"
         |    childrenOpt: {
         |      create: [{c: "c3"},{c: "c4"}]
         |    }
