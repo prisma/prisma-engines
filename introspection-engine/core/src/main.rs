@@ -4,7 +4,6 @@ mod error;
 mod rpc;
 
 #[cfg(test)]
-mod tests;
 use jsonrpc_core::*;
 use rpc::{Rpc, RpcImpl};
 
