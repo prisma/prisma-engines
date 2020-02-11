@@ -167,45 +167,39 @@ impl Queryable for Sqlite {
     }
 
     fn query_raw<'a>(&'a self, sql: &'a str, params: &'a [ParameterizedValue]) -> DBIO<'a, ResultSet> {
-        metrics::query("sqlite.query_raw", sql, params, move || {
-            async move {
-                let client = self.client.lock().await;
+        metrics::query("sqlite.query_raw", sql, params, move || async move {
+            let client = self.client.lock().await;
 
-                let mut stmt = client.prepare_cached(sql)?;
+            let mut stmt = client.prepare_cached(sql)?;
 
-                let mut rows = stmt.query(params)?;
-                let mut result = ResultSet::new(rows.to_column_names(), Vec::new());
+            let mut rows = stmt.query(params)?;
+            let mut result = ResultSet::new(rows.to_column_names(), Vec::new());
 
-                while let Some(row) = rows.next()? {
-                    result.rows.push(row.get_result_row()?);
-                }
-
-                result.set_last_insert_id(u64::try_from(client.last_insert_rowid()).unwrap_or(0));
-
-                Ok(result)
+            while let Some(row) = rows.next()? {
+                result.rows.push(row.get_result_row()?);
             }
+
+            result.set_last_insert_id(u64::try_from(client.last_insert_rowid()).unwrap_or(0));
+
+            Ok(result)
         })
     }
 
     fn execute_raw<'a>(&'a self, sql: &'a str, params: &'a [ParameterizedValue<'a>]) -> DBIO<'a, u64> {
-        metrics::query("sqlite.query_raw", sql, params, move || {
-            async move {
-                let client = self.client.lock().await;
-                let mut stmt = client.prepare_cached(sql)?;
-                let res = u64::try_from(stmt.execute(params)?)?;
+        metrics::query("sqlite.query_raw", sql, params, move || async move {
+            let client = self.client.lock().await;
+            let mut stmt = client.prepare_cached(sql)?;
+            let res = u64::try_from(stmt.execute(params)?)?;
 
-                Ok(res)
-            }
+            Ok(res)
         })
     }
 
     fn raw_cmd<'a>(&'a self, cmd: &'a str) -> DBIO<'a, ()> {
-        metrics::query("sqlite.raw_cmd", cmd, &[], move || {
-            async move {
-                let client = self.client.lock().await;
-                client.execute_batch(cmd)?;
-                Ok(())
-            }
+        metrics::query("sqlite.raw_cmd", cmd, &[], move || async move {
+            let client = self.client.lock().await;
+            client.execute_batch(cmd)?;
+            Ok(())
         })
     }
 }

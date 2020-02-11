@@ -89,7 +89,7 @@
 //! let (sql_str, params) = Sqlite::build(query);
 //!
 //! assert_eq!(
-//!     "SELECT `naukio`.* FROM `naukio` WHERE ((`word` = ? AND `age` < ?) AND `paw` = ?)",
+//!     "SELECT `naukio`.* FROM `naukio` WHERE (`word` = ? AND `age` < ? AND `paw` = ?)",
 //!     sql_str,
 //! );
 //!

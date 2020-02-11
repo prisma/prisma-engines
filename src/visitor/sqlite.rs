@@ -307,7 +307,7 @@ mod tests {
 
     #[test]
     fn test_select_and() {
-        let expected_sql = "SELECT `naukio`.* FROM `naukio` WHERE ((`word` = ? AND `age` < ?) AND `paw` = ?)";
+        let expected_sql = "SELECT `naukio`.* FROM `naukio` WHERE (`word` = ? AND `age` < ? AND `paw` = ?)";
 
         let expected_params = vec![
             ParameterizedValue::Text(Cow::from("meow")),
@@ -399,11 +399,7 @@ mod tests {
             ParameterizedValue::Text(Cow::from("warm")),
         ];
 
-        let conditions = ConditionTree::not(ConditionTree::and(
-            ConditionTree::or("word".equals("meow"), "age".less_than(10)),
-            "paw".equals("warm"),
-        ));
-
+        let conditions = ConditionTree::not("word".equals("meow").or("age".less_than(10)).and("paw".equals("warm")));
         let query = Select::from_table("naukio").so_that(conditions);
 
         let (sql, params) = Sqlite::build(query);

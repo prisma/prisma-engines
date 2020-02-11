@@ -5,8 +5,8 @@ pub use manager::{PooledConnection, QuaintManager};
 
 use crate::connector::{ConnectionInfo, SqlFamily};
 use mobc::Pool;
-use url::Url;
 use std::sync::Arc;
+use url::Url;
 
 #[cfg(feature = "sqlite")]
 use std::convert::TryFrom;

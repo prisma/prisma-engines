@@ -269,59 +269,53 @@ impl Queryable for Mysql {
     }
 
     fn query_raw<'a>(&'a self, sql: &'a str, params: &'a [ParameterizedValue]) -> DBIO<'a, ResultSet> {
-        metrics::query("mysql.query_raw", sql, params, move || {
-            async move {
-                let conn = timeout(self.connect_timeout, self.pool.get_conn()).await??;
-                let results = self
-                    .timeout(conn.prep_exec(sql, conversion::conv_params(params)))
-                    .await?;
+        metrics::query("mysql.query_raw", sql, params, move || async move {
+            let conn = timeout(self.connect_timeout, self.pool.get_conn()).await??;
+            let results = self
+                .timeout(conn.prep_exec(sql, conversion::conv_params(params)))
+                .await?;
 
-                let columns = results
-                    .columns_ref()
-                    .iter()
-                    .map(|s| s.name_str().into_owned())
-                    .collect();
+            let columns = results
+                .columns_ref()
+                .iter()
+                .map(|s| s.name_str().into_owned())
+                .collect();
 
-                let last_id = results.last_insert_id();
-                let mut result_set = ResultSet::new(columns, Vec::new());
+            let last_id = results.last_insert_id();
+            let mut result_set = ResultSet::new(columns, Vec::new());
 
-                let (_, rows) = self
-                    .timeout(results.map_and_drop(|mut row| row.take_result_row()))
-                    .await?;
+            let (_, rows) = self
+                .timeout(results.map_and_drop(|mut row| row.take_result_row()))
+                .await?;
 
-                for row in rows.into_iter() {
-                    result_set.rows.push(row?);
-                }
-
-                if let Some(id) = last_id {
-                    result_set.set_last_insert_id(id);
-                };
-
-                Ok(result_set)
+            for row in rows.into_iter() {
+                result_set.rows.push(row?);
             }
+
+            if let Some(id) = last_id {
+                result_set.set_last_insert_id(id);
+            };
+
+            Ok(result_set)
         })
     }
 
     fn execute_raw<'a>(&'a self, sql: &'a str, params: &'a [ParameterizedValue<'a>]) -> DBIO<'a, u64> {
-        metrics::query("mysql.execute_raw", sql, params, move || {
-            async move {
-                let conn = timeout(self.connect_timeout, self.pool.get_conn()).await??;
-                let results = self
-                    .timeout(conn.prep_exec(sql, conversion::conv_params(params)))
-                    .await?;
-                Ok(results.affected_rows())
-            }
+        metrics::query("mysql.execute_raw", sql, params, move || async move {
+            let conn = timeout(self.connect_timeout, self.pool.get_conn()).await??;
+            let results = self
+                .timeout(conn.prep_exec(sql, conversion::conv_params(params)))
+                .await?;
+            Ok(results.affected_rows())
         })
     }
 
     fn raw_cmd<'a>(&'a self, cmd: &'a str) -> DBIO<'a, ()> {
-        metrics::query("mysql.raw_cmd", cmd, &[], move || {
-            async move {
-                let conn = timeout(self.connect_timeout, self.pool.get_conn()).await??;
-                self.timeout(conn.query(cmd)).await?;
+        metrics::query("mysql.raw_cmd", cmd, &[], move || async move {
+            let conn = timeout(self.connect_timeout, self.pool.get_conn()).await??;
+            self.timeout(conn.query(cmd)).await?;
 
-                Ok(())
-            }
+            Ok(())
         })
     }
 }

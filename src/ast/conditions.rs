@@ -4,9 +4,9 @@ use crate::ast::*;
 #[derive(Debug, PartialEq, Clone)]
 pub enum ConditionTree<'a> {
     /// `(left_expression AND right_expression)`
-    And(Box<Expression<'a>>, Box<Expression<'a>>),
+    And(Vec<Expression<'a>>),
     /// `(left_expression OR right_expression)`
-    Or(Box<Expression<'a>>, Box<Expression<'a>>),
+    Or(Vec<Expression<'a>>),
     /// `(NOT expression)`
     Not(Box<Expression<'a>>),
     /// A single expression leaf
@@ -20,22 +20,40 @@ pub enum ConditionTree<'a> {
 impl<'a> ConditionTree<'a> {
     /// An `AND` statement, is true when both sides are true.
     #[inline]
-    pub fn and<E, J>(left: E, right: J) -> ConditionTree<'a>
+    pub fn and<E>(mut self, other: E) -> ConditionTree<'a>
     where
         E: Into<Expression<'a>>,
-        J: Into<Expression<'a>>,
     {
-        ConditionTree::And(Box::new(left.into()), Box::new(right.into()))
+        match self {
+            Self::And(ref mut conditions) => {
+                conditions.push(other.into());
+                self
+            }
+            Self::Or(_) => Self::And(vec![Expression::from(self), other.into()]),
+            Self::Not(_) => Self::And(vec![Expression::from(self), other.into()]),
+            Self::Single(expr) => Self::And(vec![*expr, other.into()]),
+            Self::NoCondition => self,
+            Self::NegativeCondition => Self::And(vec![Expression::from(self), other.into()]),
+        }
     }
 
     /// An `OR` statement, is true when one side is true.
     #[inline]
-    pub fn or<E, J>(left: E, right: J) -> ConditionTree<'a>
+    pub fn or<E>(mut self, other: E) -> ConditionTree<'a>
     where
         E: Into<Expression<'a>>,
-        J: Into<Expression<'a>>,
     {
-        ConditionTree::Or(Box::new(left.into()), Box::new(right.into()))
+        match self {
+            Self::Or(ref mut conditions) => {
+                conditions.push(other.into());
+                self
+            }
+            Self::And(_) => Self::Or(vec![Expression::from(self), other.into()]),
+            Self::Not(_) => Self::Or(vec![Expression::from(self), other.into()]),
+            Self::Single(expr) => Self::Or(vec![*expr, other.into()]),
+            Self::NoCondition => self,
+            Self::NegativeCondition => Self::Or(vec![Expression::from(self), other.into()]),
+        }
     }
 
     /// A `NOT` statement, is true when the expression is false.

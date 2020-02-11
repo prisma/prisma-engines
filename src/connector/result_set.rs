@@ -20,11 +20,7 @@ pub struct ResultSet {
 
 impl ResultSet {
     /// Creates a new instance, bound to the given column names and result rows.
-    pub fn new(
-        names: Vec<String>,
-        rows: Vec<Vec<ParameterizedValue<'static>>>,
-    ) -> Self
-    {
+    pub fn new(names: Vec<String>, rows: Vec<Vec<ParameterizedValue<'static>>>) -> Self {
         Self {
             columns: Arc::new(names),
             rows,

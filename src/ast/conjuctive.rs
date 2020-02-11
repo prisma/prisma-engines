@@ -8,7 +8,10 @@ pub trait Conjuctive<'a> {
     /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
     /// assert_eq!(
     ///     "foo".equals("bar").and("wtf".less_than(3)),
-    ///     ConditionTree::and("foo".equals("bar"), "wtf".less_than(3))
+    ///     ConditionTree::And(vec![
+    ///         Expression::from("foo".equals("bar")),
+    ///         Expression::from("wtf".less_than(3))
+    ///     ])
     /// )
     /// ```
     fn and<E>(self, other: E) -> ConditionTree<'a>
@@ -21,7 +24,10 @@ pub trait Conjuctive<'a> {
     /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
     /// assert_eq!(
     ///     "foo".equals("bar").or("wtf".less_than(3)),
-    ///     ConditionTree::or("foo".equals("bar"), "wtf".less_than(3))
+    ///     ConditionTree::Or(vec![
+    ///         Expression::from("foo".equals("bar")),
+    ///         Expression::from("wtf".less_than(3))
+    ///     ])
     /// )
     /// ```
     fn or<E>(self, other: E) -> ConditionTree<'a>
@@ -49,7 +55,7 @@ where
     where
         E: Into<Expression<'a>>,
     {
-        ConditionTree::and(self.into(), other.into())
+        ConditionTree::And(vec![self.into(), other.into()])
     }
 
     #[inline]
@@ -57,7 +63,7 @@ where
     where
         E: Into<Expression<'a>>,
     {
-        ConditionTree::or(self.into(), other.into())
+        ConditionTree::Or(vec![self.into(), other.into()])
     }
 
     #[inline]

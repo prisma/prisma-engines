@@ -53,10 +53,8 @@ impl ConnectionInfo {
         let url = url_result?;
 
         let sql_family = SqlFamily::from_scheme(url.scheme()).ok_or_else(|| {
-            let kind = ErrorKind::DatabaseUrlIsInvalid(format!(
-                "{} is not a supported database URL scheme.",
-                url.scheme())
-            );
+            let kind =
+                ErrorKind::DatabaseUrlIsInvalid(format!("{} is not a supported database URL scheme.", url.scheme()));
 
             Error::builder(kind).build()
         })?;

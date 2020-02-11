@@ -408,15 +408,31 @@ pub trait Visitor<'a> {
     /// A walk through the query conditions
     fn visit_conditions(&mut self, tree: ConditionTree<'a>) -> fmt::Result {
         match tree {
-            ConditionTree::And(left, right) => self.surround_with("(", ")", |ref mut s| {
-                s.visit_expression(*left)?;
-                s.write(" AND ")?;
-                s.visit_expression(*right)
+            ConditionTree::And(expressions) => self.surround_with("(", ")", |ref mut s| {
+                let len = expressions.len();
+
+                for (i, expr) in expressions.into_iter().enumerate() {
+                    s.visit_expression(expr)?;
+
+                    if i < (len - 1) {
+                        s.write(" AND ")?;
+                    }
+                }
+
+                Ok(())
             }),
-            ConditionTree::Or(left, right) => self.surround_with("(", ")", |ref mut s| {
-                s.visit_expression(*left)?;
-                s.write(" OR ")?;
-                s.visit_expression(*right)
+            ConditionTree::Or(expressions) => self.surround_with("(", ")", |ref mut s| {
+                let len = expressions.len();
+
+                for (i, expr) in expressions.into_iter().enumerate() {
+                    s.visit_expression(expr)?;
+
+                    if i < (len - 1) {
+                        s.write(" OR ")?;
+                    }
+                }
+
+                Ok(())
             }),
             ConditionTree::Not(expression) => self.surround_with("(", ")", |ref mut s| {
                 s.write("NOT ")?;

@@ -399,48 +399,42 @@ impl Queryable for PostgreSql {
     }
 
     fn query_raw<'a>(&'a self, sql: &'a str, params: &'a [ParameterizedValue<'a>]) -> DBIO<'a, ResultSet> {
-        metrics::query("postgres.query_raw", sql, params, move || {
-            async move {
-                let client = self.client.lock().await;
-                let stmt = self.timeout(client.prepare(sql)).await?;
+        metrics::query("postgres.query_raw", sql, params, move || async move {
+            let client = self.client.lock().await;
+            let stmt = self.timeout(client.prepare(sql)).await?;
 
-                let rows = self
-                    .timeout(client.query(&stmt, conversion::conv_params(params).as_slice()))
-                    .await?;
-                let mut result = ResultSet::new(stmt.to_column_names(), Vec::new());
+            let rows = self
+                .timeout(client.query(&stmt, conversion::conv_params(params).as_slice()))
+                .await?;
+            let mut result = ResultSet::new(stmt.to_column_names(), Vec::new());
 
-                for row in rows {
-                    result.rows.push(row.get_result_row()?);
-                }
-
-                Ok(result)
+            for row in rows {
+                result.rows.push(row.get_result_row()?);
             }
+
+            Ok(result)
         })
     }
 
     fn execute_raw<'a>(&'a self, sql: &'a str, params: &'a [ParameterizedValue<'a>]) -> DBIO<'a, u64> {
-        metrics::query("postgres.execute_raw", sql, params, move || {
-            async move {
-                let client = self.client.lock().await;
-                let stmt = self.timeout(client.prepare(sql)).await?;
+        metrics::query("postgres.execute_raw", sql, params, move || async move {
+            let client = self.client.lock().await;
+            let stmt = self.timeout(client.prepare(sql)).await?;
 
-                let changes = self
-                    .timeout(client.execute(&stmt, conversion::conv_params(params).as_slice()))
-                    .await?;
+            let changes = self
+                .timeout(client.execute(&stmt, conversion::conv_params(params).as_slice()))
+                .await?;
 
-                Ok(changes)
-            }
+            Ok(changes)
         })
     }
 
     fn raw_cmd<'a>(&'a self, cmd: &'a str) -> DBIO<'a, ()> {
-        metrics::query("postgres.raw_cmd", cmd, &[], move || {
-            async move {
-                let client = self.client.lock().await;
-                self.timeout(client.simple_query(cmd)).await?;
+        metrics::query("postgres.raw_cmd", cmd, &[], move || async move {
+            let client = self.client.lock().await;
+            self.timeout(client.simple_query(cmd)).await?;
 
-                Ok(())
-            }
+            Ok(())
         })
     }
 }
