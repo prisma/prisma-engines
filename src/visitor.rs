@@ -489,19 +489,33 @@ pub trait Visitor<'a> {
             }
             Compare::In(left, right) => match *right {
                 DatabaseValue::Row(ref row) if row.is_empty() => self.write("1=0"),
-                _ => {
-                    self.visit_database_value(*left)?;
-                    self.write(" IN ")?;
-                    self.visit_database_value(*right)
-                }
+                _ => match *right {
+                    DatabaseValue::Parameterized(pv) => {
+                        self.visit_database_value(*left)?;
+                        self.write(" = ")?;
+                        self.visit_parameterized(pv)
+                    }
+                    dbv => {
+                        self.visit_database_value(*left)?;
+                        self.write(" IN ")?;
+                        self.visit_database_value(dbv)
+                    }
+                },
             },
             Compare::NotIn(left, right) => match *right {
                 DatabaseValue::Row(ref row) if row.is_empty() => self.write("1=1"),
-                _ => {
-                    self.visit_database_value(*left)?;
-                    self.write(" NOT IN ")?;
-                    self.visit_database_value(*right)
-                }
+                _ => match *right {
+                    DatabaseValue::Parameterized(pv) => {
+                        self.visit_database_value(*left)?;
+                        self.write(" <> ")?;
+                        self.visit_parameterized(pv)
+                    }
+                    dbv => {
+                        self.visit_database_value(*left)?;
+                        self.write(" NOT IN ")?;
+                        self.visit_database_value(dbv)
+                    }
+                },
             },
             Compare::Like(left, right) => {
                 self.visit_database_value(*left)?;
