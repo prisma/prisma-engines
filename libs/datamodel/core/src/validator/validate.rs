@@ -90,7 +90,7 @@ impl<'a> Validator<'a> {
         ));
 
         let multiple_id_criteria_error = Err(DatamodelError::new_model_validation_error(
-            "Each model must have exactly one unique criteria. Either mark a single field with `@id`, `@unique` or add a multi field criterion with `@@id([])` or `@@unique([])` to the model.",
+            "Each model must have at least one unique criteria. Either mark a single field with `@id`, `@unique` or add a multi field criterion with `@@id([])` or `@@unique([])` to the model.",
             &model.name,
             ast_model.span,
         ));
