@@ -110,8 +110,6 @@ where
     T: Into<QueryArguments>,
 {
     let parent_model_identifier = parent_relation_field.model().primary_identifier();
-    //    let child_model_identifier = parent_relation_field.related_model().primary_identifier();
-
     let selected_fields: SelectedFields = parent_relation_field.related_model().primary_identifier().into();
 
     let read_children_node = graph.create_node(Query::Read(ReadQuery::RelatedRecordsQuery(RelatedRecordsQuery {
@@ -171,12 +169,11 @@ where
 /// `parent_node`: Node that provides the parent id for the find query and where the checks are appended to in the graph.
 /// `parent_relation_field`: Field on the parent model to find children.
 ///
-/// The elements added to the graph are all except `Parent Node`:
 /// ```text
-/// ┌────────────────────────┐
-/// │      Parent Node       │
-/// └────────────────────────┘
-///              │
+/// ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
+///           Parent         │
+/// └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
+///              :
 ///              ▼
 /// ┌────────────────────────┐
 /// │      Read related      │──┐
@@ -202,11 +199,11 @@ pub fn insert_existing_1to1_related_model_checks(
     parent_node: &NodeRef,
     parent_relation_field: &RelationFieldRef,
 ) -> QueryGraphBuilderResult<()> {
-    // let parent_model_identifier = parent_relation_field.model().primary_identifier();
+    let parent_model_identifier = parent_relation_field.model().primary_identifier();
     let child_model_identifier = parent_relation_field.related_model().primary_identifier();
+    let child_linking_fields = parent_relation_field.related_field().linking_fields();
 
     let child_model = parent_relation_field.related_model();
-    let child_id_field = child_model.fields().find_singular_id().unwrap().upgrade().unwrap();
     let child_side_required = parent_relation_field.related_field().is_required;
     let relation_inlined_parent = parent_relation_field.relation_is_inlined_in_parent();
     let rf = Arc::clone(&parent_relation_field);
@@ -215,13 +212,11 @@ pub fn insert_existing_1to1_related_model_checks(
         insert_find_children_by_parent_node(graph, &parent_node, &parent_relation_field, Filter::empty())?;
 
     let update_existing_child = update_records_node_placeholder(graph, Filter::empty(), child_model);
-    // let relation_field = Arc::clone(parent_relation_field);
     let if_node = graph.create_node(Flow::default_if());
 
     graph.create_edge(
         &read_existing_children,
         &if_node,
-        // TODO: it does not seem to be important which model identifier we pass
         QueryGraphDependency::ParentIds(
             child_model_identifier.clone(),
             Box::new(move |node, child_ids| {
@@ -243,10 +238,11 @@ pub fn insert_existing_1to1_related_model_checks(
         ),
     )?;
 
-    let relation_field_name = parent_relation_field.related_field().name.clone();
-
     graph.create_edge(&if_node, &update_existing_child, QueryGraphDependency::Then)?;
-    graph.create_edge(&read_existing_children, &update_existing_child, QueryGraphDependency::ParentIds(child_model_identifier.clone(), Box::new(move |mut child_node, mut child_ids| {
+    graph.create_edge(
+        &read_existing_children,
+        &update_existing_child,
+        QueryGraphDependency::ParentIds(child_model_identifier.clone(), Box::new(move |mut child_node, mut child_ids| {
              // This has to succeed or the if-then node wouldn't trigger.
              let child_id = match child_ids.pop() {
                  Some(pid) => Ok(pid),
@@ -254,11 +250,8 @@ pub fn insert_existing_1to1_related_model_checks(
              }?;
 
              if let Node::Query(Query::Write(ref mut wq)) = child_node {
-////                 wq.add_filter(child_id.filter());
-//////                 wq.inject_field_arg(relation_field.into(), vec![]);
-////                 wq.inject_id(child_id);
-                 wq.add_filter(child_id_field.data_source_field().equals(child_id.single_value()));
-                 wq.inject_field_arg(relation_field_name, PrismaValue::Null);
+                 wq.add_filter(child_id.filter());
+                 wq.inject_id_into_args(child_linking_fields.empty_record_id())
              }
 
              Ok(child_node)

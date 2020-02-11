@@ -107,6 +107,13 @@ impl ModelIdentifier {
                 .into())
         }
     }
+
+    pub fn empty_record_id(&self) -> RecordIdentifier {
+        self.data_source_fields()
+            .map(|dsf| (dsf.clone(), PrismaValue::Null))
+            .collect::<Vec<_>>()
+            .into()
+    }
 }
 
 impl IntoIterator for ModelIdentifier {
