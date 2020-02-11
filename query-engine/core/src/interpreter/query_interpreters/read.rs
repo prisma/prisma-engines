@@ -2,6 +2,7 @@ use crate::{interpreter::InterpretationResult, query_ast::*, result_ast::*};
 use connector::{self, filter::Filter, ConnectionLike, QueryArguments, ReadOperations, ScalarCompare};
 use futures::future::{BoxFuture, FutureExt};
 use prisma_models::{ManyRecords, RecordIdentifier};
+use prisma_value::PrismaValue;
 
 pub fn execute<'a, 'b>(
     tx: &'a ConnectionLike<'a, 'b>,
@@ -28,7 +29,9 @@ fn read_one<'conn, 'tx>(
     let fut = async move {
         let model = query.model;
         let filter = query.filter.expect("Expected filter to be set for ReadOne query.");
-        let scalars = tx.get_single_record(&model, &filter, &query.selected_fields.only_scalar_and_inlined()).await?;
+        let scalars = tx
+            .get_single_record(&model, &filter, &query.selected_fields.only_scalar_and_inlined())
+            .await?;
         let model_id = model.primary_identifier();
 
         match scalars {
@@ -65,7 +68,11 @@ fn read_many<'a, 'b>(
 ) -> BoxFuture<'a, InterpretationResult<QueryResult>> {
     let fut = async move {
         let scalars = tx
-            .get_many_records(&query.model, query.args.clone(), &query.selected_fields.only_scalar_and_inlined())
+            .get_many_records(
+                &query.model,
+                query.args.clone(),
+                &query.selected_fields.only_scalar_and_inlined(),
+            )
             .await?;
 
         let model_id = query.model.primary_identifier();
@@ -111,12 +118,17 @@ fn read_related<'a, 'b>(
 
         // prisma level join does not work for many 2 many yet
         // can only work if we have a parent result. This is not the case when we e.g. have nested delete inside an update
-        let use_prisma_level_join = !relation.is_many_to_many() && parent_result.is_some() && !query.args.is_with_pagination();
+        let use_prisma_level_join =
+            !relation.is_many_to_many() && parent_result.is_some() && !query.args.is_with_pagination();
 
         let mut scalars = if !use_prisma_level_join {
-            tx
-                .get_related_records(&query.parent_field, &relation_parent_ids, query.args.clone(), &query.selected_fields.only_scalar_and_inlined())
-                .await?
+            tx.get_related_records(
+                &query.parent_field,
+                &relation_parent_ids,
+                query.args.clone(),
+                &query.selected_fields.only_scalar_and_inlined(),
+            )
+            .await?
         } else {
             // PRISMA LEVEL JOIN
             let other_fields: Vec<_> = query
@@ -130,14 +142,20 @@ fn read_related<'a, 'b>(
             let filters: Vec<Filter> = relation_parent_ids
                 .clone()
                 .into_iter()
-                .map(|id| {
-                    let filters = id
+                .filter_map(|id| {
+                    let filters: Vec<Filter> = id
                         .pairs
                         .into_iter()
+                        .filter(|(_, value)| value != &PrismaValue::Null) // TODO: it is unclear to me whether this is the right thing for composite foreign keys
                         .zip(other_fields.iter())
                         .map(|((_, value), other_field)| other_field.equals(value))
                         .collect();
-                    Filter::and(filters)
+
+                    if filters.len() > 0 {
+                        Some(Filter::and(filters))
+                    } else {
+                        None
+                    }
                 })
                 .collect();
 
@@ -149,9 +167,8 @@ fn read_related<'a, 'b>(
                 None => Some(filter),
             };
 
-            tx
-            .get_many_records(&query.parent_field.related_model(), args, &query.selected_fields)
-            .await?
+            tx.get_many_records(&query.parent_field.related_model(), args, &query.selected_fields)
+                .await?
         };
 
         if use_prisma_level_join {
@@ -215,7 +232,11 @@ fn read_related<'a, 'b>(
             } else if query.parent_field.relation().is_many_to_many() {
                 // nothing to do for many to many. parent ids are already present
             } else {
-                panic!(format!("parent result: {:?}, relation: {:?}", &parent_result, &query.parent_field.relation()));
+                panic!(format!(
+                    "parent result: {:?}, relation: {:?}",
+                    &parent_result,
+                    &query.parent_field.relation()
+                ));
             }
         }
 
