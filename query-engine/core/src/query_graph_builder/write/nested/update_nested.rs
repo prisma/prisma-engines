@@ -127,7 +127,6 @@ pub fn connect_nested_update_many(
         });
 
         let update_many_node = graph.create_node(Query::Write(update_many));
-        // let id_field = child_model.fields().find_singular_id().unwrap().upgrade().unwrap();
 
         graph.create_edge(
             &find_child_records_node,
@@ -136,15 +135,16 @@ pub fn connect_nested_update_many(
                 child_model_identifier.clone(),
                 Box::new(move |mut node, parent_ids| {
                     if let Node::Query(Query::Write(WriteQuery::UpdateManyRecords(ref mut ur))) = node {
-                        // let as_prisma_values = parent_ids.iter().map(|x| x.single_value()).collect();
-                        // let ids_filter = id_field.data_source_field().is_in(as_prisma_values);
-                        // let new_filter = Filter::and(vec![ur.filter.clone(), ids_filter]);
+                        let conditions: QueryGraphBuilderResult<Vec<_>> =
+                            parent_ids.into_iter().try_fold(vec![], |mut acc, next| {
+                                let assimilated = child_model_identifier.assimilate(next)?;
 
-                        for parent_id in parent_ids {
-                            let assimilated = child_model_identifier.assimilate(parent_id)?;
-                            // [DTODO] Needs to be: [AND (Existing OR ((PID1 Cond) (PID2 Cond) (PID3 Cond))]
-                            ur.add_filter(assimilated.filter());
-                        }
+                                acc.push(assimilated.filter());
+                                Ok(acc)
+                            });
+
+                        let filter = Filter::or(conditions?);
+                        ur.set_filter(Filter::and(vec![ur.filter.clone(), filter]));
                     }
 
                     Ok(node)
