@@ -76,37 +76,43 @@ impl AliasedCondition for Filter {
     /// Conversion from a `Filter` to a query condition tree. Aliased when in a nested `SELECT`.
     fn aliased_cond(self, alias: Option<Alias>) -> ConditionTree<'static> {
         match self {
-            Filter::And(mut filters) => match filters.pop() {
-                None => ConditionTree::NoCondition,
-                Some(filter) => {
-                    let right = filter.aliased_cond(alias);
+            Filter::And(mut filters) => match filters.len() {
+                n if n == 0 => ConditionTree::NoCondition,
+                n if n == 1 => filters.pop().unwrap().aliased_cond(alias),
+                _ => {
+                    let exprs = filters
+                        .into_iter()
+                        .map(|f| f.aliased_cond(alias))
+                        .map(Expression::from)
+                        .collect();
 
-                    filters.into_iter().rev().fold(right, |acc, filter| {
-                        let left = filter.aliased_cond(alias);
-                        ConditionTree::and(left, acc)
-                    })
+                    ConditionTree::And(exprs)
                 }
             },
-            Filter::Or(mut filters) => match filters.pop() {
-                None => ConditionTree::NegativeCondition,
-                Some(filter) => {
-                    let right = filter.aliased_cond(alias);
+            Filter::Or(mut filters) => match filters.len() {
+                n if n == 0 => ConditionTree::NegativeCondition,
+                n if n == 1 => filters.pop().unwrap().aliased_cond(alias),
+                _ => {
+                    let exprs = filters
+                        .into_iter()
+                        .map(|f| f.aliased_cond(alias))
+                        .map(Expression::from)
+                        .collect();
 
-                    filters.into_iter().rev().fold(right, |acc, filter| {
-                        let left = filter.aliased_cond(alias);
-                        ConditionTree::or(left, acc)
-                    })
+                    ConditionTree::Or(exprs)
                 }
             },
-            Filter::Not(mut filters) => match filters.pop() {
-                None => ConditionTree::NoCondition,
-                Some(filter) => {
-                    let right = filter.aliased_cond(alias).not();
+            Filter::Not(mut filters) => match filters.len() {
+                n if n == 0 => ConditionTree::NoCondition,
+                n if n == 1 => filters.pop().unwrap().aliased_cond(alias).not(),
+                _ => {
+                    let exprs = filters
+                        .into_iter()
+                        .map(|f| f.aliased_cond(alias).not())
+                        .map(Expression::from)
+                        .collect();
 
-                    filters.into_iter().rev().fold(right, |acc, filter| {
-                        let left = filter.aliased_cond(alias).not();
-                        ConditionTree::and(left, acc)
-                    })
+                    ConditionTree::And(exprs)
                 }
             },
             Filter::Scalar(filter) => filter.aliased_cond(alias),
