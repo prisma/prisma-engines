@@ -28,3 +28,16 @@ async fn unreachable_database_must_return_a_proper_error_on_mysql() {
 
     assert_eq!(json_error, expected);
 }
+
+#[tokio::test]
+async fn unreachable_database_must_return_a_proper_error_on_mysql2() {
+    let datamodel = "datasource chinook {
+                              provider = \"postgresql\"
+                              url = \"postgresql://postgres:prisma@127.0.0.1:5432/divys_bug_on_postgres?schema=prisma-tests&connection_limit=1\"
+                           }";
+
+    let error = RpcImpl::introspect_internal(datamodel.to_string()).await;
+
+    println!("{:?}", error);
+    assert_eq!(1, 2);
+}
