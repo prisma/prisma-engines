@@ -143,18 +143,22 @@ fn read_related<'a, 'b>(
                 .clone()
                 .into_iter()
                 .filter_map(|id| {
+                    let contains_null_values = id.pairs.iter().find(|(_, value)| value == &PrismaValue::Null).is_some();
+
                     let filters: Vec<Filter> = id
                         .pairs
                         .into_iter()
-                        .filter(|(_, value)| value != &PrismaValue::Null) // TODO: it is unclear to me whether this is the right thing for composite foreign keys
                         .zip(other_fields.iter())
                         .map(|((_, value), other_field)| other_field.equals(value))
                         .collect();
 
-                    if filters.len() > 0 {
-                        Some(Filter::and(filters))
-                    } else {
+                    // If a database uses the match simple algorithm a foreign key is defined to not match the parent table if the foreign key contains any null value.
+                    // https://www.cockroachlabs.com/docs/stable/foreign-key.html#match-composite-foreign-keys-with-match-simple-and-match-full
+                    // https://dba.stackexchange.com/questions/58894/differences-between-match-full-match-simple-and-match-partial
+                    if contains_null_values {
                         None
+                    } else {
+                        Some(Filter::and(filters))
                     }
                 })
                 .collect();
