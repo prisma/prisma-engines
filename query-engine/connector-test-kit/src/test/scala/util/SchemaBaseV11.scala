@@ -104,7 +104,8 @@ trait SchemaBaseV11 extends PlayJsonExtensions {
         QueryParams("c_1, c_2", parse("", "c_1_c_2"), parseFirst("", "c_1_c_2"), parseAll("c_1_c_2", true))
       )
 
-    val simple = true
+    val simple       = true
+    val isManyToMany = onParent.isList && onChild.isList
 
     val datamodelsWithParams = for (parentId <- if (simple) Vector(simpleId, noId) else idOptions;
                                     childId <- if (simple) Vector(simpleId, noId) else idOptions;
@@ -125,10 +126,10 @@ trait SchemaBaseV11 extends PlayJsonExtensions {
                                                         };
                                     parentReferences <- if (simple) {
                                                          childId match {
-                                                           case _ if childReferences != noRef => Vector(noRef)
-                                                           case `simpleId`                    => Vector(idReference)
-                                                           case `noId`                        => Vector(cReference)
-                                                           case _                             => ???
+                                                           case _ if childReferences != noRef && !isManyToMany => Vector(noRef)
+                                                           case `simpleId`                                     => Vector(idReference)
+                                                           case `noId`                                         => Vector(cReference)
+                                                           case _                                              => ???
                                                          }
                                                        } else
                                                          (childId, childReferences) match {
