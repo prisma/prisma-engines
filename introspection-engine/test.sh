@@ -2,12 +2,12 @@
 
 if [ "$1" != "" ]; then
     echo "RUNNING WITH $1"
-method="$1"
+    method="$1"
 else
-method="getDatabaseDescription"
-#method="introspect"
-#method="listDatabases"
-#method="getDatabaseMetadata"
+    method="getDatabaseDescription"
+    #method="introspect"
+    #method="listDatabases"
+    #method="getDatabaseMetadata"
     echo "RUNNING WITH DEFAULT: $method"
 fi
 
