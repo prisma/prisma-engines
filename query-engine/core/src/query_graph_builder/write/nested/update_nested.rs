@@ -4,7 +4,7 @@ use crate::{
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
     InputAssertions, ParsedInputValue,
 };
-use connector::{Filter, ScalarCompare};
+use connector::Filter;
 use prisma_models::{ModelRef, RelationFieldRef};
 use std::{convert::TryInto, sync::Arc};
 use utils::IdFilter;

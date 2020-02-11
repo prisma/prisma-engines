@@ -75,9 +75,13 @@ impl WriteArgs {
     pub fn as_record_identifier(&self, id: ModelIdentifier) -> Option<RecordIdentifier> {
         let pairs: Vec<_> = id
             .data_source_fields()
-            .filter_map(|dsf| {
-                self.get_field_value(dsf.name.as_str())
-                    .map(|val| (dsf.clone(), val.clone()))
+            .map(|dsf| {
+                let val = match self.get_field_value(dsf.name.as_str()) {
+                    Some(val) => val.clone(),
+                    None => PrismaValue::Null,
+                };
+
+                (dsf.clone(), val.clone())
             })
             .collect();
 
