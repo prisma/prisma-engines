@@ -8,8 +8,10 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
   override def runOnlyForCapabilities = Set(JoinRelationLinksCapability)
 
   "A 1-n relation" should "error if trying to use nestedUpdateMany" in {
-    schemaP1optToC1opt.test { dataModel =>
-      val project = SchemaDsl.fromStringV11() { dataModel }
+    schemaWithRelation(onParent = ChildOpt, onChild = ParentOpt).test { t =>
+      val project = SchemaDsl.fromStringV11() {
+        t.datamodel
+      }
       database.setup(project)
 
       val parent1Id = server
@@ -19,7 +21,7 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
           |  {
           |    id
           |  }
-          |}""".stripMargin,
+          |}""",
           project
         )
         .pathAsString("data.createParent.id")
@@ -42,7 +44,7 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    }
          |  }
          |}
-      """.stripMargin,
+      """,
         project,
         errorCode = 0,
         errorContains = """ Reason: 'childOpt.updateMany' Field 'updateMany' is not defined in the input model 'ChildUpdateOneWithoutParentOptInput'."""
@@ -51,13 +53,13 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
   }
 
   "a PM to C1!  relation " should "work" in {
-    schemaPMToC1req.test { dataModel =>
-      val project = SchemaDsl.fromStringV11() { dataModel }
+    schemaWithRelation(onParent = ChildList, onChild = ParentReq).test { t =>
+      val project = SchemaDsl.fromStringV11() {
+        t.datamodel
+      }
       database.setup(project)
 
       setupData(project)
-
-      //ifConnectorIsActive { //dataResolver(project).countByTable("_ChildToParent").await should be(4) }
 
       server.query(
         s"""
@@ -67,36 +69,32 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    data:{
          |    childrenOpt: {updateMany: {
          |        where: {c_contains:"c"}
-         |        data: {test: "updated"}
+         |        data: {non_unique: "updated"}
          |    }}
          |  }){
          |    childrenOpt {
          |      c
-         |      test
+         |      non_unique
          |    }
          |  }
          |}
-      """.stripMargin,
+      """,
         project
       )
 
-      //ifConnectorIsActive { //dataResolver(project).countByTable("_ChildToParent").await should be(4) }
-      //dataResolver(project).countByTable(project.schema.getModelByName_!("Parent").dbName).await should be(2)
-      //dataResolver(project).countByTable(project.schema.getModelByName_!("Child").dbName).await should be(4)
-
-      server.query("query{parents{p,childrenOpt{c, test}}}", project).toString() should be(
-        """{"data":{"parents":[{"p":"p1","childrenOpt":[{"c":"c1","test":"updated"},{"c":"c2","test":"updated"}]},{"p":"p2","childrenOpt":[{"c":"c3","test":null},{"c":"c4","test":null}]}]}}""")
+      server.query("query{parents{p,childrenOpt{c, non_unique}}}", project).toString() should be(
+        """{"data":{"parents":[{"p":"p1","childrenOpt":[{"c":"c1","non_unique":"updated"},{"c":"c2","non_unique":"updated"}]},{"p":"p2","childrenOpt":[{"c":"c3","non_unique":null},{"c":"c4","non_unique":null}]}]}}""")
     }
   }
 
   "a PM to C1  relation " should "work" in {
-    schemaPMToC1opt.test { dataModel =>
-      val project = SchemaDsl.fromStringV11() { dataModel }
+    schemaWithRelation(onParent = ChildList, onChild = ParentOpt).test { t =>
+      val project = SchemaDsl.fromStringV11() {
+        t.datamodel
+      }
       database.setup(project)
 
       setupData(project)
-
-      //ifConnectorIsActive { //dataResolver(project).countByTable("_ChildToParent").await should be(4) }
 
       server.query(
         s"""
@@ -106,36 +104,32 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    data:{
          |    childrenOpt: {updateMany: {
          |        where: {c_contains:"c"}
-         |        data: {test: "updated"}
+         |        data: {non_unique: "updated"}
          |    }}
          |  }){
          |    childrenOpt {
          |      c
-         |      test
+         |      non_unique
          |    }
          |  }
          |}
-      """.stripMargin,
+      """,
         project
       )
 
-      //ifConnectorIsActive { //dataResolver(project).countByTable("_ChildToParent").await should be(4) }
-      //dataResolver(project).countByTable(project.schema.getModelByName_!("Parent").dbName).await should be(2)
-      //dataResolver(project).countByTable(project.schema.getModelByName_!("Child").dbName).await should be(4)
-
-      server.query("query{parents{p,childrenOpt{c, test}}}", project).toString() should be(
-        """{"data":{"parents":[{"p":"p1","childrenOpt":[{"c":"c1","test":"updated"},{"c":"c2","test":"updated"}]},{"p":"p2","childrenOpt":[{"c":"c3","test":null},{"c":"c4","test":null}]}]}}""")
+      server.query("query{parents{p,childrenOpt{c, non_unique}}}", project).toString() should be(
+        """{"data":{"parents":[{"p":"p1","childrenOpt":[{"c":"c1","non_unique":"updated"},{"c":"c2","non_unique":"updated"}]},{"p":"p2","childrenOpt":[{"c":"c3","non_unique":null},{"c":"c4","non_unique":null}]}]}}""")
     }
   }
 
   "a PM to CM  relation " should "work" in {
-    schemaPMToCM.test { dataModel =>
-      val project = SchemaDsl.fromStringV11() { dataModel }
+    schemaWithRelation(onParent = ChildList, onChild = ParentList).test { t =>
+      val project = SchemaDsl.fromStringV11() {
+        t.datamodel
+      }
       database.setup(project)
 
       setupData(project)
-
-      //ifConnectorIsActive { //dataResolver(project).countByTable("_ChildToParent").await should be(4) }
 
       server.query(
         s"""
@@ -145,36 +139,32 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    data:{
          |    childrenOpt: {updateMany: {
          |        where: {c_contains:"c"}
-         |        data: {test: "updated"}
+         |        data: {non_unique: "updated"}
          |    }}
          |  }){
          |    childrenOpt {
          |      c
-         |      test
+         |      non_unique
          |    }
          |  }
          |}
-      """.stripMargin,
+      """,
         project
       )
 
-      //ifConnectorIsActive { //dataResolver(project).countByTable("_ChildToParent").await should be(4) }
-      //dataResolver(project).countByTable(project.schema.getModelByName_!("Parent").dbName).await should be(2)
-      //dataResolver(project).countByTable(project.schema.getModelByName_!("Child").dbName).await should be(4)
-
-      server.query("query{parents{p,childrenOpt{c, test}}}", project).toString() should be(
-        """{"data":{"parents":[{"p":"p1","childrenOpt":[{"c":"c1","test":"updated"},{"c":"c2","test":"updated"}]},{"p":"p2","childrenOpt":[{"c":"c3","test":null},{"c":"c4","test":null}]}]}}""")
+      server.query("query{parents{p,childrenOpt{c, non_unique}}}", project).toString() should be(
+        """{"data":{"parents":[{"p":"p1","childrenOpt":[{"c":"c1","non_unique":"updated"},{"c":"c2","non_unique":"updated"}]},{"p":"p2","childrenOpt":[{"c":"c3","non_unique":null},{"c":"c4","non_unique":null}]}]}}""")
     }
   }
 
   "a PM to C1!  relation " should "work with several updateManys" in {
-    schemaPMToC1req.test { dataModel =>
-      val project = SchemaDsl.fromStringV11() { dataModel }
+    schemaWithRelation(onParent = ChildList, onChild = ParentReq).test { t =>
+      val project = SchemaDsl.fromStringV11() {
+        t.datamodel
+      }
       database.setup(project)
 
       setupData(project)
-
-      //ifConnectorIsActive { //dataResolver(project).countByTable("_ChildToParent").await should be(4) }
 
       server.query(
         s"""
@@ -185,41 +175,37 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    childrenOpt: {updateMany: [
          |    {
          |        where: {c_contains:"1"}
-         |        data: {test: "updated1"}
+         |        data: {non_unique: "updated1"}
          |    },
          |    {
          |        where: {c_contains:"2"}
-         |        data: {test: "updated2"}
+         |        data: {non_unique: "updated2"}
          |    }
          |    ]}
          |  }){
          |    childrenOpt {
          |      c
-         |      test
+         |      non_unique
          |    }
          |  }
          |}
-      """.stripMargin,
+      """,
         project
       )
 
-      //ifConnectorIsActive { //dataResolver(project).countByTable("_ChildToParent").await should be(4) }
-      //dataResolver(project).countByTable(project.schema.getModelByName_!("Parent").dbName).await should be(2)
-      //dataResolver(project).countByTable(project.schema.getModelByName_!("Child").dbName).await should be(4)
-
-      server.query("query{parents{p,childrenOpt{c, test}}}", project).toString() should be(
-        """{"data":{"parents":[{"p":"p1","childrenOpt":[{"c":"c1","test":"updated1"},{"c":"c2","test":"updated2"}]},{"p":"p2","childrenOpt":[{"c":"c3","test":null},{"c":"c4","test":null}]}]}}""")
+      server.query("query{parents{p,childrenOpt{c, non_unique}}}", project).toString() should be(
+        """{"data":{"parents":[{"p":"p1","childrenOpt":[{"c":"c1","non_unique":"updated1"},{"c":"c2","non_unique":"updated2"}]},{"p":"p2","childrenOpt":[{"c":"c3","non_unique":null},{"c":"c4","non_unique":null}]}]}}""")
     }
   }
 
   "a PM to C1!  relation " should "work with empty Filter" in {
-    schemaPMToC1req.test { dataModel =>
-      val project = SchemaDsl.fromStringV11() { dataModel }
+    schemaWithRelation(onParent = ChildList, onChild = ParentReq).test { t =>
+      val project = SchemaDsl.fromStringV11() {
+        t.datamodel
+      }
       database.setup(project)
 
       setupData(project)
-
-      //ifConnectorIsActive { //dataResolver(project).countByTable("_ChildToParent").await should be(4) }
 
       server.query(
         s"""
@@ -230,37 +216,33 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    childrenOpt: {updateMany: [
          |    {
          |        where: {}
-         |        data: {test: "updated1"}
+         |        data: {non_unique: "updated1"}
          |    }
          |    ]}
          |  }){
          |    childrenOpt {
          |      c
-         |      test
+         |      non_unique
          |    }
          |  }
          |}
-      """.stripMargin,
+      """,
         project
       )
 
-      //ifConnectorIsActive { //dataResolver(project).countByTable("_ChildToParent").await should be(4) }
-      //dataResolver(project).countByTable(project.schema.getModelByName_!("Parent").dbName).await should be(2)
-      //dataResolver(project).countByTable(project.schema.getModelByName_!("Child").dbName).await should be(4)
-
-      server.query("query{parents{p,childrenOpt{c, test}}}", project).toString() should be(
-        """{"data":{"parents":[{"p":"p1","childrenOpt":[{"c":"c1","test":"updated1"},{"c":"c2","test":"updated1"}]},{"p":"p2","childrenOpt":[{"c":"c3","test":null},{"c":"c4","test":null}]}]}}""")
+      server.query("query{parents{p,childrenOpt{c, non_unique}}}", project).toString() should be(
+        """{"data":{"parents":[{"p":"p1","childrenOpt":[{"c":"c1","non_unique":"updated1"},{"c":"c2","non_unique":"updated1"}]},{"p":"p2","childrenOpt":[{"c":"c3","non_unique":null},{"c":"c4","non_unique":null}]}]}}""")
     }
   }
 
   "a PM to C1!  relation " should "not change anything when there is no hit" in {
-    schemaPMToC1req.test { dataModel =>
-      val project = SchemaDsl.fromStringV11() { dataModel }
+    schemaWithRelation(onParent = ChildList, onChild = ParentReq).test { t =>
+      val project = SchemaDsl.fromStringV11() {
+        t.datamodel
+      }
       database.setup(project)
 
       setupData(project)
-
-      //ifConnectorIsActive { //dataResolver(project).countByTable("_ChildToParent").await should be(4) }
 
       server.query(
         s"""
@@ -271,43 +253,39 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    childrenOpt: {updateMany: [
          |    {
          |        where: {c_contains:"3"}
-         |        data: {test: "updated3"}
+         |        data: {non_unique: "updated3"}
          |    },
          |    {
          |        where: {c_contains:"4"}
-         |        data: {test: "updated4"}
+         |        data: {non_unique: "updated4"}
          |    }
          |    ]}
          |  }){
          |    childrenOpt {
          |      c
-         |      test
+         |      non_unique
          |    }
          |  }
          |}
-      """.stripMargin,
+      """,
         project
       )
 
-      //ifConnectorIsActive { //dataResolver(project).countByTable("_ChildToParent").await should be(4) }
-      //dataResolver(project).countByTable(project.schema.getModelByName_!("Parent").dbName).await should be(2)
-      //dataResolver(project).countByTable(project.schema.getModelByName_!("Child").dbName).await should be(4)
-
-      server.query("query{parents{p,childrenOpt{c, test}}}", project).toString() should be(
-        """{"data":{"parents":[{"p":"p1","childrenOpt":[{"c":"c1","test":null},{"c":"c2","test":null}]},{"p":"p2","childrenOpt":[{"c":"c3","test":null},{"c":"c4","test":null}]}]}}""")
+      server.query("query{parents{p,childrenOpt{c, non_unique}}}", project).toString() should be(
+        """{"data":{"parents":[{"p":"p1","childrenOpt":[{"c":"c1","non_unique":null},{"c":"c2","non_unique":null}]},{"p":"p2","childrenOpt":[{"c":"c3","non_unique":null},{"c":"c4","non_unique":null}]}]}}""")
     }
   }
 
   //optional ordering
 
   "a PM to C1!  relation " should "work when multiple filters hit" in {
-    schemaPMToC1req.test { dataModel =>
-      val project = SchemaDsl.fromStringV11() { dataModel }
+    schemaWithRelation(onParent = ChildList, onChild = ParentReq).test { t =>
+      val project = SchemaDsl.fromStringV11() {
+        t.datamodel
+      }
       database.setup(project)
 
       setupData(project)
-
-      //ifConnectorIsActive { //dataResolver(project).countByTable("_ChildToParent").await should be(4) }
 
       server.query(
         s"""
@@ -318,30 +296,26 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    childrenOpt: {updateMany: [
          |    {
          |        where: {c_contains:"c"}
-         |        data: {test: "updated1"}
+         |        data: {non_unique: "updated1"}
          |    },
          |    {
          |        where: {c_contains:"c1"}
-         |        data: {test: "updated2"}
+         |        data: {non_unique: "updated2"}
          |    }
          |    ]}
          |  }){
          |    childrenOpt (orderBy: id_ASC){
          |      c
-         |      test
+         |      non_unique
          |    }
          |  }
          |}
-      """.stripMargin,
+      """,
         project
       )
 
-      //ifConnectorIsActive { //dataResolver(project).countByTable("_ChildToParent").await should be(4) }
-      //dataResolver(project).countByTable(project.schema.getModelByName_!("Parent").dbName).await should be(2)
-      //dataResolver(project).countByTable(project.schema.getModelByName_!("Child").dbName).await should be(4)
-
-      server.query("query{parents{p,childrenOpt(orderBy: id_ASC){c, test}}}", project).toString() should be(
-        """{"data":{"parents":[{"p":"p1","childrenOpt":[{"c":"c1","test":"updated2"},{"c":"c2","test":"updated1"}]},{"p":"p2","childrenOpt":[{"c":"c3","test":null},{"c":"c4","test":null}]}]}}""")
+      server.query("query{parents{p,childrenOpt(orderBy: id_ASC){c, non_unique}}}", project).toString() should be(
+        """{"data":{"parents":[{"p":"p1","childrenOpt":[{"c":"c1","non_unique":"updated2"},{"c":"c2","non_unique":"updated1"}]},{"p":"p2","childrenOpt":[{"c":"c3","non_unique":null},{"c":"c4","non_unique":null}]}]}}""")
     }
   }
 
@@ -358,7 +332,7 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         |       c
         |    }
         |  }
-        |}""".stripMargin,
+        |}""",
       project
     )
 
@@ -374,7 +348,7 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         |       c
         |    }
         |  }
-        |}""".stripMargin,
+        |}""",
       project
     )
   }

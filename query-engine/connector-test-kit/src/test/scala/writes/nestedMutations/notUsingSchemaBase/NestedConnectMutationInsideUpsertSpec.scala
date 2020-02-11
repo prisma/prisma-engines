@@ -1,4 +1,4 @@
-package writes.nestedMutations
+package writes.nestedMutations.notUsingSchemaBase
 
 import org.scalatest.{FlatSpec, Matchers}
 import util.ConnectorCapability.JoinRelationLinksCapability

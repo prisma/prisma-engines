@@ -7,9 +7,11 @@ import util._
 class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers with ApiSpecBase with SchemaBaseV11 {
   override def runOnlyForCapabilities = Set(JoinRelationLinksCapability)
 
-  "a P1 to C1  relation " should "be disconnectable through a nested mutation by id" in {
-    schemaP1optToC1opt.test { dataModel =>
-      val project = SchemaDsl.fromStringV11() { dataModel }
+  "a P1 to C1 relation " should "be disconnectable through a nested mutation by id" in {
+    schemaWithRelation(onParent = ChildOpt, onChild = ParentOpt).test { t =>
+      val project = SchemaDsl.fromStringV11() {
+        t.datamodel
+      }
       database.setup(project)
 
       val res = server
@@ -33,8 +35,6 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
       val childId  = res.pathAsString("data.createParent.childOpt.id")
       val parentId = res.pathAsString("data.createParent.id")
 
-      //ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(1) }
-
       val res2 = server.query(
         s"""
          |mutation {
@@ -57,13 +57,14 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
 
       res2.toString should be("""{"data":{"upsertParent":{"childOpt":null}}}""")
 
-    //ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(0) }
     }
   }
 
   "a P1 to C1  relation with the child and the parent without a relation" should "not be disconnectable through a nested mutation by id" in {
-    schemaP1optToC1opt.test { dataModel =>
-      val project = SchemaDsl.fromStringV11() { dataModel }
+    schemaWithRelation(onParent = ChildOpt, onChild = ParentOpt).test { t =>
+      val project = SchemaDsl.fromStringV11() {
+        t.datamodel
+      }
       database.setup(project)
 
       val child1Id = server
@@ -90,8 +91,6 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
         )
         .pathAsString("data.createParent.id")
 
-      //ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(0) }
-
       val res = server.queryThatMustFail(
         s"""mutation {
          |  upsertParent(
@@ -114,13 +113,14 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
         errorCode = 3041
       )
 
-    //ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(0) }
     }
   }
 
   "a PM to C1!  relation with the child already in a relation" should "not be disconnectable through a nested mutation by unique" in {
-    schemaPMToC1req.test { dataModel =>
-      val project = SchemaDsl.fromStringV11() { dataModel }
+    schemaWithRelation(onParent = ChildList, onChild = ParentReq).test { t =>
+      val project = SchemaDsl.fromStringV11() {
+        t.datamodel
+      }
       database.setup(project)
 
       server.query(
@@ -138,8 +138,6 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
         |}""",
         project
       )
-
-      //ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(1) }
 
       server.queryThatMustFail(
         s"""mutation {
@@ -160,13 +158,14 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
         errorCode = 3042
       )
 
-    //ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(1) }
     }
   }
 
   "a P1 to C1!  relation with the child and the parent already in a relation" should "should error in a nested mutation by unique" in {
-    schemaP1optToC1req.test { dataModel =>
-      val project = SchemaDsl.fromStringV11() { dataModel }
+    schemaWithRelation(onParent = ChildOpt, onChild = ParentReq).test { t =>
+      val project = SchemaDsl.fromStringV11() {
+        t.datamodel
+      }
       database.setup(project)
 
       server.query(
@@ -184,8 +183,6 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
         |}""",
         project
       )
-
-      //ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(1) }
 
       server.queryThatMustFail(
         s"""mutation {
@@ -207,13 +204,14 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
         errorContains = "The change you are trying to make would violate the required relation 'ChildToParent' between Child and Parent"
       )
 
-    //ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(1) }
     }
   }
 
   "a PM to C1  relation with the child already in a relation" should "be disconnectable through a nested mutation by unique" in {
-    schemaPMToC1opt.test { dataModel =>
-      val project = SchemaDsl.fromStringV11() { dataModel }
+    schemaWithRelation(onParent = ChildList, onChild = ParentOpt).test { t =>
+      val project = SchemaDsl.fromStringV11() {
+        t.datamodel
+      }
       database.setup(project)
 
       server
@@ -232,8 +230,6 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
           |}""",
           project
         )
-
-      //ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(2) }
 
       val res = server.query(
         s"""
@@ -256,13 +252,14 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
 
       res.toString should be("""{"data":{"upsertParent":{"childrenOpt":[{"c":"c1"}]}}}""")
 
-    //ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(1) }
     }
   }
 
   "a P1 to CM  relation with the child already in a relation" should "be disconnectable through a nested mutation by unique" in {
-    schemaP1optToCM.test { dataModel =>
-      val project = SchemaDsl.fromStringV11() { dataModel }
+    schemaWithRelation(onParent = ChildOpt, onChild = ParentList).test { t =>
+      val project = SchemaDsl.fromStringV11() {
+        t.datamodel
+      }
       database.setup(project)
 
       server.query(
@@ -280,8 +277,6 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
         |}""",
         project
       )
-
-      //ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(1) }
 
       val res = server.query(
         s"""
@@ -306,13 +301,14 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
 
       server.query(s"""query{children{c, parentsOpt{p}}}""", project).toString should be("""{"data":{"children":[{"c":"c1","parentsOpt":[]}]}}""")
 
-    //ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(0) }
     }
   }
 
   "a PM to CM  relation with the children already in a relation" should "be disconnectable through a nested mutation by unique" in {
-    schemaPMToCM.test { dataModel =>
-      val project = SchemaDsl.fromStringV11() { dataModel }
+    schemaWithRelation(onParent = ChildList, onChild = ParentList).test { t =>
+      val project = SchemaDsl.fromStringV11() {
+        t.datamodel
+      }
       database.setup(project)
 
       server.query(
@@ -330,8 +326,6 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
         |}""",
         project
       )
-
-      //ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(2) }
 
       val res = server.query(
         s"""
@@ -357,9 +351,10 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
       server.query(s"""query{children{c, parentsOpt{p}}}""", project).toString should be(
         """{"data":{"children":[{"c":"c1","parentsOpt":[]},{"c":"c2","parentsOpt":[{"p":"p1"}]}]}}""")
 
-    //ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(1) }
     }
   }
+
+  // OTHER DATAMODELS
 
   "a one to many relation" should "be disconnectable by id through a nested mutation" in {
     val schema = s"""model Comment{
@@ -1158,7 +1153,8 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
     result.toString should be(
       """{"data":{"updateTop":{"nameTop":"updated top","middle":{"nameMiddle":"updated middle","bottom":{"nameBottom":"updated bottom","below":[{"nameBelow":"second below"}]}}}}}""")
 
-    server.query("query{belows (orderBy: id_ASC){nameBelow}}", project).toString should be("""{"data":{"belows":[{"nameBelow":"below"},{"nameBelow":"second below"}]}}""")
+    server.query("query{belows (orderBy: id_ASC){nameBelow}}", project).toString should be(
+      """{"data":{"belows":[{"nameBelow":"below"},{"nameBelow":"second below"}]}}""")
   }
 
   "a deeply nested mutation" should "execute all levels of the mutation if there are only model edges on the path" in {

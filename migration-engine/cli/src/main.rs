@@ -6,6 +6,8 @@ mod logger;
 use migration_core::{api::RpcApi, error::Error as CoreError};
 use structopt::StructOpt;
 
+/// When no subcommand is specified, the migration engine will default to starting as a JSON-RPC
+/// server over stdio.
 #[derive(Debug, StructOpt)]
 #[structopt(no_version)]
 struct MigrationEngineCli {
