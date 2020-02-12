@@ -1,4 +1,4 @@
-package writes.nestedMutations
+package writes.nestedMutations.alreadyConverted
 
 import org.scalatest.{FlatSpec, Matchers}
 import util.ConnectorCapability.JoinRelationLinksCapability
@@ -16,30 +16,30 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
 
       val res = server
         .query(
-          """mutation {
+          s"""mutation {
           |  createParent(data: {
-          |    p: "p1"
+          |    p: "p1", p_1: "p", p_2: "1"
           |    childOpt: {
           |      create: {c: "c1"}
           |    }
           |  }){
-          |    id
+          |    ${t.parent.selection}
           |    childOpt{
-          |       id
+          |       ${t.child.selection}
           |    }
           |  }
           |}""",
           project
         )
 
-      val childId  = res.pathAsString("data.createParent.childOpt.id")
-      val parentId = res.pathAsString("data.createParent.id")
+      val childId  = t.child.where(res, "data.createParent.childOpt")
+      val parentId = t.parent.where(res, "data.createParent")
 
       val res2 = server.query(
         s"""
          |mutation {
          |  upsertParent(
-         |    where:{id: "$parentId"}
+         |    where: $parentId
          |    update:{
          |      p: "p2"
          |      childOpt: {disconnect: true}
@@ -67,34 +67,34 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
       }
       database.setup(project)
 
-      val child1Id = server
+      val child1Result = server
         .query(
-          """mutation {
-          |  createChild(data: {c: "c1"})
+          s"""mutation {
+          |  createChild(data: {c: "c1", c_1: "c", c_2: "1"})
           |  {
-          |    id
+          |    ${t.child.selection}
           |  }
           |}""",
           project
         )
-        .pathAsString("data.createChild.id")
+      val child1Id = t.child.where(child1Result, "data.createChild")
 
-      val parent1Id = server
+      val parent1Result = server
         .query(
-          """mutation {
-          |  createParent(data: {p: "p1"})
+          s"""mutation {
+          |  createParent(data: {p: "p1", p_1: "p", p_2: "1"})
           |  {
-          |    id
+          |    ${t.parent.selection}
           |  }
           |}""",
           project
         )
-        .pathAsString("data.createParent.id")
+      val parent1Id = t.parent.where(parent1Result, "data.createParent")
 
       val res = server.queryThatMustFail(
         s"""mutation {
          |  upsertParent(
-         |  where:{id: "$parent1Id"}
+         |  where: $parent1Id
          |  update:{
          |    p: "p2"
          |    childOpt: {disconnect: true}
@@ -123,14 +123,15 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
       }
       database.setup(project)
 
-      server.query(
-        """mutation {
+      val parentResult = server.query(
+        s"""mutation {
         |  createParent(data: {
-        |    p: "p1"
+        |    p: "p1", p_1: "p", p_2: "1"
         |    childrenOpt: {
         |      create: {c: "c1"}
         |    }
         |  }){
+        |    ${t.parent.selection}
         |    childrenOpt{
         |       c
         |    }
@@ -138,11 +139,12 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
         |}""",
         project
       )
+      val parentIdentifier = t.parent.where(parentResult, "data.createParent")
 
       server.queryThatMustFail(
         s"""mutation {
          |  upsertParent(
-         |    where: {p: "p1"}
+         |    where: $parentIdentifier
          |    update:{
          |    childrenOpt: {disconnect: {c: "c1"}}
          |    }
@@ -168,14 +170,15 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
       }
       database.setup(project)
 
-      server.query(
-        """mutation {
+      val parentResult = server.query(
+        s"""mutation {
         |  createParent(data: {
-        |    p: "p1"
+        |    p: "p1", p_1: "p", p_2: "1"
         |    childOpt: {
         |      create: {c: "c1"}
         |    }
         |  }){
+        |    ${t.parent.selection}
         |    childOpt{
         |       c
         |    }
@@ -183,11 +186,12 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
         |}""",
         project
       )
+      val parentIdentifier = t.parent.where(parentResult, "data.createParent")
 
       server.queryThatMustFail(
         s"""mutation {
          |  upsertParent(
-         |  where: {p: "p1"}
+         |  where: $parentIdentifier
          |  update:{
          |    childOpt: {disconnect: true}
          |  }
@@ -214,15 +218,16 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
       }
       database.setup(project)
 
-      server
+      val parentResult = server
         .query(
-          """mutation {
+          s"""mutation {
           |  createParent(data: {
-          |    p: "p1"
+          |    p: "p1", p_1: "p", p_2: "1"
           |    childrenOpt: {
           |      create: [{c: "c1"}, {c: "c2"}]
           |    }
           |  }){
+          |    ${t.parent.selection}
           |    childrenOpt{
           |       c
           |    }
@@ -230,12 +235,13 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
           |}""",
           project
         )
+      val parentIdentifier = t.parent.where(parentResult, "data.createParent")
 
       val res = server.query(
         s"""
          |mutation {
          |  upsertParent(
-         |  where: { p: "p1"}
+         |  where: $parentIdentifier
          |  update:{
          |    childrenOpt: {disconnect: [{c: "c2"}]}
          |  }
@@ -262,14 +268,15 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
       }
       database.setup(project)
 
-      server.query(
-        """mutation {
+      val parentResult = server.query(
+        s"""mutation {
         |  createParent(data: {
-        |    p: "p1"
+        |    p: "p1", p_1: "p", p_2: "1"
         |    childOpt: {
         |      create: {c: "c1"}
         |    }
         |  }){
+        |    ${t.parent.selection}
         |    childOpt{
         |       c
         |    }
@@ -277,12 +284,13 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
         |}""",
         project
       )
+      val parentIdentifier = t.parent.where(parentResult, "data.createParent")
 
       val res = server.query(
         s"""
          |mutation {
          |  upsertParent(
-         |    where: {p: "p1"}
+         |    where: $parentIdentifier
          |    update:{
          |    childOpt: {disconnect: true}
          |  }
@@ -311,14 +319,15 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
       }
       database.setup(project)
 
-      server.query(
-        """mutation {
+      val parentResult = server.query(
+        s"""mutation {
         |  createParent(data: {
-        |    p: "p1"
+        |    p: "p1", p_1: "p", p_2: "1"
         |    childrenOpt: {
         |      create: [{c: "c1"},{c: "c2"}]
         |    }
         |  }){
+        |    ${t.parent.selection}
         |    childrenOpt{
         |       c
         |    }
@@ -326,12 +335,13 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
         |}""",
         project
       )
+      val parentIdentifier = t.parent.where(parentResult, "data.createParent")
 
       val res = server.query(
         s"""
          |mutation {
          |  upsertParent(
-         |  where: { p: "p1"}
+         |  where: $parentIdentifier
          |  update:{
          |    childrenOpt: {disconnect: [{c: "c1"}]}
          |  }
