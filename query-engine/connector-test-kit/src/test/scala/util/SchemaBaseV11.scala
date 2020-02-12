@@ -63,9 +63,19 @@ trait SchemaBaseV11 extends PlayJsonExtensions {
     test
   }
 
+  def parseMultiCompound(fields: Vector[String], argName: String)(json: JsValue, path: String): Vector[String] = {
+    json.pathAsJsArray(path).value.map(json => parseCompoundIdentifier(fields, argName)(json, "")).toVector
+  }
+
+  def parseMulti(field: String)(json: JsValue, path: String): Vector[String] = {
+    json.pathAsJsArray(path).value.map(json => parseIdentifer(field)(json, "")).toVector
+  }
+
   def parseCompoundIdentifier(fields: Vector[String], argName: String)(json: JsValue, path: String): String = {
-    val fieldValues = fields.map(f => json.pathAsJsValue(path + "." + f))
+    val pathPrefix  = if (path == "") "" else path + "."
+    val fieldValues = fields.map(f => json.pathAsJsValue(pathPrefix + f))
     val arguments   = fields.zip(fieldValues).map { case (name, value) => s"""$name: $value""" }.mkString(",")
+
     s"""
        |{
        |  $argName: {
@@ -73,6 +83,12 @@ trait SchemaBaseV11 extends PlayJsonExtensions {
        |  }
        |}
        """.stripMargin
+  }
+
+  def parseIdentifer(field: String)(json: JsValue, path: String): String = {
+    val finalPath = if (path == "") field else path + "." + field
+    val value     = json.pathAsJsValue(finalPath).toString()
+    s"{ $field: $value }"
   }
 
   sealed trait RelationField {
@@ -107,29 +123,40 @@ trait SchemaBaseV11 extends PlayJsonExtensions {
       selection = "id",
       where = parse(".id", "id"),
       parseFirst = parseFirst("id", "id"),
-      parseAll = parseAll("id")
+      parseAll = parseAll("id"),
+      whereMulti = parseMulti("id")
     )
 
-    val compoundIdParams = QueryParams(
-      selection = "id_1 , id_2",
-      where = parseCompoundIdentifier(Vector("id_1", "id_2"), "id_1_id_2"),
-      parseFirst = parseFirst("", "id_1_id_2"),
-      parseAll = parseAll("id_1_id_2", true)
-    )
+    val compoundIdParams = {
+      val fields  = Vector("id_1", "id_2")
+      val argName = "id_1_id_2"
+      QueryParams(
+        selection = "id_1 , id_2",
+        where = parseCompoundIdentifier(fields, argName),
+        parseFirst = parseFirst("", "id_1_id_2"),
+        parseAll = parseAll("id_1_id_2", true),
+        whereMulti = parseMultiCompound(fields, argName)
+      )
+    }
 
     val parentUniqueParams = Vector(
       QueryParams(
         selection = "p",
         where = parse(".p", "p"),
         parseFirst = parseFirst("p", "p"),
-        parseAll = parseAll("p")
-      ),
-      QueryParams(
-        selection = "p_1, p_2",
-        where = parseCompoundIdentifier(Vector("p_1", "p_2"), "p_1_p_2"),
-        parseFirst = parseFirst("", "p_1_p_2"),
-        parseAll = parseAll("p_1_p_2", true)
-      )
+        parseAll = parseAll("p"),
+        whereMulti = parseMulti("p")
+      ), {
+        val fields  = Vector("p_1", "p_2")
+        val argName = "p_1_p_2"
+        QueryParams(
+          selection = "p_1, p_2",
+          where = parseCompoundIdentifier(fields, argName),
+          parseFirst = parseFirst("", "p_1_p_2"),
+          parseAll = parseAll("p_1_p_2", true),
+          whereMulti = parseMultiCompound(fields, argName)
+        )
+      }
     )
 
     val childUniqueParams = Vector(
@@ -137,14 +164,19 @@ trait SchemaBaseV11 extends PlayJsonExtensions {
         selection = "c",
         where = parse(".c", "c"),
         parseFirst = parseFirst("c", "c"),
-        parseAll = parseAll("c")
-      ),
-      QueryParams(
-        selection = "c_1, c_2",
-        where = parseCompoundIdentifier(Vector("c_1", "c_2"), "c_1_c_2"),
-        parseFirst = parseFirst("", "c_1_c_2"),
-        parseAll = parseAll("c_1_c_2", true)
-      )
+        parseAll = parseAll("c"),
+        whereMulti = parseMulti("c")
+      ), {
+        val fields  = Vector("c_1", "c_2")
+        val argName = "c_1_c_2"
+        QueryParams(
+          selection = "c_1, c_2",
+          where = parseCompoundIdentifier(fields, argName),
+          parseFirst = parseFirst("", "c_1_c_2"),
+          parseAll = parseAll("c_1_c_2", true),
+          whereMulti = parseMultiCompound(fields, argName)
+        )
+      }
     )
 
     val simple       = true
