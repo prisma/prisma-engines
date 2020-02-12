@@ -1,4 +1,4 @@
-package writes.nestedMutations
+package writes.nestedMutations.alreadyConverted
 
 import java.util.UUID
 
@@ -16,14 +16,15 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
       }
       database.setup(project)
 
-      server.query(
-        """mutation {
+      val parentResult = server.query(
+        s"""mutation {
         |  createParent(data: {
-        |    p: "p1"
+        |    p: "p1", p_1: "p", p_2: "1"
         |    childrenOpt: {
         |      create: {c: "c1"}
         |    }
         |  }){
+        |    ${t.parent.selection}
         |    childrenOpt{
         |       c
         |    }
@@ -31,12 +32,13 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
         |}""",
         project
       )
+      val parentIdentifier = t.parent.where(parentResult, "data.createParent")
 
       val res = server.query(
         s"""
          |mutation {
          |  updateParent(
-         |    where: {p: "p1"}
+         |    where: $parentIdentifier
          |    data:{
          |      childrenOpt: {
          |        upsert: {
@@ -68,14 +70,15 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
       }
       database.setup(project)
 
-      server.query(
-        """mutation {
+      val parentResult = server.query(
+        s"""mutation {
         |  createParent(data: {
-        |    p: "p1"
+        |    p: "p1", p_1: "p", p_2: "1"
         |    childrenOpt: {
         |      create: {c: "c1"}
         |    }
         |  }){
+        |    ${t.parent.selection}
         |    childrenOpt{
         |       c
         |    }
@@ -83,12 +86,13 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
         |}""",
         project
       )
+      val parentIdentifier = t.parent.where(parentResult, "data.createParent")
 
       val res = server.query(
         s"""
          |mutation {
          |  updateParent(
-         |    where: {p: "p1"}
+         |    where: $parentIdentifier
          |    data:{
          |    childrenOpt: {upsert: {
          |    where: {c: "c1"}
@@ -117,15 +121,16 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
       }
       database.setup(project)
 
-      server
+      val parentResult = server
         .query(
-          """mutation {
+          s"""mutation {
           |  createParent(data: {
-          |    p: "p1"
+          |    p: "p1", p_1: "p", p_2: "1"
           |    childrenOpt: {
           |      create: [{c: "c1"}, {c: "c2"}]
           |    }
           |  }){
+          |    ${t.parent.selection}
           |    childrenOpt{
           |       c
           |    }
@@ -133,12 +138,13 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
           |}""",
           project
         )
+      val parentIdentifier = t.parent.where(parentResult, "data.createParent")
 
       val res = server.query(
         s"""
          |mutation {
          |  updateParent(
-         |  where: { p: "p1"}
+         |  where: $parentIdentifier
          |  data:{
          |    childrenOpt: {upsert: [{
          |    where: {c: "DOES NOT EXIST"}
@@ -167,15 +173,16 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
       }
       database.setup(project)
 
-      server
+      val parentResult = server
         .query(
-          """mutation {
+          s"""mutation {
           |  createParent(data: {
-          |    p: "p1"
+          |    p: "p1", p_1: "p", p_2: "1"
           |    childrenOpt: {
           |      create: [{c: "c1"}, {c: "c2"}]
           |    }
           |  }){
+          |    ${t.parent.selection}
           |    childrenOpt{
           |       c
           |    }
@@ -183,12 +190,13 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
           |}""",
           project
         )
+      val parentIdentifier = t.parent.where(parentResult, "data.createParent")
 
       val res = server.query(
         s"""
          |mutation {
          |  updateParent(
-         |  where: { p: "p1"}
+         |  where: $parentIdentifier
          |  data:{
          |    childrenOpt: {upsert: [{
          |    where: {c: "c1"}
@@ -217,14 +225,15 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
       }
       database.setup(project)
 
-      server.query(
-        """mutation {
+      val parentResult = server.query(
+        s"""mutation {
         |  createParent(data: {
-        |    p: "p1"
+        |    p: "p1", p_1: "p", p_2: "1"
         |    childrenOpt: {
         |      create: [{c: "c1"},{c: "c2"}]
         |    }
         |  }){
+        |    ${t.parent.selection}
         |    childrenOpt{
         |       c
         |    }
@@ -232,12 +241,13 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
         |}""",
         project
       )
+      val parentIdentifier = t.parent.where(parentResult, "data.createParent")
 
       val res = server.query(
         s"""
          |mutation {
          |  updateParent(
-         |  where: { p: "p1"}
+         |  where: $parentIdentifier
          |  data:{
          |    childrenOpt: {upsert: [{
          |    where: {c: "c2"}
@@ -269,14 +279,15 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
       }
       database.setup(project)
 
-      server.query(
-        """mutation {
+      val parentResult = server.query(
+        s"""mutation {
         |  createParent(data: {
-        |    p: "p1"
+        |    p: "p1", p_1: "p", p_2: "1"
         |    childrenOpt: {
         |      create: [{c: "c1"},{c: "c2"}]
         |    }
         |  }){
+        |    ${t.parent.selection}
         |    childrenOpt{
         |       c
         |    }
@@ -284,12 +295,13 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
         |}""",
         project
       )
+      val parentIdentifier = t.parent.where(parentResult, "data.createParent")
 
       val res = server.query(
         s"""
          |mutation {
          |  updateParent(
-         |  where: { p: "p1"}
+         |  where: $parentIdentifier
          |  data:{
          |    childrenOpt: {upsert: [{
          |      where: {c: "DOES NOT EXIST"}
