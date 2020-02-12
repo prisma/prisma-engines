@@ -61,6 +61,15 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
             model.id_fields = table.primary_key_columns();
         }
 
+        if model.id_fields.is_empty()
+            && !model
+                .fields
+                .iter()
+                .any(|f| f.is_id || f.is_unique || f.field_type.is_relation())
+        {
+            model.is_commented_out = true;
+        }
+
         data_model.add_model(model);
     }
 
