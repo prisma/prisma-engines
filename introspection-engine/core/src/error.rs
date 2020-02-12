@@ -1,54 +1,36 @@
-use failure::Fail;
+use crate::command_error::CommandError;
+use datamodel::error::ErrorCollection;
 use introspection_connector::ConnectorError;
-use jsonrpc_core::types::error::Error as JsonRpcError;
+use thiserror::Error;
 
-pub type CoreResult<T> = Result<T, CoreError>;
+pub type CoreResult<T> = Result<T, Error>;
 
-#[derive(Debug, Fail)]
-pub enum CoreError {
-    #[fail(display = "Error in connector: {}", _0)]
-    ConnectorError(#[fail(cause)] introspection_connector::ConnectorError),
-    #[fail(display = "Datamodel rendering failed: {}", _0)]
-    DatamodelRendering(datamodel::error::ErrorCollection),
+#[derive(Debug, Error)]
+pub enum Error {
+    #[error("Error in connector: {0}")]
+    ConnectorError(ConnectorError),
+
+    #[error("Failure during an introspection command: {0}")]
+    CommandError(CommandError),
+
+    #[error("Error in datamodel: {:?}", .0)]
+    DatamodelError(ErrorCollection),
 }
 
-impl From<ConnectorError> for CoreError {
+impl From<ConnectorError> for Error {
     fn from(e: ConnectorError) -> Self {
-        CoreError::ConnectorError(e)
+        Error::ConnectorError(e)
     }
 }
 
-impl From<datamodel::error::ErrorCollection> for CoreError {
+impl From<CommandError> for Error {
+    fn from(e: CommandError) -> Self {
+        Error::CommandError(e)
+    }
+}
+
+impl From<datamodel::error::ErrorCollection> for Error {
     fn from(e: datamodel::error::ErrorCollection) -> Self {
-        CoreError::DatamodelRendering(e)
-    }
-}
-
-impl From<CoreError> for jsonrpc_core::types::error::Error {
-    fn from(mut e: CoreError) -> Self {
-        use user_facing_errors::{KnownError, UnknownError};
-
-        let known_error: Option<KnownError> = match &mut e {
-            CoreError::ConnectorError(ConnectorError { user_facing, .. }) => user_facing.take(),
-            _ => None,
-        };
-
-        let data: user_facing_errors::Error = known_error.map(user_facing_errors::Error::from).unwrap_or_else(|| {
-            UnknownError {
-                message: format!("{}", e),
-                backtrace: e.backtrace().map(|bt| format!("{}", bt)),
-            }
-            .into()
-        });
-
-        render_jsonrpc_error(data, format!("CoreError: {}", e))
-    }
-}
-
-pub(crate) fn render_jsonrpc_error(payload: impl serde::Serialize, message: String) -> JsonRpcError {
-    JsonRpcError {
-        code: jsonrpc_core::ErrorCode::ServerError(1000),
-        message,
-        data: Some(serde_json::to_value(payload).unwrap()),
+        Error::DatamodelError(e)
     }
 }

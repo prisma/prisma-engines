@@ -1,8 +1,9 @@
 use jsonrpc_core::*;
 use rpc::{Rpc, RpcImpl};
 pub mod cli;
-mod connector_loader;
+mod command_error;
 mod error;
+mod error_rendering;
 mod rpc;
 
 #[tokio::main]
