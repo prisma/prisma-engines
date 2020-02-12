@@ -29,11 +29,8 @@ impl<'a> ConditionTree<'a> {
                 conditions.push(other.into());
                 self
             }
-            Self::Or(_) => Self::And(vec![Expression::from(self), other.into()]),
-            Self::Not(_) => Self::And(vec![Expression::from(self), other.into()]),
             Self::Single(expr) => Self::And(vec![*expr, other.into()]),
-            Self::NoCondition => self,
-            Self::NegativeCondition => Self::And(vec![Expression::from(self), other.into()]),
+            _ => Self::And(vec![Expression::from(self), other.into()]),
         }
     }
 
@@ -48,11 +45,8 @@ impl<'a> ConditionTree<'a> {
                 conditions.push(other.into());
                 self
             }
-            Self::And(_) => Self::Or(vec![Expression::from(self), other.into()]),
-            Self::Not(_) => Self::Or(vec![Expression::from(self), other.into()]),
             Self::Single(expr) => Self::Or(vec![*expr, other.into()]),
-            Self::NoCondition => self,
-            Self::NegativeCondition => Self::Or(vec![Expression::from(self), other.into()]),
+            _ => Self::Or(vec![Expression::from(self), other.into()]),
         }
     }
 
