@@ -86,11 +86,13 @@ case class TestServer() extends PlayJsonExtensions {
             encoded_query
           ),
           None,
-          "PRISMA_DML" -> project.envVar
+          "PRISMA_DML" -> project.envVar,
         ).!!
       }
     }
-    val lines          = response.linesIterator.toVector
+    val lines = response.linesIterator.toVector
+    println(lines.mkString("\n"))
+
     val responseMarker = "Response: " // due to race conditions the response can not always be found in the last line
     val responseLine   = lines.find(_.startsWith(responseMarker)).get.stripPrefix(responseMarker).stripSuffix("\n")
 
@@ -103,6 +105,5 @@ case class TestServer() extends PlayJsonExtensions {
         println(s"Error while decoding this line: \n$responseLine")
         throw e
     }
-
   }
 }

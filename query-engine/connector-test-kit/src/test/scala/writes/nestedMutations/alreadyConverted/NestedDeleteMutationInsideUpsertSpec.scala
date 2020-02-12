@@ -8,7 +8,7 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
   override def runOnlyForCapabilities = Set(JoinRelationLinksCapability)
 
   "a P1! to C1! relation " should "error when deleting the child" in {
-    schemaWithRelation(onParent = ChildReq, onChild = ParentReq).test { t =>
+    schemaWithRelation(onParent = ChildReq, onChild = ParentReq).test(9) { t =>
       val project = SchemaDsl.fromStringV11() {
         t.datamodel
       }
@@ -54,7 +54,6 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
         errorCode = 0,
         errorContains = "Argument 'update' expected model 'ParentUpdateInput!'"
       )
-
     }
   }
 
