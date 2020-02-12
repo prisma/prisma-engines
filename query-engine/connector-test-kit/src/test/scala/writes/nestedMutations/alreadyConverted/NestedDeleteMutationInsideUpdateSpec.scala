@@ -500,7 +500,7 @@ class NestedDeleteMutationInsideUpdateSpec extends FlatSpec with Matchers with A
         project
       )
 
-      val childIdentifier = t.child.parseFirst(res, "data.createParent.childrenOpt")
+      val childIdentifier = t.child.whereFirst(res, "data.createParent.childrenOpt")
 
       val res2 = server.query(
         s"""mutation {
@@ -598,7 +598,7 @@ class NestedDeleteMutationInsideUpdateSpec extends FlatSpec with Matchers with A
         project
       )
 
-      val childIdentifier = t.child.parseFirst(res, "data.createParent.childrenOpt")
+      val childIdentifier = t.child.whereFirst(res, "data.createParent.childrenOpt")
 
       val res2 = server.query(
         s"""mutation {

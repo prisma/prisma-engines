@@ -301,7 +301,7 @@ class NestedConnectMutationInsideCreateSpec extends FlatSpec with Matchers with 
       }
       database.setup(project)
 
-      val child = t.child.parseFirst(
+      val child = t.child.whereFirst(
         server
           .query(
             s"""mutation {

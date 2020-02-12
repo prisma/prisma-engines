@@ -29,40 +29,6 @@ trait SchemaBaseV11 extends PlayJsonExtensions {
 
   // parse functions
 
-  def unescapeFields(input: String): String = {
-    input
-      .replace("{\"c\":", "{c:")
-      .replace("{\"p\":", "{p:")
-      .replace("{\"id\":", "{id:")
-      .replace("{\"c_1\":", "{c_1:")
-      .replace("\"c_2\":", "c_2:")
-      .replace("{\"p_1\":", "{p_1:")
-      .replace("\"p_2\":", "p_2:")
-      .replace("\"{", "{")
-      .replace("}\"", "}")
-
-  }
-
-  def parse(subpath: String = "", where: String): (JsValue, String) => String = {
-    def test(input: JsValue, path: String): String = s"""{$where : ${unescapeFields(input.identifierAtPath(path, subpath, list = false))}}"""
-    test
-  }
-
-  def parseFirst(subpath: String = "", where: String): (JsValue, String) => String = {
-    def test(input: JsValue, path: String): String = s"""{$where : ${unescapeFields(input.identifierAtPath(path, subpath, list = true))}}"""
-    test
-  }
-
-  def parseAll(where: String, compound: Boolean = false): (JsValue, String) => String = {
-    def test(input: JsValue, path: String): String = {
-      compound match {
-        case false => s"""${unescapeFields(input.pathAsJsArray(path).toString())}"""
-        case true  => "[" + input.pathAsSeq(path).map(x => "{" + where + ":" + unescapeFields(x.toString()) + "}").mkString(",") + "]"
-      }
-    }
-    test
-  }
-
   def parseMultiCompound(fields: Vector[String], argName: String)(json: JsValue, path: String): Vector[String] = {
     json.pathAsJsArray(path).value.map(json => parseCompoundIdentifier(fields, argName)(json, "")).toVector
   }
@@ -121,9 +87,7 @@ trait SchemaBaseV11 extends PlayJsonExtensions {
     //Query Params
     val idParams = QueryParams(
       selection = "id",
-      where = parse(".id", "id"),
-      parseFirst = parseFirst("id", "id"),
-      parseAll = parseAll("id"),
+      where = parseIdentifer("id"),
       whereMulti = parseMulti("id")
     )
 
@@ -133,8 +97,6 @@ trait SchemaBaseV11 extends PlayJsonExtensions {
       QueryParams(
         selection = "id_1 , id_2",
         where = parseCompoundIdentifier(fields, argName),
-        parseFirst = parseFirst("", "id_1_id_2"),
-        parseAll = parseAll("id_1_id_2", true),
         whereMulti = parseMultiCompound(fields, argName)
       )
     }
@@ -142,9 +104,7 @@ trait SchemaBaseV11 extends PlayJsonExtensions {
     val parentUniqueParams = Vector(
       QueryParams(
         selection = "p",
-        where = parse(".p", "p"),
-        parseFirst = parseFirst("p", "p"),
-        parseAll = parseAll("p"),
+        where = parseIdentifer("p"),
         whereMulti = parseMulti("p")
       ), {
         val fields  = Vector("p_1", "p_2")
@@ -152,8 +112,6 @@ trait SchemaBaseV11 extends PlayJsonExtensions {
         QueryParams(
           selection = "p_1, p_2",
           where = parseCompoundIdentifier(fields, argName),
-          parseFirst = parseFirst("", "p_1_p_2"),
-          parseAll = parseAll("p_1_p_2", true),
           whereMulti = parseMultiCompound(fields, argName)
         )
       }
@@ -162,9 +120,7 @@ trait SchemaBaseV11 extends PlayJsonExtensions {
     val childUniqueParams = Vector(
       QueryParams(
         selection = "c",
-        where = parse(".c", "c"),
-        parseFirst = parseFirst("c", "c"),
-        parseAll = parseAll("c"),
+        where = parseIdentifer("c"),
         whereMulti = parseMulti("c")
       ), {
         val fields  = Vector("c_1", "c_2")
@@ -172,8 +128,6 @@ trait SchemaBaseV11 extends PlayJsonExtensions {
         QueryParams(
           selection = "c_1, c_2",
           where = parseCompoundIdentifier(fields, argName),
-          parseFirst = parseFirst("", "c_1_c_2"),
-          parseAll = parseAll("c_1_c_2", true),
           whereMulti = parseMultiCompound(fields, argName)
         )
       }
