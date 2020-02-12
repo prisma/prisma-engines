@@ -1,10 +1,11 @@
+use super::utils::IdFilter;
 use super::*;
 use crate::{
     query_ast::*,
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
     InputAssertions, ParsedInputMap, ParsedInputValue,
 };
-use connector::{Filter, ScalarCompare};
+use connector::Filter;
 use prisma_models::{ModelRef, PrismaValue, RelationFieldRef};
 use std::{convert::TryInto, sync::Arc};
 
@@ -28,7 +29,6 @@ pub fn connect_nested_delete(
     value: ParsedInputValue,
     child_model: &ModelRef,
 ) -> QueryGraphBuilderResult<()> {
-    let parent_model_identifier = parent_relation_field.model().primary_identifier();
     let child_model_identifier = parent_relation_field.related_model().primary_identifier();
 
     if parent_relation_field.is_list {
@@ -52,12 +52,6 @@ pub fn connect_nested_delete(
         });
 
         let delete_many_node = graph.create_node(Query::Write(delete_many));
-        let id_field = child_model
-            .fields()
-            .find_singular_id()
-            .expect("must have a singular field")
-            .upgrade()
-            .unwrap();
         let find_child_records_node =
             utils::insert_find_children_by_parent_node(graph, parent_node, parent_relation_field, or_filter)?;
 
@@ -81,12 +75,11 @@ pub fn connect_nested_delete(
                         });
                     }
 
-                    if let Node::Query(Query::Write(WriteQuery::DeleteManyRecords(ref mut ur))) = node {
-                        let as_prisma_values = parent_ids.iter().map(|x| x.single_value()).collect();
-                        let ids_filter = id_field.data_source_field().is_in(as_prisma_values);
-                        let new_filter = Filter::and(vec![ur.filter.clone(), ids_filter]);
+                    if let Node::Query(Query::Write(WriteQuery::DeleteManyRecords(ref mut dmr))) = node {
+                        let conditions: Vec<_> = parent_ids.into_iter().map(|pid| pid.filter()).collect();
+                        let filter = Filter::or(conditions);
 
-                        ur.filter = new_filter;
+                        dmr.set_filter(Filter::and(vec![dmr.filter.clone(), filter]));
                     }
 
                     Ok(node)
@@ -98,7 +91,6 @@ pub fn connect_nested_delete(
         let should_delete = if let PrismaValue::Boolean(b) = val { b } else { false };
 
         if should_delete {
-            let id_field = child_model.fields().find_singular_id().unwrap().upgrade().unwrap();
             let find_child_records_node =
                 utils::insert_find_children_by_parent_node(graph, parent_node, parent_relation_field, Filter::empty())?;
 
@@ -112,7 +104,7 @@ pub fn connect_nested_delete(
             graph.create_edge(
                  &find_child_records_node,
                  &delete_record_node,
-                 QueryGraphDependency::ParentIds(parent_model_identifier, Box::new(move |mut node, mut parent_ids| {
+                 QueryGraphDependency::ParentIds(child_model_identifier, Box::new(move |mut node, mut parent_ids| {
                      let parent_id = match parent_ids.pop() {
                          Some(pid) => Ok(pid),
                          None => Err(QueryGraphBuilderError::AssertionError(format!(
@@ -121,9 +113,7 @@ pub fn connect_nested_delete(
                      }?;
 
                      if let Node::Query(Query::Write(ref mut wq)) = node {
-//                         wq.add_filter(id_field.equals(parent_id));
-//                         wq.inject_id(parent_id);
-                         wq.add_filter(id_field.data_source_field().equals(parent_id.single_value()));
+                         wq.add_filter(parent_id.filter());
                      }
 
                      Ok(node)
@@ -157,8 +147,6 @@ pub fn connect_nested_delete_many(
         });
 
         let delete_many_node = graph.create_node(Query::Write(delete_many));
-        let id_field = child_model.fields().find_singular_id().unwrap().upgrade().unwrap();
-
         utils::insert_deletion_checks(graph, child_model, &find_child_records_node, &delete_many_node)?;
 
         graph.create_edge(
@@ -167,12 +155,11 @@ pub fn connect_nested_delete_many(
             QueryGraphDependency::ParentIds(
                 child_model_identifier.clone(),
                 Box::new(move |mut node, parent_ids| {
-                    if let Node::Query(Query::Write(WriteQuery::DeleteManyRecords(ref mut ur))) = node {
-                        let as_prisma_values = parent_ids.iter().map(|x| x.single_value()).collect();
-                        let ids_filter = id_field.data_source_field().is_in(as_prisma_values);
-                        let new_filter = Filter::and(vec![ur.filter.clone(), ids_filter]);
+                    if let Node::Query(Query::Write(WriteQuery::DeleteManyRecords(ref mut dmr))) = node {
+                        let conditions: Vec<_> = parent_ids.into_iter().map(|pid| pid.filter()).collect();
+                        let filter = Filter::or(conditions);
 
-                        ur.filter = new_filter;
+                        dmr.set_filter(Filter::and(vec![dmr.filter.clone(), filter]));
                     }
 
                     Ok(node)

@@ -61,7 +61,7 @@ class NestedCreateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
   }
 
   "a P1! to C1 relation" should "work" in {
-    schemaWithRelation(onParent = ChildReq, onChild = ParentOpt).test(24) { t =>
+    schemaWithRelation(onParent = ChildReq, onChild = ParentOpt).test { t =>
       val project = SchemaDsl.fromStringV11() {
         t.datamodel
       }
