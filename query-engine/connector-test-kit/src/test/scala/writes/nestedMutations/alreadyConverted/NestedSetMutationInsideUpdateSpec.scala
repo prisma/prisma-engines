@@ -1,4 +1,4 @@
-package writes.nestedMutations
+package writes.nestedMutations.alreadyConverted
 
 import org.scalatest.{FlatSpec, Matchers}
 import util.ConnectorCapability.JoinRelationLinksCapability
@@ -8,19 +8,22 @@ class NestedSetMutationInsideUpdateSpec extends FlatSpec with Matchers with ApiS
   override def runOnlyForCapabilities: Set[ConnectorCapability] = Set(JoinRelationLinksCapability)
 
   "a PM to C1  relation with the child already in a relation" should "be setable through a nested mutation by unique" in {
-    schemaPMToC1opt.test { dataModel =>
-      val project = SchemaDsl.fromStringV11() { dataModel }
+    schemaWithRelation(onParent = ChildList, onChild = ParentOpt).test { t =>
+      val project = SchemaDsl.fromStringV11() {
+        t.datamodel
+      }
       database.setup(project)
 
-      server
+      val parentResult1 = server
         .query(
-          """mutation {
+          s"""mutation {
           |  createParent(data: {
-          |    p: "p1"
+          |    p: "p1", p_1: "p", p_2: "1"
           |    childrenOpt: {
           |      create: [{c: "c1"}, {c: "c2"}]
           |    }
           |  }){
+          |    ${t.parent.selection}
           |    childrenOpt{
           |       c
           |    }
@@ -28,18 +31,19 @@ class NestedSetMutationInsideUpdateSpec extends FlatSpec with Matchers with ApiS
           |}""",
           project
         )
+      val parentIdentifier1 = t.parent.where(parentResult1, "data.createParent")
 
-      server
+      val parentResult2 = server
         .query(
-          """mutation {
-          |  createParent(data: {p: "p2"}){
+          s"""mutation {
+          |  createParent(data: {p: "p2", p_1: "p", p_2: "2"}){
           |    p
+          |    ${t.parent.selection}
           |  }
           |}""",
           project
         )
-
-      //ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(2) }
+      val parentIdentifier2 = t.parent.where(parentResult2, "data.createParent")
 
       // we are even resilient against multiple identical connects here -> twice connecting to c2
 
@@ -47,7 +51,7 @@ class NestedSetMutationInsideUpdateSpec extends FlatSpec with Matchers with ApiS
         s"""
          |mutation {
          |  updateParent(
-         |  where: { p: "p2"}
+         |  where: $parentIdentifier2
          |  data:{
          |    childrenOpt: {set: [{c: "c1"},{c: "c2"},{c: "c2"}]}
          |  }){
@@ -62,46 +66,47 @@ class NestedSetMutationInsideUpdateSpec extends FlatSpec with Matchers with ApiS
 
       res.toString should be("""{"data":{"updateParent":{"childrenOpt":[{"c":"c1"},{"c":"c2"}]}}}""")
 
-    //ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(2) }
     }
   }
 
   "a PM to C1  relation with the child without a relation" should "be setable through a nested mutation by unique" in {
-    schemaPMToC1opt.test { dataModel =>
-      val project = SchemaDsl.fromStringV11() { dataModel }
+    schemaWithRelation(onParent = ChildList, onChild = ParentOpt).test { t =>
+      val project = SchemaDsl.fromStringV11() {
+        t.datamodel
+      }
       database.setup(project)
 
-      server
+      val childResult = server
         .query(
-          """mutation {
-          |  createChild(data: {c: "c1"})
+          s"""mutation {
+          |  createChild(data: {c: "c1", c_1: "c", c_2: "1"})
           |  {
-          |    id
+          |    ${t.child.selection}
           |  }
           |}""",
           project
         )
+      val childIdentifier = t.child.where(childResult, "data.createChild")
 
-      server
+      val parentResult = server
         .query(
-          """mutation {
-          |  createParent(data: {p: "p1"})
+          s"""mutation {
+          |  createParent(data: {p: "p1", p_1: "p", p_2: "1"})
           |  {
-          |    id
+          |    ${t.parent.selection}
           |  }
           |}""",
           project
         )
-
-      //ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(0) }
+      val parentIdentifier = t.parent.where(parentResult, "data.createParent")
 
       val res = server.query(
         s"""
          |mutation {
          |  updateParent(
-         |  where: {p:"p1"}
+         |  where: $parentIdentifier
          |  data:{
-         |    childrenOpt: {set: {c: "c1"}}
+         |    childrenOpt: {set: $childIdentifier}
          |  }){
          |    childrenOpt {
          |      c
@@ -114,23 +119,28 @@ class NestedSetMutationInsideUpdateSpec extends FlatSpec with Matchers with ApiS
 
       res.toString should be("""{"data":{"updateParent":{"childrenOpt":[{"c":"c1"}]}}}""")
 
-    //ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(1) }
     }
   }
 
   "a PM to CM  relation with the children already in a relation" should "be setable through a nested mutation by unique" in {
-    schemaPMToCM.test { dataModel =>
-      val project = SchemaDsl.fromStringV11() { dataModel }
+    schemaWithRelation(onParent = ChildList, onChild = ParentList).test { t =>
+      val project = SchemaDsl.fromStringV11() {
+        t.datamodel
+      }
       database.setup(project)
 
-      server.query(
-        """mutation {
+      val parent1Result = server.query(
+        s"""mutation {
         |  createParent(data: {
-        |    p: "p1"
+        |    p: "p1", p_1: "p", p_2: "1"
         |    childrenOpt: {
-        |      create: [{c: "c1"},{c: "c2"}]
+        |      create: [
+        |        {c: "c1", c_1: "c", c_2: "1"},
+        |        {c: "c2", c_1: "c", c_2: "2"}
+        |      ]
         |    }
         |  }){
+        |    ${t.parent.selection}
         |    childrenOpt{
         |       c
         |    }
@@ -138,15 +148,20 @@ class NestedSetMutationInsideUpdateSpec extends FlatSpec with Matchers with ApiS
         |}""",
         project
       )
+      val parentIdentifier1 = t.parent.where(parent1Result, "data.createParent")
 
-      server.query(
-        """mutation {
+      val parent2Result = server.query(
+        s"""mutation {
         |  createParent(data: {
-        |    p: "p2"
+        |    p: "p2", p_1: "p", p_2: "2"
         |    childrenOpt: {
-        |      create: [{c: "c3"},{c: "c4"}]
+        |      create: [
+        |        {c: "c3", c_1: "c", c_2: "3"},
+        |        {c: "c4", c_1: "c", c_2: "4"}
+        |      ]
         |    }
         |  }){
+        |    ${t.parent.selection}
         |    childrenOpt{
         |       c
         |    }
@@ -154,14 +169,13 @@ class NestedSetMutationInsideUpdateSpec extends FlatSpec with Matchers with ApiS
         |}""",
         project
       )
-
-      //ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(4) }
+      val parentIdentifier2 = t.parent.where(parent2Result, "data.createParent")
 
       val res = server.query(
         s"""
          |mutation {
          |  updateParent(
-         |  where: {    p: "p2"}
+         |  where: $parentIdentifier2
          |  data:{
          |    childrenOpt: {set: [{c: "c1"}, {c: "c2"}]}
          |  }){
@@ -179,42 +193,45 @@ class NestedSetMutationInsideUpdateSpec extends FlatSpec with Matchers with ApiS
       server.query(s"""query{children{c, parentsOpt{p}}}""", project).toString should be(
         """{"data":{"children":[{"c":"c1","parentsOpt":[{"p":"p1"},{"p":"p2"}]},{"c":"c2","parentsOpt":[{"p":"p1"},{"p":"p2"}]},{"c":"c3","parentsOpt":[]},{"c":"c4","parentsOpt":[]}]}}""")
 
-    //ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(4) }
     }
   }
 
   "a PM to CM  relation with the child not already in a relation" should "be setable through a nested mutation by unique" in {
-    schemaPMToCM.test { dataModel =>
-      val project = SchemaDsl.fromStringV11() { dataModel }
+    schemaWithRelation(onParent = ChildList, onChild = ParentList).test { t =>
+      val project = SchemaDsl.fromStringV11() {
+        t.datamodel
+      }
       database.setup(project)
 
-      server.query(
-        """mutation {
-        |  createChild(data: {c: "c1"}){
+      val childResult = server.query(
+        s"""mutation {
+        |  createChild(data: {c: "c1", c_1: "c", c_2: "1"}){
         |       c
+        |       ${t.child.selection}
         |  }
         |}""",
         project
       )
+      val childIdentifier = t.child.where(childResult, "data.createChild")
 
-      server.query(
-        """mutation {
-        |  createParent(data: {p: "p1"}){
+      val parentResult = server.query(
+        s"""mutation {
+        |  createParent(data: {p: "p1", p_1: "p", p_2: "1"}){
         |       p
+        |       ${t.parent.selection}
         |  }
         |}""",
         project
       )
-
-      //ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(0) }
+      val parentIdentifier = t.parent.where(parentResult, "data.createParent")
 
       val res = server.query(
         s"""
          |mutation {
          |  updateParent(
-         |  where: {p: "p1"}
+         |  where: $parentIdentifier
          |  data:{
-         |    childrenOpt: {set: {c: "c1"}}
+         |    childrenOpt: {set: $childIdentifier}
          |  }){
          |    childrenOpt {
          |      c
@@ -229,23 +246,28 @@ class NestedSetMutationInsideUpdateSpec extends FlatSpec with Matchers with ApiS
 
       server.query(s"""query{children{parentsOpt{p}}}""", project).toString should be("""{"data":{"children":[{"parentsOpt":[{"p":"p1"}]}]}}""")
 
-    //ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(1) }
     }
   }
 
   "a PM to CM  relation with the children already in a relation" should "be setable to empty" in {
-    schemaPMToCM.test { dataModel =>
-      val project = SchemaDsl.fromStringV11() { dataModel }
+    schemaWithRelation(onParent = ChildList, onChild = ParentList).test { t =>
+      val project = SchemaDsl.fromStringV11() {
+        t.datamodel
+      }
       database.setup(project)
 
-      server.query(
-        """mutation {
+      val parentResult1 = server.query(
+        s"""mutation {
         |  createParent(data: {
-        |    p: "p1"
+        |    p: "p1", p_1: "p", p_2: "1"
         |    childrenOpt: {
-        |      create: [{c: "c1"},{c: "c2"}]
+        |      create: [
+        |        {c: "c1", c_1: "c", c_2: "1"},
+        |        {c: "c2", c_1: "c", c_2: "2"}
+        |      ]
         |    }
         |  }){
+        |    ${t.parent.selection}
         |    childrenOpt{
         |       c
         |    }
@@ -253,15 +275,17 @@ class NestedSetMutationInsideUpdateSpec extends FlatSpec with Matchers with ApiS
         |}""",
         project
       )
+      val parent1Identifier = t.parent.where(parentResult1, "data.createParent")
 
-      server.query(
-        """mutation {
+      val parent2Result = server.query(
+        s"""mutation {
         |  createParent(data: {
-        |    p: "p2"
+        |    p: "p2", p_1: "p", p_2: "2"
         |    childrenOpt: {
         |      create: [{c: "c3"},{c: "c4"}]
         |    }
         |  }){
+        |    ${t.parent.selection}
         |    childrenOpt{
         |       c
         |    }
@@ -269,14 +293,13 @@ class NestedSetMutationInsideUpdateSpec extends FlatSpec with Matchers with ApiS
         |}""",
         project
       )
-
-      //ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(4) }
+      val parent2Identifier = t.parent.where(parent2Result, "data.createParent")
 
       val res = server.query(
         s"""
          |mutation {
          |  updateParent(
-         |  where: {    p: "p2"}
+         |  where: $parent2Identifier
          |  data:{
          |    childrenOpt: {set: []}
          |  }){
@@ -294,7 +317,6 @@ class NestedSetMutationInsideUpdateSpec extends FlatSpec with Matchers with ApiS
       server.query(s"""query{children{c, parentsOpt{p}}}""", project).toString should be(
         """{"data":{"children":[{"c":"c1","parentsOpt":[{"p":"p1"}]},{"c":"c2","parentsOpt":[{"p":"p1"}]},{"c":"c3","parentsOpt":[]},{"c":"c4","parentsOpt":[]}]}}""")
 
-    //ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(2) }
     }
   }
 
@@ -477,8 +499,6 @@ class NestedSetMutationInsideUpdateSpec extends FlatSpec with Matchers with ApiS
       )
       .pathAsString("data.createParent.children.[0].id")
 
-    //ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(1) }
-
     val res = server.query(
       s"""
          |mutation {
@@ -498,8 +518,6 @@ class NestedSetMutationInsideUpdateSpec extends FlatSpec with Matchers with ApiS
 
     res.toString should be("""{"data":{"updateParent":{"children":[{"c":"c1"}]}}}""")
 
-    //ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(2) }
-
     server.query(
       s"""
          |mutation {
@@ -517,7 +535,6 @@ class NestedSetMutationInsideUpdateSpec extends FlatSpec with Matchers with ApiS
       project
     )
 
-    //ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(2) }
   }
 
   "Setting several times" should "not error and only connect the item once" in {
@@ -548,6 +565,4 @@ class NestedSetMutationInsideUpdateSpec extends FlatSpec with Matchers with ApiS
 
     server.query("""query{aUsers{name, posts{title}}}""", project).toString should be("""{"data":{"aUsers":[{"name":"Author","posts":[{"title":"Title"}]}]}}""")
   }
-
-  println(relationInlineDirective)
 }

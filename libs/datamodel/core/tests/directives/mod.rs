@@ -11,6 +11,7 @@ pub mod relations_legacy;
 pub mod relations_negative;
 pub mod relations_positive;
 pub mod unique;
+pub mod unique_criteria;
 pub mod updated_at_negative;
 pub mod updated_at_positive;
 

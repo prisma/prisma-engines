@@ -1,7 +1,7 @@
 package util
 
 object PrismaRsBuild {
-  val isDebug = true
+  val isDebug = false
 
   def apply(): Unit = {
     if (!EnvVars.isBuildkite) {

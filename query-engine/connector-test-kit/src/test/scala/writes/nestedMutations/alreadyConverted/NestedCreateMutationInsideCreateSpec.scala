@@ -1,4 +1,4 @@
-package writes.nestedMutations
+package writes.nestedMutations.alreadyConverted
 
 import java.util.UUID
 
@@ -30,13 +30,12 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
             |       c
             |    }
             |  }
-            |}""".stripMargin,
+            |}""",
           project
         )
 
       res.toString should be("""{"data":{"createParent":{"p":"p1","childReq":{"c":"c1"}}}}""")
 
-    // ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(1) }
     }
   }
 
@@ -47,9 +46,10 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
       }
       database.setup(project)
 
-      val child1Id = server
-        .query(
-          """mutation {
+      val child1Id = t.child.where(
+        server
+          .query(
+            s"""mutation {
           |  createParent(data: {
           |    p: "p1"
           |    childReq: {
@@ -57,15 +57,14 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
           |    }
           |  }){
           |    childReq{
-          |       id
+          |       ${t.child.selection}
           |    }
           |  }
-          |}""".stripMargin,
-          project
-        )
-        .pathAsString("data.createParent.childReq.id")
-
-    // ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(1) }
+          |}""",
+            project
+          ),
+        "data.createParent.childReq"
+      )
     }
   }
 
@@ -89,13 +88,12 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
             |     c
             |   }
             |  }
-            |}""".stripMargin,
+            |}""",
           project
         )
 
       res.toString should be("""{"data":{"createParent":{"childOpt":{"c":"c1"}}}}""")
 
-    // ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(1) }
     }
   }
 
@@ -119,13 +117,12 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
             |     c
             |   }
             |  }
-            |}""".stripMargin,
+            |}""",
           project
         )
 
       res.toString should be("""{"data":{"createParent":{"childrenOpt":[{"c":"c1"},{"c":"c2"}]}}}""")
 
-    // ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(2) }
     }
   }
 
@@ -149,13 +146,12 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
             |     c
             |   }
             |  }
-            |}""".stripMargin,
+            |}""",
           project
         )
 
       res.toString should be("""{"data":{"createParent":{"childOpt":{"c":"c1"}}}}""")
 
-    // ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(1) }
     }
   }
 
@@ -179,13 +175,12 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
             |     c
             |   }
             |  }
-            |}""".stripMargin,
+            |}""",
           project
         )
 
       res.toString should be("""{"data":{"createParent":{"childrenOpt":[{"c":"c1"},{"c":"c2"}]}}}""")
 
-    // ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(2) }
     }
   }
 
@@ -209,13 +204,12 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
             |     c
             |   }
             |  }
-            |}""".stripMargin,
+            |}""",
           project
         )
 
       res.toString should be("""{"data":{"createParent":{"childReq":{"c":"c1"}}}}""")
 
-    // ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(1) }
     }
   }
 
@@ -239,13 +233,11 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
             |     c
             |   }
             |  }
-            |}""".stripMargin,
+            |}""",
           project
         )
 
       res.toString should be("""{"data":{"createParent":{"childOpt":{"c":"c1"}}}}""")
-
-      // ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(1) }
 
       // make sure it is traversable in the opposite direction as well
       val queryResult = server.query(
@@ -257,7 +249,7 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
           |    }
           |  }
           |}
-        """.stripMargin,
+        """,
         project
       )
 
@@ -286,13 +278,12 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
             |     c
             |   }
             |  }
-            |}""".stripMargin,
+            |}""",
           project
         )
 
       res.toString should be("""{"data":{"createParent":{"childrenOpt":[{"c":"c1"},{"c":"c2"}]}}}""")
 
-    // ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(2) }
     }
   }
 
@@ -328,7 +319,7 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
         |    }
         |  }
         |}
-      """.stripMargin,
+      """,
       project
     )
     mustBeEqual(result.pathAsJsValue("data.createTodo.comments").toString, """[{"text":"comment1"},{"text":"comment2"}]""")
@@ -366,7 +357,7 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
         |    }
         |  }
         |}
-      """.stripMargin,
+      """,
       project
     )
     mustBeEqual(result.pathAsString("data.createComment.todo.title"), "todo1")
@@ -405,7 +396,7 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
         |    }
         |  }
         |}
-      """.stripMargin,
+      """,
         project
       )
 
@@ -426,7 +417,7 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
         |    }
         |  }
         |}
-      """.stripMargin,
+      """,
       project
     )
     mustBeEqual(result2.pathAsJsValue("data.createTag.todos").toString, """[{"title":"todo1"},{"title":"todo2"}]""")
@@ -461,7 +452,7 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
         |  })
         |    {id}
         |  }
-      """.stripMargin,
+      """,
       project
     )
 
@@ -478,7 +469,7 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
         |  })
         |    {id}
         |  }
-      """.stripMargin,
+      """,
       project,
       errorCode = 3010,
       errorContains = "A unique constraint would be violated on User. Details: Field name = unique"
@@ -517,7 +508,7 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
         |  })
         |    {id}
         |  }
-      """.stripMargin,
+      """,
       project
     )
 
@@ -534,7 +525,7 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
         |  })
         |    {id}
         |  }
-      """.stripMargin,
+      """,
       project,
       errorCode = 3010,
       errorContains = "A unique constraint would be violated on Post. Details: Field name = uniquePost"
@@ -595,7 +586,7 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
         |    }
         |  }
         |}
-      """.stripMargin
+      """
 
     val result = server.query(mutation, project)
     result.pathAsString("data.createList.name") should equal("the list")
@@ -636,7 +627,7 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
         |    todo{reqOnTodo}
         |  }
         |}
-      """.stripMargin,
+      """,
       project
     )
     mustBeEqual(result.pathAsString("data.createComment.todo.reqOnTodo"), "todo1")
@@ -654,7 +645,7 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
         |    }
         |  }
         |}
-      """.stripMargin,
+      """,
       project,
       errorCode = 3032,
       errorContains = "The field 'todo' on model 'Comment' is required. Performing this mutation would violate that constraint"
@@ -696,7 +687,7 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
         |    }
         |  }
         |}
-      """.stripMargin,
+      """,
       project
     )
     mustBeEqual(result.pathAsString("data.createComment.todo.reqOnTodo"), "todo1")
@@ -717,7 +708,7 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
         |    }
         |  }
         |}
-      """.stripMargin,
+      """,
       project,
       errorCode = 3032,
       errorContains = "The field 'todo' on model 'Comment' is required. Performing this mutation would violate that constraint"
@@ -737,7 +728,7 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
         |    id
         |  }
         |}
-      """.stripMargin,
+      """,
         project
       )
       .pathAsString("data.createTodo.id")
@@ -760,7 +751,7 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
         |    }
         |  }
         |}
-      """.stripMargin,
+      """,
       project
     )
 
@@ -781,7 +772,7 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
          |  id    String @id @default(uuid())
          |  title String
          |}
-       """.stripMargin
+       """
     }
     database.setup(project)
 
@@ -799,7 +790,7 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
         |    }
         |  }
         |}
-      """.stripMargin,
+      """,
       project
     )
 

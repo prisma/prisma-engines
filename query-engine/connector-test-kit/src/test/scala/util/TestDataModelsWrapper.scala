@@ -51,6 +51,7 @@ case class TestDataModelsWrapper(
           println(s"name:  $connectorName")
           println(s"index: $index")
           println(s"tag:   ${connectorTag.entryName}")
+          println(s"schema: \n ${dm}")
           println("*" * 75)
           fn(dm)
         }
@@ -114,6 +115,7 @@ case class AbstractTestDataModelsWrapper(
           println(s"name:  $connectorName")
           println(s"index: $index")
           println(s"tag:   ${connectorTag.entryName}")
+          println(s"schema: \n ${dm.datamodel}")
           println("*" * 75)
           fn(dm)
         }

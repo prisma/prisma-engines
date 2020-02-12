@@ -1,4 +1,4 @@
-package writes.nestedMutations
+package writes.nestedMutations.alreadyConverted
 
 import org.scalatest.{FlatSpec, Matchers}
 import util.ConnectorCapability.JoinRelationLinksCapability
@@ -143,8 +143,6 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
       }
       database.setup(project)
 
-      println(t)
-
       val looseChildId = t.child.where(
         server
           .query(
@@ -241,7 +239,7 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
              |    }
              |  }
              |}
-      """.stripMargin,
+      """,
           project
         )
         .pathAsString("data.parent.childReq.c") should be("otherChild")
@@ -254,7 +252,7 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
              |    c
              |  }
              |}
-      """.stripMargin,
+      """,
           project
         )
         .pathAsString("data.child.c") should be("looseChild")
@@ -744,7 +742,7 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
              |    }
              |  }
              |}
-      """.stripMargin,
+      """,
           project
         )
         .pathAsString("data.parent.childrenOpt.[0].c") should be("otherChild")
@@ -1371,7 +1369,7 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
         | text String?
         | todo Todo?   @relation(references: [id])
         |}
-      """.stripMargin
+      """
     }
     database.setup(project)
 
@@ -1417,7 +1415,7 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
         | alias String  @unique
         | todo  Todo?   @relation(references: [id])
         |}
-      """.stripMargin
+      """
     }
     database.setup(project)
 
@@ -1462,7 +1460,7 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
         | title    String
         | comments Comment[]
         |}
-      """.stripMargin
+      """
     }
     database.setup(project)
 
@@ -1507,7 +1505,7 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
         | title  String
         | note   Note?
         |}
-      """.stripMargin
+      """
     }
     database.setup(project)
 
@@ -1552,7 +1550,7 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
         | title  String
         | note   Note?   @relation(references: [id])
         |}
-      """.stripMargin
+      """
     }
     database.setup(project)
 
@@ -1621,7 +1619,7 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
         | alias String  @unique
         | todo  Todo?   @relation(references: [id])
         |}
-      """.stripMargin
+      """
     }
     database.setup(project)
 
@@ -1667,7 +1665,7 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
         | text String? @unique
         | todo Todo?   @relation(references: [id])
         |}
-      """.stripMargin
+      """
     }
     database.setup(project)
 
