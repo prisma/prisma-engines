@@ -245,6 +245,9 @@ class NestedDeleteMutationInsideUpdateSpec extends FlatSpec with Matchers with A
         |    }
         |  }){
         |    ${t.parent.selection}
+        |    childrenOpt {
+        |      ${t.child.selection}
+        |    }
         |  }
         |}""",
         project
@@ -270,8 +273,9 @@ class NestedDeleteMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |  updateParent(
          |    where: $parentIdentifier
          |    data:{
-         |    childrenOpt: {delete: $childIdentifier}
-         |  }){
+         |      childrenOpt: {delete: $childIdentifier}
+         |    }
+         |  ){
          |    childrenOpt {
          |      c
          |    }
