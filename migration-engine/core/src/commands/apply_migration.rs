@@ -119,6 +119,8 @@ impl<'a> ApplyMigrationCommand<'a> {
             .database_migration_step_applier()
             .render_steps_pretty(&database_migration)?;
 
+        tracing::trace!(?database_steps_json_pretty);
+
         let database_migration_json = database_migration.serialize();
 
         let mut migration = Migration::new(self.input.migration_id.clone());

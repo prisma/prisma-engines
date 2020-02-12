@@ -1,5 +1,5 @@
 use super::common::*;
-use crate::SqlFamily;
+use crate::{sql_schema_helpers::*, SqlFamily};
 use sql_schema_describer::*;
 use std::fmt::Write as _;
 
@@ -17,19 +17,12 @@ impl super::SqlRenderer for PostgresRenderer {
         quoted(name).to_string()
     }
 
-    fn render_column(
-        &self,
-        _schema_name: &str,
-        _table: &Table,
-        column: &Column,
-        _add_fk_prefix: bool,
-        _next_schema: &SqlSchema,
-    ) -> String {
-        let column_name = self.quote(&column.name);
-        let tpe_str = render_column_type(&column.tpe);
+    fn render_column(&self, _schema_name: &str, column: ColumnRef<'_>, _add_fk_prefix: bool) -> String {
+        let column_name = self.quote(column.name());
+        let tpe_str = render_column_type(column.column_type());
         let nullability_str = render_nullability(&column);
         let default_str = render_default(&column);
-        let is_serial = column.auto_increment;
+        let is_serial = column.auto_increment();
 
         if is_serial {
             format!("{} SERIAL", column_name)
