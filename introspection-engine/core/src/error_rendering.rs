@@ -10,7 +10,7 @@ pub fn render_error(crate_error: Error) -> UserFacingError {
             user_facing_error: Some(user_facing_error),
             ..
         }) => user_facing_error.into(),
-        Error::CommandError(CommandError::DatabaseWasEmpty(connection_string)) => {
+        Error::CommandError(CommandError::IntrospectionResultEmpty(connection_string)) => {
             KnownError::new(IntrospectionResultEmpty {
                 connection_string: connection_string,
             })

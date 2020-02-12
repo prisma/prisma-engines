@@ -78,7 +78,7 @@ impl RpcImpl {
 
         match data_model {
             Ok(dm) if dm.models.is_empty() && dm.enums.is_empty() => Err(render_jsonrpc_error(Error::from(
-                CommandError::DatabaseWasEmpty(url.to_string()),
+                CommandError::IntrospectionResultEmpty(url.to_string()),
             ))),
             Ok(dm) => Ok(datamodel::render_datamodel_and_config_to_string(&dm, &config).map_err(Error::from)?),
             Err(e) => Err(render_jsonrpc_error(Error::from(e))),
