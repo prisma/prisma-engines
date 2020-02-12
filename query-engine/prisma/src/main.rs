@@ -108,6 +108,7 @@ pub struct PrismaOpt {
 
 #[tokio::main]
 async fn main() -> Result<(), AnyError> {
+    init_logger()?;
     let opts = PrismaOpt::from_args();
 
     match CliCommand::try_from(&opts) {
@@ -119,8 +120,7 @@ async fn main() -> Result<(), AnyError> {
             }
         }
         Err(_) => {
-            init_logger()?;
-
+            set_panic_hook()?;
             let ip = opts.host.parse().expect("Host was not a valid IP address");
             let address = SocketAddr::new(ip, opts.port);
 
@@ -161,7 +161,16 @@ fn init_logger() -> Result<(), AnyError> {
                 .finish();
 
             subscriber::set_global_default(subscriber)?;
+        }
+    }
 
+    Ok(())
+}
+
+fn set_panic_hook() -> Result<(), AnyError> {
+    match *LOG_FORMAT {
+        LogFormat::Text => (),
+        LogFormat::Json => {
             std::panic::set_hook(Box::new(|info| {
                 let payload = info
                     .payload()
