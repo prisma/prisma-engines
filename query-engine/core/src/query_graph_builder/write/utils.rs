@@ -5,7 +5,7 @@ use crate::{
 };
 use connector::{Filter, QueryArguments, ScalarCompare, WriteArgs};
 use itertools::Itertools;
-use prisma_models::{ModelIdentifier, ModelRef, PrismaValue, RecordIdentifier, RelationFieldRef, SelectedFields};
+use prisma_models::{ModelIdentifier, ModelRef, RecordIdentifier, RelationFieldRef, SelectedFields};
 use std::sync::Arc;
 
 pub trait IdFilter {
@@ -57,7 +57,7 @@ pub fn read_ids_infallible<T>(model: ModelRef, id: ModelIdentifier, filter: T) -
 where
     T: Into<Filter>,
 {
-    let selected_fields: SelectedFields = id.into();
+    let selected_fields = get_selected_fields(&model, id);
     let filter: Filter = filter.into();
 
     let read_query = ReadQuery::ManyRecordsQuery(ManyRecordsQuery {
@@ -73,6 +73,19 @@ where
     Query::Read(read_query)
 }
 
+fn get_selected_fields(model: &ModelRef, id: ModelIdentifier) -> SelectedFields {
+    // Always fetch the primary identifier as well.
+    let primary_model_id = model.primary_identifier();
+    let mismatches = id != primary_model_id;
+    let mut selected_fields: SelectedFields = id.into();
+
+    if mismatches {
+        primary_model_id.into_iter().for_each(|f| selected_fields.add(f));
+    }
+
+    selected_fields.deduplicate()
+}
+
 /// Adds a read query to the query graph that finds related records by parent ID.
 /// Connects the parent node and the read node with an edge, which takes care of the
 /// node transformation based on the parent ID.
@@ -81,7 +94,6 @@ where
 ///
 /// Returns a `NodeRef` to the newly created read node.
 ///
-/// The resulting graph is (dashed already exists, everything else is added):
 /// ```text
 /// ┌ ─ ─ ─ ─ ─ ─ ─ ─ ┐
 ///       Parent
@@ -109,8 +121,14 @@ pub fn insert_find_children_by_parent_node<T>(
 where
     T: Into<QueryArguments>,
 {
-    let parent_model_identifier = parent_relation_field.model().primary_identifier();
-    let selected_fields: SelectedFields = parent_relation_field.related_model().primary_identifier().into();
+    // Todo this doesn't work without reload
+    // let parent_linking_fields = parent_relation_field.linking_fields();
+    let parent_model_id = parent_relation_field.model().primary_identifier();
+
+    let selected_fields = get_selected_fields(
+        &parent_relation_field.related_model(),
+        parent_relation_field.related_field().linking_fields(),
+    );
 
     let read_children_node = graph.create_node(Query::Read(ReadQuery::RelatedRecordsQuery(RelatedRecordsQuery {
         name: "find_children_by_parent".to_owned(),
@@ -127,7 +145,8 @@ where
         parent_node,
         &read_children_node,
         QueryGraphDependency::ParentIds(
-            parent_model_identifier,
+            // parent_linking_fields,
+            parent_model_id,
             Box::new(|mut node, parent_ids| {
                 if let Node::Query(Query::Read(ReadQuery::RelatedRecordsQuery(ref mut rq))) = node {
                     rq.relation_parent_ids = Some(parent_ids);
@@ -199,7 +218,6 @@ pub fn insert_existing_1to1_related_model_checks(
     parent_node: &NodeRef,
     parent_relation_field: &RelationFieldRef,
 ) -> QueryGraphBuilderResult<()> {
-    let parent_model_identifier = parent_relation_field.model().primary_identifier();
     let child_model_identifier = parent_relation_field.related_model().primary_identifier();
     let child_linking_fields = parent_relation_field.related_field().linking_fields();
 
