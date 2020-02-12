@@ -242,17 +242,11 @@ fn render_raw_sql(
                     write!(add_constraint, "CONSTRAINT {} ", renderer.quote(constraint_name))?;
                 }
 
-                write!(add_constraint, "FOREIGN KEY (")?;
-
-                for (idx, column) in foreign_key.columns.iter().enumerate() {
-                    write!(add_constraint, "{}", renderer.quote(column))?;
-
-                    if idx < foreign_key.columns.len() - 1 {
-                        write!(add_constraint, ", ")?;
-                    }
-                }
-
-                write!(add_constraint, ") ")?;
+                write!(
+                    add_constraint,
+                    "FOREIGN KEY ({})",
+                    foreign_key.columns.iter().map(|col| renderer.quote(col)).join(", ")
+                )?;
 
                 add_constraint.push_str(&renderer.render_references(&schema_name, &foreign_key));
 
