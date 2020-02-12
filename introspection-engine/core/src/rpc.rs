@@ -1,5 +1,5 @@
 use crate::connector_loader::load_connector;
-use crate::error::CoreError;
+use crate::error::{render_jsonrpc_error, CoreError};
 use futures::{FutureExt, TryFutureExt};
 use introspection_connector::{DatabaseMetadata, IntrospectionConnector};
 use jsonrpc_derive::rpc;
@@ -57,9 +57,18 @@ impl RpcImpl {
 
     pub(crate) async fn introspect_internal(schema: String) -> RpcResult<String> {
         let config = datamodel::parse_configuration(&schema).unwrap();
-        let connector = RpcImpl::load_connector(&schema).await?;
-        let data_model = connector.introspect().await.map_err(CoreError::from)?;
-        Ok(datamodel::render_datamodel_and_config_to_string(&data_model, &config).map_err(CoreError::from)?)
+        let url = config.datasources.first().unwrap().url().to_owned().value;
+        let connector = load_connector(&url).await?;
+        let data_model = connector.introspect().await;
+
+        match data_model {
+            Ok(dm) if dm.models.is_empty() && dm.enums.is_empty() => Err(render_jsonrpc_error(
+                "",
+                format!("The introspected database was empty: {}", url),
+            )),
+            Ok(dm) => Ok(datamodel::render_datamodel_and_config_to_string(&dm, &config).map_err(CoreError::from)?),
+            Err(e) => Err(jsonrpc_core::types::error::Error::from(CoreError::from(e))),
+        }
     }
 
     pub(crate) async fn list_databases_internal(schema: String) -> RpcResult<Vec<String>> {
