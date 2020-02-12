@@ -167,7 +167,7 @@ impl<'a> Renderer<'a> {
 
         Self::render_documentation(self, model);
 
-        self.write(format!("{} model ", comment_out).as_ref());
+        self.write(format!("{}model ", comment_out).as_ref());
         self.write(&model.name.name);
         self.write(" {");
         self.end_line();
@@ -223,8 +223,7 @@ impl<'a> Renderer<'a> {
     fn render_field(target: &mut TableFormat, field: &ast::Field, commented_out: String) {
         Self::render_documentation(&mut target.interleave_writer(), field);
 
-        target.write(&commented_out);
-        target.write(&field.name.name);
+        target.write(format!("{}{}", &commented_out, &field.name.name).as_ref());
 
         // Type
         {
