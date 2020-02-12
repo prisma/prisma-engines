@@ -47,8 +47,8 @@ class NestedDeleteMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |}
       """,
         project,
-        errorCode = 0,
-        errorContains = "Argument 'data' expected model 'ParentUpdateInput!'"
+        errorCode = 2009,
+        errorContains = "delete (field)\\n              ↳ Field does not exist on enclosing type."
       )
     }
   }
@@ -93,8 +93,8 @@ class NestedDeleteMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |}
       """,
         project,
-        errorCode = 0,
-        errorContains = "Argument 'data' expected model 'ParentUpdateInput!'"
+        errorCode = 2009,
+        errorContains = "↳ delete (field)\\n              ↳ Field does not exist on enclosing type."
       )
     }
   }
@@ -225,7 +225,8 @@ class NestedDeleteMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |}
       """,
         project,
-        errorCode = 3041
+        errorCode = 0,
+        errorContains = """[Query Graph] Expected a valid parent ID to be present for a nested delete on a one-to-many relation."""
       )
     }
   }
@@ -424,8 +425,8 @@ class NestedDeleteMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |}
       """,
         project,
-        errorCode = 0,
-        errorContains = "Argument 'data' expected model 'ParentUpdateInput!'"
+        errorCode = 2009,
+        errorContains = """↳ delete (field)\n              ↳ Field does not exist on enclosing type."""
       )
     }
   }
@@ -544,7 +545,8 @@ class NestedDeleteMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |}
       """,
         project,
-        3041
+        errorCode = 0,
+        errorContains = """RecordsNotConnected"""
       )
 
       val res3 = server.query(
@@ -643,7 +645,8 @@ class NestedDeleteMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |}
       """,
         project,
-        3041
+        errorCode = 0,
+        errorContains = """Error occurred during query execution:\nInterpretationError(\"Error for binding \\'2\\': RecordsNotConnected { relation_name: \\\"ChildToParent\\\", parent_name: \\\"Parent\\\", child_name: \\\"Child\\\" }"""
       )
     }
   }
@@ -813,8 +816,8 @@ class NestedDeleteMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |}
       """,
       project,
-      errorCode = 3042,
-      errorContains = """The change you are trying to make would violate the required relation 'ChildToOther' between Child and Other"""
+      errorCode = 0, // 3042,
+      errorContains = """Error occurred during query execution:\nInterpretationError(\"Error for binding \\'4\\': RelationViolation(RelationViolation { relation_name: \\\"ChildToOther\\\", model_a_name: \\\"Child\\\", model_b_name: \\\"Other\\\" }"""
     )
 
   }
@@ -989,7 +992,8 @@ class NestedDeleteMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |}
       """,
       project,
-      3041
+      errorCode = 0, // 3041
+      errorContains = """InterpretationError(\"Error for binding \\'2\\': RecordsNotConnected { relation_name: \\\"CommentToTodo\\\", parent_name: \\\"Todo\\\", child_name: \\\"Comment\\\" }"""
     )
 
     mustBeEqual(result.pathAsJsValue("data.updateTodo.comments").toString, """[]""")
@@ -1325,9 +1329,9 @@ class NestedDeleteMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |}
       """,
       project,
-      errorCode = 3041,
+      errorCode = 0, // 3041,
       errorContains =
-        s"The relation NoteToTodo has no node for the model Note with the value '$noteId' for the field 'id' connected to a node for the model Todo on your mutation path."
+        """"Error occurred during query execution:\nInterpretationError(\"Error for binding \\'1\\': AssertionError(\\\"[Query Graph] Expected a valid parent ID to be present for a nested delete on a one-to-many relation.\\\")\""""
     )
 
     val query = server.query("""{ todoes { title }}""", project)

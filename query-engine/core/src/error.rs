@@ -83,12 +83,18 @@ impl From<CoreError> for user_facing_errors::Error {
             })) => user_facing_error.into(),
             CoreError::QueryParserError(query_parser_error)
             | CoreError::QueryGraphBuilderError(QueryGraphBuilderError::QueryParserError(query_parser_error)) => {
-                user_facing_errors::KnownError::new(user_facing_errors::query_engine::QueryValidationFailed {
-                    query_validation_error: format!("{}", query_parser_error),
-                    query_position: format!("{}", query_parser_error.location()),
-                })
-                .unwrap()
-                .into()
+                let known_error = query_parser_error
+                    .as_missing_value_error()
+                    .map(|err| user_facing_errors::KnownError::new(err).unwrap())
+                    .unwrap_or_else(|| {
+                        user_facing_errors::KnownError::new(user_facing_errors::query_engine::QueryValidationFailed {
+                            query_validation_error: format!("{}", query_parser_error),
+                            query_position: format!("{}", query_parser_error.location()),
+                        })
+                        .unwrap()
+                    });
+
+                known_error.into()
             }
             _ => user_facing_errors::Error::from_dyn_error(&err.compat()),
         }

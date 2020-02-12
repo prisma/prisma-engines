@@ -48,8 +48,8 @@ class NestedConnectMutationInsideCreateSpec extends FlatSpec with Matchers with 
            |}
         """.stripMargin,
         project,
-        errorCode = 3042,
-        errorContains = "The change you are trying to make would violate the required relation 'ChildToParent' between Child and Parent"
+        errorCode = 0, // 3042,
+        errorContains = """Error in query graph construction: RelationViolation(RelationViolation { relation_name: \"ChildToParent\", model_a_name: \"Child\", model_b_name: \"Parent\""""
       )
 
     }
@@ -96,8 +96,9 @@ class NestedConnectMutationInsideCreateSpec extends FlatSpec with Matchers with 
            |}
         """.stripMargin,
         project,
-        errorCode = 3042,
-        errorContains = "The change you are trying to make would violate the required relation 'ChildToParent' between Child and Parent"
+        errorCode = 0, // 3042,
+        errorContains = """InterpretationError(\"Error for binding \\'2\\': RelationViolation(RelationViolation { relation_name: \\\"ChildToParent\\\", model_a_name: \\\"Child\\\", model_b_name: \\\"Parent\\\" })"""
+          // "The change you are trying to make would violate the required relation 'ChildToParent' between Child and Parent"
       )
     }
   }
@@ -510,8 +511,8 @@ class NestedConnectMutationInsideCreateSpec extends FlatSpec with Matchers with 
            |}
         """.stripMargin,
         project,
-        errorCode = 3039,
-        errorContains = "No Node for the model Child with value DOES NOT EXIST for c found."
+        errorCode = 0, // 3039,
+        errorContains = "RecordNotFound(\\\"Expected 2 records to be connected, found 1.\\\")"
       )
 
     }
@@ -879,8 +880,8 @@ class NestedConnectMutationInsideCreateSpec extends FlatSpec with Matchers with 
          |}
       """.stripMargin,
       project,
-      errorCode = 3039,
-      errorContains = "No Node for the model Comment with value 5beea4aa6183dd734b2dbd9b for id found."
+      errorCode = 0, // 3039,
+      errorContains = "RecordNotFound(\\\"Expected 1 records to be connected, found 0.\\\")"
     )
   }
 
@@ -915,8 +916,8 @@ class NestedConnectMutationInsideCreateSpec extends FlatSpec with Matchers with 
          |}
       """.stripMargin,
       project,
-      errorCode = 3039,
-      errorContains = "No Node for the model Todo with value 5beea4aa6183dd734b2dbd9b for id found."
+      errorCode = 0, // 3039,
+      errorContains = """Error occurred during query execution:\nInterpretationError(\"Error for binding \\'1\\': AssertionError(\\\"[Query Graph] Expected a valid parent ID to be present for a nested connect on a one-to-many relation.\\\")\"""
     )
   }
 
@@ -969,8 +970,8 @@ class NestedConnectMutationInsideCreateSpec extends FlatSpec with Matchers with 
          |}
       """.stripMargin,
       project,
-      errorCode = 3039,
-      errorContains = s"No Node for the model Comment with value $todoId for id found."
+      errorCode = 0, // 3039,
+      errorContains = """RecordNotFound(\"Expected 1 records to be connected, found 0.\")"""
     )
   }
 }

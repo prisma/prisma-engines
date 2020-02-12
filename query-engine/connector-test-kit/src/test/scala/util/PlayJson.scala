@@ -118,10 +118,11 @@ trait PlayJsonExtensions extends JsonUtils {
       val errors = json.pathAsSeq("errors")
       require(requirement = errors.size == errorCount, message = s"expected exactly $errorCount errors, but got ${errors.size} instead.")
 
+
       if (errorCode != 0) {
-        val errorCodeInResult = errors.head.pathAsLong("code")
+        val errorCodeInResult = errors.head.pathAsString("user_facing_error.error_code").stripPrefix("P")
         require(
-          requirement = errorCodeInResult == errorCode,
+          requirement = errorCodeInResult.toInt == errorCode,
           message = s"Expected the error code $errorCode, but got $errorCodeInResult. Here's the response: \n $json"
         )
       }

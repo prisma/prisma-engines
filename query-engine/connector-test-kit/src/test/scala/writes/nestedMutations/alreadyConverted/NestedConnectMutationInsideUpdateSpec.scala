@@ -65,8 +65,8 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
            |  }
            |}""",
         project,
-        errorCode = 3042,
-        errorContains = "The change you are trying to make would violate the required relation 'ChildToParent' between Child and Parent"
+        errorCode = 0, // 3042,
+        errorContains = """Error in query graph construction: RelationViolation(RelationViolation { relation_name: \"ChildToParent\", model_a_name: \"Child\", model_b_name: \"Parent\" })"""
       )
     }
   }
@@ -123,8 +123,8 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
       server.queryThatMustFail(
         s"""mutation {
            |  updateParent(
-           |  where: $parent2
-           |  data:
+           |  where: $parent2 ,
+           |  data: {
            |    childReq: {connect: $child1}
            |  }){
            |    childReq {
@@ -134,8 +134,9 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
            |}
       """,
         project,
-        errorCode = 3042,
-        errorContains = "The change you are trying to make would violate the required relation 'ChildToParent' between Child and Parent"
+        errorCode = 0, // 3042,
+        errorContains = """Error occurred during query execution:\nInterpretationError(\"Error for binding \\'2\\': RelationViolation(RelationViolation { relation_name: \\\"ChildToParent\\\", model_a_name: \\\"Child\\\", model_b_name: \\\"Parent\\\" })"""
+          // "The change you are trying to make would violate the required relation 'ChildToParent' between Child and Parent"
       )
     }
   }
@@ -811,8 +812,9 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
            |}
       """,
         project,
-        errorCode = 3042,
-        errorContains = "The change you are trying to make would violate the required relation 'ChildToParent' between Child and Parent"
+        errorCode = 0, // 3042,
+        errorContains = """Error occurred during query execution:\nInterpretationError(\"Error for binding \\'2\\': RelationViolation(RelationViolation { relation_name: \\\"ChildToParent\\\", model_a_name: \\\"Child\\\", model_b_name: \\\"Parent\\\" })"""
+          // "The change you are trying to make would violate the required relation 'ChildToParent' between Child and Parent"
       )
     }
   }

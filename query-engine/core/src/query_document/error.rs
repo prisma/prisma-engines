@@ -90,6 +90,30 @@ impl QueryParserError {
     fn ident(s: String, size: usize) -> String {
         format!("{}↳ {}", " ".repeat(size), s)
     }
+
+    pub(crate) fn as_missing_value_error(&self) -> Option<user_facing_errors::query_engine::MissingRequiredValue> {
+        self.as_missing_value_error_recursive(Vec::new())
+            .map(|path| user_facing_errors::query_engine::MissingRequiredValue { path: path.join(".") })
+    }
+
+    fn as_missing_value_error_recursive(&self, mut path: Vec<String>) -> Option<Vec<String>> {
+        match self {
+            QueryParserError::RequiredValueNotSetError => Some(path),
+            QueryParserError::FieldValidationError { inner, field_name } => {
+                path.push(field_name.clone());
+                inner.as_missing_value_error_recursive(path)
+            }
+            QueryParserError::ObjectValidationError { inner, object_name } => {
+                path.push(object_name.clone());
+                inner.as_missing_value_error_recursive(path)
+            }
+            QueryParserError::ArgumentValidationError { inner, argument } => {
+                path.push(argument.clone());
+                inner.as_missing_value_error_recursive(path)
+            }
+            _ => None,
+        }
+    }
 }
 
 impl fmt::Display for QueryParserError {

@@ -59,7 +59,7 @@ case class TestServer() extends PlayJsonExtensions with LogSupport {
       )
 
     // Ignore error codes for external tests (0) and containment checks ("")
-    result.assertFailingResponse(0, errorCount, "")
+    result.assertFailingResponse(errorCode, errorCount, errorContains)
     result
   }
 

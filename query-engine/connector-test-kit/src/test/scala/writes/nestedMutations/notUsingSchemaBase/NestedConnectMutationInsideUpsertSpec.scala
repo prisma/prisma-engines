@@ -73,7 +73,8 @@ class NestedConnectMutationInsideUpsertSpec extends FlatSpec with Matchers with 
            |}
       """,
         project,
-        3039
+        errorCode = 0, // 3039
+        errorContains = """Error occurred during query execution:\nInterpretationError(\"Error for binding \\'3\\': AssertionError(\\\"[Query Graph] Expected a valid parent ID to be present for a nested connect on a one-to-many relation."""
       )
     }
   }

@@ -148,3 +148,15 @@ pub struct RawQueryFailed {
     pub code: String,
     pub message: String,
 }
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(code = "P2011", message = "Null constraint violation on the ${constraint}")]
+pub struct NullConstraintViolation {
+    pub constraint: DatabaseConstraint,
+}
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(code = "P2012", message = "Missing a required value at `${path}`")]
+pub struct MissingRequiredValue {
+    pub path: String,
+}

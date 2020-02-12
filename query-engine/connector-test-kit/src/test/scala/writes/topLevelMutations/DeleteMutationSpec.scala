@@ -37,8 +37,8 @@ class DeleteMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
     server.queryThatMustFail(
       s"""mutation {deleteScalarModel(where: {id: "5beea4aa6183dd734b2dbd9b"}){id}}""",
       project = project,
-      errorCode = 3039,
-      errorContains = "No Node for the model ScalarModel with value 5beea4aa6183dd734b2dbd9b for id found"
+      errorCode = 0, // 3039,
+      errorContains = """Error occurred during query execution:\nInterpretationError(\"Error for binding \\'0\\': RecordNotFound(\\\"Record to delete does not exist.\\\""""
     )
     server.query(s"""query {scalarModels{string}}""", project = project, dataContains = s"""{"scalarModels":[{"string":"test"}]}""")
   }
@@ -59,8 +59,8 @@ class DeleteMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
     server.queryThatMustFail(
       s"""mutation {deleteScalarModel(where: {unicorn: "c"}){unicorn}}""",
       project = project,
-      errorCode = 3039,
-      errorContains = "No Node for the model ScalarModel with value c for unicorn found"
+      errorCode = 0, // 3039,
+      errorContains = """Error occurred during query execution:\nInterpretationError(\"Error for binding \\'0\\': RecordNotFound(\\\"Record to delete does not exist.\\\""""
     )
     server.query(s"""query {scalarModels{unicorn}}""", project = project, dataContains = s"""{"scalarModels":[{"unicorn":"a"}]}""")
   }
@@ -70,8 +70,8 @@ class DeleteMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
     server.queryThatMustFail(
       s"""mutation {deleteScalarModel(where: {unicorn: null}){unicorn}}""",
       project = project,
-      errorCode = 3040,
-      errorContains = "You provided an invalid argument for the where selector on ScalarModel."
+      errorCode = 0, // 3040,
+      errorContains = """"Error occurred during query execution:\nInterpretationError(\"Error for binding \\'0\\': RecordNotFound(\\\"Record to delete does not exist.\\\")\""""
     )
     server.query(s"""query {scalarModels{unicorn}}""", project = project, dataContains = s"""{"scalarModels":[{"unicorn":"a"}]}""")
   }
@@ -82,7 +82,7 @@ class DeleteMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
       s"""mutation {deleteScalarModel(where: {string: "a"}){string}}""",
       project = project,
       errorCode = 0,
-      errorContains = s"""Argument 'where' expected model 'ScalarModelWhereUniqueInput!' but got: {string: \\"a\\"}"""
+      errorContains = """Failed to validate the query `Error occurred during query validation & transformation:\nMutation (object)\n  ↳ deleteScalarModel (field)\n    ↳ where (argument)\n      ↳ ScalarModelWhereUniqueInput (object)\n        ↳ string (field)\n          ↳ Field does not exist on enclosing type.` at `.Mutation.deleteScalarModel.where.ScalarModelWhereUniqueInput.string"""
     )
     server.query(s"""query {scalarModels{string}}""", project = project, dataContains = s"""{"scalarModels":[{"string":"a"}]}""")
   }

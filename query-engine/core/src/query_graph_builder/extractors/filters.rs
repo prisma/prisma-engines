@@ -263,6 +263,18 @@ fn handle_relation_field_filter(
             field.to_one_related(extract_filter(value, &field.related_model())?)
         }
         (FilterOp::Field, None) => field.one_relation_is_null(),
+        (FilterOp::None, None) => {
+            return Err(QueryGraphBuilderError::InputError(format!(
+                "A value is required for the `none` filter on `{}`",
+                field.name
+            )))
+        }
+        (FilterOp::Some, None) => {
+            return Err(QueryGraphBuilderError::InputError(format!(
+                "A value is required for the `some` filter on `{}`",
+                field.name
+            )))
+        }
         _ => unreachable!(),
     })
 }

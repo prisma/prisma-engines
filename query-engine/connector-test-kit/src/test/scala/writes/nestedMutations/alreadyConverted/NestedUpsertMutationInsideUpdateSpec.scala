@@ -523,8 +523,8 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |}
       """,
       project,
-      errorCode = 3010,
-      errorContains = "A unique constraint would be violated on Comment. Details: Field name = uniqueComment"
+      errorCode = 2002,
+      errorContains = "Unique constraint failed on the fields: (`uniqueComment`)"
     )
   }
 

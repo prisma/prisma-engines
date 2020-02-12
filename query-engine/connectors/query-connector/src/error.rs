@@ -14,8 +14,18 @@ pub struct ConnectorError {
 
 impl ConnectorError {
     pub fn from_kind(kind: ErrorKind) -> Self {
+        let user_facing_error = match &kind {
+            ErrorKind::NullConstraintViolation { constraint } => Some(
+                KnownError::new(user_facing_errors::query_engine::NullConstraintViolation {
+                    constraint: constraint.to_owned(),
+                })
+                .unwrap(),
+            ),
+            _ => None,
+        };
+
         ConnectorError {
-            user_facing_error: None,
+            user_facing_error,
             kind,
         }
     }

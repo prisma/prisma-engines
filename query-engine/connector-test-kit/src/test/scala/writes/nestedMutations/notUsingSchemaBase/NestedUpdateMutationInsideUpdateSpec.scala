@@ -581,8 +581,9 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |}
       """,
       project,
-      errorCode = 3039,
-      errorContains = "No Node for the model Todo with value DOES NOT EXIST for id found."
+      errorCode = 0, // 3039,
+      errorContains = """Error occurred during query execution:\nInterpretationError(\"Error for binding \\'1\\': AssertionError(\\\"Expected a valid parent ID to be present for nested update to-one case"""
+        // No Node for the model Todo with value DOES NOT EXIST for id found.
     )
 
     server.query(s"""query{note(where:{id: "$noteId"}){text}}""", project, dataContains = """{"note":{"text":"Some Text"}}""")
@@ -647,8 +648,8 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |}
       """,
       project,
-      errorCode = 3039,
-      errorContains = "No Node for the model Todo with value 5beea4aa6183dd734b2dbd9b for id found."
+      errorCode = 0, // 3039,
+      errorContains = "Error occurred during query execution:\\nInterpretationError(\\\"Error for binding \\\\'1\\\\': AssertionError(\\\\\\\"Expected a valid parent ID to be present for nested update to-one case."
     )
   }
 
@@ -713,8 +714,8 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |}
       """,
       project,
-      errorCode = 3040,
-      errorContains = "You provided a null value for the where clause on Todo."
+      errorCode = 2009, // 3040,
+      errorContains = "Failed to validate the query `Error occurred during query validation & transformation:\\nAssertion error: You provided a null value for a where clause (or implicit nested selector). Please provide a non null value.."
     )
   }
 
@@ -1157,9 +1158,9 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
     server.queryThatMustFail(
       updateMutation,
       project,
-      errorCode = 3041,
+      errorCode = 0, // 3041,
       errorContains =
-        """The relation BelowToBottom has no node for the model Bottom connected to a Node for the model Below with the value 'other below' for the field 'nameBelow' on your mutation path."""
+        """Error occurred during query execution:\nInterpretationError(\"Error for binding \\'5\\': AssertionError(\\\"Expected a valid parent ID to be present for nested update to-one case.\\\""""
     )
   }
 
@@ -1379,8 +1380,8 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
     server.queryThatMustFail(
       updateMutation,
       project,
-      errorCode = 3041,
-      errorContains = """The relation BottomToMiddle has no node for the model Middle connected to a Node for the model Bottom on your mutation path."""
+      errorCode = 0, // 3041,
+      errorContains = """Error occurred during query execution:\nInterpretationError(\"Error for binding \\'3\\': AssertionError(\\\"Expected a valid parent ID to be present for nested update to-one case.\\\")\")"""
     )
 
   }
