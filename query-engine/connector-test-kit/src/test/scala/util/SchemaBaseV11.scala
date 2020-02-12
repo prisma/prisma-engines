@@ -63,6 +63,18 @@ trait SchemaBaseV11 extends PlayJsonExtensions {
     test
   }
 
+  def parseCompoundIdentifier(fields: Vector[String], argName: String)(json: JsValue, path: String): String = {
+    val fieldValues = fields.map(f => json.pathAsJsValue(path + "." + f))
+    val arguments   = fields.zip(fieldValues).map { case (name, value) => s"""$name: $value""" }.mkString(",")
+    s"""
+       |{
+       |  $argName: {
+       |    $arguments
+       |  }
+       |}
+       """.stripMargin
+  }
+
   sealed trait RelationField {
     def field: String
     def isList: Boolean = false
@@ -91,18 +103,49 @@ trait SchemaBaseV11 extends PlayJsonExtensions {
   def schemaWithRelation(onParent: RelationField, onChild: RelationField) = {
 
     //Query Params
-    val idParams         = QueryParams("id", parse(".id", "id"), parseFirst("id", "id"), parseAll("id"))
-    val compoundIdParams = QueryParams("id_1 , id_2", parse("", "id_1_id_2"), parseFirst("", "id_1_id_2"), parseAll("id_1_id_2", true))
-    val parentUniqueParams =
-      Vector(
-        QueryParams("p", parse(".p", "p"), parseFirst("p", "p"), parseAll("p")),
-        QueryParams("p_1, p_2", parse("", "p_1_p_2"), parseFirst("", "p_1_p_2"), parseAll("p_1_p_2", true))
+    val idParams = QueryParams(
+      selection = "id",
+      where = parse(".id", "id"),
+      parseFirst = parseFirst("id", "id"),
+      parseAll = parseAll("id")
+    )
+
+    val compoundIdParams = QueryParams(
+      selection = "id_1 , id_2",
+      where = parseCompoundIdentifier(Vector("id_1", "id_2"), "id_1_id_2"),
+      parseFirst = parseFirst("", "id_1_id_2"),
+      parseAll = parseAll("id_1_id_2", true)
+    )
+
+    val parentUniqueParams = Vector(
+      QueryParams(
+        selection = "p",
+        where = parse(".p", "p"),
+        parseFirst = parseFirst("p", "p"),
+        parseAll = parseAll("p")
+      ),
+      QueryParams(
+        selection = "p_1, p_2",
+        where = parseCompoundIdentifier(Vector("p_1", "p_2"), "p_1_p_2"),
+        parseFirst = parseFirst("", "p_1_p_2"),
+        parseAll = parseAll("p_1_p_2", true)
       )
-    val childUniqueParams =
-      Vector(
-        QueryParams("c", parse(".c", "c"), parseFirst("c", "c"), parseAll("c")),
-        QueryParams("c_1, c_2", parse("", "c_1_c_2"), parseFirst("", "c_1_c_2"), parseAll("c_1_c_2", true))
+    )
+
+    val childUniqueParams = Vector(
+      QueryParams(
+        selection = "c",
+        where = parse(".c", "c"),
+        parseFirst = parseFirst("c", "c"),
+        parseAll = parseAll("c")
+      ),
+      QueryParams(
+        selection = "c_1, c_2",
+        where = parseCompoundIdentifier(Vector("c_1", "c_2"), "c_1_c_2"),
+        parseFirst = parseFirst("", "c_1_c_2"),
+        parseAll = parseAll("c_1_c_2", true)
       )
+    )
 
     val simple       = true
     val isManyToMany = onParent.isList && onChild.isList
