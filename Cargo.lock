@@ -1030,10 +1030,11 @@ dependencies = [
 name = "introspection-connector"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "async-trait",
  "datamodel",
- "failure",
  "serde",
+ "thiserror",
  "user-facing-errors",
 ]
 
@@ -1041,10 +1042,10 @@ dependencies = [
 name = "introspection-core"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "async-trait",
  "clap",
  "datamodel",
- "failure",
  "futures 0.1.29",
  "futures 0.3.4",
  "introspection-connector",
@@ -1058,6 +1059,7 @@ dependencies = [
  "serde_json",
  "sql-introspection-connector",
  "test-setup",
+ "thiserror",
  "tokio",
  "tracing",
  "tracing-futures",
@@ -2794,10 +2796,10 @@ dependencies = [
 name = "sql-introspection-connector"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "async-trait",
  "barrel",
  "datamodel",
- "failure",
  "introspection-connector",
  "log",
  "once_cell",
@@ -2809,6 +2811,7 @@ dependencies = [
  "sql-schema-describer",
  "test-macros",
  "test-setup",
+ "thiserror",
  "tokio",
  "tracing",
  "tracing-futures",

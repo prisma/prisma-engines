@@ -9,7 +9,8 @@ edition = "2018"
 [dependencies]
 async-trait = "0.1.17"
 datamodel = { path = "../../../libs/datamodel/core" }
-failure = "0.1"
+thiserror = "1.0.9"
+anyhow = "1.0.26"
 
 serde = { version = "1.0", features = ["derive"]}
 user-facing-errors = { path = "../../../libs/user-facing-errors" }

@@ -10,3 +10,13 @@ pub struct IntrospectionFailed {
     /// Generic error received from the introspection engine. Indicator of why an introspection failed.
     pub introspection_error: String,
 }
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = "P4001",
+    message = "The introspected database was empty: ${connection_string}"
+)]
+pub struct IntrospectionResultEmpty {
+    /// There were no models and no enums detected in the database.
+    pub connection_string: String,
+}
