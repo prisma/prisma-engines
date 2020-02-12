@@ -66,6 +66,7 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
                 .fields
                 .iter()
                 .any(|f| f.is_id || f.is_unique || f.field_type.is_relation())
+            && !model.indices.iter().any(|i| i.is_unique())
         {
             model.is_commented_out = true;
         }

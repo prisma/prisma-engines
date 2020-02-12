@@ -30,6 +30,15 @@ pub struct IndexDefinition {
     pub tpe: IndexType,
 }
 
+impl IndexDefinition {
+    pub fn is_unique(&self) -> bool {
+        match self.tpe {
+            IndexType::Unique => true,
+            _ => false,
+        }
+    }
+}
+
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub enum IndexType {
     Unique,
