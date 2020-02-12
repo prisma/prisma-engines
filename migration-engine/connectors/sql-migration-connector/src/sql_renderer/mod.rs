@@ -7,19 +7,21 @@ mod postgres_renderer;
 mod sqlite_renderer;
 
 pub(crate) use common::IteratorJoin;
+pub(crate) use mysql_renderer::{quoted as mysql_quoted, quoted_string as mysql_quoted_string};
 pub(crate) use postgres_renderer::{
     quoted as postgres_quoted, quoted_string as postgres_quoted_string,
     render_column_type as postgres_render_column_type,
 };
 pub(crate) use sqlite_renderer::quoted as sqlite_quoted;
 
+use crate::sql_schema_helpers::ColumnRef;
 use mysql_renderer::MySqlRenderer;
 use postgres_renderer::PostgresRenderer;
 use sqlite_renderer::SqliteRenderer;
 
 use std::fmt::Write as _;
 
-pub trait SqlRenderer {
+pub(crate) trait SqlRenderer {
     fn write_quoted_with_schema(&self, buf: &mut String, schema: &str, name: &str) -> std::fmt::Result {
         self.write_quoted(buf, schema)?;
         write!(buf, ".")?;
@@ -36,14 +38,7 @@ pub trait SqlRenderer {
 
     fn quote(&self, name: &str) -> String;
 
-    fn render_column(
-        &self,
-        schema_name: &str,
-        table: &Table,
-        column: &Column,
-        add_fk_prefix: bool,
-        next_schema: &SqlSchema,
-    ) -> String;
+    fn render_column(&self, schema_name: &str, column: ColumnRef<'_>, add_fk_prefix: bool) -> String;
 
     fn render_references(&self, schema_name: &str, foreign_key: &ForeignKey) -> String;
 

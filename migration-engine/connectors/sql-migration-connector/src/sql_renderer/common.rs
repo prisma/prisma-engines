@@ -1,7 +1,8 @@
+use crate::sql_schema_helpers::*;
 use sql_schema_describer::*;
 use std::fmt::Write as _;
 
-pub fn render_nullability(column: &Column) -> &'static str {
+pub(crate) fn render_nullability(column: &ColumnRef<'_>) -> &'static str {
     if column.is_required() {
         "NOT NULL"
     } else {
@@ -9,9 +10,9 @@ pub fn render_nullability(column: &Column) -> &'static str {
     }
 }
 
-pub fn render_default(column: &Column) -> String {
-    match &column.default {
-        Some(value) => match column.tpe.family {
+pub(crate) fn render_default(column: &ColumnRef<'_>) -> String {
+    match column.default() {
+        Some(value) => match &column.column_type().family {
             ColumnTypeFamily::String | ColumnTypeFamily::DateTime | ColumnTypeFamily::Enum(_) => format!(
                 "DEFAULT '{}'",
                 // TODO: remove once sql-schema-describer does unescaping, and perform escaping again here.
@@ -27,7 +28,7 @@ pub fn render_default(column: &Column) -> String {
     }
 }
 
-pub fn render_on_delete(on_delete: &ForeignKeyAction) -> &'static str {
+pub(crate) fn render_on_delete(on_delete: &ForeignKeyAction) -> &'static str {
     match on_delete {
         ForeignKeyAction::NoAction => "",
         ForeignKeyAction::SetNull => "ON DELETE SET NULL",
