@@ -27,6 +27,21 @@ impl From<my::error::Error> for Error {
 
                 builder.build()
             }
+            my::error::Error::Server(ServerError { ref message, code, .. }) if code == 1451 || code == 1452 => {
+                let splitted: Vec<&str> = message.split_whitespace().collect();
+                let splitted: Vec<&str> = splitted[17].split('`').collect();
+
+                let field = splitted[1].to_string();
+
+                let mut builder = Error::builder(ErrorKind::ForeignKeyConstraintViolation {
+                    constraint: DatabaseConstraint::Fields(vec![field]),
+                });
+
+                builder.set_original_code(format!("{}", code));
+                builder.set_original_message(message);
+
+                builder.build()
+            }
             my::error::Error::Server(ServerError { ref message, code, .. }) if code == 1263 => {
                 let splitted: Vec<&str> = message.split_whitespace().collect();
                 let splitted: Vec<&str> = splitted.last().map(|s| s.split('\'').collect()).unwrap();

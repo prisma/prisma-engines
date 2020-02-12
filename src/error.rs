@@ -6,6 +6,7 @@ use thiserror::Error;
 pub enum DatabaseConstraint {
     Fields(Vec<String>),
     Index(String),
+    ForeignKey,
 }
 
 impl fmt::Display for DatabaseConstraint {
@@ -13,6 +14,7 @@ impl fmt::Display for DatabaseConstraint {
         match self {
             Self::Fields(fields) => write!(f, "({})", fields.join(",")),
             Self::Index(index) => index.fmt(f),
+            Self::ForeignKey => "FOREIGN KEY".fmt(f),
         }
     }
 }
@@ -108,6 +110,9 @@ pub enum ErrorKind {
 
     #[error("Null constraint failed: {}", constraint)]
     NullConstraintViolation { constraint: DatabaseConstraint },
+
+    #[error("Foreign key constraint failed: {}", constraint)]
+    ForeignKeyConstraintViolation { constraint: DatabaseConstraint },
 
     #[error("Error creating a database connection.")]
     ConnectionError(Box<dyn std::error::Error + Send + Sync + 'static>),

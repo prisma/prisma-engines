@@ -47,6 +47,25 @@ impl From<tokio_postgres::error::Error> for Error {
 
                 builder.build()
             }
+            Some(code) if code == "23503" => {
+                let code = code.to_string();
+                let error = e.into_source().unwrap(); // boom
+                let db_error = error.downcast_ref::<DbError>().unwrap(); // BOOM
+
+                let column_name = db_error
+                    .column()
+                    .expect("column on null constraint violation error")
+                    .to_owned();
+
+                let mut builder = Error::builder(ErrorKind::ForeignKeyConstraintViolation {
+                    constraint: DatabaseConstraint::Fields(vec![column_name]),
+                });
+
+                builder.set_original_code(code);
+                builder.set_original_message(db_error.message());
+
+                builder.build()
+            }
             Some(code) if code == "3D000" => {
                 let code = code.to_string();
                 let error = e.into_source().unwrap(); // boom
