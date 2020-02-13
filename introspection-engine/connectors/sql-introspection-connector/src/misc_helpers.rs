@@ -221,8 +221,8 @@ pub(crate) fn calculate_backrelation_field(
         FieldArity::List => FieldArity::Optional,
     };
 
-    //self-relation
-    let name = if model.name == other_model.name {
+    //if the backrelation name would be duplicate, probably due to being a selfrelation
+    let name = if model.name == other_model.name && relation_field.name == model.name.camel_case() {
         format!("other_{}", model.name.clone().camel_case())
     } else {
         model.name.clone().camel_case()
