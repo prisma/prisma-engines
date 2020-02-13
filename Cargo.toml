@@ -49,7 +49,6 @@ serde-support = ["serde", "chrono/serde"]
 url = "2.1"
 metrics = "0.12"
 percent-encoding = "2"
-debug_stub_derive = "0.3"
 lazy_static = "1.4"
 num_cpus = "1.12"
 rust_decimal = "=1.1.0"

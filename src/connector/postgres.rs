@@ -23,11 +23,27 @@ use url::Url;
 
 pub(crate) const DEFAULT_SCHEMA: &str = "public";
 
+#[derive(Clone)]
+struct Hidden<T>(T);
+
+impl<T> std::fmt::Debug for Hidden<T> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "<HIDDEN>")
+    }
+}
+
+struct PostgresClient(Mutex<Client>);
+
+impl std::fmt::Debug for PostgresClient {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "PostgresClient")
+    }
+}
+
 /// A connector interface for the PostgreSQL database.
-#[derive(DebugStub)]
+#[derive(Debug)]
 pub struct PostgreSql {
-    #[debug_stub = "postgres::Client"]
-    client: Mutex<Client>,
+    client: PostgresClient,
     socket_timeout: Option<Duration>,
 }
 
@@ -37,29 +53,26 @@ pub enum SslAcceptMode {
     AcceptInvalidCerts,
 }
 
-#[derive(DebugStub, Clone)]
+#[derive(Debug, Clone)]
 pub struct SslParams {
     certificate_file: Option<String>,
     identity_file: Option<String>,
-    #[debug_stub = "<HIDDEN>"]
-    identity_password: Option<String>,
+    identity_password: Hidden<Option<String>>,
     ssl_accept_mode: SslAcceptMode,
 }
 
-#[derive(DebugStub)]
+#[derive(Debug)]
 struct SslAuth {
-    #[debug_stub = "<HIDDEN>"]
-    certificate: Option<Certificate>,
-    #[debug_stub = "<HIDDEN>"]
-    identity: Option<Identity>,
+    certificate: Hidden<Option<Certificate>>,
+    identity: Hidden<Option<Identity>>,
     ssl_accept_mode: SslAcceptMode,
 }
 
 impl Default for SslAuth {
     fn default() -> Self {
         Self {
-            certificate: None,
-            identity: None,
+            certificate: Hidden(None),
+            identity: Hidden(None),
             ssl_accept_mode: SslAcceptMode::AcceptInvalidCerts,
         }
     }
@@ -67,12 +80,12 @@ impl Default for SslAuth {
 
 impl SslAuth {
     fn certificate(&mut self, certificate: Certificate) -> &mut Self {
-        self.certificate = Some(certificate);
+        self.certificate = Hidden(Some(certificate));
         self
     }
 
     fn identity(&mut self, identity: Identity) -> &mut Self {
-        self.identity = Some(identity);
+        self.identity = Hidden(Some(identity));
         self
     }
 
@@ -94,7 +107,7 @@ impl SslParams {
 
         if let Some(ref identity_file) = self.identity_file {
             let db = fs::read(identity_file)?;
-            let password = self.identity_password.as_ref().map(|s| s.as_str()).unwrap_or("");
+            let password = self.identity_password.0.as_ref().map(|s| s.as_str()).unwrap_or("");
             let identity = Identity::from_pkcs12(&db, &password)?;
 
             auth.identity(identity);
@@ -283,7 +296,7 @@ impl PostgresUrl {
                 certificate_file,
                 identity_file,
                 ssl_accept_mode,
-                identity_password,
+                identity_password: Hidden(identity_password),
             },
             connection_limit,
             schema,
@@ -340,13 +353,13 @@ impl PostgreSql {
             let ssl_params = url.ssl_params();
             let auth = ssl_params.to_owned().into_auth().await?;
 
-            if let Some(certificate) = auth.certificate {
+            if let Some(certificate) = auth.certificate.0 {
                 tls_builder.add_root_certificate(certificate);
             }
 
             tls_builder.danger_accept_invalid_certs(auth.ssl_accept_mode == SslAcceptMode::AcceptInvalidCerts);
 
-            if let Some(identity) = auth.identity {
+            if let Some(identity) = auth.identity.0 {
                 tls_builder.identity(identity);
             }
         }
@@ -361,7 +374,7 @@ impl PostgreSql {
         client.simple_query(path.as_str()).await?;
 
         Ok(Self {
-            client: Mutex::new(client),
+            client: PostgresClient(Mutex::new(client)),
             socket_timeout: url.query_params.socket_timeout,
         })
     }
@@ -400,7 +413,7 @@ impl Queryable for PostgreSql {
 
     fn query_raw<'a>(&'a self, sql: &'a str, params: &'a [ParameterizedValue<'a>]) -> DBIO<'a, ResultSet> {
         metrics::query("postgres.query_raw", sql, params, move || async move {
-            let client = self.client.lock().await;
+            let client = self.client.0.lock().await;
             let stmt = self.timeout(client.prepare(sql)).await?;
 
             let rows = self
@@ -418,7 +431,7 @@ impl Queryable for PostgreSql {
 
     fn execute_raw<'a>(&'a self, sql: &'a str, params: &'a [ParameterizedValue<'a>]) -> DBIO<'a, u64> {
         metrics::query("postgres.execute_raw", sql, params, move || async move {
-            let client = self.client.lock().await;
+            let client = self.client.0.lock().await;
             let stmt = self.timeout(client.prepare(sql)).await?;
 
             let changes = self
@@ -431,7 +444,7 @@ impl Queryable for PostgreSql {
 
     fn raw_cmd<'a>(&'a self, cmd: &'a str) -> DBIO<'a, ()> {
         metrics::query("postgres.raw_cmd", cmd, &[], move || async move {
-            let client = self.client.lock().await;
+            let client = self.client.0.lock().await;
             self.timeout(client.simple_query(cmd)).await?;
 
             Ok(())

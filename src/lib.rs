@@ -113,10 +113,6 @@ extern crate log;
 #[cfg(any(feature = "sqlite", feature = "mysql", feature = "postgresql"))]
 extern crate metrics;
 
-#[macro_use]
-#[cfg(all(feature = "array", feature = "postgresql"))]
-extern crate debug_stub_derive;
-
 pub mod ast;
 #[cfg(any(feature = "sqlite", feature = "mysql", feature = "postgresql"))]
 pub mod connector;
