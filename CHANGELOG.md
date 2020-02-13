@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.2.0-alhpa.5
+
+- Fix possible stack overflows with conditions
+- Foreign key constraint errors
+
 ## v0.2.0-alpha.4
 
 - Fix a deadlock in sqlite when panicking
