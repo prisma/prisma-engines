@@ -109,7 +109,7 @@ async fn compound_foreign_keys_should_work_for_one_to_many_relations(api: &TestA
             model User {
                id       Int                 @id @default(autoincrement())
                name     String
-               posts    Post[]
+               post     Post[]
 
                @@unique([id, name], name: "user_unique")
             }
@@ -147,7 +147,7 @@ async fn compound_foreign_keys_should_work_for_required_one_to_many_relations(ap
             model User {
                id       Int                 @id @default(autoincrement())
                name     String
-               posts    Post[]
+               post     Post[]
 
                @@unique([id, name], name: "user_unique")
             }
@@ -180,7 +180,7 @@ async fn compound_foreign_keys_should_work_for_self_relations(api: &TestApi) {
                id       Int         @id @default(autoincrement())
                name     String
                person   Person      @map(["partner_id", "partner_name"]) @relation("PersonToPerson_partner_id_partner_name", references: [id,name])
-               persons  Person[]    @relation("PersonToPerson_partner_id_partner_name")
+               person   Person[]    @relation("PersonToPerson_partner_id_partner_name")
 
                @@unique([id, name], name: "person_unique")
             }
@@ -299,7 +299,7 @@ async fn compound_foreign_keys_should_work_for_one_to_many_relations_with_non_un
             model User {
                age      Int
                id       Int                @id @default(autoincrement())
-               posts    Post[]
+               post     Post[]
 
                @@unique([id, age], name: "user_unique")
             }

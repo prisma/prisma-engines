@@ -106,7 +106,7 @@ async fn compound_foreign_keys_should_work_for_one_to_many_relations(api: &TestA
             model User {
                age      Int
                id       Int                 @id @default(autoincrement())
-               posts    Post[]
+               post     Post[]
 
                @@unique([id, age], name: "sqlite_autoindex_User_1")
             }
@@ -145,7 +145,7 @@ async fn compound_foreign_keys_should_work_for_required_one_to_many_relations(ap
             model User {
                age      Int
                id       Int                 @id @default(autoincrement())
-               posts    Post[]
+               post     Post[]
 
                @@unique([id, age], name: "sqlite_autoindex_User_1")
             }
@@ -181,7 +181,7 @@ async fn compound_foreign_keys_should_work_for_required_self_relations(api: &Tes
                age      Int
                id       Int         @id  @default(autoincrement())
                person   Person      @map(["partner_id", "partner_age"]) @relation("PersonToPerson_partner_id_partner_age", references: [id,age])
-               persons  Person[]    @relation("PersonToPerson_partner_id_partner_age")
+               person   Person[]    @relation("PersonToPerson_partner_id_partner_age")
 
                @@unique([id, age], name: "sqlite_autoindex_Person_1")
             }
@@ -212,7 +212,7 @@ async fn compound_foreign_keys_should_work_for_self_relations(api: &TestApi) {
                age      Int
                id       Int         @id  @default(autoincrement())
                person   Person?     @map(["partner_id", "partner_age"]) @relation("PersonToPerson_partner_id_partner_age", references: [id, age])
-               persons  Person[]    @relation("PersonToPerson_partner_id_partner_age")
+               person   Person[]    @relation("PersonToPerson_partner_id_partner_age")
 
                @@unique([id, age], name: "sqlite_autoindex_Person_1")
             }
@@ -243,7 +243,7 @@ async fn compound_foreign_keys_should_work_with_defaults(api: &TestApi) {
                age      Int
                id       Int         @id  @default(autoincrement())
                person   Person      @map(["partner_id", "partner_age"]) @relation("PersonToPerson_partner_id_partner_age", references: [id, age])
-               persons  Person[]    @relation("PersonToPerson_partner_id_partner_age")
+               person   Person[]    @relation("PersonToPerson_partner_id_partner_age")
 
                @@unique([id, age], name: "sqlite_autoindex_Person_1")
             }
@@ -323,7 +323,7 @@ async fn compound_foreign_keys_should_work_for_one_to_many_relations_with_non_un
             model User {
                age      Int
                id       Int                 @id @default(autoincrement())
-               posts    Post[]
+               post     Post[]
 
                @@unique([id, age], name: "sqlite_autoindex_User_1")
             }

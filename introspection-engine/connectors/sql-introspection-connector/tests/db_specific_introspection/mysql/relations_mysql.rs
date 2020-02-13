@@ -404,7 +404,7 @@ async fn introspecting_a_many_to_many_relation_with_an_id_should_work(api: &Test
     let dm = r#"
             model Post {
                id      Int @id @default(autoincrement())
-               postsToUserses PostsToUsers[] @relation(references: [post_id])
+               postsToUsers PostsToUsers[] @relation(references: [post_id])
             }
 
             model PostsToUsers {
@@ -418,7 +418,7 @@ async fn introspecting_a_many_to_many_relation_with_an_id_should_work(api: &Test
 
             model User {
                id      Int @id @default(autoincrement())
-               postToUser PostsToUsers[]
+               postsToUsers PostsToUsers[]
             }
         "#;
     let result = dbg!(api.introspect().await);

@@ -195,7 +195,7 @@ async fn introspecting_a_one_req_to_many_relation_should_work(api: &TestApi) {
     let dm = r#"
             model User {
                id Int @id @default(autoincrement())
-               posts Post[]
+               post Post[]
             }
 
             model Post {
@@ -245,12 +245,12 @@ async fn introspecting_a_prisma_many_to_many_relation_should_work(api: &TestApi)
     let dm = r#"
             model User {
                id Int @id @default(autoincrement())
-               posts Post[]
+               post Post[]
             }
 
             model Post {
                id Int @id @default(autoincrement())
-               users User[]
+               user User[]
             }
         "#;
     let result = dbg!(api.introspect().await);
@@ -370,12 +370,12 @@ async fn introspecting_a_many_to_many_relation_with_an_id_should_work(api: &Test
     let dm = r#"
             model User {
                id Int @id @default(autoincrement())
-               postsToUserses PostsToUsers[]
+               postsToUsers PostsToUsers[]
             }
 
             model Post {
                id Int @id @default(autoincrement())
-               postsToUserses PostsToUsers[] @relation(references: [post_id])
+               postsToUsers PostsToUsers[] @relation(references: [post_id])
             }
 
             model PostsToUsers {
@@ -410,8 +410,8 @@ async fn introspecting_a_self_relation_should_work(api: &TestApi) {
                 id                             Int    @id  @default(autoincrement())
                 direct_report                  User?  @relation("UserToUser_direct_report")
                 recruited_by                   User?  @relation("UserToUser_recruited_by")
-                users_UserToUser_direct_report User[] @relation("UserToUser_direct_report")
-                users_UserToUser_recruited_by  User[] @relation("UserToUser_recruited_by")
+                user_UserToUser_direct_report User[] @relation("UserToUser_direct_report")
+                user_UserToUser_recruited_by  User[] @relation("UserToUser_recruited_by")
             }
         "#;
     let result = dbg!(api.introspect().await);
@@ -442,7 +442,7 @@ async fn introspecting_cascading_delete_behaviour_should_work(api: &TestApi) {
     let dm = r#"
             model User {
                id      Int @id @default(autoincrement())
-               posts Post[] @relation(onDelete: CASCADE)
+               post Post[] @relation(onDelete: CASCADE)
             }
 
             model Post {
