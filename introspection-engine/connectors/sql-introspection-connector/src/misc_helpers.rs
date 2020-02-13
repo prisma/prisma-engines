@@ -97,7 +97,7 @@ pub(crate) fn calculate_compound_index(index: &Index, name: String) -> IndexDefi
     }
 }
 
-pub(crate) fn calculate_scalar_field(schema: &&SqlSchema, table: &&Table, column: &&Column) -> Field {
+pub(crate) fn calculate_scalar_field(schema: &SqlSchema, table: &Table, column: &Column) -> Field {
     debug!("Handling column {:?}", column);
     let field_type = calculate_field_type(&schema, &column, &table);
     let arity = match column.tpe.arity {
@@ -135,9 +135,9 @@ pub(crate) fn calculate_relation_field(schema: &SqlSchema, table: &Table, foreig
         && foreign_key.columns.len() == 1
     {
         calculate_scalar_field(
-            &schema,
-            &table,
-            &table.columns.iter().find(|c| c.name == foreign_key.columns[0]).unwrap(),
+            schema,
+            table,
+            table.columns.iter().find(|c| c.name == foreign_key.columns[0]).unwrap(),
         )
     } else {
         let field_type = FieldType::Relation(RelationInfo {
