@@ -241,13 +241,9 @@ fn handle_one_to_x(
                 }
 
                 // Handle finder / filter injection
-                match update_node {
-                    Node::Query(Query::Write(WriteQuery::UpdateManyRecords(ref mut ur))) => {
-                        let filters: Vec<_> = parent_ids.into_iter().map(|id| id.filter()).collect();
-                        ur.filter = Filter::or(filters);
-                    }
-
-                    _ => unreachable!(),
+                if let Node::Query(Query::Write(WriteQuery::UpdateManyRecords(ref mut ur))) = update_node {
+                    let filters: Vec<_> = parent_ids.into_iter().map(|id| id.filter()).collect();
+                    ur.filter = Filter::or(filters);
                 };
 
                 // Handle arg injection
