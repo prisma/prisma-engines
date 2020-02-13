@@ -28,7 +28,10 @@ fn a_data_model_can_be_generated_from_a_schema() {
         models: vec![Model {
             database_name: None,
             name: "Table1".to_string(),
-            documentation: None,
+            documentation: Some(
+                "The underlying table does not contain a unique identifier and can therefore currently not be handled."
+                    .to_string(),
+            ),
             is_embedded: false,
             is_generated: false,
             is_commented_out: true,
