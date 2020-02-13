@@ -14,7 +14,6 @@ anyhow = "1.0.26"
 async-trait = "0.1.17"
 chrono = { version = "0.4", features = ["serde"] }
 futures = { version = "0.3", features = ["compat"] }
-json-rpc-stdio = { path = "../../libs/json-rpc-stdio" }
 jsonrpc-core = "14.0"
 quaint = { git = "https://github.com/prisma/quaint", optional = true }
 serde = { version = "1.0" }

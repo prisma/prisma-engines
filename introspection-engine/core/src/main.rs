@@ -19,7 +19,7 @@ async fn main() {
         let mut io_handler = IoHandler::new();
         io_handler.extend_with(RpcImpl::new().to_delegate());
 
-        json_rpc_stdio::run(io_handler).await.unwrap();
+        json_rpc_stdio::run(&io_handler).await.unwrap();
     }
 }
 

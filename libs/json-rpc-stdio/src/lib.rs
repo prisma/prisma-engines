@@ -2,12 +2,12 @@ use futures::compat::*;
 use jsonrpc_core::IoHandler;
 use tokio::io::{AsyncBufReadExt, AsyncRead, AsyncWrite, AsyncWriteExt};
 
-pub async fn run(handler: IoHandler) -> std::io::Result<()> {
+pub async fn run(handler: &IoHandler) -> std::io::Result<()> {
     run_with_io(handler, tokio::io::stdin(), tokio::io::stdout()).await
 }
 
 async fn run_with_io(
-    handler: IoHandler,
+    handler: &IoHandler,
     input: impl AsyncRead + Unpin,
     output: impl AsyncWrite + Unpin,
 ) -> std::io::Result<()> {
