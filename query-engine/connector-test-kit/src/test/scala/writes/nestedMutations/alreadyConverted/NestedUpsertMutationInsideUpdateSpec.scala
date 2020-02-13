@@ -204,7 +204,7 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |    create :{c: "DOES NOT MATTER"}
          |    }]}
          |  }){
-         |    childrenOpt (orderBy: id_ASC){
+         |    childrenOpt (orderBy: c_ASC){
          |      c
          |    }
          |  }
@@ -213,7 +213,7 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
         project
       )
 
-      res.toString should be("""{"data":{"updateParent":{"childrenOpt":[{"c":"updated C"},{"c":"c2"}]}}}""")
+      res.toString should be("""{"data":{"updateParent":{"childrenOpt":[{"c":"c2"},{"c":"updated C"}]}}}""")
 
     }
   }

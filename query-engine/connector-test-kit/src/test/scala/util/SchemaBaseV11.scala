@@ -82,7 +82,7 @@ trait SchemaBaseV11 extends PlayJsonExtensions {
     override def field: String = "childReq      Child"
   }
 
-  def schemaWithRelation(onParent: RelationField, onChild: RelationField) = {
+  def schemaWithRelation(onParent: RelationField, onChild: RelationField, withoutParams: Boolean = false) = {
 
     //Query Params
     val idParams = QueryParams(
@@ -177,15 +177,23 @@ trait SchemaBaseV11 extends PlayJsonExtensions {
                                                            case (_, _)                                           => Vector.empty
                                                          };
                                     //only based on id
-                                    parentParams <- parentId match {
-                                                     case `simpleId`   => parentUniqueParams :+ idParams
-                                                     case `compoundId` => parentUniqueParams :+ compoundIdParams
-                                                     case `noId`       => parentUniqueParams
+                                    parentParams <- if (withoutParams) {
+                                                     Vector(idParams)
+                                                   } else {
+                                                     parentId match {
+                                                       case `simpleId`   => parentUniqueParams :+ idParams
+                                                       case `compoundId` => parentUniqueParams :+ compoundIdParams
+                                                       case `noId`       => parentUniqueParams
+                                                     }
                                                    };
-                                    childParams <- childId match {
-                                                    case `simpleId`   => childUniqueParams :+ idParams
-                                                    case `compoundId` => childUniqueParams :+ compoundIdParams
-                                                    case `noId`       => childUniqueParams
+                                    childParams <- if (withoutParams) {
+                                                    Vector(idParams)
+                                                  } else {
+                                                    childId match {
+                                                      case `simpleId`   => childUniqueParams :+ idParams
+                                                      case `compoundId` => childUniqueParams :+ compoundIdParams
+                                                      case `noId`       => childUniqueParams
+                                                    }
                                                   })
       yield {
         val datamodel =

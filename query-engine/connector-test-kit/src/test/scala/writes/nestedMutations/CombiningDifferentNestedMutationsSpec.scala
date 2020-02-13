@@ -20,7 +20,7 @@ class CombiningDifferentNestedMutationsSpec extends FlatSpec with Matchers with 
   // the error behavior would be interesting to test, which error is returned, does rollback work
 
   "A create followed by an update" should "work" in {
-    schemaWithRelation(onParent = ChildList, onChild = ParentList).test { t =>
+    schemaWithRelation(onParent = ChildList, onChild = ParentList).test(9) { t =>
       val project = SchemaDsl.fromStringV11() {
         t.datamodel
       }
@@ -34,7 +34,7 @@ class CombiningDifferentNestedMutationsSpec extends FlatSpec with Matchers with 
         |      create: [{c: "c1"},{c: "c2"}]
         |    }
         |  }){
-        |    childrenOpt(orderBy: id_ASC){
+        |    childrenOpt(orderBy: c_ASC){
         |       c
         |    }
         |  }
@@ -54,7 +54,7 @@ class CombiningDifferentNestedMutationsSpec extends FlatSpec with Matchers with 
         |    update: [{where: {c: "c3"} data: {c: "cUpdated"}}]
         |    }
         |  }){
-        |    childrenOpt(orderBy: id_ASC){
+        |    childrenOpt(orderBy: c_ASC){
         |       c
         |    }
         |  }
@@ -62,12 +62,12 @@ class CombiningDifferentNestedMutationsSpec extends FlatSpec with Matchers with 
         project
       )
 
-      res2.toString should be("""{"data":{"updateParent":{"childrenOpt":[{"c":"c1"},{"c":"c2"},{"c":"cUpdated"},{"c":"c4"}]}}}""")
+      res2.toString should be("""{"data":{"updateParent":{"childrenOpt":[{"c":"c1"},{"c":"c2"},{"c":"c4"},{"c":"cUpdated"}]}}}""")
 
 //      // ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(4) }
 
-      server.query(s"""query{children(orderBy: id_ASC){c, parentsOpt(orderBy: id_ASC){p}}}""", project).toString should be(
-        """{"data":{"children":[{"c":"c1","parentsOpt":[{"p":"p1"}]},{"c":"c2","parentsOpt":[{"p":"p1"}]},{"c":"cUpdated","parentsOpt":[{"p":"p1"}]},{"c":"c4","parentsOpt":[{"p":"p1"}]}]}}""")
+      server.query(s"""query{children(orderBy: c_ASC){c, parentsOpt(orderBy: id_ASC){p}}}""", project).toString should be(
+        """{"data":{"children":[{"c":"c1","parentsOpt":[{"p":"p1"}]},{"c":"c2","parentsOpt":[{"p":"p1"}]},{"c":"c4","parentsOpt":[{"p":"p1"}]},{"c":"cUpdated","parentsOpt":[{"p":"p1"}]}]}}""")
 
     }
   }
@@ -193,7 +193,7 @@ class CombiningDifferentNestedMutationsSpec extends FlatSpec with Matchers with 
         |      create: [{c: "c1"},{c: "c2"}]
         |    }
         |  }){
-        |    childrenOpt(orderBy: id_ASC){
+        |    childrenOpt(orderBy: c_ASC){
         |       c
         |    }
         |  }
@@ -219,7 +219,7 @@ class CombiningDifferentNestedMutationsSpec extends FlatSpec with Matchers with 
         |              ]
         |    }
         |  }){
-        |    childrenOpt(orderBy: id_ASC){
+        |    childrenOpt(orderBy: c_ASC){
         |       c
         |    }
         |  }
@@ -227,12 +227,12 @@ class CombiningDifferentNestedMutationsSpec extends FlatSpec with Matchers with 
         project
       )
 
-      res2.toString should be("""{"data":{"updateParent":{"childrenOpt":[{"c":"c1"},{"c":"c2"},{"c":"cUpdated"},{"c":"c4"},{"c":"cNew"}]}}}""")
+      res2.toString should be("""{"data":{"updateParent":{"childrenOpt":[{"c":"c1"},{"c":"c2"},{"c":"c4"},{"c":"cNew"},{"c":"cUpdated"}]}}}""")
 
       // ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(5) }
 
-      server.query(s"""query{children(orderBy: id_ASC){c, parentsOpt(orderBy: id_ASC){p}}}""", project).toString should be(
-        """{"data":{"children":[{"c":"c1","parentsOpt":[{"p":"p1"}]},{"c":"c2","parentsOpt":[{"p":"p1"}]},{"c":"cUpdated","parentsOpt":[{"p":"p1"}]},{"c":"c4","parentsOpt":[{"p":"p1"}]},{"c":"cNew","parentsOpt":[{"p":"p1"}]}]}}""")
+      server.query(s"""query{children(orderBy: c_ASC){c, parentsOpt(orderBy: p_ASC){p}}}""", project).toString should be(
+        """{"data":{"children":[{"c":"c1","parentsOpt":[{"p":"p1"}]},{"c":"c2","parentsOpt":[{"p":"p1"}]},{"c":"c4","parentsOpt":[{"p":"p1"}]},{"c":"cNew","parentsOpt":[{"p":"p1"}]},{"c":"cUpdated","parentsOpt":[{"p":"p1"}]}]}}""")
     }
   }
 

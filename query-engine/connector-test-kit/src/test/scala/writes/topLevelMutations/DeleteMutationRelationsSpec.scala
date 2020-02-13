@@ -56,31 +56,31 @@ class DeleteMutationRelationsSpec extends FlatSpec with Matchers with ApiSpecBas
 
       val res = server
         .query(
-          """mutation {
+          s"""mutation {
           |  createParent(data: {
           |    p: "p1"
           |    childReq: {
           |      create: {c: "c1"}
           |    }
           |  }){
-          |    id
+          |    ${t.parent.selection}
           |    childReq{
-          |       id
+          |       ${t.child.selection}
           |    }
           |  }
           |}""",
           project
         )
-      val childId  = res.pathAsString("data.createParent.childReq.id")
-      val parentId = res.pathAsString("data.createParent.id")
+
+      val parentId = t.parent.where(res, "data.createParent")
 
       server.queryThatMustFail(
         s"""
          |mutation {
          |  deleteParent(
-         |  where: {id: "$parentId"}
+         |    where: $parentId
          |  ){
-         |  p
+         |    p
          |  }
          |}
       """,

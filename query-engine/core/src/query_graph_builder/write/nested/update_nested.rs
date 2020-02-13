@@ -68,14 +68,13 @@ pub fn connect_nested_update(
         let update_node =
             update::update_record_node(graph, Filter::empty(), Arc::clone(child_model), data.try_into()?)?;
 
-        let parent_model_identifier = parent_relation_field.model().primary_identifier();
         let child_model_identifier = parent_relation_field.related_model().primary_identifier();
 
         graph.create_edge(
             &find_child_records_node,
             &update_node,
             QueryGraphDependency::ParentIds(
-                parent_model_identifier,
+                child_model_identifier.clone(),
                 Box::new(move |mut node, mut parent_ids| {
                     let parent_id = match parent_ids.pop() {
                         Some(pid) => Ok(pid),
@@ -85,8 +84,7 @@ pub fn connect_nested_update(
                     }?;
 
                     if let Node::Query(Query::Write(WriteQuery::UpdateRecord(ref mut ur))) = node {
-                        let assimilated = child_model_identifier.assimilate(parent_id)?;
-                        ur.add_filter(assimilated.filter());
+                        ur.add_filter(parent_id.filter());
                     }
 
                     Ok(node)
@@ -135,15 +133,16 @@ pub fn connect_nested_update_many(
                 child_model_identifier.clone(),
                 Box::new(move |mut node, parent_ids| {
                     if let Node::Query(Query::Write(WriteQuery::UpdateManyRecords(ref mut ur))) = node {
-                        let conditions: QueryGraphBuilderResult<Vec<_>> =
-                            parent_ids.into_iter().try_fold(vec![], |mut acc, next| {
-                                let assimilated = child_model_identifier.assimilate(next)?;
+                        // let conditions: QueryGraphBuilderResult<Vec<_>> =
+                        // parent_ids.into_iter().try_fold(vec![], |mut acc, next| {
+                        //     let assimilated = child_model_identifier.assimilate(next)?;
 
-                                acc.push(assimilated.filter());
-                                Ok(acc)
-                            });
+                        //     acc.push(assimilated.filter());
+                        //     Ok(acc)
+                        // });
 
-                        let filter = Filter::or(conditions?);
+                        // let filter = Filter::or(conditions?);
+                        let filter = Filter::or(parent_ids.into_iter().map(|id| id.filter()).collect());
                         ur.set_filter(Filter::and(vec![ur.filter.clone(), filter]));
                     }
 
