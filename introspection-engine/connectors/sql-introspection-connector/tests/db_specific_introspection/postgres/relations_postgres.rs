@@ -149,7 +149,7 @@ async fn introspecting_a_one_to_many_relation_should_work(api: &TestApi) {
 
             model User {
                id      Int @id @default(autoincrement())
-               posts Post[]
+               post Post[]
             }
         "#;
     let result = dbg!(api.introspect().await);
