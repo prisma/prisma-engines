@@ -18,7 +18,7 @@ pub fn render_error(crate_error: CoreError) -> Error {
                 .unwrap()
                 .into()
         }
-        _ => Error::from_fail(crate_error).into(),
+        _ => Error::from_dyn_error(&crate_error),
     }
 }
 

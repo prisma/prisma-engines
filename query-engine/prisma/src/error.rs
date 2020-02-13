@@ -88,7 +88,7 @@ impl From<PrismaError> for response_ir::ResponseError {
     fn from(other: PrismaError) -> Self {
         match other {
             PrismaError::CoreError(core_error) => response_ir::ResponseError::from(core_error),
-            err => response_ir::ResponseError::from(user_facing_errors::Error::from_fail(err)),
+            err => response_ir::ResponseError::from(user_facing_errors::Error::from_dyn_error(&err.compat())),
         }
     }
 }
