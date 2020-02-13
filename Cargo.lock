@@ -2815,7 +2815,7 @@ dependencies = [
  "tokio",
  "tracing",
  "tracing-futures",
- "url 1.7.2",
+ "url 2.1.1",
  "user-facing-errors",
 ]
 
@@ -2862,7 +2862,7 @@ dependencies = [
  "rust_decimal",
  "serde",
  "serde_json",
- "url 1.7.2",
+ "url 2.1.1",
  "user-facing-errors",
  "uuid",
 ]
@@ -2886,7 +2886,7 @@ dependencies = [
  "test-macros",
  "test-setup",
  "tokio",
- "url 1.7.2",
+ "url 2.1.1",
 ]
 
 [[package]]
