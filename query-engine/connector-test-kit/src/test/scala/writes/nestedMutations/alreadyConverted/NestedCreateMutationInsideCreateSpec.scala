@@ -485,6 +485,11 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
     server.query("query{users{id}}", project).pathAsSeq("data.users").length should be(1)
     server.query("query{posts{id}}", project).pathAsSeq("data.posts").length should be(1)
 
+    val errorTarget = () match {
+      case _ if connectorTag == ConnectorTag.MySqlConnectorTag => "constraint: `unique`"
+      case _ => "fields: (`unique`)"
+    }
+
     server.queryThatMustFail(
       """mutation{
         |  createUser(data:{
@@ -498,7 +503,7 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
       """,
       project,
       errorCode = 2002,
-      errorContains = "Unique constraint failed on the fields: (`unique`)"
+      errorContains = s"Unique constraint failed on the $errorTarget"
     )
 
     server.query("query{users{id}}", project).pathAsSeq("data.users").length should be(1)
@@ -541,6 +546,11 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
     server.query("query{users{id}}", project).pathAsSeq("data.users").length should be(1)
     server.query("query{posts{id}}", project).pathAsSeq("data.posts").length should be(1)
 
+    val errorTarget = () match {
+      case _ if connectorTag == ConnectorTag.MySqlConnectorTag => "constraint: `uniquePost`"
+      case _ => "fields: (`uniquePost`)"
+    }
+
     server.queryThatMustFail(
       """mutation{
         |  createUser(data:{
@@ -554,7 +564,7 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
       """,
       project,
       errorCode = 2002,
-      errorContains = "Unique constraint failed on the fields: (`uniquePost`)"
+      errorContains = s"Unique constraint failed on the $errorTarget"
     )
 
     ifConnectorIsNotMongo(server.query("query{users{id}}", project).pathAsSeq("data.users").length should be(1))

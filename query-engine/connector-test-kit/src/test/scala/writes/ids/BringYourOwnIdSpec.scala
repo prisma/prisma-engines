@@ -22,13 +22,18 @@ class BringYourOwnIdSpec extends FlatSpec with Matchers with ApiSpecBase with Sc
 
       res.toString should be(s"""{"data":{"createParent":{"p":"Parent","id":"Own Id"}}}""")
 
+      val errorTarget = () match {
+        case _ if connectorTag == ConnectorTag.MySqlConnectorTag => "constraint: `PRIMARY`"
+        case _ => "fields: (`id`)"
+      }
+
       server.queryThatMustFail(
         s"""mutation {
          |  createParent(data: {p: "Parent2", id: "Own Id"}){p, id}
          |}""",
         project = project,
         errorCode = 2002,
-        errorContains = "Unique constraint failed on the fields: (`id`)"
+        errorContains = s"Unique constraint failed on the $errorTarget"
       )
     }
 
@@ -96,13 +101,18 @@ class BringYourOwnIdSpec extends FlatSpec with Matchers with ApiSpecBase with Sc
 
       res.toString should be(s"""{"data":{"createParent":{"p":"Parent","id":"Own Id","childOpt":{"c":"Child","id":"Own Child Id"}}}}""")
 
+      val constraintTarget = () match {
+        case _ if connectorTag == ConnectorTag.MySqlConnectorTag => "constraint: `PRIMARY`"
+        case _ => "fields: (`id`)"
+      }
+
       server.queryThatMustFail(
         s"""mutation {
          |createParent(data: {p: "Parent 2", id: "Own Id 2", childOpt:{create:{c:"Child 2", id: "Own Child Id"}}}){p, id, childOpt { c, id} }
          |}""",
         project = project,
         errorCode = 2002,
-        errorContains = "Unique constraint failed on the fields: (`id`)"
+        errorContains = s"Unique constraint failed on the $constraintTarget"
       )
     }
   }
