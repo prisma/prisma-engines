@@ -55,7 +55,7 @@ impl From<my::error::Error> for Error {
 
                 builder.build()
             }
-            my::error::Error::Server(ServerError { ref message, code, .. }) if code == 1364 => {
+            my::error::Error::Server(ServerError { ref message, code, .. }) if code == 1364 || code == 1048 => {
                 let splitted: Vec<&str> = message.split_whitespace().collect();
                 let splitted: Vec<&str> = splitted.get(1).map(|s| s.split('\'').collect()).unwrap();
 
