@@ -83,7 +83,8 @@ async fn start_engine(datamodel_location: &str, single_cmd: bool) -> ! {
         println!("{}", response);
     } else {
         match RpcApi::new(&datamodel).await {
-            Ok(api) => api.start_server().await.unwrap(),
+            // Block the thread and handle IO in async until EOF.
+            Ok(api) => json_rpc_stdio::run(api.io_handler()).await.unwrap(),
             Err(err) => {
                 let (error, exit_code) = match &err {
                     CoreError::DatamodelError(errors) => {

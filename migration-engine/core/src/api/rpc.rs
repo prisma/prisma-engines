@@ -63,12 +63,11 @@ impl RpcApi {
         Ok(rpc_api)
     }
 
-    /// Block the thread and handle IO in async until EOF.
-    pub async fn start_server(self) -> std::io::Result<()> {
-        json_rpc_stdio::run(self.io_handler).await
+    pub fn io_handler(&self) -> &IoHandler {
+        &self.io_handler
     }
 
-    /// Handle one request
+    /// Handle one request over stdio.
     pub fn handle(&self) -> CoreResult<String> {
         let mut json_is_complete = false;
         let mut input = String::new();

@@ -1297,7 +1297,6 @@ dependencies = [
  "chrono",
  "datamodel",
  "futures 0.3.4",
- "json-rpc-stdio",
  "jsonrpc-core",
  "migration-connector",
  "quaint",
@@ -1316,6 +1315,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "futures 0.3.4",
+ "json-rpc-stdio",
  "migration-connector",
  "migration-core",
  "quaint",
