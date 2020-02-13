@@ -25,5 +25,6 @@ skip = [
 # dependencies starting at the specified crate, up to a certain depth, which is
 # by default infinite
 skip-tree = [
-    #{ name = "ansi_term", version = "=0.11.0", depth = 20 },
+    { name = "quaint" },
+    { name = "clap" },
 ]
