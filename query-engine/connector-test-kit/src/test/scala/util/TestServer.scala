@@ -93,6 +93,7 @@ case class TestServer() extends PlayJsonExtensions {
     val lines          = response.linesIterator.toVector
     val responseMarker = "Response: " // due to race conditions the response can not always be found in the last line
     val responseLine   = lines.find(_.startsWith(responseMarker)).get.stripPrefix(responseMarker).stripSuffix("\n")
+    println(lines.mkString("\n"))
 
     Try(UTF8Base64.decode(responseLine)) match {
       case Success(decodedResponse) =>
