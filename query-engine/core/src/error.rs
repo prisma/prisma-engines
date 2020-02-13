@@ -90,7 +90,7 @@ impl From<CoreError> for user_facing_errors::Error {
                 .unwrap()
                 .into()
             }
-            _ => user_facing_errors::Error::from_fail(err).into(),
+            _ => user_facing_errors::Error::from_dyn_error(&err.compat()),
         }
     }
 }

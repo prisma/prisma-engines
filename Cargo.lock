@@ -3121,7 +3121,6 @@ name = "user-facing-errors"
 version = "0.1.0"
 dependencies = [
  "backtrace",
- "failure",
  "log",
  "quaint",
  "serde",

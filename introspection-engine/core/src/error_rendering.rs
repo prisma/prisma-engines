@@ -17,7 +17,7 @@ pub fn render_error(crate_error: Error) -> UserFacingError {
             .unwrap()
             .into()
         }
-        _ => UserFacingError::from_fail(crate_error).into(),
+        _ => UserFacingError::from_dyn_error(&crate_error),
     }
 }
 
