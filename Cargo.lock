@@ -526,7 +526,7 @@ dependencies = [
  "prisma-value",
  "serde",
  "serde_json",
- "uuid 0.7.4",
+ "uuid",
 ]
 
 [[package]]
@@ -1593,7 +1593,7 @@ dependencies = [
  "sha2",
  "time",
  "twox-hash",
- "uuid 0.8.1",
+ "uuid",
 ]
 
 [[package]]
@@ -2040,7 +2040,7 @@ dependencies = [
  "postgres-protocol",
  "serde",
  "serde_json",
- "uuid 0.8.1",
+ "uuid",
 ]
 
 [[package]]
@@ -2135,7 +2135,7 @@ dependencies = [
  "serde",
  "serde_derive",
  "serde_json",
- "uuid 0.8.1",
+ "uuid",
 ]
 
 [[package]]
@@ -2149,7 +2149,7 @@ dependencies = [
  "serde",
  "serde_derive",
  "serde_json",
- "uuid 0.8.1",
+ "uuid",
 ]
 
 [[package]]
@@ -2251,7 +2251,7 @@ dependencies = [
  "tracing",
  "tracing-core",
  "url 2.1.1",
- "uuid 0.8.1",
+ "uuid",
 ]
 
 [[package]]
@@ -2268,7 +2268,7 @@ dependencies = [
  "serde",
  "serde_json",
  "user-facing-errors",
- "uuid 0.8.1",
+ "uuid",
 ]
 
 [[package]]
@@ -2297,7 +2297,7 @@ dependencies = [
  "serde",
  "serde_json",
  "user-facing-errors",
- "uuid 0.8.1",
+ "uuid",
 ]
 
 [[package]]
@@ -2864,7 +2864,7 @@ dependencies = [
  "serde_json",
  "url 1.7.2",
  "user-facing-errors",
- "uuid 0.8.1",
+ "uuid",
 ]
 
 [[package]]
@@ -3426,16 +3426,6 @@ name = "utf8-ranges"
 version = "1.0.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b4ae116fef2b7fea257ed6440d3cfcff7f190865f170cdad00bb6465bf18ecba"
-
-[[package]]
-name = "uuid"
-version = "0.7.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "90dbc611eb48397705a6b0f6e917da23ae517e4d127123d2cf7674206627d32a"
-dependencies = [
- "rand 0.6.5",
- "serde",
-]
 
 [[package]]
 name = "uuid"
