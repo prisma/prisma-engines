@@ -206,10 +206,9 @@ fn read_related<'a, 'b>(
                 let parent_fields = &parent_result.field_names;
                 let mut additional_records = vec![];
 
-                let mut the_map: HashMap<Vec<PrismaValue>, Vec<&Record>> = HashMap::new();
+                let mut the_map: HashMap<Vec<&PrismaValue>, Vec<&Record>> = HashMap::new();
                 for record in parent_result.records.iter() {
-                    let id = record.identifier(parent_fields, &parent_link_fields).unwrap();
-                    let prisma_values = id.pairs.into_iter().map(|p| p.1).collect();
+                    let prisma_values = record.identifying_values(parent_fields, &parent_link_fields).unwrap();
                     match the_map.get_mut(&prisma_values) {
                         Some(records) => records.push(record),
                         None => {
@@ -219,25 +218,11 @@ fn read_related<'a, 'b>(
                         }
                     }
                 }
-                //                let x: HashMap<RecordIdentifier, Record> = parent_result
-                //                    .records
-                //                    .iter()
-                //                    .map(|record| {
-                //                        let id = record.identifier(parent_fields, &parent_link_fields).unwrap();
-                //                        (id, record)
-                //                    })
-                //                    .collect();
 
                 for mut record in scalars.records.iter_mut() {
                     let child_link: RecordIdentifier = record.identifier(&field_names, &child_link_fields)?;
 
-                    //                    let mut parent_records = parent_result.records.iter().filter(|record| {
-                    //                        let parent_link = record.identifier(parent_fields, &parent_link_fields).unwrap();
-                    //
-                    //                        child_link.values().eq(parent_link.values())
-                    //                    });
-
-                    let child_values: Vec<PrismaValue> = child_link.values().collect();
+                    let child_values: Vec<&PrismaValue> = child_link.pairs.iter().map(|p| &p.1).collect();
                     let empty_vec = Vec::new();
                     let mut parent_records = the_map.get(&child_values).unwrap_or(&empty_vec).iter();
 
