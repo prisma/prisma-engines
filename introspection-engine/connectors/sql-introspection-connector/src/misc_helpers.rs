@@ -45,8 +45,6 @@ pub(crate) fn is_foreign_key_column(table: &Table, column: &Column) -> bool {
 //calculators
 
 pub fn calculate_many_to_many_field(foreign_key: &ForeignKey, relation_name: String, is_self_relation: bool) -> Field {
-    let inflector = prisma_inflector::default();
-
     let field_type = FieldType::Relation(RelationInfo {
         name: relation_name,
         to: foreign_key.referenced_table.clone(),
@@ -54,7 +52,7 @@ pub fn calculate_many_to_many_field(foreign_key: &ForeignKey, relation_name: Str
         on_delete: OnDeleteStrategy::None,
     });
 
-    let basename = inflector.pluralize(&foreign_key.referenced_table).camel_case();
+    let basename = foreign_key.referenced_table.camel_case();
 
     let name = match is_self_relation {
         true => format!("{}_{}", basename, foreign_key.columns[0]),
@@ -225,13 +223,8 @@ pub(crate) fn calculate_backrelation_field(
         FieldArity::List => FieldArity::Optional,
     };
 
-    let name = match arity {
-        FieldArity::List => prisma_inflector::default().pluralize(&model.name).camel_case(), // pluralize
-        FieldArity::Optional => model.name.clone().camel_case(),
-        FieldArity::Required => model.name.clone().camel_case(),
-    };
     Field {
-        name,
+        name: model.name.clone().camel_case(),
         arity,
         field_type,
         database_names: vec![],
