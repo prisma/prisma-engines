@@ -1,3 +1,4 @@
+use crate::comment_out_unhandled_models::comment_out_unhandled_models;
 use crate::misc_helpers::*;
 use crate::sanitize_datamodel_names::sanitize_datamodel_names;
 use crate::SqlIntrospectionResult;
@@ -61,16 +62,6 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
             model.id_fields = table.primary_key_columns();
         }
 
-        if model.id_fields.is_empty()
-            && !model
-                .fields
-                .iter()
-                .any(|f| f.is_id || f.is_unique || f.field_type.is_relation())
-            && !model.indices.iter().any(|i| i.is_unique())
-        {
-            model.is_commented_out = true;
-        }
-
         data_model.add_model(model);
     }
 
@@ -130,6 +121,7 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
         model.add_field(field);
     }
 
+    comment_out_unhandled_models(&mut data_model);
     sanitize_datamodel_names(&mut data_model);
     debug!("Done calculating data model {:?}", data_model);
 
