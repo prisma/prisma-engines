@@ -117,7 +117,6 @@ pub fn connect_nested_update_many(
         let find_child_records_node =
             utils::insert_find_children_by_parent_node(graph, parent, parent_relation_field, filter.clone())?;
 
-        // TODO: this looks like some duplication from write/update.rs
         let update_many = WriteQuery::UpdateManyRecords(UpdateManyRecords {
             model: Arc::clone(&child_model),
             filter,
@@ -133,15 +132,6 @@ pub fn connect_nested_update_many(
                 child_model_identifier.clone(),
                 Box::new(move |mut node, parent_ids| {
                     if let Node::Query(Query::Write(WriteQuery::UpdateManyRecords(ref mut ur))) = node {
-                        // let conditions: QueryGraphBuilderResult<Vec<_>> =
-                        // parent_ids.into_iter().try_fold(vec![], |mut acc, next| {
-                        //     let assimilated = child_model_identifier.assimilate(next)?;
-
-                        //     acc.push(assimilated.filter());
-                        //     Ok(acc)
-                        // });
-
-                        // let filter = Filter::or(conditions?);
                         let filter = Filter::or(parent_ids.into_iter().map(|id| id.filter()).collect());
                         ur.set_filter(Filter::and(vec![ur.filter.clone(), filter]));
                     }
