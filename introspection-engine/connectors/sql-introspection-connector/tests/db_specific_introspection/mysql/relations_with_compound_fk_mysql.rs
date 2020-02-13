@@ -182,7 +182,7 @@ async fn compound_foreign_keys_should_work_for_required_self_relations(api: &Tes
                age      Int
                id       Int         @id @default(autoincrement())
                person   Person      @map(["partner_id", "partner_age"]) @relation("PersonToPerson_partner_id_partner_age", references: [id, age])
-               person  Person[]    @relation("PersonToPerson_partner_id_partner_age")
+               other_person  Person[]    @relation("PersonToPerson_partner_id_partner_age")
 
                @@unique([id, age], name: "person_unique")
                @@index([person], name: "partner_id")
@@ -214,7 +214,7 @@ async fn compound_foreign_keys_should_work_for_self_relations(api: &TestApi) {
                age      Int
                id       Int         @id @default(autoincrement())
                person   Person?     @map(["partner_id", "partner_age"]) @relation("PersonToPerson_partner_id_partner_age", references: [id, age])
-               person  Person[]    @relation("PersonToPerson_partner_id_partner_age")
+               other_person  Person[]    @relation("PersonToPerson_partner_id_partner_age")
 
                @@unique([id, age], name: "person_unique")
                @@index([person], name: "partner_id")
@@ -246,7 +246,7 @@ async fn compound_foreign_keys_should_work_with_defaults(api: &TestApi) {
                age      Int
                id       Int         @id @default(autoincrement())
                person   Person      @map(["partner_id", "partner_age"]) @relation("PersonToPerson_partner_id_partner_age", references: [id, age])
-               person  Person[]    @relation("PersonToPerson_partner_id_partner_age")
+               other_person  Person[]    @relation("PersonToPerson_partner_id_partner_age")
 
                @@unique([id, age], name: "person_unique")
                @@index([person], name: "partner_id")

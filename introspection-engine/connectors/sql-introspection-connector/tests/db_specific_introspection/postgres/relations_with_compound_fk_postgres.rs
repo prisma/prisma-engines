@@ -180,7 +180,7 @@ async fn compound_foreign_keys_should_work_for_self_relations(api: &TestApi) {
                id       Int         @id @default(autoincrement())
                name     String
                person   Person      @map(["partner_id", "partner_name"]) @relation("PersonToPerson_partner_id_partner_name", references: [id,name])
-               person   Person[]    @relation("PersonToPerson_partner_id_partner_name")
+               other_person   Person[]    @relation("PersonToPerson_partner_id_partner_name")
 
                @@unique([id, name], name: "person_unique")
             }
@@ -213,7 +213,7 @@ async fn compound_foreign_keys_should_work_with_defaults(api: &TestApi) {
                id       Int         @id @default(autoincrement())
                name     String
                person   Person      @map(["partner_id", "partner_name"]) @relation("PersonToPerson_partner_id_partner_name", references: [id, name])
-               persons  Person[]    @relation("PersonToPerson_partner_id_partner_name")
+               other_person  Person[]    @relation("PersonToPerson_partner_id_partner_name")
 
                @@unique([id, name], name: "person_unique")
             }

@@ -89,7 +89,7 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
                     .is_none()
                 {
                     let other_model = data_model.find_model(relation_info.to.as_str()).unwrap();
-                    let field = calculate_backrelation_field(schema, &model, &relation_field, relation_info);
+                    let field = calculate_backrelation_field(schema, model, other_model, relation_field, relation_info);
 
                     fields_to_be_added.push((other_model.name.clone(), field));
                 }
