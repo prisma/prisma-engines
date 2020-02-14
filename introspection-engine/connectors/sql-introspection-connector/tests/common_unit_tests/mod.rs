@@ -950,7 +950,7 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                         data_source_fields: vec![],
                     },
                     Field {
-                        name: "users".to_string(),
+                        name: "user".to_string(),
                         arity: FieldArity::List,
                         field_type: FieldType::Relation(RelationInfo {
                             to: "User".to_string(),

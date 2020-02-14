@@ -45,8 +45,6 @@ pub(crate) fn is_foreign_key_column(table: &Table, column: &Column) -> bool {
 //calculators
 
 pub fn calculate_many_to_many_field(foreign_key: &ForeignKey, relation_name: String, is_self_relation: bool) -> Field {
-    let inflector = prisma_inflector::default();
-
     let field_type = FieldType::Relation(RelationInfo {
         name: relation_name,
         to: foreign_key.referenced_table.clone(),
@@ -54,7 +52,7 @@ pub fn calculate_many_to_many_field(foreign_key: &ForeignKey, relation_name: Str
         on_delete: OnDeleteStrategy::None,
     });
 
-    let basename = inflector.pluralize(&foreign_key.referenced_table).camel_case();
+    let basename = foreign_key.referenced_table.camel_case();
 
     let name = match is_self_relation {
         true => format!("{}_{}", basename, foreign_key.columns[0]),
@@ -99,7 +97,7 @@ pub(crate) fn calculate_compound_index(index: &Index, name: String) -> IndexDefi
     }
 }
 
-pub(crate) fn calculate_scalar_field(schema: &&SqlSchema, table: &&Table, column: &&Column) -> Field {
+pub(crate) fn calculate_scalar_field(schema: &SqlSchema, table: &Table, column: &Column) -> Field {
     debug!("Handling column {:?}", column);
     let field_type = calculate_field_type(&schema, &column, &table);
     let arity = match column.tpe.arity {
@@ -137,9 +135,9 @@ pub(crate) fn calculate_relation_field(schema: &SqlSchema, table: &Table, foreig
         && foreign_key.columns.len() == 1
     {
         calculate_scalar_field(
-            &schema,
-            &table,
-            &table.columns.iter().find(|c| c.name == foreign_key.columns[0]).unwrap(),
+            schema,
+            table,
+            table.columns.iter().find(|c| c.name == foreign_key.columns[0]).unwrap(),
         )
     } else {
         let field_type = FieldType::Relation(RelationInfo {
@@ -186,8 +184,9 @@ pub(crate) fn calculate_relation_field(schema: &SqlSchema, table: &Table, foreig
 
 pub(crate) fn calculate_backrelation_field(
     schema: &SqlSchema,
-    model: &&Model,
-    relation_field: &&Field,
+    model: &Model,
+    other_model: &Model,
+    relation_field: &Field,
     relation_info: &RelationInfo,
 ) -> Field {
     let table = schema.table_bang(&model.name);
@@ -204,32 +203,31 @@ pub(crate) fn calculate_backrelation_field(
         on_delete,
     });
 
-    let other_is_unique = || {
-        let table = schema.table_bang(&model.name);
-
-        match &relation_field.database_names.len() {
-            0 => table.is_column_unique(&relation_field.name),
-            1 => {
-                let column_name = relation_field.database_names.first().unwrap();
-                table.is_column_unique(column_name)
-            }
-            _ => table
-                .indices
-                .iter()
-                .any(|i| i.columns == relation_field.database_names && i.tpe == IndexType::Unique),
+    let other_is_unique = || match &relation_field.database_names.len() {
+        0 => table.is_column_unique(&relation_field.name),
+        1 => {
+            let column_name = relation_field.database_names.first().unwrap();
+            table.is_column_unique(column_name)
         }
+        _ => table
+            .indices
+            .iter()
+            .any(|i| i.columns == relation_field.database_names && i.tpe == IndexType::Unique),
     };
+
     let arity = match relation_field.arity {
         FieldArity::Required | FieldArity::Optional if other_is_unique() => FieldArity::Optional,
         FieldArity::Required | FieldArity::Optional => FieldArity::List,
         FieldArity::List => FieldArity::Optional,
     };
 
-    let name = match arity {
-        FieldArity::List => prisma_inflector::default().pluralize(&model.name).camel_case(), // pluralize
-        FieldArity::Optional => model.name.clone().camel_case(),
-        FieldArity::Required => model.name.clone().camel_case(),
+    //if the backrelation name would be duplicate, probably due to being a selfrelation
+    let name = if model.name == other_model.name && relation_field.name == model.name.camel_case() {
+        format!("other_{}", model.name.clone().camel_case())
+    } else {
+        model.name.clone().camel_case()
     };
+
     Field {
         name,
         arity,
@@ -366,13 +364,10 @@ pub fn deduplicate_names_of_fields_to_be_added(fields_to_be_added: &mut Vec<(Str
 
     duplicated_relation_fields.iter().for_each(|index| {
         let (_, ref mut field) = fields_to_be_added.get_mut(*index).unwrap();
-        let suffix = match &field.field_type {
-            FieldType::Relation(RelationInfo { name, .. }) => format!("_{}", &name),
-            FieldType::Base(_) => "".to_string(),
-            _ => "".to_string(),
+        field.name = match &field.field_type {
+            FieldType::Relation(RelationInfo { name, .. }) => format!("{}_{}", field.name, &name),
+            _ => field.name.clone(),
         };
-
-        field.name = format!("{}{}", field.name, suffix)
     });
 }
 
