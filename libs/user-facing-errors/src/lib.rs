@@ -11,7 +11,6 @@ pub use panic_hook::set_panic_hook;
 
 mod panic_hook;
 
-use failure::Fail;
 use serde::Serialize;
 
 pub trait UserFacingError: serde::Serialize {
@@ -75,11 +74,11 @@ impl Error {
         }
     }
 
-    pub fn from_fail(err: impl Fail) -> Self {
+    pub fn from_dyn_error(err: &dyn std::error::Error) -> Self {
         Error {
             inner: ErrorType::Unknown(UnknownError {
-                message: format!("{}", err),
-                backtrace: err.backtrace().map(|bt| bt.to_string()),
+                message: err.to_string(),
+                backtrace: None,
             }),
             is_panic: false,
         }

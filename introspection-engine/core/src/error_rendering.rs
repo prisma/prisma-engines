@@ -1,28 +1,27 @@
-use crate::{commands::CommandError, error::Error as CoreError};
+use crate::command_error::CommandError;
+use crate::error::Error;
+use introspection_connector::ConnectorError;
 use jsonrpc_core::types::Error as JsonRpcError;
-use migration_connector::ConnectorError;
-use user_facing_errors::{Error, KnownError};
+use user_facing_errors::{introspection_engine::IntrospectionResultEmpty, Error as UserFacingError, KnownError};
 
-pub fn render_error(crate_error: CoreError) -> Error {
+pub fn render_error(crate_error: Error) -> UserFacingError {
     match crate_error {
-        CoreError::ConnectorError(ConnectorError {
+        Error::ConnectorError(ConnectorError {
             user_facing_error: Some(user_facing_error),
             ..
         }) => user_facing_error.into(),
-        CoreError::CommandError(CommandError::ConnectorError(ConnectorError {
-            user_facing_error: Some(user_facing_error),
-            ..
-        })) => user_facing_error.into(),
-        CoreError::CommandError(CommandError::ReceivedBadDatamodel(full_error)) => {
-            KnownError::new(user_facing_errors::common::SchemaParserError { full_error })
-                .unwrap()
-                .into()
+        Error::CommandError(CommandError::IntrospectionResultEmpty(connection_string)) => {
+            KnownError::new(IntrospectionResultEmpty {
+                connection_string: connection_string,
+            })
+            .unwrap()
+            .into()
         }
-        _ => Error::from_dyn_error(&crate_error),
+        _ => UserFacingError::from_dyn_error(&crate_error),
     }
 }
 
-pub(super) fn render_jsonrpc_error(crate_error: CoreError) -> JsonRpcError {
+pub(super) fn render_jsonrpc_error(crate_error: Error) -> JsonRpcError {
     let prisma_error = render_error(crate_error);
 
     let error_rendering_result: Result<_, _> = serde_json::to_value(&prisma_error).map(|data| JsonRpcError {
@@ -50,22 +49,8 @@ fn fallback_jsonrpc_error(err: impl std::error::Error) -> JsonRpcError {
     }
 }
 
-pub fn pretty_print_datamodel_errors(
-    errors: &datamodel::error::ErrorCollection,
-    datamodel: &str,
-) -> std::io::Result<String> {
-    use std::io::Write as _;
-
-    let file_name = "schema.prisma";
-
-    let mut message: Vec<u8> = Vec::new();
-
-    for error in errors.to_iter() {
-        writeln!(&mut message)?;
-        error
-            .pretty_print(&mut message, file_name, datamodel)
-            .expect("Failed to write errors to stderr");
+impl From<Error> for JsonRpcError {
+    fn from(e: Error) -> Self {
+        render_jsonrpc_error(e)
     }
-
-    Ok(String::from_utf8_lossy(&message).into_owned())
 }

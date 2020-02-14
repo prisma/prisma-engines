@@ -253,3 +253,26 @@ async fn introspecting_a_table_with_optional_autoincrement_should_work(api: &Tes
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
+
+#[test_each_connector(tags("sqlite"))]
+async fn introspecting_a_table_without_uniques_should_comment_it_out(api: &TestApi) {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::primary());
+            });
+            migration.create_table("Post", |t| {
+                t.add_column("id", types::integer());
+                t.inject_custom(
+                    "user_id INTEGER NOT NULL UNIQUE,
+                FOREIGN KEY (`user_id`) REFERENCES `User`(`id`)",
+                )
+            });
+        })
+        .await;
+
+    let dm = "model User {\n  id Int @default(autoincrement()) @id\n}\n\n/// The underlying table does not contain a unique identifier and can therefore currently not be handled.\n// model Post {\n  // id      Int\n  // user_id User\n// }";
+
+    let result = dbg!(api.introspect().await);
+    assert_eq!(&result, dm);
+}

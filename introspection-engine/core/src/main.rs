@@ -1,8 +1,9 @@
 use jsonrpc_core::*;
 use rpc::{Rpc, RpcImpl};
 pub mod cli;
-mod connector_loader;
+mod command_error;
 mod error;
+mod error_rendering;
 mod rpc;
 
 #[tokio::main]
@@ -18,7 +19,7 @@ async fn main() {
         let mut io_handler = IoHandler::new();
         io_handler.extend_with(RpcImpl::new().to_delegate());
 
-        json_rpc_stdio::run(io_handler).await.unwrap();
+        json_rpc_stdio::run(&io_handler).await.unwrap();
     }
 }
 

@@ -120,6 +120,7 @@ async fn main() -> Result<(), AnyError> {
             }
         }
         Err(_) => {
+            set_panic_hook()?;
             let ip = opts.host.parse().expect("Host was not a valid IP address");
             let address = SocketAddr::new(ip, opts.port);
 
@@ -160,7 +161,16 @@ fn init_logger() -> Result<(), AnyError> {
                 .finish();
 
             subscriber::set_global_default(subscriber)?;
+        }
+    }
 
+    Ok(())
+}
+
+fn set_panic_hook() -> Result<(), AnyError> {
+    match *LOG_FORMAT {
+        LogFormat::Text => (),
+        LogFormat::Json => {
             std::panic::set_hook(Box::new(|info| {
                 let payload = info
                     .payload()

@@ -176,7 +176,11 @@ impl RecordIdentifier {
 
     // [DTODO] Remove
     pub fn single_value(&self) -> PrismaValue {
-        assert_eq!(self.pairs.len(), 1);
+        assert_eq!(
+            self.pairs.len(),
+            1,
+            "This function must only be called on singular record identifiers"
+        );
         self.pairs.iter().next().unwrap().1.clone()
     }
 }

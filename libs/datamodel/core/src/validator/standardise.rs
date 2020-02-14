@@ -154,6 +154,7 @@ impl Standardiser {
             indices: vec![],
             id_fields: vec![],
             is_generated: true,
+            is_commented_out: false,
         }
     }
 

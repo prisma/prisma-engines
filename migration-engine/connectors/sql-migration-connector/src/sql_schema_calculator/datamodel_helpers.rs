@@ -17,7 +17,6 @@ pub(super) fn walk_fields<'a>(datamodel: &'a Datamodel) -> impl Iterator<Item = 
     })
 }
 
-#[derive(Debug, Copy, Clone)]
 pub(crate) struct ModelRef<'a> {
     pub(crate) datamodel: &'a Datamodel,
     pub(crate) model: &'a Model,

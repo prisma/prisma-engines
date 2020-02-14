@@ -102,6 +102,15 @@ pub struct Field {
     pub data_source_fields: Vec<DataSourceField>,
 }
 
+impl Field {
+    pub fn points_to_model(&self, name: &str) -> bool {
+        match &self.field_type {
+            FieldType::Relation(rel_info) if rel_info.to == name => true,
+            _ => false,
+        }
+    }
+}
+
 impl WithName for Field {
     fn name(&self) -> &String {
         &self.name

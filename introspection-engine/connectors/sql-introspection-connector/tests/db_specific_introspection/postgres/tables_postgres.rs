@@ -361,3 +361,23 @@ async fn introspecting_a_table_enums_array_should_work(api: &TestApi) {
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
+
+#[test_each_connector(tags("postgres"))]
+async fn introspecting_a_table_without_uniques_should_comment_it_out(api: &TestApi) {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::primary());
+            });
+            migration.create_table("Post", |t| {
+                t.add_column("id", types::integer());
+                t.add_column("user_id", types::foreign("User", "id").nullable(false).unique(true));
+            });
+        })
+        .await;
+
+    let dm = "/// The underlying table does not contain a unique identifier and can therefore currently not be handled.\n// model Post {\n  // id      Int\n  // user_id User\n// }\n\nmodel User {\n  id Int @default(autoincrement()) @id\n}";
+
+    let result = dbg!(api.introspect().await);
+    assert_eq!(&result, dm);
+}
