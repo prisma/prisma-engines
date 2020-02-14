@@ -24,3 +24,4 @@ itertools = "0.8"
 rust_decimal = "=1.1.0"
 quaint = { git = "https://github.com/prisma/quaint", optional = true, features = ["uuid-0_8"] }
 prisma-value = { path = "../prisma-value", features = ["sql-ext"] }
+bincode = "1.2.1"

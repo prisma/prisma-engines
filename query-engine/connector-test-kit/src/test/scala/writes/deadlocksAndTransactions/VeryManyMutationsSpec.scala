@@ -99,7 +99,7 @@ class VeryManyMutationsSpec extends FlatSpec with Matchers with ApiSpecBase with
     server.query(s"""query {middles(first: 32500) { top { int } }}""", project)
   }
 
-  "Expanding relations for a for 40000 records" should "work" taggedAs (IgnorePostgres) in {
+  "Expanding relations for a for 40000 records" should "work" in {
     // get 40000 middles and their tops
     server.query(s"""query {middles { top { int } }}""", project)
   }

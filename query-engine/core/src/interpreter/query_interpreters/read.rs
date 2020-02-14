@@ -2,7 +2,6 @@ use crate::{interpreter::InterpretationResult, query_ast::*, result_ast::*};
 use connector::{self, filter::Filter, ConnectionLike, QueryArguments, ReadOperations, ScalarCompare};
 use futures::future::{BoxFuture, FutureExt};
 use prisma_models::{ManyRecords, Record, RecordIdentifier};
-use prisma_value::PrismaValue;
 use std::collections::HashMap;
 use std::time::Instant;
 
@@ -195,7 +194,7 @@ fn read_related<'a, 'b>(
             if parent_result.is_some() && query.parent_field.is_inlined_on_enclosing_model() {
                 println!("JOIN ALGO 1");
                 let parent_identifier = query.parent_field.model().primary_identifier();
-                let field_names = scalars.field_names.clone();
+                let field_names = &scalars.field_names;
 
                 let parent_link_fields = query.parent_field.linking_fields();
                 let child_link_fields = query.parent_field.related_field().linking_fields();
@@ -204,36 +203,54 @@ fn read_related<'a, 'b>(
                     parent_result.expect("No parent results present in the query graph for reading related records.");
 
                 let parent_fields = &parent_result.field_names;
-                let mut additional_records = vec![];
 
-                let mut the_map: HashMap<Vec<&PrismaValue>, Vec<&Record>> = HashMap::new();
+                // The child (scalars) records that are linked to more than one parent will have
+                // copies of themselves with the right parent ids pushed in this Vec.
+                let mut additional_records = Vec::new();
+
+                // Map from parent record identifier for the child records to parent records.
+                //
+                // We use raw bytes for the identifier values because we want to avoid copying
+                // PrismaValues (allocations),
+                let mut parent_records_index: HashMap<Vec<u8>, Vec<&Record>> = HashMap::new();
+
+                let mut identifiers_buf = Vec::with_capacity(16);
+
+                // Populate the identifiers index map.
                 for record in parent_result.records.iter() {
-                    let prisma_values = record.identifying_values(parent_fields, &parent_link_fields).unwrap();
-                    match the_map.get_mut(&prisma_values) {
+                    record.identifier_bytes(parent_fields, &parent_link_fields, &mut identifiers_buf)?;
+
+                    match parent_records_index.get_mut(&identifiers_buf) {
                         Some(records) => records.push(record),
                         None => {
-                            let mut records = Vec::new();
-                            records.push(record);
-                            the_map.insert(prisma_values, records);
+                            let records = vec![record];
+                            let buf_len = identifiers_buf.len();
+                            let id_bytes = std::mem::replace(&mut identifiers_buf, Vec::with_capacity(buf_len));
+                            parent_records_index.insert(id_bytes, records);
                         }
                     }
                 }
 
+                // Link each child record to its parents.
                 for mut record in scalars.records.iter_mut() {
-                    let child_link: RecordIdentifier = record.identifier(&field_names, &child_link_fields)?;
+                    record.identifier_bytes(&field_names, &child_link_fields, &mut identifiers_buf)?;
 
-                    let child_values: Vec<&PrismaValue> = child_link.pairs.iter().map(|p| &p.1).collect();
-                    let empty_vec = Vec::new();
-                    let mut parent_records = the_map.get(&child_values).unwrap_or(&empty_vec).iter();
+                    let parent_records = parent_records_index.get(&identifiers_buf);
+                    let mut parent_records = parent_records.iter().flat_map(|records| records.into_iter());
 
-                    let parent_id = parent_records
-                        .next()
-                        .unwrap()
-                        .identifier(parent_fields, &parent_identifier)
-                        .unwrap();
+                    // Set the parent id on the first record so avoid copying for the first parent.
+                    {
+                        let parent_id = parent_records
+                            .next()
+                            .unwrap()
+                            .identifier(parent_fields, &parent_identifier)
+                            .unwrap();
 
-                    record.parent_id = Some(parent_id);
+                        record.parent_id = Some(parent_id);
+                    }
 
+                    // Set the parent id on every subsequent record (i.e. join a copy of the record
+                    // to every parent that should be connected).
                     for p_record in parent_records {
                         let parent_id = p_record.identifier(parent_fields, &parent_identifier).unwrap();
                         let mut record = record.clone();

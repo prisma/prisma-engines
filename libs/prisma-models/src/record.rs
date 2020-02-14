@@ -293,30 +293,32 @@ impl Record {
         Ok(RecordIdentifier { pairs })
     }
 
-    pub fn identifying_values(&self, field_names: &[String], id: &ModelIdentifier) -> crate::Result<Vec<&PrismaValue>> {
-        let x: Vec<&PrismaValue> = id
-            .fields()
-            .into_iter()
-            .flat_map(|id_field| {
-                let source_fields = id_field.data_source_fields();
+    /// Serialize the record's identifier as bytes into the provided buffer, for fast comparison.
+    pub fn identifier_bytes(
+        &self,
+        field_names: &[String],
+        id: &ModelIdentifier,
+        mut identifier_buf: &mut Vec<u8>,
+    ) -> crate::Result<()> {
+        identifier_buf.clear();
 
-                source_fields
-                    .into_iter()
-                    .map(|source_field| self.get_field_value(field_names, &source_field.name))
-            })
-            .collect::<crate::Result<Vec<_>>>()?;
+        let fields = id.fields().into_iter().flat_map(|id_field| {
+            let source_fields = id_field.data_source_fields();
 
-        Ok(x)
+            source_fields
+                .into_iter()
+                .map(|source_field| self.get_field_value(field_names, &source_field.name))
+        });
+
+        for field in fields {
+            bincode::serialize_into(&mut identifier_buf, &field?).unwrap();
+        }
+
+        Ok(())
     }
 
     pub fn get_field_value(&self, field_names: &[String], field: &str) -> crate::Result<&PrismaValue> {
-        let index = field_names.iter().position(|r| r == field).map(Ok).unwrap_or_else(|| {
-            Err(DomainError::FieldNotFound {
-                name: field.to_string(),
-                model: String::new(),
-            })
-        })?;
-        match self.values.get(index) {
+        match self.values.get(self.get_field_index(field_names, field)?) {
             Some(v) => Ok(v),
             None => {
                 //panic!("boom")
@@ -329,6 +331,15 @@ impl Record {
                 })
             }
         }
+    }
+
+    fn get_field_index(&self, field_names: &[String], field: &str) -> crate::Result<usize> {
+        field_names.iter().position(|r| r == field).map(Ok).unwrap_or_else(|| {
+            Err(DomainError::FieldNotFound {
+                name: field.to_string(),
+                model: String::new(),
+            })
+        })
     }
 
     pub fn set_parent_id(&mut self, parent_id: RecordIdentifier) {
