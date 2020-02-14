@@ -1,6 +1,10 @@
 use crate::*;
-use sql_renderer::{postgres_render_column_type, IteratorJoin, SqlRenderer};
+use sql_renderer::{
+    mysql_quoted, mysql_quoted_string, postgres_quoted, postgres_quoted_string, postgres_render_column_type,
+    IteratorJoin, SqlRenderer,
+};
 use sql_schema_describer::*;
+use sql_schema_helpers::{walk_columns, ColumnRef};
 use std::fmt::Write as _;
 use tracing_futures::Instrument;
 
@@ -110,16 +114,11 @@ fn render_steps_pretty(
     let mut steps = Vec::with_capacity(database_migration.corrected_steps.len());
 
     for step in &database_migration.corrected_steps {
-        let mut sql = String::with_capacity(200);
-        let statements = render_raw_sql(&step, renderer, database_info, current_schema, next_schema).map_err(
-            |err: anyhow::Error| ConnectorError::from_kind(migration_connector::ErrorKind::Generic(err.into())),
-        )?;
-
-        let mut statements = statements.into_iter().peekable();
-
-        while let Some(stmt) = statements.next() {
-            write!(sql, "{}{}", stmt, if statements.peek().is_some() { ";\n" } else { "" }).unwrap();
-        }
+        let sql = render_raw_sql(&step, renderer, database_info, current_schema, next_schema)
+            .map_err(|err: anyhow::Error| {
+                ConnectorError::from_kind(migration_connector::ErrorKind::Generic(err.into()))
+            })?
+            .join(";\n");
 
         if !sql.is_empty() {
             steps.push(PrettySqlMigrationStep {
@@ -145,7 +144,11 @@ fn render_raw_sql(
     match step {
         SqlMigrationStep::CreateEnum(create_enum) => render_create_enum(renderer, create_enum),
         SqlMigrationStep::DropEnum(drop_enum) => render_drop_enum(renderer, drop_enum),
-        SqlMigrationStep::AlterEnum(_alter_enum) => todo!("alter enum support"),
+        SqlMigrationStep::AlterEnum(alter_enum) => match renderer.sql_family() {
+            SqlFamily::Postgres => postgres_alter_enum(alter_enum, next_schema, &schema_name),
+            SqlFamily::Mysql => mysql_alter_enum(alter_enum, next_schema, &schema_name),
+            _ => Ok(Vec::new()),
+        },
         SqlMigrationStep::CreateTable(CreateTable { table }) => {
             let mut create_table = String::with_capacity(100);
 
@@ -155,7 +158,12 @@ fn render_raw_sql(
 
             let mut columns = table.columns.iter().peekable();
             while let Some(column) = columns.next() {
-                let col_sql = renderer.render_column(&schema_name, &table, &column, false, next_schema);
+                let column = ColumnRef {
+                    schema: next_schema,
+                    column,
+                    table,
+                };
+                let col_sql = renderer.render_column(&schema_name, column, false);
 
                 write!(
                     create_table,
@@ -234,17 +242,11 @@ fn render_raw_sql(
                     write!(add_constraint, "CONSTRAINT {} ", renderer.quote(constraint_name))?;
                 }
 
-                write!(add_constraint, "FOREIGN KEY (")?;
-
-                for (idx, column) in foreign_key.columns.iter().enumerate() {
-                    write!(add_constraint, "{}", renderer.quote(column))?;
-
-                    if idx < foreign_key.columns.len() - 1 {
-                        write!(add_constraint, ", ")?;
-                    }
-                }
-
-                write!(add_constraint, ") ")?;
+                write!(
+                    add_constraint,
+                    "FOREIGN KEY ({})",
+                    foreign_key.columns.iter().map(|col| renderer.quote(col)).join(", ")
+                )?;
 
                 add_constraint.push_str(&renderer.render_references(&schema_name, &foreign_key));
 
@@ -253,10 +255,15 @@ fn render_raw_sql(
         },
         SqlMigrationStep::AlterTable(AlterTable { table, changes }) => {
             let mut lines = Vec::new();
-            for change in changes.clone() {
+            for change in changes {
                 match change {
                     TableChange::AddColumn(AddColumn { column }) => {
-                        let col_sql = renderer.render_column(&schema_name, &table, &column, true, next_schema);
+                        let column = ColumnRef {
+                            table,
+                            schema: next_schema,
+                            column,
+                        };
+                        let col_sql = renderer.render_column(&schema_name, column, true);
                         lines.push(format!("ADD COLUMN {}", col_sql));
                     }
                     TableChange::DropColumn(DropColumn { name }) => {
@@ -277,7 +284,12 @@ fn render_raw_sql(
                             None => {
                                 let name = renderer.quote(&name);
                                 lines.push(format!("DROP COLUMN {}", name));
-                                let col_sql = renderer.render_column(&schema_name, &table, &column, true, next_schema);
+                                let column = ColumnRef {
+                                    schema: next_schema,
+                                    table,
+                                    column,
+                                };
+                                let col_sql = renderer.render_column(&schema_name, column, true);
                                 lines.push(format!("ADD COLUMN {}", col_sql));
                             }
                         }
@@ -498,11 +510,139 @@ fn render_drop_enum(
         SqlFamily::Postgres => {
             let sql = format!(
                 "DROP TYPE {enum_name}",
-                enum_name = sql_renderer::postgres_quoted(&drop_enum.name)
+                enum_name = sql_renderer::postgres_quoted(&drop_enum.name),
             );
 
             Ok(vec![sql])
         }
         _ => Ok(Vec::new()),
     }
+}
+
+fn postgres_alter_enum(
+    alter_enum: &AlterEnum,
+    next_schema: &SqlSchema,
+    schema_name: &str,
+) -> anyhow::Result<Vec<String>> {
+    if alter_enum.dropped_variants.is_empty() {
+        let stmts: Vec<String> = alter_enum
+            .created_variants
+            .iter()
+            .map(|created_value| {
+                format!(
+                    "ALTER TYPE {enum_name} ADD VALUE {value}",
+                    enum_name = postgres_quoted(&alter_enum.name),
+                    value = postgres_quoted_string(created_value)
+                )
+            })
+            .collect();
+
+        Ok(stmts)
+    } else {
+        let new_enum = next_schema
+            .get_enum(&alter_enum.name)
+            .ok_or_else(|| anyhow::anyhow!("Enum `{}` not found in target schema.", alter_enum.name))?;
+
+        let mut stmts = Vec::with_capacity(8);
+
+        let tmp_name = format!("{}_new", &new_enum.name);
+        let tmp_old_name = format!("{}_old", &alter_enum.name);
+
+        // create the new enum with tmp name
+        {
+            let create_new_enum = format!(
+                "CREATE TYPE {enum_name} AS ENUM ({variants})",
+                enum_name = postgres_quoted(&tmp_name),
+                variants = new_enum.values.iter().map(postgres_quoted_string).join(", ")
+            );
+
+            stmts.push(create_new_enum);
+        }
+
+        // alter type of the current columns to new, with a cast
+        {
+            let affected_columns = walk_columns(next_schema).filter(|column| match &column.column_type().family {
+                ColumnTypeFamily::Enum(name) if name.as_str() == alter_enum.name.as_str() => true,
+                _ => false,
+            });
+
+            for column in affected_columns {
+                let sql = format!(
+                    "ALTER TABLE {schema_name}.{table_name} \
+                        ALTER COLUMN {column_name} DROP DEFAULT,
+                        ALTER COLUMN {column_name} TYPE {tmp_name} \
+                            USING ({old_name}::text::{tmp_name}),
+                        ALTER COLUMN {column_name} SET DEFAULT {new_enum_default}",
+                    schema_name = postgres_quoted(schema_name),
+                    table_name = postgres_quoted(column.table().name()),
+                    column_name = postgres_quoted(column.name()),
+                    tmp_name = postgres_quoted(&tmp_name),
+                    old_name = alter_enum.name,
+                    new_enum_default = postgres_quoted_string(new_enum.values.first().unwrap()),
+                );
+
+                stmts.push(sql);
+            }
+        }
+
+        // rename old enum
+        {
+            let sql = format!(
+                "ALTER TYPE {enum_name} RENAME TO {tmp_old_name}",
+                enum_name = postgres_quoted(&alter_enum.name),
+                tmp_old_name = postgres_quoted(&tmp_old_name)
+            );
+
+            stmts.push(sql);
+        }
+
+        // rename new enum
+        {
+            let sql = format!(
+                "ALTER TYPE {tmp_name} RENAME TO {enum_name}",
+                tmp_name = postgres_quoted(&tmp_name),
+                enum_name = postgres_quoted(&new_enum.name)
+            );
+
+            stmts.push(sql)
+        }
+
+        // drop old enum
+        {
+            let sql = format!(
+                "DROP TYPE {tmp_old_name}",
+                tmp_old_name = postgres_quoted(&tmp_old_name),
+            );
+
+            stmts.push(sql)
+        }
+
+        Ok(stmts)
+    }
+}
+
+fn mysql_alter_enum(alter_enum: &AlterEnum, next_schema: &SqlSchema, schema_name: &str) -> anyhow::Result<Vec<String>> {
+    let column = sql_schema_helpers::walk_columns(next_schema)
+        .find(|col| match &col.column_type().family {
+            ColumnTypeFamily::Enum(enum_name) if enum_name.as_str() == alter_enum.name.as_str() => true,
+            _ => false,
+        })
+        .ok_or_else(|| anyhow::anyhow!("Could not find column to alter for {:?}", alter_enum))?;
+    let enum_variants = next_schema
+        .get_enum(&alter_enum.name)
+        .ok_or_else(|| anyhow::anyhow!("Couldn't find enum {:?}", alter_enum.name))?
+        .values
+        .iter()
+        .map(mysql_quoted_string)
+        .join(", ");
+
+    let change_column = format!(
+        "ALTER TABLE {schema_name}.{table_name} CHANGE {column_name} {column_name} ENUM({enum_variants})",
+        schema_name = mysql_quoted(schema_name),
+        table_name = mysql_quoted(column.table().name()),
+        column_name = column.name(),
+        enum_variants = enum_variants,
+    );
+
+    Ok(vec![change_column])
 }
