@@ -307,3 +307,42 @@ async fn compound_foreign_keys_should_work_for_one_to_many_relations_with_non_un
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
+
+#[test_each_connector(tags("postgres"))]
+#[test]
+async fn repro_matt_references_on_wrong_side(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("a", |t| {
+                t.add_column("one", types::integer().nullable(false));
+                t.add_column("two", types::integer().nullable(false));
+                t.inject_custom("Primary Key (\"one\", \"two\")");
+            });
+            migration.create_table("b", |t| {
+                t.add_column("id", types::primary());
+                t.add_column("one", types::integer().nullable(false));
+                t.add_column("two", types::integer().nullable(false));
+                t.inject_custom("Foreign Key (\"one\", \"two\") references a(\"one\", \"two\")");
+            });
+        })
+        .await;
+
+    let dm = r#"
+            model a {
+              one Int
+              two Int
+              b   b[]
+                    
+              @@id([one, two])
+            }
+            
+            model b {
+              id Int @id  
+              a  a   @map(["one", "two"])
+            }
+              
+        "#;
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+}
