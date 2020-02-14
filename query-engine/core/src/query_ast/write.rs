@@ -33,9 +33,7 @@ impl WriteQuery {
             .for_each(|(key, value)| self.inject_field_arg(key, value));
     }
 
-    // Injects PrismaValues into the write arguments based the passed field.
-    // If the underlying representation of the field takes multiple values, a compound field is injected.
-    // If values are missing (e.g. empty vec passed), `PrismaValue::Null`(s) are written instead.
+    // Injects PrismaValues into the write arguments based the passed key.
     pub fn inject_field_arg(&mut self, key: String, value: PrismaValue) {
         let args = match self {
             Self::CreateRecord(ref mut x) => &mut x.args,

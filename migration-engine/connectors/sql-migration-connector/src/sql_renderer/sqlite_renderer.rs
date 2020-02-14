@@ -39,7 +39,7 @@ impl super::SqlRenderer for SqliteRenderer {
         let referenced_fields = foreign_key.referenced_columns.iter().map(SqliteQuoted).join(",");
 
         format!(
-            "REFERENCES {referenced_table}({referenced_fields}) {on_delete_action}",
+            "REFERENCES {referenced_table}({referenced_fields}) {on_delete_action} ON UPDATE CASCADE",
             referenced_table = quoted(&foreign_key.referenced_table),
             referenced_fields = referenced_fields,
             on_delete_action = render_on_delete(&foreign_key.on_delete_action)

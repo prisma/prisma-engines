@@ -16,14 +16,14 @@ class DeleteMutationRelationsSpec extends FlatSpec with Matchers with ApiSpecBas
 
       server
         .query(
-          """mutation {
+          s"""mutation {
           |  createChild(data: {
           |    c: "c1"
           |    parentReq: {
           |      create: {p: "p1"}
           |    }
           |  }){
-          |    id
+          |    ${t.child.selection}
           |  }
           |}""",
           project
@@ -33,9 +33,9 @@ class DeleteMutationRelationsSpec extends FlatSpec with Matchers with ApiSpecBas
         s"""
          |mutation {
          |  deleteParent(
-         |  where: {p: "p1"}
+         |    where: {p: "p1"}
          |  ){
-         |  p
+         |    p
          |  }
          |}
       """,
@@ -56,31 +56,31 @@ class DeleteMutationRelationsSpec extends FlatSpec with Matchers with ApiSpecBas
 
       val res = server
         .query(
-          """mutation {
+          s"""mutation {
           |  createParent(data: {
           |    p: "p1"
           |    childReq: {
           |      create: {c: "c1"}
           |    }
           |  }){
-          |    id
+          |    ${t.parent.selection}
           |    childReq{
-          |       id
+          |       ${t.child.selection}
           |    }
           |  }
           |}""",
           project
         )
-      val childId  = res.pathAsString("data.createParent.childReq.id")
-      val parentId = res.pathAsString("data.createParent.id")
+
+      val parentId = t.parent.where(res, "data.createParent")
 
       server.queryThatMustFail(
         s"""
          |mutation {
          |  deleteParent(
-         |  where: {id: "$parentId"}
+         |    where: $parentId
          |  ){
-         |  p
+         |    p
          |  }
          |}
       """,
@@ -93,7 +93,7 @@ class DeleteMutationRelationsSpec extends FlatSpec with Matchers with ApiSpecBas
   }
 
   "a P1! to C1 relation" should "succeed when trying to delete the parent" in {
-    schemaWithRelation(onParent = ChildReq, onChild = ParentOpt).test { t =>
+    schemaWithRelation(onParent = ChildReq, onChild = ParentOpt, withoutParams = true).test { t =>
       val project = SchemaDsl.fromStringV11() {
         t.datamodel
       }
@@ -101,31 +101,29 @@ class DeleteMutationRelationsSpec extends FlatSpec with Matchers with ApiSpecBas
 
       val res = server
         .query(
-          """mutation {
+          s"""mutation {
           |  createParent(data: {
           |    p: "p1"
           |    childReq: {
           |      create: {c: "c1"}
           |    }
           |  }){
-          |  id
+          |    p
           |    childReq{
-          |       id
+          |       c
           |    }
           |  }
           |}""",
           project
         )
 
-      val parentId = res.pathAsString("data.createParent.id")
-
       server.query(
         s"""
          |mutation {
          |  deleteParent(
-         |  where: {id: "$parentId"}
+         |    where: {p:"p1"}
          |  ){
-         |  p
+         |    p
          |  }
          |}
       """,
@@ -135,7 +133,7 @@ class DeleteMutationRelationsSpec extends FlatSpec with Matchers with ApiSpecBas
   }
 
   "a P1 to C1  relation " should "succeed when trying to delete the parent" in {
-    schemaWithRelation(onParent = ChildOpt, onChild = ParentOpt).test { t =>
+    schemaWithRelation(onParent = ChildOpt, onChild = ParentOpt, withoutParams = true).test { t =>
       val project = SchemaDsl.fromStringV11() {
         t.datamodel
       }
@@ -143,31 +141,29 @@ class DeleteMutationRelationsSpec extends FlatSpec with Matchers with ApiSpecBas
 
       val res = server
         .query(
-          """mutation {
+          s"""mutation {
           |  createParent(data: {
           |    p: "p1"
           |    childOpt: {
           |      create: {c: "c1"}
           |    }
           |  }){
-          |    id
+          |    p
           |    childOpt{
-          |       id
+          |       c
           |    }
           |  }
           |}""",
           project
         )
 
-      val parentId = res.pathAsString("data.createParent.id")
-
       server.query(
         s"""
          |mutation {
          |  deleteParent(
-         |  where: {id: "$parentId"}
+         |    where: {p:"p1"}
          |  ){
-         |  p
+         |    p
          |  }
          |}
       """,
@@ -186,11 +182,11 @@ class DeleteMutationRelationsSpec extends FlatSpec with Matchers with ApiSpecBas
 
       server
         .query(
-          """mutation {
+          s"""mutation {
           |  createParent(data: {
           |    p: "p1"
           |  }){
-          |    id
+          |    ${t.parent.selection}
           |  }
           |}""",
           project
@@ -200,9 +196,9 @@ class DeleteMutationRelationsSpec extends FlatSpec with Matchers with ApiSpecBas
         s"""
          |mutation {
          |  deleteParent(
-         |  where: {p: "p1"}
+         |    where: {p: "p1"}
          |  ){
-         |  p
+         |    p
          |  }
          |}
       """,

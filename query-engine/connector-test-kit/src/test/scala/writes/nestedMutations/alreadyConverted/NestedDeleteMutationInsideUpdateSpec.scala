@@ -245,6 +245,9 @@ class NestedDeleteMutationInsideUpdateSpec extends FlatSpec with Matchers with A
         |    }
         |  }){
         |    ${t.parent.selection}
+        |    childrenOpt {
+        |      ${t.child.selection}
+        |    }
         |  }
         |}""",
         project
@@ -270,8 +273,9 @@ class NestedDeleteMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |  updateParent(
          |    where: $parentIdentifier
          |    data:{
-         |    childrenOpt: {delete: $childIdentifier}
-         |  }){
+         |      childrenOpt: {delete: $childIdentifier}
+         |    }
+         |  ){
          |    childrenOpt {
          |      c
          |    }
@@ -496,7 +500,7 @@ class NestedDeleteMutationInsideUpdateSpec extends FlatSpec with Matchers with A
         project
       )
 
-      val childIdentifier = t.child.parseFirst(res, "data.createParent.childrenOpt")
+      val childIdentifier = t.child.whereFirst(res, "data.createParent.childrenOpt")
 
       val res2 = server.query(
         s"""mutation {
@@ -594,7 +598,7 @@ class NestedDeleteMutationInsideUpdateSpec extends FlatSpec with Matchers with A
         project
       )
 
-      val childIdentifier = t.child.parseFirst(res, "data.createParent.childrenOpt")
+      val childIdentifier = t.child.whereFirst(res, "data.createParent.childrenOpt")
 
       val res2 = server.query(
         s"""mutation {

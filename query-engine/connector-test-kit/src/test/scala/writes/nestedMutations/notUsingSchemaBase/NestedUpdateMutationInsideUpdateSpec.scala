@@ -7,6 +7,220 @@ import util._
 class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with ApiSpecBase with SchemaBaseV11 {
   override def runOnlyForCapabilities: Set[ConnectorCapability] = Set(JoinRelationLinksCapability)
 
+  "A P1! to C1! relation relation" should "work" in {
+    schemaWithRelation(onParent = ChildReq, onChild = ParentReq).test { t =>
+      val project = SchemaDsl.fromStringV11() {
+        t.datamodel
+      }
+      database.setup(project)
+
+      val res =
+        server
+          .query(
+            s"""mutation {
+               |  createParent(data: {
+               |    p: "p1", p_1: "p", p_2: "1",
+               |    childReq: {
+               |      create: {c: "c1", c_1: "c", c_2: "1"}
+               |    }
+               |  }){
+               |  
+               |    ${t.parent.selection}
+               |    childReq{
+               |       ${t.child.selection}
+               |    }
+               |  }
+               |}""",
+            project
+          )
+
+      val parentIdentifier = t.parent.where(res, "data.createParent")
+
+      val finalRes = server.query(
+        s"""mutation {
+           |  updateParent(
+           |  where: $parentIdentifier
+           |  data:{
+           |    childReq: {
+           |        update:  {non_unique: "updated"},
+           |          
+           |      }
+           |  }){
+           |    childReq {
+           |      non_unique
+           |    }
+           |  }
+           |}""",
+        project
+      )
+
+      finalRes.toString() should be("{\"data\":{\"updateParent\":{\"childReq\":{\"non_unique\":\"updated\"}}}}")
+
+    }
+  }
+
+  "A P1 to CM relation relation" should "work" in {
+    schemaWithRelation(onParent = ChildOpt, onChild = ParentList).test { t =>
+      val project = SchemaDsl.fromStringV11() {
+        t.datamodel
+      }
+      database.setup(project)
+
+      val res =
+        server
+          .query(
+            s"""mutation {
+               |  createParent(data: {
+               |    p: "p1", p_1: "p", p_2: "1",
+               |    childOpt: {
+               |      create: {c: "c1", c_1: "c", c_2: "1"}
+               |    }
+               |  }){
+               |  
+               |    ${t.parent.selection}
+               |    childOpt{
+               |       ${t.child.selection}
+               |    }
+               |  }
+               |}""",
+            project
+          )
+
+      val parentIdentifier = t.parent.where(res, "data.createParent")
+
+      val finalRes = server.query(
+        s"""mutation {
+           |  updateParent(
+           |  where: $parentIdentifier
+           |  data:{
+           |    childOpt: {
+           |        update:  {non_unique: "updated"},
+           |          
+           |      }
+           |  }){
+           |    childOpt {
+           |      non_unique
+           |    }
+           |  }
+           |}""",
+        project
+      )
+
+      finalRes.toString() should be("{\"data\":{\"updateParent\":{\"childOpt\":{\"non_unique\":\"updated\"}}}}")
+
+    }
+  }
+
+  "A PM to C1 relation relation" should "work" in {
+    schemaWithRelation(onParent = ChildList, onChild = ParentOpt).test { t =>
+      val project = SchemaDsl.fromStringV11() {
+        t.datamodel
+      }
+      database.setup(project)
+
+      val res =
+        server
+          .query(
+            s"""mutation {
+               |  createParent(data: {
+               |    p: "p1", p_1: "p", p_2: "1",
+               |    childrenOpt: {
+               |      create: [{c: "c1", c_1: "c", c_2: "1"},{c: "c2", c_1: "c", c_2: "2"}]
+               |    }
+               |  }){
+               |  
+               |    ${t.parent.selection}
+               |    childrenOpt{
+               |       ${t.child.selection}
+               |    }
+               |  }
+               |}""",
+            project
+          )
+
+      val parentIdentifier = t.parent.where(res, "data.createParent")
+      val childIdentifier  = t.child.whereFirst(res, "data.createParent.childrenOpt")
+
+      val finalRes = server.query(
+        s"""mutation {
+           |  updateParent(
+           |  where: $parentIdentifier
+           |  data:{
+           |    childrenOpt: {
+           |        update:  [
+           |          {where: $childIdentifier, data: {non_unique: "updated"}}
+           |        ]  
+           |      }
+           |  }){
+           |    childrenOpt (orderBy: c_ASC ){
+           |      non_unique
+           |    }
+           |  }
+           |}""",
+        project
+      )
+
+      finalRes.toString() should be("{\"data\":{\"updateParent\":{\"childrenOpt\":[{\"non_unique\":\"updated\"},{\"non_unique\":null}]}}}")
+
+    }
+  }
+
+  "A PM to CM relation relation" should "work" in {
+    schemaWithRelation(onParent = ChildList, onChild = ParentList).test { t =>
+      val project = SchemaDsl.fromStringV11() {
+        t.datamodel
+      }
+      database.setup(project)
+
+      val res =
+        server
+          .query(
+            s"""mutation {
+               |  createParent(data: {
+               |    p: "p1", p_1: "p", p_2: "1",
+               |    childrenOpt: {
+               |      create: [{c: "c1", c_1: "c", c_2: "1"},{c: "c2", c_1: "c", c_2: "2"}]
+               |    }
+               |  }){
+               |  
+               |    ${t.parent.selection}
+               |    childrenOpt{
+               |       ${t.child.selection}
+               |    }
+               |  }
+               |}""",
+            project
+          )
+
+      val parentIdentifier = t.parent.where(res, "data.createParent")
+      val childIdentifier  = t.child.whereFirst(res, "data.createParent.childrenOpt")
+
+      val finalRes = server.query(
+        s"""mutation {
+           |  updateParent(
+           |  where: $parentIdentifier
+           |  data:{
+           |    childrenOpt: {
+           |        update:  [
+           |          {where: $childIdentifier, data: {non_unique: "updated"}}
+           |        ]  
+           |      }
+           |  }){
+           |    childrenOpt (orderBy: c_ASC ){
+           |      non_unique
+           |    }
+           |  }
+           |}""",
+        project
+      )
+
+      finalRes.toString() should be("{\"data\":{\"updateParent\":{\"childrenOpt\":[{\"non_unique\":\"updated\"},{\"non_unique\":null}]}}}")
+
+    }
+  }
+
+  ///OLD
+
   "a one to many relation" should "be updateable by id through a nested mutation" in {
     val project = SchemaDsl.fromStringV11() {
       s"""model Todo {

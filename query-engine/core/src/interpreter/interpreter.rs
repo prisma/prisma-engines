@@ -22,7 +22,7 @@ pub enum ComputationResult {
     Diff(DiffResult),
 }
 
-/// Diff of two prisma value vectors A and B:
+/// Diff of two identifier vectors A and B:
 /// `left` contains all elements that are in A but not in B.
 /// `right` contains all elements that are in B but not in A.
 #[derive(Debug, Clone)]
@@ -37,18 +37,19 @@ impl ExpressionResult {
         let converted = match self {
             Self::Query(ref result) => match result {
                 QueryResult::Id(id) => match id {
-                    Some(id)=> Some(vec![id.clone()]),
-                    // FIXME: AUMFIDARR
-//                    Some(id) if model_id.matches(id) => Some(vec![id.clone()]),
-//                    Some(_) => None,
+                    Some(id) if model_id.matches(id) => Some(vec![id.clone()]),
                     None => Some(vec![]),
+                    Some(id) => {
+                        trace!("RID {:?} does not match MID {:?}", id, model_id);
+                        None
+                    }
                 },
 
                 // We always select IDs, the unwraps are safe.
                 QueryResult::RecordSelection(rs) => Some(
                     rs.scalars
                         .identifiers(model_id)
-                        .unwrap()
+                        .expect("Expected record selection to contain required model ID fields.")
                         .into_iter()
                         .map(|val| val.into())
                         .collect(),

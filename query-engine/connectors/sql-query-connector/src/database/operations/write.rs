@@ -3,7 +3,7 @@ use connector_interface::*;
 use prisma_models::*;
 use prisma_value::PrismaValue;
 use quaint::error::ErrorKind;
-use std::convert::TryFrom;
+use std::{collections::HashMap, convert::TryFrom};
 use user_facing_errors::query_engine::DatabaseConstraint;
 
 pub async fn create_record(conn: &dyn QueryExt, model: &ModelRef, args: WriteArgs) -> crate::Result<RecordIdentifier> {
@@ -60,6 +60,7 @@ pub async fn update_records(
     args: WriteArgs,
 ) -> crate::Result<Vec<RecordIdentifier>> {
     let ids = conn.filter_ids(model, where_.clone()).await?;
+    let id_args = pick_id_args(&model.primary_identifier(), &args);
 
     if ids.len() == 0 {
         return Ok(vec![]);
@@ -74,7 +75,44 @@ pub async fn update_records(
         conn.query(update).await?;
     }
 
-    Ok(ids)
+    Ok(merge_write_args(ids, id_args))
+}
+
+/// Picks all arguments out of `args` that are updating a value for a field
+/// contained in `id`, as those need to be merged into the record ids later on.
+fn pick_id_args(id: &ModelIdentifier, args: &WriteArgs) -> WriteArgs {
+    let pairs: Vec<_> = id
+        .data_source_fields()
+        .into_iter()
+        .filter_map(|dsf| args.get_field_value(&dsf.name).map(|v| (dsf.name.clone(), v.clone())))
+        .collect();
+
+    WriteArgs::from(pairs)
+}
+
+/// Merges the arg values into the given ids. Overwrites existing values.
+fn merge_write_args(ids: Vec<RecordIdentifier>, args: WriteArgs) -> Vec<RecordIdentifier> {
+    if ids.is_empty() || args.is_empty() {
+        return ids;
+    }
+
+    let rid = ids.first().unwrap();
+    let positions: HashMap<usize, &PrismaValue> = rid
+        .pairs
+        .iter()
+        .enumerate()
+        .filter_map(|(i, (dsf, _))| args.get_field_value(&dsf.name).map(|val| (i, val)))
+        .collect();
+
+    ids.into_iter()
+        .map(|mut id| {
+            for (position, value) in positions.iter() {
+                id.pairs[position.to_owned()].1 = (*value).clone();
+            }
+
+            id
+        })
+        .collect()
 }
 
 pub async fn delete_records(conn: &dyn QueryExt, model: &ModelRef, where_: Filter) -> crate::Result<usize> {

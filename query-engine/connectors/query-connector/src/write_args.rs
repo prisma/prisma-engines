@@ -15,6 +15,14 @@ impl From<HashMap<String, PrismaValue>> for WriteArgs {
     }
 }
 
+impl From<Vec<(String, PrismaValue)>> for WriteArgs {
+    fn from(pairs: Vec<(String, PrismaValue)>) -> Self {
+        Self {
+            args: pairs.into_iter().collect(),
+        }
+    }
+}
+
 impl WriteArgs {
     pub fn new() -> Self {
         Self { args: HashMap::new() }
@@ -42,6 +50,14 @@ impl WriteArgs {
 
     pub fn keys(&self) -> Keys<String, PrismaValue> {
         self.args.keys()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.args.is_empty()
+    }
+
+    pub fn len(&self) -> usize {
+        self.args.len()
     }
 
     pub fn add_datetimes(&mut self, model: ModelRef) {
@@ -75,9 +91,13 @@ impl WriteArgs {
     pub fn as_record_identifier(&self, id: ModelIdentifier) -> Option<RecordIdentifier> {
         let pairs: Vec<_> = id
             .data_source_fields()
-            .filter_map(|dsf| {
-                self.get_field_value(dsf.name.as_str())
-                    .map(|val| (dsf.clone(), val.clone()))
+            .map(|dsf| {
+                let val = match self.get_field_value(dsf.name.as_str()) {
+                    Some(val) => val.clone(),
+                    None => PrismaValue::Null,
+                };
+
+                (dsf.clone(), val.clone())
             })
             .collect();
 

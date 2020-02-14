@@ -107,6 +107,13 @@ impl ModelIdentifier {
                 .into())
         }
     }
+
+    pub fn empty_record_id(&self) -> RecordIdentifier {
+        self.data_source_fields()
+            .map(|dsf| (dsf.clone(), PrismaValue::Null))
+            .collect::<Vec<_>>()
+            .into()
+    }
 }
 
 impl IntoIterator for ModelIdentifier {
@@ -167,6 +174,7 @@ impl RecordIdentifier {
         return false;
     }
 
+    // [DTODO] Remove
     pub fn single_value(&self) -> PrismaValue {
         assert_eq!(
             self.pairs.len(),
@@ -300,18 +308,18 @@ impl Record {
                 model: String::new(),
             })
         })?;
+
+        // [DTODO] Revert to old code
+        // Ok(&self.values[index])
         match self.values.get(index) {
             Some(v) => Ok(v),
-            None => {
-                //panic!("boom")
-                Err(DomainError::FieldNotFound {
-                    name: field.to_owned(),
-                    model: format!(
-                        "Field not found in record {:?}. Field names were: {:?}",
-                        &self, &field_names
-                    ),
-                })
-            }
+            None => Err(DomainError::FieldNotFound {
+                name: field.to_owned(),
+                model: format!(
+                    "Field not found in record {:?}. Field names were: {:?}",
+                    &self, &field_names
+                ),
+            }),
         }
     }
 

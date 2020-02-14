@@ -51,6 +51,7 @@ case class TestDataModelsWrapper(
           println(s"name:  $connectorName")
           println(s"index: $index")
           println(s"tag:   ${connectorTag.entryName}")
+          println(s"schema: \n ${dm}")
           println("*" * 75)
           fn(dm)
         }
@@ -63,7 +64,14 @@ case class TestDataModelsWrapper(
 
 }
 
-case class QueryParams(selection: String, where: (JsValue, String) => String, parseFirst: (JsValue, String) => String, parseAll: (JsValue, String) => String)
+case class QueryParams(
+    selection: String,
+    where: (JsValue, String) => String,
+    whereMulti: (JsValue, String) => Vector[String],
+) {
+  def whereFirst(json: JsValue, path: String): String = this.whereMulti(json, path)(0)
+  def whereAll(json: JsValue, path: String): String   = "[" + this.whereMulti(json, path).mkString(", ") + "]"
+}
 
 case class TestAbstraction(datamodel: String, parent: QueryParams, child: QueryParams)
 
@@ -114,6 +122,7 @@ case class AbstractTestDataModelsWrapper(
           println(s"name:  $connectorName")
           println(s"index: $index")
           println(s"tag:   ${connectorTag.entryName}")
+          println(s"schema: \n ${dm.datamodel}")
           println("*" * 75)
           fn(dm)
         }

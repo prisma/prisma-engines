@@ -1,9 +1,10 @@
+use super::utils::IdFilter;
 use super::*;
 use crate::{
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
-    FilteredQuery, InputAssertions, ParsedInputMap, ParsedInputValue, Query, WriteQuery,
+    InputAssertions, ParsedInputMap, ParsedInputValue, Query, WriteQuery,
 };
-use connector::{Filter, ScalarCompare};
+use connector::Filter;
 use itertools::Itertools;
 use prisma_models::{ModelRef, PrismaValue, RelationFieldRef};
 use std::convert::TryInto;
@@ -87,7 +88,6 @@ pub fn connect_nested_disconnect(
 /// inject the required IDs after the parents executed.
 ///
 /// The resulting graph:
-/// (dashed indicates that those nodes and edges are not created in this function)
 /// ```text
 ///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ┐
 /// ┌──      Parent       ─ ─ ─ ─ ─
@@ -133,7 +133,7 @@ fn handle_many_to_many(
 /// Depending on where the relation is inlined, an update node will be inserted:
 /// (dashed indicates that those nodes and edges are not created in this function)
 /// ```text
-/// Inlined on parent:        Inlined on child:
+/// Inlined on parent:             Inlined on child:
 ///
 ///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ┐            ┌ ─ ─ ─ ─ ─ ─ ─ ─ ┐
 /// ┌──      Parent                ┌──      Parent
@@ -154,7 +154,7 @@ fn handle_many_to_many(
 ///    └─────────────────┘            └─────────────────┘
 /// ```
 ///
-/// Assumes that both `Parent` and `Child` return IDs.
+/// Assumes that both `Parent` and `Child` return the necessary IDs.
 /// We need to check that _both_ actually do return IDs to ensure that they're connected,
 /// regardless of which ID is used in the end to perform the update.
 ///
@@ -167,7 +167,7 @@ fn handle_one_to_x(
 ) -> QueryGraphBuilderResult<()> {
     let filter_size = filter.size();
 
-    // Fetches children to be disconnected.
+    // Fetches the children to be disconnected.
     let find_child_records_node =
         utils::insert_find_children_by_parent_node(graph, &parent_node, parent_relation_field, filter)?;
 
@@ -184,39 +184,39 @@ fn handle_one_to_x(
         node_to_attach,
         node_to_check,
         model_to_update,
-        relation_field_name,
-        id_field,
         expected_disconnects,
-        primary_identifier,
-    ) = if parent_relation_field.relation_is_inlined_in_parent() {
+        extractor_model_id,
+        null_record_id,
+        check_model_id,
+    ) = if parent_relation_field.is_inlined_on_enclosing_model() {
         let parent_model = parent_relation_field.model();
-        let relation_field_name = parent_relation_field.name.clone();
-        let parent_model_id = parent_model.fields().find_singular_id().unwrap().upgrade().unwrap();
-        let primary_identifier = parent_model.primary_identifier();
+        let extractor_model_id = parent_model.primary_identifier();
+        let null_record_id = parent_relation_field.linking_fields().empty_record_id();
+        let check_model_id = child_relation_field.model().primary_identifier();
 
         (
             parent_node,
             &find_child_records_node,
             parent_model,
-            relation_field_name,
-            parent_model_id,
             std::cmp::max(filter_size, 1),
-            primary_identifier,
+            extractor_model_id,
+            null_record_id,
+            check_model_id,
         )
     } else {
         let child_model = child_relation_field.model();
-        let relation_field_name = child_relation_field.name.clone();
-        let child_model_id = child_model.fields().find_singular_id().unwrap().upgrade().unwrap();
-        let primary_identifier = child_model.primary_identifier();
+        let extractor_model_id = child_model.primary_identifier();
+        let null_record_id = child_relation_field.linking_fields().empty_record_id();
+        let check_model_id = parent_relation_field.model().primary_identifier();
 
         (
             &find_child_records_node,
             parent_node,
             child_model,
-            relation_field_name,
-            child_model_id,
             1,
-            primary_identifier,
+            extractor_model_id,
+            null_record_id,
+            check_model_id,
         )
     };
 
@@ -230,8 +230,8 @@ fn handle_one_to_x(
         node_to_attach,
         &update_node,
         QueryGraphDependency::ParentIds(
-            primary_identifier.clone(),
-            Box::new(move |mut child_node, mut parent_ids| {
+            extractor_model_id,
+            Box::new(move |mut update_node, parent_ids| {
                 if parent_ids.len() == 0 {
                     return Err(QueryGraphBuilderError::RecordsNotConnected {
                         relation_name,
@@ -241,32 +241,17 @@ fn handle_one_to_x(
                 }
 
                 // Handle finder / filter injection
-                match child_node {
-                    Node::Query(Query::Write(WriteQuery::UpdateManyRecords(ref mut ur))) => {
-                        ur.filter = Filter::or(
-                            parent_ids
-                                .into_iter()
-                                .map(|id| id_field.data_source_field().clone().equals(id.single_value()))
-                                .collect::<Vec<Filter>>(),
-                        )
-                    }
-
-                    Node::Query(Query::Write(ref mut wq)) => wq.add_filter(
-                        id_field
-                            .data_source_field()
-                            .equals(parent_ids.pop().unwrap().single_value()),
-                    ),
-
-                    _ => unimplemented!(),
+                if let Node::Query(Query::Write(WriteQuery::UpdateManyRecords(ref mut ur))) = update_node {
+                    let filters: Vec<_> = parent_ids.into_iter().map(|id| id.filter()).collect();
+                    ur.filter = Filter::or(filters);
                 };
 
                 // Handle arg injection
-                if let Node::Query(Query::Write(ref mut wq)) = child_node {
-                    //                    wq.inject_non_list_arg(relation_field_name, PrismaValue::Null);
-                    wq.inject_field_arg(relation_field_name, PrismaValue::Null);
+                if let Node::Query(Query::Write(ref mut wq)) = update_node {
+                    wq.inject_id_into_args(null_record_id);
                 }
 
-                Ok(child_node)
+                Ok(update_node)
             }),
         ),
     )?;
@@ -280,7 +265,7 @@ fn handle_one_to_x(
         node_to_check,
         &update_node,
         QueryGraphDependency::ParentIds(
-            primary_identifier.clone(),
+            check_model_id,
             Box::new(move |child_node, parent_ids| {
                 if parent_ids.len() != expected_disconnects {
                     return Err(QueryGraphBuilderError::RecordsNotConnected {

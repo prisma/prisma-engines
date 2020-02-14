@@ -36,23 +36,6 @@ fn id_should_error_if_unique_and_id_are_specified() {
 }
 
 #[test]
-fn id_should_error_on_model_without_id() {
-    let dml = r#"
-    model Model {
-        id String
-    }
-    "#;
-
-    let errors = parse_error(dml);
-
-    errors.assert_is(DatamodelError::new_model_validation_error(
-        "Each model must have exactly one id criteria. Either mark a single field with `@id` or add a multi field id criterion with `@@id([])` to the model.",
-        "Model",
-        Span::new(5, 42),
-    ));
-}
-
-#[test]
 fn id_should_error_multiple_ids_are_provided() {
     let dml = r#"
     model Model {
@@ -84,7 +67,7 @@ fn id_must_error_when_single_and_multi_field_id_is_used() {
     let errors = parse_error(dml);
 
     errors.assert_is(DatamodelError::new_model_validation_error(
-        "Each model must have exactly one id criteria. Either mark a single field with `@id` or add a multi field id criterion with `@@id([])` to the model.",
+        "Each model must have at most one id criteria. You can\'t have `@id` and `@@id` at the same time.",
         "Model",
         Span::new(5, 104),
     ));

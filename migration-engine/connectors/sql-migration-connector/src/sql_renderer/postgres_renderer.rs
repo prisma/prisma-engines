@@ -35,7 +35,7 @@ impl super::SqlRenderer for PostgresRenderer {
         let referenced_columns = foreign_key.referenced_columns.iter().map(quoted).join(",");
 
         format!(
-            "REFERENCES {}.{}({}) {}",
+            "REFERENCES {}.{}({}) {}  ON UPDATE CASCADE",
             quoted(schema_name),
             quoted(&foreign_key.referenced_table),
             referenced_columns,

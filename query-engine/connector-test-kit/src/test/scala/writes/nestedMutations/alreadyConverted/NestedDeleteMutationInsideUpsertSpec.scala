@@ -1,4 +1,4 @@
-package writes.nestedMutations
+package writes.nestedMutations.alreadyConverted
 
 import org.scalatest.{FlatSpec, Matchers}
 import util.ConnectorCapability.JoinRelationLinksCapability
@@ -8,7 +8,7 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
   override def runOnlyForCapabilities = Set(JoinRelationLinksCapability)
 
   "a P1! to C1! relation " should "error when deleting the child" in {
-    schemaWithRelation(onParent = ChildReq, onChild = ParentReq).test { t =>
+    schemaWithRelation(onParent = ChildReq, onChild = ParentReq).test(9) { t =>
       val project = SchemaDsl.fromStringV11() {
         t.datamodel
       }
@@ -16,28 +16,28 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
 
       val res = server
         .query(
-          """mutation {
+          s"""mutation {
           |  createParent(data: {
-          |    p: "p1"
+          |    p: "p1", p_1: "p", p_2: "1"
           |    childReq: {
           |      create: {c: "c1"}
           |    }
           |  }){
-          |    id
+          |    ${t.parent.selection}
           |    childReq{
-          |       id
+          |       ${t.child.selection}
           |    }
           |  }
           |}""",
           project
         )
-      val childId  = res.pathAsString("data.createParent.childReq.id")
-      val parentId = res.pathAsString("data.createParent.id")
+      val childId  = t.child.where(res, "data.createParent.childReq")
+      val parentId = t.parent.where(res, "data.createParent")
 
       server.queryThatMustFail(
         s"""mutation {
          |  upsertParent(
-         |  where: {id: "$parentId"}
+         |  where: $parentId
          |  update:{
          |    p: "p2"
          |    childReq: {delete: true}
@@ -54,7 +54,6 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
         errorCode = 0,
         errorContains = "Argument 'update' expected model 'ParentUpdateInput!'"
       )
-
     }
   }
 
@@ -67,29 +66,29 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
 
       val res = server
         .query(
-          """mutation {
+          s"""mutation {
           |  createParent(data: {
-          |    p: "p1"
+          |    p: "p1", p_1: "p", p_2: "1"
           |    childReq: {
           |      create: {c: "c1"}
           |    }
           |  }){
-          |  id
+          |    ${t.parent.selection}
           |    childReq{
-          |       id
+          |       ${t.child.selection}
           |    }
           |  }
           |}""",
           project
         )
 
-      val childId  = res.pathAsString("data.createParent.childReq.id")
-      val parentId = res.pathAsString("data.createParent.id")
+      val childId  = t.child.where(res, "data.createParent.childReq")
+      val parentId = t.parent.where(res, "data.createParent")
 
       server.queryThatMustFail(
         s"""mutation {
          |  upsertParent(
-         |  where: {id: "$parentId"}
+         |  where: $parentId
          |  update:{
          |    p: "p2"
          |    childReq: {delete: true}
@@ -119,30 +118,30 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
 
       val res = server
         .query(
-          """mutation {
+          s"""mutation {
           |  createParent(data: {
-          |    p: "p1"
+          |    p: "p1", p_1: "p", p_2: "1"
           |    childOpt: {
           |      create: {c: "c1"}
           |    }
           |  }){
-          |    id
+          |    ${t.parent.selection}
           |    childOpt{
-          |       id
+          |       ${t.child.selection}
           |    }
           |  }
           |}""",
           project
         )
 
-      val childId  = res.pathAsString("data.createParent.childOpt.id")
-      val parentId = res.pathAsString("data.createParent.id")
+      val childId  = t.child.where(res, "data.createParent.childOpt")
+      val parentId = t.parent.where(res, "data.createParent")
 
       val res2 = server.query(
         s"""
          |mutation {
          |  upsertParent(
-         |  where:{id: "$parentId"}
+         |  where: $parentId
          |  update:{
          |    p: "p2"
          |    childOpt: {delete: true}
@@ -170,34 +169,34 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
       }
       database.setup(project)
 
-      val child1Id = server
+      val child1Result = server
         .query(
-          """mutation {
+          s"""mutation {
           |  createChild(data: {c: "c1"})
           |  {
-          |    id
+          |    ${t.child.selection}
           |  }
           |}""",
           project
         )
-        .pathAsString("data.createChild.id")
+      val child1Id = t.child.where(child1Result, "data.createChild")
 
-      val parent1Id = server
+      val parent1Result = server
         .query(
-          """mutation {
-          |  createParent(data: {p: "p1"})
+          s"""mutation {
+          |  createParent(data: {p: "p1", p_1: "p", p_2: "1"})
           |  {
-          |    id
+          |    ${t.parent.selection}
           |  }
           |}""",
           project
         )
-        .pathAsString("data.createParent.id")
+      val parent1Id = t.parent.where(parent1Result, "data.createParent")
 
       val res = server.queryThatMustFail(
         s"""mutation {
          |  upsertParent(
-         |  where:{id: "$parent1Id"}
+         |  where: $parent1Id
          |  update:{
          |    p: "p2"
          |    childOpt: {delete: true}
@@ -225,14 +224,15 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
       }
       database.setup(project)
 
-      server.query(
-        """mutation {
+      val parentResult = server.query(
+        s"""mutation {
         |  createParent(data: {
-        |    p: "p1"
+        |    p: "p1", p_1: "p", p_2: "1"
         |    childrenOpt: {
         |      create: {c: "c1"}
         |    }
         |  }){
+        |    ${t.parent.selection}
         |    childrenOpt{
         |       c
         |    }
@@ -240,12 +240,13 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
         |}""",
         project
       )
+      val parentIdentifier = t.parent.where(parentResult, "data.createParent")
 
       server.query(
         s"""
          |mutation {
          |  upsertParent(
-         |    where: {p: "p1"}
+         |    where: $parentIdentifier
          |    update:{
          |    childrenOpt: {delete: {c: "c1"}}
          |  }
@@ -270,14 +271,15 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
       }
       database.setup(project)
 
-      server.query(
-        """mutation {
+      val parentResult = server.query(
+        s"""mutation {
         |  createParent(data: {
-        |    p: "p1"
+        |    p: "p1", p_1: "p", p_2: "1"
         |    childOpt: {
         |      create: {c: "c1"}
         |    }
         |  }){
+        |    ${t.parent.selection}
         |    childOpt{
         |       c
         |    }
@@ -285,12 +287,13 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
         |}""",
         project
       )
+      val parentIdentifier1 = t.parent.where(parentResult, "data.createParent")
 
       server.query(
         s"""
          |mutation {
          |  upsertParent(
-         |  where: {p: "p1"}
+         |  where: $parentIdentifier1
          |  update:{
          |    childOpt: {delete: true}
          |  }
@@ -315,15 +318,16 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
       }
       database.setup(project)
 
-      server
+      val parentResult = server
         .query(
-          """mutation {
+          s"""mutation {
           |  createParent(data: {
-          |    p: "p1"
+          |    p: "p1", p_1: "p", p_2: "1"
           |    childrenOpt: {
           |      create: [{c: "c1"}, {c: "c2"}]
           |    }
           |  }){
+          |    ${t.parent.selection}
           |    childrenOpt{
           |       c
           |    }
@@ -331,12 +335,13 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
           |}""",
           project
         )
+      val parentIdentifier = t.parent.where(parentResult, "data.createParent")
 
       val res = server.query(
         s"""
          |mutation {
          |  upsertParent(
-         |  where: { p: "p1"}
+         |  where: $parentIdentifier
          |  update:{
          |    childrenOpt: {delete: [{c: "c2"}]}
          |  }
@@ -363,14 +368,15 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
       }
       database.setup(project)
 
-      server.query(
-        """mutation {
+      val parentResult = server.query(
+        s"""mutation {
         |  createParent(data: {
-        |    p: "p1"
+        |    p: "p1", p_1: "p", p_2: "1"
         |    childReq: {
         |      create: {c: "c1"}
         |    }
         |  }){
+        |    ${t.parent.selection}
         |    childReq{
         |       c
         |    }
@@ -378,11 +384,12 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
         |}""",
         project
       )
+      val parentIdentifier = t.parent.where(parentResult, "data.createParent")
 
       server.queryThatMustFail(
         s"""mutation {
          |  upsertParent(
-         |  where: {p: "p1"}
+         |  where: $parentIdentifier
          |  update:{
          |    childReq: {delete: true}
          |  }
@@ -408,14 +415,15 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
       }
       database.setup(project)
 
-      server.query(
-        """mutation {
+      val parentResult = server.query(
+        s"""mutation {
         |  createParent(data: {
-        |    p: "p1"
+        |    p: "p1", p_1: "p", p_2: "1"
         |    childOpt: {
         |      create: {c: "c1"}
         |    }
         |  }){
+        |    ${t.parent.selection}
         |    childOpt{
         |       c
         |    }
@@ -423,12 +431,13 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
         |}""",
         project
       )
+      val parentIdentifier = t.parent.where(parentResult, "data.createParent")
 
       val res = server.query(
         s"""
          |mutation {
          |  upsertParent(
-         |    where: {p: "p1"}
+         |    where: $parentIdentifier
          |    update:{childOpt: {delete: true}}
          |    create:{p: "Should not matter"}
          |  ){
@@ -455,14 +464,15 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
       }
       database.setup(project)
 
-      server.query(
-        """mutation {
+      val parentResult = server.query(
+        s"""mutation {
         |  createParent(data: {
-        |    p: "p1"
+        |    p: "p1", p_1: "p", p_2: "1"
         |    childrenOpt: {
         |      create: [{c: "c1"},{c: "c2"}]
         |    }
         |  }){
+        |    ${t.parent.selection}
         |    childrenOpt{
         |       c
         |    }
@@ -470,12 +480,13 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
         |}""",
         project
       )
+      val parentIdentifier = t.parent.where(parentResult, "data.createParent")
 
       val res = server.query(
         s"""
          |mutation {
          |  upsertParent(
-         |  where: { p: "p1"}
+         |  where: $parentIdentifier
          |  update:{
          |    childrenOpt: {delete: [{c: "c1"}, {c: "c2"}]}
          |  }

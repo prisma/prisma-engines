@@ -86,7 +86,7 @@ class NestedConnectMutationInsideCreateSpec extends FlatSpec with Matchers with 
         s"""
            |mutation {
            |  createParent(data:{
-           |    p: "p2"
+           |    p: "p2", p_1: "p", p_2: "2"
            |    childReq: {connect: $child1}
            |  }){
            |    childReq {
@@ -301,7 +301,7 @@ class NestedConnectMutationInsideCreateSpec extends FlatSpec with Matchers with 
       }
       database.setup(project)
 
-      val child = t.child.parseFirst(
+      val child = t.child.whereFirst(
         server
           .query(
             s"""mutation {
@@ -444,24 +444,24 @@ class NestedConnectMutationInsideCreateSpec extends FlatSpec with Matchers with 
       }
       database.setup(project)
 
-      val child1Id = server
+      val child1Result = server
         .query(
-          """mutation {
-            |  createChild(data: {c: "c1"})
+          s"""mutation {
+            |  createChild(data: {c: "c1", c_1: "c", c_2: "1"})
             |  {
-            |    id
+            |    ${t.child.selection}
             |  }
             |}""".stripMargin,
           project
         )
-        .pathAsString("data.createChild.id")
+      val child1Id = t.child.where(child1Result, "data.createChild")
 
       val res = server.query(
         s"""
            |mutation {
            |  createParent(data:{
            |    p: "p2"
-           |    childrenOpt: {connect: {c: "c1"}}
+           |    childrenOpt: {connect: $child1Id}
            |  }){
            |    childrenOpt {
            |      c
@@ -484,24 +484,24 @@ class NestedConnectMutationInsideCreateSpec extends FlatSpec with Matchers with 
       }
       database.setup(project)
 
-      val child1Id = server
+      val child1Result = server
         .query(
-          """mutation {
+          s"""mutation {
             |  createChild(data: {c: "c1"})
             |  {
-            |    id
+            |    ${t.child.selection}
             |  }
             |}""".stripMargin,
           project
         )
-        .pathAsString("data.createChild.id")
+      val child1Id = t.child.where(child1Result, "data.createChild")
 
       server.queryThatMustFail(
         s"""
            |mutation {
            |  createParent(data:{
            |    p: "p2"
-           |    childrenOpt: {connect: [{c: "c1"}, {c: "DOES NOT EXIST"}]}
+           |    childrenOpt: {connect: [$child1Id, {c: "DOES NOT EXIST"}]}
            |  }){
            |    childrenOpt {
            |      c

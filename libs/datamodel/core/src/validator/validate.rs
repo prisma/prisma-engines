@@ -1,7 +1,7 @@
 use crate::{
     ast, configuration, dml,
     error::{DatamodelError, ErrorCollection},
-    FieldArity,
+    FieldArity, IndexType,
 };
 
 /// Helper for validating a datamodel.
@@ -90,17 +90,34 @@ impl<'a> Validator<'a> {
         ));
 
         let multiple_id_criteria_error = Err(DatamodelError::new_model_validation_error(
-            "Each model must have exactly one id criteria. Either mark a single field with `@id` or add a multi field id criterion with `@@id([])` to the model.",
+            "Each model must have at most one id criteria. You can't have `@id` and `@@id` at the same time.",
             &model.name,
             ast_model.span,
         ));
 
-        match (model.singular_id_fields().count(), model.id_fields.is_empty()) {
-            (c, _) if c > 1 => multiple_single_field_id_error,
-            (0, true) => multiple_id_criteria_error,
-            (1, false) => multiple_id_criteria_error,
-            (1, true) | (0, false) => Ok(()),
-            (_, _) => unreachable!(), // the compiler does not check the first if guard
+        let missing_id_criteria_error = Err(DatamodelError::new_model_validation_error(
+            "Each model must have at least one unique criteria. Either mark a single field with `@id`, `@unique` or add a multi field criterion with `@@id([])` or `@@unique([])` to the model.",
+            &model.name,
+            ast_model.span,
+        ));
+
+        let has_single_field_id = model.singular_id_fields().next().is_some();
+        let has_multi_field_id = !model.id_fields.is_empty();
+        let has_single_field_unique = model.fields().find(|f| f.is_unique).is_some();
+        let has_multi_field_unique = model.indices.iter().find(|i| i.tpe == IndexType::Unique).is_some();
+
+        if model.singular_id_fields().count() > 1 {
+            return multiple_single_field_id_error;
+        }
+
+        if has_single_field_id && has_multi_field_id {
+            return multiple_id_criteria_error;
+        }
+
+        if has_single_field_id || has_multi_field_id || has_single_field_unique || has_multi_field_unique {
+            Ok(())
+        } else {
+            missing_id_criteria_error
         }
     }
 

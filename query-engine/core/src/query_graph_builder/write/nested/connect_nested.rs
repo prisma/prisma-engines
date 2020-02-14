@@ -1,3 +1,4 @@
+use super::utils::IdFilter;
 use super::*;
 use crate::{
     query_ast::*,
@@ -5,7 +6,7 @@ use crate::{
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
     ParsedInputMap, ParsedInputValue, QueryResult,
 };
-use connector::{Filter, ScalarCompare};
+use connector::Filter;
 use itertools::Itertools;
 use prisma_models::{ModelRef, RelationFieldRef};
 use std::convert::TryInto;
@@ -126,7 +127,7 @@ fn handle_many_to_many(
 ///
 /// ---
 ///
-/// In case the relation is inline in the child, we can have the parent execute first,
+/// In case the relation is inlined in the child, we execute the parent operation first,
 /// then do an update on the child to insert the parent ID into the inline relation field.
 /// ```text
 /// ┌ ─ ─ ─ ─ ─ ─ ─ ─ ┐
@@ -148,6 +149,7 @@ fn handle_many_to_many(
 /// The ID of the parent is injected into the child operation. This can be more than one record getting updated.
 ///
 /// Checks are performed to ensure that the correct number of records got connected.
+/// If the check fails a runtime error occurs.
 fn handle_one_to_many(
     graph: &mut QueryGraph,
     parent_node: NodeRef,
@@ -158,59 +160,59 @@ fn handle_one_to_many(
     let parent_model_identifier = parent_relation_field.model().primary_identifier();
     let child_model_identifier = parent_relation_field.related_model().primary_identifier();
 
-    if parent_relation_field.relation_is_inlined_in_parent() {
-        let read_query = utils::read_ids_infallible(child_model.clone(), child_model_identifier, child_filter);
-        let child_node = graph.create_node(read_query);
+    dbg!(parent_relation_field);
+    dbg!(parent_relation_field.relation_is_inlined_in_parent());
 
-        // For the injection, we need the name of the field on the inlined side, in this case the parent.
-        let relation_field_name = parent_relation_field.name.clone();
+    if parent_relation_field.relation_is_inlined_in_parent() {
+        let read_query = utils::read_ids_infallible(child_model.clone(), child_model_identifier.clone(), child_filter);
+        let read_children_node = graph.create_node(read_query);
+        let parent_linking_fields = parent_relation_field.linking_fields();
+        dbg!(&parent_linking_fields);
 
         // We need to swap the read node and the parent because the inlining is done in the parent, and we need to fetch the IDs first.
-        graph.mark_nodes(&parent_node, &child_node);
+        graph.mark_nodes(&parent_node, &read_children_node);
 
         graph.create_edge(
-                 &parent_node,
-                 &child_node,
-                 QueryGraphDependency::ParentIds(parent_model_identifier, Box::new(move |mut child_node, mut parent_ids| {
-                     let parent_id = match parent_ids.pop() {
-                         Some(pid) => Ok(pid),
-                         None => Err(QueryGraphBuilderError::AssertionError(format!(
-                             "[Query Graph] Expected a valid parent ID to be present for a nested connect on a one-to-many relation."
-                         ))),
-                     }?;
+            &parent_node,
+            &read_children_node,
+            QueryGraphDependency::ParentIds(child_model_identifier, Box::new(move |mut child_node, mut parent_ids| {
+                let parent_id = match parent_ids.pop() {
+                    Some(pid) => Ok(pid),
+                    None => Err(QueryGraphBuilderError::AssertionError(format!(
+                        "[Query Graph] Expected a valid parent ID to be present for a nested connect on a one-to-many relation."
+                    ))),
+                }?;
 
-                     if let Node::Query(Query::Write(ref mut wq)) = child_node {
-                         wq.inject_field_arg(relation_field_name, parent_id.single_value());
-                     }
+                if let Node::Query(Query::Write(ref mut wq)) = child_node {
+                    wq.inject_id_into_args(parent_linking_fields.assimilate(parent_id)?);
+                }
 
-                     Ok(child_node)
-                 })),
-             )?;
+                Ok(child_node)
+            })),
+        )?;
     } else {
         let expected_id_count = child_filter.size();
         let update_node = utils::update_records_node_placeholder(graph, child_filter, Arc::clone(child_model));
         let check_node = graph.create_node(Node::Empty);
-
-        // For the injection, we need the name of the field on the inlined side, in this case the child.
-        let relation_field_name = parent_relation_field.related_field().name.clone();
+        let child_linking_fields = parent_relation_field.related_field().linking_fields();
 
         graph.create_edge(
-             &parent_node,
-             &update_node,
-             QueryGraphDependency::ParentIds(parent_model_identifier, Box::new(move |mut child_node, mut parent_ids| {
-                 let parent_id = match parent_ids.pop() {
-                     Some(pid) => Ok(pid),
-                     None => Err(QueryGraphBuilderError::AssertionError(format!(
-                         "[Query Graph] Expected a valid parent ID to be present for a nested connect on a one-to-many relation."
-                     ))),
-                 }?;
+            &parent_node,
+            &update_node,
+            QueryGraphDependency::ParentIds(parent_model_identifier, Box::new(move |mut child_node, mut parent_ids| {
+                let parent_id = match parent_ids.pop() {
+                    Some(pid) => Ok(pid),
+                    None => Err(QueryGraphBuilderError::AssertionError(format!(
+                        "[Query Graph] Expected a valid parent ID to be present for a nested connect on a one-to-many relation."
+                    ))),
+                }?;
 
-                 if let Node::Query(Query::Write(ref mut wq)) = child_node {
-                     wq.inject_field_arg(relation_field_name, parent_id.single_value());
-                 }
+                if let Node::Query(Query::Write(ref mut wq)) = child_node {
+                    wq.inject_id_into_args(child_linking_fields.assimilate(parent_id)?)
+                }
 
-                 Ok(child_node)
-             })),
+                Ok(child_node)
+            })),
          )?;
 
         // Check that all specified children have been updated.
@@ -291,11 +293,11 @@ fn handle_one_to_many(
 /// │  └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
 /// │
 /// │  ┌────────────────────────┐
-/// ├─▶│      Update Child      │  (if inlined on the child)
+/// ├─▶│      Update Child      │  (if inlined in the child)
 /// │  └────────────────────────┘
 /// │
 /// │  ┌────────────────────────┐
-/// └─▶│     Update Parent      │  (if inlined on the parent and non-create)
+/// └─▶│     Update Parent      │  (if inlined in the parent and non-create)
 ///    └────────────────────────┘
 /// ```
 /// Where [1] and [2] are checks and disconnects inserted into the graph based
@@ -329,23 +331,15 @@ fn handle_one_to_one(
     filter: Filter,
     child_model: &ModelRef,
 ) -> QueryGraphBuilderResult<()> {
-    let child_model_id_field = child_model.fields().find_singular_id().unwrap().upgrade().unwrap();
-    let parent_model_id = parent_relation_field
-        .model()
-        .fields()
-        .find_singular_id()
-        .unwrap()
-        .upgrade()
-        .unwrap();
-
-    let parent_model_identifier = parent_relation_field.model().primary_identifier();
-    let child_model_identifier = parent_relation_field.related_model().primary_identifier();
+    let parent_linking_fields = parent_relation_field.linking_fields();
+    let child_linking_fields = parent_relation_field.related_field().linking_fields();
 
     let parent_is_create = utils::node_is_create(graph, &parent_node);
     let child_relation_field = parent_relation_field.related_field();
     let parent_side_required = parent_relation_field.is_required;
     let child_side_required = child_relation_field.is_required;
     let relation_inlined_parent = parent_relation_field.relation_is_inlined_in_parent();
+    let relation_inlined_child = !relation_inlined_parent;
 
     // Build-time check
     if parent_side_required && child_side_required {
@@ -356,7 +350,7 @@ fn handle_one_to_one(
         ));
     }
 
-    let read_query = utils::read_ids_infallible(child_model.clone(), child_model_identifier.clone(), filter);
+    let read_query = utils::read_ids_infallible(child_model.clone(), child_linking_fields.clone(), filter);
     let read_new_child_node = graph.create_node(read_query);
 
     // We always start with the read node in a nested connect 1:1 scenario.
@@ -368,16 +362,10 @@ fn handle_one_to_one(
         utils::insert_existing_1to1_related_model_checks(graph, &read_new_child_node, &child_relation_field)?;
     }
 
-    let relation_field_name = if relation_inlined_parent {
-        parent_relation_field.name.clone()
-    } else {
-        child_relation_field.name.clone()
-    };
-
     graph.create_edge(
          &parent_node,
          &read_new_child_node,
-         QueryGraphDependency::ParentIds(child_model_identifier.clone(), Box::new(move |mut child_node, mut parent_ids| {
+         QueryGraphDependency::ParentIds(child_linking_fields.clone(), Box::new(move |mut child_node, mut parent_ids| {
              let parent_id = match parent_ids.pop() {
                  Some(pid) => Ok(pid),
                  None => Err(QueryGraphBuilderError::AssertionError(format!("[Query Graph] Expected a valid parent ID to be present for a nested connect on a one-to-one relation."))),
@@ -386,8 +374,7 @@ fn handle_one_to_one(
              // This takes care of cases where the relation is inlined, CREATE ONLY. See doc comment for explanation.
              if relation_inlined_parent && parent_is_create {
                  if let Node::Query(Query::Write(ref mut wq)) = child_node {
-//                     wq.inject_id(parent_id);
-                     wq.inject_field_arg(relation_field_name, parent_id.single_value());
+                    wq.inject_id_into_args(parent_linking_fields.assimilate(parent_id)?);
                  }
              }
 
@@ -404,22 +391,23 @@ fn handle_one_to_one(
     }
 
     // If the relation is inlined on the child, we also need to update the child to connect it to the parent.
-    if !relation_inlined_parent {
+    if relation_inlined_child {
         let update_node = utils::update_records_node_placeholder(graph, Filter::empty(), Arc::clone(child_model));
-        let relation_field_name = child_relation_field.name.clone();
+        let parent_linking_fields = parent_relation_field.linking_fields();
+        let child_linking_fields = parent_relation_field.related_field().linking_fields();
+        let child_model_identifier = parent_relation_field.related_field().model().primary_identifier();
 
         graph.create_edge(
              &read_new_child_node,
              &update_node,
-             QueryGraphDependency::ParentIds(child_model_identifier.clone(), Box::new(move |mut child_node, mut parent_ids| {
+             QueryGraphDependency::ParentIds(child_model_identifier, Box::new(move |mut child_node, mut parent_ids| {
                  let parent_id = match parent_ids.pop() {
                      Some(pid) => Ok(pid),
                      None => Err(QueryGraphBuilderError::AssertionError(format!("[Query Graph] Expected a valid parent ID to be present for a nested connect on a one-to-one relation, updating inlined on child."))),
                  }?;
 
                  if let Node::Query(Query::Write(ref mut wq)) = child_node {
-//                     wq.inject_id(parent_id);
-                     wq.add_filter(child_model_id_field.clone().data_source_field().equals(parent_id.single_value()));
+                    wq.add_filter(parent_id.filter());
                  }
 
                  Ok(child_node)
@@ -429,57 +417,56 @@ fn handle_one_to_one(
         graph.create_edge(
              &parent_node,
              &update_node,
-             QueryGraphDependency::ParentIds(parent_model_identifier.clone(), Box::new(|mut child_node, mut parent_ids| {
+             QueryGraphDependency::ParentIds(parent_linking_fields.clone(), Box::new(move |mut child_node, mut parent_ids| {
                  let parent_id = match parent_ids.pop() {
                      Some(pid) => Ok(pid),
                      None => Err(QueryGraphBuilderError::AssertionError(format!("[Query Graph] Expected a valid parent ID to be present for a nested connect on a one-to-one relation, updating inlined on child."))),
                  }?;
 
                  if let Node::Query(Query::Write(ref mut wq)) = child_node {
-                     wq.inject_field_arg(relation_field_name, parent_id.single_value());
+                     wq.inject_id_into_args(child_linking_fields.assimilate(parent_id)?);
                  }
 
                  Ok(child_node)
              })),
          )?;
     } else if relation_inlined_parent && !parent_is_create {
-        // Relation is inlined on the Parent and a non-create.
-        // Create an update node for Parent to set the connection to the child.
+        // Relation is inlined on the parent and a non-create.
+        // Create an update node for parent record to set the connection to the child.
         let parent_model = parent_relation_field.model();
-        let relation_field_name = parent_relation_field.name.clone();
-        //        let parent_model_id = parent_model.fields().id();
         let update_node = utils::update_records_node_placeholder(graph, Filter::empty(), parent_model);
+        let parent_linking_fields = parent_relation_field.linking_fields();
 
         graph.create_edge(
              &read_new_child_node,
              &update_node,
-             QueryGraphDependency::ParentIds(parent_model_identifier.clone(), Box::new(|mut child_node, mut parent_ids| {
+             QueryGraphDependency::ParentIds(child_linking_fields.clone(), Box::new(move |mut child_node, mut parent_ids| {
                  let parent_id = match parent_ids.pop() {
                      Some(pid) => Ok(pid),
                      None => Err(QueryGraphBuilderError::AssertionError(format!("[Query Graph] Expected a valid parent ID to be present for a nested connect on a one-to-one relation, updating inlined on parent."))),
                  }?;
 
                  if let Node::Query(Query::Write(ref mut wq)) = child_node {
-//                     wq.inject_id_into_args(parent_id);
-                     wq.inject_field_arg(relation_field_name, parent_id.single_value());
+                    wq.inject_id_into_args(parent_linking_fields.assimilate(parent_id)?);
                  }
 
                  Ok(child_node)
              })),
          )?;
 
+        let parent_model_identifier = parent_relation_field.model().primary_identifier();
+
         graph.create_edge(
-             &parent_node,
-             &update_node,
-             QueryGraphDependency::ParentIds(parent_model_identifier.clone(), Box::new(move |mut child_node, mut parent_ids| {
+            &parent_node,
+            &update_node,
+            QueryGraphDependency::ParentIds(parent_model_identifier, Box::new(move |mut child_node, mut parent_ids| {
                  let parent_id = match parent_ids.pop() {
                      Some(pid) => Ok(pid),
                      None => Err(QueryGraphBuilderError::AssertionError(format!("[Query Graph] Expected a valid parent ID to be present for a nested connect on a one-to-one relation, updating inlined on parent."))),
                  }?;
 
                  if let Node::Query(Query::Write(ref mut wq)) = child_node {
-//                     wq.inject_id(parent_id);
-                     wq.add_filter(parent_model_id.clone().data_source_field().equals(parent_id.single_value()));
+                     wq.add_filter(parent_id.filter());
                  }
 
                  Ok(child_node)

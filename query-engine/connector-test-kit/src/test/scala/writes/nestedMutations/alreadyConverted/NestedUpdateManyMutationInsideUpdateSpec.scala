@@ -1,4 +1,4 @@
-package writes.nestedMutations
+package writes.nestedMutations.alreadyConverted
 
 import org.scalatest.{FlatSpec, Matchers}
 import util.ConnectorCapability.JoinRelationLinksCapability
@@ -14,23 +14,24 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
       }
       database.setup(project)
 
-      val parent1Id = server
+      val parent1Result = server
         .query(
-          """mutation {
-          |  createParent(data: {p: "p1"})
+          s"""mutation {
+          |  createParent(data: {p: "p1", p_1: "p", p_2: "1"})
           |  {
-          |    id
+          |    ${t.parent.selection}
           |  }
           |}""",
           project
         )
-        .pathAsString("data.createParent.id")
+
+      val parent1Id = t.parent.where(parent1Result, "data.createParent")
 
       val res = server.queryThatMustFail(
         s"""
          |mutation {
          |  updateParent(
-         |  where:{id: "$parent1Id"}
+         |  where: $parent1Id
          |  data:{
          |    p: "p2"
          |    childOpt: {updateMany: {
@@ -39,6 +40,7 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |
          |    }}
          |  }){
+         |    ${t.parent.selection}
          |    childOpt {
          |      c
          |    }
@@ -59,13 +61,13 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
       }
       database.setup(project)
 
-      setupData(project)
+      val (parent1Id, parent2Id) = setupData(project, t)
 
       server.query(
         s"""
          |mutation {
          |  updateParent(
-         |    where: {p: "p1"}
+         |    where: $parent1Id
          |    data:{
          |    childrenOpt: {updateMany: {
          |        where: {c_contains:"c"}
@@ -94,13 +96,13 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
       }
       database.setup(project)
 
-      setupData(project)
+      val (parent1Id, parent2Id) = setupData(project, t)
 
       server.query(
         s"""
          |mutation {
          |  updateParent(
-         |    where: {p: "p1"}
+         |    where: $parent1Id
          |    data:{
          |    childrenOpt: {updateMany: {
          |        where: {c_contains:"c"}
@@ -129,13 +131,13 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
       }
       database.setup(project)
 
-      setupData(project)
+      val (parent1Id, parent2Id) = setupData(project, t)
 
       server.query(
         s"""
          |mutation {
          |  updateParent(
-         |    where: {p: "p1"}
+         |    where: $parent1Id
          |    data:{
          |    childrenOpt: {updateMany: {
          |        where: {c_contains:"c"}
@@ -164,13 +166,13 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
       }
       database.setup(project)
 
-      setupData(project)
+      val (parent1Id, parent2Id) = setupData(project, t)
 
       server.query(
         s"""
          |mutation {
          |  updateParent(
-         |    where: {p: "p1"}
+         |    where: $parent1Id
          |    data:{
          |    childrenOpt: {updateMany: [
          |    {
@@ -205,13 +207,13 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
       }
       database.setup(project)
 
-      setupData(project)
+      val (parent1Id, parent2Id) = setupData(project, t)
 
       server.query(
         s"""
          |mutation {
          |  updateParent(
-         |    where: {p: "p1"}
+         |    where: $parent1Id
          |    data:{
          |    childrenOpt: {updateMany: [
          |    {
@@ -242,13 +244,13 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
       }
       database.setup(project)
 
-      setupData(project)
+      val (parent1Id, parent2Id) = setupData(project, t)
 
       server.query(
         s"""
          |mutation {
          |  updateParent(
-         |    where: {p: "p1"}
+         |    where: $parent1Id
          |    data:{
          |    childrenOpt: {updateMany: [
          |    {
@@ -285,13 +287,13 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
       }
       database.setup(project)
 
-      setupData(project)
+      val (parent1Id, parent2Id) = setupData(project, t)
 
       server.query(
         s"""
          |mutation {
          |  updateParent(
-         |    where: {p: "p1"}
+         |    where: $parent1Id
          |    data:{
          |    childrenOpt: {updateMany: [
          |    {
@@ -304,7 +306,7 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    }
          |    ]}
          |  }){
-         |    childrenOpt (orderBy: id_ASC){
+         |    childrenOpt (orderBy: c_ASC){
          |      c
          |      non_unique
          |    }
@@ -314,20 +316,21 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         project
       )
 
-      server.query("query{parents{p,childrenOpt(orderBy: id_ASC){c, non_unique}}}", project).toString() should be(
+      server.query("query{parents{p,childrenOpt(orderBy: c_ASC){c, non_unique}}}", project).toString() should be(
         """{"data":{"parents":[{"p":"p1","childrenOpt":[{"c":"c1","non_unique":"updated2"},{"c":"c2","non_unique":"updated1"}]},{"p":"p2","childrenOpt":[{"c":"c3","non_unique":null},{"c":"c4","non_unique":null}]}]}}""")
     }
   }
 
-  private def setupData(project: Project) = {
-    server.query(
-      """mutation {
+  private def setupData(project: Project, t: TestAbstraction) = {
+    val parent1Result = server.query(
+      s"""mutation {
         |  createParent(data: {
-        |    p: "p1"
+        |    p: "p1", p_1: "p", p_2: "1"
         |    childrenOpt: {
         |      create: [{c: "c1"},{c: "c2"}]
         |    }
         |  }){
+        |    ${t.parent.selection}
         |    childrenOpt{
         |       c
         |    }
@@ -335,15 +338,17 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         |}""",
       project
     )
+    val parent1Id = t.parent.where(parent1Result, "data.createParent")
 
-    server.query(
-      """mutation {
+    val parent2Result = server.query(
+      s"""mutation {
         |  createParent(data: {
-        |    p: "p2"
+        |    p: "p2", p_1: "p", p_2: "2"
         |    childrenOpt: {
         |      create: [{c: "c3"},{c: "c4"}]
         |    }
         |  }){
+        |    ${t.parent.selection}
         |    childrenOpt{
         |       c
         |    }
@@ -351,5 +356,8 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         |}""",
       project
     )
+    val parent2Id = t.parent.where(parent2Result, "data.createParent")
+
+    (parent1Id, parent2Id)
   }
 }

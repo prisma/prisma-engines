@@ -1,14 +1,14 @@
-package writes.nestedMutations
+package writes.nestedMutations.alreadyConverted
 
 import org.scalatest.{FlatSpec, Matchers}
 import util.ConnectorCapability.JoinRelationLinksCapability
 import util._
 
-class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers with ApiSpecBase with SchemaBaseV11 {
+class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers with ApiSpecBase with SchemaBaseV11 {
   override def runOnlyForCapabilities = Set(JoinRelationLinksCapability)
 
   "a P1 to C1 relation " should "be disconnectable through a nested mutation by id" in {
-    schemaWithRelation(onParent = ChildOpt, onChild = ParentOpt).test { t =>
+    schemaWithRelation(onParent = ChildOpt, onChild = ParentOpt).test(15) { t =>
       val project = SchemaDsl.fromStringV11() {
         t.datamodel
       }
@@ -16,34 +16,36 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
 
       val res = server
         .query(
-          """mutation {
+          s"""mutation {
           |  createParent(data: {
-          |    p: "p1"
+          |    p: "p1", p_1: "p", p_2: "1"
           |    childOpt: {
           |      create: {c: "c1"}
           |    }
           |  }){
-          |    id
+          |    ${t.parent.selection}
           |    childOpt{
-          |       id
+          |       ${t.child.selection}
           |    }
           |  }
           |}""",
           project
         )
 
-      val childId  = res.pathAsString("data.createParent.childOpt.id")
-      val parentId = res.pathAsString("data.createParent.id")
+      val childId  = t.child.where(res, "data.createParent.childOpt")
+      val parentId = t.parent.where(res, "data.createParent")
 
       val res2 = server.query(
         s"""
          |mutation {
-         |  updateParent(
-         |  where:{id: "$parentId"}
-         |  data:{
-         |    p: "p2"
-         |    childOpt: {disconnect: true}
-         |  }){
+         |  upsertParent(
+         |    where: $parentId
+         |    update:{
+         |      p: "p2"
+         |      childOpt: {disconnect: true}
+         |    }
+         |    create:{p: "Should not Matter"}
+         |  ){
          |    childOpt {
          |      c
          |    }
@@ -53,7 +55,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         project
       )
 
-      res2.toString should be("""{"data":{"updateParent":{"childOpt":null}}}""")
+      res2.toString should be("""{"data":{"upsertParent":{"childOpt":null}}}""")
 
     }
   }
@@ -65,39 +67,42 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
       }
       database.setup(project)
 
-      val child1Id = server
+      val child1Result = server
         .query(
-          """mutation {
-          |  createChild(data: {c: "c1"})
+          s"""mutation {
+          |  createChild(data: {c: "c1", c_1: "c", c_2: "1"})
           |  {
-          |    id
+          |    ${t.child.selection}
           |  }
           |}""",
           project
         )
-        .pathAsString("data.createChild.id")
+      val child1Id = t.child.where(child1Result, "data.createChild")
 
-      val parent1Id = server
+      val parent1Result = server
         .query(
-          """mutation {
-          |  createParent(data: {p: "p1"})
+          s"""mutation {
+          |  createParent(data: {p: "p1", p_1: "p", p_2: "1"})
           |  {
-          |    id
+          |    ${t.parent.selection}
           |  }
           |}""",
           project
         )
-        .pathAsString("data.createParent.id")
+      val parent1Id = t.parent.where(parent1Result, "data.createParent")
 
       val res = server.queryThatMustFail(
-        s"""
-         |mutation {
-         |  updateParent(
-         |  where:{id: "$parent1Id"}
-         |  data:{
+        s"""mutation {
+         |  upsertParent(
+         |  where: $parent1Id
+         |  update:{
          |    p: "p2"
          |    childOpt: {disconnect: true}
-         |  }){
+         |  }
+         |  create: {
+         |    p:"Should not Matter"
+         |  }
+         |  ){
          |    childOpt {
          |      c
          |    }
@@ -118,14 +123,15 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
       }
       database.setup(project)
 
-      server.query(
-        """mutation {
+      val parentResult = server.query(
+        s"""mutation {
         |  createParent(data: {
-        |    p: "p1"
+        |    p: "p1", p_1: "p", p_2: "1"
         |    childrenOpt: {
         |      create: {c: "c1"}
         |    }
         |  }){
+        |    ${t.parent.selection}
         |    childrenOpt{
         |       c
         |    }
@@ -133,15 +139,17 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         |}""",
         project
       )
+      val parentIdentifier = t.parent.where(parentResult, "data.createParent")
 
       server.queryThatMustFail(
-        s"""
-         |mutation {
-         |  updateParent(
-         |    where: {p: "p1"}
-         |    data:{
+        s"""mutation {
+         |  upsertParent(
+         |    where: $parentIdentifier
+         |    update:{
          |    childrenOpt: {disconnect: {c: "c1"}}
-         |  }){
+         |    }
+         |    create: {p: "Should not Matter"}
+         |  ){
          |    childrenOpt {
          |      c
          |    }
@@ -162,14 +170,15 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
       }
       database.setup(project)
 
-      server.query(
-        """mutation {
+      val parentResult = server.query(
+        s"""mutation {
         |  createParent(data: {
-        |    p: "p1"
+        |    p: "p1", p_1: "p", p_2: "1"
         |    childOpt: {
         |      create: {c: "c1"}
         |    }
         |  }){
+        |    ${t.parent.selection}
         |    childOpt{
         |       c
         |    }
@@ -177,15 +186,17 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         |}""",
         project
       )
+      val parentIdentifier = t.parent.where(parentResult, "data.createParent")
 
       server.queryThatMustFail(
-        s"""
-         |mutation {
-         |  updateParent(
-         |  where: {p: "p1"}
-         |  data:{
+        s"""mutation {
+         |  upsertParent(
+         |  where: $parentIdentifier
+         |  update:{
          |    childOpt: {disconnect: true}
-         |  }){
+         |  }
+         |  create: {p: "Should not Matter"}
+         |  ){
          |    childOpt {
          |      c
          |    }
@@ -200,22 +211,23 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
     }
   }
 
-  "a PM to C1 relation with the child already in a relation" should "be disconnectable through a nested mutation by unique" in {
+  "a PM to C1  relation with the child already in a relation" should "be disconnectable through a nested mutation by unique" in {
     schemaWithRelation(onParent = ChildList, onChild = ParentOpt).test { t =>
       val project = SchemaDsl.fromStringV11() {
         t.datamodel
       }
       database.setup(project)
 
-      server
+      val parentResult = server
         .query(
-          """mutation {
+          s"""mutation {
           |  createParent(data: {
-          |    p: "p1"
+          |    p: "p1", p_1: "p", p_2: "1"
           |    childrenOpt: {
           |      create: [{c: "c1"}, {c: "c2"}]
           |    }
           |  }){
+          |    ${t.parent.selection}
           |    childrenOpt{
           |       c
           |    }
@@ -223,15 +235,18 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
           |}""",
           project
         )
+      val parentIdentifier = t.parent.where(parentResult, "data.createParent")
 
       val res = server.query(
         s"""
          |mutation {
-         |  updateParent(
-         |  where: { p: "p1"}
-         |  data:{
+         |  upsertParent(
+         |  where: $parentIdentifier
+         |  update:{
          |    childrenOpt: {disconnect: [{c: "c2"}]}
-         |  }){
+         |  }
+         |  create: {p: "Should not Matter"}
+         |  ){
          |    childrenOpt {
          |      c
          |    }
@@ -241,7 +256,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         project
       )
 
-      res.toString should be("""{"data":{"updateParent":{"childrenOpt":[{"c":"c1"}]}}}""")
+      res.toString should be("""{"data":{"upsertParent":{"childrenOpt":[{"c":"c1"}]}}}""")
 
     }
   }
@@ -253,14 +268,15 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
       }
       database.setup(project)
 
-      server.query(
-        """mutation {
+      val parentResult = server.query(
+        s"""mutation {
         |  createParent(data: {
-        |    p: "p1"
+        |    p: "p1", p_1: "p", p_2: "1"
         |    childOpt: {
         |      create: {c: "c1"}
         |    }
         |  }){
+        |    ${t.parent.selection}
         |    childOpt{
         |       c
         |    }
@@ -268,15 +284,18 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         |}""",
         project
       )
+      val parentIdentifier = t.parent.where(parentResult, "data.createParent")
 
       val res = server.query(
         s"""
          |mutation {
-         |  updateParent(
-         |    where: {p: "p1"}
-         |    data:{
+         |  upsertParent(
+         |    where: $parentIdentifier
+         |    update:{
          |    childOpt: {disconnect: true}
-         |  }){
+         |  }
+         |    create: {p: "Should not Matter"}
+         |  ){
          |    childOpt{
          |      c
          |    }
@@ -286,29 +305,29 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         project
       )
 
-      res.toString should be("""{"data":{"updateParent":{"childOpt":null}}}""")
+      res.toString should be("""{"data":{"upsertParent":{"childOpt":null}}}""")
 
       server.query(s"""query{children{c, parentsOpt{p}}}""", project).toString should be("""{"data":{"children":[{"c":"c1","parentsOpt":[]}]}}""")
 
     }
   }
 
-  "a PM to CM  relation with the children already in a relation" should "be disconnectable through a nested mutation by unique" taggedAs (IgnoreMongo) in {
-    // since this assumes transactionality, test ist split below
+  "a PM to CM  relation with the children already in a relation" should "be disconnectable through a nested mutation by unique" in {
     schemaWithRelation(onParent = ChildList, onChild = ParentList).test { t =>
       val project = SchemaDsl.fromStringV11() {
         t.datamodel
       }
       database.setup(project)
 
-      server.query(
-        """mutation {
+      val parentResult = server.query(
+        s"""mutation {
         |  createParent(data: {
-        |    p: "p1"
+        |    p: "p1", p_1: "p", p_2: "1"
         |    childrenOpt: {
         |      create: [{c: "c1"},{c: "c2"}]
         |    }
         |  }){
+        |    ${t.parent.selection}
         |    childrenOpt{
         |       c
         |    }
@@ -316,50 +335,18 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         |}""",
         project
       )
-
-      server.query(
-        """mutation {
-        |  createParent(data: {
-        |    p: "otherParent"
-        |    childrenOpt: {
-        |      create: [{c: "otherChild"}]
-        |      connect: [{c: "c1"}]
-        |    }
-        |  }){
-        |    childrenOpt{
-        |       c
-        |    }
-        |  }
-        |}""",
-        project
-      )
-
-      server.queryThatMustFail(
-        s"""
-         |mutation {
-         |  updateParent(
-         |  where: { p: "p1"}
-         |  data:{
-         |    childrenOpt: {disconnect: [{c: "c1"}, {c: "otherChild"}]}
-         |  }){
-         |    childrenOpt{
-         |      c
-         |    }
-         |  }
-         |}
-      """,
-        project,
-        3041
-      )
+      val parentIdentifier = t.parent.where(parentResult, "data.createParent")
 
       val res = server.query(
         s"""
          |mutation {
-         |  updateParent(
-         |  where: { p: "p1"}
-         |  data:{
+         |  upsertParent(
+         |  where: $parentIdentifier
+         |  update:{
          |    childrenOpt: {disconnect: [{c: "c1"}]}
-         |  }){
+         |  }
+         |  create: {p: "Should not Matter"}
+         |  ){
          |    childrenOpt{
          |      c
          |    }
@@ -369,147 +356,10 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         project
       )
 
-      res.toString should be("""{"data":{"updateParent":{"childrenOpt":[{"c":"c2"}]}}}""")
+      res.toString should be("""{"data":{"upsertParent":{"childrenOpt":[{"c":"c2"}]}}}""")
 
-      server.query(s"""query{child(where:{c:"c1"}){c, parentsOpt{p}}}""", project).toString should be(
-        """{"data":{"child":{"c":"c1","parentsOpt":[{"p":"otherParent"}]}}}""")
-
-      server.query(s"""query{child(where:{c:"c2"}){c, parentsOpt{p}}}""", project).toString should be(
-        """{"data":{"child":{"c":"c2","parentsOpt":[{"p":"p1"}]}}}""")
-
-      server.query(s"""query{child(where:{c:"otherChild"}){c, parentsOpt{p}}}""", project).toString should be(
-        """{"data":{"child":{"c":"otherChild","parentsOpt":[{"p":"otherParent"}]}}}""")
-
-    }
-  }
-
-  "a PM to CM  relation with the children already in a relation" should "be disconnectable through a nested mutation by unique 2" in {
-    schemaWithRelation(onParent = ChildList, onChild = ParentList).test { t =>
-      val project = SchemaDsl.fromStringV11() {
-        t.datamodel
-      }
-      database.setup(project)
-
-      server.query(
-        """mutation {
-        |  createParent(data: {
-        |    p: "p1"
-        |    childrenOpt: {
-        |      create: [{c: "c1"},{c: "c2"}]
-        |    }
-        |  }){
-        |    childrenOpt{
-        |       c
-        |    }
-        |  }
-        |}""",
-        project
-      )
-
-      server.query(
-        """mutation {
-        |  createParent(data: {
-        |    p: "otherParent"
-        |    childrenOpt: {
-        |      create: [{c: "otherChild"}]
-        |      connect: [{c: "c1"}]
-        |    }
-        |  }){
-        |    childrenOpt{
-        |       c
-        |    }
-        |  }
-        |}""",
-        project
-      )
-
-      server.queryThatMustFail(
-        s"""
-         |mutation {
-         |  updateParent(
-         |  where: { p: "p1"}
-         |  data:{
-         |    childrenOpt: {disconnect: [{c: "c1"}, {c: "otherChild"}]}
-         |  }){
-         |    childrenOpt{
-         |      c
-         |    }
-         |  }
-         |}
-      """,
-        project,
-        3041
-      )
-    }
-  }
-
-  "a PM to CM  relation with the children already in a relation" should "be disconnectable through a nested mutation by unique 3" in {
-    schemaWithRelation(onParent = ChildList, onChild = ParentList).test { t =>
-      val project = SchemaDsl.fromStringV11() {
-        t.datamodel
-      }
-      database.setup(project)
-
-      server.query(
-        """mutation {
-        |  createParent(data: {
-        |    p: "p1"
-        |    childrenOpt: {
-        |      create: [{c: "c1"},{c: "c2"}]
-        |    }
-        |  }){
-        |    childrenOpt{
-        |       c
-        |    }
-        |  }
-        |}""",
-        project
-      )
-
-      server.query(
-        """mutation {
-        |  createParent(data: {
-        |    p: "otherParent"
-        |    childrenOpt: {
-        |      create: [{c: "otherChild"}]
-        |      connect: [{c: "c1"}]
-        |    }
-        |  }){
-        |    childrenOpt{
-        |       c
-        |    }
-        |  }
-        |}""",
-        project
-      )
-
-      val res = server.query(
-        s"""
-         |mutation {
-         |  updateParent(
-         |  where: { p: "p1"}
-         |  data:{
-         |    childrenOpt: {disconnect: [{c: "c1"}]}
-         |  }){
-         |    childrenOpt{
-         |      c
-         |    }
-         |  }
-         |}
-      """,
-        project
-      )
-
-      res.toString should be("""{"data":{"updateParent":{"childrenOpt":[{"c":"c2"}]}}}""")
-
-      server.query(s"""query{child(where:{c:"c1"}){c, parentsOpt{p}}}""", project).toString should be(
-        """{"data":{"child":{"c":"c1","parentsOpt":[{"p":"otherParent"}]}}}""")
-
-      server.query(s"""query{child(where:{c:"c2"}){c, parentsOpt{p}}}""", project).toString should be(
-        """{"data":{"child":{"c":"c2","parentsOpt":[{"p":"p1"}]}}}""")
-
-      server.query(s"""query{child(where:{c:"otherChild"}){c, parentsOpt{p}}}""", project).toString should be(
-        """{"data":{"child":{"c":"otherChild","parentsOpt":[{"p":"otherParent"}]}}}""")
+      server.query(s"""query{children{c, parentsOpt{p}}}""", project).toString should be(
+        """{"data":{"children":[{"c":"c1","parentsOpt":[]},{"c":"c2","parentsOpt":[{"p":"p1"}]}]}}""")
 
     }
   }
@@ -517,19 +367,19 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
   // OTHER DATAMODELS
 
   "a one to many relation" should "be disconnectable by id through a nested mutation" in {
-    val project = SchemaDsl.fromStringV11() {
-      s"""model Todo{
-            id       String    @id @default(cuid())
-            comments Comment[] $relationInlineDirective
-        }
+    val schema = s"""model Comment{
+                            id   String  @id @default(cuid())
+                            text String?
+                            todo Todo?
+                        }
 
-        model Comment{
-            id String @id @default(cuid())
-            text String?
-            todo Todo?
-        }"""
-    }
+                        model Todo{
+                            id       String    @id @default(cuid())
+                            text     String?
+                            comments Comment[] $relationInlineDirective
+                        }"""
 
+    val project = SchemaDsl.fromStringV11() { schema }
     database.setup(project)
 
     val createResult = server.query(
@@ -554,15 +404,18 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
 
     val result = server.query(
       s"""mutation {
-         |  updateTodo(
+         |  upsertTodo(
          |    where: {
          |      id: "$todoId"
          |    }
-         |    data:{
+         |    update:{
          |      comments: {
          |        disconnect: [{id: "$comment1Id"}, {id: "$comment2Id"}]
          |      }
          |    }
+         |    create: {comments: {
+         |        create: [{text: "comment3"}, {text: "comment4"}]
+         |      }}
          |  ){
          |    comments {
          |      text
@@ -573,24 +426,24 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
       project
     )
 
-    mustBeEqual(result.pathAsJsValue("data.updateTodo.comments").toString, """[]""")
+    mustBeEqual(result.pathAsJsValue("data.upsertTodo.comments").toString, """[]""")
   }
 
   "a one to many relation" should "be disconnectable by any unique argument through a nested mutation" in {
-    val project = SchemaDsl.fromStringV11() {
-      s"""model Todo {
-              id       String    @id @default(cuid())
-              comments Comment[] $relationInlineDirective
-          }
+    val schema = s"""model Comment{
+                            id    String  @id @default(cuid())
+                            text  String?
+                            alias String  @unique
+                            todo  Todo?
+                        }
 
-          model Comment {
-              id    String  @id @default(cuid())
-              text  String?
-              alias String  @unique
-              todo  Todo?
-          }"""
-    }
+                        model Todo{
+                            id       String    @id @default(cuid())
+                            text     String?
+                            comments Comment[] $relationInlineDirective
+                        }"""
 
+    val project = SchemaDsl.fromStringV11() { schema }
     database.setup(project)
 
     val createResult = server.query(
@@ -612,13 +465,18 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
 
     val result = server.query(
       s"""mutation {
-         |  updateTodo(
+         |  upsertTodo(
          |    where: {
          |      id: "$todoId"
          |    }
-         |    data:{
+         |    update:{
          |      comments: {
          |        disconnect: [{alias: "alias1"}, {alias: "alias2"}]
+         |      }
+         |    }
+         |    create: {
+         |      comments: {
+         |        create: [{text: "comment3", alias: "alias4"}, {text: "comment4",alias: "alias5"}]
          |      }
          |    }
          |  ){
@@ -631,23 +489,23 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
       project
     )
 
-    mustBeEqual(result.pathAsJsValue("data.updateTodo.comments").toString, """[]""")
+    mustBeEqual(result.pathAsJsValue("data.upsertTodo.comments").toString, """[]""")
   }
 
   "a many to one relation" should "be disconnectable by id through a nested mutation" in {
-    val project = SchemaDsl.fromStringV11() {
-      s"""model Todo{
-              id       String    @id @default(cuid())
-              comments Comment[] $relationInlineDirective
-          }
+    val schema = s"""model Comment{
+                            id   String  @id @default(cuid())
+                            text String?
+                            todo Todo?
+                        }
 
-          model Comment{
-              id   String  @id @default(cuid())
-              text String?
-              todo Todo?
-          }"""
-    }
+                        model Todo{
+                            id       String    @id @default(cuid())
+                            text     String?
+                            comments Comment[] $relationInlineDirective
+                        }"""
 
+    val project = SchemaDsl.fromStringV11() { schema }
     database.setup(project)
 
     val createResult = server.query(
@@ -671,13 +529,17 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
     val result = server.query(
       s"""
          |mutation {
-         |  updateComment(
+         |  upsertComment(
          |    where: {
          |      id: "$commentId"
          |    }
-         |    data: {
+         |    update: {
          |      todo: {disconnect: true}
          |    }
+         |    create: {todo: {
+         |        create: {text: "todo4"}
+         |      }}
+         |
          |  ){
          |    todo {
          |      id
@@ -687,24 +549,23 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
       """,
       project
     )
-    mustBeEqual(result.pathAsJsValue("data.updateComment").toString, """{"todo":null}""")
+    mustBeEqual(result.pathAsJsValue("data.upsertComment").toString, """{"todo":null}""")
   }
 
   "a one to one relation" should "be disconnectable by id through a nested mutation" in {
-    val project = SchemaDsl.fromStringV11() {
-      """model Note{
-              id   String  @id @default(cuid())
-              text String?
-              todo Todo?   @relation(references: [id])
-          }
+    val schema = """model Note{
+                            id   String  @id @default(cuid())
+                            text String?
+                            todo Todo?   @relation(references: [id])
+                        }
 
-          model Todo{
-              id    String @id @default(cuid())
-              title String
-              note  Note?
-          }"""
-    }
+                        model Todo{
+                            id    String @id @default(cuid())
+                            title String
+                            note  Note?
+                        }"""
 
+    val project = SchemaDsl.fromStringV11() { schema }
     database.setup(project)
 
     val createResult = server.query(
@@ -728,34 +589,41 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
     val result = server.query(
       s"""
          |mutation {
-         |  updateNote(
-         |    where: { id: "$noteId"}
-         |    data: { todo: { disconnect: true } }
+         |  upsertNote(
+         |    where: {
+         |      id: "$noteId"
+         |    }
+         |    update: {
+         |      todo: {   disconnect: true}
+         |    }
+         |    create:{text: "Should not matter", todo: {create:{title: "Also doesnt matter"}}}
+         |
          |  ){
-         |    todo { title }
+         |    todo {
+         |      title
+         |    }
          |  }
          |}
       """,
       project
     )
-    mustBeEqual(result.pathAsJsValue("data.updateNote").toString, """{"todo":null}""")
+    mustBeEqual(result.pathAsJsValue("data.upsertNote").toString, """{"todo":null}""")
   }
 
   "a one to many relation" should "be disconnectable by unique through a nested mutation" in {
-    val project = SchemaDsl.fromStringV11() {
-      s"""model Todo{
-              id       String    @id @default(cuid())
-              title    String    @unique
-              comments Comment[] $relationInlineDirective
-          }
+    val schema = s"""model Comment{
+                            id   String  @id @default(cuid())
+                            text String? @unique
+                            todo Todo?
+                        }
 
-          model Comment{
-              id   String  @id @default(cuid())
-              text String? @unique
-              todo Todo?
-          }"""
-    }
+                        model Todo{
+                            id       String    @id @default(cuid())
+                            title    String?   @unique
+                            comments Comment[] $relationInlineDirective
+                        }"""
 
+    val project = SchemaDsl.fromStringV11() { schema }
     database.setup(project)
 
     server.query("""mutation { createTodo(data: {title: "todo"}){ id } }""", project).pathAsString("data.createTodo.id")
@@ -787,13 +655,18 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
 
     val result2 = server.query(
       s"""mutation {
-         |  updateTodo(
+         |  upsertTodo(
          |    where: {
          |      title: "todo"
          |    }
-         |    data:{
+         |    update:{
          |      comments: {
          |        disconnect: [{text: "comment2"}]
+         |      }
+         |    }
+         |    create:{
+         |      comments: {
+         |        create: [{text: "comment3"}, {text: "comment4"}]
          |      }
          |    }
          |  ){
@@ -806,17 +679,17 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
       project
     )
 
-    mustBeEqual(result2.pathAsJsValue("data.updateTodo.comments").toString, """[{"text":"comment1"}]""")
+    mustBeEqual(result2.pathAsJsValue("data.upsertTodo.comments").toString, """[{"text":"comment1"}]""")
   }
 
   "A PM CM self relation" should "be disconnectable by unique through a nested mutation" in {
     val project = SchemaDsl.fromStringV11() { s"""|
                                               |model User {
-                                              |  id        String  @id @default(cuid())
-                                              |  banned    Boolean @default(value: false)
-                                              |  username  String  @unique
-                                              |  password  String
-                                              |  salt      String
+                                              |  id            String  @id @default(cuid())
+                                              |  banned        Boolean @default(value: false)
+                                              |  username      String  @unique
+                                              |  password      String
+                                              |  salt          String
                                               |  followers     User[]  @relation(name: "UserFollowers" $listInlineArgument)
                                               |  followersBack User[]  @relation(name: "UserFollowers")
                                               |  follows       User[]  @relation(name: "UserFollows" $listInlineArgument)
@@ -853,13 +726,22 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
 
     val result2 = server.query(
       s"""mutation {
-         |  updateUser(
+         |  upsertUser(
          |    where: {
          |      username: "Paul"
          |    }
-         |    data:{
+         |    update:{
          |      follows: {
          |        disconnect: [{username: "Peter"}]
+         |      }
+         |    }
+         |    create:{
+         |      username: "Paul3",
+         |      password: "1234",
+         |      salt: "so salty"
+         |
+         |      follows: {
+         |        create: [{username: "Paul2", password: "1234", salt: "so salty"}]
          |      }
          |    }
          |  ){
@@ -873,21 +755,20 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
       project
     )
 
-    mustBeEqual(result2.pathAsJsValue("data.updateUser.follows").toString, """[]""")
+    mustBeEqual(result2.pathAsJsValue("data.upsertUser.follows").toString, """[]""")
   }
 
   "A PM CM self relation" should "should throw a correct error for disconnect on invalid unique" in {
-    val project = SchemaDsl.fromStringV11() { s"""|
-                                              |model User {
-                                              |  id        String  @id @default(cuid())
-                                              |  banned    Boolean @default(value: false)
-                                              |  username  String  @unique
-                                              |  password  String
-                                              |  salt      String
-                                              |  followers     User[]  @relation(name: "UserFollowers" $listInlineArgument)
-                                              |  followersBack User[]  @relation(name: "UserFollowers")
-                                              |  follows       User[]  @relation(name: "UserFollows" $listInlineArgument)
-                                              |  followsBack   User[]  @relation(name: "UserFollows")
+    val project = SchemaDsl.fromStringV11() { s"""|model User {
+                                              |  id            String  @id @default(cuid())
+                                              |  banned        Boolean @default(value: false)
+                                              |  username      String  @unique
+                                              |  password      String
+                                              |  salt          String
+                                              |  followers     User[] @relation(name: "UserFollowers" $listInlineArgument)
+                                              |  followersBack User[] @relation(name: "UserFollowers")
+                                              |  follows       User[] @relation(name: "UserFollows" $listInlineArgument)
+                                              |  followsBack   User[] @relation(name: "UserFollows")
                                               |}""" }
     database.setup(project)
 
@@ -921,13 +802,21 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
 
     server.queryThatMustFail(
       s"""mutation {
-         |  updateUser(
+         |  upsertUser(
          |    where: {
          |      username: "Paul"
          |    }
-         |    data:{
+         |    update:{
          |      follows: {
          |        disconnect: [{username: "Anton"}]
+         |      }
+         |    }
+         |     create:{
+         |      username: "Paul3",
+         |      password: "1234",
+         |      salt: "so salty"
+         |      follows: {
+         |        create: [{username: "Paul2", password: "1234", salt: "so salty"}]
          |      }
          |    }
          |  ){
@@ -940,30 +829,27 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
       """,
       project,
       errorCode = 3041
-//      ,
-//      errorContains =
-//        "The relation UserFollows has no Node for the model User with value `Paul` for username connected to a Node for the model User with value `Anton` for username"
     )
   }
 
   "a deeply nested mutation" should "execute all levels of the mutation if there are only node edges on the path" in {
     val project = SchemaDsl.fromStringV11() { s"""model Top {
-                                             |  id      String @id @default(cuid())
-                                             |  nameTop String @unique
+                                             |  id      String   @id @default(cuid())
+                                             |  nameTop String   @unique
                                              |  middles Middle[] $relationInlineDirective
                                              |}
                                              |
                                              |model Middle {
-                                             |  id         String @id @default(cuid())
-                                             |  nameMiddle String @unique
+                                             |  id         String   @id @default(cuid())
+                                             |  nameMiddle String   @unique
                                              |  tops       Top[]
                                              |  bottoms    Bottom[] $relationInlineDirective
                                              |}
                                              |
                                              |model Bottom {
-                                             |  id         String   @id @default(cuid())
-                                             |  nameBottom String   @unique
-                                             |  middles    Middle[]
+                                             |  id          String   @id @default(cuid())
+                                             |  nameBottom  String   @unique
+                                             |  middles     Middle[]
                                              |}""" }
     database.setup(project)
 
@@ -1001,12 +887,13 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    data: {
          |      nameTop: "updated top",
          |      middles: {
-         |        update: [{
+         |        upsert: [{
          |              where: {nameMiddle: "the middle"},
-         |              data:{  nameMiddle: "updated middle"
-         |                      bottoms: {disconnect: [{nameBottom: "the bottom"}]
-         |              }
-         |       }}]
+         |              update:{nameMiddle: "updated middle"
+         |                      bottoms: {disconnect: [{nameBottom: "the bottom"}]}
+         |              },
+         |              create:{nameMiddle: "Should not Matter"}
+         |       }]
          |     }
          |   }
          |  ) {
@@ -1038,8 +925,8 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
                                              |}
                                              |
                                              |model Middle {
-                                             |  id         String   @id @default(cuid())
-                                             |  nameMiddle String   @unique
+                                             |  id         String @id @default(cuid())
+                                             |  nameMiddle String @unique
                                              |  bottoms    Bottom[] $relationInlineDirective
                                              |}
                                              |
@@ -1083,19 +970,19 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    data: {
          |      nameTop: "updated top",
          |      middles: {
-         |        update: [{
+         |        upsert: [{
          |              where: {nameMiddle: "the middle"},
-         |              data:{  nameMiddle: "updated middle"
-         |                      bottoms: {disconnect: [{nameBottom: "the bottom"}]
-         |              }
-         |       }}]
+         |              update:{nameMiddle: "updated middle"
+         |                      bottoms: {disconnect: [{nameBottom: "the bottom"}]}},
+         |              create:{nameMiddle: "Should not matter"}
+         |       }]
          |     }
          |   }
          |  ) {
          |    nameTop
-         |    middles (orderBy: id_ASC){
+         |    middles  (orderBy: id_ASC){
          |      nameMiddle
-         |      bottoms (orderBy: id_ASC){
+         |      bottoms  (orderBy: id_ASC){
          |        nameBottom
          |      }
          |    }
@@ -1108,7 +995,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
     result.toString should be(
       """{"data":{"updateTop":{"nameTop":"updated top","middles":[{"nameMiddle":"updated middle","bottoms":[{"nameBottom":"the second bottom"}]},{"nameMiddle":"the second middle","bottoms":[{"nameBottom":"the third bottom"},{"nameBottom":"the fourth bottom"}]}]}}}""")
 
-    server.query("query{bottoms(orderBy: id_ASC){nameBottom}}", project).toString should be(
+    server.query("query{bottoms (orderBy: id_ASC){nameBottom}}", project).toString should be(
       """{"data":{"bottoms":[{"nameBottom":"the bottom"},{"nameBottom":"the second bottom"},{"nameBottom":"the third bottom"},{"nameBottom":"the fourth bottom"}]}}""")
   }
 
@@ -1120,8 +1007,8 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
                                              |}
                                              |
                                              |model Middle {
-                                             |  id         String  @id @default(cuid())
-                                             |  nameMiddle String  @unique
+                                             |  id         String @id @default(cuid())
+                                             |  nameMiddle String @unique
                                              |  tops       Top[]
                                              |  bottom     Bottom? @relation(references: [id])
                                              |}
@@ -1163,11 +1050,11 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    data: {
          |      nameTop: "updated top",
          |      middles: {
-         |        update: [{
+         |        upsert: [{
          |              where: {nameMiddle: "the middle"},
-         |              data:{  nameMiddle: "updated middle"
-         |                      bottom: {disconnect: true}
-         |              }
+         |              update:{nameMiddle: "updated middle"
+         |                      bottom: {disconnect: true}}
+         |              create:{nameMiddle: "Should not matter"}
          |              }]
          |     }
          |   }
@@ -1248,12 +1135,10 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |        update: {
          |               nameMiddle: "updated middle"
          |               bottom: {
-         |                update: {
-         |                  nameBottom: "updated bottom"
-         |                  below: { disconnect: {nameBelow: "below"}
-         |
-         |          }
-         |                }
+         |                upsert: {
+         |                  update:{nameBottom: "updated bottom", below: { disconnect: {nameBelow: "below"}}},
+         |                  create:{nameBottom: "Should not matter"}
+         |              }
          |          }
          |       }
          |     }
@@ -1267,7 +1152,6 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |        below (orderBy: id_ASC){
          |           nameBelow
          |        }
-         |
          |      }
          |    }
          |  }
@@ -1279,7 +1163,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
     result.toString should be(
       """{"data":{"updateTop":{"nameTop":"updated top","middle":{"nameMiddle":"updated middle","bottom":{"nameBottom":"updated bottom","below":[{"nameBelow":"second below"}]}}}}}""")
 
-    server.query("query{belows(orderBy: id_ASC){nameBelow}}", project).toString should be(
+    server.query("query{belows (orderBy: id_ASC){nameBelow}}", project).toString should be(
       """{"data":{"belows":[{"nameBelow":"below"},{"nameBelow":"second below"}]}}""")
   }
 
@@ -1336,10 +1220,10 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    data: {
          |      nameTop: "updated top",
          |      middle: {
-         |        update: {
-         |              nameMiddle: "updated middle"
-         |              bottom: {disconnect: true}
-         |      }
+         |        upsert:{
+         |          update:{nameMiddle: "updated middle", bottom: {disconnect: true}},
+         |          create:{nameMiddle: "Should not Matter"}
+         |        }
          |     }
          |   }
          |  ) {
@@ -1412,9 +1296,9 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    data: {
          |      nameTop: "updated top",
          |      middle: {
-         |        update: {
-         |              nameMiddle: "updated middle"
-         |              bottom: {disconnect: true}
+         |        upsert: {
+         |              update:{nameMiddle: "updated middle",bottom: {disconnect: true}}
+         |              create:{nameMiddle: "Should not matter"}
          |      }
          |     }
          |   }
@@ -1436,73 +1320,4 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
 
     server.query("query{bottoms{nameBottom}}", project).toString should be("""{"data":{"bottoms":[{"nameBottom":"the bottom"}]}}""")
   }
-
-  "Nested disconnect on self relations" should "only disconnect the specified nodes" taggedAs IgnoreMongo in {
-    val project = SchemaDsl.fromStringV11() { s"""model User {
-                                             |  id        String @id @default(cuid())
-                                             |  name      String @unique
-                                             |  follower  User[] @relation(name: "UserFollow" $listInlineArgument)
-                                             |  following User[] @relation(name: "UserFollow")
-                                             |}""" }
-    database.setup(project)
-
-    server.query("""mutation  {createUser(data: {name: "X"}) {id}}""", project)
-    server.query("""mutation  {createUser(data: {name: "Y"}) {id}}""", project)
-    server.query("""mutation  {createUser(data: {name: "Z"}) {id}}""", project)
-
-    val updateMutation =
-      s""" mutation {
-         |  updateUser(data:{
-         |    following: {
-         |      connect: [{ name: "Y" }, { name: "Z"}]
-         |    }
-         |  },where:{
-         |    name:"X"
-         |  }) {
-         |    name
-         |    following{
-         |      name
-         |    }
-         |    follower{
-         |      name
-         |    }
-         |  }
-         |}
-      """
-
-    val result = server.query(updateMutation, project)
-
-    result.toString should be("""{"data":{"updateUser":{"name":"X","following":[{"name":"Y"},{"name":"Z"}],"follower":[]}}}""")
-
-    val check = server.query("""query{users{name, following{name}}}""", project)
-
-    check.toString should be(
-      """{"data":{"users":[{"name":"X","following":[{"name":"Y"},{"name":"Z"}]},{"name":"Y","following":[]},{"name":"Z","following":[]}]}}""")
-
-    val disconnectMutation =
-      s""" mutation {
-         |  updateUser(data:{
-         |    follower: {
-         |      disconnect: [{ name: "X" }]
-         |    }
-         |  },where:{
-         |    name:"Y"
-         |  }) {
-         |    name
-         |    following{
-         |      name
-         |    }
-         |  }
-         |}
-      """
-
-    val result2 = server.query(disconnectMutation, project)
-
-    result2.toString should be("""{"data":{"updateUser":{"name":"Y","following":[]}}}""")
-
-    val result3 = server.query("""query{users{name, following{name}}}""", project)
-
-    result3.toString should be("""{"data":{"users":[{"name":"X","following":[{"name":"Z"}]},{"name":"Y","following":[]},{"name":"Z","following":[]}]}}""")
-  }
-
 }

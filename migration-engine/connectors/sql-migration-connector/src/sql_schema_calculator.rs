@@ -216,6 +216,7 @@ impl<'a> SqlSchemaCalculator<'a> {
                         let field = model.fields().find(|f| &f.db_name() == column_name).unwrap();
 
                         let referenced_fields: Vec<FieldRef> = if referenced_fields.is_empty() {
+                            // TODO: should this the function unique_fields instead?
                             related_model.id_fields().collect()
                         } else {
                             let fields: Vec<_> = related_model
@@ -315,14 +316,18 @@ impl<'a> SqlSchemaCalculator<'a> {
                             constraint_name: None,
                             columns: a_columns.iter().map(|col| col.name.clone()).collect(),
                             referenced_table: model_a.db_name().to_owned(),
-                            referenced_columns: model_a.id_fields().map(|field| field.db_name().to_owned()).collect(),
+                            referenced_columns: unique_criteria(model_a)
+                                .map(|field| field.db_name().to_owned())
+                                .collect(),
                             on_delete_action: sql::ForeignKeyAction::Cascade,
                         },
                         sql::ForeignKey {
                             constraint_name: None,
                             columns: b_columns.iter().map(|col| col.name.clone()).collect(),
                             referenced_table: model_b.db_name().to_owned(),
-                            referenced_columns: model_b.id_fields().map(|field| field.db_name().to_owned()).collect(),
+                            referenced_columns: unique_criteria(model_b)
+                                .map(|field| field.db_name().to_owned())
+                                .collect(),
                             on_delete_action: sql::ForeignKeyAction::Cascade,
                         },
                     ];
@@ -358,11 +363,19 @@ impl<'a> SqlSchemaCalculator<'a> {
 }
 
 fn relation_table_columns(referenced_model: &ModelRef<'_>, reference_field_name: String) -> Vec<sql::Column> {
+    // TODO: must also work with multi field unique
     if referenced_model.model().id_fields.is_empty() {
-        let id_field = referenced_model.fields().find(|field| field.is_id()).unwrap();
+        let unique_field = referenced_model.fields().find(|f| f.is_unique());
+        let id_field = referenced_model.fields().find(|f| f.is_id());
+
+        let unique_field = id_field.or(unique_field).expect(&format!(
+            "No unique criteria found in model {}",
+            &referenced_model.name()
+        ));
+
         vec![sql::Column {
             name: reference_field_name,
-            tpe: column_type(&id_field),
+            tpe: column_type(&unique_field),
             default: None,
             auto_increment: false,
         }]
@@ -506,4 +519,21 @@ fn add_one_to_one_relation_unique_index(table: &mut sql::Table, column_name: &st
     };
 
     table.indices.push(index);
+}
+
+fn unique_criteria<'a>(model: ModelRef<'a>) -> impl Iterator<Item = FieldRef<'a>> {
+    // TODO: the logic for order of precedence is duplicated in `relation_table_columns`
+    let id_fields: Vec<FieldRef> = model.id_fields().collect();
+    let unique_fields: Vec<FieldRef> = unique_fields(&model).collect();
+
+    if !id_fields.is_empty() {
+        id_fields.into_iter()
+    } else {
+        unique_fields.into_iter()
+    }
+}
+
+fn unique_fields<'a, 'b>(model: &'b ModelRef<'a>) -> impl Iterator<Item = FieldRef<'a>> + 'b {
+    // TODO: handle `@@unique`
+    model.fields().filter(|field| field.is_unique())
 }

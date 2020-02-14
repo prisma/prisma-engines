@@ -1,4 +1,4 @@
-package writes.nestedMutations
+package writes.nestedMutations.alreadyConverted
 
 import java.util.UUID
 
@@ -46,9 +46,10 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
       }
       database.setup(project)
 
-      val child1Id = server
-        .query(
-          """mutation {
+      val child1Id = t.child.where(
+        server
+          .query(
+            s"""mutation {
           |  createParent(data: {
           |    p: "p1"
           |    childReq: {
@@ -56,14 +57,14 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
           |    }
           |  }){
           |    childReq{
-          |       id
+          |       ${t.child.selection}
           |    }
           |  }
           |}""",
-          project
-        )
-        .pathAsString("data.createParent.childReq.id")
-
+            project
+          ),
+        "data.createParent.childReq"
+      )
     }
   }
 
