@@ -1,12 +1,9 @@
+use jsonrpc_core::*;
+use rpc::{Rpc, RpcImpl};
 pub mod cli;
 mod connector_loader;
 mod error;
 mod rpc;
-
-#[cfg(test)]
-mod tests;
-use jsonrpc_core::*;
-use rpc::{Rpc, RpcImpl};
 
 #[tokio::main]
 async fn main() {

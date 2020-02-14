@@ -1,5 +1,5 @@
 use super::common::*;
-use crate::SqlFamily;
+use crate::{sql_schema_helpers::ColumnRef, SqlFamily};
 use sql_schema_describer::*;
 use std::fmt::Write as _;
 
@@ -13,27 +13,20 @@ impl super::SqlRenderer for MySqlRenderer {
     }
 
     fn write_quoted(&self, buf: &mut String, name: &str) -> std::fmt::Result {
-        write!(buf, "`{}`", name)
+        write!(buf, "{}", quoted(name))
     }
 
     fn quote(&self, name: &str) -> String {
-        format!("`{}`", name)
+        quoted(name).to_string()
     }
 
-    fn render_column(
-        &self,
-        _schema_name: &str,
-        table: &Table,
-        column: &Column,
-        _add_fk_prefix: bool,
-        next_schema: &SqlSchema,
-    ) -> String {
-        let column_name = self.quote(&column.name);
-        let tpe_str = self.render_column_type(&column.tpe, next_schema).unwrap();
+    fn render_column(&self, _schema_name: &str, column: ColumnRef<'_>, _add_fk_prefix: bool) -> String {
+        let column_name = self.quote(column.name());
+        let tpe_str = self.render_column_type(&column).unwrap();
         let nullability_str = render_nullability(&column);
         let default_str = render_default(&column);
-        let foreign_key = table.foreign_key_for_column(&column.name);
-        let auto_increment_str = if column.auto_increment { "AUTO_INCREMENT" } else { "" };
+        let foreign_key = column.table().foreign_key_for_column(column.name());
+        let auto_increment_str = if column.auto_increment() { "AUTO_INCREMENT" } else { "" };
 
         match foreign_key {
             Some(_) => format!("{} {} {} {}", column_name, tpe_str, nullability_str, default_str),
@@ -62,8 +55,8 @@ impl super::SqlRenderer for MySqlRenderer {
 }
 
 impl MySqlRenderer {
-    fn render_column_type(&self, t: &ColumnType, next_schema: &SqlSchema) -> anyhow::Result<String> {
-        match &t.family {
+    fn render_column_type(&self, column: &ColumnRef<'_>) -> anyhow::Result<String> {
+        match &column.column_type().family {
             ColumnTypeFamily::Boolean => Ok(format!("boolean")),
             ColumnTypeFamily::DateTime => Ok(format!("datetime(3)")),
             ColumnTypeFamily::Float => Ok(format!("Decimal(65,30)")),
@@ -71,10 +64,11 @@ impl MySqlRenderer {
             // we use varchar right now as mediumtext doesn't allow default values
             // a bigger length would not allow to use such a column as primary key
             ColumnTypeFamily::String => Ok(format!("varchar{}", VARCHAR_LENGTH_PREFIX)),
-            ColumnTypeFamily::Enum(name) => {
-                let r#enum = next_schema
-                    .get_enum(name)
-                    .ok_or_else(|| anyhow::anyhow!("Could not render the variants of enum `{}`", name))?;
+            ColumnTypeFamily::Enum(enum_name) => {
+                let r#enum = column
+                    .schema()
+                    .get_enum(&enum_name)
+                    .ok_or_else(|| anyhow::anyhow!("Could not render the variants of enum `{}`", enum_name))?;
 
                 let variants: String = r#enum.values.iter().map(quoted_string).join(", ");
 
@@ -85,14 +79,30 @@ impl MySqlRenderer {
     }
 }
 
-fn quoted_string<T: std::fmt::Display>(t: T) -> QuotedString<T> {
-    QuotedString(t)
+pub(crate) fn quoted<T: std::fmt::Display>(t: T) -> MysqlQuoted<T> {
+    MysqlQuoted(t)
 }
 
 #[derive(Debug)]
-struct QuotedString<T>(T);
+pub(crate) struct MysqlQuoted<T>(T);
 
-impl<T> std::fmt::Display for QuotedString<T>
+impl<T> std::fmt::Display for MysqlQuoted<T>
+where
+    T: std::fmt::Display,
+{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "`{}`", self.0)
+    }
+}
+
+pub(crate) fn quoted_string<T: std::fmt::Display>(t: T) -> MysqlQuotedString<T> {
+    MysqlQuotedString(t)
+}
+
+#[derive(Debug)]
+pub(crate) struct MysqlQuotedString<T>(T);
+
+impl<T> std::fmt::Display for MysqlQuotedString<T>
 where
     T: std::fmt::Display,
 {

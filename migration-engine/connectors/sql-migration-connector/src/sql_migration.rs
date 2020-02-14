@@ -154,3 +154,9 @@ pub struct AlterEnum {
     pub created_variants: Vec<String>,
     pub dropped_variants: Vec<String>,
 }
+
+impl AlterEnum {
+    pub(crate) fn is_empty(&self) -> bool {
+        self.created_variants.is_empty() && self.dropped_variants.is_empty()
+    }
+}

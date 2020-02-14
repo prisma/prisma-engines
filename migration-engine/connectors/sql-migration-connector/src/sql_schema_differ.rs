@@ -1,4 +1,5 @@
 mod column;
+mod enums;
 mod index;
 mod table;
 
@@ -6,6 +7,7 @@ pub(crate) use column::{ColumnChange, ColumnDiffer};
 pub(crate) use table::TableDiffer;
 
 use crate::*;
+use enums::EnumDiffer;
 use sql_schema_describer::*;
 use tracing::debug;
 
@@ -35,6 +37,7 @@ pub struct SqlSchemaDiff {
 impl SqlSchemaDiff {
     pub fn into_steps(self) -> Vec<SqlMigrationStep> {
         wrap_as_step(self.create_enums, SqlMigrationStep::CreateEnum)
+            .chain(wrap_as_step(self.alter_enums, SqlMigrationStep::AlterEnum))
             .chain(wrap_as_step(self.drop_indexes, SqlMigrationStep::DropIndex))
             // Order matters: we must create tables before `alter_table`s because we could
             // be adding foreign keys to the new tables there.
@@ -257,7 +260,21 @@ impl<'schema> SqlSchemaDiffer<'schema> {
     }
 
     fn alter_enums(&self) -> Vec<AlterEnum> {
-        Vec::new()
+        self.enum_pairs()
+            .filter_map(|differ| {
+                let step = AlterEnum {
+                    created_variants: differ.created_values().map(String::from).collect(),
+                    dropped_variants: differ.dropped_values().map(String::from).collect(),
+                    name: differ.previous.name.clone(),
+                };
+
+                if step.is_empty() {
+                    None
+                } else {
+                    Some(step)
+                }
+            })
+            .collect()
     }
 
     /// An iterator over the tables that are present in both schemas.
@@ -317,6 +334,14 @@ impl<'schema> SqlSchemaDiffer<'schema> {
             .tables
             .iter()
             .filter(|table| table.name != MIGRATION_TABLE_NAME)
+    }
+
+    fn enum_pairs(&self) -> impl Iterator<Item = EnumDiffer<'_>> {
+        self.previous_enums().filter_map(move |previous| {
+            self.next_enums()
+                .find(|next| enums_match(previous, next))
+                .map(|next| EnumDiffer { previous, next })
+        })
     }
 
     fn created_enums(&self) -> impl Iterator<Item = &Enum> {
