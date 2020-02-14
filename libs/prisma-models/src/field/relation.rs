@@ -184,7 +184,7 @@ impl RelationField {
             .unwrap()
     }
 
-    /// Alias for more clarity.
+    /// Alias for more clarity. [DTODO] This is actually incorrect in self-relation cases...
     pub fn is_inlined_on_enclosing_model(&self) -> bool {
         self.relation_is_inlined_in_parent()
     }
@@ -197,10 +197,8 @@ impl RelationField {
             RelationLinkManifestation::Inline(ref m) => {
                 let is_self_rel = relation.is_self_relation();
 
-                if is_self_rel && self.relation_side == RelationSide::B {
-                    true
-                } else if is_self_rel && self.relation_side == RelationSide::A {
-                    false
+                if is_self_rel {
+                    !self.relation_info.to_fields.is_empty()
                 } else {
                     m.in_table_of_model_name == self.model().name
                 }

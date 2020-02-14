@@ -26,6 +26,7 @@ class SelfRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
           |   bandmembers   Human[] @relation(name:"Team")
           |   title         Song?   @relation(references: [id])
           |}
+          |
           |model Song{
           |   id      String @id @default(cuid())
           |   title   String
@@ -48,6 +49,7 @@ class SelfRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
           |   bandmembers   Human[] @relation(name:"Team")
           |   title         Song?   @relation(references: [id])
           |}
+          |
           |model Song{
           |   id      String @id @default(cuid())
           |   title   String
