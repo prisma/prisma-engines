@@ -1,7 +1,11 @@
 use crate::{interpreter::InterpretationResult, query_ast::*, result_ast::*};
 use connector::{self, filter::Filter, ConnectionLike, QueryArguments, ReadOperations, ScalarCompare};
 use futures::future::{BoxFuture, FutureExt};
-use prisma_models::{ManyRecords, Record, RecordIdentifier};
+use prisma_models::{ManyRecords, PrismaValue, Record, RecordIdentifier};
+use rayon::{
+    iter::{IndexedParallelIterator, IntoParallelIterator, ParallelIterator},
+    slice::*,
+};
 use std::collections::HashMap;
 use std::time::Instant;
 
@@ -204,63 +208,84 @@ fn read_related<'a, 'b>(
 
                 let parent_fields = &parent_result.field_names;
 
-                // The child (scalars) records that are linked to more than one parent will have
-                // copies of themselves with the right parent ids pushed in this Vec.
-                let mut additional_records = Vec::new();
-
                 // Map from parent record identifier for the child records to parent records.
                 //
                 // We use raw bytes for the identifier values because we want to avoid copying
                 // PrismaValues (allocations),
-                let mut parent_records_index: HashMap<Vec<u8>, Vec<&Record>> = HashMap::new();
-
-                let mut identifiers_buf = Vec::with_capacity(16);
+                let mut parent_records_index: HashMap<Vec<&PrismaValue>, Vec<&Record>> = HashMap::new();
 
                 // Populate the identifiers index map.
                 for record in parent_result.records.iter() {
-                    record.identifier_bytes(parent_fields, &parent_link_fields, &mut identifiers_buf)?;
+                    let identifiers = record.identifying_fields(parent_fields, &parent_link_fields)?;
 
-                    match parent_records_index.get_mut(&identifiers_buf) {
+                    match parent_records_index.get_mut(&identifiers) {
                         Some(records) => records.push(record),
                         None => {
                             let records = vec![record];
-                            let buf_len = identifiers_buf.len();
-                            let id_bytes = std::mem::replace(&mut identifiers_buf, Vec::with_capacity(buf_len));
-                            parent_records_index.insert(id_bytes, records);
+                            parent_records_index.insert(identifiers, records);
                         }
                     }
                 }
 
+                let records = &scalars.records;
+
+                let all_records = records
+                    .into_par_iter()
+                    .flat_map(|record| {
+                        let identifiers = record.identifying_fields(&field_names, &child_link_fields).unwrap();
+
+                        let parent_records = parent_records_index.get(&identifiers);
+
+                        parent_records
+                            .iter()
+                            .flat_map(|records| records.into_iter())
+                            .map(|p_record| {
+                                let parent_id = p_record.identifier(parent_fields, &parent_identifier).unwrap();
+                                let mut record = record.clone();
+
+                                record.parent_id = Some(parent_id);
+
+                                record
+                            })
+                            .collect::<Vec<_>>()
+                    })
+                    .collect();
+
                 // Link each child record to its parents.
-                for mut record in scalars.records.iter_mut() {
-                    record.identifier_bytes(&field_names, &child_link_fields, &mut identifiers_buf)?;
+                // let all_records: Vec<Record> = scalars
+                //     .records
+                //     .as_parallel_slice()
+                //     .par_chunks(4)
+                //     .map(|chunk| {
+                //         chunk.iter().flat_map(|record| {
+                //     })
+                // })
+                // .collect();
+                // for record in scalars.records.iter_mut() {
 
-                    let parent_records = parent_records_index.get(&identifiers_buf);
-                    let mut parent_records = parent_records.iter().flat_map(|records| records.into_iter());
+                //     // // Set the parent id on the first record so avoid copying for the first parent.
+                //     // {
+                //     //     let parent_id = parent_records
+                //     //         .next()
+                //     //         .unwrap()
+                //     //         .identifier(parent_fields, &parent_identifier)
+                //     //         .unwrap();
 
-                    // Set the parent id on the first record so avoid copying for the first parent.
-                    {
-                        let parent_id = parent_records
-                            .next()
-                            .unwrap()
-                            .identifier(parent_fields, &parent_identifier)
-                            .unwrap();
+                //     //     record.parent_id = Some(parent_id);
+                //     // }
 
-                        record.parent_id = Some(parent_id);
-                    }
+                //     // Set the parent id on every subsequent record (i.e. join a copy of the record
+                //     // to every parent that should be connected).
+                //     for p_record in parent_records {
+                //         let parent_id = p_record.identifier(parent_fields, &parent_identifier).unwrap();
+                //         let mut record = record.clone();
 
-                    // Set the parent id on every subsequent record (i.e. join a copy of the record
-                    // to every parent that should be connected).
-                    for p_record in parent_records {
-                        let parent_id = p_record.identifier(parent_fields, &parent_identifier).unwrap();
-                        let mut record = record.clone();
+                //         record.parent_id = Some(parent_id);
+                //         additional_records.push(record);
+                //     }
+                // }
 
-                        record.parent_id = Some(parent_id);
-                        additional_records.push(record);
-                    }
-                }
-
-                scalars.records.extend(additional_records);
+                std::mem::replace(&mut scalars.records, all_records);
             } else if parent_result.is_some() && query.parent_field.related_field().is_inlined_on_enclosing_model() {
                 println!("JOIN ALGO 2");
                 let parent_identifier = query.parent_field.model().primary_identifier();

@@ -294,27 +294,21 @@ impl Record {
     }
 
     /// Serialize the record's identifier as bytes into the provided buffer, for fast comparison.
-    pub fn identifier_bytes(
-        &self,
+    pub fn identifying_fields<'a>(
+        &'a self,
         field_names: &[String],
         id: &ModelIdentifier,
-        mut identifier_buf: &mut Vec<u8>,
-    ) -> crate::Result<()> {
-        identifier_buf.clear();
+    ) -> crate::Result<Vec<&'a PrismaValue>> {
+        id.fields()
+            .into_iter()
+            .flat_map(|id_field| {
+                let source_fields = id_field.data_source_fields();
 
-        let fields = id.fields().into_iter().flat_map(|id_field| {
-            let source_fields = id_field.data_source_fields();
-
-            source_fields
-                .into_iter()
-                .map(|source_field| self.get_field_value(field_names, &source_field.name))
-        });
-
-        for field in fields {
-            bincode::serialize_into(&mut identifier_buf, &field?).unwrap();
-        }
-
-        Ok(())
+                source_fields
+                    .into_iter()
+                    .map(|source_field| self.get_field_value(field_names, &source_field.name))
+            })
+            .collect()
     }
 
     pub fn get_field_value(&self, field_names: &[String], field: &str) -> crate::Result<&PrismaValue> {
