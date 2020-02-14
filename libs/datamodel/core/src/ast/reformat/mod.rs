@@ -21,20 +21,19 @@ fn newlines(target: &mut dyn LineWriteable, text: &str, _identifier: &str) {
 }
 
 fn comment(target: &mut dyn LineWriteable, comment_text: &str) {
-    let trimmed = &comment_text[0..comment_text.len() - 1]; // slice away line break.
-
+    let text = comment_text.trim_end_matches("\n");
     if !target.line_empty() {
         // Prefix with whitespace seperator.
-        target.write(&format!(" {}", trimmed));
+        target.write(&format!(" {}", text));
     } else {
-        target.write(trimmed);
+        target.write(text);
     }
     target.end_line();
 }
 
 impl Reformatter {
     pub fn reformat_to(input: &str, output: &mut dyn std::io::Write, ident_width: usize) {
-        let mut ast = PrismaDatamodelParser::parse(Rule::datamodel, input).unwrap(); // TODO: Handle error.
+        let mut ast = PrismaDatamodelParser::parse(Rule::datamodel, input).unwrap(); // TODO: handle error
         let mut top_formatter = RefCell::new(Renderer::new(output, ident_width));
         Self::reformat_top(&mut top_formatter, &ast.next().unwrap());
     }
@@ -76,7 +75,7 @@ impl Reformatter {
                         newlines(target.get_mut(), current.as_str(), "d")
                     }
                 }
-                Rule::COMMENT => {
+                Rule::COMMENT | Rule::doc_comment => {
                     if types_mode {
                         comment(&mut types_table.interleave_writer(), current.as_str());
                     } else {
