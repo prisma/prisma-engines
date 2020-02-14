@@ -1,6 +1,7 @@
 use datamodel::{
     common::{ScalarType, ScalarValue},
-    dml, Datamodel, DefaultValue, Field, FieldArity, FieldType, Model, OnDeleteStrategy, RelationInfo, ValueGenerator,
+    dml, Datamodel, DefaultValue, Field, FieldArity, FieldType, IndexDefinition, Model, OnDeleteStrategy, RelationInfo,
+    ValueGenerator,
 };
 use pretty_assertions::assert_eq;
 use sql_introspection_connector::calculate_datamodel::calculate_model;
@@ -27,9 +28,13 @@ fn a_data_model_can_be_generated_from_a_schema() {
         models: vec![Model {
             database_name: None,
             name: "Table1".to_string(),
-            documentation: None,
+            documentation: Some(
+                "The underlying table does not contain a unique identifier and can therefore currently not be handled."
+                    .to_string(),
+            ),
             is_embedded: false,
             is_generated: false,
+            is_commented_out: true,
             indices: vec![],
             id_fields: vec![],
             fields: col_types
@@ -103,6 +108,7 @@ fn arity_is_preserved_when_generating_data_model_from_a_schema() {
             name: "Table1".to_string(),
             documentation: None,
             is_embedded: false,
+            is_commented_out: false,
             fields: vec![
                 Field {
                     name: "optional".to_string(),
@@ -122,9 +128,9 @@ fn arity_is_preserved_when_generating_data_model_from_a_schema() {
                     arity: FieldArity::Required,
                     field_type: FieldType::Base(ScalarType::Int),
                     database_names: Vec::new(),
-                    default_value: None,
+                    default_value: Some(DefaultValue::Expression(ValueGenerator::new_autoincrement())),
                     is_unique: false,
-                    is_id: false,
+                    is_id: true,
                     documentation: None,
                     is_generated: false,
                     is_updated_at: false,
@@ -173,7 +179,7 @@ fn arity_is_preserved_when_generating_data_model_from_a_schema() {
                         arity: ColumnArity::Required,
                     },
                     default: None,
-                    auto_increment: false,
+                    auto_increment: true,
                 },
                 Column {
                     name: "list".to_string(),
@@ -188,7 +194,7 @@ fn arity_is_preserved_when_generating_data_model_from_a_schema() {
             ],
             indices: vec![],
             primary_key: Some(PrimaryKey {
-                columns: vec!["primary_col".to_string()],
+                columns: vec!["required".to_string()],
                 sequence: None,
             }),
             foreign_keys: vec![],
@@ -209,6 +215,7 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
             name: "Table1".to_string(),
             documentation: None,
             is_embedded: false,
+            is_commented_out: false,
             fields: vec![
                 Field {
                     name: "no_default".to_string(),
@@ -277,7 +284,11 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
                 },
             ],
             is_generated: false,
-            indices: vec![],
+            indices: vec![IndexDefinition {
+                name: Some("unique".into()),
+                fields: vec!["no_default".into(), "int_default".into()],
+                tpe: dml::IndexType::Unique,
+            }],
             id_fields: vec![],
         }],
         enums: vec![],
@@ -338,7 +349,11 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
                     auto_increment: false,
                 },
             ],
-            indices: vec![],
+            indices: vec![Index {
+                name: "unique".to_string(),
+                columns: vec!["no_default".into(), "int_default".into()],
+                tpe: IndexType::Unique,
+            }],
             primary_key: None,
             foreign_keys: vec![],
         }],
@@ -360,6 +375,7 @@ fn primary_key_is_preserved_when_generating_data_model_from_a_schema() {
                 name: "Table1".to_string(),
                 documentation: None,
                 is_embedded: false,
+                is_commented_out: false,
                 fields: vec![Field {
                     name: "primary".to_string(),
                     arity: FieldArity::Required,
@@ -383,6 +399,7 @@ fn primary_key_is_preserved_when_generating_data_model_from_a_schema() {
                 name: "Table2".to_string(),
                 documentation: None,
                 is_embedded: false,
+                is_commented_out: false,
                 fields: vec![Field {
                     name: "primary".to_string(),
                     arity: FieldArity::Required,
@@ -406,6 +423,7 @@ fn primary_key_is_preserved_when_generating_data_model_from_a_schema() {
                 name: "Table3".to_string(),
                 documentation: None,
                 is_embedded: false,
+                is_commented_out: false,
                 fields: vec![Field {
                     name: "primary".to_string(),
                     arity: FieldArity::Required,
@@ -507,6 +525,7 @@ fn uniqueness_is_preserved_when_generating_data_model_from_a_schema() {
             name: "Table1".to_string(),
             documentation: None,
             is_embedded: false,
+            is_commented_out: false,
             fields: vec![
                 Field {
                     name: "non_unique".to_string(),
@@ -593,6 +612,7 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
                 name: "City".to_string(),
                 documentation: None,
                 is_embedded: false,
+                is_commented_out: false,
                 fields: vec![
                     Field {
                         name: "id".to_string(),
@@ -630,6 +650,7 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
                 name: "User".to_string(),
                 documentation: None,
                 is_embedded: false,
+                is_commented_out: false,
                 fields: vec![
                     Field {
                         name: "id".to_string(),
@@ -784,6 +805,7 @@ fn multi_field_uniques_are_preserved_when_generating_data_model_from_a_schema() 
             name: "User".to_string(),
             documentation: None,
             is_embedded: false,
+            is_commented_out: false,
             fields: vec![
                 Field {
                     name: "id".to_string(),
@@ -899,6 +921,7 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                 name: "City".to_string(),
                 documentation: None,
                 is_embedded: false,
+                is_commented_out: false,
                 fields: vec![
                     Field {
                         name: "id".to_string(),
@@ -954,6 +977,7 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                 name: "User".to_string(),
                 documentation: None,
                 is_embedded: false,
+                is_commented_out: false,
                 fields: vec![
                     Field {
                         name: "id".to_string(),

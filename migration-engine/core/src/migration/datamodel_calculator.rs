@@ -192,6 +192,7 @@ fn apply_create_model(datamodel: &mut ast::SchemaAst, step: &steps::CreateModel)
         span: new_span(),
         fields: vec![],
         directives: vec![],
+        commented_out: false,
     };
 
     datamodel.tops.push(ast::Top::Model(model));

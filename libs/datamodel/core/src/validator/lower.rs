@@ -72,6 +72,7 @@ impl LowerDmlToAst {
             directives: self.directives.model.serialize(model, datamodel)?,
             documentation: model.documentation.clone().map(|text| ast::Comment { text }),
             span: ast::Span::empty(),
+            commented_out: model.is_commented_out,
         })
     }
 

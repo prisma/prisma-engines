@@ -38,6 +38,7 @@ fn model_from_dmmf(model: &Model) -> dml::Model {
         id_fields: model.id_fields.clone(),
         documentation: model.documentation.clone(),
         is_generated: model.is_generated.unwrap_or(false),
+        is_commented_out: false,
     }
 }
 

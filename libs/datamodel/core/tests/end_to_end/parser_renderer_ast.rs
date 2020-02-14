@@ -101,7 +101,7 @@ model Post {
 
 #[test]
 fn test_parser_renderer_many_to_many_via_ast() {
-    let ast = parse_to_ast(MANY_TO_MANY_DATAMODEL).expect("failed to parse");
+    let ast = parse_to_ast(MANY_TO_MANY_DATAMODEL).unwrap();
     let rendered = render_schema_ast_to_string(&ast);
 
     print!("{}", rendered);

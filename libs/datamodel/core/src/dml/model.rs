@@ -19,6 +19,8 @@ pub struct Model {
     pub id_fields: Vec<String>,
     /// Indicates if this model is generated.
     pub is_generated: bool,
+    /// Indicates if this model has to be commented out.
+    pub is_commented_out: bool,
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -26,6 +28,15 @@ pub struct IndexDefinition {
     pub name: Option<String>,
     pub fields: Vec<String>,
     pub tpe: IndexType,
+}
+
+impl IndexDefinition {
+    pub fn is_unique(&self) -> bool {
+        match self.tpe {
+            IndexType::Unique => true,
+            _ => false,
+        }
+    }
 }
 
 #[derive(Debug, PartialEq, Clone, Copy)]
@@ -46,6 +57,7 @@ impl Model {
             database_name,
             is_embedded: false,
             is_generated: false,
+            is_commented_out: false,
         }
     }
 

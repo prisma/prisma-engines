@@ -1,3 +1,4 @@
+use crate::comment_out_unhandled_models::comment_out_unhandled_models;
 use crate::misc_helpers::*;
 use crate::sanitize_datamodel_names::sanitize_datamodel_names;
 use crate::SqlIntrospectionResult;
@@ -120,6 +121,7 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
         model.add_field(field);
     }
 
+    comment_out_unhandled_models(&mut data_model);
     sanitize_datamodel_names(&mut data_model);
     debug!("Done calculating data model {:?}", data_model);
 

@@ -11,7 +11,7 @@ else
     echo "RUNNING WITH DEFAULT: $method"
 fi
 
-schema="datasource chinook { provider = \\\"postgresql\\\" url = \\\"postgresql://postgres:prisma@127.0.0.1:5432/test?schema=test&connection_limit=1\\\" }"
+schema="datasource chinook { provider = \\\"mysql\\\" url = \\\"mysql://prisma:qd58rcCywPRS4Stk@mysql127-divy.cg7tbvsdqlrs.eu-central-1.rds.amazonaws.com:3306/Accidents\\\" }"
 echo "RUNNING WITH SCHEMA: $schema"
 
 

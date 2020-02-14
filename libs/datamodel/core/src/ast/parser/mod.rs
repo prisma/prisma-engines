@@ -267,6 +267,7 @@ fn parse_model(token: &pest::iterators::Pair<'_, Rule>) -> Result<Model, ErrorCo
             directives,
             documentation: doc_comments_to_string(&comments),
             span: Span::from_pest(token.as_span()),
+            commented_out: false,
         }),
         _ => panic!(
             "Encountered impossible model declaration during parsing: {:?}",

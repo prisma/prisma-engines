@@ -13,6 +13,8 @@ pub struct Model {
     pub documentation: Option<Comment>,
     /// The location of this model in the text representation.
     pub span: Span,
+    /// Should this be commented out.
+    pub commented_out: bool,
 }
 
 impl WithIdentifier for Model {
