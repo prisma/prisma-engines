@@ -70,7 +70,7 @@ impl DirectiveValidator<dml::Field> for RelationDirectiveValidator {
                 && relation_fields != all_related_ids
                 && parent_model.name < related_model.name
             {
-                let mut related_fields: Vec<ast::Expression> = Vec::new();
+                let mut related_fields: Vec<ast::Expression> = Vec::with_capacity(relation_info.to_fields.len());
                 for related_field in &relation_info.to_fields {
                     related_fields.push(ast::Expression::ConstantValue(
                         related_field.clone(),
