@@ -199,7 +199,7 @@ pub(crate) fn calculate_backrelation_field(
     let field_type = FieldType::Relation(RelationInfo {
         name: relation_info.name.clone(),
         to: model.name.clone(),
-        to_fields: vec![relation_field.name.clone()],
+        to_fields: vec![],
         on_delete,
     });
 
