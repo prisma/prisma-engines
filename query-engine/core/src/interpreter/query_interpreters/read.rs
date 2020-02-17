@@ -180,10 +180,8 @@ fn read_related<'a, 'b>(
                 args
             };
 
-            let result = tx
-                .get_many_records(&query.parent_field.related_model(), args, &query.selected_fields)
-                .await?;
-            result
+            tx.get_many_records(&query.parent_field.related_model(), args, &query.selected_fields)
+                .await?
         };
 
         if use_prisma_level_join {
