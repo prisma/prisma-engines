@@ -13,7 +13,6 @@ impl PrismaValueExtensions for PrismaValue {
     fn coerce(self, to_type: TypeIdentifier) -> crate::Result<PrismaValue> {
         let coerced = match (self, to_type) {
             // Trivial cases
-            (PrismaValue::GraphqlId(_), _) => unreachable!("Do not use GraphqlId anymore."),
             (val @ PrismaValue::Null, _) => val,
             (val @ PrismaValue::String(_), TypeIdentifier::String) => val,
             (val @ PrismaValue::Int(_), TypeIdentifier::Int) => val,

@@ -62,7 +62,6 @@ where
     T: ManyRelatedRecordsQueryBuilder,
 {
     // Todo: Does this work with relation fields that are backed by multiple fields?
-    // Q: What is the TypeIdentifier::Relation actually doing?
     // Q: The following code simply queries both field sides, is this correct?
     //    Columns that don't exist are ignored? Iterator is empty?
     // Q: Additionally: field names contains always both, isn't that breaking the above assumption?

@@ -367,7 +367,7 @@ impl DatamodelFieldExtensions for dml::Field {
     fn type_identifier(&self) -> TypeIdentifier {
         match self.field_type {
             dml::FieldType::Enum(_) => TypeIdentifier::Enum,
-            dml::FieldType::Relation(_) => TypeIdentifier::Relation,
+            dml::FieldType::Relation(_) => TypeIdentifier::String, // Todo: Unused
             dml::FieldType::Base(scalar) => match scalar {
                 dml::ScalarType::Boolean => TypeIdentifier::Boolean,
                 dml::ScalarType::DateTime => TypeIdentifier::DateTime,

@@ -1,21 +1,5 @@
-use crate::{GraphqlId, PrismaValue};
-use quaint::ast::{DatabaseValue, ParameterizedValue};
-
-impl<'a> From<GraphqlId> for ParameterizedValue<'a> {
-    fn from(id: GraphqlId) -> Self {
-        match id {
-            GraphqlId::String(s) => s.into(),
-            GraphqlId::Int(i) => (i as i64).into(),
-            GraphqlId::UUID(u) => u.to_string().into(),
-        }
-    }
-}
-
-impl<'a> From<&GraphqlId> for DatabaseValue<'a> {
-    fn from(id: &GraphqlId) -> Self {
-        id.clone().into()
-    }
-}
+use crate::PrismaValue;
+use quaint::ast::ParameterizedValue;
 
 impl<'a> From<ParameterizedValue<'a>> for PrismaValue {
     fn from(pv: ParameterizedValue<'a>) -> Self {
@@ -46,7 +30,6 @@ impl<'a> From<PrismaValue> for ParameterizedValue<'a> {
             PrismaValue::Int(i) => (i as i64).into(),
             PrismaValue::Null => ParameterizedValue::Null,
             PrismaValue::Uuid(u) => u.to_string().into(),
-            PrismaValue::GraphqlId(id) => id.into(),
             PrismaValue::List(l) => ParameterizedValue::Array(l.into_iter().map(|x| x.into()).collect()),
         }
     }

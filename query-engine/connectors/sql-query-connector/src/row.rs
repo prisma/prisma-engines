@@ -1,7 +1,7 @@
 use crate::error::SqlError;
 use chrono::{DateTime, Utc};
 use datamodel::FieldArity;
-use prisma_models::{GraphqlId, PrismaValue, Record, TypeIdentifier};
+use prisma_models::{PrismaValue, Record, TypeIdentifier};
 use quaint::{
     ast::{DatabaseValue, ParameterizedValue},
     connector::ResultRow,
@@ -35,7 +35,7 @@ impl ToSqlRow for ResultRow {
         let row_width = idents.len();
         for (i, p_value) in self.into_iter().enumerate().take(row_width) {
             let pv = match idents[i] {
-                (type_identifier, FieldArity::List) if type_identifier != TypeIdentifier::Relation => match p_value {
+                (type_identifier, FieldArity::List) => match p_value {
                     ParameterizedValue::Array(l) => l
                         .into_iter()
                         .map(|p_value| row_value_to_prisma_value(p_value, type_identifier))
@@ -66,22 +66,6 @@ pub fn row_value_to_prisma_value(
     type_identifier: TypeIdentifier,
 ) -> Result<PrismaValue, SqlError> {
     Ok(match type_identifier {
-        TypeIdentifier::GraphQLID | TypeIdentifier::Relation => match p_value {
-            ParameterizedValue::Null => PrismaValue::Null,
-            ParameterizedValue::Text(s) => {
-                let id = Uuid::parse_str(s.borrow())
-                    .map(|uuid| GraphqlId::UUID(uuid))
-                    .unwrap_or_else(|_| GraphqlId::String(s.into_owned()));
-
-                PrismaValue::GraphqlId(id)
-            }
-            ParameterizedValue::Integer(i) => PrismaValue::GraphqlId(GraphqlId::Int(i as usize)),
-            ParameterizedValue::Uuid(u) => PrismaValue::GraphqlId(GraphqlId::UUID(u)),
-            _ => {
-                let error = io::Error::new(io::ErrorKind::InvalidData, "ID value not stored as string, int or uuid");
-                return Err(SqlError::ConversionError(error.into()));
-            }
-        },
         TypeIdentifier::Boolean => match p_value {
             //                    ParameterizedValue::Array(vec) => PrismaValue::Boolean(b),
             ParameterizedValue::Null => PrismaValue::Null,
@@ -170,16 +154,6 @@ pub enum SqlId {
     String(String),
     Int(usize),
     UUID(Uuid),
-}
-
-impl From<SqlId> for GraphqlId {
-    fn from(sql_id: SqlId) -> Self {
-        match sql_id {
-            SqlId::String(s) => GraphqlId::String(s),
-            SqlId::Int(i) => GraphqlId::Int(i),
-            SqlId::UUID(u) => GraphqlId::UUID(u),
-        }
-    }
 }
 
 impl From<SqlId> for DatabaseValue<'static> {

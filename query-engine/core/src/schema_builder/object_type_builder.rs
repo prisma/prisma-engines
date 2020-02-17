@@ -111,10 +111,8 @@ impl<'a> ObjectTypeBuilder<'a> {
                 TypeIdentifier::Enum => Self::map_enum_field(sf).into(),
                 TypeIdentifier::Json => OutputType::json(),
                 TypeIdentifier::DateTime => OutputType::date_time(),
-                TypeIdentifier::GraphQLID => OutputType::string(),
                 TypeIdentifier::UUID => OutputType::uuid(),
                 TypeIdentifier::Int => OutputType::int(),
-                TypeIdentifier::Relation => unreachable!(), // Scalar fields can't have a Relation type identifier.
             },
         };
 

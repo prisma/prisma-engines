@@ -93,7 +93,7 @@ pub fn test_data_model() -> InternalDataModelRef {
     let user_field_templates = vec![
         FieldTemplate::Scalar(ScalarFieldTemplate {
             name: "id".to_owned(),
-            type_identifier: TypeIdentifier::GraphQLID,
+            type_identifier: TypeIdentifier::String,
             is_required: true,
             is_list: false,
             is_unique: false,

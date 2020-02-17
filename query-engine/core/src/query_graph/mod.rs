@@ -64,7 +64,7 @@ impl Flow {
     }
 }
 
-// Current limitation: We need to narrow it down to GraphqlID diffs for Hash and EQ.
+// Current limitation: We need to narrow it down to ID diffs for Hash and EQ.
 pub enum Computation {
     Diff(DiffNode),
 }
