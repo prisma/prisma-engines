@@ -26,9 +26,22 @@ fn converting_enums() {
             }
         "#,
     );
-    let expected_values = vec!["A".to_string(), "B".to_string(), "C".to_string()];
+    let expected_values = vec![
+        InternalEnumValue {
+            name: "A".to_string(),
+            database_name: None,
+        },
+        InternalEnumValue {
+            name: "B".to_string(),
+            database_name: None,
+        },
+        InternalEnumValue {
+            name: "C".to_string(),
+            database_name: None,
+        },
+    ];
     let enm = datamodel.enums.iter().find(|e| e.name == "MyEnum").unwrap();
-    assert_eq!(enm.values, vec!["A".to_string(), "B".to_string(), "C".to_string()]);
+    assert_eq!(enm.values, expected_values);
 
     let field = datamodel.assert_model("MyModel").assert_scalar_field("field");
     assert_eq!(field.type_identifier, TypeIdentifier::Enum);

@@ -108,7 +108,7 @@ model_declaration = { doc_comment* ~ (MODEL_KEYWORD | TYPE_KEYWORD) ~ identifier
 // ######################################
 // Enum declarations
 // ######################################
-enum_field_declaration = @{ identifier }
+enum_field_declaration = { identifier  ~ ( "@" ~ directive )*}
 enum_declaration = { doc_comment* ~ ENUM_KEYWORD ~ identifier ~ BLOCK_OPEN ~ (enum_field_declaration | ( "@@" ~ directive )  )* ~ BLOCK_CLOSE }
 
 // ######################################

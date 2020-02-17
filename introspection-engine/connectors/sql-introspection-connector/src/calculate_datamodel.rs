@@ -68,7 +68,7 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
     for e in schema.enums.iter() {
         data_model.add_enum(dml::Enum {
             name: e.name.clone(),
-            values: e.values.clone(),
+            values: e.values.iter().map(|v| dml::EnumValue::new(v, None)).collect(),
             database_name: None,
             documentation: None,
         });

@@ -59,7 +59,8 @@ impl<'a> SqlSchemaCalculator<'a> {
                         .single_database_name()
                         .map(|s| s.to_owned())
                         .unwrap_or_else(|| r#enum.name.clone()),
-                    values: r#enum.values.clone(),
+                    //todo get the database name, if there is none use the name
+                    values: r#enum.values.iter().map(|v| v.).clone(),
                 })
                 .collect(),
             SqlFamily::Mysql => {
@@ -77,6 +78,7 @@ impl<'a> SqlSchemaCalculator<'a> {
                             model_name = field.model().database_name(),
                             field_name = field.db_name()
                         ),
+                        //todo get the database name, if there is none use the name
                         values: enum_tpe.r#enum.values.clone(),
                     };
 

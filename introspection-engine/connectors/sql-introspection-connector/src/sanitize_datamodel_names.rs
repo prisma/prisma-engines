@@ -4,6 +4,8 @@ use regex::Regex;
 use std::collections::HashMap;
 
 pub fn sanitize_datamodel_names(datamodel: &mut Datamodel) {
+    //todo enum value renames
+
     let mut enum_renames = HashMap::new();
 
     for model in &mut datamodel.models {
