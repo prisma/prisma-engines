@@ -1,7 +1,9 @@
 use crate::{interpreter::InterpretationResult, query_ast::*, result_ast::*};
 use connector::{self, filter::Filter, ConnectionLike, QueryArguments, ReadOperations, ScalarCompare};
 use futures::future::{BoxFuture, FutureExt};
-use prisma_models::{ManyRecords, RecordIdentifier};
+use prisma_models::{ManyRecords, Record, RecordIdentifier};
+use prisma_value::PrismaValue;
+use std::collections::HashMap;
 
 pub fn execute<'a, 'b>(
     tx: &'a ConnectionLike<'a, 'b>,
@@ -197,14 +199,25 @@ fn read_related<'a, 'b>(
                 let parent_fields = &parent_result.field_names;
                 let mut additional_records = vec![];
 
+                let mut records_by_parent_id: HashMap<Vec<&PrismaValue>, Vec<&Record>> = HashMap::new();
+                for record in parent_result.records.iter() {
+                    let prisma_values = record.identifying_values(parent_fields, &parent_link_fields).unwrap();
+                    match records_by_parent_id.get_mut(&prisma_values) {
+                        Some(records) => records.push(record),
+                        None => {
+                            let mut records = Vec::new();
+                            records.push(record);
+                            records_by_parent_id.insert(prisma_values, records);
+                        }
+                    }
+                }
+
                 for mut record in scalars.records.iter_mut() {
                     let child_link: RecordIdentifier = record.identifier(&field_names, &child_link_fields)?;
 
-                    let mut parent_records = parent_result.records.iter().filter(|record| {
-                        let parent_link = record.identifier(parent_fields, &parent_link_fields).unwrap();
-
-                        child_link.values().eq(parent_link.values())
-                    });
+                    let child_values: Vec<&PrismaValue> = child_link.pairs.iter().map(|p| &p.1).collect();
+                    let empty_vec = Vec::new();
+                    let mut parent_records = records_by_parent_id.get(&child_values).unwrap_or(&empty_vec).iter();
 
                     let parent_id = parent_records
                         .next()
