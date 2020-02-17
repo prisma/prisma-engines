@@ -108,7 +108,7 @@ trait PlayJsonExtensions extends JsonUtils {
       }
     }
 
-    def assertFailingResponse(errorCode: Int, errorCount: Int, errorContains: String): Unit = {
+    def assertFailingResponse(errorCode: Int, errorCount: Int, errorContains: String, errorMetaContains: Array[(String, String)]): Unit = {
       require(
         requirement = hasErrors,
         message = s"The query had to result in an error but it returned no errors. Here's the response: \n $json"
@@ -126,6 +126,18 @@ trait PlayJsonExtensions extends JsonUtils {
           message = s"Expected the error code $errorCode, but got $errorCodeInResult. Here's the response: \n $json"
         )
       }
+
+      errorMetaContains.foreach({case (path, expectedJsonString) =>  {
+        val expectedJson = Json.parse(expectedJsonString)
+        val foundValue = errors.head.pathAsJsValue(s"user_facing_error.meta.$path")
+
+        require(
+          requirement = expectedJson == foundValue,
+          message = s"Expected the error metadata to be `$expectedJson` but found `${foundValue}`"
+
+        )
+      }
+      })
 
       if (errorContains != "") {
         require(
