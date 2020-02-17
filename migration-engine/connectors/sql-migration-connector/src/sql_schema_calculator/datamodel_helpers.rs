@@ -99,7 +99,7 @@ impl<'a> ModelRef<'a> {
 pub(super) struct FieldRef<'a> {
     datamodel: &'a Datamodel,
     model: &'a Model,
-    field: &'a Field,
+    pub field: &'a Field,
 }
 
 impl<'a> FieldRef<'a> {

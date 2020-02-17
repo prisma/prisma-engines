@@ -81,7 +81,11 @@ impl Standardiser {
                     };
 
                     if embed_here {
-                        rel.to_fields = related_model.id_field_names()
+                        rel.to_fields = related_model
+                            .first_unique_criterion()
+                            .iter()
+                            .map(|f| f.name.to_owned())
+                            .collect()
                     }
                 }
             }
@@ -458,7 +462,7 @@ impl Standardiser {
         rel_info: &dml::RelationInfo,
         datamodel: &dml::Datamodel,
     ) -> Vec<DataSourceField> {
-        let final_db_names = self.final_db_names_for_relation_field(&field, &rel_info);
+        let final_db_names = self.final_db_names_for_relation_field(&field, &rel_info, &datamodel);
         //        dbg!(&final_db_names);
         let to_fields_and_db_names = rel_info.to_fields.iter().zip(final_db_names.iter());
 
@@ -493,16 +497,30 @@ impl Standardiser {
             .collect()
     }
 
-    fn final_db_names_for_relation_field(&self, field: &dml::Field, relation_info: &dml::RelationInfo) -> Vec<String> {
+    fn final_db_names_for_relation_field(
+        &self,
+        field: &dml::Field,
+        relation_info: &dml::RelationInfo,
+        datamodel: &dml::Datamodel,
+    ) -> Vec<String> {
         if field.database_names.len() == 0 {
             // TODO: this rule must be incorporated into psl-sql-conversion.md
             if relation_info.to_fields.len() == 1 {
-                vec![field.name.to_owned()]
+                vec![field.final_single_database_name().to_owned()]
             } else {
+                let related_model = datamodel.find_model(&relation_info.to).expect(STATE_ERROR);
                 relation_info
                     .to_fields
                     .iter()
-                    .map(|to_field| format!("{}_{}", field.name, to_field))
+                    .map(|to_field| {
+                        let referenced_field = related_model.find_field(&to_field).expect(STATE_ERROR);
+                        // TODO: calling `final_single_database_name` means that this can not work for compound relation fields
+                        format!(
+                            "{}_{}",
+                            field.final_single_database_name(),
+                            referenced_field.final_single_database_name()
+                        )
+                    })
                     .collect()
             }
         } else {

@@ -100,6 +100,55 @@ impl Model {
         }
     }
 
+    /// This should match the logic in `prisma_models::Model::primary_identifier`.
+    pub fn first_unique_criterion(&self) -> Vec<&Field> {
+        // First candidate: the singular id field
+        {
+            let mut singular_id_fields = self.singular_id_fields();
+
+            match singular_id_fields.next() {
+                Some(x) => return vec![x],
+                None => {}
+            }
+        }
+
+        // second candidate: the multi field id
+        {
+            let id_fields: Vec<_> = self.id_fields.iter().map(|f| self.find_field(&f).unwrap()).collect();
+
+            if !id_fields.is_empty() {
+                return id_fields;
+            }
+        }
+
+        // Second candidate: a required scalar field with a unique index.
+        {
+            let first_scalar_unique_required_field = self
+                .fields
+                .iter()
+                .find(|field| field.is_unique && field.arity == FieldArity::Required);
+
+            if let Some(field) = first_scalar_unique_required_field {
+                return vec![field];
+            }
+        }
+
+        // Third candidate: any multi-field unique constraint.
+        {
+            let unique_field_combi = self
+                .indices
+                .iter()
+                .find(|id| id.tpe == IndexType::Unique)
+                .map(|id| id.fields.iter().map(|f| self.find_field(&f).unwrap()).collect());
+
+            if unique_field_combi.is_some() {
+                return unique_field_combi.unwrap();
+            }
+        }
+
+        panic!("Could not find the first unique criteria on model {}", self.name());
+    }
+
     /// Finds the name of all id fields
     pub fn singular_id_fields(&self) -> impl std::iter::Iterator<Item = &Field> {
         self.fields().filter(|x| x.is_id)
