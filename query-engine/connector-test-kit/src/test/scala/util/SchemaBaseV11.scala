@@ -136,13 +136,14 @@ trait SchemaBaseV11 extends PlayJsonExtensions {
     val simple       = true
     val isManyToMany = onParent.isList && onChild.isList
 
-    val datamodelsWithParams = for (parentId <- if (simple) Vector(simpleId, noId) else idOptions;
-                                    childId <- if (simple) Vector(simpleId, noId) else idOptions;
+    val datamodelsWithParams = for (parentId <- idOptions;
+                                    childId <- idOptions;
                                     //based on Id and relation fields
                                     childReferences <- if (simple) {
                                                         parentId match {
                                                           case _ if onChild.isList && !onParent.isList => Vector(noRef)
                                                           case `simpleId`                              => Vector(idReference)
+                                                          case `compoundId`                            => Vector(compoundParentIdReference)
                                                           case `noId`                                  => Vector(pReference)
                                                           case _                                       => ???
                                                         }
@@ -157,6 +158,7 @@ trait SchemaBaseV11 extends PlayJsonExtensions {
                                                          childId match {
                                                            case _ if childReferences != noRef && !isManyToMany => Vector(noRef)
                                                            case `simpleId`                                     => Vector(idReference)
+                                                           case `compoundId`                                   => Vector(compoundChildIdReference)
                                                            case `noId`                                         => Vector(cReference)
                                                            case _                                              => ???
                                                          }
