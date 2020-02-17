@@ -193,7 +193,7 @@ impl<'a> SqlSchemaCalculator<'a> {
                 match &relation.manifestation {
                     TempManifestationHolder::Inline {
                         in_table_of_model,
-                        column: column_name,
+                        field: dml_field,
                         referenced_fields,
                     } if in_table_of_model == &model_table.model.name => {
                         let (model, related_model) = if model_table.model == relation.model_a {
@@ -213,7 +213,7 @@ impl<'a> SqlSchemaCalculator<'a> {
                             },
                         );
 
-                        let field = model.fields().find(|f| &f.db_name() == column_name).unwrap();
+                        let field = model.fields().find(|f| &f.name() == &dml_field.name).unwrap();
 
                         let referenced_fields: Vec<FieldRef> = if referenced_fields.is_empty() {
                             first_unique_criterion(related_model).map_err(SqlError::Generic)?
@@ -238,32 +238,17 @@ impl<'a> SqlSchemaCalculator<'a> {
                             fields
                         };
 
-                        let columns: Vec<sql::Column> = if referenced_fields.len() == 1 {
-                            let referenced_field = referenced_fields.iter().next().unwrap();
-
-                            vec![sql::Column {
-                                name: column_name.clone(),
-                                tpe: column_type_for_scalar_type(
-                                    &scalar_type_for_field(referenced_field),
-                                    column_arity(&field),
-                                ),
+                        let columns: Vec<sql::Column> = field
+                            .field
+                            .data_source_fields
+                            .iter()
+                            .map(|dsf| sql::Column {
+                                name: dsf.name.clone(),
+                                tpe: column_type_for_scalar_type(&dsf.field_type, column_arity(dsf.arity)),
                                 default: None,
                                 auto_increment: false,
-                            }]
-                        } else {
-                            referenced_fields
-                                .iter()
-                                .map(|referenced_field| sql::Column {
-                                    name: format!("{}_{}", column_name, referenced_field.db_name()),
-                                    tpe: column_type_for_scalar_type(
-                                        &scalar_type_for_field(referenced_field),
-                                        column_arity(&field),
-                                    ),
-                                    default: None,
-                                    auto_increment: false,
-                                })
-                                .collect()
-                        };
+                            })
+                            .collect();
 
                         let foreign_key = sql::ForeignKey {
                             constraint_name: None,
@@ -273,18 +258,18 @@ impl<'a> SqlSchemaCalculator<'a> {
                                 .iter()
                                 .map(|referenced_field| referenced_field.db_name().to_owned())
                                 .collect(),
-                            on_delete_action: match column_arity(&field) {
+                            on_delete_action: match column_arity(field.arity()) {
                                 ColumnArity::Required => sql::ForeignKeyAction::Restrict,
                                 _ => sql::ForeignKeyAction::SetNull,
                             },
                         };
 
+                        if relation.is_one_to_one() {
+                            add_one_to_one_relation_unique_index(&mut model_table.table, &columns)
+                        }
+
                         model_table.table.columns.extend(columns);
                         model_table.table.foreign_keys.push(foreign_key);
-
-                        if relation.is_one_to_one() {
-                            add_one_to_one_relation_unique_index(&mut model_table.table, column_name)
-                        }
                     }
                     _ => {}
                 }
@@ -468,7 +453,7 @@ fn default_migration_value(field_type: &TypeRef<'_>) -> ScalarValue {
 }
 
 fn enum_column_type(field: &FieldRef<'_>, database_info: &DatabaseInfo, db_name: &str) -> sql::ColumnType {
-    let arity = column_arity(field);
+    let arity = column_arity(field.arity());
     match database_info.sql_family() {
         SqlFamily::Postgres => sql::ColumnType::pure(sql::ColumnTypeFamily::Enum(db_name.to_owned()), arity),
         SqlFamily::Mysql => sql::ColumnType::pure(
@@ -480,7 +465,7 @@ fn enum_column_type(field: &FieldRef<'_>, database_info: &DatabaseInfo, db_name:
 }
 
 fn column_type(field: &FieldRef<'_>) -> sql::ColumnType {
-    column_type_for_scalar_type(&scalar_type_for_field(field), column_arity(field))
+    column_type_for_scalar_type(&scalar_type_for_field(field), column_arity(field.arity()))
 }
 
 fn scalar_type_for_field(field: &FieldRef<'_>) -> ScalarType {
@@ -495,8 +480,8 @@ fn scalar_type_for_field(field: &FieldRef<'_>) -> ScalarType {
     }
 }
 
-fn column_arity(field: &FieldRef<'_>) -> sql::ColumnArity {
-    match &field.arity() {
+fn column_arity(arity: FieldArity) -> sql::ColumnArity {
+    match &arity {
         FieldArity::Required => sql::ColumnArity::Required,
         FieldArity::List => sql::ColumnArity::List,
         FieldArity::Optional => sql::ColumnArity::Nullable,
@@ -514,10 +499,12 @@ fn column_type_for_scalar_type(scalar_type: &ScalarType, column_arity: ColumnAri
     }
 }
 
-fn add_one_to_one_relation_unique_index(table: &mut sql::Table, column_name: &str) {
+fn add_one_to_one_relation_unique_index(table: &mut sql::Table, columns: &Vec<sql::Column>) {
+    let column_names: Vec<String> = columns.iter().map(|c| c.name.to_owned()).collect();
+    let columns_suffix = column_names.join("_");
     let index = sql::Index {
-        name: format!("{}_{}", table.name, column_name),
-        columns: vec![column_name.to_string()],
+        name: format!("{}_{}", table.name, columns_suffix),
+        columns: column_names,
         tpe: sql::IndexType::Unique,
     };
 
@@ -555,4 +542,3 @@ fn first_unique_criterion<'a>(model: ModelRef<'a>) -> anyhow::Result<Vec<FieldRe
 
     anyhow::bail!("Could not find the first unique criteria on model {}", model.name());
 }
-

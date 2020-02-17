@@ -256,7 +256,6 @@ fn explicit_relation_fields() {
         .assert_model_b("Post")
         .assert_manifestation(RelationLinkManifestation::Inline(InlineRelation {
             in_table_of_model_name: "Post".to_string(),
-            referencing_column: "blog_id".to_string(),
         }));
 }
 
@@ -331,7 +330,6 @@ fn implicit_relation_fields() {
         .assert_model_b("Post")
         .assert_manifestation(RelationLinkManifestation::Inline(InlineRelation {
             in_table_of_model_name: "Post".to_string(),
-            referencing_column: "blog".to_string(),
         }));
 }
 

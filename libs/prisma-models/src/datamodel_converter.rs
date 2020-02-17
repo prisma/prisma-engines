@@ -210,22 +210,22 @@ impl<'a> DatamodelConverter<'a> {
                     };
                     let inline_on_model_a = TempManifestationHolder::Inline {
                         in_table_of_model: model_a.name.clone(),
-                        column: field_a.final_db_name(),
+                        field: field_a.clone(),
                         referenced_fields: referenced_fields_a.clone(),
                     };
                     let inline_on_model_b = TempManifestationHolder::Inline {
                         in_table_of_model: model_b.name.clone(),
-                        column: field_b.final_db_name(),
+                        field: field_b.clone(),
                         referenced_fields: referenced_fields_b.clone(),
                     };
                     let inline_on_this_model = TempManifestationHolder::Inline {
                         in_table_of_model: model.name.clone(),
-                        column: field.final_db_name(),
+                        field: field.clone(),
                         referenced_fields: to_fields.clone(),
                     };
                     let inline_on_related_model = TempManifestationHolder::Inline {
                         in_table_of_model: related_model.name.clone(),
-                        column: related_field.final_db_name(),
+                        field: related_field.clone(),
                         referenced_fields: related_field_info.to_fields.clone(),
                     };
 
@@ -279,8 +279,8 @@ pub struct TempRelationHolder {
 pub enum TempManifestationHolder {
     Inline {
         in_table_of_model: String,
-        /// The name of the foreign key columns.
-        column: String,
+        /// The relation field.
+        field: dml::Field,
         /// The name of the (dml) fields referenced by the relation.
         referenced_fields: Vec<String>,
     },
@@ -339,14 +339,11 @@ impl TempRelationHolder {
                 model_a_column: self.model_a_column(),
                 model_b_column: self.model_b_column(),
             }),
-            TempManifestationHolder::Inline {
-                in_table_of_model,
-                column,
-                ..
-            } => RelationLinkManifestation::Inline(InlineRelation {
-                in_table_of_model_name: in_table_of_model.to_string(),
-                referencing_column: column.to_string(),
-            }),
+            TempManifestationHolder::Inline { in_table_of_model, .. } => {
+                RelationLinkManifestation::Inline(InlineRelation {
+                    in_table_of_model_name: in_table_of_model.to_string(),
+                })
+            }
         }
     }
 }
