@@ -76,10 +76,10 @@ impl SchemaAssertion {
         Ok(self)
     }
 
-    pub fn debug_print(self) -> AssertionResult<Self> {
+    pub fn debug_print(self) -> Self {
         dbg!(&self.0);
 
-        Ok(self)
+        self
     }
 }
 
