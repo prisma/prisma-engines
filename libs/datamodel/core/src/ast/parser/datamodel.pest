@@ -28,7 +28,7 @@ INTERPOLATION_END = { "}" }
 LEGACY_COLON = { ":" }
 
 doc_content = @{ (!NEWLINE ~ ANY)* ~ NEWLINE? }
-doc_comment = @{ "///" ~ doc_content }
+doc_comment = { "///" ~ doc_content }
 
 // ######################################
 // Base building blocks
