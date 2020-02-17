@@ -102,7 +102,7 @@ impl Model {
 
     /// This should match the logic in `prisma_models::Model::primary_identifier`.
     pub fn first_unique_criterion(&self) -> Vec<&Field> {
-        // First candidate: the singular id field
+        // first candidate: the singular id field
         {
             let mut singular_id_fields = self.singular_id_fields();
 
@@ -121,7 +121,7 @@ impl Model {
             }
         }
 
-        // Second candidate: a required scalar field with a unique index.
+        // third candidate: a required scalar field with a unique index.
         {
             let first_scalar_unique_required_field = self
                 .fields
@@ -133,7 +133,7 @@ impl Model {
             }
         }
 
-        // Third candidate: any multi-field unique constraint.
+        // fourth candidate: any multi-field unique constraint.
         {
             let unique_field_combi = self
                 .indices
