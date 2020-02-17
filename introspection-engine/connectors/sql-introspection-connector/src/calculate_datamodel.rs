@@ -30,7 +30,7 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
         }
 
         for foreign_key in &table.foreign_keys {
-            let field = calculate_relation_field(schema, table, foreign_key);
+            let field = calculate_relation_field(schema, table, foreign_key, &table.foreign_keys);
             model.add_field(field);
         }
 

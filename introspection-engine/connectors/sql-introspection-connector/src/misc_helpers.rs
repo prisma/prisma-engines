@@ -126,7 +126,12 @@ pub(crate) fn calculate_scalar_field(schema: &SqlSchema, table: &Table, column: 
     }
 }
 
-pub(crate) fn calculate_relation_field(schema: &SqlSchema, table: &Table, foreign_key: &ForeignKey) -> Field {
+pub(crate) fn calculate_relation_field(
+    schema: &SqlSchema,
+    table: &Table,
+    foreign_key: &ForeignKey,
+    foreign_keys: &Vec<ForeignKey>,
+) -> Field {
     debug!("Handling compound foreign key  {:?}", foreign_key);
 
     //todo this ignores relations on id fields of length 1, the problem persists for compound id fields
@@ -158,8 +163,24 @@ pub(crate) fn calculate_relation_field(schema: &SqlSchema, table: &Table, foreig
             false => FieldArity::Required,
         };
 
+        let more_then_one_compound_to_same_table = || {
+            foreign_keys
+                .iter()
+                .filter(|fk| fk.referenced_table == foreign_key.referenced_table && fk.columns.len() > 1)
+                .count()
+                > 1
+        };
+
         let (name, database_name) = match columns.len() {
             1 => (columns[0].name.clone(), vec![]),
+            _ if more_then_one_compound_to_same_table() => (
+                format!(
+                    "{}_{}",
+                    foreign_key.referenced_table.clone().camel_case(),
+                    columns[0].name.clone()
+                ),
+                columns.iter().map(|c| c.name.clone()).collect(),
+            ),
             _ => (
                 foreign_key.referenced_table.clone().camel_case(),
                 columns.iter().map(|c| c.name.clone()).collect(),
