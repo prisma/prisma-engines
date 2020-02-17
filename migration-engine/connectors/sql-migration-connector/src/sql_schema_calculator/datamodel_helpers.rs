@@ -17,6 +17,7 @@ pub(super) fn walk_fields<'a>(datamodel: &'a Datamodel) -> impl Iterator<Item = 
     })
 }
 
+#[derive(Debug, Copy, Clone)]
 pub(crate) struct ModelRef<'a> {
     pub(crate) datamodel: &'a Datamodel,
     pub(crate) model: &'a Model,
@@ -81,6 +82,18 @@ impl<'a> ModelRef<'a> {
                 field,
             })
     }
+
+    pub(super) fn unique_indexes<'b>(&'b self) -> impl Iterator<Item = IndexRef<'a>> + 'b {
+        self.model
+            .indices
+            .iter()
+            .filter(|index| index.is_unique())
+            .map(move |index| IndexRef {
+                model: *self,
+                index,
+                datamodel: &self.datamodel,
+            })
+    }
 }
 
 pub(super) struct FieldRef<'a> {
@@ -113,12 +126,19 @@ impl<'a> FieldRef<'a> {
         }
     }
 
-    pub(super) fn is_unique(&self) -> bool {
-        self.field.is_unique
-    }
-
     pub(super) fn is_id(&self) -> bool {
         self.field.is_id
+    }
+
+    pub(super) fn is_required(&self) -> bool {
+        match self.arity() {
+            FieldArity::Required => true,
+            _ => false,
+        }
+    }
+
+    pub(super) fn is_unique(&self) -> bool {
+        self.field.is_unique
     }
 
     pub(super) fn model(&self) -> ModelRef<'a> {
@@ -166,5 +186,23 @@ impl<'a> EnumRef<'a> {
 
     pub(super) fn db_name(&self) -> &'a str {
         self.r#enum.single_database_name().unwrap_or(&self.r#enum.name)
+    }
+}
+
+#[derive(Debug)]
+pub(super) struct IndexRef<'a> {
+    index: &'a IndexDefinition,
+    model: ModelRef<'a>,
+    datamodel: &'a Datamodel,
+}
+
+impl<'a> IndexRef<'a> {
+    pub(super) fn fields<'b>(&'b self) -> impl Iterator<Item = FieldRef<'a>> + 'b {
+        self.index.fields.iter().map(move |field_name| {
+            self.model
+                .fields()
+                .find(|f| f.name() == field_name.as_str())
+                .expect("index on unknown model field")
+        })
     }
 }

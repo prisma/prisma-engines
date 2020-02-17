@@ -1935,24 +1935,3 @@ async fn switching_databases_must_work(api: &TestApi) -> TestResult {
 
     Ok(())
 }
-
-#[test_each_connector]
-async fn creating_tables_without_primary_key_must_work(api: &TestApi) -> TestResult {
-    let dm = r#"
-        model Pair {
-            index Int
-            name String
-            weight Float
-
-            @@unique([index, name])
-        }
-    "#;
-
-    api.infer_apply(dm).send_assert().await?.assert_green()?;
-
-    api.assert_schema()
-        .await?
-        .assert_table("Pair", |table| table.assert_has_no_pk())?;
-
-    Ok(())
-}

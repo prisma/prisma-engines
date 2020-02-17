@@ -75,6 +75,12 @@ impl SchemaAssertion {
 
         Ok(self)
     }
+
+    pub fn debug_print(self) -> AssertionResult<Self> {
+        dbg!(&self.0);
+
+        Ok(self)
+    }
 }
 
 pub struct EnumAssertion<'a>(&'a Enum);

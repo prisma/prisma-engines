@@ -45,7 +45,7 @@ impl super::SqlRenderer for MySqlRenderer {
             .join(",");
 
         format!(
-            "REFERENCES `{}`.`{}`({}) {} ON UPDATE CASCADE",
+            " REFERENCES `{}`.`{}`({}) {} ON UPDATE CASCADE",
             schema_name,
             foreign_key.referenced_table,
             referenced_columns,

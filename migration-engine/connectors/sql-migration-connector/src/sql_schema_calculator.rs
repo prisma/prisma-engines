@@ -1,6 +1,6 @@
 mod datamodel_helpers;
 
-use crate::{sql_renderer::IteratorJoin, DatabaseInfo, SqlResult};
+use crate::{error::SqlError, sql_renderer::IteratorJoin, DatabaseInfo, SqlResult};
 use chrono::*;
 use datamodel::common::*;
 use datamodel::*;
@@ -216,8 +216,7 @@ impl<'a> SqlSchemaCalculator<'a> {
                         let field = model.fields().find(|f| &f.db_name() == column_name).unwrap();
 
                         let referenced_fields: Vec<FieldRef> = if referenced_fields.is_empty() {
-                            // TODO: should this the function unique_fields instead?
-                            related_model.id_fields().collect()
+                            first_unique_criterion(related_model).map_err(SqlError::Generic)?
                         } else {
                             let fields: Vec<_> = related_model
                                 .fields()
@@ -316,7 +315,9 @@ impl<'a> SqlSchemaCalculator<'a> {
                             constraint_name: None,
                             columns: a_columns.iter().map(|col| col.name.clone()).collect(),
                             referenced_table: model_a.db_name().to_owned(),
-                            referenced_columns: unique_criteria(model_a)
+                            referenced_columns: first_unique_criterion(model_a)
+                                .map_err(SqlError::Generic)?
+                                .into_iter()
                                 .map(|field| field.db_name().to_owned())
                                 .collect(),
                             on_delete_action: sql::ForeignKeyAction::Cascade,
@@ -325,7 +326,9 @@ impl<'a> SqlSchemaCalculator<'a> {
                             constraint_name: None,
                             columns: b_columns.iter().map(|col| col.name.clone()).collect(),
                             referenced_table: model_b.db_name().to_owned(),
-                            referenced_columns: unique_criteria(model_b)
+                            referenced_columns: first_unique_criterion(model_b)
+                                .map_err(SqlError::Generic)?
+                                .into_iter()
                                 .map(|field| field.db_name().to_owned())
                                 .collect(),
                             on_delete_action: sql::ForeignKeyAction::Cascade,
@@ -521,19 +524,35 @@ fn add_one_to_one_relation_unique_index(table: &mut sql::Table, column_name: &st
     table.indices.push(index);
 }
 
-fn unique_criteria<'a>(model: ModelRef<'a>) -> impl Iterator<Item = FieldRef<'a>> {
-    // TODO: the logic for order of precedence is duplicated in `relation_table_columns`
-    let id_fields: Vec<FieldRef> = model.id_fields().collect();
-    let unique_fields: Vec<FieldRef> = unique_fields(&model).collect();
+/// This should match the logic in `prisma_models::Model::primary_identifier`.
+fn first_unique_criterion<'a>(model: ModelRef<'a>) -> anyhow::Result<Vec<FieldRef<'a>>> {
+    // First candidate: the primary key.
+    {
+        let id_fields: Vec<_> = model.id_fields().collect();
 
-    if !id_fields.is_empty() {
-        id_fields.into_iter()
-    } else {
-        unique_fields.into_iter()
+        if !id_fields.is_empty() {
+            return Ok(id_fields);
+        }
     }
+
+    // Second candidate: a required scalar field with a unique index.
+    {
+        let first_scalar_unique_required_field = model.fields().find(|field| field.is_unique() && field.is_required());
+
+        if let Some(field) = first_scalar_unique_required_field {
+            return Ok(vec![field]);
+        }
+    }
+
+    // Third candidate: any multi-field unique constraint.
+    {
+        let first_multi_field_unique = model.unique_indexes().next();
+
+        if let Some(index) = first_multi_field_unique {
+            return Ok(index.fields().collect());
+        }
+    }
+
+    anyhow::bail!("Could not find the first unique criteria on model {}", model.name());
 }
 
-fn unique_fields<'a, 'b>(model: &'b ModelRef<'a>) -> impl Iterator<Item = FieldRef<'a>> + 'b {
-    // TODO: handle `@@unique`
-    model.fields().filter(|field| field.is_unique())
-}
