@@ -4,7 +4,6 @@ use futures::future::{BoxFuture, FutureExt};
 use prisma_models::{ManyRecords, Record, RecordIdentifier};
 use prisma_value::PrismaValue;
 use std::collections::HashMap;
-use std::time::Instant;
 
 pub fn execute<'a, 'b>(
     tx: &'a ConnectionLike<'a, 'b>,
@@ -181,19 +180,15 @@ fn read_related<'a, 'b>(
                 args
             };
 
-            let now = Instant::now();
             let result = tx
                 .get_many_records(&query.parent_field.related_model(), args, &query.selected_fields)
                 .await?;
-            println!("QUERY TIME {}", now.elapsed().as_millis());
             result
         };
 
-        let now = Instant::now();
         if use_prisma_level_join {
             // Write parent IDs into the retrieved records
             if parent_result.is_some() && query.parent_field.is_inlined_on_enclosing_model() {
-                println!("JOIN ALGO 1");
                 let parent_identifier = query.parent_field.model().primary_identifier();
                 let field_names = scalars.field_names.clone();
 
@@ -206,15 +201,15 @@ fn read_related<'a, 'b>(
                 let parent_fields = &parent_result.field_names;
                 let mut additional_records = vec![];
 
-                let mut the_map: HashMap<Vec<&PrismaValue>, Vec<&Record>> = HashMap::new();
+                let mut records_by_parent_id: HashMap<Vec<&PrismaValue>, Vec<&Record>> = HashMap::new();
                 for record in parent_result.records.iter() {
                     let prisma_values = record.identifying_values(parent_fields, &parent_link_fields).unwrap();
-                    match the_map.get_mut(&prisma_values) {
+                    match records_by_parent_id.get_mut(&prisma_values) {
                         Some(records) => records.push(record),
                         None => {
                             let mut records = Vec::new();
                             records.push(record);
-                            the_map.insert(prisma_values, records);
+                            records_by_parent_id.insert(prisma_values, records);
                         }
                     }
                 }
@@ -224,7 +219,7 @@ fn read_related<'a, 'b>(
 
                     let child_values: Vec<&PrismaValue> = child_link.pairs.iter().map(|p| &p.1).collect();
                     let empty_vec = Vec::new();
-                    let mut parent_records = the_map.get(&child_values).unwrap_or(&empty_vec).iter();
+                    let mut parent_records = records_by_parent_id.get(&child_values).unwrap_or(&empty_vec).iter();
 
                     let parent_id = parent_records
                         .next()
@@ -245,7 +240,6 @@ fn read_related<'a, 'b>(
 
                 scalars.records.extend(additional_records);
             } else if parent_result.is_some() && query.parent_field.related_field().is_inlined_on_enclosing_model() {
-                println!("JOIN ALGO 2");
                 let parent_identifier = query.parent_field.model().primary_identifier();
                 let field_names = scalars.field_names.clone();
                 let child_link_fields = query.parent_field.related_field().linking_fields();
@@ -271,13 +265,10 @@ fn read_related<'a, 'b>(
                 ));
             }
         }
-        println!("JOIN TIME {}", now.elapsed().as_millis());
 
         let model = query.parent_field.related_model();
         let model_id = model.primary_identifier();
-        let now = Instant::now();
         let nested: Vec<QueryResult> = process_nested(tx, query.nested, Some(&scalars)).await?;
-        println!("NESTED TIME {}", now.elapsed().as_millis());
 
         Ok(QueryResult::RecordSelection(RecordSelection {
             name: query.name,
