@@ -1,5 +1,4 @@
-use crate::{ScalarFieldRef, ScalarFieldWeak};
-use std::sync::Arc;
+use crate::{Field, FieldWeak, ScalarFieldRef};
 
 #[derive(Debug)]
 pub struct IndexTemplate {
@@ -9,7 +8,7 @@ pub struct IndexTemplate {
 }
 
 impl IndexTemplate {
-    pub fn build(self, fields: &[ScalarFieldRef]) -> Index {
+    pub fn build(self, fields: &[Field]) -> Index {
         let fields = match self.typ {
             IndexType::Unique => Self::map_fields(self.fields, fields),
             IndexType::Normal => vec![],
@@ -22,16 +21,16 @@ impl IndexTemplate {
         }
     }
 
-    fn map_fields(field_names: Vec<String>, fields: &[ScalarFieldRef]) -> Vec<ScalarFieldWeak> {
+    fn map_fields(field_names: Vec<String>, fields: &[Field]) -> Vec<FieldWeak> {
         field_names
             .into_iter()
             .map(|name| {
                 let field = fields
                     .iter()
-                    .find(|sf| sf.name == name)
-                    .expect(&format!("Unable to resolve scalar field '{}'", name));
+                    .find(|sf| sf.name() == name)
+                    .expect(&format!("Unable to resolve field '{}'", name));
 
-                Arc::downgrade(field)
+                field.downgrade()
             })
             .collect()
     }
@@ -40,13 +39,21 @@ impl IndexTemplate {
 #[derive(Debug)]
 pub struct Index {
     pub name: Option<String>,
-    pub fields: Vec<ScalarFieldWeak>,
+    pub fields: Vec<FieldWeak>,
     pub typ: IndexType,
 }
 
 impl Index {
-    pub fn fields(&self) -> Vec<ScalarFieldRef> {
-        self.fields.iter().map(|sf| sf.upgrade().unwrap()).collect()
+    pub fn fields(&self) -> Vec<Field> {
+        self.fields.iter().map(|sf| sf.upgrade()).collect()
+    }
+
+    pub fn scalar_fields(&self) -> Vec<ScalarFieldRef> {
+        self.fields
+            .iter()
+            .map(|f| f.upgrade())
+            .filter_map(Field::as_scalar)
+            .collect()
     }
 }
 
