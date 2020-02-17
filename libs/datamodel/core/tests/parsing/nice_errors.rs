@@ -15,6 +15,7 @@ fn nice_error_for_missing_model_keyword() {
     error.assert_is(DatamodelError::new_parser_error(
         &vec![
             "end of input",
+            "documentation comment",
             "type declaration",
             "model declaration",
             "enum declaration",
@@ -40,6 +41,7 @@ fn nice_error_for_missing_model_keyword_2() {
     error.assert_is(DatamodelError::new_parser_error(
         &vec![
             "end of input",
+            "documentation comment",
             "type declaration",
             "model declaration",
             "enum declaration",
@@ -98,7 +100,7 @@ fn nice_error_missing_directive_name() {
 #[test]
 fn nice_error_missing_braces() {
     let dml = r#"
-    model User 
+    model User
         id Int @id
     "#;
 
@@ -106,7 +108,7 @@ fn nice_error_missing_braces() {
 
     error.assert_is(DatamodelError::new_parser_error(
         &vec!["Start of block (\"{\")"],
-        Span::new(25, 25),
+        Span::new(24, 24),
     ));
 }
 

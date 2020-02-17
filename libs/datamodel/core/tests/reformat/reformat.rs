@@ -53,3 +53,66 @@ datasource pg {
     let actual = str::from_utf8(&buf).expect("unable to convert to string");
     assert_eq!(expected, actual);
 }
+
+#[test]
+fn test_floating_doc_comment() {
+    let input = r#"
+model a {
+  one Int
+  two Int
+  // bs  b[] @relation(references: [a])
+  @@id([one, two])
+}
+
+/// ajlsdkfkjasflk
+// model ok {}"#;
+
+    let expected = r#"
+model a {
+  one Int
+  two Int
+  // bs  b[] @relation(references: [a])
+  @@id([one, two])
+}
+
+/// ajlsdkfkjasflk
+// model ok {}"#;
+
+    let mut buf = Vec::new();
+    // replaces \t placeholder with a real tab
+    datamodel::ast::reformat::Reformatter::reformat_to(&input.replace("\\t", "\t"), &mut buf, 2);
+    let actual = str::from_utf8(&buf).expect("unable to convert to string");
+    assert_eq!(expected, actual);
+}
+
+#[test]
+fn test_floating_doc_comments() {
+    let input = r#"
+model a {
+  one Int
+  two Int
+  // bs  b[] @relation(references: [a])
+  @@id([one, two])
+}
+
+/// ajlsdkfkjasflk
+/// ajlsdkfkjasflk
+"#;
+
+    let expected = r#"
+model a {
+  one Int
+  two Int
+  // bs  b[] @relation(references: [a])
+  @@id([one, two])
+}
+
+/// ajlsdkfkjasflk
+/// ajlsdkfkjasflk"#;
+
+    let mut buf = Vec::new();
+    // replaces \t placeholder with a real tab
+    datamodel::ast::reformat::Reformatter::reformat_to(&input.replace("\\t", "\t"), &mut buf, 2);
+    let actual = str::from_utf8(&buf).expect("unable to convert to string");
+    assert_eq!(expected, actual);
+}
