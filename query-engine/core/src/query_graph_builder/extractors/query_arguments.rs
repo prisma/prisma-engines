@@ -84,14 +84,13 @@ fn extract_cursor(
         .find_from_scalar(&field_name)
         .map_err(|err| err.into())
         .and_then(|field| {
-            // Clone necessary to satisfy closure move.
             let value: PrismaValue = value.clone().try_into()?;
             Ok(Some(vec![(field, value)]))
         })
         .or_else(|_: QueryGraphBuilderError| {
             utils::resolve_compound_field(&field_name, &model)
                 .ok_or(QueryGraphBuilderError::AssertionError(format!(
-                    "Unable to resolve field {} to a scalar field or a set of scalar fields on model {}",
+                    "Unable to resolve field {} to a field or a set of fields on model {}",
                     field_name, model.name
                 )))
                 .and_then(|fields| {

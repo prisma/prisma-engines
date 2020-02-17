@@ -322,6 +322,32 @@ class MultiFieldUniqueQuerySpec extends FlatSpec with Matchers with ApiSpecBase 
     database.setup(project)
 
     server.query("""query{parent(where:{id: "1"}){id}}""", project)
+  }
 
+  "Specifying and using a single-field @@unique index" should "work" in {
+    val project = SchemaDsl.fromStringV11() {
+      """                model User {
+        |                    id String @id @default(cuid())
+        |                    u  String
+        |
+        |                    @@unique([u])
+        |                }
+        |
+        |           """.stripMargin
+    }
+
+    database.setup(project)
+
+    server
+      .query(
+        s"""mutation {
+           |  createUser(data: {u: "test"}) {
+           |    id
+           |  }
+           |}""".stripMargin,
+        project
+      )
+
+    server.query("""query{user(where:{u: "test"}){id}}""", project)
   }
 }
