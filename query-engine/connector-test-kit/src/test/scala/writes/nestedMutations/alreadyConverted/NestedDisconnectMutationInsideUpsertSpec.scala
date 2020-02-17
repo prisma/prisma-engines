@@ -8,7 +8,7 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
   override def runOnlyForCapabilities = Set(JoinRelationLinksCapability)
 
   "a P1 to C1 relation " should "be disconnectable through a nested mutation by id" in {
-    schemaWithRelation(onParent = ChildOpt, onChild = ParentOpt).test(15) { t =>
+    schemaWithRelation(onParent = ChildOpt, onChild = ParentOpt).test { t =>
       val project = SchemaDsl.fromStringV11() {
         t.datamodel
       }
