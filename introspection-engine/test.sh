@@ -11,8 +11,7 @@ else
     echo "RUNNING WITH DEFAULT: $method"
 fi
 
-schema="datasource chinook { provider = \\\"postgresql\\\" url = \\\"postgresql://postgres:prisma@127.0.0.1:5432/divys_bug_on_postgres?schema=prisma-tests&connection_limit=1\\\" }"
+schema="datasource chinook { provider = \\\"mysql\\\" url = \\\"mysql://:3306/Accidents\\\" }"
 echo "RUNNING WITH SCHEMA: $schema"
-
 
 echo "{\"id\":1,\"jsonrpc\":\"2.0\",\"method\":\"$method\",\"params\":[{\"schema\":\"$schema\"}]}"| ../target/debug/introspection-engine

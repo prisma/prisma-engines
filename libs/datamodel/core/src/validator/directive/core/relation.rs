@@ -58,19 +58,16 @@ impl DirectiveValidator<dml::Field> for RelationDirectiveValidator {
                 args.push(ast::Argument::new_string("", &relation_info.name));
             }
 
-            // We only add the references arg,
-            // if we have references
-            // and we do only reference the IDs, which is the default case.
-
             let mut relation_fields = relation_info.to_fields.clone();
 
             relation_fields.sort();
             all_related_ids.sort();
-            if !relation_info.to_fields.is_empty()
-                && relation_fields != all_related_ids
+            if !relation_info.to_fields.is_empty()         // if we are on the physical field
+                && relation_fields != all_related_ids      // if it is not the id of the opposing side OPINIONATION!!!
                 && parent_model.name < related_model.name
+            // if the name is lexicographically lower   OPINIONATION!!!
             {
-                let mut related_fields: Vec<ast::Expression> = Vec::new();
+                let mut related_fields: Vec<ast::Expression> = Vec::with_capacity(relation_info.to_fields.len());
                 for related_field in &relation_info.to_fields {
                     related_fields.push(ast::Expression::ConstantValue(
                         related_field.clone(),

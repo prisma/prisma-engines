@@ -123,6 +123,50 @@ async fn compound_foreign_keys_should_work_for_one_to_many_relations(api: &TestA
 
 #[test_each_connector(tags("sqlite"))]
 #[test]
+async fn compound_foreign_keys_should_work_for_duplicate_one_to_many_relations(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::primary());
+                t.add_column("age", types::integer());
+                t.inject_custom("CONSTRAINT user_unique UNIQUE(`id`, `age`)");
+            });
+            migration.create_table("Post", |t| {
+                t.add_column("id", types::primary());
+                t.add_column("user_id", types::integer().nullable(true));
+                t.add_column("user_age", types::integer().nullable(true));
+                t.add_column("other_user_id", types::integer().nullable(true));
+                t.add_column("other_user_age", types::integer().nullable(true));
+                t.inject_custom("FOREIGN KEY (`user_id`,`user_age`) REFERENCES `User`(`id`, `age`)");
+                t.inject_custom("FOREIGN KEY (`other_user_id`,`other_user_age`) REFERENCES `User`(`id`, `age`)");
+            });
+        })
+        .await;
+
+    let dm = r#"
+            model User {
+               age                                              Int
+               id                                               Int         @id @default(autoincrement())
+               post_Post_other_user_id_other_user_ageToUser     Post[]      @relation("Post_other_user_id_other_user_ageToUser")
+               post_Post_user_id_user_ageToUser                 Post[]      @relation("Post_user_id_user_ageToUser")
+
+               @@unique([id, age], name: "sqlite_autoindex_User_1")
+            }
+
+            model Post {
+                id                                              Int         @id @default(autoincrement())
+                user_other_user_id                              User?       @map(["other_user_id", "other_user_age"]) @relation(name: "Post_other_user_id_other_user_ageToUser", references:[id, age])
+                user_user_id                                    User?       @map(["user_id", "user_age"]) @relation(name: "Post_user_id_user_ageToUser", references:[id, age])
+            }
+
+        "#;
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+}
+
+#[test_each_connector(tags("sqlite"))]
+#[test]
 async fn compound_foreign_keys_should_work_for_required_one_to_many_relations(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel

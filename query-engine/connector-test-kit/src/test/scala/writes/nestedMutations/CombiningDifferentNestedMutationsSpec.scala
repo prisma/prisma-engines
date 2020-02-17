@@ -20,7 +20,7 @@ class CombiningDifferentNestedMutationsSpec extends FlatSpec with Matchers with 
   // the error behavior would be interesting to test, which error is returned, does rollback work
 
   "A create followed by an update" should "work" in {
-    schemaWithRelation(onParent = ChildList, onChild = ParentList).test { t =>
+    schemaWithRelation(onParent = ChildList, onChild = ParentList).test(9) { t =>
       val project = SchemaDsl.fromStringV11() {
         t.datamodel
       }

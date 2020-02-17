@@ -67,7 +67,7 @@ async fn introspecting_two_one_to_one_relations_between_the_same_models_should_w
             model Post {
                id Int @id @default(autoincrement())
                user_id User  @relation("Post_user_idToUser")
-               user    User? @relation("PostToUser_post_id", references: [post_id])
+               user    User? @relation("PostToUser_post_id")
             }
         "#;
     let result = dbg!(api.introspect().await);
@@ -375,7 +375,7 @@ async fn introspecting_a_many_to_many_relation_with_an_id_should_work(api: &Test
 
             model Post {
                id Int @id @default(autoincrement())
-               postsToUsers PostsToUsers[] @relation(references: [post_id])
+               postsToUsers PostsToUsers[] 
             }
 
             model PostsToUsers {
