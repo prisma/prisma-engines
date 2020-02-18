@@ -301,6 +301,22 @@ impl Record {
         Ok(RecordIdentifier { pairs })
     }
 
+    pub fn identifying_values(&self, field_names: &[String], id: &ModelIdentifier) -> crate::Result<Vec<&PrismaValue>> {
+        let x: Vec<&PrismaValue> = id
+            .fields()
+            .into_iter()
+            .flat_map(|id_field| {
+                let source_fields = id_field.data_source_fields();
+
+                source_fields
+                    .into_iter()
+                    .map(|source_field| self.get_field_value(field_names, &source_field.name))
+            })
+            .collect::<crate::Result<Vec<_>>>()?;
+
+        Ok(x)
+    }
+
     pub fn get_field_value(&self, field_names: &[String], field: &str) -> crate::Result<&PrismaValue> {
         let index = field_names.iter().position(|r| r == field).map(Ok).unwrap_or_else(|| {
             Err(DomainError::FieldNotFound {

@@ -138,6 +138,13 @@ impl Field {
         }
     }
 
+    pub(crate) fn as_scalar(self) -> Option<ScalarFieldRef> {
+        match self {
+            Field::Scalar(scalar) => Some(scalar),
+            _ => None,
+        }
+    }
+
     pub fn is_required(&self) -> bool {
         match self {
             Field::Scalar(ref sf) => sf.is_required,
@@ -156,6 +163,13 @@ impl Field {
         match self {
             Self::Scalar(sf) => vec![sf.data_source_field().clone()],
             Self::Relation(rf) => rf.data_source_fields().to_vec(),
+        }
+    }
+
+    pub fn downgrade(&self) -> FieldWeak {
+        match self {
+            Field::Relation(field) => FieldWeak::Relation(Arc::downgrade(field)),
+            Field::Scalar(field) => FieldWeak::Scalar(Arc::downgrade(field)),
         }
     }
 }

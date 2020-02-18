@@ -116,7 +116,7 @@ pub trait InputTypeBuilderBase<'a>: CachedBuilder<InputObjectType> + InputBuilde
             .unique_indexes()
             .into_iter()
             .map(|index| {
-                let typ = self.compound_field_unique_object_type(index.name.as_ref(), index.fields());
+                let typ = self.compound_field_unique_object_type(index.name.as_ref(), index.scalar_fields());
                 let name = compound_index_field_name(index);
 
                 input_field(name, InputType::opt(InputType::object(typ)), None)
