@@ -125,10 +125,14 @@ fn db_names_work() {
 }
 
 #[test]
-#[ignore]
 fn scalar_lists_work() {
     let datamodel = convert(
         r#"
+            datasource pg {
+                provider = "postgres"
+                url = "postgres://localhost/postgres"
+            }
+
             model Test {
                 id String @id @default(cuid())
                 intList Int[]
@@ -139,10 +143,7 @@ fn scalar_lists_work() {
     model
         .assert_scalar_field("intList")
         .assert_type_identifier(TypeIdentifier::Int)
-        .assert_list()
-        .assert_behaviour(FieldBehaviour::ScalarList {
-            strategy: ScalarListStrategy::Relation,
-        });
+        .assert_list();
 }
 
 #[test]
@@ -268,7 +269,6 @@ fn explicit_relation_fields() {
         .assert_model_b("Post")
         .assert_manifestation(RelationLinkManifestation::Inline(InlineRelation {
             in_table_of_model_name: "Post".to_string(),
-            referencing_column: "blog_id".to_string(),
         }));
 }
 
@@ -343,7 +343,6 @@ fn implicit_relation_fields() {
         .assert_model_b("Post")
         .assert_manifestation(RelationLinkManifestation::Inline(InlineRelation {
             in_table_of_model_name: "Post".to_string(),
-            referencing_column: "blog".to_string(),
         }));
 }
 

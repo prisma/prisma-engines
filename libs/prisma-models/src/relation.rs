@@ -48,7 +48,6 @@ pub enum RelationLinkManifestation {
 #[derive(Debug, Clone, PartialEq)]
 pub struct InlineRelation {
     pub in_table_of_model_name: String,
-    pub referencing_column: String,
 }
 
 #[derive(Debug, Clone, PartialEq)]

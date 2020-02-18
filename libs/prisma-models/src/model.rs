@@ -51,7 +51,7 @@ impl ModelTemplate {
             self.id_field_names,
         );
 
-        let indexes = self.indexes.into_iter().map(|i| i.build(&fields.scalar())).collect();
+        let indexes = self.indexes.into_iter().map(|i| i.build(&fields.all)).collect();
 
         // The model is created here and fields WILL BE UNSET before now!
         model.fields.set(fields).unwrap();
@@ -89,18 +89,18 @@ impl Model {
         let fields: Vec<_> = self
             .fields()
             .id()
-            .map(|fields| fields.into_iter().collect())
+            .map(|fields| fields.into_iter().map(Field::Scalar).collect())
             .or_else(|| {
                 self.fields()
                     .scalar()
                     .into_iter()
                     .find(|sf| sf.is_unique && sf.is_required)
-                    .map(|x| vec![x])
+                    .map(|x| vec![Field::Scalar(x)])
             })
             .or_else(|| {
                 self.unique_indexes()
                     .into_iter()
-                    .find(|index| index.fields().into_iter().all(|f| f.is_required))
+                    .find(|index| index.fields().into_iter().all(|f| f.is_required()))
                     .map(|index| index.fields().into_iter().collect())
             })
             .expect(&format!(

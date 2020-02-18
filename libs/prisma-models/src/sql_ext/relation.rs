@@ -1,13 +1,9 @@
-use crate::{
-    AsColumns, AsTable, ColumnIterator, InlineRelation, Relation, RelationField, RelationLinkManifestation,
-    RelationSide,
-};
+use crate::{AsColumns, AsTable, ColumnIterator, Relation, RelationField, RelationLinkManifestation, RelationSide};
 use quaint::ast::{Column, Table};
 
 pub trait RelationExt {
     /// A helper function to decide actions based on the `Relation` type. Inline
     /// relation will return columns for updates, a relation table gives back `None`.
-    fn inline_relation_columns(&self) -> Option<ColumnIterator>;
     fn columns_for_relation_side(&self, side: RelationSide) -> ColumnIterator;
     fn model_a_columns(&self) -> ColumnIterator;
     fn model_b_columns(&self) -> ColumnIterator;
@@ -19,17 +15,6 @@ pub trait RelationFieldExt {
 
     // legacy single column unique
     fn relation_column(&self, alias: bool) -> Column<'static>;
-}
-
-pub trait InlineRelationExt {
-    fn referencing_columns(&self, table: Table<'static>) -> ColumnIterator;
-}
-
-impl InlineRelationExt for InlineRelation {
-    fn referencing_columns(&self, table: Table<'static>) -> ColumnIterator {
-        let column = Column::from(self.referencing_column.clone());
-        ColumnIterator::from(vec![column.table(table)])
-    }
 }
 
 impl RelationFieldExt for RelationField {
@@ -104,17 +89,6 @@ impl RelationExt for Relation {
         match side {
             RelationSide::A => self.model_a_columns(),
             RelationSide::B => self.model_b_columns(),
-        }
-    }
-
-    fn inline_relation_columns(&self) -> Option<ColumnIterator> {
-        if let Some(mani) = self.inline_manifestation() {
-            Some(ColumnIterator::from(vec![Column::from(
-                mani.referencing_column.clone(),
-            )
-            .table(self.as_table())]))
-        } else {
-            None
         }
     }
 
