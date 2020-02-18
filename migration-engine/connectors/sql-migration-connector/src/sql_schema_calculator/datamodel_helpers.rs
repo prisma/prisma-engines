@@ -180,7 +180,7 @@ impl<'a> EnumRef<'a> {
         &self.r#enum.name
     }
 
-    pub(super) fn values(&self) -> Vec<String> {
+    pub(super) fn database_values(&self) -> Vec<String> {
         self.r#enum.database_values()
     }
 

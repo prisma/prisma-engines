@@ -241,8 +241,8 @@ async fn remapping_enum_values_should_work(api: &TestApi) {
         }
 
         enum color {
-            black   @map("b lack")
-            white   @map("w hite")
+            b_lack   @map("b lack")
+            w_hite   @map("w hite")
         }
     "#;
 
