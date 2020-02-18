@@ -75,7 +75,7 @@ impl<'a> EnumDiffer<'a> {
 }
 
 fn values_match(previous: &ast::EnumValue, next: &ast::EnumValue) -> bool {
-    previous.name == next.name
+    previous.name.name == next.name.name
 }
 
 fn enum_directives_match(previous: &ast::Directive, next: &ast::Directive) -> bool {
