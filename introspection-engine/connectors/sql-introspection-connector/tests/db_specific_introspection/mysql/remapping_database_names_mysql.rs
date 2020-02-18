@@ -107,6 +107,42 @@ async fn remapping_models_in_relations_should_work(api: &TestApi) {
 }
 
 #[test_each_connector(tags("mysql"))]
+async fn remapping_models_in_relations_should_not_map_virtual_fields(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::primary());
+                t.add_column("name", types::text());
+            });
+            migration.create_table("Post With Space", |t| {
+                t.add_column("id", types::primary());
+                t.add_column("user_id", types::integer());
+                t.inject_custom("FOREIGN KEY (`user_id`) REFERENCES `User`(`id`)");
+                t.inject_custom("CONSTRAINT post_user_unique UNIQUE(`user_id`)");
+            });
+        })
+        .await;
+
+    let dm = r#"
+            model Post_With_Space {
+                id                  Int                 @id  @default(autoincrement())
+                user_id             User
+                
+                @@map("Post With Space")
+            }
+
+            model User {
+               id                   Int                 @id  @default(autoincrement())
+               name                 String
+               post_With_Space      Post_With_Space?
+            }
+        "#;
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+}
+
+#[test_each_connector(tags("mysql"))]
 #[test]
 async fn remapping_models_in_compound_relations_should_work(api: &TestApi) {
     let barrel = api.barrel();
