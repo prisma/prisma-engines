@@ -1,4 +1,4 @@
-use crate::{InterpreterError, QueryGraphBuilderError, QueryGraphError, QueryParserError};
+use crate::{InterpreterError, QueryGraphBuilderError, QueryGraphError, QueryParserError, RelationViolation};
 use connector::error::ConnectorError;
 use failure::Fail;
 use prisma_models::DomainError;
@@ -104,6 +104,17 @@ impl From<CoreError> for user_facing_errors::Error {
                 argument_name,
                 field_name,
                 object_name,
+            })
+            .unwrap()
+            .into(),
+            CoreError::QueryGraphBuilderError(QueryGraphBuilderError::RelationViolation(RelationViolation {
+                model_a_name,
+                model_b_name,
+                relation_name,
+            })) => user_facing_errors::KnownError::new(user_facing_errors::query_engine::RelationViolation {
+                model_a_name,
+                model_b_name,
+                relation_name,
             })
             .unwrap()
             .into(),

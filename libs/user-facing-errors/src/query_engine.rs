@@ -171,3 +171,14 @@ pub struct MissingRequiredArgument {
     pub field_name: String,
     pub object_name: String,
 }
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = "P2014",
+    message = "The change you are trying to make would violate the required relation '${relation_name}' between the `${model_a_name}` and `${model_b_name}` models."
+)]
+pub struct RelationViolation {
+    pub relation_name: String,
+    pub model_a_name: String,
+    pub model_b_name: String,
+}

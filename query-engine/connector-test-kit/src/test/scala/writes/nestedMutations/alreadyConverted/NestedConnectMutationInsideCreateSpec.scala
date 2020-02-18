@@ -48,8 +48,8 @@ class NestedConnectMutationInsideCreateSpec extends FlatSpec with Matchers with 
            |}
         """.stripMargin,
         project,
-        errorCode = 0, // 3042,
-        errorContains = """Error in query graph construction: RelationViolation(RelationViolation { relation_name: \"ChildToParent\", model_a_name: \"Child\", model_b_name: \"Parent\""""
+        errorCode = 2014,
+        errorContains = """The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models"""
       )
 
     }

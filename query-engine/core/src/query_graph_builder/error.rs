@@ -44,9 +44,9 @@ pub enum QueryGraphBuilderError {
 
 #[derive(Debug)]
 pub struct RelationViolation {
-    relation_name: String,
-    model_a_name: String,
-    model_b_name: String,
+    pub(crate) relation_name: String,
+    pub(crate) model_a_name: String,
+    pub(crate) model_b_name: String,
 }
 
 impl From<RelationFieldRef> for RelationViolation {
