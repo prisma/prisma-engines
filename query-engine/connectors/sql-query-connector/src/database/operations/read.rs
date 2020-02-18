@@ -52,6 +52,26 @@ pub async fn get_many_records(
     Ok(ManyRecords { records, field_names })
 }
 
+fn m2m_column_name(field: &RelationFieldRef) -> Vec<String> {
+    let to_fields = &field.relation_info.to_fields;
+
+    dbg!(&field);
+    dbg!(&field.related_field());
+    dbg!(&to_fields);
+
+    let prefix = if field.relation_side.is_a() { "B" } else { "A" };
+
+    if to_fields.len() > 1 {
+        dbg!("M2M");
+        to_fields
+            .into_iter()
+            .map(|to_field| format!("{}_{}", prefix, to_field))
+            .collect()
+    } else {
+        vec![prefix.to_owned()]
+    }
+}
+
 pub async fn get_related_m2m_record_ids(
     conn: &dyn QueryExt,
     from_field: &RelationFieldRef,
@@ -64,35 +84,48 @@ pub async fn get_related_m2m_record_ids(
     let relation = from_field.relation();
     let table = relation.as_table();
 
-    let (from_column, to_column) = if from_field.relation_side.is_a() {
-        ("A", "B")
-    } else {
-        ("B", "A")
-    };
+    let from_columns: Vec<_> = m2m_column_name(&from_field.related_field());
+    let to_columns: Vec<_> = m2m_column_name(from_field);
+    let select = Select::from_table(table).columns(from_columns.into_iter().chain(to_columns.into_iter()));
+    // .so_that(
+    //     Columns::from(from_columns).in_selection(
+    //         from_record_ids
+    //             .into_iter()
+    //             .map(|id| id.single_value())
+    //             .collect::<Vec<_>>(),
+    //     ),
+    // );
 
-    let select = Select::from_table(table).column(from_column).column(to_column).so_that(
-        Column::from(from_column).in_selection(
-            from_record_ids
-                .into_iter()
-                .map(|id| id.single_value())
-                .collect::<Vec<_>>(),
-        ),
-    );
+    let parent_model_id = from_field.model().primary_identifier();
+    let child_model_id = from_field.related_model().primary_identifier();
 
-    let from_dsf = from_field.data_source_fields().first().unwrap().clone();
-    let to_dsf = from_field.related_field().data_source_fields().first().unwrap().clone();
+    let from_dsfs: Vec<_> = parent_model_id.data_source_fields().collect();
+    let to_dsfs: Vec<_> = child_model_id.data_source_fields().collect();
 
     // first parent id, then child id
     Ok(conn
         .filter(select.into(), idents.as_slice())
         .await?
         .into_iter()
-        .map(|mut row| {
-            let child_id = row.values.pop().unwrap();
-            let parent_id = row.values.pop().unwrap();
+        .map(|row| {
+            let mut values = row.values;
 
-            let p: RecordIdentifier = RecordIdentifier::new(vec![(Arc::clone(&from_dsf), parent_id)]);
-            let c: RecordIdentifier = RecordIdentifier::new(vec![(Arc::clone(&to_dsf), child_id)]);
+            let child_values = values.split_off(from_dsfs.len());
+            let parent_values = values;
+
+            let p: RecordIdentifier = from_dsfs
+                .iter()
+                .zip(parent_values)
+                .map(|(dsf, val)| (dsf.clone(), val))
+                .collect::<Vec<_>>()
+                .into();
+
+            let c: RecordIdentifier = to_dsfs
+                .iter()
+                .zip(child_values)
+                .map(|(dsf, val)| (dsf.clone(), val))
+                .collect::<Vec<_>>()
+                .into();
 
             (p, c)
         })

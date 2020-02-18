@@ -1,4 +1,6 @@
-use crate::{interpreter::InterpretationResult, query_ast::*, result_ast::*};
+use crate::{
+    interpreter::InterpretationResult, query_ast::*, query_graph_builder::write::utils::IdFilter, result_ast::*,
+};
 use connector::{self, filter::Filter, ConnectionLike, QueryArguments, ReadOperations, ScalarCompare};
 use futures::future::{BoxFuture, FutureExt};
 use prisma_models::{ManyRecords, Record, RecordIdentifier};
@@ -134,17 +136,15 @@ fn read_related<'a, 'b>(
                 .get_related_m2m_record_ids(&query.parent_field, &relation_parent_ids)
                 .await?;
 
-            let other_fields: Vec<_> = query
-                .parent_field
-                .related_field()
-                .linking_fields()
-                .data_source_fields()
-                .collect();
+            dbg!(&ids);
 
-            // SINGULAR CASE
-            let other_field = other_fields.first().unwrap();
-            let child_ids_as_prisma_values = ids.iter().map(|ri| ri.1.single_value()).collect();
-            let filter = other_field.is_in(child_ids_as_prisma_values);
+            let child_model_id = query.parent_field.related_model().primary_identifier();
+            let child_ids: Vec<RecordIdentifier> = ids
+                .iter()
+                .map(|ri| child_model_id.assimilate(ri.1.clone()))
+                .collect::<std::result::Result<Vec<_>, _>>()?;
+
+            let filter = child_ids.filter();
             let mut args = query.args.clone();
 
             args.filter = match args.filter {
@@ -157,44 +157,35 @@ fn read_related<'a, 'b>(
                 .await?;
 
             // Child id to parent ids
-            let mut id_map: HashMap<PrismaValue, Vec<PrismaValue>> = HashMap::new();
+            let mut id_map: HashMap<RecordIdentifier, Vec<RecordIdentifier>> = HashMap::new();
 
             for (parent_id, child_id) in ids {
-                let child_val = child_id.single_value();
-                let parent_val = parent_id.single_value();
-
-                match id_map.get_mut(&child_val) {
-                    Some(v) => v.push(parent_val),
+                match id_map.get_mut(&child_id) {
+                    Some(v) => v.push(parent_id),
                     None => {
-                        id_map.insert(child_val, vec![parent_val]);
+                        id_map.insert(child_id, vec![parent_id]);
                     }
                 };
             }
 
-            let child_model_id = query.parent_field.related_model().primary_identifier();
-            let parent_model_id = query.parent_field.model().primary_identifier();
+            dbg!(&id_map);
+
             let fields = &scalars.field_names;
             let mut additional_records = vec![];
 
             for record in scalars.records.iter_mut() {
                 let record_id = record.identifier(fields, &child_model_id)?;
-                let single_id = record_id.single_value();
+                dbg!(&record_id);
 
-                let mut parent_ids = id_map.remove(&single_id).unwrap();
-                let first = parent_ids.pop().unwrap();
+                let mut parent_ids = id_map.remove(&record_id).expect("1");
+                let first = parent_ids.pop().expect("2");
 
-                record.parent_id = Some(RecordIdentifier::new(vec![(
-                    parent_model_id.data_source_fields().next().unwrap(),
-                    first,
-                )]));
+                record.parent_id = Some(first);
 
                 for parent_id in parent_ids {
                     let mut record = record.clone();
-                    record.parent_id = Some(RecordIdentifier::new(vec![(
-                        parent_model_id.data_source_fields().next().unwrap(),
-                        parent_id,
-                    )]));
 
+                    record.parent_id = Some(parent_id);
                     additional_records.push(record);
                 }
             }
