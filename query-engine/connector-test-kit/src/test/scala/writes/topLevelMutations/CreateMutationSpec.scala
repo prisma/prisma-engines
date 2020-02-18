@@ -123,9 +123,8 @@ class CreateMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
     server.queryThatMustFail(
       s"""mutation {createScalarModel(data: {optString: "test", optInt: B, optFloat: 1.234, optBoolean: true, optEnum: A, optDateTime: "2016-07-31T23:59:01.000Z" }){optString, optInt, optFloat, optBoolean, optEnum, optDateTime }}""",
       project = project,
-      errorCode = 0,
-      errorContains = """ObjectValidationError { object_name: \"ScalarModelCreateInput\", inner: FieldValidationError { field_name: \"optInt\", inner: ValueTypeMismatchError { have: Enum(\"B\"), want: Scalar(Int) }"""
-       // """Value types mismatch. Have: Enum("B"), want: Scalar(Int)"""
+      errorCode = 2009,
+      errorContains = """↳ ScalarModelCreateInput (object)\n        ↳ optInt (field)\n          ↳ Value types mismatch. Have: Enum(\"B\"), want: Scalar(Int)""",
     )
   }
 

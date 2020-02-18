@@ -213,7 +213,6 @@ impl From<quaint::error::Error> for SqlError {
             e @ QuaintKind::ConnectTimeout { .. } => SqlError::ConnectionError(e.into()),
             e @ QuaintKind::Timeout(..) => SqlError::ConnectionError(e.into()),
             e @ QuaintKind::TlsError { .. } => Self::ConnectionError(e.into()),
-            _ => todo!(),
         }
     }
 }
