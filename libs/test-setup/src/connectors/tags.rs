@@ -16,7 +16,8 @@ pub struct UnknownTagError(String);
 
 impl std::fmt::Display for UnknownTagError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "Unknown tag `{}`.", self.0)
+        let available_tags: Vec<&str> = TAG_NAMES.iter().map(|(name, _)| *name).collect();
+        write!(f, "Unknown tag `{}`. Available tags: {:?}", self.0, available_tags)
     }
 }
 
@@ -26,13 +27,20 @@ impl std::str::FromStr for Tags {
     type Err = UnknownTagError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "mysql" => Ok(Tags::MYSQL),
-            "postgres" => Ok(Tags::POSTGRES),
-            "sqlite" => Ok(Tags::SQLITE),
-            "sql" => Ok(Tags::SQL),
-            "mariadb" => Ok(Tags::MARIADB),
-            _ => Err(UnknownTagError(s.to_owned())),
-        }
+        TAG_NAMES
+            .binary_search_by_key(&s, |(name, _tag)| *name)
+            .ok()
+            .and_then(|idx| TAG_NAMES.get(idx))
+            .map(|(_name, tag)| *tag)
+            .ok_or_else(|| UnknownTagError(s.to_owned()))
     }
 }
+
+/// All the tags, sorted by name.
+const TAG_NAMES: &[(&str, Tags)] = &[
+    ("mariadb", Tags::MARIADB),
+    ("mysql", Tags::MYSQL),
+    ("postgres", Tags::POSTGRES),
+    ("sql", Tags::SQL),
+    ("sqlite", Tags::SQLITE),
+];
