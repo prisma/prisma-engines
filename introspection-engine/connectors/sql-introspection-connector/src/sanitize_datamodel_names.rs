@@ -84,6 +84,10 @@ static RE_START: Lazy<Regex> = Lazy::new(|| Regex::new("^[^a-zA-Z]+").unwrap());
 static RE: Lazy<Regex> = Lazy::new(|| Regex::new("[^_a-zA-Z0-9]").unwrap());
 
 //todo this is now widely used, we can make this smarter at some point
+//ideas:
+// numbers only -> spell out first digit?   100 -> one00
+// Only invalid characters??
+// Underscore at start
 fn sanitize_name(name: String) -> (String, Option<String>) {
     let needs_sanitation = RE_START.is_match(name.as_str()) || RE.is_match(name.as_str());
 

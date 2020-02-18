@@ -8,7 +8,6 @@ pub struct Enum {
     /// Values of the enum.
     //    todo this needs to be able to hold database names for enum values
     pub values: Vec<EnumValue>,
-    //    pub values: Vec<String>,
     /// Comments for this enum.
     pub documentation: Option<String>,
     /// Database internal name of this enum.
@@ -17,7 +16,6 @@ pub struct Enum {
 
 impl Enum {
     /// Creates a new enum with the given name and values.
-    //    pub fn new(name: &str, values: Vec<String>) -> Enum {
     pub fn new(name: &str, values: Vec<EnumValue>) -> Enum {
         Enum {
             name: String::from(name),
