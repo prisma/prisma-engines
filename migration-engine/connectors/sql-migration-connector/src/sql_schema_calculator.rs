@@ -59,7 +59,7 @@ impl<'a> SqlSchemaCalculator<'a> {
                         .single_database_name()
                         .map(|s| s.to_owned())
                         .unwrap_or_else(|| r#enum.name.clone()),
-                    values: r#enum.values.clone(),
+                    values: r#enum.database_values(),
                 })
                 .collect(),
             SqlFamily::Mysql => {
@@ -77,7 +77,7 @@ impl<'a> SqlSchemaCalculator<'a> {
                             model_name = field.model().database_name(),
                             field_name = field.db_name()
                         ),
-                        values: enum_tpe.r#enum.values.clone(),
+                        values: enum_tpe.r#enum.database_values(),
                     };
 
                     enums.push(sql_enum)
@@ -442,8 +442,9 @@ fn default_migration_value(field_type: &TypeRef<'_>) -> ScalarValue {
             ScalarValue::DateTime(datetime)
         }
         TypeRef::Enum(inum) => {
-            let first_value = inum
-                .values()
+            let values = inum.database_values();
+
+            let first_value = values
                 .first()
                 .expect(&format!("Enum {} did not contain any values.", inum.name()));
             ScalarValue::String(first_value.to_string())

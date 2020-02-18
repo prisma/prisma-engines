@@ -260,7 +260,7 @@ impl EnumAsserts for dml::Enum {
         let pred = t.to_owned();
         self.values
             .iter()
-            .find(|x| **x == pred)
+            .find(|x| *x.name == pred)
             .expect(format!("Field {} not found", t).as_str());
 
         self

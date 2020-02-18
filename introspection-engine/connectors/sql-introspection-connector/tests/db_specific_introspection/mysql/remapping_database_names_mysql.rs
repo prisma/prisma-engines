@@ -212,3 +212,30 @@ async fn remapping_enum_names_should_work(api: &TestApi) {
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
+
+#[test_each_connector(tags("mysql"))]
+async fn remapping_enum_values_should_work(api: &TestApi) {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("Book", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom("color  Enum('b lack', 'w hite')");
+            });
+        })
+        .await;
+
+    let dm = r#"
+        model Book {
+            color   Book_color?
+            id      Int     @default(autoincrement()) @id
+        }
+
+        enum Book_color {
+            b_lack   @map("b lack")
+            w_hite   @map("w hite")
+        }
+    "#;
+
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+}

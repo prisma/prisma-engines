@@ -38,7 +38,16 @@ impl<'a> DatamodelConverter<'a> {
             .enums()
             .map(|e| InternalEnum {
                 name: e.name.clone(),
-                values: e.values.clone(),
+                values: self.convert_enum_values(e),
+            })
+            .collect()
+    }
+
+    fn convert_enum_values(&self, enm: &dml::Enum) -> Vec<InternalEnumValue> {
+        enm.values()
+            .map(|enum_value| InternalEnumValue {
+                name: enum_value.name.clone(),
+                database_name: enum_value.database_name.clone(),
             })
             .collect()
     }
@@ -357,6 +366,7 @@ trait DatamodelFieldExtensions {
     fn behaviour(&self) -> Option<FieldBehaviour>;
     fn final_db_name(&self) -> String;
     fn internal_enum(&self, datamodel: &dml::Datamodel) -> Option<InternalEnum>;
+    fn internal_enum_value(&self, enum_value: &dml::EnumValue) -> InternalEnumValue;
     // fn default_value(&self) -> Option<dml::DefaultValue>; todo this is not applicable anymore
 }
 
@@ -425,10 +435,17 @@ impl DatamodelFieldExtensions for dml::Field {
                     .find(|e| e.name == name.clone())
                     .map(|e| InternalEnum {
                         name: e.name.clone(),
-                        values: e.values.clone(),
+                        values: e.values().map(|v| self.internal_enum_value(v)).collect(),
                     })
             }
             _ => None,
+        }
+    }
+
+    fn internal_enum_value(&self, enum_value: &dml::EnumValue) -> InternalEnumValue {
+        InternalEnumValue {
+            name: enum_value.name.clone(),
+            database_name: enum_value.database_name.clone(),
         }
     }
 

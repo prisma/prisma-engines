@@ -103,7 +103,7 @@ fn push_created_enums<'a>(steps: &mut Steps, enums: impl Iterator<Item = &'a ast
     for r#enum in enums {
         let create_enum_step = steps::CreateEnum {
             r#enum: r#enum.name.name.clone(),
-            values: r#enum.values.iter().map(|value| value.name.clone()).collect(),
+            values: r#enum.values.iter().map(|value| value.name.name.clone()).collect(),
         };
 
         steps.push(MigrationStep::CreateEnum(create_enum_step));
@@ -130,11 +130,11 @@ fn push_updated_enums<'a>(steps: &mut Steps, enums: impl Iterator<Item = EnumDif
     for updated_enum in enums {
         let created_values: Vec<_> = updated_enum
             .created_values()
-            .map(|value| value.name.to_owned())
+            .map(|value| value.name.name.to_owned())
             .collect();
         let deleted_values: Vec<_> = updated_enum
             .deleted_values()
-            .map(|value| value.name.to_owned())
+            .map(|value| value.name.name.to_owned())
             .collect();
 
         let update_enum_step = steps::UpdateEnum {

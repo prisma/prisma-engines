@@ -277,7 +277,8 @@ fn parse_model(token: &pest::iterators::Pair<'_, Rule>) -> Result<Model, ErrorCo
 }
 
 // Enum parsing
-fn parse_enum(token: &pest::iterators::Pair<'_, Rule>) -> Enum {
+fn parse_enum(token: &pest::iterators::Pair<'_, Rule>) -> Result<Enum, ErrorCollection> {
+    let mut errors = ErrorCollection::new();
     let mut name: Option<Identifier> = None;
     let mut directives: Vec<Directive> = vec![];
     let mut values: Vec<EnumValue> = vec![];
@@ -287,19 +288,51 @@ fn parse_enum(token: &pest::iterators::Pair<'_, Rule>) -> Enum {
         Rule::ENUM_KEYWORD => { },
         Rule::identifier => name = Some(current.to_id()),
         Rule::directive => directives.push(parse_directive(&current)),
-        Rule::enum_field_declaration => values.push(EnumValue { name: current.as_str().to_string(), span: Span::from_pest(current.as_span()) }),
+        Rule::enum_field_declaration => {
+        match parse_enum_value(&current) {
+            Ok(enum_value) => values.push(enum_value),
+            Err(err) => errors.push(err)
+        }
+    },
         Rule::doc_comment => comments.push(parse_doc_comment(&current)),
         _ => unreachable!("Encountered impossible enum declaration during parsing: {:?}", current.tokens())
     }
 
+    errors.ok()?;
+
     match name {
-        Some(name) => Enum {
+        Some(name) => Ok(Enum {
             name,
             values,
             directives,
             documentation: doc_comments_to_string(&comments),
             span: Span::from_pest(token.as_span()),
-        },
+        }),
+        _ => panic!(
+            "Encountered impossible enum declaration during parsing, name is missing: {:?}",
+            token.as_str()
+        ),
+    }
+}
+
+// Enum value parsing
+fn parse_enum_value(token: &pest::iterators::Pair<'_, Rule>) -> Result<EnumValue, DatamodelError> {
+    let mut name: Option<Identifier> = None;
+    let mut directives: Vec<Directive> = vec![];
+
+    //todo validate that the identifier is valid???
+    match_children! { token, current,
+        Rule::identifier => name = Some(current.to_id()),
+        Rule::directive => directives.push(parse_directive(&current)),
+        _ => unreachable!("Encountered impossible enum declaration during parsing: {:?}", current.tokens())
+    }
+
+    match name {
+        Some(name) => Ok(EnumValue {
+            name,
+            directives,
+            span: Span::from_pest(token.as_span()),
+        }),
         _ => panic!(
             "Encountered impossible enum declaration during parsing, name is missing: {:?}",
             token.as_str()
@@ -434,24 +467,29 @@ pub fn parse(datamodel_string: &str) -> Result<SchemaAst, ErrorCollection> {
     match datamodel_result {
         Ok(mut datamodel_wrapped) => {
             let datamodel = datamodel_wrapped.next().unwrap();
-            let mut models: Vec<Top> = vec![];
+            let mut top_level_definitions: Vec<Top> = vec![];
 
             match_children! { datamodel, current,
                 Rule::model_declaration => match parse_model(&current) {
-                    Ok(model) => models.push(Top::Model(model)),
+                    Ok(model) => top_level_definitions.push(Top::Model(model)),
                     Err(mut err) => errors.append(&mut err)
                 },
-                Rule::enum_declaration => models.push(Top::Enum(parse_enum(&current))),
-                Rule::source_block => models.push(Top::Source(parse_source(&current))),
-                Rule::generator_block => models.push(Top::Generator(parse_generator(&current))),
-                Rule::type_declaration => models.push(Top::Type(parse_type(&current))),
+                Rule::enum_declaration => match parse_enum(&current){
+                    Ok(enm) => top_level_definitions.push(Top::Enum(enm)),
+                    Err(mut err) => errors.append(&mut err)
+                },
+                Rule::source_block => top_level_definitions.push(Top::Source(parse_source(&current))),
+                Rule::generator_block => top_level_definitions.push(Top::Generator(parse_generator(&current))),
+                Rule::type_declaration => top_level_definitions.push(Top::Type(parse_type(&current))),
                 Rule::EOI => {},
                 _ => panic!("Encountered impossible datamodel declaration during parsing: {:?}", current.tokens())
             }
 
             errors.ok()?;
 
-            Ok(SchemaAst { tops: models })
+            Ok(SchemaAst {
+                tops: top_level_definitions,
+            })
         }
         Err(err) => {
             let location = match err.location {

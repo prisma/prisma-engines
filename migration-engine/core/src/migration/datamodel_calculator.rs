@@ -1,5 +1,5 @@
 use anyhow::format_err;
-use datamodel::ast::{self, ArgumentContainer, SchemaAst};
+use datamodel::ast::{self, ArgumentContainer, Identifier, SchemaAst};
 use migration_connector::steps::{self, CreateSource, DeleteSource, MigrationStep};
 use thiserror::Error;
 
@@ -124,7 +124,8 @@ fn apply_create_enum(datamodel: &mut ast::SchemaAst, step: &steps::CreateEnum) -
     let values = values
         .iter()
         .map(|value_name| ast::EnumValue {
-            name: value_name.clone(),
+            name: Identifier::new(value_name),
+            directives: vec![],
             span: new_span(),
         })
         .collect();
@@ -345,7 +346,8 @@ fn add_enum_values(r#enum: &mut ast::Enum, added_values: &[String]) {
     r#enum
         .values
         .extend(added_values.iter().map(|added_name| ast::EnumValue {
-            name: added_name.clone(),
+            name: Identifier::new(added_name),
+            directives: vec![],
             span: new_span(),
         }))
 }
@@ -357,7 +359,7 @@ fn remove_enum_values(r#enum: &mut ast::Enum, removed_values: &[String]) {
         .filter(|value| {
             removed_values
                 .iter()
-                .find(|removed_value| removed_value.as_str() == value.name.as_str())
+                .find(|removed_value| removed_value.as_str() == value.name.name.as_str())
                 .is_none()
         })
         .collect();

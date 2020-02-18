@@ -75,7 +75,7 @@ impl<'a> EnumDiffer<'a> {
 }
 
 fn values_match(previous: &ast::EnumValue, next: &ast::EnumValue) -> bool {
-    previous.name == next.name
+    previous.name.name == next.name.name
 }
 
 fn enum_directives_match(previous: &ast::Directive, next: &ast::Directive) -> bool {
@@ -115,10 +115,10 @@ mod tests {
 
         let enum_diff: EnumDiffer<'_> = differ.enum_pairs().next().unwrap();
 
-        let created_values: Vec<&str> = enum_diff.created_values().map(|val| val.name.as_str()).collect();
+        let created_values: Vec<&str> = enum_diff.created_values().map(|val| val.name.name.as_str()).collect();
         assert_eq!(created_values, &["MostlyTrue"]);
 
-        let deleted_values: Vec<&str> = enum_diff.deleted_values().map(|val| val.name.as_str()).collect();
+        let deleted_values: Vec<&str> = enum_diff.deleted_values().map(|val| val.name.name.as_str()).collect();
         assert_eq!(deleted_values, &["NearlyTrue", "DefinitelyFalse"],);
     }
 }

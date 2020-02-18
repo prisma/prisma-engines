@@ -45,3 +45,12 @@ pub fn new_builtin_enum_directives() -> DirectiveListValidator<dml::Enum> {
 
     validator
 }
+
+/// Returns a directive list validator containing all builtin enum value directives.
+pub fn new_builtin_enum_value_directives() -> DirectiveListValidator<dml::EnumValue> {
+    let mut validator = DirectiveListValidator::<dml::EnumValue>::new();
+
+    validator.add(Box::new(map::MapDirectiveValidator {}));
+
+    validator
+}

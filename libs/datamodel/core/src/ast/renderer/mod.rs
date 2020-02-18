@@ -203,7 +203,18 @@ impl<'a> Renderer<'a> {
         self.indent_up();
 
         for value in &enm.values {
-            self.write(&value.name);
+            self.write(&value.name.name);
+            if !value.directives.is_empty() {
+                let mut attributes_builder = StringBuilder::new();
+
+                for directive in &value.directives {
+                    attributes_builder.write(&" ");
+                    Self::render_field_directive(&mut attributes_builder, &directive);
+                }
+
+                self.write(&attributes_builder.to_string());
+            }
+
             self.end_line();
         }
 

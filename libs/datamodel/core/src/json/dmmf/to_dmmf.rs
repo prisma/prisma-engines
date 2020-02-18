@@ -31,11 +31,24 @@ fn schema_to_dmmf(schema: &dml::Datamodel) -> Datamodel {
 }
 
 fn enum_to_dmmf(en: &dml::Enum) -> Enum {
-    Enum {
+    let mut enm = Enum {
         name: en.name.clone(),
-        values: en.values.clone(),
+        values: vec![],
         db_name: en.database_name.clone(),
         documentation: en.documentation.clone(),
+    };
+
+    for enum_value in &en.values {
+        enm.values.push(enum_value_to_dmmf(enum_value));
+    }
+
+    enm
+}
+
+fn enum_value_to_dmmf(en: &dml::EnumValue) -> EnumValue {
+    EnumValue {
+        name: en.name.clone(),
+        db_name: en.database_name.clone(),
     }
 }
 
