@@ -11,6 +11,13 @@ pub enum QueryGraphBuilderError {
     /// by the general validation during query document parsing.
     InputError(String),
 
+    /// More specific input error for when an argument is missing for a field on a specific model.
+    MissingRequiredArgument {
+        argument_name: String,
+        field_name: String,
+        object_name: String,
+    },
+
     /// Wraps the initial parsing stage errors.
     QueryParserError(QueryParserError),
 

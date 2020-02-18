@@ -91,11 +91,11 @@ class CreateMutationListSpec extends FlatSpec with Matchers with ApiSpecBase {
          |}""",
       project = project,
       errorCode = 0, // 1
-      errorContains = """Error in query graph construction: InputError(\"The `set` argument was not provided for field `optStrings` on `ScalarModel`"""
+      errorContains = """Missing the required argument `set` for the field `optStrings` on `ScalarModel` at `test`"""
     )
 
     res.pathAsString("errors.[0].error") should be(
-      s"""Error in query graph construction: InputError(\"The `set` argument was not provided for field `optStrings` on `ScalarModel`")"""
+      """Missing the required argument `set` for the field `optStrings` on `ScalarModel` at `test`"""
     )
   }
 

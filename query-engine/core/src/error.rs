@@ -96,7 +96,41 @@ impl From<CoreError> for user_facing_errors::Error {
 
                 known_error.into()
             }
+            CoreError::QueryGraphBuilderError(QueryGraphBuilderError::MissingRequiredArgument {
+                argument_name,
+                object_name,
+                field_name,
+            }) => user_facing_errors::KnownError::new(user_facing_errors::query_engine::MissingRequiredArgument {
+                argument_name,
+                field_name,
+                object_name,
+            })
+            .unwrap()
+            .into(),
             _ => user_facing_errors::Error::from_dyn_error(&err.compat()),
         }
     }
 }
+
+// pub(crate) fn as_missing_required_argument_error(
+//     &self,
+// ) -> Option<user_facing_errors::query_engine::MissingRequiredArgument> {
+//     let mut path: Vec<String> = Vec::new();
+//     let argument_name = None;
+//     let field_name = None;
+//     let object_name = None;
+//     let err = self;
+
+//     loop {
+//         match err {
+//                 QueryParserError::
+//         }
+//     }
+
+//     Some(user_facing_errors::query_engine::MissingRequiredArgument {
+//         argument_name: argument_name?,
+//         field_name: field_name?,
+//         object_name: object_name?,
+//         path: path.join("."),
+//     })
+// }

@@ -160,3 +160,14 @@ pub struct NullConstraintViolation {
 pub struct MissingRequiredValue {
     pub path: String,
 }
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = "P2013",
+    message = "Missing the required argument `${argument_name}` for field `${field_name}` on `${object_name}`."
+)]
+pub struct MissingRequiredArgument {
+    pub argument_name: String,
+    pub field_name: String,
+    pub object_name: String,
+}
