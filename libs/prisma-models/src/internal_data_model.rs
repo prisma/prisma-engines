@@ -52,6 +52,10 @@ impl InternalEnum {
     pub fn contains(&self, val: &String) -> bool {
         self.values.iter().any(|v| &v.name == val)
     }
+
+    pub fn values(&self) -> Vec<String> {
+        self.values.iter().map(|v| v.name.to_string()).collect::<Vec<String>>()
+    }
 }
 
 #[derive(Debug, PartialEq, Eq, Hash, Clone)]

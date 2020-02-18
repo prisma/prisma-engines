@@ -31,6 +31,10 @@ impl OrderByEnumType {
             .iter()
             .find_map(|val| if &val.0 == name { Some(&val.1) } else { None })
     }
+
+    pub fn values(&self) -> Vec<String> {
+        self.values.iter().map(|(name, _)| name.to_owned()).collect()
+    }
 }
 
 // impl Serialize for EnumValue {

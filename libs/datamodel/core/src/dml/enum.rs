@@ -35,6 +35,14 @@ impl Enum {
     pub fn values(&self) -> std::slice::Iter<EnumValue> {
         self.values.iter()
     }
+
+    /// Gets an iterator over all fields.
+    pub fn database_values(&self) -> Vec<String> {
+        self.values
+            .iter()
+            .map(|v| v.database_name.as_ref().unwrap_or(&v.name).to_owned())
+            .collect()
+    }
 }
 
 impl WithName for Enum {
