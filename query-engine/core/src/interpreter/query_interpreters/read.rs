@@ -99,7 +99,7 @@ fn read_related<'a, 'b>(
 ) -> BoxFuture<'a, InterpretationResult<QueryResult>> {
     let fut = async move {
         // The query construction must guarantee that the parent result
-        // contains the selected fields necessary to satisfy the relation query ("relation IDs").
+        // contains the selected fields necessary to satisfy the relation query.
         // There are 2 options:
         // - The query already has IDs set - use those.
         // - The IDs need to be extracted from the parent result.
@@ -135,8 +135,7 @@ fn read_related<'a, 'b>(
                 .parent_field
                 .related_field()
                 .linking_fields()
-                .fields()
-                .flat_map(|f| f.data_source_fields())
+                .data_source_fields()
                 .collect();
 
             let is_compound_case = other_fields.len() > 1;
