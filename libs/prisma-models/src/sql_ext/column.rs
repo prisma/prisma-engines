@@ -1,4 +1,4 @@
-use crate::{Field, ModelIdentifier, RelationField, ScalarField};
+use crate::{Field, ModelIdentifier, RelationField, RelationLinkManifestation, ScalarField};
 use quaint::ast::{Column, Row};
 
 pub struct ColumnIterator {
@@ -89,12 +89,23 @@ impl AsColumns for RelationField {
         let model = self.model();
         let internal_data_model = model.internal_data_model();
 
+        let relation = self.relation();
+        let table_name = if relation.is_many_to_many() {
+            if let RelationLinkManifestation::RelationTable(ref rt) = relation.manifestation {
+                rt.table.clone()
+            } else {
+                unreachable!()
+            }
+        } else {
+            model.db_name().to_string()
+        };
+
         let inner: Vec<_> = self
             .data_source_fields()
             .iter()
             .map(|dsf| {
                 let parts = (
-                    (internal_data_model.db_name.clone(), model.db_name().to_string()),
+                    (internal_data_model.db_name.clone(), table_name.clone()),
                     dsf.name.clone(),
                 );
 
@@ -128,8 +139,26 @@ impl AsColumn for crate::field::DataSourceField {
         let model = self.model_field().model();
         let db = model.internal_data_model().db_name.clone();
         let table = model.db_name().to_string();
-        let col = self.name.to_string();
+        let col = column_name(&self).to_string();
 
         Column::from(((db, table), col))
+    }
+}
+
+fn column_name(dsf: &crate::field::DataSourceField) -> &str {
+    match dsf.model_field() {
+        Field::Scalar(_) => &dsf.name,
+        Field::Relation(rf) => {
+            let relation = rf.relation();
+            if relation.is_many_to_many() {
+                if rf.relation_side.is_a() {
+                    "A"
+                } else {
+                    "B"
+                }
+            } else {
+                &dsf.name
+            }
+        }
     }
 }

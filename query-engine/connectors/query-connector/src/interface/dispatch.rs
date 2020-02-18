@@ -41,6 +41,17 @@ impl<'conn, 'tx> ReadOperations for ConnectionLike<'conn, 'tx> {
         }
     }
 
+    fn get_related_m2m_record_ids<'a>(
+        &'a self,
+        from_field: &'a RelationFieldRef,
+        from_record_ids: &'a [RecordIdentifier],
+    ) -> crate::IO<'a, Vec<(RecordIdentifier, RecordIdentifier)>> {
+        match self {
+            Self::Connection(c) => c.get_related_m2m_record_ids(from_field, from_record_ids),
+            Self::Transaction(tx) => tx.get_related_m2m_record_ids(from_field, from_record_ids),
+        }
+    }
+
     // This will eventually become a more generic `aggregate`
     fn count_by_model<'a>(&'a self, model: &'a ModelRef, query_arguments: QueryArguments) -> crate::IO<'a, usize> {
         match self {

@@ -119,8 +119,7 @@ fn read_related<'a, 'b>(
 
         // prisma level join does not work for many 2 many yet
         // can only work if we have a parent result. This is not the case when we e.g. have nested delete inside an update
-        let use_prisma_level_join =
-            !relation.is_many_to_many() && parent_result.is_some() && !query.args.is_with_pagination();
+        let use_prisma_level_join = parent_result.is_some() && !query.args.is_with_pagination();
 
         let mut scalars = if !use_prisma_level_join {
             tx.get_related_records(
@@ -130,6 +129,78 @@ fn read_related<'a, 'b>(
                 &query.selected_fields.only_scalar_and_inlined(),
             )
             .await?
+        } else if relation.is_many_to_many() {
+            let ids = tx
+                .get_related_m2m_record_ids(&query.parent_field, &relation_parent_ids)
+                .await?;
+
+            let other_fields: Vec<_> = query
+                .parent_field
+                .related_field()
+                .linking_fields()
+                .data_source_fields()
+                .collect();
+
+            // SINGULAR CASE
+            let other_field = other_fields.first().unwrap();
+            let child_ids_as_prisma_values = ids.iter().map(|ri| ri.1.single_value()).collect();
+            let filter = other_field.is_in(child_ids_as_prisma_values);
+            let mut args = query.args.clone();
+
+            args.filter = match args.filter {
+                Some(existing_filter) => Some(Filter::and(vec![existing_filter, filter])),
+                None => Some(filter),
+            };
+
+            let mut scalars = tx
+                .get_many_records(&query.parent_field.related_model(), args, &query.selected_fields)
+                .await?;
+
+            // Child id to parent ids
+            let mut id_map: HashMap<PrismaValue, Vec<PrismaValue>> = HashMap::new();
+
+            for (parent_id, child_id) in ids {
+                let child_val = child_id.single_value();
+                let parent_val = parent_id.single_value();
+
+                match id_map.get_mut(&child_val) {
+                    Some(v) => v.push(parent_val),
+                    None => {
+                        id_map.insert(child_val, vec![parent_val]);
+                    }
+                };
+            }
+
+            let child_model_id = query.parent_field.related_model().primary_identifier();
+            let parent_model_id = query.parent_field.model().primary_identifier();
+            let fields = &scalars.field_names;
+            let mut additional_records = vec![];
+
+            for record in scalars.records.iter_mut() {
+                let record_id = record.identifier(fields, &child_model_id)?;
+                let single_id = record_id.single_value();
+
+                let mut parent_ids = id_map.remove(&single_id).unwrap();
+                let first = parent_ids.pop().unwrap();
+
+                record.parent_id = Some(RecordIdentifier::new(vec![(
+                    parent_model_id.data_source_fields().next().unwrap(),
+                    first,
+                )]));
+
+                for parent_id in parent_ids {
+                    let mut record = record.clone();
+                    record.parent_id = Some(RecordIdentifier::new(vec![(
+                        parent_model_id.data_source_fields().next().unwrap(),
+                        parent_id,
+                    )]));
+
+                    additional_records.push(record);
+                }
+            }
+
+            scalars.records.extend(additional_records);
+            scalars
         } else {
             // PRISMA LEVEL JOIN
 

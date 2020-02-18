@@ -3,11 +3,12 @@ use crate::{
         self,
         read::{self, ManyRelatedRecordsBaseQuery, ManyRelatedRecordsQueryBuilder},
     },
-    QueryExt, SqlError,
+    AliasedCondition, QueryExt, SqlError,
 };
 use connector_interface::*;
 use prisma_models::*;
 use quaint::ast::*;
+use std::sync::Arc;
 
 pub async fn get_single_record(
     conn: &dyn QueryExt,
@@ -49,6 +50,53 @@ pub async fn get_many_records(
         .collect();
 
     Ok(ManyRecords { records, field_names })
+}
+
+pub async fn get_related_m2m_record_ids(
+    conn: &dyn QueryExt,
+    from_field: &RelationFieldRef,
+    from_record_ids: &[RecordIdentifier],
+) -> crate::Result<Vec<(RecordIdentifier, RecordIdentifier)>> {
+    let mut idents = vec![];
+    idents.extend(from_field.type_identifiers_with_arities());
+    idents.extend(from_field.related_field().type_identifiers_with_arities());
+
+    let relation = from_field.relation();
+    let table = relation.as_table();
+
+    let (from_column, to_column) = if from_field.relation_side.is_a() {
+        ("A", "B")
+    } else {
+        ("B", "A")
+    };
+
+    let select = Select::from_table(table).column(from_column).column(to_column).so_that(
+        Column::from(from_column).in_selection(
+            from_record_ids
+                .into_iter()
+                .map(|id| id.single_value())
+                .collect::<Vec<_>>(),
+        ),
+    );
+
+    let from_dsf = from_field.data_source_fields().first().unwrap().clone();
+    let to_dsf = from_field.related_field().data_source_fields().first().unwrap().clone();
+
+    // first parent id, then child id
+    Ok(conn
+        .filter(select.into(), idents.as_slice())
+        .await?
+        .into_iter()
+        .map(|mut row| {
+            let child_id = row.values.pop().unwrap();
+            let parent_id = row.values.pop().unwrap();
+
+            let p: RecordIdentifier = RecordIdentifier::new(vec![(Arc::clone(&from_dsf), parent_id)]);
+            let c: RecordIdentifier = RecordIdentifier::new(vec![(Arc::clone(&to_dsf), child_id)]);
+
+            (p, c)
+        })
+        .collect())
 }
 
 pub async fn get_related_records<T>(
