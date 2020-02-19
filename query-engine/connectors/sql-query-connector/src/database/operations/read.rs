@@ -3,12 +3,11 @@ use crate::{
         self,
         read::{self, ManyRelatedRecordsBaseQuery, ManyRelatedRecordsQueryBuilder},
     },
-    AliasedCondition, QueryExt, SqlError,
+    QueryExt, SqlError,
 };
 use connector_interface::*;
 use prisma_models::*;
 use quaint::ast::*;
-use std::sync::Arc;
 
 pub async fn get_single_record(
     conn: &dyn QueryExt,
@@ -52,17 +51,11 @@ pub async fn get_many_records(
     Ok(ManyRecords { records, field_names })
 }
 
-fn m2m_column_name(field: &RelationFieldRef) -> Vec<String> {
+fn m2m_column_names(field: &RelationFieldRef) -> Vec<String> {
     let to_fields = &field.relation_info.to_fields;
-
-    dbg!(&field);
-    dbg!(&field.related_field());
-    dbg!(&to_fields);
-
     let prefix = if field.relation_side.is_a() { "B" } else { "A" };
 
     if to_fields.len() > 1 {
-        dbg!("M2M");
         to_fields
             .into_iter()
             .map(|to_field| format!("{}_{}", prefix, to_field))
@@ -84,9 +77,19 @@ pub async fn get_related_m2m_record_ids(
     let relation = from_field.relation();
     let table = relation.as_table();
 
-    let from_columns: Vec<_> = m2m_column_name(&from_field.related_field());
-    let to_columns: Vec<_> = m2m_column_name(from_field);
-    let select = Select::from_table(table).columns(from_columns.into_iter().chain(to_columns.into_iter()));
+    let from_column_names: Vec<_> = m2m_column_names(&from_field.related_field());
+    let to_column_names: Vec<_> = m2m_column_names(from_field);
+    let to_columns: Vec<Column<'static>> = to_column_names.iter().map(|name| Column::from(name.clone())).collect();
+
+    dbg!(&to_columns);
+    dbg!(&from_record_ids);
+
+    // [DTODO] To verify: We might need chunked fetch here.
+    let select = Select::from_table(table)
+        .columns(from_column_names.into_iter().chain(to_column_names.into_iter()))
+        .so_that(query_builder::conditions(&to_columns, from_record_ids));
+
+    // from_record_ids.to_vec()
     // .so_that(
     //     Columns::from(from_columns).in_selection(
     //         from_record_ids
