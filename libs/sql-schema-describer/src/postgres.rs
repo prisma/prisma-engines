@@ -370,7 +370,8 @@ impl SqlSchemaDescriber {
             array_agg(columnInfos.attname) AS column_names,
             rawIndex.indisunique AS is_unique,
             rawIndex.indisprimary AS is_primary_key,
-            tableInfos.relname AS table_name
+            tableInfos.relname AS table_name,
+            pg_get_serial_sequence('"' || $1 || '"."' || tableInfos.relname || '"', (array_agg(columnInfos.attname))[1]) AS sequence_name
         FROM
             -- pg_class stores infos about tables, indices etc: https://www.postgresql.org/docs/current/catalog-pg-class.html
             pg_class tableInfos,
@@ -431,7 +432,18 @@ impl SqlSchemaDescriber {
                 .expect("column_names");
 
             if is_pk {
-                let pk = Some(self.infer_primary_key(schema, &table_name, columns, sequences).await);
+                let sequence_name = index.get("sequence_name").and_then(|x| x.to_string());
+
+                let sequence = sequence_name.and_then(|sequence_name| {
+                    let captures = RE_SEQ.captures(&sequence_name).expect("get captures");
+                    let sequence_name = captures.get(1).expect("get capture").as_str();
+                    sequences.iter().find(|s| &s.name == sequence_name).map(|sequence| {
+                        debug!("Got sequence corresponding to primary key: {:#?}", sequence);
+                        sequence.clone()
+                    })
+                });
+
+                let pk = Some(PrimaryKey { columns, sequence });
 
                 let entry = indexes_map.entry(table_name).or_insert_with(|| (Vec::new(), None));
                 entry.1 = pk;
@@ -452,48 +464,6 @@ impl SqlSchemaDescriber {
         }
 
         indexes_map
-    }
-
-    async fn infer_primary_key(
-        &self,
-        schema: &str,
-        table_name: &str,
-        columns: Vec<String>,
-        sequences: &Vec<Sequence>,
-    ) -> PrimaryKey {
-        let sequence = if columns.len() == 1 {
-            let sql = format!(
-                "SELECT pg_get_serial_sequence('\"{}\".\"{}\"', '{}') as sequence",
-                schema, table_name, columns[0]
-            );
-            debug!(
-                "Querying for sequence seeding primary key column '{}': '{}'",
-                columns[0], sql
-            );
-            let rows = self
-                .conn
-                .query_raw(&sql, &[])
-                .await
-                .expect("querying for sequence seeding primary key column");
-            // Given the result rows, find any sequence
-            rows.into_iter().fold(None, |_: Option<Sequence>, row| {
-                row.get("sequence")
-                    .and_then(|x| x.to_string())
-                    .and_then(|sequence_name| {
-                        let captures = RE_SEQ.captures(&sequence_name).expect("get captures");
-                        let sequence_name = captures.get(1).expect("get capture").as_str();
-                        debug!("Found sequence name corresponding to primary key: {}", sequence_name);
-                        sequences.iter().find(|s| &s.name == sequence_name).map(|sequence| {
-                            debug!("Got sequence corresponding to primary key: {:#?}", sequence);
-                            sequence.clone()
-                        })
-                    })
-            })
-        } else {
-            None
-        };
-
-        PrimaryKey { columns, sequence }
     }
 
     async fn get_sequences(&self, schema: &str) -> SqlSchemaDescriberResult<Vec<Sequence>> {
