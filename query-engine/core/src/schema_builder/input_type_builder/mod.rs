@@ -128,7 +128,7 @@ pub trait InputTypeBuilderBase<'a>: CachedBuilder<InputObjectType> + InputBuilde
             let name = compound_id_field_name(&fields.iter().map(|f| f.name.as_ref()).collect::<Vec<&str>>());
             let typ = self.compound_field_unique_object_type(None, fields);
 
-            input_field(name, InputType::object(typ), None)
+            input_field(name, InputType::opt(InputType::object(typ)), None)
         });
 
         fields.extend(compound_unique_fields);
