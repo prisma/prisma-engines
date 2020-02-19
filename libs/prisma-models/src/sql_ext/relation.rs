@@ -10,6 +10,7 @@ pub trait RelationExt {
 }
 
 pub trait RelationFieldExt {
+    fn m2m_column_names(&self) -> Vec<String>;
     fn opposite_columns(&self, alias: bool) -> ColumnIterator;
     fn relation_columns(&self, alias: bool) -> ColumnIterator;
 
@@ -18,6 +19,20 @@ pub trait RelationFieldExt {
 }
 
 impl RelationFieldExt for RelationField {
+    fn m2m_column_names(&self) -> Vec<String> {
+        let to_fields = &self.relation_info.to_fields;
+        let prefix = if self.relation_side.is_a() { "B" } else { "A" };
+
+        if to_fields.len() > 1 {
+            to_fields
+                .into_iter()
+                .map(|to_field| format!("{}_{}", prefix, to_field))
+                .collect()
+        } else {
+            vec![prefix.to_owned()]
+        }
+    }
+
     fn opposite_columns(&self, alias: bool) -> ColumnIterator {
         let cols = match self.relation_side {
             RelationSide::A => self.relation().model_b_columns(),

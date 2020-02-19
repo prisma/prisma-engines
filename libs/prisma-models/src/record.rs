@@ -37,8 +37,15 @@ impl ModelIdentifier {
         self.fields.iter()
     }
 
+    /// Returns the length of schema model fields contained in this identifier.
+    /// This is **not** the length of the underlying database fields, use `db_len` instead.
     pub fn len(&self) -> usize {
         self.fields.len()
+    }
+
+    /// Returns the length of data source fields contained in this identifier.
+    pub fn db_len(&self) -> usize {
+        self.data_source_fields().count()
     }
 
     pub fn is_singular_field(&self) -> bool {
@@ -83,7 +90,10 @@ impl ModelIdentifier {
     /// Additionally performs a type coercion based on the source and destination field types.
     /// (Resistance is futile.)
     pub fn assimilate(&self, id: RecordIdentifier) -> crate::Result<RecordIdentifier> {
-        if self.len() != id.len() {
+        if self.db_len() != id.len() {
+            dbg!(self);
+            dbg!(&id);
+
             Err(DomainError::ConversionFailure(
                 "record identifier".to_owned(),
                 "assimilated record identifier".to_owned(),

@@ -51,20 +51,6 @@ pub async fn get_many_records(
     Ok(ManyRecords { records, field_names })
 }
 
-fn m2m_column_names(field: &RelationFieldRef) -> Vec<String> {
-    let to_fields = &field.relation_info.to_fields;
-    let prefix = if field.relation_side.is_a() { "B" } else { "A" };
-
-    if to_fields.len() > 1 {
-        to_fields
-            .into_iter()
-            .map(|to_field| format!("{}_{}", prefix, to_field))
-            .collect()
-    } else {
-        vec![prefix.to_owned()]
-    }
-}
-
 pub async fn get_related_m2m_record_ids(
     conn: &dyn QueryExt,
     from_field: &RelationFieldRef,
@@ -77,27 +63,17 @@ pub async fn get_related_m2m_record_ids(
     let relation = from_field.relation();
     let table = relation.as_table();
 
-    let from_column_names: Vec<_> = m2m_column_names(&from_field.related_field());
-    let to_column_names: Vec<_> = m2m_column_names(from_field);
-    let to_columns: Vec<Column<'static>> = to_column_names.iter().map(|name| Column::from(name.clone())).collect();
+    let from_column_names: Vec<_> = from_field.related_field().m2m_column_names();
+    let to_column_names: Vec<_> = from_field.m2m_column_names();
+    let from_columns: Vec<Column<'static>> = from_column_names
+        .iter()
+        .map(|name| Column::from(name.clone()))
+        .collect();
 
-    dbg!(&to_columns);
-    dbg!(&from_record_ids);
-
-    // [DTODO] To verify: We might need chunked fetch here.
+    // [DTODO] To verify: We might need chunked fetch here (too many parameters in the query).
     let select = Select::from_table(table)
         .columns(from_column_names.into_iter().chain(to_column_names.into_iter()))
-        .so_that(query_builder::conditions(&to_columns, from_record_ids));
-
-    // from_record_ids.to_vec()
-    // .so_that(
-    //     Columns::from(from_columns).in_selection(
-    //         from_record_ids
-    //             .into_iter()
-    //             .map(|id| id.single_value())
-    //             .collect::<Vec<_>>(),
-    //     ),
-    // );
+        .so_that(query_builder::conditions(&from_columns, from_record_ids));
 
     let parent_model_id = from_field.model().primary_identifier();
     let child_model_id = from_field.related_model().primary_identifier();

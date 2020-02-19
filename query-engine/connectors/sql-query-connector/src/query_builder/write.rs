@@ -56,34 +56,14 @@ pub fn delete_many(model: &ModelRef, ids: &[&RecordIdentifier]) -> Vec<Query<'st
     })
 }
 
-fn m2m_column_name(field: &RelationFieldRef) -> Vec<String> {
-    let to_fields = &field.relation_info.to_fields;
-
-    dbg!(&field);
-    dbg!(&field.related_field());
-    dbg!(&to_fields);
-
-    let prefix = if field.relation_side.is_a() { "B" } else { "A" };
-
-    if to_fields.len() > 1 {
-        dbg!("M2M");
-        to_fields
-            .into_iter()
-            .map(|to_field| format!("{}_{}", prefix, to_field))
-            .collect()
-    } else {
-        vec![prefix.to_owned()]
-    }
-}
-
 pub fn create_relation_table_records(
     field: &RelationFieldRef,
     parent_id: &RecordIdentifier,
     child_ids: &[RecordIdentifier],
 ) -> Query<'static> {
     let relation = field.relation();
-    let parent_columns: Vec<_> = m2m_column_name(&field.related_field());
-    let child_columns: Vec<_> = m2m_column_name(field);
+    let parent_columns: Vec<_> = field.related_field().m2m_column_names();
+    let child_columns: Vec<_> = field.m2m_column_names();
 
     let columns: Vec<String> = parent_columns.into_iter().chain(child_columns).collect();
     let insert = Insert::multi_into(relation.as_table(), columns);
