@@ -650,8 +650,8 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
 
   }
 
-  "a PM to C1!  relation with the child already in a relation" should "be connectable through a nested mutation" in {
-    schemaWithRelation(onParent = ChildList, onChild = ParentReq).test { t =>
+  "a PM to C1! relation with the child already in a relation" should "be connectable through a nested mutation" in {
+    schemaWithRelation(onParent = ChildList, onChild = ParentReq).test(9) { t =>
       val project = SchemaDsl.fromStringV11() {
         t.datamodel
       }

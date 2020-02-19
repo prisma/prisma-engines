@@ -80,7 +80,6 @@ fn read_many<'a, 'b>(
             .await?;
 
         let model_id = query.model.primary_identifier();
-        // let ids = scalars.identifiers(&model_id)?;
         let nested: Vec<QueryResult> = process_nested(tx, query.nested, Some(&scalars)).await?;
 
         Ok(QueryResult::RecordSelection(RecordSelection {
@@ -113,7 +112,7 @@ fn read_related<'a, 'b>(
             None => {
                 let relation_id = query.parent_field.linking_fields();
                 parent_result
-                    .expect("No parent results present in the query graph for reading related records.")
+                    .expect("[ID retrieval] No parent results present in the query graph for reading related records.")
                     .identifiers(&relation_id)?
             }
         };
@@ -126,7 +125,7 @@ fn read_related<'a, 'b>(
 
         // prisma level join does not work for many 2 many yet
         // can only work if we have a parent result. This is not the case when we e.g. have nested delete inside an update
-        let use_prisma_level_join = !query.args.is_with_pagination(); //parent_result.is_some() &&
+        let use_prisma_level_join = parent_result.is_some() && !query.args.is_with_pagination();
 
         let mut scalars = if !use_prisma_level_join {
             println!("Using old code path");
@@ -160,7 +159,11 @@ fn read_related<'a, 'b>(
             };
 
             let mut scalars = tx
-                .get_many_records(&query.parent_field.related_model(), args, &query.selected_fields)
+                .get_many_records(
+                    &query.parent_field.related_model(),
+                    args,
+                    &query.selected_fields.only_scalar_and_inlined(),
+                )
                 .await?;
 
             // Child id to parent ids
@@ -262,8 +265,9 @@ fn read_related<'a, 'b>(
                 let parent_link_fields = query.parent_field.linking_fields();
                 let child_link_fields = query.parent_field.related_field().linking_fields();
 
-                let parent_result =
-                    parent_result.expect("No parent results present in the query graph for reading related records.");
+                let parent_result = parent_result.expect(
+                    "[Result Construction] No parent results present in the query graph for reading related records.",
+                );
 
                 let parent_fields = &parent_result.field_names;
                 let mut additional_records = vec![];
@@ -323,7 +327,7 @@ fn read_related<'a, 'b>(
                     record.parent_id = Some(parent_id);
                 }
             } else if query.parent_field.relation().is_many_to_many() {
-                // nothing to do for many to many. parent ids are already present
+                // nothing to do for many to many.
             } else {
                 panic!(format!(
                     "parent result: {:?}, relation: {:?}",
