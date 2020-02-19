@@ -481,6 +481,7 @@ pub fn parse(datamodel_string: &str) -> Result<SchemaAst, ErrorCollection> {
                 Rule::source_block => top_level_definitions.push(Top::Source(parse_source(&current))),
                 Rule::generator_block => top_level_definitions.push(Top::Generator(parse_generator(&current))),
                 Rule::type_declaration => top_level_definitions.push(Top::Type(parse_type(&current))),
+                Rule::doc_comment => (),
                 Rule::EOI => {},
                 _ => panic!("Encountered impossible datamodel declaration during parsing: {:?}", current.tokens())
             }
