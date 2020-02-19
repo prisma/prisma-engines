@@ -68,8 +68,8 @@ pub enum ErrorKind {
     #[error("Connect timed out")]
     ConnectTimeout,
 
-    #[error("Operation timed out")]
-    Timeout,
+    #[error("Operation timed out ({0})")]
+    Timeout(String),
 
     #[error("Error opening a TLS connection. {}", message)]
     TlsError { message: String },
