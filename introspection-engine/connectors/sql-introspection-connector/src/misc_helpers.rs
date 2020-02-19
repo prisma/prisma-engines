@@ -108,7 +108,7 @@ pub(crate) fn calculate_scalar_field(schema: &SqlSchema, table: &Table, column: 
     };
 
     let is_id = is_id(&column, &table);
-    let default_value = calculate_default(&column, &arity);
+    let default_value = calculate_default(table, &column, &arity);
     let is_unique = table.is_column_unique(&column.name) && !is_id;
 
     Field {
@@ -264,7 +264,7 @@ pub(crate) fn calculate_backrelation_field(
     }
 }
 
-pub(crate) fn calculate_default(column: &Column, arity: &FieldArity) -> Option<DefaultValue> {
+pub(crate) fn calculate_default(table: &Table, column: &Column, arity: &FieldArity) -> Option<DefaultValue> {
     match (&column.default, &column.tpe.family) {
         (_, _) if *arity == FieldArity::List => None,
         (Some(d), ColumnTypeFamily::Boolean) => match parse_int(d) {
@@ -273,6 +273,7 @@ pub(crate) fn calculate_default(column: &Column, arity: &FieldArity) -> Option<D
         },
         (Some(d), ColumnTypeFamily::Int) => match column.auto_increment {
             true => Some(DefaultValue::Expression(ValueGenerator::new_autoincrement())),
+            _ if is_sequence(column, table) => Some(DefaultValue::Expression(ValueGenerator::new_autoincrement())),
             false => parse_int(d).map(|x| DefaultValue::Single(ScalarValue::Int(x))),
         },
         (Some(d), ColumnTypeFamily::Float) => parse_float(d).map(|x| DefaultValue::Single(ScalarValue::Float(x))),
@@ -288,6 +289,14 @@ pub(crate) fn is_id(column: &Column, table: &Table) -> bool {
         .primary_key
         .as_ref()
         .map(|pk| pk.is_single_primary_key(&column.name))
+        .unwrap_or(false)
+}
+
+pub(crate) fn is_sequence(column: &Column, table: &Table) -> bool {
+    table
+        .primary_key
+        .as_ref()
+        .map(|pk| pk.is_single_primary_key(&column.name) && pk.sequence.is_some())
         .unwrap_or(false)
 }
 

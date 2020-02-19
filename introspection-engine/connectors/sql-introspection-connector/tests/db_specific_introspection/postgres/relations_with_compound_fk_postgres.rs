@@ -338,7 +338,7 @@ async fn repro_matt_references_on_wrong_side(api: &TestApi) {
             }
             
             model b {
-              id Int @id  
+              id Int @id  @default(autoincrement())
               a  a   @map(["one", "two"])
             }
               
