@@ -34,15 +34,13 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
         let enums = self.get_enums(schema).await?;
         let mut columns = self.get_columns(schema, &enums).await;
         let mut foreign_keys = self.get_foreign_keys(schema).await;
+        let mut indexes = self.get_indices(schema, &sequences).await;
 
         let table_names = self.get_table_names(schema).await;
         let mut tables = Vec::with_capacity(table_names.len());
 
         for table_name in &table_names {
-            tables.push(
-                self.get_table(schema, &table_name, &sequences, &mut columns, &mut foreign_keys)
-                    .await,
-            );
+            tables.push(self.get_table(&table_name, &mut columns, &mut foreign_keys, &mut indexes));
         }
 
         Ok(SqlSchema {
@@ -117,16 +115,15 @@ impl SqlSchemaDescriber {
         size.try_into().unwrap()
     }
 
-    async fn get_table(
+    fn get_table(
         &self,
-        schema: &str,
         name: &str,
-        sequences: &Vec<Sequence>,
         columns: &mut HashMap<String, Vec<Column>>,
         foreign_keys: &mut HashMap<String, Vec<ForeignKey>>,
+        indices: &mut HashMap<String, (Vec<Index>, Option<PrimaryKey>)>,
     ) -> Table {
         debug!("Getting table '{}'", name);
-        let (indices, primary_key) = self.get_indices(schema, name, sequences).await;
+        let (indices, primary_key) = indices.remove(name).unwrap_or_else(|| (Vec::new(), None));
         let foreign_keys = foreign_keys.remove(name).unwrap_or_else(Vec::new);
         let columns = columns.remove(name).expect("could not get columns");
         Table {
@@ -359,17 +356,21 @@ impl SqlSchemaDescriber {
         fks
     }
 
+    /// Returns a map from table name to indexes and (optional) primary key.
     async fn get_indices(
         &self,
         schema: &str,
-        table_name: &str,
         sequences: &Vec<Sequence>,
-    ) -> (Vec<Index>, Option<PrimaryKey>) {
+    ) -> HashMap<String, (Vec<Index>, Option<PrimaryKey>)> {
+        let mut indexes_map = HashMap::new();
+
         let sql = r#"
         SELECT
             indexInfos.relname as name,
-            array_agg(columnInfos.attname) as column_names,
-            rawIndex.indisunique as is_unique, rawIndex.indisprimary as is_primary_key
+            array_agg(columnInfos.attname) AS column_names,
+            rawIndex.indisunique AS is_unique,
+            rawIndex.indisprimary AS is_primary_key,
+            tableInfos.relname AS table_name
         FROM
             -- pg_class stores infos about tables, indices etc: https://www.postgresql.org/docs/current/catalog-pg-class.html
             pg_class tableInfos,
@@ -404,18 +405,14 @@ impl SqlSchemaDescriber {
             -- we only consider stuff out of one specific schema
             AND tableInfos.relnamespace = schemaInfo.oid
             AND schemaInfo.nspname = $1
-            AND tableInfos.relname = $2
         GROUP BY tableInfos.relname, indexInfos.relname, rawIndex.indisunique, rawIndex.indisprimary
         "#;
         debug!("Getting indices: {}", sql);
         let rows = self
             .conn
-            .query_raw(&sql, &[schema.into(), table_name.into()])
+            .query_raw(&sql, &[schema.into()])
             .await
             .expect("querying for indices");
-        let mut pk: Option<PrimaryKey> = None;
-
-        let mut indices = Vec::new();
 
         for index in rows {
             debug!("Got index: {:?}", index);
@@ -423,16 +420,27 @@ impl SqlSchemaDescriber {
                 .get("is_primary_key")
                 .and_then(|x| x.as_bool())
                 .expect("get is_primary_key");
-            // TODO: Implement and use as_slice instead of into_vec, to avoid cloning
+            let table_name = index
+                .get("table_name")
+                .and_then(|x| x.to_string())
+                .expect("get table_name");
+            // TODO: Implement in quaint and use as_slice instead of into_vec, to avoid cloning
             let columns = index
                 .get("column_names")
                 .and_then(|x| x.clone().into_vec::<String>())
                 .expect("column_names");
+
             if is_pk {
-                pk = Some(self.infer_primary_key(schema, table_name, columns, sequences).await);
+                let pk = Some(self.infer_primary_key(schema, &table_name, columns, sequences).await);
+
+                let entry = indexes_map.entry(table_name).or_insert_with(|| (Vec::new(), None));
+                entry.1 = pk;
             } else {
                 let is_unique = index.get("is_unique").and_then(|x| x.as_bool()).expect("is_unique");
-                indices.push(Index {
+
+                let entry = indexes_map.entry(table_name).or_insert_with(|| (Vec::new(), None));
+
+                entry.0.push(Index {
                     name: index.get("name").and_then(|x| x.to_string()).expect("name"),
                     columns,
                     tpe: match is_unique {
@@ -443,8 +451,7 @@ impl SqlSchemaDescriber {
             }
         }
 
-        debug!("Found table indices: {:?}, primary key: {:?}", indices, pk);
-        (indices, pk)
+        indexes_map
     }
 
     async fn infer_primary_key(
