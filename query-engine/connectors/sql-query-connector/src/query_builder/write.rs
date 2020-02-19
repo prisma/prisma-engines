@@ -30,22 +30,22 @@ pub fn create_record(model: &ModelRef, mut args: WriteArgs) -> (Insert<'static>,
     )
 }
 
-pub fn delete_relation_table_records(
-    field: &RelationFieldRef,
-    parent_ids: &RecordIdentifier,
-    child_ids: &[RecordIdentifier],
-) -> Delete<'static> {
-    let columns: Vec<_> = field.opposite_columns(false).collect();
+pub fn update_many(model: &ModelRef, ids: &[&RecordIdentifier], args: WriteArgs) -> crate::Result<Vec<Query<'static>>> {
+    if args.args.is_empty() || ids.is_empty() {
+        return Ok(Vec::new());
+    }
 
-    let relation = field.relation();
-    let parent_columns: Vec<Column<'static>> = field.relation_columns(false).collect();
+    let query = args
+        .args
+        .into_iter()
+        .fold(Update::table(model.as_table()), |acc, (name, val)| {
+            acc.set(name, val.clone())
+        });
 
-    let parent_ids: Vec<PrismaValue> = parent_ids.values().collect();
-    let parent_id_criteria = Row::from(parent_columns).equals(parent_ids);
+    let columns: Vec<_> = model.primary_identifier().as_columns().collect();
+    let result: Vec<Query> = super::chunked_conditions(&columns, ids, |conditions| query.clone().so_that(conditions));
 
-    let child_id_criteria = super::conditions(&columns, child_ids);
-
-    Delete::from_table(relation.as_table()).so_that(parent_id_criteria.and(child_id_criteria))
+    Ok(result)
 }
 
 pub fn delete_many(model: &ModelRef, ids: &[&RecordIdentifier]) -> Vec<Query<'static>> {
@@ -79,20 +79,33 @@ pub fn create_relation_table_records(
     insert.build().on_conflict(OnConflict::DoNothing).into()
 }
 
-pub fn update_many(model: &ModelRef, ids: &[&RecordIdentifier], args: WriteArgs) -> crate::Result<Vec<Query<'static>>> {
-    if args.args.is_empty() || ids.is_empty() {
-        return Ok(Vec::new());
-    }
-
-    let query = args
-        .args
+pub fn delete_relation_table_records(
+    parent_field: &RelationFieldRef,
+    parent_id: &RecordIdentifier,
+    child_ids: &[RecordIdentifier],
+) -> Delete<'static> {
+    let relation = parent_field.relation();
+    let mut parent_columns: Vec<_> = parent_field
+        .related_field()
+        .m2m_column_names()
         .into_iter()
-        .fold(Update::table(model.as_table()), |acc, (name, val)| {
-            acc.set(name, val.clone())
-        });
+        .map(|name| Column::from(name))
+        .collect();
 
-    let columns: Vec<_> = model.primary_identifier().as_columns().collect();
-    let result: Vec<Query> = super::chunked_conditions(&columns, ids, |conditions| query.clone().so_that(conditions));
+    let child_columns: Vec<_> = parent_field
+        .m2m_column_names()
+        .into_iter()
+        .map(|name| Column::from(name))
+        .collect();
 
-    Ok(result)
+    let parent_id: Vec<PrismaValue> = parent_id.values().collect();
+    let parent_id_criteria = if parent_columns.len() > 1 {
+        Row::from(parent_columns).equals(parent_id)
+    } else {
+        parent_columns.pop().unwrap().equals(parent_id)
+    };
+
+    let child_id_criteria = super::conditions(&child_columns, child_ids);
+
+    Delete::from_table(relation.as_table()).so_that(parent_id_criteria.and(child_id_criteria))
 }

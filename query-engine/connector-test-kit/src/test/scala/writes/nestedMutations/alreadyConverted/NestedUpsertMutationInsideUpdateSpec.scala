@@ -247,13 +247,15 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
         s"""
          |mutation {
          |  updateParent(
-         |  where: $parentIdentifier
-         |  data:{
-         |    childrenOpt: {upsert: [{
-         |    where: {c: "c2"}
-         |    update: {c: "updated C"}
-         |    create :{c: "DOES NOT MATTER"}
-         |    }]}
+         |    where: $parentIdentifier
+         |    data:{
+         |      childrenOpt: {
+         |        upsert: [{
+         |          where:  {c: "c2"}
+         |          update: {c: "updated C"}
+         |          create: {c: "DOES NOT MATTER"}
+         |        }]
+         |      }
          |  }){
          |    childrenOpt{
          |      c

@@ -40,6 +40,7 @@ fn read_one<'conn, 'tx>(
         match scalars {
             Some(record) => {
                 let records: ManyRecords = record.into();
+                dbg!(&records);
                 let nested: Vec<QueryResult> = process_nested(tx, query.nested, Some(&records)).await?;
 
                 Ok(QueryResult::RecordSelection(RecordSelection {
@@ -119,11 +120,16 @@ fn read_related<'a, 'b>(
 
         let relation = query.parent_field.relation();
 
+        println!("123 {:?}", &parent_result);
+        println!("124 {:?}", parent_result.is_some());
+        println!("125 {:?}", query.args.is_with_pagination());
+
         // prisma level join does not work for many 2 many yet
         // can only work if we have a parent result. This is not the case when we e.g. have nested delete inside an update
-        let use_prisma_level_join = parent_result.is_some() && !query.args.is_with_pagination();
+        let use_prisma_level_join = !query.args.is_with_pagination(); //parent_result.is_some() &&
 
         let mut scalars = if !use_prisma_level_join {
+            println!("Using old code path");
             tx.get_related_records(
                 &query.parent_field,
                 &relation_parent_ids,
@@ -132,11 +138,12 @@ fn read_related<'a, 'b>(
             )
             .await?
         } else if relation.is_many_to_many() {
+            println!("141 Using new many to many code path");
             let ids = tx
                 .get_related_m2m_record_ids(&query.parent_field, &relation_parent_ids)
                 .await?;
 
-            dbg!(&ids);
+            println!("146 {:?}", &ids);
 
             let child_model_id = query.parent_field.related_model().primary_identifier();
             let child_ids: Vec<RecordIdentifier> = ids
@@ -193,6 +200,7 @@ fn read_related<'a, 'b>(
             scalars.records.extend(additional_records);
             scalars
         } else {
+            println!("Using new in-memory join code path");
             // PRISMA LEVEL JOIN
 
             let other_fields: Vec<_> = query
