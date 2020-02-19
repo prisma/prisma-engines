@@ -33,12 +33,16 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
         let sequences = self.get_sequences(schema).await?;
         let enums = self.get_enums(schema).await?;
         let mut columns = self.get_columns(schema, &enums).await;
+        let mut foreign_keys = self.get_foreign_keys(schema).await;
 
         let table_names = self.get_table_names(schema).await;
         let mut tables = Vec::with_capacity(table_names.len());
 
         for table_name in &table_names {
-            tables.push(self.get_table(schema, &table_name, &sequences, &mut columns).await);
+            tables.push(
+                self.get_table(schema, &table_name, &sequences, &mut columns, &mut foreign_keys)
+                    .await,
+            );
         }
 
         Ok(SqlSchema {
@@ -119,10 +123,11 @@ impl SqlSchemaDescriber {
         name: &str,
         sequences: &Vec<Sequence>,
         columns: &mut HashMap<String, Vec<Column>>,
+        foreign_keys: &mut HashMap<String, Vec<ForeignKey>>,
     ) -> Table {
         debug!("Getting table '{}'", name);
         let (indices, primary_key) = self.get_indices(schema, name, sequences).await;
-        let foreign_keys = self.get_foreign_keys(schema, name).await;
+        let foreign_keys = foreign_keys.remove(name).unwrap_or_else(Vec::new);
         let columns = columns.remove(name).expect("could not get columns");
         Table {
             name: name.to_string(),
@@ -229,7 +234,8 @@ impl SqlSchemaDescriber {
         columns
     }
 
-    async fn get_foreign_keys(&self, schema: &str, table: &str) -> Vec<ForeignKey> {
+    /// Returns a map from table name to foreign keys.
+    async fn get_foreign_keys(&self, schema: &str) -> HashMap<String, Vec<ForeignKey>> {
         // The `generate_subscripts` in the inner select is needed because the optimizer is free to reorganize the unnested rows if not explicitly ordered.
         let sql = r#"
             SELECT
@@ -240,11 +246,13 @@ impl SqlSchemaDescriber {
                 con.confdeltype,
                 conname as constraint_name,
                 child,
-                parent
+                parent,
+                table_name
             FROM
             (SELECT
                     unnest(con1.conkey) as "parent",
                     unnest(con1.confkey) as "child",
+                    cl.relname AS table_name,
                     generate_subscripts(con1.conkey, 1) AS colidx,
                     con1.oid,
                     con1.confrelid,
@@ -256,8 +264,7 @@ impl SqlSchemaDescriber {
                     join pg_namespace ns on cl.relnamespace = ns.oid
                     join pg_constraint con1 on con1.conrelid = cl.oid
                 WHERE
-                    cl.relname = $1
-                    and ns.nspname = $2
+                    ns.nspname = $1
                     and con1.contype = 'f'
                     ORDER BY colidx
             ) con
@@ -275,10 +282,10 @@ impl SqlSchemaDescriber {
         // objects.
         let result_set = self
             .conn
-            .query_raw(&sql, &[table.into(), schema.into()])
+            .query_raw(&sql, &[schema.into()])
             .await
             .expect("querying for foreign keys");
-        let mut intermediate_fks: HashMap<i64, ForeignKey> = HashMap::new();
+        let mut intermediate_fks: HashMap<i64, (String, ForeignKey)> = HashMap::new();
         for row in result_set.into_iter() {
             debug!("Got description FK row {:?}", row);
             let id = row.get("con_id").and_then(|x| x.as_i64()).expect("get con_id");
@@ -294,6 +301,10 @@ impl SqlSchemaDescriber {
                 .get("parent_column")
                 .and_then(|x| x.to_string())
                 .expect("get parent_column");
+            let table_name = row
+                .get("table_name")
+                .and_then(|x| x.to_string())
+                .expect("get table_name");
             let confdeltype = row
                 .get("confdeltype")
                 .and_then(|x| x.as_char())
@@ -311,7 +322,7 @@ impl SqlSchemaDescriber {
                 _ => panic!(format!("unrecognized foreign key action '{}'", confdeltype)),
             };
             match intermediate_fks.get_mut(&id) {
-                Some(fk) => {
+                Some((_, fk)) => {
                     fk.columns.push(column);
                     fk.referenced_columns.push(referenced_column);
                 }
@@ -323,23 +334,27 @@ impl SqlSchemaDescriber {
                         referenced_columns: vec![referenced_column],
                         on_delete_action,
                     };
-                    intermediate_fks.insert(id, fk);
+                    intermediate_fks.insert(id, (table_name, fk));
                 }
             };
         }
 
-        let mut fks: Vec<ForeignKey> = intermediate_fks
-            .values()
-            .map(|intermediate_fk| intermediate_fk.to_owned())
-            .collect();
-        for fk in fks.iter() {
+        let mut fks = HashMap::new();
+
+        for (table_name, fk) in intermediate_fks.into_iter().map(|(_k, v)| v) {
+            let entry = fks.entry(table_name).or_insert_with(Vec::new);
+
             debug!(
                 "Found foreign key - column(s): {:?}, to table: '{}', to column(s): {:?}",
                 fk.columns, fk.referenced_table, fk.referenced_columns
             );
+
+            entry.push(fk);
         }
 
-        fks.sort_unstable_by_key(|fk| fk.columns.clone());
+        for fks in fks.values_mut() {
+            fks.sort_unstable_by_key(|fk| fk.columns.clone());
+        }
 
         fks
     }
