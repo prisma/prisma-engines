@@ -107,6 +107,7 @@ fn read_related<'a, 'b>(
         // There are 2 options:
         // - The query already has IDs set - use those.
         // - The IDs need to be extracted from the parent result.
+        let first = query.args.first.clone();
         let relation_parent_ids = match query.relation_parent_ids {
             Some(ids) => ids,
             None => {
@@ -125,7 +126,7 @@ fn read_related<'a, 'b>(
 
         // prisma level join does not work for many 2 many yet
         // can only work if we have a parent result. This is not the case when we e.g. have nested delete inside an update
-        let use_prisma_level_join = parent_result.is_some() && !query.args.is_with_pagination();
+        let use_prisma_level_join = parent_result.is_some(); // && !query.args.is_with_pagination();
 
         let mut scalars = if !use_prisma_level_join {
             println!("Using old code path");
@@ -232,6 +233,7 @@ fn read_related<'a, 'b>(
 
                 let filter = Filter::or(filters);
                 let mut args = query.args.clone();
+                args.first = None; // we do pagination ourselves and not in the db
 
                 args.filter = match args.filter {
                     Some(existing_filter) => Some(Filter::and(vec![existing_filter, filter])),
@@ -244,6 +246,7 @@ fn read_related<'a, 'b>(
                 let parent_ids_as_prisma_values = relation_parent_ids.iter().map(|ri| ri.single_value()).collect();
                 let filter = other_field.is_in(parent_ids_as_prisma_values);
                 let mut args = query.args.clone();
+                args.first = None; // we do pagination ourselves and not in the db
 
                 args.filter = match args.filter {
                     Some(existing_filter) => Some(Filter::and(vec![existing_filter, filter])),
@@ -259,6 +262,7 @@ fn read_related<'a, 'b>(
         if use_prisma_level_join {
             // Write parent IDs into the retrieved records
             if parent_result.is_some() && query.parent_field.is_inlined_on_enclosing_model() {
+                println!("1");
                 let parent_identifier = query.parent_field.model().primary_identifier();
                 let field_names = scalars.field_names.clone();
 
@@ -311,6 +315,7 @@ fn read_related<'a, 'b>(
 
                 scalars.records.extend(additional_records);
             } else if parent_result.is_some() && query.parent_field.related_field().is_inlined_on_enclosing_model() {
+                println!("2");
                 let parent_identifier = query.parent_field.model().primary_identifier();
                 let field_names = scalars.field_names.clone();
                 let child_link_fields = query.parent_field.related_field().linking_fields();
@@ -326,8 +331,25 @@ fn read_related<'a, 'b>(
 
                     record.parent_id = Some(parent_id);
                 }
+
+                if first.is_some() {
+                    println!("in memory pagination");
+                    let mut count_by_parent_id: HashMap<Option<RecordIdentifier>, i64> = HashMap::new();
+                    scalars.records.retain(|record| {
+                        let current_count = count_by_parent_id.get(&record.parent_id).unwrap_or(&0);
+                        let new_count = current_count + 1;
+                        count_by_parent_id.insert(record.parent_id.clone(), new_count);
+
+                        //                        println!("{:?}", &count_by_parent_id);
+                        //                        println!("{:?}", new_count < first.unwrap());
+                        new_count <= first.unwrap()
+                    });
+                } else {
+                    println!("no in memory pagination");
+                }
             } else if query.parent_field.relation().is_many_to_many() {
-                // nothing to do for many to many.
+                println!("3");
+            // nothing to do for many to many.
             } else {
                 panic!(format!(
                     "parent result: {:?}, relation: {:?}",
