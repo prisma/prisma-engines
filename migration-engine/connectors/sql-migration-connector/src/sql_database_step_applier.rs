@@ -571,13 +571,12 @@ fn postgres_alter_enum(
                     "ALTER TABLE {schema_name}.{table_name} \
                         ALTER COLUMN {column_name} DROP DEFAULT,
                         ALTER COLUMN {column_name} TYPE {tmp_name} \
-                            USING ({old_name}::text::{tmp_name}),
+                            USING ({column_name}::text::{tmp_name}),
                         ALTER COLUMN {column_name} SET DEFAULT {new_enum_default}",
                     schema_name = postgres_quoted(schema_name),
                     table_name = postgres_quoted(column.table().name()),
                     column_name = postgres_quoted(column.name()),
                     tmp_name = postgres_quoted(&tmp_name),
-                    old_name = alter_enum.name,
                     new_enum_default = postgres_quoted_string(new_enum.values.first().unwrap()),
                 );
 

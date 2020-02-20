@@ -115,6 +115,15 @@ fn push_created_enums<'a>(steps: &mut Steps, enums: impl Iterator<Item = &'a ast
         };
 
         push_created_directives(steps, &directive_path, r#enum.directives.iter());
+
+        for value in &r#enum.values {
+            let path = steps::DirectivePath::EnumValue {
+                r#enum: r#enum.name.name.clone(),
+                value: value.name.name.clone(),
+            };
+
+            push_created_directives(steps, &path, value.directives.iter());
+        }
     }
 }
 
