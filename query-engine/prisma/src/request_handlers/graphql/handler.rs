@@ -144,7 +144,7 @@ async fn handle_compacted(document: CompactedDocument, ctx: &Arc<PrismaContext>)
         Ok(Ok(mut responses)) => {
             // We find the response data and make a hash from the given unique
             // keys.
-            let mut data = responses
+            let data = responses
                 .take_data(plural_name)
                 .unwrap()
                 .into_list()
@@ -157,11 +157,15 @@ async fn handle_compacted(document: CompactedDocument, ctx: &Arc<PrismaContext>)
                     let vals: Vec<QueryValue> = args.into_iter().map(|(_, v)| v).collect();
                     let mut responses = Responses::with_capacity(1);
 
-                    match data.remove(&vals) {
+                    // Copying here is mandatory due to some of the queries
+                    // might be repeated with the same arguments in the original
+                    // batch. We need to give the same answer for both of them.
+                    match data.get(&vals) {
                         Some(result) => {
                             // Filter out all the keys not selected in the
                             // original query.
                             let result: IndexMap<String, Item> = result
+                                .clone()
                                 .into_iter()
                                 .filter(|(k, _)| nested_selection.contains(k))
                                 .collect();
