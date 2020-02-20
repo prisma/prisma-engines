@@ -247,6 +247,10 @@ pub enum DirectivePath {
     Enum {
         r#enum: String,
     },
+    EnumValue {
+        r#enum: String,
+        value: String,
+    },
     TypeAlias {
         #[serde(rename = "typeAlias")]
         type_alias: String,

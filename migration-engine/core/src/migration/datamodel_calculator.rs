@@ -568,6 +568,15 @@ fn find_directives_mut<'a>(
         steps::DirectivePath::Field { model, field } => &mut datamodel.find_field_mut(&model, &field)?.directives,
         steps::DirectivePath::Model { model, arguments: _ } => &mut datamodel.find_model_mut(&model)?.directives,
         steps::DirectivePath::Enum { r#enum } => &mut datamodel.find_enum_mut(&r#enum)?.directives,
+        steps::DirectivePath::EnumValue { r#enum, value } => {
+            let enum_struct = datamodel.find_enum_mut(&r#enum)?;
+            let value = enum_struct
+                .values
+                .iter_mut()
+                .find(|value_struct| &value_struct.name.name == value)?;
+
+            &mut value.directives
+        }
         steps::DirectivePath::TypeAlias { type_alias } => &mut datamodel.find_type_alias_mut(&type_alias)?.directives,
     };
 

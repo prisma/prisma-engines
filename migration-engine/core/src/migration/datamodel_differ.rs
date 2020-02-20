@@ -1,6 +1,7 @@
 #![deny(rust_2018_idioms)]
 
 mod directives;
+mod enum_values;
 mod enums;
 mod fields;
 mod models;
@@ -8,6 +9,7 @@ mod source;
 mod top_level;
 
 use directives::DirectiveDiffer;
+use enum_values::EnumValueDiffer;
 use enums::EnumDiffer;
 use fields::FieldDiffer;
 use models::ModelDiffer;
@@ -128,14 +130,26 @@ fn push_deleted_enums<'a>(steps: &mut Steps, enums: impl Iterator<Item = &'a ast
 
 fn push_updated_enums<'a>(steps: &mut Steps, enums: impl Iterator<Item = EnumDiffer<'a>>) {
     for updated_enum in enums {
-        let created_values: Vec<_> = updated_enum
-            .created_values()
-            .map(|value| value.name.name.to_owned())
-            .collect();
         let deleted_values: Vec<_> = updated_enum
             .deleted_values()
             .map(|value| value.name.name.to_owned())
             .collect();
+
+        let mut created_values = Vec::new();
+        for created_value in updated_enum.created_values() {
+            created_values.push(created_value.name.name.to_owned());
+
+            let path = DirectivePath::EnumValue {
+                r#enum: updated_enum.next.name.name.clone(),
+                value: created_value.name.name.clone(),
+            };
+
+            push_created_directives(steps, &path, created_value.directives.iter());
+        }
+
+        for value_differ in updated_enum.value_pairs() {
+            push_updated_enum_value(steps, value_differ, &updated_enum.next.name.name);
+        }
 
         let update_enum_step = steps::UpdateEnum {
             r#enum: updated_enum.previous.name.name.clone(),
@@ -158,6 +172,17 @@ fn push_updated_enums<'a>(steps: &mut Steps, enums: impl Iterator<Item = EnumDif
     }
 }
 
+fn push_updated_enum_value(steps: &mut Steps, enum_differ: EnumValueDiffer<'_>, enum_name: &str) {
+    let path = DirectivePath::EnumValue {
+        r#enum: enum_name.to_owned(),
+        value: enum_differ.next.name.name.clone(),
+    };
+
+    push_created_directives(steps, &path, enum_differ.created_directives());
+    push_updated_directives(steps, &path, enum_differ.directive_pairs());
+    push_deleted_directives(steps, &path, enum_differ.deleted_directives());
+}
+
 fn push_datasources(steps: &mut Steps, differ: &TopDiffer<'_>) {
     push_created_sources(steps, differ.created_datasources());
     push_deleted_sources(steps, differ.deleted_datasources());
@@ -169,12 +194,15 @@ fn push_updated_sources<'a>(steps: &mut Steps, sources: impl Iterator<Item = Sou
         let location = ArgumentLocation::Source(SourceLocation {
             source: source.previous.name.name.to_owned(),
         });
+
         for argument in source.created_arguments() {
             push_created_argument(steps, &location.clone(), argument);
         }
+
         for argument in source.deleted_arguments() {
             push_deleted_argument(steps, &location.clone(), &argument.name.name);
         }
+
         for (prev, next) in source.argument_pairs() {
             push_updated_argument(steps, &location.clone(), prev, next)
         }

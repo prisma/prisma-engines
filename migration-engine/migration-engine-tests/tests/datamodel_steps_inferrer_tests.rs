@@ -601,6 +601,52 @@ fn infer_CreateDirective_on_enum() {
 }
 
 #[test]
+fn infer_CreateDirective_on_enum_variant() {
+    let dm1 = parse(
+        r##"
+            enum Color {
+                RED
+                GREEN
+                BLUE
+            }
+        "##,
+    );
+
+    let dm2 = parse(
+        r##"
+        enum Color {
+            RED  @map("COLOR_RED")
+            GREEN
+            BLUE
+        }
+        "##,
+    );
+
+    let steps = infer(&dm1, &dm2);
+
+    let directive_location = DirectiveLocation {
+        path: DirectivePath::EnumValue {
+            r#enum: "Color".to_owned(),
+            value: "RED".to_owned(),
+        },
+        directive: "map".to_owned(),
+    };
+
+    let expected = &[
+        MigrationStep::CreateDirective(CreateDirective {
+            location: directive_location.clone(),
+        }),
+        MigrationStep::CreateArgument(CreateArgument {
+            location: ArgumentLocation::Directive(directive_location),
+            argument: "".to_owned(),
+            value: MigrationExpression("\"COLOR_RED\"".to_owned()),
+        }),
+    ];
+
+    assert_eq!(steps, expected);
+}
+
+#[test]
 fn infer_CreateDirective_on_type_alias() {
     let dm1 = parse(r#"type BlogPost = String @default("a")"#);
     let dm2 = parse(r#"type BlogPost = String @customized @default("a")"#);
@@ -771,6 +817,45 @@ fn infer_DeleteDirective_on_enum() {
     let directive_location = DirectiveLocation {
         path: DirectivePath::Enum {
             r#enum: "Color".to_owned(),
+        },
+        directive: "map".to_owned(),
+    };
+
+    let expected = &[MigrationStep::DeleteDirective(DeleteDirective {
+        location: directive_location,
+    })];
+
+    assert_eq!(steps, expected);
+}
+
+#[test]
+fn infer_DeleteDirective_on_enum_variant() {
+    let dm1 = parse(
+        r##"
+            enum Color {
+                RED @map("COLOR_RED")
+                GREEN
+                BLUE
+            }
+        "##,
+    );
+
+    let dm2 = parse(
+        r##"
+        enum Color {
+            RED
+            GREEN
+            BLUE
+        }
+        "##,
+    );
+
+    let steps = infer(&dm1, &dm2);
+
+    let directive_location = DirectiveLocation {
+        path: DirectivePath::EnumValue {
+            r#enum: "Color".to_owned(),
+            value: "RED".to_owned(),
         },
         directive: "map".to_owned(),
     };
@@ -1256,6 +1341,49 @@ fn infer_UpdateArgument_on_enum() {
         location: directive_location.into_argument_location(),
         argument: "one".to_owned(),
         new_value: MigrationExpression("\"three\"".to_owned()),
+    })];
+
+    assert_eq!(steps, expected);
+}
+
+#[test]
+fn infer_UpdateArgument_on_enum_value() {
+    let dm1 = parse(
+        r##"
+            enum EyeColor {
+                BLUE
+                GREEN
+                BROWN @map("COLOR_TEA")
+            }
+        "##,
+    );
+
+    assert_eq!(infer(&dm1, &dm1), &[]);
+
+    let dm2 = parse(
+        r##"
+            enum EyeColor {
+                BLUE
+                GREEN
+                BROWN @map("COLOR_BROWN")
+            }
+        "##,
+    );
+
+    let steps = infer(&dm1, &dm2);
+
+    let directive_location = DirectiveLocation {
+        path: DirectivePath::EnumValue {
+            r#enum: "EyeColor".to_owned(),
+            value: "BROWN".to_owned(),
+        },
+        directive: "map".to_owned(),
+    };
+
+    let expected = &[MigrationStep::UpdateArgument(UpdateArgument {
+        location: directive_location.into_argument_location(),
+        argument: "".to_owned(),
+        new_value: MigrationExpression("\"COLOR_BROWN\"".to_owned()),
     })];
 
     assert_eq!(steps, expected);
