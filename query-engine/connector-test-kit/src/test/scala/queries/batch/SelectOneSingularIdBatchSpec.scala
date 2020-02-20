@@ -79,13 +79,13 @@ class SelectOneSingularIdBatchSpec extends FlatSpec with Matchers with ApiSpecBa
 
   "joins and such" should "just work" in {
     val queries = Array(
-      """query {findOneArtist(where:{ArtistId:2}) {Albums { AlbumId }}}""",
-      """query {findOneArtist(where:{ArtistId:1}) {Albums { AlbumId }}}""",
-      """query {findOneArtist(where:{ArtistId:420}) {Albums { AlbumId }}}""",
+      """query {findOneArtist(where:{ArtistId:2}) {Albums { AlbumId, Title }}}""",
+      """query {findOneArtist(where:{ArtistId:1}) {Albums { Title, AlbumId }}}""",
+      """query {findOneArtist(where:{ArtistId:420}) {Albums { AlbumId, Title }}}""",
     )
 
     server.batch(queries, project, legacy = false).toString should be(
-      """[{"data":{"findOneArtist":{"Albums":[{"AlbumId":2}]}}},{"data":{"findOneArtist":{"Albums":[]}}},{"data":{"findOneArtist":null}}]"""
+      """[{"data":{"findOneArtist":{"Albums":[{"AlbumId":2,"Title":"TheAlbumWithoutTracks"}]}}},{"data":{"findOneArtist":{"Albums":[]}}},{"data":{"findOneArtist":null}}]"""
     )
   }
 

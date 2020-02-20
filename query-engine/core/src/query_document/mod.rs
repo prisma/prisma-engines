@@ -61,17 +61,15 @@ impl BatchDocument {
     fn can_compact(&self) -> bool {
         match self {
             Self::Multi(operations) => match operations.split_first() {
-                Some((first, rest)) if first.is_find_one() => {
-                    let mut selection1: Vec<&str> = first.nested_selections().iter().map(|s| s.name()).collect();
-                    selection1.sort();
-
-                    rest.into_iter().all(|op| {
-                        let mut selection2: Vec<&str> = op.nested_selections().iter().map(|s| s.name()).collect();
-                        selection2.sort();
-
-                        op.is_find_one() && first.name() == op.name() && selection1 == selection2
-                    })
-                }
+                Some((first, rest)) if first.is_find_one() => rest.into_iter().all(|op| {
+                    op.is_find_one()
+                        && first.name() == op.name()
+                        && first.nested_selections().len() == op.nested_selections().len()
+                        && first
+                            .nested_selections()
+                            .iter()
+                            .all(|fop| op.nested_selections().contains(fop))
+                }),
                 _ => false,
             },
             Self::Compact(_) => false,
@@ -202,7 +200,7 @@ impl From<Vec<Operation>> for CompactedDocument {
                         obj.push(pair);
                         obj
                     }
-                    None => unreachable!("No arguments!")
+                    None => unreachable!("No arguments!"),
                 }
             })
             .collect();
