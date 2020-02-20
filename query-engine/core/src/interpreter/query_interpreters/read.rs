@@ -109,7 +109,11 @@ fn read_related<'a, 'b>(
         // - The IDs need to be extracted from the parent result.
         let is_with_pagination = query.args.is_with_pagination();
         // todo: find better approach for first
-        let (skip, first) = (query.args.skip.unwrap_or(0), query.args.first.unwrap_or(999999));
+        let needs_reversing = query.args.last.is_some();
+        let (skip, take) = (
+            query.args.skip.unwrap_or(0),
+            query.args.first.or(query.args.last).unwrap_or(999999),
+        );
         let relation_parent_ids = match query.relation_parent_ids {
             Some(ids) => ids,
             None => {
@@ -239,6 +243,7 @@ fn read_related<'a, 'b>(
                 // we do pagination ourselves and not in the db
                 args.first = None;
                 args.skip = None;
+                args.last = None;
 
                 args.filter = match args.filter {
                     Some(existing_filter) => Some(Filter::and(vec![existing_filter, filter])),
@@ -255,6 +260,7 @@ fn read_related<'a, 'b>(
                 // we do pagination ourselves and not in the db
                 args.first = None;
                 args.skip = None;
+                args.last = None;
 
                 args.filter = match args.filter {
                     Some(existing_filter) => Some(Filter::and(vec![existing_filter, filter])),
@@ -352,13 +358,16 @@ fn read_related<'a, 'b>(
                     });
                     println!("after sorting: {:?}", scalars.records);
                     // apply pagination
+                    if needs_reversing {
+                        scalars.records.reverse();
+                    }
                     scalars.records.retain(|record| {
                         let current_count = count_by_parent_id.get(&record.parent_id).unwrap_or(&0);
                         let new_count = current_count + 1;
                         count_by_parent_id.insert(record.parent_id.clone(), new_count);
 
-                        println!("new_count: {:?}, first: {:?}, skip: {:?}", new_count, first, skip);
-                        new_count > skip && new_count <= first + skip
+                        println!("new_count: {:?}, take: {:?}, skip: {:?}", new_count, take, skip);
+                        new_count > skip && new_count <= take + skip
                     });
                     println!("{:?}", &count_by_parent_id);
                 } else {
