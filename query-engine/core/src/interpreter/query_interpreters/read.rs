@@ -3,7 +3,7 @@ use crate::{
 };
 use connector::{self, filter::Filter, ConnectionLike, QueryArguments, ReadOperations, ScalarCompare};
 use futures::future::{BoxFuture, FutureExt};
-use prisma_models::{ManyRecords, Record, RecordIdentifier};
+use prisma_models::{ManyRecords, OrderBy, Record, RecordIdentifier};
 use prisma_value::PrismaValue;
 use std::collections::HashMap;
 
@@ -107,7 +107,9 @@ fn read_related<'a, 'b>(
         // There are 2 options:
         // - The query already has IDs set - use those.
         // - The IDs need to be extracted from the parent result.
-        let first = query.args.first.clone();
+        let is_with_pagination = query.args.is_with_pagination();
+        // todo: find better approach for first
+        let (skip, first) = (query.args.skip.unwrap_or(0), query.args.first.unwrap_or(999999));
         let relation_parent_ids = match query.relation_parent_ids {
             Some(ids) => ids,
             None => {
@@ -122,11 +124,12 @@ fn read_related<'a, 'b>(
 
         println!("123 {:?}", &parent_result);
         println!("124 {:?}", parent_result.is_some());
-        println!("125 {:?}", query.args.is_with_pagination());
+        println!("125 {:?}", is_with_pagination);
 
         // prisma level join does not work for many 2 many yet
         // can only work if we have a parent result. This is not the case when we e.g. have nested delete inside an update
-        let use_prisma_level_join = parent_result.is_some(); // && !query.args.is_with_pagination();
+        //        let use_prisma_level_join = parent_result.is_some() && is_with_pagination();
+        let use_prisma_level_join = parent_result.is_some();
 
         let mut scalars = if !use_prisma_level_join {
             println!("Using old code path");
@@ -233,12 +236,15 @@ fn read_related<'a, 'b>(
 
                 let filter = Filter::or(filters);
                 let mut args = query.args.clone();
-                args.first = None; // we do pagination ourselves and not in the db
+                // we do pagination ourselves and not in the db
+                args.first = None;
+                args.skip = None;
 
                 args.filter = match args.filter {
                     Some(existing_filter) => Some(Filter::and(vec![existing_filter, filter])),
                     None => Some(filter),
                 };
+                //                args.first = Some(-1); // superb hack to force implicit ordering but not change the result of the query'
                 args
             } else {
                 // SINGULAR CASE
@@ -246,12 +252,15 @@ fn read_related<'a, 'b>(
                 let parent_ids_as_prisma_values = relation_parent_ids.iter().map(|ri| ri.single_value()).collect();
                 let filter = other_field.is_in(parent_ids_as_prisma_values);
                 let mut args = query.args.clone();
-                args.first = None; // we do pagination ourselves and not in the db
+                // we do pagination ourselves and not in the db
+                args.first = None;
+                args.skip = None;
 
                 args.filter = match args.filter {
                     Some(existing_filter) => Some(Filter::and(vec![existing_filter, filter])),
                     None => Some(filter),
                 };
+                //                args.first = Some(-1); // superb hack to force implicit ordering but not change the result of the query
                 args
             };
 
@@ -332,18 +341,26 @@ fn read_related<'a, 'b>(
                     record.parent_id = Some(parent_id);
                 }
 
-                if first.is_some() {
+                if is_with_pagination {
                     println!("in memory pagination");
                     let mut count_by_parent_id: HashMap<Option<RecordIdentifier>, i64> = HashMap::new();
+                    // replacement for SQL order by
+                    println!("before sorting: {:?}", scalars.records);
+                    scalars.records.sort_by_key(|r| {
+                        let values: Vec<_> = r.parent_id.as_ref().unwrap().values().collect();
+                        values
+                    });
+                    println!("after sorting: {:?}", scalars.records);
+                    // apply pagination
                     scalars.records.retain(|record| {
                         let current_count = count_by_parent_id.get(&record.parent_id).unwrap_or(&0);
                         let new_count = current_count + 1;
                         count_by_parent_id.insert(record.parent_id.clone(), new_count);
 
-                        //                        println!("{:?}", &count_by_parent_id);
-                        //                        println!("{:?}", new_count < first.unwrap());
-                        new_count <= first.unwrap()
+                        println!("new_count: {:?}, first: {:?}, skip: {:?}", new_count, first, skip);
+                        new_count > skip && new_count <= first + skip
                     });
+                    println!("{:?}", &count_by_parent_id);
                 } else {
                     println!("no in memory pagination");
                 }
