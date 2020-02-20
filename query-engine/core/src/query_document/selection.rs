@@ -54,12 +54,26 @@ impl SelectionBuilder {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone)]
 pub struct Selection {
     name: String,
     alias: Option<String>,
     arguments: Vec<(String, QueryValue)>,
     nested_selections: Vec<Selection>,
+}
+
+impl PartialEq for Selection {
+    fn eq(&self, other: &Self) -> bool {
+        self.name == other.name
+            && self.alias == other.alias
+            && self.arguments.len() == other.arguments.len()
+            && self.nested_selections.len() == other.nested_selections.len()
+            && self.arguments.iter().all(|arg| other.arguments.contains(arg))
+            && self
+                .nested_selections
+                .iter()
+                .all(|sel| other.nested_selections.contains(sel))
+    }
 }
 
 impl Selection {
