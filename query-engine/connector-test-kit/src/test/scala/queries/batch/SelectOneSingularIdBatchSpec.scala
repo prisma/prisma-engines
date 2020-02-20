@@ -105,4 +105,15 @@ class SelectOneSingularIdBatchSpec extends FlatSpec with Matchers with ApiSpecBa
       """[{"data":{"findOneArtist":{"Name":"ArtistWithoutAlbums"}}},{"data":{"findOneArtist":null}}]"""
     )
   }
+
+  "two queries that are the same" should "return answers for both of the queries" in {
+    val queries = Array(
+      """query {findOneArtist(where:{ArtistId: 1}){Name}}""",
+      """query {findOneArtist(where:{ArtistId: 1}){Name}}""",
+    )
+
+    server.batch(queries, project, legacy = false).toString should be(
+      """[{"data":{"findOneArtist":{"Name":"ArtistWithoutAlbums"}}},{"data":{"findOneArtist":{"Name":"ArtistWithoutAlbums"}}}]"""
+    )
+  }
 }
