@@ -1,9 +1,10 @@
+use crate::interpreter::query_interpreters::nested_pagination::NestedPagination;
 use crate::{
     interpreter::InterpretationResult, query_ast::*, query_graph_builder::write::utils::IdFilter, result_ast::*,
 };
 use connector::{self, filter::Filter, ConnectionLike, QueryArguments, ReadOperations, ScalarCompare};
 use futures::future::{BoxFuture, FutureExt};
-use prisma_models::{ManyRecords, OrderBy, Record, RecordIdentifier};
+use prisma_models::{ManyRecords, Record, RecordIdentifier};
 use prisma_value::PrismaValue;
 use std::collections::HashMap;
 
@@ -107,13 +108,16 @@ fn read_related<'a, 'b>(
         // There are 2 options:
         // - The query already has IDs set - use those.
         // - The IDs need to be extracted from the parent result.
-        let is_with_pagination = query.args.is_with_pagination();
-        // todo: find better approach for first
-        let needs_reversing = query.args.last.is_some();
-        let (skip, take) = (
-            query.args.skip.unwrap_or(0),
-            query.args.first.or(query.args.last).unwrap_or(999999),
-        );
+
+        let nested_pagination = NestedPagination::new_from_query_args(&query.args);
+        // we do pagination ourselves and not in the db
+        let mut query_args_mut = query.args;
+        query_args_mut.first = None;
+        query_args_mut.skip = None;
+        query_args_mut.last = None;
+
+        let is_with_pagination = query_args_mut.is_with_pagination();
+
         let relation_parent_ids = match query.relation_parent_ids {
             Some(ids) => ids,
             None => {
@@ -140,7 +144,7 @@ fn read_related<'a, 'b>(
             tx.get_related_records(
                 &query.parent_field,
                 &relation_parent_ids,
-                query.args.clone(),
+                query_args_mut.clone(),
                 &query.selected_fields.only_scalar_and_inlined(),
             )
             .await?
@@ -159,7 +163,7 @@ fn read_related<'a, 'b>(
                 .collect::<std::result::Result<Vec<_>, _>>()?;
 
             let filter = child_ids.filter();
-            let mut args = query.args.clone();
+            let mut args = query_args_mut.clone();
 
             args.filter = match args.filter {
                 Some(existing_filter) => Some(Filter::and(vec![existing_filter, filter])),
@@ -239,11 +243,7 @@ fn read_related<'a, 'b>(
                     .collect();
 
                 let filter = Filter::or(filters);
-                let mut args = query.args.clone();
-                // we do pagination ourselves and not in the db
-                args.first = None;
-                args.skip = None;
-                args.last = None;
+                let mut args = query_args_mut.clone();
 
                 args.filter = match args.filter {
                     Some(existing_filter) => Some(Filter::and(vec![existing_filter, filter])),
@@ -256,11 +256,7 @@ fn read_related<'a, 'b>(
                 let other_field = other_fields.first().unwrap();
                 let parent_ids_as_prisma_values = relation_parent_ids.iter().map(|ri| ri.single_value()).collect();
                 let filter = other_field.is_in(parent_ids_as_prisma_values);
-                let mut args = query.args.clone();
-                // we do pagination ourselves and not in the db
-                args.first = None;
-                args.skip = None;
-                args.last = None;
+                let mut args = query_args_mut.clone();
 
                 args.filter = match args.filter {
                     Some(existing_filter) => Some(Filter::and(vec![existing_filter, filter])),
@@ -330,7 +326,6 @@ fn read_related<'a, 'b>(
 
                 scalars.records.extend(additional_records);
             } else if parent_result.is_some() && query.parent_field.related_field().is_inlined_on_enclosing_model() {
-                println!("2");
                 let parent_identifier = query.parent_field.model().primary_identifier();
                 let field_names = scalars.field_names.clone();
                 let child_link_fields = query.parent_field.related_field().linking_fields();
@@ -347,35 +342,9 @@ fn read_related<'a, 'b>(
                     record.parent_id = Some(parent_id);
                 }
 
-                if is_with_pagination {
-                    println!("in memory pagination");
-                    let mut count_by_parent_id: HashMap<Option<RecordIdentifier>, i64> = HashMap::new();
-                    // replacement for SQL order by
-                    println!("before sorting: {:?}", scalars.records);
-                    scalars.records.sort_by_key(|r| {
-                        let values: Vec<_> = r.parent_id.as_ref().unwrap().values().collect();
-                        values
-                    });
-                    println!("after sorting: {:?}", scalars.records);
-                    // apply pagination
-                    if needs_reversing {
-                        scalars.records.reverse();
-                    }
-                    scalars.records.retain(|record| {
-                        let current_count = count_by_parent_id.get(&record.parent_id).unwrap_or(&0);
-                        let new_count = current_count + 1;
-                        count_by_parent_id.insert(record.parent_id.clone(), new_count);
-
-                        println!("new_count: {:?}, take: {:?}, skip: {:?}", new_count, take, skip);
-                        new_count > skip && new_count <= take + skip
-                    });
-                    println!("{:?}", &count_by_parent_id);
-                } else {
-                    println!("no in memory pagination");
-                }
+                nested_pagination.apply_pagination(&mut scalars);
             } else if query.parent_field.relation().is_many_to_many() {
-                println!("3");
-            // nothing to do for many to many.
+                // nothing to do for many to many.
             } else {
                 panic!(format!(
                     "parent result: {:?}, relation: {:?}",
@@ -392,7 +361,7 @@ fn read_related<'a, 'b>(
         Ok(QueryResult::RecordSelection(RecordSelection {
             name: query.name,
             fields: query.selection_order,
-            query_arguments: query.args,
+            query_arguments: query_args_mut,
             model_id,
             scalars,
             nested,
