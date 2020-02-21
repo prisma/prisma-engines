@@ -1,3 +1,4 @@
+use crate::interpreter::query_interpreters::nested_pagination::NestedPagination;
 use crate::{
     interpreter::InterpretationResult, query_ast::*, query_graph_builder::write::utils::IdFilter, result_ast::*,
 };
@@ -130,6 +131,13 @@ fn read_related<'a, 'b>(
     parent_result: Option<&'a ManyRecords>,
 ) -> BoxFuture<'a, InterpretationResult<QueryResult>> {
     let fut = async move {
+        let nested_pagination = NestedPagination::new_from_query_args(&query.args);
+        // we do pagination ourselves and not in the db
+        let mut query_args_mut = query.args;
+        query_args_mut.first = None;
+        query_args_mut.skip = None;
+        query_args_mut.last = None;
+
         // The query construction must guarantee that the parent result
         // contains the selected fields necessary to satisfy the relation query (links).
         // There are 2 options:
@@ -150,24 +158,23 @@ fn read_related<'a, 'b>(
 
         println!("122 {:?}", &parent_result);
         println!("123 {:?}", parent_result.is_some());
-        println!("124 {:?}", query.args.is_with_pagination());
+        println!("124 {:?}", query_args_mut.is_with_pagination());
         println!("125 {:?}", is_m2m);
 
         // Application level (in-memory)
         // can only work if we have a parent result. This is not the case when we e.g. have nested delete inside an update
-        let use_in_memory_join = !query.args.is_with_pagination();
 
         let is_compound_m2m = is_m2m
             && (query.parent_field.data_source_fields().len()
                 + query.parent_field.related_field().data_source_fields().len()
                 > 2);
 
-        let mut scalars = if !use_in_memory_join && !is_compound_m2m {
+        let mut scalars = if !is_compound_m2m {
             println!("Using old code path");
             tx.get_related_records(
                 &query.parent_field,
                 &parent_relation_links,
-                query.args.clone(),
+                query_args_mut.clone(),
                 &query.selected_fields.only_scalar_and_inlined(),
             )
             .await?
@@ -186,7 +193,7 @@ fn read_related<'a, 'b>(
                 .collect::<std::result::Result<Vec<_>, _>>()?;
 
             let filter = child_ids.filter();
-            let mut args = query.args.clone();
+            let mut args = query_args_mut.clone();
 
             args.filter = match args.filter {
                 Some(existing_filter) => Some(Filter::and(vec![existing_filter, filter])),
@@ -232,6 +239,9 @@ fn read_related<'a, 'b>(
             }
 
             scalars.records.extend(additional_records);
+
+            nested_pagination.apply_pagination(&mut scalars);
+
             scalars
         } else {
             println!("Using new in-memory join code path");
@@ -262,7 +272,7 @@ fn read_related<'a, 'b>(
                     .collect();
 
                 let filter = Filter::or(filters);
-                let mut args = query.args.clone();
+                let mut args = query_args_mut.clone();
 
                 args.filter = match args.filter {
                     Some(existing_filter) => Some(Filter::and(vec![existing_filter, filter])),
@@ -275,7 +285,7 @@ fn read_related<'a, 'b>(
                 let other_field = other_fields.first().unwrap();
                 let parent_ids_as_prisma_values = parent_relation_links.iter().map(|ri| ri.single_value()).collect();
                 let filter = other_field.is_in(parent_ids_as_prisma_values);
-                let mut args = query.args.clone();
+                let mut args = query_args_mut.clone();
 
                 args.filter = match args.filter {
                     Some(existing_filter) => Some(Filter::and(vec![existing_filter, filter])),
@@ -289,7 +299,7 @@ fn read_related<'a, 'b>(
                 .await?
         };
 
-        if use_in_memory_join && !is_m2m {
+        if !is_m2m {
             // Write parent IDs into the retrieved records
             // Inlining is done on the parent, this means that we need to write the parent ID
             // into the child records that we retrieved. The matching is done based on the parent link values.
@@ -328,6 +338,9 @@ fn read_related<'a, 'b>(
                 }
 
                 scalars.records.extend(additional_records);
+
+                // in SQL this will never be hit since it is to one relation which does not allow pagination
+                nested_pagination.apply_pagination(&mut scalars);
 
             // --------------
 
@@ -398,6 +411,8 @@ fn read_related<'a, 'b>(
 
                     record.parent_id = Some(parent_id);
                 }
+
+                nested_pagination.apply_pagination(&mut scalars);
             } else {
                 panic!(format!(
                     "parent result: {:?}, relation: {:?}",
@@ -414,7 +429,7 @@ fn read_related<'a, 'b>(
         Ok(QueryResult::RecordSelection(RecordSelection {
             name: query.name,
             fields: query.selection_order,
-            query_arguments: query.args,
+            query_arguments: query_args_mut,
             model_id,
             scalars,
             nested,

@@ -18,7 +18,7 @@ pub type PrismaListValue = Vec<PrismaValue>;
 #[cfg(feature = "sql-ext")]
 pub use sql_ext::*;
 
-#[derive(Debug, PartialEq, Clone, Eq, Hash, Serialize)]
+#[derive(Debug, PartialEq, Clone, Eq, Hash, Serialize, PartialOrd, Ord)]
 #[serde(untagged)]
 pub enum PrismaValue {
     String(String),
