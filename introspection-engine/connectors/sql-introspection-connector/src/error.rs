@@ -50,8 +50,8 @@ pub enum SqlError {
     #[error("Connect timed out")]
     ConnectTimeout(#[source] QuaintKind),
 
-    #[error("Operation timed out")]
-    Timeout,
+    #[error("Operation timed out ({0})")]
+    Timeout(String),
 
     #[error("Error opening a TLS connection. {}", cause)]
     TlsError {
@@ -95,7 +95,7 @@ impl SqlError {
                     kind: ErrorKind::ConnectTimeout,
                 }
             }
-            SqlError::Timeout => ConnectorError::from_kind(ErrorKind::Timeout),
+            SqlError::Timeout(message) => ConnectorError::from_kind(ErrorKind::Timeout(message)),
             SqlError::TlsError { cause } => {
                 let user_facing_error = render_quaint_error(&cause, connection_info);
 
@@ -152,7 +152,7 @@ impl From<QuaintKind> for SqlError {
             },
             e @ QuaintKind::ConnectTimeout(..) => Self::ConnectTimeout(e),
             QuaintKind::ConnectionError { .. } => Self::ConnectionError { cause: kind },
-            QuaintKind::Timeout(..) => Self::Timeout,
+            QuaintKind::Timeout(message) => Self::Timeout(format!("quaint timeout: {}", message)),
             QuaintKind::TlsError { .. } => Self::TlsError { cause: kind },
             QuaintKind::UniqueConstraintViolation { ref constraint } => Self::UniqueConstraintViolation {
                 constraint: constraint.into(),

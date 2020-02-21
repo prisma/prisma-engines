@@ -65,10 +65,17 @@ pub struct Model {
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct Enum {
     pub name: String,
-    pub values: Vec<String>,
+    pub values: Vec<EnumValue>,
     pub db_name: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub documentation: Option<String>,
+}
+
+#[serde(rename_all = "camelCase")]
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct EnumValue {
+    pub name: String,
+    pub db_name: Option<String>,
 }
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]

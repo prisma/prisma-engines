@@ -1681,7 +1681,39 @@ async fn relations_can_reference_multiple_fields(api: &TestApi) -> TestResult {
 }
 
 #[test_each_connector]
-async fn relations_can_reference_multiple_fields_with_mappings(api: &TestApi) -> TestResult {
+async fn relations_with_mappings_on_both_sides_can_reference_multiple_fields(api: &TestApi) -> TestResult {
+    let dm = r#"
+        model User {
+            id Int @id
+            email  String @map("emergency-mail")
+            age    Int    @map("birthdays-count")
+
+            @@unique([email, age])
+
+            @@map("users")
+        }
+
+        model Account {
+            id   Int @id
+            user User @relation(references: [email, age]) @map(["emergency-mail-fk1", "age-fk2"])
+        }
+    "#;
+
+    api.infer_apply(dm).send_assert().await?.assert_green()?;
+
+    api.assert_schema().await?.assert_table("Account", |table| {
+        table
+            .assert_foreign_keys_count(1)?
+            .assert_fk_on_columns(&["emergency-mail-fk1", "age-fk2"], |fk| {
+                fk.assert_references("users", &["emergency-mail", "birthdays-count"])
+            })
+    })?;
+
+    Ok(())
+}
+
+#[test_each_connector]
+async fn relations_with_mappings_on_referenced_side_can_reference_multiple_fields(api: &TestApi) -> TestResult {
     let dm = r#"
         model User {
             id Int @id
@@ -1696,7 +1728,6 @@ async fn relations_can_reference_multiple_fields_with_mappings(api: &TestApi) ->
         model Account {
             id   Int @id
             user User @relation(references: [email, age])
-            // @map(["emergency-mail-fk1", "age-fk2"])
         }
     "#;
 
@@ -1707,6 +1738,38 @@ async fn relations_can_reference_multiple_fields_with_mappings(api: &TestApi) ->
             .assert_foreign_keys_count(1)?
             .assert_fk_on_columns(&["user_emergency-mail", "user_birthdays-count"], |fk| {
                 fk.assert_references("users", &["emergency-mail", "birthdays-count"])
+            })
+    })?;
+
+    Ok(())
+}
+
+#[test_each_connector]
+async fn relations_with_mappings_on_referencing_side_can_reference_multiple_fields(api: &TestApi) -> TestResult {
+    let dm = r#"
+        model User {
+            id Int @id
+            email  String
+            age    Int
+
+            @@unique([email, age])
+
+            @@map("users")
+        }
+
+        model Account {
+            id   Int @id
+            user User @relation(references: [email, age]) @map(["emergency-mail-fk1", "age-fk2"])
+        }
+    "#;
+
+    api.infer_apply(dm).send_assert().await?.assert_green()?;
+
+    api.assert_schema().await?.assert_table("Account", |table| {
+        table
+            .assert_foreign_keys_count(1)?
+            .assert_fk_on_columns(&["emergency-mail-fk1", "age-fk2"], |fk| {
+                fk.assert_references("users", &["email", "age"])
             })
     })?;
 

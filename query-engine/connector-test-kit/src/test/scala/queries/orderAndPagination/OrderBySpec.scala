@@ -142,19 +142,12 @@ class OrderBySpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   private def createNeedsTiebreakers(): Unit = {
-    server.query(
-      """
-        |mutation {
-        |  a: createNeedsTiebreaker(data: {name: "SameSame", order: 1}){ id }
-        |  b: createNeedsTiebreaker(data: {name: "SameSame", order: 2}){ id }
-        |  c: createNeedsTiebreaker(data: {name: "SameSame", order: 3}){ id }
-        |  d: createNeedsTiebreaker(data: {name: "SameSame", order: 4}){ id }
-        |  e: createNeedsTiebreaker(data: {name: "SameSame", order: 5}){ id }
-        |  f: createNeedsTiebreaker(data: {name: "SameSame", order: 6}){ id }
-        |  g: createNeedsTiebreaker(data: {name: "SameSame", order: 7}){ id }
-        |}
-      """,
-      project
-    )
+    server.query("""mutation {createNeedsTiebreaker(data: {name: "SameSame", order: 1}){ id }}""", project)
+    server.query("""mutation {createNeedsTiebreaker(data: {name: "SameSame", order: 2}){ id }}""", project)
+    server.query("""mutation {createNeedsTiebreaker(data: {name: "SameSame", order: 3}){ id }}""", project)
+    server.query("""mutation {createNeedsTiebreaker(data: {name: "SameSame", order: 4}){ id }}""", project)
+    server.query("""mutation {createNeedsTiebreaker(data: {name: "SameSame", order: 5}){ id }}""", project)
+    server.query("""mutation {createNeedsTiebreaker(data: {name: "SameSame", order: 6}){ id }}""", project)
+    server.query("""mutation {createNeedsTiebreaker(data: {name: "SameSame", order: 7}){ id }}""", project)
   }
 }

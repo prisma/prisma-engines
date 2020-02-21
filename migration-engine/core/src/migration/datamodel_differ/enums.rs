@@ -1,4 +1,4 @@
-use super::directives::DirectiveDiffer;
+use super::{directives::DirectiveDiffer, enum_values::EnumValueDiffer};
 use datamodel::ast;
 
 /// Implements the logic to diff a pair of [AST enums](/datamodel/ast/struct.Datamodel.html).
@@ -9,6 +9,17 @@ pub(crate) struct EnumDiffer<'a> {
 }
 
 impl<'a> EnumDiffer<'a> {
+    pub(crate) fn value_pairs<'b>(&'b self) -> impl Iterator<Item = EnumValueDiffer<'a>> + 'b {
+        self.previous_values().filter_map(move |previous_value| {
+            self.next_values()
+                .find(|next_value| values_match(previous_value, next_value))
+                .map(|next_value| EnumValueDiffer {
+                    previous: previous_value,
+                    next: next_value,
+                })
+        })
+    }
+
     /// Iterator over the values present in `next` but not `previous`.
     pub(crate) fn created_values(&self) -> impl Iterator<Item = &ast::EnumValue> {
         self.next_values().filter(move |next_value| {
@@ -57,11 +68,11 @@ impl<'a> EnumDiffer<'a> {
         })
     }
 
-    fn previous_values(&self) -> impl Iterator<Item = &ast::EnumValue> {
+    fn previous_values<'b>(&'b self) -> impl Iterator<Item = &'a ast::EnumValue> + 'b {
         self.previous.values.iter()
     }
 
-    fn next_values(&self) -> impl Iterator<Item = &ast::EnumValue> {
+    fn next_values<'b>(&'b self) -> impl Iterator<Item = &'a ast::EnumValue> + 'b {
         self.next.values.iter()
     }
 
@@ -75,7 +86,7 @@ impl<'a> EnumDiffer<'a> {
 }
 
 fn values_match(previous: &ast::EnumValue, next: &ast::EnumValue) -> bool {
-    previous.name == next.name
+    previous.name.name == next.name.name
 }
 
 fn enum_directives_match(previous: &ast::Directive, next: &ast::Directive) -> bool {
@@ -115,10 +126,10 @@ mod tests {
 
         let enum_diff: EnumDiffer<'_> = differ.enum_pairs().next().unwrap();
 
-        let created_values: Vec<&str> = enum_diff.created_values().map(|val| val.name.as_str()).collect();
+        let created_values: Vec<&str> = enum_diff.created_values().map(|val| val.name.name.as_str()).collect();
         assert_eq!(created_values, &["MostlyTrue"]);
 
-        let deleted_values: Vec<&str> = enum_diff.deleted_values().map(|val| val.name.as_str()).collect();
+        let deleted_values: Vec<&str> = enum_diff.deleted_values().map(|val| val.name.name.as_str()).collect();
         assert_eq!(deleted_values, &["NearlyTrue", "DefinitelyFalse"],);
     }
 }

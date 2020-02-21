@@ -61,7 +61,7 @@ pub enum DatamodelError {
 
     #[fail(display = "Value \"{}\" is already defined on enum \"{}\".", value_name, enum_name)]
     DuplicateEnumValueError { enum_name: String, value_name: String, span: Span },
-
+    
     #[fail(display = "Attribute not known: \"@{}\".", directive_name)]
     DirectiveNotKnownError { directive_name: String, span: Span },
 
@@ -212,7 +212,7 @@ impl DatamodelError {
         }
     }
 
-    pub fn new_duplicate_enum_value_error(enum_name: &str, value_name: &str, span: Span) -> DatamodelError {
+    pub fn new_duplicate_enum_value_error(enum_name: &str, value_name: &str,  span: Span) -> DatamodelError {
         DatamodelError::DuplicateEnumValueError {
             enum_name: String::from(enum_name),
             value_name: String::from(value_name),

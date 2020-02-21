@@ -16,10 +16,11 @@ use std::{convert::TryFrom, panic::AssertUnwindSafe};
 impl<'t> QueryExt for connector::Transaction<'t> {}
 impl QueryExt for PooledConnection {}
 
-/// Functions for querying data.
-/// Basically represents a connection wrapper?
+/// An extension trait for Quaint's `Queryable`, offering certain Prisma-centric
+/// database operations on top of `Queryable`.
 #[async_trait]
 pub trait QueryExt: Queryable + Send + Sync {
+    /// Filter and map the resulting types with the given identifiers.
     async fn filter(&self, q: Query<'_>, idents: &[(TypeIdentifier, FieldArity)]) -> crate::Result<Vec<SqlRow>> {
         let result_set = self.query(q).await?;
         let mut sql_rows = Vec::new();
@@ -31,6 +32,8 @@ pub trait QueryExt: Queryable + Send + Sync {
         Ok(sql_rows)
     }
 
+    /// Execute a singular SQL query in the database, returning an arbitrary
+    /// JSON `Value` as a result.
     async fn raw_json<'a>(&'a self, q: RawQuery<'a>) -> std::result::Result<Value, crate::error::RawError> {
         if q.is_select() {
             let result_set = AssertUnwindSafe(self.query_raw(q.query(), q.parameters()))

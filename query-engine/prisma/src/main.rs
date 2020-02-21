@@ -65,7 +65,11 @@ pub struct GetConfigInput {
 
 #[derive(Debug, Clone, StructOpt)]
 pub struct ExecuteRequestInput {
+    /// GraphQL query to execute
     pub query: String,
+    /// Run in the legacy GraphQL mode
+    #[structopt(long)]
+    pub legacy: bool,
 }
 
 #[derive(Debug, StructOpt, Clone)]

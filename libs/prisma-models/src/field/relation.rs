@@ -7,7 +7,9 @@ use std::{
     sync::{Arc, Weak},
 };
 
+/// A short-hand for `Arc<RelationField>`
 pub type RelationFieldRef = Arc<RelationField>;
+/// A short-hand for `Weak<RelationField>`
 pub type RelationFieldWeak = Weak<RelationField>;
 
 #[derive(Debug)]

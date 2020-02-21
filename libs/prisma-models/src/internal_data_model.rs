@@ -33,16 +33,15 @@ pub struct InternalDataModel {
 #[derive(Debug, PartialEq, Eq, Hash, Clone)]
 pub struct InternalEnum {
     pub name: String,
-    pub values: Vec<String>,
+    pub values: Vec<InternalEnumValue>,
 }
 
 impl InternalEnum {
     pub fn new<N, I, V>(name: N, values: I) -> Self
     where
         N: Into<String>,
-        V: Into<String>,
+        V: Into<InternalEnumValue>,
         I: IntoIterator<Item = V>,
-
     {
         Self {
             name: name.into(),
@@ -51,7 +50,31 @@ impl InternalEnum {
     }
 
     pub fn contains(&self, val: &String) -> bool {
-        self.values.contains(val)
+        self.values.iter().any(|v| &v.name == val)
+    }
+
+    pub fn values(&self) -> Vec<String> {
+        self.values.iter().map(|v| v.name.to_string()).collect::<Vec<String>>()
+    }
+}
+
+#[derive(Debug, PartialEq, Eq, Hash, Clone)]
+pub struct InternalEnumValue {
+    pub name: String,
+    pub database_name: Option<String>,
+}
+
+impl InternalEnumValue {
+    pub fn new<N, I, V>(name: N, database_name: I) -> Self
+    where
+        N: Into<String>,
+        V: Into<String>,
+        I: Into<Option<String>>,
+    {
+        Self {
+            name: name.into(),
+            database_name: database_name.into(),
+        }
     }
 }
 

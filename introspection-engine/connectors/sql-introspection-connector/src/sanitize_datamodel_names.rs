@@ -11,44 +11,51 @@ pub fn sanitize_datamodel_names(datamodel: &mut Datamodel) {
 
         for field in &mut model.fields {
             let (sanitized_field_name, field_db_name) = sanitize_name(field.name.clone());
-
-            if let FieldType::Relation(info) = &mut field.field_type {
-                info.name = sanitize_name(info.name.clone()).0;
-                info.to = sanitize_name(info.to.clone()).0;
-                info.to_fields = info
-                    .to_fields
-                    .iter()
-                    .map(|f: &std::string::String| sanitize_name(f.clone()).0)
-                    .collect();
-            }
-
-            if let FieldType::Enum(enum_name) = &mut field.field_type {
-                let (sanitized_enum_name, enum_db_name) = if *enum_name == format!("{}_{}", model.name, field.name) {
-                    //MySql
-                    if model_db_name.is_none() && field_db_name.is_none() {
-                        (enum_name.clone(), None)
-                    } else {
-                        (
-                            format!("{}_{}", sanitized_model_name, sanitized_field_name),
-                            Some(enum_name.clone()),
-                        )
-                    }
-                } else {
-                    sanitize_name(enum_name.clone())
-                };
-
-                if let Some(old_name) = enum_db_name {
-                    enum_renames.insert(old_name.clone(), (sanitized_enum_name.clone(), Some(old_name.clone())));
-                };
-
-                *enum_name = sanitized_enum_name;
-            }
-
             let id_field_option = model.id_fields.iter_mut().find(|name| **name == field.name);
-            field.name = sanitized_field_name.clone();
-            id_field_option.map(|id_field| *id_field = sanitized_field_name);
+            let mut no_db_name_because_field_is_virtual = false;
 
-            if field.database_names.is_empty() {
+            match &mut field.field_type {
+                FieldType::Relation(info) => {
+                    info.name = sanitize_name(info.name.clone()).0;
+                    info.to = sanitize_name(info.to.clone()).0;
+                    info.to_fields = info
+                        .to_fields
+                        .iter()
+                        .map(|f: &std::string::String| sanitize_name(f.clone()).0)
+                        .collect();
+
+                    no_db_name_because_field_is_virtual = info.to_fields.is_empty();
+                }
+
+                FieldType::Enum(enum_name) => {
+                    let (sanitized_enum_name, enum_db_name) = if *enum_name == format!("{}_{}", model.name, field.name)
+                    {
+                        //MySql
+                        if model_db_name.is_none() && field_db_name.is_none() {
+                            (enum_name.clone(), None)
+                        } else {
+                            (
+                                format!("{}_{}", sanitized_model_name, sanitized_field_name),
+                                Some(enum_name.clone()),
+                            )
+                        }
+                    } else {
+                        sanitize_name(enum_name.clone())
+                    };
+
+                    if let Some(old_name) = enum_db_name {
+                        enum_renames.insert(old_name.clone(), (sanitized_enum_name.clone(), Some(old_name.clone())));
+                    };
+
+                    *enum_name = sanitized_enum_name;
+                }
+                _ => (),
+            }
+
+            field.name = sanitized_field_name.clone();
+            id_field_option.map(|id_field| *id_field = sanitized_field_name.clone());
+
+            if field.database_names.is_empty() && !no_db_name_because_field_is_virtual {
                 field.database_names = field_db_name.map(|db| vec![db]).unwrap_or(vec![]);
             }
         }
@@ -70,6 +77,12 @@ pub fn sanitize_datamodel_names(datamodel: &mut Datamodel) {
             enm.name = sanitized_enum_name.to_owned();
             enm.database_name = enum_db_name.to_owned();
         }
+
+        for enum_value in &mut enm.values {
+            let (sanitized_name, db_name) = sanitize_name(enum_value.name.clone());
+            enum_value.name = sanitized_name;
+            enum_value.database_name = db_name;
+        }
     }
 }
 
@@ -77,6 +90,11 @@ static RE_START: Lazy<Regex> = Lazy::new(|| Regex::new("^[^a-zA-Z]+").unwrap());
 
 static RE: Lazy<Regex> = Lazy::new(|| Regex::new("[^_a-zA-Z0-9]").unwrap());
 
+//todo this is now widely used, we can make this smarter at some point
+//ideas:
+// numbers only -> spell out first digit?   100 -> one00
+// Only invalid characters??
+// Underscore at start
 fn sanitize_name(name: String) -> (String, Option<String>) {
     let needs_sanitation = RE_START.is_match(name.as_str()) || RE.is_match(name.as_str());
 

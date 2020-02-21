@@ -160,6 +160,15 @@ pub enum IndexType {
     Normal,
 }
 
+impl IndexType {
+    pub fn is_unique(&self) -> bool {
+        match self {
+            IndexType::Unique => true,
+            _ => false,
+        }
+    }
+}
+
 /// An index of a table.
 #[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]

@@ -39,3 +39,17 @@ fn accept_a_comment_at_the_end() {
     user_model.assert_is_embedded(false);
     user_model.assert_has_field("id").assert_base_type(&ScalarType::Int);
 }
+
+#[test]
+fn accept_a_doc_comment_at_the_end() {
+    let dml = r#"
+    model User {
+        id Int @id
+    }
+    /// This is a doc comment"#;
+
+    let schema = parse(dml);
+    let user_model = schema.assert_has_model("User");
+    user_model.assert_is_embedded(false);
+    user_model.assert_has_field("id").assert_base_type(&ScalarType::Int);
+}

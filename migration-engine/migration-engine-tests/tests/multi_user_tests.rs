@@ -77,7 +77,7 @@ async fn multi_users_sanity_check(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector(log = "debug")]
+#[test_each_connector]
 async fn users_cannot_add_the_same_model_separately(api: &TestApi) -> TestResult {
     // Initial setup
     let master = {

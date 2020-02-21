@@ -85,3 +85,60 @@ async fn relations_to_models_with_no_pk_and_a_single_unique_required_field_work(
 
     Ok(())
 }
+
+#[test_each_connector(capabilities("enums"), tags("sql"))]
+async fn enum_value_with_database_names_must_work(api: &TestApi) -> TestResult {
+    let dm = r##"
+        model Cat {
+            id String @id
+            mood CatMood
+        }
+
+        enum CatMood {
+            ANGRY
+            HUNGRY @map("hongry")
+        }
+    "##;
+
+    api.infer_apply(dm)
+        .migration_id(Some("initial"))
+        .send_assert()
+        .await?
+        .assert_green()?;
+
+    if api.is_mysql() {
+        api.assert_schema()
+            .await?
+            .assert_enum("Cat_mood", |enm| enm.assert_values(&["ANGRY", "hongry"]))?;
+    } else {
+        api.assert_schema()
+            .await?
+            .assert_enum("CatMood", |enm| enm.assert_values(&["ANGRY", "hongry"]))?;
+    }
+
+    let dm = r##"
+        model Cat {
+            id String @id
+            mood CatMood
+        }
+
+        enum CatMood {
+            ANGRY
+            HUNGRY @map("hongery")
+        }
+    "##;
+
+    api.infer_apply(dm).send_assert().await?.assert_green()?;
+
+    if api.is_mysql() {
+        api.assert_schema()
+            .await?
+            .assert_enum("Cat_mood", |enm| enm.assert_values(&["ANGRY", "hongery"]))?;
+    } else {
+        api.assert_schema()
+            .await?
+            .assert_enum("CatMood", |enm| enm.assert_values(&["ANGRY", "hongery"]))?;
+    }
+
+    Ok(())
+}

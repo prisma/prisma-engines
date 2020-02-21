@@ -1106,7 +1106,16 @@ fn enums_are_preserved_when_generating_data_model_from_a_schema() {
             name: "Enum".to_string(),
             database_name: None,
             documentation: None,
-            values: vec!["a".to_string(), "b".to_string()],
+            values: vec![
+                datamodel::dml::EnumValue {
+                    name: "a".to_string(),
+                    database_name: None,
+                },
+                datamodel::dml::EnumValue {
+                    name: "b".to_string(),
+                    database_name: None,
+                },
+            ],
         }],
     };
 

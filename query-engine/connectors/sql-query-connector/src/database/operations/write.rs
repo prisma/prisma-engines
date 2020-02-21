@@ -6,6 +6,9 @@ use quaint::error::ErrorKind;
 use std::{collections::HashMap, convert::TryFrom};
 use user_facing_errors::query_engine::DatabaseConstraint;
 
+/// Create a single record to the database defined in `conn`, resulting into a
+/// `RecordIdentifier` as a unique identifier pointing to the just-created
+/// record.
 pub async fn create_record(conn: &dyn QueryExt, model: &ModelRef, args: WriteArgs) -> crate::Result<RecordIdentifier> {
     let (insert, returned_id) = write::create_record(model, args);
 
@@ -53,6 +56,9 @@ pub async fn create_record(conn: &dyn QueryExt, model: &ModelRef, args: WriteArg
     }
 }
 
+/// Update multiple records in a database defined in `conn` and the records
+/// defined in `args`, resulting the identifiers that were modified in the
+/// operation.
 pub async fn update_records(
     conn: &dyn QueryExt,
     model: &ModelRef,
@@ -76,6 +82,63 @@ pub async fn update_records(
     }
 
     Ok(merge_write_args(ids, id_args))
+}
+
+/// Delete multiple records in `conn`, defined in the `Filter`. Results the
+/// number of items deleted.
+pub async fn delete_records(conn: &dyn QueryExt, model: &ModelRef, where_: Filter) -> crate::Result<usize> {
+    let ids = conn.filter_ids(model, where_.clone()).await?;
+    let ids: Vec<&RecordIdentifier> = ids.iter().map(|id| &*id).collect();
+    let count = ids.len();
+
+    if count == 0 {
+        return Ok(count);
+    }
+
+    for delete in write::delete_many(model, ids.as_slice()) {
+        conn.query(delete).await?;
+    }
+
+    Ok(count)
+}
+
+/// Connect relations defined in `child_ids` to a parent defined in `parent_id`.
+/// The relation information is in the `RelationFieldRef`.
+pub async fn connect(
+    conn: &dyn QueryExt,
+    field: &RelationFieldRef,
+    parent_id: &RecordIdentifier,
+    child_ids: &[RecordIdentifier],
+) -> crate::Result<()> {
+    let query = write::create_relation_table_records(field, parent_id, child_ids);
+    conn.query(query).await?;
+
+    Ok(())
+}
+
+/// Disconnect relations defined in `child_ids` to a parent defined in `parent_id`.
+/// The relation information is in the `RelationFieldRef`.
+pub async fn disconnect(
+    conn: &dyn QueryExt,
+    field: &RelationFieldRef,
+    parent_id: &RecordIdentifier,
+    child_ids: &[RecordIdentifier],
+) -> crate::Result<()> {
+    let query = write::delete_relation_table_records(field, parent_id, child_ids);
+    conn.delete(query).await?;
+
+    Ok(())
+}
+
+/// Execute a plain SQL query with the given parameters, returning the answer as
+/// a JSON `Value`.
+pub async fn execute_raw(
+    conn: &dyn QueryExt,
+    query: String,
+    parameters: Vec<PrismaValue>,
+) -> crate::Result<serde_json::Value> {
+    let value = conn.raw_json(RawQuery::new(query, parameters)).await?;
+    Ok(value)
 }
 
 /// Picks all arguments out of `args` that are updating a value for a field
@@ -113,53 +176,4 @@ fn merge_write_args(ids: Vec<RecordIdentifier>, args: WriteArgs) -> Vec<RecordId
             id
         })
         .collect()
-}
-
-pub async fn delete_records(conn: &dyn QueryExt, model: &ModelRef, where_: Filter) -> crate::Result<usize> {
-    let ids = conn.filter_ids(model, where_.clone()).await?;
-    let ids: Vec<&RecordIdentifier> = ids.iter().map(|id| &*id).collect();
-    let count = ids.len();
-
-    if count == 0 {
-        return Ok(count);
-    }
-
-    for delete in write::delete_many(model, ids.as_slice()) {
-        conn.query(delete).await?;
-    }
-
-    Ok(count)
-}
-
-pub async fn connect(
-    conn: &dyn QueryExt,
-    field: &RelationFieldRef,
-    parent_id: &RecordIdentifier,
-    child_ids: &[RecordIdentifier],
-) -> crate::Result<()> {
-    let query = write::create_relation_table_records(field, parent_id, child_ids);
-
-    conn.query(query).await?;
-    Ok(())
-}
-
-pub async fn disconnect(
-    conn: &dyn QueryExt,
-    field: &RelationFieldRef,
-    parent_id: &RecordIdentifier,
-    child_ids: &[RecordIdentifier],
-) -> crate::Result<()> {
-    let query = write::delete_relation_table_records(field, parent_id, child_ids);
-    conn.delete(query).await?;
-
-    Ok(())
-}
-
-pub async fn execute_raw(
-    conn: &dyn QueryExt,
-    query: String,
-    parameters: Vec<PrismaValue>,
-) -> crate::Result<serde_json::Value> {
-    let value = conn.raw_json(RawQuery::new(query, parameters)).await?;
-    Ok(value)
 }

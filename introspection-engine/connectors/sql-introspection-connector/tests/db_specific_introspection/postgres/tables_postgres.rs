@@ -33,6 +33,26 @@ async fn introspecting_a_simple_table_with_gql_types_must_work(api: &TestApi) {
 }
 
 #[test_each_connector(tags("postgres"))]
+async fn introspecting_a_table_with_serial_type_must_work(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("Blog", |t| {
+                t.inject_custom("id serial not null primary key");
+            });
+        })
+        .await;
+
+    let dm = r#"
+            model Blog {
+                id      Int @id @default(autoincrement())
+            }
+        "#;
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+}
+
+#[test_each_connector(tags("postgres"))]
 async fn introspecting_a_table_with_compound_primary_keys_must_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel

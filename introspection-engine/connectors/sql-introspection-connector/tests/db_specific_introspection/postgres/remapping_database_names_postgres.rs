@@ -221,6 +221,36 @@ async fn remapping_enum_names_should_work(api: &TestApi) {
 }
 
 #[test_each_connector(tags("postgres"))]
+async fn remapping_enum_values_should_work(api: &TestApi) {
+    let sql1 = format!("CREATE Type Color as ENUM ('b lack', 'w hite')");
+    api.database().execute_raw(&sql1, &[]).await.unwrap();
+
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("Book", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom("color  Color Not Null");
+            });
+        })
+        .await;
+
+    let dm = r#"
+        model Book {
+            color   color
+            id      Int     @default(autoincrement()) @id
+        }
+
+        enum color {
+            b_lack   @map("b lack")
+            w_hite   @map("w hite")
+        }
+    "#;
+
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+}
+
+#[test_each_connector(tags("postgres"))]
 async fn remapping_compound_primary_keys_should_work(api: &TestApi) {
     api.barrel()
         .execute(|migration| {

@@ -43,11 +43,24 @@ fn model_from_dmmf(model: &Model) -> dml::Model {
 }
 
 fn enum_from_dmmf(en: &Enum) -> dml::Enum {
-    dml::Enum {
+    let mut enm = dml::Enum {
         name: en.name.clone(),
-        values: en.values.clone(),
+        values: vec![],
         database_name: en.db_name.clone(),
         documentation: en.documentation.clone(),
+    };
+
+    for enum_value in &en.values {
+        enm.values.push(enum_value_from_dmmf(enum_value))
+    }
+
+    enm
+}
+
+fn enum_value_from_dmmf(en: &EnumValue) -> dml::EnumValue {
+    dml::EnumValue {
+        name: en.name.clone(),
+        database_name: en.db_name.clone(),
     }
 }
 

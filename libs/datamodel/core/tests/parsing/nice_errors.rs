@@ -64,7 +64,7 @@ fn nice_error_on_incorrect_enum_field() {
     let error = parse_error(dml);
 
     error.assert_is(DatamodelError::new_parser_error(
-        &vec!["End of block (\"}\")", "enum field declaration"],
+        &vec!["End of block (\"}\")", "alphanumeric identifier"],
         Span::new(26, 26),
     ));
 }
