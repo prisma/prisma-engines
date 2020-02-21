@@ -54,6 +54,10 @@ impl NestedPagination {
 
             is_beyond_skip_range && is_within_take_range
         });
+
+        if self.needs_reversing {
+            many_records.records.reverse();
+        }
     }
 
     fn must_apply_pagination(&self) -> bool {
