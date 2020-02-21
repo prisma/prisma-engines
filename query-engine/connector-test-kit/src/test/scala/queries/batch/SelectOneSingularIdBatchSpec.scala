@@ -89,6 +89,30 @@ class SelectOneSingularIdBatchSpec extends FlatSpec with Matchers with ApiSpecBa
     )
   }
 
+  "joins with same conditions" should "just work" in {
+    val queries = Array(
+      """query {findOneArtist(where:{ArtistId:2}) {Albums(where:{AlbumId:2}) { AlbumId, Title }}}""",
+      """query {findOneArtist(where:{ArtistId:1}) {Albums(where:{AlbumId:2}) { Title, AlbumId }}}""",
+      """query {findOneArtist(where:{ArtistId:420}) {Albums(where:{AlbumId:2}) { AlbumId, Title }}}""",
+    )
+
+    server.batch(queries, project, legacy = false).toString should be(
+      """[{"data":{"findOneArtist":{"Albums":[{"AlbumId":2,"Title":"TheAlbumWithoutTracks"}]}}},{"data":{"findOneArtist":{"Albums":[]}}},{"data":{"findOneArtist":null}}]"""
+    )
+  }
+
+  "joins with different conditions" should "just work" in {
+    val queries = Array(
+      """query {findOneArtist(where:{ArtistId:2}) {Albums(where:{AlbumId:2}) { AlbumId, Title }}}""",
+      """query {findOneArtist(where:{ArtistId:1}) {Albums(where:{AlbumId:1}) { Title, AlbumId }}}""",
+      """query {findOneArtist(where:{ArtistId:420}) {Albums(where:{AlbumId:2}) { AlbumId, Title }}}""",
+    )
+
+    server.batch(queries, project, legacy = false).toString should be(
+      """[{"data":{"findOneArtist":{"Albums":[{"AlbumId":2,"Title":"TheAlbumWithoutTracks"}]}}},{"data":{"findOneArtist":{"Albums":[]}}},{"data":{"findOneArtist":null}}]"""
+    )
+  }
+
   "one singular failing query" should "work" in {
     server.batch(Array("""query {findOneArtist(where:{ArtistId: 420}){Name}}"""), project, legacy = false).toString should be(
       """[{"data":{"findOneArtist":null}}]"""
