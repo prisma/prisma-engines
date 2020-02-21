@@ -239,6 +239,9 @@ fn read_related<'a, 'b>(
             }
 
             scalars.records.extend(additional_records);
+
+            nested_pagination.apply_pagination(&mut scalars);
+
             scalars
         } else {
             println!("Using new in-memory join code path");
@@ -335,6 +338,9 @@ fn read_related<'a, 'b>(
                 }
 
                 scalars.records.extend(additional_records);
+
+                // in SQL this will never be hit since it is to one relation which does not allow pagination
+                nested_pagination.apply_pagination(&mut scalars);
 
             // --------------
 
