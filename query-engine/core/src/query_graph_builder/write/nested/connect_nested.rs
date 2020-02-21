@@ -213,7 +213,7 @@ fn handle_one_to_many(
 
                 Ok(child_node)
             })),
-         )?;
+        )?;
 
         // Check that all specified children have been updated.
         graph.create_edge(

@@ -676,8 +676,10 @@ impl QueryGraph {
 
             // Remove unsatisfied edges from node, reattach them to the reload node
             for edge in edges {
+                let target = self.edge_target(&edge);
                 let content = self.remove_edge(edge).unwrap();
-                self.create_edge(&reload_node, &node, content)?;
+
+                self.create_edge(&reload_node, &target, content)?;
             }
         }
 

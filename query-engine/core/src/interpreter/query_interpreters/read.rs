@@ -95,6 +95,7 @@ fn read_many<'a, 'b>(
     fut.boxed()
 }
 
+#[derive(Debug)]
 struct RecordCounter<'record> {
     id: &'record RecordIdentifier,
     count: usize,
@@ -130,12 +131,13 @@ fn read_related<'a, 'b>(
     parent_result: Option<&'a ManyRecords>,
 ) -> BoxFuture<'a, InterpretationResult<QueryResult>> {
     let fut = async move {
-        // The query construction must guarantee that the parent result
-        // contains the selected fields necessary to satisfy the relation query (links).
+        // The query construction must guarantee that either the parent result or the parent projections
+        // contain the fields necessary to satisfy the relation query (links), as well as the primary ID.
+        //
         // There are 2 options:
-        // - The query already has the links set - use those.
-        // - The links need to be extracted from the parent result.
-        let parent_relation_links = match query.parent_links {
+        // - The query already has the projections set - use those.
+        // - The links and primary IDs need to be extracted from the parent result.
+        let parent_relation_links = match query.parent_projections {
             Some(links) => links,
             None => {
                 let relation_id = query.parent_field.linking_fields();
@@ -289,11 +291,18 @@ fn read_related<'a, 'b>(
                 .await?
         };
 
+        // todo consider filtering null
+
         if use_in_memory_join && !is_m2m {
             // Write parent IDs into the retrieved records
             // Inlining is done on the parent, this means that we need to write the parent ID
             // into the child records that we retrieved. The matching is done based on the parent link values.
             if query.parent_field.is_inlined_on_enclosing_model() {
+                dbg!("Inlined on parent:");
+                dbg!(&query.parent_field.model().name);
+                dbg!(&scalars);
+                dbg!(&parent_relation_links);
+
                 // let parent_model_id = query.parent_field.model().primary_identifier();
                 let child_field_names = scalars.field_names.clone();
                 let mut additional_records = vec![];
@@ -308,6 +317,8 @@ fn read_related<'a, 'b>(
                         }
                     };
                 }
+
+                dbg!(&parent_record_ids);
 
                 let child_link_fields = query.parent_field.related_field().linking_fields();
 

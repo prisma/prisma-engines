@@ -133,7 +133,7 @@ where
         name: "find_children_by_parent".to_owned(),
         alias: None,
         parent_field: Arc::clone(parent_relation_field),
-        parent_links: None,
+        parent_projections: None,
         args: filter.into(),
         selected_fields,
         nested: vec![],
@@ -148,7 +148,7 @@ where
             // parent_model_id,
             Box::new(|mut node, parent_ids| {
                 if let Node::Query(Query::Read(ReadQuery::RelatedRecordsQuery(ref mut rq))) = node {
-                    rq.parent_links = Some(parent_ids);
+                    rq.parent_projections = Some(parent_ids);
                 };
 
                 Ok(node)
