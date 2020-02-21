@@ -744,3 +744,34 @@ async fn postgres_sequences_must_work() {
         },
     );
 }
+
+#[tokio::test]
+async fn postgres_multi_field_indexes_must_be_inferred_in_the_right_order() {
+    let schema = format!(
+        r##"
+            CREATE TABLE "{schema_name}"."indexes_test" (
+                id TEXT PRIMARY KEY,
+                name TEXT NOT NULL,
+                age INTEGER NOT NULL
+            );
+
+            CREATE UNIQUE INDEX "my_idx" ON "{schema_name}"."indexes_test" (name, age);
+            CREATE INDEX "my_idx2" ON "{schema_name}"."indexes_test" (age, name);
+        "##,
+        schema_name = SCHEMA
+    );
+
+    let inspector = get_postgres_describer(&schema, "postgres_multi_field_indexes").await;
+    let schema = inspector.describe(SCHEMA).await.unwrap();
+
+    let table = schema.table_bang("indexes_test");
+    let index = &table.indices[0];
+
+    assert_eq!(&index.columns, &["name", "age"]);
+    assert!(index.tpe.is_unique());
+
+    let index = &table.indices[1];
+
+    assert!(!index.tpe.is_unique());
+    assert_eq!(&index.columns, &["age", "name"]);
+}
