@@ -2,6 +2,8 @@ use connector_interface::WriteArgs;
 use prisma_models::*;
 use quaint::ast::*;
 
+/// `INSERT` a new record to the database. Resulting an `INSERT` ast and an
+/// optional `RecordIdentifier` if available from the arguments or model.
 pub fn create_record(model: &ModelRef, mut args: WriteArgs) -> (Insert<'static>, Option<RecordIdentifier>) {
     let return_id = args.as_record_identifier(model.primary_identifier());
 

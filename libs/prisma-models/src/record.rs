@@ -4,8 +4,8 @@ use crate::{
 };
 use std::convert::TryFrom;
 
-// Collection of fields that uniquely identify a record of a model.
-// There can be different sets of fields at the same time identifying a model.
+/// Collection of fields that uniquely identify a record of a model. There can
+/// be different sets of fields at the same time identifying a model.
 #[derive(Debug, Clone, Default, PartialEq)]
 pub struct ModelIdentifier {
     fields: Vec<Field>,
@@ -126,7 +126,7 @@ impl IntoIterator for ModelIdentifier {
     }
 }
 
-// Collection of field to value pairs corresponding to a ModelIdentifier the record belongs to.
+/// Collection of field to value pairs corresponding to a ModelIdentifier the record belongs to.
 #[derive(Default, Debug, Clone, PartialEq, Eq, Hash)]
 pub struct RecordIdentifier {
     pub pairs: Vec<(DataSourceFieldRef, PrismaValue)>,
@@ -192,7 +192,10 @@ impl TryFrom<RecordIdentifier> for PrismaValue {
     fn try_from(id: RecordIdentifier) -> crate::Result<Self> {
         match id.pairs.into_iter().next() {
             Some(value) => Ok(value.1),
-            None => Err(DomainError::ConversionFailure("RecordIdentifier".into(), "PrismaValue".into()))
+            None => Err(DomainError::ConversionFailure(
+                "RecordIdentifier".into(),
+                "PrismaValue".into(),
+            )),
         }
     }
 }

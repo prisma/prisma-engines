@@ -26,6 +26,7 @@ pub enum GraphqlId {
     UUID(Uuid),
 }
 
+/// Represents a value that can be stored to a database managed by Prisma.
 #[derive(Debug, PartialEq, Clone, Eq, Hash, Serialize)]
 #[serde(untagged)]
 pub enum PrismaValue {
