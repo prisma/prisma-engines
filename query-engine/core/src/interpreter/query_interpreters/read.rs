@@ -134,9 +134,7 @@ fn read_related<'a, 'b>(
         println!("124 {:?}", parent_result.is_some());
         println!("125 {:?}", is_with_pagination);
 
-        // prisma level join does not work for many 2 many yet
         // can only work if we have a parent result. This is not the case when we e.g. have nested delete inside an update
-        //        let use_prisma_level_join = parent_result.is_some() && is_with_pagination();
         let use_prisma_level_join = parent_result.is_some();
 
         let mut scalars = if !use_prisma_level_join {
@@ -249,7 +247,6 @@ fn read_related<'a, 'b>(
                     Some(existing_filter) => Some(Filter::and(vec![existing_filter, filter])),
                     None => Some(filter),
                 };
-                //                args.first = Some(-1); // superb hack to force implicit ordering but not change the result of the query'
                 args
             } else {
                 // SINGULAR CASE
@@ -262,7 +259,6 @@ fn read_related<'a, 'b>(
                     Some(existing_filter) => Some(Filter::and(vec![existing_filter, filter])),
                     None => Some(filter),
                 };
-                //                args.first = Some(-1); // superb hack to force implicit ordering but not change the result of the query
                 args
             };
 
@@ -273,7 +269,6 @@ fn read_related<'a, 'b>(
         if use_prisma_level_join {
             // Write parent IDs into the retrieved records
             if parent_result.is_some() && query.parent_field.is_inlined_on_enclosing_model() {
-                println!("1");
                 let parent_identifier = query.parent_field.model().primary_identifier();
                 let field_names = scalars.field_names.clone();
 
