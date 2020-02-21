@@ -56,11 +56,13 @@ impl ModelIdentifier {
         self.fields().find(|field| field.name() == name)
     }
 
+    // [DTODO] Hack to ignore m2m fields, remove when no dsfs are set on m2m rels anymore.
     pub fn data_source_fields<'a>(&'a self) -> impl Iterator<Item = DataSourceFieldRef> + 'a {
         self.fields
             .iter()
             .flat_map(|field| match field {
                 Field::Scalar(sf) => vec![sf.data_source_field().clone()],
+                Field::Relation(rf) if rf.relation().is_many_to_many() => vec![],
                 Field::Relation(rf) => rf.data_source_fields().to_vec(),
             })
             .into_iter()

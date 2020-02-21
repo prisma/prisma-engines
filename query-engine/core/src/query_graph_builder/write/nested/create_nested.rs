@@ -86,65 +86,44 @@ fn handle_many_to_many(
 /// ## Inlined on the parent
 /// We need to create a graph that has a create node for the child first and then the parent operation
 /// to have the child ID ready if needed.
-/// In case the relation link used to satisfy the relation is NOT the same as the primary ID of the
-/// parent model (i.e. `Create Child` here) and it can be determined that the parent operation does
-/// not return the necessary set of fields, we need to reload (`Reload Child`) the created record to
-/// be able to write the correct inlined data into `Parent`. NOTE: Currently we always insert the reload!
 ///
 /// Example finalized (with swaps already performed) graph:
 /// ```text
-/// Without reload:             With reload:
-/// ┌────────────────┐             ┌────────────────┐
-/// │  Child Create  │          ┌──│  Child Create  │
-/// └────────────────┘          │  └────────────────┘
-///          │                  │           │
-///          │                  │           │
-///          │                  │           │
-///          ▼                  │           ▼
-/// ┌ ─ ─ ─ ─ ─ ─ ─ ─           │  ┌────────────────┐
-///       Parent     │          │  │  Reload Child  │
-/// └ ─ ─ ─ ─ ─ ─ ─ ─           │  └────────────────┘
-///          │                  │           │
-///          │                  │           │
-///          │                  │           │
-///          ▼                  │           ▼
-/// ┌ ─ ─ ─ ─ ─ ─ ─ ─           │  ┌ ─ ─ ─ ─ ─ ─ ─ ─
-///       Result     │          └─▶      Parent     │
-/// └ ─ ─ ─ ─ ─ ─ ─ ─              └ ─ ─ ─ ─ ─ ─ ─ ─
-///                                         │
-///                                         │
-///                                         │
-///                                         ▼
-///                                ┌ ─ ─ ─ ─ ─ ─ ─ ─
-///                                      Result     │
-///                                └ ─ ─ ─ ─ ─ ─ ─ ─
+/// ┌────────────────┐
+/// │  Child Create  │
+/// └────────────────┘
+///          │
+///          │
+///          │
+///          ▼
+/// ┌ ─ ─ ─ ─ ─ ─ ─ ─
+///       Parent     │
+/// └ ─ ─ ─ ─ ─ ─ ─ ─
+///          │
+///          │
+///          │
+///          ▼
+/// ┌ ─ ─ ─ ─ ─ ─ ─ ─
+///       Result     │
+/// └ ─ ─ ─ ─ ─ ─ ─ ─
 /// ```
 ///
 /// ## Inlined on the child
 /// We can have the parent operation first, then do the child create(s) and
-/// insert the parent ID into the inline relation field. We need to reload the
-/// parent node if it doesn't yield the necessary fields in the result to satisfy
-/// the relation inlining. (Todo same as above, we are always reloading right now)
+/// insert the parent ID into the inline relation field.
 ///
 /// Example graph for 2 children:
 /// ```text
-///                 ┌ ─ ─ ─ ─ ─ ─                                       ┌ ─ ─ ─ ─ ─ ─ ─ ─
-///        ┌────────    Parent   │─ ─ ─ ─ ─                                   Parent     │─ ─ ─ ─ ─
-///        │        └ ─ ─ ─ ─ ─ ─          │                            └ ─ ─ ─ ─ ─ ─ ─ ─          │
-///        │               │                                                     │
-///        │               │               │                                     │                 │
-///        │               │                                                     │
-///        ▼               ▼               ▼                                     ▼                 ▼
-/// ┌────────────┐  ┌────────────┐  ┌ ─ ─ ─ ─ ─ ─                       ┌────────────────┐  ┌ ─ ─ ─ ─ ─ ─
-/// │Create Child│  │Create Child│      Result   │           ┌──────────│ Reload Parent  │      Result   │
-/// └────────────┘  └────────────┘  └ ─ ─ ─ ─ ─ ─            │          └────────────────┘  └ ─ ─ ─ ─ ─ ─
-///                                                          │                   │
-///                                                          │                   │
-///                                                          │                   │
-///                                                          ▼                   ▼
-///                                                 ┌────────────────┐  ┌────────────────┐
-///                                                 │  Create Child  │  │  Create Child  │
-///                                                 └────────────────┘  └────────────────┘
+///                 ┌ ─ ─ ─ ─ ─ ─
+///        ┌────────    Parent   │─ ─ ─ ─ ─
+///        │        └ ─ ─ ─ ─ ─ ─          │
+///        │               │
+///        │               │               │
+///        │               │
+///        ▼               ▼               ▼
+/// ┌────────────┐  ┌────────────┐  ┌ ─ ─ ─ ─ ─ ─
+/// │Create Child│  │Create Child│      Result   │
+/// └────────────┘  └────────────┘  └ ─ ─ ─ ─ ─ ─
 /// ```
 fn handle_one_to_many(
     graph: &mut QueryGraph,
@@ -157,25 +136,16 @@ fn handle_one_to_many(
             .pop()
             .expect("[Query Graph] Expected one nested create node on a 1:m relation with inline IDs on the parent.");
 
-        // Because we're swapping the parent and child model, we need to look at the related field instead of the parent relation field.
-        let reload_child_node =
-            utils::insert_node_reload(graph, &parent_relation_field.related_field(), child_node.clone())?;
-
-        // We need to swap the create node (with reload) and the parent because the inlining is done in the parent.
+        // We need to swap the create node and the parent because the inlining is done in the parent.
         graph.mark_nodes(&parent_node, &child_node);
-        // FIXME: AUMFIDARR
-        //        graph.mark_nodes(&parent_node, &reload_child_node);
 
         let child_model_id = parent_relation_field.related_field().linking_fields();
         let parent_model_id = parent_relation_field.linking_fields();
 
-        // FIXME: AUMFIDARR
-        //        graph.create_edge(&parent_node, &child_node, QueryGraphDependency::ExecutionOrder)?;
-
         // We extract the child linking fields in the edge, because after the swap, the child is the new parent.
         graph.create_edge(
             &parent_node,
-            &reload_child_node,
+            &child_node,
             QueryGraphDependency::ParentIds(child_model_id, Box::new(move |mut child_node, mut parent_ids| {
                 let parent_id = match parent_ids.pop() {
                     Some(pid) => Ok(pid),
@@ -192,14 +162,12 @@ fn handle_one_to_many(
             })),
         )?;
     } else {
-        let reload_node = utils::insert_node_reload(graph, parent_relation_field, parent_node.clone())?;
-
         for create_node in create_nodes {
             let parent_model_id = parent_relation_field.linking_fields();
             let child_model_id = parent_relation_field.related_field().linking_fields();
 
             graph.create_edge(
-                &reload_node,
+                &parent_node,
                 &create_node,
                 QueryGraphDependency::ParentIds(parent_model_id, Box::new(move |mut child_node, mut parent_ids| {
                     let parent_id = match parent_ids.pop() {

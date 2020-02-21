@@ -103,6 +103,17 @@ impl From<ModelIdentifier> for SelectedFields {
     }
 }
 
+impl From<Vec<ModelIdentifier>> for SelectedFields {
+    fn from(ids: Vec<ModelIdentifier>) -> SelectedFields {
+        let fields = ids
+            .into_iter()
+            .flat_map(|id| id.into_iter().map(SelectedField::from).collect::<Vec<_>>())
+            .collect();
+
+        SelectedFields::new(fields).deduplicate()
+    }
+}
+
 impl From<&ModelRef> for SelectedFields {
     fn from(model: &ModelRef) -> SelectedFields {
         let fields = model.fields().scalar().into_iter().map(SelectedField::from).collect();

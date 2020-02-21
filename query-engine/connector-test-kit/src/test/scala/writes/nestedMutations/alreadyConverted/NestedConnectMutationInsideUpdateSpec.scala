@@ -717,8 +717,9 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
            |  updateParent(
            |    where: {p: "p3"}
            |    data:{
-           |    childrenOpt: {connect: $child}
-           |  }){
+           |      childrenOpt: {connect: $child}
+           |    }
+           |  ){
            |    childrenOpt(first:10) {
            |      c
            |    }
