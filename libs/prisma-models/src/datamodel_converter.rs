@@ -55,13 +55,17 @@ impl<'a> DatamodelConverter<'a> {
     fn convert_models(&self) -> Vec<ModelTemplate> {
         self.datamodel
             .models()
-            .map(|model| ModelTemplate {
-                name: model.name.clone(),
-                is_embedded: model.is_embedded,
-                fields: self.convert_fields(model),
-                manifestation: model.single_database_name().map(|s| s.to_owned()),
-                id_field_names: model.id_fields.clone(),
-                indexes: self.convert_indexes(model),
+            .map(|model| {
+                let model = Self::sanitize_model(model.clone());
+
+                ModelTemplate {
+                    name: model.name.clone(),
+                    is_embedded: model.is_embedded,
+                    fields: self.convert_fields(&model),
+                    manifestation: model.single_database_name().map(|s| s.to_owned()),
+                    id_field_names: model.id_fields.clone(),
+                    indexes: self.convert_indexes(&model),
+                }
             })
             .collect()
     }
@@ -270,7 +274,44 @@ impl<'a> DatamodelConverter<'a> {
                 }
             }
         }
+
         result.into_iter().unique_by(|rel| rel.name()).collect()
+    }
+
+    /// Normalizes the model for usage in the query core.
+    fn sanitize_model(mut model: dml::Model) -> dml::Model {
+        // Fold single-field unique indices into the fields (makes a single field unique).
+        let (keep, transform): (Vec<_>, Vec<_>) = model.indices.into_iter().partition(|i| match i.tpe {
+            dml::IndexType::Unique if i.fields.len() == 1 => false,
+            _ => true,
+        });
+
+        model.indices = keep;
+
+        for index in transform {
+            if index.tpe == dml::IndexType::Unique {
+                let field_name = index.fields.first().unwrap();
+
+                model
+                    .fields
+                    .iter_mut()
+                    .find(|f| &f.name == field_name)
+                    .map(|f| f.is_unique = true);
+            }
+        }
+
+        // Fold single-field @@id into the fields (makes a single field @id).
+        if model.id_fields.len() == 1 {
+            let field_name = model.id_fields.pop().unwrap();
+
+            model
+                .fields
+                .iter_mut()
+                .find(|f| f.name == field_name)
+                .map(|f| f.is_id = true);
+        }
+
+        model
     }
 }
 
@@ -374,7 +415,7 @@ impl DatamodelFieldExtensions for dml::Field {
     fn type_identifier(&self) -> TypeIdentifier {
         match self.field_type {
             dml::FieldType::Enum(_) => TypeIdentifier::Enum,
-            dml::FieldType::Relation(_) => TypeIdentifier::Relation,
+            dml::FieldType::Relation(_) => TypeIdentifier::String, // Todo: Unused
             dml::FieldType::Base(scalar) => match scalar {
                 dml::ScalarType::Boolean => TypeIdentifier::Boolean,
                 dml::ScalarType::DateTime => TypeIdentifier::DateTime,

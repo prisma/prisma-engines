@@ -463,13 +463,14 @@ impl Standardiser {
         datamodel: &dml::Datamodel,
     ) -> Vec<DataSourceField> {
         let final_db_names = self.final_db_names_for_relation_field(&field, &rel_info, &datamodel);
-        //        dbg!(&final_db_names);
+        // dbg!(&final_db_names);
         let to_fields_and_db_names = rel_info.to_fields.iter().zip(final_db_names.iter());
 
         to_fields_and_db_names
             .map(|(to_field, db_name)| {
                 let related_model = datamodel.find_model(&rel_info.to).expect(STATE_ERROR);
                 let referenced_field = related_model.find_field(&to_field).expect(STATE_ERROR);
+
                 match &referenced_field.field_type {
                     dml::FieldType::Base(scalar_type) => {
                         let ds_field = dml::DataSourceField {

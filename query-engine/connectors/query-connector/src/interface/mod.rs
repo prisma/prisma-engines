@@ -50,6 +50,12 @@ pub trait ReadOperations {
         selected_fields: &'a SelectedFields,
     ) -> crate::IO<'a, ManyRecords>;
 
+    fn get_related_m2m_record_ids<'a>(
+        &'a self,
+        from_field: &'a RelationFieldRef,
+        from_record_ids: &'a [RecordIdentifier],
+    ) -> crate::IO<'a, Vec<(RecordIdentifier, RecordIdentifier)>>;
+
     // This will eventually become a more generic `aggregate`
     fn count_by_model<'a>(&'a self, model: &'a ModelRef, query_arguments: QueryArguments) -> crate::IO<'a, usize>;
 }

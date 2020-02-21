@@ -62,7 +62,6 @@ pub fn get_field_filters<'a>(field: &ModelField) -> Vec<&'a FilterArgument> {
         ModelField::Relation(_) => vec![&args.one_relation],
         ModelField::Scalar(sf) => match sf.type_identifier {
             TypeIdentifier::UUID => vec![&args.base, &args.inclusion, &args.alphanumeric, &args.string],
-            TypeIdentifier::GraphQLID => vec![&args.base, &args.inclusion, &args.alphanumeric, &args.string],
             TypeIdentifier::String => vec![&args.base, &args.inclusion, &args.alphanumeric, &args.string],
             TypeIdentifier::Int => vec![&args.base, &args.inclusion, &args.alphanumeric],
             TypeIdentifier::Float => vec![&args.base, &args.inclusion, &args.alphanumeric],
@@ -70,7 +69,6 @@ pub fn get_field_filters<'a>(field: &ModelField) -> Vec<&'a FilterArgument> {
             TypeIdentifier::Enum => vec![&args.base, &args.inclusion],
             TypeIdentifier::DateTime => vec![&args.base, &args.inclusion, &args.alphanumeric],
             TypeIdentifier::Json => vec![],
-            TypeIdentifier::Relation => unreachable!(),
         },
     };
 

@@ -5,8 +5,9 @@ mod disconnect;
 mod nested;
 mod update;
 mod upsert;
-mod utils;
 mod write_args_parser;
+
+pub mod utils;
 
 use super::*;
 

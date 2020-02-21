@@ -290,8 +290,8 @@ fn handle_one_to_many(
                 let parent_id = match parent_ids.pop() {
                     Some(pid) => Ok(pid),
                     None => Err(QueryGraphBuilderError::AssertionError(format!(
-                 "[Query Graph] Expected a valid parent ID to be present for a nested set on a one-to-many relation."
-             ))),
+                        "[Query Graph] Expected a valid parent ID to be present for a nested set on a one-to-many relation."
+                    ))),
                 }?;
 
                 if let Node::Query(Query::Write(ref mut wq)) = node {

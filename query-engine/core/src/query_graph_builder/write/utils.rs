@@ -121,9 +121,9 @@ pub fn insert_find_children_by_parent_node<T>(
 where
     T: Into<QueryArguments>,
 {
-    // Todo this doesn't work without reload
-    // let parent_linking_fields = parent_relation_field.linking_fields();
     let parent_model_id = parent_relation_field.model().primary_identifier();
+    let parent_linking_fields = parent_relation_field.linking_fields();
+    let projection = parent_model_id.merge(parent_linking_fields);
 
     let selected_fields = get_selected_fields(
         &parent_relation_field.related_model(),
@@ -134,7 +134,7 @@ where
         name: "find_children_by_parent".to_owned(),
         alias: None,
         parent_field: Arc::clone(parent_relation_field),
-        relation_parent_ids: None,
+        parent_projections: None,
         args: filter.into(),
         selected_fields,
         nested: vec![],
@@ -145,11 +145,10 @@ where
         parent_node,
         &read_children_node,
         QueryGraphDependency::ParentIds(
-            // parent_linking_fields,
-            parent_model_id,
+            projection,
             Box::new(|mut node, parent_ids| {
                 if let Node::Query(Query::Read(ReadQuery::RelatedRecordsQuery(ref mut rq))) = node {
-                    rq.relation_parent_ids = Some(parent_ids);
+                    rq.parent_projections = Some(parent_ids);
                 };
 
                 Ok(node)
@@ -371,71 +370,3 @@ pub fn insert_deletion_checks(
 
     Ok(())
 }
-
-/// Checks if the parent node returns the set of fields required to satisfy the relation .
-/// If not, the parent record (or records) will be reloaded with the necessary fields.
-/// This is usually the case when the relation requires a different set of fields than the
-/// primary identifier of the model.
-///
-/// Returns the reference to the node that children should attach to to get the fields they need
-/// to satisfy a relation.
-///
-/// Todo: To ensure that the results are equivalent and nothing was dropped in between, we'd need to
-/// compare the result counts from `parent_node` and `reload_node` with an empty node and error out.
-/// ```text
-/// ┌ ─ ─ ─ ─ ─ ─ ─ ─
-///       Parent     │
-/// └ ─ ─ ─ ─ ─ ─ ─ ─
-///          │
-///          │
-///          │
-///          ▼
-/// ┌────────────────┐
-/// │ Reload Parent  │
-/// └────────────────┘
-/// ```
-pub fn insert_node_reload(
-    _graph: &mut QueryGraph,
-    _parent_relation_field: &RelationFieldRef,
-    parent_node: NodeRef,
-) -> QueryGraphBuilderResult<NodeRef> {
-    // FIXME: AUMFIDARR
-    //    if let Some(Node::Query(_q)) = graph.node_content(&parent_node) {
-    //        let required_fields = parent_relation_field.linking_fields();
-    //
-    //        // Todo: Simplification: We currently always reload the node regardless of whether or not the parent actually
-    //        // returns the required fields.
-    //        // if !q.returns(&required_fields) {
-    //        let reload_node = reload_node(graph, parent_relation_field.model(), required_fields.clone());
-    //
-    //        graph.create_edge(
-    //            &parent_node,
-    //            &reload_node,
-    //            QueryGraphDependency::ParentIds(
-    //                required_fields,
-    //                Box::new(move |mut node, parent_ids| {
-    //                    if let Node::Query(ref mut q) = node {
-    //                        q.add_filter(parent_ids.filter());
-    //                    }
-    //
-    //                    Ok(node)
-    //                }),
-    //            ),
-    //        )?;
-    //
-    //        Ok(reload_node)
-    //    // } else {
-    //    //     Ok(parent_node)
-    //    // }
-    //    } else {
-    //        Err(QueryGraphBuilderError::AssertionError(
-    //            "Query graph construction error: Attempted to attach a node reload to a non-query node.".to_owned(),
-    //        ))
-    //    }
-    Ok(parent_node)
-}
-
-// fn reload_node(graph: &mut QueryGraph, model: ModelRef, identifier: ModelIdentifier) -> NodeRef {
-//     let read_query = read_ids_infallible(model, identifier, Filter::empty());
-//     graph.create_node(read_query)
-// }

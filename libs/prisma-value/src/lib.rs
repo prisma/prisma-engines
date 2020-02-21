@@ -8,7 +8,7 @@ use rust_decimal::{
     Decimal,
 };
 use serde::{ser::Serializer, Serialize};
-use std::{convert::TryFrom, fmt, string::FromUtf8Error};
+use std::{convert::TryFrom, fmt};
 use uuid::Uuid;
 
 pub use error::ConversionFailure;
@@ -18,30 +18,22 @@ pub type PrismaListValue = Vec<PrismaValue>;
 #[cfg(feature = "sql-ext")]
 pub use sql_ext::*;
 
-#[derive(Serialize, Debug, PartialEq, Eq, Hash, Clone)]
-#[serde(untagged)]
-pub enum GraphqlId {
-    String(String),
-    Int(usize),
-    UUID(Uuid),
-}
-
-/// Represents a value that can be stored to a database managed by Prisma.
-#[derive(Debug, PartialEq, Clone, Eq, Hash, Serialize)]
+#[derive(Debug, PartialEq, Clone, Eq, Hash, Serialize, PartialOrd, Ord)]
 #[serde(untagged)]
 pub enum PrismaValue {
     String(String),
-    #[serde(serialize_with = "serialize_decimal")]
-    Float(Decimal),
     Boolean(bool),
-    #[serde(serialize_with = "serialize_date")]
-    DateTime(DateTime<Utc>),
     Enum(String),
     Int(i64),
     Null,
     Uuid(Uuid),
-    GraphqlId(GraphqlId),
     List(PrismaListValue),
+
+    #[serde(serialize_with = "serialize_date")]
+    DateTime(DateTime<Utc>),
+
+    #[serde(serialize_with = "serialize_decimal")]
+    Float(Decimal),
 }
 
 pub fn stringify_date(date: &DateTime<Utc>) -> String {
@@ -123,11 +115,6 @@ impl fmt::Display for PrismaValue {
             PrismaValue::Int(x) => x.fmt(f),
             PrismaValue::Null => "null".fmt(f),
             PrismaValue::Uuid(x) => x.fmt(f),
-            PrismaValue::GraphqlId(x) => match x {
-                GraphqlId::String(x) => x.fmt(f),
-                GraphqlId::Int(x) => x.fmt(f),
-                GraphqlId::UUID(x) => x.fmt(f),
-            },
             PrismaValue::List(x) => {
                 let as_string = format!("{:?}", x);
                 as_string.fmt(f)
@@ -204,46 +191,6 @@ impl From<PrismaListValue> for PrismaValue {
     }
 }
 
-impl From<GraphqlId> for PrismaValue {
-    fn from(id: GraphqlId) -> PrismaValue {
-        PrismaValue::GraphqlId(id)
-    }
-}
-
-impl From<&GraphqlId> for PrismaValue {
-    fn from(id: &GraphqlId) -> PrismaValue {
-        PrismaValue::GraphqlId(id.clone())
-    }
-}
-
-impl TryFrom<PrismaValue> for GraphqlId {
-    type Error = ConversionFailure;
-
-    fn try_from(value: PrismaValue) -> PrismaValueResult<GraphqlId> {
-        match value {
-            PrismaValue::GraphqlId(id) => Ok(id),
-            PrismaValue::Int(i) => Ok(GraphqlId::from(i)),
-            PrismaValue::String(s) => Ok(GraphqlId::from(s)),
-            PrismaValue::Uuid(u) => Ok(GraphqlId::from(u)),
-            _ => Err(ConversionFailure::new("PrismaValue", "GraphqlId")),
-        }
-    }
-}
-
-impl TryFrom<&PrismaValue> for GraphqlId {
-    type Error = ConversionFailure;
-
-    fn try_from(value: &PrismaValue) -> PrismaValueResult<GraphqlId> {
-        match value {
-            PrismaValue::GraphqlId(id) => Ok(id.clone()),
-            PrismaValue::Int(i) => Ok(GraphqlId::from(*i)),
-            PrismaValue::String(s) => Ok(GraphqlId::from(s.clone())),
-            PrismaValue::Uuid(u) => Ok(GraphqlId::from(*u)),
-            _ => Err(ConversionFailure::new("PrismaValue", "GraphqlId")),
-        }
-    }
-}
-
 impl TryFrom<PrismaValue> for i64 {
     type Error = ConversionFailure;
 
@@ -252,49 +199,5 @@ impl TryFrom<PrismaValue> for i64 {
             PrismaValue::Int(i) => Ok(i),
             _ => Err(ConversionFailure::new("PrismaValue", "i64")),
         }
-    }
-}
-
-impl From<&str> for GraphqlId {
-    fn from(s: &str) -> Self {
-        GraphqlId::from(s.to_string())
-    }
-}
-
-impl From<String> for GraphqlId {
-    fn from(s: String) -> Self {
-        GraphqlId::String(s)
-    }
-}
-
-impl TryFrom<Vec<u8>> for GraphqlId {
-    type Error = FromUtf8Error;
-
-    fn try_from(v: Vec<u8>) -> Result<GraphqlId, Self::Error> {
-        Ok(GraphqlId::String(String::from_utf8(v)?))
-    }
-}
-
-impl From<usize> for GraphqlId {
-    fn from(id: usize) -> Self {
-        GraphqlId::Int(id)
-    }
-}
-
-impl From<i64> for GraphqlId {
-    fn from(id: i64) -> Self {
-        GraphqlId::Int(id as usize)
-    }
-}
-
-impl From<u64> for GraphqlId {
-    fn from(id: u64) -> Self {
-        GraphqlId::Int(id as usize)
-    }
-}
-
-impl From<Uuid> for GraphqlId {
-    fn from(uuid: Uuid) -> Self {
-        GraphqlId::UUID(uuid)
     }
 }

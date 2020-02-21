@@ -1,4 +1,4 @@
-use prisma_value::{GraphqlId, PrismaValue};
+use prisma_value::PrismaValue;
 use rust_decimal::Decimal;
 use std::collections::BTreeMap;
 
@@ -35,11 +35,6 @@ impl From<PrismaValue> for QueryValue {
             PrismaValue::Int(i) => Self::Int(i),
             PrismaValue::Null => Self::Null,
             PrismaValue::Uuid(u) => Self::String(u.to_hyphenated().to_string()),
-            PrismaValue::GraphqlId(gid) => match gid {
-                GraphqlId::String(s) => Self::String(s),
-                GraphqlId::Int(i) => Self::Int(i as i64),
-                GraphqlId::UUID(u) => Self::String(u.to_hyphenated().to_string()),
-            },
         }
     }
 }

@@ -15,11 +15,15 @@ pub use error::*;
 pub use formatters::*;
 pub use transformers::*;
 
-use crate::{interpreter::ExpressionResult, Query, QueryGraphBuilderResult};
+use crate::{
+    interpreter::ExpressionResult, query_graph_builder::write::utils::IdFilter, FilteredQuery, ManyRecordsQuery, Query,
+    QueryGraphBuilderResult, ReadQuery,
+};
+use connector::QueryArguments;
 use guard::*;
 use invariance_rules::*;
 use petgraph::{graph::*, visit::EdgeRef as PEdgeRef, *};
-use prisma_models::{ModelIdentifier, RecordIdentifier};
+use prisma_models::{ModelIdentifier, ModelRef, RecordIdentifier};
 use std::{borrow::Borrow, collections::HashSet};
 
 pub type QueryGraphResult<T> = std::result::Result<T, QueryGraphError>;
@@ -64,7 +68,7 @@ impl Flow {
     }
 }
 
-// Current limitation: We need to narrow it down to GraphqlID diffs for Hash and EQ.
+// Current limitation: We need to narrow it down to ID diffs for Hash and EQ.
 pub enum Computation {
     Diff(DiffNode),
 }
@@ -189,6 +193,7 @@ impl QueryGraph {
     pub fn finalize(&mut self) -> QueryGraphResult<()> {
         if !self.finalized {
             self.swap_marked()?;
+            self.insert_reloads()?;
             self.finalized = true;
         }
 
@@ -327,7 +332,7 @@ impl QueryGraph {
     }
 
     /// Completely removes the edge from the graph, returning it's content.
-    /// This operation is destructive on the underlying graph and invalidates
+    /// This operation is destructive on the underlying graph and invalidates references.
     pub fn remove_edge(&mut self, edge: EdgeRef) -> Option<QueryGraphDependency> {
         self.graph.remove_edge(edge.edge_ix).unwrap().into_inner()
     }
@@ -548,6 +553,133 @@ impl QueryGraph {
             if let Some(edge) = existing_edge {
                 let content = self.remove_edge(edge).unwrap();
                 self.create_edge(&child_node, &parent_node, content)?;
+            }
+        }
+
+        Ok(())
+    }
+
+    /// Traverses the query graph and checks if reloads of nodes is necessary.
+    /// Whether or not a node needs to be reloaded is determined based on the
+    /// outgoing edges of parent-ID-based transformers, as those hold the ModelIdentifiers
+    /// all records of the parent result need to contain in order to satisfy dependencies.
+    ///
+    /// ## Example
+    /// Given a query graph, where 3 children require different set of fields ((A, B), (B, C), (A, D))
+    /// to execute their dependent operations:
+    /// ```text
+    /// ┌ ─ ─ ─ ─ ─ ─
+    ///     Parent   │─────────┬───────────────┐
+    /// └ ─ ─ ─ ─ ─ ─          │               │
+    ///        │               │               │
+    ///     (A, B)          (B, C)           (A, D)
+    ///        │               │               │
+    ///        ▼               ▼               ▼
+    /// ┌ ─ ─ ─ ─ ─ ─   ┌ ─ ─ ─ ─ ─ ─   ┌ ─ ─ ─ ─ ─ ─
+    ///    Child A   │     Child B   │     Child C   │
+    /// └ ─ ─ ─ ─ ─ ─   └ ─ ─ ─ ─ ─ ─   └ ─ ─ ─ ─ ─ ─
+    /// ```
+    /// However, `Parent` only returns `(A, B)`, for example, because that's the primary ID of the parent model
+    /// and `Parent` is an operation that only returns IDs (e.g. update, updateMany).
+    ///
+    /// In order to satisfy children B and C, the graph is altered by this post-processing call:
+    /// ```text
+    /// ┌ ─ ─ ─ ─ ─ ─
+    ///     Parent   │
+    /// └ ─ ─ ─ ─ ─ ─
+    ///        │
+    ///     (A, B) (== Primary ID)
+    ///        │
+    ///        ▼
+    /// ┌────────────┐
+    /// │   Reload   │─────────┬───────────────┐
+    /// └────────────┘         │               │
+    ///        │               │               │
+    ///     (A, B)          (B, C)           (A, D)
+    ///        │               │               │
+    ///        ▼               ▼               ▼
+    /// ┌ ─ ─ ─ ─ ─ ─   ┌ ─ ─ ─ ─ ─ ─   ┌ ─ ─ ─ ─ ─ ─
+    ///    Child A   │     Child B   │     Child C   │
+    /// └ ─ ─ ─ ─ ─ ─   └ ─ ─ ─ ─ ─ ─   └ ─ ─ ─ ─ ─ ─
+    /// ```
+    ///
+    /// The edges from `Parent` to all dependent children are removed from the graph and reinserted in order
+    /// on the reload node.
+    ///
+    /// The `Reload` node is always a find many query.
+    /// Unwraps are safe because we're operating on the unprocessed state of the graph (`Expressionista` changes that).
+    fn insert_reloads(&mut self) -> QueryGraphResult<()> {
+        let reloads: Vec<(NodeRef, ModelRef, Vec<(EdgeRef, ModelIdentifier)>)> = self
+            .graph
+            .node_indices()
+            .filter_map(|ix| {
+                let node = NodeRef { node_ix: ix };
+
+                if let Node::Query(q) = self.node_content(&node).unwrap() {
+                    let edges = self.outgoing_edges(&node);
+
+                    let unsatisfied_edges: Vec<_> = edges
+                        .into_iter()
+                        .filter_map(|edge| match self.edge_content(&edge).unwrap() {
+                            QueryGraphDependency::ParentIds(ref requested_ident, _) if !q.returns(requested_ident) => {
+                                Some((edge, requested_ident.clone()))
+                            }
+                            _ => None,
+                        })
+                        .collect();
+
+                    if unsatisfied_edges.is_empty() {
+                        None
+                    } else {
+                        Some((node, q.model(), unsatisfied_edges))
+                    }
+                } else {
+                    None
+                }
+            })
+            .collect();
+
+        trace!("Reloading nodes: {:?}", reloads);
+
+        for (node, model, edges) in reloads {
+            // Create reload node and connect it to the `node`
+            let primary_model_id = model.primary_identifier();
+            let (edges, identifiers): (Vec<_>, Vec<_>) = edges.into_iter().unzip();
+
+            let read_query = ReadQuery::ManyRecordsQuery(ManyRecordsQuery {
+                name: "reload".into(),
+                alias: None,
+                model,
+                args: QueryArguments::default(),
+                selected_fields: identifiers.into(),
+                nested: vec![],
+                selection_order: vec![],
+            });
+
+            let query = Query::Read(read_query);
+            let reload_node = self.create_node(query);
+
+            self.create_edge(
+                &node,
+                &reload_node,
+                QueryGraphDependency::ParentIds(
+                    primary_model_id,
+                    Box::new(|mut reload_node, parent_ids| {
+                        if let Node::Query(Query::Read(ReadQuery::ManyRecordsQuery(ref mut mr))) = reload_node {
+                            mr.set_filter(parent_ids.filter());
+                        }
+
+                        Ok(reload_node)
+                    }),
+                ),
+            )?;
+
+            // Remove unsatisfied edges from node, reattach them to the reload node
+            for edge in edges {
+                let target = self.edge_target(&edge);
+                let content = self.remove_edge(edge).unwrap();
+
+                self.create_edge(&reload_node, &target, content)?;
             }
         }
 

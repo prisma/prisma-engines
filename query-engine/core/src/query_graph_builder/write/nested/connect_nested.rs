@@ -160,14 +160,10 @@ fn handle_one_to_many(
     let parent_model_identifier = parent_relation_field.model().primary_identifier();
     let child_model_identifier = parent_relation_field.related_model().primary_identifier();
 
-    dbg!(parent_relation_field);
-    dbg!(parent_relation_field.relation_is_inlined_in_parent());
-
     if parent_relation_field.relation_is_inlined_in_parent() {
         let read_query = utils::read_ids_infallible(child_model.clone(), child_model_identifier.clone(), child_filter);
         let read_children_node = graph.create_node(read_query);
         let parent_linking_fields = parent_relation_field.linking_fields();
-        dbg!(&parent_linking_fields);
 
         // We need to swap the read node and the parent because the inlining is done in the parent, and we need to fetch the IDs first.
         graph.mark_nodes(&parent_node, &read_children_node);
@@ -213,7 +209,7 @@ fn handle_one_to_many(
 
                 Ok(child_node)
             })),
-         )?;
+        )?;
 
         // Check that all specified children have been updated.
         graph.create_edge(

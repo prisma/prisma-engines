@@ -32,6 +32,15 @@ impl ReadQuery {
             ReadQuery::AggregateRecordsQuery(_x) => false,
         }
     }
+
+    pub fn model(&self) -> ModelRef {
+        match self {
+            ReadQuery::RecordQuery(x) => x.model.clone(),
+            ReadQuery::ManyRecordsQuery(x) => x.model.clone(),
+            ReadQuery::RelatedRecordsQuery(x) => x.parent_field.related_field().model().clone(),
+            ReadQuery::AggregateRecordsQuery(x) => x.model.clone(),
+        }
+    }
 }
 
 impl FilteredQuery for ReadQuery {
@@ -100,11 +109,14 @@ pub struct RelatedRecordsQuery {
     pub name: String,
     pub alias: Option<String>,
     pub parent_field: RelationFieldRef,
-    pub relation_parent_ids: Option<Vec<RecordIdentifier>>,
     pub args: QueryArguments,
     pub selected_fields: SelectedFields,
     pub nested: Vec<ReadQuery>,
     pub selection_order: Vec<String>,
+
+    /// Fields of the parent to satisfy the relation query without
+    /// relying on the parent result passed by the interpreter.
+    pub parent_projections: Option<Vec<RecordIdentifier>>,
 }
 
 #[derive(Debug, Clone)]

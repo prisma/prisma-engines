@@ -124,16 +124,15 @@ pub trait InputTypeBuilderBase<'a>: CachedBuilder<InputObjectType> + InputBuilde
             .collect();
 
         // @@id compound field (there can be only one per model)
-        // FIXME: AUMFIDARR
-        //        let compound_id_field: Option<InputField> = model.fields().id().map(|fields| {
-        //            let name = compound_id_field_name(&fields.iter().map(|f| f.name.as_ref()).collect::<Vec<&str>>());
-        //            let typ = self.compound_field_unique_object_type(None, fields);
-        //
-        //            input_field(name, InputType::object(typ), None)
-        //        });
+        let compound_id_field: Option<InputField> = model.fields().id().map(|fields| {
+            let name = compound_id_field_name(&fields.iter().map(|f| f.name.as_ref()).collect::<Vec<&str>>());
+            let typ = self.compound_field_unique_object_type(None, fields);
+
+            input_field(name, InputType::opt(InputType::object(typ)), None)
+        });
 
         fields.extend(compound_unique_fields);
-        //        fields.extend(compound_id_field);
+        fields.extend(compound_id_field);
 
         input_object.set_fields(fields);
 

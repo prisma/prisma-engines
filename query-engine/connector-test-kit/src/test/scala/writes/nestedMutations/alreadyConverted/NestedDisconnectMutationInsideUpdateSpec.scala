@@ -497,9 +497,9 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         |}""",
         project
       )
+
       val parentIdentifier = t.parent.where(parentResult, "data.createParent")
       val child1Identifier = t.child.whereMulti(parentResult, "data.createParent.childrenOpt")(0)
-
       val otherParentResult = server.query(
         s"""mutation {
         |  createParent(data: {
@@ -516,8 +516,8 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         |}""",
         project
       )
-      val otherChild = t.child.whereMulti(otherParentResult, "data.createParent.childrenOpt")(1)
 
+      val otherChild = t.child.whereMulti(otherParentResult, "data.createParent.childrenOpt")(1)
       val res = server.query(
         s"""
          |mutation {

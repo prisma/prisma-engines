@@ -51,6 +51,66 @@ pub async fn get_many_records(
     Ok(ManyRecords { records, field_names })
 }
 
+pub async fn get_related_m2m_record_ids(
+    conn: &dyn QueryExt,
+    from_field: &RelationFieldRef,
+    from_record_ids: &[RecordIdentifier],
+) -> crate::Result<Vec<(RecordIdentifier, RecordIdentifier)>> {
+    let mut idents = vec![];
+    idents.extend(from_field.type_identifiers_with_arities());
+    idents.extend(from_field.related_field().type_identifiers_with_arities());
+
+    let relation = from_field.relation();
+    let table = relation.as_table();
+
+    let from_column_names: Vec<_> = from_field.related_field().m2m_column_names();
+    let to_column_names: Vec<_> = from_field.m2m_column_names();
+    let from_columns: Vec<Column<'static>> = from_column_names
+        .iter()
+        .map(|name| Column::from(name.clone()))
+        .collect();
+
+    // [DTODO] To verify: We might need chunked fetch here (too many parameters in the query).
+    let select = Select::from_table(table)
+        .columns(from_column_names.into_iter().chain(to_column_names.into_iter()))
+        .so_that(query_builder::conditions(&from_columns, from_record_ids));
+
+    let parent_model_id = from_field.model().primary_identifier();
+    let child_model_id = from_field.related_model().primary_identifier();
+
+    let from_dsfs: Vec<_> = parent_model_id.data_source_fields().collect();
+    let to_dsfs: Vec<_> = child_model_id.data_source_fields().collect();
+
+    // first parent id, then child id
+    Ok(conn
+        .filter(select.into(), idents.as_slice())
+        .await?
+        .into_iter()
+        .map(|row| {
+            let mut values = row.values;
+
+            let child_values = values.split_off(from_dsfs.len());
+            let parent_values = values;
+
+            let p: RecordIdentifier = from_dsfs
+                .iter()
+                .zip(parent_values)
+                .map(|(dsf, val)| (dsf.clone(), val))
+                .collect::<Vec<_>>()
+                .into();
+
+            let c: RecordIdentifier = to_dsfs
+                .iter()
+                .zip(child_values)
+                .map(|(dsf, val)| (dsf.clone(), val))
+                .collect::<Vec<_>>()
+                .into();
+
+            (p, c)
+        })
+        .collect())
+}
+
 pub async fn get_related_records<T>(
     conn: &dyn QueryExt,
     from_field: &RelationFieldRef,
@@ -62,7 +122,6 @@ where
     T: ManyRelatedRecordsQueryBuilder,
 {
     // Todo: Does this work with relation fields that are backed by multiple fields?
-    // Q: What is the TypeIdentifier::Relation actually doing?
     // Q: The following code simply queries both field sides, is this correct?
     //    Columns that don't exist are ignored? Iterator is empty?
     // Q: Additionally: field names contains always both, isn't that breaking the above assumption?

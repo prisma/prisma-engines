@@ -1549,11 +1549,12 @@ class NestedDeleteMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |      nameTop: "updated top",
          |      middles: {
          |        update: [{
-         |              where: {nameMiddle: "the middle"},
-         |              data:{  nameMiddle: "updated middle"
-         |                      bottom: {delete: true}
-         |              }
-         |              }]
+         |          where: {nameMiddle: "the middle"},
+         |          data: {
+         |            nameMiddle: "updated middle"
+         |            bottom: {delete: true}
+         |          }
+         |        }]
          |     }
          |   }
          |  ) {

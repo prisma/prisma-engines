@@ -5,7 +5,7 @@ pub use read::*;
 pub use write::*;
 
 use connector::filter::Filter;
-use prisma_models::ModelIdentifier;
+use prisma_models::{ModelIdentifier, ModelRef};
 
 #[derive(Debug, Clone)]
 pub enum Query {
@@ -18,6 +18,13 @@ impl Query {
         match self {
             Self::Read(rq) => rq.returns(ident),
             Self::Write(wq) => wq.returns(ident),
+        }
+    }
+
+    pub fn model(&self) -> ModelRef {
+        match self {
+            Self::Read(rq) => rq.model(),
+            Self::Write(wq) => wq.model(),
         }
     }
 }

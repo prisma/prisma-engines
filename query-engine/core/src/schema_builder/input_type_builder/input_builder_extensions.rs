@@ -12,12 +12,10 @@ pub trait InputBuilderExtensions {
             TypeIdentifier::Int => InputType::int(),
             TypeIdentifier::Float => InputType::float(),
             TypeIdentifier::Boolean => InputType::boolean(),
-            TypeIdentifier::GraphQLID => InputType::string(),
             TypeIdentifier::UUID => InputType::uuid(),
             TypeIdentifier::DateTime => InputType::date_time(),
             TypeIdentifier::Json => InputType::json(),
             TypeIdentifier::Enum => self.map_enum_input_type(&field),
-            TypeIdentifier::Relation => unreachable!(), // A scalar field can't be a relation.
         };
 
         if field.is_list {

@@ -258,7 +258,7 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
     }
   }
 
-  "a PM to CM  relation  should work" in {
+  "a PM to CM relation should work" in {
     schemaWithRelation(onParent = ChildList, onChild = ParentList).test { t =>
       val project = SchemaDsl.fromStringV11() {
         t.datamodel

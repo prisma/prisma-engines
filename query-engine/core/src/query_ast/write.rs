@@ -67,7 +67,7 @@ impl WriteQuery {
         }
     }
 
-    fn model(&self) -> ModelRef {
+    pub fn model(&self) -> ModelRef {
         match self {
             Self::CreateRecord(q) => Arc::clone(&q.model),
             Self::UpdateRecord(q) => Arc::clone(&q.model),

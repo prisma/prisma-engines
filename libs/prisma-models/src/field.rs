@@ -112,10 +112,8 @@ pub enum TypeIdentifier {
     Enum,
     Json,
     DateTime,
-    GraphQLID,
     UUID,
     Int,
-    Relation,
 }
 
 impl Field {

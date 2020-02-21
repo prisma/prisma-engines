@@ -101,6 +101,16 @@ where
         }))
     }
 
+    fn get_related_m2m_record_ids<'b>(
+        &'b self,
+        from_field: &'b RelationFieldRef,
+        from_record_ids: &'b [RecordIdentifier],
+    ) -> connector::IO<'b, Vec<(RecordIdentifier, RecordIdentifier)>> {
+        IO::new(
+            self.catch(async move { read::get_related_m2m_record_ids(&self.inner, from_field, from_record_ids).await }),
+        )
+    }
+
     fn count_by_model<'b>(&'b self, model: &'b ModelRef, query_arguments: QueryArguments) -> connector::IO<'b, usize> {
         IO::new(self.catch(async move { read::count_by_model(&self.inner, model, query_arguments).await }))
     }

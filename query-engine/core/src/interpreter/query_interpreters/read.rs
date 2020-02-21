@@ -1,9 +1,9 @@
+use super::*;
+use crate::interpreter::query_interpreters::nested_pagination::NestedPagination;
 use crate::{interpreter::InterpretationResult, query_ast::*, result_ast::*};
-use connector::{self, filter::Filter, ConnectionLike, QueryArguments, ReadOperations, ScalarCompare};
+use connector::{self, ConnectionLike, QueryArguments, ReadOperations};
 use futures::future::{BoxFuture, FutureExt};
-use prisma_models::{ManyRecords, Record, RecordIdentifier};
-use prisma_value::PrismaValue;
-use std::collections::HashMap;
+use prisma_models::ManyRecords;
 
 pub fn execute<'a, 'b>(
     tx: &'a ConnectionLike<'a, 'b>,
@@ -29,11 +29,11 @@ fn read_one<'conn, 'tx>(
 ) -> BoxFuture<'conn, InterpretationResult<QueryResult>> {
     let fut = async move {
         let model = query.model;
+        let model_id = model.primary_identifier();
         let filter = query.filter.expect("Expected filter to be set for ReadOne query.");
         let scalars = tx
             .get_single_record(&model, &filter, &query.selected_fields.only_scalar_and_inlined())
             .await?;
-        let model_id = model.primary_identifier();
 
         match scalars {
             Some(record) => {
@@ -77,7 +77,6 @@ fn read_many<'a, 'b>(
             .await?;
 
         let model_id = query.model.primary_identifier();
-        // let ids = scalars.identifiers(&model_id)?;
         let nested: Vec<QueryResult> = process_nested(tx, query.nested, Some(&scalars)).await?;
 
         Ok(QueryResult::RecordSelection(RecordSelection {
@@ -96,173 +95,32 @@ fn read_many<'a, 'b>(
 /// Queries related records for a set of parent IDs.
 fn read_related<'a, 'b>(
     tx: &'a ConnectionLike<'a, 'b>,
-    query: RelatedRecordsQuery,
+    mut query: RelatedRecordsQuery,
     parent_result: Option<&'a ManyRecords>,
 ) -> BoxFuture<'a, InterpretationResult<QueryResult>> {
     let fut = async move {
-        // The query construction must guarantee that the parent result
-        // contains the selected fields necessary to satisfy the relation query ("relation IDs").
-        // There are 2 options:
-        // - The query already has IDs set - use those.
-        // - The IDs need to be extracted from the parent result.
-        let relation_parent_ids = match query.relation_parent_ids {
-            Some(ids) => ids,
-            None => {
-                let relation_id = query.parent_field.linking_fields();
-                parent_result
-                    .expect("No parent results present in the query graph for reading related records.")
-                    .identifiers(&relation_id)?
-            }
-        };
-
         let relation = query.parent_field.relation();
+        let is_m2m = relation.is_many_to_many();
+        let paginator = NestedPagination::new_from_query_args(&query.args);
 
-        // prisma level join does not work for many 2 many yet
-        // can only work if we have a parent result. This is not the case when we e.g. have nested delete inside an update
-        let use_prisma_level_join =
-            !relation.is_many_to_many() && parent_result.is_some() && !query.args.is_with_pagination();
+        query.args.first = None;
+        query.args.skip = None;
+        query.args.last = None;
 
-        let mut scalars = if !use_prisma_level_join {
-            tx.get_related_records(
+        let scalars = if is_m2m {
+            nested_read::m2m(tx, &query, parent_result, paginator).await?
+        } else {
+            nested_read::one2m(
+                tx,
                 &query.parent_field,
-                &relation_parent_ids,
+                query.parent_projections,
+                parent_result,
                 query.args.clone(),
-                &query.selected_fields.only_scalar_and_inlined(),
+                &query.selected_fields,
+                paginator,
             )
             .await?
-        } else {
-            // PRISMA LEVEL JOIN
-
-            let other_fields: Vec<_> = query
-                .parent_field
-                .related_field()
-                .linking_fields()
-                .fields()
-                .flat_map(|f| f.data_source_fields())
-                .collect();
-
-            let is_compound_case = other_fields.len() > 1;
-
-            let args = if is_compound_case {
-                let filters: Vec<Filter> = relation_parent_ids
-                    .clone()
-                    .into_iter()
-                    .map(|id| {
-                        let filters = id
-                            .pairs
-                            .into_iter()
-                            .zip(other_fields.iter())
-                            .map(|((_, value), other_field)| other_field.equals(value))
-                            .collect();
-                        Filter::and(filters)
-                    })
-                    .collect();
-
-                let filter = Filter::or(filters);
-                let mut args = query.args.clone();
-
-                args.filter = match args.filter {
-                    Some(existing_filter) => Some(Filter::and(vec![existing_filter, filter])),
-                    None => Some(filter),
-                };
-                args
-            } else {
-                // SINGULAR CASE
-                let other_field = other_fields.first().unwrap();
-                let parent_ids_as_prisma_values = relation_parent_ids.iter().map(|ri| ri.single_value()).collect();
-                let filter = other_field.is_in(parent_ids_as_prisma_values);
-                let mut args = query.args.clone();
-
-                args.filter = match args.filter {
-                    Some(existing_filter) => Some(Filter::and(vec![existing_filter, filter])),
-                    None => Some(filter),
-                };
-                args
-            };
-
-            tx.get_many_records(&query.parent_field.related_model(), args, &query.selected_fields)
-                .await?
         };
-
-        if use_prisma_level_join {
-            // Write parent IDs into the retrieved records
-            if parent_result.is_some() && query.parent_field.is_inlined_on_enclosing_model() {
-                let parent_identifier = query.parent_field.model().primary_identifier();
-                let field_names = scalars.field_names.clone();
-
-                let parent_link_fields = query.parent_field.linking_fields();
-                let child_link_fields = query.parent_field.related_field().linking_fields();
-
-                let parent_result =
-                    parent_result.expect("No parent results present in the query graph for reading related records.");
-
-                let parent_fields = &parent_result.field_names;
-                let mut additional_records = vec![];
-
-                let mut records_by_parent_id: HashMap<Vec<&PrismaValue>, Vec<&Record>> = HashMap::new();
-                for record in parent_result.records.iter() {
-                    let prisma_values = record.identifying_values(parent_fields, &parent_link_fields).unwrap();
-                    match records_by_parent_id.get_mut(&prisma_values) {
-                        Some(records) => records.push(record),
-                        None => {
-                            let mut records = Vec::new();
-                            records.push(record);
-                            records_by_parent_id.insert(prisma_values, records);
-                        }
-                    }
-                }
-
-                for mut record in scalars.records.iter_mut() {
-                    let child_link: RecordIdentifier = record.identifier(&field_names, &child_link_fields)?;
-
-                    let child_values: Vec<&PrismaValue> = child_link.pairs.iter().map(|p| &p.1).collect();
-                    let empty_vec = Vec::new();
-                    let mut parent_records = records_by_parent_id.get(&child_values).unwrap_or(&empty_vec).iter();
-
-                    let parent_id = parent_records
-                        .next()
-                        .unwrap()
-                        .identifier(parent_fields, &parent_identifier)
-                        .unwrap();
-
-                    record.parent_id = Some(parent_id);
-
-                    for p_record in parent_records {
-                        let parent_id = p_record.identifier(parent_fields, &parent_identifier).unwrap();
-                        let mut record = record.clone();
-
-                        record.parent_id = Some(parent_id);
-                        additional_records.push(record);
-                    }
-                }
-
-                scalars.records.extend(additional_records);
-            } else if parent_result.is_some() && query.parent_field.related_field().is_inlined_on_enclosing_model() {
-                let parent_identifier = query.parent_field.model().primary_identifier();
-                let field_names = scalars.field_names.clone();
-                let child_link_fields = query.parent_field.related_field().linking_fields();
-
-                for record in scalars.records.iter_mut() {
-                    let parent_id: RecordIdentifier = record.identifier(&field_names, &child_link_fields)?;
-                    let parent_id = parent_id
-                        .into_iter()
-                        .zip(parent_identifier.data_source_fields())
-                        .map(|((_, value), field)| (field, value))
-                        .collect::<Vec<_>>()
-                        .into();
-
-                    record.parent_id = Some(parent_id);
-                }
-            } else if query.parent_field.relation().is_many_to_many() {
-                // nothing to do for many to many. parent ids are already present
-            } else {
-                panic!(format!(
-                    "parent result: {:?}, relation: {:?}",
-                    &parent_result,
-                    &query.parent_field.relation()
-                ));
-            }
-        }
 
         let model = query.parent_field.related_model();
         let model_id = model.primary_identifier();
