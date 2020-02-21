@@ -45,8 +45,8 @@ pub(super) fn conditions<'a>(
                 let cols_with_vals = columns.into_iter().map(|c| c.clone()).zip(ids.values());
 
                 cols_with_vals.fold(ConditionTree::NoCondition, |acc, (col, val)| match acc {
-                    ConditionTree::NoCondition => dbg!(col).equals(dbg!(val)).into(),
-                    cond => cond.and(dbg!(col).equals(dbg!(val))),
+                    ConditionTree::NoCondition => col.equals(val).into(),
+                    cond => cond.and(col.equals(val)),
                 })
             })
             .fold(ConditionTree::NoCondition, |acc, cond| match acc {

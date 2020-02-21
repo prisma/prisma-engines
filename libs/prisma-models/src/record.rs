@@ -2,6 +2,8 @@ use crate::{
     dml::FieldArity, DataSourceFieldRef, DomainError, Field, ModelRef, PrismaValue, PrismaValueExtensions,
     TypeIdentifier,
 };
+use itertools::Itertools;
+use std::collections::HashMap;
 
 // Collection of fields that uniquely identify a record of a model.
 // There can be different sets of fields at the same time identifying a model.
@@ -93,9 +95,6 @@ impl ModelIdentifier {
     /// (Resistance is futile.)
     pub fn assimilate(&self, id: RecordIdentifier) -> crate::Result<RecordIdentifier> {
         if self.db_len() != id.len() {
-            dbg!(self);
-            dbg!(&id);
-
             Err(DomainError::ConversionFailure(
                 "record identifier".to_owned(),
                 "assimilated record identifier".to_owned(),
@@ -125,6 +124,23 @@ impl ModelIdentifier {
             .map(|dsf| (dsf.clone(), PrismaValue::Null))
             .collect::<Vec<_>>()
             .into()
+    }
+
+    /// Consumes both `ModelIdentifier`s to create a new one that contains
+    /// both fields. Each field is contained exactly once, with the first
+    /// occurrence of the first field in order from left (`self`) to right (`other`)
+    /// is retained. Assumes that both identifiers reason over the same model.
+    pub fn merge(self, other: ModelIdentifier) -> ModelIdentifier {
+        assert_eq!(self.model(), other.model());
+        let fields = self.fields.into_iter().chain(other.fields).unique().collect();
+
+        ModelIdentifier { fields }
+    }
+
+    /// Creates a record identifier from raw values.
+    /// No checks for length, type, or similar is performed, hence "unchecked".
+    pub fn from_unchecked(&self, values: Vec<PrismaValue>) -> RecordIdentifier {
+        RecordIdentifier::new(self.data_source_fields().zip(values).collect())
     }
 }
 
@@ -184,6 +200,33 @@ impl RecordIdentifier {
         }
 
         return false;
+    }
+
+    /// Consumes this identifier and splits it into a set of `RecordIdentifier`s based on the passed
+    /// `ModelIdentifier`s. Assumes that The transformation can be done.
+    pub fn split_into(self, identifiers: &[ModelIdentifier]) -> Vec<RecordIdentifier> {
+        let mapped: HashMap<String, (DataSourceFieldRef, PrismaValue)> = self
+            .into_iter()
+            .map(|(dsf, val)| (dsf.name.clone(), (dsf, val)))
+            .collect();
+
+        identifiers
+            .into_iter()
+            .map(|ident| {
+                ident
+                    .data_source_fields()
+                    .map(|dsf| {
+                        let entry = mapped
+                            .get(&dsf.name)
+                            .expect("Error splitting RecordIdentifier: ModelIdentifier doesn't match.")
+                            .clone();
+
+                        entry
+                    })
+                    .collect::<Vec<_>>()
+                    .into()
+            })
+            .collect()
     }
 
     // [DTODO] Remove

@@ -198,16 +198,18 @@ impl SelectedFields {
     }
 
     pub fn contains_all_db_names<'a>(&self, names: impl Iterator<Item = String>) -> bool {
-        let mut db_names: Vec<_> = self.db_names().collect();
-        let mut names: Vec<_> = names.collect();
+        let selected_db_names: Vec<_> = self.db_names().collect();
+        let names_to_select: Vec<_> = names.collect();
 
-        if names.len() > db_names.len() {
+        dbg!(&selected_db_names);
+        dbg!(&names_to_select);
+
+        if names_to_select.len() > selected_db_names.len() {
             false
         } else {
-            db_names.sort();
-            names.sort();
-
-            db_names.into_iter().zip(names).all(|(a, b)| a == b)
+            names_to_select
+                .into_iter()
+                .all(|to_select| selected_db_names.contains(&to_select.as_str()))
         }
     }
 

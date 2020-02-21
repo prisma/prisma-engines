@@ -121,8 +121,9 @@ pub fn insert_find_children_by_parent_node<T>(
 where
     T: Into<QueryArguments>,
 {
+    let parent_model_id = parent_relation_field.model().primary_identifier();
     let parent_linking_fields = parent_relation_field.linking_fields();
-    // let parent_model_id = parent_relation_field.model().primary_identifier();
+    let projection = parent_model_id.merge(parent_linking_fields);
 
     let selected_fields = get_selected_fields(
         &parent_relation_field.related_model(),
@@ -144,8 +145,7 @@ where
         parent_node,
         &read_children_node,
         QueryGraphDependency::ParentIds(
-            parent_linking_fields,
-            // parent_model_id,
+            projection,
             Box::new(|mut node, parent_ids| {
                 if let Node::Query(Query::Read(ReadQuery::RelatedRecordsQuery(ref mut rq))) = node {
                     rq.parent_projections = Some(parent_ids);

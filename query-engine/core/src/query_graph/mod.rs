@@ -579,7 +579,7 @@ impl QueryGraph {
     ///    Child A   │     Child B   │     Child C   │
     /// └ ─ ─ ─ ─ ─ ─   └ ─ ─ ─ ─ ─ ─   └ ─ ─ ─ ─ ─ ─
     /// ```
-    /// However, `Parent` only returns `(A, B)`, for example because that's the primary ID of the parent model
+    /// However, `Parent` only returns `(A, B)`, for example, because that's the primary ID of the parent model
     /// and `Parent` is an operation that only returns IDs (e.g. update, updateMany).
     ///
     /// In order to satisfy children B and C, the graph is altered by this post-processing call:
@@ -651,7 +651,7 @@ impl QueryGraph {
                 alias: None,
                 model,
                 args: QueryArguments::default(),
-                selected_fields: identifiers.into(), // todo: original selected fields + links
+                selected_fields: identifiers.into(),
                 nested: vec![],
                 selection_order: vec![],
             });
