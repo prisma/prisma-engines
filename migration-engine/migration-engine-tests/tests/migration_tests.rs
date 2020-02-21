@@ -1817,7 +1817,7 @@ async fn foreign_keys_are_added_on_existing_tables(api: &TestApi) -> TestResult 
     Ok(())
 }
 
-#[test_each_connector]
+#[test_each_connector(log = "debug")]
 async fn basic_compound_primary_keys_must_work(api: &TestApi) -> TestResult {
     let dm = r#"
         model User {
