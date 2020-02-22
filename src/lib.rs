@@ -126,14 +126,11 @@ pub mod prelude;
 #[cfg(any(feature = "sqlite", feature = "mysql", feature = "postgresql"))]
 pub mod single;
 pub mod visitor;
-
 #[cfg(feature = "serde-support")]
 pub mod serde;
 
+use once_cell::sync::Lazy;
+
+pub(crate) static LOG_QUERIES: Lazy<bool> = Lazy::new(|| std::env::var("LOG_QUERIES").map(|_| true).unwrap_or(false));
+
 pub type Result<T> = std::result::Result<T, error::Error>;
-
-use lazy_static::lazy_static;
-
-lazy_static! {
-    static ref LOG_QUERIES: bool = std::env::var("LOG_QUERIES").map(|_| true).unwrap_or(false);
-}

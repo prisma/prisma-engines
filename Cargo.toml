@@ -1,6 +1,6 @@
 [package]
 name = "quaint"
-version = "0.2.0-alpha.5"
+version = "0.2.0-alpha.6"
 authors = [
     "Julius de Bruijn <bruijn@prisma.io>",
     "Katharina Fey <kookie@spacekookie.de>",
@@ -49,7 +49,7 @@ serde-support = ["serde", "chrono/serde"]
 url = "2.1"
 metrics = "0.12"
 percent-encoding = "2"
-lazy_static = "1.4"
+once_cell = "1.3"
 num_cpus = "1.12"
 rust_decimal = "=1.1.0"
 futures = "0.3"

@@ -456,13 +456,11 @@ impl Queryable for PostgreSql {
 mod tests {
     use super::*;
     use crate::{connector::Queryable, error::*, single::Quaint};
-    use lazy_static::lazy_static;
+    use once_cell::sync::Lazy;
     use std::env;
     use url::Url;
 
-    lazy_static! {
-        static ref CONN_STR: String = env::var("TEST_PSQL").expect("TEST_PSQL env var");
-    }
+    static CONN_STR: Lazy<String> = Lazy::new(|| env::var("TEST_PSQL").expect("TEST_PSQL env var"));
 
     #[test]
     fn should_parse_socket_url() {

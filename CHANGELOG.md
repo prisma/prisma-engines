@@ -1,6 +1,10 @@
 # Changelog
 
-## v0.2.0-alhpa.5
+## v0.2.0-alpha.6
+
+- Remove lazy_static in favor of once_cell
+
+## v0.2.0-alpha.5
 
 - Fix possible stack overflows with conditions
 - Foreign key constraint errors
