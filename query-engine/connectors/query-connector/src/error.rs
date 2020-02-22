@@ -29,6 +29,9 @@ pub enum ErrorKind {
     #[fail(display = "Null constraint failed: {}", constraint)]
     NullConstraintViolation { constraint: DatabaseConstraint },
 
+    #[fail(display = "Foreign key constraint failed")]
+    ForeignKeyConstraintViolation { constraint: DatabaseConstraint },
+
     #[fail(display = "Record does not exist.")]
     RecordDoesNotExist,
 

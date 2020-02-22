@@ -1,17 +1,13 @@
-#[macro_use]
-extern crate lazy_static;
-
 mod categories;
 mod exceptions;
 mod inflector;
 mod rules;
 
+use once_cell::sync::Lazy;
 use inflector::{Inflector, Mode};
 
-lazy_static! {
-    static ref DEFAULT: Inflector = Inflector::new(Mode::Anglicized);
-    static ref CLASSICAL: Inflector = Inflector::new(Mode::Classical);
-}
+static DEFAULT: Lazy<Inflector> = Lazy::new(|| Inflector::new(Mode::Anglicized));
+static CLASSICAL: Lazy<Inflector> = Lazy::new(|| Inflector::new(Mode::Classical));
 
 /// Default inflector, anglicized mode.
 pub fn default() -> &'static Inflector {

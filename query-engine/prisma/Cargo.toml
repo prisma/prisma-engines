@@ -16,7 +16,6 @@ hyper = "0.13"
 tokio = { version = "0.2", features = ["rt-threaded", "macros"] }
 
 async-trait = "0.1"
-lazy_static = "1.4"
 prisma-inflector = { path = "../../libs/prisma-inflector" }
 datamodel = { path = "../../libs/datamodel/core" }
 prisma-models = { path = "../../libs/prisma-models" }
@@ -34,6 +33,7 @@ itertools = "0.8"
 url = "2.1"
 structopt = "0.3"
 rust_decimal = "=1.1.0"
+once_cell = "1.3"
 
 tracing = "0.1"
 tracing-log = "0.1"

@@ -12,7 +12,7 @@ use tracing_subscriber::{EnvFilter, FmtSubscriber};
 
 use cli::*;
 use error::*;
-use lazy_static::lazy_static;
+use once_cell::sync::Lazy;
 use request_handlers::{PrismaRequest, PrismaResponse, RequestHandler};
 use server::HttpServer;
 
@@ -34,14 +34,13 @@ pub enum LogFormat {
     Json,
 }
 
-lazy_static! {
-    pub static ref LOG_FORMAT: LogFormat = {
-        match std::env::var("RUST_LOG_FORMAT").as_ref().map(|s| s.as_str()) {
-            Ok("devel") => LogFormat::Text,
-            _ => LogFormat::Json,
-        }
-    };
-}
+static LOG_FORMAT: Lazy<LogFormat> = Lazy::new(|| {
+    match std::env::var("RUST_LOG_FORMAT").as_ref().map(|s| s.as_str()) {
+        Ok("devel") => LogFormat::Text,
+        _ => LogFormat::Json,
+    }
+});
+
 
 pub type PrismaResult<T> = Result<T, PrismaError>;
 type AnyError = Box<dyn Error + Send + Sync + 'static>;

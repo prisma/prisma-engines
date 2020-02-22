@@ -46,6 +46,9 @@ pub enum SqlError {
     #[fail(display = "Null constraint failed: {:?}", constraint)]
     NullConstraintViolation { constraint: DatabaseConstraint },
 
+    #[fail(display = "Foreign key constraint failed")]
+    ForeignKeyConstraintViolation { constraint: DatabaseConstraint },
+
     #[fail(display = "Record does not exist.")]
     RecordDoesNotExist,
 
@@ -114,6 +117,9 @@ impl SqlError {
             SqlError::NullConstraintViolation { constraint } => {
                 ConnectorError::from_kind(ErrorKind::NullConstraintViolation { constraint })
             }
+            SqlError::ForeignKeyConstraintViolation { constraint } => {
+                ConnectorError::from_kind(ErrorKind::ForeignKeyConstraintViolation { constraint })
+            }
             SqlError::RecordDoesNotExist => ConnectorError::from_kind(ErrorKind::RecordDoesNotExist),
             SqlError::ColumnDoesNotExist => ConnectorError::from_kind(ErrorKind::ColumnDoesNotExist),
             SqlError::ConnectionError(e) => ConnectorError {
@@ -171,6 +177,10 @@ impl From<quaint::error::Error> for SqlError {
             },
 
             QuaintKind::NullConstraintViolation { constraint } => Self::NullConstraintViolation {
+                constraint: constraint.into(),
+            },
+
+            QuaintKind::ForeignKeyConstraintViolation { constraint } => Self::ForeignKeyConstraintViolation {
                 constraint: constraint.into(),
             },
 
