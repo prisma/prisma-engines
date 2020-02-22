@@ -1921,8 +1921,8 @@ dependencies = [
  "hyper",
  "indexmap",
  "itertools",
- "lazy_static",
  "log",
+ "once_cell",
  "prisma-inflector",
  "prisma-models",
  "query-connector",
@@ -1957,7 +1957,7 @@ dependencies = [
 name = "prisma-inflector"
 version = "0.1.0"
 dependencies = [
- "lazy_static",
+ "once_cell",
  "regex",
  "unicode-segmentation",
 ]
@@ -2069,15 +2069,13 @@ dependencies = [
 
 [[package]]
 name = "quaint"
-version = "0.2.0-alpha.4"
-source = "git+https://github.com/prisma/quaint.git#b26feba48d0283f9a775d7e3e374f591cc5be03d"
+version = "0.2.0-alpha.6"
+source = "git+https://github.com/prisma/quaint.git#001fcdd74a4d08fd2776822bcacaba93d3849e3a"
 dependencies = [
  "async-trait",
  "bytes",
  "chrono",
- "debug_stub_derive",
  "futures 0.3.4",
- "lazy_static",
  "libsqlite3-sys",
  "log",
  "metrics",
@@ -2085,6 +2083,7 @@ dependencies = [
  "mysql_async",
  "native-tls",
  "num_cpus",
+ "once_cell",
  "percent-encoding 2.1.0",
  "postgres-native-tls",
  "rusqlite",
@@ -2130,7 +2129,6 @@ dependencies = [
  "im",
  "indexmap",
  "itertools",
- "lazy_static",
  "log",
  "once_cell",
  "petgraph",

@@ -7,31 +7,28 @@ use connector::{filter::Filter, RelationCompare, ScalarCompare};
 use prisma_models::{Field, ModelRef, PrismaValue, RelationFieldRef, ScalarFieldRef};
 use std::{collections::BTreeMap, convert::TryInto};
 
-lazy_static! {
-    /// Filter operations in descending order of how they should be checked.
-    static ref FILTER_OPERATIONS: Vec<FilterOp> = vec![
-        FilterOp::NotIn,
-        FilterOp::NotContains,
-        FilterOp::NotStartsWith,
-        FilterOp::NotEndsWith,
-        FilterOp::In,
-        FilterOp::Not,
-        FilterOp::Lt,
-        FilterOp::Lte,
-        FilterOp::Gt,
-        FilterOp::Gte,
-        FilterOp::Contains,
-        FilterOp::StartsWith,
-        FilterOp::EndsWith,
-        FilterOp::Some,
-        FilterOp::None,
-        FilterOp::Every,
-        FilterOp::NestedAnd,
-        FilterOp::NestedOr,
-        FilterOp::NestedNot,
-        FilterOp::Field, // Needs to be last
-    ];
-}
+static FILTER_OPERATIONS: &'static [FilterOp] = &[
+    FilterOp::NotIn,
+    FilterOp::NotContains,
+    FilterOp::NotStartsWith,
+    FilterOp::NotEndsWith,
+    FilterOp::In,
+    FilterOp::Not,
+    FilterOp::Lt,
+    FilterOp::Lte,
+    FilterOp::Gt,
+    FilterOp::Gte,
+    FilterOp::Contains,
+    FilterOp::StartsWith,
+    FilterOp::EndsWith,
+    FilterOp::Some,
+    FilterOp::None,
+    FilterOp::Every,
+    FilterOp::NestedAnd,
+    FilterOp::NestedOr,
+    FilterOp::NestedNot,
+    FilterOp::Field, // Needs to be last
+];
 
 #[derive(Debug, PartialEq, Clone, Copy)]
 enum FilterOp {

@@ -7,6 +7,7 @@ use user_facing_error_macros::*;
 pub enum DatabaseConstraint {
     Fields(Vec<String>),
     Index(String),
+    ForeignKey,
 }
 
 impl fmt::Display for DatabaseConstraint {
@@ -17,6 +18,7 @@ impl fmt::Display for DatabaseConstraint {
                 write!(f, "fields: ({})", quoted_fields.join(","))
             }
             Self::Index(index) => write!(f, "constraint: `{}`", index),
+            Self::ForeignKey => write!(f, "foreign key")
         }
     }
 }
