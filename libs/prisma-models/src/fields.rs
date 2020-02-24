@@ -214,7 +214,6 @@ impl Fields {
                 .collect();
 
             Some(fields)
-        // Some(self.scalar().filter_map(|sf| x).collect())
         } else {
             None
         }

@@ -19,37 +19,6 @@ impl Ordering {
         )
     }
 
-    pub fn internal<I, C>(second_field: I, order_directive: OrderDirections) -> OrderVec<'static>
-    where
-        C: Into<Column<'static>>,
-        I: IntoIterator<Item = C>,
-    {
-        Self::by_fields(
-            order_directive
-                .primary_order_by
-                .as_ref()
-                .map(|oby| oby.field.as_column()),
-            second_field.into_iter().map(Into::into).collect(),
-            order_directive,
-        )
-    }
-
-    pub fn aliased_internal(
-        alias: &'static str,
-        secondary_alias: &'static str,
-        secondary_field: &'static str,
-        order_directive: OrderDirections,
-    ) -> OrderVec<'static> {
-        Self::by_fields(
-            order_directive
-                .primary_order_by
-                .as_ref()
-                .map(|oby| (alias.to_string(), oby.field.db_name().to_string()).into()),
-            vec![(secondary_alias, secondary_field).into()],
-            order_directive,
-        )
-    }
-
     fn by_fields(
         first_column: Option<Column<'static>>,
         identifier: Vec<Column<'static>>,
