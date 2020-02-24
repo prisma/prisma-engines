@@ -39,7 +39,7 @@ class WhereUniqueSpec extends FlatSpec with Matchers with ApiSpecBase {
       s"""query{user(where: {}){unique}}""",
       project,
       errorCode = 2009, // 3040,
-      errorContains = """Failed to validate the query `Error occurred during query validation & transformation:\nAssertion error: Expected object to have exactly 1 key-value pairs, got: 0 ()""",
+      errorContains = """Failed to validate the query `Error occurred during query validation & transformation:\nAssertion error: Expected object to have exactly 1 key-value pairs, got: 0""",
       // """You provided an invalid argument for the where selector on User. Please provide exactly one unique field and value."""
     )
   }
