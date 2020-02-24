@@ -169,6 +169,7 @@ impl SqlError {
 impl From<quaint::error::Error> for SqlError {
     fn from(e: quaint::error::Error) -> Self {
         match QuaintKind::from(e) {
+            QuaintKind::FromRowError(_) => todo!("QuaintKind::FromRowError"),
             QuaintKind::QueryError(qe) => Self::QueryError(qe),
             e @ QuaintKind::IoError(_) => Self::ConnectionError(e),
             QuaintKind::NotFound => Self::RecordDoesNotExist,

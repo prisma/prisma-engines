@@ -2070,7 +2070,7 @@ dependencies = [
 [[package]]
 name = "quaint"
 version = "0.2.0-alpha.6"
-source = "git+https://github.com/prisma/quaint.git#001fcdd74a4d08fd2776822bcacaba93d3849e3a"
+source = "git+https://github.com/prisma/quaint#c369a0efe0fc83ef32872dc4a4ec0df6e462ee92"
 dependencies = [
  "async-trait",
  "bytes",
@@ -2088,6 +2088,7 @@ dependencies = [
  "postgres-native-tls",
  "rusqlite",
  "rust_decimal",
+ "serde",
  "serde_json",
  "thiserror",
  "tokio",
