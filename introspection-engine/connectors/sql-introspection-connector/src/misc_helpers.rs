@@ -282,7 +282,7 @@ pub(crate) fn calculate_default(table: &Table, column: &Column, arity: &FieldAri
         (Some(d), ColumnTypeFamily::Float) => parse_float(d).map(|x| DefaultValue::Single(ScalarValue::Float(x))),
         (Some(d), ColumnTypeFamily::String) => Some(DefaultValue::Single(ScalarValue::String(d.to_string()))),
         (Some(_), ColumnTypeFamily::DateTime) => None, //todo
-        (Some(d), ColumnTypeFamily::Enum(_)) => None,  //todo
+        (Some(d), ColumnTypeFamily::Enum(_)) => Some(DefaultValue::Single(ScalarValue::ConstantLiteral(d.to_string()))),
         (None, _) if column.auto_increment => Some(DefaultValue::Expression(ValueGenerator::new_autoincrement())),
         (_, _) => None,
     }

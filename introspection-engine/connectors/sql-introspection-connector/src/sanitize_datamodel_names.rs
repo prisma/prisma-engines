@@ -28,6 +28,7 @@ pub fn sanitize_datamodel_names(datamodel: &mut Datamodel) {
                 }
 
                 FieldType::Enum(enum_name) => {
+                    //todo sanitize value in defaultvalue
                     let (sanitized_enum_name, enum_db_name) = if *enum_name == format!("{}_{}", model.name, field.name)
                     {
                         //MySql
