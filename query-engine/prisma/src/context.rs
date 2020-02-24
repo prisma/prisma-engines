@@ -4,6 +4,7 @@ use query_core::{
     BuildMode, QueryExecutor, QuerySchemaBuilder,
 };
 // use prisma_models::InternalDataModelRef;
+use prisma_models::DatamodelConverter;
 use std::sync::Arc;
 
 /// Prisma request context containing all immutable state of the process.
@@ -25,6 +26,7 @@ pub struct ContextBuilder {
     legacy: bool,
     force_transactions: bool,
     enable_raw_queries: bool,
+    datamodel: Option<String>,
 }
 
 impl ContextBuilder {
@@ -43,8 +45,20 @@ impl ContextBuilder {
         self
     }
 
+    #[cfg(test)]
+    pub fn datamodel(mut self, val: String) -> Self {
+        self.datamodel = Some(val);
+        self
+    }
+
     pub async fn build(self) -> PrismaResult<PrismaContext> {
-        PrismaContext::new(self.legacy, self.force_transactions, self.enable_raw_queries).await
+        PrismaContext::new(
+            self.legacy,
+            self.force_transactions,
+            self.enable_raw_queries,
+            self.datamodel,
+        )
+        .await
     }
 }
 
@@ -54,9 +68,28 @@ impl PrismaContext {
     /// 1. The data model. This has different options on how to initialize. See data_model_loader module. The Prisma configuration (prisma.yml) is used as fallback.
     /// 2. The data model is converted to the internal data model.
     /// 3. The api query schema is constructed from the internal data model.
-    async fn new(legacy: bool, force_transactions: bool, enable_raw_queries: bool) -> PrismaResult<Self> {
+    async fn new(
+        legacy: bool,
+        force_transactions: bool,
+        enable_raw_queries: bool,
+        datamodel: Option<String>,
+    ) -> PrismaResult<Self> {
         // Load data model in order of precedence.
-        let (v2components, template) = load_data_model_components()?;
+        let (v2components, template) = match datamodel {
+            Some(datamodel_string) => {
+                let dm = datamodel::parse_datamodel(&datamodel_string)?;
+
+                let components = load_configuration(&datamodel_string).map(|config| DatamodelV2Components {
+                    datamodel: dm,
+                    data_sources: config.datasources,
+                })?;
+
+                let template = DatamodelConverter::convert(&components.datamodel);
+
+                (components, template)
+            }
+            None => load_data_model_components()?,
+        };
 
         let (dm, data_sources) = (v2components.datamodel, v2components.data_sources);
 
@@ -95,6 +128,7 @@ impl PrismaContext {
             legacy: false,
             force_transactions: false,
             enable_raw_queries: false,
+            datamodel: None,
         }
     }
 

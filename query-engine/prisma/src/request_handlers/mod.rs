@@ -7,7 +7,7 @@ use crate::context::PrismaContext;
 use async_trait::async_trait;
 use std::{collections::HashMap, fmt::Debug, sync::Arc};
 
-#[derive(Debug, serde::Serialize)]
+#[derive(Debug, serde::Serialize, PartialEq)]
 #[serde(untagged)]
 pub enum PrismaResponse {
     Single(response_ir::Responses),

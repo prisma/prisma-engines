@@ -45,3 +45,13 @@ user-facing-errors = { path = "../../libs/user-facing-errors" }
 
 [build-dependencies]
 rustc_version = "0.2.3"
+
+[dev-dependencies]
+test-macros = { path = "../../libs/test-macros" }
+test-setup = { path = "../../libs/test-setup" }
+quaint = { git = "https://github.com/prisma/quaint", features = ["full"] }
+migration-connector = { path = "../../migration-engine/connectors/migration-connector" }
+migration-core = { path = "../../migration-engine/core" }
+sql-migration-connector = { path = "../../migration-engine/connectors/sql-migration-connector" }
+indoc = "0.3"
+anyhow = "1"
