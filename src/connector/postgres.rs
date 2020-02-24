@@ -101,12 +101,23 @@ impl SslParams {
         auth.accept_mode(self.ssl_accept_mode);
 
         if let Some(ref cert_file) = self.certificate_file {
-            let cert = fs::read(cert_file)?;
+            let cert = fs::read(cert_file).map_err(|err| {
+                Error::builder(ErrorKind::TlsError {
+                    message: format!("cert file not found ({})", err),
+                })
+                .build()
+            })?;
+
             auth.certificate(Certificate::from_pem(&cert)?);
         }
 
         if let Some(ref identity_file) = self.identity_file {
-            let db = fs::read(identity_file)?;
+            let db = fs::read(identity_file).map_err(|err| {
+                Error::builder(ErrorKind::TlsError {
+                    message: format!("identity file not found ({})", err),
+                })
+                .build()
+            })?;
             let password = self.identity_password.0.as_ref().map(|s| s.as_str()).unwrap_or("");
             let identity = Identity::from_pkcs12(&db, &password)?;
 
@@ -347,6 +358,7 @@ impl PostgreSql {
     /// Create a new connection to the database.
     pub async fn new(url: PostgresUrl) -> crate::Result<Self> {
         let config = url.to_config();
+
         let mut tls_builder = TlsConnector::builder();
 
         {

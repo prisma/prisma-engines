@@ -138,7 +138,7 @@ pub enum ErrorKind {
     #[error("The provided arguments are not supported")]
     InvalidConnectionArguments,
 
-    #[error("Error in an I/O operation")]
+    #[error("Error in an I/O operation: {0}")]
     IoError(io::Error),
 
     #[error("Connect timed out ({0})")]
