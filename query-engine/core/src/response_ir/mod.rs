@@ -22,7 +22,7 @@ use utils::*;
 /// A `key -> value` map to an IR item
 pub type Map = IndexMap<String, Item>;
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq)]
 pub struct List {
     inner: Vec<Item>,
 }
@@ -88,7 +88,7 @@ impl<'a> IntoIterator for &'a List {
 /// Convenience type wrapper for Arc<Item>.
 pub type ItemRef = Arc<Item>;
 
-#[derive(Debug, serde::Serialize)]
+#[derive(Debug, serde::Serialize, PartialEq)]
 pub struct ResponseError {
     error: String,
     user_facing_error: user_facing_errors::Error,
@@ -120,7 +120,7 @@ pub enum Response {
     Error(ResponseError),
 }
 
-#[derive(Debug, serde::Serialize, Default)]
+#[derive(Debug, serde::Serialize, Default, PartialEq)]
 pub struct Responses {
     #[serde(skip_serializing_if = "IndexMap::is_empty")]
     data: Map,
@@ -167,7 +167,7 @@ impl From<Map> for Responses {
 }
 
 /// An IR item that either expands to a subtype or leaf-record.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum Item {
     Map(Map),
     List(List),

@@ -31,6 +31,22 @@ pub enum GraphQlBody {
     Multi(MultiQuery),
 }
 
+impl From<String> for SingleQuery {
+    fn from(query: String) -> Self {
+        SingleQuery {
+            query,
+            operation_name: None,
+            variables: HashMap::new(),
+        }
+    }
+}
+
+impl From<&str> for SingleQuery {
+    fn from(query: &str) -> Self {
+        String::from(query).into()
+    }
+}
+
 impl TryFrom<GraphQlBody> for QueryDocument {
     type Error = PrismaError;
 
