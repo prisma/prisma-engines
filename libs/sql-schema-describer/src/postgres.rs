@@ -612,7 +612,7 @@ fn get_column_type<'a>(data_type: &str, full_data_type: &'a str, arity: ColumnAr
 static RE_SEQ: Lazy<Regex> = Lazy::new(|| Regex::new("^(?:.+\\.)?\"?([^.\"]+)\"?").expect("compile regex"));
 
 static AUTOINCREMENT_REGEX: Lazy<Regex> = Lazy::new(|| {
-    Regex::new(r#"nextval\((?:"(?P<schema_name>.+)"\.)?"(?P<table_and_column_name>.+)_seq(?:[0-9]+)?"::regclass\)"#)
+    Regex::new(r#"nextval\('(?:"(?P<schema_name>.+)"\.)?"(?P<table_and_column_name>.+)_seq(?:[0-9]+)?"'::regclass\)"#)
         .unwrap()
 });
 
@@ -672,13 +672,13 @@ mod tests {
         assert!(!is_autoincrement(non_autoincrement, schema_name, table_name, col_name));
 
         let autoincrement = format!(
-            r#"nextval("{}"."{}_{}_seq"::regclass)"#,
+            r#"nextval('"{}"."{}_{}_seq"'::regclass)"#,
             schema_name, table_name, col_name
         );
         assert!(is_autoincrement(&autoincrement, schema_name, table_name, col_name));
 
         let autoincrement_with_number = format!(
-            r#"nextval("{}"."{}_{}_seq1"::regclass)"#,
+            r#"nextval('"{}"."{}_{}_seq1"'::regclass)"#,
             schema_name, table_name, col_name
         );
         assert!(is_autoincrement(
@@ -688,7 +688,7 @@ mod tests {
             col_name
         ));
 
-        let autoincrement_without_schema = format!(r#"nextval("{}_{}_seq1"::regclass)"#, table_name, col_name);
+        let autoincrement_without_schema = format!(r#"nextval('"{}_{}_seq1"'::regclass)"#, table_name, col_name);
         assert!(is_autoincrement(
             &autoincrement_without_schema,
             schema_name,
@@ -698,7 +698,7 @@ mod tests {
 
         // The table and column names contain underscores, so it's impossible to say from the sequence where one starts and the other ends.
         let autoincrement_with_ambiguous_table_and_column_names =
-            r#"nextval("compound_table_compound_column_name_seq"::regclass)"#;
+            r#"nextval('"compound_table_compound_column_name_seq"'::regclass)"#;
         assert!(is_autoincrement(
             &autoincrement_with_ambiguous_table_and_column_names,
             "<ignored>",
@@ -709,7 +709,7 @@ mod tests {
         // The table and column names contain underscores, so it's impossible to say from the sequence where one starts and the other ends.
         // But this one has extra text between table and column names, so it should not match.
         let autoincrement_with_ambiguous_table_and_column_names =
-            r#"nextval("compound_table_something_compound_column_name_seq"::regclass)"#;
+            r#"nextval('"compound_table_something_compound_column_name_seq"'::regclass)"#;
         assert!(!is_autoincrement(
             &autoincrement_with_ambiguous_table_and_column_names,
             "<ignored>",
