@@ -419,7 +419,18 @@ fn migration_value_new(field: &FieldRef<'_>) -> Option<String> {
             raw.truncate(raw.len() - 4); // strip the UTC suffix
             format!("{}", raw)
         }
-        ScalarValue::ConstantLiteral(x) => format!("{}", x), // this represents enum values
+        ScalarValue::ConstantLiteral(x) => match field.field_type() {
+            TypeRef::Enum(inum) => {
+                let corresponding_value = inum
+                    .values()
+                    .iter()
+                    .find(|val| val.name.as_str() == x)
+                    .expect("could not find enum value");
+
+                corresponding_value.final_database_name().to_owned()
+            }
+            _ => unreachable!("Constant default on non-enum field."),
+        },
     };
 
     if field.is_id() {
@@ -442,11 +453,14 @@ fn default_migration_value(field_type: &TypeRef<'_>) -> ScalarValue {
             ScalarValue::DateTime(datetime)
         }
         TypeRef::Enum(inum) => {
-            let values = inum.database_values();
+            let first_value = inum
+                .values()
+                .iter()
+                .next()
+                .ok_or_else(|| anyhow::anyhow!("Enum {} did not contain any values.", inum.name()))
+                .unwrap()
+                .final_database_name();
 
-            let first_value = values
-                .first()
-                .expect(&format!("Enum {} did not contain any values.", inum.name()));
             ScalarValue::String(first_value.to_string())
         }
         _ => unimplemented!("this functions must only be called for scalar fields"),

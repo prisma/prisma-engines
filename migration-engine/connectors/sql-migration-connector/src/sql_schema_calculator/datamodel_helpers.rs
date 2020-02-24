@@ -1,5 +1,9 @@
-use datamodel::dml::{
-    Datamodel, DefaultValue, Enum, Field, FieldArity, FieldType, IndexDefinition, Model, ScalarType, WithDatabaseName,
+use datamodel::{
+    dml::{
+        Datamodel, DefaultValue, Enum, Field, FieldArity, FieldType, IndexDefinition, Model, ScalarType,
+        WithDatabaseName,
+    },
+    EnumValue,
 };
 
 pub(crate) fn walk_models<'a>(datamodel: &'a Datamodel) -> impl Iterator<Item = ModelRef<'a>> + 'a {
@@ -180,8 +184,8 @@ impl<'a> EnumRef<'a> {
         &self.r#enum.name
     }
 
-    pub(super) fn database_values(&self) -> Vec<String> {
-        self.r#enum.database_values()
+    pub(super) fn values(&self) -> &[EnumValue] {
+        &self.r#enum.values
     }
 
     pub(super) fn db_name(&self) -> &'a str {

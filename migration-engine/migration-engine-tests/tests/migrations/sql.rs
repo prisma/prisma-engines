@@ -1,4 +1,5 @@
 use migration_engine_tests::sql::*;
+use std::borrow::Cow;
 
 #[test_each_connector(tags("sql"))]
 async fn creating_tables_without_primary_key_must_work(api: &TestApi) -> TestResult {
@@ -139,6 +140,62 @@ async fn enum_value_with_database_names_must_work(api: &TestApi) -> TestResult {
             .await?
             .assert_enum("CatMood", |enm| enm.assert_values(&["ANGRY", "hongery"]))?;
     }
+
+    Ok(())
+}
+
+#[derive(serde::Deserialize, Debug, PartialEq)]
+struct Cat<'a> {
+    id: Cow<'a, str>,
+    mood: Cow<'a, str>,
+    #[serde(rename = "previousMood")]
+    previous_mood: Cow<'a, str>,
+}
+
+#[test_each_connector(capabilities("enums"), tags("sql"))]
+async fn enum_defaults_must_work(api: &TestApi) -> TestResult {
+    let dm = r##"
+        model Cat {
+            id String @id
+            mood CatMood @default(HUNGRY)
+            previousMood CatMood @default(ANGRY)
+        }
+
+        enum CatMood {
+            ANGRY
+            HUNGRY @map("hongry")
+        }
+    "##;
+
+    api.infer_apply(dm)
+        .migration_id(Some("initial"))
+        .send_assert()
+        .await?
+        .assert_green()?;
+
+    let insert = quaint::ast::Insert::single_into(api.render_table_name("Cat")).value("id", "the-id");
+    api.database().execute(insert.into()).await?;
+
+    let record = api
+        .database()
+        .query(
+            quaint::ast::Select::from_table(api.render_table_name("Cat"))
+                .column("id")
+                .column("mood")
+                .column("previousMood")
+                .into(),
+        )
+        .await?;
+
+    let cat: Cat = quaint::serde::from_row(record.into_single()?)?;
+
+    let expected_cat = Cat {
+        id: "the-id".into(),
+        mood: "hongry".into(),
+        previous_mood: "ANGRY".into(),
+    };
+
+    assert_eq!(cat, expected_cat);
 
     Ok(())
 }
