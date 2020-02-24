@@ -206,10 +206,20 @@ impl SqlSchemaDescriber {
             let tpe = get_column_type(data_type.as_ref(), &full_data_type, arity, enums);
 
             //todo default value handling here needs to take the type/enum name into consideration
-            let default = col.get("column_default").and_then(|param_value| {
-                param_value.to_string()
-                //                    .map(|x| x.replace("\'", "").replace("::text", ""))
-            });
+
+            let default = match &tpe.family {
+                ColumnTypeFamily::Enum(enum_name) => col.get("column_default").and_then(|param_value| {
+                    param_value
+                        .to_string()
+                        .map(|x| unquote_postgres_strings(x.replace(format!("::{}", enum_name.clone()).as_str(), "")))
+                }),
+                _ => col.get("column_default").and_then(|param_value| {
+                    param_value
+                        .to_string()
+                        .map(|x| unquote_postgres_strings(x.replace("::text", "")))
+                }),
+            };
+
             let is_auto_increment = is_identity
                 || match default {
                     Some(ref val) => is_autoincrement(val, schema, &table_name, &col_name),
@@ -636,6 +646,17 @@ fn is_autoincrement(value: &str, schema_name: &str, table_name: &str, column_nam
         })
         .unwrap_or(false)
 }
+fn unquote_postgres_strings(input: String) -> String {
+    /// Regex for matching the quotes on the introspected string values on MariaDB.
+    static POSTGRES_STRING_DEFAULT_RE: Lazy<regex::Regex> = Lazy::new(|| regex::Regex::new(r#"^'(.*)'$"#).unwrap());
+
+    POSTGRES_STRING_DEFAULT_RE
+        .captures(input.as_ref())
+        .and_then(|captures| captures.get(1))
+        .map(|capt| capt.as_str())
+        .unwrap_or(input.as_ref())
+        .to_string()
+}
 
 #[cfg(test)]
 mod tests {
@@ -695,5 +716,13 @@ mod tests {
             "compound_table",
             "compound_column_name",
         ));
+    }
+    #[test]
+    fn postgres_string_default_regex_works() {
+        let quoted_str = "'abc $$ def'";
+
+        assert_eq!(unquote_postgres_strings(quoted_str.to_string()), "abc $$ def");
+
+        assert_eq!(unquote_postgres_strings("heh ".to_string()), "heh ");
     }
 }

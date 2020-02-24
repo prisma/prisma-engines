@@ -99,11 +99,11 @@ async fn introspecting_a_table_with_enum_default_values_should_work(api: &TestAp
 
     let dm = r#"
         model Book {
-            color   color   @default(black)
+            color   Book_color   @default(black)
             id      Int     @default(autoincrement()) @id
         }
 
-        enum color{
+        enum Book_color{
             black
             white
         }
