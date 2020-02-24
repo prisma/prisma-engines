@@ -419,31 +419,24 @@ impl SqlSchemaDescriber {
 
         for index in rows {
             debug!("Got index: {:?}", index);
-            let is_pk = index
-                .get("is_primary_key")
-                .and_then(|x| x.as_bool())
-                .expect("get is_primary_key");
-            let table_name = index
-                .get("table_name")
-                .and_then(|x| x.to_string())
-                .expect("get table_name");
-            // TODO: Implement in quaint and use as_slice instead of into_vec, to avoid cloning
-            let column = index
-                .get("column_name")
-                .and_then(|x| x.to_string())
-                .expect("column_name");
+            let IndexRow {
+                column_name,
+                is_primary_key,
+                is_unique,
+                name,
+                sequence_name,
+                table_name,
+            } = quaint::serde::from_row::<IndexRow>(index).unwrap();
 
-            if is_pk {
+            if is_primary_key {
                 let entry: &mut (Vec<_>, Option<PrimaryKey>) =
                     indexes_map.entry(table_name).or_insert_with(|| (Vec::new(), None));
 
                 match entry.1.as_mut() {
                     Some(pk) => {
-                        pk.columns.push(column);
+                        pk.columns.push(column_name);
                     }
                     None => {
-                        let sequence_name = index.get("sequence_name").and_then(|x| x.to_string());
-
                         let sequence = sequence_name.and_then(|sequence_name| {
                             let captures = RE_SEQ.captures(&sequence_name).expect("get captures");
                             let sequence_name = captures.get(1).expect("get capture").as_str();
@@ -454,23 +447,20 @@ impl SqlSchemaDescriber {
                         });
 
                         entry.1 = Some(PrimaryKey {
-                            columns: vec![column],
+                            columns: vec![column_name],
                             sequence,
                         });
                     }
                 }
             } else {
-                let is_unique = index.get("is_unique").and_then(|x| x.as_bool()).expect("is_unique");
-
                 let entry: &mut (Vec<Index>, _) = indexes_map.entry(table_name).or_insert_with(|| (Vec::new(), None));
-                let index_name = index.get("name").and_then(|x| x.to_string()).expect("name");
 
-                if let Some(existing_index) = entry.0.iter_mut().find(|idx| idx.name == index_name) {
-                    existing_index.columns.push(column);
+                if let Some(existing_index) = entry.0.iter_mut().find(|idx| idx.name == name) {
+                    existing_index.columns.push(column_name);
                 } else {
                     entry.0.push(Index {
-                        name: index_name,
-                        columns: vec![column],
+                        name: name,
+                        columns: vec![column_name],
                         tpe: match is_unique {
                             true => IndexType::Unique,
                             false => IndexType::Normal,
@@ -480,7 +470,7 @@ impl SqlSchemaDescriber {
             }
         }
 
-        dbg!(indexes_map)
+        indexes_map
     }
 
     async fn get_sequences(&self, schema: &str) -> SqlSchemaDescriberResult<Vec<Sequence>> {
@@ -548,6 +538,16 @@ impl SqlSchemaDescriber {
         debug!("Found enums: {:?}", enums);
         Ok(enums)
     }
+}
+
+#[derive(Deserialize)]
+struct IndexRow {
+    name: String,
+    column_name: String,
+    is_unique: bool,
+    is_primary_key: bool,
+    table_name: String,
+    sequence_name: Option<String>,
 }
 
 fn get_column_type<'a>(data_type: &str, full_data_type: &'a str, arity: ColumnArity, enums: &Vec<Enum>) -> ColumnType {
