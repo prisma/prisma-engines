@@ -12,7 +12,7 @@ class DefaultValueSpec extends FlatSpec with Matchers with ApiSpecBase {
         |  id        String  @id @default(cuid())
         |  reqString String? @default(value: "default")
         |}
-      """.stripMargin
+      """
     }
     database.setup(project)
 
@@ -23,7 +23,7 @@ class DefaultValueSpec extends FlatSpec with Matchers with ApiSpecBase {
          |  ){
          |  reqString
          |  }
-         |}""".stripMargin,
+         |}""",
       project = project
     )
 
@@ -42,7 +42,7 @@ class DefaultValueSpec extends FlatSpec with Matchers with ApiSpecBase {
         |  name String
         |  int  Int?   @default(value: 1)
         |}
-      """.stripMargin
+      """
     }
     database.setup(project)
 
@@ -56,7 +56,7 @@ class DefaultValueSpec extends FlatSpec with Matchers with ApiSpecBase {
          |    name
          |    int
          |  }
-         |}""".stripMargin,
+         |}""",
       project = project
     )
 
@@ -77,8 +77,7 @@ class DefaultValueSpec extends FlatSpec with Matchers with ApiSpecBase {
         |  description  String?
         |  unit         String?
         |  active       IsActive? @default(value: Yes)
-
-      """.stripMargin
+      """
     }
     database.setup(project)
 
@@ -92,7 +91,7 @@ class DefaultValueSpec extends FlatSpec with Matchers with ApiSpecBase {
          |    name
          |    active
          |  }
-         |}""".stripMargin,
+         |}""",
       project = project
     )
 
@@ -108,7 +107,7 @@ class DefaultValueSpec extends FlatSpec with Matchers with ApiSpecBase {
         |  createdAt DateTime @default(now())
         |  updatedAt DateTime @updatedAt
         |}
-      """.stripMargin
+      """
     }
     database.setup(project)
 
@@ -124,7 +123,7 @@ class DefaultValueSpec extends FlatSpec with Matchers with ApiSpecBase {
          |    createdAt
          |    updatedAt
          |  }
-         |}""".stripMargin,
+         |}""",
       project = project
     )
 
