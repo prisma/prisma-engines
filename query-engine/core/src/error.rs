@@ -111,13 +111,40 @@ impl From<CoreError> for user_facing_errors::Error {
                 model_a_name,
                 model_b_name,
                 relation_name,
-            })) => user_facing_errors::KnownError::new(user_facing_errors::query_engine::RelationViolation {
+            }))
+            | CoreError::InterpreterError(InterpreterError::QueryGraphBuilderError(
+                QueryGraphBuilderError::RelationViolation(RelationViolation {
+                    model_a_name,
+                    model_b_name,
+                    relation_name,
+                }),
+            )) => user_facing_errors::KnownError::new(user_facing_errors::query_engine::RelationViolation {
                 model_a_name,
                 model_b_name,
                 relation_name,
             })
             .unwrap()
             .into(),
+            CoreError::InterpreterError(InterpreterError::InterpretationError(msg, Some(cause))) => {
+                match cause.as_ref() {
+                    InterpreterError::QueryGraphBuilderError(QueryGraphBuilderError::RelationViolation(
+                        RelationViolation {
+                            model_a_name,
+                            model_b_name,
+                            relation_name,
+                        },
+                    )) => user_facing_errors::KnownError::new(user_facing_errors::query_engine::RelationViolation {
+                        model_a_name: model_a_name.clone(),
+                        model_b_name: model_b_name.clone(),
+                        relation_name: relation_name.clone(),
+                    })
+                    .unwrap()
+                    .into(),
+                    _ => {
+                        user_facing_errors::Error::from_dyn_error(&failure::format_err!("{}: {}", msg, cause).compat())
+                    }
+                }
+            }
             _ => user_facing_errors::Error::from_dyn_error(&err.compat()),
         }
     }

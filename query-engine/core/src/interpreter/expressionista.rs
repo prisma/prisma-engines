@@ -265,10 +265,10 @@ impl Expressionista {
                                     };
 
                                     Ok(res.map_err(|err| {
-                                        InterpreterError::InterpretationError(format!(
-                                            "Error for binding '{}': {}",
-                                            parent_binding_name, err
-                                        ))
+                                        InterpreterError::InterpretationError(
+                                            format!("Error for binding '{}'", parent_binding_name),
+                                            Some(Box::new(err)),
+                                        )
                                     })?)
                                 });
 

@@ -63,6 +63,7 @@ impl ExpressionResult {
 
         converted.ok_or(InterpreterError::InterpretationError(
             "Unable to convert result into a set of projections".to_owned(),
+            None,
         ))
     }
 
@@ -74,6 +75,7 @@ impl ExpressionResult {
 
         converted.ok_or(InterpreterError::InterpretationError(
             "Unable to convert result into a query result".to_owned(),
+            None,
         ))
     }
 
@@ -85,6 +87,7 @@ impl ExpressionResult {
 
         converted.ok_or(InterpreterError::InterpretationError(
             "Unable to convert result into a computation result".to_owned(),
+            None,
         ))
     }
 }
