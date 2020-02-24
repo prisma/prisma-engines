@@ -1345,6 +1345,7 @@ dependencies = [
  "migration-core",
  "pretty_assertions",
  "quaint",
+ "serde",
  "serde_json",
  "sql-migration-connector",
  "sql-schema-describer",
