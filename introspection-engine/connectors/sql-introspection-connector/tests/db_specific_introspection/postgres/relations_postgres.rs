@@ -500,6 +500,36 @@ async fn introspecting_id_fields_with_foreign_key_should_ignore_the_relation(api
     let dm = r#"
             model Post {
                test    String
+               /// This used to be part of a relation to User
+               user_id Int @id
+            }
+
+            model User {
+               id      Int @id @default(autoincrement())
+            }
+        "#;
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+}
+
+#[test_each_connector(tags("postgres"))]
+async fn introspecting_compound_id_fields_with_foreign_key_should_ignore_the_relation(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::primary());
+            });
+            migration.create_table("Post", |t| {
+                t.add_column("test", types::text());
+                t.inject_custom("user_id INTEGER REFERENCES \"User\"(\"id\") Primary Key");
+            });
+        })
+        .await;
+
+    let dm = r#"
+            model Post {
+               test    String
                user_id Int @id
             }
 
