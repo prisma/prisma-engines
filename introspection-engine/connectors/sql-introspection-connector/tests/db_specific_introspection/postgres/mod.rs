@@ -1,3 +1,4 @@
+pub mod enums_postgres;
 pub mod native_lists_postgres;
 pub mod relations_postgres;
 pub mod relations_with_compound_fk_postgres;

@@ -205,10 +205,10 @@ impl SqlSchemaDescriber {
             };
             let tpe = get_column_type(data_type.as_ref(), &full_data_type, arity, enums);
 
+            //todo default value handling here needs to take the type/enum name into consideration
             let default = col.get("column_default").and_then(|param_value| {
-                param_value
-                    .to_string()
-                    .map(|x| x.replace("\'", "").replace("::text", ""))
+                param_value.to_string()
+                //                    .map(|x| x.replace("\'", "").replace("::text", ""))
             });
             let is_auto_increment = is_identity
                 || match default {

@@ -147,27 +147,30 @@ async fn introspecting_a_table_with_required_and_optional_columns_must_work(api:
     custom_assert(&result, dm);
 }
 
-//#[test_each_connector(tags("postgres"))]
-//#[ignore]
-//fn introspecting_a_table_with_datetime_default_values_should_work(api: &TestApi) {
-//    let barrel = api.barrel();
-//    let _setup_schema = barrel.execute(|migration| {
-//        migration.create_table("User", |t| {
-//            t.add_column("id", types::primary());
-//            t.add_column("name", types::text());
-//            t.inject_custom("\"joined\" date DEFAULT CURRENT_DATE")
-//        });
-//    }).await;
-//    let dm = r#"
-//            model User {
-//                id      Int @id @sequence(name: "User_id_seq", allocationSize: 1, initialValue: 1)
-//                joined DateTime? @default(now())
-//                name String
-//            }
-//        "#;
-//    let result = dbg!(api.introspect().await);
-//    custom_assert(&result, dm);
-//}
+// #[test_each_connector(tags("postgres"))]
+// async fn introspecting_a_table_with_datetime_default_values_should_work2(api: &TestApi) {
+//     let barrel = api.barrel();
+//     let _setup_schema = barrel
+//         .execute(|migration| {
+//             migration.create_table("User", |t| {
+//                 t.add_column("id", types::primary());
+//                 t.add_column("name", types::text());
+//                 t.inject_custom("\"current_timestamp\" Timestamp with time zone DEFAULT CURRENT_TIMESTAMP");
+//                 t.inject_custom("\"now\" Timestamp with time zone DEFAULT NOW()");
+//             });
+//         })
+//         .await;
+//     let dm = r#"
+//             model User {
+//                 id                  Int       @default(autoincrement()) @id
+//                 current_timestamp   DateTime? @default(now())
+//                 now                 DateTime? @default(now())
+//                 name                String
+//             }
+//         "#;
+//     let result = dbg!(api.introspect().await);
+//     custom_assert(&result, dm);
+// }
 
 #[test_each_connector(tags("postgres"))]
 async fn introspecting_a_table_with_default_values_should_work(api: &TestApi) {
@@ -246,138 +249,6 @@ async fn introspecting_a_table_with_a_multi_column_non_unique_index_should_work(
             @@index([a,b], name: "test")
         }
     "#;
-    let result = dbg!(api.introspect().await);
-    custom_assert(&result, dm);
-}
-
-#[test_each_connector(tags("postgres"))]
-async fn introspecting_a_table_enums_should_work(api: &TestApi) {
-    let sql = format!("CREATE Type color as ENUM ( 'black', 'white')");
-    let sql2 = format!("CREATE Type color2 as ENUM ( 'black2', 'white2')");
-
-    api.database().execute_raw(&sql, &[]).await.unwrap();
-    api.database().execute_raw(&sql2, &[]).await.unwrap();
-
-    api.barrel()
-        .execute(|migration| {
-            migration.create_table("Book", |t| {
-                t.add_column("id", types::primary());
-                t.inject_custom("color  color Not Null");
-                t.inject_custom("color2  color2 Not Null");
-            });
-        })
-        .await;
-
-    let dm = r#"
-        model Book {
-            color   color
-            color2  color2
-            id      Int     @default(autoincrement()) @id
-        }
-
-        enum color{
-            black
-            white
-        }
-
-        enum color2{
-            black2
-            white2
-        }
-    "#;
-
-    let result = dbg!(api.introspect().await);
-    let result1 = dbg!(api.introspect().await);
-    let result2 = dbg!(api.introspect().await);
-    let result3 = dbg!(api.introspect().await);
-    let result4 = dbg!(api.introspect().await);
-    custom_assert(&result, dm);
-    custom_assert(&result1, dm);
-    custom_assert(&result2, dm);
-    custom_assert(&result3, dm);
-    custom_assert(&result4, dm);
-}
-
-#[test_each_connector(tags("postgres"))]
-async fn introspecting_a_table_enums_should_return_alphabetically_even_when_in_different_order(api: &TestApi) {
-    let sql1 = format!("CREATE Type color as ENUM ( 'black', 'white')");
-    let sql2 = format!("CREATE Type color2 as ENUM ( 'black2', 'white2')");
-
-    api.database().execute_raw(&sql2, &[]).await.unwrap();
-    api.database().execute_raw(&sql1, &[]).await.unwrap();
-
-    api.barrel()
-        .execute(|migration| {
-            migration.create_table("Book", |t| {
-                t.add_column("id", types::primary());
-                t.inject_custom("color2  Color2 Not Null");
-                t.inject_custom("color  Color Not Null");
-            });
-        })
-        .await;
-
-    let dm = r#"
-        model Book {
-            color   color
-            color2  color2
-            id      Int     @default(autoincrement()) @id
-        }
-
-        enum color{
-            black
-            white
-        }
-
-        enum color2{
-            black2
-            white2
-        }
-    "#;
-
-    let result = dbg!(api.introspect().await);
-    let result1 = dbg!(api.introspect().await);
-    let result2 = dbg!(api.introspect().await);
-    let result3 = dbg!(api.introspect().await);
-    let result4 = dbg!(api.introspect().await);
-    custom_assert(&result, dm);
-    custom_assert(&result1, dm);
-    custom_assert(&result2, dm);
-    custom_assert(&result3, dm);
-    custom_assert(&result4, dm);
-}
-
-#[test_each_connector(tags("postgres"))]
-async fn introspecting_a_table_enums_array_should_work(api: &TestApi) {
-    let sql = format!("CREATE Type color as ENUM ( 'black', 'white')");
-
-    api.database().execute_raw(&sql, &[]).await.unwrap();
-
-    api.barrel()
-        .execute(|migration| {
-            migration.create_table("Book", |t| {
-                t.add_column("id", types::primary());
-                t.inject_custom("color  color []");
-            });
-        })
-        .await;
-
-    let dm = r#"
-        datasource pg {
-              provider = "postgres"
-              url = "postgresql://localhost:5432"
-        }
-
-        model Book {
-            color   color[]
-            id      Int     @default(autoincrement()) @id
-        }
-
-        enum color{
-            black
-            white
-        }
-    "#;
-
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
