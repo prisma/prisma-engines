@@ -135,9 +135,16 @@ impl<'de> Deserializer<'de> for ParameterizedValueDeserializer<'de> {
         }
     }
 
+    fn deserialize_option<V: Visitor<'de>>(self, visitor: V) -> Result<V::Value, Self::Error> {
+        match &self.0 {
+            ParameterizedValue::Null => visitor.visit_none(),
+            _ => visitor.visit_some(self),
+        }
+    }
+
     serde::forward_to_deserialize_any! {
-        bool i8 i16 i32 i64 u8 u16 u32 u64 f32 f64 char str string bytes byte_buf
-        option unit unit_struct newtype_struct seq tuple tuple_struct map
+        bool i8 i16 i32 i64 u8 u16 u32 u64 f32 f64 char str bytes byte_buf
+        string unit unit_struct newtype_struct seq tuple tuple_struct map
         struct enum identifier ignored_any
     }
 }
@@ -168,6 +175,7 @@ mod tests {
     struct User {
         id: u64,
         name: String,
+        bio: Option<String>,
     }
 
     #[derive(Deserialize, PartialEq, Debug)]
@@ -189,7 +197,8 @@ mod tests {
             user,
             User {
                 id: 12,
-                name: "Georgina".to_owned()
+                name: "Georgina".to_owned(),
+                bio: None,
             }
         )
     }
@@ -199,8 +208,16 @@ mod tests {
         let first_row = make_row(vec![
             ("id", ParameterizedValue::Integer(12)),
             ("name", "Georgina".into()),
+            ("bio", ParameterizedValue::Null.into()),
         ]);
-        let second_row = make_row(vec![("id", 33.into()), ("name", "Philbert".into())]);
+        let second_row = make_row(vec![
+            ("id", 33.into()),
+            ("name", "Philbert".into()),
+            (
+                "bio",
+                "Invented sliced bread on a meditation retreat in the Himalayas.".into(),
+            ),
+        ]);
 
         let result_set = ResultSet {
             columns: std::sync::Arc::clone(&first_row.columns),
@@ -216,10 +233,12 @@ mod tests {
                 User {
                     id: 12,
                     name: "Georgina".to_owned(),
+                    bio: None,
                 },
                 User {
                     id: 33,
                     name: "Philbert".to_owned(),
+                    bio: Some("Invented sliced bread on a meditation retreat in the Himalayas.".into()),
                 }
             ]
         );
@@ -249,6 +268,7 @@ mod tests {
             human: User {
                 name: "Georgina".into(),
                 id: 19,
+                bio: None,
             },
         };
 
