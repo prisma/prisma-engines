@@ -77,7 +77,7 @@ class DefaultValueSpec extends FlatSpec with Matchers with ApiSpecBase {
         |  description  String?
         |  unit         String?
         |  active       IsActive? @default(value: Yes)
-        |}
+
       """.stripMargin
     }
     database.setup(project)
