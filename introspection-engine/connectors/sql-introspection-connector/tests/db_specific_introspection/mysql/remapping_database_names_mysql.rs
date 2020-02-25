@@ -275,3 +275,30 @@ async fn remapping_enum_values_should_work(api: &TestApi) {
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
+
+#[test_each_connector(tags("mysql"))]
+async fn remapping_enum_default_values_should_work(api: &TestApi) {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("Book", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom("color  Enum(\"b lack\", \"white\") Not Null default \"b lack\"");
+            });
+        })
+        .await;
+
+    let dm = r#"
+        model Book {
+            color   Book_color   @default(b_lack)
+            id      Int     @default(autoincrement()) @id
+        }
+
+        enum Book_color{
+            b_lack @map("b lack")
+            white
+        }
+    "#;
+
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+}

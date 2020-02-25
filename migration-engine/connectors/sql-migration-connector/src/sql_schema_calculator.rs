@@ -419,7 +419,7 @@ fn migration_value_new(field: &FieldRef<'_>) -> Option<String> {
             raw.truncate(raw.len() - 4); // strip the UTC suffix
             format!("{}", raw)
         }
-        ScalarValue::ConstantLiteral(x) => format!("{}", x), // this represents enum values
+        ScalarValue::ConstantLiteral(name, db_name) => format!("{}", db_name.unwrap_or(name)), // this represents enum values
     };
 
     if field.is_id() {
@@ -513,7 +513,7 @@ fn add_one_to_one_relation_unique_index(table: &mut sql::Table, columns: &Vec<sq
 }
 
 /// This should match the logic in `prisma_models::Model::primary_identifier`.
-fn first_unique_criterion<'a>(model: ModelRef<'a>) -> anyhow::Result<Vec<FieldRef<'a>>> {
+fn first_unique_criterion(model: ModelRef) -> anyhow::Result<Vec<FieldRef>> {
     // First candidate: the primary key.
     {
         let id_fields: Vec<_> = model.id_fields().collect();

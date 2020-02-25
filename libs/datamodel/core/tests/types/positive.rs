@@ -108,7 +108,10 @@ fn should_be_able_to_define_custom_enum_types() {
     user_model
         .assert_has_field("role")
         .assert_enum_type("Role")
-        .assert_default_value(DefaultValue::Single(ScalarValue::ConstantLiteral(String::from("USER"))));
+        .assert_default_value(DefaultValue::Single(ScalarValue::ConstantLiteral(
+            String::from("USER"),
+            None,
+        )));
 }
 
 #[test]

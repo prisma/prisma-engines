@@ -48,7 +48,7 @@ pub enum ScalarValue {
     Boolean(bool),
     String(String),
     DateTime(DateTime<Utc>),
-    ConstantLiteral(String),
+    ConstantLiteral(String, Option<String>),
 }
 
 impl ScalarValue {
@@ -60,7 +60,7 @@ impl ScalarValue {
             ScalarValue::Boolean(_) => ScalarType::Boolean,
             ScalarValue::String(_) => ScalarType::String,
             ScalarValue::DateTime(_) => ScalarType::DateTime,
-            ScalarValue::ConstantLiteral(_) => {
+            ScalarValue::ConstantLiteral(_, _) => {
                 panic!("Constant literal values do not map to a base type and should never surface.")
             }
         }
@@ -76,7 +76,7 @@ impl ToString for ScalarValue {
             ScalarValue::Boolean(val) => val.to_string(),
             ScalarValue::String(val) => val.to_string(),
             ScalarValue::DateTime(val) => val.to_string(),
-            ScalarValue::ConstantLiteral(val) => val.to_string(),
+            ScalarValue::ConstantLiteral(name, _) => name.to_string(),
         }
     }
 }

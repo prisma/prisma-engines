@@ -1,4 +1,4 @@
-use datamodel::{Datamodel, FieldType};
+use datamodel::{Datamodel, DefaultValue, FieldType, ScalarValue};
 use once_cell::sync::Lazy;
 use regex::Regex;
 use std::collections::HashMap;
@@ -49,6 +49,15 @@ pub fn sanitize_datamodel_names(datamodel: &mut Datamodel) {
                     };
 
                     *enum_name = sanitized_enum_name;
+
+                    match &mut field.default_value {
+                        Some(DefaultValue::Single(ScalarValue::ConstantLiteral(name, db_name))) => {
+                            let (sanitized_value, db_value) = sanitize_name(name.to_string());
+                            *name = sanitized_value;
+                            *db_name = db_value;
+                        }
+                        _ => (),
+                    }
                 }
                 _ => (),
             }

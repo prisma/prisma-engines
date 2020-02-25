@@ -132,8 +132,9 @@ impl LowerDmlToAst {
                 ast::Expression::BooleanValue(String::from("false"), ast::Span::empty())
             }
             dml::ScalarValue::String(value) => ast::Expression::StringValue(value.clone(), ast::Span::empty()),
-            dml::ScalarValue::ConstantLiteral(value) => {
-                ast::Expression::ConstantValue(value.clone(), ast::Span::empty())
+            dml::ScalarValue::ConstantLiteral(name, _) => {
+                //todo
+                ast::Expression::ConstantValue(name.clone(), ast::Span::empty())
             }
             dml::ScalarValue::DateTime(value) => ast::Expression::ConstantValue(value.to_rfc3339(), ast::Span::empty()),
             dml::ScalarValue::Decimal(value) => ast::Expression::NumericValue(value.to_string(), ast::Span::empty()),
