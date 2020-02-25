@@ -5,6 +5,7 @@ use crate::SqlIntrospectionResult;
 use datamodel::{dml, Datamodel, FieldType, Model};
 use log::debug;
 use sql_schema_describer::*;
+use std::collections::HashSet;
 
 /// Calculate a data model from a database schema.
 pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> {
@@ -36,12 +37,35 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
 
         for index in &table.indices {
             let fk_on_index = table.foreign_keys.iter().find(|fk| fk.columns == index.columns);
+
+            // This is part of the temporary guardrail that makes us ignore relations that overlap
+            // with the primary key.
+            let fk_on_index_overlaps_with_pk: bool = table
+                .primary_key
+                .as_ref()
+                .and_then(|pk| fk_on_index.as_ref().map(|fk| (pk, fk)))
+                .map(|(pk, fk)| {
+                    pk.columns
+                        .iter()
+                        .any(|pk_col| fk.columns.iter().any(|fk_col| pk_col == fk_col))
+                })
+                .unwrap_or(false);
+
+            // The database names of relation fields and the index columns are not necessarily in
+            // the same order, so a simple equality check doesn't work.
+            let index_columns: HashSet<&String> = index.columns.iter().collect();
+
             let compound_field_name = || {
                 model
                     .fields
                     .iter()
-                    .find(|f| !f.database_names.is_empty() && f.database_names == index.columns)
-                    .unwrap()
+                    .find(|f| {
+                        !f.database_names.is_empty()
+                            && f.database_names
+                                .iter()
+                                .all(|database_field_name| index_columns.contains(database_field_name))
+                    })
+                    .expect("Error finding field matching a compound index.")
                     .name
                     .clone()
             };
@@ -49,7 +73,10 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
             let index_to_add = match (fk_on_index, index.columns.len(), index.is_unique()) {
                 (Some(_), _, true) => None, // just make the relation 1:1 and dont print the unique index
                 (Some(_), 1, false) => Some(calculate_index(index)),
-                (Some(_), _, false) => Some(calculate_compound_index(index, compound_field_name())),
+                (Some(_), _, false) if !fk_on_index_overlaps_with_pk => {
+                    Some(calculate_compound_index(index, compound_field_name()))
+                }
+                (Some(_), _, false) => Some(calculate_index(index)),
                 (None, 1, true) => None, // this is expressed by the @unique already
                 (None, _, true) => Some(calculate_index(index)),
                 (None, _, false) => Some(calculate_index(index)),
