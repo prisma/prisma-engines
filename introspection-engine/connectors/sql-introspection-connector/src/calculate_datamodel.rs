@@ -5,7 +5,6 @@ use crate::SqlIntrospectionResult;
 use datamodel::{dml, Datamodel, FieldType, Model};
 use log::debug;
 use sql_schema_describer::*;
-use std::collections::HashSet;
 
 /// Calculate a data model from a database schema.
 pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> {
@@ -36,7 +35,10 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
         }
 
         for index in &table.indices {
-            let fk_on_index = table.foreign_keys.iter().find(|fk| fk.columns == index.columns);
+            let fk_on_index = table
+                .foreign_keys
+                .iter()
+                .find(|fk| columns_match(&fk.columns, &index.columns));
 
             // This is part of the temporary guardrail that makes us ignore relations that overlap
             // with the primary key.
@@ -51,20 +53,11 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
                 })
                 .unwrap_or(false);
 
-            // The database names of relation fields and the index columns are not necessarily in
-            // the same order, so a simple equality check doesn't work.
-            let index_columns: HashSet<&String> = index.columns.iter().collect();
-
             let compound_field_name = || {
                 model
                     .fields
                     .iter()
-                    .find(|f| {
-                        !f.database_names.is_empty()
-                            && f.database_names
-                                .iter()
-                                .all(|database_field_name| index_columns.contains(database_field_name))
-                    })
+                    .find(|f| !f.database_names.is_empty() && columns_match(&f.database_names, &index.columns))
                     .expect("Error finding field matching a compound index.")
                     .name
                     .clone()
@@ -153,4 +146,13 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
     debug!("Done calculating data model {:?}", data_model);
 
     Ok(data_model)
+}
+
+/// Returns whether the elements of the two slices match, regardless of ordering.
+fn columns_match(a_cols: &[String], b_cols: &[String]) -> bool {
+    if a_cols.len() != b_cols.len() {
+        return false;
+    }
+
+    a_cols.iter().all(|a_col| b_cols.iter().any(|b_col| a_col == b_col))
 }
