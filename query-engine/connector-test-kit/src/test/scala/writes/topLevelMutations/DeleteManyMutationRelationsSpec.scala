@@ -114,6 +114,8 @@ class DeleteManyMutationRelationsSpec extends FlatSpec with Matchers with ApiSpe
           s"""mutation {
           |  createParent(data: {
           |    p: "p1"
+          |    p_1: "p_1"
+          |    p_2: "p_2"
           |    childReq: {
           |      create: {
           |        c: "c1"
