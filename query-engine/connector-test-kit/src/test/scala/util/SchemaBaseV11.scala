@@ -83,7 +83,6 @@ trait SchemaBaseV11 extends PlayJsonExtensions {
   }
 
   def schemaWithRelation(onParent: RelationField, onChild: RelationField, withoutParams: Boolean = false) = {
-
     //Query Params
     val idParams = QueryParams(
       selection = "id",
@@ -133,51 +132,54 @@ trait SchemaBaseV11 extends PlayJsonExtensions {
       }
     )
 
-    val simple       = true
     val isManyToMany = onParent.isList && onChild.isList
 
     val datamodelsWithParams = for (parentId <- idOptions;
                                     childId <- idOptions;
                                     //based on Id and relation fields
-                                    childReferences <- if (simple) {
-                                                        parentId match {
-                                                          case _ if onChild.isList && !onParent.isList => Vector(noRef)
-                                                          case `simpleId`                              => Vector(idReference)
-                                                          case `compoundId`                            => Vector(compoundParentIdReference)
-                                                          case `noId`                                  => Vector(pReference)
-                                                          case _                                       => ???
-                                                        }
-                                                      } else
+                                    childReferences <- if (!isManyToMany) {
                                                         parentId match {
                                                           case _ if onChild.isList && !onParent.isList => Vector(`noRef`)
                                                           case `simpleId`                              => idReference +: commonParentReferences
                                                           case `compoundId`                            => compoundParentIdReference +: commonParentReferences
                                                           case _                                       => commonParentReferences
-                                                        };
-                                    parentReferences <- if (simple) {
-                                                         childId match {
-                                                           case _ if childReferences != noRef && !isManyToMany => Vector(noRef)
-                                                           case `simpleId`                                     => Vector(idReference)
-                                                           case `compoundId`                                   => Vector(compoundChildIdReference)
-                                                           case `noId`                                         => Vector(cReference)
-                                                           case _                                              => ???
-                                                         }
-                                                       } else
+
+                                                        }
+                                                      } else {
+                                                        parentId match {
+                                                          case `simpleId`   => Vector(idReference)
+                                                          case `compoundId` => Vector(compoundParentIdReference)
+                                                          case _            => Vector(pReference)
+
+                                                        }
+                                                      };
+
+                                    parentReferences <- if (!isManyToMany) {
                                                          (childId, childReferences) match {
                                                            case (_, _) if onParent.isList && !onChild.isList => Vector(`noRef`)
                                                            case (`simpleId`, `noRef`)                        => idReference +: commonChildReferences
                                                            case (`simpleId`, _) if onParent.isList && onChild.isList =>
                                                              idReference +: commonChildReferences :+ noRef
+
                                                            case (`simpleId`, _)         => Vector(noRef)
                                                            case (`compoundId`, `noRef`) => compoundChildIdReference +: commonChildReferences
                                                            case (`compoundId`, _) if onParent.isList && onChild.isList =>
                                                              compoundChildIdReference +: commonChildReferences :+ noRef
+
                                                            case (`compoundId`, _)                                => Vector(noRef)
                                                            case (`noId`, `noRef`)                                => commonChildReferences
                                                            case (`noId`, _) if onParent.isList && onChild.isList => commonChildReferences :+ noRef
                                                            case (`noId`, _)                                      => Vector(noRef)
                                                            case (_, _)                                           => Vector.empty
-                                                         };
+                                                         }
+                                                       } else {
+                                                         childId match {
+                                                           case `simpleId`   => Vector(idReference)
+                                                           case `compoundId` => Vector(compoundChildIdReference)
+                                                           case _            => Vector(cReference)
+                                                         }
+                                                       };
+
                                     //only based on id
                                     parentParams <- if (withoutParams) {
                                                      Vector(idParams)

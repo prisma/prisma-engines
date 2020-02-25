@@ -115,7 +115,11 @@ class DeleteManyMutationRelationsSpec extends FlatSpec with Matchers with ApiSpe
           |  createParent(data: {
           |    p: "p1"
           |    childReq: {
-          |      create: {c: "c1"}
+          |      create: {
+          |        c: "c1"
+          |        c_1: "c_1"
+          |        c_2: "c_2"
+          |      }
           |    }
           |  }){
           |    ${t.parent.selection}
@@ -160,7 +164,11 @@ class DeleteManyMutationRelationsSpec extends FlatSpec with Matchers with ApiSpe
           |  createParent(data: {
           |    p: "p1"
           |    childReq: {
-          |      create: {c: "c1"}
+          |      create: {
+          |        c: "c1"
+          |        c_1: "c_1",
+          |        c_2: "c_2"
+          |      }
           |    }
           |  }){
           |    childReq{
@@ -278,6 +286,8 @@ class DeleteManyMutationRelationsSpec extends FlatSpec with Matchers with ApiSpe
         """mutation {
         |  createParent(data: {
         |    p: "p1"
+        |    p_1: "p_1"
+        |    p_2: "p_2"
         |    childrenOpt: {
         |      create: {c: "c1"}
         |    }
@@ -356,6 +366,8 @@ class DeleteManyMutationRelationsSpec extends FlatSpec with Matchers with ApiSpe
         """mutation {
         |  createParent(data: {
         |    p: "p1"
+        |    p_1: "p_1"
+        |    p_2: "p_2"
         |    childOpt: {
         |      create: {c: "c1"}
         |    }
@@ -508,7 +520,11 @@ class DeleteManyMutationRelationsSpec extends FlatSpec with Matchers with ApiSpe
         |  createParent(data: {
         |    p: "p1"
         |    childReq: {
-        |      create: {c: "c1"}
+        |      create: {
+        |        c: "c1"
+        |        c_1: "c_1"
+        |        c_2: "c_2"
+        |      }
         |    }
         |  }){
         |    childReq{

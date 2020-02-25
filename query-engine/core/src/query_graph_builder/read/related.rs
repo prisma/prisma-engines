@@ -29,7 +29,7 @@ impl Builder<ReadQuery> for ReadRelatedRecordsBuilder {
         let selected_fields = collect_selected_fields(&sub_selections, &self.model);
         let nested = collect_nested_queries(sub_selections, &self.model)?;
         let parent_field = self.parent;
-        let selected_fields = merge_inlined_relation_fields(selected_fields, Some(parent_field.clone()), &nested);
+        let selected_fields = merge_relation_selections(selected_fields, Some(parent_field.clone()), &nested);
 
         Ok(ReadQuery::RelatedRecordsQuery(RelatedRecordsQuery {
             name,

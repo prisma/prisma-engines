@@ -105,7 +105,11 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
             |  createParent(data: {
             |    p: "p2", p_1: "p", p_2: "2",
             |    childReq: {
-            |      create: {c: "c2"}
+            |      create: {
+            |        c: "c2"
+            |        c_1: "c_1"
+            |        c_2: "c_2"
+            |      }
             |    }
             |  }){
             |    ${t.parent.selection}

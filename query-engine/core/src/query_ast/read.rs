@@ -64,18 +64,28 @@ impl FilteredQuery for ReadQuery {
 impl Display for ReadQuery {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            Self::RecordQuery(q) => write!(f, "RecordQuery(name: '{}', filter: {:?})", q.name, q.filter),
+            Self::RecordQuery(q) => write!(
+                f,
+                "RecordQuery(name: '{}', filter: {:?}, selection: {:?})",
+                q.name,
+                q.filter,
+                q.selected_fields.names().collect::<Vec<_>>()
+            ),
             Self::ManyRecordsQuery(q) => write!(
                 f,
-                "ManyRecordsQuery(name: '{}', model: {}, args: {:?})",
-                q.name, q.model.name, q.args
+                "ManyRecordsQuery(name: '{}', model: {}, args: {:?}, selection: {:?})",
+                q.name,
+                q.model.name,
+                q.args,
+                q.selected_fields.names().collect::<Vec<_>>()
             ),
             Self::RelatedRecordsQuery(q) => write!(
                 f,
-                "RelatedRecordsQuery(name: '{}', parent model: {}, parent relation field: {})",
+                "RelatedRecordsQuery(name: '{}', parent model: {}, parent relation field: {}, selection: {:?})",
                 q.name,
                 q.parent_field.model().name,
-                q.parent_field.name
+                q.parent_field.name,
+                q.selected_fields.names().collect::<Vec<_>>()
             ),
             Self::AggregateRecordsQuery(q) => write!(f, "AggregateRecordsQuery: {}", q.name),
         }

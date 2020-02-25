@@ -529,7 +529,11 @@ class NestedConnectMutationInsideCreateSpec extends FlatSpec with Matchers with 
         |  createParent(data: {
         |    p: "p1"
         |    childReq: {
-        |      create: {c: "c1"}
+        |      create: {
+        |        c: "c1"
+        |        c_1: "c_1"
+        |        c_2: "c_2"
+        |      }
         |    }
         |  }){
         |    childReq{
@@ -572,7 +576,11 @@ class NestedConnectMutationInsideCreateSpec extends FlatSpec with Matchers with 
 
       server.query(
         """mutation {
-          |  createChild(data: {c: "c1"}){
+          |  createChild(data: {
+          |    c: "c1"
+          |    c_1: "c_1"
+          |    c_2: "c_2"
+          |  }){
           |       c
           |  }
           |}""".stripMargin,

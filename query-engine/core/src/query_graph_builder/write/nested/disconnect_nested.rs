@@ -2,7 +2,7 @@ use super::utils::IdFilter;
 use super::*;
 use crate::{
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
-    InputAssertions, ParsedInputMap, ParsedInputValue, Query, WriteQuery,
+    FilteredQuery, InputAssertions, ParsedInputMap, ParsedInputValue, Query, WriteQuery,
 };
 use connector::Filter;
 use itertools::Itertools;
@@ -240,16 +240,11 @@ fn handle_one_to_x(
                     });
                 }
 
-                // Handle finder / filter injection
-                if let Node::Query(Query::Write(WriteQuery::UpdateManyRecords(ref mut ur))) = update_node {
-                    let filters: Vec<_> = parent_ids.into_iter().map(|id| id.filter()).collect();
-                    ur.filter = Filter::or(filters);
-                };
-
-                // Handle arg injection
-                if let Node::Query(Query::Write(ref mut wq)) = update_node {
+                // Handle filter & arg injection
+                if let Node::Query(Query::Write(ref mut wq @ WriteQuery::UpdateManyRecords(_))) = update_node {
+                    wq.set_filter(parent_ids.filter());
                     wq.inject_id_into_args(null_record_id);
-                }
+                };
 
                 Ok(update_node)
             }),

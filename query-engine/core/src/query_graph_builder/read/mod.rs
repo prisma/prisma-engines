@@ -90,36 +90,24 @@ pub fn collect_nested_queries(from: Vec<ParsedField>, model: &ModelRef) -> Query
         .collect::<QueryGraphBuilderResult<Vec<ReadQuery>>>()
 }
 
-/// Merges inlined fields into the selected fields of the query as required.
-/// The reason is that if a query is part of a nested query tree, it needs
-/// to ensure that it fetches all necessary fields of an inlined relation
-/// for dependent queries to succeed.
-///
-/// # Parameters:
-/// `selected_fields`: The selected fields as a base for injection.
-/// `parent_relation`: If the query is part of a nested tree (only really the
-/// case for `RelatedRecordsQuery` right now), we need to check the parent relation field
-/// requirements.
-/// `nested_queries`: Used for injecting all inlined fields that are required to satisfy
-/// dependent, nested queries.
-pub fn merge_inlined_relation_fields(
+/// Performs a lookahead based on the nested queries and merges fields required
+/// to resolve the nested queries.
+/// A lookback on the parent is also performed to ensure that fields required for
+/// resolving the parent relation are present.
+pub fn merge_relation_selections(
     mut selected_fields: SelectedFields,
     parent_relation: Option<RelationFieldRef>,
     nested_queries: &[ReadQuery],
 ) -> SelectedFields {
-    parent_relation.map(|rf| {
+    // Context: We are on the child model when calling this function.
+    if let Some(rf) = parent_relation {
         let field = rf.related_field();
-
-        if field.is_inlined_on_enclosing_model() {
-            selected_fields.add_relation(field);
-        }
-    });
+        selected_fields.add_all(field.linking_fields().into_iter());
+    }
 
     for nested in nested_queries {
         if let ReadQuery::RelatedRecordsQuery(ref rq) = nested {
-            if rq.parent_field.is_inlined_on_enclosing_model() {
-                selected_fields.add_relation(rq.parent_field.clone());
-            }
+            selected_fields.add_all(rq.parent_field.linking_fields().into_iter());
         }
     }
 

@@ -115,7 +115,6 @@ pub async fn one2m<'a, 'b>(
         let mut split = projection.split_into(&idents);
         let link_id = split.pop().unwrap();
         let id = split.pop().unwrap();
-
         let link_values: Vec<PrismaValue> = link_id.pairs.into_iter().map(|(_, v)| v).collect();
 
         match link_mapping.get_mut(&link_values) {
@@ -129,7 +128,6 @@ pub async fn one2m<'a, 'b>(
     }
 
     let is_compound_case = child_link_id.db_len() > 1;
-
     let args = if is_compound_case {
         let filters: Vec<Filter> = link_mapping
             .keys()
@@ -173,10 +171,11 @@ pub async fn one2m<'a, 'b>(
         .get_many_records(&parent_field.related_model(), args, selected_fields)
         .await?;
 
+    let child_field_names = scalars.field_names.clone();
+
     // Inlining is done on the parent, this means that we need to write the primary parent ID
     // into the child records that we retrieved. The matching is done based on the parent link values.
     if parent_field.is_inlined_on_enclosing_model() {
-        let child_field_names = scalars.field_names.clone();
         let mut additional_records = vec![];
 
         for mut record in scalars.records.iter_mut() {
@@ -199,27 +198,21 @@ pub async fn one2m<'a, 'b>(
         }
 
         scalars.records.extend(additional_records);
-
-        // Todo: In SQL this will never be hit since it is to one relation which does not allow pagination
-        paginator.apply_pagination(&mut scalars);
     } else if parent_field.related_field().is_inlined_on_enclosing_model() {
-        let parent_identifier = parent_field.model().primary_identifier();
-        let field_names = scalars.field_names.clone();
+        // Parent to map is inlined on the child records
         let child_link_fields = parent_field.related_field().linking_fields();
 
         for record in scalars.records.iter_mut() {
-            let parent_id: RecordIdentifier = record.identifier(&field_names, &child_link_fields)?;
-            let parent_id = parent_id
-                .into_iter()
-                .zip(parent_identifier.data_source_fields())
-                .map(|((_, value), field)| (field, value))
-                .collect::<Vec<_>>()
-                .into();
+            let child_link: RecordIdentifier = record.identifier(&child_field_names, &child_link_fields)?;
+            let child_link_values: Vec<PrismaValue> = child_link.pairs.iter().map(|(_, v)| v.clone()).collect();
 
-            record.parent_id = Some(parent_id);
+            if let Some(parent_ids) = link_mapping.get_mut(&child_link_values) {
+                parent_ids.reverse();
+
+                let parent_id = parent_ids.first().unwrap();
+                record.parent_id = Some(parent_id.clone());
+            }
         }
-
-        paginator.apply_pagination(&mut scalars);
     } else {
         panic!(format!(
             "parent result: {:?}, relation: {:?}",
@@ -228,5 +221,6 @@ pub async fn one2m<'a, 'b>(
         ));
     }
 
+    paginator.apply_pagination(&mut scalars);
     Ok(scalars)
 }

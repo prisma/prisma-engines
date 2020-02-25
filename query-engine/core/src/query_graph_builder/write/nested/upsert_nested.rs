@@ -95,8 +95,8 @@ pub fn connect_nested_upsert(
     let child_model_identifier = child_model.primary_identifier();
 
     for value in coerce_vec(value) {
-        let parent_linking_fields = parent_relation_field.linking_fields();
-        let child_linking_fields = parent_relation_field.related_field().linking_fields();
+        let parent_link = parent_relation_field.linking_fields();
+        let child_link = parent_relation_field.related_field().linking_fields();
 
         let mut as_map: ParsedInputMap = value.try_into()?;
         let create_input = as_map.remove("create").expect("create argument is missing");
@@ -142,22 +142,22 @@ pub fn connect_nested_upsert(
         )?;
 
         graph.create_edge(
-             &read_children_node,
-             &update_node,
-             QueryGraphDependency::ParentIds(child_model_identifier.clone(), Box::new(move |mut node, mut parent_ids| {
-                 if let Node::Query(Query::Write(WriteQuery::UpdateRecord(ref mut wq))) = node {
-                     let parent_id = match parent_ids.pop() {
-                         Some(pid) => Ok(pid),
-                         None => Err(QueryGraphBuilderError::AssertionError(format!(
-                             "[Query Graph] Expected a valid parent ID to be present for a nested update in a nested upsert."
-                         ))),
-                     }?;
+            &read_children_node,
+            &update_node,
+            QueryGraphDependency::ParentIds(child_model_identifier.clone(), Box::new(move |mut node, mut parent_ids| {
+                if let Node::Query(Query::Write(WriteQuery::UpdateRecord(ref mut wq))) = node {
+                    let parent_id = match parent_ids.pop() {
+                        Some(pid) => Ok(pid),
+                        None => Err(QueryGraphBuilderError::AssertionError(format!(
+                            "[Query Graph] Expected a valid parent ID to be present for a nested update in a nested upsert."
+                        ))),
+                    }?;
 
-                     wq.add_filter(parent_id.filter());
-                 }
-                 Ok(node)
-             })),
-         )?;
+                    wq.add_filter(parent_id.filter());
+                }
+                Ok(node)
+            })),
+        )?;
 
         graph.create_edge(&if_node, &update_node, QueryGraphDependency::Then)?;
         graph.create_edge(&if_node, &create_node, QueryGraphDependency::Else)?;
@@ -174,65 +174,64 @@ pub fn connect_nested_upsert(
 
                 // Edge to retrieve the finder
                 graph.create_edge(
-                     &parent_node,
-                     &update_node,
-                     QueryGraphDependency::ParentIds(parent_model_id, Box::new(move |mut child_node, mut parent_ids| {
-                         let parent_id = match parent_ids.pop() {
-                             Some(pid) => Ok(pid),
-                             None => Err(QueryGraphBuilderError::AssertionError(format!(
-                                 "[Query Graph] Expected a valid parent ID to be present to retrieve the finder for a parent update in a nested upsert."
-                             ))),
-                         }?;
+                    &parent_node,
+                    &update_node,
+                    QueryGraphDependency::ParentIds(parent_model_id, Box::new(move |mut child_node, mut parent_ids| {
+                        let parent_id = match parent_ids.pop() {
+                            Some(pid) => Ok(pid),
+                            None => Err(QueryGraphBuilderError::AssertionError(format!(
+                                "[Query Graph] Expected a valid parent ID to be present to retrieve the finder for a parent update in a nested upsert."
+                            ))),
+                        }?;
 
-                         if let Node::Query(Query::Write(ref mut wq)) = child_node {
-                             wq.add_filter(parent_id.filter());
-                         }
+                        if let Node::Query(Query::Write(ref mut wq)) = child_node {
+                            wq.add_filter(parent_id.filter());
+                        }
 
-                         Ok(child_node)
-                     })),
-                 )?;
-
-                let child_linking_fields = parent_relation_field.related_field().linking_fields();
+                        Ok(child_node)
+                    })),
+                )?;
 
                 // Edge to retrieve the child ID to inject
                 graph.create_edge(
-                     &create_node,
-                     &update_node,
-                     QueryGraphDependency::ParentIds(child_linking_fields.clone(), Box::new(move |mut child_node, mut parent_ids| {
-                         let parent_id = match parent_ids.pop() {
-                             Some(pid) => Ok(pid),
-                             None => Err(QueryGraphBuilderError::AssertionError(format!(
-                                 "[Query Graph] Expected a valid parent ID to be present to retrieve the ID to inject for a parent update in a nested upsert."
-                             ))),
-                         }?;
+                    &create_node,
+                    &update_node,
+                    QueryGraphDependency::ParentIds(child_link.clone(), Box::new(move |mut child_node, mut parent_ids| {
+                        let parent_id = match parent_ids.pop() {
+                            Some(pid) => Ok(pid),
+                            None => Err(QueryGraphBuilderError::AssertionError(format!(
+                                "[Query Graph] Expected a valid parent ID to be present to retrieve the ID to inject for a parent update in a nested upsert."
+                            ))),
+                        }?;
 
-                         if let Node::Query(Query::Write(ref mut wq)) = child_node {
-                             wq.inject_id_into_args(parent_linking_fields.assimilate(parent_id)?);
-                         }
+                        if let Node::Query(Query::Write(ref mut wq)) = child_node {
+                            wq.inject_id_into_args(parent_link.assimilate(parent_id)?);
+                        }
 
-                         Ok(child_node)
-                     })),
-                 )?;
+                        Ok(child_node)
+                    })),
+                )?;
             } else {
+                // Inlined on child
                 // Edge to retrieve the child ID to inject (inject into the create)
                 graph.create_edge(
-                     &parent_node,
-                     &create_node,
-                     QueryGraphDependency::ParentIds(parent_linking_fields, Box::new(move |mut child_node, mut parent_ids| {
-                         let parent_id = match parent_ids.pop() {
-                             Some(pid) => Ok(pid),
-                             None => Err(QueryGraphBuilderError::AssertionError(format!(
-                                 "[Query Graph] Expected a valid parent ID to be present to retrieve the ID to inject into the child create in a nested upsert."
-                             ))),
-                         }?;
+                    &parent_node,
+                    &create_node,
+                    QueryGraphDependency::ParentIds(parent_link, Box::new(move |mut child_node, mut parent_ids| {
+                        let parent_id = match parent_ids.pop() {
+                            Some(pid) => Ok(pid),
+                            None => Err(QueryGraphBuilderError::AssertionError(format!(
+                                "[Query Graph] Expected a valid parent ID to be present to retrieve the ID to inject into the child create in a nested upsert."
+                            ))),
+                        }?;
 
-                         if let Node::Query(Query::Write(ref mut wq)) = child_node {
-                             wq.inject_id_into_args(child_linking_fields.assimilate(parent_id)?);
-                         }
+                        if let Node::Query(Query::Write(ref mut wq)) = child_node {
+                            wq.inject_id_into_args(child_link.assimilate(parent_id)?);
+                        }
 
-                         Ok(child_node)
-                     })),
-                 )?;
+                        Ok(child_node)
+                    })),
+                )?;
             }
         }
     }

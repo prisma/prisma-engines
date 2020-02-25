@@ -20,7 +20,11 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
           |  createParent(data: {
           |    p: "p1", p_1: "p", p_2: "1"
           |    childOpt: {
-          |      create: {c: "c1"}
+          |      create: {
+          |        c: "c1"
+          |        c_1: "c_1"
+          |        c_2: "c_2"
+          |      }
           |    }
           |  }){
           |    ${t.parent.selection}
@@ -273,7 +277,11 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
         |  createParent(data: {
         |    p: "p1", p_1: "p", p_2: "1"
         |    childOpt: {
-        |      create: {c: "c1"}
+        |      create: {
+        |        c: "c1"
+        |        c_1: "c_1"
+        |        c_2: "c_2"
+        |      }
         |    }
         |  }){
         |    ${t.parent.selection}
