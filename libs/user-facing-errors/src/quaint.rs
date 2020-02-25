@@ -141,6 +141,13 @@ pub fn render_quaint_error(kind: &ErrorKind, connection_info: &ConnectionInfo) -
             .ok()
         }
 
+        (ErrorKind::DatabaseUrlIsInvalid(details), _connection_info) => {
+            KnownError::new(common::InvalidDatabaseString {
+                details: details.to_owned(),
+            })
+            .ok()
+        }
+
         _ => None,
     }
 }
