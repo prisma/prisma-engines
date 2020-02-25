@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.2.0-alpha.7
+
+- Fix a missing dependency when compiling using only single-sqlite feature
+
 ## v0.2.0-alpha.6
 
 - Remove lazy_static in favor of once_cell
