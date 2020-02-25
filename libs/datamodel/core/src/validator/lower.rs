@@ -133,7 +133,6 @@ impl LowerDmlToAst {
             }
             dml::ScalarValue::String(value) => ast::Expression::StringValue(value.clone(), ast::Span::empty()),
             dml::ScalarValue::ConstantLiteral(name, _) => {
-                //todo
                 ast::Expression::ConstantValue(name.clone(), ast::Span::empty())
             }
             dml::ScalarValue::DateTime(value) => ast::Expression::ConstantValue(value.to_rfc3339(), ast::Span::empty()),

@@ -26,9 +26,7 @@ pub fn sanitize_datamodel_names(datamodel: &mut Datamodel) {
 
                     no_db_name_because_field_is_virtual = info.to_fields.is_empty();
                 }
-
                 FieldType::Enum(enum_name) => {
-                    //todo sanitize value in defaultvalue
                     let (sanitized_enum_name, enum_db_name) = if *enum_name == format!("{}_{}", model.name, field.name)
                     {
                         //MySql
@@ -50,14 +48,13 @@ pub fn sanitize_datamodel_names(datamodel: &mut Datamodel) {
 
                     *enum_name = sanitized_enum_name;
 
-                    match &mut field.default_value {
-                        Some(DefaultValue::Single(ScalarValue::ConstantLiteral(name, db_name))) => {
-                            let (sanitized_value, db_value) = sanitize_name(name.to_string());
-                            *name = sanitized_value;
-                            *db_name = db_value;
-                        }
-                        _ => (),
-                    }
+                    if let Some(DefaultValue::Single(ScalarValue::ConstantLiteral(name, db_name))) =
+                        &mut field.default_value
+                    {
+                        let (sanitized_value, db_value) = sanitize_name(name.to_string());
+                        *name = sanitized_value;
+                        *db_name = db_value;
+                    };
                 }
                 _ => (),
             }

@@ -205,8 +205,6 @@ impl SqlSchemaDescriber {
             };
             let tpe = get_column_type(data_type.as_ref(), &full_data_type, arity, enums);
 
-            //todo default value handling here needs to take the type/enum name into consideration
-
             let default = match &tpe.family {
                 ColumnTypeFamily::Enum(enum_name) => col.get("column_default").and_then(|param_value| {
                     param_value
