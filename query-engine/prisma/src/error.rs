@@ -1,11 +1,9 @@
+use connector::error::ConnectorError;
 use datamodel::error::ErrorCollection;
 use failure::{Error, Fail};
 use graphql_parser::query::ParseError as GqlParseError;
 use query_core::{response_ir, CoreError};
 use serde_json;
-
-#[cfg(feature = "sql")]
-use sql_connector::SqlError;
 
 #[derive(Debug, Fail)]
 pub enum PrismaError {
@@ -20,6 +18,9 @@ pub enum PrismaError {
 
     #[fail(display = "{}", _0)]
     ConfigurationError(String),
+
+    #[fail(display = "{}", _0)]
+    ConnectorError(ConnectorError),
 
     #[fail(display = "{}", _0)]
     ConversionError(ErrorCollection, String),
@@ -42,13 +43,17 @@ pub enum PrismaError {
 }
 
 impl PrismaError {
-    pub(crate) fn render_as_json(&self) -> Result<(), failure::Error> {
+    pub(crate) fn render_as_json(self) -> Result<(), failure::Error> {
         use std::fmt::Write as _;
         use std::io::Write as _;
 
         let error: user_facing_errors::Error = match self {
+            PrismaError::ConnectorError(ConnectorError {
+                user_facing_error: Some(err),
+                ..
+            }) => err.into(),
             PrismaError::ConversionError(errors, dml_string) => {
-                let mut full_error = errors.to_pretty_string("schema.prisma", dml_string);
+                let mut full_error = errors.to_pretty_string("schema.prisma", &dml_string);
                 write!(full_error, "\nValidation Error Count: {}", errors.to_iter().len())?;
 
                 user_facing_errors::Error::from(
@@ -129,9 +134,8 @@ impl From<GqlParseError> for PrismaError {
     }
 }
 
-#[cfg(feature = "sql")]
-impl From<SqlError> for PrismaError {
-    fn from(e: SqlError) -> PrismaError {
-        PrismaError::ConfigurationError(format!("{}", e))
+impl From<ConnectorError> for PrismaError {
+    fn from(e: ConnectorError) -> PrismaError {
+        PrismaError::ConnectorError(e)
     }
 }
