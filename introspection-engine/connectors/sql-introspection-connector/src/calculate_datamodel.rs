@@ -35,13 +35,30 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
         }
 
         for index in &table.indices {
-            let fk_on_index = table.foreign_keys.iter().find(|fk| fk.columns == index.columns);
+            let fk_on_index = table
+                .foreign_keys
+                .iter()
+                .find(|fk| columns_match(&fk.columns, &index.columns));
+
+            // This is part of the temporary guardrail that makes us ignore relations that overlap
+            // with the primary key.
+            let fk_on_index_overlaps_with_pk: bool = table
+                .primary_key
+                .as_ref()
+                .and_then(|pk| fk_on_index.as_ref().map(|fk| (pk, fk)))
+                .map(|(pk, fk)| {
+                    pk.columns
+                        .iter()
+                        .any(|pk_col| fk.columns.iter().any(|fk_col| pk_col == fk_col))
+                })
+                .unwrap_or(false);
+
             let compound_field_name = || {
                 model
                     .fields
                     .iter()
-                    .find(|f| !f.database_names.is_empty() && f.database_names == index.columns)
-                    .unwrap()
+                    .find(|f| !f.database_names.is_empty() && columns_match(&f.database_names, &index.columns))
+                    .expect("Error finding field matching a compound index.")
                     .name
                     .clone()
             };
@@ -49,7 +66,10 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
             let index_to_add = match (fk_on_index, index.columns.len(), index.is_unique()) {
                 (Some(_), _, true) => None, // just make the relation 1:1 and dont print the unique index
                 (Some(_), 1, false) => Some(calculate_index(index)),
-                (Some(_), _, false) => Some(calculate_compound_index(index, compound_field_name())),
+                (Some(_), _, false) if !fk_on_index_overlaps_with_pk => {
+                    Some(calculate_compound_index(index, compound_field_name()))
+                }
+                (Some(_), _, false) => Some(calculate_index(index)),
                 (None, 1, true) => None, // this is expressed by the @unique already
                 (None, _, true) => Some(calculate_index(index)),
                 (None, _, false) => Some(calculate_index(index)),
@@ -126,4 +146,13 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
     debug!("Done calculating data model {:?}", data_model);
 
     Ok(data_model)
+}
+
+/// Returns whether the elements of the two slices match, regardless of ordering.
+fn columns_match(a_cols: &[String], b_cols: &[String]) -> bool {
+    if a_cols.len() != b_cols.len() {
+        return false;
+    }
+
+    a_cols.iter().all(|a_col| b_cols.iter().any(|b_col| a_col == b_col))
 }
