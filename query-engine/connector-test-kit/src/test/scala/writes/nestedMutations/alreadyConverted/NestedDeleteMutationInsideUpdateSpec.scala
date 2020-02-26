@@ -100,7 +100,7 @@ class NestedDeleteMutationInsideUpdateSpec extends FlatSpec with Matchers with A
   }
 
   "a P1 to C1  relation " should "work through a nested mutation by id" in {
-    schemaWithRelation(onParent = ChildOpt, onChild = ParentOpt).test(9) { t =>
+    schemaWithRelation(onParent = ChildOpt, onChild = ParentOpt).test { t =>
       val project = SchemaDsl.fromStringV11() {
         t.datamodel
       }

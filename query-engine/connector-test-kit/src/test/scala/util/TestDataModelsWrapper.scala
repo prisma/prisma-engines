@@ -3,11 +3,14 @@ package util
 import org.scalatest.{Suite, WordSpecLike}
 import play.api.libs.json.JsValue
 import util.ConnectorTag.{MongoConnectorTag, RelationalConnectorTag}
+import wvlet.log.LogFormatter.{BareFormatter, SimpleLogFormatter}
+import wvlet.log.{LogLevel, LogSupport, Logger}
 
 case class TestDataModels(
     mongo: Vector[String],
     sql: Vector[String]
 )
+
 object TestDataModels {
   def apply(mongo: String, sql: String): TestDataModels = {
     TestDataModels(mongo = Vector(mongo), sql = Vector(sql))
@@ -20,7 +23,11 @@ case class TestDataModelsWrapper(
     connectorName: String,
     database: TestDatabase
 )(implicit suite: Suite)
-    extends WordSpecLike {
+    extends WordSpecLike
+    with LogSupport {
+
+  Logger.setDefaultFormatter(BareFormatter)
+  Logger.setDefaultLogLevel(LogLevel.apply(sys.env.getOrElse("LOG_LEVEL", "debug").toLowerCase))
 
   def test[T](indexToTest: Int)(fn: String => T)     = internal(Some(indexToTest))(fn)
   def test[T](fn: String => T)                       = internal(None)(fn)
@@ -47,18 +54,20 @@ case class TestDataModelsWrapper(
         val testThisOne = indexToTest.forall(_ == index)
         if (testThisOne) {
           didRunATest = testThisOne
-          println("*" * 75)
-          println(s"name:  $connectorName")
-          println(s"index: $index")
-          println(s"tag:   ${connectorTag.entryName}")
-          println(s"schema: \n ${dm}")
-          println("*" * 75)
+
+          debug("*" * 75)
+          debug(s"name:  $connectorName")
+          error(s"index: $index")
+          debug(s"tag:   ${connectorTag.entryName}")
+          debug(s"schema: \n $dm")
+          debug("*" * 75)
+
           fn(dm)
         }
     }
 
     if (!didRunATest) {
-      println("There was no Datamodel for the provided index!")
+      error("There was no Datamodel for the provided index!")
     }
   }
 
@@ -79,6 +88,7 @@ case class AbstractTestDataModels(
     mongo: Vector[TestAbstraction],
     sql: Vector[TestAbstraction]
 )
+
 object AbstractTestDataModels {
   def apply(mongo: TestAbstraction, sql: TestAbstraction): AbstractTestDataModels = {
     AbstractTestDataModels(mongo = Vector(mongo), sql = Vector(sql))
@@ -91,7 +101,11 @@ case class AbstractTestDataModelsWrapper(
     connectorName: String,
     database: TestDatabase
 )(implicit suite: Suite)
-    extends WordSpecLike {
+    extends WordSpecLike
+    with LogSupport {
+
+  Logger.setDefaultFormatter(BareFormatter)
+  Logger.setDefaultLogLevel(LogLevel.apply(sys.env.getOrElse("LOG_LEVEL", "debug").toLowerCase))
 
   def test[T](indexToTest: Int)(fn: TestAbstraction => T) = internal(Some(indexToTest))(fn)
   def test[T](fn: TestAbstraction => T)                   = internal(None)(fn)
@@ -118,18 +132,20 @@ case class AbstractTestDataModelsWrapper(
         val testThisOne = indexToTest.forall(_ == index)
         if (testThisOne) {
           didRunATest = testThisOne
-          println("*" * 75)
-          println(s"name:  $connectorName")
-          println(s"index: $index")
-          println(s"tag:   ${connectorTag.entryName}")
-          println(s"schema: \n ${dm.datamodel}")
-          println("*" * 75)
+
+          debug("*" * 75)
+          debug(s"name:  $connectorName")
+          error(s"index: $index")
+          debug(s"tag:   ${connectorTag.entryName}")
+          debug(s"schema: \n ${dm.datamodel}")
+          debug("*" * 75)
+
           fn(dm)
         }
     }
 
     if (!didRunATest) {
-      println("There was no Datamodel for the provided index!")
+      error("There was no Datamodel for the provided index!")
     }
   }
 
