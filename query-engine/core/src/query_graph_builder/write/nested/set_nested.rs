@@ -215,7 +215,7 @@ fn handle_one_to_many(
 ) -> QueryGraphBuilderResult<()> {
     let child_model_identifier = parent_relation_field.related_model().primary_identifier();
     let child_link = parent_relation_field.related_field().linking_fields();
-    let parent_link = parent_relation_field.related_field().linking_fields();
+    let parent_link = parent_relation_field.linking_fields();
     let empty_child_link = child_link.empty_record_id();
 
     let child_model = parent_relation_field.related_model();

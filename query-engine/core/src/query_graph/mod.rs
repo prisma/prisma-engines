@@ -645,7 +645,7 @@ impl QueryGraph {
             .collect();
 
         for (node, model, edges) in reloads {
-            // Create reload node and connect it to the `node`
+            // Create reload node and connect it to the `node`.
             let primary_model_id = model.primary_identifier();
             let (edges, mut identifiers): (Vec<_>, Vec<_>) = edges.into_iter().unzip();
             identifiers.push(primary_model_id.clone());
