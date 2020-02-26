@@ -323,6 +323,8 @@ class DeleteMutationRelationsSpec extends FlatSpec with Matchers with ApiSpecBas
         """mutation {
         |  createParent(data: {
         |    p: "p1"
+        |    p_1: "p_1"
+        |    p_2: "p_2"
         |    childOpt: {
         |      create: {
         |        c: "c1"
