@@ -456,6 +456,7 @@ fn get_column_type_and_enum(
         ("numeric", _) => ColumnTypeFamily::Float,
         ("float", _) => ColumnTypeFamily::Float,
         ("double", _) => ColumnTypeFamily::Float,
+        ("bit", _) => ColumnTypeFamily::Int,
         ("date", _) => ColumnTypeFamily::DateTime,
         ("time", _) => ColumnTypeFamily::DateTime,
         ("datetime", _) => ColumnTypeFamily::DateTime,

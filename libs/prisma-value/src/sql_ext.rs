@@ -15,6 +15,7 @@ impl<'a> From<ParameterizedValue<'a>> for PrismaValue {
             ParameterizedValue::Uuid(uuid) => PrismaValue::Uuid(uuid),
             ParameterizedValue::DateTime(dt) => PrismaValue::DateTime(dt),
             ParameterizedValue::Char(c) => PrismaValue::String(c.to_string()),
+            ParameterizedValue::Bytes(bytes) => todo!("PrismaValue::Bytes"),
         }
     }
 }

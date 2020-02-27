@@ -7,7 +7,7 @@ use quaint::{
     connector::ResultRow,
 };
 use rust_decimal::{prelude::FromPrimitive, Decimal};
-use std::{borrow::Borrow, io};
+use std::{borrow::Borrow, io, str::FromStr};
 use uuid::Uuid;
 
 /// An allocated representation of a `Row` returned from the database.
@@ -136,7 +136,9 @@ pub fn row_value_to_prisma_value(
             ParameterizedValue::Integer(i) => {
                 PrismaValue::Float(Decimal::from_f64(i as f64).expect("f64 was not a Decimal."))
             }
-            ParameterizedValue::Text(s) => PrismaValue::Float(s.parse().unwrap()),
+            ParameterizedValue::Text(_) | ParameterizedValue::Bytes(_) => {
+                PrismaValue::Float(p_value.as_str().unwrap().parse().unwrap())
+            }
             _ => {
                 let error = io::Error::new(
                     io::ErrorKind::InvalidData,
@@ -145,7 +147,18 @@ pub fn row_value_to_prisma_value(
                 return Err(SqlError::ConversionError(error.into()));
             }
         },
-        _ => PrismaValue::from(p_value),
+        TypeIdentifier::Int => match p_value {
+            ParameterizedValue::Integer(i) => PrismaValue::Int(i),
+            ParameterizedValue::Bytes(bytes) => PrismaValue::Int(interpret_bytes_as_i64(&bytes)),
+            ParameterizedValue::Text(txt) => PrismaValue::Int(
+                i64::from_str(dbg!(txt.trim_start_matches('\0')))
+                    .map_err(|err| SqlError::ConversionError(err.into()))?,
+            ),
+            other => PrismaValue::from(other),
+        },
+        TypeIdentifier::String => p_value.into_string().map(PrismaValue::String).ok_or_else(|| {
+            SqlError::ConversionError(failure::format_err!("Could not extract text value from result set"))
+        })?,
     })
 }
 
@@ -169,5 +182,86 @@ impl From<SqlId> for DatabaseValue<'static> {
 impl From<&SqlId> for DatabaseValue<'static> {
     fn from(id: &SqlId) -> Self {
         id.clone().into()
+    }
+}
+
+// We assume the bytes are stored as a big endian signed integer, because that is what
+// mysql does if you enter a numeric value for a bits column.
+fn interpret_bytes_as_i64(bytes: &[u8]) -> i64 {
+    match bytes.len() {
+        8 => i64::from_be_bytes([
+            bytes[0], bytes[1], bytes[2], bytes[3], bytes[4], bytes[5], bytes[6], bytes[7],
+        ]),
+        len if len < 8 => {
+            let sign_bit_mask: u8 = 0b10000000;
+            // The first byte will only contain the sign bit.
+            let most_significant_bit_byte = bytes[0] & sign_bit_mask;
+            let padding = if most_significant_bit_byte == 0 { 0 } else { 0b11111111 };
+            let mut i64_bytes = [padding; 8];
+
+            for (target_byte, source_byte) in i64_bytes.iter_mut().rev().zip(bytes.iter().rev()) {
+                *target_byte = *source_byte;
+            }
+
+            i64::from_be_bytes(i64_bytes)
+        }
+        0 => 0,
+        _ => panic!("Attempted to interpret more than 8 bytes as an integer."),
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn quaint_bytes_to_integer_conversion_works() {
+        // Negative i64
+        {
+            let i: i64 = -123456789123;
+            let bytes = i.to_be_bytes();
+            let roundtripped = interpret_bytes_as_i64(&bytes);
+            assert_eq!(roundtripped, i);
+        }
+
+        // Positive i64
+        {
+            let i: i64 = 123456789123;
+            let bytes = i.to_be_bytes();
+            let roundtripped = interpret_bytes_as_i64(&bytes);
+            assert_eq!(roundtripped, i);
+        }
+
+        // Positive i32
+        {
+            let i: i32 = 123456789;
+            let bytes = i.to_be_bytes();
+            let roundtripped = interpret_bytes_as_i64(&bytes);
+            assert_eq!(roundtripped, i as i64);
+        }
+
+        // Negative i32
+        {
+            let i: i32 = -123456789;
+            let bytes = i.to_be_bytes();
+            let roundtripped = interpret_bytes_as_i64(&bytes);
+            assert_eq!(roundtripped, i as i64);
+        }
+
+        // Positive i16
+        {
+            let i: i16 = 12345;
+            let bytes = i.to_be_bytes();
+            let roundtripped = interpret_bytes_as_i64(&bytes);
+            assert_eq!(roundtripped, i as i64);
+        }
+
+        // Negative i16
+        {
+            let i: i16 = -12345;
+            let bytes = i.to_be_bytes();
+            let roundtripped = interpret_bytes_as_i64(&bytes);
+            assert_eq!(roundtripped, i as i64);
+        }
     }
 }

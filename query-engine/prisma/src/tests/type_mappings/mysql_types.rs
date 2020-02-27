@@ -17,7 +17,7 @@ const CREATE_TYPES_TABLE: &str = indoc! {
         `numeric_floating_float` float,
         `numeric_fixed_double` double,
         `numeric_fixed_real` double,
-        /* `numeric_bit` bit(64), tries to convert to string, doesn't do what we want */
+        `numeric_bit` bit(64),
         `numeric_boolean` tinyint(1),
         `date_date` date,
         `date_datetime` datetime,
@@ -69,7 +69,7 @@ async fn mysql_types_roundtrip(api: &TestApi) -> TestResult {
             .assert_field_type("numeric_floating_float", ScalarType::Float)?
             .assert_field_type("numeric_fixed_double", ScalarType::Float)?
             .assert_field_type("numeric_fixed_real", ScalarType::Float)?
-            // .assert_field_type("numeric_bit", ScalarType::String)?
+            .assert_field_type("numeric_bit", ScalarType::Int)?
             .assert_field_type("numeric_boolean", ScalarType::Boolean)?
             .assert_field_type("date_date", ScalarType::DateTime)?
             .assert_field_type("date_datetime", ScalarType::DateTime)?
@@ -115,7 +115,7 @@ async fn mysql_types_roundtrip(api: &TestApi) -> TestResult {
                         numeric_floating_float: -32.0
                         numeric_fixed_double: 0.14
                         numeric_fixed_real: 12.12
-                        # numeric_bit: \"01111\"
+                        numeric_bit: 4
                         numeric_boolean: true
                         date_date: \"2020-02-27T00:00:00Z\"
                         date_datetime: \"2020-02-27T19:10:22Z\"
@@ -168,7 +168,7 @@ async fn mysql_types_roundtrip(api: &TestApi) -> TestResult {
                     numeric_floating_float
                     numeric_fixed_double
                     numeric_fixed_real
-                    # numeric_bit
+                    numeric_bit
                     numeric_boolean
                     date_date
                     date_datetime
@@ -208,7 +208,7 @@ async fn mysql_types_roundtrip(api: &TestApi) -> TestResult {
                         "numeric_floating_float": -32.0,
                         "numeric_fixed_double": 0.14,
                         "numeric_fixed_real": 12.12,
-                        // "numeric_bit": "1110",
+                        "numeric_bit": 4,
                         "numeric_boolean": true,
                         "date_date": "2020-02-27T00:00:00.000Z",
                         "date_datetime": "2020-02-27T19:10:22.000Z",
@@ -235,6 +235,40 @@ async fn mysql_types_roundtrip(api: &TestApi) -> TestResult {
 
         assert_eq!(read_response, expected_read_response);
     }
+
+    Ok(())
+}
+
+#[test_each_connector(tags("mysql"))]
+async fn mysql_bit_columns_are_properly_mapped_to_signed_integers(api: &TestApi) -> TestResult {
+    api.execute(CREATE_TYPES_TABLE).await?;
+
+    let (_datamodel, engine) = api.create_engine().await?;
+
+    let write = indoc! {
+        "
+        mutation {
+            createOnetypes(
+                data: {
+                    numeric_bit: -12
+                }
+            ) { id numeric_bit }
+        }
+        "
+    };
+
+    let write_response = engine.request(write).await;
+
+    let expected_write_response = json!({
+        "data": {
+            "createOnetypes": {
+                "id": 1,
+                "numeric_bit": -12,
+            }
+        }
+    });
+
+    assert_eq!(write_response, expected_write_response);
 
     Ok(())
 }
