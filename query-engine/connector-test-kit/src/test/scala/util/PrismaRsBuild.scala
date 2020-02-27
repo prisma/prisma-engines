@@ -6,13 +6,13 @@ object PrismaRsBuild {
   def apply(): Unit = {
     if (!EnvVars.isBuildkite) {
       val workingDirectory = new java.io.File(EnvVars.serverRoot)
-      val command = if (isDebug) {
-        Seq("cargo", "build")
-      } else {
-        Seq("cargo", "build", "--release")
+      var command          = Seq("cargo", "build", "--bin", "prisma", "--bin", "migration-engine")
+
+      if (!isDebug) {
+        command = command :+ "--release"
       }
 
-      val env = ("RUST_LOG", "error")
+      val env = ("RUST_LOG", "info")
       sys.process.Process(command, workingDirectory, env).!!
     }
   }

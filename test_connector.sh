@@ -18,4 +18,4 @@ else
 fi
 
 cd query-engine/connector-test-kit
-sbt -mem 3072 test
+sbt -mem 4096 test

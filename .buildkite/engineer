@@ -13,7 +13,7 @@ fi
 if ! type "engineer" > /dev/null; then
     set -e
     # Setup Prisma engine build & test tool (engineer).
-    curl --fail -sSL "https://prisma-engineer.s3-eu-west-1.amazonaws.com/latest/$OS/engineer.gz" --output engineer.gz
+    curl --fail -sSL "https://prisma-engineer.s3.amazonaws.com/dom/test_complexity/4cd3eb3e6cc61452466a60d546ce0c7e4708e324/$OS/engineer.gz" --output engineer.gz
     gzip -d engineer.gz
     chmod +x engineer
 
