@@ -7,9 +7,9 @@ object PrismaRsBuild {
     if (!EnvVars.isBuildkite) {
       val workingDirectory = new java.io.File(EnvVars.serverRoot)
       val command = if (isDebug) {
-        Seq("cargo", "build")
+        Seq("cargo", "build", "--bin", "prisma", "--bin", "migration-engine")
       } else {
-        Seq("cargo", "build", "--release")
+        Seq("cargo", "build", "--release", "--bin", "prisma", "--bin", "migration-engine")
       }
 
       val env = ("RUST_LOG", "error")
