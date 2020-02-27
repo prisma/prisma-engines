@@ -1,15 +1,9 @@
+#![feature(backtrace)]
+
+
+use crate::data_model_loader;
 use query_core::{BuildMode, QuerySchema, QuerySchemaBuilder, SupportedCapabilities};
 use std::sync::Arc;
-
-fn get_query_schema(datamodel_string: &str) -> (QuerySchema, datamodel::dml::Datamodel) {
-    let lifted_datamodel = datamodel::parse_datamodel(datamodel_string).unwrap();
-    let internal_datamodel = prisma_models::DatamodelConverter::convert(&lifted_datamodel).build("blah".to_owned());
-    let supported_capabilities = SupportedCapabilities::empty();
-    (
-        QuerySchemaBuilder::new(&internal_datamodel, &supported_capabilities, BuildMode::Modern, false).build(),
-        lifted_datamodel,
-    )
-}
 
 #[test]
 fn dmmf_create_inputs_without_fields_for_parent_records_are_correct() {
@@ -74,4 +68,40 @@ fn dmmf_create_inputs_without_fields_for_parent_records_are_correct() {
             ("blogField", "BlogCreateOneWithoutPostsFieldInput")
         ]
     );
+}
+
+#[test]
+fn must_not_fail_on_missing_env_vars_in_a_datasource() {
+    let dm = r#"
+        datasource pg {
+            provider = "postgresql"
+            url = env("MISSING_ENV_VAR")
+        }
+        
+        model Blog {
+            blogId String @id
+        }
+    "#;
+    let (query_schema, datamodel) = get_query_schema(dm);
+
+    let dmmf = crate::dmmf::render_dmmf(&datamodel, Arc::new(query_schema));
+
+    let inputs = &dmmf.schema.input_types;
+
+    inputs
+        .iter()
+        .find(|input| input.name == "BlogCreateInput")
+        .expect("finding BlogCreateInput");
+}
+
+fn get_query_schema(datamodel_string: &str) -> (QuerySchema, datamodel::dml::Datamodel) {
+    // this env var is read by the data_model_loader
+    std::env::set_var("PRISMA_DML", datamodel_string);
+    let (dm, internal_dm_template) = data_model_loader::load_data_model_components(true).unwrap();
+    let internal_ref = internal_dm_template.build("db".to_owned());
+    let supported_capabilities = SupportedCapabilities::empty();
+    (
+        QuerySchemaBuilder::new(&internal_ref, &supported_capabilities, BuildMode::Modern, false).build(),
+        dm.datamodel,
+    )
 }

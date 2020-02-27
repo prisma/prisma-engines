@@ -19,7 +19,7 @@ use error::Error;
 use std::sync::Arc;
 
 pub async fn migration_api(datamodel: &str) -> CoreResult<Arc<dyn api::GenericApi>> {
-    let config = datamodel::parse_configuration(datamodel)?;
+    let config = datamodel::parse_configuration(datamodel, false)?;
 
     let source = config
         .datasources

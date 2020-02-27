@@ -34,13 +34,11 @@ pub enum LogFormat {
     Json,
 }
 
-static LOG_FORMAT: Lazy<LogFormat> = Lazy::new(|| {
-    match std::env::var("RUST_LOG_FORMAT").as_ref().map(|s| s.as_str()) {
+static LOG_FORMAT: Lazy<LogFormat> =
+    Lazy::new(|| match std::env::var("RUST_LOG_FORMAT").as_ref().map(|s| s.as_str()) {
         Ok("devel") => LogFormat::Text,
         _ => LogFormat::Json,
-    }
-});
-
+    });
 
 pub type PrismaResult<T> = Result<T, PrismaError>;
 type AnyError = Box<dyn Error + Send + Sync + 'static>;

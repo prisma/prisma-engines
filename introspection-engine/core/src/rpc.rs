@@ -52,7 +52,7 @@ impl RpcImpl {
     }
 
     async fn load_connector(schema: &String) -> Result<Box<dyn IntrospectionConnector>, Error> {
-        let config = datamodel::parse_configuration(&schema)?;
+        let config = datamodel::parse_configuration(&schema, false)?;
         let url = config
             .datasources
             .first()
@@ -64,7 +64,7 @@ impl RpcImpl {
     }
 
     pub(crate) async fn introspect_internal(schema: String) -> RpcResult<String> {
-        let config = datamodel::parse_configuration(&schema).map_err(Error::from)?;
+        let config = datamodel::parse_configuration(&schema, false).map_err(Error::from)?;
         let url = config
             .datasources
             .first()
