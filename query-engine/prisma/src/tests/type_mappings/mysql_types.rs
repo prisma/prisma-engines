@@ -23,7 +23,7 @@ const CREATE_TYPES_TABLE: &str = indoc! {
         `date_datetime` datetime,
         `date_timestamp` timestamp null DEFAULT null,
         `date_time` time,
-        /* `date_year` year(4), should be introspected as int, but we get datetime */
+        `date_year` year(4),
         `string_char` char(255),
         `string_varchar` varchar(255),
         `string_text_tinytext` tinytext,
@@ -75,7 +75,7 @@ async fn mysql_types_roundtrip(api: &TestApi) -> TestResult {
             .assert_field_type("date_datetime", ScalarType::DateTime)?
             .assert_field_type("date_timestamp", ScalarType::DateTime)?
             .assert_field_type("date_time", ScalarType::DateTime)?
-            // .assert_field_type("date_year", ScalarType::Int)
+            .assert_field_type("date_year", ScalarType::Int)?
             .assert_field_type("string_char", ScalarType::String)?
             .assert_field_type("string_varchar", ScalarType::String)?
             .assert_field_type("string_text_tinytext", ScalarType::String)?
@@ -120,7 +120,7 @@ async fn mysql_types_roundtrip(api: &TestApi) -> TestResult {
                         date_datetime: \"2020-02-27T19:10:22Z\"
                         date_timestamp: \"2020-02-27T19:11:22Z\"
                         # date_time: \"2020-02-20T12:50:01Z\"
-                        # date_year: 2012
+                        date_year: 2012
                         string_char: \"make dolphins easy\"
                         string_varchar: \"dolphins of varying characters\"
                         string_text_tinytext: \"tiny dolphins\"
@@ -132,7 +132,7 @@ async fn mysql_types_roundtrip(api: &TestApi) -> TestResult {
                         string_blob_mediumblob: \"average blob\"
                         string_blob_blob: \"very average blob\"
                         string_blob_longblob: \"loong looooong bloooooooob\"
-                        json: \"{ \\\"name\\\": null }\",
+                        json: \"{\\\"name\\\": null}\",
                     }
                 ) { id }
             }
@@ -172,7 +172,7 @@ async fn mysql_types_roundtrip(api: &TestApi) -> TestResult {
                     date_datetime
                     date_timestamp
                     # date_time
-                    # date_year
+                    date_year
                     string_char
                     string_varchar
                     string_text_tinytext
@@ -211,7 +211,7 @@ async fn mysql_types_roundtrip(api: &TestApi) -> TestResult {
                         "date_datetime": "2020-02-27T19:10:22.000Z",
                         "date_timestamp": "2020-02-27T19:11:22.000Z",
                         // "date_time": "2020-02-27T19:11:22.000Z",
-                        // "date_year": 2012,
+                        "date_year": 2012,
                         "string_char": "make dolphins easy",
                         "string_varchar": "dolphins of varying characters",
                         "string_text_tinytext": "tiny dolphins",
@@ -223,7 +223,7 @@ async fn mysql_types_roundtrip(api: &TestApi) -> TestResult {
                         "string_blob_mediumblob": "average blob",
                         "string_blob_blob": "very average blob",
                         "string_blob_longblob": "loong looooong bloooooooob",
-                        "json": "{ \"name\": null }",
+                        "json": "{\"name\": null}",
                     },
                 ]
             },

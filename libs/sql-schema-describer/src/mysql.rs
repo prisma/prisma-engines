@@ -460,7 +460,7 @@ fn get_column_type_and_enum(
         ("time", _) => ColumnTypeFamily::DateTime,
         ("datetime", _) => ColumnTypeFamily::DateTime,
         ("timestamp", _) => ColumnTypeFamily::DateTime,
-        ("year", _) => ColumnTypeFamily::DateTime,
+        ("year", _) => ColumnTypeFamily::Int,
         ("char", _) => ColumnTypeFamily::String,
         ("varchar", _) => ColumnTypeFamily::String,
         ("text", _) => ColumnTypeFamily::String,
