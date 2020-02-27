@@ -5,7 +5,8 @@ import util._
 
 class RelationsAsPartOfPrimaryKeySpec extends FlatSpec with Matchers with ApiSpecBase {
 
-  // Does the to one side have to be required??
+  //Todo Questions:
+  // Does the to one side have to be required?? It is an / part of an id so it would make sense
 
   //todo relation cardinalities
   // 1!:1!
@@ -14,19 +15,21 @@ class RelationsAsPartOfPrimaryKeySpec extends FlatSpec with Matchers with ApiSpe
   // 1:M
   // 1!:M
 
-  //todo relation variants
+  //todo @@Id
   // single id is also a relation
   // compound id contains simple relation + scalar
   // compound id contains compound relation field + scalar
   // compound id contains all compound relation fields + scalar
   // compound id is subset of compound relation field            (unlikely)
 
-  //todo possible mutations
-  // create                           | toplevel    done
-  // update                           | toplevel    done
-  // nested create                    | create      done
-  // nested update                    | update
-  // delete                           | toplevel
+  //todo @@Unique
+  // in place of @@id @@unique should behave similarly in most cases
+  // exception: if the @@unique fields exactly match the database field(s) of the relation than the @(@)unique is dropped
+  // the relation then becomes 1:1 in the datamodel
+  // Problem: Table with one fk field that is marked unique
+  // -> we generated 1:1 relation and don't put the unique on the datamodel
+  // -> we then comment it out since the datamodel has no unique even though there is one on the db level
+  // Solution: Either print the unique or treat 1:1 relation as a unique identifier
 
   "Using a simple id that is also a relation" should "work" in {
     val project = ProjectDsl.fromString {
@@ -45,6 +48,13 @@ class RelationsAsPartOfPrimaryKeySpec extends FlatSpec with Matchers with ApiSpe
        """
     }
     database.setup(project)
+
+    //todo possible mutations
+    // create                           | toplevel    done
+    // update                           | toplevel    done
+    // nested create                    | create      done
+    // nested update                    | update      done
+    // delete                           | toplevel    done
 
     val res1 = server.query(
       """
@@ -128,19 +138,58 @@ class RelationsAsPartOfPrimaryKeySpec extends FlatSpec with Matchers with ApiSpe
     database.setup(project)
 
     //todo possible mutations
-    // create                           | toplevel
-    // update                           | toplevel
-    // nested create                    | create
-    // nested connect                   | create
+    // create                           | toplevel    done
+    // update                           | toplevel    done
+    // nested create                    | create      done
+    // nested connect                   | create      done
     // nested create                    | update
     // nested update                    | update
     // nested connect                   | update
     // nested disconnect                | update
     // nested set                       | update
-    // nested delete                    | update
+    // nested delete                    | update      done
     // delete                           | toplevel
 
+    val res0 = server.query(
+      """
+        |mutation {
+        |  createChild(
+        |     data: {
+        |         id : 0,
+        |         name: "Peter"
+        | }
+        |  ){
+        |    id
+        |  }
+        |}
+      """,
+      project
+    )
+
+    res0.toString() should be("")
+
     val res1 = server.query(
+      """
+        |mutation {
+        |  createParent(
+        |     data: {
+        |         name: "Parker",
+        |         age: 10000,
+        |         child: {
+        |             connect:{id :0 }
+        |        }
+        |    }
+        |  ){
+        |    parents {age}
+        |  }
+        |}
+      """,
+      project
+    )
+
+    res1.toString() should be("")
+
+    val res2 = server.query(
       """
         |mutation {
         |  createChild(
@@ -155,7 +204,6 @@ class RelationsAsPartOfPrimaryKeySpec extends FlatSpec with Matchers with ApiSpe
         |             ]
         |        }
         |    }
-        | }
         |  ){
         |    parents {age}
         |  }
@@ -164,9 +212,25 @@ class RelationsAsPartOfPrimaryKeySpec extends FlatSpec with Matchers with ApiSpe
       project
     )
 
-    res1.toString() should be("")
+    res2.toString() should be("")
 
-    val res2 = server.query(
+    val res3 = server.query(
+      """
+        |mutation {
+        |  updateParent(
+        |     where: {child_name: {child: 1, name: "Panther"}}
+        |     data: { age 12}
+        |  ){
+        |    age
+        |  }
+        |}
+      """,
+      project
+    )
+
+    res3.toString() should be("")
+
+    val res4 = server.query(
       """
         |mutation {
         |  updateChild(
@@ -174,7 +238,7 @@ class RelationsAsPartOfPrimaryKeySpec extends FlatSpec with Matchers with ApiSpe
         |     data: {
         |         parents: {
         |             update:{
-        |                 where: {child_name: {child: 1, name: "Paul"}
+        |                 where: {child_name: {child: 1, name: "Panther"}
         |                 data: { age 12}
         |                 }
         |              }
@@ -189,7 +253,31 @@ class RelationsAsPartOfPrimaryKeySpec extends FlatSpec with Matchers with ApiSpe
       project
     )
 
-    res2.toString() should be("")
+    res4.toString() should be("")
+
+    val res6 = server.query(
+      """
+        |mutation {
+        |  updateChild(
+        |     where: {id: 1}
+        |     data: {
+        |         parents: {
+        |             delete:{
+        |                 where: {child_name: {child: 1, name: "Panther"}
+        |                 }
+        |              }
+        |        }
+        |    }
+        | }
+        |  ){
+        |    parents {age}
+        |  }
+        |}
+      """,
+      project
+    )
+
+    res6.toString() should be("")
 
   }
 
