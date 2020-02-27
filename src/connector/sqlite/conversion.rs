@@ -27,7 +27,7 @@ impl<'a> GetRow for SqliteRow<'a> {
                 },
                 ValueRef::Real(f) => ParameterizedValue::from(f),
                 ValueRef::Text(bytes) => ParameterizedValue::Text(String::from_utf8(bytes.to_vec())?.into()),
-                ValueRef::Blob(_) => panic!("Blobs not supported, yet"),
+                ValueRef::Blob(bytes) => ParameterizedValue::Bytes(bytes.to_owned().into()),
             };
 
             row.push(pv);
@@ -56,6 +56,7 @@ impl<'a> ToSql for ParameterizedValue<'a> {
             ParameterizedValue::Enum(cow) => ToSqlOutput::from(&**cow),
             ParameterizedValue::Boolean(boo) => ToSqlOutput::from(*boo),
             ParameterizedValue::Char(c) => ToSqlOutput::from(*c as u8),
+            ParameterizedValue::Bytes(bytes) => ToSqlOutput::from(bytes.as_ref()),
             #[cfg(feature = "array")]
             ParameterizedValue::Array(_) => unimplemented!("Arrays are not supported for sqlite."),
             #[cfg(feature = "json-1")]

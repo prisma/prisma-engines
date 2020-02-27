@@ -108,6 +108,7 @@ impl<'de> Deserializer<'de> for ParameterizedValueDeserializer<'de> {
 
         match self.0 {
             ParameterizedValue::Text(s) => visitor.visit_string(s.into_owned()),
+            ParameterizedValue::Bytes(bytes) => visitor.visit_bytes(bytes.as_ref()),
             ParameterizedValue::Enum(s) => visitor.visit_string(s.into_owned()),
             ParameterizedValue::Integer(i) => visitor.visit_i64(i),
             ParameterizedValue::Boolean(b) => visitor.visit_bool(b),

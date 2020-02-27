@@ -298,6 +298,7 @@ impl<'a> ToSql for ParameterizedValue<'a> {
                 _ => float.to_sql(ty, out),
             },
             ParameterizedValue::Text(string) => string.to_sql(ty, out),
+            ParameterizedValue::Bytes(bytes) => bytes.as_ref().to_sql(ty, out),
             ParameterizedValue::Enum(string) => {
                 out.extend_from_slice(string.as_bytes());
                 Ok(IsNull::No)
