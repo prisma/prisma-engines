@@ -36,7 +36,7 @@ const CREATE_TYPES_TABLE: &str = indoc! {
         `string_blob_mediumblob` mediumblob,
         `string_blob_blob` blob,
         `string_blob_longblob` longblob,
-        /* `string_enum` enum('0','1','2'), */
+        `string_enum` enum('pollicle_dogs','jellicle_cats'),
         `string_set` set('a','b','c'),
         `spatial_geometry` geometry,
         `spatial_point` point,
@@ -87,6 +87,7 @@ async fn mysql_types_roundtrip(api: &TestApi) -> TestResult {
             .assert_field_type("string_blob_mediumblob", ScalarType::String)?
             .assert_field_type("string_blob_blob", ScalarType::String)?
             .assert_field_type("string_blob_longblob", ScalarType::String)?
+            .assert_field_enum_type("string_enum", "types_string_enum")?
             .assert_field_type("string_set", ScalarType::String)?
             .assert_field_type("spatial_geometry", ScalarType::String)?
             .assert_field_type("spatial_point", ScalarType::String)?
@@ -132,7 +133,8 @@ async fn mysql_types_roundtrip(api: &TestApi) -> TestResult {
                         string_blob_mediumblob: \"average blob\"
                         string_blob_blob: \"very average blob\"
                         string_blob_longblob: \"loong looooong bloooooooob\"
-                        json: \"{\\\"name\\\": null}\",
+                        string_enum: \"jellicle_cats\"
+                        json: \"{\\\"name\\\": null}\"
                     }
                 ) { id }
             }
@@ -184,6 +186,7 @@ async fn mysql_types_roundtrip(api: &TestApi) -> TestResult {
                     string_blob_mediumblob
                     string_blob_blob
                     string_blob_longblob
+                    string_enum
                     # omitting spatial/geometry types
                     json
                 }
@@ -223,6 +226,7 @@ async fn mysql_types_roundtrip(api: &TestApi) -> TestResult {
                         "string_blob_mediumblob": "average blob",
                         "string_blob_blob": "very average blob",
                         "string_blob_longblob": "loong looooong bloooooooob",
+                        "string_enum": "jellicle_cats",
                         "json": "{\"name\": null}",
                     },
                 ]

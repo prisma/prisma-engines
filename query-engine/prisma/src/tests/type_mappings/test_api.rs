@@ -91,6 +91,23 @@ impl<'a> ModelAssertions<'a> {
 
         Ok(self)
     }
+
+    pub fn assert_field_enum_type(self, name: &str, enum_name: &str) -> anyhow::Result<Self> {
+        let field = self
+            .0
+            .find_field(name)
+            .ok_or_else(|| anyhow::anyhow!("Assertion error: could not find field {}", name))?;
+
+        anyhow::ensure!(
+            field.field_type == datamodel::dml::FieldType::Enum(enum_name.into()),
+            "Assertion error: expected the field {} to have enum type {:?}, but found {:?}",
+            field.name,
+            enum_name,
+            &field.field_type,
+        );
+
+        Ok(self)
+    }
 }
 
 pub async fn mysql_8_test_api(db_name: &str) -> TestApi {
