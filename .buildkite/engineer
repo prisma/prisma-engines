@@ -11,9 +11,9 @@ fi
 
 # Check if the system has engineer installed, if not, use a local copy.
 if ! type "engineer" > /dev/null; then
-    set -e
     # Setup Prisma engine build & test tool (engineer).
-    curl --fail -sSL "https://prisma-engineer.s3.amazonaws.com/dom/test_complexity/4cd3eb3e6cc61452466a60d546ce0c7e4708e324/$OS/engineer.gz" --output engineer.gz
+    set -e
+    curl --fail -sSL "https://prisma-engineer.s3-eu-west-1.amazonaws.com/dom/test_complexity/6cda8bcb2750808e9e0b0dbc468f7f1cab4b789c/$OS/engineer.gz" --output engineer.gz
     gzip -d engineer.gz
     chmod +x engineer
 
@@ -21,7 +21,7 @@ if ! type "engineer" > /dev/null; then
     ./engineer $@
     rm -rf ./engineer
 else
-    set -e
     # Already installed on the system
+    set -e
     engineer $@
 fi
