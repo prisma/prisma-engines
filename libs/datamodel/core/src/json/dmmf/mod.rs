@@ -59,6 +59,7 @@ pub struct Model {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub documentation: Option<String>,
     pub id_fields: Vec<String>,
+    pub unique_fields: Vec<Vec<String>>,
 }
 
 #[serde(rename_all = "camelCase")]

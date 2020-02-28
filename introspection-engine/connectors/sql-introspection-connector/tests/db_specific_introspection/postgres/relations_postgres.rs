@@ -500,6 +500,7 @@ async fn introspecting_id_fields_with_foreign_key_should_ignore_the_relation(api
     let dm = r#"
             model Post {
                test    String
+               /// This used to be part of a relation to User
                user_id Int @id
             }
 

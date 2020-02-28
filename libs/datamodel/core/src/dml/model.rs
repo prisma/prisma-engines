@@ -66,6 +66,11 @@ impl Model {
         self.fields.push(field)
     }
 
+    /// Add fields to this model.
+    pub fn add_fields(&mut self, fields: &mut Vec<Field>) {
+        self.fields.append(fields)
+    }
+
     /// Removes a field with the given name from this model.
     pub fn remove_field(&mut self, name: &str) {
         self.fields.retain(|f| f.name != name);

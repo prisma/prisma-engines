@@ -1,6 +1,6 @@
 use super::*;
 use crate::common::ScalarType;
-use crate::dml;
+use crate::{dml, IndexType};
 use serde_json;
 
 pub fn render_to_dmmf(schema: &dml::Datamodel) -> String {
@@ -61,6 +61,17 @@ fn model_to_dmmf(model: &dml::Model) -> Model {
         is_generated: Some(model.is_generated),
         documentation: model.documentation.clone(),
         id_fields: model.id_fields.clone(),
+        unique_fields: model
+            .indices
+            .iter()
+            .filter_map(|i| {
+                if i.tpe == IndexType::Unique {
+                    Some(i.fields.clone())
+                } else {
+                    None
+                }
+            })
+            .collect(),
     }
 }
 

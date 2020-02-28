@@ -252,6 +252,7 @@ model Post {
   user User
 }"#;
 
+// <<<<<<< HEAD
 // #[test]
 // fn should_serialize_dmmf_without_relation_name_correctly() {
 //     let dml = datamodel::json::dmmf::parse_from_dmmf(DMFF_WITHOUT_RELATION_NAME);
@@ -276,3 +277,30 @@ model Post {
 //
 //     rendered
 // }
+// =======
+// #[test]
+// #[ignore]
+// fn should_serialize_dmmf_without_relation_name_correctly() {
+//     let dml = datamodel::json::dmmf::parse_from_dmmf(DMFF_WITHOUT_RELATION_NAME);
+//     let rendered = datamodel::render_datamodel_to_string(&dml).unwrap();
+//
+//     assert_eq!(DML_WITHOUT_RELATION_NAME, rendered);
+// }
+//
+// fn dmmf_roundtrip(input: &str) -> String {
+//     let dml = datamodel::parse_datamodel(input).unwrap();
+//     let config = datamodel::parse_configuration(input).unwrap();
+//
+//     let dmmf = datamodel::json::dmmf::render_to_dmmf(&dml);
+//     let mcf = datamodel::json::mcf::config_to_mcf_json(&config);
+//
+//     let dml2 = datamodel::json::dmmf::parse_from_dmmf(&dmmf);
+//     let config = datamodel::json::mcf::config_from_mcf_json(&mcf);
+//
+//     let rendered = datamodel::render_datamodel_and_config_to_string(&dml2, &config).unwrap();
+//
+//     println!("{}", rendered);
+//
+//     rendered
+// }
+// >>>>>>> master

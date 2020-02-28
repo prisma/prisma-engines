@@ -11,7 +11,7 @@ release:
 	cargo build --release
 
 all-dbs:
-	docker-compose -f docker-compose.yml up  -d --remove-orphans mysql-5-7 mysql-8-0 mariadb-10-0 postgres9 postgres10 postgres11 postgres12
+	docker-compose -f docker-compose.yml up  -d --remove-orphans
 
 dev-sqlite:
 	echo 'sqlite' > current_connector

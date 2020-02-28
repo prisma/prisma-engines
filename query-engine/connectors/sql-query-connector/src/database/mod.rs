@@ -16,7 +16,7 @@ pub use sqlite::*;
 
 #[async_trait]
 pub trait FromSource {
-    async fn from_source(source: &dyn Source) -> crate::Result<Self>
+    async fn from_source(source: &dyn Source) -> connector_interface::Result<Self>
     where
         Self: Connector + Sized;
 }
