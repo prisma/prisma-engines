@@ -346,3 +346,46 @@ async fn repro_matt_references_on_wrong_side(api: &TestApi) {
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
+
+#[test_each_connector(tags("postgres"))]
+#[test]
+async fn compound_fk_pk(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("a", |t| {
+                t.add_column("one", types::integer().nullable(false));
+                t.add_column("two", types::integer().nullable(false));
+                t.inject_custom("Primary Key (\"one\", \"two\")");
+            });
+            migration.create_table("b", |t| {
+                t.add_column("dummy", types::integer().nullable(false));
+                t.add_column("one", types::integer().nullable(false));
+                t.add_column("two", types::integer().nullable(false));
+                t.inject_custom("Foreign Key (\"one\", \"two\") references a(\"one\", \"two\")");
+                t.inject_custom("Primary Key (\"dummy\",\"one\", \"two\")");
+            });
+        })
+        .await;
+
+    let dm = r#"
+            model a {
+              one Int
+              two Int
+                    
+              @@id([one, two])
+            }
+            
+            model b {
+              dummy     Int 
+              /// This used to be part of a relation to a
+              one       Int
+              /// This used to be part of a relation to a
+              two       Int
+            
+              @@id([dummy, one, two])
+            }         
+        "#;
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+}

@@ -43,6 +43,15 @@ pub fn postgres_9_url(db_name: &str) -> String {
     )
 }
 
+pub fn pgbouncer_url(db_name: &str) -> String {
+    let (host, port) = db_host_and_port_for_pgbouncer();
+
+    format!(
+        "postgresql://postgres:prisma@{}:{}/{}?schema={}",
+        host, port, db_name, SCHEMA_NAME
+    )
+}
+
 pub fn postgres_10_url(db_name: &str) -> String {
     let (host, port) = db_host_and_port_postgres_10();
 
@@ -122,6 +131,13 @@ fn db_host_and_port_postgres_10() -> (&'static str, usize) {
     }
 }
 
+fn db_host_and_port_for_pgbouncer() -> (&'static str, usize) {
+    match std::env::var("IS_BUILDKITE") {
+        Ok(_) => ("test-db-pgbouncer", 6432),
+        Err(_) => ("127.0.0.1", 6432),
+    }
+}
+
 fn db_host_and_port_postgres_11() -> (&'static str, usize) {
     match std::env::var("IS_BUILDKITE") {
         Ok(_) => ("test-db-postgres-11", 5432),
@@ -167,6 +183,19 @@ pub fn postgres_9_test_config(db_name: &str) -> String {
         }}
     "#,
         postgres_9_url(db_name)
+    )
+}
+
+pub fn pgbouncer_test_config(db_name: &str) -> String {
+    format!(
+        r#"
+        datasource my_db {{
+            provider = "postgresql"
+            url = "{}"
+            default = true
+        }}
+    "#,
+        pgbouncer_url(db_name)
     )
 }
 
@@ -219,6 +248,32 @@ pub fn mysql_test_config(db_name: &str) -> String {
         }}
     "#,
         mysql_url(db_name)
+    )
+}
+
+pub fn mysql_8_test_config(db_name: &str) -> String {
+    format!(
+        r#"
+        datasource my_db {{
+            provider = "mysql"
+            url = "{}"
+            default = true
+        }}
+    "#,
+        mysql_8_url(db_name)
+    )
+}
+
+pub fn mariadb_test_config(db_name: &str) -> String {
+    format!(
+        r#"
+        datasource my_db {{
+            provider = "mysql"
+            url = "{}"
+            default = true
+        }}
+    "#,
+        mariadb_url(db_name),
     )
 }
 

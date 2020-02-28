@@ -183,6 +183,12 @@ pub struct SchemaParserError {
     pub full_error: String,
 }
 
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(code = "P1013", message = "The provided database string is invalid. ${details}")]
+pub struct InvalidDatabaseString {
+    pub details: String,
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

@@ -97,7 +97,12 @@ pub(crate) fn calculate_compound_index(index: &Index, name: String) -> IndexDefi
     }
 }
 
-pub(crate) fn calculate_scalar_field(schema: &SqlSchema, table: &Table, column: &Column) -> Field {
+pub(crate) fn calculate_scalar_field(
+    schema: &SqlSchema,
+    table: &Table,
+    column: &Column,
+    comment: Option<String>,
+) -> Field {
     debug!("Handling column {:?}", column);
     let field_type = calculate_field_type(&schema, &column, &table);
     let arity = match column.tpe.arity {
@@ -119,7 +124,7 @@ pub(crate) fn calculate_scalar_field(schema: &SqlSchema, table: &Table, column: 
         default_value,
         is_unique,
         is_id,
-        documentation: None,
+        documentation: comment,
         is_generated: false,
         is_updated_at: false,
         data_source_fields: vec![],
@@ -131,19 +136,33 @@ pub(crate) fn calculate_relation_field(
     table: &Table,
     foreign_key: &ForeignKey,
     foreign_keys: &Vec<ForeignKey>,
-) -> Field {
+) -> Vec<Field> {
     debug!("Handling compound foreign key  {:?}", foreign_key);
-
-    //todo this ignores relations on id fields of length 1, the problem persists for compound id fields
+    //if at least one primary key column is contained in the foreign key drop the relation.
     if table.primary_key.is_some()
-        && table.primary_key.as_ref().unwrap().columns == foreign_key.columns
-        && foreign_key.columns.len() == 1
+        && table
+            .primary_key
+            .as_ref()
+            .unwrap()
+            .columns
+            .iter()
+            .any(|c| foreign_key.columns.contains(c))
     {
-        calculate_scalar_field(
-            schema,
-            table,
-            table.columns.iter().find(|c| c.name == foreign_key.columns[0]).unwrap(),
-        )
+        foreign_key
+            .columns
+            .iter()
+            .map(|fk_column| {
+                calculate_scalar_field(
+                    schema,
+                    table,
+                    table.columns.iter().find(|c| c.name == *fk_column).unwrap(),
+                    Some(format!(
+                        "This used to be part of a relation to {}",
+                        foreign_key.referenced_table.clone()
+                    )),
+                )
+            })
+            .collect()
     } else {
         let field_type = FieldType::Relation(RelationInfo {
             name: calculate_relation_name(schema, foreign_key, table),
@@ -187,7 +206,7 @@ pub(crate) fn calculate_relation_field(
             ),
         };
 
-        Field {
+        vec![Field {
             name,
             arity,
             field_type,
@@ -199,7 +218,7 @@ pub(crate) fn calculate_relation_field(
             is_generated: false,
             is_updated_at: false,
             data_source_fields: vec![],
-        }
+        }]
     }
 }
 
@@ -292,6 +311,14 @@ pub(crate) fn is_id(column: &Column, table: &Table) -> bool {
         .unwrap_or(false)
 }
 
+pub(crate) fn is_part_of_id(column: &Column, table: &Table) -> bool {
+    table
+        .primary_key
+        .as_ref()
+        .map(|pk| pk.columns.contains(&column.name))
+        .unwrap_or(false)
+}
+
 pub(crate) fn is_sequence(column: &Column, table: &Table) -> bool {
     table
         .primary_key
@@ -340,7 +367,7 @@ pub(crate) fn calculate_field_type(schema: &SqlSchema, column: &Column, table: &
     debug!("Calculating field type for '{}'", column.name);
     // Look for a foreign key referencing this column
     match table.foreign_keys.iter().find(|fk| fk.columns.contains(&column.name)) {
-        Some(fk) if !is_id(column, table) => {
+        Some(fk) if !is_id(column, table) && !is_part_of_id(column, table) => {
             debug!("Found corresponding foreign key");
             let idx = fk
                 .columns

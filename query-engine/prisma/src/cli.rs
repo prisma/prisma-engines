@@ -98,7 +98,7 @@ impl CliCommand {
     }
 
     fn dmmf(request: DmmfRequest) -> PrismaResult<()> {
-        let (v2components, template) = load_data_model_components()?;
+        let (v2components, template) = load_data_model_components(true)?;
 
         // temporary code duplication
         let internal_data_model = template.build("".into());
@@ -132,7 +132,7 @@ impl CliCommand {
     }
 
     fn get_config(input: String) -> PrismaResult<()> {
-        let config = load_configuration(&input)?;
+        let config = load_configuration(&input, false)?;
         let json = datamodel::json::mcf::config_to_mcf_json_value(&config);
         let serialized = serde_json::to_string(&json)?;
 

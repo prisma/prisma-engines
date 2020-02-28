@@ -6,6 +6,7 @@ impl From<&quaint::error::DatabaseConstraint> for crate::query_engine::DatabaseC
         match other {
             quaint::error::DatabaseConstraint::Fields(fields) => Self::Fields(fields.to_vec()),
             quaint::error::DatabaseConstraint::Index(index) => Self::Index(index.to_string()),
+            quaint::error::DatabaseConstraint::ForeignKey => Self::ForeignKey,
         }
     }
 }
@@ -15,6 +16,7 @@ impl From<quaint::error::DatabaseConstraint> for crate::query_engine::DatabaseCo
         match other {
             quaint::error::DatabaseConstraint::Fields(fields) => Self::Fields(fields.to_vec()),
             quaint::error::DatabaseConstraint::Index(index) => Self::Index(index.to_string()),
+            quaint::error::DatabaseConstraint::ForeignKey => Self::ForeignKey,
         }
     }
 }
@@ -135,6 +137,13 @@ pub fn render_quaint_error(kind: &ErrorKind, connection_info: &ConnectionInfo) -
             KnownError::new(common::DatabaseNotReachable {
                 database_host: url.host().to_owned(),
                 database_port: url.port(),
+            })
+            .ok()
+        }
+
+        (ErrorKind::DatabaseUrlIsInvalid(details), _connection_info) => {
+            KnownError::new(common::InvalidDatabaseString {
+                details: details.to_owned(),
             })
             .ok()
         }

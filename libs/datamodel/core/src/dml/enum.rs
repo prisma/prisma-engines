@@ -88,6 +88,15 @@ impl EnumValue {
             database_name: database_name.map(String::from),
         }
     }
+
+    /// The effective database name, i.e. the name in the @map annotation, and failing that the
+    /// identifier name.
+    pub fn final_database_name(&self) -> &str {
+        self.database_name
+            .as_ref()
+            .map(String::as_str)
+            .unwrap_or(self.name.as_str())
+    }
 }
 
 impl WithName for EnumValue {
