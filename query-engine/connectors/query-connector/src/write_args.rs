@@ -1,5 +1,5 @@
 use chrono::Utc;
-use prisma_models::{ModelIdentifier, ModelRef, PrismaValue, RecordIdentifier};
+use prisma_models::{ModelProjection, ModelRef, PrismaValue, RecordProjection};
 use std::collections::{hash_map::Keys, HashMap};
 
 /// WriteArgs represent data to be written to an underlying data source.
@@ -88,8 +88,8 @@ impl WriteArgs {
         }
     }
 
-    pub fn as_record_identifier(&self, id: ModelIdentifier) -> Option<RecordIdentifier> {
-        let pairs: Vec<_> = id
+    pub fn as_record_projection(&self, model_projection: ModelProjection) -> Option<RecordProjection> {
+        let pairs: Vec<_> = model_projection
             .data_source_fields()
             .map(|dsf| {
                 let val = match self.get_field_value(dsf.name.as_str()) {
