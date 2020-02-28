@@ -85,7 +85,7 @@ impl Model {
     /// 4. If all of the above fails, we panic. Models with no unique / ID are not supported (yet).
     ///
     /// This relies entirely on the datamodel parsing and conversion to have a stable ordering of fields.
-    pub fn primary_identifier(&self) -> ModelIdentifier {
+    pub fn primary_identifier(&self) -> ModelProjection {
         let fields: Vec<_> = self
             .fields()
             .id()
@@ -108,7 +108,7 @@ impl Model {
                 self.name
             ));
 
-        ModelIdentifier::new(fields.into_iter().map(Into::into).collect())
+        ModelProjection::new(fields.into_iter().map(Into::into).collect())
     }
 
     pub fn fields(&self) -> &Fields {

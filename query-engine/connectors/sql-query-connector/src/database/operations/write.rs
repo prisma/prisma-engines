@@ -7,9 +7,8 @@ use std::{collections::HashMap, convert::TryFrom};
 use user_facing_errors::query_engine::DatabaseConstraint;
 
 /// Create a single record to the database defined in `conn`, resulting into a
-/// `RecordIdentifier` as a unique identifier pointing to the just-created
-/// record.
-pub async fn create_record(conn: &dyn QueryExt, model: &ModelRef, args: WriteArgs) -> crate::Result<RecordIdentifier> {
+/// `RecordProjection` as an identifier pointing to the just-created record.
+pub async fn create_record(conn: &dyn QueryExt, model: &ModelRef, args: WriteArgs) -> crate::Result<RecordProjection> {
     let (insert, returned_id) = write::create_record(model, args);
 
     let result_set = match conn.insert(insert).await {
@@ -28,7 +27,6 @@ pub async fn create_record(conn: &dyn QueryExt, model: &ModelRef, args: WriteArg
                     let constraint = DatabaseConstraint::ForeignKey;
                     return Err(SqlError::UniqueConstraintViolation { constraint });
                 }
-
             },
             ErrorKind::NullConstraintViolation { constraint } => match constraint {
                 quaint::error::DatabaseConstraint::Index(name) => {
@@ -53,7 +51,7 @@ pub async fn create_record(conn: &dyn QueryExt, model: &ModelRef, args: WriteArg
         (Some(identifier), _, _) if !identifier.misses_autogen_value() => Ok(identifier),
 
         // PostgreSQL with a working RETURNING statement
-        (_, n, _) if n > 0 => Ok(RecordIdentifier::try_from((&model.primary_identifier(), result_set))?),
+        (_, n, _) if n > 0 => Ok(RecordProjection::try_from((&model.primary_identifier(), result_set))?),
 
         // We have an auto-incremented id that we got from MySQL or SQLite
         (Some(mut identifier), _, Some(num)) if identifier.misses_autogen_value() => {
@@ -73,16 +71,16 @@ pub async fn update_records(
     model: &ModelRef,
     where_: Filter,
     args: WriteArgs,
-) -> crate::Result<Vec<RecordIdentifier>> {
+) -> crate::Result<Vec<RecordProjection>> {
     let ids = conn.filter_ids(model, where_.clone()).await?;
-    let id_args = pick_id_args(&model.primary_identifier(), &args);
+    let id_args = pick_args(&model.primary_identifier(), &args);
 
     if ids.len() == 0 {
         return Ok(vec![]);
     }
 
     let updates = {
-        let ids: Vec<&RecordIdentifier> = ids.iter().map(|id| &*id).collect();
+        let ids: Vec<&RecordProjection> = ids.iter().map(|id| &*id).collect();
         write::update_many(model, ids.as_slice(), args)?
     };
 
@@ -98,7 +96,7 @@ pub async fn update_records(
 /// [DTODO] The filter id query is probably not necessary.
 pub async fn delete_records(conn: &dyn QueryExt, model: &ModelRef, where_: Filter) -> crate::Result<usize> {
     let ids = conn.filter_ids(model, where_.clone()).await?;
-    let ids: Vec<&RecordIdentifier> = ids.iter().map(|id| &*id).collect();
+    let ids: Vec<&RecordProjection> = ids.iter().map(|id| &*id).collect();
     let count = ids.len();
 
     if count == 0 {
@@ -117,8 +115,8 @@ pub async fn delete_records(conn: &dyn QueryExt, model: &ModelRef, where_: Filte
 pub async fn connect(
     conn: &dyn QueryExt,
     field: &RelationFieldRef,
-    parent_id: &RecordIdentifier,
-    child_ids: &[RecordIdentifier],
+    parent_id: &RecordProjection,
+    child_ids: &[RecordProjection],
 ) -> crate::Result<()> {
     let query = write::create_relation_table_records(field, parent_id, child_ids);
     conn.query(query).await?;
@@ -131,8 +129,8 @@ pub async fn connect(
 pub async fn disconnect(
     conn: &dyn QueryExt,
     field: &RelationFieldRef,
-    parent_id: &RecordIdentifier,
-    child_ids: &[RecordIdentifier],
+    parent_id: &RecordProjection,
+    child_ids: &[RecordProjection],
 ) -> crate::Result<()> {
     let query = write::delete_relation_table_records(field, parent_id, child_ids);
     conn.delete(query).await?;
@@ -152,9 +150,9 @@ pub async fn execute_raw(
 }
 
 /// Picks all arguments out of `args` that are updating a value for a field
-/// contained in `id`, as those need to be merged into the record ids later on.
-fn pick_id_args(id: &ModelIdentifier, args: &WriteArgs) -> WriteArgs {
-    let pairs: Vec<_> = id
+/// contained in `projection`, as those need to be merged into the records later on.
+fn pick_args(projection: &ModelProjection, args: &WriteArgs) -> WriteArgs {
+    let pairs: Vec<_> = projection
         .data_source_fields()
         .into_iter()
         .filter_map(|dsf| args.get_field_value(&dsf.name).map(|v| (dsf.name.clone(), v.clone())))
@@ -164,7 +162,7 @@ fn pick_id_args(id: &ModelIdentifier, args: &WriteArgs) -> WriteArgs {
 }
 
 /// Merges the arg values into the given ids. Overwrites existing values.
-fn merge_write_args(ids: Vec<RecordIdentifier>, args: WriteArgs) -> Vec<RecordIdentifier> {
+fn merge_write_args(ids: Vec<RecordProjection>, args: WriteArgs) -> Vec<RecordProjection> {
     if ids.is_empty() || args.is_empty() {
         return ids;
     }

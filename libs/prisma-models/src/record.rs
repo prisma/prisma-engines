@@ -1,279 +1,4 @@
-use crate::{
-    dml::FieldArity, DataSourceFieldRef, DomainError, Field, ModelRef, PrismaValue, PrismaValueExtensions,
-    TypeIdentifier,
-};
-use itertools::Itertools;
-use std::{collections::HashMap, convert::TryFrom};
-
-/// Collection of fields that uniquely identify a record of a model. There can
-/// be different sets of fields at the same time identifying a model.
-#[derive(Debug, Clone, Default, PartialEq)]
-pub struct ModelIdentifier {
-    fields: Vec<Field>,
-}
-
-impl From<Field> for ModelIdentifier {
-    fn from(f: Field) -> Self {
-        Self { fields: vec![f] }
-    }
-}
-
-impl ModelIdentifier {
-    pub fn model(&self) -> ModelRef {
-        self.fields[0].model()
-    }
-
-    pub fn new(fields: Vec<Field>) -> Self {
-        Self { fields }
-    }
-
-    pub fn names<'a>(&'a self) -> impl Iterator<Item = &'a str> + 'a {
-        self.fields.iter().map(|field| field.name())
-    }
-
-    pub fn db_names<'a>(&'a self) -> impl Iterator<Item = String> + 'a {
-        self.data_source_fields().map(|dsf| dsf.name.clone())
-    }
-
-    pub fn fields<'a>(&'a self) -> impl Iterator<Item = &'a Field> + 'a {
-        self.fields.iter()
-    }
-
-    /// Returns the length of schema model fields contained in this identifier.
-    /// This is **not** the length of the underlying database fields, use `db_len` instead.
-    pub fn len(&self) -> usize {
-        self.fields.len()
-    }
-
-    /// Returns the length of data source fields contained in this identifier.
-    pub fn db_len(&self) -> usize {
-        self.data_source_fields().count()
-    }
-
-    pub fn is_singular_field(&self) -> bool {
-        self.len() == 1
-    }
-
-    pub fn get(&self, name: &str) -> Option<&Field> {
-        self.fields().find(|field| field.name() == name)
-    }
-
-    // [DTODO] Hack to ignore m2m fields, remove when no dsfs are set on m2m rels anymore.
-    pub fn data_source_fields<'a>(&'a self) -> impl Iterator<Item = DataSourceFieldRef> + 'a {
-        self.fields
-            .iter()
-            .flat_map(|field| match field {
-                Field::Scalar(sf) => vec![sf.data_source_field().clone()],
-                Field::Relation(rf) if rf.relation().is_many_to_many() => vec![],
-                Field::Relation(rf) => rf.data_source_fields().to_vec(),
-            })
-            .into_iter()
-    }
-
-    pub fn map_db_name(&self, name: &str) -> Option<&DataSourceFieldRef> {
-        self.fields().find_map(|field| match field {
-            Field::Scalar(sf) if sf.data_source_field().name == name => Some(sf.data_source_field()),
-            Field::Relation(rf) => rf.data_source_fields().iter().find(|dsf| dsf.name == name),
-            _ => None,
-        })
-    }
-
-    pub fn type_identifiers_with_arities(&self) -> Vec<(TypeIdentifier, FieldArity)> {
-        self.data_source_fields()
-            .map(|dsf| (dsf.field_type.into(), dsf.arity))
-            .collect()
-    }
-
-    /// Checks if a given `RecordIdentifier` belongs to this `ModelIdentifier`.
-    pub fn matches(&self, id: &RecordIdentifier) -> bool {
-        self.data_source_fields().eq(id.fields())
-    }
-
-    /// Inserts this model identifiers data source fields into the given record identifier.
-    /// Assumes caller knows that the exchange can be done. Errors if lengths mismatch.
-    /// Additionally performs a type coercion based on the source and destination field types.
-    /// (Resistance is futile.)
-    pub fn assimilate(&self, id: RecordIdentifier) -> crate::Result<RecordIdentifier> {
-        if self.db_len() != id.len() {
-            Err(DomainError::ConversionFailure(
-                "record identifier".to_owned(),
-                "assimilated record identifier".to_owned(),
-            ))
-        } else {
-            let fields = self.data_source_fields();
-
-            Ok(id
-                .pairs
-                .into_iter()
-                .zip(fields)
-                .map(|((og_field, value), other_field)| {
-                    if og_field.field_type != other_field.field_type {
-                        let coerce_to: TypeIdentifier = other_field.field_type.into();
-                        Ok((other_field, value.coerce(coerce_to)?))
-                    } else {
-                        Ok((other_field, value))
-                    }
-                })
-                .collect::<crate::Result<Vec<_>>>()?
-                .into())
-        }
-    }
-
-    pub fn empty_record_id(&self) -> RecordIdentifier {
-        self.data_source_fields()
-            .map(|dsf| (dsf.clone(), PrismaValue::Null))
-            .collect::<Vec<_>>()
-            .into()
-    }
-
-    /// Consumes both `ModelIdentifier`s to create a new one that contains
-    /// both fields. Each field is contained exactly once, with the first
-    /// occurrence of the first field in order from left (`self`) to right (`other`)
-    /// is retained. Assumes that both identifiers reason over the same model.
-    pub fn merge(self, other: ModelIdentifier) -> ModelIdentifier {
-        assert_eq!(self.model(), other.model());
-        let fields = self.fields.into_iter().chain(other.fields).unique().collect();
-
-        ModelIdentifier { fields }
-    }
-
-    /// Creates a record identifier from raw values.
-    /// No checks for length, type, or similar is performed, hence "unchecked".
-    pub fn from_unchecked(&self, values: Vec<PrismaValue>) -> RecordIdentifier {
-        RecordIdentifier::new(self.data_source_fields().zip(values).collect())
-    }
-}
-
-impl IntoIterator for ModelIdentifier {
-    type Item = Field;
-    type IntoIter = std::vec::IntoIter<Self::Item>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        self.fields.into_iter()
-    }
-}
-
-/// Collection of field to value pairs corresponding to a ModelIdentifier the record belongs to.
-#[derive(Default, Debug, Clone, PartialEq, Eq, Hash)]
-pub struct RecordIdentifier {
-    pub pairs: Vec<(DataSourceFieldRef, PrismaValue)>,
-}
-
-impl RecordIdentifier {
-    pub fn new(pairs: Vec<(DataSourceFieldRef, PrismaValue)>) -> Self {
-        Self { pairs }
-    }
-
-    pub fn add(&mut self, pair: (DataSourceFieldRef, PrismaValue)) {
-        self.pairs.push(pair);
-    }
-
-    pub fn fields(&self) -> impl Iterator<Item = DataSourceFieldRef> + '_ {
-        self.pairs.iter().map(|p| p.0.clone())
-    }
-
-    pub fn values(&self) -> impl Iterator<Item = PrismaValue> + '_ {
-        self.pairs.iter().map(|p| p.1.clone())
-    }
-
-    pub fn len(&self) -> usize {
-        self.pairs.len()
-    }
-
-    pub fn is_empty(&self) -> bool {
-        self.len() == 0
-    }
-
-    pub fn misses_autogen_value(&self) -> bool {
-        self.pairs.iter().any(|p| p.1.is_null())
-    }
-
-    pub fn add_autogen_value<V>(&mut self, value: V) -> bool
-    where
-        V: Into<PrismaValue>,
-    {
-        for pair in self.pairs.iter_mut() {
-            if pair.1.is_null() {
-                pair.1 = value.into();
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /// Consumes this identifier and splits it into a set of `RecordIdentifier`s based on the passed
-    /// `ModelIdentifier`s. Assumes that The transformation can be done.
-    pub fn split_into(self, identifiers: &[ModelIdentifier]) -> Vec<RecordIdentifier> {
-        let mapped: HashMap<String, (DataSourceFieldRef, PrismaValue)> = self
-            .into_iter()
-            .map(|(dsf, val)| (dsf.name.clone(), (dsf, val)))
-            .collect();
-
-        identifiers
-            .into_iter()
-            .map(|ident| {
-                ident
-                    .data_source_fields()
-                    .map(|dsf| {
-                        let entry = mapped
-                            .get(&dsf.name)
-                            .expect("Error splitting RecordIdentifier: ModelIdentifier doesn't match.")
-                            .clone();
-
-                        entry
-                    })
-                    .collect::<Vec<_>>()
-                    .into()
-            })
-            .collect()
-    }
-
-    // [DTODO] Remove
-    pub fn single_value(&self) -> PrismaValue {
-        assert_eq!(
-            self.pairs.len(),
-            1,
-            "This function must only be called on singular record identifiers"
-        );
-        self.pairs.iter().next().unwrap().1.clone()
-    }
-}
-
-impl TryFrom<RecordIdentifier> for PrismaValue {
-    type Error = DomainError;
-
-    fn try_from(id: RecordIdentifier) -> crate::Result<Self> {
-        match id.pairs.into_iter().next() {
-            Some(value) => Ok(value.1),
-            None => Err(DomainError::ConversionFailure(
-                "RecordIdentifier".into(),
-                "PrismaValue".into(),
-            )),
-        }
-    }
-}
-
-impl IntoIterator for RecordIdentifier {
-    type Item = (DataSourceFieldRef, PrismaValue);
-    type IntoIter = std::vec::IntoIter<Self::Item>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        self.pairs.into_iter()
-    }
-}
-
-impl From<(DataSourceFieldRef, PrismaValue)> for RecordIdentifier {
-    fn from(tup: (DataSourceFieldRef, PrismaValue)) -> Self {
-        Self::new(vec![tup])
-    }
-}
-
-impl From<Vec<(DataSourceFieldRef, PrismaValue)>> for RecordIdentifier {
-    fn from(tup: Vec<(DataSourceFieldRef, PrismaValue)>) -> Self {
-        Self::new(tup)
-    }
-}
+use crate::{DataSourceFieldRef, DomainError, ModelProjection, PrismaValue, RecordProjection};
 
 #[derive(Debug, Clone)]
 pub struct SingleRecord {
@@ -295,8 +20,8 @@ impl SingleRecord {
         Self { record, field_names }
     }
 
-    pub fn identifier(&self, id: &ModelIdentifier) -> crate::Result<RecordIdentifier> {
-        self.record.identifier(&self.field_names, id)
+    pub fn projection(&self, projection: &ModelProjection) -> crate::Result<RecordProjection> {
+        self.record.projection(&self.field_names, projection)
     }
 
     pub fn get_field_value(&self, field: &str) -> crate::Result<&PrismaValue> {
@@ -311,10 +36,14 @@ pub struct ManyRecords {
 }
 
 impl ManyRecords {
-    pub fn identifiers(&self, model_id: &ModelIdentifier) -> crate::Result<Vec<RecordIdentifier>> {
+    pub fn projections(&self, model_projection: &ModelProjection) -> crate::Result<Vec<RecordProjection>> {
         self.records
             .iter()
-            .map(|record| record.identifier(&self.field_names, model_id).map(|i| i.clone()))
+            .map(|record| {
+                record
+                    .projection(&self.field_names, model_projection)
+                    .map(|i| i.clone())
+            })
             .collect()
     }
 
@@ -342,7 +71,7 @@ impl ManyRecords {
 #[derive(Debug, Default, Clone)]
 pub struct Record {
     pub values: Vec<PrismaValue>,
-    pub parent_id: Option<RecordIdentifier>,
+    pub parent_id: Option<RecordProjection>,
 }
 
 impl Record {
@@ -353,12 +82,16 @@ impl Record {
         }
     }
 
-    pub fn identifier(&self, field_names: &[String], id: &ModelIdentifier) -> crate::Result<RecordIdentifier> {
-        let pairs: Vec<(DataSourceFieldRef, PrismaValue)> = id
+    pub fn projection(
+        &self,
+        field_names: &[String],
+        model_projection: &ModelProjection,
+    ) -> crate::Result<RecordProjection> {
+        let pairs: Vec<(DataSourceFieldRef, PrismaValue)> = model_projection
             .fields()
             .into_iter()
-            .flat_map(|id_field| {
-                let source_fields = id_field.data_source_fields();
+            .flat_map(|field| {
+                let source_fields = field.data_source_fields();
 
                 source_fields.into_iter().map(|source_field| {
                     self.get_field_value(field_names, &source_field.name)
@@ -367,15 +100,19 @@ impl Record {
             })
             .collect::<crate::Result<Vec<_>>>()?;
 
-        Ok(RecordIdentifier { pairs })
+        Ok(RecordProjection { pairs })
     }
 
-    pub fn identifying_values(&self, field_names: &[String], id: &ModelIdentifier) -> crate::Result<Vec<&PrismaValue>> {
-        let x: Vec<&PrismaValue> = id
+    pub fn identifying_values(
+        &self,
+        field_names: &[String],
+        model_projection: &ModelProjection,
+    ) -> crate::Result<Vec<&PrismaValue>> {
+        let x: Vec<&PrismaValue> = model_projection
             .fields()
             .into_iter()
-            .flat_map(|id_field| {
-                let source_fields = id_field.data_source_fields();
+            .flat_map(|field| {
+                let source_fields = field.data_source_fields();
 
                 source_fields
                     .into_iter()
@@ -397,21 +134,10 @@ impl Record {
             })
         })?;
 
-        // [DTODO] Revert to old code
-        // Ok(&self.values[index])
-        match self.values.get(index) {
-            Some(v) => Ok(v),
-            None => Err(DomainError::FieldNotFound {
-                name: field.to_owned(),
-                model: format!(
-                    "Field not found in record {:?}. Field names are: {:?}, looking for: {:?}",
-                    &self, &field_names, field
-                ),
-            }),
-        }
+        Ok(&self.values[index])
     }
 
-    pub fn set_parent_id(&mut self, parent_id: RecordIdentifier) {
+    pub fn set_parent_id(&mut self, parent_id: RecordProjection) {
         self.parent_id = Some(parent_id);
     }
 }

@@ -29,8 +29,8 @@ impl<'conn, 'tx> ReadOperations for ConnectionLike<'conn, 'tx> {
     fn get_related_m2m_record_ids<'a>(
         &'a self,
         from_field: &'a RelationFieldRef,
-        from_record_ids: &'a [RecordIdentifier],
-    ) -> crate::IO<'a, Vec<(RecordIdentifier, RecordIdentifier)>> {
+        from_record_ids: &'a [RecordProjection],
+    ) -> crate::IO<'a, Vec<(RecordProjection, RecordProjection)>> {
         match self {
             Self::Connection(c) => c.get_related_m2m_record_ids(from_field, from_record_ids),
             Self::Transaction(tx) => tx.get_related_m2m_record_ids(from_field, from_record_ids),
@@ -47,7 +47,7 @@ impl<'conn, 'tx> ReadOperations for ConnectionLike<'conn, 'tx> {
 }
 
 impl<'conn, 'tx> WriteOperations for ConnectionLike<'conn, 'tx> {
-    fn create_record<'a>(&'a self, model: &'a ModelRef, args: WriteArgs) -> crate::IO<RecordIdentifier> {
+    fn create_record<'a>(&'a self, model: &'a ModelRef, args: WriteArgs) -> crate::IO<RecordProjection> {
         match self {
             Self::Connection(c) => c.create_record(model, args),
             Self::Transaction(tx) => tx.create_record(model, args),
@@ -59,7 +59,7 @@ impl<'conn, 'tx> WriteOperations for ConnectionLike<'conn, 'tx> {
         model: &'a ModelRef,
         where_: Filter,
         args: WriteArgs,
-    ) -> crate::IO<Vec<RecordIdentifier>> {
+    ) -> crate::IO<Vec<RecordProjection>> {
         match self {
             Self::Connection(c) => c.update_records(model, where_, args),
             Self::Transaction(tx) => tx.update_records(model, where_, args),
@@ -76,8 +76,8 @@ impl<'conn, 'tx> WriteOperations for ConnectionLike<'conn, 'tx> {
     fn connect<'a>(
         &'a self,
         field: &'a RelationFieldRef,
-        parent_id: &'a RecordIdentifier,
-        child_ids: &'a [RecordIdentifier],
+        parent_id: &'a RecordProjection,
+        child_ids: &'a [RecordProjection],
     ) -> crate::IO<()> {
         match self {
             Self::Connection(c) => c.connect(field, parent_id, child_ids),
@@ -88,8 +88,8 @@ impl<'conn, 'tx> WriteOperations for ConnectionLike<'conn, 'tx> {
     fn disconnect<'a>(
         &'a self,
         field: &'a RelationFieldRef,
-        parent_id: &'a RecordIdentifier,
-        child_ids: &'a [RecordIdentifier],
+        parent_id: &'a RecordProjection,
+        child_ids: &'a [RecordProjection],
     ) -> crate::IO<()> {
         match self {
             Self::Connection(c) => c.disconnect(field, parent_id, child_ids),

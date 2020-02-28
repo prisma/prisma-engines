@@ -22,8 +22,8 @@ impl ReadQuery {
         }
     }
 
-    pub fn returns(&self, ident: &ModelIdentifier) -> bool {
-        let db_names = ident.db_names();
+    pub fn returns(&self, projection: &ModelProjection) -> bool {
+        let db_names = projection.db_names();
 
         match self {
             ReadQuery::RecordQuery(x) => x.selected_fields.contains_all_db_names(db_names),
@@ -124,9 +124,9 @@ pub struct RelatedRecordsQuery {
     pub nested: Vec<ReadQuery>,
     pub selection_order: Vec<String>,
 
-    /// Fields of the parent to satisfy the relation query without
+    /// Fields and values of the parent to satisfy the relation query without
     /// relying on the parent result passed by the interpreter.
-    pub parent_projections: Option<Vec<RecordIdentifier>>,
+    pub parent_projections: Option<Vec<RecordProjection>>,
 }
 
 #[derive(Debug, Clone)]

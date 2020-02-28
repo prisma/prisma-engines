@@ -4,7 +4,7 @@ pub mod write;
 pub use read::*;
 pub use write::*;
 
-use prisma_models::RecordIdentifier;
+use prisma_models::RecordProjection;
 use prisma_value::PrismaValue;
 use quaint::ast::{Column, Comparable, ConditionTree, Query};
 
@@ -12,7 +12,7 @@ const PARAMETER_LIMIT: usize = 10000;
 
 pub(super) fn chunked_conditions<F, Q>(
     columns: &[Column<'static>],
-    records: &[&RecordIdentifier],
+    records: &[&RecordProjection],
     f: F,
 ) -> Vec<Query<'static>>
 where
@@ -30,19 +30,22 @@ where
 
 pub(super) fn conditions<'a>(
     columns: &'a [Column<'static>],
-    records: impl IntoIterator<Item = &'a RecordIdentifier>,
+    records: impl IntoIterator<Item = &'a RecordProjection>,
 ) -> ConditionTree<'static> {
     match columns.len() {
         1 => {
             let column = columns[0].clone();
-            let vals: Vec<PrismaValue> = records.into_iter().map(|ids| ids.values().next().unwrap()).collect();
+            let vals: Vec<PrismaValue> = records
+                .into_iter()
+                .map(|record| record.values().next().unwrap())
+                .collect();
 
             column.in_selection(vals).into()
         }
         _ => records
             .into_iter()
-            .map(|ids| {
-                let cols_with_vals = columns.into_iter().map(|c| c.clone()).zip(ids.values());
+            .map(|record| {
+                let cols_with_vals = columns.into_iter().map(|c| c.clone()).zip(record.values());
 
                 cols_with_vals.fold(ConditionTree::NoCondition, |acc, (col, val)| match acc {
                     ConditionTree::NoCondition => col.equals(val).into(),

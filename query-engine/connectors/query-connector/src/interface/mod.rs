@@ -45,22 +45,22 @@ pub trait ReadOperations {
     fn get_related_m2m_record_ids<'a>(
         &'a self,
         from_field: &'a RelationFieldRef,
-        from_record_ids: &'a [RecordIdentifier],
-    ) -> crate::IO<'a, Vec<(RecordIdentifier, RecordIdentifier)>>;
+        from_record_ids: &'a [RecordProjection],
+    ) -> crate::IO<'a, Vec<(RecordProjection, RecordProjection)>>;
 
     // This will eventually become a more generic `aggregate`
     fn count_by_model<'a>(&'a self, model: &'a ModelRef, query_arguments: QueryArguments) -> crate::IO<'a, usize>;
 }
 
 pub trait WriteOperations {
-    fn create_record<'a>(&'a self, model: &'a ModelRef, args: WriteArgs) -> crate::IO<RecordIdentifier>;
+    fn create_record<'a>(&'a self, model: &'a ModelRef, args: WriteArgs) -> crate::IO<RecordProjection>;
 
     fn update_records<'a>(
         &'a self,
         model: &'a ModelRef,
         where_: Filter,
         args: WriteArgs,
-    ) -> crate::IO<Vec<RecordIdentifier>>;
+    ) -> crate::IO<Vec<RecordProjection>>;
 
     fn delete_records<'a>(&'a self, model: &'a ModelRef, where_: Filter) -> crate::IO<usize>;
 
@@ -69,15 +69,15 @@ pub trait WriteOperations {
     fn connect<'a>(
         &'a self,
         field: &'a RelationFieldRef,
-        parent_id: &'a RecordIdentifier,
-        child_ids: &'a [RecordIdentifier],
+        parent_id: &'a RecordProjection,
+        child_ids: &'a [RecordProjection],
     ) -> crate::IO<()>;
 
     fn disconnect<'a>(
         &'a self,
         field: &'a RelationFieldRef,
-        parent_id: &'a RecordIdentifier,
-        child_ids: &'a [RecordIdentifier],
+        parent_id: &'a RecordProjection,
+        child_ids: &'a [RecordProjection],
     ) -> crate::IO<()>;
 
     fn execute_raw<'a>(&'a self, query: String, parameters: Vec<PrismaValue>) -> crate::IO<serde_json::Value>;

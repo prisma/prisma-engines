@@ -1,10 +1,9 @@
-use super::utils::IdFilter;
 use super::*;
 use crate::{
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
     FilteredQuery, InputAssertions, ParsedInputMap, ParsedInputValue, Query, WriteQuery,
 };
-use connector::Filter;
+use connector::{Filter, IdFilter};
 use itertools::Itertools;
 use prisma_models::{ModelRef, PrismaValue, RelationFieldRef};
 use std::convert::TryInto;
@@ -191,7 +190,7 @@ fn handle_one_to_x(
     ) = if parent_relation_field.is_inlined_on_enclosing_model() {
         let parent_model = parent_relation_field.model();
         let extractor_model_id = parent_model.primary_identifier();
-        let null_record_id = parent_relation_field.linking_fields().empty_record_id();
+        let null_record_id = parent_relation_field.linking_fields().empty_record_projection();
         let check_model_id = child_relation_field.model().primary_identifier();
 
         (
@@ -206,7 +205,7 @@ fn handle_one_to_x(
     } else {
         let child_model = child_relation_field.model();
         let extractor_model_id = child_model.primary_identifier();
-        let null_record_id = child_relation_field.linking_fields().empty_record_id();
+        let null_record_id = child_relation_field.linking_fields().empty_record_projection();
         let check_model_id = parent_relation_field.model().primary_identifier();
 
         (
@@ -229,10 +228,10 @@ fn handle_one_to_x(
     graph.create_edge(
         node_to_attach,
         &update_node,
-        QueryGraphDependency::ParentIds(
+        QueryGraphDependency::ParentProjection(
             extractor_model_id,
-            Box::new(move |mut update_node, parent_ids| {
-                if parent_ids.len() == 0 {
+            Box::new(move |mut update_node, links| {
+                if links.len() == 0 {
                     return Err(QueryGraphBuilderError::RecordsNotConnected {
                         relation_name,
                         parent_name,
@@ -242,8 +241,8 @@ fn handle_one_to_x(
 
                 // Handle filter & arg injection
                 if let Node::Query(Query::Write(ref mut wq @ WriteQuery::UpdateManyRecords(_))) = update_node {
-                    wq.set_filter(parent_ids.filter());
-                    wq.inject_id_into_args(null_record_id);
+                    wq.set_filter(links.filter());
+                    wq.inject_projection_into_args(null_record_id);
                 };
 
                 Ok(update_node)
@@ -259,10 +258,10 @@ fn handle_one_to_x(
     graph.create_edge(
         node_to_check,
         &update_node,
-        QueryGraphDependency::ParentIds(
+        QueryGraphDependency::ParentProjection(
             check_model_id,
-            Box::new(move |child_node, parent_ids| {
-                if parent_ids.len() != expected_disconnects {
+            Box::new(move |update_node, ids| {
+                if ids.len() != expected_disconnects {
                     return Err(QueryGraphBuilderError::RecordsNotConnected {
                         relation_name,
                         parent_name,
@@ -270,7 +269,7 @@ fn handle_one_to_x(
                     });
                 }
 
-                Ok(child_node)
+                Ok(update_node)
             }),
         ),
     )?;

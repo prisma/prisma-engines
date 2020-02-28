@@ -27,20 +27,20 @@ pub enum ComputationResult {
 /// `right` contains all elements that are in B but not in A.
 #[derive(Debug, Clone)]
 pub struct DiffResult {
-    pub left: Vec<RecordIdentifier>,
-    pub right: Vec<RecordIdentifier>,
+    pub left: Vec<RecordProjection>,
+    pub right: Vec<RecordProjection>,
 }
 
 impl ExpressionResult {
-    /// Attempts to transform the result into a vector of record identifiers.
-    pub fn as_ids(&self, model_id: &ModelIdentifier) -> InterpretationResult<Vec<RecordIdentifier>> {
+    /// Attempts to transform the result into a vector of record projections.
+    pub fn as_projections(&self, model_projection: &ModelProjection) -> InterpretationResult<Vec<RecordProjection>> {
         let converted = match self {
             Self::Query(ref result) => match result {
                 QueryResult::Id(id) => match id {
-                    Some(id) if model_id.matches(id) => Some(vec![id.clone()]),
+                    Some(id) if model_projection.matches(id) => Some(vec![id.clone()]),
                     None => Some(vec![]),
                     Some(id) => {
-                        trace!("RID {:?} does not match MID {:?}", id, model_id);
+                        trace!("RID {:?} does not match MID {:?}", id, model_projection);
                         None
                     }
                 },
@@ -48,7 +48,7 @@ impl ExpressionResult {
                 // We always select IDs, the unwraps are safe.
                 QueryResult::RecordSelection(rs) => Some(
                     rs.scalars
-                        .identifiers(model_id)
+                        .projections(model_projection)
                         .expect("Expected record selection to contain required model ID fields.")
                         .into_iter()
                         .map(|val| val.into())
@@ -62,7 +62,7 @@ impl ExpressionResult {
         };
 
         converted.ok_or(InterpreterError::InterpretationError(
-            "Unable to convert result into a set of IDs".to_owned(),
+            "Unable to convert result into a set of projections".to_owned(),
         ))
     }
 

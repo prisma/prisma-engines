@@ -3,9 +3,9 @@ use prisma_models::*;
 use quaint::ast::*;
 
 /// `INSERT` a new record to the database. Resulting an `INSERT` ast and an
-/// optional `RecordIdentifier` if available from the arguments or model.
-pub fn create_record(model: &ModelRef, mut args: WriteArgs) -> (Insert<'static>, Option<RecordIdentifier>) {
-    let return_id = args.as_record_identifier(model.primary_identifier());
+/// optional `RecordProjection` if available from the arguments or model.
+pub fn create_record(model: &ModelRef, mut args: WriteArgs) -> (Insert<'static>, Option<RecordProjection>) {
+    let return_id = args.as_record_projection(model.primary_identifier());
 
     let fields: Vec<_> = model
         .fields()
@@ -32,7 +32,7 @@ pub fn create_record(model: &ModelRef, mut args: WriteArgs) -> (Insert<'static>,
     )
 }
 
-pub fn update_many(model: &ModelRef, ids: &[&RecordIdentifier], args: WriteArgs) -> crate::Result<Vec<Query<'static>>> {
+pub fn update_many(model: &ModelRef, ids: &[&RecordProjection], args: WriteArgs) -> crate::Result<Vec<Query<'static>>> {
     if args.args.is_empty() || ids.is_empty() {
         return Ok(Vec::new());
     }
@@ -50,7 +50,7 @@ pub fn update_many(model: &ModelRef, ids: &[&RecordIdentifier], args: WriteArgs)
     Ok(result)
 }
 
-pub fn delete_many(model: &ModelRef, ids: &[&RecordIdentifier]) -> Vec<Query<'static>> {
+pub fn delete_many(model: &ModelRef, ids: &[&RecordProjection]) -> Vec<Query<'static>> {
     let columns: Vec<_> = model.primary_identifier().as_columns().collect();
 
     super::chunked_conditions(&columns, ids, |conditions| {
@@ -60,8 +60,8 @@ pub fn delete_many(model: &ModelRef, ids: &[&RecordIdentifier]) -> Vec<Query<'st
 
 pub fn create_relation_table_records(
     field: &RelationFieldRef,
-    parent_id: &RecordIdentifier,
-    child_ids: &[RecordIdentifier],
+    parent_id: &RecordProjection,
+    child_ids: &[RecordProjection],
 ) -> Query<'static> {
     let relation = field.relation();
     let parent_columns: Vec<_> = field.related_field().m2m_column_names();
@@ -83,8 +83,8 @@ pub fn create_relation_table_records(
 
 pub fn delete_relation_table_records(
     parent_field: &RelationFieldRef,
-    parent_id: &RecordIdentifier,
-    child_ids: &[RecordIdentifier],
+    parent_id: &RecordProjection,
+    child_ids: &[RecordProjection],
 ) -> Delete<'static> {
     let relation = parent_field.relation();
     let mut parent_columns: Vec<_> = parent_field
