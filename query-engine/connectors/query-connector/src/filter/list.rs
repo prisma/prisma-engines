@@ -26,6 +26,9 @@ pub enum ScalarListCondition {
 
 #[allow(warnings)]
 impl ScalarListCompare for Arc<ScalarField> {
+    //todo
+    //enumvalue mapping
+
     fn contains_element<T>(&self, value: T) -> Filter
     where
         T: Into<PrismaValue>,

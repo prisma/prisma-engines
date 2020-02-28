@@ -1,7 +1,7 @@
 use super::*;
 use crate::query_document::{ParsedInputMap, ParsedInputValue};
 use connector::WriteArgs;
-use prisma_models::{Field, ModelRef, PrismaValue, RelationFieldRef};
+use prisma_models::{Field, ModelRef, PrismaValue, RelationFieldRef, ScalarField, ScalarFieldRef};
 use std::{convert::TryInto, sync::Arc};
 
 #[derive(Default, Debug)]
@@ -36,10 +36,20 @@ impl WriteArgsParser {
 
                         args.args.insert(sf.db_name().clone(), set_value)
                     }
-
                     Field::Scalar(sf) => {
+                        // match sf.type_identifier {
+                        //     // TypeIdentifier::Enum => {
+                        //     //     //todo
+                        //     //     // the typeidentifier needs the actual enum it is referring to
+                        //     //     // model.internal_data_model.upgrade().unwrap().enums.
+                        //
+                        //         ()
+                        //     }
+                        //     _ => {
                         let value: PrismaValue = v.try_into()?;
                         args.args.insert(sf.db_name().clone(), value)
+                        // }
+                        // }
                     }
 
                     Field::Relation(ref rf) => {

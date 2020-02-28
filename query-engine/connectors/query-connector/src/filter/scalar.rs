@@ -33,6 +33,9 @@ impl ScalarCompare for DataSourceFieldRef {
     where
         T: Into<PrismaValue>,
     {
+        //todo
+        // self.model_field().model().internal_data_model.upgrade().unwrap().enums
+
         Filter::from(ScalarFilter {
             field: Arc::clone(self),
             condition: ScalarCondition::In(values.into_iter().map(|i| i.into()).collect()),
