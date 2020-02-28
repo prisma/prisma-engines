@@ -42,14 +42,6 @@ pub trait ReadOperations {
         selected_fields: &'a SelectedFields,
     ) -> crate::IO<'a, ManyRecords>;
 
-    fn get_related_records<'a>(
-        &'a self,
-        from_field: &'a RelationFieldRef,
-        from_record_ids: &'a [RecordIdentifier],
-        query_arguments: QueryArguments,
-        selected_fields: &'a SelectedFields,
-    ) -> crate::IO<'a, ManyRecords>;
-
     fn get_related_m2m_record_ids<'a>(
         &'a self,
         from_field: &'a RelationFieldRef,

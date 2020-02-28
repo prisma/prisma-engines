@@ -86,6 +86,8 @@ impl RequestHandler for GraphQlRequestHandler {
         S: Into<PrismaRequest<Self::Body>> + Send + Sync + 'static,
     {
         let request = req.into();
+        debug!("Incoming GraphQL query: {:?}", request.body);
+
         match QueryDocument::try_from(request.body) {
             Ok(QueryDocument::Single(query)) => handle_single_query(query, ctx.clone()).await,
             Ok(QueryDocument::Multi(batch)) => match batch.compact() {

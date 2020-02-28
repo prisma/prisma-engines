@@ -390,7 +390,10 @@ impl Record {
         let index = field_names.iter().position(|r| r == field).map(Ok).unwrap_or_else(|| {
             Err(DomainError::FieldNotFound {
                 name: field.to_string(),
-                model: String::new(),
+                model: format!(
+                    "Field not found in record {:?}. Field names are: {:?}, looking for: {:?}",
+                    &self, &field_names, field
+                ),
             })
         })?;
 
@@ -401,8 +404,8 @@ impl Record {
             None => Err(DomainError::FieldNotFound {
                 name: field.to_owned(),
                 model: format!(
-                    "Field not found in record {:?}. Field names were: {:?}",
-                    &self, &field_names
+                    "Field not found in record {:?}. Field names are: {:?}, looking for: {:?}",
+                    &self, &field_names, field
                 ),
             }),
         }

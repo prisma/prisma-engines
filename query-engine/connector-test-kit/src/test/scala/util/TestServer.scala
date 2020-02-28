@@ -1,11 +1,18 @@
 package util
 
 import play.api.libs.json._
+import wvlet.log.LogFormatter.SimpleLogFormatter
+import wvlet.log.{LogLevel, LogSupport, Logger}
 
-import scala.util.{Failure, Success, Try}
 import scala.sys.process.Process
+import scala.util.{Failure, Success, Try}
 
-case class TestServer() extends PlayJsonExtensions {
+case class TestServer() extends PlayJsonExtensions with LogSupport {
+  val logLevel = sys.env.getOrElse("LOG_LEVEL", "debug").toLowerCase
+
+  Logger.setDefaultFormatter(SimpleLogFormatter)
+  Logger.setDefaultLogLevel(LogLevel.apply(logLevel))
+
   def query(
       query: String,
       project: Project,
@@ -56,7 +63,7 @@ case class TestServer() extends PlayJsonExtensions {
 
   def createSingleQuery(query: String): JsValue = {
     val formattedQuery = query.stripMargin.replace("\n", "")
-    println(formattedQuery)
+    debug(formattedQuery)
     Json.obj("query" -> formattedQuery, "variables" -> Json.obj())
   }
 
@@ -65,7 +72,8 @@ case class TestServer() extends PlayJsonExtensions {
   }
 
   def queryBinaryCLI(request: JsValue, project: Project, legacy: Boolean = true) = {
-    val encoded_query = UTF8Base64.encode(Json.stringify(request))
+    val encoded_query  = UTF8Base64.encode(Json.stringify(request))
+    val binaryLogLevel = "RUST_LOG" -> s"prisma=$logLevel,quaint=$logLevel,query_core=$logLevel,query_connector=$logLevel,sql_query_connector=$logLevel,prisma_models=$logLevel,sql_introspection_connector=$logLevel"
 
     val response = (project.isPgBouncer, legacy) match {
       case (true, true) =>
@@ -80,7 +88,8 @@ case class TestServer() extends PlayJsonExtensions {
             encoded_query
           ),
           None,
-          "PRISMA_DML" -> project.pgBouncerEnvVar
+          "PRISMA_DML" -> project.pgBouncerEnvVar,
+          binaryLogLevel,
         ).!!
 
       case (true, false) =>
@@ -94,7 +103,8 @@ case class TestServer() extends PlayJsonExtensions {
             encoded_query
           ),
           None,
-          "PRISMA_DML" -> project.pgBouncerEnvVar
+          "PRISMA_DML" -> project.pgBouncerEnvVar,
+          binaryLogLevel,
         ).!!
 
       case (false, true) =>
@@ -109,35 +119,38 @@ case class TestServer() extends PlayJsonExtensions {
           ),
           None,
           "PRISMA_DML" -> project.envVar,
+          binaryLogLevel,
         ).!!
 
-        case (false, false) =>
-          Process(
-            Seq(
-              EnvVars.prismaBinaryPath,
-              "--enable_raw_queries",
-              "cli",
-              "--execute_request",
-              encoded_query
-            ),
-            None,
-            "PRISMA_DML" -> project.envVar,
-          ).!!
+      case (false, false) =>
+        Process(
+          Seq(
+            EnvVars.prismaBinaryPath,
+            "--enable_raw_queries",
+            "cli",
+            "--execute_request",
+            encoded_query
+          ),
+          None,
+          "PRISMA_DML" -> project.envVar,
+          binaryLogLevel,
+        ).!!
     }
+
     val lines = response.linesIterator.toVector
-    println(lines.mkString("\n"))
+    debug(lines.mkString("\n"))
 
     val responseMarker = "Response: " // due to race conditions the response can not always be found in the last line
     val responseLine   = lines.find(_.startsWith(responseMarker)).get.stripPrefix(responseMarker).stripSuffix("\n")
-    println(lines.mkString("\n"))
+    debug(lines.mkString("\n"))
 
     Try(UTF8Base64.decode(responseLine)) match {
       case Success(decodedResponse) =>
-        println(decodedResponse)
+        debug(decodedResponse)
         Json.parse(decodedResponse)
 
       case Failure(e) =>
-        println(s"Error while decoding this line: \n$responseLine")
+        error(s"Error while decoding this line: \n$responseLine")
         throw e
     }
   }

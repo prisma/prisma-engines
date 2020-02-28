@@ -1,12 +1,8 @@
-mod many_related_records;
-
 use crate::{cursor_condition, filter_conversion::AliasedCondition, ordering::Ordering};
 use connector_interface::{filter::Filter, QueryArguments};
 use prisma_models::*;
 use quaint::ast::*;
 use std::sync::Arc;
-
-pub use many_related_records::*;
 
 pub trait SelectDefinition {
     fn into_select(self, _: &ModelRef) -> Select<'static>;

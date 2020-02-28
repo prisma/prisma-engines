@@ -43,8 +43,8 @@ pub fn delete_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedF
             }),
         ),
     )?;
-    graph.add_result_node(&read_node);
 
+    graph.add_result_node(&read_node);
     Ok(())
 }
 
