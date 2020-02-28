@@ -10,7 +10,6 @@ use prisma_models::{ModelRef, PrismaValue, RelationFieldRef};
 use std::{convert::TryInto, sync::Arc};
 
 /// Adds a delete (single) record node to the graph and connects it to the parent.
-/// Auxiliary nodes may be added to support the deletion process, e.g. extra read nodes.
 ///
 /// If the relation is a list:
 /// - Delete specific record from the list, a record finder must be present in the data.
@@ -76,10 +75,7 @@ pub fn connect_nested_delete(
                     }
 
                     if let Node::Query(Query::Write(WriteQuery::DeleteManyRecords(ref mut dmr))) = node {
-                        let conditions: Vec<_> = parent_ids.into_iter().map(|pid| pid.filter()).collect();
-                        let filter = Filter::or(conditions);
-
-                        dmr.set_filter(Filter::and(vec![dmr.filter.clone(), filter]));
+                        dmr.set_filter(Filter::and(vec![dmr.filter.clone(), parent_ids.filter()]));
                     }
 
                     Ok(node)
@@ -156,10 +152,7 @@ pub fn connect_nested_delete_many(
                 child_model_identifier.clone(),
                 Box::new(move |mut node, parent_ids| {
                     if let Node::Query(Query::Write(WriteQuery::DeleteManyRecords(ref mut dmr))) = node {
-                        let conditions: Vec<_> = parent_ids.into_iter().map(|pid| pid.filter()).collect();
-                        let filter = Filter::or(conditions);
-
-                        dmr.set_filter(Filter::and(vec![dmr.filter.clone(), filter]));
+                        dmr.set_filter(Filter::and(vec![dmr.filter.clone(), parent_ids.filter()]));
                     }
 
                     Ok(node)

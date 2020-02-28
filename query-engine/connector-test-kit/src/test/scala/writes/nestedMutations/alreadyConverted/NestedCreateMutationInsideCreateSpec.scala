@@ -21,8 +21,14 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
           """mutation {
             |  createParent(data: {
             |    p: "p1"
+            |    p_1: "p_1"
+            |    p_2: "p_2"
             |    childReq: {
-            |      create: {c: "c1"}
+            |      create: {
+            |        c: "c1"
+            |        c_1: "c_1"
+            |        c_2: "c_2"
+            |      }
             |    }
             |  }){
             |    p
@@ -53,7 +59,11 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
           |  createParent(data: {
           |    p: "p1"
           |    childReq: {
-          |      create: {c: "c1"}
+          |      create: {
+          |        c: "c1"
+          |        c_1: "c_1"
+          |        c_2: "c_2"
+          |      }
           |    }
           |  }){
           |    childReq{
@@ -81,7 +91,11 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
             |  createParent(data: {
             |    p: "p1"
             |    childOpt: {
-            |      create: {c: "c1"}
+            |      create: {
+            |        c: "c1"
+            |        c_1: "c_1"
+            |        c_2: "c_2"
+            |      }
             |    }
             |  }){
             |   childOpt{
@@ -109,6 +123,8 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
           """mutation {
             |  createParent(data: {
             |    p: "p1"
+            |    p_1: "p_1"
+            |    p_2: "p_2"
             |    childrenOpt: {
             |      create: [{c: "c1"},{c:"c2"}]
             |    }
@@ -138,8 +154,14 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
           """mutation {
             |  createParent(data: {
             |    p: "p1"
+            |    p_1: "p_1"
+            |    p_2: "p_2"
             |    childOpt: {
-            |      create: {c: "c1"}
+            |      create: {
+            |        c: "c1"
+            |        c_1: "c_1"
+            |        c_2: "c_2"
+            |      }
             |    }
             |  }){
             |   childOpt{
@@ -197,7 +219,11 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
             |  createParent(data: {
             |    p: "p1"
             |    childReq: {
-            |      create: {c: "c1"}
+            |      create: {
+            |        c: "c1"
+            |        c_1: "c_1"
+            |        c_2: "c_2"
+            |      }
             |    }
             |  }){
             |   childReq{

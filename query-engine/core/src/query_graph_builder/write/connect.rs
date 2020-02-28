@@ -42,6 +42,7 @@ pub fn connect_records_node(
     expected_connects: usize,
 ) -> QueryGraphBuilderResult<NodeRef> {
     assert!(parent_relation_field.relation().is_many_to_many());
+
     let parent_model_id = parent_relation_field.model().primary_identifier();
     let child_model_id = parent_relation_field.related_model().primary_identifier();
 

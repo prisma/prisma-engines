@@ -26,6 +26,8 @@ case class MigrationEngine(project: Project) {
   implicit val rpcResultReads                  = Json.reads[RpcResult]
 
   val migrationId = "test_migration_id"
+  val logLevel    = "RUST_LOG" -> sys.env.getOrElse("LOG_LEVEL", "debug").toLowerCase
+//  val binaryLogLevel = "RUST_LOG" -> s"prisma=$logLevel,quaint=$logLevel,query_core=$logLevel,query_connector=$logLevel,sql_query_connector=$logLevel,prisma_models=$logLevel,sql_introspection_connector=$logLevel"
 
   def inferAndApply(): Unit = {
     val result = inferMigrationSteps()
@@ -64,12 +66,23 @@ case class MigrationEngine(project: Project) {
   private def sendRpcCallInternal[B](method: String, params: JsObject)(implicit reads: Reads[B]): B = {
     val rpcCall = envelope(method, params)
 //    println(s"sending to MigrationEngine: $rpcCall")
-    val cmd         = List(EnvVars.migrationEngineBinaryPath, "-s", "-d", project.dataModelPath)
+
     val inputStream = new ByteArrayInputStream(rpcCall.toString.getBytes("UTF-8"))
     val output: String = {
       import scala.sys.process._
-      (cmd #< inputStream).!!
+
+      (Process(
+        Seq(
+          EnvVars.migrationEngineBinaryPath,
+          "-s",
+          "-d",
+          project.dataModelPath
+        ),
+        None,
+        logLevel,
+      ) #< inputStream).!!
     }
+
     val lastLine = output.lines.foldLeft("")((_, line) => line)
     Json.parse(lastLine).validate[RpcResult] match {
       case JsSuccess(rpcResult, _) => rpcResult.result.as[B]

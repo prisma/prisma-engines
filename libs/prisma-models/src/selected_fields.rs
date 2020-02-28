@@ -11,6 +11,7 @@ pub struct SelectedFields {
     pub scalar: Vec<SelectedScalarField>,
     pub relation: Vec<SelectedRelationField>,
 }
+
 impl SelectedFields {
     // [DTODO] Remove
     pub fn only_scalar_and_inlined(&self) -> SelectedFields {
@@ -139,6 +140,10 @@ impl SelectedFields {
         SelectedFields { scalar, relation }
     }
 
+    pub fn add_all(&mut self, fields: impl Iterator<Item = Field>) {
+        fields.into_iter().for_each(|field| self.add(field))
+    }
+
     pub fn add(&mut self, field: Field) {
         match field {
             Field::Scalar(sf) => self.add_scalar(sf),
@@ -200,9 +205,6 @@ impl SelectedFields {
     pub fn contains_all_db_names<'a>(&self, names: impl Iterator<Item = String>) -> bool {
         let selected_db_names: Vec<_> = self.db_names().collect();
         let names_to_select: Vec<_> = names.collect();
-
-        dbg!(&selected_db_names);
-        dbg!(&names_to_select);
 
         if names_to_select.len() > selected_db_names.len() {
             false

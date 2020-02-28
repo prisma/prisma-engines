@@ -95,6 +95,7 @@ pub async fn update_records(
 
 /// Delete multiple records in `conn`, defined in the `Filter`. Results the
 /// number of items deleted.
+/// [DTODO] The filter id query is probably not necessary.
 pub async fn delete_records(conn: &dyn QueryExt, model: &ModelRef, where_: Filter) -> crate::Result<usize> {
     let ids = conn.filter_ids(model, where_.clone()).await?;
     let ids: Vec<&RecordIdentifier> = ids.iter().map(|id| &*id).collect();

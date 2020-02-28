@@ -10,31 +10,22 @@ use std::{convert::TryInto, sync::Arc};
 use utils::IdFilter;
 use write_args_parser::*;
 
-/// Handles nested update (one) cases.
-///
-/// We need to reload the parent node if it doesn't yield the necessary
-/// fields in the result to satisfy the relation inlining.
-/// ([DTODO]] Implement reloading. Always reloading right now for simplicity)
+/// Handles nested update (single record) cases.
 ///
 /// ```text
-///    ┌ ─ ─ ─ ─ ─ ─                       ┌ ─ ─ ─ ─ ─ ─
-/// ┌──    Parent   │─ ─ ─ ─ ─          ┌──    Parent   │─ ─ ─ ─ ─
-/// │  └ ─ ─ ─ ─ ─ ─          │         │  └ ─ ─ ─ ─ ─ ─          │
-/// │         │                         │         │
-/// │         ▼               ▼         │         ▼               ▼
-/// │  ┌────────────┐   ┌ ─ ─ ─ ─ ─     │  ┌────────────┐   ┌ ─ ─ ─ ─ ─
-/// │  │   Check    │      Result  │    │  │   Reload   │      Result  │
-/// │  └────────────┘   └ ─ ─ ─ ─ ─     │  └────────────┘   └ ─ ─ ─ ─ ─
-/// │         │                         │         │
-/// │         ▼                         │         ▼
-/// │  ┌────────────┐                   │  ┌────────────┐
-/// └─▶│   Update   │                   │  │   Check    │
-///    └────────────┘                   │  └────────────┘
-///                                     │         │
-///                                     │         ▼
-///                                     │  ┌────────────┐
-///                                     └─▶│   Update   │
-///                                        └────────────┘
+///    ┌ ─ ─ ─ ─ ─ ─
+/// ┌──    Parent   │─ ─ ─ ─ ─
+/// │  └ ─ ─ ─ ─ ─ ─          │
+/// │         │
+/// │         ▼               ▼
+/// │  ┌────────────┐   ┌ ─ ─ ─ ─ ─
+/// │  │   Check    │      Result  │
+/// │  └────────────┘   └ ─ ─ ─ ─ ─
+/// │         │
+/// │         ▼
+/// │  ┌────────────┐
+/// └─▶│   Update   │
+///    └────────────┘
 /// ```
 pub fn connect_nested_update(
     graph: &mut QueryGraph,
@@ -47,7 +38,7 @@ pub fn connect_nested_update(
         let (data, filter) = if parent_relation_field.is_list {
             // We have to have a single record filter in "where".
             // This is used to read the children first, to make sure they're actually connected.
-            // The update itself operates on the record ID found by the read check.
+            // The update itself operates on the record found by the read check.
             let mut map: ParsedInputMap = value.try_into()?;
             let where_arg: ParsedInputMap = map.remove("where").unwrap().try_into()?;
 
@@ -132,8 +123,7 @@ pub fn connect_nested_update_many(
                 child_model_identifier.clone(),
                 Box::new(move |mut node, parent_ids| {
                     if let Node::Query(Query::Write(WriteQuery::UpdateManyRecords(ref mut ur))) = node {
-                        let filter = Filter::or(parent_ids.into_iter().map(|id| id.filter()).collect());
-                        ur.set_filter(Filter::and(vec![ur.filter.clone(), filter]));
+                        ur.set_filter(Filter::and(vec![ur.filter.clone(), parent_ids.filter()]));
                     }
 
                     Ok(node)

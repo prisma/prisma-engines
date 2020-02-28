@@ -76,23 +76,22 @@ object Dependencies {
   val jacksonDataformatCbor = "com.fasterxml.jackson.dataformat" % "jackson-dataformat-cbor" % v.jackson
   val jackson               = Seq(jacksonCore, jacksonDatabind, jacksonAnnotation, jacksonDataformatCbor)
 
-  val enumeratum        = "com.beachape"               %% "enumeratum"                    % "1.5.13"
-  val amqp              = "com.rabbitmq"               % "amqp-client"                    % "4.1.0"
-  val java8Compat       = "org.scala-lang.modules"     %% "scala-java8-compat"            % "0.8.0"
-  val scalaLogging      = "com.typesafe.scala-logging" %% "scala-logging"                 % "3.7.0"
-  val log4j             = "log4j"                      % "log4j"                          % "1.2.17"
-  val jwt               = "com.pauldijou"              %% "jwt-core"                      % "0.14.1"
-  val scalajHttp        = "org.scalaj"                 %% "scalaj-http"                   % "2.3.0"
-  val evoInflector      = "org.atteo"                  % "evo-inflector"                  % "1.2"
-  val snakeYML          = "org.yaml"                   % "snakeyaml"                      % "1.23"
-  val librato           = "com.librato.metrics"        % "librato-java"                   % "2.1.0"
-  val jettyServer       = "org.eclipse.jetty"          % "jetty-server"                   % "9.3.0.v20150612"
-  val scalaUri          = "io.lemonlabs"               %% "scala-uri"                     % "1.3.1"
-  val parserCombinators = "org.scala-lang.modules"     %% "scala-parser-combinators"      % "1.0.4"
-  val apacheCommons     = "org.apache.commons"         % "commons-lang3"                  % "3.8.1"
-  val microMeter        = "io.micrometer"              % "micrometer-registry-prometheus" % "1.0.6"
-  val jooqCore          = "org.jooq"                   % "jooq"                           % "3.11.10"
-  val jooqScala         = "org.jooq"                   %% "jooq-scala"                    % "3.11.10"
+  val enumeratum        = "com.beachape"           %% "enumeratum"                    % "1.5.13"
+  val amqp              = "com.rabbitmq"           % "amqp-client"                    % "4.1.0"
+  val java8Compat       = "org.scala-lang.modules" %% "scala-java8-compat"            % "0.8.0"
+  val airframe_log      = "org.wvlet.airframe"     %% "airframe-log"                  % "20.2.1"
+  val jwt               = "com.pauldijou"          %% "jwt-core"                      % "0.14.1"
+  val scalajHttp        = "org.scalaj"             %% "scalaj-http"                   % "2.3.0"
+  val evoInflector      = "org.atteo"              % "evo-inflector"                  % "1.2"
+  val snakeYML          = "org.yaml"               % "snakeyaml"                      % "1.23"
+  val librato           = "com.librato.metrics"    % "librato-java"                   % "2.1.0"
+  val jettyServer       = "org.eclipse.jetty"      % "jetty-server"                   % "9.3.0.v20150612"
+  val scalaUri          = "io.lemonlabs"           %% "scala-uri"                     % "1.3.1"
+  val parserCombinators = "org.scala-lang.modules" %% "scala-parser-combinators"      % "1.0.4"
+  val apacheCommons     = "org.apache.commons"     % "commons-lang3"                  % "3.8.1"
+  val microMeter        = "io.micrometer"          % "micrometer-registry-prometheus" % "1.0.6"
+  val jooqCore          = "org.jooq"               % "jooq"                           % "3.11.10"
+  val jooqScala         = "org.jooq"               %% "jooq-scala"                    % "3.11.10"
 
   val jna              = "net.java.dev.jna"      % "jna"                   % "4.5.2"
   val javaxPersistence = "javax.persistence"     % "javax.persistence-api" % "2.2"
@@ -129,12 +128,11 @@ object Dependencies {
     akkaHttpTestKit,
     playJson,
     scalajHttp,
-    scalaLogging,
+    airframe_log,
     evoInflector,
     apacheCommons,
     cuid,
     jwt,
-    log4j,
     javaxPersistence
   )
 }

@@ -26,21 +26,6 @@ impl<'conn, 'tx> ReadOperations for ConnectionLike<'conn, 'tx> {
         }
     }
 
-    fn get_related_records<'a>(
-        &'a self,
-        from_field: &'a RelationFieldRef,
-        from_record_ids: &'a [RecordIdentifier],
-        query_arguments: QueryArguments,
-        selected_fields: &'a SelectedFields,
-    ) -> crate::IO<'a, ManyRecords> {
-        match self {
-            Self::Connection(c) => c.get_related_records(from_field, from_record_ids, query_arguments, selected_fields),
-            Self::Transaction(tx) => {
-                tx.get_related_records(from_field, from_record_ids, query_arguments, selected_fields)
-            }
-        }
-    }
-
     fn get_related_m2m_record_ids<'a>(
         &'a self,
         from_field: &'a RelationFieldRef,

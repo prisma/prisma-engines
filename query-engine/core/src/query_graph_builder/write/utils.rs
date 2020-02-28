@@ -77,13 +77,9 @@ fn get_selected_fields(model: &ModelRef, id: ModelIdentifier) -> SelectedFields 
     // Always fetch the primary identifier as well.
     let primary_model_id = model.primary_identifier();
     let mismatches = id != primary_model_id;
-    let mut selected_fields: SelectedFields = id.into();
 
-    if mismatches {
-        primary_model_id.into_iter().for_each(|f| selected_fields.add(f));
-    }
-
-    selected_fields.deduplicate()
+    let projection = if mismatches { primary_model_id.merge(id) } else { id };
+    projection.into()
 }
 
 /// Adds a read query to the query graph that finds related records by parent ID.

@@ -38,11 +38,12 @@ object ConnectorTag extends Enum[ConnectorTag] {
   object MongoConnectorTag            extends DocumentConnectorTag
 }
 
-trait ConnectorAwareTest extends SuiteMixin { self: Suite =>
+trait ConnectorAwareTest extends SuiteMixin { self: Suite with ApiSpecBase =>
   import IgnoreSet._
 
   lazy val connectorConfig = ConnectorConfig.instance
   lazy val connector       = connectorConfig.provider
+
   // TODO: cleanup those providers once we have moved everything
   lazy val connectorTag = connector match {
     case "mongo"                                                 => ConnectorTag.MongoConnectorTag
@@ -72,16 +73,14 @@ trait ConnectorAwareTest extends SuiteMixin { self: Suite =>
     val isTheRightConnector              = runOnlyForConnectors.contains(connectorTag) && !doNotRunForConnectors.contains(connectorTag)
 
     if (!isTheRightConnector) {
-      println(
-        s"""the suite ${self.getClass.getSimpleName} will be ignored because the current connector is not right
+      error(s"""the suite ${self.getClass.getSimpleName} will be ignored because the current connector is not right
            | allowed connectors: ${runOnlyForConnectors.mkString(",")}
            | disallowed connectors: ${doNotRunForConnectors.mkString(",")}
            | current connector: $connectorTag
-         """.stripMargin
-      )
+         """.stripMargin)
       true
     } else if (!connectorHasTheRightCapabilities) {
-      println(
+      error(
         s"""the suite ${self.getClass.getSimpleName} will be ignored because it does not have the right capabilities
            | required capabilities: ${runOnlyForCapabilities.mkString(",")}
            | connector capabilities: ${capabilities.capabilities.mkString(",")}
@@ -89,7 +88,7 @@ trait ConnectorAwareTest extends SuiteMixin { self: Suite =>
       )
       true
     } else if (connectorHasAWrongCapability) {
-      println(
+      error(
         s"""the suite ${self.getClass.getSimpleName} will be ignored because it has a wrong capability
            | wrong capabilities: ${doNotRunForCapabilities.mkString(",")}
            | connector capabilities: ${capabilities.capabilities.mkString(",")}

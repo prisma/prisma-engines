@@ -622,6 +622,11 @@ impl QueryGraph {
                         .into_iter()
                         .filter_map(|edge| match self.edge_content(&edge).unwrap() {
                             QueryGraphDependency::ParentIds(ref requested_ident, _) if !q.returns(requested_ident) => {
+                                trace!(
+                                    "Query {:?} does not return requested projection {:?} and will be reloaded.",
+                                    q,
+                                    requested_ident.names().collect::<Vec<_>>()
+                                );
                                 Some((edge, requested_ident.clone()))
                             }
                             _ => None,
@@ -639,12 +644,11 @@ impl QueryGraph {
             })
             .collect();
 
-        trace!("Reloading nodes: {:?}", reloads);
-
         for (node, model, edges) in reloads {
-            // Create reload node and connect it to the `node`
+            // Create reload node and connect it to the `node`.
             let primary_model_id = model.primary_identifier();
-            let (edges, identifiers): (Vec<_>, Vec<_>) = edges.into_iter().unzip();
+            let (edges, mut identifiers): (Vec<_>, Vec<_>) = edges.into_iter().unzip();
+            identifiers.push(primary_model_id.clone());
 
             let read_query = ReadQuery::ManyRecordsQuery(ManyRecordsQuery {
                 name: "reload".into(),
