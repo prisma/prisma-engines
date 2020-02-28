@@ -1,5 +1,7 @@
 # Changelog
 
+- AVG and SUM implementations
+
 ## v0.2.0-alpha.7
 
 - Fix a missing dependency when compiling using only single-sqlite feature
