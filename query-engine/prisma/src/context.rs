@@ -79,7 +79,7 @@ impl PrismaContext {
             Some(datamodel_string) => {
                 let dm = datamodel::parse_datamodel(&datamodel_string)?;
 
-                let components = load_configuration(&datamodel_string).map(|config| DatamodelV2Components {
+                let components = load_configuration(&datamodel_string, false).map(|config| DatamodelV2Components {
                     datamodel: dm,
                     data_sources: config.datasources,
                 })?;
@@ -88,7 +88,7 @@ impl PrismaContext {
 
                 (components, template)
             }
-            None => load_data_model_components()?,
+            None => load_data_model_components(false)?,
         };
 
         let (dm, data_sources) = (v2components.datamodel, v2components.data_sources);
