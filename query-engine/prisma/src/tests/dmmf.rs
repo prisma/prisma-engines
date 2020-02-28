@@ -1,6 +1,3 @@
-#![feature(backtrace)]
-
-
 use crate::data_model_loader;
 use query_core::{BuildMode, QuerySchema, QuerySchemaBuilder, SupportedCapabilities};
 use std::sync::Arc;

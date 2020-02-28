@@ -118,7 +118,12 @@ pub fn load_configuration(dml_string: &str, ignore_env_var_errors: bool) -> Pris
         load_string_from_env("OVERWRITE_DATASOURCES")?.unwrap_or_else(|| r#"[]"#.to_string());
     let datasource_overwrites: Vec<SourceOverride> = serde_json::from_str(&datasource_overwrites_string)?;
 
-    match datamodel::parse_configuration(&dml_string, ignore_env_var_errors) {
+    let config_result = if ignore_env_var_errors {
+        datamodel::parse_configuration_and_ignore_env_errors(&dml_string)
+    } else {
+        datamodel::parse_configuration(&dml_string)
+    };
+    match config_result {
         Err(errors) => Err(PrismaError::ConversionError(errors, dml_string.to_string())),
         Ok(mut configuration) => {
             for datasource_override in datasource_overwrites {
