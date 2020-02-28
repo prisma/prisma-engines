@@ -138,7 +138,7 @@ class DefaultValueSpec extends FlatSpec with Matchers with ApiSpecBase {
       """
         |model User {
         |  id        String   @id @default(cuid())
-        |  name      Names    @default(Spiderman)
+        |  name      Names    @default(Spiderman) @unique
         |  age       Int
         }
         |
@@ -181,5 +181,38 @@ class DefaultValueSpec extends FlatSpec with Matchers with ApiSpecBase {
     )
 
     res2.toString() should be("{\"data\":{\"createUser\":{\"name\":\"Superman\"}}}")
+
+    val res3 = server.query(
+      s"""query {
+         |  user(
+         |    where:{
+         |      name: Superman
+         |      }
+         |  ){
+         |    name,
+         |    age
+         |  }
+         |}""",
+      project = project
+    )
+
+    res3.toString() should be("{\"data\":{\"user\":{\"name\":\"Superman\",\"age\":32}}}")
+
+    val res4 = server.query(
+      s"""query {
+         |  users(
+         |    where:{
+         |      name_in: [Spiderman, Superman]
+         |      }
+         |  ){
+         |    name,
+         |    age
+         |  }
+         |}""",
+      project = project
+    )
+
+    res4.toString() should be("{\"data\":{\"users\":[{\"name\":\"Spiderman\",\"age\":21},{\"name\":\"Superman\",\"age\":32}]}}")
+
   }
 }
