@@ -1,8 +1,12 @@
 use crate::data_model_loader;
 use query_core::{BuildMode, QuerySchema, QuerySchemaBuilder, SupportedCapabilities};
+use serial_test::serial;
 use std::sync::Arc;
 
+// Tests in this file run serially because the function `get_query_schema` depends on setting an env var.
+
 #[test]
+#[serial]
 fn dmmf_create_inputs_without_fields_for_parent_records_are_correct() {
     let dm = r#"
         model Blog {
@@ -68,6 +72,7 @@ fn dmmf_create_inputs_without_fields_for_parent_records_are_correct() {
 }
 
 #[test]
+#[serial]
 fn must_not_fail_on_missing_env_vars_in_a_datasource() {
     let dm = r#"
         datasource pg {

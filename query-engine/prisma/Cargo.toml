@@ -55,3 +55,4 @@ migration-core = { path = "../../migration-engine/core" }
 sql-migration-connector = { path = "../../migration-engine/connectors/sql-migration-connector" }
 indoc = "0.3"
 anyhow = "1"
+serial_test = "*"
