@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.2.0-alpha.9
+
+- Correct position for GROUP BY if having ORDER BY in the same clause
+
+## v0.2.0-alpha.8
+
 - AVG and SUM implementations
 
 ## v0.2.0-alpha.7
@@ -36,6 +42,10 @@ Breaking changes ahead
 - Queryable redesign. (https://github.com/prisma/quaint/pull/61) and (https://github.com/prisma/quaint/pull/74)
 - Unique/null constr error should be multi-column (https://github.com/prisma/quaint/pull/62)
 - Add optional serde support (https://github.com/prisma/quaint/pull/63)
+
+## v0.1.13
+
+- Correct position for GROUP BY if having ORDER BY in the same clause
 
 ## v0.1.12
 

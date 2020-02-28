@@ -156,10 +156,6 @@ pub trait Visitor<'a> {
                 self.write(" WHERE ")?;
                 self.visit_conditions(conditions)?;
             }
-            if !select.ordering.is_empty() {
-                self.write(" ORDER BY ")?;
-                self.visit_ordering(select.ordering)?;
-            }
             if !select.grouping.is_empty() {
                 self.write(" GROUP BY ")?;
                 self.visit_grouping(select.grouping)?;
@@ -167,6 +163,10 @@ pub trait Visitor<'a> {
             if let Some(conditions) = select.having {
                 self.write(" HAVING ")?;
                 self.visit_conditions(conditions)?;
+            }
+            if !select.ordering.is_empty() {
+                self.write(" ORDER BY ")?;
+                self.visit_ordering(select.ordering)?;
             }
 
             self.visit_limit_and_offset(select.limit, select.offset)?;
