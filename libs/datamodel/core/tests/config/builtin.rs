@@ -69,116 +69,24 @@ fn serialize_builtin_sources_to_dmmf() {
     assert_eq_json(&rendered, expected);
 }
 
-const INVALID_DATAMODEL: &str = r#"
-datasource pg1 {
-    provider = "AStrangeHalfMongoDatabase"
-    url = "https://localhost/postgres1"
-}
-"#;
-
 #[test]
 fn fail_to_load_sources_for_invalid_source() {
-    let res = datamodel::parse_configuration(INVALID_DATAMODEL);
+    let invalid_datamodel: &str = r#"
+        datasource pg1 {
+            provider = "AStrangeHalfMongoDatabase"
+            url = "https://localhost/postgres1"
+        }
+    "#;
+    let res = datamodel::parse_configuration(invalid_datamodel);
 
     if let Err(error) = res {
         error.assert_is(DatamodelError::SourceNotKnownError {
             source_name: String::from("AStrangeHalfMongoDatabase"),
-            span: datamodel::ast::Span::new(33, 60),
+            span: datamodel::ast::Span::new(49, 76),
         });
     } else {
         panic!("Expected error.")
     }
-}
-
-const ENABLED_DISABLED_SOURCE: &str = r#"
-datasource chinook {
-  provider = "sqlite"
-  url = "file:../db/production.db"
-  enabled = true
-}
-
-datasource chinook {
-  provider = "sqlite"
-  url = "file:../db/staging.db"
-  enabled = false
-}
-
-"#;
-
-#[test]
-fn enable_disable_source_through_argument() {
-    let config = datamodel::parse_configuration(ENABLED_DISABLED_SOURCE).unwrap();
-
-    assert_eq!(config.datasources.len(), 1);
-
-    let source = &config.datasources[0];
-
-    assert_eq!(source.name(), "chinook");
-    assert_eq!(source.connector_type(), "sqlite");
-    assert_eq!(source.url().value, "file:../db/production.db");
-}
-
-const ENABLED_DISABLED_SOURCE_ENV: &str = r#"
-// will be disabled by the env var resolving to false
-datasource one {
-  provider = "sqlite"
-  url = "file:../db/one.db"
-  enabled = env("ONE")
-}
-
-// will be enabled by the env var resolving to true
-datasource two {
-  provider = "sqlite"
-  url = "file:../db/two.db"
-  enabled = env("TWO")
-}
-
-// will be enabled by sheer presence of the env var
-datasource three {
-    provider = "sqlite"
-    url = "file:../db/three.db"
-    enabled = env("THREE")
-}
-
-// will be disabled by sheer absence of the env var
-datasource four {
-    provider = "sqlite"
-    url = "file:../db/four.db"
-    enabled = env("FOUR")
-}
-
-// will be enabled because normal
-datasource five {
-    provider = "sqlite"
-    url = "file:../db/five.db"
-}
-
-"#;
-
-#[test]
-fn enable_and_disable_source_through_boolean_env_var() {
-    std::env::set_var("ONE", "false");
-    std::env::set_var("TWO", "true");
-    std::env::set_var("THREE", "FOOBAR");
-
-    let config = datamodel::parse_configuration(ENABLED_DISABLED_SOURCE_ENV).unwrap();
-
-    assert_eq!(config.datasources.len(), 3);
-
-    let source1 = &config.datasources[0];
-    assert_eq!(source1.name(), "two");
-    assert_eq!(source1.connector_type(), "sqlite");
-    assert_eq!(source1.url().value, "file:../db/two.db");
-
-    let source2 = &config.datasources[1];
-    assert_eq!(source2.name(), "three");
-    assert_eq!(source2.connector_type(), "sqlite");
-    assert_eq!(source2.url().value, "file:../db/three.db");
-
-    let source3 = &config.datasources[2];
-    assert_eq!(source3.name(), "five");
-    assert_eq!(source3.connector_type(), "sqlite");
-    assert_eq!(source3.url().value, "file:../db/five.db");
 }
 
 fn assert_eq_json(a: &str, b: &str) {

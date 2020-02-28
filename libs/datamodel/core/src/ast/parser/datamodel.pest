@@ -80,14 +80,15 @@ directive = { (directive_name ~ directive_arguments | directive_name) }
 // ######################################
 // Field declarations
 // ######################################
-optional_type = { identifier ~ "?" }
 base_type = { identifier } // Called base type to not conflict with type rust keyword
 list_type = { identifier ~ "[]" }
-legacy_list_type = { "[" ~ identifier ~ "]" }
+optional_type = { identifier ~ "?" }
+unsupported_optional_list_type = { identifier ~ "[]" ~ "?" }
 legacy_required_type = { identifier ~ "!" }
+legacy_list_type = { "[" ~ identifier ~ "]" }
 
 // Pest is greedy, order is very important here.
-field_type = { list_type | optional_type | legacy_required_type | legacy_list_type | base_type }
+field_type = { unsupported_optional_list_type | list_type | optional_type | legacy_required_type | legacy_list_type | base_type }
 
 // Field
 // TODO: We want to force a line break after a field declaration.

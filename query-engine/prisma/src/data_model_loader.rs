@@ -95,7 +95,7 @@ fn load_datamodel_v2(ignore_env_var_errors: bool) -> PrismaResult<Option<Datamod
     debug!("Trying to load v2 data model...");
 
     load_v2_dml_string().inner_map(|dml_string| {
-        let dml = if dbg!(ignore_env_var_errors) {
+        let dml = if ignore_env_var_errors {
             datamodel::parse_datamodel_and_ignore_env_errors(&dml_string)
         } else {
             datamodel::parse_datamodel(&dml_string)

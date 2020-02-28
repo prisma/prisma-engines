@@ -272,7 +272,7 @@ impl ErrorAsserts for ErrorCollection {
         if self.errors.len() == 1 {
             assert_eq!(self.errors[0], error);
         } else {
-            panic!("Expected exactly one validation error.");
+            panic!("Expected exactly one validation error. Errors are: {:?}", &self);
         }
 
         self
