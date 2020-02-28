@@ -64,8 +64,8 @@ pub fn connect_nested_delete(
             &delete_many_node,
             QueryGraphDependency::ParentProjection(
                 child_model_identifier,
-                Box::new(move |mut node, parent_ids| {
-                    if parent_ids.len() != filter_len {
+                Box::new(move |mut delete_many_node, child_ids| {
+                    if child_ids.len() != filter_len {
                         return Err(QueryGraphBuilderError::RecordsNotConnected {
                             relation_name,
                             parent_name,
@@ -73,11 +73,11 @@ pub fn connect_nested_delete(
                         });
                     }
 
-                    if let Node::Query(Query::Write(WriteQuery::DeleteManyRecords(ref mut dmr))) = node {
-                        dmr.set_filter(Filter::and(vec![dmr.filter.clone(), parent_ids.filter()]));
+                    if let Node::Query(Query::Write(WriteQuery::DeleteManyRecords(ref mut dmr))) = delete_many_node {
+                        dmr.set_filter(Filter::and(vec![dmr.filter.clone(), child_ids.filter()]));
                     }
 
-                    Ok(node)
+                    Ok(delete_many_node)
                 }),
             ),
         )?;
@@ -99,19 +99,19 @@ pub fn connect_nested_delete(
             graph.create_edge(
                  &find_child_records_node,
                  &delete_record_node,
-                 QueryGraphDependency::ParentProjection(child_model_identifier, Box::new(move |mut node, mut parent_ids| {
-                     let parent_id = match parent_ids.pop() {
+                 QueryGraphDependency::ParentProjection(child_model_identifier, Box::new(move |mut delete_record_node, mut child_ids| {
+                     let child_id = match child_ids.pop() {
                          Some(pid) => Ok(pid),
                          None => Err(QueryGraphBuilderError::AssertionError(format!(
                              "[Query Graph] Expected a valid parent ID to be present for a nested delete on a one-to-many relation."
                          ))),
                      }?;
 
-                     if let Node::Query(Query::Write(ref mut wq)) = node {
-                         wq.add_filter(parent_id.filter());
+                     if let Node::Query(Query::Write(ref mut wq)) = delete_record_node {
+                         wq.add_filter(child_id.filter());
                      }
 
-                     Ok(node)
+                     Ok(delete_record_node)
                  })),
              )?;
         }
@@ -149,12 +149,12 @@ pub fn connect_nested_delete_many(
             &delete_many_node,
             QueryGraphDependency::ParentProjection(
                 child_model_identifier.clone(),
-                Box::new(move |mut node, parent_ids| {
-                    if let Node::Query(Query::Write(WriteQuery::DeleteManyRecords(ref mut dmr))) = node {
-                        dmr.set_filter(Filter::and(vec![dmr.filter.clone(), parent_ids.filter()]));
+                Box::new(move |mut delete_many_node, child_ids| {
+                    if let Node::Query(Query::Write(WriteQuery::DeleteManyRecords(ref mut dmr))) = delete_many_node {
+                        dmr.set_filter(Filter::and(vec![dmr.filter.clone(), child_ids.filter()]));
                     }
 
-                    Ok(node)
+                    Ok(delete_many_node)
                 }),
             ),
         )?;

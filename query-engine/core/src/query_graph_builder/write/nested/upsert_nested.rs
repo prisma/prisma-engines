@@ -130,11 +130,11 @@ pub fn connect_nested_upsert(
             &if_node,
             QueryGraphDependency::ParentProjection(
                 child_model_identifier.clone(),
-                Box::new(|node, parent_ids| {
-                    if let Node::Flow(Flow::If(_)) = node {
-                        Ok(Node::Flow(Flow::If(Box::new(move || !parent_ids.is_empty()))))
+                Box::new(|if_node, child_ids| {
+                    if let Node::Flow(Flow::If(_)) = if_node {
+                        Ok(Node::Flow(Flow::If(Box::new(move || !child_ids.is_empty()))))
                     } else {
-                        Ok(node)
+                        Ok(if_node)
                     }
                 }),
             ),
@@ -143,18 +143,19 @@ pub fn connect_nested_upsert(
         graph.create_edge(
             &read_children_node,
             &update_node,
-            QueryGraphDependency::ParentProjection(child_model_identifier.clone(), Box::new(move |mut node, mut parent_ids| {
-                if let Node::Query(Query::Write(WriteQuery::UpdateRecord(ref mut wq))) = node {
-                    let parent_id = match parent_ids.pop() {
-                        Some(pid) => Ok(pid),
+            QueryGraphDependency::ParentProjection(child_model_identifier.clone(), Box::new(move |mut update_node, mut child_ids| {
+                if let Node::Query(Query::Write(WriteQuery::UpdateRecord(ref mut wq))) = update_node {
+                    let child_id = match child_ids.pop() {
+                        Some(id) => Ok(id),
                         None => Err(QueryGraphBuilderError::AssertionError(format!(
                             "[Query Graph] Expected a valid parent ID to be present for a nested update in a nested upsert."
                         ))),
                     }?;
 
-                    wq.add_filter(parent_id.filter());
+                    wq.add_filter(child_id.filter());
                 }
-                Ok(node)
+
+                Ok(update_node)
             })),
         )?;
 
@@ -175,7 +176,7 @@ pub fn connect_nested_upsert(
                 graph.create_edge(
                     &parent_node,
                     &update_node,
-                    QueryGraphDependency::ParentProjection(parent_model_id, Box::new(move |mut child_node, mut parent_ids| {
+                    QueryGraphDependency::ParentProjection(parent_model_id, Box::new(move |mut update_node, mut parent_ids| {
                         let parent_id = match parent_ids.pop() {
                             Some(pid) => Ok(pid),
                             None => Err(QueryGraphBuilderError::AssertionError(format!(
@@ -183,11 +184,11 @@ pub fn connect_nested_upsert(
                             ))),
                         }?;
 
-                        if let Node::Query(Query::Write(ref mut wq)) = child_node {
+                        if let Node::Query(Query::Write(ref mut wq)) = update_node {
                             wq.add_filter(parent_id.filter());
                         }
 
-                        Ok(child_node)
+                        Ok(update_node)
                     })),
                 )?;
 
@@ -195,19 +196,19 @@ pub fn connect_nested_upsert(
                 graph.create_edge(
                     &create_node,
                     &update_node,
-                    QueryGraphDependency::ParentProjection(child_link.clone(), Box::new(move |mut child_node, mut parent_ids| {
-                        let parent_id = match parent_ids.pop() {
-                            Some(pid) => Ok(pid),
+                    QueryGraphDependency::ParentProjection(child_link.clone(), Box::new(move |mut update_node, mut child_links| {
+                        let child_link = match child_links.pop() {
+                            Some(link) => Ok(link),
                             None => Err(QueryGraphBuilderError::AssertionError(format!(
                                 "[Query Graph] Expected a valid parent ID to be present to retrieve the ID to inject for a parent update in a nested upsert."
                             ))),
                         }?;
 
-                        if let Node::Query(Query::Write(ref mut wq)) = child_node {
-                            wq.inject_projection_into_args(parent_link.assimilate(parent_id)?);
+                        if let Node::Query(Query::Write(ref mut wq)) = update_node {
+                            wq.inject_projection_into_args(parent_link.assimilate(child_link)?);
                         }
 
-                        Ok(child_node)
+                        Ok(update_node)
                     })),
                 )?;
             } else {
@@ -216,19 +217,19 @@ pub fn connect_nested_upsert(
                 graph.create_edge(
                     &parent_node,
                     &create_node,
-                    QueryGraphDependency::ParentProjection(parent_link, Box::new(move |mut child_node, mut parent_ids| {
-                        let parent_id = match parent_ids.pop() {
-                            Some(pid) => Ok(pid),
+                    QueryGraphDependency::ParentProjection(parent_link, Box::new(move |mut create_node, mut parent_links| {
+                        let parent_link = match parent_links.pop() {
+                            Some(link) => Ok(link),
                             None => Err(QueryGraphBuilderError::AssertionError(format!(
                                 "[Query Graph] Expected a valid parent ID to be present to retrieve the ID to inject into the child create in a nested upsert."
                             ))),
                         }?;
 
-                        if let Node::Query(Query::Write(ref mut wq)) = child_node {
-                            wq.inject_projection_into_args(child_link.assimilate(parent_id)?);
+                        if let Node::Query(Query::Write(ref mut wq)) = create_node {
+                            wq.inject_projection_into_args(child_link.assimilate(parent_link)?);
                         }
 
-                        Ok(child_node)
+                        Ok(create_node)
                     })),
                 )?;
             }

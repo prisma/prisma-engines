@@ -120,12 +120,12 @@ where
         &read_children_node,
         QueryGraphDependency::ParentProjection(
             projection,
-            Box::new(|mut node, parent_ids| {
-                if let Node::Query(Query::Read(ReadQuery::RelatedRecordsQuery(ref mut rq))) = node {
-                    rq.parent_projections = Some(parent_ids);
+            Box::new(|mut read_children_node, projections| {
+                if let Node::Query(Query::Read(ReadQuery::RelatedRecordsQuery(ref mut rq))) = read_children_node {
+                    rq.parent_projections = Some(projections);
                 };
 
-                Ok(node)
+                Ok(read_children_node)
             }),
         ),
     )?;
@@ -210,14 +210,14 @@ pub fn insert_existing_1to1_related_model_checks(
         &if_node,
         QueryGraphDependency::ParentProjection(
             child_model_identifier.clone(),
-            Box::new(move |node, child_ids| {
+            Box::new(move |if_node, child_ids| {
                 // If the other side ("child") requires the connection, we need to make sure that there isn't a child already connected
                 // to the parent, as that would violate the other childs relation side.
                 if child_ids.len() > 0 && child_side_required {
                     return Err(QueryGraphBuilderError::RelationViolation(rf.into()));
                 }
 
-                if let Node::Flow(Flow::If(_)) = node {
+                if let Node::Flow(Flow::If(_)) = if_node {
                     // If the relation is inlined in the parent, we need to update the old parent and null out the relation (i.e. "disconnect").
                     Ok(Node::Flow(Flow::If(Box::new(move || {
                         !relation_inlined_parent && !child_ids.is_empty()
@@ -233,19 +233,19 @@ pub fn insert_existing_1to1_related_model_checks(
     graph.create_edge(
         &read_existing_children,
         &update_existing_child,
-        QueryGraphDependency::ParentProjection(child_model_identifier.clone(), Box::new(move |mut child_node, mut child_ids| {
+        QueryGraphDependency::ParentProjection(child_model_identifier.clone(), Box::new(move |mut update_existing_child, mut child_ids| {
              // This has to succeed or the if-then node wouldn't trigger.
              let child_id = match child_ids.pop() {
                  Some(pid) => Ok(pid),
                  None => Err(QueryGraphBuilderError::AssertionError(format!("[Query Graph] Expected a valid parent ID to be present for a nested connect on a one-to-one relation, updating previous parent."))),
              }?;
 
-             if let Node::Query(Query::Write(ref mut wq)) = child_node {
+             if let Node::Query(Query::Write(ref mut wq)) = update_existing_child {
                  wq.add_filter(child_id.filter());
                  wq.inject_projection_into_args(child_linking_fields.empty_record_projection())
              }
 
-             Ok(child_node)
+             Ok(update_existing_child)
          })))?;
 
     Ok(())
@@ -316,12 +316,12 @@ pub fn insert_deletion_checks(
                 &noop_node,
                 QueryGraphDependency::ParentProjection(
                     child_model_identifier,
-                    Box::new(move |node, parent_ids| {
-                        if !parent_ids.is_empty() {
+                    Box::new(move |noop_node, child_ids| {
+                        if !child_ids.is_empty() {
                             return Err(QueryGraphBuilderError::RelationViolation((relation_field).into()));
                         }
 
-                        Ok(node)
+                        Ok(noop_node)
                     }),
                 ),
             )?;

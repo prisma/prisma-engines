@@ -230,8 +230,8 @@ fn handle_one_to_x(
         &update_node,
         QueryGraphDependency::ParentProjection(
             extractor_model_id,
-            Box::new(move |mut update_node, parent_ids| {
-                if parent_ids.len() == 0 {
+            Box::new(move |mut update_node, links| {
+                if links.len() == 0 {
                     return Err(QueryGraphBuilderError::RecordsNotConnected {
                         relation_name,
                         parent_name,
@@ -241,7 +241,7 @@ fn handle_one_to_x(
 
                 // Handle filter & arg injection
                 if let Node::Query(Query::Write(ref mut wq @ WriteQuery::UpdateManyRecords(_))) = update_node {
-                    wq.set_filter(parent_ids.filter());
+                    wq.set_filter(links.filter());
                     wq.inject_projection_into_args(null_record_id);
                 };
 
@@ -260,8 +260,8 @@ fn handle_one_to_x(
         &update_node,
         QueryGraphDependency::ParentProjection(
             check_model_id,
-            Box::new(move |child_node, parent_ids| {
-                if parent_ids.len() != expected_disconnects {
+            Box::new(move |update_node, ids| {
+                if ids.len() != expected_disconnects {
                     return Err(QueryGraphBuilderError::RecordsNotConnected {
                         relation_name,
                         parent_name,
@@ -269,7 +269,7 @@ fn handle_one_to_x(
                     });
                 }
 
-                Ok(child_node)
+                Ok(update_node)
             }),
         ),
     )?;

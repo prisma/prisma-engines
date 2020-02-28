@@ -134,18 +134,7 @@ impl Record {
             })
         })?;
 
-        // [DTODO] Revert to old code
-        // Ok(&self.values[index])
-        match self.values.get(index) {
-            Some(v) => Ok(v),
-            None => Err(DomainError::FieldNotFound {
-                name: field.to_owned(),
-                model: format!(
-                    "Field not found in record {:?}. Field names are: {:?}, looking for: {:?}",
-                    &self, &field_names, field
-                ),
-            }),
-        }
+        Ok(&self.values[index])
     }
 
     pub fn set_parent_id(&mut self, parent_id: RecordProjection) {

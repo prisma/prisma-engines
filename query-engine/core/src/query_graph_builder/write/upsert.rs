@@ -20,8 +20,8 @@ pub fn upsert_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedF
     let create_argument = field.arguments.lookup("create").unwrap();
     let update_argument = field.arguments.lookup("update").unwrap();
 
-    let child_read_query = utils::read_ids_infallible(model.clone(), model_id.clone(), filter.clone());
-    let initial_read_node = graph.create_node(child_read_query);
+    let read_parent_records = utils::read_ids_infallible(model.clone(), model_id.clone(), filter.clone());
+    let read_parent_records_node = graph.create_node(read_parent_records);
 
     let create_node = create::create_record_node(graph, Arc::clone(&model), create_argument.value.try_into()?)?;
     let update_node = update::update_record_node(graph, filter, Arc::clone(&model), update_argument.value.try_into()?)?;
@@ -36,16 +36,16 @@ pub fn upsert_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedF
     let if_node = graph.create_node(Flow::default_if());
 
     graph.create_edge(
-        &initial_read_node,
+        &read_parent_records_node,
         &if_node,
         QueryGraphDependency::ParentProjection(
             model_id.clone(),
-            Box::new(|node, parent_ids| {
-                if let Node::Flow(Flow::If(_)) = node {
+            Box::new(|if_node, parent_ids| {
+                if let Node::Flow(Flow::If(_)) = if_node {
                     // Todo: This looks super unnecessary
                     Ok(Node::Flow(Flow::If(Box::new(move || !parent_ids.is_empty()))))
                 } else {
-                    Ok(node)
+                    Ok(if_node)
                 }
             }),
         ),
@@ -58,7 +58,7 @@ pub fn upsert_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedF
         &read_node_update,
         QueryGraphDependency::ParentProjection(
             model_id.clone(),
-            Box::new(move |mut node, mut parent_ids| {
+            Box::new(move |mut read_node_update, mut parent_ids| {
                 let parent_id = match parent_ids.pop() {
                     Some(pid) => Ok(pid),
                     None => Err(QueryGraphBuilderError::AssertionError(format!(
@@ -66,11 +66,11 @@ pub fn upsert_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedF
                     ))),
                 }?;
 
-                if let Node::Query(Query::Read(ReadQuery::RecordQuery(ref mut rq))) = node {
+                if let Node::Query(Query::Read(ReadQuery::RecordQuery(ref mut rq))) = read_node_update {
                     rq.add_filter(parent_id.filter());
                 };
 
-                Ok(node)
+                Ok(read_node_update)
             }),
         ),
     )?;
@@ -80,7 +80,7 @@ pub fn upsert_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedF
         &read_node_create,
         QueryGraphDependency::ParentProjection(
             model_id.clone(),
-            Box::new(move |mut node, mut parent_ids| {
+            Box::new(move |mut read_node_create, mut parent_ids| {
                 let parent_id = match parent_ids.pop() {
                     Some(pid) => Ok(pid),
                     None => Err(QueryGraphBuilderError::AssertionError(format!(
@@ -88,11 +88,11 @@ pub fn upsert_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedF
                     ))),
                 }?;
 
-                if let Node::Query(Query::Read(ReadQuery::RecordQuery(ref mut rq))) = node {
+                if let Node::Query(Query::Read(ReadQuery::RecordQuery(ref mut rq))) = read_node_create {
                     rq.add_filter(parent_id.filter());
                 };
 
-                Ok(node)
+                Ok(read_node_create)
             }),
         ),
     )?;

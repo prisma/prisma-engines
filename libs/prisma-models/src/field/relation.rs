@@ -186,7 +186,7 @@ impl RelationField {
             .unwrap()
     }
 
-    /// Alias for more clarity. [DTODO] This is actually incorrect in self-relation cases...
+    /// Alias for more clarity (in most cases, doesn't add more clarity for self-relations);
     pub fn is_inlined_on_enclosing_model(&self) -> bool {
         self.relation_is_inlined_in_parent()
     }

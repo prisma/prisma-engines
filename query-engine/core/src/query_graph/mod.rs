@@ -659,9 +659,9 @@ impl QueryGraph {
                 &reload_node,
                 QueryGraphDependency::ParentProjection(
                     primary_model_id,
-                    Box::new(|mut reload_node, parent_ids| {
+                    Box::new(|mut reload_node, parent_projections| {
                         if let Node::Query(Query::Read(ReadQuery::ManyRecordsQuery(ref mut mr))) = reload_node {
-                            mr.set_filter(parent_ids.filter());
+                            mr.set_filter(parent_projections.filter());
                         }
 
                         Ok(reload_node)

@@ -32,9 +32,9 @@ pub fn delete_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedF
         &delete_node,
         QueryGraphDependency::ParentProjection(
             model.primary_identifier(),
-            Box::new(|node, parent_ids| {
+            Box::new(|delete_node, parent_ids| {
                 if parent_ids.len() > 0 {
-                    Ok(node)
+                    Ok(delete_node)
                 } else {
                     Err(QueryGraphBuilderError::RecordNotFound(
                         "Record to delete does not exist.".to_owned(),

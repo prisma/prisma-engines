@@ -65,19 +65,19 @@ pub fn connect_nested_update(
             &update_node,
             QueryGraphDependency::ParentProjection(
                 child_model_identifier.clone(),
-                Box::new(move |mut node, mut parent_ids| {
-                    let parent_id = match parent_ids.pop() {
+                Box::new(move |mut update_node, mut child_ids| {
+                    let child_id = match child_ids.pop() {
                         Some(pid) => Ok(pid),
                         None => Err(QueryGraphBuilderError::AssertionError(format!(
                             "Expected a valid parent ID to be present for nested update to-one case."
                         ))),
                     }?;
 
-                    if let Node::Query(Query::Write(WriteQuery::UpdateRecord(ref mut ur))) = node {
-                        ur.add_filter(parent_id.filter());
+                    if let Node::Query(Query::Write(WriteQuery::UpdateRecord(ref mut ur))) = update_node {
+                        ur.add_filter(child_id.filter());
                     }
 
-                    Ok(node)
+                    Ok(update_node)
                 }),
             ),
         )?;
@@ -120,12 +120,12 @@ pub fn connect_nested_update_many(
             &update_many_node,
             QueryGraphDependency::ParentProjection(
                 child_model_identifier.clone(),
-                Box::new(move |mut node, parent_ids| {
-                    if let Node::Query(Query::Write(WriteQuery::UpdateManyRecords(ref mut ur))) = node {
-                        ur.set_filter(Filter::and(vec![ur.filter.clone(), parent_ids.filter()]));
+                Box::new(move |mut update_many_node, child_ids| {
+                    if let Node::Query(Query::Write(WriteQuery::UpdateManyRecords(ref mut ur))) = update_many_node {
+                        ur.set_filter(Filter::and(vec![ur.filter.clone(), child_ids.filter()]));
                     }
 
-                    Ok(node)
+                    Ok(update_many_node)
                 }),
             ),
         )?;
