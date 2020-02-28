@@ -1,4 +1,4 @@
-use crate::{DataSourceFieldRef, DomainError, ModelIdentifier, PrismaValue, RecordIdentifier};
+use crate::{DataSourceFieldRef, DomainError, ModelProjection, PrismaValue, RecordProjection};
 
 #[derive(Debug, Clone)]
 pub struct SingleRecord {
@@ -20,8 +20,8 @@ impl SingleRecord {
         Self { record, field_names }
     }
 
-    pub fn identifier(&self, id: &ModelIdentifier) -> crate::Result<RecordIdentifier> {
-        self.record.identifier(&self.field_names, id)
+    pub fn projection(&self, projection: &ModelProjection) -> crate::Result<RecordProjection> {
+        self.record.projection(&self.field_names, projection)
     }
 
     pub fn get_field_value(&self, field: &str) -> crate::Result<&PrismaValue> {
@@ -36,10 +36,14 @@ pub struct ManyRecords {
 }
 
 impl ManyRecords {
-    pub fn identifiers(&self, model_id: &ModelIdentifier) -> crate::Result<Vec<RecordIdentifier>> {
+    pub fn projections(&self, model_projection: &ModelProjection) -> crate::Result<Vec<RecordProjection>> {
         self.records
             .iter()
-            .map(|record| record.identifier(&self.field_names, model_id).map(|i| i.clone()))
+            .map(|record| {
+                record
+                    .projection(&self.field_names, model_projection)
+                    .map(|i| i.clone())
+            })
             .collect()
     }
 
@@ -67,7 +71,7 @@ impl ManyRecords {
 #[derive(Debug, Default, Clone)]
 pub struct Record {
     pub values: Vec<PrismaValue>,
-    pub parent_id: Option<RecordIdentifier>,
+    pub parent_id: Option<RecordProjection>,
 }
 
 impl Record {
@@ -78,12 +82,16 @@ impl Record {
         }
     }
 
-    pub fn identifier(&self, field_names: &[String], id: &ModelIdentifier) -> crate::Result<RecordIdentifier> {
-        let pairs: Vec<(DataSourceFieldRef, PrismaValue)> = id
+    pub fn projection(
+        &self,
+        field_names: &[String],
+        model_projection: &ModelProjection,
+    ) -> crate::Result<RecordProjection> {
+        let pairs: Vec<(DataSourceFieldRef, PrismaValue)> = model_projection
             .fields()
             .into_iter()
-            .flat_map(|id_field| {
-                let source_fields = id_field.data_source_fields();
+            .flat_map(|field| {
+                let source_fields = field.data_source_fields();
 
                 source_fields.into_iter().map(|source_field| {
                     self.get_field_value(field_names, &source_field.name)
@@ -92,15 +100,19 @@ impl Record {
             })
             .collect::<crate::Result<Vec<_>>>()?;
 
-        Ok(RecordIdentifier { pairs })
+        Ok(RecordProjection { pairs })
     }
 
-    pub fn identifying_values(&self, field_names: &[String], id: &ModelIdentifier) -> crate::Result<Vec<&PrismaValue>> {
-        let x: Vec<&PrismaValue> = id
+    pub fn identifying_values(
+        &self,
+        field_names: &[String],
+        model_projection: &ModelProjection,
+    ) -> crate::Result<Vec<&PrismaValue>> {
+        let x: Vec<&PrismaValue> = model_projection
             .fields()
             .into_iter()
-            .flat_map(|id_field| {
-                let source_fields = id_field.data_source_fields();
+            .flat_map(|field| {
+                let source_fields = field.data_source_fields();
 
                 source_fields
                     .into_iter()
@@ -136,7 +148,7 @@ impl Record {
         }
     }
 
-    pub fn set_parent_id(&mut self, parent_id: RecordIdentifier) {
+    pub fn set_parent_id(&mut self, parent_id: RecordProjection) {
         self.parent_id = Some(parent_id);
     }
 }

@@ -1,4 +1,4 @@
-use crate::{Field, ModelIdentifier, RelationField, RelationLinkManifestation, ScalarField};
+use crate::{Field, ModelProjection, RelationField, RelationLinkManifestation, ScalarField};
 use quaint::ast::{Column, Row};
 
 pub struct ColumnIterator {
@@ -57,14 +57,14 @@ impl AsColumns for &[Field] {
     }
 }
 
-impl AsColumns for ModelIdentifier {
+impl AsColumns for ModelProjection {
     fn as_columns(&self) -> ColumnIterator {
         let cols: Vec<Column<'static>> = self.fields().flat_map(|f| f.as_columns()).collect();
         ColumnIterator::from(cols)
     }
 }
 
-impl AsRow for ModelIdentifier {
+impl AsRow for ModelProjection {
     fn as_row(&self) -> Row<'static> {
         let cols: Vec<Column<'static>> = self.as_columns().collect();
         Row::from(cols)

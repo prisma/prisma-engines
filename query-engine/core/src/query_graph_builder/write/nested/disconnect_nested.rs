@@ -191,7 +191,7 @@ fn handle_one_to_x(
     ) = if parent_relation_field.is_inlined_on_enclosing_model() {
         let parent_model = parent_relation_field.model();
         let extractor_model_id = parent_model.primary_identifier();
-        let null_record_id = parent_relation_field.linking_fields().empty_record_id();
+        let null_record_id = parent_relation_field.linking_fields().empty_record_projection();
         let check_model_id = child_relation_field.model().primary_identifier();
 
         (
@@ -206,7 +206,7 @@ fn handle_one_to_x(
     } else {
         let child_model = child_relation_field.model();
         let extractor_model_id = child_model.primary_identifier();
-        let null_record_id = child_relation_field.linking_fields().empty_record_id();
+        let null_record_id = child_relation_field.linking_fields().empty_record_projection();
         let check_model_id = parent_relation_field.model().primary_identifier();
 
         (

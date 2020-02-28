@@ -1,4 +1,4 @@
-use crate::{Field, ModelIdentifier, ModelRef, RelationFieldRef, ScalarFieldRef, TypeIdentifier};
+use crate::{Field, ModelProjection, ModelRef, RelationFieldRef, ScalarFieldRef, TypeIdentifier};
 use datamodel::FieldArity;
 use itertools::Itertools;
 
@@ -13,7 +13,7 @@ pub struct SelectedFields {
 }
 
 impl SelectedFields {
-    // [DTODO] Remove
+    // [DTODO] Remove when m2m relation fields are no longer holding data source fields.
     pub fn only_scalar_and_inlined(&self) -> SelectedFields {
         SelectedFields {
             scalar: self.scalar.clone(),
@@ -97,18 +97,18 @@ impl From<Vec<Field>> for SelectedFields {
     }
 }
 
-impl From<ModelIdentifier> for SelectedFields {
-    fn from(id: ModelIdentifier) -> SelectedFields {
-        let fields = id.into_iter().map(SelectedField::from).collect();
+impl From<ModelProjection> for SelectedFields {
+    fn from(model_projection: ModelProjection) -> SelectedFields {
+        let fields = model_projection.into_iter().map(SelectedField::from).collect();
         SelectedFields::new(fields)
     }
 }
 
-impl From<Vec<ModelIdentifier>> for SelectedFields {
-    fn from(ids: Vec<ModelIdentifier>) -> SelectedFields {
-        let fields = ids
+impl From<Vec<ModelProjection>> for SelectedFields {
+    fn from(projections: Vec<ModelProjection>) -> SelectedFields {
+        let fields = projections
             .into_iter()
-            .flat_map(|id| id.into_iter().map(SelectedField::from).collect::<Vec<_>>())
+            .flat_map(|projection| projection.into_iter().map(SelectedField::from).collect::<Vec<_>>())
             .collect();
 
         SelectedFields::new(fields).deduplicate()

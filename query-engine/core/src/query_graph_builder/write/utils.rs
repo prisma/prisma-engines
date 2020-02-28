@@ -264,7 +264,7 @@ pub fn insert_existing_1to1_related_model_checks(
 
              if let Node::Query(Query::Write(ref mut wq)) = child_node {
                  wq.add_filter(child_id.filter());
-                 wq.inject_id_into_args(child_linking_fields.empty_record_id())
+                 wq.inject_id_into_args(child_linking_fields.empty_record_projection())
              }
 
              Ok(child_node)

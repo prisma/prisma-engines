@@ -1,14 +1,14 @@
-use super::ModelIdentifier;
+use super::ModelProjection;
 use crate::{DataSourceFieldRef, DomainError, PrismaValue};
 use std::{collections::HashMap, convert::TryFrom};
 
-/// Collection of field to value pairs corresponding to a ModelIdentifier the record belongs to.
+/// Represents a (sub)set of fields to value pairs from a single record.
 #[derive(Default, Debug, Clone, PartialEq, Eq, Hash)]
-pub struct RecordIdentifier {
+pub struct RecordProjection {
     pub pairs: Vec<(DataSourceFieldRef, PrismaValue)>,
 }
 
-impl RecordIdentifier {
+impl RecordProjection {
     pub fn new(pairs: Vec<(DataSourceFieldRef, PrismaValue)>) -> Self {
         Self { pairs }
     }
@@ -51,23 +51,22 @@ impl RecordIdentifier {
         return false;
     }
 
-    /// Consumes this identifier and splits it into a set of `RecordIdentifier`s based on the passed
-    /// `ModelIdentifier`s. Assumes that The transformation can be done.
-    pub fn split_into(self, identifiers: &[ModelIdentifier]) -> Vec<RecordIdentifier> {
+    /// Consumes this projection and splits it into a set of `RecordProjection`s based on the passed
+    /// `ModelProjection`s. Assumes that The transformation can be done.
+    pub fn split_into(self, projections: &[ModelProjection]) -> Vec<RecordProjection> {
         let mapped: HashMap<String, (DataSourceFieldRef, PrismaValue)> = self
             .into_iter()
             .map(|(dsf, val)| (dsf.name.clone(), (dsf, val)))
             .collect();
 
-        identifiers
+        projections
             .into_iter()
-            .map(|ident| {
-                ident
-                    .data_source_fields()
+            .map(|p| {
+                p.data_source_fields()
                     .map(|dsf| {
                         let entry = mapped
                             .get(&dsf.name)
-                            .expect("Error splitting RecordIdentifier: ModelIdentifier doesn't match.")
+                            .expect("Error splitting RecordProjection: ModelProjection doesn't match.")
                             .clone();
 
                         entry
@@ -77,33 +76,23 @@ impl RecordIdentifier {
             })
             .collect()
     }
-
-    // [DTODO] Remove
-    pub fn single_value(&self) -> PrismaValue {
-        assert_eq!(
-            self.pairs.len(),
-            1,
-            "This function must only be called on singular record identifiers"
-        );
-        self.pairs.iter().next().unwrap().1.clone()
-    }
 }
 
-impl TryFrom<RecordIdentifier> for PrismaValue {
+impl TryFrom<RecordProjection> for PrismaValue {
     type Error = DomainError;
 
-    fn try_from(id: RecordIdentifier) -> crate::Result<Self> {
-        match id.pairs.into_iter().next() {
+    fn try_from(projection: RecordProjection) -> crate::Result<Self> {
+        match projection.pairs.into_iter().next() {
             Some(value) => Ok(value.1),
             None => Err(DomainError::ConversionFailure(
-                "RecordIdentifier".into(),
+                "RecordProjection".into(),
                 "PrismaValue".into(),
             )),
         }
     }
 }
 
-impl IntoIterator for RecordIdentifier {
+impl IntoIterator for RecordProjection {
     type Item = (DataSourceFieldRef, PrismaValue);
     type IntoIter = std::vec::IntoIter<Self::Item>;
 
@@ -112,13 +101,13 @@ impl IntoIterator for RecordIdentifier {
     }
 }
 
-impl From<(DataSourceFieldRef, PrismaValue)> for RecordIdentifier {
+impl From<(DataSourceFieldRef, PrismaValue)> for RecordProjection {
     fn from(tup: (DataSourceFieldRef, PrismaValue)) -> Self {
         Self::new(vec![tup])
     }
 }
 
-impl From<Vec<(DataSourceFieldRef, PrismaValue)>> for RecordIdentifier {
+impl From<Vec<(DataSourceFieldRef, PrismaValue)>> for RecordProjection {
     fn from(tup: Vec<(DataSourceFieldRef, PrismaValue)>) -> Self {
         Self::new(tup)
     }
