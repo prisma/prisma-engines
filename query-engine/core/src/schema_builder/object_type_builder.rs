@@ -108,7 +108,7 @@ impl<'a> ObjectTypeBuilder<'a> {
                 TypeIdentifier::String => OutputType::string(),
                 TypeIdentifier::Float => OutputType::float(),
                 TypeIdentifier::Boolean => OutputType::boolean(),
-                TypeIdentifier::Enum => Self::map_enum_field(sf).into(),
+                TypeIdentifier::Enum(_) => Self::map_enum_field(sf).into(),
                 TypeIdentifier::Json => OutputType::json(),
                 TypeIdentifier::DateTime => OutputType::date_time(),
                 TypeIdentifier::UUID => OutputType::uuid(),
@@ -200,7 +200,7 @@ impl<'a> ObjectTypeBuilder<'a> {
 
     pub fn map_enum_field(scalar_field: &Arc<ScalarField>) -> EnumType {
         match scalar_field.type_identifier {
-            TypeIdentifier::Enum => {
+            TypeIdentifier::Enum(_) => {
                 let internal_enum = scalar_field.internal_enum.as_ref().expect(
                     "Invariant violation: Enum fields are expected to have an internal_enum associated with them.",
                 );

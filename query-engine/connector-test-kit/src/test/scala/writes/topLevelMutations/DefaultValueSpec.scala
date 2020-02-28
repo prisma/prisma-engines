@@ -132,4 +132,54 @@ class DefaultValueSpec extends FlatSpec with Matchers with ApiSpecBase {
     res.pathAsString("data.createUser.createdAt") should be("2000-01-01T00:00:00.000Z")
     res.pathAsString("data.createUser.updatedAt") should be("2001-01-01T00:00:00.000Z")
   }
+
+  "Remapped enum default values" should "work" in {
+    val project = ProjectDsl.fromString {
+      """
+        |model User {
+        |  id        String   @id @default(cuid())
+        |  name      Names    @default(Spiderman)
+        |  age       Int
+        }
+        |
+        |enum Names {
+        |   Spiderman @map("Peter Parker")
+        |   Superman  @map("Clark Kent")
+        |}
+        |
+      """
+    }
+    database.setup(project)
+
+    val res = server.query(
+      s"""mutation {
+         |  createUser(
+         |    data:{
+         |      age: 21
+         |    }
+         |  ){
+         |    name
+         |  }
+         |}""",
+      project = project
+    )
+
+    res.toString() should be("{\"data\":{\"createUser\":{\"name\":\"Spiderman\"}}}")
+
+    val res2 = server.query(
+      s"""mutation {
+         |  createUser(
+         |    data:{
+         |      name: Superman
+         |      age: 32
+         |    }
+         |  ){
+         |    name
+         |  }
+         |}""",
+      project = project
+    )
+
+    res2.toString() should be("{\"data\":{\"createUser\":{\"name\":\"Superman\"}}}")
+  }
 }

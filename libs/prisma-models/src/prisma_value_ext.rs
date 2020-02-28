@@ -5,12 +5,12 @@ use rust_decimal::prelude::ToPrimitive;
 // use std::convert::TryFrom;
 
 pub trait PrismaValueExtensions {
-    fn coerce(self, to_type: TypeIdentifier) -> crate::Result<PrismaValue>;
+    fn coerce(self, to_type: &TypeIdentifier) -> crate::Result<PrismaValue>;
 }
 
 impl PrismaValueExtensions for PrismaValue {
     // Todo this is not exhaustive for now.
-    fn coerce(self, to_type: TypeIdentifier) -> crate::Result<PrismaValue> {
+    fn coerce(self, to_type: &TypeIdentifier) -> crate::Result<PrismaValue> {
         let coerced = match (self, to_type) {
             // Trivial cases
             (val @ PrismaValue::Null, _) => val,
@@ -19,7 +19,7 @@ impl PrismaValueExtensions for PrismaValue {
             (val @ PrismaValue::Float(_), TypeIdentifier::Float) => val,
             (val @ PrismaValue::Boolean(_), TypeIdentifier::Boolean) => val,
             (val @ PrismaValue::DateTime(_), TypeIdentifier::DateTime) => val,
-            (val @ PrismaValue::Enum(_), TypeIdentifier::Enum) => val,
+            (val @ PrismaValue::Enum(_), TypeIdentifier::Enum(_)) => val,
             (val @ PrismaValue::Uuid(_), TypeIdentifier::UUID) => val,
 
             // Valid String coercions
@@ -49,7 +49,7 @@ impl PrismaValueExtensions for PrismaValue {
             // Lists
             (PrismaValue::List(list), typ) => PrismaValue::List(
                 list.into_iter()
-                    .map(|val| val.coerce(typ))
+                    .map(|val| val.coerce(&typ))
                     .collect::<crate::Result<Vec<_>>>()?,
             ),
 
