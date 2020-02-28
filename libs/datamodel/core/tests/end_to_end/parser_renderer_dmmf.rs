@@ -253,6 +253,7 @@ model Post {
 }"#;
 
 #[test]
+#[ignore]
 fn should_serialize_dmmf_without_relation_name_correctly() {
     let dml = datamodel::json::dmmf::parse_from_dmmf(DMFF_WITHOUT_RELATION_NAME);
     let rendered = datamodel::render_datamodel_to_string(&dml).unwrap();
