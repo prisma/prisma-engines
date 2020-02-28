@@ -1,10 +1,14 @@
 mod aggregate_to_string;
+mod average;
 mod count;
 mod row_number;
+mod sum;
 
 pub use aggregate_to_string::*;
+pub use average::*;
 pub use count::*;
 pub use row_number::*;
+pub use sum::*;
 
 use super::DatabaseValue;
 use std::borrow::Cow;
@@ -22,6 +26,8 @@ pub(crate) enum FunctionType<'a> {
     RowNumber(RowNumber<'a>),
     Count(Count<'a>),
     AggregateToString(AggregateToString<'a>),
+    Average(Average<'a>),
+    Sum(Sum<'a>),
 }
 
 impl<'a> Function<'a> {
@@ -58,4 +64,4 @@ macro_rules! function {
     );
 }
 
-function!(RowNumber, Count, AggregateToString);
+function!(RowNumber, Count, AggregateToString, Average, Sum);

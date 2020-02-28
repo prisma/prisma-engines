@@ -673,6 +673,14 @@ pub trait Visitor<'a> {
             FunctionType::AggregateToString(agg) => {
                 self.visit_aggregate_to_string(agg.value.as_ref().clone())?;
             }
+            FunctionType::Average(avg) => {
+                self.write("AVG")?;
+                self.surround_with("(", ")", |ref mut s| s.visit_column(avg.column))?;
+            }
+            FunctionType::Sum(sum) => {
+                self.write("SUM")?;
+                self.surround_with("(", ")", |ref mut s| s.visit_column(sum.column))?;
+            }
         };
 
         if let Some(alias) = fun.alias {
