@@ -4,10 +4,9 @@ use crate::{
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
     InputAssertions, ParsedInputValue,
 };
-use connector::Filter;
+use connector::{Filter, IdFilter};
 use prisma_models::{ModelRef, RelationFieldRef};
 use std::{convert::TryInto, sync::Arc};
-use utils::IdFilter;
 use write_args_parser::*;
 
 /// Handles nested update (single record) cases.
@@ -64,7 +63,7 @@ pub fn connect_nested_update(
         graph.create_edge(
             &find_child_records_node,
             &update_node,
-            QueryGraphDependency::ParentIds(
+            QueryGraphDependency::ParentProjection(
                 child_model_identifier.clone(),
                 Box::new(move |mut node, mut parent_ids| {
                     let parent_id = match parent_ids.pop() {
@@ -119,7 +118,7 @@ pub fn connect_nested_update_many(
         graph.create_edge(
             &find_child_records_node,
             &update_many_node,
-            QueryGraphDependency::ParentIds(
+            QueryGraphDependency::ParentProjection(
                 child_model_identifier.clone(),
                 Box::new(move |mut node, parent_ids| {
                     if let Node::Query(Query::Write(WriteQuery::UpdateManyRecords(ref mut ur))) = node {

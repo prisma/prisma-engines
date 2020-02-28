@@ -3,37 +3,10 @@ use crate::{
     query_graph::{Flow, Node, NodeRef, QueryGraph, QueryGraphDependency},
     ParsedInputValue, QueryGraphBuilderError, QueryGraphBuilderResult,
 };
-use connector::{Filter, QueryArguments, ScalarCompare, WriteArgs};
+use connector::{Filter, IdFilter, QueryArguments, WriteArgs};
 use itertools::Itertools;
-use prisma_models::{ModelIdentifier, ModelRef, RecordIdentifier, RelationFieldRef, SelectedFields};
+use prisma_models::{ModelProjection, ModelRef, RelationFieldRef, SelectedFields};
 use std::sync::Arc;
-
-pub trait IdFilter {
-    fn filter(self) -> Filter;
-}
-
-impl IdFilter for RecordIdentifier {
-    fn filter(self) -> Filter {
-        let filters: Vec<Filter> = self
-            .pairs
-            .into_iter()
-            .map(|(field, value)| field.equals(value))
-            .collect();
-
-        Filter::and(filters)
-    }
-}
-
-impl IdFilter for Vec<RecordIdentifier> {
-    fn filter(self) -> Filter {
-        let filters = self.into_iter().fold(vec![], |mut acc, id| {
-            acc.push(id.filter());
-            acc
-        });
-
-        Filter::or(filters)
-    }
-}
 
 /// Coerces single values (`ParsedInputValue::Single` and `ParsedInputValue::Map`) into a vector.
 /// Simply unpacks `ParsedInputValue::List`.
@@ -52,12 +25,12 @@ pub fn node_is_create(graph: &QueryGraph, node: &NodeRef) -> bool {
     }
 }
 
-/// Produces a non-failing read query that fetches records model IDs for a given filterable.
-pub fn read_ids_infallible<T>(model: ModelRef, id: ModelIdentifier, filter: T) -> Query
+/// Produces a non-failing read query that fetches the requested projection of records for a given filterable.
+pub fn read_ids_infallible<T>(model: ModelRef, projection: ModelProjection, filter: T) -> Query
 where
     T: Into<Filter>,
 {
-    let selected_fields = get_selected_fields(&model, id);
+    let selected_fields = get_selected_fields(&model, projection);
     let filter: Filter = filter.into();
 
     let read_query = ReadQuery::ManyRecordsQuery(ManyRecordsQuery {
@@ -73,12 +46,17 @@ where
     Query::Read(read_query)
 }
 
-fn get_selected_fields(model: &ModelRef, id: ModelIdentifier) -> SelectedFields {
+fn get_selected_fields(model: &ModelRef, projection: ModelProjection) -> SelectedFields {
     // Always fetch the primary identifier as well.
     let primary_model_id = model.primary_identifier();
-    let mismatches = id != primary_model_id;
+    let mismatches = projection != primary_model_id;
 
-    let projection = if mismatches { primary_model_id.merge(id) } else { id };
+    let projection = if mismatches {
+        primary_model_id.merge(projection)
+    } else {
+        projection
+    };
+
     projection.into()
 }
 
@@ -140,7 +118,7 @@ where
     graph.create_edge(
         parent_node,
         &read_children_node,
-        QueryGraphDependency::ParentIds(
+        QueryGraphDependency::ParentProjection(
             projection,
             Box::new(|mut node, parent_ids| {
                 if let Node::Query(Query::Read(ReadQuery::RelatedRecordsQuery(ref mut rq))) = node {
@@ -230,7 +208,7 @@ pub fn insert_existing_1to1_related_model_checks(
     graph.create_edge(
         &read_existing_children,
         &if_node,
-        QueryGraphDependency::ParentIds(
+        QueryGraphDependency::ParentProjection(
             child_model_identifier.clone(),
             Box::new(move |node, child_ids| {
                 // If the other side ("child") requires the connection, we need to make sure that there isn't a child already connected
@@ -255,7 +233,7 @@ pub fn insert_existing_1to1_related_model_checks(
     graph.create_edge(
         &read_existing_children,
         &update_existing_child,
-        QueryGraphDependency::ParentIds(child_model_identifier.clone(), Box::new(move |mut child_node, mut child_ids| {
+        QueryGraphDependency::ParentProjection(child_model_identifier.clone(), Box::new(move |mut child_node, mut child_ids| {
              // This has to succeed or the if-then node wouldn't trigger.
              let child_id = match child_ids.pop() {
                  Some(pid) => Ok(pid),
@@ -264,7 +242,7 @@ pub fn insert_existing_1to1_related_model_checks(
 
              if let Node::Query(Query::Write(ref mut wq)) = child_node {
                  wq.add_filter(child_id.filter());
-                 wq.inject_id_into_args(child_linking_fields.empty_record_projection())
+                 wq.inject_projection_into_args(child_linking_fields.empty_record_projection())
              }
 
              Ok(child_node)
@@ -336,7 +314,7 @@ pub fn insert_deletion_checks(
             graph.create_edge(
                 &read_node,
                 &noop_node,
-                QueryGraphDependency::ParentIds(
+                QueryGraphDependency::ParentProjection(
                     child_model_identifier,
                     Box::new(move |node, parent_ids| {
                         if !parent_ids.is_empty() {

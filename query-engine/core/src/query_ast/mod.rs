@@ -5,7 +5,7 @@ pub use read::*;
 pub use write::*;
 
 use connector::filter::Filter;
-use prisma_models::{ModelIdentifier, ModelRef};
+use prisma_models::{ModelProjection, ModelRef};
 
 #[derive(Debug, Clone)]
 pub enum Query {
@@ -14,10 +14,10 @@ pub enum Query {
 }
 
 impl Query {
-    pub fn returns(&self, ident: &ModelIdentifier) -> bool {
+    pub fn returns(&self, projection: &ModelProjection) -> bool {
         match self {
-            Self::Read(rq) => rq.returns(ident),
-            Self::Write(wq) => wq.returns(ident),
+            Self::Read(rq) => rq.returns(projection),
+            Self::Write(wq) => wq.returns(projection),
         }
     }
 

@@ -1,10 +1,9 @@
-use super::utils::IdFilter;
 use super::*;
 use crate::{
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
     FilteredQuery, InputAssertions, ParsedInputMap, ParsedInputValue, Query, WriteQuery,
 };
-use connector::Filter;
+use connector::{Filter, IdFilter};
 use itertools::Itertools;
 use prisma_models::{ModelRef, PrismaValue, RelationFieldRef};
 use std::convert::TryInto;
@@ -229,7 +228,7 @@ fn handle_one_to_x(
     graph.create_edge(
         node_to_attach,
         &update_node,
-        QueryGraphDependency::ParentIds(
+        QueryGraphDependency::ParentProjection(
             extractor_model_id,
             Box::new(move |mut update_node, parent_ids| {
                 if parent_ids.len() == 0 {
@@ -243,7 +242,7 @@ fn handle_one_to_x(
                 // Handle filter & arg injection
                 if let Node::Query(Query::Write(ref mut wq @ WriteQuery::UpdateManyRecords(_))) = update_node {
                     wq.set_filter(parent_ids.filter());
-                    wq.inject_id_into_args(null_record_id);
+                    wq.inject_projection_into_args(null_record_id);
                 };
 
                 Ok(update_node)
@@ -259,7 +258,7 @@ fn handle_one_to_x(
     graph.create_edge(
         node_to_check,
         &update_node,
-        QueryGraphDependency::ParentIds(
+        QueryGraphDependency::ParentProjection(
             check_model_id,
             Box::new(move |child_node, parent_ids| {
                 if parent_ids.len() != expected_disconnects {

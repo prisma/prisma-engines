@@ -4,9 +4,9 @@ use crate::{
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
     ArgumentListLookup, ParsedField, ParsedInputMap, ReadOneRecordBuilder,
 };
+use connector::IdFilter;
 use prisma_models::ModelRef;
 use std::{convert::TryInto, sync::Arc};
-use utils::IdFilter;
 use write_args_parser::*;
 
 /// Creates a create record query and adds it to the query graph, together with it's nested queries and companion read query.
@@ -23,7 +23,7 @@ pub fn create_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedF
     graph.create_edge(
         &create_node,
         &read_node,
-        QueryGraphDependency::ParentIds(
+        QueryGraphDependency::ParentProjection(
             model.primary_identifier(),
             Box::new(move |mut node, mut parent_ids| {
                 let parent_id = match parent_ids.pop() {

@@ -1,4 +1,3 @@
-use super::utils::IdFilter;
 use super::*;
 use crate::query_graph_builder::write::utils::coerce_vec;
 use crate::{
@@ -6,7 +5,7 @@ use crate::{
     query_graph::{Flow, Node, NodeRef, QueryGraph, QueryGraphDependency},
     InputAssertions, ParsedInputMap, ParsedInputValue,
 };
-use connector::Filter;
+use connector::{Filter, IdFilter};
 use prisma_models::RelationFieldRef;
 use std::{convert::TryInto, sync::Arc};
 
@@ -129,7 +128,7 @@ pub fn connect_nested_upsert(
         graph.create_edge(
             &read_children_node,
             &if_node,
-            QueryGraphDependency::ParentIds(
+            QueryGraphDependency::ParentProjection(
                 child_model_identifier.clone(),
                 Box::new(|node, parent_ids| {
                     if let Node::Flow(Flow::If(_)) = node {
@@ -144,7 +143,7 @@ pub fn connect_nested_upsert(
         graph.create_edge(
             &read_children_node,
             &update_node,
-            QueryGraphDependency::ParentIds(child_model_identifier.clone(), Box::new(move |mut node, mut parent_ids| {
+            QueryGraphDependency::ParentProjection(child_model_identifier.clone(), Box::new(move |mut node, mut parent_ids| {
                 if let Node::Query(Query::Write(WriteQuery::UpdateRecord(ref mut wq))) = node {
                     let parent_id = match parent_ids.pop() {
                         Some(pid) => Ok(pid),
@@ -176,7 +175,7 @@ pub fn connect_nested_upsert(
                 graph.create_edge(
                     &parent_node,
                     &update_node,
-                    QueryGraphDependency::ParentIds(parent_model_id, Box::new(move |mut child_node, mut parent_ids| {
+                    QueryGraphDependency::ParentProjection(parent_model_id, Box::new(move |mut child_node, mut parent_ids| {
                         let parent_id = match parent_ids.pop() {
                             Some(pid) => Ok(pid),
                             None => Err(QueryGraphBuilderError::AssertionError(format!(
@@ -196,7 +195,7 @@ pub fn connect_nested_upsert(
                 graph.create_edge(
                     &create_node,
                     &update_node,
-                    QueryGraphDependency::ParentIds(child_link.clone(), Box::new(move |mut child_node, mut parent_ids| {
+                    QueryGraphDependency::ParentProjection(child_link.clone(), Box::new(move |mut child_node, mut parent_ids| {
                         let parent_id = match parent_ids.pop() {
                             Some(pid) => Ok(pid),
                             None => Err(QueryGraphBuilderError::AssertionError(format!(
@@ -205,7 +204,7 @@ pub fn connect_nested_upsert(
                         }?;
 
                         if let Node::Query(Query::Write(ref mut wq)) = child_node {
-                            wq.inject_id_into_args(parent_link.assimilate(parent_id)?);
+                            wq.inject_projection_into_args(parent_link.assimilate(parent_id)?);
                         }
 
                         Ok(child_node)
@@ -217,7 +216,7 @@ pub fn connect_nested_upsert(
                 graph.create_edge(
                     &parent_node,
                     &create_node,
-                    QueryGraphDependency::ParentIds(parent_link, Box::new(move |mut child_node, mut parent_ids| {
+                    QueryGraphDependency::ParentProjection(parent_link, Box::new(move |mut child_node, mut parent_ids| {
                         let parent_id = match parent_ids.pop() {
                             Some(pid) => Ok(pid),
                             None => Err(QueryGraphBuilderError::AssertionError(format!(
@@ -226,7 +225,7 @@ pub fn connect_nested_upsert(
                         }?;
 
                         if let Node::Query(Query::Write(ref mut wq)) = child_node {
-                            wq.inject_id_into_args(child_link.assimilate(parent_id)?);
+                            wq.inject_projection_into_args(child_link.assimilate(parent_id)?);
                         }
 
                         Ok(child_node)

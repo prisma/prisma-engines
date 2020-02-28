@@ -1,7 +1,6 @@
-use super::utils::IdFilter;
 use super::*;
 use crate::{query_ast::*, query_graph::*, InputAssertions, ParsedInputValue};
-use connector::Filter;
+use connector::{Filter, IdFilter};
 use itertools::Itertools;
 use prisma_models::{ModelRef, RelationFieldRef};
 use std::{collections::HashSet, convert::TryInto, iter::FromIterator, sync::Arc};
@@ -110,7 +109,7 @@ fn handle_many_to_many(
     graph.create_edge(
          parent_node,
          &disconnect_node,
-         QueryGraphDependency::ParentIds(parent_model_identifier, Box::new(|mut child_node, mut parent_ids| {
+         QueryGraphDependency::ParentProjection(parent_model_identifier, Box::new(|mut child_node, mut parent_ids| {
              let parent_id = match parent_ids.pop() {
                  Some(pid) => Ok(pid),
                  None => Err(QueryGraphBuilderError::AssertionError(format!(
@@ -130,7 +129,7 @@ fn handle_many_to_many(
     graph.create_edge(
         &read_old_node,
         &disconnect_node,
-        QueryGraphDependency::ParentIds(
+        QueryGraphDependency::ParentProjection(
             child_model_identifier.clone(),
             Box::new(|mut disconnect_node, parent_ids| {
                 // todo: What if there are no connected nodes to disconnect?
@@ -232,7 +231,7 @@ fn handle_one_to_many(
     graph.create_edge(
         &read_new_node,
         &diff_node,
-        QueryGraphDependency::ParentIds(
+        QueryGraphDependency::ParentProjection(
             child_model_identifier.clone(),
             Box::new(move |mut node, parent_ids| {
                 if let Node::Computation(Computation::Diff(ref mut diff)) = node {
@@ -248,7 +247,7 @@ fn handle_one_to_many(
     graph.create_edge(
         &read_old_node,
         &diff_node,
-        QueryGraphDependency::ParentIds(
+        QueryGraphDependency::ParentProjection(
             child_model_identifier.clone(),
             Box::new(move |mut node, parent_ids| {
                 if let Node::Computation(Computation::Diff(ref mut diff)) = node {
@@ -284,7 +283,7 @@ fn handle_one_to_many(
     graph.create_edge(
         parent_node,
         &update_connect_node,
-        QueryGraphDependency::ParentIds(
+        QueryGraphDependency::ParentProjection(
             parent_link.clone(),
             Box::new(move |mut node, mut parent_ids| {
                 let parent_id = match parent_ids.pop() {
@@ -295,7 +294,7 @@ fn handle_one_to_many(
                 }?;
 
                 if let Node::Query(Query::Write(ref mut wq)) = node {
-                    wq.inject_id_into_args(child_link.assimilate(parent_id)?);
+                    wq.inject_projection_into_args(child_link.assimilate(parent_id)?);
                 }
 
                 Ok(node)
@@ -369,7 +368,7 @@ fn handle_one_to_many(
             }
 
             if let Node::Query(Query::Write(ref mut wq)) = node {
-                wq.inject_id_into_args(empty_child_link);
+                wq.inject_projection_into_args(empty_child_link);
             }
 
             Ok(node)

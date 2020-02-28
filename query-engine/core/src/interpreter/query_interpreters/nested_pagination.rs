@@ -1,5 +1,5 @@
 use connector::QueryArguments;
-use prisma_models::{ManyRecords, RecordIdentifier};
+use prisma_models::{ManyRecords, RecordProjection};
 use std::collections::HashMap;
 
 pub struct NestedPagination {
@@ -21,7 +21,7 @@ impl NestedPagination {
         if !self.must_apply_pagination() {
             return;
         }
-        let mut count_by_parent_id: HashMap<Option<RecordIdentifier>, i64> = HashMap::new();
+        let mut count_by_parent_id: HashMap<Option<RecordProjection>, i64> = HashMap::new();
         // replacement for SQL order by
         // TODO: this must also handle secondary order bys
         many_records.records.sort_by_key(|r| {

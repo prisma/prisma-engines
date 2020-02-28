@@ -1,9 +1,9 @@
 use connector::QueryArguments;
-use prisma_models::{ManyRecords, ModelIdentifier, RecordIdentifier};
+use prisma_models::{ManyRecords, ModelProjection, RecordProjection};
 
 #[derive(Debug, Clone)]
 pub enum QueryResult {
-    Id(Option<RecordIdentifier>),
+    Id(Option<RecordProjection>),
     Count(usize),
     RecordSelection(RecordSelection),
     Unit,
@@ -29,6 +29,6 @@ pub struct RecordSelection {
     /// Required for result processing
     pub query_arguments: QueryArguments,
 
-    /// Model ID that can be used to retrieve the IDs of the contained records.
-    pub model_id: ModelIdentifier,
+    /// Model projection that can be used to retrieve the IDs of the contained records.
+    pub model_id: ModelProjection,
 }

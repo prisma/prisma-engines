@@ -1,11 +1,10 @@
-use super::utils::IdFilter;
 use super::*;
 use crate::{
     query_ast::*,
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
     ParsedInputValue,
 };
-use connector::Filter;
+use connector::{Filter, IdFilter};
 use prisma_models::{ModelRef, RelationFieldRef};
 use std::{convert::TryInto, sync::Arc};
 
@@ -146,7 +145,7 @@ fn handle_one_to_many(
         graph.create_edge(
             &parent_node,
             &child_node,
-            QueryGraphDependency::ParentIds(child_link, Box::new(move |mut child_node, mut parent_ids| {
+            QueryGraphDependency::ParentProjection(child_link, Box::new(move |mut child_node, mut parent_ids| {
                 let parent_id = match parent_ids.pop() {
                     Some(pid) => Ok(pid),
                     None => Err(QueryGraphBuilderError::AssertionError(format!(
@@ -155,7 +154,7 @@ fn handle_one_to_many(
                 }?;
 
                 if let Node::Query(Query::Write(ref mut wq)) = child_node {
-                    wq.inject_id_into_args(parent_link.assimilate(parent_id)?);
+                    wq.inject_projection_into_args(parent_link.assimilate(parent_id)?);
                 }
 
                 Ok(child_node)
@@ -169,7 +168,7 @@ fn handle_one_to_many(
             graph.create_edge(
                 &parent_node,
                 &create_node,
-                QueryGraphDependency::ParentIds(parent_link, Box::new(move |mut child_node, mut parent_ids| {
+                QueryGraphDependency::ParentProjection(parent_link, Box::new(move |mut child_node, mut parent_ids| {
                     let parent_id = match parent_ids.pop() {
                         Some(pid) => Ok(pid),
                         None => Err(QueryGraphBuilderError::AssertionError(format!(
@@ -178,7 +177,7 @@ fn handle_one_to_many(
                     }?;
 
                     if let Node::Query(Query::Write(ref mut wq)) = child_node {
-                        wq.inject_id_into_args(child_link.assimilate(parent_id)?);
+                        wq.inject_projection_into_args(child_link.assimilate(parent_id)?);
                     }
 
                     Ok(child_node)
@@ -322,7 +321,7 @@ fn handle_one_to_one(
     graph.create_edge(
         &parent_node,
         &create_node,
-        QueryGraphDependency::ParentIds(extractor, Box::new(move |mut child_node, mut parent_ids| {
+        QueryGraphDependency::ParentProjection(extractor, Box::new(move |mut child_node, mut parent_ids| {
             let parent_id = match parent_ids.pop() {
             Some(pid) => Ok(pid),
                 None => Err(QueryGraphBuilderError::AssertionError(format!(
@@ -332,7 +331,7 @@ fn handle_one_to_one(
 
             // We ONLY inject for creates here. Check end of doc comment for explanation.
             if let Node::Query(Query::Write(ref mut q @ WriteQuery::CreateRecord(_))) = child_node {
-                q.inject_id_into_args(assimilator.assimilate(parent_id)?);
+                q.inject_projection_into_args(assimilator.assimilate(parent_id)?);
             }
 
             Ok(child_node)
@@ -350,14 +349,14 @@ fn handle_one_to_one(
         graph.create_edge(
             &create_node,
             &update_node,
-            QueryGraphDependency::ParentIds(child_link, Box::new(move |mut child_node, mut parent_ids| {
+            QueryGraphDependency::ParentProjection(child_link, Box::new(move |mut child_node, mut parent_ids| {
                 let parent_id = match parent_ids.pop() {
                     Some(pid) => Ok(pid),
                     None => Err(QueryGraphBuilderError::AssertionError(format!("[Query Graph] Expected a valid parent ID to be present for a nested create on a one-to-one relation, updating inlined on parent."))),
                 }?;
 
                 if let Node::Query(Query::Write(ref mut wq)) = child_node {
-                    wq.inject_id_into_args(parent_link.assimilate(parent_id)?);
+                    wq.inject_projection_into_args(parent_link.assimilate(parent_id)?);
                 }
 
                 Ok(child_node)
@@ -369,7 +368,7 @@ fn handle_one_to_one(
         graph.create_edge(
             &parent_node,
             &update_node,
-            QueryGraphDependency::ParentIds(parent_model_identifier, Box::new(move |mut child_node, mut parent_ids| {
+            QueryGraphDependency::ParentProjection(parent_model_identifier, Box::new(move |mut child_node, mut parent_ids| {
                 let parent_id = match parent_ids.pop() {
                     Some(pid) => Ok(pid),
                     None => Err(QueryGraphBuilderError::AssertionError(format!("[Query Graph] Expected a valid parent ID to be present for a nested create on a one-to-one relation, updating inlined on parent."))),

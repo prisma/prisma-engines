@@ -4,6 +4,7 @@
 //! [ScalarCompare](/query-connector/trait.ScalarCompare.html) and
 //! [RelationCompare](/query-connector/trait.RelationCompare.html).
 
+mod id_filter;
 mod list;
 mod relation;
 mod scalar;
@@ -11,6 +12,7 @@ mod scalar;
 use prisma_models::prelude::*;
 use prisma_models::{dml, DataSourceField};
 
+pub use id_filter::*;
 pub use list::*;
 pub use relation::*;
 pub use scalar::*;

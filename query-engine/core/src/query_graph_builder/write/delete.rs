@@ -30,7 +30,7 @@ pub fn delete_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedF
     graph.create_edge(
         &read_node,
         &delete_node,
-        QueryGraphDependency::ParentIds(
+        QueryGraphDependency::ParentProjection(
             model.primary_identifier(),
             Box::new(|node, parent_ids| {
                 if parent_ids.len() > 0 {

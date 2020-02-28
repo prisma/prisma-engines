@@ -4,9 +4,9 @@ use crate::{
     query_graph::{Flow, Node, QueryGraph, QueryGraphDependency},
     ArgumentListLookup, InputAssertions, ParsedField, ParsedInputMap, ReadOneRecordBuilder,
 };
+use connector::IdFilter;
 use prisma_models::ModelRef;
 use std::{convert::TryInto, sync::Arc};
-use utils::IdFilter;
 
 pub fn upsert_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedField) -> QueryGraphBuilderResult<()> {
     let where_arg: ParsedInputMap = field.arguments.lookup("where").unwrap().value.try_into()?;
@@ -38,7 +38,7 @@ pub fn upsert_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedF
     graph.create_edge(
         &initial_read_node,
         &if_node,
-        QueryGraphDependency::ParentIds(
+        QueryGraphDependency::ParentProjection(
             model_id.clone(),
             Box::new(|node, parent_ids| {
                 if let Node::Flow(Flow::If(_)) = node {
@@ -56,7 +56,7 @@ pub fn upsert_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedF
     graph.create_edge(
         &update_node,
         &read_node_update,
-        QueryGraphDependency::ParentIds(
+        QueryGraphDependency::ParentProjection(
             model_id.clone(),
             Box::new(move |mut node, mut parent_ids| {
                 let parent_id = match parent_ids.pop() {
@@ -78,7 +78,7 @@ pub fn upsert_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedF
     graph.create_edge(
         &create_node,
         &read_node_create,
-        QueryGraphDependency::ParentIds(
+        QueryGraphDependency::ParentProjection(
             model_id.clone(),
             Box::new(move |mut node, mut parent_ids| {
                 let parent_id = match parent_ids.pop() {
