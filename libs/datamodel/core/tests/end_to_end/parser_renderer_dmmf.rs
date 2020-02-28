@@ -1,5 +1,5 @@
 extern crate datamodel;
-use pretty_assertions::assert_eq;
+// use pretty_assertions::assert_eq;
 
 // TODO: test `onDelete` back once `prisma migrate` is a thing
 const DATAMODEL_STRING: &str = r#"model User {

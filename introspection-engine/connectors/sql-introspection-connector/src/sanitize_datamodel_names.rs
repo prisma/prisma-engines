@@ -48,12 +48,9 @@ pub fn sanitize_datamodel_names(datamodel: &mut Datamodel) {
 
                     *enum_name = sanitized_enum_name;
 
-                    if let Some(DefaultValue::Single(ScalarValue::ConstantLiteral(name, db_name))) =
-                        &mut field.default_value
-                    {
-                        let (sanitized_value, db_value) = sanitize_name(name.to_string());
+                    if let Some(DefaultValue::Single(ScalarValue::ConstantLiteral(name))) = &mut field.default_value {
+                        let (sanitized_value, _) = sanitize_name(name.to_string());
                         *name = sanitized_value;
-                        *db_name = db_value;
                     };
                 }
                 _ => (),

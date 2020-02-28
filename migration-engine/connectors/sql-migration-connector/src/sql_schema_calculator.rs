@@ -419,7 +419,7 @@ fn migration_value_new(field: &FieldRef<'_>) -> Option<String> {
             raw.truncate(raw.len() - 4); // strip the UTC suffix
             format!("{}", raw)
         }
-        ScalarValue::ConstantLiteral(name, db_name) => format!("{}", db_name.unwrap_or(name)), // this represents enum values
+        ScalarValue::ConstantLiteral(name) => format!("{}", name), // todo this needs to fetch the actual dbvalue from the enum
     };
 
     if field.is_id() {

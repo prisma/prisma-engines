@@ -104,7 +104,6 @@ fn default_value_from_serde(
         // Enum.
         (Some(value), dml::FieldType::Enum(_)) => Some(dml::DefaultValue::Single(dml::ScalarValue::ConstantLiteral(
             String::from(value.as_str().unwrap()),
-            None, //todo still wrong
         ))),
         (Some(_), _) => panic!("Fields with non-scalar type cannot have default value"),
         _ => None,

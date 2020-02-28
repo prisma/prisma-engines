@@ -69,10 +69,9 @@ fn should_set_default_an_enum_type() {
     user_model
         .assert_has_field("role")
         .assert_enum_type("Role")
-        .assert_default_value(DefaultValue::Single(ScalarValue::ConstantLiteral(
-            String::from("A_VARIANT_WITH_UNDERSCORES"),
-            None,
-        )));
+        .assert_default_value(DefaultValue::Single(ScalarValue::ConstantLiteral(String::from(
+            "A_VARIANT_WITH_UNDERSCORES",
+        ))));
 }
 
 #[test]
@@ -95,8 +94,7 @@ fn should_set_default_on_remapped_enum_type() {
     user_model
         .assert_has_field("role")
         .assert_enum_type("Role")
-        .assert_default_value(DefaultValue::Single(ScalarValue::ConstantLiteral(
-            String::from("A_VARIANT_WITH_UNDERSCORES"),
-            Some(String::from("A VARIANT WITH UNDERSCORES")),
-        )));
+        .assert_default_value(DefaultValue::Single(ScalarValue::ConstantLiteral(String::from(
+            "A_VARIANT_WITH_UNDERSCORES",
+        ))));
 }
