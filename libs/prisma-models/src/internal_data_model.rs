@@ -49,15 +49,9 @@ impl InternalEnum {
         }
     }
 
-    pub fn contains(&self, val: &String) -> bool {
-        self.values.iter().map(|v| &v.name).any(|value| value == val)
-    }
-
     pub fn map_input_value(&self, val: &String) -> Option<PrismaValue> {
         Some(PrismaValue::Enum(
-            dbg!(self.values.iter().find(|ev| &ev.name == val))?
-                .final_db_name()
-                .clone(),
+            self.values.iter().find(|ev| &ev.name == val)?.final_db_name().clone(),
         ))
     }
 

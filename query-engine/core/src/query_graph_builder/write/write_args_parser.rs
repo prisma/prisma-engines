@@ -1,7 +1,7 @@
 use super::*;
 use crate::query_document::{ParsedInputMap, ParsedInputValue};
 use connector::WriteArgs;
-use prisma_models::{Field, ModelRef, PrismaValue, RelationFieldRef, TypeIdentifier};
+use prisma_models::{Field, ModelRef, PrismaValue, RelationFieldRef};
 use std::{convert::TryInto, sync::Arc};
 
 #[derive(Default, Debug)]
