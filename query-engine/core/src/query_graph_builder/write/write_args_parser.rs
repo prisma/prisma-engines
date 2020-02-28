@@ -52,7 +52,6 @@ impl WriteArgsParser {
                                     None => None,
                                 };
 
-                                println!("GOT HERE HOW OFTEN?");
                                 let value: PrismaValue = match enum_value {
                                     Some(en_value) => {
                                         let value = en_value.database_name.clone().unwrap_or(en_value.name.clone());

@@ -50,14 +50,7 @@ impl InternalEnum {
     }
 
     pub fn contains(&self, val: &String) -> bool {
-        let res = self.values.iter().map(|v| &v.name).any(|value| value == val);
-
-        //todo
-        println!("ENUMVALUE CHECK");
-        println!("{:?}", self);
-        println!("{:?}", val);
-        println!("{:?}", res);
-        res
+        self.values.iter().map(|v| &v.name).any(|value| value == val)
     }
 
     pub fn out(&self, val: &String) -> Option<PrismaValue> {
