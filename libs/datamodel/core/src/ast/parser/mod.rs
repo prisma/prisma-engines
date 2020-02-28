@@ -186,6 +186,10 @@ fn parse_field_type(token: &pest::iterators::Pair<'_, Rule>) -> Result<(FieldAri
             "To specify a list, please use `Type[]` instead of `[Type]`.",
             Span::from_pest(current.as_span())
         )),
+        Rule::unsupported_optional_list_type => Err(DatamodelError::new_legacy_parser_error(
+            "Optional lists are not supported. Use either `Type[]` or `Type?`.",
+            Span::from_pest(current.as_span())
+        )),
         _ => unreachable!("Encountered impossible field during parsing: {:?}", current.tokens())
     }
 }
@@ -569,6 +573,7 @@ fn rule_to_string(rule: Rule) -> &'static str {
         Rule::LEGACY_COLON => "",
         Rule::legacy_list_type => "",
         Rule::legacy_required_type => "",
+        Rule::unsupported_optional_list_type => "",
 
         // Atomic and helper rules should not surface, we still add them for debugging.
         Rule::WHITESPACE => "",

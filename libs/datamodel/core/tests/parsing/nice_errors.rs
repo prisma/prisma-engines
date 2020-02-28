@@ -171,3 +171,19 @@ fn nice_error_legacy_model_decl() {
         Span::new(5, 9),
     ));
 }
+
+#[test]
+fn optional_list_fields_must_error() {
+    let dml = r#"
+    model User {
+        id Int @id
+        names String[]?
+    }"#;
+
+    let error = parse_error(dml);
+
+    error.assert_is(DatamodelError::new_legacy_parser_error(
+        "Optional lists are not supported. Use either `Type[]` or `Type?`.",
+        Span::new(51, 60),
+    ));
+}
