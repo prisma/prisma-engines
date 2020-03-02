@@ -38,7 +38,7 @@ impl ToSqlRow for ResultRow {
                 (type_identifier, FieldArity::List) => match p_value {
                     ParameterizedValue::Array(l) => l
                         .into_iter()
-                        .map(|p_value| row_value_to_prisma_value(p_value, type_identifier.clone()))
+                        .map(|p_value| row_value_to_prisma_value(p_value, &type_identifier))
                         .collect::<crate::Result<Vec<_>>>()
                         .map(|vec| PrismaValue::List(vec)),
 
@@ -51,7 +51,7 @@ impl ToSqlRow for ResultRow {
                         return Err(SqlError::ConversionError(error.into()));
                     }
                 },
-                (type_identifier, _) => row_value_to_prisma_value(p_value, type_identifier.clone()),
+                (type_identifier, _) => row_value_to_prisma_value(p_value, &type_identifier),
             }?;
 
             row.values.push(pv);
@@ -63,7 +63,7 @@ impl ToSqlRow for ResultRow {
 
 pub fn row_value_to_prisma_value(
     p_value: ParameterizedValue,
-    type_identifier: TypeIdentifier,
+    type_identifier: &TypeIdentifier,
 ) -> Result<PrismaValue, SqlError> {
     Ok(match type_identifier {
         TypeIdentifier::Boolean => match p_value {
