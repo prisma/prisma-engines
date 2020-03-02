@@ -80,6 +80,7 @@ fn field_from_dmmf(field: &Field) -> dml::Field {
         is_updated_at: field.is_updated_at.unwrap_or(false),
         documentation: field.documentation.clone(),
         data_source_fields: vec![],
+        is_commented_out: false,
     }
 }
 

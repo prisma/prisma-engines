@@ -274,3 +274,27 @@ async fn remapping_compound_primary_keys_should_work(api: &TestApi) {
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
+
+#[test_each_connector(tags("postgres"))]
+async fn remapping_field_names_to_empty_should_comment_them_out(api: &TestApi) {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("1", types::text());
+                t.add_column("last", types::primary());
+            });
+        })
+        .await;
+
+    let dm = r#"
+        model User {
+            first_name   String
+            last_name   String @map("last@name")
+
+            @@id([first_name, last_name])
+        }
+    "#;
+
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+}
