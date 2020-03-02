@@ -172,7 +172,7 @@ class SelfRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
     server.queryThatMustFail(
       filterDaughterNull,
       project,
-      errorCode = 0, // 3033,
+      errorCode = 2012, // 3033,
       errorContains = """Error in query graph construction: InputError(\"A value is required for the `none` filter on `daughters`\")"""
     )
   }
@@ -270,7 +270,7 @@ class SelfRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
     server.queryThatMustFail(
       filterGroupies,
       project,
-      errorCode = 0, // 3033
+      errorCode = 2012,
       errorContains = """Error in query graph construction: InputError(\"A value is required for the `some` filter on `fans`\")"""
     )
   }

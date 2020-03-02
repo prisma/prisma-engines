@@ -108,7 +108,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |}
       """,
         project,
-        errorCode = 0, // 3041
+        errorCode = 2017,
         errorContains = """Error occurred during query execution:\nInterpretationError(\"Error for binding \\'1\\': RecordsNotConnected { relation_name: \\\"ChildToParent\\\", parent_name: \\\"Parent\\\", child_name: \\\"Child\\\" }"""
       )
 
@@ -156,7 +156,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |}
       """,
         project,
-        errorCode = 0, // 3042
+        errorCode = 2014,
         errorContains = """Error in query graph construction: RelationViolation(RelationViolation { relation_name: \"ChildToParent\", model_a_name: \"Child\", model_b_name: \"Parent\" """
       )
 
@@ -203,9 +203,8 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |}
       """,
         project,
-        errorCode = 0, // 3042,
-        errorContains = """rror in query graph construction: RelationViolation(RelationViolation { relation_name: \"ChildToParent\", model_a_name: \"Child\", model_b_name: \"Parent\" })""",
-          // "The change you are trying to make would violate the required relation 'ChildToParent' between Child and Parent"
+        errorCode = 2014,
+        errorContains = """The change you are trying to make would violate the required relation 'ChildToParent' between Child and Parent""",
       )
 
     }
@@ -382,7 +381,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |}
       """,
         project,
-        errorCode = 0, // 3041
+        errorCode = 2017,
         errorContains = """Error occurred during query execution:\nInterpretationError(\"Error for binding \\'1\\': RecordsNotConnected { relation_name: \\\"ChildToParent\\\", parent_name: \\\"Parent\\\", child_name: \\\"Child\\\" }"""
       )
 
@@ -482,7 +481,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |}
       """,
         project,
-        errorCode = 0,  // 3041
+        errorCode = 2017,
         errorContains = """Error occurred during query execution:\nInterpretationError(\"Error for binding \\'1\\': RecordsNotConnected { relation_name: \\\"ChildToParent\\\", parent_name: \\\"Parent\\\", child_name: \\\"Child\\\" }\")"""
       )
     }
@@ -991,9 +990,8 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |}
       """,
       project,
-      errorCode = 0, // 3041
+      errorCode = 2017,
       errorContains = """Error occurred during query execution:\nInterpretationError(\"Error for binding \\'1\\': RecordsNotConnected { relation_name: \\\"UserFollows\\\", parent_name: \\\"User\\\", child_name: \\\"User\\\" }"""
-//      ,
 //      errorContains =
 //        "The relation UserFollows has no Node for the model User with value `Paul` for username connected to a Node for the model User with value `Anton` for username"
     )

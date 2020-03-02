@@ -161,7 +161,7 @@ class UpdateMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
          |  }
          |}""".stripMargin,
       project,
-      errorCode = 0, // 3039,
+      errorCode = 2015,
       errorContains = """InterpretationError(\"Error for binding \\'0\\': RecordNotFound(\\\"Record to update not found.\\\")\""""
     )
   }

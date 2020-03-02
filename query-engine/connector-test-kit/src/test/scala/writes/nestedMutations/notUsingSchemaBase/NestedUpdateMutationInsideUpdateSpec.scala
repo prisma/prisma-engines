@@ -1158,7 +1158,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
     server.queryThatMustFail(
       updateMutation,
       project,
-      errorCode = 0, // 3041,
+      errorCode = 2016, // 3041,
       errorContains =
         """Error occurred during query execution:\nInterpretationError(\"Error for binding \\'5\\': AssertionError(\\\"Expected a valid parent ID to be present for nested update to-one case.\\\""""
     )
@@ -1380,7 +1380,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
     server.queryThatMustFail(
       updateMutation,
       project,
-      errorCode = 0, // 3041,
+      errorCode = 2016,
       errorContains = """Error occurred during query execution:\nInterpretationError(\"Error for binding \\'3\\': AssertionError(\\\"Expected a valid parent ID to be present for nested update to-one case.\\\")\")"""
     )
 

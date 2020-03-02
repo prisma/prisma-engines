@@ -182,3 +182,26 @@ pub struct RelationViolation {
     pub model_a_name: String,
     pub model_b_name: String,
 }
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(code = "P2015", message = "A related record could not be found. ${details}")]
+pub struct RelatedRecordNotFound {
+    pub details: String,
+}
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(code = "P2016", message = "Query interpretation error. ${details}")]
+pub struct InterpretationError {
+    pub details: String,
+}
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = "P2017",
+    message = "The records for relation `${relation_name}` between the `${parent_name}` and `${child_name}` models are not connected."
+)]
+pub struct RecordsNotConnected {
+    pub relation_name: String,
+    pub parent_name: String,
+    pub child_name: String,
+}

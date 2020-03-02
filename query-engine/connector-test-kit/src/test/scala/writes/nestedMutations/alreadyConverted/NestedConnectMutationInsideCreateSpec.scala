@@ -96,9 +96,8 @@ class NestedConnectMutationInsideCreateSpec extends FlatSpec with Matchers with 
            |}
         """.stripMargin,
         project,
-        errorCode = 0, // 3042,
-        errorContains = """InterpretationError(\"Error for binding \\'2\\': RelationViolation(RelationViolation { relation_name: \\\"ChildToParent\\\", model_a_name: \\\"Child\\\", model_b_name: \\\"Parent\\\" })"""
-          // "The change you are trying to make would violate the required relation 'ChildToParent' between Child and Parent"
+        errorCode = 2014,
+        errorContains = """The change you are trying to make would violate the required relation 'ChildToParent' between Child and Parent"""
       )
     }
   }
@@ -970,7 +969,7 @@ class NestedConnectMutationInsideCreateSpec extends FlatSpec with Matchers with 
          |}
       """.stripMargin,
       project,
-      errorCode = 0, // 3039,
+      errorCode = 2015, // 3039,
       errorContains = """RecordNotFound(\"Expected 1 records to be connected, found 0.\")"""
     )
   }

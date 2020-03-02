@@ -645,8 +645,8 @@ class NestedDeleteMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |}
       """,
         project,
-        errorCode = 0,
-        errorContains = """Error occurred during query execution:\nInterpretationError(\"Error for binding \\'2\\': RecordsNotConnected { relation_name: \\\"ChildToParent\\\", parent_name: \\\"Parent\\\", child_name: \\\"Child\\\" }"""
+        errorCode = 2017,
+        errorContains = """The records for relation `ChildToParent` between the `Parent` and `Child` models are not connected"""
       )
     }
   }
@@ -816,8 +816,8 @@ class NestedDeleteMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |}
       """,
       project,
-      errorCode = 0, // 3042,
-      errorContains = """Error occurred during query execution:\nInterpretationError(\"Error for binding \\'4\\': RelationViolation(RelationViolation { relation_name: \\\"ChildToOther\\\", model_a_name: \\\"Child\\\", model_b_name: \\\"Other\\\" }"""
+      errorCode = 2014,
+      errorContains = """The change you are trying to make would violate the required relation 'ChildToOther' between the `Child` and `Other` models."""
     )
 
   }
@@ -992,8 +992,8 @@ class NestedDeleteMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |}
       """,
       project,
-      errorCode = 0, // 3041
-      errorContains = """InterpretationError(\"Error for binding \\'2\\': RecordsNotConnected { relation_name: \\\"CommentToTodo\\\", parent_name: \\\"Todo\\\", child_name: \\\"Comment\\\" }"""
+      errorCode = 2017,
+      errorContains = """The records for relation `CommentToTodo` between the `Todo` and `Comment` models are not connected."""
     )
 
     mustBeEqual(result.pathAsJsValue("data.updateTodo.comments").toString, """[]""")
@@ -1329,9 +1329,9 @@ class NestedDeleteMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |}
       """,
       project,
-      errorCode = 0, // 3041,
+      errorCode = 2016,
       errorContains =
-        """"Error occurred during query execution:\nInterpretationError(\"Error for binding \\'1\\': AssertionError(\\\"[Query Graph] Expected a valid parent ID to be present for a nested delete on a one-to-many relation.\\\")\""""
+        """"[Query Graph] Expected a valid parent ID to be present for a nested delete on a one-to-many relation."""
     )
 
     val query = server.query("""{ todoes { title }}""", project)

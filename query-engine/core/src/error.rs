@@ -140,9 +140,22 @@ impl From<CoreError> for user_facing_errors::Error {
                     })
                     .unwrap()
                     .into(),
-                    _ => {
-                        user_facing_errors::Error::from_dyn_error(&failure::format_err!("{}: {}", msg, cause).compat())
-                    }
+                    InterpreterError::QueryGraphBuilderError(QueryGraphBuilderError::RecordsNotConnected {
+                        parent_name,
+                        child_name,
+                        relation_name,
+                    }) => user_facing_errors::KnownError::new(user_facing_errors::query_engine::RecordsNotConnected {
+                        parent_name: parent_name.clone(),
+                        child_name: child_name.clone(),
+                        relation_name: relation_name.clone(),
+                    })
+                    .unwrap()
+                    .into(),
+                    _ => user_facing_errors::KnownError::new(user_facing_errors::query_engine::InterpretationError {
+                        details: format!("{}: {}", msg, cause),
+                    })
+                    .unwrap()
+                    .into(),
                 }
             }
             _ => user_facing_errors::Error::from_dyn_error(&err.compat()),
