@@ -131,6 +131,13 @@ impl Field {
         }
     }
 
+    pub fn is_id(&self) -> bool {
+        match self {
+            Field::Scalar(sf) => sf.is_id,
+            Field::Relation(rf) => rf.is_id,
+        }
+    }
+
     pub fn is_list(&self) -> bool {
         match self {
             Field::Scalar(ref sf) => sf.is_list,

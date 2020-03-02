@@ -16,18 +16,24 @@ pub fn build(query_arguments: &QueryArguments, model: ModelRef) -> ConditionTree
     ) {
         (None, None, _) => ConditionTree::NoCondition,
         (before, after, order_by) => {
-            let id_field = model.fields().find_singular_id().unwrap().upgrade().unwrap();
+            let id_projection = model.primary_identifier();
+
             let (comparison_field, sort_order) = match order_by {
                 Some(x) => (&x.field, x.sort_order),
-                None => (&id_field, SortOrder::Ascending),
+                None if id_projection.db_len() == 1 => (id_projection.fields().next().unwrap(), SortOrder::Ascending),
+                None => {
+                    panic!("Order by with multiple fields or data source fields is not permitted. This must be caught by query validation.")
+                }
             };
 
-            let cursor_for = |cursor_type: CursorType, pairs: &[(ScalarFieldRef, PrismaValue)]| {
-                let (fields, values): (Vec<_>, Vec<_>) = pairs.iter().cloned().unzip();
-                let columns: Vec<_> = vec![comparison_field.as_column()];
+            let cursor_for = |cursor_type: CursorType, projection: &RecordProjection| {
+                // Invariant: We know that the comparison field can only yield one column.
+                let columns: Vec<_> = comparison_field.as_columns().collect();
                 let order_row = Row::from(columns.clone());
+                let fields: Vec<_> = projection.fields().collect();
+                let values: Vec<_> = projection.values().collect();
 
-                let cursor_columns: Vec<_> = fields.into_iter().map(|sf| sf.as_column()).collect();
+                let cursor_columns: Vec<_> = fields.as_slice().as_columns().collect();
                 let cursor_row = Row::from(cursor_columns);
 
                 let where_condition = cursor_row.clone().equals(values.clone());

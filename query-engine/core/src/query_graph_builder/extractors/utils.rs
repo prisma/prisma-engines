@@ -30,3 +30,5 @@ pub fn resolve_index_fields(name: &str, model: &ModelRef) -> Option<Vec<ScalarFi
         .find(|index| &schema_builder::compound_index_field_name(index) == name)
         .map(|index| index.scalar_fields())
 }
+
+// pub fn resolve_relation_field()
