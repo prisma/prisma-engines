@@ -1976,6 +1976,7 @@ dependencies = [
  "tokio",
  "tracing",
  "tracing-attributes",
+ "tracing-futures",
  "tracing-log",
  "tracing-subscriber",
  "url 2.1.1",
@@ -2109,9 +2110,10 @@ dependencies = [
 [[package]]
 name = "quaint"
 version = "0.2.0-alpha.9"
-source = "git+https://github.com/prisma/quaint#f3c27482fd49bde532339716cce514d764fa9548"
+source = "git+https://github.com/prisma/quaint#e971ded73ad13a391a40f168b4c443bc969d9fc4"
 dependencies = [
  "async-trait",
+ "base64 0.11.0",
  "bytes",
  "chrono",
  "futures 0.3.4",
