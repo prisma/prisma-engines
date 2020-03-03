@@ -74,9 +74,6 @@ pub enum CliOpt {
     /// Output the DMMF from the loaded data model.
     #[structopt(name = "--dmmf")]
     Dmmf,
-    /// Convert the given DMMF JSON file to a data model.
-    #[structopt(name = "--dmmf_to_dml")]
-    DmmfToDml(DmmfToDmlInput),
     /// Get the configuration from the given data model.
     #[structopt(name = "--get_config")]
     GetConfig(GetConfigInput),
