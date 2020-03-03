@@ -1,0 +1,10 @@
+datasource pg1 {
+  provider = "postgresql"
+  url      = env("SERVER_ROOT")
+}
+
+model Author {
+  id        Int      @id
+  name      String?
+  createdAt DateTime @default(now())
+}
