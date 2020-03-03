@@ -20,9 +20,9 @@ pub enum WriteQuery {
 }
 
 impl WriteQuery {
-    pub fn inject_id_into_args(&mut self, record_id: RecordIdentifier) {
-        let keys = record_id.fields().map(|dsf| dsf.name.clone()).collect();
-        let values = record_id.values().map(|v| v.clone()).collect();
+    pub fn inject_projection_into_args(&mut self, projection: RecordProjection) {
+        let keys = projection.fields().map(|dsf| dsf.name.clone()).collect();
+        let values = projection.values().map(|v| v.clone()).collect();
 
         self.inject_values_into_args(keys, values);
     }
@@ -46,8 +46,8 @@ impl WriteQuery {
         args.insert(key, value)
     }
 
-    pub fn returns(&self, ident: &ModelIdentifier) -> bool {
-        let returns_id = &self.model().primary_identifier() == ident;
+    pub fn returns(&self, projection: &ModelProjection) -> bool {
+        let returns_id = &self.model().primary_identifier() == projection;
 
         // Write operations only return IDs at the moment, so anything different
         // from the primary ID is automatically not returned.
@@ -159,15 +159,15 @@ pub struct DeleteManyRecords {
 
 #[derive(Debug, Clone)]
 pub struct ConnectRecords {
-    pub parent_id: Option<RecordIdentifier>,
-    pub child_ids: Vec<RecordIdentifier>,
+    pub parent_id: Option<RecordProjection>,
+    pub child_ids: Vec<RecordProjection>,
     pub relation_field: RelationFieldRef,
 }
 
 #[derive(Debug, Clone)]
 pub struct DisconnectRecords {
-    pub parent_id: Option<RecordIdentifier>,
-    pub child_ids: Vec<RecordIdentifier>,
+    pub parent_id: Option<RecordProjection>,
+    pub child_ids: Vec<RecordProjection>,
     pub relation_field: RelationFieldRef,
 }
 

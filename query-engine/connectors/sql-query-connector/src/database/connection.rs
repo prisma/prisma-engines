@@ -76,8 +76,8 @@ where
     fn get_related_m2m_record_ids<'b>(
         &'b self,
         from_field: &'b RelationFieldRef,
-        from_record_ids: &'b [RecordIdentifier],
-    ) -> connector::IO<'b, Vec<(RecordIdentifier, RecordIdentifier)>> {
+        from_record_ids: &'b [RecordProjection],
+    ) -> connector::IO<'b, Vec<(RecordProjection, RecordProjection)>> {
         IO::new(
             self.catch(async move { read::get_related_m2m_record_ids(&self.inner, from_field, from_record_ids).await }),
         )
@@ -92,7 +92,7 @@ impl<'conn, C> WriteOperations for SqlConnection<'conn, C>
 where
     C: QueryExt + Send + Sync + 'static,
 {
-    fn create_record<'a>(&'a self, model: &'a ModelRef, args: WriteArgs) -> connector::IO<RecordIdentifier> {
+    fn create_record<'a>(&'a self, model: &'a ModelRef, args: WriteArgs) -> connector::IO<RecordProjection> {
         IO::new(self.catch(async move { write::create_record(&self.inner, model, args).await }))
     }
 
@@ -101,7 +101,7 @@ where
         model: &'a ModelRef,
         where_: Filter,
         args: WriteArgs,
-    ) -> connector::IO<Vec<RecordIdentifier>> {
+    ) -> connector::IO<Vec<RecordProjection>> {
         IO::new(self.catch(async move { write::update_records(&self.inner, model, where_, args).await }))
     }
 
@@ -112,8 +112,8 @@ where
     fn connect<'a>(
         &'a self,
         field: &'a RelationFieldRef,
-        parent_id: &'a RecordIdentifier,
-        child_ids: &'a [RecordIdentifier],
+        parent_id: &'a RecordProjection,
+        child_ids: &'a [RecordProjection],
     ) -> connector::IO<()> {
         IO::new(self.catch(async move { write::connect(&self.inner, field, parent_id, child_ids).await }))
     }
@@ -121,8 +121,8 @@ where
     fn disconnect<'a>(
         &'a self,
         field: &'a RelationFieldRef,
-        parent_id: &'a RecordIdentifier,
-        child_ids: &'a [RecordIdentifier],
+        parent_id: &'a RecordProjection,
+        child_ids: &'a [RecordProjection],
     ) -> connector::IO<()> {
         IO::new(self.catch(async move { write::disconnect(&self.inner, field, parent_id, child_ids).await }))
     }

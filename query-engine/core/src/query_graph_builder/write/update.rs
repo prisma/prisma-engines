@@ -5,10 +5,9 @@ use crate::{
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
     ArgumentListLookup, InputAssertions, ParsedField, ParsedInputMap, ReadOneRecordBuilder,
 };
-use connector::filter::Filter;
+use connector::{Filter, IdFilter};
 use prisma_models::ModelRef;
 use std::{convert::TryInto, sync::Arc};
-use utils::IdFilter;
 
 /// Creates an update record query and adds it to the query graph, together with it's nested queries and companion read query.
 pub fn update_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedField) -> QueryGraphBuilderResult<()> {
@@ -33,9 +32,9 @@ pub fn update_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedF
     graph.create_edge(
         &update_node,
         &read_node,
-        QueryGraphDependency::ParentIds(
+        QueryGraphDependency::ParentProjection(
             model.primary_identifier(),
-            Box::new(move |mut node, mut parent_ids| {
+            Box::new(move |mut read_node, mut parent_ids| {
                 let parent_id = match parent_ids.pop() {
                     Some(pid) => Ok(pid),
                     None => Err(QueryGraphBuilderError::RecordNotFound(format!(
@@ -43,11 +42,11 @@ pub fn update_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedF
                     ))),
                 }?;
 
-                if let Node::Query(Query::Read(ReadQuery::RecordQuery(ref mut rq))) = node {
+                if let Node::Query(Query::Read(ReadQuery::RecordQuery(ref mut rq))) = read_node {
                     rq.add_filter(parent_id.filter());
                 };
 
-                Ok(node)
+                Ok(read_node)
             }),
         ),
     )?;

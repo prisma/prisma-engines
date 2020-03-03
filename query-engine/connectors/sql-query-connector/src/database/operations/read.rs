@@ -51,8 +51,8 @@ pub async fn get_many_records(
 pub async fn get_related_m2m_record_ids(
     conn: &dyn QueryExt,
     from_field: &RelationFieldRef,
-    from_record_ids: &[RecordIdentifier],
-) -> crate::Result<Vec<(RecordIdentifier, RecordIdentifier)>> {
+    from_record_ids: &[RecordProjection],
+) -> crate::Result<Vec<(RecordProjection, RecordProjection)>> {
     let mut idents = vec![];
     idents.extend(from_field.type_identifiers_with_arities());
     idents.extend(from_field.related_field().type_identifiers_with_arities());
@@ -89,14 +89,14 @@ pub async fn get_related_m2m_record_ids(
             let child_values = values.split_off(from_dsfs.len());
             let parent_values = values;
 
-            let p: RecordIdentifier = from_dsfs
+            let p: RecordProjection = from_dsfs
                 .iter()
                 .zip(parent_values)
                 .map(|(dsf, val)| (dsf.clone(), val))
                 .collect::<Vec<_>>()
                 .into();
 
-            let c: RecordIdentifier = to_dsfs
+            let c: RecordProjection = to_dsfs
                 .iter()
                 .zip(child_values)
                 .map(|(dsf, val)| (dsf.clone(), val))

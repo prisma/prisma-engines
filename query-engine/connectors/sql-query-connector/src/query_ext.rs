@@ -91,7 +91,7 @@ pub trait QueryExt: Queryable + Send + Sync {
     }
 
     /// Read the all columns as a (primary) identifier.
-    async fn filter_ids(&self, model: &ModelRef, filter: Filter) -> crate::Result<Vec<RecordIdentifier>> {
+    async fn filter_ids(&self, model: &ModelRef, filter: Filter) -> crate::Result<Vec<RecordProjection>> {
         let model_id = model.primary_identifier();
         let id_cols: Vec<Column<'static>> = model_id.as_columns().collect();
 
@@ -102,7 +102,7 @@ pub trait QueryExt: Queryable + Send + Sync {
         self.select_ids(select, model_id).await
     }
 
-    async fn select_ids(&self, select: Select<'_>, model_id: ModelIdentifier) -> crate::Result<Vec<RecordIdentifier>> {
+    async fn select_ids(&self, select: Select<'_>, model_id: ModelProjection) -> crate::Result<Vec<RecordProjection>> {
         let idents: Vec<_> = model_id
             .fields()
             .into_iter()
@@ -117,7 +117,7 @@ pub trait QueryExt: Queryable + Send + Sync {
 
         for row in rows.drain(0..) {
             let tuples: Vec<_> = model_id.data_source_fields().zip(row.values.into_iter()).collect();
-            let record_id: RecordIdentifier = RecordIdentifier::new(tuples);
+            let record_id: RecordProjection = RecordProjection::new(tuples);
 
             result.push(record_id);
         }

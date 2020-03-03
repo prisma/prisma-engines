@@ -4,7 +4,7 @@ use crate::{
     CoreError, EnumType, QueryResult, RecordSelection,
 };
 use indexmap::IndexMap;
-use prisma_models::{InternalEnum, PrismaValue, RecordIdentifier};
+use prisma_models::{InternalEnum, PrismaValue, RecordProjection};
 use rust_decimal::prelude::ToPrimitive;
 use std::{borrow::Borrow, collections::HashMap};
 
@@ -12,12 +12,12 @@ use std::{borrow::Borrow, collections::HashMap};
 /// The item implicitly holds the information of the type of item contained.
 /// E.g., if the output type of a field designates a single object, the item will be
 /// Item::Map(map), if it's a list, Item::List(list), etc. (hence "checked")
-type CheckedItemsWithParents = IndexMap<Option<RecordIdentifier>, Item>;
+type CheckedItemsWithParents = IndexMap<Option<RecordProjection>, Item>;
 
 /// A grouping of items to their parent record.
 /// As opposed to the checked mapping, this map isn't holding final information about
 /// the contained items, i.e. the Items are all unchecked.
-type UncheckedItemsWithParents = IndexMap<Option<RecordIdentifier>, Vec<Item>>;
+type UncheckedItemsWithParents = IndexMap<Option<RecordProjection>, Vec<Item>>;
 
 /// The query validation makes sure that the output selection already has the correct shape.
 /// This means that we can make the following assumptions:
@@ -163,7 +163,7 @@ fn serialize_objects(
     // Write all fields, nested and list fields unordered into a map, afterwards order all into the final order.
     // If nothing is written to the object, write null instead.
     for record in result.scalars.records.into_iter() {
-        let record_id = Some(record.identifier(&scalar_db_field_names, &result.model_id)?);
+        let record_id = Some(record.projection(&scalar_db_field_names, &result.model_id)?);
 
         if !object_mapping.contains_key(&record.parent_id) {
             object_mapping.insert(record.parent_id.clone(), Vec::new());
@@ -209,7 +209,7 @@ fn serialize_objects(
 
 /// Unwraps are safe due to query validation.
 fn write_nested_items(
-    record_id: &Option<RecordIdentifier>,
+    record_id: &Option<RecordProjection>,
     items_with_parent: &mut HashMap<String, CheckedItemsWithParents>,
     into: &mut HashMap<String, Item>,
     enclosing_type: &ObjectTypeStrongRef,

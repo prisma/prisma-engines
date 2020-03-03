@@ -16,14 +16,13 @@ pub use formatters::*;
 pub use transformers::*;
 
 use crate::{
-    interpreter::ExpressionResult, query_graph_builder::write::utils::IdFilter, FilteredQuery, ManyRecordsQuery, Query,
-    QueryGraphBuilderResult, ReadQuery,
+    interpreter::ExpressionResult, FilteredQuery, ManyRecordsQuery, Query, QueryGraphBuilderResult, ReadQuery,
 };
-use connector::QueryArguments;
+use connector::{IdFilter, QueryArguments};
 use guard::*;
 use invariance_rules::*;
 use petgraph::{graph::*, visit::EdgeRef as PEdgeRef, *};
-use prisma_models::{ModelIdentifier, ModelRef, RecordIdentifier};
+use prisma_models::{ModelProjection, ModelRef, RecordProjection};
 use std::{borrow::Borrow, collections::HashSet};
 
 pub type QueryGraphResult<T> = std::result::Result<T, QueryGraphError>;
@@ -83,8 +82,8 @@ impl Computation {
 }
 
 pub struct DiffNode {
-    pub left: HashSet<RecordIdentifier>,
-    pub right: HashSet<RecordIdentifier>,
+    pub left: HashSet<RecordProjection>,
+    pub right: HashSet<RecordProjection>,
 }
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
@@ -111,8 +110,8 @@ impl EdgeRef {
     }
 }
 
-pub type ParentIdsFn =
-    Box<dyn FnOnce(Node, Vec<RecordIdentifier>) -> QueryGraphBuilderResult<Node> + Send + Sync + 'static>;
+pub type ParentProjectionFn =
+    Box<dyn FnOnce(Node, Vec<RecordProjection>) -> QueryGraphBuilderResult<Node> + Send + Sync + 'static>;
 
 pub type ParentResultFn =
     Box<dyn FnOnce(Node, &ExpressionResult) -> QueryGraphBuilderResult<Node> + Send + Sync + 'static>;
@@ -127,11 +126,16 @@ pub enum QueryGraphDependency {
     /// Does not move the result to the closure, but provides a reference.
     ParentResult(ParentResultFn),
 
-    /// More specialized version of `ParentResult`
-    /// Performs a transformation on the child node based on the requested IDs of the parent result (passed as RecordIdentifiers).
-    /// Assumes that the parent result can be converted into the requested record identifiers, else a runtime error will occur.
-    /// The `ModelIdentifier` is used to determine the set of values to extract from the parent result.
-    ParentIds(ModelIdentifier, ParentIdsFn),
+    /// More specialized version of `ParentResult` with more guarantees and side effects.
+    ///
+    /// Performs a transformation on the child node based on the requested projection of the parent result (represented as a single merged `ModelProjection`).
+    /// Assumes that the parent result can be converted into the requested projection, else a runtime error will occur.
+    /// The `ModelProjection` is used to determine the set of values to extract from the parent result.
+    ///
+    /// Important note: As opposed to `ParentResult`, this dependency guarantees that if the closure is called, the parent result was projected successfully.
+    /// To achieve that, the query graph is post-processed in the `finalize` and reloads are injected at points where a projection is not fulfilled.
+    /// See `insert_reloads` for more information.
+    ParentProjection(ModelProjection, ParentProjectionFn),
 
     /// Only valid in the context of a `If` control flow node.
     Then,
@@ -486,7 +490,7 @@ impl QueryGraph {
     ///                                                                                                     └──▶│ A │◀─┘
     ///                                                                                                         └───┘
     /// ```
-    /// todo put if flow exception illustration here.
+    /// [DTODO] put if flow exception illustration here.
     fn swap_marked(&mut self) -> QueryGraphResult<()> {
         if self.marked_node_pairs.len() > 0 {
             trace!("[Graph][Swap] Before shape: {}", self);
@@ -524,21 +528,6 @@ impl QueryGraph {
                             &child_node,
                             QueryGraphDependency::ExecutionOrder,
                         )?;
-                        // FIXME: AUMFIDARR
-                        // [DTODO] Revert
-                        //                        // ONLY if there is no edge already existing!
-                        //                        let existing_edge = self
-                        //                            .graph
-                        //                            .find_edge(parent_of_parent_node.node_ix, child_node.node_ix)
-                        //                            .map(|edge_ix| EdgeRef { edge_ix });
-                        //
-                        //                        if let None = existing_edge {
-                        //                            self.create_edge(
-                        //                                &parent_of_parent_node,
-                        //                                &child_node,
-                        //                                QueryGraphDependency::ExecutionOrder,
-                        //                            )?;
-                        //                        }
                     }
                 }
             }
@@ -559,9 +548,9 @@ impl QueryGraph {
         Ok(())
     }
 
-    /// Traverses the query graph and checks if reloads of nodes is necessary.
+    /// Traverses the query graph and checks if reloads of nodes are necessary.
     /// Whether or not a node needs to be reloaded is determined based on the
-    /// outgoing edges of parent-ID-based transformers, as those hold the ModelIdentifiers
+    /// outgoing edges of parent-projection-based transformers, as those hold the `ModelProjection`s
     /// all records of the parent result need to contain in order to satisfy dependencies.
     ///
     /// ## Example
@@ -609,7 +598,7 @@ impl QueryGraph {
     /// The `Reload` node is always a find many query.
     /// Unwraps are safe because we're operating on the unprocessed state of the graph (`Expressionista` changes that).
     fn insert_reloads(&mut self) -> QueryGraphResult<()> {
-        let reloads: Vec<(NodeRef, ModelRef, Vec<(EdgeRef, ModelIdentifier)>)> = self
+        let reloads: Vec<(NodeRef, ModelRef, Vec<(EdgeRef, ModelProjection)>)> = self
             .graph
             .node_indices()
             .filter_map(|ix| {
@@ -621,13 +610,15 @@ impl QueryGraph {
                     let unsatisfied_edges: Vec<_> = edges
                         .into_iter()
                         .filter_map(|edge| match self.edge_content(&edge).unwrap() {
-                            QueryGraphDependency::ParentIds(ref requested_ident, _) if !q.returns(requested_ident) => {
+                            QueryGraphDependency::ParentProjection(ref requested_projection, _)
+                                if !q.returns(requested_projection) =>
+                            {
                                 trace!(
                                     "Query {:?} does not return requested projection {:?} and will be reloaded.",
                                     q,
-                                    requested_ident.names().collect::<Vec<_>>()
+                                    requested_projection.names().collect::<Vec<_>>()
                                 );
-                                Some((edge, requested_ident.clone()))
+                                Some((edge, requested_projection.clone()))
                             }
                             _ => None,
                         })
@@ -666,11 +657,11 @@ impl QueryGraph {
             self.create_edge(
                 &node,
                 &reload_node,
-                QueryGraphDependency::ParentIds(
+                QueryGraphDependency::ParentProjection(
                     primary_model_id,
-                    Box::new(|mut reload_node, parent_ids| {
+                    Box::new(|mut reload_node, parent_projections| {
                         if let Node::Query(Query::Read(ReadQuery::ManyRecordsQuery(ref mut mr))) = reload_node {
-                            mr.set_filter(parent_ids.filter());
+                            mr.set_filter(parent_projections.filter());
                         }
 
                         Ok(reload_node)

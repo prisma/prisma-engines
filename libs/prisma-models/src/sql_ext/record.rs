@@ -1,21 +1,21 @@
-use crate::{error::DomainError, ModelIdentifier, RecordIdentifier};
+use crate::{error::DomainError, ModelProjection, RecordProjection};
 use quaint::connector::ResultSet;
 use std::{convert::TryFrom, sync::Arc};
 
-impl TryFrom<(&ModelIdentifier, ResultSet)> for RecordIdentifier {
+impl TryFrom<(&ModelProjection, ResultSet)> for RecordProjection {
     type Error = DomainError;
 
-    fn try_from(pair: (&ModelIdentifier, ResultSet)) -> crate::Result<Self> {
-        let (id, result_set) = pair;
+    fn try_from(pair: (&ModelProjection, ResultSet)) -> crate::Result<Self> {
+        let (model_projection, result_set) = pair;
 
         let columns: Vec<String> = result_set.columns().iter().map(|c| c.to_string()).collect();
-        let mut record_id = RecordIdentifier::default();
+        let mut record_projection = RecordProjection::default();
 
         for row in result_set.into_iter() {
             for (i, val) in row.into_iter().enumerate() {
-                match id.map_db_name(columns[i].as_str()) {
+                match model_projection.map_db_name(columns[i].as_str()) {
                     Some(field) => {
-                        record_id.add((Arc::clone(field), val.into()));
+                        record_projection.add((Arc::clone(field), val.into()));
                     }
                     None => {
                         return Err(DomainError::ScalarFieldNotFound {
@@ -29,12 +29,12 @@ impl TryFrom<(&ModelIdentifier, ResultSet)> for RecordIdentifier {
             break;
         }
 
-        if id.len() == record_id.len() {
-            Ok(record_id)
+        if model_projection.len() == record_projection.len() {
+            Ok(record_projection)
         } else {
             Err(DomainError::ConversionFailure(
                 "ResultSet".to_owned(),
-                "RecordIdentifier".to_owned(),
+                "RecordProjection".to_owned(),
             ))
         }
     }

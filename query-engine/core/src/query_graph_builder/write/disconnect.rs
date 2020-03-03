@@ -56,7 +56,7 @@ pub fn disconnect_records_node(
     graph.create_edge(
         parent_node,
         &disconnect_node,
-        QueryGraphDependency::ParentIds(parent_model_id, Box::new(|mut child_node, mut parent_ids| {
+        QueryGraphDependency::ParentProjection(parent_model_id, Box::new(|mut disconnect_node, mut parent_ids| {
             let parent_id = match parent_ids.pop() {
                 Some(pid) => Ok(pid),
                 None => Err(QueryGraphBuilderError::AssertionError(format!(
@@ -64,11 +64,11 @@ pub fn disconnect_records_node(
                 ))),
             }?;
 
-            if let Node::Query(Query::Write(WriteQuery::DisconnectRecords(ref mut c))) = child_node {
+            if let Node::Query(Query::Write(WriteQuery::DisconnectRecords(ref mut c))) = disconnect_node {
                 c.parent_id = Some(parent_id);
             }
 
-            Ok(child_node)
+            Ok(disconnect_node)
         })),
     )?;
 
@@ -80,10 +80,10 @@ pub fn disconnect_records_node(
     graph.create_edge(
         &child_node,
         &disconnect_node,
-        QueryGraphDependency::ParentIds(
+        QueryGraphDependency::ParentProjection(
             child_model_id,
-            Box::new(move |mut child_node, parent_ids| {
-                let len = parent_ids.len();
+            Box::new(move |mut disconnect_node, child_ids| {
+                let len = child_ids.len();
 
                 if len != expected_disconnects {
                     return Err(QueryGraphBuilderError::RecordsNotConnected {
@@ -93,11 +93,11 @@ pub fn disconnect_records_node(
                     });
                 }
 
-                if let Node::Query(Query::Write(WriteQuery::DisconnectRecords(ref mut c))) = child_node {
-                    c.child_ids = parent_ids;
+                if let Node::Query(Query::Write(WriteQuery::DisconnectRecords(ref mut c))) = disconnect_node {
+                    c.child_ids = child_ids;
                 }
 
-                Ok(child_node)
+                Ok(disconnect_node)
             }),
         ),
     )?;
