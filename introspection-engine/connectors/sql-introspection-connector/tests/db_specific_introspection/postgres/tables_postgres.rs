@@ -273,31 +273,29 @@ async fn introspecting_a_table_without_uniques_should_comment_it_out(api: &TestA
     assert_eq!(&result, dm);
 }
 
+#[test_each_connector(tags("postgres"))]
 async fn introspecting_default_values_should_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
-            migration.create_table("test", |t| {
-                t.add_column("bool", types::boolean());
-                t.add_column("float", types::float());
-                t.add_column("date", types::date());
+            migration.create_table("Test", |t| {
                 t.add_column("id", types::primary());
-                t.add_column("int", types::integer());
-                t.add_column("string", types::text());
+                t.inject_custom(" numeric_int2 int2 Default 2");
+                t.inject_custom(" numeric_int4 int4 Default 4");
+                t.inject_custom(" numeric_int8 int8 Default 8");
             });
         })
         .await;
 
     let dm = r#"
-            model Blog {
-                bool    Boolean
-                date    DateTime
-                float   Float
-                id      Int @id @default(autoincrement())
-                int     Int
-                string  String
+            model Test {
+                id                  Int @id @default(autoincrement())
+                numeric_int2        Int?    @default(2)
+                numeric_int4        Int?    @default(4)
+                numeric_int8        Int?    @default(8)
             }
         "#;
+
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
