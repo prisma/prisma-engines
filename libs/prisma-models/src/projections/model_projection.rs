@@ -106,7 +106,7 @@ impl ModelProjection {
                 .map(|((og_field, value), other_field)| {
                     if og_field.field_type != other_field.field_type {
                         let coerce_to: TypeIdentifier = other_field.field_type.into();
-                        Ok((other_field, value.coerce(coerce_to)?))
+                        Ok((other_field, value.coerce(&coerce_to)?))
                     } else {
                         Ok((other_field, value))
                     }

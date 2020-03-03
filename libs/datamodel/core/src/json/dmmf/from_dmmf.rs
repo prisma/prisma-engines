@@ -6,10 +6,10 @@ use crate::{dml, ValueGenerator};
 use chrono::{DateTime, Utc};
 use datamodel_connector::scalars::ScalarValue;
 
-pub fn parse_from_dmmf(dmmf: &str) -> dml::Datamodel {
-    let parsed_dmmf = serde_json::from_str::<Datamodel>(&dmmf).expect("Failed to parse JSON");
-    schema_from_dmmf(&parsed_dmmf)
-}
+// pub fn parse_from_dmmf(dmmf: &str) -> dml::Datamodel {
+//     let parsed_dmmf = serde_json::from_str::<Datamodel>(&dmmf).expect("Failed to parse JSON");
+//     schema_from_dmmf(&parsed_dmmf)
+// }
 
 pub fn schema_from_dmmf(schema: &Datamodel) -> dml::Datamodel {
     let mut datamodel = dml::Datamodel {

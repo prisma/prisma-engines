@@ -340,16 +340,13 @@ fn convert_prisma_value(value: PrismaValue, st: &ScalarType) -> Result<PrismaVal
 
 fn convert_enum(value: PrismaValue, i: &InternalEnum) -> Result<Item, CoreError> {
     match value {
-        PrismaValue::String(s) | PrismaValue::Enum(s) => {
-            if i.contains(&s) {
-                Ok(Item::Value(PrismaValue::Enum(s)))
-            } else {
-                Err(CoreError::SerializationError(format!(
-                    "Value '{}' not found in enum '{:?}'",
-                    s, i
-                )))
-            }
-        }
+        PrismaValue::String(s) | PrismaValue::Enum(s) => match i.map_output_value(&s) {
+            Some(inum) => Ok(Item::Value(inum)),
+            None => Err(CoreError::SerializationError(format!(
+                "Value '{}' not found in enum '{:?}'",
+                s, i
+            ))),
+        },
 
         val => Err(CoreError::SerializationError(format!(
             "Attempted to serialize non-enum-compatible value '{}' with enum '{:?}'",
