@@ -272,3 +272,32 @@ async fn introspecting_a_table_without_uniques_should_comment_it_out(api: &TestA
     let result = dbg!(api.introspect().await);
     assert_eq!(&result, dm);
 }
+
+async fn introspecting_default_values_should_work(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("test", |t| {
+                t.add_column("bool", types::boolean());
+                t.add_column("float", types::float());
+                t.add_column("date", types::date());
+                t.add_column("id", types::primary());
+                t.add_column("int", types::integer());
+                t.add_column("string", types::text());
+            });
+        })
+        .await;
+
+    let dm = r#"
+            model Blog {
+                bool    Boolean
+                date    DateTime
+                float   Float
+                id      Int @id @default(autoincrement())
+                int     Int
+                string  String
+            }
+        "#;
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+}
