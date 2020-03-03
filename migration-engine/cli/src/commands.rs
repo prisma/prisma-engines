@@ -16,7 +16,7 @@ use url::Url;
 #[derive(Debug, StructOpt)]
 pub(crate) struct Cli {
     /// The connection string to the database
-    #[structopt(long = "datasource", short = "d")]
+    #[structopt(long, short = "d")]
     datasource: String,
     #[structopt(subcommand)]
     command: CliCommand,
@@ -63,10 +63,8 @@ impl Cli {
 #[derive(Debug, StructOpt)]
 enum CliCommand {
     /// Create an empty database defined in the configuration string.
-    #[structopt(name = "--create_database")]
     CreateDatabase,
     /// Does the database connection string work?
-    #[structopt(name = "--can_connect_to_database")]
     CanConnectToDatabase,
 }
 

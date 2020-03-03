@@ -72,13 +72,10 @@ pub struct ExecuteRequestInput {
 #[derive(Debug, StructOpt, Clone)]
 pub enum CliOpt {
     /// Output the DMMF from the loaded data model.
-    #[structopt(name = "--dmmf")]
     Dmmf,
     /// Get the configuration from the given data model.
-    #[structopt(name = "--get_config")]
     GetConfig(GetConfigInput),
     /// Executes one request and then terminates.
-    #[structopt(name = "--execute_request")]
     ExecuteRequest(ExecuteRequestInput),
 }
 
@@ -95,10 +92,10 @@ pub struct PrismaOpt {
     #[structopt(long)]
     legacy: bool,
     /// Runs all queries in a transaction, including all the reads.
-    #[structopt(long = "always_force_transactions")]
+    #[structopt(long)]
     always_force_transactions: bool,
     /// Enables raw SQL queries with executeRaw mutation
-    #[structopt(long = "enable_raw_queries")]
+    #[structopt(long)]
     enable_raw_queries: bool,
     #[structopt(subcommand)]
     subcommand: Option<Subcommand>,

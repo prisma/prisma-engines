@@ -998,6 +998,7 @@ dependencies = [
  "serde_derive",
  "serde_json",
  "sql-introspection-connector",
+ "structopt",
  "test-setup",
  "thiserror",
  "tokio",
@@ -1983,10 +1984,10 @@ dependencies = [
 name = "prisma-fmt"
 version = "0.1.0"
 dependencies = [
- "clap",
  "datamodel",
  "serde",
  "serde_json",
+ "structopt",
 ]
 
 [[package]]

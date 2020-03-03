@@ -76,8 +76,8 @@ USAGE:
     prisma [FLAGS] [OPTIONS] [SUBCOMMAND]
 
 FLAGS:
-        --always_force_transactions    Runs all queries in a transaction, including all the reads
-        --enable_raw_queries           Enables raw SQL queries with executeRaw mutation
+        --always-force-transactions    Runs all queries in a transaction, including all the reads
+        --enable-raw-queries           Enables raw SQL queries with executeRaw mutation
     -h, --help                         Prints help information
         --legacy                       Switches query schema generation to Prisma 1 compatible mode
     -V, --version                      Prints version information
@@ -101,10 +101,10 @@ FLAGS:
     -V, --version    Prints version information
 
 SUBCOMMANDS:
-    --dmmf               Output the DMMF from the loaded data model
-    --dmmf_to_dml        Convert the given DMMF JSON file to a data model
-    --execute_request    Executes one request and then terminates
-    --get_config         Get the configuration from the given data model
+    dmmf               Output the DMMF from the loaded data model
+    dmmf-to-dml        Convert the given DMMF JSON file to a data model
+    execute-request    Executes one request and then terminates
+    get-config         Get the configuration from the given data model
     help                 Prints this message or the help of the given subcommand(s)
 ```
 

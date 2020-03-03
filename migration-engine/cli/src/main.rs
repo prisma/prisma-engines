@@ -9,17 +9,14 @@ use structopt::StructOpt;
 /// When no subcommand is specified, the migration engine will default to starting as a JSON-RPC
 /// server over stdio.
 #[derive(Debug, StructOpt)]
-#[structopt(no_version)]
+#[structopt(version = env!("GIT_HASH"))]
 struct MigrationEngineCli {
     /// Run only a single command, then exit
-    #[structopt(short = "s", long = "single_cmd")]
+    #[structopt(short = "s", long)]
     single_cmd: bool,
     /// Path to the datamodel
-    #[structopt(short = "d", long = "datamodel", name = "FILE")]
+    #[structopt(short = "d", long, name = "FILE")]
     datamodel: Option<String>,
-    /// Prints the server commit ID
-    #[structopt(long = "version")]
-    version: bool,
     #[structopt(subcommand)]
     cli_subcommand: Option<SubCommand>,
 }
@@ -46,11 +43,6 @@ async fn main() {
     logger::init_logger();
 
     let input = MigrationEngineCli::from_args();
-
-    if input.version {
-        println!(env!("GIT_HASH"));
-        std::process::exit(0);
-    }
 
     match input.cli_subcommand {
         None => {
