@@ -27,6 +27,7 @@ pub enum ParameterizedValue<'a> {
     Real(Decimal),
     Text(Cow<'a, str>),
     Enum(Cow<'a, str>),
+    Bytes(Cow<'a, [u8]>),
     Boolean(bool),
     Char(char),
     #[cfg(all(feature = "array", feature = "postgresql"))]
@@ -64,6 +65,7 @@ impl<'a> fmt::Display for ParameterizedValue<'a> {
             ParameterizedValue::Integer(val) => write!(f, "{}", val),
             ParameterizedValue::Real(val) => write!(f, "{}", val),
             ParameterizedValue::Text(val) => write!(f, "\"{}\"", val),
+            ParameterizedValue::Bytes(val) => write!(f, "<{} bytes blob>", val.len()),
             ParameterizedValue::Enum(val) => write!(f, "\"{}\"", val),
             ParameterizedValue::Boolean(val) => write!(f, "{}", val),
             ParameterizedValue::Char(val) => write!(f, "'{}'", val),
@@ -99,6 +101,7 @@ impl<'a> From<ParameterizedValue<'a>> for Value {
             ParameterizedValue::Integer(i) => Value::Number(Number::from(i)),
             ParameterizedValue::Real(d) => serde_json::to_value(d).unwrap(),
             ParameterizedValue::Text(cow) => Value::String(cow.into_owned()),
+            ParameterizedValue::Bytes(bytes) => Value::String(base64::encode(&bytes)),
             ParameterizedValue::Enum(cow) => Value::String(cow.into_owned()),
             ParameterizedValue::Boolean(b) => Value::Bool(b),
             ParameterizedValue::Char(c) => {
@@ -140,6 +143,7 @@ impl<'a> ParameterizedValue<'a> {
     pub fn as_str(&self) -> Option<&str> {
         match self {
             ParameterizedValue::Text(cow) => Some(cow.borrow()),
+            ParameterizedValue::Bytes(cow) => std::str::from_utf8(cow.as_ref()).ok(),
             _ => None,
         }
     }
@@ -156,6 +160,7 @@ impl<'a> ParameterizedValue<'a> {
     pub fn to_string(&self) -> Option<String> {
         match self {
             ParameterizedValue::Text(cow) => Some(cow.to_string()),
+            ParameterizedValue::Bytes(cow) => std::str::from_utf8(cow.as_ref()).map(|s| s.to_owned()).ok(),
             _ => None,
         }
     }
@@ -165,6 +170,33 @@ impl<'a> ParameterizedValue<'a> {
     pub fn into_string(self) -> Option<String> {
         match self {
             ParameterizedValue::Text(cow) => Some(cow.into_owned()),
+            ParameterizedValue::Bytes(cow) => String::from_utf8(cow.into_owned()).ok(),
+            _ => None,
+        }
+    }
+
+    /// Returns whether this value is the `Bytes` variant.
+    pub fn is_bytes(&self) -> bool {
+        match self {
+            ParameterizedValue::Bytes(_) => true,
+            _ => false,
+        }
+    }
+
+    /// Returns a bytes slice if the value is text or a byte slice, otherwise `None`.
+    pub fn as_bytes(&self) -> Option<&[u8]> {
+        match self {
+            ParameterizedValue::Text(cow) => Some(cow.as_ref().as_bytes()),
+            ParameterizedValue::Bytes(cow) => Some(cow.as_ref()),
+            _ => None,
+        }
+    }
+
+    /// Returns a cloned `Vec<u8>` if the value is text or a byte slice, otherwise `None`.
+    pub fn to_bytes(&self) -> Option<Vec<u8>> {
+        match self {
+            ParameterizedValue::Text(cow) => Some(cow.to_string().into_bytes()),
+            ParameterizedValue::Bytes(cow) => Some(cow.to_owned().into()),
             _ => None,
         }
     }
@@ -374,6 +406,12 @@ impl<'a> From<i32> for ParameterizedValue<'a> {
     #[inline]
     fn from(that: i32) -> Self {
         ParameterizedValue::Integer(i64::try_from(that).unwrap())
+    }
+}
+
+impl<'a> From<&'a [u8]> for ParameterizedValue<'a> {
+    fn from(that: &'a [u8]) -> ParameterizedValue<'a> {
+        ParameterizedValue::Bytes(that.into())
     }
 }
 

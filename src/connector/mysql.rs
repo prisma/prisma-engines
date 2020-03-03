@@ -323,7 +323,12 @@ impl Queryable for Mysql {
 #[cfg(test)]
 mod tests {
     use super::MysqlUrl;
-    use crate::{connector::Queryable, error::*, single::Quaint};
+    use crate::{
+        ast::{Insert, ParameterizedValue, Select},
+        connector::Queryable,
+        error::*,
+        single::Quaint,
+    };
     use once_cell::sync::Lazy;
     use std::env;
     use url::Url;
@@ -384,8 +389,40 @@ VALUES (1, 'Joe', 27, 20000.00 );
         let row = rows.get(0).unwrap();
         assert_eq!(row["id"].as_i64(), Some(1));
         assert_eq!(row["name"].as_str(), Some("Joe"));
+        assert!(row["name"].is_text());
         assert_eq!(row["age"].as_i64(), Some(27));
         assert_eq!(row["salary"].as_f64(), Some(20000.0));
+    }
+
+    #[tokio::test]
+    async fn blobs_roundtrip() {
+        let connection = Quaint::new(&CONN_STR).await.unwrap();
+        let blob: Vec<u8> = vec![4, 2, 0];
+
+        connection
+            .query_raw("DROP TABLE IF EXISTS mysql_blobs_roundtrip_test", &[])
+            .await
+            .unwrap();
+
+        connection
+            .query_raw(
+                "CREATE TABLE mysql_blobs_roundtrip_test (id int AUTO_INCREMENT PRIMARY KEY, bytes MEDIUMBLOB)",
+                &[],
+            )
+            .await
+            .unwrap();
+
+        let insert = Insert::single_into("mysql_blobs_roundtrip_test").value("bytes", blob.as_slice());
+
+        connection.query(insert.into()).await.unwrap();
+
+        let roundtripped = Select::from_table("mysql_blobs_roundtrip_test").column("bytes");
+        let roundtripped = connection.query(roundtripped.into()).await.unwrap();
+
+        assert_eq!(
+            roundtripped.into_single().unwrap().at(0).unwrap(),
+            &ParameterizedValue::Bytes(blob.as_slice().into())
+        );
     }
 
     #[tokio::test]

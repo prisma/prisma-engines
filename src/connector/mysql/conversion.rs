@@ -18,9 +18,16 @@ pub fn conv_params<'a>(params: &[ParameterizedValue<'a>]) -> my::Params {
 impl TakeRow for my::Row {
     fn take_result_row<'b>(&'b mut self) -> crate::Result<Vec<ParameterizedValue<'static>>> {
         fn convert(row: &mut my::Row, i: usize) -> crate::Result<ParameterizedValue<'static>> {
-            let res = match row.take(i).unwrap_or(my::Value::NULL) {
+            let value = row.take(i).unwrap_or(my::Value::NULL);
+            let column = match row.columns_ref().get(i) {
+                Some(col) => col,
+                None => return Ok(ParameterizedValue::Null),
+            };
+            let res = match value {
                 my::Value::NULL => ParameterizedValue::Null,
-                my::Value::Bytes(b) => ParameterizedValue::Text(String::from_utf8(b.to_vec())?.into()),
+                // https://dev.mysql.com/doc/internals/en/character-set.html
+                my::Value::Bytes(b) if column.character_set() == 63 => ParameterizedValue::Bytes(b.into()),
+                my::Value::Bytes(s) => ParameterizedValue::Text(String::from_utf8(s)?.into()),
                 my::Value::Int(i) => ParameterizedValue::Integer(i),
                 // TOOD: This is unsafe
                 my::Value::UInt(i) => ParameterizedValue::Integer(i as i64),
@@ -82,6 +89,7 @@ impl<'a> From<ParameterizedValue<'a>> for MyValue {
             ParameterizedValue::Integer(i) => MyValue::Int(i),
             ParameterizedValue::Real(f) => MyValue::Float(f.to_f64().expect("Decimal is not a f64.")),
             ParameterizedValue::Text(s) => MyValue::Bytes((&*s).as_bytes().to_vec()),
+            ParameterizedValue::Bytes(bytes) => MyValue::Bytes(bytes.into_owned()),
             ParameterizedValue::Enum(s) => MyValue::Bytes((&*s).as_bytes().to_vec()),
             ParameterizedValue::Boolean(b) => MyValue::Int(b as i64),
             ParameterizedValue::Char(c) => MyValue::Bytes(vec![c as u8]),
