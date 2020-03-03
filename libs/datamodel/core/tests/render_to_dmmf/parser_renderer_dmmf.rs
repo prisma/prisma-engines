@@ -19,7 +19,6 @@ fn test_dmmf_rendering() {
         let datamodel_string = load_from_file(format!("{}.prisma", test_case).as_str());
         let dml = datamodel::parse_datamodel(&datamodel_string).unwrap();
         let dmmf_string = datamodel::json::dmmf::render_to_dmmf(&dml);
-        println!("{}", dmmf_string);
         assert_eq!(dmmf_string, load_from_file(format!("{}.txt", test_case).as_str()));
     }
 }
