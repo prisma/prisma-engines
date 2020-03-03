@@ -1,4 +1,4 @@
-use crate::{Field, FieldWeak, ScalarFieldRef};
+use crate::{Field, FieldWeak};
 
 #[derive(Debug)]
 pub struct IndexTemplate {
@@ -46,14 +46,6 @@ pub struct Index {
 impl Index {
     pub fn fields(&self) -> Vec<Field> {
         self.fields.iter().map(|sf| sf.upgrade()).collect()
-    }
-
-    pub fn scalar_fields(&self) -> Vec<ScalarFieldRef> {
-        self.fields
-            .iter()
-            .map(|f| f.upgrade())
-            .filter_map(Field::as_scalar)
-            .collect()
     }
 }
 

@@ -145,7 +145,7 @@ impl Field {
         }
     }
 
-    pub(crate) fn as_scalar(self) -> Option<ScalarFieldRef> {
+    pub fn as_scalar(self) -> Option<ScalarFieldRef> {
         match self {
             Field::Scalar(scalar) => Some(scalar),
             _ => None,

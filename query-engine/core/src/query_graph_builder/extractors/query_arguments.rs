@@ -70,76 +70,105 @@ fn extract_cursor(value: ParsedInputValue, model: &ModelRef) -> QueryGraphBuilde
         return Ok(None);
     }
 
-    let map: ParsedInputMap = value.try_into()?;
-
     // map.assert_size(1)?;
     // let (field_name, value): (String, ParsedInputValue) = map.into_iter().nth(0).unwrap();
 
-    // Always try to resolve regular fields first. If that fails, try to resolve compound fields.
-    model
-        .fields()
-        .find_from_all(&field_name)
-        .map_err(|err| err.into())
-        .and_then(|field| {
-            match field {
-                Field::Scalar(sf) => {
-                    let value: PrismaValue = value.try_into()?;
+    let input_map: ParsedInputMap = value.try_into()?;
+    let mut pairs = vec![];
 
-                    Ok(Some(RecordProjection::new(vec![(
-                        sf.data_source_field().clone(),
-                        value,
-                    )])))
-                }
+    for (field_name, map_value) in input_map {
+        // Always try to resolve regular fields first. If that fails, try to resolve compound fields.
+        let model_fields = model
+            .fields()
+            .find_from_all(&field_name)
+            .map(|f| vec![f.clone()])
+            // .map_err(|err| err.into())
+            .or_else(|_| {
+                utils::resolve_compound_field(&field_name, &model).ok_or(QueryGraphBuilderError::AssertionError(
+                    format!(
+                        "Unable to resolve field {} to a field or a set of fields on model {}",
+                        field_name, model.name
+                    ),
+                ))
+            })?;
 
-                Field::Relation(rf) => {
-                    let fields = rf.data_source_fields();
+        if model_fields.len() == 1
+            && model_fields
+                .first()
+                .map(|f| f.data_source_fields().len() == 1)
+                .unwrap_or(false)
+        {
+            // Single field to single underlying data source field case.
+            let field = model_fields.first().unwrap();
+            let dsf = field.data_source_fields().pop().unwrap();
+            let value: PrismaValue = map_value.try_into()?;
 
-                    if fields.len() == 1 {
-                        let value: PrismaValue = value.try_into()?;
+            pairs.push((dsf, value));
+        } else {
+            // Compound / relation field with > 1 db fields case.
+            let mut compound_map: ParsedInputMap = map_value.try_into()?;
 
-                        Ok(Some(RecordProjection::new(vec![(
-                            fields.first().unwrap().clone(),
-                            value,
-                        )])))
-                    } else {
-                        let mut map: ParsedInputMap = value.try_into()?;
+            for field in model_fields {
+                // Unwrap is safe because validation guarantees that the value is present.
+                // let value = compound_map.remove(&field.name()).unwrap().try_into()?;
+                // pairs.push((field, value));
 
-                        let pairs: Vec<_> = fields
-                            .into_iter()
-                            .map(|field| {
-                                // Every field in the map must correspond to
-                                // If a field is not present, nulls are inserted.
-
-                                map.remove()
-
-                                todo!()
-                            })
-                            .collect();
-
-                        Ok(Some(RecordProjection::new(pairs)))
-                    }
-                }
+                // Relation and scalar fields are different in the way their underlying fields in the map are named:
+                // scalar: has actual model field names in the compound map.
+                // relation: has data source field names in the compound map for lack of a better mapping.
             }
-        })
-        .or_else(|_: QueryGraphBuilderError| {
-            // utils::resolve_compound_field(&field_name, &model)
-            //     .ok_or(QueryGraphBuilderError::AssertionError(format!(
-            //         "Unable to resolve field {} to a field or a set of fields on model {}",
-            //         field_name, model.name
-            //     )))
-            //     .and_then(|fields| {
-            //         let mut compound_map: ParsedInputMap = value.try_into()?;
-            //         let mut result = vec![];
-
-            //         for field in fields {
-            //             // Unwrap is safe because validation gurantees that the value is present.
-            //             let value = compound_map.remove(&field.name).unwrap().try_into()?;
-            //             result.push((field, value));
-            //         }
-
-            //         Ok(Some(result))
-            //     })
 
             todo!()
-        })
+        }
+
+        // .and_then(|fields| {
+        //
+        //     let mut result = vec![];
+        //     let mut compound_map: ParsedInputMap = map_value.try_into()?;
+
+        //     Ok(Some(result))
+        // })
+
+        // match model_field {
+        //     Field::Scalar(sf) => {
+        //         let value: PrismaValue = value.try_into()?;
+
+        //         Ok(Some(RecordProjection::new(vec![(
+        //             sf.data_source_field().clone(),
+        //             value,
+        //         )])))
+        //     }
+
+        //     Field::Relation(rf) => {
+        //         let fields = rf.data_source_fields();
+
+        //         if fields.len() == 1 {
+        //             let value: PrismaValue = value.try_into()?;
+
+        //             Ok(Some(RecordProjection::new(vec![(
+        //                 fields.first().unwrap().clone(),
+        //                 value,
+        //             )])))
+        //         } else {
+        //             let mut map: ParsedInputMap = value.try_into()?;
+
+        //             let pairs: Vec<_> = fields
+        //                 .into_iter()
+        //                 .map(|field| {
+        //                     // Every field in the map must correspond to
+        //                     // If a field is not present, nulls are inserted.
+
+        //                     map.remove()
+
+        //                     todo!()
+        //                 })
+        //                 .collect();
+
+        //             Ok(Some(RecordProjection::new(pairs)))
+        //         }
+        //     }
+        // }
+    }
+
+    Ok(Some(RecordProjection::new(pairs)))
 }
