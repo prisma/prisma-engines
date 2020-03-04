@@ -205,6 +205,7 @@ impl SqlSchemaDescriber {
             };
             let tpe = get_column_type(data_type.as_ref(), &full_data_type, arity, enums);
 
+            //todo we might want to use regexes here
             let default = match &tpe.family {
                 ColumnTypeFamily::Enum(enum_name) => col.get("column_default").and_then(|param_value| {
                     param_value
@@ -212,9 +213,12 @@ impl SqlSchemaDescriber {
                         .map(|x| unquote_postgres_strings(x.replace(format!("::{}", enum_name.clone()).as_str(), "")))
                 }),
                 _ => col.get("column_default").and_then(|param_value| {
-                    param_value
-                        .to_string()
-                        .map(|x| unquote_postgres_strings(x.replace("::text", "")))
+                    param_value.to_string().map(|x| {
+                        unquote_postgres_strings(
+                            x.replace(format!("::{}", data_type).as_str(), "")
+                                .replace(format!("::{}", full_data_type).as_str(), ""),
+                        )
+                    })
                 }),
             };
 
@@ -645,7 +649,7 @@ fn is_autoincrement(value: &str, schema_name: &str, table_name: &str, column_nam
         .unwrap_or(false)
 }
 fn unquote_postgres_strings(input: String) -> String {
-    /// Regex for matching the quotes on the introspected string values on MariaDB.
+    /// Regex for matching the quotes on the introspected string values on Postgres.
     static POSTGRES_STRING_DEFAULT_RE: Lazy<regex::Regex> = Lazy::new(|| regex::Regex::new(r#"^'(.*)'$"#).unwrap());
 
     POSTGRES_STRING_DEFAULT_RE
@@ -716,7 +720,7 @@ mod tests {
         ));
     }
     #[test]
-    fn postgres_string_default_regex_works() {
+    fn postgres_unquote_string_default_regex_works() {
         let quoted_str = "'abc $$ def'";
 
         assert_eq!(unquote_postgres_strings(quoted_str.to_string()), "abc $$ def");

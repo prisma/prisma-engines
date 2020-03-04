@@ -272,3 +272,83 @@ async fn introspecting_a_table_without_uniques_should_comment_it_out(api: &TestA
     let result = dbg!(api.introspect().await);
     assert_eq!(&result, dm);
 }
+
+#[test_each_connector(tags("postgres"))]
+async fn introspecting_default_values_should_work(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("Test", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom("numeric_int2 int2 Default 2");
+                t.inject_custom("numeric_int4 int4 Default 4");
+                t.inject_custom("numeric_int8 int8 Default 8");
+                t.inject_custom("numeric_decimal decimal(8,4) Default 1234.1234");
+                t.inject_custom("numeric_float4 float4 Default 123.1234");
+                t.inject_custom("numeric_float8 float8 Default 123.1234");
+
+                // numeric_serial2 serial2,
+                // numeric_serial4 serial4,
+                // numeric_serial8 serial8,
+                // t.inject_custom("numeric_money money Default 123.12");
+                // t.inject_custom("numeric_oid oid Default 42");
+
+                t.inject_custom("string_char char(8) Default 'abcdefgh'");
+                t.inject_custom("string_varchar varchar(8) Default 'abcd'");
+                t.inject_custom("string_text text Default 'abcdefgh'");
+
+                // binary_bytea bytea,
+                // binary_bits  bit(80),
+                // binary_bits_varying bit varying(80),
+                // binary_uuid uuid,
+
+                t.inject_custom("time_timestamp timestamp Default Now()"); //todo not recognized yet
+                t.inject_custom("time_timestamptz timestamptz Default Now()"); //todo not recognized yet
+                t.inject_custom("time_date date Default CURRENT_DATE"); //todo not recognized yet
+                t.inject_custom("time_time time Default Now()"); // todo not recognized yet
+
+                // time_timetz timetz,
+                // time_interval interval,
+
+                t.inject_custom("boolean_boolean boolean Default false");
+
+                // network_cidr cidr,
+                // network_inet inet,
+                // network_mac  macaddr,
+                // search_tsvector tsvector,
+                // search_tsquery tsquery,
+                // json_json json,
+                // json_jsonb jsonb,
+                // range_int4range int4range,
+                // range_int8range int8range,
+                // range_numrange numrange,
+                // range_tsrange tsrange,
+                // range_tstzrange tstzrange,
+                // range_daterange daterange
+            });
+        })
+        .await;
+
+    let dm = r#"
+            model Test {
+                boolean_boolean     Boolean?        @default(false)
+                id                  Int         @id @default(autoincrement())
+                numeric_decimal     Float?          @default(1234.1234) 
+                numeric_float4      Float?          @default(123.1234)
+                numeric_float8      Float?          @default(123.1234)
+                numeric_int2        Int?            @default(2)
+                numeric_int4        Int?            @default(4)
+                numeric_int8        Int?            @default(8)
+                string_char         String?         @default("abcdefgh")
+                string_text         String?         @default("abcdefgh")
+                string_varchar      String?         @default("abcd")
+                time_date           DateTime?
+                time_time           DateTime?
+                time_timestamp      DateTime?
+                time_timestamptz    DateTime?
+            }
+        "#;
+
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+}
