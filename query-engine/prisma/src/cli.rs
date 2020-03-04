@@ -1,13 +1,9 @@
-use std::{convert::TryFrom, fs::File, io::Read, sync::Arc};
-
-use serde::Deserialize;
-
-use datamodel::json::dmmf::Datamodel;
 use query_core::{
     schema::{QuerySchemaRef, SupportedCapabilities},
     BuildMode, QuerySchemaBuilder,
 };
 use std::collections::HashMap;
+use std::{convert::TryFrom, fs::File, io::Read, sync::Arc};
 
 use crate::context::PrismaContext;
 use crate::error::PrismaError;
@@ -17,13 +13,6 @@ use crate::{
     dmmf, PrismaResult,
 };
 use crate::{CliOpt, PrismaOpt, Subcommand};
-
-#[derive(Deserialize, Debug)]
-#[serde(rename_all = "camelCase")]
-pub struct DmmfToDmlInput {
-    pub dmmf: Datamodel,
-    pub config: serde_json::Value,
-}
 
 pub struct ExecuteRequest {
     query: String,
@@ -39,7 +28,6 @@ pub struct DmmfRequest {
 
 pub enum CliCommand {
     Dmmf(DmmfRequest),
-    DmmfToDml(DmmfToDmlInput),
     GetConfig(String),
     ExecuteRequest(ExecuteRequest),
 }
@@ -63,12 +51,6 @@ impl TryFrom<&PrismaOpt> for CliCommand {
                         enable_raw_queries: opts.enable_raw_queries,
                     }))
                 }
-                CliOpt::DmmfToDml(input) => {
-                    let file = File::open(&input.path).expect("File should open read only");
-                    let input = serde_json::from_reader(file).expect("File should be proper JSON");
-
-                    Ok(CliCommand::DmmfToDml(input))
-                }
                 CliOpt::GetConfig(input) => {
                     let mut file = File::open(&input.path).expect("File should open read only");
                     let mut datamodel = String::new();
@@ -91,7 +73,6 @@ impl CliCommand {
     pub async fn execute(self) -> PrismaResult<()> {
         match self {
             CliCommand::Dmmf(request) => Self::dmmf(request),
-            CliCommand::DmmfToDml(input) => Self::dmmf_to_dml(input),
             CliCommand::GetConfig(input) => Self::get_config(input),
             CliCommand::ExecuteRequest(request) => Self::execute_request(request).await,
         }
@@ -115,16 +96,6 @@ impl CliCommand {
 
         let dmmf = dmmf::render_dmmf(&v2components.datamodel, query_schema);
         let serialized = serde_json::to_string_pretty(&dmmf)?;
-
-        println!("{}", serialized);
-
-        Ok(())
-    }
-
-    fn dmmf_to_dml(input: DmmfToDmlInput) -> PrismaResult<()> {
-        let datamodel = datamodel::json::dmmf::schema_from_dmmf(&input.dmmf);
-        let config = datamodel::json::mcf::config_from_mcf_json_value(input.config);
-        let serialized = datamodel::render_datamodel_and_config_to_string(&datamodel, &config)?;
 
         println!("{}", serialized);
 
