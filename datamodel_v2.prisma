@@ -1,12 +1,25 @@
 datasource chinook {
   provider = "sqlite"
-  url = "file:./db/Chinook.db"
+  url = "file:./db/Wurst.db"
 }
 
 model A {
   b B @id
+  makeGQLHappy String?
 }
 
 model B {
   id String @id @default(cuid())
+}
+
+model C {
+  c String @default(cuid()) @id
+  d D @map(["c_1", "c_2"])
+}
+
+model D {
+  d_1 String @default(cuid())
+  d_2 String @default(cuid())
+
+  @@id([d_1, d_2])
 }

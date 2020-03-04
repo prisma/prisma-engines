@@ -134,6 +134,8 @@ pub trait InputTypeBuilderBase<'a>: CachedBuilder<InputObjectType> + InputBuilde
             })
             .collect();
 
+        dbg!(&fields);
+
         // @@unique compound fields.
         let compound_unique_fields: Vec<InputField> = model
             .unique_indexes()
@@ -147,12 +149,17 @@ pub trait InputTypeBuilderBase<'a>: CachedBuilder<InputObjectType> + InputBuilde
             .collect();
 
         // @@id compound field (there can be only one per model).
-        let compound_id_field: Option<InputField> = model.fields().id().map(|fields| {
-            let name = compound_id_field_name(&fields.iter().map(|f| f.name()).collect::<Vec<&str>>());
-            let typ = self.compound_field_unique_object_type(None, fields);
+        let id_fields = model.fields().id();
+        let compound_id_field: Option<InputField> = if id_fields.as_ref().map(|f| f.len() > 1).unwrap_or(false) {
+            id_fields.map(|fields| {
+                let name = compound_id_field_name(&fields.iter().map(|f| f.name()).collect::<Vec<&str>>());
+                let typ = self.compound_field_unique_object_type(None, fields);
 
-            input_field(name, InputType::opt(InputType::object(typ)), None)
-        });
+                input_field(name, InputType::opt(InputType::object(typ)), None)
+            })
+        } else {
+            None
+        };
 
         fields.extend(compound_unique_fields);
         fields.extend(compound_id_field);

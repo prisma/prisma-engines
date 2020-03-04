@@ -185,6 +185,75 @@ fn handle_relation_field(
     op: &FilterOp,
     match_suffix: bool,
 ) -> QueryGraphBuilderResult<Filter> {
+    // We need to decide if the incoming query is reasoning over relation filters or over an inlined relation field selector:
+    // - If the FilterOp is anything other than FilterOp::Field, it's definitely relation filters.
+    // - If the incoming value is not a map and not null, it is refering to an inlined relation selector.
+    // - If the incoming value is a map, and the keys of the map exactly match the data source field names of the relation field,
+    //   it is refering to an inlined relation selector
+    //
+    // [DTODO] Reevaluate the caveat in light of an improved and unambiguous filter API.
+    // Caveat: Null values are a grey zone. For now we assume that null values translate to the "one relation is null" filter and does not
+    // translate to a nullable field underneath.
+    match (op, &value) {
+        (FilterOp::Field, ParsedInputValue::Single(ref pv)) => match pv {
+            PrismaValue::Null => handle_relation_field_filter(field, value, op, match_suffix),
+            _ => handle_relation_field_selector(field, value),
+        },
+
+        (FilterOp::Field, ParsedInputValue::Map(map)) => {
+            let dsf_names = field
+                .data_source_fields()
+                .into_iter()
+                .map(|dsf| &dsf.name)
+                .collect::<Vec<_>>()
+                .sort();
+
+            let map_keys = map.keys().collect::<Vec<_>>().sort();
+
+            if dsf_names == map_keys {
+                handle_relation_field_selector(field, value)
+            } else {
+                handle_relation_field_filter(field, value, op, match_suffix)
+            }
+        }
+
+        _ => handle_relation_field_filter(field, value, op, match_suffix),
+    }
+}
+
+fn handle_relation_field_selector(
+    field: &RelationFieldRef,
+    value: ParsedInputValue,
+) -> QueryGraphBuilderResult<Filter> {
+    match value {
+        ParsedInputValue::Single(pv) => {
+            let dsf = field.data_source_fields().first().unwrap().clone();
+            Ok(dsf.equals(pv))
+        }
+
+        ParsedInputValue::Map(mut map) => {
+            let filters = field
+                .data_source_fields()
+                .into_iter()
+                .map(|dsf| {
+                    let value: PrismaValue = map.remove(&dsf.name).unwrap().try_into()?;
+                    Ok(dsf.clone().equals(value))
+                })
+                .collect::<QueryGraphBuilderResult<Vec<_>>>()?;
+
+            Ok(Filter::and(filters))
+        }
+
+        _ => unreachable!(),
+    }
+}
+
+fn handle_relation_field_filter(
+    field: &RelationFieldRef,
+    value: ParsedInputValue,
+    op: &FilterOp,
+    match_suffix: bool,
+) -> QueryGraphBuilderResult<Filter> {
     let value: Option<BTreeMap<String, ParsedInputValue>> = value.try_into()?;
 
     Ok(match (op, value) {
