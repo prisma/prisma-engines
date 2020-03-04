@@ -305,3 +305,20 @@ async fn remapping_enum_default_values_should_work(api: &TestApi) {
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
+
+#[test_each_connector(tags("postgres"))]
+async fn remapping_field_names_to_empty_should_comment_them_out(api: &TestApi) {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("1", types::text());
+                t.add_column("last", types::primary());
+            });
+        })
+        .await;
+
+    let dm = "model User {\n  /// This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*\n  // 1 String @map(\"1\")\n  last Int    @default(autoincrement()) @id\n}";
+
+    let result = dbg!(api.introspect().await);
+    assert_eq!(&result, dm);
+}

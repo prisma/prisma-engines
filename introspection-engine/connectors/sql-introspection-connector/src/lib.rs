@@ -1,5 +1,5 @@
 pub mod calculate_datamodel; // only exported to be able to unit test it
-mod comment_out_unhandled_models;
+mod commenting_out_guardrails;
 mod error;
 mod misc_helpers;
 mod sanitize_datamodel_names;

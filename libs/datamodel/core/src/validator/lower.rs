@@ -103,6 +103,7 @@ impl LowerDmlToAst {
             field_type: self.lower_type(&field.field_type),
             documentation: field.documentation.clone().map(|text| ast::Comment { text }),
             span: ast::Span::empty(),
+            is_commented_out: field.is_commented_out,
         })
     }
 

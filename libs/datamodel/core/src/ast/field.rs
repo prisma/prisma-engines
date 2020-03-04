@@ -16,6 +16,8 @@ pub struct Field {
     pub documentation: Option<Comment>,
     /// The location of this field in the text representation.
     pub span: Span,
+    /// The location of this field in the text representation.
+    pub is_commented_out: bool,
 }
 
 impl WithIdentifier for Field {

@@ -228,6 +228,7 @@ fn parse_field(token: &pest::iterators::Pair<'_, Rule>) -> Result<Field, Datamod
             directives,
             documentation: doc_comments_to_string(&comments),
             span: Span::from_pest(token.as_span()),
+            is_commented_out: false,
         }),
         _ => panic!(
             "Encountered impossible field declaration during parsing: {:?}",
@@ -453,6 +454,7 @@ fn parse_type(token: &pest::iterators::Pair<'_, Rule>) -> Field {
             directives,
             documentation: doc_comments_to_string(&comments),
             span: Span::from_pest(token.as_span()),
+            is_commented_out: false,
         },
         _ => panic!(
             "Encountered impossible custom type declaration during parsing: {:?}",
