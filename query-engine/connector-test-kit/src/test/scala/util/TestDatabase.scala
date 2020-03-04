@@ -54,7 +54,7 @@ case class MigrationEngine(project: Project) {
 
   def createDatabase(): Unit = {
     import scala.sys.process._
-    val cmd = List(EnvVars.migrationEngineBinaryPath, "cli", "-d", project.dataSourceUrl, "--create_database")
+    val cmd = List(EnvVars.migrationEngineBinaryPath, "cli", "-d", project.dataSourceUrl, "create-database")
 
     cmd.!
   }
