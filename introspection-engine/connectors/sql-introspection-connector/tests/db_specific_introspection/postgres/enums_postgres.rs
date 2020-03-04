@@ -164,3 +164,35 @@ async fn introspecting_a_table_with_enum_default_values_should_work(api: &TestAp
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
+
+#[test_each_connector(tags("postgres"))]
+async fn introspecting_a_table_with_enum_default_values_that_look_like_booleans_should_work(api: &TestApi) {
+    let sql = format!("CREATE Type Truth as ENUM ( 'true', 'false', 'rumor')");
+
+    api.database().execute_raw(&sql, &[]).await.unwrap();
+
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("News", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom("confirmed  truth Not Null default 'true'");
+            });
+        })
+        .await;
+
+    let dm = r#"
+        model News {
+            confirmed   truth   @default(true)
+            id          Int     @default(autoincrement()) @id
+        }
+
+        enum truth{
+            false
+            rumor
+            true
+        }
+    "#;
+
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+}
