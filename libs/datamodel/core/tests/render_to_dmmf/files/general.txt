@@ -1,0 +1,477 @@
+{
+  "enums": [
+    {
+      "name": "CategoryEnum",
+      "values": [
+        {
+          "name": "A",
+          "dbName": null
+        },
+        {
+          "name": "B",
+          "dbName": null
+        },
+        {
+          "name": "C",
+          "dbName": null
+        }
+      ],
+      "dbName": null
+    }
+  ],
+  "models": [
+    {
+      "name": "User",
+      "isEmbedded": false,
+      "dbName": "user",
+      "fields": [
+        {
+          "name": "id",
+          "kind": "scalar",
+          "dbNames": [],
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": true,
+          "type": "Int",
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "createdAt",
+          "kind": "scalar",
+          "dbNames": [],
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": false,
+          "type": "DateTime",
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "email",
+          "kind": "scalar",
+          "dbNames": [],
+          "isList": false,
+          "isRequired": true,
+          "isUnique": true,
+          "isId": false,
+          "type": "String",
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "name",
+          "kind": "scalar",
+          "dbNames": [],
+          "isList": false,
+          "isRequired": false,
+          "isUnique": false,
+          "isId": false,
+          "type": "String",
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "posts",
+          "kind": "object",
+          "dbNames": [],
+          "isList": true,
+          "isRequired": false,
+          "isUnique": false,
+          "isId": false,
+          "type": "Post",
+          "relationName": "author",
+          "relationToFields": [],
+          "relationOnDelete": "NONE",
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "profile",
+          "kind": "object",
+          "dbNames": [],
+          "isList": false,
+          "isRequired": false,
+          "isUnique": false,
+          "isId": false,
+          "type": "Profile",
+          "relationName": "ProfileToUser",
+          "relationToFields": [],
+          "relationOnDelete": "NONE",
+          "isGenerated": false,
+          "isUpdatedAt": false
+        }
+      ],
+      "isGenerated": false,
+      "idFields": [],
+      "uniqueFields": []
+    },
+    {
+      "name": "Profile",
+      "isEmbedded": false,
+      "dbName": "profile",
+      "fields": [
+        {
+          "name": "id",
+          "kind": "scalar",
+          "dbNames": [],
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": true,
+          "type": "Int",
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "user",
+          "kind": "object",
+          "dbNames": [],
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": false,
+          "type": "User",
+          "relationName": "ProfileToUser",
+          "relationToFields": [
+            "id"
+          ],
+          "relationOnDelete": "NONE",
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "bio",
+          "kind": "scalar",
+          "dbNames": [],
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": false,
+          "type": "String",
+          "isGenerated": false,
+          "isUpdatedAt": false
+        }
+      ],
+      "isGenerated": false,
+      "idFields": [],
+      "uniqueFields": []
+    },
+    {
+      "name": "Post",
+      "isEmbedded": false,
+      "dbName": "post",
+      "fields": [
+        {
+          "name": "id",
+          "kind": "scalar",
+          "dbNames": [],
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": false,
+          "type": "Int",
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "createdAt",
+          "kind": "scalar",
+          "dbNames": [],
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": false,
+          "type": "DateTime",
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "updatedAt",
+          "kind": "scalar",
+          "dbNames": [],
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": false,
+          "type": "DateTime",
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "title",
+          "kind": "scalar",
+          "dbNames": [],
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": false,
+          "type": "String",
+          "default": "Default-Title",
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "wasLiked",
+          "kind": "scalar",
+          "dbNames": [],
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": false,
+          "type": "Boolean",
+          "default": false,
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "author",
+          "kind": "object",
+          "dbNames": [],
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": false,
+          "type": "User",
+          "relationName": "author",
+          "relationToFields": [
+            "id"
+          ],
+          "relationOnDelete": "NONE",
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "published",
+          "kind": "scalar",
+          "dbNames": [],
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": false,
+          "type": "Boolean",
+          "default": false,
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "categories",
+          "kind": "object",
+          "dbNames": [],
+          "isList": true,
+          "isRequired": false,
+          "isUnique": false,
+          "isId": false,
+          "type": "PostToCategory",
+          "relationName": "PostToPostToCategory",
+          "relationToFields": [],
+          "relationOnDelete": "NONE",
+          "isGenerated": false,
+          "isUpdatedAt": false
+        }
+      ],
+      "isGenerated": false,
+      "idFields": [
+        "title",
+        "createdAt"
+      ],
+      "uniqueFields": []
+    },
+    {
+      "name": "Category",
+      "isEmbedded": false,
+      "dbName": "category",
+      "fields": [
+        {
+          "name": "id",
+          "kind": "scalar",
+          "dbNames": [],
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": true,
+          "type": "Int",
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "name",
+          "kind": "scalar",
+          "dbNames": [],
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": false,
+          "type": "String",
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "posts",
+          "kind": "object",
+          "dbNames": [],
+          "isList": true,
+          "isRequired": false,
+          "isUnique": false,
+          "isId": false,
+          "type": "PostToCategory",
+          "relationName": "CategoryToPostToCategory",
+          "relationToFields": [],
+          "relationOnDelete": "NONE",
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "cat",
+          "kind": "enum",
+          "dbNames": [],
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": false,
+          "type": "CategoryEnum",
+          "isGenerated": false,
+          "isUpdatedAt": false
+        }
+      ],
+      "isGenerated": false,
+      "idFields": [],
+      "uniqueFields": []
+    },
+    {
+      "name": "PostToCategory",
+      "isEmbedded": false,
+      "dbName": "post_to_category",
+      "fields": [
+        {
+          "name": "id",
+          "kind": "scalar",
+          "dbNames": [],
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": true,
+          "type": "Int",
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "post",
+          "kind": "object",
+          "dbNames": [],
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": false,
+          "type": "Post",
+          "relationName": "PostToPostToCategory",
+          "relationToFields": [
+            "title",
+            "createdAt"
+          ],
+          "relationOnDelete": "NONE",
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "category",
+          "kind": "object",
+          "dbNames": [],
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": false,
+          "type": "Category",
+          "relationName": "CategoryToPostToCategory",
+          "relationToFields": [
+            "id"
+          ],
+          "relationOnDelete": "NONE",
+          "isGenerated": false,
+          "isUpdatedAt": false
+        }
+      ],
+      "isGenerated": false,
+      "idFields": [],
+      "uniqueFields": []
+    },
+    {
+      "name": "A",
+      "isEmbedded": false,
+      "dbName": null,
+      "fields": [
+        {
+          "name": "id",
+          "kind": "scalar",
+          "dbNames": [],
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": true,
+          "type": "Int",
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "b",
+          "kind": "object",
+          "dbNames": [],
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": false,
+          "type": "B",
+          "relationName": "AToB",
+          "relationToFields": [
+            "id"
+          ],
+          "relationOnDelete": "NONE",
+          "isGenerated": false,
+          "isUpdatedAt": false
+        }
+      ],
+      "isGenerated": false,
+      "idFields": [],
+      "uniqueFields": []
+    },
+    {
+      "name": "B",
+      "isEmbedded": false,
+      "dbName": null,
+      "fields": [
+        {
+          "name": "id",
+          "kind": "scalar",
+          "dbNames": [],
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": true,
+          "type": "Int",
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "a",
+          "kind": "object",
+          "dbNames": [],
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": false,
+          "type": "A",
+          "relationName": "AToB",
+          "relationToFields": [],
+          "relationOnDelete": "NONE",
+          "isGenerated": false,
+          "isUpdatedAt": false
+        }
+      ],
+      "isGenerated": false,
+      "idFields": [],
+      "uniqueFields": []
+    }
+  ]
+}

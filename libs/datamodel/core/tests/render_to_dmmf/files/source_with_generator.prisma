@@ -1,0 +1,16 @@
+generator js {
+  provider      = "javascript"
+  output        = "./client"
+  binaryTargets = ["a", "b"]
+  extra_config  = "test"
+}
+
+generator foo {
+  provider = "bar"
+}
+
+model Author {
+  id        Int      @id
+  name      String?
+  createdAt DateTime @default(now())
+}
