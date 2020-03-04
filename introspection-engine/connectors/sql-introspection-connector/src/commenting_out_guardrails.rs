@@ -23,7 +23,7 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel) {
         for field in &mut model.fields {
             if field.name == "".to_string() {
                 field.documentation = Some(
-                    "This field was commented out because automatic field renaming would have produced an empty name"
+                    "This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*"
                         .to_string(),
                 );
                 field.name = field.database_names.first().unwrap().to_string();

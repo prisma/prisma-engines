@@ -1,4 +1,4 @@
-use crate::comment_out_unhandled_models::commenting_out_guardrails;
+use crate::commenting_out_guardrails::commenting_out_guardrails;
 use crate::misc_helpers::*;
 use crate::sanitize_datamodel_names::sanitize_datamodel_names;
 use crate::SqlIntrospectionResult;
