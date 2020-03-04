@@ -45,7 +45,7 @@ pub struct Index {
 
 impl Index {
     pub fn fields(&self) -> Vec<Field> {
-        self.fields.iter().map(|sf| sf.upgrade()).collect()
+        self.fields.iter().map(|field| field.upgrade()).collect()
     }
 }
 

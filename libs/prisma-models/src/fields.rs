@@ -63,10 +63,6 @@ impl Fields {
         self.scalar_weak().iter().map(|f| f.upgrade().unwrap()).collect()
     }
 
-    pub fn scalar_non_list(&self) -> Vec<ScalarFieldRef> {
-        self.scalar().into_iter().filter(|sf| !sf.is_list).collect()
-    }
-
     pub fn scalar_list(&self) -> Vec<ScalarFieldRef> {
         self.scalar().into_iter().filter(|sf| sf.is_list).collect()
     }

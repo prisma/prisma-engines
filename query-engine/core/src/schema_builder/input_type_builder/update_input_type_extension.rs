@@ -37,7 +37,7 @@ pub trait UpdateInputTypeBuilderExtension<'a>: InputTypeBuilderBase<'a> + Create
             model.name.clone(),
             "Update",
             model.fields().scalar(),
-            |f: ScalarFieldRef| self.map_optional_input_type(f),
+            |f: ScalarFieldRef| self.map_optional_input_type(&f),
             false,
         )
     }

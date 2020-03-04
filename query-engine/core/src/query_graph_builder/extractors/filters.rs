@@ -203,14 +203,31 @@ fn handle_relation_field(
     })
 }
 
-fn handle_compound_field(fields: Vec<ScalarFieldRef>, value: ParsedInputValue) -> QueryGraphBuilderResult<Filter> {
+// [DTODO] This is only handles equality and ignores the op. What about the other filters?
+//         Also check what the schema building allows for!
+fn handle_compound_field(fields: Vec<Field>, value: ParsedInputValue) -> QueryGraphBuilderResult<Filter> {
     let mut value: ParsedInputMap = value.try_into()?;
 
     let filters: Vec<Filter> = fields
         .into_iter()
-        .map(|field| {
-            let value: PrismaValue = value.remove(&field.name).unwrap().try_into()?;
-            Ok(field.data_source_field().equals(value))
+        .map(|field| match field {
+            Field::Scalar(sf) => {
+                let value: PrismaValue = value.remove(&sf.name).unwrap().try_into()?;
+                Ok(sf.data_source_field().clone().equals(value))
+            }
+
+            Field::Relation(rf) => {
+                let filters = rf
+                    .data_source_fields()
+                    .into_iter()
+                    .map(|dsf| {
+                        let value: PrismaValue = value.remove(&dsf.name).unwrap().try_into()?;
+                        Ok(dsf.equals(value))
+                    })
+                    .collect::<QueryGraphBuilderResult<Vec<_>>>()?;
+
+                Ok(Filter::and(filters))
+            }
         })
         .collect::<QueryGraphBuilderResult<Vec<_>>>()?;
 

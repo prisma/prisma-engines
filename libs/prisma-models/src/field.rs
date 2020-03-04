@@ -159,6 +159,13 @@ impl Field {
         }
     }
 
+    pub fn is_unique(&self) -> bool {
+        match self {
+            Field::Scalar(ref sf) => sf.unique(),
+            Field::Relation(ref rf) => rf.is_id,
+        }
+    }
+
     pub fn model(&self) -> ModelRef {
         match self {
             Self::Scalar(sf) => sf.model(),

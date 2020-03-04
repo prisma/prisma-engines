@@ -124,11 +124,11 @@ impl<'a> FilterObjectTypeBuilder<'a> {
     }
 
     fn map_input_field(&self, field: ScalarFieldRef) -> Vec<InputField> {
-        get_field_filters(&ModelField::Scalar(Arc::clone(&field))) // wip: take a look at required signatures
+        get_field_filters(&ModelField::Scalar(Arc::clone(&field)))
             .into_iter()
             .map(|arg| {
                 let field_name = format!("{}{}", field.name, arg.suffix);
-                let mapped = self.map_required_input_type(Arc::clone(&field));
+                let mapped = self.map_required_input_type(&field);
 
                 if arg.is_list {
                     input_field(field_name, InputType::opt(InputType::list(mapped)), None)

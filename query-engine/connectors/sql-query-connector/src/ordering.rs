@@ -29,12 +29,10 @@ impl Ordering {
                 let first = first_column.unwrap();
                 let size_hint = identifier.len() + 1;
 
-                let is_unique = match order_by.field {
-                    Field::Scalar(ref sf) => sf.unique(),
-                    Field::Relation(ref rf) => rf.is_id,
-                };
-
-                if !identifier.contains(&first) && order_directive.needs_implicit_id_ordering && !is_unique {
+                if !identifier.contains(&first)
+                    && order_directive.needs_implicit_id_ordering
+                    && !order_by.field.is_unique()
+                {
                     match (order_by.sort_order, order_directive.needs_to_be_reverse_order) {
                         (SortOrder::Ascending, true) => {
                             Self::merge_columns(first.descend(), identifier.into_iter().map(|c| c.descend()), size_hint)
