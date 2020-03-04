@@ -34,13 +34,6 @@ impl DefaultValue {
             })
             .unwrap_or_else(|| PrismaValue::Null)
     }
-
-    pub fn get_type(&self) -> ScalarType {
-        match self {
-            Self::Single(v) => v.get_type(),
-            Self::Expression(vg) => vg.return_type(),
-        }
-    }
 }
 
 #[derive(Clone)]
@@ -62,10 +55,6 @@ impl ValueGenerator {
         ValueGenerator::new("autoincrement".to_owned(), vec![]).unwrap()
     }
 
-    pub fn return_type(&self) -> ScalarType {
-        self.generator.return_type()
-    }
-
     pub fn generate(&self) -> Option<ScalarValue> {
         self.generator.invoke()
     }
@@ -85,24 +74,17 @@ pub enum ValueGeneratorFn {
     CUID,
     Now,
     Autoincrement,
+    DbGenerated,
 }
 
 impl ValueGeneratorFn {
-    pub fn return_type(&self) -> ScalarType {
-        match self {
-            Self::UUID => ScalarType::String,
-            Self::CUID => ScalarType::String,
-            Self::Now => ScalarType::DateTime,
-            Self::Autoincrement => ScalarType::Int,
-        }
-    }
-
     pub fn invoke(&self) -> Option<ScalarValue> {
         match self {
             Self::UUID => Self::generate_uuid(),
             Self::CUID => Self::generate_cuid(),
             Self::Now => Self::generate_now(),
             Self::Autoincrement => None,
+            Self::DbGenerated => None,
         }
     }
 
