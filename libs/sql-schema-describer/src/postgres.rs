@@ -205,6 +205,7 @@ impl SqlSchemaDescriber {
             };
             let tpe = get_column_type(data_type.as_ref(), &full_data_type, arity, enums);
 
+            //todo we might want to use regexes here
             let default = match &tpe.family {
                 ColumnTypeFamily::Enum(enum_name) => col.get("column_default").and_then(|param_value| {
                     param_value
@@ -212,9 +213,12 @@ impl SqlSchemaDescriber {
                         .map(|x| unquote_postgres_strings(x.replace(format!("::{}", enum_name.clone()).as_str(), "")))
                 }),
                 _ => col.get("column_default").and_then(|param_value| {
-                    param_value
-                        .to_string()
-                        .map(|x| unquote_postgres_strings(x.replace("::text", "")))
+                    param_value.to_string().map(|x| {
+                        unquote_postgres_strings(
+                            x.replace(format!("::{}", data_type).as_str(), "")
+                                .replace(format!("::{}", full_data_type).as_str(), ""),
+                        )
+                    })
                 }),
             };
 
