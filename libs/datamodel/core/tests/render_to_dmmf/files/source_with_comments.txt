@@ -41,9 +41,9 @@
           "isId": false,
           "type": "DateTime",
           "default": {
-            "args": [],
             "name": "now",
-            "returnType": "DateTime"
+            "returnType": "DateTime",
+            "args": []
           },
           "isGenerated": false,
           "isUpdatedAt": false

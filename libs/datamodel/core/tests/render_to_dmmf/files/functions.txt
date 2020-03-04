@@ -28,9 +28,9 @@
           "isId": false,
           "type": "DateTime",
           "default": {
-            "args": [],
             "name": "now",
-            "returnType": "DateTime"
+            "returnType": "DateTime",
+            "args": []
           },
           "isGenerated": false,
           "isUpdatedAt": false
@@ -45,9 +45,9 @@
           "isId": false,
           "type": "String",
           "default": {
-            "args": [],
             "name": "cuid",
-            "returnType": "String"
+            "returnType": "String",
+            "args": []
           },
           "isGenerated": false,
           "isUpdatedAt": false
