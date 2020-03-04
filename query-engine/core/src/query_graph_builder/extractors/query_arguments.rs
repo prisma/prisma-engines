@@ -70,9 +70,6 @@ fn extract_cursor(value: ParsedInputValue, model: &ModelRef) -> QueryGraphBuilde
         return Ok(None);
     }
 
-    // map.assert_size(1)?;
-    // let (field_name, value): (String, ParsedInputValue) = map.into_iter().nth(0).unwrap();
-
     let input_map: ParsedInputMap = value.try_into()?;
     let mut pairs = vec![];
 
@@ -109,65 +106,25 @@ fn extract_cursor(value: ParsedInputValue, model: &ModelRef) -> QueryGraphBuilde
             let mut compound_map: ParsedInputMap = map_value.try_into()?;
 
             for field in model_fields {
-                // Unwrap is safe because validation guarantees that the value is present.
-                // let value = compound_map.remove(&field.name()).unwrap().try_into()?;
-                // pairs.push((field, value));
-
                 // Relation and scalar fields are different in the way their underlying fields in the map are named:
-                // scalar: has actual model field names in the compound map.
-                // relation: has data source field names in the compound map for lack of a better mapping.
+                // - Scalar has actual model field names in the compound map.
+                // - Relation has data source field names in the compound map for lack of a better mapping in the schema.
+                // Unwraps are safe because query validation guarantees that values are present.
+                match field {
+                    Field::Scalar(sf) => {
+                        let value = compound_map.remove(&sf.name).unwrap().try_into()?;
+                        pairs.push((sf.data_source_field().clone(), value));
+                    }
+
+                    Field::Relation(rf) => {
+                        for dsf in rf.data_source_fields() {
+                            let value = compound_map.remove(&dsf.name).unwrap().try_into()?;
+                            pairs.push((dsf.clone(), value));
+                        }
+                    }
+                }
             }
-
-            todo!()
         }
-
-        // .and_then(|fields| {
-        //
-        //     let mut result = vec![];
-        //     let mut compound_map: ParsedInputMap = map_value.try_into()?;
-
-        //     Ok(Some(result))
-        // })
-
-        // match model_field {
-        //     Field::Scalar(sf) => {
-        //         let value: PrismaValue = value.try_into()?;
-
-        //         Ok(Some(RecordProjection::new(vec![(
-        //             sf.data_source_field().clone(),
-        //             value,
-        //         )])))
-        //     }
-
-        //     Field::Relation(rf) => {
-        //         let fields = rf.data_source_fields();
-
-        //         if fields.len() == 1 {
-        //             let value: PrismaValue = value.try_into()?;
-
-        //             Ok(Some(RecordProjection::new(vec![(
-        //                 fields.first().unwrap().clone(),
-        //                 value,
-        //             )])))
-        //         } else {
-        //             let mut map: ParsedInputMap = value.try_into()?;
-
-        //             let pairs: Vec<_> = fields
-        //                 .into_iter()
-        //                 .map(|field| {
-        //                     // Every field in the map must correspond to
-        //                     // If a field is not present, nulls are inserted.
-
-        //                     map.remove()
-
-        //                     todo!()
-        //                 })
-        //                 .collect();
-
-        //             Ok(Some(RecordProjection::new(pairs)))
-        //         }
-        //     }
-        // }
     }
 
     Ok(Some(RecordProjection::new(pairs)))
