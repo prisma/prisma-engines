@@ -248,21 +248,18 @@ impl QueryDocumentParser {
                     "Unexpected Enum value type {:?} for enum {}",
                     val,
                     typ.name()
-                )))
+                )));
             }
         };
 
         match typ.borrow() {
-            EnumType::Internal(i) => {
-                if i.contains(&raw) {
-                    Ok(ParsedInputValue::Single(PrismaValue::Enum(raw)))
-                } else {
-                    Err(QueryParserError::ValueParseError(format!(
-                        "Enum value '{}' is invalid for enum type {}",
-                        raw, i.name
-                    )))
-                }
-            }
+            EnumType::Internal(i) => match i.map_input_value(&raw) {
+                Some(value) => Ok(ParsedInputValue::Single(value)),
+                None => Err(QueryParserError::ValueParseError(format!(
+                    "Enum value '{}' is invalid for enum type {}",
+                    raw, i.name
+                ))),
+            },
             EnumType::OrderBy(ord) => match ord.value_for(raw.as_str()) {
                 Some(val) => Ok(ParsedInputValue::OrderBy(val.clone())),
                 None => Err(QueryParserError::ValueParseError(format!(
@@ -298,8 +295,10 @@ impl QueryDocumentParser {
 
                 match default_pair {
                     // If the input field has a default, add the default to the result.
-                    Some((k, dv)) => Some(Ok((k.clone(), ParsedInputValue::Single(dv.get_as_prisma_value())))),
-
+                    Some((k, dv)) => match Self::parse_input_field(dv.get_as_prisma_value().into(), &field) {
+                        Ok(value) => Some(Ok((k.clone(), value))),
+                        Err(err) => Some(Err(err)),
+                    },
                     // Finally, if nothing is found, parse the input value with Null but disregard the result,
                     // except errors, which are propagated.
                     None => match Self::parse_input_field(QueryValue::Null, &field) {

@@ -276,6 +276,37 @@ async fn remapping_compound_primary_keys_should_work(api: &TestApi) {
 }
 
 #[test_each_connector(tags("postgres"))]
+async fn remapping_enum_default_values_should_work(api: &TestApi) {
+    let sql = format!("CREATE Type color as ENUM ( 'b lack', 'white')");
+
+    api.database().execute_raw(&sql, &[]).await.unwrap();
+
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("Book", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom("color  color Not Null default 'b lack'");
+            });
+        })
+        .await;
+
+    let dm = r#"
+        model Book {
+            color   color   @default(b_lack)
+            id      Int     @default(autoincrement()) @id
+        }
+
+        enum color{
+            b_lack @map("b lack")
+            white
+        }
+    "#;
+
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+}
+
+#[test_each_connector(tags("postgres"))]
 async fn remapping_field_names_to_empty_should_comment_them_out(api: &TestApi) {
     api.barrel()
         .execute(|migration| {
@@ -288,10 +319,9 @@ async fn remapping_field_names_to_empty_should_comment_them_out(api: &TestApi) {
 
     let dm = r#"
         model User {
-            first_name   String
-            last_name   String @map("last@name")
-
-            @@id([first_name, last_name])
+            /// This field was commented out because automatic field renaming would have produced an empty name
+            1    String @map(\"1\")
+            last Int    @default(autoincrement()) @id
         }
     "#;
 

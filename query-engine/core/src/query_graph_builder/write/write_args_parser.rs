@@ -36,7 +36,6 @@ impl WriteArgsParser {
 
                         args.args.insert(sf.db_name().clone(), set_value)
                     }
-
                     Field::Scalar(sf) => {
                         let value: PrismaValue = v.try_into()?;
                         args.args.insert(sf.db_name().clone(), value)

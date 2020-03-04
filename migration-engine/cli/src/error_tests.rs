@@ -16,7 +16,7 @@ async fn database_already_exists_must_return_a_proper_error() {
     .await
     .ok();
 
-    let error = get_cli_error(&["migration-engine", "cli", "--datasource", &url, "--create_database"]).await;
+    let error = get_cli_error(&["migration-engine", "cli", "--datasource", &url, "create-database"]).await;
 
     let (host, port) = {
         let url = Url::parse(&url).unwrap();
@@ -60,7 +60,7 @@ async fn database_access_denied_must_return_a_proper_error_in_cli() {
         "cli",
         "--datasource",
         url.as_str(),
-        "--can_connect_to_database",
+        "can-connect-to-database",
     ])
     .await;
 
@@ -89,7 +89,7 @@ async fn tls_errors_must_be_mapped_in_the_cli() {
         "cli",
         "--datasource",
         &url,
-        "--can_connect_to_database",
+        "can-connect-to-database",
     ])
     .await;
 

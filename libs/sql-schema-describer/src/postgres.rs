@@ -205,11 +205,19 @@ impl SqlSchemaDescriber {
             };
             let tpe = get_column_type(data_type.as_ref(), &full_data_type, arity, enums);
 
-            let default = col.get("column_default").and_then(|param_value| {
-                param_value
-                    .to_string()
-                    .map(|x| x.replace("\'", "").replace("::text", ""))
-            });
+            let default = match &tpe.family {
+                ColumnTypeFamily::Enum(enum_name) => col.get("column_default").and_then(|param_value| {
+                    param_value
+                        .to_string()
+                        .map(|x| unquote_postgres_strings(x.replace(format!("::{}", enum_name.clone()).as_str(), "")))
+                }),
+                _ => col.get("column_default").and_then(|param_value| {
+                    param_value
+                        .to_string()
+                        .map(|x| unquote_postgres_strings(x.replace("::text", "")))
+                }),
+            };
+
             let is_auto_increment = is_identity
                 || match default {
                     Some(ref val) => is_autoincrement(val, schema, &table_name, &col_name),
@@ -602,7 +610,7 @@ fn get_column_type<'a>(data_type: &str, full_data_type: &'a str, arity: ColumnAr
 static RE_SEQ: Lazy<Regex> = Lazy::new(|| Regex::new("^(?:.+\\.)?\"?([^.\"]+)\"?").expect("compile regex"));
 
 static AUTOINCREMENT_REGEX: Lazy<Regex> = Lazy::new(|| {
-    Regex::new(r#"nextval\((?:"(?P<schema_name>.+)"\.)?"(?P<table_and_column_name>.+)_seq(?:[0-9]+)?"::regclass\)"#)
+    Regex::new(r#"nextval\('(?:"(?P<schema_name>.+)"\.)?"(?P<table_and_column_name>.+)_seq(?:[0-9]+)?"'::regclass\)"#)
         .unwrap()
 });
 
@@ -636,6 +644,17 @@ fn is_autoincrement(value: &str, schema_name: &str, table_name: &str, column_nam
         })
         .unwrap_or(false)
 }
+fn unquote_postgres_strings(input: String) -> String {
+    /// Regex for matching the quotes on the introspected string values on MariaDB.
+    static POSTGRES_STRING_DEFAULT_RE: Lazy<regex::Regex> = Lazy::new(|| regex::Regex::new(r#"^'(.*)'$"#).unwrap());
+
+    POSTGRES_STRING_DEFAULT_RE
+        .captures(input.as_ref())
+        .and_then(|captures| captures.get(1))
+        .map(|capt| capt.as_str())
+        .unwrap_or(input.as_ref())
+        .to_string()
+}
 
 #[cfg(test)]
 mod tests {
@@ -651,13 +670,13 @@ mod tests {
         assert!(!is_autoincrement(non_autoincrement, schema_name, table_name, col_name));
 
         let autoincrement = format!(
-            r#"nextval("{}"."{}_{}_seq"::regclass)"#,
+            r#"nextval('"{}"."{}_{}_seq"'::regclass)"#,
             schema_name, table_name, col_name
         );
         assert!(is_autoincrement(&autoincrement, schema_name, table_name, col_name));
 
         let autoincrement_with_number = format!(
-            r#"nextval("{}"."{}_{}_seq1"::regclass)"#,
+            r#"nextval('"{}"."{}_{}_seq1"'::regclass)"#,
             schema_name, table_name, col_name
         );
         assert!(is_autoincrement(
@@ -667,7 +686,7 @@ mod tests {
             col_name
         ));
 
-        let autoincrement_without_schema = format!(r#"nextval("{}_{}_seq1"::regclass)"#, table_name, col_name);
+        let autoincrement_without_schema = format!(r#"nextval('"{}_{}_seq1"'::regclass)"#, table_name, col_name);
         assert!(is_autoincrement(
             &autoincrement_without_schema,
             schema_name,
@@ -677,7 +696,7 @@ mod tests {
 
         // The table and column names contain underscores, so it's impossible to say from the sequence where one starts and the other ends.
         let autoincrement_with_ambiguous_table_and_column_names =
-            r#"nextval("compound_table_compound_column_name_seq"::regclass)"#;
+            r#"nextval('"compound_table_compound_column_name_seq"'::regclass)"#;
         assert!(is_autoincrement(
             &autoincrement_with_ambiguous_table_and_column_names,
             "<ignored>",
@@ -688,12 +707,20 @@ mod tests {
         // The table and column names contain underscores, so it's impossible to say from the sequence where one starts and the other ends.
         // But this one has extra text between table and column names, so it should not match.
         let autoincrement_with_ambiguous_table_and_column_names =
-            r#"nextval("compound_table_something_compound_column_name_seq"::regclass)"#;
+            r#"nextval('"compound_table_something_compound_column_name_seq"'::regclass)"#;
         assert!(!is_autoincrement(
             &autoincrement_with_ambiguous_table_and_column_names,
             "<ignored>",
             "compound_table",
             "compound_column_name",
         ));
+    }
+    #[test]
+    fn postgres_string_default_regex_works() {
+        let quoted_str = "'abc $$ def'";
+
+        assert_eq!(unquote_postgres_strings(quoted_str.to_string()), "abc $$ def");
+
+        assert_eq!(unquote_postgres_strings("heh ".to_string()), "heh ");
     }
 }

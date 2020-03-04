@@ -1,4 +1,4 @@
-use datamodel::{Datamodel, FieldType};
+use datamodel::{Datamodel, DefaultValue, FieldType, ScalarValue};
 use once_cell::sync::Lazy;
 use regex::Regex;
 use std::collections::HashMap;
@@ -26,7 +26,6 @@ pub fn sanitize_datamodel_names(datamodel: &mut Datamodel) {
 
                     no_db_name_because_field_is_virtual = info.to_fields.is_empty();
                 }
-
                 FieldType::Enum(enum_name) => {
                     let (sanitized_enum_name, enum_db_name) = if *enum_name == format!("{}_{}", model.name, field.name)
                     {
@@ -48,6 +47,11 @@ pub fn sanitize_datamodel_names(datamodel: &mut Datamodel) {
                     };
 
                     *enum_name = sanitized_enum_name;
+
+                    if let Some(DefaultValue::Single(ScalarValue::ConstantLiteral(name))) = &mut field.default_value {
+                        let (sanitized_value, _) = sanitize_name(name.to_string());
+                        *name = sanitized_value;
+                    };
                 }
                 _ => (),
             }

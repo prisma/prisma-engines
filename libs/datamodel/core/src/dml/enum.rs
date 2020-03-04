@@ -41,6 +41,10 @@ impl Enum {
             .map(|v| v.database_name.as_ref().unwrap_or(&v.name).to_owned())
             .collect()
     }
+
+    pub fn find_value(&self, value: &str) -> &EnumValue {
+        self.values.iter().find(|ev| ev.name == value).unwrap()
+    }
 }
 
 impl WithName for Enum {

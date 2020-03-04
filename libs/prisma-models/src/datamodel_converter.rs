@@ -413,8 +413,8 @@ trait DatamodelFieldExtensions {
 
 impl DatamodelFieldExtensions for dml::Field {
     fn type_identifier(&self) -> TypeIdentifier {
-        match self.field_type {
-            dml::FieldType::Enum(_) => TypeIdentifier::Enum,
+        match &self.field_type {
+            dml::FieldType::Enum(x) => TypeIdentifier::Enum(x.clone()),
             dml::FieldType::Relation(_) => TypeIdentifier::String, // Todo: Unused
             dml::FieldType::Base(scalar) => match scalar {
                 dml::ScalarType::Boolean => TypeIdentifier::Boolean,

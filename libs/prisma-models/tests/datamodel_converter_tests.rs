@@ -44,7 +44,7 @@ fn converting_enums() {
     assert_eq!(enm.values, expected_values);
 
     let field = datamodel.assert_model("MyModel").assert_scalar_field("field");
-    assert_eq!(field.type_identifier, TypeIdentifier::Enum);
+    assert_eq!(field.type_identifier, TypeIdentifier::Enum("MyEnum".to_string()));
     assert_eq!(
         field.internal_enum,
         Some(InternalEnum {

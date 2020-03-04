@@ -15,7 +15,7 @@ pub trait InputBuilderExtensions {
             TypeIdentifier::UUID => InputType::uuid(),
             TypeIdentifier::DateTime => InputType::date_time(),
             TypeIdentifier::Json => InputType::json(),
-            TypeIdentifier::Enum => self.map_enum_input_type(&field),
+            TypeIdentifier::Enum(_) => self.map_enum_input_type(&field),
         };
 
         if field.is_list {
