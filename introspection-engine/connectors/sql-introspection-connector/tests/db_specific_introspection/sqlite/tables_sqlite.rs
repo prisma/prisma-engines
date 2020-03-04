@@ -13,7 +13,8 @@ async fn introspecting_a_simple_table_with_gql_types_must_work(api: &TestApi) {
                 t.add_column("float", types::float());
                 t.add_column("date", types::date());
                 t.add_column("id", types::primary());
-                t.add_column("int", types::integer());
+                t.add_column("integer", types::integer());
+                t.inject_custom("int int not null");
                 t.add_column("string", types::text());
             });
         })
@@ -25,6 +26,7 @@ async fn introspecting_a_simple_table_with_gql_types_must_work(api: &TestApi) {
                 float   Float
                 id      Int @id @default(autoincrement())
                 int     Int
+                integer Int
                 string  String
             }
         "#;

@@ -12,6 +12,7 @@ use sqlite::*;
 async fn sqlite_column_types_must_work() {
     let mut migration = Migration::new().schema(SCHEMA);
     migration.create_table("User", move |t| {
+        t.inject_custom("int_col int not null");
         t.add_column("int4_col", types::integer());
         t.add_column("text_col", types::text());
         t.add_column("real_col", types::float());
@@ -23,6 +24,16 @@ async fn sqlite_column_types_must_work() {
     let result = inspector.describe(SCHEMA).await.expect("describing");
     let table = result.get_table("User").expect("couldn't get User table");
     let mut expected_columns = vec![
+        Column {
+            name: "int_col".to_string(),
+            tpe: ColumnType {
+                raw: "int".to_string(),
+                family: ColumnTypeFamily::Int,
+                arity: ColumnArity::Required,
+            },
+            default: None,
+            auto_increment: false,
+        },
         Column {
             name: "int4_col".to_string(),
             tpe: ColumnType {
@@ -227,7 +238,11 @@ async fn sqlite_text_primary_keys_must_be_inferred_on_table_and_not_as_separate_
     });
     let full_sql = migration.make::<barrel::backend::Sqlite>();
 
-    let inspector = get_sqlite_describer(&full_sql, "sqlite_text_primary_keys_must_be_inferred_on_table_and_not_as_separate_indexes").await;
+    let inspector = get_sqlite_describer(
+        &full_sql,
+        "sqlite_text_primary_keys_must_be_inferred_on_table_and_not_as_separate_indexes",
+    )
+    .await;
     let result = inspector.describe(SCHEMA).await.expect("describing");
 
     let table = result.get_table("User").expect("couldn't get User table");
