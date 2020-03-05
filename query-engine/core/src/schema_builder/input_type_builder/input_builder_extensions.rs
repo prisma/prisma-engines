@@ -47,7 +47,7 @@ pub trait InputBuilderExtensions {
             TypeIdentifier::UUID => InputType::uuid(),
             TypeIdentifier::DateTime => InputType::date_time(),
             TypeIdentifier::Json => InputType::json(),
-            TypeIdentifier::Enum => unreachable!("ScalarType should never map to Enum."),
+            TypeIdentifier::Enum(_) => unreachable!("ScalarType should never map to Enum."),
         }
     }
 }
