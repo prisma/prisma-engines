@@ -34,11 +34,11 @@ impl ToSqlRow for ResultRow {
         let mut row = SqlRow::default();
         let row_width = idents.len();
         for (i, p_value) in self.into_iter().enumerate().take(row_width) {
-            let pv = match idents[i] {
+            let pv = match &idents[i] {
                 (type_identifier, FieldArity::List) => match p_value {
                     ParameterizedValue::Array(l) => l
                         .into_iter()
-                        .map(|p_value| row_value_to_prisma_value(p_value, type_identifier))
+                        .map(|p_value| row_value_to_prisma_value(p_value, &type_identifier))
                         .collect::<crate::Result<Vec<_>>>()
                         .map(|vec| PrismaValue::List(vec)),
 
@@ -51,7 +51,7 @@ impl ToSqlRow for ResultRow {
                         return Err(SqlError::ConversionError(error.into()));
                     }
                 },
-                (type_identifier, _) => row_value_to_prisma_value(p_value, type_identifier),
+                (type_identifier, _) => row_value_to_prisma_value(p_value, &type_identifier),
             }?;
 
             row.values.push(pv);
@@ -63,7 +63,7 @@ impl ToSqlRow for ResultRow {
 
 pub fn row_value_to_prisma_value(
     p_value: ParameterizedValue,
-    type_identifier: TypeIdentifier,
+    type_identifier: &TypeIdentifier,
 ) -> Result<PrismaValue, SqlError> {
     Ok(match type_identifier {
         TypeIdentifier::Boolean => match p_value {
@@ -76,7 +76,7 @@ pub fn row_value_to_prisma_value(
                 return Err(SqlError::ConversionError(error.into()));
             }
         },
-        TypeIdentifier::Enum => match p_value {
+        TypeIdentifier::Enum(_) => match p_value {
             ParameterizedValue::Null => PrismaValue::Null,
             ParameterizedValue::Enum(cow) => PrismaValue::Enum(cow.into_owned()),
             ParameterizedValue::Text(cow) => PrismaValue::Enum(cow.into_owned()),

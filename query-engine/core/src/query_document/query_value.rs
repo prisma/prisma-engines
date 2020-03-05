@@ -1,4 +1,4 @@
-use prisma_value::PrismaValue;
+use prisma_value::{stringify_date, PrismaValue};
 use rust_decimal::Decimal;
 use std::collections::BTreeMap;
 
@@ -29,7 +29,7 @@ impl From<PrismaValue> for QueryValue {
             PrismaValue::String(s) => Self::String(s),
             PrismaValue::Float(f) => Self::Float(f),
             PrismaValue::Boolean(b) => Self::Boolean(b),
-            PrismaValue::DateTime(dt) => Self::String(dt.to_rfc3339()),
+            PrismaValue::DateTime(dt) => Self::String(stringify_date(&dt)),
             PrismaValue::Enum(s) => Self::Enum(s),
             PrismaValue::List(l) => Self::List(l.into_iter().map(QueryValue::from).collect()),
             PrismaValue::Int(i) => Self::Int(i),

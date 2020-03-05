@@ -100,6 +100,9 @@ pub struct Field {
 
     /// The data source field specifics, like backing fields and defaults.
     pub data_source_fields: Vec<DataSourceField>,
+
+    /// Indicates if this field has to be commented out.
+    pub is_commented_out: bool,
 }
 
 impl Field {
@@ -169,6 +172,7 @@ impl Field {
             is_generated: false,
             is_updated_at: false,
             data_source_fields: vec![],
+            is_commented_out: false,
         }
     }
     /// Creates a new field with the given name and type, marked as generated and optional.
@@ -185,6 +189,7 @@ impl Field {
             is_generated: true,
             is_updated_at: false,
             data_source_fields: vec![],
+            is_commented_out: false,
         }
     }
 }

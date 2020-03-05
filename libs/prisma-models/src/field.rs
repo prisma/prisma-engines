@@ -104,12 +104,12 @@ impl From<&RelationFieldRef> for FieldWeak {
     }
 }
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum TypeIdentifier {
     String,
     Float,
     Boolean,
-    Enum,
+    Enum(String),
     Json,
     DateTime,
     UUID,

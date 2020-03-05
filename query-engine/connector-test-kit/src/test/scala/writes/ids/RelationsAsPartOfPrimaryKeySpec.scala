@@ -35,13 +35,13 @@ class RelationsAsPartOfPrimaryKeySpec extends FlatSpec with Matchers with ApiSpe
     val project = ProjectDsl.fromString {
       s"""
          |model Parent {
-         |  child   Child   @relation(references: [id]) @id
+         |  child   Child  @relation(references: [id]) @id
          |  name    String 
          |  age     Int
          |}
          |
          |model Child {
-         |  id      Int @id
+         |  id      Int    @id
          |  name    String
          |  parent  Parent
          |}
@@ -59,7 +59,7 @@ class RelationsAsPartOfPrimaryKeySpec extends FlatSpec with Matchers with ApiSpe
     val res1 = server.query(
       """
         |mutation {
-        |  createParent(data: { name: "Paul" , age: 10, child: {create: {id: 1, name: "Panther"}}}){
+        |  createParent(data: { name: "Paul" , age: 40, child: {create: {id: 1, name: "Panther"}}}) {
         |    name
         |    age
         |    child{
@@ -72,12 +72,12 @@ class RelationsAsPartOfPrimaryKeySpec extends FlatSpec with Matchers with ApiSpe
       project
     )
 
-    res1.toString() should be("")
+    res1.toString() should be("{\"data\":{\"createParent\":{\"name\":\"Paul\",\"age\":40,\"child\":{\"id\":1,\"name\":\"Panther\"}}}}")
 
     val res2 = server.query(
       """
         |mutation {
-        |  updateParent(where: {child_name:{child: 1, name: "Paul"}} data: {age: 11}){
+        |  updateParent(where: { child: 1 } data: { age: 41 }) {
         |    name
         |    age
         |  }
@@ -86,25 +86,25 @@ class RelationsAsPartOfPrimaryKeySpec extends FlatSpec with Matchers with ApiSpe
       project
     )
 
-    res2.toString() should be("")
+    res2.toString() should be("{\"data\":{\"updateParent\":{\"name\":\"Paul\",\"age\":41}}}")
 
     val res3 = server.query(
       """
         |mutation {
-        |  updateChild(where: {id: 1} data: {parent: {update:{ age 12}}}}){
-        |    parent {age}
+        |  updateChild(where: { id: 1 } data: { parent: { update: { age: 42 }}}) {
+        |    parent { age }
         |  }
         |}
       """,
       project
     )
 
-    res3.toString() should be("")
+    res3.toString() should be("{\"data\":{\"updateChild\":{\"parent\":{\"age\":42}}}}")
 
     val res4 = server.query(
       """
         |mutation {
-        |  deleteParent(where: {child_name:{child: 1, name: "Paul"}}){
+        |  deleteParent(where: { child: 1 }) {
         |    name
         |    age
         |  }
@@ -114,10 +114,9 @@ class RelationsAsPartOfPrimaryKeySpec extends FlatSpec with Matchers with ApiSpe
     )
 
     res4.toString() should be("")
-
   }
 
-  "Using a compound id part of which is a relation" should "work" in {
+  "Using a compound id that contains a relation" should "work" in {
     val project = ProjectDsl.fromString {
       s"""
          |model Parent {

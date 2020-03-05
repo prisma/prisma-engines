@@ -147,27 +147,30 @@ async fn introspecting_a_table_with_required_and_optional_columns_must_work(api:
     custom_assert(&result, dm);
 }
 
-//#[test_each_connector(tags("postgres"))]
-//#[ignore]
-//fn introspecting_a_table_with_datetime_default_values_should_work(api: &TestApi) {
-//    let barrel = api.barrel();
-//    let _setup_schema = barrel.execute(|migration| {
-//        migration.create_table("User", |t| {
-//            t.add_column("id", types::primary());
-//            t.add_column("name", types::text());
-//            t.inject_custom("\"joined\" date DEFAULT CURRENT_DATE")
-//        });
-//    }).await;
-//    let dm = r#"
-//            model User {
-//                id      Int @id @sequence(name: "User_id_seq", allocationSize: 1, initialValue: 1)
-//                joined DateTime? @default(now())
-//                name String
-//            }
-//        "#;
-//    let result = dbg!(api.introspect().await);
-//    custom_assert(&result, dm);
-//}
+// #[test_each_connector(tags("postgres"))]
+// async fn introspecting_a_table_with_datetime_default_values_should_work2(api: &TestApi) {
+//     let barrel = api.barrel();
+//     let _setup_schema = barrel
+//         .execute(|migration| {
+//             migration.create_table("User", |t| {
+//                 t.add_column("id", types::primary());
+//                 t.add_column("name", types::text());
+//                 t.inject_custom("\"current_timestamp\" Timestamp with time zone DEFAULT CURRENT_TIMESTAMP");
+//                 t.inject_custom("\"now\" Timestamp with time zone DEFAULT NOW()");
+//             });
+//         })
+//         .await;
+//     let dm = r#"
+//             model User {
+//                 id                  Int       @default(autoincrement()) @id
+//                 current_timestamp   DateTime? @default(now())
+//                 now                 DateTime? @default(now())
+//                 name                String
+//             }
+//         "#;
+//     let result = dbg!(api.introspect().await);
+//     custom_assert(&result, dm);
+// }
 
 #[test_each_connector(tags("postgres"))]
 async fn introspecting_a_table_with_default_values_should_work(api: &TestApi) {
@@ -251,138 +254,6 @@ async fn introspecting_a_table_with_a_multi_column_non_unique_index_should_work(
 }
 
 #[test_each_connector(tags("postgres"))]
-async fn introspecting_a_table_enums_should_work(api: &TestApi) {
-    let sql = format!("CREATE Type color as ENUM ( 'black', 'white')");
-    let sql2 = format!("CREATE Type color2 as ENUM ( 'black2', 'white2')");
-
-    api.database().execute_raw(&sql, &[]).await.unwrap();
-    api.database().execute_raw(&sql2, &[]).await.unwrap();
-
-    api.barrel()
-        .execute(|migration| {
-            migration.create_table("Book", |t| {
-                t.add_column("id", types::primary());
-                t.inject_custom("color  color Not Null");
-                t.inject_custom("color2  color2 Not Null");
-            });
-        })
-        .await;
-
-    let dm = r#"
-        model Book {
-            color   color
-            color2  color2
-            id      Int     @default(autoincrement()) @id
-        }
-
-        enum color{
-            black
-            white
-        }
-
-        enum color2{
-            black2
-            white2
-        }
-    "#;
-
-    let result = dbg!(api.introspect().await);
-    let result1 = dbg!(api.introspect().await);
-    let result2 = dbg!(api.introspect().await);
-    let result3 = dbg!(api.introspect().await);
-    let result4 = dbg!(api.introspect().await);
-    custom_assert(&result, dm);
-    custom_assert(&result1, dm);
-    custom_assert(&result2, dm);
-    custom_assert(&result3, dm);
-    custom_assert(&result4, dm);
-}
-
-#[test_each_connector(tags("postgres"))]
-async fn introspecting_a_table_enums_should_return_alphabetically_even_when_in_different_order(api: &TestApi) {
-    let sql1 = format!("CREATE Type color as ENUM ( 'black', 'white')");
-    let sql2 = format!("CREATE Type color2 as ENUM ( 'black2', 'white2')");
-
-    api.database().execute_raw(&sql2, &[]).await.unwrap();
-    api.database().execute_raw(&sql1, &[]).await.unwrap();
-
-    api.barrel()
-        .execute(|migration| {
-            migration.create_table("Book", |t| {
-                t.add_column("id", types::primary());
-                t.inject_custom("color2  Color2 Not Null");
-                t.inject_custom("color  Color Not Null");
-            });
-        })
-        .await;
-
-    let dm = r#"
-        model Book {
-            color   color
-            color2  color2
-            id      Int     @default(autoincrement()) @id
-        }
-
-        enum color{
-            black
-            white
-        }
-
-        enum color2{
-            black2
-            white2
-        }
-    "#;
-
-    let result = dbg!(api.introspect().await);
-    let result1 = dbg!(api.introspect().await);
-    let result2 = dbg!(api.introspect().await);
-    let result3 = dbg!(api.introspect().await);
-    let result4 = dbg!(api.introspect().await);
-    custom_assert(&result, dm);
-    custom_assert(&result1, dm);
-    custom_assert(&result2, dm);
-    custom_assert(&result3, dm);
-    custom_assert(&result4, dm);
-}
-
-#[test_each_connector(tags("postgres"))]
-async fn introspecting_a_table_enums_array_should_work(api: &TestApi) {
-    let sql = format!("CREATE Type color as ENUM ( 'black', 'white')");
-
-    api.database().execute_raw(&sql, &[]).await.unwrap();
-
-    api.barrel()
-        .execute(|migration| {
-            migration.create_table("Book", |t| {
-                t.add_column("id", types::primary());
-                t.inject_custom("color  color []");
-            });
-        })
-        .await;
-
-    let dm = r#"
-        datasource pg {
-              provider = "postgres"
-              url = "postgresql://localhost:5432"
-        }
-
-        model Book {
-            color   color[]
-            id      Int     @default(autoincrement()) @id
-        }
-
-        enum color{
-            black
-            white
-        }
-    "#;
-
-    let result = dbg!(api.introspect().await);
-    custom_assert(&result, dm);
-}
-
-#[test_each_connector(tags("postgres"))]
 async fn introspecting_a_table_without_uniques_should_comment_it_out(api: &TestApi) {
     api.barrel()
         .execute(|migration| {
@@ -400,4 +271,84 @@ async fn introspecting_a_table_without_uniques_should_comment_it_out(api: &TestA
 
     let result = dbg!(api.introspect().await);
     assert_eq!(&result, dm);
+}
+
+#[test_each_connector(tags("postgres"))]
+async fn introspecting_default_values_should_work(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("Test", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom("numeric_int2 int2 Default 2");
+                t.inject_custom("numeric_int4 int4 Default 4");
+                t.inject_custom("numeric_int8 int8 Default 8");
+                t.inject_custom("numeric_decimal decimal(8,4) Default 1234.1234");
+                t.inject_custom("numeric_float4 float4 Default 123.1234");
+                t.inject_custom("numeric_float8 float8 Default 123.1234");
+
+                // numeric_serial2 serial2,
+                // numeric_serial4 serial4,
+                // numeric_serial8 serial8,
+                // t.inject_custom("numeric_money money Default 123.12");
+                // t.inject_custom("numeric_oid oid Default 42");
+
+                t.inject_custom("string_char char(8) Default 'abcdefgh'");
+                t.inject_custom("string_varchar varchar(8) Default 'abcd'");
+                t.inject_custom("string_text text Default 'abcdefgh'");
+
+                // binary_bytea bytea,
+                // binary_bits  bit(80),
+                // binary_bits_varying bit varying(80),
+                // binary_uuid uuid,
+
+                t.inject_custom("time_timestamp timestamp Default Now()"); //todo not recognized yet
+                t.inject_custom("time_timestamptz timestamptz Default Now()"); //todo not recognized yet
+                t.inject_custom("time_date date Default CURRENT_DATE"); //todo not recognized yet
+                t.inject_custom("time_time time Default Now()"); // todo not recognized yet
+
+                // time_timetz timetz,
+                // time_interval interval,
+
+                t.inject_custom("boolean_boolean boolean Default false");
+
+                // network_cidr cidr,
+                // network_inet inet,
+                // network_mac  macaddr,
+                // search_tsvector tsvector,
+                // search_tsquery tsquery,
+                // json_json json,
+                // json_jsonb jsonb,
+                // range_int4range int4range,
+                // range_int8range int8range,
+                // range_numrange numrange,
+                // range_tsrange tsrange,
+                // range_tstzrange tstzrange,
+                // range_daterange daterange
+            });
+        })
+        .await;
+
+    let dm = r#"
+            model Test {
+                boolean_boolean     Boolean?        @default(false)
+                id                  Int         @id @default(autoincrement())
+                numeric_decimal     Float?          @default(1234.1234) 
+                numeric_float4      Float?          @default(123.1234)
+                numeric_float8      Float?          @default(123.1234)
+                numeric_int2        Int?            @default(2)
+                numeric_int4        Int?            @default(4)
+                numeric_int8        Int?            @default(8)
+                string_char         String?         @default("abcdefgh")
+                string_text         String?         @default("abcdefgh")
+                string_varchar      String?         @default("abcd")
+                time_date           DateTime?
+                time_time           DateTime?
+                time_timestamp      DateTime?
+                time_timestamptz    DateTime?
+            }
+        "#;
+
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
 }

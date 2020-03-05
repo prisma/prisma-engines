@@ -12,6 +12,7 @@ introspection-connector = { path = "../connectors/introspection-connector" }
 sql-introspection-connector = { path = "../connectors/sql-introspection-connector" }
 
 clap = "2.33"
+structopt = "0.3"
 serde = "1.0"
 anyhow = "1.0.26"
 thiserror = "1.0.9"

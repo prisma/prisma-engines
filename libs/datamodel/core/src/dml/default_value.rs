@@ -30,7 +30,7 @@ impl DefaultValue {
                 ScalarValue::String(x) => PrismaValue::String(x.clone()),
                 ScalarValue::DateTime(x) => PrismaValue::DateTime(x),
                 ScalarValue::Decimal(x) => x.try_into().expect("Can't convert float to decimal"),
-                ScalarValue::ConstantLiteral(x) => PrismaValue::Enum(x.clone()),
+                ScalarValue::ConstantLiteral(value) => PrismaValue::Enum(value.clone()),
             })
             .unwrap_or_else(|| PrismaValue::Null)
     }

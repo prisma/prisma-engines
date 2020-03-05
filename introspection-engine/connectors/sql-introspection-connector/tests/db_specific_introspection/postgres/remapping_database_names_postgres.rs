@@ -274,3 +274,51 @@ async fn remapping_compound_primary_keys_should_work(api: &TestApi) {
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
+
+#[test_each_connector(tags("postgres"))]
+async fn remapping_enum_default_values_should_work(api: &TestApi) {
+    let sql = format!("CREATE Type color as ENUM ( 'b lack', 'white')");
+
+    api.database().execute_raw(&sql, &[]).await.unwrap();
+
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("Book", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom("color  color Not Null default 'b lack'");
+            });
+        })
+        .await;
+
+    let dm = r#"
+        model Book {
+            color   color   @default(b_lack)
+            id      Int     @default(autoincrement()) @id
+        }
+
+        enum color{
+            b_lack @map("b lack")
+            white
+        }
+    "#;
+
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+}
+
+#[test_each_connector(tags("postgres"))]
+async fn remapping_field_names_to_empty_should_comment_them_out(api: &TestApi) {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("1", types::text());
+                t.add_column("last", types::primary());
+            });
+        })
+        .await;
+
+    let dm = "model User {\n  /// This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*\n  // 1 String @map(\"1\")\n  last Int    @default(autoincrement()) @id\n}";
+
+    let result = dbg!(api.introspect().await);
+    assert_eq!(&result, dm);
+}

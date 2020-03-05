@@ -26,7 +26,7 @@ impl DirectiveValidator<dml::Field> for DefaultDirectiveValidator {
             field.default_value = Some(dv);
         } else if let dml::FieldType::Enum(_) = &field.field_type {
             match args.default_arg("value")?.as_constant_literal() {
-                // TODO: We should also check if this value is a valid enum value.
+                // TODO: We should also check if this value is a valid enum value. For this we need the enums -.-
                 Ok(value) => {
                     field.default_value = Some(dml::DefaultValue::Single(dml::ScalarValue::ConstantLiteral(value)))
                 }

@@ -24,7 +24,7 @@ fn mysql_url(db: Option<&str>) -> String {
 
 #[tokio::test]
 async fn test_connecting_with_a_working_mysql_connection_string() {
-    let result = run(&["--datasource", &mysql_url(None), "--can_connect_to_database"])
+    let result = run(&["--datasource", &mysql_url(None), "can-connect-to-database"])
         .await
         .unwrap();
 
@@ -34,7 +34,7 @@ async fn test_connecting_with_a_working_mysql_connection_string() {
 #[tokio::test]
 async fn test_connecting_with_a_non_working_mysql_connection_string() {
     let datasource = mysql_url(Some("this_does_not_exist"));
-    let err = run(&["--datasource", &datasource, "--can_connect_to_database"])
+    let err = run(&["--datasource", &datasource, "can-connect-to-database"])
         .await
         .unwrap_err();
 
@@ -44,7 +44,7 @@ async fn test_connecting_with_a_non_working_mysql_connection_string() {
 #[tokio::test]
 async fn test_connecting_with_a_working_psql_connection_string() {
     let datasource = postgres_url(None);
-    let result = run(&["--datasource", &datasource, "--can_connect_to_database"])
+    let result = run(&["--datasource", &datasource, "can-connect-to-database"])
         .await
         .unwrap();
 
@@ -56,7 +56,7 @@ async fn test_connecting_with_a_working_psql_connection_string_with_postgres_sch
     let result = run(&[
         "--datasource",
         &postgres_url_with_scheme(None, "postgres"),
-        "--can_connect_to_database",
+        "can-connect-to-database",
     ])
     .await
     .unwrap();
@@ -67,7 +67,7 @@ async fn test_connecting_with_a_working_psql_connection_string_with_postgres_sch
 #[tokio::test]
 async fn test_connecting_with_a_non_working_psql_connection_string() {
     let datasource = postgres_url(Some("this_does_not_exist"));
-    let err = run(&["--datasource", &datasource, "--can_connect_to_database"])
+    let err = run(&["--datasource", &datasource, "can-connect-to-database"])
         .await
         .unwrap_err();
 
@@ -78,7 +78,7 @@ async fn test_connecting_with_a_non_working_psql_connection_string() {
 async fn test_create_mysql_database() {
     let url = mysql_url(Some("this_should_exist"));
 
-    let res = run(&["--datasource", &url, "--create_database"]).await;
+    let res = run(&["--datasource", &url, "create-database"]).await;
 
     assert_eq!(
         "Database 'this_should_exist' created successfully.",
@@ -86,7 +86,7 @@ async fn test_create_mysql_database() {
     );
 
     if let Ok(_) = res {
-        let res = run(&["--datasource", &url, "--can_connect_to_database"]).await;
+        let res = run(&["--datasource", &url, "can-connect-to-database"]).await;
         assert_eq!("Connection successful", res.as_ref().unwrap());
 
         {
@@ -120,14 +120,14 @@ async fn test_create_psql_database() {
 
     let url = postgres_url(Some(db_name));
 
-    let res = run(&["--datasource", &url, "--create_database"]).await;
+    let res = run(&["--datasource", &url, "create-database"]).await;
 
     assert_eq!(
         "Database 'this_should_exist' created successfully.",
         res.as_ref().unwrap()
     );
 
-    let res = run(&["--datasource", &url, "--can_connect_to_database"]).await;
+    let res = run(&["--datasource", &url, "can-connect-to-database"]).await;
     assert_eq!("Connection successful", res.as_ref().unwrap());
 
     res.unwrap();
@@ -146,7 +146,7 @@ async fn test_create_sqlite_database() {
 
     let url = format!("file:{}", sqlite_path.to_string_lossy());
 
-    let res = run(&["--datasource", &url, "--create_database"]).await;
+    let res = run(&["--datasource", &url, "create-database"]).await;
     assert_eq!("", res.as_ref().unwrap());
 
     assert!(sqlite_path.exists());

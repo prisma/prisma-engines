@@ -76,7 +76,7 @@ impl ToString for ScalarValue {
             ScalarValue::Boolean(val) => val.to_string(),
             ScalarValue::String(val) => val.to_string(),
             ScalarValue::DateTime(val) => val.to_string(),
-            ScalarValue::ConstantLiteral(val) => val.to_string(),
+            ScalarValue::ConstantLiteral(value) => value.to_string(),
         }
     }
 }

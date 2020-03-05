@@ -341,6 +341,7 @@ fn get_column_type(tpe: &str, arity: ColumnArity) -> ColumnType {
     let family = match tpe_lower.as_ref() {
         // SQLite only has a few native data types: https://www.sqlite.org/datatype3.html
         // It's tolerant though, and you can assign any data type you like to columns
+        "int" => ColumnTypeFamily::Int,
         "integer" => ColumnTypeFamily::Int,
         "real" => ColumnTypeFamily::Float,
         "float" => ColumnTypeFamily::Float,
@@ -359,6 +360,7 @@ fn get_column_type(tpe: &str, arity: ColumnArity) -> ColumnType {
         "datetime[]" => ColumnTypeFamily::DateTime,
         "double[]" => ColumnTypeFamily::Float,
         "float[]" => ColumnTypeFamily::Float,
+        "int[]" => ColumnTypeFamily::Int,
         "integer[]" => ColumnTypeFamily::Int,
         "text[]" => ColumnTypeFamily::String,
         _ => ColumnTypeFamily::Unknown,

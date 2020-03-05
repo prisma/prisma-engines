@@ -49,11 +49,19 @@ impl InternalEnum {
         }
     }
 
-    pub fn contains(&self, val: &String) -> bool {
-        self.values.iter().any(|v| &v.name == val)
+    pub fn map_input_value(&self, val: &String) -> Option<PrismaValue> {
+        Some(PrismaValue::Enum(
+            self.values.iter().find(|ev| &ev.name == val)?.final_db_name().clone(),
+        ))
     }
 
-    pub fn values(&self) -> Vec<String> {
+    pub fn map_output_value(&self, val: &String) -> Option<PrismaValue> {
+        Some(PrismaValue::Enum(
+            self.values.iter().find(|ev| ev.final_db_name() == val)?.name.clone(),
+        ))
+    }
+
+    pub fn external_values(&self) -> Vec<String> {
         self.values.iter().map(|v| v.name.to_string()).collect::<Vec<String>>()
     }
 }
@@ -75,6 +83,10 @@ impl InternalEnumValue {
             name: name.into(),
             database_name: database_name.into(),
         }
+    }
+
+    pub fn final_db_name(&self) -> &String {
+        self.database_name.as_ref().unwrap_or(&self.name)
     }
 }
 

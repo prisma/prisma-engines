@@ -124,7 +124,17 @@ impl<'a> SqlSchemaCalculator<'a> {
                     .collect();
 
                 let primary_key = sql::PrimaryKey {
-                    columns: model.id_fields().map(|field| field.db_name().to_owned()).collect(),
+                    columns: model
+                        .id_fields()
+                        .flat_map(|field| {
+                            field
+                                .data_source_fields()
+                                .into_iter()
+                                .map(|s| s.name.clone())
+                                .collect::<Vec<String>>()
+                                .into_iter()
+                        })
+                        .collect(),
                     sequence: None,
                 };
 
@@ -419,6 +429,7 @@ fn migration_value_new(field: &FieldRef<'_>) -> Option<String> {
             raw.truncate(raw.len() - 4); // strip the UTC suffix
             format!("{}", raw)
         }
+
         ScalarValue::ConstantLiteral(x) => match field.field_type() {
             TypeRef::Enum(inum) => {
                 let corresponding_value = inum
@@ -527,7 +538,7 @@ fn add_one_to_one_relation_unique_index(table: &mut sql::Table, columns: &Vec<sq
 }
 
 /// This should match the logic in `prisma_models::Model::primary_identifier`.
-fn first_unique_criterion<'a>(model: ModelRef<'a>) -> anyhow::Result<Vec<FieldRef<'a>>> {
+fn first_unique_criterion(model: ModelRef) -> anyhow::Result<Vec<FieldRef>> {
     // First candidate: the primary key.
     {
         let id_fields: Vec<_> = model.id_fields().collect();

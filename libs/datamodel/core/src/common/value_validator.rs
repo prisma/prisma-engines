@@ -182,6 +182,7 @@ impl ValueValidator {
     pub fn as_constant_literal(&self) -> Result<String, DatamodelError> {
         match &self.value {
             ast::Expression::ConstantValue(value, _) => Ok(value.to_string()),
+            ast::Expression::BooleanValue(value, _) => Ok(value.to_string()),
             ast::Expression::Any(value, _) => Ok(value.to_string()),
             _ => Err(self.construct_type_mismatch_error("constant literal")),
         }

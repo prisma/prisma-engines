@@ -199,3 +199,82 @@ async fn enum_defaults_must_work(api: &TestApi) -> TestResult {
 
     Ok(())
 }
+
+#[test_each_connector(tags("sql"))]
+async fn id_as_part_of_relation_must_work(api: &TestApi) -> TestResult {
+    let dm = r##"
+        model Cat {
+            nemesis Dog @id
+        }
+
+        model Dog {
+            id String @id
+        }
+    "##;
+
+    api.infer_apply(dm).send_assert().await?.assert_green()?;
+
+    api.assert_schema().await?.assert_table("Cat", |table| {
+        table
+            .assert_pk(|pk| pk.assert_columns(&["nemesis"]))?
+            .assert_fk_on_columns(&["nemesis"], |fk| fk.assert_references("Dog", &["id"]))
+    })?;
+
+    Ok(())
+}
+
+#[test_each_connector(tags("sql"), log = "debug")]
+async fn multi_field_id_as_part_of_relation_must_work(api: &TestApi) -> TestResult {
+    let dm = r##"
+        model Cat {
+            nemesis Dog @id
+        }
+
+        model Dog {
+            name String
+            weight Int
+
+            @@id([name, weight])
+        }
+    "##;
+
+    api.infer_apply(dm).send_assert().await?.assert_green()?;
+
+    api.assert_schema().await?.assert_table("Cat", |table| {
+        table
+            .assert_pk(|pk| pk.assert_columns(&["nemesis_name", "nemesis_weight"]))?
+            .assert_fk_on_columns(&["nemesis_name", "nemesis_weight"], |fk| {
+                fk.assert_references("Dog", &["name", "weight"])
+            })
+    })?;
+
+    Ok(())
+}
+
+#[test_each_connector(tags("sql"), log = "debug")]
+async fn remapped_multi_field_id_as_part_of_relation_must_work(api: &TestApi) -> TestResult {
+    let dm = r##"
+        model Cat {
+            nemesis Dog @map(["dogname", "dogweight"]) @id
+        }
+
+        model Dog {
+            name String
+            weight Int
+
+            @@id([name, weight])
+        }
+    "##;
+
+    api.infer_apply(dm).send_assert().await?.assert_green()?;
+
+    api.assert_schema().await?.assert_table("Cat", |table| {
+        table
+            .assert_pk(|pk| pk.assert_columns(&["dogname", "dogweight"]))?
+            .assert_fk_on_columns(&["dogname", "dogweight"], |fk| {
+                fk.assert_references("Dog", &["name", "weight"])
+            })
+    })?;
+
+    Ok(())
+}

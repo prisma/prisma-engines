@@ -176,7 +176,7 @@ impl<'a> Renderer<'a> {
         let mut field_formatter = TableFormat::new();
 
         for field in &model.fields {
-            Self::render_field(&mut field_formatter, &field, comment_out.clone());
+            Self::render_field(&mut field_formatter, &field, model.commented_out);
         }
 
         field_formatter.render(self);
@@ -231,8 +231,14 @@ impl<'a> Renderer<'a> {
         self.end_line();
     }
 
-    fn render_field(target: &mut TableFormat, field: &ast::Field, commented_out: String) {
+    fn render_field(target: &mut TableFormat, field: &ast::Field, is_commented_out: bool) {
         Self::render_documentation(&mut target.interleave_writer(), field);
+
+        let commented_out = if field.is_commented_out || is_commented_out {
+            "// ".to_string()
+        } else {
+            "".to_string()
+        };
 
         target.write(format!("{}{}", &commented_out, &field.name.name).as_ref());
 

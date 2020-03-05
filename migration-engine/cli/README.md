@@ -13,7 +13,7 @@ USAGE:
 
 FLAGS:
     -h, --help          Prints help information
-    -s, --single_cmd    Run only a single command, then exit
+    -s, --single-cmd    Run only a single command, then exit
         --version       Prints the server commit ID
 
 OPTIONS:
@@ -41,7 +41,7 @@ OPTIONS:
     -d, --datasource <datasource>    The connection string to the database
 
 SUBCOMMANDS:
-    --can_connect_to_database    Does the database connection string work?
-    --create_database            Create an empty database defined in the configuration string
+    can-connect-to-database    Does the database connection string work?
+    create-database            Create an empty database defined in the configuration string
     help                         Prints this message or the help of the given subcommand(s)
 ```

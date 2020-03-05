@@ -128,7 +128,7 @@ fn value_to_serde(value: &dml::ScalarValue) -> serde_json::Value {
     match value {
         dml::ScalarValue::Boolean(val) => serde_json::Value::Bool(*val),
         dml::ScalarValue::String(val) => serde_json::Value::String(val.clone()),
-        dml::ScalarValue::ConstantLiteral(val) => serde_json::Value::String(val.clone()),
+        dml::ScalarValue::ConstantLiteral(name) => serde_json::Value::String(name.clone()),
         dml::ScalarValue::Float(val) => serde_json::Value::Number(serde_json::Number::from_f64(*val as f64).unwrap()),
         dml::ScalarValue::Int(val) => serde_json::Value::Number(serde_json::Number::from_f64(*val as f64).unwrap()),
         dml::ScalarValue::Decimal(val) => serde_json::Value::Number(serde_json::Number::from_f64(*val as f64).unwrap()),
