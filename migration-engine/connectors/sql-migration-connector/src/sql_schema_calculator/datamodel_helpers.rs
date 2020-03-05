@@ -3,7 +3,7 @@ use datamodel::{
         Datamodel, DefaultValue, Enum, Field, FieldArity, FieldType, IndexDefinition, Model, ScalarType,
         WithDatabaseName,
     },
-    EnumValue,
+    DataSourceField, EnumValue,
 };
 
 pub(crate) fn walk_models<'a>(datamodel: &'a Datamodel) -> impl Iterator<Item = ModelRef<'a>> + 'a {
@@ -113,6 +113,10 @@ impl<'a> FieldRef<'a> {
 
     pub(super) fn db_name(&self) -> &'a str {
         self.field.single_database_name().unwrap_or(self.name())
+    }
+
+    pub(super) fn data_source_fields(&self) -> &[DataSourceField] {
+        &self.field.data_source_fields
     }
 
     pub(super) fn default_value(&self) -> Option<&'a DefaultValue> {
