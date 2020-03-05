@@ -124,7 +124,17 @@ impl<'a> SqlSchemaCalculator<'a> {
                     .collect();
 
                 let primary_key = sql::PrimaryKey {
-                    columns: model.id_fields().map(|field| field.db_name().to_owned()).collect(),
+                    columns: model
+                        .id_fields()
+                        .flat_map(|field| {
+                            field
+                                .data_source_fields()
+                                .into_iter()
+                                .map(|s| s.name.clone())
+                                .collect::<Vec<String>>()
+                                .into_iter()
+                        })
+                        .collect(),
                     sequence: None,
                 };
 
