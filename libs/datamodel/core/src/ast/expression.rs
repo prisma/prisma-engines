@@ -10,7 +10,7 @@ pub enum Expression {
     /// Any string value.
     StringValue(String, Span),
     /// A ducktyped string value, used as function return values which can be ducktyped.
-    /// Canbe any scalar type, array or function is not possible.
+    /// Can be any scalar type, array or function is not possible.
     Any(String, Span),
     /// Any literal constant, basically a string which was not inside "...".
     /// This is used for representing builtin enums.

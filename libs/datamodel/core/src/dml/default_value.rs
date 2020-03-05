@@ -110,6 +110,7 @@ impl TryFrom<&str> for ValueGeneratorFn {
             "uuid" => Ok(Self::UUID),
             "now" => Ok(Self::Now),
             "autoincrement" => Ok(Self::Autoincrement),
+            "dbgenerated" => Ok(Self::DbGenerated),
             _ => Err(DatamodelError::new_functional_evaluation_error(
                 &format!("The function {} is not a known function.", s),
                 Span::empty(),
