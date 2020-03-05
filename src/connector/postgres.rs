@@ -467,7 +467,7 @@ impl Queryable for PostgreSql {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{connector::Queryable, error::*, single::Quaint};
+    use crate::{ast, connector::Queryable, error::*, single::Quaint};
     use once_cell::sync::Lazy;
     use std::env;
     use url::Url;
@@ -546,6 +546,96 @@ mod tests {
         assert_eq!(row["age"].as_i64(), Some(27));
 
         assert_eq!(row["salary"].as_f64(), Some(20000.0));
+    }
+
+    #[tokio::test]
+    async fn type_roundtrips() {
+        let table = r#"
+            CREATE TABLE types (
+                id SERIAL PRIMARY KEY,
+
+                bytes_uuid uuid,
+                bytes_uuid_arr uuid[],
+                network_inet inet,
+                network_inet_arr inet[],
+                numeric_float4 float4,
+                numeric_float4_arr float4[],
+                numeric_float8 float8,
+                time_timetz timetz,
+                time_time time,
+                time_date date,
+                text_jsonb jsonb,
+                time_timestamptz timestamptz
+            );
+        "#;
+
+        let connection = Quaint::new(&CONN_STR).await.unwrap();
+
+        connection.query_raw("DROP TABLE IF EXISTS types", &[]).await.unwrap();
+        connection.query_raw(table, &[]).await.unwrap();
+
+        let insert = ast::Insert::single_into("types")
+            .value("bytes_uuid", "111142ec-880b-4062-913d-8eac479ab957")
+            .value(
+                "bytes_uuid_arr",
+                ParameterizedValue::Array(vec![
+                    "111142ec-880b-4062-913d-8eac479ab957".into(),
+                    "111142ec-880b-4062-913d-8eac479ab958".into(),
+                ]),
+            )
+            .value("network_inet", "127.0.0.1")
+            .value("network_inet_arr", ParameterizedValue::Array(vec!["127.0.0.1".into()]))
+            .value("numeric_float4", 3.14)
+            .value("numeric_float4_arr", ParameterizedValue::Array(vec![3.14.into()]))
+            .value("numeric_float8", 3.14912932)
+            .value(
+                "time_date",
+                ParameterizedValue::DateTime("2020-03-02T08:00:00Z".parse().unwrap()),
+            )
+            .value(
+                "time_timetz",
+                ParameterizedValue::DateTime("2020-03-02T08:00:00Z".parse().unwrap()),
+            )
+            .value(
+                "time_time",
+                ParameterizedValue::DateTime("2020-03-02T08:00:00Z".parse().unwrap()),
+            )
+            .value("text_jsonb", "{\"isJSONB\": true}")
+            .value(
+                "time_timestamptz",
+                ParameterizedValue::DateTime("2020-03-02T08:00:00Z".parse().unwrap()),
+            );
+        let select = ast::Select::from_table("types").value(ast::asterisk());
+
+        connection.query(insert.into()).await.unwrap();
+        let result = connection
+            .query(select.into())
+            .await
+            .unwrap()
+            .into_single()
+            .unwrap()
+            .values;
+
+        let expected = &[
+            ParameterizedValue::Integer(1),
+            ParameterizedValue::Uuid("111142ec-880b-4062-913d-8eac479ab957".parse().unwrap()),
+            ParameterizedValue::Array(vec![
+                ParameterizedValue::Uuid("111142ec-880b-4062-913d-8eac479ab957".parse().unwrap()),
+                ParameterizedValue::Uuid("111142ec-880b-4062-913d-8eac479ab958".parse().unwrap()),
+            ]),
+            ParameterizedValue::Text("127.0.0.1".into()),
+            ParameterizedValue::Array(vec![ParameterizedValue::Text("127.0.0.1".into())]),
+            ParameterizedValue::Real("3.14".parse().unwrap()),
+            ParameterizedValue::Array(vec![3.14.into()]),
+            ParameterizedValue::Real("3.14912932".parse().unwrap()),
+            ParameterizedValue::DateTime("1970-01-01T08:00:00Z".parse().unwrap()),
+            ParameterizedValue::DateTime("1970-01-01T08:00:00Z".parse().unwrap()),
+            ParameterizedValue::DateTime("2020-03-02T00:00:00Z".parse().unwrap()),
+            ParameterizedValue::Json(serde_json::json!({ "isJSONB": true })),
+            ParameterizedValue::DateTime("2020-03-02T08:00:00Z".parse().unwrap()),
+        ];
+
+        assert_eq!(result, expected);
     }
 
     #[tokio::test]
