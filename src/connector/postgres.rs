@@ -561,7 +561,8 @@ mod tests {
                 time_timetz timetz,
                 time_time time,
                 time_date date,
-                text_jsonb jsonb
+                text_jsonb jsonb,
+                time_timestamptz timestamptz
             );
         "#;
 
@@ -587,7 +588,11 @@ mod tests {
                 "time_time",
                 ParameterizedValue::DateTime("2020-03-02T08:00:00Z".parse().unwrap()),
             )
-            .value("text_jsonb", "{\"isJSONB\": true}");
+            .value("text_jsonb", "{\"isJSONB\": true}")
+            .value(
+                "time_timestamptz",
+                ParameterizedValue::DateTime("2020-03-02T08:00:00Z".parse().unwrap()),
+            );
         let select = ast::Select::from_table("types").value(ast::asterisk());
 
         connection.query(insert.into()).await.unwrap();
@@ -609,6 +614,7 @@ mod tests {
             ParameterizedValue::DateTime("1970-01-01T08:00:00Z".parse().unwrap()),
             ParameterizedValue::DateTime("2020-03-02T00:00:00Z".parse().unwrap()),
             ParameterizedValue::Json(serde_json::json!({ "isJSONB": true })),
+            ParameterizedValue::DateTime("2020-03-02T08:00:00Z".parse().unwrap()),
         ];
 
         assert_eq!(result, expected);
