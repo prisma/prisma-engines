@@ -3,62 +3,48 @@ datasource chinook {
   url = "file:./db/Wurst.db"
 }
 
-// model A {
-//   b B @id
-//   makeGQLHappy String?
-// }
-
-// model B {
-//   id String @id @default(cuid())
-// }
-
-// model C {
-//   d D @map(["c_1", "c_2"]) @id
-//   makeGQLHappy String?
-// }
-
-// model D {
-//   d_1 String @default(cuid())
-//   d_2 String @default(cuid())
-
-//   @@id([d_1, d_2])
-// }
-
-// model E {
-//   e_1 String @default(cuid())
-//   f F
-
-//   @@id([e_1, f])
-// }
-
-// model F {
-//   id String @id @default(cuid())
-// }
-
-// model G {
-//   g_1 String @default(cuid())
-//   h H @map(["g_h_1", "g_h_2"])
-
-//   @@id([g_1, h])
-// }
-
-// model H {
-//   h_1 String @default(cuid())
-//   h_2 String @default(cuid())
-
-//   @@id([h_1, h_2])
-// }
-
-model Parent {
-  child Child  @relation(references: [id])
-  name  String
-  age   Int
-
-  @@id([child, name])
+model A {
+  b B @id
+  makeGQLHappy String?
 }
 
-model Child {
-  id      Int @id
-  name    String
-  parents Parent[]
+model B {
+  id String @id @default(cuid())
+}
+
+model C {
+  d D @map(["c_1", "c_2"]) @id
+  makeGQLHappy String?
+}
+
+model D {
+  d_1 String @default(cuid())
+  d_2 String @default(cuid())
+
+  @@id([d_1, d_2])
+}
+
+model E {
+  e_1 String @default(cuid())
+  f F
+
+  @@id([e_1, f])
+}
+
+model F {
+  id String @id @default(cuid())
+}
+
+model G {
+  g_1 String @default(cuid())
+  h H @map(["g_h_1", "g_h_2"])
+
+  @@id([g_1, h])
+}
+
+model H {
+  h_1 String @default(cuid())
+  h_2 String @default(cuid())
+
+  @@id([h_1, h_2])
 }

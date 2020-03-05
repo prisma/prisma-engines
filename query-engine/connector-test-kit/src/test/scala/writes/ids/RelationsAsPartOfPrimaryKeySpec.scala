@@ -34,7 +34,7 @@ class RelationsAsPartOfPrimaryKeySpec extends FlatSpec with Matchers with ApiSpe
   // todo cursors
   // todo filters
 
-  "Using a simple id that is also a relation" should "work" in {
+  "Using a simple id that is also a 1!:1! relation" should "work" in {
     val project = ProjectDsl.fromString {
       s"""
          |model Parent {
