@@ -154,6 +154,15 @@ impl GetRow for PostgresRow {
                     }
                     None => ParameterizedValue::Null,
                 },
+                #[cfg(feature = "uuid-0_8")]
+                PostgresType::UUID_ARRAY => match row.try_get(i)? {
+                    Some(val) => {
+                        let val: Vec<Uuid> = val;
+                        let val = val.into_iter().map(ParameterizedValue::Uuid).collect();
+                        ParameterizedValue::Array(val)
+                    }
+                    None => ParameterizedValue::Null,
+                },
                 #[cfg(feature = "json-1")]
                 PostgresType::JSON | PostgresType::JSONB => match row.try_get(i)? {
                     Some(val) => {
@@ -279,6 +288,17 @@ impl GetRow for PostgresRow {
                     }
                     None => ParameterizedValue::Null,
                 },
+                PostgresType::INET_ARRAY | PostgresType::CIDR_ARRAY => match row.try_get(i)? {
+                    Some(val) => {
+                        let val: Vec<std::net::IpAddr> = val;
+                        ParameterizedValue::Array(
+                            val.into_iter()
+                                .map(|v| ParameterizedValue::Text(v.to_string().into()))
+                                .collect(),
+                        )
+                    }
+                    None => ParameterizedValue::Null,
+                },
                 ref x => match x.kind() {
                     Kind::Enum(_) => match row.try_get(i)? {
                         Some(val) => {
@@ -356,6 +376,20 @@ impl<'a> ToSql for ParameterizedValue<'a> {
                 let f = decimal.to_f64().expect("decimal to f64 conversion");
                 f.to_sql(ty, out)
             }
+            (ParameterizedValue::Array(decimals), &PostgresType::FLOAT4_ARRAY) => {
+                let f: Vec<f32> = decimals
+                    .into_iter()
+                    .filter_map(|v| v.as_decimal().and_then(|decimal| decimal.to_f32()))
+                    .collect();
+                f.to_sql(ty, out)
+            }
+            (ParameterizedValue::Array(decimals), &PostgresType::FLOAT8_ARRAY) => {
+                let f: Vec<f64> = decimals
+                    .into_iter()
+                    .filter_map(|v| v.as_decimal().and_then(|decimal| decimal.to_f64()))
+                    .collect();
+                f.to_sql(ty, out)
+            }
             (ParameterizedValue::Real(decimal), &PostgresType::MONEY) => {
                 let f = decimal.to_f64().expect("decimal to f64 conversion");
                 f.to_sql(ty, out)
@@ -366,9 +400,25 @@ impl<'a> ToSql for ParameterizedValue<'a> {
                 let parsed_uuid: Uuid = string.parse()?;
                 parsed_uuid.to_sql(ty, out)
             }
+            #[cfg(feature = "uuid-0_8")]
+            (ParameterizedValue::Array(values), &PostgresType::UUID_ARRAY) => {
+                let parsed_uuid: Vec<Uuid> = values
+                    .into_iter()
+                    .filter_map(|v| v.to_string().and_then(|v| v.parse().ok()))
+                    .collect();
+                parsed_uuid.to_sql(ty, out)
+            }
             (ParameterizedValue::Text(string), &PostgresType::INET)
             | (ParameterizedValue::Text(string), &PostgresType::CIDR) => {
                 let parsed_ip_addr: std::net::IpAddr = string.parse()?;
+                parsed_ip_addr.to_sql(ty, out)
+            }
+            (ParameterizedValue::Array(values), &PostgresType::INET_ARRAY)
+            | (ParameterizedValue::Array(values), &PostgresType::CIDR_ARRAY) => {
+                let parsed_ip_addr: Vec<std::net::IpAddr> = values
+                    .into_iter()
+                    .filter_map(|v| v.to_string().and_then(|s| s.parse().ok()))
+                    .collect();
                 parsed_ip_addr.to_sql(ty, out)
             }
             (ParameterizedValue::Text(string), &PostgresType::JSON)

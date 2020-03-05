@@ -555,8 +555,11 @@ mod tests {
                 id SERIAL PRIMARY KEY,
 
                 bytes_uuid uuid,
+                bytes_uuid_arr uuid[],
                 network_inet inet,
+                network_inet_arr inet[],
                 numeric_float4 float4,
+                numeric_float4_arr float4[],
                 numeric_float8 float8,
                 time_timetz timetz,
                 time_time time,
@@ -573,8 +576,17 @@ mod tests {
 
         let insert = ast::Insert::single_into("types")
             .value("bytes_uuid", "111142ec-880b-4062-913d-8eac479ab957")
+            .value(
+                "bytes_uuid_arr",
+                ParameterizedValue::Array(vec![
+                    "111142ec-880b-4062-913d-8eac479ab957".into(),
+                    "111142ec-880b-4062-913d-8eac479ab958".into(),
+                ]),
+            )
             .value("network_inet", "127.0.0.1")
+            .value("network_inet_arr", ParameterizedValue::Array(vec!["127.0.0.1".into()]))
             .value("numeric_float4", 3.14)
+            .value("numeric_float4_arr", ParameterizedValue::Array(vec![3.14.into()]))
             .value("numeric_float8", 3.14912932)
             .value(
                 "time_date",
@@ -607,8 +619,14 @@ mod tests {
         let expected = &[
             ParameterizedValue::Integer(1),
             ParameterizedValue::Uuid("111142ec-880b-4062-913d-8eac479ab957".parse().unwrap()),
+            ParameterizedValue::Array(vec![
+                ParameterizedValue::Uuid("111142ec-880b-4062-913d-8eac479ab957".parse().unwrap()),
+                ParameterizedValue::Uuid("111142ec-880b-4062-913d-8eac479ab958".parse().unwrap()),
+            ]),
             ParameterizedValue::Text("127.0.0.1".into()),
+            ParameterizedValue::Array(vec![ParameterizedValue::Text("127.0.0.1".into())]),
             ParameterizedValue::Real("3.14".parse().unwrap()),
+            ParameterizedValue::Array(vec![3.14.into()]),
             ParameterizedValue::Real("3.14912932".parse().unwrap()),
             ParameterizedValue::DateTime("1970-01-01T08:00:00Z".parse().unwrap()),
             ParameterizedValue::DateTime("1970-01-01T08:00:00Z".parse().unwrap()),
