@@ -55,14 +55,12 @@ class RelationsAsPartOfPrimaryKeySpec extends FlatSpec with Matchers with ApiSpe
     // Mutations in this test:
     //  create        | root   | checked
     //  update        | root   | checked
-    //  delete        | root   | not possible, see comment below
-    //  nested create | nested | checked
-    //  nested update | nested | checked
-    //  nested delete | nested | not possible, see comment below
+    //  nested create | create | checked
+    //  nested update | update | checked
     val res1 = server.query(
       """
         |mutation {
-        |  createParent(data: { name: "Paul" , age: 40, child: {create: {id: 1, name: "Panther"}}}) {
+        |  createParent(data: { name: "Paul" , age: 40, child: { create: {id: 1, name: "Panther" }}}) {
         |    name
         |    age
         |    child{
@@ -103,21 +101,6 @@ class RelationsAsPartOfPrimaryKeySpec extends FlatSpec with Matchers with ApiSpe
     )
 
     res3.toString() should be("{\"data\":{\"updateChild\":{\"parent\":{\"age\":42}}}}")
-
-    // Delete can't be tested right now, throws violation error because of migration engine 1!:1! ON DELETE RESTRICT.
-//    val res4 = server.query(
-//      """
-//        |mutation {
-//        |  deleteParent(where: { child: 1 }) {
-//        |    name
-//        |    age
-//        |  }
-//        |}
-//      """,
-//      project
-//    )
-//
-//    res4.toString() should be("")
   }
 
   "Using a compound id that contains a relation" should "work" in {
@@ -140,26 +123,18 @@ class RelationsAsPartOfPrimaryKeySpec extends FlatSpec with Matchers with ApiSpe
     }
     database.setup(project)
 
-    //todo possible mutations
-    // create                           | toplevel    done
-    // update                           | toplevel    done
-    // nested create                    | create      done
-    // nested connect                   | create      done
-    // nested create                    | update
-    // nested update                    | update
-    // nested connect                   | update
-    // nested disconnect                | update
-    // nested set                       | update
-    // nested delete                    | update      done
-    // delete                           | toplevel
-
-    // Mutations in this test:
-    //  create        | root   | checked
-    //  update        | root   | checked
-    //  delete        | root   | not possible, see comment below
-    //  nested create | nested | checked
-    //  nested update | nested | checked
-    //  nested delete | nested | not possible, see comment below
+    // Mutations in this test (WIP):
+    //  create         | root   | checked
+    //  update         | root   | checked
+    //  delete         | root   | -
+    //  nested connect | create | checked
+    //  nested create  | create | checked
+    //  nested connect | update | -
+    //  nested create  | update | -
+    //  nested update  | update | -
+    //  nested delete  | update | checked
+    //  nested disconn | -      | -
+    //  nested set     | -      | -
     val res0 = server.query(
       """
         |mutation {
@@ -176,7 +151,7 @@ class RelationsAsPartOfPrimaryKeySpec extends FlatSpec with Matchers with ApiSpe
       project
     )
 
-    res0.toString() should be("")
+    res0.toString() should be("{\"data\":{\"createChild\":{\"id\":0}}}")
 
     val res1 = server.query(
       """
@@ -190,14 +165,14 @@ class RelationsAsPartOfPrimaryKeySpec extends FlatSpec with Matchers with ApiSpe
         |      }
         |    }
         |  ){
-        |    parents { age }
+        |    age
         |  }
         |}
       """,
       project
     )
 
-    res1.toString() should be("")
+    res1.toString() should be("{\"data\":{\"createParent\":{\"age\":10000}}}")
 
     val res2 = server.query(
       """
@@ -208,9 +183,9 @@ class RelationsAsPartOfPrimaryKeySpec extends FlatSpec with Matchers with ApiSpe
         |      name: "Paul",
         |      parents: {
         |        create: [
-        |          { name: Panther, age: 10 },
-        |          { name: Pawlowski, age: 100 },
-        |          { name: Parker, age: 1000 }
+        |          { name: "Panther", age: 10 },
+        |          { name: "Pawlowski", age: 100 },
+        |          { name: "Parker", age: 1000 }
         |        ]
         |      }
         |    }
@@ -222,14 +197,14 @@ class RelationsAsPartOfPrimaryKeySpec extends FlatSpec with Matchers with ApiSpe
       project
     )
 
-    res2.toString() should be("")
+    res2.toString() should be("{\"data\":{\"createChild\":{\"parents\":[{\"age\":10},{\"age\":1000},{\"age\":100}]}}}")
 
     val res3 = server.query(
       """
         |mutation {
         |  updateParent(
         |     where: { child_name: { child: 1, name: "Panther" }}
-        |     data: { age 12 }
+        |     data: { age: 12 }
         |  ){
         |    age
         |  }
@@ -238,32 +213,32 @@ class RelationsAsPartOfPrimaryKeySpec extends FlatSpec with Matchers with ApiSpe
       project
     )
 
-    res3.toString() should be("")
+    res3.toString() should be("{\"data\":{\"updateParent\":{\"age\":12}}}")
 
     val res4 = server.query(
       """
         |mutation {
         |  updateChild(
         |    where: { id: 1 }
-        |      data: {
-        |        parents: {
-        |          update: {
-        |            where: { child_name: { child: 1, name: "Panther" }
-        |            data: { age 12 }
-        |          }
+        |    data: {
+        |      parents: {
+        |        update: {
+        |          where: { child_name: { child: 1, name: "Panther" } }
+        |          data: { age: 12 }
         |        }
         |      }
-        |   }
-        | }
-        |  ){
-        |    parents { age }
+        |    }
+        |  ) {
+        |    parents {
+        |      age
+        |    }
         |  }
         |}
       """,
       project
     )
 
-    res4.toString() should be("")
+    res4.toString() should be("{\"data\":{\"updateChild\":{\"parents\":[{\"age\":12},{\"age\":1000},{\"age\":100}]}}}")
 
     val res6 = server.query(
       """
@@ -272,21 +247,19 @@ class RelationsAsPartOfPrimaryKeySpec extends FlatSpec with Matchers with ApiSpe
         |    where: { id: 1 }
         |    data: {
         |      parents: {
-        |        delete: {
-        |          where: { child_name: { child: 1, name: "Panther" }
-        |        }
+        |        delete: { child_name: { child: 1, name: "Panther" } }
         |      }
         |    }
-        |  ){
-        |    parents { age }
+        |  ) {
+        |    parents {
+        |      age
+        |    }
         |  }
         |}
       """,
       project
     )
 
-    res6.toString() should be("")
-
+    res6.toString() should be("{\"data\":{\"updateChild\":{\"parents\":[{\"age\":1000},{\"age\":100}]}}}")
   }
-
 }
