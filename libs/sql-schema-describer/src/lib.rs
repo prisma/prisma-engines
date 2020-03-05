@@ -212,7 +212,7 @@ pub struct Column {
     /// Column type.
     pub tpe: ColumnType,
     /// Column default.
-    // Does this field need to be richer? E.g. to easier detect the usages of sequences here
+    // pub default: Option<DefaultValue>,
     pub default: Option<String>,
     /// Is the column auto-incrementing?
     pub auto_increment: bool,
@@ -382,4 +382,28 @@ pub struct Sequence {
     pub initial_value: u32,
     /// Sequence allocation size.
     pub allocation_size: u32,
+}
+
+/// A DefaultValue
+#[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub enum DefaultValue {
+    /// A constant value, parsed as String
+    VALUE(String),
+    /// A function or expression that we know.
+    EXPRESSION(Expression),
+    /// A function or expression that we do not know.
+    DBGENERATED,
+}
+
+/// A DefaultValue Expression
+#[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub enum Expression {
+    /// An expression generating a current timestamp.
+    NOW,
+    /// An expression generating a UUID.
+    UUID,
+    // /// An expression generating a sequence.
+    // SEQUENCE,
 }

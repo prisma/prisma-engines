@@ -355,12 +355,17 @@ async fn introspecting_default_values_should_work(api: &TestApi) {
 
 #[test_each_connector(tags("postgres"))]
 async fn introspecting_a_default_value_as_dbgenerated_should_work(api: &TestApi) {
+    let sql = format!("CREATE SEQUENCE test_seq START 1");
+
+    api.database().execute_raw(&sql, &[]).await.unwrap();
+
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
             migration.create_table("Test", |t| {
                 t.add_column("id", types::primary());
                 t.inject_custom("text text Default 'Concatenated'||E'\n'");
+                t.inject_custom("int Integer DEFAULT nextval('test_seq')");
             });
         })
         .await;

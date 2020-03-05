@@ -206,6 +206,8 @@ impl SqlSchemaDescriber {
             let tpe = get_column_type(data_type.as_ref(), &full_data_type, arity, enums);
 
             //todo we might want to use regexes here
+            // positive list based on data types?
+
             let default = match &tpe.family {
                 ColumnTypeFamily::Enum(enum_name) => col.get("column_default").and_then(|param_value| {
                     param_value
