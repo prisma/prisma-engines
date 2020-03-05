@@ -24,13 +24,27 @@ model D {
   @@id([d_1, d_2])
 }
 
-// model C {
-//   c_1 String @default(cuid())
-//   d D
+model E {
+  e_1 String @default(cuid())
+  f F
 
-//   @@id([c_1, d])
-// }
+  @@id([e_1, f])
+}
 
-// model D {
-//   id String @id @default(cuid())
-// }
+model F {
+  id String @id @default(cuid())
+}
+
+model G {
+  g_1 String @default(cuid())
+  h H @map(["g_h_1", "g_h_2"])
+
+  @@id([g_1, h])
+}
+
+model H {
+  h_1 String @default(cuid())
+  h_2 String @default(cuid())
+
+  @@id([h_1, h_2])
+}

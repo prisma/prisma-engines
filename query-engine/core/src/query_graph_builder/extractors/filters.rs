@@ -55,7 +55,7 @@ enum FilterOp {
 }
 
 impl FilterOp {
-    pub fn find_op(name: &str) -> Option<FilterOp> {
+    pub fn find_op(name: &str) -> FilterOp {
         FILTER_OPERATIONS
             .iter()
             .find(|op| {
@@ -63,6 +63,7 @@ impl FilterOp {
                 name.ends_with(op_suffix)
             })
             .copied()
+            .expect("Expected filter operation to always default to FilterOp::Field instead of failing.")
     }
 
     pub fn suffix(self) -> &'static str {
@@ -100,7 +101,7 @@ pub fn extract_filter(
         .into_iter()
         .map(|(key, value): (String, ParsedInputValue)| {
             let op = if match_suffix {
-                FilterOp::find_op(key.as_str()).unwrap()
+                FilterOp::find_op(key.as_str())
             } else {
                 FilterOp::Field
             };
@@ -275,27 +276,36 @@ fn handle_relation_field_filter(
 // [DTODO] This is only handles equality and ignores the op. What about the other filters?
 //         Also check what the schema building allows for!
 fn handle_compound_field(fields: Vec<Field>, value: ParsedInputValue) -> QueryGraphBuilderResult<Filter> {
-    let mut value: ParsedInputMap = value.try_into()?;
+    let mut input_map: ParsedInputMap = value.try_into()?;
 
     let filters: Vec<Filter> = fields
         .into_iter()
         .map(|field| match field {
             Field::Scalar(sf) => {
-                let value: PrismaValue = value.remove(&sf.name).unwrap().try_into()?;
-                Ok(sf.data_source_field().clone().equals(value))
+                let pv: PrismaValue = input_map.remove(&sf.name).unwrap().try_into()?;
+                Ok(sf.data_source_field().clone().equals(pv))
             }
 
             Field::Relation(rf) => {
-                let filters = rf
-                    .data_source_fields()
-                    .into_iter()
-                    .map(|dsf| {
-                        let value: PrismaValue = value.remove(&dsf.name).unwrap().try_into()?;
-                        Ok(dsf.equals(value))
-                    })
-                    .collect::<QueryGraphBuilderResult<Vec<_>>>()?;
+                let rf_input = input_map.remove(&rf.name).unwrap();
+                let dsfs = rf.data_source_fields();
 
-                Ok(Filter::and(filters))
+                // We can trust the validation that if one field is present, the relation field has also only one DSF.
+                match rf_input {
+                    ParsedInputValue::Single(pv) => Ok(dsfs.first().unwrap().clone().equals(pv)),
+                    ParsedInputValue::Map(mut map) => {
+                        let filters = dsfs
+                            .into_iter()
+                            .map(|dsf| {
+                                let value: PrismaValue = map.remove(&dsf.name).unwrap().try_into()?;
+                                Ok(dsf.equals(value))
+                            })
+                            .collect::<QueryGraphBuilderResult<Vec<_>>>()?;
+
+                        Ok(Filter::and(filters))
+                    }
+                    _ => unreachable!(format!("Invalid input for relation field input (for {})", rf.name)),
+                }
             }
         })
         .collect::<QueryGraphBuilderResult<Vec<_>>>()?;
