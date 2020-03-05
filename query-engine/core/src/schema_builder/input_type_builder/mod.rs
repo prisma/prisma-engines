@@ -134,8 +134,6 @@ pub trait InputTypeBuilderBase<'a>: CachedBuilder<InputObjectType> + InputBuilde
             })
             .collect();
 
-        dbg!(&fields);
-
         // @@unique compound fields.
         let compound_unique_fields: Vec<InputField> = model
             .unique_indexes()

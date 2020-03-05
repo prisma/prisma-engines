@@ -13,8 +13,8 @@ model B {
 }
 
 model C {
-  c String @default(cuid()) @id
-  d D @map(["c_1", "c_2"])
+  d D @map(["c_1", "c_2"]) @id
+  makeGQLHappy String?
 }
 
 model D {
@@ -23,3 +23,14 @@ model D {
 
   @@id([d_1, d_2])
 }
+
+// model C {
+//   c_1 String @default(cuid())
+//   d D
+
+//   @@id([c_1, d])
+// }
+
+// model D {
+//   id String @id @default(cuid())
+// }
