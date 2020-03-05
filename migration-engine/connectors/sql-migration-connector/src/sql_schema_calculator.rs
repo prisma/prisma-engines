@@ -269,7 +269,7 @@ impl<'a> SqlSchemaCalculator<'a> {
                                 .map(|referenced_field| referenced_field.db_name().to_owned())
                                 .collect(),
                             on_delete_action: match column_arity(field.arity()) {
-                                ColumnArity::Required => sql::ForeignKeyAction::Restrict,
+                                ColumnArity::Required => sql::ForeignKeyAction::Cascade,
                                 _ => sql::ForeignKeyAction::SetNull,
                             },
                         };

@@ -243,7 +243,7 @@ async fn changing_the_type_of_an_id_field_must_work(api: &TestApi) {
             columns: vec![column.name.clone()],
             referenced_table: "B".to_string(),
             referenced_columns: vec!["id".to_string()],
-            on_delete_action: ForeignKeyAction::Restrict,
+            on_delete_action: ForeignKeyAction::Cascade,
         }]
     );
 
@@ -271,7 +271,7 @@ async fn changing_the_type_of_an_id_field_must_work(api: &TestApi) {
             columns: vec![column.name.clone()],
             referenced_table: "B".to_string(),
             referenced_columns: vec!["id".to_string()],
-            on_delete_action: ForeignKeyAction::Restrict,
+            on_delete_action: ForeignKeyAction::Cascade,
         }]
     );
 }
@@ -325,7 +325,7 @@ async fn changing_a_relation_field_to_a_scalar_field_must_work(api: &TestApi) ->
                 columns: vec!["b".to_owned()],
                 referenced_table: "B".to_string(),
                 referenced_columns: vec!["id".to_string()],
-                on_delete_action: ForeignKeyAction::Restrict,
+                on_delete_action: ForeignKeyAction::Cascade,
             })
     })?;
 
@@ -395,7 +395,7 @@ async fn changing_a_scalar_field_to_a_relation_field_must_work(api: &TestApi) {
             columns: vec![column.name.clone()],
             referenced_table: "B".to_string(),
             referenced_columns: vec!["id".to_string()],
-            on_delete_action: ForeignKeyAction::Restrict,
+            on_delete_action: ForeignKeyAction::Cascade,
         }]
     );
 }
@@ -573,7 +573,7 @@ async fn adding_an_inline_relation_must_result_in_a_foreign_key_in_the_model_tab
                 columns: vec![b_column.name.clone()],
                 referenced_table: "B".to_string(),
                 referenced_columns: vec!["id".to_string()],
-                on_delete_action: ForeignKeyAction::Restrict, // required relations can't set ON DELETE SET NULL
+                on_delete_action: ForeignKeyAction::Cascade, // required relations can't set ON DELETE SET NULL
             },
             ForeignKey {
                 constraint_name: match api.sql_family() {
@@ -617,7 +617,7 @@ async fn specifying_a_db_name_for_an_inline_relation_must_work(api: &TestApi) {
             columns: vec![column.name.clone()],
             referenced_table: "B".to_string(),
             referenced_columns: vec!["id".to_string()],
-            on_delete_action: ForeignKeyAction::Restrict,
+            on_delete_action: ForeignKeyAction::Cascade,
         }]
     );
 }
@@ -649,7 +649,7 @@ async fn adding_an_inline_relation_to_a_model_with_an_exotic_id_type(api: &TestA
             columns: vec![column.name.clone()],
             referenced_table: "B".to_string(),
             referenced_columns: vec!["id".to_string()],
-            on_delete_action: ForeignKeyAction::Restrict,
+            on_delete_action: ForeignKeyAction::Cascade,
         }]
     );
 }
@@ -718,7 +718,7 @@ async fn moving_an_inline_relation_to_the_other_side_must_work(api: &TestApi) ->
             columns: vec!["b".to_string()],
             referenced_table: "B".to_string(),
             referenced_columns: vec!["id".to_string()],
-            on_delete_action: ForeignKeyAction::Restrict,
+            on_delete_action: ForeignKeyAction::Cascade,
         }]
     );
 
@@ -745,7 +745,7 @@ async fn moving_an_inline_relation_to_the_other_side_must_work(api: &TestApi) ->
             columns: vec!["a".to_string()],
             referenced_table: "A".to_string(),
             referenced_columns: vec!["id".to_string()],
-            on_delete_action: ForeignKeyAction::Restrict,
+            on_delete_action: ForeignKeyAction::Cascade,
         }]
     );
 
