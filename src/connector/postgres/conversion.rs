@@ -417,10 +417,12 @@ impl<'a> ToSql for ParameterizedValue<'a> {
             }
             (ParameterizedValue::Real(decimal), &PostgresType::MONEY) => {
                 let mut i64_bytes: [u8; 8] = [0; 8];
-                i64_bytes.copy_from_slice(&decimal.round_dp(2).serialize()[4..12]);
-                let i = i64::from_le_bytes(i64_bytes) * 10i64.pow(decimal.scale());
+                let decimal = (decimal * Decimal::new(100, 0)).round();
+                i64_bytes.copy_from_slice(&decimal.serialize()[4..12]);
+                let i = i64::from_le_bytes(i64_bytes);
                 i.to_sql(ty, out)
             }
+            (ParameterizedValue::Real(decimal), &PostgresType::NUMERIC) => decimal.to_sql(ty, out),
             (ParameterizedValue::Real(float), _) => float.to_sql(ty, out),
             #[cfg(feature = "uuid-0_8")]
             (ParameterizedValue::Text(string), &PostgresType::UUID) => {

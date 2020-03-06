@@ -561,6 +561,7 @@ mod tests {
                 numeric_float4 float4,
                 numeric_float4_arr float4[],
                 numeric_float8 float8,
+                numeric_decimal decimal(12,8),
                 numeric_money money,
                 time_timetz timetz,
                 time_time time,
@@ -590,6 +591,11 @@ mod tests {
             .value("numeric_float4_arr", ParameterizedValue::Array(vec![3.14.into()]))
             .value("numeric_float8", 3.14912932)
             .value(
+                "numeric_decimal",
+                ParameterizedValue::Real("0.00006927".parse().unwrap()),
+            )
+            .value("numeric_money", 3.551)
+            .value(
                 "time_date",
                 ParameterizedValue::DateTime("2020-03-02T08:00:00Z".parse().unwrap()),
             )
@@ -605,8 +611,7 @@ mod tests {
             .value(
                 "time_timestamptz",
                 ParameterizedValue::DateTime("2020-03-02T08:00:00Z".parse().unwrap()),
-            )
-            .value("numeric_money", 3.55);
+            );
         let select = ast::Select::from_table("types").value(ast::asterisk());
 
         connection.query(insert.into()).await.unwrap();
@@ -630,6 +635,7 @@ mod tests {
             ParameterizedValue::Real("3.14".parse().unwrap()),
             ParameterizedValue::Array(vec![3.14.into()]),
             ParameterizedValue::Real("3.14912932".parse().unwrap()),
+            ParameterizedValue::Real("0.00006927".parse().unwrap()),
             ParameterizedValue::Real("3.55".parse().unwrap()),
             ParameterizedValue::DateTime("1970-01-01T08:00:00Z".parse().unwrap()),
             ParameterizedValue::DateTime("1970-01-01T08:00:00Z".parse().unwrap()),
