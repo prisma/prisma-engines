@@ -1,5 +1,7 @@
 use pretty_assertions::assert_eq;
-use sql_schema_describer::{Column, Enum, ForeignKey, Index, IndexType, PrimaryKey, SqlSchema, Table};
+use sql_schema_describer::{
+    Column, Enum, ForeignKey, ForeignKeyAction, Index, IndexType, PrimaryKey, SqlSchema, Table,
+};
 
 pub(crate) type AssertionResult<T> = Result<T, anyhow::Error>;
 
@@ -160,6 +162,19 @@ impl<'a> TableAssertion<'a> {
         Ok(this)
     }
 
+    pub fn assert_columns_count(self, count: usize) -> AssertionResult<Self> {
+        let actual_count = self.0.columns.len();
+
+        anyhow::ensure!(
+            actual_count == count,
+            "Assertion failed: expected {} columns, found {}",
+            count,
+            actual_count,
+        );
+
+        Ok(self)
+    }
+
     pub fn assert_has_no_pk(self) -> AssertionResult<Self> {
         anyhow::ensure!(
             self.0.primary_key.is_none(),
@@ -283,6 +298,15 @@ impl<'a> ForeignKeyAssertion<'a> {
             columns,
             self.0.referenced_table,
             self.0.referenced_columns,
+        );
+
+        Ok(self)
+    }
+
+    pub fn assert_cascades_on_delete(self) -> AssertionResult<Self> {
+        anyhow::ensure!(
+            self.0.on_delete_action == ForeignKeyAction::Cascade,
+            "Assertion failed: expected foreign key to cascade on delete."
         );
 
         Ok(self)
