@@ -229,3 +229,64 @@ async fn postgres_types_roundtrip(api: &TestApi) -> TestResult {
 
     Ok(())
 }
+
+#[test_each_connector(tags("postgres"))]
+async fn small_float_values_must_work(api: &TestApi) -> TestResult {
+    let schema = indoc! {
+        r#"
+        CREATE TABLE floatilla (
+            id SERIAL PRIMARY KEY,
+            f32 float4,
+            f64 float8,
+            decimal_column decimal
+        );
+        "#
+    };
+
+    api.execute(schema).await?;
+
+    let (datamodel, engine) = api.create_engine().await?;
+
+    datamodel.assert_model("floatilla", |model| {
+        model
+            .assert_field_type("f32", ScalarType::Float)?
+            .assert_field_type("f64", ScalarType::Float)?
+            .assert_field_type("decimal_column", ScalarType::Float)
+    })?;
+
+    let query = indoc! {
+        r##"
+        mutation {
+            createOnefloatilla(
+                data: {
+                    f32: 0.00006927,
+                    f64: 0.00006927,
+                    decimal_column: 0.00006927
+                }
+            ) {
+                id
+                f32
+                f64
+                decimal_column
+            }
+        }
+        "##
+    };
+
+    let response = engine.request(query).await;
+
+    let expected_response = json!({
+        "data": {
+            "createOnefloatilla": {
+                "id": 1,
+                "f32": 0.00006927,
+                "f64": 0.00006927,
+                "decimal_column": 0.00006927
+            }
+        }
+    });
+
+    assert_eq!(response, expected_response);
+
+    Ok(())
+}
