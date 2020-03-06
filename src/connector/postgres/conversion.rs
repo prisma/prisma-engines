@@ -52,6 +52,24 @@ impl<'a> FromSql<'a> for TimeTz {
     }
 }
 
+/// This implementation of FromSql assumes that the precision for money fields is configured to the default
+/// of 2 decimals.
+///
+/// Postgres docs: https://www.postgresql.org/docs/current/datatype-money.html
+struct NaiveMoney(Decimal);
+
+impl<'a> FromSql<'a> for NaiveMoney {
+    fn from_sql(_ty: &PostgresType, raw: &'a [u8]) -> Result<NaiveMoney, Box<dyn std::error::Error + Sync + Send>> {
+        let cents = i64::from_sql(&PostgresType::INT8, raw)?;
+
+        Ok(NaiveMoney(Decimal::new(cents, 2)))
+    }
+
+    fn accepts(ty: &PostgresType) -> bool {
+        ty == &PostgresType::MONEY
+    }
+}
+
 impl GetRow for PostgresRow {
     fn get_result_row<'b>(&'b self) -> crate::Result<Vec<ParameterizedValue<'static>>> {
         fn convert(row: &PostgresRow, i: usize) -> crate::Result<ParameterizedValue<'static>> {
@@ -99,6 +117,13 @@ impl GetRow for PostgresRow {
                     Some(val) => {
                         let val: Decimal = Decimal::from_f64(val).expect("f64 is not a Decimal");
                         ParameterizedValue::Real(val)
+                    }
+                    None => ParameterizedValue::Null,
+                },
+                PostgresType::MONEY => match row.try_get(i)? {
+                    Some(val) => {
+                        let val: NaiveMoney = val;
+                        ParameterizedValue::Real(val.0)
                     }
                     None => ParameterizedValue::Null,
                 },
@@ -391,8 +416,10 @@ impl<'a> ToSql for ParameterizedValue<'a> {
                 f.to_sql(ty, out)
             }
             (ParameterizedValue::Real(decimal), &PostgresType::MONEY) => {
-                let f = decimal.to_f64().expect("decimal to f64 conversion");
-                f.to_sql(ty, out)
+                let mut i64_bytes: [u8; 8] = [0; 8];
+                i64_bytes.copy_from_slice(&decimal.round_dp(2).serialize()[4..12]);
+                let i = i64::from_le_bytes(i64_bytes) * 10i64.pow(decimal.scale());
+                i.to_sql(ty, out)
             }
             (ParameterizedValue::Real(float), _) => float.to_sql(ty, out),
             #[cfg(feature = "uuid-0_8")]
