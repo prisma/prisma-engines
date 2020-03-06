@@ -11,6 +11,9 @@ pub async fn m2m<'a, 'b>(
     parent_result: Option<&'a ManyRecords>,
     paginator: NestedPagination,
 ) -> InterpretationResult<ManyRecords> {
+    let parent_field = &query.parent_field;
+    let child_link_id = parent_field.related_field().linking_fields();
+
     // We know that in a m2m scenario, we always require the ID of the parent, nothing else.
     let parent_ids = match query.parent_projections {
         Some(ref links) => links.clone(),
@@ -29,12 +32,37 @@ pub async fn m2m<'a, 'b>(
         .map(|ri| child_model_id.assimilate(ri.1.clone()))
         .collect::<std::result::Result<Vec<_>, _>>()?;
 
-    let filter = child_ids.filter();
-    let mut args = query.args.clone();
+    let is_compound_case = child_link_id.db_len() > 1;
 
-    args.filter = match args.filter {
-        Some(existing_filter) => Some(Filter::and(vec![existing_filter, filter])),
-        None => Some(filter),
+    let args = if is_compound_case {
+        let mut args = query.args.clone();
+        let filter = child_ids.filter();
+
+        args.filter = match args.filter {
+            Some(existing_filter) => Some(Filter::and(vec![existing_filter, filter])),
+            None => Some(filter),
+        };
+
+        args
+    } else {
+        // We can optimize queries with a single link ID field with IN filters.
+        let child_field = child_link_id.data_source_fields().next().unwrap();
+        let parent_links_as_prisma_values: Vec<PrismaValue> = child_ids
+            .into_iter()
+            .map(|vals| {
+                vals.pairs.into_iter().next().unwrap().1
+            })
+            .collect();
+
+        let filter = child_field.is_in(parent_links_as_prisma_values);
+        let mut args = query.args.clone();
+
+        args.filter = match args.filter {
+            Some(existing_filter) => Some(Filter::and(vec![existing_filter, filter])),
+            None => Some(filter),
+        };
+
+        args
     };
 
     let mut scalars = tx
