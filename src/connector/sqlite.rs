@@ -212,6 +212,9 @@ mod tests {
         connector::{Queryable, TransactionCapable},
         error::{DatabaseConstraint, ErrorKind},
         val,
+        col,
+        values,
+        single::Quaint,
     };
 
     #[test]
@@ -250,6 +253,50 @@ mod tests {
         let res = tx.query_raw("SELECT * FROM sqlite_master", &[]).await.unwrap();
 
         assert!(res.is_empty());
+    }
+
+    #[tokio::test]
+    async fn tuples_in_selection() {
+        let table = r#"
+            CREATE TABLE tuples (id SERIAL PRIMARY KEY, age INTEGER NOT NULL, length REAL NOT NULL);
+        "#;
+
+        let connection = Quaint::new("file:db/test.db").await.unwrap();
+
+        connection.query_raw("DROP TABLE IF EXISTS tuples", &[]).await.unwrap();
+        connection.query_raw(table, &[]).await.unwrap();
+
+        let insert = Insert::multi_into("tuples", vec!["age", "length"])
+            .values(vec![val!(35), val!(20.0)])
+            .values(vec![val!(40), val!(18.0)]);
+
+        connection.insert(insert.into()).await.unwrap();
+
+        // 1-tuple
+        {
+            let cols = Row::new().push(Column::from("age"));
+            let vals = Row::new().push(35);
+
+            let select = Select::from_table("tuples").so_that(cols.in_selection(vals));
+            let rows = connection.select(select).await.unwrap();
+
+            let row = rows.get(0).unwrap();
+            assert_eq!(row["age"].as_i64(), Some(35));
+            assert_eq!(row["length"].as_f64(), Some(20.0));
+        }
+
+        // 2-tuple
+        {
+            let cols = Row::from((col!("age"), col!("length")));
+            let vals = values!((35, 20.0));
+
+            let select = Select::from_table("tuples").so_that(cols.in_selection(vals));
+            let rows = connection.select(select).await.unwrap();
+
+            let row = rows.get(0).unwrap();
+            assert_eq!(row["age"].as_i64(), Some(35));
+            assert_eq!(row["length"].as_f64(), Some(20.0));
+        }
     }
 
     #[allow(unused)]

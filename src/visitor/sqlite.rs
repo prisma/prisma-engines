@@ -112,6 +112,20 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
         self.write("GROUP_CONCAT")?;
         self.surround_with("(", ")", |ref mut s| s.visit_database_value(value))
     }
+
+    fn visit_values(&mut self, values: Values<'a>) -> fmt::Result {
+        self.surround_with("(VALUES ", ")", |ref mut s| {
+            let len = values.len();
+            for (i, row) in values.into_iter().enumerate() {
+                s.visit_row(row)?;
+
+                if i < (len - 1) {
+                    s.write(",")?;
+                }
+            }
+            Ok(())
+        })
+    }
 }
 
 #[cfg(test)]

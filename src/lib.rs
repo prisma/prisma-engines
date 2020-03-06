@@ -123,11 +123,11 @@ pub mod error;
 ))]
 pub mod pooled;
 pub mod prelude;
+#[cfg(feature = "serde-support")]
+pub mod serde;
 #[cfg(any(feature = "sqlite", feature = "mysql", feature = "postgresql"))]
 pub mod single;
 pub mod visitor;
-#[cfg(feature = "serde-support")]
-pub mod serde;
 
 use once_cell::sync::Lazy;
 

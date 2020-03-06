@@ -13,6 +13,10 @@ impl<'a> Row<'a> {
         Row { values: Vec::new() }
     }
 
+    pub fn with_capacity(capacity: usize) -> Self {
+        Row { values: Vec::with_capacity(capacity) }
+    }
+
     pub fn push<T>(mut self, value: T) -> Self
     where
         T: Into<DatabaseValue<'a>>,
@@ -42,7 +46,7 @@ where
 {
     #[inline]
     fn from((val,): (A,)) -> Self {
-        Row::new().push(val)
+        Row::with_capacity(1).push(val)
     }
 }
 
@@ -53,7 +57,7 @@ where
 {
     #[inline]
     fn from(vals: (A, B)) -> Self {
-        Row::new().push(vals.0).push(vals.1)
+        Row::with_capacity(2).push(vals.0).push(vals.1)
     }
 }
 
@@ -65,7 +69,7 @@ where
 {
     #[inline]
     fn from(vals: (A, B, C)) -> Self {
-        Row::new().push(vals.0).push(vals.1).push(vals.2)
+        Row::with_capacity(3).push(vals.0).push(vals.1).push(vals.2)
     }
 }
 
@@ -78,7 +82,7 @@ where
 {
     #[inline]
     fn from(vals: (A, B, C, D)) -> Self {
-        Row::new().push(vals.0).push(vals.1).push(vals.2).push(vals.3)
+        Row::with_capacity(4).push(vals.0).push(vals.1).push(vals.2).push(vals.3)
     }
 }
 
@@ -92,7 +96,7 @@ where
 {
     #[inline]
     fn from(vals: (A, B, C, D, E)) -> Self {
-        Row::new()
+        Row::with_capacity(5)
             .push(vals.0)
             .push(vals.1)
             .push(vals.2)
