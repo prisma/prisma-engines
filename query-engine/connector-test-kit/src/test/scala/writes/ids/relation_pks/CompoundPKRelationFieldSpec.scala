@@ -1,108 +1,26 @@
-package writes.ids
+package writes.ids.relation_pks
 
 import org.scalatest.{FlatSpec, Matchers}
 import util._
 
-class RelationsAsPartOfPrimaryKeySpec extends FlatSpec with Matchers with ApiSpecBase {
-
-  //Todo Questions:
-  // Does the to one side have to be required?? It is an / part of an id so it would make sense
-
-  //todo relation cardinalities
-  // 1!:1!
-  // 1!:1
-  // 1:!1
-  // 1:M
-  // 1!:M
-
-  //todo @@Id
-  // single id is also a relation
-  // compound id contains simple relation + scalar
-  // compound id contains compound relation field + scalar
-  // compound id contains all compound relation fields + scalar
-  // compound id is subset of compound relation field            (unlikely)
-
-  //todo @@Unique
-  // in place of @@id @@unique should behave similarly in most cases
-  // exception: if the @@unique fields exactly match the database field(s) of the relation than the @(@)unique is dropped
-  // the relation then becomes 1:1 in the datamodel
-  // Problem: Table with one fk field that is marked unique
-  // -> we generated 1:1 relation and don't put the unique on the datamodel
-  // -> we then comment it out since the datamodel has no unique even though there is one on the db level
-  // Solution: Either print the unique or treat 1:1 relation as a unique identifier
-
-  // todo cursors
-  // todo filters
-
-  "Using a simple id that is also a 1!:1! relation" should "work" in {
-    val project = ProjectDsl.fromString {
-      s"""
-         |model Parent {
-         |  child   Child  @relation(references: [id]) @id
-         |  name    String 
-         |  age     Int
-         |}
-         |
-         |model Child {
-         |  id      Int    @id
-         |  name    String
-         |  parent  Parent
-         |}
-       """
-    }
-    database.setup(project)
-
-    // Mutations in this test:
-    //  create        | root   | checked
-    //  update        | root   | checked
-    //  nested create | create | checked
-    //  nested update | update | checked
-    val res1 = server.query(
-      """
-        |mutation {
-        |  createParent(data: { name: "Paul" , age: 40, child: { create: {id: 1, name: "Panther" }}}) {
-        |    name
-        |    age
-        |    child{
-        |       id
-        |       name
-        |    }
-        |  }
-        |}
-      """,
-      project
-    )
-
-    res1.toString() should be("{\"data\":{\"createParent\":{\"name\":\"Paul\",\"age\":40,\"child\":{\"id\":1,\"name\":\"Panther\"}}}}")
-
-    val res2 = server.query(
-      """
-        |mutation {
-        |  updateParent(where: { child: 1 } data: { age: 41 }) {
-        |    name
-        |    age
-        |  }
-        |}
-      """,
-      project
-    )
-
-    res2.toString() should be("{\"data\":{\"updateParent\":{\"name\":\"Paul\",\"age\":41}}}")
-
-    val res3 = server.query(
-      """
-        |mutation {
-        |  updateChild(where: { id: 1 } data: { parent: { update: { age: 42 }}}) {
-        |    parent { age }
-        |  }
-        |}
-      """,
-      project
-    )
-
-    res3.toString() should be("{\"data\":{\"updateChild\":{\"parent\":{\"age\":42}}}}")
-  }
-
+// Checks if single
+class CompoundPKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBase {
+  // Mutations in this test:
+  //  create         | root   | checked
+  //  update         | root   | checked
+  //  delete         | root   | not possible
+  //  upsert         | root   | checked
+  //  updateMany     | root   | not possible
+  //  deleteMany     | root   | not possible
+  //  nested create  | create | checked
+  //  nested update  | update | checked
+  //  nested connect | -      | not possible
+  //  nested disconn | -      | not possible
+  //  nested delete  | -      | not possible
+  //  nested set     | -      | not possible
+  //  nested upsert  | -      | not possible
+  //  nested deleteM | -      | not possible
+  //  nested updateM } -      | not possible
   "Using a compound id that contains a relation" should "work" in {
     val project = ProjectDsl.fromString {
       s"""
@@ -110,7 +28,7 @@ class RelationsAsPartOfPrimaryKeySpec extends FlatSpec with Matchers with ApiSpe
          |  child Child  @relation(references: [id])
          |  name  String
          |  age   Int
-         |  
+         |
          |  @@id([child, name])
          |}
          |
