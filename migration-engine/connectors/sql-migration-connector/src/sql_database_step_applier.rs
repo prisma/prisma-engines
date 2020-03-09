@@ -456,7 +456,7 @@ fn safe_alter_column(
             .map(|step| match step {
                 PostgresAlterColumn::DropDefault => format!("{} DROP DEFAULT", &alter_column_prefix),
                 PostgresAlterColumn::SetDefault(new_default) => {
-                    format!("{} SET DEFAULT '{}'", &alter_column_prefix, new_default)
+                    format!("{} SET DEFAULT '{}'", &alter_column_prefix, renderer.render_default(Some(&new_default), &next_column.tpe.family))
                 }
                 PostgresAlterColumn::DropNotNull => format!("{} DROP NOT NULL", &alter_column_prefix),
                 PostgresAlterColumn::SetType(ty) => format!(
@@ -471,7 +471,7 @@ fn safe_alter_column(
             .map(|step| match step {
                 MysqlAlterColumn::DropDefault => format!("{} DROP DEFAULT", &alter_column_prefix),
                 MysqlAlterColumn::SetDefault(new_default) => {
-                    format!("{} SET DEFAULT '{}'", &alter_column_prefix, new_default)
+                    format!("{} SET DEFAULT '{}'", &alter_column_prefix, renderer.render_default(Some(&new_default), &next_column.tpe.family))
                 }
             })
             .collect(),

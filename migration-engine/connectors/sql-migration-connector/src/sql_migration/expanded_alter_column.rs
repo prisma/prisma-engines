@@ -76,7 +76,7 @@ pub(crate) enum ExpandedAlterColumn {
 #[derive(Debug)]
 /// https://www.postgresql.org/docs/9.1/sql-altertable.html
 pub(crate) enum PostgresAlterColumn {
-    SetDefault(String),
+    SetDefault(sql_schema_describer::DefaultValue),
     DropDefault,
     DropNotNull,
     SetType(ColumnType),
@@ -88,7 +88,7 @@ pub(crate) enum PostgresAlterColumn {
 /// https://dev.mysql.com/doc/refman/8.0/en/alter-table.html
 #[derive(Debug)]
 pub(crate) enum MysqlAlterColumn {
-    SetDefault(String),
+    SetDefault(sql_schema_describer::DefaultValue),
     DropDefault,
     // Not used yet:
     // Rename { previous_name: String, next_name: String },

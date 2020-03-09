@@ -22,7 +22,7 @@ impl super::SqlRenderer for SqliteRenderer {
         let column_name = quoted(column.name());
         let tpe_str = self.render_column_type(column.column_type());
         let nullability_str = render_nullability(&column);
-        let default_str = render_default(&column);
+        let default_str = self.render_default(column.default(), &column.column.tpe.family);
         let auto_increment_str = if column.auto_increment() {
             "PRIMARY KEY AUTOINCREMENT"
         } else {

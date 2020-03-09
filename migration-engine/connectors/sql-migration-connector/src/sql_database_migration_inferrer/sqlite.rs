@@ -4,8 +4,9 @@ use crate::{
     sql_renderer::SqlRenderer,
     sql_schema_differ::{ColumnDiffer, SqlSchemaDiff, TableDiffer},
     SqlResult,
+    SqlFamily,
 };
-use sql_schema_describer::{Column, ColumnArity, ColumnTypeFamily, DefaultValue, SqlSchema, Table};
+use sql_schema_describer::{ Column, ColumnArity, ColumnTypeFamily, DefaultValue, SqlSchema, Table};
 
 pub(super) fn fix(
     diff: SqlSchemaDiff,
@@ -199,7 +200,7 @@ fn copy_current_table_into_new_table(
             format!(
                 "coalesce({column_name}, {default_value}) AS {column_name}",
                 column_name = sqlite_quoted(columns.name()),
-                default_value = SqlRenderer(&columns.next)
+                default_value = SqlRenderer::for_family(&SqlFamily::Sqlite).render_default(columns.next.default.as_ref(), &columns.next.tpe.family)
             )
         }))
         .peekable();

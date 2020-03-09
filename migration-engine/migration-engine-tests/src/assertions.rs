@@ -1,5 +1,5 @@
 use pretty_assertions::assert_eq;
-use sql_schema_describer::{Column, Enum, ForeignKey, Index, IndexType, PrimaryKey, SqlSchema, Table};
+use sql_schema_describer::{Column, Enum, DefaultValue, ForeignKey, Index, IndexType, PrimaryKey, SqlSchema, Table};
 
 pub(crate) type AssertionResult<T> = Result<T, anyhow::Error>;
 
@@ -214,7 +214,12 @@ pub struct ColumnAssertion<'a>(&'a Column);
 
 impl<'a> ColumnAssertion<'a> {
     pub fn assert_default(self, expected: Option<&str>) -> AssertionResult<Self> {
-        let found = self.0.default.as_ref().map(String::as_str);
+        let found = self.0.default.as_ref().map(|default_value| match default_value {
+            DefaultValue::VALUE(s) => s,
+            DefaultValue::SEQUENCE(s) => s,
+            DefaultValue::DBGENERATED(s) => s,
+            DefaultValue::NOW => "CURRENT_TIMESTAMP"
+        });
 
         anyhow::ensure!(
             found == expected,

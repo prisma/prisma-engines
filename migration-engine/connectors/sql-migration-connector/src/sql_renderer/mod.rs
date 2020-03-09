@@ -42,7 +42,16 @@ pub(crate) trait SqlRenderer {
 
     fn render_references(&self, schema_name: &str, foreign_key: &ForeignKey) -> String;
 
-    fn render_default(&self, column: &ColumnRef<'_>) -> String;
+    fn render_default(&self, default: Option<&DefaultValue>, family: &ColumnTypeFamily) -> String {
+        match (default, family) {
+            (Some(DefaultValue::DBGENERATED(val)), _) => format!("{}", val),
+            (Some(DefaultValue::VALUE(val)), ColumnTypeFamily::String) => format!("'{}'", val),
+            (Some(DefaultValue::NOW), ColumnTypeFamily::DateTime) => "CURRENT_TIMESTAMP".to_string(),
+            (Some(DefaultValue::VALUE(val)), ColumnTypeFamily::DateTime) => format!("'{}'", val),
+            (Some(DefaultValue::VALUE(val)), _) => format!("{}", val),
+            (_, _) => "".to_string(),
+        }
+    }
 
     fn sql_family(&self) -> SqlFamily;
 }

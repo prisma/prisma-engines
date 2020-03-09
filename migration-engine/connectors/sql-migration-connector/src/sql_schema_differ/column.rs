@@ -1,4 +1,5 @@
-use sql_schema_describer::{Column, ColumnTypeFamily};
+use std::borrow::Cow;
+use sql_schema_describer::{Column, ColumnTypeFamily, DefaultValue};
 
 #[derive(Debug)]
 pub(crate) struct ColumnDiffer<'a> {
@@ -59,8 +60,8 @@ impl<'a> ColumnDiffer<'a> {
             return true;
         }
 
-        let previous_value: Option<&str> = self.previous.default.as_ref().map(String::as_str);
-        let next_value: Option<&str> = self.next.default.as_ref().map(String::as_str);
+        let previous_value: Option<&str> = self.previous.default.as_ref().and_then(expand_default_value);
+        let next_value: Option<&str> = self.next.default.as_ref().and_then(expand_default_value);
 
         match self.previous.tpe.family {
             ColumnTypeFamily::String => string_defaults_match(previous_value, next_value),
@@ -69,6 +70,15 @@ impl<'a> ColumnDiffer<'a> {
             ColumnTypeFamily::Boolean => bool_default(previous_value) == bool_default(next_value),
             _ => true,
         }
+    }
+}
+
+fn expand_default_value(default_value: &DefaultValue) -> Option<&str> {
+    match default_value {
+        DefaultValue::VALUE(s) => Some(s.as_str()),
+        DefaultValue::DBGENERATED(s) => todo!("diffing of dbGenerated"),
+        DefaultValue::NOW => todo!("diffing of DefaultValue::NOw"),
+        DefaultValue::SEQUENCE(_) => None,
     }
 }
 
