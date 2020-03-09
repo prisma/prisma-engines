@@ -3,8 +3,32 @@ package writes.ids.relation_pks
 import org.scalatest.{FlatSpec, Matchers}
 import util._
 
-// Checks if single
+// 1) Checks if relation fields in @@id in any constellation work with our mutations.
+// Possible relation cardinalities:
+// - 1!:1!
+// - 1!:1
+// - 1!:M
+//
+// 2) Checks basic cursor functionality.
 class CompoundPKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBase {
+  //todo @@Id
+  // compound id contains simple relation + scalar
+  // compound id contains compound relation field + scalar
+  // compound id contains all compound relation fields + scalar
+  // compound id is subset of compound relation field            (unlikely)
+
+  //todo @@Unique
+  // in place of @@id @@unique should behave similarly in most cases
+  // exception: if the @@unique fields exactly match the database field(s) of the relation than the @(@)unique is dropped
+  // the relation then becomes 1:1 in the datamodel
+  // Problem: Table with one fk field that is marked unique
+  // -> we generated 1:1 relation and don't put the unique on the datamodel
+  // -> we then comment it out since the datamodel has no unique even though there is one on the db level
+  // Solution: Either print the unique or treat 1:1 relation as a unique identifier
+
+  // todo cursors
+  // todo filters
+
   // Mutations in this test:
   //  create         | root   | checked
   //  update         | root   | checked
