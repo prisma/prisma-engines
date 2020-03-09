@@ -509,7 +509,7 @@ pub trait Visitor<'a> {
                 }
             },
             Compare::NotIn(left, right) => match (*left, *right) {
-                (_, DatabaseValue::Row(ref row)) if row.is_empty() => self.write("1=0"),
+                (_, DatabaseValue::Row(ref row)) if row.is_empty() => self.write("1=1"),
                 (DatabaseValue::Row(mut cols), DatabaseValue::Values(vals)) if cols.len() == 1 && vals.row_len() == 1 => {
                     let col = cols.pop().unwrap();
                     let vals = vals.flatten_row().unwrap();
