@@ -3,8 +3,8 @@ mod exceptions;
 mod inflector;
 mod rules;
 
-use once_cell::sync::Lazy;
 use inflector::{Inflector, Mode};
+use once_cell::sync::Lazy;
 
 static DEFAULT: Lazy<Inflector> = Lazy::new(|| Inflector::new(Mode::Anglicized));
 static CLASSICAL: Lazy<Inflector> = Lazy::new(|| Inflector::new(Mode::Classical));
