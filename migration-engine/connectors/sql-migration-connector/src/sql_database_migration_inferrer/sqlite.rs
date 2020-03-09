@@ -1,10 +1,11 @@
 use crate::{
     sql_migration::*,
     sql_renderer::sqlite_quoted,
+    sql_renderer::SqlRenderer,
     sql_schema_differ::{ColumnDiffer, SqlSchemaDiff, TableDiffer},
     SqlResult,
 };
-use sql_schema_describer::{Column, ColumnArity, ColumnTypeFamily, SqlSchema, Table};
+use sql_schema_describer::{Column, ColumnArity, ColumnTypeFamily, DefaultValue, SqlSchema, Table};
 
 pub(super) fn fix(
     diff: SqlSchemaDiff,
@@ -198,7 +199,7 @@ fn copy_current_table_into_new_table(
             format!(
                 "coalesce({column_name}, {default_value}) AS {column_name}",
                 column_name = sqlite_quoted(columns.name()),
-                default_value = render_default(&columns.next)
+                default_value = SqlRenderer(&columns.next)
             )
         }))
         .peekable();
@@ -221,11 +222,4 @@ fn copy_current_table_into_new_table(
     steps.push(SqlMigrationStep::RawSql { raw: query });
 
     Ok(())
-}
-
-fn render_default(column: &Column) -> String {
-    match column.tpe.family {
-        ColumnTypeFamily::String => format!("'{}'", column.default.as_ref().unwrap()),
-        _ => column.default.as_ref().unwrap().to_string(),
-    }
 }

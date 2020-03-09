@@ -136,7 +136,7 @@ impl SqlSchemaDescriber {
                 let col = Column {
                     name: row.get("name").and_then(|x| x.to_string()).expect("name"),
                     tpe,
-                    default: default_value.clone(),
+                    default: None, //todo default_value.clone(),
                     auto_increment: false,
                 };
                 if pk_col > 0 {

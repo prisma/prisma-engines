@@ -24,7 +24,7 @@ impl super::SqlRenderer for MySqlRenderer {
         let column_name = self.quote(column.name());
         let tpe_str = self.render_column_type(&column).unwrap();
         let nullability_str = render_nullability(&column);
-        let default_str = render_default(&column);
+        let default_str = self.render_default(&column);
         let foreign_key = column.table().foreign_key_for_column(column.name());
         let auto_increment_str = if column.auto_increment() { "AUTO_INCREMENT" } else { "" };
 
@@ -34,6 +34,17 @@ impl super::SqlRenderer for MySqlRenderer {
                 "{} {} {} {} {}",
                 column_name, tpe_str, nullability_str, default_str, auto_increment_str
             ),
+        }
+    }
+
+    fn render_default(&self, column: &ColumnRef<'_>) -> String {
+        match (column.default, column.tpe.family) {
+            (Some(DefaultValue::DBGENERATED(val)), _) => format!("{}", val),
+            (Some(DefaultValue::VALUE(val)), ColumnTypeFamily::String) => format!("'{}'", val),
+            (Some(DefaultValue::NOW), ColumnTypeFamily::DateTime) => "CURRENT_TIMESTAMP".to_string(),
+            (Some(DefaultValue::VALUE(val)), ColumnTypeFamily::DateTime) => format!("'{}'", val),
+            (Some(DefaultValue::VALUE(val)), _) => format!("{}", val),
+            (_, _) => "".to_string(),
         }
     }
 

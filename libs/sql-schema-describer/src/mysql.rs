@@ -217,11 +217,7 @@ async fn get_all_columns(conn: &dyn Queryable, schema_name: &str) -> HashMap<Str
         let col = Column {
             name,
             tpe,
-            default: col
-                .get("column_default")
-                .and_then(|x| x.as_str())
-                .and_then(sanitize_default_value)
-                .map(String::from),
+            default: None, //todo  col.get("column_default").and_then(|x| x.as_str()).and_then(sanitize_default_value).map(String::from),
             auto_increment,
         };
 

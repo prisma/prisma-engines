@@ -212,8 +212,8 @@ pub struct Column {
     /// Column type.
     pub tpe: ColumnType,
     /// Column default.
-    // pub default: Option<DefaultValue>,
-    pub default: Option<String>,
+    pub default: Option<DefaultValue>,
+    // pub default: Option<String>,
     /// Is the column auto-incrementing?
     pub auto_increment: bool,
 }
@@ -390,20 +390,10 @@ pub struct Sequence {
 pub enum DefaultValue {
     /// A constant value, parsed as String
     VALUE(String),
-    /// A function or expression that we know.
-    EXPRESSION(Expression),
-    /// A function or expression that we do not know.
-    DBGENERATED,
-}
-
-/// A DefaultValue Expression
-#[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub enum Expression {
     /// An expression generating a current timestamp.
     NOW,
-    /// An expression generating a UUID.
-    UUID,
-    // /// An expression generating a sequence.
-    // SEQUENCE,
+    /// An expression generating a sequence.
+    SEQUENCE(String),
+    /// Unrecognized Default Value
+    DBGENERATED(String),
 }

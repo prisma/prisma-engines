@@ -208,25 +208,43 @@ impl SqlSchemaDescriber {
             //todo we might want to use regexes here
             // positive list based on data types?
 
-            let default = match &tpe.family {
-                ColumnTypeFamily::Enum(enum_name) => col.get("column_default").and_then(|param_value| {
-                    param_value
-                        .to_string()
-                        .map(|x| unquote_postgres_strings(x.replace(format!("::{}", enum_name.clone()).as_str(), "")))
-                }),
-                _ => col.get("column_default").and_then(|param_value| {
-                    param_value.to_string().map(|x| {
-                        unquote_postgres_strings(
-                            x.replace(format!("::{}", data_type).as_str(), "")
+            let default = match col.get("column_default") {
+                None => None,
+                Some(param_value) => match param_value.to_string() {
+                    None => None,
+                    Some(default_string) => Some(match &tpe.family {
+                        ColumnTypeFamily::Int => DefaultValue::DBGENERATED(default_string),
+                        ColumnTypeFamily::Float => DefaultValue::DBGENERATED(default_string),
+                        ColumnTypeFamily::Boolean => DefaultValue::DBGENERATED(default_string),
+                        ColumnTypeFamily::String => DefaultValue::DBGENERATED(default_string),
+                        ColumnTypeFamily::DateTime => DefaultValue::DBGENERATED(default_string),
+                        ColumnTypeFamily::Binary => DefaultValue::DBGENERATED(default_string),
+                        ColumnTypeFamily::Json => DefaultValue::DBGENERATED(default_string),
+                        ColumnTypeFamily::Uuid => DefaultValue::DBGENERATED(default_string),
+                        ColumnTypeFamily::Geometric => DefaultValue::DBGENERATED(default_string),
+                        ColumnTypeFamily::LogSequenceNumber => DefaultValue::DBGENERATED(default_string),
+                        ColumnTypeFamily::TextSearch => DefaultValue::DBGENERATED(default_string),
+                        ColumnTypeFamily::TransactionId => DefaultValue::DBGENERATED(default_string),
+                        ColumnTypeFamily::Enum(enum_name) => {
+                            let enum_suffix = format!("::{}", enum_name);
+                            match default_string.ends_with(&enum_suffix) {
+                                true => DefaultValue::VALUE(unquote(default_string.replace(&enum_suffix, ""))),
+                                false => DefaultValue::DBGENERATED(default_string),
+                            }
+                        }
+                        ColumnTypeFamily::Unknown => DefaultValue::VALUE(unquote(
+                            default_string
+                                .replace(format!("::{}", data_type).as_str(), "")
                                 .replace(format!("::{}", full_data_type).as_str(), ""),
-                        )
-                    })
-                }),
+                        )),
+                    }),
+                },
             };
 
+            //todo DbGenerated or Expression sequence hints at autoincrement
             let is_auto_increment = is_identity
                 || match default {
-                    Some(ref val) => is_autoincrement(val, schema, &table_name, &col_name),
+                    Some(ref _val) => true, // todo only temporary is_autoincrement(val, schema, &table_name, &col_name),
                     _ => false,
                 };
 
@@ -650,7 +668,7 @@ fn is_autoincrement(value: &str, schema_name: &str, table_name: &str, column_nam
         })
         .unwrap_or(false)
 }
-fn unquote_postgres_strings(input: String) -> String {
+fn unquote(input: String) -> String {
     /// Regex for matching the quotes on the introspected string values on Postgres.
     static POSTGRES_STRING_DEFAULT_RE: Lazy<regex::Regex> = Lazy::new(|| regex::Regex::new(r#"^'(.*)'$"#).unwrap());
 
@@ -725,8 +743,8 @@ mod tests {
     fn postgres_unquote_string_default_regex_works() {
         let quoted_str = "'abc $$ def'";
 
-        assert_eq!(unquote_postgres_strings(quoted_str.to_string()), "abc $$ def");
+        assert_eq!(unquote(quoted_str.to_string()), "abc $$ def");
 
-        assert_eq!(unquote_postgres_strings("heh ".to_string()), "heh ");
+        assert_eq!(unquote("heh ".to_string()), "heh ");
     }
 }

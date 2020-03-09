@@ -42,6 +42,8 @@ pub(crate) trait SqlRenderer {
 
     fn render_references(&self, schema_name: &str, foreign_key: &ForeignKey) -> String;
 
+    fn render_default(&self, column: &ColumnRef<'_>) -> String;
+
     fn sql_family(&self) -> SqlFamily;
 }
 

@@ -55,6 +55,14 @@ impl ValueGenerator {
         ValueGenerator::new("autoincrement".to_owned(), vec![]).unwrap()
     }
 
+    pub fn new_dbgenerated() -> Self {
+        ValueGenerator::new("dbgenerated".to_owned(), vec![]).unwrap()
+    }
+
+    pub fn new_now() -> Self {
+        ValueGenerator::new("now".to_owned(), vec![]).unwrap()
+    }
+
     pub fn generate(&self) -> Option<ScalarValue> {
         self.generator.invoke()
     }

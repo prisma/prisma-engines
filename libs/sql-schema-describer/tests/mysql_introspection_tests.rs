@@ -221,7 +221,7 @@ async fn all_mysql_column_types_must_work() {
                 arity: ColumnArity::Required,
             },
 
-            default: Some("CURRENT_TIMESTAMP".to_string()),
+            default: Some(DefaultValue::NOW),
             auto_increment: false,
         },
         Column {

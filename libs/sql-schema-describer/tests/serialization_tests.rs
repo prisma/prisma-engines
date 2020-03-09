@@ -40,7 +40,7 @@ fn database_schema_is_serializable() {
                             family: ColumnTypeFamily::String,
                             arity: ColumnArity::Nullable,
                         },
-                        default: Some("default value".to_string()),
+                        default: Some(DefaultValue::VALUE("default value".to_string())),
                         auto_increment: false,
                     },
                     Column {
