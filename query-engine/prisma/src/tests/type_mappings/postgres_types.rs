@@ -232,7 +232,7 @@ async fn postgres_types_roundtrip(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector(tags("postgres"))]
+#[test_each_connector(tags("postgres"), log = "debug")]
 async fn small_float_values_must_work(api: &TestApi) -> TestResult {
     let schema = indoc! {
         r#"
