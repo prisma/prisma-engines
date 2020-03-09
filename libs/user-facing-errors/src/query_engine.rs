@@ -18,7 +18,7 @@ impl fmt::Display for DatabaseConstraint {
                 write!(f, "fields: ({})", quoted_fields.join(","))
             }
             Self::Index(index) => write!(f, "constraint: `{}`", index),
-            Self::ForeignKey => write!(f, "foreign key")
+            Self::ForeignKey => write!(f, "foreign key"),
         }
     }
 }

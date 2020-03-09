@@ -134,31 +134,83 @@ impl AliasedCondition for Filter {
 impl AliasedCondition for ScalarFilter {
     /// Conversion from a `ScalarFilter` to a query condition tree. Aliased when in a nested `SELECT`.
     fn aliased_cond(self, alias: Option<Alias>) -> ConditionTree<'static> {
-        let column = match alias {
-            Some(ref alias) => self.field.as_column().table(alias.to_string(None)),
-            None => self.field.as_column(),
-        };
+        fn compare(
+            comparable: impl Comparable<'static>,
+            cond: ScalarCondition,
+        ) -> ConditionTree<'static> {
+            let condition = match cond {
+                ScalarCondition::Equals(PrismaValue::Null) => comparable.is_null(),
+                ScalarCondition::NotEquals(PrismaValue::Null) => comparable.is_not_null(),
+                ScalarCondition::Equals(value) => comparable.equals(value),
+                ScalarCondition::NotEquals(value) => comparable.not_equals(value),
+                ScalarCondition::Contains(value) => comparable.like(format!("{}", value)),
+                ScalarCondition::NotContains(value) => comparable.not_like(format!("{}", value)),
+                ScalarCondition::StartsWith(value) => comparable.begins_with(format!("{}", value)),
+                ScalarCondition::NotStartsWith(value) => {
+                    comparable.not_begins_with(format!("{}", value))
+                }
+                ScalarCondition::EndsWith(value) => comparable.ends_into(format!("{}", value)),
+                ScalarCondition::NotEndsWith(value) => {
+                    comparable.not_ends_into(format!("{}", value))
+                }
+                ScalarCondition::LessThan(value) => comparable.less_than(value),
+                ScalarCondition::LessThanOrEquals(value) => comparable.less_than_or_equals(value),
+                ScalarCondition::GreaterThan(value) => comparable.greater_than(value),
+                ScalarCondition::GreaterThanOrEquals(value) => {
+                    comparable.greater_than_or_equals(value)
+                }
+                ScalarCondition::In(values) => match values.split_first() {
+                    Some((PrismaValue::List(_), _)) => {
+                        let mut sql_values = Values::with_capacity(values.len());
 
-        let condition = match self.condition {
-            ScalarCondition::Equals(PrismaValue::Null) => column.is_null(),
-            ScalarCondition::NotEquals(PrismaValue::Null) => column.is_not_null(),
-            ScalarCondition::Equals(value) => column.equals(value),
-            ScalarCondition::NotEquals(value) => column.not_equals(value),
-            ScalarCondition::Contains(value) => column.like(format!("{}", value)),
-            ScalarCondition::NotContains(value) => column.not_like(format!("{}", value)),
-            ScalarCondition::StartsWith(value) => column.begins_with(format!("{}", value)),
-            ScalarCondition::NotStartsWith(value) => column.not_begins_with(format!("{}", value)),
-            ScalarCondition::EndsWith(value) => column.ends_into(format!("{}", value)),
-            ScalarCondition::NotEndsWith(value) => column.not_ends_into(format!("{}", value)),
-            ScalarCondition::LessThan(value) => column.less_than(value),
-            ScalarCondition::LessThanOrEquals(value) => column.less_than_or_equals(value),
-            ScalarCondition::GreaterThan(value) => column.greater_than(value),
-            ScalarCondition::GreaterThanOrEquals(value) => column.greater_than_or_equals(value),
-            ScalarCondition::In(values) => column.in_selection(values),
-            ScalarCondition::NotIn(values) => column.not_in_selection(values),
-        };
+                        for pv in values {
+                            let list_value = pv.into_list().unwrap();
+                            sql_values.push(list_value);
+                        }
 
-        ConditionTree::single(condition)
+                        comparable.in_selection(sql_values)
+                    },
+                    _ => comparable.in_selection(values),
+                }
+                ScalarCondition::NotIn(values) => match values.split_first() {
+                    Some((PrismaValue::List(_), _)) => {
+                        let mut sql_values = Values::with_capacity(values.len());
+
+                        for pv in values {
+                            let list_value = pv.into_list().unwrap();
+                            sql_values.push(list_value);
+                        }
+
+                        comparable.not_in_selection(sql_values)
+                    },
+                    _ => comparable.not_in_selection(values),
+                }
+            };
+
+            ConditionTree::single(condition)
+        }
+
+        match (alias, self.projection) {
+            (Some(alias), ScalarProjection::Single(field)) => compare(
+                field.as_column().table(alias.to_string(None)),
+                self.condition,
+            ),
+            (Some(alias), ScalarProjection::Compound(fields)) => {
+                let columns: Vec<Column<'static>> = fields
+                    .into_iter()
+                    .map(|field| field.as_column().table(alias.to_string(None)))
+                    .collect();
+
+                compare(Row::from(columns), self.condition)
+            }
+            (None, ScalarProjection::Single(field)) => compare(field.as_column(), self.condition),
+            (None, ScalarProjection::Compound(fields)) => {
+                let columns: Vec<Column<'static>> =
+                    fields.into_iter().map(|field| field.as_column()).collect();
+
+                compare(Row::from(columns), self.condition)
+            }
+        }
     }
 }
 
@@ -177,8 +229,12 @@ impl AliasedCondition for RelationFilter {
         let sub_select = self.aliased_sel(alias.map(|a| a.inc(AliasMode::Table)));
 
         let comparison = match condition {
-            RelationCondition::AtLeastOneRelatedRecord => Row::from(columns).in_selection(sub_select),
-            RelationCondition::EveryRelatedRecord => Row::from(columns).not_in_selection(sub_select),
+            RelationCondition::AtLeastOneRelatedRecord => {
+                Row::from(columns).in_selection(sub_select)
+            }
+            RelationCondition::EveryRelatedRecord => {
+                Row::from(columns).not_in_selection(sub_select)
+            }
             RelationCondition::NoRelatedRecord => Row::from(columns).not_in_selection(sub_select),
             RelationCondition::ToOneRelatedRecord => Row::from(columns).in_selection(sub_select),
         };
@@ -208,7 +264,9 @@ impl AliasedSelect for RelationFilter {
         let id_columns = id_columns.map(|col| col.table(alias.to_string(Some(AliasMode::Join))));
 
         let related_table = self.field.related_model().as_table();
-        let table = relation.as_table().alias(alias.to_string(Some(AliasMode::Table)));
+        let table = relation
+            .as_table()
+            .alias(alias.to_string(Some(AliasMode::Table)));
 
         // check whether the join would join the same table and same column
         // example: `Track` AS `t1` INNER JOIN `Track` AS `j1` ON `j1`.`id` = `t1`.`id`
@@ -223,7 +281,8 @@ impl AliasedSelect for RelationFilter {
                 .aliased_cond(Some(alias))
                 .invert_if(condition.invert_of_subselect());
 
-            let select_base = Select::from_table(relation.as_table().alias(alias.to_string(None))).so_that(conditions);
+            let select_base = Select::from_table(relation.as_table().alias(alias.to_string(None)))
+                .so_that(conditions);
 
             these_columns.fold(select_base, |acc, column| acc.column(column))
         } else {
@@ -251,7 +310,9 @@ impl AliasedSelect for RelationFilter {
                 .alias(alias.to_string(Some(AliasMode::Join)))
                 .on(Row::from(identifiers).equals(Row::from(other_columns)));
 
-            let select_base = Select::from_table(table).inner_join(join).so_that(conditions);
+            let select_base = Select::from_table(table)
+                .inner_join(join)
+                .so_that(conditions);
 
             these_columns.fold(select_base, |acc, column| acc.column(column))
         }
@@ -264,14 +325,16 @@ impl AliasedCondition for OneRelationIsNullFilter {
         let alias = alias.map(|a| a.to_string(None));
 
         let condition = if self.field.relation_is_inlined_in_parent() {
-            self.field.as_columns().fold(ConditionTree::NoCondition, |acc, column| {
-                let column_is_null = column.opt_table(alias.clone()).is_null();
+            self.field
+                .as_columns()
+                .fold(ConditionTree::NoCondition, |acc, column| {
+                    let column_is_null = column.opt_table(alias.clone()).is_null();
 
-                match acc {
-                    ConditionTree::NoCondition => column_is_null.into(),
-                    cond => cond.and(column_is_null),
-                }
-            })
+                    match acc {
+                        ConditionTree::NoCondition => column_is_null.into(),
+                        cond => cond.and(column_is_null),
+                    }
+                })
         } else {
             let relation = self.field.relation();
 
