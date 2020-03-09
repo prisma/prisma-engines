@@ -612,6 +612,8 @@ mod tests {
                 numeric_float4 float4,
                 numeric_float4_arr float4[],
                 numeric_float8 float8,
+                numeric_decimal decimal(12,8),
+                numeric_money money,
                 time_timetz timetz,
                 time_time time,
                 time_date date,
@@ -639,6 +641,11 @@ mod tests {
             .value("numeric_float4", 3.14)
             .value("numeric_float4_arr", ParameterizedValue::Array(vec![3.14.into()]))
             .value("numeric_float8", 3.14912932)
+            .value(
+                "numeric_decimal",
+                ParameterizedValue::Real("0.00006927".parse().unwrap()),
+            )
+            .value("numeric_money", 3.551)
             .value(
                 "time_date",
                 ParameterizedValue::DateTime("2020-03-02T08:00:00Z".parse().unwrap()),
@@ -679,6 +686,8 @@ mod tests {
             ParameterizedValue::Real("3.14".parse().unwrap()),
             ParameterizedValue::Array(vec![3.14.into()]),
             ParameterizedValue::Real("3.14912932".parse().unwrap()),
+            ParameterizedValue::Real("0.00006927".parse().unwrap()),
+            ParameterizedValue::Real("3.55".parse().unwrap()),
             ParameterizedValue::DateTime("1970-01-01T08:00:00Z".parse().unwrap()),
             ParameterizedValue::DateTime("1970-01-01T08:00:00Z".parse().unwrap()),
             ParameterizedValue::DateTime("2020-03-02T00:00:00Z".parse().unwrap()),
@@ -687,6 +696,52 @@ mod tests {
         ];
 
         assert_eq!(result, expected);
+    }
+
+    #[tokio::test]
+    async fn test_money_value_conversions_match_with_manual_inserts() {
+        let conn = Quaint::new(&CONN_STR).await.unwrap();
+
+        conn.query_raw("DROP TABLE IF EXISTS money_conversion_test", &[])
+            .await
+            .unwrap();
+        conn.query_raw(
+            "CREATE TABLE money_conversion_test (id SERIAL PRIMARY KEY, cash money)",
+            &[],
+        )
+        .await
+        .unwrap();
+
+        conn.query_raw(
+            "INSERT INTO money_conversion_test (cash) VALUES (0), (12), (855.32)",
+            &[],
+        )
+        .await
+        .unwrap();
+
+        let select = ast::Select::from_table("money_conversion_test").value(ast::asterisk());
+        let result = conn.query(select.into()).await.unwrap();
+
+        let expected_first_row = vec![
+            ParameterizedValue::Integer(1),
+            ParameterizedValue::Real("0".parse().unwrap()),
+        ];
+
+        assert_eq!(result.get(0).unwrap().values, &expected_first_row);
+
+        let expected_second_row = vec![
+            ParameterizedValue::Integer(2),
+            ParameterizedValue::Real("12".parse().unwrap()),
+        ];
+
+        assert_eq!(result.get(1).unwrap().values, &expected_second_row);
+
+        let expected_third_row = vec![
+            ParameterizedValue::Integer(3),
+            ParameterizedValue::Real("855.32".parse().unwrap()),
+        ];
+
+        assert_eq!(result.get(2).unwrap().values, &expected_third_row);
     }
 
     #[tokio::test]
