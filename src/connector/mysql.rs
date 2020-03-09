@@ -408,8 +408,11 @@ VALUES (1, 'Joe', 27, 20000.00 );
 
         // 1-tuple
         {
-            let cols = Row::new().push(Column::from("age"));
-            let vals = Row::new().push(35);
+            let mut cols = Row::new();
+            cols.push(Column::from("age"));
+
+            let mut vals = Row::new();
+            vals.push(35);
 
             let select = Select::from_table("tuples").so_that(cols.in_selection(vals));
             let rows = connection.select(select).await.unwrap();

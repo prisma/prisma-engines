@@ -487,35 +487,47 @@ pub trait Visitor<'a> {
                 self.write(" >= ")?;
                 self.visit_database_value(*right)
             }
-            Compare::In(left, right) => match *right {
-                DatabaseValue::Row(ref row) if row.is_empty() => self.write("1=0"),
-                _ => match *right {
-                    DatabaseValue::Parameterized(pv) => {
-                        self.visit_database_value(*left)?;
-                        self.write(" = ")?;
-                        self.visit_parameterized(pv)
-                    }
-                    dbv => {
-                        self.visit_database_value(*left)?;
-                        self.write(" IN ")?;
-                        self.visit_database_value(dbv)
-                    }
-                },
+            Compare::In(left, right) => match (*left, *right) {
+                (_, DatabaseValue::Row(ref row)) if row.is_empty() => self.write("1=0"),
+                (DatabaseValue::Row(mut cols), DatabaseValue::Values(vals)) if cols.len() == 1 && vals.row_len() == 1 => {
+                    let col = cols.pop().unwrap();
+                    let vals = vals.flatten_row().unwrap();
+
+                    self.visit_database_value(col)?;
+                    self.write(" IN ")?;
+                    self.visit_row(vals)
+                }
+                (left, DatabaseValue::Parameterized(pv)) => {
+                    self.visit_database_value(left)?;
+                    self.write(" = ")?;
+                    self.visit_parameterized(pv)
+                }
+                (left, dbv) => {
+                    self.visit_database_value(left)?;
+                    self.write(" IN ")?;
+                    self.visit_database_value(dbv)
+                }
             },
-            Compare::NotIn(left, right) => match *right {
-                DatabaseValue::Row(ref row) if row.is_empty() => self.write("1=1"),
-                _ => match *right {
-                    DatabaseValue::Parameterized(pv) => {
-                        self.visit_database_value(*left)?;
-                        self.write(" <> ")?;
-                        self.visit_parameterized(pv)
-                    }
-                    dbv => {
-                        self.visit_database_value(*left)?;
-                        self.write(" NOT IN ")?;
-                        self.visit_database_value(dbv)
-                    }
-                },
+            Compare::NotIn(left, right) => match (*left, *right) {
+                (_, DatabaseValue::Row(ref row)) if row.is_empty() => self.write("1=0"),
+                (DatabaseValue::Row(mut cols), DatabaseValue::Values(vals)) if cols.len() == 1 && vals.row_len() == 1 => {
+                    let col = cols.pop().unwrap();
+                    let vals = vals.flatten_row().unwrap();
+
+                    self.visit_database_value(col)?;
+                    self.write(" NOT IN ")?;
+                    self.visit_row(vals)
+                }
+                (left, DatabaseValue::Parameterized(pv)) => {
+                    self.visit_database_value(left)?;
+                    self.write(" <> ")?;
+                    self.visit_parameterized(pv)
+                }
+                (left, dbv) => {
+                    self.visit_database_value(left)?;
+                    self.write(" NOT IN ")?;
+                    self.visit_database_value(dbv)
+                }
             },
             Compare::Like(left, right) => {
                 self.visit_database_value(*left)?;

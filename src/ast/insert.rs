@@ -174,7 +174,7 @@ impl<'a> SingleRowInsert<'a> {
         V: Into<DatabaseValue<'a>>,
     {
         self.columns.push(key.into());
-        self.values = self.values.push(val.into());
+        self.values.push(val.into());
 
         self
     }

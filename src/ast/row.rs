@@ -17,16 +17,23 @@ impl<'a> Row<'a> {
         Row { values: Vec::with_capacity(capacity) }
     }
 
-    pub fn push<T>(mut self, value: T) -> Self
+    pub fn pop(&mut self) -> Option<DatabaseValue<'a>> {
+        self.values.pop()
+    }
+
+    pub fn push<T>(&mut self, value: T)
     where
         T: Into<DatabaseValue<'a>>,
     {
         self.values.push(value.into());
-        self
     }
 
     pub fn is_empty(&self) -> bool {
         self.values.is_empty()
+    }
+
+    pub fn len(&self) -> usize {
+        self.values.len()
     }
 }
 
@@ -34,9 +41,14 @@ impl<'a, T> From<Vec<T>> for Row<'a>
 where
     T: Into<DatabaseValue<'a>>,
 {
-    #[inline]
     fn from(vector: Vec<T>) -> Row<'a> {
-        vector.into_iter().fold(Row::new(), |row, v| row.push(v.into()))
+        let mut row = Row::with_capacity(vector.len());
+
+        for v in vector.into_iter() {
+            row.push(v.into());
+        }
+
+        row
     }
 }
 
@@ -44,9 +56,10 @@ impl<'a, A> From<(A,)> for Row<'a>
 where
     A: Into<DatabaseValue<'a>>,
 {
-    #[inline]
     fn from((val,): (A,)) -> Self {
-        Row::with_capacity(1).push(val)
+        let mut row = Row::with_capacity(1);
+        row.push(val);
+        row
     }
 }
 
@@ -55,9 +68,13 @@ where
     A: Into<DatabaseValue<'a>>,
     B: Into<DatabaseValue<'a>>,
 {
-    #[inline]
     fn from(vals: (A, B)) -> Self {
-        Row::with_capacity(2).push(vals.0).push(vals.1)
+        let mut row = Row::with_capacity(2);
+
+        row.push(vals.0);
+        row.push(vals.1);
+
+        row
     }
 }
 
@@ -69,7 +86,13 @@ where
 {
     #[inline]
     fn from(vals: (A, B, C)) -> Self {
-        Row::with_capacity(3).push(vals.0).push(vals.1).push(vals.2)
+        let mut row = Row::with_capacity(3);
+
+        row.push(vals.0);
+        row.push(vals.1);
+        row.push(vals.2);
+
+        row
     }
 }
 
@@ -82,7 +105,14 @@ where
 {
     #[inline]
     fn from(vals: (A, B, C, D)) -> Self {
-        Row::with_capacity(4).push(vals.0).push(vals.1).push(vals.2).push(vals.3)
+        let mut row = Row::with_capacity(4);
+
+        row.push(vals.0);
+        row.push(vals.1);
+        row.push(vals.2);
+        row.push(vals.3);
+
+        row
     }
 }
 
@@ -96,12 +126,15 @@ where
 {
     #[inline]
     fn from(vals: (A, B, C, D, E)) -> Self {
-        Row::with_capacity(5)
-            .push(vals.0)
-            .push(vals.1)
-            .push(vals.2)
-            .push(vals.3)
-            .push(vals.4)
+        let mut row = Row::with_capacity(5);
+
+        row.push(vals.0);
+        row.push(vals.1);
+        row.push(vals.2);
+        row.push(vals.3);
+        row.push(vals.4);
+
+        row
     }
 }
 

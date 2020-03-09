@@ -817,13 +817,19 @@ impl<'a> Values<'a> {
         Self::default()
     }
 
+    /// Create a new in-memory set of values with an allocated capacity.
+    pub fn with_capacity(capacity: usize) -> Self {
+        Self {
+            rows: Vec::with_capacity(capacity)
+        }
+    }
+
     /// Add value to the temporary table.
-    pub fn push<T>(mut self, row: T) -> Self
+    pub fn push<T>(&mut self, row: T)
     where
         T: Into<Row<'a>>,
     {
         self.rows.push(row.into());
-        self
     }
 
     /// The number of rows in the in-memory table.
@@ -834,6 +840,26 @@ impl<'a> Values<'a> {
     /// True if has no rows.
     pub fn is_empty(&self) -> bool {
         self.len() == 0
+    }
+
+    pub fn row_len(&self) -> usize {
+        match self.rows.split_first() {
+            Some((row, _)) => row.len(),
+            None => 0,
+        }
+    }
+
+    pub fn flatten_row(self) -> Option<Row<'a>> {
+        let mut result = Row::with_capacity(self.len());
+
+        for mut row in self.rows.into_iter() {
+            match row.pop() {
+                Some(value) => result.push(value),
+                None => return None
+            }
+        }
+
+        Some(result)
     }
 }
 

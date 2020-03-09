@@ -214,6 +214,38 @@ mod tests {
     }
 
     #[test]
+    fn test_in_values_singular() {
+        let mut cols = Row::new();
+        cols.push(Column::from("id1"));
+
+        let mut vals = Values::new();
+
+        {
+            let mut row1 = Row::new();
+            row1.push(1);
+
+            let mut row2 = Row::new();
+            row2.push(2);
+
+            vals.push(row1);
+            vals.push(row2);
+        }
+
+        let query = Select::from_table("test").so_that(cols.in_selection(vals));
+        let (sql, params) = Sqlite::build(query);
+        let expected_sql = "SELECT `test`.* FROM `test` WHERE `id1` IN (?,?)";
+
+        assert_eq!(expected_sql, sql);
+        assert_eq!(
+            vec![
+                ParameterizedValue::Integer(1),
+                ParameterizedValue::Integer(2),
+            ],
+            params
+        )
+    }
+
+    #[test]
     fn test_select_order_by() {
         let expected_sql = "SELECT `musti`.* FROM `musti` ORDER BY `foo`, `baz` ASC, `bar` DESC";
         let query = Select::from_table("musti")
