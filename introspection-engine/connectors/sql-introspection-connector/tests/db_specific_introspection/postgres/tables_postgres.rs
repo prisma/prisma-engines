@@ -364,16 +364,26 @@ async fn introspecting_a_default_value_as_dbgenerated_should_work(api: &TestApi)
         .execute(|migration| {
             migration.create_table("Test", |t| {
                 t.add_column("id", types::primary());
-                t.inject_custom("text text Default 'Concatenated'||E'\n'");
-                t.inject_custom("int Integer DEFAULT nextval('test_seq')");
+                t.inject_custom("string_static text Default 'test'");
+                t.inject_custom("string_function text Default 'Concatenated'||E'\n'");
+                t.inject_custom("int_static Integer DEFAULT 2");
+                t.inject_custom("int_sequence Integer DEFAULT nextval('test_seq')");
+                t.inject_custom("float_static Float DEFAULT 1.43");
+                t.inject_custom("boolean_static Boolean DEFAULT true");
             });
         })
         .await;
 
     let dm = r#"
             model Test {
-                id       Int         @id @default(autoincrement())
-                text     String?         @default(dbgenerated()) 
+                boolean_static  Boolean? @default(dbgenerated())
+                float_static    Float?   @default(dbgenerated())
+                id              Int      @default(dbgenerated()) @id
+                int_sequence    Int      @default(dbgenerated())
+                int_static      Int      @default(dbgenerated())
+                string_function String?  @default(dbgenerated())
+                string_static   String?  @default(dbgenerated())
+                             
             }
         "#;
 
