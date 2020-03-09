@@ -292,6 +292,93 @@ impl GetRow for PostgresRow {
                         None => ParameterizedValue::Null,
                     }
                 }
+                #[cfg(feature = "array")]
+                PostgresType::MONEY_ARRAY => match row.try_get(i)? {
+                    Some(val) => {
+                        let val: Vec<NaiveMoney> = val;
+                        ParameterizedValue::Array(val.into_iter().map(|x| ParameterizedValue::Real(x.0)).collect())
+                    }
+                    None => ParameterizedValue::Null,
+                },
+                #[cfg(feature = "array")]
+                PostgresType::OID_ARRAY => match row.try_get(i)? {
+                    Some(val) => {
+                        let val: Vec<u32> = val;
+                        ParameterizedValue::Array(
+                            val.into_iter().map(|x| ParameterizedValue::Integer(x as i64)).collect(),
+                        )
+                    }
+                    None => ParameterizedValue::Null,
+                },
+                #[cfg(feature = "array")]
+                PostgresType::TIMESTAMPTZ_ARRAY => match row.try_get(i)? {
+                    Some(val) => {
+                        let val: Vec<DateTime<Utc>> = val;
+                        ParameterizedValue::Array(val.into_iter().map(|x| ParameterizedValue::DateTime(x)).collect())
+                    }
+                    None => ParameterizedValue::Null,
+                },
+                #[cfg(feature = "array")]
+                PostgresType::DATE_ARRAY => match row.try_get(i)? {
+                    Some(val) => {
+                        let val: Vec<chrono::NaiveDate> = val;
+                        ParameterizedValue::Array(
+                            val.into_iter()
+                                .map(|date| {
+                                    let dt = date.and_time(chrono::NaiveTime::from_hms(0, 0, 0));
+                                    ParameterizedValue::DateTime(chrono::DateTime::from_utc(dt, Utc))
+                                })
+                                .collect(),
+                        )
+                    }
+                    None => ParameterizedValue::Null,
+                },
+                #[cfg(feature = "array")]
+                PostgresType::TIME_ARRAY => match row.try_get(i)? {
+                    Some(val) => {
+                        let val: Vec<chrono::NaiveTime> = val;
+                        ParameterizedValue::Array(
+                            val.into_iter()
+                                .map(|time| {
+                                    let dt = NaiveDateTime::new(chrono::NaiveDate::from_ymd(1970, 1, 1), time);
+                                    ParameterizedValue::DateTime(chrono::DateTime::from_utc(dt, Utc))
+                                })
+                                .collect(),
+                        )
+                    }
+                    None => ParameterizedValue::Null,
+                },
+                #[cfg(feature = "array")]
+                PostgresType::TIMETZ_ARRAY => match row.try_get(i)? {
+                    Some(val) => {
+                        let val: Vec<TimeTz> = val;
+                        ParameterizedValue::Array(
+                            val.into_iter()
+                                .map(|time| {
+                                    let dt = NaiveDateTime::new(chrono::NaiveDate::from_ymd(1970, 1, 1), time.0);
+                                    ParameterizedValue::DateTime(chrono::DateTime::from_utc(dt, Utc))
+                                })
+                                .collect(),
+                        )
+                    }
+                    None => ParameterizedValue::Null,
+                },
+                #[cfg(feature = "array")]
+                PostgresType::JSON_ARRAY => match row.try_get(i)? {
+                    Some(val) => {
+                        let val: Vec<serde_json::Value> = val;
+                        ParameterizedValue::Array(val.into_iter().map(|json| ParameterizedValue::Json(json)).collect())
+                    }
+                    None => ParameterizedValue::Null,
+                },
+                #[cfg(feature = "array")]
+                PostgresType::JSONB_ARRAY => match row.try_get(i)? {
+                    Some(val) => {
+                        let val: Vec<serde_json::Value> = val;
+                        ParameterizedValue::Array(val.into_iter().map(|json| ParameterizedValue::Json(json)).collect())
+                    }
+                    None => ParameterizedValue::Null,
+                },
                 PostgresType::OID => match row.try_get(i)? {
                     Some(val) => {
                         let val: u32 = val;
