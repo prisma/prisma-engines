@@ -1284,7 +1284,7 @@ class SinglePKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBase 
   // - Before
   // - After
   // ---------------------------------------
-  "Using  cursors for an ID that is also a 1!:M single-field relation" should "work" in {
+  "Using cursors for an ID that is also a 1!:M single-field relation" should "work" in {
     val project = ProjectDsl.fromString {
       s"""
          |model Parent {
