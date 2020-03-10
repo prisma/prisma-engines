@@ -18,17 +18,18 @@ pub fn build(query_arguments: &QueryArguments, model: ModelRef) -> ConditionTree
         (before, after, order_by) => {
             let id_projection = model.primary_identifier();
 
-            let (comparison_field, sort_order) = match order_by {
-                Some(x) => (&x.field, x.sort_order),
-                None if id_projection.db_len() == 1 => (id_projection.fields().next().unwrap(), SortOrder::Ascending),
-                None => {
-                    panic!("Order by with multiple fields or data source fields is not permitted. This must be caught by query validation.")
-                }
+            let (comparison_fields, sort_order) = match order_by {
+                Some(x) => (x.field.data_source_fields(), x.sort_order),
+                None => (id_projection.data_source_fields().collect(), SortOrder::Ascending),
             };
 
             let cursor_for = |cursor_type: CursorType, projection: &RecordProjection| {
-                // Invariant: We know that the comparison field can only yield one column.
-                let columns: Vec<_> = comparison_field.as_columns().collect();
+                let columns: Vec<_> = comparison_fields
+                    .as_slice()
+                    .into_iter()
+                    .map(|dsf| dsf.as_column())
+                    .collect();
+
                 let order_row = Row::from(columns.clone());
                 let fields: Vec<_> = projection.fields().collect();
                 let values: Vec<_> = projection.values().collect();

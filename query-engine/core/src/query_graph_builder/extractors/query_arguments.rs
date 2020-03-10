@@ -79,7 +79,6 @@ fn extract_cursor(value: ParsedInputValue, model: &ModelRef) -> QueryGraphBuilde
             .fields()
             .find_from_all(&field_name)
             .map(|f| vec![f.clone()])
-            // .map_err(|err| err.into())
             .or_else(|_| {
                 utils::resolve_compound_field(&field_name, &model).ok_or(QueryGraphBuilderError::AssertionError(
                     format!(
@@ -117,9 +116,18 @@ fn extract_cursor(value: ParsedInputValue, model: &ModelRef) -> QueryGraphBuilde
                     }
 
                     Field::Relation(rf) => {
-                        for dsf in rf.data_source_fields() {
-                            let value = compound_map.remove(&dsf.name).unwrap().try_into()?;
-                            pairs.push((dsf.clone(), value));
+                        let dsfs = rf.data_source_fields();
+
+                        if dsfs.len() == 1 {
+                            let pv: PrismaValue = compound_map.remove(&rf.name).unwrap().try_into()?;
+                            pairs.push((dsfs.first().unwrap().clone(), pv));
+                        } else {
+                            let mut rf_map: ParsedInputMap = compound_map.remove(&rf.name).unwrap().try_into()?;
+
+                            for dsf in dsfs {
+                                let pv: PrismaValue = rf_map.remove(&dsf.name).unwrap().try_into()?;
+                                pairs.push((dsf.clone(), pv));
+                            }
                         }
                     }
                 }
