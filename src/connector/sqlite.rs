@@ -209,12 +209,11 @@ mod tests {
     use super::*;
     use crate::{
         ast::*,
+        col,
         connector::{Queryable, TransactionCapable},
         error::{DatabaseConstraint, ErrorKind},
-        val,
-        col,
-        values,
         single::Quaint,
+        val, values,
     };
 
     #[test]

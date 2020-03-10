@@ -820,7 +820,7 @@ impl<'a> Values<'a> {
     /// Create a new in-memory set of values with an allocated capacity.
     pub fn with_capacity(capacity: usize) -> Self {
         Self {
-            rows: Vec::with_capacity(capacity)
+            rows: Vec::with_capacity(capacity),
         }
     }
 
@@ -855,7 +855,7 @@ impl<'a> Values<'a> {
         for mut row in self.rows.into_iter() {
             match row.pop() {
                 Some(value) => result.push(value),
-                None => return None
+                None => return None,
             }
         }
 

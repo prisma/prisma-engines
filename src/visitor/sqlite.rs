@@ -237,10 +237,7 @@ mod tests {
 
         assert_eq!(expected_sql, sql);
         assert_eq!(
-            vec![
-                ParameterizedValue::Integer(1),
-                ParameterizedValue::Integer(2),
-            ],
+            vec![ParameterizedValue::Integer(1), ParameterizedValue::Integer(2),],
             params
         )
     }
