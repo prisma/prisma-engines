@@ -162,9 +162,7 @@ pub fn row_value_to_prisma_value(
                 PrismaValue::String(serde_json::to_string(&json_value).expect("JSON value to string"))
             }
             ParameterizedValue::Null => PrismaValue::Null,
-            _ => p_value.into_string().map(PrismaValue::String).ok_or_else(|| {
-                SqlError::ConversionError(failure::format_err!("Could not extract text value from result set"))
-            })?,
+            other => PrismaValue::from(other),
         },
     })
 }
