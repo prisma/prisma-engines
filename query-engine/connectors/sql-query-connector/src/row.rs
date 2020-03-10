@@ -158,10 +158,14 @@ pub fn row_value_to_prisma_value(
         },
         TypeIdentifier::String => match p_value {
             ParameterizedValue::Uuid(uuid) => PrismaValue::String(uuid.to_string()),
-            ParameterizedValue::Json(json_value) => PrismaValue::String(serde_json::to_string(&json_value).expect("JSON value to string")),
+            ParameterizedValue::Json(json_value) => {
+                PrismaValue::String(serde_json::to_string(&json_value).expect("JSON value to string"))
+            }
+            ParameterizedValue::Null => PrismaValue::Null,
             _ => p_value.into_string().map(PrismaValue::String).ok_or_else(|| {
-            SqlError::ConversionError(failure::format_err!("Could not extract text value from result set")) })?,
-        }
+                SqlError::ConversionError(failure::format_err!("Could not extract text value from result set"))
+            })?,
+        },
     })
 }
 
