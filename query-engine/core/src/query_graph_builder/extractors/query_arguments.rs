@@ -4,7 +4,7 @@ use crate::{
     QueryGraphBuilderError, QueryGraphBuilderResult,
 };
 use connector::QueryArguments;
-use prisma_models::{Field, ModelRef, PrismaValue, RecordProjection};
+use prisma_models::{DataSourceFieldRef, Field, ModelRef, PrismaValue, RecordProjection};
 use std::convert::TryInto;
 
 /// Expects the caller to know that it is structurally guaranteed that query arguments can be extracted,
@@ -74,66 +74,65 @@ fn extract_cursor(value: ParsedInputValue, model: &ModelRef) -> QueryGraphBuilde
     let mut pairs = vec![];
 
     for (field_name, map_value) in input_map {
-        // Always try to resolve regular fields first. If that fails, try to resolve compound fields.
-        let model_fields = model
-            .fields()
-            .find_from_all(&field_name)
-            .map(|f| vec![f.clone()])
-            .or_else(|_| {
-                utils::resolve_compound_field(&field_name, &model).ok_or(QueryGraphBuilderError::AssertionError(
-                    format!(
-                        "Unable to resolve field {} to a field or a set of fields on model {}",
-                        field_name, model.name
-                    ),
-                ))
-            })?;
+        let additional_pairs = match model.fields().find_from_all(&field_name) {
+            Ok(field) => extract_cursor_field(field, map_value)?,
+            Err(_) => match utils::resolve_compound_field(&field_name, &model) {
+                Some(fields) => extract_compound_cursor_field(fields, map_value)?,
+                None => Err(QueryGraphBuilderError::AssertionError(format!(
+                    "Unable to resolve field {} to a field or a set of fields on model {}",
+                    field_name, model.name
+                )))?,
+            },
+        };
 
-        if model_fields.len() == 1
-            && model_fields
-                .first()
-                .map(|f| f.data_source_fields().len() == 1)
-                .unwrap_or(false)
-        {
-            // Single field to single underlying data source field case.
-            let field = model_fields.first().unwrap();
-            let dsf = field.data_source_fields().pop().unwrap();
-            let value: PrismaValue = map_value.try_into()?;
-
-            pairs.push((dsf, value));
-        } else {
-            // Compound / relation field with > 1 db fields case.
-            let mut compound_map: ParsedInputMap = map_value.try_into()?;
-
-            for field in model_fields {
-                // Relation and scalar fields are different in the way their underlying fields in the map are named:
-                // - Scalar has actual model field names in the compound map.
-                // - Relation has data source field names in the compound map for lack of a better mapping in the schema.
-                // Unwraps are safe because query validation guarantees that values are present.
-                match field {
-                    Field::Scalar(sf) => {
-                        let value = compound_map.remove(&sf.name).unwrap().try_into()?;
-                        pairs.push((sf.data_source_field().clone(), value));
-                    }
-
-                    Field::Relation(rf) => {
-                        let dsfs = rf.data_source_fields();
-
-                        if dsfs.len() == 1 {
-                            let pv: PrismaValue = compound_map.remove(&rf.name).unwrap().try_into()?;
-                            pairs.push((dsfs.first().unwrap().clone(), pv));
-                        } else {
-                            let mut rf_map: ParsedInputMap = compound_map.remove(&rf.name).unwrap().try_into()?;
-
-                            for dsf in dsfs {
-                                let pv: PrismaValue = rf_map.remove(&dsf.name).unwrap().try_into()?;
-                                pairs.push((dsf.clone(), pv));
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        pairs.extend(additional_pairs);
     }
 
     Ok(Some(RecordProjection::new(pairs)))
+}
+
+fn extract_cursor_field(
+    field: &Field,
+    input_value: ParsedInputValue,
+) -> QueryGraphBuilderResult<Vec<(DataSourceFieldRef, PrismaValue)>> {
+    match field {
+        Field::Scalar(sf) => {
+            let value = input_value.try_into()?;
+            Ok(vec![(sf.data_source_field().clone(), value)])
+        }
+
+        Field::Relation(rf) => {
+            let dsfs = rf.data_source_fields();
+
+            if dsfs.len() == 1 {
+                let value = input_value.try_into()?;
+                Ok(vec![(rf.data_source_fields().first().unwrap().clone(), value)])
+            } else {
+                let mut rf_map: ParsedInputMap = input_value.try_into()?;
+                let mut pairs = vec![];
+
+                for dsf in dsfs {
+                    let pv: PrismaValue = rf_map.remove(&dsf.name).unwrap().try_into()?;
+                    pairs.push((dsf.clone(), pv));
+                }
+
+                Ok(pairs)
+            }
+        }
+    }
+}
+
+fn extract_compound_cursor_field(
+    fields: Vec<Field>,
+    input_value: ParsedInputValue,
+) -> QueryGraphBuilderResult<Vec<(DataSourceFieldRef, PrismaValue)>> {
+    let mut map: ParsedInputMap = input_value.try_into()?;
+    let mut pairs = vec![];
+
+    for field in fields {
+        let value = map.remove(field.name()).unwrap();
+        pairs.extend(extract_cursor_field(&field, value)?);
+    }
+
+    Ok(pairs)
 }
