@@ -24,7 +24,7 @@ impl TestApi {
         )
     }
 
-    pub async fn execute(&self, sql: &str) -> anyhow::Result<()> {
+    pub async fn execute_sql(&self, sql: &str) -> anyhow::Result<()> {
         let conn = quaint::single::Quaint::new(&self.database_string).await?;
 
         conn.execute_raw(sql, &[]).await?;
@@ -32,10 +32,8 @@ impl TestApi {
         Ok(())
     }
 
-    pub async fn create_engine(&self) -> anyhow::Result<(DatamodelAssertions, QueryEngine)> {
+    pub async fn introspect_and_start_query_engine(&self) -> anyhow::Result<(DatamodelAssertions, QueryEngine)> {
         let datasource = self.datasource();
-
-        dbg!(&datasource);
 
         let schema = introspection_core::RpcImpl::introspect_internal(datasource)
             .await

@@ -64,9 +64,9 @@ const CREATE_TYPES_TABLE: &str = indoc! {
 
 #[test_each_connector(tags("postgres"), log = "debug")]
 async fn postgres_types_roundtrip(api: &TestApi) -> TestResult {
-    api.execute(CREATE_TYPES_TABLE).await?;
+    api.execute_sql(CREATE_TYPES_TABLE).await?;
 
-    let (datamodel, engine) = api.create_engine().await?;
+    let (datamodel, engine) = api.introspect_and_start_query_engine().await?;
 
     datamodel.assert_model("types", |model| {
         model
@@ -245,9 +245,9 @@ async fn small_float_values_must_work(api: &TestApi) -> TestResult {
         "#
     };
 
-    api.execute(schema).await?;
+    api.execute_sql(schema).await?;
 
-    let (datamodel, engine) = api.create_engine().await?;
+    let (datamodel, engine) = api.introspect_and_start_query_engine().await?;
 
     datamodel.assert_model("floatilla", |model| {
         model
@@ -336,9 +336,9 @@ const CREATE_ARRAY_TYPES_TABLE: &str = indoc! {
 
 #[test_each_connector(tags("postgres"), log = "debug")]
 async fn postgres_array_types_roundtrip(api: &TestApi) -> TestResult {
-    api.execute(CREATE_ARRAY_TYPES_TABLE).await?;
+    api.execute_sql(CREATE_ARRAY_TYPES_TABLE).await?;
 
-    let (datamodel, engine) = api.create_engine().await?;
+    let (datamodel, engine) = api.introspect_and_start_query_engine().await?;
 
     datamodel.assert_model("arraytypes", |model| {
         model

@@ -55,9 +55,9 @@ const CREATE_TYPES_TABLE: &str = indoc! {
 
 #[test_each_connector(tags("mysql"))]
 async fn mysql_types_roundtrip(api: &TestApi) -> TestResult {
-    api.execute(CREATE_TYPES_TABLE).await?;
+    api.execute_sql(CREATE_TYPES_TABLE).await?;
 
-    let (datamodel, engine) = api.create_engine().await?;
+    let (datamodel, engine) = api.introspect_and_start_query_engine().await?;
 
     datamodel.assert_model("types", |model| {
         model
@@ -241,9 +241,9 @@ async fn mysql_types_roundtrip(api: &TestApi) -> TestResult {
 
 #[test_each_connector(tags("mysql"))]
 async fn mysql_bit_columns_are_properly_mapped_to_signed_integers(api: &TestApi) -> TestResult {
-    api.execute(CREATE_TYPES_TABLE).await?;
+    api.execute_sql(CREATE_TYPES_TABLE).await?;
 
-    let (_datamodel, engine) = api.create_engine().await?;
+    let (_datamodel, engine) = api.introspect_and_start_query_engine().await?;
 
     let write = indoc! {
         "
