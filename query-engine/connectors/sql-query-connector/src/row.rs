@@ -33,6 +33,7 @@ impl ToSqlRow for ResultRow {
     fn to_sql_row<'b>(self, idents: &[(TypeIdentifier, FieldArity)]) -> crate::Result<SqlRow> {
         let mut row = SqlRow::default();
         let row_width = idents.len();
+        row.values.reserve(row_width);
         for (i, p_value) in self.into_iter().enumerate().take(row_width) {
             let pv = match &idents[i] {
                 (type_identifier, FieldArity::List) => match p_value {
@@ -118,7 +119,10 @@ pub fn row_value_to_prisma_value(
             ParameterizedValue::Text(dt_string) => {
                 let dt = DateTime::parse_from_rfc3339(dt_string.borrow())
                     .or_else(|_| DateTime::parse_from_rfc2822(dt_string.borrow()))
-                    .expect(&format!("Could not parse stored DateTime string: {}", dt_string));
+                    .map_err(|err| {
+                        failure::format_err!("Could not parse stored DateTime string: {} ({})", dt_string, err)
+                    })
+                    .unwrap();
 
                 PrismaValue::DateTime(dt.with_timezone(&Utc))
             }
@@ -136,9 +140,13 @@ pub fn row_value_to_prisma_value(
             ParameterizedValue::Integer(i) => {
                 PrismaValue::Float(Decimal::from_f64(i as f64).expect("f64 was not a Decimal."))
             }
-            ParameterizedValue::Text(_) | ParameterizedValue::Bytes(_) => {
-                PrismaValue::Float(p_value.as_str().unwrap().parse().unwrap())
-            }
+            ParameterizedValue::Text(_) | ParameterizedValue::Bytes(_) => PrismaValue::Float(
+                p_value
+                    .as_str()
+                    .expect("text/bytes as str")
+                    .parse()
+                    .map_err(|err: rust_decimal::Error| SqlError::ColumnReadFailure(err.into()))?,
+            ),
             _ => {
                 let error = io::Error::new(
                     io::ErrorKind::InvalidData,
