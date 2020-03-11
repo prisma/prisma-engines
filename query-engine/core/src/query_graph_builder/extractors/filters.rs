@@ -24,6 +24,7 @@ static FILTER_OPERATIONS: &'static [FilterOp] = &[
     FilterOp::Some,
     FilterOp::None,
     FilterOp::Every,
+    FilterOp::Inlined,
     FilterOp::NestedAnd,
     FilterOp::NestedOr,
     FilterOp::NestedNot,
@@ -48,6 +49,7 @@ enum FilterOp {
     Some,
     None,
     Every,
+    Inlined,
     NestedAnd,
     NestedOr,
     NestedNot,
@@ -84,6 +86,7 @@ impl FilterOp {
             FilterOp::Some => "_some",
             FilterOp::None => "_none",
             FilterOp::Every => "_every",
+            FilterOp::Inlined => "_inlined",
             FilterOp::NestedAnd => "AND",
             FilterOp::NestedOr => "OR",
             FilterOp::NestedNot => "NOT",
@@ -196,28 +199,29 @@ fn handle_relation_field(
     // Caveat: Null values are a grey zone. For now we assume that null values translate to the "one relation is null" filter and does not
     // translate to a nullable field underneath.
     match (op, &value) {
-        (FilterOp::Field, ParsedInputValue::Single(ref pv)) => match pv {
-            PrismaValue::Null => handle_relation_field_filter(field, value, op, match_suffix),
-            _ => handle_relation_field_selector(field, value),
-        },
+        (FilterOp::Inlined, _) => handle_relation_field_selector(field, value),
 
-        (FilterOp::Field, ParsedInputValue::Map(map)) => {
-            let dsf_names = field
-                .data_source_fields()
-                .into_iter()
-                .map(|dsf| &dsf.name)
-                .collect::<Vec<_>>()
-                .sort();
+        // (FilterOp::Field, ParsedInputValue::Single(ref pv)) => match pv {
+        //     PrismaValue::Null => handle_relation_field_filter(field, value, op, match_suffix),
+        //     _ => handle_relation_field_selector(field, value),
+        // },
 
-            let map_keys = map.keys().collect::<Vec<_>>().sort();
+        // (FilterOp::Field, ParsedInputValue::Map(map)) => {
+        //     let dsf_names = field
+        //         .data_source_fields()
+        //         .into_iter()
+        //         .map(|dsf| &dsf.name)
+        //         .collect::<Vec<_>>()
+        //         .sort();
 
-            if dsf_names == map_keys {
-                handle_relation_field_selector(field, value)
-            } else {
-                handle_relation_field_filter(field, value, op, match_suffix)
-            }
-        }
+        //     let map_keys = map.keys().collect::<Vec<_>>().sort();
 
+        //     if dsf_names == map_keys {
+        //         handle_relation_field_selector(field, value)
+        //     } else {
+        //         handle_relation_field_filter(field, value, op, match_suffix)
+        //     }
+        // }
         _ => handle_relation_field_filter(field, value, op, match_suffix),
     }
 }
