@@ -142,7 +142,7 @@ impl<'a> SqlSchemaCalculator<'a> {
                     if f.is_unique() {
                         Some(sql::Index {
                             name: format!("{}.{}", &model.db_name(), &f.db_name()),
-                            columns: vec![f.db_name().to_owned()],
+                            columns: f.data_source_fields().iter().map(|f| f.name.clone()).collect(),
                             tpe: sql::IndexType::Unique,
                         })
                     } else {
