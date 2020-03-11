@@ -1950,11 +1950,13 @@ dependencies = [
  "hyper",
  "indexmap",
  "indoc",
+ "introspection-core",
  "itertools",
  "log",
  "migration-connector",
  "migration-core",
  "once_cell",
+ "pretty_assertions",
  "prisma-inflector",
  "prisma-models",
  "quaint",
@@ -1974,6 +1976,7 @@ dependencies = [
  "tokio",
  "tracing",
  "tracing-attributes",
+ "tracing-futures",
  "tracing-log",
  "tracing-subscriber",
  "url 2.1.1",
@@ -2107,9 +2110,10 @@ dependencies = [
 [[package]]
 name = "quaint"
 version = "0.2.0-alpha.9"
-source = "git+https://github.com/prisma/quaint#f3c27482fd49bde532339716cce514d764fa9548"
+source = "git+https://github.com/prisma/quaint#5c85aed15976ebd8c9004251302424a587c8840b"
 dependencies = [
  "async-trait",
+ "base64 0.11.0",
  "bytes",
  "chrono",
  "futures 0.3.4",

@@ -22,6 +22,10 @@ pub struct QueryEngine {
 }
 
 impl QueryEngine {
+    pub fn new(ctx: PrismaContext) -> Self {
+        QueryEngine { context: Arc::new(ctx) }
+    }
+
     pub async fn request(&self, body: impl Into<SingleQuery>) -> serde_json::Value {
         let request = PrismaRequest {
             body: GraphQlBody::Single(body.into()),

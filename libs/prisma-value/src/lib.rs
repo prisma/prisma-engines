@@ -141,16 +141,6 @@ impl TryFrom<f64> for PrismaValue {
     fn try_from(f: f64) -> PrismaValueResult<PrismaValue> {
         Decimal::from_f64(f)
             .map(|d| PrismaValue::Float(d))
-            .ok_or(ConversionFailure::new("f32", "Decimal"))
-    }
-}
-
-impl TryFrom<f32> for PrismaValue {
-    type Error = ConversionFailure;
-
-    fn try_from(f: f32) -> PrismaValueResult<PrismaValue> {
-        Decimal::from_f32(f)
-            .map(|d| PrismaValue::Float(d))
             .ok_or(ConversionFailure::new("f64", "Decimal"))
     }
 }

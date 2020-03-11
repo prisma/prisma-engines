@@ -15,6 +15,9 @@ impl<'a> From<ParameterizedValue<'a>> for PrismaValue {
             ParameterizedValue::Uuid(uuid) => PrismaValue::Uuid(uuid),
             ParameterizedValue::DateTime(dt) => PrismaValue::DateTime(dt),
             ParameterizedValue::Char(c) => PrismaValue::String(c.to_string()),
+            ParameterizedValue::Bytes(bytes) => PrismaValue::String(
+                String::from_utf8(bytes.into_owned()).expect("PrismaValue::String from ParameterizedValue::Bytes"),
+            ),
         }
     }
 }

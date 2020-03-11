@@ -335,11 +335,17 @@ pub async fn create_postgres_database(original_url: &Url) -> Result<Quaint, AnyE
 
     let db_name = fetch_db_name(&original_url, "postgres");
 
+    let drop_stmt = format!("DROP DATABASE IF EXISTS \"{}\"", db_name);
     let create_stmt = format!("CREATE DATABASE \"{}\"", db_name);
+    let create_schema_stmt = format!("CREATE SCHEMA \"{}\"", SCHEMA_NAME);
 
     let conn = Quaint::new(url.as_str()).await.unwrap();
 
+    conn.query_raw(&drop_stmt, &[]).await.ok();
     conn.query_raw(&create_stmt, &[]).await.ok();
 
-    Ok(Quaint::new(original_url.as_str()).await?)
+    let conn = Quaint::new(original_url.as_str()).await?;
+    conn.query_raw(&create_schema_stmt, &[]).await.ok();
+
+    Ok(conn)
 }

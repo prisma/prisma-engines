@@ -43,8 +43,8 @@ impl ToString for ScalarType {
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
 pub enum ScalarValue {
     Int(i32),
-    Float(f32),
-    Decimal(f32),
+    Float(f64),
+    Decimal(f64),
     Boolean(bool),
     String(String),
     DateTime(DateTime<Utc>),

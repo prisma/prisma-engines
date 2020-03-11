@@ -3,8 +3,8 @@ use graphql_parser::query::{
     Definition, Document, OperationDefinition, Selection as GqlSelection, SelectionSet, Value,
 };
 use query_core::query_document::*;
-use rust_decimal::{prelude::FromPrimitive, Decimal};
-use std::collections::BTreeMap;
+use rust_decimal::Decimal;
+use std::{collections::BTreeMap, str::FromStr};
 
 /// Protocol adapter for GraphQL -> Query Document.
 ///
@@ -145,7 +145,9 @@ impl GraphQLProtocolAdapter {
                     i
                 ))),
             },
-            Value::Float(f) => match Decimal::from_f64(f) {
+            // We can't use Decimal::from_f64 here due to a bug in rust_decimal.
+            // Issue: https://github.com/paupino/rust-decimal/issues/228<Paste>
+            Value::Float(f) => match Decimal::from_str(&f.to_string()).ok() {
                 Some(dec) => Ok(QueryValue::Float(dec)),
                 None => Err(PrismaError::QueryConversionError(format!(
                     "invalid 64-bit float: {:?}",

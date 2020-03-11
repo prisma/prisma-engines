@@ -463,7 +463,7 @@ fn parse_bool(value: &str) -> Option<bool> {
 
 static RE_FLOAT: Lazy<Regex> = Lazy::new(|| Regex::new(r"^'?([^']+)'?$").expect("compile regex"));
 
-fn parse_float(value: &str) -> Option<f32> {
+fn parse_float(value: &str) -> Option<f64> {
     debug!("Parsing float '{}'", value);
     let rslt = RE_FLOAT.captures(value);
     if rslt.is_none() {
@@ -473,7 +473,7 @@ fn parse_float(value: &str) -> Option<f32> {
 
     let captures = rslt.expect("get captures");
     let num_str = captures.get(1).expect("get capture").as_str();
-    let num_rslt = num_str.parse::<f32>();
+    let num_rslt = num_str.parse::<f64>();
     match num_rslt {
         Ok(num) => Some(num),
         Err(_) => {
