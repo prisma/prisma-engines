@@ -5,6 +5,7 @@ use crate::{
 use connector_interface::*;
 use prisma_models::*;
 use quaint::ast::*;
+use futures::future;
 
 pub async fn get_single_record(
     conn: &dyn QueryExt,
@@ -36,14 +37,29 @@ pub async fn get_many_records(
 ) -> crate::Result<ManyRecords> {
     let field_names = selected_fields.db_names().map(String::from).collect();
     let idents: Vec<_> = selected_fields.types().collect();
-    let query = read::get_records(model, selected_fields.columns(), query_arguments);
+    let mut records = Vec::new();
 
-    let records = conn
-        .filter(query.into(), idents.as_slice())
-        .await?
-        .into_iter()
-        .map(Record::from)
-        .collect();
+    if query_arguments.can_batch() {
+        let batches = query_arguments.batched();
+        let mut futures = Vec::with_capacity(batches.len());
+
+        for args in batches.into_iter() {
+            let query = read::get_records(model, selected_fields.columns(), args);
+            futures.push(conn.filter(query.into(), idents.as_slice()));
+        }
+
+        for result in future::join_all(futures).await.into_iter() {
+            for item in result?.into_iter() {
+                records.push(Record::from(item))
+            }
+        }
+    } else {
+        let query = read::get_records(model, selected_fields.columns(), query_arguments);
+
+        for item in conn.filter(query.into(), idents.as_slice()).await?.into_iter() {
+            records.push(Record::from(item))
+        }
+    }
 
     Ok(ManyRecords { records, field_names })
 }

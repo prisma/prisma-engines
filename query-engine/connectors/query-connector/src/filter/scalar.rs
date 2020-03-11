@@ -1,7 +1,8 @@
 use super::Filter;
 use crate::compare::ScalarCompare;
+use once_cell::sync::Lazy;
 use prisma_models::{DataSourceFieldRef, ModelProjection, PrismaListValue, PrismaValue};
-use std::sync::Arc;
+use std::{collections::BTreeSet, env, sync::Arc};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ScalarProjection {
@@ -10,9 +11,91 @@ pub enum ScalarProjection {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+/// Filtering with a scalar value. From a GraphQL point of view this is in the
+/// head of the query:
+///
+/// ```graphql
+/// findManyUser(where: { id: 5 })
+/// ````
+///
+/// This translates to a projection of one column `id` with a condition where
+/// the column value equals `5`.
 pub struct ScalarFilter {
     pub projection: ScalarProjection,
     pub condition: ScalarCondition,
+}
+
+/// Number of allowed elements in query's `IN` or `NOT IN` statement.
+/// Certain databases error out if querying with too many items. For test
+/// purposes, this value can be set with the `QUERY_BATCH_SIZE` environment
+/// value to a smaller number.
+static BATCH_SIZE: Lazy<usize> = Lazy::new(|| match env::var("QUERY_BATCH_SIZE") {
+    Ok(size) => size.parse().unwrap_or(5000),
+    Err(_) => 5000,
+});
+
+impl ScalarFilter {
+    /// The number of values in the filter. `IN` and `NOT IN` may contain more
+    /// than one.
+    pub fn len(&self) -> usize {
+        match self.condition {
+            ScalarCondition::In(ref l) => l.len(),
+            ScalarCondition::NotIn(ref l) => l.len(),
+            _ => 1,
+        }
+    }
+
+    /// If `true`, the filter can be split into smaller filters executed in
+    /// separate queries.
+    pub fn can_batch(&self) -> bool {
+        self.len() > *BATCH_SIZE
+    }
+
+    /// If possible, converts the filter into multiple smaller filters.
+    pub fn batched(self) -> Vec<ScalarFilter> {
+        fn inner(mut list: PrismaListValue) -> Vec<PrismaListValue> {
+            let dedup_list: BTreeSet<_> = list.drain(..).collect();
+
+            let mut batches = Vec::with_capacity(list.len() % *BATCH_SIZE + 1);
+            batches.push(Vec::with_capacity(*BATCH_SIZE));
+
+            for (idx, item) in dedup_list.into_iter().enumerate() {
+                if idx != 0 && idx % *BATCH_SIZE == 0 {
+                    batches.push(Vec::with_capacity(*BATCH_SIZE));
+                }
+
+                batches.last_mut().unwrap().push(item);
+            }
+
+            batches
+        }
+
+        match self.condition {
+            ScalarCondition::In(list) => {
+                let projection = self.projection;
+
+                inner(list)
+                    .into_iter()
+                    .map(|batch| ScalarFilter {
+                        projection: projection.clone(),
+                        condition: ScalarCondition::In(batch),
+                    })
+                    .collect()
+            }
+            ScalarCondition::NotIn(list) => {
+                let projection = self.projection;
+
+                inner(list)
+                    .into_iter()
+                    .map(|batch| ScalarFilter {
+                        projection: projection.clone(),
+                        condition: ScalarCondition::NotIn(batch),
+                    })
+                    .collect()
+            }
+            _ => vec![self],
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
