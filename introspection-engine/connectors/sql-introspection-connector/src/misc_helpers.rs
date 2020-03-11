@@ -297,6 +297,8 @@ pub(crate) fn calculate_default(table: &Table, column: &Column, arity: &FieldAri
     // sequence(string)
     // dbgenerated(string)
 
+    println!("{:?}", column);
+
     match (&column.default, &column.tpe.family) {
         (_, _) if *arity == FieldArity::List => None,
         (None, _) if column.auto_increment => Some(DefaultValue::Expression(ValueGenerator::new_autoincrement())),

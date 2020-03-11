@@ -1,6 +1,8 @@
 //! Database description.
 
 use failure::Fail;
+use once_cell::sync::Lazy;
+use regex::Regex;
 use serde::{Deserialize, Serialize};
 use std::fmt;
 
@@ -396,4 +398,43 @@ pub enum DefaultValue {
     SEQUENCE(String),
     /// Unrecognized Default Value
     DBGENERATED(String),
+}
+
+static RE_NUM: Lazy<Regex> = Lazy::new(|| Regex::new(r"^'?(\d+)'?$").expect("compile regex"));
+
+fn parse_int(value: &str) -> Option<i32> {
+    println!("{}", value);
+    let rslt = RE_NUM.captures(value);
+    if rslt.is_none() {
+        return None;
+    }
+
+    let captures = rslt.expect("get captures");
+    let num_str = captures.get(1).expect("get capture").as_str();
+    let num_rslt = num_str.parse::<i32>();
+    match num_rslt {
+        Ok(num) => Some(num),
+        Err(_) => None,
+    }
+}
+
+fn parse_bool(value: &str) -> Option<bool> {
+    value.to_lowercase().parse().ok()
+}
+
+static RE_FLOAT: Lazy<Regex> = Lazy::new(|| Regex::new(r"^'?([^']+)'?$").expect("compile regex"));
+
+fn parse_float(value: &str) -> Option<f32> {
+    let rslt = RE_FLOAT.captures(value);
+    if rslt.is_none() {
+        return None;
+    }
+
+    let captures = rslt.expect("get captures");
+    let num_str = captures.get(1).expect("get capture").as_str();
+    let num_rslt = num_str.parse::<f32>();
+    match num_rslt {
+        Ok(num) => Some(num),
+        Err(_) => None,
+    }
 }

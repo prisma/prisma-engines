@@ -212,32 +212,62 @@ impl SqlSchemaDescriber {
                 None => None,
                 Some(param_value) => match param_value.to_string() {
                     None => None,
-                    Some(default_string) => Some(match &tpe.family {
-                        ColumnTypeFamily::Int => DefaultValue::DBGENERATED(default_string),
-                        ColumnTypeFamily::Float => DefaultValue::DBGENERATED(default_string),
-                        ColumnTypeFamily::Boolean => DefaultValue::DBGENERATED(default_string),
-                        ColumnTypeFamily::String => DefaultValue::DBGENERATED(default_string),
-                        ColumnTypeFamily::DateTime => DefaultValue::DBGENERATED(default_string),
-                        ColumnTypeFamily::Binary => DefaultValue::DBGENERATED(default_string),
-                        ColumnTypeFamily::Json => DefaultValue::DBGENERATED(default_string),
-                        ColumnTypeFamily::Uuid => DefaultValue::DBGENERATED(default_string),
-                        ColumnTypeFamily::Geometric => DefaultValue::DBGENERATED(default_string),
-                        ColumnTypeFamily::LogSequenceNumber => DefaultValue::DBGENERATED(default_string),
-                        ColumnTypeFamily::TextSearch => DefaultValue::DBGENERATED(default_string),
-                        ColumnTypeFamily::TransactionId => DefaultValue::DBGENERATED(default_string),
-                        ColumnTypeFamily::Enum(enum_name) => {
-                            let enum_suffix = format!("::{}", enum_name);
-                            match default_string.ends_with(&enum_suffix) {
-                                true => DefaultValue::VALUE(unquote(default_string.replace(&enum_suffix, ""))),
+                    Some(default_string) => {
+                        println!("{:?}", default_string);
+                        Some(match &tpe.family {
+                            ColumnTypeFamily::Int => match parse_int(&default_string).is_some() {
+                                true => DefaultValue::VALUE(default_string),
+                                false => {
+                                    //todo this can be a sequence or a function
+
+                                    println!("{:?}", parse_int(&default_string));
+                                    DefaultValue::DBGENERATED(default_string)
+                                }
+                            },
+                            ColumnTypeFamily::Float => match parse_float(&default_string).is_some() {
+                                true => DefaultValue::VALUE(default_string),
                                 false => DefaultValue::DBGENERATED(default_string),
+                            },
+                            ColumnTypeFamily::Boolean => match parse_bool(&default_string).is_some() {
+                                true => DefaultValue::VALUE(default_string),
+                                false => DefaultValue::DBGENERATED(default_string),
+                            },
+                            ColumnTypeFamily::String => {
+                                let data_type_suffix = format!("::{}", data_type);
+                                let full_data_type_suffix = format!("::{}", full_data_type);
+                                match default_string.ends_with(&data_type_suffix)
+                                    || default_string.ends_with(&full_data_type_suffix)
+                                {
+                                    true => DefaultValue::VALUE(unquote(
+                                        default_string
+                                            .replace(&data_type_suffix, "")
+                                            .replace(&full_data_type_suffix, ""),
+                                    )),
+                                    false => DefaultValue::DBGENERATED(default_string),
+                                }
                             }
-                        }
-                        ColumnTypeFamily::Unknown => DefaultValue::VALUE(unquote(
-                            default_string
-                                .replace(format!("::{}", data_type).as_str(), "")
-                                .replace(format!("::{}", full_data_type).as_str(), ""),
-                        )),
-                    }),
+                            ColumnTypeFamily::DateTime => DefaultValue::DBGENERATED(default_string),
+                            ColumnTypeFamily::Binary => DefaultValue::DBGENERATED(default_string),
+                            ColumnTypeFamily::Json => DefaultValue::DBGENERATED(default_string),
+                            ColumnTypeFamily::Uuid => DefaultValue::DBGENERATED(default_string),
+                            ColumnTypeFamily::Geometric => DefaultValue::DBGENERATED(default_string),
+                            ColumnTypeFamily::LogSequenceNumber => DefaultValue::DBGENERATED(default_string),
+                            ColumnTypeFamily::TextSearch => DefaultValue::DBGENERATED(default_string),
+                            ColumnTypeFamily::TransactionId => DefaultValue::DBGENERATED(default_string),
+                            ColumnTypeFamily::Enum(enum_name) => {
+                                let enum_suffix = format!("::{}", enum_name);
+                                match default_string.ends_with(&enum_suffix) {
+                                    true => DefaultValue::VALUE(unquote(default_string.replace(&enum_suffix, ""))),
+                                    false => DefaultValue::DBGENERATED(default_string),
+                                }
+                            }
+                            ColumnTypeFamily::Unknown => DefaultValue::VALUE(unquote(
+                                default_string
+                                    .replace(format!("::{}", data_type).as_str(), "")
+                                    .replace(format!("::{}", full_data_type).as_str(), ""),
+                            )),
+                        })
+                    }
                 },
             };
 

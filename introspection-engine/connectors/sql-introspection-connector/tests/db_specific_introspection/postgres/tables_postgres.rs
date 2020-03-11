@@ -364,9 +364,12 @@ async fn introspecting_a_default_value_as_dbgenerated_should_work(api: &TestApi)
         .execute(|migration| {
             migration.create_table("Test", |t| {
                 t.add_column("id", types::primary());
-                t.inject_custom("string_static text Default 'test'");
+                t.inject_custom("string_static_text text Default 'test'");
+                t.inject_custom("string_static_char char(5) Default 'test'");
+                t.inject_custom("string_static_varchar varchar(5) Default 'test'");
                 t.inject_custom("string_function text Default 'Concatenated'||E'\n'");
                 t.inject_custom("int_static Integer DEFAULT 2");
+                t.inject_custom("int_function Integer DEFAULT EXTRACT(year from TIMESTAMP '2001-02-16 20:38:40')");
                 t.inject_custom("int_sequence Integer DEFAULT nextval('test_seq')");
                 t.inject_custom("float_static Float DEFAULT 1.43");
                 t.inject_custom("boolean_static Boolean DEFAULT true");
@@ -376,13 +379,16 @@ async fn introspecting_a_default_value_as_dbgenerated_should_work(api: &TestApi)
 
     let dm = r#"
             model Test {
-                boolean_static  Boolean? @default(dbgenerated())
-                float_static    Float?   @default(dbgenerated())
-                id              Int      @default(dbgenerated()) @id
-                int_sequence    Int      @default(dbgenerated())
-                int_static      Int      @default(dbgenerated())
-                string_function String?  @default(dbgenerated())
-                string_static   String?  @default(dbgenerated())
+                boolean_static          Boolean? @default(true)
+                float_static            Float?   @default(1.43)
+                id                      Int      @default(autoincrement()) @id
+                int_sequence            Int      @default(autoincrement())
+                int_static              Int      @default(2)
+                int_function            Int      @default(dbgenerated())
+                string_function         String?  @default(dbgenerated())
+                string_static_char      String?  @default("test")
+                string_static_text      String?  @default("test")
+                string_static_varchar   String?  @default("test")
                              
             }
         "#;
