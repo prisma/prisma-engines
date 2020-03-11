@@ -14,7 +14,6 @@ struct StaticFilterArguments {
     pub string: &'static [FilterArgument],
     pub multi_relation: &'static [FilterArgument],
     pub one_relation: &'static [FilterArgument],
-    pub inlined_relation: &'static [FilterArgument],
 }
 
 static FILTER_ARGUMENTS: StaticFilterArguments = StaticFilterArguments {
@@ -105,12 +104,6 @@ static FILTER_ARGUMENTS: StaticFilterArguments = StaticFilterArguments {
         suffix: "",
         is_list: false,
     }],
-
-    // Band-aid for filtering inlined relations
-    inlined_relation: &[FilterArgument {
-        suffix: "_inlined",
-        is_list: false,
-    }],
 };
 
 pub fn get_field_filters<'a>(field: &ModelField) -> Vec<&'a FilterArgument> {
@@ -119,7 +112,6 @@ pub fn get_field_filters<'a>(field: &ModelField) -> Vec<&'a FilterArgument> {
     let filters = match field {
         ModelField::Relation(_) if field.is_list() => vec![&args.multi_relation],
         ModelField::Scalar(_) if field.is_list() => vec![],
-        ModelField::Relation(rf) if rf.is_inlined_on_enclosing_model() => vec![&args.inlined_relation],
         ModelField::Relation(_) => vec![&args.one_relation],
         ModelField::Scalar(sf) => match sf.type_identifier {
             TypeIdentifier::UUID => vec![&args.base, &args.inclusion, &args.alphanumeric, &args.string],

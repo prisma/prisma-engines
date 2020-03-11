@@ -103,6 +103,7 @@ pub fn extract_filter(
     let filters = value_map
         .into_iter()
         .map(|(key, value): (String, ParsedInputValue)| {
+            dbg!(match_suffix);
             let op = if match_suffix {
                 FilterOp::find_op(key.as_str())
             } else {
@@ -131,7 +132,10 @@ pub fn extract_filter(
                 }
                 op => {
                     let op_name: &'static str = op.suffix();
+                    dbg!(&op);
+                    dbg!(&op_name);
                     let field_name = key.trim_end_matches(op_name);
+                    dbg!(&field_name);
 
                     // Always try to resolve regular fields first. If that fails, try to resolve compound fields.
                     match model.fields().find_from_all(&field_name) {

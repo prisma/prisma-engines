@@ -125,12 +125,15 @@ pub trait InputTypeBuilderBase<'a>: CachedBuilder<InputObjectType> + InputBuilde
         let mut fields: Vec<InputField> = unique_fields
             .into_iter()
             .map(|f| {
-                let typ = match f {
-                    ModelField::Scalar(ref sf) => self.map_optional_input_type(sf),
-                    ModelField::Relation(ref rf) => InputType::opt(self.map_scalar_relation_input_type(rf)),
+                let (typ, name) = match f {
+                    ModelField::Scalar(ref sf) => (self.map_optional_input_type(sf), f.name().to_owned()),
+                    ModelField::Relation(ref rf) => (
+                        InputType::opt(self.map_scalar_relation_input_type(rf)),
+                        format!("{}_inlined", rf.name),
+                    ),
                 };
 
-                input_field(f.name().clone(), typ, None)
+                input_field(name, typ, None)
             })
             .collect();
 

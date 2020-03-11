@@ -77,7 +77,7 @@ class SingleUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpecB
     val res2 = server.query(
       """
         |mutation {
-        |  updateParent(where: { child: 1 } data: { p: "UpdatedParent" }) {
+        |  updateParent(where: { child_inlined: 1 } data: { p: "UpdatedParent" }) {
         |    p
         |  }
         |}
@@ -104,7 +104,7 @@ class SingleUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpecB
       """
         |mutation {
         |  upsertParent(
-        |    where: { child: 2 }
+        |    where: { child_inlined: 2 }
         |    update: { p: "Doesn't matter" }
         |    create: { id: 2, p: "Parent2", child: { create: { id: 2, c: "Child2" } } }
         |  ) {
@@ -190,7 +190,7 @@ class SingleUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpecB
     val res2 = server.query(
       """
         |mutation {
-        |  updateParent(where: { child: { child_id: 1, child_c: "Child" } } data: { p: "UpdatedParent" }) {
+        |  updateParent(where: { child_inlined: { child_id: 1, child_c: "Child" } } data: { p: "UpdatedParent" }) {
         |    p
         |  }
         |}
@@ -217,7 +217,7 @@ class SingleUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpecB
       """
         |mutation {
         |  upsertParent(
-        |    where:  { child: { child_id: 2, child_c: "Child2" } }
+        |    where:  { child_inlined: { child_id: 2, child_c: "Child2" } }
         |    update: { p: "Doesn't matter" }
         |    create: { id: 2, p: "Parent2", child: { create: { id: 2, c: "Child2" } } }
         |  ) {
