@@ -327,7 +327,7 @@ async fn all_postgres_column_types_must_work() {
             name: "interval_col".into(),
             tpe: ColumnType {
                 raw: "interval".into(),
-                family: ColumnTypeFamily::DateTime,
+                family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
             },
 

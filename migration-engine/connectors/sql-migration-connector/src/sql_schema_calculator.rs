@@ -142,7 +142,7 @@ impl<'a> SqlSchemaCalculator<'a> {
                     if f.is_unique() {
                         Some(sql::Index {
                             name: format!("{}.{}", &model.db_name(), &f.db_name()),
-                            columns: vec![f.db_name().to_owned()],
+                            columns: f.data_source_fields().iter().map(|f| f.name.clone()).collect(),
                             tpe: sql::IndexType::Unique,
                         })
                     } else {
@@ -303,7 +303,7 @@ impl<'a> SqlSchemaCalculator<'a> {
                         model: &relation.model_b,
                     };
                     let a_columns = relation_table_columns(&model_a, relation.model_a_column());
-                    let mut b_columns = relation_table_columns(&model_b, relation.model_b_column());
+                    let b_columns = relation_table_columns(&model_b, relation.model_b_column());
 
                     let foreign_keys = vec![
                         sql::ForeignKey {
@@ -331,19 +331,25 @@ impl<'a> SqlSchemaCalculator<'a> {
                     ];
 
                     let mut columns = a_columns;
-                    columns.append(&mut b_columns);
+                    columns.extend(b_columns.iter().map(|col| col.to_owned()));
 
-                    let index = sql::Index {
-                        // TODO: rename
-                        name: format!("{}_AB_unique", relation.table_name()),
-                        columns: columns.iter().map(|col| col.name.clone()).collect(),
-                        tpe: sql::IndexType::Unique,
-                    };
+                    let indexes = vec![
+                        sql::Index {
+                            name: format!("{}_AB_unique", relation.table_name()),
+                            columns: columns.iter().map(|col| col.name.clone()).collect(),
+                            tpe: sql::IndexType::Unique,
+                        },
+                        sql::Index {
+                            name: format!("{}_B_index", relation.table_name()),
+                            columns: b_columns.into_iter().map(|col| col.name).collect(),
+                            tpe: sql::IndexType::Normal,
+                        },
+                    ];
 
                     let table = sql::Table {
                         name: relation.table_name(),
                         columns,
-                        indices: vec![index],
+                        indices: indexes,
                         primary_key: None,
                         foreign_keys,
                     };

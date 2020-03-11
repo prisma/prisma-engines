@@ -228,7 +228,7 @@ async fn all_mysql_column_types_must_work() {
             name: "year_col".to_string(),
             tpe: ColumnType {
                 raw: "year".to_string(),
-                family: ColumnTypeFamily::DateTime,
+                family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
             },
 

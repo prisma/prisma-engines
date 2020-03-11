@@ -251,7 +251,7 @@ async fn multi_field_id_as_part_of_relation_must_work(api: &TestApi) -> TestResu
     Ok(())
 }
 
-#[test_each_connector(tags("sql"), log = "debug")]
+#[test_each_connector(tags("sql"))]
 async fn remapped_multi_field_id_as_part_of_relation_must_work(api: &TestApi) -> TestResult {
     let dm = r##"
         model Cat {
@@ -274,6 +274,33 @@ async fn remapped_multi_field_id_as_part_of_relation_must_work(api: &TestApi) ->
             .assert_fk_on_columns(&["dogname", "dogweight"], |fk| {
                 fk.assert_references("Dog", &["name", "weight"])
             })
+    })?;
+
+    Ok(())
+}
+
+#[test_each_connector(tags("sql"))]
+async fn unique_constraints_on_composite_relation_fields(api: &TestApi) -> TestResult {
+    let dm = r##"
+        model Parent {
+            id    Int    @id
+            child Child  @relation(references: [id, c]) @unique
+            p     String
+        }
+
+        model Child {
+            id     Int    @id
+            c      String
+            parent Parent
+
+            @@unique([id, c])
+        }
+    "##;
+
+    api.infer_apply(dm).send_assert().await?.assert_green()?;
+
+    api.assert_schema().await?.assert_table("Parent", |table| {
+        table.assert_index_on_columns(&["child_id", "child_c"], |idx| idx.assert_is_unique())
     })?;
 
     Ok(())

@@ -26,7 +26,7 @@ pub trait Rpc {
     fn introspect(&self, input: IntrospectionInput) -> RpcFutureResult<String>;
 }
 
-pub(crate) struct RpcImpl;
+pub struct RpcImpl;
 
 impl Rpc for RpcImpl {
     fn list_databases(&self, input: IntrospectionInput) -> RpcFutureResult<Vec<String>> {
@@ -47,7 +47,7 @@ impl Rpc for RpcImpl {
 }
 
 impl RpcImpl {
-    pub(crate) fn new() -> Self {
+    pub fn new() -> Self {
         RpcImpl
     }
 
@@ -63,7 +63,7 @@ impl RpcImpl {
         Ok(Box::new(SqlIntrospectionConnector::new(&url).await?))
     }
 
-    pub(crate) async fn introspect_internal(schema: String) -> RpcResult<String> {
+    pub async fn introspect_internal(schema: String) -> RpcResult<String> {
         let config = datamodel::parse_configuration(&schema).map_err(Error::from)?;
         let url = config
             .datasources
@@ -85,17 +85,17 @@ impl RpcImpl {
         }
     }
 
-    pub(crate) async fn list_databases_internal(schema: String) -> RpcResult<Vec<String>> {
+    pub async fn list_databases_internal(schema: String) -> RpcResult<Vec<String>> {
         let connector = RpcImpl::load_connector(&schema).await?;
         Ok(connector.list_databases().await.map_err(Error::from)?)
     }
 
-    pub(crate) async fn get_database_description(schema: String) -> RpcResult<String> {
+    pub async fn get_database_description(schema: String) -> RpcResult<String> {
         let connector = RpcImpl::load_connector(&schema).await?;
         Ok(connector.get_database_description().await.map_err(Error::from)?)
     }
 
-    pub(crate) async fn get_database_metadata_internal(schema: String) -> RpcResult<DatabaseMetadata> {
+    pub async fn get_database_metadata_internal(schema: String) -> RpcResult<DatabaseMetadata> {
         let connector = RpcImpl::load_connector(&schema).await?;
         Ok(connector.get_metadata().await.map_err(Error::from)?)
     }

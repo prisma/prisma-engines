@@ -163,7 +163,7 @@ If you want to use the command line, start `sbt` in
 - Start all test databases with `make all-dbs`.
 
 **Run:**
-Run `cargo test -- --test-threads 1` in the repository root.
+Run `cargo test` in the repository root.
 
 ## WIP Coding Guidelines
 - Prevent compiler warnings
