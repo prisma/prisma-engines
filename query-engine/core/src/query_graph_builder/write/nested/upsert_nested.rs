@@ -108,7 +108,7 @@ pub fn connect_nested_upsert(
             where_input.assert_size(1)?;
             where_input.assert_non_null()?;
 
-            extract_filter(where_input, &child_model, false)?
+            extract_unique_filter(where_input, &child_model)?
         } else {
             Filter::empty()
         };

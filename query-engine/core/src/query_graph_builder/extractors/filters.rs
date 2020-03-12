@@ -95,30 +95,50 @@ impl FilterOp {
     }
 }
 
+pub fn extract_unique_filter(
+    value_map: BTreeMap<String, ParsedInputValue>,
+    model: &ModelRef,
+) -> QueryGraphBuilderResult<Filter> {
+    let filters = value_map
+        .into_iter()
+        .map(|(field_name, value): (String, ParsedInputValue)| {
+            // Always try to resolve regular fields first. If that fails, try to resolve compound fields.
+            match model.fields().find_from_all(&field_name) {
+                Ok(field) => match field {
+                    Field::Scalar(field) => handle_scalar_field(field, value, &FilterOp::Field),
+                    Field::Relation(field) => handle_relation_field_selector(field, value),
+                },
+                Err(_) => utils::resolve_compound_field(&field_name, &model)
+                    .ok_or(QueryGraphBuilderError::AssertionError(format!(
+                        "Unable to resolve field {} to a field or set of fields on model {}",
+                        field_name, model.name
+                    )))
+                    .and_then(|fields| handle_compound_field(fields, value)),
+            }
+        })
+        .collect::<QueryGraphBuilderResult<Vec<Filter>>>()?;
+
+    Ok(Filter::and(filters))
+}
+
 pub fn extract_filter(
     value_map: BTreeMap<String, ParsedInputValue>,
     model: &ModelRef,
-    match_suffix: bool,
 ) -> QueryGraphBuilderResult<Filter> {
     let filters = value_map
         .into_iter()
         .map(|(key, value): (String, ParsedInputValue)| {
-            dbg!(match_suffix);
-            let op = if match_suffix {
-                FilterOp::find_op(key.as_str())
-            } else {
-                FilterOp::Field
-            };
+            let op = FilterOp::find_op(key.as_str());
 
             match op {
                 op if (op == FilterOp::NestedAnd || op == FilterOp::NestedOr || op == FilterOp::NestedNot) => {
                     let value: QueryGraphBuilderResult<Vec<Filter>> = match value {
                         ParsedInputValue::List(values) => values
                             .into_iter()
-                            .map(|val| extract_filter(val.try_into()?, model, match_suffix))
+                            .map(|val| extract_filter(val.try_into()?, model))
                             .collect(),
 
-                        ParsedInputValue::Map(map) => extract_filter(map, model, match_suffix).map(|res| vec![res]),
+                        ParsedInputValue::Map(map) => extract_filter(map, model).map(|res| vec![res]),
 
                         _ => unreachable!(),
                     };
@@ -132,16 +152,13 @@ pub fn extract_filter(
                 }
                 op => {
                     let op_name: &'static str = op.suffix();
-                    dbg!(&op);
-                    dbg!(&op_name);
                     let field_name = key.trim_end_matches(op_name);
-                    dbg!(&field_name);
 
                     // Always try to resolve regular fields first. If that fails, try to resolve compound fields.
                     match model.fields().find_from_all(&field_name) {
                         Ok(field) => match field {
                             Field::Scalar(field) => handle_scalar_field(field, value, &op),
-                            Field::Relation(field) => handle_relation_field(field, value, &op, match_suffix),
+                            Field::Relation(field) => handle_relation_field(field, value, &op),
                         },
                         Err(_) => utils::resolve_compound_field(&field_name, &model)
                             .ok_or(QueryGraphBuilderError::AssertionError(format!(
@@ -191,7 +208,6 @@ fn handle_relation_field(
     field: &RelationFieldRef,
     value: ParsedInputValue,
     op: &FilterOp,
-    match_suffix: bool,
 ) -> QueryGraphBuilderResult<Filter> {
     // We need to decide if the incoming query is reasoning over relation filters or over an inlined relation field selector:
     // - If the FilterOp is anything other than FilterOp::Field, it's definitely relation filters.
@@ -226,7 +242,7 @@ fn handle_relation_field(
         //         handle_relation_field_filter(field, value, op, match_suffix)
         //     }
         // }
-        _ => handle_relation_field_filter(field, value, op, match_suffix),
+        _ => handle_relation_field_filter(field, value, op),
     }
 }
 
@@ -261,21 +277,14 @@ fn handle_relation_field_filter(
     field: &RelationFieldRef,
     value: ParsedInputValue,
     op: &FilterOp,
-    match_suffix: bool,
 ) -> QueryGraphBuilderResult<Filter> {
     let value: Option<BTreeMap<String, ParsedInputValue>> = value.try_into()?;
 
     Ok(match (op, value) {
-        (FilterOp::Some, Some(value)) => {
-            field.at_least_one_related(extract_filter(value, &field.related_model(), match_suffix)?)
-        }
-        (FilterOp::None, Some(value)) => field.no_related(extract_filter(value, &field.related_model(), match_suffix)?),
-        (FilterOp::Every, Some(value)) => {
-            field.every_related(extract_filter(value, &field.related_model(), match_suffix)?)
-        }
-        (FilterOp::Field, Some(value)) => {
-            field.to_one_related(extract_filter(value, &field.related_model(), match_suffix)?)
-        }
+        (FilterOp::Some, Some(value)) => field.at_least_one_related(extract_filter(value, &field.related_model())?),
+        (FilterOp::None, Some(value)) => field.no_related(extract_filter(value, &field.related_model())?),
+        (FilterOp::Every, Some(value)) => field.every_related(extract_filter(value, &field.related_model())?),
+        (FilterOp::Field, Some(value)) => field.to_one_related(extract_filter(value, &field.related_model())?),
         (FilterOp::Field, None) => field.one_relation_is_null(),
         _ => unreachable!(),
     })

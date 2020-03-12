@@ -28,7 +28,7 @@ pub fn connect_nested_set(
             value.assert_size(1)?;
             value.assert_non_null()?;
 
-            extract_filter(value, &child_model, false)
+            extract_unique_filter(value, &child_model)
         })
         .collect::<QueryGraphBuilderResult<Vec<Filter>>>()?
         .into_iter()

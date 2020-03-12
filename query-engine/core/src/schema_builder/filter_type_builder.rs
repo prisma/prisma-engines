@@ -145,13 +145,6 @@ impl<'a> FilterObjectTypeBuilder<'a> {
         let related_model = field.related_model();
         let related_input_type = self.filter_object_type(related_model);
 
-        // match field.is_list {
-        //     false => vec![input_field(
-        //         field.name.clone(),
-        //         InputType::opt(InputType::object(Weak::clone(&related_input_type))),
-        //         None,
-        //     )],
-        // true =>
         let mut input_fields: Vec<_> = get_field_filters(&ModelField::Relation(Arc::clone(&field)))
             .into_iter()
             .map(|arg| {
@@ -161,7 +154,6 @@ impl<'a> FilterObjectTypeBuilder<'a> {
                 input_field(field_name, typ, None)
             })
             .collect();
-        // }
 
         if field.is_inlined_on_enclosing_model() {
             input_fields.push(self.map_inlined_relation_field(&field));
@@ -215,11 +207,6 @@ impl<'a> FilterObjectTypeBuilder<'a> {
             .map(|dsf| {
                 let name = dsf.name.clone();
                 let typ = self.map_data_source_field(dsf);
-
-                // let typ = match field {
-                //     ModelField::Scalar(ref sf) => self.map_required_input_type(sf),
-                //     ModelField::Relation(ref rf) => self.map_scalar_relation_input_type(rf),
-                // };
 
                 input_field(name, typ, None)
             })

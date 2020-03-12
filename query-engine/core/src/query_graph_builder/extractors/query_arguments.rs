@@ -50,7 +50,7 @@ pub fn extract_query_args(arguments: Vec<ParsedArgument>, model: &ModelRef) -> Q
                         let val: Option<ParsedInputMap> = arg.value.try_into()?;
                         match val {
                             Some(m) => {
-                                let filter = Some(extract_filter(m, model, true)?);
+                                let filter = Some(extract_filter(m, model)?);
                                 Ok(QueryArguments { filter, ..res })
                             }
                             None => Ok(res),
