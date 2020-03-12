@@ -8,6 +8,7 @@ use std::{
     borrow::{Borrow, Cow},
     convert::TryFrom,
     fmt,
+    str::FromStr,
 };
 
 #[cfg(feature = "json-1")]
@@ -534,7 +535,8 @@ impl<'a> From<DateTime<Utc>> for ParameterizedValue<'a> {
 impl<'a> From<f64> for ParameterizedValue<'a> {
     #[inline]
     fn from(that: f64) -> Self {
-        let dec = Decimal::from_f64(that).expect("f64 is not a Decimal");
+        // Decimal::from_f64 is buggy. See https://github.com/paupino/rust-decimal/issues/228
+        let dec = Decimal::from_str(&that.to_string()).expect("f64 is not a Decimal");
         ParameterizedValue::Real(dec)
     }
 }
