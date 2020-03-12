@@ -214,10 +214,62 @@ async fn get_all_columns(conn: &dyn Queryable, schema_name: &str) -> HashMap<Str
             entry.1.push(enm);
         }
 
+        let default = match col.get("column_default") {
+            None => None,
+            Some(param_value) => match param_value.to_string() {
+                None => None,
+                Some(default_string) => {
+                    println!("{:?}", default_string);
+                    Some(match &tpe.family {
+                        ColumnTypeFamily::Int => match parse_int(&default_string).is_some() {
+                            true => DefaultValue::VALUE(default_string),
+                            false => DefaultValue::DBGENERATED(default_string),
+                        },
+                        ColumnTypeFamily::Float => match parse_float(&default_string).is_some() {
+                            true => DefaultValue::VALUE(default_string),
+                            false => DefaultValue::DBGENERATED(default_string),
+                        },
+                        ColumnTypeFamily::Boolean => match parse_int(&default_string) {
+                            Some(1) => DefaultValue::VALUE(default_string),
+                            Some(0) => DefaultValue::VALUE(default_string),
+                            _ => DefaultValue::DBGENERATED(default_string),
+                        },
+                        ColumnTypeFamily::String => {
+                            match default_string.starts_with("\'") && default_string.ends_with("\'") {
+                                true => DefaultValue::VALUE(unquote(default_string)),
+                                false => DefaultValue::DBGENERATED(default_string),
+                            }
+                        }
+
+                        ColumnTypeFamily::DateTime => match default_string == "current_timestamp()".to_string() {
+                            //todo check other now() definitions
+                            true => DefaultValue::NOW,
+                            false => DefaultValue::DBGENERATED(default_string),
+                        },
+                        ColumnTypeFamily::Binary => DefaultValue::DBGENERATED(default_string),
+                        ColumnTypeFamily::Json => DefaultValue::DBGENERATED(default_string),
+                        ColumnTypeFamily::Uuid => DefaultValue::DBGENERATED(default_string),
+                        ColumnTypeFamily::Geometric => DefaultValue::DBGENERATED(default_string),
+                        ColumnTypeFamily::LogSequenceNumber => DefaultValue::DBGENERATED(default_string),
+                        ColumnTypeFamily::TextSearch => DefaultValue::DBGENERATED(default_string),
+                        ColumnTypeFamily::TransactionId => DefaultValue::DBGENERATED(default_string),
+                        ColumnTypeFamily::Enum(enum_name) => {
+                            let enum_suffix = format!("::{}", enum_name);
+                            match default_string.ends_with(&enum_suffix) {
+                                true => DefaultValue::VALUE(unquote(default_string.replace(&enum_suffix, ""))),
+                                false => DefaultValue::DBGENERATED(default_string),
+                            }
+                        }
+                        ColumnTypeFamily::Unknown => DefaultValue::DBGENERATED(default_string),
+                    })
+                }
+            },
+        };
+
         let col = Column {
             name,
             tpe,
-            default: None, //todo  col.get("column_default").and_then(|x| x.as_str()).and_then(sanitize_default_value).map(String::from),
+            default,
             auto_increment,
         };
 
@@ -505,28 +557,27 @@ fn get_column_type_and_enum(
 fn extract_enum_values(full_data_type: &&str) -> Vec<String> {
     let len = &full_data_type.len() - 1;
     let vals = &full_data_type[5..len];
-    vals.split(",")
-        .map(|v| unquote_mariadb_strings(v).to_string())
-        .collect()
+    vals.split(",").map(|v| unquote(v.into())).collect()
 }
 
-fn sanitize_default_value(value: &str) -> Option<&str> {
-    match value {
-        "NULL" => None,
-        default if default.starts_with("'") => Some(unquote_mariadb_strings(default)),
-        other => Some(other),
-    }
-}
+// fn sanitize_default_value(value: &str) -> Option<&str> {
+//     match value {
+//         "NULL" => None,
+//         default if default.starts_with("'") => Some(unquote(default.into())),
+//         other => Some(other),
+//     }
+// }
 
-fn unquote_mariadb_strings(input: &str) -> &str {
+fn unquote(input: String) -> String {
     /// Regex for matching the quotes on the introspected string values on MariaDB.
     static MARIADB_STRING_DEFAULT_RE: Lazy<regex::Regex> = Lazy::new(|| regex::Regex::new(r#"^'(.*)'$"#).unwrap());
 
     MARIADB_STRING_DEFAULT_RE
-        .captures(input)
+        .captures(input.as_ref())
         .and_then(|captures| captures.get(1))
         .map(|capt| capt.as_str())
-        .unwrap_or(input)
+        .unwrap_or(input.as_ref())
+        .to_string()
 }
 
 #[cfg(test)]
@@ -535,10 +586,10 @@ mod tests {
 
     #[test]
     fn mariadb_string_default_regex_works() {
-        let quoted_str = "'abc $$ def'";
+        let quoted_str = "'abc $$ def'".to_string();
 
-        assert_eq!(unquote_mariadb_strings(quoted_str), "abc $$ def");
+        assert_eq!(unquote(quoted_str), "abc $$ def");
 
-        assert_eq!(unquote_mariadb_strings("heh "), "heh ");
+        assert_eq!(unquote("heh ".to_string()), "heh ");
     }
 }

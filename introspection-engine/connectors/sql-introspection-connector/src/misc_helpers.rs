@@ -290,15 +290,6 @@ pub(crate) fn calculate_backrelation_field(
 }
 
 pub(crate) fn calculate_default(table: &Table, column: &Column, arity: &FieldArity) -> Option<DMLDef> {
-    //todo make cases with default value explicit for every datatype
-    // sql describer defaults
-    // value(string)
-    // now
-    // sequence(string)
-    // dbgenerated(string)
-
-    println!("{:?}", column);
-
     match (&column.default, &column.tpe.family) {
         (_, _) if *arity == FieldArity::List => None,
         (None, _) if column.auto_increment => Some(DMLDef::Expression(VG::new_autoincrement())),
