@@ -169,7 +169,7 @@ impl<'a> SqlSchemaCalculator<'a> {
                         // wants the column names.
                         columns: referenced_fields
                             .iter()
-                            .map(|field| field.db_name().to_owned())
+                            .flat_map(|field| field.data_source_fields().into_iter().map(|f| f.name.clone()))
                             .collect(),
                         tpe: if index_definition.tpe == IndexType::Unique {
                             sql::IndexType::Unique
@@ -266,7 +266,7 @@ impl<'a> SqlSchemaCalculator<'a> {
                             referenced_table: related_model.db_name().to_owned(),
                             referenced_columns: referenced_fields
                                 .iter()
-                                .map(|referenced_field| referenced_field.db_name().to_owned())
+                                .flat_map(|field| field.data_source_fields().into_iter().map(|f| f.name.clone()))
                                 .collect(),
                             on_delete_action: match column_arity(field.arity()) {
                                 ColumnArity::Required => sql::ForeignKeyAction::Cascade,
@@ -313,7 +313,13 @@ impl<'a> SqlSchemaCalculator<'a> {
                             referenced_columns: first_unique_criterion(model_a)
                                 .map_err(SqlError::Generic)?
                                 .into_iter()
-                                .map(|field| field.db_name().to_owned())
+                                .flat_map(|field| {
+                                    field
+                                        .data_source_fields()
+                                        .into_iter()
+                                        .map(|f| f.name.clone())
+                                        .collect::<Vec<_>>()
+                                })
                                 .collect(),
                             on_delete_action: sql::ForeignKeyAction::Cascade,
                         },
@@ -324,7 +330,13 @@ impl<'a> SqlSchemaCalculator<'a> {
                             referenced_columns: first_unique_criterion(model_b)
                                 .map_err(SqlError::Generic)?
                                 .into_iter()
-                                .map(|field| field.db_name().to_owned())
+                                .flat_map(|field| {
+                                    field
+                                        .data_source_fields()
+                                        .into_iter()
+                                        .map(|f| f.name.clone())
+                                        .collect::<Vec<_>>()
+                                })
                                 .collect(),
                             on_delete_action: sql::ForeignKeyAction::Cascade,
                         },
