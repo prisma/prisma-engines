@@ -135,7 +135,7 @@ mod tests {
 
                 match *nested {
                     Filter::Scalar(ScalarFilter {
-                        field: scalar_field,
+                        projection: ScalarProjection::Single(scalar_field),
                         condition: ScalarCondition::Equals(scalar_val),
                     }) => {
                         assert_eq!(String::from("name"), scalar_field.name);
@@ -175,7 +175,7 @@ mod tests {
 
                 match *nested {
                     Filter::Scalar(ScalarFilter {
-                        field: scalar_field,
+                        projection: ScalarProjection::Single(scalar_field),
                         condition: ScalarCondition::Equals(scalar_val),
                     }) => {
                         assert_eq!(String::from("name"), scalar_field.name);
@@ -215,7 +215,7 @@ mod tests {
 
                 match *nested {
                     Filter::Scalar(ScalarFilter {
-                        field: scalar_field,
+                        projection: ScalarProjection::Single(scalar_field),
                         condition: ScalarCondition::Equals(scalar_val),
                     }) => {
                         assert_eq!(String::from("name"), scalar_field.name);
@@ -255,7 +255,7 @@ mod tests {
 
                 match *nested {
                     Filter::Scalar(ScalarFilter {
-                        field: scalar_field,
+                        projection: ScalarProjection::Single(scalar_field),
                         condition: ScalarCondition::Equals(scalar_val),
                     }) => {
                         assert_eq!(String::from("name"), scalar_field.name);

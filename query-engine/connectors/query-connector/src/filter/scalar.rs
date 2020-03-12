@@ -1,11 +1,17 @@
 use super::Filter;
 use crate::compare::ScalarCompare;
-use prisma_models::{DataSourceFieldRef, PrismaListValue, PrismaValue};
+use prisma_models::{DataSourceFieldRef, ModelProjection, PrismaListValue, PrismaValue};
 use std::sync::Arc;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ScalarProjection {
+    Single(DataSourceFieldRef),
+    Compound(Vec<DataSourceFieldRef>),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ScalarFilter {
-    pub field: DataSourceFieldRef,
+    pub projection: ScalarProjection,
     pub condition: ScalarCondition,
 }
 
@@ -34,7 +40,7 @@ impl ScalarCompare for DataSourceFieldRef {
         T: Into<PrismaValue>,
     {
         Filter::from(ScalarFilter {
-            field: Arc::clone(self),
+            projection: ScalarProjection::Single(Arc::clone(self)),
             condition: ScalarCondition::In(values.into_iter().map(|i| i.into()).collect()),
         })
     }
@@ -45,7 +51,7 @@ impl ScalarCompare for DataSourceFieldRef {
         T: Into<PrismaValue>,
     {
         Filter::from(ScalarFilter {
-            field: Arc::clone(self),
+            projection: ScalarProjection::Single(Arc::clone(self)),
             condition: ScalarCondition::NotIn(values.into_iter().map(|i| i.into()).collect()),
         })
     }
@@ -56,7 +62,7 @@ impl ScalarCompare for DataSourceFieldRef {
         T: Into<PrismaValue>,
     {
         Filter::from(ScalarFilter {
-            field: Arc::clone(self),
+            projection: ScalarProjection::Single(Arc::clone(self)),
             condition: ScalarCondition::Equals(val.into()),
         })
     }
@@ -67,7 +73,7 @@ impl ScalarCompare for DataSourceFieldRef {
         T: Into<PrismaValue>,
     {
         Filter::from(ScalarFilter {
-            field: Arc::clone(self),
+            projection: ScalarProjection::Single(Arc::clone(self)),
             condition: ScalarCondition::NotEquals(val.into()),
         })
     }
@@ -78,7 +84,7 @@ impl ScalarCompare for DataSourceFieldRef {
         T: Into<PrismaValue>,
     {
         Filter::from(ScalarFilter {
-            field: Arc::clone(self),
+            projection: ScalarProjection::Single(Arc::clone(self)),
             condition: ScalarCondition::Contains(val.into()),
         })
     }
@@ -89,7 +95,7 @@ impl ScalarCompare for DataSourceFieldRef {
         T: Into<PrismaValue>,
     {
         Filter::from(ScalarFilter {
-            field: Arc::clone(self),
+            projection: ScalarProjection::Single(Arc::clone(self)),
             condition: ScalarCondition::NotContains(val.into()),
         })
     }
@@ -100,7 +106,7 @@ impl ScalarCompare for DataSourceFieldRef {
         T: Into<PrismaValue>,
     {
         Filter::from(ScalarFilter {
-            field: Arc::clone(self),
+            projection: ScalarProjection::Single(Arc::clone(self)),
             condition: ScalarCondition::StartsWith(val.into()),
         })
     }
@@ -111,7 +117,7 @@ impl ScalarCompare for DataSourceFieldRef {
         T: Into<PrismaValue>,
     {
         Filter::from(ScalarFilter {
-            field: Arc::clone(self),
+            projection: ScalarProjection::Single(Arc::clone(self)),
             condition: ScalarCondition::NotStartsWith(val.into()),
         })
     }
@@ -122,7 +128,7 @@ impl ScalarCompare for DataSourceFieldRef {
         T: Into<PrismaValue>,
     {
         Filter::from(ScalarFilter {
-            field: Arc::clone(self),
+            projection: ScalarProjection::Single(Arc::clone(self)),
             condition: ScalarCondition::EndsWith(val.into()),
         })
     }
@@ -133,7 +139,7 @@ impl ScalarCompare for DataSourceFieldRef {
         T: Into<PrismaValue>,
     {
         Filter::from(ScalarFilter {
-            field: Arc::clone(self),
+            projection: ScalarProjection::Single(Arc::clone(self)),
             condition: ScalarCondition::NotEndsWith(val.into()),
         })
     }
@@ -144,7 +150,7 @@ impl ScalarCompare for DataSourceFieldRef {
         T: Into<PrismaValue>,
     {
         Filter::from(ScalarFilter {
-            field: Arc::clone(self),
+            projection: ScalarProjection::Single(Arc::clone(self)),
             condition: ScalarCondition::LessThan(val.into()),
         })
     }
@@ -155,7 +161,7 @@ impl ScalarCompare for DataSourceFieldRef {
         T: Into<PrismaValue>,
     {
         Filter::from(ScalarFilter {
-            field: Arc::clone(self),
+            projection: ScalarProjection::Single(Arc::clone(self)),
             condition: ScalarCondition::LessThanOrEquals(val.into()),
         })
     }
@@ -166,7 +172,7 @@ impl ScalarCompare for DataSourceFieldRef {
         T: Into<PrismaValue>,
     {
         Filter::from(ScalarFilter {
-            field: Arc::clone(self),
+            projection: ScalarProjection::Single(Arc::clone(self)),
             condition: ScalarCondition::GreaterThan(val.into()),
         })
     }
@@ -177,7 +183,163 @@ impl ScalarCompare for DataSourceFieldRef {
         T: Into<PrismaValue>,
     {
         Filter::from(ScalarFilter {
-            field: Arc::clone(self),
+            projection: ScalarProjection::Single(Arc::clone(self)),
+            condition: ScalarCondition::GreaterThanOrEquals(val.into()),
+        })
+    }
+}
+
+impl ScalarCompare for ModelProjection {
+    /// Field is in a given value
+    fn is_in<T>(&self, values: Vec<T>) -> Filter
+    where
+        T: Into<PrismaValue>,
+    {
+        Filter::from(ScalarFilter {
+            projection: ScalarProjection::Compound(self.data_source_fields().collect()),
+            condition: ScalarCondition::In(values.into_iter().map(|i| i.into()).collect()),
+        })
+    }
+
+    /// Field is not in a given value
+    fn not_in<T>(&self, values: Vec<T>) -> Filter
+    where
+        T: Into<PrismaValue>,
+    {
+        Filter::from(ScalarFilter {
+            projection: ScalarProjection::Compound(self.data_source_fields().collect()),
+            condition: ScalarCondition::NotIn(values.into_iter().map(|i| i.into()).collect()),
+        })
+    }
+
+    /// Field equals the given value.
+    fn equals<T>(&self, val: T) -> Filter
+    where
+        T: Into<PrismaValue>,
+    {
+        Filter::from(ScalarFilter {
+            projection: ScalarProjection::Compound(self.data_source_fields().collect()),
+            condition: ScalarCondition::Equals(val.into()),
+        })
+    }
+
+    /// Field does not equal the given value.
+    fn not_equals<T>(&self, val: T) -> Filter
+    where
+        T: Into<PrismaValue>,
+    {
+        Filter::from(ScalarFilter {
+            projection: ScalarProjection::Compound(self.data_source_fields().collect()),
+            condition: ScalarCondition::NotEquals(val.into()),
+        })
+    }
+
+    /// Field contains the given value.
+    fn contains<T>(&self, val: T) -> Filter
+    where
+        T: Into<PrismaValue>,
+    {
+        Filter::from(ScalarFilter {
+            projection: ScalarProjection::Compound(self.data_source_fields().collect()),
+            condition: ScalarCondition::Contains(val.into()),
+        })
+    }
+
+    /// Field does not contain the given value.
+    fn not_contains<T>(&self, val: T) -> Filter
+    where
+        T: Into<PrismaValue>,
+    {
+        Filter::from(ScalarFilter {
+            projection: ScalarProjection::Compound(self.data_source_fields().collect()),
+            condition: ScalarCondition::NotContains(val.into()),
+        })
+    }
+
+    /// Field starts with the given value.
+    fn starts_with<T>(&self, val: T) -> Filter
+    where
+        T: Into<PrismaValue>,
+    {
+        Filter::from(ScalarFilter {
+            projection: ScalarProjection::Compound(self.data_source_fields().collect()),
+            condition: ScalarCondition::StartsWith(val.into()),
+        })
+    }
+
+    /// Field does not start with the given value.
+    fn not_starts_with<T>(&self, val: T) -> Filter
+    where
+        T: Into<PrismaValue>,
+    {
+        Filter::from(ScalarFilter {
+            projection: ScalarProjection::Compound(self.data_source_fields().collect()),
+            condition: ScalarCondition::NotStartsWith(val.into()),
+        })
+    }
+
+    /// Field ends with the given value.
+    fn ends_with<T>(&self, val: T) -> Filter
+    where
+        T: Into<PrismaValue>,
+    {
+        Filter::from(ScalarFilter {
+            projection: ScalarProjection::Compound(self.data_source_fields().collect()),
+            condition: ScalarCondition::EndsWith(val.into()),
+        })
+    }
+
+    /// Field does not end with the given value.
+    fn not_ends_with<T>(&self, val: T) -> Filter
+    where
+        T: Into<PrismaValue>,
+    {
+        Filter::from(ScalarFilter {
+            projection: ScalarProjection::Compound(self.data_source_fields().collect()),
+            condition: ScalarCondition::NotEndsWith(val.into()),
+        })
+    }
+
+    /// Field is less than the given value.
+    fn less_than<T>(&self, val: T) -> Filter
+    where
+        T: Into<PrismaValue>,
+    {
+        Filter::from(ScalarFilter {
+            projection: ScalarProjection::Compound(self.data_source_fields().collect()),
+            condition: ScalarCondition::LessThan(val.into()),
+        })
+    }
+
+    /// Field is less than or equals the given value.
+    fn less_than_or_equals<T>(&self, val: T) -> Filter
+    where
+        T: Into<PrismaValue>,
+    {
+        Filter::from(ScalarFilter {
+            projection: ScalarProjection::Compound(self.data_source_fields().collect()),
+            condition: ScalarCondition::LessThanOrEquals(val.into()),
+        })
+    }
+
+    /// Field is greater than the given value.
+    fn greater_than<T>(&self, val: T) -> Filter
+    where
+        T: Into<PrismaValue>,
+    {
+        Filter::from(ScalarFilter {
+            projection: ScalarProjection::Compound(self.data_source_fields().collect()),
+            condition: ScalarCondition::GreaterThan(val.into()),
+        })
+    }
+
+    /// Field is greater than or equals the given value.
+    fn greater_than_or_equals<T>(&self, val: T) -> Filter
+    where
+        T: Into<PrismaValue>,
+    {
+        Filter::from(ScalarFilter {
+            projection: ScalarProjection::Compound(self.data_source_fields().collect()),
             condition: ScalarCondition::GreaterThanOrEquals(val.into()),
         })
     }
@@ -203,7 +365,7 @@ mod tests {
 
         match filter {
             Filter::Scalar(ScalarFilter {
-                field,
+                projection: ScalarProjection::Single(field),
                 condition: ScalarCondition::Equals(val),
             }) => {
                 assert_eq!(PrismaValue::from("qwert"), val);
@@ -228,7 +390,7 @@ mod tests {
 
         match filter {
             Filter::Scalar(ScalarFilter {
-                field,
+                projection: ScalarProjection::Single(field),
                 condition: ScalarCondition::NotEquals(val),
             }) => {
                 assert_eq!(PrismaValue::from("qwert"), val);
@@ -253,7 +415,7 @@ mod tests {
 
         match filter {
             Filter::Scalar(ScalarFilter {
-                field,
+                projection: ScalarProjection::Single(field),
                 condition: ScalarCondition::Contains(val),
             }) => {
                 assert_eq!(PrismaValue::from("qwert"), val);
@@ -278,7 +440,7 @@ mod tests {
 
         match filter {
             Filter::Scalar(ScalarFilter {
-                field,
+                projection: ScalarProjection::Single(field),
                 condition: ScalarCondition::NotContains(val),
             }) => {
                 assert_eq!(PrismaValue::from("qwert"), val);
@@ -303,7 +465,7 @@ mod tests {
 
         match filter {
             Filter::Scalar(ScalarFilter {
-                field,
+                projection: ScalarProjection::Single(field),
                 condition: ScalarCondition::StartsWith(val),
             }) => {
                 assert_eq!(PrismaValue::from("qwert"), val);
@@ -328,7 +490,7 @@ mod tests {
 
         match filter {
             Filter::Scalar(ScalarFilter {
-                field,
+                projection: ScalarProjection::Single(field),
                 condition: ScalarCondition::NotStartsWith(val),
             }) => {
                 assert_eq!(PrismaValue::from("qwert"), val);
@@ -353,7 +515,7 @@ mod tests {
 
         match filter {
             Filter::Scalar(ScalarFilter {
-                field,
+                projection: ScalarProjection::Single(field),
                 condition: ScalarCondition::EndsWith(val),
             }) => {
                 assert_eq!(PrismaValue::from("musti"), val);
@@ -378,7 +540,7 @@ mod tests {
 
         match filter {
             Filter::Scalar(ScalarFilter {
-                field,
+                projection: ScalarProjection::Single(field),
                 condition: ScalarCondition::NotEndsWith(val),
             }) => {
                 assert_eq!(PrismaValue::from("naukio"), val);
@@ -403,7 +565,7 @@ mod tests {
 
         match filter {
             Filter::Scalar(ScalarFilter {
-                field,
+                projection: ScalarProjection::Single(field),
                 condition: ScalarCondition::LessThan(val),
             }) => {
                 assert_eq!(PrismaValue::from(10), val);
@@ -428,7 +590,7 @@ mod tests {
 
         match filter {
             Filter::Scalar(ScalarFilter {
-                field,
+                projection: ScalarProjection::Single(field),
                 condition: ScalarCondition::LessThanOrEquals(val),
             }) => {
                 assert_eq!(PrismaValue::from(10), val);
@@ -453,7 +615,7 @@ mod tests {
 
         match filter {
             Filter::Scalar(ScalarFilter {
-                field,
+                projection: ScalarProjection::Single(field),
                 condition: ScalarCondition::GreaterThan(val),
             }) => {
                 assert_eq!(PrismaValue::from(10), val);
@@ -478,7 +640,7 @@ mod tests {
 
         match filter {
             Filter::Scalar(ScalarFilter {
-                field,
+                projection: ScalarProjection::Single(field),
                 condition: ScalarCondition::GreaterThanOrEquals(val),
             }) => {
                 assert_eq!(PrismaValue::from(10), val);

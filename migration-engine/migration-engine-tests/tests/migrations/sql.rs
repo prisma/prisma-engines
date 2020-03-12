@@ -305,3 +305,31 @@ async fn unique_constraints_on_composite_relation_fields(api: &TestApi) -> TestR
 
     Ok(())
 }
+
+#[test_each_connector(tags("sql"))]
+async fn indexes_on_composite_relation_fields(api: &TestApi) -> TestResult {
+    let dm = r##"
+        model User {
+          id                  Int       @id
+          firstName           String
+          lastName            String
+
+          @@unique([firstName, lastName])
+        }
+
+        model SpamList {
+          id   Int  @id
+          user User @relation(references: [firstName, lastName])
+
+          @@index([user])
+        }
+    "##;
+
+    api.infer_apply(dm).send_assert().await?.assert_green()?;
+
+    api.assert_schema().await?.assert_table("SpamList", |table| {
+        table.assert_index_on_columns(&["user_firstName", "user_lastName"], |idx| idx.assert_is_not_unique())
+    })?;
+
+    Ok(())
+}

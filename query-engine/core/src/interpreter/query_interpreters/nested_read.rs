@@ -27,42 +27,21 @@ pub async fn m2m<'a, 'b>(
 
     let ids = tx.get_related_m2m_record_ids(&query.parent_field, &parent_ids).await?;
     let child_model_id = query.parent_field.related_model().primary_identifier();
-    let child_ids: Vec<RecordProjection> = ids
+
+    let child_ids: Vec<Vec<PrismaValue>> = ids
         .iter()
-        .map(|ri| child_model_id.assimilate(ri.1.clone()))
+        .map(|ri| {
+            let proj = child_model_id.assimilate(ri.1.clone());
+            proj.map(|ri| ri.values().collect::<Vec<_>>())
+        })
         .collect::<std::result::Result<Vec<_>, _>>()?;
 
-    let is_compound_case = child_link_id.db_len() > 1;
+    let mut args = query.args.clone();
+    let filter = child_link_id.is_in(child_ids);
 
-    let args = if is_compound_case {
-        let mut args = query.args.clone();
-        let filter = child_ids.filter();
-
-        args.filter = match args.filter {
-            Some(existing_filter) => Some(Filter::and(vec![existing_filter, filter])),
-            None => Some(filter),
-        };
-
-        args
-    } else {
-        // We can optimize queries with a single link ID field with IN filters.
-        let child_field = child_link_id.data_source_fields().next().unwrap();
-        let parent_links_as_prisma_values: Vec<PrismaValue> = child_ids
-            .into_iter()
-            .map(|vals| {
-                vals.pairs.into_iter().next().unwrap().1
-            })
-            .collect();
-
-        let filter = child_field.is_in(parent_links_as_prisma_values);
-        let mut args = query.args.clone();
-
-        args.filter = match args.filter {
-            Some(existing_filter) => Some(Filter::and(vec![existing_filter, filter])),
-            None => Some(filter),
-        };
-
-        args
+    args.filter = match args.filter {
+        Some(existing_filter) => Some(Filter::and(vec![existing_filter, filter])),
+        None => Some(filter),
     };
 
     let mut scalars = tx
@@ -138,6 +117,8 @@ pub async fn one2m<'a, 'b>(
     // Only the values are hashed for easier comparison.
     let mut link_mapping: HashMap<Vec<PrismaValue>, Vec<RecordProjection>> = HashMap::new();
     let idents = vec![parent_model_id, parent_link_id];
+    let mut uniq_projections = Vec::new();
+    let mut all_null_checks = false;
 
     for projection in joined_projections {
         let mut split = projection.split_into(&idents);
@@ -149,50 +130,41 @@ pub async fn one2m<'a, 'b>(
             Some(records) => records.push(id),
             None => {
                 let mut ids = Vec::new();
+
                 ids.push(id);
+                uniq_projections.push(link_values.clone());
+                all_null_checks = link_values.iter().all(|v| v.is_null());
                 link_mapping.insert(link_values, ids);
             }
         }
     }
 
-    let is_compound_case = child_link_id.db_len() > 1;
-    let args = if is_compound_case {
+    // TODO: this is a stupid hack to find a case where we might have `NULL`
+    // values in the query and try to do an `IN` statement with those values.
+    //
+    // Please make sure to find out WHY we'd do `one2m` with null parent ids
+    // and please use some other function than this instead.
+    let filter = if all_null_checks {
         let filters: Vec<Filter> = link_mapping
             .keys()
             .into_iter()
             .map(|id_values: &Vec<PrismaValue>| {
                 Ok(child_link_id
-                    .from_unchecked(id_values.iter().map(|v: &PrismaValue| v.clone()).collect())
-                    .filter())
+                   .from_unchecked(id_values.iter().map(|v: &PrismaValue| v.clone()).collect())
+                   .filter())
             })
             .collect::<DomainResult<_>>()?;
 
-        let filter = Filter::or(filters);
-        let mut args = query_args;
-
-        args.filter = match args.filter {
-            Some(existing_filter) => Some(Filter::and(vec![existing_filter, filter])),
-            None => Some(filter),
-        };
-
-        args
+        Filter::or(filters)
     } else {
-        // We can optimize queries with a single link ID field with IN filters.
-        let child_field = child_link_id.data_source_fields().next().unwrap();
-        let parent_links_as_prisma_values: Vec<PrismaValue> = link_mapping
-            .keys()
-            .map(|vals| (*vals.first().unwrap()).clone())
-            .collect();
+        child_link_id.is_in(uniq_projections)
+    };
 
-        let filter = child_field.is_in(parent_links_as_prisma_values);
-        let mut args = query_args;
+    let mut args = query_args;
 
-        args.filter = match args.filter {
-            Some(existing_filter) => Some(Filter::and(vec![existing_filter, filter])),
-            None => Some(filter),
-        };
-
-        args
+    args.filter = match args.filter {
+        Some(existing_filter) => Some(Filter::and(vec![existing_filter, filter])),
+        None => Some(filter),
     };
 
     let mut scalars = tx

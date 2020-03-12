@@ -5,8 +5,7 @@ pub use read::*;
 pub use write::*;
 
 use prisma_models::RecordProjection;
-use prisma_value::PrismaValue;
-use quaint::ast::{Column, Comparable, ConditionTree, Query};
+use quaint::ast::{Column, Comparable, ConditionTree, Query, Row, Values};
 
 const PARAMETER_LIMIT: usize = 10000;
 
@@ -32,29 +31,14 @@ pub(super) fn conditions<'a>(
     columns: &'a [Column<'static>],
     records: impl IntoIterator<Item = &'a RecordProjection>,
 ) -> ConditionTree<'static> {
-    match columns.len() {
-        1 => {
-            let column = columns[0].clone();
-            let vals: Vec<PrismaValue> = records
-                .into_iter()
-                .map(|record| record.values().next().unwrap())
-                .collect();
+    let mut values = Values::new();
 
-            column.in_selection(vals).into()
-        }
-        _ => records
-            .into_iter()
-            .map(|record| {
-                let cols_with_vals = columns.into_iter().map(|c| c.clone()).zip(record.values());
-
-                cols_with_vals.fold(ConditionTree::NoCondition, |acc, (col, val)| match acc {
-                    ConditionTree::NoCondition => col.equals(val).into(),
-                    cond => cond.and(col.equals(val)),
-                })
-            })
-            .fold(ConditionTree::NoCondition, |acc, cond| match acc {
-                ConditionTree::NoCondition => cond,
-                acc => acc.or(cond),
-            }),
+    for proj in records.into_iter() {
+        let vals: Vec<_> = proj.values().collect();
+        values.push(vals)
     }
+
+    Row::from(columns.to_vec())
+        .in_selection(values)
+        .into()
 }
