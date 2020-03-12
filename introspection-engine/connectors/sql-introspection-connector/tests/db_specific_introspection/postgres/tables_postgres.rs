@@ -374,22 +374,24 @@ async fn introspecting_a_default_value_as_dbgenerated_should_work(api: &TestApi)
                 t.inject_custom("int_sequence Integer DEFAULT nextval('test_seq')"); // todo this is not recognized as autoincrement
                 t.inject_custom("float_static Float DEFAULT 1.43");
                 t.inject_custom("boolean_static Boolean DEFAULT true");
+                t.inject_custom("datetime_now TIMESTAMP DEFAULT now()");
             });
         })
         .await;
 
     let dm = r#"
             model Test {
-                boolean_static          Boolean? @default(true)
-                float_static            Float?   @default(1.43)
-                id                      Int      @default(autoincrement()) @id
-                int_function            Int?     @default(dbgenerated())
-                int_sequence            Int?     @default(dbgenerated())
-                int_static              Int?     @default(2)
-                string_function         String?  @default(dbgenerated())
-                string_static_char      String?  @default("test")
-                string_static_text      String?  @default("test")
-                string_static_varchar   String?  @default("test")
+                boolean_static          Boolean?    @default(true)
+                datetime_now            DateTime?   @default(now())
+                float_static            Float?      @default(1.43)
+                id                      Int         @default(autoincrement()) @id
+                int_function            Int?        @default(dbgenerated())
+                int_sequence            Int?        @default(dbgenerated())
+                int_static              Int?        @default(2)
+                string_function         String?     @default(dbgenerated())
+                string_static_char      String?     @default("test")
+                string_static_text      String?     @default("test")
+                string_static_varchar   String?     @default("test")
                              
             }
         "#;
