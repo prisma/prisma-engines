@@ -1,62 +1,102 @@
 datasource chinook {
   provider = "sqlite"
-  url = "file:./db/Wurst.db"
+  url = "file:./db/Chinook.db"
 }
 
-model Parent {
-  child Child  @relation(references: [id]) @id
-  name  String
-  age   Int
+model Album {
+  id Int @id @map(name:"AlbumId")
+  Title String @default("TestDefaultTitle")
+  Artist Artist @map(name:"ArtistId")
+  Tracks Track[]
 }
 
-model Child {
-  id      Int    @id
-  name    String
-  parents Parent[]
+model Track {
+  id Int @id @map(name:"TrackId")
+  Name String
+  Album Album? @map(name: "AlbumId")
+  AlbumId Int?
+  Mediamodel Mediamodel @map(name: "MediamodelId")
+  Genre Genre? @map(name: "GenreId")
+  Composer String?
+  Milliseconds Int
+  UnitPrice Float
+  InvoiceLines InvoiceLine[]
 }
 
-// model A {
-//   b B @id
-//   makeGQLHappy String?
-// }
+model Mediamodel {
+  id Int @id @map(name:"MediamodelId")
+  Name String?
+}
 
-// model B {
-//   id String @id @default(cuid())
-// }
+model Genre {
+  id Int @id @map(name:"GenreId")
+  Name String?
+  Tracks Track[]
+}
 
-// model C {
-//   d D @map(["c_1", "c_2"]) @id
-//   makeGQLHappy String?
-// }
+model Artist {
+  id Int @id @map(name:"ArtistId")
+  Name String?
+  Albums Album[]
+}
 
-// model D {
-//   d_1 String @default(cuid())
-//   d_2 String @default(cuid())
+model Customer {
+  id Int @id @map(name:"CustomerId")
+  FirstName String
+  LastName String
+  Company String?
+  Address String?
+  City String?
+  State String?
+  Country String?
+  PostalCode String?
+  Phone String?
+  Fax String?
+  Email String
+  SupportRep Employee? @map(name: "SupportRepId")
+  Invoices Invoice[]
+}
 
-//   @@id([d_1, d_2])
-// }
+model Employee {
+  id Int @id @map(name:"EmployeeId")
+  FirstName String
+  LastName String
+  Title String?
+  BirthDate DateTime?
+  HireDate DateTime?
+  Address String?
+  City String?
+  State String?
+  Country String?
+  PostalCode String?
+  Phone String?
+  Fax String?
+  Email String?
+  Customers Customer[]
+}
 
-// model E {
-//   e_1 String @default(cuid())
-//   f F
+model Invoice {
+  id Int @id @map(name:"InvoiceId")
+  Customer Customer @map(name: "CustomerId")
+  InvoiceDate DateTime
+  BillingAddress String?
+  BillingCity String?
+  BillingState String?
+  BillingCountry String?
+  BillingPostalCode String?
+  Total Float
+  Lines InvoiceLine[]
+}
 
-//   @@id([e_1, f])
-// }
+model InvoiceLine {
+  id Int @id @map(name:"InvoiceLineId")
+  Invoice Invoice @map(name: "InvoiceId")
+  Track Track @map(name: "TrackId")
+  UnitPrice Float
+  Quantity Int
+}
 
-// model F {
-//   id String @id @default(cuid())
-// }
-
-// model G {
-//   g_1 String @default(cuid())
-//   h H @map(["g_h_1", "g_h_2"])
-
-//   @@id([g_1, h])
-// }
-
-// model H {
-//   h_1 String @default(cuid())
-//   h_2 String @default(cuid())
-
-//   @@id([h_1, h_2])
-// }
+model Playlist {
+  id Int @id @map(name:"PlaylistId")
+  Name String?
+}

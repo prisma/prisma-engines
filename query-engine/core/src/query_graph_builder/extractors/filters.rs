@@ -209,39 +209,8 @@ fn handle_relation_field(
     value: ParsedInputValue,
     op: &FilterOp,
 ) -> QueryGraphBuilderResult<Filter> {
-    // We need to decide if the incoming query is reasoning over relation filters or over an inlined relation field selector:
-    // - If the FilterOp is anything other than FilterOp::Field, it's definitely relation filters.
-    // - If the incoming value is not a map and not null, it is refering to an inlined relation selector.
-    // - If the incoming value is a map, and the keys of the map exactly match the data source field names of the relation field,
-    //   it is refering to an inlined relation selector
-    //
-    // [DTODO] Reevaluate the caveat in light of an improved and unambiguous filter API.
-    // Caveat: Null values are a grey zone. For now we assume that null values translate to the "one relation is null" filter and does not
-    // translate to a nullable field underneath.
     match (op, &value) {
         (FilterOp::Inlined, _) => handle_relation_field_selector(field, value),
-
-        // (FilterOp::Field, ParsedInputValue::Single(ref pv)) => match pv {
-        //     PrismaValue::Null => handle_relation_field_filter(field, value, op, match_suffix),
-        //     _ => handle_relation_field_selector(field, value),
-        // },
-
-        // (FilterOp::Field, ParsedInputValue::Map(map)) => {
-        //     let dsf_names = field
-        //         .data_source_fields()
-        //         .into_iter()
-        //         .map(|dsf| &dsf.name)
-        //         .collect::<Vec<_>>()
-        //         .sort();
-
-        //     let map_keys = map.keys().collect::<Vec<_>>().sort();
-
-        //     if dsf_names == map_keys {
-        //         handle_relation_field_selector(field, value)
-        //     } else {
-        //         handle_relation_field_filter(field, value, op, match_suffix)
-        //     }
-        // }
         _ => handle_relation_field_filter(field, value, op),
     }
 }
@@ -281,18 +250,27 @@ fn handle_relation_field_filter(
     let value: Option<BTreeMap<String, ParsedInputValue>> = value.try_into()?;
 
     Ok(match (op, value) {
-        (FilterOp::Some, Some(value)) => field.at_least_one_related(extract_filter(value, &field.related_model())?),
-        (FilterOp::None, Some(value)) => field.no_related(extract_filter(value, &field.related_model())?),
-        (FilterOp::Every, Some(value)) => field.every_related(extract_filter(value, &field.related_model())?),
-        (FilterOp::Field, Some(value)) => field.to_one_related(extract_filter(value, &field.related_model())?),
+        (FilterOp::Some, Some(value)) => {
+            field.at_least_one_related(extract_filter(value, &field.related_model())?)
+        }
+        (FilterOp::None, Some(value)) => {
+            field.no_related(extract_filter(value, &field.related_model())?)
+        }
+        (FilterOp::Every, Some(value)) => {
+            field.every_related(extract_filter(value, &field.related_model())?)
+        }
+        (FilterOp::Field, Some(value)) => {
+            field.to_one_related(extract_filter(value, &field.related_model())?)
+        }
         (FilterOp::Field, None) => field.one_relation_is_null(),
         _ => unreachable!(),
     })
 }
 
-// [DTODO] This is only handles equality and ignores the op. What about the other filters?
-//         Also check what the schema building allows for!
-fn handle_compound_field(fields: Vec<Field>, value: ParsedInputValue) -> QueryGraphBuilderResult<Filter> {
+fn handle_compound_field(
+    fields: Vec<Field>,
+    value: ParsedInputValue,
+) -> QueryGraphBuilderResult<Filter> {
     let mut input_map: ParsedInputMap = value.try_into()?;
 
     let filters: Vec<Filter> = fields
@@ -314,14 +292,18 @@ fn handle_compound_field(fields: Vec<Field>, value: ParsedInputValue) -> QueryGr
                         let filters = dsfs
                             .into_iter()
                             .map(|dsf| {
-                                let value: PrismaValue = map.remove(&dsf.name).unwrap().try_into()?;
+                                let value: PrismaValue =
+                                    map.remove(&dsf.name).unwrap().try_into()?;
                                 Ok(dsf.equals(value))
                             })
                             .collect::<QueryGraphBuilderResult<Vec<_>>>()?;
 
                         Ok(Filter::and(filters))
                     }
-                    _ => unreachable!(format!("Invalid input for relation field input (for {})", rf.name)),
+                    _ => unreachable!(format!(
+                        "Invalid input for relation field input (for {})",
+                        rf.name
+                    )),
                 }
             }
         })
