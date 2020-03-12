@@ -1,10 +1,11 @@
 use super::*;
+use prisma_models::DataSourceFieldRef;
 
 /// Filter object and scalar filter object type builder.
 #[derive(Debug)]
 pub struct FilterObjectTypeBuilder<'a> {
     capabilities: &'a SupportedCapabilities,
-    input_object_cache: TypeRefCache<InputObjectType>, // Caches "xWhereInput" / "xWhereScalarInput" -> Object type ref
+    input_object_cache: TypeRefCache<InputObjectType>,
 }
 
 impl<'a> InputBuilderExtensions for FilterObjectTypeBuilder<'a> {}
@@ -124,11 +125,11 @@ impl<'a> FilterObjectTypeBuilder<'a> {
     }
 
     fn map_input_field(&self, field: ScalarFieldRef) -> Vec<InputField> {
-        get_field_filters(&ModelField::Scalar(Arc::clone(&field))) // wip: take a look at required signatures
+        get_field_filters(&ModelField::Scalar(Arc::clone(&field)))
             .into_iter()
             .map(|arg| {
                 let field_name = format!("{}{}", field.name, arg.suffix);
-                let mapped = self.map_required_input_type(Arc::clone(&field));
+                let mapped = self.map_required_input_type(&field);
 
                 if arg.is_list {
                     input_field(field_name, InputType::opt(InputType::list(mapped)), None)
@@ -144,20 +145,74 @@ impl<'a> FilterObjectTypeBuilder<'a> {
         let related_model = field.related_model();
         let related_input_type = self.filter_object_type(related_model);
 
-        match field.is_list {
-            false => vec![input_field(
-                field.name.clone(),
-                InputType::opt(InputType::object(Weak::clone(&related_input_type))),
-                None,
-            )],
-            true => get_field_filters(&ModelField::Relation(Arc::clone(&field)))
-                .into_iter()
-                .map(|arg| {
-                    let field_name = format!("{}{}", field.name, arg.suffix);
-                    let typ = InputType::opt(InputType::object(Weak::clone(&related_input_type)));
-                    input_field(field_name, typ, None)
-                })
-                .collect(),
+        let mut input_fields: Vec<_> = get_field_filters(&ModelField::Relation(Arc::clone(&field)))
+            .into_iter()
+            .map(|arg| {
+                let field_name = format!("{}{}", field.name, arg.suffix);
+                let typ = InputType::opt(InputType::object(Weak::clone(&related_input_type)));
+
+                input_field(field_name, typ, None)
+            })
+            .collect();
+
+        if field.is_inlined_on_enclosing_model() {
+            input_fields.push(self.map_inlined_relation_field(&field));
         }
+
+        input_fields
+    }
+
+    fn map_inlined_relation_field(&self, field: &RelationFieldRef) -> InputField {
+        let dsfs = field.data_source_fields();
+        let field_name = format!("{}_inlined", field.name);
+
+        if dsfs.len() == 1 {
+            let dsf = dsfs.first().unwrap();
+            let typ = InputType::opt(self.map_data_source_field(dsf));
+
+            input_field(field_name, typ, None)
+        } else {
+            let inner_typ = self.map_inlined_compound_relation_field(field);
+
+            input_field(field_name, InputType::opt(InputType::object(inner_typ)), None)
+        }
+    }
+
+    // [DTODO] Duplicated code
+    fn map_data_source_field(&self, dsf: &DataSourceFieldRef) -> InputType {
+        let typ: TypeIdentifier = dsf.field_type.into();
+
+        match typ {
+            TypeIdentifier::String => InputType::string(),
+            TypeIdentifier::Int => InputType::int(),
+            TypeIdentifier::Float => InputType::float(),
+            TypeIdentifier::Boolean => InputType::boolean(),
+            TypeIdentifier::UUID => InputType::uuid(),
+            TypeIdentifier::DateTime => InputType::date_time(),
+            TypeIdentifier::Json => InputType::json(),
+            TypeIdentifier::Enum(_) => unreachable!("ScalarType should never map to Enum."),
+        }
+    }
+
+    fn map_inlined_compound_relation_field(&self, field: &RelationFieldRef) -> InputObjectTypeRef {
+        let name = format!("{}CompoundInlineFilterInput", field.name);
+        return_cached!(self.get_cache(), &name);
+
+        let input_object = Arc::new(init_input_object_type(name.clone()));
+        self.cache(name, Arc::clone(&input_object));
+
+        let object_fields = field
+            .data_source_fields()
+            .into_iter()
+            .map(|dsf| {
+                let name = dsf.name.clone();
+                let typ = self.map_data_source_field(dsf);
+
+                input_field(name, typ, None)
+            })
+            .collect();
+
+        input_object.set_fields(object_fields);
+        Arc::downgrade(&input_object)
     }
 }

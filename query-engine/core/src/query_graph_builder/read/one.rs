@@ -25,7 +25,7 @@ impl Builder<ReadQuery> for ReadOneRecordBuilder {
                 arg.assert_size(1)?;
                 arg.assert_non_null()?;
 
-                Some(extractors::extract_filter(arg, &self.model, false)?)
+                Some(extractors::extract_unique_filter(arg, &self.model)?)
             }
             None => None,
         };

@@ -131,6 +131,13 @@ impl Field {
         }
     }
 
+    pub fn is_id(&self) -> bool {
+        match self {
+            Field::Scalar(sf) => sf.is_id,
+            Field::Relation(rf) => rf.is_id,
+        }
+    }
+
     pub fn is_list(&self) -> bool {
         match self {
             Field::Scalar(ref sf) => sf.is_list,
@@ -138,7 +145,7 @@ impl Field {
         }
     }
 
-    pub(crate) fn as_scalar(self) -> Option<ScalarFieldRef> {
+    pub fn as_scalar(self) -> Option<ScalarFieldRef> {
         match self {
             Field::Scalar(scalar) => Some(scalar),
             _ => None,
@@ -149,6 +156,13 @@ impl Field {
         match self {
             Field::Scalar(ref sf) => sf.is_required,
             Field::Relation(ref rf) => rf.is_required,
+        }
+    }
+
+    pub fn is_unique(&self) -> bool {
+        match self {
+            Field::Scalar(ref sf) => sf.unique(),
+            Field::Relation(ref rf) => rf.is_id || rf.is_unique,
         }
     }
 

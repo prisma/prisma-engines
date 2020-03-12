@@ -8,7 +8,7 @@ use std::{
 #[derive(Debug)]
 pub struct Fields {
     pub all: Vec<Field>,
-    id: OnceCell<Option<Vec<ScalarFieldWeak>>>,
+    id: OnceCell<Option<Vec<Field>>>,
     id_field_names: Vec<String>,
     scalar: OnceCell<Vec<ScalarFieldWeak>>,
     relation: OnceCell<Vec<RelationFieldWeak>>,
@@ -31,7 +31,7 @@ impl Fields {
         }
     }
 
-    pub fn id(&self) -> Option<Vec<ScalarFieldRef>> {
+    pub fn id(&self) -> Option<Vec<Field>> {
         self.id
             .get_or_init(|| {
                 self.find_singular_id()
@@ -39,7 +39,6 @@ impl Fields {
                     .or_else(|| self.find_multipart_id())
             })
             .clone()
-            .map(|fields| fields.into_iter().map(|x| x.upgrade().unwrap()).collect())
     }
 
     pub fn created_at(&self) -> &Option<ScalarFieldRef> {
@@ -62,10 +61,6 @@ impl Fields {
 
     pub fn scalar(&self) -> Vec<ScalarFieldRef> {
         self.scalar_weak().iter().map(|f| f.upgrade().unwrap()).collect()
-    }
-
-    pub fn scalar_non_list(&self) -> Vec<ScalarFieldRef> {
-        self.scalar().into_iter().filter(|sf| !sf.is_list).collect()
     }
 
     pub fn scalar_list(&self) -> Vec<ScalarFieldRef> {
@@ -186,30 +181,25 @@ impl Fields {
         acc
     }
 
-    pub fn find_singular_id(&self) -> Option<ScalarFieldWeak> {
-        self.scalar_weak().into_iter().find_map(|wsf| {
-            let sf = wsf.upgrade().unwrap();
-
-            if sf.is_id() {
-                Some(Weak::clone(wsf))
-            } else {
-                None
-            }
-        })
+    /// Attempts to resolve a single ID field on the model (usually supplied with @id on a relation or scalar field).
+    fn find_singular_id(&self) -> Option<Field> {
+        self.all
+            .iter()
+            .find_map(|field| if field.is_id() { Some(field.clone()) } else { None })
     }
 
-    fn find_multipart_id(&self) -> Option<Vec<ScalarFieldWeak>> {
+    /// Attempts to resolve a compound ID field on the model (usually supplied with @@id on a relation or scalar field).
+    fn find_multipart_id(&self) -> Option<Vec<Field>> {
         if self.id_field_names.len() > 0 {
-            let scalars = self.scalar();
             let fields = self
                 .id_field_names
                 .iter()
                 .map(|f| {
-                    let id_field = scalars
+                    self.all
                         .iter()
-                        .find(|sf| &sf.name == f)
-                        .expect(&format!("Expected ID field {} to be present on the model", f));
-                    Arc::downgrade(id_field)
+                        .find(|field| field.name() == f)
+                        .expect(&format!("Expected ID field {} to be present on the model", f))
+                        .clone()
                 })
                 .collect();
 

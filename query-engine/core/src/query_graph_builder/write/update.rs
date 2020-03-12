@@ -17,7 +17,7 @@ pub fn update_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedF
     where_arg.assert_size(1)?;
     where_arg.assert_non_null()?;
 
-    let filter = extract_filter(where_arg, &model, false)?;
+    let filter = extract_unique_filter(where_arg, &model)?;
 
     // "data"
     let data_argument = field.arguments.lookup("data").unwrap();
@@ -61,7 +61,7 @@ pub fn update_many_records(
     mut field: ParsedField,
 ) -> QueryGraphBuilderResult<()> {
     let filter = match field.arguments.lookup("where") {
-        Some(where_arg) => extract_filter(where_arg.value.try_into()?, &model, true)?,
+        Some(where_arg) => extract_filter(where_arg.value.try_into()?, &model)?,
         None => Filter::empty(),
     };
 

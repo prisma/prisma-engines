@@ -9,12 +9,14 @@ use std::{
 
 /// A short-hand for `Arc<RelationField>`
 pub type RelationFieldRef = Arc<RelationField>;
+
 /// A short-hand for `Weak<RelationField>`
 pub type RelationFieldWeak = Weak<RelationField>;
 
 #[derive(Debug)]
 pub struct RelationFieldTemplate {
     pub name: String,
+    pub is_id: bool,
     pub is_required: bool,
     pub is_list: bool,
     pub is_unique: bool,
@@ -28,6 +30,7 @@ pub struct RelationFieldTemplate {
 #[derive(DebugStub, Clone)]
 pub struct RelationField {
     pub name: String,
+    pub is_id: bool,
     pub is_required: bool,
     pub is_list: bool,
     pub is_auto_generated_int_id: bool,
@@ -98,6 +101,7 @@ impl RelationFieldTemplate {
     pub fn build(self, model: ModelWeakRef) -> RelationFieldRef {
         let relation = RelationField {
             name: self.name,
+            is_id: self.is_id,
             is_required: self.is_required,
             is_list: self.is_list,
             is_auto_generated_int_id: self.is_auto_generated_int_id,
