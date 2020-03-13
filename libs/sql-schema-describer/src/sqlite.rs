@@ -118,25 +118,67 @@ impl SqlSchemaDescriber {
             .into_iter()
             .map(|row| {
                 debug!("Got column row {:?}", row);
-                let default_value = match row.get("dflt_value") {
-                    Some(ParameterizedValue::Text(v)) => Some(v.to_string().replace("\"", "").replace("'", "")),
-                    Some(ParameterizedValue::Null) => None,
-                    Some(p) => panic!("expected a string value but got {:?}", p),
-                    None => panic!("couldn't get dflt_value column"),
-                };
-
                 let is_required = row.get("notnull").and_then(|x| x.as_bool()).expect("notnull");
+
                 let arity = if is_required {
                     ColumnArity::Required
                 } else {
                     ColumnArity::Nullable
                 };
                 let tpe = get_column_type(&row.get("type").and_then(|x| x.to_string()).expect("type"), arity);
+
+                let default = match row.get("dflt_value") {
+                    None => None,
+                    Some(ParameterizedValue::Null) => None,
+                    Some(ParameterizedValue::Text(cow_string)) => {
+                        let default_string = cow_string.to_string();
+                        Some(match &tpe.family {
+                            ColumnTypeFamily::Int => match parse_int(&default_string).is_some() {
+                                true => DefaultValue::VALUE(default_string),
+                                false => DefaultValue::DBGENERATED(default_string),
+                            },
+                            ColumnTypeFamily::Float => match parse_float(&default_string).is_some() {
+                                true => DefaultValue::VALUE(default_string),
+                                false => DefaultValue::DBGENERATED(default_string),
+                            },
+                            ColumnTypeFamily::Boolean => match parse_int(&default_string) {
+                                Some(1) => DefaultValue::VALUE(default_string),
+                                Some(0) => DefaultValue::VALUE(default_string),
+                                _ => DefaultValue::DBGENERATED(default_string),
+                            },
+                            ColumnTypeFamily::String => DefaultValue::VALUE(unquote(default_string)),
+                            //todo check other now() definitions
+                            ColumnTypeFamily::DateTime => match default_string == "CURRENT_TIMESTAMP".to_string()
+                                || default_string == "current_timestamp()".to_string()
+                            {
+                                true => DefaultValue::NOW,
+                                false => DefaultValue::DBGENERATED(default_string),
+                            },
+                            ColumnTypeFamily::Binary => DefaultValue::DBGENERATED(default_string),
+                            ColumnTypeFamily::Json => DefaultValue::DBGENERATED(default_string),
+                            ColumnTypeFamily::Uuid => DefaultValue::DBGENERATED(default_string),
+                            ColumnTypeFamily::Geometric => DefaultValue::DBGENERATED(default_string),
+                            ColumnTypeFamily::LogSequenceNumber => DefaultValue::DBGENERATED(default_string),
+                            ColumnTypeFamily::TextSearch => DefaultValue::DBGENERATED(default_string),
+                            ColumnTypeFamily::TransactionId => DefaultValue::DBGENERATED(default_string),
+                            ColumnTypeFamily::Enum(enum_name) => {
+                                let enum_suffix = format!("::{}", enum_name);
+                                match default_string.ends_with(&enum_suffix) {
+                                    true => DefaultValue::VALUE(default_string.replace(&enum_suffix, "")),
+                                    false => DefaultValue::DBGENERATED(default_string),
+                                }
+                            }
+                            ColumnTypeFamily::Unknown => DefaultValue::DBGENERATED(default_string),
+                        })
+                    }
+                    Some(_) => None,
+                };
+
                 let pk_col = row.get("pk").and_then(|x| x.as_i64()).expect("primary key");
                 let col = Column {
                     name: row.get("name").and_then(|x| x.to_string()).expect("name"),
                     tpe,
-                    default: None, //todo default_value.clone(),
+                    default,
                     auto_increment: false,
                 };
                 if pk_col > 0 {
@@ -338,6 +380,8 @@ impl SqlSchemaDescriber {
 
 fn get_column_type(tpe: &str, arity: ColumnArity) -> ColumnType {
     let tpe_lower = tpe.to_lowercase();
+    println!("{:?}", tpe_lower);
+
     let family = match tpe_lower.as_ref() {
         // SQLite only has a few native data types: https://www.sqlite.org/datatype3.html
         // It's tolerant though, and you can assign any data type you like to columns
@@ -352,12 +396,14 @@ fn get_column_type(tpe: &str, arity: ColumnArity) -> ColumnType {
         s if s.contains("numeric") => ColumnTypeFamily::Float,
         "date" => ColumnTypeFamily::DateTime,
         "datetime" => ColumnTypeFamily::DateTime,
+        "timestamp" => ColumnTypeFamily::DateTime,
         "binary" => ColumnTypeFamily::Binary,
         "double" => ColumnTypeFamily::Float,
         "binary[]" => ColumnTypeFamily::Binary,
         "boolean[]" => ColumnTypeFamily::Boolean,
         "date[]" => ColumnTypeFamily::DateTime,
         "datetime[]" => ColumnTypeFamily::DateTime,
+        "timestamp[]" => ColumnTypeFamily::DateTime,
         "double[]" => ColumnTypeFamily::Float,
         "float[]" => ColumnTypeFamily::Float,
         "int[]" => ColumnTypeFamily::Int,
@@ -387,3 +433,15 @@ const SQLITE_SYSTEM_TABLES: &[&str] = &[
     "sqlite_stat3",
     "sqlite_stat4",
 ];
+
+fn unquote(input: String) -> String {
+    /// Regex for matching the quotes on the introspected string values on MariaDB.
+    static SQLITE_STRING_DEFAULT_RE: Lazy<regex::Regex> = Lazy::new(|| regex::Regex::new(r#"^'(.*)'$"#).unwrap());
+
+    SQLITE_STRING_DEFAULT_RE
+        .captures(input.as_ref())
+        .and_then(|captures| captures.get(1))
+        .map(|capt| capt.as_str())
+        .unwrap_or(input.as_ref())
+        .to_string()
+}

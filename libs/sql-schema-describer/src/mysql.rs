@@ -234,15 +234,18 @@ async fn get_all_columns(conn: &dyn Queryable, schema_name: &str) -> HashMap<Str
                             Some(0) => DefaultValue::VALUE(default_string),
                             _ => DefaultValue::DBGENERATED(default_string),
                         },
+                        //todo Maria DB does not seem to quote the strings
                         ColumnTypeFamily::String => {
-                            match default_string.starts_with("\'") && default_string.ends_with("\'") {
-                                true => DefaultValue::VALUE(unquote(default_string)),
-                                false => DefaultValue::DBGENERATED(default_string),
-                            }
+                            // match default_string.starts_with("\'") && default_string.ends_with("\'") {
+                            //     true => DefaultValue::VALUE(unquote(default_string)),
+                            //     false => DefaultValue::DBGENERATED(default_string),
+                            // }
+                            DefaultValue::VALUE(unquote(default_string))
                         }
-
-                        ColumnTypeFamily::DateTime => match default_string == "current_timestamp()".to_string() {
-                            //todo check other now() definitions
+                        //todo check other now() definitions
+                        ColumnTypeFamily::DateTime => match default_string == "CURRENT_TIMESTAMP".to_string()
+                            || default_string == "current_timestamp()".to_string()
+                        {
                             true => DefaultValue::NOW,
                             false => DefaultValue::DBGENERATED(default_string),
                         },
