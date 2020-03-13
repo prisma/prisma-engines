@@ -138,7 +138,8 @@ pub fn row_value_to_prisma_value(
             ParameterizedValue::Null => PrismaValue::Null,
             ParameterizedValue::Real(f) => PrismaValue::Float(f),
             ParameterizedValue::Integer(i) => {
-                PrismaValue::Float(Decimal::from_f64(i as f64).expect("f64 was not a Decimal."))
+                // Decimal::from_f64 is buggy. Issue: https://github.com/paupino/rust-decimal/issues/228
+                PrismaValue::Float(Decimal::from_str(&(i as f64).to_string()).expect("f64 was not a Decimal."))
             }
             ParameterizedValue::Text(_) | ParameterizedValue::Bytes(_) => PrismaValue::Float(
                 p_value
