@@ -3,12 +3,9 @@ mod error;
 pub mod sql_ext;
 
 use chrono::prelude::*;
-use rust_decimal::{
-    prelude::{FromPrimitive, ToPrimitive},
-    Decimal,
-};
+use rust_decimal::{prelude::ToPrimitive, Decimal};
 use serde::{ser::Serializer, Serialize};
-use std::{convert::TryFrom, fmt};
+use std::{convert::TryFrom, fmt, str::FromStr};
 use uuid::Uuid;
 
 pub use error::ConversionFailure;
@@ -57,7 +54,8 @@ impl TryFrom<serde_json::Value> for PrismaValue {
                     Ok(PrismaValue::Int(num.as_i64().unwrap()))
                 } else {
                     let fl = num.as_f64().unwrap();
-                    let dec = Decimal::from_f64(fl).unwrap();
+                    // Decimal::from_f64 is buggy. Issue: https://github.com/paupino/rust-decimal/issues/228
+                    let dec = Decimal::from_str(&fl.to_string()).unwrap();
 
                     Ok(PrismaValue::Float(dec))
                 }
@@ -139,7 +137,9 @@ impl TryFrom<f64> for PrismaValue {
     type Error = ConversionFailure;
 
     fn try_from(f: f64) -> PrismaValueResult<PrismaValue> {
-        Decimal::from_f64(f)
+        // Decimal::from_f64 is buggy. Issue: https://github.com/paupino/rust-decimal/issues/228
+        Decimal::from_str(&f.to_string())
+            .ok()
             .map(|d| PrismaValue::Float(d))
             .ok_or(ConversionFailure::new("f64", "Decimal"))
     }

@@ -272,3 +272,44 @@ async fn mysql_bit_columns_are_properly_mapped_to_signed_integers(api: &TestApi)
 
     Ok(())
 }
+
+#[test_each_connector(tags("mysql"), log = "debug")]
+async fn mysql_floats_do_not_lose_precision(api: &TestApi) -> TestResult {
+    api.execute_sql(CREATE_TYPES_TABLE).await?;
+
+    let (_datamodel, engine) = api.introspect_and_start_query_engine().await?;
+
+    let write = indoc! {
+        "
+        mutation {
+            createOnetypes(
+                data: {
+                    numeric_floating_float: 6.4
+                    numeric_floating_decimal: 6.4
+                }
+            ) {
+                id
+                numeric_floating_float
+                numeric_floating_decimal
+            }
+        }
+        "
+    };
+
+    let write_response = engine.request(write).await;
+
+    let expected_write_response = json!({
+        "data": {
+            "createOnetypes": {
+                "id": 1,
+                // This is what we expect from a f64 -> f32 -> f64 conversion.
+                "numeric_floating_float": 6.400000095367432,
+                "numeric_floating_decimal": 6.4,
+            }
+        }
+    });
+
+    assert_eq!(write_response, expected_write_response);
+
+    Ok(())
+}
