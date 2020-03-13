@@ -9,7 +9,7 @@ use rust_decimal::{
     prelude::{FromPrimitive, ToPrimitive},
     Decimal,
 };
-use std::error::Error;
+use std::{error::Error, str::FromStr};
 use tokio_postgres::{
     types::{self, FromSql, IsNull, Kind, ToSql, Type as PostgresType},
     Row as PostgresRow, Statement as PostgresStatement,
@@ -115,7 +115,9 @@ impl GetRow for PostgresRow {
                 },
                 PostgresType::FLOAT8 => match row.try_get(i)? {
                     Some(val) => {
-                        let val: Decimal = Decimal::from_f64(val).expect("f64 is not a Decimal");
+                        let val: f64 = val;
+                        // Decimal::from_f64 is buggy. Issue: https://github.com/paupino/rust-decimal/issues/228
+                        let val: Decimal = Decimal::from_str(&val.to_string()).expect("f64 is not a Decimal");
                         ParameterizedValue::Real(val)
                     }
                     None => ParameterizedValue::Null,
