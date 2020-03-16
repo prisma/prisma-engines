@@ -1437,7 +1437,7 @@ async fn column_defaults_must_be_migrated(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector]
+#[test_each_connector(log = "debug")]
 async fn escaped_string_defaults_are_not_arbitrarily_migrated(api: &TestApi) -> TestResult {
     use quaint::ast::*;
 
@@ -1519,17 +1519,18 @@ async fn created_at_does_not_get_arbitrarily_migrated(api: &TestApi) -> TestResu
     let insert = Insert::single_into(api.render_table_name("Fruit")).value("name", "banana");
     api.database().query(insert.into()).await.unwrap();
 
-    //todo
-    // anyhow::ensure!(
-    //     schema
-    //         .table_bang("Fruit")
-    //         .column_bang("createdAt")
-    //         .default
-    //         .as_ref()
-    //         .unwrap()
-    //         .contains("1970"),
-    //     "createdAt default is set"
-    // );
+    anyhow::ensure!(
+        schema
+            .table_bang("Fruit")
+            .column_bang("createdAt")
+            .default
+            .as_ref()
+            .unwrap()
+            .as_value()
+            .unwrap()
+            .contains("1970"),
+        "createdAt default is set"
+    );
 
     let dm2 = r#"
         model Fruit {

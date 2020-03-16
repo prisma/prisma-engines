@@ -1,5 +1,5 @@
-use std::borrow::Cow;
 use sql_schema_describer::{Column, ColumnTypeFamily, DefaultValue};
+use std::borrow::Cow;
 
 #[derive(Debug)]
 pub(crate) struct ColumnDiffer<'a> {
@@ -76,8 +76,8 @@ impl<'a> ColumnDiffer<'a> {
 fn expand_default_value(default_value: &DefaultValue) -> Option<&str> {
     match default_value {
         DefaultValue::VALUE(s) => Some(s.as_str()),
-        DefaultValue::DBGENERATED(s) => todo!("diffing of dbGenerated"),
-        DefaultValue::NOW => todo!("diffing of DefaultValue::NOw"),
+        DefaultValue::DBGENERATED(s) => Some(s.as_str()),
+        DefaultValue::NOW => Some("CURRENT_TIMESTAMP"),
         DefaultValue::SEQUENCE(_) => None,
     }
 }
