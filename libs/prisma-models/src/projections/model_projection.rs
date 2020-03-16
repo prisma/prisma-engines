@@ -139,6 +139,14 @@ impl ModelProjection {
     pub fn from_unchecked(&self, values: Vec<PrismaValue>) -> RecordProjection {
         RecordProjection::new(self.data_source_fields().zip(values).collect())
     }
+
+    pub fn contains<T>(&self, field: T) -> bool
+    where
+        T: Into<Field>,
+    {
+        let field: Field = field.into();
+        self.fields().find(|f| f.name() == field.name()).is_some()
+    }
 }
 
 impl IntoIterator for ModelProjection {

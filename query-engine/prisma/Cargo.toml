@@ -42,6 +42,8 @@ tracing-attributes = "0.1"
 log = "0.4"
 
 user-facing-errors = { path = "../../libs/user-facing-errors" }
+pretty_assertions = "0.6.1"
+tracing-futures = "0.2.3"
 
 [build-dependencies]
 rustc_version = "0.2.3"
@@ -52,6 +54,7 @@ test-setup = { path = "../../libs/test-setup" }
 quaint = { git = "https://github.com/prisma/quaint", features = ["full"] }
 migration-connector = { path = "../../migration-engine/connectors/migration-connector" }
 migration-core = { path = "../../migration-engine/core" }
+introspection-core = { path = "../../introspection-engine/core" }
 sql-migration-connector = { path = "../../migration-engine/connectors/sql-migration-connector" }
 indoc = "0.3"
 anyhow = "1"

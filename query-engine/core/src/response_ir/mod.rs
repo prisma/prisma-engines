@@ -11,7 +11,7 @@
 mod internal;
 mod utils;
 
-use crate::{ExpressionResult, OutputType, OutputTypeRef, QueryResult, QueryValue};
+use crate::{CoreError, ExpressionResult, OutputType, OutputTypeRef, QueryResult, QueryValue};
 use indexmap::IndexMap;
 use internal::*;
 use prisma_models::PrismaValue;
@@ -278,7 +278,10 @@ impl IrSerializer {
                             match self.output_type.borrow() {
                                 OutputType::Opt(_) => Item::Value(PrismaValue::Null),
                                 OutputType::List(_) => Item::list(Vec::new()),
-                                _ => unreachable!(),
+                                other => return Response::Error(ResponseError::from(CoreError::SerializationError(format!(
+                                    "Invalid response data: the query result was required, but an empty {:?} was returned instead.",
+                                    other
+                                )))),
                             }
                         } else {
                             let (_, item) = result.into_iter().take(1).next().unwrap();

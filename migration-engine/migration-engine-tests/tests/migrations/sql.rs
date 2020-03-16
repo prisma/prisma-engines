@@ -199,3 +199,137 @@ async fn enum_defaults_must_work(api: &TestApi) -> TestResult {
 
     Ok(())
 }
+
+#[test_each_connector(tags("sql"))]
+async fn id_as_part_of_relation_must_work(api: &TestApi) -> TestResult {
+    let dm = r##"
+        model Cat {
+            nemesis Dog @id
+        }
+
+        model Dog {
+            id String @id
+        }
+    "##;
+
+    api.infer_apply(dm).send_assert().await?.assert_green()?;
+
+    api.assert_schema().await?.assert_table("Cat", |table| {
+        table
+            .assert_pk(|pk| pk.assert_columns(&["nemesis"]))?
+            .assert_fk_on_columns(&["nemesis"], |fk| fk.assert_references("Dog", &["id"]))
+    })?;
+
+    Ok(())
+}
+
+#[test_each_connector(tags("sql"), log = "debug")]
+async fn multi_field_id_as_part_of_relation_must_work(api: &TestApi) -> TestResult {
+    let dm = r##"
+        model Cat {
+            nemesis Dog @id
+        }
+
+        model Dog {
+            name String
+            weight Int
+
+            @@id([name, weight])
+        }
+    "##;
+
+    api.infer_apply(dm).send_assert().await?.assert_green()?;
+
+    api.assert_schema().await?.assert_table("Cat", |table| {
+        table
+            .assert_pk(|pk| pk.assert_columns(&["nemesis_name", "nemesis_weight"]))?
+            .assert_fk_on_columns(&["nemesis_name", "nemesis_weight"], |fk| {
+                fk.assert_references("Dog", &["name", "weight"])
+            })
+    })?;
+
+    Ok(())
+}
+
+#[test_each_connector(tags("sql"))]
+async fn remapped_multi_field_id_as_part_of_relation_must_work(api: &TestApi) -> TestResult {
+    let dm = r##"
+        model Cat {
+            nemesis Dog @map(["dogname", "dogweight"]) @id
+        }
+
+        model Dog {
+            name String
+            weight Int
+
+            @@id([name, weight])
+        }
+    "##;
+
+    api.infer_apply(dm).send_assert().await?.assert_green()?;
+
+    api.assert_schema().await?.assert_table("Cat", |table| {
+        table
+            .assert_pk(|pk| pk.assert_columns(&["dogname", "dogweight"]))?
+            .assert_fk_on_columns(&["dogname", "dogweight"], |fk| {
+                fk.assert_references("Dog", &["name", "weight"])
+            })
+    })?;
+
+    Ok(())
+}
+
+#[test_each_connector(tags("sql"))]
+async fn unique_constraints_on_composite_relation_fields(api: &TestApi) -> TestResult {
+    let dm = r##"
+        model Parent {
+            id    Int    @id
+            child Child  @relation(references: [id, c]) @unique
+            p     String
+        }
+
+        model Child {
+            id     Int    @id
+            c      String
+            parent Parent
+
+            @@unique([id, c])
+        }
+    "##;
+
+    api.infer_apply(dm).send_assert().await?.assert_green()?;
+
+    api.assert_schema().await?.assert_table("Parent", |table| {
+        table.assert_index_on_columns(&["child_id", "child_c"], |idx| idx.assert_is_unique())
+    })?;
+
+    Ok(())
+}
+
+#[test_each_connector(tags("sql"))]
+async fn indexes_on_composite_relation_fields(api: &TestApi) -> TestResult {
+    let dm = r##"
+        model User {
+          id                  Int       @id
+          firstName           String
+          lastName            String
+
+          @@unique([firstName, lastName])
+        }
+
+        model SpamList {
+          id   Int  @id
+          user User @relation(references: [firstName, lastName])
+
+          @@index([user])
+        }
+    "##;
+
+    api.infer_apply(dm).send_assert().await?.assert_green()?;
+
+    api.assert_schema().await?.assert_table("SpamList", |table| {
+        table.assert_index_on_columns(&["user_firstName", "user_lastName"], |idx| idx.assert_is_not_unique())
+    })?;
+
+    Ok(())
+}

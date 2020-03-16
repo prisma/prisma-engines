@@ -14,7 +14,7 @@ pub fn upsert_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedF
     where_arg.assert_size(1)?;
     where_arg.assert_non_null()?;
 
-    let filter = extract_filter(where_arg, &model, false)?;
+    let filter = extract_unique_filter(where_arg, &model)?;
     let model_id = model.primary_identifier();
 
     let create_argument = field.arguments.lookup("create").unwrap();

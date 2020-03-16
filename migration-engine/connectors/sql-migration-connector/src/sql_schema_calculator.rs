@@ -124,7 +124,17 @@ impl<'a> SqlSchemaCalculator<'a> {
                     .collect();
 
                 let primary_key = sql::PrimaryKey {
-                    columns: model.id_fields().map(|field| field.db_name().to_owned()).collect(),
+                    columns: model
+                        .id_fields()
+                        .flat_map(|field| {
+                            field
+                                .data_source_fields()
+                                .into_iter()
+                                .map(|s| s.name.clone())
+                                .collect::<Vec<String>>()
+                                .into_iter()
+                        })
+                        .collect(),
                     sequence: None,
                 };
 
@@ -132,7 +142,7 @@ impl<'a> SqlSchemaCalculator<'a> {
                     if f.is_unique() {
                         Some(sql::Index {
                             name: format!("{}.{}", &model.db_name(), &f.db_name()),
-                            columns: vec![f.db_name().to_owned()],
+                            columns: f.data_source_fields().iter().map(|f| f.name.clone()).collect(),
                             tpe: sql::IndexType::Unique,
                         })
                     } else {
@@ -159,7 +169,7 @@ impl<'a> SqlSchemaCalculator<'a> {
                         // wants the column names.
                         columns: referenced_fields
                             .iter()
-                            .map(|field| field.db_name().to_owned())
+                            .flat_map(|field| field.data_source_fields().into_iter().map(|f| f.name.clone()))
                             .collect(),
                         tpe: if index_definition.tpe == IndexType::Unique {
                             sql::IndexType::Unique
@@ -256,10 +266,10 @@ impl<'a> SqlSchemaCalculator<'a> {
                             referenced_table: related_model.db_name().to_owned(),
                             referenced_columns: referenced_fields
                                 .iter()
-                                .map(|referenced_field| referenced_field.db_name().to_owned())
+                                .flat_map(|field| field.data_source_fields().into_iter().map(|f| f.name.clone()))
                                 .collect(),
                             on_delete_action: match column_arity(field.arity()) {
-                                ColumnArity::Required => sql::ForeignKeyAction::Restrict,
+                                ColumnArity::Required => sql::ForeignKeyAction::Cascade,
                                 _ => sql::ForeignKeyAction::SetNull,
                             },
                         };
@@ -293,7 +303,7 @@ impl<'a> SqlSchemaCalculator<'a> {
                         model: &relation.model_b,
                     };
                     let a_columns = relation_table_columns(&model_a, relation.model_a_column());
-                    let mut b_columns = relation_table_columns(&model_b, relation.model_b_column());
+                    let b_columns = relation_table_columns(&model_b, relation.model_b_column());
 
                     let foreign_keys = vec![
                         sql::ForeignKey {
@@ -303,7 +313,13 @@ impl<'a> SqlSchemaCalculator<'a> {
                             referenced_columns: first_unique_criterion(model_a)
                                 .map_err(SqlError::Generic)?
                                 .into_iter()
-                                .map(|field| field.db_name().to_owned())
+                                .flat_map(|field| {
+                                    field
+                                        .data_source_fields()
+                                        .into_iter()
+                                        .map(|f| f.name.clone())
+                                        .collect::<Vec<_>>()
+                                })
                                 .collect(),
                             on_delete_action: sql::ForeignKeyAction::Cascade,
                         },
@@ -314,26 +330,38 @@ impl<'a> SqlSchemaCalculator<'a> {
                             referenced_columns: first_unique_criterion(model_b)
                                 .map_err(SqlError::Generic)?
                                 .into_iter()
-                                .map(|field| field.db_name().to_owned())
+                                .flat_map(|field| {
+                                    field
+                                        .data_source_fields()
+                                        .into_iter()
+                                        .map(|f| f.name.clone())
+                                        .collect::<Vec<_>>()
+                                })
                                 .collect(),
                             on_delete_action: sql::ForeignKeyAction::Cascade,
                         },
                     ];
 
                     let mut columns = a_columns;
-                    columns.append(&mut b_columns);
+                    columns.extend(b_columns.iter().map(|col| col.to_owned()));
 
-                    let index = sql::Index {
-                        // TODO: rename
-                        name: format!("{}_AB_unique", relation.table_name()),
-                        columns: columns.iter().map(|col| col.name.clone()).collect(),
-                        tpe: sql::IndexType::Unique,
-                    };
+                    let indexes = vec![
+                        sql::Index {
+                            name: format!("{}_AB_unique", relation.table_name()),
+                            columns: columns.iter().map(|col| col.name.clone()).collect(),
+                            tpe: sql::IndexType::Unique,
+                        },
+                        sql::Index {
+                            name: format!("{}_B_index", relation.table_name()),
+                            columns: b_columns.into_iter().map(|col| col.name).collect(),
+                            tpe: sql::IndexType::Normal,
+                        },
+                    ];
 
                     let table = sql::Table {
                         name: relation.table_name(),
                         columns,
-                        indices: vec![index],
+                        indices: indexes,
                         primary_key: None,
                         foreign_keys,
                     };

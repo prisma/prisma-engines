@@ -88,6 +88,7 @@ impl<'a> DatamodelConverter<'a> {
 
                     FieldTemplate::Relation(RelationFieldTemplate {
                         name: field.name.clone(),
+                        is_id: field.is_id,
                         is_required: field.is_required(),
                         is_list: field.is_list(),
                         is_unique: field.is_unique(),

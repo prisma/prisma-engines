@@ -169,19 +169,27 @@ impl<'a> ObjectTypeBuilder<'a> {
     pub fn order_by_argument(&self, model: &ModelRef) -> Argument {
         let enum_values: Vec<_> = model
             .fields()
-            .scalar_non_list()
+            .all
             .iter()
+            .filter(|field| match field {
+                ModelField::Scalar(sf) => !sf.is_list,
+                ModelField::Relation(rf) => {
+                    !rf.relation().is_many_to_many()
+                        && rf.is_inlined_on_enclosing_model()
+                        && rf.data_source_fields().len() == 1
+                }
+            })
             .map(|field| {
                 vec![
                     (
-                        format!("{}_{}", field.name, SortOrder::Ascending.abbreviated()),
+                        format!("{}_{}", field.name(), SortOrder::Ascending.abbreviated()),
                         OrderBy {
                             field: field.clone(),
                             sort_order: SortOrder::Ascending,
                         },
                     ),
                     (
-                        format!("{}_{}", field.name, SortOrder::Descending.abbreviated()),
+                        format!("{}_{}", field.name(), SortOrder::Descending.abbreviated()),
                         OrderBy {
                             field: field.clone(),
                             sort_order: SortOrder::Descending,

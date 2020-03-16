@@ -13,7 +13,7 @@ impl Ordering {
             order_directive
                 .primary_order_by
                 .as_ref()
-                .map(|oby| oby.field.as_column()),
+                .map(|oby| oby.field.as_columns().next().unwrap()), // order by only works on scalars or relations with one data source field
             model.primary_identifier().as_columns().collect(),
             order_directive,
         )
@@ -31,7 +31,7 @@ impl Ordering {
 
                 if !identifier.contains(&first)
                     && order_directive.needs_implicit_id_ordering
-                    && !order_by.field.unique()
+                    && !order_by.field.is_unique()
                 {
                     match (order_by.sort_order, order_directive.needs_to_be_reverse_order) {
                         (SortOrder::Ascending, true) => {

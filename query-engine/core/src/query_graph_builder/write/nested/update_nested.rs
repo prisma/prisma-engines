@@ -44,7 +44,7 @@ pub fn connect_nested_update(
             where_arg.assert_size(1)?;
             where_arg.assert_non_null()?;
 
-            let filter = extract_filter(where_arg, &child_model, false)?;
+            let filter = extract_unique_filter(where_arg, &child_model)?;
             let data_value = map.remove("data").unwrap();
 
             (data_value, filter)
@@ -101,7 +101,7 @@ pub fn connect_nested_update_many(
         let where_map: ParsedInputMap = where_arg.try_into()?;
         let child_model_identifier = parent_relation_field.related_model().primary_identifier();
 
-        let filter = extract_filter(where_map, child_model, true)?;
+        let filter = extract_filter(where_map, child_model)?;
         let update_args = WriteArgsParser::from(&child_model, data_map)?;
 
         let find_child_records_node =

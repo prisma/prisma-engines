@@ -245,7 +245,7 @@ async fn changing_the_type_of_an_id_field_must_work(api: &TestApi) {
             columns: vec![column.name.clone()],
             referenced_table: "B".to_string(),
             referenced_columns: vec!["id".to_string()],
-            on_delete_action: ForeignKeyAction::Restrict,
+            on_delete_action: ForeignKeyAction::Cascade,
         }]
     );
 
@@ -273,7 +273,7 @@ async fn changing_the_type_of_an_id_field_must_work(api: &TestApi) {
             columns: vec![column.name.clone()],
             referenced_table: "B".to_string(),
             referenced_columns: vec!["id".to_string()],
-            on_delete_action: ForeignKeyAction::Restrict,
+            on_delete_action: ForeignKeyAction::Cascade,
         }]
     );
 }
@@ -313,7 +313,7 @@ async fn changing_a_relation_field_to_a_scalar_field_must_work(api: &TestApi) ->
         }
     "#;
 
-    api.infer_apply(dm1).send().await?;
+    api.infer_apply(dm1).send_assert().await?.assert_green()?;
     api.assert_schema().await?.assert_table("A", |table| {
         table
             .assert_column("b", |col| col.assert_type_is_int())?
@@ -327,7 +327,7 @@ async fn changing_a_relation_field_to_a_scalar_field_must_work(api: &TestApi) ->
                 columns: vec!["b".to_owned()],
                 referenced_table: "B".to_string(),
                 referenced_columns: vec!["id".to_string()],
-                on_delete_action: ForeignKeyAction::Restrict,
+                on_delete_action: ForeignKeyAction::Cascade,
             })
     })?;
 
@@ -397,62 +397,41 @@ async fn changing_a_scalar_field_to_a_relation_field_must_work(api: &TestApi) {
             columns: vec![column.name.clone()],
             referenced_table: "B".to_string(),
             referenced_columns: vec!["id".to_string()],
-            on_delete_action: ForeignKeyAction::Restrict,
+            on_delete_action: ForeignKeyAction::Cascade,
         }]
     );
 }
 
 #[test_each_connector]
-async fn adding_a_many_to_many_relation_must_result_in_a_prisma_style_relation_table(api: &TestApi) {
-    // TODO: one model should have an id of different type. Not possible right now due to barrel limitation.
+async fn adding_a_many_to_many_relation_must_result_in_a_prisma_style_relation_table(api: &TestApi) -> TestResult {
+    let dm1 = r##"
+        model A {
+            id Int @id
+            bs B[]
+        }
 
-    let dm1 = r#"
-            model A {
-                id Int @id
-                bs B[]
-            }
-            model B {
-                id Int @id
-                as A[]
-            }
-        "#;
-    let result = api.infer_and_apply(&dm1).await.sql_schema;
-    let relation_table = result.table_bang("_AToB");
-    println!("{:?}", relation_table.foreign_keys);
-    assert_eq!(relation_table.columns.len(), 2);
+        model B {
+            id String @id
+            as A[]
+        }
+    "##;
 
-    let a_column = relation_table.column_bang("A");
-    assert_eq!(a_column.tpe.family, ColumnTypeFamily::Int);
-    let b_column = relation_table.column_bang("B");
-    assert_eq!(b_column.tpe.family, ColumnTypeFamily::Int);
+    api.infer_apply(&dm1).send_assert().await?.assert_green()?;
 
-    assert_eq!(
-        relation_table.foreign_keys,
-        &[
-            ForeignKey {
-                constraint_name: match api.sql_family() {
-                    SqlFamily::Postgres => Some("_AToB_A_fkey".to_owned()),
-                    SqlFamily::Mysql => Some("_AToB_ibfk_1".to_owned()),
-                    SqlFamily::Sqlite => None,
-                },
-                columns: vec![a_column.name.clone()],
-                referenced_table: "A".to_string(),
-                referenced_columns: vec!["id".to_string()],
-                on_delete_action: ForeignKeyAction::Cascade,
-            },
-            ForeignKey {
-                constraint_name: match api.sql_family() {
-                    SqlFamily::Postgres => Some("_AToB_B_fkey".to_owned()),
-                    SqlFamily::Mysql => Some("_AToB_ibfk_2".to_owned()),
-                    SqlFamily::Sqlite => None,
-                },
-                columns: vec![b_column.name.clone()],
-                referenced_table: "B".to_string(),
-                referenced_columns: vec!["id".to_string()],
-                on_delete_action: ForeignKeyAction::Cascade,
-            },
-        ]
-    );
+    api.assert_schema().await?.assert_table("_AToB", |table| {
+        table
+            .assert_columns_count(2)?
+            .assert_column("A", |col| col.assert_type_is_int())?
+            .assert_column("B", |col| col.assert_type_is_string())?
+            .assert_fk_on_columns(&["A"], |fk| {
+                fk.assert_references("A", &["id"])?.assert_cascades_on_delete()
+            })?
+            .assert_fk_on_columns(&["B"], |fk| {
+                fk.assert_references("B", &["id"])?.assert_cascades_on_delete()
+            })
+    })?;
+
+    Ok(())
 }
 
 #[test_each_connector]
@@ -508,27 +487,6 @@ async fn adding_a_many_to_many_relation_with_custom_name_must_work(api: &TestApi
 
 #[test]
 #[ignore]
-fn adding_a_many_to_many_relation_for_exotic_id_types_must_work() {
-    // TODO: add this once we have figured out what id types we support
-    unimplemented!();
-}
-
-#[test]
-#[ignore]
-fn forcing_a_relation_table_for_a_one_to_many_relation_must_work() {
-    // TODO: implement this once we have decided if this is actually possible in dm v2
-    unimplemented!();
-}
-
-// #[test]
-// #[ignore]
-// fn forcing_a_relation_table_for_a_one_to_many_relation_must_work() {
-//     // TODO: implement this once we have decided if this is actually possible in dm v2
-//     unimplemented!();
-// }
-
-#[test]
-#[ignore]
 fn providing_an_explicit_link_table_must_work() {
     // TODO: implement this once we have decided if this is actually possible in dm v2
     unimplemented!();
@@ -575,7 +533,7 @@ async fn adding_an_inline_relation_must_result_in_a_foreign_key_in_the_model_tab
                 columns: vec![b_column.name.clone()],
                 referenced_table: "B".to_string(),
                 referenced_columns: vec!["id".to_string()],
-                on_delete_action: ForeignKeyAction::Restrict, // required relations can't set ON DELETE SET NULL
+                on_delete_action: ForeignKeyAction::Cascade, // required relations can't set ON DELETE SET NULL
             },
             ForeignKey {
                 constraint_name: match api.sql_family() {
@@ -619,7 +577,7 @@ async fn specifying_a_db_name_for_an_inline_relation_must_work(api: &TestApi) {
             columns: vec![column.name.clone()],
             referenced_table: "B".to_string(),
             referenced_columns: vec!["id".to_string()],
-            on_delete_action: ForeignKeyAction::Restrict,
+            on_delete_action: ForeignKeyAction::Cascade,
         }]
     );
 }
@@ -651,7 +609,7 @@ async fn adding_an_inline_relation_to_a_model_with_an_exotic_id_type(api: &TestA
             columns: vec![column.name.clone()],
             referenced_table: "B".to_string(),
             referenced_columns: vec!["id".to_string()],
-            on_delete_action: ForeignKeyAction::Restrict,
+            on_delete_action: ForeignKeyAction::Cascade,
         }]
     );
 }
@@ -720,7 +678,7 @@ async fn moving_an_inline_relation_to_the_other_side_must_work(api: &TestApi) ->
             columns: vec!["b".to_string()],
             referenced_table: "B".to_string(),
             referenced_columns: vec!["id".to_string()],
-            on_delete_action: ForeignKeyAction::Restrict,
+            on_delete_action: ForeignKeyAction::Cascade,
         }]
     );
 
@@ -747,7 +705,7 @@ async fn moving_an_inline_relation_to_the_other_side_must_work(api: &TestApi) ->
             columns: vec!["a".to_string()],
             referenced_table: "A".to_string(),
             referenced_columns: vec!["id".to_string()],
-            on_delete_action: ForeignKeyAction::Restrict,
+            on_delete_action: ForeignKeyAction::Cascade,
         }]
     );
 
@@ -1870,7 +1828,7 @@ async fn references_to_models_with_compound_primary_keys_must_work(api: &TestApi
         }
     "#;
 
-    api.infer_apply(dm).send().await?;
+    api.infer_apply(dm).send_assert().await?.assert_green()?;
 
     let sql_schema = api.describe_database().await?;
 
@@ -1904,19 +1862,24 @@ async fn join_tables_between_models_with_compound_primary_keys_must_work(api: &T
         }
     "#;
 
-    api.infer_apply(dm).send().await?;
+    api.infer_apply(dm).send_assert().await?.assert_green()?;
 
-    let sql_schema = api.describe_database().await?;
-
-    sql_schema
-        .assert_table("_CatToHuman")?
-        .assert_has_column("B_firstName")?
-        .assert_has_column("B_lastName")?
-        .assert_has_column("A")?
-        .assert_fk_on_columns(&["B_firstName", "B_lastName"], |fk| {
-            fk.assert_references("Human", &["firstName", "lastName"])
-        })?
-        .assert_fk_on_columns(&["A"], |fk| fk.assert_references("Cat", &["id"]))?;
+    api.assert_schema().await?.assert_table("_CatToHuman", |table| {
+        table
+            .assert_has_column("B_firstName")?
+            .assert_has_column("B_lastName")?
+            .assert_has_column("A")?
+            .assert_fk_on_columns(&["B_firstName", "B_lastName"], |fk| {
+                fk.assert_references("Human", &["firstName", "lastName"])?
+                    .assert_cascades_on_delete()
+            })?
+            .assert_fk_on_columns(&["A"], |fk| {
+                fk.assert_references("Cat", &["id"])?.assert_cascades_on_delete()
+            })?
+            .assert_indexes_count(2)?
+            .assert_index_on_columns(&["A", "B_firstName", "B_lastName"], |idx| idx.assert_is_unique())?
+            .assert_index_on_columns(&["B_firstName", "B_lastName"], |idx| idx.assert_is_not_unique())
+    })?;
 
     Ok(())
 }
@@ -1938,7 +1901,7 @@ async fn join_tables_between_models_with_mapped_compound_primary_keys_must_work(
         }
     "#;
 
-    api.infer_apply(dm).send().await?;
+    api.infer_apply(dm).send_assert().await?.assert_green()?;
 
     let sql_schema = api.describe_database().await?;
 
@@ -1950,7 +1913,8 @@ async fn join_tables_between_models_with_mapped_compound_primary_keys_must_work(
         .assert_fk_on_columns(&["B_the_first_name", "B_the_last_name"], |fk| {
             fk.assert_references("Human", &["the_first_name", "the_last_name"])
         })?
-        .assert_fk_on_columns(&["A"], |fk| fk.assert_references("Cat", &["id"]))?;
+        .assert_fk_on_columns(&["A"], |fk| fk.assert_references("Cat", &["id"]))?
+        .assert_indexes_count(2)?;
 
     Ok(())
 }

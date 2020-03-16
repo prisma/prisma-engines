@@ -58,7 +58,11 @@ impl SqlSchemaDescriber {
     async fn get_databases(&self) -> Vec<String> {
         debug!("Getting databases");
         let sql = "select schema_name as schema_name from information_schema.schemata;";
-        let rows = self.conn.query_raw(sql, &[]).await.expect("get schema names ");
+        let rows = self
+            .conn
+            .query_raw(sql, &[])
+            .await
+            .expect("get schema names ");
         let names = rows
             .into_iter()
             .map(|row| {
@@ -105,10 +109,18 @@ impl SqlSchemaDescriber {
             FROM information_schema.TABLES
             WHERE table_schema = ?
         "#;
-        let result = self.conn.query_raw(sql, &[schema.into()]).await.expect("get db size ");
+        let result = self
+            .conn
+            .query_raw(sql, &[schema.into()])
+            .await
+            .expect("get db size ");
         let size = result
             .first()
-            .map(|row| row.get("size").and_then(|x| x.to_string()).unwrap_or("0".to_string()))
+            .map(|row| {
+                row.get("size")
+                    .and_then(|x| x.to_string())
+                    .unwrap_or("0".to_string())
+            })
             .unwrap();
 
         debug!("Found db size: {:?}", size);
@@ -124,7 +136,9 @@ impl SqlSchemaDescriber {
     ) -> (Table, Vec<Enum>) {
         debug!("Getting table '{}'", name);
         let (columns, enums) = columns.remove(name).expect("table columns not found");
-        let (indices, primary_key) = indexes.remove(name).unwrap_or_else(|| (BTreeMap::new(), None));
+        let (indices, primary_key) = indexes
+            .remove(name)
+            .unwrap_or_else(|| (BTreeMap::new(), None));
 
         let foreign_keys = foreign_keys.remove(name).unwrap_or_default();
         (
@@ -140,7 +154,10 @@ impl SqlSchemaDescriber {
     }
 }
 
-async fn get_all_columns(conn: &dyn Queryable, schema_name: &str) -> HashMap<String, (Vec<Column>, Vec<Enum>)> {
+async fn get_all_columns(
+    conn: &dyn Queryable,
+    schema_name: &str,
+) -> HashMap<String, (Vec<Column>, Vec<Enum>)> {
     // We alias all the columns because MySQL column names are case-insensitive in queries, but the
     // information schema column names became upper-case in MySQL 8, causing the code fetching
     // the result values by column name below to fail.
@@ -177,7 +194,10 @@ async fn get_all_columns(conn: &dyn Queryable, schema_name: &str) -> HashMap<Str
             .get("column_name")
             .and_then(|x| x.to_string())
             .expect("get column name");
-        let data_type = col.get("data_type").and_then(|x| x.to_string()).expect("get data_type");
+        let data_type = col
+            .get("data_type")
+            .and_then(|x| x.to_string())
+            .expect("get data_type");
         let full_data_type = col
             .get("full_data_type")
             .and_then(|x| x.to_string())
@@ -197,7 +217,8 @@ async fn get_all_columns(conn: &dyn Queryable, schema_name: &str) -> HashMap<Str
         } else {
             ColumnArity::Nullable
         };
-        let (tpe, enum_option) = get_column_type_and_enum(&table_name, &name, &data_type, &full_data_type, arity);
+        let (tpe, enum_option) =
+            get_column_type_and_enum(&table_name, &name, &data_type, &full_data_type, arity);
         let extra = col
             .get("extra")
             .and_then(|x| x.to_string())
@@ -251,10 +272,14 @@ async fn get_all_columns(conn: &dyn Queryable, schema_name: &str) -> HashMap<Str
                         ColumnTypeFamily::Json => DefaultValue::DBGENERATED(default_string),
                         ColumnTypeFamily::Uuid => DefaultValue::DBGENERATED(default_string),
                         ColumnTypeFamily::Geometric => DefaultValue::DBGENERATED(default_string),
-                        ColumnTypeFamily::LogSequenceNumber => DefaultValue::DBGENERATED(default_string),
+                        ColumnTypeFamily::LogSequenceNumber => {
+                            DefaultValue::DBGENERATED(default_string)
+                        }
                         ColumnTypeFamily::TextSearch => DefaultValue::DBGENERATED(default_string),
-                        ColumnTypeFamily::TransactionId => DefaultValue::DBGENERATED(default_string),
-                        ColumnTypeFamily::Enum(enum_name) => DefaultValue::VALUE(unquote(default_string)),
+                        ColumnTypeFamily::TransactionId => {
+                            DefaultValue::DBGENERATED(default_string)
+                        }
+                        ColumnTypeFamily::Enum(_) => DefaultValue::VALUE(unquote(default_string)),
                         ColumnTypeFamily::Unknown => DefaultValue::DBGENERATED(default_string),
                     })
                 }
@@ -302,12 +327,27 @@ async fn get_all_indexes(
 
     for row in rows {
         debug!("Got index row: {:#?}", row);
-        let table_name = row.get("table_name").and_then(|x| x.to_string()).expect("table_name");
-        let seq_in_index = row.get("seq_in_index").and_then(|x| x.as_i64()).expect("seq_in_index");
+        let table_name = row
+            .get("table_name")
+            .and_then(|x| x.to_string())
+            .expect("table_name");
+        let seq_in_index = row
+            .get("seq_in_index")
+            .and_then(|x| x.as_i64())
+            .expect("seq_in_index");
         let pos = seq_in_index - 1;
-        let index_name = row.get("index_name").and_then(|x| x.to_string()).expect("index_name");
-        let is_unique = !row.get("non_unique").and_then(|x| x.as_bool()).expect("non_unique");
-        let column_name = row.get("column_name").and_then(|x| x.to_string()).expect("column_name");
+        let index_name = row
+            .get("index_name")
+            .and_then(|x| x.to_string())
+            .expect("index_name");
+        let is_unique = !row
+            .get("non_unique")
+            .and_then(|x| x.as_bool())
+            .expect("non_unique");
+        let column_name = row
+            .get("column_name")
+            .and_then(|x| x.to_string())
+            .expect("column_name");
 
         // Multi-column indices will return more than one row (with different column_name values).
         // We cannot assume that one row corresponds to one index.
@@ -363,7 +403,10 @@ async fn get_all_indexes(
     map
 }
 
-async fn get_foreign_keys(conn: &dyn Queryable, schema_name: &str) -> HashMap<String, Vec<ForeignKey>> {
+async fn get_foreign_keys(
+    conn: &dyn Queryable,
+    schema_name: &str,
+) -> HashMap<String, Vec<ForeignKey>> {
     // Foreign keys covering multiple columns will return multiple rows, which we need to
     // merge.
     let mut map: HashMap<String, HashMap<String, ForeignKey>> = HashMap::new();
@@ -499,11 +542,12 @@ fn get_column_type_and_enum(
         ("numeric", _) => ColumnTypeFamily::Float,
         ("float", _) => ColumnTypeFamily::Float,
         ("double", _) => ColumnTypeFamily::Float,
+        ("bit", _) => ColumnTypeFamily::Int,
         ("date", _) => ColumnTypeFamily::DateTime,
         ("time", _) => ColumnTypeFamily::DateTime,
         ("datetime", _) => ColumnTypeFamily::DateTime,
         ("timestamp", _) => ColumnTypeFamily::DateTime,
-        ("year", _) => ColumnTypeFamily::DateTime,
+        ("year", _) => ColumnTypeFamily::Int,
         ("char", _) => ColumnTypeFamily::String,
         ("varchar", _) => ColumnTypeFamily::String,
         ("text", _) => ColumnTypeFamily::String,
@@ -557,7 +601,8 @@ fn extract_enum_values(full_data_type: &&str) -> Vec<String> {
 
 fn unquote(input: String) -> String {
     /// Regex for matching the quotes on the introspected string values on MariaDB.
-    static MARIADB_STRING_DEFAULT_RE: Lazy<regex::Regex> = Lazy::new(|| regex::Regex::new(r#"^'(.*)'$"#).unwrap());
+    static MARIADB_STRING_DEFAULT_RE: Lazy<regex::Regex> =
+        Lazy::new(|| regex::Regex::new(r#"^'(.*)'$"#).unwrap());
 
     MARIADB_STRING_DEFAULT_RE
         .captures(input.as_ref())

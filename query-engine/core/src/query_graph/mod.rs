@@ -198,6 +198,7 @@ impl QueryGraph {
         if !self.finalized {
             self.swap_marked()?;
             self.insert_reloads()?;
+            // self.insert_result_relation_reloads()?;
             self.finalized = true;
         }
 

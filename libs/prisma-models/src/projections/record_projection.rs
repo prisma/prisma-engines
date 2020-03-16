@@ -52,7 +52,7 @@ impl RecordProjection {
     }
 
     /// Consumes this projection and splits it into a set of `RecordProjection`s based on the passed
-    /// `ModelProjection`s. Assumes that The transformation can be done.
+    /// `ModelProjection`s. Assumes that the transformation can be done.
     pub fn split_into(self, projections: &[ModelProjection]) -> Vec<RecordProjection> {
         let mapped: HashMap<String, (DataSourceFieldRef, PrismaValue)> = self
             .into_iter()

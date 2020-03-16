@@ -9,8 +9,8 @@ pub struct SkipAndLimit {
 
 #[derive(Debug, Default, Clone)]
 pub struct QueryArguments {
-    pub after: Option<Vec<(ScalarFieldRef, PrismaValue)>>,
-    pub before: Option<Vec<(ScalarFieldRef, PrismaValue)>>,
+    pub after: Option<RecordProjection>,
+    pub before: Option<RecordProjection>,
     pub skip: Option<i64>,
     pub first: Option<i64>,
     pub last: Option<i64>,

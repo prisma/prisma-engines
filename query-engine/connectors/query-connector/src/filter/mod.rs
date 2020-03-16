@@ -130,6 +130,7 @@ pub fn test_data_model() -> InternalDataModelRef {
         FieldTemplate::Relation(RelationFieldTemplate {
             name: "sites".to_owned(),
             is_required: false,
+            is_id: false,
             is_list: false,
             is_unique: false,
             is_auto_generated_int_id: false,
