@@ -1,7 +1,9 @@
 use crate::{
     ast::ParameterizedValue,
     connector::queryable::{GetRow, ToColumnNames},
+    error::{Error, ErrorKind},
 };
+use bit_vec::BitVec;
 use bytes::BytesMut;
 #[cfg(feature = "chrono-0_4")]
 use chrono::{DateTime, NaiveDateTime, Utc};
@@ -9,7 +11,7 @@ use rust_decimal::{
     prelude::{FromPrimitive, ToPrimitive},
     Decimal,
 };
-use std::{error::Error, str::FromStr};
+use std::{error::Error as StdError, str::FromStr};
 use tokio_postgres::{
     types::{self, FromSql, IsNull, Kind, ToSql, Type as PostgresType},
     Row as PostgresRow, Statement as PostgresStatement,
@@ -413,6 +415,25 @@ impl GetRow for PostgresRow {
                     }
                     None => ParameterizedValue::Null,
                 },
+                PostgresType::BIT | PostgresType::VARBIT => match row.try_get(i)? {
+                    Some(val) => {
+                        let val: BitVec = val;
+                        ParameterizedValue::Text(bits_to_string(&val)?.into())
+                    }
+                    None => ParameterizedValue::Null,
+                },
+                PostgresType::BIT_ARRAY | PostgresType::VARBIT_ARRAY => match row.try_get(i)? {
+                    Some(val) => {
+                        let val: Vec<BitVec> = val;
+                        let stringified = val
+                            .into_iter()
+                            .map(|bits| bits_to_string(&bits).map(|s| ParameterizedValue::Text(s.into())))
+                            .collect::<crate::Result<Vec<_>>>()?;
+
+                        ParameterizedValue::Array(stringified)
+                    }
+                    None => ParameterizedValue::Null,
+                },
                 ref x => match x.kind() {
                     Kind::Enum(_) => match row.try_get(i)? {
                         Some(val) => {
@@ -474,7 +495,11 @@ impl ToColumnNames for PostgresStatement {
 }
 
 impl<'a> ToSql for ParameterizedValue<'a> {
-    fn to_sql(&self, ty: &PostgresType, out: &mut BytesMut) -> Result<IsNull, Box<dyn Error + 'static + Send + Sync>> {
+    fn to_sql(
+        &self,
+        ty: &PostgresType,
+        out: &mut BytesMut,
+    ) -> Result<IsNull, Box<dyn StdError + 'static + Send + Sync>> {
         match (self, ty) {
             (ParameterizedValue::Null, _) => Ok(IsNull::Yes),
             (ParameterizedValue::Integer(integer), &PostgresType::INT2) => (*integer as i16).to_sql(ty, out),
@@ -543,7 +568,19 @@ impl<'a> ToSql for ParameterizedValue<'a> {
             | (ParameterizedValue::Text(string), &PostgresType::JSONB) => {
                 serde_json::from_str::<serde_json::Value>(&string)?.to_sql(ty, out)
             }
+            (ParameterizedValue::Text(string), &PostgresType::BIT)
+            | (ParameterizedValue::Text(string), &PostgresType::VARBIT) => {
+                let bits: BitVec = string_to_bits(string)?;
+
+                bits.to_sql(ty, out)
+            }
             (ParameterizedValue::Text(string), _) => string.to_sql(ty, out),
+            (ParameterizedValue::Array(values), &PostgresType::BIT_ARRAY)
+            | (ParameterizedValue::Array(values), &PostgresType::VARBIT_ARRAY) => {
+                let strings: Vec<String> = values.into_iter().filter_map(|val| val.to_string()).collect();
+
+                strings.to_sql(ty, out)
+            }
             (ParameterizedValue::Bytes(bytes), _) => bytes.as_ref().to_sql(ty, out),
             (ParameterizedValue::Enum(string), _) => {
                 out.extend_from_slice(string.as_bytes());
@@ -577,4 +614,39 @@ impl<'a> ToSql for ParameterizedValue<'a> {
     }
 
     tokio_postgres::types::to_sql_checked!();
+}
+
+fn string_to_bits(s: &str) -> crate::Result<BitVec> {
+    use bit_vec::*;
+
+    let mut bits = BitVec::with_capacity(s.len());
+
+    for c in s.chars() {
+        match c {
+            '0' => bits.push(false),
+            '1' => bits.push(true),
+            _ => {
+                return Err(Error::builder(ErrorKind::ConversionError(
+                    "Unexpected character for bits input. Expected only 1 and 0.",
+                ))
+                .build())
+            }
+        }
+    }
+
+    Ok(bits)
+}
+
+fn bits_to_string(bits: &BitVec) -> crate::Result<String> {
+    let mut s = String::with_capacity(bits.len());
+
+    for bit in bits {
+        if bit {
+            s.push('1');
+        } else {
+            s.push('0');
+        }
+    }
+
+    Ok(s)
 }

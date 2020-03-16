@@ -608,6 +608,7 @@ mod tests {
             CREATE TABLE types (
                 id SERIAL PRIMARY KEY,
 
+                binary_bits bit(12),
                 bytes_uuid uuid,
                 bytes_uuid_arr uuid[],
                 network_inet inet,
@@ -631,6 +632,7 @@ mod tests {
         connection.query_raw(table, &[]).await.unwrap();
 
         let insert = ast::Insert::single_into("types")
+            .value("binary_bits", "111011100011")
             .value("bytes_uuid", "111142ec-880b-4062-913d-8eac479ab957")
             .value(
                 "bytes_uuid_arr",
@@ -679,6 +681,7 @@ mod tests {
 
         let expected = &[
             ParameterizedValue::Integer(1),
+            ParameterizedValue::Text("111011100011".into()),
             ParameterizedValue::Uuid("111142ec-880b-4062-913d-8eac479ab957".parse().unwrap()),
             ParameterizedValue::Array(vec![
                 ParameterizedValue::Uuid("111142ec-880b-4062-913d-8eac479ab957".parse().unwrap()),
@@ -745,6 +748,49 @@ mod tests {
         ];
 
         assert_eq!(result.get(2).unwrap().values, &expected_third_row);
+    }
+
+    #[tokio::test]
+    async fn test_bits_value_conversions_match_with_manual_inserts() {
+        let conn = Quaint::new(&CONN_STR).await.unwrap();
+
+        conn.query_raw("DROP TABLE IF EXISTS bits_conversion_test", &[])
+            .await
+            .unwrap();
+        conn.query_raw(
+            "CREATE TABLE bits_conversion_test (id SERIAL PRIMARY KEY, onesandzeroes bit(12), vars varbit(12))",
+            &[],
+        )
+        .await
+        .unwrap();
+
+        conn.query_raw(
+            "INSERT INTO bits_conversion_test (onesandzeroes, vars) VALUES \
+            ('000000000000', '0000000000'), \
+            ('110011000100', '110011000100')",
+            &[],
+        )
+        .await
+        .unwrap();
+
+        let select = ast::Select::from_table("bits_conversion_test").value(ast::asterisk());
+        let result = conn.query(select.into()).await.unwrap();
+
+        let expected_first_row = vec![
+            ParameterizedValue::Integer(1),
+            ParameterizedValue::Text("000000000000".into()),
+            ParameterizedValue::Text("0000000000".into()),
+        ];
+
+        assert_eq!(result.get(0).unwrap().values, &expected_first_row);
+
+        let expected_second_row = vec![
+            ParameterizedValue::Integer(2),
+            ParameterizedValue::Text("110011000100".into()),
+            ParameterizedValue::Text("110011000100".into()),
+        ];
+
+        assert_eq!(result.get(1).unwrap().values, &expected_second_row);
     }
 
     #[tokio::test]
