@@ -289,25 +289,32 @@ async fn introspecting_a_default_value_as_dbgenerated_should_work(api: &TestApi)
                 t.inject_custom("string_static_char varchar(5) Default 'test'");
                 t.inject_custom("string_static_text text Default 'test'");
                 t.inject_custom("string_static_varchar varchar(5) Default 'test'");
-                // t.inject_custom("string_function char(200) Default 'SQLite ' || 'CONCAT'");
                 t.inject_custom("int_static Integer DEFAULT 2");
                 t.inject_custom("float_static Float DEFAULT 1.43");
                 t.inject_custom("boolean_static Boolean DEFAULT 1");
-                t.inject_custom("datetime_now TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP");
+                t.inject_custom("datetime_now_current_timestamp TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP");
+                t.inject_custom("datetime_now_current_timestamp_lc TIMESTAMP NULL DEFAULT current_TIMESTAMP");
+                t.inject_custom("datetime_now_datetime_now TIMESTAMP NULL DEFAULT (DATETIME('now'))");
+                t.inject_custom(
+                    "datetime_datetime_now_localtime TIMESTAMP NULL DEFAULT (datetime('now', 'localtime'))",
+                );
             });
         })
         .await;
 
     let dm = r#"
             model Test {
-                boolean_static          Boolean?    @default(true)
-                datetime_now            DateTime?   @default(now())
-                float_static            Float?      @default(1.43)
-                id                      Int         @default(autoincrement()) @id
-                int_static              Int?        @default(2)
-                string_static_char      String?     @default("test")
-                string_static_text      String?     @default("test")
-                string_static_varchar   String?     @default("test")                             
+                boolean_static                      Boolean?    @default(true)
+                datetime_datetime_now_localtime     DateTime?   @default(now())
+                datetime_now_current_timestamp      DateTime?   @default(now())
+                datetime_now_current_timestamp_lc   DateTime?   @default(now())
+                datetime_now_datetime_now           DateTime?   @default(now())
+                float_static                        Float?      @default(1.43)
+                id                                  Int         @default(autoincrement()) @id
+                int_static                          Int?        @default(2)
+                string_static_char                  String?     @default("test")
+                string_static_text                  String?     @default("test")
+                string_static_varchar               String?     @default("test")                             
             }
         "#;
 

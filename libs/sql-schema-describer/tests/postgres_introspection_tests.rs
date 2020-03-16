@@ -7,7 +7,6 @@ mod postgres;
 
 use crate::common::*;
 use crate::postgres::*;
-use log::Level::Debug;
 
 #[tokio::test]
 async fn all_postgres_column_types_must_work() {

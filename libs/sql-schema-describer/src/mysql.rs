@@ -218,8 +218,8 @@ async fn get_all_columns(conn: &dyn Queryable, schema_name: &str) -> HashMap<Str
             None => None,
             Some(param_value) => match param_value.to_string() {
                 None => None,
+                Some(x) if x == "NULL" => None,
                 Some(default_string) => {
-                    println!("{:?}", default_string);
                     Some(match &tpe.family {
                         ColumnTypeFamily::Int => match parse_int(&default_string).is_some() {
                             true => DefaultValue::VALUE(default_string),
@@ -234,14 +234,11 @@ async fn get_all_columns(conn: &dyn Queryable, schema_name: &str) -> HashMap<Str
                             Some(0) => DefaultValue::VALUE(default_string),
                             _ => DefaultValue::DBGENERATED(default_string),
                         },
-                        //todo Maria DB does not seem to quote the strings
-                        ColumnTypeFamily::String => {
-                            // match default_string.starts_with("\'") && default_string.ends_with("\'") {
-                            //     true => DefaultValue::VALUE(unquote(default_string)),
-                            //     false => DefaultValue::DBGENERATED(default_string),
-                            // }
-                            DefaultValue::VALUE(unquote(default_string))
-                        }
+                        //todo Maria DB does not seem to quote the strings, but it allows functions which MySQL doesnt
+                        ColumnTypeFamily::String => match &default_string.starts_with("'") {
+                            true => DefaultValue::VALUE(unquote(default_string)),
+                            false => DefaultValue::VALUE(default_string),
+                        },
                         //todo check other now() definitions
                         ColumnTypeFamily::DateTime => match default_string == "CURRENT_TIMESTAMP".to_string()
                             || default_string == "current_timestamp()".to_string()
@@ -562,14 +559,6 @@ fn extract_enum_values(full_data_type: &&str) -> Vec<String> {
     let vals = &full_data_type[5..len];
     vals.split(",").map(|v| unquote(v.into())).collect()
 }
-
-// fn sanitize_default_value(value: &str) -> Option<&str> {
-//     match value {
-//         "NULL" => None,
-//         default if default.starts_with("'") => Some(unquote(default.into())),
-//         other => Some(other),
-//     }
-// }
 
 fn unquote(input: String) -> String {
     /// Regex for matching the quotes on the introspected string values on MariaDB.

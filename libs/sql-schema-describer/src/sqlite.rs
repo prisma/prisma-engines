@@ -148,8 +148,10 @@ impl SqlSchemaDescriber {
                             },
                             ColumnTypeFamily::String => DefaultValue::VALUE(unquote(default_string)),
                             //todo check other now() definitions
-                            ColumnTypeFamily::DateTime => match default_string == "CURRENT_TIMESTAMP".to_string()
-                                || default_string == "current_timestamp()".to_string()
+                            ColumnTypeFamily::DateTime => match default_string.to_lowercase()
+                                == "current_timestamp".to_string()
+                                || default_string.to_lowercase() == "datetime(\'now\')".to_string()
+                                || default_string.to_lowercase() == "datetime(\'now\', \'localtime\')".to_string()
                             {
                                 true => DefaultValue::NOW,
                                 false => DefaultValue::DBGENERATED(default_string),
@@ -380,7 +382,6 @@ impl SqlSchemaDescriber {
 
 fn get_column_type(tpe: &str, arity: ColumnArity) -> ColumnType {
     let tpe_lower = tpe.to_lowercase();
-    println!("{:?}", tpe_lower);
 
     let family = match tpe_lower.as_ref() {
         // SQLite only has a few native data types: https://www.sqlite.org/datatype3.html

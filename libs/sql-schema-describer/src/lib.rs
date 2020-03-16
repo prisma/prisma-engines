@@ -215,7 +215,6 @@ pub struct Column {
     pub tpe: ColumnType,
     /// Column default.
     pub default: Option<DefaultValue>,
-    // pub default: Option<String>,
     /// Is the column auto-incrementing?
     pub auto_increment: bool,
 }
@@ -396,7 +395,7 @@ pub enum DefaultValue {
     NOW,
     /// An expression generating a sequence.
     SEQUENCE(String),
-    /// Unrecognized Default Value
+    /// An unrecognized Default Value
     DBGENERATED(String),
 }
 

@@ -307,7 +307,7 @@ pub(crate) fn calculate_default(table: &Table, column: &Column, arity: &FieldAri
         (Some(SQLDef::VALUE(val)), ColumnTypeFamily::Float) => parse_float(val).map(|x| DMLDef::Single(SV::Float(x))),
         (Some(SQLDef::VALUE(val)), ColumnTypeFamily::String) => Some(DMLDef::Single(SV::String(val.into()))),
         (Some(SQLDef::NOW), ColumnTypeFamily::DateTime) => Some(DMLDef::Expression(VG::new_now())),
-        (Some(SQLDef::VALUE(val)), ColumnTypeFamily::DateTime) => Some(DMLDef::Expression(VG::new_dbgenerated())), //todo parse datetime value
+        (Some(SQLDef::VALUE(_)), ColumnTypeFamily::DateTime) => Some(DMLDef::Expression(VG::new_dbgenerated())), //todo parse datetime value
         (Some(SQLDef::VALUE(val)), ColumnTypeFamily::Enum(_)) => Some(DMLDef::Single(SV::ConstantLiteral(val.into()))),
         (_, _) => None,
     }
