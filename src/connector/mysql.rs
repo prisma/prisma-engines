@@ -468,6 +468,45 @@ VALUES (1, 'Joe', 27, 20000.00 );
     }
 
     #[tokio::test]
+    async fn test_mysql_time() {
+        let connection = Quaint::new(&CONN_STR).await.unwrap();
+        let time = chrono::NaiveTime::from_hms_micro(14, 40, 22, 1);
+
+        connection
+            .query_raw("DROP TABLE IF EXISTS quaint_mysql_time_test", &[])
+            .await
+            .unwrap();
+
+        connection
+            .query_raw(
+                "CREATE TABLE quaint_mysql_time_test (id INTEGER AUTO_INCREMENT PRIMARY KEY, value TIME)",
+                &[],
+            )
+            .await
+            .unwrap();
+
+        let insert_raw = "INSERT INTO quaint_mysql_time_test (value) VALUES ('20:12:22')";
+        let insert_parameterized = Insert::single_into("quaint_mysql_time_test").value("value", time);
+
+        connection.query_raw(insert_raw, &[]).await.unwrap();
+        connection.query(insert_parameterized.into()).await.unwrap();
+
+        let select = Select::from_table("quaint_mysql_time_test").value(asterisk());
+        let rows = connection.query(select.into()).await.unwrap();
+
+        assert_eq!(rows.len(), 2);
+
+        assert_eq!(
+            rows.get(0).unwrap().at(1),
+            Some(&ParameterizedValue::DateTime("1970-01-01T20:12:22Z".parse().unwrap()))
+        );
+        assert_eq!(
+            rows.get(1).unwrap().at(1),
+            Some(&ParameterizedValue::DateTime("1970-01-01T14:40:22Z".parse().unwrap()))
+        );
+    }
+
+    #[tokio::test]
     async fn should_map_nonexisting_database_error() {
         let mut url = Url::parse(&CONN_STR).unwrap();
         url.set_username("root").unwrap();
