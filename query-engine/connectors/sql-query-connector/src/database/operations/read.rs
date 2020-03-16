@@ -3,9 +3,9 @@ use crate::{
     QueryExt, SqlError,
 };
 use connector_interface::*;
+use futures::future;
 use prisma_models::*;
 use quaint::ast::*;
-use futures::future;
 
 pub async fn get_single_record(
     conn: &dyn QueryExt,
@@ -24,7 +24,10 @@ pub async fn get_single_record(
         Err(e) => Err(e),
     })?
     .map(Record::from)
-    .map(|record| SingleRecord { record, field_names });
+    .map(|record| SingleRecord {
+        record,
+        field_names,
+    });
 
     Ok(record)
 }
@@ -56,12 +59,19 @@ pub async fn get_many_records(
     } else {
         let query = read::get_records(model, selected_fields.columns(), query_arguments);
 
-        for item in conn.filter(query.into(), idents.as_slice()).await?.into_iter() {
+        for item in conn
+            .filter(query.into(), idents.as_slice())
+            .await?
+            .into_iter()
+        {
             records.push(Record::from(item))
         }
     }
 
-    Ok(ManyRecords { records, field_names })
+    Ok(ManyRecords {
+        records,
+        field_names,
+    })
 }
 
 pub async fn get_related_m2m_record_ids(
@@ -85,7 +95,11 @@ pub async fn get_related_m2m_record_ids(
 
     // [DTODO] To verify: We might need chunked fetch here (too many parameters in the query).
     let select = Select::from_table(table)
-        .columns(from_column_names.into_iter().chain(to_column_names.into_iter()))
+        .columns(
+            from_column_names
+                .into_iter()
+                .chain(to_column_names.into_iter()),
+        )
         .so_that(query_builder::conditions(&from_columns, from_record_ids));
 
     let parent_model_id = from_field.model().primary_identifier();
