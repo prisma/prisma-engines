@@ -1,13 +1,36 @@
-use datamodel::Datamodel;
+use datamodel::{Datamodel, FieldArity, FieldType, RelationInfo};
 
 pub fn commenting_out_guardrails(datamodel: &mut Datamodel) {
     let mut commented_model_names = vec![];
+    let mut models_with_one_to_one_relation = vec![];
+
+    //todo
+    for model in &datamodel.models {
+        if model.fields.iter().any(|f| match &f.field_type {
+            FieldType::Relation(RelationInfo { to, to_fields, .. }) => {
+                let other_model = datamodel.find_model(to).unwrap();
+                match to_fields {
+                    x if x.len() == 1 => match other_model.find_field(x[0].as_str()).unwrap().arity
+                    {
+                        FieldArity::Required => true,
+                        FieldArity::Optional => true,
+                        FieldArity::List => false,
+                    },
+                    _ => false,
+                }
+            }
+            _ => false,
+        }) {
+            models_with_one_to_one_relation.push(model.name.clone())
+        }
+    }
 
     //models without uniques / ids
     for model in &mut datamodel.models {
         if model.id_fields.is_empty()
             && !model.fields.iter().any(|f| f.is_id || f.is_unique)
             && !model.indices.iter().any(|i| i.is_unique())
+            && !models_with_one_to_one_relation.contains(&model.name)
         {
             commented_model_names.push(model.name.clone());
             model.is_commented_out = true;
