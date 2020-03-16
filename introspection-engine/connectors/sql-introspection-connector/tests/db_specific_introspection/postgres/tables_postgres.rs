@@ -374,7 +374,8 @@ async fn introspecting_a_default_value_as_dbgenerated_should_work(api: &TestApi)
                 t.inject_custom("int_sequence Integer DEFAULT nextval('test_seq')"); // todo this is not recognized as autoincrement
                 t.inject_custom("float_static Float DEFAULT 1.43");
                 t.inject_custom("boolean_static Boolean DEFAULT true");
-                t.inject_custom("datetime_now TIMESTAMP DEFAULT now()");
+                t.inject_custom("datetime_now TIMESTAMP DEFAULT NOW()");
+                t.inject_custom("datetime_now_lc TIMESTAMP DEFAULT now()");
             });
         })
         .await;
@@ -383,6 +384,7 @@ async fn introspecting_a_default_value_as_dbgenerated_should_work(api: &TestApi)
             model Test {
                 boolean_static          Boolean?    @default(true)
                 datetime_now            DateTime?   @default(now())
+                datetime_now_lc         DateTime?   @default(now())
                 float_static            Float?      @default(1.43)
                 id                      Int         @default(autoincrement()) @id
                 int_function            Int?        @default(dbgenerated())

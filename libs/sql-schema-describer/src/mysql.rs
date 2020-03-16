@@ -240,8 +240,9 @@ async fn get_all_columns(conn: &dyn Queryable, schema_name: &str) -> HashMap<Str
                             false => DefaultValue::VALUE(default_string),
                         },
                         //todo check other now() definitions
-                        ColumnTypeFamily::DateTime => match default_string == "CURRENT_TIMESTAMP".to_string()
-                            || default_string == "current_timestamp()".to_string()
+                        ColumnTypeFamily::DateTime => match default_string.to_lowercase()
+                            == "current_timestamp".to_string()
+                            || default_string.to_lowercase() == "current_timestamp()".to_string()
                         {
                             true => DefaultValue::NOW,
                             false => DefaultValue::DBGENERATED(default_string),

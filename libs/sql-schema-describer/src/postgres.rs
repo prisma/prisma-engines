@@ -240,7 +240,7 @@ impl SqlSchemaDescriber {
                             }
                         }
                         ColumnTypeFamily::DateTime => {
-                            match default_string == "now()".to_string() {
+                            match default_string.to_lowercase() == "now()".to_string() {
                                 true => DefaultValue::NOW,
                                 false => DefaultValue::DBGENERATED(default_string), //todo parse values
                             }

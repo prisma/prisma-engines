@@ -402,7 +402,6 @@ pub enum DefaultValue {
 static RE_NUM: Lazy<Regex> = Lazy::new(|| Regex::new(r"^'?(\d+)'?$").expect("compile regex"));
 
 fn parse_int(value: &str) -> Option<i32> {
-    println!("{}", value);
     let rslt = RE_NUM.captures(value);
     if rslt.is_none() {
         return None;
