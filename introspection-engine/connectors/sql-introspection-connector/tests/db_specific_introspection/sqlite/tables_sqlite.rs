@@ -291,7 +291,8 @@ async fn introspecting_a_default_value_as_dbgenerated_should_work(api: &TestApi)
                 t.inject_custom("string_static_varchar varchar(5) Default 'test'");
                 t.inject_custom("int_static Integer DEFAULT 2");
                 t.inject_custom("float_static Float DEFAULT 1.43");
-                t.inject_custom("boolean_static Boolean DEFAULT 1");
+                t.inject_custom("boolean_static_1 Boolean DEFAULT 1");
+                t.inject_custom("boolean_static_true Boolean DEFAULT tRue");
                 t.inject_custom("datetime_now_current_timestamp TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP");
                 t.inject_custom("datetime_now_current_timestamp_lc TIMESTAMP NULL DEFAULT current_TIMESTAMP");
                 t.inject_custom("datetime_now_datetime_now TIMESTAMP NULL DEFAULT (DATETIME('now'))");
@@ -304,7 +305,8 @@ async fn introspecting_a_default_value_as_dbgenerated_should_work(api: &TestApi)
 
     let dm = r#"
             model Test {
-                boolean_static                      Boolean?    @default(true)
+                boolean_static_1                    Boolean?    @default(true)
+                boolean_static_true                 Boolean?    @default(true)
                 datetime_datetime_now_localtime     DateTime?   @default(now())
                 datetime_now_current_timestamp      DateTime?   @default(now())
                 datetime_now_current_timestamp_lc   DateTime?   @default(now())
