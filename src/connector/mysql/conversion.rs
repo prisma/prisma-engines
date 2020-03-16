@@ -1,6 +1,6 @@
-use crate::{ast::ParameterizedValue, connector::queryable::TakeRow};
+use crate::{ast::ParameterizedValue, connector::queryable::TakeRow, error::ErrorKind};
 #[cfg(feature = "chrono-0_4")]
-use chrono::{DateTime, Datelike, Duration, NaiveDate, NaiveDateTime, NaiveTime, Timelike, Utc};
+use chrono::{DateTime, Datelike, NaiveDate, NaiveDateTime, NaiveTime, Timelike, Utc};
 use mysql_async as my;
 use mysql_async::Value as MyValue;
 use rust_decimal::prelude::ToPrimitive;
@@ -43,24 +43,26 @@ impl TakeRow for my::Row {
                 }
                 #[cfg(feature = "chrono-0_4")]
                 my::Value::Time(is_neg, days, hours, minutes, seconds, micros) => {
-                    let days = Duration::days(i64::from(days));
-                    let hours = Duration::hours(i64::from(hours));
-                    let minutes = Duration::minutes(i64::from(minutes));
-                    let seconds = Duration::seconds(i64::from(seconds));
-                    let micros = Duration::microseconds(i64::from(micros));
+                    if is_neg {
+                        return Err(crate::error::Error::builder(ErrorKind::ConversionError(
+                            "Failed to convert a negative time",
+                        ))
+                        .build());
+                    }
 
-                    let time = days
-                        .checked_add(&hours)
-                        .and_then(|t| t.checked_add(&minutes))
-                        .and_then(|t| t.checked_add(&seconds))
-                        .and_then(|t| t.checked_add(&micros))
-                        .unwrap();
+                    if days != 0 {
+                        return Err(crate::error::Error::builder(ErrorKind::ConversionError(
+                            "Failed to read a MySQL `time` as duration",
+                        ))
+                        .build());
+                    }
 
-                    let duration = time.to_std().unwrap();
-                    let f_time = duration.as_secs() as f64 + f64::from(duration.subsec_micros()) * 1e-6;
-                    let f_time = if is_neg { -f_time } else { f_time };
+                    let time = NaiveTime::from_hms_micro(hours.into(), minutes.into(), seconds.into(), micros);
 
-                    ParameterizedValue::from(f_time)
+                    ParameterizedValue::DateTime(DateTime::<Utc>::from_utc(
+                        NaiveDateTime::new(NaiveDate::from_ymd(1970, 1, 1), time),
+                        Utc,
+                    ))
                 }
                 #[cfg(not(feature = "chrono-0_4"))]
                 typ => panic!(

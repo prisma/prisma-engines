@@ -532,6 +532,13 @@ impl<'a> From<DateTime<Utc>> for ParameterizedValue<'a> {
     }
 }
 
+#[cfg(feature = "chrono-0_4")]
+impl<'a> From<chrono::NaiveTime> for ParameterizedValue<'a> {
+    fn from(that: chrono::NaiveTime) -> Self {
+        ParameterizedValue::Text(that.to_string().into())
+    }
+}
+
 impl<'a> From<f64> for ParameterizedValue<'a> {
     #[inline]
     fn from(that: f64) -> Self {
