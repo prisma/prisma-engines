@@ -399,6 +399,15 @@ pub enum DefaultValue {
     DBGENERATED(String),
 }
 
+impl DefaultValue {
+    pub fn as_value(&self) -> Option<&str> {
+        match self {
+            DefaultValue::VALUE(s) => Some(s.as_str()),
+            _ => None,
+        }
+    }
+}
+
 static RE_NUM: Lazy<Regex> = Lazy::new(|| Regex::new(r"^'?(\d+)'?$").expect("compile regex"));
 
 fn parse_int(value: &str) -> Option<i32> {
