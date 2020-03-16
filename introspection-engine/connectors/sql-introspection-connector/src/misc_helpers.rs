@@ -1,12 +1,14 @@
 use datamodel::common::names::NameNormalizer;
 use datamodel::{
-    DefaultValue, Field, FieldArity, FieldType, IndexDefinition, Model, OnDeleteStrategy, RelationInfo, ScalarType,
-    ScalarValue, ValueGenerator,
+    DefaultValue, Field, FieldArity, FieldType, IndexDefinition, Model, OnDeleteStrategy,
+    RelationInfo, ScalarType, ScalarValue, ValueGenerator,
 };
 use log::debug;
 use once_cell::sync::Lazy;
 use regex::Regex;
-use sql_schema_describer::{Column, ColumnArity, ColumnTypeFamily, ForeignKey, Index, IndexType, SqlSchema, Table};
+use sql_schema_describer::{
+    Column, ColumnArity, ColumnTypeFamily, ForeignKey, Index, IndexType, SqlSchema, Table,
+};
 
 //checks
 
@@ -44,7 +46,11 @@ pub(crate) fn is_foreign_key_column(table: &Table, column: &Column) -> bool {
 
 //calculators
 
-pub fn calculate_many_to_many_field(foreign_key: &ForeignKey, relation_name: String, is_self_relation: bool) -> Field {
+pub fn calculate_many_to_many_field(
+    foreign_key: &ForeignKey,
+    relation_name: String,
+    is_self_relation: bool,
+) -> Field {
     let field_type = FieldType::Relation(RelationInfo {
         name: relation_name,
         to: foreign_key.referenced_table.clone(),
@@ -89,15 +95,6 @@ pub(crate) fn calculate_index(index: &Index) -> IndexDefinition {
     index_definition
 }
 
-pub(crate) fn calculate_compound_index(index: &Index, name: String) -> IndexDefinition {
-    debug!("Handling compound index  {:?}", name);
-    IndexDefinition {
-        name: Some(index.name.clone()),
-        fields: vec![name],
-        tpe: datamodel::dml::IndexType::Normal,
-    }
-}
-
 pub(crate) fn calculate_scalar_field(
     schema: &SqlSchema,
     table: &Table,
@@ -107,7 +104,9 @@ pub(crate) fn calculate_scalar_field(
     debug!("Handling column {:?}", column);
     let field_type = calculate_field_type(&schema, &column, &table);
     let arity = match column.tpe.arity {
-        _ if column.auto_increment && field_type == FieldType::Base(ScalarType::Int) => FieldArity::Required,
+        _ if column.auto_increment && field_type == FieldType::Base(ScalarType::Int) => {
+            FieldArity::Required
+        }
         ColumnArity::Required => FieldArity::Required,
         ColumnArity::Nullable => FieldArity::Optional,
         ColumnArity::List => FieldArity::List,
@@ -138,90 +137,66 @@ pub(crate) fn calculate_relation_field(
     table: &Table,
     foreign_key: &ForeignKey,
     foreign_keys: &Vec<ForeignKey>,
-) -> Vec<Field> {
+) -> Field {
     debug!("Handling compound foreign key  {:?}", foreign_key);
-    //if at least one primary key column is contained in the foreign key drop the relation.
-    if table.primary_key.is_some()
-        && table
-            .primary_key
-            .as_ref()
-            .unwrap()
-            .columns
+
+    let field_type = FieldType::Relation(RelationInfo {
+        name: calculate_relation_name(schema, foreign_key, table),
+        to: foreign_key.referenced_table.clone(),
+        to_fields: foreign_key.referenced_columns.clone(),
+        on_delete: OnDeleteStrategy::None,
+    });
+
+    let columns: Vec<&Column> = foreign_key
+        .columns
+        .iter()
+        .map(|c| table.columns.iter().find(|tc| tc.name == *c).unwrap())
+        .collect();
+
+    let arity = match !columns.iter().any(|c| c.is_required()) {
+        true => FieldArity::Optional,
+        false => FieldArity::Required,
+    };
+
+    let more_then_one_compound_to_same_table = || {
+        foreign_keys
             .iter()
-            .any(|c| foreign_key.columns.contains(c))
-    {
-        foreign_key
-            .columns
-            .iter()
-            .map(|fk_column| {
-                calculate_scalar_field(
-                    schema,
-                    table,
-                    table.columns.iter().find(|c| c.name == *fk_column).unwrap(),
-                    Some(format!(
-                        "This used to be part of a relation to {}",
-                        foreign_key.referenced_table.clone()
-                    )),
-                )
+            .filter(|fk| {
+                fk.referenced_table == foreign_key.referenced_table && fk.columns.len() > 1
             })
-            .collect()
-    } else {
-        let field_type = FieldType::Relation(RelationInfo {
-            name: calculate_relation_name(schema, foreign_key, table),
-            to: foreign_key.referenced_table.clone(),
-            to_fields: foreign_key.referenced_columns.clone(),
-            on_delete: OnDeleteStrategy::None,
-        });
+            .count()
+            > 1
+    };
 
-        let columns: Vec<&Column> = foreign_key
-            .columns
-            .iter()
-            .map(|c| table.columns.iter().find(|tc| tc.name == *c).unwrap())
-            .collect();
-
-        let arity = match !columns.iter().any(|c| c.is_required()) {
-            true => FieldArity::Optional,
-            false => FieldArity::Required,
-        };
-
-        let more_then_one_compound_to_same_table = || {
-            foreign_keys
-                .iter()
-                .filter(|fk| fk.referenced_table == foreign_key.referenced_table && fk.columns.len() > 1)
-                .count()
-                > 1
-        };
-
-        let (name, database_name) = match columns.len() {
-            1 => (columns[0].name.clone(), vec![]),
-            _ if more_then_one_compound_to_same_table() => (
-                format!(
-                    "{}_{}",
-                    foreign_key.referenced_table.clone().camel_case(),
-                    columns[0].name.clone()
-                ),
-                columns.iter().map(|c| c.name.clone()).collect(),
-            ),
-            _ => (
+    let (name, database_name) = match columns.len() {
+        1 => (columns[0].name.clone(), vec![]),
+        _ if more_then_one_compound_to_same_table() => (
+            format!(
+                "{}_{}",
                 foreign_key.referenced_table.clone().camel_case(),
-                columns.iter().map(|c| c.name.clone()).collect(),
+                columns[0].name.clone()
             ),
-        };
+            columns.iter().map(|c| c.name.clone()).collect(),
+        ),
+        _ => (
+            foreign_key.referenced_table.clone().camel_case(),
+            columns.iter().map(|c| c.name.clone()).collect(),
+        ),
+    };
 
-        vec![Field {
-            name,
-            arity,
-            field_type,
-            database_names: database_name,
-            default_value: None,
-            is_unique: false,
-            is_id: false,
-            documentation: None,
-            is_generated: false,
-            is_updated_at: false,
-            data_source_fields: vec![],
-            is_commented_out: false,
-        }]
+    Field {
+        name,
+        arity,
+        field_type,
+        database_names: database_name,
+        default_value: None,
+        is_unique: false,
+        is_id: false,
+        documentation: None,
+        is_generated: false,
+        is_updated_at: false,
+        data_source_fields: vec![],
+        is_commented_out: false,
     }
 }
 
@@ -287,7 +262,11 @@ pub(crate) fn calculate_backrelation_field(
     }
 }
 
-pub(crate) fn calculate_default(table: &Table, column: &Column, arity: &FieldArity) -> Option<DefaultValue> {
+pub(crate) fn calculate_default(
+    table: &Table,
+    column: &Column,
+    arity: &FieldArity,
+) -> Option<DefaultValue> {
     //todo make cases with default value explicit for every datatype
     match (&column.default, &column.tpe.family) {
         (_, _) if *arity == FieldArity::List => None,
@@ -297,14 +276,24 @@ pub(crate) fn calculate_default(table: &Table, column: &Column, arity: &FieldAri
         },
         (Some(d), ColumnTypeFamily::Int) => match column.auto_increment {
             true => Some(DefaultValue::Expression(ValueGenerator::new_autoincrement())),
-            _ if is_sequence(column, table) => Some(DefaultValue::Expression(ValueGenerator::new_autoincrement())),
+            _ if is_sequence(column, table) => {
+                Some(DefaultValue::Expression(ValueGenerator::new_autoincrement()))
+            }
             false => parse_int(d).map(|x| DefaultValue::Single(ScalarValue::Int(x))),
         },
-        (Some(d), ColumnTypeFamily::Float) => parse_float(d).map(|x| DefaultValue::Single(ScalarValue::Float(x))),
-        (Some(d), ColumnTypeFamily::String) => Some(DefaultValue::Single(ScalarValue::String(d.to_string()))),
+        (Some(d), ColumnTypeFamily::Float) => {
+            parse_float(d).map(|x| DefaultValue::Single(ScalarValue::Float(x)))
+        }
+        (Some(d), ColumnTypeFamily::String) => {
+            Some(DefaultValue::Single(ScalarValue::String(d.to_string())))
+        }
         (Some(_), ColumnTypeFamily::DateTime) => None, //todo
-        (Some(d), ColumnTypeFamily::Enum(_)) => Some(DefaultValue::Single(ScalarValue::ConstantLiteral(d.to_string()))),
-        (None, _) if column.auto_increment => Some(DefaultValue::Expression(ValueGenerator::new_autoincrement())),
+        (Some(d), ColumnTypeFamily::Enum(_)) => Some(DefaultValue::Single(
+            ScalarValue::ConstantLiteral(d.to_string()),
+        )),
+        (None, _) if column.auto_increment => {
+            Some(DefaultValue::Expression(ValueGenerator::new_autoincrement()))
+        }
         (_, _) => None,
     }
 }
@@ -333,7 +322,11 @@ pub(crate) fn is_sequence(column: &Column, table: &Table) -> bool {
         .unwrap_or(false)
 }
 
-pub(crate) fn calculate_relation_name(schema: &SqlSchema, fk: &ForeignKey, table: &Table) -> String {
+pub(crate) fn calculate_relation_name(
+    schema: &SqlSchema,
+    fk: &ForeignKey,
+    table: &Table,
+) -> String {
     //this is not called for prisma many to many relations. for them the name is just the name of the join table.
     let referenced_model = &fk.referenced_table;
     let model_with_fk = &table.name;
@@ -369,10 +362,18 @@ pub(crate) fn calculate_relation_name(schema: &SqlSchema, fk: &ForeignKey, table
     }
 }
 
-pub(crate) fn calculate_field_type(schema: &SqlSchema, column: &Column, table: &Table) -> FieldType {
+pub(crate) fn calculate_field_type(
+    schema: &SqlSchema,
+    column: &Column,
+    table: &Table,
+) -> FieldType {
     debug!("Calculating field type for '{}'", column.name);
     // Look for a foreign key referencing this column
-    match table.foreign_keys.iter().find(|fk| fk.columns.contains(&column.name)) {
+    match table
+        .foreign_keys
+        .iter()
+        .find(|fk| fk.columns.contains(&column.name))
+    {
         Some(fk) if !is_id(column, table) && !is_part_of_id(column, table) => {
             debug!("Found corresponding foreign key");
             let idx = fk
@@ -416,7 +417,9 @@ pub fn deduplicate_names_of_fields_to_be_added(fields_to_be_added: &mut Vec<(Str
         .for_each(|(index, (model, field))| {
             let is_duplicated = fields_to_be_added
                 .iter()
-                .filter(|(other_model, other_field)| model == other_model && field.name == other_field.name)
+                .filter(|(other_model, other_field)| {
+                    model == other_model && field.name == other_field.name
+                })
                 .count()
                 > 1;
 
