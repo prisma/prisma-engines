@@ -5,19 +5,18 @@ import util.{ApiSpecBase, ProjectDsl}
 
 class InSelectionBatching extends FlatSpec with Matchers with ApiSpecBase {
   val project = ProjectDsl.fromString {
-    """model Artist {
-      |  id       String @id @default(cuid())
-      |  ArtistId Int    @unique
-      |  Name     String
-      |  Albums   Album[]
+    """model A {
+      |  id Int @id
+      |  b B
+      |  c C
       |}
-      |
-      |model Album {
-      |  id      String  @id @default(cuid())
-      |  AlbumId Int     @unique
-      |  Title   String
-      |  Artist  Artist  @relation(references: [id])
-      |  @@index([Artist])
+      |model B {
+      |  id Int @id
+      |  as A[]
+      |}
+      |model C {
+      |  id Int @id
+      |  as A[]
       |}
       |"""
   }
@@ -27,42 +26,47 @@ class InSelectionBatching extends FlatSpec with Matchers with ApiSpecBase {
     database.setup(project)
 
     server.query(
-      """mutation artistWithoutAlbums {createArtist(data:{
-        |  Name: "ArtistWithoutAlbums"
-        |  ArtistId: 1
-        |}){Name}}""",
+      """mutation a {createA(data:{
+        |  id: 1
+        |  b: { create: { id: 1 } }
+        |  c: { create: { id: 1 } }
+        |}){id}}""",
       project = project
     )
 
     server.query(
-      """mutation artistWithAlbumButWithoutTracks {createArtist(data:{
-        |  Name: "ArtistWithOneAlbumWithoutTracks"
-        |  ArtistId: 2,
-        |}){Name}}""",
+      """mutation a {createA(data:{
+        |  id: 2
+        |  b: { connect: { id: 1 } }
+        |  c: { create: { id: 2 } }
+        |}){id}}""",
       project = project
     )
 
     server.query(
-      """mutation artistWithAlbumButWithoutTracks {createArtist(data:{
-        |  Name: "Three"
-        |  ArtistId: 3,
-        |}){Name}}""",
+      """mutation a {createA(data:{
+        |  id: 3
+        |  b: { create: { id: 3 } }
+        |  c: { create: { id: 3 } }
+        |}){id}}""",
       project = project
     )
 
     server.query(
-      """mutation artistWithAlbumButWithoutTracks {createArtist(data:{
-        |  Name: "Four"
-        |  ArtistId: 4,
-        |}){Name}}""",
+      """mutation a {createA(data:{
+        |  id: 4
+        |  b: { create: { id: 4 } }
+        |  c: { create: { id: 4 } }
+        |}){id}}""",
       project = project
     )
 
     server.query(
-      """mutation artistWithAlbumButWithoutTracks {createArtist(data:{
-        |  Name: "Five"
-        |  ArtistId: 5,
-        |}){Name}}""",
+      """mutation a {createA(data:{
+        |  id: 5
+        |  b: { create: { id: 5 } }
+        |  c: { create: { id: 5 } }
+        |}){id}}""",
       project = project
     )
   }
@@ -70,7 +74,7 @@ class InSelectionBatching extends FlatSpec with Matchers with ApiSpecBase {
   "batching of IN queries" should "work when having more than the specified amount of items" in {
     val res = server.query(
       """query idInTest {
-        |   findManyArtist(where: { ArtistId_in: [5,4,3,2,1,1,1,2,3,4,5,6,7,6,5,4,3,2,1,2,3,4,5,6] }) { ArtistId }
+        |   findManyA(where: { id_in: [5,4,3,2,1,1,1,2,3,4,5,6,7,6,5,4,3,2,1,2,3,4,5,6] }) { id }
         |}
         |""".stripMargin,
       project = project,
@@ -79,14 +83,14 @@ class InSelectionBatching extends FlatSpec with Matchers with ApiSpecBase {
     )
 
     res.toString should be(
-      """{"data":{"findManyArtist":[{"ArtistId":1},{"ArtistId":2},{"ArtistId":3},{"ArtistId":4},{"ArtistId":5}]}}""".stripMargin
+      """{"data":{"findManyA":[{"id":1},{"id":2},{"id":3},{"id":4},{"id":5}]}}""".stripMargin
     )
   }
 
   "ascending ordering of batched IN queries" should "work when having more than the specified amount of items" in {
     val res = server.query(
       """query idInTest {
-        |   findManyArtist(where: { ArtistId_in: [5,4,3,2,1,2,1,1,3,4,5,6,7,6,5,4,3,2,1,2,3,4,5,6] }, orderBy: ArtistId_ASC) { ArtistId }
+        |   findManyA(where: { id_in: [5,4,3,2,1,2,1,1,3,4,5,6,7,6,5,4,3,2,1,2,3,4,5,6] }, orderBy: id_ASC) { id }
         |}
         |""".stripMargin,
       project = project,
@@ -95,14 +99,14 @@ class InSelectionBatching extends FlatSpec with Matchers with ApiSpecBase {
     )
 
     res.toString should be(
-      """{"data":{"findManyArtist":[{"ArtistId":1},{"ArtistId":2},{"ArtistId":3},{"ArtistId":4},{"ArtistId":5}]}}""".stripMargin
+      """{"data":{"findManyA":[{"id":1},{"id":2},{"id":3},{"id":4},{"id":5}]}}""".stripMargin
     )
   }
 
   "descending ordering of batched IN queries" should "work when having more than the specified amount of items" in {
     val res = server.query(
       """query idInTest {
-        |   findManyArtist(where: { ArtistId_in: [5,4,3,2,1,1,1,2,3,4,5,6,7,6,5,4,3,2,1,2,3,4,5,6] }, orderBy: ArtistId_DESC) { ArtistId }
+        |   findManyA(where: {id_in: [5,4,3,2,1,1,1,2,3,4,5,6,7,6,5,4,3,2,1,2,3,4,5,6] }, orderBy: id_DESC) { id }
         |}
         |""".stripMargin,
       project = project,
@@ -111,7 +115,49 @@ class InSelectionBatching extends FlatSpec with Matchers with ApiSpecBase {
     )
 
     res.toString should be(
-      """{"data":{"findManyArtist":[{"ArtistId":5},{"ArtistId":4},{"ArtistId":3},{"ArtistId":2},{"ArtistId":1}]}}""".stripMargin
+      """{"data":{"findManyA":[{"id":5},{"id":4},{"id":3},{"id":2},{"id":1}]}}""".stripMargin
+    )
+  }
+
+  "ascending ordering of batched IN with relation field" should "work" in {
+    val res = server.query(
+      """
+        |query {
+        |  findManyB {
+        |		as(orderBy: c_ASC) {
+        |      c { id }
+        |    }
+        |  }
+        |}
+        |""".stripMargin,
+      project = project,
+      legacy = false,
+      batchSize = 2,
+    )
+
+    res.toString should be(
+      """{"data":{"findManyB":[{"as":[{"c":{"id":1}},{"c":{"id":2}}]},{"as":[{"c":{"id":3}}]},{"as":[{"c":{"id":4}}]},{"as":[{"c":{"id":5}}]}]}}""".stripMargin
+    )
+  }
+
+  "descending ordering of batched IN with relation field" should "work" in {
+    val res = server.query(
+      """
+        |query {
+        |  findManyB {
+        |		as(orderBy: c_DESC) {
+        |      c { id }
+        |    }
+        |  }
+        |}
+        |""".stripMargin,
+      project = project,
+      legacy = false,
+      batchSize = 2,
+    )
+
+    res.toString should be(
+      """{"data":{"findManyB":[{"as":[{"c":{"id":2}},{"c":{"id":1}}]},{"as":[{"c":{"id":3}}]},{"as":[{"c":{"id":4}}]},{"as":[{"c":{"id":5}}]}]}}""".stripMargin
     )
   }
 }

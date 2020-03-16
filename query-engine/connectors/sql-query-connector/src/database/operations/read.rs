@@ -6,7 +6,6 @@ use connector_interface::*;
 use futures::stream::{FuturesUnordered, StreamExt};
 use prisma_models::*;
 use quaint::ast::*;
-use std::collections::HashMap;
 
 pub async fn get_single_record(
     conn: &dyn QueryExt,
@@ -39,9 +38,9 @@ pub async fn get_many_records(
     mut query_arguments: QueryArguments,
     selected_fields: &SelectedFields,
 ) -> crate::Result<ManyRecords> {
-    let field_names: Vec<String> = selected_fields.db_names().map(String::from).collect();
+    let field_names = selected_fields.db_names().map(String::from).collect();
     let idents: Vec<_> = selected_fields.types().collect();
-    let mut records = Vec::new();
+    let mut records = ManyRecords::new(field_names);
 
     if query_arguments.can_batch() {
         // We don't need to order in the database due to us ordering in this
@@ -62,25 +61,8 @@ pub async fn get_many_records(
             }
         }
 
-        let field_indices: HashMap<&str, usize> = field_names
-            .iter()
-            .enumerate()
-            .map(|(i, name)| (name.as_str(), i))
-            .collect();
-
-        if let Some(order_by) = order {
-            records.sort_by(|a, b| match &order_by.field {
-                Field::Scalar(sf) => {
-                    let index = field_indices[sf.db_name()];
-
-                    if order_by.sort_order.is_ascending() {
-                        a.values[index].cmp(&b.values[index])
-                    } else {
-                        b.values[index].cmp(&a.values[index])
-                    }
-                }
-                Field::Relation(_) => todo!(),
-            })
+        if let Some(ref order_by) = order {
+            records.order_by(order_by)
         }
     } else {
         let query = read::get_records(model, selected_fields.columns(), query_arguments);
@@ -94,10 +76,7 @@ pub async fn get_many_records(
         }
     }
 
-    Ok(ManyRecords {
-        records,
-        field_names,
-    })
+    Ok(records)
 }
 
 pub async fn get_related_m2m_record_ids(

@@ -173,9 +173,9 @@ impl RelationField {
     }
 
     pub fn model(&self) -> ModelRef {
-        self.model
-            .upgrade()
-            .expect("Model does not exist anymore. Parent model got deleted without deleting the child.")
+        self.model.upgrade().expect(
+            "Model does not exist anymore. Parent model got deleted without deleting the child.",
+        )
     }
 
     pub fn relation(&self) -> RelationRef {
@@ -250,6 +250,8 @@ impl RelationField {
     }
 
     pub fn db_names(&self) -> impl Iterator<Item = &str> {
-        self.data_source_fields().into_iter().map(|dsf| dsf.name.as_str())
+        self.data_source_fields()
+            .into_iter()
+            .map(|dsf| dsf.name.as_str())
     }
 }
