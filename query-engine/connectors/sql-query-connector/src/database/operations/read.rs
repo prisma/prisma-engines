@@ -3,9 +3,10 @@ use crate::{
     QueryExt, SqlError,
 };
 use connector_interface::*;
-use futures::future;
+use futures::stream::{FuturesUnordered, StreamExt};
 use prisma_models::*;
 use quaint::ast::*;
+use std::collections::HashMap;
 
 pub async fn get_single_record(
     conn: &dyn QueryExt,
@@ -35,26 +36,51 @@ pub async fn get_single_record(
 pub async fn get_many_records(
     conn: &dyn QueryExt,
     model: &ModelRef,
-    query_arguments: QueryArguments,
+    mut query_arguments: QueryArguments,
     selected_fields: &SelectedFields,
 ) -> crate::Result<ManyRecords> {
-    let field_names = selected_fields.db_names().map(String::from).collect();
+    let field_names: Vec<String> = selected_fields.db_names().map(String::from).collect();
     let idents: Vec<_> = selected_fields.types().collect();
     let mut records = Vec::new();
 
     if query_arguments.can_batch() {
+        // We don't need to order in the database due to us ordering in this
+        // function.
+        let order = query_arguments.order_by.take();
+
         let batches = query_arguments.batched();
-        let mut futures = Vec::with_capacity(batches.len());
+        let mut futures = FuturesUnordered::new();
 
         for args in batches.into_iter() {
             let query = read::get_records(model, selected_fields.columns(), args);
             futures.push(conn.filter(query.into(), idents.as_slice()));
         }
 
-        for result in future::join_all(futures).await.into_iter() {
+        while let Some(result) = futures.next().await {
             for item in result?.into_iter() {
                 records.push(Record::from(item))
             }
+        }
+
+        let field_indices: HashMap<&str, usize> = field_names
+            .iter()
+            .enumerate()
+            .map(|(i, name)| (name.as_str(), i))
+            .collect();
+
+        if let Some(order_by) = order {
+            records.sort_by(|a, b| match &order_by.field {
+                Field::Scalar(sf) => {
+                    let index = field_indices[sf.db_name()];
+
+                    if order_by.sort_order.is_ascending() {
+                        a.values[index].cmp(&b.values[index])
+                    } else {
+                        b.values[index].cmp(&a.values[index])
+                    }
+                }
+                Field::Relation(_) => todo!(),
+            })
         }
     } else {
         let query = read::get_records(model, selected_fields.columns(), query_arguments);

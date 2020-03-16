@@ -17,6 +17,20 @@ pub enum SortOrder {
 }
 
 impl SortOrder {
+    pub fn is_ascending(self) -> bool {
+        match self {
+            Self::Ascending => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_descending(self) -> bool {
+        match self {
+            Self::Descending => true,
+            _ => false,
+        }
+    }
+
     pub fn abbreviated(self) -> &'static str {
         match self {
             SortOrder::Ascending => "ASC",
