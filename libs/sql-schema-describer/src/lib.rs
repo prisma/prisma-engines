@@ -403,6 +403,7 @@ impl DefaultValue {
     pub fn as_value(&self) -> Option<&str> {
         match self {
             DefaultValue::VALUE(s) => Some(s.as_str()),
+            DefaultValue::DBGENERATED(s) => Some(s.as_str()),
             _ => None,
         }
     }
