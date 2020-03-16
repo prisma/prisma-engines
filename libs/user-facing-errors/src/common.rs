@@ -82,58 +82,6 @@ pub enum DatabaseDoesNotExist {
 }
 
 #[derive(Debug, UserFacingError, Serialize)]
-#[user_facing(
-    code = "P1004",
-    message = "The downloaded/provided binary `${binary_path}` is not compiled for platform `${platform}`"
-)]
-pub struct IncompatibleBinary {
-    /// Fully resolved path of the binary file
-    binary_path: String,
-
-    /// Identifiers for the currently identified execution environment, e.g. `native`, `windows`, `darwin` etc
-    platform: String,
-}
-
-#[derive(Debug, UserFacingError, Serialize)]
-#[user_facing(
-    code = "P1005",
-    message = "Failed to spawn the binary `${binary_path}` process for platform `${platform}`"
-)]
-pub struct UnableToStartTheQueryEngine {
-    /// Fully resolved path of the binary file
-    binary_path: String,
-
-    /// Identifiers for the currently identified execution environment, e.g. `native`, `windows`, `darwin` etc
-    platform: String,
-}
-
-#[derive(Debug, UserFacingError, Serialize)]
-#[user_facing(
-    code = "P1006",
-    message = "\
-Query engine binary for current platform `${platform}` could not be found. Make sure to adjust the generator configuration in the Prisma schema file.
-
-${generator_config}
-
-Please run prisma2 generate for your changes to take effect.
-"
-)]
-pub struct BinaryNotFound {
-    /// Identifiers for the currently identified execution environment, e.g. `native`, `windows`, `darwin` etc
-    platform: String,
-
-    /// Details of how a generator can be added.
-    generator_config: String,
-}
-
-#[derive(Debug, UserFacingError, Serialize)]
-#[user_facing(
-    code = "P1007",
-    message = "Please try installing Prisma 2 CLI again with the `--unsafe-perm` option. <br /> Example: `npm i -g --unsafe-perm prisma2`"
-)]
-pub struct MissingWriteAccessToTheDownloadBinary;
-
-#[derive(Debug, UserFacingError, Serialize)]
 #[user_facing(code = "P1008", message = "Operations timed out after `${time}`")]
 pub struct DatabaseOperationTimeout {
     /// Operation time in s or ms (if <1000ms)
