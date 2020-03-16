@@ -287,6 +287,7 @@ async fn introspecting_a_default_value_as_dbgenerated_should_work(api: &TestApi)
             migration.create_table("Test", |t| {
                 t.add_column("id", types::primary());
                 t.inject_custom("string_static_char varchar(5) Default 'test'");
+                t.inject_custom("string_static_null varchar(5) Default NULL");
                 t.inject_custom("string_static_text text Default 'test'");
                 t.inject_custom("string_static_varchar varchar(5) Default 'test'");
                 t.inject_custom("int_static Integer DEFAULT 2");
@@ -315,6 +316,7 @@ async fn introspecting_a_default_value_as_dbgenerated_should_work(api: &TestApi)
                 id                                  Int         @default(autoincrement()) @id
                 int_static                          Int?        @default(2)
                 string_static_char                  String?     @default("test")
+                string_static_null                  String?     
                 string_static_text                  String?     @default("test")
                 string_static_varchar               String?     @default("test")                             
             }

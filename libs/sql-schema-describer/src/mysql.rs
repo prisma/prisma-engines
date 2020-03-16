@@ -254,13 +254,7 @@ async fn get_all_columns(conn: &dyn Queryable, schema_name: &str) -> HashMap<Str
                         ColumnTypeFamily::LogSequenceNumber => DefaultValue::DBGENERATED(default_string),
                         ColumnTypeFamily::TextSearch => DefaultValue::DBGENERATED(default_string),
                         ColumnTypeFamily::TransactionId => DefaultValue::DBGENERATED(default_string),
-                        ColumnTypeFamily::Enum(enum_name) => {
-                            let enum_suffix = format!("::{}", enum_name);
-                            match default_string.ends_with(&enum_suffix) {
-                                true => DefaultValue::VALUE(unquote(default_string.replace(&enum_suffix, ""))),
-                                false => DefaultValue::DBGENERATED(default_string),
-                            }
-                        }
+                        ColumnTypeFamily::Enum(enum_name) => DefaultValue::VALUE(unquote(default_string)),
                         ColumnTypeFamily::Unknown => DefaultValue::DBGENERATED(default_string),
                     })
                 }

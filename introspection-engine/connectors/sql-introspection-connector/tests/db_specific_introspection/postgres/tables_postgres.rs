@@ -356,9 +356,11 @@ async fn introspecting_default_values_should_work(api: &TestApi) {
 #[test_each_connector(tags("postgres"))]
 
 async fn introspecting_a_default_value_as_dbgenerated_should_work(api: &TestApi) {
-    let sql = format!("CREATE SEQUENCE test_seq START 1");
+    let sequence = format!("CREATE SEQUENCE test_seq START 1");
+    let color = format!("CREATE Type color as Enum ('black', 'white')");
 
-    api.database().execute_raw(&sql, &[]).await.unwrap();
+    api.database().execute_raw(&sequence, &[]).await.unwrap();
+    api.database().execute_raw(&color, &[]).await.unwrap();
 
     let barrel = api.barrel();
     let _setup_schema = barrel
@@ -366,16 +368,20 @@ async fn introspecting_a_default_value_as_dbgenerated_should_work(api: &TestApi)
             migration.create_table("Test", |t| {
                 t.add_column("id", types::primary());
                 t.inject_custom("string_static_text text Default 'test'");
+                t.inject_custom("string_static_text_null text Default Null");
                 t.inject_custom("string_static_char char(5) Default 'test'");
                 t.inject_custom("string_static_varchar varchar(5) Default 'test'");
                 t.inject_custom("string_function text Default 'Concatenated'||E'\n'");
                 t.inject_custom("int_static Integer DEFAULT 2");
+                t.inject_custom("int_serial Serial4");
                 t.inject_custom("int_function Integer DEFAULT EXTRACT(year from TIMESTAMP '2001-02-16 20:38:40')");
                 t.inject_custom("int_sequence Integer DEFAULT nextval('test_seq')"); // todo this is not recognized as autoincrement
                 t.inject_custom("float_static Float DEFAULT 1.43");
                 t.inject_custom("boolean_static Boolean DEFAULT true");
+                t.inject_custom("datetime_now_current TIMESTAMP DEFAULT CURRENT_TIMESTAMP");
                 t.inject_custom("datetime_now TIMESTAMP DEFAULT NOW()");
                 t.inject_custom("datetime_now_lc TIMESTAMP DEFAULT now()");
+                t.inject_custom("enum_static color DEFAULT 'black'");
             });
         })
         .await;
@@ -384,18 +390,26 @@ async fn introspecting_a_default_value_as_dbgenerated_should_work(api: &TestApi)
             model Test {
                 boolean_static          Boolean?    @default(true)
                 datetime_now            DateTime?   @default(now())
+                datetime_now_current    DateTime?   @default(now())
                 datetime_now_lc         DateTime?   @default(now())
+                enum_static             color?      @default(black)
                 float_static            Float?      @default(1.43)
                 id                      Int         @default(autoincrement()) @id
                 int_function            Int?        @default(dbgenerated())
                 int_sequence            Int?        @default(dbgenerated())
+                int_serial              Int        @default(autoincrement())
                 int_static              Int?        @default(2)
                 string_function         String?     @default(dbgenerated())
                 string_static_char      String?     @default("test")
                 string_static_text      String?     @default("test")
+                string_static_text_null String?     
                 string_static_varchar   String?     @default("test")
-                             
             }
+            
+           enum color{
+                black
+                white
+           }
         "#;
 
     let result = dbg!(api.introspect().await);

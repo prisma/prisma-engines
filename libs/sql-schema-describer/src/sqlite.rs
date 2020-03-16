@@ -132,46 +132,48 @@ impl SqlSchemaDescriber {
                     Some(ParameterizedValue::Null) => None,
                     Some(ParameterizedValue::Text(cow_string)) => {
                         let default_string = cow_string.to_string();
-                        Some(match &tpe.family {
-                            ColumnTypeFamily::Int => match parse_int(&default_string).is_some() {
-                                true => DefaultValue::VALUE(default_string),
-                                false => DefaultValue::DBGENERATED(default_string),
-                            },
-                            ColumnTypeFamily::Float => match parse_float(&default_string).is_some() {
-                                true => DefaultValue::VALUE(default_string),
-                                false => DefaultValue::DBGENERATED(default_string),
-                            },
-                            ColumnTypeFamily::Boolean => match parse_int(&default_string) {
-                                Some(1) => DefaultValue::VALUE(default_string),
-                                Some(0) => DefaultValue::VALUE(default_string),
-                                _ => DefaultValue::DBGENERATED(default_string),
-                            },
-                            ColumnTypeFamily::String => DefaultValue::VALUE(unquote(default_string)),
-                            //todo check other now() definitions
-                            ColumnTypeFamily::DateTime => match default_string.to_lowercase()
-                                == "current_timestamp".to_string()
-                                || default_string.to_lowercase() == "datetime(\'now\')".to_string()
-                                || default_string.to_lowercase() == "datetime(\'now\', \'localtime\')".to_string()
-                            {
-                                true => DefaultValue::NOW,
-                                false => DefaultValue::DBGENERATED(default_string),
-                            },
-                            ColumnTypeFamily::Binary => DefaultValue::DBGENERATED(default_string),
-                            ColumnTypeFamily::Json => DefaultValue::DBGENERATED(default_string),
-                            ColumnTypeFamily::Uuid => DefaultValue::DBGENERATED(default_string),
-                            ColumnTypeFamily::Geometric => DefaultValue::DBGENERATED(default_string),
-                            ColumnTypeFamily::LogSequenceNumber => DefaultValue::DBGENERATED(default_string),
-                            ColumnTypeFamily::TextSearch => DefaultValue::DBGENERATED(default_string),
-                            ColumnTypeFamily::TransactionId => DefaultValue::DBGENERATED(default_string),
-                            ColumnTypeFamily::Enum(enum_name) => {
-                                let enum_suffix = format!("::{}", enum_name);
-                                match default_string.ends_with(&enum_suffix) {
-                                    true => DefaultValue::VALUE(default_string.replace(&enum_suffix, "")),
+
+                        if default_string.to_lowercase() == "null" {
+                            None
+                        } else {
+                            Some(match &tpe.family {
+                                ColumnTypeFamily::Int => match parse_int(&default_string).is_some() {
+                                    true => DefaultValue::VALUE(default_string),
                                     false => DefaultValue::DBGENERATED(default_string),
-                                }
-                            }
-                            ColumnTypeFamily::Unknown => DefaultValue::DBGENERATED(default_string),
-                        })
+                                },
+                                ColumnTypeFamily::Float => match parse_float(&default_string).is_some() {
+                                    true => DefaultValue::VALUE(default_string),
+                                    false => DefaultValue::DBGENERATED(default_string),
+                                },
+                                ColumnTypeFamily::Boolean => match parse_int(&default_string) {
+                                    Some(1) => DefaultValue::VALUE(default_string),
+                                    Some(0) => DefaultValue::VALUE(default_string),
+                                    _ => match parse_bool(&default_string) {
+                                        Some(true) => DefaultValue::VALUE("true".into()),
+                                        Some(false) => DefaultValue::VALUE("false".into()),
+                                        None => DefaultValue::DBGENERATED(default_string),
+                                    },
+                                },
+                                ColumnTypeFamily::String => DefaultValue::VALUE(unquote(default_string)),
+                                ColumnTypeFamily::DateTime => match default_string.to_lowercase()
+                                    == "current_timestamp".to_string()
+                                    || default_string.to_lowercase() == "datetime(\'now\')".to_string()
+                                    || default_string.to_lowercase() == "datetime(\'now\', \'localtime\')".to_string()
+                                {
+                                    true => DefaultValue::NOW,
+                                    false => DefaultValue::DBGENERATED(default_string),
+                                },
+                                ColumnTypeFamily::Binary => DefaultValue::DBGENERATED(default_string),
+                                ColumnTypeFamily::Json => DefaultValue::DBGENERATED(default_string),
+                                ColumnTypeFamily::Uuid => DefaultValue::DBGENERATED(default_string),
+                                ColumnTypeFamily::Geometric => DefaultValue::DBGENERATED(default_string),
+                                ColumnTypeFamily::LogSequenceNumber => DefaultValue::DBGENERATED(default_string),
+                                ColumnTypeFamily::TextSearch => DefaultValue::DBGENERATED(default_string),
+                                ColumnTypeFamily::TransactionId => DefaultValue::DBGENERATED(default_string),
+                                ColumnTypeFamily::Enum(_) => DefaultValue::VALUE(default_string),
+                                ColumnTypeFamily::Unknown => DefaultValue::DBGENERATED(default_string),
+                            })
+                        }
                     }
                     Some(_) => None,
                 };

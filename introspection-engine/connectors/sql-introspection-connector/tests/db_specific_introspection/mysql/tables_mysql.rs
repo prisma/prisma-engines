@@ -295,6 +295,7 @@ async fn introspecting_a_default_value_as_dbgenerated_should_work(api: &TestApi)
             migration.create_table("Test", |t| {
                 t.add_column("id", types::primary());
                 t.inject_custom("string_static_char char(5) Default 'test'");
+                t.inject_custom("string_static_char_null char(5) Default NULL");
                 t.inject_custom("string_static_varchar varchar(5) Default 'test'");
                 // t.inject_custom("string_function char(200) Default CONCAT('id','string_static_text')");
                 t.inject_custom("int_static Integer DEFAULT 2");
@@ -303,20 +304,28 @@ async fn introspecting_a_default_value_as_dbgenerated_should_work(api: &TestApi)
                 t.inject_custom("boolean_static Boolean DEFAULT 1");
                 t.inject_custom("datetime_now TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP");
                 t.inject_custom("datetime_now_lc TIMESTAMP NULL DEFAULT current_timestamp");
+                t.inject_custom("enum_static  ENUM ( 'black', 'white') Default('black')");
             });
         })
         .await;
 
     let dm = r#"
             model Test {
-                boolean_static          Boolean?    @default(true)
-                datetime_now            DateTime?   @default(now())
-                datetime_now_lc         DateTime?   @default(now())
-                float_static            Float?      @default(1.43)
-                id                      Int         @default(autoincrement()) @id
-                int_static              Int?        @default(2)
-                string_static_char      String?     @default("test")
-                string_static_varchar   String?     @default("test")                      
+                boolean_static          Boolean?            @default(true)
+                datetime_now            DateTime?           @default(now())
+                datetime_now_lc         DateTime?           @default(now())
+                enum_static             Test_enum_static?   @default(black)
+                float_static            Float?              @default(1.43)
+                id                      Int                 @default(autoincrement()) @id
+                int_static              Int?                @default(2)
+                string_static_char      String?             @default("test")
+                string_static_char_null String?     
+                string_static_varchar   String?             @default("test")                      
+            }
+            
+            enum Test_enum_static{
+                black
+                white
             }
         "#;
 
