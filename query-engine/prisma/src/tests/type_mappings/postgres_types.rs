@@ -29,7 +29,7 @@ const CREATE_TYPES_TABLE: &str = indoc! {
         string_text text,
 
         binary_bytea bytea,
-        binary_bits  bit(80),
+        binary_bits  bit(7),
         binary_bits_varying bit varying(80),
         binary_uuid uuid,
 
@@ -129,6 +129,8 @@ async fn postgres_types_roundtrip(api: &TestApi) -> TestResult {
                     string_char: "yeet"
                     string_varchar: "yeet variable"
                     string_text: "to yeet or not to yeet"
+                    binary_bits: "0101110"
+                    binary_bits_varying: "0101110"
                     # binary_bytea: "test"
                     binary_uuid: "111142ec-880b-4062-913d-8eac479ab957"
                     time_timestamp: "2020-03-02T08:00:00.000"
@@ -168,6 +170,8 @@ async fn postgres_types_roundtrip(api: &TestApi) -> TestResult {
                 string_varchar
                 string_text
                 # binary_bytea
+                binary_bits
+                binary_bits_varying
                 binary_uuid
                 time_timestamp
                 time_timestamptz
@@ -213,6 +217,8 @@ async fn postgres_types_roundtrip(api: &TestApi) -> TestResult {
                 "string_char": "yeet    ",
                 "string_varchar": "yeet variable",
                 "string_text": "to yeet or not to yeet",
+                "binary_bits": "0101110",
+                "binary_bits_varying": "0101110",
                 "binary_uuid": "111142ec-880b-4062-913d-8eac479ab957",
                 "time_timestamp": "2020-03-02T08:00:00.000Z",
                 "time_timestamptz": "2020-03-02T08:00:00.000Z",
@@ -313,7 +319,7 @@ const CREATE_ARRAY_TYPES_TABLE: &str = indoc! {
         string_text text[],
 
         binary_bytea bytea[],
-        binary_bits  bit(80)[],
+        binary_bits  bit(8)[],
         binary_bits_varying bit varying(80)[],
         binary_uuid uuid[],
 
@@ -384,6 +390,8 @@ async fn postgres_array_types_roundtrip(api: &TestApi) -> TestResult {
                     string_char: { set: ["yeet"] }
                     string_varchar: { set: ["yeet variable"] }
                     string_text: { set: ["to yeet or not to yeet"] }
+                    binary_bits: { set: ["10100011"] }
+                    binary_bits_varying: { set: ["01000"] }
                     binary_uuid: { set: ["111142ec-880b-4062-913d-8eac479ab957"] }
                     time_timestamp: { set: ["2020-03-02T08:00:00.000"] }
                     time_timestamptz: { set: ["2020-03-02T08:00:00.000"] }
@@ -407,6 +415,8 @@ async fn postgres_array_types_roundtrip(api: &TestApi) -> TestResult {
                 string_char
                 string_varchar
                 string_text
+                binary_bits
+                binary_bits_varying
                 binary_uuid
                 time_timestamp
                 time_timestamptz
@@ -438,6 +448,8 @@ async fn postgres_array_types_roundtrip(api: &TestApi) -> TestResult {
                 "string_char": ["yeet    "],
                 "string_varchar": ["yeet variable"],
                 "string_text": ["to yeet or not to yeet"],
+                "binary_bits": ["10100011"],
+                "binary_bits_varying": ["01000"],
                 "binary_uuid": ["111142ec-880b-4062-913d-8eac479ab957"],
                 "time_timestamp": ["2020-03-02T08:00:00.000Z"],
                 "time_timestamptz": ["2020-03-02T08:00:00.000Z"],

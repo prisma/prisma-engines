@@ -165,6 +165,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "bit-vec"
+version = "0.6.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a4523a10839ffae575fb08aa3423026c8cb4687eef43952afb956229d4f246f7"
+
+[[package]]
 name = "bitflags"
 version = "1.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1899,6 +1905,7 @@ version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e634590e8812c500088d88db721195979223dabb05149f43cb50931d0ff5865d"
 dependencies = [
+ "bit-vec",
  "bytes",
  "chrono",
  "fallible-iterator",
@@ -2101,10 +2108,11 @@ dependencies = [
 [[package]]
 name = "quaint"
 version = "0.2.0-alpha.9"
-source = "git+https://github.com/prisma/quaint#3a4c5c287cafc79c08686d210b4bcf047fe35787"
+source = "git+https://github.com/prisma/quaint#59891af32abfb911b59fb82f07ce1d50d20534f6"
 dependencies = [
  "async-trait",
  "base64 0.11.0",
+ "bit-vec",
  "bytes",
  "chrono",
  "futures 0.3.4",
