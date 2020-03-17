@@ -1,6 +1,8 @@
 //! Database description.
 
 use failure::Fail;
+use once_cell::sync::Lazy;
+use regex::Regex;
 use serde::{Deserialize, Serialize};
 use std::fmt;
 
@@ -212,8 +214,7 @@ pub struct Column {
     /// Column type.
     pub tpe: ColumnType,
     /// Column default.
-    // Does this field need to be richer? E.g. to easier detect the usages of sequences here
-    pub default: Option<String>,
+    pub default: Option<DefaultValue>,
     /// Is the column auto-incrementing?
     pub auto_increment: bool,
 }
@@ -382,4 +383,65 @@ pub struct Sequence {
     pub initial_value: u32,
     /// Sequence allocation size.
     pub allocation_size: u32,
+}
+
+/// A DefaultValue
+#[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
+pub enum DefaultValue {
+    /// A constant value, parsed as String
+    VALUE(String),
+    /// An expression generating a current timestamp.
+    NOW,
+    /// An expression generating a sequence.
+    SEQUENCE(String),
+    /// An unrecognized Default Value
+    DBGENERATED(String),
+}
+
+impl DefaultValue {
+    pub fn as_value(&self) -> Option<&str> {
+        match self {
+            DefaultValue::VALUE(s) => Some(s.as_str()),
+            DefaultValue::DBGENERATED(s) => Some(s.as_str()),
+            _ => None,
+        }
+    }
+}
+
+static RE_NUM: Lazy<Regex> = Lazy::new(|| Regex::new(r"^'?(\d+)'?$").expect("compile regex"));
+
+fn parse_int(value: &str) -> Option<i32> {
+    let rslt = RE_NUM.captures(value);
+    if rslt.is_none() {
+        return None;
+    }
+
+    let captures = rslt.expect("get captures");
+    let num_str = captures.get(1).expect("get capture").as_str();
+    let num_rslt = num_str.parse::<i32>();
+    match num_rslt {
+        Ok(num) => Some(num),
+        Err(_) => None,
+    }
+}
+
+fn parse_bool(value: &str) -> Option<bool> {
+    value.to_lowercase().parse().ok()
+}
+
+static RE_FLOAT: Lazy<Regex> = Lazy::new(|| Regex::new(r"^'?([^']+)'?$").expect("compile regex"));
+
+fn parse_float(value: &str) -> Option<f32> {
+    let rslt = RE_FLOAT.captures(value);
+    if rslt.is_none() {
+        return None;
+    }
+
+    let captures = rslt.expect("get captures");
+    let num_str = captures.get(1).expect("get capture").as_str();
+    let num_rslt = num_str.parse::<f32>();
+    match num_rslt {
+        Ok(num) => Some(num),
+        Err(_) => None,
+    }
 }

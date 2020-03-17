@@ -418,7 +418,7 @@ struct ModelTable {
     model: Model,
 }
 
-fn migration_value_new(field: &FieldRef<'_>) -> Option<String> {
+fn migration_value_new(field: &FieldRef<'_>) -> Option<sql_schema_describer::DefaultValue> {
     let value = match (&field.default_value(), field.arity()) {
         (Some(df), _) => match df {
             dml::DefaultValue::Single(s) => s.clone(),
@@ -465,7 +465,7 @@ fn migration_value_new(field: &FieldRef<'_>) -> Option<String> {
     if field.is_id() {
         None
     } else {
-        Some(result)
+        Some(sql_schema_describer::DefaultValue::VALUE(result))
     }
 }
 

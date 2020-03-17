@@ -119,8 +119,10 @@ async fn adding_an_id_field_of_type_int_with_autoincrement_must_work(api: &TestA
         SqlFamily::Postgres => {
             let sequence = result.get_sequence("Test_myId_seq").expect("sequence must exist");
             let default = column.default.as_ref().expect("Must have nextval default");
-            assert_eq!(default.contains(&sequence.name), true);
-            assert_eq!(default, &format!("nextval('\"{}\"'::regclass)", sequence.name))
+            assert_eq!(
+                DefaultValue::SEQUENCE(format!("nextval('\"{}\"'::regclass)", sequence.name)),
+                *default
+            );
         }
         _ => assert_eq!(column.auto_increment, true),
     }
@@ -1393,7 +1395,7 @@ async fn column_defaults_must_be_migrated(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector]
+#[test_each_connector(log = "debug")]
 async fn escaped_string_defaults_are_not_arbitrarily_migrated(api: &TestApi) -> TestResult {
     use quaint::ast::*;
 
@@ -1431,40 +1433,28 @@ async fn escaped_string_defaults_are_not_arbitrarily_migrated(api: &TestApi) -> 
     let table = sql_schema.table_bang("Fruit");
 
     assert_eq!(
-        table
-            .column("name")
-            .and_then(|c| c.default.as_ref())
-            .map(String::as_str),
+        table.column("name").and_then(|c| c.default.clone()),
         Some(if api.is_mysql() && !api.connector_name().contains("mariadb") {
-            "ba\u{0}nana"
+            DefaultValue::VALUE("ba\u{0}nana".to_string())
         } else {
-            "ba\\0nana"
+            DefaultValue::VALUE("ba\\0nana".to_string())
         })
     );
     assert_eq!(
-        table
-            .column("sideNames")
-            .and_then(|c| c.default.as_ref())
-            .map(String::as_str),
+        table.column("sideNames").and_then(|c| c.default.clone()),
         Some(if api.is_mysql() && !api.connector_name().contains("mariadb") {
-            "top\ndown"
+            DefaultValue::VALUE("top\ndown".to_string())
         } else {
-            "top\\ndown"
+            DefaultValue::VALUE("top\\ndown".to_string())
         })
     );
     assert_eq!(
-        table
-            .column("contains")
-            .and_then(|c| c.default.as_ref())
-            .map(String::as_str),
-        Some("potassium")
+        table.column("contains").and_then(|c| c.default.clone()),
+        Some(DefaultValue::VALUE("potassium".to_string()))
     );
     assert_eq!(
-        table
-            .column("seasonality")
-            .and_then(|c| c.default.as_ref())
-            .map(String::as_str),
-        Some("summer")
+        table.column("seasonality").and_then(|c| c.default.clone()),
+        Some(DefaultValue::VALUE("summer".to_string()))
     );
 
     Ok(())
@@ -1493,6 +1483,8 @@ async fn created_at_does_not_get_arbitrarily_migrated(api: &TestApi) -> TestResu
             .column_bang("createdAt")
             .default
             .as_ref()
+            .unwrap()
+            .as_value()
             .unwrap()
             .contains("1970"),
         "createdAt default is set"

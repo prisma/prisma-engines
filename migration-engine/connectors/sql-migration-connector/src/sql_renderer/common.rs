@@ -10,24 +10,6 @@ pub(crate) fn render_nullability(column: &ColumnRef<'_>) -> &'static str {
     }
 }
 
-pub(crate) fn render_default(column: &ColumnRef<'_>) -> String {
-    match column.default() {
-        Some(value) => match &column.column_type().family {
-            ColumnTypeFamily::String | ColumnTypeFamily::DateTime | ColumnTypeFamily::Enum(_) => format!(
-                "DEFAULT '{}'",
-                // TODO: remove once sql-schema-describer does unescaping, and perform escaping again here.
-                value
-                    .trim_matches('\\')
-                    .trim_matches('"')
-                    .trim_matches('\'')
-                    .trim_matches('\\')
-            ),
-            _ => format!("DEFAULT {}", value),
-        },
-        None => "".to_string(),
-    }
-}
-
 pub(crate) fn render_on_delete(on_delete: &ForeignKeyAction) -> &'static str {
     match on_delete {
         ForeignKeyAction::NoAction => "",

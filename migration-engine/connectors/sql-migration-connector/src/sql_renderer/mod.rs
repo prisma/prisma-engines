@@ -18,6 +18,7 @@ use crate::sql_schema_helpers::ColumnRef;
 use mysql_renderer::MySqlRenderer;
 use postgres_renderer::PostgresRenderer;
 use sqlite_renderer::SqliteRenderer;
+use std::borrow::Cow;
 
 use std::fmt::Write as _;
 
@@ -41,6 +42,28 @@ pub(crate) trait SqlRenderer {
     fn render_column(&self, schema_name: &str, column: ColumnRef<'_>, add_fk_prefix: bool) -> String;
 
     fn render_references(&self, schema_name: &str, foreign_key: &ForeignKey) -> String;
+
+    fn render_default<'a>(&self, default: &'a DefaultValue, family: &ColumnTypeFamily) -> Cow<'a, str> {
+        match (default, family) {
+            (DefaultValue::DBGENERATED(val), _) => val.as_str().into(),
+            (DefaultValue::VALUE(val), ColumnTypeFamily::String)
+            | (DefaultValue::VALUE(val), ColumnTypeFamily::Enum(_)) => format!(
+                "'{}'",
+                val.trim_start_matches('\'')
+                    .trim_end_matches('\'')
+                    .trim_start_matches('\\')
+                    .trim_start_matches('"')
+                    .trim_end_matches('"')
+                    .trim_end_matches('\\')
+            )
+            .into(),
+            (DefaultValue::NOW, ColumnTypeFamily::DateTime) => "CURRENT_TIMESTAMP".into(),
+            (DefaultValue::NOW, _) => unreachable!("NOW default on non-datetime column"),
+            (DefaultValue::VALUE(val), ColumnTypeFamily::DateTime) => format!("'{}'", val).into(),
+            (DefaultValue::VALUE(val), _) => val.as_str().into(),
+            (DefaultValue::SEQUENCE(_), _) => todo!("rendering of sequence defaults"),
+        }
+    }
 
     fn sql_family(&self) -> SqlFamily;
 }

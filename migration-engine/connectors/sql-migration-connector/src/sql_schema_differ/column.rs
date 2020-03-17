@@ -1,4 +1,4 @@
-use sql_schema_describer::{Column, ColumnTypeFamily};
+use sql_schema_describer::{Column, ColumnTypeFamily, DefaultValue};
 
 #[derive(Debug)]
 pub(crate) struct ColumnDiffer<'a> {
@@ -59,8 +59,12 @@ impl<'a> ColumnDiffer<'a> {
             return true;
         }
 
-        let previous_value: Option<&str> = self.previous.default.as_ref().map(String::as_str);
-        let next_value: Option<&str> = self.next.default.as_ref().map(String::as_str);
+        let previous_value: Option<&str> = self
+            .previous
+            .default
+            .as_ref()
+            .and_then(expand_default_value);
+        let next_value: Option<&str> = self.next.default.as_ref().and_then(expand_default_value);
 
         match self.previous.tpe.family {
             ColumnTypeFamily::String => string_defaults_match(previous_value, next_value),
@@ -69,6 +73,15 @@ impl<'a> ColumnDiffer<'a> {
             ColumnTypeFamily::Boolean => bool_default(previous_value) == bool_default(next_value),
             _ => true,
         }
+    }
+}
+
+fn expand_default_value(default_value: &DefaultValue) -> Option<&str> {
+    match default_value {
+        DefaultValue::VALUE(s) => Some(s.as_str()),
+        DefaultValue::DBGENERATED(s) => Some(s.as_str()),
+        DefaultValue::NOW => Some("CURRENT_TIMESTAMP"),
+        DefaultValue::SEQUENCE(_) => None,
     }
 }
 
@@ -93,7 +106,8 @@ fn string_defaults_match(previous: Option<&str>, next: Option<&str>) -> bool {
         (Some(_), None) | (None, Some(_)) => false,
         (None, None) => true,
         (Some(previous), Some(next)) => {
-            if string_contains_tricky_character(previous) || string_contains_tricky_character(next) {
+            if string_contains_tricky_character(previous) || string_contains_tricky_character(next)
+            {
                 return true;
             }
 
@@ -121,43 +135,49 @@ pub(crate) struct ColumnChanges {
 
 impl ColumnChanges {
     pub(crate) fn iter<'a>(&'a self) -> impl Iterator<Item = ColumnChange> + 'a {
-        self.changes.iter().filter_map(|c| c.as_ref().map(|c| c.clone()))
+        self.changes
+            .iter()
+            .filter_map(|c| c.as_ref().map(|c| c.clone()))
     }
 
     pub(crate) fn type_changed(&self) -> bool {
-        self.changes.iter().any(|c| c.as_ref() == Some(&ColumnChange::Type))
+        self.changes
+            .iter()
+            .any(|c| c.as_ref() == Some(&ColumnChange::Type))
     }
 
     pub(crate) fn arity_changed(&self) -> bool {
-        self.changes.iter().any(|c| c.as_ref() == Some(&ColumnChange::Arity))
+        self.changes
+            .iter()
+            .any(|c| c.as_ref() == Some(&ColumnChange::Arity))
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use sql_schema_describer::{ColumnArity, ColumnType, ColumnTypeFamily};
+    use sql_schema_describer::{ColumnArity, ColumnType, ColumnTypeFamily, DefaultValue};
 
     #[test]
     fn quoted_string_defaults_match() {
         let col_a = Column {
             name: "A".to_owned(),
             tpe: ColumnType::pure(ColumnTypeFamily::String, ColumnArity::Required),
-            default: Some("abc".to_owned()),
+            default: Some(DefaultValue::VALUE("abc".to_owned())),
             auto_increment: false,
         };
 
         let col_b = Column {
             name: "A".to_owned(),
             tpe: ColumnType::pure(ColumnTypeFamily::String, ColumnArity::Required),
-            default: Some(r##""abc""##.to_owned()),
+            default: Some(DefaultValue::VALUE(r##""abc""##.to_owned())),
             auto_increment: false,
         };
 
         let col_c = Column {
             name: "A".to_owned(),
             tpe: ColumnType::pure(ColumnTypeFamily::String, ColumnArity::Required),
-            default: Some(r##"'abc'"##.to_owned()),
+            default: Some(DefaultValue::VALUE(r##"'abc'"##.to_owned())),
             auto_increment: false,
         };
 
@@ -185,14 +205,14 @@ mod tests {
         let col_a = Column {
             name: "A".to_owned(),
             tpe: ColumnType::pure(ColumnTypeFamily::DateTime, ColumnArity::Required),
-            default: Some("2019-09-01T08:00:00Z".to_owned()),
+            default: Some(DefaultValue::VALUE("2019-09-01T08:00:00Z".to_owned())),
             auto_increment: false,
         };
 
         let col_b = Column {
             name: "A".to_owned(),
             tpe: ColumnType::pure(ColumnTypeFamily::DateTime, ColumnArity::Required),
-            default: Some("2019-09-01 18:00:00 UTC".to_owned()),
+            default: Some(DefaultValue::VALUE("2019-09-01 18:00:00 UTC".to_owned())),
             auto_increment: false,
         };
 
@@ -208,14 +228,14 @@ mod tests {
         let col_a = Column {
             name: "A".to_owned(),
             tpe: ColumnType::pure(ColumnTypeFamily::Float, ColumnArity::Required),
-            default: Some("0.33".to_owned()),
+            default: Some(DefaultValue::VALUE("0.33".to_owned())),
             auto_increment: false,
         };
 
         let col_b = Column {
             name: "A".to_owned(),
             tpe: ColumnType::pure(ColumnTypeFamily::Float, ColumnArity::Required),
-            default: Some("0.33000".to_owned()),
+            default: Some(DefaultValue::VALUE("0.33000".to_owned())),
             auto_increment: false,
         };
 
@@ -228,7 +248,7 @@ mod tests {
         let col_c = Column {
             name: "A".to_owned(),
             tpe: ColumnType::pure(ColumnTypeFamily::Float, ColumnArity::Required),
-            default: Some("0.34".to_owned()),
+            default: Some(DefaultValue::VALUE("0.34".to_owned())),
             auto_increment: false,
         };
 

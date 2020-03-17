@@ -29,7 +29,6 @@
           "type": "DateTime",
           "default": {
             "name": "now",
-            "returnType": "DateTime",
             "args": []
           },
           "isGenerated": false,
@@ -46,7 +45,6 @@
           "type": "String",
           "default": {
             "name": "cuid",
-            "returnType": "String",
             "args": []
           },
           "isGenerated": false,
