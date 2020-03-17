@@ -312,7 +312,6 @@ async fn introspecting_a_default_value_as_dbgenerated_should_work(api: &TestApi)
         })
         .await;
 
-    //todo enum -> _utf8mb4\\\'black\\\'
     let dm = r#"
             model Test {
                 boolean_static          Boolean?            @default(true)
