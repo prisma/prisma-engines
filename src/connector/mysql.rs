@@ -624,4 +624,44 @@ VALUES (1, 'Joe', 27, 20000.00 );
             }
         }
     }
+
+    #[tokio::test]
+    async fn text_columns_with_non_utf8_encodings_can_be_queried() {
+        use crate::ast;
+
+        let conn = Quaint::new(&CONN_STR).await.unwrap();
+
+        conn.execute_raw("DROP TABLE IF EXISTS `encodings_test`", &[])
+            .await
+            .unwrap();
+
+        let create_table = r#"
+            CREATE TABLE `encodings_test` (
+                id INTEGER AUTO_INCREMENT PRIMARY KEY,
+                gb18030 VARCHAR(100) CHARACTER SET gb18030
+            );
+        "#;
+
+        conn.execute_raw(create_table, &[]).await.unwrap();
+
+        let insert = r#"
+            INSERT INTO `encodings_test` (gb18030)
+            VALUES ("法式咸派"), (?)
+        "#;
+
+        conn.query_raw(insert, &["土豆".into()]).await.unwrap();
+
+        let select = ast::Select::from_table("encodings_test").value(ast::asterisk());
+        let result = conn.query(select.into()).await.unwrap();
+
+        assert_eq!(
+            result.get(0).unwrap().get("gb18030").unwrap(),
+            &ParameterizedValue::Text("法式咸派".into())
+        );
+
+        assert_eq!(
+            result.get(1).unwrap().get("gb18030").unwrap(),
+            &ParameterizedValue::Text("土豆".into())
+        );
+    }
 }
