@@ -158,18 +158,18 @@ impl SqlSchemaDescriber {
                             Some(match &tpe.family {
                                 ColumnTypeFamily::Int => match parse_int(&default_string).is_some()
                                 {
-                                    true => DefaultValue::VALUE(default_string),
+                                    true => DefaultValue::VALUE(unquote_single(default_string)),
                                     false => DefaultValue::DBGENERATED(default_string),
                                 },
                                 ColumnTypeFamily::Float => {
                                     match parse_float(&default_string).is_some() {
-                                        true => DefaultValue::VALUE(default_string),
+                                        true => DefaultValue::VALUE(unquote_single(default_string)),
                                         false => DefaultValue::DBGENERATED(default_string),
                                     }
                                 }
                                 ColumnTypeFamily::Boolean => match parse_int(&default_string) {
-                                    Some(1) => DefaultValue::VALUE(default_string),
-                                    Some(0) => DefaultValue::VALUE(default_string),
+                                    Some(1) => DefaultValue::VALUE("true".into()),
+                                    Some(0) => DefaultValue::VALUE("false".into()),
                                     _ => match parse_bool(&default_string) {
                                         Some(true) => DefaultValue::VALUE("true".into()),
                                         Some(false) => DefaultValue::VALUE("false".into()),
