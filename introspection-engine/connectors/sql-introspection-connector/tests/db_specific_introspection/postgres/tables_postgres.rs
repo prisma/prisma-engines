@@ -107,7 +107,10 @@ async fn introspecting_a_table_with_multi_column_unique_index_must_work(api: &Te
                 t.add_column("id", types::primary());
                 t.add_column("firstname", types::text());
                 t.add_column("lastname", types::text());
-                t.add_index("test", types::index(vec!["firstname", "lastname"]).unique(true));
+                t.add_index(
+                    "test",
+                    types::index(vec!["firstname", "lastname"]).unique(true),
+                );
             });
         })
         .await;
@@ -262,7 +265,10 @@ async fn introspecting_a_table_without_uniques_should_comment_it_out(api: &TestA
             });
             migration.create_table("Post", |t| {
                 t.add_column("id", types::integer());
-                t.add_column("user_id", types::foreign("User", "id").nullable(false).unique(true));
+                t.add_column(
+                    "user_id",
+                    types::foreign("User", "id").nullable(false).unique(false),
+                );
             });
         })
         .await;
