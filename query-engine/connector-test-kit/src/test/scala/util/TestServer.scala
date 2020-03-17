@@ -18,11 +18,13 @@ case class TestServer() extends PlayJsonExtensions with LogSupport {
       project: Project,
       dataContains: String = "",
       legacy: Boolean = true,
+      batchSize: Int = 5000,
   ): JsValue = {
     val result = queryBinaryCLI(
       request = createSingleQuery(query),
       project = project,
       legacy = legacy,
+      batchSize = batchSize,
     )
     result.assertSuccessfulResponse(dataContains)
     result
@@ -71,7 +73,7 @@ case class TestServer() extends PlayJsonExtensions with LogSupport {
     Json.obj("batch" -> queries.map(createSingleQuery))
   }
 
-  def queryBinaryCLI(request: JsValue, project: Project, legacy: Boolean = true) = {
+  def queryBinaryCLI(request: JsValue, project: Project, legacy: Boolean = true, batchSize: Int = 5000) = {
     val encoded_query  = UTF8Base64.encode(Json.stringify(request))
     val binaryLogLevel = "RUST_LOG" -> s"prisma=$logLevel,quaint=$logLevel,query_core=$logLevel,query_connector=$logLevel,sql_query_connector=$logLevel,prisma_models=$logLevel,sql_introspection_connector=$logLevel"
 
@@ -89,6 +91,7 @@ case class TestServer() extends PlayJsonExtensions with LogSupport {
           ),
           None,
           "PRISMA_DML" -> project.pgBouncerEnvVar,
+          "QUERY_BATCH_SIZE" -> batchSize.toString,
           binaryLogLevel,
         ).!!
 
@@ -104,6 +107,7 @@ case class TestServer() extends PlayJsonExtensions with LogSupport {
           ),
           None,
           "PRISMA_DML" -> project.pgBouncerEnvVar,
+          "QUERY_BATCH_SIZE" -> batchSize.toString,
           binaryLogLevel,
         ).!!
 
@@ -119,6 +123,7 @@ case class TestServer() extends PlayJsonExtensions with LogSupport {
           ),
           None,
           "PRISMA_DML" -> project.envVar,
+          "QUERY_BATCH_SIZE" -> batchSize.toString,
           binaryLogLevel,
         ).!!
 
@@ -133,6 +138,7 @@ case class TestServer() extends PlayJsonExtensions with LogSupport {
           ),
           None,
           "PRISMA_DML" -> project.envVar,
+          "QUERY_BATCH_SIZE" -> batchSize.toString,
           binaryLogLevel,
         ).!!
     }

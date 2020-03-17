@@ -65,6 +65,39 @@ impl QueryArguments {
             },
         }
     }
+
+    pub fn can_batch(&self) -> bool {
+        self.filter
+            .as_ref()
+            .map(|filter| filter.can_batch())
+            .unwrap_or(false)
+    }
+
+    pub fn batched(self) -> Vec<Self> {
+        match self.filter {
+            Some(filter) => {
+                let after = self.after;
+                let before = self.before;
+                let skip = self.skip;
+                let first = self.first;
+                let last = self.last;
+                let order_by = self.order_by;
+
+                filter.batched().into_iter().map(|filter| {
+                    QueryArguments {
+                        after: after.clone(),
+                        before: before.clone(),
+                        skip: skip.clone(),
+                        first: first.clone(),
+                        last: last.clone(),
+                        filter: Some(filter),
+                        order_by: order_by.clone(),
+                    }
+                }).collect()
+            },
+            _ => vec![self]
+        }
+    }
 }
 
 impl<T> From<T> for QueryArguments
