@@ -609,6 +609,7 @@ mod tests {
                 id SERIAL PRIMARY KEY,
 
                 binary_bits bit(12),
+                binary_bits_arr bit(12)[],
                 bytes_uuid uuid,
                 bytes_uuid_arr uuid[],
                 network_inet inet,
@@ -633,6 +634,10 @@ mod tests {
 
         let insert = ast::Insert::single_into("types")
             .value("binary_bits", "111011100011")
+            .value(
+                "binary_bits_arr",
+                ParameterizedValue::Array(vec![ParameterizedValue::Text("111011100011".into())]),
+            )
             .value("bytes_uuid", "111142ec-880b-4062-913d-8eac479ab957")
             .value(
                 "bytes_uuid_arr",
@@ -682,6 +687,7 @@ mod tests {
         let expected = &[
             ParameterizedValue::Integer(1),
             ParameterizedValue::Text("111011100011".into()),
+            ParameterizedValue::Array(vec![ParameterizedValue::Text("111011100011".into())]),
             ParameterizedValue::Uuid("111142ec-880b-4062-913d-8eac479ab957".parse().unwrap()),
             ParameterizedValue::Array(vec![
                 ParameterizedValue::Uuid("111142ec-880b-4062-913d-8eac479ab957".parse().unwrap()),
