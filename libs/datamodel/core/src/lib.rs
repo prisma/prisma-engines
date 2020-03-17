@@ -134,6 +134,19 @@ pub fn parse_configuration(datamodel_string: &str) -> Result<Configuration, erro
     })
 }
 
+pub fn parse_configuration_and_ignore_env_errors(
+    datamodel_string: &str,
+) -> Result<Configuration, error::ErrorCollection> {
+    let ast = ast::parser::parse(datamodel_string)?;
+    let datasources = load_sources(&ast, true)?;
+    let generators = GeneratorLoader::load_generators_from_ast(&ast)?;
+
+    Ok(Configuration {
+        datasources,
+        generators,
+    })
+}
+
 fn load_sources(
     schema_ast: &SchemaAst,
     ignore_env_var_errors: bool,

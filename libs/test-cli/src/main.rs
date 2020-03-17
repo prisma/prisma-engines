@@ -3,18 +3,18 @@ use colored::Colorize;
 use structopt::*;
 
 #[derive(StructOpt)]
+#[structopt(version = env!("GIT_HASH"))]
 enum Command {
     /// Apply a prisma schema to a database
-    #[structopt(name = "apply-schema")]
     ApplySchema {
         /// The path to the prisma schema file. Either this or --stdin should be provided.
-        #[structopt(long = "file-path")]
+        #[structopt(long)]
         file_path: Option<String>,
         /// Try to read the prisma schema from stdin. Either this or --file-path should be provided.
-        #[structopt(long = "stdin")]
+        #[structopt(long)]
         stdin: bool,
         /// Whether to ignore warnings from the migration engine regarding data loss. Default: false.
-        #[structopt(long = "force")]
+        #[structopt(long)]
         force: Option<bool>,
     },
 }
@@ -58,7 +58,6 @@ fn main() -> anyhow::Result<()> {
                 };
 
                 let result = api.apply_migration(&apply_input).await?;
-
                 let warnings = result.warnings.into_iter().map(|warning| warning.description).collect();
 
                 Ok::<Vec<String>, anyhow::Error>(warnings)

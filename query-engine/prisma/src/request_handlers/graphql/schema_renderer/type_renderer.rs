@@ -53,8 +53,8 @@ impl<'a> GqlTypeRenderer<'a> {
                     ScalarType::Float => "Float",
                     ScalarType::DateTime => "DateTime",
                     ScalarType::Json => "DateTime",
-                    ScalarType::ID => "ID",
                     ScalarType::UUID => "UUID",
+                    ScalarType::JsonList => "Json",
                     ScalarType::Enum(_) => unreachable!(), // Handled separately above.
                 };
 
@@ -93,9 +93,9 @@ impl<'a> GqlTypeRenderer<'a> {
                     ScalarType::Boolean => "Boolean",
                     ScalarType::Float => "Float",
                     ScalarType::DateTime => "DateTime",
-                    ScalarType::Json => "DateTime",
-                    ScalarType::ID => "ID",
+                    ScalarType::Json => "Json",
                     ScalarType::UUID => "UUID",
+                    ScalarType::JsonList => "Json",
                     ScalarType::Enum(_) => unreachable!(), // Handled separately above.
                 };
 

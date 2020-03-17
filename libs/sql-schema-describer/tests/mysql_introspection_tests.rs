@@ -221,14 +221,14 @@ async fn all_mysql_column_types_must_work() {
                 arity: ColumnArity::Required,
             },
 
-            default: Some("CURRENT_TIMESTAMP".to_string()),
+            default: Some(DefaultValue::NOW),
             auto_increment: false,
         },
         Column {
             name: "year_col".to_string(),
             tpe: ColumnType {
                 raw: "year".to_string(),
-                family: ColumnTypeFamily::DateTime,
+                family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
             },
 
@@ -305,7 +305,7 @@ async fn all_mysql_column_types_must_work() {
             name: "enum_col".to_string(),
             tpe: ColumnType {
                 raw: "enum".to_string(),
-                family: ColumnTypeFamily::String,
+                family: ColumnTypeFamily::Enum("User_enum_col".into()),
                 arity: ColumnArity::Required,
             },
 
@@ -589,30 +589,22 @@ async fn mysql_foreign_key_on_delete_must_be_handled() {
             indices: vec![
                 Index {
                     name: "city".to_owned(),
-                    columns: vec![
-                        "city".to_owned(),
-                    ],
+                    columns: vec!["city".to_owned(),],
                     tpe: IndexType::Normal
                 },
                 Index {
                     name: "city_cascade".to_owned(),
-                    columns: vec![
-                        "city_cascade".to_owned(),
-                    ],
+                    columns: vec!["city_cascade".to_owned(),],
                     tpe: IndexType::Normal
                 },
                 Index {
                     name: "city_restrict".to_owned(),
-                    columns: vec![
-                        "city_restrict".to_owned(),
-                    ],
+                    columns: vec!["city_restrict".to_owned(),],
                     tpe: IndexType::Normal
                 },
                 Index {
                     name: "city_set_null".to_owned(),
-                    columns: vec![
-                        "city_set_null".to_owned(),
-                    ],
+                    columns: vec!["city_set_null".to_owned(),],
                     tpe: IndexType::Normal
                 }
             ],

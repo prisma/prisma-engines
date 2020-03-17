@@ -1,13 +1,18 @@
 package util
 
-import java.io.ByteArrayInputStream
-
 object PrismaRsBuild {
+  val isDebug = false
+
   def apply(): Unit = {
     if (!EnvVars.isBuildkite) {
       val workingDirectory = new java.io.File(EnvVars.serverRoot)
-      val command          = Seq("cargo", "build", "--release")
-      val env              = ("RUST_LOG", "error")
+      var command          = Seq("cargo", "build", "--bin", "prisma", "--bin", "migration-engine")
+
+      if (!isDebug) {
+        command = command :+ "--release"
+      }
+
+      val env = ("RUST_LOG", "info")
       sys.process.Process(command, workingDirectory, env).!!
     }
   }

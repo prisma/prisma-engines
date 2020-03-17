@@ -1,5 +1,33 @@
 use serde::Serialize;
+use std::fmt;
 use user_facing_error_macros::*;
+
+#[derive(Debug, PartialEq, Eq, Serialize, Clone)]
+#[serde(untagged)]
+pub enum DatabaseConstraint {
+    Fields(Vec<String>),
+    Index(String),
+    ForeignKey,
+}
+
+impl fmt::Display for DatabaseConstraint {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::Fields(fields) => {
+                let quoted_fields: Vec<String> = fields.iter().map(|f| format!("`{}`", f)).collect();
+                write!(f, "fields: ({})", quoted_fields.join(","))
+            }
+            Self::Index(index) => write!(f, "constraint: `{}`", index),
+            Self::ForeignKey => write!(f, "foreign key"),
+        }
+    }
+}
+
+impl From<Vec<String>> for DatabaseConstraint {
+    fn from(fields: Vec<String>) -> Self {
+        Self::Fields(fields)
+    }
+}
 
 #[derive(Debug, UserFacingError, Serialize)]
 #[user_facing(
@@ -33,10 +61,11 @@ pub struct RecordNotFound {
 }
 
 #[derive(Debug, UserFacingError, Serialize)]
-#[user_facing(code = "P2002", message = "Unique constraint failed on the field: `${field_name}`")]
+#[user_facing(code = "P2002", message = "Unique constraint failed on the ${constraint}")]
 pub struct UniqueKeyViolation {
     /// Field name from one model from Prisma schema
-    pub field_name: String,
+    #[serde(rename = "target")]
+    pub constraint: DatabaseConstraint,
 }
 
 #[derive(Debug, UserFacingError, Serialize)]
@@ -116,4 +145,11 @@ pub struct QueryValidationFailed {
 
     /// Location of the incorrect parsing, validation in a query. Represented by tuple or object with (line, character)
     pub query_position: String,
+}
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(code = "P2010", message = "Raw query failed. Code: `${code}`. Message: `${message}`")]
+pub struct RawQueryFailed {
+    pub code: String,
+    pub message: String,
 }

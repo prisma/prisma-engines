@@ -23,6 +23,7 @@ impl Builder<ReadQuery> for ReadManyRecordsBuilder {
         let selected_fields = collect_selected_fields(&nested_fields, &self.model);
         let nested = collect_nested_queries(nested_fields, &self.model)?;
         let model = self.model;
+        let selected_fields = merge_relation_selections(selected_fields, None, &nested);
 
         Ok(ReadQuery::ManyRecordsQuery(ManyRecordsQuery {
             name,

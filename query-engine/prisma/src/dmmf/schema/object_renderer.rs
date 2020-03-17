@@ -7,7 +7,7 @@ pub enum DMMFObjectRenderer {
 }
 
 impl<'a> Renderer<'a, ()> for DMMFObjectRenderer {
-    fn render(&self, ctx: RenderContext) -> ((), RenderContext) {
+    fn render(&self, ctx: &RenderContext) {
         match &self {
             DMMFObjectRenderer::Input(input) => self.render_input_object(input, ctx),
             DMMFObjectRenderer::Output(output) => self.render_output_object(output, ctx),
@@ -16,28 +16,25 @@ impl<'a> Renderer<'a, ()> for DMMFObjectRenderer {
 }
 
 impl DMMFObjectRenderer {
-    fn render_input_object(&self, input_object: &InputObjectTypeRef, ctx: RenderContext) -> ((), RenderContext) {
+    fn render_input_object(&self, input_object: &InputObjectTypeRef, ctx: &RenderContext) {
         let input_object = input_object.into_arc();
         if ctx.already_rendered(&input_object.name) {
-            return ((), ctx);
+            return;
         } else {
             // This short circuits recursive processing for fields.
             ctx.mark_as_rendered(input_object.name.clone())
         }
 
-        let (rendered_fields, ctx): (Vec<DMMFInputField>, RenderContext) =
-            input_object
-                .get_fields()
-                .iter()
-                .fold((vec![], ctx), |(mut acc, ctx), field| {
-                    let (rendered_field, ctx) = field.into_renderer().render(ctx);
-                    match rendered_field {
-                        DMMFFieldWrapper::Input(f) => acc.push(f),
-                        _ => unreachable!(),
-                    };
+        let fields = input_object.get_fields();
+        let mut rendered_fields = Vec::with_capacity(fields.len());
 
-                    (acc, ctx)
-                });
+        for field in fields {
+            let rendered_field = field.into_renderer().render(ctx);
+            match rendered_field {
+                DMMFFieldWrapper::Input(f) => rendered_fields.push(f),
+                _ => unreachable!(),
+            };
+        }
 
         let input_type = DMMFInputType {
             name: input_object.name.clone(),
@@ -45,32 +42,29 @@ impl DMMFObjectRenderer {
         };
 
         ctx.add_input_type(input_type);
-        ((), ctx)
     }
 
     // WIP dedup code
-    fn render_output_object(&self, output_object: &ObjectTypeRef, ctx: RenderContext) -> ((), RenderContext) {
+    fn render_output_object(&self, output_object: &ObjectTypeRef, ctx: &RenderContext) {
         let output_object = output_object.into_arc();
         if ctx.already_rendered(output_object.name()) {
-            return ((), ctx);
+            return;
         } else {
             // This short circuits recursive processing for fields.
             ctx.mark_as_rendered(output_object.name().to_string())
         }
 
-        let (rendered_fields, ctx): (Vec<DMMFField>, RenderContext) =
-            output_object
-                .get_fields()
-                .iter()
-                .fold((vec![], ctx), |(mut acc, ctx), field| {
-                    let (rendered_field, ctx) = field.into_renderer().render(ctx);
-                    match rendered_field {
-                        DMMFFieldWrapper::Output(f) => acc.push(f),
-                        _ => unreachable!(),
-                    };
+        let fields = output_object.get_fields();
+        let mut rendered_fields: Vec<DMMFField> = Vec::with_capacity(fields.len());
 
-                    (acc, ctx)
-                });
+        for field in fields {
+            let rendered_field = field.into_renderer().render(ctx);
+
+            match rendered_field {
+                DMMFFieldWrapper::Output(f) => rendered_fields.push(f),
+                _ => unreachable!(),
+            }
+        }
 
         let output_type = DMMFOutputType {
             name: output_object.name().to_string(),
@@ -78,6 +72,5 @@ impl DMMFObjectRenderer {
         };
 
         ctx.add_output_type(output_type);
-        ((), ctx)
     }
 }

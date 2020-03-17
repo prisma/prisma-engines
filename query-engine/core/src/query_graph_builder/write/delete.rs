@@ -11,7 +11,7 @@ use std::{convert::TryInto, sync::Arc};
 /// Creates a top level delete record query and adds it to the query graph.
 pub fn delete_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedField) -> QueryGraphBuilderResult<()> {
     let where_arg = field.arguments.lookup("where").unwrap();
-    let filter = extract_filter(where_arg.value.try_into()?, &model, false)?;
+    let filter = extract_unique_filter(where_arg.value.try_into()?, &model)?;
 
     // Prefetch read query for the delete
     let mut read_query = ReadOneRecordBuilder::new(field, Arc::clone(&model)).build()?;
@@ -30,18 +30,21 @@ pub fn delete_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedF
     graph.create_edge(
         &read_node,
         &delete_node,
-        QueryGraphDependency::ParentIds(Box::new(|node, parent_ids| {
-            if parent_ids.len() > 0 {
-                Ok(node)
-            } else {
-                Err(QueryGraphBuilderError::RecordNotFound(
-                    "Record to delete does not exist.".to_owned(),
-                ))
-            }
-        })),
+        QueryGraphDependency::ParentProjection(
+            model.primary_identifier(),
+            Box::new(|delete_node, parent_ids| {
+                if parent_ids.len() > 0 {
+                    Ok(delete_node)
+                } else {
+                    Err(QueryGraphBuilderError::RecordNotFound(
+                        "Record to delete does not exist.".to_owned(),
+                    ))
+                }
+            }),
+        ),
     )?;
-    graph.add_result_node(&read_node);
 
+    graph.add_result_node(&read_node);
     Ok(())
 }
 
@@ -52,13 +55,14 @@ pub fn delete_many_records(
     mut field: ParsedField,
 ) -> QueryGraphBuilderResult<()> {
     let filter = match field.arguments.lookup("where") {
-        Some(where_arg) => extract_filter(where_arg.value.try_into()?, &model, true)?,
+        Some(where_arg) => extract_filter(where_arg.value.try_into()?, &model)?,
         None => Filter::empty(),
     };
 
-    let read_query = utils::read_ids_infallible(&model, filter.clone());
+    let model_id = model.primary_identifier();
+    let read_query = utils::read_ids_infallible(model.clone(), model_id, filter.clone());
     let delete_many = WriteQuery::DeleteManyRecords(DeleteManyRecords {
-        model: Arc::clone(&model),
+        model: model.clone(),
         filter,
     });
 

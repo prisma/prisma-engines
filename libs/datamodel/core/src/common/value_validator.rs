@@ -115,20 +115,20 @@ impl ValueValidator {
     }
 
     /// Tries to convert the wrapped value to a Prisma Float.
-    pub fn as_float(&self) -> Result<f32, DatamodelError> {
+    pub fn as_float(&self) -> Result<f64, DatamodelError> {
         match &self.value {
-            ast::Expression::NumericValue(value, _) => self.wrap_error_from_result(value.parse::<f32>(), "numeric"),
-            ast::Expression::Any(value, _) => self.wrap_error_from_result(value.parse::<f32>(), "numeric"),
+            ast::Expression::NumericValue(value, _) => self.wrap_error_from_result(value.parse::<f64>(), "numeric"),
+            ast::Expression::Any(value, _) => self.wrap_error_from_result(value.parse::<f64>(), "numeric"),
             _ => Err(self.construct_type_mismatch_error("numeric")),
         }
     }
 
     // TODO: Ask which decimal type to take.
     /// Tries to convert the wrapped value to a Prisma Decimal.
-    pub fn as_decimal(&self) -> Result<f32, DatamodelError> {
+    pub fn as_decimal(&self) -> Result<f64, DatamodelError> {
         match &self.value {
-            ast::Expression::NumericValue(value, _) => self.wrap_error_from_result(value.parse::<f32>(), "numeric"),
-            ast::Expression::Any(value, _) => self.wrap_error_from_result(value.parse::<f32>(), "numeric"),
+            ast::Expression::NumericValue(value, _) => self.wrap_error_from_result(value.parse::<f64>(), "numeric"),
+            ast::Expression::Any(value, _) => self.wrap_error_from_result(value.parse::<f64>(), "numeric"),
             _ => Err(self.construct_type_mismatch_error("numeric")),
         }
     }
@@ -182,6 +182,7 @@ impl ValueValidator {
     pub fn as_constant_literal(&self) -> Result<String, DatamodelError> {
         match &self.value {
             ast::Expression::ConstantValue(value, _) => Ok(value.to_string()),
+            ast::Expression::BooleanValue(value, _) => Ok(value.to_string()),
             ast::Expression::Any(value, _) => Ok(value.to_string()),
             _ => Err(self.construct_type_mismatch_error("constant literal")),
         }

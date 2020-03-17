@@ -1,5 +1,5 @@
 use crate::test_harness::*;
-use crate::{test_each_connector,BarrelMigrationExecutor, TestApi};
+use crate::{test_each_connector, BarrelMigrationExecutor, TestApi};
 
 #[test_each_connector]
 async fn empty_metadata_should_work(api: &TestApi) {
@@ -11,7 +11,5 @@ async fn empty_metadata_should_work(api: &TestApi) {
 }
 
 async fn setup_empty(barrel: &BarrelMigrationExecutor, db_name: &str) {
-    let _setup_schema = barrel
-        .execute_with_schema(|_| {}, db_name)
-        .await;
+    let _setup_schema = barrel.execute_with_schema(|_| {}, db_name).await;
 }

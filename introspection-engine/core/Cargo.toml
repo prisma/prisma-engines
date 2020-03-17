@@ -6,11 +6,18 @@ edition = "2018"
 
 # Please keep the pyramid form
 [dependencies]
+datamodel = { path = "../../libs/datamodel/core" }
+user-facing-errors = { path = "../../libs/user-facing-errors" }
+introspection-connector = { path = "../connectors/introspection-connector" }
+sql-introspection-connector = { path = "../connectors/sql-introspection-connector" }
+
 clap = "2.33"
+structopt = "0.3"
 serde = "1.0"
+anyhow = "1.0.26"
+thiserror = "1.0.9"
 futures = { version = "0.3", features = ["compat"] }
 futures01 = { package = "futures", version = "0.1" }
-failure = "0.1"
 
 serde_json = "1.0"
 serde_derive = "1.0"
@@ -20,13 +27,9 @@ jsonrpc-derive = "14.0"
 jsonrpc-core-client = "14.0"
 json-rpc-stdio = { path = "../../libs/json-rpc-stdio" }
 
-datamodel = { path = "../../libs/datamodel/core" }
-user-facing-errors = { path = "../../libs/user-facing-errors" }
-introspection-connector = { path = "../connectors/introspection-connector" }
-sql-introspection-connector = { path = "../connectors/sql-introspection-connector" }
-tracing = "0.1.10"
-tracing-subscriber = "0.1.6"
-tracing-futures = "0.2.0"
+tracing = "0.1"
+tracing-subscriber = "0.2"
+tracing-futures = "0.2"
 
 [dependencies.tokio]
 version = "0.2"

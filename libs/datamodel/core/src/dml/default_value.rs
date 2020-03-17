@@ -30,16 +30,9 @@ impl DefaultValue {
                 ScalarValue::String(x) => PrismaValue::String(x.clone()),
                 ScalarValue::DateTime(x) => PrismaValue::DateTime(x),
                 ScalarValue::Decimal(x) => x.try_into().expect("Can't convert float to decimal"),
-                ScalarValue::ConstantLiteral(x) => PrismaValue::Enum(x.clone()),
+                ScalarValue::ConstantLiteral(value) => PrismaValue::Enum(value.clone()),
             })
             .unwrap_or_else(|| PrismaValue::Null)
-    }
-
-    pub fn get_type(&self) -> ScalarType {
-        match self {
-            Self::Single(v) => v.get_type(),
-            Self::Expression(vg) => vg.return_type(),
-        }
     }
 }
 
@@ -62,8 +55,12 @@ impl ValueGenerator {
         ValueGenerator::new("autoincrement".to_owned(), vec![]).unwrap()
     }
 
-    pub fn return_type(&self) -> ScalarType {
-        self.generator.return_type()
+    pub fn new_dbgenerated() -> Self {
+        ValueGenerator::new("dbgenerated".to_owned(), vec![]).unwrap()
+    }
+
+    pub fn new_now() -> Self {
+        ValueGenerator::new("now".to_owned(), vec![]).unwrap()
     }
 
     pub fn generate(&self) -> Option<ScalarValue> {
@@ -85,24 +82,17 @@ pub enum ValueGeneratorFn {
     CUID,
     Now,
     Autoincrement,
+    DbGenerated,
 }
 
 impl ValueGeneratorFn {
-    pub fn return_type(&self) -> ScalarType {
-        match self {
-            Self::UUID => ScalarType::String,
-            Self::CUID => ScalarType::String,
-            Self::Now => ScalarType::DateTime,
-            Self::Autoincrement => ScalarType::Int,
-        }
-    }
-
     pub fn invoke(&self) -> Option<ScalarValue> {
         match self {
             Self::UUID => Self::generate_uuid(),
             Self::CUID => Self::generate_cuid(),
             Self::Now => Self::generate_now(),
             Self::Autoincrement => None,
+            Self::DbGenerated => None,
         }
     }
 
@@ -128,6 +118,7 @@ impl TryFrom<&str> for ValueGeneratorFn {
             "uuid" => Ok(Self::UUID),
             "now" => Ok(Self::Now),
             "autoincrement" => Ok(Self::Autoincrement),
+            "dbgenerated" => Ok(Self::DbGenerated),
             _ => Err(DatamodelError::new_functional_evaluation_error(
                 &format!("The function {} is not a known function.", s),
                 Span::empty(),

@@ -78,16 +78,27 @@ class CreateMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "A Create Mutation" should "create and return item with explicit null attributes when other mutation has explicit non-null values" in {
-    val res = server.query(
-      """mutation {
-        | a: createScalarModel(data: {optString: "lala", optInt: 123, optBoolean: true, optEnum: A, optFloat: 1.23}){optString, optInt, optFloat, optBoolean, optEnum }
-        | b: createScalarModel(data: {optString: null, optInt: null, optBoolean: null, optEnum: null, optFloat: null}){optString, optInt, optFloat, optBoolean, optEnum }
-        |}""".stripMargin,
-      project = project
-    )
+    {
+      val res = server.query(
+        """mutation {
+          | createScalarModel(data: {optString: "lala", optInt: 123, optBoolean: true, optEnum: A, optFloat: 1.23}){optString, optInt, optFloat, optBoolean, optEnum }
+          |}""".stripMargin,
+        project = project
+      )
 
-    res.pathAs[JsValue]("data.a") should be("""{"optInt":123,"optBoolean":true,"optString":"lala","optEnum":"A","optFloat":1.23}""".parseJson)
-    res.pathAs[JsValue]("data.b") should be("""{"optInt":null,"optBoolean":null,"optString":null,"optEnum":null,"optFloat":null}""".parseJson)
+      res.pathAs[JsValue]("data.createScalarModel") should be("""{"optInt":123,"optBoolean":true,"optString":"lala","optEnum":"A","optFloat":1.23}""".parseJson)
+    }
+
+    {
+      val res = server.query(
+        """mutation {
+          | createScalarModel(data: {optString: null, optInt: null, optBoolean: null, optEnum: null, optFloat: null}){optString, optInt, optFloat, optBoolean, optEnum }
+          |}""".stripMargin,
+        project = project
+      )
+
+      res.pathAs[JsValue]("data.createScalarModel") should be("""{"optInt":null,"optBoolean":null,"optString":null,"optEnum":null,"optFloat":null}""".parseJson)
+    }
   }
 
   "A Create Mutation" should "create and return item with implicit null attributes and createdAt should be set" in {

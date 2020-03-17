@@ -5,9 +5,9 @@ pub struct DMMFEnumRenderer<'a> {
 }
 
 impl<'a> Renderer<'a, ()> for DMMFEnumRenderer<'a> {
-    fn render(&self, ctx: RenderContext) -> ((), RenderContext) {
+    fn render(&self, ctx: &RenderContext) {
         if ctx.already_rendered(self.enum_type.name()) {
-            return ((), ctx);
+            return;
         }
 
         let values = self.format_enum_values();
@@ -18,7 +18,6 @@ impl<'a> Renderer<'a, ()> for DMMFEnumRenderer<'a> {
         };
 
         ctx.add_enum(self.enum_type.name().to_owned(), rendered);
-        ((), ctx)
     }
 }
 
@@ -29,8 +28,8 @@ impl<'a> DMMFEnumRenderer<'a> {
 
     fn format_enum_values(&self) -> Vec<String> {
         match self.enum_type {
-            EnumType::Internal(i) => i.values.clone(),
-            EnumType::OrderBy(ord) => ord.values.iter().map(|(name, _)| name.to_owned()).collect(),
+            EnumType::Internal(i) => i.external_values(),
+            EnumType::OrderBy(ord) => ord.values(),
         }
     }
 }

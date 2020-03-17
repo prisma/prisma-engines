@@ -1,9 +1,9 @@
 use crate::{
-    query_builder::read::{self, ManyRelatedRecordsBaseQuery, ManyRelatedRecordsQueryBuilder},
+    query_builder::{self, read},
     QueryExt, SqlError,
 };
-
 use connector_interface::*;
+use futures::stream::{FuturesUnordered, StreamExt};
 use prisma_models::*;
 use quaint::ast::*;
 
@@ -14,7 +14,7 @@ pub async fn get_single_record(
     selected_fields: &SelectedFields,
 ) -> crate::Result<Option<SingleRecord>> {
     let query = read::get_records(&model, selected_fields.columns(), filter);
-    let field_names = selected_fields.names().map(String::from).collect();
+    let field_names = selected_fields.db_names().map(String::from).collect();
     let idents: Vec<_> = selected_fields.types().collect();
 
     let record = (match conn.find(query, idents.as_slice()).await {
@@ -24,7 +24,10 @@ pub async fn get_single_record(
         Err(e) => Err(e),
     })?
     .map(Record::from)
-    .map(|record| SingleRecord { record, field_names });
+    .map(|record| SingleRecord {
+        record,
+        field_names,
+    });
 
     Ok(record)
 }
@@ -32,86 +35,112 @@ pub async fn get_single_record(
 pub async fn get_many_records(
     conn: &dyn QueryExt,
     model: &ModelRef,
-    query_arguments: QueryArguments,
+    mut query_arguments: QueryArguments,
     selected_fields: &SelectedFields,
 ) -> crate::Result<ManyRecords> {
-    let field_names = selected_fields.names().map(String::from).collect();
+    let field_names = selected_fields.db_names().map(String::from).collect();
     let idents: Vec<_> = selected_fields.types().collect();
-    let query = read::get_records(model, selected_fields.columns(), query_arguments);
+    let mut records = ManyRecords::new(field_names);
 
-    let records = conn
-        .filter(query.into(), idents.as_slice())
-        .await?
-        .into_iter()
-        .map(Record::from)
-        .collect();
+    if query_arguments.can_batch() {
+        // We don't need to order in the database due to us ordering in this
+        // function.
+        let order = query_arguments.order_by.take();
 
-    Ok(ManyRecords { records, field_names })
+        let batches = query_arguments.batched();
+        let mut futures = FuturesUnordered::new();
+
+        for args in batches.into_iter() {
+            let query = read::get_records(model, selected_fields.columns(), args);
+            futures.push(conn.filter(query.into(), idents.as_slice()));
+        }
+
+        while let Some(result) = futures.next().await {
+            for item in result?.into_iter() {
+                records.push(Record::from(item))
+            }
+        }
+
+        if let Some(ref order_by) = order {
+            records.order_by(order_by)
+        }
+    } else {
+        let query = read::get_records(model, selected_fields.columns(), query_arguments);
+
+        for item in conn
+            .filter(query.into(), idents.as_slice())
+            .await?
+            .into_iter()
+        {
+            records.push(Record::from(item))
+        }
+    }
+
+    Ok(records)
 }
 
-pub async fn get_related_records<T>(
+pub async fn get_related_m2m_record_ids(
     conn: &dyn QueryExt,
     from_field: &RelationFieldRef,
-    from_record_ids: &[GraphqlId],
-    query_arguments: QueryArguments,
-    selected_fields: &SelectedFields,
-) -> crate::Result<ManyRecords>
-where
-    T: ManyRelatedRecordsQueryBuilder,
-{
-    let mut idents: Vec<_> = selected_fields.types().collect();
-    idents.push(from_field.related_field().type_identifier_with_arity());
-    idents.push(from_field.type_identifier_with_arity());
+    from_record_ids: &[RecordProjection],
+) -> crate::Result<Vec<(RecordProjection, RecordProjection)>> {
+    let mut idents = vec![];
+    idents.extend(from_field.type_identifiers_with_arities());
+    idents.extend(from_field.related_field().type_identifiers_with_arities());
 
-    let mut field_names: Vec<String> = selected_fields.names().map(String::from).collect();
-    field_names.push(from_field.related_field().name.clone());
-    field_names.push(from_field.name.clone());
+    let relation = from_field.relation();
+    let table = relation.as_table();
 
-    let can_skip_joins = from_field.relation_is_inlined_in_child() && !query_arguments.is_with_pagination();
-
-    let mut columns: Vec<_> = selected_fields.columns().collect();
-    columns.push(from_field.opposite_column(true).alias(SelectedFields::RELATED_MODEL_ALIAS));
-    columns.push(from_field.relation_column(true).alias(SelectedFields::PARENT_MODEL_ALIAS));
-
-    let query = if can_skip_joins {
-        let model = from_field.related_model();
-        let select = read::get_records(&model, columns.into_iter(), query_arguments)
-            .and_where(from_field.relation_column(true).in_selection(from_record_ids.to_owned()));
-
-        Query::from(select)
-    } else {
-        let is_with_pagination = query_arguments.is_with_pagination();
-        let base = ManyRelatedRecordsBaseQuery::new(from_field, from_record_ids, query_arguments, columns);
-
-        if is_with_pagination {
-            T::with_pagination(base)
-        } else {
-            T::without_pagination(base)
-        }
-    };
-
-    let records: crate::Result<Vec<Record>> = conn
-        .filter(query, idents.as_slice())
-        .await?
-        .into_iter()
-        .map(|mut row| {
-            let parent_id = row.values.pop().ok_or(SqlError::ColumnDoesNotExist)?;
-
-            // Relation id is always the second last value. We don't need it
-            // here and we don't need it in the record.
-            let _ = row.values.pop();
-
-            let mut record = Record::from(row);
-            record.add_parent_id(parent_id.into_graphql_id()?);
-
-            Ok(record)
-        })
+    let from_column_names: Vec<_> = from_field.related_field().m2m_column_names();
+    let to_column_names: Vec<_> = from_field.m2m_column_names();
+    let from_columns: Vec<Column<'static>> = from_column_names
+        .iter()
+        .map(|name| Column::from(name.clone()))
         .collect();
 
-    Ok(ManyRecords {
-        records: records?,
-        field_names,
-    })
+    // [DTODO] To verify: We might need chunked fetch here (too many parameters in the query).
+    let select = Select::from_table(table)
+        .columns(
+            from_column_names
+                .into_iter()
+                .chain(to_column_names.into_iter()),
+        )
+        .so_that(query_builder::conditions(&from_columns, from_record_ids));
+
+    let parent_model_id = from_field.model().primary_identifier();
+    let child_model_id = from_field.related_model().primary_identifier();
+
+    let from_dsfs: Vec<_> = parent_model_id.data_source_fields().collect();
+    let to_dsfs: Vec<_> = child_model_id.data_source_fields().collect();
+
+    // first parent id, then child id
+    Ok(conn
+        .filter(select.into(), idents.as_slice())
+        .await?
+        .into_iter()
+        .map(|row| {
+            let mut values = row.values;
+
+            let child_values = values.split_off(from_dsfs.len());
+            let parent_values = values;
+
+            let p: RecordProjection = from_dsfs
+                .iter()
+                .zip(parent_values)
+                .map(|(dsf, val)| (dsf.clone(), val))
+                .collect::<Vec<_>>()
+                .into();
+
+            let c: RecordProjection = to_dsfs
+                .iter()
+                .zip(child_values)
+                .map(|(dsf, val)| (dsf.clone(), val))
+                .collect::<Vec<_>>()
+                .into();
+
+            (p, c)
+        })
+        .collect())
 }
 
 pub async fn count_by_model(

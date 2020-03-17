@@ -6,7 +6,7 @@
 //! assume the data has to be because of the structural guarantees of the query schema validation.
 use super::*;
 use chrono::prelude::*;
-use prisma_models::{GraphqlId, OrderBy, PrismaValue};
+use prisma_models::{OrderBy, PrismaValue};
 use rust_decimal::prelude::ToPrimitive;
 use std::convert::TryInto;
 
@@ -167,25 +167,6 @@ impl TryInto<Option<i64>> for ParsedInputValue {
             PrismaValue::Null => Ok(None),
             v => Err(QueryParserError::AssertionError(format!(
                 "Attempted conversion of non-int Prisma value type ({:?}) into int failed.",
-                v
-            ))),
-        }
-    }
-}
-
-impl TryInto<Option<GraphqlId>> for ParsedInputValue {
-    type Error = QueryParserError;
-
-    fn try_into(self) -> QueryParserResult<Option<GraphqlId>> {
-        let prisma_value: PrismaValue = self.try_into()?;
-
-        match prisma_value {
-            PrismaValue::GraphqlId(id) => Ok(Some(id)),
-            PrismaValue::String(s) => Ok(Some(GraphqlId::String(s))),
-            PrismaValue::Int(i) => Ok(Some(GraphqlId::Int(i as usize))),
-            PrismaValue::Null => Ok(None),
-            v => Err(QueryParserError::AssertionError(format!(
-                "Attempted conversion of non-id Prisma value type ({:?}) into id failed.",
                 v
             ))),
         }

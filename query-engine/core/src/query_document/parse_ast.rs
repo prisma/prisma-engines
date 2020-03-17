@@ -23,6 +23,12 @@ pub struct ParsedField {
     pub schema_field: FieldRef,
 }
 
+impl ParsedField {
+    pub fn is_raw_query(&self) -> bool {
+        self.name == "executeRaw"
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct ParsedArgument {
     pub name: String,
@@ -35,6 +41,15 @@ pub enum ParsedInputValue {
     OrderBy(OrderBy),
     List(Vec<ParsedInputValue>),
     Map(ParsedInputMap),
+}
+
+impl ParsedArgument {
+    pub fn into_value(self) -> Option<PrismaValue> {
+        match self.value {
+            ParsedInputValue::Single(val) => Some(val),
+            _ => None,
+        }
+    }
 }
 
 pub trait ArgumentListLookup {
@@ -52,6 +67,9 @@ impl ArgumentListLookup for Vec<ParsedArgument> {
 pub trait InputAssertions: Sized {
     /// Asserts the exact size of the underlying input.
     fn assert_size(&self, size: usize) -> QueryParserResult<()>;
+
+    /// Asserts that the given value is non-null. The exact definition of what is considered
+    /// null or non-null is dependent on the implementor.
     fn assert_non_null(&self) -> QueryParserResult<()>;
 }
 

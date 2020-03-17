@@ -29,38 +29,32 @@ trait SchemaBaseV11 extends PlayJsonExtensions {
 
   // parse functions
 
-  def unescapeFields(input: String): String = {
-    input
-      .replace("{\"c\":", "{c:")
-      .replace("{\"p\":", "{p:")
-      .replace("{\"id\":", "{id:")
-      .replace("{\"c_1\":", "{c_1:")
-      .replace("\"c_2\":", "c_2:")
-      .replace("{\"p_1\":", "{p_1:")
-      .replace("\"p_2\":", "p_2:")
-      .replace("\"{", "{")
-      .replace("}\"", "}")
-
+  def parseMultiCompound(fields: Vector[String], argName: String)(json: JsValue, path: String): Vector[String] = {
+    json.pathAsJsArray(path).value.map(json => parseCompoundIdentifier(fields, argName)(json, "")).toVector
   }
 
-  def parse(subpath: String = "", where: String): (JsValue, String) => String = {
-    def test(input: JsValue, path: String): String = s"""{$where : ${unescapeFields(input.identifierAtPath(path, subpath, list = false))}}"""
-    test
+  def parseMulti(field: String)(json: JsValue, path: String): Vector[String] = {
+    json.pathAsJsArray(path).value.map(json => parseIdentifer(field)(json, "")).toVector
   }
 
-  def parseFirst(subpath: String = "", where: String): (JsValue, String) => String = {
-    def test(input: JsValue, path: String): String = s"""{$where : ${unescapeFields(input.identifierAtPath(path, subpath, list = true))}}"""
-    test
+  def parseCompoundIdentifier(fields: Vector[String], argName: String)(json: JsValue, path: String): String = {
+    val pathPrefix  = if (path == "") "" else path + "."
+    val fieldValues = fields.map(f => json.pathAsJsValue(pathPrefix + f))
+    val arguments   = fields.zip(fieldValues).map { case (name, value) => s"""$name: $value""" }.mkString(",")
+
+    s"""
+       |{
+       |  $argName: {
+       |    $arguments
+       |  }
+       |}
+       """.stripMargin
   }
 
-  def parseAll(where: String, compound: Boolean = false): (JsValue, String) => String = {
-    def test(input: JsValue, path: String): String = {
-      compound match {
-        case false => s"""${unescapeFields(input.pathAsJsArray(path).toString())}"""
-        case true  => "[" + input.pathAsSeq(path).map(x => "{" + where + ":" + unescapeFields(x.toString()) + "}").mkString(",") + "]"
-      }
-    }
-    test
+  def parseIdentifer(field: String)(json: JsValue, path: String): String = {
+    val finalPath = if (path == "") field else path + "." + field
+    val value     = json.pathAsJsValue(finalPath).toString()
+    s"{ $field: $value }"
   }
 
   sealed trait RelationField {
@@ -88,67 +82,85 @@ trait SchemaBaseV11 extends PlayJsonExtensions {
     override def field: String = "childReq      Child"
   }
 
-  def schemaWithRelation(onParent: RelationField, onChild: RelationField) = {
-
+  def schemaWithRelation(onParent: RelationField, onChild: RelationField, withoutParams: Boolean = false) = {
     //Query Params
-    val idParams         = QueryParams("id", parse(".id", "id"), parseFirst("id", "id"), parseAll("id"))
-    val compoundIdParams = QueryParams("id_1 , id_2", parse("", "id_1_id_2"), parseFirst("", "id_1_id_2"), parseAll("id_1_id_2", true))
-    val parentUniqueParams =
-      Vector(
-        QueryParams("p", parse(".p", "p"), parseFirst("p", "p"), parseAll("p")),
-        QueryParams("p_1, p_2", parse("", "p_1_p_2"), parseFirst("", "p_1_p_2"), parseAll("p_1_p_2", true))
-      )
-    val childUniqueParams =
-      Vector(
-        QueryParams("c", parse(".c", "c"), parseFirst("c", "c"), parseAll("c")),
-        QueryParams("c_1, c_2", parse("", "c_1_c_2"), parseFirst("", "c_1_c_2"), parseAll("c_1_c_2", true))
-      )
+    val idParams = QueryParams(
+      selection = "id",
+      where = parseIdentifer("id"),
+      whereMulti = parseMulti("id")
+    )
 
-    val simple = true
+    val compoundIdParams = {
+      val fields  = Vector("id_1", "id_2")
+      val argName = "id_1_id_2"
+      QueryParams(
+        selection = "id_1 , id_2",
+        where = parseCompoundIdentifier(fields, argName),
+        whereMulti = parseMultiCompound(fields, argName)
+      )
+    }
 
-    val datamodelsWithParams = for (parentId <- if (simple) Vector(simpleId) else idOptions;
-                                    childId <- if (simple) Vector(simpleId) else idOptions;
-                                    //based on Id and relation fields
-                                    childReferences <- if (simple) Vector(idReference)
-                                                      else
-                                                        parentId match {
-                                                          case _ if onChild.isList && !onParent.isList => Vector(`noRef`)
-                                                          case `simpleId`                              => idReference +: commonParentReferences
-                                                          case `compoundId`                            => compoundParentIdReference +: commonParentReferences
-                                                          case _                                       => commonParentReferences
-                                                        };
-                                    parentReferences <- if (simple) Vector(noRef)
-                                                       else
-                                                         (childId, childReferences) match {
-                                                           case (_, _) if onParent.isList && !onChild.isList => Vector(`noRef`)
-                                                           case (`simpleId`, `noRef`)                        => idReference +: commonChildReferences
-                                                           case (`simpleId`, _) if onParent.isList && onChild.isList =>
-                                                             idReference +: commonChildReferences :+ noRef
-                                                           case (`simpleId`, _)         => Vector(noRef)
-                                                           case (`compoundId`, `noRef`) => compoundChildIdReference +: commonChildReferences
-                                                           case (`compoundId`, _) if onParent.isList && onChild.isList =>
-                                                             compoundChildIdReference +: commonChildReferences :+ noRef
-                                                           case (`compoundId`, _)                                => Vector(noRef)
-                                                           case (`noId`, `noRef`)                                => commonChildReferences
-                                                           case (`noId`, _) if onParent.isList && onChild.isList => commonChildReferences :+ noRef
-                                                           case (`noId`, _)                                      => Vector(noRef)
-                                                           case (_, _)                                           => Vector.empty
-                                                         };
-                                    //only based on id
-                                    parentParams <- if (simple) parentUniqueParams :+ idParams
-                                                   else
+    val parentUniqueParams = Vector(
+      QueryParams(
+        selection = "p",
+        where = parseIdentifer("p"),
+        whereMulti = parseMulti("p")
+      ), {
+        val fields  = Vector("p_1", "p_2")
+        val argName = "p_1_p_2"
+        QueryParams(
+          selection = "p_1, p_2",
+          where = parseCompoundIdentifier(fields, argName),
+          whereMulti = parseMultiCompound(fields, argName)
+        )
+      }
+    )
+
+    val childUniqueParams = Vector(
+      QueryParams(
+        selection = "c",
+        where = parseIdentifer("c"),
+        whereMulti = parseMulti("c")
+      ), {
+        val fields  = Vector("c_1", "c_2")
+        val argName = "c_1_c_2"
+        QueryParams(
+          selection = "c_1, c_2",
+          where = parseCompoundIdentifier(fields, argName),
+          whereMulti = parseMultiCompound(fields, argName)
+        )
+      }
+    )
+
+    val simple = sys.env.getOrElse("TEST_MODE", "simple") == "simple"
+
+    val datamodelsWithParams = for (parentId <- idOptions;
+                                    childId <- idOptions;
+
+                                    // Based on Id and relation fields
+                                    childReference  <- childReferences(simple, parentId, onParent, onChild);
+                                    parentReference <- parentReferences(simple, childId, childReference, onParent, onChild);
+
+                                    // Only based on id
+                                    parentParams <- if (withoutParams) {
+                                                     Vector(idParams)
+                                                   } else {
                                                      parentId match {
                                                        case `simpleId`   => parentUniqueParams :+ idParams
                                                        case `compoundId` => parentUniqueParams :+ compoundIdParams
                                                        case `noId`       => parentUniqueParams
-                                                     };
-                                    childParams <- if (simple) childUniqueParams :+ idParams
-                                                  else
+                                                     }
+                                                   };
+
+                                    childParams <- if (withoutParams) {
+                                                    Vector(idParams)
+                                                  } else {
                                                     childId match {
                                                       case `simpleId`   => childUniqueParams :+ idParams
                                                       case `compoundId` => childUniqueParams :+ compoundIdParams
-                                                      case `noId`       => parentUniqueParams
-                                                    })
+                                                      case `noId`       => childUniqueParams
+                                                    }
+                                                  })
       yield {
         val datamodel =
           s"""
@@ -156,7 +168,7 @@ trait SchemaBaseV11 extends PlayJsonExtensions {
                     p             String    @unique
                     p_1           String?
                     p_2           String?
-                    ${onParent.field}         $parentReferences
+                    ${onParent.field}         $parentReference
                     non_unique    String?
                     $parentId
 
@@ -167,7 +179,7 @@ trait SchemaBaseV11 extends PlayJsonExtensions {
                     c             String    @unique
                     c_1           String?
                     c_2           String?
-                    ${onChild.field}          $childReferences
+                    ${onChild.field}          $childReference
                     non_unique    String?
                     $childId
 
@@ -181,69 +193,156 @@ trait SchemaBaseV11 extends PlayJsonExtensions {
     AbstractTestDataModels(mongo = datamodelsWithParams, sql = datamodelsWithParams)
   }
 
+  def childReferences(simple: Boolean, parentId: String, onParent: RelationField, onChild: RelationField): Vector[String] = {
+    if (simple) {
+      simpleChildReferences(parentId, onParent, onChild)
+    } else {
+      fullChildReferences(parentId, onParent, onChild)
+    }
+  }
+
+  def simpleChildReferences(parentId: String, onParent: RelationField, onChild: RelationField): Vector[String] = {
+    parentId match {
+      case _ if onChild.isList && !onParent.isList => Vector(noRef)
+      case `simpleId`                              => Vector(idReference)
+      case `compoundId`                            => Vector(compoundParentIdReference)
+      case `noId`                                  => Vector(pReference)
+      case _                                       => ???
+    }
+  }
+
+  def fullChildReferences(parentId: String, onParent: RelationField, onChild: RelationField): Vector[String] = {
+    val isManyToMany = onParent.isList && onChild.isList
+
+    if (!isManyToMany) {
+      parentId match {
+        case _ if onChild.isList && !onParent.isList => Vector(`noRef`)
+        case `simpleId`                              => idReference +: commonParentReferences
+        case `compoundId`                            => compoundParentIdReference +: commonParentReferences
+        case _                                       => commonParentReferences
+      }
+    } else {
+      parentId match {
+        case `simpleId`   => Vector(idReference)
+        case `compoundId` => Vector(compoundParentIdReference)
+        case _            => Vector(pReference)
+      }
+    }
+  }
+
+  def parentReferences(simple: Boolean, childId: String, childReference: String, onParent: RelationField, onChild: RelationField): Vector[String] = {
+    if (simple) {
+      simpleParentReferences(childId, childReference, onParent, onChild)
+    } else {
+      fullParentReferences(childId, childReference, onParent, onChild)
+    }
+  }
+
+  def simpleParentReferences(childId: String, childReference: String, onParent: RelationField, onChild: RelationField): Vector[String] = {
+    val isManyToMany = onParent.isList && onChild.isList
+
+    childId match {
+      case _ if childReference != `noRef` && !isManyToMany => Vector(noRef)
+      case `simpleId`                                      => Vector(idReference)
+      case `compoundId`                                    => Vector(compoundChildIdReference)
+      case `noId`                                          => Vector(cReference)
+      case _                                               => ???
+    }
+  }
+
+  def fullParentReferences(childId: String, childReference: String, onParent: RelationField, onChild: RelationField): Vector[String] = {
+    val isManyToMany = onParent.isList && onChild.isList
+
+    if (!isManyToMany) {
+      (childId, childReference) match {
+        case (_, _) if onParent.isList && !onChild.isList => Vector(`noRef`)
+        case (`simpleId`, `noRef`)                        => idReference +: commonChildReferences
+        case (`simpleId`, _) if onParent.isList && onChild.isList =>
+          idReference +: commonChildReferences :+ noRef
+
+        case (`simpleId`, _)         => Vector(noRef)
+        case (`compoundId`, `noRef`) => compoundChildIdReference +: commonChildReferences
+        case (`compoundId`, _) if onParent.isList && onChild.isList =>
+          compoundChildIdReference +: commonChildReferences :+ noRef
+
+        case (`compoundId`, _)                                => Vector(noRef)
+        case (`noId`, `noRef`)                                => commonChildReferences
+        case (`noId`, _) if onParent.isList && onChild.isList => commonChildReferences :+ noRef
+        case (`noId`, _)                                      => Vector(noRef)
+        case (_, _)                                           => Vector.empty
+      }
+    } else {
+      childId match {
+        case `simpleId`   => Vector(idReference)
+        case `compoundId` => Vector(compoundChildIdReference)
+        case _            => Vector(cReference)
+      }
+    };
+  }
+
   //region NON EMBEDDED WITH @id
 
-  val schemaP1reqToC1req = {
-    val s1 =
-      """
-    model Parent {
-        id       String @id @default(cuid())
-        p        String @unique
-        childReq Child  @relation(references: [id])
-    }
+//  val schemaP1reqToC1req = {
+//    val s1 =
+//      """
+//    model Parent {
+//        id       String @id @default(cuid())
+//        p        String @unique
+//        childReq Child  @relation(references: [id])
+//    }
+//
+//    model Child {
+//        id        String @id @default(cuid())
+//        c         String @unique
+//        parentReq Parent
+////    }"""
+//
+//    val s2 =
+//      """
+//    model Parent {
+//        id       String @id @default(cuid())
+//        p        String @unique
+//        childReq Child
+//    }
+//
+//    model Child {
+//        id        String @id @default(cuid())
+//        c         String @unique
+//        parentReq Parent @relation(references: [id])
+//    }"""
+//
+//    TestDataModels(mongo = Vector(s1, s2), sql = Vector(s1, s2))
+//  }
 
-    model Child {
-        id        String @id @default(cuid())
-        c         String @unique
-        parentReq Parent
-    }"""
-
-    val s2 =
-      """
-    model Parent {
-        id       String @id @default(cuid())
-        p        String @unique
-        childReq Child
-    }
-
-    model Child {
-        id        String @id @default(cuid())
-        c         String @unique
-        parentReq Parent @relation(references: [id])
-    }"""
-
-    TestDataModels(mongo = Vector(s1, s2), sql = Vector(s1, s2))
-  }
-
-  val schemaP1optToC1req = {
-    val s1 = """
-    model Parent {
-        id       String @id @default(cuid())
-        p        String @unique
-        childOpt Child? @relation(references: [id])
-    }
-
-    model Child {
-        id        String @id @default(cuid())
-        c         String @unique
-        parentReq Parent
-    }"""
-
-    val s2 = """
-    model Parent {
-        id       String @id @default(cuid())
-        p        String @unique
-        childOpt Child?
-    }
-
-    model Child {
-        id        String @id @default(cuid())
-        c         String @unique
-        parentReq Parent @relation(references: [id])
-    }"""
-
-    TestDataModels(mongo = Vector(s1, s2), sql = Vector(s1, s2))
-  }
+//  val schemaP1optToC1req = {
+//    val s1 = """
+//    model Parent {
+//        id       String @id @default(cuid())
+//        p        String @unique
+//        childOpt Child? @relation(references: [id])
+//    }
+//
+//    model Child {
+//        id        String @id @default(cuid())
+//        c         String @unique
+//        parentReq Parent
+//    }"""
+//
+//    val s2 = """
+//    model Parent {
+//        id       String @id @default(cuid())
+//        p        String @unique
+//        childOpt Child?
+//    }
+//
+//    model Child {
+//        id        String @id @default(cuid())
+//        c         String @unique
+//        parentReq Parent @relation(references: [id])
+//    }"""
+//
+//    TestDataModels(mongo = Vector(s1, s2), sql = Vector(s1, s2))
+//  }
 
   val schemaP1optToC1opt = {
     val s1 = """
@@ -275,170 +374,170 @@ trait SchemaBaseV11 extends PlayJsonExtensions {
     TestDataModels(mongo = Vector(s1, s2), sql = Vector(s1, s2))
   }
 
-  val schemaP1reqToC1opt = {
-    val s1 = """
-      model Parent {
-          id       String @id @default(cuid())
-          p        String @unique
-          childReq Child  @relation(references: [id])
-      }
+//  val schemaP1reqToC1opt = {
+//    val s1 = """
+//      model Parent {
+//          id       String @id @default(cuid())
+//          p        String @unique
+//          childReq Child  @relation(references: [id])
+//      }
+//
+//      model Child {
+//          id        String  @id @default(cuid())
+//          c         String  @unique
+//          parentOpt Parent?
+//        }"""
+//
+//    val s2 = """
+//      model Parent {
+//          id       String @id @default(cuid())
+//          p        String @unique
+//          childReq Child
+//      }
+//
+//      model Child {
+//          id        String  @id @default(cuid())
+//          c         String  @unique
+//          parentOpt Parent? @relation(references: [id])
+//      }"""
+//
+//    TestDataModels(mongo = Vector(s1, s2), sql = Vector(s1, s2))
+//  }
 
-      model Child {
-          id        String  @id @default(cuid())
-          c         String  @unique
-          parentOpt Parent?
-        }"""
+//  val schemaPMToC1req = {
+//    val s1 = """
+//    model Parent {
+//        id          String  @id @default(cuid())
+//        p           String  @unique
+//        childrenOpt Child[] @relation(references: [id])
+//    }
+//
+//    model Child {
+//        id        String @id @default(cuid())
+//        c         String @unique
+//        parentReq Parent
+//        test      String?
+//    }"""
+//
+//    val s2 = """
+//    model Parent {
+//        id          String  @id @default(cuid())
+//        p           String  @unique
+//        childrenOpt Child[]
+//    }
+//
+//    model Child {
+//        id        String  @id @default(cuid())
+//        c         String  @unique
+//        parentReq Parent  @relation(references: [id])
+//        test      String?
+//    }"""
+//
+//    val s3 = """
+//    model Parent {
+//        id          String  @id @default(cuid())
+//        p           String  @unique
+//        childrenOpt Child[]
+//    }
+//
+//    model Child {
+//        id        String @id @default(cuid())
+//        c         String @unique
+//        parentReq Parent
+//        test      String?
+//    }"""
+//
+//    TestDataModels(mongo = Vector(s1, s2), sql = Vector(s2, s3))
+//  }
 
-    val s2 = """
-      model Parent {
-          id       String @id @default(cuid())
-          p        String @unique
-          childReq Child
-      }
+//  val schemaPMToC1opt = {
+//    val s1 = """
+//    model Parent {
+//        id          String  @id @default(cuid())
+//        p           String  @unique
+//        childrenOpt Child[] @relation(references: [id])
+//    }
+//
+//    model Child {
+//        id        String @id @default(cuid())
+//        c         String @unique
+//        parentOpt Parent?
+//        test      String
+//    }"""
+//
+//    val s2 = """
+//    model Parent {
+//        id          String  @id @default(cuid())
+//        p           String  @unique
+//        childrenOpt Child[]
+//    }
+//
+//    model Child {
+//        id        String  @id @default(cuid())
+//        c         String  @unique
+//        parentOpt Parent? @relation(references: [id])
+//        test      String?
+//    }"""
+//
+//    val s3 = """
+//    model Parent {
+//        id          String  @id @default(cuid())
+//        p           String  @unique
+//        childrenOpt Child[]
+//    }
+//
+//    model Child {
+//        id        String  @id @default(cuid())
+//        c         String  @unique
+//        parentOpt Parent?
+//        test      String?
+//    }"""
+//
+//    TestDataModels(mongo = Vector(s1, s2), sql = Vector(s2, s3))
+//  }
 
-      model Child {
-          id        String  @id @default(cuid())
-          c         String  @unique
-          parentOpt Parent? @relation(references: [id])
-      }"""
-
-    TestDataModels(mongo = Vector(s1, s2), sql = Vector(s1, s2))
-  }
-
-  val schemaPMToC1req = {
-    val s1 = """
-    model Parent {
-        id          String  @id @default(cuid())
-        p           String  @unique
-        childrenOpt Child[] @relation(references: [id])
-    }
-
-    model Child {
-        id        String @id @default(cuid())
-        c         String @unique
-        parentReq Parent
-        test      String?
-    }"""
-
-    val s2 = """
-    model Parent {
-        id          String  @id @default(cuid())
-        p           String  @unique
-        childrenOpt Child[]
-    }
-
-    model Child {
-        id        String  @id @default(cuid())
-        c         String  @unique
-        parentReq Parent  @relation(references: [id])
-        test      String?
-    }"""
-
-    val s3 = """
-    model Parent {
-        id          String  @id @default(cuid())
-        p           String  @unique
-        childrenOpt Child[]
-    }
-
-    model Child {
-        id        String @id @default(cuid())
-        c         String @unique
-        parentReq Parent
-        test      String?
-    }"""
-
-    TestDataModels(mongo = Vector(s1, s2), sql = Vector(s2, s3))
-  }
-
-  val schemaPMToC1opt = {
-    val s1 = """
-    model Parent {
-        id          String  @id @default(cuid())
-        p           String  @unique
-        childrenOpt Child[] @relation(references: [id])
-    }
-
-    model Child {
-        id        String @id @default(cuid())
-        c         String @unique
-        parentOpt Parent?
-        test      String
-    }"""
-
-    val s2 = """
-    model Parent {
-        id          String  @id @default(cuid())
-        p           String  @unique
-        childrenOpt Child[]
-    }
-
-    model Child {
-        id        String  @id @default(cuid())
-        c         String  @unique
-        parentOpt Parent? @relation(references: [id])
-        test      String?
-    }"""
-
-    val s3 = """
-    model Parent {
-        id          String  @id @default(cuid())
-        p           String  @unique
-        childrenOpt Child[]
-    }
-
-    model Child {
-        id        String  @id @default(cuid())
-        c         String  @unique
-        parentOpt Parent?
-        test      String?
-    }"""
-
-    TestDataModels(mongo = Vector(s1, s2), sql = Vector(s2, s3))
-  }
-
-  val schemaP1reqToCM = {
-    val s1 = """
-    model Parent {
-        id       String  @id @default(cuid())
-        p        String  @unique
-        childReq Child   @relation(references: [id])
-    }
-
-    model Child {
-        id         String  @id @default(cuid())
-        c          String  @unique
-        parentsOpt Parent[]
-    }"""
-
-    val s2 = """
-    model Parent {
-        id       String  @id @default(cuid())
-        p        String  @unique
-        childReq Child
-    }
-
-    model Child {
-        id         String   @id @default(cuid())
-        c          String  @unique
-        parentsOpt Parent[] @relation(references: [id])
-    }"""
-
-    val s3 = """
-    model Parent {
-        id       String  @id @default(cuid())
-        p        String  @unique
-        childReq Child
-    }
-
-    model Child {
-        id         String  @id @default(cuid())
-        c          String  @unique
-        parentsOpt Parent[]
-    }"""
-
-    TestDataModels(mongo = Vector(s1, s2), sql = Vector(s1, s3))
-  }
+//  val schemaP1reqToCM = {
+//    val s1 = """
+//    model Parent {
+//        id       String  @id @default(cuid())
+//        p        String  @unique
+//        childReq Child   @relation(references: [id])
+//    }
+//
+//    model Child {
+//        id         String  @id @default(cuid())
+//        c          String  @unique
+//        parentsOpt Parent[]
+//    }"""
+//
+//    val s2 = """
+//    model Parent {
+//        id       String  @id @default(cuid())
+//        p        String  @unique
+//        childReq Child
+//    }
+//
+//    model Child {
+//        id         String   @id @default(cuid())
+//        c          String  @unique
+//        parentsOpt Parent[] @relation(references: [id])
+//    }"""
+//
+//    val s3 = """
+//    model Parent {
+//        id       String  @id @default(cuid())
+//        p        String  @unique
+//        childReq Child
+//    }
+//
+//    model Child {
+//        id         String  @id @default(cuid())
+//        c          String  @unique
+//        parentsOpt Parent[]
+//    }"""
+//
+//    TestDataModels(mongo = Vector(s1, s2), sql = Vector(s1, s3))
+//  }
 
   val schemaP1optToCM = {
     val s1 = """
@@ -483,145 +582,145 @@ trait SchemaBaseV11 extends PlayJsonExtensions {
     TestDataModels(mongo = Vector(s1, s2), sql = Vector(s1, s3))
   }
 
-  val schemaPMToCM = {
-    val s1 = """
-    model Parent {
-        id          String  @id @default(cuid())
-        p           String? @unique
-        childrenOpt Child[] @relation(references: [id])
-    }
-
-    model Child {
-        id         String   @id @default(cuid())
-        c          String   @unique
-        parentsOpt Parent[]
-        test       String?
-    }"""
-
-    val s2 = """
-    model Parent {
-        id          String  @id @default(cuid())
-        p           String  @unique
-        childrenOpt Child[]
-    }
-
-    model Child {
-        id         String   @id @default(cuid())
-        c          String  @unique
-        parentsOpt Parent[] @relation(references: [id])
-        test       String?
-    }"""
-
-    val s3 = """
-    model Parent {
-        id          String  @id @default(cuid())
-        p           String  @unique
-        childrenOpt Child[]
-    }
-
-    model Child {
-        id         String   @id @default(cuid())
-        c          String  @unique
-        parentsOpt Parent[]
-        test       String?
-    }"""
-
-    TestDataModels(mongo = Vector(s1, s2), sql = Vector(s3))
-  }
+//  val schemaPMToCM = {
+//    val s1 = """
+//    model Parent {
+//        id          String  @id @default(cuid())
+//        p           String? @unique
+//        childrenOpt Child[] @relation(references: [id])
+//    }
+//
+//    model Child {
+//        id         String   @id @default(cuid())
+//        c          String   @unique
+//        parentsOpt Parent[]
+//        test       String?
+//    }"""
+//
+//    val s2 = """
+//    model Parent {
+//        id          String  @id @default(cuid())
+//        p           String  @unique
+//        childrenOpt Child[]
+//    }
+//
+//    model Child {
+//        id         String   @id @default(cuid())
+//        c          String  @unique
+//        parentsOpt Parent[] @relation(references: [id])
+//        test       String?
+//    }"""
+//
+//    val s3 = """
+//    model Parent {
+//        id          String  @id @default(cuid())
+//        p           String  @unique
+//        childrenOpt Child[]
+//    }
+//
+//    model Child {
+//        id         String   @id @default(cuid())
+//        c          String  @unique
+//        parentsOpt Parent[]
+//        test       String?
+//    }"""
+//
+//    TestDataModels(mongo = Vector(s1, s2), sql = Vector(s3))
+//  }
 
   //endregion
 
   //region EMBEDDED
 
-  val embeddedP1req = """model Parent {
-                            id       String  @id @default(cuid())
-                            p        String  @unique
-                            childReq Child
-                        }
-
-                        model Child @embedded {
-                            c String
-                        }"""
-
-  val embeddedP1opt = """model Parent {
-                            id       String  @id @default(cuid())
-                            p        String  @unique
-                            childOpt Child?
-                        }
-
-                        model Child @embedded {
-                            c String
-                        }"""
-
-  val embeddedPM = """model Parent {
-                            id          String  @id @default(cuid())
-                            p           String  @unique
-                            childrenOpt Child[]
-                        }
-
-                        model Child @embedded{
-                            id   String @id @default(cuid())
-                            c    String
-                            test String?
-                        }"""
+//  val embeddedP1req = """model Parent {
+//                            id       String  @id @default(cuid())
+//                            p        String  @unique
+//                            childReq Child
+//                        }
+//
+//                        model Child @embedded {
+//                            c String
+//                        }"""
+//
+//  val embeddedP1opt = """model Parent {
+//                            id       String  @id @default(cuid())
+//                            p        String  @unique
+//                            childOpt Child?
+//                        }
+//
+//                        model Child @embedded {
+//                            c String
+//                        }"""
+//
+//  val embeddedPM = """model Parent {
+//                            id          String  @id @default(cuid())
+//                            p           String  @unique
+//                            childrenOpt Child[]
+//                        }
+//
+//                        model Child @embedded{
+//                            id   String @id @default(cuid())
+//                            c    String
+//                            test String?
+//                        }"""
 
   //endregion
 
   //region EMBEDDED TO NON-EMBEDDED
-  val embedddedToJoinFriendReq = """
-                            |model Parent {
-                            |    id       String  @id @default(cuid())
-                            |    p        String? @unique
-                            |    children Child[]
-                            |}
-                            |
-                            |model Child @embedded {
-                            |    id        String  @id @default(cuid())
-                            |    c         String?
-                            |    friendReq Friend
-                            |}
-                            |
-                            |model Friend{
-                            |    id String @id @default(cuid())
-                            |    f  String @unique
-                            |}"""
-
-  val embedddedToJoinFriendOpt = """
-                               |model Parent {
-                               |    id       String  @id @default(cuid())
-                               |    p        String? @unique
-                               |    children Child[]
-                               |}
-                               |
-                               |model Child @embedded {
-                               |    id        String  @id @default(cuid())
-                               |    c         String?
-                               |    friendOpt Friend?
-                               |}
-                               |
-                               |model Friend{
-                               |    id String @id @default(cuid())
-                               |    f  String @unique
-                               |}"""
-
-  val embedddedToJoinFriendsOpt = """
-                        |model Parent {
-                        |    id       String  @id @default(cuid())
-                        |    p        String? @unique
-                        |    children Child[]
-                        |}
-                        |
-                        |model Child @embedded {
-                        |    id         String  @id @default(cuid())
-                        |    c          String?
-                        |    friendsOpt Friend[]
-                        |}
-                        |
-                        |model Friend{
-                        |    id   String  @id @default(cuid())
-                        |    f    String? @unique
-                        |    test String?
-                        |}"""
+//  val embedddedToJoinFriendReq = """
+//                            |model Parent {
+//                            |    id       String  @id @default(cuid())
+//                            |    p        String? @unique
+//                            |    children Child[]
+//                            |}
+//                            |
+//                            |model Child @embedded {
+//                            |    id        String  @id @default(cuid())
+//                            |    c         String?
+//                            |    friendReq Friend
+//                            |}
+//                            |
+//                            |model Friend{
+//                            |    id String @id @default(cuid())
+//                            |    f  String @unique
+//                            |}"""
+//
+//  val embedddedToJoinFriendOpt = """
+//                               |model Parent {
+//                               |    id       String  @id @default(cuid())
+//                               |    p        String? @unique
+//                               |    children Child[]
+//                               |}
+//                               |
+//                               |model Child @embedded {
+//                               |    id        String  @id @default(cuid())
+//                               |    c         String?
+//                               |    friendOpt Friend?
+//                               |}
+//                               |
+//                               |model Friend{
+//                               |    id String @id @default(cuid())
+//                               |    f  String @unique
+//                               |}"""
+//
+//  val embedddedToJoinFriendsOpt = """
+//                        |model Parent {
+//                        |    id       String  @id @default(cuid())
+//                        |    p        String? @unique
+//                        |    children Child[]
+//                        |}
+//                        |
+//                        |model Child @embedded {
+//                        |    id         String  @id @default(cuid())
+//                        |    c          String?
+//                        |    friendsOpt Friend[]
+//                        |}
+//                        |
+//                        |model Friend{
+//                        |    id   String  @id @default(cuid())
+//                        |    f    String? @unique
+//                        |    test String?
+//                        |}"""
 
   //endregion
 }

@@ -33,12 +33,60 @@ pub struct InternalDataModel {
 #[derive(Debug, PartialEq, Eq, Hash, Clone)]
 pub struct InternalEnum {
     pub name: String,
-    pub values: Vec<String>,
+    pub values: Vec<InternalEnumValue>,
 }
 
 impl InternalEnum {
-    pub fn contains(&self, val: &String) -> bool {
-        self.values.contains(val)
+    pub fn new<N, I, V>(name: N, values: I) -> Self
+    where
+        N: Into<String>,
+        V: Into<InternalEnumValue>,
+        I: IntoIterator<Item = V>,
+    {
+        Self {
+            name: name.into(),
+            values: values.into_iter().map(|v| v.into()).collect(),
+        }
+    }
+
+    pub fn map_input_value(&self, val: &String) -> Option<PrismaValue> {
+        Some(PrismaValue::Enum(
+            self.values.iter().find(|ev| &ev.name == val)?.final_db_name().clone(),
+        ))
+    }
+
+    pub fn map_output_value(&self, val: &String) -> Option<PrismaValue> {
+        Some(PrismaValue::Enum(
+            self.values.iter().find(|ev| ev.final_db_name() == val)?.name.clone(),
+        ))
+    }
+
+    pub fn external_values(&self) -> Vec<String> {
+        self.values.iter().map(|v| v.name.to_string()).collect::<Vec<String>>()
+    }
+}
+
+#[derive(Debug, PartialEq, Eq, Hash, Clone)]
+pub struct InternalEnumValue {
+    pub name: String,
+    pub database_name: Option<String>,
+}
+
+impl InternalEnumValue {
+    pub fn new<N, I, V>(name: N, database_name: I) -> Self
+    where
+        N: Into<String>,
+        V: Into<String>,
+        I: Into<Option<String>>,
+    {
+        Self {
+            name: name.into(),
+            database_name: database_name.into(),
+        }
+    }
+
+    pub fn final_db_name(&self) -> &String {
+        self.database_name.as_ref().unwrap_or(&self.name)
     }
 }
 
@@ -81,7 +129,7 @@ impl InternalDataModel {
         self.relations.get().unwrap().as_slice()
     }
 
-    pub fn find_model(&self, name: &str) -> DomainResult<ModelRef> {
+    pub fn find_model(&self, name: &str) -> crate::Result<ModelRef> {
         self.models
             .get()
             .and_then(|models| models.iter().find(|model| model.name == name))
@@ -89,7 +137,7 @@ impl InternalDataModel {
             .ok_or_else(|| DomainError::ModelNotFound { name: name.to_string() })
     }
 
-    pub fn find_relation(&self, name: &str) -> DomainResult<RelationWeakRef> {
+    pub fn find_relation(&self, name: &str) -> crate::Result<RelationWeakRef> {
         self.relations
             .get()
             .and_then(|relations| relations.iter().find(|relation| relation.name == name))

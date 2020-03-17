@@ -1,10 +1,10 @@
 use super::*;
 use crate::{
     schema::{IntoArc, ObjectTypeStrongRef, OutputType, OutputTypeRef, ScalarType},
-    CoreError, CoreResult, EnumType, QueryResult, RecordSelection,
+    CoreError, EnumType, QueryResult, RecordSelection,
 };
 use indexmap::IndexMap;
-use prisma_models::{GraphqlId, InternalEnum, PrismaValue, PrismaValueExtensions};
+use prisma_models::{InternalEnum, PrismaValue, RecordProjection};
 use rust_decimal::prelude::ToPrimitive;
 use std::{borrow::Borrow, collections::HashMap};
 
@@ -12,12 +12,12 @@ use std::{borrow::Borrow, collections::HashMap};
 /// The item implicitly holds the information of the type of item contained.
 /// E.g., if the output type of a field designates a single object, the item will be
 /// Item::Map(map), if it's a list, Item::List(list), etc. (hence "checked")
-type CheckedItemsWithParents = IndexMap<Option<GraphqlId>, Item>;
+type CheckedItemsWithParents = IndexMap<Option<RecordProjection>, Item>;
 
 /// A grouping of items to their parent record.
 /// As opposed to the checked mapping, this map isn't holding final information about
 /// the contained items, i.e. the Items are all unchecked.
-type UncheckedItemsWithParents = IndexMap<Option<GraphqlId>, Vec<Item>>;
+type UncheckedItemsWithParents = IndexMap<Option<RecordProjection>, Vec<Item>>;
 
 /// The query validation makes sure that the output selection already has the correct shape.
 /// This means that we can make the following assumptions:
@@ -37,7 +37,7 @@ pub fn serialize_internal(
     typ: &OutputTypeRef,
     is_list: bool,
     is_optional: bool,
-) -> CoreResult<CheckedItemsWithParents> {
+) -> crate::Result<CheckedItemsWithParents> {
     match result {
         QueryResult::RecordSelection(rs) => serialize_record_selection(rs, typ, is_list, is_optional),
 
@@ -52,6 +52,8 @@ pub fn serialize_internal(
             Ok(result)
         }
 
+        QueryResult::Json(_) => unimplemented!(),
+
         QueryResult::Id(_) => unimplemented!(),
         QueryResult::Unit => unimplemented!(),
     }
@@ -62,7 +64,7 @@ fn serialize_record_selection(
     typ: &OutputTypeRef,
     is_list: bool,
     is_optional: bool,
-) -> CoreResult<CheckedItemsWithParents> {
+) -> crate::Result<CheckedItemsWithParents> {
     let query_args = record_selection.query_arguments.clone();
     let name = record_selection.name.clone();
 
@@ -94,7 +96,7 @@ fn serialize_record_selection(
 
                             // Trim excess records
                             trim_records(&mut items, &query_args);
-                            Ok((parent, Item::Ref(ItemRef::new(Item::List(items)))))
+                            Ok((parent, Item::Ref(ItemRef::new(Item::list(items)))))
                         })
                         .collect()
                 }
@@ -134,7 +136,10 @@ fn serialize_record_selection(
 /// Serializes the given result into objects of given type.
 /// Doesn't validate the shape of the result set ("unchecked" result).
 /// Returns a vector of serialized objects (as Item::Map), grouped into a map by parent, if present.
-fn serialize_objects(mut result: RecordSelection, typ: ObjectTypeStrongRef) -> CoreResult<UncheckedItemsWithParents> {
+fn serialize_objects(
+    mut result: RecordSelection,
+    typ: ObjectTypeStrongRef,
+) -> crate::Result<UncheckedItemsWithParents> {
     // The way our query execution works, we only need to look at nested + lists if we hit an object.
     // Move nested out of result for separate processing.
     let nested = std::mem::replace(&mut result.nested, Vec::new());
@@ -147,13 +152,18 @@ fn serialize_objects(mut result: RecordSelection, typ: ObjectTypeStrongRef) -> C
 
     // Finally, serialize the objects based on the selected fields.
     let mut object_mapping = UncheckedItemsWithParents::with_capacity(result.scalars.records.len());
-    let scalar_field_names = result.scalars.field_names;
+    let scalar_db_field_names = result.scalars.field_names;
+
+    let model = result.model_id.model();
+    let field_names: Vec<_> = scalar_db_field_names
+        .iter()
+        .filter_map(|f| model.map_scalar_db_field_name(f).map(|x| x.name.clone()))
+        .collect();
 
     // Write all fields, nested and list fields unordered into a map, afterwards order all into the final order.
     // If nothing is written to the object, write null instead.
-
     for record in result.scalars.records.into_iter() {
-        let record_id = Some(record.collect_id(&scalar_field_names, &result.id_field)?);
+        let record_id = Some(record.projection(&scalar_db_field_names, &result.model_id)?);
 
         if !object_mapping.contains_key(&record.parent_id) {
             object_mapping.insert(record.parent_id.clone(), Vec::new());
@@ -163,11 +173,11 @@ fn serialize_objects(mut result: RecordSelection, typ: ObjectTypeStrongRef) -> C
         let values = record.values;
         let mut object = HashMap::with_capacity(values.len());
 
-        for (val, field_name) in values.into_iter().zip(scalar_field_names.iter()) {
-            let field = typ.find_field(field_name).unwrap();
+        for (val, scalar_field_name) in values.into_iter().zip(field_names.iter()) {
+            let field = typ.find_field(scalar_field_name).unwrap();
 
             if !field.field_type.is_object() {
-                object.insert(field_name.to_owned(), serialize_scalar(val, &field.field_type)?);
+                object.insert(scalar_field_name.to_owned(), serialize_scalar(val, &field.field_type)?);
             }
         }
 
@@ -199,7 +209,7 @@ fn serialize_objects(mut result: RecordSelection, typ: ObjectTypeStrongRef) -> C
 
 /// Unwraps are safe due to query validation.
 fn write_nested_items(
-    record_id: &Option<GraphqlId>,
+    record_id: &Option<RecordProjection>,
     items_with_parent: &mut HashMap<String, CheckedItemsWithParents>,
     into: &mut HashMap<String, Item>,
     enclosing_type: &ObjectTypeStrongRef,
@@ -216,10 +226,10 @@ fn write_nested_items(
             None => {
                 let field = enclosing_type.find_field(field_name).unwrap();
                 let default = match field.field_type.borrow() {
-                    OutputType::List(_) => Item::List(Vec::new()),
+                    OutputType::List(_) => Item::list(Vec::new()),
                     OutputType::Opt(inner) => {
                         if inner.is_list() {
-                            Item::List(Vec::new())
+                            Item::list(Vec::new())
                         } else {
                             Item::Value(PrismaValue::Null)
                         }
@@ -241,7 +251,7 @@ fn write_nested_items(
 fn process_nested_results(
     nested: Vec<QueryResult>,
     enclosing_type: &ObjectTypeStrongRef,
-) -> CoreResult<HashMap<String, CheckedItemsWithParents>> {
+) -> crate::Result<HashMap<String, CheckedItemsWithParents>> {
     // For each nested selected field we need to map the parents to their items.
     let mut nested_mapping = HashMap::with_capacity(nested.len());
 
@@ -261,7 +271,7 @@ fn process_nested_results(
     Ok(nested_mapping)
 }
 
-fn serialize_scalar(value: PrismaValue, typ: &OutputTypeRef) -> CoreResult<Item> {
+fn serialize_scalar(value: PrismaValue, typ: &OutputTypeRef) -> crate::Result<Item> {
     match (&value, typ.as_ref()) {
         (PrismaValue::Null, OutputType::Opt(_)) => Ok(Item::Value(PrismaValue::Null)),
         (_, OutputType::Opt(inner)) => serialize_scalar(value, inner),
@@ -276,7 +286,7 @@ fn serialize_scalar(value: PrismaValue, typ: &OutputTypeRef) -> CoreResult<Item>
                     .map(|v| convert_prisma_value(v, subtype))
                     .map(|pv| pv.map(|x| Item::Value(x)))
                     .collect::<Result<Vec<Item>, CoreError>>()?;
-                Ok(Item::List(items))
+                Ok(Item::list(items))
             }
             OutputType::Enum(et) => {
                 let items = unwrap_prisma_value(value)
@@ -286,7 +296,7 @@ fn serialize_scalar(value: PrismaValue, typ: &OutputTypeRef) -> CoreResult<Item>
                         _ => unreachable!(),
                     })
                     .collect::<Result<Vec<Item>, CoreError>>()?;
-                Ok(Item::List(items))
+                Ok(Item::list(items))
             }
             _ => Err(CoreError::SerializationError(format!(
                 "Attempted to serialize scalar list which contained non-scalar items of type '{:?}'",
@@ -304,9 +314,6 @@ fn serialize_scalar(value: PrismaValue, typ: &OutputTypeRef) -> CoreResult<Item>
 fn convert_prisma_value(value: PrismaValue, st: &ScalarType) -> Result<PrismaValue, CoreError> {
     let item_value = match (st, value) {
         (ScalarType::String, PrismaValue::String(s)) => PrismaValue::String(s),
-
-        (ScalarType::ID, PrismaValue::GraphqlId(id)) => PrismaValue::GraphqlId(id),
-        (ScalarType::ID, val) => PrismaValue::GraphqlId(val.into_graphql_id()?),
 
         (ScalarType::Int, PrismaValue::Float(f)) => PrismaValue::Int(f.to_i64().unwrap()),
         (ScalarType::Int, PrismaValue::Int(i)) => PrismaValue::Int(i),
@@ -333,16 +340,13 @@ fn convert_prisma_value(value: PrismaValue, st: &ScalarType) -> Result<PrismaVal
 
 fn convert_enum(value: PrismaValue, i: &InternalEnum) -> Result<Item, CoreError> {
     match value {
-        PrismaValue::String(s) | PrismaValue::Enum(s) => {
-            if i.contains(&s) {
-                Ok(Item::Value(PrismaValue::Enum(s)))
-            } else {
-                Err(CoreError::SerializationError(format!(
-                    "Value '{}' not found in enum '{:?}'",
-                    s, i
-                )))
-            }
-        }
+        PrismaValue::String(s) | PrismaValue::Enum(s) => match i.map_output_value(&s) {
+            Some(inum) => Ok(Item::Value(inum)),
+            None => Err(CoreError::SerializationError(format!(
+                "Value '{}' not found in enum '{:?}'",
+                s, i
+            ))),
+        },
 
         val => Err(CoreError::SerializationError(format!(
             "Attempted to serialize non-enum-compatible value '{}' with enum '{:?}'",

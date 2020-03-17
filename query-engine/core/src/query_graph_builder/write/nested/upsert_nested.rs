@@ -5,7 +5,7 @@ use crate::{
     query_graph::{Flow, Node, NodeRef, QueryGraph, QueryGraphDependency},
     InputAssertions, ParsedInputMap, ParsedInputValue,
 };
-use connector::{Filter, ScalarCompare};
+use connector::{Filter, IdFilter};
 use prisma_models::RelationFieldRef;
 use std::{convert::TryInto, sync::Arc};
 
@@ -91,8 +91,12 @@ pub fn connect_nested_upsert(
     value: ParsedInputValue,
 ) -> QueryGraphBuilderResult<()> {
     let child_model = parent_relation_field.related_model();
+    let child_model_identifier = child_model.primary_identifier();
 
     for value in coerce_vec(value) {
+        let parent_link = parent_relation_field.linking_fields();
+        let child_link = parent_relation_field.related_field().linking_fields();
+
         let mut as_map: ParsedInputMap = value.try_into()?;
         let create_input = as_map.remove("create").expect("create argument is missing");
         let update_input = as_map.remove("update").expect("update argument is missing");
@@ -104,7 +108,7 @@ pub fn connect_nested_upsert(
             where_input.assert_size(1)?;
             where_input.assert_non_null()?;
 
-            extract_filter(where_input, &child_model, false)?
+            extract_unique_filter(where_input, &child_model)?
         } else {
             Filter::empty()
         };
@@ -112,6 +116,7 @@ pub fn connect_nested_upsert(
         let read_children_node =
             utils::insert_find_children_by_parent_node(graph, &parent_node, parent_relation_field, filter)?;
 
+        let if_node = graph.create_node(Flow::default_if());
         let create_node = create::create_record_node(graph, Arc::clone(&child_model), create_input.try_into()?)?;
         let update_node = update::update_record_node(
             graph,
@@ -119,37 +124,38 @@ pub fn connect_nested_upsert(
             Arc::clone(&child_model),
             update_input.try_into()?,
         )?;
-        let if_node = graph.create_node(Flow::default_if());
 
         graph.create_edge(
             &read_children_node,
             &if_node,
-            QueryGraphDependency::ParentIds(Box::new(|node, parent_ids| {
-                if let Node::Flow(Flow::If(_)) = node {
-                    Ok(Node::Flow(Flow::If(Box::new(move || !parent_ids.is_empty()))))
-                } else {
-                    Ok(node)
-                }
-            })),
+            QueryGraphDependency::ParentProjection(
+                child_model_identifier.clone(),
+                Box::new(|if_node, child_ids| {
+                    if let Node::Flow(Flow::If(_)) = if_node {
+                        Ok(Node::Flow(Flow::If(Box::new(move || !child_ids.is_empty()))))
+                    } else {
+                        Ok(if_node)
+                    }
+                }),
+            ),
         )?;
-
-        let id_field = child_model.fields().id();
 
         graph.create_edge(
             &read_children_node,
             &update_node,
-            QueryGraphDependency::ParentIds(Box::new(move |mut node, mut parent_ids| {
-                if let Node::Query(Query::Write(WriteQuery::UpdateRecord(ref mut x))) = node {
-                    let parent_id = match parent_ids.pop() {
-                        Some(pid) => Ok(pid),
+            QueryGraphDependency::ParentProjection(child_model_identifier.clone(), Box::new(move |mut update_node, mut child_ids| {
+                if let Node::Query(Query::Write(WriteQuery::UpdateRecord(ref mut wq))) = update_node {
+                    let child_id = match child_ids.pop() {
+                        Some(id) => Ok(id),
                         None => Err(QueryGraphBuilderError::AssertionError(format!(
                             "[Query Graph] Expected a valid parent ID to be present for a nested update in a nested upsert."
                         ))),
                     }?;
 
-                    x.add_filter(id_field.equals(parent_id));
+                    wq.add_filter(child_id.filter());
                 }
-                Ok(node)
+
+                Ok(update_node)
             })),
         )?;
 
@@ -161,20 +167,16 @@ pub fn connect_nested_upsert(
             // Many to many only needs a connect node.
             connect::connect_records_node(graph, &parent_node, &create_node, &parent_relation_field, 1)?;
         } else {
-            if parent_relation_field.relation_is_inlined_in_parent() {
+            if parent_relation_field.is_inlined_on_enclosing_model() {
                 let parent_model = parent_relation_field.model();
-                let related_field_name = parent_relation_field.name.clone();
-
-                // Update parent node
-                let update_node =
-                    utils::update_records_node_placeholder(graph, Filter::empty(), Arc::clone(&parent_model));
-                let id_field = parent_model.fields().id();
+                let parent_model_id = parent_model.primary_identifier();
+                let update_node = utils::update_records_node_placeholder(graph, Filter::empty(), parent_model);
 
                 // Edge to retrieve the finder
                 graph.create_edge(
                     &parent_node,
                     &update_node,
-                    QueryGraphDependency::ParentIds(Box::new(move |mut child_node, mut parent_ids| {
+                    QueryGraphDependency::ParentProjection(parent_model_id, Box::new(move |mut update_node, mut parent_ids| {
                         let parent_id = match parent_ids.pop() {
                             Some(pid) => Ok(pid),
                             None => Err(QueryGraphBuilderError::AssertionError(format!(
@@ -182,11 +184,11 @@ pub fn connect_nested_upsert(
                             ))),
                         }?;
 
-                        if let Node::Query(Query::Write(ref mut wq)) = child_node {
-                            wq.add_filter(id_field.equals(parent_id));
+                        if let Node::Query(Query::Write(ref mut wq)) = update_node {
+                            wq.add_filter(parent_id.filter());
                         }
 
-                        Ok(child_node)
+                        Ok(update_node)
                     })),
                 )?;
 
@@ -194,42 +196,40 @@ pub fn connect_nested_upsert(
                 graph.create_edge(
                     &create_node,
                     &update_node,
-                    QueryGraphDependency::ParentIds(Box::new(|mut child_node, mut parent_ids| {
-                        let parent_id = match parent_ids.pop() {
-                            Some(pid) => Ok(pid),
+                    QueryGraphDependency::ParentProjection(child_link.clone(), Box::new(move |mut update_node, mut child_links| {
+                        let child_link = match child_links.pop() {
+                            Some(link) => Ok(link),
                             None => Err(QueryGraphBuilderError::AssertionError(format!(
                                 "[Query Graph] Expected a valid parent ID to be present to retrieve the ID to inject for a parent update in a nested upsert."
                             ))),
                         }?;
 
-                        if let Node::Query(Query::Write(ref mut wq)) = child_node {
-                            wq.inject_non_list_arg(related_field_name, parent_id);
+                        if let Node::Query(Query::Write(ref mut wq)) = update_node {
+                            wq.inject_projection_into_args(parent_link.assimilate(child_link)?);
                         }
 
-                        Ok(child_node)
+                        Ok(update_node)
                     })),
                 )?;
             } else {
                 // Inlined on child
-                let related_field_name = parent_relation_field.related_field().name.clone();
-
                 // Edge to retrieve the child ID to inject (inject into the create)
                 graph.create_edge(
                     &parent_node,
                     &create_node,
-                    QueryGraphDependency::ParentIds(Box::new(|mut child_node, mut parent_ids| {
-                        let parent_id = match parent_ids.pop() {
-                            Some(pid) => Ok(pid),
+                    QueryGraphDependency::ParentProjection(parent_link, Box::new(move |mut create_node, mut parent_links| {
+                        let parent_link = match parent_links.pop() {
+                            Some(link) => Ok(link),
                             None => Err(QueryGraphBuilderError::AssertionError(format!(
                                 "[Query Graph] Expected a valid parent ID to be present to retrieve the ID to inject into the child create in a nested upsert."
                             ))),
                         }?;
 
-                        if let Node::Query(Query::Write(ref mut wq)) = child_node {
-                            wq.inject_non_list_arg(related_field_name, parent_id);
+                        if let Node::Query(Query::Write(ref mut wq)) = create_node {
+                            wq.inject_projection_into_args(child_link.assimilate(parent_link)?);
                         }
 
-                        Ok(child_node)
+                        Ok(create_node)
                     })),
                 )?;
             }

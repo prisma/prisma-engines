@@ -1,7 +1,8 @@
 pub mod calculate_datamodel; // only exported to be able to unit test it
+mod commenting_out_guardrails;
 mod error;
 mod misc_helpers;
-mod sanitize_datamodel_names; // only exported to be able to unit test it
+mod sanitize_datamodel_names;
 mod schema_describer_loading;
 
 use datamodel::Datamodel;
@@ -13,7 +14,7 @@ use tracing_futures::Instrument;
 
 pub use error::*;
 
-pub type SqlIntrospectionResult<T> = core::result::Result<T, SqlIntrospectionError>;
+pub type SqlIntrospectionResult<T> = core::result::Result<T, SqlError>;
 
 pub struct SqlIntrospectionConnector {
     connection_info: ConnectionInfo,
@@ -25,11 +26,9 @@ impl SqlIntrospectionConnector {
         let (describer, connection_info) = schema_describer_loading::load_describer(&url)
             .instrument(tracing::debug_span!("Loading describer"))
             .await
-            .map_err(|quaint_error| {
+            .map_err(|error| {
                 ConnectionInfo::from_url(url)
-                    .map(|connection_info| {
-                        SqlIntrospectionError::Quaint(quaint_error).into_connector_error(&connection_info)
-                    })
+                    .map(|connection_info| error.into_connector_error(&connection_info))
                     .unwrap_or_else(|err| ConnectorError::url_parse_error(err, url))
             })?;
 
@@ -41,7 +40,7 @@ impl SqlIntrospectionConnector {
         })
     }
 
-    async fn catch<O>(&self, fut: impl Future<Output = Result<O, SqlIntrospectionError>>) -> ConnectorResult<O> {
+    async fn catch<O>(&self, fut: impl Future<Output = Result<O, SqlError>>) -> ConnectorResult<O> {
         fut.await
             .map_err(|sql_introspection_error| sql_introspection_error.into_connector_error(&self.connection_info))
     }

@@ -60,7 +60,10 @@ fn parse_function(token: &pest::iterators::Pair<'_, Rule>) -> Expression {
 
     match name {
         Some(name) => Expression::Function(name, arguments, Span::from_pest(token.as_span())),
-        _ => unreachable!("Encountered impossible function during parsing: {:?}", token.as_str()),
+        _ => unreachable!(
+            "Encountered impossible function during parsing: {:?}",
+            token.as_str()
+        ),
     }
 }
 
@@ -161,7 +164,10 @@ fn parse_directive(token: &pest::iterators::Pair<'_, Rule>) -> Directive {
             arguments,
             span: Span::from_pest(token.as_span()),
         },
-        _ => panic!("Encountered impossible type during parsing: {:?}", token.as_str()),
+        _ => panic!(
+            "Encountered impossible type during parsing: {:?}",
+            token.as_str()
+        ),
     }
 }
 
@@ -173,7 +179,9 @@ fn parse_base_type(token: &pest::iterators::Pair<'_, Rule>) -> String {
     }
 }
 
-fn parse_field_type(token: &pest::iterators::Pair<'_, Rule>) -> Result<(FieldArity, String), DatamodelError> {
+fn parse_field_type(
+    token: &pest::iterators::Pair<'_, Rule>,
+) -> Result<(FieldArity, String), DatamodelError> {
     match_first! { token, current,
         Rule::optional_type => Ok((FieldArity::Optional, parse_base_type(&current))),
         Rule::base_type =>  Ok((FieldArity::Required, parse_base_type(&current))),
@@ -184,6 +192,10 @@ fn parse_field_type(token: &pest::iterators::Pair<'_, Rule>) -> Result<(FieldAri
         )),
         Rule::legacy_list_type => Err(DatamodelError::new_legacy_parser_error(
             "To specify a list, please use `Type[]` instead of `[Type]`.",
+            Span::from_pest(current.as_span())
+        )),
+        Rule::unsupported_optional_list_type => Err(DatamodelError::new_legacy_parser_error(
+            "Optional lists are not supported. Use either `Type[]` or `Type?`.",
             Span::from_pest(current.as_span())
         )),
         _ => unreachable!("Encountered impossible field during parsing: {:?}", current.tokens())
@@ -224,6 +236,7 @@ fn parse_field(token: &pest::iterators::Pair<'_, Rule>) -> Result<Field, Datamod
             directives,
             documentation: doc_comments_to_string(&comments),
             span: Span::from_pest(token.as_span()),
+            is_commented_out: false,
         }),
         _ => panic!(
             "Encountered impossible field declaration during parsing: {:?}",
@@ -268,6 +281,7 @@ fn parse_model(token: &pest::iterators::Pair<'_, Rule>) -> Result<Model, ErrorCo
             directives,
             documentation: doc_comments_to_string(&comments),
             span: Span::from_pest(token.as_span()),
+            commented_out: false,
         }),
         _ => panic!(
             "Encountered impossible model declaration during parsing: {:?}",
@@ -277,7 +291,8 @@ fn parse_model(token: &pest::iterators::Pair<'_, Rule>) -> Result<Model, ErrorCo
 }
 
 // Enum parsing
-fn parse_enum(token: &pest::iterators::Pair<'_, Rule>) -> Enum {
+fn parse_enum(token: &pest::iterators::Pair<'_, Rule>) -> Result<Enum, ErrorCollection> {
+    let mut errors = ErrorCollection::new();
     let mut name: Option<Identifier> = None;
     let mut directives: Vec<Directive> = vec![];
     let mut values: Vec<EnumValue> = vec![];
@@ -288,22 +303,50 @@ fn parse_enum(token: &pest::iterators::Pair<'_, Rule>) -> Enum {
         Rule::identifier => name = Some(current.to_id()),
         Rule::directive => directives.push(parse_directive(&current)),
         Rule::enum_field_declaration => {
-            let name_token = current.into_inner().next().unwrap();
-            let enum_value_name = name_token.as_str().to_string();
-            values.push(EnumValue { name: enum_value_name.as_str().to_string(), span: Span::from_pest(name_token.as_span()) })
-        },
+        match parse_enum_value(&current) {
+            Ok(enum_value) => values.push(enum_value),
+            Err(err) => errors.push(err)
+        }
+    },
         Rule::doc_comment => comments.push(parse_doc_comment(&current)),
         _ => unreachable!("Encountered impossible enum declaration during parsing: {:?}", current.tokens())
     }
 
+    errors.ok()?;
+
     match name {
-        Some(name) => Enum {
+        Some(name) => Ok(Enum {
             name,
             values,
             directives,
             documentation: doc_comments_to_string(&comments),
             span: Span::from_pest(token.as_span()),
-        },
+        }),
+        _ => panic!(
+            "Encountered impossible enum declaration during parsing, name is missing: {:?}",
+            token.as_str()
+        ),
+    }
+}
+
+// Enum value parsing
+fn parse_enum_value(token: &pest::iterators::Pair<'_, Rule>) -> Result<EnumValue, DatamodelError> {
+    let mut name: Option<Identifier> = None;
+    let mut directives: Vec<Directive> = vec![];
+
+    //todo validate that the identifier is valid???
+    match_children! { token, current,
+        Rule::identifier => name = Some(current.to_id()),
+        Rule::directive => directives.push(parse_directive(&current)),
+        _ => unreachable!("Encountered impossible enum declaration during parsing: {:?}", current.tokens())
+    }
+
+    match name {
+        Some(name) => Ok(EnumValue {
+            name,
+            directives,
+            span: Span::from_pest(token.as_span()),
+        }),
         _ => panic!(
             "Encountered impossible enum declaration during parsing, name is missing: {:?}",
             token.as_str()
@@ -420,6 +463,7 @@ fn parse_type(token: &pest::iterators::Pair<'_, Rule>) -> Field {
             directives,
             documentation: doc_comments_to_string(&comments),
             span: Span::from_pest(token.as_span()),
+            is_commented_out: false,
         },
         _ => panic!(
             "Encountered impossible custom type declaration during parsing: {:?}",
@@ -438,25 +482,30 @@ pub fn parse(datamodel_string: &str) -> Result<SchemaAst, ErrorCollection> {
     match datamodel_result {
         Ok(mut datamodel_wrapped) => {
             let datamodel = datamodel_wrapped.next().unwrap();
-            let mut models: Vec<Top> = vec![];
+            let mut top_level_definitions: Vec<Top> = vec![];
 
             match_children! { datamodel, current,
                 Rule::model_declaration => match parse_model(&current) {
-                    Ok(model) => models.push(Top::Model(model)),
+                    Ok(model) => top_level_definitions.push(Top::Model(model)),
                     Err(mut err) => errors.append(&mut err)
                 },
-                Rule::enum_declaration => models.push(Top::Enum(parse_enum(&current))),
-                Rule::source_block => models.push(Top::Source(parse_source(&current))),
-                Rule::generator_block => models.push(Top::Generator(parse_generator(&current))),
-                Rule::type_declaration => models.push(Top::Type(parse_type(&current))),
-                Rule::doc_comment => {},
+                Rule::enum_declaration => match parse_enum(&current){
+                    Ok(enm) => top_level_definitions.push(Top::Enum(enm)),
+                    Err(mut err) => errors.append(&mut err)
+                },
+                Rule::source_block => top_level_definitions.push(Top::Source(parse_source(&current))),
+                Rule::generator_block => top_level_definitions.push(Top::Generator(parse_generator(&current))),
+                Rule::type_declaration => top_level_definitions.push(Top::Type(parse_type(&current))),
+                Rule::doc_comment => (),
                 Rule::EOI => {},
                 _ => panic!("Encountered impossible datamodel declaration during parsing: {:?}", current.tokens())
             }
 
             errors.ok()?;
 
-            Ok(SchemaAst { tops: models })
+            Ok(SchemaAst {
+                tops: top_level_definitions,
+            })
         }
         Err(err) => {
             let location = match err.location {
@@ -465,7 +514,9 @@ pub fn parse(datamodel_string: &str) -> Result<SchemaAst, ErrorCollection> {
             };
 
             let expected = match err.variant {
-                pest::error::ErrorVariant::ParsingError { positives, .. } => get_expected_from_error(&positives),
+                pest::error::ErrorVariant::ParsingError { positives, .. } => {
+                    get_expected_from_error(&positives)
+                }
                 _ => panic!("Could not construct parsing error. This should never happend."),
             };
 
@@ -537,6 +588,7 @@ fn rule_to_string(rule: Rule) -> &'static str {
         Rule::LEGACY_COLON => "",
         Rule::legacy_list_type => "",
         Rule::legacy_required_type => "",
+        Rule::unsupported_optional_list_type => "",
 
         // Atomic and helper rules should not surface, we still add them for debugging.
         Rule::WHITESPACE => "",

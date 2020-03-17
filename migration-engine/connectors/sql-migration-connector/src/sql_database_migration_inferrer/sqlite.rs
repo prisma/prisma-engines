@@ -1,10 +1,11 @@
 use crate::{
     sql_migration::*,
-    sql_renderer::sqlite_renderer::quoted,
+    sql_renderer::sqlite_quoted,
+    sql_renderer::SqlRenderer,
     sql_schema_differ::{ColumnDiffer, SqlSchemaDiff, TableDiffer},
-    SqlResult,
+    SqlFamily, SqlResult,
 };
-use sql_schema_describer::{Column, ColumnArity, ColumnTypeFamily, SqlSchema, Table};
+use sql_schema_describer::{ColumnArity, SqlSchema, Table};
 
 pub(super) fn fix(
     diff: SqlSchemaDiff,
@@ -20,7 +21,8 @@ pub(super) fn fix(
     for step in steps {
         match step {
             SqlMigrationStep::AlterTable(ref alter_table)
-                if needs_fix(&alter_table) && current_database_schema.has_table(&alter_table.table.name) =>
+                if needs_fix(&alter_table)
+                    && current_database_schema.has_table(&alter_table.table.name) =>
             {
                 result.extend(sqlite_fix_table(
                     current_database_schema,
@@ -30,10 +32,14 @@ pub(super) fn fix(
                 )?);
                 fixed_tables.push(alter_table.table.name.clone());
             }
-            SqlMigrationStep::AddForeignKey(add_foreign_key) if fixed_tables.contains(&add_foreign_key.table) => {
+            SqlMigrationStep::AddForeignKey(add_foreign_key)
+                if fixed_tables.contains(&add_foreign_key.table) =>
+            {
                 // The fixed alter table step will already create the foreign key.
             }
-            SqlMigrationStep::CreateIndex(ref create_index) if fixed_tables.contains(&create_index.table) => {
+            SqlMigrationStep::CreateIndex(ref create_index)
+                if fixed_tables.contains(&create_index.table) =>
+            {
                 // The fixed alter table step will already create the index.
             }
             SqlMigrationStep::AlterIndex(AlterIndex { table, .. }) => {
@@ -53,17 +59,18 @@ pub(super) fn fix(
 }
 
 fn needs_fix(alter_table: &AlterTable) -> bool {
-    let change_that_does_not_work_on_sqlite = alter_table.changes.iter().find(|change| match change {
-        TableChange::AddColumn(add_column) => {
-            // sqlite does not allow adding not null columns without a default value even if the table is empty
-            // hence we just use our normal migration process
-            // https://laracasts.com/discuss/channels/general-discussion/migrations-sqlite-general-error-1-cannot-add-a-not-null-column-with-default-value-null
-            add_column.column.tpe.arity == ColumnArity::Required
-        }
-        TableChange::DropColumn(_) => true,
-        TableChange::AlterColumn(_) => true,
-        TableChange::DropForeignKey(_) => true,
-    });
+    let change_that_does_not_work_on_sqlite =
+        alter_table.changes.iter().find(|change| match change {
+            TableChange::AddColumn(add_column) => {
+                // sqlite does not allow adding not null columns without a default value even if the table is empty
+                // hence we just use our normal migration process
+                // https://laracasts.com/discuss/channels/general-discussion/migrations-sqlite-general-error-1-cannot-add-a-not-null-column-with-default-value-null
+                add_column.column.tpe.arity == ColumnArity::Required
+            }
+            TableChange::DropColumn(_) => true,
+            TableChange::AlterColumn(_) => true,
+            TableChange::DropForeignKey(_) => true,
+        });
 
     change_that_does_not_work_on_sqlite.is_some()
 }
@@ -123,7 +130,7 @@ fn fix_table(current: &Table, next: &Table, schema_name: &str) -> Vec<SqlMigrati
     }));
 
     result.push(SqlMigrationStep::RawSql {
-        raw: format!("PRAGMA {}.foreign_key_check;", quoted(schema_name)),
+        raw: format!("PRAGMA {}.foreign_key_check;", sqlite_quoted(schema_name)),
     });
 
     result.push(SqlMigrationStep::RawSql {
@@ -167,8 +174,8 @@ fn copy_current_table_into_new_table(
     write!(
         query,
         "INSERT INTO {}.{} (",
-        quoted(schema_name),
-        quoted(&differ.next.name)
+        sqlite_quoted(schema_name),
+        sqlite_quoted(&differ.next.name)
     )?;
 
     let mut destination_columns = intersection_columns
@@ -182,7 +189,7 @@ fn copy_current_table_into_new_table(
         .peekable();
 
     while let Some(destination_column) = destination_columns.next() {
-        write!(query, "{}", quoted(destination_column))?;
+        write!(query, "{}", sqlite_quoted(destination_column))?;
 
         if destination_columns.peek().is_some() {
             write!(query, ", ")?;
@@ -193,14 +200,25 @@ fn copy_current_table_into_new_table(
 
     let mut source_columns = intersection_columns
         .iter()
-        .map(|s| format!("{}", quoted(s)))
-        .chain(columns_that_became_required_with_a_default.iter().map(|columns| {
-            format!(
-                "coalesce({column_name}, {default_value}) AS {column_name}",
-                column_name = quoted(columns.name()),
-                default_value = render_default(&columns.next)
-            )
-        }))
+        .map(|s| format!("{}", sqlite_quoted(s)))
+        .chain(
+            columns_that_became_required_with_a_default
+                .iter()
+                .map(|columns| {
+                    format!(
+                        "coalesce({column_name}, {default_value}) AS {column_name}",
+                        column_name = sqlite_quoted(columns.name()),
+                        default_value = SqlRenderer::for_family(&SqlFamily::Sqlite).render_default(
+                            columns
+                                .next
+                                .default
+                                .as_ref()
+                                .expect("default on required column with default"),
+                            &columns.next.tpe.family
+                        )
+                    )
+                }),
+        )
         .peekable();
 
     while let Some(source_column) = source_columns.next() {
@@ -211,16 +229,14 @@ fn copy_current_table_into_new_table(
         }
     }
 
-    write!(query, " FROM {}.{}", quoted(schema_name), quoted(&differ.previous.name))?;
+    write!(
+        query,
+        " FROM {}.{}",
+        sqlite_quoted(schema_name),
+        sqlite_quoted(&differ.previous.name)
+    )?;
 
     steps.push(SqlMigrationStep::RawSql { raw: query });
 
     Ok(())
-}
-
-fn render_default(column: &Column) -> String {
-    match column.tpe.family {
-        ColumnTypeFamily::String => format!("'{}'", column.default.as_ref().unwrap()),
-        _ => column.default.as_ref().unwrap().to_string(),
-    }
 }

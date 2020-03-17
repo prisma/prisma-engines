@@ -28,7 +28,7 @@ impl DatabaseMigrationInferrer<SqlMigration> for SqlDatabaseMigrationInferrer<'_
     ) -> ConnectorResult<SqlMigration> {
         let fut = async {
             let current_database_schema: SqlSchema = self.describe().await?;
-            let expected_database_schema = SqlSchemaCalculator::calculate(next)?;
+            let expected_database_schema = SqlSchemaCalculator::calculate(next, self.database_info())?;
             infer(
                 &current_database_schema,
                 &expected_database_schema,
@@ -47,8 +47,8 @@ impl DatabaseMigrationInferrer<SqlMigration> for SqlDatabaseMigrationInferrer<'_
         _steps: &[MigrationStep],
     ) -> ConnectorResult<SqlMigration> {
         let result: SqlResult<SqlMigration> = (|| {
-            let current_database_schema: SqlSchema = SqlSchemaCalculator::calculate(previous)?;
-            let expected_database_schema = SqlSchemaCalculator::calculate(next)?;
+            let current_database_schema: SqlSchema = SqlSchemaCalculator::calculate(previous, self.database_info())?;
+            let expected_database_schema = SqlSchemaCalculator::calculate(next, self.database_info())?;
             infer(
                 &current_database_schema,
                 &expected_database_schema,

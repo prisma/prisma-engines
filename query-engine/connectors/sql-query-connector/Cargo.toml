@@ -7,18 +7,18 @@ edition = "2018"
 [dependencies]
 itertools = "0.8"
 serde_json = "1.0"
-parking_lot = "0.7"
 uuid = "0.8"
 failure = "0.1"
-url = "1.7"
-rand = "0.6"
+url = "2"
+rand = "0.7"
 log = "0.4"
 async-trait = "0.1"
 futures = "0.3"
-rust_decimal = "1.1"
+rust_decimal = "=1.1.0"
+tokio = "0.2"
 
 [dependencies.quaint]
-version = "0.1"
+git = "https://github.com/prisma/quaint"
 features = ["full", "tracing-log"]
 
 [dependencies.connector-interface]
@@ -27,6 +27,10 @@ package = "query-connector"
 
 [dependencies.prisma-models]
 path = "../../../libs/prisma-models"
+features = ["sql-ext"]
+
+[dependencies.prisma-value]
+path = "../../../libs/prisma-value"
 features = ["sql-ext"]
 
 [dependencies.chrono]

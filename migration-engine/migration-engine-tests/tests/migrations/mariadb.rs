@@ -1,7 +1,7 @@
 use migration_engine_tests::*;
 use quaint::ast as quaint_ast;
 
-#[test_one_connector(connector = "mysql_mariadb")]
+#[test_each_connector(tags("mariadb"))]
 async fn foreign_keys_to_indexes_being_renamed_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model User {
@@ -17,7 +17,7 @@ async fn foreign_keys_to_indexes_being_renamed_must_work(api: &TestApi) -> TestR
         }
     "#;
 
-    api.infer_apply(dm1).send().await?;
+    api.infer_apply(dm1).send_assert().await?.assert_green()?;
 
     api.assert_schema()
         .await?
@@ -37,8 +37,8 @@ async fn foreign_keys_to_indexes_being_renamed_must_work(api: &TestApi) -> TestR
         .value("name", "steve");
 
     let db = api.database();
-    db.execute(insert_user.into()).await?;
-    db.execute(insert_post.into()).await?;
+    db.query(insert_user.into()).await?;
+    db.query(insert_post.into()).await?;
 
     let dm2 = r#"
         model User {
@@ -54,7 +54,7 @@ async fn foreign_keys_to_indexes_being_renamed_must_work(api: &TestApi) -> TestR
         }
     "#;
 
-    api.infer_apply(dm2).send().await?;
+    api.infer_apply(dm2).send_assert().await?.assert_green()?;
 
     api.assert_schema()
         .await?
@@ -63,6 +63,7 @@ async fn foreign_keys_to_indexes_being_renamed_must_work(api: &TestApi) -> TestR
         })?
         .assert_table("Post", |table| {
             table.assert_fk_on_columns(&["author"], |fk| fk.assert_references("User", &["name"]))
-        })
-        .map(drop)
+        })?;
+
+    Ok(())
 }

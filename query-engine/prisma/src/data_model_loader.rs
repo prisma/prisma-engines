@@ -69,9 +69,11 @@ impl<T> PrismaResultOption<T> for PrismaResult<Option<T>> {
 
 /// Loads data model components for the v2 data model.
 /// The v2 data model is provided either as file (PRISMA_DML_PATH) or as string in the env (PRISMA_DML).
-pub fn load_data_model_components() -> PrismaResult<(DatamodelV2Components, InternalDataModelTemplate)> {
+pub fn load_data_model_components(
+    ignore_env_var_errors: bool,
+) -> PrismaResult<(DatamodelV2Components, InternalDataModelTemplate)> {
     // Load data model in order of precedence.
-    match load_datamodel_v2()? {
+    match load_datamodel_v2(ignore_env_var_errors)? {
         Some(v2components) => {
             let template = DatamodelConverter::convert(&v2components.datamodel);
             Ok((v2components, template))
@@ -89,27 +91,39 @@ pub fn load_data_model_components() -> PrismaResult<(DatamodelV2Components, Inte
 ///     Err      If a source for v2 was found, but conversion failed.
 ///     Ok(Some) If a source for v2 was found, and the conversion suceeded.
 ///     Ok(None) If no source for a v2 data model was found.
-fn load_datamodel_v2() -> PrismaResult<Option<DatamodelV2Components>> {
+fn load_datamodel_v2(ignore_env_var_errors: bool) -> PrismaResult<Option<DatamodelV2Components>> {
     debug!("Trying to load v2 data model...");
 
-    load_v2_dml_string().inner_map(|dml_string| match datamodel::parse_datamodel(&dml_string) {
-        Err(errors) => Err(PrismaError::ConversionError(errors, dml_string.clone())),
-        Ok(dm) => load_configuration(&dml_string).map(|configuration| {
-            debug!("Loaded Prisma v2 data model.");
-            Some(DatamodelV2Components {
-                datamodel: dm,
-                data_sources: configuration.datasources,
-            })
-        }),
+    load_v2_dml_string().inner_map(|dml_string| {
+        let dml = if ignore_env_var_errors {
+            datamodel::parse_datamodel_and_ignore_env_errors(&dml_string)
+        } else {
+            datamodel::parse_datamodel(&dml_string)
+        };
+        match dml {
+            Err(errors) => Err(PrismaError::ConversionError(errors, dml_string.clone())),
+            Ok(dm) => load_configuration(&dml_string, ignore_env_var_errors).map(|configuration| {
+                debug!("Loaded Prisma v2 data model.");
+                Some(DatamodelV2Components {
+                    datamodel: dm,
+                    data_sources: configuration.datasources,
+                })
+            }),
+        }
     })
 }
 
-pub fn load_configuration(dml_string: &str) -> PrismaResult<datamodel::Configuration> {
+pub fn load_configuration(dml_string: &str, ignore_env_var_errors: bool) -> PrismaResult<datamodel::Configuration> {
     let datasource_overwrites_string =
         load_string_from_env("OVERWRITE_DATASOURCES")?.unwrap_or_else(|| r#"[]"#.to_string());
     let datasource_overwrites: Vec<SourceOverride> = serde_json::from_str(&datasource_overwrites_string)?;
 
-    match datamodel::parse_configuration(&dml_string) {
+    let config_result = if ignore_env_var_errors {
+        datamodel::parse_configuration_and_ignore_env_errors(&dml_string)
+    } else {
+        datamodel::parse_configuration(&dml_string)
+    };
+    match config_result {
         Err(errors) => Err(PrismaError::ConversionError(errors, dml_string.to_string())),
         Ok(mut configuration) => {
             for datasource_override in datasource_overwrites {

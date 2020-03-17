@@ -1,6 +1,6 @@
 use super::*;
 use crate::common::ScalarType;
-use crate::dml;
+use crate::{dml, IndexType};
 use serde_json;
 
 pub fn render_to_dmmf(schema: &dml::Datamodel) -> String {
@@ -31,11 +31,24 @@ fn schema_to_dmmf(schema: &dml::Datamodel) -> Datamodel {
 }
 
 fn enum_to_dmmf(en: &dml::Enum) -> Enum {
-    Enum {
+    let mut enm = Enum {
         name: en.name.clone(),
-        values: en.values.clone(),
+        values: vec![],
         db_name: en.database_name.clone(),
         documentation: en.documentation.clone(),
+    };
+
+    for enum_value in &en.values {
+        enm.values.push(enum_value_to_dmmf(enum_value));
+    }
+
+    enm
+}
+
+fn enum_value_to_dmmf(en: &dml::EnumValue) -> EnumValue {
+    EnumValue {
+        name: en.name.clone(),
+        db_name: en.database_name.clone(),
     }
 }
 
@@ -48,6 +61,17 @@ fn model_to_dmmf(model: &dml::Model) -> Model {
         is_generated: Some(model.is_generated),
         documentation: model.documentation.clone(),
         id_fields: model.id_fields.clone(),
+        unique_fields: model
+            .indices
+            .iter()
+            .filter_map(|i| {
+                if i.tpe == IndexType::Unique {
+                    Some(i.fields.clone())
+                } else {
+                    None
+                }
+            })
+            .collect(),
     }
 }
 
@@ -96,7 +120,7 @@ fn type_to_string(scalar: &ScalarType) -> String {
 fn default_value_to_serde(dv_opt: &Option<dml::DefaultValue>) -> Option<serde_json::Value> {
     dv_opt.as_ref().map(|dv| match dv {
         dml::DefaultValue::Single(value) => value_to_serde(&value.clone()),
-        dml::DefaultValue::Expression(vg) => function_to_serde(&vg.name, vg.return_type(), &vg.args),
+        dml::DefaultValue::Expression(vg) => function_to_serde(&vg.name, &vg.args),
     })
 }
 
@@ -104,7 +128,7 @@ fn value_to_serde(value: &dml::ScalarValue) -> serde_json::Value {
     match value {
         dml::ScalarValue::Boolean(val) => serde_json::Value::Bool(*val),
         dml::ScalarValue::String(val) => serde_json::Value::String(val.clone()),
-        dml::ScalarValue::ConstantLiteral(val) => serde_json::Value::String(val.clone()),
+        dml::ScalarValue::ConstantLiteral(name) => serde_json::Value::String(name.clone()),
         dml::ScalarValue::Float(val) => serde_json::Value::Number(serde_json::Number::from_f64(*val as f64).unwrap()),
         dml::ScalarValue::Int(val) => serde_json::Value::Number(serde_json::Number::from_f64(*val as f64).unwrap()),
         dml::ScalarValue::Decimal(val) => serde_json::Value::Number(serde_json::Number::from_f64(*val as f64).unwrap()),
@@ -112,10 +136,9 @@ fn value_to_serde(value: &dml::ScalarValue) -> serde_json::Value {
     }
 }
 
-fn function_to_serde(name: &str, return_type: ScalarType, args: &Vec<dml::ScalarValue>) -> serde_json::Value {
+fn function_to_serde(name: &str, args: &Vec<dml::ScalarValue>) -> serde_json::Value {
     let func = Function {
         name: String::from(name),
-        return_type: return_type.to_string(),
         args: args.iter().map(|arg| value_to_serde(arg)).collect(),
     };
 

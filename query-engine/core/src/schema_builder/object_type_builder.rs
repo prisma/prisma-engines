@@ -6,6 +6,7 @@ pub struct ObjectTypeBuilder<'a> {
     internal_data_model: InternalDataModelRef,
     with_relations: bool,
     capabilities: &'a SupportedCapabilities,
+    input_type_builder: Weak<InputTypeBuilder<'a>>,
     filter_object_type_builder: Weak<FilterObjectTypeBuilder<'a>>,
     object_type_cache: TypeRefCache<ObjectType>,
 }
@@ -29,12 +30,14 @@ impl<'a> ObjectTypeBuilder<'a> {
         with_relations: bool,
         capabilities: &'a SupportedCapabilities,
         filter_object_type_builder: Weak<FilterObjectTypeBuilder<'a>>,
+        input_type_builder: Weak<InputTypeBuilder<'a>>,
     ) -> Self {
         ObjectTypeBuilder {
             internal_data_model,
             with_relations,
             capabilities,
             filter_object_type_builder,
+            input_type_builder,
             object_type_cache: TypeRefCache::new(),
         }
         .compute_model_object_types()
@@ -105,13 +108,11 @@ impl<'a> ObjectTypeBuilder<'a> {
                 TypeIdentifier::String => OutputType::string(),
                 TypeIdentifier::Float => OutputType::float(),
                 TypeIdentifier::Boolean => OutputType::boolean(),
-                TypeIdentifier::Enum => Self::map_enum_field(sf).into(),
+                TypeIdentifier::Enum(_) => Self::map_enum_field(sf).into(),
                 TypeIdentifier::Json => OutputType::json(),
                 TypeIdentifier::DateTime => OutputType::date_time(),
-                TypeIdentifier::GraphQLID => OutputType::id(),
                 TypeIdentifier::UUID => OutputType::uuid(),
                 TypeIdentifier::Int => OutputType::int(),
-                TypeIdentifier::Relation => unreachable!(), // Scalar fields can't have a Relation type identifier.
             },
         };
 
@@ -139,14 +140,16 @@ impl<'a> ObjectTypeBuilder<'a> {
 
     /// Builds "many records where" arguments solely based on the given model.
     pub fn many_records_arguments(&self, model: &ModelRef) -> Vec<Argument> {
-        let id_field = model.fields().id();
-        let id_input_type = self.map_optional_input_type(id_field);
+        let unique_input_type = InputType::opt(InputType::object(
+            self.input_type_builder.into_arc().where_unique_object_type(model),
+        ));
+
         vec![
             self.where_argument(&model),
             self.order_by_argument(&model),
             argument("skip", InputType::opt(InputType::int()), None),
-            argument("after", id_input_type.clone(), None),
-            argument("before", id_input_type, None),
+            argument("after", unique_input_type.clone(), None),
+            argument("before", unique_input_type, None),
             argument("first", InputType::opt(InputType::int()), None),
             argument("last", InputType::opt(InputType::int()), None),
         ]
@@ -166,19 +169,27 @@ impl<'a> ObjectTypeBuilder<'a> {
     pub fn order_by_argument(&self, model: &ModelRef) -> Argument {
         let enum_values: Vec<_> = model
             .fields()
-            .scalar_non_list()
+            .all
             .iter()
+            .filter(|field| match field {
+                ModelField::Scalar(sf) => !sf.is_list,
+                ModelField::Relation(rf) => {
+                    !rf.relation().is_many_to_many()
+                        && rf.is_inlined_on_enclosing_model()
+                        && rf.data_source_fields().len() == 1
+                }
+            })
             .map(|field| {
                 vec![
                     (
-                        format!("{}_{}", field.name, SortOrder::Ascending.abbreviated()),
+                        format!("{}_{}", field.name(), SortOrder::Ascending.abbreviated()),
                         OrderBy {
                             field: field.clone(),
                             sort_order: SortOrder::Ascending,
                         },
                     ),
                     (
-                        format!("{}_{}", field.name, SortOrder::Descending.abbreviated()),
+                        format!("{}_{}", field.name(), SortOrder::Descending.abbreviated()),
                         OrderBy {
                             field: field.clone(),
                             sort_order: SortOrder::Descending,
@@ -197,7 +208,7 @@ impl<'a> ObjectTypeBuilder<'a> {
 
     pub fn map_enum_field(scalar_field: &Arc<ScalarField>) -> EnumType {
         match scalar_field.type_identifier {
-            TypeIdentifier::Enum => {
+            TypeIdentifier::Enum(_) => {
                 let internal_enum = scalar_field.internal_enum.as_ref().expect(
                     "Invariant violation: Enum fields are expected to have an internal_enum associated with them.",
                 );

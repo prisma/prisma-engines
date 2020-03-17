@@ -1,11 +1,3 @@
-//! # The SQL Connector interface
-//!
-//! The public interface to outside is split into separate traits:
-//!
-//! - [DatabaseReader](../query-connector/trait.DatabaseReader.html) to fetch data.
-//! - [DatabaseWriter](../query-connector/trait.DatabaseWriter.html) to write
-//!   data.
-
 mod cursor_condition;
 mod database;
 mod error;

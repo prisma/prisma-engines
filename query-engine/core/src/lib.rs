@@ -6,9 +6,6 @@ extern crate log;
 #[macro_use]
 extern crate debug_stub_derive;
 
-#[macro_use]
-extern crate lazy_static;
-
 pub mod error;
 pub mod executor;
 pub mod interpreter;
@@ -34,4 +31,4 @@ pub use schema::*;
 pub use schema_builder::*;
 
 /// Result type tying all sub-result type hierarchies of the core together.
-pub type CoreResult<T> = Result<T, CoreError>;
+pub type Result<T> = std::result::Result<T, CoreError>;

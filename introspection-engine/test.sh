@@ -1,11 +1,18 @@
 #!/bin/bash
-#echo "{\"id\":1,\"jsonrpc\":\"2.0\",\"method\":\"introspect\",\"params\":[{\"url\":\"file:../db/lift.db\"}]}" | ../target/debug/introspection-engine
-echo "{\"id\":1,\"jsonrpc\":\"2.0\",\"method\":\"getDatabaseDescription\",\"params\":[{\"url\":\"file:../db/lift.db\"}]}" | ../target/debug/introspection-engine
-# debug
-# echo "{\"id\":1,\"jsonrpc\":\"2.0\",\"method\":\"introspect\",\"params\":[{\"url\":\"file:${folder}${fileName}.db\"}]}" | ../target/debug/introspection-engine 
 
-# write structopt cli that can test all the rpc calls
-# list databases
-# introspect
-# getDatabaseDescription
-# getMetadata
+if [ "$1" != "" ]; then
+    echo "RUNNING WITH $1"
+    method="$1"
+else
+    method="getDatabaseDescription"
+    #method="introspect"
+    #method="listDatabases"
+    #method="getDatabaseMetadata"
+    echo "RUNNING WITH DEFAULT: $method"
+fi
+
+schema="datasource chinook { provider = \\\"mysql\\\" url = \\\"mysql://:3306/Accidents\\\" }"
+echo "RUNNING WITH SCHEMA: $schema"
+
+
+echo "{\"id\":1,\"jsonrpc\":\"2.0\",\"method\":\"$method\",\"params\":[{\"schema\":\"$schema\"}]}"| ../target/debug/introspection-engine

@@ -15,6 +15,7 @@ fn nice_error_for_missing_model_keyword() {
     error.assert_is(DatamodelError::new_parser_error(
         &vec![
             "end of input",
+            "documentation comment",
             "type declaration",
             "model declaration",
             "enum declaration",
@@ -40,6 +41,7 @@ fn nice_error_for_missing_model_keyword_2() {
     error.assert_is(DatamodelError::new_parser_error(
         &vec![
             "end of input",
+            "documentation comment",
             "type declaration",
             "model declaration",
             "enum declaration",
@@ -82,7 +84,10 @@ fn nice_error_missing_type() {
 
     let error = parse_error(dml);
 
-    error.assert_is(DatamodelError::new_parser_error(&vec!["field type"], Span::new(49, 49)));
+    error.assert_is(DatamodelError::new_parser_error(
+        &vec!["field type"],
+        Span::new(49, 49),
+    ));
 }
 
 #[test]
@@ -95,14 +100,17 @@ fn nice_error_missing_directive_name() {
 
     let error = parse_error(dml);
 
-    error.assert_is(DatamodelError::new_parser_error(&vec!["directive"], Span::new(38, 38)));
+    error.assert_is(DatamodelError::new_parser_error(
+        &vec!["directive"],
+        Span::new(38, 38),
+    ));
 }
 
 // TODO: This case is not nice because the "{ }" belong to the declaration.
 #[test]
 fn nice_error_missing_braces() {
     let dml = r#"
-    model User 
+    model User
         id Int @id
     "#;
 
@@ -110,7 +118,7 @@ fn nice_error_missing_braces() {
 
     error.assert_is(DatamodelError::new_parser_error(
         &vec!["Start of block (\"{\")"],
-        Span::new(16, 16),
+        Span::new(15, 15),
     ));
 }
 
@@ -171,5 +179,21 @@ fn nice_error_legacy_model_decl() {
     error.assert_is(DatamodelError::new_legacy_parser_error(
         "Model declarations have to be indicated with the `model` keyword.",
         Span::new(5, 9),
+    ));
+}
+
+#[test]
+fn optional_list_fields_must_error() {
+    let dml = r#"
+    model User {
+        id Int @id
+        names String[]?
+    }"#;
+
+    let error = parse_error(dml);
+
+    error.assert_is(DatamodelError::new_legacy_parser_error(
+        "Optional lists are not supported. Use either `Type[]` or `Type?`.",
+        Span::new(51, 60),
     ));
 }

@@ -1,4 +1,5 @@
 use super::*;
+use prisma_value::PrismaValue;
 
 impl<'conn, 'tx> ReadOperations for ConnectionLike<'conn, 'tx> {
     fn get_single_record<'a>(
@@ -25,18 +26,14 @@ impl<'conn, 'tx> ReadOperations for ConnectionLike<'conn, 'tx> {
         }
     }
 
-    fn get_related_records<'a>(
+    fn get_related_m2m_record_ids<'a>(
         &'a self,
         from_field: &'a RelationFieldRef,
-        from_record_ids: &'a [GraphqlId],
-        query_arguments: QueryArguments,
-        selected_fields: &'a SelectedFields,
-    ) -> crate::IO<'a, ManyRecords> {
+        from_record_ids: &'a [RecordProjection],
+    ) -> crate::IO<'a, Vec<(RecordProjection, RecordProjection)>> {
         match self {
-            Self::Connection(c) => c.get_related_records(from_field, from_record_ids, query_arguments, selected_fields),
-            Self::Transaction(tx) => {
-                tx.get_related_records(from_field, from_record_ids, query_arguments, selected_fields)
-            }
+            Self::Connection(c) => c.get_related_m2m_record_ids(from_field, from_record_ids),
+            Self::Transaction(tx) => tx.get_related_m2m_record_ids(from_field, from_record_ids),
         }
     }
 
@@ -50,14 +47,19 @@ impl<'conn, 'tx> ReadOperations for ConnectionLike<'conn, 'tx> {
 }
 
 impl<'conn, 'tx> WriteOperations for ConnectionLike<'conn, 'tx> {
-    fn create_record<'a>(&'a self, model: &'a ModelRef, args: WriteArgs) -> crate::IO<GraphqlId> {
+    fn create_record<'a>(&'a self, model: &'a ModelRef, args: WriteArgs) -> crate::IO<RecordProjection> {
         match self {
             Self::Connection(c) => c.create_record(model, args),
             Self::Transaction(tx) => tx.create_record(model, args),
         }
     }
 
-    fn update_records<'a>(&'a self, model: &'a ModelRef, where_: Filter, args: WriteArgs) -> crate::IO<Vec<GraphqlId>> {
+    fn update_records<'a>(
+        &'a self,
+        model: &'a ModelRef,
+        where_: Filter,
+        args: WriteArgs,
+    ) -> crate::IO<Vec<RecordProjection>> {
         match self {
             Self::Connection(c) => c.update_records(model, where_, args),
             Self::Transaction(tx) => tx.update_records(model, where_, args),
@@ -74,8 +76,8 @@ impl<'conn, 'tx> WriteOperations for ConnectionLike<'conn, 'tx> {
     fn connect<'a>(
         &'a self,
         field: &'a RelationFieldRef,
-        parent_id: &'a GraphqlId,
-        child_ids: &'a [GraphqlId],
+        parent_id: &'a RecordProjection,
+        child_ids: &'a [RecordProjection],
     ) -> crate::IO<()> {
         match self {
             Self::Connection(c) => c.connect(field, parent_id, child_ids),
@@ -86,12 +88,19 @@ impl<'conn, 'tx> WriteOperations for ConnectionLike<'conn, 'tx> {
     fn disconnect<'a>(
         &'a self,
         field: &'a RelationFieldRef,
-        parent_id: &'a GraphqlId,
-        child_ids: &'a [GraphqlId],
+        parent_id: &'a RecordProjection,
+        child_ids: &'a [RecordProjection],
     ) -> crate::IO<()> {
         match self {
             Self::Connection(c) => c.disconnect(field, parent_id, child_ids),
             Self::Transaction(tx) => tx.disconnect(field, parent_id, child_ids),
+        }
+    }
+
+    fn execute_raw<'a>(&'a self, query: String, parameters: Vec<PrismaValue>) -> crate::IO<serde_json::Value> {
+        match self {
+            Self::Connection(c) => c.execute_raw(query, parameters),
+            Self::Transaction(tx) => tx.execute_raw(query, parameters),
         }
     }
 }

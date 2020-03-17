@@ -1,30 +1,27 @@
-pub mod cli;
-mod connector_loader;
+mod command_error;
 mod error;
+mod error_rendering;
 mod rpc;
 
-#[cfg(test)]
-mod tests;
-use json_rpc_stdio::ServerBuilder;
 use jsonrpc_core::*;
 use rpc::{Rpc, RpcImpl};
+use structopt::StructOpt;
+
+#[derive(Debug, StructOpt, Clone)]
+#[structopt(version = env!("GIT_HASH"))]
+pub struct IntrospectionOpt {}
 
 #[tokio::main]
 async fn main() {
-    let matches = cli::clap_app().get_matches();
     init_logger();
 
-    if matches.is_present("version") {
-        println!(env!("GIT_HASH"));
-    } else {
-        user_facing_errors::set_panic_hook();
+    let _ = IntrospectionOpt::from_args();
+    user_facing_errors::set_panic_hook();
 
-        let mut io_handler = IoHandler::new();
-        io_handler.extend_with(RpcImpl::new().to_delegate());
+    let mut io_handler = IoHandler::new();
+    io_handler.extend_with(RpcImpl::new().to_delegate());
 
-        let server = ServerBuilder::new(io_handler);
-        server.run().await.unwrap();
-    }
+    json_rpc_stdio::run(&io_handler).await.unwrap();
 }
 
 fn init_logger() {

@@ -1,6 +1,7 @@
-use super::FieldManifestation;
+use super::DataSourceField;
 use crate::prelude::*;
 use datamodel::{DefaultValue, FieldArity};
+use once_cell::sync::OnceCell;
 use std::{
     hash::{Hash, Hasher},
     sync::{Arc, Weak},
@@ -23,10 +24,9 @@ pub struct ScalarFieldTemplate {
     pub is_unique: bool,
     pub is_id: bool,
     pub is_auto_generated_int_id: bool,
-    pub manifestation: Option<FieldManifestation>,
     pub behaviour: Option<FieldBehaviour>,
-    pub default_value: Option<DefaultValue>,
     pub internal_enum: Option<InternalEnum>,
+    pub data_source_field: dml::DataSourceField,
 }
 
 #[derive(DebugStub)]
@@ -37,15 +37,13 @@ pub struct ScalarField {
     pub is_list: bool,
     pub is_id: bool,
     pub is_auto_generated_int_id: bool,
-    pub manifestation: Option<FieldManifestation>,
     pub internal_enum: Option<InternalEnum>,
     pub behaviour: Option<FieldBehaviour>,
-    pub default_value: Option<DefaultValue>,
 
     #[debug_stub = "#ModelWeakRef#"]
     pub model: ModelWeakRef,
-
     pub(crate) is_unique: bool,
+    pub(crate) data_source_field: OnceCell<DataSourceFieldRef>,
 }
 
 impl Eq for ScalarField {}
@@ -58,7 +56,6 @@ impl Hash for ScalarField {
         self.is_list.hash(state);
         self.is_id.hash(state);
         self.is_auto_generated_int_id.hash(state);
-        self.manifestation.hash(state);
         self.internal_enum.hash(state);
         self.behaviour.hash(state);
         self.is_unique.hash(state);
@@ -74,10 +71,9 @@ impl PartialEq for ScalarField {
             && self.is_list == other.is_list
             && self.is_id == other.is_id
             && self.is_auto_generated_int_id == other.is_auto_generated_int_id
-            && self.manifestation == other.manifestation
             && self.internal_enum == other.internal_enum
             && self.behaviour == other.behaviour
-            && self.default_value == other.default_value
+            && self.default_value() == other.default_value()
             && self.is_unique == other.is_unique
             && self.model() == other.model()
     }
@@ -94,6 +90,34 @@ pub enum FieldBehaviour {
 pub enum ScalarListStrategy {
     Embedded,
     Relation,
+}
+
+impl ScalarFieldTemplate {
+    pub fn build(self, model: ModelWeakRef) -> ScalarFieldRef {
+        let scalar = ScalarField {
+            name: self.name,
+            type_identifier: self.type_identifier,
+            is_id: self.is_id,
+            is_required: self.is_required,
+            is_list: self.is_list,
+            is_auto_generated_int_id: self.is_auto_generated_int_id,
+            is_unique: self.is_unique,
+            internal_enum: self.internal_enum,
+            behaviour: self.behaviour,
+            model,
+            data_source_field: OnceCell::new(),
+        };
+
+        let arc = Arc::new(scalar);
+        arc.data_source_field
+            .set(Arc::new(DataSourceField::new(
+                self.data_source_field,
+                FieldWeak::from(&arc),
+            )))
+            .unwrap();
+
+        arc
+    }
 }
 
 impl ScalarField {
@@ -144,20 +168,24 @@ impl ScalarField {
     }
 
     pub fn db_name(&self) -> &str {
-        self.db_name_opt().unwrap_or_else(|| self.name.as_ref())
-    }
-
-    pub fn db_name_opt(&self) -> Option<&str> {
-        self.manifestation.as_ref().map(|mf| mf.db_name.as_ref())
+        &self.data_source_field().name
     }
 
     pub fn type_identifier_with_arity(&self) -> (TypeIdentifier, FieldArity) {
-        let arity = match (self.is_list, self.is_required) {
-            (true, _) => FieldArity::List,
-            (false, true) => FieldArity::Required,
-            (false, false) => FieldArity::Optional,
-        };
+        (
+            self.data_source_field().field_type.into(),
+            self.data_source_field().arity,
+        )
+    }
 
-        (self.type_identifier, arity)
+    pub fn default_value(&self) -> Option<&DefaultValue> {
+        self.data_source_field().default_value.as_ref()
+    }
+
+    pub fn data_source_field(&self) -> &DataSourceFieldRef {
+        self.data_source_field
+            .get()
+            .ok_or_else(|| String::from("Data source field must be set!"))
+            .unwrap()
     }
 }

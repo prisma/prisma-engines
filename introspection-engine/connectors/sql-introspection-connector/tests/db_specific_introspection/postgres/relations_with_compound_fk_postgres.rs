@@ -2,7 +2,7 @@ use crate::*;
 use barrel::types;
 use test_harness::*;
 
-#[test_one_connector(connector = "postgres")]
+#[test_each_connector(tags("postgres"))]
 #[test]
 async fn compound_foreign_keys_should_work_for_required_one_to_one_relations(api: &TestApi) {
     let barrel = api.barrel();
@@ -17,7 +17,9 @@ async fn compound_foreign_keys_should_work_for_required_one_to_one_relations(api
                 t.add_column("id", types::primary());
                 t.add_column("user_id", types::integer());
                 t.add_column("user_name", types::text());
-                t.inject_custom("FOREIGN KEY (\"user_id\",\"user_name\") REFERENCES \"User\"(\"id\", \"name\")");
+                t.inject_custom(
+                    "FOREIGN KEY (\"user_id\",\"user_name\") REFERENCES \"User\"(\"id\", \"name\")",
+                );
                 t.inject_custom("CONSTRAINT post_user_unique UNIQUE(\"user_id\", \"user_name\")");
             });
         })
@@ -26,14 +28,14 @@ async fn compound_foreign_keys_should_work_for_required_one_to_one_relations(api
     let dm = r#"
             model Post {
                 id      Int                 @id @default(autoincrement())
-                user    User                @map(["user_id", "user_name"]) @relation(references:[id, name]) 
+                user    User                @map(["user_id", "user_name"]) @relation(references:[id, name])
             }
 
             model User {
                id       Int                 @id @default(autoincrement())
                name     String
                post     Post?
-               
+
                @@unique([id, name], name: "user_unique")
             }
         "#;
@@ -41,7 +43,7 @@ async fn compound_foreign_keys_should_work_for_required_one_to_one_relations(api
     custom_assert(&result, dm);
 }
 
-#[test_one_connector(connector = "postgres")]
+#[test_each_connector(tags("postgres"))]
 #[test]
 async fn compound_foreign_keys_should_work_for_one_to_one_relations(api: &TestApi) {
     let barrel = api.barrel();
@@ -56,7 +58,9 @@ async fn compound_foreign_keys_should_work_for_one_to_one_relations(api: &TestAp
                 t.add_column("id", types::primary());
                 t.add_column("user_id", types::integer().nullable(true));
                 t.add_column("user_name", types::text().nullable(true));
-                t.inject_custom("FOREIGN KEY (\"user_id\",\"user_name\") REFERENCES \"User\"(\"id\", \"name\")");
+                t.inject_custom(
+                    "FOREIGN KEY (\"user_id\",\"user_name\") REFERENCES \"User\"(\"id\", \"name\")",
+                );
                 t.inject_custom("CONSTRAINT post_user_unique UNIQUE(\"user_id\", \"user_name\")");
             });
         })
@@ -65,14 +69,14 @@ async fn compound_foreign_keys_should_work_for_one_to_one_relations(api: &TestAp
     let dm = r#"
             model Post {
                 id      Int                 @id @default(autoincrement())
-                user    User?                @map(["user_id", "user_name"]) @relation(references:[id, name]) 
+                user    User?                @map(["user_id", "user_name"]) @relation(references:[id, name])
             }
 
             model User {
                id       Int                 @id @default(autoincrement())
                name     String
                post     Post?
-               
+
                @@unique([id, name], name: "user_unique")
             }
         "#;
@@ -80,7 +84,7 @@ async fn compound_foreign_keys_should_work_for_one_to_one_relations(api: &TestAp
     custom_assert(&result, dm);
 }
 
-#[test_one_connector(connector = "postgres")]
+#[test_each_connector(tags("postgres"))]
 #[test]
 async fn compound_foreign_keys_should_work_for_one_to_many_relations(api: &TestApi) {
     let barrel = api.barrel();
@@ -95,7 +99,9 @@ async fn compound_foreign_keys_should_work_for_one_to_many_relations(api: &TestA
                 t.add_column("id", types::primary());
                 t.add_column("user_id", types::integer().nullable(true));
                 t.add_column("user_name", types::text().nullable(true));
-                t.inject_custom("FOREIGN KEY (\"user_id\",\"user_name\") REFERENCES \"User\"(\"id\", \"name\")");
+                t.inject_custom(
+                    "FOREIGN KEY (\"user_id\",\"user_name\") REFERENCES \"User\"(\"id\", \"name\")",
+                );
             });
         })
         .await;
@@ -103,14 +109,14 @@ async fn compound_foreign_keys_should_work_for_one_to_many_relations(api: &TestA
     let dm = r#"
             model Post {
                 id      Int                 @id @default(autoincrement())
-                user    User?                @map(["user_id", "user_name"]) @relation(references:[id, name]) 
+                user    User?                @map(["user_id", "user_name"]) @relation(references:[id, name])
             }
 
             model User {
                id       Int                 @id @default(autoincrement())
                name     String
-               posts    Post[]
-               
+               post     Post[]
+
                @@unique([id, name], name: "user_unique")
             }
         "#;
@@ -118,7 +124,7 @@ async fn compound_foreign_keys_should_work_for_one_to_many_relations(api: &TestA
     custom_assert(&result, dm);
 }
 
-#[test_one_connector(connector = "postgres")]
+#[test_each_connector(tags("postgres"))]
 #[test]
 async fn compound_foreign_keys_should_work_for_required_one_to_many_relations(api: &TestApi) {
     let barrel = api.barrel();
@@ -133,7 +139,9 @@ async fn compound_foreign_keys_should_work_for_required_one_to_many_relations(ap
                 t.add_column("id", types::primary());
                 t.add_column("user_id", types::integer());
                 t.add_column("user_name", types::text());
-                t.inject_custom("FOREIGN KEY (\"user_id\",\"user_name\") REFERENCES \"User\"(\"id\", \"name\")");
+                t.inject_custom(
+                    "FOREIGN KEY (\"user_id\",\"user_name\") REFERENCES \"User\"(\"id\", \"name\")",
+                );
             });
         })
         .await;
@@ -141,14 +149,14 @@ async fn compound_foreign_keys_should_work_for_required_one_to_many_relations(ap
     let dm = r#"
             model Post {
                 id      Int                 @id @default(autoincrement())
-                user    User                @map(["user_id", "user_name"]) @relation(references:[id, name]) 
+                user    User                @map(["user_id", "user_name"]) @relation(references:[id, name])
             }
 
             model User {
                id       Int                 @id @default(autoincrement())
                name     String
-               posts    Post[]
-               
+               post     Post[]
+
                @@unique([id, name], name: "user_unique")
             }
         "#;
@@ -156,7 +164,7 @@ async fn compound_foreign_keys_should_work_for_required_one_to_many_relations(ap
     custom_assert(&result, dm);
 }
 
-#[test_one_connector(connector = "postgres")]
+#[test_each_connector(tags("postgres"))]
 #[test]
 async fn compound_foreign_keys_should_work_for_self_relations(api: &TestApi) {
     let barrel = api.barrel();
@@ -179,9 +187,9 @@ async fn compound_foreign_keys_should_work_for_self_relations(api: &TestApi) {
             model Person {
                id       Int         @id @default(autoincrement())
                name     String
-               person   Person      @map(["partner_id", "partner_name"]) @relation("PersonToPerson_partner_id_partner_name")
-               persons  Person[]    @relation("PersonToPerson_partner_id_partner_name")
-               
+               person   Person      @map(["partner_id", "partner_name"]) @relation("PersonToPerson_partner_id_partner_name", references: [id,name])
+               other_person   Person[]    @relation("PersonToPerson_partner_id_partner_name")
+
                @@unique([id, name], name: "person_unique")
             }
         "#;
@@ -189,7 +197,7 @@ async fn compound_foreign_keys_should_work_for_self_relations(api: &TestApi) {
     custom_assert(&result, dm);
 }
 
-#[test_one_connector(connector = "postgres")]
+#[test_each_connector(tags("postgres"))]
 #[test]
 async fn compound_foreign_keys_should_work_with_defaults(api: &TestApi) {
     let barrel = api.barrel();
@@ -212,9 +220,9 @@ async fn compound_foreign_keys_should_work_with_defaults(api: &TestApi) {
             model Person {
                id       Int         @id @default(autoincrement())
                name     String
-               person   Person      @map(["partner_id", "partner_name"]) @relation("PersonToPerson_partner_id_partner_name")
-               persons  Person[]    @relation("PersonToPerson_partner_id_partner_name")
-               
+               person   Person      @map(["partner_id", "partner_name"]) @relation("PersonToPerson_partner_id_partner_name", references: [id, name])
+               other_person  Person[]    @relation("PersonToPerson_partner_id_partner_name")
+
                @@unique([id, name], name: "person_unique")
             }
         "#;
@@ -229,7 +237,7 @@ async fn compound_foreign_keys_should_work_with_defaults(api: &TestApi) {
 // model.indexes contains a multi-field unique index that matches the colums exactly, then it is unique
 // if there are separate uniques it probably should not become a relation
 // what breaks by having an @@unique that refers to fields that do not have a representation on the model anymore due to the merged relation field?
-//#[test_one_connector(connector = "postgres")]
+//#[test_each_connector(tags("postgres"))]
 //#[test]
 //async fn compound_foreign_keys_should_work_for_one_to_one_relations_with_separate_uniques(api: &TestApi) {
 //    let barrel = api.barrel();
@@ -267,9 +275,11 @@ async fn compound_foreign_keys_should_work_with_defaults(api: &TestApi) {
 //    custom_assert(&result, dm);
 //}
 
-#[test_one_connector(connector = "postgres")]
+#[test_each_connector(tags("postgres"))]
 #[test]
-async fn compound_foreign_keys_should_work_for_one_to_many_relations_with_non_unique_index(api: &TestApi) {
+async fn compound_foreign_keys_should_work_for_one_to_many_relations_with_non_unique_index(
+    api: &TestApi,
+) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -282,7 +292,9 @@ async fn compound_foreign_keys_should_work_for_one_to_many_relations_with_non_un
                 t.add_column("id", types::primary());
                 t.add_column("user_id", types::integer());
                 t.add_column("user_age", types::integer());
-                t.inject_custom("FOREIGN KEY (\"user_id\",\"user_age\") REFERENCES \"User\"(\"id\", \"age\")");
+                t.inject_custom(
+                    "FOREIGN KEY (\"user_id\",\"user_age\") REFERENCES \"User\"(\"id\", \"age\")",
+                );
                 t.add_index("test", types::index(vec!["user_id", "user_age"]));
             });
         })
@@ -292,17 +304,99 @@ async fn compound_foreign_keys_should_work_for_one_to_many_relations_with_non_un
             model Post {
                 id      Int                @id @default(autoincrement())
                 user    User               @map(["user_id", "user_age"]) @relation(references:[id, age])
-                
+
                 @@index(user, name: "test")
             }
 
             model User {
                age      Int
                id       Int                @id @default(autoincrement())
-               posts    Post[]
-               
+               post     Post[]
+
                @@unique([id, age], name: "user_unique")
             }
+        "#;
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+}
+
+#[test_each_connector(tags("postgres"))]
+#[test]
+async fn repro_matt_references_on_wrong_side(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("a", |t| {
+                t.add_column("one", types::integer().nullable(false));
+                t.add_column("two", types::integer().nullable(false));
+                t.inject_custom("Primary Key (\"one\", \"two\")");
+            });
+            migration.create_table("b", |t| {
+                t.add_column("id", types::primary());
+                t.add_column("one", types::integer().nullable(false));
+                t.add_column("two", types::integer().nullable(false));
+                t.inject_custom("Foreign Key (\"one\", \"two\") references a(\"one\", \"two\")");
+            });
+        })
+        .await;
+
+    let dm = r#"
+            model a {
+              one Int
+              two Int
+              b   b[]
+                    
+              @@id([one, two])
+            }
+            
+            model b {
+              id Int @id  @default(autoincrement())
+              a  a   @map(["one", "two"])
+            }
+              
+        "#;
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+}
+
+#[test_each_connector(tags("postgres"))]
+#[test]
+async fn compound_fk_pk(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("a", |t| {
+                t.add_column("one", types::integer().nullable(false));
+                t.add_column("two", types::integer().nullable(false));
+                t.inject_custom("Primary Key (\"one\", \"two\")");
+            });
+            migration.create_table("b", |t| {
+                t.add_column("dummy", types::integer().nullable(false));
+                t.add_column("one", types::integer().nullable(false));
+                t.add_column("two", types::integer().nullable(false));
+                t.inject_custom("Foreign Key (\"one\", \"two\") references a(\"one\", \"two\")");
+                t.inject_custom("Primary Key (\"dummy\",\"one\", \"two\")");
+            });
+        })
+        .await;
+
+    let dm = r#"
+            model a {
+              one Int
+              two Int
+                    
+              @@id([one, two])
+            }
+            
+            model b {
+              dummy     Int 
+              /// This used to be part of a relation to a
+              one       Int
+              /// This used to be part of a relation to a
+              two       Int
+            
+              @@id([dummy, one, two])
+            }         
         "#;
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);

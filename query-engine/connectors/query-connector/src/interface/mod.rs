@@ -4,6 +4,7 @@ pub use dispatch::*;
 
 use crate::{Filter, QueryArguments, WriteArgs};
 use prisma_models::*;
+use prisma_value::PrismaValue;
 
 pub trait Connector {
     fn get_connection<'a>(&'a self) -> crate::IO<Box<dyn Connection + 'a>>;
@@ -41,22 +42,25 @@ pub trait ReadOperations {
         selected_fields: &'a SelectedFields,
     ) -> crate::IO<'a, ManyRecords>;
 
-    fn get_related_records<'a>(
+    fn get_related_m2m_record_ids<'a>(
         &'a self,
         from_field: &'a RelationFieldRef,
-        from_record_ids: &'a [GraphqlId],
-        query_arguments: QueryArguments,
-        selected_fields: &'a SelectedFields,
-    ) -> crate::IO<'a, ManyRecords>;
+        from_record_ids: &'a [RecordProjection],
+    ) -> crate::IO<'a, Vec<(RecordProjection, RecordProjection)>>;
 
     // This will eventually become a more generic `aggregate`
     fn count_by_model<'a>(&'a self, model: &'a ModelRef, query_arguments: QueryArguments) -> crate::IO<'a, usize>;
 }
 
 pub trait WriteOperations {
-    fn create_record<'a>(&'a self, model: &'a ModelRef, args: WriteArgs) -> crate::IO<GraphqlId>;
+    fn create_record<'a>(&'a self, model: &'a ModelRef, args: WriteArgs) -> crate::IO<RecordProjection>;
 
-    fn update_records<'a>(&'a self, model: &'a ModelRef, where_: Filter, args: WriteArgs) -> crate::IO<Vec<GraphqlId>>;
+    fn update_records<'a>(
+        &'a self,
+        model: &'a ModelRef,
+        where_: Filter,
+        args: WriteArgs,
+    ) -> crate::IO<Vec<RecordProjection>>;
 
     fn delete_records<'a>(&'a self, model: &'a ModelRef, where_: Filter) -> crate::IO<usize>;
 
@@ -65,14 +69,16 @@ pub trait WriteOperations {
     fn connect<'a>(
         &'a self,
         field: &'a RelationFieldRef,
-        parent_id: &'a GraphqlId,
-        child_ids: &'a [GraphqlId],
+        parent_id: &'a RecordProjection,
+        child_ids: &'a [RecordProjection],
     ) -> crate::IO<()>;
 
     fn disconnect<'a>(
         &'a self,
         field: &'a RelationFieldRef,
-        parent_id: &'a GraphqlId,
-        child_ids: &'a [GraphqlId],
+        parent_id: &'a RecordProjection,
+        child_ids: &'a [RecordProjection],
     ) -> crate::IO<()>;
+
+    fn execute_raw<'a>(&'a self, query: String, parameters: Vec<PrismaValue>) -> crate::IO<serde_json::Value>;
 }

@@ -1,4 +1,5 @@
 mod column;
+mod enums;
 mod index;
 mod table;
 
@@ -6,6 +7,7 @@ pub(crate) use column::{ColumnChange, ColumnDiffer};
 pub(crate) use table::TableDiffer;
 
 use crate::*;
+use enums::EnumDiffer;
 use sql_schema_describer::*;
 use tracing::debug;
 
@@ -27,11 +29,16 @@ pub struct SqlSchemaDiff {
     pub create_indexes: Vec<CreateIndex>,
     pub drop_indexes: Vec<DropIndex>,
     pub alter_indexes: Vec<AlterIndex>,
+    pub create_enums: Vec<CreateEnum>,
+    pub drop_enums: Vec<DropEnum>,
+    pub alter_enums: Vec<AlterEnum>,
 }
 
 impl SqlSchemaDiff {
     pub fn into_steps(self) -> Vec<SqlMigrationStep> {
-        wrap_as_step(self.drop_indexes, SqlMigrationStep::DropIndex)
+        wrap_as_step(self.create_enums, SqlMigrationStep::CreateEnum)
+            .chain(wrap_as_step(self.alter_enums, SqlMigrationStep::AlterEnum))
+            .chain(wrap_as_step(self.drop_indexes, SqlMigrationStep::DropIndex))
             // Order matters: we must create tables before `alter_table`s because we could
             // be adding foreign keys to the new tables there.
             .chain(wrap_as_step(self.create_tables, SqlMigrationStep::CreateTable))
@@ -45,6 +52,7 @@ impl SqlSchemaDiff {
             // indexes created there.
             .chain(wrap_as_step(self.add_foreign_keys, SqlMigrationStep::AddForeignKey))
             .chain(wrap_as_step(self.drop_tables, SqlMigrationStep::DropTable))
+            .chain(wrap_as_step(self.drop_enums, SqlMigrationStep::DropEnum))
             .chain(wrap_as_step(self.alter_indexes, SqlMigrationStep::AlterIndex))
             .collect()
     }
@@ -71,6 +79,9 @@ impl<'schema> SqlSchemaDiffer<'schema> {
             create_indexes: self.create_indexes(),
             drop_indexes: self.drop_indexes(),
             alter_indexes,
+            create_enums: self.create_enums(),
+            drop_enums: self.drop_enums(),
+            alter_enums: self.alter_enums(),
         }
     }
 
@@ -211,7 +222,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
         steps
     }
 
-    fn drop_indexes<'a>(&'a self) -> Vec<DropIndex> {
+    fn drop_indexes(&self) -> Vec<DropIndex> {
         let mut drop_indexes = Vec::new();
 
         for tables in self.table_pairs() {
@@ -229,6 +240,41 @@ impl<'schema> SqlSchemaDiffer<'schema> {
         }
 
         drop_indexes
+    }
+
+    fn create_enums(&self) -> Vec<CreateEnum> {
+        self.created_enums()
+            .map(|r#enum| CreateEnum {
+                name: r#enum.name.clone(),
+                variants: r#enum.values.clone(),
+            })
+            .collect()
+    }
+
+    fn drop_enums(&self) -> Vec<DropEnum> {
+        self.dropped_enums()
+            .map(|r#enum| DropEnum {
+                name: r#enum.name.clone(),
+            })
+            .collect()
+    }
+
+    fn alter_enums(&self) -> Vec<AlterEnum> {
+        self.enum_pairs()
+            .filter_map(|differ| {
+                let step = AlterEnum {
+                    created_variants: differ.created_values().map(String::from).collect(),
+                    dropped_variants: differ.dropped_values().map(String::from).collect(),
+                    name: differ.previous.name.clone(),
+                };
+
+                if step.is_empty() {
+                    None
+                } else {
+                    Some(step)
+                }
+            })
+            .collect()
     }
 
     /// An iterator over the tables that are present in both schemas.
@@ -289,6 +335,32 @@ impl<'schema> SqlSchemaDiffer<'schema> {
             .iter()
             .filter(|table| table.name != MIGRATION_TABLE_NAME)
     }
+
+    fn enum_pairs(&self) -> impl Iterator<Item = EnumDiffer<'_>> {
+        self.previous_enums().filter_map(move |previous| {
+            self.next_enums()
+                .find(|next| enums_match(previous, next))
+                .map(|next| EnumDiffer { previous, next })
+        })
+    }
+
+    fn created_enums(&self) -> impl Iterator<Item = &Enum> {
+        self.next_enums()
+            .filter(move |next| !self.previous_enums().any(|previous| enums_match(previous, next)))
+    }
+
+    fn dropped_enums(&self) -> impl Iterator<Item = &Enum> {
+        self.previous_enums()
+            .filter(move |previous| !self.next_enums().any(|next| enums_match(previous, next)))
+    }
+
+    fn previous_enums(&self) -> impl Iterator<Item = &Enum> {
+        self.previous.enums.iter()
+    }
+
+    fn next_enums(&self) -> impl Iterator<Item = &Enum> {
+        self.next.enums.iter()
+    }
 }
 
 fn push_created_foreign_keys<'a, 'schema>(
@@ -335,5 +407,9 @@ fn foreign_keys_match(previous: &ForeignKey, next: &ForeignKey) -> bool {
 }
 
 fn tables_match(previous: &Table, next: &Table) -> bool {
+    previous.name == next.name
+}
+
+fn enums_match(previous: &Enum, next: &Enum) -> bool {
     previous.name == next.name
 }

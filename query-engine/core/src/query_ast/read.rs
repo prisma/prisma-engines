@@ -21,12 +21,33 @@ impl ReadQuery {
             ReadQuery::AggregateRecordsQuery(x) => &x.name,
         }
     }
+
+    pub fn returns(&self, projection: &ModelProjection) -> bool {
+        let db_names = projection.db_names();
+
+        match self {
+            ReadQuery::RecordQuery(x) => x.selected_fields.contains_all_db_names(db_names),
+            ReadQuery::ManyRecordsQuery(x) => x.selected_fields.contains_all_db_names(db_names),
+            ReadQuery::RelatedRecordsQuery(x) => x.selected_fields.contains_all_db_names(db_names),
+            ReadQuery::AggregateRecordsQuery(_x) => false,
+        }
+    }
+
+    pub fn model(&self) -> ModelRef {
+        match self {
+            ReadQuery::RecordQuery(x) => x.model.clone(),
+            ReadQuery::ManyRecordsQuery(x) => x.model.clone(),
+            ReadQuery::RelatedRecordsQuery(x) => x.parent_field.related_field().model().clone(),
+            ReadQuery::AggregateRecordsQuery(x) => x.model.clone(),
+        }
+    }
 }
 
 impl FilteredQuery for ReadQuery {
     fn get_filter(&mut self) -> Option<&mut Filter> {
         match self {
             Self::RecordQuery(q) => q.get_filter(),
+            Self::ManyRecordsQuery(q) => q.get_filter(),
             _ => unimplemented!(),
         }
     }
@@ -34,6 +55,7 @@ impl FilteredQuery for ReadQuery {
     fn set_filter(&mut self, filter: Filter) {
         match self {
             Self::RecordQuery(q) => q.set_filter(filter),
+            Self::ManyRecordsQuery(q) => q.set_filter(filter),
             _ => unimplemented!(),
         }
     }
@@ -42,14 +64,28 @@ impl FilteredQuery for ReadQuery {
 impl Display for ReadQuery {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            Self::RecordQuery(q) => write!(f, "RecordQuery(name: '{}', filter: {:?})", q.name, q.filter),
-            Self::ManyRecordsQuery(q) => write!(f, "ManyRecordsQuery(name: '{}', model: {})", q.name, q.model.name),
+            Self::RecordQuery(q) => write!(
+                f,
+                "RecordQuery(name: '{}', filter: {:?}, selection: {:?})",
+                q.name,
+                q.filter,
+                q.selected_fields.names().collect::<Vec<_>>()
+            ),
+            Self::ManyRecordsQuery(q) => write!(
+                f,
+                "ManyRecordsQuery(name: '{}', model: {}, args: {:?}, selection: {:?})",
+                q.name,
+                q.model.name,
+                q.args,
+                q.selected_fields.names().collect::<Vec<_>>()
+            ),
             Self::RelatedRecordsQuery(q) => write!(
                 f,
-                "RelatedRecordsQuery(name: '{}', parent model: {}, parent relation field: {})",
+                "RelatedRecordsQuery(name: '{}', parent model: {}, parent relation field: {}, selection: {:?})",
                 q.name,
                 q.parent_field.model().name,
-                q.parent_field.name
+                q.parent_field.name,
+                q.selected_fields.names().collect::<Vec<_>>()
             ),
             Self::AggregateRecordsQuery(q) => write!(f, "AggregateRecordsQuery: {}", q.name),
         }
@@ -83,11 +119,14 @@ pub struct RelatedRecordsQuery {
     pub name: String,
     pub alias: Option<String>,
     pub parent_field: RelationFieldRef,
-    pub parent_ids: Option<Vec<GraphqlId>>,
     pub args: QueryArguments,
     pub selected_fields: SelectedFields,
     pub nested: Vec<ReadQuery>,
     pub selection_order: Vec<String>,
+
+    /// Fields and values of the parent to satisfy the relation query without
+    /// relying on the parent result passed by the interpreter.
+    pub parent_projections: Option<Vec<RecordProjection>>,
 }
 
 #[derive(Debug, Clone)]
@@ -104,5 +143,15 @@ impl FilteredQuery for RecordQuery {
 
     fn set_filter(&mut self, filter: Filter) {
         self.filter = Some(filter)
+    }
+}
+
+impl FilteredQuery for ManyRecordsQuery {
+    fn get_filter(&mut self) -> Option<&mut Filter> {
+        self.args.filter.as_mut()
+    }
+
+    fn set_filter(&mut self, filter: Filter) {
+        self.args.filter = Some(filter)
     }
 }

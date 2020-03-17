@@ -4,6 +4,7 @@ use query_core::{
     BuildMode, QueryExecutor, QuerySchemaBuilder,
 };
 // use prisma_models::InternalDataModelRef;
+use prisma_models::DatamodelConverter;
 use std::sync::Arc;
 
 /// Prisma request context containing all immutable state of the process.
@@ -24,6 +25,8 @@ pub struct PrismaContext {
 pub struct ContextBuilder {
     legacy: bool,
     force_transactions: bool,
+    enable_raw_queries: bool,
+    datamodel: Option<String>,
 }
 
 impl ContextBuilder {
@@ -37,8 +40,25 @@ impl ContextBuilder {
         self
     }
 
+    pub fn enable_raw_queries(mut self, val: bool) -> Self {
+        self.enable_raw_queries = val;
+        self
+    }
+
+    #[cfg(test)]
+    pub fn datamodel(mut self, val: String) -> Self {
+        self.datamodel = Some(val);
+        self
+    }
+
     pub async fn build(self) -> PrismaResult<PrismaContext> {
-        PrismaContext::new(self.legacy, self.force_transactions).await
+        PrismaContext::new(
+            self.legacy,
+            self.force_transactions,
+            self.enable_raw_queries,
+            self.datamodel,
+        )
+        .await
     }
 }
 
@@ -48,9 +68,28 @@ impl PrismaContext {
     /// 1. The data model. This has different options on how to initialize. See data_model_loader module. The Prisma configuration (prisma.yml) is used as fallback.
     /// 2. The data model is converted to the internal data model.
     /// 3. The api query schema is constructed from the internal data model.
-    async fn new(legacy: bool, force_transactions: bool) -> PrismaResult<Self> {
+    async fn new(
+        legacy: bool,
+        force_transactions: bool,
+        enable_raw_queries: bool,
+        datamodel: Option<String>,
+    ) -> PrismaResult<Self> {
         // Load data model in order of precedence.
-        let (v2components, template) = load_data_model_components()?;
+        let (v2components, template) = match datamodel {
+            Some(datamodel_string) => {
+                let dm = datamodel::parse_datamodel(&datamodel_string)?;
+
+                let components = load_configuration(&datamodel_string, false).map(|config| DatamodelV2Components {
+                    datamodel: dm,
+                    data_sources: config.datasources,
+                })?;
+
+                let template = DatamodelConverter::convert(&components.datamodel);
+
+                (components, template)
+            }
+            None => load_data_model_components(false)?,
+        };
 
         let (dm, data_sources) = (v2components.datamodel, v2components.data_sources);
 
@@ -70,7 +109,10 @@ impl PrismaContext {
         // Construct query schema
         let build_mode = if legacy { BuildMode::Legacy } else { BuildMode::Modern };
         let capabilities = SupportedCapabilities::empty(); // todo connector capabilities.
-        let schema_builder = QuerySchemaBuilder::new(&internal_data_model, &capabilities, build_mode);
+
+        let schema_builder =
+            QuerySchemaBuilder::new(&internal_data_model, &capabilities, build_mode, enable_raw_queries);
+
         let query_schema: QuerySchemaRef = Arc::new(schema_builder.build());
 
         Ok(Self {
@@ -85,6 +127,8 @@ impl PrismaContext {
         ContextBuilder {
             legacy: false,
             force_transactions: false,
+            enable_raw_queries: false,
+            datamodel: None,
         }
     }
 

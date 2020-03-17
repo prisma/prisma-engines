@@ -12,7 +12,7 @@ class DefaultValueSpec extends FlatSpec with Matchers with ApiSpecBase {
         |  id        String  @id @default(cuid())
         |  reqString String? @default(value: "default")
         |}
-      """.stripMargin
+      """
     }
     database.setup(project)
 
@@ -23,7 +23,7 @@ class DefaultValueSpec extends FlatSpec with Matchers with ApiSpecBase {
          |  ){
          |  reqString
          |  }
-         |}""".stripMargin,
+         |}""",
       project = project
     )
 
@@ -42,7 +42,7 @@ class DefaultValueSpec extends FlatSpec with Matchers with ApiSpecBase {
         |  name String
         |  int  Int?   @default(value: 1)
         |}
-      """.stripMargin
+      """
     }
     database.setup(project)
 
@@ -56,7 +56,7 @@ class DefaultValueSpec extends FlatSpec with Matchers with ApiSpecBase {
          |    name
          |    int
          |  }
-         |}""".stripMargin,
+         |}""",
       project = project
     )
 
@@ -78,7 +78,7 @@ class DefaultValueSpec extends FlatSpec with Matchers with ApiSpecBase {
         |  unit         String?
         |  active       IsActive? @default(value: Yes)
         |}
-      """.stripMargin
+      """
     }
     database.setup(project)
 
@@ -92,7 +92,7 @@ class DefaultValueSpec extends FlatSpec with Matchers with ApiSpecBase {
          |    name
          |    active
          |  }
-         |}""".stripMargin,
+         |}""",
       project = project
     )
 
@@ -108,7 +108,7 @@ class DefaultValueSpec extends FlatSpec with Matchers with ApiSpecBase {
         |  createdAt DateTime @default(now())
         |  updatedAt DateTime @updatedAt
         |}
-      """.stripMargin
+      """
     }
     database.setup(project)
 
@@ -124,12 +124,96 @@ class DefaultValueSpec extends FlatSpec with Matchers with ApiSpecBase {
          |    createdAt
          |    updatedAt
          |  }
-         |}""".stripMargin,
+         |}""",
       project = project
     )
 
     // We currently have a datetime precision of 3, so Prisma will add .000
     res.pathAsString("data.createUser.createdAt") should be("2000-01-01T00:00:00.000Z")
     res.pathAsString("data.createUser.updatedAt") should be("2001-01-01T00:00:00.000Z")
+  }
+
+  "Remapped enum default values" should "work" in {
+    val project = ProjectDsl.fromString {
+      """
+        |model User {
+        |  id        String   @id @default(cuid())
+        |  name      Names    @default(Spiderman) @unique
+        |  age       Int
+        }
+        |
+        |enum Names {
+        |   Spiderman @map("Peter Parker")
+        |   Superman  @map("Clark Kent")
+        |}
+        |
+      """
+    }
+    database.setup(project)
+
+    val res = server.query(
+      s"""mutation {
+         |  createUser(
+         |    data:{
+         |      age: 21
+         |    }
+         |  ){
+         |    name
+         |  }
+         |}""",
+      project = project
+    )
+
+    res.toString() should be("{\"data\":{\"createUser\":{\"name\":\"Spiderman\"}}}")
+
+    val res2 = server.query(
+      s"""mutation {
+         |  createUser(
+         |    data:{
+         |      name: Superman
+         |      age: 32
+         |    }
+         |  ){
+         |    name
+         |  }
+         |}""",
+      project = project
+    )
+
+    res2.toString() should be("{\"data\":{\"createUser\":{\"name\":\"Superman\"}}}")
+
+    val res3 = server.query(
+      s"""query {
+         |  user(
+         |    where:{
+         |      name: Superman
+         |      }
+         |  ){
+         |    name,
+         |    age
+         |  }
+         |}""",
+      project = project
+    )
+
+    res3.toString() should be("{\"data\":{\"user\":{\"name\":\"Superman\",\"age\":32}}}")
+
+    val res4 = server.query(
+      s"""query {
+         |  users(
+         |    where:{
+         |      name_in: [Spiderman, Superman]
+         |      }
+         |    orderBy: age_ASC
+         |  ){
+         |    name,
+         |    age
+         |  }
+         |}""",
+      project = project
+    )
+
+    res4.toString() should be("{\"data\":{\"users\":[{\"name\":\"Spiderman\",\"age\":21},{\"name\":\"Superman\",\"age\":32}]}}")
+
   }
 }

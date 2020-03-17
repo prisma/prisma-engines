@@ -3,7 +3,8 @@ use crate::{
     query_ast::*,
     QueryResult,
 };
-use connector::{ConnectionLike, Filter, WriteArgs, WriteOperations};
+use connector::{ConnectionLike, Filter, WriteOperations};
+use prisma_value::PrismaValue;
 
 pub async fn execute<'a, 'b>(
     tx: &'a ConnectionLike<'a, 'b>,
@@ -17,26 +18,27 @@ pub async fn execute<'a, 'b>(
         WriteQuery::DeleteManyRecords(q) => delete_many(tx, q).await,
         WriteQuery::ConnectRecords(q) => connect(tx, q).await,
         WriteQuery::DisconnectRecords(q) => disconnect(tx, q).await,
-        // WriteQuery::SetRecords(q) => set(tx, q).await,
-        WriteQuery::ResetData(q) => reset(tx, q).await,
+        WriteQuery::Raw { query, parameters } => execute_raw(tx, query, parameters).await,
     }
 }
 
+async fn execute_raw<'a, 'b>(
+    tx: &'a ConnectionLike<'a, 'b>,
+    query: String,
+    parameters: Vec<PrismaValue>,
+) -> InterpretationResult<QueryResult> {
+    let res = tx.execute_raw(query, parameters).await?;
+    Ok(QueryResult::Json(res))
+}
+
 async fn create_one<'a, 'b>(tx: &'a ConnectionLike<'a, 'b>, q: CreateRecord) -> InterpretationResult<QueryResult> {
-    let res = tx
-        .create_record(&q.model, WriteArgs::new(q.args))
-        .await?;
+    let res = tx.create_record(&q.model, q.args).await?;
 
     Ok(QueryResult::Id(Some(res)))
 }
 
 async fn update_one<'a, 'b>(tx: &'a ConnectionLike<'a, 'b>, q: UpdateRecord) -> InterpretationResult<QueryResult> {
-    let mut res = tx.update_records(
-            &q.model,
-            Filter::from(q.where_),
-            WriteArgs::new(q.args),
-        )
-        .await?;
+    let mut res = tx.update_records(&q.model, Filter::from(q.where_), q.args).await?;
 
     Ok(QueryResult::Id(res.pop()))
 }
@@ -59,9 +61,7 @@ async fn update_many<'a, 'b>(
     tx: &'a ConnectionLike<'a, 'b>,
     q: UpdateManyRecords,
 ) -> InterpretationResult<QueryResult> {
-    let res = tx
-        .update_records(&q.model, q.filter, WriteArgs::new(q.args))
-        .await?;
+    let res = tx.update_records(&q.model, q.filter, q.args).await?;
 
     Ok(QueryResult::Count(res.len()))
 }
@@ -95,8 +95,4 @@ async fn disconnect<'a, 'b>(tx: &'a ConnectionLike<'a, 'b>, q: DisconnectRecords
     .await?;
 
     Ok(QueryResult::Unit)
-}
-
-async fn reset<'a, 'b>(_tx: &'a ConnectionLike<'a, 'b>, _q: ResetData) -> InterpretationResult<QueryResult> {
-    unimplemented!()
 }

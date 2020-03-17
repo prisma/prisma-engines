@@ -25,11 +25,11 @@ pub enum DomainError {
     ModelForRelationNotFound { model_id: String, relation: String },
 
     #[fail(display = "Conversion from `{}` to `{}` failed.", _0, _1)]
-    ConversionFailure(&'static str, &'static str),
+    ConversionFailure(String, String),
 }
 
 impl From<super::ConversionFailure> for DomainError {
     fn from(err: ConversionFailure) -> Self {
-        Self::ConversionFailure(err.from, err.to)
+        Self::ConversionFailure(err.from.to_owned(), err.to.to_owned())
     }
 }

@@ -29,16 +29,21 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
         debug!("describing schema '{}'", schema);
 
         let table_names = self.get_table_names(schema).await;
-
         let mut tables = Vec::with_capacity(table_names.len());
+        let mut columns = get_all_columns(self.conn.as_ref(), schema).await;
+        let mut indexes = get_all_indexes(self.conn.as_ref(), schema).await;
+        let mut fks = get_foreign_keys(self.conn.as_ref(), schema).await;
 
+        let mut enums = vec![];
         for table_name in &table_names {
-            tables.push(self.get_table(schema, table_name).await);
+            let (table, enms) = self.get_table(table_name, &mut columns, &mut indexes, &mut fks);
+            tables.push(table);
+            enums.extend(enms.iter().cloned());
         }
 
         Ok(SqlSchema {
             tables,
-            enums: vec![],
+            enums,
             sequences: vec![],
         })
     }
@@ -53,7 +58,11 @@ impl SqlSchemaDescriber {
     async fn get_databases(&self) -> Vec<String> {
         debug!("Getting databases");
         let sql = "select schema_name as schema_name from information_schema.schemata;";
-        let rows = self.conn.query_raw(sql, &[]).await.expect("get schema names ");
+        let rows = self
+            .conn
+            .query_raw(sql, &[])
+            .await
+            .expect("get schema names ");
         let names = rows
             .into_iter()
             .map(|row| {
@@ -94,305 +103,436 @@ impl SqlSchemaDescriber {
 
     async fn get_size(&self, schema: &str) -> usize {
         debug!("Getting db size");
-        let sql = "SELECT 
-      SUM(data_length + index_length) as size 
-      FROM information_schema.TABLES 
-      WHERE table_schema = ?";
-        let result = self.conn.query_raw(sql, &[schema.into()]).await.expect("get db size ");
+        let sql = r#"
+            SELECT
+            SUM(data_length + index_length) as size
+            FROM information_schema.TABLES
+            WHERE table_schema = ?
+        "#;
+        let result = self
+            .conn
+            .query_raw(sql, &[schema.into()])
+            .await
+            .expect("get db size ");
         let size = result
             .first()
-            .map(|row| row.get("size").and_then(|x| x.to_string()).unwrap_or("0".to_string()))
+            .map(|row| {
+                row.get("size")
+                    .and_then(|x| x.to_string())
+                    .unwrap_or("0".to_string())
+            })
             .unwrap();
 
         debug!("Found db size: {:?}", size);
         size.parse().unwrap()
     }
 
-    async fn get_table(&self, schema: &str, name: &str) -> Table {
+    fn get_table(
+        &self,
+        name: &str,
+        columns: &mut HashMap<String, (Vec<Column>, Vec<Enum>)>,
+        indexes: &mut HashMap<String, (BTreeMap<String, Index>, Option<PrimaryKey>)>,
+        foreign_keys: &mut HashMap<String, Vec<ForeignKey>>,
+    ) -> (Table, Vec<Enum>) {
         debug!("Getting table '{}'", name);
-        let columns = self.get_columns(schema, name).await;
-        let foreign_keys = self.get_foreign_keys(schema, name).await;
-        let (indices, primary_key) = self.get_indices(schema, name).await;
-        Table {
-            name: name.to_string(),
-            columns,
-            foreign_keys,
-            indices,
-            primary_key,
-        }
+        let (columns, enums) = columns.remove(name).expect("table columns not found");
+        let (indices, primary_key) = indexes
+            .remove(name)
+            .unwrap_or_else(|| (BTreeMap::new(), None));
+
+        let foreign_keys = foreign_keys.remove(name).unwrap_or_default();
+        (
+            Table {
+                name: name.to_string(),
+                columns,
+                foreign_keys,
+                indices: indices.into_iter().map(|(_k, v)| v).collect(),
+                primary_key,
+            },
+            enums,
+        )
     }
+}
 
-    async fn get_columns(&self, schema: &str, table: &str) -> Vec<Column> {
-        // We alias all the columns because MySQL column names are case-insensitive in queries, but the
-        // information schema column names became upper-case in MySQL 8, causing the code fetching
-        // the result values by column name below to fail.
-        let sql = "
-            SELECT column_name column_name, data_type data_type, column_type full_data_type, column_default column_default, is_nullable is_nullable, extra extra
-            FROM information_schema.columns
-            WHERE table_schema = ? AND table_name = ?
-            ORDER BY column_name";
-
-        let rows = self
-            .conn
-            .query_raw(sql, &[schema.into(), table.into()])
-            .await
-            .expect("querying for columns");
-        let cols = rows
-            .into_iter()
-            .map(|col| {
-                debug!("Got column: {:?}", col);
-
-                let data_type = col.get("data_type").and_then(|x| x.to_string()).expect("get data_type");
-                let full_data_type = col
-                    .get("full_data_type")
-                    .and_then(|x| x.to_string())
-                    .expect("get full_data_type aka column_type");
-                let is_nullable = col
-                    .get("is_nullable")
-                    .and_then(|x| x.to_string())
-                    .expect("get is_nullable")
-                    .to_lowercase();
-                let is_required = match is_nullable.as_ref() {
-                    "no" => true,
-                    "yes" => false,
-                    x => panic!(format!("unrecognized is_nullable variant '{}'", x)),
-                };
-                let arity = if is_required {
-                    ColumnArity::Required
-                } else {
-                    ColumnArity::Nullable
-                };
-                let tpe = get_column_type(&data_type, &full_data_type, arity);
-                let extra = col
-                    .get("extra")
-                    .and_then(|x| x.to_string())
-                    .expect("get extra")
-                    .to_lowercase();
-                let auto_increment = match extra.as_str() {
-                    "auto_increment" => true,
-                    _ => false,
-                };
-                Column {
-                    name: col
-                        .get("column_name")
-                        .and_then(|x| x.to_string())
-                        .expect("get column name"),
-                    tpe,
-                    default: col
-                        .get("column_default")
-                        .and_then(|x| x.as_str())
-                        .and_then(sanitize_default_value)
-                        .map(String::from),
-                    auto_increment: auto_increment,
-                }
-            })
-            .collect();
-
-        debug!("Found table columns: {:?}", cols);
-        cols
-    }
-
-    async fn get_foreign_keys(&self, schema: &str, table: &str) -> Vec<ForeignKey> {
-        // XXX: Is constraint_name unique? Need a way to uniquely associate rows with foreign keys
-        // One should think it's unique since it's used to join information_schema.key_column_usage
-        // and information_schema.referential_constraints tables in this query lifted from
-        // Stack Overflow
-        //
-        // We alias all the columns because MySQL column names are case-insensitive in queries, but the
-        // information schema column names became upper-case in MySQL 8, causing the code fetching
-        // the result values by column name below to fail.
-        let sql = "
+async fn get_all_columns(
+    conn: &dyn Queryable,
+    schema_name: &str,
+) -> HashMap<String, (Vec<Column>, Vec<Enum>)> {
+    // We alias all the columns because MySQL column names are case-insensitive in queries, but the
+    // information schema column names became upper-case in MySQL 8, causing the code fetching
+    // the result values by column name below to fail.
+    let sql = "
             SELECT
-                kcu.constraint_name constraint_name,
-                kcu.column_name column_name,
-                kcu.referenced_table_name referenced_table_name,
-                kcu.referenced_column_name referenced_column_name,
-                kcu.ordinal_position ordinal_position,
-                rc.delete_rule delete_rule
-            FROM information_schema.key_column_usage AS kcu
-            INNER JOIN information_schema.referential_constraints AS rc ON
-            kcu.constraint_name = rc.constraint_name
-            WHERE
-                kcu.table_schema = ?
-                AND kcu.table_name = ?
-                AND rc.constraint_schema = ?
-                AND referenced_column_name IS NOT NULL
-            ORDER BY ordinal_position
+                column_name column_name,
+                data_type data_type,
+                column_type full_data_type,
+                column_default column_default,
+                is_nullable is_nullable,
+                extra extra,
+                table_name table_name
+            FROM information_schema.columns
+            WHERE table_schema = ?
+            ORDER BY column_name
+            COLLATE utf8_general_ci
         ";
 
-        debug!("describing table foreign keys, SQL: '{}'", sql);
+    let mut map = HashMap::new();
 
-        let result_set = self
-            .conn
-            .query_raw(sql, &[schema.into(), table.into(), schema.into()])
-            .await
-            .expect("querying for foreign keys");
-        let mut intermediate_fks: HashMap<String, ForeignKey> = HashMap::new();
-        for row in result_set.into_iter() {
-            debug!("Got description FK row {:#?}", row);
-            let constraint_name = row
-                .get("constraint_name")
-                .and_then(|x| x.to_string())
-                .expect("get constraint_name");
-            let column = row
-                .get("column_name")
-                .and_then(|x| x.to_string())
-                .expect("get column_name");
-            let referenced_table = row
-                .get("referenced_table_name")
-                .and_then(|x| x.to_string())
-                .expect("get referenced_table_name");
-            let referenced_column = row
-                .get("referenced_column_name")
-                .and_then(|x| x.to_string())
-                .expect("get referenced_column_name");
-            let ord_pos = row
-                .get("ordinal_position")
-                .and_then(|x| x.as_i64())
-                .expect("get ordinal_position");
-            let on_delete_action = match row
-                .get("delete_rule")
-                .and_then(|x| x.to_string())
-                .expect("get delete_rule")
-                .to_lowercase()
-                .as_str()
-            {
-                "cascade" => ForeignKeyAction::Cascade,
-                "set null" => ForeignKeyAction::SetNull,
-                "set default" => ForeignKeyAction::SetDefault,
-                "restrict" => ForeignKeyAction::Restrict,
-                "no action" => ForeignKeyAction::NoAction,
-                s @ _ => panic!(format!("Unrecognized on delete action '{}'", s)),
-            };
+    let rows = conn
+        .query_raw(sql, &[schema_name.into()])
+        .await
+        .expect("querying for columns");
 
-            // Foreign keys covering multiple columns will return multiple rows, which we need to
-            // merge.
-            match intermediate_fks.get_mut(&constraint_name) {
-                Some(fk) => {
-                    let pos = ord_pos as usize - 1;
-                    if fk.columns.len() <= pos {
-                        fk.columns.resize(pos + 1, "".to_string());
-                    }
-                    fk.columns[pos] = column;
-                    if fk.referenced_columns.len() <= pos {
-                        fk.referenced_columns.resize(pos + 1, "".to_string());
-                    }
-                    fk.referenced_columns[pos] = referenced_column;
-                }
-                None => {
-                    let fk = ForeignKey {
-                        constraint_name: Some(constraint_name.clone()),
-                        columns: vec![column],
-                        referenced_table,
-                        referenced_columns: vec![referenced_column],
-                        on_delete_action,
-                    };
-                    intermediate_fks.insert(constraint_name, fk);
-                }
-            };
+    for col in rows {
+        debug!("Got column: {:?}", col);
+
+        let table_name = col
+            .get("table_name")
+            .and_then(|x| x.to_string())
+            .expect("get table name");
+        let name = col
+            .get("column_name")
+            .and_then(|x| x.to_string())
+            .expect("get column name");
+        let data_type = col
+            .get("data_type")
+            .and_then(|x| x.to_string())
+            .expect("get data_type");
+        let full_data_type = col
+            .get("full_data_type")
+            .and_then(|x| x.to_string())
+            .expect("get full_data_type aka column_type");
+        let is_nullable = col
+            .get("is_nullable")
+            .and_then(|x| x.to_string())
+            .expect("get is_nullable")
+            .to_lowercase();
+        let is_required = match is_nullable.as_ref() {
+            "no" => true,
+            "yes" => false,
+            x => panic!(format!("unrecognized is_nullable variant '{}'", x)),
+        };
+        let arity = if is_required {
+            ColumnArity::Required
+        } else {
+            ColumnArity::Nullable
+        };
+        let (tpe, enum_option) =
+            get_column_type_and_enum(&table_name, &name, &data_type, &full_data_type, arity);
+        let extra = col
+            .get("extra")
+            .and_then(|x| x.to_string())
+            .expect("get extra")
+            .to_lowercase();
+        let auto_increment = match extra.as_str() {
+            "auto_increment" => true,
+            _ => false,
+        };
+
+        let entry = map.entry(table_name).or_insert((Vec::new(), Vec::new()));
+
+        if let Some(enm) = enum_option {
+            entry.1.push(enm);
         }
 
-        let mut fks: Vec<ForeignKey> = intermediate_fks
-            .values()
-            .map(|intermediate_fk| intermediate_fk.to_owned())
-            .collect();
-        for fk in fks.iter() {
-            debug!(
-                "Found foreign key - column(s): {:?}, to table: '{}', to column(s): {:?}",
-                fk.columns, fk.referenced_table, fk.referenced_columns
-            );
-        }
+        let default = match col.get("column_default") {
+            None => None,
+            Some(param_value) => match param_value.to_string() {
+                None => None,
+                Some(x) if x == "NULL" => None,
+                Some(default_string) => {
+                    Some(match &tpe.family {
+                        ColumnTypeFamily::Int => match parse_int(&default_string).is_some() {
+                            true => DefaultValue::VALUE(default_string),
+                            false => DefaultValue::DBGENERATED(default_string),
+                        },
+                        ColumnTypeFamily::Float => match parse_float(&default_string).is_some() {
+                            true => DefaultValue::VALUE(default_string),
+                            false => DefaultValue::DBGENERATED(default_string),
+                        },
+                        ColumnTypeFamily::Boolean => match parse_int(&default_string) {
+                            Some(1) => DefaultValue::VALUE(default_string),
+                            Some(0) => DefaultValue::VALUE(default_string),
+                            _ => DefaultValue::DBGENERATED(default_string),
+                        },
+                        //todo Maria DB does not seem to quote the strings, but it allows functions which MySQL doesnt
+                        ColumnTypeFamily::String => match &default_string.starts_with("'") {
+                            true => DefaultValue::VALUE(unquote(default_string)),
+                            false => DefaultValue::VALUE(default_string),
+                        },
+                        //todo check other now() definitions
+                        ColumnTypeFamily::DateTime => match default_string.to_lowercase()
+                            == "current_timestamp".to_string()
+                            || default_string.to_lowercase() == "current_timestamp()".to_string()
+                        {
+                            true => DefaultValue::NOW,
+                            false => DefaultValue::DBGENERATED(default_string),
+                        },
+                        ColumnTypeFamily::Binary => DefaultValue::DBGENERATED(default_string),
+                        ColumnTypeFamily::Json => DefaultValue::DBGENERATED(default_string),
+                        ColumnTypeFamily::Uuid => DefaultValue::DBGENERATED(default_string),
+                        ColumnTypeFamily::Geometric => DefaultValue::DBGENERATED(default_string),
+                        ColumnTypeFamily::LogSequenceNumber => {
+                            DefaultValue::DBGENERATED(default_string)
+                        }
+                        ColumnTypeFamily::TextSearch => DefaultValue::DBGENERATED(default_string),
+                        ColumnTypeFamily::TransactionId => {
+                            DefaultValue::DBGENERATED(default_string)
+                        }
+                        ColumnTypeFamily::Enum(_) => DefaultValue::VALUE(unquote(
+                            default_string.replace("_utf8mb4", "").replace("\\\'", ""),
+                        )),
+                        ColumnTypeFamily::Unknown => DefaultValue::DBGENERATED(default_string),
+                    })
+                }
+            },
+        };
 
-        fks.sort_unstable_by_key(|fk| fk.columns.clone());
+        let col = Column {
+            name,
+            tpe,
+            default,
+            auto_increment,
+        };
 
-        fks
+        entry.0.push(col);
     }
 
-    async fn get_indices(&self, schema: &str, table_name: &str) -> (Vec<Index>, Option<PrimaryKey>) {
-        // We alias all the columns because MySQL column names are case-insensitive in queries, but the
-        // information schema column names became upper-case in MySQL 8, causing the code fetching
-        // the result values by column name below to fail.
-        let sql = "
+    map
+}
+
+async fn get_all_indexes(
+    conn: &dyn Queryable,
+    schema_name: &str,
+) -> HashMap<String, (BTreeMap<String, Index>, Option<PrimaryKey>)> {
+    let mut map = HashMap::new();
+
+    // We alias all the columns because MySQL column names are case-insensitive in queries, but the
+    // information schema column names became upper-case in MySQL 8, causing the code fetching
+    // the result values by column name below to fail.
+    let sql = "
             SELECT DISTINCT
                 index_name AS index_name,
                 non_unique AS non_unique,
                 column_name AS column_name,
-                seq_in_index AS seq_in_index
+                seq_in_index AS seq_in_index,
+                table_name AS table_name
             FROM INFORMATION_SCHEMA.STATISTICS
-            WHERE table_schema = ? AND table_name = ?
+            WHERE table_schema = ?
             ORDER BY index_name, seq_in_index
             ";
-        debug!("describing indices, SQL: {}", sql);
-        let rows = self
-            .conn
-            .query_raw(sql, &[schema.into(), table_name.into()])
-            .await
-            .expect("querying for indices");
+    debug!("describing indices, SQL: {}", sql);
+    let rows = conn
+        .query_raw(sql, &[schema_name.into()])
+        .await
+        .expect("querying for indices");
+
+    for row in rows {
+        debug!("Got index row: {:#?}", row);
+        let table_name = row
+            .get("table_name")
+            .and_then(|x| x.to_string())
+            .expect("table_name");
+        let seq_in_index = row
+            .get("seq_in_index")
+            .and_then(|x| x.as_i64())
+            .expect("seq_in_index");
+        let pos = seq_in_index - 1;
+        let index_name = row
+            .get("index_name")
+            .and_then(|x| x.to_string())
+            .expect("index_name");
+        let is_unique = !row
+            .get("non_unique")
+            .and_then(|x| x.as_bool())
+            .expect("non_unique");
+        let column_name = row
+            .get("column_name")
+            .and_then(|x| x.to_string())
+            .expect("column_name");
 
         // Multi-column indices will return more than one row (with different column_name values).
         // We cannot assume that one row corresponds to one index.
+        let (ref mut indexes_map, ref mut primary_key): &mut (_, Option<PrimaryKey>) =
+            map.entry(table_name).or_insert((BTreeMap::new(), None));
 
-        let mut primary_key: Option<PrimaryKey> = None;
-        let mut indexes_map: BTreeMap<String, Index> = BTreeMap::new();
-
-        for row in rows {
-            debug!("Got index row: {:#?}", row);
-            let seq_in_index = row.get("seq_in_index").and_then(|x| x.as_i64()).expect("seq_in_index");
-            let pos = seq_in_index - 1;
-            let index_name = row.get("index_name").and_then(|x| x.to_string()).expect("index_name");
-            let is_unique = !row.get("non_unique").and_then(|x| x.as_bool()).expect("non_unique");
-            let column_name = row.get("column_name").and_then(|x| x.to_string()).expect("column_name");
-            let is_pk = index_name.to_lowercase() == "primary";
-            if is_pk {
-                debug!("Column '{}' is part of the primary key", column_name);
-                match primary_key.as_mut() {
-                    Some(pk) => {
-                        if pk.columns.len() < (pos + 1) as usize {
-                            pk.columns.resize((pos + 1) as usize, "".to_string());
-                        }
-                        pk.columns[pos as usize] = column_name;
-                        debug!(
-                            "The primary key has already been created, added column to it: {:?}",
-                            pk.columns
-                        );
+        let is_pk = index_name.to_lowercase() == "primary";
+        if is_pk {
+            debug!("Column '{}' is part of the primary key", column_name);
+            match primary_key {
+                Some(pk) => {
+                    if pk.columns.len() < (pos + 1) as usize {
+                        pk.columns.resize((pos + 1) as usize, "".to_string());
                     }
-                    None => {
-                        debug!("Instantiating primary key");
-                        primary_key = Some(PrimaryKey {
-                            columns: vec![column_name],
-                            sequence: None,
-                        });
-                    }
-                };
-            } else {
-                if indexes_map.contains_key(&index_name) {
-                    indexes_map.get_mut(&index_name).map(|index: &mut Index| {
-                        index.columns.push(column_name);
-                    });
-                } else {
-                    indexes_map.insert(
-                        index_name.clone(),
-                        Index {
-                            name: index_name,
-                            columns: vec![column_name],
-                            tpe: match is_unique {
-                                true => IndexType::Unique,
-                                false => IndexType::Normal,
-                            },
-                        },
+                    pk.columns[pos as usize] = column_name;
+                    debug!(
+                        "The primary key has already been created, added column to it: {:?}",
+                        pk.columns
                     );
                 }
+                None => {
+                    debug!("Instantiating primary key");
+                    std::mem::replace(
+                        primary_key,
+                        Some(PrimaryKey {
+                            columns: vec![column_name],
+                            sequence: None,
+                        }),
+                    );
+                }
+            };
+        } else {
+            if indexes_map.contains_key(&index_name) {
+                indexes_map.get_mut(&index_name).map(|index: &mut Index| {
+                    index.columns.push(column_name);
+                });
+            } else {
+                indexes_map.insert(
+                    index_name.clone(),
+                    Index {
+                        name: index_name,
+                        columns: vec![column_name],
+                        tpe: match is_unique {
+                            true => IndexType::Unique,
+                            false => IndexType::Normal,
+                        },
+                    },
+                );
             }
         }
-
-        let indices = indexes_map.into_iter().map(|(_k, v)| v).collect();
-
-        debug!("Found table indices: {:?}, primary key: {:?}", indices, primary_key);
-        (indices, primary_key)
     }
+
+    map
 }
 
-fn get_column_type(data_type: &str, full_data_type: &str, arity: ColumnArity) -> ColumnType {
+async fn get_foreign_keys(
+    conn: &dyn Queryable,
+    schema_name: &str,
+) -> HashMap<String, Vec<ForeignKey>> {
+    // Foreign keys covering multiple columns will return multiple rows, which we need to
+    // merge.
+    let mut map: HashMap<String, HashMap<String, ForeignKey>> = HashMap::new();
+
+    // XXX: Is constraint_name unique? Need a way to uniquely associate rows with foreign keys
+    // One should think it's unique since it's used to join information_schema.key_column_usage
+    // and information_schema.referential_constraints tables in this query lifted from
+    // Stack Overflow
+    //
+    // We alias all the columns because MySQL column names are case-insensitive in queries, but the
+    // information schema column names became upper-case in MySQL 8, causing the code fetching
+    // the result values by column name below to fail.
+    let sql = "
+        SELECT
+            kcu.constraint_name constraint_name,
+            kcu.column_name column_name,
+            kcu.referenced_table_name referenced_table_name,
+            kcu.referenced_column_name referenced_column_name,
+            kcu.ordinal_position ordinal_position,
+            kcu.table_name table_name,
+            rc.delete_rule delete_rule
+        FROM information_schema.key_column_usage AS kcu
+        INNER JOIN information_schema.referential_constraints AS rc ON
+        kcu.constraint_name = rc.constraint_name
+        WHERE
+            kcu.table_schema = ?
+            AND rc.constraint_schema = ?
+            AND referenced_column_name IS NOT NULL
+        ORDER BY ordinal_position
+    ";
+
+    debug!("describing table foreign keys, SQL: '{}'", sql);
+
+    let result_set = conn
+        .query_raw(sql, &[schema_name.into(), schema_name.into()])
+        .await
+        .expect("querying for foreign keys");
+
+    for row in result_set.into_iter() {
+        debug!("Got description FK row {:#?}", row);
+        let table_name = row
+            .get("table_name")
+            .and_then(|x| x.to_string())
+            .expect("get table_name");
+        let constraint_name = row
+            .get("constraint_name")
+            .and_then(|x| x.to_string())
+            .expect("get constraint_name");
+        let column = row
+            .get("column_name")
+            .and_then(|x| x.to_string())
+            .expect("get column_name");
+        let referenced_table = row
+            .get("referenced_table_name")
+            .and_then(|x| x.to_string())
+            .expect("get referenced_table_name");
+        let referenced_column = row
+            .get("referenced_column_name")
+            .and_then(|x| x.to_string())
+            .expect("get referenced_column_name");
+        let ord_pos = row
+            .get("ordinal_position")
+            .and_then(|x| x.as_i64())
+            .expect("get ordinal_position");
+        let on_delete_action = match row
+            .get("delete_rule")
+            .and_then(|x| x.to_string())
+            .expect("get delete_rule")
+            .to_lowercase()
+            .as_str()
+        {
+            "cascade" => ForeignKeyAction::Cascade,
+            "set null" => ForeignKeyAction::SetNull,
+            "set default" => ForeignKeyAction::SetDefault,
+            "restrict" => ForeignKeyAction::Restrict,
+            "no action" => ForeignKeyAction::NoAction,
+            s @ _ => panic!(format!("Unrecognized on delete action '{}'", s)),
+        };
+
+        let intermediate_fks = map.entry(table_name).or_default();
+
+        match intermediate_fks.get_mut(&constraint_name) {
+            Some(fk) => {
+                let pos = ord_pos as usize - 1;
+                if fk.columns.len() <= pos {
+                    fk.columns.resize(pos + 1, "".to_string());
+                }
+                fk.columns[pos] = column;
+                if fk.referenced_columns.len() <= pos {
+                    fk.referenced_columns.resize(pos + 1, "".to_string());
+                }
+                fk.referenced_columns[pos] = referenced_column;
+            }
+            None => {
+                let fk = ForeignKey {
+                    constraint_name: Some(constraint_name.clone()),
+                    columns: vec![column],
+                    referenced_table,
+                    referenced_columns: vec![referenced_column],
+                    on_delete_action,
+                };
+                intermediate_fks.insert(constraint_name, fk);
+            }
+        };
+    }
+
+    map.into_iter()
+        .map(|(k, v)| {
+            let mut fks: Vec<ForeignKey> = v.into_iter().map(|(_k, v)| v).collect();
+
+            fks.sort_unstable_by(|this, other| this.columns.cmp(&other.columns));
+
+            (k, fks)
+        })
+        .collect()
+}
+
+fn get_column_type_and_enum(
+    table: &str,
+    column_name: &str,
+    data_type: &str,
+    full_data_type: &str,
+    arity: ColumnArity,
+) -> (ColumnType, Option<Enum>) {
     let family = match (data_type, full_data_type) {
         ("int", _) => ColumnTypeFamily::Int,
         ("smallint", _) => ColumnTypeFamily::Int,
@@ -404,19 +544,20 @@ fn get_column_type(data_type: &str, full_data_type: &str, arity: ColumnArity) ->
         ("numeric", _) => ColumnTypeFamily::Float,
         ("float", _) => ColumnTypeFamily::Float,
         ("double", _) => ColumnTypeFamily::Float,
+        ("bit", _) => ColumnTypeFamily::Int,
         ("date", _) => ColumnTypeFamily::DateTime,
         ("time", _) => ColumnTypeFamily::DateTime,
         ("datetime", _) => ColumnTypeFamily::DateTime,
         ("timestamp", _) => ColumnTypeFamily::DateTime,
-        ("year", _) => ColumnTypeFamily::DateTime,
+        ("year", _) => ColumnTypeFamily::Int,
         ("char", _) => ColumnTypeFamily::String,
         ("varchar", _) => ColumnTypeFamily::String,
         ("text", _) => ColumnTypeFamily::String,
         ("tinytext", _) => ColumnTypeFamily::String,
         ("mediumtext", _) => ColumnTypeFamily::String,
         ("longtext", _) => ColumnTypeFamily::String,
+        ("enum", _) => ColumnTypeFamily::Enum(format!("{}_{}", table, column_name)),
         // XXX: Is this correct?
-        ("enum", _) => ColumnTypeFamily::String,
         ("set", _) => ColumnTypeFamily::String,
         ("binary", _) => ColumnTypeFamily::Binary,
         ("varbinary", _) => ColumnTypeFamily::Binary,
@@ -435,30 +576,42 @@ fn get_column_type(data_type: &str, full_data_type: &str, arity: ColumnArity) ->
         ("json", _) => ColumnTypeFamily::Json,
         _ => ColumnTypeFamily::Unknown,
     };
-    ColumnType {
+
+    let tpe = ColumnType {
         raw: data_type.to_string(),
-        family: family,
+        family: family.clone(),
         arity,
+    };
+
+    match &family {
+        ColumnTypeFamily::Enum(name) => (
+            tpe,
+            Some(Enum {
+                name: name.clone(),
+                values: extract_enum_values(&full_data_type),
+            }),
+        ),
+        _ => (tpe, None),
     }
 }
 
-fn sanitize_default_value(value: &str) -> Option<&str> {
-    match value {
-        "NULL" => None,
-        default if default.starts_with("'") => Some(unquote_mariadb_string_defaults(default)),
-        other => Some(other),
-    }
+fn extract_enum_values(full_data_type: &&str) -> Vec<String> {
+    let len = &full_data_type.len() - 1;
+    let vals = &full_data_type[5..len];
+    vals.split(",").map(|v| unquote(v.into())).collect()
 }
 
-fn unquote_mariadb_string_defaults(default: &str) -> &str {
+fn unquote(input: String) -> String {
     /// Regex for matching the quotes on the introspected string values on MariaDB.
-    static MARIADB_STRING_DEFAULT_RE: Lazy<regex::Regex> = Lazy::new(|| regex::Regex::new(r#"^'(.*)'$"#).unwrap());
+    static MARIADB_STRING_DEFAULT_RE: Lazy<regex::Regex> =
+        Lazy::new(|| regex::Regex::new(r#"^'(.*)'$"#).unwrap());
 
     MARIADB_STRING_DEFAULT_RE
-        .captures(default)
+        .captures(input.as_ref())
         .and_then(|captures| captures.get(1))
         .map(|capt| capt.as_str())
-        .unwrap_or(default)
+        .unwrap_or(input.as_ref())
+        .to_string()
 }
 
 #[cfg(test)]
@@ -467,10 +620,10 @@ mod tests {
 
     #[test]
     fn mariadb_string_default_regex_works() {
-        let quoted_str = "'abc $$ def'";
+        let quoted_str = "'abc $$ def'".to_string();
 
-        assert_eq!(unquote_mariadb_string_defaults(quoted_str), "abc $$ def");
+        assert_eq!(unquote(quoted_str), "abc $$ def");
 
-        assert_eq!(unquote_mariadb_string_defaults("heh "), "heh ");
+        assert_eq!(unquote("heh ".to_string()), "heh ");
     }
 }

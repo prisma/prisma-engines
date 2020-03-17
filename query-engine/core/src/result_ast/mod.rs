@@ -1,12 +1,13 @@
 use connector::QueryArguments;
-use prisma_models::{GraphqlId, ManyRecords};
+use prisma_models::{ManyRecords, ModelProjection, RecordProjection};
 
 #[derive(Debug, Clone)]
 pub enum QueryResult {
-    Id(Option<GraphqlId>),
+    Id(Option<RecordProjection>),
     Count(usize),
     RecordSelection(RecordSelection),
     Unit,
+    Json(serde_json::Value),
 }
 
 // Todo: In theory, much of this info can go into the serializer as soon as the read results are resolved in a flat tree.
@@ -21,13 +22,13 @@ pub struct RecordSelection {
     /// Scalar field results
     pub scalars: ManyRecords,
 
-    /// Nested queries results
+    /// Nested query results
     // Todo this is only here because reads are still resolved in one go
     pub nested: Vec<QueryResult>,
 
     /// Required for result processing
     pub query_arguments: QueryArguments,
 
-    /// Name of the id field of the contained records.
-    pub id_field: String,
+    /// Model projection that can be used to retrieve the IDs of the contained records.
+    pub model_id: ModelProjection,
 }

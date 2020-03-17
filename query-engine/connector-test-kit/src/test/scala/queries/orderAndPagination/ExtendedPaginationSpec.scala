@@ -901,7 +901,7 @@ class ExtendedPaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
     server.query(
       """
         |mutation {
-        |  a: createTop(data: {t: "T1" middles:{create:[
+        |  createTop(data: {t: "T1" middles:{create:[
         |     {m: "M11" bottoms:{create:[
         |         {b:"B111"}
         |         {b:"B112"}
@@ -920,8 +920,15 @@ class ExtendedPaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
         |         {b:"B133"}
         |     ]}
         |     }
-        |  ]}}){ id },
-        |  b: createTop(data: {t: "T2" middles:{create:[
+        |  ]}}){ id }
+        |}""".stripMargin,
+      project
+    )
+
+    server.query(
+      """
+        |mutation {
+        |  createTop(data: {t: "T2" middles:{create:[
         |     {m: "M21" bottoms:{create:[
         |         {b:"B211"}
         |         {b:"B212"}
@@ -940,8 +947,15 @@ class ExtendedPaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
         |         {b:"B233"}
         |     ]}
         |     }
-        |  ]}}){ id },
-        |  c: createTop(data: {t: "T3" middles:{create:[
+        |  ]}}){ id }
+        |}""".stripMargin,
+      project
+    )
+
+    server.query(
+      """
+        |mutation {
+        |  createTop(data: {t: "T3" middles:{create:[
         |     {m: "M31" bottoms:{create:[
         |         {b:"B311"}
         |         {b:"B312"}

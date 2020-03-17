@@ -12,21 +12,28 @@ use hyper::service::{make_service_fn, service_fn};
 use hyper::{Body, Error, Method, Request, Response, Server, StatusCode};
 use query_core::schema::QuerySchemaRenderer;
 use serde_json::json;
+use std::net::SocketAddr;
 use std::{sync::Arc, time::Instant};
-use std::net::{SocketAddr};
 
 #[derive(RustEmbed)]
 #[folder = "query-engine/prisma/static_files"]
 struct StaticFiles;
 
 pub(crate) struct RequestContext {
-    context: PrismaContext,
+    context: Arc<PrismaContext>,
     graphql_request_handler: GraphQlRequestHandler,
+}
+
+impl RequestContext {
+    pub(crate) fn context(&self) -> &Arc<PrismaContext> {
+        &self.context
+    }
 }
 
 pub struct HttpServerBuilder {
     legacy_mode: bool,
     force_transactions: bool,
+    enable_raw_queries: bool,
 }
 
 impl HttpServerBuilder {
@@ -40,10 +47,16 @@ impl HttpServerBuilder {
         self
     }
 
+    pub fn enable_raw_queries(mut self, val: bool) -> Self {
+        self.enable_raw_queries = val;
+        self
+    }
+
     pub async fn build_and_run(self, address: SocketAddr) -> PrismaResult<()> {
         let ctx = PrismaContext::builder()
             .legacy(self.legacy_mode)
             .force_transactions(self.force_transactions)
+            .enable_raw_queries(self.enable_raw_queries)
             .build()
             .await?;
 
@@ -58,6 +71,7 @@ impl HttpServer {
         HttpServerBuilder {
             legacy_mode: false,
             force_transactions: false,
+            enable_raw_queries: false,
         }
     }
 
@@ -65,7 +79,7 @@ impl HttpServer {
         let now = Instant::now();
 
         let ctx = Arc::new(RequestContext {
-            context,
+            context: Arc::new(context),
             graphql_request_handler: GraphQlRequestHandler,
         });
 
@@ -137,7 +151,7 @@ impl HttpServer {
     }
 
     async fn http_handler(req: PrismaRequest<GraphQlBody>, cx: Arc<RequestContext>) -> Response<Body> {
-        let result = cx.graphql_request_handler.handle(req, &cx.context).await;
+        let result = cx.graphql_request_handler.handle(req, cx.context()).await;
         let bytes = serde_json::to_vec(&result).unwrap();
 
         Response::builder()

@@ -1,9 +1,8 @@
-use crate::{ModelRef, ScalarField};
-use std::sync::Arc;
+use crate::{Field, ModelRef};
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct OrderBy {
-    pub field: Arc<ScalarField>,
+    pub field: Field,
     pub sort_order: SortOrder,
 }
 
@@ -18,7 +17,6 @@ pub enum SortOrder {
 }
 
 impl SortOrder {
-    /// "ASC" / "DESC"
     pub fn abbreviated(self) -> &'static str {
         match self {
             SortOrder::Ascending => "ASC",

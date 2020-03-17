@@ -85,13 +85,17 @@ impl LiftAstToDml {
 
     /// Internal: Validates an enum AST node.
     fn lift_enum(&self, ast_enum: &ast::Enum) -> Result<dml::Enum, ErrorCollection> {
-        let mut en = dml::Enum::new(
-            &ast_enum.name.name,
-            ast_enum.values.iter().map(|x| x.name.clone()).collect(),
-        );
-        en.documentation = ast_enum.documentation.clone().map(|comment| comment.text);
-
         let mut errors = ErrorCollection::new();
+        let mut en = dml::Enum::new(&ast_enum.name.name, vec![]);
+
+        for ast_enum_value in &ast_enum.values {
+            match self.lift_enum_value(ast_enum_value) {
+                Ok(value) => en.add_value(value),
+                Err(mut err) => errors.append(&mut err),
+            }
+        }
+
+        en.documentation = ast_enum.documentation.clone().map(|comment| comment.text);
 
         if let Err(mut err) = self.directives.enm.validate_and_apply(ast_enum, &mut en) {
             errors.append(&mut err);
@@ -102,6 +106,17 @@ impl LiftAstToDml {
         } else {
             Ok(en)
         }
+    }
+
+    /// Internal: Validates an enum value AST node.
+    fn lift_enum_value(&self, ast_enum_value: &ast::EnumValue) -> Result<dml::EnumValue, ErrorCollection> {
+        let mut enum_value = dml::EnumValue::new(&ast_enum_value.name.name, None);
+
+        self.directives
+            .enm_value
+            .validate_and_apply(ast_enum_value, &mut enum_value)?;
+
+        Ok(enum_value)
     }
 
     /// Internal: Lift a field AST node to a DML field.

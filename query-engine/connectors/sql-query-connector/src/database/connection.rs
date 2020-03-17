@@ -1,30 +1,24 @@
 use super::transaction::SqlConnectorTransaction;
-use crate::{database::operations::*, query_builder::read::ManyRelatedRecordsQueryBuilder, QueryExt, SqlError};
+use crate::{database::operations::*, QueryExt, SqlError};
 use connector_interface::{
     self as connector, filter::Filter, Connection, QueryArguments, ReadOperations, Transaction, WriteArgs,
     WriteOperations, IO,
 };
 use prisma_models::prelude::*;
+use prisma_value::PrismaValue;
 use quaint::{connector::TransactionCapable, prelude::ConnectionInfo};
-use std::marker::PhantomData;
 
-pub struct SqlConnection<'a, C, T> {
+pub struct SqlConnection<'a, C> {
     inner: C,
     connection_info: &'a ConnectionInfo,
-    _p: PhantomData<T>,
 }
 
-impl<'a, C, T> SqlConnection<'a, C, T>
+impl<'a, C> SqlConnection<'a, C>
 where
     C: QueryExt + Send + Sync + 'static,
-    T: ManyRelatedRecordsQueryBuilder + Send + Sync + 'static,
 {
     pub fn new(inner: C, connection_info: &'a ConnectionInfo) -> Self {
-        Self {
-            inner,
-            connection_info,
-            _p: PhantomData,
-        }
+        Self { inner, connection_info }
     }
 
     async fn catch<O>(
@@ -38,10 +32,9 @@ where
     }
 }
 
-impl<'conninfo, C, T> Connection for SqlConnection<'conninfo, C, T>
+impl<'conninfo, C> Connection for SqlConnection<'conninfo, C>
 where
     C: QueryExt + TransactionCapable + Send + Sync + 'static,
-    T: ManyRelatedRecordsQueryBuilder + Send + Sync + 'static,
 {
     fn start_transaction<'a>(&'a self) -> IO<'a, Box<dyn Transaction<'a> + 'a>> {
         let fut_tx = self.inner.start_transaction();
@@ -49,15 +42,14 @@ where
 
         IO::new(self.catch(async move {
             let tx: quaint::connector::Transaction<'a> = fut_tx.await.map_err(SqlError::from)?;
-            Ok(Box::new(SqlConnectorTransaction::<T>::new(tx, connection_info)) as Box<dyn Transaction<'a> + 'a>)
+            Ok(Box::new(SqlConnectorTransaction::new(tx, connection_info)) as Box<dyn Transaction<'a> + 'a>)
         }))
     }
 }
 
-impl<'a, C, T> ReadOperations for SqlConnection<'a, C, T>
+impl<'a, C> ReadOperations for SqlConnection<'a, C>
 where
     C: QueryExt + Send + Sync + 'static,
-    T: ManyRelatedRecordsQueryBuilder + Send + Sync + 'static,
 {
     fn get_single_record<'b>(
         &'b self,
@@ -81,23 +73,14 @@ where
         )
     }
 
-    fn get_related_records<'b>(
+    fn get_related_m2m_record_ids<'b>(
         &'b self,
         from_field: &'b RelationFieldRef,
-        from_record_ids: &'b [GraphqlId],
-        query_arguments: QueryArguments,
-        selected_fields: &'b SelectedFields,
-    ) -> connector::IO<'b, ManyRecords> {
-        IO::new(self.catch(async move {
-            read::get_related_records::<T>(
-                &self.inner,
-                from_field,
-                from_record_ids,
-                query_arguments,
-                selected_fields,
-            )
-            .await
-        }))
+        from_record_ids: &'b [RecordProjection],
+    ) -> connector::IO<'b, Vec<(RecordProjection, RecordProjection)>> {
+        IO::new(
+            self.catch(async move { read::get_related_m2m_record_ids(&self.inner, from_field, from_record_ids).await }),
+        )
     }
 
     fn count_by_model<'b>(&'b self, model: &'b ModelRef, query_arguments: QueryArguments) -> connector::IO<'b, usize> {
@@ -105,12 +88,11 @@ where
     }
 }
 
-impl<'conn, C, T> WriteOperations for SqlConnection<'conn, C, T>
+impl<'conn, C> WriteOperations for SqlConnection<'conn, C>
 where
     C: QueryExt + Send + Sync + 'static,
-    T: ManyRelatedRecordsQueryBuilder + Send + Sync + 'static,
 {
-    fn create_record<'a>(&'a self, model: &'a ModelRef, args: WriteArgs) -> connector::IO<GraphqlId> {
+    fn create_record<'a>(&'a self, model: &'a ModelRef, args: WriteArgs) -> connector::IO<RecordProjection> {
         IO::new(self.catch(async move { write::create_record(&self.inner, model, args).await }))
     }
 
@@ -119,7 +101,7 @@ where
         model: &'a ModelRef,
         where_: Filter,
         args: WriteArgs,
-    ) -> connector::IO<Vec<GraphqlId>> {
+    ) -> connector::IO<Vec<RecordProjection>> {
         IO::new(self.catch(async move { write::update_records(&self.inner, model, where_, args).await }))
     }
 
@@ -130,8 +112,8 @@ where
     fn connect<'a>(
         &'a self,
         field: &'a RelationFieldRef,
-        parent_id: &'a GraphqlId,
-        child_ids: &'a [GraphqlId],
+        parent_id: &'a RecordProjection,
+        child_ids: &'a [RecordProjection],
     ) -> connector::IO<()> {
         IO::new(self.catch(async move { write::connect(&self.inner, field, parent_id, child_ids).await }))
     }
@@ -139,9 +121,13 @@ where
     fn disconnect<'a>(
         &'a self,
         field: &'a RelationFieldRef,
-        parent_id: &'a GraphqlId,
-        child_ids: &'a [GraphqlId],
+        parent_id: &'a RecordProjection,
+        child_ids: &'a [RecordProjection],
     ) -> connector::IO<()> {
         IO::new(self.catch(async move { write::disconnect(&self.inner, field, parent_id, child_ids).await }))
+    }
+
+    fn execute_raw<'a>(&'a self, query: String, parameters: Vec<PrismaValue>) -> connector::IO<serde_json::Value> {
+        IO::new(self.catch(async move { write::execute_raw(&self.inner, query, parameters).await }))
     }
 }

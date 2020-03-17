@@ -115,7 +115,7 @@ fn fail_on_duplicate_enum_value() {
     errors.assert_is(DatamodelError::new_duplicate_enum_value_error(
         "Role",
         "Moderator",
-        Span::new(57, 66),
+        Span::new(57, 67),
     ));
 }
 
@@ -160,5 +160,8 @@ fn fail_on_reserved_name_fo_custom_type() {
 
     let errors = parse_error(dml);
 
-    errors.assert_is(DatamodelError::new_reserved_scalar_type_error("Int", Span::new(10, 13)));
+    errors.assert_is(DatamodelError::new_reserved_scalar_type_error(
+        "Int",
+        Span::new(10, 13),
+    ));
 }

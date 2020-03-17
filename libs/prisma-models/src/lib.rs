@@ -11,8 +11,8 @@ mod index;
 mod internal_data_model;
 mod model;
 mod order_by;
-mod prisma_args;
 mod prisma_value_ext;
+mod projections;
 mod record;
 mod relation;
 mod selected_fields;
@@ -23,6 +23,7 @@ pub mod sql_ext;
 pub mod prelude;
 
 pub use datamodel::dml;
+pub use datamodel::DataSourceField;
 pub use datamodel_converter::*;
 pub use error::*;
 pub use field::*;
@@ -31,9 +32,8 @@ pub use index::*;
 pub use internal_data_model::*;
 pub use model::*;
 pub use order_by::*;
-pub use prisma_args::*;
-pub use prisma_args::*;
 pub use prisma_value_ext::*;
+pub use projections::*;
 pub use record::*;
 pub use relation::*;
 pub use selected_fields::*;
@@ -44,4 +44,4 @@ pub use prisma_value::*;
 #[cfg(feature = "sql-ext")]
 pub use sql_ext::*;
 
-pub type DomainResult<T> = Result<T, DomainError>;
+pub type Result<T> = std::result::Result<T, DomainError>;

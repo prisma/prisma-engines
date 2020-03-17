@@ -42,15 +42,23 @@ impl WithDocumentation for Enum {
 /// An enum value definition.
 #[derive(Debug, Clone, PartialEq)]
 pub struct EnumValue {
-    /// The name of the enum value.
-    pub name: String,
+    /// The name of the enum value as it will be exposed by the api.
+    pub name: Identifier,
+    /// The enum value as it will be stored in the database.
+    pub directives: Vec<Directive>,
     /// The location of this enum value in the text representation.
     pub span: Span,
 }
 
-impl WithName for EnumValue {
-    fn name(&self) -> &str {
+impl WithIdentifier for EnumValue {
+    fn identifier(&self) -> &Identifier {
         &self.name
+    }
+}
+
+impl WithDirectives for EnumValue {
+    fn directives(&self) -> &Vec<Directive> {
+        &self.directives
     }
 }
 

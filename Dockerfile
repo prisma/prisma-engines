@@ -1,4 +1,4 @@
-FROM rust:latest
+FROM rust:1.42.0
 MAINTAINER Julius de Bruijn <bruijn@prisma.io>
 
 ENV USER root
@@ -22,4 +22,4 @@ RUN mv target/release/migration-engine /usr/bin
 WORKDIR /
 
 RUN rm -rf /usr/src
-CMD /usr/bin/prisma
+CMD /usr/bin/prisma --host 0.0.0.0

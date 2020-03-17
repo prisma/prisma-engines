@@ -4,6 +4,7 @@ use chrono::*;
 use migration_connector::*;
 use quaint::ast::*;
 use quaint::{connector::ResultSet, prelude::SqlFamily};
+use std::convert::TryFrom;
 
 pub struct SqlMigrationPersistence<'a> {
     pub connector: &'a crate::SqlMigrationConnector,
@@ -115,15 +116,15 @@ impl MigrationPersistence for SqlMigrationPersistence<'_> {
 
         match self.sql_family() {
             SqlFamily::Sqlite | SqlFamily::Mysql => {
-                let id = self.conn().execute(insert.into()).await.unwrap();
-                match id {
-                    Some(quaint::ast::Id::Int(id)) => cloned.revision = id,
-                    _ => panic!("This insert must return an int"),
-                };
+                let result_set = self.conn().insert(insert.into()).await.unwrap();
+                let id = result_set.last_insert_id().unwrap();
+
+                cloned.revision = usize::try_from(id).unwrap();
             }
             SqlFamily::Postgres => {
                 let returning_insert = Insert::from(insert).returning(vec!["revision"]);
                 let result_set = self.conn().query(returning_insert.into()).await.unwrap();
+
                 result_set.into_iter().next().map(|row| {
                     cloned.revision = row["revision"].as_i64().unwrap() as usize;
                 });

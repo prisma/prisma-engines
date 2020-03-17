@@ -1,11 +1,8 @@
-mod from_dmmf;
 mod to_dmmf;
 
 use serde;
 use serde_json;
 
-pub use from_dmmf::parse_from_dmmf;
-pub use from_dmmf::schema_from_dmmf;
 pub use to_dmmf::render_to_dmmf;
 pub use to_dmmf::render_to_dmmf_value;
 
@@ -43,7 +40,6 @@ pub struct Field {
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct Function {
     pub name: String,
-    pub return_type: String,
     pub args: Vec<serde_json::Value>,
 }
 
@@ -59,16 +55,24 @@ pub struct Model {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub documentation: Option<String>,
     pub id_fields: Vec<String>,
+    pub unique_fields: Vec<Vec<String>>,
 }
 
 #[serde(rename_all = "camelCase")]
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct Enum {
     pub name: String,
-    pub values: Vec<String>,
+    pub values: Vec<EnumValue>,
     pub db_name: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub documentation: Option<String>,
+}
+
+#[serde(rename_all = "camelCase")]
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct EnumValue {
+    pub name: String,
+    pub db_name: Option<String>,
 }
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]

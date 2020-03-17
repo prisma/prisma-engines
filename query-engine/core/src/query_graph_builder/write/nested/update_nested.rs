@@ -1,33 +1,30 @@
-use super::write_arguments::WriteArguments;
 use super::*;
 use crate::{
     query_ast::*,
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
     InputAssertions, ParsedInputValue,
 };
-use connector::{Filter, ScalarCompare};
+use connector::{Filter, IdFilter};
 use prisma_models::{ModelRef, RelationFieldRef};
 use std::{convert::TryInto, sync::Arc};
+use write_args_parser::*;
 
-/// Handles nested update (one) cases.
-/// The graph is expanded with the `Check` and `Update` nodes.
-///
-/// (illustration simplified, `Parent` / `Read Result` exemplary)
+/// Handles nested update (single record) cases.
 ///
 /// ```text
-///    ┌──────┐
-/// ┌──│Parent│────────┐
-/// │  └──────┘        │
-/// │      │           │
-/// │      ▼           ▼
-/// │  ┌──────┐  ┌───────────┐
-/// │  │Check │  │Read result│
-/// │  └──────┘  └───────────┘
-/// │      │
-/// │      ▼
-/// │  ┌──────┐
-/// └─▶│Update│
-///    └──────┘
+///    ┌ ─ ─ ─ ─ ─ ─
+/// ┌──    Parent   │─ ─ ─ ─ ─
+/// │  └ ─ ─ ─ ─ ─ ─          │
+/// │         │
+/// │         ▼               ▼
+/// │  ┌────────────┐   ┌ ─ ─ ─ ─ ─
+/// │  │   Check    │      Result  │
+/// │  └────────────┘   └ ─ ─ ─ ─ ─
+/// │         │
+/// │         ▼
+/// │  ┌────────────┐
+/// └─▶│   Update   │
+///    └────────────┘
 /// ```
 pub fn connect_nested_update(
     graph: &mut QueryGraph,
@@ -38,16 +35,16 @@ pub fn connect_nested_update(
 ) -> QueryGraphBuilderResult<()> {
     for value in utils::coerce_vec(value) {
         let (data, filter) = if parent_relation_field.is_list {
-            // We have to have a record specified as a record finder in "where".
-            // This finder is used to read the children first, to make sure they're actually connected.
-            // The update itself operates on the ID found by the read check.
+            // We have to have a single record filter in "where".
+            // This is used to read the children first, to make sure they're actually connected.
+            // The update itself operates on the record found by the read check.
             let mut map: ParsedInputMap = value.try_into()?;
             let where_arg: ParsedInputMap = map.remove("where").unwrap().try_into()?;
 
             where_arg.assert_size(1)?;
             where_arg.assert_non_null()?;
 
-            let filter = extract_filter(where_arg, &child_model, false)?;
+            let filter = extract_unique_filter(where_arg, &child_model)?;
             let data_value = map.remove("data").unwrap();
 
             (data_value, filter)
@@ -60,25 +57,29 @@ pub fn connect_nested_update(
 
         let update_node =
             update::update_record_node(graph, Filter::empty(), Arc::clone(child_model), data.try_into()?)?;
-        let id_field = child_model.fields().id();
+
+        let child_model_identifier = parent_relation_field.related_model().primary_identifier();
 
         graph.create_edge(
             &find_child_records_node,
             &update_node,
-            QueryGraphDependency::ParentIds(Box::new(move |mut node, mut parent_ids| {
-                let parent_id = match parent_ids.pop() {
-                    Some(pid) => Ok(pid),
-                    None => Err(QueryGraphBuilderError::AssertionError(format!(
-                        "Expected a valid parent ID to be present for nested update to-one case."
-                    ))),
-                }?;
+            QueryGraphDependency::ParentProjection(
+                child_model_identifier.clone(),
+                Box::new(move |mut update_node, mut child_ids| {
+                    let child_id = match child_ids.pop() {
+                        Some(pid) => Ok(pid),
+                        None => Err(QueryGraphBuilderError::AssertionError(format!(
+                            "Expected a valid parent ID to be present for nested update to-one case."
+                        ))),
+                    }?;
 
-                if let Node::Query(Query::Write(WriteQuery::UpdateRecord(ref mut ur))) = node {
-                    ur.add_filter(id_field.equals(parent_id));
-                }
+                    if let Node::Query(Query::Write(WriteQuery::UpdateRecord(ref mut ur))) = update_node {
+                        ur.add_filter(child_id.filter());
+                    }
 
-                Ok(node)
-            })),
+                    Ok(update_node)
+                }),
+            ),
         )?;
     }
 
@@ -98,14 +99,14 @@ pub fn connect_nested_update_many(
         let data_value = map.remove("data").unwrap();
         let data_map: ParsedInputMap = data_value.try_into()?;
         let where_map: ParsedInputMap = where_arg.try_into()?;
+        let child_model_identifier = parent_relation_field.related_model().primary_identifier();
 
-        let filter = extract_filter(where_map, child_model, true)?;
-        let update_args = WriteArguments::from(&child_model, data_map)?;
+        let filter = extract_filter(where_map, child_model)?;
+        let update_args = WriteArgsParser::from(&child_model, data_map)?;
 
         let find_child_records_node =
             utils::insert_find_children_by_parent_node(graph, parent, parent_relation_field, filter.clone())?;
 
-        // TODO: this looks like some duplication from write/update.rs
         let update_many = WriteQuery::UpdateManyRecords(UpdateManyRecords {
             model: Arc::clone(&child_model),
             filter,
@@ -113,21 +114,20 @@ pub fn connect_nested_update_many(
         });
 
         let update_many_node = graph.create_node(Query::Write(update_many));
-        let id_field = child_model.fields().id();
 
         graph.create_edge(
             &find_child_records_node,
             &update_many_node,
-            QueryGraphDependency::ParentIds(Box::new(move |mut node, parent_ids| {
-                if let Node::Query(Query::Write(WriteQuery::UpdateManyRecords(ref mut ur))) = node {
-                    let ids_filter = id_field.is_in(parent_ids);
-                    let new_filter = Filter::and(vec![ur.filter.clone(), ids_filter]);
+            QueryGraphDependency::ParentProjection(
+                child_model_identifier.clone(),
+                Box::new(move |mut update_many_node, child_ids| {
+                    if let Node::Query(Query::Write(WriteQuery::UpdateManyRecords(ref mut ur))) = update_many_node {
+                        ur.set_filter(Filter::and(vec![ur.filter.clone(), child_ids.filter()]));
+                    }
 
-                    ur.filter = new_filter;
-                }
-
-                Ok(node)
-            })),
+                    Ok(update_many_node)
+                }),
+            ),
         )?;
     }
 

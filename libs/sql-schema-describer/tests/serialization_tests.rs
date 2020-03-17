@@ -40,7 +40,7 @@ fn database_schema_is_serializable() {
                             family: ColumnTypeFamily::String,
                             arity: ColumnArity::Nullable,
                         },
-                        default: Some("default value".to_string()),
+                        default: Some(DefaultValue::VALUE("default value".to_string())),
                         auto_increment: false,
                     },
                     Column {
@@ -102,7 +102,8 @@ fn database_schema_is_serializable() {
         }],
     };
     let ref_schema_json = include_str!("./resources/schema.json");
-    let ref_schema: SqlSchema = serde_json::from_str(ref_schema_json).expect("deserialize reference schema");
+    let ref_schema: SqlSchema =
+        serde_json::from_str(ref_schema_json).expect("deserialize reference schema");
 
     let schema_json = serde_json::to_string(&schema).expect("serialize schema to JSON");
     let schema_deser: SqlSchema = serde_json::from_str(&schema_json).expect("deserialize schema");
@@ -136,7 +137,8 @@ fn database_schema_without_primary_key_is_serializable() {
         sequences: vec![],
     };
     let ref_schema_json = include_str!("./resources/schema-without-primary-key.json");
-    let ref_schema: SqlSchema = serde_json::from_str(ref_schema_json).expect("deserialize reference schema");
+    let ref_schema: SqlSchema =
+        serde_json::from_str(ref_schema_json).expect("deserialize reference schema");
 
     let schema_json = serde_json::to_string(&schema).expect("serialize schema to JSON");
     let schema_deser: SqlSchema = serde_json::from_str(&schema_json).expect("deserialize schema");
@@ -189,7 +191,8 @@ fn database_schema_is_serializable_for_every_column_type_family() {
         sequences: vec![],
     };
     let ref_schema_json = include_str!("./resources/schema-all-column-type-families.json");
-    let ref_schema: SqlSchema = serde_json::from_str(ref_schema_json).expect("deserialize reference schema");
+    let ref_schema: SqlSchema =
+        serde_json::from_str(ref_schema_json).expect("deserialize reference schema");
 
     let schema_json = serde_json::to_string(&schema).expect("serialize schema to JSON");
     let schema_deser: SqlSchema = serde_json::from_str(&schema_json).expect("deserialize schema");
@@ -203,20 +206,24 @@ fn database_schema_is_serializable_for_every_column_type_family() {
 #[test]
 fn database_schema_is_serializable_for_every_column_arity() {
     // Add a column of every arity
-    let mut columns: Vec<Column> = vec![ColumnArity::Required, ColumnArity::Nullable, ColumnArity::List]
-        .iter()
-        .enumerate()
-        .map(|(i, arity)| Column {
-            name: format!("column{}", i + 1),
-            tpe: ColumnType {
-                raw: "int".to_string(),
-                family: ColumnTypeFamily::Int,
-                arity: arity.to_owned(),
-            },
-            default: None,
-            auto_increment: false,
-        })
-        .collect();
+    let mut columns: Vec<Column> = vec![
+        ColumnArity::Required,
+        ColumnArity::Nullable,
+        ColumnArity::List,
+    ]
+    .iter()
+    .enumerate()
+    .map(|(i, arity)| Column {
+        name: format!("column{}", i + 1),
+        tpe: ColumnType {
+            raw: "int".to_string(),
+            family: ColumnTypeFamily::Int,
+            arity: arity.to_owned(),
+        },
+        default: None,
+        auto_increment: false,
+    })
+    .collect();
     let schema = SqlSchema {
         tables: vec![Table {
             name: "table1".to_string(),
@@ -229,7 +236,8 @@ fn database_schema_is_serializable_for_every_column_arity() {
         sequences: vec![],
     };
     let ref_schema_json = include_str!("./resources/schema-all-column-arities.json");
-    let ref_schema: SqlSchema = serde_json::from_str(ref_schema_json).expect("deserialize reference schema");
+    let ref_schema: SqlSchema =
+        serde_json::from_str(ref_schema_json).expect("deserialize reference schema");
 
     let schema_json = serde_json::to_string(&schema).expect("serialize schema to JSON");
     let schema_deser: SqlSchema = serde_json::from_str(&schema_json).expect("deserialize schema");
@@ -342,7 +350,8 @@ fn database_schema_is_serializable_for_every_foreign_key_action() {
         sequences: vec![],
     };
     let ref_schema_json = include_str!("./resources/schema-all-foreign-key-actions.json");
-    let ref_schema: SqlSchema = serde_json::from_str(ref_schema_json).expect("deserialize reference schema");
+    let ref_schema: SqlSchema =
+        serde_json::from_str(ref_schema_json).expect("deserialize reference schema");
 
     let schema_json = serde_json::to_string(&schema).expect("serialize schema to JSON");
     let schema_deser: SqlSchema = serde_json::from_str(&schema_json).expect("deserialize schema");

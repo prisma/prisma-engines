@@ -74,7 +74,8 @@ async fn creating_a_field_for_an_existing_column_with_a_compatible_type_must_wor
         .execute(move |migration| {
             migration.create_table("Blog", move |t| {
                 t.add_column("id", types::primary());
-                // We add a default because the migration engine always adds defaults to facilitate migration of required columns.
+                // We add a default because the migration engine always adds defaults to facilitate
+                // migration of required columns.
                 t.add_column(
                     "title",
                     if is_mysql {
@@ -160,7 +161,7 @@ async fn creating_a_field_for_an_existing_column_and_simultaneously_making_it_op
     Ok(())
 }
 
-#[test_one_connector(connector = "postgres")]
+#[test_each_connector(capabilities("scalar_lists"))]
 async fn creating_a_scalar_list_field_for_an_existing_table_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
             datasource pg {
@@ -202,7 +203,7 @@ async fn creating_a_scalar_list_field_for_an_existing_table_must_work(api: &Test
     Ok(())
 }
 
-#[test_each_connector]
+#[test_each_connector(tags("sql"))]
 async fn delete_a_field_for_a_non_existent_column_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
             model Blog {
@@ -236,7 +237,7 @@ async fn delete_a_field_for_a_non_existent_column_must_work(api: &TestApi) -> Te
     Ok(())
 }
 
-#[test_one_connector(connector = "postgres")]
+#[test_each_connector(tags("sql"), capabilities("scalar_lists"))]
 async fn deleting_a_scalar_list_field_for_a_non_existent_column_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
             datasource pg {
@@ -250,15 +251,13 @@ async fn deleting_a_scalar_list_field_for_a_non_existent_column_must_work(api: &
             }
         "#;
 
-    let _ = api.infer_and_apply(&dm1).await.sql_schema;
+    api.infer_apply(&dm1).send_assert().await?.assert_green()?;
 
     let result = api
         .barrel()
         .execute(|migration| {
-            // sqlite does not support dropping columns. So we are emulating it..
-            migration.drop_table("Blog");
-            migration.create_table("Blog", |t| {
-                t.add_column("id", types::primary());
+            migration.change_table("Blog", |t| {
+                t.drop_column("tags");
             });
         })
         .await?;
@@ -273,13 +272,15 @@ async fn deleting_a_scalar_list_field_for_a_non_existent_column_must_work(api: &
                 id Int @id
             }
         "#;
-    let final_result = api.infer_and_apply(&dm2).await.sql_schema;
-    assert_eq!(result, final_result);
+
+    api.infer_apply(&dm2).send_assert().await?.assert_green()?;
+
+    api.assert_schema().await?.assert_equals(&result)?;
 
     Ok(())
 }
 
-#[test_each_connector]
+#[test_each_connector(tags("sql"))]
 async fn updating_a_field_for_a_non_existent_column(api: &TestApi) -> TestResult {
     let dm1 = r#"
             model Blog {

@@ -1,7 +1,7 @@
 use crate::filter::Filter;
 use failure::{Error, Fail};
 use prisma_models::prelude::DomainError;
-use user_facing_errors::KnownError;
+use user_facing_errors::{query_engine::DatabaseConstraint, KnownError};
 
 #[derive(Debug, Fail)]
 #[fail(display = "{}", kind)]
@@ -23,11 +23,14 @@ impl ConnectorError {
 
 #[derive(Debug, Fail)]
 pub enum ErrorKind {
-    #[fail(display = "Unique constraint failed: {}", field_name)]
-    UniqueConstraintViolation { field_name: String },
+    #[fail(display = "Unique constraint failed: {}", constraint)]
+    UniqueConstraintViolation { constraint: DatabaseConstraint },
 
-    #[fail(display = "Null constraint failed: {}", field_name)]
-    NullConstraintViolation { field_name: String },
+    #[fail(display = "Null constraint failed: {}", constraint)]
+    NullConstraintViolation { constraint: DatabaseConstraint },
+
+    #[fail(display = "Foreign key constraint failed")]
+    ForeignKeyConstraintViolation { constraint: DatabaseConstraint },
 
     #[fail(display = "Record does not exist.")]
     RecordDoesNotExist,
@@ -53,7 +56,7 @@ pub enum ErrorKind {
     #[fail(display = "{}", _0)]
     DomainError(DomainError),
 
-    #[fail(display = "Record not found: {}", _0)]
+    #[fail(display = "Record not found: {:?}", _0)]
     RecordNotFoundForWhere(Filter),
 
     #[fail(
@@ -93,6 +96,9 @@ pub enum ErrorKind {
 
     #[fail(display = "Authentication failed for user '{}'", user)]
     AuthenticationFailed { user: String },
+
+    #[fail(display = "Database error. error code: {}, error message: {}", code, message)]
+    RawError { code: String, message: String },
 }
 
 impl From<DomainError> for ConnectorError {

@@ -1,3 +1,4 @@
+use crate::commenting_out_guardrails::commenting_out_guardrails;
 use crate::misc_helpers::*;
 use crate::sanitize_datamodel_names::sanitize_datamodel_names;
 use crate::SqlIntrospectionResult;
@@ -24,23 +25,40 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
             .iter()
             .filter(|column| !is_foreign_key_column(&table, &column))
         {
-            let field = calculate_scalar_field(&schema, &table, &column);
+            let field = calculate_scalar_field(&schema, &table, &column, None);
             model.add_field(field);
         }
 
         for foreign_key in &table.foreign_keys {
-            let field = calculate_relation_field(schema, table, foreign_key);
-            model.add_field(field);
+            let mut fields = calculate_relation_field(schema, table, foreign_key, &table.foreign_keys);
+            model.add_fields(&mut fields);
         }
 
         for index in &table.indices {
-            let fk_on_index = table.foreign_keys.iter().find(|fk| fk.columns == index.columns);
+            let fk_on_index = table
+                .foreign_keys
+                .iter()
+                .find(|fk| columns_match(&fk.columns, &index.columns));
+
+            // This is part of the temporary guardrail that makes us ignore relations that overlap
+            // with the primary key.
+            let fk_on_index_overlaps_with_pk: bool = table
+                .primary_key
+                .as_ref()
+                .and_then(|pk| fk_on_index.as_ref().map(|fk| (pk, fk)))
+                .map(|(pk, fk)| {
+                    pk.columns
+                        .iter()
+                        .any(|pk_col| fk.columns.iter().any(|fk_col| pk_col == fk_col))
+                })
+                .unwrap_or(false);
+
             let compound_field_name = || {
                 model
                     .fields
                     .iter()
-                    .find(|f| !f.database_names.is_empty() && f.database_names == index.columns.clone())
-                    .unwrap()
+                    .find(|f| !f.database_names.is_empty() && columns_match(&f.database_names, &index.columns))
+                    .expect("Error finding field matching a compound index.")
                     .name
                     .clone()
             };
@@ -48,7 +66,10 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
             let index_to_add = match (fk_on_index, index.columns.len(), index.is_unique()) {
                 (Some(_), _, true) => None, // just make the relation 1:1 and dont print the unique index
                 (Some(_), 1, false) => Some(calculate_index(index)),
-                (Some(_), _, false) => Some(calculate_compound_index(index, compound_field_name())),
+                (Some(_), _, false) if !fk_on_index_overlaps_with_pk => {
+                    Some(calculate_compound_index(index, compound_field_name()))
+                }
+                (Some(_), _, false) => Some(calculate_index(index)),
                 (None, 1, true) => None, // this is expressed by the @unique already
                 (None, _, true) => Some(calculate_index(index)),
                 (None, _, false) => Some(calculate_index(index)),
@@ -65,11 +86,9 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
     }
 
     for e in schema.enums.iter() {
-        let mut values: Vec<String> = e.values.iter().cloned().collect();
-        values.sort_unstable();
         data_model.add_enum(dml::Enum {
             name: e.name.clone(),
-            values,
+            values: e.values.iter().map(|v| dml::EnumValue::new(v, None)).collect(),
             database_name: None,
             documentation: None,
         });
@@ -91,7 +110,7 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
                     .is_none()
                 {
                     let other_model = data_model.find_model(relation_info.to.as_str()).unwrap();
-                    let field = calculate_backrelation_field(schema, &model, &relation_field, relation_info);
+                    let field = calculate_backrelation_field(schema, model, other_model, relation_field, relation_info);
 
                     fields_to_be_added.push((other_model.name.clone(), field));
                 }
@@ -122,8 +141,18 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
         model.add_field(field);
     }
 
-    let final_datamodel = sanitize_datamodel_names(data_model);
-    debug!("Done calculating data model {:?}", final_datamodel);
+    sanitize_datamodel_names(&mut data_model);
+    commenting_out_guardrails(&mut data_model);
+    debug!("Done calculating data model {:?}", data_model);
 
-    Ok(final_datamodel)
+    Ok(data_model)
+}
+
+/// Returns whether the elements of the two slices match, regardless of ordering.
+fn columns_match(a_cols: &[String], b_cols: &[String]) -> bool {
+    if a_cols.len() != b_cols.len() {
+        return false;
+    }
+
+    a_cols.iter().all(|a_col| b_cols.iter().any(|b_col| a_col == b_col))
 }

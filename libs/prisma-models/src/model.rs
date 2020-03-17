@@ -4,7 +4,6 @@ use std::{
     hash::{Hash, Hasher},
     sync::{Arc, Weak},
 };
-use uuid::Uuid;
 
 pub type ModelRef = Arc<Model>;
 pub type ModelWeakRef = Weak<Model>;
@@ -15,6 +14,7 @@ pub struct ModelTemplate {
     pub is_embedded: bool,
     pub fields: Vec<FieldTemplate>,
     pub manifestation: Option<String>,
+    pub id_field_names: Vec<String>,
     pub indexes: Vec<IndexTemplate>,
 }
 
@@ -48,9 +48,10 @@ impl ModelTemplate {
                 .map(|fi| fi.build(Arc::downgrade(&model)))
                 .collect(),
             Arc::downgrade(&model),
+            self.id_field_names,
         );
 
-        let indexes = self.indexes.into_iter().map(|i| i.build(&fields.scalar())).collect();
+        let indexes = self.indexes.into_iter().map(|i| i.build(&fields.all)).collect();
 
         // The model is created here and fields WILL BE UNSET before now!
         model.fields.set(fields).unwrap();
@@ -75,20 +76,39 @@ impl PartialEq for Model {
 }
 
 impl Model {
-    pub fn generate_id(&self) -> GraphqlId {
-        match self.fields().id().type_identifier {
-            // This will panic when:
-            //
-            // - System time goes backwards
-            // - There is an error generating a fingerprint
-            // - Time cannot be converted to a string.
-            //
-            // Panic is a better choice than bubbling this up
-            TypeIdentifier::GraphQLID => GraphqlId::String(cuid::cuid().unwrap()),
-            TypeIdentifier::UUID => GraphqlId::UUID(Uuid::new_v4()),
-            TypeIdentifier::Int => panic!("Cannot generate integer ids."),
-            t => panic!("You shouldn't even use ids of type {:?}", t),
-        }
+    /// Returns the set of fields to be used as the primary identifier for a record of that model.
+    /// The identifier is nothing but an internal convention to have an anchor point for querying, or in other words,
+    /// the identifier is not to be mistaken for a stable, external identifier, but has to be understood as
+    /// implementation detail that is used to reason over a fixed set of fields.
+    ///
+    /// The rules for determining the primary identifier are as follows:
+    /// 1. If an ID definition (single or multi-part doesn't matter) is present, take that one.
+    /// 2. If no ID definition is found, take the first scalar unique found that is required.
+    /// 3. If no scalar unique is found, take the first compound unique found. All fields must be required.
+    /// 4. If all of the above fails, we panic. Models with no unique / ID are not supported (yet).
+    pub fn primary_identifier(&self) -> ModelProjection {
+        let fields: Vec<_> = self
+            .fields()
+            .id()
+            .or_else(|| {
+                self.fields()
+                    .scalar()
+                    .into_iter()
+                    .find(|sf| sf.is_unique && sf.is_required)
+                    .map(|x| vec![Field::Scalar(x)])
+            })
+            .or_else(|| {
+                self.unique_indexes()
+                    .into_iter()
+                    .find(|index| index.fields().into_iter().all(|f| f.is_required()))
+                    .map(|index| index.fields().into_iter().collect())
+            })
+            .expect(&format!(
+                "Unable to resolve a primary identifier for model {}.",
+                self.name
+            ));
+
+        ModelProjection::new(fields.into_iter().map(Into::into).collect())
     }
 
     pub fn fields(&self) -> &Fields {
@@ -128,5 +148,15 @@ impl Model {
         self.internal_data_model
             .upgrade()
             .expect("InternalDataModel does not exist anymore. Parent internal_data_model is deleted without deleting the child internal_data_model.")
+    }
+
+    pub fn map_scalar_db_field_name(&self, name: &str) -> Option<ScalarFieldRef> {
+        self.fields().scalar().into_iter().find_map(|field| {
+            if field.data_source_field().name == name {
+                Some(field)
+            } else {
+                None
+            }
+        })
     }
 }

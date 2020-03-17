@@ -1,0 +1,59 @@
+{
+  "enums": [],
+  "models": [
+    {
+      "name": "User",
+      "isEmbedded": false,
+      "dbName": null,
+      "fields": [
+        {
+          "name": "id",
+          "kind": "scalar",
+          "dbNames": [],
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": true,
+          "type": "Int",
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "createdAt",
+          "kind": "scalar",
+          "dbNames": [],
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": false,
+          "type": "DateTime",
+          "default": {
+            "name": "now",
+            "args": []
+          },
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "someId",
+          "kind": "scalar",
+          "dbNames": [],
+          "isList": false,
+          "isRequired": true,
+          "isUnique": true,
+          "isId": false,
+          "type": "String",
+          "default": {
+            "name": "cuid",
+            "args": []
+          },
+          "isGenerated": false,
+          "isUpdatedAt": false
+        }
+      ],
+      "isGenerated": false,
+      "idFields": [],
+      "uniqueFields": []
+    }
+  ]
+}

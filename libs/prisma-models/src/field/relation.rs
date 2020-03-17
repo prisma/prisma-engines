@@ -1,38 +1,44 @@
-use super::FieldManifestation;
+use super::DataSourceField;
 use crate::prelude::*;
-use datamodel::FieldArity;
+use datamodel::{FieldArity, RelationInfo};
 use once_cell::sync::OnceCell;
 use std::{
     hash::{Hash, Hasher},
     sync::{Arc, Weak},
 };
 
+/// A short-hand for `Arc<RelationField>`
 pub type RelationFieldRef = Arc<RelationField>;
+
+/// A short-hand for `Weak<RelationField>`
 pub type RelationFieldWeak = Weak<RelationField>;
 
 #[derive(Debug)]
 pub struct RelationFieldTemplate {
     pub name: String,
-    pub type_identifier: TypeIdentifier,
+    pub is_id: bool,
     pub is_required: bool,
     pub is_list: bool,
     pub is_unique: bool,
     pub is_auto_generated_int_id: bool,
-    pub manifestation: Option<FieldManifestation>,
     pub relation_name: String,
     pub relation_side: RelationSide,
+    pub data_source_fields: Vec<dml::DataSourceField>,
+    pub relation_info: RelationInfo,
 }
 
-#[derive(DebugStub)]
+#[derive(DebugStub, Clone)]
 pub struct RelationField {
     pub name: String,
-    pub type_identifier: TypeIdentifier,
+    pub is_id: bool,
     pub is_required: bool,
     pub is_list: bool,
     pub is_auto_generated_int_id: bool,
     pub relation_name: String,
     pub relation_side: RelationSide,
     pub relation: OnceCell<RelationWeakRef>,
+    pub data_source_fields: OnceCell<Vec<DataSourceFieldRef>>,
+    pub relation_info: RelationInfo,
 
     #[debug_stub = "#ModelWeakRef#"]
     pub model: ModelWeakRef,
@@ -45,7 +51,6 @@ impl Eq for RelationField {}
 impl Hash for RelationField {
     fn hash<H: Hasher>(&self, state: &mut H) {
         self.name.hash(state);
-        self.type_identifier.hash(state);
         self.is_required.hash(state);
         self.is_list.hash(state);
         self.is_auto_generated_int_id.hash(state);
@@ -59,7 +64,6 @@ impl Hash for RelationField {
 impl PartialEq for RelationField {
     fn eq(&self, other: &Self) -> bool {
         self.name == other.name
-            && self.type_identifier == other.type_identifier
             && self.is_required == other.is_required
             && self.is_list == other.is_list
             && self.is_auto_generated_int_id == other.is_auto_generated_int_id
@@ -93,7 +97,73 @@ impl RelationSide {
     }
 }
 
+impl RelationFieldTemplate {
+    pub fn build(self, model: ModelWeakRef) -> RelationFieldRef {
+        let relation = RelationField {
+            name: self.name,
+            is_id: self.is_id,
+            is_required: self.is_required,
+            is_list: self.is_list,
+            is_auto_generated_int_id: self.is_auto_generated_int_id,
+            is_unique: self.is_unique,
+            relation_name: self.relation_name,
+            relation_side: self.relation_side,
+            model,
+            relation: OnceCell::new(),
+            data_source_fields: OnceCell::new(),
+            relation_info: self.relation_info,
+        };
+
+        let arc = Arc::new(relation);
+        let fields: Vec<_> = self
+            .data_source_fields
+            .into_iter()
+            .map(|dsf| Arc::new(DataSourceField::new(dsf, FieldWeak::from(&arc))))
+            .collect();
+
+        arc.data_source_fields.set(fields).unwrap();
+        arc
+    }
+}
+
 impl RelationField {
+    /// Returns the `ModelProjection` used for this relation fields model.
+    ///
+    /// ## What is the model projection of a relation field?
+    /// The set of fields required by the relation (**on the model of the relation field**) to be able to link the related records.
+    ///
+    /// In case of a many-to-many relation field, we can make the assumption that the primary identifier of the enclosing model
+    /// is the set of linking fields, as this is how Prisma many-to-many works and we only support implicit join tables (i.e. m:n)
+    /// in the Prisma style.
+    pub fn linking_fields(&self) -> ModelProjection {
+        if self.relation().is_many_to_many() {
+            self.model().primary_identifier()
+        } else if self.relation_info.to_fields.is_empty() {
+            let related_field = self.related_field();
+            let model = self.model();
+            let fields = model.fields();
+
+            let to_fields: Vec<_> = related_field
+                .relation_info
+                .to_fields
+                .iter()
+                .map(|field_name| {
+                    fields
+                        .find_from_all(field_name)
+                        .expect(&format!(
+                            "Invalid data model: To field {} can't be resolved on model {}",
+                            field_name, model.name
+                        ))
+                        .clone()
+                })
+                .collect();
+
+            ModelProjection::new(to_fields)
+        } else {
+            ModelProjection::new(vec![Arc::new(self.clone()).into()])
+        }
+    }
+
     pub fn is_optional(&self) -> bool {
         !self.is_required
     }
@@ -103,9 +173,9 @@ impl RelationField {
     }
 
     pub fn model(&self) -> ModelRef {
-        self.model
-            .upgrade()
-            .expect("Model does not exist anymore. Parent model got deleted without deleting the child.")
+        self.model.upgrade().expect(
+            "Model does not exist anymore. Parent model got deleted without deleting the child.",
+        )
     }
 
     pub fn relation(&self) -> RelationRef {
@@ -120,25 +190,9 @@ impl RelationField {
             .unwrap()
     }
 
-    pub fn db_name(&self) -> String {
-        let relation = self.relation();
-
-        match relation.manifestation {
-            RelationLinkManifestation::Inline(ref m) => {
-                let is_self_rel = relation.is_self_relation();
-
-                if is_self_rel && self.relation_side == RelationSide::B {
-                    m.referencing_column.clone()
-                } else if is_self_rel && self.relation_side == RelationSide::A {
-                    self.name.clone()
-                } else if m.in_table_of_model_name == self.model().name {
-                    m.referencing_column.clone()
-                } else {
-                    self.name.clone()
-                }
-            }
-            _ => self.name.clone(),
-        }
+    /// Alias for more clarity (in most cases, doesn't add more clarity for self-relations);
+    pub fn is_inlined_on_enclosing_model(&self) -> bool {
+        self.relation_is_inlined_in_parent()
     }
 
     /// Inlined in self / model of self
@@ -149,10 +203,8 @@ impl RelationField {
             RelationLinkManifestation::Inline(ref m) => {
                 let is_self_rel = relation.is_self_relation();
 
-                if is_self_rel && self.relation_side == RelationSide::B {
-                    true
-                } else if is_self_rel && self.relation_side == RelationSide::A {
-                    false
+                if is_self_rel {
+                    !self.relation_info.to_fields.is_empty()
                 } else {
                     m.in_table_of_model_name == self.model().name
                 }
@@ -183,13 +235,23 @@ impl RelationField {
         self.relation().name == relation_name && self.relation_side == side
     }
 
-    pub fn type_identifier_with_arity(&self) -> (TypeIdentifier, FieldArity) {
-        let arity = match (self.is_list, self.is_required) {
-            (true, _) => FieldArity::List,
-            (false, true) => FieldArity::Required,
-            (false, false) => FieldArity::Optional,
-        };
+    pub fn data_source_fields(&self) -> &[DataSourceFieldRef] {
+        self.data_source_fields
+            .get()
+            .ok_or_else(|| String::from("Data source fields must be set!"))
+            .unwrap()
+    }
 
-        (self.type_identifier, arity)
+    pub fn type_identifiers_with_arities(&self) -> Vec<(TypeIdentifier, FieldArity)> {
+        self.data_source_fields()
+            .iter()
+            .map(|dsf| (dsf.field_type.into(), dsf.arity))
+            .collect()
+    }
+
+    pub fn db_names(&self) -> impl Iterator<Item = &str> {
+        self.data_source_fields()
+            .into_iter()
+            .map(|dsf| dsf.name.as_str())
     }
 }

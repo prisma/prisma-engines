@@ -47,7 +47,8 @@ impl<'a> ApplyMigrationCommand<'a> {
         let migration_persistence = connector.migration_persistence();
 
         let current_datamodel_ast = migration_persistence.current_datamodel_ast().await?;
-        let current_datamodel = datamodel::lift_ast(&current_datamodel_ast)?;
+        let current_datamodel =
+            datamodel::lift_ast(&current_datamodel_ast).map_err(CommandError::ProducedBadDatamodel)?;
 
         let last_non_watch_datamodel = migration_persistence
             .last_non_watch_migration()
@@ -77,16 +78,15 @@ impl<'a> ApplyMigrationCommand<'a> {
             .migration_is_already_applied(&self.input.migration_id)
             .await?
         {
-            return Err(CommandError::Input {
-                error: format!(
-                    "Invariant violation: the migration with id `{migration_id}` has already been applied.",
-                    migration_id = self.input.migration_id
-                ),
-            });
+            return Err(CommandError::Input(anyhow::anyhow!(
+                "Invariant violation: the migration with id `{migration_id}` has already been applied.",
+                migration_id = self.input.migration_id
+            )));
         }
 
         let current_datamodel_ast = migration_persistence.current_datamodel_ast().await?;
-        let current_datamodel = datamodel::lift_ast(&current_datamodel_ast)?;
+        let current_datamodel =
+            datamodel::lift_ast(&current_datamodel_ast).map_err(CommandError::ProducedBadDatamodel)?;
 
         let next_datamodel_ast = engine
             .datamodel_calculator()
@@ -107,24 +107,27 @@ impl<'a> ApplyMigrationCommand<'a> {
         D: DatabaseMigrationMarker + Send + Sync + 'static,
     {
         let connector = engine.connector();
-        let next_datamodel = datamodel::lift_ast(&next_schema_ast)?;
+        let next_datamodel = datamodel::lift_ast(&next_schema_ast).map_err(CommandError::ProducedBadDatamodel)?;
         let migration_persistence = connector.migration_persistence();
 
         let database_migration = connector
             .database_migration_inferrer()
             .infer(&current_datamodel, &next_datamodel, &self.input.steps)
-            .await?; // TODO: those steps are a lie right now. Does not matter because we don't use them at the moment.
+            .await?;
 
         let database_steps_json_pretty = connector
             .database_migration_step_applier()
             .render_steps_pretty(&database_migration)?;
+
+        tracing::trace!(?database_steps_json_pretty);
 
         let database_migration_json = database_migration.serialize();
 
         let mut migration = Migration::new(self.input.migration_id.clone());
         migration.datamodel_steps = self.input.steps.clone();
         migration.database_migration = database_migration_json;
-        migration.datamodel_string = datamodel::render_schema_ast_to_string(&next_schema_ast)?;
+        migration.datamodel_string =
+            datamodel::render_schema_ast_to_string(&next_schema_ast).map_err(CommandError::ProducedBadDatamodel)?;
 
         let diagnostics = connector
             .destructive_changes_checker()

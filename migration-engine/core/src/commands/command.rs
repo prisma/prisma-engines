@@ -20,36 +20,25 @@ pub type CommandResult<T> = Result<T, CommandError>;
 
 #[derive(Debug, Error)]
 pub enum CommandError {
-    #[error("Errors in datamodel. (errors: {:?})", errors)]
-    DataModelErrors { errors: Vec<String> },
+    /// When there was a bad datamodel as part of the input.
+    #[error("{0}")]
+    ReceivedBadDatamodel(String),
 
-    #[error("Initialization error. (error: {})", error)]
-    InitializationError { error: String },
+    /// When a datamodel from a generated AST is wrong. This is basically an internal error.
+    #[error("The migration produced an invalid schema ({0:?})")]
+    ProducedBadDatamodel(datamodel::error::ErrorCollection),
+
+    #[error("Initialization error. (error: {0})")]
+    InitializationError(anyhow::Error),
 
     #[error("Connector error. (error: {0})")]
     ConnectorError(ConnectorError),
 
-    #[error("Generic error. (error: {})", error)]
-    Generic { error: String },
+    #[error("Generic error. (error: {0})")]
+    Generic(anyhow::Error),
 
-    #[error("Error in command input. (error: {})", error)]
-    Input { error: String },
-}
-
-impl From<datamodel::error::ErrorCollection> for CommandError {
-    fn from(errors: datamodel::error::ErrorCollection) -> CommandError {
-        let errors_str = errors
-            .errors
-            .into_iter()
-            .map(|e| {
-                // let mut msg: Vec<u8> = Vec::new();
-                // e.pretty_print(&mut msg, "datamodel", "bla").unwrap();
-                // std::str::from_utf8(&msg).unwrap().to_string()
-                format!("{}", e)
-            })
-            .collect();
-        CommandError::DataModelErrors { errors: errors_str }
-    }
+    #[error("Error in command input. (error: {0})")]
+    Input(anyhow::Error),
 }
 
 impl From<migration_connector::ConnectorError> for CommandError {
@@ -60,8 +49,30 @@ impl From<migration_connector::ConnectorError> for CommandError {
 
 impl From<CalculatorError> for CommandError {
     fn from(error: CalculatorError) -> Self {
-        CommandError::Generic {
-            error: format!("{}", error),
-        }
+        CommandError::Generic(error.into())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn command_error_produced_bad_datamodel_is_intelligible() {
+        let bad_dml = r#"
+            model Test {
+                id Float @id
+                post Post[]
+            }
+        "#;
+
+        let err = datamodel::parse_datamodel(bad_dml)
+            .map_err(CommandError::ProducedBadDatamodel)
+            .unwrap_err();
+
+        assert_eq!(
+            err.to_string(),
+            "The migration produced an invalid schema (ErrorCollection { errors: [TypeNotFoundError { type_name: \"Post\", span: Span { start: 76, end: 82 } }] })"
+        )
     }
 }

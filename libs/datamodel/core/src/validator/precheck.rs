@@ -71,7 +71,7 @@ impl Precheck {
         let mut checker = DuplicateChecker::new();
         for value in &enum_type.values {
             checker.check_if_duplicate_exists(value, |_| {
-                DatamodelError::new_duplicate_enum_value_error(&enum_type.name.name, &value.name, value.span)
+                DatamodelError::new_duplicate_enum_value_error(&enum_type.name.name, &value.name.name, value.span)
             });
         }
         errors.append(&mut checker.errors());

@@ -1,53 +1,182 @@
-use failure::{Error, Fail};
 use introspection_connector::{ConnectorError, ErrorKind};
-use quaint::{error::Error as QuaintError, prelude::ConnectionInfo};
-use user_facing_errors::KnownError;
+use quaint::error::{Error as QuaintError, ErrorKind as QuaintKind};
+use thiserror::Error;
+use user_facing_errors::{quaint::render_quaint_error, query_engine::DatabaseConstraint};
 
-#[derive(Debug, Fail)]
-pub enum SqlIntrospectionError {
-    #[fail(display = "Couldn't parse the connection string because of: {}", message)]
-    InvalidUrl { message: String },
-    #[fail(display = "{}", _0)]
-    Generic(Error),
-    #[fail(display = "{}", _0)]
-    Quaint(QuaintError),
+pub type SqlResult<T> = Result<T, SqlError>;
+
+#[derive(Debug, Error)]
+pub enum SqlError {
+    #[error("{0}")]
+    Generic(#[source] anyhow::Error),
+
+    #[error("Error connecting to the database {cause}")]
+    ConnectionError {
+        #[source]
+        cause: QuaintKind,
+    },
+
+    #[error("Error querying the database: {}", _0)]
+    QueryError(#[source] anyhow::Error),
+
+    #[error("Database '{}' does not exist", db_name)]
+    DatabaseDoesNotExist {
+        db_name: String,
+        #[source]
+        cause: QuaintKind,
+    },
+
+    #[error("Access denied to database '{}'", db_name)]
+    DatabaseAccessDenied {
+        db_name: String,
+        #[source]
+        cause: QuaintKind,
+    },
+
+    #[error("Database '{}' already exists", db_name)]
+    DatabaseAlreadyExists {
+        db_name: String,
+        #[source]
+        cause: QuaintKind,
+    },
+
+    #[error("Authentication failed for user '{}'", user)]
+    AuthenticationFailed {
+        user: String,
+        #[source]
+        cause: QuaintKind,
+    },
+
+    #[error("Connect timed out")]
+    ConnectTimeout(#[source] QuaintKind),
+
+    #[error("Operation timed out ({0})")]
+    Timeout(String),
+
+    #[error("Error opening a TLS connection. {}", cause)]
+    TlsError {
+        #[source]
+        cause: QuaintKind,
+    },
+
+    #[error("Unique constraint violation")]
+    UniqueConstraintViolation {
+        constraint: DatabaseConstraint,
+        #[source]
+        cause: QuaintKind,
+    },
 }
 
-impl From<url::ParseError> for SqlIntrospectionError {
-    fn from(e: url::ParseError) -> Self {
-        SqlIntrospectionError::InvalidUrl {
-            message: format!("Couldn't parse the connection string because of: {}", e),
-        }
-    }
-}
+impl SqlError {
+    pub(crate) fn into_connector_error(self, connection_info: &super::ConnectionInfo) -> ConnectorError {
+        match self {
+            SqlError::DatabaseDoesNotExist { db_name, cause } => ConnectorError {
+                user_facing_error: render_quaint_error(&cause, connection_info),
+                kind: ErrorKind::DatabaseDoesNotExist { db_name },
+            },
+            SqlError::DatabaseAccessDenied { db_name, cause } => ConnectorError {
+                user_facing_error: render_quaint_error(&cause, connection_info),
+                kind: ErrorKind::DatabaseAccessDenied { database_name: db_name },
+            },
 
-impl From<quaint::error::Error> for SqlIntrospectionError {
-    fn from(e: quaint::error::Error) -> Self {
-        SqlIntrospectionError::Generic(e.into())
-    }
-}
+            SqlError::DatabaseAlreadyExists { db_name, cause } => ConnectorError {
+                user_facing_error: render_quaint_error(&cause, connection_info),
+                kind: ErrorKind::DatabaseAlreadyExists { db_name },
+            },
+            SqlError::AuthenticationFailed { user, cause } => ConnectorError {
+                user_facing_error: render_quaint_error(&cause, connection_info),
+                kind: ErrorKind::AuthenticationFailed { user },
+            },
+            SqlError::ConnectTimeout(cause) => {
+                let user_facing_error = render_quaint_error(&cause, connection_info);
 
-impl From<sql_schema_describer::SqlSchemaDescriberError> for SqlIntrospectionError {
-    fn from(e: sql_schema_describer::SqlSchemaDescriberError) -> Self {
-        SqlIntrospectionError::Generic(e.into())
-    }
-}
-
-impl SqlIntrospectionError {
-    pub(crate) fn into_connector_error(self, connection_info: &ConnectionInfo) -> ConnectorError {
-        let user_facing = match &self {
-            SqlIntrospectionError::Quaint(quaint_error) => {
-                user_facing_errors::quaint::render_quaint_error(quaint_error, connection_info)
+                ConnectorError {
+                    user_facing_error,
+                    kind: ErrorKind::ConnectTimeout,
+                }
             }
-            err => KnownError::new(user_facing_errors::introspection_engine::IntrospectionFailed {
-                introspection_error: format!("{}", err),
-            })
-            .ok(),
-        };
+            SqlError::Timeout(message) => ConnectorError::from_kind(ErrorKind::Timeout(message)),
+            SqlError::TlsError { cause } => {
+                let user_facing_error = render_quaint_error(&cause, connection_info);
 
-        ConnectorError {
-            user_facing,
-            kind: ErrorKind::Generic(self.into()),
+                ConnectorError {
+                    user_facing_error,
+                    kind: ErrorKind::TlsError {
+                        message: format!("{}", cause),
+                    },
+                }
+            }
+            SqlError::ConnectionError { cause } => {
+                let user_facing_error = render_quaint_error(&cause, connection_info);
+                ConnectorError {
+                    user_facing_error,
+                    kind: ErrorKind::ConnectionError {
+                        host: connection_info.host().to_owned(),
+                        cause: cause.into(),
+                    },
+                }
+            }
+            SqlError::UniqueConstraintViolation { cause, .. } => {
+                let user_facing_error = render_quaint_error(&cause, connection_info);
+                ConnectorError {
+                    user_facing_error,
+                    kind: ErrorKind::ConnectionError {
+                        host: connection_info.host().to_owned(),
+                        cause: cause.into(),
+                    },
+                }
+            }
+            error => ConnectorError::from_kind(ErrorKind::QueryError(error.into())),
         }
+    }
+}
+
+impl From<QuaintKind> for SqlError {
+    fn from(kind: QuaintKind) -> Self {
+        match kind {
+            QuaintKind::DatabaseDoesNotExist { ref db_name } => Self::DatabaseDoesNotExist {
+                db_name: db_name.clone(),
+                cause: kind,
+            },
+            QuaintKind::DatabaseAlreadyExists { ref db_name } => Self::DatabaseAlreadyExists {
+                db_name: db_name.clone(),
+                cause: kind,
+            },
+            QuaintKind::DatabaseAccessDenied { ref db_name } => Self::DatabaseAccessDenied {
+                db_name: db_name.clone(),
+                cause: kind,
+            },
+            QuaintKind::AuthenticationFailed { ref user } => Self::AuthenticationFailed {
+                user: user.clone(),
+                cause: kind,
+            },
+            e @ QuaintKind::ConnectTimeout(..) => Self::ConnectTimeout(e),
+            QuaintKind::ConnectionError { .. } => Self::ConnectionError { cause: kind },
+            QuaintKind::Timeout(message) => Self::Timeout(format!("quaint timeout: {}", message)),
+            QuaintKind::TlsError { .. } => Self::TlsError { cause: kind },
+            QuaintKind::UniqueConstraintViolation { ref constraint } => Self::UniqueConstraintViolation {
+                constraint: constraint.into(),
+                cause: kind,
+            },
+            _ => SqlError::QueryError(kind.into()),
+        }
+    }
+}
+
+impl From<QuaintError> for SqlError {
+    fn from(e: QuaintError) -> Self {
+        QuaintKind::from(e).into()
+    }
+}
+
+impl From<sql_schema_describer::SqlSchemaDescriberError> for SqlError {
+    fn from(error: sql_schema_describer::SqlSchemaDescriberError) -> Self {
+        SqlError::QueryError(anyhow::anyhow!("{}", error))
+    }
+}
+
+impl From<String> for SqlError {
+    fn from(error: String) -> Self {
+        SqlError::Generic(anyhow::anyhow!(error))
     }
 }

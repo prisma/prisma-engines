@@ -7,7 +7,7 @@
       "fields": [
         {
           "name": "id",
-          "typeIdentifier": "GraphQLID",
+          "typeIdentifier": "String",
           "isRequired": true,
           "isList": false,
           "isUnique": true,
@@ -56,7 +56,7 @@
       "fields": [
         {
           "name": "id",
-          "typeIdentifier": "GraphQLID",
+          "typeIdentifier": "String",
           "isRequired": true,
           "isList": false,
           "isUnique": true,

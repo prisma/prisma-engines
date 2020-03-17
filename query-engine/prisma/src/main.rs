@@ -3,12 +3,7 @@ extern crate log;
 #[macro_use]
 extern crate rust_embed;
 
-use std::{
-    error::Error,
-    net::SocketAddr,
-    process,
-    convert::TryFrom,
-};
+use std::{convert::TryFrom, error::Error, net::SocketAddr, process};
 
 use structopt::StructOpt;
 use tracing::subscriber;
@@ -17,8 +12,8 @@ use tracing_subscriber::{EnvFilter, FmtSubscriber};
 
 use cli::*;
 use error::*;
-use lazy_static::lazy_static;
-use request_handlers::{PrismaRequest, RequestHandler};
+use once_cell::sync::Lazy;
+use request_handlers::{PrismaRequest, PrismaResponse, RequestHandler};
 use server::HttpServer;
 
 mod cli;
@@ -39,14 +34,11 @@ pub enum LogFormat {
     Json,
 }
 
-lazy_static! {
-    pub static ref LOG_FORMAT: LogFormat = {
-        match std::env::var("RUST_LOG_FORMAT").as_ref().map(|s| s.as_str()) {
-            Ok("devel") => LogFormat::Text,
-            _ => LogFormat::Json,
-        }
-    };
-}
+static LOG_FORMAT: Lazy<LogFormat> =
+    Lazy::new(|| match std::env::var("RUST_LOG_FORMAT").as_ref().map(|s| s.as_str()) {
+        Ok("devel") => LogFormat::Text,
+        _ => LogFormat::Json,
+    });
 
 pub type PrismaResult<T> = Result<T, PrismaError>;
 type AnyError = Box<dyn Error + Send + Sync + 'static>;
@@ -70,26 +62,25 @@ pub struct GetConfigInput {
 
 #[derive(Debug, Clone, StructOpt)]
 pub struct ExecuteRequestInput {
+    /// GraphQL query to execute
     pub query: String,
+    /// Run in the legacy GraphQL mode
+    #[structopt(long)]
+    pub legacy: bool,
 }
 
 #[derive(Debug, StructOpt, Clone)]
 pub enum CliOpt {
     /// Output the DMMF from the loaded data model.
-    #[structopt(name = "--dmmf")]
     Dmmf,
-    /// Convert the given DMMF JSON file to a data model.
-    #[structopt(name = "--dmmf_to_dml")]
-    DmmfToDml(DmmfToDmlInput),
     /// Get the configuration from the given data model.
-    #[structopt(name = "--get_config")]
     GetConfig(GetConfigInput),
     /// Executes one request and then terminates.
-    #[structopt(name = "--execute_request")]
     ExecuteRequest(ExecuteRequestInput),
 }
 
 #[derive(Debug, StructOpt, Clone)]
+#[structopt(version = env!("GIT_HASH"))]
 pub struct PrismaOpt {
     /// The hostname or IP the query engine should bind to.
     #[structopt(long, default_value = "127.0.0.1")]
@@ -101,28 +92,30 @@ pub struct PrismaOpt {
     #[structopt(long)]
     legacy: bool,
     /// Runs all queries in a transaction, including all the reads.
-    #[structopt(long = "always_force_transactions")]
-    always_force_transactions: bool,
-    /// Prints the server commit ID.
     #[structopt(long)]
-    version: bool,
+    always_force_transactions: bool,
+    /// Enables raw SQL queries with executeRaw mutation
+    #[structopt(long)]
+    enable_raw_queries: bool,
     #[structopt(subcommand)]
     subcommand: Option<Subcommand>,
 }
 
 #[tokio::main]
 async fn main() -> Result<(), AnyError> {
+    init_logger()?;
     let opts = PrismaOpt::from_args();
 
     match CliCommand::try_from(&opts) {
-        Ok(cmd) => if let Err(err) = cmd.execute() {
-            info!("Encountered error during initialization:");
-            err.render_as_json().expect("error rendering");
-            process::exit(1);
+        Ok(cmd) => {
+            if let Err(err) = cmd.execute().await {
+                info!("Encountered error during initialization:");
+                err.render_as_json().expect("error rendering");
+                process::exit(1);
+            }
         }
         Err(_) => {
-            init_logger()?;
-
+            set_panic_hook()?;
             let ip = opts.host.parse().expect("Host was not a valid IP address");
             let address = SocketAddr::new(ip, opts.port);
 
@@ -131,6 +124,7 @@ async fn main() -> Result<(), AnyError> {
 
             let builder = HttpServer::builder()
                 .legacy(opts.legacy)
+                .enable_raw_queries(opts.enable_raw_queries)
                 .force_transactions(opts.always_force_transactions);
 
             if let Err(err) = builder.build_and_run(address).await {
@@ -162,7 +156,16 @@ fn init_logger() -> Result<(), AnyError> {
                 .finish();
 
             subscriber::set_global_default(subscriber)?;
+        }
+    }
 
+    Ok(())
+}
+
+fn set_panic_hook() -> Result<(), AnyError> {
+    match *LOG_FORMAT {
+        LogFormat::Text => (),
+        LogFormat::Json => {
             std::panic::set_hook(Box::new(|info| {
                 let payload = info
                     .payload()

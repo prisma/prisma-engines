@@ -1,5 +1,5 @@
 use anyhow::format_err;
-use datamodel::ast::{self, ArgumentContainer, SchemaAst};
+use datamodel::ast::{self, ArgumentContainer, Identifier, SchemaAst};
 use migration_connector::steps::{self, CreateSource, DeleteSource, MigrationStep};
 use thiserror::Error;
 
@@ -124,7 +124,8 @@ fn apply_create_enum(datamodel: &mut ast::SchemaAst, step: &steps::CreateEnum) -
     let values = values
         .iter()
         .map(|value_name| ast::EnumValue {
-            name: value_name.clone(),
+            name: Identifier::new(value_name),
+            directives: vec![],
             span: new_span(),
         })
         .collect();
@@ -171,6 +172,7 @@ fn apply_create_field(datamodel: &mut ast::SchemaAst, step: &steps::CreateField)
         span: new_span(),
         directives: Vec::new(),
         default_value: None,
+        is_commented_out: false,
     };
     model.fields.push(field);
 
@@ -192,6 +194,7 @@ fn apply_create_model(datamodel: &mut ast::SchemaAst, step: &steps::CreateModel)
         span: new_span(),
         fields: vec![],
         directives: vec![],
+        commented_out: false,
     };
 
     datamodel.tops.push(ast::Top::Model(model));
@@ -344,7 +347,8 @@ fn add_enum_values(r#enum: &mut ast::Enum, added_values: &[String]) {
     r#enum
         .values
         .extend(added_values.iter().map(|added_name| ast::EnumValue {
-            name: added_name.clone(),
+            name: Identifier::new(added_name),
+            directives: vec![],
             span: new_span(),
         }))
 }
@@ -356,7 +360,7 @@ fn remove_enum_values(r#enum: &mut ast::Enum, removed_values: &[String]) {
         .filter(|value| {
             removed_values
                 .iter()
-                .find(|removed_value| removed_value.as_str() == value.name.as_str())
+                .find(|removed_value| removed_value.as_str() == value.name.name.as_str())
                 .is_none()
         })
         .collect();
@@ -479,6 +483,7 @@ fn apply_create_type_alias(
         arity: step.arity.into(),
         directives: vec![],
         field_type: new_ident(step.r#type.clone()),
+        is_commented_out: false,
     };
 
     datamodel.tops.push(ast::Top::Type(type_alias));
@@ -565,6 +570,15 @@ fn find_directives_mut<'a>(
         steps::DirectivePath::Field { model, field } => &mut datamodel.find_field_mut(&model, &field)?.directives,
         steps::DirectivePath::Model { model, arguments: _ } => &mut datamodel.find_model_mut(&model)?.directives,
         steps::DirectivePath::Enum { r#enum } => &mut datamodel.find_enum_mut(&r#enum)?.directives,
+        steps::DirectivePath::EnumValue { r#enum, value } => {
+            let enum_struct = datamodel.find_enum_mut(&r#enum)?;
+            let value = enum_struct
+                .values
+                .iter_mut()
+                .find(|value_struct| &value_struct.name.name == value)?;
+
+            &mut value.directives
+        }
         steps::DirectivePath::TypeAlias { type_alias } => &mut datamodel.find_type_alias_mut(&type_alias)?.directives,
     };
 

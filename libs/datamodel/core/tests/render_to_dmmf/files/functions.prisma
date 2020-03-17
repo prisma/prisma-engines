@@ -1,0 +1,5 @@
+model User {
+  id        Int      @id
+  createdAt DateTime @default(now())
+  someId    String   @default(cuid()) @unique
+}

@@ -9,10 +9,10 @@ pub struct SkipAndLimit {
 
 #[derive(Debug, Default, Clone)]
 pub struct QueryArguments {
+    pub after: Option<RecordProjection>,
+    pub before: Option<RecordProjection>,
     pub skip: Option<i64>,
-    pub after: Option<GraphqlId>,
     pub first: Option<i64>,
-    pub before: Option<GraphqlId>,
     pub last: Option<i64>,
     pub filter: Option<Filter>,
     pub order_by: Option<OrderBy>,
@@ -63,6 +63,39 @@ impl QueryArguments {
                 skip: self.skip.unwrap_or(0) as usize,
                 limit: None,
             },
+        }
+    }
+
+    pub fn can_batch(&self) -> bool {
+        self.filter
+            .as_ref()
+            .map(|filter| filter.can_batch())
+            .unwrap_or(false)
+    }
+
+    pub fn batched(self) -> Vec<Self> {
+        match self.filter {
+            Some(filter) => {
+                let after = self.after;
+                let before = self.before;
+                let skip = self.skip;
+                let first = self.first;
+                let last = self.last;
+                let order_by = self.order_by;
+
+                filter.batched().into_iter().map(|filter| {
+                    QueryArguments {
+                        after: after.clone(),
+                        before: before.clone(),
+                        skip: skip.clone(),
+                        first: first.clone(),
+                        last: last.clone(),
+                        filter: Some(filter),
+                        order_by: order_by.clone(),
+                    }
+                }).collect()
+            },
+            _ => vec![self]
         }
     }
 }

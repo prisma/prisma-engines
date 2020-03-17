@@ -5,8 +5,14 @@ pub use relation::*;
 pub use scalar::*;
 
 use crate::prelude::*;
-use once_cell::sync::OnceCell;
-use std::{borrow::Cow, sync::Arc};
+use core::ops::Deref;
+use datamodel::ScalarType;
+use std::{
+    hash::{Hash, Hasher},
+    sync::Arc,
+};
+
+pub type DataSourceFieldRef = Arc<DataSourceField>;
 
 #[derive(Debug)]
 pub enum FieldTemplate {
@@ -14,48 +20,107 @@ pub enum FieldTemplate {
     Scalar(ScalarFieldTemplate),
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Field {
     Relation(RelationFieldRef),
     Scalar(ScalarFieldRef),
 }
 
-#[derive(Debug, PartialEq, Eq, Hash)]
-pub struct FieldManifestation {
-    pub db_name: String,
+#[derive(Debug, Clone)]
+pub enum FieldWeak {
+    Relation(RelationFieldWeak),
+    Scalar(ScalarFieldWeak),
 }
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+impl FieldWeak {
+    pub fn upgrade(&self) -> Field {
+        match self {
+            Self::Relation(rf) => rf.upgrade().unwrap().into(),
+            Self::Scalar(sf) => sf.upgrade().unwrap().into(),
+        }
+    }
+}
+
+#[derive(Clone, Debug)]
+pub struct DataSourceField {
+    backing_field: dml::DataSourceField,
+    model_field: FieldWeak,
+}
+
+impl DataSourceField {
+    pub fn new(backing_field: dml::DataSourceField, model_field: FieldWeak) -> Self {
+        Self {
+            backing_field,
+            model_field,
+        }
+    }
+
+    pub fn model_field(&self) -> Field {
+        self.model_field.upgrade()
+    }
+
+    pub fn name(&self) -> &str {
+        self.backing_field.name.as_str()
+    }
+}
+
+impl Deref for DataSourceField {
+    type Target = dml::DataSourceField;
+
+    fn deref(&self) -> &dml::DataSourceField {
+        &self.backing_field
+    }
+}
+
+impl Hash for DataSourceField {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.backing_field.hash(state);
+        self.model_field().hash(state);
+    }
+}
+
+impl Eq for DataSourceField {}
+
+impl PartialEq for DataSourceField {
+    fn eq(&self, other: &DataSourceField) -> bool {
+        self.name == other.name
+    }
+}
+
+impl From<&Field> for FieldWeak {
+    fn from(f: &Field) -> Self {
+        match f {
+            Field::Scalar(sf) => sf.into(),
+            Field::Relation(rf) => rf.into(),
+        }
+    }
+}
+
+impl From<&ScalarFieldRef> for FieldWeak {
+    fn from(f: &ScalarFieldRef) -> Self {
+        FieldWeak::Scalar(Arc::downgrade(f))
+    }
+}
+
+impl From<&RelationFieldRef> for FieldWeak {
+    fn from(f: &RelationFieldRef) -> Self {
+        FieldWeak::Relation(Arc::downgrade(f))
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum TypeIdentifier {
     String,
     Float,
     Boolean,
-    Enum,
+    Enum(String),
     Json,
     DateTime,
-    GraphQLID,
     UUID,
     Int,
-    Relation,
-}
-
-impl TypeIdentifier {
-    pub fn user_friendly_type_name(self) -> String {
-        match self {
-            TypeIdentifier::GraphQLID => "ID".to_string(),
-            _ => format!("{:?}", self),
-        }
-    }
 }
 
 impl Field {
-    pub fn db_name(&self) -> Cow<str> {
-        match self {
-            Field::Scalar(ref sf) => Cow::from(sf.db_name()),
-            Field::Relation(ref rf) => Cow::from(rf.db_name()),
-        }
-    }
-
     pub fn name(&self) -> &str {
         match self {
             Field::Scalar(ref sf) => &sf.name,
@@ -70,10 +135,24 @@ impl Field {
         }
     }
 
+    pub fn is_id(&self) -> bool {
+        match self {
+            Field::Scalar(sf) => sf.is_id,
+            Field::Relation(rf) => rf.is_id,
+        }
+    }
+
     pub fn is_list(&self) -> bool {
         match self {
             Field::Scalar(ref sf) => sf.is_list,
             Field::Relation(ref rf) => rf.is_list,
+        }
+    }
+
+    pub fn as_scalar(self) -> Option<ScalarFieldRef> {
+        match self {
+            Field::Scalar(scalar) => Some(scalar),
+            _ => None,
         }
     }
 
@@ -84,10 +163,31 @@ impl Field {
         }
     }
 
-    pub fn type_identifier(&self) -> TypeIdentifier {
+    pub fn is_unique(&self) -> bool {
         match self {
-            Field::Scalar(ref sf) => sf.type_identifier,
-            Field::Relation(ref rf) => rf.type_identifier,
+            Field::Scalar(ref sf) => sf.unique(),
+            Field::Relation(ref rf) => rf.is_id || rf.is_unique,
+        }
+    }
+
+    pub fn model(&self) -> ModelRef {
+        match self {
+            Self::Scalar(sf) => sf.model(),
+            Self::Relation(rf) => rf.model(),
+        }
+    }
+
+    pub fn data_source_fields(&self) -> Vec<DataSourceFieldRef> {
+        match self {
+            Self::Scalar(sf) => vec![sf.data_source_field().clone()],
+            Self::Relation(rf) => rf.data_source_fields().to_vec(),
+        }
+    }
+
+    pub fn downgrade(&self) -> FieldWeak {
+        match self {
+            Field::Relation(field) => FieldWeak::Relation(Arc::downgrade(field)),
+            Field::Scalar(field) => FieldWeak::Scalar(Arc::downgrade(field)),
         }
     }
 }
@@ -95,40 +195,8 @@ impl Field {
 impl FieldTemplate {
     pub fn build(self, model: ModelWeakRef) -> Field {
         match self {
-            FieldTemplate::Scalar(st) => {
-                let scalar = ScalarField {
-                    name: st.name,
-                    type_identifier: st.type_identifier,
-                    is_required: st.is_required,
-                    is_list: st.is_list,
-                    is_id: st.is_id,
-                    is_auto_generated_int_id: st.is_auto_generated_int_id,
-                    is_unique: st.is_unique,
-                    manifestation: st.manifestation,
-                    internal_enum: st.internal_enum,
-                    behaviour: st.behaviour,
-                    model,
-                    default_value: st.default_value,
-                };
-
-                Field::Scalar(Arc::new(scalar))
-            }
-            FieldTemplate::Relation(rt) => {
-                let relation = RelationField {
-                    name: rt.name,
-                    type_identifier: rt.type_identifier,
-                    is_required: rt.is_required,
-                    is_list: rt.is_list,
-                    is_auto_generated_int_id: rt.is_auto_generated_int_id,
-                    is_unique: rt.is_unique,
-                    relation_name: rt.relation_name,
-                    relation_side: rt.relation_side,
-                    model,
-                    relation: OnceCell::new(),
-                };
-
-                Field::Relation(Arc::new(relation))
-            }
+            FieldTemplate::Scalar(st) => Field::Scalar(st.build(model)),
+            FieldTemplate::Relation(rt) => Field::Relation(rt.build(model)),
         }
     }
 }
@@ -142,5 +210,18 @@ impl From<ScalarFieldRef> for Field {
 impl From<RelationFieldRef> for Field {
     fn from(rf: RelationFieldRef) -> Self {
         Field::Relation(rf)
+    }
+}
+
+impl From<ScalarType> for TypeIdentifier {
+    fn from(st: ScalarType) -> Self {
+        match st {
+            ScalarType::String => Self::String,
+            ScalarType::Int => Self::Int,
+            ScalarType::Float => Self::Float,
+            ScalarType::Boolean => Self::Boolean,
+            ScalarType::Decimal => Self::Float,
+            ScalarType::DateTime => Self::DateTime,
+        }
     }
 }

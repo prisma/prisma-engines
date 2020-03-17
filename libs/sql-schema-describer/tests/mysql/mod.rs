@@ -19,7 +19,7 @@ pub async fn get_mysql_describer_for_schema(sql: &str, schema: &str) -> mysql::S
     let statements = sql.split(";").filter(|s| !s.is_empty());
     for statement in statements {
         debug!("Executing migration statement: '{}'", statement);
-        conn.execute_raw(&statement, &[])
+        conn.query_raw(&statement, &[])
             .await
             .expect("executing migration statement");
     }

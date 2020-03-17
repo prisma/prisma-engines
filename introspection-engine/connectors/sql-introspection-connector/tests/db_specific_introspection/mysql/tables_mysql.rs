@@ -2,7 +2,7 @@ use crate::*;
 use barrel::types;
 use test_harness::*;
 
-#[test_one_connector(connector = "mysql")]
+#[test_each_connector(tags("mysql"))]
 async fn introspecting_a_simple_table_with_gql_types_must_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
@@ -26,7 +26,7 @@ async fn introspecting_a_simple_table_with_gql_types_must_work(api: &TestApi) {
                 date    DateTime
                 float   Float
                 id      Int @id @default(autoincrement())
-                int     Int 
+                int     Int
                 string  String
             }
         "#;
@@ -34,7 +34,7 @@ async fn introspecting_a_simple_table_with_gql_types_must_work(api: &TestApi) {
     custom_assert(&result, dm);
 }
 
-#[test_one_connector(connector = "mysql")]
+#[test_each_connector(tags("mysql"))]
 async fn introspecting_a_table_with_compound_primary_keys_must_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
@@ -53,7 +53,7 @@ async fn introspecting_a_table_with_compound_primary_keys_must_work(api: &TestAp
     let dm = r#"
             model Blog {
                 authorId String
-                id Int 
+                id Int
                 @@id([id, authorId])
             }
         "#;
@@ -61,7 +61,7 @@ async fn introspecting_a_table_with_compound_primary_keys_must_work(api: &TestAp
     custom_assert(&result, dm);
 }
 
-#[test_one_connector(connector = "mysql")]
+#[test_each_connector(tags("mysql"))]
 async fn introspecting_a_table_with_unique_index_must_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
@@ -87,7 +87,7 @@ async fn introspecting_a_table_with_unique_index_must_work(api: &TestApi) {
     custom_assert(&result, dm);
 }
 
-#[test_one_connector(connector = "mysql")]
+#[test_each_connector(tags("mysql"))]
 async fn introspecting_a_table_with_multi_column_unique_index_must_work(api: &TestApi) {
     let barrel = api.barrel();
     barrel
@@ -97,7 +97,10 @@ async fn introspecting_a_table_with_multi_column_unique_index_must_work(api: &Te
                     t.add_column("id", types::primary());
                     t.add_column("firstname", types::varchar(10));
                     t.add_column("lastname", types::varchar(10));
-                    t.add_index("test", types::index(vec!["firstname", "lastname"]).unique(true));
+                    t.add_index(
+                        "test",
+                        types::index(vec!["firstname", "lastname"]).unique(true),
+                    );
                 });
             },
             api.db_name(),
@@ -116,7 +119,7 @@ async fn introspecting_a_table_with_multi_column_unique_index_must_work(api: &Te
     custom_assert(&result, dm);
 }
 
-#[test_one_connector(connector = "mysql")]
+#[test_each_connector(tags("mysql"))]
 async fn introspecting_a_table_with_required_and_optional_columns_must_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
@@ -143,30 +146,34 @@ async fn introspecting_a_table_with_required_and_optional_columns_must_work(api:
     custom_assert(&result, dm);
 }
 
-//#[test_one_connector(connector = "mysql")]
-//#[ignore]
-//fn introspecting_a_table_with_datetime_default_values_should_work(api: &TestApi) {
-//    let barrel = api.barrel();
-//    let _setup_schema = barrel.execute_with_schema(, api.db_name(|migration| ){
-//        migration.create_table("User", |t| {
-//            t.add_column("id", types::primary());
-//            t.add_column("name", types::text());
-//            t.inject_custom("`joined` date DEFAULT CURRENT_DATE")
-//        });
-//    }).await;
+// #[test_each_connector(tags("mysql"))]
+// async fn introspecting_a_table_with_datetime_default_values_should_work(api: &TestApi) {
+//     let barrel = api.barrel();
+//     let _setup_schema = barrel
+//         .execute_with_schema(
+//             |migration| {
+//                 migration.create_table("User", |t| {
+//                     t.add_column("id", types::primary());
+//                     t.add_column("name", types::text());
+//                     t.inject_custom("`joined` date DEFAULT CURRENT_DATE")
+//                 });
+//             },
+//             api.db_name(),
+//         )
+//         .await;
 //
-//    let dm = r#"
-//            model User {
-//                id      Int @id
-//                joined DateTime? @default(now())
-//                name String
-//            }
-//        "#;
-//    let result = dbg!(api.introspect().await);
-//    custom_assert(&result, dm);
-//}
+//     let dm = r#"
+//             model User {
+//                 id      Int @id
+//                 joined DateTime? @default(now())
+//                 name String
+//             }
+//         "#;
+//     let result = dbg!(api.introspect().await);
+//     custom_assert(&result, dm);
+// }
 
-#[test_one_connector(connector = "mysql")]
+#[test_each_connector(tags("mysql"))]
 async fn introspecting_a_table_with_default_values_should_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
@@ -201,7 +208,7 @@ async fn introspecting_a_table_with_default_values_should_work(api: &TestApi) {
     custom_assert(&result, dm);
 }
 
-#[test_one_connector(connector = "mysql")]
+#[test_each_connector(tags("mysql"))]
 async fn introspecting_a_table_with_a_non_unique_index_should_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
@@ -228,7 +235,7 @@ async fn introspecting_a_table_with_a_non_unique_index_should_work(api: &TestApi
     custom_assert(&result, dm);
 }
 
-#[test_one_connector(connector = "mysql")]
+#[test_each_connector(tags("mysql"))]
 async fn introspecting_a_table_with_a_multi_column_non_unique_index_should_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
@@ -253,6 +260,78 @@ async fn introspecting_a_table_with_a_multi_column_non_unique_index_should_work(
                 @@index([a,b], name: "test")
             }
         "#;
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+}
+
+#[test_each_connector(tags("mysql"))]
+async fn introspecting_a_table_without_uniques_should_comment_it_out(api: &TestApi) {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::primary());
+            });
+            migration.create_table("Post", |t| {
+                t.add_column("id", types::integer());
+                t.inject_custom(
+                    "user_id INTEGER NOT NULL UNIQUE,
+                FOREIGN KEY (`user_id`) REFERENCES `User`(`id`)",
+                )
+            });
+        })
+        .await;
+
+    let dm = "/// The underlying table does not contain a unique identifier and can therefore currently not be handled.\n// model Post {\n  // id      Int\n  // user_id User\n// }\n\nmodel User {\n  id Int @default(autoincrement()) @id\n}";
+
+    let result = dbg!(api.introspect().await);
+    assert_eq!(&result, dm);
+}
+
+//todo maybe need to split due to
+// no function default values on mysql 5.7 and 8.0 -.-
+// maria db allows this
+#[test_each_connector(tags("mysql"))]
+async fn introspecting_a_default_value_as_dbgenerated_should_work(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("Test", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom("string_static_char char(5) Default 'test'");
+                t.inject_custom("string_static_char_null char(5) Default NULL");
+                t.inject_custom("string_static_varchar varchar(5) Default 'test'");
+                // t.inject_custom("string_function char(200) Default CONCAT('id','string_static_text')");
+                t.inject_custom("int_static Integer DEFAULT 2");
+                // t.inject_custom("int_function Integer DEFAULT FIELD('Bb', 'Aa', 'Bb', 'Cc', 'Dd', 'Ff')");
+                t.inject_custom("float_static Float DEFAULT 1.43");
+                t.inject_custom("boolean_static Boolean DEFAULT 1");
+                t.inject_custom("datetime_now TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP");
+                t.inject_custom("datetime_now_lc TIMESTAMP NULL DEFAULT current_timestamp");
+                t.inject_custom("enum_static  ENUM ( 'black', 'white') Default 'black'");
+            });
+        })
+        .await;
+
+    let dm = r#"
+            model Test {
+                boolean_static          Boolean?            @default(true)
+                datetime_now            DateTime?           @default(now())
+                datetime_now_lc         DateTime?           @default(now())
+                enum_static             Test_enum_static?   @default(black)   
+                float_static            Float?              @default(1.43)
+                id                      Int                 @default(autoincrement()) @id
+                int_static              Int?                @default(2)
+                string_static_char      String?             @default("test")
+                string_static_char_null String?     
+                string_static_varchar   String?             @default("test")                      
+            }
+            
+            enum Test_enum_static{
+                black
+                white
+            }
+        "#;
+
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }

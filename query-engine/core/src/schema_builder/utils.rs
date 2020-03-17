@@ -1,5 +1,6 @@
 use super::*;
 use crate::EnumType;
+use itertools::Itertools;
 use once_cell::sync::OnceCell;
 use prisma_models::{dml, ModelRef, OrderBy};
 use std::sync::Arc;
@@ -134,11 +135,20 @@ pub fn append_opt<T>(vec: &mut Vec<T>, opt: Option<T>) {
 }
 
 /// Computes a compound field name based on an index.
-pub fn compound_field_name(index: &Index) -> String {
+pub fn compound_index_field_name(index: &Index) -> String {
     index.name.clone().unwrap_or_else(|| {
         let index_fields = index.fields();
-        let field_names: Vec<&str> = index_fields.iter().map(|sf| sf.name.as_ref()).collect();
+        let field_names: Vec<&str> = index_fields.iter().map(|sf| sf.name()).collect();
 
         field_names.join("_")
     })
+}
+
+/// Computes a compound field name based on a multi-field id.
+pub fn compound_id_field_name<T>(field_names: &[T]) -> String
+where
+    T: AsRef<str>,
+{
+    // Extremely sophisticated.
+    field_names.into_iter().map(AsRef::as_ref).join("_")
 }

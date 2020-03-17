@@ -1,11 +1,12 @@
 use super::*;
 use crate::schema::*;
 use chrono::prelude::*;
-use prisma_models::{GraphqlId, PrismaValue};
-use rust_decimal::{prelude::FromPrimitive, Decimal};
+use prisma_value::PrismaValue;
+use rust_decimal::{prelude::ToPrimitive, Decimal};
 use std::{
     borrow::Borrow,
     collections::{BTreeMap, HashSet},
+    convert::TryFrom,
     sync::Arc,
 };
 use uuid::Uuid;
@@ -36,10 +37,10 @@ impl QueryDocumentParser {
         selections
             .iter()
             .map(|selection| {
-                let parsed_field = match schema_object.find_field(selection.name.as_str()) {
+                let parsed_field = match schema_object.find_field(selection.name()) {
                     Some(ref field) => Self::parse_field(selection, field),
                     None => Err(QueryParserError::FieldValidationError {
-                        field_name: selection.name.clone(),
+                        field_name: selection.name().into(),
                         inner: Box::new(QueryParserError::FieldNotFoundError),
                     }),
                 };
@@ -54,15 +55,18 @@ impl QueryDocumentParser {
     }
 
     /// Parses and validates a selection against a schema (output) field.
-    fn parse_field(selection: &Selection, schema_field: &FieldRef) -> QueryParserResult<ParsedField> {
+    fn parse_field(
+        selection: &Selection,
+        schema_field: &FieldRef,
+    ) -> QueryParserResult<ParsedField> {
         // Parse and validate all provided arguments for the field
-        Self::parse_arguments(schema_field, &selection.arguments)
+        Self::parse_arguments(schema_field, selection.arguments())
             .and_then(|arguments| {
                 // If the output type of the field is an object type of any form, validate the sub selection as well.
                 let nested_fields = schema_field
                     .field_type
                     .as_object_type()
-                    .map(|obj| Self::parse_object(&selection.nested_selections, &obj));
+                    .map(|obj| Self::parse_object(selection.nested_selections(), &obj));
 
                 let nested_fields = match nested_fields {
                     Some(sub) => Some(sub?),
@@ -70,8 +74,8 @@ impl QueryDocumentParser {
                 };
 
                 Ok(ParsedField {
-                    name: selection.name.clone(),
-                    alias: selection.alias.clone(),
+                    name: selection.name().to_string(),
+                    alias: selection.alias().clone(),
                     arguments,
                     nested_fields,
                     schema_field: Arc::clone(schema_field),
@@ -89,7 +93,11 @@ impl QueryDocumentParser {
         schema_field: &FieldRef,
         given_arguments: &[(String, QueryValue)],
     ) -> QueryParserResult<Vec<ParsedArgument>> {
-        let left: HashSet<&str> = schema_field.arguments.iter().map(|arg| arg.name.as_str()).collect();
+        let left: HashSet<&str> = schema_field
+            .arguments
+            .iter()
+            .map(|arg| arg.name.as_str())
+            .collect();
         let right: HashSet<&str> = given_arguments.iter().map(|arg| arg.0.as_str()).collect();
         let diff = Diff::new(&left, &right);
 
@@ -161,6 +169,7 @@ impl QueryDocumentParser {
             (_, InputType::Scalar(scalar))                  => Self::parse_scalar(value, &scalar).map(ParsedInputValue::Single),
             (QueryValue::Enum(_), InputType::Enum(et))      => Self::parse_enum(value, et),
             (QueryValue::String(_), InputType::Enum(et))      => Self::parse_enum(value, et),
+            (QueryValue::Boolean(_), InputType::Enum(et))      => Self::parse_enum(value, et),
 
             // List and object handling.
             (QueryValue::List(values), InputType::List(l))  => Self::parse_list(values.clone(), &l).map(ParsedInputValue::List),
@@ -177,19 +186,17 @@ impl QueryDocumentParser {
             (QueryValue::Null, _)                         => Ok(PrismaValue::Null),
             (QueryValue::String(s), ScalarType::String)   => Ok(PrismaValue::String(s)),
             (QueryValue::String(s), ScalarType::DateTime) => Self::parse_datetime(s.as_str()).map(PrismaValue::DateTime),
-            (QueryValue::String(_s), ScalarType::Json)     => unimplemented!(),
+            (QueryValue::String(s), ScalarType::JsonList) => Self::parse_json_list(&s),
             (QueryValue::String(s), ScalarType::UUID)     => Self::parse_uuid(s.as_str()).map(PrismaValue::Uuid),
-            (QueryValue::Int(i), ScalarType::Float)       => Ok(PrismaValue::Float(Decimal::from_f64(i as f64).expect("f64 is not a Decimal."))),
+            (QueryValue::Int(i), ScalarType::Float)       => Ok(PrismaValue::Float(Decimal::from(i))),
             (QueryValue::Int(i), ScalarType::Int)         => Ok(PrismaValue::Int(i)),
-            (QueryValue::Float(f), ScalarType::Float)     => Ok(PrismaValue::Float(Decimal::from_f64(f).expect("f64 is not a Decimal."))),
-            (QueryValue::Float(f), ScalarType::Int)       => Ok(PrismaValue::Int(f as i64)),
+            (QueryValue::Float(f), ScalarType::Float)     => Ok(PrismaValue::Float(f)),
+            (QueryValue::Float(f), ScalarType::Int)       => {
+                Ok(PrismaValue::Int(f.to_i64().unwrap()))
+            },
             (QueryValue::Boolean(b), ScalarType::Boolean) => Ok(PrismaValue::Boolean(b)),
 
-            // Possible ID combinations TODO UUID ids are not encoded in any useful way in the schema.
-            (QueryValue::String(s), ScalarType::ID)       => Self::parse_uuid(s.as_str()).map(PrismaValue::Uuid).or_else(|_| Ok(PrismaValue::String(s))),
-            (QueryValue::Int(i), ScalarType::ID)          => Ok(PrismaValue::GraphqlId(GraphqlId::Int(i as usize))),
-
-            // Remainder of combinations is invalid
+            // All other combinations are invalid.
             (qv, _)                                       => Err(QueryParserError::ValueTypeMismatchError { have: qv, want: InputType::Scalar(scalar_type.clone()) }),
         }
     }
@@ -206,15 +213,40 @@ impl QueryDocumentParser {
             })
     }
 
+    pub fn parse_json_list(s: &str) -> QueryParserResult<PrismaValue> {
+        let json = Self::parse_json(s)?;
+
+        let values = json.as_array().ok_or_else(|| {
+            QueryParserError::AssertionError("JSON parameter needs to be an array".into())
+        })?;
+
+        let mut prisma_values = Vec::with_capacity(values.len());
+
+        for v in values.into_iter() {
+            let pv = PrismaValue::try_from(v.clone()).map_err(|_| {
+                QueryParserError::AssertionError("Nested JSON arguments are not supported".into())
+            })?;
+
+            prisma_values.push(pv);
+        }
+
+        Ok(PrismaValue::List(prisma_values))
+    }
+
     pub fn parse_json(s: &str) -> QueryParserResult<serde_json::Value> {
-        serde_json::from_str(s).map_err(|err| QueryParserError::ValueParseError(format!("Invalid json: {}", err)))
+        serde_json::from_str(s)
+            .map_err(|err| QueryParserError::ValueParseError(format!("Invalid json: {}", err)))
     }
 
     pub fn parse_uuid(s: &str) -> QueryParserResult<Uuid> {
-        Uuid::parse_str(s).map_err(|err| QueryParserError::ValueParseError(format!("Invalid UUID: {}", err)))
+        Uuid::parse_str(s)
+            .map_err(|err| QueryParserError::ValueParseError(format!("Invalid UUID: {}", err)))
     }
 
-    pub fn parse_list(values: Vec<QueryValue>, value_type: &InputType) -> QueryParserResult<Vec<ParsedInputValue>> {
+    pub fn parse_list(
+        values: Vec<QueryValue>,
+        value_type: &InputType,
+    ) -> QueryParserResult<Vec<ParsedInputValue>> {
         values
             .into_iter()
             .map(|val| Self::parse_input_value(val, value_type))
@@ -225,26 +257,24 @@ impl QueryDocumentParser {
         let raw = match val {
             QueryValue::Enum(s) => s,
             QueryValue::String(s) => s,
+            QueryValue::Boolean(b) => if b { "true" } else { "false " }.to_owned(), // Case where a bool was misinterpreted as constant literal
             _ => {
                 return Err(QueryParserError::ValueParseError(format!(
                     "Unexpected Enum value type {:?} for enum {}",
                     val,
                     typ.name()
-                )))
+                )));
             }
         };
 
         match typ.borrow() {
-            EnumType::Internal(i) => {
-                if i.contains(&raw) {
-                    Ok(ParsedInputValue::Single(PrismaValue::Enum(raw)))
-                } else {
-                    Err(QueryParserError::ValueParseError(format!(
-                        "Enum value '{}' is invalid for enum type {}",
-                        raw, i.name
-                    )))
-                }
-            }
+            EnumType::Internal(i) => match i.map_input_value(&raw) {
+                Some(value) => Ok(ParsedInputValue::Single(value)),
+                None => Err(QueryParserError::ValueParseError(format!(
+                    "Enum value '{}' is invalid for enum type {}",
+                    raw, i.name
+                ))),
+            },
             EnumType::OrderBy(ord) => match ord.value_for(raw.as_str()) {
                 Some(val) => Ok(ParsedInputValue::OrderBy(val.clone())),
                 None => Err(QueryParserError::ValueParseError(format!(
@@ -280,8 +310,12 @@ impl QueryDocumentParser {
 
                 match default_pair {
                     // If the input field has a default, add the default to the result.
-                    Some((k, dv)) => Some(Ok((k.clone(), ParsedInputValue::Single(dv.get_as_prisma_value())))),
-
+                    Some((k, dv)) => {
+                        match Self::parse_input_field(dv.get_as_prisma_value().into(), &field) {
+                            Ok(value) => Some(Ok((k.clone(), value))),
+                            Err(err) => Some(Err(err)),
+                        }
+                    }
                     // Finally, if nothing is found, parse the input value with Null but disregard the result,
                     // except errors, which are propagated.
                     None => match Self::parse_input_field(QueryValue::Null, &field) {
@@ -316,10 +350,15 @@ impl QueryDocumentParser {
     }
 
     /// Parses and validates an input query value against a schema input field.
-    pub fn parse_input_field(value: QueryValue, schema_field: &InputFieldRef) -> QueryParserResult<ParsedInputValue> {
-        Self::parse_input_value(value, &schema_field.field_type).map_err(|err| QueryParserError::FieldValidationError {
-            field_name: schema_field.name.clone(),
-            inner: Box::new(err),
+    pub fn parse_input_field(
+        value: QueryValue,
+        schema_field: &InputFieldRef,
+    ) -> QueryParserResult<ParsedInputValue> {
+        Self::parse_input_value(value, &schema_field.field_type).map_err(|err| {
+            QueryParserError::FieldValidationError {
+                field_name: schema_field.name.clone(),
+                inner: Box::new(err),
+            }
         })
     }
 }

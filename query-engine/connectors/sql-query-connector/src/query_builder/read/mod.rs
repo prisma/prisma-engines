@@ -1,12 +1,8 @@
-mod many_related_records;
-
 use crate::{cursor_condition, filter_conversion::AliasedCondition, ordering::Ordering};
 use connector_interface::{filter::Filter, QueryArguments};
 use prisma_models::*;
 use quaint::ast::*;
 use std::sync::Arc;
-
-pub use many_related_records::*;
 
 pub trait SelectDefinition {
     fn into_select(self, _: &ModelRef) -> Select<'static>;
@@ -21,8 +17,7 @@ impl SelectDefinition for Filter {
 
 impl SelectDefinition for &Filter {
     fn into_select(self, model: &ModelRef) -> Select<'static> {
-        let args = QueryArguments::from(self.clone());
-        args.into_select(model)
+        self.clone().into_select(model)
     }
 }
 
@@ -36,7 +31,7 @@ impl SelectDefinition for QueryArguments {
     fn into_select(self, model: &ModelRef) -> Select<'static> {
         let cursor: ConditionTree = cursor_condition::build(&self, Arc::clone(&model));
         let ordering_directions = self.ordering_directions();
-        let ordering = Ordering::for_model(Arc::clone(&model), ordering_directions);
+        let ordering = Ordering::for_model(&model, ordering_directions);
 
         let filter: ConditionTree = self
             .filter
@@ -75,13 +70,9 @@ where
 }
 
 pub fn count_by_model(model: &ModelRef, query_arguments: QueryArguments) -> Select<'static> {
-    let id_field = model.fields().id();
-
-    let selected_fields = vec![id_field.as_column()];
-
-    let base_query = get_records(model, selected_fields.into_iter(), query_arguments);
+    let selected_columns = model.primary_identifier().as_columns();
+    let base_query = get_records(model, selected_columns, query_arguments);
     let table = Table::from(base_query).alias("sub");
-    let column = Column::from(("sub", id_field.db_name().to_string()));
 
-    Select::from_table(table).value(count(column))
+    Select::from_table(table).value(count(asterisk()))
 }

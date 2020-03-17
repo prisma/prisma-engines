@@ -15,11 +15,14 @@ pub use error::*;
 pub use formatters::*;
 pub use transformers::*;
 
-use crate::{interpreter::ExpressionResult, Query, QueryGraphBuilderResult};
+use crate::{
+    interpreter::ExpressionResult, FilteredQuery, ManyRecordsQuery, Query, QueryGraphBuilderResult, ReadQuery,
+};
+use connector::{IdFilter, QueryArguments};
 use guard::*;
 use invariance_rules::*;
 use petgraph::{graph::*, visit::EdgeRef as PEdgeRef, *};
-use prisma_models::{GraphqlId, PrismaValue};
+use prisma_models::{ModelProjection, ModelRef, RecordProjection};
 use std::{borrow::Borrow, collections::HashSet};
 
 pub type QueryGraphResult<T> = std::result::Result<T, QueryGraphError>;
@@ -64,7 +67,7 @@ impl Flow {
     }
 }
 
-// Current limitation: We need to narrow it down to GraphqlID diffs for Hash and EQ.
+// Current limitation: We need to narrow it down to ID diffs for Hash and EQ.
 pub enum Computation {
     Diff(DiffNode),
 }
@@ -79,8 +82,8 @@ impl Computation {
 }
 
 pub struct DiffNode {
-    pub left: HashSet<GraphqlId>,
-    pub right: HashSet<GraphqlId>,
+    pub left: HashSet<RecordProjection>,
+    pub right: HashSet<RecordProjection>,
 }
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
@@ -107,7 +110,9 @@ impl EdgeRef {
     }
 }
 
-pub type ParentIdsFn = Box<dyn FnOnce(Node, Vec<PrismaValue>) -> QueryGraphBuilderResult<Node> + Send + Sync + 'static>;
+pub type ParentProjectionFn =
+    Box<dyn FnOnce(Node, Vec<RecordProjection>) -> QueryGraphBuilderResult<Node> + Send + Sync + 'static>;
+
 pub type ParentResultFn =
     Box<dyn FnOnce(Node, &ExpressionResult) -> QueryGraphBuilderResult<Node> + Send + Sync + 'static>;
 
@@ -121,10 +126,16 @@ pub enum QueryGraphDependency {
     /// Does not move the result to the closure, but provides a reference.
     ParentResult(ParentResultFn),
 
-    /// More specialized version of `ParentResult`
-    /// Performs a transformation on the child node based on the IDs of the parent result (as PrismaValues).
-    /// Assumes that the parent result can be converted into IDs, else a runtime error will occur.
-    ParentIds(ParentIdsFn),
+    /// More specialized version of `ParentResult` with more guarantees and side effects.
+    ///
+    /// Performs a transformation on the child node based on the requested projection of the parent result (represented as a single merged `ModelProjection`).
+    /// Assumes that the parent result can be converted into the requested projection, else a runtime error will occur.
+    /// The `ModelProjection` is used to determine the set of values to extract from the parent result.
+    ///
+    /// Important note: As opposed to `ParentResult`, this dependency guarantees that if the closure is called, the parent result was projected successfully.
+    /// To achieve that, the query graph is post-processed in the `finalize` and reloads are injected at points where a projection is not fulfilled.
+    /// See `insert_reloads` for more information.
+    ParentProjection(ModelProjection, ParentProjectionFn),
 
     /// Only valid in the context of a `If` control flow node.
     Then,
@@ -186,6 +197,8 @@ impl QueryGraph {
     pub fn finalize(&mut self) -> QueryGraphResult<()> {
         if !self.finalized {
             self.swap_marked()?;
+            self.insert_reloads()?;
+            // self.insert_result_relation_reloads()?;
             self.finalized = true;
         }
 
@@ -324,7 +337,7 @@ impl QueryGraph {
     }
 
     /// Completely removes the edge from the graph, returning it's content.
-    /// This operation is destructive on the underlying graph and invalidates
+    /// This operation is destructive on the underlying graph and invalidates references.
     pub fn remove_edge(&mut self, edge: EdgeRef) -> Option<QueryGraphDependency> {
         self.graph.remove_edge(edge.edge_ix).unwrap().into_inner()
     }
@@ -419,7 +432,7 @@ impl QueryGraph {
     ///
     /// This operation preserves all edges from the parents of `parent` to the node, while inserting new edges from all parents of
     /// `parent` to `child`, effectively "pushing the child in the middle" of `parent` and it's parents. The new edges are only expressing
-    /// exection order, and no node transformation like `ParentIds`.
+    /// exection order, and no node transformation.
     ///
     /// Any edge existing between `parent` and `child` will change direction and will point from `child` to `parent` instead.
     ///
@@ -452,33 +465,33 @@ impl QueryGraph {
     /// hence making it necessary to execute the child operation first.
     ///
     /// Applying the transformations step by step will change the graph as following:
-    /// (original edges marked with an ID to show how they're preserved)
+    /// (new edges created in a transformation step are marked with *)
     /// ```text
-    ///      ┌───┐                 ┌───┐                                 ┌───┐                         ┌───┐
-    ///      │ P │                 │ P │────────────────┐             ┌──│ P │──────────┐           ┌──│ P │────────┐
-    ///      └───┘                 └───┘               1│             │  └───┘         1│           │  └───┘       1│
-    ///       1│                     │                  │            5│   6│            │          5│   6│          │
-    ///        ▼                     │                  │             │    ▼            │           │    ▼          │
-    ///      ┌───┐                   │                  │             │  ┌───┐          │           │  ┌───┐        │
-    ///      │ A │                  5│                  │             │  │ C │          │           │  │ C │───┐    │
-    ///      └───┘     ═(A, B)═▶     │                  │  ═(B, C)═▶  │  └───┘          │ ═(B, D)═▶ │  └───┘  7│    │
-    ///       2│                     │                  │             │   3│            │           │   3│     │    │
-    ///        ▼                     ▼                  │             │    ▼            │           │    │     ▼    │
-    ///      ┌───┐                 ┌───┐                │             │  ┌───┐          │           │    │   ┌───┐  │
-    ///   ┌──│ B │──┐           ┌──│ B │──┬────────┐    │             └─▶│ B │─────┐    │           │    │   │ D │  │
-    ///  3│  └───┘ 4│          3│  └───┘ 4│       2│    │                └───┘     │    │           │    │   └───┘  │
-    ///   │         │           │         │        │    │                 4│      2│    │           │    │    4│    │
-    ///   ▼         ▼           ▼         ▼        ▼    │                  ▼       ▼    │           │    ▼     │    │
-    /// ┌───┐     ┌───┐       ┌───┐     ┌───┐    ┌───┐  │                ┌───┐   ┌───┐  │           │  ┌───┐   │    │
-    /// │ C │     │ D │       │ C │     │ D │    │ A │◀─┘                │ D │   │ A │◀─┘           └─▶│ B │◀──┘    │
-    /// └───┘     └───┘       └───┘     └───┘    └───┘                   └───┘   └───┘                 └───┘        │
-    ///                                                                                                  │          │
-    ///                                                                                                  │          │
-    ///                                                                                                 2│   ┌───┐  │
-    ///                                                                                                  └──▶│ A │◀─┘
-    ///                                                                                                      └───┘
+    ///         ┌───┐                 ┌───┐                                 ┌───┐                         ┌───┐
+    ///         │ P │                 │ P │────────────────┐             ┌──│ P │──────────┐           ┌──│ P │────────┐
+    ///         └───┘                 └───┘               1│             │  └───┘         1│           │  └───┘       1│
+    ///          1│                     │                  │            5│    │ 6*         │          5│   6│          │
+    ///           ▼                     │                  │             │    ▼            │           │    ▼          │
+    ///         ┌───┐                   │                  │             │  ┌───┐          │           │  ┌───┐  7*    │
+    ///         │ A │                 5*│                  │             │  │ C │          │           │  │ C │───┐    │
+    ///         └───┘     ═(A, B)═▶     │                  │ ═(B, C)═▶   │  └───┘          │ ═(B, D)═▶ │  └───┘   │    │
+    ///          2│                     │                  │             │   3│            │           │   3│     │    │
+    ///           ▼                     ▼                  │             │    ▼            │           │    │     ▼    │
+    ///         ┌───┐                 ┌───┐                │             │  ┌───┐          │           │    │   ┌───┐  │
+    ///      ┌──│ B │──┐           ┌──│ B │──┬────────┐    │             └─▶│ B │─────┐    │           │    │   │ D │  │
+    ///     3│  └───┘ 4│          3│  └───┘ 4│       2│    │                └───┘     │    │           │    │   └───┘  │
+    ///      │         │           │         │        │    │                 4│      2│    │           │    │    4│    │
+    ///      ▼         ▼           ▼         ▼        ▼    │                  ▼       ▼    │           │    ▼     │    │
+    ///    ┌───┐     ┌───┐       ┌───┐     ┌───┐    ┌───┐  │                ┌───┐   ┌───┐  │           │  ┌───┐   │    │
+    ///    │ C │     │ D │       │ C │     │ D │    │ A │◀─┘                │ D │   │ A │◀─┘           └─▶│ B │◀──┘    │
+    ///    └───┘     └───┘       └───┘     └───┘    └───┘                   └───┘   └───┘                 └───┘        │
+    ///                                                                                                     │          │
+    ///                                                                                                     │          │
+    ///                                                                                                    2│   ┌───┐  │
+    ///                                                                                                     └──▶│ A │◀─┘
+    ///                                                                                                         └───┘
     /// ```
-    /// todo put if flow exception illustration here.
+    /// [DTODO] put if flow exception illustration here.
     fn swap_marked(&mut self) -> QueryGraphResult<()> {
         if self.marked_node_pairs.len() > 0 {
             trace!("[Graph][Swap] Before shape: {}", self);
@@ -530,6 +543,139 @@ impl QueryGraph {
             if let Some(edge) = existing_edge {
                 let content = self.remove_edge(edge).unwrap();
                 self.create_edge(&child_node, &parent_node, content)?;
+            }
+        }
+
+        Ok(())
+    }
+
+    /// Traverses the query graph and checks if reloads of nodes are necessary.
+    /// Whether or not a node needs to be reloaded is determined based on the
+    /// outgoing edges of parent-projection-based transformers, as those hold the `ModelProjection`s
+    /// all records of the parent result need to contain in order to satisfy dependencies.
+    ///
+    /// ## Example
+    /// Given a query graph, where 3 children require different set of fields ((A, B), (B, C), (A, D))
+    /// to execute their dependent operations:
+    /// ```text
+    /// ┌ ─ ─ ─ ─ ─ ─
+    ///     Parent   │─────────┬───────────────┐
+    /// └ ─ ─ ─ ─ ─ ─          │               │
+    ///        │               │               │
+    ///     (A, B)          (B, C)           (A, D)
+    ///        │               │               │
+    ///        ▼               ▼               ▼
+    /// ┌ ─ ─ ─ ─ ─ ─   ┌ ─ ─ ─ ─ ─ ─   ┌ ─ ─ ─ ─ ─ ─
+    ///    Child A   │     Child B   │     Child C   │
+    /// └ ─ ─ ─ ─ ─ ─   └ ─ ─ ─ ─ ─ ─   └ ─ ─ ─ ─ ─ ─
+    /// ```
+    /// However, `Parent` only returns `(A, B)`, for example, because that's the primary ID of the parent model
+    /// and `Parent` is an operation that only returns IDs (e.g. update, updateMany).
+    ///
+    /// In order to satisfy children B and C, the graph is altered by this post-processing call:
+    /// ```text
+    /// ┌ ─ ─ ─ ─ ─ ─
+    ///     Parent   │
+    /// └ ─ ─ ─ ─ ─ ─
+    ///        │
+    ///     (A, B) (== Primary ID)
+    ///        │
+    ///        ▼
+    /// ┌────────────┐
+    /// │   Reload   │─────────┬───────────────┐
+    /// └────────────┘         │               │
+    ///        │               │               │
+    ///     (A, B)          (B, C)           (A, D)
+    ///        │               │               │
+    ///        ▼               ▼               ▼
+    /// ┌ ─ ─ ─ ─ ─ ─   ┌ ─ ─ ─ ─ ─ ─   ┌ ─ ─ ─ ─ ─ ─
+    ///    Child A   │     Child B   │     Child C   │
+    /// └ ─ ─ ─ ─ ─ ─   └ ─ ─ ─ ─ ─ ─   └ ─ ─ ─ ─ ─ ─
+    /// ```
+    ///
+    /// The edges from `Parent` to all dependent children are removed from the graph and reinserted in order
+    /// on the reload node.
+    ///
+    /// The `Reload` node is always a find many query.
+    /// Unwraps are safe because we're operating on the unprocessed state of the graph (`Expressionista` changes that).
+    fn insert_reloads(&mut self) -> QueryGraphResult<()> {
+        let reloads: Vec<(NodeRef, ModelRef, Vec<(EdgeRef, ModelProjection)>)> = self
+            .graph
+            .node_indices()
+            .filter_map(|ix| {
+                let node = NodeRef { node_ix: ix };
+
+                if let Node::Query(q) = self.node_content(&node).unwrap() {
+                    let edges = self.outgoing_edges(&node);
+
+                    let unsatisfied_edges: Vec<_> = edges
+                        .into_iter()
+                        .filter_map(|edge| match self.edge_content(&edge).unwrap() {
+                            QueryGraphDependency::ParentProjection(ref requested_projection, _)
+                                if !q.returns(requested_projection) =>
+                            {
+                                trace!(
+                                    "Query {:?} does not return requested projection {:?} and will be reloaded.",
+                                    q,
+                                    requested_projection.names().collect::<Vec<_>>()
+                                );
+                                Some((edge, requested_projection.clone()))
+                            }
+                            _ => None,
+                        })
+                        .collect();
+
+                    if unsatisfied_edges.is_empty() {
+                        None
+                    } else {
+                        Some((node, q.model(), unsatisfied_edges))
+                    }
+                } else {
+                    None
+                }
+            })
+            .collect();
+
+        for (node, model, edges) in reloads {
+            // Create reload node and connect it to the `node`.
+            let primary_model_id = model.primary_identifier();
+            let (edges, mut identifiers): (Vec<_>, Vec<_>) = edges.into_iter().unzip();
+            identifiers.push(primary_model_id.clone());
+
+            let read_query = ReadQuery::ManyRecordsQuery(ManyRecordsQuery {
+                name: "reload".into(),
+                alias: None,
+                model,
+                args: QueryArguments::default(),
+                selected_fields: identifiers.into(),
+                nested: vec![],
+                selection_order: vec![],
+            });
+
+            let query = Query::Read(read_query);
+            let reload_node = self.create_node(query);
+
+            self.create_edge(
+                &node,
+                &reload_node,
+                QueryGraphDependency::ParentProjection(
+                    primary_model_id,
+                    Box::new(|mut reload_node, parent_projections| {
+                        if let Node::Query(Query::Read(ReadQuery::ManyRecordsQuery(ref mut mr))) = reload_node {
+                            mr.set_filter(parent_projections.filter());
+                        }
+
+                        Ok(reload_node)
+                    }),
+                ),
+            )?;
+
+            // Remove unsatisfied edges from node, reattach them to the reload node
+            for edge in edges {
+                let target = self.edge_target(&edge);
+                let content = self.remove_edge(edge).unwrap();
+
+                self.create_edge(&reload_node, &target, content)?;
             }
         }
 

@@ -218,7 +218,10 @@ async fn all_postgres_column_types_must_work() {
                 arity: ColumnArity::Required,
             },
 
-            default: Some(format!("nextval(\"{}\".\"User_primary_col_seq\"::regclass)", SCHEMA)),
+            default: Some(DefaultValue::SEQUENCE(format!(
+                "nextval('\"{}\".\"User_primary_col_seq\"'::regclass)",
+                SCHEMA
+            ))),
             auto_increment: true,
         },
         Column {
@@ -262,7 +265,10 @@ async fn all_postgres_column_types_must_work() {
                 arity: ColumnArity::Required,
             },
 
-            default: Some(format!("nextval(\"{}\".\"User_bigserial_col_seq\"::regclass)", SCHEMA)),
+            default: Some(DefaultValue::SEQUENCE(format!(
+                "nextval('\"{}\".\"User_bigserial_col_seq\"'::regclass)",
+                SCHEMA
+            ))),
             auto_increment: true,
         },
         Column {
@@ -324,7 +330,7 @@ async fn all_postgres_column_types_must_work() {
             name: "interval_col".into(),
             tpe: ColumnType {
                 raw: "interval".into(),
-                family: ColumnTypeFamily::DateTime,
+                family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
             },
 
@@ -416,10 +422,10 @@ async fn all_postgres_column_types_must_work() {
                 arity: ColumnArity::Required,
             },
 
-            default: Some(format!(
-                "nextval(\"{}\".\"User_smallserial_col_seq\"::regclass)",
+            default: Some(DefaultValue::SEQUENCE(format!(
+                "nextval('\"{}\".\"User_smallserial_col_seq\"'::regclass)",
                 SCHEMA
-            )),
+            ))),
             auto_increment: true,
         },
         Column {
@@ -430,7 +436,10 @@ async fn all_postgres_column_types_must_work() {
                 arity: ColumnArity::Required,
             },
 
-            default: Some(format!("nextval(\"{}\".\"User_serial_col_seq\"::regclass)", SCHEMA)),
+            default: Some(DefaultValue::SEQUENCE(format!(
+                "nextval('\"{}\".\"User_serial_col_seq\"'::regclass)",
+                SCHEMA
+            ))),
             auto_increment: true,
         },
         Column {
@@ -714,7 +723,7 @@ async fn postgres_enums_must_work() {
     let schema = inspector.describe(SCHEMA).await.expect("describing");
     let got_enum = schema.get_enum("mood").expect("get enum");
 
-    let values: Vec<String> = vec!["sad".into(), "ok".into(), "happy".into()];
+    let values: Vec<String> = vec!["happy".into(), "ok".into(), "sad".into()];
     assert_eq!(
         got_enum,
         &Enum {
@@ -743,4 +752,35 @@ async fn postgres_sequences_must_work() {
             allocation_size: 1,
         },
     );
+}
+
+#[tokio::test]
+async fn postgres_multi_field_indexes_must_be_inferred_in_the_right_order() {
+    let schema = format!(
+        r##"
+            CREATE TABLE "{schema_name}"."indexes_test" (
+                id TEXT PRIMARY KEY,
+                name TEXT NOT NULL,
+                age INTEGER NOT NULL
+            );
+
+            CREATE UNIQUE INDEX "my_idx" ON "{schema_name}"."indexes_test" (name, age);
+            CREATE INDEX "my_idx2" ON "{schema_name}"."indexes_test" (age, name);
+        "##,
+        schema_name = SCHEMA
+    );
+
+    let inspector = get_postgres_describer(&schema, "postgres_multi_field_indexes").await;
+    let schema = inspector.describe(SCHEMA).await.unwrap();
+
+    let table = schema.table_bang("indexes_test");
+    let index = &table.indices[0];
+
+    assert_eq!(&index.columns, &["name", "age"]);
+    assert!(index.tpe.is_unique());
+
+    let index = &table.indices[1];
+
+    assert!(!index.tpe.is_unique());
+    assert_eq!(&index.columns, &["age", "name"]);
 }

@@ -22,27 +22,34 @@ pub enum ComputationResult {
     Diff(DiffResult),
 }
 
-/// Diff of two prisma value vectors A and B:
+/// Diff of two identifier vectors A and B:
 /// `left` contains all elements that are in A but not in B.
 /// `right` contains all elements that are in B but not in A.
 #[derive(Debug, Clone)]
 pub struct DiffResult {
-    pub left: Vec<GraphqlId>,
-    pub right: Vec<GraphqlId>,
+    pub left: Vec<RecordProjection>,
+    pub right: Vec<RecordProjection>,
 }
 
 impl ExpressionResult {
-    /// Attempts to transform the result into a vector of IDs (as PrismaValue).
-    pub fn as_ids(&self) -> InterpretationResult<Vec<PrismaValue>> {
+    /// Attempts to transform the result into a vector of record projections.
+    pub fn as_projections(&self, model_projection: &ModelProjection) -> InterpretationResult<Vec<RecordProjection>> {
         let converted = match self {
             Self::Query(ref result) => match result {
-                QueryResult::Id(id) => Some(id.clone().map(|id| vec![id.into()]).unwrap_or_else(|| vec![])),
+                QueryResult::Id(id) => match id {
+                    Some(id) if model_projection.matches(id) => Some(vec![id.clone()]),
+                    None => Some(vec![]),
+                    Some(id) => {
+                        trace!("RID {:?} does not match MID {:?}", id, model_projection);
+                        None
+                    }
+                },
 
                 // We always select IDs, the unwraps are safe.
                 QueryResult::RecordSelection(rs) => Some(
                     rs.scalars
-                        .collect_ids(rs.id_field.as_str())
-                        .unwrap()
+                        .projections(model_projection)
+                        .expect("Expected record selection to contain required model ID fields.")
                         .into_iter()
                         .map(|val| val.into())
                         .collect(),
@@ -55,7 +62,7 @@ impl ExpressionResult {
         };
 
         converted.ok_or(InterpreterError::InterpretationError(
-            "Unable to convert result into a set of IDs".to_owned(),
+            "Unable to convert result into a set of projections".to_owned(),
         ))
     }
 
@@ -191,8 +198,7 @@ where
                     match query {
                         Query::Read(read) => {
                             self.log_line(level, || format!("READ {}", read));
-
-                            Ok(read::execute(&self.conn, read, &[])
+                            Ok(read::execute(&self.conn, read, None)
                                 .await
                                 .map(|res| ExpressionResult::Query(res))?)
                         }

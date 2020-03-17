@@ -1,7 +1,7 @@
 mod comment;
 mod datamodel;
 mod default_value;
-mod enummodel;
+mod r#enum;
 mod field;
 mod functions;
 mod model;
@@ -10,10 +10,10 @@ mod traits;
 
 pub use self::datamodel::*;
 pub use default_value::*;
-pub use enummodel::*;
 pub use field::*;
 pub use functions::*;
 pub use model::*;
+pub use r#enum::*;
 pub use relation_info::*;
 pub use traits::*;
 

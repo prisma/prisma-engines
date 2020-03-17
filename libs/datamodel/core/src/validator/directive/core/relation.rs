@@ -11,14 +11,20 @@ impl DirectiveValidator<dml::Field> for RelationDirectiveValidator {
     fn directive_name(&self) -> &'static str {
         &"relation"
     }
-    fn validate_and_apply(&self, args: &mut Args, field: &mut dml::Field) -> Result<(), DatamodelError> {
+    fn validate_and_apply(
+        &self,
+        args: &mut Args,
+        field: &mut dml::Field,
+    ) -> Result<(), DatamodelError> {
         if let dml::FieldType::Relation(relation_info) = &mut field.field_type {
             if let Ok(name_arg) = args.default_arg("name") {
                 let name = name_arg.as_str()?;
 
                 if name.is_empty() {
-                    return self
-                        .new_directive_validation_error("A relation cannot have an empty name.", name_arg.span());
+                    return self.new_directive_validation_error(
+                        "A relation cannot have an empty name.",
+                        name_arg.span(),
+                    );
                 }
 
                 relation_info.name = name;
@@ -39,7 +45,11 @@ impl DirectiveValidator<dml::Field> for RelationDirectiveValidator {
         }
     }
 
-    fn serialize(&self, field: &dml::Field, datamodel: &dml::Datamodel) -> Result<Vec<ast::Directive>, DatamodelError> {
+    fn serialize(
+        &self,
+        field: &dml::Field,
+        datamodel: &dml::Datamodel,
+    ) -> Result<Vec<ast::Directive>, DatamodelError> {
         if let dml::FieldType::Relation(relation_info) = &field.field_type {
             let mut args = Vec::new();
 
@@ -53,21 +63,21 @@ impl DirectiveValidator<dml::Field> for RelationDirectiveValidator {
             let mut all_related_ids = related_model.id_field_names();
 
             if !relation_info.name.is_empty()
-                && relation_info.name != DefaultNames::relation_name(&relation_info.to, &parent_model.name)
+                && relation_info.name
+                    != DefaultNames::relation_name(&relation_info.to, &parent_model.name)
             {
                 args.push(ast::Argument::new_string("", &relation_info.name));
             }
-
-            // We only add the references arg,
-            // if we have references
-            // and we do only reference the IDs, which is the default case.
 
             let mut relation_fields = relation_info.to_fields.clone();
 
             relation_fields.sort();
             all_related_ids.sort();
+
+            // if we are on the physical field
             if !relation_info.to_fields.is_empty() {
-                let mut related_fields: Vec<ast::Expression> = Vec::new();
+                let mut related_fields: Vec<ast::Expression> =
+                    Vec::with_capacity(relation_info.to_fields.len());
                 for related_field in &relation_info.to_fields {
                     related_fields.push(ast::Expression::ConstantValue(
                         related_field.clone(),

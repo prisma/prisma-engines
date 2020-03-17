@@ -1,11 +1,9 @@
+use connector::error::ConnectorError;
 use datamodel::error::ErrorCollection;
 use failure::{Error, Fail};
 use graphql_parser::query::ParseError as GqlParseError;
 use query_core::{response_ir, CoreError};
 use serde_json;
-
-#[cfg(feature = "sql")]
-use sql_connector::SqlError;
 
 #[derive(Debug, Fail)]
 pub enum PrismaError {
@@ -20,6 +18,9 @@ pub enum PrismaError {
 
     #[fail(display = "{}", _0)]
     ConfigurationError(String),
+
+    #[fail(display = "{}", _0)]
+    ConnectorError(ConnectorError),
 
     #[fail(display = "{}", _0)]
     ConversionError(ErrorCollection, String),
@@ -42,28 +43,26 @@ pub enum PrismaError {
 }
 
 impl PrismaError {
-    pub(crate) fn render_as_json(&self) -> Result<(), failure::Error> {
+    pub(crate) fn render_as_json(self) -> Result<(), failure::Error> {
+        use std::fmt::Write as _;
         use std::io::Write as _;
 
-        // Datamodel errors need raw byte IO instead of String IO.
-        let mut message: Vec<u8> = Vec::with_capacity(60);
-
-        match self {
+        let error: user_facing_errors::Error = match self {
+            PrismaError::ConnectorError(ConnectorError {
+                user_facing_error: Some(err),
+                ..
+            }) => err.into(),
             PrismaError::ConversionError(errors, dml_string) => {
-                let file_name = "schema.prisma";
+                let mut full_error = errors.to_pretty_string("schema.prisma", &dml_string);
+                write!(full_error, "\nValidation Error Count: {}", errors.to_iter().len())?;
 
-                for error in errors.to_iter() {
-                    writeln!(&mut message)?;
-
-                    error.pretty_print(&mut message, file_name, dml_string)?
-                }
+                user_facing_errors::Error::from(
+                    user_facing_errors::KnownError::new(user_facing_errors::common::SchemaParserError { full_error })
+                        .unwrap(),
+                )
             }
-            other => write!(message, "{}", other)?,
+            other => user_facing_errors::Error::new_non_panic_with_current_backtrace(other.to_string()),
         };
-
-        let error = user_facing_errors::Error::new_non_panic_with_current_backtrace(
-            String::from_utf8_lossy(&message).into_owned(),
-        );
 
         // Because of how the node frontend works (stderr.on('data', ...)), we want to emit one clean JSON message on a single line at once.
         let stderr = std::io::stderr();
@@ -94,7 +93,7 @@ impl From<PrismaError> for response_ir::ResponseError {
     fn from(other: PrismaError) -> Self {
         match other {
             PrismaError::CoreError(core_error) => response_ir::ResponseError::from(core_error),
-            err => response_ir::ResponseError::from(user_facing_errors::Error::from_fail(err)),
+            err => response_ir::ResponseError::from(user_facing_errors::Error::from_dyn_error(&err.compat())),
         }
     }
 }
@@ -135,9 +134,8 @@ impl From<GqlParseError> for PrismaError {
     }
 }
 
-#[cfg(feature = "sql")]
-impl From<SqlError> for PrismaError {
-    fn from(e: SqlError) -> PrismaError {
-        PrismaError::ConfigurationError(format!("{}", e))
+impl From<ConnectorError> for PrismaError {
+    fn from(e: ConnectorError) -> PrismaError {
+        PrismaError::ConnectorError(e)
     }
 }

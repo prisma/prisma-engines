@@ -26,12 +26,25 @@ fn converting_enums() {
             }
         "#,
     );
-    let expected_values = vec!["A".to_string(), "B".to_string(), "C".to_string()];
+    let expected_values = vec![
+        InternalEnumValue {
+            name: "A".to_string(),
+            database_name: None,
+        },
+        InternalEnumValue {
+            name: "B".to_string(),
+            database_name: None,
+        },
+        InternalEnumValue {
+            name: "C".to_string(),
+            database_name: None,
+        },
+    ];
     let enm = datamodel.enums.iter().find(|e| e.name == "MyEnum").unwrap();
-    assert_eq!(enm.values, vec!["A".to_string(), "B".to_string(), "C".to_string()]);
+    assert_eq!(enm.values, expected_values);
 
     let field = datamodel.assert_model("MyModel").assert_scalar_field("field");
-    assert_eq!(field.type_identifier, TypeIdentifier::Enum);
+    assert_eq!(field.type_identifier, TypeIdentifier::Enum("MyEnum".to_string()));
     assert_eq!(
         field.internal_enum,
         Some(InternalEnum {
@@ -107,19 +120,19 @@ fn db_names_work() {
 
     let model = datamodel.assert_model("Test");
     let field = model.assert_scalar_field("field");
-    assert_eq!(
-        field.manifestation,
-        Some(FieldManifestation {
-            db_name: "my_column".to_string()
-        })
-    )
+
+    assert_eq!(field.data_source_field().name, "my_column".to_owned(),)
 }
 
 #[test]
-#[ignore]
 fn scalar_lists_work() {
     let datamodel = convert(
         r#"
+            datasource pg {
+                provider = "postgres"
+                url = "postgres://localhost/postgres"
+            }
+
             model Test {
                 id String @id @default(cuid())
                 intList Int[]
@@ -130,10 +143,7 @@ fn scalar_lists_work() {
     model
         .assert_scalar_field("intList")
         .assert_type_identifier(TypeIdentifier::Int)
-        .assert_list()
-        .assert_behaviour(FieldBehaviour::ScalarList {
-            strategy: ScalarListStrategy::Relation,
-        });
+        .assert_list();
 }
 
 #[test]
@@ -259,7 +269,6 @@ fn explicit_relation_fields() {
         .assert_model_b("Post")
         .assert_manifestation(RelationLinkManifestation::Inline(InlineRelation {
             in_table_of_model_name: "Post".to_string(),
-            referencing_column: "blog_id".to_string(),
         }));
 }
 
@@ -334,7 +343,6 @@ fn implicit_relation_fields() {
         .assert_model_b("Post")
         .assert_manifestation(RelationLinkManifestation::Inline(InlineRelation {
             in_table_of_model_name: "Post".to_string(),
-            referencing_column: "blog".to_string(),
         }));
 }
 
@@ -514,9 +522,8 @@ impl ScalarFieldAssertions for ScalarField {
 }
 
 impl FieldAssertions for RelationField {
-    fn assert_type_identifier(&self, ti: TypeIdentifier) -> &Self {
-        assert_eq!(self.type_identifier, ti);
-        self
+    fn assert_type_identifier(&self, _ti: TypeIdentifier) -> &Self {
+        panic!("Can't assert type identifier of relation.")
     }
 
     fn assert_optional(&self) -> &Self {

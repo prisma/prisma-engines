@@ -3,8 +3,8 @@ use crate::{
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
     QueryGraphBuilderError, QueryGraphBuilderResult,
 };
-use prisma_models::{PrismaValueExtensions, RelationFieldRef};
-use std::{convert::TryInto, sync::Arc};
+use prisma_models::RelationFieldRef;
+use std::sync::Arc;
 
 /// Only for many to many relations.
 ///
@@ -41,6 +41,8 @@ pub fn disconnect_records_node(
     expected_disconnects: usize,
 ) -> QueryGraphBuilderResult<NodeRef> {
     assert!(parent_relation_field.relation().is_many_to_many());
+    let parent_model_id = parent_relation_field.model().primary_identifier();
+    let child_model_id = parent_relation_field.related_model().primary_identifier();
 
     let disconnect = WriteQuery::DisconnectRecords(DisconnectRecords {
         parent_id: None,
@@ -54,7 +56,7 @@ pub fn disconnect_records_node(
     graph.create_edge(
         parent_node,
         &disconnect_node,
-        QueryGraphDependency::ParentIds(Box::new(|mut child_node, mut parent_ids| {
+        QueryGraphDependency::ParentProjection(parent_model_id, Box::new(|mut disconnect_node, mut parent_ids| {
             let parent_id = match parent_ids.pop() {
                 Some(pid) => Ok(pid),
                 None => Err(QueryGraphBuilderError::AssertionError(format!(
@@ -62,11 +64,11 @@ pub fn disconnect_records_node(
                 ))),
             }?;
 
-            if let Node::Query(Query::Write(WriteQuery::DisconnectRecords(ref mut c))) = child_node {
-                c.parent_id = Some(parent_id.into_graphql_id()?);
+            if let Node::Query(Query::Write(WriteQuery::DisconnectRecords(ref mut c))) = disconnect_node {
+                c.parent_id = Some(parent_id);
             }
 
-            Ok(child_node)
+            Ok(disconnect_node)
         })),
     )?;
 
@@ -78,24 +80,26 @@ pub fn disconnect_records_node(
     graph.create_edge(
         &child_node,
         &disconnect_node,
-        QueryGraphDependency::ParentIds(Box::new(move |mut child_node, parent_ids| {
-            let len = parent_ids.len();
+        QueryGraphDependency::ParentProjection(
+            child_model_id,
+            Box::new(move |mut disconnect_node, child_ids| {
+                let len = child_ids.len();
 
-            if len != expected_disconnects {
-                return Err(QueryGraphBuilderError::RecordsNotConnected {
-                    relation_name,
-                    parent_name,
-                    child_name,
-                });
-            }
+                if len != expected_disconnects {
+                    return Err(QueryGraphBuilderError::RecordsNotConnected {
+                        relation_name,
+                        parent_name,
+                        child_name,
+                    });
+                }
 
-            if let Node::Query(Query::Write(WriteQuery::DisconnectRecords(ref mut c))) = child_node {
-                let child_ids = parent_ids.into_iter().map(|id| id.try_into().unwrap()).collect();
-                c.child_ids = child_ids;
-            }
+                if let Node::Query(Query::Write(WriteQuery::DisconnectRecords(ref mut c))) = disconnect_node {
+                    c.child_ids = child_ids;
+                }
 
-            Ok(child_node)
-        })),
+                Ok(disconnect_node)
+            }),
+        ),
     )?;
 
     Ok(disconnect_node)

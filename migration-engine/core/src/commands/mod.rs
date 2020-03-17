@@ -19,7 +19,7 @@ pub use reset::*;
 pub use unapply_migration::*;
 
 use migration_connector::{MigrationError, MigrationStep, MigrationWarning, UnexecutableMigration};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -30,7 +30,7 @@ pub struct DataModelWarningOrError {
     pub message: String,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct MigrationStepsResultOutput {
     pub datamodel: String,

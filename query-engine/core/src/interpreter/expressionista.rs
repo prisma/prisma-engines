@@ -2,7 +2,7 @@ use super::{
     expression::*, ComputationResult, DiffResult, Env, ExpressionResult, InterpretationResult, InterpreterError,
 };
 use crate::{query_graph::*, Query};
-use prisma_models::GraphqlId;
+use prisma_models::RecordProjection;
 use std::convert::TryInto;
 
 pub struct Expressionista;
@@ -142,8 +142,8 @@ impl Expressionista {
             Ok(Expression::Func {
                 func: Box::new(move |_| match node {
                     Node::Computation(Computation::Diff(DiffNode { left, right })) => {
-                        let left_diff: Vec<&GraphqlId> = left.difference(&right).collect();
-                        let right_diff: Vec<&GraphqlId> = right.difference(&left).collect();
+                        let left_diff: Vec<&RecordProjection> = left.difference(&right).collect();
+                        let right_diff: Vec<&RecordProjection> = right.difference(&left).collect();
 
                         Ok(Expression::Return {
                             result: ExpressionResult::Computation(ComputationResult::Diff(DiffResult {
@@ -255,9 +255,9 @@ impl Expressionista {
                                     }?;
 
                                     let res = match dependency {
-                                        QueryGraphDependency::ParentIds(f) => {
-                                            binding.as_ids().and_then(|parent_ids| Ok(f(node, parent_ids)?))
-                                        }
+                                        QueryGraphDependency::ParentProjection(projection, f) => binding
+                                            .as_projections(&projection)
+                                            .and_then(|parent_projections| Ok(f(node, parent_projections)?)),
 
                                         QueryGraphDependency::ParentResult(f) => Ok(f(node, &binding)?),
 
@@ -291,7 +291,7 @@ impl Expressionista {
                     let parent_binding_name = graph.edge_source(&edge).id();
                     Some((parent_binding_name, x))
                 }
-                x @ QueryGraphDependency::ParentIds(_) => {
+                x @ QueryGraphDependency::ParentProjection(_, _) => {
                     let parent_binding_name = graph.edge_source(&edge).id();
                     Some((parent_binding_name, x))
                 }

@@ -40,8 +40,7 @@ impl<'a> Renderer<'a> {
 
         for (i, top) in datamodel.tops.iter().enumerate() {
             match &top {
-                // TODO: This is super ugly. Goal is that type groups get
-                // formatted togehter.
+                // TODO: This is super ugly. Goal is that type groups get formatted together.
                 ast::Top::Type(custom_type) => {
                     if type_renderer.is_none() {
                         if i != 0 {
@@ -160,9 +159,15 @@ impl<'a> Renderer<'a> {
     }
 
     fn render_model(&mut self, model: &ast::Model) {
+        let comment_out = if model.commented_out {
+            "// ".to_string()
+        } else {
+            "".to_string()
+        };
+
         Self::render_documentation(self, model);
 
-        self.write("model ");
+        self.write(format!("{}model ", comment_out).as_ref());
         self.write(&model.name.name);
         self.write(" {");
         self.end_line();
@@ -171,7 +176,7 @@ impl<'a> Renderer<'a> {
         let mut field_formatter = TableFormat::new();
 
         for field in &model.fields {
-            Self::render_field(&mut field_formatter, &field);
+            Self::render_field(&mut field_formatter, &field, model.commented_out);
         }
 
         field_formatter.render(self);
@@ -179,12 +184,12 @@ impl<'a> Renderer<'a> {
         if !model.directives.is_empty() {
             self.end_line();
             for directive in &model.directives {
-                self.render_block_directive(&directive);
+                self.render_block_directive(&directive, comment_out.clone());
             }
         }
 
         self.indent_down();
-        self.write("}");
+        self.write(format!("{}{}", comment_out.clone(), "}").as_ref());
         self.end_line();
     }
 
@@ -198,7 +203,18 @@ impl<'a> Renderer<'a> {
         self.indent_up();
 
         for value in &enm.values {
-            self.write(&value.name);
+            self.write(&value.name.name);
+            if !value.directives.is_empty() {
+                let mut attributes_builder = StringBuilder::new();
+
+                for directive in &value.directives {
+                    attributes_builder.write(&" ");
+                    Self::render_field_directive(&mut attributes_builder, &directive);
+                }
+
+                self.write(&attributes_builder.to_string());
+            }
+
             self.end_line();
         }
 
@@ -206,7 +222,7 @@ impl<'a> Renderer<'a> {
             self.end_line();
             for directive in &enm.directives {
                 self.write(" ");
-                self.render_block_directive(&directive);
+                self.render_block_directive(&directive, "".to_string());
             }
         }
 
@@ -215,10 +231,16 @@ impl<'a> Renderer<'a> {
         self.end_line();
     }
 
-    fn render_field(target: &mut TableFormat, field: &ast::Field) {
+    fn render_field(target: &mut TableFormat, field: &ast::Field, is_commented_out: bool) {
         Self::render_documentation(&mut target.interleave_writer(), field);
 
-        target.write(&field.name.name);
+        let commented_out = if field.is_commented_out || is_commented_out {
+            "// ".to_string()
+        } else {
+            "".to_string()
+        };
+
+        target.write(format!("{}{}", &commented_out, &field.name.name).as_ref());
 
         // Type
         {
@@ -264,8 +286,8 @@ impl<'a> Renderer<'a> {
         }
     }
 
-    fn render_block_directive(&mut self, directive: &ast::Directive) {
-        self.write("@@");
+    fn render_block_directive(&mut self, directive: &ast::Directive, commented_out: String) {
+        self.write(format!("{}@@", commented_out).as_ref());
         self.write(&directive.name.name);
 
         if !directive.arguments.is_empty() {

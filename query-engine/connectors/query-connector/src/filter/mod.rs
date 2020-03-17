@@ -4,13 +4,15 @@
 //! [ScalarCompare](/query-connector/trait.ScalarCompare.html) and
 //! [RelationCompare](/query-connector/trait.RelationCompare.html).
 
+mod id_filter;
 mod list;
 mod relation;
 mod scalar;
 
 use prisma_models::prelude::*;
-use std::fmt;
+use prisma_models::{dml, DataSourceField};
 
+pub use id_filter::*;
 pub use list::*;
 pub use relation::*;
 pub use scalar::*;
@@ -56,12 +58,73 @@ impl Filter {
             _ => 1,
         }
     }
-}
 
-// WIP
-impl fmt::Display for Filter {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{:?}", self)
+    pub fn can_batch(&self) -> bool {
+        match self {
+            Self::Scalar(sf) => sf.can_batch(),
+            Self::And(filters) => filters.iter().any(|f| f.can_batch()),
+            Self::Or(filters) => filters.iter().any(|f| f.can_batch()),
+            _ => false,
+        }
+    }
+
+    pub fn batched(self) -> Vec<Filter> {
+        fn split_longest(mut filters: Vec<Filter>) -> (Option<ScalarFilter>, Vec<Filter>) {
+            let mut longest: Option<ScalarFilter> = None;
+            let mut other = Vec::with_capacity(filters.len());
+
+            while let Some(filter) = filters.pop() {
+                match (filter, longest.as_mut()) {
+                    (Filter::Scalar(sf), Some(ref mut prev)) if sf.len() > prev.len() => {
+                        let previous = longest.replace(sf);
+                        other.push(Filter::Scalar(previous.unwrap()));
+                    }
+                    (Filter::Scalar(sf), None) if sf.can_batch() => {
+                        longest = Some(sf);
+                    }
+                    (filter, _) => other.push(filter),
+                }
+            }
+
+            (longest, other)
+        }
+
+        fn batch<F>(filters: Vec<Filter>, f: F) -> Vec<Filter>
+        where
+            F: Fn(Vec<Filter>) -> Filter,
+        {
+            let (longest, other) = split_longest(filters);
+            let mut batched = Vec::new();
+
+            if let Some(filter) = longest {
+                for filter in filter.batched() {
+                    batched.push(Filter::Scalar(filter))
+                }
+
+                batched
+                    .into_iter()
+                    .map(|batch| {
+                        let mut filters = other.clone();
+                        filters.push(batch);
+
+                        f(filters)
+                    })
+                    .collect()
+            } else {
+                vec![f(other)]
+            }
+        }
+
+        match self {
+            Self::Scalar(sf) => sf
+                .batched()
+                .into_iter()
+                .map(|sf| Self::Scalar(sf))
+                .collect(),
+            Self::And(filters) => batch(filters, |filters| Filter::And(filters)),
+            Self::Or(filters) => batch(filters, |filters| Filter::Or(filters)),
+            _ => vec![self],
+        }
     }
 }
 
@@ -100,16 +163,20 @@ pub fn test_data_model() -> InternalDataModelRef {
     let user_field_templates = vec![
         FieldTemplate::Scalar(ScalarFieldTemplate {
             name: "id".to_owned(),
-            type_identifier: TypeIdentifier::GraphQLID,
+            type_identifier: TypeIdentifier::String,
             is_required: true,
             is_list: false,
             is_unique: false,
             is_id: false,
             is_auto_generated_int_id: false,
-            manifestation: None,
             behaviour: None,
-            default_value: None,
             internal_enum: None,
+            data_source_field: DataSourceField {
+                name: "id".to_owned(),
+                arity: dml::FieldArity::Optional,
+                field_type: dml::ScalarType::String,
+                default_value: None,
+            },
         }),
         FieldTemplate::Scalar(ScalarFieldTemplate {
             name: "name".to_owned(),
@@ -119,21 +186,26 @@ pub fn test_data_model() -> InternalDataModelRef {
             is_unique: false,
             is_id: false,
             is_auto_generated_int_id: false,
-            manifestation: None,
             behaviour: None,
-            default_value: None,
             internal_enum: None,
+            data_source_field: DataSourceField {
+                name: "name".to_owned(),
+                arity: dml::FieldArity::Optional,
+                field_type: dml::ScalarType::String,
+                default_value: None,
+            },
         }),
         FieldTemplate::Relation(RelationFieldTemplate {
             name: "sites".to_owned(),
-            type_identifier: TypeIdentifier::String,
             is_required: false,
+            is_id: false,
             is_list: false,
             is_unique: false,
             is_auto_generated_int_id: false,
-            manifestation: None,
             relation_name: "bar".to_owned(),
             relation_side: RelationSide::A,
+            data_source_fields: vec![],
+            relation_info: dml::RelationInfo::new(""),
         }),
     ];
 
@@ -145,10 +217,14 @@ pub fn test_data_model() -> InternalDataModelRef {
         is_unique: false,
         is_id: false,
         is_auto_generated_int_id: false,
-        manifestation: None,
         behaviour: None,
-        default_value: None,
         internal_enum: None,
+        data_source_field: DataSourceField {
+            name: "name".to_owned(),
+            arity: dml::FieldArity::Optional,
+            field_type: dml::ScalarType::String,
+            default_value: None,
+        },
     })];
 
     let model_templates = vec![
@@ -157,6 +233,7 @@ pub fn test_data_model() -> InternalDataModelRef {
             is_embedded: false,
             fields: user_field_templates,
             manifestation: None,
+            id_field_names: vec![],
             indexes: vec![],
         },
         ModelTemplate {
@@ -164,6 +241,7 @@ pub fn test_data_model() -> InternalDataModelRef {
             is_embedded: false,
             fields: site_field_templates,
             manifestation: None,
+            id_field_names: vec![],
             indexes: vec![],
         },
     ];

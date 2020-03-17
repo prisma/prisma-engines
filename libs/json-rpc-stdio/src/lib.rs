@@ -1,49 +1,38 @@
-use jsonrpc_core::IoHandler;
 use futures::compat::*;
-use tokio::io::{AsyncWriteExt, AsyncBufReadExt};
+use jsonrpc_core::IoHandler;
+use tokio::io::{AsyncBufReadExt, AsyncRead, AsyncWrite, AsyncWriteExt};
 
-pub struct ServerBuilder {
-    handler: IoHandler,
+pub async fn run(handler: &IoHandler) -> std::io::Result<()> {
+    run_with_io(handler, tokio::io::stdin(), tokio::io::stdout()).await
 }
 
-impl ServerBuilder {
-    /// Returns a new server instance
-    pub fn new<T>(handler: T) -> Self
-    where
-        T: Into<IoHandler>,
-    {
-        ServerBuilder {
-            handler: handler.into(),
-        }
+async fn run_with_io(
+    handler: &IoHandler,
+    input: impl AsyncRead + Unpin,
+    output: impl AsyncWrite + Unpin,
+) -> std::io::Result<()> {
+    let input = tokio::io::BufReader::new(input);
+    let mut input_lines = input.lines();
+    let mut output = tokio::io::BufWriter::new(output);
+
+    while let Some(line) = input_lines.next_line().await? {
+        let response = handle_request(&handler, &line).await;
+        output.write_all(response.as_bytes()).await?;
+        output.write_all(b"\n").await?;
+        output.flush().await?;
     }
 
-    /// Run the server until EOF.
-    pub async fn run(self) -> std::io::Result<()> {
-        let stdin = tokio::io::BufReader::new(tokio::io::stdin());
-        let mut stdin_lines = stdin.lines();
-        let mut stdout = tokio::io::BufWriter::new(tokio::io::stdout());
-
-        while let Some(line) = stdin_lines.next_line().await? {
-            let response = handle_request(&self.handler, &line).await;
-            stdout.write_all(response.as_bytes()).await?;
-            stdout.write_all(b"\n").await?;
-            stdout.flush().await?;
-        }
-
-        Ok(())
-    }
+    Ok(())
 }
 
 /// Process a request asynchronously
 async fn handle_request(io: &IoHandler, input: &str) -> String {
     let response = io.handle_request(input).compat().await;
 
-    
-    match response.expect("jsonrpc-core returned an empty error") {
-        Some(res) => res,
-        None =>  {
+    response
+        .expect("jsonrpc-core returned an empty error")
+        .unwrap_or_else(|| {
             tracing::info!("JSON RPC request produced no response: {:?}", input);
             String::from("")
-        }
-    }
+        })
 }

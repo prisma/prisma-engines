@@ -19,6 +19,8 @@ pub struct Model {
     pub id_fields: Vec<String>,
     /// Indicates if this model is generated.
     pub is_generated: bool,
+    /// Indicates if this model has to be commented out.
+    pub is_commented_out: bool,
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -26,6 +28,15 @@ pub struct IndexDefinition {
     pub name: Option<String>,
     pub fields: Vec<String>,
     pub tpe: IndexType,
+}
+
+impl IndexDefinition {
+    pub fn is_unique(&self) -> bool {
+        match self.tpe {
+            IndexType::Unique => true,
+            _ => false,
+        }
+    }
 }
 
 #[derive(Debug, PartialEq, Clone, Copy)]
@@ -46,12 +57,18 @@ impl Model {
             database_name,
             is_embedded: false,
             is_generated: false,
+            is_commented_out: false,
         }
     }
 
     /// Adds a field to this model.
     pub fn add_field(&mut self, field: Field) {
         self.fields.push(field)
+    }
+
+    /// Add fields to this model.
+    pub fn add_fields(&mut self, fields: &mut Vec<Field>) {
+        self.fields.append(fields)
     }
 
     /// Removes a field with the given name from this model.
@@ -86,6 +103,55 @@ impl Model {
             Some(f) => vec![f.name.clone()],
             None => self.id_fields.clone(),
         }
+    }
+
+    /// This should match the logic in `prisma_models::Model::primary_identifier`.
+    pub fn first_unique_criterion(&self) -> Vec<&Field> {
+        // first candidate: the singular id field
+        {
+            let mut singular_id_fields = self.singular_id_fields();
+
+            match singular_id_fields.next() {
+                Some(x) => return vec![x],
+                None => {}
+            }
+        }
+
+        // second candidate: the multi field id
+        {
+            let id_fields: Vec<_> = self.id_fields.iter().map(|f| self.find_field(&f).unwrap()).collect();
+
+            if !id_fields.is_empty() {
+                return id_fields;
+            }
+        }
+
+        // third candidate: a required scalar field with a unique index.
+        {
+            let first_scalar_unique_required_field = self
+                .fields
+                .iter()
+                .find(|field| field.is_unique && field.arity == FieldArity::Required);
+
+            if let Some(field) = first_scalar_unique_required_field {
+                return vec![field];
+            }
+        }
+
+        // fourth candidate: any multi-field unique constraint.
+        {
+            let unique_field_combi = self
+                .indices
+                .iter()
+                .find(|id| id.tpe == IndexType::Unique)
+                .map(|id| id.fields.iter().map(|f| self.find_field(&f).unwrap()).collect());
+
+            if unique_field_combi.is_some() {
+                return unique_field_combi.unwrap();
+            }
+        }
+
+        panic!("Could not find the first unique criteria on model {}", self.name());
     }
 
     /// Finds the name of all id fields

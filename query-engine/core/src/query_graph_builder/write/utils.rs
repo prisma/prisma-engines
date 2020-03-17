@@ -3,10 +3,10 @@ use crate::{
     query_graph::{Flow, Node, NodeRef, QueryGraph, QueryGraphDependency},
     ParsedInputValue, QueryGraphBuilderError, QueryGraphBuilderResult,
 };
-use connector::{Filter, QueryArguments, ScalarCompare};
+use connector::{Filter, IdFilter, QueryArguments, WriteArgs};
 use itertools::Itertools;
-use prisma_models::{ModelRef, PrismaArgs, PrismaValue, RelationFieldRef, SelectedFields};
-use std::{convert::TryInto, sync::Arc};
+use prisma_models::{ModelProjection, ModelRef, RelationFieldRef, SelectedFields};
+use std::sync::Arc;
 
 /// Coerces single values (`ParsedInputValue::Single` and `ParsedInputValue::Map`) into a vector.
 /// Simply unpacks `ParsedInputValue::List`.
@@ -25,18 +25,18 @@ pub fn node_is_create(graph: &QueryGraph, node: &NodeRef) -> bool {
     }
 }
 
-/// Produces a non-failing read query that fetches IDs for a given filterable.
-pub fn read_ids_infallible<T>(model: &ModelRef, filter: T) -> Query
+/// Produces a non-failing read query that fetches the requested projection of records for a given filterable.
+pub fn read_ids_infallible<T>(model: ModelRef, projection: ModelProjection, filter: T) -> Query
 where
     T: Into<Filter>,
 {
-    let selected_fields: SelectedFields = model.fields().id().into();
+    let selected_fields = get_selected_fields(&model, projection);
     let filter: Filter = filter.into();
 
     let read_query = ReadQuery::ManyRecordsQuery(ManyRecordsQuery {
         name: "read_ids_infallible".into(), // this name only eases debugging
         alias: None,
-        model: Arc::clone(&model),
+        model,
         args: filter.into(),
         selected_fields,
         nested: vec![],
@@ -44,6 +44,20 @@ where
     });
 
     Query::Read(read_query)
+}
+
+fn get_selected_fields(model: &ModelRef, projection: ModelProjection) -> SelectedFields {
+    // Always fetch the primary identifier as well.
+    let primary_model_id = model.primary_identifier();
+    let mismatches = projection != primary_model_id;
+
+    let projection = if mismatches {
+        primary_model_id.merge(projection)
+    } else {
+        projection
+    };
+
+    projection.into()
 }
 
 /// Adds a read query to the query graph that finds related records by parent ID.
@@ -54,7 +68,6 @@ where
 ///
 /// Returns a `NodeRef` to the newly created read node.
 ///
-/// The resulting graph is (dashed already exists, everything else is added):
 /// ```text
 /// ┌ ─ ─ ─ ─ ─ ─ ─ ─ ┐
 ///       Parent
@@ -82,15 +95,20 @@ pub fn insert_find_children_by_parent_node<T>(
 where
     T: Into<QueryArguments>,
 {
-    let selected_fields = SelectedFields::new(
-        vec![parent_relation_field.related_model().fields().id().into()],
+    let parent_model_id = parent_relation_field.model().primary_identifier();
+    let parent_linking_fields = parent_relation_field.linking_fields();
+    let projection = parent_model_id.merge(parent_linking_fields);
+
+    let selected_fields = get_selected_fields(
+        &parent_relation_field.related_model(),
+        parent_relation_field.related_field().linking_fields(),
     );
 
-    let read_parent_node = graph.create_node(Query::Read(ReadQuery::RelatedRecordsQuery(RelatedRecordsQuery {
+    let read_children_node = graph.create_node(Query::Read(ReadQuery::RelatedRecordsQuery(RelatedRecordsQuery {
         name: "find_children_by_parent".to_owned(),
         alias: None,
         parent_field: Arc::clone(parent_relation_field),
-        parent_ids: None,
+        parent_projections: None,
         args: filter.into(),
         selected_fields,
         nested: vec![],
@@ -99,18 +117,20 @@ where
 
     graph.create_edge(
         parent_node,
-        &read_parent_node,
-        QueryGraphDependency::ParentIds(Box::new(|mut node, parent_ids| {
-            if let Node::Query(Query::Read(ReadQuery::RelatedRecordsQuery(ref mut rq))) = node {
-                // We know that all PrismaValues in `parent_ids` are transformable into GraphqlIds.
-                rq.parent_ids = Some(parent_ids.into_iter().map(|id| id.try_into().unwrap()).collect());
-            };
+        &read_children_node,
+        QueryGraphDependency::ParentProjection(
+            projection,
+            Box::new(|mut read_children_node, projections| {
+                if let Node::Query(Query::Read(ReadQuery::RelatedRecordsQuery(ref mut rq))) = read_children_node {
+                    rq.parent_projections = Some(projections);
+                };
 
-            Ok(node)
-        })),
+                Ok(read_children_node)
+            }),
+        ),
     )?;
 
-    Ok(read_parent_node)
+    Ok(read_children_node)
 }
 
 /// Creates an update many records query node and adds it to the query graph.
@@ -122,8 +142,7 @@ pub fn update_records_node_placeholder<T>(graph: &mut QueryGraph, filter: T, mod
 where
     T: Into<Filter>,
 {
-    let mut args = PrismaArgs::new();
-
+    let mut args = WriteArgs::new();
     args.update_datetimes(Arc::clone(&model));
 
     let ur = UpdateManyRecords {
@@ -142,12 +161,11 @@ where
 /// `parent_node`: Node that provides the parent id for the find query and where the checks are appended to in the graph.
 /// `parent_relation_field`: Field on the parent model to find children.
 ///
-/// The elements added to the graph are all except `Parent Node`:
 /// ```text
-/// ┌────────────────────────┐
-/// │      Parent Node       │
-/// └────────────────────────┘
-///              │
+/// ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
+///           Parent         │
+/// └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
+///              :
 ///              ▼
 /// ┌────────────────────────┐
 /// │      Read related      │──┐
@@ -173,8 +191,10 @@ pub fn insert_existing_1to1_related_model_checks(
     parent_node: &NodeRef,
     parent_relation_field: &RelationFieldRef,
 ) -> QueryGraphBuilderResult<()> {
+    let child_model_identifier = parent_relation_field.related_model().primary_identifier();
+    let child_linking_fields = parent_relation_field.related_field().linking_fields();
+
     let child_model = parent_relation_field.related_model();
-    let child_model_id_field = child_model.fields().id();
     let child_side_required = parent_relation_field.related_field().is_required;
     let relation_inlined_parent = parent_relation_field.relation_is_inlined_in_parent();
     let rf = Arc::clone(&parent_relation_field);
@@ -183,45 +203,50 @@ pub fn insert_existing_1to1_related_model_checks(
         insert_find_children_by_parent_node(graph, &parent_node, &parent_relation_field, Filter::empty())?;
 
     let update_existing_child = update_records_node_placeholder(graph, Filter::empty(), child_model);
-    let relation_field_name = parent_relation_field.related_field().name.clone();
     let if_node = graph.create_node(Flow::default_if());
 
     graph.create_edge(
         &read_existing_children,
         &if_node,
-        QueryGraphDependency::ParentIds(Box::new(move |node, child_ids| {
-            // If the other side ("child") requires the connection, we need to make sure that there isn't a child already connected
-            // to the parent, as that would violate the other childs relation side.
-            if child_ids.len() > 0 && child_side_required {
-                return Err(QueryGraphBuilderError::RelationViolation(rf.into()));
-            }
+        QueryGraphDependency::ParentProjection(
+            child_model_identifier.clone(),
+            Box::new(move |if_node, child_ids| {
+                // If the other side ("child") requires the connection, we need to make sure that there isn't a child already connected
+                // to the parent, as that would violate the other childs relation side.
+                if child_ids.len() > 0 && child_side_required {
+                    return Err(QueryGraphBuilderError::RelationViolation(rf.into()));
+                }
 
-            if let Node::Flow(Flow::If(_)) = node {
-                // If the relation is inlined in the parent, we need to update the old parent and null out the relation (i.e. "disconnect").
-                Ok(Node::Flow(Flow::If(Box::new(move || {
-                    !relation_inlined_parent && !child_ids.is_empty()
-                }))))
-            } else {
-                unreachable!()
-            }
-        })),
+                if let Node::Flow(Flow::If(_)) = if_node {
+                    // If the relation is inlined in the parent, we need to update the old parent and null out the relation (i.e. "disconnect").
+                    Ok(Node::Flow(Flow::If(Box::new(move || {
+                        !relation_inlined_parent && !child_ids.is_empty()
+                    }))))
+                } else {
+                    unreachable!()
+                }
+            }),
+        ),
     )?;
 
     graph.create_edge(&if_node, &update_existing_child, QueryGraphDependency::Then)?;
-    graph.create_edge(&read_existing_children, &update_existing_child, QueryGraphDependency::ParentIds(Box::new(move |mut child_node, mut child_ids| {
-            // This has to succeed or the if-then node wouldn't trigger.
-            let child_id = match child_ids.pop() {
-                Some(pid) => Ok(pid),
-                None => Err(QueryGraphBuilderError::AssertionError(format!("[Query Graph] Expected a valid parent ID to be present for a nested connect on a one-to-one relation, updating previous parent."))),
-            }?;
+    graph.create_edge(
+        &read_existing_children,
+        &update_existing_child,
+        QueryGraphDependency::ParentProjection(child_model_identifier.clone(), Box::new(move |mut update_existing_child, mut child_ids| {
+             // This has to succeed or the if-then node wouldn't trigger.
+             let child_id = match child_ids.pop() {
+                 Some(pid) => Ok(pid),
+                 None => Err(QueryGraphBuilderError::AssertionError(format!("[Query Graph] Expected a valid parent ID to be present for a nested connect on a one-to-one relation, updating previous parent."))),
+             }?;
 
-            if let Node::Query(Query::Write(ref mut wq)) = child_node {
-                wq.add_filter(child_model_id_field.equals(child_id));
-                wq.inject_non_list_arg(relation_field_name, PrismaValue::Null);
-            }
+             if let Node::Query(Query::Write(ref mut wq)) = update_existing_child {
+                 wq.add_filter(child_id.filter());
+                 wq.inject_projection_into_args(child_linking_fields.empty_record_projection())
+             }
 
-            Ok(child_node)
-        })))?;
+             Ok(update_existing_child)
+         })))?;
 
     Ok(())
 }
@@ -283,18 +308,22 @@ pub fn insert_deletion_checks(
         // For all requiring models (RM), we use the field on `model` to query for existing RM records and error out if at least one exists.
         for rf in relation_fields {
             let relation_field = rf.related_field();
+            let child_model_identifier = relation_field.related_model().primary_identifier();
             let read_node = insert_find_children_by_parent_node(graph, parent_node, &relation_field, Filter::empty())?;
 
             graph.create_edge(
                 &read_node,
                 &noop_node,
-                QueryGraphDependency::ParentIds(Box::new(move |node, parent_ids| {
-                    if !parent_ids.is_empty() {
-                        return Err(QueryGraphBuilderError::RelationViolation((relation_field).into()));
-                    }
+                QueryGraphDependency::ParentProjection(
+                    child_model_identifier,
+                    Box::new(move |noop_node, child_ids| {
+                        if !child_ids.is_empty() {
+                            return Err(QueryGraphBuilderError::RelationViolation((relation_field).into()));
+                        }
 
-                    Ok(node)
-                })),
+                        Ok(noop_node)
+                    }),
+                ),
             )?;
 
             check_nodes.push(read_node);

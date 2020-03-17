@@ -4,6 +4,7 @@ use migration_connector::MigrationWarning;
 use migration_engine_tests::sql::*;
 use pretty_assertions::assert_eq;
 use quaint::ast::*;
+use std::borrow::Cow;
 
 #[test_each_connector]
 async fn adding_a_required_field_if_there_is_data(api: &TestApi) {
@@ -20,7 +21,7 @@ async fn adding_a_required_field_if_there_is_data(api: &TestApi) {
     api.infer_and_apply(&dm).await.sql_schema;
 
     let insert = Insert::single_into((api.schema_name(), "Test")).value("id", "test");
-    api.database().execute(insert.into()).await.unwrap();
+    api.database().query(insert.into()).await.unwrap();
 
     let dm = r#"
             model Test {
@@ -59,7 +60,7 @@ async fn adding_a_required_field_must_use_the_default_value_for_migrations(api: 
     let conn = api.database();
     let insert = Insert::single_into((api.schema_name(), "Test")).value("id", "test");
 
-    conn.execute(insert.into()).await.unwrap();
+    conn.query(insert.into()).await.unwrap();
 
     let dm = r#"
             model Test {
@@ -69,13 +70,12 @@ async fn adding_a_required_field_must_use_the_default_value_for_migrations(api: 
                 boolean Boolean @default(true)
                 string String @default("test_string")
                 dateTime DateTime
-                enum MyEnum @default(C)
+                enum MyEnum @default(A)
             }
 
             enum MyEnum {
                 B
                 A
-                C
             }
         "#;
     api.infer_and_apply(&dm).await;
@@ -104,7 +104,7 @@ async fn dropping_a_table_with_rows_should_warn(api: &TestApi) {
     let conn = api.database();
     let insert = Insert::single_into((api.schema_name(), "Test")).value("id", "test");
 
-    conn.execute(insert.into()).await.unwrap();
+    conn.query(insert.into()).await.unwrap();
 
     let dm = "";
 
@@ -140,7 +140,7 @@ async fn dropping_a_column_with_non_null_values_should_warn(api: &TestApi) {
         .values(("a", 7))
         .values(("b", 8));
 
-    api.database().execute(insert.into()).await.unwrap();
+    api.database().query(insert.into()).await.unwrap();
 
     // Drop the `favouriteAnimal` column.
     let dm = r#"
@@ -181,7 +181,7 @@ async fn altering_a_column_without_non_null_values_should_not_warn(api: &TestApi
         .values(vec!["a"])
         .values(vec!["b"]);
 
-    api.database().execute(insert.into()).await.unwrap();
+    api.database().query(insert.into()).await.unwrap();
 
     let dm2 = r#"
         model Test {
@@ -213,7 +213,7 @@ async fn altering_a_column_with_non_null_values_should_warn(api: &TestApi) -> Te
         .values(("a", 12))
         .values(("b", 22));
 
-    api.database().execute(insert.into()).await.unwrap();
+    api.database().query(insert.into()).await.unwrap();
 
     let dm2 = r#"
         model Test {
@@ -281,13 +281,13 @@ async fn column_defaults_can_safely_be_changed(api: &TestApi) -> TestResult {
         {
             let query = Insert::single_into(api.render_table_name(model_name)).value("id", "abc");
 
-            api.database().execute(query.into()).await?;
+            api.database().query(query.into()).await?;
 
             let query = Insert::single_into(api.render_table_name(model_name))
                 .value("id", "def")
                 .value("name", "Waterworld");
 
-            api.database().execute(query.into()).await?;
+            api.database().query(query.into()).await?;
 
             let data = api.dump_table(model_name).await?;
             let names: Vec<String> = data
@@ -359,7 +359,7 @@ async fn changing_a_column_from_required_to_optional_should_work(api: &TestApi) 
         .values(("a", 12))
         .values(("b", 22));
 
-    api.database().execute(insert.into()).await.unwrap();
+    api.database().query(insert.into()).await.unwrap();
 
     let dm2 = r#"
         model Test {
@@ -426,7 +426,7 @@ async fn changing_a_column_from_optional_to_required_must_warn(api: &TestApi) ->
         .values(("a", 12))
         .values(("b", 22));
 
-    api.database().execute(insert.into()).await.unwrap();
+    api.database().query(insert.into()).await.unwrap();
 
     let dm2 = r#"
         model Test {
@@ -536,7 +536,7 @@ async fn string_columns_do_not_get_arbitrarily_migrated(api: &TestApi) -> TestRe
         .value("email", "george@prisma.io")
         .value("kindle_email", "george+kindle@prisma.io");
 
-    api.database().execute(insert.into()).await?;
+    api.database().query(insert.into()).await?;
 
     let dm2 = r#"
         model User {
@@ -685,7 +685,7 @@ async fn altering_the_type_of_a_column_in_a_non_empty_table_always_warns(api: &T
         .map(drop)
 }
 
-#[test_each_connector(ignore = "mysql")]
+#[test_each_connector(ignore("mysql"))]
 async fn migrating_a_required_column_from_int_to_string_should_warn_and_cast(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Test {
@@ -747,6 +747,242 @@ async fn migrating_a_required_column_from_int_to_string_should_warn_and_cast(api
             format!("{:?} {:?}", first_row.get("id"), first_row.get("serialNumber")),
             r#"Some(Text("abcd")) Some(Text("47"))"#
         );
+    }
+
+    Ok(())
+}
+
+#[test_each_connector(capabilities("enums"))]
+async fn enum_variants_can_be_added_without_data_loss(api: &TestApi) -> TestResult {
+    let dm1 = r#"
+        model Cat {
+            id String @id
+            mood Mood
+        }
+
+        model Human {
+            id String @id
+            mood Mood
+        }
+
+        enum Mood {
+            HAPPY
+            HUNGRY
+        }
+    "#;
+
+    api.infer_apply(dm1)
+        .migration_id(Some("initial-setup"))
+        .send_assert()
+        .await?
+        .assert_green()?;
+
+    {
+        let cat_inserts = quaint::ast::Insert::multi_into(api.render_table_name("Cat"), vec!["id", "mood"])
+            .values((
+                ParameterizedValue::Text(Cow::Borrowed("felix")),
+                ParameterizedValue::Enum(Cow::Borrowed("HUNGRY")),
+            ))
+            .values((
+                ParameterizedValue::Text(Cow::Borrowed("mittens")),
+                ParameterizedValue::Enum(Cow::Borrowed("HAPPY")),
+            ));
+
+        api.database().query(cat_inserts.into()).await?;
+    }
+
+    let dm2 = r#"
+        model Cat {
+            id String @id
+            mood Mood
+        }
+
+        model Human {
+            id String @id
+            mood Mood
+        }
+
+        enum Mood {
+            ABSOLUTELY_FABULOUS
+            HAPPY
+            HUNGRY
+        }
+    "#;
+
+    api.infer_apply(dm2)
+        .migration_id(Some("add-absolutely-fabulous-variant"))
+        .send_assert()
+        .await?
+        .assert_green()?;
+
+    // Assertions
+    {
+        let cat_data = api.dump_table("Cat").await?;
+        let cat_data: Vec<Vec<quaint::ast::ParameterizedValue>> =
+            cat_data.into_iter().map(|row| row.into_iter().collect()).collect();
+
+        let expected_cat_data = if api.sql_family().is_mysql() {
+            vec![
+                vec![
+                    ParameterizedValue::Text("felix".into()),
+                    ParameterizedValue::Text("HUNGRY".into()),
+                ],
+                vec![
+                    ParameterizedValue::Text("mittens".into()),
+                    ParameterizedValue::Text("HAPPY".into()),
+                ],
+            ]
+        } else {
+            vec![
+                vec![
+                    ParameterizedValue::Text("felix".into()),
+                    ParameterizedValue::Enum("HUNGRY".into()),
+                ],
+                vec![
+                    ParameterizedValue::Text("mittens".into()),
+                    ParameterizedValue::Enum("HAPPY".into()),
+                ],
+            ]
+        };
+
+        assert_eq!(cat_data, expected_cat_data);
+
+        let human_data = api.dump_table("Human").await?;
+        let human_data: Vec<Vec<ParameterizedValue>> =
+            human_data.into_iter().map(|row| row.into_iter().collect()).collect();
+        let expected_human_data: Vec<Vec<ParameterizedValue>> = Vec::new();
+        assert_eq!(human_data, expected_human_data);
+
+        if api.sql_family().is_mysql() {
+            api.assert_schema()
+                .await?
+                .assert_enum("Cat_mood", |enm| {
+                    enm.assert_values(&["HAPPY", "HUNGRY", "ABSOLUTELY_FABULOUS"])
+                })?
+                .assert_enum("Human_mood", |enm| {
+                    enm.assert_values(&["HAPPY", "HUNGRY", "ABSOLUTELY_FABULOUS"])
+                })?;
+        } else {
+            api.assert_schema().await?.assert_enum("Mood", |enm| {
+                enm.assert_values(&["ABSOLUTELY_FABULOUS", "HAPPY", "HUNGRY"])
+            })?;
+        };
+    }
+
+    Ok(())
+}
+
+#[test_each_connector(capabilities("enums"))]
+async fn enum_variants_can_be_dropped_without_data_loss(api: &TestApi) -> TestResult {
+    let dm1 = r#"
+        model Cat {
+            id String @id
+            mood Mood
+        }
+
+        model Human {
+            id String @id
+            mood Mood
+        }
+
+        enum Mood {
+            OUTRAGED
+            HAPPY
+            HUNGRY
+        }
+    "#;
+
+    api.infer_apply(dm1)
+        .migration_id(Some("initial-setup"))
+        .send_assert()
+        .await?
+        .assert_green()?;
+
+    {
+        let cat_inserts = quaint::ast::Insert::multi_into(api.render_table_name("Cat"), vec!["id", "mood"])
+            .values((
+                ParameterizedValue::Text(Cow::Borrowed("felix")),
+                ParameterizedValue::Enum(Cow::Borrowed("HUNGRY")),
+            ))
+            .values((
+                ParameterizedValue::Text(Cow::Borrowed("mittens")),
+                ParameterizedValue::Enum(Cow::Borrowed("HAPPY")),
+            ));
+
+        api.database().query(cat_inserts.into()).await?;
+    }
+
+    let dm2 = r#"
+        model Cat {
+            id String @id
+            mood Mood
+        }
+
+        model Human {
+            id String @id
+            mood Mood
+        }
+
+        enum Mood {
+            HAPPY
+            HUNGRY
+        }
+    "#;
+
+    api.infer_apply(dm2)
+        .migration_id(Some("add-absolutely-fabulous-variant"))
+        .send_assert()
+        .await?
+        .assert_green()?;
+
+    // Assertions
+    {
+        let cat_data = api.dump_table("Cat").await?;
+        let cat_data: Vec<Vec<quaint::ast::ParameterizedValue>> =
+            cat_data.into_iter().map(|row| row.into_iter().collect()).collect();
+
+        let expected_cat_data = if api.sql_family().is_mysql() {
+            vec![
+                vec![
+                    ParameterizedValue::Text("felix".into()),
+                    ParameterizedValue::Text("HUNGRY".into()),
+                ],
+                vec![
+                    ParameterizedValue::Text("mittens".into()),
+                    ParameterizedValue::Text("HAPPY".into()),
+                ],
+            ]
+        } else {
+            vec![
+                vec![
+                    ParameterizedValue::Text("felix".into()),
+                    ParameterizedValue::Enum("HUNGRY".into()),
+                ],
+                vec![
+                    ParameterizedValue::Text("mittens".into()),
+                    ParameterizedValue::Enum("HAPPY".into()),
+                ],
+            ]
+        };
+
+        assert_eq!(cat_data, expected_cat_data);
+
+        let human_data = api.dump_table("Human").await?;
+        let human_data: Vec<Vec<ParameterizedValue>> =
+            human_data.into_iter().map(|row| row.into_iter().collect()).collect();
+        let expected_human_data: Vec<Vec<ParameterizedValue>> = Vec::new();
+        assert_eq!(human_data, expected_human_data);
+
+        if api.sql_family().is_mysql() {
+            api.assert_schema()
+                .await?
+                .assert_enum("Cat_mood", |enm| enm.assert_values(&["HAPPY", "HUNGRY"]))?
+                .assert_enum("Human_mood", |enm| enm.assert_values(&["HAPPY", "HUNGRY"]))?;
+        } else {
+            api.assert_schema()
+                .await?
+                .assert_enum("Mood", |enm| enm.assert_values(&["HAPPY", "HUNGRY"]))?;
+        };
     }
 
     Ok(())
