@@ -1458,8 +1458,9 @@ dependencies = [
 
 [[package]]
 name = "mobc"
-version = "0.5.3"
-source = "git+https://github.com/pimeys/mobc?branch=respect-health-check#3a9a07d050adebcaaea8045261cfe36f0a04dcd1"
+version = "0.5.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "fc8951baffaa36d346e5477f6c2b33321d5e5634667d2c53f949b4514753f569"
 dependencies = [
  "async-trait",
  "futures 0.3.4",
@@ -2107,7 +2108,7 @@ dependencies = [
 [[package]]
 name = "quaint"
 version = "0.2.0-alpha.9"
-source = "git+https://github.com/prisma/quaint#0c42d8940ec63c92879e415bb064dd715a51f8a2"
+source = "git+https://github.com/prisma/quaint#5463232cd3577065013bde095afb5171d96b335a"
 dependencies = [
  "async-trait",
  "base64 0.11.0",
