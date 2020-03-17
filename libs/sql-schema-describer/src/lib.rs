@@ -2,7 +2,6 @@
 
 use failure::Fail;
 use serde::{Deserialize, Serialize};
-use std::collections::HashSet;
 use std::fmt;
 
 pub mod mysql;
@@ -204,9 +203,12 @@ impl PrimaryKey {
     }
 
     pub fn matches_foreign_key(&self, columns: Vec<&Column>) -> bool {
-        let a: HashSet<String> = self.columns.clone().into_iter().collect();
-        let b: HashSet<String> = columns.into_iter().map(|c| c.name.clone()).collect();
-        a.symmetric_difference(&b).next().is_none()
+        self.columns.len() == columns.len()
+            && self.columns.iter().all(|self_column| {
+                columns
+                    .iter()
+                    .any(|other_column| *self_column == other_column.name)
+            })
     }
 }
 
