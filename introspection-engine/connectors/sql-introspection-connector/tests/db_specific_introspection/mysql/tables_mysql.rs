@@ -307,7 +307,7 @@ async fn introspecting_a_default_value_as_dbgenerated_should_work(api: &TestApi)
                 t.inject_custom("boolean_static Boolean DEFAULT 1");
                 t.inject_custom("datetime_now TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP");
                 t.inject_custom("datetime_now_lc TIMESTAMP NULL DEFAULT current_timestamp");
-                t.inject_custom("enum_static  ENUM ( 'black', 'white') Default('black')");
+                t.inject_custom("enum_static  ENUM ( 'black', 'white') Default 'black'");
             });
         })
         .await;

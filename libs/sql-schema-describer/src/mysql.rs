@@ -279,7 +279,9 @@ async fn get_all_columns(
                         ColumnTypeFamily::TransactionId => {
                             DefaultValue::DBGENERATED(default_string)
                         }
-                        ColumnTypeFamily::Enum(_) => DefaultValue::VALUE(unquote(default_string)),
+                        ColumnTypeFamily::Enum(_) => DefaultValue::VALUE(unquote(
+                            default_string.replace("_utf8mb4", "").replace("\\\'", ""),
+                        )),
                         ColumnTypeFamily::Unknown => DefaultValue::DBGENERATED(default_string),
                     })
                 }
