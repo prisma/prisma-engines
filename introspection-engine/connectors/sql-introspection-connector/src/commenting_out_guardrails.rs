@@ -4,26 +4,33 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel) {
     let mut commented_model_names = vec![];
     let mut models_with_one_to_one_relation = vec![];
 
-    //todo
+    //todo to_fields != backrelation field
     for model in &datamodel.models {
-        if model.fields.iter().any(|f| match &f.field_type {
-            FieldType::Relation(RelationInfo { to, to_fields, .. }) => {
-                let other_model = datamodel.find_model(to).unwrap();
-                match to_fields {
-                    x if x.len() == 1 => match other_model.find_field(x[0].as_str()).unwrap().arity
-                    {
-                        FieldArity::Required => true,
-                        FieldArity::Optional => true,
-                        FieldArity::List => false,
-                    },
-                    _ => false,
+        if model
+            .fields
+            .iter()
+            .any(|f| match (&f.arity, &f.field_type) {
+                (FieldArity::List, _) => false,
+                (_, FieldType::Relation(RelationInfo { to, to_fields, .. })) => {
+                    let other_model = datamodel.find_model(to).unwrap();
+                    match to_fields {
+                        x if x.len() == 1 => {
+                            match other_model.find_field(x[0].as_str()).unwrap().arity {
+                                FieldArity::Required | FieldArity::Optional => true,
+                                FieldArity::List => false,
+                            }
+                        }
+                        _ => false,
+                    }
                 }
-            }
-            _ => false,
-        }) {
+                (_, _) => false,
+            })
+        {
             models_with_one_to_one_relation.push(model.name.clone())
         }
     }
+
+    println!("{:?}", models_with_one_to_one_relation);
 
     //models without uniques / ids
     for model in &mut datamodel.models {

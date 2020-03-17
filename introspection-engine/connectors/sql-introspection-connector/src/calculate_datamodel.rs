@@ -44,11 +44,23 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
                 .iter()
                 .find(|fk| columns_match(&fk.columns, &index.columns));
 
+            let compound_name = || {
+                model
+                    .fields
+                    .iter()
+                    .find(|f| {
+                        !f.database_names.is_empty()
+                            && columns_match(&f.database_names, &index.columns)
+                    })
+                    .expect("Error finding field matching a compound index.")
+                    .name
+                    .clone()
+            };
+
             let index_to_add = match (fk_on_index, index.columns.len(), index.is_unique()) {
                 (Some(_), _, true) => None, // just make the relation 1:1 and dont print the unique index
                 (Some(_), 1, false) => Some(calculate_index(index)),
-
-                (Some(_), _, false) => Some(calculate_index(index)),
+                (Some(_), _, false) => Some(calculate_compound_index(index, compound_name())),
                 (None, 1, true) => None, // this is expressed by the @unique already
                 (None, _, true) => Some(calculate_index(index)),
                 (None, _, false) => Some(calculate_index(index)),
