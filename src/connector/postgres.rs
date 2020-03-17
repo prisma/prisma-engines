@@ -381,9 +381,20 @@ impl PostgreSql {
         tokio::spawn(conn.map(|r| r.unwrap()));
 
         let schema = url.schema();
-        let path = format!("SET search_path = \"{}\"", schema);
 
-        client.simple_query(path.as_str()).await?;
+        // SET NAMES sets the client text encoding. It needs to be explicitly set for automatic
+        // conversion to and from UTF-8 to happen server-side.
+        //
+        // Relevant docs: https://www.postgresql.org/docs/current/multibyte.html
+        let session_variables = format!(
+            r##"
+            SET search_path = "{schema}";
+            SET NAMES 'UTF8';
+            "##,
+            schema = schema
+        );
+
+        client.simple_query(session_variables.as_str()).await?;
 
         Ok(Self {
             client: PostgresClient(Mutex::new(client)),
