@@ -6,7 +6,7 @@ use quaint::{
     ast::{DatabaseValue, ParameterizedValue},
     connector::ResultRow,
 };
-use rust_decimal::{prelude::FromPrimitive, Decimal};
+use rust_decimal::Decimal;
 use std::{borrow::Borrow, io, str::FromStr};
 use uuid::Uuid;
 
