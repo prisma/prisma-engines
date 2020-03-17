@@ -2,6 +2,7 @@
 
 use failure::Fail;
 use serde::{Deserialize, Serialize};
+use std::collections::HashSet;
 use std::fmt;
 
 pub mod mysql;
@@ -200,6 +201,12 @@ pub struct PrimaryKey {
 impl PrimaryKey {
     pub fn is_single_primary_key(&self, column: &String) -> bool {
         self.columns.len() == 1 && self.columns.contains(column)
+    }
+
+    pub fn matches_foreign_key(&self, columns: Vec<&Column>) -> bool {
+        let a: HashSet<String> = self.columns.clone().into_iter().collect();
+        let b: HashSet<String> = columns.into_iter().map(|c| c.name.clone()).collect();
+        a.symmetric_difference(&b).next().is_none()
     }
 }
 

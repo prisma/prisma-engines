@@ -193,6 +193,8 @@ pub(crate) fn calculate_relation_field(
         ),
     };
 
+    let is_id = is_relation_and_id(columns, &table);
+
     Field {
         name,
         arity,
@@ -200,7 +202,7 @@ pub(crate) fn calculate_relation_field(
         database_names: database_name,
         default_value: None,
         is_unique: false,
-        is_id: false,
+        is_id,
         documentation: None,
         is_generated: false,
         is_updated_at: false,
@@ -312,6 +314,14 @@ pub(crate) fn is_id(column: &Column, table: &Table) -> bool {
         .primary_key
         .as_ref()
         .map(|pk| pk.is_single_primary_key(&column.name))
+        .unwrap_or(false)
+}
+
+pub(crate) fn is_relation_and_id(columns: Vec<&Column>, table: &Table) -> bool {
+    table
+        .primary_key
+        .as_ref()
+        .map(|pk| pk.matches_foreign_key(columns))
         .unwrap_or(false)
 }
 

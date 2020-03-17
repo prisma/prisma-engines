@@ -470,7 +470,6 @@ async fn introspecting_id_fields_with_foreign_key_should_work(api: &TestApi) {
         })
         .await;
 
-    //todo this does not yet recognize that the relation is 1:1 due to the primary key on user_id
     let dm = r#"
             model User {
                id      Int       @id @default(autoincrement())
@@ -479,7 +478,7 @@ async fn introspecting_id_fields_with_foreign_key_should_work(api: &TestApi) {
 
             model Post {
                test    String
-               user_id User     @id @default(autoincrement())
+               user_id User      @id
             }
         "#;
     let result = dbg!(api.introspect().await);
