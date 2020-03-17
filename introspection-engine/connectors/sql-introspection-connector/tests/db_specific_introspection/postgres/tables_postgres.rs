@@ -107,7 +107,10 @@ async fn introspecting_a_table_with_multi_column_unique_index_must_work(api: &Te
                 t.add_column("id", types::primary());
                 t.add_column("firstname", types::text());
                 t.add_column("lastname", types::text());
-                t.add_index("test", types::index(vec!["firstname", "lastname"]).unique(true));
+                t.add_index(
+                    "test",
+                    types::index(vec!["firstname", "lastname"]).unique(true),
+                );
             });
         })
         .await;
@@ -262,7 +265,10 @@ async fn introspecting_a_table_without_uniques_should_comment_it_out(api: &TestA
             });
             migration.create_table("Post", |t| {
                 t.add_column("id", types::integer());
-                t.add_column("user_id", types::foreign("User", "id").nullable(false).unique(true));
+                t.add_column(
+                    "user_id",
+                    types::foreign("User", "id").nullable(false).unique(true),
+                );
             });
         })
         .await;
@@ -302,10 +308,10 @@ async fn introspecting_default_values_should_work(api: &TestApi) {
                 // binary_bits_varying bit varying(80),
                 // binary_uuid uuid,
 
-                t.inject_custom("time_timestamp timestamp Default Now()"); //todo not recognized yet
-                t.inject_custom("time_timestamptz timestamptz Default Now()"); //todo not recognized yet
+                t.inject_custom("time_timestamp timestamp Default Now()");
+                t.inject_custom("time_timestamptz timestamptz Default Now()");
                 t.inject_custom("time_date date Default CURRENT_DATE"); //todo not recognized yet
-                t.inject_custom("time_time time Default Now()"); // todo not recognized yet
+                t.inject_custom("time_time time Default Now()");
 
                 // time_timetz timetz,
                 // time_interval interval,
@@ -342,10 +348,10 @@ async fn introspecting_default_values_should_work(api: &TestApi) {
                 string_char         String?         @default("abcdefgh")
                 string_text         String?         @default("abcdefgh")
                 string_varchar      String?         @default("abcd")
-                time_date           DateTime?
-                time_time           DateTime?
-                time_timestamp      DateTime?
-                time_timestamptz    DateTime?
+                time_date           DateTime?       @default(dbgenerated())
+                time_time           DateTime?       @default(now())
+                time_timestamp      DateTime?       @default(now())
+                time_timestamptz    DateTime?       @default(now())
             }
         "#;
 

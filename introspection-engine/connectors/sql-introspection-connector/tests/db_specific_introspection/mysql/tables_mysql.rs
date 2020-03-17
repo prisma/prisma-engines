@@ -97,7 +97,10 @@ async fn introspecting_a_table_with_multi_column_unique_index_must_work(api: &Te
                     t.add_column("id", types::primary());
                     t.add_column("firstname", types::varchar(10));
                     t.add_column("lastname", types::varchar(10));
-                    t.add_index("test", types::index(vec!["firstname", "lastname"]).unique(true));
+                    t.add_index(
+                        "test",
+                        types::index(vec!["firstname", "lastname"]).unique(true),
+                    );
                 });
             },
             api.db_name(),
@@ -309,12 +312,13 @@ async fn introspecting_a_default_value_as_dbgenerated_should_work(api: &TestApi)
         })
         .await;
 
+    //todo enum -> _utf8mb4\\\'black\\\'
     let dm = r#"
             model Test {
                 boolean_static          Boolean?            @default(true)
                 datetime_now            DateTime?           @default(now())
                 datetime_now_lc         DateTime?           @default(now())
-                enum_static             Test_enum_static?   @default(black)
+                enum_static             Test_enum_static?   @default(black)   
                 float_static            Float?              @default(1.43)
                 id                      Int                 @default(autoincrement()) @id
                 int_static              Int?                @default(2)
