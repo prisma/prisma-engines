@@ -577,9 +577,12 @@ impl<'a> ToSql for ParameterizedValue<'a> {
             (ParameterizedValue::Text(string), _) => string.to_sql(ty, out),
             (ParameterizedValue::Array(values), &PostgresType::BIT_ARRAY)
             | (ParameterizedValue::Array(values), &PostgresType::VARBIT_ARRAY) => {
-                let strings: Vec<String> = values.into_iter().filter_map(|val| val.to_string()).collect();
+                let bitvecs: Vec<BitVec> = values
+                    .into_iter()
+                    .filter_map(|val| val.as_str().map(|s| string_to_bits(s)))
+                    .collect::<crate::Result<Vec<_>>>()?;
 
-                strings.to_sql(ty, out)
+                bitvecs.to_sql(ty, out)
             }
             (ParameterizedValue::Bytes(bytes), _) => bytes.as_ref().to_sql(ty, out),
             (ParameterizedValue::Enum(string), _) => {
