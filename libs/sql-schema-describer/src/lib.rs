@@ -387,7 +387,6 @@ pub struct Sequence {
 
 /// A DefaultValue
 #[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub enum DefaultValue {
     /// A constant value, parsed as String
     VALUE(String),

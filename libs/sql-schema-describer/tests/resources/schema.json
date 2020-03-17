@@ -20,7 +20,9 @@
             "family": "string",
           "arity": "nullable"
           },
-          "default": "default value",
+          "default": {
+            "VALUE": "default value"
+          },
           "autoIncrement": false
         },
         {
