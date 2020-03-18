@@ -340,7 +340,7 @@ const CREATE_ARRAY_TYPES_TABLE: &str = indoc! {
     "##
 };
 
-#[test_each_connector(tags("postgres"), log = "debug")]
+#[test_each_connector(tags("postgres"))]
 async fn postgres_array_types_roundtrip(api: &TestApi) -> TestResult {
     api.execute_sql(CREATE_ARRAY_TYPES_TABLE).await?;
 
@@ -465,6 +465,75 @@ async fn postgres_array_types_roundtrip(api: &TestApi) -> TestResult {
     });
 
     assert_eq!(response, expected_response);
+
+    Ok(())
+}
+
+#[test_each_connector(tags("postgres"))]
+async fn all_postgres_id_types_work(api: &TestApi) -> TestResult {
+    let pk_types = &[
+        ("int2", "12"),
+        ("int4", "78"),
+        ("int8", "1293"),
+        ("decimal(8, 4)", "2.5"),
+        ("float4", "2.8"),
+        ("float8", "2.000039"),
+        // ("serial2", "12"),
+        // ("serial4", "78"),
+        // ("serial8", "1293"),
+        ("money", "800.2"),
+        ("oid", "1288"),
+        ("char(8)", "\"manulcat\""),
+        ("varchar(20)", "\"the-pk-is-here\""),
+        ("text", "\"this is a primary key with spaces\""),
+        ("bit(7)", "\"1111000\""),
+        ("bit varying(80)", "\"1111000\""),
+        ("uuid", "\"111142ec-880b-4062-913d-8eac479ab957\""),
+        ("timestamp", "\"2019-01-28T00:03:20.001Z\""),
+        ("timestamptz", "\"2019-01-28T00:03:20.001Z\""),
+        ("date", "\"2020-01-08T00:00:00.000Z\""),
+        ("time", "\"1970-01-01T12:33:00.050Z\""),
+        ("timetz", "\"1970-01-01T12:33:00.050Z\""),
+        ("boolean", "true"),
+        ("inet", "\"127.0.0.4\""),
+        // ("json", "\"{ \\\"isThisPrimaryKeyReallyJSON\\\": true }\""),
+        // ("jsonb", "\"{ \\\"isThisPrimaryKeyReallyJSON\\\": true }\""),
+    ];
+
+    let drop_table = r#"DROP TABLE IF EXISTS "prisma-tests"."pk_test""#;
+
+    for (pk_type, pk_value) in pk_types {
+        let create_table = format!(
+            r#"CREATE TABLE "prisma-tests"."pk_test" (id {}, PRIMARY KEY (id))"#,
+            pk_type
+        );
+        api.execute_sql(drop_table).await?;
+        api.execute_sql(&create_table).await?;
+
+        let (_datamodel, engine) = api.introspect_and_start_query_engine().await?;
+
+        let query = format!(
+            r#"
+            mutation {{
+                createOnepk_test(
+                    data: {{
+                        id: {}
+                    }}
+                ) {{
+                    id
+                }}
+            }}
+            "#,
+            pk_value
+        );
+
+        let response = engine.request(query).await;
+
+        assert_eq!(
+            response.to_string(),
+            format!(r#"{{"data":{{"createOnepk_test":{{"id":{}}}}}}}"#, pk_value)
+        );
+    }
 
     Ok(())
 }
