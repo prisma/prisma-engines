@@ -520,19 +520,6 @@ async fn introspecting_id_fields_with_foreign_key_should_work(api: &TestApi) {
     custom_assert(&result, dm);
 }
 
-// CREATE TABLE `_BookRoyalty` (
-// `id` CHAR(25) NOT NULL COLLATE 'utf8_general_ci',
-// `A` CHAR(25) NOT NULL COLLATE 'utf8_general_ci',
-// `B` CHAR(25) NOT NULL COLLATE 'utf8_general_ci',
-// PRIMARY KEY (`id`) USING BTREE,
-// UNIQUE INDEX `BookRoyalty_AB_unique` (`A`, `B`) USING BTREE,
-// INDEX `B` (`B`) USING BTREE,
-// CONSTRAINT `_BookRoyalty_ibfk_1` FOREIGN KEY (`A`) REFERENCES `email-idegesembor@dev`.`Book` (`id`) ON UPDATE RESTRICT ON DELETE CASCADE,
-// CONSTRAINT `_BookRoyalty_ibfk_2` FOREIGN KEY (`B`) REFERENCES `email-idegesembor@dev`.`BookRoyalty` (`id`) ON UPDATE RESTRICT ON DELETE CASCADE
-// )
-// COLLATE='utf8mb4_unicode_ci'
-// ENGINE=InnoDB;
-
 #[test_each_connector(tags("postgres"))]
 async fn introspecting_prisma_10_relations_should_work(api: &TestApi) {
     let barrel = api.barrel();
