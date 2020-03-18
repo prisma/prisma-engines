@@ -17,6 +17,7 @@
 - Interpret MySQL time values as DateTime
 - Fix and test array of bit vectors support on postgres
 - Update docs setup to document all features
+- Enable server-side conversion to/from UTF8 on postgres
 
 ## v0.2.0-alpha.9
 
