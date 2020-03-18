@@ -111,24 +111,25 @@ fn doc_comments_to_string(comments: &[String]) -> Option<Comment> {
 
 // Directive parsing
 
-fn parse_directive_arg(token: &pest::iterators::Pair<'_, Rule>) -> Argument {
+fn parse_directive(token: &pest::iterators::Pair<'_, Rule>) -> Directive {
     let mut name: Option<Identifier> = None;
-    let mut argument: Option<Expression> = None;
+    let mut arguments: Vec<Argument> = vec![];
 
     match_children! { token, current,
-        Rule::argument_name => name = Some(current.to_id()),
-        Rule::argument_value => argument = Some(parse_arg_value(&current)),
-        _ => unreachable!("Encountered impossible directive argument during parsing: {:?}", current.tokens())
+        Rule::directive => return parse_directive(&current),
+        Rule::directive_name => name = Some(current.to_id()),
+        Rule::directive_arguments => parse_directive_args(&current, &mut arguments),
+        _ => unreachable!("Encountered impossible directive during parsing: {:?} \n {:?}", token, current.tokens())
     };
 
-    match (name, argument) {
-        (Some(name), Some(value)) => Argument {
+    match name {
+        Some(name) => Directive {
             name,
-            value,
+            arguments,
             span: Span::from_pest(token.as_span()),
         },
         _ => panic!(
-            "Encountered impossible directive arg during parsing: {:?}",
+            "Encountered impossible type during parsing: {:?}",
             token.as_str()
         ),
     }
@@ -148,24 +149,24 @@ fn parse_directive_args(token: &pest::iterators::Pair<'_, Rule>, arguments: &mut
     }
 }
 
-fn parse_directive(token: &pest::iterators::Pair<'_, Rule>) -> Directive {
+fn parse_directive_arg(token: &pest::iterators::Pair<'_, Rule>) -> Argument {
     let mut name: Option<Identifier> = None;
-    let mut arguments: Vec<Argument> = vec![];
+    let mut argument: Option<Expression> = None;
 
     match_children! { token, current,
-        Rule::directive_name => name = Some(current.to_id()),
-        Rule::directive_arguments => parse_directive_args(&current, &mut arguments),
-        _ => unreachable!("Encountered impossible directive during parsing: {:?}", current.tokens())
+        Rule::argument_name => name = Some(current.to_id()),
+        Rule::argument_value => argument = Some(parse_arg_value(&current)),
+        _ => unreachable!("Encountered impossible directive argument during parsing: {:?}", current.tokens())
     };
 
-    match name {
-        Some(name) => Directive {
+    match (name, argument) {
+        (Some(name), Some(value)) => Argument {
             name,
-            arguments,
+            value,
             span: Span::from_pest(token.as_span()),
         },
         _ => panic!(
-            "Encountered impossible type during parsing: {:?}",
+            "Encountered impossible directive arg during parsing: {:?}",
             token.as_str()
         ),
     }
@@ -301,7 +302,7 @@ fn parse_enum(token: &pest::iterators::Pair<'_, Rule>) -> Result<Enum, ErrorColl
     match_children! { token, current,
         Rule::ENUM_KEYWORD => { },
         Rule::identifier => name = Some(current.to_id()),
-        Rule::directive => directives.push(parse_directive(&current)),
+        Rule::block_level_directive => directives.push(parse_directive(&current)),
         Rule::enum_field_declaration => {
         match parse_enum_value(&current) {
             Ok(enum_value) => values.push(enum_value),
