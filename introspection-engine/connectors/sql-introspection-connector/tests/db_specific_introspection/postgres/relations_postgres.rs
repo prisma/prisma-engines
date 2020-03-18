@@ -427,10 +427,6 @@ async fn introspecting_cascading_delete_behaviour_should_work(api: &TestApi) {
     custom_assert(&result, dm);
 }
 
-// enums
-
-// native arrays
-
 #[test_each_connector(tags("postgres"))]
 async fn introspecting_default_values_on_relations_should_be_ignored(api: &TestApi) {
     let barrel = api.barrel();
@@ -518,6 +514,62 @@ async fn introspecting_id_fields_with_foreign_key_should_work(api: &TestApi) {
             model User {
                id      Int      @id @default(autoincrement())
                post    Post[]
+            }
+        "#;
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+}
+
+#[test_each_connector(tags("postgres"))]
+async fn introspecting_prisma_10_relations_should_work(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("Book", |t| {
+                t.inject_custom("id CHAR(25) NOT NULL PRIMARY KEY");
+            });
+            migration.create_table("Royalty", |t| {
+                t.inject_custom("id CHAR(25) NOT NULL PRIMARY KEY");
+            });
+            migration.create_table("_BookRoyalty", |t| {
+                t.inject_custom("id CHAR(25) NOT NULL PRIMARY KEY");
+                t.inject_custom("A CHAR(25) NOT NULL REFERENCES \"Book\"(\"id\")");
+                t.inject_custom("B CHAR(25) NOT NULL REFERENCES \"Royalty\"(\"id\")");
+            });
+        })
+        .await;
+
+    api.database()
+        .execute_raw(
+            &format!(
+                "CREATE UNIQUE INDEX  double on \"{}\".\"_BookRoyalty\" (\"a\", \"b\");",
+                api.schema_name()
+            ),
+            &[],
+        )
+        .await
+        .unwrap();
+
+    api.database()
+        .execute_raw(
+            &format!(
+                "CREATE INDEX single on \"{}\".\"_BookRoyalty\" (\"b\");",
+                api.schema_name()
+            ),
+            &[],
+        )
+        .await
+        .unwrap();
+
+    let dm = r#"
+            model Book {
+              id        String      @id
+              royalty   Royalty[]   @relation("BookRoyalty")
+            }
+                
+            model Royalty {
+              id        String      @id
+              book      Book[]      @relation("BookRoyalty")
             }
         "#;
     let result = dbg!(api.introspect().await);

@@ -17,7 +17,7 @@ pub fn is_migration_table(table: &Table) -> bool {
     table.name == "_Migration"
 }
 
-pub(crate) fn is_prisma_join_table(table: &Table) -> bool {
+pub(crate) fn is_prisma_1_point_1_join_table(table: &Table) -> bool {
     table.columns.len() == 2
         && table.foreign_keys.len() == 2
         && table.foreign_keys[0].referenced_table < table.foreign_keys[1].referenced_table
@@ -35,6 +35,29 @@ pub(crate) fn is_prisma_join_table(table: &Table) -> bool {
         && table.indices.len() >= 1
         && table.indices.last().unwrap().columns.len() == 2
         && table.indices.last().unwrap().tpe == IndexType::Unique
+}
+
+pub(crate) fn is_prisma_1_point_0_join_table(table: &Table) -> bool {
+    table.columns.len() == 3
+        && table.foreign_keys.len() == 2
+        && table.foreign_keys[0].referenced_table < table.foreign_keys[1].referenced_table
+        && table.name.starts_with("_")
+        && table
+            .columns
+            .iter()
+            .find(|column| column.name.to_lowercase() == "a")
+            .is_some()
+        && table
+            .columns
+            .iter()
+            .find(|column| column.name.to_lowercase() == "b")
+            .is_some()
+        && table
+            .columns
+            .iter()
+            .find(|column| column.name.to_lowercase() == "id")
+            .is_some()
+        && table.indices.len() >= 1
 }
 
 pub(crate) fn is_foreign_key_column(table: &Table, column: &Column) -> bool {
