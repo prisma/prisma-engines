@@ -1,5 +1,23 @@
 # Changelog
 
+## v0.2.0-alpha.10
+
+- Use the recommended way to implement tokio_postgres::ToSql::to_sql_checked
+- Introduce byte values
+- Update to mysql_async 0.22
+- Handle many more postgres types
+- Test that timestamptz roundtrips on postgres
+- Add support for arrays of UUIDs, IPs and floats on pg
+- Add support for money columns on postgres
+- Allow querying using tuples in `IN`
+- Fix small decimal values on postgres
+- Support more array types on postgres
+- Ban Decimal::from_f64
+- Add support for postgres `bit` and `varbit` columns
+- Interpret MySQL time values as DateTime
+- Fix and test array of bit vectors support on postgres
+- Update docs setup to document all features
+
 ## v0.2.0-alpha.9
 
 - Correct position for GROUP BY if having ORDER BY in the same clause
