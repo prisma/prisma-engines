@@ -69,7 +69,7 @@ fn nice_error_on_incorrect_enum_field() {
             "block level directive",
             "enum field declaration",
         ],
-        Span::new(25, 25),
+        Span::new(26, 26),
     ));
 }
 

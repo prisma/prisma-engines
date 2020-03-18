@@ -109,8 +109,8 @@ model_declaration = { (UNTIL_END_OF_LINE | doc_comment)* ~ (MODEL_KEYWORD | TYPE
 // ######################################
 // Enum declarations
 // ######################################
-enum_field_declaration = ${ identifier ~ ( "@" ~ directive )* ~ NEWLINE }
-enum_declaration = { doc_comment* ~ ENUM_KEYWORD ~ identifier ~ BLOCK_OPEN ~ (enum_field_declaration | block_level_directive)* ~ BLOCK_CLOSE }
+enum_field_declaration = { (identifier ~ ( "@" ~ directive )+ | identifier) }
+enum_declaration = { doc_comment* ~ ENUM_KEYWORD ~ identifier ~ BLOCK_OPEN ~ (enum_field_declaration | block_level_directive | NEWLINE)* ~ BLOCK_CLOSE }
 
 // ######################################
 // Source block
