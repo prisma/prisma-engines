@@ -15,7 +15,8 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
         .tables
         .iter()
         .filter(|table| !is_migration_table(&table))
-        .filter(|table| !is_prisma_join_table(&table))
+        .filter(|table| !is_prisma_1_point_1_join_table(&table))
+        .filter(|table| !is_prisma_1_point_0_join_table(&table))
     {
         debug!("Calculating model: {}", table.name);
         let mut model = Model::new(table.name.clone(), None);
@@ -120,11 +121,9 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
     }
 
     // add prisma many to many relation fields
-    for table in schema
-        .tables
-        .iter()
-        .filter(|table| is_prisma_join_table(&table))
-    {
+    for table in schema.tables.iter().filter(|table| {
+        is_prisma_1_point_1_join_table(&table) || is_prisma_1_point_0_join_table(&table)
+    }) {
         if let (Some(f), Some(s)) = (table.foreign_keys.get(0), table.foreign_keys.get(1)) {
             let is_self_relation = f.referenced_table == s.referenced_table;
 
