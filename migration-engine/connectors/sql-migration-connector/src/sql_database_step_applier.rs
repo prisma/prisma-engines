@@ -455,9 +455,11 @@ fn safe_alter_column(
             .into_iter()
             .map(|step| match step {
                 PostgresAlterColumn::DropDefault => format!("{} DROP DEFAULT", &alter_column_prefix),
-                PostgresAlterColumn::SetDefault(new_default) => {
-                    format!("{} SET DEFAULT '{}'", &alter_column_prefix, new_default)
-                }
+                PostgresAlterColumn::SetDefault(new_default) => format!(
+                    "{} SET DEFAULT {}",
+                    &alter_column_prefix,
+                    renderer.render_default(&new_default, &next_column.tpe.family)
+                ),
                 PostgresAlterColumn::DropNotNull => format!("{} DROP NOT NULL", &alter_column_prefix),
                 PostgresAlterColumn::SetType(ty) => format!(
                     "{} SET DATA TYPE {}",
@@ -470,9 +472,11 @@ fn safe_alter_column(
             .into_iter()
             .map(|step| match step {
                 MysqlAlterColumn::DropDefault => format!("{} DROP DEFAULT", &alter_column_prefix),
-                MysqlAlterColumn::SetDefault(new_default) => {
-                    format!("{} SET DEFAULT '{}'", &alter_column_prefix, new_default)
-                }
+                MysqlAlterColumn::SetDefault(new_default) => format!(
+                    "{} SET DEFAULT {}",
+                    &alter_column_prefix,
+                    renderer.render_default(&new_default, &next_column.tpe.family)
+                ),
             })
             .collect(),
         ExpandedAlterColumn::Sqlite(_steps) => vec![],

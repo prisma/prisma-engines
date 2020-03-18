@@ -58,6 +58,10 @@ impl DataSourceField {
     pub fn model_field(&self) -> Field {
         self.model_field.upgrade()
     }
+
+    pub fn name(&self) -> &str {
+        self.backing_field.name.as_str()
+    }
 }
 
 impl Deref for DataSourceField {

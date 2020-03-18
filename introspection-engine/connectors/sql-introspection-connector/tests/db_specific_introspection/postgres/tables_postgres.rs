@@ -308,10 +308,10 @@ async fn introspecting_default_values_should_work(api: &TestApi) {
                 // binary_bits_varying bit varying(80),
                 // binary_uuid uuid,
 
-                t.inject_custom("time_timestamp timestamp Default Now()"); //todo not recognized yet
-                t.inject_custom("time_timestamptz timestamptz Default Now()"); //todo not recognized yet
+                t.inject_custom("time_timestamp timestamp Default Now()");
+                t.inject_custom("time_timestamptz timestamptz Default Now()");
                 t.inject_custom("time_date date Default CURRENT_DATE"); //todo not recognized yet
-                t.inject_custom("time_time time Default Now()"); // todo not recognized yet
+                t.inject_custom("time_time time Default Now()");
 
                 // time_timetz timetz,
                 // time_interval interval,
@@ -348,11 +348,74 @@ async fn introspecting_default_values_should_work(api: &TestApi) {
                 string_char         String?         @default("abcdefgh")
                 string_text         String?         @default("abcdefgh")
                 string_varchar      String?         @default("abcd")
-                time_date           DateTime?
-                time_time           DateTime?
-                time_timestamp      DateTime?
-                time_timestamptz    DateTime?
+                time_date           DateTime?       @default(dbgenerated())
+                time_time           DateTime?       @default(now())
+                time_timestamp      DateTime?       @default(now())
+                time_timestamptz    DateTime?       @default(now())
             }
+        "#;
+
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+}
+
+#[test_each_connector(tags("postgres"))]
+
+async fn introspecting_a_default_value_as_dbgenerated_should_work(api: &TestApi) {
+    let sequence = format!("CREATE SEQUENCE test_seq START 1");
+    let color = format!("CREATE Type color as Enum ('black', 'white')");
+
+    api.database().execute_raw(&sequence, &[]).await.unwrap();
+    api.database().execute_raw(&color, &[]).await.unwrap();
+
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("Test", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom("string_static_text text Default 'test'");
+                t.inject_custom("string_static_text_null text Default Null");
+                t.inject_custom("string_static_char char(5) Default 'test'");
+                t.inject_custom("string_static_varchar varchar(5) Default 'test'");
+                t.inject_custom("string_function text Default 'Concatenated'||E'\n'");
+                t.inject_custom("int_static Integer DEFAULT 2");
+                t.inject_custom("int_serial Serial4");
+                t.inject_custom("int_function Integer DEFAULT EXTRACT(year from TIMESTAMP '2001-02-16 20:38:40')");
+                t.inject_custom("int_sequence Integer DEFAULT nextval('test_seq')"); // todo this is not recognized as autoincrement
+                t.inject_custom("float_static Float DEFAULT 1.43");
+                t.inject_custom("boolean_static Boolean DEFAULT true");
+                t.inject_custom("datetime_now_current TIMESTAMP DEFAULT CURRENT_TIMESTAMP");
+                t.inject_custom("datetime_now TIMESTAMP DEFAULT NOW()");
+                t.inject_custom("datetime_now_lc TIMESTAMP DEFAULT now()");
+                t.inject_custom("enum_static color DEFAULT 'black'");
+            });
+        })
+        .await;
+
+    let dm = r#"
+            model Test {
+                boolean_static          Boolean?    @default(true)
+                datetime_now            DateTime?   @default(now())
+                datetime_now_current    DateTime?   @default(now())
+                datetime_now_lc         DateTime?   @default(now())
+                enum_static             color?      @default(black)
+                float_static            Float?      @default(1.43)
+                id                      Int         @default(autoincrement()) @id
+                int_function            Int?        @default(dbgenerated())
+                int_sequence            Int?        @default(dbgenerated())
+                int_serial              Int        @default(autoincrement())
+                int_static              Int?        @default(2)
+                string_function         String?     @default(dbgenerated())
+                string_static_char      String?     @default("test")
+                string_static_text      String?     @default("test")
+                string_static_text_null String?     
+                string_static_varchar   String?     @default("test")
+            }
+            
+           enum color{
+                black
+                white
+           }
         "#;
 
     let result = dbg!(api.introspect().await);

@@ -58,7 +58,11 @@ impl SqlSchemaDescriber {
     async fn get_databases(&self) -> Vec<String> {
         debug!("Getting databases");
         let sql = "select schema_name as schema_name from information_schema.schemata;";
-        let rows = self.conn.query_raw(sql, &[]).await.expect("get schema names ");
+        let rows = self
+            .conn
+            .query_raw(sql, &[])
+            .await
+            .expect("get schema names ");
         let names = rows
             .into_iter()
             .map(|row| {
@@ -105,10 +109,18 @@ impl SqlSchemaDescriber {
             FROM information_schema.TABLES
             WHERE table_schema = ?
         "#;
-        let result = self.conn.query_raw(sql, &[schema.into()]).await.expect("get db size ");
+        let result = self
+            .conn
+            .query_raw(sql, &[schema.into()])
+            .await
+            .expect("get db size ");
         let size = result
             .first()
-            .map(|row| row.get("size").and_then(|x| x.to_string()).unwrap_or("0".to_string()))
+            .map(|row| {
+                row.get("size")
+                    .and_then(|x| x.to_string())
+                    .unwrap_or("0".to_string())
+            })
             .unwrap();
 
         debug!("Found db size: {:?}", size);
@@ -124,7 +136,9 @@ impl SqlSchemaDescriber {
     ) -> (Table, Vec<Enum>) {
         debug!("Getting table '{}'", name);
         let (columns, enums) = columns.remove(name).expect("table columns not found");
-        let (indices, primary_key) = indexes.remove(name).unwrap_or_else(|| (BTreeMap::new(), None));
+        let (indices, primary_key) = indexes
+            .remove(name)
+            .unwrap_or_else(|| (BTreeMap::new(), None));
 
         let foreign_keys = foreign_keys.remove(name).unwrap_or_default();
         (
@@ -140,7 +154,10 @@ impl SqlSchemaDescriber {
     }
 }
 
-async fn get_all_columns(conn: &dyn Queryable, schema_name: &str) -> HashMap<String, (Vec<Column>, Vec<Enum>)> {
+async fn get_all_columns(
+    conn: &dyn Queryable,
+    schema_name: &str,
+) -> HashMap<String, (Vec<Column>, Vec<Enum>)> {
     // We alias all the columns because MySQL column names are case-insensitive in queries, but the
     // information schema column names became upper-case in MySQL 8, causing the code fetching
     // the result values by column name below to fail.
@@ -177,7 +194,10 @@ async fn get_all_columns(conn: &dyn Queryable, schema_name: &str) -> HashMap<Str
             .get("column_name")
             .and_then(|x| x.to_string())
             .expect("get column name");
-        let data_type = col.get("data_type").and_then(|x| x.to_string()).expect("get data_type");
+        let data_type = col
+            .get("data_type")
+            .and_then(|x| x.to_string())
+            .expect("get data_type");
         let full_data_type = col
             .get("full_data_type")
             .and_then(|x| x.to_string())
@@ -197,7 +217,8 @@ async fn get_all_columns(conn: &dyn Queryable, schema_name: &str) -> HashMap<Str
         } else {
             ColumnArity::Nullable
         };
-        let (tpe, enum_option) = get_column_type_and_enum(&table_name, &name, &data_type, &full_data_type, arity);
+        let (tpe, enum_option) =
+            get_column_type_and_enum(&table_name, &name, &data_type, &full_data_type, arity);
         let extra = col
             .get("extra")
             .and_then(|x| x.to_string())
@@ -214,14 +235,63 @@ async fn get_all_columns(conn: &dyn Queryable, schema_name: &str) -> HashMap<Str
             entry.1.push(enm);
         }
 
+        let default = match col.get("column_default") {
+            None => None,
+            Some(param_value) => match param_value.to_string() {
+                None => None,
+                Some(x) if x == "NULL" => None,
+                Some(default_string) => {
+                    Some(match &tpe.family {
+                        ColumnTypeFamily::Int => match parse_int(&default_string).is_some() {
+                            true => DefaultValue::VALUE(default_string),
+                            false => DefaultValue::DBGENERATED(default_string),
+                        },
+                        ColumnTypeFamily::Float => match parse_float(&default_string).is_some() {
+                            true => DefaultValue::VALUE(default_string),
+                            false => DefaultValue::DBGENERATED(default_string),
+                        },
+                        ColumnTypeFamily::Boolean => match parse_int(&default_string) {
+                            Some(1) => DefaultValue::VALUE(default_string),
+                            Some(0) => DefaultValue::VALUE(default_string),
+                            _ => DefaultValue::DBGENERATED(default_string),
+                        },
+                        //todo Maria DB does not seem to quote the strings, but it allows functions which MySQL doesnt
+                        ColumnTypeFamily::String => match &default_string.starts_with("'") {
+                            true => DefaultValue::VALUE(unquote(default_string)),
+                            false => DefaultValue::VALUE(default_string),
+                        },
+                        //todo check other now() definitions
+                        ColumnTypeFamily::DateTime => match default_string.to_lowercase()
+                            == "current_timestamp".to_string()
+                            || default_string.to_lowercase() == "current_timestamp()".to_string()
+                        {
+                            true => DefaultValue::NOW,
+                            false => DefaultValue::DBGENERATED(default_string),
+                        },
+                        ColumnTypeFamily::Binary => DefaultValue::DBGENERATED(default_string),
+                        ColumnTypeFamily::Json => DefaultValue::DBGENERATED(default_string),
+                        ColumnTypeFamily::Uuid => DefaultValue::DBGENERATED(default_string),
+                        ColumnTypeFamily::Geometric => DefaultValue::DBGENERATED(default_string),
+                        ColumnTypeFamily::LogSequenceNumber => {
+                            DefaultValue::DBGENERATED(default_string)
+                        }
+                        ColumnTypeFamily::TextSearch => DefaultValue::DBGENERATED(default_string),
+                        ColumnTypeFamily::TransactionId => {
+                            DefaultValue::DBGENERATED(default_string)
+                        }
+                        ColumnTypeFamily::Enum(_) => DefaultValue::VALUE(unquote(
+                            default_string.replace("_utf8mb4", "").replace("\\\'", ""),
+                        )),
+                        ColumnTypeFamily::Unknown => DefaultValue::DBGENERATED(default_string),
+                    })
+                }
+            },
+        };
+
         let col = Column {
             name,
             tpe,
-            default: col
-                .get("column_default")
-                .and_then(|x| x.as_str())
-                .and_then(sanitize_default_value)
-                .map(String::from),
+            default,
             auto_increment,
         };
 
@@ -259,12 +329,27 @@ async fn get_all_indexes(
 
     for row in rows {
         debug!("Got index row: {:#?}", row);
-        let table_name = row.get("table_name").and_then(|x| x.to_string()).expect("table_name");
-        let seq_in_index = row.get("seq_in_index").and_then(|x| x.as_i64()).expect("seq_in_index");
+        let table_name = row
+            .get("table_name")
+            .and_then(|x| x.to_string())
+            .expect("table_name");
+        let seq_in_index = row
+            .get("seq_in_index")
+            .and_then(|x| x.as_i64())
+            .expect("seq_in_index");
         let pos = seq_in_index - 1;
-        let index_name = row.get("index_name").and_then(|x| x.to_string()).expect("index_name");
-        let is_unique = !row.get("non_unique").and_then(|x| x.as_bool()).expect("non_unique");
-        let column_name = row.get("column_name").and_then(|x| x.to_string()).expect("column_name");
+        let index_name = row
+            .get("index_name")
+            .and_then(|x| x.to_string())
+            .expect("index_name");
+        let is_unique = !row
+            .get("non_unique")
+            .and_then(|x| x.as_bool())
+            .expect("non_unique");
+        let column_name = row
+            .get("column_name")
+            .and_then(|x| x.to_string())
+            .expect("column_name");
 
         // Multi-column indices will return more than one row (with different column_name values).
         // We cannot assume that one row corresponds to one index.
@@ -320,7 +405,10 @@ async fn get_all_indexes(
     map
 }
 
-async fn get_foreign_keys(conn: &dyn Queryable, schema_name: &str) -> HashMap<String, Vec<ForeignKey>> {
+async fn get_foreign_keys(
+    conn: &dyn Queryable,
+    schema_name: &str,
+) -> HashMap<String, Vec<ForeignKey>> {
     // Foreign keys covering multiple columns will return multiple rows, which we need to
     // merge.
     let mut map: HashMap<String, HashMap<String, ForeignKey>> = HashMap::new();
@@ -510,28 +598,20 @@ fn get_column_type_and_enum(
 fn extract_enum_values(full_data_type: &&str) -> Vec<String> {
     let len = &full_data_type.len() - 1;
     let vals = &full_data_type[5..len];
-    vals.split(",")
-        .map(|v| unquote_mariadb_strings(v).to_string())
-        .collect()
+    vals.split(",").map(|v| unquote(v.into())).collect()
 }
 
-fn sanitize_default_value(value: &str) -> Option<&str> {
-    match value {
-        "NULL" => None,
-        default if default.starts_with("'") => Some(unquote_mariadb_strings(default)),
-        other => Some(other),
-    }
-}
-
-fn unquote_mariadb_strings(input: &str) -> &str {
+fn unquote(input: String) -> String {
     /// Regex for matching the quotes on the introspected string values on MariaDB.
-    static MARIADB_STRING_DEFAULT_RE: Lazy<regex::Regex> = Lazy::new(|| regex::Regex::new(r#"^'(.*)'$"#).unwrap());
+    static MARIADB_STRING_DEFAULT_RE: Lazy<regex::Regex> =
+        Lazy::new(|| regex::Regex::new(r#"^'(.*)'$"#).unwrap());
 
     MARIADB_STRING_DEFAULT_RE
-        .captures(input)
+        .captures(input.as_ref())
         .and_then(|captures| captures.get(1))
         .map(|capt| capt.as_str())
-        .unwrap_or(input)
+        .unwrap_or(input.as_ref())
+        .to_string()
 }
 
 #[cfg(test)]
@@ -540,10 +620,10 @@ mod tests {
 
     #[test]
     fn mariadb_string_default_regex_works() {
-        let quoted_str = "'abc $$ def'";
+        let quoted_str = "'abc $$ def'".to_string();
 
-        assert_eq!(unquote_mariadb_strings(quoted_str), "abc $$ def");
+        assert_eq!(unquote(quoted_str), "abc $$ def");
 
-        assert_eq!(unquote_mariadb_strings("heh "), "heh ");
+        assert_eq!(unquote("heh ".to_string()), "heh ");
     }
 }

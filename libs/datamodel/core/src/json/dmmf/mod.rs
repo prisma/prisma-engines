@@ -40,7 +40,6 @@ pub struct Field {
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct Function {
     pub name: String,
-    pub return_type: String,
     pub args: Vec<serde_json::Value>,
 }
 

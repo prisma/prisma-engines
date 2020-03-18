@@ -1,4 +1,4 @@
-use sql_schema_describer::{Column, ColumnType, ForeignKey, SqlSchema, Table};
+use sql_schema_describer::{Column, ColumnType, DefaultValue, ForeignKey, SqlSchema, Table};
 
 pub(crate) fn walk_columns<'a>(schema: &'a SqlSchema) -> impl Iterator<Item = ColumnRef<'a>> + 'a {
     schema.tables.iter().flat_map(move |table| {
@@ -20,8 +20,8 @@ impl<'a> ColumnRef<'a> {
         &self.column.name
     }
 
-    pub(crate) fn default(&self) -> Option<&'a str> {
-        self.column.default.as_ref().map(String::as_str)
+    pub(crate) fn default(&self) -> Option<&'a DefaultValue> {
+        self.column.default.as_ref()
     }
 
     pub(crate) fn column_type(&self) -> &'a ColumnType {

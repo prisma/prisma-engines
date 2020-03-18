@@ -120,7 +120,7 @@ fn type_to_string(scalar: &ScalarType) -> String {
 fn default_value_to_serde(dv_opt: &Option<dml::DefaultValue>) -> Option<serde_json::Value> {
     dv_opt.as_ref().map(|dv| match dv {
         dml::DefaultValue::Single(value) => value_to_serde(&value.clone()),
-        dml::DefaultValue::Expression(vg) => function_to_serde(&vg.name, vg.return_type(), &vg.args),
+        dml::DefaultValue::Expression(vg) => function_to_serde(&vg.name, &vg.args),
     })
 }
 
@@ -136,10 +136,9 @@ fn value_to_serde(value: &dml::ScalarValue) -> serde_json::Value {
     }
 }
 
-fn function_to_serde(name: &str, return_type: ScalarType, args: &Vec<dml::ScalarValue>) -> serde_json::Value {
+fn function_to_serde(name: &str, args: &Vec<dml::ScalarValue>) -> serde_json::Value {
     let func = Function {
         name: String::from(name),
-        return_type: return_type.to_string(),
         args: args.iter().map(|arg| value_to_serde(arg)).collect(),
     };
 

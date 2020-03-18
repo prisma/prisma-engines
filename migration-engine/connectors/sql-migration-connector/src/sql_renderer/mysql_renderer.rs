@@ -24,7 +24,10 @@ impl super::SqlRenderer for MySqlRenderer {
         let column_name = self.quote(column.name());
         let tpe_str = self.render_column_type(&column).unwrap();
         let nullability_str = render_nullability(&column);
-        let default_str = render_default(&column);
+        let default_str = column
+            .default()
+            .map(|default| format!("DEFAULT {}", self.render_default(default, &column.column.tpe.family)))
+            .unwrap_or_else(String::new);
         let foreign_key = column.table().foreign_key_for_column(column.name());
         let auto_increment_str = if column.auto_increment() { "AUTO_INCREMENT" } else { "" };
 

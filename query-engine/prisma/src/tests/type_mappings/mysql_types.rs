@@ -120,7 +120,7 @@ async fn mysql_types_roundtrip(api: &TestApi) -> TestResult {
                         date_date: \"2020-02-27T00:00:00Z\"
                         date_datetime: \"2020-02-27T19:10:22Z\"
                         date_timestamp: \"2020-02-27T19:11:22Z\"
-                        # date_time: \"2020-02-20T12:50:01Z\"
+                        date_time: \"2020-02-20T12:50:01Z\"
                         date_year: 2012
                         string_char: \"make dolphins easy\"
                         string_varchar: \"dolphins of varying characters\"
@@ -173,7 +173,7 @@ async fn mysql_types_roundtrip(api: &TestApi) -> TestResult {
                     date_date
                     date_datetime
                     date_timestamp
-                    # date_time
+                    date_time
                     date_year
                     string_char
                     string_varchar
@@ -213,7 +213,7 @@ async fn mysql_types_roundtrip(api: &TestApi) -> TestResult {
                         "date_date": "2020-02-27T00:00:00.000Z",
                         "date_datetime": "2020-02-27T19:10:22.000Z",
                         "date_timestamp": "2020-02-27T19:11:22.000Z",
-                        // "date_time": "2020-02-27T19:11:22.000Z",
+                        "date_time": "1970-01-01T12:50:01.000Z",
                         "date_year": 2012,
                         "string_char": "make dolphins easy",
                         "string_varchar": "dolphins of varying characters",

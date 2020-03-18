@@ -1,13 +1,14 @@
 use datamodel::common::names::NameNormalizer;
 use datamodel::{
-    DefaultValue, Field, FieldArity, FieldType, IndexDefinition, Model, OnDeleteStrategy,
-    RelationInfo, ScalarType, ScalarValue, ValueGenerator,
+    DefaultValue as DMLDef, Field, FieldArity, FieldType, IndexDefinition, Model, OnDeleteStrategy,
+    RelationInfo, ScalarType, ScalarValue as SV, ValueGenerator as VG,
 };
 use log::debug;
 use once_cell::sync::Lazy;
 use regex::Regex;
 use sql_schema_describer::{
-    Column, ColumnArity, ColumnTypeFamily, ForeignKey, Index, IndexType, SqlSchema, Table,
+    Column, ColumnArity, ColumnTypeFamily, DefaultValue as SQLDef, ForeignKey, Index, IndexType,
+    SqlSchema, Table,
 };
 
 //checks
@@ -277,33 +278,33 @@ pub(crate) fn calculate_default(
     table: &Table,
     column: &Column,
     arity: &FieldArity,
-) -> Option<DefaultValue> {
-    //todo make cases with default value explicit for every datatype
+) -> Option<DMLDef> {
     match (&column.default, &column.tpe.family) {
         (_, _) if *arity == FieldArity::List => None,
-        (Some(d), ColumnTypeFamily::Boolean) => match parse_int(d) {
-            Some(x) => Some(DefaultValue::Single(ScalarValue::Boolean(x != 0))),
-            None => parse_bool(d).map(|b| DefaultValue::Single(ScalarValue::Boolean(b))),
+        (None, _) if column.auto_increment => Some(DMLDef::Expression(VG::new_autoincrement())),
+        (Some(SQLDef::DBGENERATED(_)), _) => Some(DMLDef::Expression(VG::new_dbgenerated())),
+        (Some(SQLDef::SEQUENCE(_)), _) => Some(DMLDef::Expression(VG::new_autoincrement())),
+        (Some(SQLDef::VALUE(val)), ColumnTypeFamily::Boolean) => match parse_int(val) {
+            Some(x) => Some(DMLDef::Single(SV::Boolean(x != 0))),
+            None => parse_bool(val).map(|b| DMLDef::Single(SV::Boolean(b))),
         },
-        (Some(d), ColumnTypeFamily::Int) => match column.auto_increment {
-            true => Some(DefaultValue::Expression(ValueGenerator::new_autoincrement())),
-            _ if is_sequence(column, table) => {
-                Some(DefaultValue::Expression(ValueGenerator::new_autoincrement()))
-            }
-            false => parse_int(d).map(|x| DefaultValue::Single(ScalarValue::Int(x))),
+        (Some(SQLDef::VALUE(val)), ColumnTypeFamily::Int) => match column.auto_increment {
+            true => Some(DMLDef::Expression(VG::new_autoincrement())),
+            _ if is_sequence(column, table) => Some(DMLDef::Expression(VG::new_autoincrement())),
+            false => parse_int(val).map(|x| DMLDef::Single(SV::Int(x))),
         },
-        (Some(d), ColumnTypeFamily::Float) => {
-            parse_float(d).map(|x| DefaultValue::Single(ScalarValue::Float(x)))
+        (Some(SQLDef::VALUE(val)), ColumnTypeFamily::Float) => {
+            parse_float(val).map(|x| DMLDef::Single(SV::Float(x)))
         }
-        (Some(d), ColumnTypeFamily::String) => {
-            Some(DefaultValue::Single(ScalarValue::String(d.to_string())))
+        (Some(SQLDef::VALUE(val)), ColumnTypeFamily::String) => {
+            Some(DMLDef::Single(SV::String(val.into())))
         }
-        (Some(_), ColumnTypeFamily::DateTime) => None, //todo
-        (Some(d), ColumnTypeFamily::Enum(_)) => Some(DefaultValue::Single(
-            ScalarValue::ConstantLiteral(d.to_string()),
-        )),
-        (None, _) if column.auto_increment => {
-            Some(DefaultValue::Expression(ValueGenerator::new_autoincrement()))
+        (Some(SQLDef::NOW), ColumnTypeFamily::DateTime) => Some(DMLDef::Expression(VG::new_now())),
+        (Some(SQLDef::VALUE(_)), ColumnTypeFamily::DateTime) => {
+            Some(DMLDef::Expression(VG::new_dbgenerated()))
+        } //todo parse datetime value
+        (Some(SQLDef::VALUE(val)), ColumnTypeFamily::Enum(_)) => {
+            Some(DMLDef::Single(SV::ConstantLiteral(val.into())))
         }
         (_, _) => None,
     }

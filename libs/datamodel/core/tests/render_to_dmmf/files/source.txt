@@ -41,7 +41,6 @@
           "type": "DateTime",
           "default": {
             "name": "now",
-            "returnType": "DateTime",
             "args": []
           },
           "isGenerated": false,

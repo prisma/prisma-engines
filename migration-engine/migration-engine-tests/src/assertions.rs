@@ -1,6 +1,7 @@
 use pretty_assertions::assert_eq;
 use sql_schema_describer::{
-    Column, Enum, ForeignKey, ForeignKeyAction, Index, IndexType, PrimaryKey, SqlSchema, Table,
+    Column, DefaultValue, Enum, ForeignKey, ForeignKeyAction, Index, IndexType, PrimaryKey,
+    SqlSchema, Table,
 };
 
 pub(crate) type AssertionResult<T> = Result<T, anyhow::Error>;
@@ -15,7 +16,10 @@ impl SqlSchemaExt for SqlSchema {
             anyhow::anyhow!(
                 "assert_table failed. Table {} not found. Tables in database: {:?}",
                 table_name,
-                self.tables.iter().map(|table| &table.name).collect::<Vec<_>>()
+                self.tables
+                    .iter()
+                    .map(|table| &table.name)
+                    .collect::<Vec<_>>()
             )
         })
     }
@@ -49,7 +53,11 @@ impl SchemaAssertion {
             anyhow::anyhow!(
                 "assert_table failed. Table {} not found. Tables in database: {:?}",
                 table_name,
-                self.0.tables.iter().map(|table| &table.name).collect::<Vec<_>>()
+                self.0
+                    .tables
+                    .iter()
+                    .map(|table| &table.name)
+                    .collect::<Vec<_>>()
             )
         })?;
 
@@ -117,14 +125,22 @@ impl<'a> TableAssertion<'a> {
         Ok(self)
     }
 
-    pub fn assert_fk_on_columns<F>(self, columns: &[&str], fk_assertions: F) -> AssertionResult<Self>
+    pub fn assert_fk_on_columns<F>(
+        self,
+        columns: &[&str],
+        fk_assertions: F,
+    ) -> AssertionResult<Self>
     where
         F: FnOnce(ForeignKeyAssertion<'a>) -> AssertionResult<ForeignKeyAssertion<'a>>,
     {
         if let Some(fk) = self.0.foreign_keys.iter().find(|fk| fk.columns == columns) {
             fk_assertions(ForeignKeyAssertion(fk))?;
         } else {
-            anyhow::bail!("Could not find foreign key on {}.{:?}", self.0.name, columns);
+            anyhow::bail!(
+                "Could not find foreign key on {}.{:?}",
+                self.0.name,
+                columns
+            );
         }
 
         Ok(self)
@@ -132,7 +148,11 @@ impl<'a> TableAssertion<'a> {
 
     pub fn assert_does_not_have_column(self, column_name: &str) -> AssertionResult<Self> {
         if self.0.column(column_name).is_some() {
-            anyhow::bail!("Assertion failed: found column `{}` on `{}`.", column_name, self.0.name);
+            anyhow::bail!(
+                "Assertion failed: found column `{}` on `{}`.",
+                column_name,
+                self.0.name
+            );
         }
 
         Ok(self)
@@ -143,7 +163,11 @@ impl<'a> TableAssertion<'a> {
             anyhow::anyhow!(
                 "Assertion failed: column {} not found. Existing columns: {:?}",
                 column_name,
-                self.0.columns.iter().map(|col| &col.name).collect::<Vec<_>>()
+                self.0
+                    .columns
+                    .iter()
+                    .map(|col| &col.name)
+                    .collect::<Vec<_>>()
             )
         })?;
 
@@ -211,7 +235,11 @@ impl<'a> TableAssertion<'a> {
         Ok(self)
     }
 
-    pub fn assert_index_on_columns<F>(self, columns: &[&str], index_assertions: F) -> AssertionResult<Self>
+    pub fn assert_index_on_columns<F>(
+        self,
+        columns: &[&str],
+        index_assertions: F,
+    ) -> AssertionResult<Self>
     where
         F: FnOnce(IndexAssertion<'a>) -> AssertionResult<IndexAssertion<'a>>,
     {
@@ -229,7 +257,16 @@ pub struct ColumnAssertion<'a>(&'a Column);
 
 impl<'a> ColumnAssertion<'a> {
     pub fn assert_default(self, expected: Option<&str>) -> AssertionResult<Self> {
-        let found = self.0.default.as_ref().map(String::as_str);
+        let found = self
+            .0
+            .default
+            .as_ref()
+            .map(|default_value| match default_value {
+                DefaultValue::VALUE(s) => s,
+                DefaultValue::SEQUENCE(s) => s,
+                DefaultValue::DBGENERATED(s) => s,
+                DefaultValue::NOW => "CURRENT_TIMESTAMP",
+            });
 
         anyhow::ensure!(
             found == expected,

@@ -3,6 +3,7 @@ use crate::{
     QueryExt, SqlError,
 };
 use connector_interface::*;
+use futures::stream::{FuturesUnordered, StreamExt};
 use prisma_models::*;
 use quaint::ast::*;
 
@@ -23,7 +24,10 @@ pub async fn get_single_record(
         Err(e) => Err(e),
     })?
     .map(Record::from)
-    .map(|record| SingleRecord { record, field_names });
+    .map(|record| SingleRecord {
+        record,
+        field_names,
+    });
 
     Ok(record)
 }
@@ -31,21 +35,48 @@ pub async fn get_single_record(
 pub async fn get_many_records(
     conn: &dyn QueryExt,
     model: &ModelRef,
-    query_arguments: QueryArguments,
+    mut query_arguments: QueryArguments,
     selected_fields: &SelectedFields,
 ) -> crate::Result<ManyRecords> {
     let field_names = selected_fields.db_names().map(String::from).collect();
     let idents: Vec<_> = selected_fields.types().collect();
-    let query = read::get_records(model, selected_fields.columns(), query_arguments);
+    let mut records = ManyRecords::new(field_names);
 
-    let records = conn
-        .filter(query.into(), idents.as_slice())
-        .await?
-        .into_iter()
-        .map(Record::from)
-        .collect();
+    if query_arguments.can_batch() {
+        // We don't need to order in the database due to us ordering in this
+        // function.
+        let order = query_arguments.order_by.take();
 
-    Ok(ManyRecords { records, field_names })
+        let batches = query_arguments.batched();
+        let mut futures = FuturesUnordered::new();
+
+        for args in batches.into_iter() {
+            let query = read::get_records(model, selected_fields.columns(), args);
+            futures.push(conn.filter(query.into(), idents.as_slice()));
+        }
+
+        while let Some(result) = futures.next().await {
+            for item in result?.into_iter() {
+                records.push(Record::from(item))
+            }
+        }
+
+        if let Some(ref order_by) = order {
+            records.order_by(order_by)
+        }
+    } else {
+        let query = read::get_records(model, selected_fields.columns(), query_arguments);
+
+        for item in conn
+            .filter(query.into(), idents.as_slice())
+            .await?
+            .into_iter()
+        {
+            records.push(Record::from(item))
+        }
+    }
+
+    Ok(records)
 }
 
 pub async fn get_related_m2m_record_ids(
@@ -69,7 +100,11 @@ pub async fn get_related_m2m_record_ids(
 
     // [DTODO] To verify: We might need chunked fetch here (too many parameters in the query).
     let select = Select::from_table(table)
-        .columns(from_column_names.into_iter().chain(to_column_names.into_iter()))
+        .columns(
+            from_column_names
+                .into_iter()
+                .chain(to_column_names.into_iter()),
+        )
         .so_that(query_builder::conditions(&from_columns, from_record_ids));
 
     let parent_model_id = from_field.model().primary_identifier();

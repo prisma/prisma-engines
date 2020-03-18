@@ -58,6 +58,74 @@ impl Filter {
             _ => 1,
         }
     }
+
+    pub fn can_batch(&self) -> bool {
+        match self {
+            Self::Scalar(sf) => sf.can_batch(),
+            Self::And(filters) => filters.iter().any(|f| f.can_batch()),
+            Self::Or(filters) => filters.iter().any(|f| f.can_batch()),
+            _ => false,
+        }
+    }
+
+    pub fn batched(self) -> Vec<Filter> {
+        fn split_longest(mut filters: Vec<Filter>) -> (Option<ScalarFilter>, Vec<Filter>) {
+            let mut longest: Option<ScalarFilter> = None;
+            let mut other = Vec::with_capacity(filters.len());
+
+            while let Some(filter) = filters.pop() {
+                match (filter, longest.as_mut()) {
+                    (Filter::Scalar(sf), Some(ref mut prev)) if sf.len() > prev.len() => {
+                        let previous = longest.replace(sf);
+                        other.push(Filter::Scalar(previous.unwrap()));
+                    }
+                    (Filter::Scalar(sf), None) if sf.can_batch() => {
+                        longest = Some(sf);
+                    }
+                    (filter, _) => other.push(filter),
+                }
+            }
+
+            (longest, other)
+        }
+
+        fn batch<F>(filters: Vec<Filter>, f: F) -> Vec<Filter>
+        where
+            F: Fn(Vec<Filter>) -> Filter,
+        {
+            let (longest, other) = split_longest(filters);
+            let mut batched = Vec::new();
+
+            if let Some(filter) = longest {
+                for filter in filter.batched() {
+                    batched.push(Filter::Scalar(filter))
+                }
+
+                batched
+                    .into_iter()
+                    .map(|batch| {
+                        let mut filters = other.clone();
+                        filters.push(batch);
+
+                        f(filters)
+                    })
+                    .collect()
+            } else {
+                vec![f(other)]
+            }
+        }
+
+        match self {
+            Self::Scalar(sf) => sf
+                .batched()
+                .into_iter()
+                .map(|sf| Self::Scalar(sf))
+                .collect(),
+            Self::And(filters) => batch(filters, |filters| Filter::And(filters)),
+            Self::Or(filters) => batch(filters, |filters| Filter::Or(filters)),
+            _ => vec![self],
+        }
+    }
 }
 
 impl From<ScalarFilter> for Filter {
