@@ -1,12 +1,13 @@
 use super::super::test_api::QueryEngine;
 use crate::context::PrismaContext;
-use quaint::prelude::Queryable;
+use quaint::{prelude::Queryable, single::Quaint};
 
 pub type TestResult = anyhow::Result<()>;
 
 pub struct TestApi {
     provider: &'static str,
     database_string: String,
+    connection: Quaint,
     is_pgbouncer: bool,
 }
 
@@ -25,14 +26,14 @@ impl TestApi {
     }
 
     pub async fn execute_sql(&self, sql: &str) -> anyhow::Result<()> {
-        let conn = quaint::single::Quaint::new(&self.database_string).await?;
-
-        conn.execute_raw(sql, &[]).await?;
+        self.connection.execute_raw(sql, &[]).await?;
 
         Ok(())
     }
 
-    pub async fn introspect_and_start_query_engine(&self) -> anyhow::Result<(DatamodelAssertions, QueryEngine)> {
+    pub async fn introspect_and_start_query_engine(
+        &self,
+    ) -> anyhow::Result<(DatamodelAssertions, QueryEngine)> {
         let datasource = self.datasource();
 
         let schema = introspection_core::RpcImpl::introspect_internal(datasource)
@@ -75,7 +76,11 @@ impl DatamodelAssertions {
 pub struct ModelAssertions<'a>(&'a datamodel::dml::Model);
 
 impl<'a> ModelAssertions<'a> {
-    pub fn assert_field_type(self, name: &str, r#type: datamodel::dml::ScalarType) -> anyhow::Result<Self> {
+    pub fn assert_field_type(
+        self,
+        name: &str,
+        r#type: datamodel::dml::ScalarType,
+    ) -> anyhow::Result<Self> {
         let field = self
             .0
             .find_field(name)
@@ -118,6 +123,7 @@ pub async fn mysql_8_test_api(db_name: &str) -> TestApi {
         .unwrap();
 
     TestApi {
+        connection: Quaint::new(&mysql_url).await.unwrap(),
         database_string: mysql_url,
         provider: "mysql",
         is_pgbouncer: false,
@@ -132,6 +138,7 @@ pub async fn mysql_test_api(db_name: &str) -> TestApi {
         .unwrap();
 
     TestApi {
+        connection: Quaint::new(&mysql_url).await.unwrap(),
         database_string: mysql_url,
         provider: "mysql",
         is_pgbouncer: false,
@@ -146,6 +153,7 @@ pub async fn mysql_mariadb_test_api(db_name: &str) -> TestApi {
         .unwrap();
 
     TestApi {
+        connection: Quaint::new(&mysql_url).await.unwrap(),
         database_string: mysql_url,
         provider: "mysql",
         is_pgbouncer: false,
@@ -160,6 +168,7 @@ pub async fn postgres_test_api(db_name: &str) -> TestApi {
         .unwrap();
 
     TestApi {
+        connection: Quaint::new(&postgres_url).await.unwrap(),
         database_string: postgres_url,
         provider: "postgres",
         is_pgbouncer: false,
@@ -174,6 +183,7 @@ pub async fn postgres9_test_api(db_name: &str) -> TestApi {
         .unwrap();
 
     TestApi {
+        connection: Quaint::new(&postgres_url).await.unwrap(),
         database_string: postgres_url,
         provider: "postgres",
         is_pgbouncer: false,
@@ -188,6 +198,7 @@ pub async fn postgres11_test_api(db_name: &str) -> TestApi {
         .unwrap();
 
     TestApi {
+        connection: Quaint::new(&postgres_url).await.unwrap(),
         database_string: postgres_url,
         provider: "postgres",
         is_pgbouncer: false,
@@ -202,6 +213,7 @@ pub async fn postgres12_test_api(db_name: &str) -> TestApi {
         .unwrap();
 
     TestApi {
+        connection: Quaint::new(&postgres_url).await.unwrap(),
         database_string: postgres_url,
         provider: "postgres",
         is_pgbouncer: false,
