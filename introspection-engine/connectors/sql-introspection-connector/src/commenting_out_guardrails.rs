@@ -20,7 +20,6 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel) {
                     }),
                 ) => {
                     let other_model = datamodel.find_model(to).unwrap();
-                    println!("{:?}", other_model);
                     let other_field = other_model
                         .fields
                         .iter()
@@ -51,11 +50,8 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel) {
         }
     }
 
-    println!("{:?}", models_with_one_to_one_relation);
-
     //models without uniques / ids
     for model in &mut datamodel.models {
-        println!("Sorting out HERE: {:?}", model);
         if model.id_fields.is_empty()
             && !model.fields.iter().any(|f| f.is_id || f.is_unique)
             && !model.indices.iter().any(|i| i.is_unique())
