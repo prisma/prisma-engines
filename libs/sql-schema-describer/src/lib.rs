@@ -203,6 +203,15 @@ impl PrimaryKey {
     pub fn is_single_primary_key(&self, column: &String) -> bool {
         self.columns.len() == 1 && self.columns.contains(column)
     }
+
+    pub fn matches_foreign_key(&self, columns: Vec<&Column>) -> bool {
+        self.columns.len() == columns.len()
+            && self.columns.iter().all(|self_column| {
+                columns
+                    .iter()
+                    .any(|other_column| *self_column == other_column.name)
+            })
+    }
 }
 
 /// A column of a table.

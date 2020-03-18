@@ -12,7 +12,10 @@ async fn introspecting_a_one_to_one_req_relation_should_work(api: &TestApi) {
             });
             migration.create_table("Post", |t| {
                 t.add_column("id", types::primary());
-                t.add_column("user_id", types::foreign("User", "id").nullable(false).unique(true));
+                t.add_column(
+                    "user_id",
+                    types::foreign("User", "id").nullable(false).unique(true),
+                );
             });
         })
         .await;
@@ -42,10 +45,16 @@ async fn introspecting_two_one_to_one_relations_between_the_same_models_should_w
             });
             migration.create_table("Post", |t| {
                 t.add_column("id", types::primary());
-                t.add_column("user_id", types::foreign("User", "id").unique(true).nullable(false));
+                t.add_column(
+                    "user_id",
+                    types::foreign("User", "id").unique(true).nullable(false),
+                );
             });
             migration.change_table("User", |t| {
-                t.add_column("post_id", types::foreign("Post", "id").unique(true).nullable(false));
+                t.add_column(
+                    "post_id",
+                    types::foreign("Post", "id").unique(true).nullable(false),
+                );
             });
         })
         .await;
@@ -77,7 +86,10 @@ async fn introspecting_a_one_to_one_relation_should_work(api: &TestApi) {
             });
             migration.create_table("Post", |t| {
                 t.add_column("id", types::primary());
-                t.add_column("user_id", types::foreign("User", "id").unique(true).nullable(true));
+                t.add_column(
+                    "user_id",
+                    types::foreign("User", "id").unique(true).nullable(true),
+                );
             });
         })
         .await;
@@ -483,7 +495,7 @@ async fn introspecting_default_values_on_lists_should_be_ignored(api: &TestApi) 
 }
 
 #[test_each_connector(tags("postgres"))]
-async fn introspecting_id_fields_with_foreign_key_should_ignore_the_relation(api: &TestApi) {
+async fn introspecting_id_fields_with_foreign_key_should_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -500,12 +512,12 @@ async fn introspecting_id_fields_with_foreign_key_should_ignore_the_relation(api
     let dm = r#"
             model Post {
                test    String
-               /// This used to be part of a relation to User
-               user_id Int @id
+               user_id User     @id
             }
 
             model User {
-               id      Int @id @default(autoincrement())
+               id      Int      @id @default(autoincrement())
+               post    Post[]
             }
         "#;
     let result = dbg!(api.introspect().await);

@@ -1,13 +1,61 @@
-use datamodel::Datamodel;
+use datamodel::{Datamodel, FieldArity, FieldType, RelationInfo};
 
 pub fn commenting_out_guardrails(datamodel: &mut Datamodel) {
     let mut commented_model_names = vec![];
+    let mut models_with_one_to_one_relation = vec![];
+
+    for model in &datamodel.models {
+        if model
+            .fields
+            .iter()
+            .any(|f| match (&f.arity, &f.field_type) {
+                (FieldArity::List, _) => false,
+                (
+                    _,
+                    FieldType::Relation(RelationInfo {
+                        to,
+                        to_fields: _,
+                        name: relation_name,
+                        ..
+                    }),
+                ) => {
+                    let other_model = datamodel.find_model(to).unwrap();
+                    let other_field = other_model
+                        .fields
+                        .iter()
+                        .find(|f| match &f.field_type {
+                            FieldType::Relation(RelationInfo {
+                                to: other_to,
+                                to_fields: _,
+                                name: other_relation_name,
+                                ..
+                            }) if other_to == &model.name
+                                && relation_name == other_relation_name =>
+                            {
+                                true
+                            }
+                            _ => false,
+                        })
+                        .unwrap();
+
+                    match other_field.arity {
+                        FieldArity::Optional | FieldArity::Required => true,
+                        FieldArity::List => false,
+                    }
+                }
+                (_, _) => false,
+            })
+        {
+            models_with_one_to_one_relation.push(model.name.clone())
+        }
+    }
 
     //models without uniques / ids
     for model in &mut datamodel.models {
         if model.id_fields.is_empty()
             && !model.fields.iter().any(|f| f.is_id || f.is_unique)
             && !model.indices.iter().any(|i| i.is_unique())
+            && !models_with_one_to_one_relation.contains(&model.name)
         {
             commented_model_names.push(model.name.clone());
             model.is_commented_out = true;

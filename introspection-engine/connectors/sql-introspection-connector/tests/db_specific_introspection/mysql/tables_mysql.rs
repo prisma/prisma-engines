@@ -274,14 +274,14 @@ async fn introspecting_a_table_without_uniques_should_comment_it_out(api: &TestA
             migration.create_table("Post", |t| {
                 t.add_column("id", types::integer());
                 t.inject_custom(
-                    "user_id INTEGER NOT NULL UNIQUE,
+                    "user_id INTEGER NOT NULL,
                 FOREIGN KEY (`user_id`) REFERENCES `User`(`id`)",
                 )
             });
         })
         .await;
 
-    let dm = "/// The underlying table does not contain a unique identifier and can therefore currently not be handled.\n// model Post {\n  // id      Int\n  // user_id User\n// }\n\nmodel User {\n  id Int @default(autoincrement()) @id\n}";
+    let dm = "/// The underlying table does not contain a unique identifier and can therefore currently not be handled.\n// model Post {\n  // id      Int\n  // user_id User\n\n  // @@index([user_id], name: \"user_id\")\n// }\n\nmodel User {\n  id Int @default(autoincrement()) @id\n}";
 
     let result = dbg!(api.introspect().await);
     assert_eq!(&result, dm);

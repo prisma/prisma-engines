@@ -147,92 +147,68 @@ pub(crate) fn calculate_relation_field(
     table: &Table,
     foreign_key: &ForeignKey,
     foreign_keys: &Vec<ForeignKey>,
-) -> Vec<Field> {
+) -> Field {
     debug!("Handling compound foreign key  {:?}", foreign_key);
-    //if at least one primary key column is contained in the foreign key drop the relation.
-    if table.primary_key.is_some()
-        && table
-            .primary_key
-            .as_ref()
-            .unwrap()
-            .columns
+
+    let field_type = FieldType::Relation(RelationInfo {
+        name: calculate_relation_name(schema, foreign_key, table),
+        to: foreign_key.referenced_table.clone(),
+        to_fields: foreign_key.referenced_columns.clone(),
+        on_delete: OnDeleteStrategy::None,
+    });
+
+    let columns: Vec<&Column> = foreign_key
+        .columns
+        .iter()
+        .map(|c| table.columns.iter().find(|tc| tc.name == *c).unwrap())
+        .collect();
+
+    let arity = match !columns.iter().any(|c| c.is_required()) {
+        true => FieldArity::Optional,
+        false => FieldArity::Required,
+    };
+
+    let more_then_one_compound_to_same_table = || {
+        foreign_keys
             .iter()
-            .any(|c| foreign_key.columns.contains(c))
-    {
-        foreign_key
-            .columns
-            .iter()
-            .map(|fk_column| {
-                calculate_scalar_field(
-                    schema,
-                    table,
-                    table.columns.iter().find(|c| c.name == *fk_column).unwrap(),
-                    Some(format!(
-                        "This used to be part of a relation to {}",
-                        foreign_key.referenced_table.clone()
-                    )),
-                )
+            .filter(|fk| {
+                fk.referenced_table == foreign_key.referenced_table && fk.columns.len() > 1
             })
-            .collect()
-    } else {
-        let field_type = FieldType::Relation(RelationInfo {
-            name: calculate_relation_name(schema, foreign_key, table),
-            to: foreign_key.referenced_table.clone(),
-            to_fields: foreign_key.referenced_columns.clone(),
-            on_delete: OnDeleteStrategy::None,
-        });
+            .count()
+            > 1
+    };
 
-        let columns: Vec<&Column> = foreign_key
-            .columns
-            .iter()
-            .map(|c| table.columns.iter().find(|tc| tc.name == *c).unwrap())
-            .collect();
-
-        let arity = match !columns.iter().any(|c| c.is_required()) {
-            true => FieldArity::Optional,
-            false => FieldArity::Required,
-        };
-
-        let more_then_one_compound_to_same_table = || {
-            foreign_keys
-                .iter()
-                .filter(|fk| {
-                    fk.referenced_table == foreign_key.referenced_table && fk.columns.len() > 1
-                })
-                .count()
-                > 1
-        };
-
-        let (name, database_name) = match columns.len() {
-            1 => (columns[0].name.clone(), vec![]),
-            _ if more_then_one_compound_to_same_table() => (
-                format!(
-                    "{}_{}",
-                    foreign_key.referenced_table.clone().camel_case(),
-                    columns[0].name.clone()
-                ),
-                columns.iter().map(|c| c.name.clone()).collect(),
-            ),
-            _ => (
+    let (name, database_name) = match columns.len() {
+        1 => (columns[0].name.clone(), vec![]),
+        _ if more_then_one_compound_to_same_table() => (
+            format!(
+                "{}_{}",
                 foreign_key.referenced_table.clone().camel_case(),
-                columns.iter().map(|c| c.name.clone()).collect(),
+                columns[0].name.clone()
             ),
-        };
+            columns.iter().map(|c| c.name.clone()).collect(),
+        ),
+        _ => (
+            foreign_key.referenced_table.clone().camel_case(),
+            columns.iter().map(|c| c.name.clone()).collect(),
+        ),
+    };
 
-        vec![Field {
-            name,
-            arity,
-            field_type,
-            database_names: database_name,
-            default_value: None,
-            is_unique: false,
-            is_id: false,
-            documentation: None,
-            is_generated: false,
-            is_updated_at: false,
-            data_source_fields: vec![],
-            is_commented_out: false,
-        }]
+    let is_id = is_relation_and_id(columns, &table);
+
+    Field {
+        name,
+        arity,
+        field_type,
+        database_names: database_name,
+        default_value: None,
+        is_unique: false,
+        is_id,
+        documentation: None,
+        is_generated: false,
+        is_updated_at: false,
+        data_source_fields: vec![],
+        is_commented_out: false,
     }
 }
 
@@ -339,6 +315,14 @@ pub(crate) fn is_id(column: &Column, table: &Table) -> bool {
         .primary_key
         .as_ref()
         .map(|pk| pk.is_single_primary_key(&column.name))
+        .unwrap_or(false)
+}
+
+pub(crate) fn is_relation_and_id(columns: Vec<&Column>, table: &Table) -> bool {
+    table
+        .primary_key
+        .as_ref()
+        .map(|pk| pk.matches_foreign_key(columns))
         .unwrap_or(false)
 }
 

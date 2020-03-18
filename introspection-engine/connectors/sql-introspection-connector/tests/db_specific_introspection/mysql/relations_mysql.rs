@@ -64,7 +64,9 @@ async fn introspecting_two_one_to_one_relations_between_the_same_models_should_w
         .execute_with_schema(
             |migration| {
                 migration.change_table("User", |t| {
-                    t.inject_custom("ADD CONSTRAINT `post_fk` FOREIGN KEY(`post_id`) REFERENCES `Post`(`id`)");
+                    t.inject_custom(
+                        "ADD CONSTRAINT `post_fk` FOREIGN KEY(`post_id`) REFERENCES `Post`(`id`)",
+                    );
                 });
             },
             api.db_name(),
@@ -502,7 +504,7 @@ async fn introspecting_cascading_delete_behaviour_should_work(api: &TestApi) {
 }
 
 #[test_each_connector(tags("mysql"))]
-async fn introspecting_id_fields_with_foreign_key_should_ignore_the_relation(api: &TestApi) {
+async fn introspecting_id_fields_with_foreign_key_should_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -520,12 +522,12 @@ async fn introspecting_id_fields_with_foreign_key_should_ignore_the_relation(api
     let dm = r#"
             model Post {
                test    String
-               /// This used to be part of a relation to User
-               user_id Int @id
+               user_id User     @id
             }
 
             model User {
-               id      Int @id @default(autoincrement())
+               id      Int      @id @default(autoincrement())
+               post    Post[]
             }
         "#;
     let result = dbg!(api.introspect().await);
