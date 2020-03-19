@@ -273,7 +273,7 @@ async fn mysql_bit_columns_are_properly_mapped_to_signed_integers(api: &TestApi)
     Ok(())
 }
 
-#[test_each_connector(tags("mysql"), log = "debug")]
+#[test_each_connector(tags("mysql"))]
 async fn mysql_floats_do_not_lose_precision(api: &TestApi) -> TestResult {
     api.execute_sql(CREATE_TYPES_TABLE).await?;
 
@@ -310,6 +310,79 @@ async fn mysql_floats_do_not_lose_precision(api: &TestApi) -> TestResult {
     });
 
     assert_eq!(write_response, expected_write_response);
+
+    Ok(())
+}
+
+#[test_each_connector(tags("mysql"), log = "debug")]
+async fn all_mysql_identifier_types_work(api: &TestApi) -> TestResult {
+    let identifier_types = &[
+        ("tinyint", "12", ""),
+        ("smallint", "350", ""),
+        ("int", "9002", ""),
+        ("bigint", "30000", ""),
+        ("decimal(4, 2)", "3.1", ""),
+        // ("float", "2.8", ""),
+        ("double", "0.1", ""),
+        ("real", "12.1", ""),
+        ("bit(32)", "4", ""),
+        ("boolean", "true", ""),
+        ("date", "\"2020-02-27T00:00:00.000Z\"", ""),
+        ("datetime", "\"2020-02-27T19:10:22.000Z\"", ""),
+        ("timestamp", "\"2020-02-27T19:11:22.000Z\"", ""),
+        // ("time", "\"1970-01-01T12:50:01.000Z\"", ""),
+        ("year", "2091", ""),
+        ("char(18)", "\"make dolphins easy\"", ""),
+        ("varchar(200)", "\"dolphins of varying characters\"", ""),
+        ("tinytext", "\"tiny dolphins\"", "(20)"),
+        ("text", "\"dolphins\"", "(100)"),
+        ("mediumtext", "\"medium dolphins\"", "(100)"),
+        ("longtext", "\"long dolphins\"", "(100)"),
+        (
+            "enum('pollicle_dogs','jellicle_cats')",
+            "\"jellicle_cats\"",
+            "",
+        ),
+        // ("json", "\"{\\\"name\\\": null}\"", ""),
+    ];
+
+    let drop_table = r#"DROP TABLE IF EXISTS `pk_test`"#;
+
+    for (identifier_type, identifier_value, prefix) in identifier_types {
+        for index_type in &["PRIMARY KEY", "CONSTRAINT UNIQUE INDEX"] {
+            let create_pk_table = format!(
+                r#"CREATE TABLE `pk_test` (id {} NOT NULL, {} (id{}))"#,
+                identifier_type, index_type, prefix
+            );
+            api.execute_sql(drop_table).await?;
+            api.execute_sql(&create_pk_table).await?;
+
+            let (_datamodel, engine) = api.introspect_and_start_query_engine().await?;
+
+            let query = format!(
+                r#"
+                mutation {{
+                    createOnepk_test(
+                        data: {{
+                            id: {}
+                        }}
+                    ) {{
+                        id
+                    }}
+                }}
+                "#,
+                identifier_value
+            );
+
+            let response = engine.request(query).await;
+
+            let expected_response = format!(
+                r#"{{"data":{{"createOnepk_test":{{"id":{}}}}}}}"#,
+                identifier_value
+            );
+            assert_eq!(response.to_string(), expected_response);
+        }
+    }
 
     Ok(())
 }
