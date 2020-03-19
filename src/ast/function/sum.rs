@@ -1,3 +1,4 @@
+use super::Function;
 use crate::ast::Column;
 
 #[derive(Debug, Clone, PartialEq)]
@@ -9,14 +10,16 @@ pub struct Sum<'a> {
 ///
 /// ```rust
 /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
-/// let query = Select::from_table("users").value(sum("age"));
+/// let query = Select::from_table("users").value(sum("age").alias("sum"));
 /// let (sql, _) = Sqlite::build(query);
-/// assert_eq!("SELECT SUM(`age`) FROM `users`", sql);
+/// assert_eq!("SELECT SUM(`age`) AS `sum` FROM `users`", sql);
 /// ```
 #[inline]
-pub fn sum<'a, C>(col: C) -> Sum<'a>
+pub fn sum<'a, C>(col: C) -> Function<'a>
 where
     C: Into<Column<'a>>,
 {
-    Sum { column: col.into() }
+    let fun = Sum { column: col.into() };
+
+    fun.into()
 }

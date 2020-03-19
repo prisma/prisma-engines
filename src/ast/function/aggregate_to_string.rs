@@ -1,3 +1,4 @@
+use super::Function;
 use crate::ast::DatabaseValue;
 
 #[derive(Debug, Clone, PartialEq)]
@@ -18,11 +19,13 @@ pub struct AggregateToString<'a> {
 /// assert_eq!("SELECT GROUP_CONCAT(`firstName`) FROM `users` GROUP BY `firstName`", sql);
 /// ```
 #[inline]
-pub fn aggregate_to_string<'a, T>(expr: T) -> AggregateToString<'a>
+pub fn aggregate_to_string<'a, T>(expr: T) -> Function<'a>
 where
     T: Into<DatabaseValue<'a>>,
 {
-    AggregateToString {
+    let fun = AggregateToString {
         value: Box::new(expr.into()),
-    }
+    };
+
+    fun.into()
 }

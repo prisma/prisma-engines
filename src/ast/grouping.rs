@@ -46,6 +46,14 @@ impl<'a> IntoGroupByDefinition<'a> for &'a str {
     }
 }
 
+impl<'a> IntoGroupByDefinition<'a> for (&'a str, &'a str) {
+    #[inline]
+    fn into_group_by_definition(self) -> GroupByDefinition<'a> {
+        let column: Column = self.into();
+        column.into()
+    }
+}
+
 impl<'a> IntoGroupByDefinition<'a> for Column<'a> {
     #[inline]
     fn into_group_by_definition(self) -> GroupByDefinition<'a> {

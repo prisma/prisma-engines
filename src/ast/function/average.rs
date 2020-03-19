@@ -1,3 +1,4 @@
+use super::Function;
 use crate::ast::Column;
 
 #[derive(Debug, Clone, PartialEq)]
@@ -14,9 +15,10 @@ pub struct Average<'a> {
 /// assert_eq!("SELECT AVG(`age`) FROM `users`", sql);
 /// ```
 #[inline]
-pub fn avg<'a, C>(col: C) -> Average<'a>
+pub fn avg<'a, C>(col: C) -> Function<'a>
 where
     C: Into<Column<'a>>,
 {
-    Average { column: col.into() }
+    let fun = Average { column: col.into() };
+    fun.into()
 }

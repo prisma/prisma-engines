@@ -1,3 +1,4 @@
+use super::Function;
 use crate::ast::DatabaseValue;
 
 #[derive(Debug, Clone, PartialEq)]
@@ -15,11 +16,13 @@ pub struct Count<'a> {
 /// assert_eq!("SELECT COUNT(*) FROM `users`", sql);
 /// ```
 #[inline]
-pub fn count<'a, T>(expr: T) -> Count<'a>
+pub fn count<'a, T>(expr: T) -> Function<'a>
 where
     T: Into<DatabaseValue<'a>>,
 {
-    Count {
+    let fun = Count {
         exprs: vec![expr.into()],
-    }
+    };
+
+    fun.into()
 }

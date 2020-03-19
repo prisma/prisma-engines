@@ -95,3 +95,11 @@ impl<'a> Orderable<'a> for &'a str {
         column.order(order)
     }
 }
+
+impl<'a> Orderable<'a> for (&'a str, &'a str) {
+    #[inline]
+    fn order(self, order: Option<Order>) -> OrderDefinition<'a> {
+        let column: Column<'a> = self.into();
+        column.order(order)
+    }
+}
