@@ -41,14 +41,14 @@ fn a_data_model_can_be_generated_from_a_schema() {
                 .iter()
                 .map(|col_type| {
                     let (field_type, is_commented_out, documentation) = match col_type {
-                        ColumnTypeFamily::Boolean => (FieldType::Base(ScalarType::Boolean), false, None),
-                        ColumnTypeFamily::DateTime => (FieldType::Base(ScalarType::DateTime), false, None),
-                        ColumnTypeFamily::Float => (FieldType::Base(ScalarType::Float), false, None),
-                        ColumnTypeFamily::Int => (FieldType::Base(ScalarType::Int), false, None),
-                        ColumnTypeFamily::String => (FieldType::Base(ScalarType::String), false, None),
+                        ColumnTypeFamily::Boolean => (FieldType::Base(ScalarType::Boolean, None), false, None),
+                        ColumnTypeFamily::DateTime => (FieldType::Base(ScalarType::DateTime, None), false, None),
+                        ColumnTypeFamily::Float => (FieldType::Base(ScalarType::Float, None), false, None),
+                        ColumnTypeFamily::Int => (FieldType::Base(ScalarType::Int, None), false, None),
+                        ColumnTypeFamily::String => (FieldType::Base(ScalarType::String, None), false, None),
                         ColumnTypeFamily::Enum(name) => (FieldType::Enum(name.clone()), false, None),
-                        ColumnTypeFamily::Uuid => (FieldType::Base(ScalarType::String), false, None),
-                        ColumnTypeFamily::Json => (FieldType::Base(ScalarType::String), false, None),
+                        ColumnTypeFamily::Uuid => (FieldType::Base(ScalarType::String, None), false, None),
+                        ColumnTypeFamily::Json => (FieldType::Base(ScalarType::String, None), false, None),
                         x => (FieldType::Unsupported(x.to_string()),true, Some("This type is currently not supported.".to_string())),
 
                     };
