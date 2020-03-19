@@ -103,6 +103,13 @@ impl<'a> From<&'a str> for Column<'a> {
     }
 }
 
+impl<'a, 'b> From<&'a &'b str> for Column<'b> {
+    #[inline]
+    fn from(s: &'a &'b str) -> Self {
+        Column::from(*s)
+    }
+}
+
 impl<'a> From<String> for Column<'a> {
     #[inline]
     fn from(s: String) -> Self {

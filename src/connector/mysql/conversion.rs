@@ -34,9 +34,9 @@ impl TakeRow for my::Row {
                 my::Value::Float(f) => ParameterizedValue::from(f),
                 #[cfg(feature = "chrono-0_4")]
                 my::Value::Date(year, month, day, hour, min, sec, micro) => {
-                    let time = NaiveTime::from_hms_micro(hour as u32, min as u32, sec as u32, micro);
+                    let time = NaiveTime::from_hms_micro(hour.into(), min.into(), sec.into(), micro);
 
-                    let date = NaiveDate::from_ymd(year as i32, month as u32, day as u32);
+                    let date = NaiveDate::from_ymd(year.into(), month.into(), day.into());
                     let dt = NaiveDateTime::new(date, time);
 
                     ParameterizedValue::DateTime(DateTime::<Utc>::from_utc(dt, Utc))
