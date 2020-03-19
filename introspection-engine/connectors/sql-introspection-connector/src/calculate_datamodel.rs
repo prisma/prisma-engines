@@ -15,7 +15,8 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
         .tables
         .iter()
         .filter(|table| !is_migration_table(&table))
-        .filter(|table| !is_prisma_join_table(&table))
+        .filter(|table| !is_prisma_1_point_1_join_table(&table))
+        .filter(|table| !is_prisma_1_point_0_join_table(&table))
     {
         debug!("Calculating model: {}", table.name);
         let mut model = Model::new(table.name.clone(), None);
@@ -30,8 +31,12 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
         }
 
         for foreign_key in &table.foreign_keys {
-            let mut fields = calculate_relation_field(schema, table, foreign_key, &table.foreign_keys);
-            model.add_fields(&mut fields);
+            model.add_field(calculate_relation_field(
+                schema,
+                table,
+                foreign_key,
+                &table.foreign_keys,
+            ));
         }
 
         for index in &table.indices {
@@ -40,24 +45,14 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
                 .iter()
                 .find(|fk| columns_match(&fk.columns, &index.columns));
 
-            // This is part of the temporary guardrail that makes us ignore relations that overlap
-            // with the primary key.
-            let fk_on_index_overlaps_with_pk: bool = table
-                .primary_key
-                .as_ref()
-                .and_then(|pk| fk_on_index.as_ref().map(|fk| (pk, fk)))
-                .map(|(pk, fk)| {
-                    pk.columns
-                        .iter()
-                        .any(|pk_col| fk.columns.iter().any(|fk_col| pk_col == fk_col))
-                })
-                .unwrap_or(false);
-
-            let compound_field_name = || {
+            let compound_name = || {
                 model
                     .fields
                     .iter()
-                    .find(|f| !f.database_names.is_empty() && columns_match(&f.database_names, &index.columns))
+                    .find(|f| {
+                        !f.database_names.is_empty()
+                            && columns_match(&f.database_names, &index.columns)
+                    })
                     .expect("Error finding field matching a compound index.")
                     .name
                     .clone()
@@ -66,10 +61,7 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
             let index_to_add = match (fk_on_index, index.columns.len(), index.is_unique()) {
                 (Some(_), _, true) => None, // just make the relation 1:1 and dont print the unique index
                 (Some(_), 1, false) => Some(calculate_index(index)),
-                (Some(_), _, false) if !fk_on_index_overlaps_with_pk => {
-                    Some(calculate_compound_index(index, compound_field_name()))
-                }
-                (Some(_), _, false) => Some(calculate_index(index)),
+                (Some(_), _, false) => Some(calculate_compound_index(index, compound_name())),
                 (None, 1, true) => None, // this is expressed by the @unique already
                 (None, _, true) => Some(calculate_index(index)),
                 (None, _, false) => Some(calculate_index(index)),
@@ -88,7 +80,11 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
     for e in schema.enums.iter() {
         data_model.add_enum(dml::Enum {
             name: e.name.clone(),
-            values: e.values.iter().map(|v| dml::EnumValue::new(v, None)).collect(),
+            values: e
+                .values
+                .iter()
+                .map(|v| dml::EnumValue::new(v, None))
+                .collect(),
             database_name: None,
             documentation: None,
         });
@@ -110,7 +106,13 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
                     .is_none()
                 {
                     let other_model = data_model.find_model(relation_info.to.as_str()).unwrap();
-                    let field = calculate_backrelation_field(schema, model, other_model, relation_field, relation_info);
+                    let field = calculate_backrelation_field(
+                        schema,
+                        model,
+                        other_model,
+                        relation_field,
+                        relation_info,
+                    );
 
                     fields_to_be_added.push((other_model.name.clone(), field));
                 }
@@ -119,7 +121,9 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
     }
 
     // add prisma many to many relation fields
-    for table in schema.tables.iter().filter(|table| is_prisma_join_table(&table)) {
+    for table in schema.tables.iter().filter(|table| {
+        is_prisma_1_point_1_join_table(&table) || is_prisma_1_point_0_join_table(&table)
+    }) {
         if let (Some(f), Some(s)) = (table.foreign_keys.get(0), table.foreign_keys.get(1)) {
             let is_self_relation = f.referenced_table == s.referenced_table;
 
@@ -154,5 +158,7 @@ fn columns_match(a_cols: &[String], b_cols: &[String]) -> bool {
         return false;
     }
 
-    a_cols.iter().all(|a_col| b_cols.iter().any(|b_col| a_col == b_col))
+    a_cols
+        .iter()
+        .all(|a_col| b_cols.iter().any(|b_col| a_col == b_col))
 }

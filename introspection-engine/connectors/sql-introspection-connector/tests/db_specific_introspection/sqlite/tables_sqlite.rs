@@ -270,7 +270,7 @@ async fn introspecting_a_table_without_uniques_should_comment_it_out(api: &TestA
             migration.create_table("Post", |t| {
                 t.add_column("id", types::integer());
                 t.inject_custom(
-                    "user_id INTEGER NOT NULL UNIQUE,
+                    "user_id INTEGER NOT NULL,
                 FOREIGN KEY (`user_id`) REFERENCES `User`(`id`)",
                 )
             });

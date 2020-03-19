@@ -268,7 +268,7 @@ async fn introspecting_a_table_without_uniques_should_comment_it_out(api: &TestA
                 t.add_column("id", types::integer());
                 t.add_column(
                     "user_id",
-                    types::foreign("User", "id").nullable(false).unique(true),
+                    types::foreign("User", "id").nullable(false).unique(false),
                 );
             });
         })
