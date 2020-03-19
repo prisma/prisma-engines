@@ -1,5 +1,6 @@
 use crate::*;
 use barrel::types;
+use pretty_assertions::assert_eq;
 use test_harness::*;
 
 #[test_each_connector(tags("sqlite"))]
@@ -90,7 +91,10 @@ async fn introspecting_a_table_with_multi_column_unique_index_must_work(api: &Te
                 t.add_column("id", types::primary());
                 t.add_column("firstname", types::text());
                 t.add_column("lastname", types::text());
-                t.add_index("test", types::index(vec!["firstname", "lastname"]).unique(true));
+                t.add_index(
+                    "test",
+                    types::index(vec!["firstname", "lastname"]).unique(true),
+                );
             });
         })
         .await;
@@ -273,7 +277,7 @@ async fn introspecting_a_table_without_uniques_should_comment_it_out(api: &TestA
         })
         .await;
 
-    let dm = "model User {\n  id Int @default(autoincrement()) @id\n}\n\n/// The underlying table does not contain a unique identifier and can therefore currently not be handled.\n// model Post {\n  // id      Int\n  // user_id User\n// }";
+    let dm = "model User {\n  id Int @default(autoincrement()) @id\n}\n\n// The underlying table does not contain a unique identifier and can therefore currently not be handled.\n// model Post {\n  // id      Int\n  // user_id User @relation(references: [id])\n// }";
 
     let result = dbg!(api.introspect().await);
     assert_eq!(&result, dm);

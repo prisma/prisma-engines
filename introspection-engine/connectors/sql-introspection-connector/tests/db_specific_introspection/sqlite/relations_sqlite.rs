@@ -60,13 +60,13 @@ async fn introspecting_two_one_to_one_relations_between_the_same_models_should_w
     let dm = r#"
             model User {
                id Int @id @default(autoincrement())
-               post_id Post  @relation("PostToUser_post_id")
+               post_id Post  @relation("PostToUser_post_id", references: [id])
                post Post?    @relation("Post_user_idToUser")
             }
 
             model Post {
                id Int @id @default(autoincrement())
-               user_id User  @relation("Post_user_idToUser")
+               user_id User  @relation("Post_user_idToUser", references: [id])
                user    User? @relation("PostToUser_post_id")
             }
         "#;
@@ -477,7 +477,7 @@ async fn introspecting_id_fields_with_foreign_key_should_ignore_the_relation(api
 
             model Post {
                test    String
-               /// This used to be part of a relation to User
+               // This used to be part of a relation to User
                user_id Int @id @default(autoincrement())
             }
         "#;

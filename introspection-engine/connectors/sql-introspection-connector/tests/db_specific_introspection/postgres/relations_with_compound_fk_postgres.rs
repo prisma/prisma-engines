@@ -390,9 +390,9 @@ async fn compound_fk_pk(api: &TestApi) {
             
             model b {
               dummy     Int 
-              /// This used to be part of a relation to a
+              // This used to be part of a relation to a
               one       Int
-              /// This used to be part of a relation to a
+              // This used to be part of a relation to a
               two       Int
             
               @@id([dummy, one, two])
