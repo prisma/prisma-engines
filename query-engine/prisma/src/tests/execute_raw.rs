@@ -129,9 +129,9 @@ async fn querying_model_tables(api: &TestApi) -> anyhow::Result<()> {
 async fn inserting_into_model_table(api: &TestApi) -> anyhow::Result<()> {
     let query_engine = api.create_engine(&TODO).await?;
 
-    let insert = Insert::multi_into("Todo", vec!["id", "title"])
-        .values(vec!["id1", "title1"])
-        .values(vec!["id2", "title2"]);
+    let insert = Insert::multi_into("Todo", &["id", "title"])
+        .values(("id1", "title1"))
+        .values(("id2", "title2"));
 
     let (query, params) = api.to_sql_string(insert);
 

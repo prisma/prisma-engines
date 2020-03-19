@@ -43,7 +43,9 @@ async fn adding_a_required_field_if_there_is_data(api: &TestApi) {
 }
 
 #[test_each_connector]
-async fn adding_a_required_field_must_use_the_default_value_for_migrations(api: &TestApi) -> TestResult {
+async fn adding_a_required_field_must_use_the_default_value_for_migrations(
+    api: &TestApi,
+) -> TestResult {
     let dm = r#"
             model Test {
                 id String @id @default(cuid())
@@ -85,7 +87,10 @@ async fn adding_a_required_field_must_use_the_default_value_for_migrations(api: 
         .column("string")
         .so_that("id".equals("test"));
     let result_set = conn.query(query.into()).await.unwrap();
-    let row = result_set.into_iter().next().expect("query returned no results");
+    let row = result_set
+        .into_iter()
+        .next()
+        .expect("query returned no results");
     assert_eq!(row["myint"].as_i64().unwrap(), 1);
     assert_eq!(row["string"].as_str().unwrap(), "test_string");
 
@@ -120,7 +125,8 @@ async fn dropping_a_table_with_rows_should_warn(api: &TestApi) {
     assert_eq!(
         migration_output.warnings,
         &[MigrationWarning {
-            description: "You are about to drop the table `Test`, which is not empty (1 rows).".into()
+            description: "You are about to drop the table `Test`, which is not empty (1 rows)."
+                .into()
         }]
     );
 }
@@ -136,7 +142,7 @@ async fn dropping_a_column_with_non_null_values_should_warn(api: &TestApi) {
 
     let original_database_schema = api.infer_and_apply(&dm).await.sql_schema;
 
-    let insert = Insert::multi_into((api.schema_name(), "Test"), vec!["id", "puppiesCount"])
+    let insert = Insert::multi_into((api.schema_name(), "Test"), &["id", "puppiesCount"])
         .values(("a", 7))
         .values(("b", 8));
 
@@ -177,9 +183,9 @@ async fn altering_a_column_without_non_null_values_should_not_warn(api: &TestApi
 
     let original_database_schema = api.infer_and_apply(&dm).await.sql_schema;
 
-    let insert = Insert::multi_into((api.schema_name(), "Test"), vec!["id"])
-        .values(vec!["a"])
-        .values(vec!["b"]);
+    let insert = Insert::multi_into((api.schema_name(), "Test"), &["id"])
+        .values(("a",))
+        .values(("b",));
 
     api.database().query(insert.into()).await.unwrap();
 
@@ -225,7 +231,9 @@ async fn altering_a_column_with_non_null_values_should_warn(api: &TestApi) -> Te
     let migration_output = api.infer_apply(&dm2).send().await?;
     // The schema should not change because the migration should not run if there are warnings
     // and the force flag isn't passed.
-    api.assert_schema().await?.assert_equals(&original_database_schema)?;
+    api.assert_schema()
+        .await?
+        .assert_equals(&original_database_schema)?;
 
     assert_eq!(
         migration_output.warnings,
@@ -270,11 +278,13 @@ async fn column_defaults_can_safely_be_changed(api: &TestApi) -> TestResult {
 
             api.infer_apply(&dm1).force(Some(true)).send().await?;
 
-            api.assert_schema().await?.assert_table(model_name, |table| {
-                table.assert_column("name", |column| {
-                    column.assert_default(Some(first_default.unwrap_or("")))
-                })
-            })?;
+            api.assert_schema()
+                .await?
+                .assert_table(model_name, |table| {
+                    table.assert_column("name", |column| {
+                        column.assert_default(Some(first_default.unwrap_or("")))
+                    })
+                })?;
         }
 
         // Insert data
@@ -295,7 +305,10 @@ async fn column_defaults_can_safely_be_changed(api: &TestApi) -> TestResult {
                 .filter_map(|row| row.get("name").and_then(|val| val.to_string()))
                 .collect();
             // TODO: change this when the defaults hack is removed
-            assert_eq!(&[first_default.unwrap_or(""), "Waterworld"], names.as_slice());
+            assert_eq!(
+                &[first_default.unwrap_or(""), "Waterworld"],
+                names.as_slice()
+            );
         }
 
         // Migrate
@@ -330,13 +343,18 @@ async fn column_defaults_can_safely_be_changed(api: &TestApi) -> TestResult {
                 .into_iter()
                 .filter_map(|row| row.get("name").and_then(|val| val.to_string()))
                 .collect();
-            assert_eq!(&[first_default.unwrap_or(""), "Waterworld"], names.as_slice());
+            assert_eq!(
+                &[first_default.unwrap_or(""), "Waterworld"],
+                names.as_slice()
+            );
 
-            api.assert_schema().await?.assert_table(model_name, |table| {
-                table.assert_column("name", |column| {
-                    column.assert_default(Some(second_default.unwrap_or("")))
-                })
-            })?;
+            api.assert_schema()
+                .await?
+                .assert_table(model_name, |table| {
+                    table.assert_column("name", |column| {
+                        column.assert_default(Some(second_default.unwrap_or("")))
+                    })
+                })?;
         }
     }
 
@@ -355,7 +373,7 @@ async fn changing_a_column_from_required_to_optional_should_work(api: &TestApi) 
     api.infer_apply(&dm).send().await?;
     let original_database_schema = api.describe_database().await?;
 
-    let insert = Insert::multi_into((api.schema_name(), "Test"), vec!["id", "age"])
+    let insert = Insert::multi_into((api.schema_name(), "Test"), &["id", "age"])
         .values(("a", 12))
         .values(("b", 22));
 
@@ -383,7 +401,9 @@ async fn changing_a_column_from_required_to_optional_should_work(api: &TestApi) 
             "You are about to alter the column `age` on the `Test` table, which still contains 2 non-null values. The data in that column will be lost.",
         );
 
-        api.assert_schema().await?.assert_equals(&original_database_schema)?;
+        api.assert_schema()
+            .await?
+            .assert_equals(&original_database_schema)?;
     } else {
         // On other databases, the migration should be successful.
         anyhow::ensure!(
@@ -392,7 +412,9 @@ async fn changing_a_column_from_required_to_optional_should_work(api: &TestApi) 
             migration_output.warnings
         );
 
-        api.assert_schema().await?.assert_ne(&original_database_schema)?;
+        api.assert_schema()
+            .await?
+            .assert_ne(&original_database_schema)?;
     }
 
     // Check that no data was lost.
@@ -422,7 +444,7 @@ async fn changing_a_column_from_optional_to_required_must_warn(api: &TestApi) ->
     api.infer_apply(&dm).send().await?;
     let original_database_schema = api.describe_database().await?;
 
-    let insert = Insert::multi_into((api.schema_name(), "Test"), vec!["id", "age"])
+    let insert = Insert::multi_into((api.schema_name(), "Test"), &["id", "age"])
         .values(("a", 12))
         .values(("b", 22));
 
@@ -439,7 +461,9 @@ async fn changing_a_column_from_optional_to_required_must_warn(api: &TestApi) ->
 
     // The schema should not change because the migration should not run if there are warnings
     // and the force flag isn't passed.
-    api.assert_schema().await?.assert_equals(&original_database_schema)?;
+    api.assert_schema()
+        .await?
+        .assert_equals(&original_database_schema)?;
 
     assert_eq!(
         migration_output.warnings,
@@ -567,13 +591,18 @@ async fn string_columns_do_not_get_arbitrarily_migrated(api: &TestApi) -> TestRe
         row.get("kindle_email").unwrap().as_str().unwrap(),
         "george+kindle@prisma.io"
     );
-    assert_eq!(row.get("email").unwrap().as_str().unwrap(), "george@prisma.io");
+    assert_eq!(
+        row.get("email").unwrap().as_str().unwrap(),
+        "george@prisma.io"
+    );
 
     Ok(())
 }
 
 #[test_each_connector]
-async fn altering_the_type_of_a_column_in_an_empty_table_should_not_warn(api: &TestApi) -> TestResult {
+async fn altering_the_type_of_a_column_in_an_empty_table_should_not_warn(
+    api: &TestApi,
+) -> TestResult {
     let dm1 = r#"
         model User {
             id String @id @default(cuid())
@@ -599,7 +628,9 @@ async fn altering_the_type_of_a_column_in_an_empty_table_should_not_warn(api: &T
     api.assert_schema()
         .await?
         .assert_table("User", |table| {
-            table.assert_column("dogs", |col| col.assert_type_is_string()?.assert_is_required())
+            table.assert_column("dogs", |col| {
+                col.assert_type_is_string()?.assert_is_required()
+            })
         })
         .map(drop)
 }
@@ -637,7 +668,9 @@ async fn making_a_column_required_in_an_empty_table_should_not_warn(api: &TestAp
 }
 
 #[test_each_connector]
-async fn altering_the_type_of_a_column_in_a_non_empty_table_always_warns(api: &TestApi) -> TestResult {
+async fn altering_the_type_of_a_column_in_a_non_empty_table_always_warns(
+    api: &TestApi,
+) -> TestResult {
     let dm1 = r#"
         model User {
             id String @id @default(cuid())
@@ -686,7 +719,9 @@ async fn altering_the_type_of_a_column_in_a_non_empty_table_always_warns(api: &T
 }
 
 #[test_each_connector(ignore("mysql"))]
-async fn migrating_a_required_column_from_int_to_string_should_warn_and_cast(api: &TestApi) -> TestResult {
+async fn migrating_a_required_column_from_int_to_string_should_warn_and_cast(
+    api: &TestApi,
+) -> TestResult {
     let dm1 = r#"
         model Test {
             id String @id
@@ -705,7 +740,11 @@ async fn migrating_a_required_column_from_int_to_string_should_warn_and_cast(api
     let test = api.dump_table("Test").await?;
     let first_row = test.get(0).unwrap();
     assert_eq!(
-        format!("{:?} {:?}", first_row.get("id"), first_row.get("serialNumber")),
+        format!(
+            "{:?} {:?}",
+            first_row.get("id"),
+            first_row.get("serialNumber")
+        ),
         r#"Some(Text("abcd")) Some(Integer(47))"#
     );
 
@@ -744,7 +783,11 @@ async fn migrating_a_required_column_from_int_to_string_should_warn_and_cast(api
         let test = api.dump_table("Test").await?;
         let first_row = test.get(0).unwrap();
         assert_eq!(
-            format!("{:?} {:?}", first_row.get("id"), first_row.get("serialNumber")),
+            format!(
+                "{:?} {:?}",
+                first_row.get("id"),
+                first_row.get("serialNumber")
+            ),
             r#"Some(Text("abcd")) Some(Text("47"))"#
         );
     }
@@ -778,15 +821,16 @@ async fn enum_variants_can_be_added_without_data_loss(api: &TestApi) -> TestResu
         .assert_green()?;
 
     {
-        let cat_inserts = quaint::ast::Insert::multi_into(api.render_table_name("Cat"), vec!["id", "mood"])
-            .values((
-                ParameterizedValue::Text(Cow::Borrowed("felix")),
-                ParameterizedValue::Enum(Cow::Borrowed("HUNGRY")),
-            ))
-            .values((
-                ParameterizedValue::Text(Cow::Borrowed("mittens")),
-                ParameterizedValue::Enum(Cow::Borrowed("HAPPY")),
-            ));
+        let cat_inserts =
+            quaint::ast::Insert::multi_into(api.render_table_name("Cat"), vec!["id", "mood"])
+                .values((
+                    ParameterizedValue::Text(Cow::Borrowed("felix")),
+                    ParameterizedValue::Enum(Cow::Borrowed("HUNGRY")),
+                ))
+                .values((
+                    ParameterizedValue::Text(Cow::Borrowed("mittens")),
+                    ParameterizedValue::Enum(Cow::Borrowed("HAPPY")),
+                ));
 
         api.database().query(cat_inserts.into()).await?;
     }
@@ -818,8 +862,10 @@ async fn enum_variants_can_be_added_without_data_loss(api: &TestApi) -> TestResu
     // Assertions
     {
         let cat_data = api.dump_table("Cat").await?;
-        let cat_data: Vec<Vec<quaint::ast::ParameterizedValue>> =
-            cat_data.into_iter().map(|row| row.into_iter().collect()).collect();
+        let cat_data: Vec<Vec<quaint::ast::ParameterizedValue>> = cat_data
+            .into_iter()
+            .map(|row| row.into_iter().collect())
+            .collect();
 
         let expected_cat_data = if api.sql_family().is_mysql() {
             vec![
@@ -848,8 +894,10 @@ async fn enum_variants_can_be_added_without_data_loss(api: &TestApi) -> TestResu
         assert_eq!(cat_data, expected_cat_data);
 
         let human_data = api.dump_table("Human").await?;
-        let human_data: Vec<Vec<ParameterizedValue>> =
-            human_data.into_iter().map(|row| row.into_iter().collect()).collect();
+        let human_data: Vec<Vec<ParameterizedValue>> = human_data
+            .into_iter()
+            .map(|row| row.into_iter().collect())
+            .collect();
         let expected_human_data: Vec<Vec<ParameterizedValue>> = Vec::new();
         assert_eq!(human_data, expected_human_data);
 
@@ -899,15 +947,16 @@ async fn enum_variants_can_be_dropped_without_data_loss(api: &TestApi) -> TestRe
         .assert_green()?;
 
     {
-        let cat_inserts = quaint::ast::Insert::multi_into(api.render_table_name("Cat"), vec!["id", "mood"])
-            .values((
-                ParameterizedValue::Text(Cow::Borrowed("felix")),
-                ParameterizedValue::Enum(Cow::Borrowed("HUNGRY")),
-            ))
-            .values((
-                ParameterizedValue::Text(Cow::Borrowed("mittens")),
-                ParameterizedValue::Enum(Cow::Borrowed("HAPPY")),
-            ));
+        let cat_inserts =
+            quaint::ast::Insert::multi_into(api.render_table_name("Cat"), &["id", "mood"])
+                .values((
+                    ParameterizedValue::Text(Cow::Borrowed("felix")),
+                    ParameterizedValue::Enum(Cow::Borrowed("HUNGRY")),
+                ))
+                .values((
+                    ParameterizedValue::Text(Cow::Borrowed("mittens")),
+                    ParameterizedValue::Enum(Cow::Borrowed("HAPPY")),
+                ));
 
         api.database().query(cat_inserts.into()).await?;
     }
@@ -938,8 +987,10 @@ async fn enum_variants_can_be_dropped_without_data_loss(api: &TestApi) -> TestRe
     // Assertions
     {
         let cat_data = api.dump_table("Cat").await?;
-        let cat_data: Vec<Vec<quaint::ast::ParameterizedValue>> =
-            cat_data.into_iter().map(|row| row.into_iter().collect()).collect();
+        let cat_data: Vec<Vec<quaint::ast::ParameterizedValue>> = cat_data
+            .into_iter()
+            .map(|row| row.into_iter().collect())
+            .collect();
 
         let expected_cat_data = if api.sql_family().is_mysql() {
             vec![
@@ -968,8 +1019,10 @@ async fn enum_variants_can_be_dropped_without_data_loss(api: &TestApi) -> TestRe
         assert_eq!(cat_data, expected_cat_data);
 
         let human_data = api.dump_table("Human").await?;
-        let human_data: Vec<Vec<ParameterizedValue>> =
-            human_data.into_iter().map(|row| row.into_iter().collect()).collect();
+        let human_data: Vec<Vec<ParameterizedValue>> = human_data
+            .into_iter()
+            .map(|row| row.into_iter().collect())
+            .collect();
         let expected_human_data: Vec<Vec<ParameterizedValue>> = Vec::new();
         assert_eq!(human_data, expected_human_data);
 
