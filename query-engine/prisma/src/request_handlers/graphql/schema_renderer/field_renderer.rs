@@ -16,7 +16,11 @@ impl Renderer for GqlFieldRenderer {
 }
 
 impl GqlFieldRenderer {
-    fn render_input_field(&self, input_field: InputFieldRef, ctx: RenderContext) -> (String, RenderContext) {
+    fn render_input_field(
+        &self,
+        input_field: InputFieldRef,
+        ctx: RenderContext,
+    ) -> (String, RenderContext) {
         let (rendered_type, ctx) = (&input_field.field_type).into_renderer().render(ctx);
 
         (format!("{}: {}", input_field.name, rendered_type), ctx)
@@ -43,10 +47,17 @@ impl GqlFieldRenderer {
         };
 
         let (rendered_type, ctx) = field.field_type.into_renderer().render(ctx);
-        (format!("{}{}: {}", field.name, rendered_args, rendered_type), ctx)
+        (
+            format!("{}{}: {}", field.name, rendered_args, rendered_type),
+            ctx,
+        )
     }
 
-    fn render_arguments(&self, args: &[Argument], ctx: RenderContext) -> (Vec<String>, RenderContext) {
+    fn render_arguments(
+        &self,
+        args: &[Argument],
+        ctx: RenderContext,
+    ) -> (Vec<String>, RenderContext) {
         args.iter().fold((vec![], ctx), |(mut prev, ctx), arg| {
             let (rendered, ctx) = self.render_argument(arg, ctx);
 
