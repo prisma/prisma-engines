@@ -53,6 +53,45 @@ const CREATE_TYPES_TABLE: &str = indoc! {
     "##
 };
 
+const CREATE_ONE_TYPES_QUERY: &str = indoc! {
+    "
+    mutation {
+        createOnetypes(
+            data: {
+                numeric_integer_tinyint: 12,
+                numeric_integer_smallint: 350,
+                numeric_integer_int: 9002,
+                numeric_integer_bigint: 30000,
+                numeric_floating_decimal: 3.14
+                numeric_floating_float: -32.0
+                numeric_fixed_double: 0.14
+                numeric_fixed_real: 12.12
+                numeric_bit: 4
+                numeric_boolean: true
+                date_date: \"2020-02-27T00:00:00Z\"
+                date_datetime: \"2020-02-27T19:10:22Z\"
+                date_timestamp: \"2020-02-27T19:11:22Z\"
+                date_time: \"2020-02-20T12:50:01Z\"
+                date_year: 2012
+                string_char: \"make dolphins easy\"
+                string_varchar: \"dolphins of varying characters\"
+                string_text_tinytext: \"tiny dolphins\"
+                string_text_text: \"dolphins\"
+                string_text_mediumtext: \"medium dolphins\"
+                string_text_longtext: \"long dolphins\"
+                string_binary_binary: \"hello 2020\"
+                string_blob_tinyblob: \"smol blob\"
+                string_blob_mediumblob: \"average blob\"
+                string_blob_blob: \"very average blob\"
+                string_blob_longblob: \"loong looooong bloooooooob\"
+                string_enum: \"jellicle_cats\"
+                json: \"{\\\"name\\\": null}\"
+            }
+        ) { id }
+    }
+    "
+};
+
 #[test_each_connector(tags("mysql"))]
 async fn mysql_types_roundtrip(api: &TestApi) -> TestResult {
     api.execute_sql(CREATE_TYPES_TABLE).await?;
@@ -102,44 +141,7 @@ async fn mysql_types_roundtrip(api: &TestApi) -> TestResult {
 
     // Write the values.
     {
-        let write = indoc! {
-            "
-            mutation {
-                createOnetypes(
-                    data: {
-                        numeric_integer_tinyint: 12,
-                        numeric_integer_smallint: 350,
-                        numeric_integer_int: 9002,
-                        numeric_integer_bigint: 30000,
-                        numeric_floating_decimal: 3.14
-                        numeric_floating_float: -32.0
-                        numeric_fixed_double: 0.14
-                        numeric_fixed_real: 12.12
-                        numeric_bit: 4
-                        numeric_boolean: true
-                        date_date: \"2020-02-27T00:00:00Z\"
-                        date_datetime: \"2020-02-27T19:10:22Z\"
-                        date_timestamp: \"2020-02-27T19:11:22Z\"
-                        date_time: \"2020-02-20T12:50:01Z\"
-                        date_year: 2012
-                        string_char: \"make dolphins easy\"
-                        string_varchar: \"dolphins of varying characters\"
-                        string_text_tinytext: \"tiny dolphins\"
-                        string_text_text: \"dolphins\"
-                        string_text_mediumtext: \"medium dolphins\"
-                        string_text_longtext: \"long dolphins\"
-                        string_binary_binary: \"hello 2020\"
-                        string_blob_tinyblob: \"smol blob\"
-                        string_blob_mediumblob: \"average blob\"
-                        string_blob_blob: \"very average blob\"
-                        string_blob_longblob: \"loong looooong bloooooooob\"
-                        string_enum: \"jellicle_cats\"
-                        json: \"{\\\"name\\\": null}\"
-                    }
-                ) { id }
-            }
-            "
-        };
+        let write = CREATE_ONE_TYPES_QUERY;
 
         let write_response = engine.request(write).await;
 
@@ -273,7 +275,7 @@ async fn mysql_bit_columns_are_properly_mapped_to_signed_integers(api: &TestApi)
     Ok(())
 }
 
-#[test_each_connector(tags("mysql"), log = "debug")]
+#[test_each_connector(tags("mysql"))]
 async fn mysql_floats_do_not_lose_precision(api: &TestApi) -> TestResult {
     api.execute_sql(CREATE_TYPES_TABLE).await?;
 
@@ -310,6 +312,130 @@ async fn mysql_floats_do_not_lose_precision(api: &TestApi) -> TestResult {
     });
 
     assert_eq!(write_response, expected_write_response);
+
+    Ok(())
+}
+
+#[test_each_connector(tags("mysql"), log = "debug")]
+async fn all_mysql_identifier_types_work(api: &TestApi) -> TestResult {
+    let identifier_types = &[
+        ("tinyint", "12", ""),
+        ("smallint", "350", ""),
+        ("int", "9002", ""),
+        ("bigint", "30000", ""),
+        ("decimal(4, 2)", "3.1", ""),
+        // ("float", "2.8", ""),
+        ("double", "0.1", ""),
+        ("real", "12.1", ""),
+        ("bit(32)", "4", ""),
+        ("boolean", "true", ""),
+        ("date", "\"2020-02-27T00:00:00.000Z\"", ""),
+        ("datetime", "\"2020-02-27T19:10:22.000Z\"", ""),
+        ("timestamp", "\"2020-02-27T19:11:22.000Z\"", ""),
+        // ("time", "\"1970-01-01T12:50:01.000Z\"", ""),
+        ("year", "2091", ""),
+        ("char(18)", "\"make dolphins easy\"", ""),
+        ("varchar(200)", "\"dolphins of varying characters\"", ""),
+        ("tinytext", "\"tiny dolphins\"", "(20)"),
+        ("text", "\"dolphins\"", "(100)"),
+        ("mediumtext", "\"medium dolphins\"", "(100)"),
+        ("longtext", "\"long dolphins\"", "(100)"),
+        (
+            "enum('pollicle_dogs','jellicle_cats')",
+            "\"jellicle_cats\"",
+            "",
+        ),
+        // ("json", "\"{\\\"name\\\": null}\"", ""),
+    ];
+
+    let drop_table = r#"DROP TABLE IF EXISTS `pk_test`"#;
+
+    for (identifier_type, identifier_value, prefix) in identifier_types {
+        for index_type in &["PRIMARY KEY", "CONSTRAINT UNIQUE INDEX"] {
+            let create_pk_table = format!(
+                r#"CREATE TABLE `pk_test` (id {} NOT NULL, {} (id{}))"#,
+                identifier_type, index_type, prefix
+            );
+            api.execute_sql(drop_table).await?;
+            api.execute_sql(&create_pk_table).await?;
+
+            let (_datamodel, engine) = api.introspect_and_start_query_engine().await?;
+
+            let query = format!(
+                r#"
+                mutation {{
+                    createOnepk_test(
+                        data: {{
+                            id: {}
+                        }}
+                    ) {{
+                        id
+                    }}
+                }}
+                "#,
+                identifier_value
+            );
+
+            let response = engine.request(query).await;
+
+            let expected_response = format!(
+                r#"{{"data":{{"createOnepk_test":{{"id":{}}}}}}}"#,
+                identifier_value
+            );
+            assert_eq!(response.to_string(), expected_response);
+        }
+    }
+
+    Ok(())
+}
+
+#[test_each_connector(tags("mysql"), log = "debug")]
+async fn all_mysql_types_work_as_filter(api: &TestApi) -> TestResult {
+    api.execute_sql(CREATE_TYPES_TABLE).await?;
+
+    let (_datamodel, engine) = api.introspect_and_start_query_engine().await?;
+
+    engine.request(CREATE_ONE_TYPES_QUERY).await;
+
+    let query = "
+        query {
+            findManytypes(
+                where: {
+                    numeric_integer_tinyint: 12,
+                    numeric_integer_smallint: 350,
+                    numeric_integer_int: 9002,
+                    numeric_integer_bigint: 30000,
+                    numeric_floating_decimal: 3.14
+                    # numeric_floating_float: -32.0
+                    numeric_fixed_double: 0.14
+                    numeric_fixed_real: 12.12
+                    numeric_bit: 4
+                    numeric_boolean: true
+                    date_date: \"2020-02-27T00:00:00Z\"
+                    date_datetime: \"2020-02-27T19:10:22Z\"
+                    date_timestamp: \"2020-02-27T19:11:22Z\"
+                    # date_time: \"2020-02-20T12:50:01Z\"
+                    date_year: 2012
+                    string_char: \"make dolphins easy\"
+                    string_varchar: \"dolphins of varying characters\"
+                    string_text_tinytext: \"tiny dolphins\"
+                    string_text_text: \"dolphins\"
+                    string_text_mediumtext: \"medium dolphins\"
+                    string_text_longtext: \"long dolphins\"
+                    string_enum: \"jellicle_cats\"
+                    # json: \"{\\\"name\\\": null}\"
+                }
+            ) {
+                id
+            }
+        }
+    ";
+
+    let response = engine.request(query).await;
+
+    let expected_json = json!({ "data": { "findManytypes": [{ "id": 1 }] } });
+
+    assert_eq!(response, expected_json);
 
     Ok(())
 }
