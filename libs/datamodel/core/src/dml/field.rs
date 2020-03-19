@@ -27,6 +27,8 @@ pub enum FieldType {
     ConnectorSpecific(ScalarFieldType),
     /// Base (built-in scalar) type.
     Base(ScalarType),
+    /// This is a field with an unsupported datatype.
+    Unsupported(String),
 }
 
 impl FieldType {

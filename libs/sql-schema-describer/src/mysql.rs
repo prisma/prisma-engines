@@ -282,7 +282,9 @@ async fn get_all_columns(
                         ColumnTypeFamily::Enum(_) => DefaultValue::VALUE(unquote(
                             default_string.replace("_utf8mb4", "").replace("\\\'", ""),
                         )),
-                        ColumnTypeFamily::Unknown => DefaultValue::DBGENERATED(default_string),
+                        ColumnTypeFamily::Unsupported(_) => {
+                            DefaultValue::DBGENERATED(default_string)
+                        }
                     })
                 }
             },
@@ -574,7 +576,7 @@ fn get_column_type_and_enum(
         ("multipolygon", _) => ColumnTypeFamily::Geometric,
         ("geometrycollection", _) => ColumnTypeFamily::Geometric,
         ("json", _) => ColumnTypeFamily::Json,
-        _ => ColumnTypeFamily::Unknown,
+        (_, full_data_type) => ColumnTypeFamily::Unsupported(full_data_type.into()),
     };
 
     let tpe = ColumnType {

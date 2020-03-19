@@ -292,7 +292,9 @@ impl SqlSchemaDescriber {
                                     false => DefaultValue::DBGENERATED(default_string),
                                 }
                             }
-                            ColumnTypeFamily::Unknown => DefaultValue::DBGENERATED(default_string),
+                            ColumnTypeFamily::Unsupported(_) => {
+                                DefaultValue::DBGENERATED(default_string)
+                            }
                         })
                     }
                 },
@@ -699,7 +701,7 @@ fn get_column_type<'a>(
         "tsquery" | "_tsquery" => TextSearch,
         "tsvector" | "_tsvector" => TextSearch,
         "txid_snapshot" | "_txid_snapshot" => TransactionId,
-        _ => Unknown,
+        data_type => Unsupported(data_type.into()),
     };
     ColumnType {
         raw: full_data_type.to_owned(),

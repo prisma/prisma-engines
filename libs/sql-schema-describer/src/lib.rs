@@ -279,7 +279,7 @@ pub enum ColumnTypeFamily {
     ///Enum
     Enum(String),
     /// Unknown
-    Unknown,
+    Unsupported(String),
 }
 
 impl fmt::Display for ColumnTypeFamily {
@@ -298,7 +298,7 @@ impl fmt::Display for ColumnTypeFamily {
             Self::TextSearch => "textSearch".to_string(),
             Self::TransactionId => "transactionId".to_string(),
             Self::Enum(x) => format!("Enum({})", &x),
-            Self::Unknown => "unknown".to_string(),
+            Self::Unsupported(x) => x.to_string(),
         };
         write!(f, "{}", str)
     }

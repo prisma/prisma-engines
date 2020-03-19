@@ -207,7 +207,7 @@ impl SqlSchemaDescriber {
                                     DefaultValue::DBGENERATED(default_string)
                                 }
                                 ColumnTypeFamily::Enum(_) => DefaultValue::VALUE(default_string),
-                                ColumnTypeFamily::Unknown => {
+                                ColumnTypeFamily::Unsupported(_) => {
                                     DefaultValue::DBGENERATED(default_string)
                                 }
                             })
@@ -483,7 +483,7 @@ fn get_column_type(tpe: &str, arity: ColumnArity) -> ColumnType {
         "int[]" => ColumnTypeFamily::Int,
         "integer[]" => ColumnTypeFamily::Int,
         "text[]" => ColumnTypeFamily::String,
-        _ => ColumnTypeFamily::Unknown,
+        data_type => ColumnTypeFamily::Unsupported(data_type.into()),
     };
     ColumnType {
         raw: tpe.to_string(),

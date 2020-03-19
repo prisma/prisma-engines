@@ -1,7 +1,7 @@
 use super::common::*;
 use crate::{
-    ast, common::names::*, dml, dml::WithDatabaseName, error::ErrorCollection, DataSourceField, FieldArity,
-    OnDeleteStrategy,
+    ast, common::names::*, dml, dml::WithDatabaseName, error::ErrorCollection, DataSourceField,
+    FieldArity, OnDeleteStrategy,
 };
 use prisma_inflector;
 
@@ -17,7 +17,11 @@ impl Standardiser {
         Standardiser {}
     }
 
-    pub fn standardise(&self, ast_schema: &ast::SchemaAst, schema: &mut dml::Datamodel) -> Result<(), ErrorCollection> {
+    pub fn standardise(
+        &self,
+        ast_schema: &ast::SchemaAst,
+        schema: &mut dml::Datamodel,
+    ) -> Result<(), ErrorCollection> {
         self.add_missing_back_relations(ast_schema, schema)?;
 
         // This is intentionally disabled for now, since the generated types would surface in the
@@ -49,14 +53,17 @@ impl Standardiser {
 
                 if let dml::FieldType::Relation(rel) = &mut field.field_type {
                     let related_model = schema_copy.find_model(&rel.to).expect(STATE_ERROR);
-                    let related_field = related_model.related_field(model_name, &rel.name, &field.name).unwrap();
+                    let related_field = related_model
+                        .related_field(model_name, &rel.name, &field.name)
+                        .unwrap();
                     let related_model_name = &related_model.name;
 
-                    let related_field_rel = if let dml::FieldType::Relation(rel) = &related_field.field_type {
-                        rel
-                    } else {
-                        panic!(STATE_ERROR)
-                    };
+                    let related_field_rel =
+                        if let dml::FieldType::Relation(rel) = &related_field.field_type {
+                            rel
+                        } else {
+                            panic!(STATE_ERROR)
+                        };
 
                     // If one of the fields has to_fields explicitly set by the user, we continue.
                     if !rel.to_fields.is_empty() || !related_field_rel.to_fields.is_empty() {
@@ -162,7 +169,11 @@ impl Standardiser {
         }
     }
 
-    fn create_reference_field_for_model(&self, model: &dml::Model, relation_name: &str) -> dml::Field {
+    fn create_reference_field_for_model(
+        &self,
+        model: &dml::Model,
+        relation_name: &str,
+    ) -> dml::Field {
         dml::Field::new_generated(
             &NameNormalizer::camel_case(&model.name),
             dml::FieldType::Relation(dml::RelationInfo {
@@ -174,7 +185,12 @@ impl Standardiser {
         )
     }
 
-    fn point_relation_to(&self, field_ref: &dml::FieldRef, to: &str, datamodel: &mut dml::Datamodel) {
+    fn point_relation_to(
+        &self,
+        field_ref: &dml::FieldRef,
+        to: &str,
+        datamodel: &mut dml::Datamodel,
+    ) {
         let field = datamodel.find_field_mut(field_ref).expect(STATE_ERROR);
 
         if let dml::FieldType::Relation(rel) = &mut field.field_type {
@@ -232,7 +248,8 @@ impl Standardiser {
 
         let mut missing_back_relation_fields = Vec::new();
         for model in &schema.models {
-            missing_back_relation_fields.append(&mut self.find_missing_back_relation_fields(&model, schema));
+            missing_back_relation_fields
+                .append(&mut self.find_missing_back_relation_fields(&model, schema));
         }
 
         for missing_back_relation_field in missing_back_relation_fields {
@@ -305,7 +322,9 @@ impl Standardiser {
                     let (arity, field_name) = if field.arity.is_singular() {
                         (
                             dml::FieldArity::List,
-                            prisma_inflector::classical().pluralize(&model.name).camel_case(),
+                            prisma_inflector::classical()
+                                .pluralize(&model.name)
+                                .camel_case(),
                         )
                     } else {
                         (dml::FieldArity::Optional, model.name.camel_case())
@@ -359,7 +378,10 @@ impl Standardiser {
     }
 
     // Returns list of model name, field name and relation info.
-    fn find_unnamed_relations(&self, datamodel: &dml::Datamodel) -> Vec<(String, String, dml::RelationInfo)> {
+    fn find_unnamed_relations(
+        &self,
+        datamodel: &dml::Datamodel,
+    ) -> Vec<(String, String, dml::RelationInfo)> {
         let mut rels = Vec::new();
 
         for model in datamodel.models() {
@@ -403,8 +425,11 @@ impl Standardiser {
                     dml::FieldType::Relation(rel_info) => {
                         self.get_datasource_fields_for_relation_field(&field, &rel_info, &datamodel)
                     }
-                    dml::FieldType::ConnectorSpecific(_) => {
-                        unimplemented!("ConnectorSpecific is not supported here as it will be removed soon.")
+                    dml::FieldType::ConnectorSpecific(_) => unimplemented!(
+                        "ConnectorSpecific is not supported here as it will be removed soon."
+                    ),
+                    dml::FieldType::Unsupported(_) => {
+                        panic!("These should always be commented out")
                     }
                 };
                 datasource_fields.into_iter().for_each(|ds_field| {
@@ -417,19 +442,21 @@ impl Standardiser {
             }
         }
 
-        datasource_fields_to_push.into_iter().for_each(|add_ds_field| {
-            let AddDatasourceField {
-                model,
-                field,
-                datasource_field,
-            } = add_ds_field;
-            let field = datamodel
-                .find_model_mut(&model)
-                .unwrap()
-                .find_field_mut(&field)
-                .unwrap();
-            field.data_source_fields.push(datasource_field);
-        });
+        datasource_fields_to_push
+            .into_iter()
+            .for_each(|add_ds_field| {
+                let AddDatasourceField {
+                    model,
+                    field,
+                    datasource_field,
+                } = add_ds_field;
+                let field = datamodel
+                    .find_model_mut(&model)
+                    .unwrap()
+                    .find_field_mut(&field)
+                    .unwrap();
+                field.data_source_fields.push(datasource_field);
+            });
     }
 
     fn get_datasource_fields_for_scalar_field(
@@ -486,9 +513,13 @@ impl Standardiser {
                         vec![ds_field]
                     }
                     dml::FieldType::Relation(rel_info) => {
-                        let mut x =
-                            self.get_datasource_fields_for_relation_field(&referenced_field, &rel_info, &datamodel);
-                        x.iter_mut().for_each(|ds_field| ds_field.name = db_name.to_owned());
+                        let mut x = self.get_datasource_fields_for_relation_field(
+                            &referenced_field,
+                            &rel_info,
+                            &datamodel,
+                        );
+                        x.iter_mut()
+                            .for_each(|ds_field| ds_field.name = db_name.to_owned());
                         x
                     }
                     x => unimplemented!("This must be a scalar type: {:?}", x),
@@ -514,7 +545,8 @@ impl Standardiser {
                     .to_fields
                     .iter()
                     .map(|to_field| {
-                        let referenced_field = related_model.find_field(&to_field).expect(STATE_ERROR);
+                        let referenced_field =
+                            related_model.find_field(&to_field).expect(STATE_ERROR);
                         // TODO: calling `final_single_database_name` means that this can not work for compound relation fields
                         format!(
                             "{}_{}",

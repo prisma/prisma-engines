@@ -28,7 +28,7 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
             .iter()
             .filter(|column| !is_foreign_key_column(&table, &column))
         {
-            let field = calculate_scalar_field(&schema, &table, &column, None);
+            let field = calculate_scalar_field(&schema, &table, &column);
             model.add_field(field);
         }
 

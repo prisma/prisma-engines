@@ -128,14 +128,17 @@ pub(crate) fn calculate_compound_index(index: &Index, name: String) -> IndexDefi
     }
 }
 
-pub(crate) fn calculate_scalar_field(
-    schema: &SqlSchema,
-    table: &Table,
-    column: &Column,
-    comment: Option<String>,
-) -> Field {
+pub(crate) fn calculate_scalar_field(schema: &SqlSchema, table: &Table, column: &Column) -> Field {
     debug!("Handling column {:?}", column);
     let field_type = calculate_field_type(&schema, &column, &table);
+    let (is_commented_out, documentation) = match field_type {
+        FieldType::Unsupported(_) => (
+            true,
+            Some("This type is currently not supported.".to_string()), //todo this should trigger a warning
+        ),
+        _ => (false, None),
+    };
+
     let arity = match column.tpe.arity {
         _ if column.auto_increment && field_type == FieldType::Base(ScalarType::Int) => {
             FieldArity::Required
@@ -157,11 +160,11 @@ pub(crate) fn calculate_scalar_field(
         default_value,
         is_unique,
         is_id,
-        documentation: comment,
+        documentation,
         is_generated: false,
         is_updated_at: false,
         data_source_fields: vec![],
-        is_commented_out: false,
+        is_commented_out,
     }
 }
 
@@ -452,7 +455,8 @@ pub(crate) fn calculate_field_type(
                 ColumnTypeFamily::Enum(name) => FieldType::Enum(name.clone()),
                 // XXX: We made a conscious decision to punt on mapping of ColumnTypeFamily
                 // variants that don't yet have corresponding PrismaType variants
-                _ => FieldType::Base(ScalarType::String),
+                //todo Unsupported Type FieldType::Unsupported(columntypefamily)
+                x => FieldType::Unsupported(x.to_string()),
             }
         }
     }
