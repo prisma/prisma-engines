@@ -437,5 +437,5 @@ async fn introspecting_an_unsupported_type_should_comment_it_out(api: &TestApi) 
         .await;
 
     let result = dbg!(api.introspect().await);
-    assert_eq!(&result, "model Test {\n  id             Int      @default(autoincrement()) @id\n  network_inet   String?\n  /// This type is currently not supported.\n  // network_mac macaddr?\n}");
+    assert_eq!(&result, "model Test {\n  id             Int      @default(autoincrement()) @id\n  network_inet   String?\n  // This type is currently not supported.\n  // network_mac macaddr?\n}");
 }
