@@ -497,7 +497,7 @@ async fn all_postgres_id_types_work(api: &TestApi) -> TestResult {
         ("boolean", "true"),
         ("inet", "\"127.0.0.4\""),
         // ("json", "\"{ \\\"isThisPrimaryKeyReallyJSON\\\": true }\""),
-        ("jsonb", "\"{ \\\"isThisPrimaryKeyReallyJSON\\\": true }\""),
+        ("jsonb", "\"{\\\"isThisPrimaryKeyReallyJSON\\\":true}\""),
     ];
 
     let drop_table = r#"DROP TABLE IF EXISTS "prisma-tests"."pk_test""#;
