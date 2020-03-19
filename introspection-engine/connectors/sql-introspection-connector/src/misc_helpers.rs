@@ -453,6 +453,8 @@ pub(crate) fn calculate_field_type(
                 ColumnTypeFamily::Int => FieldType::Base(ScalarType::Int),
                 ColumnTypeFamily::String => FieldType::Base(ScalarType::String),
                 ColumnTypeFamily::Enum(name) => FieldType::Enum(name.clone()),
+                ColumnTypeFamily::Uuid => FieldType::Base(ScalarType::String),
+                ColumnTypeFamily::Json => FieldType::Base(ScalarType::String),
                 // XXX: We made a conscious decision to punt on mapping of ColumnTypeFamily
                 // variants that don't yet have corresponding PrismaType variants
                 //todo Unsupported Type FieldType::Unsupported(columntypefamily)
