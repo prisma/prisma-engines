@@ -128,14 +128,17 @@ pub(crate) fn calculate_compound_index(index: &Index, name: String) -> IndexDefi
     }
 }
 
-pub(crate) fn calculate_scalar_field(
-    schema: &SqlSchema,
-    table: &Table,
-    column: &Column,
-    comment: Option<String>,
-) -> Field {
+pub(crate) fn calculate_scalar_field(schema: &SqlSchema, table: &Table, column: &Column) -> Field {
     debug!("Handling column {:?}", column);
     let field_type = calculate_field_type(&schema, &column, &table);
+    let (is_commented_out, documentation) = match field_type {
+        FieldType::Unsupported(_) => (
+            true,
+            Some("This type is currently not supported.".to_string()),
+        ),
+        _ => (false, None),
+    };
+
     let arity = match column.tpe.arity {
         _ if column.auto_increment && field_type == FieldType::Base(ScalarType::Int, None) => {
             FieldArity::Required
@@ -157,11 +160,11 @@ pub(crate) fn calculate_scalar_field(
         default_value,
         is_unique,
         is_id,
-        documentation: comment,
+        documentation,
         is_generated: false,
         is_updated_at: false,
         data_source_fields: vec![],
-        is_commented_out: false,
+        is_commented_out,
     }
 }
 
@@ -345,7 +348,15 @@ pub(crate) fn is_relation_and_id(columns: Vec<&Column>, table: &Table) -> bool {
     table
         .primary_key
         .as_ref()
-        .map(|pk| pk.matches_foreign_key(columns))
+        .map(|pk| {
+            columns_match(
+                &pk.columns,
+                &columns
+                    .iter()
+                    .map(|c| c.name.clone())
+                    .collect::<Vec<String>>(),
+            )
+        })
         .unwrap_or(false)
 }
 
@@ -442,9 +453,9 @@ pub(crate) fn calculate_field_type(
                 ColumnTypeFamily::Int => FieldType::Base(ScalarType::Int, None),
                 ColumnTypeFamily::String => FieldType::Base(ScalarType::String, None),
                 ColumnTypeFamily::Enum(name) => FieldType::Enum(name.clone()),
-                // XXX: We made a conscious decision to punt on mapping of ColumnTypeFamily
-                // variants that don't yet have corresponding PrismaType variants
-                _ => FieldType::Base(ScalarType::String, None),
+                ColumnTypeFamily::Uuid => FieldType::Base(ScalarType::String, None),
+                ColumnTypeFamily::Json => FieldType::Base(ScalarType::String, None),
+                x => FieldType::Unsupported(x.to_string()),
             }
         }
     }
@@ -527,4 +538,12 @@ fn parse_float(value: &str) -> Option<f64> {
             None
         }
     }
+}
+
+/// Returns whether the elements of the two slices match, regardless of ordering.
+pub fn columns_match(a_cols: &[String], b_cols: &[String]) -> bool {
+    a_cols.len() == b_cols.len()
+        && a_cols
+            .iter()
+            .all(|a_col| b_cols.iter().any(|b_col| a_col == b_col))
 }

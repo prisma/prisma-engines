@@ -12,10 +12,6 @@ pub struct TestApi {
 }
 
 impl TestApi {
-    pub fn connection(&self) -> &Quaint {
-        &self.connection
-    }
-
     fn datasource(&self) -> String {
         format!(
             r#"

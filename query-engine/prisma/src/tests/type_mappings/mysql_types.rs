@@ -79,11 +79,11 @@ const CREATE_ONE_TYPES_QUERY: &str = indoc! {
                 string_text_text: \"dolphins\"
                 string_text_mediumtext: \"medium dolphins\"
                 string_text_longtext: \"long dolphins\"
-                string_binary_binary: \"hello 2020\"
-                string_blob_tinyblob: \"smol blob\"
-                string_blob_mediumblob: \"average blob\"
-                string_blob_blob: \"very average blob\"
-                string_blob_longblob: \"loong looooong bloooooooob\"
+                # string_binary_binary: \"hello 2020\"
+                # string_blob_tinyblob: \"smol blob\"
+                # string_blob_mediumblob: \"average blob\"
+                # string_blob_blob: \"very average blob\"
+                # string_blob_longblob: \"loong looooong bloooooooob\"
                 string_enum: \"jellicle_cats\"
                 json: \"{\\\"name\\\": null}\"
             }
@@ -121,21 +121,21 @@ async fn mysql_types_roundtrip(api: &TestApi) -> TestResult {
             .assert_field_type("string_text_text", ScalarType::String)?
             .assert_field_type("string_text_mediumtext", ScalarType::String)?
             .assert_field_type("string_text_longtext", ScalarType::String)?
-            .assert_field_type("string_binary_binary", ScalarType::String)?
-            .assert_field_type("string_blob_tinyblob", ScalarType::String)?
-            .assert_field_type("string_blob_mediumblob", ScalarType::String)?
-            .assert_field_type("string_blob_blob", ScalarType::String)?
-            .assert_field_type("string_blob_longblob", ScalarType::String)?
+            // .assert_field_type("string_binary_binary", ScalarType::String)?
+            // .assert_field_type("string_blob_tinyblob", ScalarType::String)?
+            // .assert_field_type("string_blob_mediumblob", ScalarType::String)?
+            // .assert_field_type("string_blob_blob", ScalarType::String)?
+            // .assert_field_type("string_blob_longblob", ScalarType::String)?
             .assert_field_enum_type("string_enum", "types_string_enum")?
-            .assert_field_type("string_set", ScalarType::String)?
-            .assert_field_type("spatial_geometry", ScalarType::String)?
-            .assert_field_type("spatial_point", ScalarType::String)?
-            .assert_field_type("spatial_linestring", ScalarType::String)?
-            .assert_field_type("spatial_polygon", ScalarType::String)?
-            .assert_field_type("spatial_multipoint", ScalarType::String)?
-            .assert_field_type("spatial_multilinestring", ScalarType::String)?
-            .assert_field_type("spatial_multipolygon", ScalarType::String)?
-            .assert_field_type("spatial_geometrycollection", ScalarType::String)?
+            // .assert_field_type("string_set", ScalarType::String)?
+            // .assert_field_type("spatial_geometry", ScalarType::String)?
+            // .assert_field_type("spatial_point", ScalarType::String)?
+            // .assert_field_type("spatial_linestring", ScalarType::String)?
+            // .assert_field_type("spatial_polygon", ScalarType::String)?
+            // .assert_field_type("spatial_multipoint", ScalarType::String)?
+            // .assert_field_type("spatial_multilinestring", ScalarType::String)?
+            // .assert_field_type("spatial_multipolygon", ScalarType::String)?
+            // .assert_field_type("spatial_geometrycollection", ScalarType::String)?
             .assert_field_type("json", ScalarType::String)
     })?;
 
@@ -183,11 +183,12 @@ async fn mysql_types_roundtrip(api: &TestApi) -> TestResult {
                     string_text_text
                     string_text_mediumtext
                     string_text_longtext
-                    string_binary_binary
-                    string_blob_tinyblob
-                    string_blob_mediumblob
-                    string_blob_blob
-                    string_blob_longblob
+                    # string_binary_binary
+                    # string_binary_varbinary
+                    # string_blob_tinyblob
+                    # string_blob_mediumblob
+                    # string_blob_blob
+                    # string_blob_longblob
                     string_enum
                     # omitting spatial/geometry types
                     json
@@ -223,11 +224,12 @@ async fn mysql_types_roundtrip(api: &TestApi) -> TestResult {
                         "string_text_text": "dolphins",
                         "string_text_mediumtext": "medium dolphins",
                         "string_text_longtext": "long dolphins",
-                        "string_binary_binary": "hello 2020\u{0}\u{0}\u{0}\u{0}\u{0}\u{0}\u{0}\u{0}\u{0}\u{0}",
-                        "string_blob_tinyblob": "smol blob",
-                        "string_blob_mediumblob": "average blob",
-                        "string_blob_blob": "very average blob",
-                        "string_blob_longblob": "loong looooong bloooooooob",
+                        // "string_binary_binary": "hello 2020\u{0}\u{0}\u{0}\u{0}\u{0}\u{0}\u{0}\u{0}\u{0}\u{0}",
+                        // "string_binary_binary": "hello 2020",
+                        // "string_blob_tinyblob": "smol blob",
+                        // "string_blob_mediumblob": "average blob",
+                        // "string_blob_blob": "very average blob",
+                        // "string_blob_longblob": "loong looooong bloooooooob",
                         "string_enum": "jellicle_cats",
                         "json": "{\"name\": null}",
                     },

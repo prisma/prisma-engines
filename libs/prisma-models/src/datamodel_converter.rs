@@ -441,6 +441,7 @@ impl DatamodelFieldExtensions for dml::Field {
                 dml::ScalarType::Int => TypeIdentifier::Int,
                 dml::ScalarType::String => TypeIdentifier::String,
             },
+            dml::FieldType::Unsupported(_) => panic!("These should always be commented out"),
             dml::FieldType::ConnectorSpecific { .. } => {
                 unimplemented!("Connector Specific types are not supported here yet")
             }

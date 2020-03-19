@@ -203,15 +203,6 @@ impl PrimaryKey {
     pub fn is_single_primary_key(&self, column: &String) -> bool {
         self.columns.len() == 1 && self.columns.contains(column)
     }
-
-    pub fn matches_foreign_key(&self, columns: Vec<&Column>) -> bool {
-        self.columns.len() == columns.len()
-            && self.columns.iter().all(|self_column| {
-                columns
-                    .iter()
-                    .any(|other_column| *self_column == other_column.name)
-            })
-    }
 }
 
 /// A column of a table.
@@ -287,8 +278,8 @@ pub enum ColumnTypeFamily {
     TransactionId,
     ///Enum
     Enum(String),
-    /// Unknown
-    Unknown,
+    /// Unsupported
+    Unsupported(String),
 }
 
 impl fmt::Display for ColumnTypeFamily {
@@ -307,7 +298,7 @@ impl fmt::Display for ColumnTypeFamily {
             Self::TextSearch => "textSearch".to_string(),
             Self::TransactionId => "transactionId".to_string(),
             Self::Enum(x) => format!("Enum({})", &x),
-            Self::Unknown => "unknown".to_string(),
+            Self::Unsupported(x) => x.to_string(),
         };
         write!(f, "{}", str)
     }

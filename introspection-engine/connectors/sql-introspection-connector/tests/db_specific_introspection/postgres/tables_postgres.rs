@@ -422,3 +422,20 @@ async fn introspecting_a_default_value_as_dbgenerated_should_work(api: &TestApi)
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
+
+#[test_each_connector(tags("postgres"))]
+async fn introspecting_an_unsupported_type_should_comment_it_out(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("Test", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom("network_inet inet");
+                t.inject_custom("network_mac  macaddr");
+            });
+        })
+        .await;
+
+    let result = dbg!(api.introspect().await);
+    assert_eq!(&result, "model Test {\n  id             Int      @default(autoincrement()) @id\n  network_inet   String?\n  // This type is currently not supported.\n  // network_mac macaddr?\n}");
+}

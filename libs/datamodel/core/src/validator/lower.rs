@@ -49,7 +49,11 @@ impl LowerDmlToAst {
         Ok(ast::SchemaAst { tops: tops })
     }
 
-    pub fn lower_model(&self, model: &dml::Model, datamodel: &dml::Datamodel) -> Result<ast::Model, ErrorCollection> {
+    pub fn lower_model(
+        &self,
+        model: &dml::Model,
+        datamodel: &dml::Datamodel,
+    ) -> Result<ast::Model, ErrorCollection> {
         let mut errors = ErrorCollection::new();
         let mut fields: Vec<ast::Field> = Vec::new();
 
@@ -70,13 +74,20 @@ impl LowerDmlToAst {
             name: ast::Identifier::new(&model.name),
             fields,
             directives: self.directives.model.serialize(model, datamodel)?,
-            documentation: model.documentation.clone().map(|text| ast::Comment { text }),
+            documentation: model
+                .documentation
+                .clone()
+                .map(|text| ast::Comment { text }),
             span: ast::Span::empty(),
             commented_out: model.is_commented_out,
         })
     }
 
-    fn lower_enum(&self, enm: &dml::Enum, datamodel: &dml::Datamodel) -> Result<ast::Enum, ErrorCollection> {
+    fn lower_enum(
+        &self,
+        enm: &dml::Enum,
+        datamodel: &dml::Datamodel,
+    ) -> Result<ast::Enum, ErrorCollection> {
         Ok(ast::Enum {
             name: ast::Identifier::new(&enm.name),
             values: enm
@@ -94,14 +105,24 @@ impl LowerDmlToAst {
         })
     }
 
-    fn lower_field(&self, field: &dml::Field, datamodel: &dml::Datamodel) -> Result<ast::Field, ErrorCollection> {
+    fn lower_field(
+        &self,
+        field: &dml::Field,
+        datamodel: &dml::Datamodel,
+    ) -> Result<ast::Field, ErrorCollection> {
         Ok(ast::Field {
             name: ast::Identifier::new(&field.name),
             arity: self.lower_field_arity(field.arity),
-            default_value: field.default_value.clone().map(|dv| Self::lower_default_value(dv)),
+            default_value: field
+                .default_value
+                .clone()
+                .map(|dv| Self::lower_default_value(dv)),
             directives: self.directives.field.serialize(field, datamodel)?,
             field_type: self.lower_type(&field.field_type),
-            documentation: field.documentation.clone().map(|text| ast::Comment { text }),
+            documentation: field
+                .documentation
+                .clone()
+                .map(|text| ast::Comment { text }),
             span: ast::Span::empty(),
             is_commented_out: field.is_commented_out,
         })
@@ -128,18 +149,30 @@ impl LowerDmlToAst {
 
     pub fn lower_scalar_value(sv: &dml::ScalarValue) -> ast::Expression {
         match sv {
-            dml::ScalarValue::Boolean(true) => ast::Expression::BooleanValue(String::from("true"), ast::Span::empty()),
+            dml::ScalarValue::Boolean(true) => {
+                ast::Expression::BooleanValue(String::from("true"), ast::Span::empty())
+            }
             dml::ScalarValue::Boolean(false) => {
                 ast::Expression::BooleanValue(String::from("false"), ast::Span::empty())
             }
-            dml::ScalarValue::String(value) => ast::Expression::StringValue(value.clone(), ast::Span::empty()),
+            dml::ScalarValue::String(value) => {
+                ast::Expression::StringValue(value.clone(), ast::Span::empty())
+            }
             dml::ScalarValue::ConstantLiteral(value) => {
                 ast::Expression::ConstantValue(value.clone(), ast::Span::empty())
             }
-            dml::ScalarValue::DateTime(value) => ast::Expression::ConstantValue(value.to_rfc3339(), ast::Span::empty()),
-            dml::ScalarValue::Decimal(value) => ast::Expression::NumericValue(value.to_string(), ast::Span::empty()),
-            dml::ScalarValue::Float(value) => ast::Expression::NumericValue(value.to_string(), ast::Span::empty()),
-            dml::ScalarValue::Int(value) => ast::Expression::NumericValue(value.to_string(), ast::Span::empty()),
+            dml::ScalarValue::DateTime(value) => {
+                ast::Expression::ConstantValue(value.to_rfc3339(), ast::Span::empty())
+            }
+            dml::ScalarValue::Decimal(value) => {
+                ast::Expression::NumericValue(value.to_string(), ast::Span::empty())
+            }
+            dml::ScalarValue::Float(value) => {
+                ast::Expression::NumericValue(value.to_string(), ast::Span::empty())
+            }
+            dml::ScalarValue::Int(value) => {
+                ast::Expression::NumericValue(value.to_string(), ast::Span::empty())
+            }
         }
     }
 
@@ -150,6 +183,7 @@ impl LowerDmlToAst {
                 ast::Identifier::new(&custom_type_name.as_ref().unwrap_or(&tpe.to_string()))
             }
             dml::FieldType::Enum(tpe) => ast::Identifier::new(&tpe.to_string()),
+            dml::FieldType::Unsupported(tpe) => ast::Identifier::new(&tpe.to_string()),
             dml::FieldType::Relation(rel) => ast::Identifier::new(&rel.to),
             _ => unimplemented!("Connector specific types are not supported atm."),
         }

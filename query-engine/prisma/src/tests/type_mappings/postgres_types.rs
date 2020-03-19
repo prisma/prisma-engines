@@ -172,7 +172,7 @@ async fn postgres_types_roundtrip(api: &TestApi) -> TestResult {
             .assert_field_type("string_char", ScalarType::String)?
             .assert_field_type("string_varchar", ScalarType::String)?
             .assert_field_type("string_text", ScalarType::String)?
-            .assert_field_type("binary_bytea", ScalarType::String)?
+            // .assert_field_type("binary_bytea", ScalarType::String)?
             .assert_field_type("binary_bits", ScalarType::String)?
             .assert_field_type("binary_bits_varying", ScalarType::String)?
             .assert_field_type("binary_uuid", ScalarType::String)?
@@ -183,19 +183,19 @@ async fn postgres_types_roundtrip(api: &TestApi) -> TestResult {
             .assert_field_type("time_timetz", ScalarType::DateTime)?
             .assert_field_type("time_interval", ScalarType::String)?
             .assert_field_type("boolean_boolean", ScalarType::Boolean)?
-            .assert_field_type("network_cidr", ScalarType::String)?
+            // .assert_field_type("network_cidr", ScalarType::String)?
             .assert_field_type("network_inet", ScalarType::String)?
-            .assert_field_type("network_mac", ScalarType::String)?
-            .assert_field_type("search_tsvector", ScalarType::String)?
-            .assert_field_type("search_tsquery", ScalarType::String)?
+            // .assert_field_type("network_mac", ScalarType::String)?
+            // .assert_field_type("search_tsvector", ScalarType::String)?
+            // .assert_field_type("search_tsquery", ScalarType::String)?
             .assert_field_type("json_json", ScalarType::String)?
-            .assert_field_type("json_jsonb", ScalarType::String)?
-            .assert_field_type("range_int4range", ScalarType::String)?
-            .assert_field_type("range_int8range", ScalarType::String)?
-            .assert_field_type("range_numrange", ScalarType::String)?
-            .assert_field_type("range_tsrange", ScalarType::String)?
-            .assert_field_type("range_tstzrange", ScalarType::String)?
-            .assert_field_type("range_daterange", ScalarType::String)
+            .assert_field_type("json_jsonb", ScalarType::String)
+        // .assert_field_type("range_int4range", ScalarType::String)?
+        // .assert_field_type("range_int8range", ScalarType::String)?
+        // .assert_field_type("range_numrange", ScalarType::String)?
+        // .assert_field_type("range_tsrange", ScalarType::String)?
+        // .assert_field_type("range_tstzrange", ScalarType::String)?
+        // .assert_field_type("range_daterange", ScalarType::String)
     })?;
 
     let response = engine.request(CREATE_ONE_TYPES_QUERY).await;
@@ -359,7 +359,7 @@ async fn postgres_array_types_roundtrip(api: &TestApi) -> TestResult {
             .assert_field_type("string_char", ScalarType::String)?
             .assert_field_type("string_varchar", ScalarType::String)?
             .assert_field_type("string_text", ScalarType::String)?
-            .assert_field_type("binary_bytea", ScalarType::String)?
+            // .assert_field_type("binary_bytea", ScalarType::String)?
             .assert_field_type("binary_bits", ScalarType::String)?
             .assert_field_type("binary_bits_varying", ScalarType::String)?
             .assert_field_type("binary_uuid", ScalarType::String)?

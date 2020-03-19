@@ -40,15 +40,17 @@ fn a_data_model_can_be_generated_from_a_schema() {
             fields: col_types
                 .iter()
                 .map(|col_type| {
-                    let field_type = match col_type {
-                        ColumnTypeFamily::Boolean => FieldType::Base(ScalarType::Boolean, None),
-                        ColumnTypeFamily::DateTime => FieldType::Base(ScalarType::DateTime, None),
-                        ColumnTypeFamily::Float => FieldType::Base(ScalarType::Float, None),
-                        ColumnTypeFamily::Int => FieldType::Base(ScalarType::Int, None),
-                        ColumnTypeFamily::String => FieldType::Base(ScalarType::String, None),
-                        // XXX: We made a conscious decision to punt on mapping of ColumnTypeFamily
-                        // variants that don't yet have corresponding PrismaType variants
-                        _ => FieldType::Base(ScalarType::String, None),
+                    let (field_type, is_commented_out, documentation) = match col_type {
+                        ColumnTypeFamily::Boolean => (FieldType::Base(ScalarType::Boolean, None), false, None),
+                        ColumnTypeFamily::DateTime => (FieldType::Base(ScalarType::DateTime, None), false, None),
+                        ColumnTypeFamily::Float => (FieldType::Base(ScalarType::Float, None), false, None),
+                        ColumnTypeFamily::Int => (FieldType::Base(ScalarType::Int, None), false, None),
+                        ColumnTypeFamily::String => (FieldType::Base(ScalarType::String, None), false, None),
+                        ColumnTypeFamily::Enum(name) => (FieldType::Enum(name.clone()), false, None),
+                        ColumnTypeFamily::Uuid => (FieldType::Base(ScalarType::String, None), false, None),
+                        ColumnTypeFamily::Json => (FieldType::Base(ScalarType::String, None), false, None),
+                        x => (FieldType::Unsupported(x.to_string()),true, Some("This type is currently not supported.".to_string())),
+
                     };
                     Field {
                         name: col_type.to_string(),
@@ -58,11 +60,11 @@ fn a_data_model_can_be_generated_from_a_schema() {
                         default_value: None,
                         is_unique: false,
                         is_id: false,
-                        documentation: None,
+                        documentation,
                         is_generated: false,
                         is_updated_at: false,
                         data_source_fields: vec![],
-                        is_commented_out: false,
+                        is_commented_out,
                     }
                 })
                 .collect(),

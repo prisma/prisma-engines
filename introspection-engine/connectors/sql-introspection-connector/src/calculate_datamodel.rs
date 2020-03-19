@@ -1,4 +1,5 @@
 use crate::commenting_out_guardrails::commenting_out_guardrails;
+use crate::misc_helpers::columns_match;
 use crate::misc_helpers::*;
 use crate::sanitize_datamodel_names::sanitize_datamodel_names;
 use crate::SqlIntrospectionResult;
@@ -7,6 +8,7 @@ use log::debug;
 use sql_schema_describer::*;
 
 /// Calculate a data model from a database schema.
+/// todo return warnings
 pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> {
     debug!("Calculating data model.");
 
@@ -26,7 +28,7 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
             .iter()
             .filter(|column| !is_foreign_key_column(&table, &column))
         {
-            let field = calculate_scalar_field(&schema, &table, &column, None);
+            let field = calculate_scalar_field(&schema, &table, &column);
             model.add_field(field);
         }
 
@@ -145,20 +147,9 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
         model.add_field(field);
     }
 
-    sanitize_datamodel_names(&mut data_model);
-    commenting_out_guardrails(&mut data_model);
+    sanitize_datamodel_names(&mut data_model); //todo warnings
+    commenting_out_guardrails(&mut data_model); //todo warnings
     debug!("Done calculating data model {:?}", data_model);
 
     Ok(data_model)
-}
-
-/// Returns whether the elements of the two slices match, regardless of ordering.
-fn columns_match(a_cols: &[String], b_cols: &[String]) -> bool {
-    if a_cols.len() != b_cols.len() {
-        return false;
-    }
-
-    a_cols
-        .iter()
-        .all(|a_col| b_cols.iter().any(|b_col| a_col == b_col))
 }

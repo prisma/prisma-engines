@@ -292,7 +292,9 @@ impl SqlSchemaDescriber {
                                     false => DefaultValue::DBGENERATED(default_string),
                                 }
                             }
-                            ColumnTypeFamily::Unknown => DefaultValue::DBGENERATED(default_string),
+                            ColumnTypeFamily::Unsupported(_) => {
+                                DefaultValue::DBGENERATED(default_string)
+                            }
                         })
                     }
                 },
@@ -679,8 +681,9 @@ fn get_column_type<'a>(
         "json" | "_json" => Json,
         "jsonb" | "_jsonb" => Json,
         "uuid" | "_uuid" => Uuid,
-        "bit" | "_bit" => Binary,
-        "varbit" | "_varbit" => Binary,
+        // bit and varbit should be binary, but are currently mapped to strings.
+        "bit" | "_bit" => String,
+        "varbit" | "_varbit" => String,
         "box" | "_box" => Geometric,
         "circle" | "_circle" => Geometric,
         "line" | "_line" => Geometric,
@@ -699,7 +702,8 @@ fn get_column_type<'a>(
         "tsquery" | "_tsquery" => TextSearch,
         "tsvector" | "_tsvector" => TextSearch,
         "txid_snapshot" | "_txid_snapshot" => TransactionId,
-        _ => Unknown,
+        "inet" | "_inet" => String,
+        data_type => Unsupported(data_type.into()),
     };
     ColumnType {
         raw: full_data_type.to_owned(),

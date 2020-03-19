@@ -427,6 +427,9 @@ impl Standardiser {
                     dml::FieldType::ConnectorSpecific(_) => unimplemented!(
                         "ConnectorSpecific is not supported here as it will be removed soon."
                     ),
+                    dml::FieldType::Unsupported(_) => {
+                        panic!("These should always be commented out")
+                    }
                 };
                 datasource_fields.into_iter().for_each(|ds_field| {
                     datasource_fields_to_push.push(AddDatasourceField {
