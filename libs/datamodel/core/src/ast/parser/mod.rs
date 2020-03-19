@@ -60,7 +60,10 @@ fn parse_function(token: &pest::iterators::Pair<'_, Rule>) -> Expression {
 
     match name {
         Some(name) => Expression::Function(name, arguments, Span::from_pest(token.as_span())),
-        _ => unreachable!("Encountered impossible function during parsing: {:?}", token.as_str()),
+        _ => unreachable!(
+            "Encountered impossible function during parsing: {:?}",
+            token.as_str()
+        ),
     }
 }
 
@@ -108,6 +111,44 @@ fn doc_comments_to_string(comments: &[String]) -> Option<Comment> {
 
 // Directive parsing
 
+fn parse_directive(token: &pest::iterators::Pair<'_, Rule>) -> Directive {
+    let mut name: Option<Identifier> = None;
+    let mut arguments: Vec<Argument> = vec![];
+
+    match_children! { token, current,
+        Rule::directive => return parse_directive(&current),
+        Rule::directive_name => name = Some(current.to_id()),
+        Rule::directive_arguments => parse_directive_args(&current, &mut arguments),
+        _ => unreachable!("Encountered impossible directive during parsing: {:?} \n {:?}", token, current.tokens())
+    };
+
+    match name {
+        Some(name) => Directive {
+            name,
+            arguments,
+            span: Span::from_pest(token.as_span()),
+        },
+        _ => panic!(
+            "Encountered impossible type during parsing: {:?}",
+            token.as_str()
+        ),
+    }
+}
+
+fn parse_directive_args(token: &pest::iterators::Pair<'_, Rule>, arguments: &mut Vec<Argument>) {
+    match_children! { token, current,
+        // This is a named arg.
+        Rule::argument => arguments.push(parse_directive_arg(&current)),
+        // This is a an unnamed arg.
+        Rule::argument_value => arguments.push(Argument {
+            name: Identifier::new(""),
+            value: parse_arg_value(&current),
+            span: Span::from_pest(current.as_span())
+        }),
+        _ => unreachable!("Encountered impossible directive argument during parsing: {:?}", current.tokens())
+    }
+}
+
 fn parse_directive_arg(token: &pest::iterators::Pair<'_, Rule>) -> Argument {
     let mut name: Option<Identifier> = None;
     let mut argument: Option<Expression> = None;
@@ -131,40 +172,6 @@ fn parse_directive_arg(token: &pest::iterators::Pair<'_, Rule>) -> Argument {
     }
 }
 
-fn parse_directive_args(token: &pest::iterators::Pair<'_, Rule>, arguments: &mut Vec<Argument>) {
-    match_children! { token, current,
-        // This is a named arg.
-        Rule::argument => arguments.push(parse_directive_arg(&current)),
-        // This is a an unnamed arg.
-        Rule::argument_value => arguments.push(Argument {
-            name: Identifier::new(""),
-            value: parse_arg_value(&current),
-            span: Span::from_pest(current.as_span())
-        }),
-        _ => unreachable!("Encountered impossible directive argument during parsing: {:?}", current.tokens())
-    }
-}
-
-fn parse_directive(token: &pest::iterators::Pair<'_, Rule>) -> Directive {
-    let mut name: Option<Identifier> = None;
-    let mut arguments: Vec<Argument> = vec![];
-
-    match_children! { token, current,
-        Rule::directive_name => name = Some(current.to_id()),
-        Rule::directive_arguments => parse_directive_args(&current, &mut arguments),
-        _ => unreachable!("Encountered impossible directive during parsing: {:?}", current.tokens())
-    };
-
-    match name {
-        Some(name) => Directive {
-            name,
-            arguments,
-            span: Span::from_pest(token.as_span()),
-        },
-        _ => panic!("Encountered impossible type during parsing: {:?}", token.as_str()),
-    }
-}
-
 // Base type parsing
 fn parse_base_type(token: &pest::iterators::Pair<'_, Rule>) -> String {
     match_first! { token, current,
@@ -173,7 +180,9 @@ fn parse_base_type(token: &pest::iterators::Pair<'_, Rule>) -> String {
     }
 }
 
-fn parse_field_type(token: &pest::iterators::Pair<'_, Rule>) -> Result<(FieldArity, String), DatamodelError> {
+fn parse_field_type(
+    token: &pest::iterators::Pair<'_, Rule>,
+) -> Result<(FieldArity, String), DatamodelError> {
     match_first! { token, current,
         Rule::optional_type => Ok((FieldArity::Optional, parse_base_type(&current))),
         Rule::base_type =>  Ok((FieldArity::Required, parse_base_type(&current))),
@@ -260,6 +269,7 @@ fn parse_model(token: &pest::iterators::Pair<'_, Rule>) -> Result<Model, ErrorCo
             }
         },
         Rule::doc_comment => comments.push(parse_doc_comment(&current)),
+        Rule::UNTIL_END_OF_LINE => {},
         _ => unreachable!("Encountered impossible model declaration during parsing: {:?}", current.tokens())
     }
 
@@ -292,7 +302,7 @@ fn parse_enum(token: &pest::iterators::Pair<'_, Rule>) -> Result<Enum, ErrorColl
     match_children! { token, current,
         Rule::ENUM_KEYWORD => { },
         Rule::identifier => name = Some(current.to_id()),
-        Rule::directive => directives.push(parse_directive(&current)),
+        Rule::block_level_directive => directives.push(parse_directive(&current)),
         Rule::enum_field_declaration => {
         match parse_enum_value(&current) {
             Ok(enum_value) => values.push(enum_value),
@@ -505,7 +515,9 @@ pub fn parse(datamodel_string: &str) -> Result<SchemaAst, ErrorCollection> {
             };
 
             let expected = match err.variant {
-                pest::error::ErrorVariant::ParsingError { positives, .. } => get_expected_from_error(&positives),
+                pest::error::ErrorVariant::ParsingError { positives, .. } => {
+                    get_expected_from_error(&positives)
+                }
                 _ => panic!("Could not construct parsing error. This should never happend."),
             };
 
@@ -530,6 +542,7 @@ fn rule_to_string(rule: Rule) -> &'static str {
         Rule::source_block => "source definition",
         Rule::generator_block => "generator definition",
         Rule::enum_field_declaration => "enum field declaration",
+        Rule::block_level_directive => "block level directive",
         Rule::EOI => "end of input",
         Rule::identifier => "alphanumeric identifier",
         Rule::numeric_literal => "numeric literal",
@@ -566,6 +579,7 @@ fn rule_to_string(rule: Rule) -> &'static str {
         Rule::DATASOURCE_KEYWORD => "\"datasource\" keyword",
         Rule::INTERPOLATION_START => "string interpolation start",
         Rule::INTERPOLATION_END => "string interpolation end",
+        Rule::UNTIL_END_OF_LINE => "until end of line",
 
         // Those are top level things and will never surface.
         Rule::datamodel => "datamodel declaration",
@@ -587,6 +601,5 @@ fn rule_to_string(rule: Rule) -> &'static str {
         Rule::boolean_true => "boolean true",
         Rule::boolean_false => "boolean false",
         Rule::doc_content => "documentation comment content",
-        Rule::COMMENT => "",
     }
 }

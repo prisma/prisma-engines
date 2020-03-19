@@ -1,13 +1,16 @@
 use datamodel::{
     dml::{
-        Datamodel, DefaultValue, Enum, Field, FieldArity, FieldType, IndexDefinition, Model, ScalarType,
-        WithDatabaseName,
+        Datamodel, DefaultValue, Enum, Field, FieldArity, FieldType, IndexDefinition, Model,
+        ScalarType, WithDatabaseName,
     },
     DataSourceField, EnumValue,
 };
 
 pub(crate) fn walk_models<'a>(datamodel: &'a Datamodel) -> impl Iterator<Item = ModelRef<'a>> + 'a {
-    datamodel.models.iter().map(move |model| ModelRef { datamodel, model })
+    datamodel
+        .models
+        .iter()
+        .map(move |model| ModelRef { datamodel, model })
 }
 
 /// Iterator to walk all the fields in the schema, associating them with their parent model.
@@ -29,11 +32,16 @@ pub(crate) struct ModelRef<'a> {
 
 impl<'a> ModelRef<'a> {
     pub(super) fn database_name(&self) -> &'a str {
-        self.model.database_name.as_ref().unwrap_or(&self.model.name)
+        self.model
+            .database_name
+            .as_ref()
+            .unwrap_or(&self.model.name)
     }
 
     pub(super) fn db_name(&self) -> &str {
-        self.model.single_database_name().unwrap_or_else(|| &self.model.name)
+        self.model
+            .single_database_name()
+            .unwrap_or_else(|| &self.model.name)
     }
 
     pub(super) fn fields<'b>(&'b self) -> impl Iterator<Item = FieldRef<'a>> + 'b {
@@ -74,12 +82,11 @@ impl<'a> ModelRef<'a> {
             .fields()
             .filter(|field| field.is_id)
             // Compound id models
-            .chain(
+            .chain(self.model.id_fields.iter().filter_map(move |field_name| {
                 self.model
-                    .id_fields
-                    .iter()
-                    .filter_map(move |field_name| self.model.fields().find(|field| field.name.as_str() == field_name)),
-            )
+                    .fields()
+                    .find(|field| field.name.as_str() == field_name)
+            }))
             .map(move |field| FieldRef {
                 datamodel: self.datamodel,
                 model: self.model,
@@ -129,7 +136,7 @@ impl<'a> FieldRef<'a> {
                 datamodel: self.datamodel,
                 r#enum: self.datamodel.find_enum(name).unwrap(),
             }),
-            FieldType::Base(scalar_type) => TypeRef::Base(*scalar_type),
+            FieldType::Base(scalar_type, _) => TypeRef::Base(*scalar_type),
             _ => TypeRef::Other,
         }
     }
@@ -193,7 +200,9 @@ impl<'a> EnumRef<'a> {
     }
 
     pub(super) fn db_name(&self) -> &'a str {
-        self.r#enum.single_database_name().unwrap_or(&self.r#enum.name)
+        self.r#enum
+            .single_database_name()
+            .unwrap_or(&self.r#enum.name)
     }
 }
 

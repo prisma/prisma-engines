@@ -87,7 +87,7 @@ impl<'a> ModelAssertions<'a> {
             .ok_or_else(|| anyhow::anyhow!("Assertion error: could not find field {}", name))?;
 
         anyhow::ensure!(
-            field.field_type == datamodel::dml::FieldType::Base(r#type),
+            field.field_type == datamodel::dml::FieldType::Base(r#type, None),
             "Assertion error: expected the field {} to have type {:?}, but found {:?}",
             field.name,
             r#type,

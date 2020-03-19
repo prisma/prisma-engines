@@ -40,7 +40,6 @@ impl Standardiser {
     /// For any relations which are missing to_fields, sets them to the @id fields
     /// of the foreign model.
     fn set_relation_to_field_to_id_if_missing(&self, schema: &mut dml::Datamodel) {
-        // TODO: This is such a bad solution. :(
         let schema_copy = schema.clone();
 
         // Iterate and mutate models.
@@ -276,7 +275,7 @@ impl Standardiser {
                     .find_model_mut(&missing_back_relation_field.model)
                     .expect(STATE_ERROR);
 
-                let mut back_relation_field = dml::Field::new_generated(
+                let mut back_relation_field = dml::Field::new(
                     &field_name,
                     dml::FieldType::Relation(missing_back_relation_field.relation_info),
                 );
@@ -415,7 +414,7 @@ impl Standardiser {
         for model in datamodel.models() {
             for field in model.fields() {
                 let datasource_fields = match &field.field_type {
-                    dml::FieldType::Base(scalar_type) => {
+                    dml::FieldType::Base(scalar_type, _) => {
                         self.get_datasource_fields_for_scalar_field(&field, &scalar_type)
                     }
                     dml::FieldType::Enum(_) => {
@@ -499,7 +498,7 @@ impl Standardiser {
                 let referenced_field = related_model.find_field(&to_field).expect(STATE_ERROR);
 
                 match &referenced_field.field_type {
-                    dml::FieldType::Base(scalar_type) => {
+                    dml::FieldType::Base(scalar_type, _) => {
                         let ds_field = dml::DataSourceField {
                             name: db_name.clone(),
                             field_type: *scalar_type,

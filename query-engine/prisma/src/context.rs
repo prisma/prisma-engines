@@ -79,9 +79,11 @@ impl PrismaContext {
             Some(datamodel_string) => {
                 let dm = datamodel::parse_datamodel(&datamodel_string)?;
 
-                let components = load_configuration(&datamodel_string, false).map(|config| DatamodelV2Components {
-                    datamodel: dm,
-                    data_sources: config.datasources,
+                let components = load_configuration(&datamodel_string, false).map(|config| {
+                    DatamodelV2Components {
+                        datamodel: dm,
+                        data_sources: config.datasources,
+                    }
                 })?;
 
                 let template = DatamodelConverter::convert(&components.datamodel);
@@ -95,7 +97,9 @@ impl PrismaContext {
 
         // We only support one data source at the moment, so take the first one (default not exposed yet).
         let data_source = if data_sources.is_empty() {
-            return Err(PrismaError::ConfigurationError("No valid data source found".into()));
+            return Err(PrismaError::ConfigurationError(
+                "No valid data source found".into(),
+            ));
         } else {
             data_sources.first().unwrap()
         };
@@ -107,11 +111,19 @@ impl PrismaContext {
         let internal_data_model = template.build(db_name);
 
         // Construct query schema
-        let build_mode = if legacy { BuildMode::Legacy } else { BuildMode::Modern };
+        let build_mode = if legacy {
+            BuildMode::Legacy
+        } else {
+            BuildMode::Modern
+        };
         let capabilities = SupportedCapabilities::empty(); // todo connector capabilities.
 
-        let schema_builder =
-            QuerySchemaBuilder::new(&internal_data_model, &capabilities, build_mode, enable_raw_queries);
+        let schema_builder = QuerySchemaBuilder::new(
+            &internal_data_model,
+            &capabilities,
+            build_mode,
+            enable_raw_queries,
+        );
 
         let query_schema: QuerySchemaRef = Arc::new(schema_builder.build());
 

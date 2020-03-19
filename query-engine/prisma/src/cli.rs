@@ -37,7 +37,9 @@ impl TryFrom<&PrismaOpt> for CliCommand {
 
     fn try_from(opts: &PrismaOpt) -> crate::PrismaResult<CliCommand> {
         match opts.subcommand {
-            None => Err(PrismaError::InvocationError(String::from("cli subcommand not present"))),
+            None => Err(PrismaError::InvocationError(String::from(
+                "cli subcommand not present",
+            ))),
             Some(Subcommand::Cli(ref cliopts)) => match cliopts {
                 CliOpt::Dmmf => {
                     let build_mode = if opts.legacy {
@@ -55,7 +57,8 @@ impl TryFrom<&PrismaOpt> for CliCommand {
                     let mut file = File::open(&input.path).expect("File should open read only");
                     let mut datamodel = String::new();
 
-                    file.read_to_string(&mut datamodel).expect("Couldn't read file");
+                    file.read_to_string(&mut datamodel)
+                        .expect("Couldn't read file");
                     Ok(CliCommand::GetConfig(datamodel))
                 }
                 CliOpt::ExecuteRequest(input) => Ok(CliCommand::ExecuteRequest(ExecuteRequest {

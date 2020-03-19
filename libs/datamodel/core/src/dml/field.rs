@@ -25,10 +25,10 @@ pub enum FieldType {
     Relation(RelationInfo),
     /// Connector specific field type.
     ConnectorSpecific(ScalarFieldType),
-    /// Base (built-in scalar) type.
-    Base(ScalarType),
     /// This is a field with an unsupported datatype.
     Unsupported(String),
+    /// The option is Some(x) if the scalar type is based upon a type alias.
+    Base(ScalarType, Option<String>),
 }
 
 impl FieldType {

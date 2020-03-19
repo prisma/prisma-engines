@@ -113,10 +113,14 @@ fn load_datamodel_v2(ignore_env_var_errors: bool) -> PrismaResult<Option<Datamod
     })
 }
 
-pub fn load_configuration(dml_string: &str, ignore_env_var_errors: bool) -> PrismaResult<datamodel::Configuration> {
+pub fn load_configuration(
+    dml_string: &str,
+    ignore_env_var_errors: bool,
+) -> PrismaResult<datamodel::Configuration> {
     let datasource_overwrites_string =
         load_string_from_env("OVERWRITE_DATASOURCES")?.unwrap_or_else(|| r#"[]"#.to_string());
-    let datasource_overwrites: Vec<SourceOverride> = serde_json::from_str(&datasource_overwrites_string)?;
+    let datasource_overwrites: Vec<SourceOverride> =
+        serde_json::from_str(&datasource_overwrites_string)?;
 
     let config_result = if ignore_env_var_errors {
         datamodel::parse_configuration_and_ignore_env_errors(&dml_string)
@@ -181,7 +185,11 @@ fn load_string_from_env(env_var: &str) -> PrismaResult<Option<String>> {
                     Ok(Some(result))
                 }
                 Err(err) => {
-                    trace!("Error decoding {} from Base64 (invalid UTF-8): {:?}", env_var, err);
+                    trace!(
+                        "Error decoding {} from Base64 (invalid UTF-8): {:?}",
+                        env_var,
+                        err
+                    );
                     Err(PrismaError::ConfigurationError("Invalid Base64".into()))
                 }
             },

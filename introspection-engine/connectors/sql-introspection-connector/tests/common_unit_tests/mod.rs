@@ -40,8 +40,6 @@ fn a_data_model_can_be_generated_from_a_schema() {
             fields: col_types
                 .iter()
                 .map(|col_type| {
-
-
                     let (field_type, is_commented_out, documentation) = match col_type {
                         ColumnTypeFamily::Boolean => (FieldType::Base(ScalarType::Boolean), false, None),
                         ColumnTypeFamily::DateTime => (FieldType::Base(ScalarType::DateTime), false, None),
@@ -52,6 +50,7 @@ fn a_data_model_can_be_generated_from_a_schema() {
                         ColumnTypeFamily::Uuid => (FieldType::Base(ScalarType::String), false, None),
                         ColumnTypeFamily::Json => (FieldType::Base(ScalarType::String), false, None),
                         x => (FieldType::Unsupported(x.to_string()),true, Some("This type is currently not supported.".to_string())),
+
                     };
                     Field {
                         name: col_type.to_string(),
@@ -117,7 +116,7 @@ fn arity_is_preserved_when_generating_data_model_from_a_schema() {
                 Field {
                     name: "optional".to_string(),
                     arity: FieldArity::Optional,
-                    field_type: FieldType::Base(ScalarType::Int),
+                    field_type: FieldType::Base(ScalarType::Int, None),
                     database_names: Vec::new(),
                     default_value: None,
                     is_unique: false,
@@ -131,7 +130,7 @@ fn arity_is_preserved_when_generating_data_model_from_a_schema() {
                 Field {
                     name: "required".to_string(),
                     arity: FieldArity::Required,
-                    field_type: FieldType::Base(ScalarType::Int),
+                    field_type: FieldType::Base(ScalarType::Int, None),
                     database_names: Vec::new(),
                     default_value: Some(
                         DMLDefault::Expression(ValueGenerator::new_autoincrement()),
@@ -147,7 +146,7 @@ fn arity_is_preserved_when_generating_data_model_from_a_schema() {
                 Field {
                     name: "list".to_string(),
                     arity: FieldArity::List,
-                    field_type: FieldType::Base(ScalarType::Int),
+                    field_type: FieldType::Base(ScalarType::Int, None),
                     database_names: Vec::new(),
                     default_value: None,
                     is_unique: false,
@@ -229,7 +228,7 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
                 Field {
                     name: "no_default".to_string(),
                     arity: FieldArity::Optional,
-                    field_type: FieldType::Base(ScalarType::Int),
+                    field_type: FieldType::Base(ScalarType::Int, None),
                     database_names: Vec::new(),
                     default_value: None,
                     is_unique: false,
@@ -243,7 +242,7 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
                 Field {
                     name: "int_default".to_string(),
                     arity: FieldArity::Optional,
-                    field_type: FieldType::Base(ScalarType::Int),
+                    field_type: FieldType::Base(ScalarType::Int, None),
                     database_names: Vec::new(),
                     default_value: Some(dml::DefaultValue::Single(ScalarValue::Int(1))),
                     is_unique: false,
@@ -257,7 +256,7 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
                 Field {
                     name: "bool_default".to_string(),
                     arity: FieldArity::Optional,
-                    field_type: FieldType::Base(ScalarType::Boolean),
+                    field_type: FieldType::Base(ScalarType::Boolean, None),
                     database_names: Vec::new(),
                     default_value: Some(dml::DefaultValue::Single(ScalarValue::Boolean(true))),
                     is_unique: false,
@@ -271,7 +270,7 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
                 Field {
                     name: "float_default".to_string(),
                     arity: FieldArity::Optional,
-                    field_type: FieldType::Base(ScalarType::Float),
+                    field_type: FieldType::Base(ScalarType::Float, None),
                     database_names: Vec::new(),
                     default_value: Some(dml::DefaultValue::Single(ScalarValue::Float(1.0))),
                     is_unique: false,
@@ -285,7 +284,7 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
                 Field {
                     name: "string_default".to_string(),
                     arity: FieldArity::Optional,
-                    field_type: FieldType::Base(ScalarType::String),
+                    field_type: FieldType::Base(ScalarType::String, None),
                     database_names: Vec::new(),
                     default_value: Some(dml::DefaultValue::Single(ScalarValue::String(
                         "default".to_string(),
@@ -395,7 +394,7 @@ fn primary_key_is_preserved_when_generating_data_model_from_a_schema() {
                 fields: vec![Field {
                     name: "primary".to_string(),
                     arity: FieldArity::Required,
-                    field_type: FieldType::Base(ScalarType::Int),
+                    field_type: FieldType::Base(ScalarType::Int, None),
                     database_names: Vec::new(),
                     default_value: Some(
                         DMLDefault::Expression(ValueGenerator::new_autoincrement()),
@@ -422,7 +421,7 @@ fn primary_key_is_preserved_when_generating_data_model_from_a_schema() {
                 fields: vec![Field {
                     name: "primary".to_string(),
                     arity: FieldArity::Required,
-                    field_type: FieldType::Base(ScalarType::Int),
+                    field_type: FieldType::Base(ScalarType::Int, None),
                     database_names: Vec::new(),
                     default_value: None,
                     is_unique: false,
@@ -447,7 +446,7 @@ fn primary_key_is_preserved_when_generating_data_model_from_a_schema() {
                 fields: vec![Field {
                     name: "primary".to_string(),
                     arity: FieldArity::Required,
-                    field_type: FieldType::Base(ScalarType::Int),
+                    field_type: FieldType::Base(ScalarType::Int, None),
                     database_names: Vec::new(),
                     default_value: Some(
                         DMLDefault::Expression(ValueGenerator::new_autoincrement()),
@@ -553,7 +552,7 @@ fn uniqueness_is_preserved_when_generating_data_model_from_a_schema() {
                 Field {
                     name: "non_unique".to_string(),
                     arity: FieldArity::Optional,
-                    field_type: FieldType::Base(ScalarType::Int),
+                    field_type: FieldType::Base(ScalarType::Int, None),
                     database_names: Vec::new(),
                     default_value: None,
                     is_unique: false,
@@ -567,7 +566,7 @@ fn uniqueness_is_preserved_when_generating_data_model_from_a_schema() {
                 Field {
                     name: "unique".to_string(),
                     arity: FieldArity::Required,
-                    field_type: FieldType::Base(ScalarType::Int),
+                    field_type: FieldType::Base(ScalarType::Int, None),
                     database_names: Vec::new(),
                     default_value: None,
                     is_unique: true,
@@ -642,7 +641,7 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
                     Field {
                         name: "id".to_string(),
                         arity: FieldArity::Required,
-                        field_type: FieldType::Base(ScalarType::Int),
+                        field_type: FieldType::Base(ScalarType::Int, None),
                         database_names: Vec::new(),
                         default_value: Some(DMLDefault::Expression(
                             ValueGenerator::new_autoincrement(),
@@ -658,7 +657,7 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
                     Field {
                         name: "name".to_string(),
                         arity: FieldArity::Required,
-                        field_type: FieldType::Base(ScalarType::String),
+                        field_type: FieldType::Base(ScalarType::String, None),
                         database_names: Vec::new(),
                         default_value: None,
                         is_unique: false,
@@ -684,7 +683,7 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
                     Field {
                         name: "id".to_string(),
                         arity: FieldArity::Required,
-                        field_type: FieldType::Base(ScalarType::Int),
+                        field_type: FieldType::Base(ScalarType::Int, None),
                         database_names: Vec::new(),
                         default_value: None,
                         is_unique: false,
@@ -842,7 +841,7 @@ fn multi_field_uniques_are_preserved_when_generating_data_model_from_a_schema() 
                 Field {
                     name: "id".to_string(),
                     arity: FieldArity::Required,
-                    field_type: FieldType::Base(ScalarType::Int),
+                    field_type: FieldType::Base(ScalarType::Int, None),
                     database_names: Vec::new(),
                     default_value: Some(
                         DMLDefault::Expression(ValueGenerator::new_autoincrement()),
@@ -858,7 +857,7 @@ fn multi_field_uniques_are_preserved_when_generating_data_model_from_a_schema() 
                 Field {
                     name: "name".to_string(),
                     arity: FieldArity::Required,
-                    field_type: FieldType::Base(ScalarType::String),
+                    field_type: FieldType::Base(ScalarType::String, None),
                     database_names: Vec::new(),
                     default_value: None,
                     is_unique: false,
@@ -872,7 +871,7 @@ fn multi_field_uniques_are_preserved_when_generating_data_model_from_a_schema() 
                 Field {
                     name: "lastname".to_string(),
                     arity: FieldArity::Required,
-                    field_type: FieldType::Base(ScalarType::String),
+                    field_type: FieldType::Base(ScalarType::String, None),
                     database_names: Vec::new(),
                     default_value: None,
                     is_unique: false,
@@ -963,7 +962,7 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                     Field {
                         name: "id".to_string(),
                         arity: FieldArity::Required,
-                        field_type: FieldType::Base(ScalarType::Int),
+                        field_type: FieldType::Base(ScalarType::Int, None),
                         database_names: Vec::new(),
                         default_value: Some(DMLDefault::Expression(
                             ValueGenerator::new_autoincrement(),
@@ -979,7 +978,7 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                     Field {
                         name: "name".to_string(),
                         arity: FieldArity::Required,
-                        field_type: FieldType::Base(ScalarType::String),
+                        field_type: FieldType::Base(ScalarType::String, None),
                         database_names: Vec::new(),
                         default_value: None,
                         is_unique: false,
@@ -1024,7 +1023,7 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                     Field {
                         name: "id".to_string(),
                         arity: FieldArity::Required,
-                        field_type: FieldType::Base(ScalarType::Int),
+                        field_type: FieldType::Base(ScalarType::Int, None),
                         database_names: Vec::new(),
                         default_value: Some(DMLDefault::Expression(
                             ValueGenerator::new_autoincrement(),

@@ -97,29 +97,37 @@ impl<'a> TopDiffer<'a> {
     pub(crate) fn created_type_aliases(&self) -> impl Iterator<Item = &ast::Field> {
         self.next_type_aliases().filter(move |next_type_alias| {
             self.previous_type_aliases()
-                .find(|previous_type_alias| type_aliases_match(previous_type_alias, next_type_alias))
+                .find(|previous_type_alias| {
+                    type_aliases_match(previous_type_alias, next_type_alias)
+                })
                 .is_none()
         })
     }
 
     /// Iterator over the custom types present in `previous` but not `next`.
     pub(crate) fn deleted_type_aliases(&self) -> impl Iterator<Item = &ast::Field> {
-        self.previous_type_aliases().filter(move |previous_type_alias| {
-            self.next_type_aliases()
-                .find(|next_type_alias| type_aliases_match(previous_type_alias, next_type_alias))
-                .is_none()
-        })
+        self.previous_type_aliases()
+            .filter(move |previous_type_alias| {
+                self.next_type_aliases()
+                    .find(|next_type_alias| {
+                        type_aliases_match(previous_type_alias, next_type_alias)
+                    })
+                    .is_none()
+            })
     }
 
     pub(crate) fn type_alias_pairs(&self) -> impl Iterator<Item = FieldDiffer<'_>> {
-        self.previous_type_aliases().filter_map(move |previous_type_alias| {
-            self.next_type_aliases()
-                .find(|next_type_alias| type_aliases_match(previous_type_alias, next_type_alias))
-                .map(|next_type_alias| FieldDiffer {
-                    previous: previous_type_alias,
-                    next: next_type_alias,
-                })
-        })
+        self.previous_type_aliases()
+            .filter_map(move |previous_type_alias| {
+                self.next_type_aliases()
+                    .find(|next_type_alias| {
+                        type_aliases_match(previous_type_alias, next_type_alias)
+                    })
+                    .map(|next_type_alias| FieldDiffer {
+                        previous: previous_type_alias,
+                        next: next_type_alias,
+                    })
+            })
     }
 
     fn previous_sources(&self) -> impl Iterator<Item = &ast::SourceConfig> {
@@ -210,9 +218,13 @@ mod tests {
             author User
         }
 
-        enum Stays { A }
+        enum Stays { 
+            A 
+        }
 
-        enum ToBeDeleted { B }
+        enum ToBeDeleted { 
+            B 
+        }
         "#;
         let previous = parse(previous).unwrap();
         let next = r#"
@@ -225,9 +237,13 @@ mod tests {
             id Int @id
         }
 
-        enum Stays { A }
+        enum Stays { 
+            A 
+        }
 
-        enum NewEnum { B }
+        enum NewEnum { 
+            B 
+        }
         "#;
         let next = parse(next).unwrap();
 
@@ -236,10 +252,16 @@ mod tests {
             next: &next,
         };
 
-        let created_models: Vec<&str> = differ.created_models().map(|model| model.name.name.as_str()).collect();
+        let created_models: Vec<&str> = differ
+            .created_models()
+            .map(|model| model.name.name.as_str())
+            .collect();
         assert_eq!(created_models, &["Author"]);
 
-        let deleted_models: Vec<&str> = differ.deleted_models().map(|model| model.name.name.as_str()).collect();
+        let deleted_models: Vec<&str> = differ
+            .deleted_models()
+            .map(|model| model.name.name.as_str())
+            .collect();
         assert_eq!(deleted_models, &["User"]);
 
         let model_pairs: Vec<(&str, &str)> = differ
@@ -253,10 +275,16 @@ mod tests {
             .collect();
         assert_eq!(model_pairs, &[("Blog", "Blog")]);
 
-        let created_enums: Vec<&str> = differ.created_enums().map(|enm| enm.name.name.as_str()).collect();
+        let created_enums: Vec<&str> = differ
+            .created_enums()
+            .map(|enm| enm.name.name.as_str())
+            .collect();
         assert_eq!(created_enums, &["NewEnum"]);
 
-        let deleted_enums: Vec<&str> = differ.deleted_enums().map(|enm| enm.name.name.as_str()).collect();
+        let deleted_enums: Vec<&str> = differ
+            .deleted_enums()
+            .map(|enm| enm.name.name.as_str())
+            .collect();
         assert_eq!(deleted_enums, &["ToBeDeleted"]);
 
         let enum_pairs: Vec<(&str, &str)> = differ

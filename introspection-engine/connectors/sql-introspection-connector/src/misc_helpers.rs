@@ -140,7 +140,7 @@ pub(crate) fn calculate_scalar_field(schema: &SqlSchema, table: &Table, column: 
     };
 
     let arity = match column.tpe.arity {
-        _ if column.auto_increment && field_type == FieldType::Base(ScalarType::Int) => {
+        _ if column.auto_increment && field_type == FieldType::Base(ScalarType::Int, None) => {
             FieldArity::Required
         }
         ColumnArity::Required => FieldArity::Required,
@@ -447,14 +447,14 @@ pub(crate) fn calculate_field_type(
         _ => {
             debug!("Found no corresponding foreign key");
             match &column.tpe.family {
-                ColumnTypeFamily::Boolean => FieldType::Base(ScalarType::Boolean),
-                ColumnTypeFamily::DateTime => FieldType::Base(ScalarType::DateTime),
-                ColumnTypeFamily::Float => FieldType::Base(ScalarType::Float),
-                ColumnTypeFamily::Int => FieldType::Base(ScalarType::Int),
-                ColumnTypeFamily::String => FieldType::Base(ScalarType::String),
+                ColumnTypeFamily::Boolean => FieldType::Base(ScalarType::Boolean, None),
+                ColumnTypeFamily::DateTime => FieldType::Base(ScalarType::DateTime, None),
+                ColumnTypeFamily::Float => FieldType::Base(ScalarType::Float, None),
+                ColumnTypeFamily::Int => FieldType::Base(ScalarType::Int, None),
+                ColumnTypeFamily::String => FieldType::Base(ScalarType::String, None),
                 ColumnTypeFamily::Enum(name) => FieldType::Enum(name.clone()),
-                ColumnTypeFamily::Uuid => FieldType::Base(ScalarType::String),
-                ColumnTypeFamily::Json => FieldType::Base(ScalarType::String),
+                ColumnTypeFamily::Uuid => FieldType::Base(ScalarType::String, None),
+                ColumnTypeFamily::Json => FieldType::Base(ScalarType::String, None),
                 x => FieldType::Unsupported(x.to_string()),
             }
         }

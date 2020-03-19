@@ -64,7 +64,11 @@ fn nice_error_on_incorrect_enum_field() {
     let error = parse_error(dml);
 
     error.assert_is(DatamodelError::new_parser_error(
-        &vec!["End of block (\"}\")", "alphanumeric identifier"],
+        &vec![
+            "End of block (\"}\")",
+            "block level directive",
+            "enum field declaration",
+        ],
         Span::new(26, 26),
     ));
 }
@@ -80,7 +84,10 @@ fn nice_error_missing_type() {
 
     let error = parse_error(dml);
 
-    error.assert_is(DatamodelError::new_parser_error(&vec!["field type"], Span::new(54, 54)));
+    error.assert_is(DatamodelError::new_parser_error(
+        &vec!["field type"],
+        Span::new(49, 49),
+    ));
 }
 
 #[test]
@@ -93,7 +100,10 @@ fn nice_error_missing_directive_name() {
 
     let error = parse_error(dml);
 
-    error.assert_is(DatamodelError::new_parser_error(&vec!["directive"], Span::new(43, 43)));
+    error.assert_is(DatamodelError::new_parser_error(
+        &vec!["directive"],
+        Span::new(38, 38),
+    ));
 }
 
 // TODO: This case is not nice because the "{ }" belong to the declaration.
@@ -108,7 +118,7 @@ fn nice_error_missing_braces() {
 
     error.assert_is(DatamodelError::new_parser_error(
         &vec!["Start of block (\"{\")"],
-        Span::new(24, 24),
+        Span::new(15, 15),
     ));
 }
 

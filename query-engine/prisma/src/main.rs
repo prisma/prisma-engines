@@ -34,11 +34,15 @@ pub enum LogFormat {
     Json,
 }
 
-static LOG_FORMAT: Lazy<LogFormat> =
-    Lazy::new(|| match std::env::var("RUST_LOG_FORMAT").as_ref().map(|s| s.as_str()) {
+static LOG_FORMAT: Lazy<LogFormat> = Lazy::new(|| {
+    match std::env::var("RUST_LOG_FORMAT")
+        .as_ref()
+        .map(|s| s.as_str())
+    {
         Ok("devel") => LogFormat::Text,
         _ => LogFormat::Json,
-    });
+    }
+});
 
 pub type PrismaResult<T> = Result<T, PrismaError>;
 type AnyError = Box<dyn Error + Send + Sync + 'static>;
@@ -83,20 +87,23 @@ pub enum CliOpt {
 #[structopt(version = env!("GIT_HASH"))]
 pub struct PrismaOpt {
     /// The hostname or IP the query engine should bind to.
-    #[structopt(long, default_value = "127.0.0.1")]
+    #[structopt(long, short = "H", default_value = "127.0.0.1")]
     host: String,
     /// The port the query engine should bind to.
-    #[structopt(long, short, env = "PORT", default_value = "4466")]
+    #[structopt(long, short, env, default_value = "4466")]
     port: u16,
     /// Switches query schema generation to Prisma 1 compatible mode.
-    #[structopt(long)]
+    #[structopt(long, short)]
     legacy: bool,
     /// Runs all queries in a transaction, including all the reads.
-    #[structopt(long)]
+    #[structopt(long, short = "t")]
     always_force_transactions: bool,
     /// Enables raw SQL queries with executeRaw mutation
-    #[structopt(long)]
+    #[structopt(long, short = "r")]
     enable_raw_queries: bool,
+    /// Enables the GraphQL playground
+    #[structopt(long, short = "g")]
+    enable_playground: bool,
     #[structopt(subcommand)]
     subcommand: Option<Subcommand>,
 }
@@ -125,6 +132,7 @@ async fn main() -> Result<(), AnyError> {
             let builder = HttpServer::builder()
                 .legacy(opts.legacy)
                 .enable_raw_queries(opts.enable_raw_queries)
+                .enable_playground(opts.enable_playground)
                 .force_transactions(opts.always_force_transactions);
 
             if let Err(err) = builder.build_and_run(address).await {
@@ -185,7 +193,11 @@ fn set_panic_hook() -> Result<(), AnyError> {
                         );
                     }
                     None => {
-                        tracing::event!(tracing::Level::ERROR, message = "PANIC", reason = payload.as_str());
+                        tracing::event!(
+                            tracing::Level::ERROR,
+                            message = "PANIC",
+                            reason = payload.as_str()
+                        );
                     }
                 }
 

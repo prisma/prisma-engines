@@ -16,7 +16,11 @@ impl<'a> Renderer<'a, DMMFFieldWrapper> for DMMFFieldRenderer {
 }
 
 impl DMMFFieldRenderer {
-    fn render_input_field(&self, input_field: InputFieldRef, ctx: &RenderContext) -> DMMFFieldWrapper {
+    fn render_input_field(
+        &self,
+        input_field: InputFieldRef,
+        ctx: &RenderContext,
+    ) -> DMMFFieldWrapper {
         let type_info = input_field.field_type.into_renderer().render(ctx);
         let field = DMMFInputField {
             name: input_field.name.clone(),
@@ -40,7 +44,9 @@ impl DMMFFieldRenderer {
     }
 
     fn render_arguments(&self, args: &[Argument], ctx: &RenderContext) -> Vec<DMMFArgument> {
-        args.iter().map(|arg| self.render_argument(arg, ctx)).collect()
+        args.iter()
+            .map(|arg| self.render_argument(arg, ctx))
+            .collect()
     }
 
     fn render_argument(&self, arg: &Argument, ctx: &RenderContext) -> DMMFArgument {

@@ -1,11 +1,15 @@
 use super::protocol_adapter::GraphQLProtocolAdapter;
-use crate::{context::PrismaContext, PrismaError, PrismaRequest, PrismaResponse, PrismaResult, RequestHandler};
+use crate::{
+    context::PrismaContext, PrismaError, PrismaRequest, PrismaResponse, PrismaResult,
+    RequestHandler,
+};
 use async_trait::async_trait;
 use futures::{future, FutureExt};
 use graphql_parser as gql;
 use indexmap::IndexMap;
 use query_core::{
-    response_ir, BatchDocument, CompactedDocument, CoreError, Item, Operation, QueryDocument, QueryValue, Responses,
+    response_ir, BatchDocument, CompactedDocument, CoreError, Item, Operation, QueryDocument,
+    QueryValue, Responses,
 };
 use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, convert::TryFrom, panic::AssertUnwindSafe, sync::Arc};
@@ -217,7 +221,10 @@ async fn handle_compacted(document: CompactedDocument, ctx: &Arc<PrismaContext>)
     }
 }
 
-async fn handle_graphql_query(query_doc: Operation, ctx: &PrismaContext) -> PrismaResult<response_ir::Responses> {
+async fn handle_graphql_query(
+    query_doc: Operation,
+    ctx: &PrismaContext,
+) -> PrismaResult<response_ir::Responses> {
     ctx.executor
         .execute(query_doc, Arc::clone(ctx.query_schema()))
         .await
