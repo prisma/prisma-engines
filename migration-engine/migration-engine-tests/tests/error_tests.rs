@@ -117,9 +117,10 @@ async fn unreachable_database_must_return_a_proper_error_on_mysql() {
 
 #[tokio::test]
 async fn unreachable_database_must_return_a_proper_error_on_postgres() {
-    let mut url: Url = postgres_10_url("unreachable_database_must_return_a_proper_error_on_postgres")
-        .parse()
-        .unwrap();
+    let mut url: Url =
+        postgres_10_url("unreachable_database_must_return_a_proper_error_on_postgres")
+            .parse()
+            .unwrap();
 
     url.set_port(Some(8787)).unwrap();
 
@@ -194,7 +195,9 @@ async fn database_access_denied_must_return_a_proper_error_in_rpc() {
     let url: Url = mysql_url(db_name).parse().unwrap();
     let conn = create_mysql_database(&url).await.unwrap();
 
-    conn.execute_raw("DROP USER IF EXISTS jeanyves", &[]).await.unwrap();
+    conn.execute_raw("DROP USER IF EXISTS jeanyves", &[])
+        .await
+        .unwrap();
     conn.execute_raw("CREATE USER jeanyves IDENTIFIED BY '1234'", &[])
         .await
         .unwrap();
@@ -288,7 +291,11 @@ async fn datamodel_parser_errors_must_return_a_known_error(api: &TestApi) {
         }
     "#;
 
-    let error = api.infer_apply(bad_dm).send_user_facing().await.unwrap_err();
+    let error = api
+        .infer_apply(bad_dm)
+        .send_user_facing()
+        .await
+        .unwrap_err();
 
     let expected_msg = "\u{1b}[1;91merror\u{1b}[0m: \u{1b}[1mType \"Post\" is neither a built-in type, nor refers to another model, custom type, or enum.\u{1b}[0m\n  \u{1b}[1;94m-->\u{1b}[0m  \u{1b}[4mschema.prisma:4\u{1b}[0m\n\u{1b}[1;94m   | \u{1b}[0m\n\u{1b}[1;94m 3 | \u{1b}[0m            id Float @id\n\u{1b}[1;94m 4 | \u{1b}[0m            post \u{1b}[1;91mPost[]\u{1b}[0m\n\u{1b}[1;94m   | \u{1b}[0m\n";
 
@@ -302,7 +309,9 @@ async fn datamodel_parser_errors_must_return_a_known_error(api: &TestApi) {
 }
 
 #[test_each_connector]
-async fn unique_constraint_errors_in_migrations_must_return_a_known_error(api: &TestApi) -> TestResult {
+async fn unique_constraint_errors_in_migrations_must_return_a_known_error(
+    api: &TestApi,
+) -> TestResult {
     use quaint::ast::*;
 
     let dm = r#"
@@ -314,7 +323,7 @@ async fn unique_constraint_errors_in_migrations_must_return_a_known_error(api: &
 
     api.infer_and_apply(dm).await;
 
-    let insert = Insert::multi_into(api.render_table_name("Fruit"), vec!["name"])
+    let insert = Insert::multi_into(api.render_table_name("Fruit"), &["name"])
         .values(("banana",))
         .values(("apple",))
         .values(("banana",));
