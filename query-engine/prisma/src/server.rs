@@ -22,6 +22,7 @@ struct StaticFiles;
 pub(crate) struct RequestContext {
     context: Arc<PrismaContext>,
     graphql_request_handler: GraphQlRequestHandler,
+    enable_playground: bool,
 }
 
 impl RequestContext {
@@ -34,6 +35,7 @@ pub struct HttpServerBuilder {
     legacy_mode: bool,
     force_transactions: bool,
     enable_raw_queries: bool,
+    enable_playground: bool,
 }
 
 impl HttpServerBuilder {
@@ -52,6 +54,11 @@ impl HttpServerBuilder {
         self
     }
 
+    pub fn enable_playground(mut self, val: bool) -> Self {
+        self.enable_playground = val;
+        self
+    }
+
     pub async fn build_and_run(self, address: SocketAddr) -> PrismaResult<()> {
         let ctx = PrismaContext::builder()
             .legacy(self.legacy_mode)
@@ -60,7 +67,7 @@ impl HttpServerBuilder {
             .build()
             .await?;
 
-        HttpServer::run(address, ctx).await
+        HttpServer::run(address, ctx, self.enable_playground).await
     }
 }
 
@@ -72,15 +79,21 @@ impl HttpServer {
             legacy_mode: false,
             force_transactions: false,
             enable_raw_queries: false,
+            enable_playground: false,
         }
     }
 
-    async fn run(address: SocketAddr, context: PrismaContext) -> PrismaResult<()> {
+    async fn run(
+        address: SocketAddr,
+        context: PrismaContext,
+        enable_playground: bool,
+    ) -> PrismaResult<()> {
         let now = Instant::now();
 
         let ctx = Arc::new(RequestContext {
             context: Arc::new(context),
             graphql_request_handler: GraphQlRequestHandler,
+            enable_playground,
         });
 
         let service = make_service_fn(|_| {
@@ -99,7 +112,10 @@ impl HttpServer {
         Ok(())
     }
 
-    async fn routes(ctx: Arc<RequestContext>, req: Request<Body>) -> std::result::Result<Response<Body>, Error> {
+    async fn routes(
+        ctx: Arc<RequestContext>,
+        req: Request<Body>,
+    ) -> std::result::Result<Response<Body>, Error> {
         let start = Instant::now();
 
         let mut res = match (req.method(), req.uri().path()) {
@@ -130,7 +146,7 @@ impl HttpServer {
                 }
             }
 
-            (&Method::GET, "/") => Self::playground_handler(),
+            (&Method::GET, "/") if ctx.enable_playground => Self::playground_handler(),
             (&Method::GET, "/status") => Self::status_handler(),
 
             (&Method::GET, "/sdl") => Self::sdl_handler(ctx),
@@ -150,7 +166,10 @@ impl HttpServer {
         Ok(res)
     }
 
-    async fn http_handler(req: PrismaRequest<GraphQlBody>, cx: Arc<RequestContext>) -> Response<Body> {
+    async fn http_handler(
+        req: PrismaRequest<GraphQlBody>,
+        cx: Arc<RequestContext>,
+    ) -> Response<Body> {
         let result = cx.graphql_request_handler.handle(req, cx.context()).await;
         let bytes = serde_json::to_vec(&result).unwrap();
 
@@ -197,7 +216,10 @@ impl HttpServer {
     /// Renders the Data Model Meta Format.
     /// Only callable if prisma was initialized using a v2 data model.
     fn dmmf_handler(cx: Arc<RequestContext>) -> Response<Body> {
-        let dmmf = dmmf::render_dmmf(cx.context.datamodel(), Arc::clone(cx.context.query_schema()));
+        let dmmf = dmmf::render_dmmf(
+            cx.context.datamodel(),
+            Arc::clone(cx.context.query_schema()),
+        );
 
         let bytes = serde_json::to_vec(&dmmf).unwrap();
 

@@ -23,7 +23,9 @@ pub struct QueryEngine {
 
 impl QueryEngine {
     pub fn new(ctx: PrismaContext) -> Self {
-        QueryEngine { context: Arc::new(ctx) }
+        QueryEngine {
+            context: Arc::new(ctx),
+        }
     }
 
     pub async fn request(&self, body: impl Into<SingleQuery>) -> serde_json::Value {
@@ -42,7 +44,10 @@ impl QueryEngine {
 
 pub struct TestApi {
     connection_info: ConnectionInfo,
-    migration_api: MigrationApi<sql_migration_connector::SqlMigrationConnector, sql_migration_connector::SqlMigration>,
+    migration_api: MigrationApi<
+        sql_migration_connector::SqlMigrationConnector,
+        sql_migration_connector::SqlMigration,
+    >,
     config: String,
     is_pgbouncer: bool,
 }
@@ -60,7 +65,10 @@ impl TestApi {
         };
 
         self.migration_api.reset(&serde_json::Value::Null).await?;
-        let result = self.migration_api.infer_migration_steps(&infer_input).await?;
+        let result = self
+            .migration_api
+            .infer_migration_steps(&infer_input)
+            .await?;
 
         let apply_input = ApplyMigrationInput {
             force: Some(true),
@@ -87,7 +95,10 @@ impl TestApi {
         &self.connection_info
     }
 
-    pub fn to_sql_string<'a>(&'a self, query: impl Into<Query<'a>>) -> (String, Vec<ParameterizedValue>) {
+    pub fn to_sql_string<'a>(
+        &'a self,
+        query: impl Into<Query<'a>>,
+    ) -> (String, Vec<ParameterizedValue>) {
         match self.connection_info() {
             ConnectionInfo::Postgres(..) => visitor::Postgres::build(query),
             ConnectionInfo::Mysql(..) => visitor::Mysql::build(query),
@@ -250,7 +261,9 @@ pub(super) async fn mysql_migration_connector(url_str: &str) -> SqlMigrationConn
     match SqlMigrationConnector::new(url_str, "mysql").await {
         Ok(c) => c,
         Err(_) => {
-            create_mysql_database(&url_str.parse().unwrap()).await.unwrap();
+            create_mysql_database(&url_str.parse().unwrap())
+                .await
+                .unwrap();
             SqlMigrationConnector::new(url_str, "mysql").await.unwrap()
         }
     }
@@ -260,8 +273,12 @@ pub(super) async fn postgres_migration_connector(url_str: &str) -> SqlMigrationC
     match SqlMigrationConnector::new(url_str, "postgresql").await {
         Ok(c) => c,
         Err(_) => {
-            create_postgres_database(&url_str.parse().unwrap()).await.unwrap();
-            SqlMigrationConnector::new(url_str, "postgresql").await.unwrap()
+            create_postgres_database(&url_str.parse().unwrap())
+                .await
+                .unwrap();
+            SqlMigrationConnector::new(url_str, "postgresql")
+                .await
+                .unwrap()
         }
     }
 }
