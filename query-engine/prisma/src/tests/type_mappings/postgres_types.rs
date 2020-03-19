@@ -62,6 +62,94 @@ const CREATE_TYPES_TABLE: &str = indoc! {
     "##
 };
 
+const CREATE_ONE_TYPES_QUERY: &str = indoc! {
+    r##"
+    mutation {
+        createOnetypes(
+            data: {
+                numeric_int2: 12
+                numeric_int4: 9002
+                numeric_int8: 100000000
+                numeric_decimal: 49.3444
+                numeric_float4: 12.12
+                numeric_float8: 3.139428
+                numeric_serial2: 8,
+                numeric_serial4: 80,
+                numeric_serial8: 80000,
+                numeric_money: 3.50
+                numeric_oid: 2000
+                string_char: "yeet"
+                string_varchar: "yeet variable"
+                string_text: "to yeet or not to yeet"
+                binary_bits: "0101110"
+                binary_bits_varying: "0101110"
+                # binary_bytea: "test"
+                binary_uuid: "111142ec-880b-4062-913d-8eac479ab957"
+                time_timestamp: "2020-03-02T08:00:00.000"
+                time_timestamptz: "2020-03-02T08:00:00.000"
+                time_date: "2020-03-05T00:00:00.000"
+                time_time: "2020-03-05T08:00:00.000"
+                time_timetz: "2020-03-05T08:00:00.000"
+                # time_interval: "3 hours"
+                boolean_boolean: true
+                # network_cidr: "192.168.100.14/24"
+                network_inet: "192.168.100.14"
+                # network_mac: "12:33:ed:44:49:36"
+                # search_tsvector: "''a'' ''dump'' ''dumps'' ''fox'' ''in'' ''the''"
+                # search_tsquery: "''foxy cat''"
+                json_json: "{ \"isJson\": true }"
+                json_jsonb: "{ \"isJSONB\": true }"
+                # range_int4range: "[-4, 8)"
+                # range_int8range: "[4000, 9000)"
+                # range_numrange: "[11.1, 22.2)"
+                # range_tsrange: "[2010-01-01 14:30, 2010-01-01 15:30)"
+                # range_tstzrange: "[2010-01-01 14:30, 2010-01-01 15:30)"
+                # range_daterange: "[2020-03-02, 2020-03-22)"
+            }
+        ) {
+            numeric_int2
+            numeric_int4
+            numeric_int8
+            numeric_decimal
+            numeric_float4
+            numeric_float8
+            numeric_serial2
+            numeric_serial4
+            numeric_serial8
+            numeric_money
+            numeric_oid
+            string_char
+            string_varchar
+            string_text
+            # binary_bytea
+            binary_bits
+            binary_bits_varying
+            binary_uuid
+            time_timestamp
+            time_timestamptz
+            time_date
+            time_time
+            time_timetz
+            # time_interval
+            boolean_boolean
+            # network_cidr
+            network_inet
+            # network_mac
+            # search_tsvector
+            # search_tsquery
+            json_json
+            json_jsonb
+            # range_int4range
+            # range_int8range
+            # range_numrange
+            # range_tsrange
+            # range_tstzrange
+            # range_daterange
+        }
+    }
+    "##
+};
+
 #[test_each_connector(tags("postgres"), log = "debug")]
 async fn postgres_types_roundtrip(api: &TestApi) -> TestResult {
     api.execute_sql(CREATE_TYPES_TABLE).await?;
@@ -110,95 +198,7 @@ async fn postgres_types_roundtrip(api: &TestApi) -> TestResult {
             .assert_field_type("range_daterange", ScalarType::String)
     })?;
 
-    let query = indoc! {
-        r##"
-        mutation {
-            createOnetypes(
-                data: {
-                    numeric_int2: 12
-                    numeric_int4: 9002
-                    numeric_int8: 100000000
-                    numeric_decimal: 49.3444
-                    numeric_float4: 12.12
-                    numeric_float8: 3.139428
-                    numeric_serial2: 8,
-                    numeric_serial4: 80,
-                    numeric_serial8: 80000,
-                    numeric_money: 3.50
-                    numeric_oid: 2000
-                    string_char: "yeet"
-                    string_varchar: "yeet variable"
-                    string_text: "to yeet or not to yeet"
-                    binary_bits: "0101110"
-                    binary_bits_varying: "0101110"
-                    # binary_bytea: "test"
-                    binary_uuid: "111142ec-880b-4062-913d-8eac479ab957"
-                    time_timestamp: "2020-03-02T08:00:00.000"
-                    time_timestamptz: "2020-03-02T08:00:00.000"
-                    time_date: "2020-03-05T00:00:00.000"
-                    time_time: "2020-03-05T08:00:00.000"
-                    time_timetz: "2020-03-05T08:00:00.000"
-                    # time_interval: "3 hours"
-                    boolean_boolean: true
-                    # network_cidr: "192.168.100.14/24"
-                    network_inet: "192.168.100.14"
-                    # network_mac: "12:33:ed:44:49:36"
-                    # search_tsvector: "''a'' ''dump'' ''dumps'' ''fox'' ''in'' ''the''"
-                    # search_tsquery: "''foxy cat''"
-                    json_json: "{ \"isJson\": true }"
-                    json_jsonb: "{ \"isJSONB\": true }"
-                    # range_int4range: "[-4, 8)"
-                    # range_int8range: "[4000, 9000)"
-                    # range_numrange: "[11.1, 22.2)"
-                    # range_tsrange: "[2010-01-01 14:30, 2010-01-01 15:30)"
-                    # range_tstzrange: "[2010-01-01 14:30, 2010-01-01 15:30)"
-                    # range_daterange: "[2020-03-02, 2020-03-22)"
-                }
-            ) {
-                numeric_int2
-                numeric_int4
-                numeric_int8
-                numeric_decimal
-                numeric_float4
-                numeric_float8
-                numeric_serial2
-                numeric_serial4
-                numeric_serial8
-                numeric_money
-                numeric_oid
-                string_char
-                string_varchar
-                string_text
-                # binary_bytea
-                binary_bits
-                binary_bits_varying
-                binary_uuid
-                time_timestamp
-                time_timestamptz
-                time_date
-                time_time
-                time_timetz
-                # time_interval
-                boolean_boolean
-                # network_cidr
-                network_inet
-                # network_mac
-                # search_tsvector
-                # search_tsquery
-                json_json
-                json_jsonb
-                # range_int4range
-                # range_int8range
-                # range_numrange
-                # range_tsrange
-                # range_tstzrange
-                # range_daterange
-            }
-        }
-        "##
-    };
-
-    let response = engine.request(query).await;
+    let response = engine.request(CREATE_ONE_TYPES_QUERY).await;
 
     let expected_response = json!({
         "data": {
@@ -534,6 +534,59 @@ async fn all_postgres_id_types_work(api: &TestApi) -> TestResult {
             format!(r#"{{"data":{{"createOnepk_test":{{"id":{}}}}}}}"#, pk_value)
         );
     }
+
+    Ok(())
+}
+
+#[test_each_connector(tags("postgres"))]
+async fn all_postgres_types_work_as_filter(api: &TestApi) -> TestResult {
+    api.execute_sql(CREATE_TYPES_TABLE).await?;
+
+    let (_datamodel, engine) = api.introspect_and_start_query_engine().await?;
+    engine.request(CREATE_ONE_TYPES_QUERY).await;
+
+    let query = r#"
+        query {
+            findManytypes(
+                where: {
+                    numeric_int2: 12
+                    numeric_int4: 9002
+                    numeric_int8: 100000000
+                    numeric_decimal: 49.3444
+                    numeric_float4: 12.12
+                    numeric_float8: 3.139428
+                    numeric_serial2: 8,
+                    numeric_serial4: 80,
+                    numeric_serial8: 80000,
+                    numeric_money: 3.50
+                    numeric_oid: 2000
+                    string_char: "yeet"
+                    string_varchar: "yeet variable"
+                    string_text: "to yeet or not to yeet"
+                    # binary_bits: "0101110"
+                    # binary_bits_varying: "0101110"
+                    binary_uuid: "111142ec-880b-4062-913d-8eac479ab957"
+                    time_timestamp: "2020-03-02T08:00:00.000"
+                    time_timestamptz: "2020-03-02T08:00:00.000"
+                    time_date: "2020-03-05T00:00:00.000"
+                    time_time: "2020-03-05T08:00:00.000"
+                    time_timetz: "2020-03-05T08:00:00.000"
+                    boolean_boolean: true
+                    network_inet: "192.168.100.14"
+                    # json_json: "{ \"isJson\": true }"
+                    json_jsonb: "{ \"isJSONB\": true }"
+                }
+            ) {
+                id
+            }
+        }
+    "#;
+
+    let response = engine.request(query).await;
+
+    let expected_json = json!({ "data": { "findManytypes": [{ "id": 1 }] } });
+
+    assert_eq!(response, expected_json);
 
     Ok(())
 }
