@@ -324,6 +324,7 @@ impl Queryable for Mysql {
 mod tests {
     use super::MysqlUrl;
     use crate::{ast::*, col, connector::Queryable, error::*, single::Quaint, val, values};
+    use chrono::Utc;
     use once_cell::sync::Lazy;
     use std::env;
     use url::Url;
@@ -503,6 +504,49 @@ VALUES (1, 'Joe', 27, 20000.00 );
         assert_eq!(
             rows.get(1).unwrap().at(1),
             Some(&ParameterizedValue::DateTime("1970-01-01T14:40:22Z".parse().unwrap()))
+        );
+    }
+
+    #[tokio::test]
+    async fn test_mysql_datetime() {
+        let connection = Quaint::new(&CONN_STR).await.unwrap();
+        let datetime: chrono::DateTime<Utc> = "2003-03-01T13:10:35.789Z".parse().unwrap();
+
+        connection
+            .query_raw("DROP TABLE IF EXISTS quaint_mysql_datetime_test", &[])
+            .await
+            .unwrap();
+
+        connection
+            .query_raw(
+                "CREATE TABLE quaint_mysql_datetime_test (id INTEGER AUTO_INCREMENT PRIMARY KEY, value DATETIME(3))",
+                &[],
+            )
+            .await
+            .unwrap();
+
+        let insert_raw = "INSERT INTO quaint_mysql_datetime_test (value) VALUES ('2020-03-15T20:12:22.003')";
+        let insert_parameterized = Insert::single_into("quaint_mysql_datetime_test").value("value", datetime);
+
+        connection.query_raw(insert_raw, &[]).await.unwrap();
+        connection.query(insert_parameterized.into()).await.unwrap();
+
+        let select = Select::from_table("quaint_mysql_datetime_test").value(asterisk());
+        let rows = connection.query(select.into()).await.unwrap();
+
+        assert_eq!(rows.len(), 2);
+
+        assert_eq!(
+            rows.get(0).unwrap().at(1),
+            Some(&ParameterizedValue::DateTime(
+                "2020-03-15T20:12:22.003Z".parse().unwrap()
+            ))
+        );
+        assert_eq!(
+            rows.get(1).unwrap().at(1),
+            Some(&ParameterizedValue::DateTime(
+                "2003-03-01T13:10:35.789Z".parse().unwrap()
+            ))
         );
     }
 
