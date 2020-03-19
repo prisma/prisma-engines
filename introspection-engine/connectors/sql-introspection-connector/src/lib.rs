@@ -6,7 +6,9 @@ mod sanitize_datamodel_names;
 mod schema_describer_loading;
 
 use datamodel::Datamodel;
-use introspection_connector::{ConnectorError, ConnectorResult, DatabaseMetadata, IntrospectionConnector};
+use introspection_connector::{
+    ConnectorError, ConnectorResult, DatabaseMetadata, IntrospectionConnector,
+};
 use quaint::prelude::ConnectionInfo;
 use sql_schema_describer::{SqlSchema, SqlSchemaDescriberBackend};
 use std::future::Future;
@@ -41,8 +43,9 @@ impl SqlIntrospectionConnector {
     }
 
     async fn catch<O>(&self, fut: impl Future<Output = Result<O, SqlError>>) -> ConnectorResult<O> {
-        fut.await
-            .map_err(|sql_introspection_error| sql_introspection_error.into_connector_error(&self.connection_info))
+        fut.await.map_err(|sql_introspection_error| {
+            sql_introspection_error.into_connector_error(&self.connection_info)
+        })
     }
 
     async fn list_databases_internal(&self) -> SqlIntrospectionResult<Vec<String>> {
@@ -50,7 +53,10 @@ impl SqlIntrospectionConnector {
     }
 
     async fn get_metadata_internal(&self) -> SqlIntrospectionResult<DatabaseMetadata> {
-        let sql_metadata = self.describer.get_metadata(self.connection_info.schema_name()).await?;
+        let sql_metadata = self
+            .describer
+            .get_metadata(self.connection_info.schema_name())
+            .await?;
         let db_metadate = DatabaseMetadata {
             table_count: sql_metadata.table_count,
             size_in_bytes: sql_metadata.size_in_bytes,
@@ -59,7 +65,10 @@ impl SqlIntrospectionConnector {
     }
 
     async fn describe(&self) -> SqlIntrospectionResult<SqlSchema> {
-        Ok(self.describer.describe(self.connection_info.schema_name()).await?)
+        Ok(self
+            .describer
+            .describe(self.connection_info.schema_name())
+            .await?)
     }
 }
 
@@ -83,6 +92,8 @@ impl IntrospectionConnector for SqlIntrospectionConnector {
     async fn introspect(&self) -> ConnectorResult<Datamodel> {
         let sql_schema = self.catch(self.describe()).await?;
         tracing::debug!("SQL Schema Describer is done: {:?}", sql_schema);
+
+        //todo returns warnings as well
         let data_model = calculate_datamodel::calculate_model(&sql_schema).unwrap();
         tracing::debug!("Calculating datamodel is done: {:?}", sql_schema);
         Ok(data_model)

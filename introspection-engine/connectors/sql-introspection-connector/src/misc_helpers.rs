@@ -345,7 +345,15 @@ pub(crate) fn is_relation_and_id(columns: Vec<&Column>, table: &Table) -> bool {
     table
         .primary_key
         .as_ref()
-        .map(|pk| pk.matches_foreign_key(columns))
+        .map(|pk| {
+            columns_match(
+                &pk.columns,
+                &columns
+                    .iter()
+                    .map(|c| c.name.clone())
+                    .collect::<Vec<String>>(),
+            )
+        })
         .unwrap_or(false)
 }
 
@@ -527,4 +535,12 @@ fn parse_float(value: &str) -> Option<f64> {
             None
         }
     }
+}
+
+/// Returns whether the elements of the two slices match, regardless of ordering.
+pub fn columns_match(a_cols: &[String], b_cols: &[String]) -> bool {
+    a_cols.len() == b_cols.len()
+        && a_cols
+            .iter()
+            .all(|a_col| b_cols.iter().any(|b_col| a_col == b_col))
 }

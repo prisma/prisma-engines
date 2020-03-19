@@ -17,7 +17,8 @@ pub trait Rpc {
     fn list_databases(&self, input: IntrospectionInput) -> RpcFutureResult<Vec<String>>;
 
     #[rpc(name = "getDatabaseMetadata")]
-    fn get_database_metadata(&self, input: IntrospectionInput) -> RpcFutureResult<DatabaseMetadata>;
+    fn get_database_metadata(&self, input: IntrospectionInput)
+        -> RpcFutureResult<DatabaseMetadata>;
 
     #[rpc(name = "getDatabaseDescription")]
     fn get_database_description(&self, input: IntrospectionInput) -> RpcFutureResult<String>;
@@ -33,12 +34,23 @@ impl Rpc for RpcImpl {
         Box::new(Self::list_databases_internal(input.schema).boxed().compat())
     }
 
-    fn get_database_metadata(&self, input: IntrospectionInput) -> RpcFutureResult<DatabaseMetadata> {
-        Box::new(Self::get_database_metadata_internal(input.schema).boxed().compat())
+    fn get_database_metadata(
+        &self,
+        input: IntrospectionInput,
+    ) -> RpcFutureResult<DatabaseMetadata> {
+        Box::new(
+            Self::get_database_metadata_internal(input.schema)
+                .boxed()
+                .compat(),
+        )
     }
 
     fn get_database_description(&self, input: IntrospectionInput) -> RpcFutureResult<String> {
-        Box::new(Self::get_database_description(input.schema).boxed().compat())
+        Box::new(
+            Self::get_database_description(input.schema)
+                .boxed()
+                .compat(),
+        )
     }
 
     fn introspect(&self, input: IntrospectionInput) -> RpcFutureResult<String> {
@@ -56,7 +68,9 @@ impl RpcImpl {
         let url = config
             .datasources
             .first()
-            .ok_or_else(|| CommandError::Generic(anyhow::anyhow!("There is no datasource in the schema.")))?
+            .ok_or_else(|| {
+                CommandError::Generic(anyhow::anyhow!("There is no datasource in the schema."))
+            })?
             .url()
             .to_owned()
             .value;
@@ -68,19 +82,37 @@ impl RpcImpl {
         let url = config
             .datasources
             .first()
-            .ok_or_else(|| CommandError::Generic(anyhow::anyhow!("There is no datasource in the schema.")))
+            .ok_or_else(|| {
+                CommandError::Generic(anyhow::anyhow!("There is no datasource in the schema."))
+            })
             .map_err(Error::from)?
             .url()
             .to_owned()
             .value;
         let connector = RpcImpl::load_connector(&schema).await?;
+        // todo also needs to return warnings
         let data_model = connector.introspect().await;
+        // todo construct result with datamodel and warnings
+
+        // "result":{
+        //     "datamodel": "datamodel string",
+        //     "warnings": [
+        //         {
+        //             "code": 1,
+        //             "message": "Commented out Model due to missing unique identifier",
+        //             "affected": ["model1", "model2"]
+        //         }
+        //     ]
+        // }
 
         match data_model {
-            Ok(dm) if dm.models.is_empty() && dm.enums.is_empty() => Err(render_jsonrpc_error(Error::from(
-                CommandError::IntrospectionResultEmpty(url.to_string()),
-            ))),
-            Ok(dm) => Ok(datamodel::render_datamodel_and_config_to_string(&dm, &config).map_err(Error::from)?),
+            Ok(dm) if dm.models.is_empty() && dm.enums.is_empty() => Err(render_jsonrpc_error(
+                Error::from(CommandError::IntrospectionResultEmpty(url.to_string())),
+            )),
+            Ok(dm) => Ok(
+                datamodel::render_datamodel_and_config_to_string(&dm, &config)
+                    .map_err(Error::from)?,
+            ),
             Err(e) => Err(render_jsonrpc_error(Error::from(e))),
         }
     }
@@ -92,7 +124,10 @@ impl RpcImpl {
 
     pub async fn get_database_description(schema: String) -> RpcResult<String> {
         let connector = RpcImpl::load_connector(&schema).await?;
-        Ok(connector.get_database_description().await.map_err(Error::from)?)
+        Ok(connector
+            .get_database_description()
+            .await
+            .map_err(Error::from)?)
     }
 
     pub async fn get_database_metadata_internal(schema: String) -> RpcResult<DatabaseMetadata> {
