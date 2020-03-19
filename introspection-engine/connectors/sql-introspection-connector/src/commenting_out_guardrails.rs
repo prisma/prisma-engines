@@ -85,4 +85,9 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel) {
             model.fields.retain(|f| !f.points_to_model(name));
         }
     }
+
+    //todo generate warnings here by iterating over all models
+    // -> commented out models
+    // iterating over the fields of the remaining ones
+    // -> commented out fields
 }

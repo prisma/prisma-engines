@@ -134,7 +134,7 @@ pub(crate) fn calculate_scalar_field(schema: &SqlSchema, table: &Table, column: 
     let (is_commented_out, documentation) = match field_type {
         FieldType::Unsupported(_) => (
             true,
-            Some("This type is currently not supported.".to_string()), //todo this should trigger a warning
+            Some("This type is currently not supported.".to_string()),
         ),
         _ => (false, None),
     };
@@ -455,7 +455,7 @@ pub(crate) fn calculate_field_type(
                 ColumnTypeFamily::Enum(name) => FieldType::Enum(name.clone()),
                 // XXX: We made a conscious decision to punt on mapping of ColumnTypeFamily
                 // variants that don't yet have corresponding PrismaType variants
-                //todo Unsupported Type FieldType::Unsupported(columntypefamily)
+                //todo comment
                 x => FieldType::Unsupported(x.to_string()),
             }
         }

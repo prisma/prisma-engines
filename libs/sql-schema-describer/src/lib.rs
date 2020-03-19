@@ -278,7 +278,7 @@ pub enum ColumnTypeFamily {
     TransactionId,
     ///Enum
     Enum(String),
-    /// Unknown
+    /// Unsupported
     Unsupported(String),
 }
 
