@@ -99,7 +99,7 @@ fn get_field_kind(field: &dml::Field) -> String {
     match field.field_type {
         dml::FieldType::Relation(_) => String::from("object"),
         dml::FieldType::Enum(_) => String::from("enum"),
-        dml::FieldType::Base(_) => String::from("scalar"),
+        dml::FieldType::Base(_, _) => String::from("scalar"),
         _ => unimplemented!("DMMF does not support field type {:?}", field.field_type),
     }
 }
@@ -108,7 +108,7 @@ fn get_field_type(field: &dml::Field) -> String {
     match &field.field_type {
         dml::FieldType::Relation(relation_info) => relation_info.to.clone(),
         dml::FieldType::Enum(t) => t.clone(),
-        dml::FieldType::Base(t) => type_to_string(t),
+        dml::FieldType::Base(t, _) => type_to_string(t),
         dml::FieldType::ConnectorSpecific(sft) => type_to_string(&sft.prisma_type()),
     }
 }

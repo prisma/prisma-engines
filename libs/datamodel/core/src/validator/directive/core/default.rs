@@ -17,7 +17,7 @@ impl DirectiveValidator<dml::Field> for DefaultDirectiveValidator {
             return self.new_directive_validation_error("Cannot set a default value on list field.", args.span());
         }
 
-        if let dml::FieldType::Base(scalar_type) = field.field_type {
+        if let dml::FieldType::Base(scalar_type, _) = field.field_type {
             let dv = args
                 .default_arg("value")?
                 .as_default_value(scalar_type)

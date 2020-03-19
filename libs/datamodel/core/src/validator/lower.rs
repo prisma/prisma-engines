@@ -49,7 +49,7 @@ impl LowerDmlToAst {
         Ok(ast::SchemaAst { tops: tops })
     }
 
-    fn lower_model(&self, model: &dml::Model, datamodel: &dml::Datamodel) -> Result<ast::Model, ErrorCollection> {
+    pub fn lower_model(&self, model: &dml::Model, datamodel: &dml::Datamodel) -> Result<ast::Model, ErrorCollection> {
         let mut errors = ErrorCollection::new();
         let mut fields: Vec<ast::Field> = Vec::new();
 
@@ -146,7 +146,9 @@ impl LowerDmlToAst {
     /// Internal: Lowers a field's arity.
     fn lower_type(&self, field_type: &dml::FieldType) -> ast::Identifier {
         match field_type {
-            dml::FieldType::Base(tpe) => ast::Identifier::new(&tpe.to_string()),
+            dml::FieldType::Base(tpe, custom_type_name) => {
+                ast::Identifier::new(&custom_type_name.as_ref().unwrap_or(&tpe.to_string()))
+            }
             dml::FieldType::Enum(tpe) => ast::Identifier::new(&tpe.to_string()),
             dml::FieldType::Relation(rel) => ast::Identifier::new(&rel.to),
             _ => unimplemented!("Connector specific types are not supported atm."),

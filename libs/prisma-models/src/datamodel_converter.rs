@@ -99,22 +99,22 @@ impl<'a> DatamodelConverter<'a> {
                         relation_info: ri.clone(),
                     })
                 }
-                _ => FieldTemplate::Scalar(ScalarFieldTemplate {
-                    name: field.name.clone(),
-                    type_identifier: field.type_identifier(),
-                    is_required: field.is_required(),
-                    is_list: field.is_list(),
-                    is_unique: field.is_unique(),
-                    is_id: field.is_id,
-                    is_auto_generated_int_id: field.is_auto_generated_int_id(),
-                    data_source_field: field
-                        .data_source_fields
-                        .clone()
-                        .pop()
-                        .expect("Expected exactly one data source field for ScalarFieldTemplate."),
-                    behaviour: field.behaviour(),
-                    internal_enum: field.internal_enum(self.datamodel),
-                }),
+                _ => {
+                    FieldTemplate::Scalar(ScalarFieldTemplate {
+                        name: field.name.clone(),
+                        type_identifier: field.type_identifier(),
+                        is_required: field.is_required(),
+                        is_list: field.is_list(),
+                        is_unique: field.is_unique(),
+                        is_id: field.is_id,
+                        is_auto_generated_int_id: field.is_auto_generated_int_id(),
+                        data_source_field: field.data_source_fields.clone().pop().expect(
+                            "Expected exactly one data source field for ScalarFieldTemplate.",
+                        ),
+                        behaviour: field.behaviour(),
+                        internal_enum: field.internal_enum(self.datamodel),
+                    })
+                }
             })
             .collect()
     }
@@ -154,7 +154,10 @@ impl<'a> DatamodelConverter<'a> {
             for field in model.fields() {
                 if let dml::FieldType::Relation(relation_info) = &field.field_type {
                     let dml::RelationInfo {
-                        to, to_fields, name, ..
+                        to,
+                        to_fields,
+                        name,
+                        ..
                     } = relation_info;
 
                     let related_model = datamodel
@@ -168,7 +171,9 @@ impl<'a> DatamodelConverter<'a> {
                                 // TODO: i probably don't need to check the the `to`. The name of the relation should be enough. The parser must guarantee that the relation info is set right.
                                 if model.name == related_model.name {
                                     // SELF RELATIONS
-                                    rel_info.to == model.name && &rel_info.name == name && f.name != field.name
+                                    rel_info.to == model.name
+                                        && &rel_info.name == name
+                                        && f.name != field.name
                                 } else {
                                     // In a normal relation the related field could be named the same hence we omit the last condition from above.
                                     rel_info.to == model.name && &rel_info.name == name
@@ -188,7 +193,14 @@ impl<'a> DatamodelConverter<'a> {
                         _ => panic!("this was not a relation field"),
                     };
 
-                    let (model_a, model_b, field_a, field_b, referenced_fields_a, referenced_fields_b) = match () {
+                    let (
+                        model_a,
+                        model_b,
+                        field_a,
+                        field_b,
+                        referenced_fields_a,
+                        referenced_fields_b,
+                    ) = match () {
                         _ if model.name < related_model.name => (
                             model.clone(),
                             related_model.clone(),
@@ -282,10 +294,11 @@ impl<'a> DatamodelConverter<'a> {
     /// Normalizes the model for usage in the query core.
     fn sanitize_model(mut model: dml::Model) -> dml::Model {
         // Fold single-field unique indices into the fields (makes a single field unique).
-        let (keep, transform): (Vec<_>, Vec<_>) = model.indices.into_iter().partition(|i| match i.tpe {
-            dml::IndexType::Unique if i.fields.len() == 1 => false,
-            _ => true,
-        });
+        let (keep, transform): (Vec<_>, Vec<_>) =
+            model.indices.into_iter().partition(|i| match i.tpe {
+                dml::IndexType::Unique if i.fields.len() == 1 => false,
+                _ => true,
+            });
 
         model.indices = keep;
 
@@ -369,7 +382,8 @@ impl TempRelationHolder {
     }
 
     fn is_for_model_and_field(&self, model: &dml::Model, field: &dml::Field) -> bool {
-        (&self.model_a == model && &self.field_a == field) || (&self.model_b == model && &self.field_b == field)
+        (&self.model_a == model && &self.field_a == field)
+            || (&self.model_b == model && &self.field_b == field)
     }
 
     fn relation_side(&self, field: &dml::Field) -> RelationSide {
@@ -385,16 +399,18 @@ impl TempRelationHolder {
     fn manifestation(&self) -> RelationLinkManifestation {
         match &self.manifestation {
             // TODO: relation table columns must get renamed: lowercased type names instead of A and B
-            TempManifestationHolder::Table => RelationLinkManifestation::RelationTable(RelationTable {
-                table: self.table_name(),
-                model_a_column: self.model_a_column(),
-                model_b_column: self.model_b_column(),
-            }),
-            TempManifestationHolder::Inline { in_table_of_model, .. } => {
-                RelationLinkManifestation::Inline(InlineRelation {
-                    in_table_of_model_name: in_table_of_model.to_string(),
+            TempManifestationHolder::Table => {
+                RelationLinkManifestation::RelationTable(RelationTable {
+                    table: self.table_name(),
+                    model_a_column: self.model_a_column(),
+                    model_b_column: self.model_b_column(),
                 })
             }
+            TempManifestationHolder::Inline {
+                in_table_of_model, ..
+            } => RelationLinkManifestation::Inline(InlineRelation {
+                in_table_of_model_name: in_table_of_model.to_string(),
+            }),
         }
     }
 }
@@ -417,7 +433,7 @@ impl DatamodelFieldExtensions for dml::Field {
         match &self.field_type {
             dml::FieldType::Enum(x) => TypeIdentifier::Enum(x.clone()),
             dml::FieldType::Relation(_) => TypeIdentifier::String, // Todo: Unused
-            dml::FieldType::Base(scalar) => match scalar {
+            dml::FieldType::Base(scalar, _) => match scalar {
                 dml::ScalarType::Boolean => TypeIdentifier::Boolean,
                 dml::ScalarType::DateTime => TypeIdentifier::DateTime,
                 dml::ScalarType::Decimal => TypeIdentifier::Float,
@@ -471,15 +487,13 @@ impl DatamodelFieldExtensions for dml::Field {
 
     fn internal_enum(&self, datamodel: &dml::Datamodel) -> Option<InternalEnum> {
         match self.field_type {
-            dml::FieldType::Enum(ref name) => {
-                datamodel
-                    .enums()
-                    .find(|e| e.name == name.clone())
-                    .map(|e| InternalEnum {
-                        name: e.name.clone(),
-                        values: e.values().map(|v| self.internal_enum_value(v)).collect(),
-                    })
-            }
+            dml::FieldType::Enum(ref name) => datamodel
+                .enums()
+                .find(|e| e.name == name.clone())
+                .map(|e| InternalEnum {
+                    name: e.name.clone(),
+                    values: e.values().map(|v| self.internal_enum_value(v)).collect(),
+                }),
             _ => None,
         }
     }

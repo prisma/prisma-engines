@@ -79,7 +79,7 @@ impl<'a> Renderer<'a> {
     fn render_documentation(target: &mut dyn LineWriteable, obj: &dyn ast::WithDocumentation) {
         if let Some(doc) = &obj.documentation() {
             for line in doc.text.split('\n') {
-                target.write("/// ");
+                target.write("// ");
                 target.write(line);
                 target.end_line();
             }

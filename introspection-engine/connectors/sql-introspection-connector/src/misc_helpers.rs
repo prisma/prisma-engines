@@ -137,7 +137,7 @@ pub(crate) fn calculate_scalar_field(
     debug!("Handling column {:?}", column);
     let field_type = calculate_field_type(&schema, &column, &table);
     let arity = match column.tpe.arity {
-        _ if column.auto_increment && field_type == FieldType::Base(ScalarType::Int) => {
+        _ if column.auto_increment && field_type == FieldType::Base(ScalarType::Int, None) => {
             FieldArity::Required
         }
         ColumnArity::Required => FieldArity::Required,
@@ -436,15 +436,15 @@ pub(crate) fn calculate_field_type(
         _ => {
             debug!("Found no corresponding foreign key");
             match &column.tpe.family {
-                ColumnTypeFamily::Boolean => FieldType::Base(ScalarType::Boolean),
-                ColumnTypeFamily::DateTime => FieldType::Base(ScalarType::DateTime),
-                ColumnTypeFamily::Float => FieldType::Base(ScalarType::Float),
-                ColumnTypeFamily::Int => FieldType::Base(ScalarType::Int),
-                ColumnTypeFamily::String => FieldType::Base(ScalarType::String),
+                ColumnTypeFamily::Boolean => FieldType::Base(ScalarType::Boolean, None),
+                ColumnTypeFamily::DateTime => FieldType::Base(ScalarType::DateTime, None),
+                ColumnTypeFamily::Float => FieldType::Base(ScalarType::Float, None),
+                ColumnTypeFamily::Int => FieldType::Base(ScalarType::Int, None),
+                ColumnTypeFamily::String => FieldType::Base(ScalarType::String, None),
                 ColumnTypeFamily::Enum(name) => FieldType::Enum(name.clone()),
                 // XXX: We made a conscious decision to punt on mapping of ColumnTypeFamily
                 // variants that don't yet have corresponding PrismaType variants
-                _ => FieldType::Base(ScalarType::String),
+                _ => FieldType::Base(ScalarType::String, None),
             }
         }
     }

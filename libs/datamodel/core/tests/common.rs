@@ -51,7 +51,7 @@ pub trait ErrorAsserts {
 
 impl FieldAsserts for dml::Field {
     fn assert_base_type(&self, t: &ScalarType) -> &Self {
-        if let dml::FieldType::Base(base_type) = &self.field_type {
+        if let dml::FieldType::Base(base_type, _) = &self.field_type {
             assert_eq!(base_type, t);
         } else {
             panic!("Scalar expected, but found {:?}", self.field_type);
