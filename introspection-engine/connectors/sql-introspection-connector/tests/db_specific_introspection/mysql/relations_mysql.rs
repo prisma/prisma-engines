@@ -257,6 +257,7 @@ async fn introspecting_a_prisma_many_to_many_relation_should_work(api: &TestApi)
                      FOREIGN KEY (`B`) REFERENCES  `User`(`id`) ON DELETE CASCADE",
                     );
                     t.add_index("test", types::index(vec!["A", "B"]).unique(true));
+                    t.add_index("test2", types::index(vec!["B"]).unique(false));
                 });
             },
             api.db_name(),
