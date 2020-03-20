@@ -131,10 +131,10 @@ async fn main() -> anyhow::Result<()> {
             let warnings = rt.block_on(fut)?;
 
             if warnings.is_empty() {
-                println!("{}", "✔️  migrated without warning".bold().green());
+                eprintln!("{}", "✔️  migrated without warning".bold().green());
             } else {
                 for warning in warnings {
-                    println!("{} - {}", "⚠️ MIGRATION WARNING ⚠️ ".bold().red(), warning)
+                    eprintln!("{} - {}", "⚠️ MIGRATION WARNING ⚠️ ".bold().red(), warning)
                 }
 
                 std::process::exit(1);
@@ -148,7 +148,7 @@ async fn main() -> anyhow::Result<()> {
 fn read_datamodel_from_file(path: &str) -> std::io::Result<String> {
     use std::{fs::File, io::Read, path::Path};
 
-    println!(
+    eprintln!(
         "{} {}",
         "reading the prisma schema from".bold(),
         path.yellow()
@@ -166,7 +166,7 @@ fn read_datamodel_from_file(path: &str) -> std::io::Result<String> {
 fn read_datamodel_from_stdin() -> std::io::Result<String> {
     use std::io::Read;
 
-    println!(
+    eprintln!(
         "{} {}",
         "reading the prisma schema from".bold(),
         "stdin".yellow()
