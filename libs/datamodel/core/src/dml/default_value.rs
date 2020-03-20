@@ -21,18 +21,16 @@ impl DefaultValue {
         }
     }
 
-    pub fn get_as_prisma_value(&self) -> PrismaValue {
-        self.get()
-            .map(|sv| match sv {
-                ScalarValue::Boolean(x) => PrismaValue::Boolean(x),
-                ScalarValue::Int(x) => PrismaValue::Int(i64::from(x)),
-                ScalarValue::Float(x) => x.try_into().expect("Can't convert float to decimal"),
-                ScalarValue::String(x) => PrismaValue::String(x.clone()),
-                ScalarValue::DateTime(x) => PrismaValue::DateTime(x),
-                ScalarValue::Decimal(x) => x.try_into().expect("Can't convert float to decimal"),
-                ScalarValue::ConstantLiteral(value) => PrismaValue::Enum(value.clone()),
-            })
-            .unwrap_or_else(|| PrismaValue::Null)
+    pub fn get_as_prisma_value(&self) -> Option<PrismaValue> {
+        self.get().map(|sv| match sv {
+            ScalarValue::Boolean(x) => PrismaValue::Boolean(x),
+            ScalarValue::Int(x) => PrismaValue::Int(i64::from(x)),
+            ScalarValue::Float(x) => x.try_into().expect("Can't convert float to decimal"),
+            ScalarValue::String(x) => PrismaValue::String(x.clone()),
+            ScalarValue::DateTime(x) => PrismaValue::DateTime(x),
+            ScalarValue::Decimal(x) => x.try_into().expect("Can't convert float to decimal"),
+            ScalarValue::ConstantLiteral(value) => PrismaValue::Enum(value.clone()),
+        })
     }
 }
 
@@ -48,7 +46,11 @@ impl ValueGenerator {
     pub fn new(name: String, args: Vec<ScalarValue>) -> std::result::Result<Self, DatamodelError> {
         let generator = ValueGeneratorFn::try_from(name.as_ref())?;
 
-        Ok(ValueGenerator { name, args, generator })
+        Ok(ValueGenerator {
+            name,
+            args,
+            generator,
+        })
     }
 
     pub fn new_autoincrement() -> Self {
