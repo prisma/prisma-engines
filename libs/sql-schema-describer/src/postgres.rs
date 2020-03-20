@@ -4,6 +4,7 @@ use log::debug;
 use once_cell::sync::Lazy;
 use quaint::prelude::Queryable;
 use regex::Regex;
+use std::borrow::Cow;
 use std::collections::HashMap;
 use std::convert::TryInto;
 use std::sync::Arc;
@@ -234,11 +235,12 @@ impl SqlSchemaDescriber {
                                     false => DefaultValue::DBGENERATED(default_string),
                                 },
                             },
-                            ColumnTypeFamily::Float => match parse_float(&default_string).is_some()
-                            {
-                                true => DefaultValue::VALUE(default_string),
-                                false => DefaultValue::DBGENERATED(default_string),
-                            },
+                            ColumnTypeFamily::Float => {
+                                match parse_float(&default_string).is_some() {
+                                    true => DefaultValue::VALUE(default_string),
+                                    false => DefaultValue::DBGENERATED(default_string),
+                                }
+                            }
                             ColumnTypeFamily::Boolean => {
                                 match parse_bool(&default_string).is_some() {
                                     true => DefaultValue::VALUE(default_string),
@@ -246,17 +248,15 @@ impl SqlSchemaDescriber {
                                 }
                             }
                             ColumnTypeFamily::String => {
-                                let data_type_suffix = format!("::{}", data_type);
-                                let full_data_type_suffix = format!("::{}", full_data_type);
-                                match default_string.ends_with(&data_type_suffix)
-                                    || default_string.ends_with(&full_data_type_suffix)
-                                {
-                                    true => DefaultValue::VALUE(unquote(
-                                        default_string
-                                            .replace(&data_type_suffix, "")
-                                            .replace(&full_data_type_suffix, ""),
-                                    )),
-                                    false => DefaultValue::DBGENERATED(default_string),
+                                match unsuffix_default_literal(
+                                    &default_string,
+                                    &data_type,
+                                    &full_data_type,
+                                ) {
+                                    Some(default_literal) => {
+                                        DefaultValue::VALUE(unquote(default_literal).into_owned())
+                                    }
+                                    None => DefaultValue::DBGENERATED(default_string),
                                 }
                             }
                             ColumnTypeFamily::DateTime => {
@@ -286,9 +286,10 @@ impl SqlSchemaDescriber {
                             ColumnTypeFamily::Enum(enum_name) => {
                                 let enum_suffix = format!("::{}", enum_name);
                                 match default_string.ends_with(&enum_suffix) {
-                                    true => DefaultValue::VALUE(unquote(
-                                        default_string.replace(&enum_suffix, ""),
-                                    )),
+                                    true => DefaultValue::VALUE(
+                                        unquote(&default_string.replace(&enum_suffix, ""))
+                                            .into_owned(),
+                                    ),
                                     false => DefaultValue::DBGENERATED(default_string),
                                 }
                             }
@@ -752,17 +753,31 @@ fn is_autoincrement(value: &str, schema_name: &str, table_name: &str, column_nam
         })
         .unwrap_or(false)
 }
-fn unquote(input: String) -> String {
+
+fn unquote(input: &str) -> Cow<'_, str> {
     /// Regex for matching the quotes on the introspected string values on Postgres.
     static POSTGRES_STRING_DEFAULT_RE: Lazy<regex::Regex> =
-        Lazy::new(|| regex::Regex::new(r#"^'(.*)'$"#).unwrap());
+        Lazy::new(|| regex::Regex::new(r#"^B?'(.*)'$"#).unwrap());
 
-    POSTGRES_STRING_DEFAULT_RE
-        .captures(input.as_ref())
-        .and_then(|captures| captures.get(1))
-        .map(|capt| capt.as_str())
-        .unwrap_or(input.as_ref())
-        .to_string()
+    POSTGRES_STRING_DEFAULT_RE.replace(input, "$1")
+}
+
+fn unsuffix_default_literal<'a>(
+    literal: &'a str,
+    data_type: &str,
+    full_data_type: &str,
+) -> Option<&'a str> {
+    static POSTGRES_DATA_TYPE_SUFFIX_RE: Lazy<regex::Regex> =
+        Lazy::new(|| regex::Regex::new(r#"(.*)::"?(.*)"?$"#).unwrap());
+
+    let captures = POSTGRES_DATA_TYPE_SUFFIX_RE.captures(literal)?;
+    let suffix = captures.get(2).unwrap().as_str();
+
+    if suffix != data_type && suffix != full_data_type {
+        return None;
+    }
+
+    Some(captures.get(1).unwrap().as_str())
 }
 
 #[cfg(test)]
@@ -839,8 +854,8 @@ mod tests {
     fn postgres_unquote_string_default_regex_works() {
         let quoted_str = "'abc $$ def'";
 
-        assert_eq!(unquote(quoted_str.to_string()), "abc $$ def");
+        assert_eq!(unquote(quoted_str), "abc $$ def");
 
-        assert_eq!(unquote("heh ".to_string()), "heh ");
+        assert_eq!(unquote("heh "), "heh ");
     }
 }
