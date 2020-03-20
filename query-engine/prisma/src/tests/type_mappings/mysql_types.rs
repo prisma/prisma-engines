@@ -479,7 +479,7 @@ const CREATE_TYPES_TABLE_WITH_DEFAULTS: &str = indoc! {
     "##
 };
 
-#[test_each_connector(tags("mysql"), log = "debug")]
+#[test_each_connector(tags("mysql"))]
 async fn mysql_db_level_defaults_work(api: &TestApi) -> TestResult {
     api.execute_sql(CREATE_TYPES_TABLE_WITH_DEFAULTS).await?;
 

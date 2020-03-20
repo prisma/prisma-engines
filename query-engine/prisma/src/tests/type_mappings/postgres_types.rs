@@ -150,6 +150,41 @@ const CREATE_ONE_TYPES_QUERY: &str = indoc! {
     "##
 };
 
+fn create_one_types_response() -> serde_json::Value {
+    json!({
+        "data": {
+            "createOnetypes": {
+                "numeric_int2": 12,
+                "numeric_int4": 9002,
+                "numeric_int8": 100000000,
+                "numeric_serial2": 8,
+                "numeric_serial4": 80,
+                "numeric_serial8": 80000,
+                "numeric_decimal": 49.3444,
+                "numeric_float4": 12.12,
+                "numeric_float8": 3.139428,
+                "numeric_money": 3.5,
+                "numeric_oid": 2000,
+                "string_char": "yeet    ",
+                "string_varchar": "yeet variable",
+                "string_text": "to yeet or not to yeet",
+                "binary_bits": "0101110",
+                "binary_bits_varying": "0101110",
+                "binary_uuid": "111142ec-880b-4062-913d-8eac479ab957",
+                "time_timestamp": "2020-03-02T08:00:00.000Z",
+                "time_timestamptz": "2020-03-02T08:00:00.000Z",
+                "time_date": "2020-03-05T00:00:00.000Z",
+                "time_time": "1970-01-01T08:00:00.000Z",
+                "time_timetz": "1970-01-01T08:00:00.000Z",
+                "boolean_boolean": true,
+                "network_inet": "192.168.100.14",
+                "json_json": "{\"isJson\":true}",
+                "json_jsonb": "{\"isJSONB\":true}",
+            }
+        }
+    })
+}
+
 #[test_each_connector(tags("postgres"), log = "debug")]
 async fn postgres_types_roundtrip(api: &TestApi) -> TestResult {
     api.execute_sql(CREATE_TYPES_TABLE).await?;
@@ -200,38 +235,7 @@ async fn postgres_types_roundtrip(api: &TestApi) -> TestResult {
 
     let response = engine.request(CREATE_ONE_TYPES_QUERY).await;
 
-    let expected_response = json!({
-        "data": {
-            "createOnetypes": {
-                "numeric_int2": 12,
-                "numeric_int4": 9002,
-                "numeric_int8": 100000000,
-                "numeric_serial2": 8,
-                "numeric_serial4": 80,
-                "numeric_serial8": 80000,
-                "numeric_decimal": 49.3444,
-                "numeric_float4": 12.12,
-                "numeric_float8": 3.139428,
-                "numeric_money": 3.5,
-                "numeric_oid": 2000,
-                "string_char": "yeet    ",
-                "string_varchar": "yeet variable",
-                "string_text": "to yeet or not to yeet",
-                "binary_bits": "0101110",
-                "binary_bits_varying": "0101110",
-                "binary_uuid": "111142ec-880b-4062-913d-8eac479ab957",
-                "time_timestamp": "2020-03-02T08:00:00.000Z",
-                "time_timestamptz": "2020-03-02T08:00:00.000Z",
-                "time_date": "2020-03-05T00:00:00.000Z",
-                "time_time": "1970-01-01T08:00:00.000Z",
-                "time_timetz": "1970-01-01T08:00:00.000Z",
-                "boolean_boolean": true,
-                "network_inet": "192.168.100.14",
-                "json_json": "{\"isJson\":true}",
-                "json_jsonb": "{\"isJSONB\":true}",
-            }
-        }
-    });
+    let expected_response = create_one_types_response();
 
     assert_eq!(response, expected_response);
 
@@ -587,6 +591,144 @@ async fn all_postgres_types_work_as_filter(api: &TestApi) -> TestResult {
     let expected_json = json!({ "data": { "findManytypes": [{ "id": 1 }] } });
 
     assert_eq!(response, expected_json);
+
+    Ok(())
+}
+
+const CREATE_TYPES_TABLE_WITH_DEFAULTS: &str = indoc! {
+    r##"
+    CREATE TABLE "prisma-tests"."types" (
+        id SERIAL PRIMARY KEY,
+        numeric_int2 int2 NOT NULL DEFAULT 7,
+        numeric_int4 int4 NOT NULL DEFAULT 777,
+        numeric_int8 int8 NOT NULL DEFAULT 777777,
+
+        numeric_decimal decimal(8, 4) NOT NULL DEFAULT 3.14,
+        numeric_float4 float4 NOT NULL DEFAULT 3.14,
+        numeric_float8 float8 NOT NULL DEFAULT 3.14,
+
+        numeric_serial2 serial2,
+        numeric_serial4 serial4,
+        numeric_serial8 serial8,
+
+        numeric_money money NOT NULL DEFAULT 5.00,
+        numeric_oid oid NOT NULL DEFAULT 60,
+
+        string_char char(8) NOT NULL DEFAULT '12345678',
+        string_varchar varchar(20) NOT NULL DEFAULT 'bergkäse',
+        string_text text NOT NULL DEFAULT 'blue cheese',
+
+        -- binary_bytea bytea,
+        binary_bits  bit(7) NOT NULL DEFAULT '1110000',
+        binary_bits_varying bit varying(80) NOT NULL DEFAULT '1010',
+        binary_uuid uuid NOT NULL DEFAULT '111142ec-880b-4062-913d-8eac479ab957',
+
+        time_timestamp timestamp NOT NULL DEFAULT '2020-03-20T10:15:00+0200',
+        time_timestamptz timestamptz NOT NULL DEFAULT '2020-03-20T10:15:00+0200',
+        time_date date NOT NULL DEFAULT '2010-01-18',
+        time_time time NOT NULL DEFAULT '08:09:10',
+        time_timetz timetz NOT NULL DEFAULT '08:09:10',
+        -- time_interval interval,
+
+        boolean_boolean boolean NOT NULL DEFAULT TRUE,
+
+        -- network_cidr cidr,
+        network_inet inet NOT NULL DEFAULT '127.0.0.3',
+        -- network_mac  macaddr,
+
+        -- search_tsvector tsvector,
+        -- search_tsquery tsquery,
+
+        json_json json NOT NULL DEFAULT '{ "name": null }'::json,
+        json_jsonb jsonb NOT NULL DEFAULT '{ "name": null }'::jsonb
+    );
+    "##
+};
+
+#[test_each_connector(tags("postgres"), log = "debug")]
+async fn postgres_db_level_defaults_work(api: &TestApi) -> TestResult {
+    api.execute_sql(CREATE_TYPES_TABLE_WITH_DEFAULTS).await?;
+
+    let (_datamodel, engine) = api.introspect_and_start_query_engine().await?;
+
+    let response = engine.request(CREATE_ONE_TYPES_QUERY).await;
+
+    assert_eq!(response, create_one_types_response());
+
+    let create_defaults = indoc!(
+        r##"
+            mutation {
+                createOnetypes(
+                    data: {
+                    }
+                ) {
+                    numeric_int2
+                    numeric_int4
+                    numeric_int8
+                    numeric_decimal
+                    numeric_float4
+                    numeric_float8
+                    numeric_serial2
+                    numeric_serial4
+                    numeric_serial8
+                    numeric_money
+                    numeric_oid
+                    string_char
+                    string_varchar
+                    string_text
+                    binary_bits
+                    binary_bits_varying
+                    binary_uuid
+                    time_timestamp
+                    time_timestamptz
+                    time_date
+                    time_time
+                    time_timetz
+                    boolean_boolean
+                    network_inet
+                    json_json
+                    json_jsonb
+                }
+            }
+        "##
+    );
+
+    let response = engine.request(create_defaults).await;
+
+    let expected_response = json!({
+        "data": {
+            "createOnetypes": {
+                "numeric_int2": 7,
+                "numeric_int4": 777,
+                "numeric_int8": 777777,
+                "numeric_decimal": 3.14,
+                "numeric_float4": 3.14,
+                "numeric_float8": 3.14,
+                "numeric_serial2": 1,
+                "numeric_serial4": 1,
+                "numeric_serial8": 1,
+                "numeric_money": 5.0,
+                "numeric_oid": 60,
+                "string_char": "12345678",
+                "string_varchar": "bergkäse",
+                "string_text": "blue cheese",
+                "binary_bits": "1110000",
+                "binary_bits_varying": "1010",
+                "binary_uuid": "111142ec-880b-4062-913d-8eac479ab957",
+                "time_timestamp": "2020-03-20T10:15:00.000Z",
+                "time_timestamptz": "2020-03-20T08:15:00.000Z",
+                "time_date": "2010-01-18T00:00:00.000Z",
+                "time_time": "1970-01-01T08:09:10.000Z",
+                "time_timetz": "1970-01-01T08:09:10.000Z",
+                "boolean_boolean": true,
+                "network_inet": "127.0.0.3",
+                "json_json": "{\"name\":null}",
+                "json_jsonb": "{\"name\":null}",
+            }
+        }
+    });
+
+    assert_eq!(response, expected_response);
 
     Ok(())
 }
