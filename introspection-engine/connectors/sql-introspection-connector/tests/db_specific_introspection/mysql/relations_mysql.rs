@@ -266,13 +266,13 @@ async fn introspecting_a_prisma_many_to_many_relation_should_work(api: &TestApi)
 
     let dm = r#"
             model Post {
-               id      Int @id @default(autoincrement())
-               User User[]
+               id       Int @id @default(autoincrement())
+               User     User[]
             }
 
             model User {
-               id      Int @id @default(autoincrement())
-               Post Post[]
+               id       Int @id @default(autoincrement())
+               Post     Post[]
             }
         "#;
     let result = dbg!(api.introspect().await);

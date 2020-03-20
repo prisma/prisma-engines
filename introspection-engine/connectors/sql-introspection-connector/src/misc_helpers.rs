@@ -84,7 +84,7 @@ pub fn calculate_many_to_many_field(
         on_delete: OnDeleteStrategy::None,
     });
 
-    let basename = foreign_key.referenced_table.camel_case();
+    let basename = foreign_key.referenced_table.clone();
 
     let name = match is_self_relation {
         true => format!("{}_{}", basename, foreign_key.columns[0]),
