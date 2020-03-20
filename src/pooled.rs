@@ -5,7 +5,7 @@ pub use manager::{PooledConnection, QuaintManager};
 
 use crate::connector::{ConnectionInfo, SqlFamily};
 use mobc::Pool;
-use std::sync::Arc;
+use std::{sync::Arc, time::Duration};
 use url::Url;
 
 #[cfg(feature = "sqlite")]
@@ -126,6 +126,7 @@ impl Quaint {
 
         let inner = Pool::builder()
             .max_open(connection_limit.into())
+            .max_lifetime(Some(Duration::from_secs(300)))
             .test_on_check_out(false)
             .build(manager);
 
