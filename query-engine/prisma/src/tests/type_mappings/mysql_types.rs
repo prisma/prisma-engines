@@ -92,6 +92,79 @@ const CREATE_ONE_TYPES_QUERY: &str = indoc! {
     "
 };
 
+fn expected_create_one_types_result() -> serde_json::Value {
+    json!({
+        "numeric_integer_tinyint": 12,
+        "numeric_integer_smallint": 350,
+        "numeric_integer_int": 9002,
+        "numeric_integer_bigint": 30000,
+        "numeric_floating_decimal": 3.14,
+        "numeric_floating_float": -32.0,
+        "numeric_fixed_double": 0.14,
+        "numeric_fixed_real": 12.12,
+        "numeric_bit": 4,
+        "numeric_boolean": true,
+        "date_date": "2020-02-27T00:00:00.000Z",
+        "date_datetime": "2020-02-27T19:10:22.000Z",
+        "date_timestamp": "2020-02-27T19:11:22.000Z",
+        "date_time": "1970-01-01T12:50:01.000Z",
+        "date_year": 2012,
+        "string_char": "make dolphins easy",
+        "string_varchar": "dolphins of varying characters",
+        "string_text_tinytext": "tiny dolphins",
+        "string_text_text": "dolphins",
+        "string_text_mediumtext": "medium dolphins",
+        "string_text_longtext": "long dolphins",
+        // "string_binary_binary": "hello 2020\u{0}\u{0}\u{0}\u{0}\u{0}\u{0}\u{0}\u{0}\u{0}\u{0}",
+        // "string_binary_binary": "hello 2020",
+        // "string_blob_tinyblob": "smol blob",
+        // "string_blob_mediumblob": "average blob",
+        // "string_blob_blob": "very average blob",
+        // "string_blob_longblob": "loong looooong bloooooooob",
+        "string_enum": "jellicle_cats",
+        "json": "{\"name\": null}",
+    })
+}
+
+const FIND_MANY_TYPES_QUERY: &str = indoc!(
+    r##"
+    query {
+        findManytypes {
+            numeric_integer_tinyint
+            numeric_integer_smallint
+            numeric_integer_int
+            numeric_integer_bigint
+            numeric_floating_decimal
+            numeric_floating_float
+            numeric_fixed_double
+            numeric_fixed_real
+            numeric_bit
+            numeric_boolean
+            date_date
+            date_datetime
+            date_timestamp
+            date_time
+            date_year
+            string_char
+            string_varchar
+            string_text_tinytext
+            string_text_text
+            string_text_mediumtext
+            string_text_longtext
+            # string_binary_binary
+            # string_binary_varbinary
+            # string_blob_tinyblob
+            # string_blob_mediumblob
+            # string_blob_blob
+            # string_blob_longblob
+            string_enum
+            # omitting spatial/geometry types
+            json
+        }
+    }
+    "##
+);
+
 #[test_each_connector(tags("mysql"))]
 async fn mysql_types_roundtrip(api: &TestApi) -> TestResult {
     api.execute_sql(CREATE_TYPES_TABLE).await?;
@@ -158,82 +231,13 @@ async fn mysql_types_roundtrip(api: &TestApi) -> TestResult {
 
     // Read the values back.
     {
-        let read = indoc! {
-            "
-            query {
-                findManytypes {
-                    numeric_integer_tinyint
-                    numeric_integer_smallint
-                    numeric_integer_int
-                    numeric_integer_bigint
-                    numeric_floating_decimal
-                    numeric_floating_float
-                    numeric_fixed_double
-                    numeric_fixed_real
-                    numeric_bit
-                    numeric_boolean
-                    date_date
-                    date_datetime
-                    date_timestamp
-                    date_time
-                    date_year
-                    string_char
-                    string_varchar
-                    string_text_tinytext
-                    string_text_text
-                    string_text_mediumtext
-                    string_text_longtext
-                    # string_binary_binary
-                    # string_binary_varbinary
-                    # string_blob_tinyblob
-                    # string_blob_mediumblob
-                    # string_blob_blob
-                    # string_blob_longblob
-                    string_enum
-                    # omitting spatial/geometry types
-                    json
-                }
-            }
-            "
-        };
-
-        let read_response = engine.request(read).await;
+        let read_response = engine.request(FIND_MANY_TYPES_QUERY).await;
 
         let expected_read_response = json!({
             "data": {
                 "findManytypes": [
-                    {
-                        "numeric_integer_tinyint": 12,
-                        "numeric_integer_smallint": 350,
-                        "numeric_integer_int": 9002,
-                        "numeric_integer_bigint": 30000,
-                        "numeric_floating_decimal": 3.14,
-                        "numeric_floating_float": -32.0,
-                        "numeric_fixed_double": 0.14,
-                        "numeric_fixed_real": 12.12,
-                        "numeric_bit": 4,
-                        "numeric_boolean": true,
-                        "date_date": "2020-02-27T00:00:00.000Z",
-                        "date_datetime": "2020-02-27T19:10:22.000Z",
-                        "date_timestamp": "2020-02-27T19:11:22.000Z",
-                        "date_time": "1970-01-01T12:50:01.000Z",
-                        "date_year": 2012,
-                        "string_char": "make dolphins easy",
-                        "string_varchar": "dolphins of varying characters",
-                        "string_text_tinytext": "tiny dolphins",
-                        "string_text_text": "dolphins",
-                        "string_text_mediumtext": "medium dolphins",
-                        "string_text_longtext": "long dolphins",
-                        // "string_binary_binary": "hello 2020\u{0}\u{0}\u{0}\u{0}\u{0}\u{0}\u{0}\u{0}\u{0}\u{0}",
-                        // "string_binary_binary": "hello 2020",
-                        // "string_blob_tinyblob": "smol blob",
-                        // "string_blob_mediumblob": "average blob",
-                        // "string_blob_blob": "very average blob",
-                        // "string_blob_longblob": "loong looooong bloooooooob",
-                        "string_enum": "jellicle_cats",
-                        "json": "{\"name\": null}",
-                    },
-                ]
+                    expected_create_one_types_result(),
+                ],
             },
         });
 
@@ -391,7 +395,7 @@ async fn all_mysql_identifier_types_work(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector(tags("mysql"), log = "debug")]
+#[test_each_connector(tags("mysql"))]
 async fn all_mysql_types_work_as_filter(api: &TestApi) -> TestResult {
     api.execute_sql(CREATE_TYPES_TABLE).await?;
 
@@ -438,6 +442,124 @@ async fn all_mysql_types_work_as_filter(api: &TestApi) -> TestResult {
     let expected_json = json!({ "data": { "findManytypes": [{ "id": 1 }] } });
 
     assert_eq!(response, expected_json);
+
+    Ok(())
+}
+
+const CREATE_TYPES_TABLE_WITH_DEFAULTS: &str = indoc! {
+    r##"
+    CREATE TABLE `types` (
+        `id` int(11) NOT NULL AUTO_INCREMENT,
+        `numeric_integer_tinyint` tinyint(4) NOT NULL DEFAULT 7,
+        `numeric_integer_smallint` smallint(6) NOT NULL DEFAULT 42,
+        `numeric_integer_int` int(11) NOT NULL DEFAULT 9001,
+        `numeric_integer_bigint` bigint(20) NOT NULL DEFAULT 1000000,
+        `numeric_floating_decimal` decimal(10,2) NOT NULL DEFAULT 3.14,
+        `numeric_floating_float` float NOT NULL DEFAULT 6,
+        `numeric_fixed_double` double NOT NULL DEFAULT 60.3,
+        `numeric_fixed_real` double NOT NULL DEFAULT 90.1,
+        `numeric_bit` bit(64) NOT NULL DEFAULT 12,
+        `numeric_boolean` tinyint(1) NOT NULL DEFAULT TRUE,
+        `date_date` date NOT NULL DEFAULT '2020-03-20',
+        `date_datetime` datetime NOT NULL DEFAULT '2020-03-20 10:15:00',
+        `date_timestamp` timestamp null DEFAULT null,
+        `date_time` time NOT NULL DEFAULT '13:20:01',
+        `date_year` year(4) NOT NULL DEFAULT 1963,
+        `string_char` char(255) NOT NULL DEFAULT 'abcd',
+        `string_varchar` varchar(255) NOT NULL DEFAULT 'wash your hands',
+        `string_text_tinytext` tinytext,
+        `string_text_text` text,
+        `string_text_mediumtext` mediumtext,
+        `string_text_longtext` longtext,
+        `string_enum` enum('pollicle_dogs','jellicle_cats') NOT NULL DEFAULT 'jellicle_cats',
+        `json` json,
+
+        PRIMARY KEY (`id`)
+      ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+    "##
+};
+
+#[test_each_connector(tags("mysql"), log = "debug")]
+async fn mysql_db_level_defaults_work(api: &TestApi) -> TestResult {
+    api.execute_sql(CREATE_TYPES_TABLE_WITH_DEFAULTS).await?;
+
+    let (_datamodel, engine) = api.introspect_and_start_query_engine().await?;
+
+    let response = engine.request(CREATE_ONE_TYPES_QUERY).await;
+
+    assert_eq!(
+        response,
+        json!({
+            "data": {
+                "createOnetypes": {
+                    "id": 1
+                }
+            }
+        })
+    );
+
+    let defaults_create_query = indoc!(
+        r##"
+        mutation {
+            createOnetypes(
+                data: {
+                    string_text_text: "hello, this can't be a default"
+                }
+            ) { id }
+        }
+        "##
+    );
+
+    let response_2 = engine.request(defaults_create_query).await;
+
+    assert_eq!(
+        response_2,
+        json!({
+            "data": {
+                "createOnetypes": {
+                    "id": 2
+                }
+            }
+        })
+    );
+
+    let values = engine.request(FIND_MANY_TYPES_QUERY).await;
+
+    let expected_values = json!({
+        "data": {
+            "findManytypes": [
+                expected_create_one_types_result(),
+                {
+                    "numeric_integer_tinyint": 7,
+                    "numeric_integer_smallint": 42,
+                    "numeric_integer_int": 9001,
+                    "numeric_integer_bigint": 1000000,
+                    "numeric_floating_decimal": 3.14,
+                    "numeric_floating_float": 6.0,
+                    "numeric_fixed_double": 60.3,
+                    "numeric_fixed_real": 90.1,
+                    "numeric_bit": 12,
+                    "numeric_boolean": true,
+                    "date_date": "2020-03-20T00:00:00.000Z",
+                    "date_datetime": "2020-03-20T10:15:00.000Z",
+                    "date_timestamp": null,
+                    "date_time": "1970-01-01T13:20:01.000Z",
+                    "date_year": 1963,
+                    "string_char": "abcd",
+                    "string_varchar": "wash your hands",
+                    "string_text_tinytext": null,
+                    "string_text_text": "hello, this can't be a default",
+                    "string_text_mediumtext": null,
+                    "string_text_longtext": null,
+                    "string_enum": "jellicle_cats",
+                    "json": null,
+
+                }
+            ]
+        }
+    });
+
+    assert_eq!(values, expected_values);
 
     Ok(())
 }
