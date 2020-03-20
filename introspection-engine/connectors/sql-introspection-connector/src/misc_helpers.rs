@@ -54,9 +54,9 @@ fn shared(table: &Table) -> bool {
         && table.foreign_keys.len() == 2
         // Lexicographically lower model referenced by A
         && if table.foreign_keys[0].referenced_table <= table.foreign_keys[1].referenced_table {
-            is_a(&table.foreign_keys[0].columns[0]) && is_b(&table.foreign_keys[1].columns[1])
+            is_a(&table.foreign_keys[0].columns[0]) && is_b(&table.foreign_keys[1].columns[0])
         } else {
-            is_b(&table.foreign_keys[0].columns[0]) && is_a(&table.foreign_keys[1].columns[1])
+            is_b(&table.foreign_keys[0].columns[0]) && is_a(&table.foreign_keys[1].columns[0])
         }
 }
 
