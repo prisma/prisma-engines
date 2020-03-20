@@ -1,4 +1,4 @@
-use crate::data_model_loader;
+use prisma_models::DatamodelConverter;
 use query_core::{BuildMode, QuerySchema, QuerySchemaBuilder, SupportedCapabilities};
 use serial_test::serial;
 use std::sync::Arc;
@@ -97,9 +97,8 @@ fn must_not_fail_on_missing_env_vars_in_a_datasource() {
 }
 
 fn get_query_schema(datamodel_string: &str) -> (QuerySchema, datamodel::dml::Datamodel) {
-    // this env var is read by the data_model_loader
-    std::env::set_var("PRISMA_DML", datamodel_string);
-    let (dm, internal_dm_template) = data_model_loader::load_data_model_components(true).unwrap();
+    let dm = datamodel::parse_datamodel_and_ignore_env_errors(datamodel_string).unwrap();
+    let internal_dm_template = DatamodelConverter::convert(&dm);
     let internal_ref = internal_dm_template.build("db".to_owned());
     let supported_capabilities = SupportedCapabilities::empty();
     (
@@ -110,6 +109,6 @@ fn get_query_schema(datamodel_string: &str) -> (QuerySchema, datamodel::dml::Dat
             false,
         )
         .build(),
-        dm.datamodel,
+        dm,
     )
 }

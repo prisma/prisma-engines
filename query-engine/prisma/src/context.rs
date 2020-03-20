@@ -1,9 +1,10 @@
-use crate::{data_model_loader::*, exec_loader, PrismaError, PrismaResult};
+use crate::{configuration, exec_loader, PrismaError, PrismaResult};
 use query_core::{
     schema::{QuerySchemaRef, SupportedCapabilities},
     BuildMode, QueryExecutor, QuerySchemaBuilder,
 };
 // use prisma_models::InternalDataModelRef;
+use datamodel::Datamodel;
 use prisma_models::DatamodelConverter;
 use std::sync::Arc;
 
@@ -16,7 +17,7 @@ pub struct PrismaContext {
     query_schema: QuerySchemaRef,
 
     /// DML-based v2 datamodel.
-    dm: datamodel::Datamodel,
+    dm: Datamodel,
 
     /// Central query executor.
     pub executor: Box<dyn QueryExecutor + Send + Sync + 'static>,
@@ -26,7 +27,8 @@ pub struct ContextBuilder {
     legacy: bool,
     force_transactions: bool,
     enable_raw_queries: bool,
-    datamodel: Option<String>,
+    datamodel: String,
+    overwrite_datasources: Option<String>,
 }
 
 impl ContextBuilder {
@@ -45,9 +47,8 @@ impl ContextBuilder {
         self
     }
 
-    #[cfg(test)]
-    pub fn datamodel(mut self, val: String) -> Self {
-        self.datamodel = Some(val);
+    pub fn overwrite_datasources(mut self, val: Option<String>) -> Self {
+        self.overwrite_datasources = val;
         self
     }
 
@@ -57,6 +58,7 @@ impl ContextBuilder {
             self.force_transactions,
             self.enable_raw_queries,
             self.datamodel,
+            self.overwrite_datasources,
         )
         .await
     }
@@ -72,37 +74,18 @@ impl PrismaContext {
         legacy: bool,
         force_transactions: bool,
         enable_raw_queries: bool,
-        datamodel: Option<String>,
+        datamodel: String,
+        overwrite_datasources: Option<String>,
     ) -> PrismaResult<Self> {
-        // Load data model in order of precedence.
-        let (v2components, template) = match datamodel {
-            Some(datamodel_string) => {
-                let dm = datamodel::parse_datamodel(&datamodel_string)?;
-
-                let components = load_configuration(&datamodel_string, false).map(|config| {
-                    DatamodelV2Components {
-                        datamodel: dm,
-                        data_sources: config.datasources,
-                    }
-                })?;
-
-                let template = DatamodelConverter::convert(&components.datamodel);
-
-                (components, template)
-            }
-            None => load_data_model_components(false)?,
-        };
-
-        let (dm, data_sources) = (v2components.datamodel, v2components.data_sources);
+        let dm = datamodel::parse_datamodel(&datamodel)?;
+        let config = configuration::load(&datamodel, overwrite_datasources, false)?;
+        let template = DatamodelConverter::convert(&dm);
 
         // We only support one data source at the moment, so take the first one (default not exposed yet).
-        let data_source = if data_sources.is_empty() {
-            return Err(PrismaError::ConfigurationError(
-                "No valid data source found".into(),
-            ));
-        } else {
-            data_sources.first().unwrap()
-        };
+        let data_source = config
+            .datasources
+            .first()
+            .ok_or_else(|| PrismaError::ConfigurationError("No valid data source found".into()))?;
 
         // Load executor
         let (db_name, executor) = exec_loader::load(&**data_source, force_transactions).await?;
@@ -116,6 +99,7 @@ impl PrismaContext {
         } else {
             BuildMode::Modern
         };
+
         let capabilities = SupportedCapabilities::empty(); // todo connector capabilities.
 
         let schema_builder = QuerySchemaBuilder::new(
@@ -128,19 +112,19 @@ impl PrismaContext {
         let query_schema: QuerySchemaRef = Arc::new(schema_builder.build());
 
         Ok(Self {
-            // internal_data_model,
             query_schema,
             dm,
             executor,
         })
     }
 
-    pub fn builder() -> ContextBuilder {
+    pub fn builder(datamodel: String) -> ContextBuilder {
         ContextBuilder {
             legacy: false,
             force_transactions: false,
             enable_raw_queries: false,
-            datamodel: None,
+            overwrite_datasources: None,
+            datamodel,
         }
     }
 
@@ -148,7 +132,7 @@ impl PrismaContext {
         &self.query_schema
     }
 
-    pub fn datamodel(&self) -> &datamodel::Datamodel {
+    pub fn datamodel(&self) -> &Datamodel {
         &self.dm
     }
 

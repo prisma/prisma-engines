@@ -32,10 +32,12 @@ impl RequestContext {
 }
 
 pub struct HttpServerBuilder {
+    datamodel: String,
     legacy_mode: bool,
     force_transactions: bool,
     enable_raw_queries: bool,
     enable_playground: bool,
+    overwrite_datasources: Option<String>,
 }
 
 impl HttpServerBuilder {
@@ -59,11 +61,17 @@ impl HttpServerBuilder {
         self
     }
 
+    pub fn overwrite_datasources(mut self, val: Option<String>) -> Self {
+        self.overwrite_datasources = val;
+        self
+    }
+
     pub async fn build_and_run(self, address: SocketAddr) -> PrismaResult<()> {
-        let ctx = PrismaContext::builder()
+        let ctx = PrismaContext::builder(self.datamodel)
             .legacy(self.legacy_mode)
             .force_transactions(self.force_transactions)
             .enable_raw_queries(self.enable_raw_queries)
+            .overwrite_datasources(self.overwrite_datasources)
             .build()
             .await?;
 
@@ -74,12 +82,14 @@ impl HttpServerBuilder {
 pub struct HttpServer;
 
 impl HttpServer {
-    pub fn builder() -> HttpServerBuilder {
+    pub fn builder(datamodel: String) -> HttpServerBuilder {
         HttpServerBuilder {
+            datamodel,
             legacy_mode: false,
             force_transactions: false,
             enable_raw_queries: false,
             enable_playground: false,
+            overwrite_datasources: None,
         }
     }
 

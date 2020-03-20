@@ -51,7 +51,11 @@ impl ModelTemplate {
             self.id_field_names,
         );
 
-        let indexes = self.indexes.into_iter().map(|i| i.build(&fields.all)).collect();
+        let indexes = self
+            .indexes
+            .into_iter()
+            .map(|i| i.build(&fields.all))
+            .collect();
 
         // The model is created here and fields WILL BE UNSET before now!
         model.fields.set(fields).unwrap();
