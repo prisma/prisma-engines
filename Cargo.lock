@@ -2797,6 +2797,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "colored",
+ "introspection-core",
  "migration-core",
  "serde_json",
  "structopt",

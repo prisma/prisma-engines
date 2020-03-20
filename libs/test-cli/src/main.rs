@@ -17,22 +17,81 @@ enum Command {
         #[structopt(long)]
         force: Option<bool>,
     },
+    /// Introspect a database
+    Introspect {
+        /// URL of the database to introspect.
+        #[structopt(long)]
+        url: Option<String>,
+        /// Path to the schema file to introspect for.
+        #[structopt(long = "file-path")]
+        file_path: Option<String>,
+    },
 }
 
-fn main() -> anyhow::Result<()> {
+#[tokio::main]
+async fn main() -> anyhow::Result<()> {
     match Command::from_args() {
+        Command::Introspect { url, file_path } => {
+            if url.as_ref().xor(file_path.as_ref()).is_none() {
+                anyhow::bail!(
+                    "{}",
+                    "Exactly one of --url or --file-path must be provided"
+                        .bold()
+                        .red()
+                );
+            }
+
+            let schema = if let Some(file_path) = file_path {
+                read_datamodel_from_file(&file_path)?
+            } else if let Some(url) = url {
+                let provider = match url.split(':').next() {
+                    Some("file") | Some("sqlite") => "sqlite",
+                    Some(s) if s.starts_with("postgres") => "postgresql",
+                    Some("mysql") => "mysql",
+                    _ => anyhow::bail!("Could not extract a provider from the URL"),
+                };
+
+                let schema = format!(
+                    r#"
+                        datasource db {{
+                            provider = "{}"
+                            url = "{}"
+                        }}
+                    "#,
+                    provider, url
+                );
+
+                schema
+            } else {
+                unreachable!()
+            };
+
+            let introspected = introspection_core::RpcImpl::introspect_internal(schema)
+                .await
+                .map_err(|err| anyhow::anyhow!("{:?}", err.data))?;
+
+            println!("{}", introspected);
+        }
         Command::ApplySchema {
             file_path,
             force,
             stdin,
         } => {
             let datamodel_string: String = match (file_path, stdin) {
-                (Some(path), false) => read_datamodel_from_file(&path).context("error reading the schemafile")?,
-                (None, true) => read_datamodel_from_stdin()?,
-                (Some(_), true) => {
-                    anyhow::bail!("{}", "please pass either --stdin or --file-path, not both".bold().red())
+                (Some(path), false) => {
+                    read_datamodel_from_file(&path).context("error reading the schemafile")?
                 }
-                (None, false) => anyhow::bail!("{}", "either --stdin or --file-path is required".bold().red()),
+                (None, true) => read_datamodel_from_stdin()?,
+                (Some(_), true) => anyhow::bail!(
+                    "{}",
+                    "please pass either --stdin or --file-path, not both"
+                        .bold()
+                        .red()
+                ),
+                (None, false) => anyhow::bail!(
+                    "{}",
+                    "either --stdin or --file-path is required".bold().red()
+                ),
             };
 
             let fut = async move {
@@ -58,7 +117,11 @@ fn main() -> anyhow::Result<()> {
                 };
 
                 let result = api.apply_migration(&apply_input).await?;
-                let warnings = result.warnings.into_iter().map(|warning| warning.description).collect();
+                let warnings = result
+                    .warnings
+                    .into_iter()
+                    .map(|warning| warning.description)
+                    .collect();
 
                 Ok::<Vec<String>, anyhow::Error>(warnings)
             };
@@ -68,10 +131,10 @@ fn main() -> anyhow::Result<()> {
             let warnings = rt.block_on(fut)?;
 
             if warnings.is_empty() {
-                println!("{}", "✔️  migrated without warning".bold().green());
+                eprintln!("{}", "✔️  migrated without warning".bold().green());
             } else {
                 for warning in warnings {
-                    println!("{} - {}", "⚠️ MIGRATION WARNING ⚠️ ".bold().red(), warning)
+                    eprintln!("{} - {}", "⚠️ MIGRATION WARNING ⚠️ ".bold().red(), warning)
                 }
 
                 std::process::exit(1);
@@ -85,7 +148,11 @@ fn main() -> anyhow::Result<()> {
 fn read_datamodel_from_file(path: &str) -> std::io::Result<String> {
     use std::{fs::File, io::Read, path::Path};
 
-    println!("{} {}", "reading the prisma schema from".bold(), path.yellow());
+    eprintln!(
+        "{} {}",
+        "reading the prisma schema from".bold(),
+        path.yellow()
+    );
 
     let path = Path::new(path);
     let mut file = File::open(path)?;
@@ -99,7 +166,11 @@ fn read_datamodel_from_file(path: &str) -> std::io::Result<String> {
 fn read_datamodel_from_stdin() -> std::io::Result<String> {
     use std::io::Read;
 
-    println!("{} {}", "reading the prisma schema from".bold(), "stdin".yellow());
+    eprintln!(
+        "{} {}",
+        "reading the prisma schema from".bold(),
+        "stdin".yellow()
+    );
 
     let mut stdin = std::io::stdin();
 
