@@ -439,3 +439,44 @@ async fn introspecting_an_unsupported_type_should_comment_it_out(api: &TestApi) 
     let result = dbg!(api.introspect().await);
     assert_eq!(&result, "model Test {\n  id             Int      @default(autoincrement()) @id\n  network_inet   String?\n  // This type is currently not supported.\n  // network_mac macaddr?\n}");
 }
+
+#[test_each_connector(tags("postgres"))]
+async fn introspecting_a_legacy_m_to_n_relation_should_work(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("Post", |t| {
+                t.inject_custom("id integer PRIMARY KEY");
+            });
+            migration.create_table("Category", |t| {
+                t.inject_custom("id integer PRIMARY KEY");
+            });
+
+            migration.create_table("_CategoryToPost", |t| {
+                t.inject_custom("A integer NOT NULL REFERENCES \"Category\"(id) ON DELETE CASCADE ON UPDATE CASCADE");
+                t.inject_custom("B integer NOT NULL REFERENCES \"Post\"(id) ON DELETE CASCADE ON UPDATE CASCADE");
+            });
+        })
+        .await;
+    let unique =
+        "CREATE UNIQUE INDEX _CategoryToPost_AB_unique ON \"_CategoryToPost\"(\"a\",\"b\" )";
+    let index = "CREATE  INDEX _CategoryToPost_AB_index ON \"_CategoryToPost\"(\"b\" )";
+
+    api.database().execute_raw(unique, &[]).await.unwrap();
+    api.database().execute_raw(index, &[]).await.unwrap();
+
+    let dm = r#"
+            model Category {
+              id            Int    @id
+              post          Post[]
+            }
+
+            model Post {
+              id            Int    @id
+              category      Category[]
+            }
+        "#;
+
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+}

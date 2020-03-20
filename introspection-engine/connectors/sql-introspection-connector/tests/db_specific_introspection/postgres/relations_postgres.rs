@@ -228,6 +228,17 @@ async fn introspecting_a_prisma_many_to_many_relation_should_work(api: &TestApi)
         .await
         .unwrap();
 
+    api.database()
+        .execute_raw(
+            &format!(
+                "CREATE INDEX test2 ON \"{}\".\"_PostToUser\" (\"b\");",
+                api.schema_name()
+            ),
+            &[],
+        )
+        .await
+        .unwrap();
+
     let dm = r#"
             model Post {
                id      Int @id @default(autoincrement())

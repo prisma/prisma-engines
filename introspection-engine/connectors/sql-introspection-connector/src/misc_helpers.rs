@@ -19,45 +19,47 @@ pub fn is_migration_table(table: &Table) -> bool {
 
 pub(crate) fn is_prisma_1_point_1_join_table(table: &Table) -> bool {
     table.columns.len() == 2
-        && table.foreign_keys.len() == 2
-        && table.foreign_keys[0].referenced_table < table.foreign_keys[1].referenced_table
-        && table.name.starts_with("_")
-        && table
-            .columns
-            .iter()
-            .find(|column| column.name.to_lowercase() == "a")
-            .is_some()
-        && table
-            .columns
-            .iter()
-            .find(|column| column.name.to_lowercase() == "b")
-            .is_some()
-        && table.indices.len() >= 1
-        && table.indices.last().unwrap().columns.len() == 2
-        && table.indices.last().unwrap().tpe == IndexType::Unique
+        && table.indices.len() >= 2
+        && common_prisma_m_to_n_relation_conditions(table)
 }
 
 pub(crate) fn is_prisma_1_point_0_join_table(table: &Table) -> bool {
     table.columns.len() == 3
+        && table.indices.len() >= 2
+        && table.columns.iter().any(|c| c.name.as_str() == "id")
+        && common_prisma_m_to_n_relation_conditions(table)
+}
+
+fn common_prisma_m_to_n_relation_conditions(table: &Table) -> bool {
+    fn is_a(column: &String) -> bool {
+        column.to_lowercase() == "a"
+    }
+
+    fn is_b(column: &String) -> bool {
+        column.to_lowercase() == "b"
+    }
+
+    table.name.starts_with("_")
+        //UNIQUE INDEX [A,B]
+        && table.indices.iter().any(|i| {
+            i.columns.len() == 2
+                && is_a(&i.columns[0])
+                && is_b(&i.columns[1])
+                && i.tpe == IndexType::Unique
+        })
+        //INDEX [B]
+        && table
+            .indices
+            .iter()
+            .any(|i| i.columns.len() == 1 && is_b(&i.columns[0]) && i.tpe == IndexType::Normal)
+        // 2 FKs
         && table.foreign_keys.len() == 2
-        && table.foreign_keys[0].referenced_table < table.foreign_keys[1].referenced_table
-        && table.name.starts_with("_")
-        && table
-            .columns
-            .iter()
-            .find(|column| column.name.to_lowercase() == "a")
-            .is_some()
-        && table
-            .columns
-            .iter()
-            .find(|column| column.name.to_lowercase() == "b")
-            .is_some()
-        && table
-            .columns
-            .iter()
-            .find(|column| column.name.to_lowercase() == "id")
-            .is_some()
-        && table.indices.len() >= 1
+        // Lexicographically lower model referenced by A
+        && if table.foreign_keys[0].referenced_table <= table.foreign_keys[1].referenced_table {
+            is_a(&table.foreign_keys[0].columns[0]) && is_b(&table.foreign_keys[1].columns[0])
+        } else {
+            is_b(&table.foreign_keys[0].columns[0]) && is_a(&table.foreign_keys[1].columns[0])
+        }
 }
 
 pub(crate) fn is_foreign_key_column(table: &Table, column: &Column) -> bool {
