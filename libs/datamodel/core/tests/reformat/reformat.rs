@@ -129,3 +129,32 @@ model a {
     // FIXME: 2. The floating comments are not present in the dml representation at all. They get lost.
     //    assert_eq!(expected, actual);
 }
+
+#[test]
+fn reformatting_enums_must_work() {
+    let input = r#"
+enum Colors {
+  RED
+  BLUE
+  GREEN
+  
+  // comment
+  ORANGE
+}
+"#;
+
+    // moving the comment to the top is not ideal. Just want to capture the current behavior in a test.
+    let expected = r#"// comment
+enum Colors {
+  RED
+  BLUE
+  GREEN
+  ORANGE
+}"#;
+
+    let mut buf = Vec::new();
+    datamodel::ast::reformat::Reformatter::reformat_to(&input, &mut buf, 2);
+    let actual = str::from_utf8(&buf).expect("unable to convert to string");
+    println!("{}", actual);
+    assert_eq!(actual, expected);
+}
