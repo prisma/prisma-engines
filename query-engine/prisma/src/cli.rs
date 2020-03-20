@@ -106,7 +106,7 @@ impl CliCommand {
     }
 
     fn get_config(input: String) -> PrismaResult<()> {
-        let config = load_configuration(&input, false)?;
+        let config = load_configuration(&input, true)?;
         let json = datamodel::json::mcf::config_to_mcf_json_value(&config);
         let serialized = serde_json::to_string(&json)?;
 
