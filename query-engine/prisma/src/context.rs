@@ -77,7 +77,9 @@ impl PrismaContext {
         datamodel: String,
         overwrite_datasources: Option<String>,
     ) -> PrismaResult<Self> {
-        let dm = datamodel::parse_datamodel(&datamodel)?;
+        let dm = datamodel::parse_datamodel(&datamodel)
+            .map_err(|errors| PrismaError::ConversionError(errors, datamodel.clone()))?;
+
         let config = configuration::load(&datamodel, overwrite_datasources, false)?;
         let template = DatamodelConverter::convert(&dm);
 
