@@ -3,22 +3,22 @@ extern crate log;
 #[macro_use]
 extern crate rust_embed;
 
-use std::{convert::TryFrom, error::Error, net::SocketAddr, process};
-
-use structopt::StructOpt;
-use tracing::subscriber;
-use tracing_log::LogTracer;
-use tracing_subscriber::{EnvFilter, FmtSubscriber};
-
 use cli::*;
 use error::*;
 use once_cell::sync::Lazy;
 use request_handlers::{PrismaRequest, PrismaResponse, RequestHandler};
 use server::HttpServer;
+use std::{
+    convert::TryFrom, error::Error, ffi::OsStr, fs::File, io::Read, net::SocketAddr, process,
+};
+use structopt::StructOpt;
+use tracing::subscriber;
+use tracing_log::LogTracer;
+use tracing_subscriber::{EnvFilter, FmtSubscriber};
 
 mod cli;
+mod configuration;
 mod context;
-mod data_model_loader;
 mod dmmf;
 mod error;
 mod exec_loader;
@@ -26,7 +26,6 @@ mod request_handlers;
 mod server;
 #[cfg(test)]
 mod tests;
-mod utilities;
 
 #[derive(Debug, Clone, PartialEq, Copy)]
 pub enum LogFormat {
@@ -60,11 +59,6 @@ pub struct DmmfToDmlInput {
 }
 
 #[derive(Debug, Clone, StructOpt)]
-pub struct GetConfigInput {
-    pub path: String,
-}
-
-#[derive(Debug, Clone, StructOpt)]
 pub struct ExecuteRequestInput {
     /// GraphQL query to execute
     pub query: String,
@@ -78,9 +72,33 @@ pub enum CliOpt {
     /// Output the DMMF from the loaded data model.
     Dmmf,
     /// Get the configuration from the given data model.
-    GetConfig(GetConfigInput),
+    GetConfig,
     /// Executes one request and then terminates.
     ExecuteRequest(ExecuteRequestInput),
+}
+
+pub fn parse_base64_string(s: &str) -> PrismaResult<String> {
+    match base64::decode(s) {
+        Ok(bytes) => String::from_utf8(bytes).map_err(|e| {
+            trace!("Error decoding {} from Base64 (invalid UTF-8): {:?}", s, e);
+
+            PrismaError::ConfigurationError("Invalid Base64".into())
+        }),
+        Err(e) => {
+            trace!("Decoding Base64 failed (might not be encoded): {:?}", e);
+            Ok(String::from(s))
+        }
+    }
+}
+
+pub fn load_datamodel_file(path: &OsStr) -> String {
+    let mut f = File::open(path).expect(&format!("Could not open datamodel file {:?}", path));
+    let mut datamodel = String::new();
+
+    f.read_to_string(&mut datamodel)
+        .expect(&format!("Could not read datamodel file: {:?}", path));
+
+    datamodel
 }
 
 #[derive(Debug, StructOpt, Clone)]
@@ -92,6 +110,15 @@ pub struct PrismaOpt {
     /// The port the query engine should bind to.
     #[structopt(long, short, env, default_value = "4466")]
     port: u16,
+    /// Path to the Prisma datamodel file
+    #[structopt(long, env = "PRISMA_DML_PATH", parse(from_os_str = load_datamodel_file))]
+    datamodel_path: Option<String>,
+    /// Base64 encoded Prisma datamodel
+    #[structopt(long, env = "PRISMA_DML", parse(try_from_str = parse_base64_string))]
+    datamodel: Option<String>,
+    /// Base64 encoded datasources, overwriting the ones in the datamodel
+    #[structopt(long, env, parse(try_from_str = parse_base64_string))]
+    overwrite_datasources: Option<String>,
     /// Switches query schema generation to Prisma 1 compatible mode.
     #[structopt(long, short)]
     legacy: bool,
@@ -129,8 +156,14 @@ async fn main() -> Result<(), AnyError> {
             eprintln!("Printing to stderr for debugging");
             eprintln!("Listening on {}:{}", opts.host, opts.port);
 
-            let builder = HttpServer::builder()
+            let datamodel = opts
+                .datamodel
+                .xor(opts.datamodel_path)
+                .expect("Datamodel should be provided either as path or base64-encoded string.");
+
+            let builder = HttpServer::builder(datamodel)
                 .legacy(opts.legacy)
+                .overwrite_datasources(opts.overwrite_datasources)
                 .enable_raw_queries(opts.enable_raw_queries)
                 .enable_playground(opts.enable_playground)
                 .force_transactions(opts.always_force_transactions);
