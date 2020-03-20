@@ -675,6 +675,7 @@ fn get_column_type<'a>(
         "float8" | "_float8" => Float,
         "bool" | "_bool" => Boolean,
         "text" | "_text" => String,
+        "citext" | "_citext" => String,
         "varchar" | "_varchar" => String,
         "date" | "_date" => DateTime,
         "bytea" | "_bytea" => Binary,
