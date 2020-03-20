@@ -211,13 +211,13 @@ pub(crate) fn calculate_relation_field(
         _ if more_then_one_compound_to_same_table() => (
             format!(
                 "{}_{}",
-                foreign_key.referenced_table.clone().camel_case(),
+                foreign_key.referenced_table.clone(),
                 columns[0].name.clone()
             ),
             columns.iter().map(|c| c.name.clone()).collect(),
         ),
         _ => (
-            foreign_key.referenced_table.clone().camel_case(),
+            foreign_key.referenced_table.clone(),
             columns.iter().map(|c| c.name.clone()).collect(),
         ),
     };
