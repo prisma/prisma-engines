@@ -19,7 +19,9 @@ fn parse_comments_without_crasing_or_loosing_info() {
     let schema = parse(dml);
     let user_model = schema.assert_has_model("User");
     user_model.assert_is_embedded(false);
-    user_model.assert_has_field("id").assert_base_type(&ScalarType::Int);
+    user_model
+        .assert_has_field("id")
+        .assert_base_type(&ScalarType::Int);
     user_model
         .assert_has_field("firstName")
         .assert_base_type(&ScalarType::String);
@@ -41,7 +43,9 @@ fn accept_a_comment_at_the_end() {
     let schema = parse(dml);
     let user_model = schema.assert_has_model("User");
     user_model.assert_is_embedded(false);
-    user_model.assert_has_field("id").assert_base_type(&ScalarType::Int);
+    user_model
+        .assert_has_field("id")
+        .assert_base_type(&ScalarType::Int);
 }
 
 #[test]
@@ -55,5 +59,22 @@ fn accept_a_doc_comment_at_the_end() {
     let schema = parse(dml);
     let user_model = schema.assert_has_model("User");
     user_model.assert_is_embedded(false);
-    user_model.assert_has_field("id").assert_base_type(&ScalarType::Int);
+    user_model
+        .assert_has_field("id")
+        .assert_base_type(&ScalarType::Int);
+}
+
+#[test]
+fn comments_must_work_in_enums() {
+    let dml = r#"
+    // Line 1
+    // Line 2
+    enum Role {
+      // Comment above
+      USER // Comment on the side
+      // Comment below
+    }"#;
+
+    // must not crash
+    let _ = parse(dml);
 }
