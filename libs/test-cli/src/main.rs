@@ -94,41 +94,33 @@ async fn main() -> anyhow::Result<()> {
                 ),
             };
 
-            let fut = async move {
-                let api = migration_core::migration_api(&datamodel_string).await?;
+            let api = migration_core::migration_api(&datamodel_string).await?;
 
-                let migration_id = "test-cli-migration".to_owned();
+            let migration_id = "test-cli-migration".to_owned();
 
-                let infer_input = migration_core::InferMigrationStepsInput {
-                    assume_applied_migrations: Some(Vec::new()),
-                    assume_to_be_applied: Some(Vec::new()),
-                    datamodel: datamodel_string.clone(),
-                    migration_id: migration_id.clone(),
-                };
-
-                api.reset(&serde_json::Value::Null).await?;
-
-                let result = api.infer_migration_steps(&infer_input).await?;
-
-                let apply_input = migration_core::ApplyMigrationInput {
-                    force,
-                    migration_id,
-                    steps: result.datamodel_steps,
-                };
-
-                let result = api.apply_migration(&apply_input).await?;
-                let warnings = result
-                    .warnings
-                    .into_iter()
-                    .map(|warning| warning.description)
-                    .collect();
-
-                Ok::<Vec<String>, anyhow::Error>(warnings)
+            let infer_input = migration_core::InferMigrationStepsInput {
+                assume_applied_migrations: Some(Vec::new()),
+                assume_to_be_applied: Some(Vec::new()),
+                datamodel: datamodel_string.clone(),
+                migration_id: migration_id.clone(),
             };
 
-            let mut rt = tokio::runtime::Runtime::new()?;
+            api.reset(&serde_json::Value::Null).await?;
 
-            let warnings = rt.block_on(fut)?;
+            let result = api.infer_migration_steps(&infer_input).await?;
+
+            let apply_input = migration_core::ApplyMigrationInput {
+                force,
+                migration_id,
+                steps: result.datamodel_steps,
+            };
+
+            let result = api.apply_migration(&apply_input).await?;
+            let warnings: Vec<_> = result
+                .warnings
+                .into_iter()
+                .map(|warning| warning.description)
+                .collect();
 
             if warnings.is_empty() {
                 eprintln!("{}", "✔️  migrated without warning".bold().green());
