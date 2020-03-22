@@ -175,6 +175,7 @@ impl Standardiser {
                 if !back_field_exists {
                     let relation_info = dml::RelationInfo {
                         to: model.name.clone(),
+                        fields: vec![],
                         to_fields: vec![],
                         name: rel.name.clone(),
                         on_delete: OnDeleteStrategy::None,

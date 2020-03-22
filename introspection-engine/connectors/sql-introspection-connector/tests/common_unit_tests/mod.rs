@@ -700,6 +700,7 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
                         field_type: FieldType::Relation(RelationInfo {
                             name: "".to_string(),
                             to: "City".to_string(),
+                            fields: todo!("fix virtual relation fields"),
                             to_fields: vec!["id".to_string()],
                             on_delete: OnDeleteStrategy::None,
                         }),
@@ -719,6 +720,7 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
                         field_type: FieldType::Relation(RelationInfo {
                             name: "".to_string(),
                             to: "City".to_string(),
+                            fields: todo!("fix virtual relation fields"),
                             to_fields: vec!["name".to_string()],
                             on_delete: OnDeleteStrategy::None,
                         }),
@@ -994,6 +996,7 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                         arity: FieldArity::List,
                         field_type: FieldType::Relation(RelationInfo {
                             to: "User".to_string(),
+                            fields: todo!("fix virtual relation fields"),
                             to_fields: vec![],
                             name: "CityToUser".to_string(),
                             on_delete: OnDeleteStrategy::None,
@@ -1042,6 +1045,7 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                         field_type: FieldType::Relation(RelationInfo {
                             name: "CityToUser".to_string(),
                             to: "City".to_string(),
+                            fields: todo!("fix virtual relation fields"),
                             to_fields: vec!["id".to_string()],
                             on_delete: OnDeleteStrategy::None,
                         }),

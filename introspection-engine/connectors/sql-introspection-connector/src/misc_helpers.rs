@@ -79,6 +79,7 @@ pub fn calculate_many_to_many_field(
 ) -> Field {
     let field_type = FieldType::Relation(RelationInfo {
         name: relation_name,
+        fields: todo!("fix virtual relation fields"),
         to: foreign_key.referenced_table.clone(),
         to_fields: foreign_key.referenced_columns.clone(),
         on_delete: OnDeleteStrategy::None,
@@ -180,6 +181,7 @@ pub(crate) fn calculate_relation_field(
 
     let field_type = FieldType::Relation(RelationInfo {
         name: calculate_relation_name(schema, foreign_key, table),
+        fields: todo!("fix virtual relation fields"),
         to: foreign_key.referenced_table.clone(),
         to_fields: foreign_key.referenced_columns.clone(),
         on_delete: OnDeleteStrategy::None,
@@ -257,6 +259,7 @@ pub(crate) fn calculate_backrelation_field(
     let field_type = FieldType::Relation(RelationInfo {
         name: relation_info.name.clone(),
         to: model.name.clone(),
+        fields: todo!("fix virtual relation fields"),
         to_fields: vec![],
         on_delete,
     });
@@ -441,6 +444,7 @@ pub(crate) fn calculate_field_type(
 
             FieldType::Relation(RelationInfo {
                 name: calculate_relation_name(schema, fk, table),
+                fields: todo!("fix virtual relation fields"),
                 to: fk.referenced_table.clone(),
                 to_fields: vec![referenced_col.clone()],
                 on_delete: OnDeleteStrategy::None,

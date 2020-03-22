@@ -5,7 +5,9 @@ use super::Parsable;
 pub struct RelationInfo {
     /// The target model of the relation.
     pub to: String,
-    /// The target field of the relation.
+    /// The fields forming the relation.
+    pub fields: Vec<String>,
+    /// The target field of the relation a.k.a. `references`
     pub to_fields: Vec<String>,
     /// The name of the relation. Internally, an empty string signals no name.
     pub name: String,
@@ -20,6 +22,7 @@ impl RelationInfo {
     pub fn new(to: &str) -> RelationInfo {
         RelationInfo {
             to: String::from(to),
+            fields: Vec::new(),
             to_fields: Vec::new(),
             name: String::new(),
             on_delete: OnDeleteStrategy::None,
