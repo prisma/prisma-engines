@@ -285,7 +285,8 @@ impl Standardiser {
                         self.get_datasource_fields_for_enum_field(&field)
                     }
                     dml::FieldType::Relation(rel_info) => {
-                        self.get_datasource_fields_for_relation_field(&field, &rel_info, &datamodel)
+                        //                        self.get_datasource_fields_for_relation_field(&field, &rel_info, &datamodel)
+                        self.get_datasource_fields_for_relation_field_new(&model, &field, &rel_info)
                     }
                     dml::FieldType::ConnectorSpecific(_) => unimplemented!(
                         "ConnectorSpecific is not supported here as it will be removed soon."
@@ -345,6 +346,35 @@ impl Standardiser {
         vec![datasource_field]
     }
 
+    fn get_datasource_fields_for_relation_field_new(
+        &self,
+        model: &dml::Model,
+        field: &dml::Field,
+        rel_info: &dml::RelationInfo,
+    ) -> Vec<DataSourceField> {
+        rel_info
+            .fields
+            .iter()
+            .map(|base_field| {
+                let referenced_field = model.find_field(&base_field).expect(&format!(
+                    "the field {} was not found in the model {}",
+                    &base_field, &model.name
+                ));
+
+                match &referenced_field.field_type {
+                    dml::FieldType::Base(scalar_type, _) => dml::DataSourceField {
+                        name: referenced_field.final_single_database_name().to_owned(),
+                        field_type: *scalar_type,
+                        arity: field.arity,
+                        default_value: None,
+                    },
+                    x => unimplemented!("This must be a scalar type: {:?}", x),
+                }
+            })
+            .collect()
+    }
+
+    #[allow(unused)]
     fn get_datasource_fields_for_relation_field(
         &self,
         field: &dml::Field,
@@ -391,6 +421,7 @@ impl Standardiser {
             .collect()
     }
 
+    #[allow(unused)]
     fn final_db_names_for_relation_field(
         &self,
         field: &dml::Field,
