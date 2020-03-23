@@ -102,7 +102,9 @@ impl CliCommand {
     }
 
     fn dmmf(request: DmmfRequest) -> PrismaResult<()> {
-        let dm = datamodel::parse_datamodel_and_ignore_env_errors(&request.datamodel)?;
+        let dm = datamodel::parse_datamodel_and_ignore_env_errors(&request.datamodel)
+            .map_err(|errors| PrismaError::ConversionError(errors, request.datamodel.clone()))?;
+
         let template = DatamodelConverter::convert(&dm);
 
         // temporary code duplication
