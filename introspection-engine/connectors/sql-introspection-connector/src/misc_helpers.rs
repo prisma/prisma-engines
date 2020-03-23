@@ -113,15 +113,6 @@ pub(crate) fn calculate_index(index: &Index) -> IndexDefinition {
     index_definition
 }
 
-pub(crate) fn calculate_compound_index(index: &Index, name: String) -> IndexDefinition {
-    debug!("Handling compound index  {:?}", name);
-    IndexDefinition {
-        name: Some(index.name.clone()),
-        fields: vec![name],
-        tpe: datamodel::dml::IndexType::Normal,
-    }
-}
-
 pub(crate) fn calculate_scalar_field(table: &Table, column: &Column) -> Field {
     debug!("Handling column {:?}", column);
     let field_type = calculate_scalar_field_type(&column);
