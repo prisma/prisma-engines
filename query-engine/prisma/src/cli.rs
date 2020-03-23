@@ -1,11 +1,12 @@
 use crate::{
-    configuration,
     context::PrismaContext,
     dmmf,
     error::PrismaError,
+    opt::{CliOpt, PrismaOpt, Subcommand},
     request_handlers::{graphql::*, PrismaRequest, RequestHandler},
-    PrismaResult, {CliOpt, PrismaOpt, Subcommand},
+    PrismaResult,
 };
+use datamodel::{Configuration, Datamodel};
 use prisma_models::DatamodelConverter;
 use query_core::{
     schema::{QuerySchemaRef, SupportedCapabilities},
@@ -13,28 +14,23 @@ use query_core::{
 };
 use std::{collections::HashMap, convert::TryFrom, sync::Arc};
 
-#[derive(Debug)]
 pub struct ExecuteRequest {
     legacy: bool,
     query: String,
-    datamodel: String,
+    datamodel: Datamodel,
+    config: Configuration,
     force_transactions: bool,
     enable_raw_queries: bool,
-    overwrite_datasources: Option<String>,
 }
 
-#[derive(Debug)]
 pub struct DmmfRequest {
-    datamodel: String,
+    datamodel: Datamodel,
     build_mode: BuildMode,
     enable_raw_queries: bool,
-    overwrite_datasources: Option<String>,
 }
 
-#[derive(Debug)]
 pub struct GetConfigRequest {
-    datamodel: String,
-    overwrite_datasources: Option<String>,
+    config: Configuration,
 }
 
 pub enum CliCommand {
@@ -47,15 +43,10 @@ impl TryFrom<&PrismaOpt> for CliCommand {
     type Error = PrismaError;
 
     fn try_from(opts: &PrismaOpt) -> crate::PrismaResult<CliCommand> {
-        let subcommand = opts.subcommand.clone().ok_or_else(|| {
-            PrismaError::InvocationError(String::from("cli subcommand not present"))
-        })?;
-
-        let datamodel = opts
-            .datamodel
-            .clone()
-            .xor(opts.datamodel_path.clone())
-            .expect("Datamodel should be provided either as path or base64-encoded string.");
+        let subcommand = opts
+            .subcommand
+            .as_ref()
+            .ok_or_else(|| PrismaError::InvocationError(String::from("cli subcommand not present")))?;
 
         match subcommand {
             Subcommand::Cli(ref cliopts) => match cliopts {
@@ -67,23 +58,21 @@ impl TryFrom<&PrismaOpt> for CliCommand {
                     };
 
                     Ok(CliCommand::Dmmf(DmmfRequest {
-                        datamodel,
+                        datamodel: opts.datamodel(true)?,
                         build_mode,
                         enable_raw_queries: opts.enable_raw_queries,
-                        overwrite_datasources: opts.overwrite_datasources.clone(),
                     }))
                 }
                 CliOpt::GetConfig => Ok(CliCommand::GetConfig(GetConfigRequest {
-                    datamodel,
-                    overwrite_datasources: opts.overwrite_datasources.clone(),
+                    config: opts.configuration(true)?,
                 })),
                 CliOpt::ExecuteRequest(input) => Ok(CliCommand::ExecuteRequest(ExecuteRequest {
                     query: input.query.clone(),
                     force_transactions: opts.always_force_transactions,
-                    overwrite_datasources: opts.overwrite_datasources.clone(),
                     enable_raw_queries: opts.enable_raw_queries,
                     legacy: input.legacy,
-                    datamodel,
+                    datamodel: opts.datamodel(false)?,
+                    config: opts.configuration(false)?,
                 })),
             },
         }
@@ -94,18 +83,13 @@ impl CliCommand {
     pub async fn execute(self) -> PrismaResult<()> {
         match self {
             CliCommand::Dmmf(request) => Self::dmmf(request),
-            CliCommand::GetConfig(input) => {
-                Self::get_config(input.datamodel, input.overwrite_datasources)
-            }
+            CliCommand::GetConfig(input) => Self::get_config(input.config),
             CliCommand::ExecuteRequest(request) => Self::execute_request(request).await,
         }
     }
 
     fn dmmf(request: DmmfRequest) -> PrismaResult<()> {
-        let dm = datamodel::parse_datamodel_and_ignore_env_errors(&request.datamodel)
-            .map_err(|errors| PrismaError::ConversionError(errors, request.datamodel.clone()))?;
-
-        let template = DatamodelConverter::convert(&dm);
+        let template = DatamodelConverter::convert(&request.datamodel);
 
         // temporary code duplication
         let internal_data_model = template.build("".into());
@@ -120,7 +104,7 @@ impl CliCommand {
 
         let query_schema: QuerySchemaRef = Arc::new(schema_builder.build());
 
-        let dmmf = dmmf::render_dmmf(&dm, query_schema);
+        let dmmf = dmmf::render_dmmf(&request.datamodel, query_schema);
         let serialized = serde_json::to_string_pretty(&dmmf)?;
 
         println!("{}", serialized);
@@ -128,8 +112,7 @@ impl CliCommand {
         Ok(())
     }
 
-    fn get_config(datamodel: String, overwrite_datasources: Option<String>) -> PrismaResult<()> {
-        let config = configuration::load(&datamodel, overwrite_datasources, true)?;
+    fn get_config(config: Configuration) -> PrismaResult<()> {
         let json = datamodel::json::mcf::config_to_mcf_json_value(&config);
         let serialized = serde_json::to_string(&json)?;
 
@@ -142,11 +125,10 @@ impl CliCommand {
         let decoded = base64::decode(&request.query)?;
         let decoded_request = String::from_utf8(decoded)?;
 
-        let ctx = PrismaContext::builder(request.datamodel)
+        let ctx = PrismaContext::builder(request.config, request.datamodel)
             .legacy(request.legacy)
             .force_transactions(request.force_transactions)
             .enable_raw_queries(request.enable_raw_queries)
-            .overwrite_datasources(request.overwrite_datasources)
             .build()
             .await?;
 

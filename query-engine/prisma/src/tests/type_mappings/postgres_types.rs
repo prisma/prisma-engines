@@ -780,8 +780,7 @@ const CREATE_TYPES_TABLE_WITH_ARRAY_DEFAULTS: &str = indoc! {
 
 #[test_each_connector(tags("postgres"), log = "debug")]
 async fn postgres_db_level_array_defaults_work(api: &TestApi) -> TestResult {
-    api.execute_sql(CREATE_TYPES_TABLE_WITH_ARRAY_DEFAULTS)
-        .await?;
+    api.execute_sql(CREATE_TYPES_TABLE_WITH_ARRAY_DEFAULTS).await?;
 
     let (_datamodel, engine) = api.introspect_and_start_query_engine().await?;
 

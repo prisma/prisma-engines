@@ -102,13 +102,7 @@ fn get_query_schema(datamodel_string: &str) -> (QuerySchema, datamodel::dml::Dat
     let internal_ref = internal_dm_template.build("db".to_owned());
     let supported_capabilities = SupportedCapabilities::empty();
     (
-        QuerySchemaBuilder::new(
-            &internal_ref,
-            &supported_capabilities,
-            BuildMode::Modern,
-            false,
-        )
-        .build(),
+        QuerySchemaBuilder::new(&internal_ref, &supported_capabilities, BuildMode::Modern, false).build(),
         dm,
     )
 }

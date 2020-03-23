@@ -7,6 +7,7 @@ use crate::{
     },
     PrismaResult,
 };
+use datamodel::{Configuration, Datamodel};
 use hyper::header;
 use hyper::service::{make_service_fn, service_fn};
 use hyper::{Body, Error, Method, Request, Response, Server, StatusCode};
@@ -32,12 +33,12 @@ impl RequestContext {
 }
 
 pub struct HttpServerBuilder {
-    datamodel: String,
+    config: Configuration,
+    datamodel: Datamodel,
     legacy_mode: bool,
     force_transactions: bool,
     enable_raw_queries: bool,
     enable_playground: bool,
-    overwrite_datasources: Option<String>,
 }
 
 impl HttpServerBuilder {
@@ -61,17 +62,11 @@ impl HttpServerBuilder {
         self
     }
 
-    pub fn overwrite_datasources(mut self, val: Option<String>) -> Self {
-        self.overwrite_datasources = val;
-        self
-    }
-
     pub async fn build_and_run(self, address: SocketAddr) -> PrismaResult<()> {
-        let ctx = PrismaContext::builder(self.datamodel)
+        let ctx = PrismaContext::builder(self.config, self.datamodel)
             .legacy(self.legacy_mode)
             .force_transactions(self.force_transactions)
             .enable_raw_queries(self.enable_raw_queries)
-            .overwrite_datasources(self.overwrite_datasources)
             .build()
             .await?;
 
@@ -82,22 +77,18 @@ impl HttpServerBuilder {
 pub struct HttpServer;
 
 impl HttpServer {
-    pub fn builder(datamodel: String) -> HttpServerBuilder {
+    pub fn builder(config: Configuration, datamodel: Datamodel) -> HttpServerBuilder {
         HttpServerBuilder {
+            config,
             datamodel,
             legacy_mode: false,
             force_transactions: false,
             enable_raw_queries: false,
             enable_playground: false,
-            overwrite_datasources: None,
         }
     }
 
-    async fn run(
-        address: SocketAddr,
-        context: PrismaContext,
-        enable_playground: bool,
-    ) -> PrismaResult<()> {
+    async fn run(address: SocketAddr, context: PrismaContext, enable_playground: bool) -> PrismaResult<()> {
         let now = Instant::now();
 
         let ctx = Arc::new(RequestContext {
@@ -122,10 +113,7 @@ impl HttpServer {
         Ok(())
     }
 
-    async fn routes(
-        ctx: Arc<RequestContext>,
-        req: Request<Body>,
-    ) -> std::result::Result<Response<Body>, Error> {
+    async fn routes(ctx: Arc<RequestContext>, req: Request<Body>) -> std::result::Result<Response<Body>, Error> {
         let start = Instant::now();
 
         let mut res = match (req.method(), req.uri().path()) {
@@ -176,10 +164,7 @@ impl HttpServer {
         Ok(res)
     }
 
-    async fn http_handler(
-        req: PrismaRequest<GraphQlBody>,
-        cx: Arc<RequestContext>,
-    ) -> Response<Body> {
+    async fn http_handler(req: PrismaRequest<GraphQlBody>, cx: Arc<RequestContext>) -> Response<Body> {
         let result = cx.graphql_request_handler.handle(req, cx.context()).await;
         let bytes = serde_json::to_vec(&result).unwrap();
 
@@ -226,10 +211,7 @@ impl HttpServer {
     /// Renders the Data Model Meta Format.
     /// Only callable if prisma was initialized using a v2 data model.
     fn dmmf_handler(cx: Arc<RequestContext>) -> Response<Body> {
-        let dmmf = dmmf::render_dmmf(
-            cx.context.datamodel(),
-            Arc::clone(cx.context.query_schema()),
-        );
+        let dmmf = dmmf::render_dmmf(cx.context.datamodel(), Arc::clone(cx.context.query_schema()));
 
         let bytes = serde_json::to_vec(&dmmf).unwrap();
 
