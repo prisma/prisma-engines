@@ -78,6 +78,18 @@ impl DirectiveValidator<dml::Field> for RelationDirectiveValidator {
             relation_fields.sort();
             all_related_ids.sort();
 
+            if !relation_info.fields.is_empty() {
+                let mut fields: Vec<ast::Expression> = Vec::new();
+                for field in &relation_info.fields {
+                    fields.push(ast::Expression::ConstantValue(
+                        field.clone(),
+                        ast::Span::empty(),
+                    ));
+                }
+
+                args.push(ast::Argument::new_array("fields", fields));
+            }
+
             // if we are on the physical field
             if !relation_info.to_fields.is_empty() {
                 let mut related_fields: Vec<ast::Expression> =
