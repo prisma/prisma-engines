@@ -1,6 +1,7 @@
 // Super cool postgres source.
 datasource pg1 {
   provider = "postgresql"
+  // The url to the database
   url      = "https://localhost/postgres1"
 }
 

@@ -151,6 +151,7 @@ fn test_parser_renderer_sources_via_ast() {
 const DATAMODEL_WITH_SOURCE_AND_COMMENTS: &str = r#"// Super cool postgres source.
 datasource pg1 {
   provider = "postgres"
+  // This points to the postgres instance.
   url      = "https://localhost/postgres1"
 }
 
