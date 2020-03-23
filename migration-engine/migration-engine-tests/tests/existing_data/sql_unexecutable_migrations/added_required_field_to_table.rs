@@ -1,6 +1,6 @@
 use migration_engine_tests::sql::*;
 
-#[test_each_connector]
+#[test_each_connector(tags("sql"))]
 async fn adding_a_required_field_to_an_existing_table_with_data_without_a_default_is_unexecutable(
     api: &TestApi,
 ) -> TestResult {
@@ -27,8 +27,11 @@ async fn adding_a_required_field_to_an_existing_table_with_data_without_a_defaul
         }
     "#;
 
-    // TODO: flip this
-    api.infer_apply(&dm2).send_assert().await?.assert_green()?;
+    api.infer_apply(&dm2)
+        .force(Some(false))
+        .send_assert()
+        .await?
+        .assert_unexecutable(&[format!("Added the required column `age` to the `Test` table without a default value. There are Some(1) rows in this table, it is not possible.")])?;
 
     let rows = api.select("Test").column("id").column("name").send_debug().await?;
     assert_eq!(rows, &[&[r#"Text("abc")"#, r#"Text("george")"#]]);
@@ -36,7 +39,7 @@ async fn adding_a_required_field_to_an_existing_table_with_data_without_a_defaul
     Ok(())
 }
 
-#[test_each_connector]
+#[test_each_connector(tags("sql"))]
 async fn adding_a_required_field_with_a_default_to_an_existing_table_works(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Test {

@@ -322,7 +322,7 @@ async fn mysql_floats_do_not_lose_precision(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector(tags("mysql"), log = "debug")]
+#[test_each_connector(tags("mysql"))]
 async fn all_mysql_identifier_types_work(api: &TestApi) -> TestResult {
     let identifier_types = &[
         ("tinyint", "12", ""),
@@ -346,11 +346,7 @@ async fn all_mysql_identifier_types_work(api: &TestApi) -> TestResult {
         ("text", "\"dolphins\"", "(100)"),
         ("mediumtext", "\"medium dolphins\"", "(100)"),
         ("longtext", "\"long dolphins\"", "(100)"),
-        (
-            "enum('pollicle_dogs','jellicle_cats')",
-            "\"jellicle_cats\"",
-            "",
-        ),
+        ("enum('pollicle_dogs','jellicle_cats')", "\"jellicle_cats\"", ""),
         // ("json", "\"{\\\"name\\\": null}\"", ""),
     ];
 
@@ -384,10 +380,7 @@ async fn all_mysql_identifier_types_work(api: &TestApi) -> TestResult {
 
             let response = engine.request(query).await;
 
-            let expected_response = format!(
-                r#"{{"data":{{"createOnepk_test":{{"id":{}}}}}}}"#,
-                identifier_value
-            );
+            let expected_response = format!(r#"{{"data":{{"createOnepk_test":{{"id":{}}}}}}}"#, identifier_value);
             assert_eq!(response.to_string(), expected_response);
         }
     }

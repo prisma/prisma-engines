@@ -13,7 +13,8 @@ async fn foreign_keys_to_indexes_being_renamed_must_work(api: &TestApi) -> TestR
 
         model Post {
             id String @id
-            author User @relation(references: name)
+            author String
+            author_rel User @relation(fields: [author], references: name)
         }
     "#;
 
@@ -50,7 +51,8 @@ async fn foreign_keys_to_indexes_being_renamed_must_work(api: &TestApi) -> TestR
 
         model Post {
             id String @id
-            author User @relation(references: name)
+            author String
+            author_rel User @relation(fields: [author], references: name)
         }
     "#;
 
