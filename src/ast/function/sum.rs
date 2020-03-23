@@ -14,7 +14,6 @@ pub struct Sum<'a> {
 /// let (sql, _) = Sqlite::build(query);
 /// assert_eq!("SELECT SUM(`age`) AS `sum` FROM `users`", sql);
 /// ```
-#[inline]
 pub fn sum<'a, C>(col: C) -> Function<'a>
 where
     C: Into<Column<'a>>,

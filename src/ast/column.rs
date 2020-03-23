@@ -40,7 +40,6 @@ macro_rules! col {
 }
 
 impl<'a> From<Column<'a>> for DatabaseValue<'a> {
-    #[inline]
     fn from(col: Column<'a>) -> Self {
         DatabaseValue::Column(Box::new(col))
     }
@@ -48,7 +47,6 @@ impl<'a> From<Column<'a>> for DatabaseValue<'a> {
 
 impl<'a> Column<'a> {
     /// Create a column definition.
-    #[inline]
     pub fn new<S>(name: S) -> Self
     where
         S: Into<Cow<'a, str>>,
@@ -60,7 +58,6 @@ impl<'a> Column<'a> {
     }
 
     /// Include the table name in the column expression.
-    #[inline]
     pub fn table<T>(mut self, table: T) -> Self
     where
         T: Into<Table<'a>>,
@@ -70,7 +67,6 @@ impl<'a> Column<'a> {
     }
 
     /// Include the table name in the column expression, if table is defined.
-    #[inline]
     pub fn opt_table<T>(mut self, table: Option<T>) -> Self
     where
         T: Into<Table<'a>>,
@@ -83,7 +79,6 @@ impl<'a> Column<'a> {
     }
 
     /// Give the column an alias in the query.
-    #[inline]
     pub fn alias<S>(mut self, alias: S) -> Self
     where
         S: Into<Cow<'a, str>>,
@@ -94,7 +89,6 @@ impl<'a> Column<'a> {
 }
 
 impl<'a> From<&'a str> for Column<'a> {
-    #[inline]
     fn from(s: &'a str) -> Self {
         Column {
             name: s.into(),
@@ -104,14 +98,12 @@ impl<'a> From<&'a str> for Column<'a> {
 }
 
 impl<'a, 'b> From<&'a &'b str> for Column<'b> {
-    #[inline]
     fn from(s: &'a &'b str) -> Self {
         Column::from(*s)
     }
 }
 
 impl<'a> From<String> for Column<'a> {
-    #[inline]
     fn from(s: String) -> Self {
         Column {
             name: s.into(),
@@ -125,7 +117,6 @@ where
     T: Into<Table<'a>>,
     C: Into<Column<'a>>,
 {
-    #[inline]
     fn from(t: (T, C)) -> Column<'a> {
         let mut column: Column<'a> = t.1.into();
         column = column.table(t.0);

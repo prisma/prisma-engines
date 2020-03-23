@@ -8,7 +8,6 @@ pub struct Delete<'a> {
 }
 
 impl<'a> From<Delete<'a>> for Query<'a> {
-    #[inline]
     fn from(delete: Delete<'a>) -> Self {
         Query::Delete(Box::new(delete))
     }
@@ -24,7 +23,6 @@ impl<'a> Delete<'a> {
     ///
     /// assert_eq!("DELETE FROM `users`", sql);
     /// ```
-    #[inline]
     pub fn from_table<T>(table: T) -> Self
     where
         T: Into<Table<'a>>,

@@ -18,7 +18,6 @@ pub struct AggregateToString<'a> {
 /// let (sql, _) = Sqlite::build(query);
 /// assert_eq!("SELECT GROUP_CONCAT(`firstName`) FROM `users` GROUP BY `firstName`", sql);
 /// ```
-#[inline]
 pub fn aggregate_to_string<'a, T>(expr: T) -> Function<'a>
 where
     T: Into<DatabaseValue<'a>>,

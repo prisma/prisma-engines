@@ -12,7 +12,6 @@ pub enum Expression<'a> {
 }
 
 impl<'a> From<Select<'a>> for Expression<'a> {
-    #[inline]
     fn from(sel: Select<'a>) -> Expression<'a> {
         Expression::Value(Box::new(DatabaseValue::from(sel)))
     }

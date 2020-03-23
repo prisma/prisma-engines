@@ -15,7 +15,6 @@ pub struct Count<'a> {
 /// let (sql, _) = Sqlite::build(query);
 /// assert_eq!("SELECT COUNT(*) FROM `users`", sql);
 /// ```
-#[inline]
 pub fn count<'a, T>(expr: T) -> Function<'a>
 where
     T: Into<DatabaseValue<'a>>,

@@ -41,7 +41,6 @@ pub enum OnConflict {
 }
 
 impl<'a> From<Insert<'a>> for Query<'a> {
-    #[inline]
     fn from(insert: Insert<'a>) -> Self {
         Query::Insert(Box::new(insert))
     }
@@ -66,7 +65,6 @@ impl<'a> From<SingleRowInsert<'a>> for Insert<'a> {
 }
 
 impl<'a> From<MultiRowInsert<'a>> for Insert<'a> {
-    #[inline]
     fn from(insert: MultiRowInsert<'a>) -> Self {
         Insert {
             table: insert.table,
@@ -79,14 +77,12 @@ impl<'a> From<MultiRowInsert<'a>> for Insert<'a> {
 }
 
 impl<'a> From<SingleRowInsert<'a>> for Query<'a> {
-    #[inline]
     fn from(insert: SingleRowInsert<'a>) -> Query<'a> {
         Query::from(Insert::from(insert))
     }
 }
 
 impl<'a> From<MultiRowInsert<'a>> for Query<'a> {
-    #[inline]
     fn from(insert: MultiRowInsert<'a>) -> Query<'a> {
         Query::from(Insert::from(insert))
     }
@@ -102,7 +98,6 @@ impl<'a> Insert<'a> {
     ///
     /// assert_eq!("INSERT INTO `users` DEFAULT VALUES", sql);
     /// ```
-    #[inline]
     pub fn single_into<T>(table: T) -> SingleRowInsert<'a>
     where
         T: Into<Table<'a>>,
@@ -115,7 +110,6 @@ impl<'a> Insert<'a> {
     }
 
     /// Creates a new multi row `INSERT` statement for the given table.
-    #[inline]
     pub fn multi_into<T, K, I>(table: T, columns: I) -> MultiRowInsert<'a>
     where
         T: Into<Table<'a>>,
@@ -130,7 +124,6 @@ impl<'a> Insert<'a> {
     }
 
     /// Sets the conflict resolution strategy.
-    #[inline]
     pub fn on_conflict(mut self, on_conflict: OnConflict) -> Self {
         self.on_conflict = Some(on_conflict);
         self

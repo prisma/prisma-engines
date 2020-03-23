@@ -8,7 +8,6 @@ pub struct Row<'a> {
 }
 
 impl<'a> Row<'a> {
-    #[inline]
     pub fn new() -> Self {
         Row { values: Vec::new() }
     }
@@ -86,7 +85,6 @@ where
     B: Into<DatabaseValue<'a>>,
     C: Into<DatabaseValue<'a>>,
 {
-    #[inline]
     fn from(vals: (A, B, C)) -> Self {
         let mut row = Row::with_capacity(3);
 
@@ -105,7 +103,6 @@ where
     C: Into<DatabaseValue<'a>>,
     D: Into<DatabaseValue<'a>>,
 {
-    #[inline]
     fn from(vals: (A, B, C, D)) -> Self {
         let mut row = Row::with_capacity(4);
 
@@ -126,7 +123,6 @@ where
     D: Into<DatabaseValue<'a>>,
     E: Into<DatabaseValue<'a>>,
 {
-    #[inline]
     fn from(vals: (A, B, C, D, E)) -> Self {
         let mut row = Row::with_capacity(5);
 
@@ -141,7 +137,6 @@ where
 }
 
 impl<'a> Comparable<'a> for Row<'a> {
-    #[inline]
     fn equals<T>(self, comparison: T) -> Compare<'a>
     where
         T: Into<DatabaseValue<'a>>,
@@ -150,7 +145,6 @@ impl<'a> Comparable<'a> for Row<'a> {
         value.equals(comparison)
     }
 
-    #[inline]
     fn not_equals<T>(self, comparison: T) -> Compare<'a>
     where
         T: Into<DatabaseValue<'a>>,
@@ -159,7 +153,6 @@ impl<'a> Comparable<'a> for Row<'a> {
         value.not_equals(comparison)
     }
 
-    #[inline]
     fn less_than<T>(self, comparison: T) -> Compare<'a>
     where
         T: Into<DatabaseValue<'a>>,
@@ -168,7 +161,6 @@ impl<'a> Comparable<'a> for Row<'a> {
         value.less_than(comparison)
     }
 
-    #[inline]
     fn less_than_or_equals<T>(self, comparison: T) -> Compare<'a>
     where
         T: Into<DatabaseValue<'a>>,
@@ -177,7 +169,6 @@ impl<'a> Comparable<'a> for Row<'a> {
         value.less_than_or_equals(comparison)
     }
 
-    #[inline]
     fn greater_than<T>(self, comparison: T) -> Compare<'a>
     where
         T: Into<DatabaseValue<'a>>,
@@ -186,7 +177,6 @@ impl<'a> Comparable<'a> for Row<'a> {
         value.greater_than(comparison)
     }
 
-    #[inline]
     fn greater_than_or_equals<T>(self, comparison: T) -> Compare<'a>
     where
         T: Into<DatabaseValue<'a>>,
@@ -195,7 +185,6 @@ impl<'a> Comparable<'a> for Row<'a> {
         value.greater_than_or_equals(comparison)
     }
 
-    #[inline]
     fn in_selection<T>(self, selection: T) -> Compare<'a>
     where
         T: Into<DatabaseValue<'a>>,
@@ -204,7 +193,6 @@ impl<'a> Comparable<'a> for Row<'a> {
         value.in_selection(selection)
     }
 
-    #[inline]
     fn not_in_selection<T>(self, selection: T) -> Compare<'a>
     where
         T: Into<DatabaseValue<'a>>,
@@ -213,7 +201,6 @@ impl<'a> Comparable<'a> for Row<'a> {
         value.not_in_selection(selection)
     }
 
-    #[inline]
     fn like<T>(self, pattern: T) -> Compare<'a>
     where
         T: Into<Cow<'a, str>>,
@@ -222,7 +209,6 @@ impl<'a> Comparable<'a> for Row<'a> {
         value.like(pattern)
     }
 
-    #[inline]
     fn not_like<T>(self, pattern: T) -> Compare<'a>
     where
         T: Into<Cow<'a, str>>,
@@ -231,7 +217,6 @@ impl<'a> Comparable<'a> for Row<'a> {
         value.not_like(pattern)
     }
 
-    #[inline]
     fn begins_with<T>(self, pattern: T) -> Compare<'a>
     where
         T: Into<Cow<'a, str>>,
@@ -240,7 +225,6 @@ impl<'a> Comparable<'a> for Row<'a> {
         value.begins_with(pattern)
     }
 
-    #[inline]
     fn not_begins_with<T>(self, pattern: T) -> Compare<'a>
     where
         T: Into<Cow<'a, str>>,
@@ -249,7 +233,6 @@ impl<'a> Comparable<'a> for Row<'a> {
         value.not_begins_with(pattern)
     }
 
-    #[inline]
     fn ends_into<T>(self, pattern: T) -> Compare<'a>
     where
         T: Into<Cow<'a, str>>,
@@ -258,7 +241,6 @@ impl<'a> Comparable<'a> for Row<'a> {
         value.ends_into(pattern)
     }
 
-    #[inline]
     fn not_ends_into<T>(self, pattern: T) -> Compare<'a>
     where
         T: Into<Cow<'a, str>>,
@@ -267,19 +249,16 @@ impl<'a> Comparable<'a> for Row<'a> {
         value.not_ends_into(pattern)
     }
 
-    #[inline]
     fn is_null(self) -> Compare<'a> {
         let value: DatabaseValue<'a> = self.into();
         value.is_null()
     }
 
-    #[inline]
     fn is_not_null(self) -> Compare<'a> {
         let value: DatabaseValue<'a> = self.into();
         value.is_not_null()
     }
 
-    #[inline]
     fn between<T, V>(self, left: T, right: V) -> Compare<'a>
     where
         T: Into<DatabaseValue<'a>>,
@@ -289,7 +268,6 @@ impl<'a> Comparable<'a> for Row<'a> {
         value.between(left, right)
     }
 
-    #[inline]
     fn not_between<T, V>(self, left: T, right: V) -> Compare<'a>
     where
         T: Into<DatabaseValue<'a>>,

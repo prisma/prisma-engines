@@ -15,14 +15,12 @@ pub struct Select<'a> {
 }
 
 impl<'a> From<Select<'a>> for DatabaseValue<'a> {
-    #[inline]
     fn from(sel: Select<'a>) -> DatabaseValue<'a> {
         DatabaseValue::Select(Box::new(sel))
     }
 }
 
 impl<'a> From<Select<'a>> for Query<'a> {
-    #[inline]
     fn from(sel: Select<'a>) -> Query<'a> {
         Query::Select(Box::new(sel))
     }
@@ -82,7 +80,6 @@ impl<'a> Select<'a> {
     ///     params
     /// );
     /// ```
-    #[inline]
     pub fn from_table<T>(table: T) -> Self
     where
         T: Into<Table<'a>>,

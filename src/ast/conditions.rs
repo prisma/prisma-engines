@@ -19,7 +19,6 @@ pub enum ConditionTree<'a> {
 
 impl<'a> ConditionTree<'a> {
     /// An `AND` statement, is true when both sides are true.
-    #[inline]
     pub fn and<E>(mut self, other: E) -> ConditionTree<'a>
     where
         E: Into<Expression<'a>>,
@@ -35,7 +34,6 @@ impl<'a> ConditionTree<'a> {
     }
 
     /// An `OR` statement, is true when one side is true.
-    #[inline]
     pub fn or<E>(mut self, other: E) -> ConditionTree<'a>
     where
         E: Into<Expression<'a>>,
@@ -51,7 +49,6 @@ impl<'a> ConditionTree<'a> {
     }
 
     /// A `NOT` statement, is true when the expression is false.
-    #[inline]
     pub fn not<E>(left: E) -> ConditionTree<'a>
     where
         E: Into<Expression<'a>>,
@@ -60,7 +57,6 @@ impl<'a> ConditionTree<'a> {
     }
 
     /// A single leaf, is true when the expression is true.
-    #[inline]
     pub fn single<E>(left: E) -> ConditionTree<'a>
     where
         E: Into<Expression<'a>>,
@@ -69,7 +65,6 @@ impl<'a> ConditionTree<'a> {
     }
 
     /// Inverts the entire condition tree if condition is met.
-    #[inline]
     pub fn invert_if(self, invert: bool) -> ConditionTree<'a> {
         if invert {
             self.not()
@@ -80,21 +75,18 @@ impl<'a> ConditionTree<'a> {
 }
 
 impl<'a> Default for ConditionTree<'a> {
-    #[inline]
     fn default() -> Self {
         ConditionTree::NoCondition
     }
 }
 
 impl<'a> From<ConditionTree<'a>> for Expression<'a> {
-    #[inline]
     fn from(ct: ConditionTree<'a>) -> Self {
         Expression::ConditionTree(ct)
     }
 }
 
 impl<'a> From<Select<'a>> for ConditionTree<'a> {
-    #[inline]
     fn from(sel: Select<'a>) -> Self {
         ConditionTree::single(Expression::Value(Box::new(sel.into())))
     }

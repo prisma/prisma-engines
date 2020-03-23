@@ -13,12 +13,10 @@ impl<'a> Grouping<'a> {
         self
     }
 
-    #[inline]
     pub fn new(values: Vec<GroupByDefinition<'a>>) -> Self {
         Self(values)
     }
 
-    #[inline]
     pub fn is_empty(&self) -> bool {
         self.0.is_empty()
     }
@@ -39,7 +37,6 @@ pub trait IntoGroupByDefinition<'a> {
 }
 
 impl<'a> IntoGroupByDefinition<'a> for &'a str {
-    #[inline]
     fn into_group_by_definition(self) -> GroupByDefinition<'a> {
         let column: Column = self.into();
         column.into()
@@ -47,7 +44,6 @@ impl<'a> IntoGroupByDefinition<'a> for &'a str {
 }
 
 impl<'a> IntoGroupByDefinition<'a> for (&'a str, &'a str) {
-    #[inline]
     fn into_group_by_definition(self) -> GroupByDefinition<'a> {
         let column: Column = self.into();
         column.into()
@@ -55,28 +51,24 @@ impl<'a> IntoGroupByDefinition<'a> for (&'a str, &'a str) {
 }
 
 impl<'a> IntoGroupByDefinition<'a> for Column<'a> {
-    #[inline]
     fn into_group_by_definition(self) -> GroupByDefinition<'a> {
         self.into()
     }
 }
 
 impl<'a> IntoGroupByDefinition<'a> for GroupByDefinition<'a> {
-    #[inline]
     fn into_group_by_definition(self) -> GroupByDefinition<'a> {
         self
     }
 }
 
 impl<'a> Groupable<'a> for Column<'a> {
-    #[inline]
     fn group(self) -> GroupByDefinition<'a> {
         self.into()
     }
 }
 
 impl<'a> Groupable<'a> for &'a str {
-    #[inline]
     fn group(self) -> GroupByDefinition<'a> {
         Column::from(self).group()
     }

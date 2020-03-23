@@ -45,7 +45,6 @@ macro_rules! function {
     ($($kind:ident),*) => (
         $(
             impl<'a> From<$kind<'a>> for Function<'a> {
-                #[inline]
                 fn from(f: $kind<'a>) -> Self {
                     Function {
                         typ_: FunctionType::$kind(f),
@@ -55,7 +54,6 @@ macro_rules! function {
             }
 
             impl<'a> From<$kind<'a>> for DatabaseValue<'a> {
-                #[inline]
                 fn from(f: $kind<'a>) -> Self {
                     Function::from(f).into()
                 }

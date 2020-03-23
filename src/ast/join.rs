@@ -44,7 +44,6 @@ impl<'a, U> Joinable<'a> for U
 where
     U: Into<Table<'a>>,
 {
-    #[inline]
     fn on<T>(self, conditions: T) -> JoinData<'a>
     where
         T: Into<ConditionTree<'a>>,

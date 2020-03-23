@@ -44,7 +44,6 @@ impl<'a> RowNumber<'a> {
 ///     sql
 /// );
 /// ```
-#[inline]
 pub fn row_number<'a>() -> RowNumber<'a> {
     RowNumber::default()
 }

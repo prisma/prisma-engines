@@ -375,7 +375,6 @@ pub enum DatabaseValue<'a> {
 ///     DatabaseValue::Asterisk(None)
 /// )
 /// ```
-#[inline]
 pub fn asterisk() -> DatabaseValue<'static> {
     DatabaseValue::Asterisk(None)
 }
@@ -397,14 +396,12 @@ impl<'a> From<String> for ParameterizedValue<'a> {
 }
 
 impl<'a> From<usize> for ParameterizedValue<'a> {
-    #[inline]
     fn from(that: usize) -> Self {
         ParameterizedValue::Integer(i64::try_from(that).unwrap())
     }
 }
 
 impl<'a> From<i32> for ParameterizedValue<'a> {
-    #[inline]
     fn from(that: i32) -> Self {
         ParameterizedValue::Integer(i64::try_from(that).unwrap())
     }
@@ -526,7 +523,6 @@ parameterized_value!(Uuid, Uuid);
 
 #[cfg(feature = "chrono-0_4")]
 impl<'a> From<DateTime<Utc>> for ParameterizedValue<'a> {
-    #[inline]
     fn from(that: DateTime<Utc>) -> Self {
         ParameterizedValue::DateTime(that)
     }
@@ -540,7 +536,6 @@ impl<'a> From<chrono::NaiveTime> for ParameterizedValue<'a> {
 }
 
 impl<'a> From<f64> for ParameterizedValue<'a> {
-    #[inline]
     fn from(that: f64) -> Self {
         // Decimal::from_f64 is buggy. See https://github.com/paupino/rust-decimal/issues/228
         let dec = Decimal::from_str(&that.to_string()).expect("f64 is not a Decimal");
@@ -549,7 +544,6 @@ impl<'a> From<f64> for ParameterizedValue<'a> {
 }
 
 impl<'a> From<f32> for ParameterizedValue<'a> {
-    #[inline]
     fn from(that: f32) -> Self {
         let dec = Decimal::from_f32(that).expect("f32 is not a Decimal");
         ParameterizedValue::Real(dec)
@@ -574,14 +568,12 @@ database_value!(Row, Row);
 database_value!(Function, Function);
 
 impl<'a> From<Values<'a>> for DatabaseValue<'a> {
-    #[inline]
     fn from(p: Values<'a>) -> Self {
         Self::Values(Box::new(p))
     }
 }
 
 impl<'a> From<SqlOp<'a>> for DatabaseValue<'a> {
-    #[inline]
     fn from(p: SqlOp<'a>) -> Self {
         Self::Op(Box::new(p))
     }
@@ -591,7 +583,6 @@ impl<'a, T> From<T> for DatabaseValue<'a>
 where
     T: Into<ParameterizedValue<'a>>,
 {
-    #[inline]
     fn from(p: T) -> Self {
         DatabaseValue::Parameterized(p.into())
     }
@@ -601,7 +592,6 @@ impl<'a, T> From<Vec<T>> for DatabaseValue<'a>
 where
     T: Into<DatabaseValue<'a>>,
 {
-    #[inline]
     fn from(v: Vec<T>) -> Self {
         let row: Row<'a> = v.into();
         row.into()
@@ -609,7 +599,6 @@ where
 }
 
 impl<'a> Comparable<'a> for DatabaseValue<'a> {
-    #[inline]
     fn equals<T>(self, comparison: T) -> Compare<'a>
     where
         T: Into<DatabaseValue<'a>>,
@@ -617,7 +606,6 @@ impl<'a> Comparable<'a> for DatabaseValue<'a> {
         Compare::Equals(Box::new(self), Box::new(comparison.into()))
     }
 
-    #[inline]
     fn not_equals<T>(self, comparison: T) -> Compare<'a>
     where
         T: Into<DatabaseValue<'a>>,
@@ -625,7 +613,6 @@ impl<'a> Comparable<'a> for DatabaseValue<'a> {
         Compare::NotEquals(Box::new(self), Box::new(comparison.into()))
     }
 
-    #[inline]
     fn less_than<T>(self, comparison: T) -> Compare<'a>
     where
         T: Into<DatabaseValue<'a>>,
@@ -633,7 +620,6 @@ impl<'a> Comparable<'a> for DatabaseValue<'a> {
         Compare::LessThan(Box::new(self), Box::new(comparison.into()))
     }
 
-    #[inline]
     fn less_than_or_equals<T>(self, comparison: T) -> Compare<'a>
     where
         T: Into<DatabaseValue<'a>>,
@@ -641,7 +627,6 @@ impl<'a> Comparable<'a> for DatabaseValue<'a> {
         Compare::LessThanOrEquals(Box::new(self), Box::new(comparison.into()))
     }
 
-    #[inline]
     fn greater_than<T>(self, comparison: T) -> Compare<'a>
     where
         T: Into<DatabaseValue<'a>>,
@@ -649,7 +634,6 @@ impl<'a> Comparable<'a> for DatabaseValue<'a> {
         Compare::GreaterThan(Box::new(self), Box::new(comparison.into()))
     }
 
-    #[inline]
     fn greater_than_or_equals<T>(self, comparison: T) -> Compare<'a>
     where
         T: Into<DatabaseValue<'a>>,
@@ -657,7 +641,6 @@ impl<'a> Comparable<'a> for DatabaseValue<'a> {
         Compare::GreaterThanOrEquals(Box::new(self), Box::new(comparison.into()))
     }
 
-    #[inline]
     fn in_selection<T>(self, selection: T) -> Compare<'a>
     where
         T: Into<DatabaseValue<'a>>,
@@ -665,7 +648,6 @@ impl<'a> Comparable<'a> for DatabaseValue<'a> {
         Compare::In(Box::new(self), Box::new(selection.into()))
     }
 
-    #[inline]
     fn not_in_selection<T>(self, selection: T) -> Compare<'a>
     where
         T: Into<DatabaseValue<'a>>,
@@ -673,7 +655,6 @@ impl<'a> Comparable<'a> for DatabaseValue<'a> {
         Compare::NotIn(Box::new(self), Box::new(selection.into()))
     }
 
-    #[inline]
     fn like<T>(self, pattern: T) -> Compare<'a>
     where
         T: Into<Cow<'a, str>>,
@@ -681,7 +662,6 @@ impl<'a> Comparable<'a> for DatabaseValue<'a> {
         Compare::Like(Box::new(self), pattern.into())
     }
 
-    #[inline]
     fn not_like<T>(self, pattern: T) -> Compare<'a>
     where
         T: Into<Cow<'a, str>>,
@@ -689,7 +669,6 @@ impl<'a> Comparable<'a> for DatabaseValue<'a> {
         Compare::NotLike(Box::new(self), pattern.into())
     }
 
-    #[inline]
     fn begins_with<T>(self, pattern: T) -> Compare<'a>
     where
         T: Into<Cow<'a, str>>,
@@ -697,7 +676,6 @@ impl<'a> Comparable<'a> for DatabaseValue<'a> {
         Compare::BeginsWith(Box::new(self), pattern.into())
     }
 
-    #[inline]
     fn not_begins_with<T>(self, pattern: T) -> Compare<'a>
     where
         T: Into<Cow<'a, str>>,
@@ -705,7 +683,6 @@ impl<'a> Comparable<'a> for DatabaseValue<'a> {
         Compare::NotBeginsWith(Box::new(self), pattern.into())
     }
 
-    #[inline]
     fn ends_into<T>(self, pattern: T) -> Compare<'a>
     where
         T: Into<Cow<'a, str>>,
@@ -713,7 +690,6 @@ impl<'a> Comparable<'a> for DatabaseValue<'a> {
         Compare::EndsInto(Box::new(self), pattern.into())
     }
 
-    #[inline]
     fn not_ends_into<T>(self, pattern: T) -> Compare<'a>
     where
         T: Into<Cow<'a, str>>,
@@ -721,17 +697,14 @@ impl<'a> Comparable<'a> for DatabaseValue<'a> {
         Compare::NotEndsInto(Box::new(self), pattern.into())
     }
 
-    #[inline]
     fn is_null(self) -> Compare<'a> {
         Compare::Null(Box::new(self))
     }
 
-    #[inline]
     fn is_not_null(self) -> Compare<'a> {
         Compare::NotNull(Box::new(self))
     }
 
-    #[inline]
     fn between<T, V>(self, left: T, right: V) -> Compare<'a>
     where
         T: Into<DatabaseValue<'a>>,
@@ -740,7 +713,6 @@ impl<'a> Comparable<'a> for DatabaseValue<'a> {
         Compare::Between(Box::new(self), Box::new(left.into()), Box::new(right.into()))
     }
 
-    #[inline]
     fn not_between<T, V>(self, left: T, right: V) -> Compare<'a>
     where
         T: Into<DatabaseValue<'a>>,

@@ -43,14 +43,12 @@ pub enum Compare<'a> {
 }
 
 impl<'a> From<Compare<'a>> for ConditionTree<'a> {
-    #[inline]
     fn from(cmp: Compare<'a>) -> Self {
         ConditionTree::single(Expression::from(cmp))
     }
 }
 
 impl<'a> From<Compare<'a>> for Expression<'a> {
-    #[inline]
     fn from(cmp: Compare<'a>) -> Self {
         Expression::Compare(cmp)
     }
@@ -398,7 +396,6 @@ impl<'a, U> Comparable<'a> for U
 where
     U: Into<Column<'a>>,
 {
-    #[inline]
     fn equals<T>(self, comparison: T) -> Compare<'a>
     where
         T: Into<DatabaseValue<'a>>,
@@ -409,7 +406,6 @@ where
         val.equals(comparison)
     }
 
-    #[inline]
     fn not_equals<T>(self, comparison: T) -> Compare<'a>
     where
         T: Into<DatabaseValue<'a>>,
@@ -419,7 +415,6 @@ where
         val.not_equals(comparison)
     }
 
-    #[inline]
     fn less_than<T>(self, comparison: T) -> Compare<'a>
     where
         T: Into<DatabaseValue<'a>>,
@@ -429,7 +424,6 @@ where
         val.less_than(comparison)
     }
 
-    #[inline]
     fn less_than_or_equals<T>(self, comparison: T) -> Compare<'a>
     where
         T: Into<DatabaseValue<'a>>,
@@ -439,7 +433,6 @@ where
         val.less_than_or_equals(comparison)
     }
 
-    #[inline]
     fn greater_than<T>(self, comparison: T) -> Compare<'a>
     where
         T: Into<DatabaseValue<'a>>,
@@ -449,7 +442,6 @@ where
         val.greater_than(comparison)
     }
 
-    #[inline]
     fn greater_than_or_equals<T>(self, comparison: T) -> Compare<'a>
     where
         T: Into<DatabaseValue<'a>>,
@@ -459,7 +451,6 @@ where
         val.greater_than_or_equals(comparison)
     }
 
-    #[inline]
     fn in_selection<T>(self, selection: T) -> Compare<'a>
     where
         T: Into<DatabaseValue<'a>>,
@@ -469,7 +460,6 @@ where
         val.in_selection(selection)
     }
 
-    #[inline]
     fn not_in_selection<T>(self, selection: T) -> Compare<'a>
     where
         T: Into<DatabaseValue<'a>>,
@@ -479,7 +469,6 @@ where
         val.not_in_selection(selection)
     }
 
-    #[inline]
     fn like<T>(self, pattern: T) -> Compare<'a>
     where
         T: Into<Cow<'a, str>>,
@@ -489,7 +478,6 @@ where
         val.like(pattern)
     }
 
-    #[inline]
     fn not_like<T>(self, pattern: T) -> Compare<'a>
     where
         T: Into<Cow<'a, str>>,
@@ -499,7 +487,6 @@ where
         val.not_like(pattern)
     }
 
-    #[inline]
     fn begins_with<T>(self, pattern: T) -> Compare<'a>
     where
         T: Into<Cow<'a, str>>,
@@ -509,7 +496,6 @@ where
         val.begins_with(pattern)
     }
 
-    #[inline]
     fn not_begins_with<T>(self, pattern: T) -> Compare<'a>
     where
         T: Into<Cow<'a, str>>,
@@ -519,7 +505,6 @@ where
         val.not_begins_with(pattern)
     }
 
-    #[inline]
     fn ends_into<T>(self, pattern: T) -> Compare<'a>
     where
         T: Into<Cow<'a, str>>,
@@ -529,7 +514,6 @@ where
         val.ends_into(pattern)
     }
 
-    #[inline]
     fn not_ends_into<T>(self, pattern: T) -> Compare<'a>
     where
         T: Into<Cow<'a, str>>,
@@ -539,21 +523,18 @@ where
         val.not_ends_into(pattern)
     }
 
-    #[inline]
     fn is_null(self) -> Compare<'a> {
         let col: Column<'a> = self.into();
         let val: DatabaseValue<'a> = col.into();
         val.is_null()
     }
 
-    #[inline]
     fn is_not_null(self) -> Compare<'a> {
         let col: Column<'a> = self.into();
         let val: DatabaseValue<'a> = col.into();
         val.is_not_null()
     }
 
-    #[inline]
     fn between<T, V>(self, left: T, right: V) -> Compare<'a>
     where
         T: Into<DatabaseValue<'a>>,
@@ -564,7 +545,6 @@ where
         val.between(left, right)
     }
 
-    #[inline]
     fn not_between<T, V>(self, left: T, right: V) -> Compare<'a>
     where
         T: Into<DatabaseValue<'a>>,

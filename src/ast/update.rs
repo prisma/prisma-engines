@@ -10,7 +10,6 @@ pub struct Update<'a> {
 }
 
 impl<'a> From<Update<'a>> for Query<'a> {
-    #[inline]
     fn from(update: Update<'a>) -> Self {
         Query::Update(Box::new(update))
     }
@@ -18,7 +17,6 @@ impl<'a> From<Update<'a>> for Query<'a> {
 
 impl<'a> Update<'a> {
     /// Creates the basis for an `UPDATE` statement to the given table.
-    #[inline]
     pub fn table<T>(table: T) -> Self
     where
         T: Into<Table<'a>>,

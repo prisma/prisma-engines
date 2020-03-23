@@ -50,7 +50,6 @@ impl<'a, T> Conjuctive<'a> for T
 where
     T: Into<Expression<'a>>,
 {
-    #[inline]
     fn and<E>(self, other: E) -> ConditionTree<'a>
     where
         E: Into<Expression<'a>>,
@@ -58,7 +57,6 @@ where
         ConditionTree::And(vec![self.into(), other.into()])
     }
 
-    #[inline]
     fn or<E>(self, other: E) -> ConditionTree<'a>
     where
         E: Into<Expression<'a>>,
@@ -66,7 +64,6 @@ where
         ConditionTree::Or(vec![self.into(), other.into()])
     }
 
-    #[inline]
     fn not(self) -> ConditionTree<'a> {
         ConditionTree::not(self.into())
     }

@@ -14,7 +14,6 @@ pub struct Average<'a> {
 /// let (sql, _) = Sqlite::build(query);
 /// assert_eq!("SELECT AVG(`age`) FROM `users`", sql);
 /// ```
-#[inline]
 pub fn avg<'a, C>(col: C) -> Function<'a>
 where
     C: Into<Column<'a>>,

@@ -24,7 +24,6 @@ pub struct Union<'a> {
 }
 
 impl<'a> From<Union<'a>> for Query<'a> {
-    #[inline]
     fn from(ua: Union<'a>) -> Self {
         Query::Union(ua)
     }
