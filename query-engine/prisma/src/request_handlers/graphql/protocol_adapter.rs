@@ -30,10 +30,7 @@ impl GraphQLProtocolAdapter {
                 .into_iter()
                 .find(|def| Self::matches_operation(def, op))
                 .ok_or_else(|| {
-                    PrismaError::QueryConversionError(format!(
-                        "Operation '{}' does not match any query.",
-                        op
-                    ))
+                    PrismaError::QueryConversionError(format!("Operation '{}' does not match any query.", op))
                 })
                 .and_then(Self::convert_definition),
 
@@ -47,9 +44,7 @@ impl GraphQLProtocolAdapter {
 
         let operation = operations
             .pop()
-            .ok_or_else(|| {
-                PrismaError::QueryConversionError("Document contained no operations.".into())
-            })?
+            .ok_or_else(|| PrismaError::QueryConversionError("Document contained no operations.".into()))?
             .dedup_selections();
 
         Ok(operation)
@@ -74,12 +69,8 @@ impl GraphQLProtocolAdapter {
     }
 
     fn convert_query(selection_set: SelectionSet) -> PrismaResult<Vec<Operation>> {
-        Self::convert_selection_set(selection_set).map(|fields| {
-            fields
-                .into_iter()
-                .map(|field| Operation::Read(field))
-                .collect()
-        })
+        Self::convert_selection_set(selection_set)
+            .map(|fields| fields.into_iter().map(|field| Operation::Read(field)).collect())
     }
 
     fn convert_mutation(selection_set: SelectionSet) -> PrismaResult<Vec<Operation>> {
@@ -116,10 +107,7 @@ impl GraphQLProtocolAdapter {
 
                 GqlSelection::FragmentSpread(fs) => Err(PrismaError::UnsupportedFeatureError(
                     "Fragment spread",
-                    format!(
-                        "Fragment '{}', at position {}.",
-                        fs.fragment_name, fs.position
-                    ),
+                    format!("Fragment '{}', at position {}.", fs.fragment_name, fs.position),
                 )),
 
                 GqlSelection::InlineFragment(i) => Err(PrismaError::UnsupportedFeatureError(

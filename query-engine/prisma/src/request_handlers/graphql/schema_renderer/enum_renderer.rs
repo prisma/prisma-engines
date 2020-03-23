@@ -11,11 +11,7 @@ impl<'a> Renderer for GqlEnumRenderer<'a> {
         }
 
         let values = self.format_enum_values();
-        let rendered = format!(
-            "enum {} {{\n{}\n}}",
-            self.enum_type.name(),
-            values.join("\n")
-        );
+        let rendered = format!("enum {} {{\n{}\n}}", self.enum_type.name(), values.join("\n"));
 
         ctx.add(self.enum_type.name().to_owned(), rendered.clone());
         (rendered, ctx)
