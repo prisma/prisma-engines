@@ -27,16 +27,20 @@ async fn compound_foreign_keys_should_work_for_required_one_to_one_relations(api
 
     let dm = r#"
             model Post {
-                id      Int                 @id @default(autoincrement())
-                User    User                @map(["user_id", "user_name"]) @relation(references:[id, name])
+                id        Int    @default(autoincrement()) @id
+                user_id   Int
+                user_name String
+                User      User   @relation(fields: [user_id, user_name], references: [id, name])
+                
+                @@unique([user_id, user_name], name: "post_user_unique")
             }
-
+            
             model User {
-               id       Int                 @id @default(autoincrement())
-               name     String
-               Post     Post?
-
-               @@unique([id, name], name: "user_unique")
+                id   Int    @default(autoincrement()) @id
+                name String
+                Post Post?
+                
+                @@unique([id, name], name: "user_unique")
             }
         "#;
     let result = dbg!(api.introspect().await);
@@ -68,16 +72,20 @@ async fn compound_foreign_keys_should_work_for_one_to_one_relations(api: &TestAp
 
     let dm = r#"
             model Post {
-                id      Int                 @id @default(autoincrement())
-                User    User?                @map(["user_id", "user_name"]) @relation(references:[id, name])
+                id        Int     @default(autoincrement()) @id
+                user_id   Int?
+                user_name String?
+                User      User?   @relation(fields: [user_id, user_name], references: [id, name])
+                    
+                @@unique([user_id, user_name], name: "post_user_unique")
             }
-
+                      
             model User {
-               id       Int                 @id @default(autoincrement())
-               name     String
-               Post     Post?
-
-               @@unique([id, name], name: "user_unique")
+                id   Int    @default(autoincrement()) @id
+                name String
+                Post Post?
+                            
+                @@unique([id, name], name: "user_unique")
             }
         "#;
     let result = dbg!(api.introspect().await);
@@ -107,18 +115,20 @@ async fn compound_foreign_keys_should_work_for_one_to_many_relations(api: &TestA
         .await;
 
     let dm = r#"
-            model Post {
-                id      Int                 @id @default(autoincrement())
-                User    User?                @map(["user_id", "user_name"]) @relation(references:[id, name])
-            }
-
-            model User {
-               id       Int                 @id @default(autoincrement())
-               name     String
-               Post     Post[]
-
-               @@unique([id, name], name: "user_unique")
-            }
+           model Post {
+                id        Int     @default(autoincrement()) @id
+                user_id   Int?
+                user_name String?
+                User      User?   @relation(fields: [user_id, user_name], references: [id, name])
+           }
+           
+           model User {
+                id   Int    @default(autoincrement()) @id
+                name String
+                Post Post[]
+                
+                @@unique([id, name], name: "user_unique")
+           }
         "#;
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
@@ -148,16 +158,18 @@ async fn compound_foreign_keys_should_work_for_required_one_to_many_relations(ap
 
     let dm = r#"
             model Post {
-                id      Int                 @id @default(autoincrement())
-                User    User                @map(["user_id", "user_name"]) @relation(references:[id, name])
+                id        Int    @default(autoincrement()) @id
+                user_id   Int
+                user_name String
+                User      User   @relation(fields: [user_id, user_name], references: [id, name])
             }
-
+            
             model User {
-               id       Int                 @id @default(autoincrement())
-               name     String
-               Post     Post[]
-
-               @@unique([id, name], name: "user_unique")
+                id   Int    @default(autoincrement()) @id
+                name String
+                Post Post[]
+                
+                @@unique([id, name], name: "user_unique")
             }
         "#;
     let result = dbg!(api.introspect().await);
@@ -184,14 +196,17 @@ async fn compound_foreign_keys_should_work_for_self_relations(api: &TestApi) {
         .await;
 
     let dm = r#"
-            model Person {
-               id       Int         @id @default(autoincrement())
-               name     String
-               Person   Person      @map(["partner_id", "partner_name"]) @relation("PersonToPerson_partner_id_partner_name", references: [id,name])
-               other_Person   Person[]    @relation("PersonToPerson_partner_id_partner_name")
-
-               @@unique([id, name], name: "person_unique")
+           model Person {
+                id           Int      @default(autoincrement()) @id
+                name         String
+                partner_id   Int
+                partner_name String
+                Person       Person   @relation("PersonToPerson_partner_id_partner_name", fields: [partner_id, partner_name], references: [id, name])
+                other_Person Person[] @relation("PersonToPerson_partner_id_partner_name")
+                
+                @@unique([id, name], name: "person_unique")
             }
+            
         "#;
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
@@ -217,14 +232,16 @@ async fn compound_foreign_keys_should_work_with_defaults(api: &TestApi) {
         .await;
 
     let dm = r#"
-            model Person {
-               id       Int         @id @default(autoincrement())
-               name     String
-               Person   Person      @map(["partner_id", "partner_name"]) @relation("PersonToPerson_partner_id_partner_name", references: [id, name])
-               other_Person  Person[]    @relation("PersonToPerson_partner_id_partner_name")
-
-               @@unique([id, name], name: "person_unique")
-            }
+               model Person {
+                    id           Int      @default(autoincrement()) @id
+                    name         String
+                    partner_id   Int      @default(0)
+                    partner_name String   @default("")
+                    Person       Person   @relation("PersonToPerson_partner_id_partner_name", fields: [partner_id, partner_name], references: [id, name])
+                    other_Person Person[] @relation("PersonToPerson_partner_id_partner_name")
+                    
+                    @@unique([id, name], name: "person_unique")
+               }
         "#;
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
@@ -302,18 +319,20 @@ async fn compound_foreign_keys_should_work_for_one_to_many_relations_with_non_un
 
     let dm = r#"
             model Post {
-                id      Int                @id @default(autoincrement())
-                User    User               @map(["user_id", "user_age"]) @relation(references:[id, age])
-
-                @@index(User, name: "test")
+                id       Int  @default(autoincrement()) @id
+                user_age Int
+                user_id  Int
+                User     User @relation(fields: [user_id, user_age], references: [id, age])
+                
+                @@index([user_id, user_age], name: "test")
             }
-
+            
             model User {
-               age      Int
-               id       Int                @id @default(autoincrement())
-               Post     Post[]
-
-               @@unique([id, age], name: "user_unique")
+                age  Int
+                id   Int    @default(autoincrement()) @id
+                Post Post[]
+                
+                @@unique([id, age], name: "user_unique")
             }
         "#;
     let result = dbg!(api.introspect().await);
@@ -342,61 +361,65 @@ async fn repro_matt_references_on_wrong_side(api: &TestApi) {
 
     let dm = r#"
             model a {
-              one Int
-              two Int
-              b   b[]
-                    
-              @@id([one, two])
+                one Int
+                two Int
+                b   b[]
+                
+                @@id([one, two])
             }
-            
+
             model b {
-              id Int @id  @default(autoincrement())
-              a  a   @map(["one", "two"])
-            }
-              
+                id  Int @default(autoincrement()) @id
+                one Int
+                two Int
+                
+                a   a   @relation(fields: [one, two], references: [one, two])
+            }             
         "#;
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
 
-//todo referencing unknown field in index due to compound, will be fixed in follow up PR
-// #[test_each_connector(tags("postgres"))]
-// #[test]
-// async fn compound_fk_pk(api: &TestApi) {
-//     let barrel = api.barrel();
-//     let _setup_schema = barrel
-//         .execute(|migration| {
-//             migration.create_table("a", |t| {
-//                 t.add_column("one", types::integer().nullable(false));
-//                 t.add_column("two", types::integer().nullable(false));
-//                 t.inject_custom("Primary Key (\"one\", \"two\")");
-//             });
-//             migration.create_table("b", |t| {
-//                 t.add_column("dummy", types::integer().nullable(false));
-//                 t.add_column("one", types::integer().nullable(false));
-//                 t.add_column("two", types::integer().nullable(false));
-//                 t.inject_custom("Foreign Key (\"one\", \"two\") references a(\"one\", \"two\")");
-//                 t.inject_custom("Primary Key (\"dummy\",\"one\", \"two\")");
-//             });
-//         })
-//         .await;
-//
-//     let dm = r#"
-//             model a {
-//               one Int
-//               two Int
-//               b   b[]
-//
-//               @@id([one, two])
-//             }
-//
-//             model b {
-//               dummy Int
-//               a     a   @map(["one", "two"])
-//
-//               @@id([dummy, one, two])
-//             }
-//         "#;
-//     let result = dbg!(api.introspect().await);
-//     custom_assert(&result, dm);
-// }
+#[test_each_connector(tags("postgres"))]
+#[test]
+async fn introspecting_a_compound_fk_pk_with_overlapping_primary_key_should_work(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("a", |t| {
+                t.add_column("one", types::integer().nullable(false));
+                t.add_column("two", types::integer().nullable(false));
+                t.inject_custom("Primary Key (\"one\", \"two\")");
+            });
+            migration.create_table("b", |t| {
+                t.add_column("dummy", types::integer().nullable(false));
+                t.add_column("one", types::integer().nullable(false));
+                t.add_column("two", types::integer().nullable(false));
+                t.inject_custom("Foreign Key (\"one\", \"two\") references a(\"one\", \"two\")");
+                t.inject_custom("Primary Key (\"dummy\",\"one\", \"two\")");
+            });
+        })
+        .await;
+
+    let dm = r#"
+            model a {
+                one Int
+                two Int
+                b   b[]
+                
+                @@id([one, two])
+            }
+            
+            model b {
+                dummy Int
+                one   Int
+                two   Int
+                a     a   @relation(fields: [one, two], references: [one, two])
+            
+                @@id([dummy, one, two])
+            }
+            
+        "#;
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+}
