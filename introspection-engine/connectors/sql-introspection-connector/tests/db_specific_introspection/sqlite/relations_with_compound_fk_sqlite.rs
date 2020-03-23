@@ -156,18 +156,22 @@ async fn compound_foreign_keys_should_work_for_duplicate_one_to_many_relations(a
 
     let dm = r#"
             model User {
-               age                                              Int
-               id                                               Int         @id @default(autoincrement())
-               Post_Post_other_user_id_other_user_ageToUser     Post[]      @relation("Post_other_user_id_other_user_ageToUser")
-               Post_Post_user_id_user_ageToUser                 Post[]      @relation("Post_user_id_user_ageToUser")
-
-               @@unique([id, age], name: "sqlite_autoindex_User_1")
+                age                                             Int
+                id                                              Int    @default(autoincrement()) @id
+                Post_Post_other_user_id_other_user_ageToUser    Post[] @relation("Post_other_user_id_other_user_ageToUser")
+                Post_Post_user_id_user_ageToUser                Post[] @relation("Post_user_id_user_ageToUser")
+                    
+                @@unique([id, age], name: "sqlite_autoindex_User_1")
             }
-
+                      
             model Post {
-                id                                              Int         @id @default(autoincrement())
-                User_other_user_id                              User?       @map(["other_user_id", "other_user_age"]) @relation(name: "Post_other_user_id_other_user_ageToUser", references:[id, age])
-                User_user_id                                    User?       @map(["user_id", "user_age"]) @relation(name: "Post_user_id_user_ageToUser", references:[id, age])
+               id                                               Int   @default(autoincrement()) @id
+               other_user_age                                   Int?
+               other_user_id                                    Int?
+               user_age                                         Int?
+               user_id                                          Int?
+               User_Post_other_user_id_other_user_ageToUser     User? @relation("Post_other_user_id_other_user_ageToUser", fields: [other_user_id, other_user_age], references: [id, age])
+               User_Post_user_id_user_ageToUser                 User? @relation("Post_user_id_user_ageToUser", fields: [user_id, user_age], references: [id, age])
             }
 
         "#;

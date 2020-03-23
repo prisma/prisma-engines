@@ -22,8 +22,9 @@ async fn introspecting_a_one_to_one_req_relation_should_work(api: &TestApi) {
 
     let dm = r#"
               model Post {
-               id      Int @id @default(autoincrement())
-               user_id User
+               id       Int @id @default(autoincrement())
+               user_id  Int  @unique
+               User     User @relation(fields: [user_id], references: [id])
             }
 
             model User {
