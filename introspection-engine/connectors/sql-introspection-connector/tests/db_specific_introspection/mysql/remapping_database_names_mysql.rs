@@ -97,7 +97,7 @@ async fn remapping_models_in_relations_should_work(api: &TestApi) {
             model User_with_Space {
                id       Int                             @id  @default(autoincrement())
                name     String
-               post     Post?
+               Post     Post?
 
                @@map("User with Space")
             }
@@ -135,7 +135,7 @@ async fn remapping_models_in_relations_should_not_map_virtual_fields(api: &TestA
             model User {
                id                   Int                 @id  @default(autoincrement())
                name                 String
-               post_With_Space      Post_With_Space?
+               Post_With_Space      Post_With_Space?
             }
         "#;
     let result = dbg!(api.introspect().await);
@@ -157,7 +157,9 @@ async fn remapping_models_in_compound_relations_should_work(api: &TestApi) {
                 t.add_column("id", types::primary());
                 t.add_column("user_id", types::integer());
                 t.add_column("user_age", types::integer());
-                t.inject_custom("FOREIGN KEY (`user_id`,`user_age`) REFERENCES `User with Space`(`id`, `age`)");
+                t.inject_custom(
+                    "FOREIGN KEY (`user_id`,`user_age`) REFERENCES `User with Space`(`id`, `age`)",
+                );
                 t.inject_custom("CONSTRAINT post_user_unique UNIQUE(`user_id`, `user_age`)");
             });
         })
@@ -166,13 +168,13 @@ async fn remapping_models_in_compound_relations_should_work(api: &TestApi) {
     let dm = r#"
             model Post {
                 id      Int                             @id @default(autoincrement())
-                user_with_Space    User_with_Space      @map(["user_id", "user_age"]) @relation(references:[id, age])
+                User_with_Space    User_with_Space      @map(["user_id", "user_age"]) @relation(references:[id, age])
             }
 
             model User_with_Space {
                age      Int
                id       Int                             @id  @default(autoincrement())
-               post     Post?
+               Post     Post?
 
                @@map("User with Space")
                @@unique([id, age], name: "user_unique")
@@ -206,13 +208,13 @@ async fn remapping_fields_in_compound_relations_should_work(api: &TestApi) {
     let dm = r#"
             model Post {
                 id                      Int     @id @default(autoincrement())
-                user                    User    @map(["user_id", "user_age"]) @relation(references:[id, age_that_is_invalid])
+                User                    User    @map(["user_id", "user_age"]) @relation(references:[id, age_that_is_invalid])
             }
 
             model User {
                age_that_is_invalid      Int     @map("age-that-is-invalid")
                id                       Int     @id @default(autoincrement())
-               post                     Post?
+               Post                     Post?
 
                @@unique([id, age_that_is_invalid], name: "user_unique")
             }

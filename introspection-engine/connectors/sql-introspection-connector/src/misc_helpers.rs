@@ -85,7 +85,7 @@ pub fn calculate_many_to_many_field(
         on_delete: OnDeleteStrategy::None,
     });
 
-    let basename = foreign_key.referenced_table.camel_case();
+    let basename = foreign_key.referenced_table.clone();
 
     let name = match is_self_relation {
         true => format!("{}_{}", basename, foreign_key.columns[0]),
@@ -213,13 +213,13 @@ pub(crate) fn calculate_relation_field(
         _ if more_then_one_compound_to_same_table() => (
             format!(
                 "{}_{}",
-                foreign_key.referenced_table.clone().camel_case(),
+                foreign_key.referenced_table.clone(),
                 columns[0].name.clone()
             ),
             columns.iter().map(|c| c.name.clone()).collect(),
         ),
         _ => (
-            foreign_key.referenced_table.clone().camel_case(),
+            foreign_key.referenced_table.clone(),
             columns.iter().map(|c| c.name.clone()).collect(),
         ),
     };
@@ -283,10 +283,10 @@ pub(crate) fn calculate_backrelation_field(
     };
 
     //if the backrelation name would be duplicate, probably due to being a selfrelation
-    let name = if model.name == other_model.name && relation_field.name == model.name.camel_case() {
-        format!("other_{}", model.name.clone().camel_case())
+    let name = if model.name == other_model.name && relation_field.name == model.name {
+        format!("other_{}", model.name.clone())
     } else {
-        model.name.clone().camel_case()
+        model.name.clone()
     };
 
     Field {

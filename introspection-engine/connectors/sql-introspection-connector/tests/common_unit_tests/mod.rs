@@ -992,7 +992,7 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                         is_commented_out: false,
                     },
                     Field {
-                        name: "user".to_string(),
+                        name: "User".to_string(),
                         arity: FieldArity::List,
                         field_type: FieldType::Relation(RelationInfo {
                             to: "User".to_string(),

@@ -28,13 +28,13 @@ async fn compound_foreign_keys_should_work_for_required_one_to_one_relations(api
     let dm = r#"
             model Post {
                 id      Int                 @id @default(autoincrement())
-                user    User                @map(["user_id", "user_name"]) @relation(references:[id, name])
+                User    User                @map(["user_id", "user_name"]) @relation(references:[id, name])
             }
 
             model User {
                id       Int                 @id @default(autoincrement())
                name     String
-               post     Post?
+               Post     Post?
 
                @@unique([id, name], name: "user_unique")
             }
@@ -69,13 +69,13 @@ async fn compound_foreign_keys_should_work_for_one_to_one_relations(api: &TestAp
     let dm = r#"
             model Post {
                 id      Int                 @id @default(autoincrement())
-                user    User?                @map(["user_id", "user_name"]) @relation(references:[id, name])
+                User    User?                @map(["user_id", "user_name"]) @relation(references:[id, name])
             }
 
             model User {
                id       Int                 @id @default(autoincrement())
                name     String
-               post     Post?
+               Post     Post?
 
                @@unique([id, name], name: "user_unique")
             }
@@ -109,13 +109,13 @@ async fn compound_foreign_keys_should_work_for_one_to_many_relations(api: &TestA
     let dm = r#"
             model Post {
                 id      Int                 @id @default(autoincrement())
-                user    User?                @map(["user_id", "user_name"]) @relation(references:[id, name])
+                User    User?                @map(["user_id", "user_name"]) @relation(references:[id, name])
             }
 
             model User {
                id       Int                 @id @default(autoincrement())
                name     String
-               post     Post[]
+               Post     Post[]
 
                @@unique([id, name], name: "user_unique")
             }
@@ -149,13 +149,13 @@ async fn compound_foreign_keys_should_work_for_required_one_to_many_relations(ap
     let dm = r#"
             model Post {
                 id      Int                 @id @default(autoincrement())
-                user    User                @map(["user_id", "user_name"]) @relation(references:[id, name])
+                User    User                @map(["user_id", "user_name"]) @relation(references:[id, name])
             }
 
             model User {
                id       Int                 @id @default(autoincrement())
                name     String
-               post     Post[]
+               Post     Post[]
 
                @@unique([id, name], name: "user_unique")
             }
@@ -187,8 +187,8 @@ async fn compound_foreign_keys_should_work_for_self_relations(api: &TestApi) {
             model Person {
                id       Int         @id @default(autoincrement())
                name     String
-               person   Person      @map(["partner_id", "partner_name"]) @relation("PersonToPerson_partner_id_partner_name", references: [id,name])
-               other_person   Person[]    @relation("PersonToPerson_partner_id_partner_name")
+               Person   Person      @map(["partner_id", "partner_name"]) @relation("PersonToPerson_partner_id_partner_name", references: [id,name])
+               other_Person   Person[]    @relation("PersonToPerson_partner_id_partner_name")
 
                @@unique([id, name], name: "person_unique")
             }
@@ -220,8 +220,8 @@ async fn compound_foreign_keys_should_work_with_defaults(api: &TestApi) {
             model Person {
                id       Int         @id @default(autoincrement())
                name     String
-               person   Person      @map(["partner_id", "partner_name"]) @relation("PersonToPerson_partner_id_partner_name", references: [id, name])
-               other_person  Person[]    @relation("PersonToPerson_partner_id_partner_name")
+               Person   Person      @map(["partner_id", "partner_name"]) @relation("PersonToPerson_partner_id_partner_name", references: [id, name])
+               other_Person  Person[]    @relation("PersonToPerson_partner_id_partner_name")
 
                @@unique([id, name], name: "person_unique")
             }
@@ -303,15 +303,15 @@ async fn compound_foreign_keys_should_work_for_one_to_many_relations_with_non_un
     let dm = r#"
             model Post {
                 id      Int                @id @default(autoincrement())
-                user    User               @map(["user_id", "user_age"]) @relation(references:[id, age])
+                User    User               @map(["user_id", "user_age"]) @relation(references:[id, age])
 
-                @@index(user, name: "test")
+                @@index(User, name: "test")
             }
 
             model User {
                age      Int
                id       Int                @id @default(autoincrement())
-               post     Post[]
+               Post     Post[]
 
                @@unique([id, age], name: "user_unique")
             }
