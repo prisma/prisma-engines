@@ -98,7 +98,7 @@ async fn remapping_models_in_relations_should_work(api: &TestApi) {
             model User_with_Space {
                id       Int                             @id @default(autoincrement())
                name     String
-               post     Post?
+               Post     Post?
 
                @@map("User with Space")
             }
@@ -133,13 +133,13 @@ async fn remapping_models_in_compound_relations_should_work(api: &TestApi) {
     let dm = r#"
             model Post {
                 id      Int                             @id @default(autoincrement())
-                user_with_Space    User_with_Space      @map(["user_id", "user_name"]) @relation(references:[id, name])
+                User_with_Space    User_with_Space      @map(["user_id", "user_name"]) @relation(references:[id, name])
             }
 
             model User_with_Space {
                id       Int                             @id @default(autoincrement())
                name     String
-               post     Post?
+               Post     Post?
 
                @@map("User with Space")
                @@unique([id, name], name: "user_unique")
@@ -175,13 +175,13 @@ async fn remapping_fields_in_compound_relations_should_work(api: &TestApi) {
     let dm = r#"
             model Post {
                 id                      Int     @id @default(autoincrement())
-                user                    User    @map(["user_id", "user_name"]) @relation(references:[id, name_that_is_invalid])
+                User                    User    @map(["user_id", "user_name"]) @relation(references:[id, name_that_is_invalid])
             }
 
             model User {
                id                       Int     @id @default(autoincrement())
                name_that_is_invalid     String  @map("name-that-is-invalid")
-               post                     Post?
+               Post                     Post?
 
                @@unique([id, name_that_is_invalid], name: "user_unique")
             }

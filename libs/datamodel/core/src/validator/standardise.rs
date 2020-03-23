@@ -174,7 +174,8 @@ impl Standardiser {
         relation_name: &str,
     ) -> dml::Field {
         dml::Field::new_generated(
-            &NameNormalizer::camel_case(&model.name),
+            // &NameNormalizer::camel_case(&model.name),
+            &model.name,
             dml::FieldType::Relation(dml::RelationInfo {
                 to: model.name.clone(),
                 to_fields: model.id_field_names(),

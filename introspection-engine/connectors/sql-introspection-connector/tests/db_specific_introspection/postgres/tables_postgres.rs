@@ -468,12 +468,12 @@ async fn introspecting_a_legacy_m_to_n_relation_should_work(api: &TestApi) {
     let dm = r#"
             model Category {
               id            Int    @id
-              post          Post[]
+              Post          Post[]
             }
 
             model Post {
               id            Int    @id
-              category      Category[]
+              Category      Category[]
             }
         "#;
 

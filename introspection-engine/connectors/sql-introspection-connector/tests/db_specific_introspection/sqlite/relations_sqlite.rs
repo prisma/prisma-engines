@@ -23,7 +23,7 @@ async fn introspecting_a_one_to_one_req_relation_should_work(api: &TestApi) {
     let dm = r#"
             model User {
                id Int @id @default(autoincrement())
-               post Post?
+               Post Post?
             }
 
             model Post {
@@ -61,13 +61,13 @@ async fn introspecting_two_one_to_one_relations_between_the_same_models_should_w
             model User {
                id Int @id @default(autoincrement())
                post_id Post  @relation("PostToUser_post_id", references: [id])
-               post Post?    @relation("Post_user_idToUser")
+               Post Post?    @relation("Post_user_idToUser")
             }
 
             model Post {
                id Int @id @default(autoincrement())
                user_id User  @relation("Post_user_idToUser", references: [id])
-               user    User? @relation("PostToUser_post_id")
+               User    User? @relation("PostToUser_post_id")
             }
         "#;
     let result = dbg!(api.introspect().await);
@@ -95,7 +95,7 @@ async fn introspecting_a_one_to_one_relation_should_work(api: &TestApi) {
     let dm = r#"
             model User {
                id Int @id @default(autoincrement())
-               post Post?
+               Post Post?
             }
 
             model Post {
@@ -129,7 +129,7 @@ async fn introspecting_a_one_to_one_relation_referencing_non_id_should_work(api:
             model User {
                email        String? @unique
                id           Int     @id  @default(autoincrement())
-               post         Post?
+               Post         Post?
             }
 
             model Post {
@@ -162,7 +162,7 @@ async fn introspecting_a_one_to_many_relation_should_work(api: &TestApi) {
     let dm = r#"
             model User {
                id Int @id @default(autoincrement())
-               post Post[]
+               Post Post[]
             }
 
             model Post {
@@ -195,7 +195,7 @@ async fn introspecting_a_one_req_to_many_relation_should_work(api: &TestApi) {
     let dm = r#"
             model User {
                id Int @id @default(autoincrement())
-               post Post[]
+               Post Post[]
             }
 
             model Post {
@@ -256,12 +256,12 @@ async fn introspecting_a_prisma_many_to_many_relation_should_work(api: &TestApi)
     let dm = r#"
             model User {
                id Int @id @default(autoincrement())
-               post Post[]
+               Post Post[]
             }
 
             model Post {
                id Int @id @default(autoincrement())
-               user User[]
+               User User[]
             }
         "#;
     let result = dbg!(api.introspect().await);
@@ -381,12 +381,12 @@ async fn introspecting_a_many_to_many_relation_with_an_id_should_work(api: &Test
     let dm = r#"
             model User {
                id Int @id @default(autoincrement())
-               postsToUsers PostsToUsers[]
+               PostsToUsers PostsToUsers[]
             }
 
             model Post {
                id Int @id @default(autoincrement())
-               postsToUsers PostsToUsers[] 
+               PostsToUsers PostsToUsers[] 
             }
 
             model PostsToUsers {
@@ -421,8 +421,8 @@ async fn introspecting_a_self_relation_should_work(api: &TestApi) {
                 id                             Int    @id  @default(autoincrement())
                 direct_report                  User?  @relation("UserToUser_direct_report")
                 recruited_by                   User?  @relation("UserToUser_recruited_by")
-                user_UserToUser_direct_report User[] @relation("UserToUser_direct_report")
-                user_UserToUser_recruited_by  User[] @relation("UserToUser_recruited_by")
+                User_UserToUser_direct_report User[] @relation("UserToUser_direct_report")
+                User_UserToUser_recruited_by  User[] @relation("UserToUser_recruited_by")
             }
         "#;
     let result = dbg!(api.introspect().await);
@@ -453,7 +453,7 @@ async fn introspecting_cascading_delete_behaviour_should_work(api: &TestApi) {
     let dm = r#"
             model User {
                id      Int @id @default(autoincrement())
-               post Post[] @relation(onDelete: CASCADE)
+               Post Post[] @relation(onDelete: CASCADE)
             }
 
             model Post {
@@ -484,7 +484,7 @@ async fn introspecting_id_fields_with_foreign_key_should_work(api: &TestApi) {
     let dm = r#"
             model User {
                id      Int       @id @default(autoincrement())
-               post    Post[]
+               Post    Post[]
             }
 
             model Post {
