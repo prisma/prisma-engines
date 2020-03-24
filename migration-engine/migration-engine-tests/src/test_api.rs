@@ -198,7 +198,6 @@ pub struct SingleRowInsert<'a> {
 
 impl<'a> SingleRowInsert<'a> {
     pub fn value(mut self, name: &'a str, value: impl Into<quaint::ast::DatabaseValue<'a>>) -> Self {
-        // let insert = std::mem::replace(&mut self.insert, quaint::ast::Insert::single_into(""));
         self.insert = self.insert.value(name, value);
 
         self

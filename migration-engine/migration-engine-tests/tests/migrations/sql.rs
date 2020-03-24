@@ -37,7 +37,9 @@ async fn relations_to_models_without_a_primary_key_work(api: &TestApi) -> TestRe
 
         model PairMetadata {
             id String @id
-            pair Pair
+            pairidx Int
+            pairname String
+            pair Pair @relation(fields: [pairidx, pairname], references: [index, name])
         }
     "#;
 
@@ -49,7 +51,7 @@ async fn relations_to_models_without_a_primary_key_work(api: &TestApi) -> TestRe
         .assert_table("PairMetadata", |table| {
             table
                 .assert_pk(|pk| pk.assert_columns(&["id"]))?
-                .assert_fk_on_columns(&["pair_index", "pair_name"], |fk| {
+                .assert_fk_on_columns(&["pairidx", "pairname"], |fk| {
                     fk.assert_references("Pair", &["index", "name"])
                 })
         })?;
@@ -68,7 +70,8 @@ async fn relations_to_models_with_no_pk_and_a_single_unique_required_field_work(
 
         model PairMetadata {
             id String @id
-            pair Pair
+            pweight Float
+            pair Pair @relation(fields: [pweight], references: [weight])
         }
     "#;
 
@@ -76,12 +79,11 @@ async fn relations_to_models_with_no_pk_and_a_single_unique_required_field_work(
 
     api.assert_schema()
         .await?
-        .debug_print()
         .assert_table("Pair", |table| table.assert_has_no_pk())?
         .assert_table("PairMetadata", |table| {
             table
                 .assert_pk(|pk| pk.assert_columns(&["id"]))?
-                .assert_fk_on_columns(&["pair"], |fk| fk.assert_references("Pair", &["weight"]))
+                .assert_fk_on_columns(&["pweight"], |fk| fk.assert_references("Pair", &["weight"]))
         })?;
 
     Ok(())
@@ -204,7 +206,8 @@ async fn enum_defaults_must_work(api: &TestApi) -> TestResult {
 async fn id_as_part_of_relation_must_work(api: &TestApi) -> TestResult {
     let dm = r##"
         model Cat {
-            nemesis Dog @id
+            nemesis_id String @id
+            nemesis Dog @relation(fields: [nemesis_id], references: [id])
         }
 
         model Dog {
@@ -216,18 +219,23 @@ async fn id_as_part_of_relation_must_work(api: &TestApi) -> TestResult {
 
     api.assert_schema().await?.assert_table("Cat", |table| {
         table
-            .assert_pk(|pk| pk.assert_columns(&["nemesis"]))?
-            .assert_fk_on_columns(&["nemesis"], |fk| fk.assert_references("Dog", &["id"]))
+            .assert_pk(|pk| pk.assert_columns(&["nemesis_id"]))?
+            .assert_fk_on_columns(&["nemesis_id"], |fk| fk.assert_references("Dog", &["id"]))
     })?;
 
     Ok(())
 }
 
-#[test_each_connector(tags("sql"), log = "debug")]
+#[test_each_connector(tags("sql"))]
 async fn multi_field_id_as_part_of_relation_must_work(api: &TestApi) -> TestResult {
     let dm = r##"
         model Cat {
-            nemesis Dog @id
+            nemesis_name String
+            nemesis_weight Int
+
+            nemesis Dog @relation(fields: [nemesis_name, nemesis_weight], references: [name, weight])
+
+            @@id([nemesis_name, nemesis_weight])
         }
 
         model Dog {
@@ -255,7 +263,11 @@ async fn multi_field_id_as_part_of_relation_must_work(api: &TestApi) -> TestResu
 async fn remapped_multi_field_id_as_part_of_relation_must_work(api: &TestApi) -> TestResult {
     let dm = r##"
         model Cat {
-            nemesis Dog @map(["dogname", "dogweight"]) @id
+            nemesis_name String @map("dogname")
+            nemesis_weight Int @map("dogweight")
+            nemesis Dog @relation(fields: [nemesis_name, nemesis_weight], references: [name, weight])
+
+            @@id([nemesis_name, nemesis_weight])
         }
 
         model Dog {
@@ -284,14 +296,19 @@ async fn unique_constraints_on_composite_relation_fields(api: &TestApi) -> TestR
     let dm = r##"
         model Parent {
             id    Int    @id
-            child Child  @relation(references: [id, c]) @unique
+            chiid Int
+            chic  String
+            child Child  @relation(fields: [chiid, chic], references: [id, c])
             p     String
+
+            @@unique([chiid, chic])
         }
 
         model Child {
-            id     Int    @id
-            c      String
-            parent Parent
+            id        Int    @id
+            c         String
+            parent_id Int
+            parent    Parent @relation(name: "ChildParent", fields: [parent_id], references: [id])
 
             @@unique([id, c])
         }
@@ -300,7 +317,7 @@ async fn unique_constraints_on_composite_relation_fields(api: &TestApi) -> TestR
     api.infer_apply(dm).send_assert().await?.assert_green()?;
 
     api.assert_schema().await?.assert_table("Parent", |table| {
-        table.assert_index_on_columns(&["child_id", "child_c"], |idx| idx.assert_is_unique())
+        table.assert_index_on_columns(&["chiid", "chic"], |idx| idx.assert_is_unique())
     })?;
 
     Ok(())
@@ -319,7 +336,9 @@ async fn indexes_on_composite_relation_fields(api: &TestApi) -> TestResult {
 
         model SpamList {
           id   Int  @id
-          user User @relation(references: [firstName, lastName])
+          ufn String
+          uln String
+          user User @relation(fields: [ufn, uln], references: [firstName, lastName])
 
           @@index([user])
         }
@@ -328,7 +347,7 @@ async fn indexes_on_composite_relation_fields(api: &TestApi) -> TestResult {
     api.infer_apply(dm).send_assert().await?.assert_green()?;
 
     api.assert_schema().await?.assert_table("SpamList", |table| {
-        table.assert_index_on_columns(&["user_firstName", "user_lastName"], |idx| idx.assert_is_not_unique())
+        table.assert_index_on_columns(&["ufn", "uln"], |idx| idx.assert_is_not_unique())
     })?;
 
     Ok(())
