@@ -566,3 +566,131 @@ async fn introspecting_prisma_10_relations_should_work(api: &TestApi) {
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
+
+#[test_each_connector(tags("postgres"))]
+async fn introspecting_relations_should_avoid_name_clashes(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("y", |t| {
+                t.inject_custom("id CHAR(25) NOT NULL PRIMARY KEY");
+                t.inject_custom("x  CHAR(25) NOT NULL");
+            });
+            migration.create_table("x", |t| {
+                t.inject_custom("id CHAR(25) NOT NULL PRIMARY KEY");
+                t.inject_custom("y CHAR(25) NOT NULL REFERENCES \"y\"(\"id\")");
+            });
+        })
+        .await;
+
+    let dm = r#"
+            model x {
+                id String @id
+                y  String
+                y_xToy  y      @relation(fields: [y], references: [id])
+            }
+                  
+            model y {
+                id String @id
+                x  String
+                x_xToy  x[]
+            }
+        "#;
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+}
+
+//
+// CREATE TABLE IF NOT EXISTS `x` (
+// `y` int(11) DEFAULT NULL,
+// `id` int(11) DEFAULT NULL,
+// UNIQUE KEY `unique_id` (`id`) USING BTREE,
+// UNIQUE KEY `unique_y_id` (`y`,`id`) USING BTREE,
+// KEY `FK__y` (`y`),
+// CONSTRAINT `FK__y` FOREIGN KEY (`y`) REFERENCES `y` (`id`)
+// ) ENGINE=InnoDB DEFAULT;
+//
+// CREATE TABLE IF NOT EXISTS `y` (
+// `id` int(11) DEFAULT NULL,
+// `x` int(11) DEFAULT NULL,
+// `fk_x_1` int(11) DEFAULT NULL,
+// `fk_x_2` int(11) DEFAULT NULL,
+// UNIQUE KEY `unique_id` (`id`) USING BTREE,
+// KEY `FK_y_x` (`fk_x_1`,`fk_x_2`) USING BTREE,
+// CONSTRAINT `FK_y_x` FOREIGN KEY (`fk_x_1`, `fk_x_2`) REFERENCES `x` (`y`, `id`)
+// ) ENGINE=InnoDB DEFAULT;
+
+#[test_each_connector(tags("postgres"))]
+async fn introspecting_relations_should_avoid_name_clashes_2(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("x", |t| {
+                t.inject_custom("id CHAR(25) NOT NULL PRIMARY KEY");
+                t.inject_custom("y CHAR(25) NOT NULL");
+            });
+
+            migration.create_table("y", |t| {
+                t.inject_custom("id CHAR(25) NOT NULL PRIMARY KEY");
+                t.inject_custom("x  CHAR(25) NOT NULL");
+                t.inject_custom("fk_x_1  CHAR(25) NOT NULL");
+                t.inject_custom("fk_x_2  CHAR(25) NOT NULL");
+            });
+        })
+        .await;
+
+    api.database()
+        .execute_raw(
+            &format!(
+                "CREATE UNIQUE INDEX unique_y_id on \"{}\".\"x\" (\"id\", \"y\");",
+                api.schema_name()
+            ),
+            &[],
+        )
+        .await
+        .unwrap();
+
+    api.database()
+        .execute_raw(
+            &format!(
+                "Alter table \"{}\".\"x\" ADD CONSTRAINT fk_y FOREIGN KEY (\"y\") REFERENCES \"y\" (\"id\");",
+                api.schema_name()
+            ),
+            &[],
+        )
+        .await
+        .unwrap();
+
+    api.database()
+        .execute_raw(
+            &format!(
+                "Alter table \"{}\".\"y\" ADD CONSTRAINT fk_y_x FOREIGN KEY (\"fk_x_1\", \"fk_x_2\") REFERENCES \"x\" (\"y\",\"id\");",
+                api.schema_name()
+            ),
+            &[],
+        )
+        .await
+        .unwrap();
+
+    let dm = r#"
+            model x {
+                id                   String @id
+                y                    String
+                y_x_yToy             y      @relation("x_yToy", fields: [y], references: [id])
+                y_xToy_fk_x_1_fk_x_2 y[]    @relation("xToy_fk_x_1_fk_x_2")
+                    
+                @@unique([id, y], name: "unique_y_id")
+            }
+                      
+            model y {
+               fk_x_1               String
+               fk_x_2               String
+               id                   String @id
+               x                    String
+               x_xToy_fk_x_1_fk_x_2 x      @relation("xToy_fk_x_1_fk_x_2", fields: [fk_x_1, fk_x_2], references: [y, id])
+               x_x_yToy             x[]    @relation("x_yToy")
+            }
+        "#;
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+}

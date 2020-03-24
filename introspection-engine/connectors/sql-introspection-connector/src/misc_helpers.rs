@@ -369,28 +369,33 @@ pub fn deduplicate_field_names(datamodel: &mut Datamodel) {
         for field in &model.fields {
             let is_duplicated = model.fields.iter().filter(|f| field.name == f.name).count() > 1;
 
-            if is_duplicated {
-                duplicated_relation_fields.push((model.name.clone(), field.name.clone()));
-            }
+            if let FieldType::Relation(RelationInfo {
+                name: relation_name,
+                ..
+            }) = &field.field_type
+            {
+                if is_duplicated {
+                    duplicated_relation_fields.push((
+                        model.name.clone(),
+                        field.name.clone(),
+                        relation_name.clone(),
+                    ));
+                }
+            };
         }
     }
 
     duplicated_relation_fields
         .iter()
-        .for_each(|(model, field)| {
+        .for_each(|(model, field, relation_name)| {
             let mut field = datamodel
                 .find_model_mut(model)
                 .unwrap()
-                .find_field_mut(field)
+                .find_relation_field_mut(field)
                 .unwrap();
 
             //todo self vs normal relation?
-            field.name = match &field.field_type {
-                FieldType::Relation(RelationInfo { name, .. }) => {
-                    format!("{}_{}", field.name, &name)
-                }
-                _ => field.name.clone(),
-            };
+            field.name = format!("{}_{}", field.name, &relation_name);
         });
 }
 
