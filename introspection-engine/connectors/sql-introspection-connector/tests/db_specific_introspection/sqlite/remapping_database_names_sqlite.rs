@@ -88,21 +88,7 @@ async fn remapping_models_in_relations_should_work(api: &TestApi) {
         })
         .await;
 
-    //todo User_With_Space has a duplicate map
     let dm = r#"
-            model User_with_Space {
-               id       Int                             @id  @default(autoincrement())
-               name     String
-               Post     Post?
-
-               @@map("User with Space")
-            }
-
-            model Post {
-                id                  Int                 @id  @default(autoincrement())
-                user_id     User_with_Space
-            }
-            
             model User_with_Space {
                 id   Int    @default(autoincrement()) @id
                 name String
@@ -114,7 +100,7 @@ async fn remapping_models_in_relations_should_work(api: &TestApi) {
             model Post {
                 id              Int             @default(autoincrement()) @id
                 user_id         Int             @unique
-                User_with_Space User_with_Space @map("User with Space") @relation(fields: [user_id], references: [id])
+                User_with_Space User_with_Space @relation(fields: [user_id], references: [id])
             }
             
         "#;
@@ -145,7 +131,6 @@ async fn remapping_models_in_compound_relations_should_work(api: &TestApi) {
         })
         .await;
 
-    //todo User_With_Space has a duplicate map
     let dm = r#"
             model User_with_Space {
                 age  Int
@@ -160,7 +145,7 @@ async fn remapping_models_in_compound_relations_should_work(api: &TestApi) {
                 id              Int             @default(autoincrement()) @id
                 user_age        Int
                 user_id         Int
-                User_with_Space User_with_Space @map("User with Space") @relation(fields: [user_id, user_age], references: [id, age])
+                User_with_Space User_with_Space  @relation(fields: [user_id, user_age], references: [id, age])
                               
                 @@unique([user_id, user_age], name: "sqlite_autoindex_Post_1")
             }

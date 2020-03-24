@@ -12,7 +12,6 @@ pub fn sanitize_datamodel_names(datamodel: &mut Datamodel) {
         for field in &mut model.fields {
             let (sanitized_field_name, field_db_name) = sanitize_name(field.name.clone());
             let id_field_option = model.id_fields.iter_mut().find(|name| **name == field.name);
-            let mut no_db_name_because_field_is_virtual = false;
 
             match &mut field.field_type {
                 FieldType::Relation(info) => {
@@ -23,8 +22,6 @@ pub fn sanitize_datamodel_names(datamodel: &mut Datamodel) {
                         .iter()
                         .map(|f: &std::string::String| sanitize_name(f.clone()).0)
                         .collect();
-
-                    no_db_name_because_field_is_virtual = info.to_fields.is_empty();
                 }
                 FieldType::Enum(enum_name) => {
                     let (sanitized_enum_name, enum_db_name) =
@@ -58,12 +55,12 @@ pub fn sanitize_datamodel_names(datamodel: &mut Datamodel) {
                         *name = sanitized_value;
                     };
 
-                    if field.database_names.is_empty() && !no_db_name_because_field_is_virtual {
+                    if field.database_names.is_empty() {
                         field.database_names = field_db_name.map(|db| vec![db]).unwrap_or(vec![]);
                     }
                 }
                 _ => {
-                    if field.database_names.is_empty() && !no_db_name_because_field_is_virtual {
+                    if field.database_names.is_empty() {
                         field.database_names = field_db_name.map(|db| vec![db]).unwrap_or(vec![]);
                     }
                 }

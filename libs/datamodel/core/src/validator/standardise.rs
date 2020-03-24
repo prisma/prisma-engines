@@ -81,7 +81,7 @@ impl Standardiser {
                             (x, y) if x < y => true,
                             (x, y) if x > y => false,
                             // SELF RELATIONS
-                            (x, y) => field.name < related_field.name,
+                            _ => field.name < related_field.name,
                         },
                     };
 
