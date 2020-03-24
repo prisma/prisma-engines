@@ -274,7 +274,7 @@ async fn introspecting_a_table_without_uniques_should_comment_it_out(api: &TestA
         })
         .await;
 
-    let dm = "// The underlying table does not contain a unique identifier and can therefore currently not be handled.\n// model Post {\n  // id      Int\n  // user_id User @relation(references: [id])\n// }\n\nmodel User {\n  id Int @default(autoincrement()) @id\n}";
+    let dm = "// The underlying table does not contain a unique identifier and can therefore currently not be handled.\n// model Post {\n  // id      Int\n  // user_id Int\n  // User    User @relation(fields: [user_id], references: [id])\n// }\n\nmodel User {\n  id Int @default(autoincrement()) @id\n}";
 
     let result = dbg!(api.introspect().await);
     assert_eq!(&result, dm);
@@ -477,6 +477,35 @@ async fn introspecting_a_legacy_m_to_n_relation_should_work(api: &TestApi) {
             }
         "#;
 
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+}
+
+#[test_each_connector(tags("postgres"))]
+async fn introspecting_default_values_on_lists_should_be_ignored(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom("ints Integer[] DEFAULT array[]::Integer[]");
+                t.inject_custom("ints2 Integer[] DEFAULT '{}'");
+            });
+        })
+        .await;
+
+    let dm = r#"
+            datasource pg {
+              provider = "postgres"
+              url = "postgresql://localhost:5432"
+            }
+
+            model User {
+               id      Int @id @default(autoincrement())
+               ints    Int []
+               ints2   Int []
+            }
+        "#;
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }

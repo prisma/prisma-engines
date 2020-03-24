@@ -25,18 +25,22 @@ async fn compound_foreign_keys_should_work_for_one_to_one_relations(api: &TestAp
         })
         .await;
 
-    let dm = r#"
+    let dm = r#"          
             model Post {
-                id      Int                 @id  @default(autoincrement())
-                User    User?               @map(["user_id", "user_age"]) @relation(references:[id, age])
+                id       Int   @default(autoincrement()) @id
+                user_age Int?
+                user_id  Int?
+                User     User? @relation(fields: [user_id, user_age], references: [id, age])
+                    
+                @@unique([user_id, user_age], name: "post_user_unique")
             }
 
             model User {
-               age      Int
-               id       Int                 @id  @default(autoincrement())
-               Post     Post?
-
-               @@unique([id, age], name: "user_unique")
+                age  Int
+                id   Int   @default(autoincrement()) @id
+                Post Post?
+                            
+                @@unique([id, age], name: "user_unique")
             }
         "#;
     let result = dbg!(api.introspect().await);
@@ -67,16 +71,21 @@ async fn compound_foreign_keys_should_work_for_required_one_to_one_relations(api
         .await;
 
     let dm = r#"
-            model Post {
-                id      Int                 @id   @default(autoincrement())
-                User    User                @map(["user_id", "user_age"]) @relation(references:[id, age])
+             model Post {
+                id       Int  @default(autoincrement()) @id
+                user_age Int
+                user_id  Int
+                User     User @relation(fields: [user_id, user_age], references: [id, age])
+                
+                @@unique([user_id, user_age], name: "post_user_unique")
             }
-
+            
+            
             model User {
-               age     Int
-               id       Int                 @id   @default(autoincrement())
-               Post     Post?
-
+               age  Int
+               id   Int   @default(autoincrement()) @id
+               Post Post?
+               
                @@unique([id, age], name: "user_unique")
             }
         "#;
@@ -106,21 +115,24 @@ async fn compound_foreign_keys_should_work_for_one_to_many_relations(api: &TestA
         })
         .await;
 
-    let dm = r#"
+    let dm = r#"           
             model Post {
-                id      Int                 @id  @default(autoincrement())
-                User    User?               @map(["user_id", "user_age"]) @relation(references:[id, age])
-
-                @@index([User], name: "user_id")
+                id       Int   @default(autoincrement()) @id
+                user_age Int?
+                user_id  Int?
+                User     User? @relation(fields: [user_id, user_age], references: [id, age])
+                    
+                @@index([user_id, user_age], name: "user_id")
             }
-
+                      
             model User {
-               age      Int
-               id       Int                 @id  @default(autoincrement())
-               Post    Post[]
-
-               @@unique([id, age], name: "user_unique")
+                age  Int
+                id   Int    @default(autoincrement()) @id
+                Post Post[]
+                            
+                @@unique([id, age], name: "user_unique")
             }
+            
         "#;
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
@@ -150,18 +162,20 @@ async fn compound_foreign_keys_should_work_for_required_one_to_many_relations(ap
 
     let dm = r#"
             model Post {
-                id      Int                 @id  @default(autoincrement())
-                User    User               @map(["user_id", "user_age"]) @relation(references:[id, age])
-
-                @@index([User], name: "user_id")
+                id       Int  @default(autoincrement()) @id
+                user_age Int
+                user_id  Int
+                User     User @relation(fields: [user_id, user_age], references: [id, age])
+                
+                @@index([user_id, user_age], name: "user_id")
             }
-
+            
             model User {
-               age      Int
-               id       Int                 @id  @default(autoincrement())
-               Post    Post[]
-
-               @@unique([id, age], name: "user_unique")
+                age  Int
+                id   Int    @default(autoincrement()) @id
+                Post Post[]
+                
+                @@unique([id, age], name: "user_unique")
             }
         "#;
     let result = dbg!(api.introspect().await);
@@ -188,14 +202,16 @@ async fn compound_foreign_keys_should_work_for_required_self_relations(api: &Tes
         .await;
 
     let dm = r#"
-            model Person {
-               age      Int
-               id       Int         @id @default(autoincrement())
-               Person   Person      @map(["partner_id", "partner_age"]) @relation("PersonToPerson_partner_id_partner_age", references: [id, age])
-               other_Person  Person[]    @relation("PersonToPerson_partner_id_partner_age")
-
-               @@unique([id, age], name: "person_unique")
-               @@index([Person], name: "partner_id")
+           model Person {
+                age          Int
+                id           Int      @default(autoincrement()) @id
+                partner_age  Int
+                partner_id   Int
+                Person       Person   @relation("PersonToPerson_partner_id_partner_age", fields: [partner_id, partner_age], references: [id, age])
+                other_Person Person[] @relation("PersonToPerson_partner_id_partner_age")
+                        
+                @@index([partner_id, partner_age], name: "partner_id")
+                @@unique([id, age], name: "person_unique")
             }
         "#;
     let result = dbg!(api.introspect().await);
@@ -222,15 +238,17 @@ async fn compound_foreign_keys_should_work_for_self_relations(api: &TestApi) {
         .await;
 
     let dm = r#"
-            model Person {
-               age      Int
-               id       Int         @id @default(autoincrement())
-               Person   Person?     @map(["partner_id", "partner_age"]) @relation("PersonToPerson_partner_id_partner_age", references: [id, age])
-               other_Person  Person[]    @relation("PersonToPerson_partner_id_partner_age")
-
-               @@unique([id, age], name: "person_unique")
-               @@index([Person], name: "partner_id")
-            }
+           model Person {
+                age          Int
+                id           Int      @default(autoincrement()) @id
+                partner_age  Int?
+                partner_id   Int?
+                Person       Person?  @relation("PersonToPerson_partner_id_partner_age", fields: [partner_id, partner_age], references: [id, age])
+                other_Person Person[] @relation("PersonToPerson_partner_id_partner_age")
+                
+                @@index([partner_id, partner_age], name: "partner_id")
+                @@unique([id, age], name: "person_unique")
+            }   
         "#;
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
@@ -256,15 +274,17 @@ async fn compound_foreign_keys_should_work_with_defaults(api: &TestApi) {
         .await;
 
     let dm = r#"
-            model Person {
-               age      Int
-               id       Int         @id @default(autoincrement())
-               Person   Person      @map(["partner_id", "partner_age"]) @relation("PersonToPerson_partner_id_partner_age", references: [id, age])
-               other_Person  Person[]    @relation("PersonToPerson_partner_id_partner_age")
-
-               @@unique([id, age], name: "person_unique")
-               @@index([Person], name: "partner_id")
-            }
+             model Person {
+                age          Int
+                id           Int      @default(autoincrement()) @id
+                partner_age  Int      @default(0)
+                partner_id   Int      @default(0)
+                Person       Person   @relation("PersonToPerson_partner_id_partner_age", fields: [partner_id, partner_age], references: [id, age])
+                other_Person Person[] @relation("PersonToPerson_partner_id_partner_age")
+                
+                @@index([partner_id, partner_age], name: "partner_id")
+                @@unique([id, age], name: "person_unique")
+            }           
         "#;
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
@@ -341,18 +361,20 @@ async fn compound_foreign_keys_should_work_for_one_to_many_relations_with_non_un
 
     let dm = r#"
             model Post {
-                id      Int                 @id @default(autoincrement())
-                User    User               @map(["user_id", "user_age"]) @relation(references:[id, age])
-
-                @@index([User], name: "user_id")
+                id       Int  @default(autoincrement()) @id
+                user_age Int
+                user_id  Int
+                User     User @relation(fields: [user_id, user_age], references: [id, age])
+                    
+                @@index([user_id, user_age], name: "user_id")
             }
-
+                      
             model User {
-               age      Int
-               id       Int                 @id @default(autoincrement())
-               Post    Post[]
-
-               @@unique([id, age], name: "user_unique")
+                age  Int
+                id   Int    @default(autoincrement()) @id
+                Post Post[]
+                            
+                @@unique([id, age], name: "user_unique")
             }
         "#;
     let result = dbg!(api.introspect().await);

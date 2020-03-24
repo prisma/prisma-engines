@@ -81,8 +81,7 @@ impl Standardiser {
                             (x, y) if x < y => true,
                             (x, y) if x > y => false,
                             // SELF RELATIONS
-                            (x, y) if x == y => field.name < related_field.name,
-                            _ => unreachable!(), // no clue why the compiler does not understand it is exhaustive
+                            _ => field.name < related_field.name,
                         },
                     };
 

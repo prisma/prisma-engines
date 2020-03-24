@@ -91,17 +91,19 @@ async fn remapping_models_in_relations_should_work(api: &TestApi) {
 
     let dm = r#"
             model Post {
-                id                  Int                 @id @default(autoincrement())
-                user_id     User_with_Space
+                id              Int             @default(autoincrement()) @id
+                user_id         Int             @unique
+                User_with_Space User_with_Space @relation(fields: [user_id], references: [id])
             }
-
+            
             model User_with_Space {
-               id       Int                             @id @default(autoincrement())
-               name     String
-               Post     Post?
-
-               @@map("User with Space")
+                id   Int    @default(autoincrement()) @id
+                name String
+                Post Post?
+                
+                @@map("User with Space")
             }
+            
         "#;
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
@@ -132,18 +134,23 @@ async fn remapping_models_in_compound_relations_should_work(api: &TestApi) {
 
     let dm = r#"
             model Post {
-                id      Int                             @id @default(autoincrement())
-                User_with_Space    User_with_Space      @map(["user_id", "user_name"]) @relation(references:[id, name])
+                id              Int             @default(autoincrement()) @id
+                user_id         Int
+                user_name       String
+                User_with_Space User_with_Space @relation(fields: [user_id, user_name], references: [id, name])
+                
+                @@unique([user_id, user_name], name: "post_user_unique")
             }
-
+            
             model User_with_Space {
-               id       Int                             @id @default(autoincrement())
-               name     String
-               Post     Post?
-
-               @@map("User with Space")
-               @@unique([id, name], name: "user_unique")
+                id   Int    @default(autoincrement()) @id
+                name String
+                Post Post?
+                
+                @@map("User with Space")
+                @@unique([id, name], name: "user_unique")
             }
+            
         "#;
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
@@ -174,17 +181,22 @@ async fn remapping_fields_in_compound_relations_should_work(api: &TestApi) {
 
     let dm = r#"
             model Post {
-                id                      Int     @id @default(autoincrement())
-                User                    User    @map(["user_id", "user_name"]) @relation(references:[id, name_that_is_invalid])
+                id        Int    @default(autoincrement()) @id
+                user_id   Int
+                user_name String
+                User      User   @relation(fields: [user_id, user_name], references: [id, name_that_is_invalid])
+                
+                @@unique([user_id, user_name], name: "post_user_unique")
             }
-
+            
             model User {
-               id                       Int     @id @default(autoincrement())
-               name_that_is_invalid     String  @map("name-that-is-invalid")
-               Post                     Post?
-
-               @@unique([id, name_that_is_invalid], name: "user_unique")
+                id                   Int    @default(autoincrement()) @id
+                name_that_is_invalid String @map("name-that-is-invalid")
+                Post                 Post?
+                
+                @@unique([id, name_that_is_invalid], name: "user_unique")
             }
+            
         "#;
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);

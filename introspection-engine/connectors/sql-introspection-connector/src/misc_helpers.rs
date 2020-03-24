@@ -1,7 +1,6 @@
-use datamodel::common::names::NameNormalizer;
 use datamodel::{
-    DefaultValue as DMLDef, Field, FieldArity, FieldType, IndexDefinition, Model, OnDeleteStrategy,
-    RelationInfo, ScalarType, ScalarValue as SV, ValueGenerator as VG,
+    Datamodel, DefaultValue as DMLDef, Field, FieldArity, FieldType, IndexDefinition, Model,
+    OnDeleteStrategy, RelationInfo, ScalarType, ScalarValue as SV, ValueGenerator as VG,
 };
 use log::debug;
 use once_cell::sync::Lazy;
@@ -62,14 +61,6 @@ fn common_prisma_m_to_n_relation_conditions(table: &Table) -> bool {
         }
 }
 
-pub(crate) fn is_foreign_key_column(table: &Table, column: &Column) -> bool {
-    table
-        .foreign_keys
-        .iter()
-        .find(|fk| fk.columns.contains(&column.name))
-        .is_some()
-}
-
 //calculators
 
 pub fn calculate_many_to_many_field(
@@ -79,7 +70,7 @@ pub fn calculate_many_to_many_field(
 ) -> Field {
     let field_type = FieldType::Relation(RelationInfo {
         name: relation_name,
-        fields: todo!("fix virtual relation fields"),
+        fields: vec![],
         to: foreign_key.referenced_table.clone(),
         to_fields: foreign_key.referenced_columns.clone(),
         on_delete: OnDeleteStrategy::None,
@@ -122,18 +113,9 @@ pub(crate) fn calculate_index(index: &Index) -> IndexDefinition {
     index_definition
 }
 
-pub(crate) fn calculate_compound_index(index: &Index, name: String) -> IndexDefinition {
-    debug!("Handling compound index  {:?}", name);
-    IndexDefinition {
-        name: Some(index.name.clone()),
-        fields: vec![name],
-        tpe: datamodel::dml::IndexType::Normal,
-    }
-}
-
-pub(crate) fn calculate_scalar_field(schema: &SqlSchema, table: &Table, column: &Column) -> Field {
+pub(crate) fn calculate_scalar_field(table: &Table, column: &Column) -> Field {
     debug!("Handling column {:?}", column);
-    let field_type = calculate_field_type(&schema, &column, &table);
+    let field_type = calculate_scalar_field_type(&column);
     let (is_commented_out, documentation) = match field_type {
         FieldType::Unsupported(_) => (
             true,
@@ -175,13 +157,12 @@ pub(crate) fn calculate_relation_field(
     schema: &SqlSchema,
     table: &Table,
     foreign_key: &ForeignKey,
-    foreign_keys: &Vec<ForeignKey>,
 ) -> Field {
-    debug!("Handling compound foreign key  {:?}", foreign_key);
+    debug!("Handling foreign key  {:?}", foreign_key);
 
     let field_type = FieldType::Relation(RelationInfo {
         name: calculate_relation_name(schema, foreign_key, table),
-        fields: todo!("fix virtual relation fields"),
+        fields: foreign_key.columns.clone(),
         to: foreign_key.referenced_table.clone(),
         to_fields: foreign_key.referenced_columns.clone(),
         on_delete: OnDeleteStrategy::None,
@@ -198,42 +179,15 @@ pub(crate) fn calculate_relation_field(
         false => FieldArity::Required,
     };
 
-    let more_then_one_compound_to_same_table = || {
-        foreign_keys
-            .iter()
-            .filter(|fk| {
-                fk.referenced_table == foreign_key.referenced_table && fk.columns.len() > 1
-            })
-            .count()
-            > 1
-    };
-
-    let (name, database_name) = match columns.len() {
-        1 => (columns[0].name.clone(), vec![]),
-        _ if more_then_one_compound_to_same_table() => (
-            format!(
-                "{}_{}",
-                foreign_key.referenced_table.clone(),
-                columns[0].name.clone()
-            ),
-            columns.iter().map(|c| c.name.clone()).collect(),
-        ),
-        _ => (
-            foreign_key.referenced_table.clone(),
-            columns.iter().map(|c| c.name.clone()).collect(),
-        ),
-    };
-
-    let is_id = is_relation_and_id(columns, &table);
-
+    // todo Should this be an extra type? It uses just a small subset of the features of a scalar field
     Field {
-        name,
+        name: foreign_key.referenced_table.clone(),
         arity,
-        field_type,
-        database_names: database_name,
+        field_type, // todo we could remove relation out of the type and make relationinfo part of RelationField
+        database_names: vec![],
         default_value: None,
         is_unique: false,
-        is_id,
+        is_id: false,
         documentation: None,
         is_generated: false,
         is_updated_at: false,
@@ -250,30 +204,23 @@ pub(crate) fn calculate_backrelation_field(
     relation_info: &RelationInfo,
 ) -> Field {
     let table = schema.table_bang(&model.name);
-    let fk = table.foreign_key_for_column(&relation_field.name);
-    let on_delete = match fk {
-        // TODO: bring `onDelete` back once `prisma migrate` is a thing
-        //        Some(fk) if fk.on_delete_action == ForeignKeyAction::Cascade => OnDeleteStrategy::Cascade,
-        _ => OnDeleteStrategy::None,
-    };
+
     let field_type = FieldType::Relation(RelationInfo {
         name: relation_info.name.clone(),
         to: model.name.clone(),
-        fields: todo!("fix virtual relation fields"),
+        fields: vec![],
         to_fields: vec![],
-        on_delete,
+        on_delete: OnDeleteStrategy::None,
     });
 
-    let other_is_unique = || match &relation_field.database_names.len() {
-        0 => table.is_column_unique(&relation_field.name),
+    let other_is_unique = || match &relation_info.fields.len() {
         1 => {
-            let column_name = relation_field.database_names.first().unwrap();
+            let column_name = &relation_info.fields.first().unwrap();
             table.is_column_unique(column_name)
         }
-        _ => table
-            .indices
-            .iter()
-            .any(|i| i.columns == relation_field.database_names && i.tpe == IndexType::Unique),
+        _ => table.indices.iter().any(|i| {
+            columns_match(&i.columns, &relation_info.fields) && i.tpe == IndexType::Unique
+        }),
     };
 
     let arity = match relation_field.arity {
@@ -349,30 +296,6 @@ pub(crate) fn is_id(column: &Column, table: &Table) -> bool {
         .unwrap_or(false)
 }
 
-pub(crate) fn is_relation_and_id(columns: Vec<&Column>, table: &Table) -> bool {
-    table
-        .primary_key
-        .as_ref()
-        .map(|pk| {
-            columns_match(
-                &pk.columns,
-                &columns
-                    .iter()
-                    .map(|c| c.name.clone())
-                    .collect::<Vec<String>>(),
-            )
-        })
-        .unwrap_or(false)
-}
-
-pub(crate) fn is_part_of_id(column: &Column, table: &Table) -> bool {
-    table
-        .primary_key
-        .as_ref()
-        .map(|pk| pk.columns.contains(&column.name))
-        .unwrap_or(false)
-}
-
 pub(crate) fn is_sequence(column: &Column, table: &Table) -> bool {
     table
         .primary_key
@@ -421,80 +344,59 @@ pub(crate) fn calculate_relation_name(
     }
 }
 
-pub(crate) fn calculate_field_type(
-    schema: &SqlSchema,
-    column: &Column,
-    table: &Table,
-) -> FieldType {
+pub(crate) fn calculate_scalar_field_type(column: &Column) -> FieldType {
     debug!("Calculating field type for '{}'", column.name);
-    // Look for a foreign key referencing this column
-    match table
-        .foreign_keys
-        .iter()
-        .find(|fk| fk.columns.contains(&column.name))
-    {
-        Some(fk) if !is_id(column, table) && !is_part_of_id(column, table) => {
-            debug!("Found corresponding foreign key");
-            let idx = fk
-                .columns
-                .iter()
-                .position(|n| n == &column.name)
-                .expect("get column FK position");
-            let referenced_col = &fk.referenced_columns[idx];
 
-            FieldType::Relation(RelationInfo {
-                name: calculate_relation_name(schema, fk, table),
-                fields: todo!("fix virtual relation fields"),
-                to: fk.referenced_table.clone(),
-                to_fields: vec![referenced_col.clone()],
-                on_delete: OnDeleteStrategy::None,
-            })
-        }
-        _ => {
-            debug!("Found no corresponding foreign key");
-            match &column.tpe.family {
-                ColumnTypeFamily::Boolean => FieldType::Base(ScalarType::Boolean, None),
-                ColumnTypeFamily::DateTime => FieldType::Base(ScalarType::DateTime, None),
-                ColumnTypeFamily::Float => FieldType::Base(ScalarType::Float, None),
-                ColumnTypeFamily::Int => FieldType::Base(ScalarType::Int, None),
-                ColumnTypeFamily::String => FieldType::Base(ScalarType::String, None),
-                ColumnTypeFamily::Enum(name) => FieldType::Enum(name.clone()),
-                ColumnTypeFamily::Uuid => FieldType::Base(ScalarType::String, None),
-                ColumnTypeFamily::Json => FieldType::Base(ScalarType::String, None),
-                x => FieldType::Unsupported(x.to_string()),
-            }
-        }
+    match &column.tpe.family {
+        ColumnTypeFamily::Boolean => FieldType::Base(ScalarType::Boolean, None),
+        ColumnTypeFamily::DateTime => FieldType::Base(ScalarType::DateTime, None),
+        ColumnTypeFamily::Float => FieldType::Base(ScalarType::Float, None),
+        ColumnTypeFamily::Int => FieldType::Base(ScalarType::Int, None),
+        ColumnTypeFamily::String => FieldType::Base(ScalarType::String, None),
+        ColumnTypeFamily::Enum(name) => FieldType::Enum(name.clone()),
+        ColumnTypeFamily::Uuid => FieldType::Base(ScalarType::String, None),
+        ColumnTypeFamily::Json => FieldType::Base(ScalarType::String, None),
+        x => FieldType::Unsupported(x.to_string()),
     }
 }
 
 // misc
 
-pub fn deduplicate_names_of_fields_to_be_added(fields_to_be_added: &mut Vec<(String, Field)>) {
+pub fn deduplicate_field_names(datamodel: &mut Datamodel) {
     let mut duplicated_relation_fields = Vec::new();
-    fields_to_be_added
+
+    for model in &datamodel.models {
+        for field in &model.fields {
+            let is_duplicated = model.fields.iter().filter(|f| field.name == f.name).count() > 1;
+
+            if let FieldType::Relation(RelationInfo {
+                name: relation_name,
+                ..
+            }) = &field.field_type
+            {
+                if is_duplicated {
+                    duplicated_relation_fields.push((
+                        model.name.clone(),
+                        field.name.clone(),
+                        relation_name.clone(),
+                    ));
+                }
+            };
+        }
+    }
+
+    duplicated_relation_fields
         .iter()
-        .enumerate()
-        .for_each(|(index, (model, field))| {
-            let is_duplicated = fields_to_be_added
-                .iter()
-                .filter(|(other_model, other_field)| {
-                    model == other_model && field.name == other_field.name
-                })
-                .count()
-                > 1;
+        .for_each(|(model, field, relation_name)| {
+            let mut field = datamodel
+                .find_model_mut(model)
+                .unwrap()
+                .find_relation_field_mut(field)
+                .unwrap();
 
-            if is_duplicated {
-                duplicated_relation_fields.push(index);
-            }
+            //todo self vs normal relation?
+            field.name = format!("{}_{}", field.name, &relation_name);
         });
-
-    duplicated_relation_fields.iter().for_each(|index| {
-        let (_, ref mut field) = fields_to_be_added.get_mut(*index).unwrap();
-        field.name = match &field.field_type {
-            FieldType::Relation(RelationInfo { name, .. }) => format!("{}_{}", field.name, &name),
-            _ => field.name.clone(),
-        };
-    });
 }
 
 static RE_NUM: Lazy<Regex> = Lazy::new(|| Regex::new(r"^'?(\d+)'?$").expect("compile regex"));
