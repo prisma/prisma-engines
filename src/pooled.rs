@@ -126,7 +126,7 @@ impl Quaint {
 
         let inner = Pool::builder()
             .max_open(connection_limit.into())
-            .max_lifetime(Some(Duration::from_secs(300)))
+            .max_idle_lifetime(Some(Duration::from_secs(300)))
             .test_on_check_out(false)
             .build(manager);
 
