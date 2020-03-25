@@ -1,4 +1,5 @@
 use crate::common::*;
+use datamodel::ast::Span;
 use datamodel::{ast, error::DatamodelError};
 
 #[test]
@@ -94,64 +95,24 @@ fn map_must_fail_on_multiple_args_for_enums() {
 }
 
 #[test]
-fn map_must_fail_on_wrong_number_of_args_for_relation_fields() {
+#[ignore] // this is hard to implement with the current abstraction in use for `@map`
+fn map_must_error_for_relation_fields() {
     let dml = r#"
     model User {
         id Int @id
-        firstRelation Foo @map(["name1", "name2"]) @relation("One", references: id)
-        secondRelation Foo @map(["name1"]) @relation("Two", references:[a,b])
+        fooId Int
+        relationField  Foo @relation(fields: [fooId], references: [id]) @map(["custom_name"])
     }
     
     model Foo {
         id Int @id
-        a String
-        b String
-        userOne User @relation("One")
-        userTwo User @relation("Two")
-        
-        @@unique([a,b])
     }
     "#;
 
     let errors = parse_error(dml);
-    errors.assert_is_at(
-        0,
-        DatamodelError::new_directive_validation_error(
-            "This Relation Field must specify exactly 1 mapped names.",
-            "map",
-            ast::Span::new(64, 87),
-        ),
-    );
-    errors.assert_is_at(
-        1,
-        DatamodelError::new_directive_validation_error(
-            "This Relation Field must specify exactly 2 mapped names.",
-            "map",
-            ast::Span::new(149, 163),
-        ),
-    );
-}
-
-#[test]
-fn map_must_work_on_right_number_of_args_for_relation_fields() {
-    let dml = r#"
-    model User {
-        id Int @id
-        firstRelation Foo @map(["name1"]) @relation("One", references: id)
-        secondRelation Foo @map(["name1", "name2"]) @relation("Two", references:[a,b])
-    }
-    
-    model Foo {
-        id Int @id
-        a String
-        b String
-        
-        userOne User @relation("One")
-        userTwo User @relation("Two")
-        
-        @@unique([a,b])
-    }
-    "#;
-
-    parse(dml);
+    errors.assert_is(DatamodelError::new_directive_validation_error(
+        "",
+        "map",
+        Span::new(0, 0),
+    ));
 }
