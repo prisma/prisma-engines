@@ -31,6 +31,38 @@ impl Fields {
         }
     }
 
+    pub(crate) fn finalize(&self) {
+        self.mark_read_only()
+    }
+
+    fn mark_read_only(&self) {
+        let inlined_rfs: Vec<&RelationFieldRef> = self
+            .all
+            .iter()
+            .filter_map(|f| match f {
+                Field::Relation(rf) if rf.is_inlined_on_enclosing_model() => Some(rf),
+                _ => None,
+            })
+            .collect();
+
+        for rf in inlined_rfs {
+            for field_name in rf.relation_info.fields.iter() {
+                let field = self
+                    .all
+                    .iter()
+                    .find(|f| match f {
+                        Field::Scalar(sf) if &sf.name == field_name => true,
+                        _ => false,
+                    })
+                    .expect("Expected inlined relation field reference to be an existing scalar field.");
+
+                if let Field::Scalar(sf) = field {
+                    sf.read_only.get_or_init(|| true);
+                }
+            }
+        }
+    }
+
     pub fn id(&self) -> Option<Vec<Field>> {
         self.id
             .get_or_init(|| {

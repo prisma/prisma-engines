@@ -31,11 +31,12 @@ class CompoundPKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBas
     val project = ProjectDsl.fromString {
       s"""
          |model Parent {
-         |  name  String
-         |  child Child  @relation(references: [id])
-         |  age   Int
+         |  name     String
+         |  child_id Int
+         |  age      Int
          |
-         |  @@id([name, child])
+         |  child Child  @relation(fields: [child_id], references: [id])
+         |  @@id([name, child_id])
          |}
          |
          |model Child {
