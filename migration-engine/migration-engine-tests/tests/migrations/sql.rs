@@ -340,7 +340,7 @@ async fn indexes_on_composite_relation_fields(api: &TestApi) -> TestResult {
           uln String
           user User @relation(fields: [ufn, uln], references: [firstName, lastName])
 
-          @@index([user])
+          @@index([ufn, uln])
         }
     "##;
 
