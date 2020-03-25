@@ -185,7 +185,7 @@ fn create_one_types_response() -> serde_json::Value {
     })
 }
 
-#[test_each_connector(tags("postgres"), log = "debug")]
+#[test_each_connector(tags("postgres"))]
 async fn postgres_types_roundtrip(api: &TestApi) -> TestResult {
     api.execute_sql(CREATE_TYPES_TABLE).await?;
 
@@ -242,7 +242,7 @@ async fn postgres_types_roundtrip(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector(tags("postgres"), log = "debug")]
+#[test_each_connector(tags("postgres"))]
 async fn small_float_values_must_work(api: &TestApi) -> TestResult {
     let schema = indoc! {
         r#"
@@ -477,9 +477,9 @@ async fn postgres_array_types_roundtrip(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector(tags("postgres"))]
+#[test_each_connector(tags("postgres"), log = "debug")]
 async fn all_postgres_id_types_work(api: &TestApi) -> TestResult {
-    let pk_types = &[
+    let identifier_types = &[
         ("int2", "12"),
         ("int4", "78"),
         ("int8", "1293"),
@@ -510,37 +510,39 @@ async fn all_postgres_id_types_work(api: &TestApi) -> TestResult {
 
     let drop_table = r#"DROP TABLE IF EXISTS "prisma-tests"."pk_test""#;
 
-    for (pk_type, pk_value) in pk_types {
-        let create_table = format!(
-            r#"CREATE TABLE "prisma-tests"."pk_test" (id {}, PRIMARY KEY (id))"#,
-            pk_type
-        );
-        api.execute_sql(drop_table).await?;
-        api.execute_sql(&create_table).await?;
+    for (identifier_type, identifier_value) in identifier_types {
+        for index_type in &["PRIMARY KEY", "UNIQUE"] {
+            let create_table = format!(
+                r#"CREATE TABLE "prisma-tests"."pk_test" (id {} NOT NULL, {} (id))"#,
+                identifier_type, index_type,
+            );
+            api.execute_sql(drop_table).await?;
+            api.execute_sql(&create_table).await?;
 
-        let (_datamodel, engine) = api.introspect_and_start_query_engine().await?;
+            let (_datamodel, engine) = api.introspect_and_start_query_engine().await?;
 
-        let query = format!(
-            r#"
-            mutation {{
-                createOnepk_test(
-                    data: {{
-                        id: {}
+            let query = format!(
+                r#"
+                mutation {{
+                    createOnepk_test(
+                        data: {{
+                            id: {}
+                        }}
+                    ) {{
+                        id
                     }}
-                ) {{
-                    id
                 }}
-            }}
-            "#,
-            pk_value
-        );
+                "#,
+                identifier_value
+            );
 
-        let response = engine.request(query).await;
+            let response = engine.request(query).await;
 
-        assert_eq!(
-            response.to_string(),
-            format!(r#"{{"data":{{"createOnepk_test":{{"id":{}}}}}}}"#, pk_value)
-        );
+            assert_eq!(
+                response.to_string(),
+                format!(r#"{{"data":{{"createOnepk_test":{{"id":{}}}}}}}"#, identifier_value)
+            );
+        }
     }
 
     Ok(())
@@ -571,8 +573,8 @@ async fn all_postgres_types_work_as_filter(api: &TestApi) -> TestResult {
                     string_char: "yeet"
                     string_varchar: "yeet variable"
                     string_text: "to yeet or not to yeet"
-                    # binary_bits: "0101110"
-                    # binary_bits_varying: "0101110"
+                    binary_bits: "0101110"
+                    binary_bits_varying: "0101110"
                     binary_uuid: "111142ec-880b-4062-913d-8eac479ab957"
                     time_timestamp: "2020-03-02T08:00:00.000"
                     time_timestamptz: "2020-03-02T08:00:00.000"
@@ -778,7 +780,7 @@ const CREATE_TYPES_TABLE_WITH_ARRAY_DEFAULTS: &str = indoc! {
     "##
 };
 
-#[test_each_connector(tags("postgres"), log = "debug")]
+#[test_each_connector(tags("postgres"))]
 async fn postgres_db_level_array_defaults_work(api: &TestApi) -> TestResult {
     api.execute_sql(CREATE_TYPES_TABLE_WITH_ARRAY_DEFAULTS).await?;
 
