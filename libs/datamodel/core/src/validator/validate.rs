@@ -20,38 +20,36 @@ impl<'a> Validator<'a> {
         Self { source }
     }
 
-    pub fn validate(
-        &self,
-        ast_schema: &ast::SchemaAst,
-        schema: &mut dml::Datamodel,
-    ) -> Result<(), ErrorCollection> {
+    pub fn validate(&self, ast_schema: &ast::SchemaAst, schema: &mut dml::Datamodel) -> Result<(), ErrorCollection> {
         let mut errors = ErrorCollection::new();
 
         // Model level validations.
         for model in schema.models() {
-            if let Err(err) = self.validate_model_has_id(
-                ast_schema.find_model(&model.name).expect(STATE_ERROR),
-                model,
-            ) {
+            if let Err(err) = self.validate_model_has_id(ast_schema.find_model(&model.name).expect(STATE_ERROR), model)
+            {
                 errors.push(err);
             }
             if let Err(err) = self.validate_relations_not_ambiguous(ast_schema, model) {
                 errors.push(err);
             }
-            if let Err(err) =
-                self.validate_embedded_types_have_no_back_relation(ast_schema, schema, model)
-            {
+            if let Err(err) = self.validate_embedded_types_have_no_back_relation(ast_schema, schema, model) {
                 errors.push(err);
             }
 
-            if let Err(ref mut the_errors) = self.validate_field_arities(
-                ast_schema.find_model(&model.name).expect(STATE_ERROR),
-                model,
-            ) {
+            if let Err(ref mut the_errors) =
+                self.validate_field_arities(ast_schema.find_model(&model.name).expect(STATE_ERROR), model)
+            {
                 errors.append(the_errors);
             }
 
-            if let Err(ref mut the_errors) = self.validate_base_fields_for_relation(
+            if let Err(ref mut the_errors) =
+                self.validate_base_fields_for_relation(ast_schema.find_model(&model.name).expect(STATE_ERROR), model)
+            {
+                errors.append(the_errors);
+            }
+
+            if let Err(ref mut the_errors) = self.validate_referenced_fields_for_relation(
+                schema,
                 ast_schema.find_model(&model.name).expect(STATE_ERROR),
                 model,
             ) {
@@ -66,11 +64,7 @@ impl<'a> Validator<'a> {
         }
     }
 
-    fn validate_field_arities(
-        &self,
-        ast_model: &ast::Model,
-        model: &dml::Model,
-    ) -> Result<(), ErrorCollection> {
+    fn validate_field_arities(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), ErrorCollection> {
         let mut errors = ErrorCollection::new();
 
         // TODO: this is really ugly
@@ -80,10 +74,7 @@ impl<'a> Validator<'a> {
         };
 
         for field in model.fields() {
-            if field.arity == FieldArity::List
-                && !scalar_lists_are_supported
-                && !field.field_type.is_relation()
-            {
+            if field.arity == FieldArity::List && !scalar_lists_are_supported && !field.field_type.is_relation() {
                 let ast_field = ast_model
                     .fields
                     .iter()
@@ -105,11 +96,7 @@ impl<'a> Validator<'a> {
         }
     }
 
-    fn validate_model_has_id(
-        &self,
-        ast_model: &ast::Model,
-        model: &dml::Model,
-    ) -> Result<(), DatamodelError> {
+    fn validate_model_has_id(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), DatamodelError> {
         let multiple_single_field_id_error = Err(DatamodelError::new_model_validation_error(
             "At most one field must be marked as the id field with the `@id` directive.",
             &model.name,
@@ -131,11 +118,7 @@ impl<'a> Validator<'a> {
         let has_single_field_id = model.singular_id_fields().next().is_some();
         let has_multi_field_id = !model.id_fields.is_empty();
         let has_single_field_unique = model.fields().find(|f| f.is_unique).is_some();
-        let has_multi_field_unique = model
-            .indices
-            .iter()
-            .find(|i| i.tpe == IndexType::Unique)
-            .is_some();
+        let has_multi_field_unique = model.indices.iter().find(|i| i.tpe == IndexType::Unique).is_some();
 
         if model.singular_id_fields().count() > 1 {
             return multiple_single_field_id_error;
@@ -145,11 +128,7 @@ impl<'a> Validator<'a> {
             return multiple_id_criteria_error;
         }
 
-        if has_single_field_id
-            || has_multi_field_id
-            || has_single_field_unique
-            || has_multi_field_unique
-        {
+        if has_single_field_id || has_multi_field_id || has_single_field_unique || has_multi_field_unique {
             Ok(())
         } else {
             missing_id_criteria_error
@@ -170,19 +149,14 @@ impl<'a> Validator<'a> {
                     if let dml::FieldType::Relation(rel) = &field.field_type {
                         // TODO: I am not sure if this check is d'accord with the query engine.
                         let related = datamodel.find_model(&rel.to).unwrap();
-                        let related_field = related
-                            .related_field(&model.name, &rel.name, &field.name)
-                            .unwrap();
+                        let related_field = related.related_field(&model.name, &rel.name, &field.name).unwrap();
 
                         if rel.to_fields.is_empty() && !related_field.is_generated {
                             // TODO: Refactor that out, it's way too much boilerplate.
                             return Err(DatamodelError::new_model_validation_error(
                                 "Embedded models cannot have back relation fields.",
                                 &model.name,
-                                ast_schema
-                                    .find_field(&model.name, &field.name)
-                                    .expect(STATE_ERROR)
-                                    .span,
+                                ast_schema.find_field(&model.name, &field.name).expect(STATE_ERROR).span,
                             ));
                         }
                     }
@@ -208,11 +182,88 @@ impl<'a> Validator<'a> {
                 .unwrap();
 
             if let dml::FieldType::Relation(rel_info) = &field.field_type {
-                let unknown_scalar_fields: Vec<String> = rel_info
+                let unknown_fields: Vec<String> = rel_info
                     .fields
                     .iter()
-                    .filter(|base_field| {
-                        let scalar_field = model.find_field(&base_field);
+                    .filter(|base_field| model.find_field(&base_field).is_none())
+                    .map(|f| f.clone())
+                    .collect();
+
+                let referenced_relation_fields: Vec<String> = rel_info
+                    .fields
+                    .iter()
+                    .filter(|base_field| match model.find_field(&base_field) {
+                        None => false,
+                        Some(scalar_field) => scalar_field.field_type.is_relation(),
+                    })
+                    .map(|f| f.clone())
+                    .collect();
+
+                let fields_with_wrong_arity: Vec<&dml::Field> = rel_info
+                    .fields
+                    .iter()
+                    .filter_map(|base_field| model.find_field(&base_field))
+                    .filter(|f| f.arity != field.arity)
+                    .collect();
+                let fields_with_wrong_arity_names: Vec<String> =
+                    fields_with_wrong_arity.iter().map(|f| f.name.clone()).collect();
+
+                if !unknown_fields.is_empty() {
+                    errors.push(DatamodelError::new_validation_error(
+                        &format!("The argument fields must refer only to existing fields. The following fields do not exist in this model: {}", unknown_fields.join(", ")),
+                        ast_field.span.clone())
+                    );
+                }
+
+                if !referenced_relation_fields.is_empty() {
+                    errors.push(DatamodelError::new_validation_error(
+                        &format!("The argument fields must refer only to scalar fields. But it is referencing the following relation fields: {}", referenced_relation_fields.join(", ")),
+                        ast_field.span.clone())
+                    );
+                }
+
+                if !fields_with_wrong_arity.is_empty() {
+                    errors.push(DatamodelError::new_validation_error(
+                        &format!("The relation field `{}` uses the scalar fields {}. The arity of those fields must be the same. The relation field is {} but the scalar fields are {}.",
+                            &field.name,
+                                 fields_with_wrong_arity_names.join(", "),
+                        &field.arity.verbal_display(),
+                        &fields_with_wrong_arity.first().unwrap().arity.verbal_display()),
+                        ast_field.span.clone())
+                    );
+                }
+            }
+        }
+
+        if errors.has_errors() {
+            Err(errors)
+        } else {
+            Ok(())
+        }
+    }
+
+    fn validate_referenced_fields_for_relation(
+        &self,
+        datamodel: &dml::Datamodel,
+        ast_model: &ast::Model,
+        model: &dml::Model,
+    ) -> Result<(), ErrorCollection> {
+        let mut errors = ErrorCollection::new();
+
+        for field in model.fields() {
+            let ast_field = ast_model
+                .fields
+                .iter()
+                .find(|ast_field| ast_field.name.name == field.name)
+                .unwrap();
+
+            if let dml::FieldType::Relation(rel_info) = &field.field_type {
+                let related_model = datamodel.find_model(&rel_info.to).expect(STATE_ERROR);
+                let unknown_scalar_fields: Vec<String> = rel_info
+                    .to_fields
+                    .iter()
+                    .filter(|referenced_field| {
+                        let scalar_field = related_model.find_field(&referenced_field);
                         scalar_field.is_none()
                     })
                     .map(|f| f.clone())
@@ -220,7 +271,9 @@ impl<'a> Validator<'a> {
 
                 if !unknown_scalar_fields.is_empty() {
                     errors.push(DatamodelError::new_validation_error(
-                        &format!("The argument fields must refer only to other scalar fields. The following fields are not known in this model: {}", unknown_scalar_fields.join(", ")), 
+                        &format!("The argument `references` must refer to scalar fields in the related model `{}`. The following fields do not exist in the related model: {}",
+                            &related_model.name,
+                                 unknown_scalar_fields.join(", ")),
                         ast_field.span.clone())
                     );
                 }
@@ -289,8 +342,7 @@ impl<'a> Validator<'a> {
                                 // Named self relations are ambiguous when they involve more than two fields.
                                 for field_c in model.fields() {
                                     if field_a != field_c && field_b != field_c {
-                                        if let dml::FieldType::Relation(rel_c) = &field_c.field_type
-                                        {
+                                        if let dml::FieldType::Relation(rel_c) = &field_c.field_type {
                                             if rel_c.to == model.name
                                                 && rel_a.name == rel_b.name
                                                 && rel_a.name == rel_c.name
