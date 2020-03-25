@@ -54,22 +54,14 @@ impl PrismaError {
             }) => err.into(),
             PrismaError::ConversionError(errors, dml_string) => {
                 let mut full_error = errors.to_pretty_string("schema.prisma", &dml_string);
-                write!(
-                    full_error,
-                    "\nValidation Error Count: {}",
-                    errors.to_iter().len()
-                )?;
+                write!(full_error, "\nValidation Error Count: {}", errors.to_iter().len())?;
 
                 user_facing_errors::Error::from(
-                    user_facing_errors::KnownError::new(
-                        user_facing_errors::common::SchemaParserError { full_error },
-                    )
-                    .unwrap(),
+                    user_facing_errors::KnownError::new(user_facing_errors::common::SchemaParserError { full_error })
+                        .unwrap(),
                 )
             }
-            other => {
-                user_facing_errors::Error::new_non_panic_with_current_backtrace(other.to_string())
-            }
+            other => user_facing_errors::Error::new_non_panic_with_current_backtrace(other.to_string()),
         };
 
         // Because of how the node frontend works (stderr.on('data', ...)), we want to emit one clean JSON message on a single line at once.
@@ -101,9 +93,7 @@ impl From<PrismaError> for response_ir::ResponseError {
     fn from(other: PrismaError) -> Self {
         match other {
             PrismaError::CoreError(core_error) => response_ir::ResponseError::from(core_error),
-            err => response_ir::ResponseError::from(user_facing_errors::Error::from_dyn_error(
-                &err.compat(),
-            )),
+            err => response_ir::ResponseError::from(user_facing_errors::Error::from_dyn_error(&err.compat())),
         }
     }
 }

@@ -173,9 +173,8 @@ async fn querying_model_tables_with_alias(api: &TestApi) -> anyhow::Result<()> {
 
     query_engine.request(mutation).await;
 
-    let (query, params) = api.to_sql_string(
-        Select::from_table("Todo").column(Column::from("title").alias("aliasedTitle")),
-    );
+    let (query, params) =
+        api.to_sql_string(Select::from_table("Todo").column(Column::from("title").alias("aliasedTitle")));
 
     assert_eq!(
         json!({
@@ -223,12 +222,9 @@ async fn querying_the_same_column_name_twice_with_aliasing(api: &TestApi) -> any
 async fn arrays(api: &TestApi) -> anyhow::Result<()> {
     let query_engine = api.create_engine(&TODO).await?;
 
-    let query =
-        "SELECT ARRAY_AGG(columnInfos.attname) AS postgres_array FROM pg_attribute columnInfos";
+    let query = "SELECT ARRAY_AGG(columnInfos.attname) AS postgres_array FROM pg_attribute columnInfos";
     let result = query_engine.request(execute_raw(query, vec![])).await;
-    let array = result["data"]["executeRaw"][0]["postgres_array"]
-        .as_array()
-        .unwrap();
+    let array = result["data"]["executeRaw"][0]["postgres_array"].as_array().unwrap();
 
     for val in array.into_iter() {
         assert!(val.is_string());
@@ -240,9 +236,7 @@ async fn arrays(api: &TestApi) -> anyhow::Result<()> {
 #[test_each_connector]
 async fn syntactic_errors_bubbling_through_to_the_user(api: &TestApi) -> anyhow::Result<()> {
     let query_engine = api.create_engine(&TODO).await?;
-    let result = query_engine
-        .request(execute_raw("SELECT * FROM ", vec![]))
-        .await;
+    let result = query_engine.request(execute_raw("SELECT * FROM ", vec![])).await;
     let error_code = result["errors"][0]["user_facing_error"]["meta"]["code"].as_str();
 
     match api.connection_info() {
@@ -267,9 +261,7 @@ async fn other_errors_bubbling_through_to_the_user(api: &TestApi) -> anyhow::Res
     let result = query_engine.request(mutation).await;
     let id = result["data"]["createOneTodo"]["id"].as_str().unwrap();
 
-    let insert = Insert::single_into("Todo")
-        .value("id", id)
-        .value("title", "irrelevant");
+    let insert = Insert::single_into("Todo").value("id", id).value("title", "irrelevant");
     let (query, params) = api.to_sql_string(insert);
 
     let result = query_engine.request(execute_raw(&query, params)).await;
