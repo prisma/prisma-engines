@@ -259,21 +259,37 @@ impl<'a> Validator<'a> {
 
             if let dml::FieldType::Relation(rel_info) = &field.field_type {
                 let related_model = datamodel.find_model(&rel_info.to).expect(STATE_ERROR);
-                let unknown_scalar_fields: Vec<String> = rel_info
+                let unknown_fields: Vec<String> = rel_info
                     .to_fields
                     .iter()
-                    .filter(|referenced_field| {
-                        let scalar_field = related_model.find_field(&referenced_field);
-                        scalar_field.is_none()
+                    .filter(|referenced_field| related_model.find_field(&referenced_field).is_none())
+                    .map(|f| f.clone())
+                    .collect();
+
+                let referenced_relation_fields: Vec<String> = rel_info
+                    .to_fields
+                    .iter()
+                    .filter(|base_field| match related_model.find_field(&base_field) {
+                        None => false,
+                        Some(scalar_field) => scalar_field.field_type.is_relation(),
                     })
                     .map(|f| f.clone())
                     .collect();
 
-                if !unknown_scalar_fields.is_empty() {
+                if !unknown_fields.is_empty() {
                     errors.push(DatamodelError::new_validation_error(
-                        &format!("The argument `references` must refer to scalar fields in the related model `{}`. The following fields do not exist in the related model: {}",
-                            &related_model.name,
-                                 unknown_scalar_fields.join(", ")),
+                        &format!("The argument `references` must refer only to existing fields in the related model `{}`. The following fields do not exist in the related model: {}",
+                                 &related_model.name,
+                                 unknown_fields.join(", ")),
+                        ast_field.span.clone())
+                    );
+                }
+
+                if !referenced_relation_fields.is_empty() {
+                    errors.push(DatamodelError::new_validation_error(
+                        &format!("The argument `references` must refer only to scalar fields in the related model `{}`. But it is referencing the following relation fields: {}",
+                                 &related_model.name,
+                                 referenced_relation_fields.join(", ")),
                         ast_field.span.clone())
                     );
                 }

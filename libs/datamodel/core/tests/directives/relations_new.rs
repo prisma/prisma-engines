@@ -126,5 +126,26 @@ fn relation_must_error_when_referenced_field_does_not_exist() {
     "#;
 
     let errors = parse_error(dml);
-    errors.assert_is(DatamodelError::new_validation_error("The argument `references` must refer to scalar fields in the related model `User`. The following fields do not exist in the related model: fooBar", Span::new(181, 240)));
+    errors.assert_is(DatamodelError::new_validation_error("The argument `references` must refer only to existing fields in the related model `User`. The following fields do not exist in the related model: fooBar", Span::new(181, 240)));
+}
+
+#[test]
+fn relation_must_error_when_referenced_field_is_not_scalar() {
+    let dml = r#"
+    model User {
+        id Int @id
+        firstName String
+        posts Post[]
+    }
+
+    model Post {
+        id Int @id
+        text String
+        userId Int        
+        user User @relation(fields: [userId], references: [posts])
+    }
+    "#;
+
+    let errors = parse_error(dml);
+    errors.assert_is(DatamodelError::new_validation_error("The argument `references` must refer only to scalar fields in the related model `User`. But it is referencing the following relation fields: posts", Span::new(181, 239)));
 }
