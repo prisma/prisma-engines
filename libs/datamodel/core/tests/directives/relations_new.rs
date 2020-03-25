@@ -1,7 +1,7 @@
 use crate::common::*;
 use datamodel::ast::Span;
+use datamodel::dml;
 use datamodel::error::DatamodelError;
-use datamodel::{common::ScalarType, dml};
 
 #[test]
 fn relation_happy_path() {

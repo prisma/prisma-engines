@@ -24,11 +24,13 @@ fn basic_unique_index_must_work() {
 }
 
 #[test]
-fn unique_indexes_on_relation_fields_must_work() {
+fn multi_field_unique_indexes_on_relation_fields_must_not_work() {
     let dml = r#"
     model User {
-        id             Int            @id
-        identification Identification @relation(references:[id])
+        id               Int @id
+        identificationId Int
+        
+        identification Identification @relation(fields: [identificationId], references:[id])
 
         @@unique([identification])
     }
@@ -38,13 +40,27 @@ fn unique_indexes_on_relation_fields_must_work() {
     }
     "#;
 
-    let schema = parse(dml);
-    let user_model = schema.assert_has_model("User");
-    user_model.assert_has_index(IndexDefinition {
-        name: None,
-        fields: vec!["identification".to_string()],
-        tpe: IndexType::Unique,
-    });
+    let errors = parse_error(dml);
+    errors.assert_is(DatamodelError::new_model_validation_error("The unique index definition refers to the relation fields identification. Index definitions must reference only scalar fields.", "User",Span::new(193, 217)));
+}
+
+#[test]
+fn single_field_unique_on_relation_fields_must_not_work() {
+    let dml = r#"
+    model User {
+        id               Int @id
+        identificationId Int
+        
+        identification Identification @relation(fields: [identificationId], references:[id]) @unique
+    }
+    
+    model Identification {
+        id Int @id
+    }
+    "#;
+
+    let errors = parse_error(dml);
+    errors.assert_is(DatamodelError::new_directive_validation_error("The field `identification` is a relation field and cannot be marked with `unique`. Only scalar fields can be made unique.", "unique",Span::new(183, 189)));
 }
 
 #[test]
