@@ -94,6 +94,10 @@ impl MysqlUrl {
         self.url.port().unwrap_or(3306)
     }
 
+    pub(crate) fn connect_timeout(&self) -> Duration {
+        self.query_params.connect_timeout
+    }
+
     fn default_connection_limit() -> usize {
         num_cpus::get_physical() * 2 + 1
     }

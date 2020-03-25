@@ -1,7 +1,8 @@
 //! A connection pool to a SQL database.
+
 mod manager;
 
-pub use manager::{PooledConnection, QuaintManager};
+pub use manager::*;
 
 use crate::connector::{ConnectionInfo, SqlFamily};
 use mobc::Pool;
@@ -16,6 +17,7 @@ use std::convert::TryFrom;
 pub struct Quaint {
     pub inner: Pool<QuaintManager>,
     connection_info: Arc<ConnectionInfo>,
+    connect_timeout: Duration,
 }
 
 impl Quaint {
@@ -90,7 +92,7 @@ impl Quaint {
     pub async fn new(url_str: &str) -> crate::Result<Self> {
         let url = Url::parse(url_str)?;
 
-        let (manager, connection_limit) = match url.scheme() {
+        let (manager, connection_limit, connect_timeout) = match url.scheme() {
             #[cfg(feature = "sqlite")]
             "file" | "sqlite" => {
                 let params = crate::connector::SqliteParams::try_from(url_str)?;
@@ -100,23 +102,26 @@ impl Quaint {
                     db_name: params.db_name,
                 };
 
-                (manager, params.connection_limit)
+                (manager, params.connection_limit, Duration::from_secs(5))
             }
             #[cfg(feature = "mysql")]
             "mysql" => {
                 let url = crate::connector::MysqlUrl::new(url)?;
                 let connection_limit = url.connection_limit();
+                let connect_timeout = url.connect_timeout();
+
                 let manager = QuaintManager::Mysql(url);
 
-                (manager, connection_limit as u32)
+                (manager, connection_limit as u32, connect_timeout)
             }
             #[cfg(feature = "postgresql")]
             "postgres" | "postgresql" => {
                 let url = crate::connector::PostgresUrl::new(url)?;
                 let connection_limit = url.connection_limit();
+                let connect_timeout = url.connect_timeout();
                 let manager = QuaintManager::Postgres(url);
 
-                (manager, connection_limit as u32)
+                (manager, connection_limit as u32, connect_timeout)
             }
             _ => unimplemented!("Supported url schemes: file or sqlite, mysql, postgres or postgresql."),
         };
@@ -127,10 +132,15 @@ impl Quaint {
         let inner = Pool::builder()
             .max_open(connection_limit.into())
             .max_idle_lifetime(Some(Duration::from_secs(300)))
-            .test_on_check_out(false)
+            .health_check_interval(Some(Duration::from_secs(15)))
+            .test_on_check_out(true)
             .build(manager);
 
-        Ok(Self { inner, connection_info })
+        Ok(Self {
+            inner,
+            connection_info,
+            connect_timeout,
+        })
     }
 
     /// The number of connections in the pool.
@@ -141,7 +151,7 @@ impl Quaint {
     /// Reserve a connection from the pool.
     pub async fn check_out(&self) -> crate::Result<PooledConnection> {
         Ok(PooledConnection {
-            inner: self.inner.get().await?,
+            inner: self.inner.get_timeout(self.connect_timeout).await?,
         })
     }
 

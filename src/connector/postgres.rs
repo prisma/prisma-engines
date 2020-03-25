@@ -208,6 +208,10 @@ impl PostgresUrl {
         &self.query_params.schema
     }
 
+    pub(crate) fn connect_timeout(&self) -> Duration {
+        self.query_params.connect_timeout
+    }
+
     fn default_connection_limit() -> usize {
         num_cpus::get_physical() * 2 + 1
     }
