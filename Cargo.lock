@@ -2317,9 +2317,9 @@ version = "5.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "50633968284cfc373661345fc6382e62b738079f045738023ebc5e445cf44357"
 dependencies = [
- "quote 1.0.2",
+ "quote 1.0.3",
  "rust-embed-utils",
- "syn 1.0.15",
+ "syn 1.0.16",
  "walkdir",
 ]
 
