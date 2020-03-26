@@ -744,7 +744,7 @@ class NestedDeleteMutationInsideUpdateSpec extends FlatSpec with Matchers with A
 
   // OTHER DATAMODELS
 
-  "a PM to CM relation" should "delete fail if other req relations would be violated" in {
+  "a PM to CM relation" should "delete fail if other req relations would be violated" ignore {
     val project = SchemaDsl.fromStringV11() {
       s"""
         |model Parent{
@@ -819,7 +819,7 @@ class NestedDeleteMutationInsideUpdateSpec extends FlatSpec with Matchers with A
 
   }
 
-  "a PM to CM  relation" should "delete the child from other relations as well" in {
+  "a PM to CM  relation" should "delete the child from other relations as well" ignore {
     val project = SchemaDsl.fromStringV11() {
       s"""
         |model Parent{
