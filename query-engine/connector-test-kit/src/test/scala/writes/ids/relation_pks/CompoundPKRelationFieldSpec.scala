@@ -69,10 +69,15 @@ class CompoundPKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBas
     val res2 = server.query(
       """
         |mutation {
-        |  updateParent(where: { name_child: {
-        |    child: 1
-        |    name: "Paul"
-        |  } } data: { age: 41 }) {
+        |  updateParent(
+        |    where: {
+        |      name_child_id: {
+        |        child_id: 1
+        |        name: "Paul"
+        |      }
+        |    }
+        |    data: { age: 41 }
+        |  ) {
         |    name
         |    age
         |  }
@@ -100,9 +105,9 @@ class CompoundPKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBas
       """
         |mutation {
         |  upsertParent(
-        |    where: { name_child: {
+        |    where: { name_child_id: {
         |      name: "Paul"
-        |      child: 2
+        |      child_id: 2
         |    }}
         |    update: { name: "Milutin", age: 43 }
         |    create: { name: "Milutin", age: 43, child: { create: { id: 2, name: "Nikola" } } }

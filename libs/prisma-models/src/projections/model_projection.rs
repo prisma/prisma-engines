@@ -127,7 +127,6 @@ impl ModelProjection {
     /// occurrence of the first field in order from left (`self`) to right (`other`)
     /// is retained. Assumes that both projections reason over the same model.
     pub fn merge(self, other: ModelProjection) -> ModelProjection {
-        assert_eq!(self.model(), other.model());
         let fields = self.fields.into_iter().chain(other.fields).unique().collect();
 
         ModelProjection { fields }

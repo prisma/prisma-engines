@@ -1,4 +1,5 @@
 use crate::*;
+use itertools::Itertools;
 use once_cell::sync::OnceCell;
 use std::{
     collections::BTreeSet,
@@ -249,5 +250,6 @@ impl Fields {
         self.all
             .iter()
             .flat_map(|field| field.data_source_fields().into_iter().map(|dsf| dsf.name.clone()))
+            .unique()
     }
 }
