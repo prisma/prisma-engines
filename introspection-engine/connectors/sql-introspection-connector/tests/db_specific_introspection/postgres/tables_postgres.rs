@@ -430,8 +430,14 @@ async fn introspecting_an_unsupported_type_should_comment_it_out(api: &TestApi) 
         })
         .await;
 
+    let warnings = dbg!(api.introspection_warnings().await);
+    assert_eq!(
+        &warnings,
+        "[{\"code\":3,\"message\":\"These fields were commented out because we currently do not support their types.\",\"affected\":[{\"model\":\"Test\",\"field\":\"network_mac\",\"tpe\":\"macaddr\"}]}]"
+    );
+
     let result = dbg!(api.introspect().await);
-    assert_eq!(&result, "model Test {\n  id             Int   X   @default(autoincrement()) @id\n  network_inet   String?\n  // This type is currently not supported.\n  // network_mac macaddr?\n}");
+    assert_eq!(&result, "model Test {\n  id             Int      @default(autoincrement()) @id\n  network_inet   String?\n  // This type is currently not supported.\n  // network_mac macaddr?\n}");
 }
 
 #[test_each_connector(tags("postgres"))]
