@@ -30,7 +30,14 @@ pub struct IntrospectionResult {
     /// Datamodel
     pub datamodel: Datamodel,
     /// warnings
-    pub warnings: Value,
+    pub warnings: Vec<Warning>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Warning {
+    pub code: i8,
+    pub message: String,
+    pub affected: Value,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -38,7 +45,7 @@ pub struct IntrospectionResultOutput {
     /// Datamodel
     pub datamodel: String,
     /// warnings
-    pub warnings: Value,
+    pub warnings: Vec<Warning>,
 }
 
 impl fmt::Display for IntrospectionResultOutput {
@@ -46,7 +53,8 @@ impl fmt::Display for IntrospectionResultOutput {
         write!(
             f,
             "{{\"datamodel\": \"{}\", \"warnings\": {}}}",
-            self.datamodel, self.warnings
+            self.datamodel,
+            serde_json::to_string(&self.warnings).unwrap()
         )
     }
 }

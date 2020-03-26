@@ -1,13 +1,6 @@
 use datamodel::{Datamodel, FieldArity, FieldType, RelationInfo};
+use introspection_connector::Warning;
 use serde::Serialize;
-use serde_json::Value;
-
-#[derive(Serialize, Debug)]
-struct Warning {
-    code: i8,
-    message: String,
-    affected: Value,
-}
 
 #[derive(Serialize, Debug)]
 struct Model {
@@ -27,7 +20,7 @@ struct ModelAndFieldType {
     tpe: String,
 }
 
-pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Value {
+pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
     let mut models_without_identifiers = vec![];
     let mut fields_with_empty_names = vec![];
     let mut unsupported_types = vec![];
@@ -145,7 +138,7 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Value {
     if !fields_with_empty_names.is_empty() {
         warnings.push(Warning {
             code: 2,
-            message: "The names of these fields are empty because we unsuccessfully tried to remap the column names."
+            message: "These fields were commented out because of invalid names. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]*."
                 .into(),
             affected: serde_json::to_value(&fields_with_empty_names).unwrap(),
         })
@@ -159,5 +152,5 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Value {
         })
     }
 
-    serde_json::to_value(warnings).unwrap()
+    warnings
 }

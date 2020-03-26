@@ -85,7 +85,6 @@ impl IntrospectionConnector for SqlIntrospectionConnector {
         let sql_schema = self.catch(self.describe()).await?;
         tracing::debug!("SQL Schema Describer is done: {:?}", sql_schema);
 
-        //todo returns warnings as well
         let introspection_result = calculate_datamodel::calculate_model(&sql_schema).unwrap();
         tracing::debug!("Calculating datamodel is done: {:?}", sql_schema);
         Ok(introspection_result)

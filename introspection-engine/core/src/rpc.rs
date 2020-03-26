@@ -92,7 +92,7 @@ impl RpcImpl {
                         &config,
                     )
                     .map_err(Error::from)?,
-                    warnings: introspection_result.warnings.clone(),
+                    warnings: introspection_result.warnings,
                 };
 
                 Ok(result)

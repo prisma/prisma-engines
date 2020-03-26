@@ -8,7 +8,6 @@ use log::debug;
 use sql_schema_describer::*;
 
 /// Calculate a data model from a database schema.
-/// todo return warnings
 pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<IntrospectionResult> {
     debug!("Calculating data model.");
 
@@ -107,7 +106,7 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Introspecti
 
     //todo sanitizing might need to be adjusted to also change the fields in the RelationInfo
     sanitize_datamodel_names(&mut data_model);
-    let warnings = commenting_out_guardrails(&mut data_model); //todo warnings
+    let warnings = commenting_out_guardrails(&mut data_model);
 
     deduplicate_field_names(&mut data_model);
 
@@ -115,6 +114,6 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Introspecti
 
     Ok(IntrospectionResult {
         datamodel: data_model,
-        warnings: warnings,
+        warnings,
     })
 }
