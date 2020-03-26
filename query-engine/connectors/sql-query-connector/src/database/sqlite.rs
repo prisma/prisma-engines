@@ -7,7 +7,7 @@ use connector_interface::{
 };
 use datamodel::Source;
 use quaint::{connector::SqliteParams, error::ErrorKind as QuaintKind, pooled::Quaint, prelude::ConnectionInfo};
-use std::convert::TryFrom;
+use std::{convert::TryFrom, time::Duration};
 
 pub struct Sqlite {
     pool: Quaint,
@@ -58,10 +58,15 @@ impl FromSource for Sqlite {
             format!("{}?{}", url, params.join("&"))
         };
 
-        let pool = Quaint::new(url_with_db.as_str())
-            .await
+        let mut builder = Quaint::builder(url_with_db.as_str())
             .map_err(SqlError::from)
             .map_err(|sql_error| sql_error.into_connector_error(&connection_info))?;
+
+        builder.max_idle_lifetime(Duration::from_secs(300));
+        builder.health_check_interval(Duration::from_secs(15));
+        builder.test_on_check_out(true);
+
+        let pool = builder.build();
 
         Ok(Sqlite { pool, file_path })
     }

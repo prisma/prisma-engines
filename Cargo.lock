@@ -782,9 +782,9 @@ dependencies = [
 
 [[package]]
 name = "h2"
-version = "0.2.2"
+version = "0.2.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9d5c295d1c0c68e4e42003d75f908f5e16a1edd1cbe0b0d02e4dc2006a384f47"
+checksum = "7938e6aa2a31df4e21f224dc84704bd31c089a6d1355c535b03667371cccc843"
 dependencies = [
  "bytes",
  "fnv",
@@ -839,9 +839,9 @@ dependencies = [
 
 [[package]]
 name = "http"
-version = "0.2.0"
+version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b708cc7f06493459026f53b9a61a7a121a5d1ec6238dee58ea4941132b30156b"
+checksum = "28d569972648b2c512421b5f2a405ad6ac9666547189d0c5477a3f200f3e02f9"
 dependencies = [
  "bytes",
  "fnv",
@@ -1455,8 +1455,9 @@ dependencies = [
 
 [[package]]
 name = "mobc"
-version = "0.5.5"
-source = "git+https://github.com/pimeys/mobc?branch=health-check-timeout#ddf151985d94f31f4d45c14e0a16acd6859d6682"
+version = "0.5.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a3fc3c5eb65068542d05bc023d3afa1b9c4aaef647e4f62b167c86c8a85d1ef5"
 dependencies = [
  "async-trait",
  "futures 0.3.4",
@@ -2098,7 +2099,7 @@ dependencies = [
 [[package]]
 name = "quaint"
 version = "0.2.0-alpha.10"
-source = "git+https://github.com/prisma/quaint#83a309ccaabe0a7d2faeb8c2623aae815b839ff8"
+source = "git+https://github.com/prisma/quaint#37bcb11fd7b3fc9fbeb4a501c83101cd5eb744f4"
 dependencies = [
  "async-trait",
  "base64 0.11.0",
