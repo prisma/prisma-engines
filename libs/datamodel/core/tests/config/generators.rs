@@ -10,6 +10,7 @@ generator js1 {
 generator go {
     provider = "go"
     binaryTargets = ["a", "b"]
+  
 }"#;
 
 #[test]

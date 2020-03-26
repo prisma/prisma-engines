@@ -11,6 +11,7 @@ datasource db1 {
 datasource db2 {
     provider = "mysql"
     url = "https://localhost"
+  
 }
 
 
