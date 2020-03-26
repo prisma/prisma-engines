@@ -45,26 +45,50 @@ trait SchemaBaseV11 extends PlayJsonExtensions {
 
   val compoundParentIdReference = RelationReference { rf =>
     //"@relation(references: [id_1, id_2]) @map([\"parent_id_1\", \"parent_id_2\"])"
-    s"@relation(fields: [parent_id_1, parent_id_2], references: [id_1, id_2]) \n parent_id_1 String${rf.optionalSuffix}\n parent_id_2 String${rf.optionalSuffix}"
+    if (rf.isList) {
+      s"@relation(references: [id_1, id_2])"
+    } else {
+      s"@relation(fields: [parent_id_1, parent_id_2], references: [id_1, id_2]) \n parent_id_1 String${rf.optionalSuffix}\n parent_id_2 String${rf.optionalSuffix}"
+    }
   }
   val compoundChildIdReference = RelationReference { rf =>
     //"@relation(references: [id_1, id_2]) @map([\"child_id_1\", \"child_id_2\"])"
-    s"@relation(fields: [child_id_1, child_id_2], references: [id_1, id_2])\n child_id_1 String${rf.optionalSuffix}\n child_id_2 String${rf.optionalSuffix}"
+    if (rf.isList) {
+      s"@relation(references: [id_1, id_2])"
+    } else {
+      s"@relation(fields: [child_id_1, child_id_2], references: [id_1, id_2])\n child_id_1 String${rf.optionalSuffix}\n child_id_2 String${rf.optionalSuffix}"
+    }
   }
 
   val pReference = RelationReference { rf =>
-    s"@relation(fields: [parentRef], references: [p]) \n parentRef String${rf.optionalSuffix}"
+    if (rf.isList) {
+      s"@relation(references: [p])"
+    } else {
+      s"@relation(fields: [parentRef], references: [p]) \n parentRef String${rf.optionalSuffix}"
+    }
   }
   val compoundPReference = RelationReference { rf =>
     //"@relation(references: [p_1, p_2]) @map([\"parent_p_1\", \"parent_p_2\"])"
-    s"@relation(fields: [parent_p_1, parent_p_2], references: [p_1, p_2])\n parent_p_1 String${rf.optionalSuffix}\n parent_p_2 String${rf.optionalSuffix}"
+    if (rf.isList) {
+      s"@relation(references: [p_1, p_2])"
+    } else {
+      s"@relation(fields: [parent_p_1, parent_p_2], references: [p_1, p_2])\n parent_p_1 String${rf.optionalSuffix}\n parent_p_2 String${rf.optionalSuffix}"
+    }
   }
   val cReference = RelationReference { rf =>
-    s"@relation(fields:[parent_c], references: [c]) \nparent_c String${rf.optionalSuffix}"
+    if (rf.isList) {
+      s"@relation(references: [c])"
+    } else {
+      s"@relation(fields:[parent_c], references: [c]) \nparent_c String${rf.optionalSuffix}"
+    }
   }
   val compoundCReference = RelationReference { rf =>
     //"@relation(references: [c_1, c_2]) @map([\"child_c_1\", \"child_c_2\"])"
-    s"@relation(fields: [child_c_1, child_c_2], references: [c_1, c_2])\n child_c_1 String${rf.optionalSuffix}\n child_c_2 String${rf.optionalSuffix}"
+    if (rf.isList) {
+      s"@relation(references: [c_1, c_2])"
+    } else {
+      s"@relation(fields: [child_c_1, child_c_2], references: [c_1, c_2])\n child_c_1 String${rf.optionalSuffix}\n child_c_2 String${rf.optionalSuffix}"
+    }
   }
 
   def commonParentReferences(rf: RelationField): Vector[String] = Vector(pReference(rf), compoundPReference(rf))
