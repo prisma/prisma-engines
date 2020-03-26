@@ -20,17 +20,23 @@ class ManyRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
       |   id         String @id @default(cuid())
       |   title      String
       |   popularity Int
-      |   blog       Blog   @relation(references: [id])
+      |   blog_id    String
       |   comments   Comment[]
-      |   @@index([blog])
+      |   
+      |   blog Blog @relation(fields: [blog_id], references: [id])
+      |   
+      |   @@index([blog_id])
       |}
       |
       |model Comment {
-      |   id    String @id @default(cuid())
-      |   text  String
-      |   likes Int
-      |   post  Post   @relation(references: [id])
-      |   @@index([post])
+      |   id      String @id @default(cuid())
+      |   text    String
+      |   likes   Int
+      |   post_id String
+      |
+      |   post Post @relation(fields: [post_id], references: [id])
+      |
+      |   @@index([post_id])
       |}
     """
   }
@@ -223,7 +229,7 @@ class ManyRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
       val dm1 = """
         |model Post {
         |  id       String  @id @default(cuid())
-        |  authors  AUser[]
+        |  authors  AUser[] @relation(references: [id])
         |  title    String  @unique
         |}
         |
@@ -236,14 +242,14 @@ class ManyRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
       val dm2 = """
         |model Post {
         |  id      String  @id @default(cuid())
-        |  authors AUser[]
+        |  authors AUser[] @relation(references: [id])
         |  title   String  @unique
         |}
         |
         |model AUser {
         |  id    String @id @default(cuid())
         |  name  String @unique
-        |  posts Post[]
+        |  posts Post[] @relation(references: [id])
         |}"""
 
       TestDataModels(mongo = Vector(dm1), sql = Vector(dm2))
@@ -264,7 +270,10 @@ class ManyRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
       server.query("""query{posts(orderBy: id_ASC) {title, authors (orderBy: id_ASC){name}}}""", project).toString should be(
         """{"data":{"posts":[{"title":"Title1","authors":[{"name":"Author1"},{"name":"Author2"}]},{"title":"Title2","authors":[{"name":"Author1"},{"name":"Author2"}]}]}}""")
 
-      val res = server.query("""query{aUsers(where:{name_starts_with: "Author2", posts_some:{title_ends_with: "1"}},orderBy: id_ASC){name, posts(orderBy: id_ASC){title}}}""", project)
+      val res = server.query(
+        """query{aUsers(where:{name_starts_with: "Author2", posts_some:{title_ends_with: "1"}},orderBy: id_ASC){name, posts(orderBy: id_ASC){title}}}""",
+        project
+      )
       res.toString should be("""{"data":{"aUsers":[{"name":"Author2","posts":[{"title":"Title1"},{"title":"Title2"}]}]}}""")
     }
 
