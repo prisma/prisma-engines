@@ -92,9 +92,7 @@ impl RenderContext {
                 let model_name = m.model.name.clone();
                 let tag_str = format!("{}", m.tag);
                 let mut mappings = self.mappings.borrow_mut();
-                let mapping = mappings
-                    .iter()
-                    .find(|mapping| mapping.model_name == model_name);
+                let mapping = mappings.iter().find(|mapping| mapping.model_name == model_name);
 
                 match mapping {
                     Some(ref existing) => existing.add_operation(tag_str, name.clone()),

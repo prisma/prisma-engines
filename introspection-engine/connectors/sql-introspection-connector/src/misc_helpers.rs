@@ -1,4 +1,3 @@
-use datamodel::common::names::NameNormalizer;
 use datamodel::{
     DefaultValue as DMLDef, Field, FieldArity, FieldType, IndexDefinition, Model, OnDeleteStrategy,
     RelationInfo, ScalarType, ScalarValue as SV, ValueGenerator as VG,
