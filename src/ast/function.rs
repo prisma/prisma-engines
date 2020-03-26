@@ -10,7 +10,7 @@ pub use count::*;
 pub use row_number::*;
 pub use sum::*;
 
-use super::DatabaseValue;
+use super::{Aliasable, DatabaseValue};
 use std::borrow::Cow;
 
 /// A database function definition
@@ -30,11 +30,12 @@ pub(crate) enum FunctionType<'a> {
     Sum(Sum<'a>),
 }
 
-impl<'a> Function<'a> {
-    /// Give the function an alias in the query.
-    pub fn alias<S>(mut self, alias: S) -> Self
+impl<'a> Aliasable<'a> for Function<'a> {
+    type Target = Function<'a>;
+
+    fn alias<T>(mut self, alias: T) -> Self::Target
     where
-        S: Into<Cow<'a, str>>,
+        T: Into<Cow<'a, str>>,
     {
         self.alias = Some(alias.into());
         self
