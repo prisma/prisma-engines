@@ -78,8 +78,13 @@ pub async fn get_related_m2m_record_ids(
     from_record_ids: &[RecordProjection],
 ) -> crate::Result<Vec<(RecordProjection, RecordProjection)>> {
     let mut idents = vec![];
-    idents.extend(from_field.type_identifiers_with_arities());
-    idents.extend(from_field.related_field().type_identifiers_with_arities());
+    idents.extend(from_field.model().primary_identifier().type_identifiers_with_arities());
+    idents.extend(
+        from_field
+            .related_model()
+            .primary_identifier()
+            .type_identifiers_with_arities(),
+    );
 
     let relation = from_field.relation();
     let table = relation.as_table();
