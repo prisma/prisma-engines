@@ -3,6 +3,9 @@ package writes.ids.relation_pks
 import org.scalatest.{FlatSpec, Matchers}
 import util._
 
+// Note: These tests changed from including the relation fields into only including the scalars as per the new relations
+// implementation. Tests are retained as they offer a good coverage over scalar + relation field usage.
+//
 // 1) Checks if relation fields in @id in any constellation work with our mutations.
 // Possible relation cardinalities:
 // - 1!:1!
@@ -31,9 +34,11 @@ class SinglePKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBase 
     val project = ProjectDsl.fromString {
       s"""
          |model Parent {
-         |  child Child  @relation(references: [id]) @id
-         |  name  String
-         |  age   Int
+         |  name     String
+         |  age      Int
+         |  child_id Int @id
+         |
+         |  child Child  @relation(fields: [child_id], references: [id])
          |}
          |
          |model Child {
@@ -48,7 +53,7 @@ class SinglePKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBase 
     val res1 = server.query(
       """
         |mutation {
-        |  createParent(data: { name: "Paul" , age: 40, child: { create: {id: 1, name: "Panther" }}}) {
+        |  createParent(data: { name: "Paul" , age: 40, child: { create: { id: 1, name: "Panther" }}}) {
         |    name
         |    age
         |    child{
@@ -66,7 +71,7 @@ class SinglePKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBase 
     val res2 = server.query(
       """
         |mutation {
-        |  updateParent(where: { child: 1 } data: { age: 41 }) {
+        |  updateParent(where: { child_id: 1 } data: { age: 41 }) {
         |    name
         |    age
         |  }
@@ -94,9 +99,9 @@ class SinglePKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBase 
       """
         |mutation {
         |  upsertParent(
-        |    where: { child: 2 }
+        |    where: { child_id: 2 }
         |    update: { age: 43 }
-        |    create: { name: "Milutin", age: 42, child: { create: { id: 2, name: "Nikola" } } }
+        |    create: { name: "Milutin", age: 42, child_id: { create: { id: 2, name: "Nikola" } } }
         |  ) {
         |    age
         |    child {
@@ -132,9 +137,13 @@ class SinglePKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBase 
     val project = ProjectDsl.fromString {
       s"""
          |model Parent {
-         |  child Child  @relation(references: [id, ssn]) @id
-         |  name  String
-         |  age   Int
+         |  name      String
+         |  age       Int
+         |  child_id  Int
+         |  child_ssn String
+         |
+         |  child Child  @relation(fields: [child_id, child_ssn], references: [id, ssn])
+         |  @@id([child_id, child_ssn])
          |}
          |
          |model Child {
@@ -171,7 +180,7 @@ class SinglePKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBase 
     val res2 = server.query(
       """
         |mutation {
-        |  updateParent(where: { child: { child_id: 1, child_ssn: "1" } } data: { age: 41 }) {
+        |  updateParent(where: { child_id_child_ssn: { child_id: 1, child_ssn: "1" } } data: { age: 41 }) {
         |    name
         |    age
         |  }
@@ -205,7 +214,7 @@ class SinglePKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBase 
       """
         |mutation {
         |  upsertParent(
-        |    where: { child: { child_id: 2, child_ssn: "2" } }
+        |    where: { child_id_child_ssn: { child_id: 2, child_ssn: "2" } }
         |    update: { age: 43 }
         |    create: { name: "Milutin", age: 42, child: { create: { id: 2, ssn: "2", name: "Nikola" } } }
         |  ) {

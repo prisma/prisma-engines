@@ -3,6 +3,9 @@ package writes.ids.relation_pks
 import org.scalatest.{FlatSpec, Matchers}
 import util._
 
+// Note: These tests changed from including the relation fields into only including the scalars as per the new relations
+// implementation. Tests are retained as they offer a good coverage over scalar + relation field usage.
+//
 // 1) Checks if relation fields in @@id in any constellation work with our mutations.
 // Possible relation cardinalities:
 // - 1!:1!
@@ -32,8 +35,8 @@ class CompoundPKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBas
       s"""
          |model Parent {
          |  name     String
-         |  child_id Int
          |  age      Int
+         |  child_id Int
          |
          |  child Child  @relation(fields: [child_id], references: [id])
          |  @@id([name, child_id])
@@ -146,11 +149,13 @@ class CompoundPKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBas
     val project = ProjectDsl.fromString {
       s"""
          |model Parent {
-         |  name  String
-         |  child Child  @relation(references: [id, ssn])
-         |  age   Int
+         |  name      String
+         |  age       Int
+         |  child_id  Int
+         |  child_ssn String
          |
-         |  @@id([name, child])
+         |  child Child  @relation(fields: [child_id, child_ssn], references: [id, ssn])
+         |  @@id([name, child_id, child_ssn])
          |}
          |
          |model Child {
@@ -189,8 +194,9 @@ class CompoundPKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBas
         |mutation {
         |  updateParent(
         |    where: {
-        |      name_child: {
-        |        child: { child_id: 1, child_ssn: "1" }
+        |      name_child_id_child_ssn: {
+        |        child_id: 1
+        |        child_ssn: "1"
         |        name: "Paul"
         |      }
         |    }
@@ -230,9 +236,10 @@ class CompoundPKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBas
         |mutation {
         |  upsertParent(
         |    where: {
-        |      name_child: {
+        |      name_child_id_child_ssn: {
         |        name: "Paul"
-        |        child: { child_id: 2, child_ssn: "2" }
+        |        child_id: 2
+        |        child_ssn: "2"
         |      }
         |    }
         |    update: { age: 43 }
@@ -274,11 +281,12 @@ class CompoundPKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBas
     val project = ProjectDsl.fromString {
       s"""
          |model Parent {
-         |  name  String
-         |  child Child  @relation(references: [id])
-         |  age   Int
+         |  name     String
+         |  age      Int
+         |  child_id Int
          |
-         |  @@id([name, child])
+         |  child Child  @relation(fields: [child_id], references: [id])
+         |  @@id([name, child_id])
          |}
          |
          |model Child {
@@ -313,9 +321,9 @@ class CompoundPKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBas
         |mutation {
         |  updateParent(
         |    where: {
-        |      name_child: {
+        |      name_child_id: {
         |        name: "Paul"
-        |        child: 1
+        |        child_id: 1
         |      }
         |    }
         |    data: { age: 41 }
@@ -348,9 +356,9 @@ class CompoundPKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBas
         |mutation {
         |  upsertParent(
         |    where: {
-        |      name_child: {
+        |      name_child_id: {
         |        name: "Paul"
-        |        child: 2
+        |        child_id: 2
         |      }
         |    }
         |    update: { name: "Milutin", age: 43 }
@@ -371,9 +379,9 @@ class CompoundPKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBas
         |mutation {
         |  deleteParent(
         |    where: {
-        |      name_child: {
+        |      name_child_id: {
         |        name: "Milutin"
-        |        child: 2
+        |        child_id: 2
         |      }
         |    }
         |  ) {
@@ -538,11 +546,13 @@ class CompoundPKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBas
     val project = ProjectDsl.fromString {
       s"""
          |model Parent {
-         |  name  String
-         |  child Child  @relation(references: [id, ssn])
-         |  age   Int
+         |  name      String
+         |  age       Int
+         |  child_id  Int
+         |  child_ssn String
          |
-         |  @@id([name, child])
+         |  child Child  @relation(fields: [child_id, child_ssn], references: [id, ssn])
+         |  @@id([name, child_id, child_ssn])
          |}
          |
          |model Child {
@@ -580,10 +590,11 @@ class CompoundPKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBas
         |mutation {
         |  updateParent(
         |    where: {
-        |      name_child: {
+        |      name_child_id_child_ssn: {
         |        name: "Paul"
-        |        child: { child_id: 1, child_ssn: "1" }}
-        |      }
+        |        child_id: 1
+        |        child_ssn: "1"
+        |      }}
         |      data: { age: 41 }
         |    ) {
         |    name
@@ -614,9 +625,10 @@ class CompoundPKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBas
         |mutation {
         |  upsertParent(
         |    where: {
-        |      name_child: {
+        |      name_child_id_child_ssn: {
         |        name: "Paul"
-        |        child: { child_id: 2, child_ssn: "2" }
+        |        child_id: 2
+        |        child_ssn: "2"
         |      }
         |    }
         |    update: { name: "Milutin", age: 43 }
@@ -641,9 +653,10 @@ class CompoundPKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBas
         |mutation {
         |  deleteParent(
         |    where: {
-        |      name_child: {
+        |      name_child_id_child_ssn: {
         |        name: "Milutin"
-        |        child: { child_id: 2, child_ssn: "2" }
+        |        child_id: 2
+        |        child_ssn: "2"
         |      }
         |    }
         |  ) {
@@ -809,11 +822,12 @@ class CompoundPKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBas
     val project = ProjectDsl.fromString {
       s"""
          |model Parent {
-         |  child Child  @relation(references: [id])
-         |  name  String
-         |  age   Int
+         |  name     String
+         |  age      Int
+         |  child_id Int
          |
-         |  @@id([name, child])
+         |  child Child  @relation(fields: [child_id], references: [id])
+         |  @@id([name, child_id])
          |}
          |
          |model Child {
@@ -848,9 +862,9 @@ class CompoundPKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBas
         |mutation {
         |  updateParent(
         |    where: {
-        |      name_child: {
+        |      name_child_id: {
         |        name: "Paul"
-        |        child: 1
+        |        child_id: 1
         |      }
         |    }
         |    data: { age: 41 }
@@ -890,9 +904,9 @@ class CompoundPKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBas
         |mutation {
         |  upsertParent(
         |    where: {
-        |      name_child: {
+        |      name_child_id: {
         |        name: "Paul"
-        |        child: 2
+        |        child_id: 2
         |      }
         |    }
         |    update: { name: "Milutin", age: 43 }
@@ -912,9 +926,9 @@ class CompoundPKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBas
         |mutation {
         |  deleteParent(
         |    where: {
-        |      name_child: {
+        |      name_child_id: {
         |        name: "Milutin"
-        |        child: 2
+        |        child_id: 2
         |      }
         |    }
         |  ) {
@@ -1006,9 +1020,9 @@ class CompoundPKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBas
         |      parents: {
         |        upsert: {
         |          where: {
-        |            name_child: {
+        |            name_child_id: {
         |              name: "Đuka"
-        |              child: 3
+        |              child_id: 3
         |            }
         |          }
         |          create: { name: "Đuka", age: 40 }
@@ -1109,11 +1123,13 @@ class CompoundPKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBas
     val project = ProjectDsl.fromString {
       s"""
          |model Parent {
-         |  name  String
-         |  child Child  @relation(references: [id, ssn])
-         |  age   Int
+         |  name      String
+         |  age       Int
+         |  child_id  Int
+         |  child_ssn String
          |
-         |  @@id([name, child])
+         |  child Child  @relation(fields: [child_id, child_ssn], references: [id, ssn])
+         |  @@id([name, child_id, child_ssn])
          |}
          |
          |model Child {
@@ -1151,9 +1167,10 @@ class CompoundPKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBas
         |mutation {
         |  updateParent(
         |    where: {
-        |      name_child: {
+        |      name_child_id_child_ssn: {
         |        name: "Paul"
-        |        child: { child_id: 1, child_ssn: "1" }
+        |        child_id: 1
+        |        child_ssn: "1"
         |      }
         |    }
         |    data: { age: 41 }
@@ -1193,9 +1210,10 @@ class CompoundPKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBas
         |mutation {
         |  upsertParent(
         |    where: {
-        |      name_child: {
+        |      name_child_id_child_ssn: {
         |        name: "Paul"
-        |        child: { child_id: 2, child_ssn: "2" }
+        |        child_id: 2
+        |        child_ssn: "2"
         |      }
         |    }
         |    update: { name: "Milutin", age: 43 }
@@ -1219,9 +1237,10 @@ class CompoundPKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBas
         |mutation {
         |  deleteParent(
         |    where: {
-        |      name_child: {
+        |      name_child_id_child_ssn: {
         |        name: "Milutin"
-        |        child: { child_id: 2, child_ssn: "2" }
+        |        child_id: 2
+        |        child_ssn: "2"
         |      }
         |    }
         |  ) {
@@ -1315,9 +1334,10 @@ class CompoundPKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBas
         |      parents: {
         |        upsert: {
         |          where: {
-        |            name_child: {
+        |            name_child_id_child_ssn: {
         |              name: "Đuka"
-        |              child: { child_id: 3, child_ssn: "3" }
+        |              child_id: 3
+        |              child_ssn: "3"
         |            }
         |          }
         |          create: { name: "Đuka", age: 40 }
@@ -1406,11 +1426,12 @@ class CompoundPKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBas
     val project = ProjectDsl.fromString {
       s"""
          |model Parent {
-         |  name  String
-         |  child Child  @relation(references: [id])
-         |  age   Int
+         |  name     String
+         |  age      Int
+         |  child_id Int
          |
-         |  @@id([name, child])
+         |  child Child  @relation(fields: [child_id], references: [id])
+         |  @@id([name, child_id])
          |}
          |
          |model Child {
@@ -1481,9 +1502,9 @@ class CompoundPKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBas
         |query {
         |  parents(
         |    before: {
-        |      name_child: {
+        |      name_child_id: {
         |        name: "Parent3"
-        |        child: 3
+        |        child_id: 3
         |      }
         |    }
         |  ){
@@ -1507,9 +1528,9 @@ class CompoundPKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBas
         |query {
         |  parents(
         |    after: {
-        |      name_child: {
+        |      name_child_id: {
         |        name: "Parent1"
-        |        child: 1
+        |        child_id: 1
         |      }
         |    }
         |  ){
@@ -1533,15 +1554,15 @@ class CompoundPKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBas
         |query {
         |  parents(
         |    after: {
-        |      name_child: {
+        |      name_child_id: {
         |        name: "Parent1"
-        |        child: 1
+        |        child_id: 1
         |      }
         |    }
         |    before: {
-        |      name_child: {
+        |      name_child_id: {
         |        name: "Parent3"
-        |        child: 3
+        |        child_id: 3
         |      }
         |    }
         |  ){
@@ -1569,11 +1590,13 @@ class CompoundPKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBas
     val project = ProjectDsl.fromString {
       s"""
          |model Parent {
-         |  name  String
-         |  child Child  @relation(references: [id, ssn])
-         |  age   Int
+         |  name      String
+         |  age       Int
+         |  child_id  Int
+         |  child_ssn String
          |
-         |  @@id([name, child])
+         |  child Child  @relation(fields: [child_id, child_ssn], references: [id, ssn])
+         |  @@id([name, child_id, child_ssn])
          |}
          |
          |model Child {
@@ -1647,12 +1670,10 @@ class CompoundPKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBas
         |query {
         |  parents(
         |    before: {
-        |      name_child: {
+        |      name_child_id_child_ssn: {
         |        name: "Parent3"
-        |        child: {
-        |          child_id: 3
-        |          child_ssn: "3"
-        |        }
+        |        child_id: 3
+        |        child_ssn: "3"
         |      }
         |    }
         |  ){
@@ -1676,12 +1697,10 @@ class CompoundPKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBas
         |query {
         |  parents(
         |    after: {
-        |      name_child: {
+        |      name_child_id_child_ssn: {
         |        name: "Parent1"
-        |        child: {
-        |          child_id: 1
-        |          child_ssn: "1"
-        |        }
+        |        child_id: 1
+        |        child_ssn: "1"
         |      }
         |    }
         |  ){
@@ -1705,21 +1724,17 @@ class CompoundPKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBas
         |query {
         |  parents(
         |    after: {
-        |      name_child: {
+        |      name_child_id_child_ssn: {
         |        name: "Parent1"
-        |        child: {
-        |          child_id: 1
-        |          child_ssn: "1"
-        |        }
+        |        child_id: 1
+        |        child_ssn: "1"
         |      }
         |    }
         |    before: {
-        |      name_child: {
+        |      name_child_id_child_ssn: {
         |        name: "Parent3"
-        |        child: {
-        |          child_id: 3
-        |          child_ssn: "3"
-        |        }
+        |        child_id: 3
+        |        child_ssn: "3"
         |      }
         |    }
         |  ){
