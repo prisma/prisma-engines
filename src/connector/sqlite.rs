@@ -22,7 +22,7 @@ pub struct Sqlite {
 }
 
 pub struct SqliteParams {
-    pub connection_limit: u32,
+    pub connection_limit: Option<usize>,
     /// This is not a `PathBuf` because we need to `ATTACH` the database to the path, and this can
     /// only be done with UTF-8 paths.
     pub file_path: String,
@@ -50,7 +50,7 @@ impl TryFrom<&str> for SqliteParams {
             Err(Error::builder(ErrorKind::DatabaseUrlIsInvalid(path.to_str().unwrap().to_string())).build())
         } else {
             let official = vec![];
-            let mut connection_limit = num_cpus::get_physical() * 2 + 1;
+            let mut connection_limit = None;
             let mut db_name = None;
             let mut socket_timeout = None;
 
@@ -74,7 +74,7 @@ impl TryFrom<&str> for SqliteParams {
                                 .parse()
                                 .map_err(|_| Error::builder(ErrorKind::InvalidConnectionArguments).build())?;
 
-                            connection_limit = as_int;
+                            connection_limit = Some(as_int);
                         }
                         "db_name" => {
                             db_name = Some(v.to_string());
@@ -97,7 +97,7 @@ impl TryFrom<&str> for SqliteParams {
             }
 
             Ok(Self {
-                connection_limit: u32::try_from(connection_limit).unwrap(),
+                connection_limit,
                 file_path: path_str.to_owned(),
                 db_name: db_name.unwrap_or_else(|| DEFAULT_SCHEMA_NAME.to_owned()),
                 socket_timeout,

@@ -208,16 +208,12 @@ impl PostgresUrl {
         &self.query_params.schema
     }
 
-    pub(crate) fn connect_timeout(&self) -> Duration {
+    pub(crate) fn connect_timeout(&self) -> Option<Duration> {
         self.query_params.connect_timeout
     }
 
-    fn default_connection_limit() -> usize {
-        num_cpus::get_physical() * 2 + 1
-    }
-
     fn parse_query_params(url: &Url) -> Result<PostgresUrlQueryParams, Error> {
-        let mut connection_limit = Self::default_connection_limit();
+        let mut connection_limit = None;
         let mut schema = String::from(DEFAULT_SCHEMA);
         let mut certificate_file = None;
         let mut identity_file = None;
@@ -226,7 +222,7 @@ impl PostgresUrl {
         let mut ssl_mode = SslMode::Prefer;
         let mut host = None;
         let mut socket_timeout = None;
-        let mut connect_timeout = Duration::from_secs(5);
+        let mut connect_timeout = None;
 
         for (k, v) in url.query_pairs() {
             match k.as_ref() {
@@ -280,7 +276,7 @@ impl PostgresUrl {
                     let as_int: usize = v
                         .parse()
                         .map_err(|_| Error::builder(ErrorKind::InvalidConnectionArguments).build())?;
-                    connection_limit = as_int;
+                    connection_limit = Some(as_int);
                 }
                 "host" => {
                     host = Some(v.to_string());
@@ -295,7 +291,7 @@ impl PostgresUrl {
                     let as_int = v
                         .parse()
                         .map_err(|_| Error::builder(ErrorKind::InvalidConnectionArguments).build())?;
-                    connect_timeout = Duration::from_secs(as_int);
+                    connect_timeout = Some(Duration::from_secs(as_int));
                 }
                 _ => {
                     #[cfg(not(feature = "tracing-log"))]
@@ -327,7 +323,7 @@ impl PostgresUrl {
     }
 
     #[cfg(feature = "pooled")]
-    pub(crate) fn connection_limit(&self) -> usize {
+    pub(crate) fn connection_limit(&self) -> Option<usize> {
         self.query_params.connection_limit
     }
 
@@ -339,7 +335,10 @@ impl PostgresUrl {
         config.host(self.host());
         config.port(self.port());
         config.dbname(self.dbname());
-        config.connect_timeout(self.query_params.connect_timeout);
+
+        if let Some(connect_timeout) = self.query_params.connect_timeout {
+            config.connect_timeout(connect_timeout);
+        };
 
         config.ssl_mode(self.query_params.ssl_mode);
 
@@ -350,12 +349,12 @@ impl PostgresUrl {
 #[derive(Debug, Clone)]
 pub(crate) struct PostgresUrlQueryParams {
     ssl_params: SslParams,
-    connection_limit: usize,
+    connection_limit: Option<usize>,
     schema: String,
     ssl_mode: SslMode,
     host: Option<String>,
     socket_timeout: Option<Duration>,
-    connect_timeout: Duration,
+    connect_timeout: Option<Duration>,
 }
 
 impl PostgreSql {

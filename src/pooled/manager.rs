@@ -100,7 +100,7 @@ mod tests {
     async fn mysql_default_connection_limit() {
         let conn_string = std::env::var("TEST_MYSQL").expect("TEST_MYSQL connection string not set.");
 
-        let pool = Quaint::new(&conn_string).await.unwrap();
+        let pool = Quaint::builder(&conn_string).unwrap().build();
 
         assert_eq!(num_cpus::get_physical() * 2 + 1, pool.capacity().await as usize);
     }
@@ -113,7 +113,7 @@ mod tests {
             std::env::var("TEST_MYSQL").expect("TEST_MYSQL connection string not set.")
         );
 
-        let pool = Quaint::new(&conn_string).await.unwrap();
+        let pool = Quaint::builder(&conn_string).unwrap().build();
 
         assert_eq!(10, pool.capacity().await as usize);
     }
@@ -123,7 +123,7 @@ mod tests {
     async fn psql_default_connection_limit() {
         let conn_string = std::env::var("TEST_PSQL").expect("TEST_PSQL connection string not set.");
 
-        let pool = Quaint::new(&conn_string).await.unwrap();
+        let pool = Quaint::builder(&conn_string).unwrap().build();
 
         assert_eq!(num_cpus::get_physical() * 2 + 1, pool.capacity().await as usize);
     }
@@ -136,7 +136,7 @@ mod tests {
             std::env::var("TEST_PSQL").expect("TEST_PSQL connection string not set.")
         );
 
-        let pool = Quaint::new(&conn_string).await.unwrap();
+        let pool = Quaint::builder(&conn_string).unwrap().build();
 
         assert_eq!(10, pool.capacity().await as usize);
     }
@@ -145,7 +145,7 @@ mod tests {
     #[cfg(feature = "sqlite")]
     async fn test_default_connection_limit() {
         let conn_string = format!("file:db/test.db",);
-        let pool = Quaint::new(&conn_string).await.unwrap();
+        let pool = Quaint::builder(&conn_string).unwrap().build();
 
         assert_eq!(num_cpus::get_physical() * 2 + 1, pool.capacity().await as usize);
     }
@@ -154,7 +154,7 @@ mod tests {
     #[cfg(feature = "sqlite")]
     async fn test_custom_connection_limit() {
         let conn_string = format!("file:db/test.db?connection_limit=10",);
-        let pool = Quaint::new(&conn_string).await.unwrap();
+        let pool = Quaint::builder(&conn_string).unwrap().build();
 
         assert_eq!(10, pool.capacity().await as usize);
     }

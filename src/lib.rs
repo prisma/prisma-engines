@@ -1,10 +1,7 @@
 //! # quaint
 //!
-//! A database client abstraction for reading and writing to a SQL database in a
+//! A database client abstraction for reading and writing to an SQL database in a
 //! safe manner.
-//!
-//! Under construction and will go through several rounds of changes. Not meant
-//! for production use in the current form.
 //!
 //! ### Goals
 //!
@@ -55,7 +52,7 @@
 //!
 //! #[tokio::main]
 //! async fn main() -> Result<(), quaint::error::Error> {
-//!     let pool = Quaint::new("file:///tmp/example.db").await?;
+//!     let pool = Quaint::builder("file:///tmp/example.db")?.build();
 //!     let conn = pool.check_out().await?;
 //!     let result = conn.select(Select::default().value(1)).await?;
 //!

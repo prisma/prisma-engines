@@ -489,11 +489,7 @@ pub trait Visitor<'a> {
             }
             Compare::In(left, right) => match (*left, *right) {
                 (_, DatabaseValue::Row(ref row)) if row.is_empty() => self.write("1=0"),
-                (DatabaseValue::Row(_), DatabaseValue::Values(ref vals))
-                    if vals.row_len() == 0 =>
-                {
-                    self.write("1=0")
-                }
+                (DatabaseValue::Row(_), DatabaseValue::Values(ref vals)) if vals.row_len() == 0 => self.write("1=0"),
                 (DatabaseValue::Row(mut cols), DatabaseValue::Values(vals))
                     if cols.len() == 1 && vals.row_len() == 1 =>
                 {
@@ -517,11 +513,7 @@ pub trait Visitor<'a> {
             },
             Compare::NotIn(left, right) => match (*left, *right) {
                 (_, DatabaseValue::Row(ref row)) if row.is_empty() => self.write("1=1"),
-                (DatabaseValue::Row(_), DatabaseValue::Values(ref vals))
-                    if vals.row_len() == 0 =>
-                {
-                    self.write("1=1")
-                }
+                (DatabaseValue::Row(_), DatabaseValue::Values(ref vals)) if vals.row_len() == 0 => self.write("1=1"),
                 (DatabaseValue::Row(mut cols), DatabaseValue::Values(vals))
                     if cols.len() == 1 && vals.row_len() == 1 =>
                 {
