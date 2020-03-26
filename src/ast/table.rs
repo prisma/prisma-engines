@@ -3,8 +3,10 @@ use std::borrow::Cow;
 
 /// An object that can be aliased.
 pub trait Aliasable<'a> {
+    type Target;
+
     /// Alias table for usage elsewhere in the query.
-    fn alias<T>(self, alias: T) -> Table<'a>
+    fn alias<T>(self, alias: T) -> Self::Target
     where
         T: Into<Cow<'a, str>>;
 }
@@ -102,7 +104,9 @@ impl<'a> From<Select<'a>> for Table<'a> {
 }
 
 impl<'a> Aliasable<'a> for Table<'a> {
-    fn alias<T>(mut self, alias: T) -> Table<'a>
+    type Target = Table<'a>;
+
+    fn alias<T>(mut self, alias: T) -> Self::Target
     where
         T: Into<Cow<'a, str>>,
     {
@@ -115,7 +119,9 @@ macro_rules! aliasable {
     ($($kind:ty),*) => (
         $(
             impl<'a> Aliasable<'a> for $kind {
-                fn alias<T>(self, alias: T) -> Table<'a>
+                type Target = Table<'a>;
+
+                fn alias<T>(self, alias: T) -> Self::Target
                 where
                     T: Into<Cow<'a, str>>,
                 {

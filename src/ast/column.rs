@@ -1,3 +1,4 @@
+use super::Aliasable;
 use crate::ast::{DatabaseValue, Table};
 use std::borrow::Cow;
 
@@ -77,11 +78,14 @@ impl<'a> Column<'a> {
 
         self
     }
+}
 
-    /// Give the column an alias in the query.
-    pub fn alias<S>(mut self, alias: S) -> Self
+impl<'a> Aliasable<'a> for Column<'a> {
+    type Target = Column<'a>;
+
+    fn alias<T>(mut self, alias: T) -> Self::Target
     where
-        S: Into<Cow<'a, str>>,
+        T: Into<Cow<'a, str>>,
     {
         self.alias = Some(alias.into());
         self
