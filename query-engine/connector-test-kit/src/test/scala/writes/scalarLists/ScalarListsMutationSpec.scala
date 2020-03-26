@@ -51,16 +51,20 @@ class ScalarListsMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
   "Deeply nested scalar lists" should "work in creates " in {
     val testDataModels = {
       val s1 = s"""model List{
-                  |   id String @id @default(cuid())
-                  |   todo Todo? @relation(references: [id])
+                  |   id       String @id @default(cuid())
                   |   listInts Int[]
+                  |   todoId   String?
+                  |
+                  |   todo Todo? @relation(fields: [todoId], references: [id])
                   |}
                   |
                   |model Todo{
-                  |   id String @id @default(cuid())
-                  |   list List?
-                  |   tag Tag? @relation(references: [id])
+                  |   id       String @id @default(cuid())
                   |   todoInts Int[]
+                  |   tagId    String?
+                  |
+                  |   list List?
+                  |   tag  Tag?  @relation(fields: [tagId], references: [id])
                   |}
                   |
                   |model Tag{
@@ -70,26 +74,7 @@ class ScalarListsMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
                   |}
                   |"""
 
-      val s2 = s"""model List{
-                  |   id String @id @default(cuid())
-                  |   todo Todo? @relation(references: [id])
-                  |   listInts Int[]
-                  |}
-                  |
-                  |model Todo{
-                  |   id String @id @default(cuid())
-                  |   list List?
-                  |   tag Tag? @relation(references: [id])
-                  |   todoInts Int[]
-                  |}
-                  |
-                  |model Tag{
-                  |   id String @id @default(cuid())
-                  |   todo Todo?
-                  |   tagInts Int[]
-                  |}
-                  |"""
-      TestDataModels(mongo = Vector(s1), sql = Vector(s2))
+      TestDataModels(mongo = Vector(s1), sql = Vector(s1))
     }
 
     testDataModels.testV11 { project =>
@@ -108,51 +93,33 @@ class ScalarListsMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
   "Deeply nested scalar lists" should "work in updates " in {
     val testDataModels = {
       val s1 = s"""model List{
-                  |   id String @id @default(cuid())
-                  |   todo Todo? @relation(references: [id])
-                  |   uList String @unique
+                  |   id       String @id @default(cuid())
                   |   listInts Int[]
+                  |   uList    String @unique
+                  |   todoId   String?
+                  |
+                  |   todo Todo? @relation(fields: [todoId], references: [id])
                   |}
                   |
                   |model Todo{
-                  |   id String @id @default(cuid())
-                  |   uTodo String @unique
-                  |   list List?
-                  |   tag Tag? @relation(references: [id])
+                  |   id       String @id @default(cuid())
+                  |   uTodo    String @unique
+                  |   list     List?
                   |   todoInts Int[]
+                  |   tagId    String?
+                  |
+                  |   tag Tag? @relation(fields: [tagId], references: [id])
                   |}
                   |
                   |model Tag{
-                  |   id String @id @default(cuid())
-                  |   uTag String @unique
-                  |   todo Todo?
+                  |   id      String @id @default(cuid())
+                  |   uTag    String @unique
                   |   tagInts Int[]
+                  |
+                  |   todo Todo?
                   |}
                   |"""
-
-      val s2 = s"""model List{
-                  |   id String @id @default(cuid())
-                  |   todo Todo? @relation(references: [id])
-                  |   uList String @unique
-                  |   listInts Int[]
-                  |}
-                  |
-                  |model Todo{
-                  |   id String @id @default(cuid())
-                  |   uTodo String @unique
-                  |   list List?
-                  |   tag Tag? @relation(references: [id])
-                  |   todoInts Int[]
-                  |}
-                  |
-                  |model Tag{
-                  |   id String @id @default(cuid())
-                  |   uTag String @unique
-                  |   todo Todo?
-                  |   tagInts Int[]
-                  |}
-                  |"""
-      TestDataModels(mongo = Vector(s1), sql = Vector(s2))
+      TestDataModels(mongo = Vector(s1), sql = Vector(s1))
     }
 
     testDataModels.testV11 { project =>
@@ -179,35 +146,23 @@ class ScalarListsMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
   "Nested scalar lists" should "work in upserts and only execute one branch of the upsert" in {
     val testDataModels = {
       val s1 = s"""model List{
-                  |   id String @id @default(cuid())
-                  |   todo Todo? @relation(references: [id])
-                  |   uList String @unique
+                  |   id       String @id @default(cuid())
+                  |   uList    String @unique
                   |   listInts Int[]
+                  |   todoId   String?
+                  |
+                  |   todo Todo? @relation(fields: [todoId], references: [id])
                   |}
                   |
                   |model Todo{
-                  |   id String @id @default(cuid())
-                  |   uTodo String @unique
-                  |   list List?
+                  |   id       String @id @default(cuid())
+                  |   uTodo    String @unique
                   |   todoInts Int[]
-                  |}
-                  |"""
-
-      val s2 = s"""model List{
-                  |   id String @id @default(cuid())
-                  |   todo Todo? @relation(references: [id])
-                  |   uList String @unique
-                  |   listInts Int[]
-                  |}
                   |
-                  |model Todo{
-                  |   id String @id @default(cuid())
-                  |   uTodo String @unique
                   |   list List?
-                  |   todoInts Int[]
                   |}
                   |"""
-      TestDataModels(mongo = Vector(s1), sql = Vector(s2))
+      TestDataModels(mongo = Vector(s1), sql = Vector(s1))
     }
 
     testDataModels.testV11 { project =>

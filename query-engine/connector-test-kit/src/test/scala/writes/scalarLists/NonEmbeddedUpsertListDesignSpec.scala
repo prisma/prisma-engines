@@ -87,11 +87,12 @@ class NonEmbeddedUpsertListDesignSpec extends FlatSpec with Matchers with ApiSpe
   }
 
   val dmPMToC1 = {
+    // TODO: fix for Mongo
     val dm1 = s"""model List{
-                     id String @id @default(cuid())
-                     uList String? @unique
+                     id       String  @id @default(cuid())
+                     uList    String? @unique
                      listInts Int[]
-                     todoes Todo[] @relation(references: [id])
+                     todoes   Todo[] @relation(references: [id])
                   }
 
                   model Todo{
@@ -101,6 +102,7 @@ class NonEmbeddedUpsertListDesignSpec extends FlatSpec with Matchers with ApiSpe
                      list List?
                   }"""
 
+    // TODO: fix for Mongo
     val dm2 = s"""model List{
                      id String @id @default(cuid())
                      uList String? @unique
@@ -116,17 +118,20 @@ class NonEmbeddedUpsertListDesignSpec extends FlatSpec with Matchers with ApiSpe
                   }"""
 
     val dm3 = s"""model List{
-                     id String @id @default(cuid())
-                     uList String? @unique
+                     id       String  @id @default(cuid())
+                     uList    String? @unique
                      listInts Int[]
+
                      todoes Todo[]
                   }
 
                   model Todo{
-                     id String @id @default(cuid())
-                     uTodo String? @unique
+                     id       String  @id @default(cuid())
+                     uTodo    String? @unique
                      todoInts Int[]
-                     list List?
+                     listId   String?
+
+                     list List? @relation(fields: [listId], references: [id])
                   }"""
 
     TestDataModels(mongo = Vector(dm1, dm2), sql = Vector(dm3))

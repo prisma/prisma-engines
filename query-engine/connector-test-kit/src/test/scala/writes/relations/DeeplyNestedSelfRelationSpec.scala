@@ -10,9 +10,11 @@ class DeeplyNestedSelfRelationSpec extends FlatSpec with Matchers with ApiSpecBa
   "A deeply nested self relation create" should "be executed completely" in {
     val project = ProjectDsl.fromString {
       """model User {
-      |  id       String @id @default(cuid())
-      |  name     String @unique
-      |  parent   User?  @relation(name: "Users", references: [id])
+      |  id       String  @id @default(cuid())
+      |  name     String  @unique
+      |  parentId String?
+      |
+      |  parent   User?  @relation(name: "Users", fields: [parentId], references: [id])
       |  children User[] @relation(name: "Users")
       |}"""
     }
@@ -82,7 +84,9 @@ class DeeplyNestedSelfRelationSpec extends FlatSpec with Matchers with ApiSpecBa
                                                 |  createdAt  DateTime  @default(now())
                                                 |  updatedAt  DateTime  @updatedAt
                                                 |  value      String
-                                                |  author     User
+                                                |  authorId   String
+                                                |
+                                                |  author     User      @relation(...)
                                                 |  children   Comment[] @relation("comment_children", onDelete: CASCADE)
                                                 |}
                                               """.stripMargin }

@@ -61,18 +61,13 @@ class SameModelSelfRelationWithoutBackRelationSpec extends FlatSpec with Matcher
       val dm1 = """model Post {
                     id         String @id @default(cuid())
                     identifier Int?   @unique
-                    related    Post?  @relation(name: "RelatedPosts" references: [id])
+                    relatedId  String?
+
+                    related    Post?  @relation(name: "RelatedPosts", fields:[relatedId], references: [id])
                     parents    Post[] @relation(name: "RelatedPosts")
                   }"""
 
-      val dm2 = """model Post {
-                    id         String @id @default(cuid())
-                    identifier Int?   @unique
-                    related    Post?  @relation(name: "RelatedPosts")
-                    parents    Post[] @relation(name: "RelatedPosts")
-                  }"""
-
-      TestDataModels(mongo = dm1, sql = dm2)
+      TestDataModels(mongo = dm1, sql = dm1)
     }
 
     testDataModels.testV11 { project =>
