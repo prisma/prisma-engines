@@ -54,7 +54,7 @@ class CompoundPKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBas
         |  createParent(data: { name: "Paul" , age: 40, child: { create: { id: 1, name: "Panther" }}}) {
         |    name
         |    age
-        |    child{
+        |    child {
         |       id
         |       name
         |    }

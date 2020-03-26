@@ -57,7 +57,7 @@ impl Fields {
                     .expect("Expected inlined relation field reference to be an existing scalar field.");
 
                 if let Field::Scalar(sf) = field {
-                    sf.read_only.get_or_init(|| true);
+                    sf.read_only.set(true).unwrap();
                 }
             }
         }
@@ -93,6 +93,10 @@ impl Fields {
 
     pub fn scalar(&self) -> Vec<ScalarFieldRef> {
         self.scalar_weak().iter().map(|f| f.upgrade().unwrap()).collect()
+    }
+
+    pub fn scalar_writable(&self) -> Vec<ScalarFieldRef> {
+        self.scalar().into_iter().filter(|sf| !sf.is_read_only()).collect()
     }
 
     pub fn scalar_list(&self) -> Vec<ScalarFieldRef> {

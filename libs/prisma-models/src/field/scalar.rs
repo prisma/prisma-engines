@@ -191,10 +191,7 @@ impl ScalarField {
             .unwrap()
     }
 
-    pub fn read_only(&self) -> bool {
-        self.read_only
-            .get()
-            .expect("Called read_only on scalar field before initialization finished.")
-            .clone()
+    pub fn is_read_only(&self) -> bool {
+        self.read_only.get_or_init(|| false).clone()
     }
 }

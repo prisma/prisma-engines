@@ -206,7 +206,7 @@ impl<'a> FilterObjectTypeBuilder<'a> {
             .into_iter()
             .map(|dsf| {
                 let name = dsf.name.clone();
-                let typ = self.map_data_source_field(dsf);
+                let typ = self.map_data_source_field(&dsf);
 
                 input_field(name, typ, None)
             })

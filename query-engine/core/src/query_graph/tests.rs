@@ -1,6 +1,5 @@
 use super::*;
 use crate::{Query, ReadQuery, RecordQuery};
-use prisma_models::SelectedFields;
 use std::sync::Arc;
 
 #[test]
@@ -128,7 +127,7 @@ fn dummy_query() -> Query {
         name: "Test".to_owned(),
         model: Arc::clone(test_dm.models().first().unwrap()),
         filter: None,
-        selected_fields: SelectedFields::default(),
+        selected_fields: ModelProjection::default(),
         nested: vec![],
         selection_order: vec![],
     }))

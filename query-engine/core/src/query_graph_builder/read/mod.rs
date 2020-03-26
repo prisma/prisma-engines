@@ -10,9 +10,7 @@ pub use related::*;
 
 use super::*;
 use crate::{query_document::ParsedField, ReadQuery};
-use prisma_models::{
-    Field, ModelRef, RelationFieldRef, SelectedField, SelectedFields, SelectedRelationField, SelectedScalarField,
-};
+use prisma_models::{Field, ModelProjection, ModelRef, RelationFieldRef};
 use std::sync::Arc;
 
 pub enum ReadQueryBuilder {
@@ -46,26 +44,17 @@ pub fn collect_selection_order(from: &[ParsedField]) -> Vec<String> {
 
 /// Creates SelectedFields from a query selection.
 /// Automatically adds model IDs to the selected fields as well.
-pub fn collect_selected_fields(from: &[ParsedField], model: &ModelRef) -> SelectedFields {
+/// Unwraps are safe due to query validation.
+pub fn collect_selected_fields(from: &[ParsedField], model: &ModelRef) -> ModelProjection {
     let selected_fields = from
         .iter()
-        .map(|selected_field| {
-            let model_field = model.fields().find_from_all(&selected_field.name).unwrap();
-            match model_field {
-                Field::Scalar(ref sf) => SelectedField::Scalar(SelectedScalarField { field: Arc::clone(sf) }),
-                Field::Relation(ref rf) => SelectedField::Relation(SelectedRelationField { field: Arc::clone(rf) }),
-            }
-        })
-        .collect::<Vec<SelectedField>>();
+        .map(|selected_field| model.fields().find_from_all(&selected_field.name).unwrap().clone())
+        .collect::<Vec<Field>>();
 
-    let mut selected_fields = SelectedFields::new(selected_fields);
-
+    let selected_projection = ModelProjection::new(selected_fields);
     let model_id = model.primary_identifier();
-    for field in model_id {
-        selected_fields.add(field);
-    }
 
-    selected_fields
+    model_id.merge(selected_projection)
 }
 
 pub fn collect_nested_queries(from: Vec<ParsedField>, model: &ModelRef) -> QueryGraphBuilderResult<Vec<ReadQuery>> {
@@ -95,21 +84,28 @@ pub fn collect_nested_queries(from: Vec<ParsedField>, model: &ModelRef) -> Query
 /// A lookback on the parent is also performed to ensure that fields required for
 /// resolving the parent relation are present.
 pub fn merge_relation_selections(
-    mut selected_fields: SelectedFields,
+    selected_fields: ModelProjection,
     parent_relation: Option<RelationFieldRef>,
     nested_queries: &[ReadQuery],
-) -> SelectedFields {
+) -> ModelProjection {
     // Context: We are on the child model when calling this function.
-    if let Some(rf) = parent_relation {
+    let selected_fields = if let Some(rf) = parent_relation {
         let field = rf.related_field();
-        selected_fields.add_all(field.linking_fields().into_iter());
-    }
+        selected_fields.merge(field.linking_fields())
+    } else {
+        selected_fields
+    };
 
-    for nested in nested_queries {
-        if let ReadQuery::RelatedRecordsQuery(ref rq) = nested {
-            selected_fields.add_all(rq.parent_field.linking_fields().into_iter());
-        }
-    }
+    let nested: Vec<_> = nested_queries
+        .into_iter()
+        .map(|nested_query| {
+            if let ReadQuery::RelatedRecordsQuery(ref rq) = nested_query {
+                rq.parent_field.linking_fields()
+            } else {
+                unreachable!()
+            }
+        })
+        .collect();
 
-    selected_fields.deduplicate()
+    selected_fields.merge(ModelProjection::union(nested))
 }

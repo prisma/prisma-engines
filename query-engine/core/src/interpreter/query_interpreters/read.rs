@@ -31,9 +31,7 @@ fn read_one<'conn, 'tx>(
         let model = query.model;
         let model_id = model.primary_identifier();
         let filter = query.filter.expect("Expected filter to be set for ReadOne query.");
-        let scalars = tx
-            .get_single_record(&model, &filter, &query.selected_fields.only_scalar_and_inlined())
-            .await?;
+        let scalars = tx.get_single_record(&model, &filter, &query.selected_fields).await?;
 
         match scalars {
             Some(record) => {
@@ -69,11 +67,7 @@ fn read_many<'a, 'b>(
 ) -> BoxFuture<'a, InterpretationResult<QueryResult>> {
     let fut = async move {
         let scalars = tx
-            .get_many_records(
-                &query.model,
-                query.args.clone(),
-                &query.selected_fields.only_scalar_and_inlined(),
-            )
+            .get_many_records(&query.model, query.args.clone(), &query.selected_fields)
             .await?;
 
         let model_id = query.model.primary_identifier();

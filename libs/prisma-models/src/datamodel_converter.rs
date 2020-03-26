@@ -93,7 +93,6 @@ impl<'a> DatamodelConverter<'a> {
                         is_list: field.is_list(),
                         is_unique: field.is_unique(),
                         is_auto_generated_int_id: field.is_auto_generated_int_id(),
-                        data_source_fields: field.data_source_fields.clone(),
                         relation_name: relation.name(),
                         relation_side: relation.relation_side(field),
                         relation_info: ri.clone(),
