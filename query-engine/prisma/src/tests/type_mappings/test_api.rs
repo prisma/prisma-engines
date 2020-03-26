@@ -31,24 +31,21 @@ impl TestApi {
         Ok(())
     }
 
-    pub async fn introspect_and_start_query_engine(
-        &self,
-    ) -> anyhow::Result<(DatamodelAssertions, QueryEngine)> {
+    pub async fn introspect_and_start_query_engine(&self) -> anyhow::Result<(DatamodelAssertions, QueryEngine)> {
         let datasource = self.datasource();
 
-        let schema = introspection_core::RpcImpl::introspect_internal(datasource)
+        let introspection_result = introspection_core::RpcImpl::introspect_internal(datasource)
             .await
             .map_err(|err| anyhow::anyhow!("{:?}", err.data))?;
 
-        let context = PrismaContext::builder(schema.clone())
+        let context = PrismaContext::builder(introspection_result.datamodel.clone())
             .enable_raw_queries(true)
             .force_transactions(self.is_pgbouncer)
             .build()
             .await
             .unwrap();
 
-        eprintln!("{}", schema);
-        let schema = datamodel::parse_datamodel(&schema).unwrap();
+        let schema = datamodel::parse_datamodel(&introspection_result.datamodel).unwrap();
 
         Ok((DatamodelAssertions(schema), QueryEngine::new(context)))
     }
@@ -75,11 +72,7 @@ impl DatamodelAssertions {
 pub struct ModelAssertions<'a>(&'a datamodel::dml::Model);
 
 impl<'a> ModelAssertions<'a> {
-    pub fn assert_field_type(
-        self,
-        name: &str,
-        r#type: datamodel::dml::ScalarType,
-    ) -> anyhow::Result<Self> {
+    pub fn assert_field_type(self, name: &str, r#type: datamodel::dml::ScalarType) -> anyhow::Result<Self> {
         let field = self
             .0
             .find_field(name)

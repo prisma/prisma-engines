@@ -1,7 +1,7 @@
 use datamodel::{
     common::{ScalarType, ScalarValue},
-    dml, Datamodel, DefaultValue as DMLDefault, Field, FieldArity, FieldType, IndexDefinition,
-    Model, OnDeleteStrategy, RelationInfo, ValueGenerator,
+    dml, Datamodel, DefaultValue as DMLDefault, Field, FieldArity, FieldType, IndexDefinition, Model, OnDeleteStrategy,
+    RelationInfo, ValueGenerator,
 };
 use pretty_assertions::assert_eq;
 use sql_introspection_connector::calculate_datamodel::calculate_model;
@@ -49,8 +49,11 @@ fn a_data_model_can_be_generated_from_a_schema() {
                         ColumnTypeFamily::Enum(name) => (FieldType::Enum(name.clone()), false, None),
                         ColumnTypeFamily::Uuid => (FieldType::Base(ScalarType::String, None), false, None),
                         ColumnTypeFamily::Json => (FieldType::Base(ScalarType::String, None), false, None),
-                        x => (FieldType::Unsupported(x.to_string()),true, Some("This type is currently not supported.".to_string())),
-
+                        x => (
+                            FieldType::Unsupported(x.to_string()),
+                            true,
+                            Some("This type is currently not supported.".to_string()),
+                        ),
                     };
                     Field {
                         name: col_type.to_string(),
@@ -98,9 +101,9 @@ fn a_data_model_can_be_generated_from_a_schema() {
         enums: vec![],
         sequences: vec![],
     };
-    let data_model = calculate_model(&schema).expect("calculate data model");
+    let introspection_result = calculate_model(&schema).expect("calculate data model");
 
-    assert_eq!(data_model, ref_data_model);
+    assert_eq!(introspection_result.datamodel, ref_data_model);
 }
 
 #[test]
@@ -132,9 +135,7 @@ fn arity_is_preserved_when_generating_data_model_from_a_schema() {
                     arity: FieldArity::Required,
                     field_type: FieldType::Base(ScalarType::Int, None),
                     database_names: Vec::new(),
-                    default_value: Some(
-                        DMLDefault::Expression(ValueGenerator::new_autoincrement()),
-                    ),
+                    default_value: Some(DMLDefault::Expression(ValueGenerator::new_autoincrement())),
                     is_unique: false,
                     is_id: true,
                     documentation: None,
@@ -210,9 +211,9 @@ fn arity_is_preserved_when_generating_data_model_from_a_schema() {
         enums: vec![],
         sequences: vec![],
     };
-    let data_model = calculate_model(&schema).expect("calculate data model");
+    let introspection_result = calculate_model(&schema).expect("calculate data model");
 
-    assert_eq!(data_model, ref_data_model);
+    assert_eq!(introspection_result.datamodel, ref_data_model);
 }
 
 #[test]
@@ -286,9 +287,7 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
                     arity: FieldArity::Optional,
                     field_type: FieldType::Base(ScalarType::String, None),
                     database_names: Vec::new(),
-                    default_value: Some(dml::DefaultValue::Single(ScalarValue::String(
-                        "default".to_string(),
-                    ))),
+                    default_value: Some(dml::DefaultValue::Single(ScalarValue::String("default".to_string()))),
                     is_unique: false,
                     is_id: false,
                     documentation: None,
@@ -375,9 +374,9 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
         enums: vec![],
         sequences: vec![],
     };
-    let data_model = calculate_model(&schema).expect("calculate data model");
+    let introspection_result = calculate_model(&schema).expect("calculate data model");
 
-    assert_eq!(data_model, ref_data_model);
+    assert_eq!(introspection_result.datamodel, ref_data_model);
 }
 
 #[test]
@@ -396,9 +395,7 @@ fn primary_key_is_preserved_when_generating_data_model_from_a_schema() {
                     arity: FieldArity::Required,
                     field_type: FieldType::Base(ScalarType::Int, None),
                     database_names: Vec::new(),
-                    default_value: Some(
-                        DMLDefault::Expression(ValueGenerator::new_autoincrement()),
-                    ),
+                    default_value: Some(DMLDefault::Expression(ValueGenerator::new_autoincrement())),
                     is_unique: false,
                     is_id: true,
                     documentation: None,
@@ -448,9 +445,7 @@ fn primary_key_is_preserved_when_generating_data_model_from_a_schema() {
                     arity: FieldArity::Required,
                     field_type: FieldType::Base(ScalarType::Int, None),
                     database_names: Vec::new(),
-                    default_value: Some(
-                        DMLDefault::Expression(ValueGenerator::new_autoincrement()),
-                    ),
+                    default_value: Some(DMLDefault::Expression(ValueGenerator::new_autoincrement())),
                     is_unique: false,
                     is_id: true,
                     documentation: None,
@@ -534,9 +529,9 @@ fn primary_key_is_preserved_when_generating_data_model_from_a_schema() {
         enums: vec![],
         sequences: vec![],
     };
-    let data_model = calculate_model(&schema).expect("calculate data model");
+    let introspection_result = calculate_model(&schema).expect("calculate data model");
 
-    assert_eq!(data_model, ref_data_model);
+    assert_eq!(introspection_result.datamodel, ref_data_model);
 }
 
 #[test]
@@ -621,9 +616,9 @@ fn uniqueness_is_preserved_when_generating_data_model_from_a_schema() {
         enums: vec![],
         sequences: vec![],
     };
-    let data_model = calculate_model(&schema).expect("calculate data model");
+    let introspection_result = calculate_model(&schema).expect("calculate data model");
 
-    assert_eq!(data_model, ref_data_model);
+    assert_eq!(introspection_result.datamodel, ref_data_model);
 }
 
 #[test]
@@ -642,9 +637,7 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
                         arity: FieldArity::Required,
                         field_type: FieldType::Base(ScalarType::Int, None),
                         database_names: Vec::new(),
-                        default_value: Some(DMLDefault::Expression(
-                            ValueGenerator::new_autoincrement(),
-                        )),
+                        default_value: Some(DMLDefault::Expression(ValueGenerator::new_autoincrement())),
                         is_unique: false,
                         is_id: true,
                         documentation: None,
@@ -704,9 +697,7 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
                         arity: FieldArity::Required,
                         field_type: FieldType::Base(ScalarType::Int, None),
                         database_names: Vec::new(),
-                        default_value: Some(DMLDefault::Expression(
-                            ValueGenerator::new_autoincrement(),
-                        )),
+                        default_value: Some(DMLDefault::Expression(ValueGenerator::new_autoincrement())),
                         is_unique: false,
                         is_id: true,
                         documentation: None,
@@ -857,9 +848,9 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
         enums: vec![],
         sequences: vec![],
     };
-    let data_model = calculate_model(&schema).expect("calculate data model");
+    let introspection_result = calculate_model(&schema).expect("calculate data model");
 
-    assert_eq!(data_model, ref_data_model);
+    assert_eq!(introspection_result.datamodel, ref_data_model);
 }
 
 #[test]
@@ -877,9 +868,7 @@ fn multi_field_uniques_are_preserved_when_generating_data_model_from_a_schema() 
                     arity: FieldArity::Required,
                     field_type: FieldType::Base(ScalarType::Int, None),
                     database_names: Vec::new(),
-                    default_value: Some(
-                        DMLDefault::Expression(ValueGenerator::new_autoincrement()),
-                    ),
+                    default_value: Some(DMLDefault::Expression(ValueGenerator::new_autoincrement())),
                     is_unique: false,
                     is_id: true,
                     documentation: None,
@@ -977,9 +966,9 @@ fn multi_field_uniques_are_preserved_when_generating_data_model_from_a_schema() 
         enums: vec![],
         sequences: vec![],
     };
-    let data_model = calculate_model(&schema).expect("calculate data model");
+    let introspection_result = calculate_model(&schema).expect("calculate data model");
 
-    assert_eq!(data_model, ref_data_model);
+    assert_eq!(introspection_result.datamodel, ref_data_model);
 }
 
 #[test]
@@ -998,9 +987,7 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                         arity: FieldArity::Required,
                         field_type: FieldType::Base(ScalarType::Int, None),
                         database_names: Vec::new(),
-                        default_value: Some(DMLDefault::Expression(
-                            ValueGenerator::new_autoincrement(),
-                        )),
+                        default_value: Some(DMLDefault::Expression(ValueGenerator::new_autoincrement())),
                         is_unique: false,
                         is_id: true,
                         documentation: None,
@@ -1060,9 +1047,7 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                         arity: FieldArity::Required,
                         field_type: FieldType::Base(ScalarType::Int, None),
                         database_names: Vec::new(),
-                        default_value: Some(DMLDefault::Expression(
-                            ValueGenerator::new_autoincrement(),
-                        )),
+                        default_value: Some(DMLDefault::Expression(ValueGenerator::new_autoincrement())),
                         is_unique: false,
                         is_id: true,
                         documentation: None,
@@ -1174,9 +1159,9 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
         enums: vec![],
         sequences: vec![],
     };
-    let data_model = calculate_model(&schema).expect("calculate data model");
+    let introspection_result = calculate_model(&schema).expect("calculate data model");
 
-    assert_eq!(data_model, ref_data_model);
+    assert_eq!(introspection_result.datamodel, ref_data_model);
 }
 
 #[test]
@@ -1209,7 +1194,7 @@ fn enums_are_preserved_when_generating_data_model_from_a_schema() {
         }],
         sequences: vec![],
     };
-    let data_model = calculate_model(&schema).expect("calculate data model");
+    let introspection_result = calculate_model(&schema).expect("calculate data model");
 
-    assert_eq!(data_model, ref_data_model);
+    assert_eq!(introspection_result.datamodel, ref_data_model);
 }

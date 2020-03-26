@@ -35,9 +35,7 @@ async fn main() -> anyhow::Result<()> {
             if url.as_ref().xor(file_path.as_ref()).is_none() {
                 anyhow::bail!(
                     "{}",
-                    "Exactly one of --url or --file-path must be provided"
-                        .bold()
-                        .red()
+                    "Exactly one of --url or --file-path must be provided".bold().red()
                 );
             }
 
@@ -78,20 +76,12 @@ async fn main() -> anyhow::Result<()> {
             stdin,
         } => {
             let datamodel_string: String = match (file_path, stdin) {
-                (Some(path), false) => {
-                    read_datamodel_from_file(&path).context("error reading the schemafile")?
-                }
+                (Some(path), false) => read_datamodel_from_file(&path).context("error reading the schemafile")?,
                 (None, true) => read_datamodel_from_stdin()?,
-                (Some(_), true) => anyhow::bail!(
-                    "{}",
-                    "please pass either --stdin or --file-path, not both"
-                        .bold()
-                        .red()
-                ),
-                (None, false) => anyhow::bail!(
-                    "{}",
-                    "either --stdin or --file-path is required".bold().red()
-                ),
+                (Some(_), true) => {
+                    anyhow::bail!("{}", "please pass either --stdin or --file-path, not both".bold().red())
+                }
+                (None, false) => anyhow::bail!("{}", "either --stdin or --file-path is required".bold().red()),
             };
 
             let api = migration_core::migration_api(&datamodel_string).await?;
@@ -116,11 +106,7 @@ async fn main() -> anyhow::Result<()> {
             };
 
             let result = api.apply_migration(&apply_input).await?;
-            let warnings: Vec<_> = result
-                .warnings
-                .into_iter()
-                .map(|warning| warning.description)
-                .collect();
+            let warnings: Vec<_> = result.warnings.into_iter().map(|warning| warning.description).collect();
 
             if warnings.is_empty() {
                 eprintln!("{}", "✔️  migrated without warning".bold().green());
@@ -140,11 +126,7 @@ async fn main() -> anyhow::Result<()> {
 fn read_datamodel_from_file(path: &str) -> std::io::Result<String> {
     use std::{fs::File, io::Read, path::Path};
 
-    eprintln!(
-        "{} {}",
-        "reading the prisma schema from".bold(),
-        path.yellow()
-    );
+    eprintln!("{} {}", "reading the prisma schema from".bold(), path.yellow());
 
     let path = Path::new(path);
     let mut file = File::open(path)?;
@@ -158,11 +140,7 @@ fn read_datamodel_from_file(path: &str) -> std::io::Result<String> {
 fn read_datamodel_from_stdin() -> std::io::Result<String> {
     use std::io::Read;
 
-    eprintln!(
-        "{} {}",
-        "reading the prisma schema from".bold(),
-        "stdin".yellow()
-    );
+    eprintln!("{} {}", "reading the prisma schema from".bold(), "stdin".yellow());
 
     let mut stdin = std::io::stdin();
 
