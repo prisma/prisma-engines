@@ -11,11 +11,13 @@ async fn last_should_return_none_if_there_is_no_migration(api: &TestApi) {
 }
 
 #[test_each_connector]
-async fn last_must_return_none_if_there_is_no_successful_migration(api: &TestApi) {
+async fn last_must_return_none_if_there_is_no_successful_migration(api: &TestApi) -> TestResult {
     let persistence = api.migration_persistence();
-    persistence.create(Migration::new("my_migration".to_string()));
-    let loaded = persistence.last().await.unwrap();
+    persistence.create(Migration::new("my_migration".to_string())).await?;
+    let loaded = persistence.last().await?;
     assert_eq!(loaded, None);
+
+    Ok(())
 }
 
 #[test_each_connector]
