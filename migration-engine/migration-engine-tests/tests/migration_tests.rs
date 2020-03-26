@@ -1332,9 +1332,9 @@ async fn model_with_multiple_indexes_works(api: &TestApi) -> TestResult {
       comment_id Int
       comment   Comment @relation(fields: [comment_id], references: [id])
 
-      @@index([post])
-      @@index([user])
-      @@index([comment])
+      @@index([post_id])
+      @@index([user_id])
+      @@index([comment_id])
     }
     "#;
 

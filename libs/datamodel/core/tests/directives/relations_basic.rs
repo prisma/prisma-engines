@@ -33,9 +33,7 @@ fn resolve_relation() {
     post_model
         .assert_has_field("text")
         .assert_base_type(&ScalarType::String);
-    post_model
-        .assert_has_field("user")
-        .assert_relation_to("User");
+    post_model.assert_has_field("user").assert_relation_to("User");
 }
 
 #[test]
@@ -112,7 +110,7 @@ fn must_error_when_non_existing_fields_are_used() {
     let errors = parse_error(dml);
     errors.assert_is(
         DatamodelError::new_validation_error(
-            "The argument fields must refer only to other scalar fields. The following fields are not known in this model: authorFirstName, authorLastName", 
+            "The argument fields must refer only to existing fields. The following fields do not exist in this model: authorFirstName, authorLastName", 
                 Span::new(183, 282)
         )
     );
