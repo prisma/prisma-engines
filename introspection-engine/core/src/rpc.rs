@@ -77,14 +77,26 @@ impl RpcImpl {
         let data_model = connector.introspect().await;
 
         match data_model {
-            Ok(dm) if dm.datamodel.models.is_empty() && dm.datamodel.enums.is_empty() => Err(render_jsonrpc_error(
-                Error::from(CommandError::IntrospectionResultEmpty(url.to_string())),
-            )),
-            Ok(dm) => Ok(IntrospectionResultOutput {
-                datamodel: datamodel::render_datamodel_and_config_to_string(&dm.datamodel, &config)
+            Ok(introspection_result)
+                if introspection_result.datamodel.models.is_empty()
+                    && introspection_result.datamodel.enums.is_empty() =>
+            {
+                Err(render_jsonrpc_error(Error::from(
+                    CommandError::IntrospectionResultEmpty(url.to_string()),
+                )))
+            }
+            Ok(introspection_result) => {
+                let result = IntrospectionResultOutput {
+                    datamodel: datamodel::render_datamodel_and_config_to_string(
+                        &introspection_result.datamodel,
+                        &config,
+                    )
                     .map_err(Error::from)?,
-                warnings: dm.warnings.clone(),
-            }),
+                    warnings: introspection_result.warnings.clone(),
+                };
+
+                Ok(result)
+            }
             Err(e) => Err(render_jsonrpc_error(Error::from(e))),
         }
     }
