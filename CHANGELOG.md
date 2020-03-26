@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.2.0-alpha.11
+
+- `impl From<&&str> for Column`
+- Cleanup for function, ordering and grouping interfaces
+- Removing explicit inlining
+- Pool builder with new pool options, such as `max_idle_lifetime`,
+  `test_on_check_out` and `health_check_interval`
+
 ## v0.2.0-alpha.10
 
 - Use the recommended way to implement tokio_postgres::ToSql::to_sql_checked
