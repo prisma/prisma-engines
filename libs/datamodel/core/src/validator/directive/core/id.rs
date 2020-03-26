@@ -16,6 +16,17 @@ impl DirectiveValidator<dml::Field> for IdDirectiveValidator {
             return self.new_directive_validation_error("Fields that are marked as id must be required.", args.span());
         }
 
+        if let dml::FieldType::Relation(_) = obj.field_type {
+            return self.new_directive_validation_error(
+                &format!(
+                    "The field `{}` is a relation field and cannot be marked with `@{}`. Only scalar fields can be declared as id.",
+                    &obj.name,
+                    self.directive_name()
+                ),
+                args.span(),
+            );
+        }
+
         obj.is_id = true;
 
         Ok(())
@@ -62,11 +73,32 @@ impl DirectiveValidator<dml::Model> for ModelLevelIdDirectiveValidator {
             })
             .collect();
 
+        let referenced_relation_fields: Vec<String> = obj
+            .id_fields
+            .iter()
+            .filter(|field| match obj.find_field(&field) {
+                Some(field) => field.field_type.is_relation(),
+                None => false,
+            })
+            .map(|f| f.to_owned())
+            .collect();
+
         if !undefined_fields.is_empty() {
             return Err(DatamodelError::new_model_validation_error(
                 &format!(
                     "The multi field id declaration refers to the unknown fields {}.",
                     undefined_fields.join(", ")
+                ),
+                &obj.name,
+                args.span(),
+            ));
+        }
+
+        if !referenced_relation_fields.is_empty() {
+            return Err(DatamodelError::new_model_validation_error(
+                &format!(
+                    "The id definition refers to the relation fields {}. Id definitions must reference only scalar fields.",
+                    referenced_relation_fields.join(", ")
                 ),
                 &obj.name,
                 args.span(),

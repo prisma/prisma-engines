@@ -169,13 +169,16 @@ fn must_handle_crazy_compound_stuff() {
         authorFirstName String
         authorLastName  Int
         authorIdentification Float
-        author User @relation(fields:[authorFirstName, authorLastName, authorIdentification], references: [firstName, lastName, identification])
+        author User @relation(fields:[authorFirstName, authorLastName, authorIdentification], references: [firstName, lastName, identificationId])
     }
     model User {
-        firstName      String
-        lastName       Int
-        identification Identification
-        @@id([firstName, lastName, identification])
+        firstName        String
+        lastName         Int
+        identificationId Float
+        
+        identification Identification @relation(fields: [identificationId], references: [id])
+        
+        @@id([firstName, lastName, identificationId])
     }
     
     model Identification {
