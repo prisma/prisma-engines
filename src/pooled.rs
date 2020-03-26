@@ -189,7 +189,7 @@ impl Builder {
     }
 
     /// Perform a health check before returning a connection from the
-    /// [`check_out`]. If the health check fails, the a few reconnects are tried
+    /// [`check_out`]. If the health check fails, a few reconnects are tried
     /// before returning the error and dropping the broken connection from the
     /// pool.
     ///
