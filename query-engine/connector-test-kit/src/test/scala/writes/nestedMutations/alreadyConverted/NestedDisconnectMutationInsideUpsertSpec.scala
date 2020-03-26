@@ -374,7 +374,7 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
 
   // OTHER DATAMODELS
 
-  "a one to many relation" should "be disconnectable by id through a nested mutation" in {
+  "a one to many relation" should "be disconnectable by id through a nested mutation" ignore {
     val schema = s"""model Comment{
                             id   String  @id @default(cuid())
                             text String?
@@ -437,7 +437,7 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
     mustBeEqual(result.pathAsJsValue("data.upsertTodo.comments").toString, """[]""")
   }
 
-  "a one to many relation" should "be disconnectable by any unique argument through a nested mutation" in {
+  "a one to many relation" should "be disconnectable by any unique argument through a nested mutation" ignore {
     val schema = s"""model Comment{
                             id    String  @id @default(cuid())
                             text  String?
@@ -500,7 +500,7 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
     mustBeEqual(result.pathAsJsValue("data.upsertTodo.comments").toString, """[]""")
   }
 
-  "a many to one relation" should "be disconnectable by id through a nested mutation" in {
+  "a many to one relation" should "be disconnectable by id through a nested mutation" ignore {
     val schema = s"""model Comment{
                             id   String  @id @default(cuid())
                             text String?
@@ -560,7 +560,7 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
     mustBeEqual(result.pathAsJsValue("data.upsertComment").toString, """{"todo":null}""")
   }
 
-  "a one to one relation" should "be disconnectable by id through a nested mutation" in {
+  "a one to one relation" should "be disconnectable by id through a nested mutation" ignore {
     val schema = """model Note{
                             id   String  @id @default(cuid())
                             text String?
@@ -618,7 +618,7 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
     mustBeEqual(result.pathAsJsValue("data.upsertNote").toString, """{"todo":null}""")
   }
 
-  "a one to many relation" should "be disconnectable by unique through a nested mutation" in {
+  "a one to many relation" should "be disconnectable by unique through a nested mutation" ignore {
     val schema = s"""model Comment{
                             id   String  @id @default(cuid())
                             text String? @unique
@@ -690,7 +690,7 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
     mustBeEqual(result2.pathAsJsValue("data.upsertTodo.comments").toString, """[{"text":"comment1"}]""")
   }
 
-  "A PM CM self relation" should "be disconnectable by unique through a nested mutation" in {
+  "A PM CM self relation" should "be disconnectable by unique through a nested mutation" ignore {
     val project = SchemaDsl.fromStringV11() { s"""|
                                               |model User {
                                               |  id            String  @id @default(cuid())
@@ -766,7 +766,7 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
     mustBeEqual(result2.pathAsJsValue("data.upsertUser.follows").toString, """[]""")
   }
 
-  "A PM CM self relation" should "should throw a correct error for disconnect on invalid unique" in {
+  "A PM CM self relation" should "should throw a correct error for disconnect on invalid unique" ignore {
     val project = SchemaDsl.fromStringV11() { s"""|model User {
                                               |  id            String  @id @default(cuid())
                                               |  banned        Boolean @default(value: false)
@@ -840,7 +840,7 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
     )
   }
 
-  "a deeply nested mutation" should "execute all levels of the mutation if there are only node edges on the path" in {
+  "a deeply nested mutation" should "execute all levels of the mutation if there are only node edges on the path" ignore {
     val project = SchemaDsl.fromStringV11() { s"""model Top {
                                              |  id      String   @id @default(cuid())
                                              |  nameTop String   @unique
@@ -925,7 +925,7 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
       """{"data":{"bottoms":[{"nameBottom":"the bottom"},{"nameBottom":"the second bottom"},{"nameBottom":"the third bottom"},{"nameBottom":"the fourth bottom"}]}}""")
   }
 
-  "a deeply nested mutation" should "execute all levels of the mutation if there are only node edges on the path and there are no backrelations" in {
+  "a deeply nested mutation" should "execute all levels of the mutation if there are only node edges on the path and there are no backrelations" ignore {
     val project = SchemaDsl.fromStringV11() { s"""model Top {
                                              |  id      String   @id @default(cuid())
                                              |  nameTop String   @unique
@@ -1007,7 +1007,7 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
       """{"data":{"bottoms":[{"nameBottom":"the bottom"},{"nameBottom":"the second bottom"},{"nameBottom":"the third bottom"},{"nameBottom":"the fourth bottom"}]}}""")
   }
 
-  "a deeply nested mutation" should "execute all levels of the mutation if there are model and node edges on the path " in {
+  "a deeply nested mutation" should "execute all levels of the mutation if there are model and node edges on the path " ignore {
     val project = SchemaDsl.fromStringV11() { s"""model Top {
                                              |  id      String   @id @default(cuid())
                                              |  nameTop String   @unique
@@ -1087,7 +1087,7 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
       """{"data":{"bottoms":[{"nameBottom":"the bottom"},{"nameBottom":"the second bottom"}]}}""")
   }
 
-  "a deeply nested mutation" should "execute all levels of the mutation if there are model and node edges on the path  and back relations are missing and node edges follow model edges" in {
+  "a deeply nested mutation" should "execute all levels of the mutation if there are model and node edges on the path  and back relations are missing and node edges follow model edges" ignore {
     val project = SchemaDsl.fromStringV11() { s"""model Top {
                                              |  id      String  @id @default(cuid())
                                              |  nameTop String  @unique
@@ -1175,7 +1175,7 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
       """{"data":{"belows":[{"nameBelow":"below"},{"nameBelow":"second below"}]}}""")
   }
 
-  "a deeply nested mutation" should "execute all levels of the mutation if there are only model edges on the path" in {
+  "a deeply nested mutation" should "execute all levels of the mutation if there are only model edges on the path" ignore {
     val project = SchemaDsl.fromStringV11() { """model Top {
                                              |  id      String  @id @default(cuid())
                                              |  nameTop String  @unique
@@ -1253,7 +1253,7 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
     server.query("query{bottoms{nameBottom}}", project).toString should be("""{"data":{"bottoms":[{"nameBottom":"the bottom"}]}}""")
   }
 
-  "a deeply nested mutation" should "execute all levels of the mutation if there are only model edges on the path and there are no backrelations" in {
+  "a deeply nested mutation" should "execute all levels of the mutation if there are only model edges on the path and there are no backrelations" ignore {
     val project = SchemaDsl.fromStringV11() { """model Top {
                                              |  id      String  @id @default(cuid())
                                              |  nameTop String  @unique
