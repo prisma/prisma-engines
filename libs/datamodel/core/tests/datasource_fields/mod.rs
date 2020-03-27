@@ -34,7 +34,8 @@ fn relation_fields_only_have_a_datasource_field_when_they_are_not_virtual() {
     }
     model Post {
         id String @id
-        blog Blog @relation(references: [id])
+        blogId Int
+        blog Blog @relation(fields: [blogId], references: [id])
     }
     "#;
 
@@ -46,7 +47,7 @@ fn relation_fields_only_have_a_datasource_field_when_they_are_not_virtual() {
             .assert_has_field("blog")
             .assert_has_one_datasource_field(),
         &DataSourceField {
-            name: "blog".to_owned(),
+            name: "blogId".to_owned(),
             arity: FieldArity::Required,
             field_type: ScalarType::Int,
             default_value: None
@@ -64,7 +65,9 @@ fn relation_fields_only_have_multiple_datasource_field_when_they_are_compound() 
     let dml = r#"
     model Blog {
         id Int @id
-        author User @relation(references: [firstName, lastName])
+        authorFirstName String
+        authorLastName  Int 
+        author          User   @relation(fields: [authorFirstName, authorLastName], references: [firstName, lastName])
     }
     model User {
         id Int @id
@@ -84,13 +87,13 @@ fn relation_fields_only_have_multiple_datasource_field_when_they_are_compound() 
             .assert_has_multiple_datasource_fields(),
         vec![
             &DataSourceField {
-                name: "author_firstName".to_owned(),
+                name: "authorFirstName".to_owned(),
                 arity: FieldArity::Required,
                 field_type: ScalarType::String,
                 default_value: None
             },
             &DataSourceField {
-                name: "author_lastName".to_owned(),
+                name: "authorLastName".to_owned(),
                 arity: FieldArity::Required,
                 field_type: ScalarType::Int,
                 default_value: None
@@ -109,7 +112,9 @@ fn must_respect_custom_db_names() {
     let dml = r#"
     model Blog {
         id Int @id @map("blog_id") 
-        author User @relation(references: [firstName, lastName]) @map(["author_fn", "author_ln"])
+        authorFirstName String @map("author_fn")
+        authorLastName  Int    @map("author_ln")
+        author          User   @relation(fields: [authorFirstName, authorLastName], references: [firstName, lastName])
     }
     model User {
         id Int @id
@@ -161,13 +166,19 @@ fn must_handle_crazy_compound_stuff() {
     let dml = r#"
     model Blog {
         id Int @id 
-        author User
+        authorFirstName String
+        authorLastName  Int
+        authorIdentification Float
+        author User @relation(fields:[authorFirstName, authorLastName, authorIdentification], references: [firstName, lastName, identificationId])
     }
     model User {
-        firstName      String
-        lastName       Int
-        identification Identification
-        @@id([firstName, lastName, identification])
+        firstName        String
+        lastName         Int
+        identificationId Float
+        
+        identification Identification @relation(fields: [identificationId], references: [id])
+        
+        @@id([firstName, lastName, identificationId])
     }
     
     model Identification {
@@ -184,19 +195,19 @@ fn must_handle_crazy_compound_stuff() {
             .assert_has_multiple_datasource_fields(),
         vec![
             &DataSourceField {
-                name: "author_firstName".to_owned(),
+                name: "authorFirstName".to_owned(),
                 arity: FieldArity::Required,
                 field_type: ScalarType::String,
                 default_value: None
             },
             &DataSourceField {
-                name: "author_lastName".to_owned(),
+                name: "authorLastName".to_owned(),
                 arity: FieldArity::Required,
                 field_type: ScalarType::Int,
                 default_value: None
             },
             &DataSourceField {
-                name: "author_identification".to_owned(),
+                name: "authorIdentification".to_owned(),
                 arity: FieldArity::Required,
                 field_type: ScalarType::Float,
                 default_value: None

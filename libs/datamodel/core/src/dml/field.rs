@@ -14,6 +14,14 @@ impl FieldArity {
     pub fn is_singular(&self) -> bool {
         self == &FieldArity::Required || self == &FieldArity::Optional
     }
+
+    pub fn verbal_display(&self) -> &'static str {
+        match self {
+            FieldArity::Required => "required",
+            FieldArity::Optional => "optional",
+            FieldArity::List => "list",
+        }
+    }
 }
 
 /// Datamodel field type.

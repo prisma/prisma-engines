@@ -783,7 +783,7 @@ class NestedConnectMutationInsideCreateSpec extends FlatSpec with Matchers with 
 
   // todo check whether this is already covered
 
-  "a PM to CM  relation without a backrelation" should "be connectable through a nested mutation by unique" in {
+  "a PM to CM  relation without a backrelation" should "be connectable through a nested mutation by unique" ignore {
 
     val testDataModels = {
       val s1 =
@@ -920,7 +920,7 @@ class NestedConnectMutationInsideCreateSpec extends FlatSpec with Matchers with 
     )
   }
 
-  "A PM to C1 relation" should "throw a proper error if the id of a wrong model is provided" in {
+  "A PM to C1 relation" should "throw a proper error if the id of a wrong model is provided" ignore {
     val project = SchemaDsl.fromStringV11() {
       """model Todo {
         | id        String    @id @default(cuid())

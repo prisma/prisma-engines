@@ -5,7 +5,7 @@ use crate::{
 };
 use connector::{Filter, IdFilter, QueryArguments, WriteArgs};
 use itertools::Itertools;
-use prisma_models::{ModelProjection, ModelRef, RelationFieldRef, SelectedFields};
+use prisma_models::{ModelProjection, ModelRef, RelationFieldRef};
 use std::sync::Arc;
 
 /// Coerces single values (`ParsedInputValue::Single` and `ParsedInputValue::Map`) into a vector.
@@ -46,7 +46,7 @@ where
     Query::Read(read_query)
 }
 
-fn get_selected_fields(model: &ModelRef, projection: ModelProjection) -> SelectedFields {
+fn get_selected_fields(model: &ModelRef, projection: ModelProjection) -> ModelProjection {
     // Always fetch the primary identifier as well.
     let primary_model_id = model.primary_identifier();
     let mismatches = projection != primary_model_id;
@@ -57,7 +57,7 @@ fn get_selected_fields(model: &ModelRef, projection: ModelProjection) -> Selecte
         projection
     };
 
-    projection.into()
+    projection
 }
 
 /// Adds a read query to the query graph that finds related records by parent ID.

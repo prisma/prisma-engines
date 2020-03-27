@@ -34,6 +34,10 @@ impl DirectiveValidator<dml::Field> for RelationDirectiveValidator {
                 relation_info.to_fields = related_fields.as_array()?.to_literal_vec()?;
             }
 
+            if let Ok(base_fields) = args.arg("fields") {
+                relation_info.fields = base_fields.as_array()?.to_literal_vec()?;
+            }
+
             // TODO: bring `onDelete` back once `prisma migrate` is a thing
             //            if let Ok(on_delete) = args.arg("onDelete") {
             //                relation_info.on_delete = on_delete.parse_literal::<dml::OnDeleteStrategy>()?;
@@ -73,6 +77,18 @@ impl DirectiveValidator<dml::Field> for RelationDirectiveValidator {
 
             relation_fields.sort();
             all_related_ids.sort();
+
+            if !relation_info.fields.is_empty() {
+                let mut fields: Vec<ast::Expression> = Vec::new();
+                for field in &relation_info.fields {
+                    fields.push(ast::Expression::ConstantValue(
+                        field.clone(),
+                        ast::Span::empty(),
+                    ));
+                }
+
+                args.push(ast::Argument::new_array("fields", fields));
+            }
 
             // if we are on the physical field
             if !relation_info.to_fields.is_empty() {

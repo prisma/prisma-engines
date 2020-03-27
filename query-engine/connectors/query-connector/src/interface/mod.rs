@@ -38,7 +38,7 @@ pub trait ReadOperations {
         &'a self,
         model: &'a ModelRef,
         filter: &'a Filter,
-        selected_fields: &'a SelectedFields,
+        selected_fields: &'a ModelProjection,
     ) -> crate::IO<'a, Option<SingleRecord>>;
 
     /// Gets multiple records from the database.
@@ -52,7 +52,7 @@ pub trait ReadOperations {
         &'a self,
         model: &'a ModelRef,
         query_arguments: QueryArguments,
-        selected_fields: &'a SelectedFields,
+        selected_fields: &'a ModelProjection,
     ) -> crate::IO<'a, ManyRecords>;
 
     /// Retrieves pairs of IDs that belong together from a intermediate join

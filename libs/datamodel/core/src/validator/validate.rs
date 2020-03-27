@@ -41,6 +41,20 @@ impl<'a> Validator<'a> {
             {
                 errors.append(the_errors);
             }
+
+            if let Err(ref mut the_errors) =
+                self.validate_base_fields_for_relation(ast_schema.find_model(&model.name).expect(STATE_ERROR), model)
+            {
+                errors.append(the_errors);
+            }
+
+            if let Err(ref mut the_errors) = self.validate_referenced_fields_for_relation(
+                schema,
+                ast_schema.find_model(&model.name).expect(STATE_ERROR),
+                model,
+            ) {
+                errors.append(the_errors);
+            }
         }
 
         if errors.has_errors() {
@@ -151,6 +165,142 @@ impl<'a> Validator<'a> {
         }
 
         Ok(())
+    }
+
+    fn validate_base_fields_for_relation(
+        &self,
+        ast_model: &ast::Model,
+        model: &dml::Model,
+    ) -> Result<(), ErrorCollection> {
+        let mut errors = ErrorCollection::new();
+
+        for field in model.fields() {
+            let ast_field = ast_model
+                .fields
+                .iter()
+                .find(|ast_field| ast_field.name.name == field.name)
+                .unwrap();
+
+            if let dml::FieldType::Relation(rel_info) = &field.field_type {
+                let unknown_fields: Vec<String> = rel_info
+                    .fields
+                    .iter()
+                    .filter(|base_field| model.find_field(&base_field).is_none())
+                    .map(|f| f.clone())
+                    .collect();
+
+                let referenced_relation_fields: Vec<String> = rel_info
+                    .fields
+                    .iter()
+                    .filter(|base_field| match model.find_field(&base_field) {
+                        None => false,
+                        Some(scalar_field) => scalar_field.field_type.is_relation(),
+                    })
+                    .map(|f| f.clone())
+                    .collect();
+
+                let fields_with_wrong_arity: Vec<&dml::Field> = rel_info
+                    .fields
+                    .iter()
+                    .filter_map(|base_field| model.find_field(&base_field))
+                    .filter(|f| f.arity != field.arity)
+                    .collect();
+                let fields_with_wrong_arity_names: Vec<String> =
+                    fields_with_wrong_arity.iter().map(|f| f.name.clone()).collect();
+
+                if !unknown_fields.is_empty() {
+                    errors.push(DatamodelError::new_validation_error(
+                        &format!("The argument fields must refer only to existing fields. The following fields do not exist in this model: {}", unknown_fields.join(", ")),
+                        ast_field.span.clone())
+                    );
+                }
+
+                if !referenced_relation_fields.is_empty() {
+                    errors.push(DatamodelError::new_validation_error(
+                        &format!("The argument fields must refer only to scalar fields. But it is referencing the following relation fields: {}", referenced_relation_fields.join(", ")),
+                        ast_field.span.clone())
+                    );
+                }
+
+                if !fields_with_wrong_arity.is_empty() {
+                    errors.push(DatamodelError::new_validation_error(
+                        &format!("The relation field `{}` uses the scalar fields {}. The arity of those fields must be the same. The relation field is {} but the scalar fields are {}.",
+                            &field.name,
+                                 fields_with_wrong_arity_names.join(", "),
+                        &field.arity.verbal_display(),
+                        &fields_with_wrong_arity.first().unwrap().arity.verbal_display()),
+                        ast_field.span.clone())
+                    );
+                }
+            }
+        }
+
+        if errors.has_errors() {
+            Err(errors)
+        } else {
+            Ok(())
+        }
+    }
+
+    fn validate_referenced_fields_for_relation(
+        &self,
+        datamodel: &dml::Datamodel,
+        ast_model: &ast::Model,
+        model: &dml::Model,
+    ) -> Result<(), ErrorCollection> {
+        let mut errors = ErrorCollection::new();
+
+        for field in model.fields() {
+            let ast_field = ast_model
+                .fields
+                .iter()
+                .find(|ast_field| ast_field.name.name == field.name)
+                .unwrap();
+
+            if let dml::FieldType::Relation(rel_info) = &field.field_type {
+                let related_model = datamodel.find_model(&rel_info.to).expect(STATE_ERROR);
+                let unknown_fields: Vec<String> = rel_info
+                    .to_fields
+                    .iter()
+                    .filter(|referenced_field| related_model.find_field(&referenced_field).is_none())
+                    .map(|f| f.clone())
+                    .collect();
+
+                let referenced_relation_fields: Vec<String> = rel_info
+                    .to_fields
+                    .iter()
+                    .filter(|base_field| match related_model.find_field(&base_field) {
+                        None => false,
+                        Some(scalar_field) => scalar_field.field_type.is_relation(),
+                    })
+                    .map(|f| f.clone())
+                    .collect();
+
+                if !unknown_fields.is_empty() {
+                    errors.push(DatamodelError::new_validation_error(
+                        &format!("The argument `references` must refer only to existing fields in the related model `{}`. The following fields do not exist in the related model: {}",
+                                 &related_model.name,
+                                 unknown_fields.join(", ")),
+                        ast_field.span.clone())
+                    );
+                }
+
+                if !referenced_relation_fields.is_empty() {
+                    errors.push(DatamodelError::new_validation_error(
+                        &format!("The argument `references` must refer only to scalar fields in the related model `{}`. But it is referencing the following relation fields: {}",
+                                 &related_model.name,
+                                 referenced_relation_fields.join(", ")),
+                        ast_field.span.clone())
+                    );
+                }
+            }
+        }
+
+        if errors.has_errors() {
+            Err(errors)
+        } else {
+            Ok(())
+        }
     }
 
     /// Elegantly checks if any relations in the model are ambigious.

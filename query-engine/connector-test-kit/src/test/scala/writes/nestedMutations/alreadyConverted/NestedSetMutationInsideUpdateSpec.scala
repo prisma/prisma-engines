@@ -320,7 +320,7 @@ class NestedSetMutationInsideUpdateSpec extends FlatSpec with Matchers with ApiS
     }
   }
 
-  "a one to many relation" should "be setable by id through a nested mutation" in {
+  "a one to many relation" should "be setable by id through a nested mutation" ignore {
     val project = SchemaDsl.fromStringV11() {
       """model Comment {
         | id   String  @id @default(cuid())
@@ -364,7 +364,7 @@ class NestedSetMutationInsideUpdateSpec extends FlatSpec with Matchers with ApiS
     mustBeEqual(result.pathAsJsValue("data.updateTodo.comments").toString, """[{"text":"comment1"},{"text":"comment2"}]""")
   }
 
-  "a one to many relation" should "be setable by unique through a nested mutation" in {
+  "a one to many relation" should "be setable by unique through a nested mutation" ignore {
     val project = SchemaDsl.fromStringV11() {
       """model Comment {
         | id   String  @id @default(cuid())
@@ -409,7 +409,7 @@ class NestedSetMutationInsideUpdateSpec extends FlatSpec with Matchers with ApiS
     mustBeEqual(result.pathAsJsValue("data.updateTodo.comments").toString, """[{"text":"comment1"},{"text":"comment2"}]""")
   }
 
-  "a PM to CM  self relation with the child not already in a relation" should "be setable through a nested mutation by unique" in {
+  "a PM to CM  self relation with the child not already in a relation" should "be setable through a nested mutation by unique" ignore {
     val project = SchemaDsl.fromStringV11() {
       s"""model Technology {
          |  id                 String       @id @default(cuid())
@@ -454,7 +454,7 @@ class NestedSetMutationInsideUpdateSpec extends FlatSpec with Matchers with ApiS
       """{"data":{"technologies":[{"name":"techA","childTechnologies":[{"name":"techB"}],"parentTechnologies":[]},{"name":"techB","childTechnologies":[],"parentTechnologies":[{"name":"techA"}]}]}}""")
   }
 
-  "Setting two nodes twice" should "not error" in {
+  "Setting two nodes twice" should "not error" ignore {
     val project = SchemaDsl.fromStringV11() {
       s"""model Child {
         | id      String   @id @default(cuid())
@@ -537,7 +537,7 @@ class NestedSetMutationInsideUpdateSpec extends FlatSpec with Matchers with ApiS
 
   }
 
-  "Setting several times" should "not error and only connect the item once" in {
+  "Setting several times" should "not error and only connect the item once" ignore {
 
     val project = SchemaDsl.fromStringV11() {
       s"""

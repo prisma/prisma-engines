@@ -10,9 +10,11 @@ class RelationDesignSpec extends FlatSpec with Matchers with ApiSpecBase {
 
   val schema =
     """model List{
-        |   id    String  @id @default(cuid())
-        |   uList String? @unique
-        |   todo  Todo?   @relation(references: [id])
+        |   id     String  @id @default(cuid())
+        |   uList  String? @unique
+        |   todoId String?
+        |
+        |   todo  Todo?   @relation(fields: [todoId], references: [id])
         |}
         |
         |model Todo{

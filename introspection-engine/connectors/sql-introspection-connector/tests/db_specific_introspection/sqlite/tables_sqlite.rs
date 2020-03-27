@@ -277,7 +277,7 @@ async fn introspecting_a_table_without_uniques_should_comment_it_out(api: &TestA
         })
         .await;
 
-    let dm = "model User {\n  id Int @default(autoincrement()) @id\n}\n\n// The underlying table does not contain a unique identifier and can therefore currently not be handled.\n// model Post {\n  // id      Int\n  // user_id User @relation(references: [id])\n// }";
+    let dm = "model User {\n  id Int @default(autoincrement()) @id\n}\n\n// The underlying table does not contain a unique identifier and can therefore currently not be handled.\n// model Post {\n  // id      Int\n  // user_id Int\n  // User    User @relation(fields: [user_id], references: [id])\n// }";
 
     let result = dbg!(api.introspect().await);
     assert_eq!(&result, dm);

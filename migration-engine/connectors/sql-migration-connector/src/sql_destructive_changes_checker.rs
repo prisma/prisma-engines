@@ -349,6 +349,9 @@ impl SqlDestructiveChangesChecker<'_> {
             }
         }
 
+        // Temporary, for better reporting.
+        diagnostics.warn_about_unexecutable_migrations();
+
         Ok(diagnostics)
     }
 }

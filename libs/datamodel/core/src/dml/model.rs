@@ -91,6 +91,14 @@ impl Model {
         self.fields_mut().find(|f| f.name == *name)
     }
 
+    /// Finds a relation field by name and returns a mutable reference.
+    pub fn find_relation_field_mut(&mut self, name: &str) -> Option<&mut Field> {
+        self.fields_mut().find(|f| match f.field_type {
+            FieldType::Relation(_) => f.name == *name,
+            _ => false,
+        })
+    }
+
     /// Finds the name of all id fields
     pub fn id_field_names(&self) -> Vec<String> {
         let singular_id_field = self.singular_id_fields().next();

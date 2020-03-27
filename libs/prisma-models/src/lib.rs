@@ -15,7 +15,6 @@ mod prisma_value_ext;
 mod projections;
 mod record;
 mod relation;
-mod selected_fields;
 
 #[cfg(feature = "sql-ext")]
 pub mod sql_ext;
@@ -36,7 +35,6 @@ pub use prisma_value_ext::*;
 pub use projections::*;
 pub use record::*;
 pub use relation::*;
-pub use selected_fields::*;
 
 // reexport
 pub use prisma_value::*;

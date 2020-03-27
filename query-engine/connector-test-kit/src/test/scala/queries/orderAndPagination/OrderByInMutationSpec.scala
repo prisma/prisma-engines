@@ -13,20 +13,7 @@ class OrderByInMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
       model Foo {
           id   String  @id @default(cuid())
           test String?
-          bars Bar[]   @relation(references: [id])
-      }
 
-      model Bar {
-          id         String @id @default(cuid())
-          quantity   Int
-          orderField Int?
-      }
-    """
-
-    val s2 = """
-      model Foo {
-          id   String  @id @default(cuid())
-          test String?
           bars Bar[]
       }
 
@@ -34,7 +21,28 @@ class OrderByInMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
           id         String @id @default(cuid())
           quantity   Int
           orderField Int?
+          foo_id     String
+
+          foo Foo @relation(fields: [foo_id], references: [id])
       }
+    """
+
+    val s2 = """
+      model Foo {
+           id   String  @id @default(cuid())
+           test String?
+
+           bars Bar[]
+       }
+
+       model Bar {
+           id         String @id @default(cuid())
+           quantity   Int
+           orderField Int?
+           foo_id     String
+
+           foo Foo @relation(fields: [foo_id], references: [id])
+       }
     """
 
     TestDataModels(mongo = Vector(s1), sql = Vector(s2))

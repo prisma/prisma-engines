@@ -90,16 +90,17 @@ async fn remapping_models_in_relations_should_work(api: &TestApi) {
 
     let dm = r#"
             model Post {
-                id                  Int                 @id  @default(autoincrement())
-                user_id     User_with_Space
+                id              Int             @default(autoincrement()) @id
+                user_id         Int             @unique
+                User_with_Space User_with_Space @relation(fields: [user_id], references: [id])
             }
-
+                  
             model User_with_Space {
-               id       Int                             @id  @default(autoincrement())
-               name     String
-               Post     Post?
-
-               @@map("User with Space")
+                id   Int    @default(autoincrement()) @id
+                name String
+                Post Post?
+                        
+                @@map("User with Space")
             }
         "#;
     let result = dbg!(api.introspect().await);
@@ -126,17 +127,18 @@ async fn remapping_models_in_relations_should_not_map_virtual_fields(api: &TestA
 
     let dm = r#"
             model Post_With_Space {
-                id                  Int                 @id  @default(autoincrement())
-                user_id             User
+                id      Int  @default(autoincrement()) @id
+                user_id Int  @unique
+                User    User @relation(fields: [user_id], references: [id])
                 
                 @@map("Post With Space")
             }
-
+            
             model User {
-               id                   Int                 @id  @default(autoincrement())
-               name                 String
-               Post_With_Space      Post_With_Space?
-            }
+                id              Int              @default(autoincrement()) @id
+                name            String
+                Post_With_Space Post_With_Space?
+            }          
         "#;
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
@@ -167,17 +169,21 @@ async fn remapping_models_in_compound_relations_should_work(api: &TestApi) {
 
     let dm = r#"
             model Post {
-                id      Int                             @id @default(autoincrement())
-                User_with_Space    User_with_Space      @map(["user_id", "user_age"]) @relation(references:[id, age])
+                id              Int             @default(autoincrement()) @id
+                user_age        Int
+                user_id         Int
+                User_with_Space User_with_Space @relation(fields: [user_id, user_age], references: [id, age])
+                    
+                @@unique([user_id, user_age], name: "post_user_unique")
             }
-
+                      
             model User_with_Space {
-               age      Int
-               id       Int                             @id  @default(autoincrement())
-               Post     Post?
-
-               @@map("User with Space")
-               @@unique([id, age], name: "user_unique")
+                age  Int
+                id   Int   @default(autoincrement()) @id
+                Post Post?
+                            
+                @@map("User with Space")
+                @@unique([id, age], name: "user_unique")
             }
         "#;
     let result = dbg!(api.introspect().await);
@@ -205,18 +211,22 @@ async fn remapping_fields_in_compound_relations_should_work(api: &TestApi) {
         })
         .await;
 
-    let dm = r#"
+    let dm = r#" 
             model Post {
-                id                      Int     @id @default(autoincrement())
-                User                    User    @map(["user_id", "user_age"]) @relation(references:[id, age_that_is_invalid])
+                id       Int  @default(autoincrement()) @id
+                user_age Int
+                user_id  Int
+                User     User @relation(fields: [user_id, user_age], references: [id, age_that_is_invalid])
+                    
+                @@unique([user_id, user_age], name: "post_user_unique")
             }
-
+                      
             model User {
-               age_that_is_invalid      Int     @map("age-that-is-invalid")
-               id                       Int     @id @default(autoincrement())
-               Post                     Post?
-
-               @@unique([id, age_that_is_invalid], name: "user_unique")
+                age_that_is_invalid Int   @map("age-that-is-invalid")
+                id                  Int   @default(autoincrement()) @id
+                Post                Post?
+                            
+                @@unique([id, age_that_is_invalid], name: "user_unique")
             }
         "#;
     let result = dbg!(api.introspect().await);

@@ -76,14 +76,7 @@ async fn creating_a_field_for_an_existing_column_with_a_compatible_type_must_wor
                 t.add_column("id", types::primary());
                 // We add a default because the migration engine always adds defaults to facilitate
                 // migration of required columns.
-                t.add_column(
-                    "title",
-                    if is_mysql {
-                        types::varchar(181).default("")
-                    } else {
-                        types::text().default("")
-                    },
-                );
+                t.add_column("title", if is_mysql { types::varchar(181) } else { types::text() });
             });
         })
         .await?;
@@ -95,8 +88,15 @@ async fn creating_a_field_for_an_existing_column_with_a_compatible_type_must_wor
         }
     "#;
 
-    let result = api.infer_and_apply(&dm).await.sql_schema;
-    assert_eq!(initial_result, result);
+    api.infer_apply(&dm)
+        .force(Some(true))
+        .send_assert()
+        .await?
+        .assert_green()?;
+
+    let final_schema = api.describe_database().await?;
+
+    assert_eq!(initial_result, final_schema);
 
     Ok(())
 }
@@ -380,8 +380,10 @@ async fn removing_a_default_from_a_non_nullable_foreign_key_column_must_warn(api
                 t.add_column("id", types::primary());
                 // Barrel fails to create foreign key columns with defaults (bad SQL).
                 let fk = match sql_family {
-                    SqlFamily::Postgres => r#""user" INTEGER DEFAULT 1, FOREIGN KEY ("user") REFERENCES "User" ("id")"#,
-                    _ => "user INTEGER DEFAULT 1, FOREIGN KEY (user) REFERENCES User (id)",
+                    SqlFamily::Postgres => {
+                        r#""userId" INTEGER DEFAULT 1, FOREIGN KEY ("userId") REFERENCES "User" ("id")"#
+                    }
+                    _ => "userId INTEGER DEFAULT 1, FOREIGN KEY (userId) REFERENCES User (id)",
                 };
 
                 t.inject_custom(fk);
@@ -389,7 +391,12 @@ async fn removing_a_default_from_a_non_nullable_foreign_key_column_must_warn(api
         })
         .await?;
 
-    assert!(sql_schema.table_bang("Blog").column("user").unwrap().default.is_some());
+    assert!(sql_schema
+        .table_bang("Blog")
+        .column("userId")
+        .unwrap()
+        .default
+        .is_some());
 
     let dm = r#"
         model User {
@@ -398,7 +405,8 @@ async fn removing_a_default_from_a_non_nullable_foreign_key_column_must_warn(api
 
         model Blog {
             id Int @id
-            user User
+            userId Int
+            user User @relation(fields: [userId])
         }
     "#;
 
@@ -416,7 +424,7 @@ async fn removing_a_default_from_a_non_nullable_foreign_key_column_must_warn(api
         .send()
         .await?;
 
-    let expected_warning = "The migration is about to remove a default value on the foreign key field `Blog.user`.";
+    let expected_warning = "The migration is about to remove a default value on the foreign key field `Blog.userId`.";
     assert_eq!(
         result.warnings,
         &[migration_connector::MigrationWarning {

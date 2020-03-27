@@ -12,17 +12,21 @@ class SelfRelationFilterBugSpec extends FlatSpec with Matchers with ApiSpecBase 
     connectorTag match {
       case _: RelationalConnectorTag =>
         """model Category {
-          |  id       String    @id @default(cuid())
-          |  name     String
-          |  parent   Category? @relation(name: "C", references: [id])
+          |  id        String    @id @default(cuid())
+          |  name      String
+          |  parent_id String?
+          |
+          |  parent   Category? @relation(name: "C", fields: [parent_id], references: [id])
           |  opposite Category? @relation(name: "C")
           |}"""
 
       case _: DocumentConnectorTag =>
         """model Category {
-          |  id       String    @id @default(cuid())
-          |  name     String
-          |  parent   Category? @relation(name: "C", references: [id])
+          |  id        String    @id @default(cuid())
+          |  name      String
+          |  parent_id String?
+          |
+          |  parent   Category? @relation(name: "C", fields: [parent_id], references: [id])
           |  opposite Category? @relation(name: "C")
           |}"""
     }

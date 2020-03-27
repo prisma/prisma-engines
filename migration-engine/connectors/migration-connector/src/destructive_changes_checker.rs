@@ -44,6 +44,14 @@ impl DestructiveChangeDiagnostics {
     pub fn has_warnings(&self) -> bool {
         !self.warnings.is_empty()
     }
+
+    pub fn warn_about_unexecutable_migrations(&mut self) {
+        for unexecutable in &self.unexecutable_migrations {
+            self.warnings.push(MigrationWarning {
+                description: unexecutable.description.clone(),
+            });
+        }
+    }
 }
 
 /// A warning emitted by [DestructiveChangesChecker](trait.DestructiveChangesChecker.html). Warnings will

@@ -16,12 +16,15 @@ class ExtendedRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase
                                          |}
                                          |
                                          |model Album {
-                                         |  id      String  @id @default(cuid())
-                                         |  AlbumId Int     @unique
-                                         |  Title   String
-                                         |  Artist  Artist  @relation(references: [id])
-                                         |  Tracks  Track[]
-                                         |  @@index([Artist])
+                                         |  id       String  @id @default(cuid())
+                                         |  AlbumId  Int     @unique
+                                         |  Title    String
+                                         |  Tracks   Track[]
+                                         |  ArtistId String
+                                         |  
+                                         |  Artist Artist @relation(fields: [ArtistId], references: [id])
+                                         |
+                                         |  @@index([ArtistId])
                                          |}
                                          |
                                          |model Genre {
@@ -42,16 +45,21 @@ class ExtendedRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase
                                          |  id           String    @id @default(cuid())
                                          |  TrackId      Int       @unique
                                          |  Name         String
-                                         |  Album        Album     @relation(references: [id])
-                                         |  MediaType    MediaType @relation(references: [id])
-                                         |  Genre        Genre     @relation(references: [id])
                                          |  Composer     String
                                          |  Milliseconds Int
                                          |  Bytes        Int
                                          |  UnitPrice    Float
-                                         |  @@index([Album])
-                                         |  @@index([MediaType])
-                                         |  @@index([Genre])
+                                         |  AlbumId      String
+                                         |  MediaTypeId  String
+                                         |  GenreId      String
+                                         |  
+                                         |  Album        Album     @relation(fields: [AlbumId], references: [id])
+                                         |  MediaType    MediaType @relation(fields: [MediaTypeId], references: [id])
+                                         |  Genre        Genre     @relation(fields: [GenreId], references: [id])
+                                         |  
+                                         |  @@index([AlbumId])
+                                         |  @@index([MediaTypeId])
+                                         |  @@index([GenreId])
                                          |}
                                          |""" }
 
@@ -354,7 +362,8 @@ class ExtendedRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase
   "2 level m-relation filters that have subfilters that are connected with an explicit AND" should "work for _some" in {
 
     server
-      .query(query = """{albums(where:{Tracks_some:{AND:[{MediaType: {Name: "MediaType1"}},{Genre: {Name: "Genre1"}}]}}, orderBy: id_ASC){Title}}""", project = project)
+      .query(query = """{albums(where:{Tracks_some:{AND:[{MediaType: {Name: "MediaType1"}},{Genre: {Name: "Genre1"}}]}}, orderBy: id_ASC){Title}}""",
+             project = project)
       .toString should be("""{"data":{"albums":[{"Title":"Album1"},{"Title":"Album4"},{"Title":"Album5"}]}}""")
 
     server

@@ -24,9 +24,10 @@ async fn introspecting_a_one_to_one_req_relation_should_work(api: &TestApi) {
         .await;
 
     let dm = r#"
-              model Post {
-               id      Int @id @default(autoincrement())
-               user_id User
+            model Post {
+               id       Int @id @default(autoincrement())
+               user_id  Int  @unique
+               User     User @relation(fields: [user_id], references: [id])
             }
 
             model User {
@@ -75,17 +76,19 @@ async fn introspecting_two_one_to_one_relations_between_the_same_models_should_w
 
     let dm = r#"
         model Post {
-            id      Int @id @default(autoincrement())
-            user_id User  @relation("Post_user_idToUser", references: [id])
-            User    User? @relation("PostToUser_post_id")
+            id                      Int   @default(autoincrement()) @id
+            user_id                 Int   @unique
+            User_Post_user_idToUser User  @relation("Post_user_idToUser", fields: [user_id], references: [id])
+            User_PostToUser_post_id User? @relation("PostToUser_post_id")
         }
-
+                
         model User {
-            id      Int @id @default(autoincrement())
-            post_id Post  @relation("PostToUser_post_id", references: [id])
-            Post Post?    @relation("Post_user_idToUser")
+            id                      Int   @default(autoincrement()) @id
+            post_id                 Int   @unique
+            Post_PostToUser_post_id Post  @relation("PostToUser_post_id", fields: [post_id], references: [id])
+            Post_Post_user_idToUser Post? @relation("Post_user_idToUser")
         }
-    "#;
+        "#;
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
@@ -113,15 +116,15 @@ async fn introspecting_a_one_to_one_relation_should_work(api: &TestApi) {
 
     let dm = r#"
             model Post {
-               id      Int @id @default(autoincrement())
-               user_id User?
+                id      Int   @default(autoincrement()) @id
+                user_id Int?  @unique
+                User    User? @relation(fields: [user_id], references: [id])
             }
-
+                  
             model User {
-               id      Int @id @default(autoincrement())
-               Post Post?
-
-            }
+                id   Int   @default(autoincrement()) @id
+                Post Post?
+            }       
         "#;
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
@@ -146,15 +149,16 @@ async fn introspecting_a_one_to_one_relation_referencing_non_id_should_work(api:
         })
         .await;
     let dm = r#"
-            model Post {
-               id           Int     @id @default(autoincrement())
-               user_email   User?   @relation(references: [email])
+           model Post {
+                id         Int     @default(autoincrement()) @id
+                user_email String? @unique
+                User       User?   @relation(fields: [user_email], references: [email])
             }
-
+                  
             model User {
-               email        String? @unique
-               id           Int     @id  @default(autoincrement())
-               Post         Post?
+                email String? @unique
+                id    Int     @default(autoincrement()) @id
+                Post  Post?
             }
         "#;
     let result = dbg!(api.introspect().await);
@@ -184,15 +188,16 @@ async fn introspecting_a_one_to_many_relation_should_work(api: &TestApi) {
 
     let dm = r#"
             model Post {
-               id      Int @id @default(autoincrement())
-               user_id User?
-
-               @@index([user_id], name: "user_id")
+                id      Int   @default(autoincrement()) @id
+                user_id Int?
+                User    User? @relation(fields: [user_id], references: [id])
+                
+                @@index([user_id], name: "user_id")
             }
-
+            
             model User {
-               id      Int @id @default(autoincrement())
-               Post Post[]
+                id   Int    @default(autoincrement()) @id
+                Post Post[]
             }
         "#;
     let result = dbg!(api.introspect().await);
@@ -222,15 +227,16 @@ async fn introspecting_a_one_req_to_many_relation_should_work(api: &TestApi) {
 
     let dm = r#"
             model Post {
-               id      Int @id @default(autoincrement())
-               user_id User
-
-               @@index([user_id], name: "user_id")
+                id      Int  @default(autoincrement()) @id
+                user_id Int
+                User    User @relation(fields: [user_id], references: [id])
+                
+                @@index([user_id], name: "user_id")
             }
-
+            
             model User {
-               id      Int @id @default(autoincrement())
-               Post Post[]
+                id   Int    @default(autoincrement()) @id
+                Post Post[]
             }
        "#;
     let result = dbg!(api.introspect().await);
@@ -406,23 +412,25 @@ async fn introspecting_a_many_to_many_relation_with_an_id_should_work(api: &Test
 
     let dm = r#"
             model Post {
-               id      Int @id @default(autoincrement())
-               PostsToUsers PostsToUsers[] 
+                id           Int            @default(autoincrement()) @id
+                PostsToUsers PostsToUsers[]
             }
-
+            
             model PostsToUsers {
-              id      Int @id
-              post_id Post
-              user_id User
-
-              @@index([post_id], name: "post_id")
-              @@index([user_id], name: "user_id")
+                id      Int  @id
+                post_id Int
+                user_id Int
+                Post    Post @relation(fields: [post_id], references: [id])
+                User    User @relation(fields: [user_id], references: [id])
+                
+                @@index([post_id], name: "post_id")
+                @@index([user_id], name: "user_id")
             }
-
+            
             model User {
-               id      Int @id @default(autoincrement())
-               PostsToUsers PostsToUsers[]
-            }
+                id           Int            @default(autoincrement()) @id
+                PostsToUsers PostsToUsers[]
+            }         
         "#;
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
@@ -449,13 +457,15 @@ async fn introspecting_a_self_relation_should_work(api: &TestApi) {
         .await;
 
     let dm = r#"
-            model User {
-                id                             Int @id @default(autoincrement())
-                direct_report                  User?  @relation("UserToUser_direct_report")
-                recruited_by                   User?  @relation("UserToUser_recruited_by")
-                User_UserToUser_direct_report User[] @relation("UserToUser_direct_report")
-                User_UserToUser_recruited_by  User[] @relation("UserToUser_recruited_by")
-
+              model User {
+                direct_report                       Int?
+                id                                  Int    @default(autoincrement()) @id
+                recruited_by                        Int?
+                User_UserToUser_direct_report       User?  @relation("UserToUser_direct_report", fields: [direct_report], references: [id])
+                User_UserToUser_recruited_by        User?  @relation("UserToUser_recruited_by", fields: [recruited_by], references: [id])
+                other_User_UserToUser_direct_report User[] @relation("UserToUser_direct_report")
+                other_User_UserToUser_recruited_by  User[] @relation("UserToUser_recruited_by")
+                
                 @@index([direct_report], name: "direct_report")
                 @@index([recruited_by], name: "recruited_by")
             }
@@ -468,41 +478,41 @@ async fn introspecting_a_self_relation_should_work(api: &TestApi) {
 
 // TODO: bring `onDelete` back once `prisma migrate` is a thing
 //#[test_each_connector(tags("mysql"))]
-async fn introspecting_cascading_delete_behaviour_should_work(api: &TestApi) {
-    let barrel = api.barrel();
-    let _setup_schema = barrel
-        .execute_with_schema(
-            |migration| {
-                migration.create_table("User", |t| {
-                    t.add_column("id", types::primary());
-                });
-                migration.create_table("Post", |t| {
-                    t.add_column("id", types::primary());
-                    t.inject_custom(
-                        "user_id INTEGER, FOREIGN KEY (`user_id`) REFERENCES `User`(`id`) ON DELETE CASCADE",
-                    );
-                });
-            },
-            api.db_name(),
-        )
-        .await;
-
-    let dm = r#"
-            model Post {
-               id      Int @id @default(autoincrement())
-               user_id User?
-
-               @@index([user_id], name: "user_id")
-            }
-
-            model User {
-               id      Int @id @default(autoincrement())
-               Post Post[] @relation(onDelete: CASCADE)
-            }
-        "#;
-    let result = api.introspect().await;
-    custom_assert(&result, dm);
-}
+// async fn introspecting_cascading_delete_behaviour_should_work(api: &TestApi) {
+//     let barrel = api.barrel();
+//     let _setup_schema = barrel
+//         .execute_with_schema(
+//             |migration| {
+//                 migration.create_table("User", |t| {
+//                     t.add_column("id", types::primary());
+//                 });
+//                 migration.create_table("Post", |t| {
+//                     t.add_column("id", types::primary());
+//                     t.inject_custom(
+//                         "user_id INTEGER, FOREIGN KEY (`user_id`) REFERENCES `User`(`id`) ON DELETE CASCADE",
+//                     );
+//                 });
+//             },
+//             api.db_name(),
+//         )
+//         .await;
+//
+//     let dm = r#"
+//             model Post {
+//                id      Int @id @default(autoincrement())
+//                user_id User?
+//
+//                @@index([user_id], name: "user_id")
+//             }
+//
+//             model User {
+//                id      Int @id @default(autoincrement())
+//                Post Post[] @relation(onDelete: CASCADE)
+//             }
+//         "#;
+//     let result = api.introspect().await;
+//     custom_assert(&result, dm);
+// }
 
 #[test_each_connector(tags("mysql"))]
 async fn introspecting_id_fields_with_foreign_key_should_work(api: &TestApi) {
@@ -521,16 +531,17 @@ async fn introspecting_id_fields_with_foreign_key_should_work(api: &TestApi) {
         .await;
 
     let dm = r#"
-            model Post {
-               test    String
-               user_id User     @id @relation(references: [id])
-            }
-
-            model User {
-               id      Int      @id @default(autoincrement())
-               Post    Post[]
-            }
-        "#;
+        model Post {
+            test    String
+            user_id Int    @id
+            User    User   @relation(fields: [user_id], references: [id])
+        }
+              
+        model User {
+            id   Int    @default(autoincrement()) @id
+            Post Post[]
+        }
+"#;
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }

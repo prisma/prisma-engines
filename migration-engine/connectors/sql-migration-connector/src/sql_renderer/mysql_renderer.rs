@@ -1,7 +1,7 @@
 use super::common::*;
 use crate::{sql_schema_helpers::ColumnRef, SqlFamily};
 use sql_schema_describer::*;
-use std::fmt::Write as _;
+use std::{borrow::Cow, fmt::Write as _};
 
 const VARCHAR_LENGTH_PREFIX: &str = "(191)";
 
@@ -58,15 +58,22 @@ impl super::SqlRenderer for MySqlRenderer {
 }
 
 impl MySqlRenderer {
-    fn render_column_type(&self, column: &ColumnRef<'_>) -> anyhow::Result<String> {
+    fn render_column_type(&self, column: &ColumnRef<'_>) -> anyhow::Result<Cow<'static, str>> {
         match &column.column_type().family {
-            ColumnTypeFamily::Boolean => Ok(format!("boolean")),
-            ColumnTypeFamily::DateTime => Ok(format!("datetime(3)")),
-            ColumnTypeFamily::Float => Ok(format!("Decimal(65,30)")),
-            ColumnTypeFamily::Int => Ok(format!("int")),
+            ColumnTypeFamily::Boolean => Ok("boolean".into()),
+            ColumnTypeFamily::DateTime => {
+                // CURRENT_TIMESTAMP has up to second precision, not more.
+                if let Some(DefaultValue::NOW) = column.default() {
+                    return Ok("datetime".into());
+                } else {
+                    Ok("datetime(3)".into())
+                }
+            }
+            ColumnTypeFamily::Float => Ok("Decimal(65,30)".into()),
+            ColumnTypeFamily::Int => Ok("int".into()),
             // we use varchar right now as mediumtext doesn't allow default values
             // a bigger length would not allow to use such a column as primary key
-            ColumnTypeFamily::String => Ok(format!("varchar{}", VARCHAR_LENGTH_PREFIX)),
+            ColumnTypeFamily::String => Ok(format!("varchar{}", VARCHAR_LENGTH_PREFIX).into()),
             ColumnTypeFamily::Enum(enum_name) => {
                 let r#enum = column
                     .schema()
@@ -75,7 +82,7 @@ impl MySqlRenderer {
 
                 let variants: String = r#enum.values.iter().map(quoted_string).join(", ");
 
-                Ok(format!("ENUM({})", variants))
+                Ok(format!("ENUM({})", variants).into())
             }
             x => unimplemented!("{:?} not handled yet", x),
         }

@@ -1,4 +1,6 @@
 use crate::common::*;
+use datamodel::ast::Span;
+use datamodel::error::DatamodelError;
 use datamodel::{common::ScalarType, dml};
 
 #[test]
@@ -72,7 +74,9 @@ fn resolve_related_fields() {
     model Post {
         id Int @id
         text String
-        user User @relation(references: [firstName, lastName])
+        authorFirstName String
+        authorLastName  String
+        user            User @relation(fields: [authorFirstName, authorLastName], references: [firstName, lastName])
     }
     "#;
 
@@ -82,7 +86,34 @@ fn resolve_related_fields() {
     post_model
         .assert_has_field("user")
         .assert_relation_to("User")
+        .assert_relation_base_fields(&["authorFirstName", "authorLastName"])
         .assert_relation_to_fields(&["firstName", "lastName"]);
+}
+
+#[test]
+fn must_error_when_non_existing_fields_are_used() {
+    let dml = r#"
+    model User {
+        id Int @id
+        firstName String
+        lastName String
+        posts Post[]
+    }
+
+    model Post {
+        id   Int    @id
+        text String
+        user User   @relation(fields: [authorFirstName, authorLastName], references: [firstName, lastName])
+    }
+    "#;
+
+    let errors = parse_error(dml);
+    errors.assert_is(
+        DatamodelError::new_validation_error(
+            "The argument fields must refer only to existing fields. The following fields do not exist in this model: authorFirstName, authorLastName", 
+                Span::new(183, 282)
+        )
+    );
 }
 
 #[test]

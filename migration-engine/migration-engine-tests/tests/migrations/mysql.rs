@@ -8,7 +8,8 @@ async fn indexes_on_foreign_key_fields_are_not_created_twice(api: &TestApi) -> T
     let schema = r#"
         model Human {
             id String @id
-            cat Cat @relation(references: [name])
+            catname String
+            cat_rel Cat @relation(fields: [catname], references: [name])
         }
 
         model Cat {
@@ -26,9 +27,9 @@ async fn indexes_on_foreign_key_fields_are_not_created_twice(api: &TestApi) -> T
         .assert_table("Human", |table| {
             table
                 .assert_foreign_keys_count(1)?
-                .assert_fk_on_columns(&["cat"], |fk| fk.assert_references("Cat", &["name"]))?
+                .assert_fk_on_columns(&["catname"], |fk| fk.assert_references("Cat", &["name"]))?
                 .assert_indexes_count(1)?
-                .assert_index_on_columns(&["cat"], |idx| idx.assert_is_not_unique())
+                .assert_index_on_columns(&["catname"], |idx| idx.assert_is_not_unique())
         })?
         .into_schema();
 

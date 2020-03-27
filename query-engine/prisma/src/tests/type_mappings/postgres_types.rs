@@ -785,7 +785,6 @@ async fn postgres_db_level_array_defaults_work(api: &TestApi) -> TestResult {
     api.execute_sql(CREATE_TYPES_TABLE_WITH_ARRAY_DEFAULTS).await?;
 
     let (_datamodel, engine) = api.introspect_and_start_query_engine().await?;
-
     let response = engine.request(CREATE_ONE_ARRAY_TYPES_QUERY).await;
 
     assert_eq!(response, create_one_array_types_response());

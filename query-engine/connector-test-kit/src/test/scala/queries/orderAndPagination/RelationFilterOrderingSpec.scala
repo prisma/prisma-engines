@@ -10,11 +10,14 @@ class RelationFilterOrderingSpec extends FlatSpec with Matchers with ApiSpecBase
                   id String @id @default(cuid())
                   title String
                   score Int
-                  labels Label[] @relation(references: [id])
+
+                  labels Label[]
                 }
+
                 model Label {
                   id String @id @default(cuid())
                   text String @unique
+
                   blogs Blog[]
                 }"""
 
@@ -22,11 +25,14 @@ class RelationFilterOrderingSpec extends FlatSpec with Matchers with ApiSpecBase
                   id String @id @default(cuid())
                   title String
                   score Int
+
                   labels Label[]
                 }
+
                 model Label {
                   id String @id @default(cuid())
                   text String @unique
+
                   blogs Blog[]
                 }"""
 

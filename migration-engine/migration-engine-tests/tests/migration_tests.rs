@@ -224,7 +224,8 @@ async fn changing_the_type_of_an_id_field_must_work(api: &TestApi) {
     let dm1 = r#"
             model A {
                 id Int @id
-                b  B   @relation(references: [id])
+                b_id Int
+                b  B   @relation(fields: [b_id], references: [id])
             }
             model B {
                 id Int @id
@@ -232,13 +233,13 @@ async fn changing_the_type_of_an_id_field_must_work(api: &TestApi) {
         "#;
     let result = api.infer_and_apply(&dm1).await.sql_schema;
     let table = result.table_bang("A");
-    let column = table.column_bang("b");
+    let column = table.column_bang("b_id");
     assert_eq!(column.tpe.family, ColumnTypeFamily::Int);
     assert_eq!(
         table.foreign_keys,
         &[ForeignKey {
             constraint_name: match api.sql_family() {
-                SqlFamily::Postgres => Some("A_b_fkey".to_owned()),
+                SqlFamily::Postgres => Some("A_b_id_fkey".to_owned()),
                 SqlFamily::Mysql => Some("A_ibfk_1".to_owned()),
                 SqlFamily::Sqlite => None,
             },
@@ -252,7 +253,8 @@ async fn changing_the_type_of_an_id_field_must_work(api: &TestApi) {
     let dm2 = r#"
             model A {
                 id Int @id
-                b  B   @relation(references: [id])
+                b_id String
+                b  B   @relation(fields: [b_id], references: [id])
             }
             model B {
                 id String @id @default(cuid())
@@ -260,17 +262,17 @@ async fn changing_the_type_of_an_id_field_must_work(api: &TestApi) {
         "#;
     let result = api.infer_and_apply(&dm2).await.sql_schema;
     let table = result.table_bang("A");
-    let column = table.column_bang("b");
+    let column = table.column_bang("b_id");
     assert_eq!(column.tpe.family, ColumnTypeFamily::String);
     assert_eq!(
         table.foreign_keys,
         &[ForeignKey {
             constraint_name: match api.sql_family() {
-                SqlFamily::Postgres => Some("A_b_fkey".to_owned()),
+                SqlFamily::Postgres => Some("A_b_id_fkey".to_owned()),
                 SqlFamily::Mysql => Some("A_ibfk_1".to_owned()),
                 SqlFamily::Sqlite => None,
             },
-            columns: vec![column.name.clone()],
+            columns: vec!["b_id".into()],
             referenced_table: "B".to_string(),
             referenced_columns: vec!["id".to_string()],
             on_delete_action: ForeignKeyAction::Cascade,
@@ -305,7 +307,8 @@ async fn changing_a_relation_field_to_a_scalar_field_must_work(api: &TestApi) ->
     let dm1 = r#"
         model A {
             id Int @id
-            b B @relation(references: [id])
+            b Int
+            b_rel B @relation(fields: [b], references: [id])
         }
         model B {
             id Int @id
@@ -375,7 +378,8 @@ async fn changing_a_scalar_field_to_a_relation_field_must_work(api: &TestApi) {
     let dm2 = r#"
             model A {
                 id Int @id
-                b B @relation(references: [id])
+                b Int
+                b_rel B @relation(fields: [b], references: [id])
             }
             model B {
                 id Int @id
@@ -485,20 +489,15 @@ async fn adding_a_many_to_many_relation_with_custom_name_must_work(api: &TestApi
     );
 }
 
-#[test]
-#[ignore]
-fn providing_an_explicit_link_table_must_work() {
-    // TODO: implement this once we have decided if this is actually possible in dm v2
-    unimplemented!();
-}
-
 #[test_each_connector]
-async fn adding_an_inline_relation_must_result_in_a_foreign_key_in_the_model_table(api: &TestApi) {
+async fn adding_an_inline_relation_must_result_in_a_foreign_key_in_the_model_table(api: &TestApi) -> TestResult {
     let dm1 = r#"
             model A {
                 id Int @id
-                b  B   @relation(references: [id])
-                c  C?  @relation(references: [id])
+                bid Int
+                cid Int?
+                b  B   @relation(fields: [bid], references: [id])
+                c  C?  @relation(fields: [cid], references: [id])
             }
 
             model B {
@@ -513,11 +512,11 @@ async fn adding_an_inline_relation_must_result_in_a_foreign_key_in_the_model_tab
     let result = api.infer_and_apply(&dm1).await.sql_schema;
     let table = result.table_bang("A");
 
-    let b_column = table.column_bang("b");
+    let b_column = table.column_bang("bid");
     assert_eq!(b_column.tpe.family, ColumnTypeFamily::Int);
     assert_eq!(b_column.tpe.arity, ColumnArity::Required);
 
-    let c_column = table.column_bang("c");
+    let c_column = table.column_bang("cid");
     assert_eq!(c_column.tpe.family, ColumnTypeFamily::Int);
     assert_eq!(c_column.tpe.arity, ColumnArity::Nullable);
 
@@ -526,7 +525,7 @@ async fn adding_an_inline_relation_must_result_in_a_foreign_key_in_the_model_tab
         &[
             ForeignKey {
                 constraint_name: match api.sql_family() {
-                    SqlFamily::Postgres => Some("A_b_fkey".to_owned()),
+                    SqlFamily::Postgres => Some("A_bid_fkey".to_owned()),
                     SqlFamily::Mysql => Some("A_ibfk_1".to_owned()),
                     SqlFamily::Sqlite => None,
                 },
@@ -537,7 +536,7 @@ async fn adding_an_inline_relation_must_result_in_a_foreign_key_in_the_model_tab
             },
             ForeignKey {
                 constraint_name: match api.sql_family() {
-                    SqlFamily::Postgres => Some("A_c_fkey".to_owned()),
+                    SqlFamily::Postgres => Some("A_cid_fkey".to_owned()),
                     SqlFamily::Mysql => Some("A_ibfk_2".to_owned()),
                     SqlFamily::Sqlite => None,
                 },
@@ -548,6 +547,8 @@ async fn adding_an_inline_relation_must_result_in_a_foreign_key_in_the_model_tab
             }
         ]
     );
+
+    Ok(())
 }
 
 #[test_each_connector]
@@ -555,7 +556,8 @@ async fn specifying_a_db_name_for_an_inline_relation_must_work(api: &TestApi) {
     let dm1 = r#"
             model A {
                 id Int @id
-                b B @relation(references: [id]) @map(name: "b_column")
+                b_id_field Int @map(name: "b_column")
+                b B @relation(fields: [b_id_field])
             }
 
             model B {
@@ -587,7 +589,8 @@ async fn adding_an_inline_relation_to_a_model_with_an_exotic_id_type(api: &TestA
     let dm1 = r#"
             model A {
                 id Int @id
-                b B @relation(references: [id])
+                b_id String
+                b B @relation(fields: [b_id], references: [id])
             }
 
             model B {
@@ -596,13 +599,13 @@ async fn adding_an_inline_relation_to_a_model_with_an_exotic_id_type(api: &TestA
         "#;
     let result = api.infer_and_apply(&dm1).await.sql_schema;
     let table = result.table_bang("A");
-    let column = table.column_bang("b");
+    let column = table.column_bang("b_id");
     assert_eq!(column.tpe.family, ColumnTypeFamily::String);
     assert_eq!(
         table.foreign_keys,
         &[ForeignKey {
             constraint_name: match api.sql_family() {
-                SqlFamily::Postgres => Some("A_b_fkey".to_owned()),
+                SqlFamily::Postgres => Some("A_b_id_fkey".to_owned()),
                 SqlFamily::Mysql => Some("A_ibfk_1".to_owned()),
                 SqlFamily::Sqlite => None,
             },
@@ -619,16 +622,19 @@ async fn removing_an_inline_relation_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
             model A {
                 id Int @id
-                b B @relation(references: [id])
+                b_id Int
+                b B @relation(fields: [b_id], references: [id])
             }
 
             model B {
                 id Int @id
             }
         "#;
-    let result = api.infer_and_apply(&dm1).await.sql_schema;
-    let column = result.table_bang("A").column("b");
-    assert_eq!(column.is_some(), true);
+
+    api.infer_apply(&dm1).send_assert().await?.assert_green()?;
+    api.assert_schema()
+        .await?
+        .assert_table("A", |table| table.assert_has_column("b_id"))?;
 
     let dm2 = r#"
             model A {
@@ -642,15 +648,14 @@ async fn removing_an_inline_relation_must_work(api: &TestApi) -> TestResult {
 
     api.infer_apply(dm2).send().await?;
 
-    api.assert_schema()
-        .await?
-        .assert_table("A", |table| {
-            table
-                .assert_foreign_keys_count(0)?
-                .assert_indexes_count(0)?
-                .assert_does_not_have_column("b")
-        })
-        .map(drop)
+    api.assert_schema().await?.assert_table("A", |table| {
+        table
+            .assert_foreign_keys_count(0)?
+            .assert_indexes_count(0)?
+            .assert_does_not_have_column("b")
+    })?;
+
+    Ok(())
 }
 
 #[test_each_connector]
@@ -658,7 +663,8 @@ async fn moving_an_inline_relation_to_the_other_side_must_work(api: &TestApi) ->
     let dm1 = r#"
             model A {
                 id Int @id
-                b B @relation(references: [id])
+                b_id Int
+                b B @relation(fields: [b_id], references: [id])
             }
 
             model B {
@@ -671,11 +677,11 @@ async fn moving_an_inline_relation_to_the_other_side_must_work(api: &TestApi) ->
         table.foreign_keys,
         &[ForeignKey {
             constraint_name: match api.sql_family() {
-                SqlFamily::Postgres => Some("A_b_fkey".to_owned()),
+                SqlFamily::Postgres => Some("A_b_id_fkey".to_owned()),
                 SqlFamily::Sqlite => None,
                 SqlFamily::Mysql => Some("A_ibfk_1".to_owned()),
             },
-            columns: vec!["b".to_string()],
+            columns: vec!["b_id".to_string()],
             referenced_table: "B".to_string(),
             referenced_columns: vec!["id".to_string()],
             on_delete_action: ForeignKeyAction::Cascade,
@@ -689,7 +695,8 @@ async fn moving_an_inline_relation_to_the_other_side_must_work(api: &TestApi) ->
 
             model B {
                 id Int @id
-                a A @relation(references: [id])
+                a_id Int
+                a A @relation(fields: [a_id], references: [id])
             }
         "#;
     let result = api.infer_and_apply(&dm2).await.sql_schema;
@@ -698,11 +705,11 @@ async fn moving_an_inline_relation_to_the_other_side_must_work(api: &TestApi) ->
         table.foreign_keys,
         &[ForeignKey {
             constraint_name: match api.sql_family() {
-                SqlFamily::Postgres => Some("B_a_fkey".to_owned()),
+                SqlFamily::Postgres => Some("B_a_id_fkey".to_owned()),
                 SqlFamily::Sqlite => None,
                 SqlFamily::Mysql => Some("B_ibfk_1".to_owned()),
             },
-            columns: vec!["a".to_string()],
+            columns: vec!["a_id".to_string()],
             referenced_table: "A".to_string(),
             referenced_columns: vec!["id".to_string()],
             on_delete_action: ForeignKeyAction::Cascade,
@@ -1158,7 +1165,8 @@ async fn reserved_sql_key_words_must_work(api: &TestApi) {
     let dm = r#"
             model Group {
                 id    String  @default(cuid()) @id
-                parent Group? @relation(name: "ChildGroups")
+                parent_id String?
+                parent Group? @relation(name: "ChildGroups", fields: [parent_id])
                 childGroups Group[] @relation(name: "ChildGroups")
             }
         "#;
@@ -1169,11 +1177,11 @@ async fn reserved_sql_key_words_must_work(api: &TestApi) {
         table.foreign_keys,
         vec![ForeignKey {
             constraint_name: match sql_family {
-                SqlFamily::Postgres => Some("Group_parent_fkey".to_owned()),
+                SqlFamily::Postgres => Some("Group_parent_id_fkey".to_owned()),
                 SqlFamily::Mysql => Some("Group_ibfk_1".to_owned()),
                 SqlFamily::Sqlite => None,
             },
-            columns: vec!["parent".to_string()],
+            columns: vec!["parent_id".to_string()],
             referenced_table: "Group".to_string(),
             referenced_columns: vec!["id".to_string()],
             on_delete_action: ForeignKeyAction::SetNull,
@@ -1241,11 +1249,12 @@ async fn migrations_with_many_to_many_related_models_must_not_recreate_indexes(a
 }
 
 #[test_each_connector]
-async fn removing_a_relation_field_must_work(api: &TestApi) {
+async fn removing_a_relation_field_must_work(api: &TestApi) -> TestResult {
     let dm_1 = r#"
             model User {
                 id        String  @default(cuid()) @id
-                address   Address @map("address_name")
+                address_id String @map("address_name")
+                address   Address @relation(fields: [address_id])
             }
 
             model Address {
@@ -1254,15 +1263,10 @@ async fn removing_a_relation_field_must_work(api: &TestApi) {
             }
         "#;
 
-    let sql_schema = api.infer_and_apply(&dm_1).await.sql_schema;
-
-    let address_name_field = sql_schema
-        .table_bang("User")
-        .columns
-        .iter()
-        .find(|col| col.name == "address_name");
-
-    assert!(address_name_field.is_some());
+    api.infer_apply(&dm_1).send_assert().await?.assert_green()?;
+    api.assert_schema()
+        .await?
+        .assert_table("User", |table| table.assert_has_column("address_name"))?;
 
     let dm_2 = r#"
             model User {
@@ -1284,6 +1288,8 @@ async fn removing_a_relation_field_must_work(api: &TestApi) {
         .find(|col| col.name == "address_name");
 
     assert!(address_name_field.is_none());
+
+    Ok(())
 }
 
 #[test_each_connector]
@@ -1319,13 +1325,16 @@ async fn model_with_multiple_indexes_works(api: &TestApi) -> TestResult {
 
     model Like {
       id        Int       @id
-      user      User
-      post      Post
-      comment   Comment
+      user_id   Int
+      user      User @relation(fields: [user_id], references: [id])
+      post_id   Int
+      post      Post @relation(fields: [post_id], references: [id])
+      comment_id Int
+      comment   Comment @relation(fields: [comment_id], references: [id])
 
-      @@index([post])
-      @@index([user])
-      @@index([comment])
+      @@index([post_id])
+      @@index([user_id])
+      @@index([comment_id])
     }
     "#;
 
@@ -1347,7 +1356,8 @@ async fn foreign_keys_of_inline_one_to_one_relations_have_a_unique_constraint(ap
 
         model Box {
             id Int @id
-            cat Cat
+            cat_id Int
+            cat Cat @relation(fields: [cat_id], references: [id])
         }
     "#;
 
@@ -1356,8 +1366,8 @@ async fn foreign_keys_of_inline_one_to_one_relations_have_a_unique_constraint(ap
     let box_table = schema.table_bang("Box");
 
     let expected_indexes = &[Index {
-        name: "Box_cat".into(),
-        columns: vec!["cat".into()],
+        name: "Box_cat_id".into(),
+        columns: vec!["cat_id".into()],
         tpe: IndexType::Unique,
     }];
 
@@ -1395,7 +1405,7 @@ async fn column_defaults_must_be_migrated(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector(log = "debug")]
+#[test_each_connector]
 async fn escaped_string_defaults_are_not_arbitrarily_migrated(api: &TestApi) -> TestResult {
     use quaint::ast::*;
 
@@ -1478,15 +1488,10 @@ async fn created_at_does_not_get_arbitrarily_migrated(api: &TestApi) -> TestResu
     api.database().query(insert.into()).await.unwrap();
 
     anyhow::ensure!(
-        schema
-            .table_bang("Fruit")
-            .column_bang("createdAt")
-            .default
-            .as_ref()
-            .unwrap()
-            .as_value()
-            .unwrap()
-            .contains("1970"),
+        matches!(
+            schema.table_bang("Fruit").column_bang("createdAt").default,
+            Some(DefaultValue::NOW)
+        ),
         "createdAt default is set"
     );
 
@@ -1498,7 +1503,7 @@ async fn created_at_does_not_get_arbitrarily_migrated(api: &TestApi) -> TestResu
         }
     "#;
 
-    let output = api.infer_apply(dm2).send().await?;
+    let output = api.infer_apply(dm2).send_assert().await?.assert_green()?.into_inner();
 
     anyhow::ensure!(output.warnings.is_empty(), "No warnings");
     anyhow::ensure!(output.datamodel_steps.is_empty(), "Migration should be empty");
@@ -1551,11 +1556,12 @@ async fn relations_can_reference_arbitrary_unique_fields(api: &TestApi) -> TestR
 
         model Account {
             id Int @id
-            user User @relation(references: [email])
+            uem String
+            user User @relation(fields: [uem], references: [email])
         }
     "#;
 
-    api.infer_apply(dm).send().await?;
+    api.infer_apply(dm).send_assert().await?.assert_green()?;
 
     let schema = api.describe_database().await?;
 
@@ -1565,7 +1571,7 @@ async fn relations_can_reference_arbitrary_unique_fields(api: &TestApi) -> TestR
 
     let fk = fks.iter().next().unwrap();
 
-    assert_eq!(fk.columns, &["user"]);
+    assert_eq!(fk.columns, &["uem"]);
     assert_eq!(fk.referenced_table, "User");
     assert_eq!(fk.referenced_columns, &["email"]);
 
@@ -1585,7 +1591,8 @@ async fn relations_can_reference_arbitrary_unique_fields_with_maps(api: &TestApi
 
         model Account {
             id Int @id
-            user User @relation(references: [email]) @map("user-id")
+            uem String @map("user-id")
+            user User @relation(fields: [uem], references: [email])
         }
     "#;
 
@@ -1613,7 +1620,9 @@ async fn relations_can_reference_multiple_fields(api: &TestApi) -> TestResult {
 
         model Account {
             id   Int @id
-            user User @relation(references: [email, age])
+            usermail String
+            userage Int
+            user User @relation(fields: [usermail, userage], references: [email, age])
         }
     "#;
 
@@ -1623,7 +1632,7 @@ async fn relations_can_reference_multiple_fields(api: &TestApi) -> TestResult {
     schema
         .assert_table("Account")?
         .assert_foreign_keys_count(1)?
-        .assert_fk_on_columns(&["user_email", "user_age"], |fk| {
+        .assert_fk_on_columns(&["usermail", "userage"], |fk| {
             fk.assert_references("User", &["email", "age"])
         })?;
 
@@ -1639,13 +1648,15 @@ async fn relations_with_mappings_on_both_sides_can_reference_multiple_fields(api
             age    Int    @map("birthdays-count")
 
             @@unique([email, age])
-
             @@map("users")
         }
 
         model Account {
             id   Int @id
-            user User @relation(references: [email, age]) @map(["emergency-mail-fk1", "age-fk2"])
+            usermail String @map("emergency-mail-fk-1")
+            userage Int @map("age-fk2")
+
+            user User @relation(fields: [usermail, userage], references: [email, age])
         }
     "#;
 
@@ -1654,7 +1665,7 @@ async fn relations_with_mappings_on_both_sides_can_reference_multiple_fields(api
     api.assert_schema().await?.assert_table("Account", |table| {
         table
             .assert_foreign_keys_count(1)?
-            .assert_fk_on_columns(&["emergency-mail-fk1", "age-fk2"], |fk| {
+            .assert_fk_on_columns(&["emergency-mail-fk-1", "age-fk2"], |fk| {
                 fk.assert_references("users", &["emergency-mail", "birthdays-count"])
             })
     })?;
@@ -1671,13 +1682,14 @@ async fn relations_with_mappings_on_referenced_side_can_reference_multiple_field
             age    Int    @map("birthdays-count")
 
             @@unique([email, age])
-
             @@map("users")
         }
 
         model Account {
             id   Int @id
-            user User @relation(references: [email, age])
+            useremail String
+            userage Int
+            user User @relation(fields: [useremail, userage], references: [email, age])
         }
     "#;
 
@@ -1686,7 +1698,7 @@ async fn relations_with_mappings_on_referenced_side_can_reference_multiple_field
     api.assert_schema().await?.assert_table("Account", |table| {
         table
             .assert_foreign_keys_count(1)?
-            .assert_fk_on_columns(&["user_emergency-mail", "user_birthdays-count"], |fk| {
+            .assert_fk_on_columns(&["useremail", "userage"], |fk| {
                 fk.assert_references("users", &["emergency-mail", "birthdays-count"])
             })
     })?;
@@ -1703,13 +1715,14 @@ async fn relations_with_mappings_on_referencing_side_can_reference_multiple_fiel
             age    Int
 
             @@unique([email, age])
-
             @@map("users")
         }
 
         model Account {
             id   Int @id
-            user User @relation(references: [email, age]) @map(["emergency-mail-fk1", "age-fk2"])
+            user_email String @map("emergency-mail-fk1")
+            user_age Int @map("age-fk2")
+            user User @relation(fields: [user_email, user_age], references: [email, age])
         }
     "#;
 
@@ -1739,7 +1752,7 @@ async fn foreign_keys_are_added_on_existing_tables(api: &TestApi) -> TestResult 
         }
     "#;
 
-    api.infer_apply(dm1).send().await?;
+    api.infer_apply(dm1).send_assert().await?.assert_green()?;
     api.assert_schema()
         .await?
         // There should be no foreign keys yet.
@@ -1753,15 +1766,16 @@ async fn foreign_keys_are_added_on_existing_tables(api: &TestApi) -> TestResult 
 
         model Account {
             id Int @id
-            user User @relation(references: [email])
+            user_email String
+            user User @relation(fields: [user_email], references: [email])
         }
     "#;
 
-    api.infer_apply(dm2).send().await?;
+    api.infer_apply(dm2).send_assert().await?.assert_green()?;
     api.assert_schema().await?.assert_table("Account", |table| {
         table
             .assert_foreign_keys_count(1)?
-            .assert_fk_on_columns(&["user"], |fk| fk.assert_references("User", &["email"]))
+            .assert_fk_on_columns(&["user_email"], |fk| fk.assert_references("User", &["email"]))
     })?;
 
     Ok(())
@@ -1811,7 +1825,7 @@ async fn compound_primary_keys_on_mapped_columns_must_work(api: &TestApi) -> Tes
     Ok(())
 }
 
-#[test_each_connector]
+#[test_each_connector(tags("sql"))]
 async fn references_to_models_with_compound_primary_keys_must_work(api: &TestApi) -> TestResult {
     let dm = r#"
         model User {
@@ -1824,7 +1838,10 @@ async fn references_to_models_with_compound_primary_keys_must_work(api: &TestApi
 
         model Pet {
             id String @id
-            human User
+            human_firstName String
+            human_lastName String
+
+            human User @relation(fields: [human_firstName, human_lastName])
         }
     "#;
 

@@ -1,7 +1,7 @@
 use datamodel::{
     common::{ScalarType, ScalarValue},
-    dml, Datamodel, DefaultValue as DMLDefault, Field, FieldArity, FieldType, IndexDefinition,
-    Model, OnDeleteStrategy, RelationInfo, ValueGenerator,
+    dml, Datamodel, DefaultValue as DMLDefault, Field, FieldArity, FieldType, IndexDefinition, Model, OnDeleteStrategy,
+    RelationInfo, ValueGenerator,
 };
 use pretty_assertions::assert_eq;
 use sql_introspection_connector::calculate_datamodel::calculate_model;
@@ -49,8 +49,11 @@ fn a_data_model_can_be_generated_from_a_schema() {
                         ColumnTypeFamily::Enum(name) => (FieldType::Enum(name.clone()), false, None),
                         ColumnTypeFamily::Uuid => (FieldType::Base(ScalarType::String, None), false, None),
                         ColumnTypeFamily::Json => (FieldType::Base(ScalarType::String, None), false, None),
-                        x => (FieldType::Unsupported(x.to_string()),true, Some("This type is currently not supported.".to_string())),
-
+                        x => (
+                            FieldType::Unsupported(x.to_string()),
+                            true,
+                            Some("This type is currently not supported.".to_string()),
+                        ),
                     };
                     Field {
                         name: col_type.to_string(),
@@ -132,9 +135,7 @@ fn arity_is_preserved_when_generating_data_model_from_a_schema() {
                     arity: FieldArity::Required,
                     field_type: FieldType::Base(ScalarType::Int, None),
                     database_names: Vec::new(),
-                    default_value: Some(
-                        DMLDefault::Expression(ValueGenerator::new_autoincrement()),
-                    ),
+                    default_value: Some(DMLDefault::Expression(ValueGenerator::new_autoincrement())),
                     is_unique: false,
                     is_id: true,
                     documentation: None,
@@ -286,9 +287,7 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
                     arity: FieldArity::Optional,
                     field_type: FieldType::Base(ScalarType::String, None),
                     database_names: Vec::new(),
-                    default_value: Some(dml::DefaultValue::Single(ScalarValue::String(
-                        "default".to_string(),
-                    ))),
+                    default_value: Some(dml::DefaultValue::Single(ScalarValue::String("default".to_string()))),
                     is_unique: false,
                     is_id: false,
                     documentation: None,
@@ -396,9 +395,7 @@ fn primary_key_is_preserved_when_generating_data_model_from_a_schema() {
                     arity: FieldArity::Required,
                     field_type: FieldType::Base(ScalarType::Int, None),
                     database_names: Vec::new(),
-                    default_value: Some(
-                        DMLDefault::Expression(ValueGenerator::new_autoincrement()),
-                    ),
+                    default_value: Some(DMLDefault::Expression(ValueGenerator::new_autoincrement())),
                     is_unique: false,
                     is_id: true,
                     documentation: None,
@@ -448,9 +445,7 @@ fn primary_key_is_preserved_when_generating_data_model_from_a_schema() {
                     arity: FieldArity::Required,
                     field_type: FieldType::Base(ScalarType::Int, None),
                     database_names: Vec::new(),
-                    default_value: Some(
-                        DMLDefault::Expression(ValueGenerator::new_autoincrement()),
-                    ),
+                    default_value: Some(DMLDefault::Expression(ValueGenerator::new_autoincrement())),
                     is_unique: false,
                     is_id: true,
                     documentation: None,
@@ -627,9 +622,8 @@ fn uniqueness_is_preserved_when_generating_data_model_from_a_schema() {
 }
 
 #[test]
-#[ignore]
 fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
-    let ref_data_model = Datamodel {
+    let expected_data_model = Datamodel {
         models: vec![
             Model {
                 database_name: None,
@@ -643,9 +637,7 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
                         arity: FieldArity::Required,
                         field_type: FieldType::Base(ScalarType::Int, None),
                         database_names: Vec::new(),
-                        default_value: Some(DMLDefault::Expression(
-                            ValueGenerator::new_autoincrement(),
-                        )),
+                        default_value: Some(DMLDefault::Expression(ValueGenerator::new_autoincrement())),
                         is_unique: false,
                         is_id: true,
                         documentation: None,
@@ -659,6 +651,26 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
                         arity: FieldArity::Required,
                         field_type: FieldType::Base(ScalarType::String, None),
                         database_names: Vec::new(),
+                        default_value: None,
+                        is_unique: false,
+                        is_id: false,
+                        documentation: None,
+                        is_generated: false,
+                        is_updated_at: false,
+                        data_source_fields: vec![],
+                        is_commented_out: false,
+                    },
+                    Field {
+                        name: "User".to_string(),
+                        field_type: FieldType::Relation(RelationInfo {
+                            to: "User".to_string(),
+                            fields: vec![],
+                            to_fields: vec![],
+                            name: "CityToUser".to_string(),
+                            on_delete: OnDeleteStrategy::None,
+                        }),
+                        arity: FieldArity::List,
+                        database_names: vec![],
                         default_value: None,
                         is_unique: false,
                         is_id: false,
@@ -685,6 +697,20 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
                         arity: FieldArity::Required,
                         field_type: FieldType::Base(ScalarType::Int, None),
                         database_names: Vec::new(),
+                        default_value: Some(DMLDefault::Expression(ValueGenerator::new_autoincrement())),
+                        is_unique: false,
+                        is_id: true,
+                        documentation: None,
+                        is_generated: false,
+                        is_updated_at: false,
+                        data_source_fields: vec![],
+                        is_commented_out: false,
+                    },
+                    Field {
+                        name: "city_id".to_string(),
+                        arity: FieldArity::Required,
+                        field_type: FieldType::Base(ScalarType::Int, None),
+                        database_names: vec!["city-id".to_string()],
                         default_value: None,
                         is_unique: false,
                         is_id: false,
@@ -695,15 +721,10 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
                         is_commented_out: false,
                     },
                     Field {
-                        name: "city-id".to_string(),
+                        name: "city_name".to_string(),
+                        field_type: FieldType::Base(ScalarType::String, None),
                         arity: FieldArity::Required,
-                        field_type: FieldType::Relation(RelationInfo {
-                            name: "".to_string(),
-                            to: "City".to_string(),
-                            to_fields: vec!["id".to_string()],
-                            on_delete: OnDeleteStrategy::None,
-                        }),
-                        database_names: Vec::new(),
+                        database_names: vec!["city-name".to_string()],
                         default_value: None,
                         is_unique: false,
                         is_id: false,
@@ -714,12 +735,13 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
                         is_commented_out: false,
                     },
                     Field {
-                        name: "city-name".to_string(),
+                        name: "City".to_string(),
                         arity: FieldArity::Required,
                         field_type: FieldType::Relation(RelationInfo {
-                            name: "".to_string(),
+                            name: "CityToUser".to_string(),
                             to: "City".to_string(),
-                            to_fields: vec!["name".to_string()],
+                            fields: vec!["city-id".to_string(), "city-name".to_string()],
+                            to_fields: vec!["id".to_string(), "name".to_string()],
                             on_delete: OnDeleteStrategy::None,
                         }),
                         database_names: Vec::new(),
@@ -809,7 +831,10 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
                     },
                 ],
                 indices: vec![],
-                primary_key: None,
+                primary_key: Some(PrimaryKey {
+                    columns: vec!["id".to_string()],
+                    sequence: None,
+                }),
                 foreign_keys: vec![ForeignKey {
                     // what does this mean? the from columns are not targeting a specific to column?
                     constraint_name: None,
@@ -825,7 +850,7 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
     };
     let data_model = calculate_model(&schema).expect("calculate data model");
 
-    assert_eq!(data_model, ref_data_model);
+    assert_eq!(data_model, expected_data_model);
 }
 
 #[test]
@@ -843,9 +868,7 @@ fn multi_field_uniques_are_preserved_when_generating_data_model_from_a_schema() 
                     arity: FieldArity::Required,
                     field_type: FieldType::Base(ScalarType::Int, None),
                     database_names: Vec::new(),
-                    default_value: Some(
-                        DMLDefault::Expression(ValueGenerator::new_autoincrement()),
-                    ),
+                    default_value: Some(DMLDefault::Expression(ValueGenerator::new_autoincrement())),
                     is_unique: false,
                     is_id: true,
                     documentation: None,
@@ -964,9 +987,7 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                         arity: FieldArity::Required,
                         field_type: FieldType::Base(ScalarType::Int, None),
                         database_names: Vec::new(),
-                        default_value: Some(DMLDefault::Expression(
-                            ValueGenerator::new_autoincrement(),
-                        )),
+                        default_value: Some(DMLDefault::Expression(ValueGenerator::new_autoincrement())),
                         is_unique: false,
                         is_id: true,
                         documentation: None,
@@ -994,6 +1015,7 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                         arity: FieldArity::List,
                         field_type: FieldType::Relation(RelationInfo {
                             to: "User".to_string(),
+                            fields: vec![],
                             to_fields: vec![],
                             name: "CityToUser".to_string(),
                             on_delete: OnDeleteStrategy::None,
@@ -1025,9 +1047,7 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                         arity: FieldArity::Required,
                         field_type: FieldType::Base(ScalarType::Int, None),
                         database_names: Vec::new(),
-                        default_value: Some(DMLDefault::Expression(
-                            ValueGenerator::new_autoincrement(),
-                        )),
+                        default_value: Some(DMLDefault::Expression(ValueGenerator::new_autoincrement())),
                         is_unique: false,
                         is_id: true,
                         documentation: None,
@@ -1039,9 +1059,24 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                     Field {
                         name: "city_id".to_string(),
                         arity: FieldArity::Required,
+                        field_type: FieldType::Base(ScalarType::Int, None),
+                        database_names: vec![],
+                        default_value: None,
+                        is_unique: false,
+                        is_id: false,
+                        documentation: None,
+                        is_generated: false,
+                        is_updated_at: false,
+                        data_source_fields: vec![],
+                        is_commented_out: false,
+                    },
+                    Field {
+                        name: "City".to_string(),
+                        arity: FieldArity::Required,
                         field_type: FieldType::Relation(RelationInfo {
                             name: "CityToUser".to_string(),
                             to: "City".to_string(),
+                            fields: vec!["city_id".to_string()],
                             to_fields: vec!["id".to_string()],
                             on_delete: OnDeleteStrategy::None,
                         }),

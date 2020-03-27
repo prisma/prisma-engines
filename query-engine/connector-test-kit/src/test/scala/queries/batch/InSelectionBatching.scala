@@ -6,14 +6,19 @@ import util.{ApiSpecBase, ProjectDsl}
 class InSelectionBatching extends FlatSpec with Matchers with ApiSpecBase {
   val project = ProjectDsl.fromString {
     """model A {
-      |  id Int @id
-      |  b B
-      |  c C
+      |  id   Int @id
+      |  b_id Int
+      |  c_id Int
+      |
+      |  b B @relation(fields: [b_id], references: [id])
+      |  c C @relation(fields: [c_id], references: [id])
       |}
+      |
       |model B {
       |  id Int @id
       |  as A[]
       |}
+      |
       |model C {
       |  id Int @id
       |  as A[]

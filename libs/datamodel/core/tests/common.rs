@@ -12,6 +12,7 @@ pub trait FieldAsserts {
     fn assert_relation_to(&self, t: &str) -> &Self;
     fn assert_relation_delete_strategy(&self, t: dml::OnDeleteStrategy) -> &Self;
     fn assert_relation_to_fields(&self, t: &[&str]) -> &Self;
+    fn assert_relation_base_fields(&self, t: &[&str]) -> &Self;
     fn assert_arity(&self, arity: &dml::FieldArity) -> &Self;
     fn assert_with_db_name(&self, t: &str) -> &Self;
     fn assert_with_documentation(&self, t: &str) -> &Self;
@@ -64,7 +65,10 @@ impl FieldAsserts for dml::Field {
         if let dml::FieldType::ConnectorSpecific(t) = &self.field_type {
             assert_eq!(t, sft);
         } else {
-            panic!("Connector Specific Type expected, but found {:?}", self.field_type);
+            panic!(
+                "Connector Specific Type expected, but found {:?}",
+                self.field_type
+            );
         }
 
         self
@@ -103,6 +107,16 @@ impl FieldAsserts for dml::Field {
     fn assert_relation_delete_strategy(&self, t: dml::OnDeleteStrategy) -> &Self {
         if let dml::FieldType::Relation(info) = &self.field_type {
             assert_eq!(info.on_delete, t);
+        } else {
+            panic!("Relation expected, but found {:?}", self.field_type);
+        }
+
+        self
+    }
+
+    fn assert_relation_base_fields(&self, t: &[&str]) -> &Self {
+        if let dml::FieldType::Relation(info) = &self.field_type {
+            assert_eq!(info.fields, t);
         } else {
             panic!("Relation expected, but found {:?}", self.field_type);
         }
@@ -272,7 +286,10 @@ impl ErrorAsserts for ErrorCollection {
         if self.errors.len() == 1 {
             assert_eq!(self.errors[0], error);
         } else {
-            panic!("Expected exactly one validation error. Errors are: {:?}", &self);
+            panic!(
+                "Expected exactly one validation error. Errors are: {:?}",
+                &self
+            );
         }
 
         self

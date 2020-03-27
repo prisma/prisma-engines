@@ -322,7 +322,7 @@ async fn mysql_floats_do_not_lose_precision(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector(tags("mysql"), log = "debug")]
+#[test_each_connector(tags("mysql"))]
 async fn all_mysql_identifier_types_work(api: &TestApi) -> TestResult {
     let identifier_types = &[
         ("tinyint", "12", ""),

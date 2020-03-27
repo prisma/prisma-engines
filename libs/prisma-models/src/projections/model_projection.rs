@@ -55,22 +55,21 @@ impl ModelProjection {
         self.fields().find(|field| field.name() == name)
     }
 
-    // [DTODO] Hack to ignore m2m fields, remove when no dsfs are set on m2m rels anymore.
     pub fn data_source_fields<'a>(&'a self) -> impl Iterator<Item = DataSourceFieldRef> + 'a {
         self.fields
             .iter()
             .flat_map(|field| match field {
                 Field::Scalar(sf) => vec![sf.data_source_field().clone()],
-                Field::Relation(rf) if rf.relation().is_many_to_many() => vec![],
                 Field::Relation(rf) => rf.data_source_fields().to_vec(),
             })
             .into_iter()
+            .unique_by(|dsf| dsf.name.clone())
     }
 
-    pub fn map_db_name(&self, name: &str) -> Option<&DataSourceFieldRef> {
+    pub fn map_db_name(&self, name: &str) -> Option<DataSourceFieldRef> {
         self.fields().find_map(|field| match field {
-            Field::Scalar(sf) if sf.data_source_field().name == name => Some(sf.data_source_field()),
-            Field::Relation(rf) => rf.data_source_fields().iter().find(|dsf| dsf.name == name),
+            Field::Scalar(sf) if sf.data_source_field().name == name => Some(sf.data_source_field().clone()),
+            Field::Relation(rf) => rf.data_source_fields().into_iter().find(|dsf| dsf.name == name),
             _ => None,
         })
     }
@@ -128,7 +127,6 @@ impl ModelProjection {
     /// occurrence of the first field in order from left (`self`) to right (`other`)
     /// is retained. Assumes that both projections reason over the same model.
     pub fn merge(self, other: ModelProjection) -> ModelProjection {
-        assert_eq!(self.model(), other.model());
         let fields = self.fields.into_iter().chain(other.fields).unique().collect();
 
         ModelProjection { fields }
@@ -146,6 +144,25 @@ impl ModelProjection {
     {
         let field: Field = field.into();
         self.fields().find(|f| f.name() == field.name()).is_some()
+    }
+
+    pub fn contains_all_db_names<'a>(&self, names: impl Iterator<Item = String>) -> bool {
+        let selected_db_names: Vec<_> = self.db_names().collect();
+        let names_to_select: Vec<_> = names.collect();
+
+        if names_to_select.len() > selected_db_names.len() {
+            false
+        } else {
+            names_to_select
+                .into_iter()
+                .all(|to_select| selected_db_names.contains(&to_select))
+        }
+    }
+
+    pub fn union(projections: Vec<ModelProjection>) -> ModelProjection {
+        projections
+            .into_iter()
+            .fold(ModelProjection::default(), |acc, next| acc.merge(next))
     }
 }
 

@@ -22,7 +22,9 @@ class VeryManyMutationsSpec extends FlatSpec with Matchers with ApiSpecBase with
        |model Middle {
        |   id  String @id @default(cuid())
        |   int Int
-       |   top Top?
+       |
+       |   topId String?
+       |   top   Top?    @relation(fields: [topId], references: [id])
        |}
   """
   }

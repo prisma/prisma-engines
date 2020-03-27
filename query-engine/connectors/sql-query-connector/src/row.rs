@@ -33,7 +33,9 @@ impl ToSqlRow for ResultRow {
     fn to_sql_row<'b>(self, idents: &[(TypeIdentifier, FieldArity)]) -> crate::Result<SqlRow> {
         let mut row = SqlRow::default();
         let row_width = idents.len();
+
         row.values.reserve(row_width);
+
         for (i, p_value) in self.into_iter().enumerate().take(row_width) {
             let pv = match &idents[i] {
                 (type_identifier, FieldArity::List) => match p_value {
@@ -73,10 +75,7 @@ pub fn row_value_to_prisma_value(
             ParameterizedValue::Integer(i) => PrismaValue::Boolean(i != 0),
             ParameterizedValue::Boolean(b) => PrismaValue::Boolean(b),
             _ => {
-                let error = io::Error::new(
-                    io::ErrorKind::InvalidData,
-                    "Bool value not stored as bool or int",
-                );
+                let error = io::Error::new(io::ErrorKind::InvalidData, "Bool value not stored as bool or int");
                 return Err(SqlError::ConversionError(error.into()));
             }
         },
@@ -85,8 +84,7 @@ pub fn row_value_to_prisma_value(
             ParameterizedValue::Enum(cow) => PrismaValue::Enum(cow.into_owned()),
             ParameterizedValue::Text(cow) => PrismaValue::Enum(cow.into_owned()),
             _ => {
-                let error =
-                    io::Error::new(io::ErrorKind::InvalidData, "Enum value not stored as enum");
+                let error = io::Error::new(io::ErrorKind::InvalidData, "Enum value not stored as enum");
                 return Err(SqlError::ConversionError(error.into()));
             }
         },
@@ -96,10 +94,7 @@ pub fn row_value_to_prisma_value(
             ParameterizedValue::Text(json) => PrismaValue::String(json.into()),
             ParameterizedValue::Json(json) => PrismaValue::String(json.to_string()),
             _ => {
-                let error = io::Error::new(
-                    io::ErrorKind::InvalidData,
-                    "Json value not stored as text or json",
-                );
+                let error = io::Error::new(io::ErrorKind::InvalidData, "Json value not stored as text or json");
                 return Err(SqlError::ConversionError(error.into()));
             }
         },
@@ -108,10 +103,7 @@ pub fn row_value_to_prisma_value(
             ParameterizedValue::Text(uuid) => PrismaValue::Uuid(Uuid::parse_str(&uuid)?),
             ParameterizedValue::Uuid(uuid) => PrismaValue::Uuid(uuid),
             _ => {
-                let error = io::Error::new(
-                    io::ErrorKind::InvalidData,
-                    "Uuid value not stored as text or uuid",
-                );
+                let error = io::Error::new(io::ErrorKind::InvalidData, "Uuid value not stored as text or uuid");
                 return Err(SqlError::ConversionError(error.into()));
             }
         },
@@ -130,11 +122,7 @@ pub fn row_value_to_prisma_value(
                 let dt = DateTime::parse_from_rfc3339(dt_string.borrow())
                     .or_else(|_| DateTime::parse_from_rfc2822(dt_string.borrow()))
                     .map_err(|err| {
-                        failure::format_err!(
-                            "Could not parse stored DateTime string: {} ({})",
-                            dt_string,
-                            err
-                        )
+                        failure::format_err!("Could not parse stored DateTime string: {} ({})", dt_string, err)
                     })
                     .unwrap();
 
@@ -153,9 +141,7 @@ pub fn row_value_to_prisma_value(
             ParameterizedValue::Real(f) => PrismaValue::Float(f),
             ParameterizedValue::Integer(i) => {
                 // Decimal::from_f64 is buggy. Issue: https://github.com/paupino/rust-decimal/issues/228
-                PrismaValue::Float(
-                    Decimal::from_str(&(i as f64).to_string()).expect("f64 was not a Decimal."),
-                )
+                PrismaValue::Float(Decimal::from_str(&(i as f64).to_string()).expect("f64 was not a Decimal."))
             }
             ParameterizedValue::Text(_) | ParameterizedValue::Bytes(_) => PrismaValue::Float(
                 p_value
@@ -183,9 +169,9 @@ pub fn row_value_to_prisma_value(
         },
         TypeIdentifier::String => match p_value {
             ParameterizedValue::Uuid(uuid) => PrismaValue::String(uuid.to_string()),
-            ParameterizedValue::Json(json_value) => PrismaValue::String(
-                serde_json::to_string(&json_value).expect("JSON value to string"),
-            ),
+            ParameterizedValue::Json(json_value) => {
+                PrismaValue::String(serde_json::to_string(&json_value).expect("JSON value to string"))
+            }
             ParameterizedValue::Null => PrismaValue::Null,
             other => PrismaValue::from(other),
         },
@@ -226,11 +212,7 @@ fn interpret_bytes_as_i64(bytes: &[u8]) -> i64 {
             let sign_bit_mask: u8 = 0b10000000;
             // The first byte will only contain the sign bit.
             let most_significant_bit_byte = bytes[0] & sign_bit_mask;
-            let padding = if most_significant_bit_byte == 0 {
-                0
-            } else {
-                0b11111111
-            };
+            let padding = if most_significant_bit_byte == 0 { 0 } else { 0b11111111 };
             let mut i64_bytes = [padding; 8];
 
             for (target_byte, source_byte) in i64_bytes.iter_mut().rev().zip(bytes.iter().rev()) {

@@ -59,7 +59,7 @@ impl AsColumns for &[Field] {
 
 impl AsColumns for ModelProjection {
     fn as_columns(&self) -> ColumnIterator {
-        let cols: Vec<Column<'static>> = self.fields().flat_map(|f| f.as_columns()).collect();
+        let cols: Vec<Column<'static>> = self.data_source_fields().map(|f| f.as_column()).collect();
         ColumnIterator::from(cols)
     }
 }
@@ -118,6 +118,13 @@ impl AsColumns for RelationField {
 }
 
 impl AsColumns for &[crate::field::DataSourceFieldRef] {
+    fn as_columns(&self) -> ColumnIterator {
+        let inner: Vec<_> = self.iter().map(|dsf| dsf.as_column()).collect();
+        ColumnIterator::from(inner)
+    }
+}
+
+impl AsColumns for Vec<crate::field::DataSourceFieldRef> {
     fn as_columns(&self) -> ColumnIterator {
         let inner: Vec<_> = self.iter().map(|dsf| dsf.as_column()).collect();
         ColumnIterator::from(inner)

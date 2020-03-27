@@ -21,9 +21,10 @@ async fn introspecting_a_one_to_one_req_relation_should_work(api: &TestApi) {
         .await;
 
     let dm = r#"
-              model Post {
-               id      Int @id @default(autoincrement())
-               user_id User
+             model Post {
+               id       Int @id @default(autoincrement())
+               user_id  Int  @unique
+               User     User @relation(fields: [user_id], references: [id])
             }
 
             model User {
@@ -61,16 +62,18 @@ async fn introspecting_two_one_to_one_relations_between_the_same_models_should_w
 
     let dm = r#"
             model Post {
-               id      Int @id @default(autoincrement())
-               user_id User  @relation("Post_user_idToUser", references: [id])
-               User    User? @relation("PostToUser_post_id")
-            }
-
-            model User {
-               id      Int @id @default(autoincrement())
-               post_id Post  @relation("PostToUser_post_id", references: [id])
-               Post Post?    @relation("Post_user_idToUser")
-            }
+            id                      Int   @default(autoincrement()) @id
+            user_id                 Int   @unique
+            User_Post_user_idToUser User  @relation("Post_user_idToUser", fields: [user_id], references: [id])
+            User_PostToUser_post_id User? @relation("PostToUser_post_id")
+        }
+                
+        model User {
+            id                      Int   @default(autoincrement()) @id
+            post_id                 Int   @unique
+            Post_PostToUser_post_id Post  @relation("PostToUser_post_id", fields: [post_id], references: [id])
+            Post_Post_user_idToUser Post? @relation("Post_user_idToUser")
+        }
         "#;
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
@@ -94,15 +97,16 @@ async fn introspecting_a_one_to_one_relation_should_work(api: &TestApi) {
         })
         .await;
     let dm = r#"
-            model Post {
-               id      Int @id @default(autoincrement())
-               user_id User?
+               model Post {
+                id      Int   @default(autoincrement()) @id
+                user_id Int?  @unique
+                User    User? @relation(fields: [user_id], references: [id])
             }
-
+                  
             model User {
-               id      Int @id @default(autoincrement())
-               Post Post?
-            }
+                id   Int   @default(autoincrement()) @id
+                Post Post?
+            }     
         "#;
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
@@ -125,14 +129,15 @@ async fn introspecting_a_one_to_one_relation_referencing_non_id_should_work(api:
         .await;
     let dm = r#"
             model Post {
-               id           Int     @id  @default(autoincrement())
-               user_email   User?   @relation(references: [email])
+                id         Int     @default(autoincrement()) @id
+                user_email String? @unique
+                User       User?   @relation(fields: [user_email], references: [email])
             }
-
+                  
             model User {
-               email        String? @unique
-               id           Int     @id  @default(autoincrement())
-               Post         Post?
+                email String? @unique
+                id    Int     @default(autoincrement()) @id
+                Post  Post?
             }
         "#;
     let result = dbg!(api.introspect().await);
@@ -154,14 +159,15 @@ async fn introspecting_a_one_to_many_relation_should_work(api: &TestApi) {
         })
         .await;
     let dm = r#"
-            model Post {
-               id      Int @id @default(autoincrement())
-               user_id User?
+             model Post {
+                id      Int   @default(autoincrement()) @id
+                user_id Int?
+                User    User? @relation(fields: [user_id], references: [id])
             }
-
+            
             model User {
-               id      Int @id @default(autoincrement())
-               Post Post[]
+                id   Int    @default(autoincrement()) @id
+                Post Post[]
             }
         "#;
     let result = dbg!(api.introspect().await);
@@ -184,13 +190,14 @@ async fn introspecting_a_one_req_to_many_relation_should_work(api: &TestApi) {
         .await;
     let dm = r#"
             model Post {
-               id      Int @id @default(autoincrement())
-               user_id User
+                id      Int  @default(autoincrement()) @id
+                user_id Int
+                User    User @relation(fields: [user_id], references: [id])
             }
-
+            
             model User {
-               id      Int @id @default(autoincrement())
-               Post  Post[]
+                id   Int    @default(autoincrement()) @id
+                Post Post[]
             }
        "#;
     let result = dbg!(api.introspect().await);
@@ -360,20 +367,22 @@ async fn introspecting_a_many_to_many_relation_with_an_id_should_work(api: &Test
 
     let dm = r#"
             model Post {
-               id      Int @id @default(autoincrement())
-               PostsToUsers PostsToUsers[]
+                id           Int            @default(autoincrement()) @id
+                PostsToUsers PostsToUsers[]
             }
-
+            
             model PostsToUsers {
-              id    Int @id
-              post_id Post
-              user_id User
+                id      Int  @id
+                post_id Int
+                user_id Int
+                Post    Post @relation(fields: [post_id], references: [id])
+                User    User @relation(fields: [user_id], references: [id])
             }
-
+            
             model User {
-               id      Int @id @default(autoincrement())
-               PostsToUsers PostsToUsers[]
-            }
+                id           Int            @default(autoincrement()) @id
+                PostsToUsers PostsToUsers[]
+            }        
         "#;
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
@@ -394,11 +403,13 @@ async fn introspecting_a_self_relation_should_work(api: &TestApi) {
         .await;
     let dm = r#"
             model User {
-                id      Int @id @default(autoincrement())
-                direct_report                  User?  @relation("UserToUser_direct_report")
-                recruited_by                   User?  @relation("UserToUser_recruited_by")
-                User_UserToUser_direct_report User[] @relation("UserToUser_direct_report")
-                User_UserToUser_recruited_by  User[] @relation("UserToUser_recruited_by")
+                direct_report                       Int?
+                id                                  Int    @default(autoincrement()) @id
+                recruited_by                        Int?
+                User_UserToUser_direct_report       User?  @relation("UserToUser_direct_report", fields: [direct_report], references: [id])
+                User_UserToUser_recruited_by        User?  @relation("UserToUser_recruited_by", fields: [recruited_by], references: [id])
+                other_User_UserToUser_direct_report User[] @relation("UserToUser_direct_report")
+                other_User_UserToUser_recruited_by  User[] @relation("UserToUser_recruited_by")
             }
         "#;
     let result = dbg!(api.introspect().await);
@@ -409,37 +420,37 @@ async fn introspecting_a_self_relation_should_work(api: &TestApi) {
 
 // TODO: bring `onDelete` back once `prisma migrate` is a thing
 //#[test_each_connector(tags("postgres"))]
-async fn introspecting_cascading_delete_behaviour_should_work(api: &TestApi) {
-    let barrel = api.barrel();
-    barrel
-        .execute(|migration| {
-            migration.create_table("User", |t| {
-                t.add_column("id", types::primary());
-            });
-            migration.create_table("Post", |t| {
-                t.add_column("id", types::primary());
-                t.inject_custom("user_id INTEGER REFERENCES \"User\"(\"id\") ON DELETE CASCADE");
-            });
-        })
-        .await;
-
-    let dm = r#"
-            model Post {
-               id      Int @id @default(autoincrement())
-               user_id User?
-            }
-
-            model User {
-               id    Int @id @default(autoincrement())
-               Post  Post[] @relation(onDelete: CASCADE)
-            }
-        "#;
-    let result = dbg!(api.introspect().await);
-    custom_assert(&result, dm);
-}
+// async fn introspecting_cascading_delete_behaviour_should_work(api: &TestApi) {
+//     let barrel = api.barrel();
+//     barrel
+//         .execute(|migration| {
+//             migration.create_table("User", |t| {
+//                 t.add_column("id", types::primary());
+//             });
+//             migration.create_table("Post", |t| {
+//                 t.add_column("id", types::primary());
+//                 t.inject_custom("user_id INTEGER REFERENCES \"User\"(\"id\") ON DELETE CASCADE");
+//             });
+//         })
+//         .await;
+//
+//     let dm = r#"
+//             model Post {
+//                id      Int @id @default(autoincrement())
+//                user_id User?
+//             }
+//
+//             model User {
+//                id    Int @id @default(autoincrement())
+//                Post  Post[] @relation(onDelete: CASCADE)
+//             }
+//         "#;
+//     let result = dbg!(api.introspect().await);
+//     custom_assert(&result, dm);
+// }
 
 #[test_each_connector(tags("postgres"))]
-async fn introspecting_default_values_on_relations_should_be_ignored(api: &TestApi) {
+async fn introspecting_default_values_on_relations_should_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -454,47 +465,15 @@ async fn introspecting_default_values_on_relations_should_be_ignored(api: &TestA
         .await;
 
     let dm = r#"
-            datasource pg {
-              provider = "postgres"
-              url = "postgresql://localhost:5432"
-            }
             model Post {
-               id      Int @id @default(autoincrement())
-               user_id User?
+                id      Int   @default(autoincrement()) @id
+                user_id Int?  @default(0)
+                User    User? @relation(fields: [user_id], references: [id])
             }
-
+            
             model User {
-               id      Int @id @default(autoincrement())
-               Post  Post[]
-            }
-        "#;
-    let result = dbg!(api.introspect().await);
-    custom_assert(&result, dm);
-}
-
-#[test_each_connector(tags("postgres"))]
-async fn introspecting_default_values_on_lists_should_be_ignored(api: &TestApi) {
-    let barrel = api.barrel();
-    let _setup_schema = barrel
-        .execute(|migration| {
-            migration.create_table("User", |t| {
-                t.add_column("id", types::primary());
-                t.inject_custom("ints Integer[] DEFAULT array[]::Integer[]");
-                t.inject_custom("ints2 Integer[] DEFAULT '{}'");
-            });
-        })
-        .await;
-
-    let dm = r#"
-            datasource pg {
-              provider = "postgres"
-              url = "postgresql://localhost:5432"
-            }
-
-            model User {
-               id      Int @id @default(autoincrement())
-               ints    Int []
-               ints2   Int []
+                id   Int    @default(autoincrement()) @id
+                Post Post[]
             }
         "#;
     let result = dbg!(api.introspect().await);
@@ -518,13 +497,14 @@ async fn introspecting_id_fields_with_foreign_key_should_work(api: &TestApi) {
 
     let dm = r#"
             model Post {
-               test    String
-               user_id User     @id @relation(references: [id])
+                test    String
+                user_id Int    @id
+                User    User   @relation(fields: [user_id], references: [id])
             }
-
+            
             model User {
-               id      Int      @id @default(autoincrement())
-               Post    Post[]
+                id   Int    @default(autoincrement()) @id
+                Post Post[]
             }
         "#;
     let result = dbg!(api.introspect().await);
@@ -581,6 +561,134 @@ async fn introspecting_prisma_10_relations_should_work(api: &TestApi) {
             model Royalty {
               id        String      @id
               Book      Book[]      @relation("BookRoyalty")
+            }
+        "#;
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+}
+
+#[test_each_connector(tags("postgres"))]
+async fn introspecting_relations_should_avoid_name_clashes(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("y", |t| {
+                t.inject_custom("id CHAR(25) NOT NULL PRIMARY KEY");
+                t.inject_custom("x  CHAR(25) NOT NULL");
+            });
+            migration.create_table("x", |t| {
+                t.inject_custom("id CHAR(25) NOT NULL PRIMARY KEY");
+                t.inject_custom("y CHAR(25) NOT NULL REFERENCES \"y\"(\"id\")");
+            });
+        })
+        .await;
+
+    let dm = r#"
+            model x {
+                id String @id
+                y  String
+                y_xToy  y      @relation(fields: [y], references: [id])
+            }
+                  
+            model y {
+                id String @id
+                x  String
+                x_xToy  x[]
+            }
+        "#;
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+}
+
+//
+// CREATE TABLE IF NOT EXISTS `x` (
+// `y` int(11) DEFAULT NULL,
+// `id` int(11) DEFAULT NULL,
+// UNIQUE KEY `unique_id` (`id`) USING BTREE,
+// UNIQUE KEY `unique_y_id` (`y`,`id`) USING BTREE,
+// KEY `FK__y` (`y`),
+// CONSTRAINT `FK__y` FOREIGN KEY (`y`) REFERENCES `y` (`id`)
+// ) ENGINE=InnoDB DEFAULT;
+//
+// CREATE TABLE IF NOT EXISTS `y` (
+// `id` int(11) DEFAULT NULL,
+// `x` int(11) DEFAULT NULL,
+// `fk_x_1` int(11) DEFAULT NULL,
+// `fk_x_2` int(11) DEFAULT NULL,
+// UNIQUE KEY `unique_id` (`id`) USING BTREE,
+// KEY `FK_y_x` (`fk_x_1`,`fk_x_2`) USING BTREE,
+// CONSTRAINT `FK_y_x` FOREIGN KEY (`fk_x_1`, `fk_x_2`) REFERENCES `x` (`y`, `id`)
+// ) ENGINE=InnoDB DEFAULT;
+
+#[test_each_connector(tags("postgres"))]
+async fn introspecting_relations_should_avoid_name_clashes_2(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("x", |t| {
+                t.inject_custom("id CHAR(25) NOT NULL PRIMARY KEY");
+                t.inject_custom("y CHAR(25) NOT NULL");
+            });
+
+            migration.create_table("y", |t| {
+                t.inject_custom("id CHAR(25) NOT NULL PRIMARY KEY");
+                t.inject_custom("x  CHAR(25) NOT NULL");
+                t.inject_custom("fk_x_1  CHAR(25) NOT NULL");
+                t.inject_custom("fk_x_2  CHAR(25) NOT NULL");
+            });
+        })
+        .await;
+
+    api.database()
+        .execute_raw(
+            &format!(
+                "CREATE UNIQUE INDEX unique_y_id on \"{}\".\"x\" (\"id\", \"y\");",
+                api.schema_name()
+            ),
+            &[],
+        )
+        .await
+        .unwrap();
+
+    api.database()
+        .execute_raw(
+            &format!(
+                "Alter table \"{}\".\"x\" ADD CONSTRAINT fk_y FOREIGN KEY (\"y\") REFERENCES \"y\" (\"id\");",
+                api.schema_name()
+            ),
+            &[],
+        )
+        .await
+        .unwrap();
+
+    api.database()
+        .execute_raw(
+            &format!(
+                "Alter table \"{}\".\"y\" ADD CONSTRAINT fk_y_x FOREIGN KEY (\"fk_x_1\", \"fk_x_2\") REFERENCES \"x\" (\"y\",\"id\");",
+                api.schema_name()
+            ),
+            &[],
+        )
+        .await
+        .unwrap();
+
+    let dm = r#"
+            model x {
+                id                   String @id
+                y                    String
+                y_x_yToy             y      @relation("x_yToy", fields: [y], references: [id])
+                y_xToy_fk_x_1_fk_x_2 y[]    @relation("xToy_fk_x_1_fk_x_2")
+                    
+                @@unique([id, y], name: "unique_y_id")
+            }
+                      
+            model y {
+               fk_x_1               String
+               fk_x_2               String
+               id                   String @id
+               x                    String
+               x_xToy_fk_x_1_fk_x_2 x      @relation("xToy_fk_x_1_fk_x_2", fields: [fk_x_1, fk_x_2], references: [y, id])
+               x_x_yToy             x[]    @relation("x_yToy")
             }
         "#;
     let result = dbg!(api.introspect().await);
