@@ -28,6 +28,12 @@ where
 }
 
 pub trait ReadOperations {
+    /// Gets a single record or `None` back from the database.
+    ///
+    /// - The `ModelRef` represents the datamodel and its relations.
+    /// - The `Filter` defines what item we want back and is guaranteed to be
+    ///   defined to filter at most one item by the core.
+    /// - The `SelectedFields` defines the values to be returned.
     fn get_single_record<'a>(
         &'a self,
         model: &'a ModelRef,
@@ -35,6 +41,13 @@ pub trait ReadOperations {
         selected_fields: &'a ModelProjection,
     ) -> crate::IO<'a, Option<SingleRecord>>;
 
+    /// Gets multiple records from the database.
+    ///
+    /// - The `ModelRef` represents the datamodel and its relations.
+    /// - The `QueryArguments` defines the filter and ordering of the returned
+    ///   data, other parameters are currently not necessary due to windowing
+    ///   handled in the core.
+    /// - The `SelectedFields` defines the values to be returned.
     fn get_many_records<'a>(
         &'a self,
         model: &'a ModelRef,
@@ -42,19 +55,29 @@ pub trait ReadOperations {
         selected_fields: &'a ModelProjection,
     ) -> crate::IO<'a, ManyRecords>;
 
+    /// Retrieves pairs of IDs that belong together from a intermediate join
+    /// table.
+    ///
+    /// Given the field from parent, and the projections, return the given
+    /// projections with the corresponding child projections fetched from the
+    /// database. The IDs returned will be used to perform a in-memory join
+    /// between two datasets.
     fn get_related_m2m_record_ids<'a>(
         &'a self,
         from_field: &'a RelationFieldRef,
         from_record_ids: &'a [RecordProjection],
     ) -> crate::IO<'a, Vec<(RecordProjection, RecordProjection)>>;
 
-    // This will eventually become a more generic `aggregate`
+    // return the number of items from the `Model`, filtered by the given `QueryArguments`.
     fn count_by_model<'a>(&'a self, model: &'a ModelRef, query_arguments: QueryArguments) -> crate::IO<'a, usize>;
 }
 
 pub trait WriteOperations {
+    /// Insert a single record to the database.
     fn create_record<'a>(&'a self, model: &'a ModelRef, args: WriteArgs) -> crate::IO<RecordProjection>;
 
+    /// Update records in the `Model` with the given `WriteArgs` filtered by the
+    /// `Filter`.
     fn update_records<'a>(
         &'a self,
         model: &'a ModelRef,
@@ -62,10 +85,12 @@ pub trait WriteOperations {
         args: WriteArgs,
     ) -> crate::IO<Vec<RecordProjection>>;
 
+    /// Delete records in the `Model` with the given `Filter`.
     fn delete_records<'a>(&'a self, model: &'a ModelRef, where_: Filter) -> crate::IO<usize>;
 
     // We plan to remove the methods below in the future. We want emulate them with the ones above. Those should suffice.
 
+    /// Connect the children to the parent.
     fn connect<'a>(
         &'a self,
         field: &'a RelationFieldRef,
@@ -73,6 +98,7 @@ pub trait WriteOperations {
         child_ids: &'a [RecordProjection],
     ) -> crate::IO<()>;
 
+    /// Disconnect the children from the parent.
     fn disconnect<'a>(
         &'a self,
         field: &'a RelationFieldRef,
@@ -80,5 +106,7 @@ pub trait WriteOperations {
         child_ids: &'a [RecordProjection],
     ) -> crate::IO<()>;
 
+    /// Execute the raw query in the database as-is. The `parameters` are
+    /// parameterized values for databases that support prepared statements.
     fn execute_raw<'a>(&'a self, query: String, parameters: Vec<PrismaValue>) -> crate::IO<serde_json::Value>;
 }

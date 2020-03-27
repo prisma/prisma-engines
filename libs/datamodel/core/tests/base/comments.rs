@@ -19,9 +19,7 @@ fn parse_comments_without_crasing_or_loosing_info() {
     let schema = parse(dml);
     let user_model = schema.assert_has_model("User");
     user_model.assert_is_embedded(false);
-    user_model
-        .assert_has_field("id")
-        .assert_base_type(&ScalarType::Int);
+    user_model.assert_has_field("id").assert_base_type(&ScalarType::Int);
     user_model
         .assert_has_field("firstName")
         .assert_base_type(&ScalarType::String);
@@ -43,9 +41,7 @@ fn accept_a_comment_at_the_end() {
     let schema = parse(dml);
     let user_model = schema.assert_has_model("User");
     user_model.assert_is_embedded(false);
-    user_model
-        .assert_has_field("id")
-        .assert_base_type(&ScalarType::Int);
+    user_model.assert_has_field("id").assert_base_type(&ScalarType::Int);
 }
 
 #[test]
@@ -59,9 +55,7 @@ fn accept_a_doc_comment_at_the_end() {
     let schema = parse(dml);
     let user_model = schema.assert_has_model("User");
     user_model.assert_is_embedded(false);
-    user_model
-        .assert_has_field("id")
-        .assert_base_type(&ScalarType::Int);
+    user_model.assert_has_field("id").assert_base_type(&ScalarType::Int);
 }
 
 #[test]
@@ -74,6 +68,38 @@ fn comments_must_work_in_enums() {
       USER // Comment on the side
       // Comment below
     }"#;
+
+    // must not crash
+    let _ = parse(dml);
+}
+
+#[test]
+fn comments_in_a_generator_must_work() {
+    let dml = r#"
+    generator gen {
+        provider  = "predefined-generator"
+        platforms = ["darwin"]
+        // platforms is deprecated
+    }
+    "#;
+
+    // must not crash
+    let _ = parse(dml);
+}
+
+#[test]
+fn comments_in_a_datasource_must_work() {
+    let dml = r#"
+        datasource db {
+            provider = "postgresql"
+            // Like, postgresql://user:password@localhost:5432/database/schema
+            url      = env("PARCEL_PG_URL")
+        }
+    "#;
+    std::env::set_var(
+        "PARCEL_PG_URL",
+        "postgresql://user:password@localhost:5432/database/schema",
+    );
 
     // must not crash
     let _ = parse(dml);
