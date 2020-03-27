@@ -1,7 +1,7 @@
 use super::test_api::*;
 use datamodel::dml::ScalarType;
 use indoc::indoc;
-use pretty_assertions::assert_eq;
+use pretty_assertions::{assert_eq, assert_ne};
 use serde_json::json;
 use test_macros::*;
 
@@ -600,6 +600,48 @@ async fn length_mismatch_is_a_known_error(api: &TestApi) -> TestResult {
     });
 
     assert_eq!(response["errors"][0]["user_facing_error"], expected_response);
+
+    Ok(())
+}
+
+// On MySQL 8, timestamps are more like normal columns.
+#[test_each_connector(tags("mysql"), ignore("mysql_8"))]
+async fn timestamp_columns_can_be_optional(api: &TestApi) -> TestResult {
+    let create_table = indoc! {
+        r##"
+        CREATE TABLE `timestamps` (
+            id SERIAL PRIMARY KEY,
+            nullable timestamp,
+            time_date date
+        );
+        "##
+    };
+
+    api.execute_sql(create_table).await?;
+
+    let (_datamodel, engine) = api.introspect_and_start_query_engine().await?;
+
+    let query = indoc!(
+        r##"
+        mutation {
+            createOnetimestamps(
+                data: {
+                    time_date: "2020-03-10T12:00:00Z",
+                }
+            ) {
+                id
+                nullable
+                time_date
+            }
+        }
+        "##
+    );
+
+    let response = engine.request(query).await;
+
+    let data = &response["data"]["createOnetimestamps"];
+
+    assert_ne!(&data["nullable"], &json!(null));
 
     Ok(())
 }

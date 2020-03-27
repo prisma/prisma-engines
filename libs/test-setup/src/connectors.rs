@@ -8,7 +8,7 @@ use once_cell::sync::Lazy;
 
 fn connector_names() -> Vec<(&'static str, Tags)> {
     vec![
-        ("mysql_8", Tags::MYSQL),
+        ("mysql_8", Tags::MYSQL | Tags::MYSQL_8),
         ("mysql", Tags::MYSQL),
         ("postgres9", Tags::POSTGRES),
         ("postgres", Tags::POSTGRES),

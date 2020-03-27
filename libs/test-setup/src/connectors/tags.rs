@@ -6,6 +6,7 @@ bitflags! {
         const MARIADB  = 0b00000010;
         const POSTGRES = 0b00000100;
         const SQLITE   = 0b00001000;
+        const MYSQL_8  = 0b00010000;
 
         const SQL = Self::MYSQL.bits | Self::POSTGRES.bits | Self::SQLITE.bits;
     }
@@ -40,6 +41,7 @@ impl std::str::FromStr for Tags {
 const TAG_NAMES: &[(&str, Tags)] = &[
     ("mariadb", Tags::MARIADB),
     ("mysql", Tags::MYSQL),
+    ("mysql_8", Tags::MYSQL_8),
     ("postgres", Tags::POSTGRES),
     ("sql", Tags::SQL),
     ("sqlite", Tags::SQLITE),
