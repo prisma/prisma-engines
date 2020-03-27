@@ -151,7 +151,19 @@ impl SqlError {
                 child_name,
             }),
             SqlError::ConversionError(e) => ConnectorError::from_kind(ErrorKind::ConversionError(e)),
-            SqlError::QueryError(e) => ConnectorError::from_kind(ErrorKind::QueryError(e)),
+            SqlError::QueryError(e) => {
+                let quaint_error: Option<&QuaintKind> = e.downcast_ref();
+                match quaint_error {
+                    Some(quaint_error) => ConnectorError {
+                        user_facing_error: user_facing_errors::quaint::render_quaint_error(
+                            quaint_error,
+                            connection_info,
+                        ),
+                        kind: ErrorKind::QueryError(e),
+                    },
+                    None => ConnectorError::from_kind(ErrorKind::QueryError(e)),
+                }
+            }
             SqlError::RawError { code, message } => ConnectorError {
                 user_facing_error: user_facing_errors::KnownError::new(
                     user_facing_errors::query_engine::RawQueryFailed {
@@ -191,6 +203,7 @@ impl From<quaint::error::Error> for SqlError {
             e @ QuaintKind::ConversionError(_) => SqlError::ConversionError(e.into()),
             e @ QuaintKind::ResultIndexOutOfBounds { .. } => SqlError::QueryError(e.into()),
             e @ QuaintKind::ResultTypeMismatch { .. } => SqlError::QueryError(e.into()),
+            e @ QuaintKind::LengthMismatch { .. } => SqlError::QueryError(e.into()),
             e @ QuaintKind::DatabaseUrlIsInvalid { .. } => SqlError::ConnectionError(e),
             e @ QuaintKind::DatabaseDoesNotExist { .. } => SqlError::ConnectionError(e),
             e @ QuaintKind::AuthenticationFailed { .. } => SqlError::ConnectionError(e),

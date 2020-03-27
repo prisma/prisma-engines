@@ -859,3 +859,50 @@ async fn postgres_db_level_array_defaults_work(api: &TestApi) -> TestResult {
 
     Ok(())
 }
+
+#[test_each_connector(tags("postgres"))]
+async fn length_mismatch_is_a_known_error(api: &TestApi) -> TestResult {
+    let create_table = indoc!(
+        r#"
+            CREATE TABLE fixed_lengths (
+                id SERIAL PRIMARY KEY,
+                fixed_smol char(8),
+                smol varchar(8)
+            )
+        "#
+    );
+
+    api.execute_sql(create_table).await?;
+
+    let (_datamodel, engine) = api.introspect_and_start_query_engine().await?;
+
+    let query = indoc!(
+        r#"
+        mutation {
+            createOnefixed_lengths(
+                data: {
+                    smol: "Supercalifragilisticexpialidocious"
+                }
+            ) {
+                id
+                smol
+            }
+        }
+        "#
+    );
+
+    let response = engine.request(query).await;
+
+    let expected_response = json!({
+        "is_panic": false,
+        "message": "The provided value for the column is too long for the column\'s type. Column: <unknown>",
+        "meta": {
+            "column_name": "<unknown>"
+        },
+        "error_code": "P2000",
+    });
+
+    assert_eq!(response["errors"][0]["user_facing_error"], expected_response);
+
+    Ok(())
+}
