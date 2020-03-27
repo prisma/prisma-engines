@@ -20,9 +20,16 @@ struct ModelAndFieldType {
     tpe: String,
 }
 
+#[derive(Serialize, Debug)]
+struct EnumAndValue {
+    enm: String,
+    value: String,
+}
+
 pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
     let mut models_without_identifiers = vec![];
     let mut fields_with_empty_names = vec![];
+    let mut enum_values_with_empty_names = vec![];
     let mut unsupported_types = vec![];
 
     let mut commented_model_names = vec![];
@@ -112,6 +119,22 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
         }
     }
 
+    //empty enum values
+    for enm in &mut datamodel.enums {
+        for enum_value in &mut enm.values {
+            if let Some(name) = &enum_value.database_name {
+                if enum_value.name == "".to_string() {
+                    enum_value.name = name.clone();
+                    enum_value.commented_out = true;
+                    enum_values_with_empty_names.push(EnumAndValue {
+                        enm: enm.name.clone(),
+                        value: enum_value.name.clone(),
+                    })
+                }
+            }
+        }
+    }
+
     // fields with unsupported as datatype
     for model in &datamodel.models {
         for field in &model.fields {
@@ -149,6 +172,15 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
             code: 3,
             message: "These fields were commented out because we currently do not support their types.".into(),
             affected: serde_json::to_value(&unsupported_types).unwrap(),
+        })
+    }
+
+    if !enum_values_with_empty_names.is_empty() {
+        warnings.push(Warning {
+            code: 4,
+            message: "These enum values were commented out because of invalid names. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]*."
+                .into(),
+            affected: serde_json::to_value(&enum_values_with_empty_names).unwrap(),
         })
     }
 

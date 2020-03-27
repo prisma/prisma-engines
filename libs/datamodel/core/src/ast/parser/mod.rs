@@ -60,10 +60,7 @@ fn parse_function(token: &pest::iterators::Pair<'_, Rule>) -> Expression {
 
     match name {
         Some(name) => Expression::Function(name, arguments, Span::from_pest(token.as_span())),
-        _ => unreachable!(
-            "Encountered impossible function during parsing: {:?}",
-            token.as_str()
-        ),
+        _ => unreachable!("Encountered impossible function during parsing: {:?}", token.as_str()),
     }
 }
 
@@ -128,10 +125,7 @@ fn parse_directive(token: &pest::iterators::Pair<'_, Rule>) -> Directive {
             arguments,
             span: Span::from_pest(token.as_span()),
         },
-        _ => panic!(
-            "Encountered impossible type during parsing: {:?}",
-            token.as_str()
-        ),
+        _ => panic!("Encountered impossible type during parsing: {:?}", token.as_str()),
     }
 }
 
@@ -180,9 +174,7 @@ fn parse_base_type(token: &pest::iterators::Pair<'_, Rule>) -> String {
     }
 }
 
-fn parse_field_type(
-    token: &pest::iterators::Pair<'_, Rule>,
-) -> Result<(FieldArity, String), DatamodelError> {
+fn parse_field_type(token: &pest::iterators::Pair<'_, Rule>) -> Result<(FieldArity, String), DatamodelError> {
     match_first! { token, current,
         Rule::optional_type => Ok((FieldArity::Optional, parse_base_type(&current))),
         Rule::base_type =>  Ok((FieldArity::Required, parse_base_type(&current))),
@@ -347,6 +339,7 @@ fn parse_enum_value(token: &pest::iterators::Pair<'_, Rule>) -> Result<EnumValue
             name,
             directives,
             span: Span::from_pest(token.as_span()),
+            commented_out: false,
         }),
         _ => panic!(
             "Encountered impossible enum declaration during parsing, name is missing: {:?}",
@@ -515,9 +508,7 @@ pub fn parse(datamodel_string: &str) -> Result<SchemaAst, ErrorCollection> {
             };
 
             let expected = match err.variant {
-                pest::error::ErrorVariant::ParsingError { positives, .. } => {
-                    get_expected_from_error(&positives)
-                }
+                pest::error::ErrorVariant::ParsingError { positives, .. } => get_expected_from_error(&positives),
                 _ => panic!("Could not construct parsing error. This should never happend."),
             };
 
