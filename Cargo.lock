@@ -1456,8 +1456,7 @@ dependencies = [
 [[package]]
 name = "mobc"
 version = "0.5.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a3fc3c5eb65068542d05bc023d3afa1b9c4aaef647e4f62b167c86c8a85d1ef5"
+source = "git+https://github.com/pimeys/mobc?branch=non-panic-interval-checks#55e6e9733d1c3ec715c5d083621b6aef38afce9e"
 dependencies = [
  "async-trait",
  "futures 0.3.4",
@@ -2099,7 +2098,7 @@ dependencies = [
 [[package]]
 name = "quaint"
 version = "0.2.0-alpha.11"
-source = "git+https://github.com/prisma/quaint#cd0d23372c440eb15a73f888b977052d59c8169d"
+source = "git+https://github.com/prisma/quaint#095eaf7dc565424ec724cf74cea410633f890bd7"
 dependencies = [
  "async-trait",
  "base64 0.11.0",
