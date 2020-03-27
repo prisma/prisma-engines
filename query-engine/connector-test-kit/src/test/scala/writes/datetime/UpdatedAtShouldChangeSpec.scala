@@ -5,7 +5,6 @@ import util._
 
 class UpdatedAtShouldChangeSpec extends FlatSpec with Matchers with ApiSpecBase {
 
-
   override def runOnlyForCapabilities = Set(ConnectorCapability.ScalarListsCapability)
 
   val testDataModels = {
@@ -13,9 +12,11 @@ class UpdatedAtShouldChangeSpec extends FlatSpec with Matchers with ApiSpecBase 
       |model Top {
       |  id        String   @id @default(cuid())
       |  top       String   @unique
-      |  bottom    Bottom?  @relation(references: [id])
       |  createdAt DateTime @default(now())
       |  updatedAt DateTime @updatedAt
+      |  bottom_id String?
+      |  
+      |  bottom    Bottom?  @relation(fields: [bottom_id], references: [id])
       |}
       |
       |model Bottom {
@@ -121,9 +122,7 @@ class UpdatedAtShouldChangeSpec extends FlatSpec with Matchers with ApiSpecBase 
     }
   }
 
-
-
-  "Updating scalar list values" should "change updatedAt values" in  {
+  "Updating scalar list values" should "change updatedAt values" in {
     testDataModels.testV11 { project =>
       val updatedAt = server.query("""mutation a {createList(data: { list: "test" }) {updatedAt}}""", project).pathAsString("data.createList.updatedAt")
 
