@@ -1,7 +1,7 @@
 use super::*;
 use crate::interpreter::query_interpreters::nested_pagination::NestedPagination;
 use crate::{interpreter::InterpretationResult, query_ast::*, result_ast::*};
-use connector::{self, ConnectionLike, QueryArguments, ReadOperations};
+use connector::{self, ConnectionLike, ReadOperations};
 use futures::future::{BoxFuture, FutureExt};
 use prisma_models::ManyRecords;
 
@@ -135,10 +135,23 @@ fn read_related<'a, 'b>(
 
 async fn aggregate<'a, 'b>(
     tx: &'a ConnectionLike<'a, 'b>,
-    query: AggregateRecordsQuery,
+    aggregate: AggregateRecordsQuery,
 ) -> InterpretationResult<QueryResult> {
-    let result = tx.count_by_model(&query.model, QueryArguments::default()).await?;
-    Ok(QueryResult::Count(result))
+    let mut results = vec![];
+
+    for query in aggregate.queries {
+        match query {
+            AggregationQuery::Count(name, args) => {
+                let result = tx.count_by_model(&aggregate.model, args).await?;
+                results.push(AggregationQueryResult::Count(name, result));
+            }
+        }
+    }
+
+    Ok(QueryResult::RecordAggregation(RecordAggregation {
+        fields: aggregate.selection_order,
+        results,
+    }))
 }
 
 fn process_nested<'a, 'b>(
