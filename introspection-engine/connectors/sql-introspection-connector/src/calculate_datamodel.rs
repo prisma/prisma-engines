@@ -3,12 +3,12 @@ use crate::misc_helpers::*;
 use crate::sanitize_datamodel_names::sanitize_datamodel_names;
 use crate::SqlIntrospectionResult;
 use datamodel::{dml, Datamodel, FieldType, Model};
+use introspection_connector::IntrospectionResult;
 use log::debug;
 use sql_schema_describer::*;
 
 /// Calculate a data model from a database schema.
-/// todo return warnings
-pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> {
+pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<IntrospectionResult> {
     debug!("Calculating data model.");
 
     let mut data_model = Datamodel::new();
@@ -105,12 +105,15 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
     }
 
     //todo sanitizing might need to be adjusted to also change the fields in the RelationInfo
-    sanitize_datamodel_names(&mut data_model); //todo warnings
-    commenting_out_guardrails(&mut data_model); //todo warnings
+    sanitize_datamodel_names(&mut data_model);
+    let warnings = commenting_out_guardrails(&mut data_model);
 
     deduplicate_field_names(&mut data_model);
 
     debug!("Done calculating data model {:?}", data_model);
 
-    Ok(data_model)
+    Ok(IntrospectionResult {
+        datamodel: data_model,
+        warnings,
+    })
 }

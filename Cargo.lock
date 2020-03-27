@@ -968,6 +968,7 @@ dependencies = [
  "async-trait",
  "datamodel",
  "serde",
+ "serde_json",
  "thiserror",
  "user-facing-errors",
 ]
@@ -2562,6 +2563,7 @@ dependencies = [
  "prisma-inflector",
  "quaint",
  "regex",
+ "serde",
  "serde_json",
  "sql-schema-describer",
  "test-macros",

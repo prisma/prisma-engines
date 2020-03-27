@@ -203,7 +203,14 @@ impl<'a> Renderer<'a> {
         self.indent_up();
 
         for value in &enm.values {
-            self.write(&value.name.name);
+            //todo do the commenting out
+
+            let commented_out = if value.commented_out {
+                "// ".to_string()
+            } else {
+                "".to_string()
+            };
+            self.write(format!("{}{}", commented_out, &value.name.name).as_str());
             if !value.directives.is_empty() {
                 let mut attributes_builder = StringBuilder::new();
 

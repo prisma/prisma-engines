@@ -196,3 +196,25 @@ async fn introspecting_a_table_with_enum_default_values_that_look_like_booleans_
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
+
+#[test_each_connector(tags("postgres"))]
+async fn introspecting_an_enum_with_an_invalid_name_should_work(api: &TestApi) {
+    let sql = format!("CREATE Type status as ENUM ( '1', '2', '3', 'undefined')");
+
+    api.database().execute_raw(&sql, &[]).await.unwrap();
+
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("News", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom("status  status Not Null default '1'");
+            });
+        })
+        .await;
+
+    let warnings = dbg!(api.introspection_warnings().await);
+    assert_eq!(&warnings, "[{\"code\":4,\"message\":\"These enum values were commented out because of invalid names. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]*.\",\"affected\":[{\"enm\":\"status\",\"value\":\"1\"},{\"enm\":\"status\",\"value\":\"2\"},{\"enm\":\"status\",\"value\":\"3\"}]}]");
+
+    let result = dbg!(api.introspect().await);
+    assert_eq!(&result, "model News {\n  id     Int    @default(autoincrement()) @id\n  status status @default()\n}\n\nenum status {\n  // 1 @map(\"1\")\n  // 2 @map(\"2\")\n  // 3 @map(\"3\")\n  undefined\n}");
+}

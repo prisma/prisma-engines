@@ -1,8 +1,10 @@
 mod error;
 
+use core::fmt;
 use datamodel::Datamodel;
 pub use error::{ConnectorError, ErrorKind};
 use serde::*;
+use serde_json::Value;
 
 pub type ConnectorResult<T> = Result<T, ConnectorError>;
 
@@ -14,12 +16,45 @@ pub trait IntrospectionConnector: Send + Sync + 'static {
 
     async fn get_database_description(&self) -> ConnectorResult<String>;
 
-    //todo needs to be a compound result
-    async fn introspect(&self) -> ConnectorResult<Datamodel>;
+    async fn introspect(&self) -> ConnectorResult<IntrospectionResult>;
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DatabaseMetadata {
     pub table_count: usize,
     pub size_in_bytes: usize,
+}
+
+#[derive(Debug)]
+pub struct IntrospectionResult {
+    /// Datamodel
+    pub datamodel: Datamodel,
+    /// warnings
+    pub warnings: Vec<Warning>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Warning {
+    pub code: i8,
+    pub message: String,
+    pub affected: Value,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct IntrospectionResultOutput {
+    /// Datamodel
+    pub datamodel: String,
+    /// warnings
+    pub warnings: Vec<Warning>,
+}
+
+impl fmt::Display for IntrospectionResultOutput {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "{{\"datamodel\": \"{}\", \"warnings\": {}}}",
+            self.datamodel,
+            serde_json::to_string(&self.warnings).unwrap()
+        )
+    }
 }

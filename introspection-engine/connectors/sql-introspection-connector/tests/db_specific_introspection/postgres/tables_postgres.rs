@@ -108,10 +108,7 @@ async fn introspecting_a_table_with_multi_column_unique_index_must_work(api: &Te
                 t.add_column("id", types::primary());
                 t.add_column("firstname", types::text());
                 t.add_column("lastname", types::text());
-                t.add_index(
-                    "test",
-                    types::index(vec!["firstname", "lastname"]).unique(true),
-                );
+                t.add_index("test", types::index(vec!["firstname", "lastname"]).unique(true));
             });
         })
         .await;
@@ -266,10 +263,7 @@ async fn introspecting_a_table_without_uniques_should_comment_it_out(api: &TestA
             });
             migration.create_table("Post", |t| {
                 t.add_column("id", types::integer());
-                t.add_column(
-                    "user_id",
-                    types::foreign("User", "id").nullable(false).unique(false),
-                );
+                t.add_column("user_id", types::foreign("User", "id").nullable(false).unique(false));
             });
         })
         .await;
@@ -436,6 +430,12 @@ async fn introspecting_an_unsupported_type_should_comment_it_out(api: &TestApi) 
         })
         .await;
 
+    let warnings = dbg!(api.introspection_warnings().await);
+    assert_eq!(
+        &warnings,
+        "[{\"code\":3,\"message\":\"These fields were commented out because we currently do not support their types.\",\"affected\":[{\"model\":\"Test\",\"field\":\"network_mac\",\"tpe\":\"macaddr\"}]}]"
+    );
+
     let result = dbg!(api.introspect().await);
     assert_eq!(&result, "model Test {\n  id             Int      @default(autoincrement()) @id\n  network_inet   String?\n  // This type is currently not supported.\n  // network_mac macaddr?\n}");
 }
@@ -458,8 +458,7 @@ async fn introspecting_a_legacy_m_to_n_relation_should_work(api: &TestApi) {
             });
         })
         .await;
-    let unique =
-        "CREATE UNIQUE INDEX _CategoryToPost_AB_unique ON \"_CategoryToPost\"(\"a\",\"b\" )";
+    let unique = "CREATE UNIQUE INDEX _CategoryToPost_AB_unique ON \"_CategoryToPost\"(\"a\",\"b\" )";
     let index = "CREATE  INDEX _CategoryToPost_AB_index ON \"_CategoryToPost\"(\"b\" )";
 
     api.database().execute_raw(unique, &[]).await.unwrap();
