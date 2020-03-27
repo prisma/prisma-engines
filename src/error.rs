@@ -135,6 +135,9 @@ pub enum ErrorKind {
     #[error("Conversion failed: {}", _0)]
     ConversionError(&'static str),
 
+    #[error("The value provided for column {:?} is too long.", column)]
+    LengthMismatch { column: Option<String> },
+
     #[error("The provided arguments are not supported")]
     InvalidConnectionArguments,
 

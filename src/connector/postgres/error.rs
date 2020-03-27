@@ -5,6 +5,18 @@ impl From<tokio_postgres::error::Error> for Error {
         use tokio_postgres::error::DbError;
 
         match e.code().map(|c| c.code()) {
+            Some(code) if code == "22001" => {
+                let code = code.to_string();
+                let error = e.into_source().unwrap(); // boom
+                let db_error = error.downcast_ref::<DbError>().unwrap(); // BOOM
+
+                let mut builder = Error::builder(ErrorKind::LengthMismatch { column: None });
+
+                builder.set_original_code(code);
+                builder.set_original_message(db_error.to_string());
+
+                builder.build()
+            }
             // Don't look at me, I'm hideous ;((
             Some(code) if code == "23505" => {
                 let code = code.to_string();
