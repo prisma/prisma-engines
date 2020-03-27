@@ -3,6 +3,7 @@ use crate::{Query, ReadQuery, RecordQuery};
 use std::sync::Arc;
 
 #[test]
+#[ignore]
 fn test_direct_children() {
     let mut graph = QueryGraph::new();
 
@@ -13,9 +14,11 @@ fn test_direct_children() {
     let edge_gp_p = graph
         .create_edge(&grandparent, &parent, QueryGraphDependency::ExecutionOrder)
         .unwrap();
+
     let _edge_gp_c = graph
         .create_edge(&grandparent, &child, QueryGraphDependency::ExecutionOrder)
         .unwrap();
+
     let edge_p_c = graph
         .create_edge(&parent, &child, QueryGraphDependency::ExecutionOrder)
         .unwrap();
@@ -28,6 +31,7 @@ fn test_direct_children() {
 }
 
 #[test]
+#[ignore]
 fn test_direct_children_2() {
     let mut graph = QueryGraph::new();
 
@@ -62,6 +66,7 @@ fn test_direct_children_2() {
 }
 
 #[test]
+#[ignore]
 fn test_valid_multiparent() {
     let mut graph = QueryGraph::new();
 
@@ -109,6 +114,7 @@ fn test_invalid_multiparent() {
 
 #[should_panic]
 #[test]
+#[ignore]
 fn test_invalid_self_connecting_edge() {
     let mut graph = QueryGraph::new();
     let node = graph.create_node(dummy_query());
