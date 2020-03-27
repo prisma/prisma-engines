@@ -293,6 +293,28 @@ impl<'a> Validator<'a> {
                         ast_field.span.clone())
                     );
                 }
+
+                if !rel_info.to_fields.is_empty() && !errors.has_errors() {
+                    // when we have other errors already don't push this error additionally
+                    let references_unique_criteria = related_model
+                        .unique_criterias()
+                        .iter()
+                        .find(|criteria| {
+                            let criteria_field_names: Vec<_> =
+                                criteria.fields.iter().map(|f| f.name.to_owned()).collect();
+                            criteria_field_names == rel_info.to_fields
+                        })
+                        .is_some();
+
+                    if !references_unique_criteria {
+                        errors.push(DatamodelError::new_validation_error(
+                            &format!("The argument `references` must refer to a unique criteria in the related model `{}`. But it is referencing the following fields that are not a unique criteria: {}",
+                                     &related_model.name,
+                                     rel_info.to_fields.join(", ")),
+                            ast_field.span.clone())
+                        );
+                    }
+                }
             }
         }
 

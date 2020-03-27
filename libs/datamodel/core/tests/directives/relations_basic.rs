@@ -40,15 +40,15 @@ fn resolve_relation() {
 fn resolve_related_field() {
     let dml = r#"
     model User {
-        id Int @id
-        firstName String
+        id        Int    @id
+        firstName String @unique
         posts Post[]
     }
 
     model Post {
-        id Int @id
+        id   Int    @id
         text String
-        user User @relation(references: [firstName])
+        user User   @relation(references: [firstName])
     }
     "#;
 
@@ -69,6 +69,8 @@ fn resolve_related_fields() {
         firstName String
         lastName String
         posts Post[]
+        
+        @@unique([firstName, lastName])
     }
 
     model Post {
@@ -98,6 +100,8 @@ fn must_error_when_non_existing_fields_are_used() {
         firstName String
         lastName String
         posts Post[]
+        
+        @@unique([firstName, lastName])
     }
 
     model Post {
@@ -111,7 +115,7 @@ fn must_error_when_non_existing_fields_are_used() {
     errors.assert_is(
         DatamodelError::new_validation_error(
             "The argument fields must refer only to existing fields. The following fields do not exist in this model: authorFirstName, authorLastName", 
-                Span::new(183, 282)
+                Span::new(232, 331)
         )
     );
 }

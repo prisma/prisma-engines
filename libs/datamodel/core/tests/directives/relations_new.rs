@@ -149,3 +149,46 @@ fn relation_must_error_when_referenced_field_is_not_scalar() {
     let errors = parse_error(dml);
     errors.assert_is(DatamodelError::new_validation_error("The argument `references` must refer only to scalar fields in the related model `User`. But it is referencing the following relation fields: posts", Span::new(181, 239)));
 }
+
+#[test]
+fn relation_must_error_when_referenced_fields_are_not_a_unique_criteria() {
+    let dml = r#"
+    model User {
+        id Int @id
+        firstName String
+        posts Post[]
+    }
+
+    model Post {
+        id Int @id
+        text String
+        userName Int        
+        user User @relation(fields: [userName], references: [firstName])
+    }
+    "#;
+
+    let errors = parse_error(dml);
+    errors.assert_is(DatamodelError::new_validation_error("The argument `references` must refer to a unique criteria in the related model `User`. But it is referencing the following fields that are not a unique criteria: firstName", Span::new(183, 247)));
+}
+
+#[test]
+fn relation_must_error_when_referenced_fields_are_multiple_uniques() {
+    let dml = r#"
+    model User {
+        id Int @id
+        firstName String @unique
+        posts Post[]
+    }
+
+    model Post {
+        id Int @id
+        text String
+        userName Int        
+        // the relation is referencing two uniques. That is too much.
+        user User @relation(fields: [userName], references: [id, firstName])
+    }
+    "#;
+
+    let errors = parse_error(dml);
+    errors.assert_is(DatamodelError::new_validation_error("The argument `references` must refer to a unique criteria in the related model `User`. But it is referencing the following fields that are not a unique criteria: id, firstName", Span::new(191, 329)));
+}
