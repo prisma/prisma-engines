@@ -212,20 +212,9 @@ async fn introspecting_an_enum_with_an_invalid_name_should_work(api: &TestApi) {
         })
         .await;
 
-    let dm = r#"
-        model News {
-            confirmed   status   @default(undefined)
-            id          Int     @default(autoincrement()) @id
-        }
-
-        enum status{
-            undefined
-        }
-    "#;
-
     let warnings = dbg!(api.introspection_warnings().await);
     assert_eq!(&warnings, "[{\"code\":4,\"message\":\"These enum values were commented out because of invalid names. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]*.\",\"affected\":[{\"enm\":\"status\",\"value\":\"1\"},{\"enm\":\"status\",\"value\":\"2\"},{\"enm\":\"status\",\"value\":\"3\"}]}]");
 
     let result = dbg!(api.introspect().await);
-    custom_assert(&result, dm);
+    assert_eq!(&result, "model News {\n  id     Int    @default(autoincrement()) @id\n  status status @default()\n}\n\nenum status {\n  // 1 @map(\"1\")\n  // 2 @map(\"2\")\n  // 3 @map(\"3\")\n  undefined\n}");
 }
