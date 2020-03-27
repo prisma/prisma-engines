@@ -32,15 +32,10 @@ impl From<Vec<String>> for DatabaseConstraint {
 #[derive(Debug, UserFacingError, Serialize)]
 #[user_facing(
     code = "P2000",
-    message = "The value ${field_value} for the field ${field_name} is too long for the field's type"
+    message = "The provided value for the column is too long for the column's type. Column: ${column_name}"
 )]
 pub struct InputValueTooLong {
-    /// Concrete value provided for a field on a model in Prisma schema. Should be peeked/truncated
-    /// if too long to display in the error message
-    pub field_value: String,
-
-    /// Field name from one model from Prisma schema
-    pub field_name: String,
+    pub column_name: String,
 }
 
 #[derive(Debug, UserFacingError, Serialize)]
