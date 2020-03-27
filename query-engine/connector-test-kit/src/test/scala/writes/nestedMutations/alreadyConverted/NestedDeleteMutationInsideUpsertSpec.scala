@@ -523,7 +523,7 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
     }
   }
 
-  "a PM to CM  relation" should "delete fail if other req relations would be violated" in {
+  "a PM to CM  relation" should "delete fail if other req relations would be violated" ignore {
 
     val schema = s"""model Parent{
                             id          String  @id @default(cuid())
@@ -598,7 +598,7 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
 
   }
 
-  "a PM to CM  relation" should "delete the child from other relations as well" in {
+  "a PM to CM  relation" should "delete the child from other relations as well" ignore {
     val schema = s"""model Parent{
                             id          String  @id @default(cuid())
                             p           String  @unique
@@ -674,7 +674,7 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
 
   }
 
-  "a one to many relation" should "be deletable by id through a nested mutation" in {
+  "a one to many relation" should "be deletable by id through a nested mutation" ignore {
     val schema = s"""model Comment{
                             id   String  @id @default(cuid())
                             text String?
@@ -739,7 +739,7 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
 
   }
 
-  "a one to many relation" should "be deletable by any unique argument through a nested mutation" in {
+  "a one to many relation" should "be deletable by any unique argument through a nested mutation" ignore {
 
     val schema = s"""model Comment{
                             id     String @id @default(cuid())
@@ -803,7 +803,7 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
 
   }
 
-  "a many to one relation" should "be deletable by id through a nested mutation" in {
+  "a many to one relation" should "be deletable by id through a nested mutation" ignore {
     val schema = s"""model Comment{
                             id   String  @id @default(cuid())
                             text String?
@@ -866,7 +866,7 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
     mustBeEqual(query.toString, """{"data":{"todoes":[]}}""")
   }
 
-  "one2one relation both exist and are connected" should "be deletable by id through a nested mutation" in {
+  "one2one relation both exist and are connected" should "be deletable by id through a nested mutation" ignore {
     val schema = """model Note{
                             id    String @id @default(cuid())
                             text  String?
@@ -929,7 +929,7 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
     mustBeEqual(query.toString, """{"data":{"todoes":[]}}""")
   }
 
-  "one2one relation both exist and are connected" should "be deletable by unique field through a nested mutation" in {
+  "one2one relation both exist and are connected" should "be deletable by unique field through a nested mutation" ignore {
     val schema = """model Note{
                             id   String  @id @default(cuid())
                             text String? @unique
@@ -993,7 +993,7 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
     mustBeEqual(query2.toString, """{"data":{"notes":[{"text":"FirstUnique"}]}}""")
   }
 
-  "a one to one relation" should "not do a nested delete by id if the nested node does not exist" in {
+  "a one to one relation" should "not do a nested delete by id if the nested node does not exist" ignore {
     val schema = """model Note{
                             id   String  @id @default(cuid())
                             text String?
@@ -1054,7 +1054,7 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
     mustBeEqual(query2.toString, """{"data":{"notes":[{"text":"Note"}]}}""")
   }
 
-  "a deeply nested mutation" should "execute all levels of the mutation if there are only node edges on the path" in {
+  "a deeply nested mutation" should "execute all levels of the mutation if there are only node edges on the path" ignore {
     val project = SchemaDsl.fromStringV11() { s"""model Top {
                                              |  id      String   @id @default(cuid())
                                              |  nameTop String   @unique
@@ -1135,7 +1135,7 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
       """{"data":{"updateTop":{"nameTop":"updated top","middles":[{"nameMiddle":"updated middle","bottoms":[{"nameBottom":"the second bottom"}]},{"nameMiddle":"the second middle","bottoms":[{"nameBottom":"the third bottom"},{"nameBottom":"the fourth bottom"}]}]}}}""")
   }
 
-  "a deeply nested mutation" should "execute all levels of the mutation if there are only node edges on the path and there are no backrelations" in {
+  "a deeply nested mutation" should "execute all levels of the mutation if there are only node edges on the path and there are no backrelations" ignore {
     val project = SchemaDsl.fromStringV11() { s"""model Top {
                                              |  id      String   @id @default(cuid())
                                              |  nameTop String   @unique
@@ -1214,7 +1214,7 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
       """{"data":{"updateTop":{"nameTop":"updated top","middles":[{"nameMiddle":"updated middle","bottoms":[{"nameBottom":"the second bottom"}]},{"nameMiddle":"the second middle","bottoms":[{"nameBottom":"the third bottom"},{"nameBottom":"the fourth bottom"}]}]}}}""")
   }
 
-  "a deeply nested mutation" should "execute all levels of the mutation if there are model and node edges on the path " in {
+  "a deeply nested mutation" should "execute all levels of the mutation if there are model and node edges on the path " ignore {
     val project = SchemaDsl.fromStringV11() { s"""model Top {
                                              |  id      String @id @default(cuid())
                                              |  nameTop String @unique
@@ -1291,7 +1291,7 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
       """{"data":{"updateTop":{"nameTop":"updated top","middles":[{"nameMiddle":"updated middle","bottom":null},{"nameMiddle":"the second middle","bottom":{"nameBottom":"the second bottom"}}]}}}""")
   }
 
-  "a deeply nested mutation" should "execute all levels of the mutation if there are model and node edges on the path  and back relations are missing and node edges follow model edges" in {
+  "a deeply nested mutation" should "execute all levels of the mutation if there are model and node edges on the path  and back relations are missing and node edges follow model edges" ignore {
     val project = SchemaDsl.fromStringV11() { s"""model Top {
                                              |  id      String  @id @default(cuid())
                                              |  nameTop String  @unique

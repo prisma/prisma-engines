@@ -16,11 +16,7 @@ impl Renderer for GqlObjectRenderer {
 }
 
 impl GqlObjectRenderer {
-    fn render_input_object(
-        &self,
-        input_object: &InputObjectTypeRef,
-        ctx: RenderContext,
-    ) -> (String, RenderContext) {
+    fn render_input_object(&self, input_object: &InputObjectTypeRef, ctx: RenderContext) -> (String, RenderContext) {
         let input_object = input_object.into_arc();
         if ctx.already_rendered(&input_object.name) {
             return ("".into(), ctx);
@@ -29,35 +25,28 @@ impl GqlObjectRenderer {
             ctx.mark_as_rendered(input_object.name.clone())
         }
 
-        let (rendered_fields, ctx): (Vec<String>, RenderContext) = input_object
-            .get_fields()
-            .iter()
-            .fold((vec![], ctx), |(mut acc, ctx), field| {
-                let (rendered_field, ctx) = field.into_renderer().render(ctx);
-                acc.push(rendered_field);
-                (acc, ctx)
-            });
+        let (rendered_fields, ctx): (Vec<String>, RenderContext) =
+            input_object
+                .get_fields()
+                .iter()
+                .fold((vec![], ctx), |(mut acc, ctx), field| {
+                    let (rendered_field, ctx) = field.into_renderer().render(ctx);
+                    acc.push(rendered_field);
+                    (acc, ctx)
+                });
 
         let indented: Vec<String> = rendered_fields
             .into_iter()
             .map(|f| format!("{}{}", ctx.indent(), f))
             .collect();
 
-        let rendered = format!(
-            "input {} {{\n{}\n}}",
-            input_object.name,
-            indented.join("\n")
-        );
+        let rendered = format!("input {} {{\n{}\n}}", input_object.name, indented.join("\n"));
 
         ctx.add(input_object.name.clone(), rendered.clone());
         (rendered, ctx)
     }
 
-    fn render_output_object(
-        &self,
-        output_object: &ObjectTypeRef,
-        ctx: RenderContext,
-    ) -> (String, RenderContext) {
+    fn render_output_object(&self, output_object: &ObjectTypeRef, ctx: RenderContext) -> (String, RenderContext) {
         let output_object = output_object.into_arc();
 
         if ctx.already_rendered(output_object.name()) {
@@ -67,25 +56,22 @@ impl GqlObjectRenderer {
             ctx.mark_as_rendered(output_object.name().to_string())
         }
 
-        let (rendered_fields, ctx): (Vec<String>, RenderContext) = output_object
-            .get_fields()
-            .iter()
-            .fold((vec![], ctx), |(mut acc, ctx), field| {
-                let (rendered_field, ctx) = field.into_renderer().render(ctx);
-                acc.push(rendered_field);
-                (acc, ctx)
-            });
+        let (rendered_fields, ctx): (Vec<String>, RenderContext) =
+            output_object
+                .get_fields()
+                .iter()
+                .fold((vec![], ctx), |(mut acc, ctx), field| {
+                    let (rendered_field, ctx) = field.into_renderer().render(ctx);
+                    acc.push(rendered_field);
+                    (acc, ctx)
+                });
 
         let indented: Vec<String> = rendered_fields
             .into_iter()
             .map(|f| format!("{}{}", ctx.indent(), f))
             .collect();
 
-        let rendered = format!(
-            "type {} {{\n{}\n}}",
-            output_object.name(),
-            indented.join("\n")
-        );
+        let rendered = format!("type {} {{\n{}\n}}", output_object.name(), indented.join("\n"));
 
         ctx.add_output(rendered.clone());
         (rendered, ctx)

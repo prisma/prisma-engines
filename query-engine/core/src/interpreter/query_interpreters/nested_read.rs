@@ -1,11 +1,7 @@
 use crate::interpreter::query_interpreters::nested_pagination::NestedPagination;
 use crate::{interpreter::InterpretationResult, query_ast::*};
-use connector::{
-    self, filter::Filter, ConnectionLike, IdFilter, QueryArguments, ReadOperations, ScalarCompare,
-};
-use prisma_models::{
-    ManyRecords, RecordProjection, RelationFieldRef, Result as DomainResult, SelectedFields,
-};
+use connector::{self, filter::Filter, ConnectionLike, IdFilter, QueryArguments, ReadOperations, ScalarCompare};
+use prisma_models::{ManyRecords, ModelProjection, RecordProjection, RelationFieldRef, Result as DomainResult};
 use prisma_value::PrismaValue;
 use std::collections::HashMap;
 
@@ -29,9 +25,7 @@ pub async fn m2m<'a, 'b>(
         }
     };
 
-    let ids = tx
-        .get_related_m2m_record_ids(&query.parent_field, &parent_ids)
-        .await?;
+    let ids = tx.get_related_m2m_record_ids(&query.parent_field, &parent_ids).await?;
     let child_model_id = query.parent_field.related_model().primary_identifier();
 
     let child_ids: Vec<Vec<PrismaValue>> = ids
@@ -51,11 +45,7 @@ pub async fn m2m<'a, 'b>(
     };
 
     let mut scalars = tx
-        .get_many_records(
-            &query.parent_field.related_model(),
-            args,
-            &query.selected_fields.only_scalar_and_inlined(),
-        )
+        .get_many_records(&query.parent_field.related_model(), args, &query.selected_fields)
         .await?;
 
     // Child id to parent ids
@@ -101,7 +91,7 @@ pub async fn one2m<'a, 'b>(
     parent_projections: Option<Vec<RecordProjection>>,
     parent_result: Option<&'a ManyRecords>,
     query_args: QueryArguments,
-    selected_fields: &SelectedFields,
+    selected_fields: &ModelProjection,
     paginator: NestedPagination,
 ) -> InterpretationResult<ManyRecords> {
     let parent_model_id = parent_field.model().primary_identifier();
@@ -183,10 +173,8 @@ pub async fn one2m<'a, 'b>(
         let mut additional_records = vec![];
 
         for mut record in scalars.records.iter_mut() {
-            let child_link: RecordProjection =
-                record.projection(&scalars.field_names, &child_link_id)?;
-            let child_link_values: Vec<PrismaValue> =
-                child_link.pairs.into_iter().map(|(_, v)| v).collect();
+            let child_link: RecordProjection = record.projection(&scalars.field_names, &child_link_id)?;
+            let child_link_values: Vec<PrismaValue> = child_link.pairs.into_iter().map(|(_, v)| v).collect();
 
             if let Some(parent_ids) = link_mapping.get_mut(&child_link_values) {
                 parent_ids.reverse();
@@ -209,10 +197,8 @@ pub async fn one2m<'a, 'b>(
         let child_link_fields = parent_field.related_field().linking_fields();
 
         for record in scalars.records.iter_mut() {
-            let child_link: RecordProjection =
-                record.projection(&scalars.field_names, &child_link_fields)?;
-            let child_link_values: Vec<PrismaValue> =
-                child_link.pairs.into_iter().map(|(_, v)| v).collect();
+            let child_link: RecordProjection = record.projection(&scalars.field_names, &child_link_fields)?;
+            let child_link_values: Vec<PrismaValue> = child_link.pairs.into_iter().map(|(_, v)| v).collect();
 
             if let Some(parent_ids) = link_mapping.get(&child_link_values) {
                 let parent_id = parent_ids.last().unwrap();

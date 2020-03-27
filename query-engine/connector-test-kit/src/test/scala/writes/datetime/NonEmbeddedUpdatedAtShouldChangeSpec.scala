@@ -12,9 +12,11 @@ class NonEmbeddedUpdatedAtShouldChangeSpec extends FlatSpec with Matchers with A
     """model Top {
       |  id        String   @id @default(cuid())
       |  top       String   @unique
-      |  bottom    Bottom?  @relation(references: [id])
       |  createdAt DateTime @default(now())
       |  updatedAt DateTime @updatedAt
+      |
+      |  bottomId  String?
+      |  bottom    Bottom?  @relation(fields: [bottomId], references: [id])
       |}
       |
       |model Bottom {

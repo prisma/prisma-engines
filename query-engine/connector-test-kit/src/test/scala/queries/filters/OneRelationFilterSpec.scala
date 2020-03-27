@@ -12,24 +12,31 @@ class OneRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
       |model Blog {
       |   id   String @id @default(cuid())
       |   name String
+      |
       |   post Post?
       |}
       |
       |model Post {
-      |   id         String @id @default(cuid())
+      |   id         String  @id @default(cuid())
       |   title      String
       |   popularity Int
-      |   blog       Blog?    @relation(references: [id])
+      |   blogId     String?
+      |
+      |   blog       Blog?    @relation(fields: [blogId], references: [id])
       |   comment    Comment?
-      |   @@index([blog])
+      |
+      |   @@index([blogId])
       |}
       |
       |model Comment {
-      |   id    String  @id @default(cuid())
-      |   text  String
-      |   likes Int
-      |   post  Post?   @relation(references: [id])
-      |   @@index([post])
+      |   id     String  @id @default(cuid())
+      |   text   String
+      |   likes  Int
+      |   postId String?
+      |
+      |   post  Post?   @relation(fields: [postId], references: [id])
+      |
+      |   @@index([postId])
       |}
     """
   }
@@ -127,15 +134,18 @@ class OneRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
       """
         |model Post {
         |  id      String @id @default(cuid())
-        |  author  AUser?
         |  title   String @unique
+        |
+        |  author  AUser?
         |}
         |
         |model AUser {
-        |  id    String  @id @default(cuid())
-        |  name  String  @unique
-        |  int   Int?
-        |  post  Post?   @relation(references: [id])
+        |  id     String  @id @default(cuid())
+        |  name   String  @unique
+        |  int    Int?
+        |  postId String?
+        |
+        |  post  Post?   @relation(fields: [postId], references: [id])
         |}"""
     }
 

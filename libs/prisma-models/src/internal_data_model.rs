@@ -116,11 +116,16 @@ impl InternalDataModelTemplate {
             .collect();
 
         internal_data_model.relations.set(relations).unwrap();
+        internal_data_model.finalize();
         internal_data_model
     }
 }
 
 impl InternalDataModel {
+    fn finalize(&self) {
+        self.models().iter().for_each(|model| model.finalize());
+    }
+
     pub fn models(&self) -> &[ModelRef] {
         self.models.get().unwrap()
     }

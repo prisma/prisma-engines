@@ -11,20 +11,27 @@ class SelfRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
   val project = ProjectDsl.fromString {
     connectorTag match {
       case _: RelationalConnectorTag =>
-        """model Human{
-          |   id            String  @id @default(cuid())
-          |   name          String
-          |   wife          Human?   @relation(name: "Marriage", references: [id])
-          |   husband       Human?  @relation(name: "Marriage")
-          |   daughters     Human[] @relation(name:"Offspring")
-          |   father        Human?  @relation(name:"Offspring")
-          |   stepdaughters Human[] @relation(name:"Cuckoo")
-          |   mother        Human?  @relation(name:"Cuckoo")
-          |   fans          Human[] @relation(name:"Admirers")
-          |   rockstars     Human[] @relation(name:"Admirers")
-          |   singer        Human?  @relation(name:"Team")
-          |   bandmembers   Human[] @relation(name:"Team")
-          |   title         Song?   @relation(references: [id])
+        """model Human {
+          |  id         String  @id @default(cuid())
+          |  name       String
+          |  wife_id    String?
+          |  mother_id  String?
+          |  father_id  String?
+          |  singer_id  String?
+          |  title_id   String?
+          |
+          |  husband       Human? @relation(name: "Marriage")
+          |  wife          Human? @relation(name: "Marriage", fields: [wife_id], references: [id])
+          |  mother        Human? @relation(name:"Cuckoo", fields: [mother_id], references: [id])
+          |  father        Human? @relation(name:"Offspring", fields: [father_id], references: [id])
+          |  singer        Human? @relation(name:"Team", fields: [singer_id], references: [id])
+          |  title         Song?  @relation(fields: [title_id], references: [id])
+          |
+          |  daughters     Human[] @relation(name:"Offspring")
+          |  stepdaughters Human[] @relation(name:"Cuckoo")
+          |  fans          Human[] @relation(name:"Admirers")
+          |  rockstars     Human[] @relation(name:"Admirers")
+          |  bandmembers   Human[] @relation(name:"Team")
           |}
           |
           |model Song{

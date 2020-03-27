@@ -13,7 +13,9 @@ class NonEmbeddedOptionalBackrelationSpec extends FlatSpec with Matchers with Ap
         |model Owner {
         |  id        String @id @default(cuid())
         |  ownerName String @unique
-        |  cat       Cat    @relation(references: [id])
+        |  catId     String
+        |
+        |  cat       Cat    @relation(fields: [catId], references: [id])
         |}
         |
         |model Cat {
@@ -63,6 +65,9 @@ class NonEmbeddedOptionalBackrelationSpec extends FlatSpec with Matchers with Ap
         |model Cat {
         |  id      String @id @default(cuid())
         |  catName String @unique
+        |  ownerId String
+        |
+        |  owner Owner @relation(fields:[ownerId], references:[id])
         |}
         |
       """.stripMargin
@@ -112,6 +117,9 @@ class NonEmbeddedOptionalBackrelationSpec extends FlatSpec with Matchers with Ap
         |model Cat {
         |  id      String @id @default(cuid())
         |  catName String @unique
+        |  ownerId String
+        |
+        |  owner Owner @relation(fields:[ownerId], references:[id])
         |}
         |
       """.stripMargin

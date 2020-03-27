@@ -9,19 +9,22 @@ class FilterSpec extends FlatSpec with Matchers with ApiSpecBase {
 
   val project: Project = ProjectDsl.fromString { """
                                                    |model User {
-                                                   |  id       String   @id @default(cuid())
-                                                   |  unique   Int      @unique
-                                                   |  name     String?
-                                                   |  optional String?
-                                                   |  ride     Vehicle? @relation(references: [id])
+                                                   |  id         String   @id @default(cuid())
+                                                   |  unique     Int      @unique
+                                                   |  name       String?
+                                                   |  optional   String?
+                                                   |  vehicle_id String?
+                                                   |
+                                                   |  ride Vehicle? @relation(fields: [vehicle_id], references: [id])
                                                    |}
                                                    |
                                                    |model Vehicle {
                                                    |  id     String  @id @default(cuid())
                                                    |  unique Int     @unique
                                                    |  brand  String?
-                                                   |  owner  User
                                                    |  parked Boolean?
+                                                   |
+                                                   |  owner  User
                                                    |}
                                                    |
                                                    |model ParkingLot {

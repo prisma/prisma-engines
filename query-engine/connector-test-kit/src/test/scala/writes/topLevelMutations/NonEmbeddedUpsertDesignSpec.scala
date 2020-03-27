@@ -9,9 +9,11 @@ class NonEmbeddedUpsertDesignSpec extends FlatSpec with Matchers with ApiSpecBas
   //region top level upserts
 
   val dmP1ToC1 = """model List{
-        |   id    String  @id @default(cuid())
-        |   uList String? @unique
-        |   todo  Todo?   @relation(references: [id])
+        |   id     String  @id @default(cuid())
+        |   uList  String? @unique
+        |   todoId String?
+        |
+        |   todo  Todo?   @relation(fields: [todoId], references: [id])
         |}
         |
         |model Todo{

@@ -10,14 +10,16 @@ class NonEmbeddedOrderBySpec extends FlatSpec with Matchers with ApiSpecBase {
   val testDataModels = {
     val s1 = """
       model  List {
-        id    String  @id @default(cuid())
-        name  String  @unique
-        todos Todo[]  @relation(references: [id])
+        id    String @id @default(cuid())
+        name  String @unique
+
+        todos Todo[]
       }
 
       model  Todo {
         id    String @id @default(cuid())
         title String @unique
+
         lists List[]
       }
     """
@@ -26,12 +28,14 @@ class NonEmbeddedOrderBySpec extends FlatSpec with Matchers with ApiSpecBase {
       model  List {
         id    String @id @default(cuid())
         name  String @unique
+
         todos Todo[]
       }
 
       model  Todo {
         id    String @id @default(cuid())
         title String @unique
+
         lists List[]
       }
     """

@@ -181,10 +181,12 @@ class DeleteManySpec extends FlatSpec with Matchers with ApiSpecBase {
     val project = ProjectDsl.fromString {
       """
         |model ZChild{
-        |    id     String  @id @default(cuid())
-        |    name   String? @unique
-        |    test   String?
-        |    parent Parent? @relation(references: [id])
+        |    id       String  @id @default(cuid())
+        |    name     String? @unique
+        |    test     String?
+        |    parentId String?
+        |
+        |    parent Parent? @relation(fields: [parentId], references: [id])
         |}
         |
         |model Parent{

@@ -46,7 +46,7 @@ impl<'a> ReadOperations for SqlConnectorTransaction<'a> {
         &'b self,
         model: &'b ModelRef,
         filter: &'b Filter,
-        selected_fields: &'b SelectedFields,
+        selected_fields: &'b ModelProjection,
     ) -> connector::IO<'b, Option<SingleRecord>> {
         IO::new(self.catch(async move { read::get_single_record(&self.inner, model, filter, selected_fields).await }))
     }
@@ -55,7 +55,7 @@ impl<'a> ReadOperations for SqlConnectorTransaction<'a> {
         &'b self,
         model: &'b ModelRef,
         query_arguments: QueryArguments,
-        selected_fields: &'b SelectedFields,
+        selected_fields: &'b ModelProjection,
     ) -> connector::IO<'b, ManyRecords> {
         IO::new(
             self.catch(

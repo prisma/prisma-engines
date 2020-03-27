@@ -14,37 +14,51 @@ class ExtendedPaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
       model Top {
         id      String   @id @default(cuid())
         t       String   @unique
-        middles Middle[] @relation(references: [id])
+
+        middles Middle[]
       }
 
       model Middle {
-        id      String   @id @default(cuid())
-        m       String   @unique
-        bottoms Bottom[] @relation(references: [id])
+        id     String   @id @default(cuid())
+        m      String   @unique
+        top_id String
+
+        top     Top      @relation(fields: [top_id], references: [id])
+        bottoms Bottom[]
       }
 
       model Bottom {
-        id String @id @default(cuid())
-        b  String @unique
+        id        String @id @default(cuid())
+        b         String @unique
+        middle_id String
+
+        middle Middle @relation(fields: [middle_id], references: [id])
       }
     """
 
     val s2 = """
       model Top {
-        id      String   @id @default(cuid())
-        t       String   @unique
+        id     String   @id @default(cuid())
+        t      String   @unique
+
         middles Middle[]
       }
 
       model Middle {
         id      String   @id @default(cuid())
         m       String   @unique
+        top_id String
+
+        top     Top      @relation(fields: [top_id], references: [id])
         bottoms Bottom[]
       }
 
       model Bottom {
-        id String @id @default(cuid())
-        b  String @unique
+        id        String @id @default(cuid())
+        b         String @unique
+        middle_id String
+
+        middle Middle @relation(fields: [middle_id], references: [id])
       }
     """
 

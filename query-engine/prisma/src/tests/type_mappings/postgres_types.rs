@@ -344,6 +344,96 @@ const CREATE_ARRAY_TYPES_TABLE: &str = indoc! {
     "##
 };
 
+const CREATE_ONE_ARRAY_TYPES_QUERY: &str = indoc!(
+    r##"
+    mutation {
+        createOnearraytypes(
+            data: {
+                numeric_int2: { set: [12] }
+                numeric_int4: { set: [9002] }
+                numeric_int8: { set: [100000000] }
+                numeric_decimal: { set: [49.3444] }
+                numeric_float4: { set: [12.12] }
+                numeric_float8: { set: [3.139428] }
+                numeric_money: { set: [3.50] }
+                numeric_oid: { set: [2000] }
+                string_char: { set: ["yeet"] }
+                string_varchar: { set: ["yeet variable"] }
+                string_text: { set: ["to yeet or not to yeet"] }
+                binary_bits: { set: ["10100011"] }
+                binary_bits_varying: { set: ["01000"] }
+                binary_uuid: { set: ["111142ec-880b-4062-913d-8eac479ab957"] }
+                time_timestamp: { set: ["2020-03-02T08:00:00.000"] }
+                time_timestamptz: { set: ["2020-03-02T08:00:00.000"] }
+                time_date: { set: ["2020-03-05T00:00:00.000"] }
+                time_time: { set: ["2020-03-05T08:00:00.000"] }
+                time_timetz: { set: ["2020-03-05T08:00:00.000"] }
+                boolean_boolean: { set: [true, true, false, true] }
+                network_inet: { set: ["192.168.100.14"] }
+                json_json: { set: ["{ \"isJson\": true }"] }
+                json_jsonb: { set: ["{ \"isJSONB\": true }"] }
+            }
+        ) {
+            numeric_int2
+            numeric_int4
+            numeric_int8
+            numeric_decimal
+            numeric_float4
+            numeric_float8
+            numeric_money
+            numeric_oid
+            string_char
+            string_varchar
+            string_text
+            binary_bits
+            binary_bits_varying
+            binary_uuid
+            time_timestamp
+            time_timestamptz
+            time_date
+            time_time
+            time_timetz
+            boolean_boolean
+            network_inet
+            json_json
+            json_jsonb
+        }
+    }
+    "##
+);
+
+fn create_one_array_types_response() -> serde_json::Value {
+    json!({
+        "data": {
+            "createOnearraytypes": {
+                "numeric_int2": [12],
+                "numeric_int4": [9002],
+                "numeric_int8": [100000000],
+                "numeric_decimal": [49.3444],
+                "numeric_float4": [12.12],
+                "numeric_float8": [3.139428],
+                "numeric_money": [3.5],
+                "numeric_oid": [2000],
+                "string_char": ["yeet    "],
+                "string_varchar": ["yeet variable"],
+                "string_text": ["to yeet or not to yeet"],
+                "binary_bits": ["10100011"],
+                "binary_bits_varying": ["01000"],
+                "binary_uuid": ["111142ec-880b-4062-913d-8eac479ab957"],
+                "time_timestamp": ["2020-03-02T08:00:00.000Z"],
+                "time_timestamptz": ["2020-03-02T08:00:00.000Z"],
+                "time_date": ["2020-03-05T00:00:00.000Z"],
+                "time_time": ["1970-01-01T08:00:00.000Z"],
+                "time_timetz": ["1970-01-01T08:00:00.000Z"],
+                "boolean_boolean": [true, true, false, true],
+                "network_inet": ["192.168.100.14"],
+                "json_json": ["{\"isJson\":true}"],
+                "json_jsonb": ["{\"isJSONB\":true}"],
+            }
+        }
+    })
+}
+
 #[test_each_connector(tags("postgres"))]
 async fn postgres_array_types_roundtrip(api: &TestApi) -> TestResult {
     api.execute_sql(CREATE_ARRAY_TYPES_TABLE).await?;
@@ -378,95 +468,9 @@ async fn postgres_array_types_roundtrip(api: &TestApi) -> TestResult {
             .assert_field_type("json_jsonb", ScalarType::String)
     })?;
 
-    let query = indoc! {
-        r##"
-        mutation {
-            createOnearraytypes(
-                data: {
-                    numeric_int2: { set: [12] }
-                    numeric_int4: { set: [9002] }
-                    numeric_int8: { set: [100000000] }
-                    numeric_decimal: { set: [49.3444] }
-                    numeric_float4: { set: [12.12] }
-                    numeric_float8: { set: [3.139428] }
-                    numeric_money: { set: [3.50] }
-                    numeric_oid: { set: [2000] }
-                    string_char: { set: ["yeet"] }
-                    string_varchar: { set: ["yeet variable"] }
-                    string_text: { set: ["to yeet or not to yeet"] }
-                    binary_bits: { set: ["10100011"] }
-                    binary_bits_varying: { set: ["01000"] }
-                    binary_uuid: { set: ["111142ec-880b-4062-913d-8eac479ab957"] }
-                    time_timestamp: { set: ["2020-03-02T08:00:00.000"] }
-                    time_timestamptz: { set: ["2020-03-02T08:00:00.000"] }
-                    time_date: { set: ["2020-03-05T00:00:00.000"] }
-                    time_time: { set: ["2020-03-05T08:00:00.000"] }
-                    time_timetz: { set: ["2020-03-05T08:00:00.000"] }
-                    boolean_boolean: { set: [true, true, false, true] }
-                    network_inet: { set: ["192.168.100.14"] }
-                    json_json: { set: ["{ \"isJson\": true }"] }
-                    json_jsonb: { set: ["{ \"isJSONB\": true }"] }
-                }
-            ) {
-                numeric_int2
-                numeric_int4
-                numeric_int8
-                numeric_decimal
-                numeric_float4
-                numeric_float8
-                numeric_money
-                numeric_oid
-                string_char
-                string_varchar
-                string_text
-                binary_bits
-                binary_bits_varying
-                binary_uuid
-                time_timestamp
-                time_timestamptz
-                time_date
-                time_time
-                time_timetz
-                boolean_boolean
-                network_inet
-                json_json
-                json_jsonb
-            }
-        }
-        "##
-    };
+    let response = engine.request(CREATE_ONE_ARRAY_TYPES_QUERY).await;
 
-    let response = engine.request(query).await;
-
-    let expected_response = json!({
-        "data": {
-            "createOnearraytypes": {
-                "numeric_int2": [12],
-                "numeric_int4": [9002],
-                "numeric_int8": [100000000],
-                "numeric_decimal": [49.3444],
-                "numeric_float4": [12.12],
-                "numeric_float8": [3.139428],
-                "numeric_money": [3.5],
-                "numeric_oid": [2000],
-                "string_char": ["yeet    "],
-                "string_varchar": ["yeet variable"],
-                "string_text": ["to yeet or not to yeet"],
-                "binary_bits": ["10100011"],
-                "binary_bits_varying": ["01000"],
-                "binary_uuid": ["111142ec-880b-4062-913d-8eac479ab957"],
-                "time_timestamp": ["2020-03-02T08:00:00.000Z"],
-                "time_timestamptz": ["2020-03-02T08:00:00.000Z"],
-                "time_date": ["2020-03-05T00:00:00.000Z"],
-                "time_time": ["1970-01-01T08:00:00.000Z"],
-                "time_timetz": ["1970-01-01T08:00:00.000Z"],
-                "boolean_boolean": [true, true, false, true],
-                "network_inet": ["192.168.100.14"],
-                "json_json": ["{\"isJson\":true}"],
-                "json_jsonb": ["{\"isJSONB\":true}"],
-            }
-        }
-    });
+    let expected_response = create_one_array_types_response();
 
     assert_eq!(response, expected_response);
 
@@ -645,7 +649,7 @@ const CREATE_TYPES_TABLE_WITH_DEFAULTS: &str = indoc! {
     "##
 };
 
-#[test_each_connector(tags("postgres"), log = "debug")]
+#[test_each_connector(tags("postgres"))]
 async fn postgres_db_level_defaults_work(api: &TestApi) -> TestResult {
     api.execute_sql(CREATE_TYPES_TABLE_WITH_DEFAULTS).await?;
 
@@ -724,6 +728,127 @@ async fn postgres_db_level_defaults_work(api: &TestApi) -> TestResult {
                 "network_inet": "127.0.0.3",
                 "json_json": "{\"name\":null}",
                 "json_jsonb": "{\"name\":null}",
+            }
+        }
+    });
+
+    assert_eq!(response, expected_response);
+
+    Ok(())
+}
+
+const CREATE_TYPES_TABLE_WITH_ARRAY_DEFAULTS: &str = indoc! {
+    r##"
+    CREATE TABLE "prisma-tests"."arraytypes" (
+        id SERIAL PRIMARY KEY,
+        numeric_int2 int2[] NOT NULL DEFAULT '{1, 2, 3}',
+        numeric_int4 int4[] NOT NULL DEFAULT '{3, 2, 3}',
+        numeric_int8 int8[] NOT NULL DEFAULT '{3, 2, 3}',
+
+        numeric_decimal decimal(8, 4)[] NOT NULL DEFAULT '{6.1, 6.2, 6.3}',
+        numeric_float4 float4[] NOT NULL DEFAULT '{6.1, 6.2, 6.3}',
+        numeric_float8 float8[] NOT NULL DEFAULT '{6.1, 6.2, 6.3}',
+
+        numeric_money money[] NOT NULL DEFAULT '{80, 50, 30.2}',
+        numeric_oid oid[] NOT NULL DEFAULT '{5, 6, 7}',
+
+        string_char char(8)[] NOT NULL DEFAULT '{"abcdefgh", "12345678"}',
+        string_varchar varchar(20)[] NOT NULL DEFAULT '{"y", "e", "e", "t"}',
+        string_text text[] NOT NULL DEFAULT '{"y", "e", "e", "t"}',
+
+        -- binary_bytea bytea[],
+        binary_bits  bit(8)[] NOT NULL DEFAULT '{"11110000", "00001111"}',
+        binary_bits_varying bit varying(80)[] NOT NULL DEFAULT '{"1111", "0000"}',
+        binary_uuid uuid[] NOT NULL DEFAULT '{"1db27d16-bda5-4b06-8709-ceef793ead2b", "c4e29dfd-f566-412a-b823-c5eab4778678"}',
+
+        time_timestamp timestamp[] NOT NULL DEFAULT '{"2018-09-09T12:00:01Z", "2020-09-09T16:00:00Z"}',
+        time_timestamptz timestamptz[] NOT NULL DEFAULT '{"2018-09-09T12:00:01Z", "2020-09-09T16:00:00Z"}',
+        time_date date[] NOT NULL DEFAULT '{"2020-03-23", "2020-03-24"}',
+        time_time time[] NOT NULL DEFAULT '{"12:30", "13:30"}',
+        time_timetz timetz[] NOT NULL DEFAULT '{"12:30", "13:30"}',
+
+        boolean_boolean boolean[] NOT NULL DEFAULT '{ true, true, true, false }',
+
+        -- network_cidr cidr[],
+        network_inet inet[] NOT NULL DEFAULT '{"127.0.0.3", "127.0.0.4"}',
+
+        json_json json[] NOT NULL DEFAULT '{"true", "[]", "{ \"isJson\": true }"}',
+        json_jsonb jsonb[] NOT NULL DEFAULT '{"true", "[]", "{ \"isJson\": true }"}'
+    );
+    "##
+};
+
+#[test_each_connector(tags("postgres"), log = "debug")]
+async fn postgres_db_level_array_defaults_work(api: &TestApi) -> TestResult {
+    api.execute_sql(CREATE_TYPES_TABLE_WITH_ARRAY_DEFAULTS).await?;
+
+    let (_datamodel, engine) = api.introspect_and_start_query_engine().await?;
+
+    let response = engine.request(CREATE_ONE_ARRAY_TYPES_QUERY).await;
+
+    assert_eq!(response, create_one_array_types_response());
+
+    let defaults_mutation = r##"
+    mutation {
+        createOnearraytypes(
+            data: {
+            }
+        ) {
+            numeric_int2
+            numeric_int4
+            numeric_int8
+            numeric_decimal
+            numeric_float4
+            numeric_float8
+            numeric_money
+            numeric_oid
+            string_char
+            string_varchar
+            string_text
+            binary_bits
+            binary_bits_varying
+            binary_uuid
+            time_timestamp
+            time_timestamptz
+            time_date
+            time_time
+            time_timetz
+            boolean_boolean
+            network_inet
+            json_json
+            json_jsonb
+        }
+    }
+    "##;
+
+    let response = engine.request(defaults_mutation).await;
+
+    let expected_response = json!({
+        "data": {
+            "createOnearraytypes": {
+                "numeric_int2": [1, 2, 3],
+                "numeric_int4": [3, 2, 3],
+                "numeric_int8": [3, 2, 3],
+                "numeric_decimal": [6.1, 6.2, 6.3],
+                "numeric_float4": [6.1, 6.2, 6.3],
+                "numeric_float8": [6.1, 6.2, 6.3],
+                "numeric_money": [80.0, 50.0, 30.2],
+                "numeric_oid": [5, 6, 7],
+                "string_char": ["abcdefgh", "12345678"],
+                "string_varchar": ["y", "e", "e", "t"],
+                "string_text": ["y", "e", "e", "t"],
+                "binary_bits": ["11110000", "00001111"],
+                "binary_bits_varying": ["1111", "0000"],
+                "binary_uuid": ["1db27d16-bda5-4b06-8709-ceef793ead2b", "c4e29dfd-f566-412a-b823-c5eab4778678"],
+                "time_timestamp": ["2018-09-09T12:00:01.000Z", "2020-09-09T16:00:00.000Z"],
+                "time_timestamptz": ["2018-09-09T12:00:01.000Z", "2020-09-09T16:00:00.000Z"],
+                "time_date": ["2020-03-23T00:00:00.000Z", "2020-03-24T00:00:00.000Z"],
+                "time_time": ["1970-01-01T12:30:00.000Z", "1970-01-01T13:30:00.000Z"],
+                "time_timetz": ["1970-01-01T12:30:00.000Z", "1970-01-01T13:30:00.000Z"],
+                "boolean_boolean": [true, true, true, false],
+                "network_inet": ["127.0.0.3", "127.0.0.4"],
+                "json_json": ["true", "[]", "{\"isJson\":true}"],
+                "json_jsonb": ["true", "[]", "{\"isJson\":true}"],
             }
         }
     });

@@ -11,10 +11,12 @@ class NonEmbeddedSettingNodeSelectorToNullSpec extends FlatSpec with Matchers wi
     val project = SchemaDsl.fromStringV11() {
       """
         |model A {
-        |  id  String  @id @default(cuid())
-        |  b   String? @unique
-        |  key String  @unique
-        |  c   C?      @relation(references: [id])
+        |  id   String  @id @default(cuid())
+        |  b    String? @unique
+        |  key  String  @unique
+        |  c_id String?
+        |
+        |  c C? @relation(fields: [c_id], references: [id])
         |}
         |
         |model C {

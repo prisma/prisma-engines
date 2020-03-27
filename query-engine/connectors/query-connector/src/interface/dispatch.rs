@@ -6,7 +6,7 @@ impl<'conn, 'tx> ReadOperations for ConnectionLike<'conn, 'tx> {
         &'a self,
         model: &'a ModelRef,
         filter: &'a Filter,
-        selected_fields: &'a SelectedFields,
+        selected_fields: &'a ModelProjection,
     ) -> crate::IO<'a, Option<SingleRecord>> {
         match self {
             Self::Connection(c) => c.get_single_record(model, filter, selected_fields),
@@ -18,7 +18,7 @@ impl<'conn, 'tx> ReadOperations for ConnectionLike<'conn, 'tx> {
         &'a self,
         model: &'a ModelRef,
         query_arguments: QueryArguments,
-        selected_fields: &'a SelectedFields,
+        selected_fields: &'a ModelProjection,
     ) -> crate::IO<'a, ManyRecords> {
         match self {
             Self::Connection(c) => c.get_many_records(model, query_arguments, selected_fields),

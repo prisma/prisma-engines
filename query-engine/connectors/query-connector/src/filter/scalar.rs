@@ -433,6 +433,7 @@ mod tests {
     use crate::{filter::*, *};
 
     #[test]
+    #[ignore]
     fn equals() {
         let schema = test_data_model();
         let model = schema.find_model("User").unwrap();
@@ -459,6 +460,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore]
     fn not_equals() {
         let schema = test_data_model();
         let model = schema.find_model("User").unwrap();
@@ -484,6 +486,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore]
     fn contains() {
         let schema = test_data_model();
         let model = schema.find_model("User").unwrap();
@@ -509,6 +512,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore]
     fn not_contains() {
         let schema = test_data_model();
         let model = schema.find_model("User").unwrap();
@@ -534,6 +538,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore]
     fn starts_with() {
         let schema = test_data_model();
         let model = schema.find_model("User").unwrap();
@@ -559,6 +564,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore]
     fn not_starts_with() {
         let schema = test_data_model();
         let model = schema.find_model("User").unwrap();
@@ -584,6 +590,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore]
     fn ends_with() {
         let schema = test_data_model();
         let model = schema.find_model("User").unwrap();
@@ -609,6 +616,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore]
     fn not_ends_with() {
         let schema = test_data_model();
         let model = schema.find_model("User").unwrap();
@@ -634,6 +642,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore]
     fn less_than() {
         let schema = test_data_model();
         let model = schema.find_model("User").unwrap();
@@ -659,6 +668,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore]
     fn less_than_or_equals() {
         let schema = test_data_model();
         let model = schema.find_model("User").unwrap();
@@ -684,6 +694,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore]
     fn greater_than() {
         let schema = test_data_model();
         let model = schema.find_model("User").unwrap();
@@ -709,6 +720,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore]
     fn greater_then_or_equals() {
         let schema = test_data_model();
         let model = schema.find_model("User").unwrap();

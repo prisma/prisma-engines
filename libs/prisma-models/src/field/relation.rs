@@ -1,4 +1,3 @@
-use super::DataSourceField;
 use crate::prelude::*;
 use datamodel::{FieldArity, RelationInfo};
 use once_cell::sync::OnceCell;
@@ -23,7 +22,6 @@ pub struct RelationFieldTemplate {
     pub is_auto_generated_int_id: bool,
     pub relation_name: String,
     pub relation_side: RelationSide,
-    pub data_source_fields: Vec<dml::DataSourceField>,
     pub relation_info: RelationInfo,
 }
 
@@ -37,13 +35,13 @@ pub struct RelationField {
     pub relation_name: String,
     pub relation_side: RelationSide,
     pub relation: OnceCell<RelationWeakRef>,
-    pub data_source_fields: OnceCell<Vec<DataSourceFieldRef>>,
     pub relation_info: RelationInfo,
 
     #[debug_stub = "#ModelWeakRef#"]
     pub model: ModelWeakRef,
 
     pub(crate) is_unique: bool,
+    pub(crate) fields: OnceCell<Vec<ScalarFieldWeak>>,
 }
 
 impl Eq for RelationField {}
@@ -99,7 +97,7 @@ impl RelationSide {
 
 impl RelationFieldTemplate {
     pub fn build(self, model: ModelWeakRef) -> RelationFieldRef {
-        let relation = RelationField {
+        Arc::new(RelationField {
             name: self.name,
             is_id: self.is_id,
             is_required: self.is_required,
@@ -110,19 +108,9 @@ impl RelationFieldTemplate {
             relation_side: self.relation_side,
             model,
             relation: OnceCell::new(),
-            data_source_fields: OnceCell::new(),
             relation_info: self.relation_info,
-        };
-
-        let arc = Arc::new(relation);
-        let fields: Vec<_> = self
-            .data_source_fields
-            .into_iter()
-            .map(|dsf| Arc::new(DataSourceField::new(dsf, FieldWeak::from(&arc))))
-            .collect();
-
-        arc.data_source_fields.set(fields).unwrap();
-        arc
+            fields: OnceCell::new(),
+        })
     }
 }
 
@@ -173,9 +161,29 @@ impl RelationField {
     }
 
     pub fn model(&self) -> ModelRef {
-        self.model.upgrade().expect(
-            "Model does not exist anymore. Parent model got deleted without deleting the child.",
-        )
+        self.model
+            .upgrade()
+            .expect("Model does not exist anymore. Parent model got deleted without deleting the child.")
+    }
+
+    pub fn fields(&self) -> Vec<ScalarFieldRef> {
+        let fields = self.fields.get_or_init(|| {
+            let model = self.model();
+            let fields = model.fields();
+
+            self.relation_info
+                .fields
+                .iter()
+                .map(|f| {
+                    Arc::downgrade(&fields.find_from_scalar(f).expect(&format!(
+                        "Expected '{}' to be a scalar field on model '{}', found none.",
+                        f, model.name
+                    )))
+                })
+                .collect()
+        });
+
+        fields.iter().map(|f| f.upgrade().unwrap()).collect()
     }
 
     pub fn relation(&self) -> RelationRef {
@@ -235,11 +243,11 @@ impl RelationField {
         self.relation().name == relation_name && self.relation_side == side
     }
 
-    pub fn data_source_fields(&self) -> &[DataSourceFieldRef] {
-        self.data_source_fields
-            .get()
-            .ok_or_else(|| String::from("Data source fields must be set!"))
-            .unwrap()
+    pub fn data_source_fields(&self) -> Vec<DataSourceFieldRef> {
+        self.fields()
+            .into_iter()
+            .map(|f| Arc::clone(f.data_source_field()))
+            .collect()
     }
 
     pub fn type_identifiers_with_arities(&self) -> Vec<(TypeIdentifier, FieldArity)> {
@@ -249,9 +257,7 @@ impl RelationField {
             .collect()
     }
 
-    pub fn db_names(&self) -> impl Iterator<Item = &str> {
-        self.data_source_fields()
-            .into_iter()
-            .map(|dsf| dsf.name.as_str())
+    pub fn db_names(&self) -> impl Iterator<Item = String> {
+        self.data_source_fields().into_iter().map(|dsf| dsf.name.clone())
     }
 }

@@ -6,20 +6,22 @@ import util.{ApiSpecBase, ProjectDsl}
 class SelectOneSingularIdBatchSpec extends FlatSpec with Matchers with ApiSpecBase {
   val project = ProjectDsl.fromString {
     """model Artist {
-      |  id       String @id @default(cuid())
-      |  ArtistId Int    @unique
+      |  id       String  @id @default(cuid())
+      |  ArtistId Int     @unique
       |  Name     String
       |  Albums   Album[]
       |}
       |
       |model Album {
-      |  id      String  @id @default(cuid())
-      |  AlbumId Int     @unique
-      |  Title   String
-      |  Artist  Artist  @relation(references: [id])
-      |  @@index([Artist])
+      |  id       String  @id @default(cuid())
+      |  AlbumId  Int     @unique
+      |  Title    String
+      |  ArtistId String
+      |
+      |  Artist  Artist  @relation(fields: [ArtistId], references: [id])
+      |  @@index([ArtistId])
       |}
-      |"""
+      """
   }
 
   override protected def beforeAll(): Unit = {
