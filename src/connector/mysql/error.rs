@@ -120,6 +120,24 @@ impl From<my::error::Error> for Error {
             my::error::Error::Server(ServerError {
                 ref message,
                 code,
+                state: _,
+            }) if code == 1406 => {
+                let splitted: Vec<&str> = message.split_whitespace().collect();
+                let splitted: Vec<&str> = splitted.iter().flat_map(|s| s.split('\'')).collect();
+                let column_name = splitted[6];
+
+                let mut builder = Error::builder(ErrorKind::LengthMismatch {
+                    column: Some(column_name.to_owned()),
+                });
+
+                builder.set_original_code(code.to_string());
+                builder.set_original_message(message);
+
+                builder.build()
+            }
+            my::error::Error::Server(ServerError {
+                ref message,
+                code,
                 ref state,
             }) => {
                 let kind = ErrorKind::QueryError(
