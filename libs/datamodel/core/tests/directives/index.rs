@@ -24,11 +24,13 @@ fn basic_index_must_work() {
 }
 
 #[test]
-fn indexes_on_relation_fields_must_work() {
+fn indexes_on_relation_fields_must_error() {
     let dml = r#"
     model User {
-        id             Int            @id
-        identification Identification @relation(references:[id])
+        id               Int @id
+        identificationId Int
+        
+        identification   Identification @relation(fields: [identificationId], references:[id])
 
         @@index([identification])
     }
@@ -38,13 +40,12 @@ fn indexes_on_relation_fields_must_work() {
     }
     "#;
 
-    let schema = parse(dml);
-    let user_model = schema.assert_has_model("User");
-    user_model.assert_has_index(IndexDefinition {
-        name: None,
-        fields: vec!["identification".to_string()],
-        tpe: IndexType::Normal,
-    });
+    let errors = parse_error(dml);
+    errors.assert_is(DatamodelError::new_model_validation_error(
+        "The index definition refers to the relation fields identification. Index definitions must reference only scalar fields.",
+        "User",
+        Span::new(195,218),
+    ));
 }
 
 #[test]

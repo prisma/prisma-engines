@@ -11,14 +11,17 @@ class RelationIsNullSpec extends FlatSpec with Matchers with ApiSpecBase {
     """
       |model Message {
       |  id          String  @id @default(cuid())
-      |  image       Image?  @relation(name: "MessageImageRelation", references: [id])
       |  messageName String?
+      |  image_id    String?
+      |
+      |  image Image? @relation(fields: [image_id], references: [id])
       |}
       |
       |model Image {
       |  id        String   @id @default(cuid())
-      |  message   Message? @relation(name: "MessageImageRelation")
       |  imageName String?
+      |
+      |  message Message?
       |}
     """
   }

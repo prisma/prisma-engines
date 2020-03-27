@@ -116,11 +116,7 @@ impl Filter {
         }
 
         match self {
-            Self::Scalar(sf) => sf
-                .batched()
-                .into_iter()
-                .map(|sf| Self::Scalar(sf))
-                .collect(),
+            Self::Scalar(sf) => sf.batched().into_iter().map(|sf| Self::Scalar(sf)).collect(),
             Self::And(filters) => batch(filters, |filters| Filter::And(filters)),
             Self::Or(filters) => batch(filters, |filters| Filter::Or(filters)),
             _ => vec![self],
@@ -204,7 +200,6 @@ pub fn test_data_model() -> InternalDataModelRef {
             is_auto_generated_int_id: false,
             relation_name: "bar".to_owned(),
             relation_side: RelationSide::A,
-            data_source_fields: vec![],
             relation_info: dml::RelationInfo::new(""),
         }),
     ];

@@ -14,9 +14,11 @@ class FilterUnwrapSomeSpec extends FlatSpec with Matchers with ApiSpecBase {
                                                     |}
                                                     |
                                                     |model SubItem {
-                                                    |  id   String  @id @default(cuid())
-                                                    |  name String? @unique
-                                                    |  item Item?   @relation(references: [id])
+                                                    |  id      String  @id @default(cuid())
+                                                    |  name    String? @unique
+                                                    |  item_id String?
+                                                    |
+                                                    |  item Item? @relation(fields: [item_id], references: [id])
                                                     |}""".stripMargin }
 
   override protected def beforeAll(): Unit = {

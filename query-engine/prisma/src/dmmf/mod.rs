@@ -72,10 +72,7 @@ impl Serialize for DMMFMapping {
     }
 }
 
-pub fn render_dmmf(
-    dml: &datamodel::Datamodel,
-    query_schema: QuerySchemaRef,
-) -> DataModelMetaFormat {
+pub fn render_dmmf(dml: &datamodel::Datamodel, query_schema: QuerySchemaRef) -> DataModelMetaFormat {
     let (schema, mappings) = DMMFQuerySchemaRenderer::render(query_schema);
     let datamodel_json = datamodel::json::dmmf::render_to_dmmf_value(&dml);
 

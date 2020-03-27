@@ -12,6 +12,7 @@ class NonEmbeddedPaginationSpecForCuids extends NonEmbeddedPaginationSpec {
       |  id        String   @id @default(cuid())
       |  createdAt DateTime @default(now())
       |  name      String   @unique
+      |
       |  todos     Todo[]
       |}
       |
@@ -19,7 +20,9 @@ class NonEmbeddedPaginationSpecForCuids extends NonEmbeddedPaginationSpec {
       |  id        String   @id @default(cuid())
       |  createdAt DateTime @default(now())
       |  title     String   @unique
-      |  list      List     @relation(references: [id])
+      |  list_id   String
+      |
+      |  list List @relation(fields: [list_id], references: [id])
       |}
     """
   }
@@ -35,6 +38,7 @@ class NonEmbeddedPaginationSpecForUuids extends NonEmbeddedPaginationSpec {
       |  id        String   @id @default(uuid())
       |  createdAt DateTime @default(now())
       |  name      String   @unique
+      |
       |  todos     Todo[]
       |}
       |
@@ -42,7 +46,9 @@ class NonEmbeddedPaginationSpecForUuids extends NonEmbeddedPaginationSpec {
       |  id        String   @id @default(uuid())
       |  createdAt DateTime @default(now())
       |  title     String   @unique
-      |  list      List     @relation(references: [id])
+      |  list_id   String
+      |
+      |  list List @relation(fields: [list_id], references: [id])
       |}
     """
   }
@@ -57,6 +63,7 @@ class NonEmbeddedPaginationSpecForInts extends NonEmbeddedPaginationSpec {
       |  id        Int      @id
       |  createdAt DateTime @default(now())
       |  name      String   @unique
+      |
       |  todos     Todo[]
       |}
       |
@@ -64,7 +71,9 @@ class NonEmbeddedPaginationSpecForInts extends NonEmbeddedPaginationSpec {
       |  id        Int      @id
       |  createdAt DateTime @default(now())
       |  title     String   @unique
-      |  list      List     @relation(references: [id])
+      |  list_id   String
+      |
+      |  list List @relation(fields: [list_id], references: [id])
       |}
     """
   }

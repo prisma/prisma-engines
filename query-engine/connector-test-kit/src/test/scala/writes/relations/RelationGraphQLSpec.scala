@@ -12,7 +12,9 @@ class RelationGraphQLSpec extends FlatSpec with Matchers with ApiSpecBase {
       val dm1 = """model Owner{
                      id        String  @id @default(cuid())
                      ownerName String? @unique
-                     cat       Cat?    @relation(references: [id])
+                     catId     String?
+
+                     cat       Cat?    @relation(fields: [catId], references: [id])
                   }
 
                   model Cat{
@@ -30,7 +32,9 @@ class RelationGraphQLSpec extends FlatSpec with Matchers with ApiSpecBase {
                   model Cat{
                      id      String  @id @default(cuid())
                      catName String? @unique
-                     owner   Owner?  @relation(references: [id])
+                     ownerId String?
+
+                     owner   Owner?  @relation(fields: [ownerId], references: [id])
                   }"""
 
       TestDataModels(mongo = Vector(dm1, dm2), sql = Vector(dm1, dm2))

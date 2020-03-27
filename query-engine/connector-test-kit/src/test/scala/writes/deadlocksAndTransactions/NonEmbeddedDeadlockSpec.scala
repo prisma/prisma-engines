@@ -220,6 +220,7 @@ class NonEmbeddedDeadlockSpec extends FlatSpec with Matchers with Retries with A
   }
 
   val testDataModels = {
+    // TODO: use new syntax for Mongo
     val dm1 = """
         model Todo {
            id       String    @id @default(cuid())
@@ -234,6 +235,7 @@ class NonEmbeddedDeadlockSpec extends FlatSpec with Matchers with Retries with A
         }
       """
 
+    // TODO: use new syntax for Mongo
     val dm2 = """
         model Todo {
            id       String   @id @default(cuid())
@@ -256,9 +258,11 @@ class NonEmbeddedDeadlockSpec extends FlatSpec with Matchers with Retries with A
         }
 
         model Comment {
-           id   String @id @default(cuid())
-           text String?
-           todo Todo?
+           id     String  @id @default(cuid())
+           text   String?
+           todoId String?
+
+           todo Todo? @relation(fields:[todoId], references: [id])
         }
       """
 

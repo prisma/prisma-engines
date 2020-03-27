@@ -3,6 +3,9 @@ package writes.uniquesAndNodeSelectors.relation_uniques
 import org.scalatest.{FlatSpec, Matchers}
 import util._
 
+// Note: These tests changed from including the relation fields into only including the scalars as per the new relations
+// implementation. Tests are retained as they offer a good coverage over scalar + relation field usage.
+//
 // 1) Checks if relation fields in @@unique in any constellation work with our mutations.
 // Possible relation cardinalities:
 // - 1!:1!
@@ -31,11 +34,12 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
     val project = ProjectDsl.fromString {
       s"""
          |model Parent {
-         |  id    Int    @id
-         |  child Child  @relation(references: [id])
-         |  p     String
+         |  id       Int    @id
+         |  p        String
+         |  child_id Int
          |
-         |  @@unique([child, p])
+         |  child Child  @relation(fields: [child_id], references: [id])
+         |  @@unique([child_id, p])
          |}
          |
          |model Child {
@@ -81,8 +85,8 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
         |mutation {
         |  updateParent(
         |    where: {
-        |      child_p: {
-        |        child: 1,
+        |      child_id_p: {
+        |        child_id: 1,
         |        p: "Parent1"
         |      }
         |    }
@@ -114,7 +118,7 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
       """
         |mutation {
         |  upsertParent(
-        |    where: { child_p: { child: 2, p: "Parent2" } }
+        |    where: { child_id_p: { child_id: 2, p: "Parent2" } }
         |    update: { p: "Doesn't matter" }
         |    create: { id: 2, p: "Parent2", child: { create: { id: 2, c: "Child2" } } }
         |  ) {
@@ -152,11 +156,13 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
     val project = ProjectDsl.fromString {
       s"""
          |model Parent {
-         |  id    Int    @id
-         |  child Child  @relation(references: [id, c])
-         |  p     String
+         |  id       Int    @id
+         |  p        String
+         |  child_id Int
+         |  child_c  String
          |
-         |  @@unique([child, p])
+         |  child Child  @relation(fields: [child_id, child_c], references: [id, c])
+         |  @@unique([child_id, child_c, p])
          |}
          |
          |model Child {
@@ -202,7 +208,7 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
     val res2 = server.query(
       """
         |mutation {
-        |  updateParent(where: { child_p: { child: { child_id: 1, child_c: "Child1" }, p: "Parent1" } } data: { p: "UpdatedParent" }) {
+        |  updateParent(where: { child_id_child_c_p: { child_id: 1, child_c: "Child1", p: "Parent1" } } data: { p: "UpdatedParent" }) {
         |    p
         |  }
         |}
@@ -229,7 +235,7 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
       """
         |mutation {
         |  upsertParent(
-        |    where:  { child_p: { child: { child_id: 2, child_c: "Child2" }, p: "Parent2" } }
+        |    where:  { child_id_child_c_p: { child_id: 2, child_c: "Child2", p: "Parent2" } }
         |    update: { p: "Doesn't matter" }
         |    create: { id: 2, p: "Parent2", child: { create: { id: 2, c: "Child2" } } }
         |  ) {
@@ -268,11 +274,12 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
     val project = ProjectDsl.fromString {
       s"""
          |model Parent {
-         |  id    Int    @id
-         |  child Child  @relation(references: [id])
-         |  p     String
+         |  id       Int    @id
+         |  p        String
+         |  child_id Int
          |
-         |  @@unique([child, p])
+         |  child Child  @relation(fields: [child_id], references: [id])
+         |  @@unique([child_id, p])
          |}
          |
          |model Child {
@@ -305,7 +312,7 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
     val res2 = server.query(
       """
         |mutation {
-        |  updateParent(where: { child_p: { child: 1, p: "Parent1" } } data: { p: "UpdatedParent1" }) {
+        |  updateParent(where: { child_id_p: { child_id: 1, p: "Parent1" } } data: { p: "UpdatedParent1" }) {
         |    p
         |  }
         |}
@@ -332,7 +339,7 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
       """
         |mutation {
         |  upsertParent(
-        |    where: { child_p: { child: 2, p: "Parent2" } }
+        |    where: { child_id_p: { child_id: 2, p: "Parent2" } }
         |    update: { p: "doesn't matter" }
         |    create: { id: 2, p: "Parent2", child: { create: { id: 2, c: "Child2" } } }
         |  ) {
@@ -351,7 +358,7 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
         |mutation {
         |  deleteParent(
         |    where: {
-        |      child_p: { child: 2, p: "Parent2" }
+        |      child_id_p: { child_id: 2, p: "Parent2" }
         |    }
         |  ) {
         |    p
@@ -414,7 +421,7 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
         |mutation {
         |  updateParent(
         |    where: {
-        |      child_p: { child: 2, p: "Parent2New" }
+        |      child_id_p: { child_id: 2, p: "Parent2New" }
         |    }
         |    data: {
         |      child: {
@@ -515,11 +522,13 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
     val project = ProjectDsl.fromString {
       s"""
          |model Parent {
-         |  id    Int    @id
-         |  child Child  @relation(references: [id, c])
-         |  p     String
+         |  id       Int    @id
+         |  p        String
+         |  child_id Int
+         |  child_c  String
          |
-         |  @@unique([child, p])
+         |  child Child  @relation(fields: [child_id, child_c], references: [id, c])
+         |  @@unique([child_id, child_c, p])
          |}
          |
          |model Child {
@@ -552,7 +561,7 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
     val res2 = server.query(
       """
         |mutation {
-        |  updateParent(where: { child_p: { child: { child_id: 1, child_c: "Child1" }, p: "Parent1" } } data: { p: "UpdatedParent1" }) {
+        |  updateParent(where: { child_id_child_c_p: { child_id: 1, child_c: "Child1", p: "Parent1" } } data: { p: "UpdatedParent1" }) {
         |    p
         |  }
         |}
@@ -579,7 +588,7 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
       """
         |mutation {
         |  upsertParent(
-        |    where: { child_p: { child: { child_id: 2, child_c: "Child2" }, p: "Parent2" } }
+        |    where: { child_id_child_c_p: { child_id: 2, child_c: "Child2", p: "Parent2" } }
         |    update: { p: "doesn't matter" }
         |    create: { id: 2, p: "Parent2", child: { create: { id: 2, c: "Child2" } } }
         |  ) {
@@ -598,7 +607,7 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
         |mutation {
         |  deleteParent(
         |    where: {
-        |      child_p: { child: { child_id: 2, child_c: "Child2" }, p: "Parent2" }
+        |      child_id_child_c_p: { child_id: 2, child_c: "Child2", p: "Parent2" }
         |    }
         |  ) {
         |    p
@@ -661,7 +670,7 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
         |mutation {
         |  updateParent(
         |    where: {
-        |      child_p: { child: { child_id: 2, child_c: "Child2" }, p: "Parent2New" }
+        |      child_id_child_c_p: { child_id: 2, child_c: "Child2", p: "Parent2New" }
         |    }
         |    data: {
         |      child: {
@@ -782,11 +791,12 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
     val project = ProjectDsl.fromString {
       s"""
          |model Parent {
-         |  id    Int    @id
-         |  child Child  @relation(references: [id])
-         |  p     String
+         |  id       Int    @id
+         |  p        String
+         |  child_id Int
          |
-         |  @@unique([child, p])
+         |  child Child  @relation(fields: [child_id], references: [id])
+         |  @@unique([child_id, p])
          |}
          |
          |model Child {
@@ -820,7 +830,7 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
     val res2 = server.query(
       """
         |mutation {
-        |  updateParent(where: { child_p: { child: 1, p: "Parent1" } } data: { p: "Parent1Updated" }) {
+        |  updateParent(where: { child_id_p: { child_id: 1, p: "Parent1" } } data: { p: "Parent1Updated" }) {
         |    p
         |  }
         |}
@@ -856,7 +866,7 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
       """
         |mutation {
         |  upsertParent(
-        |    where: { child_p: { child: 2, p: "Parent2" } }
+        |    where: { child_id_p: { child_id: 2, p: "Parent2" } }
         |    update: { p: "doesn't matter" }
         |    create: { id: 2, p: "Parent2", child: { create: { id: 2, c: "Child2" } } }
         |  ) {
@@ -873,7 +883,7 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
       """
         |mutation {
         |  deleteParent(
-        |    where: { child_p: { child: 2, p: "Parent2" } }
+        |    where: { child_id_p: { child_id: 2, p: "Parent2" } }
         |  ) {
         |    p
         |  }
@@ -933,7 +943,7 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
       """
         |mutation {
         |  updateParent(
-        |    where: { child_p: { child: 2, p: "Parent2New" } }
+        |    where: { child_id_p: { child_id: 2, p: "Parent2New" } }
         |    data: {
         |      child: {
         |        connect: {
@@ -980,7 +990,7 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
         |    data: {
         |      parents: {
         |        upsert: {
-        |          where: { child_p: { child: 3, p: "Parent3" } }
+        |          where: { child_id_p: { child_id: 3, p: "Parent3" } }
         |          create: { id: 3, p: "Parent3" }
         |          update: { p: "doesn't matter" }
         |        }
@@ -1080,11 +1090,13 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
     val project = ProjectDsl.fromString {
       s"""
          |model Parent {
-         |  id    Int    @id
-         |  child Child  @relation(references: [id, c])
-         |  p     String
+         |  id       Int    @id
+         |  p        String
+         |  child_id Int
+         |  child_c  String
          |
-         |  @@unique([child, p])
+         |  child Child  @relation(fields: [child_id, child_c], references: [id, c])
+         |  @@unique([child_id, child_c, p])
          |}
          |
          |model Child {
@@ -1118,7 +1130,7 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
     val res2 = server.query(
       """
         |mutation {
-        |  updateParent(where: { child_p: { child: { child_id: 1, child_c: "Child1" }, p: "Parent1" } } data: { p: "Parent1Updated" }) {
+        |  updateParent(where: { child_id_child_c_p: { child_id: 1, child_c: "Child1", p: "Parent1" } } data: { p: "Parent1Updated" }) {
         |    p
         |  }
         |}
@@ -1154,7 +1166,7 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
       """
         |mutation {
         |  upsertParent(
-        |    where: { child_p: { child: { child_id: 2, child_c: "Child2" }, p: "Parent2" } }
+        |    where: { child_id_child_c_p: { child_id: 2, child_c: "Child2", p: "Parent2" } }
         |    update: { p: "doesn't matter" }
         |    create: { id: 2, p: "Parent2", child: { create: { id: 2, c: "Child2" } } }
         |  ) {
@@ -1171,7 +1183,7 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
       """
         |mutation {
         |  deleteParent(
-        |    where: { child_p: { child: { child_id: 2, child_c: "Child2" }, p: "Parent2" } }
+        |    where: { child_id_child_c_p: { child_id: 2, child_c: "Child2", p: "Parent2" } }
         |  ) {
         |    p
         |  }
@@ -1231,7 +1243,7 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
       """
         |mutation {
         |  updateParent(
-        |    where: { child_p: { child: { child_id: 2, child_c: "Child2" }, p: "Parent2New" } }
+        |    where: { child_id_child_c_p: { child_id: 2, child_c: "Child2", p: "Parent2New" } }
         |    data: {
         |      child: {
         |        connect: {
@@ -1278,7 +1290,7 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
         |    data: {
         |      parents: {
         |        upsert: {
-        |          where: { child_p: { child: { child_id: 3, child_c: "Child3" }, p: "Parent3" } }
+        |          where: { child_id_child_c_p: { child_id: 3, child_c: "Child3", p: "Parent3" } }
         |          create: { id: 3, p: "Parent3" }
         |          update: { p: "doesn't matter" }
         |        }
@@ -1366,11 +1378,12 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
     val project = ProjectDsl.fromString {
       s"""
          |model Parent {
-         |  id    Int    @id
-         |  child Child  @relation(references: [id])
-         |  p     String
+         |  id       Int    @id
+         |  p        String
+         |  child_id Int
          |
-         |  @@unique([child, p])
+         |  child Child  @relation(fields: [child_id], references: [id])
+         |  @@unique([child_id, p])
          |}
          |
          |model Child {
@@ -1440,7 +1453,7 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
         |query {
         |  parents(
         |    before: {
-        |      child_p: { child: 3, p: "Parent3"}
+        |      child_id_p: { child_id: 3, p: "Parent3"}
         |    }
         |  ){
         |    p
@@ -1462,7 +1475,7 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
         |query {
         |  parents(
         |    after: {
-        |      child_p: { child: 1, p: "Parent1" }
+        |      child_id_p: { child_id: 1, p: "Parent1" }
         |    }
         |  ){
         |    p
@@ -1484,10 +1497,10 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
         |query {
         |  parents(
         |    after: {
-        |      child_p: { child: 1, p: "Parent1"}
+        |      child_id_p: { child_id: 1, p: "Parent1"}
         |    }
         |    before: {
-        |      child_p: { child: 3, p: "Parent3"}
+        |      child_id_p: { child_id: 3, p: "Parent3"}
         |    }
         |  ){
         |    p
@@ -1513,11 +1526,13 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
     val project = ProjectDsl.fromString {
       s"""
          |model Parent {
-         |  id    Int    @id
-         |  child Child  @relation(references: [id, c])
-         |  p     String
+         |  id       Int    @id
+         |  p        String
+         |  child_id Int
+         |  child_c  String
          |
-         |  @@unique([child, p])
+         |  child Child  @relation(fields: [child_id, child_c], references: [id, c])
+         |  @@unique([child_id, child_c, p])
          |}
          |
          |model Child {
@@ -1587,7 +1602,7 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
         |query {
         |  parents(
         |    before: {
-        |      child_p: { child: { child_id: 3, child_c: "Child3" }, p: "Parent3" }
+        |      child_id_child_c_p: { child_id: 3, child_c: "Child3", p: "Parent3" }
         |    }
         |  ){
         |    p
@@ -1609,7 +1624,7 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
         |query {
         |  parents(
         |    after: {
-        |      child_p: { child: { child_id: 1, child_c: "Child1" }, p: "Parent1" }
+        |      child_id_child_c_p: { child_id: 1, child_c: "Child1", p: "Parent1" }
         |    }
         |  ){
         |    p
@@ -1631,10 +1646,10 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
         |query {
         |  parents(
         |    after: {
-        |      child_p: { child: { child_id: 1, child_c: "Child1" }, p: "Parent1" }
+        |      child_id_child_c_p: { child_id: 1, child_c: "Child1", p: "Parent1" }
         |    }
         |    before: {
-        |      child_p: { child: { child_id: 3, child_c: "Child3" }, p: "Parent3" }
+        |      child_id_child_c_p: { child_id: 3, child_c: "Child3", p: "Parent3" }
         |    }
         |  ){
         |    p

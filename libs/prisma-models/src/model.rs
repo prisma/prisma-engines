@@ -45,17 +45,13 @@ impl ModelTemplate {
         let fields = Fields::new(
             self.fields
                 .into_iter()
-                .map(|fi| fi.build(Arc::downgrade(&model)))
+                .map(|ft| ft.build(Arc::downgrade(&model)))
                 .collect(),
             Arc::downgrade(&model),
             self.id_field_names,
         );
 
-        let indexes = self
-            .indexes
-            .into_iter()
-            .map(|i| i.build(&fields.all))
-            .collect();
+        let indexes = self.indexes.into_iter().map(|i| i.build(&fields.all)).collect();
 
         // The model is created here and fields WILL BE UNSET before now!
         model.fields.set(fields).unwrap();
@@ -80,6 +76,10 @@ impl PartialEq for Model {
 }
 
 impl Model {
+    pub(crate) fn finalize(&self) {
+        self.fields.get().unwrap().finalize();
+    }
+
     /// Returns the set of fields to be used as the primary identifier for a record of that model.
     /// The identifier is nothing but an internal convention to have an anchor point for querying, or in other words,
     /// the identifier is not to be mistaken for a stable, external identifier, but has to be understood as

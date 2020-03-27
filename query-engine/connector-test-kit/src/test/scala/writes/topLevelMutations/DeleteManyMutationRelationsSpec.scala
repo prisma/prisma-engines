@@ -17,7 +17,9 @@ class DeleteManyMutationRelationsSpec extends FlatSpec with Matchers with ApiSpe
                         model Child{
                             id        String @id @default(cuid())
                             c         String @unique
-                            parentReq Parent @relation(references: [id])
+                            parentId  String
+
+                            parentReq Parent @relation(fields: [parentId], references: [id])
                         }"""
 
     val project = ProjectDsl.fromString { schema }
@@ -64,7 +66,9 @@ class DeleteManyMutationRelationsSpec extends FlatSpec with Matchers with ApiSpe
                         model Child{
                             id        String @id @default(cuid())
                             c         String @unique
-                            parentReq Parent @relation(references: [id])
+                            parentId  String
+
+                            parentReq Parent @relation(fields: [parentId], references: [id])
                         }"""
 
     val project = ProjectDsl.fromString { schema }
@@ -698,10 +702,11 @@ class DeleteManyMutationRelationsSpec extends FlatSpec with Matchers with ApiSpe
 
   "a PM to CM  relation" should "delete the parent from other relations as well" in {
     val testDataModels = {
+      // TODO: use new syntax for Mongo
       val dm1 = """model Parent{
-                       id           String @id @default(cuid())
-                       p            String @unique
-                       childrenOpt  Child[] @relation(references: [id])
+                       id           String    @id @default(cuid())
+                       p            String    @unique
+                       childrenOpt  Child[]   @relation(references: [id])
                        stepChildOpt StepChild @relation(references: [id])
                    }
 
@@ -720,19 +725,23 @@ class DeleteManyMutationRelationsSpec extends FlatSpec with Matchers with ApiSpe
       val dm2 = """model Parent{
                        id           String     @id @default(cuid())
                        p            String     @unique
+                       stepChildId  String?
+
                        childrenOpt  Child[]
-                       stepChildOpt StepChild? @relation(references: [id])
+                       stepChildOpt StepChild? @relation(fields: [stepChildId], references: [id])
                    }
 
                    model Child{
                        id         String @id @default(cuid())
                        c          String @unique
+
                        parentsOpt Parent[]
                    }
 
                    model StepChild{
                         id        String  @id @default(cuid())
                         s         String  @unique
+
                         parentOpt Parent?
                    }"""
       TestDataModels(mongo = dm1, sql = dm2)

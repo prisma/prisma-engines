@@ -647,7 +647,7 @@ impl QueryGraph {
                 alias: None,
                 model,
                 args: QueryArguments::default(),
-                selected_fields: identifiers.into(),
+                selected_fields: ModelProjection::union(identifiers),
                 nested: vec![],
                 selection_order: vec![],
             });

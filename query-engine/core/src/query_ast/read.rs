@@ -98,7 +98,7 @@ pub struct RecordQuery {
     pub alias: Option<String>,
     pub model: ModelRef,
     pub filter: Option<Filter>,
-    pub selected_fields: SelectedFields,
+    pub selected_fields: ModelProjection,
     pub nested: Vec<ReadQuery>,
     pub selection_order: Vec<String>,
 }
@@ -109,7 +109,7 @@ pub struct ManyRecordsQuery {
     pub alias: Option<String>,
     pub model: ModelRef,
     pub args: QueryArguments,
-    pub selected_fields: SelectedFields,
+    pub selected_fields: ModelProjection,
     pub nested: Vec<ReadQuery>,
     pub selection_order: Vec<String>,
 }
@@ -120,7 +120,7 @@ pub struct RelatedRecordsQuery {
     pub alias: Option<String>,
     pub parent_field: RelationFieldRef,
     pub args: QueryArguments,
-    pub selected_fields: SelectedFields,
+    pub selected_fields: ModelProjection,
     pub nested: Vec<ReadQuery>,
     pub selection_order: Vec<String>,
 

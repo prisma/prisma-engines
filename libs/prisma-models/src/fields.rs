@@ -1,4 +1,5 @@
 use crate::*;
+use itertools::Itertools;
 use once_cell::sync::OnceCell;
 use std::{
     collections::BTreeSet,
@@ -28,6 +29,38 @@ impl Fields {
             created_at: OnceCell::new(),
             updated_at: OnceCell::new(),
             model,
+        }
+    }
+
+    pub(crate) fn finalize(&self) {
+        self.mark_read_only()
+    }
+
+    fn mark_read_only(&self) {
+        let inlined_rfs: Vec<&RelationFieldRef> = self
+            .all
+            .iter()
+            .filter_map(|f| match f {
+                Field::Relation(rf) if rf.is_inlined_on_enclosing_model() => Some(rf),
+                _ => None,
+            })
+            .collect();
+
+        for rf in inlined_rfs {
+            for field_name in rf.relation_info.fields.iter() {
+                let field = self
+                    .all
+                    .iter()
+                    .find(|f| match f {
+                        Field::Scalar(sf) if &sf.name == field_name => true,
+                        _ => false,
+                    })
+                    .expect("Expected inlined relation field reference to be an existing scalar field.");
+
+                if let Field::Scalar(sf) = field {
+                    sf.read_only.set(true).unwrap();
+                }
+            }
         }
     }
 
@@ -61,6 +94,10 @@ impl Fields {
 
     pub fn scalar(&self) -> Vec<ScalarFieldRef> {
         self.scalar_weak().iter().map(|f| f.upgrade().unwrap()).collect()
+    }
+
+    pub fn scalar_writable(&self) -> Vec<ScalarFieldRef> {
+        self.scalar().into_iter().filter(|sf| !sf.is_read_only()).collect()
     }
 
     pub fn scalar_list(&self) -> Vec<ScalarFieldRef> {
@@ -213,5 +250,6 @@ impl Fields {
         self.all
             .iter()
             .flat_map(|field| field.data_source_fields().into_iter().map(|dsf| dsf.name.clone()))
+            .unique()
     }
 }

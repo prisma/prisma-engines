@@ -1,5 +1,7 @@
 use crate::common::*;
+use datamodel::ast::Span;
 use datamodel::dml::*;
+use datamodel::error::DatamodelError;
 
 #[test]
 fn int_id_without_default_should_have_strategy_none() {
@@ -146,7 +148,7 @@ fn multi_field_ids_must_work() {
 }
 
 #[test]
-fn relation_field_as_id_must_work() {
+fn relation_field_as_id_must_error() {
     let dml = r#"
     model User {
         identification Identification @relation(references:[id]) @id
@@ -157,13 +159,16 @@ fn relation_field_as_id_must_work() {
     }
     "#;
 
-    let schema = parse(dml);
-    let user_model = schema.assert_has_model("User");
-    user_model.assert_has_field("identification").assert_is_id();
+    let errors = parse_error(dml);
+    errors.assert_is(DatamodelError::new_directive_validation_error(
+        "The field `identification` is a relation field and cannot be marked with `@id`. Only scalar fields can be declared as id.",
+        "id",
+        Span::new(84, 86),
+    ));
 }
 
 #[test]
-fn relation_fields_as_part_of_compound_id_must_work() {
+fn relation_fields_as_part_of_compound_id_must_error() {
     let dml = r#"
     model User {
         name           String            
@@ -177,7 +182,10 @@ fn relation_fields_as_part_of_compound_id_must_work() {
     }
     "#;
 
-    let schema = parse(dml);
-    let user_model = schema.assert_has_model("User");
-    user_model.assert_has_id_fields(&["name", "identification"]);
+    let errors = parse_error(dml);
+    errors.assert_is(DatamodelError::new_model_validation_error(
+        "The id definition refers to the relation fields identification. Id definitions must reference only scalar fields.",
+        "User",
+        Span::new(136, 162),
+    ));
 }

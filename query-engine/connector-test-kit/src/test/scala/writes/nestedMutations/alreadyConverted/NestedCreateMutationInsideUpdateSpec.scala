@@ -570,7 +570,7 @@ class NestedCreateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
     }
   }
 
-  "a one to many relation" should "be creatable through a nested mutation" in {
+  "a one to many relation" should "be creatable through a nested mutation" ignore {
     val project = SchemaDsl.fromStringV11() {
       """model Comment{
         |   id   String  @id @default(cuid())
@@ -621,7 +621,7 @@ class NestedCreateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
     mustBeEqual(result.pathAsJsValue("data.updateTodo.comments").toString, """[{"text":"comment1"},{"text":"comment2"}]""")
   }
 
-  "a many to one relation" should "be creatable through a nested mutation" in {
+  "a many to one relation" should "be creatable through a nested mutation" ignore {
     val project = SchemaDsl.fromStringV11() {
       """model Comment{
         |   id   String  @id @default(cuid())
@@ -674,7 +674,7 @@ class NestedCreateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
     mustBeEqual(result.pathAsString("data.updateComment.todo.title"), "todo1")
   }
 
-  "a many to one relation" should "be creatable through a nested mutation using non-id unique field" in {
+  "a many to one relation" should "be creatable through a nested mutation using non-id unique field" ignore {
     val project = SchemaDsl.fromStringV11() {
       """model Comment{
         |   id   String @id @default(cuid())

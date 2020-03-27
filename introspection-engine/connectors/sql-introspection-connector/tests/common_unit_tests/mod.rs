@@ -623,7 +623,7 @@ fn uniqueness_is_preserved_when_generating_data_model_from_a_schema() {
 
 #[test]
 fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
-    let ref_data_model = Datamodel {
+    let expected_data_model = Datamodel {
         models: vec![
             Model {
                 database_name: None,
@@ -850,7 +850,7 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
     };
     let introspection_result = calculate_model(&schema).expect("calculate data model");
 
-    assert_eq!(introspection_result.datamodel, ref_data_model);
+    assert_eq!(introspection_result.datamodel, expected_data_model);
 }
 
 #[test]

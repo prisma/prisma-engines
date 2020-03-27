@@ -19,7 +19,7 @@ pub trait CreateInputTypeBuilderExtension<'a>: InputTypeBuilderBase<'a> {
         // Compute input fields for scalar fields.
         let scalar_fields: Vec<ScalarFieldRef> = model
             .fields()
-            .scalar()
+            .scalar_writable()
             .into_iter()
             .filter(|f|  Self::field_should_be_kept_for_create_input_type(&f))
             .collect();
@@ -70,7 +70,6 @@ pub trait CreateInputTypeBuilderExtension<'a>: InputTypeBuilderBase<'a> {
                 let field_is_opposite_relation_field = parent_field
                     .as_ref()
                     .and_then(|pf| {
-                        // TODO: The original version compared full case classes. Is this solution here enough?
                         if pf.related_field().name == rf.name {
                             Some(pf)
                         } else {

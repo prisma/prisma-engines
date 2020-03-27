@@ -44,6 +44,7 @@ pub struct ScalarField {
     pub model: ModelWeakRef,
     pub(crate) is_unique: bool,
     pub(crate) data_source_field: OnceCell<DataSourceFieldRef>,
+    pub(crate) read_only: OnceCell<bool>,
 }
 
 impl Eq for ScalarField {}
@@ -101,6 +102,7 @@ impl ScalarFieldTemplate {
             is_required: self.is_required,
             is_list: self.is_list,
             is_auto_generated_int_id: self.is_auto_generated_int_id,
+            read_only: OnceCell::new(),
             is_unique: self.is_unique,
             internal_enum: self.internal_enum,
             behaviour: self.behaviour,
@@ -187,5 +189,9 @@ impl ScalarField {
             .get()
             .ok_or_else(|| String::from("Data source field must be set!"))
             .unwrap()
+    }
+
+    pub fn is_read_only(&self) -> bool {
+        self.read_only.get_or_init(|| false).clone()
     }
 }

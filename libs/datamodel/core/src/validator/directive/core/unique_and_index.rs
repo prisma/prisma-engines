@@ -18,6 +18,17 @@ impl DirectiveValidator<dml::Field> for FieldLevelUniqueDirectiveValidator {
             );
         }
 
+        if let dml::FieldType::Relation(_) = obj.field_type {
+            return self.new_directive_validation_error(
+                &format!(
+                    "The field `{}` is a relation field and cannot be marked with `{}`. Only scalar fields can be made unique.",
+                    &obj.name,
+                    self.directive_name()
+                ),
+                args.span(),
+            );
+        }
+
         obj.is_unique = true;
 
         Ok(())
@@ -133,12 +144,34 @@ trait IndexDirectiveBase<T>: DirectiveValidator<T> {
             })
             .collect();
 
+        let referenced_relation_fields: Vec<String> = index_def
+            .fields
+            .iter()
+            .filter(|field| match obj.find_field(&field) {
+                Some(field) => field.field_type.is_relation(),
+                None => false,
+            })
+            .map(|f| f.to_owned())
+            .collect();
+
         if !undefined_fields.is_empty() {
             return Err(DatamodelError::new_model_validation_error(
                 &format!(
                     "The {}index definition refers to the unknown fields {}.",
                     if index_type == IndexType::Unique { "unique " } else { "" },
                     undefined_fields.join(", ")
+                ),
+                &obj.name,
+                args.span(),
+            ));
+        }
+
+        if !referenced_relation_fields.is_empty() {
+            return Err(DatamodelError::new_model_validation_error(
+                &format!(
+                    "The {}index definition refers to the relation fields {}. Index definitions must reference only scalar fields.",
+                    if index_type == IndexType::Unique { "unique " } else { "" },
+                    referenced_relation_fields.join(", ")
                 ),
                 &obj.name,
                 args.span(),

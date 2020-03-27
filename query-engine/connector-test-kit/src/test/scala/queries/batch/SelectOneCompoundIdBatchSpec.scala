@@ -3,12 +3,13 @@ package queries.batch
 import org.scalatest.{FlatSpec, Matchers}
 import util.{ApiSpecBase, ProjectDsl}
 
-class SelectOneCompoundIdBatchSpec  extends FlatSpec with Matchers with ApiSpecBase {
+class SelectOneCompoundIdBatchSpec extends FlatSpec with Matchers with ApiSpecBase {
 
   val project = ProjectDsl.fromString {
     """model Artist {
       |  firstName String
       |  lastName  String
+      |  
       |  @@unique([firstName, lastName])
       |}
       |"""
@@ -36,7 +37,9 @@ class SelectOneCompoundIdBatchSpec  extends FlatSpec with Matchers with ApiSpecB
   }
 
   "one successful query" should "work" in {
-    server.batch(Array("""query {findOneArtist(where:{firstName_lastName:{firstName:"Musti",lastName:"Naukio"}}) {firstName lastName}}"""), project, legacy = false).toString should be(
+    server
+      .batch(Array("""query {findOneArtist(where:{firstName_lastName:{firstName:"Musti",lastName:"Naukio"}}) {firstName lastName}}"""), project, legacy = false)
+      .toString should be(
       """[{"data":{"findOneArtist":{"firstName":"Musti","lastName":"Naukio"}}}]"""
     )
   }
@@ -89,7 +92,9 @@ class SelectOneCompoundIdBatchSpec  extends FlatSpec with Matchers with ApiSpecB
 
   "one singular failing query" should "work" in {
 
-    server.batch(Array("""query {findOneArtist(where:{firstName_lastName:{firstName:"NO",lastName:"AVAIL"}}) {lastName}}"""), project, legacy = false).toString should be(
+    server
+      .batch(Array("""query {findOneArtist(where:{firstName_lastName:{firstName:"NO",lastName:"AVAIL"}}) {lastName}}"""), project, legacy = false)
+      .toString should be(
       """[{"data":{"findOneArtist":null}}]"""
     )
   }

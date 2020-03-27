@@ -315,7 +315,7 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
 
   // todo other test
 
-  "a one to many relation should be creatable through a nested mutation" in {
+  "a one to many relation should be creatable through a nested mutation" ignore {
     val project = SchemaDsl.fromStringV11() {
       s"""model Todo{
         |   id        String    @id @default(cuid())
@@ -351,7 +351,7 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
     mustBeEqual(result.pathAsJsValue("data.createTodo.comments").toString, """[{"text":"comment1"},{"text":"comment2"}]""")
   }
 
-  "a many to one relation should be creatable through a nested mutation" in {
+  "a many to one relation should be creatable through a nested mutation" ignore {
     val project = SchemaDsl.fromStringV11() {
       """model Todo{
         |   id       String   @id @default(cuid())
@@ -389,7 +389,7 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
     mustBeEqual(result.pathAsString("data.createComment.todo.title"), "todo1")
   }
 
-  "a many to many relation should be creatable through a nested mutation" in {
+  "a many to many relation should be creatable through a nested mutation" ignore {
     val project = SchemaDsl.fromStringV11() {
       s"""model Todo{
         |   id     String @id @default(cuid())
@@ -449,7 +449,7 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
     mustBeEqual(result2.pathAsJsValue("data.createTag.todos").toString, """[{"title":"todo1"},{"title":"todo2"}]""")
   }
 
-  "A nested create on a one to one relation should correctly assign violations to offending model and not partially execute first direction" in {
+  "A nested create on a one to one relation should correctly assign violations to offending model and not partially execute first direction" ignore {
     val project = SchemaDsl.fromStringV11() {
       """model User{
         |   id     String  @id @default(cuid())
@@ -505,7 +505,7 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
     server.query("query{posts{id}}", project).pathAsSeq("data.posts").length should be(1)
   }
 
-  "A nested create on a one to one relation should correctly assign violations to offending model and not partially execute second direction" in {
+  "A nested create on a one to one relation should correctly assign violations to offending model and not partially execute second direction" ignore {
     val project = SchemaDsl.fromStringV11() {
       """model User{
         |   id      String  @id @default(cuid())
@@ -561,7 +561,7 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
     server.query("query{posts{id}}", project).pathAsSeq("data.posts").length should be(1)
   }
 
-  "a deeply nested mutation should execute all levels of the mutation" in {
+  "a deeply nested mutation should execute all levels of the mutation" ignore {
     val project = SchemaDsl.fromStringV11() {
       s"""model List{
         |   id    String @id @default(cuid())
@@ -620,7 +620,7 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
     result.pathAsString("data.createList.todos.[0].tag.name") should equal("the tag")
   }
 
-  "a required one2one relation should be creatable through a nested create mutation" in {
+  "a required one2one relation should be creatable through a nested create mutation" ignore {
 
     val project = SchemaDsl.fromStringV11() {
       """model Comment{
@@ -678,7 +678,7 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
     )
   }
 
-  "a required one2one relation should be creatable through a nested connected mutation" in {
+  "a required one2one relation should be creatable through a nested connected mutation" ignore {
 
     val project = SchemaDsl.fromStringV11() {
       """model Comment{
@@ -786,7 +786,7 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
 
   }
 
-  "creating a nested item with an id of model UUID should work" in {
+  "creating a nested item with an id of model UUID should work" ignore {
     val project = SchemaDsl.fromStringV11() {
       s"""
          |model List {
@@ -825,7 +825,7 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
     UUID.fromString(theUuid) // should now blow up
   }
 
-  "Backrelation bug should be fixed" in {
+  "Backrelation bug should be fixed" ignore {
 
     val project = SchemaDsl.fromStringV11() {
       s"""

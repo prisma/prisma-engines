@@ -11,15 +11,17 @@ class MultiFieldUniqueMutationSpec extends FlatSpec with Matchers with ApiSpecBa
     val project = SchemaDsl.fromStringV11() { """model User {
                                                   |  id   String @id @default(cuid())
                                                   |  name String
+                                                  |
                                                   |  blog Blog?
                                                   |}
                                                   |
                                                   |model Blog {
-                                                  |  id       String @id @default(cuid())
-                                                  |  title    String
-                                                  |  category String
-                                                  |  author   User?
+                                                  |  id        String  @id @default(cuid())
+                                                  |  title     String
+                                                  |  category  String
+                                                  |  author_id String?
                                                   |
+                                                  |  author   User? @relation(fields: [author_id], references: [id])
                                                   |  @@unique([title, category])
                                                   |}
                                                 """.stripMargin }
@@ -81,6 +83,7 @@ class MultiFieldUniqueMutationSpec extends FlatSpec with Matchers with ApiSpecBa
     val project = SchemaDsl.fromStringV11() { """model User {
                                                 |  id    String @id @default(cuid())
                                                 |  name  String
+                                                |
                                                 |  blogs Blog[]
                                                 |}
                                                 |
@@ -88,8 +91,9 @@ class MultiFieldUniqueMutationSpec extends FlatSpec with Matchers with ApiSpecBa
                                                 |  id       String @id @default(cuid())
                                                 |  title    String
                                                 |  category String
-                                                |  author   User?
+                                                |  author_id String?
                                                 |
+                                                |  author   User? @relation(fields: [author_id], references: [id])
                                                 |  @@unique([title, category])
                                                 |}
                                               """.stripMargin }
@@ -160,8 +164,9 @@ class MultiFieldUniqueMutationSpec extends FlatSpec with Matchers with ApiSpecBa
                                                 |  id       String @id @default(cuid())
                                                 |  title    String
                                                 |  category String
-                                                |  author   User?
+                                                |  author_id String?
                                                 |
+                                                |  author   User? @relation(fields: [author_id], references: [id])
                                                 |  @@unique([title, category])
                                                 |}
                                               """.stripMargin }
@@ -274,8 +279,9 @@ class MultiFieldUniqueMutationSpec extends FlatSpec with Matchers with ApiSpecBa
                                                 |  title     String
                                                 |  category  String
                                                 |  published Boolean
-                                                |  author    User?
+                                                |  author_id String?
                                                 |
+                                                |  author   User? @relation(fields: [author_id], references: [id])
                                                 |  @@unique([title, category])
                                                 |}
                                               """.stripMargin }
@@ -386,8 +392,9 @@ class MultiFieldUniqueMutationSpec extends FlatSpec with Matchers with ApiSpecBa
                                                 |  id        String @id @default(cuid())
                                                 |  title     String
                                                 |  category  String
-                                                |  author    User?
+                                                |  author_id String?
                                                 |
+                                                |  author   User? @relation(fields: [author_id], references: [id])
                                                 |  @@unique([title, category])
                                                 |}
                                               """.stripMargin }
@@ -494,8 +501,9 @@ class MultiFieldUniqueMutationSpec extends FlatSpec with Matchers with ApiSpecBa
                                                 |  id        String @id @default(cuid())
                                                 |  title     String
                                                 |  category  String
-                                                |  author    User?
+                                                |  author_id String?
                                                 |
+                                                |  author   User? @relation(fields: [author_id], references: [id])
                                                 |  @@unique([title, category])
                                                 |}
                                               """.stripMargin }
@@ -571,8 +579,9 @@ class MultiFieldUniqueMutationSpec extends FlatSpec with Matchers with ApiSpecBa
                                                 |  id        String @id @default(cuid())
                                                 |  title     String
                                                 |  category  String
-                                                |  author    User?
+                                                |  author_id String?
                                                 |
+                                                |  author   User? @relation(fields: [author_id], references: [id])
                                                 |  @@unique([title, category])
                                                 |}
                                               """.stripMargin }
