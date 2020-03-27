@@ -353,9 +353,10 @@ trait SchemaBaseV11 extends PlayJsonExtensions {
   val schemaP1optToC1opt = {
     val s1 = """
       model Parent {
-          id       String @id @default(cuid())
-          p        String @unique
-          childOpt Child? @relation(references: [id])
+          id       String  @id @default(cuid())
+          p        String  @unique
+          childOpt Child?  @relation(fields: [childId], references: [id])
+          childId  String?
       }
 
       model Child {
@@ -374,7 +375,8 @@ trait SchemaBaseV11 extends PlayJsonExtensions {
       model Child {
           id        String  @id @default(cuid())
           c         String  @unique
-          parentOpt Parent? @relation(references: [id])
+          parentOpt Parent? @relation(fields: [parentId],references: [id])
+          parentId  String?
       }"""
 
     TestDataModels(mongo = Vector(s1, s2), sql = Vector(s1, s2))
@@ -385,7 +387,8 @@ trait SchemaBaseV11 extends PlayJsonExtensions {
     model Parent {
         id       String  @id @default(cuid())
         p        String  @unique
-        childOpt Child?  @relation(references: [id])
+        childOpt Child?  @relation(fields: [childId], references: [id])
+        childId  String?
     }
 
     model Child {
@@ -404,22 +407,10 @@ trait SchemaBaseV11 extends PlayJsonExtensions {
     model Child {
         id         String   @id @default(cuid())
         c          String  @unique
-        parentsOpt Parent[] @relation(references: [id])
+        parentsOpt Parent[] @relation(fields: [parentIds], references: [id])
+        parentIds  String[]
     }"""
 
-    val s3 = """
-    model Parent {
-        id       String  @id @default(cuid())
-        p        String  @unique
-        childOpt Child?
-    }
-
-    model Child {
-        id         String   @id @default(cuid())
-        c          String  @unique
-        parentsOpt Parent[]
-    }"""
-
-    TestDataModels(mongo = Vector(s1, s2), sql = Vector(s1, s3))
+    TestDataModels(mongo = Vector(s1, s2), sql = Vector(s1))
   }
 }

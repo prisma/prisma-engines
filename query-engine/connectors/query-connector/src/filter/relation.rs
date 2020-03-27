@@ -94,6 +94,7 @@ mod tests {
     use crate::{filter::*, *};
 
     #[test]
+    #[ignore]
     fn one_relation_is_null() {
         let schema = test_data_model();
         let user = schema.find_model("User").unwrap();
@@ -109,6 +110,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore]
     fn no_related() {
         let schema = test_data_model();
         let user = schema.find_model("User").unwrap();
@@ -149,6 +151,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore]
     fn to_one_related() {
         let schema = test_data_model();
         let user = schema.find_model("User").unwrap();
@@ -189,6 +192,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore]
     fn at_least_one_related() {
         let schema = test_data_model();
         let user = schema.find_model("User").unwrap();
@@ -229,6 +233,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore]
     fn every_related() {
         let schema = test_data_model();
         let user = schema.find_model("User").unwrap();

@@ -221,7 +221,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
 
   ///OLD
 
-  "a one to many relation" should "be updateable by id through a nested mutation" in {
+  "a one to many relation" should "be updateable by id through a nested mutation" ignore {
     val project = SchemaDsl.fromStringV11() {
       s"""model Todo {
         | id       String    @id @default(cuid())
@@ -285,7 +285,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
     mustBeEqual(result.pathAsString("data.updateTodo.comments.[1].text").toString, """update comment2""")
   }
 
-  "a one to many relation" should "be updateable by any unique argument through a nested mutation" in {
+  "a one to many relation" should "be updateable by any unique argument through a nested mutation" ignore {
     val project = SchemaDsl.fromStringV11() {
       s"""model Todo {
         | id       String @id @default(cuid())
@@ -347,7 +347,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
     mustBeEqual(result.pathAsString("data.updateTodo.comments.[1].text").toString, """update comment2""")
   }
 
-  "a many to many relation with an optional backrelation" should "be updateable by any unique argument through a nested mutation" in {
+  "a many to many relation with an optional backrelation" should "be updateable by any unique argument through a nested mutation" ignore {
     val project = SchemaDsl.fromStringV11() {
       s"""model List {
         | id         String @id @default(cuid())
@@ -404,7 +404,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
     mustBeEqual(result.pathAsString("data.updateList.todoes.[0].todoUnique").toString, """new todo""")
   }
 
-  "a many to one relation" should "be updateable by id through a nested mutation" in {
+  "a many to one relation" should "be updateable by id through a nested mutation" ignore {
     val project = SchemaDsl.fromStringV11() {
       s"""model Todo {
         | id       String    @id @default(cuid())
@@ -463,7 +463,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
     mustBeEqual(result.pathAsJsValue("data.updateComment.todo").toString, """{"title":"updated title"}""")
   }
 
-  "a one to one relation" should "be updateable by id through a nested mutation" in {
+  "a one to one relation" should "be updateable by id through a nested mutation" ignore {
     val project = SchemaDsl.fromStringV11() {
       """model Todo {
         | id    String @id @default(cuid())
@@ -801,7 +801,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
       """{"data":{"updateTop":{"nameTop":"updated top","middles":[{"nameMiddle":"updated middle","bottoms":[{"nameBottom":"updated bottom"},{"nameBottom":"the second bottom"}]},{"nameMiddle":"the second middle","bottoms":[{"nameBottom":"the third bottom"},{"nameBottom":"the fourth bottom"}]}]}}}""")
   }
 
-  "a deeply nested mutation" should "execute all levels of the mutation if there are only node edges on the path and there are no backrelations" in {
+  "a deeply nested mutation" should "execute all levels of the mutation if there are only node edges on the path and there are no backrelations" ignore {
     val project = SchemaDsl.fromStringV11() { s"""model Top {
                                              |  id      String   @id @default(cuid())
                                              |  nameTop String   @unique
@@ -882,7 +882,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
       """{"data":{"updateTop":{"nameTop":"updated top","middles":[{"nameMiddle":"updated middle","bottoms":[{"nameBottom":"updated bottom"},{"nameBottom":"the second bottom"}]},{"nameMiddle":"the second middle","bottoms":[{"nameBottom":"the third bottom"},{"nameBottom":"the fourth bottom"}]}]}}}""")
   }
 
-  "a deeply nested mutation" should "execute all levels of the mutation if there are model and node edges on the path " in {
+  "a deeply nested mutation" should "execute all levels of the mutation if there are model and node edges on the path " ignore {
     val project = SchemaDsl.fromStringV11() { s"""model Top {
                                              |  id      String   @id @default(cuid())
                                              |  nameTop String   @unique
@@ -959,7 +959,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
       """{"data":{"updateTop":{"nameTop":"updated top","middles":[{"nameMiddle":"updated middle","bottom":{"nameBottom":"updated bottom"}},{"nameMiddle":"the second middle","bottom":{"nameBottom":"the second bottom"}}]}}}""")
   }
 
-  "a deeply nested mutation" should "execute all levels of the mutation if there are model and node edges on the path  and back relations are missing and node edges follow model edges" in {
+  "a deeply nested mutation" should "execute all levels of the mutation if there are model and node edges on the path  and back relations are missing and node edges follow model edges" ignore {
     val project = SchemaDsl.fromStringV11() { s"""model Top {
                                              |  id      String  @id @default(cuid())
                                              |  nameTop String  @unique
@@ -1049,7 +1049,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
       """{"data":{"updateTop":{"nameTop":"updated top","middle":{"nameMiddle":"updated middle","bottom":{"nameBottom":"updated bottom","below":[{"nameBelow":"updated below"},{"nameBelow":"second below"}]}}}}}""")
   }
 
-  "a deeply nested mutation" should "fail if there are model and node edges on the path and back relations are missing and node edges follow model edges but the path is interrupted" in {
+  "a deeply nested mutation" should "fail if there are model and node edges on the path and back relations are missing and node edges follow model edges but the path is interrupted" ignore {
     val project = SchemaDsl.fromStringV11() { s"""model Top {
                                              |  id      String  @id @default(cuid())
                                              |  nameTop String  @unique
@@ -1163,7 +1163,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
     )
   }
 
-  "a deeply nested mutation" should "execute all levels of the mutation if there are only model edges on the path" in {
+  "a deeply nested mutation" should "execute all levels of the mutation if there are only model edges on the path" ignore {
     val project = SchemaDsl.fromStringV11() { """model Top {
                                              |  id      String  @id @default(cuid())
                                              |  nameTop String  @unique
@@ -1240,7 +1240,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
       """{"data":{"updateTop":{"nameTop":"updated top","middle":{"nameMiddle":"updated middle","bottom":{"nameBottom":"updated bottom"}}}}}""")
   }
 
-  "a deeply nested mutation" should "execute all levels of the mutation if there are only model edges on the path and there are no backrelations" in {
+  "a deeply nested mutation" should "execute all levels of the mutation if there are only model edges on the path and there are no backrelations" ignore {
     val project = SchemaDsl.fromStringV11() { """model Top {
                                              |  id      String  @id @default(cuid())
                                              |  nameTop String  @unique
@@ -1315,7 +1315,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
       """{"data":{"updateTop":{"nameTop":"updated top","middle":{"nameMiddle":"updated middle","bottom":{"nameBottom":"updated bottom"}}}}}""")
   }
 
-  "a deeply nested mutation" should "fail if there are only model edges on the path but there is no connected item to update at the end" in {
+  "a deeply nested mutation" should "fail if there are only model edges on the path but there is no connected item to update at the end" ignore {
     val project = SchemaDsl.fromStringV11() { """model Top {
                                              |  id      String @id @default(cuid())
                                              |  nameTop String @unique

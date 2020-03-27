@@ -14,17 +14,18 @@ class UpdatedAtShouldChangeSpec extends FlatSpec with Matchers with ApiSpecBase 
       |  top       String   @unique
       |  createdAt DateTime @default(now())
       |  updatedAt DateTime @updatedAt
-      |  bottom_id String?
-      |  
-      |  bottom    Bottom?  @relation(fields: [bottom_id], references: [id])
+      |
+      |  bottomId  String?
+      |  bottom    Bottom?  @relation(fields: [bottomId], references: [id])
       |}
       |
       |model Bottom {
-      |  id        String @id @default(cuid())
-      |  bottom    String @unique
-      |  top       Top?
+      |  id        String   @id @default(cuid())
+      |  bottom    String   @unique
       |  createdAt DateTime @default(now())
       |  updatedAt DateTime @updatedAt
+      |  
+      |  top       Top?
       |}
       |
       |model List {

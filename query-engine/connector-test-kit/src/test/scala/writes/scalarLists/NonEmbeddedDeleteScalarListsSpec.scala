@@ -11,9 +11,11 @@ class NonEmbeddedDeleteScalarListsSpec extends FlatSpec with Matchers with ApiSp
 
     val project: Project = SchemaDsl.fromStringV11() {
       s"""model Top {
-        | id     String  @id @default(cuid())
-        | name   String  @unique
-        | bottom Bottom? @relation(references: [id])
+        | id       String  @id @default(cuid())
+        | name     String  @unique
+        | bottomId String?
+        | 
+        | bottom Bottom? @relation(fields: [bottomId], references: [id])
         |}
         |
         |model Bottom {
@@ -43,7 +45,7 @@ class NonEmbeddedDeleteScalarListsSpec extends FlatSpec with Matchers with ApiSp
     res.toString should be("""{"data":{"updateTop":{"name":"test","bottom":null}}}""")
   }
 
-  "A cascading delete  mutation" should "also delete ListTable entries" ignore  { // TODO: Remove ignore when cascading again
+  "A cascading delete  mutation" should "also delete ListTable entries" ignore { // TODO: Remove ignore when cascading again
 
     val project: Project = SchemaDsl.fromStringV11() {
       s"""model Top {

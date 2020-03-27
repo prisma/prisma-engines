@@ -9,16 +9,20 @@ class DeleteManyRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBa
 
   val schema =
     """model Top{
-      |   id     String  @id @default(cuid())
-      |   top    String
-      |   bottom Bottom? @relation(references: [id])
+      |   id       String  @id @default(cuid())
+      |   top      String
+      |   bottomId String?
+      |
+      |   bottom Bottom? @relation(fields: [bottomId], references: [id])
       |}
       |
       |model Bottom{
-      |   id         String @id @default(cuid())
-      |   bottom     String
+      |   id           String  @id @default(cuid())
+      |   bottom       String
+      |   veryBottomId String?
+      |
       |   top        Top?
-      |   veryBottom VeryBottom? @relation(references: [id])
+      |   veryBottom VeryBottom? @relation(fields: [veryBottomId], references: [id])
       |}
       |
       |model VeryBottom{
