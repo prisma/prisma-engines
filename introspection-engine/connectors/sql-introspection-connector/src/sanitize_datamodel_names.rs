@@ -22,35 +22,35 @@ pub fn sanitize_datamodel_names(datamodel: &mut Datamodel) {
                         .iter()
                         .map(|f: &std::string::String| sanitize_name(f.clone()).0)
                         .collect();
+                    info.fields = info
+                        .fields
+                        .iter()
+                        .map(|f: &std::string::String| sanitize_name(f.clone()).0)
+                        .collect();
                 }
                 FieldType::Enum(enum_name) => {
-                    let (sanitized_enum_name, enum_db_name) =
-                        if *enum_name == format!("{}_{}", model.name, field.name) {
-                            //MySql
-                            if model_db_name.is_none() && field_db_name.is_none() {
-                                (enum_name.clone(), None)
-                            } else {
-                                (
-                                    format!("{}_{}", sanitized_model_name, sanitized_field_name),
-                                    Some(enum_name.clone()),
-                                )
-                            }
+                    let (sanitized_enum_name, enum_db_name) = if *enum_name == format!("{}_{}", model.name, field.name)
+                    {
+                        //MySql
+                        if model_db_name.is_none() && field_db_name.is_none() {
+                            (enum_name.clone(), None)
                         } else {
-                            sanitize_name(enum_name.clone())
-                        };
+                            (
+                                format!("{}_{}", sanitized_model_name, sanitized_field_name),
+                                Some(enum_name.clone()),
+                            )
+                        }
+                    } else {
+                        sanitize_name(enum_name.clone())
+                    };
 
                     if let Some(old_name) = enum_db_name {
-                        enum_renames.insert(
-                            old_name.clone(),
-                            (sanitized_enum_name.clone(), Some(old_name.clone())),
-                        );
+                        enum_renames.insert(old_name.clone(), (sanitized_enum_name.clone(), Some(old_name.clone())));
                     };
 
                     *enum_name = sanitized_enum_name;
 
-                    if let Some(DefaultValue::Single(ScalarValue::ConstantLiteral(name))) =
-                        &mut field.default_value
-                    {
+                    if let Some(DefaultValue::Single(ScalarValue::ConstantLiteral(name))) = &mut field.default_value {
                         let (sanitized_value, _) = sanitize_name(name.to_string());
                         *name = sanitized_value;
                     };
@@ -71,11 +71,7 @@ pub fn sanitize_datamodel_names(datamodel: &mut Datamodel) {
         }
 
         for index in &mut model.indices {
-            index.fields = index
-                .fields
-                .iter()
-                .map(|f| sanitize_name(f.clone()).0)
-                .collect();
+            index.fields = index.fields.iter().map(|f| sanitize_name(f.clone()).0).collect();
         }
 
         model.name = sanitized_model_name;
@@ -114,10 +110,7 @@ fn sanitize_name(name: String) -> (String, Option<String>) {
 
     if needs_sanitation {
         let start_cleaned: String = RE_START.replace_all(name.as_str(), "").parse().unwrap();
-        (
-            RE.replace_all(start_cleaned.as_str(), "_").parse().unwrap(),
-            Some(name),
-        )
+        (RE.replace_all(start_cleaned.as_str(), "_").parse().unwrap(), Some(name))
     } else {
         (name, None)
     }

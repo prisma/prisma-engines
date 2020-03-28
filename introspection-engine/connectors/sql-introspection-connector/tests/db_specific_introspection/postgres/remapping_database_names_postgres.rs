@@ -72,6 +72,38 @@ async fn remapping_tables_with_invalid_characters_should_work(api: &TestApi) {
 }
 
 #[test_each_connector(tags("postgres"))]
+async fn remapping_fk_columns_with_invalid_characters_should_work(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("Post", |t| {
+                t.add_column("id", types::primary());
+            });
+
+            migration.create_table("User", |t| {
+                t.add_column("id", types::primary());
+                t.add_column("post id", types::integer());
+                t.inject_custom("FOREIGN KEY (\"post id\") REFERENCES \"Post\"(\"id\")");
+            });
+        })
+        .await;
+    let dm = r#"
+            model Post {
+                id   Int    @default(autoincrement()) @id
+                User User[]
+            }
+            
+            model User {
+                id      Int  @default(autoincrement()) @id
+                post_id Int  @map("post id")
+                Post    Post @relation(fields: [post_id], references: [id])
+            }
+        "#;
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+}
+
+#[test_each_connector(tags("postgres"))]
 async fn remapping_models_in_relations_should_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
