@@ -158,3 +158,23 @@ enum Colors {
     println!("{}", actual);
     assert_eq!(actual, expected);
 }
+
+#[test]
+fn test_reformat_config_with_env() {
+    let input = r#"
+        datasource pg { 
+            provider = "postgres"
+            url = env("DATABASE_URL")
+        }
+    "#;
+
+    let expected = r#"datasource pg {
+  provider = "postgres"
+  url      = env("DATABASE_URL")
+}"#;
+
+    let mut buf = Vec::new();
+    datamodel::ast::reformat::Reformatter::reformat_to(&input, &mut buf, 2);
+    let actual = str::from_utf8(&buf).expect("unable to convert to string");
+    assert_eq!(expected, actual);
+}
