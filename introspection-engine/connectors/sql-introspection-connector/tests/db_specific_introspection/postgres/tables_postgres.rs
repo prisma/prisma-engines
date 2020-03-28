@@ -508,3 +508,29 @@ async fn introspecting_default_values_on_lists_should_be_ignored(api: &TestApi) 
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
+
+#[test_each_connector(tags("postgres"))]
+async fn introspecting_an_unsupported_type_should_and_commenting_it_out_should_also_drop_its_usages(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("Test", |t| {
+                t.add_column("id", types::integer().unique(true));
+                t.add_column("dummy", types::integer());
+                t.inject_custom("network_mac  macaddr");
+                t.add_index("unique", types::index(vec!["network_mac", "dummy"]).unique(true));
+                t.add_index("non_unique", types::index(vec!["network_mac", "dummy"]).unique(false));
+                t.inject_custom("Primary Key (\"network_mac\", \"dummy\")");
+            });
+        })
+        .await;
+
+    let warnings = dbg!(api.introspection_warnings().await);
+    assert_eq!(
+        &warnings,
+        "[{\"code\":3,\"message\":\"These fields were commented out because we currently do not support their types.\",\"affected\":[{\"model\":\"Test\",\"field\":\"network_mac\",\"tpe\":\"macaddr\"}]}]"
+    );
+
+    let result = dbg!(api.introspect().await);
+    assert_eq!(&result, "model Test {\n  dummy          Int\n  id             Int     @unique\n  // This type is currently not supported.\n  // network_mac macaddr\n}");
+}
