@@ -10,7 +10,6 @@ generator js1 {
 generator go {
     provider = "go"
     binaryTargets = ["a", "b"]
-  
 }"#;
 
 #[test]
@@ -34,6 +33,34 @@ fn serialize_generators_to_cmf() {
     "config": {}
   }
 ]"#;
+
+    print!("{}", &rendered);
+
+    assert_eq_json(&rendered, expected);
+}
+
+#[test]
+fn new_lines_in_generator_must_work() {
+    let schema = r#"
+        generator go {
+          provider = "go"
+          binaryTargets = ["b", "c"]
+        
+        }
+    "#;
+
+    let config = datamodel::parse_configuration(schema).unwrap();
+    let rendered = datamodel::json::mcf::generators_to_json(&config.generators);
+
+    let expected = r#"[
+        {
+          "name": "go",
+          "provider": "go",
+          "output": null,
+          "binaryTargets": ["b","c"],
+          "config": {}
+        }
+    ]"#;
 
     print!("{}", &rendered);
 

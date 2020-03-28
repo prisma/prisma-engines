@@ -11,7 +11,6 @@ datasource db1 {
 datasource db2 {
     provider = "mysql"
     url = "https://localhost"
-  
 }
 
 
@@ -76,6 +75,35 @@ fn must_forbid_env_functions_in_provider_field() {
         "A datasource must not use the env() function in the provider argument.",
         Span::new(9, 108),
     ));
+}
+
+#[test]
+fn new_lines_in_source_must_work() {
+    let schema = r#"
+        datasource ds {
+          provider = "postgresql"
+          url = "https://localhost"
+        
+        }
+    "#;
+
+    let config = datamodel::parse_configuration(schema).unwrap();
+    let rendered = datamodel::json::mcf::render_sources_to_json(&config.datasources);
+
+    let expected = r#"[
+        {
+          "name": "ds",
+          "connectorType": "postgresql",
+          "url": {
+              "fromEnvVar": null,
+              "value": "https://localhost"       
+          }
+        }
+    ]"#;
+
+    println!("{}", rendered);
+
+    assert_eq_json(&rendered, expected);
 }
 
 fn assert_eq_json(a: &str, b: &str) {
