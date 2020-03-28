@@ -740,7 +740,7 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
                         field_type: FieldType::Relation(RelationInfo {
                             name: "CityToUser".to_string(),
                             to: "City".to_string(),
-                            fields: vec!["city-id".to_string(), "city-name".to_string()],
+                            fields: vec!["city_id".to_string(), "city_name".to_string()],
                             to_fields: vec!["id".to_string(), "name".to_string()],
                             on_delete: OnDeleteStrategy::None,
                         }),
