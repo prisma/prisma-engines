@@ -22,6 +22,11 @@ pub fn sanitize_datamodel_names(datamodel: &mut Datamodel) {
                         .iter()
                         .map(|f: &std::string::String| sanitize_name(f.clone()).0)
                         .collect();
+                    info.fields = info
+                        .fields
+                        .iter()
+                        .map(|f: &std::string::String| sanitize_name(f.clone()).0)
+                        .collect();
                 }
                 FieldType::Enum(enum_name) => {
                     let (sanitized_enum_name, enum_db_name) = if *enum_name == format!("{}_{}", model.name, field.name)
