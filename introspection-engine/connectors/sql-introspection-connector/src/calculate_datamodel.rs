@@ -28,6 +28,8 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Introspecti
         }
 
         for foreign_key in &table.foreign_keys {
+            //todo only if no unsupported types are used
+
             model.add_field(calculate_relation_field(schema, table, foreign_key));
         }
 

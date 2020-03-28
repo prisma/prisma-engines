@@ -74,32 +74,6 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
         }
     }
 
-    // models without uniques / ids
-    for model in &mut datamodel.models {
-        if model.id_fields.is_empty()
-            && !model.fields.iter().any(|f| f.is_id || f.is_unique)
-            && !model.indices.iter().any(|i| i.is_unique())
-            && !models_with_one_to_one_relation.contains(&model.name)
-        {
-            commented_model_names.push(model.name.clone());
-            model.is_commented_out = true;
-            model.documentation = Some(
-                "The underlying table does not contain a unique identifier and can therefore currently not be handled."
-                    .to_string(),
-            );
-            models_without_identifiers.push(Model {
-                model: model.name.clone(),
-            })
-        }
-    }
-
-    // remove their backrelations
-    for name in &commented_model_names {
-        for model in &mut datamodel.models {
-            model.fields.retain(|f| !f.points_to_model(name));
-        }
-    }
-
     // fields with an empty name
     for model in &mut datamodel.models {
         for field in &mut model.fields {
@@ -145,6 +119,44 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
                     tpe: tpe.clone(),
                 })
             }
+        }
+    }
+
+    // use unsupported types to drop @@id / @@unique /@@index
+    for mf in &unsupported_types {
+        let model = datamodel.find_model_mut(&mf.model).unwrap();
+        model.indices.retain(|i| !i.fields.contains(&mf.field));
+        if model.id_fields.contains(&mf.field) {
+            model.id_fields = vec![]
+        };
+    }
+
+    // models without uniques / ids
+    for model in &mut datamodel.models {
+        if model.id_fields.is_empty()
+            && !model
+                .fields
+                .iter()
+                .any(|f| (f.is_id || f.is_unique) && !f.is_commented_out)
+            && !model.indices.iter().any(|i| i.is_unique())
+            && !models_with_one_to_one_relation.contains(&model.name)
+        {
+            commented_model_names.push(model.name.clone());
+            model.is_commented_out = true;
+            model.documentation = Some(
+                "The underlying table does not contain a unique identifier and can therefore currently not be handled."
+                    .to_string(),
+            );
+            models_without_identifiers.push(Model {
+                model: model.name.clone(),
+            })
+        }
+    }
+
+    // remove their backrelations
+    for name in &commented_model_names {
+        for model in &mut datamodel.models {
+            model.fields.retain(|f| !f.points_to_model(name));
         }
     }
 
