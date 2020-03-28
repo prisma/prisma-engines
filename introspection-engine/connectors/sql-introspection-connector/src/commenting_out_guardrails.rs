@@ -134,7 +134,10 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
     // models without uniques / ids
     for model in &mut datamodel.models {
         if model.id_fields.is_empty()
-            && !model.fields.iter().any(|f| f.is_id || f.is_unique)
+            && !model
+                .fields
+                .iter()
+                .any(|f| (f.is_id || f.is_unique) && !f.is_commented_out)
             && !model.indices.iter().any(|i| i.is_unique())
             && !models_with_one_to_one_relation.contains(&model.name)
         {
