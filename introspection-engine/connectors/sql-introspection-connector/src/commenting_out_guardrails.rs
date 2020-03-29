@@ -32,8 +32,6 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
     let mut enum_values_with_empty_names = vec![];
     let mut unsupported_types = vec![];
 
-    let mut commented_model_names = vec![];
-
     // find models with 1to1 relations
     let mut models_with_one_to_one_relation = vec![];
     for model in &datamodel.models {
@@ -68,7 +66,7 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
                     FieldArity::List => false,
                 }
             }
-            (_, _) => false,
+            _ => false,
         }) {
             models_with_one_to_one_relation.push(model.name.clone())
         }
@@ -110,9 +108,10 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
     }
 
     // fields with unsupported as datatype
-    for model in &datamodel.models {
-        for field in &model.fields {
+    for model in &mut datamodel.models {
+        for field in &mut model.fields {
             if let FieldType::Unsupported(tpe) = &field.field_type {
+                field.is_commented_out = true;
                 unsupported_types.push(ModelAndFieldType {
                     model: model.name.clone(),
                     field: field.name.clone(),
@@ -141,7 +140,6 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
             && !model.indices.iter().any(|i| i.is_unique())
             && !models_with_one_to_one_relation.contains(&model.name)
         {
-            commented_model_names.push(model.name.clone());
             model.is_commented_out = true;
             model.documentation = Some(
                 "The underlying table does not contain a unique identifier and can therefore currently not be handled."
@@ -154,9 +152,11 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
     }
 
     // remove their backrelations
-    for name in &commented_model_names {
+    for model_without_identifier in &models_without_identifiers {
         for model in &mut datamodel.models {
-            model.fields.retain(|f| !f.points_to_model(name));
+            model
+                .fields
+                .retain(|f| !f.points_to_model(model_without_identifier.model.as_ref()));
         }
     }
 
