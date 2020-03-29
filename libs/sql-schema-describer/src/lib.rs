@@ -368,7 +368,6 @@ impl PartialEq for ForeignKey {
         self.columns == other.columns
             && self.referenced_table == other.referenced_table
             && self.referenced_columns == other.referenced_columns
-            && self.on_delete_action == other.on_delete_action
     }
 }
 
