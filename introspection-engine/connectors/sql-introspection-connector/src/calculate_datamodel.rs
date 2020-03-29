@@ -27,9 +27,11 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Introspecti
             model.add_field(field);
         }
 
-        for foreign_key in &table.foreign_keys {
-            //todo only if no unsupported types are used
+        let mut copy = table.foreign_keys.clone();
 
+        copy.clear_duplicates();
+
+        for foreign_key in &copy {
             model.add_field(calculate_relation_field(schema, table, foreign_key));
         }
 
@@ -118,4 +120,21 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Introspecti
         datamodel: data_model,
         warnings,
     })
+}
+
+trait Dedup<T: PartialEq + Clone> {
+    fn clear_duplicates(&mut self);
+}
+
+impl<T: PartialEq + Clone> Dedup<T> for Vec<T> {
+    fn clear_duplicates(&mut self) {
+        let mut already_seen = vec![];
+        self.retain(|item| match already_seen.contains(item) {
+            true => false,
+            _ => {
+                already_seen.push(item.clone());
+                true
+            }
+        })
+    }
 }
