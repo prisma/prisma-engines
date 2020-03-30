@@ -97,7 +97,7 @@ class NestedConnectMutationInsideCreateSpec extends FlatSpec with Matchers with 
         """.stripMargin,
         project,
         errorCode = 2014,
-        errorContains = """The change you are trying to make would violate the required relation 'ChildToParent' between Child and Parent"""
+        errorContains = """The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models"""
       )
     }
   }

@@ -115,7 +115,7 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
       """,
         project,
         errorCode = 2017,
-        errorContains = """Error occurred during query execution:\nInterpretationError(\"Error for binding \\'3\\': RecordsNotConnected { relation_name: \\\"ChildToParent\\\", parent_name: \\\"Parent\\\", child_name: \\\"Child\\\" }""",
+        errorContains = """The records for relation `ChildToParent` between the `Parent` and `Child` models are not connected.""",
       )
 
     }
@@ -163,7 +163,7 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
       """,
         project,
         errorCode = 2014,
-        errorContains = """The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models  """
+        errorContains = """The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."""
       )
 
     }
@@ -211,7 +211,7 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
       """,
         project,
         errorCode = 2014,
-        errorContains = """The change you are trying to make would violate the required relation 'ChildToParent' between Child and Parent"""
+        errorContains = """The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."""
       )
 
     }

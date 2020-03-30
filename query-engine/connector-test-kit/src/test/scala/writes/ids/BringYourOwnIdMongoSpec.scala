@@ -58,7 +58,7 @@ class BringYourOwnIdMongoSpec extends FlatSpec with Matchers with ApiSpecBase wi
          |  createParent(data: {p: "Parent", id: true}){p, id}
          |}""",
         project = project,
-        errorCode = 5588,
+        errorCode = 0,
         errorContains = "Reason: 'id' String or Int value expected"
       )
     }

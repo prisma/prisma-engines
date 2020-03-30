@@ -222,8 +222,9 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
          |}
       """,
         project,
-        errorCode = 5588,
-        errorContains = """[Query Graph] Expected a valid parent ID to be present for a nested delete on a one-to-many relation."""
+        errorCode = 2016,
+        errorContains = """Query interpretation error. Error for binding '3': AssertionError(\"[Query Graph] Expected a valid parent ID to be present for a nested delete on a one-to-many relation."""
+        // errorContains = """[Query Graph] Expected a valid parent ID to be present for a nested delete on a one-to-many relation."""
       )
 
     }
