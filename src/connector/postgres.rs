@@ -381,7 +381,20 @@ impl PostgreSql {
 
         let tls = MakeTlsConnector::new(tls_builder.build()?);
         let (client, conn) = config.connect(tls).await?;
-        tokio::spawn(conn.map(|r| r.unwrap()));
+
+        tokio::spawn(conn.map(|r| match r {
+            Ok(_) => (),
+            Err(e) => {
+                #[cfg(not(feature = "tracing-log"))]
+                {
+                    error!("Error in PostgreSQL connection: {:?}", e);
+                }
+                #[cfg(feature = "tracing-log")]
+                {
+                    tracing::error!("Error in PostgreSQL connection: {:?}", e);
+                }
+            }
+        }));
 
         let schema = url.schema();
 
