@@ -67,10 +67,7 @@ impl QueryArguments {
     }
 
     pub fn can_batch(&self) -> bool {
-        self.filter
-            .as_ref()
-            .map(|filter| filter.can_batch())
-            .unwrap_or(false)
+        self.filter.as_ref().map(|filter| filter.can_batch()).unwrap_or(false)
     }
 
     pub fn batched(self) -> Vec<Self> {
@@ -83,8 +80,10 @@ impl QueryArguments {
                 let last = self.last;
                 let order_by = self.order_by;
 
-                filter.batched().into_iter().map(|filter| {
-                    QueryArguments {
+                filter
+                    .batched()
+                    .into_iter()
+                    .map(|filter| QueryArguments {
                         after: after.clone(),
                         before: before.clone(),
                         skip: skip.clone(),
@@ -92,10 +91,10 @@ impl QueryArguments {
                         last: last.clone(),
                         filter: Some(filter),
                         order_by: order_by.clone(),
-                    }
-                }).collect()
-            },
-            _ => vec![self]
+                    })
+                    .collect()
+            }
+            _ => vec![self],
         }
     }
 }
