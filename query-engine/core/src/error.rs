@@ -175,26 +175,3 @@ impl From<CoreError> for user_facing_errors::Error {
         }
     }
 }
-
-// pub(crate) fn as_missing_required_argument_error(
-//     &self,
-// ) -> Option<user_facing_errors::query_engine::MissingRequiredArgument> {
-//     let mut path: Vec<String> = Vec::new();
-//     let argument_name = None;
-//     let field_name = None;
-//     let object_name = None;
-//     let err = self;
-
-//     loop {
-//         match err {
-//                 QueryParserError::
-//         }
-//     }
-
-//     Some(user_facing_errors::query_engine::MissingRequiredArgument {
-//         argument_name: argument_name?,
-//         field_name: field_name?,
-//         object_name: object_name?,
-//         path: path.join("."),
-//     })
-// }
