@@ -24,6 +24,7 @@ tracing = "0.1.10"
 tracing-futures = "0.2.0"
 tokio = { version = "0.2", features = ["rt-threaded", "time"] }
 once_cell = "1.3"
+futures = "0.3.4"
 
 [dependencies.quaint]
 git = "https://github.com/prisma/quaint"

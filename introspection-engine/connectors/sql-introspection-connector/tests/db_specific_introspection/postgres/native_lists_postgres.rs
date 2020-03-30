@@ -3,7 +3,7 @@ use barrel::types;
 use test_harness::*;
 
 #[test_each_connector(tags("postgres"))]
-async fn introspecting_native_arrays_should_work(api: &TestApi) {
+async fn introspecting_native_arrays_should_work(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {

@@ -3,7 +3,7 @@ use migration_engine_tests::sql::*;
 // TODO!
 // #[test_each_connector(tags("sql"), log = "debug")]
 // async fn adding_a_unique_constraint_when_existing_data_does_not_respect_it_is_unexecutable(
-//     api: &TestApi,
+//     api: TestApi,
 // ) -> TestResult {
 //     let dm1 = r#"
 //         model Test {
@@ -54,7 +54,7 @@ use migration_engine_tests::sql::*;
 // }
 
 #[test_each_connector(tags("sql"))]
-async fn adding_a_unique_constraint_when_existing_data_respects_it_works(api: &TestApi) -> TestResult {
+async fn adding_a_unique_constraint_when_existing_data_respects_it_works(api: TestApi) -> TestResult {
     let dm1 = r#"
         model Test {
             id String @id

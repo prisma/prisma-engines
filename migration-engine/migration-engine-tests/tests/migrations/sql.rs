@@ -2,7 +2,7 @@ use migration_engine_tests::sql::*;
 use std::borrow::Cow;
 
 #[test_each_connector(tags("sql"))]
-async fn creating_tables_without_primary_key_must_work(api: &TestApi) -> TestResult {
+async fn creating_tables_without_primary_key_must_work(api: TestApi) -> TestResult {
     let dm = r#"
         model Pair {
             index Int
@@ -25,7 +25,7 @@ async fn creating_tables_without_primary_key_must_work(api: &TestApi) -> TestRes
 }
 
 #[test_each_connector(tags("sql"))]
-async fn relations_to_models_without_a_primary_key_work(api: &TestApi) -> TestResult {
+async fn relations_to_models_without_a_primary_key_work(api: TestApi) -> TestResult {
     let dm = r#"
         model Pair {
             index Int
@@ -60,7 +60,7 @@ async fn relations_to_models_without_a_primary_key_work(api: &TestApi) -> TestRe
 }
 
 #[test_each_connector(tags("sql"))]
-async fn relations_to_models_with_no_pk_and_a_single_unique_required_field_work(api: &TestApi) -> TestResult {
+async fn relations_to_models_with_no_pk_and_a_single_unique_required_field_work(api: TestApi) -> TestResult {
     let dm = r#"
         model Pair {
             index Int
@@ -90,7 +90,7 @@ async fn relations_to_models_with_no_pk_and_a_single_unique_required_field_work(
 }
 
 #[test_each_connector(capabilities("enums"), tags("sql"))]
-async fn enum_value_with_database_names_must_work(api: &TestApi) -> TestResult {
+async fn enum_value_with_database_names_must_work(api: TestApi) -> TestResult {
     let dm = r##"
         model Cat {
             id String @id
@@ -155,7 +155,7 @@ struct Cat<'a> {
 }
 
 #[test_each_connector(capabilities("enums"), tags("sql"))]
-async fn enum_defaults_must_work(api: &TestApi) -> TestResult {
+async fn enum_defaults_must_work(api: TestApi) -> TestResult {
     let dm = r##"
         model Cat {
             id String @id
@@ -203,7 +203,7 @@ async fn enum_defaults_must_work(api: &TestApi) -> TestResult {
 }
 
 #[test_each_connector(tags("sql"))]
-async fn id_as_part_of_relation_must_work(api: &TestApi) -> TestResult {
+async fn id_as_part_of_relation_must_work(api: TestApi) -> TestResult {
     let dm = r##"
         model Cat {
             nemesis_id String @id
@@ -227,7 +227,7 @@ async fn id_as_part_of_relation_must_work(api: &TestApi) -> TestResult {
 }
 
 #[test_each_connector(tags("sql"))]
-async fn multi_field_id_as_part_of_relation_must_work(api: &TestApi) -> TestResult {
+async fn multi_field_id_as_part_of_relation_must_work(api: TestApi) -> TestResult {
     let dm = r##"
         model Cat {
             nemesis_name String
@@ -260,7 +260,7 @@ async fn multi_field_id_as_part_of_relation_must_work(api: &TestApi) -> TestResu
 }
 
 #[test_each_connector(tags("sql"))]
-async fn remapped_multi_field_id_as_part_of_relation_must_work(api: &TestApi) -> TestResult {
+async fn remapped_multi_field_id_as_part_of_relation_must_work(api: TestApi) -> TestResult {
     let dm = r##"
         model Cat {
             nemesis_name String @map("dogname")
@@ -292,7 +292,7 @@ async fn remapped_multi_field_id_as_part_of_relation_must_work(api: &TestApi) ->
 }
 
 #[test_each_connector(tags("sql"))]
-async fn unique_constraints_on_composite_relation_fields(api: &TestApi) -> TestResult {
+async fn unique_constraints_on_composite_relation_fields(api: TestApi) -> TestResult {
     let dm = r##"
         model Parent {
             id    Int    @id
@@ -324,7 +324,7 @@ async fn unique_constraints_on_composite_relation_fields(api: &TestApi) -> TestR
 }
 
 #[test_each_connector(tags("sql"))]
-async fn indexes_on_composite_relation_fields(api: &TestApi) -> TestResult {
+async fn indexes_on_composite_relation_fields(api: TestApi) -> TestResult {
     let dm = r##"
         model User {
           id                  Int       @id

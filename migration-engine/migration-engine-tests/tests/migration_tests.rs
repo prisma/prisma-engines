@@ -7,7 +7,7 @@ use sql_migration_connector::{AlterIndex, CreateIndex, DropIndex, SqlMigrationSt
 use sql_schema_describer::*;
 
 #[test_each_connector]
-async fn adding_a_scalar_field_must_work(api: &TestApi) {
+async fn adding_a_scalar_field_must_work(api: TestApi) {
     let dm2 = r#"
         model Test {
             id String @id @default(cuid())
@@ -48,7 +48,7 @@ async fn adding_a_scalar_field_must_work(api: &TestApi) {
 }
 
 #[test_each_connector]
-async fn adding_an_optional_field_must_work(api: &TestApi) {
+async fn adding_an_optional_field_must_work(api: TestApi) {
     let dm2 = r#"
         model Test {
             id String @id @default(cuid())
@@ -62,7 +62,7 @@ async fn adding_an_optional_field_must_work(api: &TestApi) {
 }
 
 #[test_each_connector]
-async fn adding_an_id_field_with_a_special_name_must_work(api: &TestApi) {
+async fn adding_an_id_field_with_a_special_name_must_work(api: TestApi) {
     let dm2 = r#"
             model Test {
                 specialName String @id @default(cuid())
@@ -74,7 +74,7 @@ async fn adding_an_id_field_with_a_special_name_must_work(api: &TestApi) {
 }
 
 #[test_each_connector(ignore("sqlite"))]
-async fn adding_an_id_field_of_type_int_must_work(api: &TestApi) {
+async fn adding_an_id_field_of_type_int_must_work(api: TestApi) {
     let dm2 = r#"
         model Test {
             myId Int @id
@@ -89,7 +89,7 @@ async fn adding_an_id_field_of_type_int_must_work(api: &TestApi) {
 }
 
 #[test_each_connector(tags("sqlite"))]
-async fn adding_an_id_field_of_type_int_must_work_for_sqlite(api: &TestApi) {
+async fn adding_an_id_field_of_type_int_must_work_for_sqlite(api: TestApi) {
     let dm2 = r#"
         model Test {
             myId Int @id
@@ -104,7 +104,7 @@ async fn adding_an_id_field_of_type_int_must_work_for_sqlite(api: &TestApi) {
 }
 
 #[test_each_connector]
-async fn adding_an_id_field_of_type_int_with_autoincrement_must_work(api: &TestApi) {
+async fn adding_an_id_field_of_type_int_with_autoincrement_must_work(api: TestApi) {
     let dm2 = r#"
         model Test {
             myId Int @id @default(autoincrement())
@@ -129,7 +129,7 @@ async fn adding_an_id_field_of_type_int_with_autoincrement_must_work(api: &TestA
 }
 
 #[test_each_connector]
-async fn removing_a_scalar_field_must_work(api: &TestApi) {
+async fn removing_a_scalar_field_must_work(api: TestApi) {
     let dm1 = r#"
             model Test {
                 id String @id @default(cuid())
@@ -151,7 +151,7 @@ async fn removing_a_scalar_field_must_work(api: &TestApi) {
 }
 
 #[test_each_connector]
-async fn can_handle_reserved_sql_keywords_for_model_name(api: &TestApi) {
+async fn can_handle_reserved_sql_keywords_for_model_name(api: TestApi) {
     let dm1 = r#"
             model Group {
                 id String @id @default(cuid())
@@ -174,7 +174,7 @@ async fn can_handle_reserved_sql_keywords_for_model_name(api: &TestApi) {
 }
 
 #[test_each_connector]
-async fn can_handle_reserved_sql_keywords_for_field_name(api: &TestApi) {
+async fn can_handle_reserved_sql_keywords_for_field_name(api: TestApi) {
     let dm1 = r#"
             model Test {
                 id String @id @default(cuid())
@@ -197,7 +197,7 @@ async fn can_handle_reserved_sql_keywords_for_field_name(api: &TestApi) {
 }
 
 #[test_each_connector]
-async fn update_type_of_scalar_field_must_work(api: &TestApi) {
+async fn update_type_of_scalar_field_must_work(api: TestApi) {
     let dm1 = r#"
             model Test {
                 id String @id @default(cuid())
@@ -220,7 +220,7 @@ async fn update_type_of_scalar_field_must_work(api: &TestApi) {
 }
 
 #[test_each_connector]
-async fn changing_the_type_of_an_id_field_must_work(api: &TestApi) {
+async fn changing_the_type_of_an_id_field_must_work(api: TestApi) {
     let dm1 = r#"
             model A {
                 id Int @id
@@ -281,7 +281,7 @@ async fn changing_the_type_of_an_id_field_must_work(api: &TestApi) {
 }
 
 #[test_each_connector]
-async fn updating_db_name_of_a_scalar_field_must_work(api: &TestApi) {
+async fn updating_db_name_of_a_scalar_field_must_work(api: TestApi) {
     let dm1 = r#"
             model A {
                 id String @id @default(cuid())
@@ -303,7 +303,7 @@ async fn updating_db_name_of_a_scalar_field_must_work(api: &TestApi) {
 }
 
 #[test_each_connector]
-async fn changing_a_relation_field_to_a_scalar_field_must_work(api: &TestApi) -> TestResult {
+async fn changing_a_relation_field_to_a_scalar_field_must_work(api: TestApi) -> TestResult {
     let dm1 = r#"
         model A {
             id Int @id
@@ -359,7 +359,7 @@ async fn changing_a_relation_field_to_a_scalar_field_must_work(api: &TestApi) ->
 }
 
 #[test_each_connector]
-async fn changing_a_scalar_field_to_a_relation_field_must_work(api: &TestApi) {
+async fn changing_a_scalar_field_to_a_relation_field_must_work(api: TestApi) {
     let dm1 = r#"
             model A {
                 id Int @id
@@ -407,7 +407,7 @@ async fn changing_a_scalar_field_to_a_relation_field_must_work(api: &TestApi) {
 }
 
 #[test_each_connector]
-async fn adding_a_many_to_many_relation_must_result_in_a_prisma_style_relation_table(api: &TestApi) -> TestResult {
+async fn adding_a_many_to_many_relation_must_result_in_a_prisma_style_relation_table(api: TestApi) -> TestResult {
     let dm1 = r##"
         model A {
             id Int @id
@@ -439,7 +439,7 @@ async fn adding_a_many_to_many_relation_must_result_in_a_prisma_style_relation_t
 }
 
 #[test_each_connector]
-async fn adding_a_many_to_many_relation_with_custom_name_must_work(api: &TestApi) {
+async fn adding_a_many_to_many_relation_with_custom_name_must_work(api: TestApi) {
     let dm1 = r#"
             model A {
                 id Int @id
@@ -490,7 +490,7 @@ async fn adding_a_many_to_many_relation_with_custom_name_must_work(api: &TestApi
 }
 
 #[test_each_connector]
-async fn adding_an_inline_relation_must_result_in_a_foreign_key_in_the_model_table(api: &TestApi) -> TestResult {
+async fn adding_an_inline_relation_must_result_in_a_foreign_key_in_the_model_table(api: TestApi) -> TestResult {
     let dm1 = r#"
             model A {
                 id Int @id
@@ -552,7 +552,7 @@ async fn adding_an_inline_relation_must_result_in_a_foreign_key_in_the_model_tab
 }
 
 #[test_each_connector]
-async fn specifying_a_db_name_for_an_inline_relation_must_work(api: &TestApi) {
+async fn specifying_a_db_name_for_an_inline_relation_must_work(api: TestApi) {
     let dm1 = r#"
             model A {
                 id Int @id
@@ -585,7 +585,7 @@ async fn specifying_a_db_name_for_an_inline_relation_must_work(api: &TestApi) {
 }
 
 #[test_each_connector]
-async fn adding_an_inline_relation_to_a_model_with_an_exotic_id_type(api: &TestApi) {
+async fn adding_an_inline_relation_to_a_model_with_an_exotic_id_type(api: TestApi) {
     let dm1 = r#"
             model A {
                 id Int @id
@@ -618,7 +618,7 @@ async fn adding_an_inline_relation_to_a_model_with_an_exotic_id_type(api: &TestA
 }
 
 #[test_each_connector]
-async fn removing_an_inline_relation_must_work(api: &TestApi) -> TestResult {
+async fn removing_an_inline_relation_must_work(api: TestApi) -> TestResult {
     let dm1 = r#"
             model A {
                 id Int @id
@@ -659,7 +659,7 @@ async fn removing_an_inline_relation_must_work(api: &TestApi) -> TestResult {
 }
 
 #[test_each_connector]
-async fn moving_an_inline_relation_to_the_other_side_must_work(api: &TestApi) -> TestResult {
+async fn moving_an_inline_relation_to_the_other_side_must_work(api: TestApi) -> TestResult {
     let dm1 = r#"
             model A {
                 id Int @id
@@ -724,7 +724,7 @@ async fn moving_an_inline_relation_to_the_other_side_must_work(api: &TestApi) ->
 }
 
 #[test_each_connector]
-async fn adding_a_new_unique_field_must_work(api: &TestApi) {
+async fn adding_a_new_unique_field_must_work(api: TestApi) {
     let dm1 = r#"
             model A {
                 id Int @id
@@ -738,7 +738,7 @@ async fn adding_a_new_unique_field_must_work(api: &TestApi) {
 }
 
 #[test_each_connector]
-async fn adding_new_fields_with_multi_column_unique_must_work(api: &TestApi) {
+async fn adding_new_fields_with_multi_column_unique_must_work(api: TestApi) {
     let dm1 = r#"
             model A {
                 id Int @id
@@ -759,7 +759,7 @@ async fn adding_new_fields_with_multi_column_unique_must_work(api: &TestApi) {
 }
 
 #[test_each_connector]
-async fn unique_in_conjunction_with_custom_column_name_must_work(api: &TestApi) {
+async fn unique_in_conjunction_with_custom_column_name_must_work(api: TestApi) {
     let dm1 = r#"
             model A {
                 id Int @id
@@ -777,7 +777,7 @@ async fn unique_in_conjunction_with_custom_column_name_must_work(api: &TestApi) 
 }
 
 #[test_each_connector]
-async fn multi_column_unique_in_conjunction_with_custom_column_name_must_work(api: &TestApi) {
+async fn multi_column_unique_in_conjunction_with_custom_column_name_must_work(api: TestApi) {
     let dm1 = r#"
             model A {
                 id Int @id
@@ -798,7 +798,7 @@ async fn multi_column_unique_in_conjunction_with_custom_column_name_must_work(ap
 }
 
 #[test_each_connector]
-async fn removing_an_existing_unique_field_must_work(api: &TestApi) {
+async fn removing_an_existing_unique_field_must_work(api: TestApi) {
     let dm1 = r#"
             model A {
                 id    Int    @id
@@ -829,7 +829,7 @@ async fn removing_an_existing_unique_field_must_work(api: &TestApi) {
 }
 
 #[test_each_connector]
-async fn adding_unique_to_an_existing_field_must_work(api: &TestApi) {
+async fn adding_unique_to_an_existing_field_must_work(api: TestApi) {
     let dm1 = r#"
             model A {
                 id    Int    @id
@@ -861,7 +861,7 @@ async fn adding_unique_to_an_existing_field_must_work(api: &TestApi) {
 }
 
 #[test_each_connector]
-async fn removing_unique_from_an_existing_field_must_work(api: &TestApi) {
+async fn removing_unique_from_an_existing_field_must_work(api: TestApi) {
     let dm1 = r#"
             model A {
                 id    Int    @id
@@ -885,7 +885,7 @@ async fn removing_unique_from_an_existing_field_must_work(api: &TestApi) {
 }
 
 #[test_each_connector]
-async fn removing_multi_field_unique_index_must_work(api: &TestApi) {
+async fn removing_multi_field_unique_index_must_work(api: TestApi) {
     let dm1 = r#"
             model A {
                 id    Int    @id
@@ -921,7 +921,7 @@ async fn removing_multi_field_unique_index_must_work(api: &TestApi) {
 }
 
 #[test_each_connector]
-async fn index_renaming_must_work(api: &TestApi) -> TestResult {
+async fn index_renaming_must_work(api: TestApi) -> TestResult {
     let dm1 = r#"
             model A {
                 id Int @id
@@ -971,7 +971,7 @@ async fn index_renaming_must_work(api: &TestApi) -> TestResult {
 }
 
 #[test_each_connector]
-async fn index_renaming_must_work_when_renaming_to_default(api: &TestApi) {
+async fn index_renaming_must_work_when_renaming_to_default(api: TestApi) {
     let dm1 = r#"
             model A {
                 id Int @id
@@ -1022,7 +1022,7 @@ async fn index_renaming_must_work_when_renaming_to_default(api: &TestApi) {
 }
 
 #[test_each_connector]
-async fn index_renaming_must_work_when_renaming_to_custom(api: &TestApi) -> TestResult {
+async fn index_renaming_must_work_when_renaming_to_custom(api: TestApi) -> TestResult {
     let dm1 = r#"
         model A {
             id Int @id
@@ -1074,7 +1074,7 @@ async fn index_renaming_must_work_when_renaming_to_custom(api: &TestApi) -> Test
 }
 
 #[test_each_connector]
-async fn index_updates_with_rename_must_work(api: &TestApi) {
+async fn index_updates_with_rename_must_work(api: TestApi) {
     let dm1 = r#"
             model A {
                 id Int @id
@@ -1133,7 +1133,7 @@ async fn index_updates_with_rename_must_work(api: &TestApi) {
 }
 
 #[test_each_connector]
-async fn dropping_a_model_with_a_multi_field_unique_index_must_work(api: &TestApi) -> TestResult {
+async fn dropping_a_model_with_a_multi_field_unique_index_must_work(api: TestApi) -> TestResult {
     let dm1 = r#"
             model A {
                 id Int @id
@@ -1159,7 +1159,7 @@ async fn dropping_a_model_with_a_multi_field_unique_index_must_work(api: &TestAp
 }
 
 #[test_each_connector]
-async fn reserved_sql_key_words_must_work(api: &TestApi) {
+async fn reserved_sql_key_words_must_work(api: TestApi) {
     // Group is a reserved keyword
     let sql_family = api.sql_family();
     let dm = r#"
@@ -1190,7 +1190,7 @@ async fn reserved_sql_key_words_must_work(api: &TestApi) {
 }
 
 #[test_each_connector]
-async fn migrations_with_many_to_many_related_models_must_not_recreate_indexes(api: &TestApi) {
+async fn migrations_with_many_to_many_related_models_must_not_recreate_indexes(api: TestApi) {
     // test case for https://github.com/prisma/lift/issues/148
     let dm_1 = r#"
             model User {
@@ -1249,7 +1249,7 @@ async fn migrations_with_many_to_many_related_models_must_not_recreate_indexes(a
 }
 
 #[test_each_connector]
-async fn removing_a_relation_field_must_work(api: &TestApi) -> TestResult {
+async fn removing_a_relation_field_must_work(api: TestApi) -> TestResult {
     let dm_1 = r#"
             model User {
                 id        String  @default(cuid()) @id
@@ -1293,7 +1293,7 @@ async fn removing_a_relation_field_must_work(api: &TestApi) -> TestResult {
 }
 
 #[test_each_connector]
-async fn simple_type_aliases_in_migrations_must_work(api: &TestApi) -> TestResult {
+async fn simple_type_aliases_in_migrations_must_work(api: TestApi) -> TestResult {
     let dm1 = r#"
         type CUID = String @id @default(cuid())
 
@@ -1309,7 +1309,7 @@ async fn simple_type_aliases_in_migrations_must_work(api: &TestApi) -> TestResul
 }
 
 #[test_each_connector]
-async fn model_with_multiple_indexes_works(api: &TestApi) -> TestResult {
+async fn model_with_multiple_indexes_works(api: TestApi) -> TestResult {
     let dm = r#"
     model User {
       id         Int       @id
@@ -1347,7 +1347,7 @@ async fn model_with_multiple_indexes_works(api: &TestApi) -> TestResult {
 }
 
 #[test_each_connector]
-async fn foreign_keys_of_inline_one_to_one_relations_have_a_unique_constraint(api: &TestApi) {
+async fn foreign_keys_of_inline_one_to_one_relations_have_a_unique_constraint(api: TestApi) {
     let dm = r#"
         model Cat {
             id Int @id
@@ -1375,7 +1375,7 @@ async fn foreign_keys_of_inline_one_to_one_relations_have_a_unique_constraint(ap
 }
 
 #[test_each_connector]
-async fn column_defaults_must_be_migrated(api: &TestApi) -> TestResult {
+async fn column_defaults_must_be_migrated(api: TestApi) -> TestResult {
     let dm1 = r#"
         model Fruit {
             id Int @id
@@ -1406,7 +1406,7 @@ async fn column_defaults_must_be_migrated(api: &TestApi) -> TestResult {
 }
 
 #[test_each_connector]
-async fn escaped_string_defaults_are_not_arbitrarily_migrated(api: &TestApi) -> TestResult {
+async fn escaped_string_defaults_are_not_arbitrarily_migrated(api: TestApi) -> TestResult {
     use quaint::ast::*;
 
     let dm1 = r#"
@@ -1471,7 +1471,7 @@ async fn escaped_string_defaults_are_not_arbitrarily_migrated(api: &TestApi) -> 
 }
 
 #[test_each_connector]
-async fn created_at_does_not_get_arbitrarily_migrated(api: &TestApi) -> TestResult {
+async fn created_at_does_not_get_arbitrarily_migrated(api: TestApi) -> TestResult {
     use quaint::ast::*;
 
     let dm1 = r#"
@@ -1512,7 +1512,7 @@ async fn created_at_does_not_get_arbitrarily_migrated(api: &TestApi) -> TestResu
 }
 
 #[test_each_connector(tags("sqlite"))]
-async fn renaming_a_datasource_works(api: &TestApi) -> TestResult {
+async fn renaming_a_datasource_works(api: TestApi) -> TestResult {
     let dm1 = r#"
         datasource db1 {
             provider = "sqlite"
@@ -1547,7 +1547,7 @@ async fn renaming_a_datasource_works(api: &TestApi) -> TestResult {
 }
 
 #[test_each_connector]
-async fn relations_can_reference_arbitrary_unique_fields(api: &TestApi) -> TestResult {
+async fn relations_can_reference_arbitrary_unique_fields(api: TestApi) -> TestResult {
     let dm = r#"
         model User {
             id Int @id
@@ -1579,7 +1579,7 @@ async fn relations_can_reference_arbitrary_unique_fields(api: &TestApi) -> TestR
 }
 
 #[test_each_connector]
-async fn relations_can_reference_arbitrary_unique_fields_with_maps(api: &TestApi) -> TestResult {
+async fn relations_can_reference_arbitrary_unique_fields_with_maps(api: TestApi) -> TestResult {
     let dm = r#"
         model User {
             id Int @id
@@ -1608,7 +1608,7 @@ async fn relations_can_reference_arbitrary_unique_fields_with_maps(api: &TestApi
 }
 
 #[test_each_connector]
-async fn relations_can_reference_multiple_fields(api: &TestApi) -> TestResult {
+async fn relations_can_reference_multiple_fields(api: TestApi) -> TestResult {
     let dm = r#"
         model User {
             id Int @id
@@ -1640,7 +1640,7 @@ async fn relations_can_reference_multiple_fields(api: &TestApi) -> TestResult {
 }
 
 #[test_each_connector]
-async fn relations_with_mappings_on_both_sides_can_reference_multiple_fields(api: &TestApi) -> TestResult {
+async fn relations_with_mappings_on_both_sides_can_reference_multiple_fields(api: TestApi) -> TestResult {
     let dm = r#"
         model User {
             id Int @id
@@ -1674,7 +1674,7 @@ async fn relations_with_mappings_on_both_sides_can_reference_multiple_fields(api
 }
 
 #[test_each_connector]
-async fn relations_with_mappings_on_referenced_side_can_reference_multiple_fields(api: &TestApi) -> TestResult {
+async fn relations_with_mappings_on_referenced_side_can_reference_multiple_fields(api: TestApi) -> TestResult {
     let dm = r#"
         model User {
             id Int @id
@@ -1707,7 +1707,7 @@ async fn relations_with_mappings_on_referenced_side_can_reference_multiple_field
 }
 
 #[test_each_connector]
-async fn relations_with_mappings_on_referencing_side_can_reference_multiple_fields(api: &TestApi) -> TestResult {
+async fn relations_with_mappings_on_referencing_side_can_reference_multiple_fields(api: TestApi) -> TestResult {
     let dm = r#"
         model User {
             id Int @id
@@ -1740,7 +1740,7 @@ async fn relations_with_mappings_on_referencing_side_can_reference_multiple_fiel
 }
 
 #[test_each_connector]
-async fn foreign_keys_are_added_on_existing_tables(api: &TestApi) -> TestResult {
+async fn foreign_keys_are_added_on_existing_tables(api: TestApi) -> TestResult {
     let dm1 = r#"
         model User {
             id Int @id
@@ -1782,7 +1782,7 @@ async fn foreign_keys_are_added_on_existing_tables(api: &TestApi) -> TestResult 
 }
 
 #[test_each_connector]
-async fn basic_compound_primary_keys_must_work(api: &TestApi) -> TestResult {
+async fn basic_compound_primary_keys_must_work(api: TestApi) -> TestResult {
     let dm = r#"
         model User {
             firstName String
@@ -1804,7 +1804,7 @@ async fn basic_compound_primary_keys_must_work(api: &TestApi) -> TestResult {
 }
 
 #[test_each_connector]
-async fn compound_primary_keys_on_mapped_columns_must_work(api: &TestApi) -> TestResult {
+async fn compound_primary_keys_on_mapped_columns_must_work(api: TestApi) -> TestResult {
     let dm = r#"
         model User {
             firstName String @map("first_name")
@@ -1826,7 +1826,7 @@ async fn compound_primary_keys_on_mapped_columns_must_work(api: &TestApi) -> Tes
 }
 
 #[test_each_connector(tags("sql"))]
-async fn references_to_models_with_compound_primary_keys_must_work(api: &TestApi) -> TestResult {
+async fn references_to_models_with_compound_primary_keys_must_work(api: TestApi) -> TestResult {
     let dm = r#"
         model User {
             firstName String
@@ -1863,7 +1863,7 @@ async fn references_to_models_with_compound_primary_keys_must_work(api: &TestApi
 }
 
 #[test_each_connector]
-async fn join_tables_between_models_with_compound_primary_keys_must_work(api: &TestApi) -> TestResult {
+async fn join_tables_between_models_with_compound_primary_keys_must_work(api: TestApi) -> TestResult {
     let dm = r#"
         model Human {
             firstName String
@@ -1902,7 +1902,7 @@ async fn join_tables_between_models_with_compound_primary_keys_must_work(api: &T
 }
 
 #[test_each_connector]
-async fn join_tables_between_models_with_mapped_compound_primary_keys_must_work(api: &TestApi) -> TestResult {
+async fn join_tables_between_models_with_mapped_compound_primary_keys_must_work(api: TestApi) -> TestResult {
     let dm = r#"
         model Human {
             firstName String @map("the_first_name")
@@ -1937,7 +1937,7 @@ async fn join_tables_between_models_with_mapped_compound_primary_keys_must_work(
 }
 
 #[test_each_connector]
-async fn switching_databases_must_work(api: &TestApi) -> TestResult {
+async fn switching_databases_must_work(api: TestApi) -> TestResult {
     let dm1 = r#"
         datasource db {
             provider = "sqlite"

@@ -186,7 +186,7 @@ fn create_one_types_response() -> serde_json::Value {
 }
 
 #[test_each_connector(tags("postgres"))]
-async fn postgres_types_roundtrip(api: &TestApi) -> TestResult {
+async fn postgres_types_roundtrip(api: TestApi) -> TestResult {
     api.execute_sql(CREATE_TYPES_TABLE).await?;
 
     let (datamodel, engine) = api.introspect_and_start_query_engine().await?;
@@ -243,7 +243,7 @@ async fn postgres_types_roundtrip(api: &TestApi) -> TestResult {
 }
 
 #[test_each_connector(tags("postgres"))]
-async fn small_float_values_must_work(api: &TestApi) -> TestResult {
+async fn small_float_values_must_work(api: TestApi) -> TestResult {
     let schema = indoc! {
         r#"
         CREATE TABLE floatilla (
@@ -435,7 +435,7 @@ fn create_one_array_types_response() -> serde_json::Value {
 }
 
 #[test_each_connector(tags("postgres"))]
-async fn postgres_array_types_roundtrip(api: &TestApi) -> TestResult {
+async fn postgres_array_types_roundtrip(api: TestApi) -> TestResult {
     api.execute_sql(CREATE_ARRAY_TYPES_TABLE).await?;
 
     let (datamodel, engine) = api.introspect_and_start_query_engine().await?;
@@ -478,7 +478,7 @@ async fn postgres_array_types_roundtrip(api: &TestApi) -> TestResult {
 }
 
 #[test_each_connector(tags("postgres"), log = "debug")]
-async fn all_postgres_id_types_work(api: &TestApi) -> TestResult {
+async fn all_postgres_id_types_work(api: TestApi) -> TestResult {
     let identifier_types = &[
         ("int2", "12"),
         ("int4", "78"),
@@ -549,7 +549,7 @@ async fn all_postgres_id_types_work(api: &TestApi) -> TestResult {
 }
 
 #[test_each_connector(tags("postgres"))]
-async fn all_postgres_types_work_as_filter(api: &TestApi) -> TestResult {
+async fn all_postgres_types_work_as_filter(api: TestApi) -> TestResult {
     api.execute_sql(CREATE_TYPES_TABLE).await?;
 
     let (_datamodel, engine) = api.introspect_and_start_query_engine().await?;
@@ -652,7 +652,7 @@ const CREATE_TYPES_TABLE_WITH_DEFAULTS: &str = indoc! {
 };
 
 #[test_each_connector(tags("postgres"))]
-async fn postgres_db_level_defaults_work(api: &TestApi) -> TestResult {
+async fn postgres_db_level_defaults_work(api: TestApi) -> TestResult {
     api.execute_sql(CREATE_TYPES_TABLE_WITH_DEFAULTS).await?;
 
     let (_datamodel, engine) = api.introspect_and_start_query_engine().await?;
@@ -781,7 +781,7 @@ const CREATE_TYPES_TABLE_WITH_ARRAY_DEFAULTS: &str = indoc! {
 };
 
 #[test_each_connector(tags("postgres"))]
-async fn postgres_db_level_array_defaults_work(api: &TestApi) -> TestResult {
+async fn postgres_db_level_array_defaults_work(api: TestApi) -> TestResult {
     api.execute_sql(CREATE_TYPES_TABLE_WITH_ARRAY_DEFAULTS).await?;
 
     let (_datamodel, engine) = api.introspect_and_start_query_engine().await?;
@@ -860,7 +860,7 @@ async fn postgres_db_level_array_defaults_work(api: &TestApi) -> TestResult {
 }
 
 #[test_each_connector(tags("postgres"))]
-async fn length_mismatch_is_a_known_error(api: &TestApi) -> TestResult {
+async fn length_mismatch_is_a_known_error(api: TestApi) -> TestResult {
     let create_table = indoc!(
         r#"
             CREATE TABLE fixed_lengths (

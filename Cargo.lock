@@ -2557,6 +2557,7 @@ dependencies = [
  "async-trait",
  "barrel",
  "datamodel",
+ "futures 0.3.4",
  "introspection-connector",
  "log",
  "once_cell",

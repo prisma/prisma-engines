@@ -3,7 +3,7 @@ use barrel::types;
 use test_harness::*;
 
 #[test_each_connector(tags("postgres"))]
-async fn introspecting_a_one_to_one_req_relation_should_work(api: &TestApi) {
+async fn introspecting_a_one_to_one_req_relation_should_work(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -34,7 +34,7 @@ async fn introspecting_a_one_to_one_req_relation_should_work(api: &TestApi) {
 }
 
 #[test_each_connector(tags("postgres"))]
-async fn introspecting_two_one_to_one_relations_between_the_same_models_should_work(api: &TestApi) {
+async fn introspecting_two_one_to_one_relations_between_the_same_models_should_work(api: TestApi) {
     let barrel = api.barrel();
     barrel
         .execute(|migration| {
@@ -58,7 +58,7 @@ async fn introspecting_two_one_to_one_relations_between_the_same_models_should_w
             User_Post_user_idToUser User  @relation("Post_user_idToUser", fields: [user_id], references: [id])
             User_PostToUser_post_id User? @relation("PostToUser_post_id")
         }
-                
+
         model User {
             id                      Int   @default(autoincrement()) @id
             post_id                 Int   @unique
@@ -71,7 +71,7 @@ async fn introspecting_two_one_to_one_relations_between_the_same_models_should_w
 }
 
 #[test_each_connector(tags("postgres"))]
-async fn introspecting_a_one_to_one_relation_should_work(api: &TestApi) {
+async fn introspecting_a_one_to_one_relation_should_work(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -90,18 +90,18 @@ async fn introspecting_a_one_to_one_relation_should_work(api: &TestApi) {
                 user_id Int?  @unique
                 User    User? @relation(fields: [user_id], references: [id])
             }
-                  
+
             model User {
                 id   Int   @default(autoincrement()) @id
                 Post Post?
-            }     
+            }
         "#;
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
 
 #[test_each_connector(tags("postgres"))]
-async fn introspecting_a_one_to_one_relation_referencing_non_id_should_work(api: &TestApi) {
+async fn introspecting_a_one_to_one_relation_referencing_non_id_should_work(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -121,7 +121,7 @@ async fn introspecting_a_one_to_one_relation_referencing_non_id_should_work(api:
                 user_email String? @unique
                 User       User?   @relation(fields: [user_email], references: [email])
             }
-                  
+
             model User {
                 email String? @unique
                 id    Int     @default(autoincrement()) @id
@@ -133,7 +133,7 @@ async fn introspecting_a_one_to_one_relation_referencing_non_id_should_work(api:
 }
 
 #[test_each_connector(tags("postgres"))]
-async fn introspecting_a_one_to_many_relation_should_work(api: &TestApi) {
+async fn introspecting_a_one_to_many_relation_should_work(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -152,7 +152,7 @@ async fn introspecting_a_one_to_many_relation_should_work(api: &TestApi) {
                 user_id Int?
                 User    User? @relation(fields: [user_id], references: [id])
             }
-            
+
             model User {
                 id   Int    @default(autoincrement()) @id
                 Post Post[]
@@ -163,7 +163,7 @@ async fn introspecting_a_one_to_many_relation_should_work(api: &TestApi) {
 }
 
 #[test_each_connector(tags("postgres"))]
-async fn introspecting_duplicate_fks_should_ignore_one_of_them(api: &TestApi) {
+async fn introspecting_duplicate_fks_should_ignore_one_of_them(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -194,7 +194,7 @@ async fn introspecting_duplicate_fks_should_ignore_one_of_them(api: &TestApi) {
                  user_id Int?
                  User    User? @relation("Post_user_idToUser", fields: [user_id], references: [id])
              }
-             
+
              model User {
                  id   Int    @default(autoincrement()) @id
                  Post Post[] @relation("Post_user_idToUser")
@@ -205,7 +205,7 @@ async fn introspecting_duplicate_fks_should_ignore_one_of_them(api: &TestApi) {
 }
 
 #[test_each_connector(tags("postgres"))]
-async fn introspecting_a_one_req_to_many_relation_should_work(api: &TestApi) {
+async fn introspecting_a_one_req_to_many_relation_should_work(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -224,7 +224,7 @@ async fn introspecting_a_one_req_to_many_relation_should_work(api: &TestApi) {
                 user_id Int
                 User    User @relation(fields: [user_id], references: [id])
             }
-            
+
             model User {
                 id   Int    @default(autoincrement()) @id
                 Post Post[]
@@ -235,7 +235,7 @@ async fn introspecting_a_one_req_to_many_relation_should_work(api: &TestApi) {
 }
 
 #[test_each_connector(tags("postgres"))]
-async fn introspecting_a_prisma_many_to_many_relation_should_work(api: &TestApi) {
+async fn introspecting_a_prisma_many_to_many_relation_should_work(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -293,7 +293,7 @@ async fn introspecting_a_prisma_many_to_many_relation_should_work(api: &TestApi)
 
 // currently disallowed by the validator since the relation tables do not have ids
 //#[test_one_connector(connector = "postgres")]
-//async fn introspecting_a_many_to_many_relation_should_work(api: &TestApi) {
+//async fn introspecting_a_many_to_many_relation_should_work(api: TestApi) {
 //    let barrel = api.barrel();
 //    let _setup_schema = barrel
 //        .execute(|migration| {
@@ -333,7 +333,7 @@ async fn introspecting_a_prisma_many_to_many_relation_should_work(api: &TestApi)
 //}
 //
 //#[test_one_connector(connector = "postgres")]
-//async fn introspecting_a_many_to_many_relation_with_extra_fields_should_work(api: &TestApi) {
+//async fn introspecting_a_many_to_many_relation_with_extra_fields_should_work(api: TestApi) {
 //    let barrel = api.barrel();
 //    let _setup_schema = barrel
 //        .execute(|migration| {
@@ -400,7 +400,7 @@ async fn introspecting_a_many_to_many_relation_with_an_id_should_work(api: &Test
                 id           Int            @default(autoincrement()) @id
                 PostsToUsers PostsToUsers[]
             }
-            
+
             model PostsToUsers {
                 id      Int  @id
                 post_id Int
@@ -408,17 +408,17 @@ async fn introspecting_a_many_to_many_relation_with_an_id_should_work(api: &Test
                 Post    Post @relation(fields: [post_id], references: [id])
                 User    User @relation(fields: [user_id], references: [id])
             }
-            
+
             model User {
                 id           Int            @default(autoincrement()) @id
                 PostsToUsers PostsToUsers[]
-            }        
+            }
         "#;
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
 #[test_each_connector(tags("postgres"))]
-async fn introspecting_a_self_relation_should_work(api: &TestApi) {
+async fn introspecting_a_self_relation_should_work(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -450,7 +450,7 @@ async fn introspecting_a_self_relation_should_work(api: &TestApi) {
 
 // TODO: bring `onDelete` back once `prisma migrate` is a thing
 //#[test_each_connector(tags("postgres"))]
-// async fn introspecting_cascading_delete_behaviour_should_work(api: &TestApi) {
+// async fn introspecting_cascading_delete_behaviour_should_work(api: TestApi) {
 //     let barrel = api.barrel();
 //     barrel
 //         .execute(|migration| {
@@ -480,7 +480,7 @@ async fn introspecting_a_self_relation_should_work(api: &TestApi) {
 // }
 
 #[test_each_connector(tags("postgres"))]
-async fn introspecting_default_values_on_relations_should_work(api: &TestApi) {
+async fn introspecting_default_values_on_relations_should_work(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -500,7 +500,7 @@ async fn introspecting_default_values_on_relations_should_work(api: &TestApi) {
                 user_id Int?  @default(0)
                 User    User? @relation(fields: [user_id], references: [id])
             }
-            
+
             model User {
                 id   Int    @default(autoincrement()) @id
                 Post Post[]
@@ -511,7 +511,7 @@ async fn introspecting_default_values_on_relations_should_work(api: &TestApi) {
 }
 
 #[test_each_connector(tags("postgres"))]
-async fn introspecting_id_fields_with_foreign_key_should_work(api: &TestApi) {
+async fn introspecting_id_fields_with_foreign_key_should_work(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -531,7 +531,7 @@ async fn introspecting_id_fields_with_foreign_key_should_work(api: &TestApi) {
                 user_id Int    @id
                 User    User   @relation(fields: [user_id], references: [id])
             }
-            
+
             model User {
                 id   Int    @default(autoincrement()) @id
                 Post Post[]
@@ -542,7 +542,7 @@ async fn introspecting_id_fields_with_foreign_key_should_work(api: &TestApi) {
 }
 
 #[test_each_connector(tags("postgres"))]
-async fn introspecting_prisma_10_relations_should_work(api: &TestApi) {
+async fn introspecting_prisma_10_relations_should_work(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -587,7 +587,7 @@ async fn introspecting_prisma_10_relations_should_work(api: &TestApi) {
               id        String      @id
               Royalty   Royalty[]   @relation("BookRoyalty")
             }
-                
+
             model Royalty {
               id        String      @id
               Book      Book[]      @relation("BookRoyalty")
@@ -598,7 +598,7 @@ async fn introspecting_prisma_10_relations_should_work(api: &TestApi) {
 }
 
 #[test_each_connector(tags("postgres"))]
-async fn introspecting_relations_should_avoid_name_clashes(api: &TestApi) {
+async fn introspecting_relations_should_avoid_name_clashes(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -619,7 +619,7 @@ async fn introspecting_relations_should_avoid_name_clashes(api: &TestApi) {
                 y  String
                 y_xToy  y      @relation(fields: [y], references: [id])
             }
-                  
+
             model y {
                 id String @id
                 x  String
@@ -651,7 +651,7 @@ async fn introspecting_relations_should_avoid_name_clashes(api: &TestApi) {
 // ) ENGINE=InnoDB DEFAULT;
 
 #[test_each_connector(tags("postgres"))]
-async fn introspecting_relations_should_avoid_name_clashes_2(api: &TestApi) {
+async fn introspecting_relations_should_avoid_name_clashes_2(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -708,10 +708,10 @@ async fn introspecting_relations_should_avoid_name_clashes_2(api: &TestApi) {
                 y                    String
                 y_x_yToy             y      @relation("x_yToy", fields: [y], references: [id])
                 y_xToy_fk_x_1_fk_x_2 y[]    @relation("xToy_fk_x_1_fk_x_2")
-                    
+
                 @@unique([id, y], name: "unique_y_id")
             }
-                      
+
             model y {
                fk_x_1               String
                fk_x_2               String

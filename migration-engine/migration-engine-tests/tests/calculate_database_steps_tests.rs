@@ -1,7 +1,7 @@
 use migration_engine_tests::sql::*;
 
 #[test_each_connector]
-async fn calculate_database_steps_with_infer_after_an_apply_must_work(api: &TestApi) -> TestResult {
+async fn calculate_database_steps_with_infer_after_an_apply_must_work(api: TestApi) -> TestResult {
     let dm1 = r#"
         type CUID = String @id @default(cuid())
 
@@ -59,7 +59,7 @@ async fn calculate_database_steps_with_infer_after_an_apply_must_work(api: &Test
 }
 
 #[test_each_connector]
-async fn calculate_database_steps_with_steps_to_apply_in_assume_to_be_applied_works(api: &TestApi) -> TestResult {
+async fn calculate_database_steps_with_steps_to_apply_in_assume_to_be_applied_works(api: TestApi) -> TestResult {
     let first_migration_id = "first-migration";
     let second_migration_id = "second-migration";
 
@@ -139,7 +139,7 @@ async fn calculate_database_steps_with_steps_to_apply_in_assume_to_be_applied_wo
 }
 
 #[test_each_connector]
-async fn calculate_database_steps_without_assume_to_be_applied_works(api: &TestApi) -> TestResult {
+async fn calculate_database_steps_without_assume_to_be_applied_works(api: TestApi) -> TestResult {
     let dm = r#"
         type CUID = String @id @default(cuid())
 

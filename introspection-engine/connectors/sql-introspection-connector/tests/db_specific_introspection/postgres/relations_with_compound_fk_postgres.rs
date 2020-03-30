@@ -4,7 +4,7 @@ use test_harness::*;
 
 #[test_each_connector(tags("postgres"))]
 #[test]
-async fn compound_foreign_keys_should_work_for_required_one_to_one_relations(api: &TestApi) {
+async fn compound_foreign_keys_should_work_for_required_one_to_one_relations(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -31,15 +31,15 @@ async fn compound_foreign_keys_should_work_for_required_one_to_one_relations(api
                 user_id   Int
                 user_name String
                 User      User   @relation(fields: [user_id, user_name], references: [id, name])
-                
+
                 @@unique([user_id, user_name], name: "post_user_unique")
             }
-            
+
             model User {
                 id   Int    @default(autoincrement()) @id
                 name String
                 Post Post?
-                
+
                 @@unique([id, name], name: "user_unique")
             }
         "#;
@@ -49,7 +49,7 @@ async fn compound_foreign_keys_should_work_for_required_one_to_one_relations(api
 
 #[test_each_connector(tags("postgres"))]
 #[test]
-async fn compound_foreign_keys_should_work_for_one_to_one_relations(api: &TestApi) {
+async fn compound_foreign_keys_should_work_for_one_to_one_relations(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -76,15 +76,15 @@ async fn compound_foreign_keys_should_work_for_one_to_one_relations(api: &TestAp
                 user_id   Int?
                 user_name String?
                 User      User?   @relation(fields: [user_id, user_name], references: [id, name])
-                    
+
                 @@unique([user_id, user_name], name: "post_user_unique")
             }
-                      
+
             model User {
                 id   Int    @default(autoincrement()) @id
                 name String
                 Post Post?
-                            
+
                 @@unique([id, name], name: "user_unique")
             }
         "#;
@@ -94,7 +94,7 @@ async fn compound_foreign_keys_should_work_for_one_to_one_relations(api: &TestAp
 
 #[test_each_connector(tags("postgres"))]
 #[test]
-async fn compound_foreign_keys_should_work_for_one_to_many_relations(api: &TestApi) {
+async fn compound_foreign_keys_should_work_for_one_to_many_relations(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -121,12 +121,12 @@ async fn compound_foreign_keys_should_work_for_one_to_many_relations(api: &TestA
                 user_name String?
                 User      User?   @relation(fields: [user_id, user_name], references: [id, name])
            }
-           
+
            model User {
                 id   Int    @default(autoincrement()) @id
                 name String
                 Post Post[]
-                
+
                 @@unique([id, name], name: "user_unique")
            }
         "#;
@@ -136,7 +136,7 @@ async fn compound_foreign_keys_should_work_for_one_to_many_relations(api: &TestA
 
 #[test_each_connector(tags("postgres"))]
 #[test]
-async fn compound_foreign_keys_should_work_for_required_one_to_many_relations(api: &TestApi) {
+async fn compound_foreign_keys_should_work_for_required_one_to_many_relations(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -163,12 +163,12 @@ async fn compound_foreign_keys_should_work_for_required_one_to_many_relations(ap
                 user_name String
                 User      User   @relation(fields: [user_id, user_name], references: [id, name])
             }
-            
+
             model User {
                 id   Int    @default(autoincrement()) @id
                 name String
                 Post Post[]
-                
+
                 @@unique([id, name], name: "user_unique")
             }
         "#;
@@ -178,7 +178,7 @@ async fn compound_foreign_keys_should_work_for_required_one_to_many_relations(ap
 
 #[test_each_connector(tags("postgres"))]
 #[test]
-async fn compound_foreign_keys_should_work_for_self_relations(api: &TestApi) {
+async fn compound_foreign_keys_should_work_for_self_relations(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -203,10 +203,10 @@ async fn compound_foreign_keys_should_work_for_self_relations(api: &TestApi) {
                 partner_name String
                 Person       Person   @relation("PersonToPerson_partner_id_partner_name", fields: [partner_id, partner_name], references: [id, name])
                 other_Person Person[] @relation("PersonToPerson_partner_id_partner_name")
-                
+
                 @@unique([id, name], name: "person_unique")
             }
-            
+
         "#;
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
@@ -214,7 +214,7 @@ async fn compound_foreign_keys_should_work_for_self_relations(api: &TestApi) {
 
 #[test_each_connector(tags("postgres"))]
 #[test]
-async fn compound_foreign_keys_should_work_with_defaults(api: &TestApi) {
+async fn compound_foreign_keys_should_work_with_defaults(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -239,7 +239,7 @@ async fn compound_foreign_keys_should_work_with_defaults(api: &TestApi) {
                     partner_name String   @default("")
                     Person       Person   @relation("PersonToPerson_partner_id_partner_name", fields: [partner_id, partner_name], references: [id, name])
                     other_Person Person[] @relation("PersonToPerson_partner_id_partner_name")
-                    
+
                     @@unique([id, name], name: "person_unique")
                }
         "#;
@@ -256,7 +256,7 @@ async fn compound_foreign_keys_should_work_with_defaults(api: &TestApi) {
 // what breaks by having an @@unique that refers to fields that do not have a representation on the model anymore due to the merged relation field?
 //#[test_each_connector(tags("postgres"))]
 //#[test]
-//async fn compound_foreign_keys_should_work_for_one_to_one_relations_with_separate_uniques(api: &TestApi) {
+//async fn compound_foreign_keys_should_work_for_one_to_one_relations_with_separate_uniques(api: TestApi) {
 //    let barrel = api.barrel();
 //    let _setup_schema = barrel
 //        .execute(|migration| {
@@ -295,7 +295,7 @@ async fn compound_foreign_keys_should_work_with_defaults(api: &TestApi) {
 #[test_each_connector(tags("postgres"))]
 #[test]
 async fn compound_foreign_keys_should_work_for_one_to_many_relations_with_non_unique_index(
-    api: &TestApi,
+    api: TestApi,
 ) {
     let barrel = api.barrel();
     let _setup_schema = barrel
@@ -323,15 +323,15 @@ async fn compound_foreign_keys_should_work_for_one_to_many_relations_with_non_un
                 user_age Int
                 user_id  Int
                 User     User @relation(fields: [user_id, user_age], references: [id, age])
-                
+
                 @@index([user_id, user_age], name: "test")
             }
-            
+
             model User {
                 age  Int
                 id   Int    @default(autoincrement()) @id
                 Post Post[]
-                
+
                 @@unique([id, age], name: "user_unique")
             }
         "#;
@@ -341,7 +341,7 @@ async fn compound_foreign_keys_should_work_for_one_to_many_relations_with_non_un
 
 #[test_each_connector(tags("postgres"))]
 #[test]
-async fn repro_matt_references_on_wrong_side(api: &TestApi) {
+async fn repro_matt_references_on_wrong_side(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -364,7 +364,7 @@ async fn repro_matt_references_on_wrong_side(api: &TestApi) {
                 one Int
                 two Int
                 b   b[]
-                
+
                 @@id([one, two])
             }
 
@@ -372,9 +372,9 @@ async fn repro_matt_references_on_wrong_side(api: &TestApi) {
                 id  Int @default(autoincrement()) @id
                 one Int
                 two Int
-                
+
                 a   a   @relation(fields: [one, two], references: [one, two])
-            }             
+            }
         "#;
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
@@ -382,7 +382,7 @@ async fn repro_matt_references_on_wrong_side(api: &TestApi) {
 
 #[test_each_connector(tags("postgres"))]
 #[test]
-async fn introspecting_a_compound_fk_pk_with_overlapping_primary_key_should_work(api: &TestApi) {
+async fn introspecting_a_compound_fk_pk_with_overlapping_primary_key_should_work(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -406,19 +406,19 @@ async fn introspecting_a_compound_fk_pk_with_overlapping_primary_key_should_work
                 one Int
                 two Int
                 b   b[]
-                
+
                 @@id([one, two])
             }
-            
+
             model b {
                 dummy Int
                 one   Int
                 two   Int
                 a     a   @relation(fields: [one, two], references: [one, two])
-            
+
                 @@id([dummy, one, two])
             }
-            
+
         "#;
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);

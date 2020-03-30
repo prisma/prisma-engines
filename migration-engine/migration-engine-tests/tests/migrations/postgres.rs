@@ -2,7 +2,7 @@ use migration_engine_tests::*;
 use sql_schema_describer::{ColumnArity, ColumnTypeFamily};
 
 #[test_each_connector(tags("postgres"))]
-async fn enums_can_be_dropped_on_postgres(api: &TestApi) -> TestResult {
+async fn enums_can_be_dropped_on_postgres(api: TestApi) -> TestResult {
     let dm1 = r#"
         model Cat {
             id String @id
@@ -36,7 +36,7 @@ async fn enums_can_be_dropped_on_postgres(api: &TestApi) -> TestResult {
 }
 
 #[test_each_connector(capabilities("scalar_lists"))]
-async fn adding_a_scalar_list_for_a_model_with_id_type_int_must_work(api: &TestApi) {
+async fn adding_a_scalar_list_for_a_model_with_id_type_int_must_work(api: TestApi) {
     let dm1 = r#"
         datasource pg {
             provider = "postgres"

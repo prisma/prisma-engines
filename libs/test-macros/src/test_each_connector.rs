@@ -143,7 +143,7 @@ fn test_each_connector_async_wrapper_functions(
     });
 
     let optional_unwrap = if super::function_returns_result(&test_function) {
-        Some(quote!(.unwrap()))
+        Some(quote! { .unwrap() })
     } else {
         None
     };
@@ -156,12 +156,13 @@ fn test_each_connector_async_wrapper_functions(
         let test = quote! {
             #[test]
             fn #connector_test_fn_name() {
+                use futures::FutureExt;
                 #optional_logging_import
 
-                let fut = async {
-                    let api = #connector_api_factory(#test_fn_name_str).await;
-                    #test_fn_name(&api).await#optional_unwrap
-                }#optional_logging;
+                let fut = #connector_api_factory(#test_fn_name_str)
+                    .then(|api| #test_fn_name(api))
+                    .map(|r| r #optional_unwrap)
+                    #optional_logging;
 
                 test_setup::runtime::run_with_tokio(fut)
             }

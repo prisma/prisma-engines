@@ -3,7 +3,7 @@ use barrel::types;
 use test_harness::*;
 
 #[test_each_connector(tags("postgres"))]
-async fn introspecting_a_table_enums_should_work(api: &TestApi) {
+async fn introspecting_a_table_enums_should_work(api: TestApi) {
     let sql = format!("CREATE Type color as ENUM ( 'black', 'white')");
     let sql2 = format!("CREATE Type color2 as ENUM ( 'black2', 'white2')");
 
@@ -51,7 +51,7 @@ async fn introspecting_a_table_enums_should_work(api: &TestApi) {
 }
 
 #[test_each_connector(tags("postgres"))]
-async fn introspecting_a_table_enums_should_return_alphabetically_even_when_in_different_order(api: &TestApi) {
+async fn introspecting_a_table_enums_should_return_alphabetically_even_when_in_different_order(api: TestApi) {
     let sql1 = format!("CREATE Type color as ENUM ( 'black', 'white')");
     let sql2 = format!("CREATE Type color2 as ENUM ( 'black2', 'white2')");
 
@@ -99,7 +99,7 @@ async fn introspecting_a_table_enums_should_return_alphabetically_even_when_in_d
 }
 
 #[test_each_connector(tags("postgres"))]
-async fn introspecting_a_table_enums_array_should_work(api: &TestApi) {
+async fn introspecting_a_table_enums_array_should_work(api: TestApi) {
     let sql = format!("CREATE Type color as ENUM ( 'black', 'white')");
 
     api.database().execute_raw(&sql, &[]).await.unwrap();
@@ -135,7 +135,7 @@ async fn introspecting_a_table_enums_array_should_work(api: &TestApi) {
 }
 
 #[test_each_connector(tags("postgres"))]
-async fn introspecting_a_table_with_enum_default_values_should_work(api: &TestApi) {
+async fn introspecting_a_table_with_enum_default_values_should_work(api: TestApi) {
     let sql = format!("CREATE Type color as ENUM ( 'black', 'white')");
 
     api.database().execute_raw(&sql, &[]).await.unwrap();
@@ -166,7 +166,7 @@ async fn introspecting_a_table_with_enum_default_values_should_work(api: &TestAp
 }
 
 #[test_each_connector(tags("postgres"))]
-async fn introspecting_a_table_with_enum_default_values_that_look_like_booleans_should_work(api: &TestApi) {
+async fn introspecting_a_table_with_enum_default_values_that_look_like_booleans_should_work(api: TestApi) {
     let sql = format!("CREATE Type Truth as ENUM ( 'true', 'false', 'rumor')");
 
     api.database().execute_raw(&sql, &[]).await.unwrap();
@@ -198,7 +198,7 @@ async fn introspecting_a_table_with_enum_default_values_that_look_like_booleans_
 }
 
 #[test_each_connector(tags("postgres"))]
-async fn introspecting_an_enum_with_an_invalid_value_should_work(api: &TestApi) {
+async fn introspecting_an_enum_with_an_invalid_value_should_work(api: TestApi) {
     let sql = format!("CREATE Type status as ENUM ( '1', 'UNDEFINED')");
 
     api.database().execute_raw(&sql, &[]).await.unwrap();
@@ -220,7 +220,7 @@ async fn introspecting_an_enum_with_an_invalid_value_should_work(api: &TestApi) 
 }
 
 #[test_each_connector(tags("postgres"))]
-async fn introspecting_an_enum_with_an_invalid_value_as_default_should_work(api: &TestApi) {
+async fn introspecting_an_enum_with_an_invalid_value_as_default_should_work(api: TestApi) {
     let sql = format!("CREATE Type status as ENUM ( '1', 'UNDEFINED')");
 
     api.database().execute_raw(&sql, &[]).await.unwrap();

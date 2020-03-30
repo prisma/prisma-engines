@@ -3,7 +3,7 @@ use barrel::types;
 use test_harness::*;
 
 #[test_each_connector(tags("sqlite"))]
-async fn introspecting_a_one_to_one_req_relation_should_work(api: &TestApi) {
+async fn introspecting_a_one_to_one_req_relation_should_work(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -37,7 +37,7 @@ async fn introspecting_a_one_to_one_req_relation_should_work(api: &TestApi) {
 }
 
 #[test_each_connector(tags("sqlite"))]
-async fn introspecting_two_one_to_one_relations_between_the_same_models_should_work(api: &TestApi) {
+async fn introspecting_two_one_to_one_relations_between_the_same_models_should_work(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -65,7 +65,7 @@ async fn introspecting_two_one_to_one_relations_between_the_same_models_should_w
                 Post_PostToUser_post_id Post  @relation("PostToUser_post_id", fields: [post_id], references: [id])
                 Post_Post_user_idToUser Post? @relation("Post_user_idToUser")
             }
-            
+
             model Post {
                 id                      Int   @default(autoincrement()) @id
                 user_id                 Int   @unique
@@ -78,7 +78,7 @@ async fn introspecting_two_one_to_one_relations_between_the_same_models_should_w
 }
 
 #[test_each_connector(tags("sqlite"))]
-async fn introspecting_a_one_to_one_relation_should_work(api: &TestApi) {
+async fn introspecting_a_one_to_one_relation_should_work(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -100,7 +100,7 @@ async fn introspecting_a_one_to_one_relation_should_work(api: &TestApi) {
                 id   Int   @default(autoincrement()) @id
                 Post Post?
             }
-            
+
             model Post {
                 id      Int   @default(autoincrement()) @id
                 user_id Int?  @unique
@@ -112,7 +112,7 @@ async fn introspecting_a_one_to_one_relation_should_work(api: &TestApi) {
 }
 
 #[test_each_connector(tags("sqlite"))]
-async fn introspecting_a_one_to_one_relation_referencing_non_id_should_work(api: &TestApi) {
+async fn introspecting_a_one_to_one_relation_referencing_non_id_should_work(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -135,7 +135,7 @@ async fn introspecting_a_one_to_one_relation_referencing_non_id_should_work(api:
                 id    Int     @default(autoincrement()) @id
                 Post  Post?
             }
-            
+
             model Post {
                 id         Int     @default(autoincrement()) @id
                 user_email String? @unique
@@ -147,7 +147,7 @@ async fn introspecting_a_one_to_one_relation_referencing_non_id_should_work(api:
 }
 
 #[test_each_connector(tags("sqlite"))]
-async fn introspecting_a_one_to_many_relation_should_work(api: &TestApi) {
+async fn introspecting_a_one_to_many_relation_should_work(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -169,7 +169,7 @@ async fn introspecting_a_one_to_many_relation_should_work(api: &TestApi) {
                 id   Int    @default(autoincrement()) @id
                 Post Post[]
             }
-            
+
             model Post {
                 id      Int   @default(autoincrement()) @id
                 user_id Int?
@@ -181,7 +181,7 @@ async fn introspecting_a_one_to_many_relation_should_work(api: &TestApi) {
 }
 
 #[test_each_connector(tags("sqlite"))]
-async fn introspecting_a_one_req_to_many_relation_should_work(api: &TestApi) {
+async fn introspecting_a_one_req_to_many_relation_should_work(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -203,7 +203,7 @@ async fn introspecting_a_one_req_to_many_relation_should_work(api: &TestApi) {
                 id   Int    @default(autoincrement()) @id
                 Post Post[]
             }
-                
+
             model Post {
                 id      Int  @default(autoincrement()) @id
                 user_id Int
@@ -215,7 +215,7 @@ async fn introspecting_a_one_req_to_many_relation_should_work(api: &TestApi) {
 }
 
 #[test_each_connector(tags("sqlite"))]
-async fn introspecting_a_prisma_many_to_many_relation_should_work(api: &TestApi) {
+async fn introspecting_a_prisma_many_to_many_relation_should_work(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -277,7 +277,7 @@ async fn introspecting_a_prisma_many_to_many_relation_should_work(api: &TestApi)
 
 // currently disallowed by the validator since the relation tables do not have ids
 //#[test_each_connector(tags("sqlite"))]
-//async fn introspecting_a_many_to_many_relation_should_work(api: &TestApi) {
+//async fn introspecting_a_many_to_many_relation_should_work(api: TestApi) {
 //    let barrel = api.barrel();
 //    let _setup_schema = barrel
 //        .execute(|migration| {
@@ -319,7 +319,7 @@ async fn introspecting_a_prisma_many_to_many_relation_should_work(api: &TestApi)
 //}
 //
 //#[test_each_connector(tags("sqlite"))]
-//async fn introspecting_a_many_to_many_relation_with_extra_fields_should_work(api: &TestApi) {
+//async fn introspecting_a_many_to_many_relation_with_extra_fields_should_work(api: TestApi) {
 //    let barrel = api.barrel();
 //    let _setup_schema = barrel
 //        .execute(|migration| {
@@ -363,7 +363,7 @@ async fn introspecting_a_prisma_many_to_many_relation_should_work(api: &TestApi)
 //}
 
 #[test_each_connector(tags("sqlite"))]
-async fn introspecting_a_many_to_many_relation_with_an_id_should_work(api: &TestApi) {
+async fn introspecting_a_many_to_many_relation_with_an_id_should_work(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -390,12 +390,12 @@ async fn introspecting_a_many_to_many_relation_with_an_id_should_work(api: &Test
                 id           Int            @default(autoincrement()) @id
                 PostsToUsers PostsToUsers[]
             }
-            
+
             model Post {
                 id           Int            @default(autoincrement()) @id
                 PostsToUsers PostsToUsers[]
             }
-            
+
             model PostsToUsers {
                 id      Int    @default(autoincrement()) @id
                 post_id String
@@ -403,14 +403,14 @@ async fn introspecting_a_many_to_many_relation_with_an_id_should_work(api: &Test
                 Post    Post   @relation(fields: [post_id], references: [id])
                 User    User   @relation(fields: [user_id], references: [id])
             }
-            
+
         "#;
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
 
 #[test_each_connector(tags("sqlite"))]
-async fn introspecting_a_self_relation_should_work(api: &TestApi) {
+async fn introspecting_a_self_relation_should_work(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -445,7 +445,7 @@ async fn introspecting_a_self_relation_should_work(api: &TestApi) {
 
 // TODO: bring `onDelete` back once `prisma migrate` is a thing
 //#[test_each_connector(tags("sqlite"))]
-// async fn introspecting_cascading_delete_behaviour_should_work(api: &TestApi) {
+// async fn introspecting_cascading_delete_behaviour_should_work(api: TestApi) {
 //     let barrel = api.barrel();
 //     let _setup_schema = barrel
 //         .execute(|migration| {
@@ -478,7 +478,7 @@ async fn introspecting_a_self_relation_should_work(api: &TestApi) {
 // }
 
 #[test_each_connector(tags("sqlite"))]
-async fn introspecting_id_fields_with_foreign_key_should_work(api: &TestApi) {
+async fn introspecting_id_fields_with_foreign_key_should_work(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -493,12 +493,12 @@ async fn introspecting_id_fields_with_foreign_key_should_work(api: &TestApi) {
         })
         .await;
 
-    let dm = r#"    
+    let dm = r#"
             model User {
                 id   Int    @default(autoincrement()) @id
                 Post Post[]
             }
-            
+
             model Post {
                 test    String
                 user_id Int    @default(autoincrement()) @id

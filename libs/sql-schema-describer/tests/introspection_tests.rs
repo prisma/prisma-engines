@@ -30,7 +30,7 @@ fn varchar_type(db_type: SqlFamily, length: u64) -> String {
 }
 
 #[test_each_connector]
-async fn is_required_must_work(api: &TestApi) {
+async fn is_required_must_work(api: TestApi) {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -69,7 +69,7 @@ async fn is_required_must_work(api: &TestApi) {
 }
 
 #[test_each_connector]
-async fn foreign_keys_must_work(api: &TestApi) {
+async fn foreign_keys_must_work(api: TestApi) {
     let sql_family = api.sql_family();
 
     api.barrel()
@@ -140,7 +140,7 @@ async fn foreign_keys_must_work(api: &TestApi) {
 }
 
 #[test_each_connector]
-async fn multi_column_foreign_keys_must_work(api: &TestApi) {
+async fn multi_column_foreign_keys_must_work(api: TestApi) {
     let sql_family = api.sql_family();
     let schema = api.schema_name().to_owned();
 
@@ -235,7 +235,7 @@ async fn multi_column_foreign_keys_must_work(api: &TestApi) {
 }
 
 #[test_each_connector]
-async fn names_with_hyphens_must_work(api: &TestApi) {
+async fn names_with_hyphens_must_work(api: TestApi) {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User-table", |t| {
@@ -259,7 +259,7 @@ async fn names_with_hyphens_must_work(api: &TestApi) {
 }
 
 #[test_each_connector]
-async fn composite_primary_keys_must_work(api: &TestApi) {
+async fn composite_primary_keys_must_work(api: TestApi) {
     let sql = match api.sql_family() {
         SqlFamily::Mysql => format!(
             "CREATE TABLE `{0}`.`User` (
@@ -328,7 +328,7 @@ async fn composite_primary_keys_must_work(api: &TestApi) {
 }
 
 #[test_each_connector]
-async fn indices_must_work(api: &TestApi) {
+async fn indices_must_work(api: TestApi) {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", move |t| {
@@ -395,7 +395,7 @@ async fn indices_must_work(api: &TestApi) {
 }
 
 #[test_each_connector]
-async fn column_uniqueness_must_be_detected(api: &TestApi) {
+async fn column_uniqueness_must_be_detected(api: TestApi) {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", move |t| {
@@ -477,7 +477,7 @@ async fn column_uniqueness_must_be_detected(api: &TestApi) {
 }
 
 #[test_each_connector]
-async fn defaults_must_work(api: &TestApi) {
+async fn defaults_must_work(api: TestApi) {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", move |t| {

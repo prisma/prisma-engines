@@ -3,7 +3,7 @@ use barrel::types;
 use test_harness::*;
 
 #[test_each_connector(tags("postgres"))]
-async fn remapping_fields_with_invalid_characters_should_work(api: &TestApi) {
+async fn remapping_fields_with_invalid_characters_should_work(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -41,7 +41,7 @@ async fn remapping_fields_with_invalid_characters_should_work(api: &TestApi) {
 }
 
 #[test_each_connector(tags("postgres"))]
-async fn remapping_tables_with_invalid_characters_should_work(api: &TestApi) {
+async fn remapping_tables_with_invalid_characters_should_work(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -72,7 +72,7 @@ async fn remapping_tables_with_invalid_characters_should_work(api: &TestApi) {
 }
 
 #[test_each_connector(tags("postgres"))]
-async fn remapping_fk_columns_with_invalid_characters_should_work(api: &TestApi) {
+async fn remapping_fk_columns_with_invalid_characters_should_work(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -92,7 +92,7 @@ async fn remapping_fk_columns_with_invalid_characters_should_work(api: &TestApi)
                 id   Int    @default(autoincrement()) @id
                 User User[]
             }
-            
+
             model User {
                 id      Int  @default(autoincrement()) @id
                 post_id Int  @map("post id")
@@ -104,7 +104,7 @@ async fn remapping_fk_columns_with_invalid_characters_should_work(api: &TestApi)
 }
 
 #[test_each_connector(tags("postgres"))]
-async fn remapping_models_in_relations_should_work(api: &TestApi) {
+async fn remapping_models_in_relations_should_work(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -127,15 +127,15 @@ async fn remapping_models_in_relations_should_work(api: &TestApi) {
                 user_id         Int             @unique
                 User_with_Space User_with_Space @relation(fields: [user_id], references: [id])
             }
-            
+
             model User_with_Space {
                 id   Int    @default(autoincrement()) @id
                 name String
                 Post Post?
-                
+
                 @@map("User with Space")
             }
-            
+
         "#;
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
@@ -143,7 +143,7 @@ async fn remapping_models_in_relations_should_work(api: &TestApi) {
 
 #[test_each_connector(tags("postgres"))]
 #[test]
-async fn remapping_models_in_compound_relations_should_work(api: &TestApi) {
+async fn remapping_models_in_compound_relations_should_work(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -170,19 +170,19 @@ async fn remapping_models_in_compound_relations_should_work(api: &TestApi) {
                 user_id         Int
                 user_name       String
                 User_with_Space User_with_Space @relation(fields: [user_id, user_name], references: [id, name])
-                
+
                 @@unique([user_id, user_name], name: "post_user_unique")
             }
-            
+
             model User_with_Space {
                 id   Int    @default(autoincrement()) @id
                 name String
                 Post Post?
-                
+
                 @@map("User with Space")
                 @@unique([id, name], name: "user_unique")
             }
-            
+
         "#;
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
@@ -190,7 +190,7 @@ async fn remapping_models_in_compound_relations_should_work(api: &TestApi) {
 
 #[test_each_connector(tags("postgres"))]
 #[test]
-async fn remapping_fields_in_compound_relations_should_work(api: &TestApi) {
+async fn remapping_fields_in_compound_relations_should_work(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -217,25 +217,25 @@ async fn remapping_fields_in_compound_relations_should_work(api: &TestApi) {
                 user_id   Int
                 user_name String
                 User      User   @relation(fields: [user_id, user_name], references: [id, name_that_is_invalid])
-                
+
                 @@unique([user_id, user_name], name: "post_user_unique")
             }
-            
+
             model User {
                 id                   Int    @default(autoincrement()) @id
                 name_that_is_invalid String @map("name-that-is-invalid")
                 Post                 Post?
-                
+
                 @@unique([id, name_that_is_invalid], name: "user_unique")
             }
-            
+
         "#;
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
 
 #[test_each_connector(tags("postgres"))]
-async fn remapping_enum_names_should_work(api: &TestApi) {
+async fn remapping_enum_names_should_work(api: TestApi) {
     let sql1 = format!("CREATE Type _color as ENUM ('black')");
     api.database().execute_raw(&sql1, &[]).await.unwrap();
 
@@ -265,7 +265,7 @@ async fn remapping_enum_names_should_work(api: &TestApi) {
 }
 
 #[test_each_connector(tags("postgres"))]
-async fn remapping_enum_values_should_work(api: &TestApi) {
+async fn remapping_enum_values_should_work(api: TestApi) {
     let sql1 = format!("CREATE Type Color as ENUM ('b lack', 'w hite')");
     api.database().execute_raw(&sql1, &[]).await.unwrap();
 
@@ -295,7 +295,7 @@ async fn remapping_enum_values_should_work(api: &TestApi) {
 }
 
 #[test_each_connector(tags("postgres"))]
-async fn remapping_compound_primary_keys_should_work(api: &TestApi) {
+async fn remapping_compound_primary_keys_should_work(api: TestApi) {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -320,7 +320,7 @@ async fn remapping_compound_primary_keys_should_work(api: &TestApi) {
 }
 
 #[test_each_connector(tags("postgres"))]
-async fn remapping_enum_default_values_should_work(api: &TestApi) {
+async fn remapping_enum_default_values_should_work(api: TestApi) {
     let sql = format!("CREATE Type color as ENUM ( 'b lack', 'white')");
 
     api.database().execute_raw(&sql, &[]).await.unwrap();
@@ -351,7 +351,7 @@ async fn remapping_enum_default_values_should_work(api: &TestApi) {
 }
 
 #[test_each_connector(tags("postgres"))]
-async fn remapping_field_names_to_empty_should_comment_them_out(api: &TestApi) {
+async fn remapping_field_names_to_empty_should_comment_them_out(api: TestApi) {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {

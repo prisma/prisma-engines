@@ -3,7 +3,7 @@ use crate::{BarrelMigrationExecutor, TestApi};
 use barrel::types;
 
 #[test_each_connector(tags("mysql"))]
-async fn metadata_for_mysql_should_work(api: &TestApi) {
+async fn metadata_for_mysql_should_work(api: TestApi) {
     let barrel = api.barrel();
     setup(&barrel, api.db_name()).await;
     let result = api.get_metadata().await;
@@ -12,7 +12,7 @@ async fn metadata_for_mysql_should_work(api: &TestApi) {
 }
 
 #[test_each_connector(tags("postgres"))]
-async fn metadata_for_postgres_should_work(api: &TestApi) {
+async fn metadata_for_postgres_should_work(api: TestApi) {
     let barrel = api.barrel();
     setup(&barrel, api.schema_name()).await;
     let result = dbg!(api.get_metadata().await);
@@ -21,7 +21,7 @@ async fn metadata_for_postgres_should_work(api: &TestApi) {
 }
 
 #[test_each_connector(tags("sqlite"))]
-async fn metadata_for_sqlite_should_work(api: &TestApi) {
+async fn metadata_for_sqlite_should_work(api: TestApi) {
     let barrel = api.barrel();
     setup(&barrel, api.schema_name()).await;
     let result = dbg!(api.get_metadata().await);

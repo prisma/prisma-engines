@@ -4,7 +4,7 @@ use pretty_assertions::assert_eq;
 use test_harness::*;
 
 #[test_each_connector(tags("mysql"))]
-async fn introspecting_a_simple_table_with_gql_types_must_work(api: &TestApi) {
+async fn introspecting_a_simple_table_with_gql_types_must_work(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute_with_schema(
@@ -36,7 +36,7 @@ async fn introspecting_a_simple_table_with_gql_types_must_work(api: &TestApi) {
 }
 
 #[test_each_connector(tags("mysql"))]
-async fn introspecting_a_table_with_compound_primary_keys_must_work(api: &TestApi) {
+async fn introspecting_a_table_with_compound_primary_keys_must_work(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute_with_schema(
@@ -63,7 +63,7 @@ async fn introspecting_a_table_with_compound_primary_keys_must_work(api: &TestAp
 }
 
 #[test_each_connector(tags("mysql"))]
-async fn introspecting_a_table_with_unique_index_must_work(api: &TestApi) {
+async fn introspecting_a_table_with_unique_index_must_work(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute_with_schema(
@@ -89,7 +89,7 @@ async fn introspecting_a_table_with_unique_index_must_work(api: &TestApi) {
 }
 
 #[test_each_connector(tags("mysql"))]
-async fn introspecting_a_table_with_multi_column_unique_index_must_work(api: &TestApi) {
+async fn introspecting_a_table_with_multi_column_unique_index_must_work(api: TestApi) {
     let barrel = api.barrel();
     barrel
         .execute_with_schema(
@@ -121,7 +121,7 @@ async fn introspecting_a_table_with_multi_column_unique_index_must_work(api: &Te
 }
 
 #[test_each_connector(tags("mysql"))]
-async fn introspecting_a_table_with_required_and_optional_columns_must_work(api: &TestApi) {
+async fn introspecting_a_table_with_required_and_optional_columns_must_work(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute_with_schema(
@@ -148,7 +148,7 @@ async fn introspecting_a_table_with_required_and_optional_columns_must_work(api:
 }
 
 // #[test_each_connector(tags("mysql"))]
-// async fn introspecting_a_table_with_datetime_default_values_should_work(api: &TestApi) {
+// async fn introspecting_a_table_with_datetime_default_values_should_work(api: TestApi) {
 //     let barrel = api.barrel();
 //     let _setup_schema = barrel
 //         .execute_with_schema(
@@ -175,7 +175,7 @@ async fn introspecting_a_table_with_required_and_optional_columns_must_work(api:
 // }
 
 #[test_each_connector(tags("mysql"))]
-async fn introspecting_a_table_with_default_values_should_work(api: &TestApi) {
+async fn introspecting_a_table_with_default_values_should_work(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute_with_schema(
@@ -210,7 +210,7 @@ async fn introspecting_a_table_with_default_values_should_work(api: &TestApi) {
 }
 
 #[test_each_connector(tags("mysql"))]
-async fn introspecting_a_table_with_a_non_unique_index_should_work(api: &TestApi) {
+async fn introspecting_a_table_with_a_non_unique_index_should_work(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute_with_schema(
@@ -237,7 +237,7 @@ async fn introspecting_a_table_with_a_non_unique_index_should_work(api: &TestApi
 }
 
 #[test_each_connector(tags("mysql"))]
-async fn introspecting_a_table_with_a_multi_column_non_unique_index_should_work(api: &TestApi) {
+async fn introspecting_a_table_with_a_multi_column_non_unique_index_should_work(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute_with_schema(
@@ -266,7 +266,7 @@ async fn introspecting_a_table_with_a_multi_column_non_unique_index_should_work(
 }
 
 #[test_each_connector(tags("mysql"))]
-async fn introspecting_a_table_without_uniques_should_comment_it_out(api: &TestApi) {
+async fn introspecting_a_table_without_uniques_should_comment_it_out(api: TestApi) {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -292,7 +292,7 @@ async fn introspecting_a_table_without_uniques_should_comment_it_out(api: &TestA
 // no function default values on mysql 5.7 and 8.0 -.-
 // maria db allows this
 #[test_each_connector(tags("mysql"))]
-async fn introspecting_a_default_value_as_dbgenerated_should_work(api: &TestApi) {
+async fn introspecting_a_default_value_as_dbgenerated_should_work(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -318,15 +318,15 @@ async fn introspecting_a_default_value_as_dbgenerated_should_work(api: &TestApi)
                 boolean_static          Boolean?            @default(true)
                 datetime_now            DateTime?           @default(now())
                 datetime_now_lc         DateTime?           @default(now())
-                enum_static             Test_enum_static?   @default(black)   
+                enum_static             Test_enum_static?   @default(black)
                 float_static            Float?              @default(1.43)
                 id                      Int                 @default(autoincrement()) @id
                 int_static              Int?                @default(2)
                 string_static_char      String?             @default("test")
-                string_static_char_null String?     
-                string_static_varchar   String?             @default("test")                      
+                string_static_char_null String?
+                string_static_varchar   String?             @default("test")
             }
-            
+
             enum Test_enum_static{
                 black
                 white

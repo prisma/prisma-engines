@@ -2,7 +2,7 @@ use crate::test_harness::*;
 use crate::{test_each_connector, BarrelMigrationExecutor, TestApi};
 
 #[test_each_connector]
-async fn empty_metadata_should_work(api: &TestApi) {
+async fn empty_metadata_should_work(api: TestApi) {
     let barrel = api.barrel();
     setup_empty(&barrel, api.schema_name()).await;
     let result = dbg!(api.get_metadata().await);

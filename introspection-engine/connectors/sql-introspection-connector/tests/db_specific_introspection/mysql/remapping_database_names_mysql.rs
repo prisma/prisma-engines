@@ -3,7 +3,7 @@ use barrel::types;
 use test_harness::*;
 
 #[test_each_connector(tags("mysql"))]
-async fn remapping_fields_with_invalid_characters_should_work(api: &TestApi) {
+async fn remapping_fields_with_invalid_characters_should_work(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -40,7 +40,7 @@ async fn remapping_fields_with_invalid_characters_should_work(api: &TestApi) {
 }
 
 #[test_each_connector(tags("mysql"))]
-async fn remapping_tables_with_invalid_characters_should_work(api: &TestApi) {
+async fn remapping_tables_with_invalid_characters_should_work(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -71,7 +71,7 @@ async fn remapping_tables_with_invalid_characters_should_work(api: &TestApi) {
 }
 
 #[test_each_connector(tags("mysql"))]
-async fn remapping_models_in_relations_should_work(api: &TestApi) {
+async fn remapping_models_in_relations_should_work(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -94,12 +94,12 @@ async fn remapping_models_in_relations_should_work(api: &TestApi) {
                 user_id         Int             @unique
                 User_with_Space User_with_Space @relation(fields: [user_id], references: [id])
             }
-                  
+
             model User_with_Space {
                 id   Int    @default(autoincrement()) @id
                 name String
                 Post Post?
-                        
+
                 @@map("User with Space")
             }
         "#;
@@ -108,7 +108,7 @@ async fn remapping_models_in_relations_should_work(api: &TestApi) {
 }
 
 #[test_each_connector(tags("mysql"))]
-async fn remapping_models_in_relations_should_not_map_virtual_fields(api: &TestApi) {
+async fn remapping_models_in_relations_should_not_map_virtual_fields(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -130,15 +130,15 @@ async fn remapping_models_in_relations_should_not_map_virtual_fields(api: &TestA
                 id      Int  @default(autoincrement()) @id
                 user_id Int  @unique
                 User    User @relation(fields: [user_id], references: [id])
-                
+
                 @@map("Post With Space")
             }
-            
+
             model User {
                 id              Int              @default(autoincrement()) @id
                 name            String
                 Post_With_Space Post_With_Space?
-            }          
+            }
         "#;
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
@@ -146,7 +146,7 @@ async fn remapping_models_in_relations_should_not_map_virtual_fields(api: &TestA
 
 #[test_each_connector(tags("mysql"))]
 #[test]
-async fn remapping_models_in_compound_relations_should_work(api: &TestApi) {
+async fn remapping_models_in_compound_relations_should_work(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -173,15 +173,15 @@ async fn remapping_models_in_compound_relations_should_work(api: &TestApi) {
                 user_age        Int
                 user_id         Int
                 User_with_Space User_with_Space @relation(fields: [user_id, user_age], references: [id, age])
-                    
+
                 @@unique([user_id, user_age], name: "post_user_unique")
             }
-                      
+
             model User_with_Space {
                 age  Int
                 id   Int   @default(autoincrement()) @id
                 Post Post?
-                            
+
                 @@map("User with Space")
                 @@unique([id, age], name: "user_unique")
             }
@@ -192,7 +192,7 @@ async fn remapping_models_in_compound_relations_should_work(api: &TestApi) {
 
 #[test_each_connector(tags("mysql"))]
 #[test]
-async fn remapping_fields_in_compound_relations_should_work(api: &TestApi) {
+async fn remapping_fields_in_compound_relations_should_work(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -211,21 +211,21 @@ async fn remapping_fields_in_compound_relations_should_work(api: &TestApi) {
         })
         .await;
 
-    let dm = r#" 
+    let dm = r#"
             model Post {
                 id       Int  @default(autoincrement()) @id
                 user_age Int
                 user_id  Int
                 User     User @relation(fields: [user_id, user_age], references: [id, age_that_is_invalid])
-                    
+
                 @@unique([user_id, user_age], name: "post_user_unique")
             }
-                      
+
             model User {
                 age_that_is_invalid Int   @map("age-that-is-invalid")
                 id                  Int   @default(autoincrement()) @id
                 Post                Post?
-                            
+
                 @@unique([id, age_that_is_invalid], name: "user_unique")
             }
         "#;
@@ -234,7 +234,7 @@ async fn remapping_fields_in_compound_relations_should_work(api: &TestApi) {
 }
 
 #[test_each_connector(tags("mysql"))]
-async fn remapping_enum_names_should_work(api: &TestApi) {
+async fn remapping_enum_names_should_work(api: TestApi) {
     api.barrel()
         .execute(|migration| {
             migration.create_table("123MySQLBook", |t| {
@@ -262,7 +262,7 @@ async fn remapping_enum_names_should_work(api: &TestApi) {
 }
 
 #[test_each_connector(tags("mysql"))]
-async fn remapping_enum_values_should_work(api: &TestApi) {
+async fn remapping_enum_values_should_work(api: TestApi) {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Book", |t| {
@@ -289,7 +289,7 @@ async fn remapping_enum_values_should_work(api: &TestApi) {
 }
 
 #[test_each_connector(tags("mysql"))]
-async fn remapping_enum_default_values_should_work(api: &TestApi) {
+async fn remapping_enum_default_values_should_work(api: TestApi) {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Book", |t| {

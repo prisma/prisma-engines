@@ -6,7 +6,7 @@ use pretty_assertions::assert_eq;
 use sql_migration_connector::PrettySqlMigrationStep;
 
 #[test_each_connector]
-async fn assume_to_be_applied_must_work(api: &TestApi) -> TestResult {
+async fn assume_to_be_applied_must_work(api: TestApi) -> TestResult {
     let dm0 = r#"
         model Blog {
             id Int @id
@@ -64,7 +64,7 @@ async fn assume_to_be_applied_must_work(api: &TestApi) -> TestResult {
 
 #[test_each_connector]
 async fn infer_migration_steps_validates_that_already_applied_migrations_are_not_in_assume_to_be_applied(
-    api: &TestApi,
+    api: TestApi,
 ) -> TestResult {
     let dm1 = r#"
         model Test {
@@ -108,7 +108,7 @@ async fn infer_migration_steps_validates_that_already_applied_migrations_are_not
 }
 
 #[test_each_connector]
-async fn special_handling_of_watch_migrations(api: &TestApi) -> TestResult {
+async fn special_handling_of_watch_migrations(api: TestApi) -> TestResult {
     let dm = r#"
             model Blog {
                 id Int @id
@@ -174,7 +174,7 @@ async fn special_handling_of_watch_migrations(api: &TestApi) -> TestResult {
 ///
 /// Relevant issue: https://github.com/prisma/lift/issues/167
 #[test_each_connector]
-async fn watch_migrations_must_be_returned_when_transitioning_out_of_watch_mode(api: &TestApi) -> TestResult {
+async fn watch_migrations_must_be_returned_when_transitioning_out_of_watch_mode(api: TestApi) -> TestResult {
     let dm = r#"
             model Blog {
                 id Int @id
@@ -237,7 +237,7 @@ async fn watch_migrations_must_be_returned_when_transitioning_out_of_watch_mode(
 
 #[test_each_connector]
 async fn watch_migrations_must_be_returned_in_addition_to_regular_inferred_steps_when_transitioning_out_of_watch_mode(
-    api: &TestApi,
+    api: TestApi,
 ) -> TestResult {
     let dm = r#"
             model Blog {

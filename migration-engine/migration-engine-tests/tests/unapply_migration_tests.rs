@@ -2,7 +2,7 @@ use migration_engine_tests::*;
 use quaint::ast as quaint_ast;
 
 #[test_each_connector]
-async fn unapply_must_work(api: &TestApi) -> TestResult {
+async fn unapply_must_work(api: TestApi) -> TestResult {
     let dm1 = r#"
         model Test {
             id String @id @default(cuid())
@@ -41,7 +41,7 @@ async fn unapply_must_work(api: &TestApi) -> TestResult {
 }
 
 #[test_each_connector]
-async fn destructive_change_checks_run_on_unapply_migration(api: &TestApi) -> TestResult {
+async fn destructive_change_checks_run_on_unapply_migration(api: TestApi) -> TestResult {
     let dm1 = r#"
         model Test {
             id String @id

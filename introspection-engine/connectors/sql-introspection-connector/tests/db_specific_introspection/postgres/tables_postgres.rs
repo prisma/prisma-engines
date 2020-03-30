@@ -4,7 +4,7 @@ use pretty_assertions::assert_eq;
 use test_harness::*;
 
 #[test_each_connector(tags("postgres"))]
-async fn introspecting_a_simple_table_with_gql_types_must_work(api: &TestApi) {
+async fn introspecting_a_simple_table_with_gql_types_must_work(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -34,7 +34,7 @@ async fn introspecting_a_simple_table_with_gql_types_must_work(api: &TestApi) {
 }
 
 #[test_each_connector(tags("postgres"))]
-async fn introspecting_a_table_with_serial_type_must_work(api: &TestApi) {
+async fn introspecting_a_table_with_serial_type_must_work(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -54,7 +54,7 @@ async fn introspecting_a_table_with_serial_type_must_work(api: &TestApi) {
 }
 
 #[test_each_connector(tags("postgres"))]
-async fn introspecting_a_table_with_compound_primary_keys_must_work(api: &TestApi) {
+async fn introspecting_a_table_with_compound_primary_keys_must_work(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -77,7 +77,7 @@ async fn introspecting_a_table_with_compound_primary_keys_must_work(api: &TestAp
 }
 
 #[test_each_connector(tags("postgres"))]
-async fn introspecting_a_table_with_unique_index_must_work(api: &TestApi) {
+async fn introspecting_a_table_with_unique_index_must_work(api: TestApi) {
     let barrel = api.barrel();
     barrel
         .execute(|migration| {
@@ -100,7 +100,7 @@ async fn introspecting_a_table_with_unique_index_must_work(api: &TestApi) {
 }
 
 #[test_each_connector(tags("postgres"))]
-async fn introspecting_a_table_with_multi_column_unique_index_must_work(api: &TestApi) {
+async fn introspecting_a_table_with_multi_column_unique_index_must_work(api: TestApi) {
     let barrel = api.barrel();
     barrel
         .execute(|migration| {
@@ -126,7 +126,7 @@ async fn introspecting_a_table_with_multi_column_unique_index_must_work(api: &Te
 }
 
 #[test_each_connector(tags("postgres"))]
-async fn introspecting_a_table_with_required_and_optional_columns_must_work(api: &TestApi) {
+async fn introspecting_a_table_with_required_and_optional_columns_must_work(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -149,7 +149,7 @@ async fn introspecting_a_table_with_required_and_optional_columns_must_work(api:
 }
 
 // #[test_each_connector(tags("postgres"))]
-// async fn introspecting_a_table_with_datetime_default_values_should_work2(api: &TestApi) {
+// async fn introspecting_a_table_with_datetime_default_values_should_work2(api: TestApi) {
 //     let barrel = api.barrel();
 //     let _setup_schema = barrel
 //         .execute(|migration| {
@@ -174,7 +174,7 @@ async fn introspecting_a_table_with_required_and_optional_columns_must_work(api:
 // }
 
 #[test_each_connector(tags("postgres"))]
-async fn introspecting_a_table_with_default_values_should_work(api: &TestApi) {
+async fn introspecting_a_table_with_default_values_should_work(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -205,7 +205,7 @@ async fn introspecting_a_table_with_default_values_should_work(api: &TestApi) {
 }
 
 #[test_each_connector(tags("postgres"))]
-async fn introspecting_a_table_with_a_non_unique_index_should_work(api: &TestApi) {
+async fn introspecting_a_table_with_a_non_unique_index_should_work(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -229,7 +229,7 @@ async fn introspecting_a_table_with_a_non_unique_index_should_work(api: &TestApi
 }
 
 #[test_each_connector(tags("postgres"))]
-async fn introspecting_a_table_with_a_multi_column_non_unique_index_should_work(api: &TestApi) {
+async fn introspecting_a_table_with_a_multi_column_non_unique_index_should_work(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -255,7 +255,7 @@ async fn introspecting_a_table_with_a_multi_column_non_unique_index_should_work(
 }
 
 #[test_each_connector(tags("postgres"))]
-async fn introspecting_a_table_without_uniques_should_comment_it_out(api: &TestApi) {
+async fn introspecting_a_table_without_uniques_should_comment_it_out(api: TestApi) {
     api.barrel()
         .execute(|migration| {
             migration.create_table("User", |t| {
@@ -275,7 +275,7 @@ async fn introspecting_a_table_without_uniques_should_comment_it_out(api: &TestA
 }
 
 #[test_each_connector(tags("postgres"))]
-async fn introspecting_default_values_should_work(api: &TestApi) {
+async fn introspecting_default_values_should_work(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -334,7 +334,7 @@ async fn introspecting_default_values_should_work(api: &TestApi) {
             model Test {
                 boolean_boolean     Boolean?        @default(false)
                 id                  Int         @id @default(autoincrement())
-                numeric_decimal     Float?          @default(1234.1234) 
+                numeric_decimal     Float?          @default(1234.1234)
                 numeric_float4      Float?          @default(123.1234)
                 numeric_float8      Float?          @default(123.1234)
                 numeric_int2        Int?            @default(2)
@@ -356,7 +356,7 @@ async fn introspecting_default_values_should_work(api: &TestApi) {
 
 #[test_each_connector(tags("postgres"))]
 
-async fn introspecting_a_default_value_as_dbgenerated_should_work(api: &TestApi) {
+async fn introspecting_a_default_value_as_dbgenerated_should_work(api: TestApi) {
     let sequence = format!("CREATE SEQUENCE test_seq START 1");
     let color = format!("CREATE Type color as Enum ('black', 'white')");
 
@@ -403,10 +403,10 @@ async fn introspecting_a_default_value_as_dbgenerated_should_work(api: &TestApi)
                 string_function         String?     @default(dbgenerated())
                 string_static_char      String?     @default("test")
                 string_static_text      String?     @default("test")
-                string_static_text_null String?     
+                string_static_text_null String?
                 string_static_varchar   String?     @default("test")
             }
-            
+
            enum color{
                 black
                 white
@@ -418,7 +418,7 @@ async fn introspecting_a_default_value_as_dbgenerated_should_work(api: &TestApi)
 }
 
 #[test_each_connector(tags("postgres"))]
-async fn introspecting_an_unsupported_type_should_comment_it_out(api: &TestApi) {
+async fn introspecting_an_unsupported_type_should_comment_it_out(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -441,7 +441,7 @@ async fn introspecting_an_unsupported_type_should_comment_it_out(api: &TestApi) 
 }
 
 #[test_each_connector(tags("postgres"))]
-async fn introspecting_a_legacy_m_to_n_relation_should_work(api: &TestApi) {
+async fn introspecting_a_legacy_m_to_n_relation_should_work(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -481,7 +481,7 @@ async fn introspecting_a_legacy_m_to_n_relation_should_work(api: &TestApi) {
 }
 
 #[test_each_connector(tags("postgres"))]
-async fn introspecting_default_values_on_lists_should_be_ignored(api: &TestApi) {
+async fn introspecting_default_values_on_lists_should_be_ignored(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -510,7 +510,7 @@ async fn introspecting_default_values_on_lists_should_be_ignored(api: &TestApi) 
 }
 
 #[test_each_connector(tags("postgres"))]
-async fn introspecting_an_unsupported_type_should_and_commenting_it_out_should_also_drop_its_usages(api: &TestApi) {
+async fn introspecting_an_unsupported_type_should_and_commenting_it_out_should_also_drop_its_usages(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -536,7 +536,7 @@ async fn introspecting_an_unsupported_type_should_and_commenting_it_out_should_a
 }
 
 #[test_each_connector(tags("postgres"))]
-async fn introspecting_a_table_with_only_an_unsupported_id_type_should_comment_it_out(api: &TestApi) {
+async fn introspecting_a_table_with_only_an_unsupported_id_type_should_comment_it_out(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {

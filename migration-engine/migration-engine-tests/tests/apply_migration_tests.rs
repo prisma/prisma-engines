@@ -4,7 +4,7 @@ use migration_connector::*;
 use migration_engine_tests::sql::*;
 
 #[test_each_connector]
-async fn single_watch_migrations_must_work(api: &TestApi) {
+async fn single_watch_migrations_must_work(api: TestApi) {
     let migration_persistence = api.migration_persistence();
 
     let steps = vec![
@@ -34,7 +34,7 @@ async fn single_watch_migrations_must_work(api: &TestApi) {
 }
 
 #[test_each_connector]
-async fn multiple_watch_migrations_must_work(api: &TestApi) {
+async fn multiple_watch_migrations_must_work(api: TestApi) {
     let migration_persistence = api.migration_persistence();
 
     let steps1 = vec![
@@ -79,7 +79,7 @@ async fn multiple_watch_migrations_must_work(api: &TestApi) {
 }
 
 #[test_each_connector]
-async fn steps_equivalence_criteria_is_satisfied_when_leaving_watch_mode(api: &TestApi) {
+async fn steps_equivalence_criteria_is_satisfied_when_leaving_watch_mode(api: TestApi) {
     let migration_persistence = api.migration_persistence();
 
     let steps1 = vec![
@@ -110,7 +110,7 @@ async fn steps_equivalence_criteria_is_satisfied_when_leaving_watch_mode(api: &T
 }
 
 #[test_each_connector]
-async fn must_handle_additional_steps_when_transitioning_out_of_watch_mode(api: &TestApi) {
+async fn must_handle_additional_steps_when_transitioning_out_of_watch_mode(api: TestApi) {
     let migration_persistence = api.migration_persistence();
 
     let steps1 = vec![
@@ -147,7 +147,7 @@ async fn must_handle_additional_steps_when_transitioning_out_of_watch_mode(api: 
 }
 
 #[test_each_connector]
-async fn applying_an_already_applied_migration_must_return_an_error(api: &TestApi) -> TestResult {
+async fn applying_an_already_applied_migration_must_return_an_error(api: TestApi) -> TestResult {
     let steps = vec![
         create_model_step("Test"),
         create_field_step("Test", "id", "Int"),

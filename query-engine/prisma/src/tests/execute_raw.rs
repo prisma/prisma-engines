@@ -24,7 +24,7 @@ fn execute_raw(query: &str, params: Vec<ParameterizedValue>) -> String {
 }
 
 #[test_each_connector]
-async fn select_1(api: &TestApi) -> anyhow::Result<()> {
+async fn select_1(api: TestApi) -> anyhow::Result<()> {
     let query_engine = api.create_engine(&TODO).await?;
 
     let query = indoc! {r#"
@@ -53,7 +53,7 @@ async fn select_1(api: &TestApi) -> anyhow::Result<()> {
 }
 
 #[test_each_connector]
-async fn parameterized_queries(api: &TestApi) -> anyhow::Result<()> {
+async fn parameterized_queries(api: TestApi) -> anyhow::Result<()> {
     let query_engine = api.create_engine(&TODO).await?;
 
     let query = match api.connection_info() {
@@ -97,7 +97,7 @@ async fn parameterized_queries(api: &TestApi) -> anyhow::Result<()> {
 }
 
 #[test_each_connector]
-async fn querying_model_tables(api: &TestApi) -> anyhow::Result<()> {
+async fn querying_model_tables(api: TestApi) -> anyhow::Result<()> {
     let query_engine = api.create_engine(&TODO).await?;
 
     let mutation = indoc! {r#"
@@ -126,7 +126,7 @@ async fn querying_model_tables(api: &TestApi) -> anyhow::Result<()> {
 }
 
 #[test_each_connector]
-async fn inserting_into_model_table(api: &TestApi) -> anyhow::Result<()> {
+async fn inserting_into_model_table(api: TestApi) -> anyhow::Result<()> {
     let query_engine = api.create_engine(&TODO).await?;
 
     let insert = Insert::multi_into("Todo", &["id", "title"])
@@ -162,7 +162,7 @@ async fn inserting_into_model_table(api: &TestApi) -> anyhow::Result<()> {
 }
 
 #[test_each_connector]
-async fn querying_model_tables_with_alias(api: &TestApi) -> anyhow::Result<()> {
+async fn querying_model_tables_with_alias(api: TestApi) -> anyhow::Result<()> {
     let query_engine = api.create_engine(&TODO).await?;
 
     let mutation = indoc! {r#"
@@ -189,7 +189,7 @@ async fn querying_model_tables_with_alias(api: &TestApi) -> anyhow::Result<()> {
 }
 
 #[test_each_connector]
-async fn querying_the_same_column_name_twice_with_aliasing(api: &TestApi) -> anyhow::Result<()> {
+async fn querying_the_same_column_name_twice_with_aliasing(api: TestApi) -> anyhow::Result<()> {
     let query_engine = api.create_engine(&TODO).await?;
 
     let mutation = indoc! {r#"
@@ -234,7 +234,7 @@ async fn arrays(api: &TestApi) -> anyhow::Result<()> {
 }
 
 #[test_each_connector]
-async fn syntactic_errors_bubbling_through_to_the_user(api: &TestApi) -> anyhow::Result<()> {
+async fn syntactic_errors_bubbling_through_to_the_user(api: TestApi) -> anyhow::Result<()> {
     let query_engine = api.create_engine(&TODO).await?;
     let result = query_engine.request(execute_raw("SELECT * FROM ", vec![])).await;
     let error_code = result["errors"][0]["user_facing_error"]["meta"]["code"].as_str();
@@ -249,7 +249,7 @@ async fn syntactic_errors_bubbling_through_to_the_user(api: &TestApi) -> anyhow:
 }
 
 #[test_each_connector]
-async fn other_errors_bubbling_through_to_the_user(api: &TestApi) -> anyhow::Result<()> {
+async fn other_errors_bubbling_through_to_the_user(api: TestApi) -> anyhow::Result<()> {
     let query_engine = api.create_engine(&TODO).await?;
 
     let mutation = indoc! {r#"

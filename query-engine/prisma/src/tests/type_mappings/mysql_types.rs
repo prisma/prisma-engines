@@ -166,7 +166,7 @@ const FIND_MANY_TYPES_QUERY: &str = indoc!(
 );
 
 #[test_each_connector(tags("mysql"))]
-async fn mysql_types_roundtrip(api: &TestApi) -> TestResult {
+async fn mysql_types_roundtrip(api: TestApi) -> TestResult {
     api.execute_sql(CREATE_TYPES_TABLE).await?;
 
     let (datamodel, engine) = api.introspect_and_start_query_engine().await?;
@@ -248,7 +248,7 @@ async fn mysql_types_roundtrip(api: &TestApi) -> TestResult {
 }
 
 #[test_each_connector(tags("mysql"))]
-async fn mysql_bit_columns_are_properly_mapped_to_signed_integers(api: &TestApi) -> TestResult {
+async fn mysql_bit_columns_are_properly_mapped_to_signed_integers(api: TestApi) -> TestResult {
     api.execute_sql(CREATE_TYPES_TABLE).await?;
 
     let (_datamodel, engine) = api.introspect_and_start_query_engine().await?;
@@ -282,7 +282,7 @@ async fn mysql_bit_columns_are_properly_mapped_to_signed_integers(api: &TestApi)
 }
 
 #[test_each_connector(tags("mysql"))]
-async fn mysql_floats_do_not_lose_precision(api: &TestApi) -> TestResult {
+async fn mysql_floats_do_not_lose_precision(api: TestApi) -> TestResult {
     api.execute_sql(CREATE_TYPES_TABLE).await?;
 
     let (_datamodel, engine) = api.introspect_and_start_query_engine().await?;
@@ -323,7 +323,7 @@ async fn mysql_floats_do_not_lose_precision(api: &TestApi) -> TestResult {
 }
 
 #[test_each_connector(tags("mysql"))]
-async fn all_mysql_identifier_types_work(api: &TestApi) -> TestResult {
+async fn all_mysql_identifier_types_work(api: TestApi) -> TestResult {
     let identifier_types = &[
         ("tinyint", "12", ""),
         ("smallint", "350", ""),
@@ -389,7 +389,7 @@ async fn all_mysql_identifier_types_work(api: &TestApi) -> TestResult {
 }
 
 #[test_each_connector(tags("mysql"))]
-async fn all_mysql_types_work_as_filter(api: &TestApi) -> TestResult {
+async fn all_mysql_types_work_as_filter(api: TestApi) -> TestResult {
     api.execute_sql(CREATE_TYPES_TABLE).await?;
 
     let (_datamodel, engine) = api.introspect_and_start_query_engine().await?;
@@ -473,7 +473,7 @@ const CREATE_TYPES_TABLE_WITH_DEFAULTS: &str = indoc! {
 };
 
 #[test_each_connector(tags("mysql"))]
-async fn mysql_db_level_defaults_work(api: &TestApi) -> TestResult {
+async fn mysql_db_level_defaults_work(api: TestApi) -> TestResult {
     api.execute_sql(CREATE_TYPES_TABLE_WITH_DEFAULTS).await?;
 
     let (_datamodel, engine) = api.introspect_and_start_query_engine().await?;
@@ -558,7 +558,7 @@ async fn mysql_db_level_defaults_work(api: &TestApi) -> TestResult {
 }
 
 #[test_each_connector(tags("mysql"))]
-async fn length_mismatch_is_a_known_error(api: &TestApi) -> TestResult {
+async fn length_mismatch_is_a_known_error(api: TestApi) -> TestResult {
     let create_table = indoc!(
         r#"
             CREATE TABLE fixed_lengths (

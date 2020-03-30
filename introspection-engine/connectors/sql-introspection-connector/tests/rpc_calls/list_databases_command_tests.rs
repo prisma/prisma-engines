@@ -2,7 +2,7 @@ use crate::{test_harness::*, BarrelMigrationExecutor};
 use barrel::types;
 
 #[test_each_connector(tags("mysql"))]
-async fn databases_for_mysql_should_work(api: &TestApi) {
+async fn databases_for_mysql_should_work(api: TestApi) {
     let barrel = api.barrel();
     setup(&barrel, api.db_name());
     let result = dbg!(api.list_databases().await);
@@ -10,7 +10,7 @@ async fn databases_for_mysql_should_work(api: &TestApi) {
 }
 
 #[test_each_connector(tags("postgres"))]
-async fn databases_for_postgres_should_work(api: &TestApi) {
+async fn databases_for_postgres_should_work(api: TestApi) {
     let barrel = api.barrel();
     setup(&barrel, api.schema_name());
     let result = dbg!(api.list_databases().await);
@@ -18,7 +18,7 @@ async fn databases_for_postgres_should_work(api: &TestApi) {
 }
 
 #[test_each_connector(tags("sqlite"))]
-async fn databases_for_sqlite_should_work(api: &TestApi) {
+async fn databases_for_sqlite_should_work(api: TestApi) {
     let barrel = api.barrel();
     setup(&barrel, api.schema_name());
     let result = dbg!(api.list_databases().await);

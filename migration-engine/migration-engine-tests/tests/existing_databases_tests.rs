@@ -5,7 +5,7 @@ use quaint::prelude::SqlFamily;
 use sql_schema_describer::*;
 
 #[test_each_connector]
-async fn adding_a_model_for_an_existing_table_must_work(api: &TestApi) -> TestResult {
+async fn adding_a_model_for_an_existing_table_must_work(api: TestApi) -> TestResult {
     let initial_result = api
         .barrel()
         .execute(|migration| {
@@ -33,7 +33,7 @@ fn bigint_columns_must_work() {
 }
 
 #[test_each_connector]
-async fn removing_a_model_for_a_table_that_is_already_deleted_must_work(api: &TestApi) -> TestResult {
+async fn removing_a_model_for_a_table_that_is_already_deleted_must_work(api: TestApi) -> TestResult {
     let dm1 = r#"
             model Blog {
                 id Int @id
@@ -67,7 +67,7 @@ async fn removing_a_model_for_a_table_that_is_already_deleted_must_work(api: &Te
 }
 
 #[test_each_connector]
-async fn creating_a_field_for_an_existing_column_with_a_compatible_type_must_work(api: &TestApi) -> TestResult {
+async fn creating_a_field_for_an_existing_column_with_a_compatible_type_must_work(api: TestApi) -> TestResult {
     let is_mysql = api.is_mysql();
     let initial_result = api
         .barrel()
@@ -102,7 +102,7 @@ async fn creating_a_field_for_an_existing_column_with_a_compatible_type_must_wor
 }
 
 #[test_each_connector]
-async fn creating_a_field_for_an_existing_column_and_changing_its_type_must_work(api: &TestApi) -> TestResult {
+async fn creating_a_field_for_an_existing_column_and_changing_its_type_must_work(api: TestApi) -> TestResult {
     let initial_result = api
         .barrel()
         .execute(|migration| {
@@ -135,7 +135,7 @@ async fn creating_a_field_for_an_existing_column_and_changing_its_type_must_work
 }
 
 #[test_each_connector]
-async fn creating_a_field_for_an_existing_column_and_simultaneously_making_it_optional(api: &TestApi) -> TestResult {
+async fn creating_a_field_for_an_existing_column_and_simultaneously_making_it_optional(api: TestApi) -> TestResult {
     let initial_result = api
         .barrel()
         .execute(|migration| {
@@ -162,7 +162,7 @@ async fn creating_a_field_for_an_existing_column_and_simultaneously_making_it_op
 }
 
 #[test_each_connector(capabilities("scalar_lists"))]
-async fn creating_a_scalar_list_field_for_an_existing_table_must_work(api: &TestApi) -> TestResult {
+async fn creating_a_scalar_list_field_for_an_existing_table_must_work(api: TestApi) -> TestResult {
     let dm1 = r#"
             datasource pg {
               provider = "postgres"
@@ -204,7 +204,7 @@ async fn creating_a_scalar_list_field_for_an_existing_table_must_work(api: &Test
 }
 
 #[test_each_connector(tags("sql"))]
-async fn delete_a_field_for_a_non_existent_column_must_work(api: &TestApi) -> TestResult {
+async fn delete_a_field_for_a_non_existent_column_must_work(api: TestApi) -> TestResult {
     let dm1 = r#"
             model Blog {
                 id Int @id
@@ -238,7 +238,7 @@ async fn delete_a_field_for_a_non_existent_column_must_work(api: &TestApi) -> Te
 }
 
 #[test_each_connector(tags("sql"), capabilities("scalar_lists"))]
-async fn deleting_a_scalar_list_field_for_a_non_existent_column_must_work(api: &TestApi) -> TestResult {
+async fn deleting_a_scalar_list_field_for_a_non_existent_column_must_work(api: TestApi) -> TestResult {
     let dm1 = r#"
             datasource pg {
               provider = "postgres"
@@ -281,7 +281,7 @@ async fn deleting_a_scalar_list_field_for_a_non_existent_column_must_work(api: &
 }
 
 #[test_each_connector(tags("sql"))]
-async fn updating_a_field_for_a_non_existent_column(api: &TestApi) -> TestResult {
+async fn updating_a_field_for_a_non_existent_column(api: TestApi) -> TestResult {
     let dm1 = r#"
             model Blog {
                 id Int @id
@@ -325,7 +325,7 @@ async fn updating_a_field_for_a_non_existent_column(api: &TestApi) -> TestResult
 }
 
 #[test_each_connector]
-async fn renaming_a_field_where_the_column_was_already_renamed_must_work(api: &TestApi) -> TestResult {
+async fn renaming_a_field_where_the_column_was_already_renamed_must_work(api: TestApi) -> TestResult {
     let dm1 = r#"
             model Blog {
                 id Int @id
@@ -367,7 +367,7 @@ async fn renaming_a_field_where_the_column_was_already_renamed_must_work(api: &T
 }
 
 #[test_each_connector]
-async fn removing_a_default_from_a_non_nullable_foreign_key_column_must_warn(api: &TestApi) -> TestResult {
+async fn removing_a_default_from_a_non_nullable_foreign_key_column_must_warn(api: TestApi) -> TestResult {
     let sql_family = api.sql_family();
     let sql_schema = api
         .barrel()

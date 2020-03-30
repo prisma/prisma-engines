@@ -4,7 +4,7 @@ use test_harness::*;
 
 #[test_each_connector(tags("sqlite"))]
 #[test]
-async fn compound_foreign_keys_should_work_for_one_to_one_relations(api: &TestApi) {
+async fn compound_foreign_keys_should_work_for_one_to_one_relations(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -30,16 +30,16 @@ async fn compound_foreign_keys_should_work_for_one_to_one_relations(api: &TestAp
                 age  Int
                 id   Int   @default(autoincrement()) @id
                 Post Post?
-                
+
                 @@unique([id, age], name: "sqlite_autoindex_User_1")
             }
-            
+
             model Post {
                 id       Int   @default(autoincrement()) @id
                 user_age Int?
                 user_id  Int?
                 User     User? @relation(fields: [user_id, user_age], references: [id, age])
-                
+
                 @@unique([user_id, user_age], name: "sqlite_autoindex_Post_1")
             }
 
@@ -50,7 +50,7 @@ async fn compound_foreign_keys_should_work_for_one_to_one_relations(api: &TestAp
 
 #[test_each_connector(tags("sqlite"))]
 #[test]
-async fn compound_foreign_keys_should_work_for_required_one_to_one_relations(api: &TestApi) {
+async fn compound_foreign_keys_should_work_for_required_one_to_one_relations(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -76,16 +76,16 @@ async fn compound_foreign_keys_should_work_for_required_one_to_one_relations(api
                 age  Int
                 id   Int   @default(autoincrement()) @id
                 Post Post?
-                
+
                 @@unique([id, age], name: "sqlite_autoindex_User_1")
             }
-            
+
             model Post {
                 id       Int  @default(autoincrement()) @id
                 user_age Int
                 user_id  Int
                 User     User @relation(fields: [user_id, user_age], references: [id, age])
-                
+
                 @@unique([user_id, user_age], name: "sqlite_autoindex_Post_1")
             }
 
@@ -96,7 +96,7 @@ async fn compound_foreign_keys_should_work_for_required_one_to_one_relations(api
 
 #[test_each_connector(tags("sqlite"))]
 #[test]
-async fn compound_foreign_keys_should_work_for_one_to_many_relations(api: &TestApi) {
+async fn compound_foreign_keys_should_work_for_one_to_many_relations(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -121,10 +121,10 @@ async fn compound_foreign_keys_should_work_for_one_to_many_relations(api: &TestA
                   age  Int
                   id   Int    @default(autoincrement()) @id
                   Post Post[]
-                      
+
                   @@unique([id, age], name: "sqlite_autoindex_User_1")
             }
-                    
+
             model Post {
                   id       Int   @default(autoincrement()) @id
                   user_age Int?
@@ -139,7 +139,7 @@ async fn compound_foreign_keys_should_work_for_one_to_many_relations(api: &TestA
 
 #[test_each_connector(tags("sqlite"))]
 #[test]
-async fn compound_foreign_keys_should_work_for_duplicate_one_to_many_relations(api: &TestApi) {
+async fn compound_foreign_keys_should_work_for_duplicate_one_to_many_relations(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -170,10 +170,10 @@ async fn compound_foreign_keys_should_work_for_duplicate_one_to_many_relations(a
                 id                                              Int    @default(autoincrement()) @id
                 Post_Post_other_user_id_other_user_ageToUser    Post[] @relation("Post_other_user_id_other_user_ageToUser")
                 Post_Post_user_id_user_ageToUser                Post[] @relation("Post_user_id_user_ageToUser")
-                    
+
                 @@unique([id, age], name: "sqlite_autoindex_User_1")
             }
-                      
+
             model Post {
                id                                               Int   @default(autoincrement()) @id
                other_user_age                                   Int?
@@ -191,7 +191,7 @@ async fn compound_foreign_keys_should_work_for_duplicate_one_to_many_relations(a
 
 #[test_each_connector(tags("sqlite"))]
 #[test]
-async fn compound_foreign_keys_should_work_for_required_one_to_many_relations(api: &TestApi) {
+async fn compound_foreign_keys_should_work_for_required_one_to_many_relations(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -216,10 +216,10 @@ async fn compound_foreign_keys_should_work_for_required_one_to_many_relations(ap
                 age  Int
                 id   Int    @default(autoincrement()) @id
                 Post Post[]
-                
+
                 @@unique([id, age], name: "sqlite_autoindex_User_1")
             }
-            
+
             model Post {
                 id       Int  @default(autoincrement()) @id
                 user_age Int
@@ -233,7 +233,7 @@ async fn compound_foreign_keys_should_work_for_required_one_to_many_relations(ap
 
 #[test_each_connector(tags("sqlite"))]
 #[test]
-async fn compound_foreign_keys_should_work_for_required_self_relations(api: &TestApi) {
+async fn compound_foreign_keys_should_work_for_required_self_relations(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -258,10 +258,10 @@ async fn compound_foreign_keys_should_work_for_required_self_relations(api: &Tes
                 partner_id   Int
                 Person       Person   @relation("PersonToPerson_partner_id_partner_age", fields: [partner_id, partner_age], references: [id, age])
                 other_Person Person[] @relation("PersonToPerson_partner_id_partner_age")
-                
+
                 @@unique([id, age], name: "sqlite_autoindex_Person_1")
             }
-            
+
         "#;
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
@@ -269,7 +269,7 @@ async fn compound_foreign_keys_should_work_for_required_self_relations(api: &Tes
 
 #[test_each_connector(tags("sqlite"))]
 #[test]
-async fn compound_foreign_keys_should_work_for_self_relations(api: &TestApi) {
+async fn compound_foreign_keys_should_work_for_self_relations(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -294,10 +294,10 @@ async fn compound_foreign_keys_should_work_for_self_relations(api: &TestApi) {
                 partner_id   Int?
                 Person       Person?  @relation("PersonToPerson_partner_id_partner_age", fields: [partner_id, partner_age], references: [id, age])
                 other_Person Person[] @relation("PersonToPerson_partner_id_partner_age")
-                
+
                 @@unique([id, age], name: "sqlite_autoindex_Person_1")
             }
-            
+
         "#;
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
@@ -305,7 +305,7 @@ async fn compound_foreign_keys_should_work_for_self_relations(api: &TestApi) {
 
 #[test_each_connector(tags("sqlite"))]
 #[test]
-async fn compound_foreign_keys_should_work_with_defaults(api: &TestApi) {
+async fn compound_foreign_keys_should_work_with_defaults(api: TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -330,10 +330,10 @@ async fn compound_foreign_keys_should_work_with_defaults(api: &TestApi) {
               partner_id   Int      @default(0)
               Person       Person   @relation("PersonToPerson_partner_id_partner_age", fields: [partner_id, partner_age], references: [id, age])
               other_Person Person[] @relation("PersonToPerson_partner_id_partner_age")
-              
+
               @@unique([id, age], name: "sqlite_autoindex_Person_1")
             }
-            
+
         "#;
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
@@ -348,7 +348,7 @@ async fn compound_foreign_keys_should_work_with_defaults(api: &TestApi) {
 // what breaks by having an @@unique that refers to fields that do not have a representation on the model anymore due to the merged relation field?
 //#[test_each_connector(tags("sqlite"))]
 //#[test]
-//async fn compound_foreign_keys_should_work_for_one_to_one_relations_with_separate_uniques(api: &TestApi) {
+//async fn compound_foreign_keys_should_work_for_one_to_one_relations_with_separate_uniques(api: TestApi) {
 //    let barrel = api.barrel();
 //    let _setup_schema = barrel
 //        .execute(|migration| {
@@ -388,7 +388,7 @@ async fn compound_foreign_keys_should_work_with_defaults(api: &TestApi) {
 #[test_each_connector(tags("sqlite"))]
 #[test]
 async fn compound_foreign_keys_should_work_for_one_to_many_relations_with_non_unique_index(
-    api: &TestApi,
+    api: TestApi,
 ) {
     let barrel = api.barrel();
     let _setup_schema = barrel
@@ -415,19 +415,19 @@ async fn compound_foreign_keys_should_work_for_one_to_many_relations_with_non_un
                 age  Int
                 id   Int    @default(autoincrement()) @id
                 Post Post[]
-                
+
                 @@unique([id, age], name: "sqlite_autoindex_User_1")
             }
-            
+
             model Post {
                 id       Int  @default(autoincrement()) @id
                 user_age Int
                 user_id  Int
                 User     User @relation(fields: [user_id, user_age], references: [id, age])
-                
+
                 @@index([user_id, user_age], name: "test")
             }
-            
+
         "#;
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);

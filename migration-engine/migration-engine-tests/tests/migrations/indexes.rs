@@ -1,7 +1,7 @@
 use migration_engine_tests::sql::*;
 
 #[test_each_connector]
-async fn index_on_compound_relation_fields_must_work(api: &TestApi) -> TestResult {
+async fn index_on_compound_relation_fields_must_work(api: TestApi) -> TestResult {
     let dm = r#"
         model User {
             id String @id
@@ -34,7 +34,7 @@ async fn index_on_compound_relation_fields_must_work(api: &TestApi) -> TestResul
 }
 
 #[test_each_connector]
-async fn index_settings_must_be_migrated(api: &TestApi) -> TestResult {
+async fn index_settings_must_be_migrated(api: TestApi) -> TestResult {
     let dm = r#"
         model Test {
             id String @id
@@ -75,7 +75,7 @@ async fn index_settings_must_be_migrated(api: &TestApi) -> TestResult {
 }
 
 #[test_each_connector]
-async fn unique_directive_on_required_one_to_one_relation_creates_one_index(api: &TestApi) -> TestResult {
+async fn unique_directive_on_required_one_to_one_relation_creates_one_index(api: TestApi) -> TestResult {
     // We want to test that only one index is created, because of the implicit unique index on
     // required 1:1 relations.
 

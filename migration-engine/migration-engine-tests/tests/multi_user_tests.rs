@@ -1,7 +1,7 @@
 use migration_engine_tests::{sql::multi_user::*, TestResult};
 
 #[test_each_connector]
-async fn multi_users_sanity_check(api: &TestApi) -> TestResult {
+async fn multi_users_sanity_check(api: TestApi) -> TestResult {
     let dm = r#"
         model Cat {
             id String @id
@@ -78,7 +78,7 @@ async fn multi_users_sanity_check(api: &TestApi) -> TestResult {
 }
 
 #[test_each_connector]
-async fn users_cannot_add_the_same_model_separately(api: &TestApi) -> TestResult {
+async fn users_cannot_add_the_same_model_separately(api: TestApi) -> TestResult {
     // Initial setup
     let master = {
         let initial_dm = r#"

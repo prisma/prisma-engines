@@ -7,7 +7,7 @@ use quaint::ast::*;
 use std::borrow::Cow;
 
 #[test_each_connector]
-async fn dropping_a_table_with_rows_should_warn(api: &TestApi) {
+async fn dropping_a_table_with_rows_should_warn(api: TestApi) {
     let dm = r#"
         model Test {
             id String @id @default(cuid())
@@ -40,7 +40,7 @@ async fn dropping_a_table_with_rows_should_warn(api: &TestApi) {
 }
 
 #[test_each_connector]
-async fn dropping_a_column_with_non_null_values_should_warn(api: &TestApi) {
+async fn dropping_a_column_with_non_null_values_should_warn(api: TestApi) {
     let dm = r#"
             model Test {
                 id String @id @default(cuid())
@@ -81,7 +81,7 @@ async fn dropping_a_column_with_non_null_values_should_warn(api: &TestApi) {
 }
 
 #[test_each_connector]
-async fn altering_a_column_without_non_null_values_should_not_warn(api: &TestApi) {
+async fn altering_a_column_without_non_null_values_should_not_warn(api: TestApi) {
     let dm = r#"
         model Test {
             id String @id @default(cuid())
@@ -112,7 +112,7 @@ async fn altering_a_column_without_non_null_values_should_not_warn(api: &TestApi
 }
 
 #[test_each_connector]
-async fn altering_a_column_with_non_null_values_should_warn(api: &TestApi) -> TestResult {
+async fn altering_a_column_with_non_null_values_should_warn(api: TestApi) -> TestResult {
     let dm = r#"
         model Test {
             id String @id @default(cuid())
@@ -158,7 +158,7 @@ async fn altering_a_column_with_non_null_values_should_warn(api: &TestApi) -> Te
 }
 
 #[test_each_connector]
-async fn column_defaults_can_safely_be_changed(api: &TestApi) -> TestResult {
+async fn column_defaults_can_safely_be_changed(api: TestApi) -> TestResult {
     let combinations = &[
         ("Meow", Some("Cats"), None),
         ("Freedom", None, Some("Braveheart")),
@@ -258,7 +258,7 @@ async fn column_defaults_can_safely_be_changed(api: &TestApi) -> TestResult {
 }
 
 #[test_each_connector]
-async fn changing_a_column_from_required_to_optional_should_work(api: &TestApi) -> TestResult {
+async fn changing_a_column_from_required_to_optional_should_work(api: TestApi) -> TestResult {
     let dm = r#"
         model Test {
             id String @id @default(cuid())
@@ -325,7 +325,7 @@ async fn changing_a_column_from_required_to_optional_should_work(api: &TestApi) 
 }
 
 #[test_each_connector]
-async fn changing_a_column_from_optional_to_required_must_warn(api: &TestApi) -> TestResult {
+async fn changing_a_column_from_optional_to_required_must_warn(api: TestApi) -> TestResult {
     let dm = r#"
         model Test {
             id String @id @default(cuid())
@@ -381,7 +381,7 @@ async fn changing_a_column_from_optional_to_required_must_warn(api: &TestApi) ->
 }
 
 #[test_each_connector(tags("sql"))]
-async fn dropping_a_table_referenced_by_foreign_keys_must_work(api: &TestApi) -> TestResult {
+async fn dropping_a_table_referenced_by_foreign_keys_must_work(api: TestApi) -> TestResult {
     use quaint::ast::*;
 
     let dm1 = r#"
@@ -434,7 +434,7 @@ async fn dropping_a_table_referenced_by_foreign_keys_must_work(api: &TestApi) ->
 }
 
 #[test_each_connector]
-async fn string_columns_do_not_get_arbitrarily_migrated(api: &TestApi) -> TestResult {
+async fn string_columns_do_not_get_arbitrarily_migrated(api: TestApi) -> TestResult {
     use quaint::ast::*;
 
     let dm1 = r#"
@@ -491,7 +491,7 @@ async fn string_columns_do_not_get_arbitrarily_migrated(api: &TestApi) -> TestRe
 }
 
 #[test_each_connector]
-async fn altering_the_type_of_a_column_in_an_empty_table_should_not_warn(api: &TestApi) -> TestResult {
+async fn altering_the_type_of_a_column_in_an_empty_table_should_not_warn(api: TestApi) -> TestResult {
     let dm1 = r#"
         model User {
             id String @id @default(cuid())
@@ -523,7 +523,7 @@ async fn altering_the_type_of_a_column_in_an_empty_table_should_not_warn(api: &T
 }
 
 #[test_each_connector]
-async fn making_a_column_required_in_an_empty_table_should_not_warn(api: &TestApi) -> TestResult {
+async fn making_a_column_required_in_an_empty_table_should_not_warn(api: TestApi) -> TestResult {
     let dm1 = r#"
         model User {
             id String @id @default(cuid())
@@ -555,7 +555,7 @@ async fn making_a_column_required_in_an_empty_table_should_not_warn(api: &TestAp
 }
 
 #[test_each_connector]
-async fn altering_the_type_of_a_column_in_a_non_empty_table_always_warns(api: &TestApi) -> TestResult {
+async fn altering_the_type_of_a_column_in_a_non_empty_table_always_warns(api: TestApi) -> TestResult {
     let dm1 = r#"
         model User {
             id String @id @default(cuid())
@@ -604,7 +604,7 @@ async fn altering_the_type_of_a_column_in_a_non_empty_table_always_warns(api: &T
 }
 
 #[test_each_connector(ignore("mysql"))]
-async fn migrating_a_required_column_from_int_to_string_should_warn_and_cast(api: &TestApi) -> TestResult {
+async fn migrating_a_required_column_from_int_to_string_should_warn_and_cast(api: TestApi) -> TestResult {
     let dm1 = r#"
         model Test {
             id String @id
@@ -671,7 +671,7 @@ async fn migrating_a_required_column_from_int_to_string_should_warn_and_cast(api
 }
 
 #[test_each_connector(capabilities("enums"))]
-async fn enum_variants_can_be_added_without_data_loss(api: &TestApi) -> TestResult {
+async fn enum_variants_can_be_added_without_data_loss(api: TestApi) -> TestResult {
     let dm1 = r#"
         model Cat {
             id String @id
@@ -791,7 +791,7 @@ async fn enum_variants_can_be_added_without_data_loss(api: &TestApi) -> TestResu
 }
 
 #[test_each_connector(capabilities("enums"))]
-async fn enum_variants_can_be_dropped_without_data_loss(api: &TestApi) -> TestResult {
+async fn enum_variants_can_be_dropped_without_data_loss(api: TestApi) -> TestResult {
     let dm1 = r#"
         model Cat {
             id String @id

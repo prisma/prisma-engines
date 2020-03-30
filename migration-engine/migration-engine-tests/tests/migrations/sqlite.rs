@@ -1,7 +1,7 @@
 use migration_engine_tests::sql::*;
 
 #[test_each_connector(tags("sqlite"))]
-async fn sqlite_must_recreate_indexes(api: &TestApi) -> TestResult {
+async fn sqlite_must_recreate_indexes(api: TestApi) -> TestResult {
     // SQLite must go through a complicated migration procedure which requires dropping and recreating indexes. This test checks that.
     // We run them still against each connector.
     let dm1 = r#"
@@ -36,7 +36,7 @@ async fn sqlite_must_recreate_indexes(api: &TestApi) -> TestResult {
 }
 
 #[test_each_connector(tags("sqlite"))]
-async fn sqlite_must_recreate_multi_field_indexes(api: &TestApi) -> TestResult {
+async fn sqlite_must_recreate_multi_field_indexes(api: TestApi) -> TestResult {
     // SQLite must go through a complicated migration procedure which requires dropping and recreating indexes. This test checks that.
     // We run them still against each connector.
     let dm1 = r#"

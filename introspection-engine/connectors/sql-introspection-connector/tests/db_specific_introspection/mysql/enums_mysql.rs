@@ -3,7 +3,7 @@ use barrel::types;
 use test_harness::*;
 
 #[test_each_connector(tags("mysql"))]
-async fn introspecting_a_table_enums_should_work(api: &TestApi) {
+async fn introspecting_a_table_enums_should_work(api: TestApi) {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Book", |t| {
@@ -45,7 +45,7 @@ async fn introspecting_a_table_enums_should_work(api: &TestApi) {
 }
 
 #[test_each_connector(tags("mysql"))]
-async fn introspecting_a_table_enums_should_return_alphabetically_even_when_in_different_order(api: &TestApi) {
+async fn introspecting_a_table_enums_should_return_alphabetically_even_when_in_different_order(api: TestApi) {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Book", |t| {
@@ -87,7 +87,7 @@ async fn introspecting_a_table_enums_should_return_alphabetically_even_when_in_d
 }
 
 #[test_each_connector(tags("mysql"))]
-async fn introspecting_a_table_with_enum_default_values_should_work(api: &TestApi) {
+async fn introspecting_a_table_with_enum_default_values_should_work(api: TestApi) {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Book", |t| {

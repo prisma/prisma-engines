@@ -2,7 +2,7 @@ use migration_engine_tests::sql::*;
 
 #[test_each_connector(tags("sql"))]
 async fn adding_a_required_field_to_an_existing_table_with_data_without_a_default_is_unexecutable(
-    api: &TestApi,
+    api: TestApi,
 ) -> TestResult {
     let dm1 = r#"
         model Test {
@@ -40,7 +40,7 @@ async fn adding_a_required_field_to_an_existing_table_with_data_without_a_defaul
 }
 
 #[test_each_connector(tags("sql"))]
-async fn adding_a_required_field_with_a_default_to_an_existing_table_works(api: &TestApi) -> TestResult {
+async fn adding_a_required_field_with_a_default_to_an_existing_table_works(api: TestApi) -> TestResult {
     let dm1 = r#"
         model Test {
             id String @id
@@ -79,7 +79,7 @@ async fn adding_a_required_field_with_a_default_to_an_existing_table_works(api: 
 }
 
 #[test_each_connector]
-async fn adding_a_required_field_without_default_to_an_existing_table_without_data_works(api: &TestApi) -> TestResult {
+async fn adding_a_required_field_without_default_to_an_existing_table_without_data_works(api: TestApi) -> TestResult {
     let dm1 = r#"
         model Test {
             id String @id
