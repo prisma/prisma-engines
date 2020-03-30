@@ -1072,7 +1072,7 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
                                              |
                                              |model Bottom {
                                              |  id         String @id @default(cuid())
-                                              |  nameBottom String @unique
+                                             |  nameBottom String @unique
                                              |  middles    Middle
                                              |}""" }
     database.setup(project)
