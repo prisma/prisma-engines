@@ -715,4 +715,33 @@ VALUES (1, 'Joe', 27, 20000.00 );
             &ParameterizedValue::Text("土豆".into())
         );
     }
+
+    #[tokio::test]
+    async fn filtering_by_json_values_does_not_work_but_does_not_crash() {
+        let create_table = r#"
+            CREATE TABLE `nested` (
+                id       int4 AUTO_INCREMENT PRIMARY KEY,
+                nested   json NOT NULL
+            );
+        "#;
+
+        let drop_table = "DROP TABLE IF EXISTS `nested`";
+
+        let conn = Quaint::new(&CONN_STR).await.unwrap();
+
+        conn.query_raw(drop_table, &[]).await.unwrap();
+        conn.query_raw(create_table, &[]).await.unwrap();
+
+        let insert = Insert::multi_into("nested", &["nested"])
+            .values(vec!["{\"isTrue\": true}"])
+            .values(vec!["{\"isTrue\": false}"]);
+
+        conn.query(insert.into()).await.unwrap();
+
+        let select = Select::from_table("nested").so_that("nested".equals("{\"isTrue\": false}"));
+
+        let result = conn.query(select.into()).await.unwrap();
+
+        assert!(result.is_empty());
+    }
 }
