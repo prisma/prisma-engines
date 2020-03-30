@@ -165,7 +165,7 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
     if !models_without_identifiers.is_empty() {
         warnings.push(Warning {
             code: 1,
-            message: "The following models were commented out as they do not have a unique identifier or id. This is currently not supported by Prisma. Read more about this here: https://pris.ly/d/introspection-warning-1".into(),
+            message: "The following models were commented out as they do not have a unique identifier or id. This is currently not supported by Prisma. Read more about why and how to work around this at https://pris.ly/d/introspection-warning-1".into(),
             affected: serde_json::to_value(&models_without_identifiers).unwrap(),
         })
     }
@@ -173,7 +173,7 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
     if !fields_with_empty_names.is_empty() {
         warnings.push(Warning {
             code: 2,
-            message: "These fields were commented out because their names are currently not supported by Prisma. Read more about this here: https://pris.ly/d/introspection-warning-2"
+            message: "These fields were commented out because their names are currently not supported by Prisma. Find out how to fix this at https://pris.ly/d/introspection-warning-3"
                 .into(),
             affected: serde_json::to_value(&fields_with_empty_names).unwrap(),
         })
@@ -182,7 +182,7 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
     if !unsupported_types.is_empty() {
         warnings.push(Warning {
             code: 3,
-            message: "These fields were commented out because Prisma currently does not support their types. Read more about this here: https://pris.ly/d/introspection-warning-3".into(),
+            message: "These fields were commented out because Prisma currently does not support their types. Read more about this here: https://pris.ly/d/introspection-warning-2".into(),
             affected: serde_json::to_value(&unsupported_types).unwrap(),
         })
     }
@@ -190,7 +190,7 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
     if !enum_values_with_empty_names.is_empty() {
         warnings.push(Warning {
             code: 4,
-            message: "These enum values were commented out because their names are currently not supported by Prisma. Read more about this here: https://pris.ly/d/introspection-warning-4"
+            message: "These enum values were commented out because their names are currently not supported by Prisma. Find out how to fix this at https://pris.ly/d/introspection-warning-4"
                 .into(),
             affected: serde_json::to_value(&enum_values_with_empty_names).unwrap(),
         })
