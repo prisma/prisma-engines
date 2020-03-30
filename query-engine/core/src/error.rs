@@ -125,6 +125,19 @@ impl From<CoreError> for user_facing_errors::Error {
             })
             .unwrap()
             .into(),
+            CoreError::QueryGraphBuilderError(QueryGraphBuilderError::RecordNotFound(details))
+            | CoreError::InterpreterError(InterpreterError::QueryGraphBuilderError(
+                QueryGraphBuilderError::RecordNotFound(details),
+            )) => user_facing_errors::KnownError::new(user_facing_errors::query_engine::ConnectedRecordsNotFound {
+                details,
+            })
+            .unwrap()
+            .into(),
+            CoreError::QueryGraphBuilderError(QueryGraphBuilderError::InputError(details)) => {
+                user_facing_errors::KnownError::new(user_facing_errors::query_engine::InputError { details })
+                    .unwrap()
+                    .into()
+            }
             CoreError::InterpreterError(InterpreterError::InterpretationError(msg, Some(cause))) => {
                 match cause.as_ref() {
                     InterpreterError::QueryGraphBuilderError(QueryGraphBuilderError::RelationViolation(

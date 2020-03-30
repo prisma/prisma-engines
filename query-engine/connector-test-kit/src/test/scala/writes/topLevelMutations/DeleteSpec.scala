@@ -53,8 +53,8 @@ class DeleteSpec extends FlatSpec with Matchers with ApiSpecBase {
         |}
       """.stripMargin,
       project,
-      errorCode = 2001, // or 2015? used to be 3039,
-      errorContains = """Error occurred during query execution:\nInterpretationError(\"Error for binding \\'0\\': RecordNotFound(\\\"Record to delete does not exist."""
+      errorCode = 2016, // 3039,
+      errorContains = """Query interpretation error. Error for binding '0': RecordNotFound(\"Record to delete does not exist.\""""
       // """No Node for the model Todo with value does not exist for title found."""
     )
 

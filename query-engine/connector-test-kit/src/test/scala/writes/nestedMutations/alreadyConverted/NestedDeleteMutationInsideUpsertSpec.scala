@@ -222,7 +222,7 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
          |}
       """,
         project,
-        errorCode = 0,
+        errorCode = 5588,
         errorContains = """[Query Graph] Expected a valid parent ID to be present for a nested delete on a one-to-many relation."""
       )
 
@@ -593,7 +593,7 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
          |}
       """,
       project,
-      errorCode = 0,
+      errorCode = 5588,
       errorContains = """Error occurred during query execution:\nInterpretationError(\"Error for binding \\'6\\': RelationViolation(RelationViolation { relation_name: \\\"ChildToReqOther\\\", model_a_name: \\\"Child\\\", model_b_name: \\\"ReqOther\\\" })\")"""
     )
 
@@ -1043,7 +1043,7 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
          |}
       """,
       project,
-      errorCode = 0,
+      errorCode = 5588,
       errorContains =
         """Error occurred during query execution:\nInterpretationError(\"Error for binding \\'3\\': AssertionError(\\\"[Query Graph] Expected a valid parent ID to be present for a nested delete on a one-to-many relation."""
     )
@@ -1071,7 +1071,7 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
                                              |
                                              |model Bottom {
                                              |  id         String @id @default(cuid())
-                                             |  nameBottom String @unique
+                                              |  nameBottom String @unique
                                              |  middles    Middle
                                              |}""" }
     database.setup(project)

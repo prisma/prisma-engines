@@ -205,3 +205,18 @@ pub struct RecordsNotConnected {
     pub parent_name: String,
     pub child_name: String,
 }
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = "P2018",
+    message = "The required connected records were not found. ${details}"
+)]
+pub struct ConnectedRecordsNotFound {
+    pub details: String,
+}
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(code = "P2019", message = "Input error. ${details}")]
+pub struct InputError {
+    pub details: String,
+}

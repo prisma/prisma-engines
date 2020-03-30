@@ -135,8 +135,7 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
       """,
         project,
         errorCode = 2014,
-        errorContains = """Error occurred during query execution:\nInterpretationError(\"Error for binding \\'2\\': RelationViolation(RelationViolation { relation_name: \\\"ChildToParent\\\", model_a_name: \\\"Child\\\", model_b_name: \\\"Parent\\\" })"""
-          // "The change you are trying to make would violate the required relation 'ChildToParent' between Child and Parent"
+        errorContains = """he change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."""
       )
     }
   }
@@ -813,8 +812,7 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
       """,
         project,
         errorCode = 2014,
-        errorContains = """Error occurred during query execution:\nInterpretationError(\"Error for binding \\'2\\': RelationViolation(RelationViolation { relation_name: \\\"ChildToParent\\\", model_a_name: \\\"Child\\\", model_b_name: \\\"Parent\\\" })"""
-          // "The change you are trying to make would violate the required relation 'ChildToParent' between Child and Parent"
+        errorContains = """The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."""
       )
     }
   }

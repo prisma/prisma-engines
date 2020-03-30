@@ -308,7 +308,7 @@ class NestedCreateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
       """,
         project,
         errorCode = 2014,
-        errorContains = """Error occurred during query execution:\nInterpretationError(\"Error for binding \\'2\\': RelationViolation(RelationViolation { relation_name: \\\"ChildToParent\\\", model_a_name: \\\"Child\\\", model_b_name: \\\"Parent\\\" })\")"""
+        errorContains = """The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."""
       )
     }
   }

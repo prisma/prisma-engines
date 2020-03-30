@@ -225,7 +225,7 @@ class NestedDeleteMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |}
       """,
         project,
-        errorCode = 0,
+        errorCode = 2016,
         errorContains = """[Query Graph] Expected a valid parent ID to be present for a nested delete on a one-to-many relation."""
       )
     }
@@ -545,8 +545,8 @@ class NestedDeleteMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |}
       """,
         project,
-        errorCode = 0,
-        errorContains = """RecordsNotConnected"""
+        errorCode = 2017,
+        errorContains = """The records for relation `ChildToParent` between the `Parent` and `Child` models are not connected."""
       )
 
       val res3 = server.query(

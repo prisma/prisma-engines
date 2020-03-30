@@ -163,7 +163,7 @@ class NestedDisconnectMutationInsideUpsertSpec extends FlatSpec with Matchers wi
       """,
         project,
         errorCode = 2014,
-        errorContains = """BLECH"""
+        errorContains = """The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models  """
       )
 
     }

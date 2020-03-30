@@ -44,7 +44,7 @@ class NestedDeleteManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |}
       """,
         project,
-        errorCode = 0,
+        errorCode = 2009,
         errorContains = """ ↳ ChildUpdateOneWithoutParentOptInput (object)\n            ↳ deleteMany (field)\n              ↳ Field does not exist on enclosing type.` at `.Mutation.updateParent.data.ParentUpdateInput.childOpt.ChildUpdateOneWithoutParentOptInput.deleteMany`"""
       )
     }

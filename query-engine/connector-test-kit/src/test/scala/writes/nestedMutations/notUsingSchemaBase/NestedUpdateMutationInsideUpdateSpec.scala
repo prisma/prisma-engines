@@ -582,7 +582,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
       """,
       project,
       errorCode = 2016,
-      errorContains = """Error occurred during query execution:\nInterpretationError(\"Error for binding \\'1\\': AssertionError(\\\"Expected a valid parent ID to be present for nested update to-one case"""
+      errorContains = """Query interpretation error. Error for binding '1': AssertionError(\"Expected a valid parent ID to be present for nested update to-one case.\")"""
         // No Node for the model Todo with value DOES NOT EXIST for id found.
     )
 
@@ -649,7 +649,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
       """,
       project,
       errorCode = 2016,
-      errorContains = "Error occurred during query execution:\\nInterpretationError(\\\"Error for binding \\\\'1\\\\': AssertionError(\\\\\\\"Expected a valid parent ID to be present for nested update to-one case."
+      errorContains = "Query interpretation error. Error for binding '1': AssertionError(\\\"Expected a valid parent ID to be present for nested update to-one case."
     )
   }
 
