@@ -1,36 +1,37 @@
 use migration_engine_tests::sql::*;
 
-// Blocked on schema parser implementation
-//
-// #[test_each_connector]
-// async fn index_on_compound_relation_fields_must_work(api: &TestApi) -> TestResult {
-//     let dm = r#"
-//         model User {
-//             id String @id
-//             email String
-//             name String
+#[test_each_connector]
+async fn index_on_compound_relation_fields_must_work(api: &TestApi) -> TestResult {
+    let dm = r#"
+        model User {
+            id String @id
+            email String
+            name String
 
-//             @@unique([email, name])
-//         }
+            @@unique([email, name])
+        }
 
-//         model Post {
-//             id String @id
-//             author User @relation(references: [email, name])
+        model Post {
+            id String @id
+            authorEmail String
+            authorName String
+            author User @relation(fields: [authorEmail, authorName], references: [email, name])
 
-//             @@index([author])
-//         }
-//     "#;
+            @@index([authorEmail, authorName])
+        }
+    "#;
 
-//     api.infer_apply(dm).send().await?;
+    api.infer_apply(dm).send().await?;
 
-//     api.assert_schema().await?.assert_table("Post", |table| {
-//         table
-//             .assert_has_column("username")?
-//             .assert_index_on_columns(&["a", "b"], |idx| Ok(idx))
-//     })?;
+    api.assert_schema().await?.assert_table("Post", |table| {
+        table
+            .assert_has_column("authorName")?
+            .assert_has_column("authorEmail")?
+            .assert_index_on_columns(&["authorEmail", "authorName"], |idx| Ok(idx))
+    })?;
 
-//     Ok(())
-// }
+    Ok(())
+}
 
 #[test_each_connector]
 async fn index_settings_must_be_migrated(api: &TestApi) -> TestResult {
