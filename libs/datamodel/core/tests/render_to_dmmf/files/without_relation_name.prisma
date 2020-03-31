@@ -4,6 +4,7 @@ model User {
 }
 
 model Post {
-  id   Int  @id
-  user User
+  id     Int  @id
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
 }

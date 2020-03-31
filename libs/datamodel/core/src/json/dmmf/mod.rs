@@ -18,6 +18,7 @@ pub struct Field {
     pub is_required: bool,
     pub is_unique: bool,
     pub is_id: bool,
+    pub is_read_only: bool,
     #[serde(rename = "type")]
     pub field_type: String,
     #[serde(skip_serializing_if = "Option::is_none")]
