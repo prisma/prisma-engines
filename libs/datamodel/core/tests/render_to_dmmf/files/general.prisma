@@ -10,8 +10,9 @@ model User {
 }
 
 model Profile {
-  id   Int    @id
-  user User
+  id     Int  @id
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
   bio  String
 
   @@map("profile")
@@ -23,8 +24,10 @@ model Post {
   updatedAt  DateTime
   title      String           @default("Default-Title")
   wasLiked   Boolean          @default(false)
-  author     User             @relation("author")
   published  Boolean          @default(false)
+  authorId   Int
+
+  author     User             @relation("author", fields: [authorId], references: [id])
   categories PostToCategory[]
 
   @@id([title, createdAt])
@@ -41,9 +44,12 @@ model Category {
 }
 
 model PostToCategory {
-  id       Int      @id
-  post     Post
-  category Category
+  id         Int @id
+  postId     Int
+  categoryId Int
+
+  post     Post     @relation(fields: [postId], references: [title, createdAt])
+  category Category @relation(fields: [categoryId], references: [id])
 
   @@map("post_to_category")
 }
