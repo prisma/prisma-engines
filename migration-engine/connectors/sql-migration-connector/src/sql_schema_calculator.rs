@@ -437,6 +437,15 @@ fn column_type_for_scalar_type(scalar_type: &ScalarType, column_arity: ColumnAri
 }
 
 fn add_one_to_one_relation_unique_index(table: &mut sql::Table, column_names: &[String]) {
+    // Don't add a duplicate index.
+    if table
+        .indices
+        .iter()
+        .any(|index| index.columns == column_names && index.tpe.is_unique())
+    {
+        return;
+    }
+
     let columns_suffix = column_names.join("_");
     let index = sql::Index {
         name: format!("{}_{}", table.name, columns_suffix),

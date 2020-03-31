@@ -21,7 +21,7 @@ async fn index_on_compound_relation_fields_must_work(api: &TestApi) -> TestResul
         }
     "#;
 
-    api.infer_apply(dm).send().await?;
+    api.infer_apply(dm).send_assert().await?.assert_green()?;
 
     api.assert_schema().await?.assert_table("Post", |table| {
         table
@@ -63,13 +63,40 @@ async fn index_settings_must_be_migrated(api: &TestApi) -> TestResult {
         }
     "#;
 
-    api.infer_apply(dm2).send().await?;
+    api.infer_apply(dm2).send_assert().await?.assert_green()?;
 
     api.assert_schema().await?.assert_table("Test", |table| {
         table
             .assert_indexes_count(1)?
             .assert_index_on_columns(&["name", "followersCount"], |idx| idx.assert_is_unique())
     })?;
+
+    Ok(())
+}
+
+#[test_each_connector]
+async fn unique_directive_on_required_one_to_one_relation_creates_one_index(api: &TestApi) -> TestResult {
+    // We want to test that only one index is created, because of the implicit unique index on
+    // required 1:1 relations.
+
+    let dm = r#"
+        model Cat {
+            id Int @id
+            boxId Int @unique
+            box Box @relation(fields: [boxId], references: [id])
+        }
+
+        model Box {
+            id Int @id
+            cat Cat
+        }
+    "#;
+
+    api.infer_apply(dm).send_assert().await?.assert_green()?;
+
+    api.assert_schema()
+        .await?
+        .assert_table("Cat", |table| table.assert_indexes_count(1))?;
 
     Ok(())
 }
