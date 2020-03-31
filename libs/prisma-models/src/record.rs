@@ -1,6 +1,5 @@
 use crate::{
-    DataSourceFieldRef, DomainError, Field, ModelProjection, OrderBy, PrismaValue,
-    RecordProjection, SortOrder,
+    DataSourceFieldRef, DomainError, Field, ModelProjection, OrderBy, PrismaValue, RecordProjection, SortOrder,
 };
 use std::collections::HashMap;
 
@@ -21,10 +20,7 @@ impl Into<ManyRecords> for SingleRecord {
 
 impl SingleRecord {
     pub fn new(record: Record, field_names: Vec<String>) -> Self {
-        Self {
-            record,
-            field_names,
-        }
+        Self { record, field_names }
     }
 
     pub fn projection(&self, projection: &ModelProjection) -> crate::Result<RecordProjection> {
@@ -90,10 +86,7 @@ impl ManyRecords {
         self.records.push(record);
     }
 
-    pub fn projections(
-        &self,
-        model_projection: &ModelProjection,
-    ) -> crate::Result<Vec<RecordProjection>> {
+    pub fn projections(&self, model_projection: &ModelProjection) -> crate::Result<Vec<RecordProjection>> {
         self.records
             .iter()
             .map(|record| {
@@ -180,24 +173,16 @@ impl Record {
         Ok(x)
     }
 
-    pub fn get_field_value(
-        &self,
-        field_names: &[String],
-        field: &str,
-    ) -> crate::Result<&PrismaValue> {
-        let index = field_names
-            .iter()
-            .position(|r| r == field)
-            .map(Ok)
-            .unwrap_or_else(|| {
-                Err(DomainError::FieldNotFound {
-                    name: field.to_string(),
-                    model: format!(
-                        "Field not found in record {:?}. Field names are: {:?}, looking for: {:?}",
-                        &self, &field_names, field
-                    ),
-                })
-            })?;
+    pub fn get_field_value(&self, field_names: &[String], field: &str) -> crate::Result<&PrismaValue> {
+        let index = field_names.iter().position(|r| r == field).map(Ok).unwrap_or_else(|| {
+            Err(DomainError::FieldNotFound {
+                name: field.to_string(),
+                model: format!(
+                    "Field not found in record {:?}. Field names are: {:?}, looking for: {:?}",
+                    &self, &field_names, field
+                ),
+            })
+        })?;
 
         Ok(&self.values[index])
     }

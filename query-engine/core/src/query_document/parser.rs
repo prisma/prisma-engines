@@ -55,10 +55,7 @@ impl QueryDocumentParser {
     }
 
     /// Parses and validates a selection against a schema (output) field.
-    fn parse_field(
-        selection: &Selection,
-        schema_field: &FieldRef,
-    ) -> QueryParserResult<ParsedField> {
+    fn parse_field(selection: &Selection, schema_field: &FieldRef) -> QueryParserResult<ParsedField> {
         // Parse and validate all provided arguments for the field
         Self::parse_arguments(schema_field, selection.arguments())
             .and_then(|arguments| {
@@ -93,11 +90,7 @@ impl QueryDocumentParser {
         schema_field: &FieldRef,
         given_arguments: &[(String, QueryValue)],
     ) -> QueryParserResult<Vec<ParsedArgument>> {
-        let left: HashSet<&str> = schema_field
-            .arguments
-            .iter()
-            .map(|arg| arg.name.as_str())
-            .collect();
+        let left: HashSet<&str> = schema_field.arguments.iter().map(|arg| arg.name.as_str()).collect();
         let right: HashSet<&str> = given_arguments.iter().map(|arg| arg.0.as_str()).collect();
         let diff = Diff::new(&left, &right);
 
@@ -216,16 +209,15 @@ impl QueryDocumentParser {
     pub fn parse_json_list(s: &str) -> QueryParserResult<PrismaValue> {
         let json = Self::parse_json(s)?;
 
-        let values = json.as_array().ok_or_else(|| {
-            QueryParserError::AssertionError("JSON parameter needs to be an array".into())
-        })?;
+        let values = json
+            .as_array()
+            .ok_or_else(|| QueryParserError::AssertionError("JSON parameter needs to be an array".into()))?;
 
         let mut prisma_values = Vec::with_capacity(values.len());
 
         for v in values.into_iter() {
-            let pv = PrismaValue::try_from(v.clone()).map_err(|_| {
-                QueryParserError::AssertionError("Nested JSON arguments are not supported".into())
-            })?;
+            let pv = PrismaValue::try_from(v.clone())
+                .map_err(|_| QueryParserError::AssertionError("Nested JSON arguments are not supported".into()))?;
 
             prisma_values.push(pv);
         }
@@ -234,19 +226,14 @@ impl QueryDocumentParser {
     }
 
     pub fn parse_json(s: &str) -> QueryParserResult<serde_json::Value> {
-        serde_json::from_str(s)
-            .map_err(|err| QueryParserError::ValueParseError(format!("Invalid json: {}", err)))
+        serde_json::from_str(s).map_err(|err| QueryParserError::ValueParseError(format!("Invalid json: {}", err)))
     }
 
     pub fn parse_uuid(s: &str) -> QueryParserResult<Uuid> {
-        Uuid::parse_str(s)
-            .map_err(|err| QueryParserError::ValueParseError(format!("Invalid UUID: {}", err)))
+        Uuid::parse_str(s).map_err(|err| QueryParserError::ValueParseError(format!("Invalid UUID: {}", err)))
     }
 
-    pub fn parse_list(
-        values: Vec<QueryValue>,
-        value_type: &InputType,
-    ) -> QueryParserResult<Vec<ParsedInputValue>> {
+    pub fn parse_list(values: Vec<QueryValue>, value_type: &InputType) -> QueryParserResult<Vec<ParsedInputValue>> {
         values
             .into_iter()
             .map(|val| Self::parse_input_value(val, value_type))
@@ -311,12 +298,11 @@ impl QueryDocumentParser {
                 match default_pair {
                     // If the input field has a default, add the default to the result.
                     Some((k, dv)) => {
-                        dv.get_as_prisma_value().map(|pv| {
-                            match Self::parse_input_field(pv.into(), &field) {
+                        dv.get_as_prisma_value()
+                            .map(|pv| match Self::parse_input_field(pv.into(), &field) {
                                 Ok(value) => Ok((k.clone(), value)),
                                 Err(err) => Err(err),
-                            }
-                        })
+                            })
                     }
                     // Finally, if nothing is found, parse the input value with Null but disregard the result,
                     // except errors, which are propagated.
@@ -352,15 +338,10 @@ impl QueryDocumentParser {
     }
 
     /// Parses and validates an input query value against a schema input field.
-    pub fn parse_input_field(
-        value: QueryValue,
-        schema_field: &InputFieldRef,
-    ) -> QueryParserResult<ParsedInputValue> {
-        Self::parse_input_value(value, &schema_field.field_type).map_err(|err| {
-            QueryParserError::FieldValidationError {
-                field_name: schema_field.name.clone(),
-                inner: Box::new(err),
-            }
+    pub fn parse_input_field(value: QueryValue, schema_field: &InputFieldRef) -> QueryParserResult<ParsedInputValue> {
+        Self::parse_input_value(value, &schema_field.field_type).map_err(|err| QueryParserError::FieldValidationError {
+            field_name: schema_field.name.clone(),
+            inner: Box::new(err),
         })
     }
 }

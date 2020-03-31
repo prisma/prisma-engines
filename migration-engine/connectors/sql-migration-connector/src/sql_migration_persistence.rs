@@ -111,10 +111,7 @@ impl MigrationPersistence for SqlMigrationPersistence<'_> {
             .value(DATAMODEL_STEPS_COLUMN, model_steps_json)
             .value(DATABASE_MIGRATION_COLUMN, database_migration_json)
             .value(ERRORS_COLUMN, errors_json)
-            .value(
-                STARTED_AT_COLUMN,
-                self.convert_datetime(migration.started_at),
-            )
+            .value(STARTED_AT_COLUMN, self.convert_datetime(migration.started_at))
             .value(FINISHED_AT_COLUMN, ParameterizedValue::Null);
 
         match self.sql_family() {
@@ -239,8 +236,7 @@ fn parse_rows_new(result_set: ResultSet) -> Vec<Migration> {
             let datamodel_string: String = row[DATAMODEL_COLUMN].to_string().unwrap();
             let datamodel_steps_json: String = row[DATAMODEL_STEPS_COLUMN].to_string().unwrap();
 
-            let database_migration_string: String =
-                row[DATABASE_MIGRATION_COLUMN].to_string().unwrap();
+            let database_migration_string: String = row[DATABASE_MIGRATION_COLUMN].to_string().unwrap();
             let errors_json: String = row[ERRORS_COLUMN].to_string().unwrap();
 
             let finished_at = match &row[FINISHED_AT_COLUMN] {
@@ -248,11 +244,11 @@ fn parse_rows_new(result_set: ResultSet) -> Vec<Migration> {
                 x => Some(convert_parameterized_date_value(x)),
             };
 
-            let datamodel_steps = serde_json::from_str(&datamodel_steps_json)
-                .expect("Error parsing the migration steps");
+            let datamodel_steps =
+                serde_json::from_str(&datamodel_steps_json).expect("Error parsing the migration steps");
 
-            let database_migration_json = serde_json::from_str(&database_migration_string)
-                .expect("Error parsing the database migration steps");
+            let database_migration_json =
+                serde_json::from_str(&database_migration_string).expect("Error parsing the database migration steps");
             let errors: Vec<String> = serde_json::from_str(&errors_json).unwrap();
 
             Migration {

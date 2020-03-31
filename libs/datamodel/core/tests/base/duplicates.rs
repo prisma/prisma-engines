@@ -160,8 +160,5 @@ fn fail_on_reserved_name_fo_custom_type() {
 
     let errors = parse_error(dml);
 
-    errors.assert_is(DatamodelError::new_reserved_scalar_type_error(
-        "Int",
-        Span::new(10, 13),
-    ));
+    errors.assert_is(DatamodelError::new_reserved_scalar_type_error("Int", Span::new(10, 13)));
 }
