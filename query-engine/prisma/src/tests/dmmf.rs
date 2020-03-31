@@ -10,13 +10,14 @@ use std::sync::Arc;
 fn dmmf_create_inputs_without_fields_for_parent_records_are_correct() {
     let dm = r#"
         model Blog {
-            blogId String @id
+            blogId     String @id
             postsField Post[]
         }
 
         model Post {
-            postId String @id
-            blogField Blog?
+            postId    String  @id
+            blogId    String?
+            blogField Blog?   @relation(fields: [blogId], references: [blogId])
             tagsField Tag[]
         }
 
