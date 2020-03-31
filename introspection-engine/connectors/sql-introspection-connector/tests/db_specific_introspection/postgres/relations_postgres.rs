@@ -724,3 +724,29 @@ async fn introspecting_relations_should_avoid_name_clashes_2(api: &TestApi) {
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
+
+#[test_each_connector(tags("postgres"))]
+async fn introspecting_a_relation_based_on_an_unsupported_type_should_drop_it(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom("network_mac  macaddr Not null Unique");
+            });
+            migration.create_table("Post", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom("user_network_mac macaddr REFERENCES \"User\"(\"network_mac\")");
+            });
+        })
+        .await;
+
+    let warnings = dbg!(api.introspection_warnings().await);
+    assert_eq!(
+        &warnings,
+        "[{\"code\":3,\"message\":\"These fields were commented out because we currently do not support their types.\",\"affected\":[{\"model\":\"Post\",\"field\":\"user_network_mac\",\"tpe\":\"macaddr\"},{\"model\":\"User\",\"field\":\"network_mac\",\"tpe\":\"macaddr\"}]}]"
+    );
+
+    let result = dbg!(api.introspect().await);
+    assert_eq!(&result, "model Post {\n  id                  Int      @default(autoincrement()) @id\n  // This type is currently not supported.\n  // user_network_mac macaddr?\n}\n\nmodel User {\n  id             Int     @default(autoincrement()) @id\n  // This type is currently not supported.\n  // network_mac macaddr @unique\n}");
+}

@@ -31,7 +31,11 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Introspecti
 
         copy.clear_duplicates();
 
-        for foreign_key in &copy {
+        for foreign_key in copy.iter().filter(|fk| {
+            !fk.columns
+                .iter()
+                .any(|c| matches!(table.column_bang(c).tpe.family, ColumnTypeFamily::Unsupported(_)))
+        }) {
             model.add_field(calculate_relation_field(schema, table, foreign_key));
         }
 
