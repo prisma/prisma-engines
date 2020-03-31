@@ -217,6 +217,13 @@ impl ValueValidator {
             }
         }
     }
+
+    pub fn as_value_generator(&self) -> Result<ValueGenerator, DatamodelError> {
+        match &self.value {
+            ast::Expression::Function(name, _, _) => Ok(ValueGenerator::new(name.to_string(), vec![])?),
+            _ => Err(self.construct_type_mismatch_error("function")),
+        }
+    }
 }
 
 pub trait ValueListValidator {
