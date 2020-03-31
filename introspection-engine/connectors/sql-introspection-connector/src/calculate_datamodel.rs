@@ -27,14 +27,14 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Introspecti
             model.add_field(field);
         }
 
-        let mut copy = table.foreign_keys.clone();
+        let mut foreign_keys_copy = table.foreign_keys.clone();
+        let model_copy = model.clone();
+        foreign_keys_copy.clear_duplicates();
 
-        copy.clear_duplicates();
-
-        for foreign_key in copy.iter().filter(|fk| {
+        for foreign_key in foreign_keys_copy.iter().filter(|fk| {
             !fk.columns
                 .iter()
-                .any(|c| matches!(table.column_bang(c).tpe.family, ColumnTypeFamily::Unsupported(_)))
+                .any(|c| matches!(model_copy.find_field(c).unwrap().field_type, FieldType::Unsupported(_)))
         }) {
             model.add_field(calculate_relation_field(schema, table, foreign_key));
         }
