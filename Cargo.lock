@@ -2302,22 +2302,33 @@ dependencies = [
 
 [[package]]
 name = "rust-embed"
-version = "4.5.0"
+version = "5.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "87d03df18bbdfa087d46e74598715032a69b2a0811cdedc1b6cccadc5332f183"
+checksum = "b18893bdbdb0fa5bce588f5d7ab4afbd0678fc879d31535912bf39b7fbc062d6"
 dependencies = [
  "rust-embed-impl",
+ "rust-embed-utils",
  "walkdir",
 ]
 
 [[package]]
 name = "rust-embed-impl"
-version = "4.5.0"
+version = "5.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f02513e276f68b7520798f8d9a47ce4039103566ec7632559768a8d36ff1027e"
+checksum = "50633968284cfc373661345fc6382e62b738079f045738023ebc5e445cf44357"
 dependencies = [
- "quote 0.3.15",
- "syn 0.11.11",
+ "quote 1.0.3",
+ "rust-embed-utils",
+ "syn 1.0.17",
+ "walkdir",
+]
+
+[[package]]
+name = "rust-embed-utils"
+version = "5.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "97655158074ccb2d2cfb1ccb4c956ef0f4054e43a2c1e71146d4991e6961e105"
+dependencies = [
  "walkdir",
 ]
 

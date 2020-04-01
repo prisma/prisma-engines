@@ -39,7 +39,8 @@ class InsertingNullInRequiredFieldsSpec extends FlatSpec with Matchers with ApiS
         |  }
         |}""",
       project,
-      3020
+      errorCode = 2011, // 3020
+      errorContains = "Null constraint violation on the fields: (`key`)"
     )
   }
 
@@ -64,8 +65,8 @@ class InsertingNullInRequiredFieldsSpec extends FlatSpec with Matchers with ApiS
         |  }
         |}""",
       project,
-      errorCode = 0,
-      errorContains = """Argument 'data' expected model 'ACreateInput!' but got: {b: \"abc\", key: null}. Reason: 'key' String value expected"""
+      errorCode = 2012,
+      errorContains = """Missing a required value at `Mutation.createA.data.ACreateInput.key"""
     )
   }
 

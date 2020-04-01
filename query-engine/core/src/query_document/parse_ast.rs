@@ -100,10 +100,13 @@ impl InputAssertions for ParsedInputMap {
     fn assert_size(&self, size: usize) -> QueryParserResult<()> {
         if self.len() != size {
             Err(QueryParserError::AssertionError(format!(
-                "Expected object to have exactly {} key-value pairs, got: {} ({})",
+                "Expected object to have exactly {} key-value pairs, got: {} {}",
                 size,
                 self.len(),
-                self.iter().map(|v| v.0.as_str()).collect::<Vec<&str>>().join(", ")
+                Some(self.iter().map(|v| v.0.as_str()).collect::<Vec<&str>>().join(", "))
+                    .filter(|s| !s.is_empty())
+                    .map(|s| format!("({})", s))
+                    .unwrap_or_else(String::new)
             )))
         } else {
             Ok(())

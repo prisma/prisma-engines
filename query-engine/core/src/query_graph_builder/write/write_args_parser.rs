@@ -26,11 +26,11 @@ impl WriteArgsParser {
                         let set_value: PrismaValue = match set_value {
                             Some(value) => value.1.try_into()?,
                             None => {
-                                return Err(QueryGraphBuilderError::InputError(format!(
-                                    "The `set` argument was not provided for field `{field_name}` on `{model_name}`",
-                                    field_name = &sf.name,
-                                    model_name = &model.name,
-                                )))
+                                return Err(QueryGraphBuilderError::MissingRequiredArgument {
+                                    argument_name: "set".to_owned(),
+                                    field_name: sf.name.to_owned(),
+                                    object_name: model.name.to_owned(),
+                                })
                             }
                         };
 

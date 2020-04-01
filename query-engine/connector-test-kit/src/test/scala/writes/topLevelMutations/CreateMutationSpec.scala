@@ -123,15 +123,15 @@ class CreateMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
     server.queryThatMustFail(
       s"""mutation {createScalarModel(data: {optString: "test", optInt: B, optFloat: 1.234, optBoolean: true, optEnum: A, optDateTime: "2016-07-31T23:59:01.000Z" }){optString, optInt, optFloat, optBoolean, optEnum, optDateTime }}""",
       project = project,
-      0,
-      errorContains = """Value types mismatch. Have: Enum("B"), want: Scalar(Int)"""
+      errorCode = 2009,
+      errorContains = """↳ ScalarModelCreateInput (object)\n        ↳ optInt (field)\n          ↳ Value types mismatch. Have: Enum(\"B\"), want: Scalar(Int)""",
     )
   }
 
   "A Create Mutation" should "gracefully fail when a unique violation occurs" in {
     val mutation = s"""mutation {createScalarModel(data: {optUnique: "test"}){optUnique}}"""
     server.query(mutation, project)
-    server.queryThatMustFail(mutation, project, errorCode = 3010)
+    server.queryThatMustFail(mutation, project, errorCode = 2002) // 3010)
   }
 
   "A Create Mutation" should "create and return an item with enums passed as strings" in {
@@ -140,6 +140,7 @@ class CreateMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "A Create Mutation" should "fail if an item with enums passed as strings doesn't match and enum value" in {
-    server.queryThatMustFail(s"""mutation {createScalarModel(data: {optEnum: "NOPE"}){ optEnum }}""", project, errorCode = 3010)
+    // previous errorCode: 3010
+    server.queryThatMustFail(s"""mutation {createScalarModel(data: {optEnum: "NOPE"}){ optEnum }}""", project, errorCode = 2009, errorContains = """↳ createScalarModel (field)\n    ↳ data (argument)\n      ↳ ScalarModelCreateInput (object)\n        ↳ optEnum (field)\n          ↳ Error parsing value: Enum value 'NOPE' is invalid for enum type MyEnum.""")
   }
 }

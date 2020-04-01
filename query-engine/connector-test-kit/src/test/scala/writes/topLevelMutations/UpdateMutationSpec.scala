@@ -161,8 +161,8 @@ class UpdateMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
          |  }
          |}""".stripMargin,
       project,
-      errorCode = 3039,
-      errorContains = "No Node for the model Todo with value NOT A VALID ALIAS for alias found"
+      errorCode = 2016,
+      errorContains = """Query interpretation error. Error for binding '0': RecordNotFound(\"Record to update not found.\"""
     )
   }
 

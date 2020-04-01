@@ -485,6 +485,11 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
     server.query("query{users{id}}", project).pathAsSeq("data.users").length should be(1)
     server.query("query{posts{id}}", project).pathAsSeq("data.posts").length should be(1)
 
+    val errorTarget = () match {
+      case _ if connectorTag == ConnectorTag.MySqlConnectorTag => "constraint: `unique`"
+      case _ => "fields: (`unique`)"
+    }
+
     server.queryThatMustFail(
       """mutation{
         |  createUser(data:{
@@ -497,8 +502,8 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
         |  }
       """,
       project,
-      errorCode = 3010,
-      errorContains = "A unique constraint would be violated on User. Details: Field name = unique"
+      errorCode = 2002,
+      errorContains = s"Unique constraint failed on the $errorTarget"
     )
 
     server.query("query{users{id}}", project).pathAsSeq("data.users").length should be(1)
@@ -541,6 +546,11 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
     server.query("query{users{id}}", project).pathAsSeq("data.users").length should be(1)
     server.query("query{posts{id}}", project).pathAsSeq("data.posts").length should be(1)
 
+    val errorTarget = () match {
+      case _ if connectorTag == ConnectorTag.MySqlConnectorTag => "constraint: `uniquePost`"
+      case _ => "fields: (`uniquePost`)"
+    }
+
     server.queryThatMustFail(
       """mutation{
         |  createUser(data:{
@@ -553,8 +563,8 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
         |  }
       """,
       project,
-      errorCode = 3010,
-      errorContains = "A unique constraint would be violated on Post. Details: Field name = uniquePost"
+      errorCode = 2002,
+      errorContains = s"Unique constraint failed on the $errorTarget"
     )
 
     ifConnectorIsNotMongo(server.query("query{users{id}}", project).pathAsSeq("data.users").length should be(1))
@@ -673,8 +683,8 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
         |}
       """,
       project,
-      errorCode = 3032,
-      errorContains = "The field 'todo' on model 'Comment' is required. Performing this mutation would violate that constraint"
+      errorCode = 2011,
+      errorContains = "Null constraint violation on the fields: (`todo`)"
     )
   }
 
@@ -736,8 +746,8 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
         |}
       """,
       project,
-      errorCode = 3032,
-      errorContains = "The field 'todo' on model 'Comment' is required. Performing this mutation would violate that constraint"
+      errorCode = 2012,
+      errorContains = "Missing a required value at `Mutation.createComment.data.CommentCreateInput.todo`"
     )
 
     server.query("{ todoes { id } }", project).pathAsSeq("data.todoes").size should be(1)

@@ -26,7 +26,7 @@ graphql-parser = { git = "https://github.com/prisma/graphql-parser", optional = 
 serde = { version = "1.0", features = ["derive"] }
 serde_json = { version = "1.0", features = [ "preserve_order" ] }
 base64 = "0.10"
-rust-embed = { version = "4.3", features = ["debug-embed"] }
+rust-embed = { version = "5.2" }
 failure = { version = "0.1" }
 indexmap = { version = "1.0", features = [ "serde-1" ] }
 itertools = "0.8"

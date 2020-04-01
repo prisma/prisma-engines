@@ -186,8 +186,9 @@ class TransactionalNestedExecutionSpec extends FlatSpec with Matchers with ApiSp
          |}
       """.stripMargin,
       project,
-      errorCode = 3039,
-      errorContains = s"No Node for the model Todo with value $falseWhereInError2 for innerUnique found."
+      errorCode = 2016, // 3039,
+      errorContains = """Expected a valid parent ID to be present for nested update to-one case.""",
+        // s"No Node for the model Todo with value $falseWhereInError2 for innerUnique found."
     )
 
     server.query(s"""query{note(where:{outerUnique:$outerWhere}){outerString}}""", project, dataContains = s"""{"note":{"outerString":"Outer String"}}""")
@@ -214,8 +215,8 @@ class TransactionalNestedExecutionSpec extends FlatSpec with Matchers with ApiSp
          |}
       """.stripMargin,
       project,
-      errorCode = 3039,
-      errorContains = s"No Node for the model Todo with value $falseWhereInError for innerUnique found."
+      errorCode = 2016,
+      errorContains = """Expected a valid parent ID to be present for nested update to-one case."""
     )
 
     server.query(s"""query{note(where:{outerUnique:$outerWhere}){outerString}}""", project, dataContains = s"""{"note":{"outerString":"Outer String"}}""")
@@ -272,9 +273,9 @@ class TransactionalNestedExecutionSpec extends FlatSpec with Matchers with ApiSp
          |}
       """.stripMargin,
       project,
-      errorCode = 3041,
-      errorContains =
-        s"The relation NoteToTodo has no node for the model Note connected to a Node for the model Todo with the value 'Some Inner ID2' for the field 'innerUnique' on your mutation path."
+      errorCode = 2016, // 3041,
+      errorContains = """Query interpretation error. Error for binding '3': AssertionError(\"Expected a valid parent ID to be present for nested update to-one case.\")"""
+//        s"The relation NoteToTodo has no node for the model Note connected to a Node for the model Todo with the value 'Some Inner ID2' for the field 'innerUnique' on your mutation path."
     )
 
     server.query(s"""query{note(where:{outerUnique:$outerWhere}){outerString}}""", project, dataContains = s"""{"note":{"outerString":"Outer String"}}""")
@@ -323,8 +324,9 @@ class TransactionalNestedExecutionSpec extends FlatSpec with Matchers with ApiSp
          |}
       """.stripMargin,
       project,
-      errorCode = 3039,
-      errorContains = s"No Node for the model Todo with value $falseWhereInError for innerUnique found."
+      errorCode = 2016, // 3039,
+      errorContains = """Query interpretation error. Error for binding '1': AssertionError(\"Expected a valid parent ID to be present for nested update to-one case.""",
+        // s"No Node for the model Todo with value $falseWhereInError for innerUnique found."
     )
 
     server.query(s"""query{note(where:{outerUnique:$outerWhere}){outerString}}""", project, dataContains = s"""{"note":{"outerString":"Outer String"}}""")
@@ -350,8 +352,9 @@ class TransactionalNestedExecutionSpec extends FlatSpec with Matchers with ApiSp
          |}
       """.stripMargin,
       project,
-      errorCode = 3039,
-      errorContains = s"No Node for the model Note with value $falseWhereInError for outerUnique found."
+      errorCode = 2016, // 3039,
+      errorContains = """"Query interpretation error. Error for binding '1': AssertionError(\"Expected a valid parent ID to be present for nested update to-one case.\")""",
+        // s"No Node for the model Note with value $falseWhereInError for outerUnique found."
     )
 
     server.query(s"""query{note(where:{outerUnique:$outerWhere}){outerString}}""", project, dataContains = s"""{"note":{"outerString":"Outer String"}}""")
