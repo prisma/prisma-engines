@@ -50,10 +50,7 @@ async fn all_postgres_column_types_must_work() {
         t.add_column("time_col", types::custom("TIME"));
         t.add_column("time_with_zone_col", types::custom("TIME WITH TIME ZONE"));
         t.add_column("timestamp_col", types::custom("TIMESTAMP"));
-        t.add_column(
-            "timestamp_with_zone_col",
-            types::custom("TIMESTAMP WITH TIME ZONE"),
-        );
+        t.add_column("timestamp_with_zone_col", types::custom("TIMESTAMP WITH TIME ZONE"));
         t.add_column("tsquery_col", types::custom("TSQUERY"));
         t.add_column("tsvector_col", types::custom("TSVECTOR"));
         t.add_column("txid_col", types::custom("TXID_SNAPSHOT"));
@@ -65,10 +62,7 @@ async fn all_postgres_column_types_must_work() {
     let full_sql = migration.make::<barrel::backend::Pg>();
     let inspector = get_postgres_describer(&full_sql, "all_postgres_column_types_must_work").await;
     let result = inspector.describe(SCHEMA).await.expect("describing");
-    let mut table = result
-        .get_table("User")
-        .expect("couldn't get User table")
-        .to_owned();
+    let mut table = result.get_table("User").expect("couldn't get User table").to_owned();
     // Ensure columns are sorted as expected when comparing
     table.columns.sort_unstable_by_key(|c| c.name.to_owned());
     let mut expected_columns = vec![
@@ -599,14 +593,11 @@ async fn postgres_foreign_key_on_delete_must_be_handled() {
         ",
         SCHEMA
     );
-    let inspector =
-        get_postgres_describer(&sql, "postgres_foreign_key_on_delete_must_be_handled").await;
+    let inspector = get_postgres_describer(&sql, "postgres_foreign_key_on_delete_must_be_handled").await;
 
     let schema = inspector.describe(SCHEMA).await.expect("describing");
     let mut table = schema.get_table("User").expect("get User table").to_owned();
-    table
-        .foreign_keys
-        .sort_unstable_by_key(|fk| fk.columns.clone());
+    table.foreign_keys.sort_unstable_by_key(|fk| fk.columns.clone());
 
     assert_eq!(
         table,
@@ -724,10 +715,7 @@ async fn postgres_foreign_key_on_delete_must_be_handled() {
 #[tokio::test]
 async fn postgres_enums_must_work() {
     let inspector = get_postgres_describer(
-        &format!(
-            "CREATE TYPE \"{}\".\"mood\" AS ENUM ('sad', 'ok', 'happy')",
-            SCHEMA
-        ),
+        &format!("CREATE TYPE \"{}\".\"mood\" AS ENUM ('sad', 'ok', 'happy')", SCHEMA),
         "postgres_enums_must_work",
     )
     .await;

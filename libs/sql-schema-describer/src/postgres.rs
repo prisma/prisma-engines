@@ -61,11 +61,7 @@ impl SqlSchemaDescriber {
     async fn get_databases(&self) -> Vec<String> {
         debug!("Getting databases");
         let sql = "select schema_name from information_schema.schemata;";
-        let rows = self
-            .conn
-            .query_raw(sql, &[])
-            .await
-            .expect("get schema names ");
+        let rows = self.conn.query_raw(sql, &[]).await.expect("get schema names ");
         let names = rows
             .into_iter()
             .map(|row| {
@@ -110,11 +106,7 @@ impl SqlSchemaDescriber {
             "SELECT SUM(pg_total_relation_size(quote_ident(schemaname) || '.' || quote_ident(tablename)))::BIGINT as size
              FROM pg_tables
              WHERE schemaname = $1::text";
-        let result = self
-            .conn
-            .query_raw(sql, &[schema.into()])
-            .await
-            .expect("get db size ");
+        let result = self.conn.query_raw(sql, &[schema.into()]).await.expect("get db size ");
         let size: i64 = result
             .first()
             .map(|row| row.get("size").and_then(|x| x.as_i64()).unwrap_or(0))
@@ -179,10 +171,7 @@ impl SqlSchemaDescriber {
                 .get("column_name")
                 .and_then(|x| x.to_string())
                 .expect("get column name");
-            let data_type = col
-                .get("data_type")
-                .and_then(|x| x.to_string())
-                .expect("get data_type");
+            let data_type = col.get("data_type").and_then(|x| x.to_string()).expect("get data_type");
             let full_data_type = col
                 .get("full_data_type")
                 .and_then(|x| x.to_string())
@@ -225,44 +214,28 @@ impl SqlSchemaDescriber {
                         Some(match &tpe.family {
                             ColumnTypeFamily::Int => match parse_int(&default_string).is_some() {
                                 true => DefaultValue::VALUE(default_string),
-                                false => match is_autoincrement(
-                                    &default_string,
-                                    schema,
-                                    &table_name,
-                                    &col_name,
-                                ) {
+                                false => match is_autoincrement(&default_string, schema, &table_name, &col_name) {
                                     true => DefaultValue::SEQUENCE(default_string),
                                     false => DefaultValue::DBGENERATED(default_string),
                                 },
                             },
-                            ColumnTypeFamily::Float => {
-                                match parse_float(&default_string).is_some() {
-                                    true => DefaultValue::VALUE(default_string),
-                                    false => DefaultValue::DBGENERATED(default_string),
-                                }
-                            }
-                            ColumnTypeFamily::Boolean => {
-                                match parse_bool(&default_string).is_some() {
-                                    true => DefaultValue::VALUE(default_string),
-                                    false => DefaultValue::DBGENERATED(default_string),
-                                }
-                            }
+                            ColumnTypeFamily::Float => match parse_float(&default_string).is_some() {
+                                true => DefaultValue::VALUE(default_string),
+                                false => DefaultValue::DBGENERATED(default_string),
+                            },
+                            ColumnTypeFamily::Boolean => match parse_bool(&default_string).is_some() {
+                                true => DefaultValue::VALUE(default_string),
+                                false => DefaultValue::DBGENERATED(default_string),
+                            },
                             ColumnTypeFamily::String => {
-                                match unsuffix_default_literal(
-                                    &default_string,
-                                    &data_type,
-                                    &full_data_type,
-                                ) {
-                                    Some(default_literal) => {
-                                        DefaultValue::VALUE(unquote(default_literal).into_owned())
-                                    }
+                                match unsuffix_default_literal(&default_string, &data_type, &full_data_type) {
+                                    Some(default_literal) => DefaultValue::VALUE(unquote(default_literal).into_owned()),
                                     None => DefaultValue::DBGENERATED(default_string),
                                 }
                             }
                             ColumnTypeFamily::DateTime => {
                                 match default_string.to_lowercase() == "now()".to_string()
-                                    || default_string.to_lowercase()
-                                        == "current_timestamp".to_string()
+                                    || default_string.to_lowercase() == "current_timestamp".to_string()
                                 {
                                     true => DefaultValue::NOW,
                                     false => DefaultValue::DBGENERATED(default_string), //todo parse values
@@ -271,31 +244,20 @@ impl SqlSchemaDescriber {
                             ColumnTypeFamily::Binary => DefaultValue::DBGENERATED(default_string),
                             ColumnTypeFamily::Json => DefaultValue::DBGENERATED(default_string),
                             ColumnTypeFamily::Uuid => DefaultValue::DBGENERATED(default_string),
-                            ColumnTypeFamily::Geometric => {
-                                DefaultValue::DBGENERATED(default_string)
-                            }
-                            ColumnTypeFamily::LogSequenceNumber => {
-                                DefaultValue::DBGENERATED(default_string)
-                            }
-                            ColumnTypeFamily::TextSearch => {
-                                DefaultValue::DBGENERATED(default_string)
-                            }
-                            ColumnTypeFamily::TransactionId => {
-                                DefaultValue::DBGENERATED(default_string)
-                            }
+                            ColumnTypeFamily::Geometric => DefaultValue::DBGENERATED(default_string),
+                            ColumnTypeFamily::LogSequenceNumber => DefaultValue::DBGENERATED(default_string),
+                            ColumnTypeFamily::TextSearch => DefaultValue::DBGENERATED(default_string),
+                            ColumnTypeFamily::TransactionId => DefaultValue::DBGENERATED(default_string),
                             ColumnTypeFamily::Enum(enum_name) => {
                                 let enum_suffix = format!("::{}", enum_name);
                                 match default_string.ends_with(&enum_suffix) {
                                     true => DefaultValue::VALUE(
-                                        unquote(&default_string.replace(&enum_suffix, ""))
-                                            .into_owned(),
+                                        unquote(&default_string.replace(&enum_suffix, "")).into_owned(),
                                     ),
                                     false => DefaultValue::DBGENERATED(default_string),
                                 }
                             }
-                            ColumnTypeFamily::Unsupported(_) => {
-                                DefaultValue::DBGENERATED(default_string)
-                            }
+                            ColumnTypeFamily::Unsupported(_) => DefaultValue::DBGENERATED(default_string),
                         })
                     }
                 },
@@ -376,10 +338,7 @@ impl SqlSchemaDescriber {
         let mut intermediate_fks: HashMap<i64, (String, ForeignKey)> = HashMap::new();
         for row in result_set.into_iter() {
             debug!("Got description FK row {:?}", row);
-            let id = row
-                .get("con_id")
-                .and_then(|x| x.as_i64())
-                .expect("get con_id");
+            let id = row.get("con_id").and_then(|x| x.as_i64()).expect("get con_id");
             let column = row
                 .get("child_column")
                 .and_then(|x| x.to_string())
@@ -523,9 +482,8 @@ impl SqlSchemaDescriber {
             } = quaint::serde::from_row::<IndexRow>(index).unwrap();
 
             if is_primary_key {
-                let entry: &mut (Vec<_>, Option<PrimaryKey>) = indexes_map
-                    .entry(table_name)
-                    .or_insert_with(|| (Vec::new(), None));
+                let entry: &mut (Vec<_>, Option<PrimaryKey>) =
+                    indexes_map.entry(table_name).or_insert_with(|| (Vec::new(), None));
 
                 match entry.1.as_mut() {
                     Some(pk) => {
@@ -535,16 +493,10 @@ impl SqlSchemaDescriber {
                         let sequence = sequence_name.and_then(|sequence_name| {
                             let captures = RE_SEQ.captures(&sequence_name).expect("get captures");
                             let sequence_name = captures.get(1).expect("get capture").as_str();
-                            sequences
-                                .iter()
-                                .find(|s| &s.name == sequence_name)
-                                .map(|sequence| {
-                                    debug!(
-                                        "Got sequence corresponding to primary key: {:#?}",
-                                        sequence
-                                    );
-                                    sequence.clone()
-                                })
+                            sequences.iter().find(|s| &s.name == sequence_name).map(|sequence| {
+                                debug!("Got sequence corresponding to primary key: {:#?}", sequence);
+                                sequence.clone()
+                            })
                         });
 
                         entry.1 = Some(PrimaryKey {
@@ -554,9 +506,7 @@ impl SqlSchemaDescriber {
                     }
                 }
             } else {
-                let entry: &mut (Vec<Index>, _) = indexes_map
-                    .entry(table_name)
-                    .or_insert_with(|| (Vec::new(), None));
+                let entry: &mut (Vec<Index>, _) = indexes_map.entry(table_name).or_insert_with(|| (Vec::new(), None));
 
                 if let Some(existing_index) = entry.0.iter_mut().find(|idx| idx.name == name) {
                     existing_index.columns.push(column_name);
@@ -653,21 +603,14 @@ struct IndexRow {
     sequence_name: Option<String>,
 }
 
-fn get_column_type<'a>(
-    data_type: &str,
-    full_data_type: &'a str,
-    arity: ColumnArity,
-    enums: &Vec<Enum>,
-) -> ColumnType {
+fn get_column_type<'a>(data_type: &str, full_data_type: &'a str, arity: ColumnArity, enums: &Vec<Enum>) -> ColumnType {
     use ColumnTypeFamily::*;
     let trim = |name: &'a str| name.trim_start_matches("_");
     let enum_exists = |name: &'a str| enums.iter().any(|e| e.name == name);
 
     let family: ColumnTypeFamily = match full_data_type {
         x if data_type == "USER-DEFINED" && enum_exists(x) => Enum(x.to_owned()),
-        x if data_type == "ARRAY" && x.starts_with("_") && enum_exists(trim(x)) => {
-            Enum(trim(x).to_owned())
-        }
+        x if data_type == "ARRAY" && x.starts_with("_") && enum_exists(trim(x)) => Enum(trim(x).to_owned()),
         "int2" | "_int2" => Int,
         "int4" | "_int4" => Int,
         "int8" | "_int8" => Int,
@@ -714,12 +657,13 @@ fn get_column_type<'a>(
     }
 }
 
-static RE_SEQ: Lazy<Regex> =
-    Lazy::new(|| Regex::new("^(?:.+\\.)?\"?([^.\"]+)\"?").expect("compile regex"));
+static RE_SEQ: Lazy<Regex> = Lazy::new(|| Regex::new("^(?:.+\\.)?\"?([^.\"]+)\"?").expect("compile regex"));
 
 static AUTOINCREMENT_REGEX: Lazy<Regex> = Lazy::new(|| {
-    Regex::new(r#"nextval\('(?:"(?P<schema_name>.+)"\.)?(")?(?P<table_and_column_name>.+)_seq(?:[0-9]+)?(")?'::regclass\)"#)
-        .unwrap()
+    Regex::new(
+        r#"nextval\('(?:"(?P<schema_name>.+)"\.)?(")?(?P<table_and_column_name>.+)_seq(?:[0-9]+)?(")?'::regclass\)"#,
+    )
+    .unwrap()
 });
 
 /// Returns whether a particular sequence (`value`) matches the provided column info.
@@ -757,17 +701,12 @@ fn is_autoincrement(value: &str, schema_name: &str, table_name: &str, column_nam
 
 fn unquote(input: &str) -> Cow<'_, str> {
     /// Regex for matching the quotes on the introspected string values on Postgres.
-    static POSTGRES_STRING_DEFAULT_RE: Lazy<regex::Regex> =
-        Lazy::new(|| regex::Regex::new(r#"^B?'(.*)'$"#).unwrap());
+    static POSTGRES_STRING_DEFAULT_RE: Lazy<regex::Regex> = Lazy::new(|| regex::Regex::new(r#"^B?'(.*)'$"#).unwrap());
 
     POSTGRES_STRING_DEFAULT_RE.replace(input, "$1")
 }
 
-fn unsuffix_default_literal<'a>(
-    literal: &'a str,
-    data_type: &str,
-    full_data_type: &str,
-) -> Option<&'a str> {
+fn unsuffix_default_literal<'a>(literal: &'a str, data_type: &str, full_data_type: &str) -> Option<&'a str> {
     static POSTGRES_DATA_TYPE_SUFFIX_RE: Lazy<regex::Regex> =
         Lazy::new(|| regex::Regex::new(r#"(.*)::"?(.*)"?$"#).unwrap());
 
@@ -792,23 +731,13 @@ mod tests {
         let col_name = "id";
 
         let non_autoincrement = "_seq";
-        assert!(!is_autoincrement(
-            non_autoincrement,
-            schema_name,
-            table_name,
-            col_name
-        ));
+        assert!(!is_autoincrement(non_autoincrement, schema_name, table_name, col_name));
 
         let autoincrement = format!(
             r#"nextval('"{}"."{}_{}_seq"'::regclass)"#,
             schema_name, table_name, col_name
         );
-        assert!(is_autoincrement(
-            &autoincrement,
-            schema_name,
-            table_name,
-            col_name
-        ));
+        assert!(is_autoincrement(&autoincrement, schema_name, table_name, col_name));
 
         let autoincrement_with_number = format!(
             r#"nextval('"{}"."{}_{}_seq1"'::regclass)"#,
@@ -821,8 +750,7 @@ mod tests {
             col_name
         ));
 
-        let autoincrement_without_schema =
-            format!(r#"nextval('"{}_{}_seq1"'::regclass)"#, table_name, col_name);
+        let autoincrement_without_schema = format!(r#"nextval('"{}_{}_seq1"'::regclass)"#, table_name, col_name);
         assert!(is_autoincrement(
             &autoincrement_without_schema,
             schema_name,

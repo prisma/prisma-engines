@@ -122,11 +122,7 @@ impl Model {
 
         // second candidate: the multi field id
         {
-            let id_fields: Vec<_> = self
-                .id_fields
-                .iter()
-                .map(|f| self.find_field(&f).unwrap())
-                .collect();
+            let id_fields: Vec<_> = self.id_fields.iter().map(|f| self.find_field(&f).unwrap()).collect();
 
             if !id_fields.is_empty() {
                 return id_fields;
@@ -151,22 +147,14 @@ impl Model {
                 .indices
                 .iter()
                 .find(|id| id.tpe == IndexType::Unique)
-                .map(|id| {
-                    id.fields
-                        .iter()
-                        .map(|f| self.find_field(&f).unwrap())
-                        .collect()
-                });
+                .map(|id| id.fields.iter().map(|f| self.find_field(&f).unwrap()).collect());
 
             if unique_field_combi.is_some() {
                 return unique_field_combi.unwrap();
             }
         }
 
-        panic!(
-            "Could not find the first unique criteria on model {}",
-            self.name()
-        );
+        panic!("Could not find the first unique criteria on model {}", self.name());
     }
 
     /// Finds the name of all id fields
@@ -176,18 +164,10 @@ impl Model {
 
     /// Finds a field with a certain relation guarantee.
     /// exclude_field are necessary to avoid corner cases with self-relations (e.g. we must not recognize a field as its own related field).
-    pub fn related_field(
-        &self,
-        to: &str,
-        relation_name: &str,
-        exclude_field: &str,
-    ) -> Option<&Field> {
+    pub fn related_field(&self, to: &str, relation_name: &str, exclude_field: &str) -> Option<&Field> {
         self.fields().find(|f| {
             if let FieldType::Relation(rel_info) = &f.field_type {
-                if rel_info.to == to
-                    && rel_info.name == relation_name
-                    && (self.name != to || f.name != exclude_field)
-                {
+                if rel_info.to == to && rel_info.name == relation_name && (self.name != to || f.name != exclude_field) {
                     return true;
                 }
             }
@@ -196,19 +176,11 @@ impl Model {
     }
 
     /// Finds a mutable field with a certain relation guarantee.
-    pub fn related_field_mut(
-        &mut self,
-        to: &str,
-        name: &str,
-        exclude_field: &str,
-    ) -> Option<&mut Field> {
+    pub fn related_field_mut(&mut self, to: &str, name: &str, exclude_field: &str) -> Option<&mut Field> {
         let self_name = self.name.clone();
         self.fields_mut().find(|f| {
             if let FieldType::Relation(rel_info) = &f.field_type {
-                if rel_info.to == to
-                    && rel_info.name == name
-                    && (self_name != to || f.name != exclude_field)
-                {
+                if rel_info.to == to && rel_info.name == name && (self_name != to || f.name != exclude_field) {
                     return true;
                 }
             }

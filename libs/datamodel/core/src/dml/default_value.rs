@@ -46,11 +46,7 @@ impl ValueGenerator {
     pub fn new(name: String, args: Vec<ScalarValue>) -> std::result::Result<Self, DatamodelError> {
         let generator = ValueGeneratorFn::try_from(name.as_ref())?;
 
-        Ok(ValueGenerator {
-            name,
-            args,
-            generator,
-        })
+        Ok(ValueGenerator { name, args, generator })
     }
 
     pub fn new_autoincrement() -> Self {

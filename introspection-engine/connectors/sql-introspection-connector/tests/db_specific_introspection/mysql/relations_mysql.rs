@@ -65,9 +65,7 @@ async fn introspecting_two_one_to_one_relations_between_the_same_models_should_w
         .execute_with_schema(
             |migration| {
                 migration.change_table("User", |t| {
-                    t.inject_custom(
-                        "ADD CONSTRAINT `post_fk` FOREIGN KEY(`post_id`) REFERENCES `Post`(`id`)",
-                    );
+                    t.inject_custom("ADD CONSTRAINT `post_fk` FOREIGN KEY(`post_id`) REFERENCES `Post`(`id`)");
                 });
             },
             api.db_name(),
