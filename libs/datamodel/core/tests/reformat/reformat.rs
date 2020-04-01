@@ -160,7 +160,7 @@ enum Colors {
 }
 
 #[test]
-fn test_reformat_config_with_env() {
+fn reformatting_must_work_when_env_var_is_missing() {
     let input = r#"
         datasource pg { 
             provider = "postgres"
