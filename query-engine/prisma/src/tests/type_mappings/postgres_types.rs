@@ -905,3 +905,55 @@ async fn length_mismatch_is_a_known_error(api: &TestApi) -> TestResult {
 
     Ok(())
 }
+
+#[test_each_connector(tags("postgres"))]
+async fn serial_columns_can_be_optional(api: &TestApi) -> TestResult {
+    let create_table = indoc! {
+        r##"
+        CREATE TABLE "prisma-tests"."timestamps" (
+            id SERIAL PRIMARY KEY,
+            serial serial4 NOT NULL,
+            bigserial serial8,
+            time_date date
+        );
+        "##
+    };
+
+    api.execute_sql(create_table).await?;
+
+    let (_datamodel, engine) = api.introspect_and_start_query_engine().await?;
+
+    let query = indoc!(
+        r##"
+        mutation {
+            createOnetimestamps(
+                data: {
+                    time_date: "2020-03-10T12:00:00Z",
+                }
+            ) {
+                id
+                serial
+                time_date
+                bigserial
+            }
+        }
+        "##
+    );
+
+    let response = engine.request(query).await;
+
+    let expected_response = json!({
+        "data": {
+            "createOnetimestamps": {
+                "id": 1,
+                "serial": 1,
+                "time_date": "2020-03-10T00:00:00.000Z",
+                "bigserial": 1,
+            },
+        },
+    });
+
+    assert_eq!(response, expected_response);
+
+    Ok(())
+}
