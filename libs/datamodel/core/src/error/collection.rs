@@ -35,6 +35,11 @@ impl ErrorCollection {
         self.errors.append(&mut errs.errors)
     }
 
+    pub fn append_vec(&mut self, errors: Vec<DatamodelError>) {
+        let mut errors = errors;
+        self.errors.append(&mut errors);
+    }
+
     pub fn ok(&self) -> Result<(), ErrorCollection> {
         if self.has_errors() {
             Err(self.clone())

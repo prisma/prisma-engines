@@ -13,6 +13,7 @@ pub struct Validator<'a> {
 
 /// State error message. Seeing this error means something went really wrong internally. It's the datamodel equivalent of a bluescreen.
 const STATE_ERROR: &str = "Failed lookup of model, field or optional property during internal processing. This means that the internal representation was mutated incorrectly.";
+const RELATION_DIRECTIVE_NAME: &str = "@relation";
 
 impl<'a> Validator<'a> {
     /// Creates a new instance, with all builtin directives registered.
@@ -42,9 +43,11 @@ impl<'a> Validator<'a> {
                 errors.append(the_errors);
             }
 
-            if let Err(ref mut the_errors) =
-                self.validate_base_fields_for_relation(ast_schema.find_model(&model.name).expect(STATE_ERROR), model)
-            {
+            if let Err(ref mut the_errors) = self.validate_base_fields_for_relation(
+                schema,
+                ast_schema.find_model(&model.name).expect(STATE_ERROR),
+                model,
+            ) {
                 errors.append(the_errors);
             }
 
@@ -169,6 +172,7 @@ impl<'a> Validator<'a> {
 
     fn validate_base_fields_for_relation(
         &self,
+        _datamodel: &dml::Datamodel,
         ast_model: &ast::Model,
         model: &dml::Model,
     ) -> Result<(), ErrorCollection> {
@@ -276,6 +280,29 @@ impl<'a> Validator<'a> {
                     .map(|f| f.clone())
                     .collect();
 
+                let fields_with_wrong_type: Vec<DatamodelError> = rel_info.fields.iter().zip(rel_info.to_fields.iter())
+                    .filter_map(|(base_field, referenced_field)| {
+                        let base_field = model.find_field(&base_field)?;
+                        let referenced_field = related_model.find_field(&referenced_field)?;
+
+                        if base_field.field_type != referenced_field.field_type {
+                            Some(DatamodelError::new_directive_validation_error(
+                                &format!(
+                                    "The type of the field `{}` in the model `{}` is not matching the type of the referenced field `{}` in model `{}`.",
+                                    &base_field.name,
+                                    &model.name,
+                                    &referenced_field.name,
+                                    &related_model.name
+                                ),
+                                RELATION_DIRECTIVE_NAME,
+                                ast_field.span.clone(),
+                            ))
+                        } else {
+                            None
+                        }
+                    })
+                    .collect();
+
                 if !unknown_fields.is_empty() {
                     errors.push(DatamodelError::new_validation_error(
                         &format!("The argument `references` must refer only to existing fields in the related model `{}`. The following fields do not exist in the related model: {}",
@@ -314,6 +341,11 @@ impl<'a> Validator<'a> {
                             ast_field.span.clone())
                         );
                     }
+                }
+
+                if !fields_with_wrong_type.is_empty() && !errors.has_errors() {
+                    // don't output too much errors
+                    errors.append_vec(fields_with_wrong_type);
                 }
             }
         }

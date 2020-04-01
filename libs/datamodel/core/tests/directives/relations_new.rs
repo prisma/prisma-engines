@@ -84,7 +84,8 @@ fn relation_must_error_when_base_field_is_not_scalar() {
     "#;
 
     let errors = parse_error(dml);
-    errors.assert_is(DatamodelError::new_validation_error("The argument fields must refer only to scalar fields. But it is referencing the following relation fields: other", Span::new(210, 264)));
+    errors.assert_is_at(0,DatamodelError::new_validation_error("The argument fields must refer only to scalar fields. But it is referencing the following relation fields: other", Span::new(210, 264)));
+    errors.assert_is_at(1,DatamodelError::new_directive_validation_error("The type of the field `other` in the model `Post` is not matching the type of the referenced field `id` in model `User`.","@relation", Span::new(210, 264)));
 }
 
 #[test]
@@ -191,4 +192,24 @@ fn relation_must_error_when_referenced_fields_are_multiple_uniques() {
 
     let errors = parse_error(dml);
     errors.assert_is(DatamodelError::new_validation_error("The argument `references` must refer to a unique criteria in the related model `User`. But it is referencing the following fields that are not a unique criteria: id, firstName", Span::new(191, 329)));
+}
+
+#[test]
+fn relation_must_error_when_types_of_base_field_and_referenced_field_do_not_match() {
+    let dml = r#"
+    model User {
+        id        Int @id
+        firstName String
+        posts     Post[]
+    }
+
+    model Post {
+        id     Int     @id
+        userId String  // this type does not match
+        user   User    @relation(fields: [userId], references: [id])
+    }
+    "#;
+
+    let errors = parse_error(dml);
+    errors.assert_is(DatamodelError::new_directive_validation_error("The type of the field `userId` in the model `Post` is not matching the type of the referenced field `id` in model `User`.","@relation", Span::new(204, 264)));
 }
