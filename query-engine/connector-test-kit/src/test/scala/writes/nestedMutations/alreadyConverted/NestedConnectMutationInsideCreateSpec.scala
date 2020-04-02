@@ -855,9 +855,10 @@ class NestedConnectMutationInsideCreateSpec extends FlatSpec with Matchers with 
         |}
         |
         |model Comment {
-        | id    String  @id @default(cuid())
-        | text  String
-        | todo  Todo?   @relation(references: [id])
+        | id     String  @id @default(cuid())
+        | text   String
+        | todoId String?
+        | todo   Todo?   @relation(fields: todoId, references: [id])
         |}
       """.stripMargin
     }
@@ -888,9 +889,10 @@ class NestedConnectMutationInsideCreateSpec extends FlatSpec with Matchers with 
   "A P1 to CM relation " should "throw a proper error if connected by wrong id the other way around" in {
     val project = SchemaDsl.fromStringV11() {
       """model Comment {
-        | id   String @id @default(cuid())
-        | text String
-        | todo Todo?  @relation(references: [id])
+        | id     String  @id @default(cuid())
+        | text   String
+        | todoId String?
+        | todo   Todo?   @relation(fields: todoId, references: [id])
         |}
         |
         |model Todo {

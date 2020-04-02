@@ -322,6 +322,7 @@ fn must_error_when_fields_argument_is_missing_for_one_to_many() {
 }
 
 #[test]
+#[ignore]
 fn must_error_when_references_argument_is_missing_for_one_to_many() {
     let dml = r#"
     model User {
@@ -346,6 +347,7 @@ fn must_error_when_references_argument_is_missing_for_one_to_many() {
 }
 
 #[test]
+#[ignore]
 fn must_error_when_both_arguments_are_missing_for_one_to_many() {
     let dml = r#"
     model User {
@@ -411,6 +413,7 @@ fn must_error_when_fields_argument_is_missing_for_one_to_one() {
 }
 
 #[test]
+#[ignore]
 fn must_error_when_references_argument_is_missing_for_one_to_one() {
     let dml = r#"
     model User {

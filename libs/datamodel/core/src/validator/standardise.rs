@@ -82,7 +82,7 @@ impl Standardiser {
 
                     if embed_here {
                         // user input has precedence
-                        if rel.to_fields.is_empty() && related_field_rel.to_fields.is_empty() && field.is_generated {
+                        if rel.to_fields.is_empty() && related_field_rel.to_fields.is_empty() {
                             rel.to_fields = related_model
                                 .first_unique_criterion()
                                 .iter()
