@@ -240,7 +240,6 @@ model Author {
         .assert_has_field("authors")
         .assert_relation_to("Blog")
         .assert_relation_name("AuthorToBlog")
-        .assert_relation_to_fields(&["id"])
         .assert_arity(&datamodel::dml::FieldArity::List);
 
     author_model.assert_has_field("id");
@@ -250,7 +249,6 @@ model Author {
         .assert_has_field("authors")
         .assert_relation_to("Author")
         .assert_relation_name("AuthorToBlog")
-        .assert_relation_to_fields(&["id"])
         .assert_arity(&datamodel::dml::FieldArity::List);
 
     blog_model.assert_has_field("id");

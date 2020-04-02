@@ -278,19 +278,6 @@ impl Standardiser {
             } else {
                 panic!("Tried to name a non-existing relation.");
             }
-
-            // Foreign side.
-            let field = datamodel
-                .find_model_mut(&rel_info.to)
-                .expect(STATE_ERROR)
-                .related_field_mut(&model_name, &rel_info.name, &field_name)
-                .expect(STATE_ERROR);
-
-            if let dml::FieldType::Relation(rel) = &mut field.field_type {
-                rel.name = DefaultNames::relation_name(&model_name, &rel_info.to);
-            } else {
-                panic!("Tried to name a non-existing relation.");
-            }
         }
     }
 
@@ -301,21 +288,8 @@ impl Standardiser {
         for model in datamodel.models() {
             for field in model.fields() {
                 if let dml::FieldType::Relation(rel) = &field.field_type {
-                    let related_model = datamodel.find_model(&rel.to).expect(STATE_ERROR);
-                    let related_field = related_model
-                        .related_field(&model.name, &rel.name, &field.name)
-                        .expect(STATE_ERROR);
-
-                    if let dml::FieldType::Relation(related_rel) = &related_field.field_type {
-                        if rel.name.is_empty()
-                            && !rel.to_fields.is_empty()
-                            // Tie is used to prevent duplicates on n:m relation.
-                            && (related_rel.to_fields.is_empty() || tie(&model, &field, &related_model, &related_field))
-                        {
-                            rels.push((model.name.clone(), field.name.clone(), rel.clone()))
-                        }
-                    } else {
-                        panic!(STATE_ERROR);
+                    if rel.name.is_empty() {
+                        rels.push((model.name.clone(), field.name.clone(), rel.clone()))
                     }
                 }
             }
