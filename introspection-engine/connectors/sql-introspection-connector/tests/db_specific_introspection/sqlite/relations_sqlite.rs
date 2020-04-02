@@ -376,8 +376,8 @@ async fn introspecting_a_many_to_many_relation_with_an_id_should_work(api: &Test
             migration.create_table("PostsToUsers", |t| {
                 t.inject_custom(
                     "id Integer Primary Key Not Null,
-                          user_id TEXT NOT NULL,
-                          post_id TEXT NOT NULL,
+                          user_id INTEGER NOT NULL,
+                          post_id INTEGER NOT NULL,
                           FOREIGN KEY (user_id) REFERENCES  User(id),
                           FOREIGN KEY (post_id) REFERENCES  Post(id)",
                 )
@@ -398,8 +398,8 @@ async fn introspecting_a_many_to_many_relation_with_an_id_should_work(api: &Test
             
             model PostsToUsers {
                 id      Int    @default(autoincrement()) @id
-                post_id String
-                user_id String
+                post_id Int
+                user_id Int
                 Post    Post   @relation(fields: [post_id], references: [id])
                 User    User   @relation(fields: [user_id], references: [id])
             }
