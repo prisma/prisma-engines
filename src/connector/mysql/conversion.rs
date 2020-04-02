@@ -32,6 +32,7 @@ impl TakeRow for my::Row {
                 // TOOD: This is unsafe
                 my::Value::UInt(i) => ParameterizedValue::Integer(i as i64),
                 my::Value::Float(f) => ParameterizedValue::from(f),
+                my::Value::Double(f) => ParameterizedValue::from(f),
                 #[cfg(feature = "chrono-0_4")]
                 my::Value::Date(year, month, day, hour, min, sec, micro) => {
                     let time = NaiveTime::from_hms_micro(hour.into(), min.into(), sec.into(), micro);
@@ -89,7 +90,7 @@ impl<'a> From<ParameterizedValue<'a>> for MyValue {
         match pv {
             ParameterizedValue::Null => MyValue::NULL,
             ParameterizedValue::Integer(i) => MyValue::Int(i),
-            ParameterizedValue::Real(f) => MyValue::Float(f.to_f64().expect("Decimal is not a f64.")),
+            ParameterizedValue::Real(f) => MyValue::Double(f.to_f64().expect("Decimal is not a f64.")),
             ParameterizedValue::Text(s) => MyValue::Bytes((&*s).as_bytes().to_vec()),
             ParameterizedValue::Bytes(bytes) => MyValue::Bytes(bytes.into_owned()),
             ParameterizedValue::Enum(s) => MyValue::Bytes((&*s).as_bytes().to_vec()),
