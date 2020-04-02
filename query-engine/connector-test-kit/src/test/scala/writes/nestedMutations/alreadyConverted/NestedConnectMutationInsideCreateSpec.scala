@@ -847,7 +847,7 @@ class NestedConnectMutationInsideCreateSpec extends FlatSpec with Matchers with 
   }
 
   // FIXME: dom must look into this
-  "A PM to C1 relation" should "throw a proper error if connected by wrong id" ignore {
+  "A PM to C1 relation" should "throw a proper error if connected by wrong id" in {
     val project = SchemaDsl.fromStringV11() {
       """
         |model Todo {
