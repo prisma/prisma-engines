@@ -1,9 +1,12 @@
+use crate::common::parse;
+
 #[test]
 fn test_exclude_default_relation_names_from_rendering() {
     let input = r#"
         model Todo {
-            id Int @id
-            user User @relation("TodoToUser")
+            id     Int  @id
+            userId Int
+            user   User @relation("TodoToUser", fields: [userId], references: [id])
         }
 
         model User {
@@ -13,8 +16,9 @@ fn test_exclude_default_relation_names_from_rendering() {
     "#;
 
     let expected = r#"model Todo {
-  id   Int  @id
-  user User @relation(references: [id])
+  id     Int  @id
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
 }
 
 model User {
@@ -22,7 +26,7 @@ model User {
   todo Todo
 }"#;
 
-    let dml = datamodel::parse_datamodel(input).unwrap();
+    let dml = parse(input);
     let rendered = datamodel::render_datamodel_to_string(&dml).unwrap();
 
     print!("{}", rendered);
@@ -54,7 +58,7 @@ model User {
   todo Todo
 }"#;
 
-    let dml = datamodel::parse_datamodel(input).unwrap();
+    let dml = parse(input);
     let rendered = datamodel::render_datamodel_to_string(&dml).unwrap();
 
     print!("{}", rendered);

@@ -1,4 +1,5 @@
 extern crate datamodel;
+use crate::common::*;
 use pretty_assertions::assert_eq;
 
 // TODO: test `onDelete` back once `prisma migrate` is a thing
@@ -16,9 +17,10 @@ const DATAMODEL_STRING: &str = r#"model User {
 }
 
 model Profile {
-  id   Int    @id
-  user User   @relation(references: [id])
-  bio  String
+  id     Int    @id
+  bio    String
+  userId Int
+  user   User   @relation(fields: [userId], references: [id])
 
   @@map("profile")
 }
@@ -29,7 +31,8 @@ model Post {
   updatedAt  DateTime
   title      String           @default("Default-Title")
   wasLiked   Boolean          @default(false)
-  author     User             @relation("author", references: [id])
+  authorId   Int
+  author     User             @relation("author", fields: [authorId], references: [id])
   published  Boolean          @default(false)
   categories PostToCategory[]
 
@@ -47,16 +50,20 @@ model Category {
 }
 
 model PostToCategory {
-  id       Int      @id
-  post     Post     @relation(references: [title, createdAt])
-  category Category @relation(references: [id])
+  id            Int      @id
+  postTitle     String
+  postCreatedAt DateTime
+  categoryId    Int
+  post          Post     @relation(fields: [postTitle, postCreatedAt], references: [title, createdAt])
+  category      Category @relation(fields: [categoryId], references: [id])
 
   @@map("post_to_category")
 }
 
 model A {
-  id Int @id
-  b  B   @relation(references: [id])
+  id  Int @id
+  bId Int
+  b   B   @relation(fields: [bId], references: [id])
 }
 
 model B {
@@ -72,7 +79,7 @@ enum CategoryEnum {
 
 #[test]
 fn test_parser_renderer_via_dml() {
-    let dml = datamodel::parse_datamodel(DATAMODEL_STRING).unwrap();
+    let dml = parse(DATAMODEL_STRING);
     let rendered = datamodel::render_datamodel_to_string(&dml).unwrap();
 
     print!("{}", rendered);
@@ -95,14 +102,15 @@ model Author {
 }
 
 model Post {
-  id    Int    @id
-  title String
-  blog  Blog   @relation(references: [id])
+  id     Int    @id
+  title  String
+  blogId Int
+  blog   Blog   @relation(fields: [blogId], references: [id])
 }"#;
 
 #[test]
 fn test_parser_renderer_many_to_many_via_dml() {
-    let dml = datamodel::parse_datamodel(MANY_TO_MANY_DATAMODEL).unwrap();
+    let dml = parse(MANY_TO_MANY_DATAMODEL);
     let rendered = datamodel::render_datamodel_to_string(&dml).unwrap();
 
     print!("{}", rendered);
@@ -125,7 +133,7 @@ model User {
 
 #[test]
 fn test_parser_renderer_model_with_comments_via_dml() {
-    let dml = datamodel::parse_datamodel(DATAMODEL_STRING_WITH_COMMENTS).unwrap();
+    let dml = parse(DATAMODEL_STRING_WITH_COMMENTS);
     let rendered = datamodel::render_datamodel_to_string(&dml).unwrap();
 
     print!("{}", rendered);

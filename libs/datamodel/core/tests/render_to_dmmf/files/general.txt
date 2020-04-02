@@ -505,6 +505,19 @@
           "isUpdatedAt": false
         },
         {
+          "name": "bId",
+          "kind": "scalar",
+          "dbNames": [],
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": false,
+          "isReadOnly": true,
+          "type": "Int",
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
           "name": "b",
           "kind": "object",
           "dbNames": [],
