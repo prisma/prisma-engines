@@ -44,11 +44,12 @@ model Category {
 }
 
 model PostToCategory {
-  id         Int @id
-  postId     Int
-  categoryId Int
+  id            Int @id
+  postTitle     String
+  postCreatedAt DateTime
+  categoryId    Int
 
-  post     Post     @relation(fields: [postId], references: [title, createdAt])
+  post     Post     @relation(fields: [postTitle, postCreatedAt], references: [title, createdAt])
   category Category @relation(fields: [categoryId], references: [id])
 
   @@map("post_to_category")

@@ -406,7 +406,7 @@
           "isUpdatedAt": false
         },
         {
-          "name": "postId",
+          "name": "postTitle",
           "kind": "scalar",
           "dbNames": [],
           "isList": false,
@@ -414,7 +414,20 @@
           "isUnique": false,
           "isId": false,
           "isReadOnly": true,
-          "type": "Int",
+          "type": "String",
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "postCreatedAt",
+          "kind": "scalar",
+          "dbNames": [],
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": false,
+          "isReadOnly": true,
+          "type": "DateTime",
           "isGenerated": false,
           "isUpdatedAt": false
         },

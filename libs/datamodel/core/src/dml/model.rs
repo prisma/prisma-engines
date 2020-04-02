@@ -45,6 +45,7 @@ pub enum IndexType {
     Normal,
 }
 
+#[derive(Debug)]
 pub struct UniqueCriteria<'a> {
     pub fields: Vec<&'a Field>,
 }
