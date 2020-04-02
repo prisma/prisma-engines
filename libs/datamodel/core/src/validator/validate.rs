@@ -62,6 +62,37 @@ impl<'a> Validator<'a> {
                 errors_for_model.append(the_errors);
             }
 
+            //            if !errors_for_model.has_errors() {
+            //                let mut new_errors = self.validate_relation_arguments_bla(
+            //                    schema,
+            //                    ast_schema.find_model(&model.name).expect(STATE_ERROR),
+            //                    model,
+            //                );
+            //                errors_for_model.append(&mut new_errors);
+            //            }
+
+            all_errors.append(&mut errors_for_model);
+        }
+
+        if all_errors.has_errors() {
+            Err(all_errors)
+        } else {
+            Ok(())
+        }
+    }
+
+    pub fn post_standardisation_validate(
+        &self,
+        ast_schema: &ast::SchemaAst,
+        schema: &mut dml::Datamodel,
+    ) -> Result<(), ErrorCollection> {
+        let mut all_errors = ErrorCollection::new();
+
+        // Model level validations.
+        for model in schema.models() {
+            // Having a separate error collection allows checking whether any error has occurred for a model.
+            let mut errors_for_model = ErrorCollection::new();
+
             if !errors_for_model.has_errors() {
                 let mut new_errors = self.validate_relation_arguments_bla(
                     schema,
@@ -404,11 +435,12 @@ impl<'a> Validator<'a> {
         let mut errors = ErrorCollection::new();
 
         for field in model.fields() {
-            let ast_field = ast_model
+            let field_span = ast_model
                 .fields
                 .iter()
                 .find(|ast_field| ast_field.name.name == field.name)
-                .unwrap();
+                .map(|ast_field| ast_field.span)
+                .unwrap_or(ast::Span::empty());
 
             if let dml::FieldType::Relation(rel_info) = &field.field_type {
                 let related_model = datamodel.find_model(&rel_info.to).expect(STATE_ERROR);
@@ -429,7 +461,7 @@ impl<'a> Validator<'a> {
                                 &field.name, &model.name, RELATION_DIRECTIVE_NAME
                             ),
                             RELATION_DIRECTIVE_NAME,
-                            ast_field.span.clone(),
+                            field_span.clone(),
                         ));
                     }
 
@@ -440,7 +472,7 @@ impl<'a> Validator<'a> {
                                 &field.name, &model.name, RELATION_DIRECTIVE_NAME
                             ),
                             RELATION_DIRECTIVE_NAME,
-                            ast_field.span.clone(),
+                            field_span.clone(),
                         ));
                     }
                 }
@@ -453,7 +485,7 @@ impl<'a> Validator<'a> {
                                 &field.name, &model.name, &related_field.name, &related_model.name, RELATION_DIRECTIVE_NAME
                             ),
                             RELATION_DIRECTIVE_NAME,
-                            ast_field.span.clone(),
+                            field_span.clone(),
                         ));
                     }
 
@@ -464,7 +496,7 @@ impl<'a> Validator<'a> {
                                 &field.name, &model.name, &related_field.name, &related_model.name, RELATION_DIRECTIVE_NAME
                             ),
                             RELATION_DIRECTIVE_NAME,
-                            ast_field.span.clone(),
+                            field_span.clone(),
                         ));
                     }
                 }

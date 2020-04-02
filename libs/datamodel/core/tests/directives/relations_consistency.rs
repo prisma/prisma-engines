@@ -35,8 +35,10 @@ fn must_add_back_relation_fields_for_given_list_field() {
 fn must_add_back_relation_fields_for_given_singular_field() {
     let dml = r#"
     model User {
-        id   Int @id
-        post Post
+        id     Int @id
+        postId Int 
+        
+        post   Post @relation(fields: [postId], references: [post_id]) 
     }
 
     model Post {
@@ -457,8 +459,10 @@ fn should_camel_case_back_relation_field_name() {
 fn must_add_back_relation_fields_for_self_relations() {
     let dml = r#"
     model Human {
-        id Int @id
-        son Human?
+        id    Int @id
+        sonId Int?
+        
+        son   Human? @relation(fields: [sonId], references: [id]) 
     }
     "#;
 

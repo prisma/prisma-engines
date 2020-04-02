@@ -13,9 +13,11 @@ fn resolve_relation() {
     }
 
     model Post {
-        id Int @id
-        text String
-        user User
+        id     Int    @id
+        text   String
+        userId Int
+        
+        user User @relation(fields: [userId], references: [id])
     }
     "#;
 
@@ -46,9 +48,10 @@ fn resolve_related_field() {
     }
 
     model Post {
-        id   Int    @id
-        text String
-        user User   @relation(references: [firstName])
+        id            Int    @id
+        text          String
+        userFirstName String
+        user          User   @relation(fields: [userFirstName], references: [firstName])
     }
     "#;
 

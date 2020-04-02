@@ -67,6 +67,11 @@ impl<'a> ValidationPipeline<'a> {
             all_errors.append(&mut err);
         }
 
+        // Phase 6: Post Standardisation Validation
+        if let Err(mut err) = self.validator.post_standardisation_validate(ast_schema, &mut schema) {
+            all_errors.append(&mut err);
+        }
+
         if all_errors.has_errors() {
             Err(all_errors)
         } else {
