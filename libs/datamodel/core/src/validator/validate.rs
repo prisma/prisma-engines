@@ -22,25 +22,28 @@ impl<'a> Validator<'a> {
     }
 
     pub fn validate(&self, ast_schema: &ast::SchemaAst, schema: &mut dml::Datamodel) -> Result<(), ErrorCollection> {
-        let mut errors = ErrorCollection::new();
+        let mut all_errors = ErrorCollection::new();
 
         // Model level validations.
         for model in schema.models() {
+            // Having a separate error collection allows checking whether any error has occurred for a model.
+            let mut errors_for_model = ErrorCollection::new();
+
             if let Err(err) = self.validate_model_has_id(ast_schema.find_model(&model.name).expect(STATE_ERROR), model)
             {
-                errors.push(err);
+                errors_for_model.push(err);
             }
             if let Err(err) = self.validate_relations_not_ambiguous(ast_schema, model) {
-                errors.push(err);
+                errors_for_model.push(err);
             }
             if let Err(err) = self.validate_embedded_types_have_no_back_relation(ast_schema, schema, model) {
-                errors.push(err);
+                errors_for_model.push(err);
             }
 
             if let Err(ref mut the_errors) =
                 self.validate_field_arities(ast_schema.find_model(&model.name).expect(STATE_ERROR), model)
             {
-                errors.append(the_errors);
+                errors_for_model.append(the_errors);
             }
 
             if let Err(ref mut the_errors) = self.validate_base_fields_for_relation(
@@ -48,7 +51,7 @@ impl<'a> Validator<'a> {
                 ast_schema.find_model(&model.name).expect(STATE_ERROR),
                 model,
             ) {
-                errors.append(the_errors);
+                errors_for_model.append(the_errors);
             }
 
             if let Err(ref mut the_errors) = self.validate_referenced_fields_for_relation(
@@ -56,12 +59,23 @@ impl<'a> Validator<'a> {
                 ast_schema.find_model(&model.name).expect(STATE_ERROR),
                 model,
             ) {
-                errors.append(the_errors);
+                errors_for_model.append(the_errors);
             }
+
+            if !errors_for_model.has_errors() {
+                let mut new_errors = self.validate_relation_arguments_bla(
+                    schema,
+                    ast_schema.find_model(&model.name).expect(STATE_ERROR),
+                    model,
+                );
+                errors_for_model.append(&mut new_errors);
+            }
+
+            all_errors.append(&mut errors_for_model);
         }
 
-        if errors.has_errors() {
-            Err(errors)
+        if all_errors.has_errors() {
+            Err(all_errors)
         } else {
             Ok(())
         }
@@ -379,6 +393,85 @@ impl<'a> Validator<'a> {
         } else {
             Ok(())
         }
+    }
+
+    fn validate_relation_arguments_bla(
+        &self,
+        datamodel: &dml::Datamodel,
+        ast_model: &ast::Model,
+        model: &dml::Model,
+    ) -> ErrorCollection {
+        let mut errors = ErrorCollection::new();
+
+        for field in model.fields() {
+            let ast_field = ast_model
+                .fields
+                .iter()
+                .find(|ast_field| ast_field.name.name == field.name)
+                .unwrap();
+
+            if let dml::FieldType::Relation(rel_info) = &field.field_type {
+                let related_model = datamodel.find_model(&rel_info.to).expect(STATE_ERROR);
+                let related_field = related_model
+                    .related_field(&model.name, &rel_info.name, &field.name)
+                    .unwrap();
+
+                let related_field_rel_info = match &related_field.field_type {
+                    dml::FieldType::Relation(x) => x,
+                    _ => unreachable!(),
+                };
+
+                if field.arity.is_singular() && related_field.arity.is_list() {
+                    if rel_info.fields.is_empty() {
+                        errors.push(DatamodelError::new_directive_validation_error(
+                            &format!(
+                                "The relation field `{}` on Model `{}` must specify the `fields` argument in the {} directive.",
+                                &field.name, &model.name, RELATION_DIRECTIVE_NAME
+                            ),
+                            RELATION_DIRECTIVE_NAME,
+                            ast_field.span.clone(),
+                        ));
+                    }
+
+                    if rel_info.to_fields.is_empty() {
+                        errors.push(DatamodelError::new_directive_validation_error(
+                            &format!(
+                                "The relation field `{}` on Model `{}` must specify the `references` argument in the {} directive.",
+                                &field.name, &model.name, RELATION_DIRECTIVE_NAME
+                            ),
+                            RELATION_DIRECTIVE_NAME,
+                            ast_field.span.clone(),
+                        ));
+                    }
+                }
+
+                if field.arity.is_singular() && related_field.arity.is_singular() {
+                    if rel_info.fields.is_empty() && related_field_rel_info.fields.is_empty() {
+                        errors.push(DatamodelError::new_directive_validation_error(
+                            &format!(
+                                "The relation fields `{}` on Model `{}` and `{}` on Model `{}` do not provide the `fields` argument in the {} directive. You have to provide it on one of the two fields.",
+                                &field.name, &model.name, &related_field.name, &related_model.name, RELATION_DIRECTIVE_NAME
+                            ),
+                            RELATION_DIRECTIVE_NAME,
+                            ast_field.span.clone(),
+                        ));
+                    }
+
+                    if rel_info.to_fields.is_empty() && related_field_rel_info.to_fields.is_empty() {
+                        errors.push(DatamodelError::new_directive_validation_error(
+                            &format!(
+                                "The relation fields `{}` on Model `{}` and `{}` on Model `{}` do not provide the `references` argument in the {} directive. You have to provide it on one of the two fields.",
+                                &field.name, &model.name, &related_field.name, &related_model.name, RELATION_DIRECTIVE_NAME
+                            ),
+                            RELATION_DIRECTIVE_NAME,
+                            ast_field.span.clone(),
+                        ));
+                    }
+                }
+            }
+        }
+
+        errors
     }
 
     /// Elegantly checks if any relations in the model are ambigious.
