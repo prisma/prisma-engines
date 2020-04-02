@@ -100,6 +100,7 @@ impl<'a> Validator<'a> {
     }
 
     fn validate_model_has_id(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), DatamodelError> {
+        // TODO: replace with unique criteria function
         let multiple_single_field_id_error = Err(DatamodelError::new_model_validation_error(
             "At most one field must be marked as the id field with the `@id` directive.",
             &model.name,
@@ -324,12 +325,17 @@ impl<'a> Validator<'a> {
                 if !rel_info.to_fields.is_empty() && !errors.has_errors() {
                     // when we have other errors already don't push this error additionally
                     let references_unique_criteria = related_model
-                        .unique_criterias()
+                        .loose_unique_criterias()
                         .iter()
                         .find(|criteria| {
-                            let criteria_field_names: Vec<_> =
+                            let mut criteria_field_names: Vec<_> =
                                 criteria.fields.iter().map(|f| f.name.to_owned()).collect();
-                            criteria_field_names == rel_info.to_fields
+                            criteria_field_names.sort();
+
+                            let mut to_fields_sorted = rel_info.to_fields.clone();
+                            to_fields_sorted.sort();
+
+                            criteria_field_names == to_fields_sorted
                         })
                         .is_some();
 

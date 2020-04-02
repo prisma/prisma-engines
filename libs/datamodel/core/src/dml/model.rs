@@ -120,14 +120,24 @@ impl Model {
 
     /// This should match the logic in `prisma_models::Model::primary_identifier`.
     pub fn first_unique_criterion(&self) -> Vec<&Field> {
-        match self.unique_criterias().first() {
+        match self.strict_unique_criterias().first() {
             Some(criteria) => criteria.fields.clone(),
             None => panic!("Could not find the first unique criteria on model {}", self.name()),
         }
     }
 
+    /// optional unique fields are NOT considered a unique criteria
+    pub fn strict_unique_criterias(&self) -> Vec<UniqueCriteria> {
+        self.unique_criterias(false)
+    }
+
+    /// optional unique fields are considered a unique criteria
+    pub fn loose_unique_criterias(&self) -> Vec<UniqueCriteria> {
+        self.unique_criterias(true)
+    }
+
     // returns the order of unique criterias ordered based on their precedence
-    pub fn unique_criterias(&self) -> Vec<UniqueCriteria> {
+    fn unique_criterias(&self, allow_optional: bool) -> Vec<UniqueCriteria> {
         let mut result = Vec::new();
         // first candidate: the singular id field
         {
@@ -153,7 +163,7 @@ impl Model {
             let mut unique_required_fields: Vec<_> = self
                 .fields
                 .iter()
-                .filter(|field| field.is_unique && field.arity == FieldArity::Required)
+                .filter(|field| field.is_unique && (field.arity == FieldArity::Required || allow_optional))
                 .map(|f| UniqueCriteria::new(vec![f]))
                 .collect();
 
