@@ -46,8 +46,8 @@ class DeleteMutationRelationsSpec extends FlatSpec with Matchers with ApiSpecBas
          |}
       """,
         project,
-        errorCode = 3042,
-        errorContains = "The change you are trying to make would violate the required relation 'ChildToParent' between Child and Parent"
+        errorCode = 2014,
+        errorContains = """The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models"""
       )
 
     }
@@ -97,8 +97,8 @@ class DeleteMutationRelationsSpec extends FlatSpec with Matchers with ApiSpecBas
          |}
       """,
         project,
-        errorCode = 3042,
-        errorContains = "The change you are trying to make would violate the required relation 'ChildToParent' between Child and Parent"
+        errorCode = 2014, // 3042,
+        errorContains = """The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."""
       )
 
     }
@@ -266,8 +266,8 @@ class DeleteMutationRelationsSpec extends FlatSpec with Matchers with ApiSpecBas
          |}
       """,
         project,
-        errorCode = 3042,
-        errorContains = "The change you are trying to make would violate the required relation 'ChildToParent' between Child and Parent"
+        errorCode = 2014,
+        errorContains = """The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models.""",
       )
 
     }
@@ -352,8 +352,8 @@ class DeleteMutationRelationsSpec extends FlatSpec with Matchers with ApiSpecBas
          |}
       """,
         project,
-        errorCode = 3042,
-        errorContains = "The change you are trying to make would violate the required relation 'ChildToParent' between Child and Parent"
+        errorCode = 2014,
+        errorContains = """The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models."""
       )
     }
   }

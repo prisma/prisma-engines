@@ -12,10 +12,7 @@ async fn introspecting_a_one_to_one_req_relation_should_work(api: &TestApi) {
             });
             migration.create_table("Post", |t| {
                 t.add_column("id", types::primary());
-                t.add_column(
-                    "user_id",
-                    types::foreign("User", "id").nullable(false).unique(true),
-                );
+                t.add_column("user_id", types::foreign("User", "id").nullable(false).unique(true));
             });
         })
         .await;
@@ -46,16 +43,10 @@ async fn introspecting_two_one_to_one_relations_between_the_same_models_should_w
             });
             migration.create_table("Post", |t| {
                 t.add_column("id", types::primary());
-                t.add_column(
-                    "user_id",
-                    types::foreign("User", "id").unique(true).nullable(false),
-                );
+                t.add_column("user_id", types::foreign("User", "id").unique(true).nullable(false));
             });
             migration.change_table("User", |t| {
-                t.add_column(
-                    "post_id",
-                    types::foreign("Post", "id").unique(true).nullable(false),
-                );
+                t.add_column("post_id", types::foreign("Post", "id").unique(true).nullable(false));
             });
         })
         .await;
@@ -89,10 +80,7 @@ async fn introspecting_a_one_to_one_relation_should_work(api: &TestApi) {
             });
             migration.create_table("Post", |t| {
                 t.add_column("id", types::primary());
-                t.add_column(
-                    "user_id",
-                    types::foreign("User", "id").unique(true).nullable(true),
-                );
+                t.add_column("user_id", types::foreign("User", "id").unique(true).nullable(true));
             });
         })
         .await;
@@ -169,6 +157,48 @@ async fn introspecting_a_one_to_many_relation_should_work(api: &TestApi) {
                 id   Int    @default(autoincrement()) @id
                 Post Post[]
             }
+        "#;
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+}
+
+#[test_each_connector(tags("postgres"))]
+async fn introspecting_duplicate_fks_should_ignore_one_of_them(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::primary());
+            });
+            migration.create_table("Post", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom("user_id INTEGER REFERENCES \"User\"(\"id\")");
+            });
+        })
+        .await;
+
+    api.database()
+        .execute_raw(
+            &format!(
+                "Alter table \"{}\".\"Post\" ADD CONSTRAINT fk_duplicate FOREIGN KEY (\"user_id\") REFERENCES \"User\" (\"id\");",
+                api.schema_name()
+            ),
+            &[],
+        )
+        .await
+        .unwrap();
+
+    let dm = r#"
+             model Post {
+                 id      Int   @default(autoincrement()) @id
+                 user_id Int?
+                 User    User? @relation("Post_user_idToUser", fields: [user_id], references: [id])
+             }
+             
+             model User {
+                 id   Int    @default(autoincrement()) @id
+                 Post Post[] @relation("Post_user_idToUser")
+             }
         "#;
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
@@ -693,4 +723,30 @@ async fn introspecting_relations_should_avoid_name_clashes_2(api: &TestApi) {
         "#;
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
+}
+
+#[test_each_connector(tags("postgres"))]
+async fn introspecting_a_relation_based_on_an_unsupported_type_should_drop_it(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom("network_mac  macaddr Not null Unique");
+            });
+            migration.create_table("Post", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom("user_network_mac macaddr REFERENCES \"User\"(\"network_mac\")");
+            });
+        })
+        .await;
+
+    let warnings = dbg!(api.introspection_warnings().await);
+    assert_eq!(
+        &warnings,
+        "[{\"code\":3,\"message\":\"These fields were commented out because we currently do not support their types.\",\"affected\":[{\"model\":\"Post\",\"field\":\"user_network_mac\",\"tpe\":\"macaddr\"},{\"model\":\"User\",\"field\":\"network_mac\",\"tpe\":\"macaddr\"}]}]"
+    );
+
+    let result = dbg!(api.introspect().await);
+    assert_eq!(&result, "model Post {\n  id                  Int      @default(autoincrement()) @id\n  // This type is currently not supported.\n  // user_network_mac macaddr?\n}\n\nmodel User {\n  id             Int     @default(autoincrement()) @id\n  // This type is currently not supported.\n  // network_mac macaddr @unique\n}");
 }

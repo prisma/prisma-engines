@@ -204,14 +204,21 @@ impl<'a> Validator<'a> {
                     .map(|f| f.clone())
                     .collect();
 
-                let fields_with_wrong_arity: Vec<&dml::Field> = rel_info
+                let at_least_one_underlying_field_is_required = rel_info
                     .fields
                     .iter()
                     .filter_map(|base_field| model.find_field(&base_field))
-                    .filter(|f| f.arity != field.arity)
-                    .collect();
-                let fields_with_wrong_arity_names: Vec<String> =
-                    fields_with_wrong_arity.iter().map(|f| f.name.clone()).collect();
+                    .any(|f| f.arity.is_required());
+
+                let all_underlying_fields_are_optional = rel_info
+                    .fields
+                    .iter()
+                    .map(|base_field| match model.find_field(&base_field) {
+                        Some(f) => f.arity.is_optional(),
+                        None => false,
+                    })
+                    .all(|x| x)
+                    && !rel_info.fields.is_empty(); // TODO: hack to maintain backwards compatibility for test schemas that don't specify fields yet
 
                 if !unknown_fields.is_empty() {
                     errors.push(DatamodelError::new_validation_error(
@@ -227,13 +234,24 @@ impl<'a> Validator<'a> {
                     );
                 }
 
-                if !fields_with_wrong_arity.is_empty() {
+                if at_least_one_underlying_field_is_required && !field.arity.is_required() {
                     errors.push(DatamodelError::new_validation_error(
-                        &format!("The relation field `{}` uses the scalar fields {}. The arity of those fields must be the same. The relation field is {} but the scalar fields are {}.",
+                        &format!(
+                            "The relation field `{}` uses the scalar fields {}. At least one of those fields is required. Hence the relation field must be required as well.",
                             &field.name,
-                                 fields_with_wrong_arity_names.join(", "),
-                        &field.arity.verbal_display(),
-                        &fields_with_wrong_arity.first().unwrap().arity.verbal_display()),
+                            rel_info.fields.join(", ")
+                        ),
+                        ast_field.span.clone())
+                    );
+                }
+
+                if all_underlying_fields_are_optional && field.arity.is_required() {
+                    errors.push(DatamodelError::new_validation_error(
+                        &format!(
+                            "The relation field `{}` uses the scalar fields {}. All those fields are optional. Hence the relation field must be optional as well.",
+                            &field.name,
+                            rel_info.fields.join(", ")
+                        ),
                         ast_field.span.clone())
                     );
                 }

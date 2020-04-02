@@ -148,8 +148,8 @@ class UpsertMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
          |}
       """.stripMargin,
       project,
-      3036,
-      errorContains = "The input value null was not valid for field reqString of model WithDefaultValue."
+      errorCode = 2011,
+      errorContains = "Null constraint violation on the fields: (`reqString`)"
     )
   }
 

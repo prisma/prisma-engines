@@ -22,6 +22,14 @@ impl FieldArity {
             FieldArity::List => "list",
         }
     }
+
+    pub fn is_required(&self) -> bool {
+        self == &Self::Required
+    }
+
+    pub fn is_optional(&self) -> bool {
+        self == &Self::Optional
+    }
 }
 
 /// Datamodel field type.

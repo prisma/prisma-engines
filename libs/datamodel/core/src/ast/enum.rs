@@ -48,6 +48,7 @@ pub struct EnumValue {
     pub directives: Vec<Directive>,
     /// The location of this enum value in the text representation.
     pub span: Span,
+    pub commented_out: bool,
 }
 
 impl WithIdentifier for EnumValue {

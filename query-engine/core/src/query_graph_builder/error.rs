@@ -11,6 +11,13 @@ pub enum QueryGraphBuilderError {
     /// by the general validation during query document parsing.
     InputError(String),
 
+    /// More specific input error for when an argument is missing for a field on a specific model.
+    MissingRequiredArgument {
+        argument_name: String,
+        field_name: String,
+        object_name: String,
+    },
+
     /// Wraps the initial parsing stage errors.
     QueryParserError(QueryParserError),
 
@@ -37,9 +44,9 @@ pub enum QueryGraphBuilderError {
 
 #[derive(Debug)]
 pub struct RelationViolation {
-    relation_name: String,
-    model_a_name: String,
-    model_b_name: String,
+    pub(crate) relation_name: String,
+    pub(crate) model_a_name: String,
+    pub(crate) model_b_name: String,
 }
 
 impl From<RelationFieldRef> for RelationViolation {

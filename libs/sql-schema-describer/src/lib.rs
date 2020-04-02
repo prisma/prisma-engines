@@ -348,7 +348,7 @@ pub enum ForeignKeyAction {
 }
 
 /// A foreign key.
-#[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ForeignKey {
     /// The database name of the foreign key constraint, when available.
@@ -361,6 +361,14 @@ pub struct ForeignKey {
     pub referenced_columns: Vec<String>,
     /// Action on deletion.
     pub on_delete_action: ForeignKeyAction,
+}
+
+impl PartialEq for ForeignKey {
+    fn eq(&self, other: &Self) -> bool {
+        self.columns == other.columns
+            && self.referenced_table == other.referenced_table
+            && self.referenced_columns == other.referenced_columns
+    }
 }
 
 /// A SQL enum.

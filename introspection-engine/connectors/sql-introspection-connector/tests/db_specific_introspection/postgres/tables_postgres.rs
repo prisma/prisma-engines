@@ -108,10 +108,7 @@ async fn introspecting_a_table_with_multi_column_unique_index_must_work(api: &Te
                 t.add_column("id", types::primary());
                 t.add_column("firstname", types::text());
                 t.add_column("lastname", types::text());
-                t.add_index(
-                    "test",
-                    types::index(vec!["firstname", "lastname"]).unique(true),
-                );
+                t.add_index("test", types::index(vec!["firstname", "lastname"]).unique(true));
             });
         })
         .await;
@@ -266,10 +263,7 @@ async fn introspecting_a_table_without_uniques_should_comment_it_out(api: &TestA
             });
             migration.create_table("Post", |t| {
                 t.add_column("id", types::integer());
-                t.add_column(
-                    "user_id",
-                    types::foreign("User", "id").nullable(false).unique(false),
-                );
+                t.add_column("user_id", types::foreign("User", "id").nullable(false).unique(false));
             });
         })
         .await;
@@ -340,7 +334,7 @@ async fn introspecting_default_values_should_work(api: &TestApi) {
             model Test {
                 boolean_boolean     Boolean?        @default(false)
                 id                  Int         @id @default(autoincrement())
-                numeric_decimal     Float?          @default(1234.1234) 
+                numeric_decimal     Float?          @default(1234.1234)
                 numeric_float4      Float?          @default(123.1234)
                 numeric_float8      Float?          @default(123.1234)
                 numeric_int2        Int?            @default(2)
@@ -361,7 +355,6 @@ async fn introspecting_default_values_should_work(api: &TestApi) {
 }
 
 #[test_each_connector(tags("postgres"))]
-
 async fn introspecting_a_default_value_as_dbgenerated_should_work(api: &TestApi) {
     let sequence = format!("CREATE SEQUENCE test_seq START 1");
     let color = format!("CREATE Type color as Enum ('black', 'white')");
@@ -409,10 +402,10 @@ async fn introspecting_a_default_value_as_dbgenerated_should_work(api: &TestApi)
                 string_function         String?     @default(dbgenerated())
                 string_static_char      String?     @default("test")
                 string_static_text      String?     @default("test")
-                string_static_text_null String?     
+                string_static_text_null String?
                 string_static_varchar   String?     @default("test")
             }
-            
+
            enum color{
                 black
                 white
@@ -436,6 +429,12 @@ async fn introspecting_an_unsupported_type_should_comment_it_out(api: &TestApi) 
         })
         .await;
 
+    let warnings = dbg!(api.introspection_warnings().await);
+    assert_eq!(
+        &warnings,
+        "[{\"code\":3,\"message\":\"These fields were commented out because we currently do not support their types.\",\"affected\":[{\"model\":\"Test\",\"field\":\"network_mac\",\"tpe\":\"macaddr\"}]}]"
+    );
+
     let result = dbg!(api.introspect().await);
     assert_eq!(&result, "model Test {\n  id             Int      @default(autoincrement()) @id\n  network_inet   String?\n  // This type is currently not supported.\n  // network_mac macaddr?\n}");
 }
@@ -458,8 +457,7 @@ async fn introspecting_a_legacy_m_to_n_relation_should_work(api: &TestApi) {
             });
         })
         .await;
-    let unique =
-        "CREATE UNIQUE INDEX _CategoryToPost_AB_unique ON \"_CategoryToPost\"(\"a\",\"b\" )";
+    let unique = "CREATE UNIQUE INDEX _CategoryToPost_AB_unique ON \"_CategoryToPost\"(\"a\",\"b\" )";
     let index = "CREATE  INDEX _CategoryToPost_AB_index ON \"_CategoryToPost\"(\"b\" )";
 
     api.database().execute_raw(unique, &[]).await.unwrap();
@@ -508,4 +506,52 @@ async fn introspecting_default_values_on_lists_should_be_ignored(api: &TestApi) 
         "#;
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
+}
+
+#[test_each_connector(tags("postgres"))]
+async fn introspecting_an_unsupported_type_should_and_commenting_it_out_should_also_drop_its_usages(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("Test", |t| {
+                t.add_column("id", types::integer().unique(true));
+                t.add_column("dummy", types::integer());
+                t.inject_custom("network_mac  macaddr");
+                t.add_index("unique", types::index(vec!["network_mac", "dummy"]).unique(true));
+                t.add_index("non_unique", types::index(vec!["network_mac", "dummy"]).unique(false));
+                t.inject_custom("Primary Key (\"network_mac\", \"dummy\")");
+            });
+        })
+        .await;
+
+    let warnings = dbg!(api.introspection_warnings().await);
+    assert_eq!(
+        &warnings,
+        "[{\"code\":3,\"message\":\"These fields were commented out because we currently do not support their types.\",\"affected\":[{\"model\":\"Test\",\"field\":\"network_mac\",\"tpe\":\"macaddr\"}]}]"
+    );
+
+    let result = dbg!(api.introspect().await);
+    assert_eq!(&result, "model Test {\n  dummy          Int\n  id             Int     @unique\n  // This type is currently not supported.\n  // network_mac macaddr\n}");
+}
+
+#[test_each_connector(tags("postgres"))]
+async fn introspecting_a_table_with_only_an_unsupported_id_type_should_comment_it_out(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("Test", |t| {
+                t.add_column("dummy", types::integer());
+                t.inject_custom("network_mac  macaddr Primary Key");
+            });
+        })
+        .await;
+
+    let warnings = dbg!(api.introspection_warnings().await);
+    assert_eq!(
+        &warnings,
+        "[{\"code\":1,\"message\":\"These models do not have a unique identifier or id and are therefore commented out.\",\"affected\":[{\"model\":\"Test\"}]},{\"code\":3,\"message\":\"These fields were commented out because we currently do not support their types.\",\"affected\":[{\"model\":\"Test\",\"field\":\"network_mac\",\"tpe\":\"macaddr\"}]}]"
+    );
+
+    let result = dbg!(api.introspect().await);
+    assert_eq!(&result, "// The underlying table does not contain a unique identifier and can therefore currently not be handled.\n// model Test {\n  // dummy       Int\n  // This type is currently not supported.\n  // network_mac macaddr @id\n// }");
 }

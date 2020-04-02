@@ -3,12 +3,12 @@ use crate::misc_helpers::*;
 use crate::sanitize_datamodel_names::sanitize_datamodel_names;
 use crate::SqlIntrospectionResult;
 use datamodel::{dml, Datamodel, FieldType, Model};
+use introspection_connector::IntrospectionResult;
 use log::debug;
 use sql_schema_describer::*;
 
 /// Calculate a data model from a database schema.
-/// todo return warnings
-pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> {
+pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<IntrospectionResult> {
     debug!("Calculating data model.");
 
     let mut data_model = Datamodel::new();
@@ -27,7 +27,15 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
             model.add_field(field);
         }
 
-        for foreign_key in &table.foreign_keys {
+        let mut foreign_keys_copy = table.foreign_keys.clone();
+        let model_copy = model.clone();
+        foreign_keys_copy.clear_duplicates();
+
+        for foreign_key in foreign_keys_copy.iter().filter(|fk| {
+            !fk.columns
+                .iter()
+                .any(|c| matches!(model_copy.find_field(c).unwrap().field_type, FieldType::Unsupported(_)))
+        }) {
             model.add_field(calculate_relation_field(schema, table, foreign_key));
         }
 
@@ -105,12 +113,32 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Datamodel> 
     }
 
     //todo sanitizing might need to be adjusted to also change the fields in the RelationInfo
-    sanitize_datamodel_names(&mut data_model); //todo warnings
-    commenting_out_guardrails(&mut data_model); //todo warnings
+    sanitize_datamodel_names(&mut data_model);
+    let warnings = commenting_out_guardrails(&mut data_model);
 
     deduplicate_field_names(&mut data_model);
 
     debug!("Done calculating data model {:?}", data_model);
 
-    Ok(data_model)
+    Ok(IntrospectionResult {
+        datamodel: data_model,
+        warnings,
+    })
+}
+
+trait Dedup<T: PartialEq + Clone> {
+    fn clear_duplicates(&mut self);
+}
+
+impl<T: PartialEq + Clone> Dedup<T> for Vec<T> {
+    fn clear_duplicates(&mut self) {
+        let mut already_seen = vec![];
+        self.retain(|item| match already_seen.contains(item) {
+            true => false,
+            _ => {
+                already_seen.push(item.clone());
+                true
+            }
+        })
+    }
 }

@@ -250,27 +250,28 @@ fn handle_relation_field_filter(
     let value: Option<BTreeMap<String, ParsedInputValue>> = value.try_into()?;
 
     Ok(match (op, value) {
-        (FilterOp::Some, Some(value)) => {
-            field.at_least_one_related(extract_filter(value, &field.related_model())?)
-        }
-        (FilterOp::None, Some(value)) => {
-            field.no_related(extract_filter(value, &field.related_model())?)
-        }
-        (FilterOp::Every, Some(value)) => {
-            field.every_related(extract_filter(value, &field.related_model())?)
-        }
-        (FilterOp::Field, Some(value)) => {
-            field.to_one_related(extract_filter(value, &field.related_model())?)
-        }
+        (FilterOp::Some, Some(value)) => field.at_least_one_related(extract_filter(value, &field.related_model())?),
+        (FilterOp::None, Some(value)) => field.no_related(extract_filter(value, &field.related_model())?),
+        (FilterOp::Every, Some(value)) => field.every_related(extract_filter(value, &field.related_model())?),
+        (FilterOp::Field, Some(value)) => field.to_one_related(extract_filter(value, &field.related_model())?),
         (FilterOp::Field, None) => field.one_relation_is_null(),
+        (FilterOp::None, None) => {
+            return Err(QueryGraphBuilderError::InputError(format!(
+                "A value is required for the `none` filter on `{}`",
+                field.name
+            )))
+        }
+        (FilterOp::Some, None) => {
+            return Err(QueryGraphBuilderError::InputError(format!(
+                "A value is required for the `some` filter on `{}`",
+                field.name
+            )))
+        }
         _ => unreachable!(),
     })
 }
 
-fn handle_compound_field(
-    fields: Vec<Field>,
-    value: ParsedInputValue,
-) -> QueryGraphBuilderResult<Filter> {
+fn handle_compound_field(fields: Vec<Field>, value: ParsedInputValue) -> QueryGraphBuilderResult<Filter> {
     let mut input_map: ParsedInputMap = value.try_into()?;
 
     let filters: Vec<Filter> = fields
@@ -292,18 +293,14 @@ fn handle_compound_field(
                         let filters = dsfs
                             .into_iter()
                             .map(|dsf| {
-                                let value: PrismaValue =
-                                    map.remove(&dsf.name).unwrap().try_into()?;
+                                let value: PrismaValue = map.remove(&dsf.name).unwrap().try_into()?;
                                 Ok(dsf.equals(value))
                             })
                             .collect::<QueryGraphBuilderResult<Vec<_>>>()?;
 
                         Ok(Filter::and(filters))
                     }
-                    _ => unreachable!(format!(
-                        "Invalid input for relation field input (for {})",
-                        rf.name
-                    )),
+                    _ => unreachable!(format!("Invalid input for relation field input (for {})", rf.name)),
                 }
             }
         })

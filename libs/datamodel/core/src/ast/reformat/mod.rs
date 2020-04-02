@@ -1,4 +1,4 @@
-use crate::{ast, parse_datamodel, parse_schema_ast, render_schema_ast_to, validator::LowerDmlToAst};
+use crate::{ast, parse_datamodel_and_ignore_env_errors, parse_schema_ast, render_schema_ast_to, validator::LowerDmlToAst};
 
 pub struct Reformatter {}
 
@@ -7,7 +7,7 @@ impl Reformatter {
         // the AST contains the datasources, generators, type aliases that are missing in the dml
         // it also contains all the original positions within the file
         let mut ast = parse_schema_ast(&input).unwrap();
-        let dml = parse_datamodel(&input).unwrap();
+        let dml = parse_datamodel_and_ignore_env_errors(&input).unwrap();
 
         for top in ast.tops.iter_mut() {
             match top {

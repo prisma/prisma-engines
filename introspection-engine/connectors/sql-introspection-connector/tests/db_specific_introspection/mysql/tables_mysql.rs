@@ -98,10 +98,7 @@ async fn introspecting_a_table_with_multi_column_unique_index_must_work(api: &Te
                     t.add_column("id", types::primary());
                     t.add_column("firstname", types::varchar(10));
                     t.add_column("lastname", types::varchar(10));
-                    t.add_index(
-                        "test",
-                        types::index(vec!["firstname", "lastname"]).unique(true),
-                    );
+                    t.add_index("test", types::index(vec!["firstname", "lastname"]).unique(true));
                 });
             },
             api.db_name(),

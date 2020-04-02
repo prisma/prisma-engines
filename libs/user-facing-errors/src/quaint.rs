@@ -148,6 +148,11 @@ pub fn render_quaint_error(kind: &ErrorKind, connection_info: &ConnectionInfo) -
             .ok()
         }
 
+        (ErrorKind::LengthMismatch { column }, _connection_info) => KnownError::new(query_engine::InputValueTooLong {
+            column_name: column.clone().unwrap_or_else(|| "<unknown>".to_string()),
+        })
+        .ok(),
+
         _ => None,
     }
 }

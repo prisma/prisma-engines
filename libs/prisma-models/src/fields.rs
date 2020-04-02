@@ -58,7 +58,9 @@ impl Fields {
                     .expect("Expected inlined relation field reference to be an existing scalar field.");
 
                 if let Field::Scalar(sf) = field {
-                    sf.read_only.set(true).unwrap();
+                    if let Err(_) = sf.read_only.set(true) {
+                        // Ignore error
+                    };
                 }
             }
         }

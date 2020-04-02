@@ -34,24 +34,21 @@ impl TestApi {
     pub async fn introspect_and_start_query_engine(&self) -> anyhow::Result<(DatamodelAssertions, QueryEngine)> {
         let datasource = self.datasource();
 
-        let schema = introspection_core::RpcImpl::introspect_internal(datasource)
+        let introspection_result = introspection_core::RpcImpl::introspect_internal(datasource)
             .await
             .map_err(|err| anyhow::anyhow!("{:?}", err.data))?;
 
-        let dml = datamodel::parse_datamodel(&schema).unwrap();
-        let config = datamodel::parse_configuration(&schema).unwrap();
+        let dml = datamodel::parse_datamodel(&introspection_result.datamodel).unwrap();
+        let config = datamodel::parse_configuration(&introspection_result.datamodel).unwrap();
 
-        let context = PrismaContext::builder(config, dml)
+        let context = PrismaContext::builder(config, dml.clone())
             .enable_raw_queries(true)
             .force_transactions(self.is_pgbouncer)
             .build()
             .await
             .unwrap();
 
-        eprintln!("{}", schema);
-        let schema = datamodel::parse_datamodel(&schema).unwrap();
-
-        Ok((DatamodelAssertions(schema), QueryEngine::new(context)))
+        Ok((DatamodelAssertions(dml), QueryEngine::new(context)))
     }
 }
 

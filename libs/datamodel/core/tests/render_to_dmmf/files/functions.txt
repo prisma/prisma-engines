@@ -14,6 +14,7 @@
           "isRequired": true,
           "isUnique": false,
           "isId": true,
+          "isReadOnly": false,
           "type": "Int",
           "isGenerated": false,
           "isUpdatedAt": false
@@ -26,6 +27,7 @@
           "isRequired": true,
           "isUnique": false,
           "isId": false,
+          "isReadOnly": false,
           "type": "DateTime",
           "default": {
             "name": "now",
@@ -42,6 +44,7 @@
           "isRequired": true,
           "isUnique": true,
           "isId": false,
+          "isReadOnly": false,
           "type": "String",
           "default": {
             "name": "cuid",

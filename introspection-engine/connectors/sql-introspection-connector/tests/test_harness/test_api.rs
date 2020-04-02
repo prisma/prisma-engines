@@ -26,8 +26,13 @@ impl TestApi {
     }
 
     pub async fn introspect(&self) -> String {
-        let datamodel = self.introspection_connector.introspect().await.unwrap();
-        datamodel::render_datamodel_to_string(&datamodel).expect("Datamodel rendering failed")
+        let introspection_result = self.introspection_connector.introspect().await.unwrap();
+        datamodel::render_datamodel_to_string(&introspection_result.datamodel).expect("Datamodel rendering failed")
+    }
+
+    pub async fn introspection_warnings(&self) -> String {
+        let introspection_result = self.introspection_connector.introspect().await.unwrap();
+        serde_json::to_string(&introspection_result.warnings).unwrap()
     }
 
     pub async fn get_metadata(&self) -> DatabaseMetadata {

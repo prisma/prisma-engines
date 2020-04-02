@@ -101,9 +101,9 @@ fn a_data_model_can_be_generated_from_a_schema() {
         enums: vec![],
         sequences: vec![],
     };
-    let data_model = calculate_model(&schema).expect("calculate data model");
+    let introspection_result = calculate_model(&schema).expect("calculate data model");
 
-    assert_eq!(data_model, ref_data_model);
+    assert_eq!(introspection_result.datamodel, ref_data_model);
 }
 
 #[test]
@@ -211,9 +211,9 @@ fn arity_is_preserved_when_generating_data_model_from_a_schema() {
         enums: vec![],
         sequences: vec![],
     };
-    let data_model = calculate_model(&schema).expect("calculate data model");
+    let introspection_result = calculate_model(&schema).expect("calculate data model");
 
-    assert_eq!(data_model, ref_data_model);
+    assert_eq!(introspection_result.datamodel, ref_data_model);
 }
 
 #[test]
@@ -374,9 +374,9 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
         enums: vec![],
         sequences: vec![],
     };
-    let data_model = calculate_model(&schema).expect("calculate data model");
+    let introspection_result = calculate_model(&schema).expect("calculate data model");
 
-    assert_eq!(data_model, ref_data_model);
+    assert_eq!(introspection_result.datamodel, ref_data_model);
 }
 
 #[test]
@@ -529,9 +529,9 @@ fn primary_key_is_preserved_when_generating_data_model_from_a_schema() {
         enums: vec![],
         sequences: vec![],
     };
-    let data_model = calculate_model(&schema).expect("calculate data model");
+    let introspection_result = calculate_model(&schema).expect("calculate data model");
 
-    assert_eq!(data_model, ref_data_model);
+    assert_eq!(introspection_result.datamodel, ref_data_model);
 }
 
 #[test]
@@ -616,9 +616,9 @@ fn uniqueness_is_preserved_when_generating_data_model_from_a_schema() {
         enums: vec![],
         sequences: vec![],
     };
-    let data_model = calculate_model(&schema).expect("calculate data model");
+    let introspection_result = calculate_model(&schema).expect("calculate data model");
 
-    assert_eq!(data_model, ref_data_model);
+    assert_eq!(introspection_result.datamodel, ref_data_model);
 }
 
 #[test]
@@ -740,7 +740,7 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
                         field_type: FieldType::Relation(RelationInfo {
                             name: "CityToUser".to_string(),
                             to: "City".to_string(),
-                            fields: vec!["city-id".to_string(), "city-name".to_string()],
+                            fields: vec!["city_id".to_string(), "city_name".to_string()],
                             to_fields: vec!["id".to_string(), "name".to_string()],
                             on_delete: OnDeleteStrategy::None,
                         }),
@@ -848,9 +848,9 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
         enums: vec![],
         sequences: vec![],
     };
-    let data_model = calculate_model(&schema).expect("calculate data model");
+    let introspection_result = calculate_model(&schema).expect("calculate data model");
 
-    assert_eq!(data_model, expected_data_model);
+    assert_eq!(introspection_result.datamodel, expected_data_model);
 }
 
 #[test]
@@ -966,9 +966,9 @@ fn multi_field_uniques_are_preserved_when_generating_data_model_from_a_schema() 
         enums: vec![],
         sequences: vec![],
     };
-    let data_model = calculate_model(&schema).expect("calculate data model");
+    let introspection_result = calculate_model(&schema).expect("calculate data model");
 
-    assert_eq!(data_model, ref_data_model);
+    assert_eq!(introspection_result.datamodel, ref_data_model);
 }
 
 #[test]
@@ -1058,8 +1058,8 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                     },
                     Field {
                         name: "city_id".to_string(),
-                        arity: FieldArity::Required,
                         field_type: FieldType::Base(ScalarType::Int, None),
+                        arity: FieldArity::Required,
                         database_names: vec![],
                         default_value: None,
                         is_unique: false,
@@ -1173,9 +1173,9 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
         enums: vec![],
         sequences: vec![],
     };
-    let data_model = calculate_model(&schema).expect("calculate data model");
+    let introspection_result = calculate_model(&schema).expect("calculate data model");
 
-    assert_eq!(data_model, ref_data_model);
+    assert_eq!(introspection_result.datamodel, ref_data_model);
 }
 
 #[test]
@@ -1190,10 +1190,12 @@ fn enums_are_preserved_when_generating_data_model_from_a_schema() {
                 datamodel::dml::EnumValue {
                     name: "a".to_string(),
                     database_name: None,
+                    commented_out: false,
                 },
                 datamodel::dml::EnumValue {
                     name: "b".to_string(),
                     database_name: None,
+                    commented_out: false,
                 },
             ],
         }],
@@ -1208,7 +1210,7 @@ fn enums_are_preserved_when_generating_data_model_from_a_schema() {
         }],
         sequences: vec![],
     };
-    let data_model = calculate_model(&schema).expect("calculate data model");
+    let introspection_result = calculate_model(&schema).expect("calculate data model");
 
-    assert_eq!(data_model, ref_data_model);
+    assert_eq!(introspection_result.datamodel, ref_data_model);
 }

@@ -49,6 +49,7 @@ async fn delete_one<'a, 'b>(tx: &'a ConnectionLike<'a, 'b>, q: DeleteRecord) -> 
         Some(f) => Ok(f),
         None => Err(InterpreterError::InterpretationError(
             "No record finder specified for delete record operation. Aborting.".to_owned(),
+            None,
         )),
     }?;
 

@@ -1,7 +1,7 @@
 use super::*;
 use crate::{
     schema::{IntoArc, ObjectTypeStrongRef, OutputType, OutputTypeRef, ScalarType},
-    CoreError, EnumType, QueryResult, RecordSelection,
+    AggregationQueryResult, CoreError, EnumType, QueryResult, RecordAggregation, RecordSelection,
 };
 use indexmap::IndexMap;
 use prisma_models::{InternalEnum, PrismaValue, RecordProjection};
@@ -40,10 +40,11 @@ pub fn serialize_internal(
 ) -> crate::Result<CheckedItemsWithParents> {
     match result {
         QueryResult::RecordSelection(rs) => serialize_record_selection(rs, typ, is_list, is_optional),
+        QueryResult::RecordAggregation(ra) => serialize_aggregation(ra),
 
         QueryResult::Count(c) => {
-            // Todo needs a real implementation
-            let mut map: IndexMap<String, Item> = IndexMap::with_capacity(1);
+            // Todo needs a real implementation or needs to move to RecordAggregation
+            let mut map: Map = IndexMap::with_capacity(1);
             let mut result = CheckedItemsWithParents::new();
 
             map.insert("count".into(), Item::Value(PrismaValue::Int(c as i64)));
@@ -53,10 +54,27 @@ pub fn serialize_internal(
         }
 
         QueryResult::Json(_) => unimplemented!(),
-
         QueryResult::Id(_) => unimplemented!(),
         QueryResult::Unit => unimplemented!(),
     }
+}
+
+fn serialize_aggregation(record_aggregation: RecordAggregation) -> crate::Result<CheckedItemsWithParents> {
+    let mut envelope = CheckedItemsWithParents::new();
+    let mut inner_map: Map = IndexMap::with_capacity(record_aggregation.results.len());
+
+    for result in record_aggregation.results {
+        match result {
+            AggregationQueryResult::Count(name, count) => {
+                inner_map.insert(name, Item::Value(PrismaValue::Int(count as i64)));
+            }
+        }
+    }
+
+    envelope.insert(None, Item::Map(inner_map));
+
+    // [DTODO] Ordering when we have more queries
+    Ok(envelope)
 }
 
 fn serialize_record_selection(

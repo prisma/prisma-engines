@@ -26,42 +26,40 @@ enum Command {
         #[structopt(long = "file-path")]
         file_path: Option<String>,
     },
+    /// Generate DMMF from a schema, or directly from a database URl.
+    Dmmf(DmmfCommand),
+}
+
+#[derive(StructOpt)]
+struct DmmfCommand {
+    /// The path to the `prisma` binary. Defaults to the value of the `PRISMA_BINARY_PATH` env var,
+    /// or just `prisma`.
+    #[structopt(env = "PRISMA_BINARY_PATH", default_value = "prisma")]
+    prisma_binary_path: String,
+    /// A database URL to introspect and generate DMMF for.
+    #[structopt(long = "url")]
+    url: Option<String>,
+    /// Path of the prisma schema to generate DMMF for.
+    #[structopt(long = "file-path")]
+    file_path: Option<String>,
 }
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     match Command::from_args() {
+        Command::Dmmf(cmd) => generate_dmmf(&cmd).await?,
         Command::Introspect { url, file_path } => {
             if url.as_ref().xor(file_path.as_ref()).is_none() {
                 anyhow::bail!(
                     "{}",
-                    "Exactly one of --url or --file-path must be provided"
-                        .bold()
-                        .red()
+                    "Exactly one of --url or --file-path must be provided".bold().red()
                 );
             }
 
             let schema = if let Some(file_path) = file_path {
                 read_datamodel_from_file(&file_path)?
             } else if let Some(url) = url {
-                let provider = match url.split(':').next() {
-                    Some("file") | Some("sqlite") => "sqlite",
-                    Some(s) if s.starts_with("postgres") => "postgresql",
-                    Some("mysql") => "mysql",
-                    _ => anyhow::bail!("Could not extract a provider from the URL"),
-                };
-
-                let schema = format!(
-                    r#"
-                        datasource db {{
-                            provider = "{}"
-                            url = "{}"
-                        }}
-                    "#,
-                    provider, url
-                );
-
-                schema
+                minimal_schema_from_url(&url)?
             } else {
                 unreachable!()
             };
@@ -78,20 +76,12 @@ async fn main() -> anyhow::Result<()> {
             stdin,
         } => {
             let datamodel_string: String = match (file_path, stdin) {
-                (Some(path), false) => {
-                    read_datamodel_from_file(&path).context("error reading the schemafile")?
-                }
+                (Some(path), false) => read_datamodel_from_file(&path).context("error reading the schemafile")?,
                 (None, true) => read_datamodel_from_stdin()?,
-                (Some(_), true) => anyhow::bail!(
-                    "{}",
-                    "please pass either --stdin or --file-path, not both"
-                        .bold()
-                        .red()
-                ),
-                (None, false) => anyhow::bail!(
-                    "{}",
-                    "either --stdin or --file-path is required".bold().red()
-                ),
+                (Some(_), true) => {
+                    anyhow::bail!("{}", "please pass either --stdin or --file-path, not both".bold().red())
+                }
+                (None, false) => anyhow::bail!("{}", "either --stdin or --file-path is required".bold().red()),
             };
 
             let api = migration_core::migration_api(&datamodel_string).await?;
@@ -116,11 +106,7 @@ async fn main() -> anyhow::Result<()> {
             };
 
             let result = api.apply_migration(&apply_input).await?;
-            let warnings: Vec<_> = result
-                .warnings
-                .into_iter()
-                .map(|warning| warning.description)
-                .collect();
+            let warnings: Vec<_> = result.warnings.into_iter().map(|warning| warning.description).collect();
 
             if warnings.is_empty() {
                 eprintln!("{}", "✔️  migrated without warning".bold().green());
@@ -140,11 +126,7 @@ async fn main() -> anyhow::Result<()> {
 fn read_datamodel_from_file(path: &str) -> std::io::Result<String> {
     use std::{fs::File, io::Read, path::Path};
 
-    eprintln!(
-        "{} {}",
-        "reading the prisma schema from".bold(),
-        path.yellow()
-    );
+    eprintln!("{} {}", "reading the prisma schema from".bold(), path.yellow());
 
     let path = Path::new(path);
     let mut file = File::open(path)?;
@@ -158,11 +140,7 @@ fn read_datamodel_from_file(path: &str) -> std::io::Result<String> {
 fn read_datamodel_from_stdin() -> std::io::Result<String> {
     use std::io::Read;
 
-    eprintln!(
-        "{} {}",
-        "reading the prisma schema from".bold(),
-        "stdin".yellow()
-    );
+    eprintln!("{} {}", "reading the prisma schema from".bold(), "stdin".yellow());
 
     let mut stdin = std::io::stdin();
 
@@ -170,4 +148,70 @@ fn read_datamodel_from_stdin() -> std::io::Result<String> {
     stdin.read_to_string(&mut out)?;
 
     Ok(out)
+}
+
+fn minimal_schema_from_url(url: &str) -> anyhow::Result<String> {
+    let provider = match url.split(':').next() {
+        Some("file") | Some("sqlite") => "sqlite",
+        Some(s) if s.starts_with("postgres") => "postgresql",
+        Some("mysql") => "mysql",
+        _ => anyhow::bail!("Could not extract a provider from the URL"),
+    };
+
+    let schema = format!(
+        r#"
+            datasource db {{
+                provider = "{}"
+                url = "{}"
+            }}
+        "#,
+        provider, url
+    );
+
+    Ok(schema)
+}
+
+async fn generate_dmmf(cmd: &DmmfCommand) -> anyhow::Result<()> {
+    let schema_path: String = {
+        if let Some(url) = cmd.url.as_ref() {
+            let skeleton = minimal_schema_from_url(url)?;
+
+            let introspected = introspection_core::RpcImpl::introspect_internal(skeleton)
+                .await
+                .map_err(|err| anyhow::anyhow!("{:?}", err.data))?;
+
+            eprintln!("{}", "Schema was successfully introspected from database URL".green());
+
+            let path = "/tmp/prisma-test-cli-introspected.prisma";
+            std::fs::write(path, introspected.datamodel)?;
+            path.to_owned()
+        } else if let Some(file_path) = cmd.file_path.as_ref() {
+            file_path.clone()
+        } else {
+            eprintln!(
+                "{} {} {} {}",
+                "Please provide one of".yellow(),
+                "--url".bold(),
+                "or".yellow(),
+                "--file-path".bold()
+            );
+            std::process::exit(1)
+        }
+    };
+
+    eprintln!(
+        "{} {}",
+        "Using the prisma binary at".yellow(),
+        cmd.prisma_binary_path.bold()
+    );
+
+    let cmd = std::process::Command::new(&cmd.prisma_binary_path)
+        .arg("cli")
+        .arg("dmmf")
+        .env("PRISMA_DML_PATH", schema_path)
+        .spawn()?;
+
+    cmd.wait_with_output()?;
+
+    Ok(())
 }

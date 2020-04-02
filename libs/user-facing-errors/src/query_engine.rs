@@ -32,15 +32,10 @@ impl From<Vec<String>> for DatabaseConstraint {
 #[derive(Debug, UserFacingError, Serialize)]
 #[user_facing(
     code = "P2000",
-    message = "The value ${field_value} for the field ${field_name} is too long for the field's type"
+    message = "The provided value for the column is too long for the column's type. Column: ${column_name}"
 )]
 pub struct InputValueTooLong {
-    /// Concrete value provided for a field on a model in Prisma schema. Should be peeked/truncated
-    /// if too long to display in the error message
-    pub field_value: String,
-
-    /// Field name from one model from Prisma schema
-    pub field_name: String,
+    pub column_name: String,
 }
 
 #[derive(Debug, UserFacingError, Serialize)]
@@ -152,4 +147,76 @@ pub struct QueryValidationFailed {
 pub struct RawQueryFailed {
     pub code: String,
     pub message: String,
+}
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(code = "P2011", message = "Null constraint violation on the ${constraint}")]
+pub struct NullConstraintViolation {
+    pub constraint: DatabaseConstraint,
+}
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(code = "P2012", message = "Missing a required value at `${path}`")]
+pub struct MissingRequiredValue {
+    pub path: String,
+}
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = "P2013",
+    message = "Missing the required argument `${argument_name}` for field `${field_name}` on `${object_name}`."
+)]
+pub struct MissingRequiredArgument {
+    pub argument_name: String,
+    pub field_name: String,
+    pub object_name: String,
+}
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = "P2014",
+    message = "The change you are trying to make would violate the required relation '${relation_name}' between the `${model_a_name}` and `${model_b_name}` models."
+)]
+pub struct RelationViolation {
+    pub relation_name: String,
+    pub model_a_name: String,
+    pub model_b_name: String,
+}
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(code = "P2015", message = "A related record could not be found. ${details}")]
+pub struct RelatedRecordNotFound {
+    pub details: String,
+}
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(code = "P2016", message = "Query interpretation error. ${details}")]
+pub struct InterpretationError {
+    pub details: String,
+}
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = "P2017",
+    message = "The records for relation `${relation_name}` between the `${parent_name}` and `${child_name}` models are not connected."
+)]
+pub struct RecordsNotConnected {
+    pub relation_name: String,
+    pub parent_name: String,
+    pub child_name: String,
+}
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = "P2018",
+    message = "The required connected records were not found. ${details}"
+)]
+pub struct ConnectedRecordsNotFound {
+    pub details: String,
+}
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(code = "P2019", message = "Input error. ${details}")]
+pub struct InputError {
+    pub details: String,
 }

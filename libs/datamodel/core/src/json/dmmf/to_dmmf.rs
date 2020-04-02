@@ -57,7 +57,7 @@ fn model_to_dmmf(model: &dml::Model) -> Model {
         name: model.name.clone(),
         db_name: model.database_name.clone(),
         is_embedded: model.is_embedded,
-        fields: model.fields().map(&field_to_dmmf).collect(),
+        fields: model.fields().map(|f| field_to_dmmf(model, f)).collect(),
         is_generated: Some(model.is_generated),
         documentation: model.documentation.clone(),
         id_fields: model.id_fields.clone(),
@@ -75,7 +75,11 @@ fn model_to_dmmf(model: &dml::Model) -> Model {
     }
 }
 
-fn field_to_dmmf(field: &dml::Field) -> Field {
+fn field_to_dmmf(model: &dml::Model, field: &dml::Field) -> Field {
+    let a_relation_field_is_based_on_this_field: bool = model.fields.iter().any(|f| match &f.field_type {
+        dml::FieldType::Relation(rel_info) => rel_info.fields.contains(&field.name),
+        _ => false,
+    });
     Field {
         name: field.name.clone(),
         kind: get_field_kind(field),
@@ -83,6 +87,7 @@ fn field_to_dmmf(field: &dml::Field) -> Field {
         is_required: field.arity == dml::FieldArity::Required,
         is_list: field.arity == dml::FieldArity::List,
         is_id: field.is_id,
+        is_read_only: a_relation_field_is_based_on_this_field,
         default: default_value_to_serde(&field.default_value),
         is_unique: field.is_unique,
         relation_name: get_relation_name(field),
@@ -130,15 +135,9 @@ fn value_to_serde(value: &dml::ScalarValue) -> serde_json::Value {
         dml::ScalarValue::Boolean(val) => serde_json::Value::Bool(*val),
         dml::ScalarValue::String(val) => serde_json::Value::String(val.clone()),
         dml::ScalarValue::ConstantLiteral(name) => serde_json::Value::String(name.clone()),
-        dml::ScalarValue::Float(val) => {
-            serde_json::Value::Number(serde_json::Number::from_f64(*val as f64).unwrap())
-        }
-        dml::ScalarValue::Int(val) => {
-            serde_json::Value::Number(serde_json::Number::from_f64(*val as f64).unwrap())
-        }
-        dml::ScalarValue::Decimal(val) => {
-            serde_json::Value::Number(serde_json::Number::from_f64(*val as f64).unwrap())
-        }
+        dml::ScalarValue::Float(val) => serde_json::Value::Number(serde_json::Number::from_f64(*val as f64).unwrap()),
+        dml::ScalarValue::Int(val) => serde_json::Value::Number(serde_json::Number::from_f64(*val as f64).unwrap()),
+        dml::ScalarValue::Decimal(val) => serde_json::Value::Number(serde_json::Number::from_f64(*val as f64).unwrap()),
         dml::ScalarValue::DateTime(val) => serde_json::Value::String(val.to_rfc3339()),
     }
 }
