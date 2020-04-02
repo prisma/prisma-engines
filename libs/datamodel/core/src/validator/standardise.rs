@@ -82,7 +82,7 @@ impl Standardiser {
 
                     if embed_here {
                         // user input has precedence
-                        if rel.to_fields.is_empty() && related_field_rel.to_fields.is_empty() {
+                        if rel.to_fields.is_empty() && related_field_rel.to_fields.is_empty() && field.is_generated {
                             rel.to_fields = related_model
                                 .first_unique_criterion()
                                 .iter()
@@ -91,7 +91,10 @@ impl Standardiser {
                         }
 
                         // user input has precedence
-                        if !is_m2m && (rel.fields.is_empty() && related_field_rel.fields.is_empty()) {
+                        if !is_m2m
+                            && (rel.fields.is_empty() && related_field_rel.fields.is_empty())
+                            && field.is_generated
+                        {
                             rel.fields = underlying_fields.iter().map(|f| f.name.clone()).collect();
                             for underlying_field in underlying_fields {
                                 model.add_field(underlying_field);
@@ -141,7 +144,7 @@ impl Standardiser {
                     .find_model_mut(&missing_back_relation_field.model)
                     .expect(STATE_ERROR);
 
-                let mut back_relation_field = dml::Field::new(
+                let mut back_relation_field = dml::Field::new_generated(
                     &field_name,
                     dml::FieldType::Relation(missing_back_relation_field.relation_info),
                 );
