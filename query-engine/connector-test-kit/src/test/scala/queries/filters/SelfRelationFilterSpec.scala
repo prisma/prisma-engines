@@ -157,18 +157,24 @@ class SelfRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
 
   "Filter Queries along OneToMany self relations" should "fail with  null filter" taggedAs (IgnoreMongo) in {
 
-    val filterDaughterNull = s"""query{songs (
-                                          where: {
-                                            creator: {
-                                              daughters_none: null
-                                                }
-                                              }
-                                            ) {
-                                              title
-                                            }
-                                          }""".stripMargin
+    val filterDaughterNull = s"""query {
+       songs (
+          where: {
+            creator: {
+              daughters_none: null
+            }
+          }
+        ) {
+          title
+        }
+    }"""
 
-    server.queryThatMustFail(filterDaughterNull, project, errorCode = 3033)
+    server.queryThatMustFail(
+      filterDaughterNull,
+      project,
+      errorCode = 2019, // 3033,
+      errorContains = """Error in query graph construction: InputError(\"A value is required for the `none` filter on `daughters`\")"""
+    )
   }
 
   "Filter Queries along OneToMany self relations" should "succeed with empty filter {}" in {
@@ -246,20 +252,27 @@ class SelfRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
 
   "Filter Queries along ManyToMany self relations" should "give an error with null" taggedAs (IgnoreMongo) in {
 
-    val filterGroupies = s"""query{songs (
-                                          where: {
-                                            creator: {
-                                              fans_every: {
-                                                    fans_some: null
-                                                  }
-                                                }
-                                              }
-                                            ) {
-                                              title
-                                            }
-                                          }""".stripMargin
+    val filterGroupies = s"""
+       query {
+          songs (
+            where: {
+              creator: {
+                fans_every: {
+                      fans_some: null
+                    }
+                  }
+                }
+              ) {
+                title
+              }
+            }"""
 
-    server.queryThatMustFail(filterGroupies, project, errorCode = 3033)
+    server.queryThatMustFail(
+      filterGroupies,
+      project,
+      errorCode = 2019,
+      errorContains = """Input error. A value is required for the `some` filter on `fans`"""
+    )
   }
 
   "Filter Queries along ManyToMany self relations" should "succeed with {} filter _some" in {

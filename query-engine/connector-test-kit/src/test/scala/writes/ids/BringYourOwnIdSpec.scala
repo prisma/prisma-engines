@@ -22,13 +22,18 @@ class BringYourOwnIdSpec extends FlatSpec with Matchers with ApiSpecBase with Sc
 
       res.toString should be(s"""{"data":{"createParent":{"p":"Parent","id":"Own Id"}}}""")
 
+      val errorTarget = () match {
+        case _ if connectorTag == ConnectorTag.MySqlConnectorTag => "constraint: `PRIMARY`"
+        case _ => "fields: (`id`)"
+      }
+
       server.queryThatMustFail(
         s"""mutation {
          |  createParent(data: {p: "Parent2", id: "Own Id"}){p, id}
          |}""",
         project = project,
-        errorCode = 3010,
-        errorContains = "A unique constraint would be violated on Parent. Details: Field name = id"
+        errorCode = 2002,
+        errorContains = s"Unique constraint failed on the $errorTarget"
       )
     }
 
@@ -60,8 +65,8 @@ class BringYourOwnIdSpec extends FlatSpec with Matchers with ApiSpecBase with Sc
          |  createParent(data: {p: "Parent", id: true}){p, id}
          |}""",
         project = project,
-        errorCode = 0,
-        errorContains = "Reason: 'id' String or Int value expected"
+        errorCode = 2009,
+        errorContains = """↳ createParent (field)\n    ↳ data (argument)\n      ↳ ParentCreateInput (object)\n        ↳ id (field)\n          ↳ Value types mismatch. Have: Boolean(true), want: Scalar(String)"""
       )
     }
   }
@@ -96,13 +101,18 @@ class BringYourOwnIdSpec extends FlatSpec with Matchers with ApiSpecBase with Sc
 
       res.toString should be(s"""{"data":{"createParent":{"p":"Parent","id":"Own Id","childOpt":{"c":"Child","id":"Own Child Id"}}}}""")
 
+      val constraintTarget = () match {
+        case _ if connectorTag == ConnectorTag.MySqlConnectorTag => "constraint: `PRIMARY`"
+        case _ => "fields: (`id`)"
+      }
+
       server.queryThatMustFail(
         s"""mutation {
          |createParent(data: {p: "Parent 2", id: "Own Id 2", childOpt:{create:{c:"Child 2", id: "Own Child Id"}}}){p, id, childOpt { c, id} }
          |}""",
         project = project,
-        errorCode = 3010,
-        errorContains = "A unique constraint would be violated on Child. Details: Field name = id"
+        errorCode = 2002,
+        errorContains = s"Unique constraint failed on the $constraintTarget"
       )
     }
   }

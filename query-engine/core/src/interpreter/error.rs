@@ -10,7 +10,9 @@ pub enum InterpreterError {
     DomainError(DomainError),
 
     /// Expresses an error that ocurred during interpretation.
-    InterpretationError(String),
+    ///
+    /// The second field is an optional cause for this error.
+    InterpretationError(String, Option<Box<InterpreterError>>),
 
     QueryGraphError(QueryGraphError),
 

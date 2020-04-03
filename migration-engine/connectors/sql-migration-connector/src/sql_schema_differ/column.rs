@@ -59,11 +59,7 @@ impl<'a> ColumnDiffer<'a> {
             return true;
         }
 
-        let previous_value: Option<&str> = self
-            .previous
-            .default
-            .as_ref()
-            .and_then(expand_default_value);
+        let previous_value: Option<&str> = self.previous.default.as_ref().and_then(expand_default_value);
         let next_value: Option<&str> = self.next.default.as_ref().and_then(expand_default_value);
 
         match self.previous.tpe.family {
@@ -106,8 +102,7 @@ fn string_defaults_match(previous: Option<&str>, next: Option<&str>) -> bool {
         (Some(_), None) | (None, Some(_)) => false,
         (None, None) => true,
         (Some(previous), Some(next)) => {
-            if string_contains_tricky_character(previous) || string_contains_tricky_character(next)
-            {
+            if string_contains_tricky_character(previous) || string_contains_tricky_character(next) {
                 return true;
             }
 
@@ -135,21 +130,15 @@ pub(crate) struct ColumnChanges {
 
 impl ColumnChanges {
     pub(crate) fn iter<'a>(&'a self) -> impl Iterator<Item = ColumnChange> + 'a {
-        self.changes
-            .iter()
-            .filter_map(|c| c.as_ref().map(|c| c.clone()))
+        self.changes.iter().filter_map(|c| c.as_ref().map(|c| c.clone()))
     }
 
     pub(crate) fn type_changed(&self) -> bool {
-        self.changes
-            .iter()
-            .any(|c| c.as_ref() == Some(&ColumnChange::Type))
+        self.changes.iter().any(|c| c.as_ref() == Some(&ColumnChange::Type))
     }
 
     pub(crate) fn arity_changed(&self) -> bool {
-        self.changes
-            .iter()
-            .any(|c| c.as_ref() == Some(&ColumnChange::Arity))
+        self.changes.iter().any(|c| c.as_ref() == Some(&ColumnChange::Arity))
     }
 }
 

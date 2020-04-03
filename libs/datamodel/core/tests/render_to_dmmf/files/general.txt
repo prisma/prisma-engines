@@ -33,6 +33,7 @@
           "isRequired": true,
           "isUnique": false,
           "isId": true,
+          "isReadOnly": false,
           "type": "Int",
           "isGenerated": false,
           "isUpdatedAt": false
@@ -45,6 +46,7 @@
           "isRequired": true,
           "isUnique": false,
           "isId": false,
+          "isReadOnly": false,
           "type": "DateTime",
           "isGenerated": false,
           "isUpdatedAt": false
@@ -57,6 +59,7 @@
           "isRequired": true,
           "isUnique": true,
           "isId": false,
+          "isReadOnly": false,
           "type": "String",
           "isGenerated": false,
           "isUpdatedAt": false
@@ -69,6 +72,7 @@
           "isRequired": false,
           "isUnique": false,
           "isId": false,
+          "isReadOnly": false,
           "type": "String",
           "isGenerated": false,
           "isUpdatedAt": false
@@ -81,6 +85,7 @@
           "isRequired": false,
           "isUnique": false,
           "isId": false,
+          "isReadOnly": false,
           "type": "Post",
           "relationName": "author",
           "relationToFields": [],
@@ -96,6 +101,7 @@
           "isRequired": false,
           "isUnique": false,
           "isId": false,
+          "isReadOnly": false,
           "type": "Profile",
           "relationName": "ProfileToUser",
           "relationToFields": [],
@@ -121,6 +127,20 @@
           "isRequired": true,
           "isUnique": false,
           "isId": true,
+          "isReadOnly": false,
+          "type": "Int",
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "userId",
+          "kind": "scalar",
+          "dbNames": [],
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": false,
+          "isReadOnly": true,
           "type": "Int",
           "isGenerated": false,
           "isUpdatedAt": false
@@ -133,6 +153,7 @@
           "isRequired": true,
           "isUnique": false,
           "isId": false,
+          "isReadOnly": false,
           "type": "User",
           "relationName": "ProfileToUser",
           "relationToFields": [
@@ -150,6 +171,7 @@
           "isRequired": true,
           "isUnique": false,
           "isId": false,
+          "isReadOnly": false,
           "type": "String",
           "isGenerated": false,
           "isUpdatedAt": false
@@ -172,6 +194,7 @@
           "isRequired": true,
           "isUnique": false,
           "isId": false,
+          "isReadOnly": false,
           "type": "Int",
           "isGenerated": false,
           "isUpdatedAt": false
@@ -184,6 +207,7 @@
           "isRequired": true,
           "isUnique": false,
           "isId": false,
+          "isReadOnly": false,
           "type": "DateTime",
           "isGenerated": false,
           "isUpdatedAt": false
@@ -196,6 +220,7 @@
           "isRequired": true,
           "isUnique": false,
           "isId": false,
+          "isReadOnly": false,
           "type": "DateTime",
           "isGenerated": false,
           "isUpdatedAt": false
@@ -208,6 +233,7 @@
           "isRequired": true,
           "isUnique": false,
           "isId": false,
+          "isReadOnly": false,
           "type": "String",
           "default": "Default-Title",
           "isGenerated": false,
@@ -221,25 +247,9 @@
           "isRequired": true,
           "isUnique": false,
           "isId": false,
+          "isReadOnly": false,
           "type": "Boolean",
           "default": false,
-          "isGenerated": false,
-          "isUpdatedAt": false
-        },
-        {
-          "name": "author",
-          "kind": "object",
-          "dbNames": [],
-          "isList": false,
-          "isRequired": true,
-          "isUnique": false,
-          "isId": false,
-          "type": "User",
-          "relationName": "author",
-          "relationToFields": [
-            "id"
-          ],
-          "relationOnDelete": "NONE",
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -251,8 +261,40 @@
           "isRequired": true,
           "isUnique": false,
           "isId": false,
+          "isReadOnly": false,
           "type": "Boolean",
           "default": false,
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "authorId",
+          "kind": "scalar",
+          "dbNames": [],
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": false,
+          "isReadOnly": true,
+          "type": "Int",
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "author",
+          "kind": "object",
+          "dbNames": [],
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": false,
+          "isReadOnly": false,
+          "type": "User",
+          "relationName": "author",
+          "relationToFields": [
+            "id"
+          ],
+          "relationOnDelete": "NONE",
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -264,6 +306,7 @@
           "isRequired": false,
           "isUnique": false,
           "isId": false,
+          "isReadOnly": false,
           "type": "PostToCategory",
           "relationName": "PostToPostToCategory",
           "relationToFields": [],
@@ -292,6 +335,7 @@
           "isRequired": true,
           "isUnique": false,
           "isId": true,
+          "isReadOnly": false,
           "type": "Int",
           "isGenerated": false,
           "isUpdatedAt": false
@@ -304,6 +348,7 @@
           "isRequired": true,
           "isUnique": false,
           "isId": false,
+          "isReadOnly": false,
           "type": "String",
           "isGenerated": false,
           "isUpdatedAt": false
@@ -316,6 +361,7 @@
           "isRequired": false,
           "isUnique": false,
           "isId": false,
+          "isReadOnly": false,
           "type": "PostToCategory",
           "relationName": "CategoryToPostToCategory",
           "relationToFields": [],
@@ -331,6 +377,7 @@
           "isRequired": true,
           "isUnique": false,
           "isId": false,
+          "isReadOnly": false,
           "type": "CategoryEnum",
           "isGenerated": false,
           "isUpdatedAt": false
@@ -353,6 +400,33 @@
           "isRequired": true,
           "isUnique": false,
           "isId": true,
+          "isReadOnly": false,
+          "type": "Int",
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "postId",
+          "kind": "scalar",
+          "dbNames": [],
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": false,
+          "isReadOnly": true,
+          "type": "Int",
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "categoryId",
+          "kind": "scalar",
+          "dbNames": [],
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": false,
+          "isReadOnly": true,
           "type": "Int",
           "isGenerated": false,
           "isUpdatedAt": false
@@ -365,6 +439,7 @@
           "isRequired": true,
           "isUnique": false,
           "isId": false,
+          "isReadOnly": false,
           "type": "Post",
           "relationName": "PostToPostToCategory",
           "relationToFields": [
@@ -383,6 +458,7 @@
           "isRequired": true,
           "isUnique": false,
           "isId": false,
+          "isReadOnly": false,
           "type": "Category",
           "relationName": "CategoryToPostToCategory",
           "relationToFields": [
@@ -410,6 +486,7 @@
           "isRequired": true,
           "isUnique": false,
           "isId": true,
+          "isReadOnly": false,
           "type": "Int",
           "isGenerated": false,
           "isUpdatedAt": false
@@ -422,6 +499,7 @@
           "isRequired": true,
           "isUnique": false,
           "isId": false,
+          "isReadOnly": false,
           "type": "B",
           "relationName": "AToB",
           "relationToFields": [
@@ -449,6 +527,7 @@
           "isRequired": true,
           "isUnique": false,
           "isId": true,
+          "isReadOnly": false,
           "type": "Int",
           "isGenerated": false,
           "isUpdatedAt": false
@@ -461,6 +540,7 @@
           "isRequired": true,
           "isUnique": false,
           "isId": false,
+          "isReadOnly": false,
           "type": "A",
           "relationName": "AToB",
           "relationToFields": [],

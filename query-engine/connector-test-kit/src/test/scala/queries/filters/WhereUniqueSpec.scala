@@ -38,8 +38,9 @@ class WhereUniqueSpec extends FlatSpec with Matchers with ApiSpecBase {
     server.queryThatMustFail(
       s"""query{user(where: {}){unique}}""",
       project,
-      errorCode = 3040,
-      errorContains = """You provided an invalid argument for the where selector on User. Please provide exactly one unique field and value."""
+      errorCode = 2009, // 3040,
+      errorContains = """Failed to validate the query `Error occurred during query validation & transformation:\nAssertion error: Expected object to have exactly 1 key-value pairs, got: 0""",
+      // """You provided an invalid argument for the where selector on User. Please provide exactly one unique field and value."""
     )
   }
 
@@ -51,9 +52,9 @@ class WhereUniqueSpec extends FlatSpec with Matchers with ApiSpecBase {
     server.queryThatMustFail(
       s"""query{user(where: {id:"wrong", email: "test@test.com"}){unique}}""",
       project,
-      errorCode = 3045,
-      errorContains =
-        """You provided more than one field for the unique selector on User. If you want that behavior you can use the many query and combine fields with AND / OR."""
+      errorCode = 2009, // 3045,
+      errorContains = """"Failed to validate the query `Error occurred during query validation & transformation:\nAssertion error: Expected object to have exactly 1 key-value pairs, got: 2 (email, id).`"""
+        // """You provided more than one field for the unique selector on User. If you want that behavior you can use the many query and combine fields with AND / OR."""
     )
   }
 

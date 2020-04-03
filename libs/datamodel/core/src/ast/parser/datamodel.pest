@@ -116,12 +116,12 @@ enum_declaration = { doc_comment* ~ ENUM_KEYWORD ~ identifier ~ BLOCK_OPEN ~ (en
 // Source block
 // ######################################
 key_value = { identifier ~ "=" ~ expression ~ NEWLINE }
-source_block = { doc_comment* ~ DATASOURCE_KEYWORD ~ identifier ~ BLOCK_OPEN ~ (key_value | doc_comment)* ~ BLOCK_CLOSE }
+source_block = { doc_comment* ~ DATASOURCE_KEYWORD ~ identifier ~ BLOCK_OPEN ~ (key_value | doc_comment | NEWLINE)* ~ BLOCK_CLOSE }
 
 // ######################################
 // Generator block
 // ######################################
-generator_block = { doc_comment* ~ GENERATOR_KEYWORD ~ identifier ~ BLOCK_OPEN ~ (key_value | doc_comment)* ~ BLOCK_CLOSE }
+generator_block = { doc_comment* ~ GENERATOR_KEYWORD ~ identifier ~ BLOCK_OPEN ~ (key_value | doc_comment | NEWLINE)* ~ BLOCK_CLOSE }
 
 // ######################################
 // Datamodel

@@ -65,10 +65,7 @@ impl FieldAsserts for dml::Field {
         if let dml::FieldType::ConnectorSpecific(t) = &self.field_type {
             assert_eq!(t, sft);
         } else {
-            panic!(
-                "Connector Specific Type expected, but found {:?}",
-                self.field_type
-            );
+            panic!("Connector Specific Type expected, but found {:?}", self.field_type);
         }
 
         self
@@ -286,10 +283,7 @@ impl ErrorAsserts for ErrorCollection {
         if self.errors.len() == 1 {
             assert_eq!(self.errors[0], error);
         } else {
-            panic!(
-                "Expected exactly one validation error. Errors are: {:?}",
-                &self
-            );
+            panic!("Expected exactly one validation error. Errors are: {:?}", &self);
         }
 
         self

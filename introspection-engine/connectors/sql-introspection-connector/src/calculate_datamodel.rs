@@ -27,9 +27,15 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Introspecti
             model.add_field(field);
         }
 
-        for foreign_key in &table.foreign_keys {
-            //todo only if no unsupported types are used
+        let mut foreign_keys_copy = table.foreign_keys.clone();
+        let model_copy = model.clone();
+        foreign_keys_copy.clear_duplicates();
 
+        for foreign_key in foreign_keys_copy.iter().filter(|fk| {
+            !fk.columns
+                .iter()
+                .any(|c| matches!(model_copy.find_field(c).unwrap().field_type, FieldType::Unsupported(_)))
+        }) {
             model.add_field(calculate_relation_field(schema, table, foreign_key));
         }
 
@@ -118,4 +124,21 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Introspecti
         datamodel: data_model,
         warnings,
     })
+}
+
+trait Dedup<T: PartialEq + Clone> {
+    fn clear_duplicates(&mut self);
+}
+
+impl<T: PartialEq + Clone> Dedup<T> for Vec<T> {
+    fn clear_duplicates(&mut self) {
+        let mut already_seen = vec![];
+        self.retain(|item| match already_seen.contains(item) {
+            true => false,
+            _ => {
+                already_seen.push(item.clone());
+                true
+            }
+        })
+    }
 }

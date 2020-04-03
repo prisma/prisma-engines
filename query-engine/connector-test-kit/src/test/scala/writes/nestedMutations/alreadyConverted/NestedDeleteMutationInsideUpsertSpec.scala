@@ -55,8 +55,8 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
          |}
       """,
         project,
-        errorCode = 0,
-        errorContains = "Argument 'update' expected model 'ParentUpdateInput!'"
+        errorCode = 2009,
+        errorContains = """↳ ChildUpdateOneRequiredWithoutParentReqInput (object)\n            ↳ delete (field)\n              ↳ Field does not exist on enclosing type."""
       )
     }
   }
@@ -110,8 +110,8 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
          |}
       """,
         project,
-        errorCode = 0,
-        errorContains = "Argument 'update' expected model 'ParentUpdateInput!'"
+        errorCode = 2009,
+        errorContains = """↳ update (argument)\n      ↳ ParentUpdateInput (object)\n        ↳ childReq (field)\n          ↳ ChildUpdateOneRequiredWithoutParentOptInput (object)\n            ↳ delete (field)\n              ↳ Field does not exist on enclosing type."""
       )
 
     }
@@ -222,7 +222,9 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
          |}
       """,
         project,
-        errorCode = 3041
+        errorCode = 2016,
+        errorContains = """Query interpretation error. Error for binding '3': AssertionError(\"[Query Graph] Expected a valid parent ID to be present for a nested delete on a one-to-many relation."""
+        // errorContains = """[Query Graph] Expected a valid parent ID to be present for a nested delete on a one-to-many relation."""
       )
 
     }
@@ -417,8 +419,8 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
          |}
       """,
         project,
-        errorCode = 0,
-        errorContains = "Argument 'update' expected model 'ParentUpdateInput!'"
+        errorCode = 2009,
+        errorContains = """Mutation (object)\n  ↳ upsertParent (field)\n    ↳ update (argument)\n      ↳ ParentUpdateInput (object)\n        ↳ childReq (field)\n          ↳ ChildUpdateOneRequiredWithoutParentsOptInput (object)\n            ↳ delete (field)\n              ↳ Field does not exist on enclosing type."""
       )
     }
   }
@@ -592,8 +594,8 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
          |}
       """,
       project,
-      errorCode = 3042,
-      errorContains = """The change you are trying to make would violate the required relation 'ChildToReqOther' between Child and ReqOther"""
+      errorCode = 5588,
+      errorContains = """Error occurred during query execution:\nInterpretationError(\"Error for binding \\'6\\': RelationViolation(RelationViolation { relation_name: \\\"ChildToReqOther\\\", model_a_name: \\\"Child\\\", model_b_name: \\\"ReqOther\\\" })\")"""
     )
 
   }
@@ -1042,9 +1044,9 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
          |}
       """,
       project,
-      errorCode = 3041,
+      errorCode = 5588,
       errorContains =
-        s"The relation NoteToTodo has no node for the model Note with the value '$noteId' for the field 'id' connected to a node for the model Todo on your mutation path."
+        """Error occurred during query execution:\nInterpretationError(\"Error for binding \\'3\\': AssertionError(\\\"[Query Graph] Expected a valid parent ID to be present for a nested delete on a one-to-many relation."""
     )
 
     val query = server.query("""{ todoes { title }}""", project)

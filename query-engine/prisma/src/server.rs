@@ -17,7 +17,7 @@ use std::net::SocketAddr;
 use std::{sync::Arc, time::Instant};
 
 #[derive(RustEmbed)]
-#[folder = "query-engine/prisma/static_files"]
+#[folder = "static_files"]
 struct StaticFiles;
 
 pub(crate) struct RequestContext {

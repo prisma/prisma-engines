@@ -1,7 +1,7 @@
 use crate::error::DatamodelError;
 use crate::validator::directive::{Args, DirectiveValidator};
 use crate::validator::LowerDmlToAst;
-use crate::{ast, dml};
+use crate::{ast, dml, ValueGenerator};
 
 /// Prismas builtin `@default` directive.
 pub struct DefaultDirectiveValidator {}
@@ -25,12 +25,21 @@ impl DirectiveValidator<dml::Field> for DefaultDirectiveValidator {
 
             field.default_value = Some(dv);
         } else if let dml::FieldType::Enum(_) = &field.field_type {
-            match args.default_arg("value")?.as_constant_literal() {
+            let default_arg = args.default_arg("value")?;
+
+            match default_arg.as_constant_literal() {
                 // TODO: We should also check if this value is a valid enum value. For this we need the enums -.-
                 Ok(value) => {
                     field.default_value = Some(dml::DefaultValue::Single(dml::ScalarValue::ConstantLiteral(value)))
                 }
-                Err(err) => return Err(self.wrap_in_directive_validation_error(&err)),
+                Err(err) => {
+                    let generator = default_arg.as_value_generator()?;
+                    if generator == ValueGenerator::new_dbgenerated() {
+                        field.default_value = Some(dml::DefaultValue::Expression(generator));
+                    } else {
+                        return Err(self.wrap_in_directive_validation_error(&err));
+                    }
+                }
             }
         } else {
             return self.new_directive_validation_error("Cannot set a default value on a relation field.", args.span());

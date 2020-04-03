@@ -5,6 +5,7 @@ object EnvVars {
     .get("SERVER_ROOT")
     .orElse(sys.env.get("BUILDKITE_BUILD_CHECKOUT_PATH").map(path => s"$path/server")) // todo change as soon as the split is done
     .getOrElse(sys.error("Unable to resolve cargo root path"))
+    .stripSuffix("/")
 
   // env var is for compatibility with `test_connector.sh`
   val isDebugBuild = sys.env.get("IS_DEBUG_BUILD") match {

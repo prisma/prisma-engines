@@ -1,4 +1,4 @@
-use crate::{InterpreterError, QueryGraphBuilderError, QueryGraphError, QueryParserError};
+use crate::{InterpreterError, QueryGraphBuilderError, QueryGraphError, QueryParserError, RelationViolation};
 use connector::error::ConnectorError;
 use failure::Fail;
 use prisma_models::DomainError;
@@ -83,12 +83,93 @@ impl From<CoreError> for user_facing_errors::Error {
             })) => user_facing_error.into(),
             CoreError::QueryParserError(query_parser_error)
             | CoreError::QueryGraphBuilderError(QueryGraphBuilderError::QueryParserError(query_parser_error)) => {
-                user_facing_errors::KnownError::new(user_facing_errors::query_engine::QueryValidationFailed {
-                    query_validation_error: format!("{}", query_parser_error),
-                    query_position: format!("{}", query_parser_error.location()),
-                })
-                .unwrap()
-                .into()
+                let known_error = query_parser_error
+                    .as_missing_value_error()
+                    .map(|err| user_facing_errors::KnownError::new(err).unwrap())
+                    .unwrap_or_else(|| {
+                        user_facing_errors::KnownError::new(user_facing_errors::query_engine::QueryValidationFailed {
+                            query_validation_error: format!("{}", query_parser_error),
+                            query_position: format!("{}", query_parser_error.location()),
+                        })
+                        .unwrap()
+                    });
+
+                known_error.into()
+            }
+            CoreError::QueryGraphBuilderError(QueryGraphBuilderError::MissingRequiredArgument {
+                argument_name,
+                object_name,
+                field_name,
+            }) => user_facing_errors::KnownError::new(user_facing_errors::query_engine::MissingRequiredArgument {
+                argument_name,
+                field_name,
+                object_name,
+            })
+            .unwrap()
+            .into(),
+            CoreError::QueryGraphBuilderError(QueryGraphBuilderError::RelationViolation(RelationViolation {
+                model_a_name,
+                model_b_name,
+                relation_name,
+            }))
+            | CoreError::InterpreterError(InterpreterError::QueryGraphBuilderError(
+                QueryGraphBuilderError::RelationViolation(RelationViolation {
+                    model_a_name,
+                    model_b_name,
+                    relation_name,
+                }),
+            )) => user_facing_errors::KnownError::new(user_facing_errors::query_engine::RelationViolation {
+                model_a_name,
+                model_b_name,
+                relation_name,
+            })
+            .unwrap()
+            .into(),
+            CoreError::QueryGraphBuilderError(QueryGraphBuilderError::RecordNotFound(details))
+            | CoreError::InterpreterError(InterpreterError::QueryGraphBuilderError(
+                QueryGraphBuilderError::RecordNotFound(details),
+            )) => user_facing_errors::KnownError::new(user_facing_errors::query_engine::ConnectedRecordsNotFound {
+                details,
+            })
+            .unwrap()
+            .into(),
+            CoreError::QueryGraphBuilderError(QueryGraphBuilderError::InputError(details)) => {
+                user_facing_errors::KnownError::new(user_facing_errors::query_engine::InputError { details })
+                    .unwrap()
+                    .into()
+            }
+            CoreError::InterpreterError(InterpreterError::InterpretationError(msg, Some(cause))) => {
+                match cause.as_ref() {
+                    InterpreterError::QueryGraphBuilderError(QueryGraphBuilderError::RelationViolation(
+                        RelationViolation {
+                            model_a_name,
+                            model_b_name,
+                            relation_name,
+                        },
+                    )) => user_facing_errors::KnownError::new(user_facing_errors::query_engine::RelationViolation {
+                        model_a_name: model_a_name.clone(),
+                        model_b_name: model_b_name.clone(),
+                        relation_name: relation_name.clone(),
+                    })
+                    .unwrap()
+                    .into(),
+                    InterpreterError::QueryGraphBuilderError(QueryGraphBuilderError::RecordsNotConnected {
+                        parent_name,
+                        child_name,
+                        relation_name,
+                    }) => user_facing_errors::KnownError::new(user_facing_errors::query_engine::RecordsNotConnected {
+                        parent_name: parent_name.clone(),
+                        child_name: child_name.clone(),
+                        relation_name: relation_name.clone(),
+                    })
+                    .unwrap()
+                    .into(),
+                    _ => user_facing_errors::KnownError::new(user_facing_errors::query_engine::InterpretationError {
+                        details: format!("{}: {}", msg, cause),
+                    })
+                    .unwrap()
+                    .into(),
+                }
             }
             _ => user_facing_errors::Error::from_dyn_error(&err.compat()),
         }

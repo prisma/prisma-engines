@@ -17,9 +17,7 @@ async fn compound_foreign_keys_should_work_for_required_one_to_one_relations(api
                 t.add_column("id", types::primary());
                 t.add_column("user_id", types::integer());
                 t.add_column("user_name", types::text());
-                t.inject_custom(
-                    "FOREIGN KEY (\"user_id\",\"user_name\") REFERENCES \"User\"(\"id\", \"name\")",
-                );
+                t.inject_custom("FOREIGN KEY (\"user_id\",\"user_name\") REFERENCES \"User\"(\"id\", \"name\")");
                 t.inject_custom("CONSTRAINT post_user_unique UNIQUE(\"user_id\", \"user_name\")");
             });
         })
@@ -62,9 +60,7 @@ async fn compound_foreign_keys_should_work_for_one_to_one_relations(api: &TestAp
                 t.add_column("id", types::primary());
                 t.add_column("user_id", types::integer().nullable(true));
                 t.add_column("user_name", types::text().nullable(true));
-                t.inject_custom(
-                    "FOREIGN KEY (\"user_id\",\"user_name\") REFERENCES \"User\"(\"id\", \"name\")",
-                );
+                t.inject_custom("FOREIGN KEY (\"user_id\",\"user_name\") REFERENCES \"User\"(\"id\", \"name\")");
                 t.inject_custom("CONSTRAINT post_user_unique UNIQUE(\"user_id\", \"user_name\")");
             });
         })
@@ -107,9 +103,7 @@ async fn compound_foreign_keys_should_work_for_one_to_many_relations(api: &TestA
                 t.add_column("id", types::primary());
                 t.add_column("user_id", types::integer().nullable(true));
                 t.add_column("user_name", types::text().nullable(true));
-                t.inject_custom(
-                    "FOREIGN KEY (\"user_id\",\"user_name\") REFERENCES \"User\"(\"id\", \"name\")",
-                );
+                t.inject_custom("FOREIGN KEY (\"user_id\",\"user_name\") REFERENCES \"User\"(\"id\", \"name\")");
             });
         })
         .await;
@@ -149,9 +143,7 @@ async fn compound_foreign_keys_should_work_for_required_one_to_many_relations(ap
                 t.add_column("id", types::primary());
                 t.add_column("user_id", types::integer());
                 t.add_column("user_name", types::text());
-                t.inject_custom(
-                    "FOREIGN KEY (\"user_id\",\"user_name\") REFERENCES \"User\"(\"id\", \"name\")",
-                );
+                t.inject_custom("FOREIGN KEY (\"user_id\",\"user_name\") REFERENCES \"User\"(\"id\", \"name\")");
             });
         })
         .await;
@@ -294,9 +286,7 @@ async fn compound_foreign_keys_should_work_with_defaults(api: &TestApi) {
 
 #[test_each_connector(tags("postgres"))]
 #[test]
-async fn compound_foreign_keys_should_work_for_one_to_many_relations_with_non_unique_index(
-    api: &TestApi,
-) {
+async fn compound_foreign_keys_should_work_for_one_to_many_relations_with_non_unique_index(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -309,9 +299,7 @@ async fn compound_foreign_keys_should_work_for_one_to_many_relations_with_non_un
                 t.add_column("id", types::primary());
                 t.add_column("user_id", types::integer());
                 t.add_column("user_age", types::integer());
-                t.inject_custom(
-                    "FOREIGN KEY (\"user_id\",\"user_age\") REFERENCES \"User\"(\"id\", \"age\")",
-                );
+                t.inject_custom("FOREIGN KEY (\"user_id\",\"user_age\") REFERENCES \"User\"(\"id\", \"age\")");
                 t.add_index("test", types::index(vec!["user_id", "user_age"]));
             });
         })

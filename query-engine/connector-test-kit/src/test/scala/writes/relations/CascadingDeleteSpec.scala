@@ -770,7 +770,7 @@ class CascadingDeleteSpec extends FlatSpec with Matchers with ApiSpecBase {
     server.queryThatMustFail(
       """mutation{updateC(where: {c:"c"} data: {p: {delete: true}}){id}}""",
       project,
-      errorCode = 0,
+      errorCode = 5588,
       errorContains = "Argument 'data' expected model 'CUpdateInput!'"
     )
   }
@@ -845,7 +845,7 @@ class CascadingDeleteSpec extends FlatSpec with Matchers with ApiSpecBase {
     server.queryThatMustFail(
       """mutation{updateP(where: {p:"p"}, data: { c: {delete: true}}){id}}""",
       project,
-      errorCode = 0,
+      errorCode = 5588,
       errorContains = "Argument 'data' expected model 'PUpdateInput!'"
     )
   }

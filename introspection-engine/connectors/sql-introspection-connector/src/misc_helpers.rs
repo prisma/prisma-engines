@@ -1,13 +1,12 @@
 use datamodel::{
-    Datamodel, DefaultValue as DMLDef, Field, FieldArity, FieldType, IndexDefinition, Model,
-    OnDeleteStrategy, RelationInfo, ScalarType, ScalarValue as SV, ValueGenerator as VG,
+    Datamodel, DefaultValue as DMLDef, Field, FieldArity, FieldType, IndexDefinition, Model, OnDeleteStrategy,
+    RelationInfo, ScalarType, ScalarValue as SV, ValueGenerator as VG,
 };
 use log::debug;
 use once_cell::sync::Lazy;
 use regex::Regex;
 use sql_schema_describer::{
-    Column, ColumnArity, ColumnTypeFamily, DefaultValue as SQLDef, ForeignKey, Index, IndexType,
-    SqlSchema, Table,
+    Column, ColumnArity, ColumnTypeFamily, DefaultValue as SQLDef, ForeignKey, Index, IndexType, SqlSchema, Table,
 };
 
 //checks
@@ -17,9 +16,7 @@ pub fn is_migration_table(table: &Table) -> bool {
 }
 
 pub(crate) fn is_prisma_1_point_1_join_table(table: &Table) -> bool {
-    table.columns.len() == 2
-        && table.indices.len() >= 2
-        && common_prisma_m_to_n_relation_conditions(table)
+    table.columns.len() == 2 && table.indices.len() >= 2 && common_prisma_m_to_n_relation_conditions(table)
 }
 
 pub(crate) fn is_prisma_1_point_0_join_table(table: &Table) -> bool {
@@ -63,11 +60,7 @@ fn common_prisma_m_to_n_relation_conditions(table: &Table) -> bool {
 
 //calculators
 
-pub fn calculate_many_to_many_field(
-    foreign_key: &ForeignKey,
-    relation_name: String,
-    is_self_relation: bool,
-) -> Field {
+pub fn calculate_many_to_many_field(foreign_key: &ForeignKey, relation_name: String, is_self_relation: bool) -> Field {
     let field_type = FieldType::Relation(RelationInfo {
         name: relation_name,
         fields: vec![],
@@ -117,17 +110,12 @@ pub(crate) fn calculate_scalar_field(table: &Table, column: &Column) -> Field {
     debug!("Handling column {:?}", column);
     let field_type = calculate_scalar_field_type(&column);
     let (is_commented_out, documentation) = match field_type {
-        FieldType::Unsupported(_) => (
-            true,
-            Some("This type is currently not supported.".to_string()),
-        ),
+        FieldType::Unsupported(_) => (true, Some("This type is currently not supported.".to_string())),
         _ => (false, None),
     };
 
     let arity = match column.tpe.arity {
-        _ if column.auto_increment && field_type == FieldType::Base(ScalarType::Int, None) => {
-            FieldArity::Required
-        }
+        _ if column.auto_increment && field_type == FieldType::Base(ScalarType::Int, None) => FieldArity::Required,
         ColumnArity::Required => FieldArity::Required,
         ColumnArity::Nullable => FieldArity::Optional,
         ColumnArity::List => FieldArity::List,
@@ -153,11 +141,7 @@ pub(crate) fn calculate_scalar_field(table: &Table, column: &Column) -> Field {
     }
 }
 
-pub(crate) fn calculate_relation_field(
-    schema: &SqlSchema,
-    table: &Table,
-    foreign_key: &ForeignKey,
-) -> Field {
+pub(crate) fn calculate_relation_field(schema: &SqlSchema, table: &Table, foreign_key: &ForeignKey) -> Field {
     debug!("Handling foreign key  {:?}", foreign_key);
 
     let field_type = FieldType::Relation(RelationInfo {
@@ -218,9 +202,10 @@ pub(crate) fn calculate_backrelation_field(
             let column_name = &relation_info.fields.first().unwrap();
             table.is_column_unique(column_name)
         }
-        _ => table.indices.iter().any(|i| {
-            columns_match(&i.columns, &relation_info.fields) && i.tpe == IndexType::Unique
-        }),
+        _ => table
+            .indices
+            .iter()
+            .any(|i| columns_match(&i.columns, &relation_info.fields) && i.tpe == IndexType::Unique),
     };
 
     let arity = match relation_field.arity {
@@ -252,11 +237,7 @@ pub(crate) fn calculate_backrelation_field(
     }
 }
 
-pub(crate) fn calculate_default(
-    table: &Table,
-    column: &Column,
-    arity: &FieldArity,
-) -> Option<DMLDef> {
+pub(crate) fn calculate_default(table: &Table, column: &Column, arity: &FieldArity) -> Option<DMLDef> {
     match (&column.default, &column.tpe.family) {
         (_, _) if *arity == FieldArity::List => None,
         (None, _) if column.auto_increment => Some(DMLDef::Expression(VG::new_autoincrement())),
@@ -271,19 +252,11 @@ pub(crate) fn calculate_default(
             _ if is_sequence(column, table) => Some(DMLDef::Expression(VG::new_autoincrement())),
             false => parse_int(val).map(|x| DMLDef::Single(SV::Int(x))),
         },
-        (Some(SQLDef::VALUE(val)), ColumnTypeFamily::Float) => {
-            parse_float(val).map(|x| DMLDef::Single(SV::Float(x)))
-        }
-        (Some(SQLDef::VALUE(val)), ColumnTypeFamily::String) => {
-            Some(DMLDef::Single(SV::String(val.into())))
-        }
+        (Some(SQLDef::VALUE(val)), ColumnTypeFamily::Float) => parse_float(val).map(|x| DMLDef::Single(SV::Float(x))),
+        (Some(SQLDef::VALUE(val)), ColumnTypeFamily::String) => Some(DMLDef::Single(SV::String(val.into()))),
         (Some(SQLDef::NOW), ColumnTypeFamily::DateTime) => Some(DMLDef::Expression(VG::new_now())),
-        (Some(SQLDef::VALUE(_)), ColumnTypeFamily::DateTime) => {
-            Some(DMLDef::Expression(VG::new_dbgenerated()))
-        } //todo parse datetime value
-        (Some(SQLDef::VALUE(val)), ColumnTypeFamily::Enum(_)) => {
-            Some(DMLDef::Single(SV::ConstantLiteral(val.into())))
-        }
+        (Some(SQLDef::VALUE(_)), ColumnTypeFamily::DateTime) => Some(DMLDef::Expression(VG::new_dbgenerated())), //todo parse datetime value
+        (Some(SQLDef::VALUE(val)), ColumnTypeFamily::Enum(_)) => Some(DMLDef::Single(SV::ConstantLiteral(val.into()))),
         (_, _) => None,
     }
 }
@@ -304,11 +277,7 @@ pub(crate) fn is_sequence(column: &Column, table: &Table) -> bool {
         .unwrap_or(false)
 }
 
-pub(crate) fn calculate_relation_name(
-    schema: &SqlSchema,
-    fk: &ForeignKey,
-    table: &Table,
-) -> String {
+pub(crate) fn calculate_relation_name(schema: &SqlSchema, fk: &ForeignKey, table: &Table) -> String {
     //this is not called for prisma many to many relations. for them the name is just the name of the join table.
     let referenced_model = &fk.referenced_table;
     let model_with_fk = &table.name;
@@ -370,16 +339,11 @@ pub fn deduplicate_field_names(datamodel: &mut Datamodel) {
             let is_duplicated = model.fields.iter().filter(|f| field.name == f.name).count() > 1;
 
             if let FieldType::Relation(RelationInfo {
-                name: relation_name,
-                ..
+                name: relation_name, ..
             }) = &field.field_type
             {
                 if is_duplicated {
-                    duplicated_relation_fields.push((
-                        model.name.clone(),
-                        field.name.clone(),
-                        relation_name.clone(),
-                    ));
+                    duplicated_relation_fields.push((model.name.clone(), field.name.clone(), relation_name.clone()));
                 }
             };
         }
@@ -450,8 +414,5 @@ fn parse_float(value: &str) -> Option<f64> {
 
 /// Returns whether the elements of the two slices match, regardless of ordering.
 pub fn columns_match(a_cols: &[String], b_cols: &[String]) -> bool {
-    a_cols.len() == b_cols.len()
-        && a_cols
-            .iter()
-            .all(|a_col| b_cols.iter().any(|b_col| a_col == b_col))
+    a_cols.len() == b_cols.len() && a_cols.iter().all(|a_col| b_cols.iter().any(|b_col| a_col == b_col))
 }

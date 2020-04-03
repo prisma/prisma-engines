@@ -159,9 +159,7 @@ async fn remapping_models_in_compound_relations_should_work(api: &TestApi) {
                 t.add_column("id", types::primary());
                 t.add_column("user_id", types::integer());
                 t.add_column("user_age", types::integer());
-                t.inject_custom(
-                    "FOREIGN KEY (`user_id`,`user_age`) REFERENCES `User with Space`(`id`, `age`)",
-                );
+                t.inject_custom("FOREIGN KEY (`user_id`,`user_age`) REFERENCES `User with Space`(`id`, `age`)");
                 t.inject_custom("CONSTRAINT post_user_unique UNIQUE(`user_id`, `user_age`)");
             });
         })

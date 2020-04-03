@@ -162,8 +162,7 @@ pub fn row_value_to_prisma_value(
             ParameterizedValue::Integer(i) => PrismaValue::Int(i),
             ParameterizedValue::Bytes(bytes) => PrismaValue::Int(interpret_bytes_as_i64(&bytes)),
             ParameterizedValue::Text(txt) => PrismaValue::Int(
-                i64::from_str(dbg!(txt.trim_start_matches('\0')))
-                    .map_err(|err| SqlError::ConversionError(err.into()))?,
+                i64::from_str(txt.trim_start_matches('\0')).map_err(|err| SqlError::ConversionError(err.into()))?,
             ),
             other => PrismaValue::from(other),
         },

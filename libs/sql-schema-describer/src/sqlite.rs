@@ -55,11 +55,7 @@ impl SqlSchemaDescriber {
     async fn get_databases(&self) -> Vec<String> {
         debug!("Getting databases");
         let sql = "PRAGMA database_list;";
-        let rows = self
-            .conn
-            .query_raw(sql, &[])
-            .await
-            .expect("get schema names ");
+        let rows = self.conn.query_raw(sql, &[]).await.expect("get schema names ");
         let names = rows
             .into_iter()
             .map(|row| {
@@ -75,16 +71,9 @@ impl SqlSchemaDescriber {
     }
 
     async fn get_table_names(&self, schema: &str) -> Vec<String> {
-        let sql = format!(
-            r#"SELECT name FROM "{}".sqlite_master WHERE type='table'"#,
-            schema
-        );
+        let sql = format!(r#"SELECT name FROM "{}".sqlite_master WHERE type='table'"#, schema);
         debug!("describing table names with query: '{}'", sql);
-        let result_set = self
-            .conn
-            .query_raw(&sql, &[])
-            .await
-            .expect("get table names");
+        let result_set = self.conn.query_raw(&sql, &[]).await.expect("get table names");
         let names = result_set
             .into_iter()
             .map(|row| row.get("name").and_then(|x| x.to_string()).unwrap())
@@ -96,9 +85,7 @@ impl SqlSchemaDescriber {
 
     async fn get_size(&self, _schema: &str) -> usize {
         debug!("Getting db size");
-        let sql = format!(
-            r#"SELECT page_count * page_size as size FROM pragma_page_count(), pragma_page_size();"#
-        );
+        let sql = format!(r#"SELECT page_count * page_size as size FROM pragma_page_count(), pragma_page_size();"#);
         let result = self.conn.query_raw(&sql, &[]).await.expect("get db size ");
         let size: i64 = result
             .first()
@@ -131,20 +118,14 @@ impl SqlSchemaDescriber {
             .into_iter()
             .map(|row| {
                 debug!("Got column row {:?}", row);
-                let is_required = row
-                    .get("notnull")
-                    .and_then(|x| x.as_bool())
-                    .expect("notnull");
+                let is_required = row.get("notnull").and_then(|x| x.as_bool()).expect("notnull");
 
                 let arity = if is_required {
                     ColumnArity::Required
                 } else {
                     ColumnArity::Nullable
                 };
-                let tpe = get_column_type(
-                    &row.get("type").and_then(|x| x.to_string()).expect("type"),
-                    arity,
-                );
+                let tpe = get_column_type(&row.get("type").and_then(|x| x.to_string()).expect("type"), arity);
 
                 let default = match row.get("dflt_value") {
                     None => None,
@@ -156,17 +137,14 @@ impl SqlSchemaDescriber {
                             None
                         } else {
                             Some(match &tpe.family {
-                                ColumnTypeFamily::Int => match parse_int(&default_string).is_some()
-                                {
+                                ColumnTypeFamily::Int => match parse_int(&default_string).is_some() {
                                     true => DefaultValue::VALUE(unquote_single(default_string)),
                                     false => DefaultValue::DBGENERATED(default_string),
                                 },
-                                ColumnTypeFamily::Float => {
-                                    match parse_float(&default_string).is_some() {
-                                        true => DefaultValue::VALUE(unquote_single(default_string)),
-                                        false => DefaultValue::DBGENERATED(default_string),
-                                    }
-                                }
+                                ColumnTypeFamily::Float => match parse_float(&default_string).is_some() {
+                                    true => DefaultValue::VALUE(unquote_single(default_string)),
+                                    false => DefaultValue::DBGENERATED(default_string),
+                                },
                                 ColumnTypeFamily::Boolean => match parse_int(&default_string) {
                                     Some(1) => DefaultValue::VALUE("true".into()),
                                     Some(0) => DefaultValue::VALUE("false".into()),
@@ -176,40 +154,26 @@ impl SqlSchemaDescriber {
                                         None => DefaultValue::DBGENERATED(default_string),
                                     },
                                 },
-                                ColumnTypeFamily::String => DefaultValue::VALUE(unquote_double(
-                                    unquote_single(default_string),
-                                )),
+                                ColumnTypeFamily::String => {
+                                    DefaultValue::VALUE(unquote_double(unquote_single(default_string)))
+                                }
                                 ColumnTypeFamily::DateTime => match default_string.to_lowercase()
                                     == "current_timestamp".to_string()
-                                    || default_string.to_lowercase()
-                                        == "datetime(\'now\')".to_string()
-                                    || default_string.to_lowercase()
-                                        == "datetime(\'now\', \'localtime\')".to_string()
+                                    || default_string.to_lowercase() == "datetime(\'now\')".to_string()
+                                    || default_string.to_lowercase() == "datetime(\'now\', \'localtime\')".to_string()
                                 {
                                     true => DefaultValue::NOW,
                                     false => DefaultValue::DBGENERATED(default_string),
                                 },
-                                ColumnTypeFamily::Binary => {
-                                    DefaultValue::DBGENERATED(default_string)
-                                }
+                                ColumnTypeFamily::Binary => DefaultValue::DBGENERATED(default_string),
                                 ColumnTypeFamily::Json => DefaultValue::DBGENERATED(default_string),
                                 ColumnTypeFamily::Uuid => DefaultValue::DBGENERATED(default_string),
-                                ColumnTypeFamily::Geometric => {
-                                    DefaultValue::DBGENERATED(default_string)
-                                }
-                                ColumnTypeFamily::LogSequenceNumber => {
-                                    DefaultValue::DBGENERATED(default_string)
-                                }
-                                ColumnTypeFamily::TextSearch => {
-                                    DefaultValue::DBGENERATED(default_string)
-                                }
-                                ColumnTypeFamily::TransactionId => {
-                                    DefaultValue::DBGENERATED(default_string)
-                                }
+                                ColumnTypeFamily::Geometric => DefaultValue::DBGENERATED(default_string),
+                                ColumnTypeFamily::LogSequenceNumber => DefaultValue::DBGENERATED(default_string),
+                                ColumnTypeFamily::TextSearch => DefaultValue::DBGENERATED(default_string),
+                                ColumnTypeFamily::TransactionId => DefaultValue::DBGENERATED(default_string),
                                 ColumnTypeFamily::Enum(_) => DefaultValue::VALUE(default_string),
-                                ColumnTypeFamily::Unsupported(_) => {
-                                    DefaultValue::DBGENERATED(default_string)
-                                }
+                                ColumnTypeFamily::Unsupported(_) => DefaultValue::DBGENERATED(default_string),
                             })
                         }
                     }
@@ -267,10 +231,7 @@ impl SqlSchemaDescriber {
                     }
                 }
 
-                debug!(
-                    "Determined that table has primary key with columns {:?}",
-                    columns
-                );
+                debug!("Determined that table has primary key with columns {:?}", columns);
                 Some(PrimaryKey {
                     columns,
                     sequence: None,
@@ -291,11 +252,7 @@ impl SqlSchemaDescriber {
 
         let sql = format!(r#"PRAGMA "{}".foreign_key_list("{}");"#, schema, table);
         debug!("describing table foreign keys, SQL: '{}'", sql);
-        let result_set = self
-            .conn
-            .query_raw(&sql, &[])
-            .await
-            .expect("querying for foreign keys");
+        let result_set = self.conn.query_raw(&sql, &[]).await.expect("querying for foreign keys");
 
         // Since one foreign key with multiple columns will be represented here as several
         // rows with the same ID, we have to use an intermediate representation that gets
@@ -355,8 +312,7 @@ impl SqlSchemaDescriber {
                     columns.push(intermediate_fk.columns[i].to_owned());
                 }
 
-                let mut referenced_column_keys: Vec<&i64> =
-                    intermediate_fk.referenced_columns.keys().collect();
+                let mut referenced_column_keys: Vec<&i64> = intermediate_fk.referenced_columns.keys().collect();
                 referenced_column_keys.sort();
                 let mut referenced_columns: Vec<String> = vec![];
                 referenced_columns.reserve(referenced_column_keys.len());
@@ -387,33 +343,18 @@ impl SqlSchemaDescriber {
     async fn get_indices(&self, schema: &str, table: &str) -> Vec<Index> {
         let sql = format!(r#"PRAGMA "{}".index_list("{}");"#, schema, table);
         debug!("describing table indices, SQL: '{}'", sql);
-        let result_set = self
-            .conn
-            .query_raw(&sql, &[])
-            .await
-            .expect("querying for indices");
+        let result_set = self.conn.query_raw(&sql, &[]).await.expect("querying for indices");
         debug!("Got indices description results: {:?}", result_set);
 
         let mut indices = Vec::new();
         let filtered_rows = result_set
             .into_iter()
             // Exclude primary keys, they are inferred separately.
-            .filter(|row| {
-                row.get("origin")
-                    .and_then(|origin| origin.as_str())
-                    .unwrap()
-                    != "pk"
-            });
+            .filter(|row| row.get("origin").and_then(|origin| origin.as_str()).unwrap() != "pk");
 
         for row in filtered_rows {
-            let is_unique = row
-                .get("unique")
-                .and_then(|x| x.as_bool())
-                .expect("get unique");
-            let name = row
-                .get("name")
-                .and_then(|x| x.to_string())
-                .expect("get name");
+            let is_unique = row.get("unique").and_then(|x| x.as_bool()).expect("get unique");
+            let name = row.get("name").and_then(|x| x.to_string()).expect("get name");
             let mut index = Index {
                 name: name.clone(),
                 tpe: match is_unique {
@@ -425,21 +366,11 @@ impl SqlSchemaDescriber {
 
             let sql = format!(r#"PRAGMA "{}".index_info("{}");"#, schema, name);
             debug!("describing table index '{}', SQL: '{}'", name, sql);
-            let result_set = self
-                .conn
-                .query_raw(&sql, &[])
-                .await
-                .expect("querying for index info");
+            let result_set = self.conn.query_raw(&sql, &[]).await.expect("querying for index info");
             debug!("Got index description results: {:?}", result_set);
             for row in result_set.into_iter() {
-                let pos = row
-                    .get("seqno")
-                    .and_then(|x| x.as_i64())
-                    .expect("get seqno") as usize;
-                let col_name = row
-                    .get("name")
-                    .and_then(|x| x.to_string())
-                    .expect("get name");
+                let pos = row.get("seqno").and_then(|x| x.as_i64()).expect("get seqno") as usize;
+                let col_name = row.get("name").and_then(|x| x.to_string()).expect("get name");
                 if index.columns.len() <= pos {
                     index.columns.resize(pos + 1, "".to_string());
                 }
@@ -510,8 +441,7 @@ const SQLITE_SYSTEM_TABLES: &[&str] = &[
 
 fn unquote_single(input: String) -> String {
     /// Regex for matching the quotes on the introspected string values on Sqlite.
-    static SQLITE_STRING_DEFAULT_RE: Lazy<regex::Regex> =
-        Lazy::new(|| regex::Regex::new(r#"^'(.*)'$"#).unwrap());
+    static SQLITE_STRING_DEFAULT_RE: Lazy<regex::Regex> = Lazy::new(|| regex::Regex::new(r#"^'(.*)'$"#).unwrap());
 
     SQLITE_STRING_DEFAULT_RE
         .captures(input.as_ref())
@@ -523,8 +453,7 @@ fn unquote_single(input: String) -> String {
 
 fn unquote_double(input: String) -> String {
     /// Regex for matching the quotes on the introspected string values on Sqlite.
-    static SQLITE_STRING_DEFAULT_RE: Lazy<regex::Regex> =
-        Lazy::new(|| regex::Regex::new(r#"^"(.*)"$"#).unwrap());
+    static SQLITE_STRING_DEFAULT_RE: Lazy<regex::Regex> = Lazy::new(|| regex::Regex::new(r#"^"(.*)"$"#).unwrap());
 
     SQLITE_STRING_DEFAULT_RE
         .captures(input.as_ref())

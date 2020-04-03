@@ -24,6 +24,31 @@ fn basic_index_must_work() {
 }
 
 #[test]
+fn indexes_on_enum_fields_must_work() {
+    let dml = r#"
+    model User {
+        id        Int    @id
+        role      Role
+
+        @@index([role])
+    }
+    
+    enum Role {
+        Admin
+        Member
+    }
+    "#;
+
+    let schema = parse(dml);
+    let user_model = schema.assert_has_model("User");
+    user_model.assert_has_index(IndexDefinition {
+        name: None,
+        fields: vec!["role".to_string()],
+        tpe: IndexType::Normal,
+    });
+}
+
+#[test]
 fn indexes_on_relation_fields_must_error() {
     let dml = r#"
     model User {

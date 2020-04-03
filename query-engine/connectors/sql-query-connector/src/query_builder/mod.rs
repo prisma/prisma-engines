@@ -38,7 +38,5 @@ pub(super) fn conditions<'a>(
         values.push(vals)
     }
 
-    Row::from(columns.to_vec())
-        .in_selection(values)
-        .into()
+    Row::from(columns.to_vec()).in_selection(values).into()
 }

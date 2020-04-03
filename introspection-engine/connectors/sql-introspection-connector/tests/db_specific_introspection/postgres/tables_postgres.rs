@@ -334,7 +334,7 @@ async fn introspecting_default_values_should_work(api: &TestApi) {
             model Test {
                 boolean_boolean     Boolean?        @default(false)
                 id                  Int         @id @default(autoincrement())
-                numeric_decimal     Float?          @default(1234.1234) 
+                numeric_decimal     Float?          @default(1234.1234)
                 numeric_float4      Float?          @default(123.1234)
                 numeric_float8      Float?          @default(123.1234)
                 numeric_int2        Int?            @default(2)
@@ -355,7 +355,6 @@ async fn introspecting_default_values_should_work(api: &TestApi) {
 }
 
 #[test_each_connector(tags("postgres"))]
-
 async fn introspecting_a_default_value_as_dbgenerated_should_work(api: &TestApi) {
     let sequence = format!("CREATE SEQUENCE test_seq START 1");
     let color = format!("CREATE Type color as Enum ('black', 'white')");
@@ -403,10 +402,10 @@ async fn introspecting_a_default_value_as_dbgenerated_should_work(api: &TestApi)
                 string_function         String?     @default(dbgenerated())
                 string_static_char      String?     @default("test")
                 string_static_text      String?     @default("test")
-                string_static_text_null String?     
+                string_static_text_null String?
                 string_static_varchar   String?     @default("test")
             }
-            
+
            enum color{
                 black
                 white

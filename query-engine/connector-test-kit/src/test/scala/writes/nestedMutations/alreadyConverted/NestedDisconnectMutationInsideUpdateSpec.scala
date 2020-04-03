@@ -108,7 +108,8 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |}
       """,
         project,
-        errorCode = 3041
+        errorCode = 2017,
+        errorContains = """The records for relation `ChildToParent` between the `Parent` and `Child` models are not connected."""
       )
 
     }
@@ -155,7 +156,8 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |}
       """,
         project,
-        errorCode = 3042
+        errorCode = 2014,
+        errorContains = """Error in query graph construction: RelationViolation(RelationViolation { relation_name: \"ChildToParent\", model_a_name: \"Child\", model_b_name: \"Parent\" """
       )
 
     }
@@ -201,8 +203,8 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |}
       """,
         project,
-        errorCode = 3042,
-        errorContains = "The change you are trying to make would violate the required relation 'ChildToParent' between Child and Parent"
+        errorCode = 2014,
+        errorContains = """The change you are trying to make would violate the required relation 'ChildToParent' between the `Child` and `Parent` models.""",
       )
 
     }
@@ -379,7 +381,8 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |}
       """,
         project,
-        3041
+        errorCode = 2017,
+        errorContains = """The records for relation `ChildToParent` between the `Parent` and `Child` models are not connected."""
       )
 
       val res = server.query(
@@ -478,7 +481,8 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |}
       """,
         project,
-        3041
+        errorCode = 2017,
+        errorContains = """The records for relation `ChildToParent` between the `Parent` and `Child` models are not connected."""
       )
     }
   }
@@ -986,8 +990,8 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |}
       """,
       project,
-      errorCode = 3041
-//      ,
+      errorCode = 2017,
+      errorContains = """Error occurred during query execution:\nInterpretationError(\"Error for binding \\'1\\': RecordsNotConnected { relation_name: \\\"UserFollows\\\", parent_name: \\\"User\\\", child_name: \\\"User\\\" }"""
 //      errorContains =
 //        "The relation UserFollows has no Node for the model User with value `Paul` for username connected to a Node for the model User with value `Anton` for username"
     )

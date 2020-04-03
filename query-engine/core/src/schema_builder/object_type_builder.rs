@@ -238,7 +238,8 @@ impl<'a> ObjectTypeBuilder<'a> {
         return_cached!(self.get_cache(), &name);
 
         let object = ObjectTypeStrongRef::new(ObjectType::new(&name, Some(ModelRef::clone(model))));
-        let fields = vec![field("count", vec![], OutputType::int(), None)];
+        let arguments = self.many_records_arguments(model);
+        let fields = vec![field("count", arguments, OutputType::int(), None)];
 
         object.set_fields(fields);
         self.cache(name, ObjectTypeStrongRef::clone(&object));
