@@ -13,9 +13,9 @@ use std::{collections::HashMap, convert::TryFrom, panic::AssertUnwindSafe, sync:
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SingleQuery {
-    query: String,
-    operation_name: Option<String>,
-    variables: HashMap<String, String>,
+    pub query: String,
+    pub operation_name: Option<String>,
+    pub variables: HashMap<String, String>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]

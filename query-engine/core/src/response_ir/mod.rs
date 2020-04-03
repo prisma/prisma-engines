@@ -123,9 +123,9 @@ pub enum Response {
 #[derive(Debug, serde::Serialize, Default, PartialEq)]
 pub struct Responses {
     #[serde(skip_serializing_if = "IndexMap::is_empty")]
-    data: Map,
+    pub data: Map,
     #[serde(skip_serializing_if = "Vec::is_empty")]
-    errors: Vec<ResponseError>,
+    pub errors: Vec<ResponseError>,
 }
 
 impl Responses {
