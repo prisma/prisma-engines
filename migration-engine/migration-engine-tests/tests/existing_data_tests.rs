@@ -120,7 +120,7 @@ async fn altering_a_column_with_non_null_values_should_warn(api: &TestApi) -> Te
         }
     "#;
 
-    api.infer_apply(&dm).send().await?;
+    api.infer_apply(&dm).send().await?.assert_green()?;
     let original_database_schema = api.describe_database().await?;
 
     let insert = Insert::multi_into((api.schema_name(), "Test"), vec!["id", "age"])
@@ -136,7 +136,7 @@ async fn altering_a_column_with_non_null_values_should_warn(api: &TestApi) -> Te
         }
     "#;
 
-    let migration_output = api.infer_apply(&dm2).send().await?;
+    let migration_output = api.infer_apply(&dm2).send().await?.into_inner();
     // The schema should not change because the migration should not run if there are warnings
     // and the force flag isn't passed.
     api.assert_schema().await?.assert_equals(&original_database_schema)?;
@@ -228,7 +228,7 @@ async fn column_defaults_can_safely_be_changed(api: &TestApi) -> TestResult {
                     .unwrap_or_else(|| format!("@default(\"\")"))
             );
 
-            let response = api.infer_apply(&dm2).send().await?;
+            let response = api.infer_apply(&dm2).send().await?.assert_green()?.into_inner();
 
             anyhow::ensure!(
                 response.warnings.is_empty(),
@@ -266,7 +266,7 @@ async fn changing_a_column_from_required_to_optional_should_work(api: &TestApi) 
         }
     "#;
 
-    api.infer_apply(&dm).send().await?;
+    api.infer_apply(&dm).send().await?.assert_green()?;
     let original_database_schema = api.describe_database().await?;
 
     let insert = Insert::multi_into((api.schema_name(), "Test"), &["id", "age"])
@@ -282,7 +282,7 @@ async fn changing_a_column_from_required_to_optional_should_work(api: &TestApi) 
         }
     "#;
 
-    let migration_output = api.infer_apply(&dm2).send().await?;
+    let migration_output = api.infer_apply(&dm2).send().await?.into_inner();
 
     // On MySQL we can't safely restate the type in a CHANGE clause, so this change is still destructive.
     if api.is_mysql() {
@@ -333,7 +333,7 @@ async fn changing_a_column_from_optional_to_required_must_warn(api: &TestApi) ->
         }
     "#;
 
-    api.infer_apply(&dm).send().await?;
+    api.infer_apply(&dm).send().await?.assert_green()?;
     let original_database_schema = api.describe_database().await?;
 
     let insert = Insert::multi_into((api.schema_name(), "Test"), &["id", "age"])
@@ -349,7 +349,7 @@ async fn changing_a_column_from_optional_to_required_must_warn(api: &TestApi) ->
         }
     "#;
 
-    let migration_output = api.infer_apply(&dm2).send().await?;
+    let migration_output = api.infer_apply(&dm2).send().await?.into_inner();
 
     // The schema should not change because the migration should not run if there are warnings
     // and the force flag isn't passed.
@@ -397,7 +397,7 @@ async fn dropping_a_table_referenced_by_foreign_keys_must_work(api: &TestApi) ->
         }
     "#;
 
-    api.infer_apply(&dm1).send_assert().await?.assert_green()?;
+    api.infer_apply(&dm1).send().await?.assert_green()?;
 
     api.assert_schema()
         .await?
@@ -424,7 +424,7 @@ async fn dropping_a_table_referenced_by_foreign_keys_must_work(api: &TestApi) ->
         }
     "#;
 
-    api.infer_apply(dm2).force(Some(true)).send().await?;
+    api.infer_apply(dm2).force(Some(true)).send().await?.into_inner();
     let sql_schema = api.describe_database().await.unwrap();
 
     assert!(sql_schema.table("Category").is_err());
@@ -446,7 +446,7 @@ async fn string_columns_do_not_get_arbitrarily_migrated(api: &TestApi) -> TestRe
         }
     "#;
 
-    api.infer_apply(dm1).send().await?;
+    api.infer_apply(dm1).send().await?.assert_green()?;
 
     let insert = Insert::single_into(api.render_table_name("User"))
         .value("id", "the-id")
@@ -466,7 +466,7 @@ async fn string_columns_do_not_get_arbitrarily_migrated(api: &TestApi) -> TestRe
         }
     "#;
 
-    let output = api.infer_apply(dm2).send().await?;
+    let output = api.infer_apply(dm2).send().await?.assert_green()?.into_inner();
 
     assert!(output.warnings.is_empty());
 
@@ -500,7 +500,7 @@ async fn altering_the_type_of_a_column_in_an_empty_table_should_not_warn(api: &T
         }
     "#;
 
-    api.infer_apply(dm1).send().await?;
+    api.infer_apply(dm1).send().await?.assert_green()?;
 
     let dm2 = r#"
         model User {
@@ -510,7 +510,7 @@ async fn altering_the_type_of_a_column_in_an_empty_table_should_not_warn(api: &T
         }
     "#;
 
-    let response = api.infer_apply(dm2).send().await?;
+    let response = api.infer_apply(dm2).send().await?.assert_green()?.into_inner();
 
     assert!(response.warnings.is_empty());
 
@@ -532,7 +532,7 @@ async fn making_a_column_required_in_an_empty_table_should_not_warn(api: &TestAp
         }
     "#;
 
-    api.infer_apply(dm1).send().await?;
+    api.infer_apply(dm1).send().await?.assert_green()?;
 
     let dm2 = r#"
         model User {
@@ -542,7 +542,7 @@ async fn making_a_column_required_in_an_empty_table_should_not_warn(api: &TestAp
         }
     "#;
 
-    let response = api.infer_apply(dm2).send().await?;
+    let response = api.infer_apply(dm2).send().await?.assert_green()?.into_inner();
 
     assert!(response.warnings.is_empty());
 
@@ -564,7 +564,7 @@ async fn altering_the_type_of_a_column_in_a_non_empty_table_always_warns(api: &T
         }
     "#;
 
-    api.infer_apply(dm1).send().await?;
+    api.infer_apply(dm1).send().await?.assert_green()?;
 
     let insert = quaint::ast::Insert::single_into(api.render_table_name("User"))
         .value("id", "abc")
@@ -581,7 +581,7 @@ async fn altering_the_type_of_a_column_in_a_non_empty_table_always_warns(api: &T
         }
     "#;
 
-    let response = api.infer_apply(dm2).send().await?;
+    let response = api.infer_apply(dm2).send().await?.into_inner();
 
     assert_eq!(
         response.warnings,
@@ -595,12 +595,11 @@ async fn altering_the_type_of_a_column_in_a_non_empty_table_always_warns(api: &T
     let rows = api.select("User").column("dogs").send_debug().await?;
     assert_eq!(rows, &[["Integer(7)"]]);
 
-    api.assert_schema()
-        .await?
-        .assert_table("User", |table| {
-            table.assert_column("dogs", |col| col.assert_type_is_int()?.assert_is_required())
-        })
-        .map(drop)
+    api.assert_schema().await?.assert_table("User", |table| {
+        table.assert_column("dogs", |col| col.assert_type_is_int()?.assert_is_required())
+    })?;
+
+    Ok(())
 }
 
 #[test_each_connector(ignore("mysql"))]
@@ -612,7 +611,7 @@ async fn migrating_a_required_column_from_int_to_string_should_warn_and_cast(api
         }
     "#;
 
-    api.infer_apply(dm1).send().await?;
+    api.infer_apply(dm1).send().await?.assert_green()?;
 
     api.insert("Test")
         .value("id", "abcd")
@@ -642,7 +641,7 @@ async fn migrating_a_required_column_from_int_to_string_should_warn_and_cast(api
 
     // Apply once without forcing
     {
-        let result = api.infer_apply(dm2).send().await?;
+        let result = api.infer_apply(dm2).send().await?.into_inner();
 
         assert_eq!(result.warnings, &[expected_warning.clone()]);
 
@@ -651,7 +650,7 @@ async fn migrating_a_required_column_from_int_to_string_should_warn_and_cast(api
 
     // Force apply
     {
-        let result = api.infer_apply(dm2).force(Some(true)).send().await?;
+        let result = api.infer_apply(dm2).force(Some(true)).send().await?.into_inner();
 
         assert_eq!(result.warnings, &[expected_warning]);
 
@@ -691,7 +690,7 @@ async fn enum_variants_can_be_added_without_data_loss(api: &TestApi) -> TestResu
 
     api.infer_apply(dm1)
         .migration_id(Some("initial-setup"))
-        .send_assert()
+        .send()
         .await?
         .assert_green()?;
 
@@ -729,7 +728,7 @@ async fn enum_variants_can_be_added_without_data_loss(api: &TestApi) -> TestResu
 
     api.infer_apply(dm2)
         .migration_id(Some("add-absolutely-fabulous-variant"))
-        .send_assert()
+        .send()
         .await?
         .assert_green()?;
 
@@ -812,7 +811,7 @@ async fn enum_variants_can_be_dropped_without_data_loss(api: &TestApi) -> TestRe
 
     api.infer_apply(dm1)
         .migration_id(Some("initial-setup"))
-        .send_assert()
+        .send()
         .await?
         .assert_green()?;
 
@@ -849,7 +848,7 @@ async fn enum_variants_can_be_dropped_without_data_loss(api: &TestApi) -> TestRe
 
     api.infer_apply(dm2)
         .migration_id(Some("add-absolutely-fabulous-variant"))
-        .send_assert()
+        .send()
         .await?
         .assert_green()?;
 

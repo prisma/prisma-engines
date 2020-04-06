@@ -102,7 +102,7 @@ impl TestApi {
     }
 
     pub async fn infer_and_apply(&self, schema: &str) -> InferAndApplyOutput {
-        let migration_output = self.infer_apply(schema).send().await.unwrap();
+        let migration_output = self.infer_apply(schema).send().await.unwrap().into_inner();
 
         InferAndApplyOutput {
             migration_output,

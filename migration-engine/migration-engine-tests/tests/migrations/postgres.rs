@@ -17,7 +17,7 @@ async fn enums_can_be_dropped_on_postgres(api: &TestApi) -> TestResult {
         }
     "#;
 
-    api.infer_apply(dm1).send_assert().await?.assert_green()?;
+    api.infer_apply(dm1).send().await?.assert_green()?;
     api.assert_schema()
         .await?
         .assert_enum("CatMood", |r#enum| r#enum.assert_values(&["ANGRY", "CUDDLY", "HUNGRY"]))?;
@@ -29,7 +29,7 @@ async fn enums_can_be_dropped_on_postgres(api: &TestApi) -> TestResult {
         }
     "#;
 
-    api.infer_apply(dm2).send_assert().await?.assert_green()?;
+    api.infer_apply(dm2).send().await?.assert_green()?;
     api.assert_schema().await?.assert_has_no_enum("CatMood")?;
 
     Ok(())

@@ -36,7 +36,7 @@ async fn indexes_on_foreign_key_fields_are_not_created_twice(api: &TestApi) -> T
     // Test that after introspection, we do not migrate further.
     api.infer_apply(schema)
         .force(Some(true))
-        .send_assert()
+        .send()
         .await?
         .assert_green()?
         .assert_no_steps()?;
@@ -66,13 +66,9 @@ async fn enum_creation_is_idempotent(api: &TestApi) -> TestResult {
         }
     "#;
 
-    api.infer_apply(dm1).send_assert().await?.assert_green()?;
+    api.infer_apply(dm1).send().await?.assert_green()?;
 
-    api.infer_apply(dm1)
-        .send_assert()
-        .await?
-        .assert_green()?
-        .assert_no_steps()?;
+    api.infer_apply(dm1).send().await?.assert_green()?.assert_no_steps()?;
 
     Ok(())
 }

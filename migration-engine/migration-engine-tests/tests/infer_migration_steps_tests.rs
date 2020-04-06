@@ -13,11 +13,7 @@ async fn assume_to_be_applied_must_work(api: &TestApi) -> TestResult {
         }
     "#;
 
-    api.infer_apply(&dm0)
-        .migration_id(Some("mig0000"))
-        .send()
-        .await
-        .unwrap();
+    api.infer_apply(&dm0).migration_id(Some("mig0000")).send().await?;
 
     let dm1 = r#"
         model Blog {
@@ -118,7 +114,8 @@ async fn special_handling_of_watch_migrations(api: &TestApi) -> TestResult {
     api.infer_apply(&dm)
         .migration_id(Some("mig00".to_owned()))
         .send()
-        .await?;
+        .await?
+        .assert_green()?;
 
     let dm = r#"
             model Blog {
@@ -130,7 +127,8 @@ async fn special_handling_of_watch_migrations(api: &TestApi) -> TestResult {
     api.infer_apply(&dm)
         .migration_id(Some("watch01".to_owned()))
         .send()
-        .await?;
+        .await?
+        .assert_green()?;
 
     let dm = r#"
             model Blog {
@@ -194,9 +192,10 @@ async fn watch_migrations_must_be_returned_when_transitioning_out_of_watch_mode(
 
     let output = api
         .infer_apply(&dm)
-        .migration_id(Some("watch01".to_owned()))
+        .migration_id(Some("watch01"))
         .send()
-        .await?;
+        .await?
+        .into_inner();
 
     applied_database_steps
         .extend(serde_json::from_value::<Vec<PrettySqlMigrationStep>>(output.database_steps).unwrap());
@@ -217,7 +216,12 @@ async fn watch_migrations_must_be_returned_when_transitioning_out_of_watch_mode(
             }
         "#;
 
-    let output = api.infer_apply(&dm).migration_id(Some("watch02")).send().await?;
+    let output = api
+        .infer_apply(&dm)
+        .migration_id(Some("watch02"))
+        .send()
+        .await?
+        .into_inner();
 
     applied_database_steps
         .extend(serde_json::from_value::<Vec<PrettySqlMigrationStep>>(output.database_steps).unwrap());
@@ -247,7 +251,11 @@ async fn watch_migrations_must_be_returned_in_addition_to_regular_inferred_steps
 
     let mut applied_database_steps: Vec<PrettySqlMigrationStep> = Vec::new();
 
-    api.infer_apply(&dm).migration_id(Some("mig00")).send().await?;
+    api.infer_apply(&dm)
+        .migration_id(Some("mig00"))
+        .send()
+        .await?
+        .assert_green()?;
 
     let dm = r#"
             model Blog {
@@ -256,7 +264,12 @@ async fn watch_migrations_must_be_returned_in_addition_to_regular_inferred_steps
             }
         "#;
 
-    let output = api.infer_apply(&dm).migration_id(Some("watch01")).send().await?;
+    let output = api
+        .infer_apply(&dm)
+        .migration_id(Some("watch01"))
+        .send()
+        .await?
+        .into_inner();
 
     applied_database_steps
         .extend(serde_json::from_value::<Vec<PrettySqlMigrationStep>>(output.database_steps).unwrap());
@@ -277,7 +290,12 @@ async fn watch_migrations_must_be_returned_in_addition_to_regular_inferred_steps
             }
         "#;
 
-    let output = api.infer_apply(&dm).migration_id(Some("watch02")).send().await?;
+    let output = api
+        .infer_apply(&dm)
+        .migration_id(Some("watch02"))
+        .send()
+        .await?
+        .into_inner();
     applied_database_steps
         .extend(serde_json::from_value::<Vec<PrettySqlMigrationStep>>(output.database_steps).unwrap());
 
