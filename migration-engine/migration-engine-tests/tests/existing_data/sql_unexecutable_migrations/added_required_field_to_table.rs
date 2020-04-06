@@ -11,7 +11,7 @@ async fn adding_a_required_field_to_an_existing_table_with_data_without_a_defaul
         }
     "#;
 
-    api.infer_apply(&dm1).send_assert().await?.assert_green()?;
+    api.infer_apply(&dm1).send().await?.assert_green()?;
 
     api.insert("Test")
         .value("id", "abc")
@@ -29,7 +29,7 @@ async fn adding_a_required_field_to_an_existing_table_with_data_without_a_defaul
 
     api.infer_apply(&dm2)
         .force(Some(false))
-        .send_assert()
+        .send()
         .await?
         .assert_unexecutable(&[format!("Added the required column `age` to the `Test` table without a default value. There are Some(1) rows in this table, it is not possible.")])?;
 
@@ -48,7 +48,7 @@ async fn adding_a_required_field_with_a_default_to_an_existing_table_works(api: 
         }
     "#;
 
-    api.infer_apply(&dm1).send_assert().await?.assert_green()?;
+    api.infer_apply(&dm1).send().await?.assert_green()?;
 
     api.insert("Test")
         .value("id", "abc")
@@ -64,7 +64,7 @@ async fn adding_a_required_field_with_a_default_to_an_existing_table_works(api: 
         }
     "#;
 
-    api.infer_apply(&dm2).send_assert().await?.assert_green()?;
+    api.infer_apply(&dm2).send().await?.assert_green()?;
 
     let rows = api
         .select("Test")
@@ -87,7 +87,7 @@ async fn adding_a_required_field_without_default_to_an_existing_table_without_da
         }
     "#;
 
-    api.infer_apply(&dm1).send_assert().await?.assert_green()?;
+    api.infer_apply(&dm1).send().await?.assert_green()?;
 
     let dm2 = r#"
         model Test {
@@ -97,7 +97,7 @@ async fn adding_a_required_field_without_default_to_an_existing_table_without_da
         }
     "#;
 
-    api.infer_apply(&dm2).send_assert().await?.assert_green()?;
+    api.infer_apply(&dm2).send().await?.assert_green()?;
 
     api.assert_schema()
         .await?

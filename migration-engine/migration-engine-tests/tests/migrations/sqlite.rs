@@ -27,12 +27,11 @@ async fn sqlite_must_recreate_indexes(api: &TestApi) -> TestResult {
 
     api.infer_apply(&dm2).send().await?;
 
-    api.assert_schema()
-        .await?
-        .assert_table("A", |table| {
-            table.assert_index_on_columns(&["field"], |idx| idx.assert_is_unique())
-        })
-        .map(drop)
+    api.assert_schema().await?.assert_table("A", |table| {
+        table.assert_index_on_columns(&["field"], |idx| idx.assert_is_unique())
+    })?;
+
+    Ok(())
 }
 
 #[test_each_connector(tags("sqlite"))]
@@ -49,7 +48,7 @@ async fn sqlite_must_recreate_multi_field_indexes(api: &TestApi) -> TestResult {
         }
     "#;
 
-    api.infer_apply(&dm1).send().await?;
+    api.infer_apply(&dm1).send().await?.assert_green()?;
 
     api.assert_schema().await?.assert_table("A", |table| {
         table.assert_index_on_columns(&["field", "secondField"], |idx| idx.assert_is_unique())
@@ -66,12 +65,11 @@ async fn sqlite_must_recreate_multi_field_indexes(api: &TestApi) -> TestResult {
         }
     "#;
 
-    api.infer_apply(&dm2).send().await?;
+    api.infer_apply(&dm2).send().await?.assert_green()?;
 
-    api.assert_schema()
-        .await?
-        .assert_table("A", |table| {
-            table.assert_index_on_columns(&["field", "secondField"], |idx| idx.assert_is_unique())
-        })
-        .map(drop)
+    api.assert_schema().await?.assert_table("A", |table| {
+        table.assert_index_on_columns(&["field", "secondField"], |idx| idx.assert_is_unique())
+    })?;
+
+    Ok(())
 }

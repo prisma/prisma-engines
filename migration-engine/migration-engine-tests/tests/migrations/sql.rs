@@ -13,7 +13,7 @@ async fn creating_tables_without_primary_key_must_work(api: &TestApi) -> TestRes
         }
     "#;
 
-    api.infer_apply(dm).send_assert().await?.assert_green()?;
+    api.infer_apply(dm).send().await?.assert_green()?;
 
     api.assert_schema().await?.assert_table("Pair", |table| {
         table
@@ -43,7 +43,7 @@ async fn relations_to_models_without_a_primary_key_work(api: &TestApi) -> TestRe
         }
     "#;
 
-    api.infer_apply(dm).send_assert().await?.assert_green()?;
+    api.infer_apply(dm).send().await?.assert_green()?;
 
     api.assert_schema()
         .await?
@@ -75,7 +75,7 @@ async fn relations_to_models_with_no_pk_and_a_single_unique_required_field_work(
         }
     "#;
 
-    api.infer_apply(dm).send_assert().await?.assert_green()?;
+    api.infer_apply(dm).send().await?.assert_green()?;
 
     api.assert_schema()
         .await?
@@ -105,7 +105,7 @@ async fn enum_value_with_database_names_must_work(api: &TestApi) -> TestResult {
 
     api.infer_apply(dm)
         .migration_id(Some("initial"))
-        .send_assert()
+        .send()
         .await?
         .assert_green()?;
 
@@ -131,7 +131,7 @@ async fn enum_value_with_database_names_must_work(api: &TestApi) -> TestResult {
         }
     "##;
 
-    api.infer_apply(dm).send_assert().await?.assert_green()?;
+    api.infer_apply(dm).send().await?.assert_green()?;
 
     if api.is_mysql() {
         api.assert_schema()
@@ -171,7 +171,7 @@ async fn enum_defaults_must_work(api: &TestApi) -> TestResult {
 
     api.infer_apply(dm)
         .migration_id(Some("initial"))
-        .send_assert()
+        .send()
         .await?
         .assert_green()?;
 
@@ -215,7 +215,7 @@ async fn id_as_part_of_relation_must_work(api: &TestApi) -> TestResult {
         }
     "##;
 
-    api.infer_apply(dm).send_assert().await?.assert_green()?;
+    api.infer_apply(dm).send().await?.assert_green()?;
 
     api.assert_schema().await?.assert_table("Cat", |table| {
         table
@@ -246,7 +246,7 @@ async fn multi_field_id_as_part_of_relation_must_work(api: &TestApi) -> TestResu
         }
     "##;
 
-    api.infer_apply(dm).send_assert().await?.assert_green()?;
+    api.infer_apply(dm).send().await?.assert_green()?;
 
     api.assert_schema().await?.assert_table("Cat", |table| {
         table
@@ -278,7 +278,7 @@ async fn remapped_multi_field_id_as_part_of_relation_must_work(api: &TestApi) ->
         }
     "##;
 
-    api.infer_apply(dm).send_assert().await?.assert_green()?;
+    api.infer_apply(dm).send().await?.assert_green()?;
 
     api.assert_schema().await?.assert_table("Cat", |table| {
         table
@@ -312,7 +312,7 @@ async fn unique_constraints_on_composite_relation_fields(api: &TestApi) -> TestR
         }
     "##;
 
-    api.infer_apply(dm).send_assert().await?.assert_green()?;
+    api.infer_apply(dm).send().await?.assert_green()?;
 
     api.assert_schema().await?.assert_table("Parent", |table| {
         table.assert_index_on_columns(&["chiid", "chic"], |idx| idx.assert_is_unique())
@@ -342,7 +342,7 @@ async fn indexes_on_composite_relation_fields(api: &TestApi) -> TestResult {
         }
     "##;
 
-    api.infer_apply(dm).send_assert().await?.assert_green()?;
+    api.infer_apply(dm).send().await?.assert_green()?;
 
     api.assert_schema().await?.assert_table("SpamList", |table| {
         table.assert_index_on_columns(&["ufn", "uln"], |idx| idx.assert_is_not_unique())
