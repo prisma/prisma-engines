@@ -310,8 +310,7 @@ async fn mysql_floats_do_not_lose_precision(api: &TestApi) -> TestResult {
         "data": {
             "createOnetypes": {
                 "id": 1,
-                // This is what we expect from a f64 -> f32 -> f64 conversion.
-                "numeric_floating_float": 6.400000095367432,
+                "numeric_floating_float": 6.4,
                 "numeric_floating_decimal": 6.4,
             }
         }
