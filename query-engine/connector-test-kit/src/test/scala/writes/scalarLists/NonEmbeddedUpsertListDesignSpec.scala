@@ -9,32 +9,34 @@ class NonEmbeddedUpsertListDesignSpec extends FlatSpec with Matchers with ApiSpe
   //region top level upserts
 
   val dmP1ToC1 = {
-    val dm1 = s"""model List{
-                 |   id String @id @default(cuid())
-                 |   uList String? @unique
+    val dm1 = s"""model List {
+                 |   id       String  @id @default(cuid())
+                 |   uList    String? @unique
                  |   listInts Int[]
-                 |   todo Todo? @relation(references: [id])
+                 |   listId   String?
+                 |   todo     Todo?   @relation(fields: [listId], references: [id])
                  |}
                  |
-                 |model Todo{
-                 |   id String @id @default(cuid())
-                 |   uTodo String? @unique
+                 |model Todo {
+                 |   id       String  @id @default(cuid())
+                 |   uTodo    String? @unique
                  |   todoInts Int[]
-                 |   list List?
+                 |   list     List?
                  |}"""
 
     val dm2 = s"""model List{
-                 |   id String @id @default(cuid())
-                 |   uList String? @unique
+                 |   id       String  @id @default(cuid())
+                 |   uList    String? @unique
                  |   listInts Int[]
-                 |   todo Todo?
+                 |   listId   String?
+                 |   todo     Todo?   @relation(fields: [listId], references: [id])
                  |}
                  |
                  |model Todo{
-                 |   id String @id @default(cuid())
-                 |   uTodo String? @unique
+                 |   id       String  @id @default(cuid())
+                 |   uTodo    String? @unique
                  |   todoInts Int[]
-                 |   list List? @relation(references: [id])
+                 |   list     List?
                  |}"""
 
     TestDataModels(mongo = Vector(dm1, dm2), sql = Vector(dm1, dm2))
