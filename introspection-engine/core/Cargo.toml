@@ -11,7 +11,6 @@ user-facing-errors = { path = "../../libs/user-facing-errors" }
 introspection-connector = { path = "../connectors/introspection-connector" }
 sql-introspection-connector = { path = "../connectors/sql-introspection-connector" }
 
-clap = "2.33"
 structopt = "0.3"
 serde = "1.0"
 anyhow = "1.0.26"
@@ -38,9 +37,6 @@ features = ["macros"]
 [dev-dependencies]
 pretty_assertions = "0.6.1"
 test-setup = { path = "../../libs/test-setup" }
-url = "2.1.0"
-
-
 
 [[bin]]
 name = "introspection-engine"
