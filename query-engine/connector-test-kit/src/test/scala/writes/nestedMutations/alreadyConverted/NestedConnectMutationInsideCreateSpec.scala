@@ -846,7 +846,6 @@ class NestedConnectMutationInsideCreateSpec extends FlatSpec with Matchers with 
     }
   }
 
-  // FIXME: dom must look into this
   "A PM to C1 relation" should "throw a proper error if connected by wrong id" in {
     val project = SchemaDsl.fromStringV11() {
       """
@@ -882,8 +881,8 @@ class NestedConnectMutationInsideCreateSpec extends FlatSpec with Matchers with 
          |}
       """.stripMargin,
       project,
-      errorCode = 2016, // 3039,
-      errorContains = """Query interpretation error. Error for binding '0': DomainError(ConversionFailure(\"record identifier\", \"assimilated record identifier\")"""
+      errorCode = 2018, // 3039,
+      errorContains = """RecordNotFound(\"Expected 1 records to be connected, found 0.\")"""
     )
   }
 
