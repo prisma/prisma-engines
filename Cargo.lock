@@ -979,7 +979,6 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "async-trait",
- "clap",
  "datamodel",
  "futures 0.1.29",
  "futures 0.3.4",
@@ -1000,7 +999,6 @@ dependencies = [
  "tracing",
  "tracing-futures",
  "tracing-subscriber",
- "url 2.1.1",
  "user-facing-errors",
 ]
 
@@ -2630,7 +2628,6 @@ dependencies = [
  "serde",
  "serde_json",
  "tokio",
- "url 2.1.1",
  "user-facing-errors",
  "uuid",
 ]
