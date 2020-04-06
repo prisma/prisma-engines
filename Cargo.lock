@@ -2573,7 +2573,6 @@ dependencies = [
  "log",
  "once_cell",
  "pretty_assertions",
- "prisma-inflector",
  "quaint",
  "regex",
  "serde",
@@ -2585,7 +2584,6 @@ dependencies = [
  "tokio",
  "tracing",
  "tracing-futures",
- "url 2.1.1",
  "user-facing-errors",
 ]
 
