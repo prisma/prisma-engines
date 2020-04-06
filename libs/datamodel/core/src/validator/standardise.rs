@@ -3,7 +3,6 @@ use crate::{
     ast, common::names::*, dml, dml::WithDatabaseName, error::ErrorCollection, DataSourceField, FieldArity,
     OnDeleteStrategy,
 };
-use prisma_inflector;
 
 /// Helper for standardsing a datamodel.
 ///
@@ -172,18 +171,15 @@ impl Standardiser {
                         on_delete: OnDeleteStrategy::None,
                     };
 
-                    let (arity, field_name) = if field.arity.is_singular() {
-                        (
-                            dml::FieldArity::List,
-                            prisma_inflector::classical().pluralize(&model.name).camel_case(),
-                        )
+                    let arity = if field.arity.is_singular() {
+                        dml::FieldArity::List
                     } else {
-                        (dml::FieldArity::Optional, model.name.camel_case())
+                        dml::FieldArity::Optional
                     };
 
                     result.push(AddMissingBackRelationField {
                         model: rel.to.clone(),
-                        field: field_name,
+                        field: model.name.camel_case(),
                         arity,
                         relation_info,
                         related_model: model.name.to_string(),

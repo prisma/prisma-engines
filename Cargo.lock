@@ -435,7 +435,6 @@ dependencies = [
  "pest_derive_tmp",
  "pest_tmp",
  "pretty_assertions",
- "prisma-inflector",
  "prisma-value",
  "serde",
  "serde_json",

@@ -5,7 +5,6 @@ authors = ["Emanuel Joebstl <emanuel.joebstl@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-prisma-inflector = { path = "../../prisma-inflector" }
 prisma-value = { path = "../../prisma-value" }
 datamodel-connector = { path = "../connectors/datamodel-connector" }
 # Temporary until PR is accepted.
