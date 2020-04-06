@@ -979,7 +979,6 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "async-trait",
- "clap",
  "datamodel",
  "futures 0.1.29",
  "futures 0.3.4",
@@ -1000,7 +999,6 @@ dependencies = [
  "tracing",
  "tracing-futures",
  "tracing-subscriber",
- "url 2.1.1",
  "user-facing-errors",
 ]
 
@@ -1469,15 +1467,16 @@ dependencies = [
 
 [[package]]
 name = "mysql_async"
-version = "0.22.2"
+version = "0.23.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a3ab6132a8ca0bfa77100fc839738abe084295f3d512b1250ce6b6340082ad66"
+checksum = "1a3fd66ae4fc140bf5ec55c443d79c4c1ad574ce2b5aa3f12aa6ebbd2fd4a2f4"
 dependencies = [
  "bytes",
  "crossbeam",
  "futures-core",
  "futures-sink",
  "futures-util",
+ "lazy_static",
  "mio-named-pipes",
  "mysql_common",
  "native-tls",
@@ -1495,9 +1494,9 @@ dependencies = [
 
 [[package]]
 name = "mysql_common"
-version = "0.20.2"
+version = "0.21.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8e3950cf532b88574a05c3fcd4f1b1e0cd0b84883462ae6811298fe7c3c92edc"
+checksum = "a2f612a8e5d723ab0ecd2e424f88df298bd9d3eb8d40b80cd293c6126b25bdf3"
 dependencies = [
  "base64 0.11.0",
  "bigdecimal",
@@ -1931,54 +1930,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "prisma"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "async-trait",
- "base64 0.10.1",
- "datamodel",
- "failure",
- "futures 0.3.4",
- "graphql-parser",
- "http",
- "hyper",
- "indexmap",
- "indoc",
- "introspection-core",
- "itertools",
- "log",
- "migration-connector",
- "migration-core",
- "once_cell",
- "pretty_assertions",
- "prisma-inflector",
- "prisma-models",
- "quaint",
- "query-connector",
- "query-core",
- "rust-embed",
- "rust_decimal",
- "rustc_version",
- "serde",
- "serde_json",
- "serial_test",
- "sql-migration-connector",
- "sql-query-connector",
- "structopt",
- "test-macros",
- "test-setup",
- "tokio",
- "tracing",
- "tracing-attributes",
- "tracing-futures",
- "tracing-log",
- "tracing-subscriber",
- "url 2.1.1",
- "user-facing-errors",
-]
-
-[[package]]
 name = "prisma-fmt"
 version = "0.1.0"
 dependencies = [
@@ -2100,7 +2051,7 @@ dependencies = [
 [[package]]
 name = "quaint"
 version = "0.2.0-alpha.11"
-source = "git+https://github.com/prisma/quaint#ee2f9f1aaa1a1fb0c61cdab5dd757af6d1ea9fe3"
+source = "git+https://github.com/prisma/quaint#693906bb83353f621f4226ece8e6b26e84b031cf"
 dependencies = [
  "async-trait",
  "base64 0.11.0",
@@ -2174,6 +2125,54 @@ dependencies = [
  "serde_json",
  "user-facing-errors",
  "uuid",
+]
+
+[[package]]
+name = "query-engine"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "base64 0.10.1",
+ "datamodel",
+ "failure",
+ "futures 0.3.4",
+ "graphql-parser",
+ "http",
+ "hyper",
+ "indexmap",
+ "indoc",
+ "introspection-core",
+ "itertools",
+ "log",
+ "migration-connector",
+ "migration-core",
+ "once_cell",
+ "pretty_assertions",
+ "prisma-inflector",
+ "prisma-models",
+ "quaint",
+ "query-connector",
+ "query-core",
+ "rust-embed",
+ "rust_decimal",
+ "rustc_version",
+ "serde",
+ "serde_json",
+ "serial_test",
+ "sql-migration-connector",
+ "sql-query-connector",
+ "structopt",
+ "test-macros",
+ "test-setup",
+ "tokio",
+ "tracing",
+ "tracing-attributes",
+ "tracing-futures",
+ "tracing-log",
+ "tracing-subscriber",
+ "url 2.1.1",
+ "user-facing-errors",
 ]
 
 [[package]]
@@ -2431,18 +2430,18 @@ checksum = "388a1df253eca08550bef6c72392cfe7c30914bf41df5269b68cbd6ff8f570a3"
 
 [[package]]
 name = "serde"
-version = "1.0.105"
+version = "1.0.106"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e707fbbf255b8fc8c3b99abb91e7257a622caeb20a9818cbadbeeede4e0932ff"
+checksum = "36df6ac6412072f67cf767ebbde4133a5b2e88e76dc6187fa7104cd16f783399"
 dependencies = [
  "serde_derive",
 ]
 
 [[package]]
 name = "serde_derive"
-version = "1.0.105"
+version = "1.0.106"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ac5d00fc561ba2724df6758a17de23df5914f20e41cb00f94d5b7ae42fffaff8"
+checksum = "9e549e3abf4fb8621bd1609f11dfc9f5e50320802273b12f3811a67e6716ea6c"
 dependencies = [
  "proc-macro2 1.0.10",
  "quote 1.0.3",
@@ -2451,9 +2450,9 @@ dependencies = [
 
 [[package]]
 name = "serde_json"
-version = "1.0.50"
+version = "1.0.51"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "78a7a12c167809363ec3bd7329fc0a3369056996de43c4b37ef3cd54a6ce4867"
+checksum = "da07b57ee2623368351e9a0488bb0b261322a15a6e0ae53e243cbdc0f4208da9"
 dependencies = [
  "indexmap",
  "itoa",
@@ -2573,7 +2572,6 @@ dependencies = [
  "log",
  "once_cell",
  "pretty_assertions",
- "prisma-inflector",
  "quaint",
  "regex",
  "serde",
@@ -2585,7 +2583,6 @@ dependencies = [
  "tokio",
  "tracing",
  "tracing-futures",
- "url 2.1.1",
  "user-facing-errors",
 ]
 
@@ -2632,7 +2629,6 @@ dependencies = [
  "serde",
  "serde_json",
  "tokio",
- "url 2.1.1",
  "user-facing-errors",
  "uuid",
 ]
@@ -2656,7 +2652,6 @@ dependencies = [
  "test-macros",
  "test-setup",
  "tokio",
- "url 2.1.1",
 ]
 
 [[package]]
@@ -2883,9 +2878,9 @@ dependencies = [
 
 [[package]]
 name = "tokio"
-version = "0.2.14"
+version = "0.2.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2751672f9da075d045c67fdb0068be9850ab7b231fa77bb51d6fd35da9c0bb0d"
+checksum = "0fa5e81d6bc4e67fe889d5783bd2a128ab2e0cfa487e0be16b6a8d177b101616"
 dependencies = [
  "bytes",
  "fnv",
