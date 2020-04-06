@@ -37,17 +37,8 @@ fn test_render_relation_name_on_self_relations() {
   id         String     @id
   name       String
   updatedAt  DateTime
-  Category_A Category[] @relation("_CategoryToCategory", references: [id])
-  Category_B Category[] @relation("_CategoryToCategory", references: [id])
-}"#;
-
-    let expected = r#"model Category {
-  createdAt  DateTime
-  id         String     @id
-  name       String
-  updatedAt  DateTime
-  Category_A Category[] @relation("_CategoryToCategory", references: [id])
-  Category_B Category[] @relation("_CategoryToCategory", references: [id])
+  Category_A Category[] @relation("CategoryToCategory", references: [id])
+  Category_B Category[] @relation("CategoryToCategory", references: [id])
 }"#;
 
     let dml = datamodel::parse_datamodel(input).unwrap();
@@ -55,7 +46,7 @@ fn test_render_relation_name_on_self_relations() {
 
     print!("{}", rendered);
 
-    assert_eq!(rendered, expected);
+    assert_eq!(rendered, input);
 }
 
 // TODO: this is probably obsolete
