@@ -307,8 +307,6 @@ async fn unique_constraints_on_composite_relation_fields(api: &TestApi) -> TestR
         model Child {
             id        Int    @id
             c         String
-            parent_id Int
-            parent    Parent @relation(name: "ChildParent", fields: [parent_id], references: [id])
 
             @@unique([id, c])
         }
