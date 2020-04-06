@@ -222,6 +222,9 @@ impl<'a> RelationFieldRef<'a> {
             .find(|relation_field| {
                 relation_field.relation_name() == self.relation_name()
                     && relation_field.referenced_model().name.as_str() == &self.field.model.name
+                    // This is to differentiate the opposite field from self in the self relation case.
+                    && relation_field.relation_info.to_fields != self.relation_info.to_fields
+                    && relation_field.relation_info.fields != self.relation_info.fields
             })
     }
 
