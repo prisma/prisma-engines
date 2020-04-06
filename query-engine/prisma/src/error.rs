@@ -43,7 +43,7 @@ pub enum PrismaError {
 }
 
 impl PrismaError {
-    pub(crate) fn render_as_json(self) -> Result<(), failure::Error> {
+    pub fn render_as_json(self) -> Result<(), failure::Error> {
         use std::fmt::Write as _;
         use std::io::Write as _;
 
