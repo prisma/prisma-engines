@@ -11,7 +11,7 @@ members = [
   "query-engine/connectors/query-connector",
   "query-engine/connectors/sql-query-connector",
   "query-engine/core",
-  "query-engine/prisma",
+  "query-engine/query-engine",
   "prisma-fmt",
   "libs/datamodel/core",
   "libs/datamodel/connectors/datamodel-connector",

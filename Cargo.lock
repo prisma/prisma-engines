@@ -1930,54 +1930,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "prisma"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "async-trait",
- "base64 0.10.1",
- "datamodel",
- "failure",
- "futures 0.3.4",
- "graphql-parser",
- "http",
- "hyper",
- "indexmap",
- "indoc",
- "introspection-core",
- "itertools",
- "log",
- "migration-connector",
- "migration-core",
- "once_cell",
- "pretty_assertions",
- "prisma-inflector",
- "prisma-models",
- "quaint",
- "query-connector",
- "query-core",
- "rust-embed",
- "rust_decimal",
- "rustc_version",
- "serde",
- "serde_json",
- "serial_test",
- "sql-migration-connector",
- "sql-query-connector",
- "structopt",
- "test-macros",
- "test-setup",
- "tokio",
- "tracing",
- "tracing-attributes",
- "tracing-futures",
- "tracing-log",
- "tracing-subscriber",
- "url 2.1.1",
- "user-facing-errors",
-]
-
-[[package]]
 name = "prisma-fmt"
 version = "0.1.0"
 dependencies = [
@@ -2173,6 +2125,54 @@ dependencies = [
  "serde_json",
  "user-facing-errors",
  "uuid",
+]
+
+[[package]]
+name = "query-engine"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "base64 0.10.1",
+ "datamodel",
+ "failure",
+ "futures 0.3.4",
+ "graphql-parser",
+ "http",
+ "hyper",
+ "indexmap",
+ "indoc",
+ "introspection-core",
+ "itertools",
+ "log",
+ "migration-connector",
+ "migration-core",
+ "once_cell",
+ "pretty_assertions",
+ "prisma-inflector",
+ "prisma-models",
+ "quaint",
+ "query-connector",
+ "query-core",
+ "rust-embed",
+ "rust_decimal",
+ "rustc_version",
+ "serde",
+ "serde_json",
+ "serial_test",
+ "sql-migration-connector",
+ "sql-query-connector",
+ "structopt",
+ "test-macros",
+ "test-setup",
+ "tokio",
+ "tracing",
+ "tracing-attributes",
+ "tracing-futures",
+ "tracing-log",
+ "tracing-subscriber",
+ "url 2.1.1",
+ "user-facing-errors",
 ]
 
 [[package]]

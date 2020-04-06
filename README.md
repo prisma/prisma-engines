@@ -1,12 +1,12 @@
 # Prisma Engines
 
 This repository contains a collection of engines that power the core stack for
-[Prisma](https://github.com/prisma/prisma2), most prominently [Prisma
+[Prisma](https://github.com/prisma/prisma), most prominently [Prisma
 Client](https://github.com/prisma/prisma-client-js) and [Prisma
 Migrate](https://github.com/prisma/migrate).
 
 The engines and their respective binary crates are:
-- Query engine: `prisma`
+- Query engine: `query-engine`
 - Migration engine: `migration-engine`
 - Introspection engine: `introspection-engine`
 - Prisma Format: `prisma-fmt`
@@ -35,7 +35,7 @@ compiled binaries inside the repository root in the `target/debug` (without
 
 | Prisma Component           | Path to Binary                                            |
 | -------------------------- | --------------------------------------------------------- |
-| Query Engine               | `./target/[debug\|release]/prisma`                         |
+| Query Engine               | `./target/[debug\|release]/query-engine`                         |
 | Migration Engine           | `./target/[debug\|release]/migration-engine`               |
 | Introspection Engine       | `./target/[debug\|release]/introspection-engine`           |
 | Prisma Format              | `./target/[debug\|release]/prisma-fmt`                     |
@@ -65,15 +65,15 @@ Starting the Query Engine:
 
 The engine can be started either with using the `cargo` build tool, or
 pre-building a binary and running it directly. If using `cargo`, replace
-whatever command that starts with `./prisma` with `cargo run --bin prisma --`.
+whatever command that starts with `./query-engine` with `cargo run --bin query-engine --`.
 
 **Help**
 ```bash
-> ./target/release/prisma --help
-prisma d6f9915c25a2ae6eb793a3a18f87e576fb82e9da
+> ./target/release/query-engine --help
+query-engine d6f9915c25a2ae6eb793a3a18f87e576fb82e9da
 
 USAGE:
-    prisma [FLAGS] [OPTIONS] [SUBCOMMAND]
+    query-engine [FLAGS] [OPTIONS] [SUBCOMMAND]
 
 FLAGS:
         --always-force-transactions    Runs all queries in a transaction, including all the reads
@@ -90,11 +90,11 @@ SUBCOMMANDS:
     cli     Doesn't start a server, but allows running specific commands against Prisma
     help    Prints this message or the help of the given subcommand(s)
 
-> ./target/release/prisma cli --help
+> ./target/release/query-engine cli --help
 Doesn't start a server, but allows running specific commands against Prisma
 
 USAGE:
-    prisma cli <SUBCOMMAND>
+    query-engine cli <SUBCOMMAND>
 
 FLAGS:
     -h, --help       Prints help information
@@ -105,7 +105,7 @@ SUBCOMMANDS:
     dmmf-to-dml        Convert the given DMMF JSON file to a data model
     execute-request    Executes one request and then terminates
     get-config         Get the configuration from the given data model
-    help                 Prints this message or the help of the given subcommand(s)
+    help               Prints this message or the help of the given subcommand(s)
 ```
 
 The prisma version hash is the latest git commit at the time the binary was built.
