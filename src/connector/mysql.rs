@@ -744,4 +744,29 @@ VALUES (1, 'Joe', 27, 20000.00 );
 
         assert!(result.is_empty());
     }
+
+    #[tokio::test]
+    async fn mysql_float_columns_cast_to_f32() {
+        let create_table = r#"
+            CREATE TABLE `float_precision_test` (
+                id int4 AUTO_INCREMENT PRIMARY KEY,
+                f  float NOT NULL
+            )
+        "#;
+
+        let drop_table = "DROP TABLE IF EXISTS `float_precision_test`";
+
+        let conn = Quaint::new(&CONN_STR).await.unwrap();
+
+        conn.query_raw(drop_table, &[]).await.unwrap();
+        conn.query_raw(create_table, &[]).await.unwrap();
+
+        let insert = Insert::single_into("float_precision_test").value("f", 6.4123456);
+        let select = Select::from_table("float_precision_test").column("f");
+
+        conn.query(insert.into()).await.unwrap();
+        let result = conn.query(select.into()).await.unwrap();
+
+        assert_eq!(result.into_single().unwrap().at(0).unwrap().as_f64().unwrap(), 6.412345);
+    }
 }
