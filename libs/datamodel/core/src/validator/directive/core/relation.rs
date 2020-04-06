@@ -57,7 +57,8 @@ impl DirectiveValidator<dml::Field> for RelationDirectiveValidator {
             let mut all_related_ids = related_model.id_field_names();
 
             if !relation_info.name.is_empty()
-                && relation_info.name != DefaultNames::relation_name(&relation_info.to, &parent_model.name)
+                && (relation_info.name != DefaultNames::relation_name(&relation_info.to, &parent_model.name)
+                    || parent_model.name == related_model.name)
             {
                 args.push(ast::Argument::new_string("", &relation_info.name));
             }

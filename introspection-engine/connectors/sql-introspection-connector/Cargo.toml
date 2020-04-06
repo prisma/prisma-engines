@@ -10,7 +10,6 @@ edition = "2018"
 async-trait = "0.1.17"
 introspection-connector = { path = "../introspection-connector" }
 sql-schema-describer = { path = "../../../libs/sql-schema-describer" }
-prisma-inflector = { path = "../../../libs/prisma-inflector" }
 datamodel = { path = "../../../libs/datamodel/core" }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1.0"
@@ -18,7 +17,6 @@ thiserror = "1.0.9"
 anyhow = "1.0.26"
 log = "0.4"
 regex = "1.2"
-url = "2"
 user-facing-errors = { path = "../../../libs/user-facing-errors", features = ["sql"] }
 tracing = "0.1.10"
 tracing-futures = "0.2.0"

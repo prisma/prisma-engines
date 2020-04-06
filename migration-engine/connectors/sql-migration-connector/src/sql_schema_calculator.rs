@@ -127,8 +127,6 @@ impl<'a> SqlSchemaCalculator<'a> {
                             .data_source_fields()
                             .into_iter()
                             .map(|s| s.name.clone())
-                            .collect::<Vec<String>>()
-                            .into_iter()
                     })
                     .collect(),
                 sequence: None,
@@ -238,13 +236,7 @@ impl<'a> SqlSchemaCalculator<'a> {
                             referenced_columns: first_unique_criterion(model_a)
                                 .map_err(SqlError::Generic)?
                                 .into_iter()
-                                .flat_map(|field| {
-                                    field
-                                        .data_source_fields()
-                                        .into_iter()
-                                        .map(|f| f.name.clone())
-                                        .collect::<Vec<_>>()
-                                })
+                                .flat_map(|field| field.data_source_fields().into_iter().map(|f| f.name.clone()))
                                 .collect(),
                             on_delete_action: sql::ForeignKeyAction::Cascade,
                         },
@@ -255,13 +247,7 @@ impl<'a> SqlSchemaCalculator<'a> {
                             referenced_columns: first_unique_criterion(model_b)
                                 .map_err(SqlError::Generic)?
                                 .into_iter()
-                                .flat_map(|field| {
-                                    field
-                                        .data_source_fields()
-                                        .into_iter()
-                                        .map(|f| f.name.clone())
-                                        .collect::<Vec<_>>()
-                                })
+                                .flat_map(|field| field.data_source_fields().into_iter().map(|f| f.name.clone()))
                                 .collect(),
                             on_delete_action: sql::ForeignKeyAction::Cascade,
                         },
@@ -292,7 +278,7 @@ impl<'a> SqlSchemaCalculator<'a> {
                     };
                     result.push(table);
                 }
-                _ => {}
+                _ => (),
             }
         }
         Ok(result)
@@ -338,34 +324,30 @@ fn relation_table_columns(referenced_model: &ModelRef<'_>, reference_field_name:
 }
 
 fn migration_value_new(field: &FieldRef<'_>) -> Option<sql_schema_describer::DefaultValue> {
-    let value = match (&field.default_value(), field.arity()) {
-        (Some(df), _) => match df {
-            dml::DefaultValue::Single(s) => s.clone(),
-            dml::DefaultValue::Expression(expression) if expression.name == "now" && expression.args.is_empty() => {
-                return Some(sql_schema_describer::DefaultValue::NOW)
-            }
-            dml::DefaultValue::Expression(_) => return None,
-        },
-        (None, _) => return None,
+    if field.is_id() {
+        return None;
+    }
+
+    let value = match &field.default_value()? {
+        dml::DefaultValue::Single(s) => s.clone(),
+        dml::DefaultValue::Expression(expression) if expression.name == "now" && expression.args.is_empty() => {
+            return Some(sql_schema_describer::DefaultValue::NOW)
+        }
+        dml::DefaultValue::Expression(_) => return None,
     };
 
     let result = match value {
-        ScalarValue::Boolean(x) => {
-            if x {
-                "true".to_string()
-            } else {
-                "false".to_string()
-            }
-        }
-        ScalarValue::Int(x) => format!("{}", x),
-        ScalarValue::Float(x) => format!("{}", x),
-        ScalarValue::Decimal(x) => format!("{}", x),
-        ScalarValue::String(x) => format!("{}", x),
+        ScalarValue::Boolean(x) => if x { "true" } else { "false" }.to_string(),
+        ScalarValue::Int(x) => x.to_string(),
+        ScalarValue::Float(x) => x.to_string(),
+        ScalarValue::Decimal(x) => x.to_string(),
+        ScalarValue::String(x) => x,
 
         ScalarValue::DateTime(x) => {
-            let mut raw = format!("{}", x); // this will produce a String 1970-01-01 00:00:00 UTC
+            // TODO: use a proper format string instead.
+            let mut raw = x.to_string(); // this will produce a String 1970-01-01 00:00:00 UTC
             raw.truncate(raw.len() - 4); // strip the UTC suffix
-            format!("{}", raw)
+            raw
         }
 
         ScalarValue::ConstantLiteral(x) => match field.field_type() {
@@ -382,11 +364,7 @@ fn migration_value_new(field: &FieldRef<'_>) -> Option<sql_schema_describer::Def
         },
     };
 
-    if field.is_id() {
-        None
-    } else {
-        Some(sql_schema_describer::DefaultValue::VALUE(result))
-    }
+    Some(sql_schema_describer::DefaultValue::VALUE(result))
 }
 
 fn enum_column_type(field: &FieldRef<'_>, database_info: &DatabaseInfo, db_name: &str) -> sql::ColumnType {
@@ -457,7 +435,7 @@ fn add_one_to_one_relation_unique_index(table: &mut sql::Table, column_names: &[
 }
 
 /// This should match the logic in `prisma_models::Model::primary_identifier`.
-fn first_unique_criterion(model: ModelRef) -> anyhow::Result<Vec<FieldRef>> {
+fn first_unique_criterion(model: ModelRef<'_>) -> anyhow::Result<Vec<FieldRef>> {
     // First candidate: the primary key.
     {
         let id_fields: Vec<_> = model.id_fields().collect();

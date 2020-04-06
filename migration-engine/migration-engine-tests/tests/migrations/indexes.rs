@@ -100,3 +100,31 @@ async fn unique_directive_on_required_one_to_one_relation_creates_one_index(api:
 
     Ok(())
 }
+
+#[test_each_connector]
+async fn one_to_many_self_relations_do_not_create_a_unique_index(api: &TestApi) -> TestResult {
+    let dm = r#"
+        model Location {
+            id        String      @id @default(cuid())
+            parent    Location?   @relation("LocationToLocation_parent", fields:[parentId], references: [id])
+            parentId  String?     @map("parent")
+            children  Location[]  @relation("LocationToLocation_parent")
+        }
+    "#;
+
+    api.infer_apply(dm).send_assert().await?.assert_green()?;
+
+    if api.is_mysql() {
+        // MySQL creates an index for the FK.
+        api.assert_schema().await?.assert_table("Location", |t| {
+            t.assert_indexes_count(1)?
+                .assert_index_on_columns(&["parent"], |idx| idx.assert_is_not_unique())
+        })?;
+    } else {
+        api.assert_schema()
+            .await?
+            .assert_table("Location", |t| t.assert_indexes_count(0))?;
+    }
+
+    Ok(())
+}
