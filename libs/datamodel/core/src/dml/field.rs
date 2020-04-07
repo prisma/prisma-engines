@@ -30,6 +30,10 @@ impl FieldArity {
     pub fn is_optional(&self) -> bool {
         self == &Self::Optional
     }
+
+    pub fn is_list(&self) -> bool {
+        self == &Self::List
+    }
 }
 
 /// Datamodel field type.

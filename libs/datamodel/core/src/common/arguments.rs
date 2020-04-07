@@ -7,6 +7,7 @@ use std::collections::HashSet;
 ///
 /// This class makes it more convenient to implement
 /// custom directives.
+#[derive(Debug)]
 pub struct Arguments<'a> {
     arguments: &'a [ast::Argument],
     used_arguments: HashSet<&'a str>,

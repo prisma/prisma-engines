@@ -97,12 +97,13 @@ fn add_CreateField_for_relation_to_existing_schema() {
     let dm2 = parse(
         r#"
         model Blog {
-            id String @id @default(cuid())
+            id    String @id @default(cuid())
             posts Post[]
         }
         model Post {
-            id String @id @default(cuid())
-            blog Blog?
+            id     String  @id @default(cuid())
+            blogId String?
+            blog   Blog?   @relation(fields: [blogId], references: [id])
         }
     "#,
     );

@@ -35,8 +35,10 @@ fn must_add_back_relation_fields_for_given_list_field() {
 fn must_add_back_relation_fields_for_given_singular_field() {
     let dml = r#"
     model User {
-        id   Int @id
-        post Post
+        id     Int @id
+        postId Int 
+        
+        post   Post @relation(fields: [postId], references: [post_id]) 
     }
 
     model Post {
@@ -62,6 +64,7 @@ fn must_add_back_relation_fields_for_given_singular_field() {
 }
 
 #[test]
+#[ignore]
 fn must_add_to_fields_on_the_right_side_for_one_to_one_relations() {
     // the to fields are always added to model with the lower name in lexicographic order
     let dml = r#"
@@ -110,6 +113,7 @@ fn must_add_to_fields_on_the_right_side_for_one_to_one_relations() {
 }
 
 #[test]
+#[ignore]
 fn must_add_to_fields_correctly_for_one_to_one_relations() {
     // Post is lower that User. So the to_fields should be stored in Post.
     let dml = r#"
@@ -137,6 +141,7 @@ fn must_add_to_fields_correctly_for_one_to_one_relations() {
 }
 
 #[test]
+#[ignore]
 fn must_add_to_fields_on_both_sides_for_many_to_many_relations() {
     let dml = r#"
     model User {
@@ -163,6 +168,7 @@ fn must_add_to_fields_on_both_sides_for_many_to_many_relations() {
 }
 
 #[test]
+#[ignore]
 fn must_add_to_fields_on_both_sides_for_one_to_many_relations() {
     let dml = r#"
     model User {
@@ -234,7 +240,6 @@ model Author {
         .assert_has_field("authors")
         .assert_relation_to("Blog")
         .assert_relation_name("AuthorToBlog")
-        .assert_relation_to_fields(&["id"])
         .assert_arity(&datamodel::dml::FieldArity::List);
 
     author_model.assert_has_field("id");
@@ -244,7 +249,6 @@ model Author {
         .assert_has_field("authors")
         .assert_relation_to("Author")
         .assert_relation_name("AuthorToBlog")
-        .assert_relation_to_fields(&["id"])
         .assert_arity(&datamodel::dml::FieldArity::List);
 
     blog_model.assert_has_field("id");
@@ -279,9 +283,12 @@ fn should_add_back_relations_for_more_complex_cases() {
     }
 
     model PostToCategory {
-        id Int @id
-        post Post
-        category Category
+        id          Int @id
+        postId      Int
+        categoryId  Int
+        
+        post     Post     @relation(fields: [postId], references: [post_id])
+        category Category @relation(fields: [categoryId], references: [category_id])
         @@map("post_to_category")
     }
     "#;
@@ -297,7 +304,7 @@ fn should_add_back_relations_for_more_complex_cases() {
         .assert_relation_to("User")
         .assert_relation_to_fields(&["id"])
         .assert_relation_name("PostToUser")
-        .assert_is_generated(false)
+        .assert_is_generated(true)
         .assert_arity(&datamodel::dml::FieldArity::Optional);
 
     // Backward
@@ -319,7 +326,7 @@ fn should_add_back_relations_for_more_complex_cases() {
         .assert_relation_to("Post")
         .assert_relation_to_fields(&["post_id"])
         .assert_relation_name("CommentToPost")
-        .assert_is_generated(false)
+        .assert_is_generated(true)
         .assert_arity(&datamodel::dml::FieldArity::Optional);
 
     // Backward
@@ -378,6 +385,7 @@ fn should_add_back_relations_for_more_complex_cases() {
 }
 
 #[test]
+#[ignore]
 fn should_add_to_fields_on_the_correct_side_tie_breaker() {
     let dml = r#"
     model User {
@@ -406,6 +414,7 @@ fn should_add_to_fields_on_the_correct_side_tie_breaker() {
 }
 
 #[test]
+#[ignore]
 fn should_add_to_fields_on_the_correct_side_list() {
     let dml = r#"
     model User {
@@ -457,8 +466,10 @@ fn should_camel_case_back_relation_field_name() {
 fn must_add_back_relation_fields_for_self_relations() {
     let dml = r#"
     model Human {
-        id Int @id
-        son Human?
+        id    Int @id
+        sonId Int?
+        
+        son   Human? @relation(fields: [sonId], references: [id]) 
     }
     "#;
 
@@ -478,6 +489,7 @@ fn must_add_back_relation_fields_for_self_relations() {
 }
 
 #[test]
+#[ignore]
 fn should_add_embed_ids_on_self_relations() {
     let dml = r#"
     model Human {
@@ -505,13 +517,19 @@ fn should_add_embed_ids_on_self_relations() {
 fn should_not_get_confused_with_complicated_self_relations() {
     let dml = r#"
     model Human {
-        id Int @id
-        wife Human? @relation("Marrige")
-        husband Human? @relation("Marrige")
-        father Human? @relation("Paternity")
-        son Human? @relation("Paternity")
+        id        Int  @id
+        husbandId Int?
+        fatherId  Int?
+        parentId  Int?
+        
+        wife     Human? @relation("Marrige")
+        husband  Human? @relation("Marrige", fields: husbandId, references: id)
+        
+        father   Human? @relation("Paternity", fields: fatherId, references: id)
+        son      Human? @relation("Paternity")
+        
         children Human[] @relation("Offspring")
-        parent Human? @relation("Offspring")
+        parent   Human? @relation("Offspring", fields: parentId, references: id)
     }
     "#;
 

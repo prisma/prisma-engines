@@ -1,4 +1,7 @@
-use crate::{ast, parse_datamodel_and_ignore_env_errors, parse_schema_ast, render_schema_ast_to, validator::LowerDmlToAst};
+use crate::common::WritableString;
+use crate::{
+    ast, parse_datamodel_and_ignore_env_errors, parse_schema_ast, render_schema_ast_to, validator::LowerDmlToAst,
+};
 
 pub struct Reformatter {}
 
@@ -22,5 +25,11 @@ impl Reformatter {
         }
 
         render_schema_ast_to(output, &ast, 2);
+    }
+
+    pub fn reformat_to_string(input: &str) -> String {
+        let mut result = WritableString::new();
+        Reformatter::reformat_to(input, &mut result, 0);
+        result.into()
     }
 }

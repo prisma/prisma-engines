@@ -45,6 +45,17 @@ pub enum IndexType {
     Normal,
 }
 
+#[derive(Debug)]
+pub struct UniqueCriteria<'a> {
+    pub fields: Vec<&'a Field>,
+}
+
+impl<'a> UniqueCriteria<'a> {
+    pub fn new(fields: Vec<&'a Field>) -> UniqueCriteria<'a> {
+        UniqueCriteria { fields }
+    }
+}
+
 impl Model {
     /// Creates a new model with the given name.
     pub fn new(name: String, database_name: Option<String>) -> Model {
@@ -110,12 +121,31 @@ impl Model {
 
     /// This should match the logic in `prisma_models::Model::primary_identifier`.
     pub fn first_unique_criterion(&self) -> Vec<&Field> {
+        match self.strict_unique_criterias().first() {
+            Some(criteria) => criteria.fields.clone(),
+            None => panic!("Could not find the first unique criteria on model {}", self.name()),
+        }
+    }
+
+    /// optional unique fields are NOT considered a unique criteria
+    pub fn strict_unique_criterias(&self) -> Vec<UniqueCriteria> {
+        self.unique_criterias(false)
+    }
+
+    /// optional unique fields are considered a unique criteria
+    pub fn loose_unique_criterias(&self) -> Vec<UniqueCriteria> {
+        self.unique_criterias(true)
+    }
+
+    // returns the order of unique criterias ordered based on their precedence
+    fn unique_criterias(&self, allow_optional: bool) -> Vec<UniqueCriteria> {
+        let mut result = Vec::new();
         // first candidate: the singular id field
         {
             let mut singular_id_fields = self.singular_id_fields();
 
             match singular_id_fields.next() {
-                Some(x) => return vec![x],
+                Some(x) => result.push(UniqueCriteria::new(vec![x])),
                 None => {}
             }
         }
@@ -125,36 +155,38 @@ impl Model {
             let id_fields: Vec<_> = self.id_fields.iter().map(|f| self.find_field(&f).unwrap()).collect();
 
             if !id_fields.is_empty() {
-                return id_fields;
+                result.push(UniqueCriteria::new(id_fields));
             }
         }
 
         // third candidate: a required scalar field with a unique index.
         {
-            let first_scalar_unique_required_field = self
+            let mut unique_required_fields: Vec<_> = self
                 .fields
                 .iter()
-                .find(|field| field.is_unique && field.arity == FieldArity::Required);
+                .filter(|field| field.is_unique && (field.arity == FieldArity::Required || allow_optional))
+                .map(|f| UniqueCriteria::new(vec![f]))
+                .collect();
 
-            if let Some(field) = first_scalar_unique_required_field {
-                return vec![field];
-            }
+            result.append(&mut unique_required_fields);
         }
 
         // fourth candidate: any multi-field unique constraint.
         {
-            let unique_field_combi = self
+            let mut unique_field_combi = self
                 .indices
                 .iter()
-                .find(|id| id.tpe == IndexType::Unique)
-                .map(|id| id.fields.iter().map(|f| self.find_field(&f).unwrap()).collect());
+                .filter(|id| id.tpe == IndexType::Unique)
+                .map(|id| {
+                    let fields = id.fields.iter().map(|f| self.find_field(&f).unwrap()).collect();
+                    UniqueCriteria::new(fields)
+                })
+                .collect();
 
-            if unique_field_combi.is_some() {
-                return unique_field_combi.unwrap();
-            }
+            result.append(&mut unique_field_combi)
         }
 
-        panic!("Could not find the first unique criteria on model {}", self.name());
+        result
     }
 
     /// Finds the name of all id fields

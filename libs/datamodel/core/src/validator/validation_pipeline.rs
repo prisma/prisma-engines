@@ -67,6 +67,16 @@ impl<'a> ValidationPipeline<'a> {
             all_errors.append(&mut err);
         }
 
+        // Early return so that the post validation does not have to deal with invalid schemas
+        if all_errors.has_errors() {
+            return Err(all_errors);
+        }
+
+        // Phase 6: Post Standardisation Validation
+        if let Err(mut err) = self.validator.post_standardisation_validate(ast_schema, &mut schema) {
+            all_errors.append(&mut err);
+        }
+
         if all_errors.has_errors() {
             Err(all_errors)
         } else {

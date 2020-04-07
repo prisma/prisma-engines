@@ -557,7 +557,7 @@ async fn specifying_a_db_name_for_an_inline_relation_must_work(api: &TestApi) {
             model A {
                 id Int @id
                 b_id_field Int @map(name: "b_column")
-                b B @relation(fields: [b_id_field])
+                b B @relation(fields: [b_id_field], references: [id])
             }
 
             model B {
@@ -1166,7 +1166,7 @@ async fn reserved_sql_key_words_must_work(api: &TestApi) {
             model Group {
                 id    String  @default(cuid()) @id
                 parent_id String?
-                parent Group? @relation(name: "ChildGroups", fields: [parent_id])
+                parent Group? @relation(name: "ChildGroups", fields: [parent_id], references: id)
                 childGroups Group[] @relation(name: "ChildGroups")
             }
         "#;
@@ -1199,7 +1199,8 @@ async fn migrations_with_many_to_many_related_models_must_not_recreate_indexes(a
 
             model Profile {
                 id        String  @default(cuid()) @id
-                user      User
+                userId    String
+                user      User    @relation(fields: userId, references: id)
                 skills    Skill[]
             }
 
@@ -1226,7 +1227,8 @@ async fn migrations_with_many_to_many_related_models_must_not_recreate_indexes(a
 
             model Profile {
                 id        String  @default(cuid()) @id
-                user      User
+                userId    String
+                user      User    @relation(fields: userId, references: id)
                 skills    Skill[]
             }
 
@@ -1254,7 +1256,7 @@ async fn removing_a_relation_field_must_work(api: &TestApi) -> TestResult {
             model User {
                 id        String  @default(cuid()) @id
                 address_id String @map("address_name")
-                address   Address @relation(fields: [address_id])
+                address   Address @relation(fields: [address_id], references: [id])
             }
 
             model Address {
@@ -1825,18 +1827,18 @@ async fn references_to_models_with_compound_primary_keys_must_work(api: &TestApi
     let dm = r#"
         model User {
             firstName String
-            lastName String
-            pets Pet[]
+            lastName  String
+            pets      Pet[]
 
             @@id([firstName, lastName])
         }
 
         model Pet {
-            id String @id
+            id              String @id
             human_firstName String
-            human_lastName String
+            human_lastName  String
 
-            human User @relation(fields: [human_firstName, human_lastName])
+            human User @relation(fields: [human_firstName, human_lastName], references: [firstName, lastName])
         }
     "#;
 

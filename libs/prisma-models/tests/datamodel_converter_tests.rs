@@ -241,8 +241,9 @@ fn explicit_relation_fields() {
             }
 
             model Post {
-                id Int @id
-                blog Blog? @map(name:"blog_id")
+                id     Int   @id
+                blogId Int?  @map("blog_id")
+                blog   Blog? @relation(fields: blogId, references: id)
             }
         "#,
     );
@@ -356,8 +357,9 @@ fn explicit_relation_names() {
             }
 
             model Post {
-                id Int @id
-                blog Blog? @relation(name: "MyRelationName")
+                id     Int  @id
+                blogId Int?
+                blog   Blog? @relation(name: "MyRelationName", fields: blogId, references: id)
             }
         "#,
     );
@@ -406,9 +408,11 @@ fn ambiguous_relations() {
             }
 
             model Post {
-                id    Int  @id
-                blog1 Blog @relation(name: "Relation1")
-                blog2 Blog @relation(name: "Relation2")
+                id      Int  @id
+                blog1Id Int
+                blog2Id Int
+                blog1   Blog @relation(name: "Relation1", fields: blog1Id, references: id)
+                blog2   Blog @relation(name: "Relation2", fields: blog2Id, references: id)
             }
         "#,
     );
