@@ -5,16 +5,19 @@ use datamodel::{common::ScalarType, dml};
 fn allow_multiple_relations() {
     let dml = r#"
     model User {
-        id Int @id
+        id         Int    @id
         more_posts Post[] @relation(name: "more_posts")
-        posts Post[]
+        posts      Post[]
     }
 
     model Post {
-        id Int @id
-        text String
-        user User
-        posting_user User @relation(name: "more_posts")
+        id            Int    @id
+        text          String
+        userId        Int
+        postingUserId Int
+        
+        user         User   @relation(fields: userId, references: id)
+        posting_user User   @relation(name: "more_posts", fields: postingUserId, references: id)
     }
     "#;
 
@@ -51,11 +54,15 @@ fn allow_multiple_relations() {
 fn allow_complicated_self_relations() {
     let dml = r#"
     model User {
-        id Int @id
-        son User @relation(name: "offspring")
-        father User @relation(name: "offspring")
+        id     Int @id
+        sonId  Int
+        wifeId Int
+        
+        son     User @relation(name: "offspring", fields: sonId, references: id)
+        father  User @relation(name: "offspring")
+        
         husband User @relation(name: "spouse")
-        wife User @relation(name: "spouse")
+        wife    User @relation(name: "spouse", fields: wifeId, references: id)
     }
     "#;
 
@@ -72,13 +79,15 @@ fn allow_complicated_self_relations() {
 fn allow_unambiguous_self_relations_in_presence_of_unrelated_other_relations() {
     let dml = r#"
         model User {
-            id Int @id
+            id          Int @id
+            motherId    Int
+            
             subscribers Follower[]
-            mother User
+            mother      User @relation(fields: motherId, references: id)
         }
 
         model Follower {
-            id Int @id
+            id        Int   @id
             following User[]
         }
     "#;

@@ -406,7 +406,7 @@ async fn removing_a_default_from_a_non_nullable_foreign_key_column_must_warn(api
         model Blog {
             id Int @id
             userId Int
-            user User @relation(fields: [userId])
+            user User @relation(fields: [userId], references: [id])
         }
     "#;
 

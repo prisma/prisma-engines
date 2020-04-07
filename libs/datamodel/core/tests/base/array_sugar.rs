@@ -1,7 +1,7 @@
 use crate::common::*;
 
 #[test]
-fn should_treat_single_values_as_arrays_of_length_oneca() {
+fn should_treat_single_values_as_arrays_of_length_one() {
     let dml = r#"
     model User {
         id Int @id
@@ -9,8 +9,10 @@ fn should_treat_single_values_as_arrays_of_length_oneca() {
     }
 
     model Post {
-        id Int @id
-        user User @relation(references: id)
+        id     Int @id
+        userId Int
+        
+        user   User @relation(fields: userId, references: id)
     }
     "#;
 

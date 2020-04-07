@@ -67,11 +67,11 @@ fn fail_if_back_relation_for_embedded_type() {
 fn settings_must_be_deteced() {
     let dml = r#"
     model Todo {
-      id Int @id
+      id       Int  @id
+      parentId Int?
+      
       child_todos Todo[] @relation("MyRelation")
-      // TODO: bring `onDelete` back once `prisma migrate` is a thing
-      // parent_todo Todo? @relation("MyRelation", onDelete: CASCADE, references: id)
-      parent_todo Todo? @relation("MyRelation", references: id)
+      parent_todo Todo? @relation("MyRelation", fields: parentId, references: id)
     }
     "#;
 

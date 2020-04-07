@@ -1,5 +1,6 @@
 extern crate datamodel;
 
+use crate::common::*;
 use pretty_assertions::assert_eq;
 use std::fs;
 
@@ -17,7 +18,7 @@ fn test_dmmf_rendering() {
     for test_case in test_cases {
         println!("TESTING: {}", test_case);
         let datamodel_string = load_from_file(format!("{}.prisma", test_case).as_str());
-        let dml = datamodel::parse_datamodel(&datamodel_string).unwrap();
+        let dml = parse(&datamodel_string);
         let dmmf_string = datamodel::json::dmmf::render_to_dmmf(&dml);
         //        println!("DMMF: \n{}", dmmf_string);
         assert_eq_json(

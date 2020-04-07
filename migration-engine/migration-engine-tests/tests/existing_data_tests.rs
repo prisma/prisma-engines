@@ -393,7 +393,7 @@ async fn dropping_a_table_referenced_by_foreign_keys_must_work(api: &TestApi) ->
         model Recipe {
             id Int @id
             categoryId Int
-            category Category @relation(fields: [categoryId])
+            category Category @relation(fields: [categoryId], references: [id])
         }
     "#;
 

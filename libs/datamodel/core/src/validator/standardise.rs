@@ -1,7 +1,7 @@
 use super::common::*;
 use crate::{
-    ast, common::names::*, dml, dml::WithDatabaseName, error::ErrorCollection, DataSourceField, FieldArity,
-    OnDeleteStrategy,
+    ast, common::names::*, dml, dml::WithDatabaseName, error::ErrorCollection, DataSourceField, Field, FieldArity,
+    OnDeleteStrategy, UniqueCriteria,
 };
 use prisma_inflector;
 
@@ -40,27 +40,26 @@ impl Standardiser {
 
         // Iterate and mutate models.
         for model_idx in 0..schema.models.len() {
+            let cloned_model = schema.models[model_idx].clone();
+            let unique_criteria = self.unique_criteria(&cloned_model);
             let model = &mut schema.models[model_idx];
-            let model_name = &model.name;
 
             for field_index in 0..model.fields.len() {
                 let field = &mut model.fields[field_index];
 
                 if let dml::FieldType::Relation(rel) = &mut field.field_type {
                     let related_model = schema_copy.find_model(&rel.to).expect(STATE_ERROR);
-                    let related_field = related_model.related_field(model_name, &rel.name, &field.name).unwrap();
+                    let related_field = related_model
+                        .related_field(model.name.clone().as_str(), &rel.name, &field.name)
+                        .unwrap();
                     let related_model_name = &related_model.name;
+                    let is_m2m = field.arity.is_list() && related_field.arity.is_list();
 
                     let related_field_rel = if let dml::FieldType::Relation(rel) = &related_field.field_type {
                         rel
                     } else {
                         panic!(STATE_ERROR)
                     };
-
-                    // If one of the fields has to_fields explicitly set by the user, we continue.
-                    if !rel.to_fields.is_empty() || !related_field_rel.to_fields.is_empty() {
-                        continue;
-                    }
 
                     let embed_here = match (field.arity, related_field.arity) {
                         // many to many
@@ -70,7 +69,7 @@ impl Standardiser {
                         // many to one
                         (dml::FieldArity::List, _) => false,
                         // one to one
-                        (_, _) => match (model_name, related_model_name) {
+                        (_, _) => match (&model.name, related_model_name) {
                             (x, y) if x < y => true,
                             (x, y) if x > y => false,
                             // SELF RELATIONS
@@ -78,12 +77,29 @@ impl Standardiser {
                         },
                     };
 
+                    let underlying_fields =
+                        self.underlying_fields_for_unique_criteria(&unique_criteria, model.name.clone().as_ref());
+
                     if embed_here {
-                        rel.to_fields = related_model
-                            .first_unique_criterion()
-                            .iter()
-                            .map(|f| f.name.to_owned())
-                            .collect()
+                        // user input has precedence
+                        if rel.to_fields.is_empty() && related_field_rel.to_fields.is_empty() {
+                            rel.to_fields = related_model
+                                .first_unique_criterion()
+                                .iter()
+                                .map(|f| f.name.to_owned())
+                                .collect();
+                        }
+
+                        // user input has precedence
+                        if !is_m2m
+                            && (rel.fields.is_empty() && related_field_rel.fields.is_empty())
+                            && field.is_generated
+                        {
+                            rel.fields = underlying_fields.iter().map(|f| f.name.clone()).collect();
+                            for underlying_field in underlying_fields {
+                                model.add_field(underlying_field);
+                            }
+                        }
                     }
                 }
             }
@@ -128,13 +144,17 @@ impl Standardiser {
                     .find_model_mut(&missing_back_relation_field.model)
                     .expect(STATE_ERROR);
 
-                let mut back_relation_field = dml::Field::new(
+                let mut back_relation_field = dml::Field::new_generated(
                     &field_name,
                     dml::FieldType::Relation(missing_back_relation_field.relation_info),
                 );
 
                 back_relation_field.arity = missing_back_relation_field.arity;
                 model_mut.add_field(back_relation_field);
+
+                for underlying_field in missing_back_relation_field.underlying_fields.into_iter() {
+                    model_mut.add_field(underlying_field);
+                }
             }
         }
 
@@ -164,36 +184,82 @@ impl Standardiser {
                 }
 
                 if !back_field_exists {
-                    let relation_info = dml::RelationInfo {
-                        to: model.name.clone(),
-                        fields: vec![],
-                        to_fields: vec![],
-                        name: rel.name.clone(),
-                        on_delete: OnDeleteStrategy::None,
-                    };
+                    // needs scalar field maybe, add this to the fields vector
+                    // link to id unique criteria of related model
 
-                    let (arity, field_name) = if field.arity.is_singular() {
-                        (
-                            dml::FieldArity::List,
-                            prisma_inflector::classical().pluralize(&model.name).camel_case(),
-                        )
+                    if field.arity.is_singular() {
+                        let relation_info = dml::RelationInfo {
+                            to: model.name.clone(),
+                            fields: vec![],
+                            to_fields: vec![],
+                            name: rel.name.clone(),
+                            on_delete: OnDeleteStrategy::None,
+                        };
+
+                        result.push(AddMissingBackRelationField {
+                            model: rel.to.clone(),
+                            field: prisma_inflector::classical().pluralize(&model.name).camel_case(),
+                            arity: dml::FieldArity::List,
+                            relation_info,
+                            related_model: model.name.to_string(),
+                            related_field: field.name.to_string(),
+                            underlying_fields: vec![],
+                        });
                     } else {
-                        (dml::FieldArity::Optional, model.name.camel_case())
-                    };
+                        let unique_criteria = self.unique_criteria(&model);
+                        let unique_criteria_field_names =
+                            unique_criteria.fields.iter().map(|f| f.name.to_owned()).collect();
 
-                    result.push(AddMissingBackRelationField {
-                        model: rel.to.clone(),
-                        field: field_name,
-                        arity,
-                        relation_info,
-                        related_model: model.name.to_string(),
-                        related_field: field.name.to_string(),
-                    })
+                        let underlying_fields =
+                            self.underlying_fields_for_unique_criteria(&unique_criteria, &model.name);
+
+                        let relation_info = dml::RelationInfo {
+                            to: model.name.clone(),
+                            fields: underlying_fields.iter().map(|f| f.name.clone()).collect(),
+                            to_fields: unique_criteria_field_names,
+                            name: rel.name.clone(),
+                            on_delete: OnDeleteStrategy::None,
+                        };
+
+                        result.push(AddMissingBackRelationField {
+                            model: rel.to.clone(),
+                            field: model.name.camel_case(),
+                            arity: dml::FieldArity::Optional,
+                            relation_info,
+                            related_model: model.name.to_string(),
+                            related_field: field.name.to_string(),
+                            underlying_fields,
+                        });
+                    };
                 }
             }
         }
 
         result
+    }
+
+    fn unique_criteria<'a>(&self, model: &'a dml::Model) -> UniqueCriteria<'a> {
+        model.loose_unique_criterias().into_iter().next().unwrap()
+    }
+
+    fn underlying_fields_for_unique_criteria(
+        &self,
+        unique_criteria: &dml::UniqueCriteria,
+        model_name: &str,
+    ) -> Vec<Field> {
+        let model_name = model_name.to_owned();
+        unique_criteria
+            .fields
+            .iter()
+            .map(|f| {
+                let mut underlying_field = Field::new(
+                    &format!("{}{}", model_name.camel_case(), f.name.pascal_case()),
+                    f.field_type.clone(),
+                );
+                underlying_field.arity = dml::FieldArity::Optional;
+                underlying_field
+            })
+            .collect()
     }
 
     fn name_unnamed_relations(&self, datamodel: &mut dml::Datamodel) {
@@ -212,19 +278,6 @@ impl Standardiser {
             } else {
                 panic!("Tried to name a non-existing relation.");
             }
-
-            // Foreign side.
-            let field = datamodel
-                .find_model_mut(&rel_info.to)
-                .expect(STATE_ERROR)
-                .related_field_mut(&model_name, &rel_info.name, &field_name)
-                .expect(STATE_ERROR);
-
-            if let dml::FieldType::Relation(rel) = &mut field.field_type {
-                rel.name = DefaultNames::relation_name(&model_name, &rel_info.to);
-            } else {
-                panic!("Tried to name a non-existing relation.");
-            }
         }
     }
 
@@ -235,21 +288,8 @@ impl Standardiser {
         for model in datamodel.models() {
             for field in model.fields() {
                 if let dml::FieldType::Relation(rel) = &field.field_type {
-                    let related_model = datamodel.find_model(&rel.to).expect(STATE_ERROR);
-                    let related_field = related_model
-                        .related_field(&model.name, &rel.name, &field.name)
-                        .expect(STATE_ERROR);
-
-                    if let dml::FieldType::Relation(related_rel) = &related_field.field_type {
-                        if rel.name.is_empty()
-                            && !rel.to_fields.is_empty()
-                            // Tie is used to prevent duplicates on n:m relation.
-                            && (related_rel.to_fields.is_empty() || tie(&model, &field, &related_model, &related_field))
-                        {
-                            rels.push((model.name.clone(), field.name.clone(), rel.clone()))
-                        }
-                    } else {
-                        panic!(STATE_ERROR);
+                    if rel.name.is_empty() {
+                        rels.push((model.name.clone(), field.name.clone(), rel.clone()))
                     }
                 }
             }
@@ -443,6 +483,7 @@ struct AddMissingBackRelationField {
     relation_info: dml::RelationInfo,
     related_model: String,
     related_field: String,
+    underlying_fields: Vec<dml::Field>,
 }
 
 #[derive(Debug)]
