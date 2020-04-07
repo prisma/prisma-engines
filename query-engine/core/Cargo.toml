@@ -22,7 +22,6 @@ log = "0.4"
 petgraph = "0.4"
 im = "13.0"
 futures = "0.3"
-async-std = { version = "1", features = ["unstable"] }
 async-trait = "0.1"
 crossbeam-queue = "0.2"
 rust_decimal = "=1.1.0"

@@ -5,7 +5,6 @@ authors = ["Emanuel Joebstl <emanuel.joebstl@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-prisma-inflector = { path = "../../prisma-inflector" }
 prisma-value = { path = "../../prisma-value" }
 datamodel-connector = { path = "../connectors/datamodel-connector" }
 # Temporary until PR is accepted.
@@ -16,7 +15,6 @@ chrono = { version = "0.4.6", features = ["serde"] }
 serde = { version = "1.0.90", features = ["derive"] }
 serde_json ={version =  "1.0" ,features = ["preserve_order"]}
 failure = { version = "0.1", features = ["derive"] }
-bytecount = "0.5"
 uuid = { version = "0.8", features = ["serde", "v4"] }
 cuid = { git = "https://github.com/prisma/cuid-rust" }
 

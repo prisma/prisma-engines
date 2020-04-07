@@ -10,7 +10,7 @@ async fn making_an_optional_field_required_with_data_without_a_default_is_unexec
         }
     "#;
 
-    api.infer_apply(&dm1).send_assert().await?.assert_green()?;
+    api.infer_apply(&dm1).send().await?.assert_green()?;
 
     api.insert("Test")
         .value("id", "abc")
@@ -26,7 +26,7 @@ async fn making_an_optional_field_required_with_data_without_a_default_is_unexec
         }
     "#;
 
-    api.infer_apply(&dm2).send_assert().await?.assert_unexecutable(&[
+    api.infer_apply(&dm2).send().await?.assert_unexecutable(&[
         "Made the column `age` on table `Test` required, but there are existing NULL values.".into(),
     ])?;
 
@@ -50,7 +50,7 @@ async fn making_an_optional_field_required_with_data_with_a_default_works(api: &
         }
     "#;
 
-    api.infer_apply(&dm1).send_assert().await?.assert_green()?;
+    api.infer_apply(&dm1).send().await?.assert_green()?;
 
     api.insert("Test")
         .value("id", "abc")
@@ -66,7 +66,7 @@ async fn making_an_optional_field_required_with_data_with_a_default_works(api: &
         }
     "#;
 
-    api.infer_apply(&dm2).send_assert().await?.assert_green()?;
+    api.infer_apply(&dm2).send().await?.assert_green()?;
 
     api.assert_schema()
         .await?
@@ -94,7 +94,7 @@ async fn making_an_optional_field_required_on_an_empty_table_works(api: &TestApi
         }
     "#;
 
-    api.infer_apply(&dm1).send_assert().await?.assert_green()?;
+    api.infer_apply(&dm1).send().await?.assert_green()?;
 
     let dm2 = r#"
         model Test {
@@ -104,7 +104,7 @@ async fn making_an_optional_field_required_on_an_empty_table_works(api: &TestApi
         }
     "#;
 
-    api.infer_apply(&dm2).send_assert().await?.assert_green()?;
+    api.infer_apply(&dm2).send().await?.assert_green()?;
 
     api.assert_schema()
         .await?

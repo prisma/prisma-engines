@@ -3,7 +3,6 @@ use crate::{
     ast, common::names::*, dml, dml::WithDatabaseName, error::ErrorCollection, DataSourceField, Field, FieldArity,
     OnDeleteStrategy, UniqueCriteria,
 };
-use prisma_inflector;
 
 /// Helper for standardsing a datamodel.
 ///
@@ -198,7 +197,7 @@ impl Standardiser {
 
                         result.push(AddMissingBackRelationField {
                             model: rel.to.clone(),
-                            field: prisma_inflector::classical().pluralize(&model.name).camel_case(),
+                            field: model.name.camel_case(),
                             arity: dml::FieldArity::List,
                             relation_info,
                             related_model: model.name.to_string(),

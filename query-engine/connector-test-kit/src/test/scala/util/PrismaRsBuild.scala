@@ -6,7 +6,7 @@ object PrismaRsBuild {
   def apply(): Unit = {
     if (!EnvVars.isBuildkite) {
       val workingDirectory = new java.io.File(EnvVars.serverRoot)
-      var command          = Seq("cargo", "build", "--bin", "prisma", "--bin", "migration-engine")
+      var command          = Seq("cargo", "build", "--bin", "query-engine", "--bin", "migration-engine")
 
       if (!isDebug) {
         command = command :+ "--release"

@@ -88,11 +88,7 @@ async fn creating_a_field_for_an_existing_column_with_a_compatible_type_must_wor
         }
     "#;
 
-    api.infer_apply(&dm)
-        .force(Some(true))
-        .send_assert()
-        .await?
-        .assert_green()?;
+    api.infer_apply(&dm).force(Some(true)).send().await?.assert_green()?;
 
     let final_schema = api.describe_database().await?;
 
@@ -251,7 +247,7 @@ async fn deleting_a_scalar_list_field_for_a_non_existent_column_must_work(api: &
             }
         "#;
 
-    api.infer_apply(&dm1).send_assert().await?.assert_green()?;
+    api.infer_apply(&dm1).send().await?.assert_green()?;
 
     let result = api
         .barrel()
@@ -273,7 +269,7 @@ async fn deleting_a_scalar_list_field_for_a_non_existent_column_must_work(api: &
             }
         "#;
 
-    api.infer_apply(&dm2).send_assert().await?.assert_green()?;
+    api.infer_apply(&dm2).send().await?.assert_green()?;
 
     api.assert_schema().await?.assert_equals(&result)?;
 

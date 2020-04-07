@@ -12,7 +12,7 @@ use migration_engine_tests::sql::*;
 //         }
 //     "#;
 
-//     api.infer_apply(&dm1).send_assert().await?.assert_green()?;
+//     api.infer_apply(&dm1).send().await?.assert_green()?;
 
 //     {
 //         api.insert("Test")
@@ -37,7 +37,7 @@ use migration_engine_tests::sql::*;
 
 //     api.infer_apply(&dm2)
 //         .force(Some(false))
-//         .send_assert()
+//         .send()
 //         .await?
 //         .assert_unexecutable(&["yo".into()])?;
 
@@ -62,7 +62,7 @@ async fn adding_a_unique_constraint_when_existing_data_respects_it_works(api: &T
         }
     "#;
 
-    api.infer_apply(&dm1).send_assert().await?.assert_green()?;
+    api.infer_apply(&dm1).send().await?.assert_green()?;
 
     api.insert("Test")
         .value("id", "abc")
@@ -83,7 +83,7 @@ async fn adding_a_unique_constraint_when_existing_data_respects_it_works(api: &T
         }
     "#;
 
-    api.infer_apply(&dm2).send_assert().await?.assert_green()?;
+    api.infer_apply(&dm2).send().await?.assert_green()?;
 
     let rows = api.select("Test").column("id").column("name").send_debug().await?;
     assert_eq!(

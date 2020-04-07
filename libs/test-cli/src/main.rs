@@ -32,10 +32,10 @@ enum Command {
 
 #[derive(StructOpt)]
 struct DmmfCommand {
-    /// The path to the `prisma` binary. Defaults to the value of the `PRISMA_BINARY_PATH` env var,
-    /// or just `prisma`.
-    #[structopt(env = "PRISMA_BINARY_PATH", default_value = "prisma")]
-    prisma_binary_path: String,
+    /// The path to the `query-engine` binary. Defaults to the value of the `PRISMA_BINARY_PATH`
+    /// env var, or just `query-engine`.
+    #[structopt(env = "PRISMA_BINARY_PATH", default_value = "query-engine")]
+    query_engine_binary_path: String,
     /// A database URL to introspect and generate DMMF for.
     #[structopt(long = "url")]
     url: Option<String>,
@@ -201,11 +201,11 @@ async fn generate_dmmf(cmd: &DmmfCommand) -> anyhow::Result<()> {
 
     eprintln!(
         "{} {}",
-        "Using the prisma binary at".yellow(),
-        cmd.prisma_binary_path.bold()
+        "Using the query engine binary at".yellow(),
+        cmd.query_engine_binary_path.bold()
     );
 
-    let cmd = std::process::Command::new(&cmd.prisma_binary_path)
+    let cmd = std::process::Command::new(&cmd.query_engine_binary_path)
         .arg("cli")
         .arg("dmmf")
         .env("PRISMA_DML_PATH", schema_path)
