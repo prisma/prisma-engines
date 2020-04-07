@@ -10,7 +10,7 @@ async fn unapply_must_work(api: &TestApi) -> TestResult {
         }
     "#;
 
-    api.infer_apply(&dm1).send().await?;
+    api.infer_apply(&dm1).send().await?.assert_green()?;
 
     let result1 = api
         .assert_schema()
@@ -24,7 +24,7 @@ async fn unapply_must_work(api: &TestApi) -> TestResult {
         }
     "#;
 
-    api.infer_apply(&dm2).send().await?;
+    api.infer_apply(&dm2).send().await?.assert_green()?;
 
     let result2 = api
         .assert_schema()
@@ -36,7 +36,7 @@ async fn unapply_must_work(api: &TestApi) -> TestResult {
     api.assert_schema().await?.assert_equals(&result1)?;
 
     // reapply the migration again
-    api.infer_apply(&dm2).send().await?;
+    api.infer_apply(&dm2).send().await?.assert_green()?;
     api.assert_schema().await?.assert_equals(&result2).map(drop)
 }
 
@@ -49,7 +49,7 @@ async fn destructive_change_checks_run_on_unapply_migration(api: &TestApi) -> Te
         }
     "#;
 
-    api.infer_apply(dm1).send().await?;
+    api.infer_apply(dm1).send().await?.assert_green()?;
 
     // Insert data.
     let query = quaint_ast::Insert::single_into(api.render_table_name("Test"))

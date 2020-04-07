@@ -55,7 +55,7 @@ fn must_add_back_relation_fields_for_given_singular_field() {
 
     let post_model = schema.assert_has_model("Post");
     post_model
-        .assert_has_field("users")
+        .assert_has_field("user")
         .assert_relation_to("User")
         .assert_relation_to_fields(&[])
         .assert_arity(&datamodel::dml::FieldArity::List);
@@ -471,7 +471,7 @@ fn must_add_back_relation_fields_for_self_relations() {
         .assert_relation_to_fields(&["id"]);
 
     model
-        .assert_has_field("humans")
+        .assert_has_field("human")
         .assert_relation_to("Human")
         .assert_arity(&FieldArity::List)
         .assert_relation_to_fields(&[]);

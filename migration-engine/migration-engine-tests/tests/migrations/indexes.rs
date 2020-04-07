@@ -21,7 +21,7 @@ async fn index_on_compound_relation_fields_must_work(api: &TestApi) -> TestResul
         }
     "#;
 
-    api.infer_apply(dm).send_assert().await?.assert_green()?;
+    api.infer_apply(dm).send().await?.assert_green()?;
 
     api.assert_schema().await?.assert_table("Post", |table| {
         table
@@ -45,7 +45,7 @@ async fn index_settings_must_be_migrated(api: &TestApi) -> TestResult {
         }
     "#;
 
-    api.infer_apply(dm).send().await?;
+    api.infer_apply(dm).send().await?.assert_green()?;
 
     api.assert_schema().await?.assert_table("Test", |table| {
         table
@@ -63,7 +63,7 @@ async fn index_settings_must_be_migrated(api: &TestApi) -> TestResult {
         }
     "#;
 
-    api.infer_apply(dm2).send_assert().await?.assert_green()?;
+    api.infer_apply(dm2).send().await?.assert_green()?;
 
     api.assert_schema().await?.assert_table("Test", |table| {
         table
@@ -92,7 +92,7 @@ async fn unique_directive_on_required_one_to_one_relation_creates_one_index(api:
         }
     "#;
 
-    api.infer_apply(dm).send_assert().await?.assert_green()?;
+    api.infer_apply(dm).send().await?.assert_green()?;
 
     api.assert_schema()
         .await?
@@ -112,7 +112,7 @@ async fn one_to_many_self_relations_do_not_create_a_unique_index(api: &TestApi) 
         }
     "#;
 
-    api.infer_apply(dm).send_assert().await?.assert_green()?;
+    api.infer_apply(dm).send().await?.assert_green()?;
 
     if api.is_mysql() {
         // MySQL creates an index for the FK.

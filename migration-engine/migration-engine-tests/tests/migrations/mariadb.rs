@@ -18,7 +18,7 @@ async fn foreign_keys_to_indexes_being_renamed_must_work(api: &TestApi) -> TestR
         }
     "#;
 
-    api.infer_apply(dm1).send_assert().await?.assert_green()?;
+    api.infer_apply(dm1).send().await?.assert_green()?;
 
     api.assert_schema()
         .await?
@@ -56,7 +56,7 @@ async fn foreign_keys_to_indexes_being_renamed_must_work(api: &TestApi) -> TestR
         }
     "#;
 
-    api.infer_apply(dm2).send_assert().await?.assert_green()?;
+    api.infer_apply(dm2).send().await?.assert_green()?;
 
     api.assert_schema()
         .await?

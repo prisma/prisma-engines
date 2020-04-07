@@ -31,13 +31,9 @@ impl<'a> InferApply<'a> {
         self
     }
 
-    pub async fn send(self) -> Result<MigrationStepsResultOutput, anyhow::Error> {
-        Ok(self.send_inner().await?)
-    }
-
-    pub async fn send_assert(self) -> Result<InferApplyAssertion<'a>, anyhow::Error> {
+    pub async fn send(self) -> Result<InferApplyAssertion<'a>, anyhow::Error> {
         let api = self.api;
-        let result = self.send().await?;
+        let result = self.send_inner().await?;
 
         Ok(InferApplyAssertion { result, _api: api })
     }
