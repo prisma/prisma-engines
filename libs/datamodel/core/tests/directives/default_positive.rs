@@ -2,6 +2,8 @@ use crate::common::*;
 use chrono::{DateTime, Utc};
 use datamodel::{common::ScalarType, DefaultValue, ValueGenerator};
 use prisma_value::PrismaValue;
+use rust_decimal::prelude::FromPrimitive;
+use rust_decimal::Decimal;
 
 #[test]
 fn should_set_default_for_all_scalar_types() {
@@ -25,7 +27,9 @@ fn should_set_default_for_all_scalar_types() {
     user_model
         .assert_has_field("float")
         .assert_base_type(&ScalarType::Float)
-        .assert_default_value(DefaultValue::Single(PrismaValue::Float(3.into())));
+        .assert_default_value(DefaultValue::Single(PrismaValue::Float(
+            Decimal::from_f64(3.14.into()).unwrap(),
+        )));
 
     user_model
         .assert_has_field("string")

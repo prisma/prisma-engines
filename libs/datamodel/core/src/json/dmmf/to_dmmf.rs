@@ -140,16 +140,17 @@ fn value_to_serde(value: &PrismaValue) -> serde_json::Value {
         PrismaValue::Float(val) => serde_json::Value::Number(serde_json::Number::from_f64(0.into()).unwrap()), //todo
         PrismaValue::Int(val) => serde_json::Value::Number(serde_json::Number::from_f64(*val as f64).unwrap()),
         PrismaValue::DateTime(val) => serde_json::Value::String(val.to_rfc3339()),
-        PrismaValue::Null => serde_json::Value::String("todo".to_string()),
-        PrismaValue::Uuid(_) => serde_json::Value::String("todo".to_string()),
+        PrismaValue::Null => serde_json::Value::String("null".to_string()),
+        PrismaValue::Uuid(val) => serde_json::Value::String(val.to_string()),
         PrismaValue::List(_) => serde_json::Value::String("todo".to_string()),
+        // todo PrismaValue::List(value_vec) => serde_json::Value::String(serde_json::Array::from_vec(vec![])),
     }
 }
 
 fn function_to_serde(name: &str, args: &Vec<PrismaValue>) -> serde_json::Value {
     let func = Function {
         name: String::from(name),
-        args: vec![], //args.iter().map(|arg| value_to_serde(arg)).collect(),
+        args: args.iter().map(|arg| value_to_serde(arg)).collect(),
     };
 
     serde_json::to_value(&func).expect("Failed to render function JSON")
