@@ -1,8 +1,6 @@
 use crate::common::*;
-use datamodel::{
-    common::{ScalarType, ScalarValue},
-    dml,
-};
+use datamodel::{common::ScalarType, dml};
+use prisma_value::PrismaValue;
 
 #[test]
 fn should_not_remove_whitespace() {
@@ -19,7 +17,7 @@ fn should_not_remove_whitespace() {
     user_model
         .assert_has_field("firstName")
         .assert_base_type(&ScalarType::String)
-        .assert_default_value(dml::DefaultValue::Single(ScalarValue::String(String::from(
+        .assert_default_value(dml::DefaultValue::Single(PrismaValue::String(String::from(
             "This is a string with whitespace",
         ))));
 }
@@ -39,7 +37,7 @@ fn should_not_try_to_interpret_comments_in_strings() {
     user_model
         .assert_has_field("firstName")
         .assert_base_type(&ScalarType::String)
-        .assert_default_value(dml::DefaultValue::Single(ScalarValue::String(String::from(
+        .assert_default_value(dml::DefaultValue::Single(PrismaValue::String(String::from(
             "This is a string with a // Comment",
         ))));
 }

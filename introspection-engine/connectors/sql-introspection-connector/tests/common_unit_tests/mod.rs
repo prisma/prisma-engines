@@ -1,9 +1,9 @@
 use datamodel::{
-    common::{ScalarType, ScalarValue},
-    dml, Datamodel, DefaultValue as DMLDefault, Field, FieldArity, FieldType, IndexDefinition, Model, OnDeleteStrategy,
-    RelationInfo, ValueGenerator,
+    common::ScalarType, dml, Datamodel, DefaultValue as DMLDefault, Field, FieldArity, FieldType, IndexDefinition,
+    Model, OnDeleteStrategy, RelationInfo, ValueGenerator,
 };
 use pretty_assertions::assert_eq;
+use prisma_value::PrismaValue;
 use sql_introspection_connector::calculate_datamodel::calculate_model;
 use sql_schema_describer::*;
 
@@ -245,7 +245,7 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
                     arity: FieldArity::Optional,
                     field_type: FieldType::Base(ScalarType::Int, None),
                     database_names: Vec::new(),
-                    default_value: Some(dml::DefaultValue::Single(ScalarValue::Int(1))),
+                    default_value: Some(dml::DefaultValue::Single(PrismaValue::Int(1))),
                     is_unique: false,
                     is_id: false,
                     documentation: None,
@@ -259,7 +259,7 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
                     arity: FieldArity::Optional,
                     field_type: FieldType::Base(ScalarType::Boolean, None),
                     database_names: Vec::new(),
-                    default_value: Some(dml::DefaultValue::Single(ScalarValue::Boolean(true))),
+                    default_value: Some(dml::DefaultValue::Single(PrismaValue::Boolean(true))),
                     is_unique: false,
                     is_id: false,
                     documentation: None,
@@ -273,7 +273,7 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
                     arity: FieldArity::Optional,
                     field_type: FieldType::Base(ScalarType::Float, None),
                     database_names: Vec::new(),
-                    default_value: Some(dml::DefaultValue::Single(ScalarValue::Float(1.0))),
+                    default_value: Some(dml::DefaultValue::Single(PrismaValue::Float(1.into()))),
                     is_unique: false,
                     is_id: false,
                     documentation: None,
@@ -287,7 +287,7 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
                     arity: FieldArity::Optional,
                     field_type: FieldType::Base(ScalarType::String, None),
                     database_names: Vec::new(),
-                    default_value: Some(dml::DefaultValue::Single(ScalarValue::String("default".to_string()))),
+                    default_value: Some(dml::DefaultValue::Single(PrismaValue::String("default".to_string()))),
                     is_unique: false,
                     is_id: false,
                     documentation: None,

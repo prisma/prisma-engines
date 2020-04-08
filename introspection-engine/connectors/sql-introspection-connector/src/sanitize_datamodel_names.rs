@@ -1,5 +1,6 @@
-use datamodel::{Datamodel, DefaultValue, FieldType, ScalarValue, ValueGenerator};
+use datamodel::{Datamodel, DefaultValue, FieldType, ValueGenerator};
 use once_cell::sync::Lazy;
+use prisma_value::PrismaValue;
 use regex::Regex;
 use std::collections::HashMap;
 
@@ -50,13 +51,13 @@ pub fn sanitize_datamodel_names(datamodel: &mut Datamodel) {
 
                     *enum_name = sanitized_enum_name;
 
-                    if let Some(DefaultValue::Single(ScalarValue::ConstantLiteral(value))) = &mut field.default_value {
+                    if let Some(DefaultValue::Single(PrismaValue::Enum(value))) = &mut field.default_value {
                         let (sanitized_value, _) = sanitize_name(value.to_string());
 
                         field.default_value = if sanitized_value == "".to_string() {
                             Some(DefaultValue::Expression(ValueGenerator::new_dbgenerated()))
                         } else {
-                            Some(DefaultValue::Single(ScalarValue::ConstantLiteral(sanitized_value)))
+                            Some(DefaultValue::Single(PrismaValue::Enum(sanitized_value)))
                         };
                     };
 

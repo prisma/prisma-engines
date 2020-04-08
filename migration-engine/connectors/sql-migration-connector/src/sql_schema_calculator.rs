@@ -5,6 +5,7 @@ use datamodel::common::*;
 use datamodel::*;
 use datamodel_helpers::{FieldRef, ModelRef, TypeRef};
 use prisma_models::{DatamodelConverter, TempManifestationHolder, TempRelationHolder};
+use prisma_value::PrismaValue;
 use quaint::prelude::SqlFamily;
 use sql_schema_describer::{self as sql, ColumnArity};
 
@@ -337,20 +338,17 @@ fn migration_value_new(field: &FieldRef<'_>) -> Option<sql_schema_describer::Def
     };
 
     let result = match value {
-        ScalarValue::Boolean(x) => if x { "true" } else { "false" }.to_string(),
-        ScalarValue::Int(x) => x.to_string(),
-        ScalarValue::Float(x) => x.to_string(),
-        ScalarValue::Decimal(x) => x.to_string(),
-        ScalarValue::String(x) => x,
-
-        ScalarValue::DateTime(x) => {
+        PrismaValue::Boolean(x) => if x { "true" } else { "false" }.to_string(),
+        PrismaValue::Int(x) => x.to_string(),
+        PrismaValue::Float(x) => x.to_string(),
+        PrismaValue::String(x) => x,
+        PrismaValue::DateTime(x) => {
             // TODO: use a proper format string instead.
             let mut raw = x.to_string(); // this will produce a String 1970-01-01 00:00:00 UTC
             raw.truncate(raw.len() - 4); // strip the UTC suffix
             raw
         }
-
-        ScalarValue::ConstantLiteral(x) => match field.field_type() {
+        PrismaValue::Enum(x) => match field.field_type() {
             TypeRef::Enum(inum) => {
                 let corresponding_value = inum
                     .values()
@@ -362,6 +360,7 @@ fn migration_value_new(field: &FieldRef<'_>) -> Option<sql_schema_describer::Def
             }
             _ => unreachable!("Constant default on non-enum field."),
         },
+        _ => todo!(),
     };
 
     Some(sql_schema_describer::DefaultValue::VALUE(result))
@@ -410,7 +409,6 @@ fn column_type_for_scalar_type(scalar_type: &ScalarType, column_arity: ColumnAri
         ScalarType::Boolean => sql::ColumnType::pure(sql::ColumnTypeFamily::Boolean, column_arity),
         ScalarType::String => sql::ColumnType::pure(sql::ColumnTypeFamily::String, column_arity),
         ScalarType::DateTime => sql::ColumnType::pure(sql::ColumnTypeFamily::DateTime, column_arity),
-        ScalarType::Decimal => unimplemented!(),
     }
 }
 

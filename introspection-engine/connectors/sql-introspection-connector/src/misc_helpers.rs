@@ -254,14 +254,13 @@ pub(crate) fn calculate_default(table: &Table, column: &Column, arity: &FieldAri
             false => parse_int(val).map(|x| DMLDef::Single(PrismaValue::Int(x))),
         },
         (Some(SQLDef::VALUE(val)), ColumnTypeFamily::Float) => {
-            parse_float(val).map(|x| DMLDef::Single(PrismaValue::Float(x)))
+            parse_float(val).map(|x| DMLDef::Single(PrismaValue::Float(0.into())))
+            //todo
         }
         (Some(SQLDef::VALUE(val)), ColumnTypeFamily::String) => Some(DMLDef::Single(PrismaValue::String(val.into()))),
         (Some(SQLDef::NOW), ColumnTypeFamily::DateTime) => Some(DMLDef::Expression(VG::new_now())),
         (Some(SQLDef::VALUE(_)), ColumnTypeFamily::DateTime) => Some(DMLDef::Expression(VG::new_dbgenerated())), //todo parse datetime value
-        (Some(SQLDef::VALUE(val)), ColumnTypeFamily::Enum(_)) => {
-            Some(DMLDef::Single(PrismaValue::ConstantLiteral(val.into())))
-        }
+        (Some(SQLDef::VALUE(val)), ColumnTypeFamily::Enum(_)) => Some(DMLDef::Single(PrismaValue::Enum(val.into()))),
         (_, _) => None,
     }
 }
@@ -380,7 +379,7 @@ fn parse_int(value: &str) -> Option<i64> {
 
     let captures = rslt.expect("get captures");
     let num_str = captures.get(1).expect("get capture").as_str();
-    let num_rslt = num_str.parse::<i32>();
+    let num_rslt = num_str.parse::<i64>();
     match num_rslt {
         Ok(num) => Some(num),
         Err(_) => {

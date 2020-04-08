@@ -2530,6 +2530,7 @@ dependencies = [
  "datamodel",
  "migration-connector",
  "prisma-models",
+ "prisma-value",
  "quaint",
  "serde",
  "serde_json",
