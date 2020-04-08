@@ -6,9 +6,11 @@ use log::debug;
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
 use regex::Regex;
+use rust_decimal::Decimal;
 use sql_schema_describer::{
     Column, ColumnArity, ColumnTypeFamily, DefaultValue as SQLDef, ForeignKey, Index, IndexType, SqlSchema, Table,
 };
+use std::str::FromStr;
 
 //checks
 
@@ -254,8 +256,7 @@ pub(crate) fn calculate_default(table: &Table, column: &Column, arity: &FieldAri
             false => parse_int(val).map(|x| DMLDef::Single(PrismaValue::Int(x))),
         },
         (Some(SQLDef::VALUE(val)), ColumnTypeFamily::Float) => {
-            parse_float(val).map(|x| DMLDef::Single(PrismaValue::Float(0.into())))
-            //todo
+            parse_float(val).map(|x| DMLDef::Single(PrismaValue::Float(x)))
         }
         (Some(SQLDef::VALUE(val)), ColumnTypeFamily::String) => Some(DMLDef::Single(PrismaValue::String(val.into()))),
         (Some(SQLDef::NOW), ColumnTypeFamily::DateTime) => Some(DMLDef::Expression(VG::new_now())),
@@ -394,23 +395,12 @@ fn parse_bool(value: &str) -> Option<bool> {
     value.to_lowercase().parse().ok()
 }
 
-static RE_FLOAT: Lazy<Regex> = Lazy::new(|| Regex::new(r"^'?([^']+)'?$").expect("compile regex"));
-
-fn parse_float(value: &str) -> Option<f64> {
+fn parse_float(value: &str) -> Option<Decimal> {
     debug!("Parsing float '{}'", value);
-    let rslt = RE_FLOAT.captures(value);
-    if rslt.is_none() {
-        debug!("Couldn't parse float");
-        return None;
-    }
-
-    let captures = rslt.expect("get captures");
-    let num_str = captures.get(1).expect("get capture").as_str();
-    let num_rslt = num_str.parse::<f64>();
-    match num_rslt {
+    match Decimal::from_str(value) {
         Ok(num) => Some(num),
         Err(_) => {
-            debug!("Couldn't parse float '{}'", num_str);
+            debug!("Couldn't parse float '{}'", value);
             None
         }
     }

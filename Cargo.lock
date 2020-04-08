@@ -2506,6 +2506,7 @@ dependencies = [
  "prisma-value",
  "quaint",
  "regex",
+ "rust_decimal",
  "serde",
  "serde_json",
  "sql-schema-describer",
