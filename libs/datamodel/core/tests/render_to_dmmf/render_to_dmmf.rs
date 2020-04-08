@@ -23,7 +23,7 @@ fn test_dmmf_rendering() {
         //        println!("DMMF: \n{}", dmmf_string);
         assert_eq_json(
             &dmmf_string,
-            &load_from_file(format!("{}.txt", test_case).as_str()),
+            &load_from_file(format!("{}.json", test_case).as_str()),
             test_case,
         );
     }

@@ -26,6 +26,8 @@ pub struct Field {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub relation_name: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub relation_from_fields: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub relation_to_fields: Option<Vec<String>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub relation_on_delete: Option<String>,

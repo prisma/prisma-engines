@@ -91,6 +91,7 @@ fn field_to_dmmf(model: &dml::Model, field: &dml::Field) -> Field {
         default: default_value_to_serde(&field.default_value),
         is_unique: field.is_unique,
         relation_name: get_relation_name(field),
+        relation_from_fields: get_relation_from_fields(field),
         relation_to_fields: get_relation_to_fields(field),
         relation_on_delete: get_relation_delete_strategy(field),
         field_type: get_field_type(field),
@@ -154,6 +155,13 @@ fn function_to_serde(name: &str, args: &Vec<dml::ScalarValue>) -> serde_json::Va
 fn get_relation_name(field: &dml::Field) -> Option<String> {
     match &field.field_type {
         dml::FieldType::Relation(relation_info) => Some(relation_info.name.clone()),
+        _ => None,
+    }
+}
+
+fn get_relation_from_fields(field: &dml::Field) -> Option<Vec<String>> {
+    match &field.field_type {
+        dml::FieldType::Relation(relation_info) => Some(relation_info.fields.clone()),
         _ => None,
     }
 }
