@@ -1,6 +1,7 @@
 use super::*;
 use crate::common::ScalarType;
 use crate::{dml, IndexType};
+use prisma_value::PrismaValue;
 use serde_json;
 
 pub fn render_to_dmmf(schema: &dml::Datamodel) -> String {
@@ -131,22 +132,24 @@ fn default_value_to_serde(dv_opt: &Option<dml::DefaultValue>) -> Option<serde_js
     })
 }
 
-fn value_to_serde(value: &dml::ScalarValue) -> serde_json::Value {
+fn value_to_serde(value: &PrismaValue) -> serde_json::Value {
     match value {
-        dml::ScalarValue::Boolean(val) => serde_json::Value::Bool(*val),
-        dml::ScalarValue::String(val) => serde_json::Value::String(val.clone()),
-        dml::ScalarValue::ConstantLiteral(name) => serde_json::Value::String(name.clone()),
-        dml::ScalarValue::Float(val) => serde_json::Value::Number(serde_json::Number::from_f64(*val as f64).unwrap()),
-        dml::ScalarValue::Int(val) => serde_json::Value::Number(serde_json::Number::from_f64(*val as f64).unwrap()),
-        dml::ScalarValue::Decimal(val) => serde_json::Value::Number(serde_json::Number::from_f64(*val as f64).unwrap()),
-        dml::ScalarValue::DateTime(val) => serde_json::Value::String(val.to_rfc3339()),
+        PrismaValue::Boolean(val) => serde_json::Value::Bool(*val),
+        PrismaValue::String(val) => serde_json::Value::String(val.clone()),
+        PrismaValue::Enum(name) => serde_json::Value::String(name.clone()),
+        PrismaValue::Float(val) => serde_json::Value::Number(serde_json::Number::from_f64(0.into()).unwrap()), //todo
+        PrismaValue::Int(val) => serde_json::Value::Number(serde_json::Number::from_f64(*val as f64).unwrap()),
+        PrismaValue::DateTime(val) => serde_json::Value::String(val.to_rfc3339()),
+        PrismaValue::Null => serde_json::Value::String("todo".to_string()),
+        PrismaValue::Uuid(_) => serde_json::Value::String("todo".to_string()),
+        PrismaValue::List(_) => serde_json::Value::String("todo".to_string()),
     }
 }
 
-fn function_to_serde(name: &str, args: &Vec<dml::ScalarValue>) -> serde_json::Value {
+fn function_to_serde(name: &str, args: &Vec<PrismaValue>) -> serde_json::Value {
     let func = Function {
         name: String::from(name),
-        args: args.iter().map(|arg| value_to_serde(arg)).collect(),
+        args: vec![], //args.iter().map(|arg| value_to_serde(arg)).collect(),
     };
 
     serde_json::to_value(&func).expect("Failed to render function JSON")

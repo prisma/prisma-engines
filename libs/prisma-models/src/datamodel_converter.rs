@@ -419,7 +419,6 @@ impl DatamodelFieldExtensions for dml::Field {
             dml::FieldType::Base(scalar, _) => match scalar {
                 dml::ScalarType::Boolean => TypeIdentifier::Boolean,
                 dml::ScalarType::DateTime => TypeIdentifier::DateTime,
-                dml::ScalarType::Decimal => TypeIdentifier::Float,
                 dml::ScalarType::Float => TypeIdentifier::Float,
                 dml::ScalarType::Int => TypeIdentifier::Int,
                 dml::ScalarType::String => TypeIdentifier::String,

@@ -1,9 +1,10 @@
 use datamodel::{
     Datamodel, DefaultValue as DMLDef, Field, FieldArity, FieldType, IndexDefinition, Model, OnDeleteStrategy,
-    RelationInfo, ScalarType, ScalarValue as SV, ValueGenerator as VG,
+    RelationInfo, ScalarType, ValueGenerator as VG,
 };
 use log::debug;
 use once_cell::sync::Lazy;
+use prisma_value::PrismaValue;
 use regex::Regex;
 use sql_schema_describer::{
     Column, ColumnArity, ColumnTypeFamily, DefaultValue as SQLDef, ForeignKey, Index, IndexType, SqlSchema, Table,
@@ -244,19 +245,23 @@ pub(crate) fn calculate_default(table: &Table, column: &Column, arity: &FieldAri
         (Some(SQLDef::DBGENERATED(_)), _) => Some(DMLDef::Expression(VG::new_dbgenerated())),
         (Some(SQLDef::SEQUENCE(_)), _) => Some(DMLDef::Expression(VG::new_autoincrement())),
         (Some(SQLDef::VALUE(val)), ColumnTypeFamily::Boolean) => match parse_int(val) {
-            Some(x) => Some(DMLDef::Single(SV::Boolean(x != 0))),
-            None => parse_bool(val).map(|b| DMLDef::Single(SV::Boolean(b))),
+            Some(x) => Some(DMLDef::Single(PrismaValue::Boolean(x != 0))),
+            None => parse_bool(val).map(|b| DMLDef::Single(PrismaValue::Boolean(b))),
         },
         (Some(SQLDef::VALUE(val)), ColumnTypeFamily::Int) => match column.auto_increment {
             true => Some(DMLDef::Expression(VG::new_autoincrement())),
             _ if is_sequence(column, table) => Some(DMLDef::Expression(VG::new_autoincrement())),
-            false => parse_int(val).map(|x| DMLDef::Single(SV::Int(x))),
+            false => parse_int(val).map(|x| DMLDef::Single(PrismaValue::Int(x))),
         },
-        (Some(SQLDef::VALUE(val)), ColumnTypeFamily::Float) => parse_float(val).map(|x| DMLDef::Single(SV::Float(x))),
-        (Some(SQLDef::VALUE(val)), ColumnTypeFamily::String) => Some(DMLDef::Single(SV::String(val.into()))),
+        (Some(SQLDef::VALUE(val)), ColumnTypeFamily::Float) => {
+            parse_float(val).map(|x| DMLDef::Single(PrismaValue::Float(x)))
+        }
+        (Some(SQLDef::VALUE(val)), ColumnTypeFamily::String) => Some(DMLDef::Single(PrismaValue::String(val.into()))),
         (Some(SQLDef::NOW), ColumnTypeFamily::DateTime) => Some(DMLDef::Expression(VG::new_now())),
         (Some(SQLDef::VALUE(_)), ColumnTypeFamily::DateTime) => Some(DMLDef::Expression(VG::new_dbgenerated())), //todo parse datetime value
-        (Some(SQLDef::VALUE(val)), ColumnTypeFamily::Enum(_)) => Some(DMLDef::Single(SV::ConstantLiteral(val.into()))),
+        (Some(SQLDef::VALUE(val)), ColumnTypeFamily::Enum(_)) => {
+            Some(DMLDef::Single(PrismaValue::ConstantLiteral(val.into())))
+        }
         (_, _) => None,
     }
 }
@@ -365,7 +370,7 @@ pub fn deduplicate_field_names(datamodel: &mut Datamodel) {
 
 static RE_NUM: Lazy<Regex> = Lazy::new(|| Regex::new(r"^'?(\d+)'?$").expect("compile regex"));
 
-fn parse_int(value: &str) -> Option<i32> {
+fn parse_int(value: &str) -> Option<i64> {
     debug!("Parsing int '{}'", value);
     let rslt = RE_NUM.captures(value);
     if rslt.is_none() {
