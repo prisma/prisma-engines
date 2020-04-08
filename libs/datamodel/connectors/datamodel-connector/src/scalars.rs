@@ -1,4 +1,3 @@
-use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
 /// Prisma's builtin scalar types.
@@ -34,15 +33,4 @@ impl ToString for ScalarType {
             ScalarType::DateTime => String::from("DateTime"),
         }
     }
-}
-
-/// Value types for Prisma's builtin scalar types.
-#[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
-pub enum ScalarValue {
-    Int(i64),
-    Float(f64),
-    Boolean(bool),
-    String(String),
-    DateTime(DateTime<Utc>),
-    ConstantLiteral(String),
 }

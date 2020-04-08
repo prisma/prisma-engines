@@ -446,7 +446,6 @@ dependencies = [
 name = "datamodel-connector"
 version = "0.1.0"
 dependencies = [
- "chrono",
  "serde",
 ]
 
