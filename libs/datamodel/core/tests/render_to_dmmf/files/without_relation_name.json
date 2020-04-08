@@ -30,6 +30,7 @@
           "isReadOnly": false,
           "type": "Post",
           "relationName": "PostToUser",
+          "relationFromFields": [],
           "relationToFields": [],
           "relationOnDelete": "NONE",
           "isGenerated": false,
@@ -82,6 +83,9 @@
           "isReadOnly": false,
           "type": "User",
           "relationName": "PostToUser",
+          "relationFromFields": [
+            "userId"
+          ],
           "relationToFields": [
             "id"
           ],

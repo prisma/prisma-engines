@@ -88,6 +88,7 @@
           "isReadOnly": false,
           "type": "Post",
           "relationName": "author",
+          "relationFromFields": [],
           "relationToFields": [],
           "relationOnDelete": "NONE",
           "isGenerated": false,
@@ -104,6 +105,7 @@
           "isReadOnly": false,
           "type": "Profile",
           "relationName": "ProfileToUser",
+          "relationFromFields": [],
           "relationToFields": [],
           "relationOnDelete": "NONE",
           "isGenerated": false,
@@ -156,6 +158,9 @@
           "isReadOnly": false,
           "type": "User",
           "relationName": "ProfileToUser",
+          "relationFromFields": [
+            "userId"
+          ],
           "relationToFields": [
             "id"
           ],
@@ -291,6 +296,9 @@
           "isReadOnly": false,
           "type": "User",
           "relationName": "author",
+          "relationFromFields": [
+            "authorId"
+          ],
           "relationToFields": [
             "id"
           ],
@@ -309,6 +317,7 @@
           "isReadOnly": false,
           "type": "PostToCategory",
           "relationName": "PostToPostToCategory",
+          "relationFromFields": [],
           "relationToFields": [],
           "relationOnDelete": "NONE",
           "isGenerated": false,
@@ -364,6 +373,7 @@
           "isReadOnly": false,
           "type": "PostToCategory",
           "relationName": "CategoryToPostToCategory",
+          "relationFromFields": [],
           "relationToFields": [],
           "relationOnDelete": "NONE",
           "isGenerated": false,
@@ -455,6 +465,10 @@
           "isReadOnly": false,
           "type": "Post",
           "relationName": "PostToPostToCategory",
+          "relationFromFields": [
+            "postTitle",
+            "postCreatedAt"
+          ],
           "relationToFields": [
             "title",
             "createdAt"
@@ -474,6 +488,9 @@
           "isReadOnly": false,
           "type": "Category",
           "relationName": "CategoryToPostToCategory",
+          "relationFromFields": [
+            "categoryId"
+          ],
           "relationToFields": [
             "id"
           ],
@@ -528,6 +545,9 @@
           "isReadOnly": false,
           "type": "B",
           "relationName": "AToB",
+          "relationFromFields": [
+            "bId"
+          ],
           "relationToFields": [
             "id"
           ],
@@ -569,6 +589,7 @@
           "isReadOnly": false,
           "type": "A",
           "relationName": "AToB",
+          "relationFromFields": [],
           "relationToFields": [],
           "relationOnDelete": "NONE",
           "isGenerated": false,
