@@ -360,7 +360,9 @@ fn migration_value_new(field: &FieldRef<'_>) -> Option<sql_schema_describer::Def
             }
             _ => unreachable!("Constant default on non-enum field."),
         },
-        _ => todo!(),
+        PrismaValue::Null => "NULL".to_string(),
+        PrismaValue::Uuid(x) => x.to_string(),
+        PrismaValue::List(x) => "[]".to_string(), //todo
     };
 
     Some(sql_schema_describer::DefaultValue::VALUE(result))
