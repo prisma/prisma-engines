@@ -18,7 +18,7 @@ tokio = "0.2"
 
 [dependencies.quaint]
 git = "https://github.com/prisma/quaint"
-features = ["full", "tracing-log"]
+features = ["full", "tracing-log", "serde-support"]
 
 [dependencies.connector-interface]
 path = "../query-connector"
