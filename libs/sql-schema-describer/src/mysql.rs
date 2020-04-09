@@ -222,23 +222,23 @@ async fn get_all_columns(conn: &dyn Queryable, schema_name: &str) -> HashMap<Str
                 Some(x) if x == "NULL" => None,
                 Some(default_string) => {
                     Some(match &tpe.family {
-                        ColumnTypeFamily::Int => match parse_int(&default_string).is_some() {
-                            true => DefaultValue::VALUE(default_string),
-                            false => DefaultValue::DBGENERATED(default_string),
+                        ColumnTypeFamily::Int => match parse_int(&default_string) {
+                            Some(int_value) => DefaultValue::VALUE(int_value),
+                            None => DefaultValue::DBGENERATED(default_string),
                         },
-                        ColumnTypeFamily::Float => match parse_float(&default_string).is_some() {
-                            true => DefaultValue::VALUE(default_string),
-                            false => DefaultValue::DBGENERATED(default_string),
+                        ColumnTypeFamily::Float => match parse_float(&default_string) {
+                            Some(float_value) => DefaultValue::VALUE(float_value),
+                            None => DefaultValue::DBGENERATED(default_string),
                         },
                         ColumnTypeFamily::Boolean => match parse_int(&default_string) {
-                            Some(1) => DefaultValue::VALUE(default_string),
-                            Some(0) => DefaultValue::VALUE(default_string),
+                            Some(PrismaValue::Int(1)) => DefaultValue::VALUE(PrismaValue::Boolean(true)),
+                            Some(PrismaValue::Int(0)) => DefaultValue::VALUE(PrismaValue::Boolean(false)),
                             _ => DefaultValue::DBGENERATED(default_string),
                         },
                         //todo Maria DB does not seem to quote the strings, but it allows functions which MySQL doesnt
                         ColumnTypeFamily::String => match &default_string.starts_with("'") {
-                            true => DefaultValue::VALUE(unquote(default_string)),
-                            false => DefaultValue::VALUE(default_string),
+                            true => DefaultValue::VALUE(PrismaValue::String(unquote(default_string))),
+                            false => DefaultValue::VALUE(PrismaValue::String(default_string)),
                         },
                         //todo check other now() definitions
                         ColumnTypeFamily::DateTime => match default_string.to_lowercase()
@@ -255,9 +255,9 @@ async fn get_all_columns(conn: &dyn Queryable, schema_name: &str) -> HashMap<Str
                         ColumnTypeFamily::LogSequenceNumber => DefaultValue::DBGENERATED(default_string),
                         ColumnTypeFamily::TextSearch => DefaultValue::DBGENERATED(default_string),
                         ColumnTypeFamily::TransactionId => DefaultValue::DBGENERATED(default_string),
-                        ColumnTypeFamily::Enum(_) => {
-                            DefaultValue::VALUE(unquote(default_string.replace("_utf8mb4", "").replace("\\\'", "")))
-                        }
+                        ColumnTypeFamily::Enum(_) => DefaultValue::VALUE(PrismaValue::Enum(unquote(
+                            default_string.replace("_utf8mb4", "").replace("\\\'", ""),
+                        ))),
                         ColumnTypeFamily::Unsupported(_) => DefaultValue::DBGENERATED(default_string),
                     })
                 }

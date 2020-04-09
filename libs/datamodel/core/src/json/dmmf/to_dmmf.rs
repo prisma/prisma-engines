@@ -143,7 +143,7 @@ fn value_to_serde(value: &PrismaValue) -> serde_json::Value {
         }
         PrismaValue::Int(val) => serde_json::Value::Number(serde_json::Number::from_f64(*val as f64).unwrap()),
         PrismaValue::DateTime(val) => serde_json::Value::String(val.to_rfc3339()),
-        PrismaValue::Null => serde_json::Value::String("null".to_string()),
+        PrismaValue::Null => serde_json::Value::Null,
         PrismaValue::Uuid(val) => serde_json::Value::String(val.to_string()),
         PrismaValue::List(value_vec) => {
             serde_json::Value::Array(value_vec.iter().map(|pv| value_to_serde(pv)).collect())

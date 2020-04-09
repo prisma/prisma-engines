@@ -86,7 +86,7 @@ impl ValueGeneratorFn {
     }
 
     fn generate_uuid() -> Option<PrismaValue> {
-        Some(PrismaValue::String(Uuid::new_v4().to_string()))
+        Some(PrismaValue::Uuid(Uuid::new_v4()))
     }
 
     fn generate_now() -> Option<PrismaValue> {

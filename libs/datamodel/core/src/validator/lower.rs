@@ -137,13 +137,12 @@ impl LowerDmlToAst {
             PrismaValue::DateTime(value) => ast::Expression::ConstantValue(value.to_rfc3339(), ast::Span::empty()),
             PrismaValue::Float(value) => ast::Expression::NumericValue(value.to_string(), ast::Span::empty()),
             PrismaValue::Int(value) => ast::Expression::NumericValue(value.to_string(), ast::Span::empty()),
-            PrismaValue::Null => ast::Expression::StringValue("null".to_string(), ast::Span::empty()),
+            PrismaValue::Null => ast::Expression::ConstantValue("null".to_string(), ast::Span::empty()),
             PrismaValue::Uuid(val) => ast::Expression::StringValue(val.to_string(), ast::Span::empty()),
-            PrismaValue::List(_) => ast::Expression::StringValue("null".to_string(), ast::Span::empty()),
-            // PrismaValue::List(vec) => ast::Expression::Array(
-            //     vec.iter().map(|pv| lower_prisma_value(pv)).collect(),
-            //     ast::Span::empty(),
-            // ),
+            PrismaValue::List(vec) => ast::Expression::Array(
+                vec.iter().map(|pv| Self::lower_prisma_value(pv)).collect(),
+                ast::Span::empty(),
+            ),
         }
     }
 

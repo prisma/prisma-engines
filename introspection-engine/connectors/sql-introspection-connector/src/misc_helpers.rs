@@ -3,7 +3,6 @@ use datamodel::{
     RelationInfo, ScalarType, ValueGenerator as VG,
 };
 use log::debug;
-use prisma_value::PrismaValue;
 use sql_schema_describer::{
     Column, ColumnArity, ColumnTypeFamily, DefaultValue as SQLDef, ForeignKey, Index, IndexType, SqlSchema, Table,
 };
@@ -239,24 +238,13 @@ pub(crate) fn calculate_backrelation_field(
 pub(crate) fn calculate_default(table: &Table, column: &Column, arity: &FieldArity) -> Option<DMLDef> {
     match (&column.default, &column.tpe.family) {
         (_, _) if *arity == FieldArity::List => None,
-        (None, _) if column.auto_increment => Some(DMLDef::Expression(VG::new_autoincrement())),
-        (Some(SQLDef::DBGENERATED(_)), _) => Some(DMLDef::Expression(VG::new_dbgenerated())),
+        (_, ColumnTypeFamily::Int) if column.auto_increment => Some(DMLDef::Expression(VG::new_autoincrement())),
+        (_, ColumnTypeFamily::Int) if is_sequence(column, table) => Some(DMLDef::Expression(VG::new_autoincrement())),
         (Some(SQLDef::SEQUENCE(_)), _) => Some(DMLDef::Expression(VG::new_autoincrement())),
-        (Some(SQLDef::VALUE(val)), ColumnTypeFamily::Boolean) => match PrismaValue::parse_int(val) {
-            Some(x) => Some(DMLDef::Single(PrismaValue::Boolean(x != PrismaValue::Int(0)))),
-            None => PrismaValue::parse_bool(val).map(|b| DMLDef::Single(b)),
-        },
-        (Some(SQLDef::VALUE(val)), ColumnTypeFamily::Int) => match column.auto_increment {
-            true => Some(DMLDef::Expression(VG::new_autoincrement())),
-            _ if is_sequence(column, table) => Some(DMLDef::Expression(VG::new_autoincrement())),
-            false => PrismaValue::parse_int(val).map(|x| DMLDef::Single(x)),
-        },
-        (Some(SQLDef::VALUE(val)), ColumnTypeFamily::Float) => PrismaValue::parse_float(val).map(|x| DMLDef::Single(x)),
-        (Some(SQLDef::VALUE(val)), ColumnTypeFamily::String) => Some(DMLDef::Single(PrismaValue::String(val.into()))),
         (Some(SQLDef::NOW), ColumnTypeFamily::DateTime) => Some(DMLDef::Expression(VG::new_now())),
-        (Some(SQLDef::VALUE(_)), ColumnTypeFamily::DateTime) => Some(DMLDef::Expression(VG::new_dbgenerated())), //todo parse datetime value
-        (Some(SQLDef::VALUE(val)), ColumnTypeFamily::Enum(_)) => Some(DMLDef::Single(PrismaValue::Enum(val.into()))),
-        (_, _) => None,
+        (Some(SQLDef::DBGENERATED(_)), _) => Some(DMLDef::Expression(VG::new_dbgenerated())),
+        (Some(SQLDef::VALUE(val)), _) => Some(DMLDef::Single(val.clone())),
+        _ => None,
     }
 }
 

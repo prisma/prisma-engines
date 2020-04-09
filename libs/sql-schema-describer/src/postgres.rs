@@ -212,24 +212,26 @@ impl SqlSchemaDescriber {
                     None => None,
                     Some(default_string) => {
                         Some(match &tpe.family {
-                            ColumnTypeFamily::Int => match parse_int(&default_string).is_some() {
-                                true => DefaultValue::VALUE(default_string),
-                                false => match is_autoincrement(&default_string, schema, &table_name, &col_name) {
+                            ColumnTypeFamily::Int => match parse_int(&default_string) {
+                                Some(int_value) => DefaultValue::VALUE(int_value),
+                                None => match is_autoincrement(&default_string, schema, &table_name, &col_name) {
                                     true => DefaultValue::SEQUENCE(default_string),
                                     false => DefaultValue::DBGENERATED(default_string),
                                 },
                             },
-                            ColumnTypeFamily::Float => match parse_float(&default_string).is_some() {
-                                true => DefaultValue::VALUE(default_string),
-                                false => DefaultValue::DBGENERATED(default_string),
+                            ColumnTypeFamily::Float => match parse_float(&default_string) {
+                                Some(float_value) => DefaultValue::VALUE(float_value),
+                                None => DefaultValue::DBGENERATED(default_string),
                             },
-                            ColumnTypeFamily::Boolean => match parse_bool(&default_string).is_some() {
-                                true => DefaultValue::VALUE(default_string),
-                                false => DefaultValue::DBGENERATED(default_string),
+                            ColumnTypeFamily::Boolean => match parse_bool(&default_string) {
+                                Some(bool_value) => DefaultValue::VALUE(bool_value),
+                                None => DefaultValue::DBGENERATED(default_string),
                             },
                             ColumnTypeFamily::String => {
                                 match unsuffix_default_literal(&default_string, &data_type, &full_data_type) {
-                                    Some(default_literal) => DefaultValue::VALUE(unquote(default_literal).into_owned()),
+                                    Some(default_literal) => {
+                                        DefaultValue::VALUE(PrismaValue::String(unquote(default_literal).into_owned()))
+                                    }
                                     None => DefaultValue::DBGENERATED(default_string),
                                 }
                             }
@@ -251,9 +253,9 @@ impl SqlSchemaDescriber {
                             ColumnTypeFamily::Enum(enum_name) => {
                                 let enum_suffix = format!("::{}", enum_name);
                                 match default_string.ends_with(&enum_suffix) {
-                                    true => DefaultValue::VALUE(
+                                    true => DefaultValue::VALUE(PrismaValue::Enum(
                                         unquote(&default_string.replace(&enum_suffix, "")).into_owned(),
-                                    ),
+                                    )),
                                     false => DefaultValue::DBGENERATED(default_string),
                                 }
                             }
