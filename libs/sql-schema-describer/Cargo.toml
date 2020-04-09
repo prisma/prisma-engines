@@ -13,6 +13,7 @@ log = "0.4"
 regex = "1.2"
 async-trait = "0.1.17"
 once_cell = "1.3"
+rust_decimal = "=1.1.0"
 
 [dependencies.quaint]
 git = "https://github.com/prisma/quaint"
