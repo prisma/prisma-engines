@@ -5,7 +5,6 @@ use datamodel::common::*;
 use datamodel::*;
 use datamodel_helpers::{FieldRef, ModelRef, TypeRef};
 use prisma_models::{DatamodelConverter, TempManifestationHolder, TempRelationHolder};
-use prisma_value::PrismaValue;
 use quaint::prelude::SqlFamily;
 use sql_schema_describer::{self as sql, ColumnArity};
 
@@ -337,35 +336,7 @@ fn migration_value_new(field: &FieldRef<'_>) -> Option<sql_schema_describer::Def
         dml::DefaultValue::Expression(_) => return None,
     };
 
-    let result = match value {
-        PrismaValue::Boolean(x) => if x { "true" } else { "false" }.to_string(),
-        PrismaValue::Int(x) => x.to_string(),
-        PrismaValue::Float(x) => x.to_string(),
-        PrismaValue::String(x) => x,
-        PrismaValue::DateTime(x) => {
-            // TODO: use a proper format string instead.
-            let mut raw = x.to_string(); // this will produce a String 1970-01-01 00:00:00 UTC
-            raw.truncate(raw.len() - 4); // strip the UTC suffix
-            raw
-        }
-        PrismaValue::Enum(x) => match field.field_type() {
-            TypeRef::Enum(inum) => {
-                let corresponding_value = inum
-                    .values()
-                    .iter()
-                    .find(|val| val.name.as_str() == x)
-                    .expect("could not find enum value");
-
-                corresponding_value.final_database_name().to_owned()
-            }
-            _ => unreachable!("Constant default on non-enum field."),
-        },
-        PrismaValue::Null => "NULL".to_string(),
-        PrismaValue::Uuid(x) => x.to_string(),
-        PrismaValue::List(x) => "[]".to_string(), //todo
-    };
-
-    Some(sql_schema_describer::DefaultValue::VALUE(result))
+    Some(sql_schema_describer::DefaultValue::VALUE(value.clone()))
 }
 
 fn enum_column_type(field: &FieldRef<'_>, database_info: &DatabaseInfo, db_name: &str) -> sql::ColumnType {

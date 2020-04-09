@@ -47,20 +47,11 @@ pub(crate) trait SqlRenderer {
         match (default, family) {
             (DefaultValue::DBGENERATED(val), _) => val.as_str().into(),
             (DefaultValue::VALUE(val), ColumnTypeFamily::String)
-            | (DefaultValue::VALUE(val), ColumnTypeFamily::Enum(_)) => format!(
-                "'{}'",
-                val.trim_start_matches('\'')
-                    .trim_end_matches('\'')
-                    .trim_start_matches('\\')
-                    .trim_start_matches('"')
-                    .trim_end_matches('"')
-                    .trim_end_matches('\\')
-            )
-            .into(),
+            | (DefaultValue::VALUE(val), ColumnTypeFamily::Enum(_)) => format!("'{}'", val).into(),
             (DefaultValue::NOW, ColumnTypeFamily::DateTime) => "CURRENT_TIMESTAMP".into(),
             (DefaultValue::NOW, _) => unreachable!("NOW default on non-datetime column"),
             (DefaultValue::VALUE(val), ColumnTypeFamily::DateTime) => format!("'{}'", val).into(),
-            (DefaultValue::VALUE(val), _) => val.as_str().into(),
+            (DefaultValue::VALUE(val), _) => format!("{}", val).into(),
             (DefaultValue::SEQUENCE(_), _) => todo!("rendering of sequence defaults"),
         }
     }
