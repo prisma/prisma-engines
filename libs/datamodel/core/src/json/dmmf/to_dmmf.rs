@@ -137,7 +137,7 @@ fn value_to_serde(value: &PrismaValue) -> serde_json::Value {
     match value {
         PrismaValue::Boolean(val) => serde_json::Value::Bool(*val),
         PrismaValue::String(val) => serde_json::Value::String(val.clone()),
-        PrismaValue::Enum(name) => serde_json::Value::String(name.clone()),
+        PrismaValue::Enum(val) => serde_json::Value::String(val.clone()),
         PrismaValue::Float(val) => {
             serde_json::Value::Number(serde_json::Number::from_f64(val.to_f64().unwrap()).unwrap())
         }

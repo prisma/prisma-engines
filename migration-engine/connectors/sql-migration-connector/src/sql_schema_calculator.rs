@@ -5,6 +5,7 @@ use datamodel::common::*;
 use datamodel::*;
 use datamodel_helpers::{FieldRef, ModelRef, TypeRef};
 use prisma_models::{DatamodelConverter, TempManifestationHolder, TempRelationHolder};
+use prisma_value::PrismaValue;
 use quaint::prelude::SqlFamily;
 use sql_schema_describer::{self as sql, ColumnArity};
 
@@ -329,7 +330,18 @@ fn migration_value_new(field: &FieldRef<'_>) -> Option<sql_schema_describer::Def
     }
 
     let value = match &field.default_value()? {
-        dml::DefaultValue::Single(s) => s.clone(),
+        dml::DefaultValue::Single(s) => match field.field_type() {
+            TypeRef::Enum(inum) => {
+                let corresponding_value = inum
+                    .r#enum
+                    .values()
+                    .find(|val| val.name.as_str() == s.to_string())
+                    .expect("could not find enum value");
+
+                PrismaValue::Enum(corresponding_value.final_database_name().to_owned())
+            }
+            _ => s.clone(),
+        },
         dml::DefaultValue::Expression(expression) if expression.name == "now" && expression.args.is_empty() => {
             return Some(sql_schema_describer::DefaultValue::NOW)
         }
