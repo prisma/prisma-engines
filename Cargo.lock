@@ -1907,7 +1907,10 @@ name = "prisma-value"
 version = "0.1.0"
 dependencies = [
  "chrono",
+ "log",
+ "once_cell",
  "quaint",
+ "regex",
  "rust_decimal",
  "serde",
  "serde_derive",

@@ -11,6 +11,9 @@ use uuid::Uuid;
 pub use error::ConversionFailure;
 pub type PrismaValueResult<T> = std::result::Result<T, ConversionFailure>;
 pub type PrismaListValue = Vec<PrismaValue>;
+use log::debug;
+use once_cell::sync::Lazy;
+use regex::Regex;
 
 #[cfg(feature = "sql-ext")]
 pub use sql_ext::*;
@@ -79,6 +82,9 @@ where
     decimal.to_f64().expect("Decimal is not a f64.").serialize(serializer)
 }
 
+static RE_NUM: Lazy<Regex> = Lazy::new(|| Regex::new(r"^'?(\d+)'?$").expect("compile regex"));
+static RE_FLOAT: Lazy<Regex> = Lazy::new(|| Regex::new(r"^'?([^']+)'?$").expect("compile regex"));
+
 impl PrismaValue {
     pub fn is_null(&self) -> bool {
         match self {
@@ -98,6 +104,45 @@ impl PrismaValue {
         match self {
             PrismaValue::List(l) => Some(l),
             _ => None,
+        }
+    }
+
+    pub fn parse_int(value: &str) -> Option<PrismaValue> {
+        let rslt = RE_NUM.captures(value);
+        if rslt.is_none() {
+            return None;
+        }
+
+        let captures = rslt.expect("get captures");
+        let num_str = captures.get(1).expect("get capture").as_str();
+        let num_rslt = num_str.parse::<i64>();
+        match num_rslt {
+            Ok(num) => Some(PrismaValue::Int(num)),
+            Err(_) => None,
+        }
+    }
+
+    pub fn parse_bool(value: &str) -> Option<PrismaValue> {
+        match value.to_lowercase().parse() {
+            Ok(val) => Some(PrismaValue::Boolean(val)),
+            Err(_) => None,
+        }
+    }
+
+    pub fn parse_float(value: &str) -> Option<PrismaValue> {
+        let rslt = RE_FLOAT.captures(value);
+        if rslt.is_none() {
+            return None;
+        }
+
+        let captures = rslt.expect("get captures");
+        let num_str = captures.get(1).expect("get capture").as_str();
+        match Decimal::from_str(num_str) {
+            Ok(num) => Some(PrismaValue::Float(num)),
+            Err(_) => {
+                debug!("Couldn't parse float '{}'", value);
+                None
+            }
         }
     }
 }

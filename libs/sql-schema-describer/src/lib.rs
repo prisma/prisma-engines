@@ -416,9 +416,12 @@ impl DefaultValue {
     }
 }
 
+// todo move to prismavalue ?? but then we need to depend on PV here
+// we could return PV from here as default than we do not parse twice
+
 static RE_NUM: Lazy<Regex> = Lazy::new(|| Regex::new(r"^'?(\d+)'?$").expect("compile regex"));
 
-fn parse_int(value: &str) -> Option<i32> {
+fn parse_int(value: &str) -> Option<i64> {
     let rslt = RE_NUM.captures(value);
     if rslt.is_none() {
         return None;
@@ -426,7 +429,7 @@ fn parse_int(value: &str) -> Option<i32> {
 
     let captures = rslt.expect("get captures");
     let num_str = captures.get(1).expect("get capture").as_str();
-    let num_rslt = num_str.parse::<i32>();
+    let num_rslt = num_str.parse::<i64>();
     match num_rslt {
         Ok(num) => Some(num),
         Err(_) => None,
@@ -439,7 +442,8 @@ fn parse_bool(value: &str) -> Option<bool> {
 
 static RE_FLOAT: Lazy<Regex> = Lazy::new(|| Regex::new(r"^'?([^']+)'?$").expect("compile regex"));
 
-fn parse_float(value: &str) -> Option<f32> {
+//todo in the core we parso to decimal here
+fn parse_float(value: &str) -> Option<f64> {
     let rslt = RE_FLOAT.captures(value);
     if rslt.is_none() {
         return None;
@@ -447,7 +451,7 @@ fn parse_float(value: &str) -> Option<f32> {
 
     let captures = rslt.expect("get captures");
     let num_str = captures.get(1).expect("get capture").as_str();
-    let num_rslt = num_str.parse::<f32>();
+    let num_rslt = num_str.parse::<f64>();
     match num_rslt {
         Ok(num) => Some(num),
         Err(_) => None,

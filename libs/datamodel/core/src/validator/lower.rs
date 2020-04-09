@@ -122,7 +122,7 @@ impl LowerDmlToAst {
         match dv {
             dml::DefaultValue::Single(v) => Self::lower_prisma_value(&v),
             dml::DefaultValue::Expression(e) => {
-                let exprs = vec![]; //e.args.iter().map(Self::lower_scalar_value).collect();
+                let exprs = e.args.iter().map(Self::lower_prisma_value).collect();
                 ast::Expression::Function(e.name, exprs, ast::Span::empty())
             }
         }
@@ -140,7 +140,7 @@ impl LowerDmlToAst {
             PrismaValue::Null => ast::Expression::StringValue("null".to_string(), ast::Span::empty()),
             PrismaValue::Uuid(val) => ast::Expression::StringValue(val.to_string(), ast::Span::empty()),
             PrismaValue::List(_) => ast::Expression::StringValue("null".to_string(), ast::Span::empty()),
-            // todo PrismaValue::List(vec) => ast::Expression::Array(
+            // PrismaValue::List(vec) => ast::Expression::Array(
             //     vec.iter().map(|pv| lower_prisma_value(pv)).collect(),
             //     ast::Span::empty(),
             // ),
