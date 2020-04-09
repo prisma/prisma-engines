@@ -5,7 +5,7 @@
 mod error;
 mod formatters;
 mod guard;
-mod invariance_rules;
+// mod invariance_rules;
 mod transformers;
 
 #[cfg(test)]
@@ -15,76 +15,19 @@ pub use error::*;
 pub use formatters::*;
 pub use transformers::*;
 
-use crate::{
-    interpreter::ExpressionResult, FilteredQuery, ManyRecordsQuery, Query, QueryGraphBuilderResult, ReadQuery,
-};
-use connector::{IdFilter, QueryArguments};
-use guard::*;
-use invariance_rules::*;
+// use crate::{
+//     interpreter::ExpressionResult, FilteredQuery, ManyRecordsQuery, Query, QueryGraphBuilderResult, ReadQuery,
+// };
+// use guard::*;
+// use prisma_models::{ModelProjection, ModelRef, RecordProjection, RelationFieldRef};
+// use connector::{IdFilter, QueryArguments};
+// use std::{borrow::Borrow, collections::HashSet};
+use crate::Query;
+// use invariance_rules::*;
 use petgraph::{graph::*, visit::EdgeRef as PEdgeRef, *};
-use prisma_models::{ModelProjection, ModelRef, RecordProjection};
-use std::{borrow::Borrow, collections::HashSet};
+use prisma_models::RelationFieldRef;
 
 pub type QueryGraphResult<T> = std::result::Result<T, QueryGraphError>;
-
-pub enum Node {
-    /// Nodes representing actual queries to the underlying connector.
-    Query(Query),
-
-    /// Flow control nodes.
-    Flow(Flow),
-
-    // Todo this strongly indicates that the query graph has to change, probably towards a true AST for the interpretation,
-    // instead of this unsatisfying in-between of high-level abstraction over the incoming query and concrete interpreter actions.
-    /// A general computation to perform. As opposed to `Query`, this doesn't invoke the connector.
-    Computation(Computation),
-
-    /// Empty node.
-    Empty,
-}
-
-impl From<Query> for Node {
-    fn from(q: Query) -> Node {
-        Node::Query(q)
-    }
-}
-
-impl From<Flow> for Node {
-    fn from(f: Flow) -> Node {
-        Node::Flow(f)
-    }
-}
-
-pub enum Flow {
-    /// Expresses a conditional control flow in the graph.
-    /// Possible outgoing edges are `then` and `else`, each at most once, with `then` required to be present.
-    If(Box<dyn FnOnce() -> bool + Send + Sync + 'static>),
-}
-
-impl Flow {
-    pub fn default_if() -> Self {
-        Self::If(Box::new(|| true))
-    }
-}
-
-// Current limitation: We need to narrow it down to ID diffs for Hash and EQ.
-pub enum Computation {
-    Diff(DiffNode),
-}
-
-impl Computation {
-    pub fn empty_diff() -> Self {
-        Self::Diff(DiffNode {
-            left: HashSet::new(),
-            right: HashSet::new(),
-        })
-    }
-}
-
-pub struct DiffNode {
-    pub left: HashSet<RecordProjection>,
-    pub right: HashSet<RecordProjection>,
-}
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
 pub struct NodeRef {
@@ -108,40 +51,6 @@ impl EdgeRef {
     pub fn id(&self) -> String {
         self.edge_ix.index().to_string()
     }
-}
-
-pub type ParentProjectionFn =
-    Box<dyn FnOnce(Node, Vec<RecordProjection>) -> QueryGraphBuilderResult<Node> + Send + Sync + 'static>;
-
-pub type ParentResultFn =
-    Box<dyn FnOnce(Node, &ExpressionResult) -> QueryGraphBuilderResult<Node> + Send + Sync + 'static>;
-
-/// Stored on the edges of the QueryGraph, a QueryGraphDependency contains information on how children are connected to their parents,
-/// expressing for example the need for additional information from the parent to be able to execute at runtime.
-pub enum QueryGraphDependency {
-    /// Simple dependency indicating order of execution. Effectively an ordering and reachability tool for now.
-    ExecutionOrder,
-
-    /// Performs a transformation on the child node based on the raw parent query result.
-    /// Does not move the result to the closure, but provides a reference.
-    ParentResult(ParentResultFn),
-
-    /// More specialized version of `ParentResult` with more guarantees and side effects.
-    ///
-    /// Performs a transformation on the child node based on the requested projection of the parent result (represented as a single merged `ModelProjection`).
-    /// Assumes that the parent result can be converted into the requested projection, else a runtime error will occur.
-    /// The `ModelProjection` is used to determine the set of values to extract from the parent result.
-    ///
-    /// Important note: As opposed to `ParentResult`, this dependency guarantees that if the closure is called, the parent result was projected successfully.
-    /// To achieve that, the query graph is post-processed in the `finalize` and reloads are injected at points where a projection is not fulfilled.
-    /// See `insert_reloads` for more information.
-    ParentProjection(ModelProjection, ParentProjectionFn),
-
-    /// Only valid in the context of a `If` control flow node.
-    Then,
-
-    /// Only valid in the context of a `If` control flow node.
-    Else,
 }
 
 /// A graph representing an abstract view of queries and their execution dependencies.
@@ -184,7 +93,7 @@ pub struct QueryGraph {
 }
 
 /// Implementation detail of the QueryGraph.
-type InnerGraph = Graph<Guard<Node>, Guard<QueryGraphDependency>>;
+type InnerGraph = Graph<Query, Option<RelationFieldRef>>;
 
 impl QueryGraph {
     pub fn new() -> Self {
@@ -197,19 +106,19 @@ impl QueryGraph {
     pub fn finalize(&mut self) -> QueryGraphResult<()> {
         if !self.finalized {
             self.swap_marked()?;
-            self.insert_reloads()?;
+            // self.insert_reloads()?;
             // self.insert_result_relation_reloads()?;
             self.finalized = true;
         }
 
-        self.validate()?;
+        // self.validate()?;
 
         Ok(())
     }
 
-    pub fn validate(&self) -> QueryGraphResult<()> {
-        after_graph_completion(self)
-    }
+    // pub fn validate(&self) -> QueryGraphResult<()> {
+    //     after_graph_completion(self)
+    // }
 
     /// Adds a result node to the graph.
     pub fn add_result_node(&mut self, node: &NodeRef) {
@@ -240,7 +149,7 @@ impl QueryGraph {
     /// Returns all root nodes of the graph.
     /// A root node is defined by having no incoming edges.
     pub fn root_nodes(&self) -> Vec<NodeRef> {
-        let graph = self.graph.borrow();
+        let graph = &self.graph;
 
         graph
             .node_indices()
@@ -255,13 +164,8 @@ impl QueryGraph {
             .collect()
     }
 
-    /// Creates a node with content `t` and adds it to the graph.
-    /// Returns a `NodeRef` to the newly added node.
-    pub fn create_node<T>(&mut self, t: T) -> NodeRef
-    where
-        T: Into<Node>,
-    {
-        let node_ix = self.graph.add_node(Guard::new(t.into()));
+    pub fn create_node(&mut self, q: Query) -> NodeRef {
+        let node_ix = self.graph.add_node(q);
 
         NodeRef { node_ix }
     }
@@ -274,12 +178,12 @@ impl QueryGraph {
         &mut self,
         from: &NodeRef,
         to: &NodeRef,
-        content: QueryGraphDependency,
+        content: Option<RelationFieldRef>,
     ) -> QueryGraphResult<EdgeRef> {
-        let edge_ix = self.graph.add_edge(from.node_ix, to.node_ix, Guard::new(content));
-        let edge = EdgeRef { edge_ix };
+        let edge_ix = self.graph.add_edge(from.node_ix, to.node_ix, content);
+        Ok(EdgeRef { edge_ix })
 
-        after_edge_creation(self, &edge).map(|_| edge)
+        // after_edge_creation(self, &edge).map(|_| edge)
     }
 
     /// Mark the query graph to need a transaction.
@@ -293,13 +197,13 @@ impl QueryGraph {
     }
 
     /// Returns a reference to the content of `node`, if the content is still present.
-    pub fn node_content(&self, node: &NodeRef) -> Option<&Node> {
-        self.graph.node_weight(node.node_ix).unwrap().borrow()
+    pub fn node_content(&self, node: &NodeRef) -> &Query {
+        self.graph.node_weight(node.node_ix).unwrap()
     }
 
     /// Returns a reference to the content of `edge`, if the content is still present.
-    pub fn edge_content(&self, edge: &EdgeRef) -> Option<&QueryGraphDependency> {
-        self.graph.edge_weight(edge.edge_ix).unwrap().borrow()
+    pub fn edge_content(&self, edge: &EdgeRef) -> &Option<RelationFieldRef> {
+        self.graph.edge_weight(edge.edge_ix).unwrap()
     }
 
     /// Returns the node from where `edge` originates (e.g. source).
@@ -324,22 +228,22 @@ impl QueryGraph {
         self.collect_edges(node, Direction::Incoming)
     }
 
-    /// Removes the edge from the graph but leaves the graph intact by keeping the empty
-    /// edge in the graph by plucking the content of the edge, but not the edge itself.
-    pub fn pluck_edge(&mut self, edge: &EdgeRef) -> QueryGraphDependency {
-        self.graph.edge_weight_mut(edge.edge_ix).unwrap().unset()
-    }
+    // /// Removes the edge from the graph but leaves the graph intact by keeping the empty
+    // /// edge in the graph by plucking the content of the edge, but not the edge itself.
+    // pub fn pluck_edge(&mut self, edge: &EdgeRef) -> Option<RelationFieldRef> {
+    //     self.graph.edge_weight_mut(edge.edge_ix).unwrap().unset()
+    // }
 
-    /// Removes the node from the graph but leaves the graph intact by keeping the empty
-    /// node in the graph by plucking the content of the node, but not the node itself.
-    pub fn pluck_node(&mut self, node: &NodeRef) -> Node {
-        self.graph.node_weight_mut(node.node_ix).unwrap().unset()
-    }
+    // /// Removes the node from the graph but leaves the graph intact by keeping the empty
+    // /// node in the graph by plucking the content of the node, but not the node itself.
+    // pub fn pluck_node(&mut self, node: &NodeRef) -> Query {
+    //     self.graph.node_weight_mut(node.node_ix).unwrap()
+    // }
 
     /// Completely removes the edge from the graph, returning it's content.
     /// This operation is destructive on the underlying graph and invalidates references.
-    pub fn remove_edge(&mut self, edge: EdgeRef) -> Option<QueryGraphDependency> {
-        self.graph.remove_edge(edge.edge_ix).unwrap().into_inner()
+    pub fn remove_edge(&mut self, edge: EdgeRef) -> Option<RelationFieldRef> {
+        self.graph.remove_edge(edge.edge_ix).unwrap()
     }
 
     /// Checks if `child` is a direct child of `parent`.
@@ -432,11 +336,10 @@ impl QueryGraph {
     ///
     /// This operation preserves all edges from the parents of `parent` to the node, while inserting new edges from all parents of
     /// `parent` to `child`, effectively "pushing the child in the middle" of `parent` and it's parents. The new edges are only expressing
-    /// exection order, and no node transformation.
+    /// exection order, and no relational dependency.
     ///
-    /// Any edge existing between `parent` and `child` will change direction and will point from `child` to `parent` instead.
-    ///
-    /// **Important exception**: If a parent node is a `Flow` node, we need to completely remove the edge to the flow node and rewire it to the child.
+    /// An edge existing between `parent` and `child` will change direction and will point from `child` to `parent` instead,
+    /// flipping a stored relation field reference, if any.
     ///
     /// ## Example transformation
     /// Given the marked pairs `[(A, B), (B, C), (B, D)]` and a graph (depicting the state before the transformation):
@@ -491,14 +394,13 @@ impl QueryGraph {
     ///                                                                                                     └──▶│ A │◀─┘
     ///                                                                                                         └───┘
     /// ```
-    /// [DTODO] put if flow exception illustration here.
     fn swap_marked(&mut self) -> QueryGraphResult<()> {
         if self.marked_node_pairs.len() > 0 {
             trace!("[Graph][Swap] Before shape: {}", self);
         }
 
         let mut marked = std::mem::replace(&mut self.marked_node_pairs, vec![]);
-        marked.reverse(); // Todo: Marked operation order is currently breaking if done bottom-up. Investigate how to fix it.
+        marked.reverse(); // [DTODO]: Marked operation order is currently breaking if done bottom-up. Investigate how to fix it.
 
         for (parent_node, child_node) in marked {
             // All parents of `parent_node` are becoming a parent of `child_node` as well, except flow nodes.
@@ -506,31 +408,13 @@ impl QueryGraph {
             for parent_edge in parent_edges {
                 let parent_of_parent_node = self.edge_source(&parent_edge);
 
-                match self
-                    .node_content(&parent_of_parent_node)
-                    .expect("Expected marked nodes to be non-empty.")
-                {
-                    Node::Flow(_) => {
-                        let content = self
-                            .remove_edge(parent_edge)
-                            .expect("Expected edges between marked nodes to be non-empty.");
-                        self.create_edge(&parent_of_parent_node, &child_node, content)?;
-                    }
+                trace!(
+                    "[Graph][Swap] Connecting parent of parent {} with child {}",
+                    parent_of_parent_node.id(),
+                    child_node.id()
+                );
 
-                    _ => {
-                        trace!(
-                            "[Graph][Swap] Connecting parent of parent {} with child {}",
-                            parent_of_parent_node.id(),
-                            child_node.id()
-                        );
-
-                        self.create_edge(
-                            &parent_of_parent_node,
-                            &child_node,
-                            QueryGraphDependency::ExecutionOrder,
-                        )?;
-                    }
-                }
+                self.create_edge(&parent_of_parent_node, &child_node, None)?;
             }
 
             // Find existing edge between parent and child. Can only be one at most.
@@ -541,7 +425,7 @@ impl QueryGraph {
 
             // Remove edge and reinsert edge in reverse.
             if let Some(edge) = existing_edge {
-                let content = self.remove_edge(edge).unwrap();
+                let content = self.remove_edge(edge).map(|rf| rf.related_field());
                 self.create_edge(&child_node, &parent_node, content)?;
             }
         }
@@ -549,136 +433,135 @@ impl QueryGraph {
         Ok(())
     }
 
-    /// Traverses the query graph and checks if reloads of nodes are necessary.
-    /// Whether or not a node needs to be reloaded is determined based on the
-    /// outgoing edges of parent-projection-based transformers, as those hold the `ModelProjection`s
-    /// all records of the parent result need to contain in order to satisfy dependencies.
-    ///
-    /// ## Example
-    /// Given a query graph, where 3 children require different set of fields ((A, B), (B, C), (A, D))
-    /// to execute their dependent operations:
-    /// ```text
-    /// ┌ ─ ─ ─ ─ ─ ─
-    ///     Parent   │─────────┬───────────────┐
-    /// └ ─ ─ ─ ─ ─ ─          │               │
-    ///        │               │               │
-    ///     (A, B)          (B, C)           (A, D)
-    ///        │               │               │
-    ///        ▼               ▼               ▼
-    /// ┌ ─ ─ ─ ─ ─ ─   ┌ ─ ─ ─ ─ ─ ─   ┌ ─ ─ ─ ─ ─ ─
-    ///    Child A   │     Child B   │     Child C   │
-    /// └ ─ ─ ─ ─ ─ ─   └ ─ ─ ─ ─ ─ ─   └ ─ ─ ─ ─ ─ ─
-    /// ```
-    /// However, `Parent` only returns `(A, B)`, for example, because that's the primary ID of the parent model
-    /// and `Parent` is an operation that only returns IDs (e.g. update, updateMany).
-    ///
-    /// In order to satisfy children B and C, the graph is altered by this post-processing call:
-    /// ```text
-    /// ┌ ─ ─ ─ ─ ─ ─
-    ///     Parent   │
-    /// └ ─ ─ ─ ─ ─ ─
-    ///        │
-    ///     (A, B) (== Primary ID)
-    ///        │
-    ///        ▼
-    /// ┌────────────┐
-    /// │   Reload   │─────────┬───────────────┐
-    /// └────────────┘         │               │
-    ///        │               │               │
-    ///     (A, B)          (B, C)           (A, D)
-    ///        │               │               │
-    ///        ▼               ▼               ▼
-    /// ┌ ─ ─ ─ ─ ─ ─   ┌ ─ ─ ─ ─ ─ ─   ┌ ─ ─ ─ ─ ─ ─
-    ///    Child A   │     Child B   │     Child C   │
-    /// └ ─ ─ ─ ─ ─ ─   └ ─ ─ ─ ─ ─ ─   └ ─ ─ ─ ─ ─ ─
-    /// ```
-    ///
-    /// The edges from `Parent` to all dependent children are removed from the graph and reinserted in order
-    /// on the reload node.
-    ///
-    /// The `Reload` node is always a find many query.
-    /// Unwraps are safe because we're operating on the unprocessed state of the graph (`Expressionista` changes that).
-    fn insert_reloads(&mut self) -> QueryGraphResult<()> {
-        let reloads: Vec<(NodeRef, ModelRef, Vec<(EdgeRef, ModelProjection)>)> = self
-            .graph
-            .node_indices()
-            .filter_map(|ix| {
-                let node = NodeRef { node_ix: ix };
+    //   /// Traverses the query graph and checks if reloads of nodes are necessary.
+    //   /// Whether or not a node needs to be reloaded is determined based on the
+    //   /// outgoing edges of parent-projection-based transformers, as those hold the `ModelProjection`s
+    //   /// all records of the parent result need to contain in order to satisfy dependencies.
+    //   ///
+    //   /// ## Example
+    //   /// Given a query graph, where 3 children require different set of fields ((A, B), (B, C), (A, D))
+    //   /// to execute their dependent operations:
+    //   /// ```text
+    //   /// ┌ ─ ─ ─ ─ ─ ─
+    //   ///     Parent   │─────────┬───────────────┐
+    //   /// └ ─ ─ ─ ─ ─ ─          │               │
+    //   ///        │               │               │
+    //   ///     (A, B)          (B, C)           (A, D)
+    //   ///        │               │               │
+    //   ///        ▼               ▼               ▼
+    //   /// ┌ ─ ─ ─ ─ ─ ─   ┌ ─ ─ ─ ─ ─ ─   ┌ ─ ─ ─ ─ ─ ─
+    //   ///    Child A   │     Child B   │     Child C   │
+    //   /// └ ─ ─ ─ ─ ─ ─   └ ─ ─ ─ ─ ─ ─   └ ─ ─ ─ ─ ─ ─
+    //   /// ```
+    //   /// However, `Parent` only returns `(A, B)`, for example, because that's the primary ID of the parent model
+    //   /// and `Parent` is an operation that only returns IDs (e.g. update, updateMany).
+    //   ///
+    //   /// In order to satisfy children B and C, the graph is altered by this post-processing call:
+    //   /// ```text
+    //   /// ┌ ─ ─ ─ ─ ─ ─
+    //   ///     Parent   │
+    //   /// └ ─ ─ ─ ─ ─ ─
+    //   ///        │
+    //   ///     (A, B) (== Primary ID)
+    //   ///        │
+    //   ///        ▼
+    //   /// ┌────────────┐
+    //   /// │   Reload   │─────────┬───────────────┐
+    //   /// └────────────┘         │               │
+    //   ///        │               │               │
+    //   ///     (A, B)          (B, C)           (A, D)
+    //   ///        │               │               │
+    //   ///        ▼               ▼               ▼
+    //   /// ┌ ─ ─ ─ ─ ─ ─   ┌ ─ ─ ─ ─ ─ ─   ┌ ─ ─ ─ ─ ─ ─
+    //   ///    Child A   │     Child B   │     Child C   │
+    //   /// └ ─ ─ ─ ─ ─ ─   └ ─ ─ ─ ─ ─ ─   └ ─ ─ ─ ─ ─ ─
+    //   /// ```
+    //   ///
+    //   /// The edges from `Parent` to all dependent children are removed from the graph and reinserted in order
+    //   /// on the reload node.
+    //   ///
+    //   /// The `Reload` node is always a find many query.
+    //   /// Unwraps are safe because we're operating on the unprocessed state of the graph (`Expressionista` changes that).
+    //   // fn insert_reloads(&mut self) -> QueryGraphResult<()> {
+    //     let reloads: Vec<(NodeRef, ModelRef, Vec<(EdgeRef, ModelProjection)>)> = self
+    //         .graph
+    //         .node_indices()
+    //         .filter_map(|ix| {
+    //             let node = NodeRef { node_ix: ix };
 
-                if let Node::Query(q) = self.node_content(&node).unwrap() {
-                    let edges = self.outgoing_edges(&node);
+    //             if let Node::Query(q) = self.node_content(&node).unwrap() {
+    //                 let edges = self.outgoing_edges(&node);
 
-                    let unsatisfied_edges: Vec<_> = edges
-                        .into_iter()
-                        .filter_map(|edge| match self.edge_content(&edge).unwrap() {
-                            QueryGraphDependency::ParentProjection(ref requested_projection, _)
-                                if !q.returns(requested_projection) =>
-                            {
-                                trace!(
-                                    "Query {:?} does not return requested projection {:?} and will be reloaded.",
-                                    q,
-                                    requested_projection.names().collect::<Vec<_>>()
-                                );
-                                Some((edge, requested_projection.clone()))
-                            }
-                            _ => None,
-                        })
-                        .collect();
+    //                 let unsatisfied_edges: Vec<_> = edges
+    //                     .into_iter()
+    //                     .filter_map(|edge| match self.edge_content(&edge).unwrap() {
+    //                         QueryGraphDependency::ParentProjection(ref requested_projection, _)
+    //                             if !q.returns(requested_projection) =>
+    //                         {
+    //                             trace!(
+    //                                 "Query {:?} does not return requested projection {:?} and will be reloaded.",
+    //                                 q,
+    //                                 requested_projection.names().collect::<Vec<_>>()
+    //                             );
+    //                             Some((edge, requested_projection.clone()))
+    //                         }
+    //                         _ => None,
+    //                     })
+    //                     .collect();
 
-                    if unsatisfied_edges.is_empty() {
-                        None
-                    } else {
-                        Some((node, q.model(), unsatisfied_edges))
-                    }
-                } else {
-                    None
-                }
-            })
-            .collect();
+    //                 if unsatisfied_edges.is_empty() {
+    //                     None
+    //                 } else {
+    //                     Some((node, q.model(), unsatisfied_edges))
+    //                 }
+    //             } else {
+    //                 None
+    //             }
+    //         })
+    //         .collect();
 
-        for (node, model, edges) in reloads {
-            // Create reload node and connect it to the `node`.
-            let primary_model_id = model.primary_identifier();
-            let (edges, mut identifiers): (Vec<_>, Vec<_>) = edges.into_iter().unzip();
-            identifiers.push(primary_model_id.clone());
+    //     for (node, model, edges) in reloads {
+    //         // Create reload node and connect it to the `node`.
+    //         let primary_model_id = model.primary_identifier();
+    //         let (edges, mut identifiers): (Vec<_>, Vec<_>) = edges.into_iter().unzip();
+    //         identifiers.push(primary_model_id.clone());
 
-            let read_query = ReadQuery::ManyRecordsQuery(ManyRecordsQuery {
-                name: "reload".into(),
-                alias: None,
-                model,
-                args: QueryArguments::default(),
-                selected_fields: ModelProjection::union(identifiers),
-                nested: vec![],
-                selection_order: vec![],
-            });
+    //         let read_query = ReadQuery::ManyRecordsQuery(ManyRecordsQuery {
+    //             name: "reload".into(),
+    //             alias: None,
+    //             model,
+    //             args: QueryArguments::default(),
+    //             selected_fields: ModelProjection::union(identifiers),
+    //             nested: vec![],
+    //             selection_order: vec![],
+    //         });
 
-            let query = Query::Read(read_query);
-            let reload_node = self.create_node(query);
+    //         let query = Query::Read(read_query);
+    //         let reload_node = self.create_node(query);
 
-            self.create_edge(
-                &node,
-                &reload_node,
-                QueryGraphDependency::ParentProjection(
-                    primary_model_id,
-                    Box::new(|mut reload_node, parent_projections| {
-                        if let Node::Query(Query::Read(ReadQuery::ManyRecordsQuery(ref mut mr))) = reload_node {
-                            mr.set_filter(parent_projections.filter());
-                        }
+    //         self.create_edge(
+    //             &node,
+    //             &reload_node,
+    //             QueryGraphDependency::ParentProjection(
+    //                 primary_model_id,
+    //                 Box::new(|mut reload_node, parent_projections| {
+    //                     if let Node::Query(Query::Read(ReadQuery::ManyRecordsQuery(ref mut mr))) = reload_node {
+    //                         mr.set_filter(parent_projections.filter());
+    //                     }
 
-                        Ok(reload_node)
-                    }),
-                ),
-            )?;
+    //                     Ok(reload_node)
+    //                 }),
+    //             ),
+    //         )?;
 
-            // Remove unsatisfied edges from node, reattach them to the reload node
-            for edge in edges {
-                let target = self.edge_target(&edge);
-                let content = self.remove_edge(edge).unwrap();
+    //         // Remove unsatisfied edges from node, reattach them to the reload node
+    //         for edge in edges {
+    //             let target = self.edge_target(&edge);
+    //             let content = self.remove_edge(edge).unwrap();
 
-                self.create_edge(&reload_node, &target, content)?;
-            }
-        }
+    //             self.create_edge(&reload_node, &target, content)?;
+    //         }
+    //     }
 
-        Ok(())
-    }
+    //     Ok(())
 }

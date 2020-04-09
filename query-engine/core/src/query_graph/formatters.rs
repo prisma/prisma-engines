@@ -28,10 +28,10 @@ fn stringify_nodes(graph: &QueryGraph, nodes: Vec<NodeRef>, seen_nodes: &mut Vec
             .map(|child_edge| {
                 let child_node = graph.edge_target(child_edge);
                 node_child_info.push(format!(
-                    "Child (edge {}): Node {} - {}",
+                    "Child (edge {}): Node {} - {:?}",
                     child_edge.id(),
                     child_node.id(),
-                    graph.edge_content(child_edge).unwrap()
+                    graph.edge_content(child_edge).map(|rf| rf.name)
                 ));
 
                 child_node
@@ -41,7 +41,7 @@ fn stringify_nodes(graph: &QueryGraph, nodes: Vec<NodeRef>, seen_nodes: &mut Vec
         rendered_nodes.push(format!(
             "Node {}: {}\n  {}",
             node.id(),
-            graph.node_content(&node).unwrap(),
+            graph.node_content(&node),
             node_child_info.join("\n  ")
         ));
 
@@ -51,32 +51,32 @@ fn stringify_nodes(graph: &QueryGraph, nodes: Vec<NodeRef>, seen_nodes: &mut Vec
     rendered_nodes
 }
 
-impl Display for Flow {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            Self::If(_) => write!(f, "(If (condition func)"),
-        }
-    }
-}
+// impl Display for Flow {
+//     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+//         match self {
+//             Self::If(_) => write!(f, "(If (condition func)"),
+//         }
+//     }
+// }
 
-impl Display for Computation {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            Self::Diff(_) => write!(f, "Diff"),
-        }
-    }
-}
+// impl Display for Computation {
+//     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+//         match self {
+//             Self::Diff(_) => write!(f, "Diff"),
+//         }
+//     }
+// }
 
-impl Display for Node {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            Self::Query(q) => write!(f, "{}", q),
-            Self::Flow(flow) => write!(f, "{}", flow),
-            Self::Computation(c) => write!(f, "{}", c),
-            Self::Empty => write!(f, "Empty"),
-        }
-    }
-}
+// impl Display for Node {
+//     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+//         match self {
+//             Self::Query(q) => write!(f, "{}", q),
+//             Self::Flow(flow) => write!(f, "{}", flow),
+//             Self::Computation(c) => write!(f, "{}", c),
+//             Self::Empty => write!(f, "Empty"),
+//         }
+//     }
+// }
 
 impl Display for NodeRef {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -90,22 +90,22 @@ impl Display for QueryGraph {
     }
 }
 
-impl Display for QueryGraphDependency {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            Self::ExecutionOrder => write!(f, "ExecutionOrder"),
-            Self::ParentResult(_) => write!(f, "ParentResult"),
-            Self::ParentProjection(projection, _) => write!(
-                f,
-                "ParentProjection ({} | {:?})",
-                projection.model().name,
-                projection.names().collect::<Vec<_>>()
-            ),
-            Self::Then => write!(f, "Then"),
-            Self::Else => write!(f, "Else"),
-        }
-    }
-}
+// impl Display for QueryGraphDependency {
+//     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+//         match self {
+//             Self::ExecutionOrder => write!(f, "ExecutionOrder"),
+//             Self::ParentResult(_) => write!(f, "ParentResult"),
+//             Self::ParentProjection(projection, _) => write!(
+//                 f,
+//                 "ParentProjection ({} | {:?})",
+//                 projection.model().name,
+//                 projection.names().collect::<Vec<_>>()
+//             ),
+//             Self::Then => write!(f, "Then"),
+//             Self::Else => write!(f, "Else"),
+//         }
+//     }
+// }
 
 fn fmt_raw_indices(i: &[NodeIndex]) -> String {
     let refs: Vec<NodeRef> = i

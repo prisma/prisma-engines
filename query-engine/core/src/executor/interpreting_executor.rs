@@ -42,7 +42,6 @@ where
 
         let result = if needs_transaction {
             let tx = conn.start_transaction().await?;
-
             let interpreter = QueryInterpreter::new(ConnectionLike::Transaction(tx.as_ref()));
             let result = QueryPipeline::new(query, interpreter, info).execute().await;
 

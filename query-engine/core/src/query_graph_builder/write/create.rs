@@ -1,7 +1,7 @@
 use super::*;
 use crate::{
     query_ast::*,
-    query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
+    query_graph::{NodeRef, QueryGraph},
     ArgumentListLookup, ParsedField, ParsedInputMap, ReadOneRecordBuilder,
 };
 use connector::IdFilter;
@@ -59,7 +59,8 @@ pub fn create_record_node(
     let create_node = graph.create_node(Query::Write(WriteQuery::CreateRecord(cr)));
 
     for (relation_field, data_map) in create_args.nested {
-        nested::connect_nested_query(graph, create_node, relation_field, data_map)?;
+        // nested::connect_nested_query(graph, create_node, relation_field, data_map)?;
+        todo!()
     }
 
     Ok(create_node)
