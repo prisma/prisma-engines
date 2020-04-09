@@ -769,4 +769,15 @@ VALUES (1, 'Joe', 27, 20000.00 );
 
         assert_eq!(result.into_single().unwrap().at(0).unwrap().as_f64().unwrap(), 6.412345);
     }
+
+    #[tokio::test]
+    async fn newdecimal_conversion_is_handled_correctly() {
+        let conn = Quaint::new(&CONN_STR).await.unwrap();
+        let result = conn.query_raw("SELECT SUM(1) AS THEONE", &[]).await.unwrap();
+
+        assert_eq!(
+            result.into_single().unwrap()[0],
+            ParameterizedValue::Real("1.0".parse().unwrap())
+        );
+    }
 }

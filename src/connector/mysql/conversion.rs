@@ -25,6 +25,20 @@ impl TakeRow for my::Row {
             };
             let res = match value {
                 my::Value::NULL => ParameterizedValue::Null,
+                // NEWDECIMAL returned as bytes. See https://mariadb.com/kb/en/resultset-row/#decimal-binary-encoding
+                my::Value::Bytes(b)
+                    if column.column_type() == mysql_async::consts::ColumnType::MYSQL_TYPE_NEWDECIMAL =>
+                {
+                    ParameterizedValue::Real(
+                        String::from_utf8(b)
+                            .expect("MySQL NEWDECIMAL as string")
+                            .parse()
+                            .map_err(|_err| {
+                                crate::error::Error::builder(ErrorKind::ConversionError("mysql NEWDECIMAL conversion"))
+                                    .build()
+                            })?,
+                    )
+                }
                 // https://dev.mysql.com/doc/internals/en/character-set.html
                 my::Value::Bytes(b) if column.character_set() == 63 => ParameterizedValue::Bytes(b.into()),
                 my::Value::Bytes(s) => ParameterizedValue::Text(String::from_utf8(s)?.into()),
