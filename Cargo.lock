@@ -1297,6 +1297,7 @@ dependencies = [
  "migration-connector",
  "migration-core",
  "pretty_assertions",
+ "prisma-value",
  "quaint",
  "serde",
  "serde_json",

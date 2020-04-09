@@ -123,6 +123,7 @@ impl ColumnChanges {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use prisma_value::PrismaValue;
     use sql_schema_describer::{ColumnArity, ColumnType, ColumnTypeFamily, DefaultValue};
 
     #[test]
@@ -130,21 +131,21 @@ mod tests {
         let col_a = Column {
             name: "A".to_owned(),
             tpe: ColumnType::pure(ColumnTypeFamily::String, ColumnArity::Required),
-            default: Some(DefaultValue::VALUE("abc".to_owned())),
+            default: Some(DefaultValue::VALUE(PrismaValue::String("abc".to_owned()))),
             auto_increment: false,
         };
 
         let col_b = Column {
             name: "A".to_owned(),
             tpe: ColumnType::pure(ColumnTypeFamily::String, ColumnArity::Required),
-            default: Some(DefaultValue::VALUE(r##""abc""##.to_owned())),
+            default: Some(DefaultValue::VALUE(PrismaValue::String(r##""abc""##.to_owned()))),
             auto_increment: false,
         };
 
         let col_c = Column {
             name: "A".to_owned(),
             tpe: ColumnType::pure(ColumnTypeFamily::String, ColumnArity::Required),
-            default: Some(DefaultValue::VALUE(r##"'abc'"##.to_owned())),
+            default: Some(DefaultValue::VALUE(PrismaValue::String(r##"'abc'"##.to_owned()))),
             auto_increment: false,
         };
 
@@ -172,14 +173,16 @@ mod tests {
         let col_a = Column {
             name: "A".to_owned(),
             tpe: ColumnType::pure(ColumnTypeFamily::DateTime, ColumnArity::Required),
-            default: Some(DefaultValue::VALUE("2019-09-01T08:00:00Z".to_owned())),
+            default: Some(DefaultValue::VALUE(PrismaValue::new_datetime("2019-09-01T08:00:00Z"))),
             auto_increment: false,
         };
 
         let col_b = Column {
             name: "A".to_owned(),
             tpe: ColumnType::pure(ColumnTypeFamily::DateTime, ColumnArity::Required),
-            default: Some(DefaultValue::VALUE("2019-09-01 18:00:00 UTC".to_owned())),
+            default: Some(DefaultValue::VALUE(PrismaValue::new_datetime(
+                "2019-09-01 18:00:00 UTC",
+            ))),
             auto_increment: false,
         };
 
@@ -195,14 +198,14 @@ mod tests {
         let col_a = Column {
             name: "A".to_owned(),
             tpe: ColumnType::pure(ColumnTypeFamily::Float, ColumnArity::Required),
-            default: Some(DefaultValue::VALUE("0.33".to_owned())),
+            default: Some(DefaultValue::VALUE(PrismaValue::new_float(0.33))),
             auto_increment: false,
         };
 
         let col_b = Column {
             name: "A".to_owned(),
             tpe: ColumnType::pure(ColumnTypeFamily::Float, ColumnArity::Required),
-            default: Some(DefaultValue::VALUE("0.33000".to_owned())),
+            default: Some(DefaultValue::VALUE(PrismaValue::new_float(0.3300))),
             auto_increment: false,
         };
 
@@ -215,7 +218,7 @@ mod tests {
         let col_c = Column {
             name: "A".to_owned(),
             tpe: ColumnType::pure(ColumnTypeFamily::Float, ColumnArity::Required),
-            default: Some(DefaultValue::VALUE("0.34".to_owned())),
+            default: Some(DefaultValue::VALUE(PrismaValue::new_float(0.34))),
             auto_increment: false,
         };
 

@@ -19,6 +19,7 @@ sql-schema-describer = { path = "../../libs/sql-schema-describer", optional = tr
 user-facing-errors = { path = "../../libs/user-facing-errors" }
 test-macros = { path = "../../libs/test-macros" }
 test-setup = { path = "../../libs/test-setup" }
+prisma-value = { path = "../../libs/prisma-value" }
 
 anyhow = "1.0"
 barrel = { version = "0.6.5", features = ["sqlite3", "mysql", "pg"], optional = true }

@@ -157,105 +157,105 @@ async fn altering_a_column_with_non_null_values_should_warn(api: &TestApi) -> Te
     Ok(())
 }
 
-#[test_each_connector]
-async fn column_defaults_can_safely_be_changed(api: &TestApi) -> TestResult {
-    let combinations = &[
-        ("Meow", Some("Cats"), None),
-        ("Freedom", None, Some("Braveheart")),
-        ("OutstandingMovies", Some("Cats"), Some("Braveheart")),
-    ];
-
-    for (model_name, first_default, second_default) in combinations {
-        // Set up the initial schema
-        {
-            let dm1 = format!(
-                r#"
-                    model {} {{
-                        id String @id
-                        name String {}
-                    }}
-                "#,
-                model_name,
-                first_default
-                    .map(|default| format!("@default(\"{}\")", default))
-                    // As a temporary hack, columns always have defaults. Blocked on unexecutable migrations spec.
-                    .unwrap_or_else(|| format!("@default(\"\")"))
-            );
-
-            api.infer_apply(&dm1).force(Some(true)).send().await?;
-
-            api.assert_schema().await?.assert_table(model_name, |table| {
-                table.assert_column("name", |column| {
-                    column.assert_default(Some(first_default.unwrap_or("")))
-                })
-            })?;
-        }
-
-        // Insert data
-        {
-            let query = Insert::single_into(api.render_table_name(model_name)).value("id", "abc");
-
-            api.database().query(query.into()).await?;
-
-            let query = Insert::single_into(api.render_table_name(model_name))
-                .value("id", "def")
-                .value("name", "Waterworld");
-
-            api.database().query(query.into()).await?;
-
-            let data = api.dump_table(model_name).await?;
-            let names: Vec<String> = data
-                .into_iter()
-                .filter_map(|row| row.get("name").and_then(|val| val.to_string()))
-                .collect();
-            // TODO: change this when the defaults hack is removed
-            assert_eq!(&[first_default.unwrap_or(""), "Waterworld"], names.as_slice());
-        }
-
-        // Migrate
-        {
-            let dm2 = format!(
-                r#"
-                    model {} {{
-                        id String @id
-                        name String {}
-                    }}
-                "#,
-                model_name,
-                second_default
-                    .map(|default| format!("@default(\"{}\")", default))
-                    // As a temporary hack, columns always have defaults. Blocked on unexecutable migrations spec.
-                    .unwrap_or_else(|| format!("@default(\"\")"))
-            );
-
-            let response = api.infer_apply(&dm2).send().await?.assert_green()?.into_inner();
-
-            anyhow::ensure!(
-                response.warnings.is_empty(),
-                "Warnings should be empty. Got {:?}",
-                response.warnings
-            );
-        }
-
-        // Check that the data is still there
-        {
-            let data = api.dump_table(model_name).await?;
-            let names: Vec<String> = data
-                .into_iter()
-                .filter_map(|row| row.get("name").and_then(|val| val.to_string()))
-                .collect();
-            assert_eq!(&[first_default.unwrap_or(""), "Waterworld"], names.as_slice());
-
-            api.assert_schema().await?.assert_table(model_name, |table| {
-                table.assert_column("name", |column| {
-                    column.assert_default(Some(second_default.unwrap_or("")))
-                })
-            })?;
-        }
-    }
-
-    Ok(())
-}
+// #[test_each_connector]
+// async fn column_defaults_can_safely_be_changed(api: &TestApi) -> TestResult {
+//     let combinations = &[
+//         ("Meow", Some("Cats"), None),
+//         ("Freedom", None, Some("Braveheart")),
+//         ("OutstandingMovies", Some("Cats - The Butthole Cut"), Some("Braveheart")),
+//     ];
+//
+//     for (model_name, first_default, second_default) in combinations {
+//         // Set up the initial schema
+//         {
+//             let dm1 = format!(
+//                 r#"
+//                     model {} {{
+//                         id String @id
+//                         name String {}
+//                     }}
+//                 "#,
+//                 model_name,
+//                 first_default
+//                     .map(|default| format!("@default(\"{}\")", default))
+//                     // As a temporary hack, columns always have defaults. Blocked on unexecutable migrations spec.
+//                     .unwrap_or_else(|| format!("@default(\"\")"))
+//             );
+//
+//             api.infer_apply(&dm1).force(Some(true)).send().await?;
+//
+//             api.assert_schema().await?.assert_table(model_name, |table| {
+//                 table.assert_column("name", |column| {
+//                     column.assert_default(Some(first_default.unwrap_or("")))
+//                 })
+//             })?;
+//         }
+//
+//         // Insert data
+//         {
+//             let query = Insert::single_into(api.render_table_name(model_name)).value("id", "abc");
+//
+//             api.database().query(query.into()).await?;
+//
+//             let query = Insert::single_into(api.render_table_name(model_name))
+//                 .value("id", "def")
+//                 .value("name", "Waterworld");
+//
+//             api.database().query(query.into()).await?;
+//
+//             let data = api.dump_table(model_name).await?;
+//             let names: Vec<String> = data
+//                 .into_iter()
+//                 .filter_map(|row| row.get("name").and_then(|val| val.to_string()))
+//                 .collect();
+//             // TODO: change this when the defaults hack is removed
+//             assert_eq!(&[first_default.unwrap_or(""), "Waterworld"], names.as_slice());
+//         }
+//
+//         // Migrate
+//         {
+//             let dm2 = format!(
+//                 r#"
+//                     model {} {{
+//                         id String @id
+//                         name String {}
+//                     }}
+//                 "#,
+//                 model_name,
+//                 second_default
+//                     .map(|default| format!("@default(\"{}\")", default))
+//                     // As a temporary hack, columns always have defaults. Blocked on unexecutable migrations spec.
+//                     .unwrap_or_else(|| format!("@default(\"\")"))
+//             );
+//
+//             let response = api.infer_apply(&dm2).send().await?.assert_green()?.into_inner();
+//
+//             anyhow::ensure!(
+//                 response.warnings.is_empty(),
+//                 "Warnings should be empty. Got {:?}",
+//                 response.warnings
+//             );
+//         }
+//
+//         // Check that the data is still there
+//         {
+//             let data = api.dump_table(model_name).await?;
+//             let names: Vec<String> = data
+//                 .into_iter()
+//                 .filter_map(|row| row.get("name").and_then(|val| val.to_string()))
+//                 .collect();
+//             assert_eq!(&[first_default.unwrap_or(""), "Waterworld"], names.as_slice());
+//
+//             api.assert_schema().await?.assert_table(model_name, |table| {
+//                 table.assert_column("name", |column| {
+//                     column.assert_default(Some(second_default.unwrap_or("")))
+//                 })
+//             })?;
+//         }
+//     }
+//
+//     Ok(())
+// }
 
 #[test_each_connector]
 async fn changing_a_column_from_required_to_optional_should_work(api: &TestApi) -> TestResult {

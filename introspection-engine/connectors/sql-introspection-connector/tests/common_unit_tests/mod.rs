@@ -329,7 +329,7 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
                     },
-                    default: Some(DefaultValue::VALUE("'1'".to_string())),
+                    default: Some(DefaultValue::VALUE(PrismaValue::Int(1))),
                     auto_increment: false,
                 },
                 Column {
@@ -339,7 +339,7 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
                         family: ColumnTypeFamily::Boolean,
                         arity: ColumnArity::Nullable,
                     },
-                    default: Some(DefaultValue::VALUE("'1'".to_string())),
+                    default: Some(DefaultValue::VALUE(PrismaValue::Boolean(true))),
                     auto_increment: false,
                 },
                 Column {
@@ -349,7 +349,7 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
                         family: ColumnTypeFamily::Float,
                         arity: ColumnArity::Nullable,
                     },
-                    default: Some(DefaultValue::VALUE("'1.0'".to_string())),
+                    default: Some(DefaultValue::VALUE(PrismaValue::new_float(1.0))),
                     auto_increment: false,
                 },
                 Column {
@@ -359,7 +359,7 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
                         family: ColumnTypeFamily::String,
                         arity: ColumnArity::Nullable,
                     },
-                    default: Some(DefaultValue::VALUE("default".to_string())),
+                    default: Some(DefaultValue::VALUE(PrismaValue::String("default".to_string()))),
                     auto_increment: false,
                 },
             ],

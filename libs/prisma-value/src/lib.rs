@@ -12,6 +12,7 @@ pub use error::ConversionFailure;
 pub type PrismaValueResult<T> = std::result::Result<T, ConversionFailure>;
 pub type PrismaListValue = Vec<PrismaValue>;
 
+use rust_decimal::prelude::FromPrimitive;
 #[cfg(feature = "sql-ext")]
 pub use sql_ext::*;
 
@@ -99,6 +100,14 @@ impl PrismaValue {
             PrismaValue::List(l) => Some(l),
             _ => None,
         }
+    }
+
+    pub fn new_float(float: f64) -> PrismaValue {
+        PrismaValue::Float(Decimal::from_f64(float).unwrap())
+    }
+
+    pub fn new_datetime(datetime: &str) -> PrismaValue {
+        PrismaValue::DateTime(DateTime::<Utc>::from_str(datetime).unwrap())
     }
 }
 
