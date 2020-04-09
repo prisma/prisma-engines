@@ -20,8 +20,10 @@ pub trait WithDatabaseName: WithName {
         self.single_database_name().unwrap_or(self.name())
     }
 
+    // TODO: remove
     fn database_names(&self) -> Vec<&str>;
 
+    // TODO: remove
     fn set_database_names(&mut self, database_name: Vec<String>) -> Result<(), String>;
 
     fn set_database_name(&mut self, database_name: Option<String>);

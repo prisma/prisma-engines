@@ -18,26 +18,7 @@ impl<T: dml::WithDatabaseName> DirectiveValidator<T> for MapDirectiveValidator {
     }
 
     fn serialize(&self, obj: &T, _datamodel: &dml::Datamodel) -> Result<Vec<ast::Directive>, DatamodelError> {
-        let db_names: Vec<ast::Expression> = obj
-            .database_names()
-            .into_iter()
-            .map(|name| ast::Expression::StringValue(String::from(name), Span::empty()))
-            .collect();
-
-        match db_names.len() {
-            0 => Ok(vec![]),
-            1 => {
-                let db_name = db_names.into_iter().next().unwrap();
-                Ok(vec![ast::Directive::new(
-                    DIRECTIVE_NAME,
-                    vec![ast::Argument::new("", db_name)],
-                )])
-            }
-            _ => {
-                let directive = ast::Directive::new(DIRECTIVE_NAME, vec![ast::Argument::new_array("", db_names)]);
-                Ok(vec![directive])
-            }
-        }
+        internal_serialize(obj)
     }
 }
 
@@ -47,4 +28,17 @@ fn internal_validate_and_apply(args: &mut Args, obj: &mut dyn WithDatabaseName) 
     })?;
     obj.set_database_name(Some(db_name));
     Ok(())
+}
+
+fn internal_serialize(obj: &dyn WithDatabaseName) -> Result<Vec<ast::Directive>, DatamodelError> {
+    match obj.single_database_name() {
+        Some(db_name) => Ok(vec![ast::Directive::new(
+            DIRECTIVE_NAME,
+            vec![ast::Argument::new_unnamed(ast::Expression::StringValue(
+                String::from(db_name),
+                Span::empty(),
+            ))],
+        )]),
+        None => Ok(vec![]),
+    }
 }
