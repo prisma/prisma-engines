@@ -12,16 +12,6 @@ pub trait MigrationPersistence: Send + Sync {
     /// Drop all persisted state.
     async fn reset(&self) -> Result<(), ConnectorError>;
 
-    async fn current_datamodel_ast(&self) -> Result<SchemaAst, ConnectorError> {
-        let ast = self
-            .last()
-            .await?
-            .and_then(|m| datamodel::ast::parser::parse(&m.datamodel_string).ok())
-            .unwrap_or_else(SchemaAst::empty);
-
-        Ok(ast)
-    }
-
     async fn last_non_watch_applied_migration(&self) -> Result<Option<Migration>, ConnectorError> {
         let migration =
             self.load_all().await?.into_iter().rev().find(|migration| {
@@ -261,9 +251,5 @@ impl MigrationPersistence for EmptyMigrationPersistence {
 
     async fn update(&self, _params: &MigrationUpdateParams) -> Result<(), ConnectorError> {
         unimplemented!("Not allowed on a EmptyMigrationPersistence")
-    }
-
-    async fn current_datamodel_ast(&self) -> Result<datamodel::ast::SchemaAst, ConnectorError> {
-        Ok(datamodel::ast::SchemaAst { tops: Vec::new() })
     }
 }

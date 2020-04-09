@@ -62,7 +62,11 @@ impl ErrorCollection {
 
 impl std::fmt::Display for ErrorCollection {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "{:?}", self.errors)
+        for error in &self.errors {
+            writeln!(f, "{} (span: {:?})", error, error.span())?;
+        }
+
+        Ok(())
     }
 }
 
