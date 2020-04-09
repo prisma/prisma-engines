@@ -1,23 +1,65 @@
-use crate::ast::Span;
+use crate::ast::{Directive, Span};
 use crate::error::DatamodelError;
 use crate::validator::directive::{Args, DirectiveValidator};
-use crate::{ast, dml, WithDatabaseName};
+use crate::{ast, dml, Datamodel, WithDatabaseName};
 
 /// Prismas builtin `@map` directive.
 pub struct MapDirectiveValidator {}
 
 const DIRECTIVE_NAME: &'static str = "map";
 
-impl<T: dml::WithDatabaseName> DirectiveValidator<T> for MapDirectiveValidator {
-    fn directive_name(&self) -> &'static str {
+impl DirectiveValidator<dml::Model> for MapDirectiveValidator {
+    fn directive_name(&self) -> &str {
         DIRECTIVE_NAME
     }
 
-    fn validate_and_apply(&self, args: &mut Args, obj: &mut T) -> Result<(), DatamodelError> {
+    fn validate_and_apply(&self, args: &mut Args, obj: &mut dml::Model) -> Result<(), DatamodelError> {
         internal_validate_and_apply(args, obj)
     }
 
-    fn serialize(&self, obj: &T, _datamodel: &dml::Datamodel) -> Result<Vec<ast::Directive>, DatamodelError> {
+    fn serialize(&self, obj: &dml::Model, _datamodel: &Datamodel) -> Result<Vec<Directive>, DatamodelError> {
+        internal_serialize(obj)
+    }
+}
+
+impl DirectiveValidator<dml::Field> for MapDirectiveValidator {
+    fn directive_name(&self) -> &str {
+        DIRECTIVE_NAME
+    }
+
+    fn validate_and_apply(&self, args: &mut Args, obj: &mut dml::Field) -> Result<(), DatamodelError> {
+        internal_validate_and_apply(args, obj)
+    }
+
+    fn serialize(&self, obj: &dml::Field, _datamodel: &Datamodel) -> Result<Vec<Directive>, DatamodelError> {
+        internal_serialize(obj)
+    }
+}
+
+impl DirectiveValidator<dml::Enum> for MapDirectiveValidator {
+    fn directive_name(&self) -> &str {
+        DIRECTIVE_NAME
+    }
+
+    fn validate_and_apply(&self, args: &mut Args, obj: &mut dml::Enum) -> Result<(), DatamodelError> {
+        internal_validate_and_apply(args, obj)
+    }
+
+    fn serialize(&self, obj: &dml::Enum, _datamodel: &Datamodel) -> Result<Vec<Directive>, DatamodelError> {
+        internal_serialize(obj)
+    }
+}
+
+impl DirectiveValidator<dml::EnumValue> for MapDirectiveValidator {
+    fn directive_name(&self) -> &str {
+        DIRECTIVE_NAME
+    }
+
+    fn validate_and_apply(&self, args: &mut Args, obj: &mut dml::EnumValue) -> Result<(), DatamodelError> {
+        internal_validate_and_apply(args, obj)
+    }
+
+    fn serialize(&self, obj: &dml::EnumValue, _datamodel: &Datamodel) -> Result<Vec<Directive>, DatamodelError> {
         internal_serialize(obj)
     }
 }
