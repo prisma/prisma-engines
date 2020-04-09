@@ -98,6 +98,8 @@ impl SqlSchemaDescriber {
     }
 
     async fn get_size(&self, schema: &str) -> usize {
+        use rust_decimal::prelude::*;
+
         debug!("Getting db size");
         let sql = r#"
             SELECT
@@ -108,11 +110,15 @@ impl SqlSchemaDescriber {
         let result = self.conn.query_raw(sql, &[schema.into()]).await.expect("get db size ");
         let size = result
             .first()
-            .map(|row| row.get("size").and_then(|x| x.to_string()).unwrap_or("0".to_string()))
-            .unwrap();
+            .and_then(|row| {
+                row.get("size")
+                    .and_then(|x| x.as_decimal())
+                    .and_then(|decimal| decimal.round().to_usize())
+            })
+            .unwrap_or(0);
 
         debug!("Found db size: {:?}", size);
-        size.parse().unwrap()
+        size as usize
     }
 
     fn get_table(

@@ -1983,7 +1983,7 @@ dependencies = [
 [[package]]
 name = "quaint"
 version = "0.2.0-alpha.11"
-source = "git+https://github.com/prisma/quaint#693906bb83353f621f4226ece8e6b26e84b031cf"
+source = "git+https://github.com/prisma/quaint#f85183c6eacfc37e1bd2880fe38d763633b69cba"
 dependencies = [
  "async-trait",
  "base64 0.11.0",
@@ -2578,6 +2578,7 @@ dependencies = [
  "pretty_assertions",
  "quaint",
  "regex",
+ "rust_decimal",
  "serde",
  "serde_json",
  "test-macros",
