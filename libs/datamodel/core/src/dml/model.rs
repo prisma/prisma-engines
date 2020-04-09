@@ -276,4 +276,8 @@ impl WithDatabaseName for Model {
             Ok(())
         }
     }
+
+    fn set_database_name(&mut self, database_name: Option<String>) {
+        self.database_name = database_name;
+    }
 }

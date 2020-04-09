@@ -177,6 +177,14 @@ impl WithDatabaseName for Field {
             }
         }
     }
+
+    fn set_database_name(&mut self, database_name: Option<String>) {
+        self.database_names = match database_name {
+            Some(db_name) => vec![db_name],
+            None => vec![],
+        }
+        //        self.database_name = database_name;
+    }
 }
 
 impl Field {

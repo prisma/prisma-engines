@@ -23,6 +23,8 @@ pub trait WithDatabaseName: WithName {
     fn database_names(&self) -> Vec<&str>;
 
     fn set_database_names(&mut self, database_name: Vec<String>) -> Result<(), String>;
+
+    fn set_database_name(&mut self, database_name: Option<String>);
 }
 
 pub trait Parsable: Sized {

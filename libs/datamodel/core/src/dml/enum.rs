@@ -73,6 +73,10 @@ impl WithDatabaseName for Enum {
             Ok(())
         }
     }
+
+    fn set_database_name(&mut self, database_name: Option<String>) {
+        self.database_name = database_name;
+    }
 }
 
 /// Represents a value of an enum
@@ -131,5 +135,9 @@ impl WithDatabaseName for EnumValue {
             self.database_name = first;
             Ok(())
         }
+    }
+
+    fn set_database_name(&mut self, database_name: Option<String>) {
+        self.database_name = database_name;
     }
 }
