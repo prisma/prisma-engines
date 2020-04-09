@@ -69,7 +69,6 @@ fn must_forbid_env_functions_in_provider_field() {
             url = env("DB_URL")
         }
     "#;
-    std::env::set_var("DB_PROVIDER", "postgresql");
     std::env::set_var("DB_URL", "https://localhost");
     let config = datamodel::parse_configuration(schema);
     assert!(config.is_err());
