@@ -1,6 +1,6 @@
 use crate::common::*;
 use datamodel::ast::Span;
-use datamodel::{ast, error::DatamodelError};
+use datamodel::error::DatamodelError;
 
 #[test]
 fn map_directive() {
@@ -31,36 +31,12 @@ fn map_directive() {
 }
 
 #[test]
-#[ignore]
-fn map_must_fail_on_multiple_args_for_enums() {
-    let dml = r#"
-    enum Status {
-        A
-        B
-        
-        @@map(["name1", "name2"])
-    }
-    "#;
-
-    let errors = parse_error(dml);
-    errors.assert_is_at(
-        0,
-        DatamodelError::new_directive_validation_error(
-            "A Model must not specify multiple mapped names.",
-            "map",
-            ast::Span::new(56, 79),
-        ),
-    );
-}
-
-#[test]
-#[ignore] // this is hard to implement with the current abstraction in use for `@map`
 fn map_must_error_for_relation_fields() {
     let dml = r#"
     model User {
         id Int @id
         fooId Int
-        relationField  Foo @relation(fields: [fooId], references: [id]) @map(["custom_name"])
+        relationField  Foo @relation(fields: [fooId], references: [id]) @map("custom_name")
     }
     
     model Foo {
@@ -70,8 +46,8 @@ fn map_must_error_for_relation_fields() {
 
     let errors = parse_error(dml);
     errors.assert_is(DatamodelError::new_directive_validation_error(
-        "",
+        "The directive `@map` can not be used on relation fields.",
         "map",
-        Span::new(0, 0),
+        Span::new(128, 146),
     ));
 }

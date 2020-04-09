@@ -22,12 +22,22 @@ impl DirectiveValidator<dml::Model> for MapDirectiveValidator {
     }
 }
 
-impl DirectiveValidator<dml::Field> for MapDirectiveValidator {
+pub struct MapDirectiveValidatorForField {}
+impl DirectiveValidator<dml::Field> for MapDirectiveValidatorForField {
     fn directive_name(&self) -> &str {
         DIRECTIVE_NAME
     }
 
     fn validate_and_apply(&self, args: &mut Args, obj: &mut dml::Field) -> Result<(), DatamodelError> {
+        if obj.field_type.is_relation() {
+            return self.new_directive_validation_error(
+                &format!(
+                    "The directive `@{}` can not be used on relation fields.",
+                    DIRECTIVE_NAME
+                ),
+                args.span(),
+            );
+        }
         internal_validate_and_apply(args, obj)
     }
 
