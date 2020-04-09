@@ -1,7 +1,7 @@
 use crate::ast::Span;
 use crate::error::DatamodelError;
 use crate::validator::directive::{Args, DirectiveValidator};
-use crate::{ast, dml};
+use crate::{ast, dml, WithDatabaseName};
 
 /// Prismas builtin `@map` directive.
 pub struct MapDirectiveValidator {}
@@ -14,36 +14,7 @@ impl<T: dml::WithDatabaseName> DirectiveValidator<T> for MapDirectiveValidator {
     }
 
     fn validate_and_apply(&self, args: &mut Args, obj: &mut T) -> Result<(), DatamodelError> {
-        match args.default_arg("name")?.as_array() {
-            Ok(value) => {
-                let db_names = value
-                    .into_iter()
-                    .map(|v| v.as_str())
-                    .collect::<Result<Vec<String>, _>>()?;
-
-                if db_names.len() == 0 {
-                    return Err(DatamodelError::new_directive_validation_error(
-                        "Expected one argument. No argument was provided.",
-                        DIRECTIVE_NAME,
-                        args.span(),
-                    ));
-                } else {
-                    obj.set_database_names(db_names).map_err(|err_msg| {
-                        DatamodelError::new_directive_validation_error(&err_msg, DIRECTIVE_NAME, args.span())
-                    })?
-                }
-            }
-            // self.parser_error would be better here, but we cannot call it due to rust limitations.
-            Err(err) => {
-                return Err(DatamodelError::new_directive_validation_error(
-                    &format!("{}", err),
-                    "map",
-                    err.span(),
-                ))
-            }
-        };
-
-        Ok(())
+        internal_validate_and_apply(args, obj)
     }
 
     fn serialize(&self, obj: &T, _datamodel: &dml::Datamodel) -> Result<Vec<ast::Directive>, DatamodelError> {
@@ -68,4 +39,12 @@ impl<T: dml::WithDatabaseName> DirectiveValidator<T> for MapDirectiveValidator {
             }
         }
     }
+}
+
+fn internal_validate_and_apply(args: &mut Args, obj: &mut dyn WithDatabaseName) -> Result<(), DatamodelError> {
+    let db_name = args.default_arg("name")?.as_str().map_err(|err| {
+        DatamodelError::new_directive_validation_error(&format!("{}", err), DIRECTIVE_NAME, err.span())
+    })?;
+    obj.set_database_name(Some(db_name));
+    Ok(())
 }

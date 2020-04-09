@@ -31,47 +31,6 @@ fn map_directive() {
 }
 
 #[test]
-fn map_must_fail_on_multiple_args_for_scalar_fields() {
-    let dml = r#"
-    model User {
-        id Int @id
-        firstName String @map(["name1", "name2"])
-    }
-    "#;
-
-    let errors = parse_error(dml);
-    errors.assert_is_at(
-        0,
-        DatamodelError::new_directive_validation_error(
-            "A scalar Field must not specify multiple mapped names.",
-            "map",
-            ast::Span::new(63, 86),
-        ),
-    );
-}
-
-#[test]
-fn map_must_fail_on_multiple_args_for_models() {
-    let dml = r#"
-    model User {
-        id Int @id
-        
-        @@map(["name1", "name2"])
-    }
-    "#;
-
-    let errors = parse_error(dml);
-    errors.assert_is_at(
-        0,
-        DatamodelError::new_directive_validation_error(
-            "A Model must not specify multiple mapped names.",
-            "map",
-            ast::Span::new(56, 79),
-        ),
-    );
-}
-
-#[test]
 #[ignore]
 fn map_must_fail_on_multiple_args_for_enums() {
     let dml = r#"
