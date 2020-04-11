@@ -48,7 +48,7 @@ pub(crate) trait SqlRenderer {
         match (default, family) {
             (DefaultValue::DBGENERATED(val), _) => val.as_str().into(),
             (DefaultValue::VALUE(PrismaValue::String(val)), ColumnTypeFamily::String)
-            | (DefaultValue::VALUE(PrismaValue::String(val)), ColumnTypeFamily::Enum(_)) => format!(
+            | (DefaultValue::VALUE(PrismaValue::Enum(val)), ColumnTypeFamily::Enum(_)) => format!(
                 "'{}'",
                 val.trim_start_matches('\'')
                     .trim_end_matches('\'')
