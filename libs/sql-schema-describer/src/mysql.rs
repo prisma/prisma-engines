@@ -1,6 +1,5 @@
 use super::*;
 use log::debug;
-use once_cell::sync::Lazy;
 use quaint::prelude::Queryable;
 use std::collections::{BTreeMap, HashMap};
 use std::sync::Arc;
@@ -237,7 +236,7 @@ async fn get_all_columns(conn: &dyn Queryable, schema_name: &str) -> HashMap<Str
                         },
                         //todo Maria DB does not seem to quote the strings, but it allows functions which MySQL doesnt
                         ColumnTypeFamily::String => match &default_string.starts_with("'") {
-                            true => DefaultValue::VALUE(PrismaValue::String(unquote(default_string))),
+                            true => DefaultValue::VALUE(PrismaValue::String(unquote_string(default_string))),
                             false => DefaultValue::VALUE(PrismaValue::String(default_string)),
                         },
                         //todo check other now() definitions
@@ -255,7 +254,7 @@ async fn get_all_columns(conn: &dyn Queryable, schema_name: &str) -> HashMap<Str
                         ColumnTypeFamily::LogSequenceNumber => DefaultValue::DBGENERATED(default_string),
                         ColumnTypeFamily::TextSearch => DefaultValue::DBGENERATED(default_string),
                         ColumnTypeFamily::TransactionId => DefaultValue::DBGENERATED(default_string),
-                        ColumnTypeFamily::Enum(_) => DefaultValue::VALUE(PrismaValue::Enum(unquote(
+                        ColumnTypeFamily::Enum(_) => DefaultValue::VALUE(PrismaValue::Enum(unquote_string(
                             default_string.replace("_utf8mb4", "").replace("\\\'", ""),
                         ))),
                         ColumnTypeFamily::Unsupported(_) => DefaultValue::DBGENERATED(default_string),
@@ -556,31 +555,5 @@ fn get_column_type_and_enum(
 fn extract_enum_values(full_data_type: &&str) -> Vec<String> {
     let len = &full_data_type.len() - 1;
     let vals = &full_data_type[5..len];
-    vals.split(",").map(|v| unquote(v.into())).collect()
-}
-
-fn unquote(input: String) -> String {
-    /// Regex for matching the quotes on the introspected string values on MariaDB.
-    static MARIADB_STRING_DEFAULT_RE: Lazy<regex::Regex> = Lazy::new(|| regex::Regex::new(r#"^'(.*)'$"#).unwrap());
-
-    MARIADB_STRING_DEFAULT_RE
-        .captures(input.as_ref())
-        .and_then(|captures| captures.get(1))
-        .map(|capt| capt.as_str())
-        .unwrap_or(input.as_ref())
-        .to_string()
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn mariadb_string_default_regex_works() {
-        let quoted_str = "'abc $$ def'".to_string();
-
-        assert_eq!(unquote(quoted_str), "abc $$ def");
-
-        assert_eq!(unquote("heh ".to_string()), "heh ");
-    }
+    vals.split(",").map(|v| unquote_string(v.into())).collect()
 }

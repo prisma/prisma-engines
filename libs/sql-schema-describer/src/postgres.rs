@@ -1,10 +1,8 @@
 //! Postgres description.
 use super::*;
 use log::debug;
-use once_cell::sync::Lazy;
 use quaint::prelude::Queryable;
 use regex::Regex;
-use std::borrow::Cow;
 use std::collections::HashMap;
 use std::convert::TryInto;
 use std::sync::Arc;
@@ -230,7 +228,7 @@ impl SqlSchemaDescriber {
                             ColumnTypeFamily::String => {
                                 match unsuffix_default_literal(&default_string, &data_type, &full_data_type) {
                                     Some(default_literal) => {
-                                        DefaultValue::VALUE(PrismaValue::String(unquote(default_literal).into_owned()))
+                                        DefaultValue::VALUE(PrismaValue::String(unquote_string(default_literal.into())))
                                     }
                                     None => DefaultValue::DBGENERATED(default_string),
                                 }
@@ -253,9 +251,9 @@ impl SqlSchemaDescriber {
                             ColumnTypeFamily::Enum(enum_name) => {
                                 let enum_suffix = format!("::{}", enum_name);
                                 match default_string.ends_with(&enum_suffix) {
-                                    true => DefaultValue::VALUE(PrismaValue::Enum(
-                                        unquote(&default_string.replace(&enum_suffix, "")).into_owned(),
-                                    )),
+                                    true => DefaultValue::VALUE(PrismaValue::Enum(unquote_string(
+                                        default_string.replace(&enum_suffix, ""),
+                                    ))),
                                     false => DefaultValue::DBGENERATED(default_string),
                                 }
                             }
@@ -701,13 +699,6 @@ fn is_autoincrement(value: &str, schema_name: &str, table_name: &str, column_nam
         .unwrap_or(false)
 }
 
-fn unquote(input: &str) -> Cow<'_, str> {
-    /// Regex for matching the quotes on the introspected string values on Postgres.
-    static POSTGRES_STRING_DEFAULT_RE: Lazy<regex::Regex> = Lazy::new(|| regex::Regex::new(r#"^B?'(.*)'$"#).unwrap());
-
-    POSTGRES_STRING_DEFAULT_RE.replace(input, "$1")
-}
-
 fn unsuffix_default_literal<'a>(literal: &'a str, data_type: &str, full_data_type: &str) -> Option<&'a str> {
     static POSTGRES_DATA_TYPE_SUFFIX_RE: Lazy<regex::Regex> =
         Lazy::new(|| regex::Regex::new(r#"(.*)::"?(.*)"?$"#).unwrap());
@@ -780,13 +771,5 @@ mod tests {
             "compound_table",
             "compound_column_name",
         ));
-    }
-    #[test]
-    fn postgres_unquote_string_default_regex_works() {
-        let quoted_str = "'abc $$ def'";
-
-        assert_eq!(unquote(quoted_str), "abc $$ def");
-
-        assert_eq!(unquote("heh "), "heh ");
     }
 }

@@ -153,9 +153,9 @@ impl SqlSchemaDescriber {
                                         None => DefaultValue::DBGENERATED(default_string),
                                     },
                                 },
-                                ColumnTypeFamily::String => DefaultValue::VALUE(PrismaValue::String(unquote_double(
-                                    unquote_single(default_string),
-                                ))),
+                                ColumnTypeFamily::String => {
+                                    DefaultValue::VALUE(PrismaValue::String(unquote_string(default_string)))
+                                }
                                 ColumnTypeFamily::DateTime => match default_string.to_lowercase()
                                     == "current_timestamp".to_string()
                                     || default_string.to_lowercase() == "datetime(\'now\')".to_string()
@@ -437,27 +437,3 @@ const SQLITE_SYSTEM_TABLES: &[&str] = &[
     "sqlite_stat3",
     "sqlite_stat4",
 ];
-
-fn unquote_single(input: String) -> String {
-    /// Regex for matching the quotes on the introspected string values on Sqlite.
-    static SQLITE_STRING_DEFAULT_RE: Lazy<regex::Regex> = Lazy::new(|| regex::Regex::new(r#"^'(.*)'$"#).unwrap());
-
-    SQLITE_STRING_DEFAULT_RE
-        .captures(input.as_ref())
-        .and_then(|captures| captures.get(1))
-        .map(|capt| capt.as_str())
-        .unwrap_or(input.as_ref())
-        .to_string()
-}
-
-fn unquote_double(input: String) -> String {
-    /// Regex for matching the quotes on the introspected string values on Sqlite.
-    static SQLITE_STRING_DEFAULT_RE: Lazy<regex::Regex> = Lazy::new(|| regex::Regex::new(r#"^"(.*)"$"#).unwrap());
-
-    SQLITE_STRING_DEFAULT_RE
-        .captures(input.as_ref())
-        .and_then(|captures| captures.get(1))
-        .map(|capt| capt.as_str())
-        .unwrap_or(input.as_ref())
-        .to_string()
-}
