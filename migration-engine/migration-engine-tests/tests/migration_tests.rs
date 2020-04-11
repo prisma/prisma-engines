@@ -1390,7 +1390,7 @@ async fn column_defaults_must_be_migrated(api: &TestApi) -> TestResult {
 
     api.assert_schema().await?.assert_table("Fruit", |table| {
         table.assert_column("name", |col| {
-            col.assert_default(Some(DefaultValue::VALUE(PrismaValue::String("banana".to_uppercase()))))
+            col.assert_default(Some(DefaultValue::VALUE(PrismaValue::String("banana".to_string()))))
         })
     })?;
 
