@@ -234,11 +234,9 @@ async fn get_all_columns(conn: &dyn Queryable, schema_name: &str) -> HashMap<Str
                             Some(PrismaValue::Int(0)) => DefaultValue::VALUE(PrismaValue::Boolean(false)),
                             _ => DefaultValue::DBGENERATED(default_string),
                         },
-                        //todo Maria DB does not seem to quote the strings, but it allows functions which MySQL doesnt
-                        ColumnTypeFamily::String => match &default_string.starts_with("'") {
-                            true => DefaultValue::VALUE(PrismaValue::String(unquote_string(default_string))),
-                            false => DefaultValue::VALUE(PrismaValue::String(default_string)),
-                        },
+                        ColumnTypeFamily::String => {
+                            DefaultValue::VALUE(PrismaValue::String(unquote_string(default_string)))
+                        }
                         //todo check other now() definitions
                         ColumnTypeFamily::DateTime => match default_string.to_lowercase()
                             == "current_timestamp".to_string()

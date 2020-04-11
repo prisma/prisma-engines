@@ -20,6 +20,7 @@ use postgres_renderer::PostgresRenderer;
 use sqlite_renderer::SqliteRenderer;
 use std::borrow::Cow;
 
+use prisma_value::PrismaValue;
 use std::fmt::Write as _;
 
 pub(crate) trait SqlRenderer {
@@ -46,8 +47,17 @@ pub(crate) trait SqlRenderer {
     fn render_default<'a>(&self, default: &'a DefaultValue, family: &ColumnTypeFamily) -> Cow<'a, str> {
         match (default, family) {
             (DefaultValue::DBGENERATED(val), _) => val.as_str().into(),
-            (DefaultValue::VALUE(val), ColumnTypeFamily::String)
-            | (DefaultValue::VALUE(val), ColumnTypeFamily::Enum(_)) => format!("'{}'", val).into(),
+            (DefaultValue::VALUE(PrismaValue::String(val)), ColumnTypeFamily::String)
+            | (DefaultValue::VALUE(PrismaValue::String(val)), ColumnTypeFamily::Enum(_)) => format!(
+                "'{}'",
+                val.trim_start_matches('\'')
+                    .trim_end_matches('\'')
+                    .trim_start_matches('\\')
+                    .trim_start_matches('"')
+                    .trim_end_matches('"')
+                    .trim_end_matches('\\')
+            )
+            .into(),
             (DefaultValue::NOW, ColumnTypeFamily::DateTime) => "CURRENT_TIMESTAMP".into(),
             (DefaultValue::NOW, _) => unreachable!("NOW default on non-datetime column"),
             (DefaultValue::VALUE(val), ColumnTypeFamily::DateTime) => format!("'{}'", val).into(),
