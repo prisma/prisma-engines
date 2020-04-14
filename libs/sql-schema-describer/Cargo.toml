@@ -14,6 +14,8 @@ regex = "1.2"
 async-trait = "0.1.17"
 once_cell = "1.3"
 rust_decimal = "=1.1.0"
+prisma-value = { path = "../prisma-value" }
+
 
 [dependencies.quaint]
 git = "https://github.com/prisma/quaint"

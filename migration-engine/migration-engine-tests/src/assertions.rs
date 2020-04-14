@@ -241,16 +241,11 @@ impl<'a> TableAssertion<'a> {
 pub struct ColumnAssertion<'a>(&'a Column);
 
 impl<'a> ColumnAssertion<'a> {
-    pub fn assert_default(self, expected: Option<&str>) -> AssertionResult<Self> {
-        let found = self.0.default.as_ref().map(|default_value| match default_value {
-            DefaultValue::VALUE(s) => s,
-            DefaultValue::SEQUENCE(s) => s,
-            DefaultValue::DBGENERATED(s) => s,
-            DefaultValue::NOW => "CURRENT_TIMESTAMP",
-        });
+    pub fn assert_default(self, expected: Option<DefaultValue>) -> AssertionResult<Self> {
+        let found = &self.0.default;
 
         anyhow::ensure!(
-            found == expected,
+            found == &expected,
             "Assertion failed. Expected default: {:?}, but found {:?}",
             expected,
             found

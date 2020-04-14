@@ -5,6 +5,7 @@ use datamodel::common::*;
 use datamodel::*;
 use datamodel_helpers::{FieldRef, ModelRef, TypeRef};
 use prisma_models::{DatamodelConverter, TempManifestationHolder, TempRelationHolder};
+use prisma_value::PrismaValue;
 use quaint::prelude::SqlFamily;
 use sql_schema_describer::{self as sql, ColumnArity};
 
@@ -329,42 +330,25 @@ fn migration_value_new(field: &FieldRef<'_>) -> Option<sql_schema_describer::Def
     }
 
     let value = match &field.default_value()? {
-        dml::DefaultValue::Single(s) => s.clone(),
+        dml::DefaultValue::Single(s) => match field.field_type() {
+            TypeRef::Enum(inum) => {
+                let corresponding_value = inum
+                    .r#enum
+                    .values()
+                    .find(|val| val.name.as_str() == s.to_string())
+                    .expect("could not find enum value");
+
+                PrismaValue::Enum(corresponding_value.final_database_name().to_owned())
+            }
+            _ => s.clone(),
+        },
         dml::DefaultValue::Expression(expression) if expression.name == "now" && expression.args.is_empty() => {
             return Some(sql_schema_describer::DefaultValue::NOW)
         }
         dml::DefaultValue::Expression(_) => return None,
     };
 
-    let result = match value {
-        ScalarValue::Boolean(x) => if x { "true" } else { "false" }.to_string(),
-        ScalarValue::Int(x) => x.to_string(),
-        ScalarValue::Float(x) => x.to_string(),
-        ScalarValue::Decimal(x) => x.to_string(),
-        ScalarValue::String(x) => x,
-
-        ScalarValue::DateTime(x) => {
-            // TODO: use a proper format string instead.
-            let mut raw = x.to_string(); // this will produce a String 1970-01-01 00:00:00 UTC
-            raw.truncate(raw.len() - 4); // strip the UTC suffix
-            raw
-        }
-
-        ScalarValue::ConstantLiteral(x) => match field.field_type() {
-            TypeRef::Enum(inum) => {
-                let corresponding_value = inum
-                    .values()
-                    .iter()
-                    .find(|val| val.name.as_str() == x)
-                    .expect("could not find enum value");
-
-                corresponding_value.final_database_name().to_owned()
-            }
-            _ => unreachable!("Constant default on non-enum field."),
-        },
-    };
-
-    Some(sql_schema_describer::DefaultValue::VALUE(result))
+    Some(sql_schema_describer::DefaultValue::VALUE(value.clone()))
 }
 
 fn enum_column_type(field: &FieldRef<'_>, database_info: &DatabaseInfo, db_name: &str) -> sql::ColumnType {
@@ -410,7 +394,6 @@ fn column_type_for_scalar_type(scalar_type: &ScalarType, column_arity: ColumnAri
         ScalarType::Boolean => sql::ColumnType::pure(sql::ColumnTypeFamily::Boolean, column_arity),
         ScalarType::String => sql::ColumnType::pure(sql::ColumnTypeFamily::String, column_arity),
         ScalarType::DateTime => sql::ColumnType::pure(sql::ColumnTypeFamily::DateTime, column_arity),
-        ScalarType::Decimal => unimplemented!(),
     }
 }
 

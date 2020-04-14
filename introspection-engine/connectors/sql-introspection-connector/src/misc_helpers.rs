@@ -1,10 +1,8 @@
 use datamodel::{
     Datamodel, DefaultValue as DMLDef, Field, FieldArity, FieldType, IndexDefinition, Model, OnDeleteStrategy,
-    RelationInfo, ScalarType, ScalarValue as SV, ValueGenerator as VG,
+    RelationInfo, ScalarType, ValueGenerator as VG,
 };
 use log::debug;
-use once_cell::sync::Lazy;
-use regex::Regex;
 use sql_schema_describer::{
     Column, ColumnArity, ColumnTypeFamily, DefaultValue as SQLDef, ForeignKey, Index, IndexType, SqlSchema, Table,
 };
@@ -240,24 +238,13 @@ pub(crate) fn calculate_backrelation_field(
 pub(crate) fn calculate_default(table: &Table, column: &Column, arity: &FieldArity) -> Option<DMLDef> {
     match (&column.default, &column.tpe.family) {
         (_, _) if *arity == FieldArity::List => None,
-        (None, _) if column.auto_increment => Some(DMLDef::Expression(VG::new_autoincrement())),
-        (Some(SQLDef::DBGENERATED(_)), _) => Some(DMLDef::Expression(VG::new_dbgenerated())),
+        (_, ColumnTypeFamily::Int) if column.auto_increment => Some(DMLDef::Expression(VG::new_autoincrement())),
+        (_, ColumnTypeFamily::Int) if is_sequence(column, table) => Some(DMLDef::Expression(VG::new_autoincrement())),
         (Some(SQLDef::SEQUENCE(_)), _) => Some(DMLDef::Expression(VG::new_autoincrement())),
-        (Some(SQLDef::VALUE(val)), ColumnTypeFamily::Boolean) => match parse_int(val) {
-            Some(x) => Some(DMLDef::Single(SV::Boolean(x != 0))),
-            None => parse_bool(val).map(|b| DMLDef::Single(SV::Boolean(b))),
-        },
-        (Some(SQLDef::VALUE(val)), ColumnTypeFamily::Int) => match column.auto_increment {
-            true => Some(DMLDef::Expression(VG::new_autoincrement())),
-            _ if is_sequence(column, table) => Some(DMLDef::Expression(VG::new_autoincrement())),
-            false => parse_int(val).map(|x| DMLDef::Single(SV::Int(x))),
-        },
-        (Some(SQLDef::VALUE(val)), ColumnTypeFamily::Float) => parse_float(val).map(|x| DMLDef::Single(SV::Float(x))),
-        (Some(SQLDef::VALUE(val)), ColumnTypeFamily::String) => Some(DMLDef::Single(SV::String(val.into()))),
         (Some(SQLDef::NOW), ColumnTypeFamily::DateTime) => Some(DMLDef::Expression(VG::new_now())),
-        (Some(SQLDef::VALUE(_)), ColumnTypeFamily::DateTime) => Some(DMLDef::Expression(VG::new_dbgenerated())), //todo parse datetime value
-        (Some(SQLDef::VALUE(val)), ColumnTypeFamily::Enum(_)) => Some(DMLDef::Single(SV::ConstantLiteral(val.into()))),
-        (_, _) => None,
+        (Some(SQLDef::DBGENERATED(_)), _) => Some(DMLDef::Expression(VG::new_dbgenerated())),
+        (Some(SQLDef::VALUE(val)), _) => Some(DMLDef::Single(val.clone())),
+        _ => None,
     }
 }
 
@@ -362,56 +349,6 @@ pub fn deduplicate_field_names(datamodel: &mut Datamodel) {
             field.name = format!("{}_{}", field.name, &relation_name);
         });
 }
-
-static RE_NUM: Lazy<Regex> = Lazy::new(|| Regex::new(r"^'?(\d+)'?$").expect("compile regex"));
-
-fn parse_int(value: &str) -> Option<i32> {
-    debug!("Parsing int '{}'", value);
-    let rslt = RE_NUM.captures(value);
-    if rslt.is_none() {
-        debug!("Couldn't parse int");
-        return None;
-    }
-
-    let captures = rslt.expect("get captures");
-    let num_str = captures.get(1).expect("get capture").as_str();
-    let num_rslt = num_str.parse::<i32>();
-    match num_rslt {
-        Ok(num) => Some(num),
-        Err(_) => {
-            debug!("Couldn't parse int '{}'", num_str);
-            None
-        }
-    }
-}
-
-fn parse_bool(value: &str) -> Option<bool> {
-    debug!("Parsing bool '{}'", value);
-    value.to_lowercase().parse().ok()
-}
-
-static RE_FLOAT: Lazy<Regex> = Lazy::new(|| Regex::new(r"^'?([^']+)'?$").expect("compile regex"));
-
-fn parse_float(value: &str) -> Option<f64> {
-    debug!("Parsing float '{}'", value);
-    let rslt = RE_FLOAT.captures(value);
-    if rslt.is_none() {
-        debug!("Couldn't parse float");
-        return None;
-    }
-
-    let captures = rslt.expect("get captures");
-    let num_str = captures.get(1).expect("get capture").as_str();
-    let num_rslt = num_str.parse::<f64>();
-    match num_rslt {
-        Ok(num) => Some(num),
-        Err(_) => {
-            debug!("Couldn't parse float '{}'", num_str);
-            None
-        }
-    }
-}
-
 /// Returns whether the elements of the two slices match, regardless of ordering.
 pub fn columns_match(a_cols: &[String], b_cols: &[String]) -> bool {
     a_cols.len() == b_cols.len() && a_cols.iter().all(|a_col| b_cols.iter().any(|b_col| a_col == b_col))
