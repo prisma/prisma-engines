@@ -205,10 +205,21 @@ fn render_raw_sql(
 
             Ok(vec![create_table])
         }
-        SqlMigrationStep::DropTable(DropTable { name }) => Ok(vec![format!(
-            "DROP TABLE {};",
-            renderer.quote_with_schema(&schema_name, &name)
-        )]),
+        SqlMigrationStep::DropTable(DropTable { name }) => match sql_family {
+            SqlFamily::Mysql | SqlFamily::Postgres => Ok(vec![format!(
+                "DROP TABLE {};",
+                renderer.quote_with_schema(&schema_name, &name)
+            )]),
+            // Turning off the pragma is safe, because schema validation would forbid foreign keys
+            // to a non-existent model. There appears to be no other way to deal with cyclic
+            // dependencies in the dropping order of tables in the presence of foreign key
+            // constraints on SQLite.
+            SqlFamily::Sqlite => Ok(vec![
+                "PRAGMA foreign_keys=off".to_string(),
+                format!("DROP TABLE {};", renderer.quote_with_schema(&schema_name, &name)),
+                "PRAGMA foreign_keys=on".to_string(),
+            ]),
+        },
         SqlMigrationStep::DropTables(DropTables { names }) => {
             let fully_qualified_names: Vec<String> = names
                 .iter()
@@ -303,7 +314,7 @@ fn render_raw_sql(
                             let constraint_name = renderer.quote(&constraint_name);
                             lines.push(format!("DROP CONSTRAINT IF EXiSTS {}", constraint_name));
                         }
-                        _ => (),
+                        SqlFamily::Sqlite => (),
                     },
                 };
             }

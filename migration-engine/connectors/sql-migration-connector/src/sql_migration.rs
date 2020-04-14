@@ -86,8 +86,6 @@ pub enum TableChange {
     AddColumn(AddColumn),
     AlterColumn(AlterColumn),
     DropColumn(DropColumn),
-    /// This is actually producing SQL only on MySQL, where we have to drop the foreign key
-    /// constraint before any column that is part of it.
     DropForeignKey(DropForeignKey),
 }
 

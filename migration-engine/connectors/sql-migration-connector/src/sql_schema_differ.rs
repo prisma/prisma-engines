@@ -45,8 +45,8 @@ impl SqlSchemaDiff {
             // Order matters: we must run `alter table`s before `drop`s because we want to
             // drop foreign keys before the tables they are pointing to.
             .chain(wrap_as_step(self.alter_tables, SqlMigrationStep::AlterTable))
-            // Order matters: we must create indexes after ALTER TABLEs because the indexes can be on fields that
-            // are dropped/created there.
+            // Order matters: we must create indexes after ALTER TABLEs because the indexes can be
+            // on fields that are dropped/created there.
             .chain(wrap_as_step(self.create_indexes, SqlMigrationStep::CreateIndex))
             // Order matters: this needs to come after create_indexes, because the foreign keys can depend on unique
             // indexes created there.
@@ -70,12 +70,15 @@ impl<'schema> SqlSchemaDiffer<'schema> {
 
     fn diff_internal(&self) -> SqlSchemaDiff {
         let alter_indexes: Vec<_> = self.alter_indexes();
+        let (drop_tables, drop_foreign_keys) = self.drop_tables();
+        let mut alter_tables = self.alter_tables();
+        alter_tables.extend(drop_foreign_keys.into_iter());
 
         SqlSchemaDiff {
             add_foreign_keys: self.add_foreign_keys(),
-            drop_tables: self.drop_tables(),
+            drop_tables,
             create_tables: self.create_tables(),
-            alter_tables: self.alter_tables(),
+            alter_tables,
             create_indexes: self.create_indexes(),
             drop_indexes: self.drop_indexes(),
             alter_indexes,
@@ -93,12 +96,39 @@ impl<'schema> SqlSchemaDiffer<'schema> {
             .collect()
     }
 
-    fn drop_tables(&self) -> Vec<DropTable> {
-        self.dropped_tables()
-            .map(|dropped_table| DropTable {
+    // We drop the foreign keys of dropped tables first, so we can drop tables in whatever order we
+    // please later.
+    fn drop_tables(&self) -> (Vec<DropTable>, Vec<AlterTable>) {
+        let (dropped_tables_count, dropped_fks_count) = self.dropped_tables().fold((0, 0), |(tables, fks), item| {
+            (tables + 1, fks + item.foreign_keys.len())
+        });
+        let mut dropped_tables = Vec::with_capacity(dropped_tables_count);
+        let mut dropped_foreign_keys = Vec::with_capacity(dropped_fks_count);
+
+        for dropped_table in self.dropped_tables() {
+            let drop_table = DropTable {
                 name: dropped_table.name.clone(),
-            })
-            .collect()
+            };
+
+            dropped_tables.push(drop_table);
+
+            for fk_name in dropped_table
+                .foreign_keys
+                .iter()
+                .filter_map(|fk| fk.constraint_name.as_ref())
+            {
+                let alter_table = AlterTable {
+                    table: dropped_table.clone(),
+                    changes: vec![TableChange::DropForeignKey(DropForeignKey {
+                        constraint_name: fk_name.clone(),
+                    })],
+                };
+
+                dropped_foreign_keys.push(alter_table);
+            }
+        }
+
+        (dropped_tables, dropped_foreign_keys)
     }
 
     fn add_foreign_keys(&self) -> Vec<AddForeignKey> {

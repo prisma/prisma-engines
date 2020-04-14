@@ -350,3 +350,41 @@ async fn indexes_on_composite_relation_fields(api: &TestApi) -> TestResult {
 
     Ok(())
 }
+
+#[test_each_connector(tags("sql"))]
+async fn dropping_mutually_referencing_tables_works(api: &TestApi) -> TestResult {
+    let dm1 = r#"
+    model A {
+        id Int @id
+        b_id Int
+        ab B @relation("AtoB", fields: [b_id], references: [id])
+        c_id Int
+        ac C @relation("AtoC", fields: [c_id], references: [id])
+    }
+
+    model B {
+        id Int @id
+        a_id Int
+        ba A @relation("BtoA", fields: [a_id], references: [id])
+        c_id Int
+        bc C @relation("BtoC", fields: [c_id], references: [id])
+    }
+
+    model C {
+        id Int @id
+        a_id Int
+        ca A @relation("CtoA", fields: [a_id], references: [id])
+        b_id Int
+        cb B @relation("CtoB", fields: [b_id], references: [id])
+    }
+
+    "#;
+
+    api.infer_apply(dm1).send().await?.assert_green()?;
+    api.assert_schema().await?.assert_tables_count(3)?;
+
+    api.infer_apply("").send().await?.assert_green()?;
+    api.assert_schema().await?.assert_tables_count(0)?;
+
+    Ok(())
+}

@@ -46,9 +46,15 @@ impl<'a> ApplyMigrationCommand<'a> {
         let connector = engine.connector();
         let migration_persistence = connector.migration_persistence();
 
-        let current_datamodel_ast = migration_persistence.current_datamodel_ast().await?;
-        let current_datamodel =
-            datamodel::lift_ast(&current_datamodel_ast).map_err(CommandError::ProducedBadDatamodel)?;
+        let last_migration = migration_persistence.last().await?;
+        let (current_datamodel_string, current_datamodel_ast) = last_migration
+            .map(|migration| {
+                let ast = migration.datamodel_ast();
+                (migration.datamodel_string, ast)
+            })
+            .unwrap_or_else(|| (String::new(), SchemaAst::empty()));
+        let current_datamodel = datamodel::lift_ast(&current_datamodel_ast)
+            .map_err(|err| CommandError::InvalidPersistedDatamodel(err, current_datamodel_string))?;
 
         let last_non_watch_datamodel = migration_persistence
             .last_non_watch_migration()
@@ -84,9 +90,15 @@ impl<'a> ApplyMigrationCommand<'a> {
             )));
         }
 
-        let current_datamodel_ast = migration_persistence.current_datamodel_ast().await?;
-        let current_datamodel =
-            datamodel::lift_ast(&current_datamodel_ast).map_err(CommandError::ProducedBadDatamodel)?;
+        let last_migration = migration_persistence.last().await?;
+        let (current_datamodel_string, current_datamodel_ast) = last_migration
+            .map(|migration| {
+                let ast = migration.datamodel_ast();
+                (migration.datamodel_string, ast)
+            })
+            .unwrap_or_else(|| (String::new(), SchemaAst::empty()));
+        let current_datamodel = datamodel::lift_ast(&current_datamodel_ast)
+            .map_err(|err| CommandError::InvalidPersistedDatamodel(err, current_datamodel_string))?;
 
         let next_datamodel_ast = engine
             .datamodel_calculator()
