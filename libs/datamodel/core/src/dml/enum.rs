@@ -57,7 +57,7 @@ impl WithName for Enum {
 }
 
 impl WithDatabaseName for Enum {
-    fn single_database_name(&self) -> Option<&str> {
+    fn database_name(&self) -> Option<&str> {
         self.database_name.as_deref()
     }
 
@@ -107,7 +107,7 @@ impl WithName for EnumValue {
 }
 
 impl WithDatabaseName for EnumValue {
-    fn single_database_name(&self) -> Option<&str> {
+    fn database_name(&self) -> Option<&str> {
         self.database_name.as_deref()
     }
 

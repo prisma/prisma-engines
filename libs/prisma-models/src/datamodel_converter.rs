@@ -62,7 +62,7 @@ impl<'a> DatamodelConverter<'a> {
                     name: model.name.clone(),
                     is_embedded: model.is_embedded,
                     fields: self.convert_fields(&model),
-                    manifestation: model.single_database_name().map(|s| s.to_owned()),
+                    manifestation: model.database_name().map(|s| s.to_owned()),
                     id_field_names: model.id_fields.clone(),
                     indexes: self.convert_indexes(&model),
                 }

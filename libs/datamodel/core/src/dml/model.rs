@@ -260,7 +260,7 @@ impl WithName for Model {
 }
 
 impl WithDatabaseName for Model {
-    fn single_database_name(&self) -> Option<&str> {
+    fn database_name(&self) -> Option<&str> {
         self.database_name.as_deref()
     }
 

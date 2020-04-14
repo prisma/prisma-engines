@@ -5,11 +5,10 @@ pub trait WithName {
 }
 
 pub trait WithDatabaseName: WithName {
-    /// Should not be used on fields as those can have multiple db names.
-    fn single_database_name(&self) -> Option<&str>;
+    fn database_name(&self) -> Option<&str>;
 
     fn final_single_database_name(&self) -> &str {
-        self.single_database_name().unwrap_or(self.name())
+        self.database_name().unwrap_or(self.name())
     }
 
     fn set_database_name(&mut self, database_name: Option<String>);

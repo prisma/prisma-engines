@@ -146,7 +146,7 @@ impl WithName for Field {
 }
 
 impl WithDatabaseName for Field {
-    fn single_database_name(&self) -> Option<&str> {
+    fn database_name(&self) -> Option<&str> {
         //        self.database_name.map(|x| x.as_str())
         self.database_names.first().map(|s| s.as_str())
     }

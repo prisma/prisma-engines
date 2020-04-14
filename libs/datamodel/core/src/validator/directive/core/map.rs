@@ -83,7 +83,7 @@ fn internal_validate_and_apply(args: &mut Args, obj: &mut dyn WithDatabaseName) 
 }
 
 fn internal_serialize(obj: &dyn WithDatabaseName) -> Result<Vec<ast::Directive>, DatamodelError> {
-    match obj.single_database_name() {
+    match obj.database_name() {
         Some(db_name) => Ok(vec![ast::Directive::new(
             DIRECTIVE_NAME,
             vec![ast::Argument::new_unnamed(ast::Expression::StringValue(
