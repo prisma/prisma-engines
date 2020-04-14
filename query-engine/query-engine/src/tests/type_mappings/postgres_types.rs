@@ -655,7 +655,7 @@ const CREATE_TYPES_TABLE_WITH_DEFAULTS: &str = indoc! {
 async fn postgres_db_level_defaults_work(api: &TestApi) -> TestResult {
     api.execute_sql(CREATE_TYPES_TABLE_WITH_DEFAULTS).await?;
 
-    let (_datamodel, engine) = api.introspect_and_start_query_engine().await?;
+    let (datamodel, engine) = api.introspect_and_start_query_engine().await?;
 
     let response = engine.request(CREATE_ONE_TYPES_QUERY).await;
 

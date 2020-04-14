@@ -700,15 +700,21 @@ fn is_autoincrement(value: &str, schema_name: &str, table_name: &str, column_nam
 }
 
 fn unsuffix_default_literal<'a>(literal: &'a str, data_type: &str, full_data_type: &str) -> Option<&'a str> {
+    static POSTGRES_STRING_DEFAULT_RE: Lazy<regex::Regex> = Lazy::new(|| regex::Regex::new(r#"^B?'(.*)'$"#).unwrap());
+
     static POSTGRES_DATA_TYPE_SUFFIX_RE: Lazy<regex::Regex> =
-        Lazy::new(|| regex::Regex::new(r#"(.*)::"?(.*)"?$"#).unwrap());
+        Lazy::new(|| regex::Regex::new(r#"(.*)::(\\")?(.*)(\\")?$"#).unwrap());
 
     let captures = POSTGRES_DATA_TYPE_SUFFIX_RE.captures(literal)?;
-    let suffix = captures.get(2).unwrap().as_str();
+    let suffix = captures.get(3).unwrap().as_str();
 
     if suffix != data_type && suffix != full_data_type {
         return None;
     }
+
+    let raw = captures.get(1).unwrap().as_str();
+
+    let captures = POSTGRES_STRING_DEFAULT_RE.captures(raw)?;
 
     Some(captures.get(1).unwrap().as_str())
 }
