@@ -1,6 +1,5 @@
 use super::*;
 use log::debug;
-use once_cell::sync::Lazy;
 use quaint::prelude::Queryable;
 use std::collections::{BTreeMap, HashMap};
 use std::sync::Arc;
@@ -98,6 +97,8 @@ impl SqlSchemaDescriber {
     }
 
     async fn get_size(&self, schema: &str) -> usize {
+        use rust_decimal::prelude::*;
+
         debug!("Getting db size");
         let sql = r#"
             SELECT
@@ -108,11 +109,15 @@ impl SqlSchemaDescriber {
         let result = self.conn.query_raw(sql, &[schema.into()]).await.expect("get db size ");
         let size = result
             .first()
-            .map(|row| row.get("size").and_then(|x| x.to_string()).unwrap_or("0".to_string()))
-            .unwrap();
+            .and_then(|row| {
+                row.get("size")
+                    .and_then(|x| x.as_decimal())
+                    .and_then(|decimal| decimal.round().to_usize())
+            })
+            .unwrap_or(0);
 
         debug!("Found db size: {:?}", size);
-        size.parse().unwrap()
+        size as usize
     }
 
     fn get_table(
@@ -222,24 +227,22 @@ async fn get_all_columns(conn: &dyn Queryable, schema_name: &str) -> HashMap<Str
                 Some(x) if x == "NULL" => None,
                 Some(default_string) => {
                     Some(match &tpe.family {
-                        ColumnTypeFamily::Int => match parse_int(&default_string).is_some() {
-                            true => DefaultValue::VALUE(default_string),
-                            false => DefaultValue::DBGENERATED(default_string),
+                        ColumnTypeFamily::Int => match parse_int(&default_string) {
+                            Some(int_value) => DefaultValue::VALUE(int_value),
+                            None => DefaultValue::DBGENERATED(default_string),
                         },
-                        ColumnTypeFamily::Float => match parse_float(&default_string).is_some() {
-                            true => DefaultValue::VALUE(default_string),
-                            false => DefaultValue::DBGENERATED(default_string),
+                        ColumnTypeFamily::Float => match parse_float(&default_string) {
+                            Some(float_value) => DefaultValue::VALUE(float_value),
+                            None => DefaultValue::DBGENERATED(default_string),
                         },
                         ColumnTypeFamily::Boolean => match parse_int(&default_string) {
-                            Some(1) => DefaultValue::VALUE(default_string),
-                            Some(0) => DefaultValue::VALUE(default_string),
+                            Some(PrismaValue::Int(1)) => DefaultValue::VALUE(PrismaValue::Boolean(true)),
+                            Some(PrismaValue::Int(0)) => DefaultValue::VALUE(PrismaValue::Boolean(false)),
                             _ => DefaultValue::DBGENERATED(default_string),
                         },
-                        //todo Maria DB does not seem to quote the strings, but it allows functions which MySQL doesnt
-                        ColumnTypeFamily::String => match &default_string.starts_with("'") {
-                            true => DefaultValue::VALUE(unquote(default_string)),
-                            false => DefaultValue::VALUE(default_string),
-                        },
+                        ColumnTypeFamily::String => {
+                            DefaultValue::VALUE(PrismaValue::String(unquote_string(default_string)))
+                        }
                         //todo check other now() definitions
                         ColumnTypeFamily::DateTime => match default_string.to_lowercase()
                             == "current_timestamp".to_string()
@@ -255,9 +258,9 @@ async fn get_all_columns(conn: &dyn Queryable, schema_name: &str) -> HashMap<Str
                         ColumnTypeFamily::LogSequenceNumber => DefaultValue::DBGENERATED(default_string),
                         ColumnTypeFamily::TextSearch => DefaultValue::DBGENERATED(default_string),
                         ColumnTypeFamily::TransactionId => DefaultValue::DBGENERATED(default_string),
-                        ColumnTypeFamily::Enum(_) => {
-                            DefaultValue::VALUE(unquote(default_string.replace("_utf8mb4", "").replace("\\\'", "")))
-                        }
+                        ColumnTypeFamily::Enum(_) => DefaultValue::VALUE(PrismaValue::Enum(unquote_string(
+                            default_string.replace("_utf8mb4", "").replace("\\\'", ""),
+                        ))),
                         ColumnTypeFamily::Unsupported(_) => DefaultValue::DBGENERATED(default_string),
                     })
                 }
@@ -556,31 +559,5 @@ fn get_column_type_and_enum(
 fn extract_enum_values(full_data_type: &&str) -> Vec<String> {
     let len = &full_data_type.len() - 1;
     let vals = &full_data_type[5..len];
-    vals.split(",").map(|v| unquote(v.into())).collect()
-}
-
-fn unquote(input: String) -> String {
-    /// Regex for matching the quotes on the introspected string values on MariaDB.
-    static MARIADB_STRING_DEFAULT_RE: Lazy<regex::Regex> = Lazy::new(|| regex::Regex::new(r#"^'(.*)'$"#).unwrap());
-
-    MARIADB_STRING_DEFAULT_RE
-        .captures(input.as_ref())
-        .and_then(|captures| captures.get(1))
-        .map(|capt| capt.as_str())
-        .unwrap_or(input.as_ref())
-        .to_string()
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn mariadb_string_default_regex_works() {
-        let quoted_str = "'abc $$ def'".to_string();
-
-        assert_eq!(unquote(quoted_str), "abc $$ def");
-
-        assert_eq!(unquote("heh ".to_string()), "heh ");
-    }
+    vals.split(",").map(|v| unquote_string(v.into())).collect()
 }

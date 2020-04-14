@@ -318,6 +318,11 @@ fn render_raw_sql(
                     },
                 };
             }
+
+            if lines.is_empty() {
+                return Ok(Vec::new());
+            }
+
             Ok(vec![format!(
                 "ALTER TABLE {} {};",
                 renderer.quote_with_schema(&schema_name, &table.name),

@@ -436,6 +436,7 @@ dependencies = [
  "pest_tmp",
  "pretty_assertions",
  "prisma-value",
+ "rust_decimal",
  "serde",
  "serde_json",
  "uuid",
@@ -445,7 +446,6 @@ dependencies = [
 name = "datamodel-connector"
 version = "0.1.0"
 dependencies = [
- "chrono",
  "serde",
 ]
 
@@ -1297,6 +1297,7 @@ dependencies = [
  "migration-connector",
  "migration-core",
  "pretty_assertions",
+ "prisma-value",
  "quaint",
  "serde",
  "serde_json",
@@ -1907,7 +1908,10 @@ name = "prisma-value"
 version = "0.1.0"
 dependencies = [
  "chrono",
+ "log",
+ "once_cell",
  "quaint",
+ "regex",
  "rust_decimal",
  "serde",
  "serde_derive",
@@ -1983,7 +1987,7 @@ dependencies = [
 [[package]]
 name = "quaint"
 version = "0.2.0-alpha.11"
-source = "git+https://github.com/prisma/quaint#693906bb83353f621f4226ece8e6b26e84b031cf"
+source = "git+https://github.com/prisma/quaint#f85183c6eacfc37e1bd2880fe38d763633b69cba"
 dependencies = [
  "async-trait",
  "base64 0.11.0",
@@ -2503,8 +2507,10 @@ dependencies = [
  "log",
  "once_cell",
  "pretty_assertions",
+ "prisma-value",
  "quaint",
  "regex",
+ "rust_decimal",
  "serde",
  "serde_json",
  "sql-schema-describer",
@@ -2528,6 +2534,7 @@ dependencies = [
  "datamodel",
  "migration-connector",
  "prisma-models",
+ "prisma-value",
  "quaint",
  "serde",
  "serde_json",
@@ -2576,8 +2583,10 @@ dependencies = [
  "log",
  "once_cell",
  "pretty_assertions",
+ "prisma-value",
  "quaint",
  "regex",
+ "rust_decimal",
  "serde",
  "serde_json",
  "test-macros",

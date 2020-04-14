@@ -1,10 +1,11 @@
-use crate::error::DatamodelError;
-use crate::{ast, DefaultValue, EnvFunction};
-use crate::{dml, ValueGenerator};
-
 use super::FromStrAndSpan;
 use super::ScalarType;
+use crate::error::DatamodelError;
+use crate::ValueGenerator;
+use crate::{ast, DefaultValue, EnvFunction};
 use chrono::{DateTime, Utc};
+use prisma_value::PrismaValue;
+use rust_decimal::Decimal;
 use std::error;
 
 /// Wraps a value and provides convenience methods for
@@ -50,14 +51,13 @@ impl ValueValidator {
 
     /// Attempts to parse the wrapped value
     /// to a given prisma type.
-    pub fn as_type(&self, scalar_type: ScalarType) -> Result<dml::ScalarValue, DatamodelError> {
+    pub fn as_type(&self, scalar_type: ScalarType) -> Result<PrismaValue, DatamodelError> {
         match scalar_type {
-            ScalarType::Int => self.as_int().map(dml::ScalarValue::Int),
-            ScalarType::Float => self.as_float().map(dml::ScalarValue::Float),
-            ScalarType::Decimal => self.as_decimal().map(dml::ScalarValue::Decimal),
-            ScalarType::Boolean => self.as_bool().map(dml::ScalarValue::Boolean),
-            ScalarType::DateTime => self.as_date_time().map(dml::ScalarValue::DateTime),
-            ScalarType::String => self.as_str().map(dml::ScalarValue::String),
+            ScalarType::Int => self.as_int().map(PrismaValue::Int),
+            ScalarType::Float => self.as_float().map(PrismaValue::Float),
+            ScalarType::Boolean => self.as_bool().map(PrismaValue::Boolean),
+            ScalarType::DateTime => self.as_date_time().map(PrismaValue::DateTime),
+            ScalarType::String => self.as_str().map(PrismaValue::String),
         }
     }
 
@@ -106,29 +106,19 @@ impl ValueValidator {
     }
 
     /// Tries to convert the wrapped value to a Prisma Integer.
-    pub fn as_int(&self) -> Result<i32, DatamodelError> {
+    pub fn as_int(&self) -> Result<i64, DatamodelError> {
         match &self.value {
-            ast::Expression::NumericValue(value, _) => self.wrap_error_from_result(value.parse::<i32>(), "numeric"),
-            ast::Expression::Any(value, _) => self.wrap_error_from_result(value.parse::<i32>(), "numeric"),
+            ast::Expression::NumericValue(value, _) => self.wrap_error_from_result(value.parse::<i64>(), "numeric"),
+            ast::Expression::Any(value, _) => self.wrap_error_from_result(value.parse::<i64>(), "numeric"),
             _ => Err(self.construct_type_mismatch_error("numeric")),
         }
     }
 
     /// Tries to convert the wrapped value to a Prisma Float.
-    pub fn as_float(&self) -> Result<f64, DatamodelError> {
+    pub fn as_float(&self) -> Result<Decimal, DatamodelError> {
         match &self.value {
-            ast::Expression::NumericValue(value, _) => self.wrap_error_from_result(value.parse::<f64>(), "numeric"),
-            ast::Expression::Any(value, _) => self.wrap_error_from_result(value.parse::<f64>(), "numeric"),
-            _ => Err(self.construct_type_mismatch_error("numeric")),
-        }
-    }
-
-    // TODO: Ask which decimal type to take.
-    /// Tries to convert the wrapped value to a Prisma Decimal.
-    pub fn as_decimal(&self) -> Result<f64, DatamodelError> {
-        match &self.value {
-            ast::Expression::NumericValue(value, _) => self.wrap_error_from_result(value.parse::<f64>(), "numeric"),
-            ast::Expression::Any(value, _) => self.wrap_error_from_result(value.parse::<f64>(), "numeric"),
+            ast::Expression::NumericValue(value, _) => self.wrap_error_from_result(value.parse::<Decimal>(), "numeric"),
+            ast::Expression::Any(value, _) => self.wrap_error_from_result(value.parse::<Decimal>(), "numeric"),
             _ => Err(self.construct_type_mismatch_error("numeric")),
         }
     }

@@ -25,25 +25,37 @@ pub enum CommandError {
     ReceivedBadDatamodel(String),
 
     /// When a datamodel from a generated AST is wrong. This is basically an internal error.
-    #[error("The migration produced an invalid schema ({0:?})")]
+    #[error("The migration produced an invalid schema.\n{}", render_datamodel_error(.0, None))]
     ProducedBadDatamodel(datamodel::error::ErrorCollection),
 
+    /// When a saved datamodel from a migration in the migrations table is no longer valid.
+    #[error("The migration contains an invalid schema.\n{}", render_datamodel_error(.0, Some(.1)))]
+    InvalidPersistedDatamodel(datamodel::error::ErrorCollection, String),
+
+    #[error("Failed to render the schema to a string  ({0:?})")]
+    DatamodelRenderingError(datamodel::error::ErrorCollection),
+
     #[error("Initialization error. (error: {0})")]
-    InitializationError(anyhow::Error),
+    InitializationError(#[source] anyhow::Error),
 
     #[error("Connector error. (error: {0})")]
-    ConnectorError(ConnectorError),
+    ConnectorError(
+        #[source]
+        #[from]
+        ConnectorError,
+    ),
 
     #[error("Generic error. (error: {0})")]
-    Generic(anyhow::Error),
+    Generic(#[source] anyhow::Error),
 
     #[error("Error in command input. (error: {0})")]
-    Input(anyhow::Error),
+    Input(#[source] anyhow::Error),
 }
 
-impl From<migration_connector::ConnectorError> for CommandError {
-    fn from(error: migration_connector::ConnectorError) -> CommandError {
-        CommandError::ConnectorError(error)
+fn render_datamodel_error(err: &datamodel::error::ErrorCollection, schema: Option<&String>) -> String {
+    match schema {
+        Some(schema) => err.to_pretty_string("virtual_schema.prisma", schema),
+        None => format!("Datamodel error in schema that could not be rendered. {}", err),
     }
 }
 
@@ -67,12 +79,12 @@ mod tests {
         "#;
 
         let err = datamodel::parse_datamodel(bad_dml)
-            .map_err(CommandError::ProducedBadDatamodel)
+            .map_err(|err| CommandError::ProducedBadDatamodel(err))
             .unwrap_err();
 
         assert_eq!(
             err.to_string(),
-            "The migration produced an invalid schema (ErrorCollection { errors: [TypeNotFoundError { type_name: \"Post\", span: Span { start: 76, end: 82 } }] })"
+            "The migration produced an invalid schema.\nDatamodel error in schema that could not be rendered. Type \"Post\" is neither a built-in type, nor refers to another model, custom type, or enum. (span: Span { start: 76, end: 82 })\n"
         )
     }
 }

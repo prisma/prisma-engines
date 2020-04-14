@@ -1,9 +1,9 @@
 use crate::common::*;
 use chrono::{DateTime, Utc};
-use datamodel::{
-    common::{ScalarType, ScalarValue},
-    DefaultValue, ValueGenerator,
-};
+use datamodel::{common::ScalarType, DefaultValue, ValueGenerator};
+use prisma_value::PrismaValue;
+use rust_decimal::prelude::FromPrimitive;
+use rust_decimal::Decimal;
 
 #[test]
 fn should_set_default_for_all_scalar_types() {
@@ -12,7 +12,6 @@ fn should_set_default_for_all_scalar_types() {
         id Int @id
         int Int @default(3)
         float Float @default(3.14)
-        decimal Decimal @default(3.15)
         string String @default("String")
         boolean Boolean @default(false)
         dateTime DateTime @default("2019-06-17T14:20:57Z")
@@ -24,27 +23,26 @@ fn should_set_default_for_all_scalar_types() {
     user_model
         .assert_has_field("int")
         .assert_base_type(&ScalarType::Int)
-        .assert_default_value(DefaultValue::Single(ScalarValue::Int(3)));
+        .assert_default_value(DefaultValue::Single(PrismaValue::Int(3)));
     user_model
         .assert_has_field("float")
         .assert_base_type(&ScalarType::Float)
-        .assert_default_value(DefaultValue::Single(ScalarValue::Float(3.14)));
-    user_model
-        .assert_has_field("decimal")
-        .assert_base_type(&ScalarType::Decimal)
-        .assert_default_value(DefaultValue::Single(ScalarValue::Decimal(3.15)));
+        .assert_default_value(DefaultValue::Single(PrismaValue::Float(
+            Decimal::from_f64(3.14.into()).unwrap(),
+        )));
+
     user_model
         .assert_has_field("string")
         .assert_base_type(&ScalarType::String)
-        .assert_default_value(DefaultValue::Single(ScalarValue::String(String::from("String"))));
+        .assert_default_value(DefaultValue::Single(PrismaValue::String(String::from("String"))));
     user_model
         .assert_has_field("boolean")
         .assert_base_type(&ScalarType::Boolean)
-        .assert_default_value(DefaultValue::Single(ScalarValue::Boolean(false)));
+        .assert_default_value(DefaultValue::Single(PrismaValue::Boolean(false)));
     user_model
         .assert_has_field("dateTime")
         .assert_base_type(&ScalarType::DateTime)
-        .assert_default_value(DefaultValue::Single(ScalarValue::DateTime(
+        .assert_default_value(DefaultValue::Single(PrismaValue::DateTime(
             "2019-06-17T14:20:57Z".parse::<DateTime<Utc>>().unwrap(),
         )));
 }
@@ -69,7 +67,7 @@ fn should_set_default_an_enum_type() {
     user_model
         .assert_has_field("role")
         .assert_enum_type("Role")
-        .assert_default_value(DefaultValue::Single(ScalarValue::ConstantLiteral(String::from(
+        .assert_default_value(DefaultValue::Single(PrismaValue::Enum(String::from(
             "A_VARIANT_WITH_UNDERSCORES",
         ))));
 }
@@ -94,7 +92,7 @@ fn should_set_default_on_remapped_enum_type() {
     user_model
         .assert_has_field("role")
         .assert_enum_type("Role")
-        .assert_default_value(DefaultValue::Single(ScalarValue::ConstantLiteral(String::from(
+        .assert_default_value(DefaultValue::Single(PrismaValue::Enum(String::from(
             "A_VARIANT_WITH_UNDERSCORES",
         ))));
 }

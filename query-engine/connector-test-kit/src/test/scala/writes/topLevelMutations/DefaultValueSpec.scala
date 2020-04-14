@@ -133,7 +133,7 @@ class DefaultValueSpec extends FlatSpec with Matchers with ApiSpecBase {
     res.pathAsString("data.createUser.updatedAt") should be("2001-01-01T00:00:00.000Z")
   }
 
-  "Remapped enum default values" should "work" in {
+  "Remapped enum default values" should "work" taggedAs (IgnoreSQLite) in {
     val project = ProjectDsl.fromString {
       """
         |model User {
