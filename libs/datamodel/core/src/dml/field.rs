@@ -146,36 +146,9 @@ impl WithName for Field {
 }
 
 impl WithDatabaseName for Field {
-    fn database_names(&self) -> Vec<&str> {
-        self.database_names.iter().map(|s| s.as_str()).collect()
-    }
-
-    fn set_database_names(&mut self, database_names: Vec<String>) -> Result<(), String> {
-        match &self.field_type {
-            FieldType::Relation(rel_info) => {
-                let num_of_to_fields = rel_info.to_fields.len();
-                // in case of auto populated to fields the validation is very hard. We want to move to explicit references anyway.
-                // TODO: revisist this once explicit `@relation(references:)` is implemented
-                let should_validate = num_of_to_fields > 0;
-                if should_validate && rel_info.to_fields.len() != database_names.len() {
-                    Err(format!(
-                        "This Relation Field must specify exactly {} mapped names.",
-                        rel_info.to_fields.len()
-                    ))
-                } else {
-                    self.database_names = database_names;
-                    Ok(())
-                }
-            }
-            _ => {
-                if database_names.len() > 1 {
-                    Err("A scalar Field must not specify multiple mapped names.".to_string())
-                } else {
-                    self.database_names = database_names;
-                    Ok(())
-                }
-            }
-        }
+    fn single_database_name(&self) -> Option<&str> {
+        //        self.database_name.map(|x| x.as_str())
+        self.database_names.first().map(|s| s.as_str())
     }
 
     fn set_database_name(&mut self, database_name: Option<String>) {
