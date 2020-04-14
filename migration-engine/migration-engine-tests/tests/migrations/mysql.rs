@@ -72,3 +72,25 @@ async fn enum_creation_is_idempotent(api: &TestApi) -> TestResult {
 
     Ok(())
 }
+
+#[test_each_connector(tags("mysql"))]
+async fn enums_work_when_table_name_is_remapped(api: &TestApi) -> TestResult {
+    let schema = r#"
+    model User {
+        id         String     @default(uuid()) @id
+        status     UserStatus @map("currentStatus___")
+
+        @@map("users")
+    }
+
+    enum UserStatus {
+        CONFIRMED
+        CANCELED
+        BLOCKED
+    }
+    "#;
+
+    api.infer_apply(schema).send().await?.assert_green()?;
+
+    Ok(())
+}

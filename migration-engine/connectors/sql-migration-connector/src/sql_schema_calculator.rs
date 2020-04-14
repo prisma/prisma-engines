@@ -372,7 +372,7 @@ fn enum_column_type(field: &FieldRef<'_>, database_info: &DatabaseInfo, db_name:
     match database_info.sql_family() {
         SqlFamily::Postgres => sql::ColumnType::pure(sql::ColumnTypeFamily::Enum(db_name.to_owned()), arity),
         SqlFamily::Mysql => sql::ColumnType::pure(
-            sql::ColumnTypeFamily::Enum(format!("{}_{}", field.model().name(), field.name())),
+            sql::ColumnTypeFamily::Enum(format!("{}_{}", field.model().db_name(), field.db_name())),
             arity,
         ),
         _ => column_type(field),
