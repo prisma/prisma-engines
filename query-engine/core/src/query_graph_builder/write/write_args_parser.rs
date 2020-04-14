@@ -1,5 +1,5 @@
 use super::*;
-use crate::query_document::{ParsedInputMap, ParsedInputValue};
+use crate::query_document::{InputAssertions, ParsedInputMap, ParsedInputValue};
 use connector::WriteArgs;
 use prisma_models::{Field, ModelRef, PrismaValue, RelationFieldRef};
 use std::{convert::TryInto, sync::Arc};
@@ -18,6 +18,7 @@ impl WriteArgsParser {
             WriteArgsParser::default(),
             |mut args, (k, v): (String, ParsedInputValue)| {
                 let field = model.fields().find_from_all(&k).unwrap();
+
                 match field {
                     Field::Scalar(sf) if sf.is_list => {
                         let vals: ParsedInputMap = v.try_into()?;
@@ -41,9 +42,11 @@ impl WriteArgsParser {
                         args.args.insert(sf.db_name().clone(), value)
                     }
 
-                    Field::Relation(ref rf) => {
+                    Field::Relation(ref rf) if v.assert_non_null().is_ok() => {
                         args.nested.push((Arc::clone(rf), v.try_into()?));
                     }
+
+                    _ => (),
                 };
 
                 Ok(args)
