@@ -97,7 +97,7 @@ pub struct Field {
     pub arity: FieldArity,
 
     /// The database internal name.
-    pub database_names: Vec<String>,
+    pub database_name: Option<String>,
 
     /// The default value.
     pub default_value: Option<DefaultValue>,
@@ -147,16 +147,11 @@ impl WithName for Field {
 
 impl WithDatabaseName for Field {
     fn database_name(&self) -> Option<&str> {
-        //        self.database_name.map(|x| x.as_str())
-        self.database_names.first().map(|s| s.as_str())
+        self.database_name.as_deref()
     }
 
     fn set_database_name(&mut self, database_name: Option<String>) {
-        self.database_names = match database_name {
-            Some(db_name) => vec![db_name],
-            None => vec![],
-        }
-        //        self.database_name = database_name;
+        self.database_name = database_name;
     }
 }
 
@@ -167,7 +162,7 @@ impl Field {
             name: String::from(name),
             arity: FieldArity::Required,
             field_type,
-            database_names: Vec::new(),
+            database_name: None,
             default_value: None,
             is_unique: false,
             is_id: false,
@@ -180,19 +175,10 @@ impl Field {
     }
     /// Creates a new field with the given name and type, marked as generated and optional.
     pub fn new_generated(name: &str, field_type: FieldType) -> Field {
-        Field {
-            name: String::from(name),
-            arity: FieldArity::Optional,
-            field_type,
-            database_names: Vec::new(),
-            default_value: None,
-            is_unique: false,
-            is_id: false,
-            documentation: None,
-            is_generated: true,
-            is_updated_at: false,
-            data_source_fields: vec![],
-            is_commented_out: false,
-        }
+        let mut field = Self::new(name, field_type);
+        field.arity = FieldArity::Optional;
+        field.is_generated = true;
+
+        field
     }
 }

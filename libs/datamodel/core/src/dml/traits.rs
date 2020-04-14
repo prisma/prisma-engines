@@ -7,7 +7,7 @@ pub trait WithName {
 pub trait WithDatabaseName: WithName {
     fn database_name(&self) -> Option<&str>;
 
-    fn final_single_database_name(&self) -> &str {
+    fn final_database_name(&self) -> &str {
         self.database_name().unwrap_or(self.name())
     }
 

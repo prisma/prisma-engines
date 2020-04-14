@@ -138,7 +138,7 @@ impl FieldAsserts for dml::Field {
     }
 
     fn assert_with_db_name(&self, t: &str) -> &Self {
-        assert_eq!(self.database_names, vec![t.to_owned()]);
+        assert_eq!(self.database_name, Some(t.to_owned()));
 
         self
     }

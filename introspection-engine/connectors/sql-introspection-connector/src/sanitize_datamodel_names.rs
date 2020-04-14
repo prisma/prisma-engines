@@ -60,13 +60,13 @@ pub fn sanitize_datamodel_names(datamodel: &mut Datamodel) {
                         };
                     };
 
-                    if field.database_names.is_empty() {
-                        field.database_names = field_db_name.map(|db| vec![db]).unwrap_or(vec![]);
+                    if field.database_name.is_none() {
+                        field.database_name = field_db_name;
                     }
                 }
                 _ => {
-                    if field.database_names.is_empty() {
-                        field.database_names = field_db_name.map(|db| vec![db]).unwrap_or(vec![]);
+                    if field.database_name.is_none() {
+                        field.database_name = field_db_name;
                     }
                 }
             }

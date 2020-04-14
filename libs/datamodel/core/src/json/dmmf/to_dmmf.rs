@@ -83,7 +83,6 @@ fn field_to_dmmf(model: &dml::Model, field: &dml::Field) -> Field {
     Field {
         name: field.name.clone(),
         kind: get_field_kind(field),
-        db_names: field.database_names.clone(),
         is_required: field.arity == dml::FieldArity::Required,
         is_list: field.arity == dml::FieldArity::List,
         is_id: field.is_id,

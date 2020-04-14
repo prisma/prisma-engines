@@ -463,10 +463,7 @@ impl DatamodelFieldExtensions for dml::Field {
     }
 
     fn final_db_name(&self) -> String {
-        match self.database_names.first() {
-            None => self.name.clone(),
-            Some(x) => x.clone(),
-        }
+        self.final_database_name().to_owned()
     }
 
     fn internal_enum(&self, datamodel: &dml::Datamodel) -> Option<InternalEnum> {

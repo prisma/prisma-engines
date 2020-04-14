@@ -80,7 +80,7 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
                     "This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*"
                         .to_string(),
                 );
-                field.name = field.database_names.first().unwrap().to_string();
+                field.name = field.database_name.as_ref().unwrap().to_string();
                 field.is_commented_out = true;
 
                 fields_with_empty_names.push(ModelAndField {
