@@ -18,6 +18,7 @@ impl WriteArgsParser {
             WriteArgsParser::default(),
             |mut args, (k, v): (String, ParsedInputValue)| {
                 let field = model.fields().find_from_all(&k).unwrap();
+
                 match field {
                     Field::Scalar(sf) if sf.is_list => {
                         let vals: ParsedInputMap = v.try_into()?;
@@ -36,14 +37,16 @@ impl WriteArgsParser {
 
                         args.args.insert(sf.db_name().clone(), set_value)
                     }
+
                     Field::Scalar(sf) => {
                         let value: PrismaValue = v.try_into()?;
                         args.args.insert(sf.db_name().clone(), value)
                     }
 
-                    Field::Relation(ref rf) => {
-                        args.nested.push((Arc::clone(rf), v.try_into()?));
-                    }
+                    Field::Relation(ref rf) => match v {
+                        ParsedInputValue::Single(PrismaValue::Null) => (),
+                        _ => args.nested.push((Arc::clone(rf), v.try_into()?)),
+                    },
                 };
 
                 Ok(args)
