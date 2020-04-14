@@ -9,7 +9,6 @@
         {
           "name": "id",
           "kind": "scalar",
-          "dbNames": [],
           "isList": false,
           "isRequired": true,
           "isUnique": false,
@@ -22,7 +21,6 @@
         {
           "name": "posts",
           "kind": "object",
-          "dbNames": [],
           "isList": true,
           "isRequired": false,
           "isUnique": false,
@@ -49,7 +47,6 @@
         {
           "name": "id",
           "kind": "scalar",
-          "dbNames": [],
           "isList": false,
           "isRequired": true,
           "isUnique": false,
@@ -62,7 +59,6 @@
         {
           "name": "userId",
           "kind": "scalar",
-          "dbNames": [],
           "isList": false,
           "isRequired": true,
           "isUnique": false,
@@ -75,7 +71,6 @@
         {
           "name": "user",
           "kind": "object",
-          "dbNames": [],
           "isList": false,
           "isRequired": true,
           "isUnique": false,

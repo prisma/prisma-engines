@@ -28,7 +28,6 @@
         {
           "name": "id",
           "kind": "scalar",
-          "dbNames": [],
           "isList": false,
           "isRequired": true,
           "isUnique": false,
@@ -41,7 +40,6 @@
         {
           "name": "createdAt",
           "kind": "scalar",
-          "dbNames": [],
           "isList": false,
           "isRequired": true,
           "isUnique": false,
@@ -54,7 +52,6 @@
         {
           "name": "email",
           "kind": "scalar",
-          "dbNames": [],
           "isList": false,
           "isRequired": true,
           "isUnique": true,
@@ -67,7 +64,6 @@
         {
           "name": "name",
           "kind": "scalar",
-          "dbNames": [],
           "isList": false,
           "isRequired": false,
           "isUnique": false,
@@ -80,7 +76,6 @@
         {
           "name": "posts",
           "kind": "object",
-          "dbNames": [],
           "isList": true,
           "isRequired": false,
           "isUnique": false,
@@ -97,7 +92,6 @@
         {
           "name": "profile",
           "kind": "object",
-          "dbNames": [],
           "isList": false,
           "isRequired": false,
           "isUnique": false,
@@ -124,7 +118,6 @@
         {
           "name": "id",
           "kind": "scalar",
-          "dbNames": [],
           "isList": false,
           "isRequired": true,
           "isUnique": false,
@@ -137,7 +130,6 @@
         {
           "name": "userId",
           "kind": "scalar",
-          "dbNames": [],
           "isList": false,
           "isRequired": true,
           "isUnique": false,
@@ -150,7 +142,6 @@
         {
           "name": "user",
           "kind": "object",
-          "dbNames": [],
           "isList": false,
           "isRequired": true,
           "isUnique": false,
@@ -171,7 +162,6 @@
         {
           "name": "bio",
           "kind": "scalar",
-          "dbNames": [],
           "isList": false,
           "isRequired": true,
           "isUnique": false,
@@ -194,7 +184,6 @@
         {
           "name": "id",
           "kind": "scalar",
-          "dbNames": [],
           "isList": false,
           "isRequired": true,
           "isUnique": false,
@@ -207,7 +196,6 @@
         {
           "name": "createdAt",
           "kind": "scalar",
-          "dbNames": [],
           "isList": false,
           "isRequired": true,
           "isUnique": false,
@@ -220,7 +208,6 @@
         {
           "name": "updatedAt",
           "kind": "scalar",
-          "dbNames": [],
           "isList": false,
           "isRequired": true,
           "isUnique": false,
@@ -233,7 +220,6 @@
         {
           "name": "title",
           "kind": "scalar",
-          "dbNames": [],
           "isList": false,
           "isRequired": true,
           "isUnique": false,
@@ -247,7 +233,6 @@
         {
           "name": "wasLiked",
           "kind": "scalar",
-          "dbNames": [],
           "isList": false,
           "isRequired": true,
           "isUnique": false,
@@ -261,7 +246,6 @@
         {
           "name": "published",
           "kind": "scalar",
-          "dbNames": [],
           "isList": false,
           "isRequired": true,
           "isUnique": false,
@@ -275,7 +259,6 @@
         {
           "name": "authorId",
           "kind": "scalar",
-          "dbNames": [],
           "isList": false,
           "isRequired": true,
           "isUnique": false,
@@ -288,7 +271,6 @@
         {
           "name": "author",
           "kind": "object",
-          "dbNames": [],
           "isList": false,
           "isRequired": true,
           "isUnique": false,
@@ -309,7 +291,6 @@
         {
           "name": "categories",
           "kind": "object",
-          "dbNames": [],
           "isList": true,
           "isRequired": false,
           "isUnique": false,
@@ -339,7 +320,6 @@
         {
           "name": "id",
           "kind": "scalar",
-          "dbNames": [],
           "isList": false,
           "isRequired": true,
           "isUnique": false,
@@ -352,7 +332,6 @@
         {
           "name": "name",
           "kind": "scalar",
-          "dbNames": [],
           "isList": false,
           "isRequired": true,
           "isUnique": false,
@@ -365,7 +344,6 @@
         {
           "name": "posts",
           "kind": "object",
-          "dbNames": [],
           "isList": true,
           "isRequired": false,
           "isUnique": false,
@@ -382,7 +360,6 @@
         {
           "name": "cat",
           "kind": "enum",
-          "dbNames": [],
           "isList": false,
           "isRequired": true,
           "isUnique": false,
@@ -405,7 +382,6 @@
         {
           "name": "id",
           "kind": "scalar",
-          "dbNames": [],
           "isList": false,
           "isRequired": true,
           "isUnique": false,
@@ -418,7 +394,6 @@
         {
           "name": "postTitle",
           "kind": "scalar",
-          "dbNames": [],
           "isList": false,
           "isRequired": true,
           "isUnique": false,
@@ -431,7 +406,6 @@
         {
           "name": "postCreatedAt",
           "kind": "scalar",
-          "dbNames": [],
           "isList": false,
           "isRequired": true,
           "isUnique": false,
@@ -444,7 +418,6 @@
         {
           "name": "categoryId",
           "kind": "scalar",
-          "dbNames": [],
           "isList": false,
           "isRequired": true,
           "isUnique": false,
@@ -457,7 +430,6 @@
         {
           "name": "post",
           "kind": "object",
-          "dbNames": [],
           "isList": false,
           "isRequired": true,
           "isUnique": false,
@@ -480,7 +452,6 @@
         {
           "name": "category",
           "kind": "object",
-          "dbNames": [],
           "isList": false,
           "isRequired": true,
           "isUnique": false,
@@ -511,7 +482,6 @@
         {
           "name": "id",
           "kind": "scalar",
-          "dbNames": [],
           "isList": false,
           "isRequired": true,
           "isUnique": false,
@@ -524,7 +494,6 @@
         {
           "name": "bId",
           "kind": "scalar",
-          "dbNames": [],
           "isList": false,
           "isRequired": true,
           "isUnique": false,
@@ -537,7 +506,6 @@
         {
           "name": "b",
           "kind": "object",
-          "dbNames": [],
           "isList": false,
           "isRequired": true,
           "isUnique": false,
@@ -568,7 +536,6 @@
         {
           "name": "id",
           "kind": "scalar",
-          "dbNames": [],
           "isList": false,
           "isRequired": true,
           "isUnique": false,
@@ -581,7 +548,6 @@
         {
           "name": "a",
           "kind": "object",
-          "dbNames": [],
           "isList": false,
           "isRequired": true,
           "isUnique": false,

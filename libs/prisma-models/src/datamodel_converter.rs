@@ -62,7 +62,7 @@ impl<'a> DatamodelConverter<'a> {
                     name: model.name.clone(),
                     is_embedded: model.is_embedded,
                     fields: self.convert_fields(&model),
-                    manifestation: model.single_database_name().map(|s| s.to_owned()),
+                    manifestation: model.database_name().map(|s| s.to_owned()),
                     id_field_names: model.id_fields.clone(),
                     indexes: self.convert_indexes(&model),
                 }
@@ -462,10 +462,7 @@ impl DatamodelFieldExtensions for dml::Field {
     }
 
     fn final_db_name(&self) -> String {
-        match self.database_names.first() {
-            None => self.name.clone(),
-            Some(x) => x.clone(),
-        }
+        self.final_database_name().to_owned()
     }
 
     fn internal_enum(&self, datamodel: &dml::Datamodel) -> Option<InternalEnum> {

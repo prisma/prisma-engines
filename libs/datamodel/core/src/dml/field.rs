@@ -97,7 +97,7 @@ pub struct Field {
     pub arity: FieldArity,
 
     /// The database internal name.
-    pub database_names: Vec<String>,
+    pub database_name: Option<String>,
 
     /// The default value.
     pub default_value: Option<DefaultValue>,
@@ -146,36 +146,12 @@ impl WithName for Field {
 }
 
 impl WithDatabaseName for Field {
-    fn database_names(&self) -> Vec<&str> {
-        self.database_names.iter().map(|s| s.as_str()).collect()
+    fn database_name(&self) -> Option<&str> {
+        self.database_name.as_deref()
     }
 
-    fn set_database_names(&mut self, database_names: Vec<String>) -> Result<(), String> {
-        match &self.field_type {
-            FieldType::Relation(rel_info) => {
-                let num_of_to_fields = rel_info.to_fields.len();
-                // in case of auto populated to fields the validation is very hard. We want to move to explicit references anyway.
-                // TODO: revisist this once explicit `@relation(references:)` is implemented
-                let should_validate = num_of_to_fields > 0;
-                if should_validate && rel_info.to_fields.len() != database_names.len() {
-                    Err(format!(
-                        "This Relation Field must specify exactly {} mapped names.",
-                        rel_info.to_fields.len()
-                    ))
-                } else {
-                    self.database_names = database_names;
-                    Ok(())
-                }
-            }
-            _ => {
-                if database_names.len() > 1 {
-                    Err("A scalar Field must not specify multiple mapped names.".to_string())
-                } else {
-                    self.database_names = database_names;
-                    Ok(())
-                }
-            }
-        }
+    fn set_database_name(&mut self, database_name: Option<String>) {
+        self.database_name = database_name;
     }
 }
 
@@ -186,7 +162,7 @@ impl Field {
             name: String::from(name),
             arity: FieldArity::Required,
             field_type,
-            database_names: Vec::new(),
+            database_name: None,
             default_value: None,
             is_unique: false,
             is_id: false,
@@ -199,19 +175,10 @@ impl Field {
     }
     /// Creates a new field with the given name and type, marked as generated and optional.
     pub fn new_generated(name: &str, field_type: FieldType) -> Field {
-        Field {
-            name: String::from(name),
-            arity: FieldArity::Optional,
-            field_type,
-            database_names: Vec::new(),
-            default_value: None,
-            is_unique: false,
-            is_id: false,
-            documentation: None,
-            is_generated: true,
-            is_updated_at: false,
-            data_source_fields: vec![],
-            is_commented_out: false,
-        }
+        let mut field = Self::new(name, field_type);
+        field.arity = FieldArity::Optional;
+        field.is_generated = true;
+
+        field
     }
 }

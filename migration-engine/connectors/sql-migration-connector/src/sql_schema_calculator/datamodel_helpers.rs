@@ -37,7 +37,7 @@ impl<'a> ModelRef<'a> {
     }
 
     pub(super) fn db_name(&self) -> &str {
-        self.model.single_database_name().unwrap_or_else(|| &self.model.name)
+        self.model.final_database_name()
     }
 
     pub(super) fn fields<'b>(&'b self) -> impl Iterator<Item = FieldRef<'a>> + 'b {
@@ -117,7 +117,7 @@ impl<'a> FieldRef<'a> {
     }
 
     pub(super) fn db_name(&self) -> &'a str {
-        self.field.single_database_name().unwrap_or(self.name())
+        self.field.final_database_name()
     }
 
     pub(super) fn data_source_fields(&self) -> &'a [DataSourceField] {
@@ -251,7 +251,7 @@ impl<'a> RelationFieldRef<'a> {
     }
 
     pub(crate) fn referenced_table_name(&self) -> &'a str {
-        self.referenced_model().final_single_database_name()
+        self.referenced_model().final_database_name()
     }
 
     fn referenced_model(&self) -> &'a Model {
@@ -283,7 +283,7 @@ pub(super) struct EnumRef<'a> {
 
 impl<'a> EnumRef<'a> {
     pub(super) fn db_name(&self) -> &'a str {
-        self.r#enum.single_database_name().unwrap_or(&self.r#enum.name)
+        self.r#enum.final_database_name()
     }
 }
 

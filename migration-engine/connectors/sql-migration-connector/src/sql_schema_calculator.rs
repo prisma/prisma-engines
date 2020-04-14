@@ -60,10 +60,7 @@ impl<'a> SqlSchemaCalculator<'a> {
                 .data_model
                 .enums()
                 .map(|r#enum| sql::Enum {
-                    name: r#enum
-                        .single_database_name()
-                        .map(|s| s.to_owned())
-                        .unwrap_or_else(|| r#enum.name.clone()),
+                    name: r#enum.final_database_name().to_owned(),
                     values: r#enum.database_values(),
                 })
                 .collect(),
