@@ -91,8 +91,7 @@ impl EnumValue {
     /// identifier name.
     pub fn final_database_name(&self) -> &str {
         self.database_name
-            .as_ref()
-            .map(String::as_str)
+            .as_deref()
             .unwrap_or(self.name.as_str())
     }
 }
