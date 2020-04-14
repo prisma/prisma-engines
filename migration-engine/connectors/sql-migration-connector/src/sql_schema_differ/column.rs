@@ -127,6 +127,7 @@ mod tests {
     use sql_schema_describer::{ColumnArity, ColumnType, ColumnTypeFamily, DefaultValue};
 
     #[test]
+    #[ignore] // these values should already be cleaned up during introspection / datamodel validation
     fn quoted_string_defaults_match() {
         let col_a = Column {
             name: "A".to_owned(),
@@ -181,7 +182,7 @@ mod tests {
             name: "A".to_owned(),
             tpe: ColumnType::pure(ColumnTypeFamily::DateTime, ColumnArity::Required),
             default: Some(DefaultValue::VALUE(PrismaValue::new_datetime(
-                "2019-09-01 18:00:00 UTC",
+                "2019-09-01 08:00:00 UTC",
             ))),
             auto_increment: false,
         };
