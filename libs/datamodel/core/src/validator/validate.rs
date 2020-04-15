@@ -349,7 +349,7 @@ impl<'a> Validator<'a> {
                         let base_field = model.find_field(&base_field)?;
                         let referenced_field = related_model.find_field(&referenced_field)?;
 
-                        if base_field.field_type != referenced_field.field_type {
+                        if !base_field.field_type.is_compatible_with(&referenced_field.field_type) {
                             Some(DatamodelError::new_directive_validation_error(
                                 &format!(
                                     "The type of the field `{}` in the model `{}` is not matching the type of the referenced field `{}` in model `{}`.",

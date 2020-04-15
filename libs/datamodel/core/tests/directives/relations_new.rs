@@ -326,6 +326,27 @@ fn relation_must_error_when_types_of_base_field_and_referenced_field_do_not_matc
 }
 
 #[test]
+fn relation_must_succeed_when_type_alias_is_used_for_referenced_field() {
+    let dml = r#"
+    type CustomId = Int @id @default(autoincrement())
+    
+    model User {
+        id        CustomId
+        firstName String
+        posts     Post[]
+    }
+
+    model Post {
+        id     Int     @id
+        userId Int
+        user   User    @relation(fields: [userId], references: [id])
+    }
+    "#;
+
+    let _ = parse(dml);
+}
+
+#[test]
 fn must_error_when_fields_argument_is_missing_for_one_to_many() {
     let dml = r#"
     model User {
