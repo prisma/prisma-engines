@@ -220,7 +220,6 @@ impl From<ScalarType> for TypeIdentifier {
             ScalarType::Int => Self::Int,
             ScalarType::Float => Self::Float,
             ScalarType::Boolean => Self::Boolean,
-            ScalarType::Decimal => Self::Float,
             ScalarType::DateTime => Self::DateTime,
         }
     }

@@ -1,10 +1,8 @@
 //! Postgres description.
 use super::*;
 use log::debug;
-use once_cell::sync::Lazy;
 use quaint::prelude::Queryable;
 use regex::Regex;
-use std::borrow::Cow;
 use std::collections::HashMap;
 use std::convert::TryInto;
 use std::sync::Arc;
@@ -212,24 +210,26 @@ impl SqlSchemaDescriber {
                     None => None,
                     Some(default_string) => {
                         Some(match &tpe.family {
-                            ColumnTypeFamily::Int => match parse_int(&default_string).is_some() {
-                                true => DefaultValue::VALUE(default_string),
-                                false => match is_autoincrement(&default_string, schema, &table_name, &col_name) {
+                            ColumnTypeFamily::Int => match parse_int(&default_string) {
+                                Some(int_value) => DefaultValue::VALUE(int_value),
+                                None => match is_autoincrement(&default_string, schema, &table_name, &col_name) {
                                     true => DefaultValue::SEQUENCE(default_string),
                                     false => DefaultValue::DBGENERATED(default_string),
                                 },
                             },
-                            ColumnTypeFamily::Float => match parse_float(&default_string).is_some() {
-                                true => DefaultValue::VALUE(default_string),
-                                false => DefaultValue::DBGENERATED(default_string),
+                            ColumnTypeFamily::Float => match parse_float(&default_string) {
+                                Some(float_value) => DefaultValue::VALUE(float_value),
+                                None => DefaultValue::DBGENERATED(default_string),
                             },
-                            ColumnTypeFamily::Boolean => match parse_bool(&default_string).is_some() {
-                                true => DefaultValue::VALUE(default_string),
-                                false => DefaultValue::DBGENERATED(default_string),
+                            ColumnTypeFamily::Boolean => match parse_bool(&default_string) {
+                                Some(bool_value) => DefaultValue::VALUE(bool_value),
+                                None => DefaultValue::DBGENERATED(default_string),
                             },
                             ColumnTypeFamily::String => {
                                 match unsuffix_default_literal(&default_string, &data_type, &full_data_type) {
-                                    Some(default_literal) => DefaultValue::VALUE(unquote(default_literal).into_owned()),
+                                    Some(default_literal) => {
+                                        DefaultValue::VALUE(PrismaValue::String(unquote_string(default_literal.into())))
+                                    }
                                     None => DefaultValue::DBGENERATED(default_string),
                                 }
                             }
@@ -251,9 +251,9 @@ impl SqlSchemaDescriber {
                             ColumnTypeFamily::Enum(enum_name) => {
                                 let enum_suffix = format!("::{}", enum_name);
                                 match default_string.ends_with(&enum_suffix) {
-                                    true => DefaultValue::VALUE(
-                                        unquote(&default_string.replace(&enum_suffix, "")).into_owned(),
-                                    ),
+                                    true => DefaultValue::VALUE(PrismaValue::Enum(unquote_string(
+                                        default_string.replace(&enum_suffix, ""),
+                                    ))),
                                     false => DefaultValue::DBGENERATED(default_string),
                                 }
                             }
@@ -699,23 +699,22 @@ fn is_autoincrement(value: &str, schema_name: &str, table_name: &str, column_nam
         .unwrap_or(false)
 }
 
-fn unquote(input: &str) -> Cow<'_, str> {
-    /// Regex for matching the quotes on the introspected string values on Postgres.
+fn unsuffix_default_literal<'a>(literal: &'a str, data_type: &str, full_data_type: &str) -> Option<&'a str> {
     static POSTGRES_STRING_DEFAULT_RE: Lazy<regex::Regex> = Lazy::new(|| regex::Regex::new(r#"^B?'(.*)'$"#).unwrap());
 
-    POSTGRES_STRING_DEFAULT_RE.replace(input, "$1")
-}
-
-fn unsuffix_default_literal<'a>(literal: &'a str, data_type: &str, full_data_type: &str) -> Option<&'a str> {
     static POSTGRES_DATA_TYPE_SUFFIX_RE: Lazy<regex::Regex> =
-        Lazy::new(|| regex::Regex::new(r#"(.*)::"?(.*)"?$"#).unwrap());
+        Lazy::new(|| regex::Regex::new(r#"(.*)::(\\")?(.*)(\\")?$"#).unwrap());
 
     let captures = POSTGRES_DATA_TYPE_SUFFIX_RE.captures(literal)?;
-    let suffix = captures.get(2).unwrap().as_str();
+    let suffix = captures.get(3).unwrap().as_str();
 
     if suffix != data_type && suffix != full_data_type {
         return None;
     }
+
+    let raw = captures.get(1).unwrap().as_str();
+
+    let captures = POSTGRES_STRING_DEFAULT_RE.captures(raw)?;
 
     Some(captures.get(1).unwrap().as_str())
 }
@@ -778,13 +777,5 @@ mod tests {
             "compound_table",
             "compound_column_name",
         ));
-    }
-    #[test]
-    fn postgres_unquote_string_default_regex_works() {
-        let quoted_str = "'abc $$ def'";
-
-        assert_eq!(unquote(quoted_str), "abc $$ def");
-
-        assert_eq!(unquote("heh "), "heh ");
     }
 }

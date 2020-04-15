@@ -52,6 +52,7 @@ impl TestApi {
     }
 }
 
+#[derive(Debug)]
 pub struct DatamodelAssertions(datamodel::Datamodel);
 
 impl DatamodelAssertions {

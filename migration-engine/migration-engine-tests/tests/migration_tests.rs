@@ -2,6 +2,7 @@ mod migrations;
 
 use migration_engine_tests::sql::*;
 use pretty_assertions::assert_eq;
+use prisma_value::PrismaValue;
 use quaint::prelude::SqlFamily;
 use sql_migration_connector::{AlterIndex, CreateIndex, DropIndex, SqlMigrationStep};
 use sql_schema_describer::*;
@@ -1388,7 +1389,9 @@ async fn column_defaults_must_be_migrated(api: &TestApi) -> TestResult {
     api.infer_apply(dm1).send().await?.assert_green()?;
 
     api.assert_schema().await?.assert_table("Fruit", |table| {
-        table.assert_column("name", |col| col.assert_default(Some("banana")))
+        table.assert_column("name", |col| {
+            col.assert_default(Some(DefaultValue::VALUE(PrismaValue::String("banana".to_string()))))
+        })
     })?;
 
     let dm2 = r#"
@@ -1401,7 +1404,9 @@ async fn column_defaults_must_be_migrated(api: &TestApi) -> TestResult {
     api.infer_apply(dm2).send().await?.assert_green()?;
 
     api.assert_schema().await?.assert_table("Fruit", |table| {
-        table.assert_column("name", |col| col.assert_default(Some("mango")))
+        table.assert_column("name", |col| {
+            col.assert_default(Some(DefaultValue::VALUE(PrismaValue::String("mango".to_string()))))
+        })
     })?;
 
     Ok(())
@@ -1446,26 +1451,26 @@ async fn escaped_string_defaults_are_not_arbitrarily_migrated(api: &TestApi) -> 
     assert_eq!(
         table.column("name").and_then(|c| c.default.clone()),
         Some(if api.is_mysql() && !api.connector_name().contains("mariadb") {
-            DefaultValue::VALUE("ba\u{0}nana".to_string())
+            DefaultValue::VALUE(PrismaValue::String("ba\u{0}nana".to_string()))
         } else {
-            DefaultValue::VALUE("ba\\0nana".to_string())
+            DefaultValue::VALUE(PrismaValue::String("ba\\0nana".to_string()))
         })
     );
     assert_eq!(
         table.column("sideNames").and_then(|c| c.default.clone()),
         Some(if api.is_mysql() && !api.connector_name().contains("mariadb") {
-            DefaultValue::VALUE("top\ndown".to_string())
+            DefaultValue::VALUE(PrismaValue::String("top\ndown".to_string()))
         } else {
-            DefaultValue::VALUE("top\\ndown".to_string())
+            DefaultValue::VALUE(PrismaValue::String("top\\ndown".to_string()))
         })
     );
     assert_eq!(
         table.column("contains").and_then(|c| c.default.clone()),
-        Some(DefaultValue::VALUE("potassium".to_string()))
+        Some(DefaultValue::VALUE(PrismaValue::String("potassium".to_string())))
     );
     assert_eq!(
         table.column("seasonality").and_then(|c| c.default.clone()),
-        Some(DefaultValue::VALUE("summer".to_string()))
+        Some(DefaultValue::VALUE(PrismaValue::String("summer".to_string())))
     );
 
     Ok(())

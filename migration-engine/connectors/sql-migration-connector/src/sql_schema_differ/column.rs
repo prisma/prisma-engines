@@ -1,4 +1,4 @@
-use sql_schema_describer::{Column, ColumnTypeFamily, DefaultValue};
+use sql_schema_describer::{Column, DefaultValue};
 
 #[derive(Debug)]
 pub(crate) struct ColumnDiffer<'a> {
@@ -59,60 +59,38 @@ impl<'a> ColumnDiffer<'a> {
             return true;
         }
 
-        let previous_value: Option<&str> = self.previous.default.as_ref().and_then(expand_default_value);
-        let next_value: Option<&str> = self.next.default.as_ref().and_then(expand_default_value);
+        match (&self.previous.default, &self.next.default) {
+            (Some(DefaultValue::VALUE(prev)), Some(DefaultValue::VALUE(next))) => prev == next,
+            (Some(DefaultValue::VALUE(_)), Some(DefaultValue::DBGENERATED(_))) => true,
+            (Some(DefaultValue::VALUE(_)), Some(DefaultValue::SEQUENCE(_))) => true,
+            (Some(DefaultValue::VALUE(_)), Some(DefaultValue::NOW)) => false,
+            (Some(DefaultValue::VALUE(_)), None) => false,
 
-        match self.previous.tpe.family {
-            ColumnTypeFamily::String => string_defaults_match(previous_value, next_value),
-            ColumnTypeFamily::Float => float_default(previous_value) == float_default(next_value),
-            ColumnTypeFamily::Int => int_default(previous_value) == int_default(next_value),
-            ColumnTypeFamily::Boolean => bool_default(previous_value) == bool_default(next_value),
-            _ => true,
+            (Some(DefaultValue::NOW), Some(DefaultValue::NOW)) => true,
+            (Some(DefaultValue::NOW), Some(DefaultValue::DBGENERATED(_))) => true,
+            (Some(DefaultValue::NOW), Some(DefaultValue::SEQUENCE(_))) => true,
+            (Some(DefaultValue::NOW), None) => false,
+            (Some(DefaultValue::NOW), Some(DefaultValue::VALUE(_))) => false,
+
+            (Some(DefaultValue::DBGENERATED(_)), Some(DefaultValue::DBGENERATED(_))) => true,
+            (Some(DefaultValue::DBGENERATED(_)), Some(DefaultValue::SEQUENCE(_))) => true,
+            (Some(DefaultValue::DBGENERATED(_)), Some(DefaultValue::VALUE(_))) => false,
+            (Some(DefaultValue::DBGENERATED(_)), Some(DefaultValue::NOW)) => false,
+            (Some(DefaultValue::DBGENERATED(_)), None) => false,
+
+            (Some(DefaultValue::SEQUENCE(_)), Some(DefaultValue::SEQUENCE(_))) => true,
+            (Some(DefaultValue::SEQUENCE(_)), Some(DefaultValue::DBGENERATED(_))) => true,
+            (Some(DefaultValue::SEQUENCE(_)), None) => false,
+            (Some(DefaultValue::SEQUENCE(_)), Some(DefaultValue::VALUE(_))) => false,
+            (Some(DefaultValue::SEQUENCE(_)), Some(DefaultValue::NOW)) => false,
+
+            (None, None) => true,
+            (None, Some(DefaultValue::DBGENERATED(_))) => true,
+            (None, Some(DefaultValue::SEQUENCE(_))) => true,
+            (None, Some(DefaultValue::VALUE(_))) => false,
+            (None, Some(DefaultValue::NOW)) => false,
         }
     }
-}
-
-fn expand_default_value(default_value: &DefaultValue) -> Option<&str> {
-    match default_value {
-        DefaultValue::VALUE(s) => Some(s.as_str()),
-        DefaultValue::DBGENERATED(s) => Some(s.as_str()),
-        DefaultValue::NOW => Some("CURRENT_TIMESTAMP"),
-        DefaultValue::SEQUENCE(_) => None,
-    }
-}
-
-fn float_default(s: Option<&str>) -> Option<f64> {
-    s.and_then(|s| s.parse().ok())
-}
-
-fn int_default(s: Option<&str>) -> Option<i128> {
-    s.and_then(|s| s.parse().ok())
-}
-
-fn bool_default(s: Option<&str>) -> Option<bool> {
-    s.and_then(|s| match s {
-        "true" | "TRUE" | "True" | "t" | "1" => Some(true),
-        "false" | "FALSE" | "False" | "f" | "0" => Some(false),
-        _ => None,
-    })
-}
-
-fn string_defaults_match(previous: Option<&str>, next: Option<&str>) -> bool {
-    match (previous, next) {
-        (Some(_), None) | (None, Some(_)) => false,
-        (None, None) => true,
-        (Some(previous), Some(next)) => {
-            if string_contains_tricky_character(previous) || string_contains_tricky_character(next) {
-                return true;
-            }
-
-            previous == next
-        }
-    }
-}
-
-fn string_contains_tricky_character(s: &str) -> bool {
-    s.contains('\\') || s.contains("'") || s.contains("\"")
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -145,28 +123,30 @@ impl ColumnChanges {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use prisma_value::PrismaValue;
     use sql_schema_describer::{ColumnArity, ColumnType, ColumnTypeFamily, DefaultValue};
 
     #[test]
+    #[ignore] // these values should already be cleaned up during introspection / datamodel validation
     fn quoted_string_defaults_match() {
         let col_a = Column {
             name: "A".to_owned(),
             tpe: ColumnType::pure(ColumnTypeFamily::String, ColumnArity::Required),
-            default: Some(DefaultValue::VALUE("abc".to_owned())),
+            default: Some(DefaultValue::VALUE(PrismaValue::String("abc".to_owned()))),
             auto_increment: false,
         };
 
         let col_b = Column {
             name: "A".to_owned(),
             tpe: ColumnType::pure(ColumnTypeFamily::String, ColumnArity::Required),
-            default: Some(DefaultValue::VALUE(r##""abc""##.to_owned())),
+            default: Some(DefaultValue::VALUE(PrismaValue::String(r##""abc""##.to_owned()))),
             auto_increment: false,
         };
 
         let col_c = Column {
             name: "A".to_owned(),
             tpe: ColumnType::pure(ColumnTypeFamily::String, ColumnArity::Required),
-            default: Some(DefaultValue::VALUE(r##"'abc'"##.to_owned())),
+            default: Some(DefaultValue::VALUE(PrismaValue::String(r##"'abc'"##.to_owned()))),
             auto_increment: false,
         };
 
@@ -194,14 +174,16 @@ mod tests {
         let col_a = Column {
             name: "A".to_owned(),
             tpe: ColumnType::pure(ColumnTypeFamily::DateTime, ColumnArity::Required),
-            default: Some(DefaultValue::VALUE("2019-09-01T08:00:00Z".to_owned())),
+            default: Some(DefaultValue::VALUE(PrismaValue::new_datetime("2019-09-01T08:00:00Z"))),
             auto_increment: false,
         };
 
         let col_b = Column {
             name: "A".to_owned(),
             tpe: ColumnType::pure(ColumnTypeFamily::DateTime, ColumnArity::Required),
-            default: Some(DefaultValue::VALUE("2019-09-01 18:00:00 UTC".to_owned())),
+            default: Some(DefaultValue::VALUE(PrismaValue::new_datetime(
+                "2019-09-01 08:00:00 UTC",
+            ))),
             auto_increment: false,
         };
 
@@ -217,14 +199,14 @@ mod tests {
         let col_a = Column {
             name: "A".to_owned(),
             tpe: ColumnType::pure(ColumnTypeFamily::Float, ColumnArity::Required),
-            default: Some(DefaultValue::VALUE("0.33".to_owned())),
+            default: Some(DefaultValue::VALUE(PrismaValue::new_float(0.33))),
             auto_increment: false,
         };
 
         let col_b = Column {
             name: "A".to_owned(),
             tpe: ColumnType::pure(ColumnTypeFamily::Float, ColumnArity::Required),
-            default: Some(DefaultValue::VALUE("0.33000".to_owned())),
+            default: Some(DefaultValue::VALUE(PrismaValue::new_float(0.3300))),
             auto_increment: false,
         };
 
@@ -237,7 +219,7 @@ mod tests {
         let col_c = Column {
             name: "A".to_owned(),
             tpe: ColumnType::pure(ColumnTypeFamily::Float, ColumnArity::Required),
-            default: Some(DefaultValue::VALUE("0.34".to_owned())),
+            default: Some(DefaultValue::VALUE(PrismaValue::new_float(0.34))),
             auto_increment: false,
         };
 

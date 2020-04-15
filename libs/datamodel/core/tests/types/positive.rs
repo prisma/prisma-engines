@@ -1,9 +1,7 @@
 use crate::common::*;
-use datamodel::{
-    common::{ScalarType, ScalarValue},
-    DefaultValue, ValueGenerator,
-};
+use datamodel::{common::ScalarType, DefaultValue, ValueGenerator};
 use datamodel_connector::ScalarFieldType;
+use prisma_value::PrismaValue;
 
 #[test]
 fn should_apply_a_custom_type() {
@@ -81,7 +79,7 @@ fn should_be_able_to_handle_multiple_types() {
     user_model
         .assert_has_field("balance")
         .assert_base_type(&ScalarType::Int)
-        .assert_default_value(DefaultValue::Single(ScalarValue::Int(0)));
+        .assert_default_value(DefaultValue::Single(PrismaValue::Int(0)));
 }
 
 #[test]
@@ -108,7 +106,7 @@ fn should_be_able_to_define_custom_enum_types() {
     user_model
         .assert_has_field("role")
         .assert_enum_type("Role")
-        .assert_default_value(DefaultValue::Single(ScalarValue::ConstantLiteral(String::from("USER"))));
+        .assert_default_value(DefaultValue::Single(PrismaValue::Enum(String::from("USER"))));
 }
 
 #[test]

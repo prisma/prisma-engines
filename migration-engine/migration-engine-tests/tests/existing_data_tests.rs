@@ -3,7 +3,9 @@ mod existing_data;
 use migration_connector::MigrationWarning;
 use migration_engine_tests::sql::*;
 use pretty_assertions::assert_eq;
+use prisma_value::PrismaValue;
 use quaint::ast::*;
+use sql_schema_describer::DefaultValue;
 use std::borrow::Cow;
 
 #[test_each_connector]
@@ -160,9 +162,13 @@ async fn altering_a_column_with_non_null_values_should_warn(api: &TestApi) -> Te
 #[test_each_connector]
 async fn column_defaults_can_safely_be_changed(api: &TestApi) -> TestResult {
     let combinations = &[
-        ("Meow", Some("Cats"), None),
-        ("Freedom", None, Some("Braveheart")),
-        ("OutstandingMovies", Some("Cats"), Some("Braveheart")),
+        ("Meow", Some(PrismaValue::String("Cats".to_string())), None),
+        ("Freedom", None, Some(PrismaValue::String("Braveheart".to_string()))),
+        (
+            "OutstandingMovies",
+            Some(PrismaValue::String("Cats".to_string())),
+            Some(PrismaValue::String("Braveheart".to_string())),
+        ),
     ];
 
     for (model_name, first_default, second_default) in combinations {
@@ -177,6 +183,7 @@ async fn column_defaults_can_safely_be_changed(api: &TestApi) -> TestResult {
                 "#,
                 model_name,
                 first_default
+                    .clone()
                     .map(|default| format!("@default(\"{}\")", default))
                     // As a temporary hack, columns always have defaults. Blocked on unexecutable migrations spec.
                     .unwrap_or_else(|| format!("@default(\"\")"))
@@ -186,7 +193,9 @@ async fn column_defaults_can_safely_be_changed(api: &TestApi) -> TestResult {
 
             api.assert_schema().await?.assert_table(model_name, |table| {
                 table.assert_column("name", |column| {
-                    column.assert_default(Some(first_default.unwrap_or("")))
+                    column.assert_default(Some(DefaultValue::VALUE(
+                        first_default.clone().unwrap_or(PrismaValue::String("".to_string())),
+                    )))
                 })
             })?;
         }
@@ -204,12 +213,21 @@ async fn column_defaults_can_safely_be_changed(api: &TestApi) -> TestResult {
             api.database().query(query.into()).await?;
 
             let data = api.dump_table(model_name).await?;
-            let names: Vec<String> = data
+            let names: Vec<PrismaValue> = data
                 .into_iter()
-                .filter_map(|row| row.get("name").and_then(|val| val.to_string()))
+                .filter_map(|row| {
+                    row.get("name")
+                        .and_then(|val| Some(PrismaValue::String(val.to_string().unwrap())))
+                })
                 .collect();
             // TODO: change this when the defaults hack is removed
-            assert_eq!(&[first_default.unwrap_or(""), "Waterworld"], names.as_slice());
+            assert_eq!(
+                &[
+                    first_default.clone().unwrap_or(PrismaValue::String("".to_string())),
+                    PrismaValue::String("Waterworld".to_string())
+                ],
+                names.as_slice()
+            );
         }
 
         // Migrate
@@ -223,6 +241,7 @@ async fn column_defaults_can_safely_be_changed(api: &TestApi) -> TestResult {
                 "#,
                 model_name,
                 second_default
+                    .clone()
                     .map(|default| format!("@default(\"{}\")", default))
                     // As a temporary hack, columns always have defaults. Blocked on unexecutable migrations spec.
                     .unwrap_or_else(|| format!("@default(\"\")"))
@@ -240,15 +259,26 @@ async fn column_defaults_can_safely_be_changed(api: &TestApi) -> TestResult {
         // Check that the data is still there
         {
             let data = api.dump_table(model_name).await?;
-            let names: Vec<String> = data
+            let names: Vec<PrismaValue> = data
                 .into_iter()
-                .filter_map(|row| row.get("name").and_then(|val| val.to_string()))
+                .filter_map(|row| {
+                    row.get("name")
+                        .and_then(|val| Some(PrismaValue::String(val.to_string().unwrap())))
+                })
                 .collect();
-            assert_eq!(&[first_default.unwrap_or(""), "Waterworld"], names.as_slice());
+            assert_eq!(
+                &[
+                    first_default.clone().unwrap_or(PrismaValue::String("".to_string())),
+                    PrismaValue::String("Waterworld".to_string())
+                ],
+                names.as_slice()
+            );
 
             api.assert_schema().await?.assert_table(model_name, |table| {
                 table.assert_column("name", |column| {
-                    column.assert_default(Some(second_default.unwrap_or("")))
+                    column.assert_default(Some(DefaultValue::VALUE(
+                        second_default.clone().unwrap_or(PrismaValue::String("".to_string())),
+                    )))
                 })
             })?;
         }

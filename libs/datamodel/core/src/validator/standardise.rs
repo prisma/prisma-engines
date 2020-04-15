@@ -1,6 +1,6 @@
 use super::common::*;
 use crate::{
-    ast, common::names::*, dml, dml::WithDatabaseName, error::ErrorCollection, DataSourceField, Field, FieldArity,
+    ast, common::names::*, dml, dml::WithDatabaseName, error::ErrorCollection, DataSourceField, Field,
     OnDeleteStrategy, UniqueCriteria,
 };
 
@@ -349,7 +349,7 @@ impl Standardiser {
         scalar_type: &dml::ScalarType,
     ) -> Vec<DataSourceField> {
         let datasource_field = dml::DataSourceField {
-            name: field.final_single_database_name().to_owned(),
+            name: field.final_database_name().to_owned(),
             field_type: scalar_type.clone(),
             arity: field.arity,
             default_value: field.default_value.clone(),
@@ -359,7 +359,7 @@ impl Standardiser {
 
     fn get_datasource_fields_for_enum_field(&self, field: &dml::Field) -> Vec<DataSourceField> {
         let datasource_field = dml::DataSourceField {
-            name: field.final_single_database_name().to_owned(),
+            name: field.final_database_name().to_owned(),
             field_type: dml::ScalarType::String,
             arity: field.arity,
             default_value: field.default_value.clone(),
@@ -384,7 +384,7 @@ impl Standardiser {
 
                 match &referenced_field.field_type {
                     dml::FieldType::Base(scalar_type, _) => dml::DataSourceField {
-                        name: referenced_field.final_single_database_name().to_owned(),
+                        name: referenced_field.final_database_name().to_owned(),
                         field_type: *scalar_type,
                         arity: field.arity,
                         default_value: None,
@@ -393,84 +393,6 @@ impl Standardiser {
                 }
             })
             .collect()
-    }
-
-    #[allow(unused)]
-    fn get_datasource_fields_for_relation_field(
-        &self,
-        field: &dml::Field,
-        rel_info: &dml::RelationInfo,
-        datamodel: &dml::Datamodel,
-    ) -> Vec<DataSourceField> {
-        let final_db_names = self.final_db_names_for_relation_field(&field, &rel_info, &datamodel);
-        // dbg!(&final_db_names);
-        let to_fields_and_db_names = rel_info.to_fields.iter().zip(final_db_names.iter());
-
-        to_fields_and_db_names
-            .map(|(to_field, db_name)| {
-                let related_model = datamodel.find_model(&rel_info.to).expect(STATE_ERROR);
-                let referenced_field = related_model.find_field(&to_field).expect(STATE_ERROR);
-
-                match &referenced_field.field_type {
-                    dml::FieldType::Base(scalar_type, _) => {
-                        let ds_field = dml::DataSourceField {
-                            name: db_name.clone(),
-                            field_type: *scalar_type,
-                            arity: match field.arity {
-                                // FIXME: superior hack. Talk to Marcus. This is a workaround for the behavior in row.rs for trait `ToSqlRow`
-                                FieldArity::List => FieldArity::Optional,
-                                x => x,
-                            },
-                            default_value: None,
-                        };
-                        vec![ds_field]
-                    }
-                    dml::FieldType::Relation(rel_info) => {
-                        let mut x =
-                            self.get_datasource_fields_for_relation_field(&referenced_field, &rel_info, &datamodel);
-                        x.iter_mut().for_each(|ds_field| ds_field.name = db_name.to_owned());
-                        x
-                    }
-                    x => unimplemented!("This must be a scalar type: {:?}", x),
-                }
-            })
-            .flatten()
-            .collect()
-    }
-
-    #[allow(unused)]
-    fn final_db_names_for_relation_field(
-        &self,
-        field: &dml::Field,
-        relation_info: &dml::RelationInfo,
-        datamodel: &dml::Datamodel,
-    ) -> Vec<String> {
-        if field.database_names.len() == 0 {
-            // TODO: this rule must be incorporated into psl-sql-conversion.md
-            if relation_info.to_fields.len() == 1 {
-                vec![field.final_single_database_name().to_owned()]
-            } else {
-                let related_model = datamodel.find_model(&relation_info.to).expect(STATE_ERROR);
-                relation_info
-                    .to_fields
-                    .iter()
-                    .map(|to_field| {
-                        let referenced_field = related_model.find_field(&to_field).expect(STATE_ERROR);
-                        // TODO: calling `final_single_database_name` means that this can not work for compound relation fields
-                        format!(
-                            "{}_{}",
-                            field.final_single_database_name(),
-                            referenced_field.final_single_database_name()
-                        )
-                    })
-                    .collect()
-            }
-        } else {
-            // This assertion verifies that the same number of names was used in @relation(references: [..]) and @map([..])
-            // This must already verified by the parser. Just making sure this is the case.
-            assert_eq!(relation_info.to_fields.len(), field.database_names.len());
-            field.database_names.clone()
-        }
     }
 }
 

@@ -137,25 +137,24 @@ impl SqlSchemaDescriber {
                             None
                         } else {
                             Some(match &tpe.family {
-                                ColumnTypeFamily::Int => match parse_int(&default_string).is_some() {
-                                    true => DefaultValue::VALUE(unquote_single(default_string)),
-                                    false => DefaultValue::DBGENERATED(default_string),
+                                ColumnTypeFamily::Int => match parse_int(&default_string) {
+                                    Some(int_value) => DefaultValue::VALUE(int_value),
+                                    None => DefaultValue::DBGENERATED(default_string),
                                 },
-                                ColumnTypeFamily::Float => match parse_float(&default_string).is_some() {
-                                    true => DefaultValue::VALUE(unquote_single(default_string)),
-                                    false => DefaultValue::DBGENERATED(default_string),
+                                ColumnTypeFamily::Float => match parse_float(&default_string) {
+                                    Some(float_value) => DefaultValue::VALUE(float_value),
+                                    None => DefaultValue::DBGENERATED(default_string),
                                 },
                                 ColumnTypeFamily::Boolean => match parse_int(&default_string) {
-                                    Some(1) => DefaultValue::VALUE("true".into()),
-                                    Some(0) => DefaultValue::VALUE("false".into()),
+                                    Some(PrismaValue::Int(1)) => DefaultValue::VALUE(PrismaValue::Boolean(true)),
+                                    Some(PrismaValue::Int(0)) => DefaultValue::VALUE(PrismaValue::Boolean(false)),
                                     _ => match parse_bool(&default_string) {
-                                        Some(true) => DefaultValue::VALUE("true".into()),
-                                        Some(false) => DefaultValue::VALUE("false".into()),
+                                        Some(bool_value) => DefaultValue::VALUE(bool_value),
                                         None => DefaultValue::DBGENERATED(default_string),
                                     },
                                 },
                                 ColumnTypeFamily::String => {
-                                    DefaultValue::VALUE(unquote_double(unquote_single(default_string)))
+                                    DefaultValue::VALUE(PrismaValue::String(unquote_string(default_string)))
                                 }
                                 ColumnTypeFamily::DateTime => match default_string.to_lowercase()
                                     == "current_timestamp".to_string()
@@ -172,7 +171,7 @@ impl SqlSchemaDescriber {
                                 ColumnTypeFamily::LogSequenceNumber => DefaultValue::DBGENERATED(default_string),
                                 ColumnTypeFamily::TextSearch => DefaultValue::DBGENERATED(default_string),
                                 ColumnTypeFamily::TransactionId => DefaultValue::DBGENERATED(default_string),
-                                ColumnTypeFamily::Enum(_) => DefaultValue::VALUE(default_string),
+                                ColumnTypeFamily::Enum(_) => DefaultValue::VALUE(PrismaValue::Enum(default_string)),
                                 ColumnTypeFamily::Unsupported(_) => DefaultValue::DBGENERATED(default_string),
                             })
                         }
@@ -438,27 +437,3 @@ const SQLITE_SYSTEM_TABLES: &[&str] = &[
     "sqlite_stat3",
     "sqlite_stat4",
 ];
-
-fn unquote_single(input: String) -> String {
-    /// Regex for matching the quotes on the introspected string values on Sqlite.
-    static SQLITE_STRING_DEFAULT_RE: Lazy<regex::Regex> = Lazy::new(|| regex::Regex::new(r#"^'(.*)'$"#).unwrap());
-
-    SQLITE_STRING_DEFAULT_RE
-        .captures(input.as_ref())
-        .and_then(|captures| captures.get(1))
-        .map(|capt| capt.as_str())
-        .unwrap_or(input.as_ref())
-        .to_string()
-}
-
-fn unquote_double(input: String) -> String {
-    /// Regex for matching the quotes on the introspected string values on Sqlite.
-    static SQLITE_STRING_DEFAULT_RE: Lazy<regex::Regex> = Lazy::new(|| regex::Regex::new(r#"^"(.*)"$"#).unwrap());
-
-    SQLITE_STRING_DEFAULT_RE
-        .captures(input.as_ref())
-        .and_then(|captures| captures.get(1))
-        .map(|capt| capt.as_str())
-        .unwrap_or(input.as_ref())
-        .to_string()
-}

@@ -1,10 +1,13 @@
 //! Database description.
 
 use failure::Fail;
+use log::debug;
 use once_cell::sync::Lazy;
+use prisma_value::PrismaValue;
 use regex::Regex;
+use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
-use std::fmt;
+use std::{fmt, str::FromStr};
 
 pub mod mysql;
 pub mod postgres;
@@ -397,7 +400,7 @@ pub struct Sequence {
 #[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
 pub enum DefaultValue {
     /// A constant value, parsed as String
-    VALUE(String),
+    VALUE(PrismaValue),
     /// An expression generating a current timestamp.
     NOW,
     /// An expression generating a sequence.
@@ -406,19 +409,10 @@ pub enum DefaultValue {
     DBGENERATED(String),
 }
 
-impl DefaultValue {
-    pub fn as_value(&self) -> Option<&str> {
-        match self {
-            DefaultValue::VALUE(s) => Some(s.as_str()),
-            DefaultValue::DBGENERATED(s) => Some(s.as_str()),
-            _ => None,
-        }
-    }
-}
-
 static RE_NUM: Lazy<Regex> = Lazy::new(|| Regex::new(r"^'?(\d+)'?$").expect("compile regex"));
+static RE_FLOAT: Lazy<Regex> = Lazy::new(|| Regex::new(r"^'?([^']+)'?$").expect("compile regex"));
 
-fn parse_int(value: &str) -> Option<i32> {
+pub fn parse_int(value: &str) -> Option<PrismaValue> {
     let rslt = RE_NUM.captures(value);
     if rslt.is_none() {
         return None;
@@ -426,20 +420,21 @@ fn parse_int(value: &str) -> Option<i32> {
 
     let captures = rslt.expect("get captures");
     let num_str = captures.get(1).expect("get capture").as_str();
-    let num_rslt = num_str.parse::<i32>();
+    let num_rslt = num_str.parse::<i64>();
     match num_rslt {
-        Ok(num) => Some(num),
+        Ok(num) => Some(PrismaValue::Int(num)),
         Err(_) => None,
     }
 }
 
-fn parse_bool(value: &str) -> Option<bool> {
-    value.to_lowercase().parse().ok()
+pub fn parse_bool(value: &str) -> Option<PrismaValue> {
+    match value.to_lowercase().parse() {
+        Ok(val) => Some(PrismaValue::Boolean(val)),
+        Err(_) => None,
+    }
 }
 
-static RE_FLOAT: Lazy<Regex> = Lazy::new(|| Regex::new(r"^'?([^']+)'?$").expect("compile regex"));
-
-fn parse_float(value: &str) -> Option<f32> {
+pub fn parse_float(value: &str) -> Option<PrismaValue> {
     let rslt = RE_FLOAT.captures(value);
     if rslt.is_none() {
         return None;
@@ -447,9 +442,35 @@ fn parse_float(value: &str) -> Option<f32> {
 
     let captures = rslt.expect("get captures");
     let num_str = captures.get(1).expect("get capture").as_str();
-    let num_rslt = num_str.parse::<f32>();
-    match num_rslt {
-        Ok(num) => Some(num),
-        Err(_) => None,
+    match Decimal::from_str(num_str) {
+        Ok(num) => Some(PrismaValue::Float(num)),
+        Err(_) => {
+            debug!("Couldn't parse float '{}'", value);
+            None
+        }
+    }
+}
+
+pub fn unquote_string(val: String) -> String {
+    val.trim_start_matches('\'')
+        .trim_end_matches('\'')
+        .trim_start_matches('\\')
+        .trim_start_matches('"')
+        .trim_end_matches('"')
+        .trim_end_matches('\\')
+        .into()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn unquoting_works() {
+        let quoted_str = "'abc $$ def'".to_string();
+
+        assert_eq!(unquote_string(quoted_str), "abc $$ def");
+
+        assert_eq!(unquote_string("heh ".into()), "heh ");
     }
 }
