@@ -238,21 +238,49 @@ fn relation_must_error_when_referenced_field_is_not_scalar() {
 fn relation_must_error_when_referenced_fields_are_not_a_unique_criteria() {
     let dml = r#"
     model User {
-        id Int @id
+        id        Int    @id
         firstName String
-        posts Post[]
+        posts     Post[]
     }
 
     model Post {
-        id Int @id
-        text String
-        userName Int        
-        user User @relation(fields: [userName], references: [firstName])
+        id       Int    @id
+        text     String
+        userName String        
+        user     User   @relation(fields: [userName], references: [firstName])
     }
     "#;
 
     let errors = parse_error(dml);
-    errors.assert_is(DatamodelError::new_validation_error("The argument `references` must refer to a unique criteria in the related model `User`. But it is referencing the following fields that are not a unique criteria: firstName", Span::new(183, 247)));
+    errors.assert_is(DatamodelError::new_validation_error("The argument `references` must refer to a unique criteria in the related model `User`. But it is referencing the following fields that are not a unique criteria: firstName", Span::new(213, 283)));
+}
+
+#[allow(non_snake_case)]
+#[test]
+fn relation_must_NOT_error_when_referenced_fields_are_not_a_unique_criteria_on_mysql() {
+    // MySQL allows foreign key to references a non unique criteria
+    // https://stackoverflow.com/questions/588741/can-a-foreign-key-reference-a-non-unique-index
+    let dml = r#"
+    datasource db {
+        provider = "mysql"
+        url = "mysql://localhost:3306"
+    }
+    
+    model User {
+        id        Int    @id
+        firstName String
+        posts     Post[]
+    }
+
+    model Post {
+        id       Int    @id
+        text     String
+        userName String        
+        user     User   @relation(fields: [userName], references: [firstName])
+    }
+    "#;
+
+    let _ = parse(dml);
 }
 
 #[test]

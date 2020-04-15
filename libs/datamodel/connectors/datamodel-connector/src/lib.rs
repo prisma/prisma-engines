@@ -13,6 +13,8 @@ pub trait Connector {
     fn calculate_type(&self, name: &str, args: Vec<i32>) -> Option<ScalarFieldType>;
 
     fn supports_scalar_lists(&self) -> bool;
+
+    fn supports_relations_over_non_unique_criteria(&self) -> bool;
 }
 
 #[derive(Debug, Clone, PartialEq)]

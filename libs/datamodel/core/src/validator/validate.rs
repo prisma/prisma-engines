@@ -402,7 +402,11 @@ impl<'a> Validator<'a> {
                         })
                         .is_some();
 
-                    if !references_unique_criteria {
+                    let must_reference_unique_criteria = match self.source {
+                        Some(source) => !source.connector().supports_relations_over_non_unique_criteria(),
+                        None => true,
+                    };
+                    if !references_unique_criteria && must_reference_unique_criteria {
                         errors.push(DatamodelError::new_validation_error(
                             &format!("The argument `references` must refer to a unique criteria in the related model `{}`. But it is referencing the following fields that are not a unique criteria: {}",
                                      &related_model.name,
