@@ -1,42 +1,54 @@
-use super::{Env, ExpressionResult, InterpretationResult};
+use super::{result::ExpressionResult, Env};
 use crate::{Query, WriteQuery};
 use prisma_value::PrismaValue;
 
+type BoxedExpression = Box<Expression>;
+type BindingName = String;
+
+/// They do not represent a fundamental building block like `Expression`
+/// but custom, build-in functionality.
+pub enum FnInvocation {
+    Get(BindingName),
+    Query(Query),
+    Diff(BindingName, BindingName),
+    // Raise
+    // Inject
+    // Filter
+}
+
+impl FnInvocation {
+    pub fn apply(self, env: Env) -> ExpressionResult {
+        // todo result type / dynamic typing?
+        todo!()
+    }
+
+    // functions defined here
+}
+
+/// Fundamental building blocks of the interpreted language.
 pub enum Expression {
-    Sequence {
-        seq: Vec<Expression>,
-    },
+    Sequence(Vec<Expression>),
+    Invoke(FnInvocation),
 
-    Func {
-        func: Box<dyn FnOnce(Env) -> InterpretationResult<Expression> + Send + Sync + 'static>,
-    },
-
-    Query {
-        query: Query,
-    },
-
+    // Query {
+    //     query: Query,
+    // },
     Let {
         bindings: Vec<Binding>,
-        expressions: Vec<Expression>,
+        inner: BoxedExpression,
     },
 
-    Get {
-        binding_name: String,
-    },
-
-    GetFirstNonEmpty {
-        binding_names: Vec<String>,
-    },
-
+    // GetFirstNonEmpty {
+    //     binding_names: Vec<String>,
+    // },
     If {
-        func: Box<dyn FnOnce() -> bool + Send + Sync + 'static>,
-        then: Vec<Expression>,
-        else_: Vec<Expression>,
+        func: BoxedExpression,
+        then: BoxedExpression,
+        else_: BoxedExpression,
     },
-
-    Return {
-        result: ExpressionResult,
-    },
+    // Return {
+    //     result: ExpressionResult,
+    // },
 }
 
 impl Expression {

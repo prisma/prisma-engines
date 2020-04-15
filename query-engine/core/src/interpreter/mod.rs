@@ -3,6 +3,7 @@ mod expression;
 mod expressionista;
 mod formatters;
 mod interpreter;
+mod result;
 
 pub(self) mod query_interpreters;
 

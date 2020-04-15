@@ -1,6 +1,4 @@
-use super::{
-    expression::*, ComputationResult, DiffResult, Env, ExpressionResult, InterpretationResult, InterpreterError,
-};
+use super::{expression::*, Env, InterpretationResult, InterpreterError};
 use crate::{query_graph::*, Query};
 use prisma_models::RecordProjection;
 use std::convert::TryInto;
