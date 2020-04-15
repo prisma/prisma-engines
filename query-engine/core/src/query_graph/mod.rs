@@ -4,8 +4,7 @@
 //! Considered not stable. Will change in the future.
 mod error;
 mod formatters;
-mod guard;
-// mod invariance_rules;
+// mod guard;
 mod transformers;
 
 #[cfg(test)]
@@ -15,15 +14,7 @@ pub use error::*;
 pub use formatters::*;
 pub use transformers::*;
 
-// use crate::{
-//     interpreter::ExpressionResult, FilteredQuery, ManyRecordsQuery, Query, QueryGraphBuilderResult, ReadQuery,
-// };
-// use guard::*;
-// use prisma_models::{ModelProjection, ModelRef, RecordProjection, RelationFieldRef};
-// use connector::{IdFilter, QueryArguments};
-// use std::{borrow::Borrow, collections::HashSet};
 use crate::Query;
-// use invariance_rules::*;
 use petgraph::{graph::*, visit::EdgeRef as PEdgeRef, *};
 use prisma_models::RelationFieldRef;
 

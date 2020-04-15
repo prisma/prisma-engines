@@ -31,7 +31,7 @@ fn stringify_nodes(graph: &QueryGraph, nodes: Vec<NodeRef>, seen_nodes: &mut Vec
                     "Child (edge {}): Node {} - {:?}",
                     child_edge.id(),
                     child_node.id(),
-                    graph.edge_content(child_edge).map(|rf| rf.name)
+                    graph.edge_content(child_edge).as_ref().map(|rf| &rf.name)
                 ));
 
                 child_node
