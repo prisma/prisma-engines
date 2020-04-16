@@ -22,3 +22,4 @@ cuid = { git = "https://github.com/prisma/cuid-rust" }
 [dev-dependencies]
 pretty_assertions = "0.6.1"
 clap = "2.33"
+serial_test = "*"

@@ -1,6 +1,7 @@
 use crate::common::*;
 use datamodel::{ast::Span, error::DatamodelError};
 use pretty_assertions::assert_eq;
+use serial_test::serial;
 
 const DATAMODEL: &str = r#"
 datasource db1 {
@@ -29,6 +30,7 @@ model Post {
 "#;
 
 #[test]
+#[serial]
 fn serialize_sources_to_dmmf() {
     std::env::set_var("URL_CUSTOM_1", "https://localhost");
     let config = datamodel::parse_configuration(DATAMODEL).unwrap();
@@ -59,6 +61,7 @@ fn serialize_sources_to_dmmf() {
 }
 
 #[test]
+#[serial]
 fn must_forbid_env_functions_in_provider_field() {
     let schema = r#"
         datasource ds {
@@ -74,6 +77,44 @@ fn must_forbid_env_functions_in_provider_field() {
     errors.assert_is(DatamodelError::new_functional_evaluation_error(
         "A datasource must not use the env() function in the provider argument.",
         Span::new(9, 108),
+    ));
+}
+
+#[test]
+fn must_error_for_empty_urls() {
+    let schema = r#"
+        datasource myds {
+            provider = "sqlite"
+            url = ""
+        }
+    "#;
+    let config = datamodel::parse_configuration(schema);
+    assert!(config.is_err());
+    let errors = config.err().expect("This must error");
+    errors.assert_is(DatamodelError::new_source_validation_error(
+        "You must provide a nonempty URL for the datasource `myds`.",
+        "myds",
+        Span::new(77, 79),
+    ));
+}
+
+#[test]
+#[serial]
+fn must_error_for_empty_urls_derived_from_env_vars() {
+    std::env::set_var("DB_URL", "  ");
+    let schema = r#"
+        datasource myds {
+            provider = "sqlite"
+            url = env("DB_URL")
+        }
+    "#;
+    let config = datamodel::parse_configuration(schema);
+    assert!(config.is_err());
+    let errors = config.err().expect("This must error");
+    errors.assert_is(DatamodelError::new_source_validation_error(
+        "You must provide a nonempty URL for the datasource `myds`. The environment variable `DB_URL` resolved to an empty string.",
+        "myds",
+        Span::new(77, 90),
     ));
 }
 

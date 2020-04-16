@@ -55,12 +55,16 @@ impl SourceLoader {
         ast_source: &ast::SourceConfig,
         ignore_env_var_errors: bool,
     ) -> Result<Option<Box<dyn Source + Send + Sync>>, DatamodelError> {
+        let source_name = &ast_source.name.name;
         let mut args = Arguments::new(&ast_source.properties, ast_source.span);
-        let (env_var_for_url, url) = match args.arg("url")?.as_str_from_env() {
-            Ok((env_var, url)) => (env_var, url),
+
+        let url_args = args.arg("url")?;
+        let (env_var_for_url, url) = match url_args.as_str_from_env() {
+            Ok((env_var, url)) => (env_var, url.trim().to_owned()),
             Err(_) if ignore_env_var_errors => (None, "dummy://url".to_owned()), // the flag is only used by the vs code plugin
             Err(err) => return Err(err),
         };
+
         let provider_arg = args.arg("provider")?;
         let provider = provider_arg.as_str()?;
 
@@ -71,6 +75,25 @@ impl SourceLoader {
             ));
         }
 
+        if url.is_empty() {
+            let suffix = match &env_var_for_url {
+                Some(env_var_name) => format!(
+                    " The environment variable `{}` resolved to an empty string.",
+                    env_var_name
+                ),
+                None => "".to_owned(),
+            };
+            let msg = format!(
+                "You must provide a nonempty URL for the datasource `{}`.{}",
+                source_name, &suffix
+            );
+            return Err(DatamodelError::new_source_validation_error(
+                &msg,
+                source_name,
+                url_args.span(),
+            ));
+        }
+
         for decl in &self.source_declarations {
             // The provider given in the config block identifies the source type.
             // TODO: The second condition is a fallback to mitigate the postgres -> postgresql rename. It should be
@@ -78,7 +101,7 @@ impl SourceLoader {
             if provider == decl.connector_type() || (decl.connector_type() == "postgresql" && provider == "postgres") {
                 return Ok(Some(decl.create(
                     // The name in front of the block is the name of the concrete instantiation.
-                    &ast_source.name.name,
+                    source_name,
                     StringFromEnvVar {
                         from_env_var: env_var_for_url,
                         value: url,
