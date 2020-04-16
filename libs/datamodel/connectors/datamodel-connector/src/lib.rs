@@ -15,6 +15,8 @@ pub trait Connector {
     fn supports_scalar_lists(&self) -> bool;
 
     fn supports_relations_over_non_unique_criteria(&self) -> bool;
+
+    fn supports_enums(&self) -> bool;
 }
 
 #[derive(Debug, Clone, PartialEq)]

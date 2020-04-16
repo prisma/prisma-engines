@@ -6,6 +6,7 @@ pub struct DeclarativeConnector {
     pub field_type_constructors: Vec<FieldTypeConstructor>,
     pub supports_scalar_lists: bool,
     pub supports_relations_over_non_unique_criteria: bool,
+    pub supports_enums: bool,
 }
 
 impl Connector for DeclarativeConnector {
@@ -30,6 +31,10 @@ impl Connector for DeclarativeConnector {
 
     fn supports_relations_over_non_unique_criteria(&self) -> bool {
         self.supports_relations_over_non_unique_criteria
+    }
+
+    fn supports_enums(&self) -> bool {
+        self.supports_enums
     }
 }
 
