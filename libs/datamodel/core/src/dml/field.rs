@@ -92,7 +92,6 @@ pub struct Field {
     /// The field's type.
     pub field_type: FieldType,
 
-    // -------- todo this is duplicated from DataSourceField --------
     /// The field's arity.
     pub arity: FieldArity,
 
@@ -101,7 +100,7 @@ pub struct Field {
 
     /// The default value.
     pub default_value: Option<DefaultValue>,
-    // -------- -------------------------------------------- --------
+
     /// Indicates if the field is unique.
     pub is_unique: bool,
 

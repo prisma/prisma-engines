@@ -1,6 +1,4 @@
-use crate::{
-    DataSourceFieldRef, DomainError, Field, ModelProjection, OrderBy, PrismaValue, RecordProjection, SortOrder,
-};
+use crate::{DomainError, Field, ModelProjection, OrderBy, PrismaValue, RecordProjection, ScalarFieldRef, SortOrder};
 use std::collections::HashMap;
 
 #[derive(Debug, Clone)]
@@ -64,12 +62,13 @@ impl ManyRecords {
                 }
             }
             Field::Relation(ref rf) => {
-                let ds_fields = rf.data_source_fields();
-                let mut a_vals = Vec::with_capacity(ds_fields.len());
-                let mut b_vals = Vec::with_capacity(ds_fields.len());
+                let fields = rf.fields();
+                let mut a_vals = Vec::with_capacity(fields.len());
+                let mut b_vals = Vec::with_capacity(fields.len());
 
-                for dsf in ds_fields {
-                    let index = field_indices[dsf.name()];
+                for field in fields {
+                    let index = field_indices[field.db_name()];
+
                     a_vals.push(&a.values[index]);
                     b_vals.push(&b.values[index]);
                 }
@@ -137,15 +136,13 @@ impl Record {
         field_names: &[String],
         model_projection: &ModelProjection,
     ) -> crate::Result<RecordProjection> {
-        let pairs: Vec<(DataSourceFieldRef, PrismaValue)> = model_projection
+        let pairs: Vec<(ScalarFieldRef, PrismaValue)> = model_projection
             .fields()
             .into_iter()
             .flat_map(|field| {
-                let source_fields = field.data_source_fields();
-
-                source_fields.into_iter().map(|source_field| {
-                    self.get_field_value(field_names, &source_field.name)
-                        .map(|val| (source_field, val.clone()))
+                field.scalar_fields().into_iter().map(|field| {
+                    self.get_field_value(field_names, field.db_name())
+                        .map(|val| (field, val.clone()))
                 })
             })
             .collect::<crate::Result<Vec<_>>>()?;
@@ -162,9 +159,8 @@ impl Record {
             .fields()
             .into_iter()
             .flat_map(|field| {
-                let source_fields = field.data_source_fields();
-
-                source_fields
+                field
+                    .scalar_fields()
                     .into_iter()
                     .map(|source_field| self.get_field_value(field_names, &source_field.name))
             })

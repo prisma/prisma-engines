@@ -177,10 +177,10 @@ impl Field {
         }
     }
 
-    pub fn data_source_fields(&self) -> Vec<DataSourceFieldRef> {
+    pub fn scalar_fields(&self) -> Vec<ScalarFieldRef> {
         match self {
-            Self::Scalar(sf) => vec![sf.data_source_field().clone()],
-            Self::Relation(rf) => rf.data_source_fields().to_vec(),
+            Self::Scalar(sf) => vec![sf.clone()],
+            Self::Relation(rf) => rf.fields(),
         }
     }
 

@@ -155,12 +155,9 @@ impl Model {
     }
 
     pub fn map_scalar_db_field_name(&self, name: &str) -> Option<ScalarFieldRef> {
-        self.fields().scalar().into_iter().find_map(|field| {
-            if field.data_source_field().name == name {
-                Some(field)
-            } else {
-                None
-            }
-        })
+        self.fields()
+            .scalar()
+            .into_iter()
+            .find_map(|field| if field.db_name() == name { Some(field) } else { None })
     }
 }

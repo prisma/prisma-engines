@@ -106,13 +106,11 @@ impl<'a> DatamodelConverter<'a> {
                     is_unique: field.is_unique(),
                     is_id: field.is_id,
                     is_auto_generated_int_id: field.is_auto_generated_int_id(),
-                    data_source_field: field
-                        .data_source_fields
-                        .clone()
-                        .pop()
-                        .expect("Expected exactly one data source field for ScalarFieldTemplate."),
                     behaviour: field.behaviour(),
                     internal_enum: field.internal_enum(self.datamodel),
+                    db_name: field.database_name.clone(),
+                    arity: field.arity,
+                    default_value: field.default_value.clone(),
                 }),
             })
             .collect()

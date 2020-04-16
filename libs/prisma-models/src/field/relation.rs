@@ -243,21 +243,11 @@ impl RelationField {
         self.relation().name == relation_name && self.relation_side == side
     }
 
-    pub fn data_source_fields(&self) -> Vec<DataSourceFieldRef> {
-        self.fields()
-            .into_iter()
-            .map(|f| Arc::clone(f.data_source_field()))
-            .collect()
-    }
-
     pub fn type_identifiers_with_arities(&self) -> Vec<(TypeIdentifier, FieldArity)> {
-        self.data_source_fields()
-            .iter()
-            .map(|dsf| (dsf.field_type.into(), dsf.arity))
-            .collect()
+        self.fields().iter().map(|f| f.type_identifier_with_arity()).collect()
     }
 
     pub fn db_names(&self) -> impl Iterator<Item = String> {
-        self.data_source_fields().into_iter().map(|dsf| dsf.name.clone())
+        self.fields().into_iter().map(|f| f.db_name().to_owned())
     }
 }
