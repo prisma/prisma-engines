@@ -63,7 +63,7 @@ class DefaultValueSpec extends FlatSpec with Matchers with ApiSpecBase {
     res.toString should be(s"""{"data":{"createService":{"name":"issue1820","int":1}}}""")
   }
 
-  "The default value" should "work for enums" in {
+  "The default value" should "work for enums" taggedAs IgnoreSQLite in {
     val project = ProjectDsl.fromString {
       """
         |enum IsActive{
