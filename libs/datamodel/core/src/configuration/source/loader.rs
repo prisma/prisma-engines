@@ -50,7 +50,7 @@ impl SourceLoader {
     }
 
     /// Internal: Loads a single source from a source config block in the datamodel.
-    pub fn load_source(
+    fn load_source(
         &self,
         ast_source: &ast::SourceConfig,
         ignore_env_var_errors: bool,

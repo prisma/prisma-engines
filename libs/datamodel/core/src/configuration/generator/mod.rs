@@ -1,11 +1,11 @@
 mod loader;
 pub use loader::*;
 
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 use std::collections::HashMap;
 
 #[serde(rename_all = "camelCase")]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize)]
 pub struct Generator {
     name: String,
     provider: String,
