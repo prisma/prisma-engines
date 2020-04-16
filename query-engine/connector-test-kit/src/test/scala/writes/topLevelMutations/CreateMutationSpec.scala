@@ -2,9 +2,13 @@ package writes.topLevelMutations
 
 import org.scalatest.{FlatSpec, Matchers}
 import play.api.libs.json.JsValue
+import util.ConnectorCapability.EnumCapability
 import util._
 
 class CreateMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
+
+  override def runOnlyForCapabilities = Set(EnumCapability)
+
   val schema =
     """
     |model ScalarModel {
@@ -141,6 +145,12 @@ class CreateMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
 
   "A Create Mutation" should "fail if an item with enums passed as strings doesn't match and enum value" in {
     // previous errorCode: 3010
-    server.queryThatMustFail(s"""mutation {createScalarModel(data: {optEnum: "NOPE"}){ optEnum }}""", project, errorCode = 2009, errorContains = """↳ createScalarModel (field)\n    ↳ data (argument)\n      ↳ ScalarModelCreateInput (object)\n        ↳ optEnum (field)\n          ↳ Error parsing value: Enum value 'NOPE' is invalid for enum type MyEnum.""")
+    server.queryThatMustFail(
+      s"""mutation {createScalarModel(data: {optEnum: "NOPE"}){ optEnum }}""",
+      project,
+      errorCode = 2009,
+      errorContains =
+        """↳ createScalarModel (field)\n    ↳ data (argument)\n      ↳ ScalarModelCreateInput (object)\n        ↳ optEnum (field)\n          ↳ Error parsing value: Enum value 'NOPE' is invalid for enum type MyEnum."""
+    )
   }
 }

@@ -1,7 +1,6 @@
-use crate::{ast::Span, error::DatamodelError};
 use chrono::Utc;
 use prisma_value::PrismaValue;
-use std::{convert::TryFrom, fmt};
+use std::fmt;
 use uuid::Uuid;
 
 #[derive(Clone, PartialEq)]
@@ -30,8 +29,8 @@ pub struct ValueGenerator {
 }
 
 impl ValueGenerator {
-    pub fn new(name: String, args: Vec<PrismaValue>) -> std::result::Result<Self, DatamodelError> {
-        let generator = ValueGeneratorFn::try_from(name.as_ref())?;
+    pub fn new(name: String, args: Vec<PrismaValue>) -> std::result::Result<Self, String> {
+        let generator = ValueGeneratorFn::new(name.as_ref())?;
 
         Ok(ValueGenerator { name, args, generator })
     }
@@ -46,6 +45,14 @@ impl ValueGenerator {
 
     pub fn new_now() -> Self {
         ValueGenerator::new("now".to_owned(), vec![]).unwrap()
+    }
+
+    pub fn new_cuid() -> Self {
+        ValueGenerator::new("cuid".to_owned(), vec![]).unwrap()
+    }
+
+    pub fn new_uuid() -> Self {
+        ValueGenerator::new("uuid".to_owned(), vec![]).unwrap()
     }
 
     pub fn generate(&self) -> Option<PrismaValue> {
@@ -71,6 +78,17 @@ pub enum ValueGeneratorFn {
 }
 
 impl ValueGeneratorFn {
+    fn new(name: &str) -> std::result::Result<Self, String> {
+        match name {
+            "cuid" => Ok(Self::CUID),
+            "uuid" => Ok(Self::UUID),
+            "now" => Ok(Self::Now),
+            "autoincrement" => Ok(Self::Autoincrement),
+            "dbgenerated" => Ok(Self::DbGenerated),
+            _ => Err(format!("The function {} is not a known function.", name)),
+        }
+    }
+
     pub fn invoke(&self) -> Option<PrismaValue> {
         match self {
             Self::UUID => Self::generate_uuid(),
@@ -91,24 +109,6 @@ impl ValueGeneratorFn {
 
     fn generate_now() -> Option<PrismaValue> {
         Some(PrismaValue::DateTime(Utc::now()))
-    }
-}
-
-impl TryFrom<&str> for ValueGeneratorFn {
-    type Error = DatamodelError;
-
-    fn try_from(s: &str) -> std::result::Result<Self, DatamodelError> {
-        match s {
-            "cuid" => Ok(Self::CUID),
-            "uuid" => Ok(Self::UUID),
-            "now" => Ok(Self::Now),
-            "autoincrement" => Ok(Self::Autoincrement),
-            "dbgenerated" => Ok(Self::DbGenerated),
-            _ => Err(DatamodelError::new_functional_evaluation_error(
-                &format!("The function {} is not a known function.", s),
-                Span::empty(),
-            )),
-        }
     }
 }
 

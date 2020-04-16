@@ -1,5 +1,4 @@
 use super::DirectiveBox;
-use crate::configuration;
 use crate::error::ErrorCollection;
 use crate::{ast, dml};
 use prisma_value::PrismaValue;
@@ -13,17 +12,6 @@ impl LowerDmlToAst {
     pub fn new() -> Self {
         Self {
             directives: DirectiveBox::new(),
-        }
-    }
-
-    /// Creates a new instance, with all builtin directives and
-    /// the directives defined by the given sources registered.
-    ///
-    /// The directives defined by the given sources will be namespaced.
-    #[allow(unused)]
-    fn with_sources(sources: &[Box<dyn configuration::Source + Send + Sync>]) -> LowerDmlToAst {
-        LowerDmlToAst {
-            directives: DirectiveBox::with_sources(sources),
         }
     }
 

@@ -54,15 +54,15 @@ fn allow_multiple_relations() {
 fn allow_complicated_self_relations() {
     let dml = r#"
     model User {
-        id     Int @id
-        sonId  Int
-        wifeId Int
+        id     Int  @id
+        sonId  Int?
+        wifeId Int?
         
-        son     User @relation(name: "offspring", fields: sonId, references: id)
-        father  User @relation(name: "offspring")
+        son     User? @relation(name: "offspring", fields: sonId, references: id)
+        father  User  @relation(name: "offspring")
         
-        husband User @relation(name: "spouse")
-        wife    User @relation(name: "spouse", fields: wifeId, references: id)
+        husband User? @relation(name: "spouse")
+        wife    User? @relation(name: "spouse", fields: wifeId, references: id)
     }
     "#;
 

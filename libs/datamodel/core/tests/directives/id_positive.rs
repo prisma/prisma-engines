@@ -59,9 +59,7 @@ fn should_allow_string_ids_with_cuid() {
         .assert_has_field("id")
         .assert_is_id()
         .assert_base_type(&ScalarType::String)
-        .assert_default_value(DefaultValue::Expression(
-            ValueGenerator::new("cuid".to_owned(), Vec::new()).unwrap(),
-        ));
+        .assert_default_value(DefaultValue::Expression(ValueGenerator::new_cuid()));
 }
 
 #[test]
@@ -78,9 +76,7 @@ fn should_allow_string_ids_with_uuid() {
         .assert_has_field("id")
         .assert_is_id()
         .assert_base_type(&ScalarType::String)
-        .assert_default_value(DefaultValue::Expression(
-            ValueGenerator::new("uuid".to_owned(), Vec::new()).unwrap(),
-        ));
+        .assert_default_value(DefaultValue::Expression(ValueGenerator::new_uuid()));
 }
 
 #[test]

@@ -19,9 +19,7 @@ fn should_apply_a_custom_type() {
         .assert_has_field("id")
         .assert_is_id()
         .assert_base_type(&ScalarType::String)
-        .assert_default_value(DefaultValue::Expression(
-            ValueGenerator::new("cuid".to_owned(), Vec::new()).unwrap(),
-        ));
+        .assert_default_value(DefaultValue::Expression(ValueGenerator::new_cuid()));
 }
 
 #[test]
@@ -42,9 +40,7 @@ fn should_recursively_apply_a_custom_type() {
         .assert_has_field("id")
         .assert_is_id()
         .assert_base_type(&ScalarType::String)
-        .assert_default_value(DefaultValue::Expression(
-            ValueGenerator::new("cuid".to_owned(), Vec::new()).unwrap(),
-        ));
+        .assert_default_value(DefaultValue::Expression(ValueGenerator::new_cuid()));
 }
 
 #[test]
@@ -67,9 +63,7 @@ fn should_be_able_to_handle_multiple_types() {
         .assert_has_field("id")
         .assert_is_id()
         .assert_base_type(&ScalarType::String)
-        .assert_default_value(DefaultValue::Expression(
-            ValueGenerator::new("cuid".to_owned(), Vec::new()).unwrap(),
-        ));
+        .assert_default_value(DefaultValue::Expression(ValueGenerator::new_cuid()));
 
     user_model
         .assert_has_field("email")
