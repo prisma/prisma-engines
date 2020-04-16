@@ -58,16 +58,15 @@ impl SourceLoader {
         let source_name = &ast_source.name.name;
         let mut args = Arguments::new(&ast_source.properties, ast_source.span);
 
-        let url_args = args.arg("url")?;
-        let (env_var_for_url, url) = match url_args.as_str_from_env() {
-            Ok((env_var, url)) => (env_var, url.trim().to_owned()),
-            Err(_) if ignore_env_var_errors => (None, "dummy://url".to_owned()), // the flag is only used by the vs code plugin
-            Err(err) => return Err(err),
-        };
-
         let provider_arg = args.arg("provider")?;
         let provider = provider_arg.as_str()?;
 
+        let url_args = args.arg("url")?;
+        let (env_var_for_url, url) = match url_args.as_str_from_env() {
+            Ok((env_var, url)) => (env_var, url.trim().to_owned()),
+            Err(_) if ignore_env_var_errors => (None, format!("{}://", provider)), // glorious hack. ask marcus
+            Err(err) => return Err(err),
+        };
         if provider_arg.is_from_env() {
             return Err(DatamodelError::new_functional_evaluation_error(
                 &format!("A datasource must not use the env() function in the provider argument."),
