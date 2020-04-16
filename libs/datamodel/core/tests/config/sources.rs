@@ -11,7 +11,7 @@ datasource db1 {
 
 datasource db2 {
     provider = "mysql"
-    url = "https://localhost"
+    url = "mysql://localhost"
 }
 
 
@@ -32,7 +32,7 @@ model Post {
 #[test]
 #[serial]
 fn serialize_sources_to_dmmf() {
-    std::env::set_var("URL_CUSTOM_1", "https://localhost");
+    std::env::set_var("URL_CUSTOM_1", "postgresql://localhost");
     let config = datamodel::parse_configuration(DATAMODEL).unwrap();
     let rendered = datamodel::json::mcf::render_sources_to_json(&config.datasources);
 
@@ -42,7 +42,7 @@ fn serialize_sources_to_dmmf() {
     "connectorType": "postgresql",
     "url": {
         "fromEnvVar": "URL_CUSTOM_1",
-        "value": "https://localhost"       
+        "value": "postgresql://localhost"       
     }
   },
   {
@@ -50,7 +50,7 @@ fn serialize_sources_to_dmmf() {
     "connectorType": "mysql",
     "url": {
         "fromEnvVar": null,
-        "value": "https://localhost"      
+        "value": "mysql://localhost"      
     }
   }
 ]"#;
@@ -177,7 +177,7 @@ fn new_lines_in_source_must_work() {
     let schema = r#"
         datasource ds {
           provider = "postgresql"
-          url = "https://localhost"
+          url = "postgresql://localhost"
         
         }
     "#;
@@ -191,7 +191,7 @@ fn new_lines_in_source_must_work() {
           "connectorType": "postgresql",
           "url": {
               "fromEnvVar": null,
-              "value": "https://localhost"       
+              "value": "postgresql://localhost"       
           }
         }
     ]"#;
