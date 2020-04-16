@@ -199,7 +199,8 @@ impl ValueValidator {
     pub fn as_default_value(&self, scalar_type: ScalarType) -> Result<DefaultValue, DatamodelError> {
         match &self.value {
             ast::Expression::Function(name, _, _) => {
-                Ok(DefaultValue::Expression(ValueGenerator::new(name.to_string(), vec![])?))
+                let generator = self.get_value_generator(&name)?;
+                Ok(DefaultValue::Expression(generator))
             }
             _ => {
                 let x = ValueValidator::new(&self.value).as_type(scalar_type)?;
@@ -210,9 +211,14 @@ impl ValueValidator {
 
     pub fn as_value_generator(&self) -> Result<ValueGenerator, DatamodelError> {
         match &self.value {
-            ast::Expression::Function(name, _, _) => Ok(ValueGenerator::new(name.to_string(), vec![])?),
+            ast::Expression::Function(name, _, _) => self.get_value_generator(&name),
             _ => Err(self.construct_type_mismatch_error("function")),
         }
+    }
+
+    fn get_value_generator(&self, name: &str) -> Result<ValueGenerator, DatamodelError> {
+        ValueGenerator::new(name.to_string(), vec![])
+            .map_err(|err_msg| DatamodelError::new_functional_evaluation_error(&err_msg, self.span()))
     }
 }
 
