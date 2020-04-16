@@ -99,15 +99,20 @@ impl SourceLoader {
             // TODO: The second condition is a fallback to mitigate the postgres -> postgresql rename. It should be
             // renamed at some point.
             if provider == decl.connector_type() || (decl.connector_type() == "postgresql" && provider == "postgres") {
-                return Ok(Some(decl.create(
-                    // The name in front of the block is the name of the concrete instantiation.
-                    source_name,
-                    StringFromEnvVar {
-                        from_env_var: env_var_for_url,
-                        value: url,
-                    },
-                    &ast_source.documentation.clone().map(|comment| comment.text),
-                )?));
+                let source = decl
+                    .create(
+                        source_name,
+                        StringFromEnvVar {
+                            from_env_var: env_var_for_url,
+                            value: url,
+                        },
+                        &ast_source.documentation.clone().map(|comment| comment.text),
+                    )
+                    .map_err(|err_msg| {
+                        DatamodelError::new_source_validation_error(&err_msg, source_name, url_args.span())
+                    });
+
+                return Ok(Some(source?));
             }
         }
 

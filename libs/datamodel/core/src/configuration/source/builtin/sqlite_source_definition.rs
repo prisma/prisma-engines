@@ -1,5 +1,5 @@
-use super::{SqliteSource, SQLITE_SOURCE_NAME};
-use crate::{configuration::*, error::DatamodelError};
+use super::{shared_validation::*, SqliteSource, SQLITE_SOURCE_NAME};
+use crate::configuration::*;
 
 pub struct SqliteSourceDefinition {}
 
@@ -19,10 +19,10 @@ impl SourceDefinition for SqliteSourceDefinition {
         name: &str,
         url: StringFromEnvVar,
         documentation: &Option<String>,
-    ) -> Result<Box<dyn Source + Send + Sync>, DatamodelError> {
+    ) -> Result<Box<dyn Source + Send + Sync>, String> {
         Ok(Box::new(SqliteSource {
             name: String::from(name),
-            url: url,
+            url: validate_url(name, "sqlite://", url)?,
             documentation: documentation.clone(),
         }))
     }

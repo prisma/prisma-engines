@@ -119,6 +119,60 @@ fn must_error_for_empty_urls_derived_from_env_vars() {
 }
 
 #[test]
+fn must_error_if_wrong_protocol_is_used_for_mysql() {
+    let schema = r#"
+        datasource myds {
+            provider = "mysql"
+            url = "postgresql://"
+        }
+    "#;
+    let config = datamodel::parse_configuration(schema);
+    assert!(config.is_err());
+    let errors = config.err().expect("This must error");
+    errors.assert_is(DatamodelError::new_source_validation_error(
+        "The URL for datasource `myds` must start with the protocol `mysql://`.",
+        "myds",
+        Span::new(76, 91),
+    ));
+}
+
+#[test]
+fn must_error_if_wrong_protocol_is_used_for_postgresql() {
+    let schema = r#"
+        datasource myds {
+            provider = "postgresql"
+            url = "mysql://"
+        }
+    "#;
+    let config = datamodel::parse_configuration(schema);
+    assert!(config.is_err());
+    let errors = config.err().expect("This must error");
+    errors.assert_is(DatamodelError::new_source_validation_error(
+        "The URL for datasource `myds` must start with the protocol `postgresql://`.",
+        "myds",
+        Span::new(81, 91),
+    ));
+}
+
+#[test]
+fn must_error_if_wrong_protocol_is_used_for_sqlite() {
+    let schema = r#"
+        datasource myds {
+            provider = "sqlite"
+            url = "mysql://"
+        }
+    "#;
+    let config = datamodel::parse_configuration(schema);
+    assert!(config.is_err());
+    let errors = config.err().expect("This must error");
+    errors.assert_is(DatamodelError::new_source_validation_error(
+        "The URL for datasource `myds` must start with the protocol `sqlite://`.",
+        "myds",
+        Span::new(77, 87),
+    ));
+}
+
+#[test]
 fn new_lines_in_source_must_work() {
     let schema = r#"
         datasource ds {

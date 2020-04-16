@@ -1,5 +1,5 @@
-use super::{PostgresSource, POSTGRES_SOURCE_NAME};
-use crate::{configuration::*, error::DatamodelError};
+use super::{shared_validation::*, PostgresSource, POSTGRES_SOURCE_NAME};
+use crate::configuration::*;
 
 pub struct PostgresSourceDefinition {}
 
@@ -19,10 +19,10 @@ impl SourceDefinition for PostgresSourceDefinition {
         name: &str,
         url: StringFromEnvVar,
         documentation: &Option<String>,
-    ) -> Result<Box<dyn Source + Send + Sync>, DatamodelError> {
+    ) -> Result<Box<dyn Source + Send + Sync>, String> {
         Ok(Box::new(PostgresSource {
             name: String::from(name),
-            url: url,
+            url: validate_url(name, "postgresql://", url)?,
             documentation: documentation.clone(),
         }))
     }
