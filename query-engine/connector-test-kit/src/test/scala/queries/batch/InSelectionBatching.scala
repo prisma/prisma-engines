@@ -123,46 +123,4 @@ class InSelectionBatching extends FlatSpec with Matchers with ApiSpecBase {
       """{"data":{"findManyA":[{"id":5},{"id":4},{"id":3},{"id":2},{"id":1}]}}""".stripMargin
     )
   }
-
-  "ascending ordering of batched IN with relation field" should "work" in {
-    val res = server.query(
-      """
-        |query {
-        |  findManyB {
-        |		as(orderBy: c_ASC) {
-        |      c { id }
-        |    }
-        |  }
-        |}
-        |""".stripMargin,
-      project = project,
-      legacy = false,
-      batchSize = 2,
-    )
-
-    res.toString should be(
-      """{"data":{"findManyB":[{"as":[{"c":{"id":1}},{"c":{"id":2}}]},{"as":[{"c":{"id":3}}]},{"as":[{"c":{"id":4}}]},{"as":[{"c":{"id":5}}]}]}}""".stripMargin
-    )
-  }
-
-  "descending ordering of batched IN with relation field" should "work" in {
-    val res = server.query(
-      """
-        |query {
-        |  findManyB {
-        |		as(orderBy: c_DESC) {
-        |      c { id }
-        |    }
-        |  }
-        |}
-        |""".stripMargin,
-      project = project,
-      legacy = false,
-      batchSize = 2,
-    )
-
-    res.toString should be(
-      """{"data":{"findManyB":[{"as":[{"c":{"id":2}},{"c":{"id":1}}]},{"as":[{"c":{"id":3}}]},{"as":[{"c":{"id":4}}]},{"as":[{"c":{"id":5}}]}]}}""".stripMargin
-    )
-  }
 }
