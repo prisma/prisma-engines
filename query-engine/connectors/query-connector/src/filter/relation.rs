@@ -115,15 +115,8 @@ mod tests {
         let schema = test_data_model();
         let user = schema.find_model("User").unwrap();
         let site = schema.find_model("Site").unwrap();
-
         let rel_field = user.fields().find_from_relation_fields("sites").unwrap();
-        let site_name = site
-            .fields()
-            .find_from_scalar("name")
-            .unwrap()
-            .data_source_field()
-            .clone();
-
+        let site_name = site.fields().find_from_scalar("name").unwrap();
         let filter = rel_field.no_related(site_name.equals("Blog"));
 
         match filter {
@@ -156,15 +149,8 @@ mod tests {
         let schema = test_data_model();
         let user = schema.find_model("User").unwrap();
         let site = schema.find_model("Site").unwrap();
-
         let rel_field = user.fields().find_from_relation_fields("sites").unwrap();
-        let site_name = site
-            .fields()
-            .find_from_scalar("name")
-            .unwrap()
-            .data_source_field()
-            .clone();
-
+        let site_name = site.fields().find_from_scalar("name").unwrap();
         let filter = rel_field.to_one_related(site_name.equals("Blog"));
 
         match filter {
@@ -197,15 +183,8 @@ mod tests {
         let schema = test_data_model();
         let user = schema.find_model("User").unwrap();
         let site = schema.find_model("Site").unwrap();
-
         let rel_field = user.fields().find_from_relation_fields("sites").unwrap();
-        let site_name = site
-            .fields()
-            .find_from_scalar("name")
-            .unwrap()
-            .data_source_field()
-            .clone();
-
+        let site_name = site.fields().find_from_scalar("name").unwrap();
         let filter = rel_field.at_least_one_related(site_name.equals("Blog"));
 
         match filter {
@@ -238,15 +217,8 @@ mod tests {
         let schema = test_data_model();
         let user = schema.find_model("User").unwrap();
         let site = schema.find_model("Site").unwrap();
-
         let rel_field = user.fields().find_from_relation_fields("sites").unwrap();
-        let site_name = site
-            .fields()
-            .find_from_scalar("name")
-            .unwrap()
-            .data_source_field()
-            .clone();
-
+        let site_name = site.fields().find_from_scalar("name").unwrap();
         let filter = rel_field.every_related(site_name.equals("Blog"));
 
         match filter {

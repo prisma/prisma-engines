@@ -116,7 +116,7 @@ pub trait QueryExt: Queryable + Send + Sync {
         let mut result = Vec::new();
 
         for row in rows.drain(0..) {
-            let tuples: Vec<_> = model_id.data_source_fields().zip(row.values.into_iter()).collect();
+            let tuples: Vec<_> = model_id.scalar_fields().zip(row.values.into_iter()).collect();
             let record_id: RecordProjection = RecordProjection::new(tuples);
 
             result.push(record_id);

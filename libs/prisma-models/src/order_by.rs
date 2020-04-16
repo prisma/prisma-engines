@@ -1,8 +1,8 @@
-use crate::{Field, ModelRef};
+use crate::{ModelRef, ScalarFieldRef};
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct OrderBy {
-    pub field: Field,
+    pub field: ScalarFieldRef,
     pub sort_order: SortOrder,
 }
 

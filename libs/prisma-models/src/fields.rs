@@ -9,7 +9,7 @@ use std::{
 #[derive(Debug)]
 pub struct Fields {
     pub all: Vec<Field>,
-    id: OnceCell<Option<Vec<Field>>>,
+    id: OnceCell<Option<Vec<ScalarFieldRef>>>,
     id_field_names: Vec<String>,
     scalar: OnceCell<Vec<ScalarFieldWeak>>,
     relation: OnceCell<Vec<RelationFieldWeak>>,
@@ -66,7 +66,7 @@ impl Fields {
         }
     }
 
-    pub fn id(&self) -> Option<Vec<Field>> {
+    pub fn id(&self) -> Option<Vec<ScalarFieldRef>> {
         self.id
             .get_or_init(|| {
                 self.find_singular_id()
@@ -220,23 +220,23 @@ impl Fields {
         acc
     }
 
-    /// Attempts to resolve a single ID field on the model (usually supplied with @id on a relation or scalar field).
-    fn find_singular_id(&self) -> Option<Field> {
-        self.all
-            .iter()
-            .find_map(|field| if field.is_id() { Some(field.clone()) } else { None })
+    /// Attempts to resolve a single ID field on the model (supplied with an @id on a scalar field).
+    fn find_singular_id(&self) -> Option<ScalarFieldRef> {
+        self.scalar()
+            .into_iter()
+            .find_map(|field| if field.is_id() { Some(field) } else { None })
     }
 
-    /// Attempts to resolve a compound ID field on the model (usually supplied with @@id on a relation or scalar field).
-    fn find_multipart_id(&self) -> Option<Vec<Field>> {
+    /// Attempts to resolve a compound ID field on the model (supplied with @@id on scalar fields).
+    fn find_multipart_id(&self) -> Option<Vec<ScalarFieldRef>> {
         if self.id_field_names.len() > 0 {
             let fields = self
                 .id_field_names
                 .iter()
                 .map(|f| {
-                    self.all
-                        .iter()
-                        .find(|field| field.name() == f)
+                    self.scalar()
+                        .into_iter()
+                        .find(|field| &field.name == f)
                         .expect(&format!("Expected ID field {} to be present on the model", f))
                         .clone()
                 })

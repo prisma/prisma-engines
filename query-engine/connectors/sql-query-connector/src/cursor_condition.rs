@@ -19,8 +19,8 @@ pub fn build(query_arguments: &QueryArguments, model: ModelRef) -> ConditionTree
             let id_projection = model.primary_identifier();
 
             let (comparison_fields, sort_order) = match order_by {
-                Some(x) => (x.field.data_source_fields(), x.sort_order),
-                None => (id_projection.data_source_fields().collect(), SortOrder::Ascending),
+                Some(x) => (vec![x.field.clone()], x.sort_order),
+                None => (id_projection.scalar_fields().collect(), SortOrder::Ascending),
             };
 
             let cursor_for = |cursor_type: CursorType, projection: &RecordProjection| {

@@ -1,4 +1,4 @@
-use crate::{DomainError, Field, ModelProjection, OrderBy, PrismaValue, RecordProjection, ScalarFieldRef, SortOrder};
+use crate::{DomainError, ModelProjection, OrderBy, PrismaValue, RecordProjection, ScalarFieldRef, SortOrder};
 use std::collections::HashMap;
 
 #[derive(Debug, Clone)]
@@ -52,31 +52,12 @@ impl ManyRecords {
             .map(|(i, name)| (name.as_str(), i))
             .collect();
 
-        self.records.sort_by(|a, b| match order_by.field {
-            Field::Scalar(ref sf) => {
-                let index = field_indices[sf.db_name()];
+        self.records.sort_by(|a, b| {
+            let index = field_indices[order_by.field.db_name()];
 
-                match order_by.sort_order {
-                    SortOrder::Ascending => a.values[index].cmp(&b.values[index]),
-                    SortOrder::Descending => b.values[index].cmp(&a.values[index]),
-                }
-            }
-            Field::Relation(ref rf) => {
-                let fields = rf.fields();
-                let mut a_vals = Vec::with_capacity(fields.len());
-                let mut b_vals = Vec::with_capacity(fields.len());
-
-                for field in fields {
-                    let index = field_indices[field.db_name()];
-
-                    a_vals.push(&a.values[index]);
-                    b_vals.push(&b.values[index]);
-                }
-
-                match order_by.sort_order {
-                    SortOrder::Ascending => a_vals.cmp(&b_vals),
-                    SortOrder::Descending => b_vals.cmp(&a_vals),
-                }
+            match order_by.sort_order {
+                SortOrder::Ascending => a.values[index].cmp(&b.values[index]),
+                SortOrder::Descending => b.values[index].cmp(&a.values[index]),
             }
         })
     }

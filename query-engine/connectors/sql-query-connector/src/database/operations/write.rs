@@ -153,9 +153,12 @@ pub async fn execute_raw(
 /// contained in `projection`, as those need to be merged into the records later on.
 fn pick_args(projection: &ModelProjection, args: &WriteArgs) -> WriteArgs {
     let pairs: Vec<_> = projection
-        .data_source_fields()
+        .scalar_fields()
         .into_iter()
-        .filter_map(|dsf| args.get_field_value(&dsf.name).map(|v| (dsf.name.clone(), v.clone())))
+        .filter_map(|field| {
+            args.get_field_value(field.db_name())
+                .map(|v| (field.db_name().to_owned(), v.clone()))
+        })
         .collect();
 
     WriteArgs::from(pairs)
@@ -172,7 +175,7 @@ fn merge_write_args(ids: Vec<RecordProjection>, args: WriteArgs) -> Vec<RecordPr
         .pairs
         .iter()
         .enumerate()
-        .filter_map(|(i, (dsf, _))| args.get_field_value(&dsf.name).map(|val| (i, val)))
+        .filter_map(|(i, (field, _))| args.get_field_value(field.db_name()).map(|val| (i, val)))
         .collect();
 
     ids.into_iter()

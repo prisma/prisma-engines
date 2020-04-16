@@ -181,25 +181,24 @@ fn handle_scalar_field(
     op: &FilterOp,
 ) -> QueryGraphBuilderResult<Filter> {
     let value: PrismaValue = value.try_into()?;
-    let dsf = field.data_source_field();
 
     Ok(match (op, value) {
-        (FilterOp::In, PrismaValue::Null) => dsf.equals(PrismaValue::Null),
-        (FilterOp::In, PrismaValue::List(values)) => dsf.is_in(values),
-        (FilterOp::NotIn, PrismaValue::Null) => dsf.not_equals(PrismaValue::Null),
-        (FilterOp::NotIn, PrismaValue::List(values)) => dsf.not_in(values),
-        (FilterOp::Not, val) => dsf.not_equals(val),
-        (FilterOp::Lt, val) => dsf.less_than(val),
-        (FilterOp::Lte, val) => dsf.less_than_or_equals(val),
-        (FilterOp::Gt, val) => dsf.greater_than(val),
-        (FilterOp::Gte, val) => dsf.greater_than_or_equals(val),
-        (FilterOp::Contains, val) => dsf.contains(val),
-        (FilterOp::NotContains, val) => dsf.not_contains(val),
-        (FilterOp::StartsWith, val) => dsf.starts_with(val),
-        (FilterOp::NotStartsWith, val) => dsf.not_starts_with(val),
-        (FilterOp::EndsWith, val) => dsf.ends_with(val),
-        (FilterOp::NotEndsWith, val) => dsf.not_ends_with(val),
-        (FilterOp::Field, val) => dsf.equals(val),
+        (FilterOp::In, PrismaValue::Null) => field.equals(PrismaValue::Null),
+        (FilterOp::In, PrismaValue::List(values)) => field.is_in(values),
+        (FilterOp::NotIn, PrismaValue::Null) => field.not_equals(PrismaValue::Null),
+        (FilterOp::NotIn, PrismaValue::List(values)) => field.not_in(values),
+        (FilterOp::Not, val) => field.not_equals(val),
+        (FilterOp::Lt, val) => field.less_than(val),
+        (FilterOp::Lte, val) => field.less_than_or_equals(val),
+        (FilterOp::Gt, val) => field.greater_than(val),
+        (FilterOp::Gte, val) => field.greater_than_or_equals(val),
+        (FilterOp::Contains, val) => field.contains(val),
+        (FilterOp::NotContains, val) => field.not_contains(val),
+        (FilterOp::StartsWith, val) => field.starts_with(val),
+        (FilterOp::NotStartsWith, val) => field.not_starts_with(val),
+        (FilterOp::EndsWith, val) => field.ends_with(val),
+        (FilterOp::NotEndsWith, val) => field.not_ends_with(val),
+        (FilterOp::Field, val) => field.equals(val),
         (_, _) => unreachable!(),
     })
 }
@@ -221,17 +220,17 @@ fn handle_relation_field_selector(
 ) -> QueryGraphBuilderResult<Filter> {
     match value {
         ParsedInputValue::Single(pv) => {
-            let dsf = field.data_source_fields().first().unwrap().clone();
-            Ok(dsf.equals(pv))
+            let field = field.fields().first().unwrap().clone();
+            Ok(field.equals(pv))
         }
 
         ParsedInputValue::Map(mut map) => {
             let filters = field
-                .data_source_fields()
+                .fields()
                 .into_iter()
-                .map(|dsf| {
-                    let value: PrismaValue = map.remove(&dsf.name).unwrap().try_into()?;
-                    Ok(dsf.clone().equals(value))
+                .map(|field| {
+                    let value: PrismaValue = map.remove(field.db_name()).unwrap().try_into()?;
+                    Ok(field.equals(value))
                 })
                 .collect::<QueryGraphBuilderResult<Vec<_>>>()?;
 
@@ -271,38 +270,14 @@ fn handle_relation_field_filter(
     })
 }
 
-fn handle_compound_field(fields: Vec<Field>, value: ParsedInputValue) -> QueryGraphBuilderResult<Filter> {
+fn handle_compound_field(fields: Vec<ScalarFieldRef>, value: ParsedInputValue) -> QueryGraphBuilderResult<Filter> {
     let mut input_map: ParsedInputMap = value.try_into()?;
 
     let filters: Vec<Filter> = fields
         .into_iter()
-        .map(|field| match field {
-            Field::Scalar(sf) => {
-                let pv: PrismaValue = input_map.remove(&sf.name).unwrap().try_into()?;
-                Ok(sf.data_source_field().clone().equals(pv))
-            }
-
-            Field::Relation(rf) => {
-                let rf_input = input_map.remove(&rf.name).unwrap();
-                let dsfs = rf.data_source_fields();
-
-                // We can trust the validation that if one field is present, the relation field has also only one DSF.
-                match rf_input {
-                    ParsedInputValue::Single(pv) => Ok(dsfs.first().unwrap().clone().equals(pv)),
-                    ParsedInputValue::Map(mut map) => {
-                        let filters = dsfs
-                            .into_iter()
-                            .map(|dsf| {
-                                let value: PrismaValue = map.remove(&dsf.name).unwrap().try_into()?;
-                                Ok(dsf.equals(value))
-                            })
-                            .collect::<QueryGraphBuilderResult<Vec<_>>>()?;
-
-                        Ok(Filter::and(filters))
-                    }
-                    _ => unreachable!(format!("Invalid input for relation field input (for {})", rf.name)),
-                }
-            }
+        .map(|sf| {
+            let pv: PrismaValue = input_map.remove(sf.db_name()).unwrap().try_into()?;
+            Ok(sf.equals(pv))
         })
         .collect::<QueryGraphBuilderResult<Vec<_>>>()?;
 

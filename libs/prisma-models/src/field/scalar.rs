@@ -178,10 +178,6 @@ impl ScalarField {
         (self.type_identifier.clone(), self.arity)
     }
 
-    // pub fn default_value(&self) -> Option<&DefaultValue> {
-    //     self.default_value.as_ref()
-    // }
-
     pub fn is_read_only(&self) -> bool {
         self.read_only.get_or_init(|| false).clone()
     }
