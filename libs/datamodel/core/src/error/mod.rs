@@ -101,6 +101,9 @@ pub enum DatamodelError {
     #[fail(display = "Error validating model \"{}\": {}", model_name, message)]
     ModelValidationError { message: String, model_name: String, span: Span  },
 
+    #[fail(display = "Error validating field `{}` in model `{}`: {}", field, model, message)]
+    FieldValidationError { message: String, model: String, field: String, span: Span },
+
     #[fail(display = "Error validating: {}", message)]
     ValidationError { message: String, span: Span  },
 }
@@ -245,6 +248,15 @@ impl DatamodelError {
         }
     }
 
+    pub fn new_field_validation_error(message: &str, model: &str, field: &str, span: Span) -> DatamodelError {
+        DatamodelError::FieldValidationError {
+            message: message.to_owned(),
+            model: model.to_owned(),
+            field: field.to_owned(),
+            span,
+        }
+    }
+
     pub fn new_validation_error(message: &str, span: Span) -> DatamodelError {
         DatamodelError::ValidationError {
             message: String::from(message),
@@ -335,6 +347,7 @@ impl DatamodelError {
             DatamodelError::DuplicateDefaultArgumentError { span, .. } => *span,
             DatamodelError::UnusedArgumentError { span, .. } => *span,
             DatamodelError::ScalarListFieldsAreNotSupported {span, ..} => *span,
+            DatamodelError::FieldValidationError {span , ..} => *span,
         }
     }
     pub fn description(&self) -> String {

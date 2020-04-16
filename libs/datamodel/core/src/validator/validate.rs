@@ -495,6 +495,20 @@ impl<'a> Validator<'a> {
                     }
                 }
 
+                // required ONE TO ONE SELF RELATION
+                let is_self_relation = model.name == related_model.name;
+                if is_self_relation && field.arity.is_required() && related_field.arity.is_required() {
+                    errors.push(DatamodelError::new_field_validation_error(
+                        &format!(
+                            "The relation fields `{}` and `{}` on Model `{}` are both required. This is not allowed for a self relation because it would not be possible to create a record.",
+                            &field.name, &related_field.name, &model.name,
+                        ),
+                        &model.name,
+                        &field.name,
+                        field_span.clone(),
+                    ));
+                }
+
                 // ONE TO ONE
                 if field.arity.is_singular() && related_field.arity.is_singular() {
                     if rel_info.fields.is_empty() && related_field_rel_info.fields.is_empty() {

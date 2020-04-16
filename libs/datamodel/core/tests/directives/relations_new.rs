@@ -608,3 +608,24 @@ fn must_error_when_fields_or_references_argument_is_placed_on_both_sides_for_one
         ),
     );
 }
+
+#[test]
+fn must_error_for_required_one_to_one_self_relations() {
+    let dml = r#"
+        model User {
+          id       Int  @id
+          friendId Int
+          friend   User @relation("Friends", fields: friendId, references: id)
+          friendOf User @relation("Friends")
+        }
+    "#;
+    let errors = parse_error(dml);
+    errors.assert_is_at(
+        0,
+        DatamodelError::new_field_validation_error("The relation fields `friend` and `friendOf` on Model `User` are both required. This is not allowed for a self relation because it would not be possible to create a record.", "User", "friend", Span::new(83, 151)),
+    );
+    errors.assert_is_at(
+        1,
+        DatamodelError::new_field_validation_error("The relation fields `friendOf` and `friend` on Model `User` are both required. This is not allowed for a self relation because it would not be possible to create a record.", "User", "friendOf", Span::new(162, 196)),
+    );
+}
