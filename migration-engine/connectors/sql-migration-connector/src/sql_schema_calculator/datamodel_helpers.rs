@@ -243,7 +243,7 @@ impl<'a> RelationFieldRef<'a> {
                     .any(|to_field| to_field == &field.name)
             })
             .flat_map(|field| field.data_source_fields.iter())
-            .map(|dsf| dsf.name.as_str())
+            .map(|sf| sf.name.as_str())
     }
 
     pub(crate) fn relation_name(&self) -> &'a str {

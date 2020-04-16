@@ -44,7 +44,7 @@ impl ModelProjection {
         self.fields.len()
     }
 
-    /// Returns the length of data source fields contained in this projection, e.g. the actual
+    /// Returns the length of scalar fields contained in this projection, e.g. the actual
     /// number of SQL columns or document fields for this model.
     pub fn db_len(&self) -> usize {
         self.scalar_fields().count()
@@ -82,7 +82,7 @@ impl ModelProjection {
         self.scalar_fields().eq(id.fields())
     }
 
-    /// Inserts this projections data source fields into the given record projection.
+    /// Inserts this projections scalar fields into the given record projection.
     /// Assumes caller knows that the exchange can be done. Errors if lengths mismatch.
     /// Additionally performs a type coercion based on the source and destination field types.
     /// (Resistance is futile.)

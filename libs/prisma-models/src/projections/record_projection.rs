@@ -54,18 +54,16 @@ impl RecordProjection {
     /// Consumes this projection and splits it into a set of `RecordProjection`s based on the passed
     /// `ModelProjection`s. Assumes that the transformation can be done.
     pub fn split_into(self, projections: &[ModelProjection]) -> Vec<RecordProjection> {
-        let mapped: HashMap<String, (ScalarFieldRef, PrismaValue)> = self
-            .into_iter()
-            .map(|(dsf, val)| (dsf.name.clone(), (dsf, val)))
-            .collect();
+        let mapped: HashMap<String, (ScalarFieldRef, PrismaValue)> =
+            self.into_iter().map(|(sf, val)| (sf.name.clone(), (sf, val))).collect();
 
         projections
             .into_iter()
             .map(|p| {
                 p.scalar_fields()
-                    .map(|dsf| {
+                    .map(|sf| {
                         let entry = mapped
-                            .get(&dsf.name)
+                            .get(&sf.name)
                             .expect("Error splitting RecordProjection: ModelProjection doesn't match.")
                             .clone();
 

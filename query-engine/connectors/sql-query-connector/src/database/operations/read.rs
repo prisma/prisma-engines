@@ -120,14 +120,14 @@ pub async fn get_related_m2m_record_ids(
             let p: RecordProjection = from_sfs
                 .iter()
                 .zip(parent_values)
-                .map(|(dsf, val)| (dsf.clone(), val))
+                .map(|(sf, val)| (sf.clone(), val))
                 .collect::<Vec<_>>()
                 .into();
 
             let c: RecordProjection = to_sfs
                 .iter()
                 .zip(child_values)
-                .map(|(dsf, val)| (dsf.clone(), val))
+                .map(|(sf, val)| (sf.clone(), val))
                 .collect::<Vec<_>>()
                 .into();
 

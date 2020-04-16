@@ -138,12 +138,6 @@ where
     }
 }
 
-// impl AsColumn for ScalarFieldRef {
-//     fn as_column(&self) -> Column<'static> {
-//         self.borrow().as_column()
-//     }
-// }
-
 impl<T> AsColumn for T
 where
     T: AsRef<ScalarField>,
@@ -157,21 +151,3 @@ where
         Column::from(((db, table), col))
     }
 }
-
-// fn column_name(dsf: &crate::field::DataSourceField) -> &str {
-//     match dsf.model_field() {
-//         Field::Scalar(_) => &dsf.name,
-//         Field::Relation(rf) => {
-//             let relation = rf.relation();
-//             if relation.is_many_to_many() {
-//                 if rf.relation_side.is_a() {
-//                     "A"
-//                 } else {
-//                     "B"
-//                 }
-//             } else {
-//                 &dsf.name
-//             }
-//         }
-//     }
-// }

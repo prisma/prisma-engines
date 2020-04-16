@@ -27,7 +27,7 @@ pub fn build(query_arguments: &QueryArguments, model: ModelRef) -> ConditionTree
                 let columns: Vec<_> = comparison_fields
                     .as_slice()
                     .into_iter()
-                    .map(|dsf| dsf.as_column())
+                    .map(|sf| sf.as_column())
                     .collect();
 
                 let order_row = Row::from(columns.clone());
