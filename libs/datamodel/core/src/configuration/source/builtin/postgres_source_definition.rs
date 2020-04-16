@@ -20,9 +20,11 @@ impl SourceDefinition for PostgresSourceDefinition {
         url: StringFromEnvVar,
         documentation: &Option<String>,
     ) -> Result<Box<dyn Source + Send + Sync>, String> {
+        let high_prio_validation = validate_url(name, "postgresql://", url.clone());
+        let low_prio_validation = validate_url(name, "postgres://", url); // for postgres urls on heroku -> https://devcenter.heroku.com/articles/heroku-postgresql#spring-java
         Ok(Box::new(PostgresSource {
             name: String::from(name),
-            url: validate_url(name, "postgresql://", url)?,
+            url: low_prio_validation.or(high_prio_validation)?,
             documentation: documentation.clone(),
         }))
     }

@@ -253,7 +253,7 @@ fn validate_database_str(database_str: &str, provider: &str) -> ConnectorResult<
 
     match (provider, scheme) {
         ("mysql", Some("mysql")) => Ok(()),
-        ("postgresql", Some(scheme)) if scheme.starts_with("postgres") => Ok(()),
+        ("postgresql", Some(scheme)) if scheme.starts_with("postgresql") => Ok(()),
         ("postgres", Some(scheme)) if scheme.starts_with("postgres") => Ok(()),
         ("sqlite", Some("file")) | ("sqlite", Some("sqlite")) => Ok(()),
         _ => {
