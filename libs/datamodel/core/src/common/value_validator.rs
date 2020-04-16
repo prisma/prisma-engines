@@ -179,7 +179,7 @@ impl ValueValidator {
     }
 
     /// Unwraps the wrapped value as a constant literal..
-    pub fn as_array(&self) -> Result<Vec<ValueValidator>, DatamodelError> {
+    pub fn as_array(&self) -> Vec<ValueValidator> {
         match &self.value {
             ast::Expression::Array(values, _) => {
                 let mut validators: Vec<ValueValidator> = Vec::new();
@@ -188,11 +188,11 @@ impl ValueValidator {
                     validators.push(ValueValidator::new(value));
                 }
 
-                Ok(validators)
+                validators
             }
-            _ => Ok(vec![ValueValidator {
+            _ => vec![ValueValidator {
                 value: self.value.clone(),
-            }]),
+            }],
         }
     }
 
