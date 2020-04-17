@@ -5,53 +5,56 @@ use pretty_assertions::{assert_eq, assert_ne};
 use serde_json::json;
 use test_macros::*;
 
-const CREATE_TYPES_TABLE: &str = indoc! {
-    r##"
-    CREATE TABLE `types` (
-        `id` int(11) NOT NULL AUTO_INCREMENT,
-        `numeric_integer_tinyint` tinyint(4),
-        `numeric_integer_smallint` smallint(6),
-        `numeric_integer_int` int(11),
-        `numeric_integer_bigint` bigint(20),
-        `numeric_floating_decimal` decimal(10,2),
-        `numeric_floating_float` float,
-        `numeric_fixed_double` double,
-        `numeric_fixed_real` double,
-        `numeric_bit` bit(64),
-        `numeric_boolean` tinyint(1),
-        `date_date` date,
-        `date_datetime` datetime,
-        `date_timestamp` timestamp null DEFAULT null,
-        `date_time` time,
-        `date_year` year(4),
-        `string_char` char(255),
-        `string_varchar` varchar(255),
-        `string_text_tinytext` tinytext,
-        `string_text_text` text,
-        `string_text_mediumtext` mediumtext,
-        `string_text_longtext` longtext,
-        `string_binary_binary` binary(20),
-        `string_binary_varbinary` varbinary(255),
-        `string_blob_tinyblob` tinyblob,
-        `string_blob_mediumblob` mediumblob,
-        `string_blob_blob` blob,
-        `string_blob_longblob` longblob,
-        `string_enum` enum('pollicle_dogs','jellicle_cats'),
-        `string_set` set('a','b','c'),
-        `spatial_geometry` geometry,
-        `spatial_point` point,
-        `spatial_linestring` linestring,
-        `spatial_polygon` polygon,
-        `spatial_multipoint` multipoint,
-        `spatial_multilinestring` multilinestring,
-        `spatial_multipolygon` multipolygon,
-        `spatial_geometrycollection` geometrycollection,
-        `json` json,
+fn create_types_table_sql(api: &TestApi) -> String {
+    format!(
+        r##"
+        CREATE TABLE `types` (
+            `id` int(11) NOT NULL AUTO_INCREMENT,
+            `numeric_integer_tinyint` tinyint(4),
+            `numeric_integer_smallint` smallint(6),
+            `numeric_integer_int` int(11),
+            `numeric_integer_bigint` bigint(20),
+            `numeric_floating_decimal` decimal(10,2),
+            `numeric_floating_float` float,
+            `numeric_fixed_double` double,
+            `numeric_fixed_real` double,
+            `numeric_bit` bit(64),
+            `numeric_boolean` tinyint(1),
+            `date_date` date,
+            `date_datetime` datetime,
+            `date_timestamp` timestamp null DEFAULT null,
+            `date_time` time,
+            `date_year` year(4),
+            `string_char` char(255),
+            `string_varchar` varchar(255),
+            `string_text_tinytext` tinytext,
+            `string_text_text` text,
+            `string_text_mediumtext` mediumtext,
+            `string_text_longtext` longtext,
+            `string_binary_binary` binary(20),
+            `string_binary_varbinary` varbinary(255),
+            `string_blob_tinyblob` tinyblob,
+            `string_blob_mediumblob` mediumblob,
+            `string_blob_blob` blob,
+            `string_blob_longblob` longblob,
+            `string_enum` enum('pollicle_dogs','jellicle_cats'),
+            `string_set` set('a','b','c'),
+            `spatial_geometry` geometry,
+            `spatial_point` point,
+            `spatial_linestring` linestring,
+            `spatial_polygon` polygon,
+            `spatial_multipoint` multipoint,
+            `spatial_multilinestring` multilinestring,
+            `spatial_multipolygon` multipolygon,
+            `spatial_geometrycollection` geometrycollection,
+            `json` {json_column_type},
 
-        PRIMARY KEY (`id`)
-      ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-    "##
-};
+            PRIMARY KEY (`id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+        "##,
+        json_column_type = if api.is_mysql_5_6() { "text" } else { "json" },
+    )
+}
 
 const CREATE_ONE_TYPES_QUERY: &str = indoc! {
     "
@@ -167,7 +170,7 @@ const FIND_MANY_TYPES_QUERY: &str = indoc!(
 
 #[test_each_connector(tags("mysql"))]
 async fn mysql_types_roundtrip(api: &TestApi) -> TestResult {
-    api.execute_sql(CREATE_TYPES_TABLE).await?;
+    api.execute_sql(&create_types_table_sql(api)).await?;
 
     let (datamodel, engine) = api.introspect_and_start_query_engine().await?;
 
@@ -249,7 +252,7 @@ async fn mysql_types_roundtrip(api: &TestApi) -> TestResult {
 
 #[test_each_connector(tags("mysql"))]
 async fn mysql_bit_columns_are_properly_mapped_to_signed_integers(api: &TestApi) -> TestResult {
-    api.execute_sql(CREATE_TYPES_TABLE).await?;
+    api.execute_sql(&create_types_table_sql(api)).await?;
 
     let (_datamodel, engine) = api.introspect_and_start_query_engine().await?;
 
@@ -283,7 +286,7 @@ async fn mysql_bit_columns_are_properly_mapped_to_signed_integers(api: &TestApi)
 
 #[test_each_connector(tags("mysql"))]
 async fn mysql_floats_do_not_lose_precision(api: &TestApi) -> TestResult {
-    api.execute_sql(CREATE_TYPES_TABLE).await?;
+    api.execute_sql(&create_types_table_sql(api)).await?;
 
     let (_datamodel, engine) = api.introspect_and_start_query_engine().await?;
 
@@ -389,7 +392,7 @@ async fn all_mysql_identifier_types_work(api: &TestApi) -> TestResult {
 
 #[test_each_connector(tags("mysql"))]
 async fn all_mysql_types_work_as_filter(api: &TestApi) -> TestResult {
-    api.execute_sql(CREATE_TYPES_TABLE).await?;
+    api.execute_sql(&create_types_table_sql(api)).await?;
 
     let (_datamodel, engine) = api.introspect_and_start_query_engine().await?;
 
@@ -438,42 +441,45 @@ async fn all_mysql_types_work_as_filter(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-const CREATE_TYPES_TABLE_WITH_DEFAULTS: &str = indoc! {
-    r##"
-    CREATE TABLE `types` (
-        `id` int(11) NOT NULL AUTO_INCREMENT,
-        `numeric_integer_tinyint` tinyint(4) NOT NULL DEFAULT 7,
-        `numeric_integer_smallint` smallint(6) NOT NULL DEFAULT 42,
-        `numeric_integer_int` int(11) NOT NULL DEFAULT 9001,
-        `numeric_integer_bigint` bigint(20) NOT NULL DEFAULT 1000000,
-        `numeric_floating_decimal` decimal(10,2) NOT NULL DEFAULT 3.14,
-        `numeric_floating_float` float NOT NULL DEFAULT 6,
-        `numeric_fixed_double` double NOT NULL DEFAULT 60.3,
-        `numeric_fixed_real` double NOT NULL DEFAULT 90.1,
-        `numeric_bit` bit(64) NOT NULL DEFAULT 12,
-        `numeric_boolean` tinyint(1) NOT NULL DEFAULT TRUE,
-        `date_date` date NOT NULL DEFAULT '2020-03-20',
-        `date_datetime` datetime NOT NULL DEFAULT '2020-03-20 10:15:00',
-        `date_timestamp` timestamp null DEFAULT null,
-        `date_time` time NOT NULL DEFAULT '13:20:01',
-        `date_year` year(4) NOT NULL DEFAULT 1963,
-        `string_char` char(255) NOT NULL DEFAULT 'abcd',
-        `string_varchar` varchar(255) NOT NULL DEFAULT 'wash your hands',
-        `string_text_tinytext` tinytext,
-        `string_text_text` text,
-        `string_text_mediumtext` mediumtext,
-        `string_text_longtext` longtext,
-        `string_enum` enum('pollicle_dogs','jellicle_cats') NOT NULL DEFAULT 'jellicle_cats',
-        `json` json,
+fn create_types_table_with_defaults_sql(api: &TestApi) -> String {
+    format!(
+        r##"
+        CREATE TABLE `types` (
+            `id` int(11) NOT NULL AUTO_INCREMENT,
+            `numeric_integer_tinyint` tinyint(4) NOT NULL DEFAULT 7,
+            `numeric_integer_smallint` smallint(6) NOT NULL DEFAULT 42,
+            `numeric_integer_int` int(11) NOT NULL DEFAULT 9001,
+            `numeric_integer_bigint` bigint(20) NOT NULL DEFAULT 1000000,
+            `numeric_floating_decimal` decimal(10,2) NOT NULL DEFAULT 3.14,
+            `numeric_floating_float` float NOT NULL DEFAULT 6,
+            `numeric_fixed_double` double NOT NULL DEFAULT 60.3,
+            `numeric_fixed_real` double NOT NULL DEFAULT 90.1,
+            `numeric_bit` bit(64) NOT NULL DEFAULT 12,
+            `numeric_boolean` tinyint(1) NOT NULL DEFAULT TRUE,
+            `date_date` date NOT NULL DEFAULT '2020-03-20',
+            `date_datetime` datetime NOT NULL DEFAULT '2020-03-20 10:15:00',
+            `date_timestamp` timestamp null DEFAULT null,
+            `date_time` time NOT NULL DEFAULT '13:20:01',
+            `date_year` year(4) NOT NULL DEFAULT 1963,
+            `string_char` char(255) NOT NULL DEFAULT 'abcd',
+            `string_varchar` varchar(255) NOT NULL DEFAULT 'wash your hands',
+            `string_text_tinytext` tinytext,
+            `string_text_text` text,
+            `string_text_mediumtext` mediumtext,
+            `string_text_longtext` longtext,
+            `string_enum` enum('pollicle_dogs','jellicle_cats') NOT NULL DEFAULT 'jellicle_cats',
+            `json` {json_column_type},
 
-        PRIMARY KEY (`id`)
-      ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-    "##
-};
+            PRIMARY KEY (`id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+        "##,
+        json_column_type = if api.is_mysql_5_6() { "text" } else { "json" },
+    )
+}
 
 #[test_each_connector(tags("mysql"))]
 async fn mysql_db_level_defaults_work(api: &TestApi) -> TestResult {
-    api.execute_sql(CREATE_TYPES_TABLE_WITH_DEFAULTS).await?;
+    api.execute_sql(&create_types_table_with_defaults_sql(api)).await?;
 
     let (_datamodel, engine) = api.introspect_and_start_query_engine().await?;
 
@@ -556,7 +562,8 @@ async fn mysql_db_level_defaults_work(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector(tags("mysql"))]
+// On MySQL 5.6, this is not an error. The value will be silently truncated instead.
+#[test_each_connector(tags("mysql"), ignore("mysql_5_6"))]
 async fn length_mismatch_is_a_known_error(api: &TestApi) -> TestResult {
     let create_table = indoc!(
         r#"

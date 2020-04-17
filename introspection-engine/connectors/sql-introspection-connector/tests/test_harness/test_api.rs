@@ -99,6 +99,22 @@ pub async fn mysql_8_test_api(db_name: &'static str) -> TestApi {
     }
 }
 
+pub async fn mysql_5_6_test_api(db_name: &'static str) -> TestApi {
+    let db_name = test_setup::mysql_safe_identifier(db_name);
+    let url = mysql_5_6_url(db_name.as_ref());
+    let conn = create_mysql_database(&url.parse().unwrap()).await.unwrap();
+
+    let introspection_connector = SqlIntrospectionConnector::new(&url).await.unwrap();
+
+    TestApi {
+        connection_info: conn.connection_info().to_owned(),
+        db_name,
+        database: Arc::new(conn),
+        sql_family: SqlFamily::Mysql,
+        introspection_connector,
+    }
+}
+
 pub async fn mysql_mariadb_test_api(db_name: &'static str) -> TestApi {
     let db_name = test_setup::mysql_safe_identifier(db_name);
     let url = mariadb_url(db_name.as_ref());

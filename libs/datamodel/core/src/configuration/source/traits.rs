@@ -1,4 +1,3 @@
-use crate::error::DatamodelError;
 use crate::StringFromEnvVar;
 use datamodel_connector::Connector;
 
@@ -37,5 +36,5 @@ pub trait SourceDefinition {
         name: &str,
         url: StringFromEnvVar,
         documentation: &Option<String>,
-    ) -> Result<Box<dyn Source + Send + Sync>, DatamodelError>;
+    ) -> Result<Box<dyn Source + Send + Sync>, String>;
 }

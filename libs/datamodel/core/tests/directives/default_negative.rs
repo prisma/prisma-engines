@@ -76,3 +76,21 @@ fn should_error_if_default_value_parser_error() {
         Span::new(68, 74),
     ));
 }
+
+#[test]
+fn should_error_if_unknown_function_is_used() {
+    let dml = r#"
+    model Model {
+        id Int @id
+        rel DateTime @default(unknown_function())
+    }
+    "#;
+
+    let errors = parse_error(dml);
+
+    errors.assert_is(DatamodelError::new_directive_validation_error(
+        "The function unknown_function is not a known function.",
+        "default",
+        Span::new(68, 86),
+    ));
+}

@@ -74,7 +74,7 @@ async fn create_conn(datasource: &str, admin_mode: bool) -> CoreResult<(String, 
 
     match sql_family {
         Some(SqlFamily::Sqlite) => {
-            let connector = SqlMigrationConnector::new(datasource, "sqlite").await?;
+            let connector = SqlMigrationConnector::new(datasource).await?;
             Ok((datasource.to_owned(), Box::new(connector)))
         }
         Some(SqlFamily::Postgres) => {
@@ -83,7 +83,7 @@ async fn create_conn(datasource: &str, admin_mode: bool) -> CoreResult<(String, 
             let connector = if admin_mode {
                 create_postgres_admin_conn(url).await?
             } else {
-                SqlMigrationConnector::new(url.as_str(), "postgres").await?
+                SqlMigrationConnector::new(url.as_str()).await?
             };
 
             Ok((db_name, Box::new(connector)))
@@ -95,7 +95,7 @@ async fn create_conn(datasource: &str, admin_mode: bool) -> CoreResult<(String, 
                 url.set_path("");
             }
 
-            let inner = SqlMigrationConnector::new(url.as_str(), "mysql").await?;
+            let inner = SqlMigrationConnector::new(url.as_str()).await?;
             Ok((db_name, Box::new(inner)))
         }
         None => unimplemented!("Connector {} is not supported yet", url.scheme()),
@@ -161,7 +161,7 @@ async fn create_postgres_admin_conn(mut url: Url) -> CoreResult<SqlMigrationConn
 
     for database_name in candidate_default_databases {
         url.set_path(&format!("/{}", database_name));
-        match SqlMigrationConnector::new(url.as_str(), "postgresql").await {
+        match SqlMigrationConnector::new(url.as_str()).await {
             // If the database does not exist, try the next one.
             Err(err) => match &err.kind {
                 migration_connector::ErrorKind::DatabaseDoesNotExist { .. } => (),

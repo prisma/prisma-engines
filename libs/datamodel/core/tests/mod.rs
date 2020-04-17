@@ -1,7 +1,7 @@
 pub mod base;
+pub mod capabilities;
 pub mod common;
 pub mod config;
-pub mod datasource_fields;
 pub mod directives;
 pub mod functions;
 pub mod parsing;

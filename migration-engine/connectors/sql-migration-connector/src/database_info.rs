@@ -20,6 +20,15 @@ impl DatabaseInfo {
         })
     }
 
+    pub(crate) fn is_mysql_5_6(&self) -> bool {
+        self.connection_info.sql_family() == SqlFamily::Mysql
+            && self
+                .database_version
+                .as_ref()
+                .map(|version| version.contains("5.6"))
+                .unwrap_or(false)
+    }
+
     pub(crate) fn is_mariadb(&self) -> bool {
         self.connection_info.sql_family() == SqlFamily::Mysql
             && self
