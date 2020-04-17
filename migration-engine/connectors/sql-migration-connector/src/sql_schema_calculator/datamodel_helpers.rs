@@ -224,38 +224,32 @@ impl<'a> RelationFieldRef<'a> {
             })
     }
 
-    pub(crate) fn referencing_columns<'b>(&'b self) -> Vec<String> {
-        let db_names: Vec<_> = self
+    pub(crate) fn referencing_columns<'b>(&'b self) -> impl Iterator<Item = &'a str> + 'b {
+        self
             .relation_info
             .fields
             .iter()
-            .map(|field| {
+            .map(move |field| {
                 let model = self.field.model();
                 let field = model.find_field(field.as_str())
                 .expect(&format!("Unable to resolve field {} on {}, Expected relation `fields` to point to fields on the enclosing model.", field, model.name()));
 
-                field.db_name().to_owned()
+                field.db_name()
             })
-            .collect();
-
-        db_names
     }
 
-    pub(crate) fn referenced_columns<'b>(&'b self) -> Vec<String> {
-        let db_names: Vec<_> = self
+    pub(crate) fn referenced_columns<'b>(&'b self) -> impl Iterator<Item = &'a str> + 'b {
+        self
             .relation_info
             .to_fields
             .iter()
-            .map(|field| {
+            .map(move |field| {
                 let model = self.referenced_model();
                 let field = model.find_field(field.as_str())
                 .expect(&format!("Unable to resolve field {} on {}, Expected relation `references` to point to fields on the related model.", field, model.name));
 
-                field.db_name().to_owned()
+                field.db_name()
             })
-            .collect();
-
-        db_names
     }
 
     pub(crate) fn relation_name(&self) -> &'a str {
