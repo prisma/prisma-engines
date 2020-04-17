@@ -40,7 +40,7 @@ pub struct SqlMigrationConnector {
 }
 
 impl SqlMigrationConnector {
-    pub async fn new(database_str: &str, provider: &str) -> ConnectorResult<Self> {
+    pub async fn new(database_str: &str) -> ConnectorResult<Self> {
         let connection_info =
             ConnectionInfo::from_url(database_str).map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
 
