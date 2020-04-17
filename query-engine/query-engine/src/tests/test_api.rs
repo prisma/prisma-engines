@@ -129,6 +129,23 @@ pub async fn mysql_8_test_api(db_name: &str) -> TestApi {
     }
 }
 
+pub async fn mysql_5_6_test_api(db_name: &str) -> TestApi {
+    let url = mysql_5_6_url(db_name);
+    let connection_info = ConnectionInfo::from_url(&url).unwrap();
+
+    let connector = mysql_migration_connector(&url).await;
+    let migration_api = migration_api(connector).await;
+
+    let config = mysql_5_6_test_config(db_name);
+
+    TestApi {
+        connection_info,
+        migration_api,
+        config,
+        is_pgbouncer: false,
+    }
+}
+
 pub async fn mysql_test_api(db_name: &str) -> TestApi {
     let url = mysql_url(db_name);
     let connection_info = ConnectionInfo::from_url(&url).unwrap();

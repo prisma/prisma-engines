@@ -40,6 +40,10 @@ dev-mysql:
 	docker-compose -f docker-compose.yml up -d --remove-orphans mysql-5-7
 	echo 'mysql' > current_connector
 
+dev-mysql_5_6:
+	docker-compose -f docker-compose.yml up -d --remove-orphans mysql-5-6
+	echo 'mysql56' > current_connector
+
 dev-mysql8:
 	docker-compose -f docker-compose.yml up -d --remove-orphans mysql-8-0
 	echo 'mysql8' > current_connector
