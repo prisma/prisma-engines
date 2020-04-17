@@ -22,6 +22,7 @@ use migration_core::{
     commands::ApplyMigrationInput,
 };
 use quaint::prelude::{ConnectionInfo, Queryable, SqlFamily};
+use sql_migration_connector::MIGRATION_TABLE_NAME;
 use sql_schema_describer::*;
 use std::sync::Arc;
 use test_setup::*;
@@ -154,7 +155,11 @@ impl TestApi {
             .expect("Description failed");
 
         // the presence of the _Migration table makes assertions harder. Therefore remove it from the result.
-        result.tables = result.tables.into_iter().filter(|t| t.name != "_Migration").collect();
+        result.tables = result
+            .tables
+            .into_iter()
+            .filter(|t| t.name != MIGRATION_TABLE_NAME)
+            .collect();
 
         Ok(result)
     }

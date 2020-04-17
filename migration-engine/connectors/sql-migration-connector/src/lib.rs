@@ -13,6 +13,7 @@ mod sql_schema_helpers;
 
 pub use error::*;
 pub use sql_migration::*;
+pub use sql_migration_persistence::MIGRATION_TABLE_NAME;
 
 use component::Component;
 use database_info::DatabaseInfo;
