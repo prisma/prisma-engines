@@ -288,6 +288,17 @@ impl<'a> ColumnAssertion<'a> {
 
         Ok(self)
     }
+
+    pub fn assert_is_nullable(self) -> AssertionResult<Self> {
+        anyhow::ensure!(
+            self.0.tpe.arity.is_nullable(),
+            "Assertion failed. Expected column `{}` to be nullable, got {:?}",
+            self.0.name,
+            self.0.tpe.arity,
+        );
+
+        Ok(self)
+    }
 }
 
 pub struct PrimaryKeyAssertion<'a>(&'a PrimaryKey);

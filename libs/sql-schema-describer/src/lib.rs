@@ -321,10 +321,11 @@ pub enum ColumnArity {
 
 impl ColumnArity {
     pub fn is_required(&self) -> bool {
-        match self {
-            ColumnArity::Required => true,
-            _ => false,
-        }
+        matches!(self, ColumnArity::Required)
+    }
+
+    pub fn is_nullable(&self) -> bool {
+        matches!(self, ColumnArity::Nullable)
     }
 }
 
