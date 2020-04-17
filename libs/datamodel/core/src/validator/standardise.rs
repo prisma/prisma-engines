@@ -17,6 +17,8 @@ impl Standardiser {
     }
 
     pub fn standardise(&self, ast_schema: &ast::SchemaAst, schema: &mut dml::Datamodel) -> Result<(), ErrorCollection> {
+        self.name_unnamed_relations(schema);
+
         self.add_missing_back_relations(ast_schema, schema)?;
 
         // This is intentionally disabled for now, since the generated types would surface in the
@@ -24,8 +26,6 @@ impl Standardiser {
         // self.add_missing_relation_tables(ast_schema, schema)?;
 
         self.set_relation_to_field_to_id_if_missing(schema);
-
-        self.name_unnamed_relations(schema);
 
         self.populate_datasource_fields(schema);
 
@@ -152,7 +152,9 @@ impl Standardiser {
                 model_mut.add_field(back_relation_field);
 
                 for underlying_field in missing_back_relation_field.underlying_fields.into_iter() {
-                    model_mut.add_field(underlying_field);
+                    if !model_mut.has_field(&underlying_field.name) {
+                        model_mut.add_field(underlying_field);
+                    }
                 }
             }
         }
@@ -209,8 +211,20 @@ impl Standardiser {
                         let unique_criteria_field_names =
                             unique_criteria.fields.iter().map(|f| f.name.to_owned()).collect();
 
-                        let underlying_fields =
-                            self.underlying_fields_for_unique_criteria(&unique_criteria, &model.name);
+                        let underlying_fields: Vec<Field> = self
+                            .underlying_fields_for_unique_criteria(&unique_criteria, &model.name)
+                            .into_iter()
+                            .map(|f| {
+                                // This prevents name conflicts with existing fields on the model that have a type that is incompatible
+                                let mut f = f;
+                                if let Some(existing_field) = related_model.find_field(&f.name) {
+                                    if !existing_field.field_type.is_compatible_with(&f.field_type) {
+                                        f.name = format!("{}_{}", &f.name, &rel.name);
+                                    }
+                                }
+                                f
+                            })
+                            .collect();
 
                         let relation_info = dml::RelationInfo {
                             to: model.name.clone(),
