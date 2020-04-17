@@ -29,7 +29,7 @@ pub async fn migration_api(datamodel: &str) -> CoreResult<Arc<dyn api::GenericAp
     let connector = match source.connector_type() {
         #[cfg(feature = "sql")]
         provider if [MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME].contains(&provider) => {
-            sql_migration_connector::SqlMigrationConnector::new(&source.url().value, provider).await?
+            sql_migration_connector::SqlMigrationConnector::new(&source.url().value).await?
         }
         x => unimplemented!("Connector {} is not supported yet", x),
     };
