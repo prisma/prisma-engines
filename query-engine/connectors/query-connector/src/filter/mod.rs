@@ -9,8 +9,8 @@ mod list;
 mod relation;
 mod scalar;
 
+use prisma_models::dml;
 use prisma_models::prelude::*;
-use prisma_models::{dml, DataSourceField};
 
 pub use id_filter::*;
 pub use list::*;
@@ -167,12 +167,9 @@ pub fn test_data_model() -> InternalDataModelRef {
             is_auto_generated_int_id: false,
             behaviour: None,
             internal_enum: None,
-            data_source_field: DataSourceField {
-                name: "id".to_owned(),
-                arity: dml::FieldArity::Optional,
-                field_type: dml::ScalarType::String,
-                default_value: None,
-            },
+            arity: dml::FieldArity::Optional,
+            default_value: None,
+            db_name: None,
         }),
         FieldTemplate::Scalar(ScalarFieldTemplate {
             name: "name".to_owned(),
@@ -184,12 +181,9 @@ pub fn test_data_model() -> InternalDataModelRef {
             is_auto_generated_int_id: false,
             behaviour: None,
             internal_enum: None,
-            data_source_field: DataSourceField {
-                name: "name".to_owned(),
-                arity: dml::FieldArity::Optional,
-                field_type: dml::ScalarType::String,
-                default_value: None,
-            },
+            arity: dml::FieldArity::Optional,
+            default_value: None,
+            db_name: None,
         }),
         FieldTemplate::Relation(RelationFieldTemplate {
             name: "sites".to_owned(),
@@ -214,12 +208,9 @@ pub fn test_data_model() -> InternalDataModelRef {
         is_auto_generated_int_id: false,
         behaviour: None,
         internal_enum: None,
-        data_source_field: DataSourceField {
-            name: "name".to_owned(),
-            arity: dml::FieldArity::Optional,
-            field_type: dml::ScalarType::String,
-            default_value: None,
-        },
+        arity: dml::FieldArity::Optional,
+        default_value: None,
+        db_name: None,
     })];
 
     let model_templates = vec![

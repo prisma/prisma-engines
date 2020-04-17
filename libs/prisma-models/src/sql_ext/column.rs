@@ -1,5 +1,6 @@
 use crate::{Field, ModelProjection, RelationField, RelationLinkManifestation, ScalarField};
 use quaint::ast::{Column, Row};
+use std::convert::AsRef;
 
 pub struct ColumnIterator {
     count: usize,
@@ -59,7 +60,7 @@ impl AsColumns for &[Field] {
 
 impl AsColumns for ModelProjection {
     fn as_columns(&self) -> ColumnIterator {
-        let cols: Vec<Column<'static>> = self.data_source_fields().map(|f| f.as_column()).collect();
+        let cols: Vec<Column<'static>> = self.fields().flat_map(|f| f.as_columns()).collect();
         ColumnIterator::from(cols)
     }
 }
@@ -101,12 +102,12 @@ impl AsColumns for RelationField {
         };
 
         let inner: Vec<_> = self
-            .data_source_fields()
+            .fields()
             .iter()
-            .map(|dsf| {
+            .map(|f| {
                 let parts = (
                     (internal_data_model.db_name.clone(), table_name.clone()),
-                    dsf.name.clone(),
+                    f.db_name().to_owned(),
                 );
 
                 Column::from(parts)
@@ -117,55 +118,36 @@ impl AsColumns for RelationField {
     }
 }
 
-impl AsColumns for &[crate::field::DataSourceFieldRef] {
+impl<T> AsColumns for &[T]
+where
+    T: AsColumn,
+{
     fn as_columns(&self) -> ColumnIterator {
-        let inner: Vec<_> = self.iter().map(|dsf| dsf.as_column()).collect();
+        let inner: Vec<_> = self.iter().map(|x| x.as_column()).collect();
         ColumnIterator::from(inner)
     }
 }
 
-impl AsColumns for Vec<crate::field::DataSourceFieldRef> {
+impl<T> AsColumns for Vec<T>
+where
+    T: AsColumn,
+{
     fn as_columns(&self) -> ColumnIterator {
-        let inner: Vec<_> = self.iter().map(|dsf| dsf.as_column()).collect();
+        let inner: Vec<_> = self.iter().map(|x| x.as_column()).collect();
         ColumnIterator::from(inner)
     }
 }
 
-impl AsColumn for ScalarField {
+impl<T> AsColumn for T
+where
+    T: AsRef<ScalarField>,
+{
     fn as_column(&self) -> Column<'static> {
-        let db = self.internal_data_model().db_name.clone();
-        let table = self.model().db_name().to_string();
-        let col = self.db_name().to_string();
+        let sf = self.as_ref();
+        let db = sf.internal_data_model().db_name.clone();
+        let table = sf.model().db_name().to_string();
+        let col = sf.db_name().to_string();
 
         Column::from(((db, table), col))
-    }
-}
-
-impl AsColumn for crate::field::DataSourceField {
-    fn as_column(&self) -> Column<'static> {
-        let model = self.model_field().model();
-        let db = model.internal_data_model().db_name.clone();
-        let table = model.db_name().to_string();
-        let col = column_name(&self).to_string();
-
-        Column::from(((db, table), col))
-    }
-}
-
-fn column_name(dsf: &crate::field::DataSourceField) -> &str {
-    match dsf.model_field() {
-        Field::Scalar(_) => &dsf.name,
-        Field::Relation(rf) => {
-            let relation = rf.relation();
-            if relation.is_many_to_many() {
-                if rf.relation_side.is_a() {
-                    "A"
-                } else {
-                    "B"
-                }
-            } else {
-                &dsf.name
-            }
-        }
     }
 }

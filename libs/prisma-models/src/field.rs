@@ -5,14 +5,8 @@ pub use relation::*;
 pub use scalar::*;
 
 use crate::prelude::*;
-use core::ops::Deref;
 use datamodel::ScalarType;
-use std::{
-    hash::{Hash, Hasher},
-    sync::Arc,
-};
-
-pub type DataSourceFieldRef = Arc<DataSourceField>;
+use std::{hash::Hash, sync::Arc};
 
 #[derive(Debug)]
 pub enum FieldTemplate {
@@ -38,52 +32,6 @@ impl FieldWeak {
             Self::Relation(rf) => rf.upgrade().unwrap().into(),
             Self::Scalar(sf) => sf.upgrade().unwrap().into(),
         }
-    }
-}
-
-#[derive(Clone, Debug)]
-pub struct DataSourceField {
-    backing_field: dml::DataSourceField,
-    model_field: FieldWeak,
-}
-
-impl DataSourceField {
-    pub fn new(backing_field: dml::DataSourceField, model_field: FieldWeak) -> Self {
-        Self {
-            backing_field,
-            model_field,
-        }
-    }
-
-    pub fn model_field(&self) -> Field {
-        self.model_field.upgrade()
-    }
-
-    pub fn name(&self) -> &str {
-        self.backing_field.name.as_str()
-    }
-}
-
-impl Deref for DataSourceField {
-    type Target = dml::DataSourceField;
-
-    fn deref(&self) -> &dml::DataSourceField {
-        &self.backing_field
-    }
-}
-
-impl Hash for DataSourceField {
-    fn hash<H: Hasher>(&self, state: &mut H) {
-        self.backing_field.hash(state);
-        self.model_field().hash(state);
-    }
-}
-
-impl Eq for DataSourceField {}
-
-impl PartialEq for DataSourceField {
-    fn eq(&self, other: &DataSourceField) -> bool {
-        self.name == other.name
     }
 }
 
@@ -177,10 +125,10 @@ impl Field {
         }
     }
 
-    pub fn data_source_fields(&self) -> Vec<DataSourceFieldRef> {
+    pub fn scalar_fields(&self) -> Vec<ScalarFieldRef> {
         match self {
-            Self::Scalar(sf) => vec![sf.data_source_field().clone()],
-            Self::Relation(rf) => rf.data_source_fields().to_vec(),
+            Self::Scalar(sf) => vec![sf.clone()],
+            Self::Relation(rf) => rf.fields(),
         }
     }
 

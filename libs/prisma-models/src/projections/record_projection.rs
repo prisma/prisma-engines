@@ -1,23 +1,23 @@
 use super::ModelProjection;
-use crate::{DataSourceFieldRef, DomainError, PrismaValue};
+use crate::{DomainError, PrismaValue, ScalarFieldRef};
 use std::{collections::HashMap, convert::TryFrom};
 
 /// Represents a (sub)set of fields to value pairs from a single record.
 #[derive(Default, Debug, Clone, PartialEq, Eq, Hash)]
 pub struct RecordProjection {
-    pub pairs: Vec<(DataSourceFieldRef, PrismaValue)>,
+    pub pairs: Vec<(ScalarFieldRef, PrismaValue)>,
 }
 
 impl RecordProjection {
-    pub fn new(pairs: Vec<(DataSourceFieldRef, PrismaValue)>) -> Self {
+    pub fn new(pairs: Vec<(ScalarFieldRef, PrismaValue)>) -> Self {
         Self { pairs }
     }
 
-    pub fn add(&mut self, pair: (DataSourceFieldRef, PrismaValue)) {
+    pub fn add(&mut self, pair: (ScalarFieldRef, PrismaValue)) {
         self.pairs.push(pair);
     }
 
-    pub fn fields(&self) -> impl Iterator<Item = DataSourceFieldRef> + '_ {
+    pub fn fields(&self) -> impl Iterator<Item = ScalarFieldRef> + '_ {
         self.pairs.iter().map(|p| p.0.clone())
     }
 
@@ -54,18 +54,16 @@ impl RecordProjection {
     /// Consumes this projection and splits it into a set of `RecordProjection`s based on the passed
     /// `ModelProjection`s. Assumes that the transformation can be done.
     pub fn split_into(self, projections: &[ModelProjection]) -> Vec<RecordProjection> {
-        let mapped: HashMap<String, (DataSourceFieldRef, PrismaValue)> = self
-            .into_iter()
-            .map(|(dsf, val)| (dsf.name.clone(), (dsf, val)))
-            .collect();
+        let mapped: HashMap<String, (ScalarFieldRef, PrismaValue)> =
+            self.into_iter().map(|(sf, val)| (sf.name.clone(), (sf, val))).collect();
 
         projections
             .into_iter()
             .map(|p| {
-                p.data_source_fields()
-                    .map(|dsf| {
+                p.scalar_fields()
+                    .map(|sf| {
                         let entry = mapped
-                            .get(&dsf.name)
+                            .get(&sf.name)
                             .expect("Error splitting RecordProjection: ModelProjection doesn't match.")
                             .clone();
 
@@ -93,7 +91,7 @@ impl TryFrom<RecordProjection> for PrismaValue {
 }
 
 impl IntoIterator for RecordProjection {
-    type Item = (DataSourceFieldRef, PrismaValue);
+    type Item = (ScalarFieldRef, PrismaValue);
     type IntoIter = std::vec::IntoIter<Self::Item>;
 
     fn into_iter(self) -> Self::IntoIter {
@@ -101,14 +99,14 @@ impl IntoIterator for RecordProjection {
     }
 }
 
-impl From<(DataSourceFieldRef, PrismaValue)> for RecordProjection {
-    fn from(tup: (DataSourceFieldRef, PrismaValue)) -> Self {
+impl From<(ScalarFieldRef, PrismaValue)> for RecordProjection {
+    fn from(tup: (ScalarFieldRef, PrismaValue)) -> Self {
         Self::new(vec![tup])
     }
 }
 
-impl From<Vec<(DataSourceFieldRef, PrismaValue)>> for RecordProjection {
-    fn from(tup: Vec<(DataSourceFieldRef, PrismaValue)>) -> Self {
+impl From<Vec<(ScalarFieldRef, PrismaValue)>> for RecordProjection {
+    fn from(tup: Vec<(ScalarFieldRef, PrismaValue)>) -> Self {
         Self::new(tup)
     }
 }

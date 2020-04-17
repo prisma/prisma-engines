@@ -1,9 +1,6 @@
 use super::common::*;
 use crate::error::DatamodelError;
-use crate::{
-    ast, common::names::*, dml, dml::WithDatabaseName, error::ErrorCollection, DataSourceField, Field,
-    OnDeleteStrategy, UniqueCriteria,
-};
+use crate::{ast, common::names::*, dml, error::ErrorCollection, Field, OnDeleteStrategy, UniqueCriteria};
 
 /// Helper for standardsing a datamodel.
 ///
@@ -25,10 +22,7 @@ impl Standardiser {
         // This is intentionally disabled for now, since the generated types would surface in the
         // client schema.
         // self.add_missing_relation_tables(ast_schema, schema)?;
-
         self.set_relation_to_field_to_id_if_missing(schema);
-
-        self.populate_datasource_fields(schema);
 
         Ok(())
     }
@@ -350,104 +344,6 @@ impl Standardiser {
 
         rels
     }
-
-    fn populate_datasource_fields(&self, datamodel: &mut dml::Datamodel) {
-        let mut datasource_fields_to_push: Vec<AddDatasourceField> = Vec::new();
-        for model in datamodel.models() {
-            for field in model.fields() {
-                let datasource_fields = match &field.field_type {
-                    dml::FieldType::Base(scalar_type, _) => {
-                        self.get_datasource_fields_for_scalar_field(&field, &scalar_type)
-                    }
-                    dml::FieldType::Enum(_) => {
-                        // TODO: why i do not need the enum name here? Seems fishy to ignore that.
-                        self.get_datasource_fields_for_enum_field(&field)
-                    }
-                    dml::FieldType::Relation(rel_info) => {
-                        //                        self.get_datasource_fields_for_relation_field(&field, &rel_info, &datamodel)
-                        self.get_datasource_fields_for_relation_field_new(&model, &field, &rel_info)
-                    }
-                    dml::FieldType::ConnectorSpecific(_) => {
-                        unimplemented!("ConnectorSpecific is not supported here as it will be removed soon.")
-                    }
-                    dml::FieldType::Unsupported(_) => panic!("These should always be commented out"),
-                };
-                datasource_fields.into_iter().for_each(|ds_field| {
-                    datasource_fields_to_push.push(AddDatasourceField {
-                        model: model.name.clone(),
-                        field: field.name.clone(),
-                        datasource_field: ds_field,
-                    })
-                });
-            }
-        }
-
-        datasource_fields_to_push.into_iter().for_each(|add_ds_field| {
-            let AddDatasourceField {
-                model,
-                field,
-                datasource_field,
-            } = add_ds_field;
-            let field = datamodel
-                .find_model_mut(&model)
-                .unwrap()
-                .find_field_mut(&field)
-                .unwrap();
-            field.data_source_fields.push(datasource_field);
-        });
-    }
-
-    fn get_datasource_fields_for_scalar_field(
-        &self,
-        field: &dml::Field,
-        scalar_type: &dml::ScalarType,
-    ) -> Vec<DataSourceField> {
-        let datasource_field = dml::DataSourceField {
-            name: field.final_database_name().to_owned(),
-            field_type: scalar_type.clone(),
-            arity: field.arity,
-            default_value: field.default_value.clone(),
-        };
-        vec![datasource_field]
-    }
-
-    fn get_datasource_fields_for_enum_field(&self, field: &dml::Field) -> Vec<DataSourceField> {
-        let datasource_field = dml::DataSourceField {
-            name: field.final_database_name().to_owned(),
-            field_type: dml::ScalarType::String,
-            arity: field.arity,
-            default_value: field.default_value.clone(),
-        };
-        vec![datasource_field]
-    }
-
-    fn get_datasource_fields_for_relation_field_new(
-        &self,
-        model: &dml::Model,
-        field: &dml::Field,
-        rel_info: &dml::RelationInfo,
-    ) -> Vec<DataSourceField> {
-        rel_info
-            .fields
-            .iter()
-            .map(|base_field| {
-                let referenced_field = model.find_field(&base_field).expect(&format!(
-                    "the field {} was not found in the model {}",
-                    &base_field, &model.name
-                ));
-
-                match &referenced_field.field_type {
-                    dml::FieldType::Base(scalar_type, _) => dml::DataSourceField {
-                        name: referenced_field.final_database_name().to_owned(),
-                        field_type: *scalar_type,
-                        arity: field.arity,
-                        default_value: None,
-                    },
-                    x => unimplemented!("This must be a scalar type: {:?}", x),
-                }
-            })
-            .collect()
-    }
 }
 
 #[derive(Debug)]
@@ -459,11 +355,4 @@ struct AddMissingBackRelationField {
     related_model: String,
     related_field: String,
     underlying_fields: Vec<dml::Field>,
-}
-
-#[derive(Debug)]
-struct AddDatasourceField {
-    model: String,
-    field: String,
-    datasource_field: DataSourceField,
 }

@@ -1,6 +1,6 @@
 use super::*;
 use datamodel_connector::ScalarFieldType;
-use std::hash::{Hash, Hasher};
+use std::hash::Hash;
 
 /// Datamodel field arity.
 #[derive(Debug, PartialEq, Copy, Clone, Eq, Hash)]
@@ -67,29 +67,6 @@ impl FieldType {
     }
 }
 
-/// Describes a singular field on a data source.
-/// This doesn't necessarily map 1:1 to fields in the datamodel, as some
-/// datamodel fields, notably relation fields, can be backed by multiple
-/// data source fields.
-#[derive(Debug, PartialEq, Clone)]
-pub struct DataSourceField {
-    /// Name of the backing data source field (e.g. SQL column name or document key).
-    pub name: String,
-    pub field_type: ScalarType,
-    pub arity: FieldArity,
-    pub default_value: Option<DefaultValue>,
-}
-
-impl Hash for DataSourceField {
-    fn hash<H: Hasher>(&self, state: &mut H) {
-        self.name.hash(state);
-        self.field_type.hash(state);
-        self.arity.hash(state);
-    }
-}
-
-impl Eq for DataSourceField {}
-
 /// Represents a field in a model.
 #[derive(Debug, PartialEq, Clone)]
 pub struct Field {
@@ -99,7 +76,6 @@ pub struct Field {
     /// The field's type.
     pub field_type: FieldType,
 
-    // -------- todo this is duplicated from DataSourceField --------
     /// The field's arity.
     pub arity: FieldArity,
 
@@ -108,7 +84,7 @@ pub struct Field {
 
     /// The default value.
     pub default_value: Option<DefaultValue>,
-    // -------- -------------------------------------------- --------
+
     /// Indicates if the field is unique.
     pub is_unique: bool,
 
@@ -127,9 +103,6 @@ pub struct Field {
     /// automatically.
     pub is_updated_at: bool,
 
-    /// The data source field specifics, like backing fields and defaults.
-    pub data_source_fields: Vec<DataSourceField>,
-
     /// Indicates if this field has to be commented out.
     pub is_commented_out: bool,
 }
@@ -140,6 +113,10 @@ impl Field {
             FieldType::Relation(rel_info) if rel_info.to == name => true,
             _ => false,
         }
+    }
+
+    pub fn db_name(&self) -> &str {
+        self.database_name.as_ref().unwrap_or(&self.name)
     }
 }
 
@@ -176,7 +153,6 @@ impl Field {
             documentation: None,
             is_generated: false,
             is_updated_at: false,
-            data_source_fields: vec![],
             is_commented_out: false,
         }
     }

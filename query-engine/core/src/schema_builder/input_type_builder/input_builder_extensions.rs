@@ -1,5 +1,4 @@
 use super::*;
-use prisma_models::DataSourceFieldRef;
 
 /// Generic extension also used by the FilterInputTypeBuilder.
 pub trait InputBuilderExtensions {
@@ -34,20 +33,5 @@ pub trait InputBuilderExtensions {
 
         let et: EnumType = internal_enum.clone().into();
         et.into()
-    }
-
-    fn map_required_data_source_field_input_type(&self, dsf: &DataSourceFieldRef) -> InputType {
-        let typ: TypeIdentifier = dsf.field_type.into();
-
-        match typ {
-            TypeIdentifier::String => InputType::string(),
-            TypeIdentifier::Int => InputType::int(),
-            TypeIdentifier::Float => InputType::float(),
-            TypeIdentifier::Boolean => InputType::boolean(),
-            TypeIdentifier::UUID => InputType::uuid(),
-            TypeIdentifier::DateTime => InputType::date_time(),
-            TypeIdentifier::Json => InputType::json(),
-            TypeIdentifier::Enum(_) => unreachable!("ScalarType should never map to Enum."),
-        }
     }
 }
