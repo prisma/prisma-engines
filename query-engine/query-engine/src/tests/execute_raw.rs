@@ -218,7 +218,7 @@ async fn querying_the_same_column_name_twice_with_aliasing(api: &TestApi) -> any
     Ok(())
 }
 
-#[test_one_connector(connector = "postgres")]
+#[test_each_connector(tags("postgres"))]
 async fn arrays(api: &TestApi) -> anyhow::Result<()> {
     let query_engine = api.create_engine(&TODO).await?;
 

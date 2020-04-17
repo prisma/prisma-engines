@@ -266,27 +266,25 @@ pub async fn sqlite_test_api(db_name: &str) -> TestApi {
 }
 
 pub(super) async fn mysql_migration_connector(url_str: &str) -> SqlMigrationConnector {
-    match SqlMigrationConnector::new(url_str, "mysql").await {
+    match SqlMigrationConnector::new(url_str).await {
         Ok(c) => c,
         Err(_) => {
             create_mysql_database(&url_str.parse().unwrap()).await.unwrap();
-            SqlMigrationConnector::new(url_str, "mysql").await.unwrap()
+            SqlMigrationConnector::new(url_str).await.unwrap()
         }
     }
 }
 
 pub(super) async fn postgres_migration_connector(url_str: &str) -> SqlMigrationConnector {
-    match SqlMigrationConnector::new(url_str, "postgresql").await {
+    match SqlMigrationConnector::new(url_str).await {
         Ok(c) => c,
         Err(_) => {
             create_postgres_database(&url_str.parse().unwrap()).await.unwrap();
-            SqlMigrationConnector::new(url_str, "postgresql").await.unwrap()
+            SqlMigrationConnector::new(url_str).await.unwrap()
         }
     }
 }
 
 pub(super) async fn sqlite_migration_connector(db_name: &str) -> SqlMigrationConnector {
-    SqlMigrationConnector::new(&sqlite_test_url(db_name), "sqlite")
-        .await
-        .unwrap()
+    SqlMigrationConnector::new(&sqlite_test_url(db_name)).await.unwrap()
 }
