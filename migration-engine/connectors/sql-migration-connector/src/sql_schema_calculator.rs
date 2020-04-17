@@ -288,7 +288,6 @@ impl<'a> SqlSchemaCalculator<'a> {
 }
 
 fn relation_table_columns(referenced_model: &ModelRef<'_>, reference_field_name: String) -> Vec<sql::Column> {
-    // TODO: must also work with multi field unique
     if referenced_model.model().id_fields.is_empty() {
         let unique_field = referenced_model.fields().find(|f| f.is_unique());
         let id_field = referenced_model.fields().find(|f| f.is_id());

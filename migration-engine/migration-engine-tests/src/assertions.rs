@@ -254,6 +254,31 @@ impl<'a> ColumnAssertion<'a> {
         Ok(self)
     }
 
+    pub fn assert_has_no_default(self) -> AssertionResult<Self> {
+        self.assert_default(None)
+    }
+
+    pub fn assert_default_value(self, expected: &prisma_value::PrismaValue) -> AssertionResult<Self> {
+        let found = &self.0.default;
+
+        match found {
+            Some(DefaultValue::VALUE(val)) => anyhow::ensure!(
+                val == expected,
+                "Assertion failed. Expected the default value for `{}` to be `{:?}`, got `{:?}`",
+                self.0.name,
+                expected,
+                val
+            ),
+            other => anyhow::bail!(
+                "Assertion failed. Expected default: {:?}, but found {:?}",
+                expected,
+                other
+            ),
+        }
+
+        Ok(self)
+    }
+
     pub fn assert_type_is_string(self) -> AssertionResult<Self> {
         let found = &self.0.tpe.family;
 
