@@ -150,7 +150,7 @@ fn fix_id_column_type_change(
         let tables_to_drop: Vec<String> = from
             .tables
             .iter()
-            .filter(|t| t.name != "_Migration")
+            .filter(|t| t.name != MIGRATION_TABLE_NAME)
             .map(|t| t.name.clone())
             .collect();
         radical_steps.push(SqlMigrationStep::DropTables(DropTables { names: tables_to_drop }));
