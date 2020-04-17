@@ -185,7 +185,11 @@ impl<'a> SqlSchemaCalculator<'a> {
             .filter(|relation_field| !relation_field.is_virtual());
 
         for relation_field in relation_fields {
-            let fk_columns: Vec<String> = relation_field.referencing_columns().map(String::from).collect();
+            let fk_columns: Vec<String> = relation_field
+                .referencing_columns()
+                .into_iter()
+                .map(String::from)
+                .collect();
 
             // Optional unique index for 1:1 relations.
             if relation_field.is_one_to_one() {
@@ -198,7 +202,11 @@ impl<'a> SqlSchemaCalculator<'a> {
                     constraint_name: None,
                     columns: fk_columns,
                     referenced_table: relation_field.referenced_table_name().to_owned(),
-                    referenced_columns: relation_field.referenced_columns().map(String::from).collect(),
+                    referenced_columns: relation_field
+                        .referenced_columns()
+                        .into_iter()
+                        .map(String::from)
+                        .collect(),
                     on_delete_action: match column_arity(relation_field.arity()) {
                         ColumnArity::Required => sql::ForeignKeyAction::Cascade,
                         _ => sql::ForeignKeyAction::SetNull,

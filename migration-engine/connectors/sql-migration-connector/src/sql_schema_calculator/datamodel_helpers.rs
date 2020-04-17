@@ -224,21 +224,38 @@ impl<'a> RelationFieldRef<'a> {
             })
     }
 
-    pub(crate) fn referencing_columns<'b>(&'b self) -> impl Iterator<Item = &'a str> {
-        self.relation_info.fields.iter().map(|field| field.as_str())
-        // self.field.data_source_fields().iter().map(|field| field.name.as_str())
+    pub(crate) fn referencing_columns<'b>(&'b self) -> Vec<String> {
+        let db_names: Vec<_> = self
+            .relation_info
+            .fields
+            .iter()
+            .map(|field| {
+                let model = self.field.model();
+                let field = model.find_field(field.as_str())
+                .expect(&format!("Unable to resolve field {} on {}, Expected relation `fields` to point to fields on the enclosing model.", field, model.name()));
+
+                field.db_name().to_owned()
+            })
+            .collect();
+
+        db_names
     }
 
-    pub(crate) fn referenced_columns<'b>(&'b self) -> impl Iterator<Item = &'a str> + 'b {
-        self.referenced_model().fields.iter().filter_map(move |field| {
-            self.relation_info
-                .to_fields
-                .iter()
-                .find(|to_field| *to_field == &field.name)
-                .map(|to_field| to_field.as_str())
-        })
-        // .flat_map(|field| field.data_source_fields.iter())
-        // .map(|sf| sf.name.as_str())
+    pub(crate) fn referenced_columns<'b>(&'b self) -> Vec<String> {
+        let db_names: Vec<_> = self
+            .relation_info
+            .to_fields
+            .iter()
+            .map(|field| {
+                let model = self.referenced_model();
+                let field = model.find_field(field.as_str())
+                .expect(&format!("Unable to resolve field {} on {}, Expected relation `references` to point to fields on the related model.", field, model.name));
+
+                field.db_name().to_owned()
+            })
+            .collect();
+
+        db_names
     }
 
     pub(crate) fn relation_name(&self) -> &'a str {
