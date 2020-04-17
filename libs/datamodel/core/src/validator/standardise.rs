@@ -1,4 +1,5 @@
 use super::common::*;
+use crate::error::DatamodelError;
 use crate::{
     ast, common::names::*, dml, dml::WithDatabaseName, error::ErrorCollection, DataSourceField, Field,
     OnDeleteStrategy, UniqueCriteria,
@@ -17,6 +18,8 @@ impl Standardiser {
     }
 
     pub fn standardise(&self, ast_schema: &ast::SchemaAst, schema: &mut dml::Datamodel) -> Result<(), ErrorCollection> {
+        self.name_unnamed_relations(schema);
+
         self.add_missing_back_relations(ast_schema, schema)?;
 
         // This is intentionally disabled for now, since the generated types would surface in the
@@ -24,8 +27,6 @@ impl Standardiser {
         // self.add_missing_relation_tables(ast_schema, schema)?;
 
         self.set_relation_to_field_to_id_if_missing(schema);
-
-        self.name_unnamed_relations(schema);
 
         self.populate_datasource_fields(schema);
 
@@ -116,7 +117,8 @@ impl Standardiser {
 
         let mut missing_back_relation_fields = Vec::new();
         for model in &schema.models {
-            missing_back_relation_fields.append(&mut self.find_missing_back_relation_fields(&model, schema));
+            missing_back_relation_fields
+                .append(&mut self.find_missing_back_relation_fields(&model, schema, ast_schema)?);
         }
 
         for missing_back_relation_field in missing_back_relation_fields {
@@ -152,7 +154,9 @@ impl Standardiser {
                 model_mut.add_field(back_relation_field);
 
                 for underlying_field in missing_back_relation_field.underlying_fields.into_iter() {
-                    model_mut.add_field(underlying_field);
+                    if !model_mut.has_field(&underlying_field.name) {
+                        model_mut.add_field(underlying_field);
+                    }
                 }
             }
         }
@@ -168,7 +172,10 @@ impl Standardiser {
         &self,
         model: &dml::Model,
         schema: &dml::Datamodel,
-    ) -> Vec<AddMissingBackRelationField> {
+        schema_ast: &ast::SchemaAst,
+    ) -> Result<Vec<AddMissingBackRelationField>, ErrorCollection> {
+        let mut errors = ErrorCollection::new();
+
         let mut result = Vec::new();
         for field in model.fields() {
             if let dml::FieldType::Relation(rel) = &field.field_type {
@@ -183,9 +190,6 @@ impl Standardiser {
                 }
 
                 if !back_field_exists {
-                    // needs scalar field maybe, add this to the fields vector
-                    // link to id unique criteria of related model
-
                     if field.arity.is_singular() {
                         let relation_info = dml::RelationInfo {
                             to: model.name.clone(),
@@ -209,12 +213,58 @@ impl Standardiser {
                         let unique_criteria_field_names =
                             unique_criteria.fields.iter().map(|f| f.name.to_owned()).collect();
 
-                        let underlying_fields =
-                            self.underlying_fields_for_unique_criteria(&unique_criteria, &model.name);
+                        let underlying_fields: Vec<Field> = self
+                            .underlying_fields_for_unique_criteria(&unique_criteria, &model.name)
+                            .into_iter()
+                            .map(|f| {
+                                // This prevents name conflicts with existing fields on the model
+                                let mut f = f;
+                                if let Some(existing_field) = related_model.find_field(&f.name) {
+                                    if !existing_field.field_type.is_compatible_with(&f.field_type) {
+                                        f.name = format!("{}_{}", &f.name, &rel.name);
+                                    }
+                                }
+                                f
+                            })
+                            .collect();
+
+                        let underlying_field_names = underlying_fields.iter().map(|f| f.name.clone()).collect();
+                        let underlying_fields_to_add = underlying_fields
+                            .into_iter()
+                            .filter_map(|f| {
+                                match related_model.find_field(&f.name) {
+                                    None => {
+                                        // field with name does not exist yet
+                                        Some(f)
+                                    }
+                                    Some(other) if other.field_type.is_compatible_with(&f.field_type) => {
+                                        // field with name exists and its type is compatible. We must not add it since we would have a duplicate.
+                                        None
+                                    }
+                                    _ => {
+                                        // field with name exists and the type is incompatible.
+                                        errors.push(DatamodelError::new_model_validation_error(
+                                            &format!(
+                                                "Automatic underlying field generation tried to add the field `{}` in model `{}` for the back relation field of `{}` in `{}`. A field with that name exists already and has an incompatible type for the relation. Please add the back relation manually.",
+                                                &f.name,
+                                                &related_model.name,
+                                                &field.name,
+                                                &model.name,
+                                            ),
+                                            &related_model.name,
+                                            schema_ast.find_model(&related_model.name)
+                                                .expect(ERROR_GEN_STATE_ERROR)
+                                                .span,
+                                        ));
+                                        None
+                                    }
+                                }
+                            })
+                            .collect();
 
                         let relation_info = dml::RelationInfo {
                             to: model.name.clone(),
-                            fields: underlying_fields.iter().map(|f| f.name.clone()).collect(),
+                            fields: underlying_field_names,
                             to_fields: unique_criteria_field_names,
                             name: rel.name.clone(),
                             on_delete: OnDeleteStrategy::None,
@@ -227,14 +277,18 @@ impl Standardiser {
                             relation_info,
                             related_model: model.name.to_string(),
                             related_field: field.name.to_string(),
-                            underlying_fields,
+                            underlying_fields: underlying_fields_to_add,
                         });
                     };
                 }
             }
         }
 
-        result
+        if errors.has_errors() {
+            Err(errors)
+        } else {
+            Ok(result)
+        }
     }
 
     fn unique_criteria<'a>(&self, model: &'a dml::Model) -> UniqueCriteria<'a> {

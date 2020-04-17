@@ -97,6 +97,10 @@ impl Model {
         self.fields().find(|f| f.name == *name)
     }
 
+    pub fn has_field(&self, name: &str) -> bool {
+        self.find_field(name).is_some()
+    }
+
     /// Finds a field by name and returns a mutable reference.
     pub fn find_field_mut(&mut self, name: &str) -> Option<&mut Field> {
         self.fields_mut().find(|f| f.name == *name)
