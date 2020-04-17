@@ -66,7 +66,6 @@ fn a_data_model_can_be_generated_from_a_schema() {
                         documentation,
                         is_generated: false,
                         is_updated_at: false,
-                        data_source_fields: vec![],
                         is_commented_out,
                     }
                 })
@@ -127,7 +126,6 @@ fn arity_is_preserved_when_generating_data_model_from_a_schema() {
                     documentation: None,
                     is_generated: false,
                     is_updated_at: false,
-                    data_source_fields: vec![],
                     is_commented_out: false,
                 },
                 Field {
@@ -141,7 +139,6 @@ fn arity_is_preserved_when_generating_data_model_from_a_schema() {
                     documentation: None,
                     is_generated: false,
                     is_updated_at: false,
-                    data_source_fields: vec![],
                     is_commented_out: false,
                 },
                 Field {
@@ -155,7 +152,6 @@ fn arity_is_preserved_when_generating_data_model_from_a_schema() {
                     documentation: None,
                     is_generated: false,
                     is_updated_at: false,
-                    data_source_fields: vec![],
                     is_commented_out: false,
                 },
             ],
@@ -237,7 +233,6 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
                     documentation: None,
                     is_generated: false,
                     is_updated_at: false,
-                    data_source_fields: vec![],
                     is_commented_out: false,
                 },
                 Field {
@@ -251,7 +246,6 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
                     documentation: None,
                     is_generated: false,
                     is_updated_at: false,
-                    data_source_fields: vec![],
                     is_commented_out: false,
                 },
                 Field {
@@ -265,7 +259,6 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
                     documentation: None,
                     is_generated: false,
                     is_updated_at: false,
-                    data_source_fields: vec![],
                     is_commented_out: false,
                 },
                 Field {
@@ -279,7 +272,6 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
                     documentation: None,
                     is_generated: false,
                     is_updated_at: false,
-                    data_source_fields: vec![],
                     is_commented_out: false,
                 },
                 Field {
@@ -293,7 +285,6 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
                     documentation: None,
                     is_generated: false,
                     is_updated_at: false,
-                    data_source_fields: vec![],
                     is_commented_out: false,
                 },
             ],
@@ -401,7 +392,6 @@ fn primary_key_is_preserved_when_generating_data_model_from_a_schema() {
                     documentation: None,
                     is_generated: false,
                     is_updated_at: false,
-                    data_source_fields: vec![],
                     is_commented_out: false,
                 }],
                 is_generated: false,
@@ -426,7 +416,6 @@ fn primary_key_is_preserved_when_generating_data_model_from_a_schema() {
                     documentation: None,
                     is_generated: false,
                     is_updated_at: false,
-                    data_source_fields: vec![],
                     is_commented_out: false,
                 }],
                 is_generated: false,
@@ -451,7 +440,6 @@ fn primary_key_is_preserved_when_generating_data_model_from_a_schema() {
                     documentation: None,
                     is_generated: false,
                     is_updated_at: false,
-                    data_source_fields: vec![],
                     is_commented_out: false,
                 }],
                 is_generated: false,
@@ -555,7 +543,6 @@ fn uniqueness_is_preserved_when_generating_data_model_from_a_schema() {
                     documentation: None,
                     is_generated: false,
                     is_updated_at: false,
-                    data_source_fields: vec![],
                     is_commented_out: false,
                 },
                 Field {
@@ -569,7 +556,6 @@ fn uniqueness_is_preserved_when_generating_data_model_from_a_schema() {
                     documentation: None,
                     is_generated: false,
                     is_updated_at: false,
-                    data_source_fields: vec![],
                     is_commented_out: false,
                 },
             ],
@@ -643,7 +629,6 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
                         documentation: None,
                         is_generated: false,
                         is_updated_at: false,
-                        data_source_fields: vec![],
                         is_commented_out: false,
                     },
                     Field {
@@ -657,7 +642,6 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
                         documentation: None,
                         is_generated: false,
                         is_updated_at: false,
-                        data_source_fields: vec![],
                         is_commented_out: false,
                     },
                     Field {
@@ -677,7 +661,6 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
                         documentation: None,
                         is_generated: false,
                         is_updated_at: false,
-                        data_source_fields: vec![],
                         is_commented_out: false,
                     },
                 ],
@@ -703,7 +686,6 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
                         documentation: None,
                         is_generated: false,
                         is_updated_at: false,
-                        data_source_fields: vec![],
                         is_commented_out: false,
                     },
                     Field {
@@ -717,7 +699,6 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
                         documentation: None,
                         is_generated: false,
                         is_updated_at: false,
-                        data_source_fields: vec![],
                         is_commented_out: false,
                     },
                     Field {
@@ -731,7 +712,6 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
                         documentation: None,
                         is_generated: false,
                         is_updated_at: false,
-                        data_source_fields: vec![],
                         is_commented_out: false,
                     },
                     Field {
@@ -751,7 +731,6 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
                         documentation: None,
                         is_generated: false,
                         is_updated_at: false,
-                        data_source_fields: vec![],
                         is_commented_out: false,
                     },
                 ],
@@ -874,7 +853,6 @@ fn multi_field_uniques_are_preserved_when_generating_data_model_from_a_schema() 
                     documentation: None,
                     is_generated: false,
                     is_updated_at: false,
-                    data_source_fields: vec![],
                     is_commented_out: false,
                 },
                 Field {
@@ -888,7 +866,6 @@ fn multi_field_uniques_are_preserved_when_generating_data_model_from_a_schema() 
                     documentation: None,
                     is_generated: false,
                     is_updated_at: false,
-                    data_source_fields: vec![],
                     is_commented_out: false,
                 },
                 Field {
@@ -902,7 +879,6 @@ fn multi_field_uniques_are_preserved_when_generating_data_model_from_a_schema() 
                     documentation: None,
                     is_generated: false,
                     is_updated_at: false,
-                    data_source_fields: vec![],
                     is_commented_out: false,
                 },
             ],
@@ -993,7 +969,6 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                         documentation: None,
                         is_generated: false,
                         is_updated_at: false,
-                        data_source_fields: vec![],
                         is_commented_out: false,
                     },
                     Field {
@@ -1007,7 +982,6 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                         documentation: None,
                         is_generated: false,
                         is_updated_at: false,
-                        data_source_fields: vec![],
                         is_commented_out: false,
                     },
                     Field {
@@ -1027,7 +1001,6 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                         documentation: None,
                         is_generated: false,
                         is_updated_at: false,
-                        data_source_fields: vec![],
                         is_commented_out: false,
                     },
                 ],
@@ -1053,7 +1026,6 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                         documentation: None,
                         is_generated: false,
                         is_updated_at: false,
-                        data_source_fields: vec![],
                         is_commented_out: false,
                     },
                     Field {
@@ -1067,7 +1039,6 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                         documentation: None,
                         is_generated: false,
                         is_updated_at: false,
-                        data_source_fields: vec![],
                         is_commented_out: false,
                     },
                     Field {
@@ -1087,7 +1058,6 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                         documentation: None,
                         is_generated: false,
                         is_updated_at: false,
-                        data_source_fields: vec![],
                         is_commented_out: false,
                     },
                 ],

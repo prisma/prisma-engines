@@ -3,7 +3,7 @@ use datamodel::{
         Datamodel, DefaultValue, Enum, Field, FieldArity, FieldType, IndexDefinition, Model, ScalarType,
         WithDatabaseName,
     },
-    DataSourceField, RelationInfo,
+    RelationInfo,
 };
 
 pub(crate) fn walk_models<'a>(datamodel: &'a Datamodel) -> impl Iterator<Item = ModelRef<'a>> + 'a {
@@ -120,10 +120,6 @@ impl<'a> FieldRef<'a> {
         self.field.final_database_name()
     }
 
-    pub(super) fn data_source_fields(&self) -> &'a [DataSourceField] {
-        &self.field.data_source_fields
-    }
-
     pub(super) fn default_value(&self) -> Option<&'a DefaultValue> {
         self.field.default_value.as_ref()
     }
@@ -229,21 +225,20 @@ impl<'a> RelationFieldRef<'a> {
     }
 
     pub(crate) fn referencing_columns<'b>(&'b self) -> impl Iterator<Item = &'a str> {
-        self.field.data_source_fields().iter().map(|field| field.name.as_str())
+        self.relation_info.fields.iter().map(|field| field.as_str())
+        // self.field.data_source_fields().iter().map(|field| field.name.as_str())
     }
 
     pub(crate) fn referenced_columns<'b>(&'b self) -> impl Iterator<Item = &'a str> + 'b {
-        self.referenced_model()
-            .fields
-            .iter()
-            .filter(move |field| {
-                self.relation_info
-                    .to_fields
-                    .iter()
-                    .any(|to_field| to_field == &field.name)
-            })
-            .flat_map(|field| field.data_source_fields.iter())
-            .map(|sf| sf.name.as_str())
+        self.referenced_model().fields.iter().filter_map(move |field| {
+            self.relation_info
+                .to_fields
+                .iter()
+                .find(|to_field| *to_field == &field.name)
+                .map(|to_field| to_field.as_str())
+        })
+        // .flat_map(|field| field.data_source_fields.iter())
+        // .map(|sf| sf.name.as_str())
     }
 
     pub(crate) fn relation_name(&self) -> &'a str {
