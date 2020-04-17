@@ -49,17 +49,20 @@ async fn adding_a_scalar_field_must_work(api: &TestApi) {
 }
 
 #[test_each_connector]
-async fn adding_an_optional_field_must_work(api: &TestApi) {
+async fn adding_an_optional_field_must_work(api: &TestApi) -> TestResult {
     let dm2 = r#"
         model Test {
             id String @id @default(cuid())
             field String?
         }
     "#;
-    let result = api.infer_and_apply(&dm2).await.sql_schema;
-    let column = result.table_bang("Test").column_bang("field");
-    assert_eq!(column.is_required(), false);
-    assert!(column.default.is_none());
+
+    api.infer_apply(dm2).send().await?.assert_green()?;
+    api.assert_schema().await?.assert_table("Test", |table| {
+        table.assert_column("field", |column| column.assert_default(None)?.assert_is_nullable())
+    })?;
+
+    Ok(())
 }
 
 #[test_each_connector]
@@ -1966,6 +1969,41 @@ async fn switching_databases_must_work(api: &TestApi) -> TestResult {
         model Test {
             id String @id
             name String
+        }
+    "#;
+
+    api.infer_apply(dm2).send().await?.assert_green()?;
+
+    Ok(())
+}
+
+#[test_each_connector(log = "debug")]
+async fn adding_mutual_references_on_existing_tables_works(api: &TestApi) -> TestResult {
+    let dm1 = r#"
+        model A {
+            id Int @id
+        }
+
+        model B {
+            id Int @id
+        }
+    "#;
+
+    api.infer_apply(dm1).send().await?.assert_green()?;
+
+    let dm2 = r#"
+        model A {
+            id Int
+            name String @unique
+            b_email String
+            brel B @relation("AtoB", fields: [b_email], references: [email])
+        }
+
+        model B {
+            id Int
+            email String @unique
+            a_name String
+            arel A @relation("BtoA", fields: [a_name], references: [name])
         }
     "#;
 
