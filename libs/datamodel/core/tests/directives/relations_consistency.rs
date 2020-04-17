@@ -1,4 +1,6 @@
 use crate::common::*;
+use datamodel::ast::Span;
+use datamodel::error::DatamodelError;
 use datamodel::{Field, FieldArity, FieldType};
 use datamodel_connector::scalars::ScalarType;
 
@@ -613,10 +615,35 @@ fn must_handle_conflicts_with_existing_fields_if_types_are_incompatible() {
     let schema = parse(dml);
     let post = schema.assert_has_model("Post");
 
+    dbg!(&post.fields);
+
     let underlying_field = post.find_field("blogId_BlogToPost").unwrap();
     assert!(underlying_field.arity.is_optional());
     assert_eq!(underlying_field.field_type, FieldType::Base(ScalarType::String, None));
 
     let field = post.assert_has_field("blog");
     field.assert_relation_base_fields(&["blogId_BlogToPost"]);
+}
+
+#[test]
+fn must_handle_conflicts_with_existing_fields_if_types_are_incompatible_and_name_generation_breaks_down() {
+    let dml = r#"
+    model Blog {
+      id    String @id
+      posts Post[]
+    }
+    
+    model Post {
+      id                String   @id      
+      blogId            Int?     // this is not compatible with Blog.id
+      blogId_BlogToPost Int?     // clashes with the auto generated name
+    }
+    "#;
+
+    let errors = parse_error(dml);
+    errors.assert_is(DatamodelError::new_model_validation_error(
+        "Automatic underlying field generation tried to add the field `blogId_BlogToPost` in model `Post` for the back relation field of `posts` in `Blog`. A field with that name exists already and has an incompatible type for the relation. Please add the back relation manually.",
+        "Post",
+        Span::new(75,281),
+    ));
 }
