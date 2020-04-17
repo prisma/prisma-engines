@@ -103,6 +103,20 @@ pub fn mysql_8_url(db_name: &str) -> String {
     )
 }
 
+pub fn mysql_5_6_url(db_name: &str) -> String {
+    let (host, port) = db_host_and_port_mysql_5_6();
+
+    // maximum length of identifiers on mysql
+    let db_name = mysql_safe_identifier(db_name);
+
+    format!(
+        "mysql://root:prisma@{host}:{port}/{db_name}?connect_timeout=20&socket_timeout=20",
+        host = host,
+        port = port,
+        db_name = db_name,
+    )
+}
+
 pub fn mariadb_url(db_name: &str) -> String {
     let (host, port) = db_host_and_port_mariadb();
 
@@ -156,6 +170,13 @@ fn db_host_and_port_mysql_8_0() -> (&'static str, usize) {
     match std::env::var("IS_BUILDKITE") {
         Ok(_) => ("test-db-mysql-8-0", 3306),
         Err(_) => ("127.0.0.1", 3307),
+    }
+}
+
+fn db_host_and_port_mysql_5_6() -> (&'static str, usize) {
+    match std::env::var("IS_BUILDKITE") {
+        Ok(_) => ("test-db-mysql-5-6", 3306),
+        Err(_) => ("127.0.0.1", 3309),
     }
 }
 
@@ -261,6 +282,19 @@ pub fn mysql_8_test_config(db_name: &str) -> String {
         }}
     "#,
         mysql_8_url(db_name)
+    )
+}
+
+pub fn mysql_5_6_test_config(db_name: &str) -> String {
+    format!(
+        r#"
+        datasource my_db {{
+            provider = "mysql"
+            url = "{}"
+            default = true
+        }}
+    "#,
+        mysql_5_6_url(db_name)
     )
 }
 

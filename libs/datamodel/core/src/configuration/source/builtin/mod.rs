@@ -2,6 +2,7 @@ mod mysql_source;
 mod mysql_source_definition;
 mod postgres_source;
 mod postgres_source_definition;
+mod shared_validation;
 mod sqlite_source;
 mod sqlite_source_definition;
 

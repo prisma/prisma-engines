@@ -439,6 +439,7 @@ dependencies = [
  "rust_decimal",
  "serde",
  "serde_json",
+ "serial_test",
  "uuid",
 ]
 

@@ -129,6 +129,23 @@ pub async fn mysql_8_test_api(db_name: &str) -> TestApi {
     }
 }
 
+pub async fn mysql_5_6_test_api(db_name: &str) -> TestApi {
+    let url = mysql_5_6_url(db_name);
+    let connection_info = ConnectionInfo::from_url(&url).unwrap();
+
+    let connector = mysql_migration_connector(&url).await;
+    let migration_api = migration_api(connector).await;
+
+    let config = mysql_5_6_test_config(db_name);
+
+    TestApi {
+        connection_info,
+        migration_api,
+        config,
+        is_pgbouncer: false,
+    }
+}
+
 pub async fn mysql_test_api(db_name: &str) -> TestApi {
     let url = mysql_url(db_name);
     let connection_info = ConnectionInfo::from_url(&url).unwrap();
@@ -249,27 +266,25 @@ pub async fn sqlite_test_api(db_name: &str) -> TestApi {
 }
 
 pub(super) async fn mysql_migration_connector(url_str: &str) -> SqlMigrationConnector {
-    match SqlMigrationConnector::new(url_str, "mysql").await {
+    match SqlMigrationConnector::new(url_str).await {
         Ok(c) => c,
         Err(_) => {
             create_mysql_database(&url_str.parse().unwrap()).await.unwrap();
-            SqlMigrationConnector::new(url_str, "mysql").await.unwrap()
+            SqlMigrationConnector::new(url_str).await.unwrap()
         }
     }
 }
 
 pub(super) async fn postgres_migration_connector(url_str: &str) -> SqlMigrationConnector {
-    match SqlMigrationConnector::new(url_str, "postgresql").await {
+    match SqlMigrationConnector::new(url_str).await {
         Ok(c) => c,
         Err(_) => {
             create_postgres_database(&url_str.parse().unwrap()).await.unwrap();
-            SqlMigrationConnector::new(url_str, "postgresql").await.unwrap()
+            SqlMigrationConnector::new(url_str).await.unwrap()
         }
     }
 }
 
 pub(super) async fn sqlite_migration_connector(db_name: &str) -> SqlMigrationConnector {
-    SqlMigrationConnector::new(&sqlite_test_url(db_name), "sqlite")
-        .await
-        .unwrap()
+    SqlMigrationConnector::new(&sqlite_test_url(db_name)).await.unwrap()
 }

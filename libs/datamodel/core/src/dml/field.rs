@@ -58,6 +58,13 @@ impl FieldType {
             _ => false,
         }
     }
+
+    pub fn is_compatible_with(&self, other: &Self) -> bool {
+        match (self, other) {
+            (Self::Base(a, _), Self::Base(b, _)) => a == b, // the name of the type alias is not important for the comparison
+            (a, b) => a == b,
+        }
+    }
 }
 
 /// Represents a field in a model.

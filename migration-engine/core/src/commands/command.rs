@@ -84,7 +84,7 @@ mod tests {
 
         assert_eq!(
             err.to_string(),
-            "The migration produced an invalid schema.\nDatamodel error in schema that could not be rendered. Type \"Post\" is neither a built-in type, nor refers to another model, custom type, or enum. (span: Span { start: 76, end: 82 })\n"
+            "The migration produced an invalid schema.\nDatamodel error in schema that could not be rendered. Type \"Post\" is neither a built-in type, nor refers to another model, custom type, or enum."
         )
     }
 }

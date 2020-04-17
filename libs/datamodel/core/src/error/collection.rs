@@ -62,11 +62,8 @@ impl ErrorCollection {
 
 impl std::fmt::Display for ErrorCollection {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        for error in &self.errors {
-            writeln!(f, "{} (span: {:?})", error, error.span())?;
-        }
-
-        Ok(())
+        let msg: Vec<String> = self.errors.iter().map(|e| format!("{}", e)).collect();
+        f.write_str(&msg.join("\n"))
     }
 }
 

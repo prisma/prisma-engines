@@ -50,24 +50,46 @@ impl SourceLoader {
     }
 
     /// Internal: Loads a single source from a source config block in the datamodel.
-    pub fn load_source(
+    fn load_source(
         &self,
         ast_source: &ast::SourceConfig,
         ignore_env_var_errors: bool,
     ) -> Result<Option<Box<dyn Source + Send + Sync>>, DatamodelError> {
+        let source_name = &ast_source.name.name;
         let mut args = Arguments::new(&ast_source.properties, ast_source.span);
-        let (env_var_for_url, url) = match args.arg("url")?.as_str_from_env() {
-            Ok((env_var, url)) => (env_var, url),
-            Err(_) if ignore_env_var_errors => (None, "dummy://url".to_owned()), // the flag is only used by the vs code plugin
-            Err(err) => return Err(err),
-        };
+
         let provider_arg = args.arg("provider")?;
         let provider = provider_arg.as_str()?;
 
+        let url_args = args.arg("url")?;
+        let (env_var_for_url, url) = match url_args.as_str_from_env() {
+            Ok((env_var, url)) => (env_var, url.trim().to_owned()),
+            Err(_) if ignore_env_var_errors => (None, format!("{}://", provider)), // glorious hack. ask marcus
+            Err(err) => return Err(err),
+        };
         if provider_arg.is_from_env() {
             return Err(DatamodelError::new_functional_evaluation_error(
                 &format!("A datasource must not use the env() function in the provider argument."),
                 ast_source.span,
+            ));
+        }
+
+        if url.is_empty() {
+            let suffix = match &env_var_for_url {
+                Some(env_var_name) => format!(
+                    " The environment variable `{}` resolved to an empty string.",
+                    env_var_name
+                ),
+                None => "".to_owned(),
+            };
+            let msg = format!(
+                "You must provide a nonempty URL for the datasource `{}`.{}",
+                source_name, &suffix
+            );
+            return Err(DatamodelError::new_source_validation_error(
+                &msg,
+                source_name,
+                url_args.span(),
             ));
         }
 
@@ -76,15 +98,20 @@ impl SourceLoader {
             // TODO: The second condition is a fallback to mitigate the postgres -> postgresql rename. It should be
             // renamed at some point.
             if provider == decl.connector_type() || (decl.connector_type() == "postgresql" && provider == "postgres") {
-                return Ok(Some(decl.create(
-                    // The name in front of the block is the name of the concrete instantiation.
-                    &ast_source.name.name,
-                    StringFromEnvVar {
-                        from_env_var: env_var_for_url,
-                        value: url,
-                    },
-                    &ast_source.documentation.clone().map(|comment| comment.text),
-                )?));
+                let source = decl
+                    .create(
+                        source_name,
+                        StringFromEnvVar {
+                            from_env_var: env_var_for_url,
+                            value: url,
+                        },
+                        &ast_source.documentation.clone().map(|comment| comment.text),
+                    )
+                    .map_err(|err_msg| {
+                        DatamodelError::new_source_validation_error(&err_msg, source_name, url_args.span())
+                    });
+
+                return Ok(Some(source?));
             }
         }
 

@@ -25,11 +25,11 @@ impl DirectiveValidator<dml::Field> for RelationDirectiveValidator {
             }
 
             if let Ok(related_fields) = args.arg("references") {
-                relation_info.to_fields = related_fields.as_array()?.to_literal_vec()?;
+                relation_info.to_fields = related_fields.as_array().to_literal_vec()?;
             }
 
             if let Ok(base_fields) = args.arg("fields") {
-                relation_info.fields = base_fields.as_array()?.to_literal_vec()?;
+                relation_info.fields = base_fields.as_array().to_literal_vec()?;
             }
 
             // TODO: bring `onDelete` back once `prisma migrate` is a thing

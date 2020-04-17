@@ -245,6 +245,19 @@ pub async fn mysql_8_test_api(db_name: &str) -> TestApi {
     }
 }
 
+pub async fn mysql_5_6_test_api(db_name: &str) -> TestApi {
+    let url = mysql_5_6_url(db_name);
+    let connection_info = ConnectionInfo::from_url(&url).unwrap();
+    let connector = mysql_migration_connector(&url).await;
+
+    TestApi {
+        connector_name: "mysql_5_6",
+        connection_info,
+        database: Arc::clone(&connector.database),
+        api: test_api(connector).await,
+    }
+}
+
 pub async fn mysql_test_api(db_name: &str) -> TestApi {
     let url = mysql_url(db_name);
     let connection_info = ConnectionInfo::from_url(&url).unwrap();
