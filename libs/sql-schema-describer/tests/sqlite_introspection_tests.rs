@@ -17,6 +17,7 @@ async fn sqlite_column_types_must_work() {
         t.add_column("text_col", types::text());
         t.add_column("real_col", types::float());
         t.add_column("primary_col", types::primary());
+        t.inject_custom("decimal_col decimal (5, 3) not null");
     });
 
     let full_sql = migration.make::<barrel::backend::Sqlite>();
@@ -73,6 +74,16 @@ async fn sqlite_column_types_must_work() {
             },
             default: None,
             auto_increment: true,
+        },
+        Column {
+            name: "decimal_col".to_string(),
+            tpe: ColumnType {
+                raw: "decimal (5, 3)".to_string(),
+                family: ColumnTypeFamily::Float,
+                arity: ColumnArity::Required,
+            },
+            default: None,
+            auto_increment: false,
         },
     ];
     expected_columns.sort_unstable_by_key(|c| c.name.to_owned());
