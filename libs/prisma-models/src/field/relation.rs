@@ -166,7 +166,7 @@ impl RelationField {
             .expect("Model does not exist anymore. Parent model got deleted without deleting the child.")
     }
 
-    pub fn fields(&self) -> Vec<ScalarFieldRef> {
+    pub fn scalar_fields(&self) -> Vec<ScalarFieldRef> {
         let fields = self.fields.get_or_init(|| {
             let model = self.model();
             let fields = model.fields();
@@ -244,10 +244,13 @@ impl RelationField {
     }
 
     pub fn type_identifiers_with_arities(&self) -> Vec<(TypeIdentifier, FieldArity)> {
-        self.fields().iter().map(|f| f.type_identifier_with_arity()).collect()
+        self.scalar_fields()
+            .iter()
+            .map(|f| f.type_identifier_with_arity())
+            .collect()
     }
 
     pub fn db_names(&self) -> impl Iterator<Item = String> {
-        self.fields().into_iter().map(|f| f.db_name().to_owned())
+        self.scalar_fields().into_iter().map(|f| f.db_name().to_owned())
     }
 }

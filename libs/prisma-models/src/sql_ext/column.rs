@@ -102,7 +102,7 @@ impl AsColumns for RelationField {
         };
 
         let inner: Vec<_> = self
-            .fields()
+            .scalar_fields()
             .iter()
             .map(|f| {
                 let parts = (

@@ -128,7 +128,7 @@ impl Field {
     pub fn scalar_fields(&self) -> Vec<ScalarFieldRef> {
         match self {
             Self::Scalar(sf) => vec![sf.clone()],
-            Self::Relation(rf) => rf.fields(),
+            Self::Relation(rf) => rf.scalar_fields(),
         }
     }
 

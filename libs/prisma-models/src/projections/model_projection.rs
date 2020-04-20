@@ -59,7 +59,7 @@ impl ModelProjection {
             .iter()
             .flat_map(|field| match field {
                 Field::Scalar(sf) => vec![sf.clone()],
-                Field::Relation(rf) => rf.fields(),
+                Field::Relation(rf) => rf.scalar_fields(),
             })
             .into_iter()
             .unique_by(|field| field.name.clone())
@@ -68,7 +68,7 @@ impl ModelProjection {
     pub fn map_db_name(&self, name: &str) -> Option<ScalarFieldRef> {
         self.fields().find_map(|field| match field {
             Field::Scalar(sf) if sf.db_name() == name => Some(sf.clone()),
-            Field::Relation(rf) => rf.fields().into_iter().find(|f| f.db_name() == name),
+            Field::Relation(rf) => rf.scalar_fields().into_iter().find(|f| f.db_name() == name),
             _ => None,
         })
     }

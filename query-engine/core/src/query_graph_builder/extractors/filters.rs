@@ -220,13 +220,13 @@ fn handle_relation_field_selector(
 ) -> QueryGraphBuilderResult<Filter> {
     match value {
         ParsedInputValue::Single(pv) => {
-            let field = field.fields().first().unwrap().clone();
+            let field = field.scalar_fields().first().unwrap().clone();
             Ok(field.equals(pv))
         }
 
         ParsedInputValue::Map(mut map) => {
             let filters = field
-                .fields()
+                .scalar_fields()
                 .into_iter()
                 .map(|field| {
                     let value: PrismaValue = map.remove(field.db_name()).unwrap().try_into()?;
