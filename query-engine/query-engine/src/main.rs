@@ -1,5 +1,5 @@
 #[macro_use]
-extern crate log;
+extern crate tracing;
 #[macro_use]
 extern crate rust_embed;
 
