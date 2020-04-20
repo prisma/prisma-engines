@@ -398,6 +398,7 @@ fn get_column_type(tpe: &str, arity: ColumnArity) -> ColumnType {
         "text" => ColumnTypeFamily::String,
         s if s.contains("char") => ColumnTypeFamily::String,
         s if s.contains("numeric") => ColumnTypeFamily::Float,
+        s if s.contains("decimal") => ColumnTypeFamily::Float,
         "date" => ColumnTypeFamily::DateTime,
         "datetime" => ColumnTypeFamily::DateTime,
         "timestamp" => ColumnTypeFamily::DateTime,
