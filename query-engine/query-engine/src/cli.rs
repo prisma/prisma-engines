@@ -63,8 +63,8 @@ impl TryFrom<&PrismaOpt> for CliCommand {
                         enable_raw_queries: opts.enable_raw_queries,
                     }))
                 }
-                CliOpt::GetConfig => Ok(CliCommand::GetConfig(GetConfigRequest {
-                    config: opts.configuration(true)?,
+                CliOpt::GetConfig(input) => Ok(CliCommand::GetConfig(GetConfigRequest {
+                    config: opts.configuration(input.ignore_env_var_errors)?,
                 })),
                 CliOpt::ExecuteRequest(input) => Ok(CliCommand::ExecuteRequest(ExecuteRequest {
                     query: input.query.clone(),
