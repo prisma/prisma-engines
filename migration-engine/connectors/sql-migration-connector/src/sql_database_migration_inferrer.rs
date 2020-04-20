@@ -146,14 +146,19 @@ fn fix_id_column_type_change(
 
     // TODO: There's probably a much more graceful way to handle this. But this would also involve a lot of data loss probably. Let's tackle that after P Day
     if has_id_type_change {
-        let mut radical_steps = Vec::new();
         let tables_to_drop: Vec<String> = from
             .tables
             .iter()
             .filter(|t| t.name != MIGRATION_TABLE_NAME)
             .map(|t| t.name.clone())
             .collect();
-        radical_steps.push(SqlMigrationStep::DropTables(DropTables { names: tables_to_drop }));
+        let mut radical_steps = Vec::with_capacity(tables_to_drop.len());
+        radical_steps.extend(
+            tables_to_drop
+                .into_iter()
+                .map(|name| DropTable { name })
+                .map(SqlMigrationStep::DropTable),
+        );
         let diff_from_empty: SqlSchemaDiff = SqlSchemaDiffer::diff(&SqlSchema::empty(), &to, sql_family);
         let mut steps_from_empty = diff_from_empty.into_steps();
         radical_steps.append(&mut steps_from_empty);
