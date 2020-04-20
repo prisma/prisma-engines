@@ -40,6 +40,7 @@ pub enum SqlMigrationStep {
     CreateTable(CreateTable),
     AlterTable(AlterTable),
     DropTable(DropTable),
+    // TODO: remove this variant on next migration format breaking change.
     DropTables(DropTables),
     RenameTable { name: String, new_name: String },
     RawSql { raw: String },
