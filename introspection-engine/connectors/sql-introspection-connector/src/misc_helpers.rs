@@ -2,10 +2,10 @@ use datamodel::{
     Datamodel, DefaultValue as DMLDef, Field, FieldArity, FieldType, IndexDefinition, Model, OnDeleteStrategy,
     RelationInfo, ScalarType, ValueGenerator as VG,
 };
-use log::debug;
 use sql_schema_describer::{
     Column, ColumnArity, ColumnTypeFamily, DefaultValue as SQLDef, ForeignKey, Index, IndexType, SqlSchema, Table,
 };
+use tracing::debug;
 
 //checks
 
