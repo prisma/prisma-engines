@@ -25,12 +25,19 @@ pub struct ExecuteRequestInput {
     pub legacy: bool,
 }
 
+#[derive(Debug, Clone, StructOpt)]
+#[structopt(rename_all = "camelCase")]
+pub struct GetConfigInput {
+    #[structopt(long)]
+    pub ignore_env_var_errors: bool,
+}
+
 #[derive(Debug, StructOpt, Clone)]
 pub enum CliOpt {
     /// Output the DMMF from the loaded data model.
     Dmmf,
     /// Get the configuration from the given data model.
-    GetConfig,
+    GetConfig(GetConfigInput),
     /// Executes one request and then terminates.
     ExecuteRequest(ExecuteRequestInput),
 }
