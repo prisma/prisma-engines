@@ -427,7 +427,6 @@ name = "datamodel"
 version = "0.1.0"
 dependencies = [
  "chrono",
- "clap",
  "colored",
  "cuid",
  "datamodel-connector",
@@ -1909,7 +1908,6 @@ name = "prisma-value"
 version = "0.1.0"
 dependencies = [
  "chrono",
- "log",
  "once_cell",
  "quaint",
  "regex",
@@ -2013,8 +2011,6 @@ dependencies = [
  "thiserror",
  "tokio",
  "tokio-postgres",
- "tracing",
- "tracing-core",
  "url 2.1.1",
  "uuid",
 ]
@@ -2049,7 +2045,6 @@ dependencies = [
  "im",
  "indexmap",
  "itertools",
- "log",
  "once_cell",
  "petgraph",
  "prisma-inflector",
@@ -2059,6 +2054,7 @@ dependencies = [
  "rust_decimal",
  "serde",
  "serde_json",
+ "tracing",
  "user-facing-errors",
  "uuid",
 ]
@@ -2080,7 +2076,6 @@ dependencies = [
  "indoc",
  "introspection-core",
  "itertools",
- "log",
  "migration-connector",
  "migration-core",
  "once_cell",
@@ -2105,7 +2100,6 @@ dependencies = [
  "tracing",
  "tracing-attributes",
  "tracing-futures",
- "tracing-log",
  "tracing-subscriber",
  "url 2.1.1",
  "user-facing-errors",
@@ -2505,7 +2499,6 @@ dependencies = [
  "barrel",
  "datamodel",
  "introspection-connector",
- "log",
  "once_cell",
  "pretty_assertions",
  "prisma-value",
@@ -2558,7 +2551,6 @@ dependencies = [
  "failure",
  "futures 0.3.4",
  "itertools",
- "log",
  "prisma-models",
  "prisma-value",
  "quaint",
@@ -2581,7 +2573,6 @@ dependencies = [
  "chrono",
  "failure",
  "futures 0.3.4",
- "log",
  "once_cell",
  "pretty_assertions",
  "prisma-value",
@@ -2593,6 +2584,7 @@ dependencies = [
  "test-macros",
  "test-setup",
  "tokio",
+ "tracing",
 ]
 
 [[package]]
@@ -3134,10 +3126,10 @@ name = "user-facing-errors"
 version = "0.1.0"
 dependencies = [
  "backtrace",
- "log",
  "quaint",
  "serde",
  "serde_json",
+ "tracing",
  "user-facing-error-macros",
 ]
 

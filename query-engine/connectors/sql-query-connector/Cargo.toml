@@ -10,7 +10,6 @@ serde_json = "1.0"
 uuid = "0.8"
 failure = "0.1"
 rand = "0.7"
-log = "0.4"
 async-trait = "0.1"
 futures = "0.3"
 rust_decimal = "=1.1.0"
@@ -18,7 +17,7 @@ tokio = "0.2"
 
 [dependencies.quaint]
 git = "https://github.com/prisma/quaint"
-features = ["full", "tracing-log"]
+features = ["full"]
 
 [dependencies.connector-interface]
 path = "../query-connector"

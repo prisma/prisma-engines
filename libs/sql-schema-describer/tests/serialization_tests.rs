@@ -2,7 +2,6 @@
 #![allow(unused)]
 
 use barrel::{types, Migration};
-use log::{debug, LevelFilter};
 use pretty_assertions::assert_eq;
 use prisma_value::PrismaValue;
 use quaint::connector::{Queryable, Sqlite as SqliteDatabaseClient};
@@ -13,6 +12,7 @@ use std::path::Path;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};
 use std::{thread, time};
+use tracing::debug;
 
 const SCHEMA: &str = "DatabaseInspectorTest";
 

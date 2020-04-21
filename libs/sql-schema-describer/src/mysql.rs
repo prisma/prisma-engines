@@ -1,8 +1,8 @@
 use super::*;
-use log::debug;
 use quaint::prelude::Queryable;
 use std::collections::{BTreeMap, HashMap};
 use std::sync::Arc;
+use tracing::debug;
 
 pub struct SqlSchemaDescriber {
     conn: Arc<dyn Queryable + Send + Sync + 'static>,

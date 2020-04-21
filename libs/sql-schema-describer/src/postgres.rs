@@ -1,11 +1,11 @@
 //! Postgres description.
 use super::*;
-use log::debug;
 use quaint::prelude::Queryable;
 use regex::Regex;
 use std::collections::HashMap;
 use std::convert::TryInto;
 use std::sync::Arc;
+use tracing::debug;
 
 pub struct SqlSchemaDescriber {
     conn: Arc<dyn Queryable + Send + Sync + 'static>,
