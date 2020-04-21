@@ -2012,6 +2012,8 @@ dependencies = [
  "thiserror",
  "tokio",
  "tokio-postgres",
+ "tracing",
+ "tracing-core",
  "url 2.1.1",
  "uuid",
 ]

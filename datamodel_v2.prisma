@@ -4,99 +4,106 @@ datasource chinook {
 }
 
 model Album {
-  id Int @id @map(name:"AlbumId")
-  Title String @default("TestDefaultTitle")
-  Artist Artist @map(name:"ArtistId")
-  Tracks Track[]
+  id       Int     @id @map(name: "AlbumId")
+  Title    String  @default("TestDefaultTitle")
+  ArtistId Int
+  Tracks   Track[]
+  Artist   Artist  @relation(fields: [ArtistId], references: [id])
 }
 
 model Track {
-  id Int @id @map(name:"TrackId")
-  Name String
-  Album Album? @map(name: "AlbumId")
-  AlbumId Int?
-  Mediamodel Mediamodel @map(name: "MediamodelId")
-  Genre Genre? @map(name: "GenreId")
-  Composer String?
+  id           Int @id       @map(name:"TrackId")
+  Name         String
+  Composer     String?
   Milliseconds Int
-  UnitPrice Float
+  UnitPrice    Float
+  AlbumId      Int?
+  GenreId      Int?
+  MediaTypeId  Int
+  MediaType    MediaType     @relation(fields: [MediaTypeId], references: [id])
+  Genre        Genre?        @relation(fields: [GenreId], references: [id])
+  Album        Album?        @relation(fields: [AlbumId], references: [id])
   InvoiceLines InvoiceLine[]
 }
 
-model Mediamodel {
-  id Int @id @map(name:"MediamodelId")
+model MediaType {
+  id   Int     @id @map(name:"MediaTypeId")
   Name String?
 }
 
 model Genre {
-  id Int @id @map(name:"GenreId")
-  Name String?
+  id     Int     @id @map(name:"GenreId")
+  Name   String?
   Tracks Track[]
 }
 
 model Artist {
-  id Int @id @map(name:"ArtistId")
-  Name String?
+  id     Int     @id @map(name:"ArtistId")
+  Name   String?
   Albums Album[]
 }
 
 model Customer {
-  id Int @id @map(name:"CustomerId")
-  FirstName String
-  LastName String
-  Company String?
-  Address String?
-  City String?
-  State String?
-  Country String?
-  PostalCode String?
-  Phone String?
-  Fax String?
-  Email String
-  SupportRep Employee? @map(name: "SupportRepId")
-  Invoices Invoice[]
+  id           Int       @id @map(name:"CustomerId")
+  FirstName    String
+  LastName     String
+  Company      String?
+  Address      String?
+  City         String?
+  State        String?
+  Country      String?
+  PostalCode   String?
+  Phone        String?
+  Fax          String?
+  Email        String
+  SupportRepId Int?
+  SupportRep   Employee? @relation(fields: [SupportRepId], references: [id])
+  Invoices     Invoice[]
 }
 
 model Employee {
-  id Int @id @map(name:"EmployeeId")
-  FirstName String
-  LastName String
-  Title String?
-  BirthDate DateTime?
-  HireDate DateTime?
-  Address String?
-  City String?
-  State String?
-  Country String?
+  id         Int       @id @map(name:"EmployeeId")
+  FirstName  String
+  LastName   String
+  Title      String?
+  BirthDate  DateTime?
+  HireDate   DateTime?
+  Address    String?
+  City       String?
+  State      String?
+  Country    String?
   PostalCode String?
-  Phone String?
-  Fax String?
-  Email String?
-  Customers Customer[]
+  Phone      String?
+  Fax        String?
+  Email      String?
+  Customers  Customer[]
 }
 
 model Invoice {
-  id Int @id @map(name:"InvoiceId")
-  Customer Customer @map(name: "CustomerId")
-  InvoiceDate DateTime
-  BillingAddress String?
-  BillingCity String?
-  BillingState String?
-  BillingCountry String?
+  id                Int           @id @map(name:"InvoiceId")
+  InvoiceDate       DateTime
+  BillingAddress    String?
+  BillingCity       String?
+  BillingState      String?
+  BillingCountry    String?
   BillingPostalCode String?
-  Total Float
-  Lines InvoiceLine[]
+  Total             Float
+  CustomerId        Int
+  Customer          Customer      @relation(fields: [CustomerId], references: [id])
+  Lines             InvoiceLine[]
 }
 
 model InvoiceLine {
-  id Int @id @map(name:"InvoiceLineId")
-  Invoice Invoice @map(name: "InvoiceId")
-  Track Track @map(name: "TrackId")
+  id        Int     @id @map(name:"InvoiceLineId")
   UnitPrice Float
-  Quantity Int
+  Quantity  Int
+  InvoiceId Int
+  TrackId   Int
+  Invoice   Invoice @relation(fields: [InvoiceId], references: [id])
+  Track     Track   @relation(fields: [TrackId], references: [id])
 }
 
 model Playlist {
-  id Int @id @map(name:"PlaylistId")
+  id   Int     @id @map(name:"PlaylistId")
   Name String?
 }
