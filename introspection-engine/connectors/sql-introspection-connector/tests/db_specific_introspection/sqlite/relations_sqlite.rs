@@ -37,6 +37,40 @@ async fn introspecting_a_one_to_one_req_relation_should_work(api: &TestApi) {
 }
 
 #[test_each_connector(tags("sqlite"))]
+async fn introspecting_a_one_to_one_req_relation_using_shortened_syntax_should_work(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::primary());
+            });
+            migration.create_table("Post", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom(
+                    "user_id INTEGER NOT NULL UNIQUE,
+                        FOREIGN KEY(user_id) REFERENCES User",
+                )
+            });
+        })
+        .await;
+
+    let dm = r#"
+            model User {
+               id        Int @id @default(autoincrement())
+               Post      Post?
+            }
+
+            model Post {
+               id       Int @id @default(autoincrement())
+               user_id  Int  @unique
+               User     User @relation(fields: [user_id], references: [id])
+            }
+        "#;
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+}
+
+#[test_each_connector(tags("sqlite"))]
 async fn introspecting_two_one_to_one_relations_between_the_same_models_should_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel

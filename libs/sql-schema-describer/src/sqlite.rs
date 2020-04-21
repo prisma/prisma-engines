@@ -36,6 +36,22 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
             tables.push(self.get_table(schema, table_name).await)
         }
 
+        //sqlite allows foreign key definitions without specifying the referenced columns, it then assumes the pk is used
+        let mut foreign_keys_without_referenced_columns = vec![];
+        for (table_index, table) in tables.iter().enumerate() {
+            for (fk_index, foreign_key) in table.foreign_keys.iter().enumerate() {
+                if foreign_key.referenced_columns.is_empty() {
+                    let referenced_table = tables.iter().find(|t| t.name == foreign_key.referenced_table).unwrap();
+                    let referenced_pk = referenced_table.primary_key.as_ref().unwrap();
+                    foreign_keys_without_referenced_columns.push((table_index, fk_index, referenced_pk.columns.clone()))
+                }
+            }
+        }
+
+        for (table_index, fk_index, columns) in foreign_keys_without_referenced_columns {
+            tables[table_index].foreign_keys[fk_index].referenced_columns = columns
+        }
+
         Ok(SqlSchema {
             // There's no enum type in SQLite.
             enums: vec![],
@@ -262,18 +278,24 @@ impl SqlSchemaDescriber {
             let id = row.get("id").and_then(|x| x.as_i64()).expect("id");
             let seq = row.get("seq").and_then(|x| x.as_i64()).expect("seq");
             let column = row.get("from").and_then(|x| x.to_string()).expect("from");
-            let referenced_column = row.get("to").and_then(|x| x.to_string()).expect("to");
+            // this can be null if the primary key and shortened fk syntax was used
+            let referenced_column = row.get("to").and_then(|x| x.to_string());
             let referenced_table = row.get("table").and_then(|x| x.to_string()).expect("table");
             match intermediate_fks.get_mut(&id) {
                 Some(fk) => {
                     fk.columns.insert(seq, column);
-                    fk.referenced_columns.insert(seq, referenced_column);
+                    if let Some(column) = referenced_column {
+                        fk.referenced_columns.insert(seq, column);
+                    };
                 }
                 None => {
                     let mut columns: HashMap<i64, String> = HashMap::new();
                     columns.insert(seq, column);
                     let mut referenced_columns: HashMap<i64, String> = HashMap::new();
-                    referenced_columns.insert(seq, referenced_column);
+
+                    if let Some(column) = referenced_column {
+                        referenced_columns.insert(seq, column);
+                    };
                     let on_delete_action = match row
                         .get("on_delete")
                         .and_then(|x| x.to_string())
