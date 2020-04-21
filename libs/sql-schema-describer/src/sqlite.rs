@@ -1,10 +1,10 @@
 //! SQLite description.
 use super::*;
 use failure::_core::convert::TryInto;
-use log::debug;
 use quaint::{ast::ParameterizedValue, prelude::Queryable};
 use std::collections::HashMap;
 use std::sync::Arc;
+use tracing::debug;
 
 pub struct SqlSchemaDescriber {
     conn: Arc<dyn Queryable + Send + Sync + 'static>,
@@ -398,6 +398,7 @@ fn get_column_type(tpe: &str, arity: ColumnArity) -> ColumnType {
         "text" => ColumnTypeFamily::String,
         s if s.contains("char") => ColumnTypeFamily::String,
         s if s.contains("numeric") => ColumnTypeFamily::Float,
+        s if s.contains("decimal") => ColumnTypeFamily::Float,
         "date" => ColumnTypeFamily::DateTime,
         "datetime" => ColumnTypeFamily::DateTime,
         "timestamp" => ColumnTypeFamily::DateTime,

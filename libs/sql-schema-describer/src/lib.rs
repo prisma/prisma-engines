@@ -1,13 +1,13 @@
 //! Database description.
 
 use failure::Fail;
-use log::debug;
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
 use regex::Regex;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use std::{fmt, str::FromStr};
+use tracing::debug;
 
 pub mod mysql;
 pub mod postgres;

@@ -1,5 +1,5 @@
 #[macro_use]
-extern crate log;
+extern crate tracing;
 #[macro_use]
 extern crate rust_embed;
 
@@ -12,7 +12,6 @@ use server::{HttpServer, HttpServerBuilder};
 use std::{convert::TryFrom, error::Error, net::SocketAddr, process};
 use structopt::StructOpt;
 use tracing::subscriber;
-use tracing_log::LogTracer;
 use tracing_subscriber::{EnvFilter, FmtSubscriber};
 
 mod cli;
@@ -102,8 +101,6 @@ async fn main() -> Result<(), AnyError> {
 }
 
 fn init_logger() -> Result<(), AnyError> {
-    LogTracer::init()?;
-
     match *LOG_FORMAT {
         LogFormat::Text => {
             let subscriber = FmtSubscriber::builder()

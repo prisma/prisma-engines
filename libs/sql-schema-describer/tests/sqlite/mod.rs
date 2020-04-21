@@ -1,10 +1,10 @@
 #![allow(unused)]
 
-use log::debug;
 use quaint::{prelude::*, single::Quaint};
 use sql_schema_describer::*;
 use std::path::Path;
 use std::sync::Arc;
+use tracing::debug;
 
 use super::SCHEMA;
 

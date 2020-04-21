@@ -11,7 +11,7 @@ user-facing-error-macros = { path = "../user-facing-error-macros" }
 serde_json = "1.0.41"
 serde = { version = "1.0.102", features = ["derive"] }
 backtrace = "0.3.40"
-log = "0.4.8"
+tracing = "0.1"
 quaint = { git = "https://github.com/prisma/quaint", features = ["mysql", "postgresql", "sqlite"], optional = true }
 
 [features]
