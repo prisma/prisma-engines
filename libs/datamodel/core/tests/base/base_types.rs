@@ -7,10 +7,10 @@ use datamodel::{common::ScalarType, dml};
 fn parse_scalar_types() {
     let dml = r#"
     model User {
-        id Int @id
-        firstName String
-        age Int
-        isPro Boolean
+        id           Int    @id
+        firstName    String
+        age          Int
+        isPro        Boolean
         averageGrade Float
     }
     "#;
@@ -148,4 +148,42 @@ fn scalar_list_types_are_not_supported_by_mysql() {
         1,
         DatamodelError::new_scalar_list_fields_are_not_supported("Post", "enums", Span::new(204, 219)),
     );
+}
+
+#[test]
+fn json_type_must_work_for_some_connectors() {
+    let dml = r#"
+    model User {
+        id   Int    @id
+        json JSON
+    }
+    "#;
+
+    // empty connector does not support it
+    parse_error(dml).assert_is(DatamodelError::new_field_validation_error(
+        "Field `json` in model `User` can\'t be of type JSON. The current connector does not support the JSON type.",
+        "User",
+        "json",
+        Span::new(50, 59),
+    ));
+
+    // SQLite does not support it
+    parse_error(&format!("{}\n{}", SQLITE_SOURCE, dml)).assert_is(DatamodelError::new_field_validation_error(
+        "Field `json` in model `User` can\'t be of type JSON. The current connector does not support the JSON type.",
+        "User",
+        "json",
+        Span::new(139, 148),
+    ));
+
+    // Postgres does support it
+    parse(&format!("{}\n{}", POSTGRES_SOURCE, dml))
+        .assert_has_model("User")
+        .assert_has_field("json")
+        .assert_base_type(&ScalarType::JSON);
+
+    // MySQL does support it
+    parse(&format!("{}\n{}", MYSQL_SOURCE, dml))
+        .assert_has_model("User")
+        .assert_has_field("json")
+        .assert_base_type(&ScalarType::JSON);
 }

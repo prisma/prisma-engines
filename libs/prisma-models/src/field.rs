@@ -169,6 +169,7 @@ impl From<ScalarType> for TypeIdentifier {
             ScalarType::Float => Self::Float,
             ScalarType::Boolean => Self::Boolean,
             ScalarType::DateTime => Self::DateTime,
+            ScalarType::JSON => Self::Json,
         }
     }
 }

@@ -420,6 +420,7 @@ impl DatamodelFieldExtensions for dml::Field {
                 dml::ScalarType::Float => TypeIdentifier::Float,
                 dml::ScalarType::Int => TypeIdentifier::Int,
                 dml::ScalarType::String => TypeIdentifier::String,
+                dml::ScalarType::JSON => TypeIdentifier::Json,
             },
             dml::FieldType::Unsupported(_) => panic!("These should always be commented out"),
             dml::FieldType::ConnectorSpecific { .. } => {
