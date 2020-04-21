@@ -153,6 +153,11 @@ pub fn render_quaint_error(kind: &ErrorKind, connection_info: &ConnectionInfo) -
         })
         .ok(),
 
+        (ErrorKind::ValueOutOfRange { message }, _connection_info) => KnownError::new(query_engine::ValueOutOfRange {
+            details: message.clone(),
+        })
+        .ok(),
+
         _ => None,
     }
 }

@@ -666,3 +666,160 @@ async fn timestamp_columns_can_be_optional(api: &TestApi) -> TestResult {
 
     Ok(())
 }
+
+#[test_each_connector(tags("mysql"))]
+async fn unsigned_big_integers_are_handled(api: &TestApi) -> TestResult {
+    let create_table = indoc! {
+        r##"
+        CREATE TABLE `unsigned_bigints` (
+            id SERIAL PRIMARY KEY,
+            very_large BIGINT UNSIGNED
+        );
+        "##
+    };
+
+    api.execute_sql(create_table).await?;
+
+    api.execute_sql(
+        "INSERT INTO `unsigned_bigints` (`very_large`) VALUES (18446744073709551614)
+    ",
+    )
+    .await?;
+
+    let (_datamodel, engine) = api.introspect_and_start_query_engine().await?;
+
+    let query = r#"
+        query {
+            findManyunsigned_bigints {
+                id
+                very_large
+            }
+        }
+    "#;
+
+    let response = engine.request(query).await;
+
+    let expected_message = "Value out of range for the type. Unsigned integers larger than 9_223_372_036_854_775_807 are currently not handled.";
+    let expected_code = "P2020";
+
+    assert_eq!(response["errors"][0]["user_facing_error"]["message"], expected_message);
+    assert_eq!(response["errors"][0]["user_facing_error"]["error_code"], expected_code);
+
+    Ok(())
+}
+
+#[test_each_connector(tags("mysql"))]
+async fn unsigned_integers_out_of_range_errors_are_handled(api: &TestApi) -> TestResult {
+    let create_table = indoc! {
+        r##"
+        CREATE TABLE `unsigned_bigints` (
+            id SERIAL PRIMARY KEY,
+            not_signed TINYINT UNSIGNED
+        );
+        "##
+    };
+
+    api.execute_sql(create_table).await?;
+
+    let (_datamodel, engine) = api.introspect_and_start_query_engine().await?;
+
+    // Value too small
+    {
+        let query = r#"
+            mutation {
+                createOneunsigned_bigints(
+                    data: {
+                        not_signed: -5
+                    }
+                ) {
+                    id
+                    not_signed
+                }
+            }
+        "#;
+
+        let response = engine.request(query).await;
+
+        if api.is_mysql_5_6() {
+            let expected = json!({
+                "data": {
+                    "createOneunsigned_bigints": {
+                        "id": 1,
+                        "not_signed": 0,
+                    }
+                }
+            });
+
+            assert_eq!(response, expected);
+        } else {
+            let expected = json!({
+                "errors": [
+                    {
+                        "error":  "Error occurred during query execution:\nConnectorError(ConnectorError { user_facing_error: Some(KnownError { message: \"Value out of range for the type. Out of range value for column \\\'not_signed\\\' at row 1\", meta: Object({\"details\": String(\"Out of range value for column \\\'not_signed\\\' at row 1\")}), error_code: \"P2020\" }), kind: QueryError(ValueOutOfRange { message: \"Out of range value for column \\\'not_signed\\\' at row 1\" }) })",
+                        "user_facing_error": {
+                            "is_panic": false,
+                            "message": "Value out of range for the type. Out of range value for column \'not_signed\' at row 1",
+                            "meta": {
+                                "details": "Out of range value for column \'not_signed\' at row 1",
+                            },
+                            "error_code": "P2020",
+                        },
+                    },
+                ]
+            });
+
+            assert_eq!(response, expected);
+        }
+    }
+
+    // Value too big
+    {
+        let query = r#"
+            mutation {
+                createOneunsigned_bigints(
+                    data: {
+                        not_signed: 9223372036854775807
+                    }
+                ) {
+                    id
+                    not_signed
+                }
+            }
+        "#;
+
+        let response = engine.request(query).await;
+
+        if api.is_mysql_5_6() {
+            let expected = json!({
+                "data": {
+                    "createOneunsigned_bigints": {
+                        "id": 2,
+                        "not_signed": 255,
+                    }
+                }
+            });
+
+            assert_eq!(response, expected);
+        } else {
+            let expected = json!({
+                "errors": [
+                    {
+                        "error":  "Error occurred during query execution:\nConnectorError(ConnectorError { user_facing_error: Some(KnownError { message: \"Value out of range for the type. Out of range value for column \\\'not_signed\\\' at row 1\", meta: Object({\"details\": String(\"Out of range value for column \\\'not_signed\\\' at row 1\")}), error_code: \"P2020\" }), kind: QueryError(ValueOutOfRange { message: \"Out of range value for column \\\'not_signed\\\' at row 1\" }) })",
+                        "user_facing_error": {
+                            "is_panic": false,
+                            "message": "Value out of range for the type. Out of range value for column \'not_signed\' at row 1",
+                            "meta": {
+                                "details": "Out of range value for column \'not_signed\' at row 1",
+                            },
+                            "error_code": "P2020",
+                        },
+                    },
+                ]
+            });
+
+            assert_eq!(response, expected);
+        }
+    }
+
+    Ok(())
+}
