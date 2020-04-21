@@ -3,7 +3,7 @@ use crate::{
     query_ast::*,
     QueryResult,
 };
-use connector::{ConnectionLike, Filter, WriteOperations};
+use connector::{ConnectionLike, WriteOperations};
 use prisma_value::PrismaValue;
 
 pub async fn execute<'a, 'b>(
@@ -38,22 +38,22 @@ async fn create_one<'a, 'b>(tx: &'a ConnectionLike<'a, 'b>, q: CreateRecord) -> 
 }
 
 async fn update_one<'a, 'b>(tx: &'a ConnectionLike<'a, 'b>, q: UpdateRecord) -> InterpretationResult<QueryResult> {
-    let mut res = tx.update_records(&q.model, Filter::from(q.where_), q.args).await?;
+    let mut res = tx.update_records(&q.model, q.record_filter, q.args).await?;
 
     Ok(QueryResult::Id(res.pop()))
 }
 
 async fn delete_one<'a, 'b>(tx: &'a ConnectionLike<'a, 'b>, q: DeleteRecord) -> InterpretationResult<QueryResult> {
     // We need to ensure that we have a record finder, else we delete everything (conversion to empty filter).
-    let finder = match q.where_ {
+    let filter = match q.record_filter {
         Some(f) => Ok(f),
         None => Err(InterpreterError::InterpretationError(
-            "No record finder specified for delete record operation. Aborting.".to_owned(),
+            "No record filter specified for delete record operation. Aborting.".to_owned(),
             None,
         )),
     }?;
 
-    let res = tx.delete_records(&q.model, Filter::from(finder)).await?;
+    let res = tx.delete_records(&q.model, filter).await?;
 
     Ok(QueryResult::Count(res))
 }
@@ -62,7 +62,7 @@ async fn update_many<'a, 'b>(
     tx: &'a ConnectionLike<'a, 'b>,
     q: UpdateManyRecords,
 ) -> InterpretationResult<QueryResult> {
-    let res = tx.update_records(&q.model, q.filter, q.args).await?;
+    let res = tx.update_records(&q.model, q.record_filter, q.args).await?;
 
     Ok(QueryResult::Count(res.len()))
 }
@@ -71,7 +71,7 @@ async fn delete_many<'a, 'b>(
     tx: &'a ConnectionLike<'a, 'b>,
     q: DeleteManyRecords,
 ) -> InterpretationResult<QueryResult> {
-    let res = tx.delete_records(&q.model, q.filter).await?;
+    let res = tx.delete_records(&q.model, q.record_filter).await?;
 
     Ok(QueryResult::Count(res))
 }

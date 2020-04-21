@@ -69,10 +69,10 @@ pub async fn create_record(conn: &dyn QueryExt, model: &ModelRef, args: WriteArg
 pub async fn update_records(
     conn: &dyn QueryExt,
     model: &ModelRef,
-    where_: Filter,
+    record_filter: RecordFilter,
     args: WriteArgs,
 ) -> crate::Result<Vec<RecordProjection>> {
-    let ids = conn.filter_ids(model, where_.clone()).await?;
+    let ids = conn.filter_selectors(model, record_filter).await?;
     let id_args = pick_args(&model.primary_identifier(), &args);
 
     if ids.len() == 0 {
@@ -91,11 +91,13 @@ pub async fn update_records(
     Ok(merge_write_args(ids, id_args))
 }
 
-/// Delete multiple records in `conn`, defined in the `Filter`. Results the
-/// number of items deleted.
-/// [DTODO] The filter id query is probably not necessary.
-pub async fn delete_records(conn: &dyn QueryExt, model: &ModelRef, where_: Filter) -> crate::Result<usize> {
-    let ids = conn.filter_ids(model, where_.clone()).await?;
+/// Delete multiple records in `conn`, defined in the `Filter`. Result is the number of items deleted.
+pub async fn delete_records(
+    conn: &dyn QueryExt,
+    model: &ModelRef,
+    record_filter: RecordFilter,
+) -> crate::Result<usize> {
+    let ids = conn.filter_selectors(model, record_filter).await?;
     let ids: Vec<&RecordProjection> = ids.iter().map(|id| &*id).collect();
     let count = ids.len();
 
