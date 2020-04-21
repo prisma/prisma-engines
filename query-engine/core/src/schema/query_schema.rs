@@ -293,6 +293,7 @@ pub enum InputType {
     List(Box<InputType>),
     Object(InputObjectTypeRef),
     Opt(Box<InputType>),
+    Null(Box<InputType>),
     Scalar(ScalarType),
 }
 
@@ -303,6 +304,10 @@ impl InputType {
 
     pub fn opt(containing: InputType) -> InputType {
         InputType::Opt(Box::new(containing))
+    }
+
+    pub fn null(containing: InputType) -> InputType {
+        InputType::Null(Box::new(containing))
     }
 
     pub fn object(containing: InputObjectTypeRef) -> InputType {

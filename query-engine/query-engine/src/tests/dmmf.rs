@@ -74,6 +74,44 @@ fn dmmf_create_inputs_without_fields_for_parent_records_are_correct() {
 
 #[test]
 #[serial]
+fn dmmf_update_nullable_inputs_are_correct() {
+  let dm = r#"
+        model User {
+            id     Int  @id
+            name   String
+            suffix String?
+        }
+    "#;
+
+    let (query_schema, datamodel) = get_query_schema(dm);
+
+    let dmmf = crate::dmmf::render_dmmf(&datamodel, Arc::new(query_schema));
+
+    let inputs = &dmmf.schema.input_types;
+
+    let update_one_user = inputs
+        .iter()
+        .find(|input| input.name == "UserUpdateInput")
+        .expect("finding UserUpdateInput");
+
+    let update_one_user_fields: Vec<(&str, bool, bool)> = update_one_user
+        .fields
+        .iter()
+        .map(|f| (f.name.as_str(), f.input_type.is_required, f.input_type.is_nullable))
+        .collect();
+
+    assert_eq!(
+        update_one_user_fields,
+        &[
+            ("id", false, false),
+            ("name", false, false),
+            ("suffix", false, true),
+        ]
+    );
+}
+
+#[test]
+#[serial]
 fn must_not_fail_on_missing_env_vars_in_a_datasource() {
     let dm = r#"
         datasource pg {

@@ -65,6 +65,7 @@ pub struct DMMFTypeInfo {
     pub typ: String,
     pub kind: TypeKind,
     pub is_required: bool,
+    pub is_nullable: bool,
     pub is_list: bool,
 }
 

@@ -24,6 +24,7 @@ impl<'a> DMMFTypeRenderer<'a> {
                     typ: obj.into_arc().name.clone(),
                     kind: TypeKind::Object,
                     is_required: true,
+                    is_nullable: false,
                     is_list: false,
                 };
 
@@ -35,6 +36,7 @@ impl<'a> DMMFTypeRenderer<'a> {
                     typ: et.name().to_owned(),
                     kind: TypeKind::Enum,
                     is_required: true,
+                    is_nullable: false,
                     is_list: false,
                 };
 
@@ -52,12 +54,20 @@ impl<'a> DMMFTypeRenderer<'a> {
 
                 type_info
             }
+            InputType::Null(ref null) => {
+                let mut type_info = self.render_input_type(null, ctx);
+                type_info.is_required = false;
+                type_info.is_nullable = true;
+
+                type_info
+            }
             InputType::Scalar(ScalarType::Enum(et)) => {
                 et.into_renderer().render(ctx);
                 let type_info = DMMFTypeInfo {
                     typ: et.name().to_owned(),
                     kind: TypeKind::Scalar,
                     is_required: true,
+                    is_nullable: false,
                     is_list: false,
                 };
 
@@ -80,6 +90,7 @@ impl<'a> DMMFTypeRenderer<'a> {
                     typ: stringified.into(),
                     kind: TypeKind::Scalar,
                     is_required: true,
+                    is_nullable: false,
                     is_list: false,
                 };
 
@@ -97,6 +108,7 @@ impl<'a> DMMFTypeRenderer<'a> {
                     typ: obj.into_arc().name().to_string(),
                     kind: TypeKind::Object,
                     is_required: true,
+                    is_nullable: false,
                     is_list: false,
                 };
 
@@ -108,6 +120,7 @@ impl<'a> DMMFTypeRenderer<'a> {
                     typ: et.name().to_owned(),
                     kind: TypeKind::Enum,
                     is_required: true,
+                    is_nullable: false,
                     is_list: false,
                 };
 
@@ -131,6 +144,7 @@ impl<'a> DMMFTypeRenderer<'a> {
                     typ: et.name().to_owned(),
                     kind: TypeKind::Scalar,
                     is_required: true,
+                    is_nullable: false,
                     is_list: false,
                 };
 
@@ -153,6 +167,7 @@ impl<'a> DMMFTypeRenderer<'a> {
                     typ: stringified.into(),
                     kind: TypeKind::Scalar,
                     is_required: true,
+                    is_nullable: false,
                     is_list: false,
                 };
 

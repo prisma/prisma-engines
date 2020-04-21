@@ -41,6 +41,10 @@ impl<'a> GqlTypeRenderer<'a> {
                 let (substring, subctx) = self.render_input_type(opt, ctx);
                 (substring.trim_end_matches('!').to_owned(), subctx)
             }
+            InputType::Null(ref null) => {
+                let (substring, subctx) = self.render_input_type(null, ctx);
+                (substring.trim_end_matches('!').to_owned(), subctx)
+            }
             InputType::Scalar(ScalarType::Enum(et)) => {
                 let (_, subctx) = et.into_renderer().render(ctx);
                 (format!("{}!", et.name()), subctx)

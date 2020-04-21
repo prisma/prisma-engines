@@ -7,7 +7,7 @@ pub trait InputBuilderExtensions {
     }
 
     fn map_required_input_type(&self, field: &ScalarFieldRef) -> InputType {
-        let typ = match field.type_identifier {
+        let mut typ = match field.type_identifier {
             TypeIdentifier::String => InputType::string(),
             TypeIdentifier::Int => InputType::int(),
             TypeIdentifier::Float => InputType::float(),
@@ -19,10 +19,13 @@ pub trait InputBuilderExtensions {
         };
 
         if field.is_list {
-            InputType::list(typ)
-        } else {
-            typ
+            typ = InputType::list(typ)
+        } 
+        if !field.is_required {
+            typ = InputType::null(typ)
         }
+
+        typ
     }
 
     fn map_enum_input_type(&self, field: &ScalarFieldRef) -> InputType {
