@@ -427,6 +427,7 @@ name = "datamodel"
 version = "0.1.0"
 dependencies = [
  "chrono",
+ "clap",
  "colored",
  "cuid",
  "datamodel-connector",
@@ -2011,6 +2012,8 @@ dependencies = [
  "thiserror",
  "tokio",
  "tokio-postgres",
+ "tracing",
+ "tracing-core",
  "url 2.1.1",
  "uuid",
 ]
