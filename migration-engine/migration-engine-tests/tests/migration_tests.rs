@@ -72,7 +72,7 @@ async fn json_fields_can_be_created(api: &TestApi) -> TestResult {
 
             model Test {{
                 id String @id @default(cuid())
-                javaScriptObjectNotation JSON
+                javaScriptObjectNotation Json
             }}
         "#,
         api.datasource()

@@ -160,7 +160,7 @@ impl<'a> Validator<'a> {
                 .find(|ast_field| ast_field.name.name == field.name)
                 .unwrap();
 
-            if let Some(dml::ScalarType::JSON) = field.field_type.scalar_type() {
+            if let Some(dml::ScalarType::Json) = field.field_type.scalar_type() {
                 // TODO: this is really ugly
                 let supports_json_type = match self.source {
                     Some(source) => source.connector().supports_json(),
@@ -168,7 +168,7 @@ impl<'a> Validator<'a> {
                 };
                 if !supports_json_type {
                     errors.push(DatamodelError::new_field_validation_error(
-                        &format!("Field `{}` in model `{}` can't be of type JSON. The current connector does not support the JSON type.", &field.name, &model.name),
+                        &format!("Field `{}` in model `{}` can't be of type Json. The current connector does not support the Json type.", &field.name, &model.name),
                         &model.name,
                         &field.name,
                         ast_field.span.clone(),
