@@ -31,11 +31,21 @@ where
 /// communicate already known record selectors to connectors.
 ///
 /// Connector implementations should use known selectors to skip unnecessary fetch operations
-/// if the query core already determined the selectors in a previous step.
+/// if the query core already determined the selectors in a previous step. Simply put,
+/// `selectors` should always have precendence over `filter`.
 #[derive(Debug, Clone)]
 pub struct RecordFilter {
     pub filter: Filter,
     pub selectors: Option<Vec<RecordProjection>>,
+}
+
+impl RecordFilter {
+    pub fn empty() -> Self {
+        Self {
+            filter: Filter::empty(),
+            selectors: None,
+        }
+    }
 }
 
 impl From<Filter> for RecordFilter {
@@ -52,6 +62,15 @@ impl From<Vec<RecordProjection>> for RecordFilter {
         Self {
             filter: Filter::empty(),
             selectors: Some(selectors),
+        }
+    }
+}
+
+impl From<RecordProjection> for RecordFilter {
+    fn from(selector: RecordProjection) -> Self {
+        Self {
+            filter: Filter::empty(),
+            selectors: Some(vec![selector]),
         }
     }
 }

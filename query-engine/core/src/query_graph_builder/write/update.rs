@@ -72,7 +72,12 @@ pub fn update_many_records(
     let mut args = update_args.args;
     args.update_datetimes(Arc::clone(&model));
 
-    let update_many = WriteQuery::UpdateManyRecords(UpdateManyRecords { model, filter, args });
+    let record_filter = filter.into();
+    let update_many = WriteQuery::UpdateManyRecords(UpdateManyRecords {
+        model,
+        record_filter,
+        args,
+    });
     graph.create_node(Query::Write(update_many));
 
     Ok(())
@@ -93,9 +98,11 @@ where
 
     args.update_datetimes(Arc::clone(&model));
 
+    let filter = filter.into();
+    let record_filter = filter.into();
     let ur = UpdateRecord {
         model,
-        where_: filter.into(),
+        record_filter,
         args,
     };
 

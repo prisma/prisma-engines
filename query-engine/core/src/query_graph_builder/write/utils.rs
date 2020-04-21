@@ -145,10 +145,13 @@ where
     let mut args = WriteArgs::new();
     args.update_datetimes(Arc::clone(&model));
 
+    let filter = filter.into();
+    let record_filter = filter.into();
+
     let ur = UpdateManyRecords {
         model,
-        filter: filter.into(),
-        args: args,
+        record_filter,
+        args,
     };
 
     graph.create_node(Query::Write(WriteQuery::UpdateManyRecords(ur)))
