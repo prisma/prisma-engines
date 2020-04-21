@@ -262,6 +262,7 @@ impl SqlSchemaDescriber {
             let id = row.get("id").and_then(|x| x.as_i64()).expect("id");
             let seq = row.get("seq").and_then(|x| x.as_i64()).expect("seq");
             let column = row.get("from").and_then(|x| x.to_string()).expect("from");
+            // todo this can be null if the primary key and shortened fk syntax was used
             let referenced_column = row.get("to").and_then(|x| x.to_string()).expect("to");
             let referenced_table = row.get("table").and_then(|x| x.to_string()).expect("table");
             match intermediate_fks.get_mut(&id) {
