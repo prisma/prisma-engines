@@ -60,11 +60,7 @@ async fn adding_a_scalar_field_must_work(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector(
-    capabilities("json"),
-    ignore("mysql_5_6", "mariadb"),
-    log = "debug,sql_schema_describer=info"
-)]
+#[test_each_connector(capabilities("json"), ignore("mysql_5_6"))]
 async fn json_fields_can_be_created(api: &TestApi) -> TestResult {
     let dm = format!(
         r#"
@@ -82,9 +78,16 @@ async fn json_fields_can_be_created(api: &TestApi) -> TestResult {
 
     api.assert_schema().await?.assert_table("Test", |table| {
         table.assert_column("javaScriptObjectNotation", |c| {
-            c.assert_is_required()?.assert_type_family(ColumnTypeFamily::Json)
+            if api.is_mariadb() {
+                // JSON is an alias for LONGTEXT on MariaDB - https://mariadb.com/kb/en/json-data-type/
+                c.assert_is_required()?.assert_type_family(ColumnTypeFamily::String)
+            } else {
+                c.assert_is_required()?.assert_type_family(ColumnTypeFamily::Json)
+            }
         })
     })?;
+
+    api.infer(&dm).send_assert().await?.assert_green()?.assert_no_steps()?;
 
     Ok(())
 }

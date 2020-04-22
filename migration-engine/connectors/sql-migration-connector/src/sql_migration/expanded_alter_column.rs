@@ -1,4 +1,4 @@
-use crate::sql_schema_differ::{ColumnChange, ColumnDiffer};
+use crate::sql_schema_differ::{ColumnChange, ColumnDiffer, DiffingOptions};
 use quaint::prelude::SqlFamily;
 use sql_schema_describer::{Column, ColumnArity, ColumnType, ColumnTypeFamily};
 
@@ -6,8 +6,10 @@ pub(crate) fn expand_alter_column(
     previous_column: &Column,
     next_column: &Column,
     sql_family: &SqlFamily,
+    diffing_options: &DiffingOptions,
 ) -> Option<ExpandedAlterColumn> {
     let column_differ = ColumnDiffer {
+        diffing_options,
         previous: previous_column,
         next: next_column,
     };
