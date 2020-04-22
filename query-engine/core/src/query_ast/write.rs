@@ -1,6 +1,6 @@
 //! Write query AST
 use super::FilteredQuery;
-use connector::{filter::Filter, WriteArgs};
+use connector::{filter::Filter, RecordFilter, WriteArgs};
 use prisma_models::prelude::*;
 use std::sync::Arc;
 
@@ -112,10 +112,10 @@ impl std::fmt::Display for WriteQuery {
             Self::CreateRecord(q) => write!(f, "CreateRecord(model: {}, args: {:?})", q.model.name, q.args,),
             Self::UpdateRecord(q) => write!(
                 f,
-                "UpdateRecord(model: {}, finder: {:?}, args: {:?})",
-                q.model.name, q.where_, q.args,
+                "UpdateRecord(model: {}, filter: {:?}, args: {:?})",
+                q.model.name, q.record_filter, q.args,
             ),
-            Self::DeleteRecord(q) => write!(f, "DeleteRecord: {}, {:?}", q.model.name, q.where_),
+            Self::DeleteRecord(q) => write!(f, "DeleteRecord: {}, {:?}", q.model.name, q.record_filter),
             Self::UpdateManyRecords(q) => write!(f, "UpdateManyRecords(model: {}, args: {:?})", q.model.name, q.args),
             Self::DeleteManyRecords(q) => write!(f, "DeleteManyRecords: {}", q.model.name),
             Self::ConnectRecords(_) => write!(f, "ConnectRecords"),
@@ -134,27 +134,27 @@ pub struct CreateRecord {
 #[derive(Debug, Clone)]
 pub struct UpdateRecord {
     pub model: ModelRef,
-    pub where_: Filter,
+    pub record_filter: RecordFilter,
     pub args: WriteArgs,
 }
 
 #[derive(Debug, Clone)]
 pub struct UpdateManyRecords {
     pub model: ModelRef,
-    pub filter: Filter,
+    pub record_filter: RecordFilter,
     pub args: WriteArgs,
 }
 
 #[derive(Debug, Clone)]
 pub struct DeleteRecord {
     pub model: ModelRef,
-    pub where_: Option<Filter>,
+    pub record_filter: Option<RecordFilter>,
 }
 
 #[derive(Debug, Clone)]
 pub struct DeleteManyRecords {
     pub model: ModelRef,
-    pub filter: Filter,
+    pub record_filter: RecordFilter,
 }
 
 #[derive(Debug, Clone)]
@@ -173,40 +173,45 @@ pub struct DisconnectRecords {
 
 impl FilteredQuery for UpdateRecord {
     fn get_filter(&mut self) -> Option<&mut Filter> {
-        Some(&mut self.where_)
+        Some(&mut self.record_filter.filter)
     }
 
     fn set_filter(&mut self, filter: Filter) {
-        self.where_ = filter
+        self.record_filter.filter = filter
     }
 }
 
 impl FilteredQuery for UpdateManyRecords {
     fn get_filter(&mut self) -> Option<&mut Filter> {
-        Some(&mut self.filter)
+        Some(&mut self.record_filter.filter)
     }
 
     fn set_filter(&mut self, filter: Filter) {
-        self.filter = filter
+        self.record_filter.filter = filter
     }
 }
 
 impl FilteredQuery for DeleteManyRecords {
     fn get_filter(&mut self) -> Option<&mut Filter> {
-        Some(&mut self.filter)
+        Some(&mut self.record_filter.filter)
     }
 
     fn set_filter(&mut self, filter: Filter) {
-        self.filter = filter
+        self.record_filter.filter = filter
     }
 }
 
 impl FilteredQuery for DeleteRecord {
     fn get_filter(&mut self) -> Option<&mut Filter> {
-        self.where_.as_mut()
+        self.record_filter.as_mut().map(|f| &mut f.filter)
     }
 
     fn set_filter(&mut self, filter: Filter) {
-        self.where_ = Some(filter)
+        match self.record_filter {
+            Some(ref mut rf) => rf.filter = filter,
+            None => self.record_filter = Some(filter.into()),
+        }
+
+        //.filter = Some(filter)
     }
 }

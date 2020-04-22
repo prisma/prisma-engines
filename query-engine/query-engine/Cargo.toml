@@ -49,7 +49,7 @@ rustc_version = "0.2.3"
 [dev-dependencies]
 test-macros = { path = "../../libs/test-macros" }
 test-setup = { path = "../../libs/test-setup" }
-quaint = { git = "https://github.com/prisma/quaint", features = ["full"] }
+quaint = { git = "https://github.com/prisma/quaint", features = ["full", "tracing-log"] }
 migration-connector = { path = "../../migration-engine/connectors/migration-connector" }
 migration-core = { path = "../../migration-engine/core" }
 introspection-core = { path = "../../introspection-engine/core" }

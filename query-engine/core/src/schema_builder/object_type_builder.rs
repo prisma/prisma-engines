@@ -175,14 +175,14 @@ impl<'a> ObjectTypeBuilder<'a> {
             .map(|field| {
                 vec![
                     (
-                        format!("{}_{}", field.name, SortOrder::Ascending.abbreviated()),
+                        format!("{}_{}", field.name, SortOrder::Ascending.to_string()),
                         OrderBy {
                             field: field.clone(),
                             sort_order: SortOrder::Ascending,
                         },
                     ),
                     (
-                        format!("{}_{}", field.name, SortOrder::Descending.abbreviated()),
+                        format!("{}_{}", field.name, SortOrder::Descending.to_string()),
                         OrderBy {
                             field: field.clone(),
                             sort_order: SortOrder::Descending,

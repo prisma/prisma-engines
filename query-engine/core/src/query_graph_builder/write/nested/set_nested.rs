@@ -1,6 +1,6 @@
 use super::*;
 use crate::{query_ast::*, query_graph::*, InputAssertions, ParsedInputValue};
-use connector::{Filter, IdFilter};
+use connector::Filter;
 use itertools::Itertools;
 use prisma_models::{ModelRef, RelationFieldRef};
 use std::{collections::HashSet, convert::TryInto, iter::FromIterator, sync::Arc};
@@ -309,13 +309,7 @@ fn handle_one_to_many(
             let diff_result = result.as_diff_result().unwrap();
 
             if let Node::Query(Query::Write(WriteQuery::UpdateManyRecords(ref mut ur))) = update_connect_node {
-                ur.filter = Filter::or(
-                    diff_result
-                        .left
-                        .iter()
-                        .map(|id| id.clone().filter())
-                        .collect::<Vec<Filter>>(),
-                );
+                ur.record_filter = diff_result.left.clone().into();
             }
 
             Ok(update_connect_node)
@@ -358,13 +352,7 @@ fn handle_one_to_many(
             let diff_result = result.as_diff_result().unwrap();
 
             if let Node::Query(Query::Write(WriteQuery::UpdateManyRecords(ref mut ur))) = node {
-                ur.filter = Filter::or(
-                    diff_result
-                        .right
-                        .iter()
-                        .map(|id| id.clone().filter())
-                        .collect::<Vec<Filter>>(),
-                );
+                ur.record_filter = diff_result.right.clone().into();
             }
 
             if let Node::Query(Query::Write(ref mut wq)) = node {

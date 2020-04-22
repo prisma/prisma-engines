@@ -57,19 +57,19 @@ impl<'conn, 'tx> WriteOperations for ConnectionLike<'conn, 'tx> {
     fn update_records<'a>(
         &'a self,
         model: &'a ModelRef,
-        where_: Filter,
+        record_filter: RecordFilter,
         args: WriteArgs,
     ) -> crate::IO<Vec<RecordProjection>> {
         match self {
-            Self::Connection(c) => c.update_records(model, where_, args),
-            Self::Transaction(tx) => tx.update_records(model, where_, args),
+            Self::Connection(c) => c.update_records(model, record_filter, args),
+            Self::Transaction(tx) => tx.update_records(model, record_filter, args),
         }
     }
 
-    fn delete_records<'a>(&'a self, model: &'a ModelRef, where_: Filter) -> crate::IO<usize> {
+    fn delete_records<'a>(&'a self, model: &'a ModelRef, record_filter: RecordFilter) -> crate::IO<usize> {
         match self {
-            Self::Connection(c) => c.delete_records(model, where_),
-            Self::Transaction(tx) => tx.delete_records(model, where_),
+            Self::Connection(c) => c.delete_records(model, record_filter),
+            Self::Transaction(tx) => tx.delete_records(model, record_filter),
         }
     }
 

@@ -20,7 +20,7 @@ pub fn delete_record(graph: &mut QueryGraph, model: ModelRef, mut field: ParsedF
     let read_node = graph.create_node(Query::Read(read_query));
     let delete_query = Query::Write(WriteQuery::DeleteRecord(DeleteRecord {
         model: Arc::clone(&model),
-        where_: Some(filter),
+        record_filter: Some(filter.into()),
     }));
 
     let delete_node = graph.create_node(delete_query);
@@ -61,9 +61,10 @@ pub fn delete_many_records(
 
     let model_id = model.primary_identifier();
     let read_query = utils::read_ids_infallible(model.clone(), model_id, filter.clone());
+    let record_filter = filter.into();
     let delete_many = WriteQuery::DeleteManyRecords(DeleteManyRecords {
         model: model.clone(),
-        filter,
+        record_filter,
     });
 
     let read_query_node = graph.create_node(read_query);
