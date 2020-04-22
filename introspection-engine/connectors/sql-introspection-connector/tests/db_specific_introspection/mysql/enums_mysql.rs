@@ -45,6 +45,34 @@ async fn introspecting_a_table_enums_should_work(api: &TestApi) {
 }
 
 #[test_each_connector(tags("mysql"))]
+async fn introspecting_a_table_with_an_enum_default_value_that_is_an_empty_string_should_work(api: &TestApi) {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("Book", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom("color  ENUM ( 'black', '') Not Null default ''");
+            });
+        })
+        .await;
+
+    let dm = r#"
+        model Book {
+            color   Book_color  @default(EMPTY_ENUM_VALUE)
+            id      Int         @default(autoincrement()) @id
+        }
+
+        enum Book_color{
+            black
+            EMPTY_ENUM_VALUE    @map("")
+        }
+
+    "#;
+
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+}
+
+#[test_each_connector(tags("mysql"))]
 async fn introspecting_a_table_enums_should_return_alphabetically_even_when_in_different_order(api: &TestApi) {
     api.barrel()
         .execute(|migration| {
