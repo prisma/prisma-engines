@@ -780,4 +780,38 @@ VALUES (1, 'Joe', 27, 20000.00 );
             ParameterizedValue::Real("1.0".parse().unwrap())
         );
     }
+
+    #[tokio::test]
+    async fn json_conversion_is_handled_correctly() {
+        let create_table = r#"
+            CREATE TABLE `json_test` (
+                id int4 AUTO_INCREMENT PRIMARY KEY,
+                j  json NOT NULL
+            )
+        "#;
+
+        let drop_table = "DROP TABLE IF EXISTS `json_test`";
+        let conn = Quaint::new(&CONN_STR).await.unwrap();
+
+        conn.query_raw(drop_table, &[]).await.unwrap();
+        conn.query_raw(create_table, &[]).await.unwrap();
+
+        let insert = Insert::single_into("json_test").value("j", r#"{"some": "json"}"#);
+        let select = Select::from_table("json_test").column("j");
+
+        conn.query(insert.into()).await.unwrap();
+        let result = conn.query(select.into()).await.unwrap();
+
+        assert_eq!(
+            result
+                .into_single()
+                .unwrap()
+                .at(0)
+                .unwrap()
+                .as_json()
+                .unwrap()
+                .to_string(),
+            r#"{"some":"json"}"#
+        );
+    }
 }
