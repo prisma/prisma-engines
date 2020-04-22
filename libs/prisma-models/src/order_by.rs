@@ -1,4 +1,5 @@
 use crate::{ModelRef, ScalarFieldRef};
+use std::string::ToString;
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct OrderBy {
@@ -16,11 +17,11 @@ pub enum SortOrder {
     Descending,
 }
 
-impl SortOrder {
-    pub fn abbreviated(self) -> &'static str {
+impl ToString for SortOrder {
+    fn to_string(&self) -> String {
         match self {
-            SortOrder::Ascending => "ASC",
-            SortOrder::Descending => "DESC",
+            SortOrder::Ascending => String::from("ASC"),
+            SortOrder::Descending => String::from("DESC"),
         }
     }
 }

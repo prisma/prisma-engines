@@ -26,49 +26,50 @@ impl ModelProjection {
         Self { fields }
     }
 
+    /// Returns all field names (NOT database level column names!) of contained fields.
     pub fn names<'a>(&'a self) -> impl Iterator<Item = &'a str> + 'a {
         self.fields.iter().map(|field| field.name())
     }
 
+    /// Returns all database (e.g. column or field) names of contained fields.
     pub fn db_names<'a>(&'a self) -> impl Iterator<Item = String> + 'a {
         self.scalar_fields().map(|f| f.db_name().to_owned())
     }
 
+    /// Returns an iterator over all fields contained in this projection.
     pub fn fields<'a>(&'a self) -> impl Iterator<Item = &'a Field> + 'a {
         self.fields.iter()
     }
 
-    /// Returns the length of schema model fields contained in this projection.
-    /// This is **not** the length of the underlying database fields, use `db_len` instead.
-    pub fn len(&self) -> usize {
-        self.fields.len()
-    }
-
     /// Returns the length of scalar fields contained in this projection, e.g. the actual
-    /// number of SQL columns or document fields for this model.
-    pub fn db_len(&self) -> usize {
+    /// number of SQL columns or document fields for this model projection.
+    pub fn scalar_length(&self) -> usize {
         self.scalar_fields().count()
     }
 
-    pub fn get(&self, name: &str) -> Option<&Field> {
+    /// Attempts to retrieve a field by name (NOT database level column name) from this projection.
+    pub fn find(&self, name: &str) -> Option<&Field> {
         self.fields().find(|field| field.name() == name)
     }
 
+    /// Returns an iterator over all scalar fields represented by this model projection, in order.
+    /// Resolves relation fields to all backing scalar fields, if existing.
     pub fn scalar_fields<'a>(&'a self) -> impl Iterator<Item = ScalarFieldRef> + 'a {
         self.fields
             .iter()
             .flat_map(|field| match field {
                 Field::Scalar(sf) => vec![sf.clone()],
-                Field::Relation(rf) => rf.fields(),
+                Field::Relation(rf) => rf.scalar_fields(),
             })
             .into_iter()
             .unique_by(|field| field.name.clone())
     }
 
+    ///
     pub fn map_db_name(&self, name: &str) -> Option<ScalarFieldRef> {
         self.fields().find_map(|field| match field {
             Field::Scalar(sf) if sf.db_name() == name => Some(sf.clone()),
-            Field::Relation(rf) => rf.fields().into_iter().find(|f| f.db_name() == name),
+            Field::Relation(rf) => rf.scalar_fields().into_iter().find(|f| f.db_name() == name),
             _ => None,
         })
     }
@@ -87,7 +88,7 @@ impl ModelProjection {
     /// Additionally performs a type coercion based on the source and destination field types.
     /// (Resistance is futile.)
     pub fn assimilate(&self, id: RecordProjection) -> crate::Result<RecordProjection> {
-        if self.db_len() != id.len() {
+        if self.scalar_length() != id.len() {
             Err(DomainError::ConversionFailure(
                 "record identifier".to_owned(),
                 "assimilated record identifier".to_owned(),
@@ -112,6 +113,7 @@ impl ModelProjection {
         }
     }
 
+    /// Creates a record projection of the model projection containing only null values.
     pub fn empty_record_projection(&self) -> RecordProjection {
         self.scalar_fields()
             .map(|f| (f.clone(), PrismaValue::Null))
@@ -135,6 +137,7 @@ impl ModelProjection {
         RecordProjection::new(self.scalar_fields().zip(values).collect())
     }
 
+    /// Checks if this model projection contains given field.
     pub fn contains<T>(&self, field: T) -> bool
     where
         T: Into<Field>,
@@ -143,6 +146,7 @@ impl ModelProjection {
         self.fields().find(|f| f.name() == field.name()).is_some()
     }
 
+    /// Checks if this model projection contains all the given database names.
     pub fn contains_all_db_names<'a>(&self, names: impl Iterator<Item = String>) -> bool {
         let selected_db_names: Vec<_> = self.db_names().collect();
         let names_to_select: Vec<_> = names.collect();
@@ -156,6 +160,7 @@ impl ModelProjection {
         }
     }
 
+    /// Merges this model projection with given model projections and creates a set union of all.
     pub fn union(projections: Vec<ModelProjection>) -> ModelProjection {
         projections
             .into_iter()

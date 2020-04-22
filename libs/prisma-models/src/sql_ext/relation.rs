@@ -117,14 +117,14 @@ impl RelationExt for Relation {
                 let model_a = self.model_a();
 
                 if self.is_self_relation() {
-                    self.field_b().fields().as_columns()
+                    self.field_b().scalar_fields().as_columns()
                 } else if m.in_table_of_model_name == model_a.name && !self.is_self_relation() {
                     let identifier = model_a.primary_identifier();
-                    let count = identifier.len();
+                    let count = identifier.scalar_length();
 
                     ColumnIterator::new(identifier.as_columns(), count)
                 } else {
-                    self.field_b().fields().as_columns()
+                    self.field_b().scalar_fields().as_columns()
                 }
             }
         }
@@ -141,16 +141,16 @@ impl RelationExt for Relation {
 
                 if self.is_self_relation() {
                     let identifier = model_b.primary_identifier();
-                    let count = identifier.len();
+                    let count = identifier.scalar_length();
 
                     ColumnIterator::new(identifier.as_columns(), count)
                 } else if m.in_table_of_model_name == model_b.name {
                     let identifier = model_b.primary_identifier();
-                    let count = identifier.len();
+                    let count = identifier.scalar_length();
 
                     ColumnIterator::new(identifier.as_columns(), count)
                 } else {
-                    self.field_a().fields().as_columns()
+                    self.field_a().scalar_fields().as_columns()
                 }
             }
         }

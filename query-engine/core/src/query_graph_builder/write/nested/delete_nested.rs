@@ -4,7 +4,7 @@ use crate::{
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
     InputAssertions, ParsedInputMap, ParsedInputValue,
 };
-use connector::{Filter, IdFilter};
+use connector::{Filter, RecordFilter};
 use prisma_models::{ModelRef, PrismaValue, RelationFieldRef};
 use std::{convert::TryInto, sync::Arc};
 
@@ -46,7 +46,7 @@ pub fn connect_nested_delete(
         let or_filter = Filter::Or(filters);
         let delete_many = WriteQuery::DeleteManyRecords(DeleteManyRecords {
             model: Arc::clone(&child_model),
-            filter: or_filter.clone(),
+            record_filter: or_filter.clone().into(),
         });
 
         let delete_many_node = graph.create_node(Query::Write(delete_many));
@@ -74,7 +74,7 @@ pub fn connect_nested_delete(
                     }
 
                     if let Node::Query(Query::Write(WriteQuery::DeleteManyRecords(ref mut dmr))) = delete_many_node {
-                        dmr.set_filter(Filter::and(vec![dmr.filter.clone(), child_ids.filter()]));
+                        dmr.record_filter = child_ids.into();
                     }
 
                     Ok(delete_many_node)
@@ -91,7 +91,7 @@ pub fn connect_nested_delete(
 
             let delete_record_node = graph.create_node(Query::Write(WriteQuery::DeleteRecord(DeleteRecord {
                 model: Arc::clone(&child_model),
-                where_: None,
+                record_filter: None,
             })));
 
             utils::insert_deletion_checks(graph, child_model, &find_child_records_node, &delete_record_node)?;
@@ -107,8 +107,8 @@ pub fn connect_nested_delete(
                          ))),
                      }?;
 
-                     if let Node::Query(Query::Write(ref mut wq)) = delete_record_node {
-                         wq.add_filter(child_id.filter());
+                     if let Node::Query(Query::Write(WriteQuery::DeleteRecord(ref mut dq))) = delete_record_node {
+                         dq.record_filter = Some(child_id.into());
                      }
 
                      Ok(delete_record_node)
@@ -138,7 +138,7 @@ pub fn connect_nested_delete_many(
 
         let delete_many = WriteQuery::DeleteManyRecords(DeleteManyRecords {
             model: Arc::clone(&child_model),
-            filter,
+            record_filter: RecordFilter::empty(),
         });
 
         let delete_many_node = graph.create_node(Query::Write(delete_many));
@@ -151,7 +151,7 @@ pub fn connect_nested_delete_many(
                 child_model_identifier.clone(),
                 Box::new(move |mut delete_many_node, child_ids| {
                     if let Node::Query(Query::Write(WriteQuery::DeleteManyRecords(ref mut dmr))) = delete_many_node {
-                        dmr.set_filter(Filter::and(vec![dmr.filter.clone(), child_ids.filter()]));
+                        dmr.record_filter = child_ids.into();
                     }
 
                     Ok(delete_many_node)

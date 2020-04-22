@@ -27,6 +27,54 @@ where
     Transaction(&'conn (dyn Transaction<'tx> + 'tx)),
 }
 
+/// A wrapper struct allowing to either filter for records or for the core to
+/// communicate already known record selectors to connectors.
+///
+/// Connector implementations should use known selectors to skip unnecessary fetch operations
+/// if the query core already determined the selectors in a previous step. Simply put,
+/// `selectors` should always have precendence over `filter`.
+#[derive(Debug, Clone)]
+pub struct RecordFilter {
+    pub filter: Filter,
+    pub selectors: Option<Vec<RecordProjection>>,
+}
+
+impl RecordFilter {
+    pub fn empty() -> Self {
+        Self {
+            filter: Filter::empty(),
+            selectors: None,
+        }
+    }
+}
+
+impl From<Filter> for RecordFilter {
+    fn from(filter: Filter) -> Self {
+        Self {
+            filter,
+            selectors: None,
+        }
+    }
+}
+
+impl From<Vec<RecordProjection>> for RecordFilter {
+    fn from(selectors: Vec<RecordProjection>) -> Self {
+        Self {
+            filter: Filter::empty(),
+            selectors: Some(selectors),
+        }
+    }
+}
+
+impl From<RecordProjection> for RecordFilter {
+    fn from(selector: RecordProjection) -> Self {
+        Self {
+            filter: Filter::empty(),
+            selectors: Some(vec![selector]),
+        }
+    }
+}
+
 pub trait ReadOperations {
     /// Gets a single record or `None` back from the database.
     ///
@@ -81,12 +129,12 @@ pub trait WriteOperations {
     fn update_records<'a>(
         &'a self,
         model: &'a ModelRef,
-        where_: Filter,
+        record_filter: RecordFilter,
         args: WriteArgs,
     ) -> crate::IO<Vec<RecordProjection>>;
 
     /// Delete records in the `Model` with the given `Filter`.
-    fn delete_records<'a>(&'a self, model: &'a ModelRef, where_: Filter) -> crate::IO<usize>;
+    fn delete_records<'a>(&'a self, model: &'a ModelRef, record_filter: RecordFilter) -> crate::IO<usize>;
 
     // We plan to remove the methods below in the future. We want emulate them with the ones above. Those should suffice.
 

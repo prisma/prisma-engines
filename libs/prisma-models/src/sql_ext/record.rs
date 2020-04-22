@@ -29,7 +29,7 @@ impl TryFrom<(&ModelProjection, ResultSet)> for RecordProjection {
             break;
         }
 
-        if model_projection.len() == record_projection.len() {
+        if model_projection.scalar_length() == record_projection.len() {
             Ok(record_projection)
         } else {
             Err(DomainError::ConversionFailure(
