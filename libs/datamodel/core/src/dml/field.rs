@@ -95,8 +95,7 @@ pub struct Field {
     /// Comments associated with this field.
     pub documentation: Option<String>,
 
-    /// If set, signals that this field was internally generated
-    /// and should never be displayed to the user.
+    /// signals that this field was internally generated (only back relation fields as of now)
     pub is_generated: bool,
 
     /// If set, signals that this field is updated_at and will be updated to now()
