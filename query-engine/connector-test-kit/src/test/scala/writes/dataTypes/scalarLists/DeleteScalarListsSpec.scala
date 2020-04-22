@@ -1,4 +1,4 @@
-package writes.scalarLists
+package writes.dataTypes.scalarLists
 
 import org.scalatest.{FlatSpec, Matchers}
 import util.ConnectorCapability.ScalarListsCapability
@@ -15,7 +15,6 @@ class DeleteScalarListsSpec extends FlatSpec with Matchers with ApiSpecBase {
         | name String @unique
         | list Int[]
         |}"""
-
 
       val dm2 = """
         |model TestModel {
