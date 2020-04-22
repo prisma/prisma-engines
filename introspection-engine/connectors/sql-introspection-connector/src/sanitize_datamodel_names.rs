@@ -4,7 +4,7 @@ use prisma_value::PrismaValue;
 use regex::Regex;
 use std::collections::HashMap;
 
-static EMPTY_STRING_PLACEHOLDER: &'static str = "EMPTY_STRING_VALUE";
+static EMPTY_ENUM_PLACEHOLDER: &'static str = "EMPTY_ENUM_VALUE";
 static EMPTY_STRING: &'static str = "";
 
 pub fn sanitize_datamodel_names(datamodel: &mut Datamodel) {
@@ -56,7 +56,7 @@ pub fn sanitize_datamodel_names(datamodel: &mut Datamodel) {
 
                     if let Some(DefaultValue::Single(PrismaValue::Enum(value))) = &mut field.default_value {
                         if EMPTY_STRING == value {
-                            *value = EMPTY_STRING_PLACEHOLDER.to_string();
+                            *value = EMPTY_ENUM_PLACEHOLDER.to_string();
                         } else {
                             let (sanitized_value, _) = sanitize_name(value.to_string());
 
@@ -103,7 +103,7 @@ pub fn sanitize_datamodel_names(datamodel: &mut Datamodel) {
 
         for enum_value in &mut enm.values {
             if &enum_value.name == EMPTY_STRING {
-                enum_value.name = EMPTY_STRING_PLACEHOLDER.to_string();
+                enum_value.name = EMPTY_ENUM_PLACEHOLDER.to_string();
                 enum_value.database_name = Some(EMPTY_STRING.to_string());
             } else {
                 let (sanitized_name, db_name) = sanitize_name(enum_value.name.clone());

@@ -258,12 +258,12 @@ async fn introspecting_a_table_with_an_enum_default_value_that_is_an_empty_strin
 
     let dm = r#"
         model News {
-            content     strings     @default(EMPTY_STRING_VALUE)
+            content     strings     @default(EMPTY_ENUM_VALUE)
             id          Int         @default(autoincrement()) @id
         }
 
         enum strings{
-            EMPTY_STRING_VALUE      @map("")
+            EMPTY_ENUM_VALUE      @map("")
             non_empty
         }
     "#;
