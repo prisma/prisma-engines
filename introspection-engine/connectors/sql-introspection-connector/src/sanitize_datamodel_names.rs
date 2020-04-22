@@ -104,12 +104,12 @@ pub fn sanitize_datamodel_names(datamodel: &mut Datamodel) {
         for enum_value in &mut enm.values {
             if &enum_value.name == EMPTY_STRING {
                 enum_value.name = EMPTY_STRING_PLACEHOLDER.to_string();
-                enum_value.database_name = Some(EMPTY_STRING.to_string()); // todo this is not printed atm
+                enum_value.database_name = Some(EMPTY_STRING.to_string());
+            } else {
+                let (sanitized_name, db_name) = sanitize_name(enum_value.name.clone());
+                enum_value.name = sanitized_name;
+                enum_value.database_name = db_name;
             }
-
-            let (sanitized_name, db_name) = sanitize_name(enum_value.name.clone());
-            enum_value.name = sanitized_name;
-            enum_value.database_name = db_name;
         }
     }
 }

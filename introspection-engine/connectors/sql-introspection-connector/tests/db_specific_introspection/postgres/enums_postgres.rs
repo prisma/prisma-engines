@@ -263,8 +263,8 @@ async fn introspecting_a_table_with_an_enum_default_value_that_is_an_empty_strin
         }
 
         enum strings{
-            non_empty
             EMPTY_STRING_VALUE      @map("")
+            non_empty
         }
     "#;
 
