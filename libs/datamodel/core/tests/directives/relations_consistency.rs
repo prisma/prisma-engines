@@ -1,8 +1,9 @@
 use crate::common::*;
 use datamodel::ast::Span;
 use datamodel::error::DatamodelError;
-use datamodel::{Field, FieldArity, FieldType};
+use datamodel::{render_datamodel_to_string, Field, FieldArity, FieldType};
 use datamodel_connector::scalars::ScalarType;
+use pretty_assertions::assert_eq;
 
 #[test]
 fn must_add_back_relation_fields_for_given_list_field() {
@@ -30,8 +31,12 @@ fn must_add_back_relation_fields_for_given_list_field() {
     post_model
         .assert_has_field("user")
         .assert_relation_to("User")
+        .assert_relation_base_fields(&["userId"])
         .assert_relation_to_fields(&["id"])
         .assert_arity(&datamodel::dml::FieldArity::Optional);
+    post_model
+        .assert_has_field("userId")
+        .assert_base_type(&datamodel::dml::ScalarType::Int);
 }
 
 #[test]
@@ -62,8 +67,41 @@ fn must_add_back_relation_fields_for_given_singular_field() {
     post_model
         .assert_has_field("user")
         .assert_relation_to("User")
+        .assert_relation_base_fields(&[])
         .assert_relation_to_fields(&[])
         .assert_arity(&datamodel::dml::FieldArity::List);
+}
+
+#[test]
+fn must_render_generated_back_relation_fields() {
+    let dml = r#"
+    model User {
+        id Int @id
+        posts Post[]
+    }
+
+    model Post {
+        post_id Int @id
+    }
+    "#;
+
+    let schema = parse(dml);
+
+    let rendered = dbg!(render_datamodel_to_string(&schema).unwrap());
+
+    assert_eq!(
+        rendered,
+        r#"model User {
+  id    Int    @id
+  posts Post[]
+}
+
+model Post {
+  post_id Int   @id
+  user    User? @relation(fields: [userId], references: [id])
+  userId  Int?
+}"#
+    );
 }
 
 #[test]
