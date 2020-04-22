@@ -4,6 +4,9 @@ use prisma_value::PrismaValue;
 use regex::Regex;
 use std::collections::HashMap;
 
+static EMPTY_ENUM_PLACEHOLDER: &'static str = "EMPTY_ENUM_VALUE";
+static EMPTY_STRING: &'static str = "";
+
 pub fn sanitize_datamodel_names(datamodel: &mut Datamodel) {
     let mut enum_renames = HashMap::new();
 
@@ -52,13 +55,17 @@ pub fn sanitize_datamodel_names(datamodel: &mut Datamodel) {
                     *enum_name = sanitized_enum_name;
 
                     if let Some(DefaultValue::Single(PrismaValue::Enum(value))) = &mut field.default_value {
-                        let (sanitized_value, _) = sanitize_name(value.to_string());
-
-                        field.default_value = if sanitized_value == "".to_string() {
-                            Some(DefaultValue::Expression(ValueGenerator::new_dbgenerated()))
+                        if EMPTY_STRING == value {
+                            *value = EMPTY_ENUM_PLACEHOLDER.to_string();
                         } else {
-                            Some(DefaultValue::Single(PrismaValue::Enum(sanitized_value)))
-                        };
+                            let (sanitized_value, _) = sanitize_name(value.to_string());
+
+                            field.default_value = if sanitized_value == EMPTY_STRING.to_string() {
+                                Some(DefaultValue::Expression(ValueGenerator::new_dbgenerated()))
+                            } else {
+                                Some(DefaultValue::Single(PrismaValue::Enum(sanitized_value)))
+                            };
+                        }
                     };
 
                     if field.database_name.is_none() {
@@ -95,9 +102,14 @@ pub fn sanitize_datamodel_names(datamodel: &mut Datamodel) {
         }
 
         for enum_value in &mut enm.values {
-            let (sanitized_name, db_name) = sanitize_name(enum_value.name.clone());
-            enum_value.name = sanitized_name;
-            enum_value.database_name = db_name;
+            if &enum_value.name == EMPTY_STRING {
+                enum_value.name = EMPTY_ENUM_PLACEHOLDER.to_string();
+                enum_value.database_name = Some(EMPTY_STRING.to_string());
+            } else {
+                let (sanitized_name, db_name) = sanitize_name(enum_value.name.clone());
+                enum_value.name = sanitized_name;
+                enum_value.database_name = db_name;
+            }
         }
     }
 }
