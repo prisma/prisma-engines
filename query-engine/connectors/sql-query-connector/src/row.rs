@@ -70,7 +70,7 @@ pub fn row_value_to_prisma_value(
 ) -> Result<PrismaValue, SqlError> {
     Ok(match type_identifier {
         TypeIdentifier::Boolean => match p_value {
-            //                    ParameterizedValue::Array(vec) => PrismaValue::Boolean(b),
+            // ParameterizedValue::Array(vec) => PrismaValue::Boolean(b),
             ParameterizedValue::Null => PrismaValue::Null,
             ParameterizedValue::Integer(i) => PrismaValue::Boolean(i != 0),
             ParameterizedValue::Boolean(b) => PrismaValue::Boolean(b),
@@ -91,8 +91,8 @@ pub fn row_value_to_prisma_value(
 
         TypeIdentifier::Json => match p_value {
             ParameterizedValue::Null => PrismaValue::Null,
-            ParameterizedValue::Text(json) => PrismaValue::String(json.into()),
-            ParameterizedValue::Json(json) => PrismaValue::String(json.to_string()),
+            ParameterizedValue::Text(json) => PrismaValue::Json(json.into()),
+            ParameterizedValue::Json(json) => PrismaValue::Json(json.to_string()),
             _ => {
                 let error = io::Error::new(io::ErrorKind::InvalidData, "Json value not stored as text or json");
                 return Err(SqlError::ConversionError(error.into()));

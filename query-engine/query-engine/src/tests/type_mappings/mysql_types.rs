@@ -88,7 +88,7 @@ const CREATE_ONE_TYPES_QUERY: &str = indoc! {
                 # string_blob_blob: \"very average blob\"
                 # string_blob_longblob: \"loong looooong bloooooooob\"
                 string_enum: \"jellicle_cats\"
-                json: \"{\\\"name\\\": null}\"
+                json: \"{\\\"name\\\":null}\"
             }
         ) { id }
     }
@@ -125,7 +125,7 @@ fn expected_create_one_types_result() -> serde_json::Value {
         // "string_blob_blob": "very average blob",
         // "string_blob_longblob": "loong looooong bloooooooob",
         "string_enum": "jellicle_cats",
-        "json": "{\"name\": null}",
+        "json": "{\"name\":null}",
     })
 }
 

@@ -1,4 +1,4 @@
-package writes.datetime
+package writes.dataTypes.datetime
 
 import org.scalatest.{FlatSpec, Matchers}
 import util._

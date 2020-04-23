@@ -35,6 +35,7 @@ impl From<PrismaValue> for QueryValue {
             PrismaValue::Int(i) => Self::Int(i),
             PrismaValue::Null => Self::Null,
             PrismaValue::Uuid(u) => Self::String(u.to_hyphenated().to_string()),
+            PrismaValue::Json(s) => Self::String(s),
         }
     }
 }
