@@ -4,6 +4,7 @@ use chrono::{DateTime, Datelike, NaiveDate, NaiveDateTime, NaiveTime, Timelike, 
 use mysql_async as my;
 use mysql_async::Value as MyValue;
 use rust_decimal::prelude::ToPrimitive;
+use std::convert::TryFrom;
 
 pub fn conv_params<'a>(params: &[ParameterizedValue<'a>]) -> my::Params {
     if params.is_empty() {
@@ -30,7 +31,7 @@ impl TakeRow for my::Row {
                 my::Value::Bytes(b) if column.column_type() == mysql_async::consts::ColumnType::MYSQL_TYPE_JSON => {
                     serde_json::from_slice(&b)
                         .map(|val| ParameterizedValue::Json(val))
-                        .map_err(|e| {
+                        .map_err(|_e| {
                             crate::error::Error::builder(ErrorKind::ConversionError("Unable to convert bytes to JSON"))
                                 .build()
                         })?
@@ -53,8 +54,13 @@ impl TakeRow for my::Row {
                 my::Value::Bytes(b) if column.character_set() == 63 => ParameterizedValue::Bytes(b.into()),
                 my::Value::Bytes(s) => ParameterizedValue::Text(String::from_utf8(s)?.into()),
                 my::Value::Int(i) => ParameterizedValue::Integer(i),
-                // TOOD: This is unsafe
-                my::Value::UInt(i) => ParameterizedValue::Integer(i as i64),
+                my::Value::UInt(i) => ParameterizedValue::Integer(i64::try_from(i).map_err(|_| {
+                    let builder = crate::error::Error::builder(ErrorKind::ValueOutOfRange {
+                        message: "Unsigned integers larger than 9_223_372_036_854_775_807 are currently not handled."
+                            .into(),
+                    });
+                    builder.build()
+                })?),
                 my::Value::Float(f) => ParameterizedValue::from(f),
                 my::Value::Double(f) => ParameterizedValue::from(f),
                 #[cfg(feature = "chrono-0_4")]

@@ -153,6 +153,9 @@ pub enum ErrorKind {
     #[error("Error opening a TLS connection. {}", message)]
     TlsError { message: String },
 
+    #[error("Value out of range error. {}", message)]
+    ValueOutOfRange { message: String },
+
     #[cfg(feature = "serde-support")]
     #[error("Deserializing a ResultRow {:?}", _0)]
     FromRowError(serde::de::value::Error),
