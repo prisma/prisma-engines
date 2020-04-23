@@ -382,7 +382,7 @@ fn implicit_relation_fields() {
     let post = datamodel.assert_model("Post");
     let relation = datamodel.assert_relation(relation_name);
 
-    post.assert_relation_field("blog").assert_optional();
+    post.assert_relation_field("Blog").assert_optional();
 
     relation
         .assert_name(relation_name)
