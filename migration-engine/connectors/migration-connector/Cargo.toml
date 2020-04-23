@@ -16,3 +16,4 @@ user-facing-errors = { path = "../../../libs/user-facing-errors" }
 tracing = "0.1.10"
 thiserror = "1.0.9"
 anyhow = "1.0.26"
+tracing-error = "0.1.2"
