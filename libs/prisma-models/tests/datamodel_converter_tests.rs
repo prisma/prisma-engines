@@ -165,6 +165,52 @@ fn unique_works() {
 }
 
 #[test]
+fn multi_field_unique_with_1_field_must_be_transformed_to_is_unique_on_field() {
+    let datamodel = convert(
+        r#"
+            model Test {
+                id     String @id
+                a      String
+                b      String
+                @@unique([a])
+                @@unique([a,b])
+                @@index([b,a])
+            }
+        "#,
+    );
+
+    let model = datamodel.assert_model("Test");
+    dbg!(&model);
+    model
+        .assert_indexes_length(2)
+        .assert_index(&["a", "b"], IndexType::Unique)
+        .assert_index(&["b", "a"], IndexType::Normal);
+    model
+        .assert_scalar_field("a")
+        .assert_type_identifier(TypeIdentifier::String)
+        .assert_unique();
+}
+
+#[test]
+fn multi_field_id_with_1_field_must_be_transformed_to_is_id_on_field() {
+    let datamodel = convert(
+        r#"
+            model Test {
+                a String
+                
+                @@id([a])
+            }
+        "#,
+    );
+
+    let model = datamodel.assert_model("Test");
+    model
+        .assert_scalar_field("a")
+        .assert_type_identifier(TypeIdentifier::String)
+        .assert_is_id();
+}
+
+#[test]
 fn uuid_fields_must_work() {
     let datamodel = convert(
         r#"
@@ -336,7 +382,7 @@ fn implicit_relation_fields() {
     let post = datamodel.assert_model("Post");
     let relation = datamodel.assert_relation(relation_name);
 
-    post.assert_relation_field("blog").assert_optional();
+    post.assert_relation_field("Blog").assert_optional();
 
     relation
         .assert_name(relation_name)
@@ -448,11 +494,36 @@ impl DatamodelAssertions for InternalDataModel {
 }
 
 trait ModelAssertions {
+    fn assert_indexes_length(&self, len: usize) -> &Self;
+    fn assert_index(&self, fields: &[&str], tpe: IndexType) -> &Self;
     fn assert_scalar_field(&self, name: &str) -> Arc<ScalarField>;
     fn assert_relation_field(&self, name: &str) -> Arc<RelationField>;
 }
 
 impl ModelAssertions for Model {
+    fn assert_indexes_length(&self, len: usize) -> &Self {
+        assert_eq!(self.indexes().len(), len);
+        self
+    }
+
+    fn assert_index(&self, fields: &[&str], tpe: IndexType) -> &Self {
+        self.indexes()
+            .iter()
+            .find(|index| {
+                let has_right_type = index.typ == tpe;
+                let field_names: Vec<String> = index.fields().iter().map(|f| f.name.clone()).collect();
+                let expected_field_names: Vec<String> = fields.into_iter().map(|f| f.to_string()).collect();
+                let is_for_right_fields = field_names == expected_field_names;
+
+                is_for_right_fields && has_right_type
+            })
+            .expect(&format!(
+                "Could not find the index for fields {:?} and type {:?}",
+                fields, tpe
+            ));
+        self
+    }
+
     fn assert_scalar_field(&self, name: &str) -> Arc<ScalarField> {
         self.fields().find_from_scalar(name).unwrap()
     }
@@ -474,6 +545,7 @@ trait ScalarFieldAssertions {
     fn assert_behaviour(&self, behaviour: FieldBehaviour) -> &Self;
     fn assert_no_behaviour(&self) -> &Self;
     fn assert_is_auto_generated_int_id_by_db(&self) -> &Self;
+    fn assert_is_id(&self) -> &Self;
 }
 
 trait RelationFieldAssertions {
@@ -521,6 +593,11 @@ impl ScalarFieldAssertions for ScalarField {
 
     fn assert_is_auto_generated_int_id_by_db(&self) -> &Self {
         assert!(self.is_auto_generated_int_id);
+        self
+    }
+
+    fn assert_is_id(&self) -> &Self {
+        assert!(self.is_id);
         self
     }
 }
