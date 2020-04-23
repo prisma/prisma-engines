@@ -1239,6 +1239,7 @@ dependencies = [
  "serde_json",
  "thiserror",
  "tracing",
+ "tracing-error",
  "user-facing-errors",
 ]
 
@@ -1259,6 +1260,7 @@ dependencies = [
  "sql-migration-connector",
  "thiserror",
  "tracing",
+ "tracing-error",
  "tracing-futures",
  "user-facing-errors",
 ]
@@ -1281,6 +1283,7 @@ dependencies = [
  "thiserror",
  "tokio",
  "tracing",
+ "tracing-error",
  "tracing-subscriber",
  "url 2.1.1",
  "user-facing-errors",
@@ -2539,6 +2542,7 @@ dependencies = [
  "thiserror",
  "tokio",
  "tracing",
+ "tracing-error",
  "tracing-futures",
  "user-facing-errors",
 ]
@@ -2759,6 +2763,7 @@ dependencies = [
  "once_cell",
  "quaint",
  "tokio",
+ "tracing-error",
  "tracing-subscriber",
  "url 2.1.1",
 ]
@@ -2946,6 +2951,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0aa83a9a47081cd522c09c81b31aec2c9273424976f922ad61c053b58350b715"
 dependencies = [
  "lazy_static",
+]
+
+[[package]]
+name = "tracing-error"
+version = "0.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b4d7c0b83d4a500748fa5879461652b361edf5c9d51ede2a2ac03875ca185e24"
+dependencies = [
+ "tracing",
+ "tracing-subscriber",
 ]
 
 [[package]]

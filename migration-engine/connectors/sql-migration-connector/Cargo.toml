@@ -22,3 +22,4 @@ tokio = { version = "0.2", features = ["time"] }
 tracing = "0.1.10"
 tracing-futures = "0.2.0"
 user-facing-errors = { path = "../../../libs/user-facing-errors", features = ["sql"] }
+tracing-error = "0.1.2"

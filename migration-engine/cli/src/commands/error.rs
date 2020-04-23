@@ -1,5 +1,6 @@
 use migration_connector::*;
 use thiserror::Error;
+use tracing_error::SpanTrace;
 
 #[derive(Debug, Error)]
 pub enum CliError {
@@ -8,9 +9,10 @@ pub enum CliError {
         error: user_facing_errors::KnownError,
         exit_code: i32,
     },
-    #[error("{}", error)]
+    #[error("{}\n{}", error, context)]
     Unknown {
         error: migration_connector::ErrorKind,
+        context: SpanTrace,
         exit_code: i32,
     },
 
@@ -70,6 +72,7 @@ impl From<migration_connector::ConnectorError> for CliError {
         let ConnectorError {
             user_facing_error,
             kind: error_kind,
+            context,
         } = e;
 
         let exit_code = exit_code(&error_kind);
@@ -79,6 +82,7 @@ impl From<migration_connector::ConnectorError> for CliError {
             None => CliError::Unknown {
                 error: error_kind,
                 exit_code,
+                context,
             },
         }
     }

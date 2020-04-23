@@ -69,23 +69,31 @@ pub enum SqlError {
 
 impl SqlError {
     pub(crate) fn into_connector_error(self, connection_info: &super::ConnectionInfo) -> ConnectorError {
+        use tracing_error::SpanTrace;
+
+        let context = SpanTrace::capture();
+
         match self {
             SqlError::DatabaseDoesNotExist { db_name, cause } => ConnectorError {
                 user_facing_error: render_quaint_error(&cause, connection_info),
                 kind: ErrorKind::DatabaseDoesNotExist { db_name },
+                context,
             },
             SqlError::DatabaseAccessDenied { db_name, cause } => ConnectorError {
                 user_facing_error: render_quaint_error(&cause, connection_info),
                 kind: ErrorKind::DatabaseAccessDenied { database_name: db_name },
+                context,
             },
 
             SqlError::DatabaseAlreadyExists { db_name, cause } => ConnectorError {
                 user_facing_error: render_quaint_error(&cause, connection_info),
                 kind: ErrorKind::DatabaseAlreadyExists { db_name },
+                context,
             },
             SqlError::AuthenticationFailed { user, cause } => ConnectorError {
                 user_facing_error: render_quaint_error(&cause, connection_info),
                 kind: ErrorKind::AuthenticationFailed { user },
+                context,
             },
             SqlError::ConnectTimeout(cause) => {
                 let user_facing_error = render_quaint_error(&cause, connection_info);
@@ -93,6 +101,7 @@ impl SqlError {
                 ConnectorError {
                     user_facing_error,
                     kind: ErrorKind::ConnectTimeout,
+                    context,
                 }
             }
             SqlError::Timeout => ConnectorError::from_kind(ErrorKind::Timeout),
@@ -102,8 +111,9 @@ impl SqlError {
                 ConnectorError {
                     user_facing_error,
                     kind: ErrorKind::TlsError {
-                        message: format!("{}", cause),
+                        message: cause.to_string(),
                     },
+                    context,
                 }
             }
             SqlError::ConnectionError { cause } => {
@@ -114,6 +124,7 @@ impl SqlError {
                         host: connection_info.host().to_owned(),
                         cause: cause.into(),
                     },
+                    context,
                 }
             }
             SqlError::UniqueConstraintViolation { cause, .. } => {
@@ -124,6 +135,7 @@ impl SqlError {
                         host: connection_info.host().to_owned(),
                         cause: cause.into(),
                     },
+                    context,
                 }
             }
             error => ConnectorError::from_kind(ErrorKind::QueryError(error.into())),
