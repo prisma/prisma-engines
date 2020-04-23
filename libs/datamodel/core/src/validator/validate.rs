@@ -33,6 +33,10 @@ impl<'a> Validator<'a> {
             {
                 errors_for_model.push(err);
             }
+            if let Err(err) = self.validate_model_name(ast_schema.find_model(&model.name).expect(STATE_ERROR), model) {
+                errors_for_model.push(err);
+            }
+
             if let Err(err) = self.validate_relations_not_ambiguous(ast_schema, model) {
                 errors_for_model.push(err);
             }
@@ -181,6 +185,21 @@ impl<'a> Validator<'a> {
             Ok(())
         } else {
             missing_id_criteria_error
+        }
+    }
+
+    fn validate_model_name(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), DatamodelError> {
+        if super::invalid_model_names::RESERVED_MODEL_NAMES.contains(&model.name.as_str()) {
+            Err(DatamodelError::new_model_validation_error(
+                &format!(
+                    "The model name `{}` is invalid. It is a reserved name. Please change it.",
+                    &model.name
+                ),
+                &model.name,
+                ast_model.span.clone(),
+            ))
+        } else {
+            Ok(())
         }
     }
 
