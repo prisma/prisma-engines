@@ -186,6 +186,10 @@ impl<'a> TypeRef<'a> {
             _ => None,
         }
     }
+
+    pub(super) fn is_json(&self) -> bool {
+        matches!(self, TypeRef::Base(ScalarType::Json))
+    }
 }
 
 #[derive(Debug)]
