@@ -29,7 +29,7 @@ fn must_add_back_relation_fields_for_given_list_field() {
 
     let post_model = schema.assert_has_model("Post");
     post_model
-        .assert_has_field("user")
+        .assert_has_field("User")
         .assert_relation_to("User")
         .assert_relation_base_fields(&["userId"])
         .assert_relation_to_fields(&["id"])
@@ -65,7 +65,7 @@ fn must_add_back_relation_fields_for_given_singular_field() {
 
     let post_model = schema.assert_has_model("Post");
     post_model
-        .assert_has_field("user")
+        .assert_has_field("User")
         .assert_relation_to("User")
         .assert_relation_base_fields(&[])
         .assert_relation_to_fields(&[])
@@ -98,7 +98,7 @@ fn must_render_generated_back_relation_fields() {
 
 model Post {
   post_id Int   @id
-  user    User? @relation(fields: [userId], references: [id])
+  User    User? @relation(fields: [userId], references: [id])
   userId  Int?
 }"#
     );
@@ -341,7 +341,7 @@ fn should_add_back_relations_for_more_complex_cases() {
     // Forward
     schema
         .assert_has_model("Post")
-        .assert_has_field("user")
+        .assert_has_field("User")
         .assert_relation_to("User")
         .assert_relation_to_fields(&["id"])
         .assert_relation_name("PostToUser")
@@ -363,7 +363,7 @@ fn should_add_back_relations_for_more_complex_cases() {
     // Forward
     schema
         .assert_has_model("Comment")
-        .assert_has_field("post")
+        .assert_has_field("Post")
         .assert_relation_to("Post")
         .assert_relation_to_fields(&["post_id"])
         .assert_relation_name("CommentToPost")
@@ -499,7 +499,7 @@ fn should_camel_case_back_relation_field_name() {
     let schema = parse(dml);
     let post_model = schema.assert_has_model("Post");
     post_model
-        .assert_has_field("ohWhatAUser")
+        .assert_has_field("OhWhatAUser")
         .assert_relation_to("OhWhatAUser");
 }
 
@@ -523,7 +523,7 @@ fn must_add_back_relation_fields_for_self_relations() {
         .assert_relation_to_fields(&["id"]);
 
     model
-        .assert_has_field("human")
+        .assert_has_field("Human")
         .assert_relation_to("Human")
         .assert_arity(&FieldArity::List)
         .assert_relation_to_fields(&[]);
@@ -632,7 +632,7 @@ fn must_handle_conflicts_with_existing_fields_if_types_are_compatible() {
     dbg!(&post.fields);
     assert_eq!(blog_id_fields.len(), 1);
 
-    let field = post.find_field("blog").unwrap();
+    let field = post.assert_has_field("Blog");
     field.assert_relation_base_fields(&["blogId"]);
 }
 
@@ -659,7 +659,7 @@ fn must_handle_conflicts_with_existing_fields_if_types_are_incompatible() {
     assert!(underlying_field.arity.is_optional());
     assert_eq!(underlying_field.field_type, FieldType::Base(ScalarType::String, None));
 
-    let field = post.assert_has_field("blog");
+    let field = post.assert_has_field("Blog");
     field.assert_relation_base_fields(&["blogId_BlogToPost"]);
 }
 

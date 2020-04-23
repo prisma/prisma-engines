@@ -31,7 +31,7 @@ fn succeed_without_directive_if_unambigous() {
 
     let comment_model = schema.assert_has_model("Comment");
     comment_model
-        .assert_has_field("todo")
+        .assert_has_field("Todo")
         .assert_arity(&dml::FieldArity::Optional)
         .assert_relation_to("Todo");
 }

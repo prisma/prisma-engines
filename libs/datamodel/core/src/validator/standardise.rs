@@ -195,7 +195,7 @@ impl Standardiser {
 
                         result.push(AddMissingBackRelationField {
                             model: rel.to.clone(),
-                            field: model.name.camel_case(),
+                            field: model.name.clone(),
                             arity: dml::FieldArity::List,
                             relation_info,
                             related_model: model.name.to_string(),
@@ -266,7 +266,7 @@ impl Standardiser {
 
                         result.push(AddMissingBackRelationField {
                             model: rel.to.clone(),
-                            field: model.name.camel_case(),
+                            field: model.name.clone(),
                             arity: dml::FieldArity::Optional,
                             relation_info,
                             related_model: model.name.to_string(),
