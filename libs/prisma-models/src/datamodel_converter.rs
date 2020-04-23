@@ -55,17 +55,13 @@ impl<'a> DatamodelConverter<'a> {
     fn convert_models(&self) -> Vec<ModelTemplate> {
         self.datamodel
             .models()
-            .map(|model| {
-                let model = Self::sanitize_model(model.clone());
-
-                ModelTemplate {
-                    name: model.name.clone(),
-                    is_embedded: model.is_embedded,
-                    fields: self.convert_fields(&model),
-                    manifestation: model.database_name().map(|s| s.to_owned()),
-                    id_field_names: model.id_fields.clone(),
-                    indexes: self.convert_indexes(&model),
-                }
+            .map(|model| ModelTemplate {
+                name: model.name.clone(),
+                is_embedded: model.is_embedded,
+                fields: self.convert_fields(&model),
+                manifestation: model.database_name().map(|s| s.to_owned()),
+                id_field_names: model.id_fields.clone(),
+                indexes: self.convert_indexes(&model),
             })
             .collect()
     }
@@ -91,7 +87,7 @@ impl<'a> DatamodelConverter<'a> {
                         is_id: field.is_id,
                         is_required: field.is_required(),
                         is_list: field.is_list(),
-                        is_unique: field.is_unique(),
+                        is_unique: field.is_unique(&model),
                         is_auto_generated_int_id: field.is_auto_generated_int_id(),
                         relation_name: relation.name(),
                         relation_side: relation.relation_side(field),
@@ -103,8 +99,8 @@ impl<'a> DatamodelConverter<'a> {
                     type_identifier: field.type_identifier(),
                     is_required: field.is_required(),
                     is_list: field.is_list(),
-                    is_unique: field.is_unique(),
-                    is_id: field.is_id,
+                    is_unique: field.is_unique(&model),
+                    is_id: field.is_id(&model),
                     is_auto_generated_int_id: field.is_auto_generated_int_id(),
                     behaviour: field.behaviour(),
                     internal_enum: field.internal_enum(self.datamodel),
@@ -134,6 +130,7 @@ impl<'a> DatamodelConverter<'a> {
         model
             .indices
             .iter()
+            .filter(|i| i.fields.len() > 1) // @@unique for 1 field are transformed to is_unique instead
             .map(|i| IndexTemplate {
                 name: i.name.clone(),
                 fields: i.fields.clone(),
@@ -275,42 +272,6 @@ impl<'a> DatamodelConverter<'a> {
 
         result.into_iter().unique_by(|rel| rel.name()).collect()
     }
-
-    /// Normalizes the model for usage in the query core.
-    fn sanitize_model(mut model: dml::Model) -> dml::Model {
-        // Fold single-field unique indices into the fields (makes a single field unique).
-        let (keep, transform): (Vec<_>, Vec<_>) = model.indices.into_iter().partition(|i| match i.tpe {
-            dml::IndexType::Unique if i.fields.len() == 1 => false,
-            _ => true,
-        });
-
-        model.indices = keep;
-
-        for index in transform {
-            if index.tpe == dml::IndexType::Unique {
-                let field_name = index.fields.first().unwrap();
-
-                model
-                    .fields
-                    .iter_mut()
-                    .find(|f| &f.name == field_name)
-                    .map(|f| f.is_unique = true);
-            }
-        }
-
-        // Fold single-field @@id into the fields (makes a single field @id).
-        if model.id_fields.len() == 1 {
-            let field_name = model.id_fields.pop().unwrap();
-
-            model
-                .fields
-                .iter_mut()
-                .find(|f| f.name == field_name)
-                .map(|f| f.is_id = true);
-        }
-
-        model
-    }
 }
 
 #[derive(Debug, Clone)]
@@ -400,7 +361,8 @@ trait DatamodelFieldExtensions {
     fn type_identifier(&self) -> TypeIdentifier;
     fn is_required(&self) -> bool;
     fn is_list(&self) -> bool;
-    fn is_unique(&self) -> bool;
+    fn is_unique(&self, model: &dml::Model) -> bool;
+    fn is_id(&self, model: &dml::Model) -> bool;
     fn is_auto_generated_int_id(&self) -> bool;
     fn behaviour(&self) -> Option<FieldBehaviour>;
     fn final_db_name(&self) -> String;
@@ -436,8 +398,20 @@ impl DatamodelFieldExtensions for dml::Field {
         self.arity == dml::FieldArity::List
     }
 
-    fn is_unique(&self) -> bool {
-        self.is_unique
+    fn is_unique(&self, model: &dml::Model) -> bool {
+        // transform @@unique for 1 field to is_unique
+        let is_declared_as_unique_through_multi_field_unique = model
+            .indices
+            .iter()
+            .find(|id| id.fields == vec![self.name.clone()])
+            .is_some();
+
+        self.is_unique || is_declared_as_unique_through_multi_field_unique
+    }
+
+    fn is_id(&self, model: &dml::Model) -> bool {
+        // transform @@id for 1 field to is_id
+        self.is_id || model.id_fields == vec![self.name.clone()]
     }
 
     fn is_auto_generated_int_id(&self) -> bool {
