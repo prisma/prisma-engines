@@ -1,9 +1,11 @@
-mod datamodel_helpers;
-
-use crate::{error::SqlError, sql_renderer::IteratorJoin, DatabaseInfo, SqlResult};
+use crate::{
+    datamodel_helpers::{self, FieldRef, ModelRef, TypeRef},
+    error::SqlError,
+    sql_renderer::IteratorJoin,
+    DatabaseInfo, SqlResult,
+};
 use datamodel::common::*;
 use datamodel::*;
-use datamodel_helpers::{FieldRef, ModelRef, TypeRef};
 use prisma_models::{DatamodelConverter, TempManifestationHolder, TempRelationHolder};
 use prisma_value::PrismaValue;
 use quaint::prelude::SqlFamily;

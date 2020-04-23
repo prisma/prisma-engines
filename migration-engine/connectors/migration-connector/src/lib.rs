@@ -42,6 +42,15 @@ pub trait MigrationConnector: Send + Sync + 'static {
     /// Drop all database state.
     async fn reset(&self) -> ConnectorResult<()>;
 
+    /// Optionally check that the features implied by the provided datamodel are all compatible with
+    /// the specific database version being used.
+    fn check_database_version_compatibility(
+        &self,
+        _datamodel: &datamodel::dml::Datamodel,
+    ) -> Vec<destructive_changes_checker::MigrationError> {
+        Vec::new()
+    }
+
     /// See [MigrationPersistence](trait.MigrationPersistence.html).
     fn migration_persistence<'a>(&'a self) -> Box<dyn MigrationPersistence + 'a>;
 
