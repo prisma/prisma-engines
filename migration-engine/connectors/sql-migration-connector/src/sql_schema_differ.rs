@@ -12,10 +12,25 @@ use sql_schema_describer::*;
 use tracing::debug;
 
 #[derive(Debug)]
+#[cfg_attr(test, derive(Default))]
+pub(crate) struct DiffingOptions {
+    is_mariadb: bool,
+}
+
+impl DiffingOptions {
+    pub(crate) fn from_database_info(database_info: &DatabaseInfo) -> Self {
+        DiffingOptions {
+            is_mariadb: database_info.is_mariadb(),
+        }
+    }
+}
+
+#[derive(Debug)]
 pub struct SqlSchemaDiffer<'a> {
     previous: &'a SqlSchema,
     next: &'a SqlSchema,
     sql_family: SqlFamily,
+    diffing_options: &'a DiffingOptions,
 }
 
 #[derive(Debug, Clone)]
@@ -57,11 +72,17 @@ impl SqlSchemaDiff {
 }
 
 impl<'schema> SqlSchemaDiffer<'schema> {
-    pub fn diff(previous: &SqlSchema, next: &SqlSchema, sql_family: SqlFamily) -> SqlSchemaDiff {
+    pub(crate) fn diff(
+        previous: &SqlSchema,
+        next: &SqlSchema,
+        sql_family: SqlFamily,
+        options: &DiffingOptions,
+    ) -> SqlSchemaDiff {
         let differ = SqlSchemaDiffer {
             previous,
             next,
             sql_family,
+            diffing_options: &options,
         };
         differ.diff_internal()
     }
@@ -144,6 +165,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
         for previous_table in &self.previous.tables {
             if let Ok(next_table) = self.next.table(&previous_table.name) {
                 let differ = TableDiffer {
+                    diffing_options: &self.diffing_options,
                     previous: &previous_table,
                     next: &next_table,
                 };
@@ -316,6 +338,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
                 .iter()
                 .find(move |next_table| tables_match(previous_table, next_table))
                 .map(move |next_table| TableDiffer {
+                    diffing_options: &self.diffing_options,
                     previous: previous_table,
                     next: next_table,
                 })

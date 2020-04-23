@@ -84,6 +84,7 @@ impl MySqlRenderer {
 
                 Ok(format!("ENUM({})", variants).into())
             }
+            ColumnTypeFamily::Json => Ok("json".into()),
             x => unimplemented!("{:?} not handled yet", x),
         }
     }

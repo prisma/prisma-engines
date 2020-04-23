@@ -60,6 +60,7 @@ pub(crate) fn render_column_type(t: &ColumnType) -> String {
         ColumnTypeFamily::Int => format!("integer {}", array),
         ColumnTypeFamily::String => format!("text {}", array),
         ColumnTypeFamily::Enum(name) => format!("{}{}", quoted(name), array),
+        ColumnTypeFamily::Json => format!("jsonb {}", array),
         x => unimplemented!("{:?} not handled yet", x),
     }
 }

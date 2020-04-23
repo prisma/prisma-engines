@@ -1,8 +1,9 @@
 use crate::{
+    database_info::DatabaseInfo,
     sql_migration::*,
     sql_renderer::sqlite_quoted,
     sql_renderer::SqlRenderer,
-    sql_schema_differ::{ColumnDiffer, SqlSchemaDiff, TableDiffer},
+    sql_schema_differ::{ColumnDiffer, DiffingOptions, SqlSchemaDiff, TableDiffer},
     SqlFamily, SqlResult,
 };
 use sql_schema_describer::{ColumnArity, SqlSchema, Table};
@@ -12,6 +13,7 @@ pub(super) fn fix(
     current_database_schema: &SqlSchema,
     next_database_schema: &SqlSchema,
     schema_name: &str,
+    database_info: &DatabaseInfo,
 ) -> SqlResult<Vec<SqlMigrationStep>> {
     let steps = diff.into_steps();
 
@@ -32,6 +34,7 @@ pub(super) fn fix(
                     next_database_schema,
                     &alter_table.table.name,
                     schema_name,
+                    database_info,
                 )?);
                 fixed_tables.push(alter_table.table.name.clone());
             }
@@ -47,6 +50,7 @@ pub(super) fn fix(
                     next_database_schema,
                     &table,
                     schema_name,
+                    database_info,
                 )?);
                 fixed_tables.push(table.clone());
             }
@@ -91,13 +95,14 @@ fn sqlite_fix_table(
     next_database_schema: &SqlSchema,
     table_name: &str,
     schema_name: &str,
+    database_info: &DatabaseInfo,
 ) -> SqlResult<impl Iterator<Item = SqlMigrationStep>> {
     let current_table = current_database_schema.table(table_name)?;
     let next_table = next_database_schema.table(table_name)?;
-    Ok(fix_table(&current_table, &next_table, &schema_name).into_iter())
+    Ok(fix_table(&current_table, &next_table, &schema_name, database_info).into_iter())
 }
 
-fn fix_table(current: &Table, next: &Table, schema_name: &str) -> Vec<SqlMigrationStep> {
+fn fix_table(current: &Table, next: &Table, schema_name: &str, database_info: &DatabaseInfo) -> Vec<SqlMigrationStep> {
     // based on 'Making Other Kinds Of Table Schema Changes' from https://www.sqlite.org/lang_altertable.html
     let name_of_temporary_table = format!("new_{}", &next.name);
     let mut temporary_table = next.clone();
@@ -110,9 +115,12 @@ fn fix_table(current: &Table, next: &Table, schema_name: &str) -> Vec<SqlMigrati
         table: temporary_table.clone(),
     }));
 
+    let diffing_options = DiffingOptions::from_database_info(database_info);
+
     copy_current_table_into_new_table(
         &mut result,
         TableDiffer {
+            diffing_options: &diffing_options,
             previous: current,
             next: &temporary_table,
         },

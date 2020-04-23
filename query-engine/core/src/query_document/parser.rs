@@ -179,6 +179,7 @@ impl QueryDocumentParser {
             (QueryValue::Null, _)                         => Ok(PrismaValue::Null),
             (QueryValue::String(s), ScalarType::String)   => Ok(PrismaValue::String(s)),
             (QueryValue::String(s), ScalarType::DateTime) => Self::parse_datetime(s.as_str()).map(PrismaValue::DateTime),
+            (QueryValue::String(s), ScalarType::Json) => Ok(PrismaValue::Json(Self::parse_json(&s).map(|_| s)?)),
             (QueryValue::String(s), ScalarType::JsonList) => Self::parse_json_list(&s),
             (QueryValue::String(s), ScalarType::UUID)     => Self::parse_uuid(s.as_str()).map(PrismaValue::Uuid),
             (QueryValue::Int(i), ScalarType::Float)       => Ok(PrismaValue::Float(Decimal::from(i))),
@@ -206,6 +207,7 @@ impl QueryDocumentParser {
             })
     }
 
+    // [DTODO] This completely misses the point of the API type system. Rework & remove.
     pub fn parse_json_list(s: &str) -> QueryParserResult<PrismaValue> {
         let json = Self::parse_json(s)?;
 
