@@ -1,5 +1,5 @@
 #[macro_use]
-extern crate log;
+extern crate tracing;
 #[macro_use]
 extern crate rust_embed;
 
@@ -17,7 +17,6 @@ use once_cell::sync::Lazy;
 use request_handlers::{PrismaRequest, PrismaResponse, RequestHandler};
 use std::error::Error;
 use tracing::subscriber;
-use tracing_log::LogTracer;
 use tracing_subscriber::{EnvFilter, FmtSubscriber};
 
 
@@ -41,8 +40,6 @@ pub type AnyError = Box<dyn Error + Send + Sync + 'static>;
 
 
 pub fn init_logger() -> Result<(), AnyError> {
-	LogTracer::init()?;
-
 	match *LOG_FORMAT {
 		LogFormat::Text => {
 			let subscriber = FmtSubscriber::builder()

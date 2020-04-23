@@ -1,7 +1,6 @@
 #[macro_use]
-extern crate log;
+extern crate tracing;
 
-// use query_engine::*;
 use std::process;
 use std::net::SocketAddr;
 use query_engine::{
