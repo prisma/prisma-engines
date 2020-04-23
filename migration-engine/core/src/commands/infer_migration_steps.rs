@@ -1,13 +1,12 @@
 //! The InferMigrationSteps RPC method.
 
 use super::MigrationStepsResultOutput;
-use crate::commands::command::*;
-use crate::migration_engine::MigrationEngine;
-use crate::*;
+use crate::{commands::command::*, migration_engine::MigrationEngine, *};
 use datamodel::ast::{parser::parse, SchemaAst};
 use migration_connector::*;
 use serde::Deserialize;
 use tracing::debug;
+use tracing_error::SpanTrace;
 
 pub struct InferMigrationStepsCommand<'a> {
     input: &'a InferMigrationStepsInput,
@@ -145,6 +144,7 @@ impl InferMigrationStepsCommand<'_> {
                             "Input is invalid. Migration {} is already applied.",
                             migration.migration_id
                         )),
+                        context: SpanTrace::capture(),
                     }));
                 }
             }

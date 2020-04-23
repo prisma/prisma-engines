@@ -1,15 +1,18 @@
 use anyhow::format_err;
 use std::fmt::Display;
 use thiserror::Error;
+use tracing_error::SpanTrace;
 use user_facing_errors::KnownError;
 
 #[derive(Debug, Error)]
-#[error("{}", kind)]
+#[error("{}\n{}", kind, context)]
 pub struct ConnectorError {
     /// An optional error already rendered for users in case the migration core does not handle it.
     pub user_facing_error: Option<KnownError>,
     /// The error information for internal use.
     pub kind: ErrorKind,
+    /// See the tracing-error docs.
+    pub context: SpanTrace,
 }
 
 impl ConnectorError {
@@ -17,6 +20,7 @@ impl ConnectorError {
         ConnectorError {
             user_facing_error: None,
             kind,
+            context: SpanTrace::capture(),
         }
     }
 
@@ -28,6 +32,7 @@ impl ConnectorError {
                 url,
                 err
             )),
+            context: SpanTrace::capture(),
         }
     }
 }

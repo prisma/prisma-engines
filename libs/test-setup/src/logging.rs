@@ -1,20 +1,24 @@
+use tracing_error::ErrorLayer;
 use tracing_subscriber::{
-    fmt::{
-        format::{DefaultFields, Format},
-        Subscriber,
-    },
-    EnvFilter,
+    fmt::format::{DefaultFields, Format},
+    layer::Layered,
+    prelude::*,
+    EnvFilter, FmtSubscriber,
 };
 
-type Sub = Subscriber<DefaultFields, Format, EnvFilter, PrintWriter>;
+type Sub = Layered<
+    ErrorLayer<FmtSubscriber<DefaultFields, Format, EnvFilter, PrintWriter>>,
+    FmtSubscriber<DefaultFields, Format, EnvFilter, PrintWriter>,
+>;
 
 pub fn test_tracing_subscriber(log_config: &'static str) -> Sub {
     let filter = EnvFilter::new(log_config);
 
-    Subscriber::builder()
+    FmtSubscriber::builder()
         .with_env_filter(filter)
         .with_writer(PrintWriter)
         .finish()
+        .with(ErrorLayer::default())
 }
 
 /// This is a temporary implementation detail for `tracing` logs in tests.
