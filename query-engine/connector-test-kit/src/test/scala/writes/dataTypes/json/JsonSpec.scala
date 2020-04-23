@@ -4,7 +4,7 @@ import org.scalatest.{FlatSpec, Matchers}
 import util._
 
 class JsonSpec extends FlatSpec with Matchers with ApiSpecBase {
-  "Using a json field" should "work" taggedAs IgnoreSQLite in {
+  "Using a json field" should "work" taggedAs (IgnoreSQLite, IgnoreMySql56, IgnoreMariaDb) in {
     val project = ProjectDsl.fromString {
       """|model Model {
          | id   String @id @default(cuid())
@@ -19,7 +19,7 @@ class JsonSpec extends FlatSpec with Matchers with ApiSpecBase {
          |mutation {
          |  createModel(
          |    data: {
-         |      field: "{\\"a\\": \\"b\\" }"
+         |      field: "{\\"a\\":\\"b\\"}"
          |    }
          |  ) {
          |    field 

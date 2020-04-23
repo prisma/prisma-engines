@@ -19,9 +19,15 @@ object IgnoreMongo extends Tag("ignore.mongo") with AssociatedWithConnectorTags 
 object IgnoreSQLite extends Tag("ignore.sqlite") with AssociatedWithConnectorTags {
   override def tag = ConnectorTag.SQLiteConnectorTag
 }
+object IgnoreMySql56 extends Tag("ignore.mysql56") with AssociatedWithConnectorTags {
+  override def tag = ConnectorTag.Mysql56ConnectorTag
+}
+object IgnoreMariaDb extends Tag("ignore.mariadb") with AssociatedWithConnectorTags {
+  override def tag = ConnectorTag.MariaDbConnectorTag
+}
 
 object IgnoreSet {
-  val ignoreConnectorTags = Set(IgnorePostgres, IgnoreMySql, IgnoreMongo, IgnoreSQLite)
+  val ignoreConnectorTags = Set(IgnorePostgres, IgnoreMySql, IgnoreMongo, IgnoreSQLite, IgnoreMySql56, IgnoreMariaDb)
 
   def byName(name: String): Option[AssociatedWithConnectorTags] = ignoreConnectorTags.find(_.name == name)
 }
@@ -33,6 +39,7 @@ object ConnectorTag extends Enum[ConnectorTag] {
   sealed trait RelationalConnectorTag extends ConnectorTag
   object MySqlConnectorTag            extends RelationalConnectorTag
   object Mysql56ConnectorTag          extends RelationalConnectorTag
+  object MariaDbConnectorTag          extends RelationalConnectorTag
   object PostgresConnectorTag         extends RelationalConnectorTag
   object SQLiteConnectorTag           extends RelationalConnectorTag
   sealed trait DocumentConnectorTag   extends ConnectorTag
@@ -49,6 +56,8 @@ trait ConnectorAwareTest extends SuiteMixin { self: Suite with ApiSpecBase =>
   lazy val connectorTag = connector match {
     case "mongo"                                                 => ConnectorTag.MongoConnectorTag
     case "mysql" | "mysql-native"                                => ConnectorTag.MySqlConnectorTag
+    case "mysql56"                                               => ConnectorTag.Mysql56ConnectorTag
+    case "mariadb"                                               => ConnectorTag.MariaDbConnectorTag
     case "postgres" | "postgres-native" | "postgresql"           => ConnectorTag.PostgresConnectorTag
     case "sqlite" | "sqlite-native" | "native-integration-tests" => ConnectorTag.SQLiteConnectorTag
   }
