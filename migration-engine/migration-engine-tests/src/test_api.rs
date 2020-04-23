@@ -58,6 +58,10 @@ impl TestApi {
         self.sql_family() == SqlFamily::Mysql
     }
 
+    pub fn is_mariadb(&self) -> bool {
+        self.connector_name == "mysql_mariadb"
+    }
+
     pub fn migration_persistence<'a>(&'a self) -> Box<dyn MigrationPersistence + 'a> {
         self.api.migration_persistence()
     }

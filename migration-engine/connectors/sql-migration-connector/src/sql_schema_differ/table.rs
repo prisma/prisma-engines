@@ -1,9 +1,10 @@
 use super::column::ColumnDiffer;
 use sql_schema_describer::{Column, ForeignKey, Index, Table};
 
-pub(crate) struct TableDiffer<'schema> {
-    pub(crate) previous: &'schema Table,
-    pub(crate) next: &'schema Table,
+pub(crate) struct TableDiffer<'a> {
+    pub(crate) diffing_options: &'a super::DiffingOptions,
+    pub(crate) previous: &'a Table,
+    pub(crate) next: &'a Table,
 }
 
 impl<'schema> TableDiffer<'schema> {
@@ -14,7 +15,11 @@ impl<'schema> TableDiffer<'schema> {
                     .find(|next_column| columns_match(previous_column, next_column))
                     .map(|next_column| (previous_column, next_column))
             })
-            .map(|(previous, next)| ColumnDiffer { previous, next })
+            .map(move |(previous, next)| ColumnDiffer {
+                diffing_options: self.diffing_options,
+                previous,
+                next,
+            })
     }
 
     pub(crate) fn dropped_columns<'a>(&'a self) -> impl Iterator<Item = &'schema Column> + 'a {

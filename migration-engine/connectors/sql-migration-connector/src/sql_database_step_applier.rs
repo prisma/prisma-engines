@@ -4,6 +4,7 @@ use sql_renderer::{
     IteratorJoin, SqlRenderer,
 };
 use sql_schema_describer::*;
+use sql_schema_differ::DiffingOptions;
 use sql_schema_helpers::{walk_columns, ColumnRef};
 use std::fmt::Write as _;
 use tracing_futures::Instrument;
@@ -286,6 +287,7 @@ fn render_raw_sql(
                             renderer,
                             current_schema.get_table(&table.name).unwrap().column(&name).unwrap(),
                             &column,
+                            &DiffingOptions::from_database_info(database_info),
                         ) {
                             Some(safe_sql) => {
                                 for line in safe_sql {
@@ -455,6 +457,7 @@ fn safe_alter_column(
     renderer: &dyn SqlRenderer,
     previous_column: &Column,
     next_column: &Column,
+    diffing_options: &DiffingOptions,
 ) -> Option<Vec<String>> {
     use crate::sql_migration::expanded_alter_column::*;
 
@@ -462,6 +465,7 @@ fn safe_alter_column(
         previous_column,
         next_column,
         &renderer.sql_family(),
+        diffing_options,
     )?;
 
     let alter_column_prefix = format!("ALTER COLUMN {}", renderer.quote(&previous_column.name));
