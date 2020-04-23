@@ -12,7 +12,7 @@ impl IndexTemplate {
     pub fn build(self, fields: &[ScalarFieldRef]) -> Index {
         let fields = match self.typ {
             IndexType::Unique => Self::map_fields(self.fields, fields),
-            IndexType::Normal => vec![],
+            IndexType::Normal => Self::map_fields(self.fields, fields),
         };
 
         Index {
