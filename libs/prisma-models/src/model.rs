@@ -51,7 +51,7 @@ impl ModelTemplate {
             self.id_field_names,
         );
 
-        let indexes = self.indexes.into_iter().map(|i| i.build(&fields.all)).collect();
+        let indexes = self.indexes.into_iter().map(|i| i.build(&fields.scalar())).collect();
 
         // The model is created here and fields WILL BE UNSET before now!
         model.fields.set(fields).unwrap();
@@ -99,13 +99,13 @@ impl Model {
                     .scalar()
                     .into_iter()
                     .find(|sf| sf.is_unique && sf.is_required)
-                    .map(|x| vec![Field::Scalar(x)])
+                    .map(|x| vec![x])
             })
             .or_else(|| {
                 self.unique_indexes()
                     .into_iter()
-                    .find(|index| index.fields().into_iter().all(|f| f.is_required()))
-                    .map(|index| index.fields().into_iter().collect())
+                    .find(|index| index.fields().into_iter().all(|f| f.is_required))
+                    .map(|index| index.fields().into_iter().map(|f| f.into()).collect())
             })
             .expect(&format!(
                 "Unable to resolve a primary identifier for model {}.",
@@ -155,12 +155,9 @@ impl Model {
     }
 
     pub fn map_scalar_db_field_name(&self, name: &str) -> Option<ScalarFieldRef> {
-        self.fields().scalar().into_iter().find_map(|field| {
-            if field.data_source_field().name == name {
-                Some(field)
-            } else {
-                None
-            }
-        })
+        self.fields()
+            .scalar()
+            .into_iter()
+            .find_map(|field| if field.db_name() == name { Some(field) } else { None })
     }
 }

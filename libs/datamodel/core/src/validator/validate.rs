@@ -349,7 +349,7 @@ impl<'a> Validator<'a> {
                         let base_field = model.find_field(&base_field)?;
                         let referenced_field = related_model.find_field(&referenced_field)?;
 
-                        if base_field.field_type != referenced_field.field_type {
+                        if !base_field.field_type.is_compatible_with(&referenced_field.field_type) {
                             Some(DatamodelError::new_directive_validation_error(
                                 &format!(
                                     "The type of the field `{}` in the model `{}` is not matching the type of the referenced field `{}` in model `{}`.",
@@ -402,7 +402,11 @@ impl<'a> Validator<'a> {
                         })
                         .is_some();
 
-                    if !references_unique_criteria {
+                    let must_reference_unique_criteria = match self.source {
+                        Some(source) => !source.connector().supports_relations_over_non_unique_criteria(),
+                        None => true,
+                    };
+                    if !references_unique_criteria && must_reference_unique_criteria {
                         errors.push(DatamodelError::new_validation_error(
                             &format!("The argument `references` must refer to a unique criteria in the related model `{}`. But it is referencing the following fields that are not a unique criteria: {}",
                                      &related_model.name,
@@ -453,6 +457,7 @@ impl<'a> Validator<'a> {
                     _ => unreachable!(),
                 };
 
+                // ONE TO MANY
                 if field.arity.is_singular() && related_field.arity.is_list() {
                     if rel_info.fields.is_empty() {
                         errors.push(DatamodelError::new_directive_validation_error(
@@ -477,6 +482,34 @@ impl<'a> Validator<'a> {
                     }
                 }
 
+                if field.arity.is_list() && related_field.arity.is_singular() {
+                    if !rel_info.fields.is_empty() || !rel_info.to_fields.is_empty() {
+                        errors.push(DatamodelError::new_directive_validation_error(
+                            &format!(
+                                "The relation field `{}` on Model `{}` must not specify the `fields` or `references` argument in the {} directive. You must only specify it on the opposite field `{}` on model `{}`.",
+                                &field.name, &model.name, RELATION_DIRECTIVE_NAME, &related_field.name, &related_model.name
+                            ),
+                            RELATION_DIRECTIVE_NAME,
+                            field_span.clone(),
+                        ));
+                    }
+                }
+
+                // required ONE TO ONE SELF RELATION
+                let is_self_relation = model.name == related_model.name;
+                if is_self_relation && field.arity.is_required() && related_field.arity.is_required() {
+                    errors.push(DatamodelError::new_field_validation_error(
+                        &format!(
+                            "The relation fields `{}` and `{}` on Model `{}` are both required. This is not allowed for a self relation because it would not be possible to create a record.",
+                            &field.name, &related_field.name, &model.name,
+                        ),
+                        &model.name,
+                        &field.name,
+                        field_span.clone(),
+                    ));
+                }
+
+                // ONE TO ONE
                 if field.arity.is_singular() && related_field.arity.is_singular() {
                     if rel_info.fields.is_empty() && related_field_rel_info.fields.is_empty() {
                         errors.push(DatamodelError::new_directive_validation_error(
@@ -498,6 +531,52 @@ impl<'a> Validator<'a> {
                             RELATION_DIRECTIVE_NAME,
                             field_span.clone(),
                         ));
+                    }
+
+                    if !rel_info.to_fields.is_empty() && !related_field_rel_info.to_fields.is_empty() {
+                        errors.push(DatamodelError::new_directive_validation_error(
+                            &format!(
+                                "The relation fields `{}` on Model `{}` and `{}` on Model `{}` both provide the `references` argument in the {} directive. You have to provide it only on one of the two fields.",
+                                &field.name, &model.name, &related_field.name, &related_model.name, RELATION_DIRECTIVE_NAME
+                            ),
+                            RELATION_DIRECTIVE_NAME,
+                            field_span.clone(),
+                        ));
+                    }
+
+                    if !rel_info.fields.is_empty() && !related_field_rel_info.fields.is_empty() {
+                        errors.push(DatamodelError::new_directive_validation_error(
+                            &format!(
+                                "The relation fields `{}` on Model `{}` and `{}` on Model `{}` both provide the `fields` argument in the {} directive. You have to provide it only on one of the two fields.",
+                                &field.name, &model.name, &related_field.name, &related_model.name, RELATION_DIRECTIVE_NAME
+                            ),
+                            RELATION_DIRECTIVE_NAME,
+                            field_span.clone(),
+                        ));
+                    }
+
+                    if !errors.has_errors() {
+                        if !rel_info.fields.is_empty() && !related_field_rel_info.to_fields.is_empty() {
+                            errors.push(DatamodelError::new_directive_validation_error(
+                                &format!(
+                                "The relation field `{}` on Model `{}` provides the `fields` argument in the {} directive. And the related field `{}` on Model `{}` provides the `references` argument. You must provide both arguments on the same side.",
+                                &field.name, &model.name, RELATION_DIRECTIVE_NAME, &related_field.name, &related_model.name,
+                            ),
+                            RELATION_DIRECTIVE_NAME,
+                            field_span.clone(),
+                            ));
+                        }
+
+                        if !rel_info.to_fields.is_empty() && !related_field_rel_info.fields.is_empty() {
+                            errors.push(DatamodelError::new_directive_validation_error(
+                                &format!(
+                                    "The relation field `{}` on Model `{}` provides the `references` argument in the {} directive. And the related field `{}` on Model `{}` provides the `fields` argument. You must provide both arguments on the same side.",
+                                    &field.name, &model.name, RELATION_DIRECTIVE_NAME, &related_field.name, &related_model.name,
+                                ),
+                                RELATION_DIRECTIVE_NAME,
+                                field_span.clone(),
+                            ));
+                        }
                     }
                 }
             }

@@ -1,13 +1,13 @@
 use super::Filter;
 use crate::compare::ScalarCompare;
 use once_cell::sync::Lazy;
-use prisma_models::{DataSourceFieldRef, ModelProjection, PrismaListValue, PrismaValue};
+use prisma_models::{ModelProjection, PrismaListValue, PrismaValue, ScalarFieldRef};
 use std::{collections::BTreeSet, env, sync::Arc};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ScalarProjection {
-    Single(DataSourceFieldRef),
-    Compound(Vec<DataSourceFieldRef>),
+    Single(ScalarFieldRef),
+    Compound(Vec<ScalarFieldRef>),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -116,7 +116,7 @@ pub enum ScalarCondition {
     NotIn(PrismaListValue),
 }
 
-impl ScalarCompare for DataSourceFieldRef {
+impl ScalarCompare for ScalarFieldRef {
     /// Field is in a given value
     fn is_in<T>(&self, values: Vec<T>) -> Filter
     where
@@ -279,7 +279,7 @@ impl ScalarCompare for ModelProjection {
         T: Into<PrismaValue>,
     {
         Filter::from(ScalarFilter {
-            projection: ScalarProjection::Compound(self.data_source_fields().collect()),
+            projection: ScalarProjection::Compound(self.scalar_fields().collect()),
             condition: ScalarCondition::In(values.into_iter().map(|i| i.into()).collect()),
         })
     }
@@ -290,7 +290,7 @@ impl ScalarCompare for ModelProjection {
         T: Into<PrismaValue>,
     {
         Filter::from(ScalarFilter {
-            projection: ScalarProjection::Compound(self.data_source_fields().collect()),
+            projection: ScalarProjection::Compound(self.scalar_fields().collect()),
             condition: ScalarCondition::NotIn(values.into_iter().map(|i| i.into()).collect()),
         })
     }
@@ -301,7 +301,7 @@ impl ScalarCompare for ModelProjection {
         T: Into<PrismaValue>,
     {
         Filter::from(ScalarFilter {
-            projection: ScalarProjection::Compound(self.data_source_fields().collect()),
+            projection: ScalarProjection::Compound(self.scalar_fields().collect()),
             condition: ScalarCondition::Equals(val.into()),
         })
     }
@@ -312,7 +312,7 @@ impl ScalarCompare for ModelProjection {
         T: Into<PrismaValue>,
     {
         Filter::from(ScalarFilter {
-            projection: ScalarProjection::Compound(self.data_source_fields().collect()),
+            projection: ScalarProjection::Compound(self.scalar_fields().collect()),
             condition: ScalarCondition::NotEquals(val.into()),
         })
     }
@@ -323,7 +323,7 @@ impl ScalarCompare for ModelProjection {
         T: Into<PrismaValue>,
     {
         Filter::from(ScalarFilter {
-            projection: ScalarProjection::Compound(self.data_source_fields().collect()),
+            projection: ScalarProjection::Compound(self.scalar_fields().collect()),
             condition: ScalarCondition::Contains(val.into()),
         })
     }
@@ -334,7 +334,7 @@ impl ScalarCompare for ModelProjection {
         T: Into<PrismaValue>,
     {
         Filter::from(ScalarFilter {
-            projection: ScalarProjection::Compound(self.data_source_fields().collect()),
+            projection: ScalarProjection::Compound(self.scalar_fields().collect()),
             condition: ScalarCondition::NotContains(val.into()),
         })
     }
@@ -345,7 +345,7 @@ impl ScalarCompare for ModelProjection {
         T: Into<PrismaValue>,
     {
         Filter::from(ScalarFilter {
-            projection: ScalarProjection::Compound(self.data_source_fields().collect()),
+            projection: ScalarProjection::Compound(self.scalar_fields().collect()),
             condition: ScalarCondition::StartsWith(val.into()),
         })
     }
@@ -356,7 +356,7 @@ impl ScalarCompare for ModelProjection {
         T: Into<PrismaValue>,
     {
         Filter::from(ScalarFilter {
-            projection: ScalarProjection::Compound(self.data_source_fields().collect()),
+            projection: ScalarProjection::Compound(self.scalar_fields().collect()),
             condition: ScalarCondition::NotStartsWith(val.into()),
         })
     }
@@ -367,7 +367,7 @@ impl ScalarCompare for ModelProjection {
         T: Into<PrismaValue>,
     {
         Filter::from(ScalarFilter {
-            projection: ScalarProjection::Compound(self.data_source_fields().collect()),
+            projection: ScalarProjection::Compound(self.scalar_fields().collect()),
             condition: ScalarCondition::EndsWith(val.into()),
         })
     }
@@ -378,7 +378,7 @@ impl ScalarCompare for ModelProjection {
         T: Into<PrismaValue>,
     {
         Filter::from(ScalarFilter {
-            projection: ScalarProjection::Compound(self.data_source_fields().collect()),
+            projection: ScalarProjection::Compound(self.scalar_fields().collect()),
             condition: ScalarCondition::NotEndsWith(val.into()),
         })
     }
@@ -389,7 +389,7 @@ impl ScalarCompare for ModelProjection {
         T: Into<PrismaValue>,
     {
         Filter::from(ScalarFilter {
-            projection: ScalarProjection::Compound(self.data_source_fields().collect()),
+            projection: ScalarProjection::Compound(self.scalar_fields().collect()),
             condition: ScalarCondition::LessThan(val.into()),
         })
     }
@@ -400,7 +400,7 @@ impl ScalarCompare for ModelProjection {
         T: Into<PrismaValue>,
     {
         Filter::from(ScalarFilter {
-            projection: ScalarProjection::Compound(self.data_source_fields().collect()),
+            projection: ScalarProjection::Compound(self.scalar_fields().collect()),
             condition: ScalarCondition::LessThanOrEquals(val.into()),
         })
     }
@@ -411,7 +411,7 @@ impl ScalarCompare for ModelProjection {
         T: Into<PrismaValue>,
     {
         Filter::from(ScalarFilter {
-            projection: ScalarProjection::Compound(self.data_source_fields().collect()),
+            projection: ScalarProjection::Compound(self.scalar_fields().collect()),
             condition: ScalarCondition::GreaterThan(val.into()),
         })
     }
@@ -422,7 +422,7 @@ impl ScalarCompare for ModelProjection {
         T: Into<PrismaValue>,
     {
         Filter::from(ScalarFilter {
-            projection: ScalarProjection::Compound(self.data_source_fields().collect()),
+            projection: ScalarProjection::Compound(self.scalar_fields().collect()),
             condition: ScalarCondition::GreaterThanOrEquals(val.into()),
         })
     }
@@ -437,14 +437,7 @@ mod tests {
     fn equals() {
         let schema = test_data_model();
         let model = schema.find_model("User").unwrap();
-
-        let field = model
-            .fields()
-            .find_from_scalar("name")
-            .unwrap()
-            .data_source_field()
-            .clone();
-
+        let field = model.fields().find_from_scalar("name").unwrap();
         let filter = field.equals("qwert");
 
         match filter {
@@ -464,13 +457,7 @@ mod tests {
     fn not_equals() {
         let schema = test_data_model();
         let model = schema.find_model("User").unwrap();
-
-        let field = model
-            .fields()
-            .find_from_scalar("name")
-            .unwrap()
-            .data_source_field()
-            .clone();
+        let field = model.fields().find_from_scalar("name").unwrap();
         let filter = field.not_equals("qwert");
 
         match filter {
@@ -490,13 +477,7 @@ mod tests {
     fn contains() {
         let schema = test_data_model();
         let model = schema.find_model("User").unwrap();
-
-        let field = model
-            .fields()
-            .find_from_scalar("name")
-            .unwrap()
-            .data_source_field()
-            .clone();
+        let field = model.fields().find_from_scalar("name").unwrap();
         let filter = field.contains("qwert");
 
         match filter {
@@ -516,13 +497,7 @@ mod tests {
     fn not_contains() {
         let schema = test_data_model();
         let model = schema.find_model("User").unwrap();
-
-        let field = model
-            .fields()
-            .find_from_scalar("name")
-            .unwrap()
-            .data_source_field()
-            .clone();
+        let field = model.fields().find_from_scalar("name").unwrap();
         let filter = field.not_contains("qwert");
 
         match filter {
@@ -542,13 +517,7 @@ mod tests {
     fn starts_with() {
         let schema = test_data_model();
         let model = schema.find_model("User").unwrap();
-
-        let field = model
-            .fields()
-            .find_from_scalar("name")
-            .unwrap()
-            .data_source_field()
-            .clone();
+        let field = model.fields().find_from_scalar("name").unwrap();
         let filter = field.starts_with("qwert");
 
         match filter {
@@ -568,13 +537,7 @@ mod tests {
     fn not_starts_with() {
         let schema = test_data_model();
         let model = schema.find_model("User").unwrap();
-
-        let field = model
-            .fields()
-            .find_from_scalar("name")
-            .unwrap()
-            .data_source_field()
-            .clone();
+        let field = model.fields().find_from_scalar("name").unwrap();
         let filter = field.not_starts_with("qwert");
 
         match filter {
@@ -594,13 +557,7 @@ mod tests {
     fn ends_with() {
         let schema = test_data_model();
         let model = schema.find_model("User").unwrap();
-
-        let field = model
-            .fields()
-            .find_from_scalar("name")
-            .unwrap()
-            .data_source_field()
-            .clone();
+        let field = model.fields().find_from_scalar("name").unwrap();
         let filter = field.ends_with("musti");
 
         match filter {
@@ -620,13 +577,7 @@ mod tests {
     fn not_ends_with() {
         let schema = test_data_model();
         let model = schema.find_model("User").unwrap();
-
-        let field = model
-            .fields()
-            .find_from_scalar("name")
-            .unwrap()
-            .data_source_field()
-            .clone();
+        let field = model.fields().find_from_scalar("name").unwrap();
         let filter = field.not_ends_with("naukio");
 
         match filter {
@@ -646,13 +597,7 @@ mod tests {
     fn less_than() {
         let schema = test_data_model();
         let model = schema.find_model("User").unwrap();
-
-        let field = model
-            .fields()
-            .find_from_scalar("id")
-            .unwrap()
-            .data_source_field()
-            .clone();
+        let field = model.fields().find_from_scalar("id").unwrap();
         let filter = field.less_than(10);
 
         match filter {
@@ -672,13 +617,7 @@ mod tests {
     fn less_than_or_equals() {
         let schema = test_data_model();
         let model = schema.find_model("User").unwrap();
-
-        let field = model
-            .fields()
-            .find_from_scalar("id")
-            .unwrap()
-            .data_source_field()
-            .clone();
+        let field = model.fields().find_from_scalar("id").unwrap();
         let filter = field.less_than_or_equals(10);
 
         match filter {
@@ -698,13 +637,7 @@ mod tests {
     fn greater_than() {
         let schema = test_data_model();
         let model = schema.find_model("User").unwrap();
-
-        let field = model
-            .fields()
-            .find_from_scalar("id")
-            .unwrap()
-            .data_source_field()
-            .clone();
+        let field = model.fields().find_from_scalar("id").unwrap();
         let filter = field.greater_than(10);
 
         match filter {
@@ -724,13 +657,7 @@ mod tests {
     fn greater_then_or_equals() {
         let schema = test_data_model();
         let model = schema.find_model("User").unwrap();
-
-        let field = model
-            .fields()
-            .find_from_scalar("id")
-            .unwrap()
-            .data_source_field()
-            .clone();
+        let field = model.fields().find_from_scalar("id").unwrap();
         let filter = field.greater_than_or_equals(10);
 
         match filter {

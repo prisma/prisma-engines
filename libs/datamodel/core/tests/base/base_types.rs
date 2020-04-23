@@ -11,7 +11,6 @@ fn parse_scalar_types() {
         firstName String
         age Int
         isPro Boolean
-        balance Decimal
         averageGrade Float
     }
     "#;
@@ -25,9 +24,6 @@ fn parse_scalar_types() {
     user_model
         .assert_has_field("isPro")
         .assert_base_type(&ScalarType::Boolean);
-    user_model
-        .assert_has_field("balance")
-        .assert_base_type(&ScalarType::Decimal);
     user_model
         .assert_has_field("averageGrade")
         .assert_base_type(&ScalarType::Float);

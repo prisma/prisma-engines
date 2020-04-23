@@ -421,6 +421,10 @@ pub fn mysql_8_test_api(db_name: &'static str) -> Ready<TestApi> {
     futures::future::ready(TestApi::new(db_name, mysql_8_url, "mysql8", "mysql"))
 }
 
+pub fn mysql_5_6_test_api(db_name: &'static str) -> Ready<TestApi> {
+    futures::future::ready(TestApi::new(db_name, mysql_5_6_url, "mysql_5_6", "mysql"))
+}
+
 pub fn mysql_test_api(db_name: &'static str) -> Ready<TestApi> {
     futures::future::ready(TestApi::new(db_name, mysql_url, "mysql", "mysql"))
 }

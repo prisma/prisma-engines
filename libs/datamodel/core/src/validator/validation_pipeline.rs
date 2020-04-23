@@ -3,7 +3,7 @@ use crate::{ast, configuration, dml, error::ErrorCollection};
 
 /// Wrapper for all lift and validation steps
 pub struct ValidationPipeline<'a> {
-    lifter: LiftAstToDml,
+    lifter: LiftAstToDml<'a>,
     validator: Validator<'a>,
     standardiser: Standardiser,
 }
@@ -16,7 +16,7 @@ impl<'a> ValidationPipeline<'a> {
     pub fn with_sources(sources: &'a [Box<dyn configuration::Source + Send + Sync>]) -> ValidationPipeline<'a> {
         let source = sources.first();
         ValidationPipeline {
-            lifter: LiftAstToDml::with_sources(sources),
+            lifter: LiftAstToDml::new(source),
             validator: Validator::new(source),
             standardiser: Standardiser::new(),
         }

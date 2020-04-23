@@ -32,6 +32,7 @@ object ConnectorTag extends Enum[ConnectorTag] {
 
   sealed trait RelationalConnectorTag extends ConnectorTag
   object MySqlConnectorTag            extends RelationalConnectorTag
+  object Mysql56ConnectorTag          extends RelationalConnectorTag
   object PostgresConnectorTag         extends RelationalConnectorTag
   object SQLiteConnectorTag           extends RelationalConnectorTag
   sealed trait DocumentConnectorTag   extends ConnectorTag

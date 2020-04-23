@@ -1,8 +1,6 @@
 use super::common::*;
-use crate::{
-    ast, common::names::*, dml, dml::WithDatabaseName, error::ErrorCollection, DataSourceField, Field, FieldArity,
-    OnDeleteStrategy, UniqueCriteria,
-};
+use crate::error::DatamodelError;
+use crate::{ast, common::names::*, dml, error::ErrorCollection, Field, OnDeleteStrategy, UniqueCriteria};
 
 /// Helper for standardsing a datamodel.
 ///
@@ -17,17 +15,14 @@ impl Standardiser {
     }
 
     pub fn standardise(&self, ast_schema: &ast::SchemaAst, schema: &mut dml::Datamodel) -> Result<(), ErrorCollection> {
+        self.name_unnamed_relations(schema);
+
         self.add_missing_back_relations(ast_schema, schema)?;
 
         // This is intentionally disabled for now, since the generated types would surface in the
         // client schema.
         // self.add_missing_relation_tables(ast_schema, schema)?;
-
         self.set_relation_to_field_to_id_if_missing(schema);
-
-        self.name_unnamed_relations(schema);
-
-        self.populate_datasource_fields(schema);
 
         Ok(())
     }
@@ -116,7 +111,8 @@ impl Standardiser {
 
         let mut missing_back_relation_fields = Vec::new();
         for model in &schema.models {
-            missing_back_relation_fields.append(&mut self.find_missing_back_relation_fields(&model, schema));
+            missing_back_relation_fields
+                .append(&mut self.find_missing_back_relation_fields(&model, schema, ast_schema)?);
         }
 
         for missing_back_relation_field in missing_back_relation_fields {
@@ -152,7 +148,9 @@ impl Standardiser {
                 model_mut.add_field(back_relation_field);
 
                 for underlying_field in missing_back_relation_field.underlying_fields.into_iter() {
-                    model_mut.add_field(underlying_field);
+                    if !model_mut.has_field(&underlying_field.name) {
+                        model_mut.add_field(underlying_field);
+                    }
                 }
             }
         }
@@ -168,7 +166,10 @@ impl Standardiser {
         &self,
         model: &dml::Model,
         schema: &dml::Datamodel,
-    ) -> Vec<AddMissingBackRelationField> {
+        schema_ast: &ast::SchemaAst,
+    ) -> Result<Vec<AddMissingBackRelationField>, ErrorCollection> {
+        let mut errors = ErrorCollection::new();
+
         let mut result = Vec::new();
         for field in model.fields() {
             if let dml::FieldType::Relation(rel) = &field.field_type {
@@ -183,9 +184,6 @@ impl Standardiser {
                 }
 
                 if !back_field_exists {
-                    // needs scalar field maybe, add this to the fields vector
-                    // link to id unique criteria of related model
-
                     if field.arity.is_singular() {
                         let relation_info = dml::RelationInfo {
                             to: model.name.clone(),
@@ -209,12 +207,58 @@ impl Standardiser {
                         let unique_criteria_field_names =
                             unique_criteria.fields.iter().map(|f| f.name.to_owned()).collect();
 
-                        let underlying_fields =
-                            self.underlying_fields_for_unique_criteria(&unique_criteria, &model.name);
+                        let underlying_fields: Vec<Field> = self
+                            .underlying_fields_for_unique_criteria(&unique_criteria, &model.name)
+                            .into_iter()
+                            .map(|f| {
+                                // This prevents name conflicts with existing fields on the model
+                                let mut f = f;
+                                if let Some(existing_field) = related_model.find_field(&f.name) {
+                                    if !existing_field.field_type.is_compatible_with(&f.field_type) {
+                                        f.name = format!("{}_{}", &f.name, &rel.name);
+                                    }
+                                }
+                                f
+                            })
+                            .collect();
+
+                        let underlying_field_names = underlying_fields.iter().map(|f| f.name.clone()).collect();
+                        let underlying_fields_to_add = underlying_fields
+                            .into_iter()
+                            .filter_map(|f| {
+                                match related_model.find_field(&f.name) {
+                                    None => {
+                                        // field with name does not exist yet
+                                        Some(f)
+                                    }
+                                    Some(other) if other.field_type.is_compatible_with(&f.field_type) => {
+                                        // field with name exists and its type is compatible. We must not add it since we would have a duplicate.
+                                        None
+                                    }
+                                    _ => {
+                                        // field with name exists and the type is incompatible.
+                                        errors.push(DatamodelError::new_model_validation_error(
+                                            &format!(
+                                                "Automatic underlying field generation tried to add the field `{}` in model `{}` for the back relation field of `{}` in `{}`. A field with that name exists already and has an incompatible type for the relation. Please add the back relation manually.",
+                                                &f.name,
+                                                &related_model.name,
+                                                &field.name,
+                                                &model.name,
+                                            ),
+                                            &related_model.name,
+                                            schema_ast.find_model(&related_model.name)
+                                                .expect(ERROR_GEN_STATE_ERROR)
+                                                .span,
+                                        ));
+                                        None
+                                    }
+                                }
+                            })
+                            .collect();
 
                         let relation_info = dml::RelationInfo {
                             to: model.name.clone(),
-                            fields: underlying_fields.iter().map(|f| f.name.clone()).collect(),
+                            fields: underlying_field_names,
                             to_fields: unique_criteria_field_names,
                             name: rel.name.clone(),
                             on_delete: OnDeleteStrategy::None,
@@ -227,14 +271,18 @@ impl Standardiser {
                             relation_info,
                             related_model: model.name.to_string(),
                             related_field: field.name.to_string(),
-                            underlying_fields,
+                            underlying_fields: underlying_fields_to_add,
                         });
                     };
                 }
             }
         }
 
-        result
+        if errors.has_errors() {
+            Err(errors)
+        } else {
+            Ok(result)
+        }
     }
 
     fn unique_criteria<'a>(&self, model: &'a dml::Model) -> UniqueCriteria<'a> {
@@ -296,182 +344,6 @@ impl Standardiser {
 
         rels
     }
-
-    fn populate_datasource_fields(&self, datamodel: &mut dml::Datamodel) {
-        let mut datasource_fields_to_push: Vec<AddDatasourceField> = Vec::new();
-        for model in datamodel.models() {
-            for field in model.fields() {
-                let datasource_fields = match &field.field_type {
-                    dml::FieldType::Base(scalar_type, _) => {
-                        self.get_datasource_fields_for_scalar_field(&field, &scalar_type)
-                    }
-                    dml::FieldType::Enum(_) => {
-                        // TODO: why i do not need the enum name here? Seems fishy to ignore that.
-                        self.get_datasource_fields_for_enum_field(&field)
-                    }
-                    dml::FieldType::Relation(rel_info) => {
-                        //                        self.get_datasource_fields_for_relation_field(&field, &rel_info, &datamodel)
-                        self.get_datasource_fields_for_relation_field_new(&model, &field, &rel_info)
-                    }
-                    dml::FieldType::ConnectorSpecific(_) => {
-                        unimplemented!("ConnectorSpecific is not supported here as it will be removed soon.")
-                    }
-                    dml::FieldType::Unsupported(_) => panic!("These should always be commented out"),
-                };
-                datasource_fields.into_iter().for_each(|ds_field| {
-                    datasource_fields_to_push.push(AddDatasourceField {
-                        model: model.name.clone(),
-                        field: field.name.clone(),
-                        datasource_field: ds_field,
-                    })
-                });
-            }
-        }
-
-        datasource_fields_to_push.into_iter().for_each(|add_ds_field| {
-            let AddDatasourceField {
-                model,
-                field,
-                datasource_field,
-            } = add_ds_field;
-            let field = datamodel
-                .find_model_mut(&model)
-                .unwrap()
-                .find_field_mut(&field)
-                .unwrap();
-            field.data_source_fields.push(datasource_field);
-        });
-    }
-
-    fn get_datasource_fields_for_scalar_field(
-        &self,
-        field: &dml::Field,
-        scalar_type: &dml::ScalarType,
-    ) -> Vec<DataSourceField> {
-        let datasource_field = dml::DataSourceField {
-            name: field.final_single_database_name().to_owned(),
-            field_type: scalar_type.clone(),
-            arity: field.arity,
-            default_value: field.default_value.clone(),
-        };
-        vec![datasource_field]
-    }
-
-    fn get_datasource_fields_for_enum_field(&self, field: &dml::Field) -> Vec<DataSourceField> {
-        let datasource_field = dml::DataSourceField {
-            name: field.final_single_database_name().to_owned(),
-            field_type: dml::ScalarType::String,
-            arity: field.arity,
-            default_value: field.default_value.clone(),
-        };
-        vec![datasource_field]
-    }
-
-    fn get_datasource_fields_for_relation_field_new(
-        &self,
-        model: &dml::Model,
-        field: &dml::Field,
-        rel_info: &dml::RelationInfo,
-    ) -> Vec<DataSourceField> {
-        rel_info
-            .fields
-            .iter()
-            .map(|base_field| {
-                let referenced_field = model.find_field(&base_field).expect(&format!(
-                    "the field {} was not found in the model {}",
-                    &base_field, &model.name
-                ));
-
-                match &referenced_field.field_type {
-                    dml::FieldType::Base(scalar_type, _) => dml::DataSourceField {
-                        name: referenced_field.final_single_database_name().to_owned(),
-                        field_type: *scalar_type,
-                        arity: field.arity,
-                        default_value: None,
-                    },
-                    x => unimplemented!("This must be a scalar type: {:?}", x),
-                }
-            })
-            .collect()
-    }
-
-    #[allow(unused)]
-    fn get_datasource_fields_for_relation_field(
-        &self,
-        field: &dml::Field,
-        rel_info: &dml::RelationInfo,
-        datamodel: &dml::Datamodel,
-    ) -> Vec<DataSourceField> {
-        let final_db_names = self.final_db_names_for_relation_field(&field, &rel_info, &datamodel);
-        // dbg!(&final_db_names);
-        let to_fields_and_db_names = rel_info.to_fields.iter().zip(final_db_names.iter());
-
-        to_fields_and_db_names
-            .map(|(to_field, db_name)| {
-                let related_model = datamodel.find_model(&rel_info.to).expect(STATE_ERROR);
-                let referenced_field = related_model.find_field(&to_field).expect(STATE_ERROR);
-
-                match &referenced_field.field_type {
-                    dml::FieldType::Base(scalar_type, _) => {
-                        let ds_field = dml::DataSourceField {
-                            name: db_name.clone(),
-                            field_type: *scalar_type,
-                            arity: match field.arity {
-                                // FIXME: superior hack. Talk to Marcus. This is a workaround for the behavior in row.rs for trait `ToSqlRow`
-                                FieldArity::List => FieldArity::Optional,
-                                x => x,
-                            },
-                            default_value: None,
-                        };
-                        vec![ds_field]
-                    }
-                    dml::FieldType::Relation(rel_info) => {
-                        let mut x =
-                            self.get_datasource_fields_for_relation_field(&referenced_field, &rel_info, &datamodel);
-                        x.iter_mut().for_each(|ds_field| ds_field.name = db_name.to_owned());
-                        x
-                    }
-                    x => unimplemented!("This must be a scalar type: {:?}", x),
-                }
-            })
-            .flatten()
-            .collect()
-    }
-
-    #[allow(unused)]
-    fn final_db_names_for_relation_field(
-        &self,
-        field: &dml::Field,
-        relation_info: &dml::RelationInfo,
-        datamodel: &dml::Datamodel,
-    ) -> Vec<String> {
-        if field.database_names.len() == 0 {
-            // TODO: this rule must be incorporated into psl-sql-conversion.md
-            if relation_info.to_fields.len() == 1 {
-                vec![field.final_single_database_name().to_owned()]
-            } else {
-                let related_model = datamodel.find_model(&relation_info.to).expect(STATE_ERROR);
-                relation_info
-                    .to_fields
-                    .iter()
-                    .map(|to_field| {
-                        let referenced_field = related_model.find_field(&to_field).expect(STATE_ERROR);
-                        // TODO: calling `final_single_database_name` means that this can not work for compound relation fields
-                        format!(
-                            "{}_{}",
-                            field.final_single_database_name(),
-                            referenced_field.final_single_database_name()
-                        )
-                    })
-                    .collect()
-            }
-        } else {
-            // This assertion verifies that the same number of names was used in @relation(references: [..]) and @map([..])
-            // This must already verified by the parser. Just making sure this is the case.
-            assert_eq!(relation_info.to_fields.len(), field.database_names.len());
-            field.database_names.clone()
-        }
-    }
 }
 
 #[derive(Debug)]
@@ -483,11 +355,4 @@ struct AddMissingBackRelationField {
     related_model: String,
     related_field: String,
     underlying_fields: Vec<dml::Field>,
-}
-
-#[derive(Debug)]
-struct AddDatasourceField {
-    model: String,
-    field: String,
-    datasource_field: DataSourceField,
 }

@@ -1,6 +1,6 @@
 datasource pg1 {
   provider = "postgresql"
-  url      = env("SERVER_ROOT")
+  url      = "postgresql://"
 }
 
 model Author {

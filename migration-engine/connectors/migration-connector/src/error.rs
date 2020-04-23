@@ -34,11 +34,11 @@ impl ConnectorError {
 
 #[derive(Debug, Error)]
 pub enum ErrorKind {
-    #[error("{0}")]
+    #[error(transparent)]
     Generic(anyhow::Error),
 
     #[error("Error querying the database: {0}")]
-    QueryError(anyhow::Error),
+    QueryError(#[source] anyhow::Error),
 
     #[error("Database '{}' does not exist", db_name)]
     DatabaseDoesNotExist { db_name: String },

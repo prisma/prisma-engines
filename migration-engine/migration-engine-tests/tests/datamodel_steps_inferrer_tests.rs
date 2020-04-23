@@ -60,7 +60,6 @@ fn infer_DeleteModel() {
 
 #[test]
 fn infer_UpdateModel() {
-    // TODO: add tests for other properties as well
     let dm1 = parse(
         r#"
         model Post {

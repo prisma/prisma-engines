@@ -28,20 +28,23 @@ class InsertingNullInRequiredFieldsSpec extends FlatSpec with Matchers with ApiS
       project
     )
 
-    server.queryThatMustFail(
-      """mutation b {
-        |  updateA(
-        |    where: { b: "abc" }
-        |    data: {
-        |      key: null
-        |    }) {
-        |    id
-        |  }
-        |}""",
-      project,
-      errorCode = 2011, // 3020
-      errorContains = "Null constraint violation on the fields: (`key`)"
-    )
+    if (connectorConfig.name != "mysql56")
+      {
+        server.queryThatMustFail(
+          """mutation b {
+            |  updateA(
+            |    where: { b: "abc" }
+            |    data: {
+            |      key: null
+            |    }) {
+            |    id
+            |  }
+            |}""",
+          project,
+          errorCode = 2011, // 3020
+          errorContains = "Null constraint violation on the fields: (`key`)"
+        )
+      }
   }
 
   "Creating a required value as null" should "throw a proper error" in {

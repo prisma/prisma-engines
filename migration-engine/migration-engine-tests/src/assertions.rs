@@ -241,20 +241,40 @@ impl<'a> TableAssertion<'a> {
 pub struct ColumnAssertion<'a>(&'a Column);
 
 impl<'a> ColumnAssertion<'a> {
-    pub fn assert_default(self, expected: Option<&str>) -> AssertionResult<Self> {
-        let found = self.0.default.as_ref().map(|default_value| match default_value {
-            DefaultValue::VALUE(s) => s,
-            DefaultValue::SEQUENCE(s) => s,
-            DefaultValue::DBGENERATED(s) => s,
-            DefaultValue::NOW => "CURRENT_TIMESTAMP",
-        });
+    pub fn assert_default(self, expected: Option<DefaultValue>) -> AssertionResult<Self> {
+        let found = &self.0.default;
 
         anyhow::ensure!(
-            found == expected,
+            found == &expected,
             "Assertion failed. Expected default: {:?}, but found {:?}",
             expected,
             found
         );
+
+        Ok(self)
+    }
+
+    pub fn assert_has_no_default(self) -> AssertionResult<Self> {
+        self.assert_default(None)
+    }
+
+    pub fn assert_default_value(self, expected: &prisma_value::PrismaValue) -> AssertionResult<Self> {
+        let found = &self.0.default;
+
+        match found {
+            Some(DefaultValue::VALUE(val)) => anyhow::ensure!(
+                val == expected,
+                "Assertion failed. Expected the default value for `{}` to be `{:?}`, got `{:?}`",
+                self.0.name,
+                expected,
+                val
+            ),
+            other => anyhow::bail!(
+                "Assertion failed. Expected default: {:?}, but found {:?}",
+                expected,
+                other
+            ),
+        }
 
         Ok(self)
     }
@@ -287,6 +307,17 @@ impl<'a> ColumnAssertion<'a> {
         anyhow::ensure!(
             self.0.tpe.arity.is_required(),
             "Assertion failed. Expected column `{}` to be NOT NULL, got {:?}",
+            self.0.name,
+            self.0.tpe.arity,
+        );
+
+        Ok(self)
+    }
+
+    pub fn assert_is_nullable(self) -> AssertionResult<Self> {
+        anyhow::ensure!(
+            self.0.tpe.arity.is_nullable(),
+            "Assertion failed. Expected column `{}` to be nullable, got {:?}",
             self.0.name,
             self.0.tpe.arity,
         );

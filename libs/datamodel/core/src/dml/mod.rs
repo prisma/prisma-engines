@@ -18,4 +18,4 @@ pub use relation_info::*;
 pub use traits::*;
 
 // Compatibility exports.
-pub use datamodel_connector::scalars::{ScalarType, ScalarValue};
+pub use datamodel_connector::scalars::ScalarType;

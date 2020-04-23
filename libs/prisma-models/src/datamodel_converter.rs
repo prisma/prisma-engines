@@ -62,7 +62,7 @@ impl<'a> DatamodelConverter<'a> {
                     name: model.name.clone(),
                     is_embedded: model.is_embedded,
                     fields: self.convert_fields(&model),
-                    manifestation: model.single_database_name().map(|s| s.to_owned()),
+                    manifestation: model.database_name().map(|s| s.to_owned()),
                     id_field_names: model.id_fields.clone(),
                     indexes: self.convert_indexes(&model),
                 }
@@ -106,13 +106,11 @@ impl<'a> DatamodelConverter<'a> {
                     is_unique: field.is_unique(),
                     is_id: field.is_id,
                     is_auto_generated_int_id: field.is_auto_generated_int_id(),
-                    data_source_field: field
-                        .data_source_fields
-                        .clone()
-                        .pop()
-                        .expect("Expected exactly one data source field for ScalarFieldTemplate."),
                     behaviour: field.behaviour(),
                     internal_enum: field.internal_enum(self.datamodel),
+                    db_name: field.database_name.clone(),
+                    arity: field.arity,
+                    default_value: field.default_value.clone(),
                 }),
             })
             .collect()
@@ -419,7 +417,6 @@ impl DatamodelFieldExtensions for dml::Field {
             dml::FieldType::Base(scalar, _) => match scalar {
                 dml::ScalarType::Boolean => TypeIdentifier::Boolean,
                 dml::ScalarType::DateTime => TypeIdentifier::DateTime,
-                dml::ScalarType::Decimal => TypeIdentifier::Float,
                 dml::ScalarType::Float => TypeIdentifier::Float,
                 dml::ScalarType::Int => TypeIdentifier::Int,
                 dml::ScalarType::String => TypeIdentifier::String,
@@ -463,10 +460,7 @@ impl DatamodelFieldExtensions for dml::Field {
     }
 
     fn final_db_name(&self) -> String {
-        match self.database_names.first() {
-            None => self.name.clone(),
-            Some(x) => x.clone(),
-        }
+        self.final_database_name().to_owned()
     }
 
     fn internal_enum(&self, datamodel: &dml::Datamodel) -> Option<InternalEnum> {

@@ -1,5 +1,3 @@
-#![allow(non_snake_case)]
-
 use migration_core::commands::AppliedMigration;
 use migration_engine_tests::sql::*;
 use pretty_assertions::assert_eq;

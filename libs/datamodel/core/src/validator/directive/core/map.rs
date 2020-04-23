@@ -1,71 +1,96 @@
-use crate::ast::Span;
+use crate::ast::{Directive, Span};
 use crate::error::DatamodelError;
 use crate::validator::directive::{Args, DirectiveValidator};
-use crate::{ast, dml};
+use crate::{ast, dml, Datamodel, WithDatabaseName};
 
 /// Prismas builtin `@map` directive.
 pub struct MapDirectiveValidator {}
 
 const DIRECTIVE_NAME: &'static str = "map";
 
-impl<T: dml::WithDatabaseName> DirectiveValidator<T> for MapDirectiveValidator {
-    fn directive_name(&self) -> &'static str {
+impl DirectiveValidator<dml::Model> for MapDirectiveValidator {
+    fn directive_name(&self) -> &str {
         DIRECTIVE_NAME
     }
 
-    fn validate_and_apply(&self, args: &mut Args, obj: &mut T) -> Result<(), DatamodelError> {
-        match args.default_arg("name")?.as_array() {
-            Ok(value) => {
-                let db_names = value
-                    .into_iter()
-                    .map(|v| v.as_str())
-                    .collect::<Result<Vec<String>, _>>()?;
-
-                if db_names.len() == 0 {
-                    return Err(DatamodelError::new_directive_validation_error(
-                        "Expected one argument. No argument was provided.",
-                        DIRECTIVE_NAME,
-                        args.span(),
-                    ));
-                } else {
-                    obj.set_database_names(db_names).map_err(|err_msg| {
-                        DatamodelError::new_directive_validation_error(&err_msg, DIRECTIVE_NAME, args.span())
-                    })?
-                }
-            }
-            // self.parser_error would be better here, but we cannot call it due to rust limitations.
-            Err(err) => {
-                return Err(DatamodelError::new_directive_validation_error(
-                    &format!("{}", err),
-                    "map",
-                    err.span(),
-                ))
-            }
-        };
-
-        Ok(())
+    fn validate_and_apply(&self, args: &mut Args, obj: &mut dml::Model) -> Result<(), DatamodelError> {
+        internal_validate_and_apply(args, obj)
     }
 
-    fn serialize(&self, obj: &T, _datamodel: &dml::Datamodel) -> Result<Vec<ast::Directive>, DatamodelError> {
-        let db_names: Vec<ast::Expression> = obj
-            .database_names()
-            .into_iter()
-            .map(|name| ast::Expression::StringValue(String::from(name), Span::empty()))
-            .collect();
+    fn serialize(&self, obj: &dml::Model, _datamodel: &Datamodel) -> Result<Vec<Directive>, DatamodelError> {
+        internal_serialize(obj)
+    }
+}
 
-        match db_names.len() {
-            0 => Ok(vec![]),
-            1 => {
-                let db_name = db_names.into_iter().next().unwrap();
-                Ok(vec![ast::Directive::new(
-                    DIRECTIVE_NAME,
-                    vec![ast::Argument::new("", db_name)],
-                )])
-            }
-            _ => {
-                let directive = ast::Directive::new(DIRECTIVE_NAME, vec![ast::Argument::new_array("", db_names)]);
-                Ok(vec![directive])
-            }
+pub struct MapDirectiveValidatorForField {}
+impl DirectiveValidator<dml::Field> for MapDirectiveValidatorForField {
+    fn directive_name(&self) -> &str {
+        DIRECTIVE_NAME
+    }
+
+    fn validate_and_apply(&self, args: &mut Args, obj: &mut dml::Field) -> Result<(), DatamodelError> {
+        if obj.field_type.is_relation() {
+            return self.new_directive_validation_error(
+                &format!(
+                    "The directive `@{}` can not be used on relation fields.",
+                    DIRECTIVE_NAME
+                ),
+                args.span(),
+            );
         }
+        internal_validate_and_apply(args, obj)
+    }
+
+    fn serialize(&self, obj: &dml::Field, _datamodel: &Datamodel) -> Result<Vec<Directive>, DatamodelError> {
+        internal_serialize(obj)
+    }
+}
+
+impl DirectiveValidator<dml::Enum> for MapDirectiveValidator {
+    fn directive_name(&self) -> &str {
+        DIRECTIVE_NAME
+    }
+
+    fn validate_and_apply(&self, args: &mut Args, obj: &mut dml::Enum) -> Result<(), DatamodelError> {
+        internal_validate_and_apply(args, obj)
+    }
+
+    fn serialize(&self, obj: &dml::Enum, _datamodel: &Datamodel) -> Result<Vec<Directive>, DatamodelError> {
+        internal_serialize(obj)
+    }
+}
+
+impl DirectiveValidator<dml::EnumValue> for MapDirectiveValidator {
+    fn directive_name(&self) -> &str {
+        DIRECTIVE_NAME
+    }
+
+    fn validate_and_apply(&self, args: &mut Args, obj: &mut dml::EnumValue) -> Result<(), DatamodelError> {
+        internal_validate_and_apply(args, obj)
+    }
+
+    fn serialize(&self, obj: &dml::EnumValue, _datamodel: &Datamodel) -> Result<Vec<Directive>, DatamodelError> {
+        internal_serialize(obj)
+    }
+}
+
+fn internal_validate_and_apply(args: &mut Args, obj: &mut dyn WithDatabaseName) -> Result<(), DatamodelError> {
+    let db_name = args.default_arg("name")?.as_str().map_err(|err| {
+        DatamodelError::new_directive_validation_error(&format!("{}", err), DIRECTIVE_NAME, err.span())
+    })?;
+    obj.set_database_name(Some(db_name));
+    Ok(())
+}
+
+fn internal_serialize(obj: &dyn WithDatabaseName) -> Result<Vec<ast::Directive>, DatamodelError> {
+    match obj.database_name() {
+        Some(db_name) => Ok(vec![ast::Directive::new(
+            DIRECTIVE_NAME,
+            vec![ast::Argument::new_unnamed(ast::Expression::StringValue(
+                String::from(db_name),
+                Span::empty(),
+            ))],
+        )]),
+        None => Ok(vec![]),
     }
 }

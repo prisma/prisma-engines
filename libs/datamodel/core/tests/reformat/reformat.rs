@@ -24,14 +24,14 @@ fn test_reformat_model() {
 fn test_reformat_config() {
     let input = r#"
         datasource pg { 
-            provider = "postgres"
-            url = "postgres://"
+            provider = "postgresql"
+            url = "postgresql://"
         }
     "#;
 
     let expected = r#"datasource pg {
-  provider = "postgres"
-  url      = "postgres://"
+  provider = "postgresql"
+  url      = "postgresql://"
 }"#;
 
     let mut buf = Vec::new();
@@ -44,14 +44,14 @@ fn test_reformat_config() {
 fn test_reformat_tabs() {
     let input = r#"
         datasource pg {
-            provider\t=\t"postgres"
-            url = "postgres://"
+            provider\t=\t"postgresql"
+            url = "postgresql://"
         }
     "#;
 
     let expected = r#"datasource pg {
-  provider = "postgres"
-  url      = "postgres://"
+  provider = "postgresql"
+  url      = "postgresql://"
 }"#;
 
     let mut buf = Vec::new();
@@ -163,13 +163,13 @@ enum Colors {
 fn reformatting_must_work_when_env_var_is_missing() {
     let input = r#"
         datasource pg { 
-            provider = "postgres"
+            provider = "postgresql"
             url = env("DATABASE_URL")
         }
     "#;
 
     let expected = r#"datasource pg {
-  provider = "postgres"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }"#;
 

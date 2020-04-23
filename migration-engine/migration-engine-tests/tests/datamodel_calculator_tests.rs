@@ -9,8 +9,6 @@ use migration_core::migration::{
 use migration_engine_tests::*;
 use pretty_assertions::assert_eq;
 
-// TODO: We could unify the tests for inferrer and calculator.
-
 #[test]
 fn add_CreateModel_to_existing_schema() {
     let dm1 = SchemaAst::empty();

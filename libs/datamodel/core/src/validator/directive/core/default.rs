@@ -2,6 +2,7 @@ use crate::error::DatamodelError;
 use crate::validator::directive::{Args, DirectiveValidator};
 use crate::validator::LowerDmlToAst;
 use crate::{ast, dml, ValueGenerator};
+use prisma_value::PrismaValue;
 
 /// Prismas builtin `@default` directive.
 pub struct DefaultDirectiveValidator {}
@@ -29,9 +30,7 @@ impl DirectiveValidator<dml::Field> for DefaultDirectiveValidator {
 
             match default_arg.as_constant_literal() {
                 // TODO: We should also check if this value is a valid enum value. For this we need the enums -.-
-                Ok(value) => {
-                    field.default_value = Some(dml::DefaultValue::Single(dml::ScalarValue::ConstantLiteral(value)))
-                }
+                Ok(value) => field.default_value = Some(dml::DefaultValue::Single(PrismaValue::Enum(value))),
                 Err(err) => {
                     let generator = default_arg.as_value_generator()?;
                     if generator == ValueGenerator::new_dbgenerated() {

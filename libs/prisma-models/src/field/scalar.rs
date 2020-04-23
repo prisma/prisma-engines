@@ -1,4 +1,3 @@
-use super::DataSourceField;
 use crate::prelude::*;
 use datamodel::{DefaultValue, FieldArity};
 use once_cell::sync::OnceCell;
@@ -26,7 +25,9 @@ pub struct ScalarFieldTemplate {
     pub is_auto_generated_int_id: bool,
     pub behaviour: Option<FieldBehaviour>,
     pub internal_enum: Option<InternalEnum>,
-    pub data_source_field: dml::DataSourceField,
+    pub arity: FieldArity,
+    pub db_name: Option<String>,
+    pub default_value: Option<DefaultValue>,
 }
 
 #[derive(DebugStub)]
@@ -39,11 +40,13 @@ pub struct ScalarField {
     pub is_auto_generated_int_id: bool,
     pub internal_enum: Option<InternalEnum>,
     pub behaviour: Option<FieldBehaviour>,
+    pub arity: FieldArity,
+    pub db_name: Option<String>,
+    pub default_value: Option<DefaultValue>,
 
     #[debug_stub = "#ModelWeakRef#"]
     pub model: ModelWeakRef,
     pub(crate) is_unique: bool,
-    pub(crate) data_source_field: OnceCell<DataSourceFieldRef>,
     pub(crate) read_only: OnceCell<bool>,
 }
 
@@ -61,6 +64,8 @@ impl Hash for ScalarField {
         self.behaviour.hash(state);
         self.is_unique.hash(state);
         self.model().hash(state);
+        self.arity.hash(state);
+        self.db_name.hash(state);
     }
 }
 
@@ -74,9 +79,11 @@ impl PartialEq for ScalarField {
             && self.is_auto_generated_int_id == other.is_auto_generated_int_id
             && self.internal_enum == other.internal_enum
             && self.behaviour == other.behaviour
-            && self.default_value() == other.default_value()
+            && self.default_value == other.default_value
             && self.is_unique == other.is_unique
             && self.model() == other.model()
+            && self.arity == other.arity
+            && self.db_name == other.db_name
     }
 }
 
@@ -106,19 +113,13 @@ impl ScalarFieldTemplate {
             is_unique: self.is_unique,
             internal_enum: self.internal_enum,
             behaviour: self.behaviour,
+            arity: self.arity,
+            db_name: self.db_name,
+            default_value: self.default_value,
             model,
-            data_source_field: OnceCell::new(),
         };
 
-        let arc = Arc::new(scalar);
-        arc.data_source_field
-            .set(Arc::new(DataSourceField::new(
-                self.data_source_field,
-                FieldWeak::from(&arc),
-            )))
-            .unwrap();
-
-        arc
+        Arc::new(scalar)
     }
 }
 
@@ -170,25 +171,11 @@ impl ScalarField {
     }
 
     pub fn db_name(&self) -> &str {
-        &self.data_source_field().name
+        &self.db_name.as_ref().unwrap_or(&self.name)
     }
 
     pub fn type_identifier_with_arity(&self) -> (TypeIdentifier, FieldArity) {
-        (
-            self.data_source_field().field_type.into(),
-            self.data_source_field().arity,
-        )
-    }
-
-    pub fn default_value(&self) -> Option<&DefaultValue> {
-        self.data_source_field().default_value.as_ref()
-    }
-
-    pub fn data_source_field(&self) -> &DataSourceFieldRef {
-        self.data_source_field
-            .get()
-            .ok_or_else(|| String::from("Data source field must be set!"))
-            .unwrap()
+        (self.type_identifier.clone(), self.arity)
     }
 
     pub fn is_read_only(&self) -> bool {

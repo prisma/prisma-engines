@@ -1,10 +1,10 @@
 //! SQLite description.
 use super::*;
 use failure::_core::convert::TryInto;
-use log::debug;
 use quaint::{ast::ParameterizedValue, prelude::Queryable};
 use std::collections::HashMap;
 use std::sync::Arc;
+use tracing::debug;
 
 pub struct SqlSchemaDescriber {
     conn: Arc<dyn Queryable + Send + Sync + 'static>,
@@ -34,6 +34,22 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
 
         for table_name in table_names.iter().filter(|table| !is_system_table(&table)) {
             tables.push(self.get_table(schema, table_name).await)
+        }
+
+        //sqlite allows foreign key definitions without specifying the referenced columns, it then assumes the pk is used
+        let mut foreign_keys_without_referenced_columns = vec![];
+        for (table_index, table) in tables.iter().enumerate() {
+            for (fk_index, foreign_key) in table.foreign_keys.iter().enumerate() {
+                if foreign_key.referenced_columns.is_empty() {
+                    let referenced_table = tables.iter().find(|t| t.name == foreign_key.referenced_table).unwrap();
+                    let referenced_pk = referenced_table.primary_key.as_ref().unwrap();
+                    foreign_keys_without_referenced_columns.push((table_index, fk_index, referenced_pk.columns.clone()))
+                }
+            }
+        }
+
+        for (table_index, fk_index, columns) in foreign_keys_without_referenced_columns {
+            tables[table_index].foreign_keys[fk_index].referenced_columns = columns
         }
 
         Ok(SqlSchema {
@@ -137,25 +153,24 @@ impl SqlSchemaDescriber {
                             None
                         } else {
                             Some(match &tpe.family {
-                                ColumnTypeFamily::Int => match parse_int(&default_string).is_some() {
-                                    true => DefaultValue::VALUE(unquote_single(default_string)),
-                                    false => DefaultValue::DBGENERATED(default_string),
+                                ColumnTypeFamily::Int => match parse_int(&default_string) {
+                                    Some(int_value) => DefaultValue::VALUE(int_value),
+                                    None => DefaultValue::DBGENERATED(default_string),
                                 },
-                                ColumnTypeFamily::Float => match parse_float(&default_string).is_some() {
-                                    true => DefaultValue::VALUE(unquote_single(default_string)),
-                                    false => DefaultValue::DBGENERATED(default_string),
+                                ColumnTypeFamily::Float => match parse_float(&default_string) {
+                                    Some(float_value) => DefaultValue::VALUE(float_value),
+                                    None => DefaultValue::DBGENERATED(default_string),
                                 },
                                 ColumnTypeFamily::Boolean => match parse_int(&default_string) {
-                                    Some(1) => DefaultValue::VALUE("true".into()),
-                                    Some(0) => DefaultValue::VALUE("false".into()),
+                                    Some(PrismaValue::Int(1)) => DefaultValue::VALUE(PrismaValue::Boolean(true)),
+                                    Some(PrismaValue::Int(0)) => DefaultValue::VALUE(PrismaValue::Boolean(false)),
                                     _ => match parse_bool(&default_string) {
-                                        Some(true) => DefaultValue::VALUE("true".into()),
-                                        Some(false) => DefaultValue::VALUE("false".into()),
+                                        Some(bool_value) => DefaultValue::VALUE(bool_value),
                                         None => DefaultValue::DBGENERATED(default_string),
                                     },
                                 },
                                 ColumnTypeFamily::String => {
-                                    DefaultValue::VALUE(unquote_double(unquote_single(default_string)))
+                                    DefaultValue::VALUE(PrismaValue::String(unquote_string(default_string)))
                                 }
                                 ColumnTypeFamily::DateTime => match default_string.to_lowercase()
                                     == "current_timestamp".to_string()
@@ -172,7 +187,7 @@ impl SqlSchemaDescriber {
                                 ColumnTypeFamily::LogSequenceNumber => DefaultValue::DBGENERATED(default_string),
                                 ColumnTypeFamily::TextSearch => DefaultValue::DBGENERATED(default_string),
                                 ColumnTypeFamily::TransactionId => DefaultValue::DBGENERATED(default_string),
-                                ColumnTypeFamily::Enum(_) => DefaultValue::VALUE(default_string),
+                                ColumnTypeFamily::Enum(_) => DefaultValue::VALUE(PrismaValue::Enum(default_string)),
                                 ColumnTypeFamily::Unsupported(_) => DefaultValue::DBGENERATED(default_string),
                             })
                         }
@@ -263,18 +278,24 @@ impl SqlSchemaDescriber {
             let id = row.get("id").and_then(|x| x.as_i64()).expect("id");
             let seq = row.get("seq").and_then(|x| x.as_i64()).expect("seq");
             let column = row.get("from").and_then(|x| x.to_string()).expect("from");
-            let referenced_column = row.get("to").and_then(|x| x.to_string()).expect("to");
+            // this can be null if the primary key and shortened fk syntax was used
+            let referenced_column = row.get("to").and_then(|x| x.to_string());
             let referenced_table = row.get("table").and_then(|x| x.to_string()).expect("table");
             match intermediate_fks.get_mut(&id) {
                 Some(fk) => {
                     fk.columns.insert(seq, column);
-                    fk.referenced_columns.insert(seq, referenced_column);
+                    if let Some(column) = referenced_column {
+                        fk.referenced_columns.insert(seq, column);
+                    };
                 }
                 None => {
                     let mut columns: HashMap<i64, String> = HashMap::new();
                     columns.insert(seq, column);
                     let mut referenced_columns: HashMap<i64, String> = HashMap::new();
-                    referenced_columns.insert(seq, referenced_column);
+
+                    if let Some(column) = referenced_column {
+                        referenced_columns.insert(seq, column);
+                    };
                     let on_delete_action = match row
                         .get("on_delete")
                         .and_then(|x| x.to_string())
@@ -399,6 +420,7 @@ fn get_column_type(tpe: &str, arity: ColumnArity) -> ColumnType {
         "text" => ColumnTypeFamily::String,
         s if s.contains("char") => ColumnTypeFamily::String,
         s if s.contains("numeric") => ColumnTypeFamily::Float,
+        s if s.contains("decimal") => ColumnTypeFamily::Float,
         "date" => ColumnTypeFamily::DateTime,
         "datetime" => ColumnTypeFamily::DateTime,
         "timestamp" => ColumnTypeFamily::DateTime,
@@ -438,27 +460,3 @@ const SQLITE_SYSTEM_TABLES: &[&str] = &[
     "sqlite_stat3",
     "sqlite_stat4",
 ];
-
-fn unquote_single(input: String) -> String {
-    /// Regex for matching the quotes on the introspected string values on Sqlite.
-    static SQLITE_STRING_DEFAULT_RE: Lazy<regex::Regex> = Lazy::new(|| regex::Regex::new(r#"^'(.*)'$"#).unwrap());
-
-    SQLITE_STRING_DEFAULT_RE
-        .captures(input.as_ref())
-        .and_then(|captures| captures.get(1))
-        .map(|capt| capt.as_str())
-        .unwrap_or(input.as_ref())
-        .to_string()
-}
-
-fn unquote_double(input: String) -> String {
-    /// Regex for matching the quotes on the introspected string values on Sqlite.
-    static SQLITE_STRING_DEFAULT_RE: Lazy<regex::Regex> = Lazy::new(|| regex::Regex::new(r#"^"(.*)"$"#).unwrap());
-
-    SQLITE_STRING_DEFAULT_RE
-        .captures(input.as_ref())
-        .and_then(|captures| captures.get(1))
-        .map(|capt| capt.as_str())
-        .unwrap_or(input.as_ref())
-        .to_string()
-}

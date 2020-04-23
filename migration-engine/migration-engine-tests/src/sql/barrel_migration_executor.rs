@@ -1,5 +1,6 @@
 use crate::sql::TestApi;
 use quaint::prelude::Queryable;
+use sql_migration_connector::MIGRATION_TABLE_NAME;
 use sql_schema_describer::SqlSchema;
 use std::sync::Arc;
 
@@ -24,7 +25,11 @@ impl BarrelMigrationExecutor<'_> {
         let mut result = self.api.describe_database().await.expect("Description failed");
 
         // The presence of the _Migration table makes assertions harder. Therefore remove it.
-        result.tables = result.tables.into_iter().filter(|t| t.name != "_Migration").collect();
+        result.tables = result
+            .tables
+            .into_iter()
+            .filter(|t| t.name != MIGRATION_TABLE_NAME)
+            .collect();
 
         Ok(result)
     }

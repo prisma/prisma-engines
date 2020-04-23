@@ -22,7 +22,6 @@ pub mod sql_ext;
 pub mod prelude;
 
 pub use datamodel::dml;
-pub use datamodel::DataSourceField;
 pub use datamodel_converter::*;
 pub use error::*;
 pub use field::*;

@@ -1,6 +1,6 @@
 use crate::{error::*, AliasedCondition, RawQuery, SqlRow, ToSqlRow};
 use async_trait::async_trait;
-use connector_interface::filter::Filter;
+use connector_interface::{filter::Filter, RecordFilter};
 use datamodel::FieldArity;
 use futures::future::FutureExt;
 use prisma_models::*;
@@ -90,6 +90,20 @@ pub trait QueryExt: Queryable + Send + Sync {
         })?)
     }
 
+    /// Process the record filter and either return directly with precomputed values,
+    /// or fetch IDs from the database.
+    async fn filter_selectors(
+        &self,
+        model: &ModelRef,
+        record_filter: RecordFilter,
+    ) -> crate::Result<Vec<RecordProjection>> {
+        if let Some(selectors) = record_filter.selectors {
+            Ok(selectors)
+        } else {
+            self.filter_ids(model, record_filter.filter).await
+        }
+    }
+
     /// Read the all columns as a (primary) identifier.
     async fn filter_ids(&self, model: &ModelRef, filter: Filter) -> crate::Result<Vec<RecordProjection>> {
         let model_id = model.primary_identifier();
@@ -116,7 +130,7 @@ pub trait QueryExt: Queryable + Send + Sync {
         let mut result = Vec::new();
 
         for row in rows.drain(0..) {
-            let tuples: Vec<_> = model_id.data_source_fields().zip(row.values.into_iter()).collect();
+            let tuples: Vec<_> = model_id.scalar_fields().zip(row.values.into_iter()).collect();
             let record_id: RecordProjection = RecordProjection::new(tuples);
 
             result.push(record_id);

@@ -1,6 +1,7 @@
 use super::*;
 use crate::{query_graph_builder::*, Query, QueryGraph};
 use prisma_models::dml;
+use prisma_value::PrismaValue;
 
 /// Build mode for schema generation.
 #[derive(Debug, Copy, Clone)]
@@ -284,7 +285,7 @@ impl<'a> QuerySchemaBuilder<'a> {
                 argument(
                     "parameters",
                     InputType::opt(InputType::json_list()),
-                    Some(dml::DefaultValue::Single(dml::ScalarValue::String("[]".into()))),
+                    Some(dml::DefaultValue::Single(PrismaValue::String("[]".into()))),
                 ),
             ],
             OutputType::json(),

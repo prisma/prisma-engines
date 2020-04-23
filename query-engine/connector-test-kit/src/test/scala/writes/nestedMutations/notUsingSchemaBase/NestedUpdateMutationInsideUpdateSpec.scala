@@ -582,8 +582,9 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
       """,
       project,
       errorCode = 2016,
-      errorContains = """Query interpretation error. Error for binding '1': AssertionError(\"Expected a valid parent ID to be present for nested update to-one case.\")"""
-        // No Node for the model Todo with value DOES NOT EXIST for id found.
+      errorContains =
+        """Query interpretation error. Error for binding '1': AssertionError(\"Expected a valid parent ID to be present for nested update to-one case.\")"""
+      // No Node for the model Todo with value DOES NOT EXIST for id found.
     )
 
     server.query(s"""query{note(where:{id: "$noteId"}){text}}""", project, dataContains = """{"note":{"text":"Some Text"}}""")
@@ -649,7 +650,8 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
       """,
       project,
       errorCode = 2016,
-      errorContains = "Query interpretation error. Error for binding '1': AssertionError(\\\"Expected a valid parent ID to be present for nested update to-one case."
+      errorContains =
+        "Query interpretation error. Error for binding '1': AssertionError(\\\"Expected a valid parent ID to be present for nested update to-one case."
     )
   }
 
@@ -676,9 +678,8 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
         |  createNote(
         |    data: {
         |      text: "Some Text"
-        |      todos:
-        |      {
-        |       create: [{ title: "the title", unique: "test"},{ title: "the other title"}]
+        |      todos: {
+        |       create: [{ title: "the title", unique: "test"}, { title: "the other title" }]
         |      }
         |    }
         |  ){
@@ -700,8 +701,8 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |      text: "Some Changed Text"
          |      todos: {
          |        update: {
-         |          where: {unique: null},
-         |          data:{title: "updated title"}
+         |          where: { unique: null },
+         |          data: { title: "updated title" }
          |        }
          |      }
          |    }
@@ -715,7 +716,8 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
       """,
       project,
       errorCode = 2009, // 3040,
-      errorContains = "Failed to validate the query `Error occurred during query validation & transformation:\\nAssertion error: You provided a null value for a where clause (or implicit nested selector). Please provide a non null value.."
+      errorContains =
+        "Failed to validate the query `Error occurred during query validation & transformation:\\nAssertion error: You provided a null value for a where clause (or implicit nested selector). Please provide a non null value.."
     )
   }
 

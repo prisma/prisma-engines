@@ -13,20 +13,22 @@ use datamodel_connector::{Connector, ExampleConnector};
 /// When lifting, the
 /// AST is converted to the real datamodel, and
 /// additional semantics are attached.
-pub struct LiftAstToDml {
+pub struct LiftAstToDml<'a> {
     directives: DirectiveBox,
+    source: Option<&'a Box<dyn configuration::Source + Send + Sync>>,
 }
 
 const USE_CONNECTORS_FOR_CUSTOM_TYPES: bool = false; // FEATURE FLAG
 
-impl LiftAstToDml {
+impl<'a> LiftAstToDml<'a> {
     /// Creates a new instance, with all builtin directives and
     /// the directives defined by the given sources registered.
     ///
     /// The directives defined by the given sources will be namespaced.
-    pub fn with_sources(sources: &[Box<dyn configuration::Source + Send + Sync>]) -> LiftAstToDml {
+    pub fn new(source: Option<&'a Box<dyn configuration::Source + Send + Sync>>) -> LiftAstToDml {
         LiftAstToDml {
-            directives: DirectiveBox::with_sources(sources),
+            directives: DirectiveBox::new(),
+            source,
         }
     }
 
@@ -86,6 +88,22 @@ impl LiftAstToDml {
     /// Internal: Validates an enum AST node.
     fn lift_enum(&self, ast_enum: &ast::Enum) -> Result<dml::Enum, ErrorCollection> {
         let mut errors = ErrorCollection::new();
+
+        let supports_enums = match self.source {
+            Some(source) => source.connector().supports_enums(),
+            None => true,
+        };
+        if !supports_enums {
+            errors.push(DatamodelError::new_validation_error(
+                &format!(
+                    "You defined the enum `{}`. But the current connector does not support enums.",
+                    &ast_enum.name.name
+                ),
+                ast_enum.span,
+            ));
+            return Err(errors);
+        }
+
         let mut en = dml::Enum::new(&ast_enum.name.name, vec![]);
 
         for ast_enum_value in &ast_enum.values {

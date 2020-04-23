@@ -13,7 +13,7 @@ pub enum Error {
     #[error("Failure during a migration command: {0}")]
     CommandError(CommandError),
 
-    #[error("Error in datamodel: {:?}", .0)]
+    #[error("Error in datamodel: {}", .0)]
     DatamodelError(ErrorCollection),
 
     #[error("Error performing IO: {:?}", .0)]

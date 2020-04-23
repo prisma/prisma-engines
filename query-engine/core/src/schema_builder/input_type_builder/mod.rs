@@ -28,11 +28,7 @@ pub trait InputTypeBuilderBase<'a>: CachedBuilder<InputObjectType> + InputBuilde
             .iter()
             .filter(|f| !f.is_list)
             .map(|f| {
-                let default = if with_defaults {
-                    f.default_value().cloned()
-                } else {
-                    None
-                };
+                let default = if with_defaults { f.default_value.clone() } else { None };
                 input_field(f.name.clone(), field_mapper(Arc::clone(f)), default)
             })
             .collect();
@@ -99,38 +95,19 @@ pub trait InputTypeBuilderBase<'a>: CachedBuilder<InputObjectType> + InputBuilde
         self.cache(name, Arc::clone(&input_object));
 
         // Single unique or ID fields.
-        let unique_fields: Vec<ModelField> = model
+        let unique_fields: Vec<ScalarFieldRef> = model
             .fields()
-            .all
+            .scalar()
             .iter()
-            .filter(|f| f.is_unique())
-            .filter_map(|f| {
-                // We need to filter out m2m relations because they're never inlined on the model.
-                // This is mostly a defensive precaution, as the parser should guarantee that the field
-                // is inlined if it's unique or ID.
-                // [DTODO] After checking the parser and tests, we might want to remove this filter.
-                if let ModelField::Relation(rf) = f {
-                    if rf.relation().is_many_to_many() {
-                        None
-                    } else {
-                        Some(f)
-                    }
-                } else {
-                    Some(f)
-                }
-            })
+            .filter(|f| f.unique())
             .map(|f| f.clone())
             .collect();
 
         let mut fields: Vec<InputField> = unique_fields
             .into_iter()
-            .map(|f| {
-                let name = f.name().to_owned();
-
-                let typ = match f {
-                    ModelField::Scalar(ref sf) => self.map_optional_input_type(sf),
-                    ModelField::Relation(ref rf) => InputType::opt(self.map_scalar_relation_input_type(rf)),
-                };
+            .map(|sf| {
+                let name = sf.name.clone();
+                let typ = self.map_optional_input_type(&sf);
 
                 input_field(name, typ, None)
             })
@@ -152,7 +129,7 @@ pub trait InputTypeBuilderBase<'a>: CachedBuilder<InputObjectType> + InputBuilde
         let id_fields = model.fields().id();
         let compound_id_field: Option<InputField> = if id_fields.as_ref().map(|f| f.len() > 1).unwrap_or(false) {
             id_fields.map(|fields| {
-                let name = compound_id_field_name(&fields.iter().map(|f| f.name()).collect::<Vec<&str>>());
+                let name = compound_id_field_name(&fields.iter().map(|f| f.name.as_ref()).collect::<Vec<&str>>());
                 let typ = self.compound_field_unique_object_type(None, fields);
 
                 input_field(name, InputType::opt(InputType::object(typ)), None)
@@ -173,7 +150,7 @@ pub trait InputTypeBuilderBase<'a>: CachedBuilder<InputObjectType> + InputBuilde
     fn compound_field_unique_object_type(
         &self,
         alias: Option<&String>,
-        from_fields: Vec<ModelField>,
+        from_fields: Vec<ScalarFieldRef>,
     ) -> InputObjectTypeRef {
         let name = format!("{}CompoundUniqueInput", Self::compound_object_name(alias, &from_fields));
         return_cached!(self.get_cache(), &name);
@@ -184,12 +161,8 @@ pub trait InputTypeBuilderBase<'a>: CachedBuilder<InputObjectType> + InputBuilde
         let object_fields = from_fields
             .into_iter()
             .map(|field| {
-                let name = field.name().to_owned();
-
-                let typ = match field {
-                    ModelField::Scalar(ref sf) => self.map_required_input_type(sf),
-                    ModelField::Relation(ref rf) => self.map_scalar_relation_input_type(rf),
-                };
+                let name = field.name.clone();
+                let typ = self.map_required_input_type(&field);
 
                 input_field(name, typ, None)
             })
@@ -199,47 +172,11 @@ pub trait InputTypeBuilderBase<'a>: CachedBuilder<InputObjectType> + InputBuilde
         Arc::downgrade(&input_object)
     }
 
-    fn compound_object_name(alias: Option<&String>, from_fields: &[ModelField]) -> String {
+    fn compound_object_name(alias: Option<&String>, from_fields: &[ScalarFieldRef]) -> String {
         alias.map(|n| capitalize(n)).unwrap_or_else(|| {
-            let field_names: Vec<String> = from_fields.iter().map(|field| capitalize(field.name())).collect();
+            let field_names: Vec<String> = from_fields.iter().map(|field| capitalize(&field.name)).collect();
             field_names.join("")
         })
-    }
-
-    /// Handles special cases where (non-m2m, inlined) relation fields can be used with scalar inputs.
-    /// The input type is again a cached object type if the relation contains more than one data source field.
-    fn map_scalar_relation_input_type(&self, relation_field: &RelationFieldRef) -> InputType {
-        let dsfs = relation_field.data_source_fields();
-
-        if dsfs.len() == 1 {
-            return self.map_required_data_source_field_input_type(dsfs.first().unwrap());
-        }
-
-        let object_name = format!(
-            "{}{}ScalarRelationInput",
-            capitalize(&relation_field.model().name),
-            capitalize(&relation_field.name)
-        );
-
-        if let Some(existing) = self.get_cache().get(&object_name) {
-            return InputType::object(existing);
-        };
-
-        let input_object = Arc::new(init_input_object_type(object_name.clone()));
-        self.cache(object_name, Arc::clone(&input_object));
-
-        let object_fields = dsfs
-            .into_iter()
-            .map(|dsf| {
-                let name = dsf.name.clone();
-                let typ = self.map_required_data_source_field_input_type(&dsf);
-
-                input_field(name, typ, None)
-            })
-            .collect();
-
-        input_object.set_fields(object_fields);
-        InputType::object(Arc::downgrade(&input_object))
     }
 
     fn get_filter_object_builder(&self) -> Arc<FilterObjectTypeBuilder<'a>>;

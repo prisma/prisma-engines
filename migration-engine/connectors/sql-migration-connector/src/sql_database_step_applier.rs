@@ -318,6 +318,11 @@ fn render_raw_sql(
                     },
                 };
             }
+
+            if lines.is_empty() {
+                return Ok(Vec::new());
+            }
+
             Ok(vec![format!(
                 "ALTER TABLE {} {};",
                 renderer.quote_with_schema(&schema_name, &table.name),
@@ -344,8 +349,8 @@ fn render_raw_sql(
             index_new_name,
         }) => match sql_family {
             SqlFamily::Mysql => {
-                // MariaDB does not support `ALTER TABLE ... RENAME INDEX`.
-                if database_info.is_mariadb() {
+                // MariaDB and MySQL 5.6 do not support `ALTER TABLE ... RENAME INDEX`.
+                if database_info.is_mariadb() || database_info.is_mysql_5_6() {
                     let old_index = current_schema
                         .table(table)
                         .map_err(|_| {

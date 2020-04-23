@@ -5,6 +5,7 @@ use quaint::{prelude::Queryable, single::Quaint};
 pub type TestResult = anyhow::Result<()>;
 
 pub struct TestApi {
+    connector_name: &'static str,
     provider: &'static str,
     database_string: String,
     connection: Quaint,
@@ -50,8 +51,13 @@ impl TestApi {
 
         Ok((DatamodelAssertions(dml), QueryEngine::new(context)))
     }
+
+    pub fn is_mysql_5_6(&self) -> bool {
+        self.connector_name == "mysql_5_6"
+    }
 }
 
+#[derive(Debug)]
 pub struct DatamodelAssertions(datamodel::Datamodel);
 
 impl DatamodelAssertions {
@@ -116,6 +122,23 @@ pub async fn mysql_8_test_api(db_name: &str) -> TestApi {
         .unwrap();
 
     TestApi {
+        connector_name: "mysql_8",
+        connection: Quaint::new(&mysql_url).await.unwrap(),
+        database_string: mysql_url,
+        provider: "mysql",
+        is_pgbouncer: false,
+    }
+}
+
+pub async fn mysql_5_6_test_api(db_name: &str) -> TestApi {
+    let mysql_url = test_setup::mysql_5_6_url(db_name);
+
+    test_setup::create_mysql_database(&mysql_url.parse().unwrap())
+        .await
+        .unwrap();
+
+    TestApi {
+        connector_name: "mysql_5_6",
         connection: Quaint::new(&mysql_url).await.unwrap(),
         database_string: mysql_url,
         provider: "mysql",
@@ -131,6 +154,7 @@ pub async fn mysql_test_api(db_name: &str) -> TestApi {
         .unwrap();
 
     TestApi {
+        connector_name: "mysql",
         connection: Quaint::new(&mysql_url).await.unwrap(),
         database_string: mysql_url,
         provider: "mysql",
@@ -146,6 +170,7 @@ pub async fn mysql_mariadb_test_api(db_name: &str) -> TestApi {
         .unwrap();
 
     TestApi {
+        connector_name: "mysql_mariadb",
         connection: Quaint::new(&mysql_url).await.unwrap(),
         database_string: mysql_url,
         provider: "mysql",
@@ -161,6 +186,7 @@ pub async fn postgres_test_api(db_name: &str) -> TestApi {
         .unwrap();
 
     TestApi {
+        connector_name: "postgres",
         connection: Quaint::new(&postgres_url).await.unwrap(),
         database_string: postgres_url,
         provider: "postgres",
@@ -176,6 +202,7 @@ pub async fn postgres9_test_api(db_name: &str) -> TestApi {
         .unwrap();
 
     TestApi {
+        connector_name: "postgres9",
         connection: Quaint::new(&postgres_url).await.unwrap(),
         database_string: postgres_url,
         provider: "postgres",
@@ -191,6 +218,7 @@ pub async fn postgres11_test_api(db_name: &str) -> TestApi {
         .unwrap();
 
     TestApi {
+        connector_name: "postgres11",
         connection: Quaint::new(&postgres_url).await.unwrap(),
         database_string: postgres_url,
         provider: "postgres",
@@ -206,6 +234,7 @@ pub async fn postgres12_test_api(db_name: &str) -> TestApi {
         .unwrap();
 
     TestApi {
+        connector_name: "postgres12",
         connection: Quaint::new(&postgres_url).await.unwrap(),
         database_string: postgres_url,
         provider: "postgres",

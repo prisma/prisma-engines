@@ -1,9 +1,7 @@
 use crate::common::*;
-use datamodel::{
-    common::{ScalarType, ScalarValue},
-    DefaultValue, ValueGenerator,
-};
+use datamodel::{common::ScalarType, DefaultValue, ValueGenerator};
 use datamodel_connector::ScalarFieldType;
+use prisma_value::PrismaValue;
 
 #[test]
 fn should_apply_a_custom_type() {
@@ -21,9 +19,7 @@ fn should_apply_a_custom_type() {
         .assert_has_field("id")
         .assert_is_id()
         .assert_base_type(&ScalarType::String)
-        .assert_default_value(DefaultValue::Expression(
-            ValueGenerator::new("cuid".to_owned(), Vec::new()).unwrap(),
-        ));
+        .assert_default_value(DefaultValue::Expression(ValueGenerator::new_cuid()));
 }
 
 #[test]
@@ -44,9 +40,7 @@ fn should_recursively_apply_a_custom_type() {
         .assert_has_field("id")
         .assert_is_id()
         .assert_base_type(&ScalarType::String)
-        .assert_default_value(DefaultValue::Expression(
-            ValueGenerator::new("cuid".to_owned(), Vec::new()).unwrap(),
-        ));
+        .assert_default_value(DefaultValue::Expression(ValueGenerator::new_cuid()));
 }
 
 #[test]
@@ -69,9 +63,7 @@ fn should_be_able_to_handle_multiple_types() {
         .assert_has_field("id")
         .assert_is_id()
         .assert_base_type(&ScalarType::String)
-        .assert_default_value(DefaultValue::Expression(
-            ValueGenerator::new("cuid".to_owned(), Vec::new()).unwrap(),
-        ));
+        .assert_default_value(DefaultValue::Expression(ValueGenerator::new_cuid()));
 
     user_model
         .assert_has_field("email")
@@ -81,7 +73,7 @@ fn should_be_able_to_handle_multiple_types() {
     user_model
         .assert_has_field("balance")
         .assert_base_type(&ScalarType::Int)
-        .assert_default_value(DefaultValue::Single(ScalarValue::Int(0)));
+        .assert_default_value(DefaultValue::Single(PrismaValue::Int(0)));
 }
 
 #[test]
@@ -108,7 +100,7 @@ fn should_be_able_to_define_custom_enum_types() {
     user_model
         .assert_has_field("role")
         .assert_enum_type("Role")
-        .assert_default_value(DefaultValue::Single(ScalarValue::ConstantLiteral(String::from("USER"))));
+        .assert_default_value(DefaultValue::Single(PrismaValue::Enum(String::from("USER"))));
 }
 
 #[test]

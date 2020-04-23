@@ -297,13 +297,10 @@ impl QueryDocumentParser {
 
                 match default_pair {
                     // If the input field has a default, add the default to the result.
-                    Some((k, dv)) => {
-                        dv.get_as_prisma_value()
-                            .map(|pv| match Self::parse_input_field(pv.into(), &field) {
-                                Ok(value) => Ok((k.clone(), value)),
-                                Err(err) => Err(err),
-                            })
-                    }
+                    Some((k, dv)) => dv.get().map(|pv| match Self::parse_input_field(pv.into(), &field) {
+                        Ok(value) => Ok((k.clone(), value)),
+                        Err(err) => Err(err),
+                    }),
                     // Finally, if nothing is found, parse the input value with Null but disregard the result,
                     // except errors, which are propagated.
                     None => match Self::parse_input_field(QueryValue::Null, &field) {

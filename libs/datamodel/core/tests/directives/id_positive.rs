@@ -2,6 +2,7 @@ use crate::common::*;
 use datamodel::ast::Span;
 use datamodel::dml::*;
 use datamodel::error::DatamodelError;
+use prisma_value::PrismaValue;
 
 #[test]
 fn int_id_without_default_should_have_strategy_none() {
@@ -58,9 +59,7 @@ fn should_allow_string_ids_with_cuid() {
         .assert_has_field("id")
         .assert_is_id()
         .assert_base_type(&ScalarType::String)
-        .assert_default_value(DefaultValue::Expression(
-            ValueGenerator::new("cuid".to_owned(), Vec::new()).unwrap(),
-        ));
+        .assert_default_value(DefaultValue::Expression(ValueGenerator::new_cuid()));
 }
 
 #[test]
@@ -77,9 +76,7 @@ fn should_allow_string_ids_with_uuid() {
         .assert_has_field("id")
         .assert_is_id()
         .assert_base_type(&ScalarType::String)
-        .assert_default_value(DefaultValue::Expression(
-            ValueGenerator::new("uuid".to_owned(), Vec::new()).unwrap(),
-        ));
+        .assert_default_value(DefaultValue::Expression(ValueGenerator::new_uuid()));
 }
 
 #[test]
@@ -111,7 +108,7 @@ fn should_allow_string_ids_with_static_default() {
     user_model
         .assert_has_field("id")
         .assert_is_id()
-        .assert_default_value(DefaultValue::Single(ScalarValue::String(String::from(""))))
+        .assert_default_value(DefaultValue::Single(PrismaValue::String(String::from(""))))
         .assert_base_type(&ScalarType::String);
 }
 
@@ -128,7 +125,7 @@ fn should_allow_int_ids_with_static_default() {
     user_model
         .assert_has_field("id")
         .assert_is_id()
-        .assert_default_value(DefaultValue::Single(ScalarValue::Int(0)))
+        .assert_default_value(DefaultValue::Single(PrismaValue::Int(0)))
         .assert_base_type(&ScalarType::Int);
 }
 

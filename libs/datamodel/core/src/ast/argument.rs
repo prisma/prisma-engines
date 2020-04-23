@@ -57,4 +57,12 @@ impl Argument {
             span: Span::empty(),
         }
     }
+
+    pub fn new_unnamed(value: Expression) -> Argument {
+        Argument {
+            name: Identifier::new(""),
+            value,
+            span: Span::empty(),
+        }
+    }
 }

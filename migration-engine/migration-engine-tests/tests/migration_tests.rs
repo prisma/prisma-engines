@@ -2,6 +2,7 @@ mod migrations;
 
 use migration_engine_tests::sql::*;
 use pretty_assertions::assert_eq;
+use prisma_value::PrismaValue;
 use quaint::prelude::SqlFamily;
 use sql_migration_connector::{AlterIndex, CreateIndex, DropIndex, SqlMigrationStep};
 use sql_schema_describer::*;
@@ -48,17 +49,20 @@ async fn adding_a_scalar_field_must_work(api: &TestApi) {
 }
 
 #[test_each_connector]
-async fn adding_an_optional_field_must_work(api: &TestApi) {
+async fn adding_an_optional_field_must_work(api: &TestApi) -> TestResult {
     let dm2 = r#"
         model Test {
             id String @id @default(cuid())
             field String?
         }
     "#;
-    let result = api.infer_and_apply(&dm2).await.sql_schema;
-    let column = result.table_bang("Test").column_bang("field");
-    assert_eq!(column.is_required(), false);
-    assert!(column.default.is_none());
+
+    api.infer_apply(dm2).send().await?.assert_green()?;
+    api.assert_schema().await?.assert_table("Test", |table| {
+        table.assert_column("field", |column| column.assert_default(None)?.assert_is_nullable())
+    })?;
+
+    Ok(())
 }
 
 #[test_each_connector]
@@ -1388,7 +1392,9 @@ async fn column_defaults_must_be_migrated(api: &TestApi) -> TestResult {
     api.infer_apply(dm1).send().await?.assert_green()?;
 
     api.assert_schema().await?.assert_table("Fruit", |table| {
-        table.assert_column("name", |col| col.assert_default(Some("banana")))
+        table.assert_column("name", |col| {
+            col.assert_default(Some(DefaultValue::VALUE(PrismaValue::String("banana".to_string()))))
+        })
     })?;
 
     let dm2 = r#"
@@ -1401,7 +1407,9 @@ async fn column_defaults_must_be_migrated(api: &TestApi) -> TestResult {
     api.infer_apply(dm2).send().await?.assert_green()?;
 
     api.assert_schema().await?.assert_table("Fruit", |table| {
-        table.assert_column("name", |col| col.assert_default(Some("mango")))
+        table.assert_column("name", |col| {
+            col.assert_default(Some(DefaultValue::VALUE(PrismaValue::String("mango".to_string()))))
+        })
     })?;
 
     Ok(())
@@ -1446,26 +1454,26 @@ async fn escaped_string_defaults_are_not_arbitrarily_migrated(api: &TestApi) -> 
     assert_eq!(
         table.column("name").and_then(|c| c.default.clone()),
         Some(if api.is_mysql() && !api.connector_name().contains("mariadb") {
-            DefaultValue::VALUE("ba\u{0}nana".to_string())
+            DefaultValue::VALUE(PrismaValue::String("ba\u{0}nana".to_string()))
         } else {
-            DefaultValue::VALUE("ba\\0nana".to_string())
+            DefaultValue::VALUE(PrismaValue::String("ba\\0nana".to_string()))
         })
     );
     assert_eq!(
         table.column("sideNames").and_then(|c| c.default.clone()),
         Some(if api.is_mysql() && !api.connector_name().contains("mariadb") {
-            DefaultValue::VALUE("top\ndown".to_string())
+            DefaultValue::VALUE(PrismaValue::String("top\ndown".to_string()))
         } else {
-            DefaultValue::VALUE("top\\ndown".to_string())
+            DefaultValue::VALUE(PrismaValue::String("top\\ndown".to_string()))
         })
     );
     assert_eq!(
         table.column("contains").and_then(|c| c.default.clone()),
-        Some(DefaultValue::VALUE("potassium".to_string()))
+        Some(DefaultValue::VALUE(PrismaValue::String("potassium".to_string())))
     );
     assert_eq!(
         table.column("seasonality").and_then(|c| c.default.clone()),
-        Some(DefaultValue::VALUE("summer".to_string()))
+        Some(DefaultValue::VALUE(PrismaValue::String("summer".to_string())))
     );
 
     Ok(())
@@ -1961,6 +1969,41 @@ async fn switching_databases_must_work(api: &TestApi) -> TestResult {
         model Test {
             id String @id
             name String
+        }
+    "#;
+
+    api.infer_apply(dm2).send().await?.assert_green()?;
+
+    Ok(())
+}
+
+#[test_each_connector(log = "debug")]
+async fn adding_mutual_references_on_existing_tables_works(api: &TestApi) -> TestResult {
+    let dm1 = r#"
+        model A {
+            id Int @id
+        }
+
+        model B {
+            id Int @id
+        }
+    "#;
+
+    api.infer_apply(dm1).send().await?.assert_green()?;
+
+    let dm2 = r#"
+        model A {
+            id Int
+            name String @unique
+            b_email String
+            brel B @relation("AtoB", fields: [b_email], references: [email])
+        }
+
+        model B {
+            id Int
+            email String @unique
+            a_name String
+            arel A @relation("BtoA", fields: [a_name], references: [name])
         }
     "#;
 

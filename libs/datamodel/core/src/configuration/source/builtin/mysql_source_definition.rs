@@ -1,5 +1,5 @@
-use super::{MySqlSource, MYSQL_SOURCE_NAME};
-use crate::{configuration::*, error::DatamodelError};
+use super::{shared_validation::*, MySqlSource, MYSQL_SOURCE_NAME};
+use crate::configuration::*;
 
 pub struct MySqlSourceDefinition {}
 
@@ -19,10 +19,10 @@ impl SourceDefinition for MySqlSourceDefinition {
         name: &str,
         url: StringFromEnvVar,
         documentation: &Option<String>,
-    ) -> Result<Box<dyn Source + Send + Sync>, DatamodelError> {
+    ) -> Result<Box<dyn Source + Send + Sync>, String> {
         Ok(Box::new(MySqlSource {
             name: String::from(name),
-            url: url,
+            url: validate_url(name, "mysql://", url)?,
             documentation: documentation.clone(),
         }))
     }

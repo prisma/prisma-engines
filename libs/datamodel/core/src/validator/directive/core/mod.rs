@@ -14,7 +14,7 @@ mod utils;
 pub fn new_builtin_field_directives() -> DirectiveListValidator<dml::Field> {
     let mut validator = DirectiveListValidator::<dml::Field>::new();
 
-    validator.add(Box::new(map::MapDirectiveValidator {}));
+    validator.add(Box::new(map::MapDirectiveValidatorForField {}));
     validator.add(Box::new(id::IdDirectiveValidator {}));
     validator.add(Box::new(unique_and_index::FieldLevelUniqueDirectiveValidator {}));
     validator.add(Box::new(default::DefaultDirectiveValidator {}));

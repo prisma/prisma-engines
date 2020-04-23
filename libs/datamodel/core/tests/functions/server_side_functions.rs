@@ -18,9 +18,7 @@ fn correctly_handle_server_side_now_function() {
     user_model
         .assert_has_field("signupDate")
         .assert_base_type(&ScalarType::DateTime)
-        .assert_default_value(DefaultValue::Expression(
-            ValueGenerator::new("now".to_owned(), Vec::new()).unwrap(),
-        ));
+        .assert_default_value(DefaultValue::Expression(ValueGenerator::new_now()));
 }
 
 #[test]
@@ -40,9 +38,7 @@ fn correctly_handle_server_side_cuid_function() {
     user_model
         .assert_has_field("someId")
         .assert_base_type(&ScalarType::String)
-        .assert_default_value(DefaultValue::Expression(
-            ValueGenerator::new("cuid".to_owned(), Vec::new()).unwrap(),
-        ));
+        .assert_default_value(DefaultValue::Expression(ValueGenerator::new_cuid()));
 }
 
 #[test]
@@ -62,7 +58,5 @@ fn correctly_handle_server_side_uuid_function() {
     user_model
         .assert_has_field("someId")
         .assert_base_type(&ScalarType::String)
-        .assert_default_value(DefaultValue::Expression(
-            ValueGenerator::new("uuid".to_owned(), Vec::new()).unwrap(),
-        ));
+        .assert_default_value(DefaultValue::Expression(ValueGenerator::new_uuid()));
 }

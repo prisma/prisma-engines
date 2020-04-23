@@ -48,7 +48,9 @@ impl<'a> MigrationCommand for InferMigrationStepsCommand<'a> {
             datamodel::lift_ast(&assumed_datamodel_ast).map_err(CommandError::ProducedBadDatamodel)?;
 
         let next_datamodel = parse_datamodel(&cmd.input.datamodel)?;
-        let next_datamodel_ast = parse(&cmd.input.datamodel).map_err(CommandError::ProducedBadDatamodel)?;
+        let next_datamodel_ast = parse(&cmd.input.datamodel).map_err(|err| {
+            CommandError::Input(anyhow::anyhow!("{}", err.to_pretty_string("", &cmd.input.datamodel)))
+        })?;
 
         let model_migration_steps = engine
             .datamodel_migration_steps_inferrer()

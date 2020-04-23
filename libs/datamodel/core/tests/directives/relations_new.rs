@@ -238,21 +238,49 @@ fn relation_must_error_when_referenced_field_is_not_scalar() {
 fn relation_must_error_when_referenced_fields_are_not_a_unique_criteria() {
     let dml = r#"
     model User {
-        id Int @id
+        id        Int    @id
         firstName String
-        posts Post[]
+        posts     Post[]
     }
 
     model Post {
-        id Int @id
-        text String
-        userName Int        
-        user User @relation(fields: [userName], references: [firstName])
+        id       Int    @id
+        text     String
+        userName String        
+        user     User   @relation(fields: [userName], references: [firstName])
     }
     "#;
 
     let errors = parse_error(dml);
-    errors.assert_is(DatamodelError::new_validation_error("The argument `references` must refer to a unique criteria in the related model `User`. But it is referencing the following fields that are not a unique criteria: firstName", Span::new(183, 247)));
+    errors.assert_is(DatamodelError::new_validation_error("The argument `references` must refer to a unique criteria in the related model `User`. But it is referencing the following fields that are not a unique criteria: firstName", Span::new(213, 283)));
+}
+
+#[allow(non_snake_case)]
+#[test]
+fn relation_must_NOT_error_when_referenced_fields_are_not_a_unique_criteria_on_mysql() {
+    // MySQL allows foreign key to references a non unique criteria
+    // https://stackoverflow.com/questions/588741/can-a-foreign-key-reference-a-non-unique-index
+    let dml = r#"
+    datasource db {
+        provider = "mysql"
+        url = "mysql://localhost:3306"
+    }
+    
+    model User {
+        id        Int    @id
+        firstName String
+        posts     Post[]
+    }
+
+    model Post {
+        id       Int    @id
+        text     String
+        userName String        
+        user     User   @relation(fields: [userName], references: [firstName])
+    }
+    "#;
+
+    let _ = parse(dml);
 }
 
 #[test]
@@ -295,6 +323,27 @@ fn relation_must_error_when_types_of_base_field_and_referenced_field_do_not_matc
 
     let errors = parse_error(dml);
     errors.assert_is(DatamodelError::new_directive_validation_error("The type of the field `userId` in the model `Post` is not matching the type of the referenced field `id` in model `User`.","@relation", Span::new(204, 264)));
+}
+
+#[test]
+fn relation_must_succeed_when_type_alias_is_used_for_referenced_field() {
+    let dml = r#"
+    type CustomId = Int @id @default(autoincrement())
+    
+    model User {
+        id        CustomId
+        firstName String
+        posts     Post[]
+    }
+
+    model Post {
+        id     Int     @id
+        userId Int
+        user   User    @relation(fields: [userId], references: [id])
+    }
+    "#;
+
+    let _ = parse(dml);
 }
 
 #[test]
@@ -344,6 +393,36 @@ fn must_error_when_references_argument_is_missing_for_one_to_many() {
         "@relation",
         Span::new(172, 214),
     ));
+}
+
+#[test]
+fn must_error_fields_or_references_argument_is_placed_on_wrong_side_for_one_to_many() {
+    let dml = r#"
+        datasource pg {
+            provider = "postgres"
+            url = "postgresql://localhost:5432"
+        }
+        
+        model User {
+          id     Int    @id
+          postId Int[]
+          posts  Post[] @relation(fields: [postId], references: [id])
+        }
+        
+        model Post {
+          id     Int   @id
+          userId Int?
+          user   User? @relation(fields: [userId], references: [id])
+        }
+    "#;
+
+    let errors = parse_error(dml);
+    errors.assert_is(
+        DatamodelError::new_directive_validation_error(
+            "The relation field `posts` on Model `User` must not specify the `fields` or `references` argument in the @relation directive. You must only specify it on the opposite field `user` on model `Post`.",
+            "@relation", Span::new(208, 267)
+        ),
+    );
 }
 
 #[test]
@@ -443,5 +522,110 @@ fn must_error_when_references_argument_is_missing_for_one_to_one() {
             "The relation fields `user` on Model `Post` and `post` on Model `User` do not provide the `references` argument in the @relation directive. You have to provide it on one of the two fields.", 
             "@relation", Span::new(170, 212)
         ),
+    );
+}
+
+#[test]
+fn must_error_when_fields_and_references_argument_are_placed_on_different_sides_for_one_to_one() {
+    let dml = r#"
+    model User {
+        id        Int @id
+        firstName String
+        postId    Int
+        post      Post @relation(references: [id])
+    }
+
+    model Post {
+        id     Int     @id
+        userId Int
+        user   User    @relation(fields: [userId])
+    }
+    "#;
+
+    let errors = parse_error(dml);
+    errors.assert_is_at(
+        0,
+        DatamodelError::new_directive_validation_error(
+            "The relation field `post` on Model `User` provides the `references` argument in the @relation directive. And the related field `user` on Model `Post` provides the `fields` argument. You must provide both arguments on the same side.",
+            "@relation", Span::new(99, 141)
+        ),
+    );
+    errors.assert_is_at(
+        1,
+        DatamodelError::new_directive_validation_error(
+            "The relation field `user` on Model `Post` provides the `fields` argument in the @relation directive. And the related field `post` on Model `User` provides the `references` argument. You must provide both arguments on the same side.",
+            "@relation", Span::new(220, 262)
+        ),
+    );
+}
+
+#[test]
+fn must_error_when_fields_or_references_argument_is_placed_on_both_sides_for_one_to_one() {
+    let dml = r#"
+    model User {
+        id        Int @id
+        firstName String
+        postId    Int
+        post      Post @relation(fields: [postId], references: [id])
+    }
+
+    model Post {
+        id     Int     @id
+        userId Int
+        user   User    @relation(fields: [userId], references: [id])
+    }
+    "#;
+
+    let errors = parse_error(dml);
+    errors.assert_is_at(
+            0,
+            DatamodelError::new_directive_validation_error(
+                "The relation fields `post` on Model `User` and `user` on Model `Post` both provide the `references` argument in the @relation directive. You have to provide it only on one of the two fields.",
+                "@relation", Span::new(99, 159)
+            ),
+        );
+    errors.assert_is_at(
+            1,
+            DatamodelError::new_directive_validation_error(
+                "The relation fields `post` on Model `User` and `user` on Model `Post` both provide the `fields` argument in the @relation directive. You have to provide it only on one of the two fields.",
+                "@relation", Span::new(99, 159)
+            ),
+        );
+
+    errors.assert_is_at(
+        2,
+        DatamodelError::new_directive_validation_error(
+            "The relation fields `user` on Model `Post` and `post` on Model `User` both provide the `references` argument in the @relation directive. You have to provide it only on one of the two fields.",
+            "@relation", Span::new(238, 298)
+        ),
+    );
+
+    errors.assert_is_at(
+        3,
+        DatamodelError::new_directive_validation_error(
+            "The relation fields `user` on Model `Post` and `post` on Model `User` both provide the `fields` argument in the @relation directive. You have to provide it only on one of the two fields.",
+            "@relation", Span::new(238,298)
+        ),
+    );
+}
+
+#[test]
+fn must_error_for_required_one_to_one_self_relations() {
+    let dml = r#"
+        model User {
+          id       Int  @id
+          friendId Int
+          friend   User @relation("Friends", fields: friendId, references: id)
+          friendOf User @relation("Friends")
+        }
+    "#;
+    let errors = parse_error(dml);
+    errors.assert_is_at(
+        0,
+        DatamodelError::new_field_validation_error("The relation fields `friend` and `friendOf` on Model `User` are both required. This is not allowed for a self relation because it would not be possible to create a record.", "User", "friend", Span::new(83, 151)),
+    );
+    errors.assert_is_at(
+        1,
+        DatamodelError::new_field_validation_error("The relation fields `friendOf` and `friend` on Model `User` are both required. This is not allowed for a self relation because it would not be possible to create a record.", "User", "friendOf", Span::new(162, 196)),
     );
 }

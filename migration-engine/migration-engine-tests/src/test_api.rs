@@ -22,6 +22,7 @@ use migration_core::{
     commands::ApplyMigrationInput,
 };
 use quaint::prelude::{ConnectionInfo, Queryable, SqlFamily};
+use sql_migration_connector::MIGRATION_TABLE_NAME;
 use sql_schema_describer::*;
 use std::sync::Arc;
 use test_setup::*;
@@ -154,7 +155,11 @@ impl TestApi {
             .expect("Description failed");
 
         // the presence of the _Migration table makes assertions harder. Therefore remove it from the result.
-        result.tables = result.tables.into_iter().filter(|t| t.name != "_Migration").collect();
+        result.tables = result
+            .tables
+            .into_iter()
+            .filter(|t| t.name != MIGRATION_TABLE_NAME)
+            .collect();
 
         Ok(result)
     }
@@ -239,6 +244,19 @@ pub async fn mysql_8_test_api(db_name: &str) -> TestApi {
 
     TestApi {
         connector_name: "mysql_8",
+        connection_info,
+        database: Arc::clone(&connector.database),
+        api: test_api(connector).await,
+    }
+}
+
+pub async fn mysql_5_6_test_api(db_name: &str) -> TestApi {
+    let url = mysql_5_6_url(db_name);
+    let connection_info = ConnectionInfo::from_url(&url).unwrap();
+    let connector = mysql_migration_connector(&url).await;
+
+    TestApi {
+        connector_name: "mysql_5_6",
         connection_info,
         database: Arc::clone(&connector.database),
         api: test_api(connector).await,

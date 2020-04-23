@@ -90,14 +90,14 @@ impl WriteArgs {
 
     pub fn as_record_projection(&self, model_projection: ModelProjection) -> Option<RecordProjection> {
         let pairs: Vec<_> = model_projection
-            .data_source_fields()
-            .map(|dsf| {
-                let val = match self.get_field_value(dsf.name.as_str()) {
+            .scalar_fields()
+            .map(|field| {
+                let val = match self.get_field_value(field.db_name()) {
                     Some(val) => val.clone(),
                     None => PrismaValue::Null,
                 };
 
-                (dsf.clone(), val.clone())
+                (field.clone(), val.clone())
             })
             .collect();
 

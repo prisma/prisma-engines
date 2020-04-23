@@ -1,6 +1,6 @@
 use super::*;
 use datamodel_connector::ScalarFieldType;
-use std::hash::{Hash, Hasher};
+use std::hash::Hash;
 
 /// Datamodel field arity.
 #[derive(Debug, PartialEq, Copy, Clone, Eq, Hash)]
@@ -58,30 +58,14 @@ impl FieldType {
             _ => false,
         }
     }
-}
 
-/// Describes a singular field on a data source.
-/// This doesn't necessarily map 1:1 to fields in the datamodel, as some
-/// datamodel fields, notably relation fields, can be backed by multiple
-/// data source fields.
-#[derive(Debug, PartialEq, Clone)]
-pub struct DataSourceField {
-    /// Name of the backing data source field (e.g. SQL column name or document key).
-    pub name: String,
-    pub field_type: ScalarType,
-    pub arity: FieldArity,
-    pub default_value: Option<DefaultValue>,
-}
-
-impl Hash for DataSourceField {
-    fn hash<H: Hasher>(&self, state: &mut H) {
-        self.name.hash(state);
-        self.field_type.hash(state);
-        self.arity.hash(state);
+    pub fn is_compatible_with(&self, other: &Self) -> bool {
+        match (self, other) {
+            (Self::Base(a, _), Self::Base(b, _)) => a == b, // the name of the type alias is not important for the comparison
+            (a, b) => a == b,
+        }
     }
 }
-
-impl Eq for DataSourceField {}
 
 /// Represents a field in a model.
 #[derive(Debug, PartialEq, Clone)]
@@ -92,16 +76,15 @@ pub struct Field {
     /// The field's type.
     pub field_type: FieldType,
 
-    // -------- todo this is duplicated from DataSourceField --------
     /// The field's arity.
     pub arity: FieldArity,
 
     /// The database internal name.
-    pub database_names: Vec<String>,
+    pub database_name: Option<String>,
 
     /// The default value.
     pub default_value: Option<DefaultValue>,
-    // -------- -------------------------------------------- --------
+
     /// Indicates if the field is unique.
     pub is_unique: bool,
 
@@ -112,16 +95,12 @@ pub struct Field {
     /// Comments associated with this field.
     pub documentation: Option<String>,
 
-    /// If set, signals that this field was internally generated
-    /// and should never be displayed to the user.
+    /// signals that this field was internally generated (only back relation fields as of now)
     pub is_generated: bool,
 
     /// If set, signals that this field is updated_at and will be updated to now()
     /// automatically.
     pub is_updated_at: bool,
-
-    /// The data source field specifics, like backing fields and defaults.
-    pub data_source_fields: Vec<DataSourceField>,
 
     /// Indicates if this field has to be commented out.
     pub is_commented_out: bool,
@@ -133,6 +112,10 @@ impl Field {
             FieldType::Relation(rel_info) if rel_info.to == name => true,
             _ => false,
         }
+    }
+
+    pub fn db_name(&self) -> &str {
+        self.database_name.as_ref().unwrap_or(&self.name)
     }
 }
 
@@ -146,36 +129,12 @@ impl WithName for Field {
 }
 
 impl WithDatabaseName for Field {
-    fn database_names(&self) -> Vec<&str> {
-        self.database_names.iter().map(|s| s.as_str()).collect()
+    fn database_name(&self) -> Option<&str> {
+        self.database_name.as_deref()
     }
 
-    fn set_database_names(&mut self, database_names: Vec<String>) -> Result<(), String> {
-        match &self.field_type {
-            FieldType::Relation(rel_info) => {
-                let num_of_to_fields = rel_info.to_fields.len();
-                // in case of auto populated to fields the validation is very hard. We want to move to explicit references anyway.
-                // TODO: revisist this once explicit `@relation(references:)` is implemented
-                let should_validate = num_of_to_fields > 0;
-                if should_validate && rel_info.to_fields.len() != database_names.len() {
-                    Err(format!(
-                        "This Relation Field must specify exactly {} mapped names.",
-                        rel_info.to_fields.len()
-                    ))
-                } else {
-                    self.database_names = database_names;
-                    Ok(())
-                }
-            }
-            _ => {
-                if database_names.len() > 1 {
-                    Err("A scalar Field must not specify multiple mapped names.".to_string())
-                } else {
-                    self.database_names = database_names;
-                    Ok(())
-                }
-            }
-        }
+    fn set_database_name(&mut self, database_name: Option<String>) {
+        self.database_name = database_name;
     }
 }
 
@@ -186,32 +145,22 @@ impl Field {
             name: String::from(name),
             arity: FieldArity::Required,
             field_type,
-            database_names: Vec::new(),
+            database_name: None,
             default_value: None,
             is_unique: false,
             is_id: false,
             documentation: None,
             is_generated: false,
             is_updated_at: false,
-            data_source_fields: vec![],
             is_commented_out: false,
         }
     }
     /// Creates a new field with the given name and type, marked as generated and optional.
     pub fn new_generated(name: &str, field_type: FieldType) -> Field {
-        Field {
-            name: String::from(name),
-            arity: FieldArity::Optional,
-            field_type,
-            database_names: Vec::new(),
-            default_value: None,
-            is_unique: false,
-            is_id: false,
-            documentation: None,
-            is_generated: true,
-            is_updated_at: false,
-            data_source_fields: vec![],
-            is_commented_out: false,
-        }
+        let mut field = Self::new(name, field_type);
+        field.arity = FieldArity::Optional;
+        field.is_generated = true;
+
+        field
     }
 }

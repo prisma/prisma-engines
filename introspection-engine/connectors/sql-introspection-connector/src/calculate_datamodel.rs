@@ -4,8 +4,8 @@ use crate::sanitize_datamodel_names::sanitize_datamodel_names;
 use crate::SqlIntrospectionResult;
 use datamodel::{dml, Datamodel, FieldType, Model};
 use introspection_connector::IntrospectionResult;
-use log::debug;
 use sql_schema_describer::*;
+use tracing::debug;
 
 /// Calculate a data model from a database schema.
 pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<IntrospectionResult> {

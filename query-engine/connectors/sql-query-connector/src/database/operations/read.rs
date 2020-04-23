@@ -103,8 +103,8 @@ pub async fn get_related_m2m_record_ids(
     let parent_model_id = from_field.model().primary_identifier();
     let child_model_id = from_field.related_model().primary_identifier();
 
-    let from_dsfs: Vec<_> = parent_model_id.data_source_fields().collect();
-    let to_dsfs: Vec<_> = child_model_id.data_source_fields().collect();
+    let from_sfs: Vec<_> = parent_model_id.scalar_fields().collect();
+    let to_sfs: Vec<_> = child_model_id.scalar_fields().collect();
 
     // first parent id, then child id
     Ok(conn
@@ -114,20 +114,20 @@ pub async fn get_related_m2m_record_ids(
         .map(|row| {
             let mut values = row.values;
 
-            let child_values = values.split_off(from_dsfs.len());
+            let child_values = values.split_off(from_sfs.len());
             let parent_values = values;
 
-            let p: RecordProjection = from_dsfs
+            let p: RecordProjection = from_sfs
                 .iter()
                 .zip(parent_values)
-                .map(|(dsf, val)| (dsf.clone(), val))
+                .map(|(sf, val)| (sf.clone(), val))
                 .collect::<Vec<_>>()
                 .into();
 
-            let c: RecordProjection = to_dsfs
+            let c: RecordProjection = to_sfs
                 .iter()
                 .zip(child_values)
-                .map(|(dsf, val)| (dsf.clone(), val))
+                .map(|(sf, val)| (sf.clone(), val))
                 .collect::<Vec<_>>()
                 .into();
 

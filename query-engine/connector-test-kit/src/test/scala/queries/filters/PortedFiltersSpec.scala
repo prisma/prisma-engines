@@ -1,9 +1,11 @@
 package queries.filters
 
 import org.scalatest.{FlatSpec, Matchers}
+import util.ConnectorCapability.EnumCapability
 import util._
 
 class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
+  override def runOnlyForCapabilities = Set(EnumCapability)
 
   // Always running the filter query twice - once with a one relation condition that is always true for all nodes - ensures that
   // Mongo executes the query once as a find query and once using the aggregation framework

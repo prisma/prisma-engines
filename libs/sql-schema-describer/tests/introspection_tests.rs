@@ -12,6 +12,7 @@ mod test_api;
 
 use crate::common::*;
 use crate::test_api::*;
+use prisma_value::PrismaValue;
 
 fn int_type(db_type: SqlFamily) -> String {
     match db_type {
@@ -488,7 +489,7 @@ async fn defaults_must_work(api: &TestApi) {
 
     let result = api.describe().await.expect("describing");
     let user_table = result.get_table("User").expect("getting User table");
-    let default = DefaultValue::VALUE("1".to_owned());
+    let default = DefaultValue::VALUE(PrismaValue::Int(1));
     let expected_columns = vec![Column {
         name: "id".to_string(),
         tpe: ColumnType {

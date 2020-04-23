@@ -121,7 +121,7 @@ fn db_names_work() {
     let model = datamodel.assert_model("Test");
     let field = model.assert_scalar_field("field");
 
-    assert_eq!(field.data_source_field().name, "my_column".to_owned(),)
+    assert_eq!(field.db_name(), "my_column")
 }
 
 #[test]

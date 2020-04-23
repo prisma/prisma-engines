@@ -124,13 +124,13 @@ trait IndexDirectiveBase<T>: DirectiveValidator<T> {
         };
         index_def.name = name;
 
-        match args.default_arg("fields")?.as_array() {
-            Ok(fields) => {
-                let fields = fields.iter().map(|f| f.as_constant_literal().unwrap()).collect();
-                index_def.fields = fields;
-            }
-            Err(err) => return Err(self.wrap_in_directive_validation_error(&err)),
-        }
+        let fields = args
+            .default_arg("fields")?
+            .as_array()
+            .iter()
+            .map(|f| f.as_constant_literal().unwrap())
+            .collect();
+        index_def.fields = fields;
 
         let undefined_fields: Vec<String> = index_def
             .fields

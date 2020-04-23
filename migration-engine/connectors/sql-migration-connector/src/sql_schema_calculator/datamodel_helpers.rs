@@ -3,7 +3,7 @@ use datamodel::{
         Datamodel, DefaultValue, Enum, Field, FieldArity, FieldType, IndexDefinition, Model, ScalarType,
         WithDatabaseName,
     },
-    DataSourceField, EnumValue, RelationInfo,
+    RelationInfo,
 };
 
 pub(crate) fn walk_models<'a>(datamodel: &'a Datamodel) -> impl Iterator<Item = ModelRef<'a>> + 'a {
@@ -37,7 +37,7 @@ impl<'a> ModelRef<'a> {
     }
 
     pub(super) fn db_name(&self) -> &str {
-        self.model.single_database_name().unwrap_or_else(|| &self.model.name)
+        self.model.final_database_name()
     }
 
     pub(super) fn fields<'b>(&'b self) -> impl Iterator<Item = FieldRef<'a>> + 'b {
@@ -117,11 +117,7 @@ impl<'a> FieldRef<'a> {
     }
 
     pub(super) fn db_name(&self) -> &'a str {
-        self.field.single_database_name().unwrap_or(self.name())
-    }
-
-    pub(super) fn data_source_fields(&self) -> &'a [DataSourceField] {
-        &self.field.data_source_fields
+        self.field.final_database_name()
     }
 
     pub(super) fn default_value(&self) -> Option<&'a DefaultValue> {
@@ -228,22 +224,32 @@ impl<'a> RelationFieldRef<'a> {
             })
     }
 
-    pub(crate) fn referencing_columns<'b>(&'b self) -> impl Iterator<Item = &'a str> {
-        self.field.data_source_fields().iter().map(|field| field.name.as_str())
+    pub(crate) fn referencing_columns<'b>(&'b self) -> impl Iterator<Item = &'a str> + 'b {
+        self
+            .relation_info
+            .fields
+            .iter()
+            .map(move |field| {
+                let model = self.field.model();
+                let field = model.find_field(field.as_str())
+                .expect(&format!("Unable to resolve field {} on {}, Expected relation `fields` to point to fields on the enclosing model.", field, model.name()));
+
+                field.db_name()
+            })
     }
 
     pub(crate) fn referenced_columns<'b>(&'b self) -> impl Iterator<Item = &'a str> + 'b {
-        self.referenced_model()
-            .fields
+        self
+            .relation_info
+            .to_fields
             .iter()
-            .filter(move |field| {
-                self.relation_info
-                    .to_fields
-                    .iter()
-                    .any(|to_field| to_field == &field.name)
+            .map(move |field| {
+                let model = self.referenced_model();
+                let field = model.find_field(field.as_str())
+                .expect(&format!("Unable to resolve field {} on {}, Expected relation `references` to point to fields on the related model.", field, model.name));
+
+                field.db_name()
             })
-            .flat_map(|field| field.data_source_fields.iter())
-            .map(|dsf| dsf.name.as_str())
     }
 
     pub(crate) fn relation_name(&self) -> &'a str {
@@ -251,7 +257,7 @@ impl<'a> RelationFieldRef<'a> {
     }
 
     pub(crate) fn referenced_table_name(&self) -> &'a str {
-        self.referenced_model().final_single_database_name()
+        self.referenced_model().final_database_name()
     }
 
     fn referenced_model(&self) -> &'a Model {
@@ -282,12 +288,8 @@ pub(super) struct EnumRef<'a> {
 }
 
 impl<'a> EnumRef<'a> {
-    pub(super) fn values(&self) -> &[EnumValue] {
-        &self.r#enum.values
-    }
-
     pub(super) fn db_name(&self) -> &'a str {
-        self.r#enum.single_database_name().unwrap_or(&self.r#enum.name)
+        self.r#enum.final_database_name()
     }
 }
 

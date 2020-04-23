@@ -4,7 +4,7 @@ pub mod sql_ext;
 
 use chrono::prelude::*;
 use rust_decimal::{prelude::ToPrimitive, Decimal};
-use serde::{ser::Serializer, Serialize};
+use serde::{ser::Serializer, Deserialize, Serialize};
 use std::{convert::TryFrom, fmt, str::FromStr};
 use uuid::Uuid;
 
@@ -12,10 +12,11 @@ pub use error::ConversionFailure;
 pub type PrismaValueResult<T> = std::result::Result<T, ConversionFailure>;
 pub type PrismaListValue = Vec<PrismaValue>;
 
+use rust_decimal::prelude::FromPrimitive;
 #[cfg(feature = "sql-ext")]
 pub use sql_ext::*;
 
-#[derive(Debug, PartialEq, Clone, Eq, Hash, Serialize, PartialOrd, Ord)]
+#[derive(Debug, PartialEq, Clone, Eq, Hash, Serialize, Deserialize, PartialOrd, Ord)]
 #[serde(untagged)]
 pub enum PrismaValue {
     String(String),
@@ -99,6 +100,14 @@ impl PrismaValue {
             PrismaValue::List(l) => Some(l),
             _ => None,
         }
+    }
+
+    pub fn new_float(float: f64) -> PrismaValue {
+        PrismaValue::Float(Decimal::from_f64(float).unwrap())
+    }
+
+    pub fn new_datetime(datetime: &str) -> PrismaValue {
+        PrismaValue::DateTime(DateTime::<Utc>::from_str(datetime).unwrap())
     }
 }
 

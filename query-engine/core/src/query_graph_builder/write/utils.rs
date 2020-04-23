@@ -3,7 +3,7 @@ use crate::{
     query_graph::{Flow, Node, NodeRef, QueryGraph, QueryGraphDependency},
     ParsedInputValue, QueryGraphBuilderError, QueryGraphBuilderResult,
 };
-use connector::{Filter, IdFilter, QueryArguments, WriteArgs};
+use connector::{Filter, QueryArguments, WriteArgs};
 use itertools::Itertools;
 use prisma_models::{ModelProjection, ModelRef, RelationFieldRef};
 use std::sync::Arc;
@@ -145,10 +145,13 @@ where
     let mut args = WriteArgs::new();
     args.update_datetimes(Arc::clone(&model));
 
+    let filter = filter.into();
+    let record_filter = filter.into();
+
     let ur = UpdateManyRecords {
         model,
-        filter: filter.into(),
-        args: args,
+        record_filter,
+        args,
     };
 
     graph.create_node(Query::Write(WriteQuery::UpdateManyRecords(ur)))
@@ -234,18 +237,21 @@ pub fn insert_existing_1to1_related_model_checks(
         &read_existing_children,
         &update_existing_child,
         QueryGraphDependency::ParentProjection(child_model_identifier.clone(), Box::new(move |mut update_existing_child, mut child_ids| {
-             // This has to succeed or the if-then node wouldn't trigger.
-             let child_id = match child_ids.pop() {
-                 Some(pid) => Ok(pid),
-                 None => Err(QueryGraphBuilderError::AssertionError(format!("[Query Graph] Expected a valid parent ID to be present for a nested connect on a one-to-one relation, updating previous parent."))),
-             }?;
+            // This has to succeed or the if-then node wouldn't trigger.
+            let child_id = match child_ids.pop() {
+                Some(pid) => Ok(pid),
+                None => Err(QueryGraphBuilderError::AssertionError(format!("[Query Graph] Expected a valid parent ID to be present for a nested connect on a one-to-one relation, updating previous parent."))),
+            }?;
 
-             if let Node::Query(Query::Write(ref mut wq)) = update_existing_child {
-                 wq.add_filter(child_id.filter());
-                 wq.inject_projection_into_args(child_linking_fields.empty_record_projection())
-             }
+            if let Node::Query(Query::Write(ref mut wq)) = update_existing_child {
+                wq.inject_projection_into_args(child_linking_fields.empty_record_projection())
+            }
 
-             Ok(update_existing_child)
+            if let Node::Query(Query::Write(WriteQuery::UpdateManyRecords(ref mut ur))) = update_existing_child {
+                ur.record_filter = child_id.into();
+            }
+
+            Ok(update_existing_child)
          })))?;
 
     Ok(())

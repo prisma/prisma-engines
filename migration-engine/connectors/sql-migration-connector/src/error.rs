@@ -7,8 +7,8 @@ pub type SqlResult<T> = Result<T, SqlError>;
 
 #[derive(Debug, Error)]
 pub enum SqlError {
-    #[error("{0}")]
-    Generic(#[source] anyhow::Error),
+    #[error(transparent)]
+    Generic(anyhow::Error),
 
     #[error("Error connecting to the database {cause}")]
     ConnectionError {
@@ -16,8 +16,8 @@ pub enum SqlError {
         cause: QuaintKind,
     },
 
-    #[error("Error querying the database: {}", _0)]
-    QueryError(#[source] anyhow::Error),
+    #[error(transparent)]
+    QueryError(anyhow::Error),
 
     #[error("Database '{}' does not exist", db_name)]
     DatabaseDoesNotExist {

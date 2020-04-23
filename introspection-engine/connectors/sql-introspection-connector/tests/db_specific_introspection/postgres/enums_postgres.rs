@@ -240,3 +240,34 @@ async fn introspecting_an_enum_with_an_invalid_value_as_default_should_work(api:
     let result = dbg!(api.introspect().await);
     assert_eq!(&result, "model News {\n  id     Int    @default(autoincrement()) @id\n  status status @default(dbgenerated())\n}\n\nenum status {\n  // 1 @map(\"1\")\n  UNDEFINED\n}");
 }
+
+#[test_each_connector(tags("postgres"))]
+async fn introspecting_a_table_with_an_enum_default_value_that_is_an_empty_string_should_work(api: &TestApi) {
+    let sql = format!("CREATE Type strings as ENUM ( 'non_empty', '')");
+
+    api.database().execute_raw(&sql, &[]).await.unwrap();
+
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("News", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom("content  strings Not Null default ''");
+            });
+        })
+        .await;
+
+    let dm = r#"
+        model News {
+            content     strings     @default(EMPTY_ENUM_VALUE)
+            id          Int         @default(autoincrement()) @id
+        }
+
+        enum strings{
+            EMPTY_ENUM_VALUE      @map("")
+            non_empty
+        }
+    "#;
+
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+}

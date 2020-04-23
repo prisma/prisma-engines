@@ -7,7 +7,7 @@ pub fn set_panic_hook() {
         match serde_json::to_writer(std::io::stderr(), &err) {
             Ok(_) => eprintln!(),
             Err(err) => {
-                log::error!("Failed to write JSON error to stderr: {}", err);
+                tracing::error!("Failed to write JSON error to stderr: {}", err);
                 original_hook(panic)
             }
         }

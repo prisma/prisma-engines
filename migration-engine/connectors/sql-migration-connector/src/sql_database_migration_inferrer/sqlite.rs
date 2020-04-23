@@ -18,6 +18,10 @@ pub(super) fn fix(
     let mut result = Vec::new();
     let mut fixed_tables = Vec::new();
 
+    result.push(SqlMigrationStep::RawSql {
+        raw: "PRAGMA foreign_keys=OFF;".to_string(),
+    });
+
     for step in steps {
         match step {
             SqlMigrationStep::AlterTable(ref alter_table)
@@ -49,6 +53,19 @@ pub(super) fn fix(
             x => result.push(x),
         }
     }
+
+    // No steps
+    if result.len() == 1 {
+        return Ok(Vec::new());
+    }
+
+    result.push(SqlMigrationStep::RawSql {
+        raw: format!("PRAGMA {}.foreign_key_check;", sqlite_quoted(schema_name)),
+    });
+
+    result.push(SqlMigrationStep::RawSql {
+        raw: "PRAGMA foreign_keys=ON;".to_string(),
+    });
 
     Ok(result)
 }
@@ -88,9 +105,6 @@ fn fix_table(current: &Table, next: &Table, schema_name: &str) -> Vec<SqlMigrati
 
     let mut result = Vec::new();
 
-    result.push(SqlMigrationStep::RawSql {
-        raw: "PRAGMA foreign_keys=OFF;".to_string(),
-    });
     // todo: start transaction now. Unclear if we really want to do that.
     result.push(SqlMigrationStep::CreateTable(CreateTable {
         table: temporary_table.clone(),
@@ -122,14 +136,6 @@ fn fix_table(current: &Table, next: &Table, schema_name: &str) -> Vec<SqlMigrati
             index: index.clone(),
         })
     }));
-
-    result.push(SqlMigrationStep::RawSql {
-        raw: format!("PRAGMA {}.foreign_key_check;", sqlite_quoted(schema_name)),
-    });
-
-    result.push(SqlMigrationStep::RawSql {
-        raw: "PRAGMA foreign_keys=ON;".to_string(),
-    });
 
     result
 }

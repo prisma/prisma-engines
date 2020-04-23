@@ -3,6 +3,7 @@ mod existing_data;
 use migration_connector::MigrationWarning;
 use migration_engine_tests::sql::*;
 use pretty_assertions::assert_eq;
+use prisma_value::PrismaValue;
 use quaint::ast::*;
 use std::borrow::Cow;
 
@@ -157,42 +158,57 @@ async fn altering_a_column_with_non_null_values_should_warn(api: &TestApi) -> Te
     Ok(())
 }
 
-#[test_each_connector]
+#[test_each_connector(log = "debug")]
 async fn column_defaults_can_safely_be_changed(api: &TestApi) -> TestResult {
     let combinations = &[
-        ("Meow", Some("Cats"), None),
-        ("Freedom", None, Some("Braveheart")),
-        ("OutstandingMovies", Some("Cats"), Some("Braveheart")),
+        ("Meow", Some(PrismaValue::String("Cats".to_string())), None),
+        ("Freedom", None, Some(PrismaValue::String("Braveheart".to_string()))),
+        (
+            "OutstandingMovies",
+            Some(PrismaValue::String("Cats".to_string())),
+            Some(PrismaValue::String("Braveheart".to_string())),
+        ),
     ];
 
     for (model_name, first_default, second_default) in combinations {
+        let span = tracing::info_span!("Combination", model_name, ?first_default, ?second_default);
+        let _combination_scope = span.enter();
+        tracing::info!("Testing new combination");
+
         // Set up the initial schema
         {
             let dm1 = format!(
                 r#"
                     model {} {{
                         id String @id
-                        name String {}
+                        name String? {}
                     }}
                 "#,
                 model_name,
                 first_default
+                    .as_ref()
                     .map(|default| format!("@default(\"{}\")", default))
-                    // As a temporary hack, columns always have defaults. Blocked on unexecutable migrations spec.
-                    .unwrap_or_else(|| format!("@default(\"\")"))
+                    .unwrap_or_else(String::new)
             );
 
             api.infer_apply(&dm1).force(Some(true)).send().await?;
 
             api.assert_schema().await?.assert_table(model_name, |table| {
                 table.assert_column("name", |column| {
-                    column.assert_default(Some(first_default.unwrap_or("")))
+                    if let Some(first_default) = first_default.as_ref() {
+                        column.assert_default_value(first_default)
+                    } else {
+                        column.assert_has_no_default()
+                    }
                 })
             })?;
         }
 
         // Insert data
         {
+            let insert_span = tracing::info_span!("Data insertion");
+            let _insert_scope = insert_span.enter();
+
             let query = Insert::single_into(api.render_table_name(model_name)).value("id", "abc");
 
             api.database().query(query.into()).await?;
@@ -204,12 +220,24 @@ async fn column_defaults_can_safely_be_changed(api: &TestApi) -> TestResult {
             api.database().query(query.into()).await?;
 
             let data = api.dump_table(model_name).await?;
-            let names: Vec<String> = data
+            let names: Vec<PrismaValue> = data
                 .into_iter()
-                .filter_map(|row| row.get("name").and_then(|val| val.to_string()))
+                .filter_map(|row| {
+                    row.get("name").map(|val| {
+                        val.to_string()
+                            .map(|val| PrismaValue::String(val))
+                            .unwrap_or(PrismaValue::Null)
+                    })
+                })
                 .collect();
-            // TODO: change this when the defaults hack is removed
-            assert_eq!(&[first_default.unwrap_or(""), "Waterworld"], names.as_slice());
+
+            assert_eq!(
+                &[
+                    first_default.as_ref().cloned().unwrap_or(PrismaValue::Null),
+                    PrismaValue::String("Waterworld".to_string())
+                ],
+                names.as_slice()
+            );
         }
 
         // Migrate
@@ -218,37 +246,47 @@ async fn column_defaults_can_safely_be_changed(api: &TestApi) -> TestResult {
                 r#"
                     model {} {{
                         id String @id
-                        name String {}
+                        name String? {}
                     }}
                 "#,
                 model_name,
                 second_default
-                    .map(|default| format!("@default(\"{}\")", default))
-                    // As a temporary hack, columns always have defaults. Blocked on unexecutable migrations spec.
-                    .unwrap_or_else(|| format!("@default(\"\")"))
+                    .as_ref()
+                    .map(|default| format!(r#"@default("{}")"#, default))
+                    .unwrap_or_else(String::new)
             );
 
-            let response = api.infer_apply(&dm2).send().await?.assert_green()?.into_inner();
-
-            anyhow::ensure!(
-                response.warnings.is_empty(),
-                "Warnings should be empty. Got {:?}",
-                response.warnings
-            );
+            api.infer_apply(&dm2).send().await?.assert_green()?;
         }
 
         // Check that the data is still there
         {
             let data = api.dump_table(model_name).await?;
-            let names: Vec<String> = data
+            let names: Vec<PrismaValue> = data
                 .into_iter()
-                .filter_map(|row| row.get("name").and_then(|val| val.to_string()))
+                .filter_map(|row| {
+                    row.get("name").map(|val| {
+                        val.to_string()
+                            .map(|val| PrismaValue::String(val))
+                            .unwrap_or(PrismaValue::Null)
+                    })
+                })
                 .collect();
-            assert_eq!(&[first_default.unwrap_or(""), "Waterworld"], names.as_slice());
+            assert_eq!(
+                &[
+                    first_default.as_ref().cloned().unwrap_or(PrismaValue::Null),
+                    PrismaValue::String("Waterworld".to_string())
+                ],
+                names.as_slice()
+            );
 
             api.assert_schema().await?.assert_table(model_name, |table| {
                 table.assert_column("name", |column| {
-                    column.assert_default(Some(second_default.unwrap_or("")))
+                    if let Some(second_default) = second_default.as_ref() {
+                        column.assert_default_value(second_default)
+                    } else {
+                        column.assert_has_no_default()
+                    }
                 })
             })?;
         }

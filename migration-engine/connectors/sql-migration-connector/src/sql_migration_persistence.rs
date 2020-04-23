@@ -23,17 +23,17 @@ impl MigrationPersistence for SqlMigrationPersistence<'_> {
             let sql_str = match self.sql_family() {
                 SqlFamily::Sqlite => {
                     let mut m = barrel::Migration::new().schema(self.schema_name());
-                    m.create_table_if_not_exists(TABLE_NAME, migration_table_setup_sqlite);
+                    m.create_table_if_not_exists(MIGRATION_TABLE_NAME, migration_table_setup_sqlite);
                     m.make_from(barrel::SqlVariant::Sqlite)
                 }
                 SqlFamily::Postgres => {
                     let mut m = barrel::Migration::new().schema(self.schema_name());
-                    m.create_table(TABLE_NAME, migration_table_setup_postgres);
+                    m.create_table(MIGRATION_TABLE_NAME, migration_table_setup_postgres);
                     m.make_from(barrel::SqlVariant::Pg)
                 }
                 SqlFamily::Mysql => {
                     let mut m = barrel::Migration::new().schema(self.schema_name());
-                    m.create_table(TABLE_NAME, migration_table_setup_mysql);
+                    m.create_table(MIGRATION_TABLE_NAME, migration_table_setup_mysql);
                     m.make_from(barrel::SqlVariant::Mysql)
                 }
             };
@@ -51,7 +51,7 @@ impl MigrationPersistence for SqlMigrationPersistence<'_> {
 
         crate::catch(self.connection_info(), async {
             self.conn()
-                .query(Delete::from_table((self.schema_name(), TABLE_NAME)).into())
+                .query(Delete::from_table((self.schema_name(), MIGRATION_TABLE_NAME)).into())
                 .await
                 .ok();
 
@@ -197,9 +197,9 @@ impl<'a> SqlMigrationPersistence<'a> {
         match self.sql_family() {
             SqlFamily::Sqlite => {
                 // sqlite case. Otherwise quaint produces invalid SQL
-                TABLE_NAME.to_string().into()
+                MIGRATION_TABLE_NAME.to_string().into()
             }
-            _ => (self.schema_name().to_string(), TABLE_NAME.to_string()).into(),
+            _ => (self.schema_name().to_string(), MIGRATION_TABLE_NAME.to_string()).into(),
         }
     }
 
@@ -268,7 +268,7 @@ fn parse_rows_new(result_set: ResultSet) -> Vec<Migration> {
         .collect()
 }
 
-static TABLE_NAME: &str = "_Migration";
+pub static MIGRATION_TABLE_NAME: &str = "_Migration";
 static NAME_COLUMN: &str = "name";
 static REVISION_COLUMN: &str = "revision";
 static DATAMODEL_COLUMN: &str = "datamodel";

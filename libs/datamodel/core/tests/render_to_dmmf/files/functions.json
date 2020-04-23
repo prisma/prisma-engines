@@ -9,7 +9,6 @@
         {
           "name": "id",
           "kind": "scalar",
-          "dbNames": [],
           "isList": false,
           "isRequired": true,
           "isUnique": false,
@@ -22,7 +21,6 @@
         {
           "name": "createdAt",
           "kind": "scalar",
-          "dbNames": [],
           "isList": false,
           "isRequired": true,
           "isUnique": false,
@@ -39,7 +37,6 @@
         {
           "name": "someId",
           "kind": "scalar",
-          "dbNames": [],
           "isList": false,
           "isRequired": true,
           "isUnique": true,

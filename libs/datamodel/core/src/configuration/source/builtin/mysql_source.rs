@@ -34,6 +34,6 @@ impl Source for MySqlSource {
     }
 
     fn connector(&self) -> Box<dyn Connector> {
-        Box::new(ExampleConnector::empty())
+        Box::new(ExampleConnector::mysql())
     }
 }

@@ -1,6 +1,6 @@
 #![allow(unused)]
 
-use log::debug;
+use tracing::debug;
 
 use quaint::prelude::*;
 use sql_schema_describer::*;

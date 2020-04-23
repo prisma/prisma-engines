@@ -1,5 +1,9 @@
 use crate::common::*;
-use datamodel::FieldArity;
+use datamodel::ast::Span;
+use datamodel::error::DatamodelError;
+use datamodel::{render_datamodel_to_string, Field, FieldArity, FieldType};
+use datamodel_connector::scalars::ScalarType;
+use pretty_assertions::assert_eq;
 
 #[test]
 fn must_add_back_relation_fields_for_given_list_field() {
@@ -27,8 +31,12 @@ fn must_add_back_relation_fields_for_given_list_field() {
     post_model
         .assert_has_field("user")
         .assert_relation_to("User")
+        .assert_relation_base_fields(&["userId"])
         .assert_relation_to_fields(&["id"])
         .assert_arity(&datamodel::dml::FieldArity::Optional);
+    post_model
+        .assert_has_field("userId")
+        .assert_base_type(&datamodel::dml::ScalarType::Int);
 }
 
 #[test]
@@ -59,8 +67,41 @@ fn must_add_back_relation_fields_for_given_singular_field() {
     post_model
         .assert_has_field("user")
         .assert_relation_to("User")
+        .assert_relation_base_fields(&[])
         .assert_relation_to_fields(&[])
         .assert_arity(&datamodel::dml::FieldArity::List);
+}
+
+#[test]
+fn must_render_generated_back_relation_fields() {
+    let dml = r#"
+    model User {
+        id Int @id
+        posts Post[]
+    }
+
+    model Post {
+        post_id Int @id
+    }
+    "#;
+
+    let schema = parse(dml);
+
+    let rendered = dbg!(render_datamodel_to_string(&schema).unwrap());
+
+    assert_eq!(
+        rendered,
+        r#"model User {
+  id    Int    @id
+  posts Post[]
+}
+
+model Post {
+  post_id Int   @id
+  user    User? @relation(fields: [userId], references: [id])
+  userId  Int?
+}"#
+    );
 }
 
 #[test]
@@ -569,4 +610,78 @@ fn should_not_get_confused_with_complicated_self_relations() {
         .assert_relation_to("Human")
         .assert_relation_name("Offspring")
         .assert_relation_to_fields(&["id"]);
+}
+
+#[test]
+fn must_handle_conflicts_with_existing_fields_if_types_are_compatible() {
+    let dml = r#"
+    model Blog {
+      id    String @id
+      posts Post[]
+    }
+    
+    model Post {
+      id     String   @id      
+      blogId String?
+    }
+    "#;
+
+    let schema = parse(dml);
+    let post = schema.assert_has_model("Post");
+    let blog_id_fields: Vec<&Field> = post.fields.iter().filter(|f| &f.name == "blogId").collect();
+    dbg!(&post.fields);
+    assert_eq!(blog_id_fields.len(), 1);
+
+    let field = post.find_field("blog").unwrap();
+    field.assert_relation_base_fields(&["blogId"]);
+}
+
+#[test]
+fn must_handle_conflicts_with_existing_fields_if_types_are_incompatible() {
+    let dml = r#"
+    model Blog {
+      id    String @id
+      posts Post[]
+    }
+    
+    model Post {
+      id     String   @id      
+      blogId Int?     // this is not compatible with Blog.id  
+    }
+    "#;
+
+    let schema = parse(dml);
+    let post = schema.assert_has_model("Post");
+
+    dbg!(&post.fields);
+
+    let underlying_field = post.find_field("blogId_BlogToPost").unwrap();
+    assert!(underlying_field.arity.is_optional());
+    assert_eq!(underlying_field.field_type, FieldType::Base(ScalarType::String, None));
+
+    let field = post.assert_has_field("blog");
+    field.assert_relation_base_fields(&["blogId_BlogToPost"]);
+}
+
+#[test]
+fn must_handle_conflicts_with_existing_fields_if_types_are_incompatible_and_name_generation_breaks_down() {
+    let dml = r#"
+    model Blog {
+      id    String @id
+      posts Post[]
+    }
+    
+    model Post {
+      id                String   @id      
+      blogId            Int?     // this is not compatible with Blog.id
+      blogId_BlogToPost Int?     // clashes with the auto generated name
+    }
+    "#;
+
+    let errors = parse_error(dml);
+    errors.assert_is(DatamodelError::new_model_validation_error(
+        "Automatic underlying field generation tried to add the field `blogId_BlogToPost` in model `Post` for the back relation field of `posts` in `Blog`. A field with that name exists already and has an incompatible type for the relation. Please add the back relation manually.",
+        "Post",
+        Span::new(75,281),
+    ));
 }

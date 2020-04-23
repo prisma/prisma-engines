@@ -10,6 +10,7 @@ fn connector_names() -> Vec<(&'static str, Tags)> {
     vec![
         ("mysql_8", Tags::MYSQL | Tags::MYSQL_8),
         ("mysql", Tags::MYSQL),
+        ("mysql_5_6", Tags::MYSQL | Tags::MYSQL_5_6),
         ("postgres9", Tags::POSTGRES),
         ("postgres", Tags::POSTGRES),
         ("postgres11", Tags::POSTGRES),

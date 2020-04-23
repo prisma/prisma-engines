@@ -123,7 +123,7 @@ where
     'tx: 'conn,
 {
     fn log_enabled() -> bool {
-        log::max_level() == log::LevelFilter::Trace
+        tracing::level_filters::STATIC_MAX_LEVEL == tracing::level_filters::LevelFilter::TRACE
     }
 
     pub fn new(conn: ConnectionLike<'conn, 'tx>) -> QueryInterpreter<'conn, 'tx> {

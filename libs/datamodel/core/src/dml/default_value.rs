@@ -1,50 +1,36 @@
-use super::*;
-use crate::{ast::Span, error::DatamodelError};
 use chrono::Utc;
 use prisma_value::PrismaValue;
-use std::{convert::TryFrom, convert::TryInto, fmt};
+use std::fmt;
 use uuid::Uuid;
 
 #[derive(Clone, PartialEq)]
 pub enum DefaultValue {
-    Single(ScalarValue),
+    Single(PrismaValue),
     Expression(ValueGenerator),
 }
 
 impl DefaultValue {
     // Returns either a copy of the contained value or produces a new
     // value as defined by the expression.
-    pub fn get(&self) -> Option<ScalarValue> {
+    pub fn get(&self) -> Option<PrismaValue> {
         match self {
             Self::Single(v) => Some(v.clone()),
             Self::Expression(g) => g.generate(),
         }
-    }
-
-    pub fn get_as_prisma_value(&self) -> Option<PrismaValue> {
-        self.get().map(|sv| match sv {
-            ScalarValue::Boolean(x) => PrismaValue::Boolean(x),
-            ScalarValue::Int(x) => PrismaValue::Int(i64::from(x)),
-            ScalarValue::Float(x) => x.try_into().expect("Can't convert float to decimal"),
-            ScalarValue::String(x) => PrismaValue::String(x.clone()),
-            ScalarValue::DateTime(x) => PrismaValue::DateTime(x),
-            ScalarValue::Decimal(x) => x.try_into().expect("Can't convert float to decimal"),
-            ScalarValue::ConstantLiteral(value) => PrismaValue::Enum(value.clone()),
-        })
     }
 }
 
 #[derive(Clone)]
 pub struct ValueGenerator {
     pub name: String,
-    pub args: Vec<ScalarValue>,
+    pub args: Vec<PrismaValue>,
 
     pub generator: ValueGeneratorFn,
 }
 
 impl ValueGenerator {
-    pub fn new(name: String, args: Vec<ScalarValue>) -> std::result::Result<Self, DatamodelError> {
-        let generator = ValueGeneratorFn::try_from(name.as_ref())?;
+    pub fn new(name: String, args: Vec<PrismaValue>) -> std::result::Result<Self, String> {
+        let generator = ValueGeneratorFn::new(name.as_ref())?;
 
         Ok(ValueGenerator { name, args, generator })
     }
@@ -61,7 +47,15 @@ impl ValueGenerator {
         ValueGenerator::new("now".to_owned(), vec![]).unwrap()
     }
 
-    pub fn generate(&self) -> Option<ScalarValue> {
+    pub fn new_cuid() -> Self {
+        ValueGenerator::new("cuid".to_owned(), vec![]).unwrap()
+    }
+
+    pub fn new_uuid() -> Self {
+        ValueGenerator::new("uuid".to_owned(), vec![]).unwrap()
+    }
+
+    pub fn generate(&self) -> Option<PrismaValue> {
         self.generator.invoke()
     }
 
@@ -69,7 +63,7 @@ impl ValueGenerator {
         &self.name
     }
 
-    fn args(&self) -> &[ScalarValue] {
+    fn args(&self) -> &[PrismaValue] {
         &self.args
     }
 }
@@ -84,7 +78,18 @@ pub enum ValueGeneratorFn {
 }
 
 impl ValueGeneratorFn {
-    pub fn invoke(&self) -> Option<ScalarValue> {
+    fn new(name: &str) -> std::result::Result<Self, String> {
+        match name {
+            "cuid" => Ok(Self::CUID),
+            "uuid" => Ok(Self::UUID),
+            "now" => Ok(Self::Now),
+            "autoincrement" => Ok(Self::Autoincrement),
+            "dbgenerated" => Ok(Self::DbGenerated),
+            _ => Err(format!("The function {} is not a known function.", name)),
+        }
+    }
+
+    pub fn invoke(&self) -> Option<PrismaValue> {
         match self {
             Self::UUID => Self::generate_uuid(),
             Self::CUID => Self::generate_cuid(),
@@ -94,34 +99,16 @@ impl ValueGeneratorFn {
         }
     }
 
-    fn generate_cuid() -> Option<ScalarValue> {
-        Some(ScalarValue::String(cuid::cuid().unwrap()))
+    fn generate_cuid() -> Option<PrismaValue> {
+        Some(PrismaValue::String(cuid::cuid().unwrap()))
     }
 
-    fn generate_uuid() -> Option<ScalarValue> {
-        Some(ScalarValue::String(Uuid::new_v4().to_string()))
+    fn generate_uuid() -> Option<PrismaValue> {
+        Some(PrismaValue::Uuid(Uuid::new_v4()))
     }
 
-    fn generate_now() -> Option<ScalarValue> {
-        Some(ScalarValue::DateTime(Utc::now()))
-    }
-}
-
-impl TryFrom<&str> for ValueGeneratorFn {
-    type Error = DatamodelError;
-
-    fn try_from(s: &str) -> std::result::Result<Self, DatamodelError> {
-        match s {
-            "cuid" => Ok(Self::CUID),
-            "uuid" => Ok(Self::UUID),
-            "now" => Ok(Self::Now),
-            "autoincrement" => Ok(Self::Autoincrement),
-            "dbgenerated" => Ok(Self::DbGenerated),
-            _ => Err(DatamodelError::new_functional_evaluation_error(
-                &format!("The function {} is not a known function.", s),
-                Span::empty(),
-            )),
-        }
+    fn generate_now() -> Option<PrismaValue> {
+        Some(PrismaValue::DateTime(Utc::now()))
     }
 }
 

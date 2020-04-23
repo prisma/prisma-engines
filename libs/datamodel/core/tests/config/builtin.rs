@@ -4,11 +4,11 @@ use pretty_assertions::assert_eq;
 
 #[test]
 fn serialize_builtin_sources_to_dmmf() {
-    std::env::set_var("pg2", "https://localhost/postgres2");
+    std::env::set_var("pg2", "postgresql://localhost/postgres2");
     const DATAMODEL: &str = r#"
         datasource pg1 {
             provider = "postgresql"
-            url = "https://localhost/postgres1"
+            url = "postgresql://localhost/postgres1"
         }
         
         datasource pg2 {
@@ -18,12 +18,12 @@ fn serialize_builtin_sources_to_dmmf() {
         
         datasource sqlite1 {
             provider = "sqlite"
-            url = "https://localhost/sqlite1"
+            url = "sqlite://file.db"
         }
         
         datasource mysql1 {
             provider = "mysql"
-            url = "https://localhost/mysql"
+            url = "mysql://localhost"
         }
     "#;
     let config = datamodel::parse_configuration(DATAMODEL).unwrap();
@@ -35,7 +35,7 @@ fn serialize_builtin_sources_to_dmmf() {
     "connectorType": "postgresql",
     "url": {
       "fromEnvVar": null,
-      "value": "https://localhost/postgres1"
+      "value": "postgresql://localhost/postgres1"
     }
   },
   {
@@ -43,7 +43,7 @@ fn serialize_builtin_sources_to_dmmf() {
     "connectorType": "postgresql",
     "url": {
       "fromEnvVar": "pg2",
-      "value": "https://localhost/postgres2"
+      "value": "postgresql://localhost/postgres2"
     }
   },
   {
@@ -51,7 +51,7 @@ fn serialize_builtin_sources_to_dmmf() {
     "connectorType": "sqlite",
     "url": {
       "fromEnvVar": null,
-      "value": "https://localhost/sqlite1"
+      "value": "sqlite://file.db"
     }
   },
   {
@@ -59,7 +59,7 @@ fn serialize_builtin_sources_to_dmmf() {
     "connectorType": "mysql",
     "url": {
       "fromEnvVar": null,
-      "value": "https://localhost/mysql"
+      "value": "mysql://localhost"
     }
   }
 ]"#;

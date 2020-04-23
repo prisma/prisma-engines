@@ -6,7 +6,7 @@ import util._
 
 class UpdateMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
 
-  "The Update Mutation" should "update an item" in {
+  "The Update Mutation" should "update an item" taggedAs IgnoreSQLite in {
     val project = ProjectDsl.fromString {
       """
         |model ScalarModel {

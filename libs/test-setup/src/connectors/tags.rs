@@ -2,11 +2,12 @@ use bitflags::bitflags;
 
 bitflags! {
     pub struct Tags: u8 {
-        const MYSQL    = 0b00000001;
-        const MARIADB  = 0b00000010;
-        const POSTGRES = 0b00000100;
-        const SQLITE   = 0b00001000;
-        const MYSQL_8  = 0b00010000;
+        const MYSQL     = 0b00000001;
+        const MARIADB   = 0b00000010;
+        const POSTGRES  = 0b00000100;
+        const SQLITE    = 0b00001000;
+        const MYSQL_8   = 0b00010000;
+        const MYSQL_5_6 = 0b00100000;
 
         const SQL = Self::MYSQL.bits | Self::POSTGRES.bits | Self::SQLITE.bits;
     }
@@ -41,6 +42,7 @@ impl std::str::FromStr for Tags {
 const TAG_NAMES: &[(&str, Tags)] = &[
     ("mariadb", Tags::MARIADB),
     ("mysql", Tags::MYSQL),
+    ("mysql_5_6", Tags::MYSQL_5_6),
     ("mysql_8", Tags::MYSQL_8),
     ("postgres", Tags::POSTGRES),
     ("sql", Tags::SQL),

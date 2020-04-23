@@ -1,9 +1,9 @@
 #![allow(unused)]
 
-use log::debug;
 use quaint::prelude::*;
 use sql_schema_describer::*;
 use std::sync::Arc;
+use tracing::debug;
 
 use super::SCHEMA;
 

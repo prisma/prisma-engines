@@ -18,7 +18,7 @@ serde = { version = "1", features = ["derive"] }
 chrono = "0.4"
 once_cell = "1.3"
 debug_stub_derive = "0.3"
-log = "0.4"
+tracing = "0.1"
 petgraph = "0.4"
 im = "13.0"
 futures = "0.3"

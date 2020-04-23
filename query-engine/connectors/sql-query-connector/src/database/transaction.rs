@@ -1,7 +1,8 @@
 use crate::database::operations::*;
 use crate::SqlError;
 use connector_interface::{
-    self as connector, filter::Filter, QueryArguments, ReadOperations, Transaction, WriteArgs, WriteOperations, IO,
+    self as connector, filter::Filter, QueryArguments, ReadOperations, RecordFilter, Transaction, WriteArgs,
+    WriteOperations, IO,
 };
 use prisma_models::prelude::*;
 use prisma_value::PrismaValue;
@@ -87,14 +88,14 @@ impl<'a> WriteOperations for SqlConnectorTransaction<'a> {
     fn update_records<'b>(
         &'b self,
         model: &'b ModelRef,
-        where_: Filter,
+        record_filter: RecordFilter,
         args: WriteArgs,
     ) -> connector::IO<Vec<RecordProjection>> {
-        IO::new(self.catch(async move { write::update_records(&self.inner, model, where_, args).await }))
+        IO::new(self.catch(async move { write::update_records(&self.inner, model, record_filter, args).await }))
     }
 
-    fn delete_records<'b>(&'b self, model: &'b ModelRef, where_: Filter) -> connector::IO<usize> {
-        IO::new(self.catch(async move { write::delete_records(&self.inner, model, where_).await }))
+    fn delete_records<'b>(&'b self, model: &'b ModelRef, record_filter: RecordFilter) -> connector::IO<usize> {
+        IO::new(self.catch(async move { write::delete_records(&self.inner, model, record_filter).await }))
     }
 
     fn connect<'b>(

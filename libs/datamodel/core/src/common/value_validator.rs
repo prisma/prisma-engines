@@ -1,10 +1,11 @@
-use crate::error::DatamodelError;
-use crate::{ast, DefaultValue, EnvFunction};
-use crate::{dml, ValueGenerator};
-
 use super::FromStrAndSpan;
 use super::ScalarType;
+use crate::error::DatamodelError;
+use crate::ValueGenerator;
+use crate::{ast, DefaultValue, EnvFunction};
 use chrono::{DateTime, Utc};
+use prisma_value::PrismaValue;
+use rust_decimal::Decimal;
 use std::error;
 
 /// Wraps a value and provides convenience methods for
@@ -50,14 +51,13 @@ impl ValueValidator {
 
     /// Attempts to parse the wrapped value
     /// to a given prisma type.
-    pub fn as_type(&self, scalar_type: ScalarType) -> Result<dml::ScalarValue, DatamodelError> {
+    pub fn as_type(&self, scalar_type: ScalarType) -> Result<PrismaValue, DatamodelError> {
         match scalar_type {
-            ScalarType::Int => self.as_int().map(dml::ScalarValue::Int),
-            ScalarType::Float => self.as_float().map(dml::ScalarValue::Float),
-            ScalarType::Decimal => self.as_decimal().map(dml::ScalarValue::Decimal),
-            ScalarType::Boolean => self.as_bool().map(dml::ScalarValue::Boolean),
-            ScalarType::DateTime => self.as_date_time().map(dml::ScalarValue::DateTime),
-            ScalarType::String => self.as_str().map(dml::ScalarValue::String),
+            ScalarType::Int => self.as_int().map(PrismaValue::Int),
+            ScalarType::Float => self.as_float().map(PrismaValue::Float),
+            ScalarType::Boolean => self.as_bool().map(PrismaValue::Boolean),
+            ScalarType::DateTime => self.as_date_time().map(PrismaValue::DateTime),
+            ScalarType::String => self.as_str().map(PrismaValue::String),
         }
     }
 
@@ -106,29 +106,19 @@ impl ValueValidator {
     }
 
     /// Tries to convert the wrapped value to a Prisma Integer.
-    pub fn as_int(&self) -> Result<i32, DatamodelError> {
+    pub fn as_int(&self) -> Result<i64, DatamodelError> {
         match &self.value {
-            ast::Expression::NumericValue(value, _) => self.wrap_error_from_result(value.parse::<i32>(), "numeric"),
-            ast::Expression::Any(value, _) => self.wrap_error_from_result(value.parse::<i32>(), "numeric"),
+            ast::Expression::NumericValue(value, _) => self.wrap_error_from_result(value.parse::<i64>(), "numeric"),
+            ast::Expression::Any(value, _) => self.wrap_error_from_result(value.parse::<i64>(), "numeric"),
             _ => Err(self.construct_type_mismatch_error("numeric")),
         }
     }
 
     /// Tries to convert the wrapped value to a Prisma Float.
-    pub fn as_float(&self) -> Result<f64, DatamodelError> {
+    pub fn as_float(&self) -> Result<Decimal, DatamodelError> {
         match &self.value {
-            ast::Expression::NumericValue(value, _) => self.wrap_error_from_result(value.parse::<f64>(), "numeric"),
-            ast::Expression::Any(value, _) => self.wrap_error_from_result(value.parse::<f64>(), "numeric"),
-            _ => Err(self.construct_type_mismatch_error("numeric")),
-        }
-    }
-
-    // TODO: Ask which decimal type to take.
-    /// Tries to convert the wrapped value to a Prisma Decimal.
-    pub fn as_decimal(&self) -> Result<f64, DatamodelError> {
-        match &self.value {
-            ast::Expression::NumericValue(value, _) => self.wrap_error_from_result(value.parse::<f64>(), "numeric"),
-            ast::Expression::Any(value, _) => self.wrap_error_from_result(value.parse::<f64>(), "numeric"),
+            ast::Expression::NumericValue(value, _) => self.wrap_error_from_result(value.parse::<Decimal>(), "numeric"),
+            ast::Expression::Any(value, _) => self.wrap_error_from_result(value.parse::<Decimal>(), "numeric"),
             _ => Err(self.construct_type_mismatch_error("numeric")),
         }
     }
@@ -189,7 +179,7 @@ impl ValueValidator {
     }
 
     /// Unwraps the wrapped value as a constant literal..
-    pub fn as_array(&self) -> Result<Vec<ValueValidator>, DatamodelError> {
+    pub fn as_array(&self) -> Vec<ValueValidator> {
         match &self.value {
             ast::Expression::Array(values, _) => {
                 let mut validators: Vec<ValueValidator> = Vec::new();
@@ -198,18 +188,19 @@ impl ValueValidator {
                     validators.push(ValueValidator::new(value));
                 }
 
-                Ok(validators)
+                validators
             }
-            _ => Ok(vec![ValueValidator {
+            _ => vec![ValueValidator {
                 value: self.value.clone(),
-            }]),
+            }],
         }
     }
 
     pub fn as_default_value(&self, scalar_type: ScalarType) -> Result<DefaultValue, DatamodelError> {
         match &self.value {
             ast::Expression::Function(name, _, _) => {
-                Ok(DefaultValue::Expression(ValueGenerator::new(name.to_string(), vec![])?))
+                let generator = self.get_value_generator(&name)?;
+                Ok(DefaultValue::Expression(generator))
             }
             _ => {
                 let x = ValueValidator::new(&self.value).as_type(scalar_type)?;
@@ -220,9 +211,14 @@ impl ValueValidator {
 
     pub fn as_value_generator(&self) -> Result<ValueGenerator, DatamodelError> {
         match &self.value {
-            ast::Expression::Function(name, _, _) => Ok(ValueGenerator::new(name.to_string(), vec![])?),
+            ast::Expression::Function(name, _, _) => self.get_value_generator(&name),
             _ => Err(self.construct_type_mismatch_error("function")),
         }
+    }
+
+    fn get_value_generator(&self, name: &str) -> Result<ValueGenerator, DatamodelError> {
+        ValueGenerator::new(name.to_string(), vec![])
+            .map_err(|err_msg| DatamodelError::new_functional_evaluation_error(&err_msg, self.span()))
     }
 }
 

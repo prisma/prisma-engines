@@ -11,8 +11,6 @@ use enums::EnumDiffer;
 use sql_schema_describer::*;
 use tracing::debug;
 
-const MIGRATION_TABLE_NAME: &str = "_Migration";
-
 #[derive(Debug)]
 pub struct SqlSchemaDiffer<'a> {
     previous: &'a SqlSchema,

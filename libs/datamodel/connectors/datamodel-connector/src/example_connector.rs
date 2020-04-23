@@ -3,11 +3,23 @@ use super::{declarative_connector::*, ScalarType};
 pub struct ExampleConnector {}
 
 impl ExampleConnector {
-    pub fn empty() -> DeclarativeConnector {
+    pub fn sqlite() -> DeclarativeConnector {
         DeclarativeConnector {
             type_aliases: vec![],
             field_type_constructors: vec![],
             supports_scalar_lists: false,
+            supports_relations_over_non_unique_criteria: false,
+            supports_enums: false,
+        }
+    }
+
+    pub fn mysql() -> DeclarativeConnector {
+        DeclarativeConnector {
+            type_aliases: vec![],
+            field_type_constructors: vec![],
+            supports_scalar_lists: false,
+            supports_relations_over_non_unique_criteria: true,
+            supports_enums: true,
         }
     }
 
@@ -70,6 +82,8 @@ impl ExampleConnector {
             type_aliases,
             field_type_constructors,
             supports_scalar_lists: true,
+            supports_relations_over_non_unique_criteria: false,
+            supports_enums: true,
         }
     }
 }
