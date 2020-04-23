@@ -1,5 +1,7 @@
 use crate::common::*;
+use datamodel::ast::Span;
 use datamodel::common::ScalarType;
+use datamodel::error::DatamodelError;
 
 #[test]
 fn parse_basic_model() {
@@ -66,4 +68,20 @@ fn parse_comments() {
     user_model
         .assert_has_field("firstName")
         .assert_with_documentation("The first name.\nCan be multi-line.");
+}
+
+#[test]
+fn must_error_for_invalid_model_names() {
+    let dml = r#"
+    model DateTimeFilter {
+        id Int @id
+    }
+    "#;
+
+    let errors = parse_error(dml);
+    errors.assert_is(DatamodelError::new_model_validation_error(
+        "The model name `DateTimeFilter` is invalid. It is a reserved name. Please change it.",
+        "DateTimeFilter",
+        Span::new(5, 52),
+    ));
 }

@@ -1,4 +1,5 @@
 mod directive_box;
+mod invalid_model_names;
 mod lift;
 mod lower;
 mod precheck;
