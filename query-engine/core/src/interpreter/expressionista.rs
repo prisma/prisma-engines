@@ -38,11 +38,12 @@ impl Expressionista {
         node: &NodeRef,
         parent_edges: Vec<EdgeRef>,
     ) -> InterpretationResult<Expression> {
+        dbg!("Entering node: ", &node);
         // Child edges are ordered, evaluation order is low to high in the graph, unless other rules override.
         let mut direct_children = graph.direct_child_pairs(&node);
 
         // Find the positions of all result returning graph nodes.
-        let result_positions: Vec<usize> = direct_children
+        let mut result_positions: Vec<usize> = direct_children
             .iter()
             .enumerate()
             .filter_map(|(ix, (_, child_node))| {
@@ -54,10 +55,18 @@ impl Expressionista {
             })
             .collect();
 
+        // Start removing the highest indices first to not invalidate subsequent removals.
+        result_positions.sort();
+        result_positions.reverse();
+
+        dbg!(&direct_children);
+
         let result_subgraphs: Vec<(EdgeRef, NodeRef)> = result_positions
             .into_iter()
             .map(|pos| direct_children.remove(pos))
             .collect();
+
+        dbg!(&result_subgraphs);
 
         // Because we split from right to left, everything remaining in `direct_children`
         // doesn't belong into results, and is executed before all result scopes.
@@ -74,6 +83,8 @@ impl Expressionista {
             let result_exp = Self::fold_result_scopes(graph, result_subgraphs)?;
             expressions.push(result_exp);
         }
+
+        graph.mark_visited(&node);
 
         let is_result = graph.is_result_node(&node);
         let node_id = node.id();
@@ -113,8 +124,9 @@ impl Expressionista {
         node: &NodeRef,
         parent_edges: Vec<EdgeRef>,
     ) -> InterpretationResult<Expression> {
-        let child_pairs = graph.direct_child_pairs(node);
+        graph.mark_visited(node);
 
+        let child_pairs = graph.direct_child_pairs(node);
         let exprs: Vec<Expression> = child_pairs
             .into_iter()
             .map(|(_, node)| Self::build_expression(graph, &node, graph.incoming_edges(&node)))
@@ -129,6 +141,8 @@ impl Expressionista {
         node: &NodeRef,
         parent_edges: Vec<EdgeRef>,
     ) -> InterpretationResult<Expression> {
+        graph.mark_visited(node);
+
         let node_id = node.id();
         let child_pairs = graph.direct_child_pairs(node);
 
@@ -181,6 +195,8 @@ impl Expressionista {
     ) -> InterpretationResult<Expression> {
         match graph.node_content(node).unwrap() {
             Node::Flow(Flow::If(_)) => {
+                graph.mark_visited(node);
+
                 let child_pairs = graph.child_pairs(node);
 
                 // Graph validation guarantees this succeeds.
@@ -317,6 +333,7 @@ impl Expressionista {
 
         let result_binding_names = bindings.iter().map(|b| b.name.clone()).collect();
 
+        // bindings.fold()
         Ok(Expression::Let {
             bindings,
             expressions: vec![Expression::GetFirstNonEmpty {

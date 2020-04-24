@@ -1,109 +1,50 @@
 datasource chinook {
   provider = "sqlite"
-  url = "file:./db/Chinook.db"
+  url = "file:./db/633.db"
 }
 
-model Album {
-  id       Int     @id @map(name: "AlbumId")
-  Title    String  @default("TestDefaultTitle")
-  ArtistId Int
-  Tracks   Track[]
-  Artist   Artist  @relation(fields: [ArtistId], references: [id])
+model Car {
+  id        Int       @default(autoincrement()) @id
+  carnumber Int       @unique
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @default(now())
+  opts      Options[]
 }
 
-model Track {
-  id           Int @id       @map(name:"TrackId")
-  Name         String
-  Composer     String?
-  Milliseconds Int
-  UnitPrice    Float
-  AlbumId      Int?
-  GenreId      Int?
-  MediaTypeId  Int
-  MediaType    MediaType     @relation(fields: [MediaTypeId], references: [id])
-  Genre        Genre?        @relation(fields: [GenreId], references: [id])
-  Album        Album?        @relation(fields: [AlbumId], references: [id])
-  InvoiceLines InvoiceLine[]
+model File {
+  id        Int       @default(autoincrement()) @id
+  name      String    @unique
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @default(now())
+  opts      Options[]
 }
 
-model MediaType {
-  id   Int     @id @map(name:"MediaTypeId")
-  Name String?
+model Routetovalue {
+  id        Int       @default(autoincrement()) @id
+  index     String    @unique
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @default(now())
+  opts      Options[]
 }
 
-model Genre {
-  id     Int     @id @map(name:"GenreId")
-  Name   String?
-  Tracks Track[]
+model Values {
+  id        Int       @default(autoincrement()) @id
+  value     String    @unique
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @default(now())
+  opts      Options[]
 }
 
-model Artist {
-  id     Int     @id @map(name:"ArtistId")
-  Name   String?
-  Albums Album[]
-}
-
-model Customer {
-  id           Int       @id @map(name:"CustomerId")
-  FirstName    String
-  LastName     String
-  Company      String?
-  Address      String?
-  City         String?
-  State        String?
-  Country      String?
-  PostalCode   String?
-  Phone        String?
-  Fax          String?
-  Email        String
-  SupportRepId Int?
-  SupportRep   Employee? @relation(fields: [SupportRepId], references: [id])
-  Invoices     Invoice[]
-}
-
-model Employee {
-  id         Int       @id @map(name:"EmployeeId")
-  FirstName  String
-  LastName   String
-  Title      String?
-  BirthDate  DateTime?
-  HireDate   DateTime?
-  Address    String?
-  City       String?
-  State      String?
-  Country    String?
-  PostalCode String?
-  Phone      String?
-  Fax        String?
-  Email      String?
-  Customers  Customer[]
-}
-
-model Invoice {
-  id                Int           @id @map(name:"InvoiceId")
-  InvoiceDate       DateTime
-  BillingAddress    String?
-  BillingCity       String?
-  BillingState      String?
-  BillingCountry    String?
-  BillingPostalCode String?
-  Total             Float
-  CustomerId        Int
-  Customer          Customer      @relation(fields: [CustomerId], references: [id])
-  Lines             InvoiceLine[]
-}
-
-model InvoiceLine {
-  id        Int     @id @map(name:"InvoiceLineId")
-  UnitPrice Float
-  Quantity  Int
-  InvoiceId Int
-  TrackId   Int
-  Invoice   Invoice @relation(fields: [InvoiceId], references: [id])
-  Track     Track   @relation(fields: [TrackId], references: [id])
-}
-
-model Playlist {
-  id   Int     @id @map(name:"PlaylistId")
-  Name String?
+model Options {
+  id        Int           @default(autoincrement()) @id
+  createdAt DateTime?     @default(now())
+  updatedAt DateTime?     @default(now())
+  routeName String?
+  Routes    Routetovalue? @relation(fields: [routeName], references: [index])
+  fileName  String?
+  file      File?         @relation(fields: [fileName], references: [name])
+  carnr     Int?
+  Car       Car?          @relation(fields: [carnr], references: [carnumber])
+  val       String?
+  Value     Values?       @relation(fields: [val], references: [value])
 }
