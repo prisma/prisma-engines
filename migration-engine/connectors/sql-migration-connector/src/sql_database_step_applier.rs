@@ -1,5 +1,5 @@
 use crate::*;
-use sql_renderer::{postgres_render_column_type, IteratorJoin, Quoted, SqlRenderer};
+use sql_renderer::{postgres_render_column_type, rendered_step::RenderedStep, IteratorJoin, Quoted, SqlRenderer};
 use sql_schema_describer::*;
 use sql_schema_differ::DiffingOptions;
 use sql_schema_helpers::{walk_columns, ColumnRef};
@@ -143,42 +143,36 @@ fn render_raw_sql(
         SqlMigrationStep::CreateEnum(create_enum) => render_create_enum(renderer, create_enum),
         SqlMigrationStep::DropEnum(drop_enum) => render_drop_enum(renderer, drop_enum),
         SqlMigrationStep::AlterEnum(alter_enum) => match renderer.sql_family() {
-            SqlFamily::Postgres => postgres_alter_enum(alter_enum, next_schema, &schema_name),
+            SqlFamily::Postgres => postgres_alter_enum(alter_enum, next_schema, &schema_name)?.into(),
             SqlFamily::Mysql => mysql_alter_enum(alter_enum, next_schema, &schema_name),
             _ => Ok(Vec::new()),
         },
         SqlMigrationStep::CreateTable(CreateTable { table }) => {
-            let mut create_table = String::with_capacity(100);
+            let columns: String = table
+                .columns
+                .iter()
+                .map(|column| {
+                    let column = ColumnRef {
+                        schema: next_schema,
+                        column,
+                        table,
+                    };
+                    renderer.render_column(&schema_name, column, false)
+                })
+                .join(",");
 
-            writeln!(
-                create_table,
-                "CREATE TABLE {} (",
-                renderer.quote_with_schema(&schema_name, &table.name)
-            )?;
-
-            let mut columns = table.columns.iter().peekable();
-            while let Some(column) = columns.next() {
-                let column = ColumnRef {
-                    schema: next_schema,
-                    column,
-                    table,
-                };
-                let col_sql = renderer.render_column(&schema_name, column, false);
-
-                write!(
-                    create_table,
-                    "    {}{}",
-                    col_sql,
-                    if columns.peek().is_some() { ",\n" } else { "" }
-                )?;
-            }
+            let mut create_table = format!(
+                "CREATE TABLE {} (\n{}",
+                renderer.quote_with_schema(&schema_name, &table.name),
+                columns,
+            );
 
             let primary_key_is_already_set = create_table.contains("PRIMARY KEY");
             let primary_columns = table.primary_key_columns();
 
             if primary_columns.len() > 0 && !primary_key_is_already_set {
-                let column_names = primary_columns.iter().map(|col| renderer.quote(&col));
-                write!(create_table, ",\n    PRIMARY KEY ({})", column_names.join(","))?;
+                let column_names = primary_columns.iter().map(|col| renderer.quote(&col)).join(",");
+                write!(create_table, ",\n    PRIMARY KEY ({})", column_names)?;
             }
 
             if sql_family == SqlFamily::Sqlite && !table.foreign_keys.is_empty() {
@@ -197,7 +191,7 @@ fn render_raw_sql(
                 }
             }
 
-            write!(create_table, "\n) {}", create_table_suffix(sql_family))?;
+            create_table.push_str(create_table_suffix(sql_family));
 
             Ok(vec![create_table])
         }
@@ -441,9 +435,9 @@ fn mysql_drop_index(
 
 fn create_table_suffix(sql_family: SqlFamily) -> &'static str {
     match sql_family {
-        SqlFamily::Sqlite => "",
-        SqlFamily::Postgres => "",
-        SqlFamily::Mysql => "\nDEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci",
+        SqlFamily::Sqlite => ")",
+        SqlFamily::Postgres => ")",
+        SqlFamily::Mysql => "\n) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci",
     }
 }
 
@@ -537,7 +531,7 @@ fn postgres_alter_enum(
     alter_enum: &AlterEnum,
     next_schema: &SqlSchema,
     schema_name: &str,
-) -> anyhow::Result<Vec<String>> {
+) -> anyhow::Result<RenderedStep> {
     if alter_enum.dropped_variants.is_empty() {
         let stmts: Vec<String> = alter_enum
             .created_variants
@@ -551,7 +545,7 @@ fn postgres_alter_enum(
             })
             .collect();
 
-        Ok(stmts)
+        Ok(RenderedStep::new(stmts))
     } else {
         let new_enum = next_schema
             .get_enum(&alter_enum.name)
@@ -630,7 +624,7 @@ fn postgres_alter_enum(
             stmts.push(sql)
         }
 
-        Ok(stmts)
+        Ok(RenderedStep::new(stmts).with_transaction(true))
     }
 }
 
