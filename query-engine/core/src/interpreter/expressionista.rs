@@ -3,7 +3,7 @@ use super::{
 };
 use crate::{query_graph::*, Query};
 use prisma_models::RecordProjection;
-use std::convert::TryInto;
+use std::{collections::VecDeque, convert::TryInto};
 
 pub struct Expressionista;
 
@@ -320,6 +320,9 @@ impl Expressionista {
         graph: &mut QueryGraph,
         result_subgraphs: Vec<(EdgeRef, NodeRef)>,
     ) -> InterpretationResult<Expression> {
+        // if the subgraphs all point to the same result node, we fold them in sequence
+        // if not, we can separate them with a getfirstnonempty
+
         let bindings: Vec<Binding> = result_subgraphs
             .into_iter()
             .map(|(_, node)| {
@@ -333,12 +336,54 @@ impl Expressionista {
 
         let result_binding_names = bindings.iter().map(|b| b.name.clone()).collect();
 
-        // bindings.fold()
-        Ok(Expression::Let {
-            bindings,
-            expressions: vec![Expression::GetFirstNonEmpty {
-                binding_names: result_binding_names,
-            }],
-        })
+        // bindings.into_iter().fold(|| );
+
+        let mut exprs: VecDeque<Expression> = bindings
+            .into_iter()
+            .map(|binding| Expression::Let {
+                bindings: vec![binding],
+                expressions: vec![],
+            })
+            .collect();
+
+        // exprs.reverse();
+
+        if exprs.len() > 1 {
+            // Last expression gets a GetFirstNonEmpty to conclude the chain
+            if let Some(Expression::Let {
+                bindings: _,
+                expressions,
+            }) = exprs.back_mut()
+            {
+                expressions.push(Expression::GetFirstNonEmpty {
+                    binding_names: result_binding_names,
+                })
+            }
+
+            let first = exprs.pop_front().unwrap();
+
+            let folded = exprs.into_iter().fold(first, |mut acc, next| {
+                if let Expression::Let {
+                    bindings: _,
+                    ref mut expressions,
+                } = acc
+                {
+                    expressions.push(next);
+                }
+
+                acc
+            });
+
+            Ok(folded)
+
+        // Ok(Expression::Let {
+        //     bindings,
+        //     expressions: vec![Expression::GetFirstNonEmpty {
+        //         binding_names: result_binding_names,
+        //     }],
+        // })
+        } else {
+            Ok(exprs.pop_front().unwrap())
+        }
     }
 }
