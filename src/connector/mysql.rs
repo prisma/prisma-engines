@@ -814,4 +814,98 @@ VALUES (1, 'Joe', 27, 20000.00 );
             r#"{"some":"json"}"#
         );
     }
+
+    #[tokio::test]
+    async fn unsigned_integers_are_handled() {
+        let conn = Quaint::new(&CONN_STR).await.unwrap();
+
+        let create_table = r#"
+            CREATE TABLE `unsigned_integers_test` (
+                id int4 AUTO_INCREMENT PRIMARY KEY,
+                big BIGINT UNSIGNED
+            )
+        "#;
+
+        let drop_table = r#"DROP TABLE IF EXISTS `unsigned_integers_test`"#;
+
+        conn.query_raw(drop_table, &[]).await.unwrap();
+        conn.query_raw(create_table, &[]).await.unwrap();
+
+        let insert = Insert::multi_into("unsigned_integers_test", &["big"])
+            .values((2,))
+            .values((std::i64::MAX,));
+        conn.query(insert.into()).await.unwrap();
+
+        let select_star = Select::from_table("unsigned_integers_test")
+            .column("big")
+            .order_by(Column::from("id"));
+        let roundtripped = conn.query(select_star.into()).await.unwrap();
+
+        let expected = &[2, std::i64::MAX];
+        let actual: Vec<i64> = roundtripped
+            .into_iter()
+            .map(|row| row.at(0).unwrap().as_i64().unwrap())
+            .collect();
+
+        assert_eq!(actual, expected);
+    }
+
+    #[tokio::test]
+    async fn integer_out_of_range_errors() {
+        let conn = Quaint::new(&CONN_STR).await.unwrap();
+
+        let create_table = r#"
+            CREATE TABLE `out_of_range_integers_test` (
+                id int4 AUTO_INCREMENT PRIMARY KEY,
+                big INT4 UNSIGNED
+            )
+        "#;
+
+        let drop_table = r#"DROP TABLE IF EXISTS `out_of_range_integers_test`"#;
+
+        conn.query_raw(drop_table, &[]).await.unwrap();
+        conn.query_raw(create_table, &[]).await.unwrap();
+
+        // Negative value
+        {
+            let insert = Insert::multi_into("out_of_range_integers_test", &["big"]).values((-22,));
+            let result = conn.query(insert.into()).await;
+
+            assert!(matches!(result.unwrap_err().kind(), ErrorKind::ValueOutOfRange { .. }));
+        }
+
+        // Value too big
+        {
+            let insert = Insert::multi_into("out_of_range_integers_test", &["big"]).values((std::i64::MAX,));
+            let result = conn.query(insert.into()).await;
+
+            assert!(matches!(result.unwrap_err().kind(), ErrorKind::ValueOutOfRange { .. }));
+        }
+    }
+
+    #[tokio::test]
+    async fn bigint_unsigned_can_overflow() {
+        let conn = Quaint::new(&CONN_STR).await.unwrap();
+
+        let create_table = r#"
+            CREATE TABLE `bigint_unsigned_test` (
+                id int4 AUTO_INCREMENT PRIMARY KEY,
+                big BIGINT UNSIGNED
+            )
+        "#;
+
+        let drop_table = r#"DROP TABLE IF EXISTS `bigint_unsigned_test`"#;
+
+        let insert = r#"INSERT INTO `bigint_unsigned_test` (`big`) VALUES (18446744073709551615)"#;
+
+        conn.query_raw(drop_table, &[]).await.unwrap();
+        conn.query_raw(create_table, &[]).await.unwrap();
+        conn.query_raw(insert, &[]).await.unwrap();
+
+        let result = conn.query_raw("SELECT * FROM `bigint_unsigned_test`", &[]).await;
+
+        assert!(
+            matches!(result.unwrap_err().kind(), ErrorKind::ValueOutOfRange { message } if message == "Unsigned integers larger than 9_223_372_036_854_775_807 are currently not handled.")
+        );
+    }
 }
