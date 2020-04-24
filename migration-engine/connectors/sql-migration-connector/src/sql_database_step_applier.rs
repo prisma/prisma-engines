@@ -1,7 +1,7 @@
 use crate::*;
 use sql_renderer::{
     mysql_quoted, mysql_quoted_string, postgres_quoted, postgres_quoted_string, postgres_render_column_type,
-    IteratorJoin, SqlRenderer,
+    rendered_step::RenderedStep, IteratorJoin, SqlRenderer,
 };
 use sql_schema_describer::*;
 use sql_schema_differ::DiffingOptions;
