@@ -1,8 +1,5 @@
 use crate::*;
-use sql_renderer::{
-    mysql_quoted, mysql_quoted_string, postgres_quoted, postgres_quoted_string, postgres_render_column_type,
-    rendered_step::RenderedStep, IteratorJoin, SqlRenderer,
-};
+use sql_renderer::{postgres_render_column_type, IteratorJoin, Quoted, SqlRenderer};
 use sql_schema_describer::*;
 use sql_schema_differ::DiffingOptions;
 use sql_schema_helpers::{walk_columns, ColumnRef};
@@ -153,9 +150,11 @@ fn render_raw_sql(
         SqlMigrationStep::CreateTable(CreateTable { table }) => {
             let mut create_table = String::with_capacity(100);
 
-            write!(create_table, "CREATE TABLE ")?;
-            renderer.write_quoted_with_schema(&mut create_table, &schema_name, &table.name)?;
-            writeln!(create_table, " (")?;
+            writeln!(
+                create_table,
+                "CREATE TABLE {} (",
+                renderer.quote_with_schema(&schema_name, &table.name)
+            )?;
 
             let mut columns = table.columns.iter().peekable();
             while let Some(column) = columns.next() {
@@ -178,11 +177,7 @@ fn render_raw_sql(
             let primary_columns = table.primary_key_columns();
 
             if primary_columns.len() > 0 && !primary_key_is_already_set {
-                let column_names: Vec<String> = primary_columns
-                    .clone()
-                    .into_iter()
-                    .map(|col| renderer.quote(&col))
-                    .collect();
+                let column_names = primary_columns.iter().map(|col| renderer.quote(&col));
                 write!(create_table, ",\n    PRIMARY KEY ({})", column_names.join(","))?;
             }
 
@@ -222,16 +217,13 @@ fn render_raw_sql(
             ]),
         },
         SqlMigrationStep::DropTables(DropTables { names }) => {
-            let fully_qualified_names: Vec<String> = names
-                .iter()
-                .map(|name| renderer.quote_with_schema(&schema_name, &name))
-                .collect();
+            let fully_qualified_names = names.iter().map(|name| renderer.quote_with_schema(&schema_name, &name));
             Ok(vec![format!("DROP TABLE {};", fully_qualified_names.join(","))])
         }
         SqlMigrationStep::RenameTable { name, new_name } => {
             let new_name = match sql_family {
-                SqlFamily::Sqlite => renderer.quote(new_name),
-                _ => renderer.quote_with_schema(&schema_name, &new_name),
+                SqlFamily::Sqlite => renderer.quote(new_name).to_string(),
+                _ => renderer.quote_with_schema(&schema_name, &new_name).to_string(),
             };
             Ok(vec![format!(
                 "ALTER TABLE {} RENAME TO {};",
@@ -412,14 +404,18 @@ fn render_create_index(
     };
     let sql_family = database_info.sql_family();
     let index_name = match sql_family {
-        SqlFamily::Sqlite => renderer.quote_with_schema(database_info.connection_info().schema_name(), &name),
-        _ => renderer.quote(&name),
+        SqlFamily::Sqlite => renderer
+            .quote_with_schema(database_info.connection_info().schema_name(), &name)
+            .to_string(),
+        _ => renderer.quote(&name).to_string(),
     };
     let table_reference = match sql_family {
-        SqlFamily::Sqlite => renderer.quote(table_name),
-        _ => renderer.quote_with_schema(database_info.connection_info().schema_name(), table_name),
+        SqlFamily::Sqlite => renderer.quote(table_name).to_string(),
+        _ => renderer
+            .quote_with_schema(database_info.connection_info().schema_name(), table_name)
+            .to_string(),
     };
-    let columns: Vec<String> = columns.iter().map(|c| renderer.quote(c)).collect();
+    let columns = columns.iter().map(|c| renderer.quote(c));
 
     format!(
         "CREATE {} INDEX {} ON {}({})",
@@ -436,13 +432,11 @@ fn mysql_drop_index(
     table_name: &str,
     index_name: &str,
 ) -> Result<String, std::fmt::Error> {
-    let mut drop_index = String::with_capacity(24 + table_name.len() + index_name.len());
-    write!(drop_index, "DROP INDEX ")?;
-    renderer.write_quoted(&mut drop_index, index_name)?;
-    write!(drop_index, " ON ")?;
-    renderer.write_quoted_with_schema(&mut drop_index, &schema_name, table_name)?;
-
-    Ok(drop_index)
+    Ok(format!(
+        "DROP INDEX {} ON {}",
+        renderer.quote(index_name),
+        renderer.quote_with_schema(schema_name, table_name)
+    ))
 }
 
 fn create_table_suffix(sql_family: SqlFamily) -> &'static str {
@@ -513,12 +507,8 @@ fn render_create_enum(
         SqlFamily::Postgres => {
             let sql = format!(
                 r#"CREATE TYPE {enum_name} AS ENUM ({variants});"#,
-                enum_name = sql_renderer::postgres_quoted(&create_enum.name),
-                variants = create_enum
-                    .variants
-                    .iter()
-                    .map(sql_renderer::postgres_quoted_string)
-                    .join(", "),
+                enum_name = Quoted::postgres_ident(&create_enum.name),
+                variants = create_enum.variants.iter().map(Quoted::postgres_string).join(", "),
             );
             Ok(vec![sql])
         }
@@ -534,7 +524,7 @@ fn render_drop_enum(
         SqlFamily::Postgres => {
             let sql = format!(
                 "DROP TYPE {enum_name}",
-                enum_name = sql_renderer::postgres_quoted(&drop_enum.name),
+                enum_name = Quoted::postgres_ident(&drop_enum.name),
             );
 
             Ok(vec![sql])
@@ -555,8 +545,8 @@ fn postgres_alter_enum(
             .map(|created_value| {
                 format!(
                     "ALTER TYPE {enum_name} ADD VALUE {value}",
-                    enum_name = postgres_quoted(&alter_enum.name),
-                    value = postgres_quoted_string(created_value)
+                    enum_name = Quoted::postgres_ident(&alter_enum.name),
+                    value = Quoted::postgres_string(created_value)
                 )
             })
             .collect();
@@ -576,8 +566,8 @@ fn postgres_alter_enum(
         {
             let create_new_enum = format!(
                 "CREATE TYPE {enum_name} AS ENUM ({variants})",
-                enum_name = postgres_quoted(&tmp_name),
-                variants = new_enum.values.iter().map(postgres_quoted_string).join(", ")
+                enum_name = Quoted::postgres_ident(&tmp_name),
+                variants = new_enum.values.iter().map(Quoted::postgres_string).join(", ")
             );
 
             stmts.push(create_new_enum);
@@ -597,11 +587,11 @@ fn postgres_alter_enum(
                         ALTER COLUMN {column_name} TYPE {tmp_name} \
                             USING ({column_name}::text::{tmp_name}),
                         ALTER COLUMN {column_name} SET DEFAULT {new_enum_default}",
-                    schema_name = postgres_quoted(schema_name),
-                    table_name = postgres_quoted(column.table().name()),
-                    column_name = postgres_quoted(column.name()),
-                    tmp_name = postgres_quoted(&tmp_name),
-                    new_enum_default = postgres_quoted_string(new_enum.values.first().unwrap()),
+                    schema_name = Quoted::postgres_ident(schema_name),
+                    table_name = Quoted::postgres_ident(column.table().name()),
+                    column_name = Quoted::postgres_ident(column.name()),
+                    tmp_name = Quoted::postgres_ident(&tmp_name),
+                    new_enum_default = Quoted::postgres_string(new_enum.values.first().unwrap()),
                 );
 
                 stmts.push(sql);
@@ -612,8 +602,8 @@ fn postgres_alter_enum(
         {
             let sql = format!(
                 "ALTER TYPE {enum_name} RENAME TO {tmp_old_name}",
-                enum_name = postgres_quoted(&alter_enum.name),
-                tmp_old_name = postgres_quoted(&tmp_old_name)
+                enum_name = Quoted::postgres_ident(&alter_enum.name),
+                tmp_old_name = Quoted::postgres_ident(&tmp_old_name)
             );
 
             stmts.push(sql);
@@ -623,8 +613,8 @@ fn postgres_alter_enum(
         {
             let sql = format!(
                 "ALTER TYPE {tmp_name} RENAME TO {enum_name}",
-                tmp_name = postgres_quoted(&tmp_name),
-                enum_name = postgres_quoted(&new_enum.name)
+                tmp_name = Quoted::postgres_ident(&tmp_name),
+                enum_name = Quoted::postgres_ident(&new_enum.name)
             );
 
             stmts.push(sql)
@@ -634,7 +624,7 @@ fn postgres_alter_enum(
         {
             let sql = format!(
                 "DROP TYPE {tmp_old_name}",
-                tmp_old_name = postgres_quoted(&tmp_old_name),
+                tmp_old_name = Quoted::postgres_ident(&tmp_old_name),
             );
 
             stmts.push(sql)
@@ -656,13 +646,13 @@ fn mysql_alter_enum(alter_enum: &AlterEnum, next_schema: &SqlSchema, schema_name
         .ok_or_else(|| anyhow::anyhow!("Couldn't find enum {:?}", alter_enum.name))?
         .values
         .iter()
-        .map(mysql_quoted_string)
+        .map(Quoted::mysql_string)
         .join(", ");
 
     let change_column = format!(
         "ALTER TABLE {schema_name}.{table_name} CHANGE {column_name} {column_name} ENUM({enum_variants})",
-        schema_name = mysql_quoted(schema_name),
-        table_name = mysql_quoted(column.table().name()),
+        schema_name = Quoted::mysql_ident(schema_name),
+        table_name = Quoted::mysql_ident(column.table().name()),
         column_name = column.name(),
         enum_variants = enum_variants,
     );

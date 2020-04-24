@@ -1,6 +1,73 @@
 use crate::sql_schema_helpers::*;
 use sql_schema_describer::*;
-use std::fmt::Write as _;
+use std::fmt::{Display, Write as _};
+
+#[derive(Debug)]
+pub(crate) enum Quoted<T> {
+    Double(T),
+    Single(T),
+    Backticks(T),
+}
+
+impl<T> Quoted<T> {
+    fn quote_that_too<U>(&self, u: U) -> Quoted<U> {
+        match self {
+            Quoted::Double(_) => Quoted::Double(u),
+            Quoted::Single(_) => Quoted::Single(u),
+            Quoted::Backticks(_) => Quoted::Backticks(u),
+        }
+    }
+
+    pub(crate) fn mysql_string(contents: T) -> Quoted<T> {
+        Quoted::Single(contents)
+    }
+
+    pub(crate) fn mysql_ident(name: T) -> Quoted<T> {
+        Quoted::Backticks(name)
+    }
+
+    pub(crate) fn postgres_string(contents: T) -> Quoted<T> {
+        Quoted::Single(contents)
+    }
+
+    pub(crate) fn postgres_ident(name: T) -> Quoted<T> {
+        Quoted::Double(name)
+    }
+
+    pub(crate) fn sqlite_ident(name: T) -> Quoted<T> {
+        Quoted::Double(name)
+    }
+}
+
+impl<T> Display for Quoted<T>
+where
+    T: Display,
+{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Quoted::Double(inner) => write!(f, "\"{}\"", inner),
+            Quoted::Single(inner) => write!(f, "'{}'", inner),
+            Quoted::Backticks(inner) => write!(f, "`{}`", inner),
+        }
+    }
+}
+
+#[derive(Debug)]
+pub(crate) struct QuotedWithSchema<'a, T> {
+    pub(crate) schema_name: &'a str,
+    pub(crate) name: Quoted<T>,
+}
+
+impl<'a, T> Display for QuotedWithSchema<'a, T>
+where
+    T: Display,
+{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let quoted_schema = self.name.quote_that_too(self.schema_name);
+
+        write!(f, "{}.{}", quoted_schema, self.name)
+    }
+}
 
 pub(crate) fn render_nullability(column: &ColumnRef<'_>) -> &'static str {
     if column.is_required() {
@@ -27,7 +94,7 @@ pub(crate) trait IteratorJoin {
 impl<T, I> IteratorJoin for T
 where
     T: Iterator<Item = I>,
-    I: std::fmt::Display,
+    I: Display,
 {
     fn join(mut self, sep: &str) -> String {
         let (lower_bound, _) = self.size_hint();

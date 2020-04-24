@@ -1,7 +1,7 @@
 use super::common::*;
 use crate::{sql_schema_helpers::ColumnRef, SqlFamily};
 use sql_schema_describer::*;
-use std::{borrow::Cow, fmt::Write as _};
+use std::borrow::Cow;
 
 const VARCHAR_LENGTH_PREFIX: &str = "(191)";
 
@@ -12,12 +12,8 @@ impl super::SqlRenderer for MySqlRenderer {
         SqlFamily::Mysql
     }
 
-    fn write_quoted(&self, buf: &mut String, name: &str) -> std::fmt::Result {
-        write!(buf, "{}", quoted(name))
-    }
-
-    fn quote(&self, name: &str) -> String {
-        quoted(name).to_string()
+    fn quote<'a>(&self, name: &'a str) -> Quoted<&'a str> {
+        Quoted::Backticks(name)
     }
 
     fn render_column(&self, _schema_name: &str, column: ColumnRef<'_>, _add_fk_prefix: bool) -> String {
@@ -80,44 +76,12 @@ impl MySqlRenderer {
                     .get_enum(&enum_name)
                     .ok_or_else(|| anyhow::anyhow!("Could not render the variants of enum `{}`", enum_name))?;
 
-                let variants: String = r#enum.values.iter().map(quoted_string).join(", ");
+                let variants: String = r#enum.values.iter().map(Quoted::mysql_string).join(", ");
 
                 Ok(format!("ENUM({})", variants).into())
             }
             ColumnTypeFamily::Json => Ok("json".into()),
             x => unimplemented!("{:?} not handled yet", x),
         }
-    }
-}
-
-pub(crate) fn quoted<T: std::fmt::Display>(t: T) -> MysqlQuoted<T> {
-    MysqlQuoted(t)
-}
-
-#[derive(Debug)]
-pub(crate) struct MysqlQuoted<T>(T);
-
-impl<T> std::fmt::Display for MysqlQuoted<T>
-where
-    T: std::fmt::Display,
-{
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "`{}`", self.0)
-    }
-}
-
-pub(crate) fn quoted_string<T: std::fmt::Display>(t: T) -> MysqlQuotedString<T> {
-    MysqlQuotedString(t)
-}
-
-#[derive(Debug)]
-pub(crate) struct MysqlQuotedString<T>(T);
-
-impl<T> std::fmt::Display for MysqlQuotedString<T>
-where
-    T: std::fmt::Display,
-{
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "'{}'", self.0)
     }
 }
