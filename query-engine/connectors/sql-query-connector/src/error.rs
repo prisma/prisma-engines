@@ -197,6 +197,8 @@ impl From<quaint::error::Error> for SqlError {
                 constraint: constraint.into(),
             },
 
+            _ => Self::RecordDoesNotExist,
+
             e @ QuaintKind::ConnectionError(_) => Self::ConnectionError(e),
             QuaintKind::ColumnReadFailure(e) => Self::ColumnReadFailure(e),
             QuaintKind::ColumnNotFound(_) => Self::ColumnDoesNotExist,
