@@ -56,7 +56,7 @@ async fn assume_to_be_applied_must_work(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector]
+#[test_each_connector(log = "debug")]
 async fn infer_migration_steps_validates_that_already_applied_migrations_are_not_in_assume_to_be_applied(
     api: &TestApi,
 ) -> TestResult {
@@ -96,7 +96,7 @@ async fn infer_migration_steps_validates_that_already_applied_migrations_are_not
         .send()
         .await;
 
-    assert_eq!(response.unwrap_err().to_string(), "Failure during a migration command: Connector error. (error: Input is invalid. Migration mig01 is already applied.)");
+    assert!(response.unwrap_err().to_string().starts_with("Failure during a migration command: Connector error. (error: Input is invalid. Migration mig01 is already applied."));
 
     Ok(())
 }

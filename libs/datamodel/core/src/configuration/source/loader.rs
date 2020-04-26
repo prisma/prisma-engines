@@ -59,6 +59,12 @@ impl SourceLoader {
         let mut args = Arguments::new(&ast_source.properties, ast_source.span);
 
         let provider_arg = args.arg("provider")?;
+        if provider_arg.is_from_env() {
+            return Err(DatamodelError::new_functional_evaluation_error(
+                &format!("A datasource must not use the env() function in the provider argument."),
+                ast_source.span,
+            ));
+        }
         let provider = provider_arg.as_str()?;
 
         let url_args = args.arg("url")?;
@@ -67,12 +73,6 @@ impl SourceLoader {
             Err(_) if ignore_env_var_errors => (None, format!("{}://", provider)), // glorious hack. ask marcus
             Err(err) => return Err(err),
         };
-        if provider_arg.is_from_env() {
-            return Err(DatamodelError::new_functional_evaluation_error(
-                &format!("A datasource must not use the env() function in the provider argument."),
-                ast_source.span,
-            ));
-        }
 
         if url.is_empty() {
             let suffix = match &env_var_for_url {

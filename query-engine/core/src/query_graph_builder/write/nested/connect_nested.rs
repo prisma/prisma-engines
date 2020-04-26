@@ -40,14 +40,18 @@ pub fn connect_nested_connect(
         .unique()
         .collect();
 
-    let filter = Filter::or(filters);
+    if !filters.is_empty() {
+        let filter = Filter::or(filters);
 
-    if relation.is_many_to_many() {
-        handle_many_to_many(graph, parent_node, parent_relation_field, filter, child_model)
-    } else if relation.is_one_to_many() {
-        handle_one_to_many(graph, parent_node, parent_relation_field, filter, child_model)
+        if relation.is_many_to_many() {
+            handle_many_to_many(graph, parent_node, parent_relation_field, filter, child_model)
+        } else if relation.is_one_to_many() {
+            handle_one_to_many(graph, parent_node, parent_relation_field, filter, child_model)
+        } else {
+            handle_one_to_one(graph, parent_node, parent_relation_field, filter, child_model)
+        }
     } else {
-        handle_one_to_one(graph, parent_node, parent_relation_field, filter, child_model)
+        Ok(())
     }
 }
 

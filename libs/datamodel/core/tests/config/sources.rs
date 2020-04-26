@@ -81,6 +81,25 @@ fn must_forbid_env_functions_in_provider_field() {
 }
 
 #[test]
+#[serial]
+fn must_forbid_env_functions_in_provider_field_even_if_missing() {
+    let schema = r#"
+        datasource ds {
+            provider = env("DB_PROVIDER")
+            url = env("DB_URL")
+        }
+    "#;
+    std::env::set_var("DB_URL", "https://localhost");
+    let config = datamodel::parse_configuration(schema);
+    assert!(config.is_err());
+    let errors = config.err().expect("This must error");
+    errors.assert_is(DatamodelError::new_functional_evaluation_error(
+        "A datasource must not use the env() function in the provider argument.",
+        Span::new(9, 108),
+    ));
+}
+
+#[test]
 fn must_error_for_empty_urls() {
     let schema = r#"
         datasource myds {

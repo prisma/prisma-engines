@@ -165,7 +165,7 @@ fn should_fail_on_conflicting_back_relation_field_name() {
 
     model Post {
         post_id Int @id
-        user User @relation(name: "test")
+        User User @relation(name: "test")
     }
     "#;
 

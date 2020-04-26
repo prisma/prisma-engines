@@ -112,7 +112,7 @@ fn must_generate_back_relation_fields_for_named_relation_fields() {
 
     datamodel
         .assert_has_model("User")
-        .assert_has_field("todo")
+        .assert_has_field("Todo")
         .assert_relation_name("AssignedTodos")
         .assert_relation_to("Todo");
 }
