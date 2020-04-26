@@ -1,3 +1,4 @@
+#![allow(unreachable_patterns)]
 mod cursor_condition;
 mod database;
 mod error;
