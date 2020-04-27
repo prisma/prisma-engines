@@ -1,5 +1,5 @@
 use super::Aliasable;
-use crate::ast::{DatabaseValue, Table};
+use crate::ast::{Expression, Table};
 use std::borrow::Cow;
 
 /// A column definition.
@@ -32,17 +32,17 @@ pub struct Column<'a> {
 /// ```
 macro_rules! col {
     ($e1:expr) => {
-        DatabaseValue::from(Column::from($e1))
+        Expression::from(Column::from($e1))
     };
 
     ($e1:expr, $e2:expr) => {
-        DatabaseValue::from(Column::from(($e1, $e2)))
+        Expression::from(Column::from(($e1, $e2)))
     };
 }
 
-impl<'a> From<Column<'a>> for DatabaseValue<'a> {
+impl<'a> From<Column<'a>> for Expression<'a> {
     fn from(col: Column<'a>) -> Self {
-        DatabaseValue::Column(Box::new(col))
+        Expression::Column(Box::new(col))
     }
 }
 

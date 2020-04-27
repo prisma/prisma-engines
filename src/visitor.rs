@@ -72,7 +72,7 @@ pub trait Visitor<'a> {
     fn parameter_substitution(&mut self) -> fmt::Result;
 
     /// What to use to substitute a parameter in the query.
-    fn visit_aggregate_to_string(&mut self, value: DatabaseValue<'a>) -> fmt::Result;
+    fn visit_aggregate_to_string(&mut self, value: Expression<'a>) -> fmt::Result;
 
     /// A visit to a value we parameterize
     fn visit_parameterized(&mut self, value: Value<'a>) -> fmt::Result {
@@ -188,7 +188,7 @@ pub trait Visitor<'a> {
             for (i, (key, value)) in pairs.enumerate() {
                 self.visit_column(key)?;
                 self.write(" = ")?;
-                self.visit_database_value(value)?;
+                self.visit_expression(value)?;
 
                 if i < (len - 1) {
                     self.write(", ")?;
@@ -266,11 +266,11 @@ pub trait Visitor<'a> {
     }
 
     /// The selected columns
-    fn visit_columns(&mut self, columns: Vec<DatabaseValue<'a>>) -> fmt::Result {
+    fn visit_columns(&mut self, columns: Vec<Expression<'a>>) -> fmt::Result {
         let len = columns.len();
 
         for (i, column) in columns.into_iter().enumerate() {
-            self.visit_database_value(column)?;
+            self.visit_expression(column)?;
 
             if i < (len - 1) {
                 self.write(", ")?;
@@ -283,44 +283,47 @@ pub trait Visitor<'a> {
     fn visit_operation(&mut self, op: SqlOp<'a>) -> fmt::Result {
         match op {
             SqlOp::Add(left, right) => self.surround_with("(", ")", |ref mut se| {
-                se.visit_database_value(left)?;
+                se.visit_expression(left)?;
                 se.write(" + ")?;
-                se.visit_database_value(right)
+                se.visit_expression(right)
             }),
             SqlOp::Sub(left, right) => self.surround_with("(", ")", |ref mut se| {
-                se.visit_database_value(left)?;
+                se.visit_expression(left)?;
                 se.write(" - ")?;
-                se.visit_database_value(right)
+                se.visit_expression(right)
             }),
             SqlOp::Mul(left, right) => self.surround_with("(", ")", |ref mut se| {
-                se.visit_database_value(left)?;
+                se.visit_expression(left)?;
                 se.write(" * ")?;
-                se.visit_database_value(right)
+                se.visit_expression(right)
             }),
             SqlOp::Div(left, right) => self.surround_with("(", ")", |ref mut se| {
-                se.visit_database_value(left)?;
+                se.visit_expression(left)?;
                 se.write(" / ")?;
-                se.visit_database_value(right)
+                se.visit_expression(right)
             }),
             SqlOp::Rem(left, right) => self.surround_with("(", ")", |ref mut se| {
-                se.visit_database_value(left)?;
+                se.visit_expression(left)?;
                 se.write(" % ")?;
-                se.visit_database_value(right)
+                se.visit_expression(right)
             }),
         }
     }
 
     /// A visit to a value used in an expression
-    fn visit_database_value(&mut self, value: DatabaseValue<'a>) -> fmt::Result {
+    fn visit_expression(&mut self, value: Expression<'a>) -> fmt::Result {
         match value {
-            DatabaseValue::Parameterized(val) => self.visit_parameterized(val),
-            DatabaseValue::Column(column) => self.visit_column(*column),
-            DatabaseValue::Row(row) => self.visit_row(row),
-            DatabaseValue::Select(select) => self.surround_with("(", ")", |ref mut s| s.visit_select(*select)),
-            DatabaseValue::Function(function) => self.visit_function(function),
-            DatabaseValue::Op(op) => self.visit_operation(*op),
-            DatabaseValue::Values(values) => self.visit_values(*values),
-            DatabaseValue::Asterisk(table) => match table {
+            Expression::Value(value) => self.visit_expression(*value),
+            Expression::ConditionTree(tree) => self.visit_conditions(tree),
+            Expression::Compare(compare) => self.visit_compare(compare),
+            Expression::Parameterized(val) => self.visit_parameterized(val),
+            Expression::Column(column) => self.visit_column(*column),
+            Expression::Row(row) => self.visit_row(row),
+            Expression::Select(select) => self.surround_with("(", ")", |ref mut s| s.visit_select(*select)),
+            Expression::Function(function) => self.visit_function(function),
+            Expression::Op(op) => self.visit_operation(*op),
+            Expression::Values(values) => self.visit_values(*values),
+            Expression::Asterisk(table) => match table {
                 Some(table) => {
                     self.visit_table(*table, false)?;
                     self.write(".*")
@@ -390,7 +393,7 @@ pub trait Visitor<'a> {
         self.surround_with("(", ")", |ref mut s| {
             let len = row.values.len();
             for (i, value) in row.values.into_iter().enumerate() {
-                s.visit_database_value(value)?;
+                s.visit_expression(value)?;
 
                 if i < (len - 1) {
                     s.write(",")?;
@@ -440,99 +443,85 @@ pub trait Visitor<'a> {
         }
     }
 
-    /// An expression that can either be a single value, a set of conditions or
-    /// a comparison call
-    fn visit_expression(&mut self, expression: Expression<'a>) -> fmt::Result {
-        match expression {
-            Expression::Value(value) => self.visit_database_value(*value),
-            Expression::ConditionTree(tree) => self.visit_conditions(tree),
-            Expression::Compare(compare) => self.visit_compare(compare),
-        }
-    }
-
     /// A comparison expression
     fn visit_compare(&mut self, compare: Compare<'a>) -> fmt::Result {
         match compare {
             Compare::Equals(left, right) => {
-                self.visit_database_value(*left)?;
+                self.visit_expression(*left)?;
                 self.write(" = ")?;
-                self.visit_database_value(*right)
+                self.visit_expression(*right)
             }
             Compare::NotEquals(left, right) => {
-                self.visit_database_value(*left)?;
+                self.visit_expression(*left)?;
                 self.write(" <> ")?;
-                self.visit_database_value(*right)
+                self.visit_expression(*right)
             }
             Compare::LessThan(left, right) => {
-                self.visit_database_value(*left)?;
+                self.visit_expression(*left)?;
                 self.write(" < ")?;
-                self.visit_database_value(*right)
+                self.visit_expression(*right)
             }
             Compare::LessThanOrEquals(left, right) => {
-                self.visit_database_value(*left)?;
+                self.visit_expression(*left)?;
                 self.write(" <= ")?;
-                self.visit_database_value(*right)
+                self.visit_expression(*right)
             }
             Compare::GreaterThan(left, right) => {
-                self.visit_database_value(*left)?;
+                self.visit_expression(*left)?;
                 self.write(" > ")?;
-                self.visit_database_value(*right)
+                self.visit_expression(*right)
             }
             Compare::GreaterThanOrEquals(left, right) => {
-                self.visit_database_value(*left)?;
+                self.visit_expression(*left)?;
                 self.write(" >= ")?;
-                self.visit_database_value(*right)
+                self.visit_expression(*right)
             }
             Compare::In(left, right) => match (*left, *right) {
-                (_, DatabaseValue::Row(ref row)) if row.is_empty() => self.write("1=0"),
-                (DatabaseValue::Row(_), DatabaseValue::Values(ref vals)) if vals.row_len() == 0 => self.write("1=0"),
-                (DatabaseValue::Row(mut cols), DatabaseValue::Values(vals))
-                    if cols.len() == 1 && vals.row_len() == 1 =>
-                {
+                (_, Expression::Row(ref row)) if row.is_empty() => self.write("1=0"),
+                (Expression::Row(_), Expression::Values(ref vals)) if vals.row_len() == 0 => self.write("1=0"),
+                (Expression::Row(mut cols), Expression::Values(vals)) if cols.len() == 1 && vals.row_len() == 1 => {
                     let col = cols.pop().unwrap();
                     let vals = vals.flatten_row().unwrap();
 
-                    self.visit_database_value(col)?;
+                    self.visit_expression(col)?;
                     self.write(" IN ")?;
                     self.visit_row(vals)
                 }
-                (left, DatabaseValue::Parameterized(pv)) => {
-                    self.visit_database_value(left)?;
+                (left, Expression::Parameterized(pv)) => {
+                    self.visit_expression(left)?;
                     self.write(" = ")?;
                     self.visit_parameterized(pv)
                 }
                 (left, dbv) => {
-                    self.visit_database_value(left)?;
+                    self.visit_expression(left)?;
                     self.write(" IN ")?;
-                    self.visit_database_value(dbv)
+                    self.visit_expression(dbv)
                 }
             },
             Compare::NotIn(left, right) => match (*left, *right) {
-                (_, DatabaseValue::Row(ref row)) if row.is_empty() => self.write("1=1"),
-                (DatabaseValue::Row(_), DatabaseValue::Values(ref vals)) if vals.row_len() == 0 => self.write("1=1"),
-                (DatabaseValue::Row(mut cols), DatabaseValue::Values(vals))
-                    if cols.len() == 1 && vals.row_len() == 1 =>
-                {
+                (_, Expression::Row(ref row)) if row.is_empty() => self.write("1=1"),
+                (Expression::Row(_), Expression::Values(ref vals)) if vals.row_len() == 0 => self.write("1=1"),
+                (Expression::Row(mut cols), Expression::Values(vals)) if cols.len() == 1 && vals.row_len() == 1 => {
                     let col = cols.pop().unwrap();
                     let vals = vals.flatten_row().unwrap();
 
-                    self.visit_database_value(col)?;
+                    self.visit_expression(col)?;
                     self.write(" NOT IN ")?;
                     self.visit_row(vals)
                 }
-                (left, DatabaseValue::Parameterized(pv)) => {
-                    self.visit_database_value(left)?;
+                (left, Expression::Parameterized(pv)) => {
+                    self.visit_expression(left)?;
                     self.write(" <> ")?;
                     self.visit_parameterized(pv)
                 }
                 (left, dbv) => {
-                    self.visit_database_value(left)?;
+                    self.visit_expression(left)?;
                     self.write(" NOT IN ")?;
-                    self.visit_database_value(dbv)
+                    self.visit_expression(dbv)
                 }
             },
             Compare::Like(left, right) => {
-                self.visit_database_value(*left)?;
+                self.visit_expression(*left)?;
 
                 self.add_parameter(Value::Text(Cow::from(format!(
                     "{}{}{}",
@@ -545,7 +534,7 @@ pub trait Visitor<'a> {
                 self.parameter_substitution()
             }
             Compare::NotLike(left, right) => {
-                self.visit_database_value(*left)?;
+                self.visit_expression(*left)?;
 
                 self.add_parameter(Value::Text(Cow::from(format!(
                     "{}{}{}",
@@ -558,7 +547,7 @@ pub trait Visitor<'a> {
                 self.parameter_substitution()
             }
             Compare::BeginsWith(left, right) => {
-                self.visit_database_value(*left)?;
+                self.visit_expression(*left)?;
 
                 self.add_parameter(Value::Text(Cow::from(format!("{}{}", right, Self::C_WILDCARD))));
 
@@ -566,7 +555,7 @@ pub trait Visitor<'a> {
                 self.parameter_substitution()
             }
             Compare::NotBeginsWith(left, right) => {
-                self.visit_database_value(*left)?;
+                self.visit_expression(*left)?;
 
                 self.add_parameter(Value::Text(Cow::from(format!("{}{}", right, Self::C_WILDCARD))));
 
@@ -574,7 +563,7 @@ pub trait Visitor<'a> {
                 self.parameter_substitution()
             }
             Compare::EndsInto(left, right) => {
-                self.visit_database_value(*left)?;
+                self.visit_expression(*left)?;
 
                 self.add_parameter(Value::Text(Cow::from(format!("{}{}", Self::C_WILDCARD, right,))));
 
@@ -582,7 +571,7 @@ pub trait Visitor<'a> {
                 self.parameter_substitution()
             }
             Compare::NotEndsInto(left, right) => {
-                self.visit_database_value(*left)?;
+                self.visit_expression(*left)?;
 
                 self.add_parameter(Value::Text(Cow::from(format!("{}{}", Self::C_WILDCARD, right,))));
 
@@ -590,26 +579,26 @@ pub trait Visitor<'a> {
                 self.parameter_substitution()
             }
             Compare::Null(column) => {
-                self.visit_database_value(*column)?;
+                self.visit_expression(*column)?;
                 self.write(" IS NULL")
             }
             Compare::NotNull(column) => {
-                self.visit_database_value(*column)?;
+                self.visit_expression(*column)?;
                 self.write(" IS NOT NULL")
             }
             Compare::Between(val, left, right) => {
-                self.visit_database_value(*val)?;
+                self.visit_expression(*val)?;
                 self.write(" BETWEEN ")?;
-                self.visit_database_value(*left)?;
+                self.visit_expression(*left)?;
                 self.write(" AND ")?;
-                self.visit_database_value(*right)
+                self.visit_expression(*right)
             }
             Compare::NotBetween(val, left, right) => {
-                self.visit_database_value(*val)?;
+                self.visit_expression(*val)?;
                 self.write(" NOT BETWEEN ")?;
-                self.visit_database_value(*left)?;
+                self.visit_expression(*left)?;
                 self.write(" AND ")?;
-                self.visit_database_value(*right)
+                self.visit_expression(*right)
             }
         }
     }
@@ -624,7 +613,7 @@ pub trait Visitor<'a> {
                 Order::Desc => " DESC",
             });
 
-            self.visit_database_value(value)?;
+            self.visit_expression(value)?;
             self.write(direction.unwrap_or(""))?;
 
             if i < (len - 1) {
@@ -640,7 +629,7 @@ pub trait Visitor<'a> {
         let len = grouping.0.len();
 
         for (i, value) in grouping.0.into_iter().enumerate() {
-            self.visit_database_value(value)?;
+            self.visit_expression(value)?;
 
             if i < (len - 1) {
                 self.write(", ")?;

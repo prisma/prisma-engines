@@ -31,7 +31,7 @@ pub use compare::{Comparable, Compare};
 pub use conditions::ConditionTree;
 pub use conjuctive::Conjuctive;
 pub use delete::Delete;
-pub use expression::Expression;
+pub use expression::*;
 pub use function::*;
 pub use grouping::*;
 pub use insert::*;
@@ -45,7 +45,7 @@ pub use select::Select;
 pub use table::*;
 pub use union::Union;
 pub use update::*;
+pub use values::{Value, Values};
 
 #[cfg(any(feature = "sqlite", feature = "mysql", feature = "postgresql"))]
 pub(crate) use values::Params;
-pub use values::{asterisk, DatabaseValue, Value, Values};

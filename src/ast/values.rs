@@ -345,44 +345,6 @@ impl<'a> Value<'a> {
     }
 }
 
-/// A value we can compare and use in database queries.
-#[derive(Debug, Clone, PartialEq)]
-pub enum DatabaseValue<'a> {
-    /// Anything that we must parameterize before querying
-    Parameterized(Value<'a>),
-    /// A database column
-    Column(Box<Column<'a>>),
-    /// Data in a row form, e.g. (1, 2, 3)
-    Row(Row<'a>),
-    /// A nested `SELECT` statement
-    Select(Box<Select<'a>>),
-    /// A database function call
-    Function(Function<'a>),
-    /// A qualified asterisk to a table
-    Asterisk(Option<Box<Table<'a>>>),
-    /// An operation: sum, sub, mul or div.
-    Op(Box<SqlOp<'a>>),
-    /// A `VALUES` statement
-    Values(Box<Values<'a>>),
-}
-
-/// A quick alias to create an asterisk to a table.
-///
-/// ```rust
-/// # use quaint::ast::*;
-/// assert_eq!(
-///     asterisk(),
-///     DatabaseValue::Asterisk(None)
-/// )
-/// ```
-pub fn asterisk() -> DatabaseValue<'static> {
-    DatabaseValue::Asterisk(None)
-}
-
-/*
- * Here be the parameterized value converters.
- */
-
 impl<'a> From<&'a str> for Value<'a> {
     fn from(that: &'a str) -> Self {
         Value::Text(that.into())
@@ -475,33 +437,7 @@ impl<'a> TryFrom<Value<'a>> for DateTime<Utc> {
     }
 }
 
-#[macro_export]
-/// Marks a given string as a value. Useful when using a value in calculations,
-/// e.g.
-///
-/// ``` rust
-/// # use quaint::{col, val, ast::*, visitor::{Visitor, Sqlite}};
-/// let join = "dogs".on(("dogs", "slave_id").equals(Column::from(("cats", "master_id"))));
-///
-/// let query = Select::from_table("cats")
-///     .value(Table::from("cats").asterisk())
-///     .value(col!("dogs", "age") - val!(4))
-///     .inner_join(join);
-///
-/// let (sql, params) = Sqlite::build(query);
-///
-/// assert_eq!(
-///     "SELECT `cats`.*, (`dogs`.`age` - ?) FROM `cats` INNER JOIN `dogs` ON `dogs`.`slave_id` = `cats`.`master_id`",
-///     sql
-/// );
-/// ```
-macro_rules! val {
-    ($val:expr) => {
-        DatabaseValue::from($val)
-    };
-}
-
-macro_rules! parameterized_value {
+macro_rules! value {
     ($kind:ident,$paramkind:ident) => {
         impl<'a> From<$kind> for Value<'a> {
             fn from(that: $kind) -> Self {
@@ -511,15 +447,15 @@ macro_rules! parameterized_value {
     };
 }
 
-parameterized_value!(i64, Integer);
-parameterized_value!(bool, Boolean);
-parameterized_value!(Decimal, Real);
+value!(i64, Integer);
+value!(bool, Boolean);
+value!(Decimal, Real);
 
 #[cfg(feature = "json-1")]
-parameterized_value!(JsonValue, Json);
+value!(JsonValue, Json);
 
 #[cfg(feature = "uuid-0_8")]
-parameterized_value!(Uuid, Uuid);
+value!(Uuid, Uuid);
 
 #[cfg(feature = "chrono-0_4")]
 impl<'a> From<DateTime<Utc>> for Value<'a> {
@@ -553,174 +489,6 @@ impl<'a> From<f32> for Value<'a> {
 /*
  * Here be the database value converters.
  */
-
-macro_rules! database_value {
-    ($kind:ident,$paramkind:ident) => {
-        impl<'a> From<$kind<'a>> for DatabaseValue<'a> {
-            fn from(that: $kind<'a>) -> Self {
-                DatabaseValue::$paramkind(that)
-            }
-        }
-    };
-}
-
-database_value!(Row, Row);
-database_value!(Function, Function);
-
-impl<'a> From<Values<'a>> for DatabaseValue<'a> {
-    fn from(p: Values<'a>) -> Self {
-        Self::Values(Box::new(p))
-    }
-}
-
-impl<'a> From<SqlOp<'a>> for DatabaseValue<'a> {
-    fn from(p: SqlOp<'a>) -> Self {
-        Self::Op(Box::new(p))
-    }
-}
-
-impl<'a, T> From<T> for DatabaseValue<'a>
-where
-    T: Into<Value<'a>>,
-{
-    fn from(p: T) -> Self {
-        DatabaseValue::Parameterized(p.into())
-    }
-}
-
-impl<'a, T> From<Vec<T>> for DatabaseValue<'a>
-where
-    T: Into<DatabaseValue<'a>>,
-{
-    fn from(v: Vec<T>) -> Self {
-        let row: Row<'a> = v.into();
-        row.into()
-    }
-}
-
-impl<'a> Comparable<'a> for DatabaseValue<'a> {
-    fn equals<T>(self, comparison: T) -> Compare<'a>
-    where
-        T: Into<DatabaseValue<'a>>,
-    {
-        Compare::Equals(Box::new(self), Box::new(comparison.into()))
-    }
-
-    fn not_equals<T>(self, comparison: T) -> Compare<'a>
-    where
-        T: Into<DatabaseValue<'a>>,
-    {
-        Compare::NotEquals(Box::new(self), Box::new(comparison.into()))
-    }
-
-    fn less_than<T>(self, comparison: T) -> Compare<'a>
-    where
-        T: Into<DatabaseValue<'a>>,
-    {
-        Compare::LessThan(Box::new(self), Box::new(comparison.into()))
-    }
-
-    fn less_than_or_equals<T>(self, comparison: T) -> Compare<'a>
-    where
-        T: Into<DatabaseValue<'a>>,
-    {
-        Compare::LessThanOrEquals(Box::new(self), Box::new(comparison.into()))
-    }
-
-    fn greater_than<T>(self, comparison: T) -> Compare<'a>
-    where
-        T: Into<DatabaseValue<'a>>,
-    {
-        Compare::GreaterThan(Box::new(self), Box::new(comparison.into()))
-    }
-
-    fn greater_than_or_equals<T>(self, comparison: T) -> Compare<'a>
-    where
-        T: Into<DatabaseValue<'a>>,
-    {
-        Compare::GreaterThanOrEquals(Box::new(self), Box::new(comparison.into()))
-    }
-
-    fn in_selection<T>(self, selection: T) -> Compare<'a>
-    where
-        T: Into<DatabaseValue<'a>>,
-    {
-        Compare::In(Box::new(self), Box::new(selection.into()))
-    }
-
-    fn not_in_selection<T>(self, selection: T) -> Compare<'a>
-    where
-        T: Into<DatabaseValue<'a>>,
-    {
-        Compare::NotIn(Box::new(self), Box::new(selection.into()))
-    }
-
-    fn like<T>(self, pattern: T) -> Compare<'a>
-    where
-        T: Into<Cow<'a, str>>,
-    {
-        Compare::Like(Box::new(self), pattern.into())
-    }
-
-    fn not_like<T>(self, pattern: T) -> Compare<'a>
-    where
-        T: Into<Cow<'a, str>>,
-    {
-        Compare::NotLike(Box::new(self), pattern.into())
-    }
-
-    fn begins_with<T>(self, pattern: T) -> Compare<'a>
-    where
-        T: Into<Cow<'a, str>>,
-    {
-        Compare::BeginsWith(Box::new(self), pattern.into())
-    }
-
-    fn not_begins_with<T>(self, pattern: T) -> Compare<'a>
-    where
-        T: Into<Cow<'a, str>>,
-    {
-        Compare::NotBeginsWith(Box::new(self), pattern.into())
-    }
-
-    fn ends_into<T>(self, pattern: T) -> Compare<'a>
-    where
-        T: Into<Cow<'a, str>>,
-    {
-        Compare::EndsInto(Box::new(self), pattern.into())
-    }
-
-    fn not_ends_into<T>(self, pattern: T) -> Compare<'a>
-    where
-        T: Into<Cow<'a, str>>,
-    {
-        Compare::NotEndsInto(Box::new(self), pattern.into())
-    }
-
-    fn is_null(self) -> Compare<'a> {
-        Compare::Null(Box::new(self))
-    }
-
-    fn is_not_null(self) -> Compare<'a> {
-        Compare::NotNull(Box::new(self))
-    }
-
-    fn between<T, V>(self, left: T, right: V) -> Compare<'a>
-    where
-        T: Into<DatabaseValue<'a>>,
-        V: Into<DatabaseValue<'a>>,
-    {
-        Compare::Between(Box::new(self), Box::new(left.into()), Box::new(right.into()))
-    }
-
-    fn not_between<T, V>(self, left: T, right: V) -> Compare<'a>
-    where
-        T: Into<DatabaseValue<'a>>,
-        V: Into<DatabaseValue<'a>>,
-    {
-        Compare::NotBetween(Box::new(self), Box::new(left.into()), Box::new(right.into()))
-    }
-}
 
 #[cfg(all(test, feature = "array", feature = "postgresql"))]
 mod tests {

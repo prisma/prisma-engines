@@ -4,7 +4,7 @@ use crate::ast::*;
 #[derive(Debug, PartialEq, Clone, Default)]
 pub struct Select<'a> {
     pub(crate) table: Option<Box<Table<'a>>>,
-    pub(crate) columns: Vec<DatabaseValue<'a>>,
+    pub(crate) columns: Vec<Expression<'a>>,
     pub(crate) conditions: Option<ConditionTree<'a>>,
     pub(crate) ordering: Ordering<'a>,
     pub(crate) grouping: Grouping<'a>,
@@ -14,9 +14,9 @@ pub struct Select<'a> {
     pub(crate) joins: Vec<Join<'a>>,
 }
 
-impl<'a> From<Select<'a>> for DatabaseValue<'a> {
-    fn from(sel: Select<'a>) -> DatabaseValue<'a> {
-        DatabaseValue::Select(Box::new(sel))
+impl<'a> From<Select<'a>> for Expression<'a> {
+    fn from(sel: Select<'a>) -> Expression<'a> {
+        Expression::Select(Box::new(sel))
     }
 }
 
@@ -123,7 +123,7 @@ impl<'a> Select<'a> {
     /// ```
     pub fn value<T>(mut self, value: T) -> Self
     where
-        T: Into<DatabaseValue<'a>>,
+        T: Into<Expression<'a>>,
     {
         self.columns.push(value.into());
         self

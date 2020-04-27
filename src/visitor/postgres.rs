@@ -108,12 +108,12 @@ impl<'a> Visitor<'a> for Postgres<'a> {
         Ok(())
     }
 
-    fn visit_aggregate_to_string(&mut self, value: DatabaseValue<'a>) -> fmt::Result {
+    fn visit_aggregate_to_string(&mut self, value: Expression<'a>) -> fmt::Result {
         self.write("ARRAY_TO_STRING")?;
         self.write("(")?;
         self.write("ARRAY_AGG")?;
         self.write("(")?;
-        self.visit_database_value(value)?;
+        self.visit_expression(value)?;
         self.write(")")?;
         self.write("','")?;
         self.write(")")

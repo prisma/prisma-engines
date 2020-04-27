@@ -1,11 +1,11 @@
 use super::Function;
-use crate::ast::DatabaseValue;
+use crate::ast::Expression;
 
 #[derive(Debug, Clone, PartialEq)]
 /// An aggregate function that concatenates strings from a group into a single
 /// string with various options.
 pub struct AggregateToString<'a> {
-    pub(crate) value: Box<DatabaseValue<'a>>,
+    pub(crate) value: Box<Expression<'a>>,
 }
 
 /// Aggregates the given field into a string.
@@ -20,7 +20,7 @@ pub struct AggregateToString<'a> {
 /// ```
 pub fn aggregate_to_string<'a, T>(expr: T) -> Function<'a>
 where
-    T: Into<DatabaseValue<'a>>,
+    T: Into<Expression<'a>>,
 {
     let fun = AggregateToString {
         value: Box::new(expr.into()),

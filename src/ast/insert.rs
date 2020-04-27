@@ -164,7 +164,7 @@ impl<'a> SingleRowInsert<'a> {
     pub fn value<K, V>(mut self, key: K, val: V) -> SingleRowInsert<'a>
     where
         K: Into<Column<'a>>,
-        V: Into<DatabaseValue<'a>>,
+        V: Into<Expression<'a>>,
     {
         self.columns.push(key.into());
         self.values.push(val.into());

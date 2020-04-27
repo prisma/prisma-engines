@@ -102,9 +102,9 @@ impl<'a> Visitor<'a> for Mysql<'a> {
         }
     }
 
-    fn visit_aggregate_to_string(&mut self, value: DatabaseValue<'a>) -> fmt::Result {
+    fn visit_aggregate_to_string(&mut self, value: Expression<'a>) -> fmt::Result {
         self.write(" GROUP_CONCAT")?;
-        self.surround_with("(", ")", |ref mut s| s.visit_database_value(value))
+        self.surround_with("(", ")", |ref mut s| s.visit_expression(value))
     }
 }
 

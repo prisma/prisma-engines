@@ -10,7 +10,7 @@ pub use count::*;
 pub use row_number::*;
 pub use sum::*;
 
-use super::{Aliasable, DatabaseValue};
+use super::{Aliasable, Expression};
 use std::borrow::Cow;
 
 /// A database function definition
@@ -54,7 +54,7 @@ macro_rules! function {
                 }
             }
 
-            impl<'a> From<$kind<'a>> for DatabaseValue<'a> {
+            impl<'a> From<$kind<'a>> for Expression<'a> {
                 fn from(f: $kind<'a>) -> Self {
                     Function::from(f).into()
                 }

@@ -5,7 +5,7 @@ use crate::ast::*;
 pub struct Update<'a> {
     pub(crate) table: Table<'a>,
     pub(crate) columns: Vec<Column<'a>>,
-    pub(crate) values: Vec<DatabaseValue<'a>>,
+    pub(crate) values: Vec<Expression<'a>>,
     pub(crate) conditions: Option<ConditionTree<'a>>,
 }
 
@@ -49,7 +49,7 @@ impl<'a> Update<'a> {
     pub fn set<K, V>(mut self, column: K, value: V) -> Update<'a>
     where
         K: Into<Column<'a>>,
-        V: Into<DatabaseValue<'a>>,
+        V: Into<Expression<'a>>,
     {
         self.columns.push(column.into());
         self.values.push(value.into());
