@@ -181,6 +181,11 @@ pub struct QueryGraph {
     /// For now a stupid marker if the query graph needs to be run inside a
     /// transaction. Should happen if any of the queries is writing data.
     needs_transaction: bool,
+
+    /// Already visited nodes.
+    /// Nodes are visited during query graph processing.
+    /// Influences traversal rules and how child nodes are treated.
+    visited: Vec<NodeIndex>,
 }
 
 /// Implementation detail of the QueryGraph.
@@ -211,9 +216,34 @@ impl QueryGraph {
         after_graph_completion(self)
     }
 
+    /// Returns a NodeRef to the result node that occurs in the subtree, if it exists.
+    /// Returns None if no such node is found.
+    pub fn find_result_node(&self, starting_node: &NodeRef) -> Option<NodeRef> {
+        if self.is_result_node(starting_node) {
+            Some(starting_node.clone())
+        } else {
+            todo!()
+        }
+    }
+
+    pub fn result_nodes(&self) -> Vec<NodeRef> {
+        self.result_nodes
+            .iter()
+            .map(|node_ix| NodeRef {
+                node_ix: node_ix.clone(),
+            })
+            .collect()
+    }
+
     /// Adds a result node to the graph.
     pub fn add_result_node(&mut self, node: &NodeRef) {
         self.result_nodes.push(node.node_ix.clone());
+    }
+
+    pub fn mark_visited(&mut self, node: &NodeRef) {
+        if !self.visited.contains(&node.node_ix) {
+            self.visited.push(node.node_ix);
+        }
     }
 
     /// Checks if the given node is marked as one of the result nodes in the graph.
@@ -344,20 +374,33 @@ impl QueryGraph {
 
     /// Checks if `child` is a direct child of `parent`.
     ///
-    /// Criteria for a direct child:
+    /// Criteria for a direct child (either):
     /// - Every node that only has `parent` as their parent.
-    /// - In case of multiple parents, has `parent` as their parent and _all_ other
+    /// - OR In case of multiple parents, has `parent` as their parent and _all_ other
     ///   parents are strict ancestors of `parent`, meaning they are "higher up" in the graph.
+    /// - OR All other parents have already been visited before.
     pub fn is_direct_child(&self, parent: &NodeRef, child: &NodeRef) -> bool {
-        self.incoming_edges(child).into_iter().all(|edge| {
-            let ancestor = self.edge_source(&edge);
+        let ancestry_rule = self.incoming_edges(child).into_iter().all(|edge| {
+            let other_parent = self.edge_source(&edge);
 
-            if &ancestor != parent {
-                self.is_ancestor(&ancestor, parent)
+            if &other_parent != parent {
+                self.is_ancestor(&other_parent, parent)
             } else {
                 true
             }
-        })
+        });
+
+        let visitation_rule = self.incoming_edges(child).into_iter().all(|edge| {
+            let other_parent = self.edge_source(&edge);
+
+            if &other_parent != parent {
+                self.visited.contains(&other_parent.node_ix)
+            } else {
+                true
+            }
+        });
+
+        ancestry_rule || visitation_rule
     }
 
     /// Returns a list of child nodes, together with their child edge for the given `node`.
