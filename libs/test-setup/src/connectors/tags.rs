@@ -1,4 +1,5 @@
 use bitflags::bitflags;
+use std::{error::Error as StdError, str::FromStr};
 
 bitflags! {
     pub struct Tags: u8 {
@@ -23,9 +24,9 @@ impl std::fmt::Display for UnknownTagError {
     }
 }
 
-impl std::error::Error for UnknownTagError {}
+impl StdError for UnknownTagError {}
 
-impl std::str::FromStr for Tags {
+impl FromStr for Tags {
     type Err = UnknownTagError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {

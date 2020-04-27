@@ -2749,6 +2749,7 @@ name = "test-macros"
 version = "0.1.0"
 dependencies = [
  "darling",
+ "once_cell",
  "proc-macro2 1.0.10",
  "quote 1.0.3",
  "syn 1.0.17",

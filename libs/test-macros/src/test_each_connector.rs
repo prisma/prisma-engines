@@ -1,4 +1,5 @@
 use darling::FromMeta;
+use once_cell::sync::Lazy;
 use proc_macro::TokenStream;
 use proc_macro2::Span;
 use quote::quote;
@@ -6,17 +7,33 @@ use std::str::FromStr;
 use syn::{parse_macro_input, spanned::Spanned, AttributeArgs, Ident, ItemFn};
 use test_setup::connectors::{Capabilities, Connector, Tags, CONNECTORS};
 
+const TAGS_FILTER: Lazy<Tags> = Lazy::new(|| {
+    let tags_str = std::env::var("TEST_EACH_CONNECTOR_TAGS").ok();
+    let mut tags = Tags::empty();
+
+    if let Some(tags_str) = tags_str {
+        for tag_str in tags_str.split(',') {
+            let tag = Tags::from_str(tag_str).unwrap();
+            tags |= tag;
+        }
+    }
+
+    tags
+});
+
 #[derive(Debug, FromMeta)]
 struct TestEachConnectorArgs {
     /// If present, setup tracing logging with the passed in configuration string.
     #[darling(default)]
     log: Option<String>,
 
-    /// If present, run only the tests for the connectors with all of the passed in capabilities.
+    /// If present, run only the tests for the connectors with all of the passed
+    /// in capabilities.
     #[darling(default)]
     capabilities: CapabilitiesWrapper,
 
-    /// If present, run only the tests for the connectors with any of the passed in tags.
+    /// If present, run only the tests for the connectors with any of the passed
+    /// in tags.
     #[darling(default)]
     tags: TagsWrapper,
 
@@ -98,6 +115,7 @@ impl TestEachConnectorArgs {
         CONNECTORS
             .all()
             .filter(move |connector| connector.capabilities.contains(self.capabilities.0))
+            .filter(move |connector| TAGS_FILTER.is_empty() || connector.tags.contains(**&TAGS_FILTER))
             .filter(move |connector| self.tags.0.is_empty() || connector.tags.intersects(self.tags.0))
             .filter(move |connector| !connector.tags.intersects(self.ignore.0))
     }
@@ -170,7 +188,7 @@ fn test_each_connector_async_wrapper_functions(
         tests.push(test);
     }
 
-    if tests.is_empty() {
+    if tests.is_empty() && TAGS_FILTER.is_empty() {
         return vec![
             syn::Error::new_spanned(test_function, "All connectors were filtered out for this test.")
                 .to_compile_error()
