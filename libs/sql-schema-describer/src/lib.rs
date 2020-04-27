@@ -232,8 +232,10 @@ impl Column {
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ColumnType {
-    /// The raw SQL type.
-    pub raw: String,
+    /// The SQL data type.
+    pub data_type: String,
+    /// The full SQL data type.
+    pub full_data_type: String,
     /// The family of the raw type.
     pub family: ColumnTypeFamily,
     /// The arity of the column.
@@ -243,7 +245,8 @@ pub struct ColumnType {
 impl ColumnType {
     pub fn pure(family: ColumnTypeFamily, arity: ColumnArity) -> ColumnType {
         ColumnType {
-            raw: "".to_string(),
+            data_type: "".to_string(),
+            full_data_type: "".to_string(),
             family,
             arity,
         }

@@ -539,7 +539,8 @@ fn get_column_type_and_enum(
     };
 
     let tpe = ColumnType {
-        raw: data_type.to_string(),
+        data_type: data_type.to_owned(),
+        full_data_type: full_data_type.to_owned(),
         family: family.clone(),
         arity,
     };

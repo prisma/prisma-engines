@@ -651,7 +651,8 @@ fn get_column_type<'a>(data_type: &str, full_data_type: &'a str, arity: ColumnAr
         data_type => Unsupported(data_type.into()),
     };
     ColumnType {
-        raw: full_data_type.to_owned(),
+        data_type: data_type.to_owned(),
+        full_data_type: full_data_type.to_owned(),
         family,
         arity,
     }
