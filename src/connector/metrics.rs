@@ -1,15 +1,10 @@
 use crate::{
-    ast::{ParameterizedValue, Params},
+    ast::{Params, Value},
     connector::DBIO,
 };
 use std::{future::Future, time::Instant};
 
-pub(crate) fn query<'a, F, T, U>(
-    tag: &'static str,
-    query: &'a str,
-    params: &'a [ParameterizedValue],
-    f: F,
-) -> DBIO<'a, T>
+pub(crate) fn query<'a, F, T, U>(tag: &'static str, query: &'a str, params: &'a [Value], f: F) -> DBIO<'a, T>
 where
     F: FnOnce() -> U + Send + 'a,
     U: Future<Output = crate::Result<T>> + Send,

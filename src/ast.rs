@@ -48,4 +48,4 @@ pub use update::*;
 
 #[cfg(any(feature = "sqlite", feature = "mysql", feature = "postgresql"))]
 pub(crate) use values::Params;
-pub use values::{asterisk, DatabaseValue, ParameterizedValue, Values};
+pub use values::{asterisk, DatabaseValue, Value, Values};

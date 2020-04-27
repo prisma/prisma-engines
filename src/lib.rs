@@ -92,9 +92,9 @@
 //!
 //! assert_eq!(
 //!     vec![
-//!         ParameterizedValue::from("meow"),
-//!         ParameterizedValue::from(10),
-//!         ParameterizedValue::from("warm"),
+//!         Value::from("meow"),
+//!         Value::from(10),
+//!         Value::from("warm"),
 //!     ],
 //!     params
 //! );

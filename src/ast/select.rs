@@ -9,8 +9,8 @@ pub struct Select<'a> {
     pub(crate) ordering: Ordering<'a>,
     pub(crate) grouping: Grouping<'a>,
     pub(crate) having: Option<ConditionTree<'a>>,
-    pub(crate) limit: Option<ParameterizedValue<'a>>,
-    pub(crate) offset: Option<ParameterizedValue<'a>>,
+    pub(crate) limit: Option<Value<'a>>,
+    pub(crate) offset: Option<Value<'a>>,
     pub(crate) joins: Vec<Join<'a>>,
 }
 
@@ -56,7 +56,7 @@ impl<'a> Select<'a> {
     /// let (sql, params) = Sqlite::build(query);
     ///
     /// assert_eq!("SELECT `num`.* FROM (SELECT ?) AS `num`", sql);
-    /// assert_eq!(vec![ParameterizedValue::from(1)], params);
+    /// assert_eq!(vec![Value::from(1)], params);
     /// ```
     ///
     /// Selecting from a set of values.
@@ -72,10 +72,10 @@ impl<'a> Select<'a> {
     /// assert_eq!(expected_sql, sql);
     /// assert_eq!(
     ///     vec![
-    ///         ParameterizedValue::Integer(1),
-    ///         ParameterizedValue::Integer(2),
-    ///         ParameterizedValue::Integer(3),
-    ///         ParameterizedValue::Integer(4),
+    ///         Value::Integer(1),
+    ///         Value::Integer(2),
+    ///         Value::Integer(3),
+    ///         Value::Integer(4),
     ///     ],
     ///     params
     /// );
@@ -98,7 +98,7 @@ impl<'a> Select<'a> {
     /// let (sql, params) = Sqlite::build(query);
     ///
     /// assert_eq!("SELECT ?", sql);
-    /// assert_eq!(vec![ParameterizedValue::from(1)], params);
+    /// assert_eq!(vec![Value::from(1)], params);
     /// ```
     ///
     /// Creating a qualified asterisk to a joined table:
@@ -119,7 +119,7 @@ impl<'a> Select<'a> {
     ///     sql
     /// );
     ///
-    /// assert_eq!(vec![ParameterizedValue::from(4)], params);
+    /// assert_eq!(vec![Value::from(4)], params);
     /// ```
     pub fn value<T>(mut self, value: T) -> Self
     where
@@ -180,7 +180,7 @@ impl<'a> Select<'a> {
     /// assert_eq!("SELECT `users`.* FROM `users` WHERE `foo` = ?", sql);
     ///
     /// assert_eq!(vec![
-    ///    ParameterizedValue::from("bar"),
+    ///    Value::from("bar"),
     /// ], params);
     /// ```
     pub fn so_that<T>(mut self, conditions: T) -> Self
@@ -206,8 +206,8 @@ impl<'a> Select<'a> {
     /// assert_eq!("SELECT `users`.* FROM `users` WHERE (`foo` = ? AND `lol` = ?)", sql);
     ///
     /// assert_eq!(vec![
-    ///    ParameterizedValue::from("bar"),
-    ///    ParameterizedValue::from("wtf"),
+    ///    Value::from("bar"),
+    ///    Value::from("wtf"),
     /// ], params);
     /// ```
     pub fn and_where<T>(mut self, conditions: T) -> Self
@@ -238,8 +238,8 @@ impl<'a> Select<'a> {
     /// assert_eq!("SELECT `users`.* FROM `users` WHERE (`foo` = ? OR `lol` = ?)", sql);
     ///
     /// assert_eq!(vec![
-    ///    ParameterizedValue::from("bar"),
-    ///    ParameterizedValue::from("wtf"),
+    ///    Value::from("bar"),
+    ///    Value::from("wtf"),
     /// ], params);
     /// ```
     pub fn or_where<T>(mut self, conditions: T) -> Self
@@ -291,7 +291,7 @@ impl<'a> Select<'a> {
     ///
     /// assert_eq!(
     ///     vec![
-    ///         ParameterizedValue::from(true),
+    ///         Value::from(true),
     ///     ],
     ///     params
     /// );
@@ -319,7 +319,7 @@ impl<'a> Select<'a> {
     ///
     /// assert_eq!(
     ///     vec![
-    ///         ParameterizedValue::from(true),
+    ///         Value::from(true),
     ///     ],
     ///     params
     /// );
@@ -347,7 +347,7 @@ impl<'a> Select<'a> {
     ///
     /// assert_eq!(
     ///     vec![
-    ///         ParameterizedValue::from(true),
+    ///         Value::from(true),
     ///     ],
     ///     params
     /// );
@@ -413,7 +413,7 @@ impl<'a> Select<'a> {
     /// let (sql, params) = Sqlite::build(query);
     ///
     /// assert_eq!("SELECT `foo`, `bar` FROM `users` GROUP BY `foo` HAVING `foo` > ?", sql);
-    /// assert_eq!(vec![ParameterizedValue::from(100)], params);
+    /// assert_eq!(vec![Value::from(100)], params);
     pub fn having<T>(mut self, conditions: T) -> Self
     where
         T: Into<ConditionTree<'a>>,
@@ -430,9 +430,9 @@ impl<'a> Select<'a> {
     /// let (sql, params) = Sqlite::build(query);
     ///
     /// assert_eq!("SELECT `users`.* FROM `users` LIMIT ?", sql);
-    /// assert_eq!(vec![ParameterizedValue::from(10)], params);
+    /// assert_eq!(vec![Value::from(10)], params);
     pub fn limit(mut self, limit: usize) -> Self {
-        self.limit = Some(ParameterizedValue::from(limit));
+        self.limit = Some(Value::from(limit));
         self
     }
 
@@ -444,9 +444,9 @@ impl<'a> Select<'a> {
     /// let (sql, params) = Sqlite::build(query);
     ///
     /// assert_eq!("SELECT `users`.* FROM `users` LIMIT ? OFFSET ?", sql);
-    /// assert_eq!(vec![ParameterizedValue::from(-1), ParameterizedValue::from(10)], params);
+    /// assert_eq!(vec![Value::from(-1), Value::from(10)], params);
     pub fn offset(mut self, offset: usize) -> Self {
-        self.offset = Some(ParameterizedValue::from(offset));
+        self.offset = Some(Value::from(offset));
         self
     }
 }

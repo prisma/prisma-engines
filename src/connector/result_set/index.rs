@@ -1,5 +1,5 @@
 use super::{ResultRow, ResultRowRef};
-use crate::ast::ParameterizedValue;
+use crate::ast::Value;
 use std::ops;
 
 pub trait ValueIndex<RowType, ReturnValue>: private::Sealed {
@@ -13,42 +13,42 @@ mod private {
     impl Sealed for &str {}
 }
 
-impl ValueIndex<ResultRowRef<'_>, ParameterizedValue<'static>> for usize {
-    fn index_into<'v>(self, row: &'v ResultRowRef) -> &'v ParameterizedValue<'static> {
+impl ValueIndex<ResultRowRef<'_>, Value<'static>> for usize {
+    fn index_into<'v>(self, row: &'v ResultRowRef) -> &'v Value<'static> {
         row.at(self).unwrap()
     }
 }
 
-impl ValueIndex<ResultRowRef<'_>, ParameterizedValue<'static>> for &str {
-    fn index_into<'v>(self, row: &'v ResultRowRef) -> &'v ParameterizedValue<'static> {
+impl ValueIndex<ResultRowRef<'_>, Value<'static>> for &str {
+    fn index_into<'v>(self, row: &'v ResultRowRef) -> &'v Value<'static> {
         row.get(self).unwrap()
     }
 }
 
-impl ValueIndex<ResultRow, ParameterizedValue<'static>> for usize {
-    fn index_into<'v>(self, row: &'v ResultRow) -> &'v ParameterizedValue<'static> {
+impl ValueIndex<ResultRow, Value<'static>> for usize {
+    fn index_into<'v>(self, row: &'v ResultRow) -> &'v Value<'static> {
         row.at(self).unwrap()
     }
 }
 
-impl ValueIndex<ResultRow, ParameterizedValue<'static>> for &str {
-    fn index_into<'v>(self, row: &'v ResultRow) -> &'v ParameterizedValue<'static> {
+impl ValueIndex<ResultRow, Value<'static>> for &str {
+    fn index_into<'v>(self, row: &'v ResultRow) -> &'v Value<'static> {
         row.get(self).unwrap()
     }
 }
 
-impl<'a, I: ValueIndex<ResultRowRef<'a>, ParameterizedValue<'static>> + 'static> ops::Index<I> for ResultRowRef<'a> {
-    type Output = ParameterizedValue<'static>;
+impl<'a, I: ValueIndex<ResultRowRef<'a>, Value<'static>> + 'static> ops::Index<I> for ResultRowRef<'a> {
+    type Output = Value<'static>;
 
-    fn index(&self, index: I) -> &ParameterizedValue<'static> {
+    fn index(&self, index: I) -> &Value<'static> {
         index.index_into(self)
     }
 }
 
-impl<I: ValueIndex<ResultRow, ParameterizedValue<'static>> + 'static> ops::Index<I> for ResultRow {
-    type Output = ParameterizedValue<'static>;
+impl<I: ValueIndex<ResultRow, Value<'static>> + 'static> ops::Index<I> for ResultRow {
+    type Output = Value<'static>;
 
-    fn index(&self, index: I) -> &ParameterizedValue<'static> {
+    fn index(&self, index: I) -> &Value<'static> {
         index.index_into(self)
     }
 }

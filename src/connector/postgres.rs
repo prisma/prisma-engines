@@ -2,7 +2,7 @@ mod conversion;
 mod error;
 
 use crate::{
-    ast::{ParameterizedValue, Query},
+    ast::{Query, Value},
     connector::{metrics, queryable::*, ResultSet, DBIO},
     error::{Error, ErrorKind},
     visitor::{self, Visitor},
@@ -450,7 +450,7 @@ impl Queryable for PostgreSql {
         DBIO::new(async move { self.execute_raw(sql.as_str(), &params[..]).await })
     }
 
-    fn query_raw<'a>(&'a self, sql: &'a str, params: &'a [ParameterizedValue<'a>]) -> DBIO<'a, ResultSet> {
+    fn query_raw<'a>(&'a self, sql: &'a str, params: &'a [Value<'a>]) -> DBIO<'a, ResultSet> {
         metrics::query("postgres.query_raw", sql, params, move || async move {
             let client = self.client.0.lock().await;
             let stmt = self.timeout(client.prepare(sql)).await?;
@@ -458,6 +458,7 @@ impl Queryable for PostgreSql {
             let rows = self
                 .timeout(client.query(&stmt, conversion::conv_params(params).as_slice()))
                 .await?;
+
             let mut result = ResultSet::new(stmt.to_column_names(), Vec::new());
 
             for row in rows {
@@ -468,7 +469,7 @@ impl Queryable for PostgreSql {
         })
     }
 
-    fn execute_raw<'a>(&'a self, sql: &'a str, params: &'a [ParameterizedValue<'a>]) -> DBIO<'a, u64> {
+    fn execute_raw<'a>(&'a self, sql: &'a str, params: &'a [Value<'a>]) -> DBIO<'a, u64> {
         metrics::query("postgres.execute_raw", sql, params, move || async move {
             let client = self.client.0.lock().await;
             let stmt = self.timeout(client.prepare(sql)).await?;
@@ -663,42 +664,30 @@ mod tests {
             .value("binary_bits", "111011100011")
             .value(
                 "binary_bits_arr",
-                ParameterizedValue::Array(vec![ParameterizedValue::Text("111011100011".into())]),
+                Value::Array(vec![Value::Text("111011100011".into())]),
             )
             .value("bytes_uuid", "111142ec-880b-4062-913d-8eac479ab957")
             .value(
                 "bytes_uuid_arr",
-                ParameterizedValue::Array(vec![
+                Value::Array(vec![
                     "111142ec-880b-4062-913d-8eac479ab957".into(),
                     "111142ec-880b-4062-913d-8eac479ab958".into(),
                 ]),
             )
             .value("network_inet", "127.0.0.1")
-            .value("network_inet_arr", ParameterizedValue::Array(vec!["127.0.0.1".into()]))
+            .value("network_inet_arr", Value::Array(vec!["127.0.0.1".into()]))
             .value("numeric_float4", 3.14)
-            .value("numeric_float4_arr", ParameterizedValue::Array(vec![3.14.into()]))
+            .value("numeric_float4_arr", Value::Array(vec![3.14.into()]))
             .value("numeric_float8", 3.14912932)
-            .value(
-                "numeric_decimal",
-                ParameterizedValue::Real("0.00006927".parse().unwrap()),
-            )
+            .value("numeric_decimal", Value::Real("0.00006927".parse().unwrap()))
             .value("numeric_money", 3.551)
-            .value(
-                "time_date",
-                ParameterizedValue::DateTime("2020-03-02T08:00:00Z".parse().unwrap()),
-            )
-            .value(
-                "time_timetz",
-                ParameterizedValue::DateTime("2020-03-02T08:00:00Z".parse().unwrap()),
-            )
-            .value(
-                "time_time",
-                ParameterizedValue::DateTime("2020-03-02T08:00:00Z".parse().unwrap()),
-            )
+            .value("time_date", Value::DateTime("2020-03-02T08:00:00Z".parse().unwrap()))
+            .value("time_timetz", Value::DateTime("2020-03-02T08:00:00Z".parse().unwrap()))
+            .value("time_time", Value::DateTime("2020-03-02T08:00:00Z".parse().unwrap()))
             .value("text_jsonb", "{\"isJSONB\": true}")
             .value(
                 "time_timestamptz",
-                ParameterizedValue::DateTime("2020-03-02T08:00:00Z".parse().unwrap()),
+                Value::DateTime("2020-03-02T08:00:00Z".parse().unwrap()),
             );
         let select = ast::Select::from_table("types").value(ast::asterisk());
 
@@ -712,26 +701,26 @@ mod tests {
             .values;
 
         let expected = &[
-            ParameterizedValue::Integer(1),
-            ParameterizedValue::Text("111011100011".into()),
-            ParameterizedValue::Array(vec![ParameterizedValue::Text("111011100011".into())]),
-            ParameterizedValue::Uuid("111142ec-880b-4062-913d-8eac479ab957".parse().unwrap()),
-            ParameterizedValue::Array(vec![
-                ParameterizedValue::Uuid("111142ec-880b-4062-913d-8eac479ab957".parse().unwrap()),
-                ParameterizedValue::Uuid("111142ec-880b-4062-913d-8eac479ab958".parse().unwrap()),
+            Value::Integer(1),
+            Value::Text("111011100011".into()),
+            Value::Array(vec![Value::Text("111011100011".into())]),
+            Value::Uuid("111142ec-880b-4062-913d-8eac479ab957".parse().unwrap()),
+            Value::Array(vec![
+                Value::Uuid("111142ec-880b-4062-913d-8eac479ab957".parse().unwrap()),
+                Value::Uuid("111142ec-880b-4062-913d-8eac479ab958".parse().unwrap()),
             ]),
-            ParameterizedValue::Text("127.0.0.1".into()),
-            ParameterizedValue::Array(vec![ParameterizedValue::Text("127.0.0.1".into())]),
-            ParameterizedValue::Real("3.14".parse().unwrap()),
-            ParameterizedValue::Array(vec![3.14.into()]),
-            ParameterizedValue::Real("3.14912932".parse().unwrap()),
-            ParameterizedValue::Real("0.00006927".parse().unwrap()),
-            ParameterizedValue::Real("3.55".parse().unwrap()),
-            ParameterizedValue::DateTime("1970-01-01T08:00:00Z".parse().unwrap()),
-            ParameterizedValue::DateTime("1970-01-01T08:00:00Z".parse().unwrap()),
-            ParameterizedValue::DateTime("2020-03-02T00:00:00Z".parse().unwrap()),
-            ParameterizedValue::Json(serde_json::json!({ "isJSONB": true })),
-            ParameterizedValue::DateTime("2020-03-02T08:00:00Z".parse().unwrap()),
+            Value::Text("127.0.0.1".into()),
+            Value::Array(vec![Value::Text("127.0.0.1".into())]),
+            Value::Real("3.14".parse().unwrap()),
+            Value::Array(vec![3.14.into()]),
+            Value::Real("3.14912932".parse().unwrap()),
+            Value::Real("0.00006927".parse().unwrap()),
+            Value::Real("3.55".parse().unwrap()),
+            Value::DateTime("1970-01-01T08:00:00Z".parse().unwrap()),
+            Value::DateTime("1970-01-01T08:00:00Z".parse().unwrap()),
+            Value::DateTime("2020-03-02T00:00:00Z".parse().unwrap()),
+            Value::Json(serde_json::json!({ "isJSONB": true })),
+            Value::DateTime("2020-03-02T08:00:00Z".parse().unwrap()),
         ];
 
         assert_eq!(result, expected);
@@ -761,24 +750,15 @@ mod tests {
         let select = ast::Select::from_table("money_conversion_test").value(ast::asterisk());
         let result = conn.query(select.into()).await.unwrap();
 
-        let expected_first_row = vec![
-            ParameterizedValue::Integer(1),
-            ParameterizedValue::Real("0".parse().unwrap()),
-        ];
+        let expected_first_row = vec![Value::Integer(1), Value::Real("0".parse().unwrap())];
 
         assert_eq!(result.get(0).unwrap().values, &expected_first_row);
 
-        let expected_second_row = vec![
-            ParameterizedValue::Integer(2),
-            ParameterizedValue::Real("12".parse().unwrap()),
-        ];
+        let expected_second_row = vec![Value::Integer(2), Value::Real("12".parse().unwrap())];
 
         assert_eq!(result.get(1).unwrap().values, &expected_second_row);
 
-        let expected_third_row = vec![
-            ParameterizedValue::Integer(3),
-            ParameterizedValue::Real("855.32".parse().unwrap()),
-        ];
+        let expected_third_row = vec![Value::Integer(3), Value::Real("855.32".parse().unwrap())];
 
         assert_eq!(result.get(2).unwrap().values, &expected_third_row);
     }
@@ -810,17 +790,17 @@ mod tests {
         let result = conn.query(select.into()).await.unwrap();
 
         let expected_first_row = vec![
-            ParameterizedValue::Integer(1),
-            ParameterizedValue::Text("000000000000".into()),
-            ParameterizedValue::Text("0000000000".into()),
+            Value::Integer(1),
+            Value::Text("000000000000".into()),
+            Value::Text("0000000000".into()),
         ];
 
         assert_eq!(result.get(0).unwrap().values, &expected_first_row);
 
         let expected_second_row = vec![
-            ParameterizedValue::Integer(2),
-            ParameterizedValue::Text("110011000100".into()),
-            ParameterizedValue::Text("110011000100".into()),
+            Value::Integer(2),
+            Value::Text("110011000100".into()),
+            Value::Text("110011000100".into()),
         ];
 
         assert_eq!(result.get(1).unwrap().values, &expected_second_row);
@@ -975,7 +955,7 @@ mod tests {
         let err = conn
             .query(
                 Insert::single_into("should_map_null_constraint_errors_test")
-                    .value("id", ParameterizedValue::Null)
+                    .value("id", Value::Null)
                     .into(),
             )
             .await

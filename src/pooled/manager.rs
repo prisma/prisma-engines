@@ -29,11 +29,11 @@ impl Queryable for PooledConnection {
         self.inner.execute(q)
     }
 
-    fn query_raw<'a>(&'a self, sql: &'a str, params: &'a [ast::ParameterizedValue]) -> DBIO<'a, connector::ResultSet> {
+    fn query_raw<'a>(&'a self, sql: &'a str, params: &'a [ast::Value]) -> DBIO<'a, connector::ResultSet> {
         self.inner.query_raw(sql, params)
     }
 
-    fn execute_raw<'a>(&'a self, sql: &'a str, params: &'a [ast::ParameterizedValue]) -> DBIO<'a, u64> {
+    fn execute_raw<'a>(&'a self, sql: &'a str, params: &'a [ast::Value]) -> DBIO<'a, u64> {
         self.inner.execute_raw(sql, params)
     }
 

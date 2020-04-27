@@ -159,7 +159,7 @@ impl<'a> SingleRowInsert<'a> {
     /// let (sql, params) = Sqlite::build(query);
     ///
     /// assert_eq!("INSERT INTO `users` (`foo`) VALUES (?)", sql);
-    /// assert_eq!(vec![ParameterizedValue::Integer(10)], params);
+    /// assert_eq!(vec![Value::Integer(10)], params);
     /// ```
     pub fn value<K, V>(mut self, key: K, val: V) -> SingleRowInsert<'a>
     where
@@ -193,8 +193,8 @@ impl<'a> MultiRowInsert<'a> {
     ///
     /// assert_eq!(
     ///     vec![
-    ///         ParameterizedValue::Integer(1),
-    ///         ParameterizedValue::Integer(2),
+    ///         Value::Integer(1),
+    ///         Value::Integer(2),
     ///     ], params);
     /// ```
     pub fn values<V>(mut self, values: V) -> Self

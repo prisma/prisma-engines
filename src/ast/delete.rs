@@ -42,7 +42,7 @@ impl<'a> Delete<'a> {
     /// let (sql, params) = Sqlite::build(query);
     ///
     /// assert_eq!("DELETE FROM `users` WHERE `bar` = ?", sql);
-    /// assert_eq!(vec![ParameterizedValue::Boolean(false)], params);
+    /// assert_eq!(vec![Value::Boolean(false)], params);
     /// ```
     pub fn so_that<T>(mut self, conditions: T) -> Self
     where

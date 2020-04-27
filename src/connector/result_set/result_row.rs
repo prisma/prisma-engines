@@ -1,5 +1,5 @@
 use crate::{
-    ast::ParameterizedValue,
+    ast::Value,
     error::{Error, ErrorKind},
 };
 use std::sync::Arc;
@@ -9,12 +9,12 @@ use std::sync::Arc;
 #[derive(Debug)]
 pub struct ResultRow {
     pub(crate) columns: Arc<Vec<String>>,
-    pub(crate) values: Vec<ParameterizedValue<'static>>,
+    pub(crate) values: Vec<Value<'static>>,
 }
 
 impl IntoIterator for ResultRow {
-    type Item = ParameterizedValue<'static>;
-    type IntoIter = std::vec::IntoIter<ParameterizedValue<'static>>;
+    type Item = Value<'static>;
+    type IntoIter = std::vec::IntoIter<Value<'static>>;
 
     fn into_iter(self) -> Self::IntoIter {
         self.values.into_iter()
@@ -38,14 +38,14 @@ impl IntoIterator for ResultRow {
 #[derive(Debug)]
 pub struct ResultRowRef<'a> {
     pub(crate) columns: Arc<Vec<String>>,
-    pub(crate) values: &'a Vec<ParameterizedValue<'static>>,
+    pub(crate) values: &'a Vec<Value<'static>>,
 }
 
 impl ResultRow {
     /// Take a value from a certain position in the row, if having a value in
     /// that position. Usage documentation in
     /// [ResultRowRef](struct.ResultRowRef.html).
-    pub fn at(&self, i: usize) -> Option<&ParameterizedValue<'static>> {
+    pub fn at(&self, i: usize) -> Option<&Value<'static>> {
         if self.values.len() <= i {
             None
         } else {
@@ -55,7 +55,7 @@ impl ResultRow {
 
     /// Take a value with the given column name from the row. Usage
     /// documentation in [ResultRowRef](struct.ResultRowRef.html).
-    pub fn get(&self, name: &str) -> Option<&ParameterizedValue<'static>> {
+    pub fn get(&self, name: &str) -> Option<&Value<'static>> {
         if let Some(idx) = self.columns.iter().position(|c| c == name) {
             Some(&self.values[idx])
         } else {
@@ -71,7 +71,7 @@ impl ResultRow {
         }
     }
 
-    pub fn into_single(self) -> crate::Result<ParameterizedValue<'static>> {
+    pub fn into_single(self) -> crate::Result<Value<'static>> {
         match self.into_iter().next() {
             Some(val) => Ok(val),
             None => Err(Error::builder(ErrorKind::NotFound).build()),
@@ -91,7 +91,7 @@ impl<'a> ResultRowRef<'a> {
     /// # let row = result_set.first().unwrap();
     /// assert_eq!(Some(&row[0]), row.at(0));
     /// ```
-    pub fn at(&self, i: usize) -> Option<&ParameterizedValue<'static>> {
+    pub fn at(&self, i: usize) -> Option<&Value<'static>> {
         if self.values.len() <= i {
             None
         } else {
@@ -109,7 +109,7 @@ impl<'a> ResultRowRef<'a> {
     /// # let row = result_set.first().unwrap();
     /// assert_eq!(Some(&row["id"]), row.get("id"));
     /// ```
-    pub fn get(&self, name: &str) -> Option<&ParameterizedValue<'static>> {
+    pub fn get(&self, name: &str) -> Option<&Value<'static>> {
         if let Some(idx) = self.columns.iter().position(|c| c == name) {
             Some(&self.values[idx])
         } else {

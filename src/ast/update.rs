@@ -40,8 +40,8 @@ impl<'a> Update<'a> {
     ///
     /// assert_eq!(
     ///     vec![
-    ///         ParameterizedValue::Integer(10),
-    ///         ParameterizedValue::Boolean(false),
+    ///         Value::Integer(10),
+    ///         Value::Boolean(false),
     ///     ],
     ///     params,
     /// );
@@ -69,8 +69,8 @@ impl<'a> Update<'a> {
     ///
     /// assert_eq!(
     ///     vec![
-    ///         ParameterizedValue::Integer(1),
-    ///         ParameterizedValue::Boolean(false),
+    ///         Value::Integer(1),
+    ///         Value::Boolean(false),
     ///     ],
     ///     params,
     /// );
@@ -91,8 +91,8 @@ impl<'a> Update<'a> {
     ///
     /// assert_eq!(
     ///     vec![
-    ///         ParameterizedValue::Integer(1),
-    ///         ParameterizedValue::Integer(3),
+    ///         Value::Integer(1),
+    ///         Value::Integer(3),
     ///     ],
     ///     params,
     /// );

@@ -8,14 +8,14 @@ use std::fmt::{self, Write};
 /// can be used directly with the database.
 pub struct Sqlite<'a> {
     query: String,
-    parameters: Vec<ParameterizedValue<'a>>,
+    parameters: Vec<Value<'a>>,
 }
 
 impl<'a> Visitor<'a> for Sqlite<'a> {
     const C_BACKTICK: &'static str = "`";
     const C_WILDCARD: &'static str = "%";
 
-    fn build<Q>(query: Q) -> (String, Vec<ParameterizedValue<'a>>)
+    fn build<Q>(query: Q) -> (String, Vec<Value<'a>>)
     where
         Q: Into<Query<'a>>,
     {
@@ -76,15 +76,11 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
         self.write("?")
     }
 
-    fn add_parameter(&mut self, value: ParameterizedValue<'a>) {
+    fn add_parameter(&mut self, value: Value<'a>) {
         self.parameters.push(value);
     }
 
-    fn visit_limit_and_offset(
-        &mut self,
-        limit: Option<ParameterizedValue<'a>>,
-        offset: Option<ParameterizedValue<'a>>,
-    ) -> fmt::Result {
+    fn visit_limit_and_offset(&mut self, limit: Option<Value<'a>>, offset: Option<Value<'a>>) -> fmt::Result {
         match (limit, offset) {
             (Some(limit), Some(offset)) => {
                 self.write(" LIMIT ")?;
@@ -95,7 +91,7 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
             }
             (None, Some(offset)) => {
                 self.write(" LIMIT ")?;
-                self.visit_parameterized(ParameterizedValue::from(-1))?;
+                self.visit_parameterized(Value::from(-1))?;
 
                 self.write(" OFFSET ")?;
                 self.visit_parameterized(offset)
@@ -132,14 +128,14 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
 mod tests {
     use crate::visitor::*;
 
-    fn expected_values<'a, T>(sql: &'static str, params: Vec<T>) -> (String, Vec<ParameterizedValue<'a>>)
+    fn expected_values<'a, T>(sql: &'static str, params: Vec<T>) -> (String, Vec<Value<'a>>)
     where
-        T: Into<ParameterizedValue<'a>>,
+        T: Into<Value<'a>>,
     {
         (String::from(sql), params.into_iter().map(|p| p.into()).collect())
     }
 
-    fn default_params<'a>(mut additional: Vec<ParameterizedValue<'a>>) -> Vec<ParameterizedValue<'a>> {
+    fn default_params<'a>(mut additional: Vec<Value<'a>>) -> Vec<Value<'a>> {
         let mut result = Vec::new();
 
         for param in additional.drain(0..) {
@@ -182,10 +178,10 @@ mod tests {
         assert_eq!(expected_sql, sql);
         assert_eq!(
             vec![
-                ParameterizedValue::Integer(1),
-                ParameterizedValue::Integer(2),
-                ParameterizedValue::Integer(3),
-                ParameterizedValue::Integer(4),
+                Value::Integer(1),
+                Value::Integer(2),
+                Value::Integer(3),
+                Value::Integer(4),
             ],
             params
         );
@@ -204,10 +200,10 @@ mod tests {
         assert_eq!(expected_sql, sql);
         assert_eq!(
             vec![
-                ParameterizedValue::Integer(1),
-                ParameterizedValue::Integer(2),
-                ParameterizedValue::Integer(3),
-                ParameterizedValue::Integer(4),
+                Value::Integer(1),
+                Value::Integer(2),
+                Value::Integer(3),
+                Value::Integer(4),
             ],
             params
         );
@@ -236,10 +232,7 @@ mod tests {
         let expected_sql = "SELECT `test`.* FROM `test` WHERE `id1` IN (?,?)";
 
         assert_eq!(expected_sql, sql);
-        assert_eq!(
-            vec![ParameterizedValue::Integer(1), ParameterizedValue::Integer(2),],
-            params
-        )
+        assert_eq!(vec![Value::Integer(1), Value::Integer(2),], params)
     }
 
     #[test]
@@ -350,9 +343,9 @@ mod tests {
         let expected_sql = "SELECT `naukio`.* FROM `naukio` WHERE (`word` = ? AND `age` < ? AND `paw` = ?)";
 
         let expected_params = vec![
-            ParameterizedValue::Text(Cow::from("meow")),
-            ParameterizedValue::Integer(10),
-            ParameterizedValue::Text(Cow::from("warm")),
+            Value::Text(Cow::from("meow")),
+            Value::Integer(10),
+            Value::Text(Cow::from("warm")),
         ];
 
         let conditions = "word".equals("meow").and("age".less_than(10)).and("paw".equals("warm"));
@@ -370,9 +363,9 @@ mod tests {
         let expected_sql = "SELECT `naukio`.* FROM `naukio` WHERE (`word` = ? AND (`age` < ? AND `paw` = ?))";
 
         let expected_params = vec![
-            ParameterizedValue::Text(Cow::from("meow")),
-            ParameterizedValue::Integer(10),
-            ParameterizedValue::Text(Cow::from("warm")),
+            Value::Text(Cow::from("meow")),
+            Value::Integer(10),
+            Value::Text(Cow::from("warm")),
         ];
 
         let conditions = "word".equals("meow").and("age".less_than(10).and("paw".equals("warm")));
@@ -390,9 +383,9 @@ mod tests {
         let expected_sql = "SELECT `naukio`.* FROM `naukio` WHERE ((`word` = ? OR `age` < ?) AND `paw` = ?)";
 
         let expected_params = vec![
-            ParameterizedValue::Text(Cow::from("meow")),
-            ParameterizedValue::Integer(10),
-            ParameterizedValue::Text(Cow::from("warm")),
+            Value::Text(Cow::from("meow")),
+            Value::Integer(10),
+            Value::Text(Cow::from("warm")),
         ];
 
         let conditions = "word".equals("meow").or("age".less_than(10)).and("paw".equals("warm"));
@@ -410,9 +403,9 @@ mod tests {
         let expected_sql = "SELECT `naukio`.* FROM `naukio` WHERE (NOT ((`word` = ? OR `age` < ?) AND `paw` = ?))";
 
         let expected_params = vec![
-            ParameterizedValue::Text(Cow::from("meow")),
-            ParameterizedValue::Integer(10),
-            ParameterizedValue::Text(Cow::from("warm")),
+            Value::Text(Cow::from("meow")),
+            Value::Integer(10),
+            Value::Text(Cow::from("warm")),
         ];
 
         let conditions = "word"
@@ -434,9 +427,9 @@ mod tests {
         let expected_sql = "SELECT `naukio`.* FROM `naukio` WHERE (NOT ((`word` = ? OR `age` < ?) AND `paw` = ?))";
 
         let expected_params = vec![
-            ParameterizedValue::Text(Cow::from("meow")),
-            ParameterizedValue::Integer(10),
-            ParameterizedValue::Text(Cow::from("warm")),
+            Value::Text(Cow::from("meow")),
+            Value::Integer(10),
+            Value::Text(Cow::from("warm")),
         ];
 
         let conditions = ConditionTree::not("word".equals("meow").or("age".less_than(10)).and("paw".equals("warm")));
@@ -473,7 +466,7 @@ mod tests {
         let (sql, params) = Sqlite::build(query);
 
         assert_eq!(expected_sql, sql);
-        assert_eq!(default_params(vec![ParameterizedValue::Boolean(true),]), params);
+        assert_eq!(default_params(vec![Value::Boolean(true),]), params);
     }
 
     #[test]
@@ -501,7 +494,7 @@ mod tests {
         let (sql, params) = Sqlite::build(query);
 
         assert_eq!(expected_sql, sql);
-        assert_eq!(default_params(vec![ParameterizedValue::Boolean(true),]), params);
+        assert_eq!(default_params(vec![Value::Boolean(true),]), params);
     }
 
     #[test]

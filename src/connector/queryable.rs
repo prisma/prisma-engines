@@ -2,11 +2,11 @@ use super::{ResultSet, Transaction, DBIO};
 use crate::ast::*;
 
 pub trait GetRow {
-    fn get_result_row(&self) -> crate::Result<Vec<ParameterizedValue<'static>>>;
+    fn get_result_row(&self) -> crate::Result<Vec<Value<'static>>>;
 }
 
 pub trait TakeRow {
-    fn take_result_row(&mut self) -> crate::Result<Vec<ParameterizedValue<'static>>>;
+    fn take_result_row(&mut self) -> crate::Result<Vec<Value<'static>>>;
 }
 
 pub trait ToColumnNames {
@@ -22,14 +22,14 @@ where
     fn query<'a>(&'a self, q: Query<'a>) -> DBIO<'a, ResultSet>;
 
     /// Execute a query given as SQL, interpolating the given parameters.
-    fn query_raw<'a>(&'a self, sql: &'a str, params: &'a [ParameterizedValue<'a>]) -> DBIO<'a, ResultSet>;
+    fn query_raw<'a>(&'a self, sql: &'a str, params: &'a [Value<'a>]) -> DBIO<'a, ResultSet>;
 
     /// Execute the given query, returning the number of affected rows.
     fn execute<'a>(&'a self, q: Query<'a>) -> DBIO<'a, u64>;
 
     /// Execute a query given as SQL, interpolating the given parameters and
     /// returning the number of affected rows.
-    fn execute_raw<'a>(&'a self, sql: &'a str, params: &'a [ParameterizedValue<'a>]) -> DBIO<'a, u64>;
+    fn execute_raw<'a>(&'a self, sql: &'a str, params: &'a [Value<'a>]) -> DBIO<'a, u64>;
 
     /// Run a command in the database, for queries that can't be run using
     /// prepared statements.

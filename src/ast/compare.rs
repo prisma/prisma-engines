@@ -67,7 +67,7 @@ pub trait Comparable<'a> {
     ///
     /// assert_eq!(
     ///     vec![
-    ///         ParameterizedValue::from("bar"),
+    ///         Value::from("bar"),
     ///     ],
     ///     params
     /// );
@@ -87,7 +87,7 @@ pub trait Comparable<'a> {
     ///
     /// assert_eq!(
     ///     vec![
-    ///         ParameterizedValue::from("bar"),
+    ///         Value::from("bar"),
     ///     ],
     ///     params
     /// );
@@ -107,7 +107,7 @@ pub trait Comparable<'a> {
     ///
     /// assert_eq!(
     ///     vec![
-    ///         ParameterizedValue::from(10),
+    ///         Value::from(10),
     ///     ],
     ///     params
     /// );
@@ -127,7 +127,7 @@ pub trait Comparable<'a> {
     ///
     /// assert_eq!(
     ///     vec![
-    ///         ParameterizedValue::from(10),
+    ///         Value::from(10),
     ///     ],
     ///     params
     /// );
@@ -147,7 +147,7 @@ pub trait Comparable<'a> {
     ///
     /// assert_eq!(
     ///     vec![
-    ///         ParameterizedValue::from(10),
+    ///         Value::from(10),
     ///     ],
     ///     params
     /// );
@@ -167,7 +167,7 @@ pub trait Comparable<'a> {
     ///
     /// assert_eq!(
     ///     vec![
-    ///         ParameterizedValue::from(10),
+    ///         Value::from(10),
     ///     ],
     ///     params
     /// );
@@ -185,8 +185,8 @@ pub trait Comparable<'a> {
     ///
     /// assert_eq!("SELECT `users`.* FROM `users` WHERE `foo` IN (?,?)", sql);
     /// assert_eq!(vec![
-    ///     ParameterizedValue::Integer(1),
-    ///     ParameterizedValue::Integer(2),
+    ///     Value::Integer(1),
+    ///     Value::Integer(2),
     /// ], params);
     /// ```
     fn in_selection<T>(self, selection: T) -> Compare<'a>
@@ -203,8 +203,8 @@ pub trait Comparable<'a> {
     /// assert_eq!("SELECT `users`.* FROM `users` WHERE `foo` NOT IN (?,?)", sql);
     ///
     /// assert_eq!(vec![
-    ///     ParameterizedValue::Integer(1),
-    ///     ParameterizedValue::Integer(2),
+    ///     Value::Integer(1),
+    ///     Value::Integer(2),
     /// ], params);
     /// ```
     fn not_in_selection<T>(self, selection: T) -> Compare<'a>
@@ -222,7 +222,7 @@ pub trait Comparable<'a> {
     ///
     /// assert_eq!(
     ///     vec![
-    ///         ParameterizedValue::from("%bar%"),
+    ///         Value::from("%bar%"),
     ///     ],
     ///     params
     /// );
@@ -242,7 +242,7 @@ pub trait Comparable<'a> {
     ///
     /// assert_eq!(
     ///     vec![
-    ///         ParameterizedValue::from("%bar%"),
+    ///         Value::from("%bar%"),
     ///     ],
     ///     params
     /// );
@@ -262,7 +262,7 @@ pub trait Comparable<'a> {
     ///
     /// assert_eq!(
     ///     vec![
-    ///         ParameterizedValue::from("bar%"),
+    ///         Value::from("bar%"),
     ///     ],
     ///     params
     /// );
@@ -282,7 +282,7 @@ pub trait Comparable<'a> {
     ///
     /// assert_eq!(
     ///     vec![
-    ///         ParameterizedValue::from("bar%"),
+    ///         Value::from("bar%"),
     ///     ],
     ///     params
     /// );
@@ -302,7 +302,7 @@ pub trait Comparable<'a> {
     ///
     /// assert_eq!(
     ///     vec![
-    ///         ParameterizedValue::from("%bar"),
+    ///         Value::from("%bar"),
     ///     ],
     ///     params
     /// );
@@ -322,7 +322,7 @@ pub trait Comparable<'a> {
     ///
     /// assert_eq!(
     ///     vec![
-    ///         ParameterizedValue::from("%bar"),
+    ///         Value::from("%bar"),
     ///     ],
     ///     params
     /// );
@@ -363,8 +363,8 @@ pub trait Comparable<'a> {
     /// assert_eq!("SELECT `users`.* FROM `users` WHERE `foo` BETWEEN ? AND ?", sql);
     ///
     /// assert_eq!(vec![
-    ///     ParameterizedValue::Integer(420),
-    ///     ParameterizedValue::Integer(666),
+    ///     Value::Integer(420),
+    ///     Value::Integer(666),
     /// ], params);
     /// ```
     fn between<T, V>(self, left: T, right: V) -> Compare<'a>
@@ -382,8 +382,8 @@ pub trait Comparable<'a> {
     /// assert_eq!("SELECT `users`.* FROM `users` WHERE `foo` NOT BETWEEN ? AND ?", sql);
     ///
     /// assert_eq!(vec![
-    ///     ParameterizedValue::Integer(420),
-    ///     ParameterizedValue::Integer(666),
+    ///     Value::Integer(420),
+    ///     Value::Integer(666),
     /// ], params);
     /// ```
     fn not_between<T, V>(self, left: T, right: V) -> Compare<'a>

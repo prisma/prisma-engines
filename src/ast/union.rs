@@ -49,8 +49,8 @@ impl<'a> Union<'a> {
     /// assert_eq!("(SELECT ?) UNION ALL (SELECT ?)", sql);
     ///
     /// assert_eq!(vec![
-    ///     ParameterizedValue::from(1),
-    ///     ParameterizedValue::from(2)
+    ///     Value::from(1),
+    ///     Value::from(2)
     /// ], params);
     /// ```
     pub fn all(mut self, q: Select<'a>) -> Self {
@@ -71,8 +71,8 @@ impl<'a> Union<'a> {
     /// assert_eq!("(SELECT ?) UNION (SELECT ?)", sql);
     ///
     /// assert_eq!(vec![
-    ///     ParameterizedValue::from(1),
-    ///     ParameterizedValue::from(2)
+    ///     Value::from(1),
+    ///     Value::from(2)
     /// ], params);
     /// ```
     pub fn distinct(mut self, q: Select<'a>) -> Self {

@@ -42,7 +42,7 @@ pub trait Visitor<'a> {
     /// assert_eq!("SELECT \"cats\".* FROM \"cats\"", psql);
     /// assert_eq!("SELECT `cats`.* FROM `cats`", mysql);
     /// ```
-    fn build<Q>(query: Q) -> (String, Vec<ParameterizedValue<'a>>)
+    fn build<Q>(query: Q) -> (String, Vec<Value<'a>>)
     where
         Q: Into<Query<'a>>;
 
@@ -60,14 +60,10 @@ pub trait Visitor<'a> {
 
     /// When called, the visitor decided to not render the parameter into the query,
     /// replacing it with the `C_PARAM`, calling `add_parameter` with the replaced value.
-    fn add_parameter(&mut self, value: ParameterizedValue<'a>);
+    fn add_parameter(&mut self, value: Value<'a>);
 
     /// The `LIMIT` and `OFFSET` statement in the query
-    fn visit_limit_and_offset(
-        &mut self,
-        limit: Option<ParameterizedValue<'a>>,
-        offset: Option<ParameterizedValue<'a>>,
-    ) -> fmt::Result;
+    fn visit_limit_and_offset(&mut self, limit: Option<Value<'a>>, offset: Option<Value<'a>>) -> fmt::Result;
 
     /// A walk through an `INSERT` statement
     fn visit_insert(&mut self, insert: Insert<'a>) -> fmt::Result;
@@ -79,7 +75,7 @@ pub trait Visitor<'a> {
     fn visit_aggregate_to_string(&mut self, value: DatabaseValue<'a>) -> fmt::Result;
 
     /// A visit to a value we parameterize
-    fn visit_parameterized(&mut self, value: ParameterizedValue<'a>) -> fmt::Result {
+    fn visit_parameterized(&mut self, value: Value<'a>) -> fmt::Result {
         self.add_parameter(value);
         self.parameter_substitution()
     }
@@ -538,7 +534,7 @@ pub trait Visitor<'a> {
             Compare::Like(left, right) => {
                 self.visit_database_value(*left)?;
 
-                self.add_parameter(ParameterizedValue::Text(Cow::from(format!(
+                self.add_parameter(Value::Text(Cow::from(format!(
                     "{}{}{}",
                     Self::C_WILDCARD,
                     right,
@@ -551,7 +547,7 @@ pub trait Visitor<'a> {
             Compare::NotLike(left, right) => {
                 self.visit_database_value(*left)?;
 
-                self.add_parameter(ParameterizedValue::Text(Cow::from(format!(
+                self.add_parameter(Value::Text(Cow::from(format!(
                     "{}{}{}",
                     Self::C_WILDCARD,
                     right,
@@ -564,11 +560,7 @@ pub trait Visitor<'a> {
             Compare::BeginsWith(left, right) => {
                 self.visit_database_value(*left)?;
 
-                self.add_parameter(ParameterizedValue::Text(Cow::from(format!(
-                    "{}{}",
-                    right,
-                    Self::C_WILDCARD
-                ))));
+                self.add_parameter(Value::Text(Cow::from(format!("{}{}", right, Self::C_WILDCARD))));
 
                 self.write(" LIKE ")?;
                 self.parameter_substitution()
@@ -576,11 +568,7 @@ pub trait Visitor<'a> {
             Compare::NotBeginsWith(left, right) => {
                 self.visit_database_value(*left)?;
 
-                self.add_parameter(ParameterizedValue::Text(Cow::from(format!(
-                    "{}{}",
-                    right,
-                    Self::C_WILDCARD
-                ))));
+                self.add_parameter(Value::Text(Cow::from(format!("{}{}", right, Self::C_WILDCARD))));
 
                 self.write(" NOT LIKE ")?;
                 self.parameter_substitution()
@@ -588,11 +576,7 @@ pub trait Visitor<'a> {
             Compare::EndsInto(left, right) => {
                 self.visit_database_value(*left)?;
 
-                self.add_parameter(ParameterizedValue::Text(Cow::from(format!(
-                    "{}{}",
-                    Self::C_WILDCARD,
-                    right,
-                ))));
+                self.add_parameter(Value::Text(Cow::from(format!("{}{}", Self::C_WILDCARD, right,))));
 
                 self.write(" LIKE ")?;
                 self.parameter_substitution()
@@ -600,11 +584,7 @@ pub trait Visitor<'a> {
             Compare::NotEndsInto(left, right) => {
                 self.visit_database_value(*left)?;
 
-                self.add_parameter(ParameterizedValue::Text(Cow::from(format!(
-                    "{}{}",
-                    Self::C_WILDCARD,
-                    right,
-                ))));
+                self.add_parameter(Value::Text(Cow::from(format!("{}{}", Self::C_WILDCARD, right,))));
 
                 self.write(" NOT LIKE ")?;
                 self.parameter_substitution()

@@ -1,5 +1,5 @@
 use crate::{
-    ast::ParameterizedValue,
+    ast::Value,
     connector::queryable::{GetRow, ToColumnNames},
     error::{Error, ErrorKind},
 };
@@ -20,7 +20,7 @@ use tokio_postgres::{
 #[cfg(feature = "uuid-0_8")]
 use uuid::Uuid;
 
-pub fn conv_params<'a>(params: &'a [ParameterizedValue<'a>]) -> Vec<&'a (dyn types::ToSql + Sync)> {
+pub fn conv_params<'a>(params: &'a [Value<'a>]) -> Vec<&'a (dyn types::ToSql + Sync)> {
     params.iter().map(|x| x as &(dyn ToSql + Sync)).collect::<Vec<_>>()
 }
 
@@ -73,403 +73,377 @@ impl<'a> FromSql<'a> for NaiveMoney {
 }
 
 impl GetRow for PostgresRow {
-    fn get_result_row<'b>(&'b self) -> crate::Result<Vec<ParameterizedValue<'static>>> {
-        fn convert(row: &PostgresRow, i: usize) -> crate::Result<ParameterizedValue<'static>> {
+    fn get_result_row<'b>(&'b self) -> crate::Result<Vec<Value<'static>>> {
+        fn convert(row: &PostgresRow, i: usize) -> crate::Result<Value<'static>> {
             let result = match *row.columns()[i].type_() {
                 PostgresType::BOOL => match row.try_get(i)? {
-                    Some(val) => ParameterizedValue::Boolean(val),
-                    None => ParameterizedValue::Null,
+                    Some(val) => Value::Boolean(val),
+                    None => Value::Null,
                 },
                 PostgresType::INT2 => match row.try_get(i)? {
                     Some(val) => {
                         let val: i16 = val;
-                        ParameterizedValue::Integer(i64::from(val))
+                        Value::Integer(i64::from(val))
                     }
-                    None => ParameterizedValue::Null,
+                    None => Value::Null,
                 },
                 PostgresType::INT4 => match row.try_get(i)? {
                     Some(val) => {
                         let val: i32 = val;
-                        ParameterizedValue::Integer(i64::from(val))
+                        Value::Integer(i64::from(val))
                     }
-                    None => ParameterizedValue::Null,
+                    None => Value::Null,
                 },
                 PostgresType::INT8 => match row.try_get(i)? {
                     Some(val) => {
                         let val: i64 = val;
-                        ParameterizedValue::Integer(val)
+                        Value::Integer(val)
                     }
-                    None => ParameterizedValue::Null,
+                    None => Value::Null,
                 },
                 PostgresType::NUMERIC => match row.try_get(i)? {
                     Some(val) => {
                         let val: Decimal = val;
-                        ParameterizedValue::Real(val)
+                        Value::Real(val)
                     }
-                    None => ParameterizedValue::Null,
+                    None => Value::Null,
                 },
                 PostgresType::FLOAT4 => match row.try_get(i)? {
                     Some(val) => {
                         let val: Decimal = Decimal::from_f32(val).expect("f32 is not a Decimal");
-                        ParameterizedValue::Real(val)
+                        Value::Real(val)
                     }
-                    None => ParameterizedValue::Null,
+                    None => Value::Null,
                 },
                 PostgresType::FLOAT8 => match row.try_get(i)? {
                     Some(val) => {
                         let val: f64 = val;
                         // Decimal::from_f64 is buggy. Issue: https://github.com/paupino/rust-decimal/issues/228
                         let val: Decimal = Decimal::from_str(&val.to_string()).expect("f64 is not a Decimal");
-                        ParameterizedValue::Real(val)
+                        Value::Real(val)
                     }
-                    None => ParameterizedValue::Null,
+                    None => Value::Null,
                 },
                 PostgresType::MONEY => match row.try_get(i)? {
                     Some(val) => {
                         let val: NaiveMoney = val;
-                        ParameterizedValue::Real(val.0)
+                        Value::Real(val.0)
                     }
-                    None => ParameterizedValue::Null,
+                    None => Value::Null,
                 },
                 #[cfg(feature = "chrono-0_4")]
                 PostgresType::TIMESTAMP => match row.try_get(i)? {
                     Some(val) => {
                         let ts: NaiveDateTime = val;
                         let dt = DateTime::<Utc>::from_utc(ts, Utc);
-                        ParameterizedValue::DateTime(dt)
+                        Value::DateTime(dt)
                     }
-                    None => ParameterizedValue::Null,
+                    None => Value::Null,
                 },
                 #[cfg(feature = "chrono-0_4")]
                 PostgresType::TIMESTAMPTZ => match row.try_get(i)? {
                     Some(val) => {
                         let ts: DateTime<Utc> = val;
-                        ParameterizedValue::DateTime(ts)
+                        Value::DateTime(ts)
                     }
-                    None => ParameterizedValue::Null,
+                    None => Value::Null,
                 },
                 #[cfg(feature = "chrono-0_4")]
                 PostgresType::DATE => match row.try_get(i)? {
                     Some(val) => {
                         let ts: chrono::NaiveDate = val;
                         let dt = ts.and_time(chrono::NaiveTime::from_hms(0, 0, 0));
-                        ParameterizedValue::DateTime(chrono::DateTime::from_utc(dt, Utc))
+                        Value::DateTime(chrono::DateTime::from_utc(dt, Utc))
                     }
-                    None => ParameterizedValue::Null,
+                    None => Value::Null,
                 },
                 #[cfg(feature = "chrono-0_4")]
                 PostgresType::TIME => match row.try_get(i)? {
                     Some(val) => {
                         let time: chrono::NaiveTime = val;
                         let dt = NaiveDateTime::new(chrono::NaiveDate::from_ymd(1970, 1, 1), time);
-                        ParameterizedValue::DateTime(chrono::DateTime::from_utc(dt, Utc))
+                        Value::DateTime(chrono::DateTime::from_utc(dt, Utc))
                     }
-                    None => ParameterizedValue::Null,
+                    None => Value::Null,
                 },
                 #[cfg(feature = "chrono-0_4")]
                 PostgresType::TIMETZ => match row.try_get(i)? {
                     Some(val) => {
                         let time: TimeTz = val;
                         let dt = NaiveDateTime::new(chrono::NaiveDate::from_ymd(1970, 1, 1), time.0);
-                        ParameterizedValue::DateTime(chrono::DateTime::from_utc(dt, Utc))
+                        Value::DateTime(chrono::DateTime::from_utc(dt, Utc))
                     }
-                    None => ParameterizedValue::Null,
+                    None => Value::Null,
                 },
                 #[cfg(feature = "uuid-0_8")]
                 PostgresType::UUID => match row.try_get(i)? {
                     Some(val) => {
                         let val: Uuid = val;
-                        ParameterizedValue::Uuid(val)
+                        Value::Uuid(val)
                     }
-                    None => ParameterizedValue::Null,
+                    None => Value::Null,
                 },
                 #[cfg(feature = "uuid-0_8")]
                 PostgresType::UUID_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<Uuid> = val;
-                        let val = val.into_iter().map(ParameterizedValue::Uuid).collect();
-                        ParameterizedValue::Array(val)
+                        let val = val.into_iter().map(Value::Uuid).collect();
+                        Value::Array(val)
                     }
-                    None => ParameterizedValue::Null,
+                    None => Value::Null,
                 },
                 #[cfg(feature = "json-1")]
                 PostgresType::JSON | PostgresType::JSONB => match row.try_get(i)? {
                     Some(val) => {
                         let val: serde_json::Value = val;
-                        ParameterizedValue::Json(val)
+                        Value::Json(val)
                     }
-                    None => ParameterizedValue::Null,
+                    None => Value::Null,
                 },
                 #[cfg(feature = "array")]
                 PostgresType::INT2_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<i16> = val;
-                        ParameterizedValue::Array(
-                            val.into_iter()
-                                .map(|x| ParameterizedValue::Integer(i64::from(x)))
-                                .collect(),
-                        )
+                        Value::Array(val.into_iter().map(|x| Value::Integer(i64::from(x))).collect())
                     }
-                    None => ParameterizedValue::Null,
+                    None => Value::Null,
                 },
                 #[cfg(feature = "array")]
                 PostgresType::INT4_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<i32> = val;
-                        ParameterizedValue::Array(
-                            val.into_iter()
-                                .map(|x| ParameterizedValue::Integer(i64::from(x)))
-                                .collect(),
-                        )
+                        Value::Array(val.into_iter().map(|x| Value::Integer(i64::from(x))).collect())
                     }
-                    None => ParameterizedValue::Null,
+                    None => Value::Null,
                 },
                 #[cfg(feature = "array")]
                 PostgresType::INT8_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<i64> = val;
-                        ParameterizedValue::Array(
-                            val.into_iter().map(|x| ParameterizedValue::Integer(x as i64)).collect(),
-                        )
+                        Value::Array(val.into_iter().map(|x| Value::Integer(x as i64)).collect())
                     }
-                    None => ParameterizedValue::Null,
+                    None => Value::Null,
                 },
                 #[cfg(feature = "array")]
                 PostgresType::FLOAT4_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<f32> = val;
-                        ParameterizedValue::Array(val.into_iter().map(ParameterizedValue::from).collect())
+                        Value::Array(val.into_iter().map(Value::from).collect())
                     }
-                    None => ParameterizedValue::Null,
+                    None => Value::Null,
                 },
                 #[cfg(feature = "array")]
                 PostgresType::FLOAT8_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<f64> = val;
-                        ParameterizedValue::Array(val.into_iter().map(ParameterizedValue::from).collect())
+                        Value::Array(val.into_iter().map(Value::from).collect())
                     }
-                    None => ParameterizedValue::Null,
+                    None => Value::Null,
                 },
                 #[cfg(feature = "array")]
                 PostgresType::BOOL_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<bool> = val;
-                        ParameterizedValue::Array(val.into_iter().map(ParameterizedValue::Boolean).collect())
+                        Value::Array(val.into_iter().map(Value::Boolean).collect())
                     }
-                    None => ParameterizedValue::Null,
+                    None => Value::Null,
                 },
                 #[cfg(all(feature = "array", feature = "chrono-0_4"))]
                 PostgresType::TIMESTAMP_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<NaiveDateTime> = val;
-                        ParameterizedValue::Array(
+                        Value::Array(
                             val.into_iter()
-                                .map(|x| ParameterizedValue::DateTime(DateTime::<Utc>::from_utc(x, Utc)))
+                                .map(|x| Value::DateTime(DateTime::<Utc>::from_utc(x, Utc)))
                                 .collect(),
                         )
                     }
-                    None => ParameterizedValue::Null,
+                    None => Value::Null,
                 },
                 #[cfg(feature = "array")]
                 PostgresType::NUMERIC_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<Decimal> = val;
-                        ParameterizedValue::Array(
+                        Value::Array(
                             val.into_iter()
-                                .map(|x| ParameterizedValue::Real(x.to_string().parse().unwrap()))
+                                .map(|x| Value::Real(x.to_string().parse().unwrap()))
                                 .collect(),
                         )
                     }
-                    None => ParameterizedValue::Null,
+                    None => Value::Null,
                 },
                 #[cfg(feature = "array")]
                 PostgresType::TEXT_ARRAY | PostgresType::NAME_ARRAY | PostgresType::VARCHAR_ARRAY => {
                     match row.try_get(i)? {
                         Some(val) => {
                             let val: Vec<&str> = val;
-                            ParameterizedValue::Array(
-                                val.into_iter()
-                                    .map(|x| ParameterizedValue::Text(String::from(x).into()))
-                                    .collect(),
-                            )
+                            Value::Array(val.into_iter().map(|x| Value::Text(String::from(x).into())).collect())
                         }
-                        None => ParameterizedValue::Null,
+                        None => Value::Null,
                     }
                 }
                 #[cfg(feature = "array")]
                 PostgresType::MONEY_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<NaiveMoney> = val;
-                        ParameterizedValue::Array(val.into_iter().map(|x| ParameterizedValue::Real(x.0)).collect())
+                        Value::Array(val.into_iter().map(|x| Value::Real(x.0)).collect())
                     }
-                    None => ParameterizedValue::Null,
+                    None => Value::Null,
                 },
                 #[cfg(feature = "array")]
                 PostgresType::OID_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<u32> = val;
-                        ParameterizedValue::Array(
-                            val.into_iter().map(|x| ParameterizedValue::Integer(x as i64)).collect(),
-                        )
+                        Value::Array(val.into_iter().map(|x| Value::Integer(x as i64)).collect())
                     }
-                    None => ParameterizedValue::Null,
+                    None => Value::Null,
                 },
                 #[cfg(feature = "array")]
                 PostgresType::TIMESTAMPTZ_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<DateTime<Utc>> = val;
-                        ParameterizedValue::Array(val.into_iter().map(|x| ParameterizedValue::DateTime(x)).collect())
+                        Value::Array(val.into_iter().map(|x| Value::DateTime(x)).collect())
                     }
-                    None => ParameterizedValue::Null,
+                    None => Value::Null,
                 },
                 #[cfg(feature = "array")]
                 PostgresType::DATE_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<chrono::NaiveDate> = val;
-                        ParameterizedValue::Array(
+                        Value::Array(
                             val.into_iter()
                                 .map(|date| {
                                     let dt = date.and_time(chrono::NaiveTime::from_hms(0, 0, 0));
-                                    ParameterizedValue::DateTime(chrono::DateTime::from_utc(dt, Utc))
+                                    Value::DateTime(chrono::DateTime::from_utc(dt, Utc))
                                 })
                                 .collect(),
                         )
                     }
-                    None => ParameterizedValue::Null,
+                    None => Value::Null,
                 },
                 #[cfg(feature = "array")]
                 PostgresType::TIME_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<chrono::NaiveTime> = val;
-                        ParameterizedValue::Array(
+                        Value::Array(
                             val.into_iter()
                                 .map(|time| {
                                     let dt = NaiveDateTime::new(chrono::NaiveDate::from_ymd(1970, 1, 1), time);
-                                    ParameterizedValue::DateTime(chrono::DateTime::from_utc(dt, Utc))
+                                    Value::DateTime(chrono::DateTime::from_utc(dt, Utc))
                                 })
                                 .collect(),
                         )
                     }
-                    None => ParameterizedValue::Null,
+                    None => Value::Null,
                 },
                 #[cfg(feature = "array")]
                 PostgresType::TIMETZ_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<TimeTz> = val;
-                        ParameterizedValue::Array(
+                        Value::Array(
                             val.into_iter()
                                 .map(|time| {
                                     let dt = NaiveDateTime::new(chrono::NaiveDate::from_ymd(1970, 1, 1), time.0);
-                                    ParameterizedValue::DateTime(chrono::DateTime::from_utc(dt, Utc))
+                                    Value::DateTime(chrono::DateTime::from_utc(dt, Utc))
                                 })
                                 .collect(),
                         )
                     }
-                    None => ParameterizedValue::Null,
+                    None => Value::Null,
                 },
                 #[cfg(feature = "array")]
                 PostgresType::JSON_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<serde_json::Value> = val;
-                        ParameterizedValue::Array(val.into_iter().map(|json| ParameterizedValue::Json(json)).collect())
+                        Value::Array(val.into_iter().map(|json| Value::Json(json)).collect())
                     }
-                    None => ParameterizedValue::Null,
+                    None => Value::Null,
                 },
                 #[cfg(feature = "array")]
                 PostgresType::JSONB_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<serde_json::Value> = val;
-                        ParameterizedValue::Array(val.into_iter().map(|json| ParameterizedValue::Json(json)).collect())
+                        Value::Array(val.into_iter().map(|json| Value::Json(json)).collect())
                     }
-                    None => ParameterizedValue::Null,
+                    None => Value::Null,
                 },
                 PostgresType::OID => match row.try_get(i)? {
                     Some(val) => {
                         let val: u32 = val;
-                        ParameterizedValue::Integer(i64::from(val))
+                        Value::Integer(i64::from(val))
                     }
-                    None => ParameterizedValue::Null,
+                    None => Value::Null,
                 },
                 PostgresType::CHAR => match row.try_get(i)? {
                     Some(val) => {
                         let val: i8 = val;
-                        ParameterizedValue::Char((val as u8) as char)
+                        Value::Char((val as u8) as char)
                     }
-                    None => ParameterizedValue::Null,
+                    None => Value::Null,
                 },
                 PostgresType::INET | PostgresType::CIDR => match row.try_get(i)? {
                     Some(val) => {
                         let val: std::net::IpAddr = val;
-                        ParameterizedValue::Text(val.to_string().into())
+                        Value::Text(val.to_string().into())
                     }
-                    None => ParameterizedValue::Null,
+                    None => Value::Null,
                 },
                 PostgresType::INET_ARRAY | PostgresType::CIDR_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<std::net::IpAddr> = val;
-                        ParameterizedValue::Array(
-                            val.into_iter()
-                                .map(|v| ParameterizedValue::Text(v.to_string().into()))
-                                .collect(),
-                        )
+                        Value::Array(val.into_iter().map(|v| Value::Text(v.to_string().into())).collect())
                     }
-                    None => ParameterizedValue::Null,
+                    None => Value::Null,
                 },
                 PostgresType::BIT | PostgresType::VARBIT => match row.try_get(i)? {
                     Some(val) => {
                         let val: BitVec = val;
-                        ParameterizedValue::Text(bits_to_string(&val)?.into())
+                        Value::Text(bits_to_string(&val)?.into())
                     }
-                    None => ParameterizedValue::Null,
+                    None => Value::Null,
                 },
                 PostgresType::BIT_ARRAY | PostgresType::VARBIT_ARRAY => match row.try_get(i)? {
                     Some(val) => {
                         let val: Vec<BitVec> = val;
                         let stringified = val
                             .into_iter()
-                            .map(|bits| bits_to_string(&bits).map(|s| ParameterizedValue::Text(s.into())))
+                            .map(|bits| bits_to_string(&bits).map(|s| Value::Text(s.into())))
                             .collect::<crate::Result<Vec<_>>>()?;
 
-                        ParameterizedValue::Array(stringified)
+                        Value::Array(stringified)
                     }
-                    None => ParameterizedValue::Null,
+                    None => Value::Null,
                 },
                 ref x => match x.kind() {
                     Kind::Enum(_) => match row.try_get(i)? {
                         Some(val) => {
                             let val: EnumString = val;
-                            ParameterizedValue::Enum(val.value.into())
+                            Value::Enum(val.value.into())
                         }
-                        None => ParameterizedValue::Null,
+                        None => Value::Null,
                     },
                     Kind::Array(inner) => match inner.kind() {
                         Kind::Enum(_) => match row.try_get(i)? {
                             Some(val) => {
                                 let val: Vec<EnumString> = val;
-                                ParameterizedValue::Array(
-                                    val.into_iter()
-                                        .map(|x| ParameterizedValue::Enum(x.value.into()))
-                                        .collect(),
-                                )
+                                Value::Array(val.into_iter().map(|x| Value::Enum(x.value.into())).collect())
                             }
-                            None => ParameterizedValue::Null,
+                            None => Value::Null,
                         },
                         _ => match row.try_get(i)? {
                             Some(val) => {
                                 let val: Vec<String> = val;
-                                ParameterizedValue::Array(
-                                    val.into_iter().map(|x| ParameterizedValue::Text(x.into())).collect(),
-                                )
+                                Value::Array(val.into_iter().map(|x| Value::Text(x.into())).collect())
                             }
-                            None => ParameterizedValue::Null,
+                            None => Value::Null,
                         },
                     },
                     _ => match row.try_get(i)? {
                         Some(val) => {
                             let val: String = val;
-                            ParameterizedValue::Text(val.into())
+                            Value::Text(val.into())
                         }
-                        None => ParameterizedValue::Null,
+                        None => Value::Null,
                     },
                 },
             };
@@ -494,89 +468,84 @@ impl ToColumnNames for PostgresStatement {
     }
 }
 
-impl<'a> ToSql for ParameterizedValue<'a> {
+impl<'a> ToSql for Value<'a> {
     fn to_sql(
         &self,
         ty: &PostgresType,
         out: &mut BytesMut,
     ) -> Result<IsNull, Box<dyn StdError + 'static + Send + Sync>> {
         match (self, ty) {
-            (ParameterizedValue::Null, _) => Ok(IsNull::Yes),
-            (ParameterizedValue::Integer(integer), &PostgresType::INT2) => (*integer as i16).to_sql(ty, out),
-            (ParameterizedValue::Integer(integer), &PostgresType::INT4) => (*integer as i32).to_sql(ty, out),
-            (ParameterizedValue::Integer(integer), &PostgresType::TEXT) => format!("{}", integer).to_sql(ty, out),
-            (ParameterizedValue::Integer(integer), &PostgresType::OID) => (*integer as u32).to_sql(ty, out),
-            (ParameterizedValue::Integer(integer), _) => (*integer as i64).to_sql(ty, out),
-            (ParameterizedValue::Real(decimal), &PostgresType::FLOAT4) => {
+            (Value::Null, _) => Ok(IsNull::Yes),
+            (Value::Integer(integer), &PostgresType::INT2) => (*integer as i16).to_sql(ty, out),
+            (Value::Integer(integer), &PostgresType::INT4) => (*integer as i32).to_sql(ty, out),
+            (Value::Integer(integer), &PostgresType::TEXT) => format!("{}", integer).to_sql(ty, out),
+            (Value::Integer(integer), &PostgresType::OID) => (*integer as u32).to_sql(ty, out),
+            (Value::Integer(integer), _) => (*integer as i64).to_sql(ty, out),
+            (Value::Real(decimal), &PostgresType::FLOAT4) => {
                 let f = decimal.to_f32().expect("decimal to f32 conversion");
                 f.to_sql(ty, out)
             }
-            (ParameterizedValue::Real(decimal), &PostgresType::FLOAT8) => {
+            (Value::Real(decimal), &PostgresType::FLOAT8) => {
                 let f = decimal.to_f64().expect("decimal to f64 conversion");
                 f.to_sql(ty, out)
             }
-            (ParameterizedValue::Array(decimals), &PostgresType::FLOAT4_ARRAY) => {
+            (Value::Array(decimals), &PostgresType::FLOAT4_ARRAY) => {
                 let f: Vec<f32> = decimals
                     .into_iter()
                     .filter_map(|v| v.as_decimal().and_then(|decimal| decimal.to_f32()))
                     .collect();
                 f.to_sql(ty, out)
             }
-            (ParameterizedValue::Array(decimals), &PostgresType::FLOAT8_ARRAY) => {
+            (Value::Array(decimals), &PostgresType::FLOAT8_ARRAY) => {
                 let f: Vec<f64> = decimals
                     .into_iter()
                     .filter_map(|v| v.as_decimal().and_then(|decimal| decimal.to_f64()))
                     .collect();
                 f.to_sql(ty, out)
             }
-            (ParameterizedValue::Real(decimal), &PostgresType::MONEY) => {
+            (Value::Real(decimal), &PostgresType::MONEY) => {
                 let mut i64_bytes: [u8; 8] = [0; 8];
                 let decimal = (decimal * Decimal::new(100, 0)).round();
                 i64_bytes.copy_from_slice(&decimal.serialize()[4..12]);
                 let i = i64::from_le_bytes(i64_bytes);
                 i.to_sql(ty, out)
             }
-            (ParameterizedValue::Real(decimal), &PostgresType::NUMERIC) => decimal.to_sql(ty, out),
-            (ParameterizedValue::Real(float), _) => float.to_sql(ty, out),
+            (Value::Real(decimal), &PostgresType::NUMERIC) => decimal.to_sql(ty, out),
+            (Value::Real(float), _) => float.to_sql(ty, out),
             #[cfg(feature = "uuid-0_8")]
-            (ParameterizedValue::Text(string), &PostgresType::UUID) => {
+            (Value::Text(string), &PostgresType::UUID) => {
                 let parsed_uuid: Uuid = string.parse()?;
                 parsed_uuid.to_sql(ty, out)
             }
             #[cfg(feature = "uuid-0_8")]
-            (ParameterizedValue::Array(values), &PostgresType::UUID_ARRAY) => {
+            (Value::Array(values), &PostgresType::UUID_ARRAY) => {
                 let parsed_uuid: Vec<Uuid> = values
                     .into_iter()
                     .filter_map(|v| v.to_string().and_then(|v| v.parse().ok()))
                     .collect();
                 parsed_uuid.to_sql(ty, out)
             }
-            (ParameterizedValue::Text(string), &PostgresType::INET)
-            | (ParameterizedValue::Text(string), &PostgresType::CIDR) => {
+            (Value::Text(string), &PostgresType::INET) | (Value::Text(string), &PostgresType::CIDR) => {
                 let parsed_ip_addr: std::net::IpAddr = string.parse()?;
                 parsed_ip_addr.to_sql(ty, out)
             }
-            (ParameterizedValue::Array(values), &PostgresType::INET_ARRAY)
-            | (ParameterizedValue::Array(values), &PostgresType::CIDR_ARRAY) => {
+            (Value::Array(values), &PostgresType::INET_ARRAY) | (Value::Array(values), &PostgresType::CIDR_ARRAY) => {
                 let parsed_ip_addr: Vec<std::net::IpAddr> = values
                     .into_iter()
                     .filter_map(|v| v.to_string().and_then(|s| s.parse().ok()))
                     .collect();
                 parsed_ip_addr.to_sql(ty, out)
             }
-            (ParameterizedValue::Text(string), &PostgresType::JSON)
-            | (ParameterizedValue::Text(string), &PostgresType::JSONB) => {
+            (Value::Text(string), &PostgresType::JSON) | (Value::Text(string), &PostgresType::JSONB) => {
                 serde_json::from_str::<serde_json::Value>(&string)?.to_sql(ty, out)
             }
-            (ParameterizedValue::Text(string), &PostgresType::BIT)
-            | (ParameterizedValue::Text(string), &PostgresType::VARBIT) => {
+            (Value::Text(string), &PostgresType::BIT) | (Value::Text(string), &PostgresType::VARBIT) => {
                 let bits: BitVec = string_to_bits(string)?;
 
                 bits.to_sql(ty, out)
             }
-            (ParameterizedValue::Text(string), _) => string.to_sql(ty, out),
-            (ParameterizedValue::Array(values), &PostgresType::BIT_ARRAY)
-            | (ParameterizedValue::Array(values), &PostgresType::VARBIT_ARRAY) => {
+            (Value::Text(string), _) => string.to_sql(ty, out),
+            (Value::Array(values), &PostgresType::BIT_ARRAY) | (Value::Array(values), &PostgresType::VARBIT_ARRAY) => {
                 let bitvecs: Vec<BitVec> = values
                     .into_iter()
                     .filter_map(|val| val.as_str().map(|s| string_to_bits(s)))
@@ -584,31 +553,31 @@ impl<'a> ToSql for ParameterizedValue<'a> {
 
                 bitvecs.to_sql(ty, out)
             }
-            (ParameterizedValue::Bytes(bytes), _) => bytes.as_ref().to_sql(ty, out),
-            (ParameterizedValue::Enum(string), _) => {
+            (Value::Bytes(bytes), _) => bytes.as_ref().to_sql(ty, out),
+            (Value::Enum(string), _) => {
                 out.extend_from_slice(string.as_bytes());
                 Ok(IsNull::No)
             }
-            (ParameterizedValue::Boolean(boo), _) => boo.to_sql(ty, out),
-            (ParameterizedValue::Char(c), _) => (*c as i8).to_sql(ty, out),
+            (Value::Boolean(boo), _) => boo.to_sql(ty, out),
+            (Value::Char(c), _) => (*c as i8).to_sql(ty, out),
             #[cfg(feature = "array")]
-            (ParameterizedValue::Array(vec), _) => vec.to_sql(ty, out),
+            (Value::Array(vec), _) => vec.to_sql(ty, out),
             #[cfg(feature = "json-1")]
-            (ParameterizedValue::Json(value), _) => value.to_sql(ty, out),
+            (Value::Json(value), _) => value.to_sql(ty, out),
             #[cfg(feature = "uuid-0_8")]
-            (ParameterizedValue::Uuid(value), _) => value.to_sql(ty, out),
+            (Value::Uuid(value), _) => value.to_sql(ty, out),
             #[cfg(feature = "chrono-0_4")]
-            (ParameterizedValue::DateTime(value), &PostgresType::DATE) => value.date().naive_utc().to_sql(ty, out),
+            (Value::DateTime(value), &PostgresType::DATE) => value.date().naive_utc().to_sql(ty, out),
             #[cfg(feature = "chrono-0_4")]
-            (ParameterizedValue::DateTime(value), &PostgresType::TIME) => value.time().to_sql(ty, out),
-            (ParameterizedValue::DateTime(value), &PostgresType::TIMETZ) => {
+            (Value::DateTime(value), &PostgresType::TIME) => value.time().to_sql(ty, out),
+            (Value::DateTime(value), &PostgresType::TIMETZ) => {
                 let result = value.time().to_sql(ty, out)?;
                 // We assume UTC. see https://www.postgresql.org/docs/9.5/datatype-datetime.html
                 out.extend_from_slice(&[0; 4]);
                 Ok(result)
             }
             #[cfg(feature = "chrono-0_4")]
-            (ParameterizedValue::DateTime(value), _) => value.naive_utc().to_sql(ty, out),
+            (Value::DateTime(value), _) => value.naive_utc().to_sql(ty, out),
         }
     }
 

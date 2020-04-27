@@ -8,7 +8,7 @@ use tokio::time::timeout;
 use url::Url;
 
 use crate::{
-    ast::{ParameterizedValue, Query},
+    ast::{Query, Value},
     connector::{metrics, queryable::*, ResultSet, DBIO},
     error::{Error, ErrorKind},
     visitor::{self, Visitor},
@@ -275,7 +275,7 @@ impl Queryable for Mysql {
         DBIO::new(async move { self.execute_raw(&sql, &params).await })
     }
 
-    fn query_raw<'a>(&'a self, sql: &'a str, params: &'a [ParameterizedValue]) -> DBIO<'a, ResultSet> {
+    fn query_raw<'a>(&'a self, sql: &'a str, params: &'a [Value]) -> DBIO<'a, ResultSet> {
         metrics::query("mysql.query_raw", sql, params, move || async move {
             let conn = self.get_conn().await?;
             let results = self
@@ -307,7 +307,7 @@ impl Queryable for Mysql {
         })
     }
 
-    fn execute_raw<'a>(&'a self, sql: &'a str, params: &'a [ParameterizedValue<'a>]) -> DBIO<'a, u64> {
+    fn execute_raw<'a>(&'a self, sql: &'a str, params: &'a [Value<'a>]) -> DBIO<'a, u64> {
         metrics::query("mysql.execute_raw", sql, params, move || async move {
             let conn = self.get_conn().await?;
             let results = self
@@ -471,7 +471,7 @@ VALUES (1, 'Joe', 27, 20000.00 );
 
         assert_eq!(
             roundtripped.into_single().unwrap().at(0).unwrap(),
-            &ParameterizedValue::Bytes(blob.as_slice().into())
+            &Value::Bytes(blob.as_slice().into())
         );
     }
 
@@ -506,11 +506,11 @@ VALUES (1, 'Joe', 27, 20000.00 );
 
         assert_eq!(
             rows.get(0).unwrap().at(1),
-            Some(&ParameterizedValue::DateTime("1970-01-01T20:12:22Z".parse().unwrap()))
+            Some(&Value::DateTime("1970-01-01T20:12:22Z".parse().unwrap()))
         );
         assert_eq!(
             rows.get(1).unwrap().at(1),
-            Some(&ParameterizedValue::DateTime("1970-01-01T14:40:22Z".parse().unwrap()))
+            Some(&Value::DateTime("1970-01-01T14:40:22Z".parse().unwrap()))
         );
     }
 
@@ -545,15 +545,11 @@ VALUES (1, 'Joe', 27, 20000.00 );
 
         assert_eq!(
             rows.get(0).unwrap().at(1),
-            Some(&ParameterizedValue::DateTime(
-                "2020-03-15T20:12:22.003Z".parse().unwrap()
-            ))
+            Some(&Value::DateTime("2020-03-15T20:12:22.003Z".parse().unwrap()))
         );
         assert_eq!(
             rows.get(1).unwrap().at(1),
-            Some(&ParameterizedValue::DateTime(
-                "2003-03-01T13:10:35.789Z".parse().unwrap()
-            ))
+            Some(&Value::DateTime("2003-03-01T13:10:35.789Z".parse().unwrap()))
         );
     }
 
@@ -707,12 +703,12 @@ VALUES (1, 'Joe', 27, 20000.00 );
 
         assert_eq!(
             result.get(0).unwrap().get("gb18030").unwrap(),
-            &ParameterizedValue::Text("法式咸派".into())
+            &Value::Text("法式咸派".into())
         );
 
         assert_eq!(
             result.get(1).unwrap().get("gb18030").unwrap(),
-            &ParameterizedValue::Text("土豆".into())
+            &Value::Text("土豆".into())
         );
     }
 
@@ -775,10 +771,7 @@ VALUES (1, 'Joe', 27, 20000.00 );
         let conn = Quaint::new(&CONN_STR).await.unwrap();
         let result = conn.query_raw("SELECT SUM(1) AS THEONE", &[]).await.unwrap();
 
-        assert_eq!(
-            result.into_single().unwrap()[0],
-            ParameterizedValue::Real("1.0".parse().unwrap())
-        );
+        assert_eq!(result.into_single().unwrap()[0], Value::Real("1.0".parse().unwrap()));
     }
 
     #[tokio::test]

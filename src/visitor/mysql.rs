@@ -6,14 +6,14 @@ use std::fmt::{self, Write};
 /// The returned parameter values can be used directly with the mysql crate.
 pub struct Mysql<'a> {
     query: String,
-    parameters: Vec<ParameterizedValue<'a>>,
+    parameters: Vec<Value<'a>>,
 }
 
 impl<'a> Visitor<'a> for Mysql<'a> {
     const C_BACKTICK: &'static str = "`";
     const C_WILDCARD: &'static str = "%";
 
-    fn build<Q>(query: Q) -> (String, Vec<ParameterizedValue<'a>>)
+    fn build<Q>(query: Q) -> (String, Vec<Value<'a>>)
     where
         Q: Into<Query<'a>>,
     {
@@ -73,15 +73,11 @@ impl<'a> Visitor<'a> for Mysql<'a> {
         self.write("?")
     }
 
-    fn add_parameter(&mut self, value: ParameterizedValue<'a>) {
+    fn add_parameter(&mut self, value: Value<'a>) {
         self.parameters.push(value);
     }
 
-    fn visit_limit_and_offset(
-        &mut self,
-        limit: Option<ParameterizedValue<'a>>,
-        offset: Option<ParameterizedValue<'a>>,
-    ) -> fmt::Result {
+    fn visit_limit_and_offset(&mut self, limit: Option<Value<'a>>, offset: Option<Value<'a>>) -> fmt::Result {
         match (limit, offset) {
             (Some(limit), Some(offset)) => {
                 self.write(" LIMIT ")?;
@@ -90,10 +86,10 @@ impl<'a> Visitor<'a> for Mysql<'a> {
                 self.write(" OFFSET ")?;
                 self.visit_parameterized(offset)
             }
-            (None, Some(ParameterizedValue::Integer(offset))) if offset < 1 => Ok(()),
+            (None, Some(Value::Integer(offset))) if offset < 1 => Ok(()),
             (None, Some(offset)) => {
                 self.write(" LIMIT ")?;
-                self.visit_parameterized(ParameterizedValue::from(9_223_372_036_854_775_807i64))?;
+                self.visit_parameterized(Value::from(9_223_372_036_854_775_807i64))?;
 
                 self.write(" OFFSET ")?;
                 self.visit_parameterized(offset)
@@ -116,14 +112,14 @@ impl<'a> Visitor<'a> for Mysql<'a> {
 mod tests {
     use crate::visitor::*;
 
-    fn expected_values<'a, T>(sql: &'static str, params: Vec<T>) -> (String, Vec<ParameterizedValue<'a>>)
+    fn expected_values<'a, T>(sql: &'static str, params: Vec<T>) -> (String, Vec<Value<'a>>)
     where
-        T: Into<ParameterizedValue<'a>>,
+        T: Into<Value<'a>>,
     {
         (String::from(sql), params.into_iter().map(|p| p.into()).collect())
     }
 
-    fn default_params<'a>(mut additional: Vec<ParameterizedValue<'a>>) -> Vec<ParameterizedValue<'a>> {
+    fn default_params<'a>(mut additional: Vec<Value<'a>>) -> Vec<Value<'a>> {
         let mut result = Vec::new();
 
         for param in additional.drain(0..) {
@@ -211,10 +207,10 @@ mod tests {
         assert_eq!(expected_sql, sql);
         assert_eq!(
             vec![
-                ParameterizedValue::Integer(1),
-                ParameterizedValue::Integer(2),
-                ParameterizedValue::Integer(3),
-                ParameterizedValue::Integer(4),
+                Value::Integer(1),
+                Value::Integer(2),
+                Value::Integer(3),
+                Value::Integer(4),
             ],
             params
         );
