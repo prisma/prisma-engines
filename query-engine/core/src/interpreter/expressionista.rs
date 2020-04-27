@@ -317,7 +317,6 @@ impl Expressionista {
     ) -> InterpretationResult<Expression> {
         // if the subgraphs all point to the same result node, we fold them in sequence
         // if not, we can separate them with a getfirstnonempty
-
         let bindings: Vec<Binding> = result_subgraphs
             .into_iter()
             .map(|(_, node)| {
