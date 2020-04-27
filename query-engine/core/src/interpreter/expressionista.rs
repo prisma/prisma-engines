@@ -38,7 +38,6 @@ impl Expressionista {
         node: &NodeRef,
         parent_edges: Vec<EdgeRef>,
     ) -> InterpretationResult<Expression> {
-        dbg!("Entering node: ", &node);
         // Child edges are ordered, evaluation order is low to high in the graph, unless other rules override.
         let mut direct_children = graph.direct_child_pairs(&node);
 
@@ -59,14 +58,10 @@ impl Expressionista {
         result_positions.sort();
         result_positions.reverse();
 
-        dbg!(&direct_children);
-
         let result_subgraphs: Vec<(EdgeRef, NodeRef)> = result_positions
             .into_iter()
             .map(|pos| direct_children.remove(pos))
             .collect();
-
-        dbg!(&result_subgraphs);
 
         // Because we split from right to left, everything remaining in `direct_children`
         // doesn't belong into results, and is executed before all result scopes.
@@ -335,33 +330,27 @@ impl Expressionista {
             .collect::<InterpretationResult<Vec<Binding>>>()?;
 
         let result_binding_names = bindings.iter().map(|b| b.name.clone()).collect();
+        let result_nodes = graph.result_nodes();
 
-        // bindings.into_iter().fold(|| );
+        if result_nodes.len() == 1 {
+            let mut exprs: VecDeque<Expression> = bindings
+                .into_iter()
+                .map(|binding| Expression::Let {
+                    bindings: vec![binding],
+                    expressions: vec![],
+                })
+                .collect();
 
-        let mut exprs: VecDeque<Expression> = bindings
-            .into_iter()
-            .map(|binding| Expression::Let {
-                bindings: vec![binding],
-                expressions: vec![],
-            })
-            .collect();
-
-        // exprs.reverse();
-
-        if exprs.len() > 1 {
-            // Last expression gets a GetFirstNonEmpty to conclude the chain
-            if let Some(Expression::Let {
-                bindings: _,
-                expressions,
-            }) = exprs.back_mut()
-            {
-                expressions.push(Expression::GetFirstNonEmpty {
-                    binding_names: result_binding_names,
+            if let Some(Expression::Let { bindings, expressions }) = exprs.back_mut() {
+                expressions.push(Expression::Get {
+                    binding_name: bindings
+                        .last()
+                        .map(|b| b.name.clone())
+                        .expect("Expected let binding to have at least one expr."),
                 })
             }
 
             let first = exprs.pop_front().unwrap();
-
             let folded = exprs.into_iter().fold(first, |mut acc, next| {
                 if let Expression::Let {
                     bindings: _,
@@ -375,15 +364,13 @@ impl Expressionista {
             });
 
             Ok(folded)
-
-        // Ok(Expression::Let {
-        //     bindings,
-        //     expressions: vec![Expression::GetFirstNonEmpty {
-        //         binding_names: result_binding_names,
-        //     }],
-        // })
         } else {
-            Ok(exprs.pop_front().unwrap())
+            Ok(Expression::Let {
+                bindings,
+                expressions: vec![Expression::GetFirstNonEmpty {
+                    binding_names: result_binding_names,
+                }],
+            })
         }
     }
 }

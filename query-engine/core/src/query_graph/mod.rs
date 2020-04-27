@@ -216,6 +216,25 @@ impl QueryGraph {
         after_graph_completion(self)
     }
 
+    /// Returns a NodeRef to the result node that occurs in the subtree, if it exists.
+    /// Returns None if no such node is found.
+    pub fn find_result_node(&self, starting_node: &NodeRef) -> Option<NodeRef> {
+        if self.is_result_node(starting_node) {
+            Some(starting_node.clone())
+        } else {
+            todo!()
+        }
+    }
+
+    pub fn result_nodes(&self) -> Vec<NodeRef> {
+        self.result_nodes
+            .iter()
+            .map(|node_ix| NodeRef {
+                node_ix: node_ix.clone(),
+            })
+            .collect()
+    }
+
     /// Adds a result node to the graph.
     pub fn add_result_node(&mut self, node: &NodeRef) {
         self.result_nodes.push(node.node_ix.clone());
