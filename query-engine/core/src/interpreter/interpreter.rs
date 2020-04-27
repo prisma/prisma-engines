@@ -92,7 +92,7 @@ impl ExpressionResult {
     }
 }
 
-#[derive(Default, Clone)]
+#[derive(Default, Debug, Clone)]
 pub struct Env {
     env: HashMap<String, ExpressionResult>,
 }
