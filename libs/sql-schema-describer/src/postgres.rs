@@ -228,7 +228,7 @@ impl SqlSchemaDescriber {
                             ColumnTypeFamily::String => {
                                 match unsuffix_default_literal(&default_string, &data_type, &full_data_type) {
                                     Some(default_literal) => {
-                                        DefaultValue::VALUE(PrismaValue::String(unquote_string(default_literal.into())))
+                                        DefaultValue::VALUE(PrismaValue::String(default_literal.into()))
                                     }
                                     None => DefaultValue::DBGENERATED(default_string),
                                 }
@@ -700,10 +700,12 @@ fn is_autoincrement(value: &str, schema_name: &str, table_name: &str, column_nam
 }
 
 fn unsuffix_default_literal<'a>(literal: &'a str, data_type: &str, full_data_type: &str) -> Option<&'a str> {
-    static POSTGRES_STRING_DEFAULT_RE: Lazy<regex::Regex> = Lazy::new(|| regex::Regex::new(r#"^B?'(.*)'$"#).unwrap());
+    dbg!(literal);
+    const POSTGRES_STRING_DEFAULT_RE: Lazy<regex::Regex> =
+        Lazy::new(|| regex::Regex::new(r#"(?ms)^B?'(.*)'$"#).unwrap());
 
-    static POSTGRES_DATA_TYPE_SUFFIX_RE: Lazy<regex::Regex> =
-        Lazy::new(|| regex::Regex::new(r#"(.*)::(\\")?(.*)(\\")?$"#).unwrap());
+    const POSTGRES_DATA_TYPE_SUFFIX_RE: Lazy<regex::Regex> =
+        Lazy::new(|| regex::Regex::new(r#"(?ms)^(.*)::(\\")?(.*)(\\")?$"#).unwrap());
 
     let captures = POSTGRES_DATA_TYPE_SUFFIX_RE.captures(literal)?;
     let suffix = captures.get(3).unwrap().as_str();
@@ -714,9 +716,9 @@ fn unsuffix_default_literal<'a>(literal: &'a str, data_type: &str, full_data_typ
 
     let raw = captures.get(1).unwrap().as_str();
 
-    let captures = POSTGRES_STRING_DEFAULT_RE.captures(raw)?;
+    let captures = dbg!(POSTGRES_STRING_DEFAULT_RE.captures(raw))?;
 
-    Some(captures.get(1).unwrap().as_str())
+    dbg!(Some(captures.get(1).unwrap().as_str()))
 }
 
 #[cfg(test)]

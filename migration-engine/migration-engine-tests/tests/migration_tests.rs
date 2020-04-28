@@ -1459,14 +1459,13 @@ async fn column_defaults_must_be_migrated(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector]
+#[test_each_connector(log = "debug")]
 async fn escaped_string_defaults_are_not_arbitrarily_migrated(api: &TestApi) -> TestResult {
     use quaint::ast::*;
 
     let dm1 = r#"
         model Fruit {
             id String @id @default(cuid())
-            name String @default("ba\0nana")
             seasonality String @default("\"summer\"")
             contains String @default("'potassium'")
             sideNames String @default("top\ndown")
@@ -1481,7 +1480,6 @@ async fn escaped_string_defaults_are_not_arbitrarily_migrated(api: &TestApi) -> 
 
     let insert = Insert::single_into(api.render_table_name("Fruit"))
         .value("id", "apple-id")
-        .value("name", "apple")
         .value("sideNames", "stem and the other one")
         .value("contains", "'vitamin C'")
         .value("seasonality", "september");
@@ -1496,20 +1494,8 @@ async fn escaped_string_defaults_are_not_arbitrarily_migrated(api: &TestApi) -> 
     let table = sql_schema.table_bang("Fruit");
 
     assert_eq!(
-        table.column("name").and_then(|c| c.default.clone()),
-        Some(if api.is_mysql() && !api.connector_name().contains("mariadb") {
-            DefaultValue::VALUE(PrismaValue::String("ba\u{0}nana".to_string()))
-        } else {
-            DefaultValue::VALUE(PrismaValue::String("ba\0nana".to_string()))
-        })
-    );
-    assert_eq!(
         table.column("sideNames").and_then(|c| c.default.clone()),
-        Some(if api.is_mysql() && !api.connector_name().contains("mariadb") {
-            DefaultValue::VALUE(PrismaValue::String("top\ndown".to_string()))
-        } else {
-            DefaultValue::VALUE(PrismaValue::String("top\ndown".to_string()))
-        })
+        Some(DefaultValue::VALUE(PrismaValue::String("top\ndown".to_string())))
     );
     assert_eq!(
         table.column("contains").and_then(|c| c.default.clone()),

@@ -32,20 +32,7 @@ pub(crate) trait SqlRenderer {
 
     fn render_references(&self, schema_name: &str, foreign_key: &ForeignKey) -> String;
 
-    fn render_default<'a>(&self, default: &'a DefaultValue, family: &ColumnTypeFamily) -> Cow<'a, str> {
-        match (default, family) {
-            (DefaultValue::DBGENERATED(val), _) => val.as_str().into(),
-            (DefaultValue::VALUE(PrismaValue::String(val)), ColumnTypeFamily::String)
-            | (DefaultValue::VALUE(PrismaValue::Enum(val)), ColumnTypeFamily::Enum(_)) => {
-                dbg!(format!("'{}'", escape_quotes(&val))).into()
-            }
-            (DefaultValue::NOW, ColumnTypeFamily::DateTime) => "CURRENT_TIMESTAMP".into(),
-            (DefaultValue::NOW, _) => unreachable!("NOW default on non-datetime column"),
-            (DefaultValue::VALUE(val), ColumnTypeFamily::DateTime) => format!("'{}'", val).into(),
-            (DefaultValue::VALUE(val), _) => format!("{}", val).into(),
-            (DefaultValue::SEQUENCE(_), _) => todo!("rendering of sequence defaults"),
-        }
-    }
+    fn render_default<'a>(&self, default: &'a DefaultValue, family: &ColumnTypeFamily) -> Cow<'a, str>;
 
     fn sql_family(&self) -> SqlFamily;
 }

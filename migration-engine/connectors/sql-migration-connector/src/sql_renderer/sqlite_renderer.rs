@@ -1,6 +1,8 @@
 use super::common::*;
 use crate::{sql_schema_helpers::*, SqlFamily};
+use prisma_models::PrismaValue;
 use sql_schema_describer::*;
+use std::{borrow::Cow, fmt::Write as _};
 
 pub struct SqliteRenderer;
 
@@ -46,6 +48,21 @@ impl super::SqlRenderer for SqliteRenderer {
             referenced_fields = referenced_fields,
             on_delete_action = render_on_delete(&foreign_key.on_delete_action)
         )
+    }
+
+    fn render_default<'a>(&self, default: &'a DefaultValue, family: &ColumnTypeFamily) -> Cow<'a, str> {
+        match (default, family) {
+            (DefaultValue::DBGENERATED(val), _) => val.as_str().into(),
+            (DefaultValue::VALUE(PrismaValue::String(val)), ColumnTypeFamily::String)
+            | (DefaultValue::VALUE(PrismaValue::Enum(val)), ColumnTypeFamily::Enum(_)) => {
+                format!("'{}'", super::escape_quotes(&val)).into()
+            }
+            (DefaultValue::NOW, ColumnTypeFamily::DateTime) => "CURRENT_TIMESTAMP".into(),
+            (DefaultValue::NOW, _) => unreachable!("NOW default on non-datetime column"),
+            (DefaultValue::VALUE(val), ColumnTypeFamily::DateTime) => format!("'{}'", val).into(),
+            (DefaultValue::VALUE(val), _) => format!("{}", val).into(),
+            (DefaultValue::SEQUENCE(_), _) => todo!("rendering of sequence defaults"),
+        }
     }
 }
 
