@@ -7,6 +7,7 @@ use crate::{
     error::{Error, ErrorKind},
     visitor::{self, Visitor},
 };
+use futures::future;
 use rusqlite::NO_PARAMS;
 use std::{collections::HashSet, convert::TryFrom, path::Path, time::Duration};
 use tokio::sync::Mutex;
@@ -201,6 +202,10 @@ impl Queryable for Sqlite {
             client.execute_batch(cmd)?;
             Ok(())
         })
+    }
+
+    fn version<'a>(&'a self) -> DBIO<'a, Option<String>> {
+        DBIO::new(future::ready(Ok(Some(rusqlite::version().into()))))
     }
 }
 

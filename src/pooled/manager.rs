@@ -40,6 +40,10 @@ impl Queryable for PooledConnection {
     fn raw_cmd<'a>(&'a self, cmd: &'a str) -> DBIO<'a, ()> {
         self.inner.raw_cmd(cmd)
     }
+
+    fn version<'a>(&'a self) -> DBIO<'a, Option<String>> {
+        self.inner.version()
+    }
 }
 
 #[doc(hidden)]

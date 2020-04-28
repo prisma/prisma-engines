@@ -51,4 +51,8 @@ impl<'a> Queryable for Transaction<'a> {
     fn raw_cmd<'b>(&'b self, cmd: &'b str) -> DBIO<'b, ()> {
         self.inner.raw_cmd(cmd)
     }
+
+    fn version<'b>(&'b self) -> DBIO<'b, Option<String>> {
+        self.inner.version()
+    }
 }

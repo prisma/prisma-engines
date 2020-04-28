@@ -163,4 +163,8 @@ impl Queryable for Quaint {
     fn raw_cmd<'a>(&'a self, cmd: &'a str) -> DBIO<'a, ()> {
         DBIO::new(async move { self.inner.lock().await.raw_cmd(cmd).await })
     }
+
+    fn version<'a>(&'a self) -> DBIO<'a, Option<String>> {
+        DBIO::new(async move { self.inner.lock().await.version().await })
+    }
 }
