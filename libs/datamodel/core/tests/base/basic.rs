@@ -85,3 +85,21 @@ fn must_error_for_invalid_model_names() {
         Span::new(5, 52),
     ));
 }
+
+#[test]
+fn must_return_good_error_messages_for_numbers_in_enums() {
+    let dml = r#"
+    enum MyEnum {
+        1
+        TWO
+        THREE
+    }
+    "#;
+
+    let errors = parse_error(dml);
+    errors.assert_is(DatamodelError::new_enum_validation_error(
+        "The enum value `1` is not valid. Enum values must not start with a number.",
+        "MyEnum",
+        Span::new(27, 28),
+    ));
+}

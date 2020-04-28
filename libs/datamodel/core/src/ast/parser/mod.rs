@@ -296,11 +296,11 @@ fn parse_enum(token: &pest::iterators::Pair<'_, Rule>) -> Result<Enum, ErrorColl
         Rule::identifier => name = Some(current.to_id()),
         Rule::block_level_directive => directives.push(parse_directive(&current)),
         Rule::enum_field_declaration => {
-        match parse_enum_value(&current) {
-            Ok(enum_value) => values.push(enum_value),
-            Err(err) => errors.push(err)
-        }
-    },
+            match parse_enum_value(&name.as_ref().unwrap().name, &current) {
+                Ok(enum_value) => values.push(enum_value),
+                Err(err) => errors.push(err)
+            }
+        },
         Rule::doc_comment => comments.push(parse_doc_comment(&current)),
         _ => unreachable!("Encountered impossible enum declaration during parsing: {:?}", current.tokens())
     }
@@ -323,7 +323,7 @@ fn parse_enum(token: &pest::iterators::Pair<'_, Rule>) -> Result<Enum, ErrorColl
 }
 
 // Enum value parsing
-fn parse_enum_value(token: &pest::iterators::Pair<'_, Rule>) -> Result<EnumValue, DatamodelError> {
+fn parse_enum_value(enum_name: &str, token: &pest::iterators::Pair<'_, Rule>) -> Result<EnumValue, DatamodelError> {
     let mut name: Option<Identifier> = None;
     let mut directives: Vec<Directive> = vec![];
 
@@ -331,7 +331,14 @@ fn parse_enum_value(token: &pest::iterators::Pair<'_, Rule>) -> Result<EnumValue
     match_children! { token, current,
         Rule::identifier => name = Some(current.to_id()),
         Rule::directive => directives.push(parse_directive(&current)),
-        _ => unreachable!("Encountered impossible enum declaration during parsing: {:?}", current.tokens())
+        Rule::number => {
+            return Err(DatamodelError::new_enum_validation_error(
+                &format!("The enum value `{}` is not valid. Enum values must not start with a number.", current.as_str()),
+                enum_name,
+                Span::from_pest(token.as_span()))
+            );
+        },
+        _ => unreachable!("Encountered impossible enum value declaration during parsing: {:?}", current.tokens())
     }
 
     match name {
@@ -342,7 +349,7 @@ fn parse_enum_value(token: &pest::iterators::Pair<'_, Rule>) -> Result<EnumValue
             commented_out: false,
         }),
         _ => panic!(
-            "Encountered impossible enum declaration during parsing, name is missing: {:?}",
+            "Encountered impossible enum value declaration during parsing, name is missing: {:?}",
             token.as_str()
         ),
     }
@@ -559,6 +566,7 @@ fn rule_to_string(rule: Rule) -> &'static str {
         Rule::string_any => "any character",
         Rule::string_escaped_interpolation => "string interpolation",
         Rule::doc_comment => "documentation comment",
+        Rule::number => "number",
 
         // Those are helpers, so we get better error messages:
         Rule::BLOCK_OPEN => "Start of block (\"{\")",
