@@ -1990,7 +1990,7 @@ dependencies = [
 [[package]]
 name = "quaint"
 version = "0.2.0-alpha.11"
-source = "git+https://github.com/prisma/quaint#8a9c18c08ca426ce8cd1bc5a439d4609bd70800f"
+source = "git+https://github.com/prisma/quaint#fff44f1102750ce433136909659822598f71a0ec"
 dependencies = [
  "async-trait",
  "base64 0.11.0",
