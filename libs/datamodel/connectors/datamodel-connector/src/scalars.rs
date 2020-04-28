@@ -33,7 +33,7 @@ impl ToString for ScalarType {
             ScalarType::Boolean => String::from("Boolean"),
             ScalarType::String => String::from("String"),
             ScalarType::DateTime => String::from("DateTime"),
-            ScalarType::Json => String::from("DateTime"),
+            ScalarType::Json => String::from("Json"),
         }
     }
 }

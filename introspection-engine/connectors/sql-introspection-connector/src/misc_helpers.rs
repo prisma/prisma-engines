@@ -307,7 +307,7 @@ pub(crate) fn calculate_scalar_field_type(column: &Column) -> FieldType {
         ColumnTypeFamily::String => FieldType::Base(ScalarType::String, None),
         ColumnTypeFamily::Enum(name) => FieldType::Enum(name.clone()),
         ColumnTypeFamily::Uuid => FieldType::Base(ScalarType::String, None),
-        ColumnTypeFamily::Json => FieldType::Base(ScalarType::String, None),
+        ColumnTypeFamily::Json => FieldType::Base(ScalarType::Json, None),
         x => FieldType::Unsupported(x.to_string()),
     }
 }
