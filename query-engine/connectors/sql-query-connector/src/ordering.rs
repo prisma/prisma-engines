@@ -2,7 +2,7 @@ use connector_interface::OrderDirections;
 use prisma_models::*;
 use quaint::ast::*;
 
-pub type OrderVec<'a> = Vec<(DatabaseValue<'a>, Option<Order>)>;
+pub type OrderVec<'a> = Vec<(Expression<'a>, Option<Order>)>;
 
 pub struct Ordering;
 

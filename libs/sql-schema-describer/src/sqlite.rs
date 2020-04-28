@@ -1,7 +1,7 @@
 //! SQLite description.
 use super::*;
 use failure::_core::convert::TryInto;
-use quaint::{ast::ParameterizedValue, prelude::Queryable};
+use quaint::{ast::Value, prelude::Queryable};
 use std::collections::HashMap;
 use std::sync::Arc;
 use tracing::debug;
@@ -145,8 +145,8 @@ impl SqlSchemaDescriber {
 
                 let default = match row.get("dflt_value") {
                     None => None,
-                    Some(ParameterizedValue::Null) => None,
-                    Some(ParameterizedValue::Text(cow_string)) => {
+                    Some(Value::Null) => None,
+                    Some(Value::Text(cow_string)) => {
                         let default_string = cow_string.to_string();
 
                         if default_string.to_lowercase() == "null" {
