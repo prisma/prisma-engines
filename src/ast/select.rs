@@ -16,7 +16,10 @@ pub struct Select<'a> {
 
 impl<'a> From<Select<'a>> for Expression<'a> {
     fn from(sel: Select<'a>) -> Expression<'a> {
-        Expression::Select(Box::new(sel))
+        Expression {
+            kind: ExpressionKind::Select(Box::new(sel)),
+            alias: None,
+        }
     }
 }
 

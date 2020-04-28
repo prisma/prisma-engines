@@ -1,3 +1,4 @@
+use super::ExpressionKind;
 use crate::ast::{Column, ConditionTree, Expression};
 use std::borrow::Cow;
 
@@ -50,7 +51,10 @@ impl<'a> From<Compare<'a>> for ConditionTree<'a> {
 
 impl<'a> From<Compare<'a>> for Expression<'a> {
     fn from(cmp: Compare<'a>) -> Self {
-        Expression::Compare(cmp)
+        Expression {
+            kind: ExpressionKind::Compare(cmp),
+            alias: None,
+        }
     }
 }
 

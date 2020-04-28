@@ -312,25 +312,33 @@ pub trait Visitor<'a> {
 
     /// A visit to a value used in an expression
     fn visit_expression(&mut self, value: Expression<'a>) -> fmt::Result {
-        match value {
-            Expression::Value(value) => self.visit_expression(*value),
-            Expression::ConditionTree(tree) => self.visit_conditions(tree),
-            Expression::Compare(compare) => self.visit_compare(compare),
-            Expression::Parameterized(val) => self.visit_parameterized(val),
-            Expression::Column(column) => self.visit_column(*column),
-            Expression::Row(row) => self.visit_row(row),
-            Expression::Select(select) => self.surround_with("(", ")", |ref mut s| s.visit_select(*select)),
-            Expression::Function(function) => self.visit_function(function),
-            Expression::Op(op) => self.visit_operation(*op),
-            Expression::Values(values) => self.visit_values(*values),
-            Expression::Asterisk(table) => match table {
+        match value.kind {
+            ExpressionKind::Value(value) => self.visit_expression(*value)?,
+            ExpressionKind::ConditionTree(tree) => self.visit_conditions(tree)?,
+            ExpressionKind::Compare(compare) => self.visit_compare(compare)?,
+            ExpressionKind::Parameterized(val) => self.visit_parameterized(val)?,
+            ExpressionKind::Column(column) => self.visit_column(*column)?,
+            ExpressionKind::Row(row) => self.visit_row(row)?,
+            ExpressionKind::Select(select) => self.surround_with("(", ")", |ref mut s| s.visit_select(*select))?,
+            ExpressionKind::Function(function) => self.visit_function(function)?,
+            ExpressionKind::Op(op) => self.visit_operation(*op)?,
+            ExpressionKind::Values(values) => self.visit_values(*values)?,
+            ExpressionKind::Asterisk(table) => match table {
                 Some(table) => {
                     self.visit_table(*table, false)?;
-                    self.write(".*")
+                    self.write(".*")?
                 }
-                None => self.write("*"),
+                None => self.write("*")?,
             },
         }
+
+        if let Some(alias) = value.alias {
+            self.write(" AS ")?;
+
+            self.delimited_identifiers(&[&*alias])?;
+        };
+
+        Ok(())
     }
 
     fn visit_values(&mut self, values: Values<'a>) -> fmt::Result {
@@ -477,9 +485,38 @@ pub trait Visitor<'a> {
                 self.visit_expression(*right)
             }
             Compare::In(left, right) => match (*left, *right) {
-                (_, Expression::Row(ref row)) if row.is_empty() => self.write("1=0"),
-                (Expression::Row(_), Expression::Values(ref vals)) if vals.row_len() == 0 => self.write("1=0"),
-                (Expression::Row(mut cols), Expression::Values(vals)) if cols.len() == 1 && vals.row_len() == 1 => {
+                // To prevent `x IN ()` from happening.
+                (
+                    _,
+                    Expression {
+                        kind: ExpressionKind::Row(ref row),
+                        ..
+                    },
+                ) if row.is_empty() => self.write("1=0"),
+
+                // To prevent `x IN ()` from happening.
+                (
+                    Expression {
+                        kind: ExpressionKind::Row(_),
+                        ..
+                    },
+                    Expression {
+                        kind: ExpressionKind::Values(ref vals),
+                        ..
+                    },
+                ) if vals.row_len() == 0 => self.write("1=0"),
+
+                // Flattening out a row.
+                (
+                    Expression {
+                        kind: ExpressionKind::Row(mut cols),
+                        ..
+                    },
+                    Expression {
+                        kind: ExpressionKind::Values(vals),
+                        ..
+                    },
+                ) if cols.len() == 1 && vals.row_len() == 1 => {
                     let col = cols.pop().unwrap();
                     let vals = vals.flatten_row().unwrap();
 
@@ -487,21 +524,60 @@ pub trait Visitor<'a> {
                     self.write(" IN ")?;
                     self.visit_row(vals)
                 }
-                (left, Expression::Parameterized(pv)) => {
+
+                // No need to do `IN` if right side is only one value,
+                (
+                    left,
+                    Expression {
+                        kind: ExpressionKind::Parameterized(pv),
+                        ..
+                    },
+                ) => {
                     self.visit_expression(left)?;
                     self.write(" = ")?;
                     self.visit_parameterized(pv)
                 }
-                (left, dbv) => {
+
+                // expr IN (..)
+                (left, right) => {
                     self.visit_expression(left)?;
                     self.write(" IN ")?;
-                    self.visit_expression(dbv)
+                    self.visit_expression(right)
                 }
             },
             Compare::NotIn(left, right) => match (*left, *right) {
-                (_, Expression::Row(ref row)) if row.is_empty() => self.write("1=1"),
-                (Expression::Row(_), Expression::Values(ref vals)) if vals.row_len() == 0 => self.write("1=1"),
-                (Expression::Row(mut cols), Expression::Values(vals)) if cols.len() == 1 && vals.row_len() == 1 => {
+                // To prevent `x NOT IN ()` from happening.
+                (
+                    _,
+                    Expression {
+                        kind: ExpressionKind::Row(ref row),
+                        ..
+                    },
+                ) if row.is_empty() => self.write("1=1"),
+
+                // To prevent `x NOT IN ()` from happening.
+                (
+                    Expression {
+                        kind: ExpressionKind::Row(_),
+                        ..
+                    },
+                    Expression {
+                        kind: ExpressionKind::Values(ref vals),
+                        ..
+                    },
+                ) if vals.row_len() == 0 => self.write("1=1"),
+
+                // Flattening out a row.
+                (
+                    Expression {
+                        kind: ExpressionKind::Row(mut cols),
+                        ..
+                    },
+                    Expression {
+                        kind: ExpressionKind::Values(vals),
+                        ..
+                    },
+                ) if cols.len() == 1 && vals.row_len() == 1 => {
                     let col = cols.pop().unwrap();
                     let vals = vals.flatten_row().unwrap();
 
@@ -509,15 +585,25 @@ pub trait Visitor<'a> {
                     self.write(" NOT IN ")?;
                     self.visit_row(vals)
                 }
-                (left, Expression::Parameterized(pv)) => {
+
+                // No need to do `IN` if right side is only one value,
+                (
+                    left,
+                    Expression {
+                        kind: ExpressionKind::Parameterized(pv),
+                        ..
+                    },
+                ) => {
                     self.visit_expression(left)?;
                     self.write(" <> ")?;
                     self.visit_parameterized(pv)
                 }
-                (left, dbv) => {
+
+                // expr IN (..)
+                (left, right) => {
                     self.visit_expression(left)?;
                     self.write(" NOT IN ")?;
-                    self.visit_expression(dbv)
+                    self.visit_expression(right)
                 }
             },
             Compare::Like(left, right) => {

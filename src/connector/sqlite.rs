@@ -255,6 +255,26 @@ mod tests {
     }
 
     #[tokio::test]
+    async fn test_aliased_value() {
+        let conn = Sqlite::new("db/test.db").unwrap();
+        let query = Select::default().value(val!(1).alias("test"));
+        let rows = conn.select(query).await.unwrap();
+        let row = rows.get(0).unwrap();
+
+        assert_eq!(Value::Integer(1), row["test"]);
+    }
+
+    #[tokio::test]
+    async fn test_aliased_null() {
+        let conn = Sqlite::new("db/test.db").unwrap();
+        let query = Select::default().value(val!(Option::<i64>::None).alias("test"));
+        let rows = conn.select(query).await.unwrap();
+        let row = rows.get(0).unwrap();
+
+        assert_eq!(Value::Null, row["test"]);
+    }
+
+    #[tokio::test]
     async fn tuples_in_selection() {
         let table = r#"
             CREATE TABLE tuples (id SERIAL PRIMARY KEY, age INTEGER NOT NULL, length REAL NOT NULL);

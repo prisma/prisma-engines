@@ -375,6 +375,18 @@ impl<'a> From<&'a [u8]> for Value<'a> {
     }
 }
 
+impl<'a, T> From<Option<T>> for Value<'a>
+where
+    T: Into<Value<'a>>,
+{
+    fn from(opt: Option<T>) -> Self {
+        match opt {
+            Some(value) => value.into(),
+            None => Value::Null,
+        }
+    }
+}
+
 impl<'a> TryFrom<Value<'a>> for i64 {
     type Error = Error;
 

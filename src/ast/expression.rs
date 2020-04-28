@@ -1,9 +1,15 @@
 use crate::ast::*;
 use std::borrow::Cow;
 
+#[derive(Debug, Clone, PartialEq)]
+pub struct Expression<'a> {
+    pub(crate) kind: ExpressionKind<'a>,
+    pub(crate) alias: Option<Cow<'a, str>>,
+}
+
 /// An expression we can compare and use in database queries.
 #[derive(Debug, Clone, PartialEq)]
-pub enum Expression<'a> {
+pub enum ExpressionKind<'a> {
     /// Anything that we must parameterize before querying
     Parameterized(Value<'a>),
     /// A database column
@@ -29,16 +35,11 @@ pub enum Expression<'a> {
 }
 
 /// A quick alias to create an asterisk to a table.
-///
-/// ```rust
-/// # use quaint::ast::*;
-/// assert_eq!(
-///     asterisk(),
-///     Expression::Asterisk(None)
-/// )
-/// ```
 pub fn asterisk() -> Expression<'static> {
-    Expression::Asterisk(None)
+    Expression {
+        kind: ExpressionKind::Asterisk(None),
+        alias: None,
+    }
 }
 
 #[macro_export]
@@ -71,7 +72,10 @@ macro_rules! expression {
     ($kind:ident,$paramkind:ident) => {
         impl<'a> From<$kind<'a>> for Expression<'a> {
             fn from(that: $kind<'a>) -> Self {
-                Expression::$paramkind(that)
+                Expression {
+                    kind: ExpressionKind::$paramkind(that),
+                    alias: None,
+                }
             }
         }
     };
@@ -82,13 +86,19 @@ expression!(Function, Function);
 
 impl<'a> From<Values<'a>> for Expression<'a> {
     fn from(p: Values<'a>) -> Self {
-        Self::Values(Box::new(p))
+        Expression {
+            kind: ExpressionKind::Values(Box::new(p)),
+            alias: None,
+        }
     }
 }
 
 impl<'a> From<SqlOp<'a>> for Expression<'a> {
     fn from(p: SqlOp<'a>) -> Self {
-        Self::Op(Box::new(p))
+        Expression {
+            kind: ExpressionKind::Op(Box::new(p)),
+            alias: None,
+        }
     }
 }
 
@@ -97,7 +107,10 @@ where
     T: Into<Value<'a>>,
 {
     fn from(p: T) -> Self {
-        Expression::Parameterized(p.into())
+        Expression {
+            kind: ExpressionKind::Parameterized(p.into()),
+            alias: None,
+        }
     }
 }
 
@@ -108,6 +121,18 @@ where
     fn from(v: Vec<T>) -> Self {
         let row: Row<'a> = v.into();
         row.into()
+    }
+}
+
+impl<'a> Aliasable<'a> for Expression<'a> {
+    type Target = Expression<'a>;
+
+    fn alias<T>(mut self, alias: T) -> Self::Target
+    where
+        T: Into<Cow<'a, str>>,
+    {
+        self.alias = Some(alias.into());
+        self
     }
 }
 

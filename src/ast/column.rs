@@ -1,5 +1,5 @@
 use super::Aliasable;
-use crate::ast::{Expression, Table};
+use crate::ast::{Expression, ExpressionKind, Table};
 use std::borrow::Cow;
 
 /// A column definition.
@@ -42,7 +42,10 @@ macro_rules! col {
 
 impl<'a> From<Column<'a>> for Expression<'a> {
     fn from(col: Column<'a>) -> Self {
-        Expression::Column(Box::new(col))
+        Expression {
+            kind: ExpressionKind::Column(Box::new(col)),
+            alias: None,
+        }
     }
 }
 

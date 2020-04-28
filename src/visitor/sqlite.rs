@@ -126,7 +126,7 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
 
 #[cfg(test)]
 mod tests {
-    use crate::visitor::*;
+    use crate::{val, visitor::*};
 
     fn expected_values<'a, T>(sql: &'static str, params: Vec<T>) -> (String, Vec<Value<'a>>)
     where
@@ -154,6 +154,27 @@ mod tests {
 
         assert_eq!(expected.0, sql);
         assert_eq!(expected.1, params);
+    }
+
+    #[test]
+    fn test_aliased_value() {
+        let expected = expected_values("SELECT ? AS `test`", vec![1]);
+
+        let query = Select::default().value(val!(1).alias("test"));
+        let (sql, params) = Sqlite::build(query);
+
+        assert_eq!(expected.0, sql);
+        assert_eq!(expected.1, params);
+    }
+
+    #[test]
+    fn test_aliased_null() {
+        let expected_sql = "SELECT ? AS `test`";
+        let query = Select::default().value(val!(Value::Null).alias("test"));
+        let (sql, params) = Sqlite::build(query);
+
+        assert_eq!(expected_sql, sql);
+        assert_eq!(vec![Value::Null], params);
     }
 
     #[test]

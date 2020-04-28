@@ -1,3 +1,4 @@
+use super::ExpressionKind;
 use crate::ast::{Expression, Row, Select, Values};
 use std::borrow::Cow;
 
@@ -39,7 +40,10 @@ impl<'a> Table<'a> {
 
     /// A qualified asterisk to this table
     pub fn asterisk(self) -> Expression<'a> {
-        Expression::Asterisk(Some(Box::new(self)))
+        Expression {
+            kind: ExpressionKind::Asterisk(Some(Box::new(self))),
+            alias: None,
+        }
     }
 }
 
