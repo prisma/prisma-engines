@@ -30,8 +30,8 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
 
     async fn describe(&self, schema: &str) -> SqlSchemaDescriberResult<SqlSchema> {
         debug!("describing schema '{}'", schema);
-        let version = self.conn.version().await?;
-        let is_mariadb = version.as_ref().map(is_mariadb).unwrap_or(false);
+        let version = self.conn.version().await.ok().flatten();
+        let is_mariadb = version.as_ref().map(|s| is_mariadb(s)).unwrap_or(false);
 
         let table_names = self.get_table_names(schema).await;
         let mut tables = Vec::with_capacity(table_names.len());
