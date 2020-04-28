@@ -1,6 +1,8 @@
 mod conversion;
 mod error;
 
+pub use rusqlite::version as sqlite_version;
+
 use crate::{
     ast::{ParameterizedValue, Query},
     connector::{metrics, queryable::*, ResultSet, DBIO},
