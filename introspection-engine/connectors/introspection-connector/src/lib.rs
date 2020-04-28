@@ -25,12 +25,22 @@ pub struct DatabaseMetadata {
     pub size_in_bytes: usize,
 }
 
+#[derive(Serialize, Deserialize, Debug)]
+pub enum Version {
+    NON_PRISMA,
+    PRISMA_1,
+    PRISMA_1_1,
+    PRISMA_2,
+}
+
 #[derive(Debug)]
 pub struct IntrospectionResult {
     /// Datamodel
     pub datamodel: Datamodel,
     /// warnings
     pub warnings: Vec<Warning>,
+    /// version
+    pub version: Version,
 }
 
 #[derive(Serialize, Deserialize, Debug)]

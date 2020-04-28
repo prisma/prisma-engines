@@ -9,11 +9,12 @@ use tracing::debug;
 
 //checks
 
+//todo make this more targeted
 pub fn is_migration_table(table: &Table) -> bool {
     table.name == "_Migration"
 }
 
-pub(crate) fn is_prisma_1_point_1_join_table(table: &Table) -> bool {
+pub(crate) fn is_prisma_1_point_1_or_2_join_table(table: &Table) -> bool {
     table.columns.len() == 2 && table.indices.len() >= 2 && common_prisma_m_to_n_relation_conditions(table)
 }
 

@@ -3,20 +3,44 @@ use crate::misc_helpers::*;
 use crate::sanitize_datamodel_names::sanitize_datamodel_names;
 use crate::SqlIntrospectionResult;
 use datamodel::{dml, Datamodel, FieldType, Model};
-use introspection_connector::IntrospectionResult;
+use introspection_connector::{IntrospectionResult, Version};
+use quaint::connector::SqlFamily;
 use sql_schema_describer::*;
 use tracing::debug;
 
 /// Calculate a data model from a database schema.
-pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<IntrospectionResult> {
+pub fn calculate_datamodel(schema: &SqlSchema, family: &SqlFamily) -> SqlIntrospectionResult<IntrospectionResult> {
     debug!("Calculating data model.");
+
+    let has_migration_table = schema.tables.iter().any(|table| is_migration_table(&table));
+    let has_prisma_1_join_table = schema.tables.iter().any(|table| is_prisma_1_point_0_join_table(&table));
+    let has_prisma_1_1_or_2_join_table = schema
+        .tables
+        .iter()
+        .any(|table| is_prisma_1_point_1_or_2_join_table(&table));
+    let mut uses_on_delete = false; //should check all foreign keys -> needs default onDelete option
+    let mut always_has_created_at_updated_at = false; //should check all models
+    let mut uses_non_prisma_types = false; // should check all scalar fields and needs mapping SQLFamily -> Types
+
+    //Currently from Migration Engine
+    //Types positive list, complicated by enums -.-
+
+    // SQLITE   Types
+    // "BOOLEAN","DATE","REAL","INTEGER","TEXT"
+    // POSTGRES Types
+    // Array types are only a P2 thing on Postgres
+    // "boolean", "timestamp(3)", "Decimal(65,30)", "integer", "text"
+    // native enums are only a P2 thing "ENUM_NAME"
+    // MYSQL    Types
+    // "boolean","datetime(3)", "Decimal(65,30)", "int", "varchar()",
+    // native enums are only a P2 thing "ENUM()"
 
     let mut data_model = Datamodel::new();
     for table in schema
         .tables
         .iter()
         .filter(|table| !is_migration_table(&table))
-        .filter(|table| !is_prisma_1_point_1_join_table(&table))
+        .filter(|table| !is_prisma_1_point_1_or_2_join_table(&table))
         .filter(|table| !is_prisma_1_point_0_join_table(&table))
     {
         debug!("Calculating model: {}", table.name);
@@ -91,7 +115,7 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Introspecti
     for table in schema
         .tables
         .iter()
-        .filter(|table| is_prisma_1_point_1_join_table(&table) || is_prisma_1_point_0_join_table(&table))
+        .filter(|table| is_prisma_1_point_1_or_2_join_table(&table) || is_prisma_1_point_0_join_table(&table))
     {
         if let (Some(f), Some(s)) = (table.foreign_keys.get(0), table.foreign_keys.get(1)) {
             let is_self_relation = f.referenced_table == s.referenced_table;
@@ -120,9 +144,55 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Introspecti
 
     debug!("Done calculating data model {:?}", data_model);
 
+    let version = match family {
+        SqlFamily::Sqlite if has_migration_table && !uses_on_delete && !uses_non_prisma_types => Version::PRISMA_2,
+        SqlFamily::Sqlite => Version::NON_PRISMA,
+        SqlFamily::Mysql if has_migration_table && !uses_on_delete && !uses_non_prisma_types => Version::PRISMA_2,
+        SqlFamily::Mysql
+            if !has_migration_table
+                && !uses_on_delete
+                && !uses_non_prisma_types
+                && always_has_created_at_updated_at
+                && !has_prisma_1_1_or_2_join_table =>
+        {
+            Version::PRISMA_1
+        }
+        SqlFamily::Mysql
+            if !has_migration_table
+                && !uses_on_delete
+                && !uses_non_prisma_types
+                && always_has_created_at_updated_at
+                && !has_prisma_1_join_table =>
+        {
+            Version::PRISMA_1_1
+        }
+        SqlFamily::Mysql => Version::NON_PRISMA,
+        SqlFamily::Postgres if has_migration_table && !uses_on_delete && !uses_non_prisma_types => Version::PRISMA_2,
+        SqlFamily::Postgres
+            if !has_migration_table
+                && !uses_on_delete
+                && !uses_non_prisma_types
+                && always_has_created_at_updated_at
+                && !has_prisma_1_1_or_2_join_table =>
+        {
+            Version::PRISMA_1
+        }
+        SqlFamily::Postgres
+            if !has_migration_table
+                && !uses_on_delete
+                && !uses_non_prisma_types
+                && always_has_created_at_updated_at
+                && !has_prisma_1_join_table =>
+        {
+            Version::PRISMA_1_1
+        }
+        SqlFamily::Postgres => Version::NON_PRISMA,
+    };
+
     Ok(IntrospectionResult {
         datamodel: data_model,
         warnings,
+        version,
     })
 }
 
