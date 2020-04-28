@@ -37,7 +37,7 @@ pub(crate) trait SqlRenderer {
             (DefaultValue::DBGENERATED(val), _) => val.as_str().into(),
             (DefaultValue::VALUE(PrismaValue::String(val)), ColumnTypeFamily::String)
             | (DefaultValue::VALUE(PrismaValue::Enum(val)), ColumnTypeFamily::Enum(_)) => {
-                format!("'{}'", escape_quotes(&val)).into()
+                dbg!(format!("'{}'", escape_quotes(&val))).into()
             }
             (DefaultValue::NOW, ColumnTypeFamily::DateTime) => "CURRENT_TIMESTAMP".into(),
             (DefaultValue::NOW, _) => unreachable!("NOW default on non-datetime column"),
@@ -61,8 +61,7 @@ impl dyn SqlRenderer {
 }
 
 fn escape_quotes(s: &str) -> Cow<'_, str> {
-    const STRING_LITERAL_CHARACTER_TO_ESCAPE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#""#).unwrap());
+    const STRING_LITERAL_CHARACTER_TO_ESCAPE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"'"#).unwrap());
 
-    todo!();
-    s.into()
+    STRING_LITERAL_CHARACTER_TO_ESCAPE_RE.replace_all(s, "\\$0")
 }

@@ -1,11 +1,26 @@
 use super::*;
 use quaint::prelude::Queryable;
 use std::collections::{BTreeMap, HashMap};
-use std::sync::Arc;
+use std::{borrow::Cow, sync::Arc};
 use tracing::debug;
 
 fn is_mariadb(version: &str) -> bool {
     version.contains("MariaDB")
+}
+
+enum Flavour {
+    Mysql,
+    MariaDb,
+}
+
+impl Flavour {
+    fn from_version(version_string: &str) -> Self {
+        if is_mariadb(version_string) {
+            Self::MariaDb
+        } else {
+            Self::Mysql
+        }
+    }
 }
 
 pub struct SqlSchemaDescriber {
@@ -31,11 +46,14 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
     async fn describe(&self, schema: &str) -> SqlSchemaDescriberResult<SqlSchema> {
         debug!("describing schema '{}'", schema);
         let version = self.conn.version().await.ok().flatten();
-        let is_mariadb = version.as_ref().map(|s| is_mariadb(s)).unwrap_or(false);
+        let flavour = version
+            .as_ref()
+            .map(|s| Flavour::from_version(s))
+            .unwrap_or(Flavour::Mysql);
 
         let table_names = self.get_table_names(schema).await;
         let mut tables = Vec::with_capacity(table_names.len());
-        let mut columns = get_all_columns(self.conn.as_ref(), schema).await;
+        let mut columns = get_all_columns(self.conn.as_ref(), schema, &flavour).await;
         let mut indexes = get_all_indexes(self.conn.as_ref(), schema).await;
         let mut fks = get_foreign_keys(self.conn.as_ref(), schema).await;
 
@@ -151,7 +169,11 @@ impl SqlSchemaDescriber {
     }
 }
 
-async fn get_all_columns(conn: &dyn Queryable, schema_name: &str) -> HashMap<String, (Vec<Column>, Vec<Enum>)> {
+async fn get_all_columns(
+    conn: &dyn Queryable,
+    schema_name: &str,
+    flavour: &Flavour,
+) -> HashMap<String, (Vec<Column>, Vec<Enum>)> {
     // We alias all the columns because MySQL column names are case-insensitive in queries, but the
     // information schema column names became upper-case in MySQL 8, causing the code fetching
     // the result values by column name below to fail.
@@ -247,7 +269,7 @@ async fn get_all_columns(conn: &dyn Queryable, schema_name: &str) -> HashMap<Str
                             _ => DefaultValue::DBGENERATED(default_string),
                         },
                         ColumnTypeFamily::String => DefaultValue::VALUE(PrismaValue::String(
-                            unescape_and_unquote_default_string(default_string),
+                            unescape_and_unquote_default_string(default_string, flavour),
                         )),
                         //todo check other now() definitions
                         ColumnTypeFamily::DateTime => match default_string.to_lowercase()
@@ -568,17 +590,20 @@ fn extract_enum_values(full_data_type: &&str) -> Vec<String> {
     vals.split(",").map(|v| unquote_string(v.into())).collect()
 }
 
-fn unescape_and_unquote_default_string(default: String) -> String {
+fn unescape_and_unquote_default_string(default: String, flavour: &Flavour) -> String {
     const MYSQL_ESCAPING_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"\\(.)"#).unwrap());
-    // TOD: only mariadb wraps its default strings in single quotes. We would need to know that to
-    // do the right thing.
+
     const MARIADB_QUOTES_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"^'(.*)'$"#).unwrap());
 
     if !MYSQL_ESCAPING_RE.is_match(&default) && !MARIADB_QUOTES_RE.is_match(&default) {
         return default;
     }
 
-    MYSQL_ESCAPING_RE
-        .replace_all(MARIADB_QUOTES_RE.replace_all(&default, "$1").as_ref(), "$1")
-        .into()
+    let maybe_unquoted: Cow<str> = if matches!(flavour, Flavour::MariaDb) {
+        MARIADB_QUOTES_RE.replace_all(&default, "$1")
+    } else {
+        default.into()
+    };
+
+    MYSQL_ESCAPING_RE.replace_all(maybe_unquoted.as_ref(), "$1").into()
 }
