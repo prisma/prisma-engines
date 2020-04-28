@@ -1,4 +1,6 @@
 use super::SqlResult;
+use datamodel::Datamodel;
+use migration_connector::MigrationError;
 use quaint::{
     prelude::{ConnectionInfo, Queryable, SqlFamily},
     single::Quaint,
@@ -45,6 +47,16 @@ impl DatabaseInfo {
     pub(crate) fn connection_info(&self) -> &ConnectionInfo {
         &self.connection_info
     }
+
+    pub(crate) fn check_database_version_compatibility(&self, datamodel: &Datamodel) -> Vec<MigrationError> {
+        let mut errors = Vec::new();
+
+        if self.is_mysql_5_6() {
+            check_datamodel_for_mysql_5_6(datamodel, &mut errors)
+        }
+
+        errors
+    }
 }
 
 async fn get_database_version(connection: &Quaint, connection_info: &ConnectionInfo) -> SqlResult<Option<String>> {
@@ -62,4 +74,20 @@ async fn get_database_version(connection: &Quaint, connection_info: &ConnectionI
         }
         _ => Ok(None),
     }
+}
+
+fn check_datamodel_for_mysql_5_6(datamodel: &Datamodel, errors: &mut Vec<MigrationError>) {
+    crate::datamodel_helpers::walk_fields(datamodel).for_each(|field| {
+        if field.field_type().is_json() {
+            errors.push(MigrationError {
+                description: format!(
+                    "The `Json` data type used in {}.{} is not supported on MySQL 5.6.",
+                    field.model().name(),
+                    field.name()
+                ),
+                field: None,
+                tpe: "".into(),
+            })
+        }
+    });
 }

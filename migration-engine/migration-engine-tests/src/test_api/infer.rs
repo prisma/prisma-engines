@@ -1,4 +1,5 @@
 use super::super::unique_migration_id;
+use crate::AssertionResult;
 use migration_connector::MigrationStep;
 use migration_core::{
     api::GenericApi,
@@ -39,6 +40,13 @@ impl<'a> Infer<'a> {
         self
     }
 
+    pub async fn send_assert(self) -> anyhow::Result<InferAssertion<'a>> {
+        let api = self.api;
+        let result = self.send().await?;
+
+        Ok(InferAssertion { result, _api: api })
+    }
+
     pub async fn send(self) -> Result<MigrationStepsResultOutput, anyhow::Error> {
         let migration_id = self.migration_id.unwrap_or_else(unique_migration_id);
 
@@ -57,5 +65,54 @@ impl<'a> Infer<'a> {
         );
 
         Ok(output)
+    }
+}
+
+pub struct InferAssertion<'a> {
+    result: MigrationStepsResultOutput,
+    _api: &'a dyn GenericApi,
+}
+
+impl<'a> InferAssertion<'a> {
+    pub fn assert_green(self) -> AssertionResult<Self> {
+        self.assert_no_warning()?.assert_no_error()?.assert_executable()
+    }
+
+    pub fn assert_no_warning(self) -> AssertionResult<Self> {
+        anyhow::ensure!(
+            self.result.warnings.is_empty(),
+            "Assertion failed. Expected no warning, got {:?}",
+            self.result.warnings
+        );
+
+        Ok(self)
+    }
+
+    pub fn assert_no_error(self) -> AssertionResult<Self> {
+        assert!(self.result.general_errors.is_empty());
+
+        Ok(self)
+    }
+
+    pub fn assert_executable(self) -> AssertionResult<Self> {
+        assert!(self.result.unexecutable_migrations.is_empty());
+
+        Ok(self)
+    }
+
+    pub fn assert_no_steps(self) -> AssertionResult<Self> {
+        anyhow::ensure!(
+            self.result.datamodel_steps.is_empty(),
+            "Assertion failed. Datamodel migration steps should be empty, but found {:?}",
+            self.result.datamodel_steps
+        );
+
+        anyhow::ensure!(
+            self.result.database_steps.as_array().unwrap().is_empty(),
+            "Assertion failed. Database migration steps should be empty, but found {:?}",
+            self.result.database_steps
+        );
+
+        Ok(self)
     }
 }

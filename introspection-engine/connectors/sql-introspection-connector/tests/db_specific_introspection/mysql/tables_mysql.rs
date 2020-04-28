@@ -21,7 +21,7 @@ async fn introspecting_a_simple_table_with_gql_types_must_work(api: &TestApi) {
             api.db_name(),
         )
         .await;
-    let dm = r#"
+    let dm = r#"    
             model Blog {
                 bool    Boolean
                 date    DateTime
@@ -29,6 +29,35 @@ async fn introspecting_a_simple_table_with_gql_types_must_work(api: &TestApi) {
                 id      Int @id @default(autoincrement())
                 int     Int
                 string  String
+            }
+        "#;
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+}
+
+#[test_each_connector(tags("mysql_8"))]
+async fn introspecting_a_table_with_json_type_must_work(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute_with_schema(
+            |migration| {
+                migration.create_table("Blog", |t| {
+                    t.add_column("id", types::primary());
+                    t.add_column("json", types::json());
+                });
+            },
+            api.db_name(),
+        )
+        .await;
+    let dm = r#"
+            datasource mysql {
+                provider = "mysql"
+                url = "mysql://asdlj"
+            }
+    
+            model Blog {
+                id      Int @id @default(autoincrement())
+                json    Json
             }
         "#;
     let result = dbg!(api.introspect().await);

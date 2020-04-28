@@ -8,8 +8,8 @@ use sql_migration_connector::{AlterIndex, CreateIndex, DropIndex, SqlMigrationSt
 use sql_schema_describer::*;
 
 #[test_each_connector]
-async fn adding_a_scalar_field_must_work(api: &TestApi) {
-    let dm2 = r#"
+async fn adding_a_scalar_field_must_work(api: &TestApi) -> TestResult {
+    let dm = r#"
         model Test {
             id String @id @default(cuid())
             int Int
@@ -25,27 +25,71 @@ async fn adding_a_scalar_field_must_work(api: &TestApi) {
             B
         }
     "#;
-    let result = api.infer_and_apply(&dm2).await.sql_schema;
-    let table = result.table_bang("Test");
-    table.columns.iter().for_each(|c| assert_eq!(c.is_required(), true));
 
-    assert_eq!(table.column_bang("int").tpe.family, ColumnTypeFamily::Int);
-    assert_eq!(table.column_bang("float").tpe.family, ColumnTypeFamily::Float);
-    assert_eq!(table.column_bang("boolean").tpe.family, ColumnTypeFamily::Boolean);
-    assert_eq!(table.column_bang("string").tpe.family, ColumnTypeFamily::String);
-    assert_eq!(table.column_bang("dateTime").tpe.family, ColumnTypeFamily::DateTime);
+    api.infer_apply(dm).send().await?.assert_green()?;
 
-    match api.sql_family() {
-        SqlFamily::Postgres => assert_eq!(
-            table.column_bang("enum").tpe.family,
-            ColumnTypeFamily::Enum("MyEnum".to_owned())
-        ),
-        SqlFamily::Mysql => assert_eq!(
-            table.column_bang("enum").tpe.family,
-            ColumnTypeFamily::Enum("Test_enum".to_owned())
-        ),
-        _ => assert_eq!(table.column_bang("enum").tpe.family, ColumnTypeFamily::String),
-    }
+    api.assert_schema().await?.assert_table("Test", |table| {
+        table
+            .assert_columns_count(7)?
+            .assert_column("int", |c| {
+                c.assert_is_required()?.assert_type_family(ColumnTypeFamily::Int)
+            })?
+            .assert_column("float", |c| {
+                c.assert_is_required()?.assert_type_family(ColumnTypeFamily::Float)
+            })?
+            .assert_column("boolean", |c| {
+                c.assert_is_required()?.assert_type_family(ColumnTypeFamily::Boolean)
+            })?
+            .assert_column("string", |c| {
+                c.assert_is_required()?.assert_type_family(ColumnTypeFamily::String)
+            })?
+            .assert_column("dateTime", |c| {
+                c.assert_is_required()?.assert_type_family(ColumnTypeFamily::DateTime)
+            })?
+            .assert_column("enum", |c| match api.sql_family() {
+                SqlFamily::Postgres => c
+                    .assert_is_required()?
+                    .assert_type_family(ColumnTypeFamily::Enum("MyEnum".to_owned())),
+                SqlFamily::Mysql => c
+                    .assert_is_required()?
+                    .assert_type_family(ColumnTypeFamily::Enum("Test_enum".to_owned())),
+                _ => c.assert_is_required()?.assert_type_is_string(),
+            })
+    })?;
+
+    Ok(())
+}
+
+#[test_each_connector(capabilities("json"), ignore("mysql_5_6"))]
+async fn json_fields_can_be_created(api: &TestApi) -> TestResult {
+    let dm = format!(
+        r#"
+            {}
+
+            model Test {{
+                id String @id @default(cuid())
+                javaScriptObjectNotation Json
+            }}
+        "#,
+        api.datasource()
+    );
+
+    api.infer_apply(&dm).send().await?.assert_green()?;
+
+    api.assert_schema().await?.assert_table("Test", |table| {
+        table.assert_column("javaScriptObjectNotation", |c| {
+            if api.is_mariadb() {
+                // JSON is an alias for LONGTEXT on MariaDB - https://mariadb.com/kb/en/json-data-type/
+                c.assert_is_required()?.assert_type_family(ColumnTypeFamily::String)
+            } else {
+                c.assert_is_required()?.assert_type_family(ColumnTypeFamily::Json)
+            }
+        })
+    })?;
+
+    api.infer(&dm).send_assert().await?.assert_green()?.assert_no_steps()?;
+
+    Ok(())
 }
 
 #[test_each_connector]
@@ -1977,7 +2021,7 @@ async fn switching_databases_must_work(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector(log = "debug")]
+#[test_each_connector]
 async fn adding_mutual_references_on_existing_tables_works(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model A {

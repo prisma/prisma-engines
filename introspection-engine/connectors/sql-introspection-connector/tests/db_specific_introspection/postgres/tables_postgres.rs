@@ -34,6 +34,34 @@ async fn introspecting_a_simple_table_with_gql_types_must_work(api: &TestApi) {
 }
 
 #[test_each_connector(tags("postgres"))]
+async fn introspecting_a_table_with_json_type_must_work(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("Blog", |t| {
+                t.add_column("id", types::primary());
+                t.add_column("json", types::json());
+            });
+        })
+        .await;
+
+    let dm = r#"
+            datasource postgres {
+                provider = "postgres"
+                url = "postgresql://asdlj"
+            }
+    
+            model Blog {
+                id      Int @id @default(autoincrement())
+                json    Json
+            }
+        "#;
+
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+}
+
+#[test_each_connector(tags("postgres"))]
 async fn introspecting_a_table_with_serial_type_must_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel

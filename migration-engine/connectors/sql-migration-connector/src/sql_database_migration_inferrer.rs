@@ -7,6 +7,7 @@ use datamodel::*;
 use migration_connector::steps::MigrationStep;
 use migration_connector::*;
 use sql_schema_describer::*;
+use sql_schema_differ::DiffingOptions;
 
 pub struct SqlDatabaseMigrationInferrer<'a> {
     pub connector: &'a crate::SqlMigrationConnector,
@@ -34,6 +35,7 @@ impl DatabaseMigrationInferrer<SqlMigration> for SqlDatabaseMigrationInferrer<'_
                 &expected_database_schema,
                 self.schema_name(),
                 self.sql_family(),
+                self.database_info(),
             )
         };
 
@@ -54,6 +56,7 @@ impl DatabaseMigrationInferrer<SqlMigration> for SqlDatabaseMigrationInferrer<'_
                 &expected_database_schema,
                 self.schema_name(),
                 self.sql_family(),
+                self.database_info(),
             )
         })();
 
@@ -66,18 +69,21 @@ fn infer(
     expected_database_schema: &SqlSchema,
     schema_name: &str,
     sql_family: SqlFamily,
+    database_info: &DatabaseInfo,
 ) -> SqlResult<SqlMigration> {
     let (original_steps, corrected_steps) = infer_database_migration_steps_and_fix(
         &current_database_schema,
         &expected_database_schema,
         &schema_name,
         sql_family,
+        database_info,
     )?;
     let (_, rollback) = infer_database_migration_steps_and_fix(
         &expected_database_schema,
         &current_database_schema,
         &schema_name,
         sql_family,
+        database_info,
     )?;
     Ok(SqlMigration {
         before: current_database_schema.clone(),
@@ -93,17 +99,29 @@ fn infer_database_migration_steps_and_fix(
     to: &SqlSchema,
     schema_name: &str,
     sql_family: SqlFamily,
+    database_info: &DatabaseInfo,
 ) -> SqlResult<(Vec<SqlMigrationStep>, Vec<SqlMigrationStep>)> {
-    let diff: SqlSchemaDiff = SqlSchemaDiffer::diff(&from, &to, sql_family);
+    let diff: SqlSchemaDiff = SqlSchemaDiffer::diff(
+        &from,
+        &to,
+        sql_family,
+        &DiffingOptions::from_database_info(database_info),
+    );
 
     let corrected_steps = if sql_family.is_sqlite() {
-        sqlite::fix(diff, &from, &to, &schema_name)?
+        sqlite::fix(diff, &from, &to, &schema_name, database_info)?
     } else {
-        fix_id_column_type_change(&from, &to, schema_name, diff.into_steps(), sql_family)?
+        fix_id_column_type_change(&from, &to, schema_name, diff.into_steps(), sql_family, database_info)?
     };
 
     Ok((
-        SqlSchemaDiffer::diff(&from, &to, sql_family).into_steps(),
+        SqlSchemaDiffer::diff(
+            &from,
+            &to,
+            sql_family,
+            &DiffingOptions::from_database_info(database_info),
+        )
+        .into_steps(),
         corrected_steps,
     ))
 }
@@ -114,6 +132,7 @@ fn fix_id_column_type_change(
     _schema_name: &str,
     steps: Vec<SqlMigrationStep>,
     sql_family: SqlFamily,
+    database_info: &DatabaseInfo,
 ) -> SqlResult<Vec<SqlMigrationStep>> {
     let has_id_type_change = steps
         .iter()
@@ -159,7 +178,12 @@ fn fix_id_column_type_change(
                 .map(|name| DropTable { name })
                 .map(SqlMigrationStep::DropTable),
         );
-        let diff_from_empty: SqlSchemaDiff = SqlSchemaDiffer::diff(&SqlSchema::empty(), &to, sql_family);
+        let diff_from_empty: SqlSchemaDiff = SqlSchemaDiffer::diff(
+            &SqlSchema::empty(),
+            &to,
+            sql_family,
+            &DiffingOptions::from_database_info(database_info),
+        );
         let mut steps_from_empty = diff_from_empty.into_steps();
         radical_steps.append(&mut steps_from_empty);
 

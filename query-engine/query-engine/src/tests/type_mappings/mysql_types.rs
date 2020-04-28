@@ -52,7 +52,11 @@ fn create_types_table_sql(api: &TestApi) -> String {
             PRIMARY KEY (`id`)
         ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
         "##,
-        json_column_type = if api.is_mysql_5_6() { "text" } else { "json" },
+        json_column_type = if api.is_mysql_5_6() || api.is_maria_db() {
+            "text"
+        } else {
+            "json"
+        },
     )
 }
 
@@ -88,7 +92,7 @@ const CREATE_ONE_TYPES_QUERY: &str = indoc! {
                 # string_blob_blob: \"very average blob\"
                 # string_blob_longblob: \"loong looooong bloooooooob\"
                 string_enum: \"jellicle_cats\"
-                json: \"{\\\"name\\\": null}\"
+                json: \"{\\\"name\\\":null}\"
             }
         ) { id }
     }
@@ -125,7 +129,7 @@ fn expected_create_one_types_result() -> serde_json::Value {
         // "string_blob_blob": "very average blob",
         // "string_blob_longblob": "loong looooong bloooooooob",
         "string_enum": "jellicle_cats",
-        "json": "{\"name\": null}",
+        "json": "{\"name\":null}",
     })
 }
 
@@ -212,7 +216,14 @@ async fn mysql_types_roundtrip(api: &TestApi) -> TestResult {
             // .assert_field_type("spatial_multilinestring", ScalarType::String)?
             // .assert_field_type("spatial_multipolygon", ScalarType::String)?
             // .assert_field_type("spatial_geometrycollection", ScalarType::String)?
-            .assert_field_type("json", ScalarType::String)
+            .assert_field_type(
+                "json",
+                if api.is_mysql_5_6() || api.is_maria_db() {
+                    ScalarType::String
+                } else {
+                    ScalarType::Json
+                },
+            )
     })?;
 
     // Write the values.
@@ -473,7 +484,11 @@ fn create_types_table_with_defaults_sql(api: &TestApi) -> String {
             PRIMARY KEY (`id`)
         ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
         "##,
-        json_column_type = if api.is_mysql_5_6() { "text" } else { "json" },
+        json_column_type = if api.is_mysql_5_6() || api.is_maria_db() {
+            "text"
+        } else {
+            "json"
+        },
     )
 }
 

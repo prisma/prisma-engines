@@ -1,4 +1,4 @@
-package writes.scalarLists
+package writes.dataTypes.scalarLists
 
 import org.scalatest.{FlatSpec, Matchers}
 import play.api.libs.json.JsValue

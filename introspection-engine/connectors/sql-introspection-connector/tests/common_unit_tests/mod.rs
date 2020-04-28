@@ -48,7 +48,7 @@ fn a_data_model_can_be_generated_from_a_schema() {
                         ColumnTypeFamily::String => (FieldType::Base(ScalarType::String, None), false, None),
                         ColumnTypeFamily::Enum(name) => (FieldType::Enum(name.clone()), false, None),
                         ColumnTypeFamily::Uuid => (FieldType::Base(ScalarType::String, None), false, None),
-                        ColumnTypeFamily::Json => (FieldType::Base(ScalarType::String, None), false, None),
+                        ColumnTypeFamily::Json => (FieldType::Base(ScalarType::Json, None), false, None),
                         x => (
                             FieldType::Unsupported(x.to_string()),
                             true,

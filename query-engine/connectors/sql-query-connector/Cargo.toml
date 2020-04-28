@@ -13,7 +13,7 @@ rand = "0.7"
 async-trait = "0.1"
 futures = "0.3"
 rust_decimal = "=1.1.0"
-tokio = "0.2"
+tokio = "=0.2.13"
 
 [dependencies.quaint]
 git = "https://github.com/prisma/quaint"

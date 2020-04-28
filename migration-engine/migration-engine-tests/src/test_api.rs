@@ -58,6 +58,10 @@ impl TestApi {
         self.sql_family() == SqlFamily::Mysql
     }
 
+    pub fn is_mariadb(&self) -> bool {
+        self.connector_name == "mysql_mariadb"
+    }
+
     pub fn migration_persistence<'a>(&'a self) -> Box<dyn MigrationPersistence + 'a> {
         self.api.migration_persistence()
     }
@@ -68,6 +72,14 @@ impl TestApi {
 
     pub fn sql_family(&self) -> SqlFamily {
         self.connection_info().sql_family()
+    }
+
+    pub fn datasource(&self) -> String {
+        match self.sql_family() {
+            SqlFamily::Mysql => mysql_test_config("unreachable"),
+            SqlFamily::Postgres => postgres_12_test_config("unreachable"),
+            SqlFamily::Sqlite => sqlite_test_config("unreachable"),
+        }
     }
 
     /// Render a table name with the required prefixing for use with quaint query building.

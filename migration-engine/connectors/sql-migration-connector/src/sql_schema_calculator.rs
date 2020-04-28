@@ -1,9 +1,11 @@
-mod datamodel_helpers;
-
-use crate::{error::SqlError, sql_renderer::IteratorJoin, DatabaseInfo, SqlResult};
+use crate::{
+    datamodel_helpers::{self, FieldRef, ModelRef, TypeRef},
+    error::SqlError,
+    sql_renderer::IteratorJoin,
+    DatabaseInfo, SqlResult,
+};
 use datamodel::common::*;
 use datamodel::*;
-use datamodel_helpers::{FieldRef, ModelRef, TypeRef};
 use prisma_models::{DatamodelConverter, TempManifestationHolder, TempRelationHolder};
 use prisma_value::PrismaValue;
 use quaint::prelude::SqlFamily;
@@ -385,6 +387,7 @@ fn column_type_for_scalar_type(scalar_type: &ScalarType, column_arity: ColumnAri
         ScalarType::Boolean => sql::ColumnType::pure(sql::ColumnTypeFamily::Boolean, column_arity),
         ScalarType::String => sql::ColumnType::pure(sql::ColumnTypeFamily::String, column_arity),
         ScalarType::DateTime => sql::ColumnType::pure(sql::ColumnTypeFamily::DateTime, column_arity),
+        ScalarType::Json => sql::ColumnType::pure(sql::ColumnTypeFamily::Json, column_arity),
     }
 }
 

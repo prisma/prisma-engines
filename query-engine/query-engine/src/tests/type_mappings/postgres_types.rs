@@ -223,8 +223,8 @@ async fn postgres_types_roundtrip(api: &TestApi) -> TestResult {
             // .assert_field_type("network_mac", ScalarType::String)?
             // .assert_field_type("search_tsvector", ScalarType::String)?
             // .assert_field_type("search_tsquery", ScalarType::String)?
-            .assert_field_type("json_json", ScalarType::String)?
-            .assert_field_type("json_jsonb", ScalarType::String)
+            .assert_field_type("json_json", ScalarType::Json)?
+            .assert_field_type("json_jsonb", ScalarType::Json)
         // .assert_field_type("range_int4range", ScalarType::String)?
         // .assert_field_type("range_int8range", ScalarType::String)?
         // .assert_field_type("range_numrange", ScalarType::String)?
@@ -464,8 +464,8 @@ async fn postgres_array_types_roundtrip(api: &TestApi) -> TestResult {
             .assert_field_type("time_timetz", ScalarType::DateTime)?
             .assert_field_type("boolean_boolean", ScalarType::Boolean)?
             .assert_field_type("network_inet", ScalarType::String)?
-            .assert_field_type("json_json", ScalarType::String)?
-            .assert_field_type("json_jsonb", ScalarType::String)
+            .assert_field_type("json_json", ScalarType::Json)?
+            .assert_field_type("json_jsonb", ScalarType::Json)
     })?;
 
     let response = engine.request(CREATE_ONE_ARRAY_TYPES_QUERY).await;
@@ -583,8 +583,8 @@ async fn all_postgres_types_work_as_filter(api: &TestApi) -> TestResult {
                     time_timetz: "2020-03-05T08:00:00.000"
                     boolean_boolean: true
                     network_inet: "192.168.100.14"
-                    # json_json: "{ \"isJson\": true }"
-                    json_jsonb: "{ \"isJSONB\": true }"
+                    #json_json: "{ \"isJson\": true }"
+                    #json_jsonb: "{ \"isJSONB\": true }"
                 }
             ) {
                 id

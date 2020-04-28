@@ -65,6 +65,14 @@ impl FieldType {
             (a, b) => a == b,
         }
     }
+
+    pub fn scalar_type(&self) -> Option<ScalarType> {
+        match self {
+            FieldType::ConnectorSpecific(sft) => Some(sft.prisma_type()),
+            FieldType::Base(st, _) => Some(*st),
+            _ => None,
+        }
+    }
 }
 
 /// Represents a field in a model.

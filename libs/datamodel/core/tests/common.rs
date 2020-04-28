@@ -291,3 +291,24 @@ pub fn parse_error(datamodel_string: &str) -> ErrorCollection {
         Err(errs) => errs,
     }
 }
+
+pub const SQLITE_SOURCE: &'static str = r#"
+    datasource db {
+        provider = "sqlite"
+        url      = "file:dev.db"
+    }
+"#;
+
+pub const POSTGRES_SOURCE: &'static str = r#"
+    datasource db {
+        provider = "postgres"
+        url      = "postgresql://localhost:5432"
+    }
+"#;
+
+pub const MYSQL_SOURCE: &'static str = r#"
+    datasource db {
+        provider = "mysql"
+        url      = "mysql://localhost:3306"
+    }
+"#;

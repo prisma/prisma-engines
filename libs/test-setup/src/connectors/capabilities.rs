@@ -4,6 +4,7 @@ bitflags! {
     pub struct Capabilities: u8 {
         const SCALAR_LISTS = 0b00000001;
         const ENUMS        = 0b00000010;
+        const JSON         = 0b00000100;
     }
 }
 
@@ -40,5 +41,6 @@ impl std::str::FromStr for Capabilities {
 /// All the capabilities, sorted by name.
 const CAPABILITY_NAMES: &[(&str, Capabilities)] = &[
     ("enums", Capabilities::ENUMS),
+    ("json", Capabilities::JSON),
     ("scalar_lists", Capabilities::SCALAR_LISTS),
 ];
