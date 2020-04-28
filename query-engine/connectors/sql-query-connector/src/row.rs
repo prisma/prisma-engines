@@ -3,7 +3,7 @@ use chrono::{DateTime, Utc};
 use datamodel::FieldArity;
 use prisma_models::{PrismaValue, Record, TypeIdentifier};
 use quaint::{
-    ast::{DatabaseValue, ParameterizedValue},
+    ast::{Expression, Value},
     connector::ResultRow,
 };
 use rust_decimal::Decimal;
@@ -39,13 +39,13 @@ impl ToSqlRow for ResultRow {
         for (i, p_value) in self.into_iter().enumerate().take(row_width) {
             let pv = match &idents[i] {
                 (type_identifier, FieldArity::List) => match p_value {
-                    ParameterizedValue::Array(l) => l
+                    Value::Array(l) => l
                         .into_iter()
                         .map(|p_value| row_value_to_prisma_value(p_value, &type_identifier))
                         .collect::<crate::Result<Vec<_>>>()
                         .map(|vec| PrismaValue::List(vec)),
 
-                    ParameterizedValue::Null => Ok(PrismaValue::List(Vec::new())),
+                    Value::Null => Ok(PrismaValue::List(Vec::new())),
                     _ => {
                         let error = io::Error::new(
                             io::ErrorKind::InvalidData,
@@ -64,25 +64,22 @@ impl ToSqlRow for ResultRow {
     }
 }
 
-pub fn row_value_to_prisma_value(
-    p_value: ParameterizedValue,
-    type_identifier: &TypeIdentifier,
-) -> Result<PrismaValue, SqlError> {
+pub fn row_value_to_prisma_value(p_value: Value, type_identifier: &TypeIdentifier) -> Result<PrismaValue, SqlError> {
     Ok(match type_identifier {
         TypeIdentifier::Boolean => match p_value {
-            // ParameterizedValue::Array(vec) => PrismaValue::Boolean(b),
-            ParameterizedValue::Null => PrismaValue::Null,
-            ParameterizedValue::Integer(i) => PrismaValue::Boolean(i != 0),
-            ParameterizedValue::Boolean(b) => PrismaValue::Boolean(b),
+            // Value::Array(vec) => PrismaValue::Boolean(b),
+            Value::Null => PrismaValue::Null,
+            Value::Integer(i) => PrismaValue::Boolean(i != 0),
+            Value::Boolean(b) => PrismaValue::Boolean(b),
             _ => {
                 let error = io::Error::new(io::ErrorKind::InvalidData, "Bool value not stored as bool or int");
                 return Err(SqlError::ConversionError(error.into()));
             }
         },
         TypeIdentifier::Enum(_) => match p_value {
-            ParameterizedValue::Null => PrismaValue::Null,
-            ParameterizedValue::Enum(cow) => PrismaValue::Enum(cow.into_owned()),
-            ParameterizedValue::Text(cow) => PrismaValue::Enum(cow.into_owned()),
+            Value::Null => PrismaValue::Null,
+            Value::Enum(cow) => PrismaValue::Enum(cow.into_owned()),
+            Value::Text(cow) => PrismaValue::Enum(cow.into_owned()),
             _ => {
                 let error = io::Error::new(io::ErrorKind::InvalidData, "Enum value not stored as enum");
                 return Err(SqlError::ConversionError(error.into()));
@@ -90,27 +87,27 @@ pub fn row_value_to_prisma_value(
         },
 
         TypeIdentifier::Json => match p_value {
-            ParameterizedValue::Null => PrismaValue::Null,
-            ParameterizedValue::Text(json) => PrismaValue::Json(json.into()),
-            ParameterizedValue::Json(json) => PrismaValue::Json(json.to_string()),
+            Value::Null => PrismaValue::Null,
+            Value::Text(json) => PrismaValue::Json(json.into()),
+            Value::Json(json) => PrismaValue::Json(json.to_string()),
             _ => {
                 let error = io::Error::new(io::ErrorKind::InvalidData, "Json value not stored as text or json");
                 return Err(SqlError::ConversionError(error.into()));
             }
         },
         TypeIdentifier::UUID => match p_value {
-            ParameterizedValue::Null => PrismaValue::Null,
-            ParameterizedValue::Text(uuid) => PrismaValue::Uuid(Uuid::parse_str(&uuid)?),
-            ParameterizedValue::Uuid(uuid) => PrismaValue::Uuid(uuid),
+            Value::Null => PrismaValue::Null,
+            Value::Text(uuid) => PrismaValue::Uuid(Uuid::parse_str(&uuid)?),
+            Value::Uuid(uuid) => PrismaValue::Uuid(uuid),
             _ => {
                 let error = io::Error::new(io::ErrorKind::InvalidData, "Uuid value not stored as text or uuid");
                 return Err(SqlError::ConversionError(error.into()));
             }
         },
         TypeIdentifier::DateTime => match p_value {
-            ParameterizedValue::Null => PrismaValue::Null,
-            ParameterizedValue::DateTime(dt) => PrismaValue::DateTime(dt),
-            ParameterizedValue::Integer(ts) => {
+            Value::Null => PrismaValue::Null,
+            Value::DateTime(dt) => PrismaValue::DateTime(dt),
+            Value::Integer(ts) => {
                 let nsecs = ((ts % 1000) * 1_000_000) as u32;
                 let secs = (ts / 1000) as i64;
                 let naive = chrono::NaiveDateTime::from_timestamp(secs, nsecs);
@@ -118,7 +115,7 @@ pub fn row_value_to_prisma_value(
 
                 PrismaValue::DateTime(datetime)
             }
-            ParameterizedValue::Text(dt_string) => {
+            Value::Text(dt_string) => {
                 let dt = DateTime::parse_from_rfc3339(dt_string.borrow())
                     .or_else(|_| DateTime::parse_from_rfc2822(dt_string.borrow()))
                     .map_err(|err| {
@@ -137,13 +134,13 @@ pub fn row_value_to_prisma_value(
             }
         },
         TypeIdentifier::Float => match p_value {
-            ParameterizedValue::Null => PrismaValue::Null,
-            ParameterizedValue::Real(f) => PrismaValue::Float(f),
-            ParameterizedValue::Integer(i) => {
+            Value::Null => PrismaValue::Null,
+            Value::Real(f) => PrismaValue::Float(f),
+            Value::Integer(i) => {
                 // Decimal::from_f64 is buggy. Issue: https://github.com/paupino/rust-decimal/issues/228
                 PrismaValue::Float(Decimal::from_str(&(i as f64).to_string()).expect("f64 was not a Decimal."))
             }
-            ParameterizedValue::Text(_) | ParameterizedValue::Bytes(_) => PrismaValue::Float(
+            Value::Text(_) | Value::Bytes(_) => PrismaValue::Float(
                 p_value
                     .as_str()
                     .expect("text/bytes as str")
@@ -159,19 +156,19 @@ pub fn row_value_to_prisma_value(
             }
         },
         TypeIdentifier::Int => match p_value {
-            ParameterizedValue::Integer(i) => PrismaValue::Int(i),
-            ParameterizedValue::Bytes(bytes) => PrismaValue::Int(interpret_bytes_as_i64(&bytes)),
-            ParameterizedValue::Text(txt) => PrismaValue::Int(
+            Value::Integer(i) => PrismaValue::Int(i),
+            Value::Bytes(bytes) => PrismaValue::Int(interpret_bytes_as_i64(&bytes)),
+            Value::Text(txt) => PrismaValue::Int(
                 i64::from_str(txt.trim_start_matches('\0')).map_err(|err| SqlError::ConversionError(err.into()))?,
             ),
             other => PrismaValue::from(other),
         },
         TypeIdentifier::String => match p_value {
-            ParameterizedValue::Uuid(uuid) => PrismaValue::String(uuid.to_string()),
-            ParameterizedValue::Json(json_value) => {
+            Value::Uuid(uuid) => PrismaValue::String(uuid.to_string()),
+            Value::Json(json_value) => {
                 PrismaValue::String(serde_json::to_string(&json_value).expect("JSON value to string"))
             }
-            ParameterizedValue::Null => PrismaValue::Null,
+            Value::Null => PrismaValue::Null,
             other => PrismaValue::from(other),
         },
     })
@@ -184,7 +181,7 @@ pub enum SqlId {
     UUID(Uuid),
 }
 
-impl From<SqlId> for DatabaseValue<'static> {
+impl From<SqlId> for Expression<'static> {
     fn from(id: SqlId) -> Self {
         match id {
             SqlId::String(s) => s.into(),
@@ -194,7 +191,7 @@ impl From<SqlId> for DatabaseValue<'static> {
     }
 }
 
-impl From<&SqlId> for DatabaseValue<'static> {
+impl From<&SqlId> for Expression<'static> {
     fn from(id: &SqlId) -> Self {
         id.clone().into()
     }

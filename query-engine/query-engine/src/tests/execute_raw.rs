@@ -12,7 +12,7 @@ static TODO: &str = indoc! {"
     }
 "};
 
-fn execute_raw(query: &str, params: Vec<ParameterizedValue>) -> String {
+fn execute_raw(query: &str, params: Vec<Value>) -> String {
     let params: Vec<serde_json::Value> = params.into_iter().map(serde_json::Value::from).collect();
     let params = serde_json::to_string(&params).unwrap();
 

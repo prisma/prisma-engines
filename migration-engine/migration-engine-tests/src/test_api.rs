@@ -214,7 +214,7 @@ pub struct SingleRowInsert<'a> {
 }
 
 impl<'a> SingleRowInsert<'a> {
-    pub fn value(mut self, name: &'a str, value: impl Into<quaint::ast::DatabaseValue<'a>>) -> Self {
+    pub fn value(mut self, name: &'a str, value: impl Into<quaint::ast::Expression<'a>>) -> Self {
         self.insert = self.insert.value(name, value);
 
         self
