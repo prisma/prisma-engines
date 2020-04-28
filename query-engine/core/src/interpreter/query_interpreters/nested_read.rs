@@ -135,7 +135,7 @@ pub async fn one2m<'a, 'b>(
 
     let uniq_projections = uniq_projections
         .into_iter()
-        .filter(|p| p.contains(&PrismaValue::Null))
+        .filter(|p| !p.contains(&PrismaValue::Null))
         .collect();
 
     let filter = child_link_id.is_in(uniq_projections);
