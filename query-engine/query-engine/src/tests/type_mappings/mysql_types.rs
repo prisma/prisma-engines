@@ -435,7 +435,7 @@ async fn all_mysql_types_work_as_filter(api: &TestApi) -> TestResult {
                     string_text_mediumtext: \"medium dolphins\"
                     string_text_longtext: \"long dolphins\"
                     string_enum: \"jellicle_cats\"
-                    json: \"{\\\"name\\\": null}\"
+                    # json: \"{\\\"name\\\": null}\"
                 }
             ) {
                 id
