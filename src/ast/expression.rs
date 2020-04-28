@@ -1,18 +1,236 @@
 use crate::ast::*;
+use std::borrow::Cow;
 
-/// A database expression.
-#[derive(Debug, PartialEq, Clone)]
+/// An expression we can compare and use in database queries.
+#[derive(Debug, Clone, PartialEq)]
 pub enum Expression<'a> {
+    /// Anything that we must parameterize before querying
+    Parameterized(Value<'a>),
+    /// A database column
+    Column(Box<Column<'a>>),
+    /// Data in a row form, e.g. (1, 2, 3)
+    Row(Row<'a>),
+    /// A nested `SELECT` statement
+    Select(Box<Select<'a>>),
+    /// A database function call
+    Function(Function<'a>),
+    /// A qualified asterisk to a table
+    Asterisk(Option<Box<Table<'a>>>),
+    /// An operation: sum, sub, mul or div.
+    Op(Box<SqlOp<'a>>),
+    /// A `VALUES` statement
+    Values(Box<Values<'a>>),
     /// A tree of expressions to evaluate from the deepest value to up
     ConditionTree(ConditionTree<'a>),
     /// A comparison expression
     Compare(Compare<'a>),
     /// A single value, column, row or a nested select
-    Value(Box<DatabaseValue<'a>>),
+    Value(Box<Expression<'a>>),
 }
 
-impl<'a> From<Select<'a>> for Expression<'a> {
-    fn from(sel: Select<'a>) -> Expression<'a> {
-        Expression::Value(Box::new(DatabaseValue::from(sel)))
+/// A quick alias to create an asterisk to a table.
+///
+/// ```rust
+/// # use quaint::ast::*;
+/// assert_eq!(
+///     asterisk(),
+///     Expression::Asterisk(None)
+/// )
+/// ```
+pub fn asterisk() -> Expression<'static> {
+    Expression::Asterisk(None)
+}
+
+#[macro_export]
+/// Marks a given string as a value. Useful when using a value in calculations,
+/// e.g.
+///
+/// ``` rust
+/// # use quaint::{col, val, ast::*, visitor::{Visitor, Sqlite}};
+/// let join = "dogs".on(("dogs", "slave_id").equals(Column::from(("cats", "master_id"))));
+///
+/// let query = Select::from_table("cats")
+///     .value(Table::from("cats").asterisk())
+///     .value(col!("dogs", "age") - val!(4))
+///     .inner_join(join);
+///
+/// let (sql, params) = Sqlite::build(query);
+///
+/// assert_eq!(
+///     "SELECT `cats`.*, (`dogs`.`age` - ?) FROM `cats` INNER JOIN `dogs` ON `dogs`.`slave_id` = `cats`.`master_id`",
+///     sql
+/// );
+/// ```
+macro_rules! val {
+    ($val:expr) => {
+        Expression::from($val)
+    };
+}
+
+macro_rules! expression {
+    ($kind:ident,$paramkind:ident) => {
+        impl<'a> From<$kind<'a>> for Expression<'a> {
+            fn from(that: $kind<'a>) -> Self {
+                Expression::$paramkind(that)
+            }
+        }
+    };
+}
+
+expression!(Row, Row);
+expression!(Function, Function);
+
+impl<'a> From<Values<'a>> for Expression<'a> {
+    fn from(p: Values<'a>) -> Self {
+        Self::Values(Box::new(p))
+    }
+}
+
+impl<'a> From<SqlOp<'a>> for Expression<'a> {
+    fn from(p: SqlOp<'a>) -> Self {
+        Self::Op(Box::new(p))
+    }
+}
+
+impl<'a, T> From<T> for Expression<'a>
+where
+    T: Into<Value<'a>>,
+{
+    fn from(p: T) -> Self {
+        Expression::Parameterized(p.into())
+    }
+}
+
+impl<'a, T> From<Vec<T>> for Expression<'a>
+where
+    T: Into<Expression<'a>>,
+{
+    fn from(v: Vec<T>) -> Self {
+        let row: Row<'a> = v.into();
+        row.into()
+    }
+}
+
+impl<'a> Comparable<'a> for Expression<'a> {
+    fn equals<T>(self, comparison: T) -> Compare<'a>
+    where
+        T: Into<Expression<'a>>,
+    {
+        Compare::Equals(Box::new(self), Box::new(comparison.into()))
+    }
+
+    fn not_equals<T>(self, comparison: T) -> Compare<'a>
+    where
+        T: Into<Expression<'a>>,
+    {
+        Compare::NotEquals(Box::new(self), Box::new(comparison.into()))
+    }
+
+    fn less_than<T>(self, comparison: T) -> Compare<'a>
+    where
+        T: Into<Expression<'a>>,
+    {
+        Compare::LessThan(Box::new(self), Box::new(comparison.into()))
+    }
+
+    fn less_than_or_equals<T>(self, comparison: T) -> Compare<'a>
+    where
+        T: Into<Expression<'a>>,
+    {
+        Compare::LessThanOrEquals(Box::new(self), Box::new(comparison.into()))
+    }
+
+    fn greater_than<T>(self, comparison: T) -> Compare<'a>
+    where
+        T: Into<Expression<'a>>,
+    {
+        Compare::GreaterThan(Box::new(self), Box::new(comparison.into()))
+    }
+
+    fn greater_than_or_equals<T>(self, comparison: T) -> Compare<'a>
+    where
+        T: Into<Expression<'a>>,
+    {
+        Compare::GreaterThanOrEquals(Box::new(self), Box::new(comparison.into()))
+    }
+
+    fn in_selection<T>(self, selection: T) -> Compare<'a>
+    where
+        T: Into<Expression<'a>>,
+    {
+        Compare::In(Box::new(self), Box::new(selection.into()))
+    }
+
+    fn not_in_selection<T>(self, selection: T) -> Compare<'a>
+    where
+        T: Into<Expression<'a>>,
+    {
+        Compare::NotIn(Box::new(self), Box::new(selection.into()))
+    }
+
+    fn like<T>(self, pattern: T) -> Compare<'a>
+    where
+        T: Into<Cow<'a, str>>,
+    {
+        Compare::Like(Box::new(self), pattern.into())
+    }
+
+    fn not_like<T>(self, pattern: T) -> Compare<'a>
+    where
+        T: Into<Cow<'a, str>>,
+    {
+        Compare::NotLike(Box::new(self), pattern.into())
+    }
+
+    fn begins_with<T>(self, pattern: T) -> Compare<'a>
+    where
+        T: Into<Cow<'a, str>>,
+    {
+        Compare::BeginsWith(Box::new(self), pattern.into())
+    }
+
+    fn not_begins_with<T>(self, pattern: T) -> Compare<'a>
+    where
+        T: Into<Cow<'a, str>>,
+    {
+        Compare::NotBeginsWith(Box::new(self), pattern.into())
+    }
+
+    fn ends_into<T>(self, pattern: T) -> Compare<'a>
+    where
+        T: Into<Cow<'a, str>>,
+    {
+        Compare::EndsInto(Box::new(self), pattern.into())
+    }
+
+    fn not_ends_into<T>(self, pattern: T) -> Compare<'a>
+    where
+        T: Into<Cow<'a, str>>,
+    {
+        Compare::NotEndsInto(Box::new(self), pattern.into())
+    }
+
+    fn is_null(self) -> Compare<'a> {
+        Compare::Null(Box::new(self))
+    }
+
+    fn is_not_null(self) -> Compare<'a> {
+        Compare::NotNull(Box::new(self))
+    }
+
+    fn between<T, V>(self, left: T, right: V) -> Compare<'a>
+    where
+        T: Into<Expression<'a>>,
+        V: Into<Expression<'a>>,
+    {
+        Compare::Between(Box::new(self), Box::new(left.into()), Box::new(right.into()))
+    }
+
+    fn not_between<T, V>(self, left: T, right: V) -> Compare<'a>
+    where
+        T: Into<Expression<'a>>,
+        V: Into<Expression<'a>>,
+    {
+        Compare::NotBetween(Box::new(self), Box::new(left.into()), Box::new(right.into()))
     }
 }

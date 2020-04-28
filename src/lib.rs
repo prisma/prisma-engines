@@ -92,9 +92,9 @@
 //!
 //! assert_eq!(
 //!     vec![
-//!         ParameterizedValue::from("meow"),
-//!         ParameterizedValue::from(10),
-//!         ParameterizedValue::from("warm"),
+//!         Value::from("meow"),
+//!         Value::from(10),
+//!         Value::from("warm"),
 //!     ],
 //!     params
 //! );
@@ -127,6 +127,8 @@ pub mod single;
 pub mod visitor;
 
 use once_cell::sync::Lazy;
+
+pub use ast::Value;
 
 pub(crate) static LOG_QUERIES: Lazy<bool> = Lazy::new(|| std::env::var("LOG_QUERIES").map(|_| true).unwrap_or(false));
 

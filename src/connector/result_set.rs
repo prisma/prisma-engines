@@ -4,23 +4,23 @@ mod result_row;
 pub use index::*;
 pub use result_row::*;
 
-use crate::{ast::ParameterizedValue, error::*};
+use crate::{ast::Value, error::*};
 use std::sync::Arc;
 
 #[cfg(feature = "json-1")]
-use serde_json::{Map, Value};
+use serde_json::Map;
 
 /// Encapsulates a set of results and their respective column names.
 #[derive(Debug, Default)]
 pub struct ResultSet {
     pub(crate) columns: Arc<Vec<String>>,
-    pub(crate) rows: Vec<Vec<ParameterizedValue<'static>>>,
+    pub(crate) rows: Vec<Vec<Value<'static>>>,
     pub(crate) last_insert_id: Option<u64>,
 }
 
 impl ResultSet {
     /// Creates a new instance, bound to the given column names and result rows.
-    pub fn new(names: Vec<String>, rows: Vec<Vec<ParameterizedValue<'static>>>) -> Self {
+    pub fn new(names: Vec<String>, rows: Vec<Vec<Value<'static>>>) -> Self {
         Self {
             columns: Arc::new(names),
             rows,
@@ -91,7 +91,7 @@ impl IntoIterator for ResultSet {
 /// Might become lazy one day.
 pub struct ResultSetIterator {
     pub(crate) columns: Arc<Vec<String>>,
-    pub(crate) internal_iterator: std::vec::IntoIter<Vec<ParameterizedValue<'static>>>,
+    pub(crate) internal_iterator: std::vec::IntoIter<Vec<Value<'static>>>,
 }
 
 impl Iterator for ResultSetIterator {
@@ -109,7 +109,7 @@ impl Iterator for ResultSetIterator {
 }
 
 #[cfg(feature = "json-1")]
-impl From<ResultSet> for Value {
+impl From<ResultSet> for serde_json::Value {
     fn from(result_set: ResultSet) -> Self {
         let columns: Vec<String> = result_set.columns().iter().map(ToString::to_string).collect();
         let mut result = Vec::new();
@@ -119,12 +119,12 @@ impl From<ResultSet> for Value {
 
             for (idx, p_value) in row.into_iter().enumerate() {
                 let column_name: String = columns[idx].clone();
-                object.insert(column_name, Value::from(p_value));
+                object.insert(column_name, serde_json::Value::from(p_value));
             }
 
-            result.push(Value::Object(object));
+            result.push(serde_json::Value::Object(object));
         }
 
-        Value::Array(result)
+        serde_json::Value::Array(result)
     }
 }

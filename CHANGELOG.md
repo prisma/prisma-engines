@@ -76,7 +76,7 @@ Breaking changes ahead
 
 ## v0.1.12
 
-- Add a ParameterizedValue::Enum in order to support writing to native enum columns in Postgres
+- Add a Value::Enum in order to support writing to native enum columns in Postgres
 
 ## v0.1.11
 
@@ -105,7 +105,7 @@ Breaking changes ahead
 ## v0.1.6
 
 - Loosen up certain vector-taking functions to use `IntoIter`
-- Fix the `columns` method to actually use `Column` instead of a plain `DatabaseValue`
+- Fix the `columns` method to actually use `Column` instead of a plain `Expression`
 
 ## v0.1.5
 

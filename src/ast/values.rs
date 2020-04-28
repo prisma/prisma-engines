@@ -12,7 +12,7 @@ use std::{
 };
 
 #[cfg(feature = "json-1")]
-use serde_json::{Number, Value};
+use serde_json::{Number, Value as JsonValue};
 
 #[cfg(feature = "uuid-0_8")]
 use uuid::Uuid;
@@ -22,7 +22,7 @@ use chrono::{DateTime, Utc};
 
 /// A value we must parameterize for the prepared statement.
 #[derive(Debug, Clone, PartialEq)]
-pub enum ParameterizedValue<'a> {
+pub enum Value<'a> {
     Null,
     Integer(i64),
     Real(Decimal),
@@ -32,16 +32,16 @@ pub enum ParameterizedValue<'a> {
     Boolean(bool),
     Char(char),
     #[cfg(all(feature = "array", feature = "postgresql"))]
-    Array(Vec<ParameterizedValue<'a>>),
+    Array(Vec<Value<'a>>),
     #[cfg(feature = "json-1")]
-    Json(Value),
+    Json(serde_json::Value),
     #[cfg(feature = "uuid-0_8")]
     Uuid(Uuid),
     #[cfg(feature = "chrono-0_4")]
     DateTime(DateTime<Utc>),
 }
 
-pub(crate) struct Params<'a>(pub(crate) &'a [ParameterizedValue<'a>]);
+pub(crate) struct Params<'a>(pub(crate) &'a [Value<'a>]);
 
 impl<'a> fmt::Display for Params<'a> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -59,19 +59,19 @@ impl<'a> fmt::Display for Params<'a> {
     }
 }
 
-impl<'a> fmt::Display for ParameterizedValue<'a> {
+impl<'a> fmt::Display for Value<'a> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            ParameterizedValue::Null => write!(f, "null"),
-            ParameterizedValue::Integer(val) => write!(f, "{}", val),
-            ParameterizedValue::Real(val) => write!(f, "{}", val),
-            ParameterizedValue::Text(val) => write!(f, "\"{}\"", val),
-            ParameterizedValue::Bytes(val) => write!(f, "<{} bytes blob>", val.len()),
-            ParameterizedValue::Enum(val) => write!(f, "\"{}\"", val),
-            ParameterizedValue::Boolean(val) => write!(f, "{}", val),
-            ParameterizedValue::Char(val) => write!(f, "'{}'", val),
+            Value::Null => write!(f, "null"),
+            Value::Integer(val) => write!(f, "{}", val),
+            Value::Real(val) => write!(f, "{}", val),
+            Value::Text(val) => write!(f, "\"{}\"", val),
+            Value::Bytes(val) => write!(f, "<{} bytes blob>", val.len()),
+            Value::Enum(val) => write!(f, "\"{}\"", val),
+            Value::Boolean(val) => write!(f, "{}", val),
+            Value::Char(val) => write!(f, "'{}'", val),
             #[cfg(feature = "array")]
-            ParameterizedValue::Array(vals) => {
+            Value::Array(vals) => {
                 let len = vals.len();
 
                 write!(f, "[")?;
@@ -85,57 +85,57 @@ impl<'a> fmt::Display for ParameterizedValue<'a> {
                 write!(f, "]")
             }
             #[cfg(feature = "json-1")]
-            ParameterizedValue::Json(val) => write!(f, "{}", val),
+            Value::Json(val) => write!(f, "{}", val),
             #[cfg(feature = "uuid-0_8")]
-            ParameterizedValue::Uuid(val) => write!(f, "{}", val),
+            Value::Uuid(val) => write!(f, "{}", val),
             #[cfg(feature = "chrono-0_4")]
-            ParameterizedValue::DateTime(val) => write!(f, "{}", val),
+            Value::DateTime(val) => write!(f, "{}", val),
         }
     }
 }
 
 #[cfg(feature = "json-1")]
-impl<'a> From<ParameterizedValue<'a>> for Value {
-    fn from(pv: ParameterizedValue<'a>) -> Self {
+impl<'a> From<Value<'a>> for serde_json::Value {
+    fn from(pv: Value<'a>) -> Self {
         match pv {
-            ParameterizedValue::Null => Value::Null,
-            ParameterizedValue::Integer(i) => Value::Number(Number::from(i)),
-            ParameterizedValue::Real(d) => serde_json::to_value(d).unwrap(),
-            ParameterizedValue::Text(cow) => Value::String(cow.into_owned()),
-            ParameterizedValue::Bytes(bytes) => Value::String(base64::encode(&bytes)),
-            ParameterizedValue::Enum(cow) => Value::String(cow.into_owned()),
-            ParameterizedValue::Boolean(b) => Value::Bool(b),
-            ParameterizedValue::Char(c) => {
+            Value::Null => serde_json::Value::Null,
+            Value::Integer(i) => serde_json::Value::Number(Number::from(i)),
+            Value::Real(d) => serde_json::to_value(d).unwrap(),
+            Value::Text(cow) => serde_json::Value::String(cow.into_owned()),
+            Value::Bytes(bytes) => serde_json::Value::String(base64::encode(&bytes)),
+            Value::Enum(cow) => serde_json::Value::String(cow.into_owned()),
+            Value::Boolean(b) => serde_json::Value::Bool(b),
+            Value::Char(c) => {
                 let bytes = [c as u8];
                 let s = std::str::from_utf8(&bytes)
                     .expect("interpret byte as UTF-8")
                     .to_string();
-                Value::String(s)
+                serde_json::Value::String(s)
             }
-            ParameterizedValue::Json(v) => v,
+            Value::Json(v) => v,
             #[cfg(feature = "array")]
-            ParameterizedValue::Array(v) => Value::Array(v.into_iter().map(Value::from).collect()),
+            Value::Array(v) => serde_json::Value::Array(v.into_iter().map(serde_json::Value::from).collect()),
             #[cfg(feature = "uuid-0_8")]
-            ParameterizedValue::Uuid(u) => Value::String(u.to_hyphenated().to_string()),
+            Value::Uuid(u) => serde_json::Value::String(u.to_hyphenated().to_string()),
             #[cfg(feature = "chrono-0_4")]
-            ParameterizedValue::DateTime(dt) => Value::String(dt.to_rfc3339()),
+            Value::DateTime(dt) => serde_json::Value::String(dt.to_rfc3339()),
         }
     }
 }
 
-impl<'a> ParameterizedValue<'a> {
-    /// `true` if the `ParameterizedValue` is null.
+impl<'a> Value<'a> {
+    /// `true` if the `Value` is null.
     pub fn is_null(&self) -> bool {
         match self {
-            ParameterizedValue::Null => true,
+            Value::Null => true,
             _ => false,
         }
     }
 
-    /// `true` if the `ParameterizedValue` is text.
+    /// `true` if the `Value` is text.
     pub fn is_text(&self) -> bool {
         match self {
-            ParameterizedValue::Text(_) => true,
+            Value::Text(_) => true,
             _ => false,
         }
     }
@@ -143,8 +143,8 @@ impl<'a> ParameterizedValue<'a> {
     /// Returns a &str if the value is text, otherwise `None`.
     pub fn as_str(&self) -> Option<&str> {
         match self {
-            ParameterizedValue::Text(cow) => Some(cow.borrow()),
-            ParameterizedValue::Bytes(cow) => std::str::from_utf8(cow.as_ref()).ok(),
+            Value::Text(cow) => Some(cow.borrow()),
+            Value::Bytes(cow) => std::str::from_utf8(cow.as_ref()).ok(),
             _ => None,
         }
     }
@@ -152,7 +152,7 @@ impl<'a> ParameterizedValue<'a> {
     /// Returns a char if the value is a char, otherwise `None`.
     pub fn as_char(&self) -> Option<char> {
         match self {
-            ParameterizedValue::Char(c) => Some(*c),
+            Value::Char(c) => Some(*c),
             _ => None,
         }
     }
@@ -160,18 +160,18 @@ impl<'a> ParameterizedValue<'a> {
     /// Returns a cloned String if the value is text, otherwise `None`.
     pub fn to_string(&self) -> Option<String> {
         match self {
-            ParameterizedValue::Text(cow) => Some(cow.to_string()),
-            ParameterizedValue::Bytes(cow) => std::str::from_utf8(cow.as_ref()).map(|s| s.to_owned()).ok(),
+            Value::Text(cow) => Some(cow.to_string()),
+            Value::Bytes(cow) => std::str::from_utf8(cow.as_ref()).map(|s| s.to_owned()).ok(),
             _ => None,
         }
     }
 
-    /// Transforms the `ParameterizedValue` to a `String` if it's text,
+    /// Transforms the `Value` to a `String` if it's text,
     /// otherwise `None`.
     pub fn into_string(self) -> Option<String> {
         match self {
-            ParameterizedValue::Text(cow) => Some(cow.into_owned()),
-            ParameterizedValue::Bytes(cow) => String::from_utf8(cow.into_owned()).ok(),
+            Value::Text(cow) => Some(cow.into_owned()),
+            Value::Bytes(cow) => String::from_utf8(cow.into_owned()).ok(),
             _ => None,
         }
     }
@@ -179,7 +179,7 @@ impl<'a> ParameterizedValue<'a> {
     /// Returns whether this value is the `Bytes` variant.
     pub fn is_bytes(&self) -> bool {
         match self {
-            ParameterizedValue::Bytes(_) => true,
+            Value::Bytes(_) => true,
             _ => false,
         }
     }
@@ -187,8 +187,8 @@ impl<'a> ParameterizedValue<'a> {
     /// Returns a bytes slice if the value is text or a byte slice, otherwise `None`.
     pub fn as_bytes(&self) -> Option<&[u8]> {
         match self {
-            ParameterizedValue::Text(cow) => Some(cow.as_ref().as_bytes()),
-            ParameterizedValue::Bytes(cow) => Some(cow.as_ref()),
+            Value::Text(cow) => Some(cow.as_ref().as_bytes()),
+            Value::Bytes(cow) => Some(cow.as_ref()),
             _ => None,
         }
     }
@@ -196,16 +196,16 @@ impl<'a> ParameterizedValue<'a> {
     /// Returns a cloned `Vec<u8>` if the value is text or a byte slice, otherwise `None`.
     pub fn to_bytes(&self) -> Option<Vec<u8>> {
         match self {
-            ParameterizedValue::Text(cow) => Some(cow.to_string().into_bytes()),
-            ParameterizedValue::Bytes(cow) => Some(cow.to_owned().into()),
+            Value::Text(cow) => Some(cow.to_string().into_bytes()),
+            Value::Bytes(cow) => Some(cow.to_owned().into()),
             _ => None,
         }
     }
 
-    /// `true` if the `ParameterizedValue` is an integer.
+    /// `true` if the `Value` is an integer.
     pub fn is_integer(&self) -> bool {
         match self {
-            ParameterizedValue::Integer(_) => true,
+            Value::Integer(_) => true,
             _ => false,
         }
     }
@@ -213,15 +213,15 @@ impl<'a> ParameterizedValue<'a> {
     /// Returns an i64 if the value is an integer, otherwise `None`.
     pub fn as_i64(&self) -> Option<i64> {
         match self {
-            ParameterizedValue::Integer(i) => Some(*i),
+            Value::Integer(i) => Some(*i),
             _ => None,
         }
     }
 
-    /// `true` if the `ParameterizedValue` is a real value.
+    /// `true` if the `Value` is a real value.
     pub fn is_real(&self) -> bool {
         match self {
-            ParameterizedValue::Real(_) => true,
+            Value::Real(_) => true,
             _ => false,
         }
     }
@@ -229,7 +229,7 @@ impl<'a> ParameterizedValue<'a> {
     /// Returns a f64 if the value is a real value and the underlying decimal can be converted, otherwise `None`.
     pub fn as_f64(&self) -> Option<f64> {
         match self {
-            ParameterizedValue::Real(d) => d.to_f64(),
+            Value::Real(d) => d.to_f64(),
             _ => None,
         }
     }
@@ -237,17 +237,17 @@ impl<'a> ParameterizedValue<'a> {
     /// Returns a decimal if the value is a real value, otherwise `None`.
     pub fn as_decimal(&self) -> Option<Decimal> {
         match self {
-            ParameterizedValue::Real(d) => Some(*d),
+            Value::Real(d) => Some(*d),
             _ => None,
         }
     }
 
-    /// `true` if the `ParameterizedValue` is a boolean value.
+    /// `true` if the `Value` is a boolean value.
     pub fn is_bool(&self) -> bool {
         match self {
-            ParameterizedValue::Boolean(_) => true,
+            Value::Boolean(_) => true,
             // For schemas which don't tag booleans
-            ParameterizedValue::Integer(i) if *i == 0 || *i == 1 => true,
+            Value::Integer(i) if *i == 0 || *i == 1 => true,
             _ => false,
         }
     }
@@ -255,18 +255,18 @@ impl<'a> ParameterizedValue<'a> {
     /// Returns a bool if the value is a boolean, otherwise `None`.
     pub fn as_bool(&self) -> Option<bool> {
         match self {
-            ParameterizedValue::Boolean(b) => Some(*b),
+            Value::Boolean(b) => Some(*b),
             // For schemas which don't tag booleans
-            ParameterizedValue::Integer(i) if *i == 0 || *i == 1 => Some(*i == 1),
+            Value::Integer(i) if *i == 0 || *i == 1 => Some(*i == 1),
             _ => None,
         }
     }
 
-    /// `true` if the `ParameterizedValue` is of UUID type.
+    /// `true` if the `Value` is of UUID type.
     #[cfg(feature = "uuid-0_8")]
     pub fn is_uuid(&self) -> bool {
         match self {
-            ParameterizedValue::Uuid(_) => true,
+            Value::Uuid(_) => true,
             _ => false,
         }
     }
@@ -275,16 +275,16 @@ impl<'a> ParameterizedValue<'a> {
     #[cfg(feature = "uuid-0_8")]
     pub fn as_uuid(&self) -> Option<Uuid> {
         match self {
-            ParameterizedValue::Uuid(u) => Some(*u),
+            Value::Uuid(u) => Some(*u),
             _ => None,
         }
     }
 
-    /// `true` if the `ParameterizedValue` is a DateTime.
+    /// `true` if the `Value` is a DateTime.
     #[cfg(feature = "chrono-0_4")]
     pub fn is_datetime(&self) -> bool {
         match self {
-            ParameterizedValue::DateTime(_) => true,
+            Value::DateTime(_) => true,
             _ => false,
         }
     }
@@ -293,34 +293,34 @@ impl<'a> ParameterizedValue<'a> {
     #[cfg(feature = "chrono-0_4")]
     pub fn as_datetime(&self) -> Option<DateTime<Utc>> {
         match self {
-            ParameterizedValue::DateTime(dt) => Some(*dt),
+            Value::DateTime(dt) => Some(*dt),
             _ => None,
         }
     }
 
-    /// `true` if the `ParameterizedValue` is a JSON value.
+    /// `true` if the `Value` is a JSON value.
     #[cfg(feature = "json-1")]
     pub fn is_json(&self) -> bool {
         match self {
-            ParameterizedValue::Json(_) => true,
+            Value::Json(_) => true,
             _ => false,
         }
     }
 
     /// Returns a reference to a JSON Value if of Json type, otherwise `None`.
     #[cfg(feature = "json-1")]
-    pub fn as_json(&self) -> Option<&Value> {
+    pub fn as_json(&self) -> Option<&serde_json::Value> {
         match self {
-            ParameterizedValue::Json(j) => Some(j),
+            Value::Json(j) => Some(j),
             _ => None,
         }
     }
 
     /// Transforms to a JSON Value if of Json type, otherwise `None`.
     #[cfg(feature = "json-1")]
-    pub fn into_json(self) -> Option<Value> {
+    pub fn into_json(self) -> Option<serde_json::Value> {
         match self {
-            ParameterizedValue::Json(j) => Some(j),
+            Value::Json(j) => Some(j),
             _ => None,
         }
     }
@@ -329,11 +329,11 @@ impl<'a> ParameterizedValue<'a> {
     #[cfg(all(feature = "array", feature = "postgresql"))]
     pub fn into_vec<T>(self) -> Option<Vec<T>>
     where
-        // Implement From<ParameterizedValue>
-        T: TryFrom<ParameterizedValue<'a>>,
+        // Implement From<Value>
+        T: TryFrom<Value<'a>>,
     {
         match self {
-            ParameterizedValue::Array(vec) => {
+            Value::Array(vec) => {
                 let rslt: Result<Vec<_>, _> = vec.into_iter().map(T::try_from).collect();
                 match rslt {
                     Err(_) => None,
@@ -345,98 +345,60 @@ impl<'a> ParameterizedValue<'a> {
     }
 }
 
-/// A value we can compare and use in database queries.
-#[derive(Debug, Clone, PartialEq)]
-pub enum DatabaseValue<'a> {
-    /// Anything that we must parameterize before querying
-    Parameterized(ParameterizedValue<'a>),
-    /// A database column
-    Column(Box<Column<'a>>),
-    /// Data in a row form, e.g. (1, 2, 3)
-    Row(Row<'a>),
-    /// A nested `SELECT` statement
-    Select(Box<Select<'a>>),
-    /// A database function call
-    Function(Function<'a>),
-    /// A qualified asterisk to a table
-    Asterisk(Option<Box<Table<'a>>>),
-    /// An operation: sum, sub, mul or div.
-    Op(Box<SqlOp<'a>>),
-    /// A `VALUES` statement
-    Values(Box<Values<'a>>),
-}
-
-/// A quick alias to create an asterisk to a table.
-///
-/// ```rust
-/// # use quaint::ast::*;
-/// assert_eq!(
-///     asterisk(),
-///     DatabaseValue::Asterisk(None)
-/// )
-/// ```
-pub fn asterisk() -> DatabaseValue<'static> {
-    DatabaseValue::Asterisk(None)
-}
-
-/*
- * Here be the parameterized value converters.
- */
-
-impl<'a> From<&'a str> for ParameterizedValue<'a> {
+impl<'a> From<&'a str> for Value<'a> {
     fn from(that: &'a str) -> Self {
-        ParameterizedValue::Text(that.into())
+        Value::Text(that.into())
     }
 }
 
-impl<'a> From<String> for ParameterizedValue<'a> {
+impl<'a> From<String> for Value<'a> {
     fn from(that: String) -> Self {
-        ParameterizedValue::Text(that.into())
+        Value::Text(that.into())
     }
 }
 
-impl<'a> From<usize> for ParameterizedValue<'a> {
+impl<'a> From<usize> for Value<'a> {
     fn from(that: usize) -> Self {
-        ParameterizedValue::Integer(i64::try_from(that).unwrap())
+        Value::Integer(i64::try_from(that).unwrap())
     }
 }
 
-impl<'a> From<i32> for ParameterizedValue<'a> {
+impl<'a> From<i32> for Value<'a> {
     fn from(that: i32) -> Self {
-        ParameterizedValue::Integer(i64::try_from(that).unwrap())
+        Value::Integer(i64::try_from(that).unwrap())
     }
 }
 
-impl<'a> From<&'a [u8]> for ParameterizedValue<'a> {
-    fn from(that: &'a [u8]) -> ParameterizedValue<'a> {
-        ParameterizedValue::Bytes(that.into())
+impl<'a> From<&'a [u8]> for Value<'a> {
+    fn from(that: &'a [u8]) -> Value<'a> {
+        Value::Bytes(that.into())
     }
 }
 
-impl<'a> TryFrom<ParameterizedValue<'a>> for i64 {
+impl<'a> TryFrom<Value<'a>> for i64 {
     type Error = Error;
 
-    fn try_from(value: ParameterizedValue<'a>) -> Result<i64, Self::Error> {
+    fn try_from(value: Value<'a>) -> Result<i64, Self::Error> {
         value
             .as_i64()
             .ok_or_else(|| Error::builder(ErrorKind::ConversionError("Not an i64")).build())
     }
 }
 
-impl<'a> TryFrom<ParameterizedValue<'a>> for Decimal {
+impl<'a> TryFrom<Value<'a>> for Decimal {
     type Error = Error;
 
-    fn try_from(value: ParameterizedValue<'a>) -> Result<Decimal, Self::Error> {
+    fn try_from(value: Value<'a>) -> Result<Decimal, Self::Error> {
         value
             .as_decimal()
             .ok_or_else(|| Error::builder(ErrorKind::ConversionError("Not a decimal")).build())
     }
 }
 
-impl<'a> TryFrom<ParameterizedValue<'a>> for f64 {
+impl<'a> TryFrom<Value<'a>> for f64 {
     type Error = Error;
 
-    fn try_from(value: ParameterizedValue<'a>) -> Result<f64, Self::Error> {
+    fn try_from(value: Value<'a>) -> Result<f64, Self::Error> {
         value
             .as_decimal()
             .and_then(|d| d.to_f64())
@@ -444,20 +406,20 @@ impl<'a> TryFrom<ParameterizedValue<'a>> for f64 {
     }
 }
 
-impl<'a> TryFrom<ParameterizedValue<'a>> for String {
+impl<'a> TryFrom<Value<'a>> for String {
     type Error = Error;
 
-    fn try_from(value: ParameterizedValue<'a>) -> Result<String, Self::Error> {
+    fn try_from(value: Value<'a>) -> Result<String, Self::Error> {
         value
             .into_string()
             .ok_or_else(|| Error::builder(ErrorKind::ConversionError("Not a string")).build())
     }
 }
 
-impl<'a> TryFrom<ParameterizedValue<'a>> for bool {
+impl<'a> TryFrom<Value<'a>> for bool {
     type Error = Error;
 
-    fn try_from(value: ParameterizedValue<'a>) -> Result<bool, Self::Error> {
+    fn try_from(value: Value<'a>) -> Result<bool, Self::Error> {
         value
             .as_bool()
             .ok_or_else(|| Error::builder(ErrorKind::ConversionError("Not a bool")).build())
@@ -465,262 +427,68 @@ impl<'a> TryFrom<ParameterizedValue<'a>> for bool {
 }
 
 #[cfg(feature = "chrono-0_4")]
-impl<'a> TryFrom<ParameterizedValue<'a>> for DateTime<Utc> {
+impl<'a> TryFrom<Value<'a>> for DateTime<Utc> {
     type Error = Error;
 
-    fn try_from(value: ParameterizedValue<'a>) -> Result<DateTime<Utc>, Self::Error> {
+    fn try_from(value: Value<'a>) -> Result<DateTime<Utc>, Self::Error> {
         value
             .as_datetime()
             .ok_or_else(|| Error::builder(ErrorKind::ConversionError("Not a datetime")).build())
     }
 }
 
-#[macro_export]
-/// Marks a given string as a value. Useful when using a value in calculations,
-/// e.g.
-///
-/// ``` rust
-/// # use quaint::{col, val, ast::*, visitor::{Visitor, Sqlite}};
-/// let join = "dogs".on(("dogs", "slave_id").equals(Column::from(("cats", "master_id"))));
-///
-/// let query = Select::from_table("cats")
-///     .value(Table::from("cats").asterisk())
-///     .value(col!("dogs", "age") - val!(4))
-///     .inner_join(join);
-///
-/// let (sql, params) = Sqlite::build(query);
-///
-/// assert_eq!(
-///     "SELECT `cats`.*, (`dogs`.`age` - ?) FROM `cats` INNER JOIN `dogs` ON `dogs`.`slave_id` = `cats`.`master_id`",
-///     sql
-/// );
-/// ```
-macro_rules! val {
-    ($val:expr) => {
-        DatabaseValue::from($val)
-    };
-}
-
-macro_rules! parameterized_value {
+macro_rules! value {
     ($kind:ident,$paramkind:ident) => {
-        impl<'a> From<$kind> for ParameterizedValue<'a> {
+        impl<'a> From<$kind> for Value<'a> {
             fn from(that: $kind) -> Self {
-                ParameterizedValue::$paramkind(that)
+                Value::$paramkind(that)
             }
         }
     };
 }
 
-parameterized_value!(i64, Integer);
-parameterized_value!(bool, Boolean);
-parameterized_value!(Decimal, Real);
+value!(i64, Integer);
+value!(bool, Boolean);
+value!(Decimal, Real);
 
 #[cfg(feature = "json-1")]
-parameterized_value!(Value, Json);
+value!(JsonValue, Json);
 
 #[cfg(feature = "uuid-0_8")]
-parameterized_value!(Uuid, Uuid);
+value!(Uuid, Uuid);
 
 #[cfg(feature = "chrono-0_4")]
-impl<'a> From<DateTime<Utc>> for ParameterizedValue<'a> {
+impl<'a> From<DateTime<Utc>> for Value<'a> {
     fn from(that: DateTime<Utc>) -> Self {
-        ParameterizedValue::DateTime(that)
+        Value::DateTime(that)
     }
 }
 
 #[cfg(feature = "chrono-0_4")]
-impl<'a> From<chrono::NaiveTime> for ParameterizedValue<'a> {
+impl<'a> From<chrono::NaiveTime> for Value<'a> {
     fn from(that: chrono::NaiveTime) -> Self {
-        ParameterizedValue::Text(that.to_string().into())
+        Value::Text(that.to_string().into())
     }
 }
 
-impl<'a> From<f64> for ParameterizedValue<'a> {
+impl<'a> From<f64> for Value<'a> {
     fn from(that: f64) -> Self {
         // Decimal::from_f64 is buggy. See https://github.com/paupino/rust-decimal/issues/228
         let dec = Decimal::from_str(&that.to_string()).expect("f64 is not a Decimal");
-        ParameterizedValue::Real(dec)
+        Value::Real(dec)
     }
 }
 
-impl<'a> From<f32> for ParameterizedValue<'a> {
+impl<'a> From<f32> for Value<'a> {
     fn from(that: f32) -> Self {
         let dec = Decimal::from_f32(that).expect("f32 is not a Decimal");
-        ParameterizedValue::Real(dec)
+        Value::Real(dec)
     }
 }
 
 /*
  * Here be the database value converters.
  */
-
-macro_rules! database_value {
-    ($kind:ident,$paramkind:ident) => {
-        impl<'a> From<$kind<'a>> for DatabaseValue<'a> {
-            fn from(that: $kind<'a>) -> Self {
-                DatabaseValue::$paramkind(that)
-            }
-        }
-    };
-}
-
-database_value!(Row, Row);
-database_value!(Function, Function);
-
-impl<'a> From<Values<'a>> for DatabaseValue<'a> {
-    fn from(p: Values<'a>) -> Self {
-        Self::Values(Box::new(p))
-    }
-}
-
-impl<'a> From<SqlOp<'a>> for DatabaseValue<'a> {
-    fn from(p: SqlOp<'a>) -> Self {
-        Self::Op(Box::new(p))
-    }
-}
-
-impl<'a, T> From<T> for DatabaseValue<'a>
-where
-    T: Into<ParameterizedValue<'a>>,
-{
-    fn from(p: T) -> Self {
-        DatabaseValue::Parameterized(p.into())
-    }
-}
-
-impl<'a, T> From<Vec<T>> for DatabaseValue<'a>
-where
-    T: Into<DatabaseValue<'a>>,
-{
-    fn from(v: Vec<T>) -> Self {
-        let row: Row<'a> = v.into();
-        row.into()
-    }
-}
-
-impl<'a> Comparable<'a> for DatabaseValue<'a> {
-    fn equals<T>(self, comparison: T) -> Compare<'a>
-    where
-        T: Into<DatabaseValue<'a>>,
-    {
-        Compare::Equals(Box::new(self), Box::new(comparison.into()))
-    }
-
-    fn not_equals<T>(self, comparison: T) -> Compare<'a>
-    where
-        T: Into<DatabaseValue<'a>>,
-    {
-        Compare::NotEquals(Box::new(self), Box::new(comparison.into()))
-    }
-
-    fn less_than<T>(self, comparison: T) -> Compare<'a>
-    where
-        T: Into<DatabaseValue<'a>>,
-    {
-        Compare::LessThan(Box::new(self), Box::new(comparison.into()))
-    }
-
-    fn less_than_or_equals<T>(self, comparison: T) -> Compare<'a>
-    where
-        T: Into<DatabaseValue<'a>>,
-    {
-        Compare::LessThanOrEquals(Box::new(self), Box::new(comparison.into()))
-    }
-
-    fn greater_than<T>(self, comparison: T) -> Compare<'a>
-    where
-        T: Into<DatabaseValue<'a>>,
-    {
-        Compare::GreaterThan(Box::new(self), Box::new(comparison.into()))
-    }
-
-    fn greater_than_or_equals<T>(self, comparison: T) -> Compare<'a>
-    where
-        T: Into<DatabaseValue<'a>>,
-    {
-        Compare::GreaterThanOrEquals(Box::new(self), Box::new(comparison.into()))
-    }
-
-    fn in_selection<T>(self, selection: T) -> Compare<'a>
-    where
-        T: Into<DatabaseValue<'a>>,
-    {
-        Compare::In(Box::new(self), Box::new(selection.into()))
-    }
-
-    fn not_in_selection<T>(self, selection: T) -> Compare<'a>
-    where
-        T: Into<DatabaseValue<'a>>,
-    {
-        Compare::NotIn(Box::new(self), Box::new(selection.into()))
-    }
-
-    fn like<T>(self, pattern: T) -> Compare<'a>
-    where
-        T: Into<Cow<'a, str>>,
-    {
-        Compare::Like(Box::new(self), pattern.into())
-    }
-
-    fn not_like<T>(self, pattern: T) -> Compare<'a>
-    where
-        T: Into<Cow<'a, str>>,
-    {
-        Compare::NotLike(Box::new(self), pattern.into())
-    }
-
-    fn begins_with<T>(self, pattern: T) -> Compare<'a>
-    where
-        T: Into<Cow<'a, str>>,
-    {
-        Compare::BeginsWith(Box::new(self), pattern.into())
-    }
-
-    fn not_begins_with<T>(self, pattern: T) -> Compare<'a>
-    where
-        T: Into<Cow<'a, str>>,
-    {
-        Compare::NotBeginsWith(Box::new(self), pattern.into())
-    }
-
-    fn ends_into<T>(self, pattern: T) -> Compare<'a>
-    where
-        T: Into<Cow<'a, str>>,
-    {
-        Compare::EndsInto(Box::new(self), pattern.into())
-    }
-
-    fn not_ends_into<T>(self, pattern: T) -> Compare<'a>
-    where
-        T: Into<Cow<'a, str>>,
-    {
-        Compare::NotEndsInto(Box::new(self), pattern.into())
-    }
-
-    fn is_null(self) -> Compare<'a> {
-        Compare::Null(Box::new(self))
-    }
-
-    fn is_not_null(self) -> Compare<'a> {
-        Compare::NotNull(Box::new(self))
-    }
-
-    fn between<T, V>(self, left: T, right: V) -> Compare<'a>
-    where
-        T: Into<DatabaseValue<'a>>,
-        V: Into<DatabaseValue<'a>>,
-    {
-        Compare::Between(Box::new(self), Box::new(left.into()), Box::new(right.into()))
-    }
-
-    fn not_between<T, V>(self, left: T, right: V) -> Compare<'a>
-    where
-        T: Into<DatabaseValue<'a>>,
-        V: Into<DatabaseValue<'a>>,
-    {
-        Compare::NotBetween(Box::new(self), Box::new(left.into()), Box::new(right.into()))
-    }
-}
 
 #[cfg(all(test, feature = "array", feature = "postgresql"))]
 mod tests {
@@ -730,7 +498,7 @@ mod tests {
 
     #[test]
     fn a_parameterized_value_of_ints_can_be_converted_into_a_vec() {
-        let pv = ParameterizedValue::Array(vec![ParameterizedValue::Integer(1)]);
+        let pv = Value::Array(vec![Value::Integer(1)]);
 
         let values: Vec<i64> = pv.into_vec().expect("convert into Vec<i64>");
 
@@ -739,7 +507,7 @@ mod tests {
 
     #[test]
     fn a_parameterized_value_of_reals_can_be_converted_into_a_vec() {
-        let pv = ParameterizedValue::Array(vec![ParameterizedValue::from(1.0)]);
+        let pv = Value::Array(vec![Value::from(1.0)]);
 
         let values: Vec<f64> = pv.into_vec().expect("convert into Vec<f64>");
 
@@ -748,7 +516,7 @@ mod tests {
 
     #[test]
     fn a_parameterized_value_of_texts_can_be_converted_into_a_vec() {
-        let pv = ParameterizedValue::Array(vec![ParameterizedValue::Text(Cow::from("test"))]);
+        let pv = Value::Array(vec![Value::Text(Cow::from("test"))]);
 
         let values: Vec<String> = pv.into_vec().expect("convert into Vec<String>");
 
@@ -757,7 +525,7 @@ mod tests {
 
     #[test]
     fn a_parameterized_value_of_booleans_can_be_converted_into_a_vec() {
-        let pv = ParameterizedValue::Array(vec![ParameterizedValue::Boolean(true)]);
+        let pv = Value::Array(vec![Value::Boolean(true)]);
 
         let values: Vec<bool> = pv.into_vec().expect("convert into Vec<bool>");
 
@@ -768,7 +536,7 @@ mod tests {
     #[cfg(feature = "chrono-0_4")]
     fn a_parameterized_value_of_datetimes_can_be_converted_into_a_vec() {
         let datetime = DateTime::from_str("2019-07-27T05:30:30Z").expect("parsing date/time");
-        let pv = ParameterizedValue::Array(vec![ParameterizedValue::DateTime(datetime)]);
+        let pv = Value::Array(vec![Value::DateTime(datetime)]);
 
         let values: Vec<DateTime<Utc>> = pv.into_vec().expect("convert into Vec<DateTime>");
 
@@ -777,7 +545,7 @@ mod tests {
 
     #[test]
     fn a_parameterized_value_of_an_array_cant_be_converted_into_a_vec_of_the_wrong_type() {
-        let pv = ParameterizedValue::Array(vec![ParameterizedValue::Integer(1)]);
+        let pv = Value::Array(vec![Value::Integer(1)]);
 
         let rslt: Option<Vec<f64>> = pv.into_vec();
 

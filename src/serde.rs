@@ -1,7 +1,7 @@
 //! Convert results from the database into any type implementing `serde::Deserialize`.
 
 use crate::{
-    ast::ParameterizedValue,
+    ast::Value,
     connector::{ResultRow, ResultSet},
     error::{Error, ErrorKind},
 };
@@ -31,7 +31,7 @@ pub fn from_rows<T: DeserializeOwned>(result_set: ResultSet) -> crate::Result<Ve
 ///
 /// ```
 /// # use serde::Deserialize;
-/// # use quaint::ast::ParameterizedValue;
+/// # use quaint::ast::Value;
 /// #
 /// # #[derive(Deserialize, Debug, PartialEq)]
 /// # struct User {
@@ -42,7 +42,7 @@ pub fn from_rows<T: DeserializeOwned>(result_set: ResultSet) -> crate::Result<Ve
 /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
 /// #
 /// #   let row = quaint::serde::make_row(vec![
-/// #       ("id", ParameterizedValue::Integer(12)),
+/// #       ("id", Value::Integer(12)),
 /// #       ("name", "Georgina".into()),
 /// #   ]);
 /// #
@@ -73,7 +73,7 @@ impl<'de> Deserializer<'de> for RowDeserializer {
         let kvs = columns.iter().enumerate().map(move |(v, k)| {
             // The unwrap is safe if `columns` is correct.
             let value = values.get_mut(v).unwrap();
-            let taken_value = std::mem::replace(value, ParameterizedValue::Null);
+            let taken_value = std::mem::replace(value, Value::Null);
             (k.as_str(), taken_value)
         });
 
@@ -89,47 +89,47 @@ impl<'de> Deserializer<'de> for RowDeserializer {
     }
 }
 
-impl<'de> IntoDeserializer<'de, DeserializeError> for ParameterizedValue<'de> {
-    type Deserializer = ParameterizedValueDeserializer<'de>;
+impl<'de> IntoDeserializer<'de, DeserializeError> for Value<'de> {
+    type Deserializer = ValueDeserializer<'de>;
 
     fn into_deserializer(self) -> Self::Deserializer {
-        ParameterizedValueDeserializer(self)
+        ValueDeserializer(self)
     }
 }
 
 #[derive(Debug)]
-pub struct ParameterizedValueDeserializer<'a>(ParameterizedValue<'a>);
+pub struct ValueDeserializer<'a>(Value<'a>);
 
-impl<'de> Deserializer<'de> for ParameterizedValueDeserializer<'de> {
+impl<'de> Deserializer<'de> for ValueDeserializer<'de> {
     type Error = DeserializeError;
 
     fn deserialize_any<V: Visitor<'de>>(self, visitor: V) -> Result<V::Value, Self::Error> {
         use rust_decimal::prelude::ToPrimitive;
 
         match self.0 {
-            ParameterizedValue::Text(s) => visitor.visit_string(s.into_owned()),
-            ParameterizedValue::Bytes(bytes) => visitor.visit_bytes(bytes.as_ref()),
-            ParameterizedValue::Enum(s) => visitor.visit_string(s.into_owned()),
-            ParameterizedValue::Integer(i) => visitor.visit_i64(i),
-            ParameterizedValue::Boolean(b) => visitor.visit_bool(b),
-            ParameterizedValue::Char(c) => visitor.visit_char(c),
-            ParameterizedValue::Null => visitor.visit_none(),
-            ParameterizedValue::Real(real) => visitor.visit_f64(real.to_f64().unwrap()),
+            Value::Text(s) => visitor.visit_string(s.into_owned()),
+            Value::Bytes(bytes) => visitor.visit_bytes(bytes.as_ref()),
+            Value::Enum(s) => visitor.visit_string(s.into_owned()),
+            Value::Integer(i) => visitor.visit_i64(i),
+            Value::Boolean(b) => visitor.visit_bool(b),
+            Value::Char(c) => visitor.visit_char(c),
+            Value::Null => visitor.visit_none(),
+            Value::Real(real) => visitor.visit_f64(real.to_f64().unwrap()),
 
             #[cfg(feature = "uuid-0_8")]
-            ParameterizedValue::Uuid(uuid) => visitor.visit_string(uuid.to_string()),
+            Value::Uuid(uuid) => visitor.visit_string(uuid.to_string()),
 
             #[cfg(feature = "json-1")]
-            ParameterizedValue::Json(value) => value
+            Value::Json(value) => value
                 .into_deserializer()
                 .deserialize_any(visitor)
                 .map_err(|err| serde::de::value::Error::custom(format!("Error deserializing JSON value: {}", err))),
 
             #[cfg(feature = "chrono-0_4")]
-            ParameterizedValue::DateTime(dt) => visitor.visit_string(dt.to_rfc3339()),
+            Value::DateTime(dt) => visitor.visit_string(dt.to_rfc3339()),
 
             #[cfg(all(feature = "array", feature = "postgresql"))]
-            ParameterizedValue::Array(values) => {
+            Value::Array(values) => {
                 let deserializer = serde::de::value::SeqDeserializer::new(values.into_iter());
                 visitor.visit_seq(deserializer)
             }
@@ -138,7 +138,7 @@ impl<'de> Deserializer<'de> for ParameterizedValueDeserializer<'de> {
 
     fn deserialize_option<V: Visitor<'de>>(self, visitor: V) -> Result<V::Value, Self::Error> {
         match &self.0 {
-            ParameterizedValue::Null => visitor.visit_none(),
+            Value::Null => visitor.visit_none(),
             _ => visitor.visit_some(self),
         }
     }
@@ -151,7 +151,7 @@ impl<'de> Deserializer<'de> for ParameterizedValueDeserializer<'de> {
 }
 
 #[doc(hidden)]
-pub fn make_row(cols: Vec<(&'static str, ParameterizedValue<'static>)>) -> ResultRow {
+pub fn make_row(cols: Vec<(&'static str, Value<'static>)>) -> ResultRow {
     let mut columns = Vec::with_capacity(cols.len());
     let mut values = Vec::with_capacity(cols.len());
 
@@ -188,10 +188,7 @@ mod tests {
 
     #[test]
     fn deserialize_user() {
-        let row = make_row(vec![
-            ("id", ParameterizedValue::Integer(12)),
-            ("name", "Georgina".into()),
-        ]);
+        let row = make_row(vec![("id", Value::Integer(12)), ("name", "Georgina".into())]);
         let user: User = from_row(row).unwrap();
 
         assert_eq!(
@@ -207,9 +204,9 @@ mod tests {
     #[test]
     fn from_rows_works() {
         let first_row = make_row(vec![
-            ("id", ParameterizedValue::Integer(12)),
+            ("id", Value::Integer(12)),
             ("name", "Georgina".into()),
-            ("bio", ParameterizedValue::Null.into()),
+            ("bio", Value::Null.into()),
         ]);
         let second_row = make_row(vec![
             ("id", 33.into()),
@@ -248,14 +245,11 @@ mod tests {
     #[test]
     fn deserialize_cat() {
         let row = make_row(vec![
-            ("age", ParameterizedValue::Real("18.800001".parse().unwrap())),
-            (
-                "birthday",
-                ParameterizedValue::DateTime("2019-08-01T20:00:00Z".parse().unwrap()),
-            ),
+            ("age", Value::Real("18.800001".parse().unwrap())),
+            ("birthday", Value::DateTime("2019-08-01T20:00:00Z".parse().unwrap())),
             (
                 "human",
-                ParameterizedValue::Json(serde_json::json!({
+                Value::Json(serde_json::json!({
                     "id": 19,
                     "name": "Georgina"
                 })),

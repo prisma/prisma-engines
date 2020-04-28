@@ -5,7 +5,7 @@ use crate::ast::*;
 pub struct Update<'a> {
     pub(crate) table: Table<'a>,
     pub(crate) columns: Vec<Column<'a>>,
-    pub(crate) values: Vec<DatabaseValue<'a>>,
+    pub(crate) values: Vec<Expression<'a>>,
     pub(crate) conditions: Option<ConditionTree<'a>>,
 }
 
@@ -40,8 +40,8 @@ impl<'a> Update<'a> {
     ///
     /// assert_eq!(
     ///     vec![
-    ///         ParameterizedValue::Integer(10),
-    ///         ParameterizedValue::Boolean(false),
+    ///         Value::Integer(10),
+    ///         Value::Boolean(false),
     ///     ],
     ///     params,
     /// );
@@ -49,7 +49,7 @@ impl<'a> Update<'a> {
     pub fn set<K, V>(mut self, column: K, value: V) -> Update<'a>
     where
         K: Into<Column<'a>>,
-        V: Into<DatabaseValue<'a>>,
+        V: Into<Expression<'a>>,
     {
         self.columns.push(column.into());
         self.values.push(value.into());
@@ -69,8 +69,8 @@ impl<'a> Update<'a> {
     ///
     /// assert_eq!(
     ///     vec![
-    ///         ParameterizedValue::Integer(1),
-    ///         ParameterizedValue::Boolean(false),
+    ///         Value::Integer(1),
+    ///         Value::Boolean(false),
     ///     ],
     ///     params,
     /// );
@@ -91,8 +91,8 @@ impl<'a> Update<'a> {
     ///
     /// assert_eq!(
     ///     vec![
-    ///         ParameterizedValue::Integer(1),
-    ///         ParameterizedValue::Integer(3),
+    ///         Value::Integer(1),
+    ///         Value::Integer(3),
     ///     ],
     ///     params,
     /// );

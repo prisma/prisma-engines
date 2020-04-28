@@ -40,11 +40,11 @@ impl<'a> Queryable for Transaction<'a> {
         self.inner.execute(q)
     }
 
-    fn query_raw<'b>(&'b self, sql: &'b str, params: &'b [ParameterizedValue]) -> DBIO<'b, ResultSet> {
+    fn query_raw<'b>(&'b self, sql: &'b str, params: &'b [Value]) -> DBIO<'b, ResultSet> {
         self.inner.query_raw(sql, params)
     }
 
-    fn execute_raw<'b>(&'b self, sql: &'b str, params: &'b [ParameterizedValue<'b>]) -> DBIO<'b, u64> {
+    fn execute_raw<'b>(&'b self, sql: &'b str, params: &'b [Value<'b>]) -> DBIO<'b, u64> {
         self.inner.execute_raw(sql, params)
     }
 

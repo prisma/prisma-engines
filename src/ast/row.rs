@@ -1,10 +1,10 @@
-use crate::ast::{Comparable, Compare, DatabaseValue};
+use crate::ast::{Comparable, Compare, Expression};
 use std::borrow::Cow;
 
 /// A collection of values surrounded by parentheses.
 #[derive(Debug, Default, PartialEq, Clone)]
 pub struct Row<'a> {
-    pub values: Vec<DatabaseValue<'a>>,
+    pub values: Vec<Expression<'a>>,
 }
 
 impl<'a> Row<'a> {
@@ -18,13 +18,13 @@ impl<'a> Row<'a> {
         }
     }
 
-    pub fn pop(&mut self) -> Option<DatabaseValue<'a>> {
+    pub fn pop(&mut self) -> Option<Expression<'a>> {
         self.values.pop()
     }
 
     pub fn push<T>(&mut self, value: T)
     where
-        T: Into<DatabaseValue<'a>>,
+        T: Into<Expression<'a>>,
     {
         self.values.push(value.into());
     }
@@ -40,7 +40,7 @@ impl<'a> Row<'a> {
 
 impl<'a, T> From<Vec<T>> for Row<'a>
 where
-    T: Into<DatabaseValue<'a>>,
+    T: Into<Expression<'a>>,
 {
     fn from(vector: Vec<T>) -> Row<'a> {
         let mut row = Row::with_capacity(vector.len());
@@ -55,7 +55,7 @@ where
 
 impl<'a, A> From<(A,)> for Row<'a>
 where
-    A: Into<DatabaseValue<'a>>,
+    A: Into<Expression<'a>>,
 {
     fn from((val,): (A,)) -> Self {
         let mut row = Row::with_capacity(1);
@@ -66,8 +66,8 @@ where
 
 impl<'a, A, B> From<(A, B)> for Row<'a>
 where
-    A: Into<DatabaseValue<'a>>,
-    B: Into<DatabaseValue<'a>>,
+    A: Into<Expression<'a>>,
+    B: Into<Expression<'a>>,
 {
     fn from(vals: (A, B)) -> Self {
         let mut row = Row::with_capacity(2);
@@ -81,9 +81,9 @@ where
 
 impl<'a, A, B, C> From<(A, B, C)> for Row<'a>
 where
-    A: Into<DatabaseValue<'a>>,
-    B: Into<DatabaseValue<'a>>,
-    C: Into<DatabaseValue<'a>>,
+    A: Into<Expression<'a>>,
+    B: Into<Expression<'a>>,
+    C: Into<Expression<'a>>,
 {
     fn from(vals: (A, B, C)) -> Self {
         let mut row = Row::with_capacity(3);
@@ -98,10 +98,10 @@ where
 
 impl<'a, A, B, C, D> From<(A, B, C, D)> for Row<'a>
 where
-    A: Into<DatabaseValue<'a>>,
-    B: Into<DatabaseValue<'a>>,
-    C: Into<DatabaseValue<'a>>,
-    D: Into<DatabaseValue<'a>>,
+    A: Into<Expression<'a>>,
+    B: Into<Expression<'a>>,
+    C: Into<Expression<'a>>,
+    D: Into<Expression<'a>>,
 {
     fn from(vals: (A, B, C, D)) -> Self {
         let mut row = Row::with_capacity(4);
@@ -117,11 +117,11 @@ where
 
 impl<'a, A, B, C, D, E> From<(A, B, C, D, E)> for Row<'a>
 where
-    A: Into<DatabaseValue<'a>>,
-    B: Into<DatabaseValue<'a>>,
-    C: Into<DatabaseValue<'a>>,
-    D: Into<DatabaseValue<'a>>,
-    E: Into<DatabaseValue<'a>>,
+    A: Into<Expression<'a>>,
+    B: Into<Expression<'a>>,
+    C: Into<Expression<'a>>,
+    D: Into<Expression<'a>>,
+    E: Into<Expression<'a>>,
 {
     fn from(vals: (A, B, C, D, E)) -> Self {
         let mut row = Row::with_capacity(5);
@@ -139,65 +139,65 @@ where
 impl<'a> Comparable<'a> for Row<'a> {
     fn equals<T>(self, comparison: T) -> Compare<'a>
     where
-        T: Into<DatabaseValue<'a>>,
+        T: Into<Expression<'a>>,
     {
-        let value: DatabaseValue<'a> = self.into();
+        let value: Expression<'a> = self.into();
         value.equals(comparison)
     }
 
     fn not_equals<T>(self, comparison: T) -> Compare<'a>
     where
-        T: Into<DatabaseValue<'a>>,
+        T: Into<Expression<'a>>,
     {
-        let value: DatabaseValue<'a> = self.into();
+        let value: Expression<'a> = self.into();
         value.not_equals(comparison)
     }
 
     fn less_than<T>(self, comparison: T) -> Compare<'a>
     where
-        T: Into<DatabaseValue<'a>>,
+        T: Into<Expression<'a>>,
     {
-        let value: DatabaseValue<'a> = self.into();
+        let value: Expression<'a> = self.into();
         value.less_than(comparison)
     }
 
     fn less_than_or_equals<T>(self, comparison: T) -> Compare<'a>
     where
-        T: Into<DatabaseValue<'a>>,
+        T: Into<Expression<'a>>,
     {
-        let value: DatabaseValue<'a> = self.into();
+        let value: Expression<'a> = self.into();
         value.less_than_or_equals(comparison)
     }
 
     fn greater_than<T>(self, comparison: T) -> Compare<'a>
     where
-        T: Into<DatabaseValue<'a>>,
+        T: Into<Expression<'a>>,
     {
-        let value: DatabaseValue<'a> = self.into();
+        let value: Expression<'a> = self.into();
         value.greater_than(comparison)
     }
 
     fn greater_than_or_equals<T>(self, comparison: T) -> Compare<'a>
     where
-        T: Into<DatabaseValue<'a>>,
+        T: Into<Expression<'a>>,
     {
-        let value: DatabaseValue<'a> = self.into();
+        let value: Expression<'a> = self.into();
         value.greater_than_or_equals(comparison)
     }
 
     fn in_selection<T>(self, selection: T) -> Compare<'a>
     where
-        T: Into<DatabaseValue<'a>>,
+        T: Into<Expression<'a>>,
     {
-        let value: DatabaseValue<'a> = self.into();
+        let value: Expression<'a> = self.into();
         value.in_selection(selection)
     }
 
     fn not_in_selection<T>(self, selection: T) -> Compare<'a>
     where
-        T: Into<DatabaseValue<'a>>,
+        T: Into<Expression<'a>>,
     {
-        let value: DatabaseValue<'a> = self.into();
+        let value: Expression<'a> = self.into();
         value.not_in_selection(selection)
     }
 
@@ -205,7 +205,7 @@ impl<'a> Comparable<'a> for Row<'a> {
     where
         T: Into<Cow<'a, str>>,
     {
-        let value: DatabaseValue<'a> = self.into();
+        let value: Expression<'a> = self.into();
         value.like(pattern)
     }
 
@@ -213,7 +213,7 @@ impl<'a> Comparable<'a> for Row<'a> {
     where
         T: Into<Cow<'a, str>>,
     {
-        let value: DatabaseValue<'a> = self.into();
+        let value: Expression<'a> = self.into();
         value.not_like(pattern)
     }
 
@@ -221,7 +221,7 @@ impl<'a> Comparable<'a> for Row<'a> {
     where
         T: Into<Cow<'a, str>>,
     {
-        let value: DatabaseValue<'a> = self.into();
+        let value: Expression<'a> = self.into();
         value.begins_with(pattern)
     }
 
@@ -229,7 +229,7 @@ impl<'a> Comparable<'a> for Row<'a> {
     where
         T: Into<Cow<'a, str>>,
     {
-        let value: DatabaseValue<'a> = self.into();
+        let value: Expression<'a> = self.into();
         value.not_begins_with(pattern)
     }
 
@@ -237,7 +237,7 @@ impl<'a> Comparable<'a> for Row<'a> {
     where
         T: Into<Cow<'a, str>>,
     {
-        let value: DatabaseValue<'a> = self.into();
+        let value: Expression<'a> = self.into();
         value.ends_into(pattern)
     }
 
@@ -245,35 +245,35 @@ impl<'a> Comparable<'a> for Row<'a> {
     where
         T: Into<Cow<'a, str>>,
     {
-        let value: DatabaseValue<'a> = self.into();
+        let value: Expression<'a> = self.into();
         value.not_ends_into(pattern)
     }
 
     fn is_null(self) -> Compare<'a> {
-        let value: DatabaseValue<'a> = self.into();
+        let value: Expression<'a> = self.into();
         value.is_null()
     }
 
     fn is_not_null(self) -> Compare<'a> {
-        let value: DatabaseValue<'a> = self.into();
+        let value: Expression<'a> = self.into();
         value.is_not_null()
     }
 
     fn between<T, V>(self, left: T, right: V) -> Compare<'a>
     where
-        T: Into<DatabaseValue<'a>>,
-        V: Into<DatabaseValue<'a>>,
+        T: Into<Expression<'a>>,
+        V: Into<Expression<'a>>,
     {
-        let value: DatabaseValue<'a> = self.into();
+        let value: Expression<'a> = self.into();
         value.between(left, right)
     }
 
     fn not_between<T, V>(self, left: T, right: V) -> Compare<'a>
     where
-        T: Into<DatabaseValue<'a>>,
-        V: Into<DatabaseValue<'a>>,
+        T: Into<Expression<'a>>,
+        V: Into<Expression<'a>>,
     {
-        let value: DatabaseValue<'a> = self.into();
+        let value: Expression<'a> = self.into();
         value.not_between(left, right)
     }
 }

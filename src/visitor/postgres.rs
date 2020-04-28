@@ -7,14 +7,14 @@ use std::fmt::{self, Write};
 /// can be used directly with the database.
 pub struct Postgres<'a> {
     query: String,
-    parameters: Vec<ParameterizedValue<'a>>,
+    parameters: Vec<Value<'a>>,
 }
 
 impl<'a> Visitor<'a> for Postgres<'a> {
     const C_BACKTICK: &'static str = "\"";
     const C_WILDCARD: &'static str = "%";
 
-    fn build<Q>(query: Q) -> (String, Vec<ParameterizedValue<'a>>)
+    fn build<Q>(query: Q) -> (String, Vec<Value<'a>>)
     where
         Q: Into<Query<'a>>,
     {
@@ -32,7 +32,7 @@ impl<'a> Visitor<'a> for Postgres<'a> {
         write!(&mut self.query, "{}", s)
     }
 
-    fn add_parameter(&mut self, value: ParameterizedValue<'a>) {
+    fn add_parameter(&mut self, value: Value<'a>) {
         self.parameters.push(value);
     }
 
@@ -41,11 +41,7 @@ impl<'a> Visitor<'a> for Postgres<'a> {
         self.write(self.parameters.len())
     }
 
-    fn visit_limit_and_offset(
-        &mut self,
-        limit: Option<ParameterizedValue<'a>>,
-        offset: Option<ParameterizedValue<'a>>,
-    ) -> fmt::Result {
+    fn visit_limit_and_offset(&mut self, limit: Option<Value<'a>>, offset: Option<Value<'a>>) -> fmt::Result {
         match (limit, offset) {
             (Some(limit), Some(offset)) => {
                 self.write(" LIMIT ")?;
@@ -112,12 +108,12 @@ impl<'a> Visitor<'a> for Postgres<'a> {
         Ok(())
     }
 
-    fn visit_aggregate_to_string(&mut self, value: DatabaseValue<'a>) -> fmt::Result {
+    fn visit_aggregate_to_string(&mut self, value: Expression<'a>) -> fmt::Result {
         self.write("ARRAY_TO_STRING")?;
         self.write("(")?;
         self.write("ARRAY_AGG")?;
         self.write("(")?;
-        self.visit_database_value(value)?;
+        self.visit_expression(value)?;
         self.write(")")?;
         self.write("','")?;
         self.write(")")
@@ -128,14 +124,14 @@ impl<'a> Visitor<'a> for Postgres<'a> {
 mod tests {
     use crate::visitor::*;
 
-    fn expected_values<'a, T>(sql: &'static str, params: Vec<T>) -> (String, Vec<ParameterizedValue<'a>>)
+    fn expected_values<'a, T>(sql: &'static str, params: Vec<T>) -> (String, Vec<Value<'a>>)
     where
-        T: Into<ParameterizedValue<'a>>,
+        T: Into<Value<'a>>,
     {
         (String::from(sql), params.into_iter().map(|p| p.into()).collect())
     }
 
-    fn default_params<'a>(mut additional: Vec<ParameterizedValue<'a>>) -> Vec<ParameterizedValue<'a>> {
+    fn default_params<'a>(mut additional: Vec<Value<'a>>) -> Vec<Value<'a>> {
         let mut result = Vec::new();
 
         for param in additional.drain(0..) {

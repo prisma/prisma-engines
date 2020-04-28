@@ -2,7 +2,7 @@ mod conversion;
 mod error;
 
 use crate::{
-    ast::{ParameterizedValue, Query},
+    ast::{Query, Value},
     connector::{metrics, queryable::*, ResultSet, DBIO},
     error::{Error, ErrorKind},
     visitor::{self, Visitor},
@@ -166,7 +166,7 @@ impl Queryable for Sqlite {
         DBIO::new(async move { self.execute_raw(&sql, &params).await })
     }
 
-    fn query_raw<'a>(&'a self, sql: &'a str, params: &'a [ParameterizedValue]) -> DBIO<'a, ResultSet> {
+    fn query_raw<'a>(&'a self, sql: &'a str, params: &'a [Value]) -> DBIO<'a, ResultSet> {
         metrics::query("sqlite.query_raw", sql, params, move || async move {
             let client = self.client.lock().await;
 
@@ -185,7 +185,7 @@ impl Queryable for Sqlite {
         })
     }
 
-    fn execute_raw<'a>(&'a self, sql: &'a str, params: &'a [ParameterizedValue<'a>]) -> DBIO<'a, u64> {
+    fn execute_raw<'a>(&'a self, sql: &'a str, params: &'a [Value<'a>]) -> DBIO<'a, u64> {
         metrics::query("sqlite.query_raw", sql, params, move || async move {
             let client = self.client.lock().await;
             let mut stmt = client.prepare_cached(sql)?;

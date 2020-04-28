@@ -1,4 +1,4 @@
-use crate::ast::{DatabaseValue, Row, Select, Values};
+use crate::ast::{Expression, Row, Select, Values};
 use std::borrow::Cow;
 
 /// An object that can be aliased.
@@ -38,8 +38,8 @@ impl<'a> Table<'a> {
     }
 
     /// A qualified asterisk to this table
-    pub fn asterisk(self) -> DatabaseValue<'a> {
-        DatabaseValue::Asterisk(Some(Box::new(self)))
+    pub fn asterisk(self) -> Expression<'a> {
+        Expression::Asterisk(Some(Box::new(self)))
     }
 }
 
