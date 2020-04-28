@@ -149,7 +149,7 @@ impl SqlMigrationConnector {
     }
 
     async fn drop_database(&self) -> ConnectorResult<()> {
-        use quaint::ast::ParameterizedValue;
+        use quaint::ast::Value;
 
         catch(self.connection_info(), async {
             match &self.connection_info() {
@@ -161,17 +161,14 @@ impl SqlMigrationConnector {
                 }
                 ConnectionInfo::Sqlite { file_path, .. } => {
                     self.conn()
-                        .query_raw("DETACH DATABASE ?", &[ParameterizedValue::from(self.schema_name())])
+                        .query_raw("DETACH DATABASE ?", &[Value::from(self.schema_name())])
                         .await
                         .ok();
                     std::fs::remove_file(file_path).ok(); // ignore potential errors
                     self.conn()
                         .query_raw(
                             "ATTACH DATABASE ? AS ?",
-                            &[
-                                ParameterizedValue::from(file_path.as_str()),
-                                ParameterizedValue::from(self.schema_name()),
-                            ],
+                            &[Value::from(file_path.as_str()), Value::from(self.schema_name())],
                         )
                         .await?;
                 }
