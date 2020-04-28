@@ -52,7 +52,11 @@ fn create_types_table_sql(api: &TestApi) -> String {
             PRIMARY KEY (`id`)
         ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
         "##,
-        json_column_type = if api.is_mysql_5_6() { "text" } else { "json" },
+        json_column_type = if api.is_mysql_5_6() || api.is_maria_db() {
+            "text"
+        } else {
+            "json"
+        },
     )
 }
 
@@ -212,7 +216,14 @@ async fn mysql_types_roundtrip(api: &TestApi) -> TestResult {
             // .assert_field_type("spatial_multilinestring", ScalarType::String)?
             // .assert_field_type("spatial_multipolygon", ScalarType::String)?
             // .assert_field_type("spatial_geometrycollection", ScalarType::String)?
-            .assert_field_type("json", ScalarType::Json)
+            .assert_field_type(
+                "json",
+                if api.is_mysql_5_6() || api.is_maria_db() {
+                    ScalarType::String
+                } else {
+                    ScalarType::Json
+                },
+            )
     })?;
 
     // Write the values.
@@ -424,7 +435,7 @@ async fn all_mysql_types_work_as_filter(api: &TestApi) -> TestResult {
                     string_text_mediumtext: \"medium dolphins\"
                     string_text_longtext: \"long dolphins\"
                     string_enum: \"jellicle_cats\"
-                    # json: \"{\\\"name\\\": null}\"
+                    json: \"{\\\"name\\\": null}\"
                 }
             ) {
                 id
@@ -473,7 +484,11 @@ fn create_types_table_with_defaults_sql(api: &TestApi) -> String {
             PRIMARY KEY (`id`)
         ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
         "##,
-        json_column_type = if api.is_mysql_5_6() { "text" } else { "json" },
+        json_column_type = if api.is_mysql_5_6() || api.is_maria_db() {
+            "text"
+        } else {
+            "json"
+        },
     )
 }
 
