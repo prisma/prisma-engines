@@ -240,9 +240,9 @@ async fn get_all_columns(conn: &dyn Queryable, schema_name: &str) -> HashMap<Str
                             Some(PrismaValue::Int(0)) => DefaultValue::VALUE(PrismaValue::Boolean(false)),
                             _ => DefaultValue::DBGENERATED(default_string),
                         },
-                        ColumnTypeFamily::String => {
-                            DefaultValue::VALUE(PrismaValue::String(unquote_string(default_string)))
-                        }
+                        ColumnTypeFamily::String => DefaultValue::VALUE(PrismaValue::String(
+                            unescape_and_unquote_default_string(default_string),
+                        )),
                         //todo check other now() definitions
                         ColumnTypeFamily::DateTime => match default_string.to_lowercase()
                             == "current_timestamp".to_string()
@@ -560,4 +560,19 @@ fn extract_enum_values(full_data_type: &&str) -> Vec<String> {
     let len = &full_data_type.len() - 1;
     let vals = &full_data_type[5..len];
     vals.split(",").map(|v| unquote_string(v.into())).collect()
+}
+
+fn unescape_and_unquote_default_string(default: String) -> String {
+    const MYSQL_ESCAPING_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"\\(.)"#).unwrap());
+    // TOD: only mariadb wraps its default strings in single quotes. We would need to know that to
+    // do the right thing.
+    const MARIADB_QUOTES_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"^'(.*)'$"#).unwrap());
+
+    if !MYSQL_ESCAPING_RE.is_match(&default) && !MARIADB_QUOTES_RE.is_match(&default) {
+        return default;
+    }
+
+    MYSQL_ESCAPING_RE
+        .replace_all(MARIADB_QUOTES_RE.replace_all(&default, "$1").as_ref(), "$1")
+        .into()
 }

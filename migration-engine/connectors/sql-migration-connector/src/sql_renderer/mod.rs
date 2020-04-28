@@ -10,8 +10,10 @@ pub(crate) use postgres_renderer::render_column_type as postgres_render_column_t
 
 use crate::{sql_schema_helpers::ColumnRef, SqlFamily};
 use mysql_renderer::MySqlRenderer;
+use once_cell::sync::Lazy;
 use postgres_renderer::PostgresRenderer;
 use prisma_value::PrismaValue;
+use regex::Regex;
 use sql_schema_describer::*;
 use sqlite_renderer::SqliteRenderer;
 use std::borrow::Cow;
@@ -34,16 +36,9 @@ pub(crate) trait SqlRenderer {
         match (default, family) {
             (DefaultValue::DBGENERATED(val), _) => val.as_str().into(),
             (DefaultValue::VALUE(PrismaValue::String(val)), ColumnTypeFamily::String)
-            | (DefaultValue::VALUE(PrismaValue::Enum(val)), ColumnTypeFamily::Enum(_)) => format!(
-                "'{}'",
-                val.trim_start_matches('\'')
-                    .trim_end_matches('\'')
-                    .trim_start_matches('\\')
-                    .trim_start_matches('"')
-                    .trim_end_matches('"')
-                    .trim_end_matches('\\')
-            )
-            .into(),
+            | (DefaultValue::VALUE(PrismaValue::Enum(val)), ColumnTypeFamily::Enum(_)) => {
+                format!("'{}'", escape_quotes(&val)).into()
+            }
             (DefaultValue::NOW, ColumnTypeFamily::DateTime) => "CURRENT_TIMESTAMP".into(),
             (DefaultValue::NOW, _) => unreachable!("NOW default on non-datetime column"),
             (DefaultValue::VALUE(val), ColumnTypeFamily::DateTime) => format!("'{}'", val).into(),
@@ -63,4 +58,11 @@ impl dyn SqlRenderer {
             SqlFamily::Sqlite => Box::new(SqliteRenderer {}),
         }
     }
+}
+
+fn escape_quotes(s: &str) -> Cow<'_, str> {
+    const STRING_LITERAL_CHARACTER_TO_ESCAPE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#""#).unwrap());
+
+    todo!();
+    s.into()
 }

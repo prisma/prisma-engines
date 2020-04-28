@@ -1500,7 +1500,7 @@ async fn escaped_string_defaults_are_not_arbitrarily_migrated(api: &TestApi) -> 
         Some(if api.is_mysql() && !api.connector_name().contains("mariadb") {
             DefaultValue::VALUE(PrismaValue::String("ba\u{0}nana".to_string()))
         } else {
-            DefaultValue::VALUE(PrismaValue::String("ba\\0nana".to_string()))
+            DefaultValue::VALUE(PrismaValue::String("ba\0nana".to_string()))
         })
     );
     assert_eq!(
@@ -1508,7 +1508,7 @@ async fn escaped_string_defaults_are_not_arbitrarily_migrated(api: &TestApi) -> 
         Some(if api.is_mysql() && !api.connector_name().contains("mariadb") {
             DefaultValue::VALUE(PrismaValue::String("top\ndown".to_string()))
         } else {
-            DefaultValue::VALUE(PrismaValue::String("top\\ndown".to_string()))
+            DefaultValue::VALUE(PrismaValue::String("top\ndown".to_string()))
         })
     );
     assert_eq!(

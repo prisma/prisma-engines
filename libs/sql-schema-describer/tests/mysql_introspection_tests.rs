@@ -780,3 +780,33 @@ async fn constraints_from_other_databases_should_not_be_introspected() {
         }]
     );
 }
+
+// When multiple databases exist on a mysql instance, and they share names for foreign key
+// constraints, introspecting one database should not yield constraints from the other.
+#[tokio::test]
+async fn mysql_introspected_default_strings_should_be_unescaped() {
+    let db_name = "mysql_introspected_default_strings_should_be_unescaped";
+
+    let create_table = r#"
+        CREATE TABLE `mysql_introspected_default_strings_should_be_unescaped`.`User` (
+            id INTEGER PRIMARY KEY,
+            favouriteQuote VARCHAR(500) NOT NULL DEFAULT '"That\'s a lot of fish!"\n - Godzilla, 1998'
+        )
+    "#;
+
+    let inspector = get_mysql_describer_for_schema(create_table, db_name).await;
+    let schema = inspector.describe(db_name).await.unwrap();
+
+    let expected_default = prisma_value::PrismaValue::String(
+        r#""That's a lot of fish!"
+ - Godzilla, 1998"#
+            .into(),
+    );
+
+    let table = schema.table_bang("User");
+    let column = table.column_bang("favouriteQuote");
+
+    let actual_default = column.default.as_ref().unwrap().as_value().unwrap();
+
+    assert_eq!(actual_default, &expected_default);
+}
