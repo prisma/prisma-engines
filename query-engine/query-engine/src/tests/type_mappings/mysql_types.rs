@@ -212,7 +212,7 @@ async fn mysql_types_roundtrip(api: &TestApi) -> TestResult {
             // .assert_field_type("spatial_multilinestring", ScalarType::String)?
             // .assert_field_type("spatial_multipolygon", ScalarType::String)?
             // .assert_field_type("spatial_geometrycollection", ScalarType::String)?
-            .assert_field_type("json", ScalarType::String)
+            .assert_field_type("json", ScalarType::Json)
     })?;
 
     // Write the values.
