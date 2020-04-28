@@ -8,6 +8,7 @@ pub enum ScalarType {
     Boolean,
     String,
     DateTime,
+    Json,
 }
 
 impl ScalarType {
@@ -18,6 +19,7 @@ impl ScalarType {
             "Boolean" => Ok(ScalarType::Boolean),
             "String" => Ok(ScalarType::String),
             "DateTime" => Ok(ScalarType::DateTime),
+            "Json" => Ok(ScalarType::Json),
             _ => Err(format!("type {} is not a known scalar type.", s)),
         }
     }
@@ -31,6 +33,7 @@ impl ToString for ScalarType {
             ScalarType::Boolean => String::from("Boolean"),
             ScalarType::String => String::from("String"),
             ScalarType::DateTime => String::from("DateTime"),
+            ScalarType::Json => String::from("Json"),
         }
     }
 }

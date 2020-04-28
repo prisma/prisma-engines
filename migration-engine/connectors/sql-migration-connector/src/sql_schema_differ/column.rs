@@ -1,10 +1,14 @@
-use sql_schema_describer::{Column, DefaultValue};
+use sql_schema_describer::{Column, ColumnTypeFamily, DefaultValue};
 
 #[derive(Debug)]
 pub(crate) struct ColumnDiffer<'a> {
+    pub(crate) diffing_options: &'a super::DiffingOptions,
     pub(crate) previous: &'a Column,
     pub(crate) next: &'a Column,
 }
+
+/// On MariaDB, JSON is an alias for LONGTEXT. https://mariadb.com/kb/en/json-data-type/
+const MARIADB_ALIASES: &[ColumnTypeFamily] = &[ColumnTypeFamily::String, ColumnTypeFamily::Json];
 
 impl<'a> ColumnDiffer<'a> {
     pub(crate) fn name(&self) -> &'a str {
@@ -30,7 +34,7 @@ impl<'a> ColumnDiffer<'a> {
             None
         };
 
-        let r#type = if self.previous.tpe.family != self.next.tpe.family {
+        let r#type = if self.column_type_changed() {
             Some(ColumnChange::Type)
         } else {
             None
@@ -45,6 +49,17 @@ impl<'a> ColumnDiffer<'a> {
         ColumnChanges {
             changes: [renaming, r#type, arity, default],
         }
+    }
+
+    fn column_type_changed(&self) -> bool {
+        if self.diffing_options.is_mariadb
+            && MARIADB_ALIASES.contains(&self.previous.tpe.family)
+            && MARIADB_ALIASES.contains(&self.next.tpe.family)
+        {
+            return false;
+        }
+
+        self.previous.tpe.family != self.next.tpe.family
     }
 
     /// There are workarounds to cope with current migration and introspection limitations.
@@ -67,28 +82,27 @@ impl<'a> ColumnDiffer<'a> {
             (Some(DefaultValue::VALUE(_)), None) => false,
 
             (Some(DefaultValue::NOW), Some(DefaultValue::NOW)) => true,
-            (Some(DefaultValue::NOW), Some(DefaultValue::DBGENERATED(_))) => true,
             (Some(DefaultValue::NOW), Some(DefaultValue::SEQUENCE(_))) => true,
             (Some(DefaultValue::NOW), None) => false,
             (Some(DefaultValue::NOW), Some(DefaultValue::VALUE(_))) => false,
 
-            (Some(DefaultValue::DBGENERATED(_)), Some(DefaultValue::DBGENERATED(_))) => true,
             (Some(DefaultValue::DBGENERATED(_)), Some(DefaultValue::SEQUENCE(_))) => true,
             (Some(DefaultValue::DBGENERATED(_)), Some(DefaultValue::VALUE(_))) => false,
             (Some(DefaultValue::DBGENERATED(_)), Some(DefaultValue::NOW)) => false,
             (Some(DefaultValue::DBGENERATED(_)), None) => false,
 
             (Some(DefaultValue::SEQUENCE(_)), Some(DefaultValue::SEQUENCE(_))) => true,
-            (Some(DefaultValue::SEQUENCE(_)), Some(DefaultValue::DBGENERATED(_))) => true,
             (Some(DefaultValue::SEQUENCE(_)), None) => false,
             (Some(DefaultValue::SEQUENCE(_)), Some(DefaultValue::VALUE(_))) => false,
             (Some(DefaultValue::SEQUENCE(_)), Some(DefaultValue::NOW)) => false,
 
             (None, None) => true,
-            (None, Some(DefaultValue::DBGENERATED(_))) => true,
             (None, Some(DefaultValue::SEQUENCE(_))) => true,
             (None, Some(DefaultValue::VALUE(_))) => false,
             (None, Some(DefaultValue::NOW)) => false,
+
+            // We can never migrate to @dbgenerated
+            (_, Some(DefaultValue::DBGENERATED(_))) => true,
         }
     }
 }
@@ -151,18 +165,21 @@ mod tests {
         };
 
         assert!(ColumnDiffer {
+            diffing_options: &Default::default(),
             previous: &col_a,
             next: &col_b
         }
         .defaults_match());
 
         assert!(ColumnDiffer {
+            diffing_options: &Default::default(),
             previous: &col_a,
             next: &col_c
         }
         .defaults_match());
 
         assert!(ColumnDiffer {
+            diffing_options: &Default::default(),
             previous: &col_c,
             next: &col_b
         }
@@ -188,6 +205,7 @@ mod tests {
         };
 
         assert!(ColumnDiffer {
+            diffing_options: &Default::default(),
             previous: &col_a,
             next: &col_b,
         }
@@ -211,6 +229,7 @@ mod tests {
         };
 
         assert!(ColumnDiffer {
+            diffing_options: &Default::default(),
             previous: &col_a,
             next: &col_b,
         }
@@ -224,6 +243,7 @@ mod tests {
         };
 
         assert!(!ColumnDiffer {
+            diffing_options: &Default::default(),
             previous: &col_a,
             next: &col_c,
         }

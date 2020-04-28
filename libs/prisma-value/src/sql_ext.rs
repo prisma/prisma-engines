@@ -11,7 +11,7 @@ impl<'a> From<ParameterizedValue<'a>> for PrismaValue {
             ParameterizedValue::Enum(s) => PrismaValue::Enum(s.into_owned()),
             ParameterizedValue::Boolean(b) => PrismaValue::Boolean(b),
             ParameterizedValue::Array(v) => PrismaValue::List(v.into_iter().map(PrismaValue::from).collect()),
-            ParameterizedValue::Json(val) => PrismaValue::String(val.to_string()),
+            ParameterizedValue::Json(val) => PrismaValue::Json(val.to_string()),
             ParameterizedValue::Uuid(uuid) => PrismaValue::Uuid(uuid),
             ParameterizedValue::DateTime(dt) => PrismaValue::DateTime(dt),
             ParameterizedValue::Char(c) => PrismaValue::String(c.to_string()),
@@ -34,6 +34,7 @@ impl<'a> From<PrismaValue> for ParameterizedValue<'a> {
             PrismaValue::Null => ParameterizedValue::Null,
             PrismaValue::Uuid(u) => u.to_string().into(),
             PrismaValue::List(l) => ParameterizedValue::Array(l.into_iter().map(|x| x.into()).collect()),
+            PrismaValue::Json(s) => ParameterizedValue::Text(s.into()),
         }
     }
 }

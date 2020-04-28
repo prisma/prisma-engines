@@ -1,5 +1,6 @@
 mod component;
 mod database_info;
+mod datamodel_helpers;
 mod error;
 mod sql_database_migration_inferrer;
 mod sql_database_step_applier;
@@ -214,6 +215,12 @@ impl MigrationConnector for SqlMigrationConnector {
         self.drop_database().await?;
 
         Ok(())
+    }
+
+    /// Optionally check that the features implied by the provided datamodel are all compatible with
+    /// the specific database version being used.
+    fn check_database_version_compatibility(&self, datamodel: &datamodel::dml::Datamodel) -> Vec<MigrationError> {
+        self.database_info.check_database_version_compatibility(datamodel)
     }
 
     fn migration_persistence<'a>(&'a self) -> Box<dyn MigrationPersistence + 'a> {

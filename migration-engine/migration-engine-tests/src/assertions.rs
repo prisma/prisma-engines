@@ -1,6 +1,7 @@
 use pretty_assertions::assert_eq;
 use sql_schema_describer::{
-    Column, DefaultValue, Enum, ForeignKey, ForeignKeyAction, Index, IndexType, PrimaryKey, SqlSchema, Table,
+    Column, ColumnTypeFamily, DefaultValue, Enum, ForeignKey, ForeignKeyAction, Index, IndexType, PrimaryKey,
+    SqlSchema, Table,
 };
 
 pub(crate) type AssertionResult<T> = Result<T, anyhow::Error>;
@@ -275,6 +276,20 @@ impl<'a> ColumnAssertion<'a> {
                 other
             ),
         }
+
+        Ok(self)
+    }
+
+    pub fn assert_type_family(self, expected: ColumnTypeFamily) -> AssertionResult<Self> {
+        let found = &self.0.tpe.family;
+
+        anyhow::ensure!(
+            found == &expected,
+            "Assertion failed. Expected the column type family for `{}` to be `{:?}`, found `{:?}`",
+            self.0.name,
+            expected,
+            found,
+        );
 
         Ok(self)
     }

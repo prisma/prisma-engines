@@ -21,11 +21,11 @@ fn connector_names() -> Vec<(&'static str, Tags)> {
 }
 
 fn postgres_capabilities() -> Capabilities {
-    Capabilities::SCALAR_LISTS | Capabilities::ENUMS
+    Capabilities::SCALAR_LISTS | Capabilities::ENUMS | Capabilities::JSON
 }
 
 fn mysql_capabilities() -> Capabilities {
-    Capabilities::ENUMS
+    Capabilities::ENUMS | Capabilities::JSON
 }
 
 fn infer_capabilities(tags: Tags) -> Capabilities {
