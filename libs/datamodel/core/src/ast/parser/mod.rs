@@ -499,6 +499,12 @@ pub fn parse(datamodel_string: &str) -> Result<SchemaAst, ErrorCollection> {
                 Rule::type_declaration => top_level_definitions.push(Top::Type(parse_type(&current))),
                 Rule::doc_comment => (),
                 Rule::EOI => {},
+                Rule::CATCH_ALL => {
+                    errors.push(DatamodelError::new_validation_error(
+                        &format!("This line is invalid. It does not start with any known Prisma schema keyword."),
+                        Span::from_pest(current.as_span()))
+                    )
+                },
                 _ => panic!("Encountered impossible datamodel declaration during parsing: {:?}", current.tokens())
             }
 
@@ -579,6 +585,7 @@ fn rule_to_string(rule: Rule) -> &'static str {
         Rule::INTERPOLATION_START => "string interpolation start",
         Rule::INTERPOLATION_END => "string interpolation end",
         Rule::UNTIL_END_OF_LINE => "until end of line",
+        Rule::CATCH_ALL => "CATCH ALL",
 
         // Those are top level things and will never surface.
         Rule::datamodel => "datamodel declaration",
