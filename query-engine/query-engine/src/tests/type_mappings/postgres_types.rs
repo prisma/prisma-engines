@@ -548,7 +548,7 @@ async fn all_postgres_id_types_work(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector(tags("postgres"))]
+#[test_each_connector(tags("postgres"), log = "debug")]
 async fn all_postgres_types_work_as_filter(api: &TestApi) -> TestResult {
     api.execute_sql(CREATE_TYPES_TABLE).await?;
 
@@ -583,8 +583,8 @@ async fn all_postgres_types_work_as_filter(api: &TestApi) -> TestResult {
                     time_timetz: "2020-03-05T08:00:00.000"
                     boolean_boolean: true
                     network_inet: "192.168.100.14"
-                    #json_json: "{ \"isJson\": true }"
-                    #json_jsonb: "{ \"isJSONB\": true }"
+                    json_json: "{ \"isJson\": true }"
+                    json_jsonb: "{ \"isJSONB\": true }"
                 }
             ) {
                 id

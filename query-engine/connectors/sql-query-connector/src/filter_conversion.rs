@@ -253,11 +253,11 @@ impl AliasedSelect for RelationFilter {
 
         // check whether the join would join the same table and same column
         // example: `Track` AS `t1` INNER JOIN `Track` AS `j1` ON `j1`.`id` = `t1`.`id`
-        let would_peform_needless_join = other_columns_len == id_columns_len
+        let would_perform_needless_join = other_columns_len == id_columns_len
             && table.typ == related_table.typ
             && id_columns.zip(other_columns).all(|(id, other)| id == other);
 
-        if would_peform_needless_join {
+        if would_perform_needless_join {
             // Don't do the useless join
             let conditions = self
                 .nested_filter
