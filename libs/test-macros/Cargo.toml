@@ -15,3 +15,4 @@ syn = "1.0.5"
 quote = "1.0.2"
 proc-macro2 = "1.0.6"
 test-setup = { path = "../test-setup" }
+once_cell = "1.3.1"
