@@ -289,11 +289,19 @@ pub struct InputField {
 
 #[derive(Debug, Clone)]
 pub enum InputType {
+    Scalar(ScalarType),
     Enum(EnumTypeRef),
     List(Box<InputType>),
     Object(InputObjectTypeRef),
+
+    /// An optional input type may be provided, meaning only that the presence
+    /// of the input is required or not, but doesn't make any assumption about
+    /// whether or not the input can be null.
     Opt(Box<InputType>),
-    Scalar(ScalarType),
+
+    /// A nullable input denotes that, if provided, a given input can be null.
+    /// This makes no assumption about if an input needs to be provided or not.
+    Null(Box<InputType>),
 }
 
 impl InputType {
@@ -303,6 +311,10 @@ impl InputType {
 
     pub fn opt(containing: InputType) -> InputType {
         InputType::Opt(Box::new(containing))
+    }
+
+    pub fn null(containing: InputType) -> InputType {
+        InputType::Null(Box::new(containing))
     }
 
     pub fn object(containing: InputObjectTypeRef) -> InputType {

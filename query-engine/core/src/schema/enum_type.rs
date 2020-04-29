@@ -1,5 +1,4 @@
 use prisma_models::{InternalEnum, OrderBy};
-// use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
 #[derive(Debug)]
 pub enum EnumType {
@@ -36,42 +35,6 @@ impl OrderByEnumType {
         self.values.iter().map(|(name, _)| name.to_owned()).collect()
     }
 }
-
-// impl Serialize for EnumValue {
-//     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-//     where
-//         S: Serializer,
-//     {
-//         serializer.serialize_str(&*self.as_string())
-//     }
-// }
-
-// impl<'de> Deserialize<'de> for EnumValue {
-//     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-//     where
-//         D: Deserializer<'de>,
-//     {
-//         deserializer.deserialize_any(EnumValueVisitor)
-//     }
-// }
-
-// /// Custom deserialization
-// struct EnumValueVisitor;
-
-// impl<'de> Visitor<'de> for EnumValueVisitor {
-//     type Value = EnumValue;
-
-//     fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
-//         formatter.write_str("A string.")
-//     }
-
-//     fn visit_str<E>(self, value: &str) -> Result<EnumValue, E>
-//     where
-//         E: de::Error,
-//     {
-//         Ok(EnumValue::string(value.to_owned(), value.to_owned()))
-//     }
-// }
 
 impl From<InternalEnum> for EnumType {
     fn from(internal_enum: InternalEnum) -> EnumType {
