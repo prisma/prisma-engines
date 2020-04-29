@@ -117,6 +117,6 @@ fn invalid_line_must_not_break() {
     let errors = parse_error(dml);
     errors.assert_is(DatamodelError::new_validation_error(
         "This line is invalid. It does not start with any known Prisma schema keyword.",
-        Span::new(5, 15),
+        Span::new(5, 16),
     ));
 }

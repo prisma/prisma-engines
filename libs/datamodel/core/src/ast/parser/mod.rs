@@ -505,6 +505,12 @@ pub fn parse(datamodel_string: &str) -> Result<SchemaAst, ErrorCollection> {
                         Span::from_pest(current.as_span()))
                     )
                 },
+                Rule::arbitrary_block => {
+                    errors.push(DatamodelError::new_validation_error(
+                        &format!("This block is invalid. It does not start with any known Prisma schema keyword."),
+                        Span::from_pest(current.as_span()))
+                    )
+                },
                 _ => panic!("Encountered impossible datamodel declaration during parsing: {:?}", current.tokens())
             }
 
@@ -545,6 +551,7 @@ fn rule_to_string(rule: Rule) -> &'static str {
         Rule::enum_declaration => "enum declaration",
         Rule::source_block => "source definition",
         Rule::generator_block => "generator definition",
+        Rule::arbitrary_block => "arbitrary block",
         Rule::enum_field_declaration => "enum field declaration",
         Rule::block_level_directive => "block level directive",
         Rule::EOI => "end of input",

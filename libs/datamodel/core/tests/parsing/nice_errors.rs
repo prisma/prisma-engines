@@ -12,17 +12,9 @@ fn nice_error_for_missing_model_keyword() {
 
     let error = parse_error(dml);
 
-    error.assert_is(DatamodelError::new_parser_error(
-        &vec![
-            "end of input",
-            "documentation comment",
-            "type declaration",
-            "model declaration",
-            "enum declaration",
-            "source definition",
-            "generator definition",
-        ],
-        Span::new(5, 5),
+    error.assert_is(DatamodelError::new_validation_error(
+        "This block is invalid. It does not start with any known Prisma schema keyword.",
+        Span::new(5, 36),
     ));
 }
 #[test]
@@ -32,23 +24,15 @@ fn nice_error_for_missing_model_keyword_2() {
         id Int @id
     }
     Todo {
-        id Int @id
+        id
     }
     "#;
 
     let error = parse_error(dml);
 
-    error.assert_is(DatamodelError::new_parser_error(
-        &vec![
-            "end of input",
-            "documentation comment",
-            "type declaration",
-            "model declaration",
-            "enum declaration",
-            "source definition",
-            "generator definition",
-        ],
-        Span::new(47, 47),
+    error.assert_is(DatamodelError::new_validation_error(
+        "This block is invalid. It does not start with any known Prisma schema keyword.",
+        Span::new(47, 70),
     ));
 }
 
