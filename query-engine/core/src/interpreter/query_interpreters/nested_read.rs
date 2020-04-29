@@ -1,7 +1,7 @@
 use crate::interpreter::query_interpreters::nested_pagination::NestedPagination;
 use crate::{interpreter::InterpretationResult, query_ast::*};
-use connector::{self, filter::Filter, ConnectionLike, IdFilter, QueryArguments, ReadOperations, ScalarCompare};
-use prisma_models::{ManyRecords, ModelProjection, RecordProjection, RelationFieldRef, Result as DomainResult};
+use connector::{self, filter::Filter, ConnectionLike, QueryArguments, ReadOperations, ScalarCompare};
+use prisma_models::{ManyRecords, ModelProjection, RecordProjection, RelationFieldRef};
 use prisma_value::PrismaValue;
 use std::collections::HashMap;
 
@@ -114,7 +114,6 @@ pub async fn one2m<'a, 'b>(
     let mut link_mapping: HashMap<Vec<PrismaValue>, Vec<RecordProjection>> = HashMap::new();
     let idents = vec![parent_model_id, parent_link_id];
     let mut uniq_projections = Vec::new();
-    let mut all_null_checks = false;
 
     for projection in joined_projections {
         let mut split = projection.split_into(&idents);
@@ -129,33 +128,17 @@ pub async fn one2m<'a, 'b>(
 
                 ids.push(id);
                 uniq_projections.push(link_values.clone());
-                all_null_checks = link_values.iter().all(|v| v.is_null());
                 link_mapping.insert(link_values, ids);
             }
         }
     }
 
-    // TODO: this is a stupid hack to find a case where we might have `NULL`
-    // values in the query and try to do an `IN` statement with those values.
-    //
-    // Please make sure to find out WHY we'd do `one2m` with null parent ids
-    // and please use some other function than this instead.
-    let filter = if all_null_checks {
-        let filters: Vec<Filter> = link_mapping
-            .keys()
-            .into_iter()
-            .map(|id_values: &Vec<PrismaValue>| {
-                Ok(child_link_id
-                    .from_unchecked(id_values.iter().map(|v: &PrismaValue| v.clone()).collect())
-                    .filter())
-            })
-            .collect::<DomainResult<_>>()?;
+    let uniq_projections = uniq_projections
+        .into_iter()
+        .filter(|p| !p.contains(&PrismaValue::Null))
+        .collect();
 
-        Filter::or(filters)
-    } else {
-        child_link_id.is_in(uniq_projections)
-    };
-
+    let filter = child_link_id.is_in(uniq_projections);
     let mut args = query_args;
 
     args.filter = match args.filter {

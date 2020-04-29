@@ -18,7 +18,9 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
         .query(
           s"""mutation {
           |  createParent(data: {
-          |    p: "p1", p_1: "p", p_2: "1"
+          |    p: "p1"
+          |    p_1: "p_1"
+          |    p_2: "p_2"
           |    childReq: {
           |      create: {
           |        c: "c1"
@@ -56,7 +58,8 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
       """,
         project,
         errorCode = 2009,
-        errorContains = """↳ ChildUpdateOneRequiredWithoutParentReqInput (object)\n            ↳ delete (field)\n              ↳ Field does not exist on enclosing type."""
+        errorContains =
+          """↳ ChildUpdateOneRequiredWithoutParentReqInput (object)\n            ↳ delete (field)\n              ↳ Field does not exist on enclosing type."""
       )
     }
   }
@@ -111,7 +114,8 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
       """,
         project,
         errorCode = 2009,
-        errorContains = """↳ update (argument)\n      ↳ ParentUpdateInput (object)\n        ↳ childReq (field)\n          ↳ ChildUpdateOneRequiredWithoutParentOptInput (object)\n            ↳ delete (field)\n              ↳ Field does not exist on enclosing type."""
+        errorContains =
+          """↳ update (argument)\n      ↳ ParentUpdateInput (object)\n        ↳ childReq (field)\n          ↳ ChildUpdateOneRequiredWithoutParentOptInput (object)\n            ↳ delete (field)\n              ↳ Field does not exist on enclosing type."""
       )
 
     }
@@ -223,7 +227,8 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
       """,
         project,
         errorCode = 2016,
-        errorContains = """Query interpretation error. Error for binding '3': AssertionError(\"[Query Graph] Expected a valid parent ID to be present for a nested delete on a one-to-many relation."""
+        errorContains =
+          """Query interpretation error. Error for binding '3': AssertionError(\"[Query Graph] Expected a valid parent ID to be present for a nested delete on a one-to-many relation."""
         // errorContains = """[Query Graph] Expected a valid parent ID to be present for a nested delete on a one-to-many relation."""
       )
 
@@ -420,7 +425,8 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
       """,
         project,
         errorCode = 2009,
-        errorContains = """Mutation (object)\n  ↳ upsertParent (field)\n    ↳ update (argument)\n      ↳ ParentUpdateInput (object)\n        ↳ childReq (field)\n          ↳ ChildUpdateOneRequiredWithoutParentsOptInput (object)\n            ↳ delete (field)\n              ↳ Field does not exist on enclosing type."""
+        errorContains =
+          """Mutation (object)\n  ↳ upsertParent (field)\n    ↳ update (argument)\n      ↳ ParentUpdateInput (object)\n        ↳ childReq (field)\n          ↳ ChildUpdateOneRequiredWithoutParentsOptInput (object)\n            ↳ delete (field)\n              ↳ Field does not exist on enclosing type."""
       )
     }
   }
@@ -435,9 +441,15 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
       val parentResult = server.query(
         s"""mutation {
         |  createParent(data: {
-        |    p: "p1", p_1: "p", p_2: "1"
+        |    p: "p1",
+        |    p_1: "p_1"
+        |    p_2: "p_2"
         |    childOpt: {
-        |      create: {c: "c1"}
+        |      create: {
+        |        c: "c1"
+        |        c_1: "c_1"
+        |        c_2: "c_2"
+        |      }
         |    }
         |  }){
         |    ${t.parent.selection}
@@ -595,7 +607,8 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
       """,
       project,
       errorCode = 5588,
-      errorContains = """Error occurred during query execution:\nInterpretationError(\"Error for binding \\'6\\': RelationViolation(RelationViolation { relation_name: \\\"ChildToReqOther\\\", model_a_name: \\\"Child\\\", model_b_name: \\\"ReqOther\\\" })\")"""
+      errorContains =
+        """Error occurred during query execution:\nInterpretationError(\"Error for binding \\'6\\': RelationViolation(RelationViolation { relation_name: \\\"ChildToReqOther\\\", model_a_name: \\\"Child\\\", model_b_name: \\\"ReqOther\\\" })\")"""
     )
 
   }
