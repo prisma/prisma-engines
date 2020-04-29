@@ -1,41 +1,41 @@
 use crate::{cursor_condition, filter_conversion::AliasedCondition, ordering::Ordering};
 use connector_interface::{filter::Filter, QueryArguments};
 use prisma_models::*;
-use quaint::ast::*;
+use quaint::{ast::*, connector::SqlFamily};
 use std::sync::Arc;
 
 pub trait SelectDefinition {
-    fn into_select(self, _: &ModelRef) -> Select<'static>;
+    fn into_select(self, _: &ModelRef, sql_family: SqlFamily) -> Select<'static>;
 }
 
 impl SelectDefinition for Filter {
-    fn into_select(self, model: &ModelRef) -> Select<'static> {
+    fn into_select(self, model: &ModelRef, sql_family: SqlFamily) -> Select<'static> {
         let args = QueryArguments::from(self);
-        args.into_select(model)
+        args.into_select(model, sql_family)
     }
 }
 
 impl SelectDefinition for &Filter {
-    fn into_select(self, model: &ModelRef) -> Select<'static> {
-        self.clone().into_select(model)
+    fn into_select(self, model: &ModelRef, sql_family: SqlFamily) -> Select<'static> {
+        self.clone().into_select(model, sql_family)
     }
 }
 
 impl SelectDefinition for Select<'static> {
-    fn into_select(self, _: &ModelRef) -> Select<'static> {
+    fn into_select(self, _: &ModelRef, _sql_family: SqlFamily) -> Select<'static> {
         self
     }
 }
 
 impl SelectDefinition for QueryArguments {
-    fn into_select(self, model: &ModelRef) -> Select<'static> {
+    fn into_select(self, model: &ModelRef, sql_family: SqlFamily) -> Select<'static> {
         let cursor: ConditionTree = cursor_condition::build(&self, Arc::clone(&model));
         let ordering_directions = self.ordering_directions();
         let ordering = Ordering::for_model(&model, ordering_directions);
 
         let filter: ConditionTree = self
             .filter
-            .map(|f| f.aliased_cond(None))
+            .map(|f| f.aliased_cond(None, sql_family))
             .unwrap_or(ConditionTree::NoCondition);
 
         let conditions = match (filter, cursor) {
@@ -62,16 +62,21 @@ impl SelectDefinition for QueryArguments {
     }
 }
 
-pub fn get_records<T>(model: &ModelRef, columns: impl Iterator<Item = Column<'static>>, query: T) -> Select<'static>
+pub fn get_records<T>(
+    model: &ModelRef,
+    columns: impl Iterator<Item = Column<'static>>,
+    query: T,
+    sql_family: SqlFamily,
+) -> Select<'static>
 where
     T: SelectDefinition,
 {
-    columns.fold(query.into_select(model), |acc, col| acc.column(col))
+    columns.fold(query.into_select(model, sql_family), |acc, col| acc.column(col))
 }
 
-pub fn count_by_model(model: &ModelRef, query_arguments: QueryArguments) -> Select<'static> {
+pub fn count_by_model(model: &ModelRef, query_arguments: QueryArguments, sql_family: SqlFamily) -> Select<'static> {
     let selected_columns = model.primary_identifier().as_columns();
-    let base_query = get_records(model, selected_columns, query_arguments);
+    let base_query = get_records(model, selected_columns, query_arguments, sql_family);
     let table = Table::from(base_query).alias("sub");
 
     Select::from_table(table).value(count(asterisk()))

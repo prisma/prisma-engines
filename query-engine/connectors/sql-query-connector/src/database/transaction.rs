@@ -6,7 +6,7 @@ use connector_interface::{
 };
 use prisma_models::prelude::*;
 use prisma_value::PrismaValue;
-use quaint::prelude::ConnectionInfo;
+use quaint::{connector::SqlFamily, prelude::ConnectionInfo};
 
 pub struct SqlConnectorTransaction<'a> {
     inner: quaint::connector::Transaction<'a>,
@@ -30,6 +30,10 @@ impl<'a> SqlConnectorTransaction<'a> {
             Err(err) => Err(err.into_connector_error(&self.connection_info)),
         }
     }
+
+    fn sql_family(&self) -> SqlFamily {
+        self.connection_info.sql_family()
+    }
 }
 
 impl<'a> Transaction<'a> for SqlConnectorTransaction<'a> {
@@ -49,7 +53,9 @@ impl<'a> ReadOperations for SqlConnectorTransaction<'a> {
         filter: &'b Filter,
         selected_fields: &'b ModelProjection,
     ) -> connector::IO<'b, Option<SingleRecord>> {
-        IO::new(self.catch(async move { read::get_single_record(&self.inner, model, filter, selected_fields).await }))
+        IO::new(self.catch(async move {
+            read::get_single_record(&self.inner, model, filter, selected_fields, self.sql_family()).await
+        }))
     }
 
     fn get_many_records<'b>(
@@ -58,11 +64,9 @@ impl<'a> ReadOperations for SqlConnectorTransaction<'a> {
         query_arguments: QueryArguments,
         selected_fields: &'b ModelProjection,
     ) -> connector::IO<'b, ManyRecords> {
-        IO::new(
-            self.catch(
-                async move { read::get_many_records(&self.inner, model, query_arguments, selected_fields).await },
-            ),
-        )
+        IO::new(self.catch(async move {
+            read::get_many_records(&self.inner, model, query_arguments, selected_fields, self.sql_family()).await
+        }))
     }
 
     fn get_related_m2m_record_ids<'b>(
@@ -76,7 +80,11 @@ impl<'a> ReadOperations for SqlConnectorTransaction<'a> {
     }
 
     fn count_by_model<'b>(&'b self, model: &'b ModelRef, query_arguments: QueryArguments) -> connector::IO<'b, usize> {
-        IO::new(self.catch(async move { read::count_by_model(&self.inner, model, query_arguments).await }))
+        IO::new(
+            self.catch(
+                async move { read::count_by_model(&self.inner, model, query_arguments, self.sql_family()).await },
+            ),
+        )
     }
 }
 
@@ -91,11 +99,17 @@ impl<'a> WriteOperations for SqlConnectorTransaction<'a> {
         record_filter: RecordFilter,
         args: WriteArgs,
     ) -> connector::IO<Vec<RecordProjection>> {
-        IO::new(self.catch(async move { write::update_records(&self.inner, model, record_filter, args).await }))
+        IO::new(self.catch(async move {
+            write::update_records(&self.inner, model, record_filter, args, self.sql_family()).await
+        }))
     }
 
     fn delete_records<'b>(&'b self, model: &'b ModelRef, record_filter: RecordFilter) -> connector::IO<usize> {
-        IO::new(self.catch(async move { write::delete_records(&self.inner, model, record_filter).await }))
+        IO::new(
+            self.catch(
+                async move { write::delete_records(&self.inner, model, record_filter, self.sql_family()).await },
+            ),
+        )
     }
 
     fn connect<'b>(

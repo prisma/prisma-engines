@@ -10,6 +10,7 @@ use quaint::{
     pooled::PooledConnection,
 };
 
+use connector::SqlFamily;
 use serde_json::{Map, Number, Value};
 use std::{convert::TryFrom, panic::AssertUnwindSafe};
 
@@ -96,22 +97,28 @@ pub trait QueryExt: Queryable + Send + Sync {
         &self,
         model: &ModelRef,
         record_filter: RecordFilter,
+        sql_family: SqlFamily,
     ) -> crate::Result<Vec<RecordProjection>> {
         if let Some(selectors) = record_filter.selectors {
             Ok(selectors)
         } else {
-            self.filter_ids(model, record_filter.filter).await
+            self.filter_ids(model, record_filter.filter, sql_family).await
         }
     }
 
     /// Read the all columns as a (primary) identifier.
-    async fn filter_ids(&self, model: &ModelRef, filter: Filter) -> crate::Result<Vec<RecordProjection>> {
+    async fn filter_ids(
+        &self,
+        model: &ModelRef,
+        filter: Filter,
+        sql_family: SqlFamily,
+    ) -> crate::Result<Vec<RecordProjection>> {
         let model_id = model.primary_identifier();
         let id_cols: Vec<Column<'static>> = model_id.as_columns().collect();
 
         let select = Select::from_table(model.as_table())
             .columns(id_cols)
-            .so_that(filter.aliased_cond(None));
+            .so_that(filter.aliased_cond(None, sql_family));
 
         self.select_ids(select, model_id).await
     }

@@ -2,7 +2,7 @@ use crate::{error::SqlError, query_builder::write, QueryExt, RawQuery};
 use connector_interface::*;
 use prisma_models::*;
 use prisma_value::PrismaValue;
-use quaint::error::ErrorKind;
+use quaint::{connector::SqlFamily, error::ErrorKind};
 use std::{collections::HashMap, convert::TryFrom};
 use user_facing_errors::query_engine::DatabaseConstraint;
 
@@ -71,8 +71,9 @@ pub async fn update_records(
     model: &ModelRef,
     record_filter: RecordFilter,
     args: WriteArgs,
+    sql_family: SqlFamily,
 ) -> crate::Result<Vec<RecordProjection>> {
-    let ids = conn.filter_selectors(model, record_filter).await?;
+    let ids = conn.filter_selectors(model, record_filter, sql_family).await?;
     let id_args = pick_args(&model.primary_identifier(), &args);
 
     if ids.len() == 0 {
@@ -96,8 +97,9 @@ pub async fn delete_records(
     conn: &dyn QueryExt,
     model: &ModelRef,
     record_filter: RecordFilter,
+    sql_family: SqlFamily,
 ) -> crate::Result<usize> {
-    let ids = conn.filter_selectors(model, record_filter).await?;
+    let ids = conn.filter_selectors(model, record_filter, sql_family).await?;
     let ids: Vec<&RecordProjection> = ids.iter().map(|id| &*id).collect();
     let count = ids.len();
 

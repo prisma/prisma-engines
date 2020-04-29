@@ -5,15 +5,16 @@ use crate::{
 use connector_interface::*;
 use futures::stream::{FuturesUnordered, StreamExt};
 use prisma_models::*;
-use quaint::ast::*;
+use quaint::{ast::*, connector::SqlFamily};
 
 pub async fn get_single_record(
     conn: &dyn QueryExt,
     model: &ModelRef,
     filter: &Filter,
     selected_fields: &ModelProjection,
+    sql_family: SqlFamily,
 ) -> crate::Result<Option<SingleRecord>> {
-    let query = read::get_records(&model, selected_fields.as_columns(), filter);
+    let query = read::get_records(&model, selected_fields.as_columns(), filter, sql_family);
     let field_names = selected_fields.db_names().map(String::from).collect();
     let idents: Vec<_> = selected_fields.type_identifiers_with_arities();
 
@@ -34,6 +35,7 @@ pub async fn get_many_records(
     model: &ModelRef,
     mut query_arguments: QueryArguments,
     selected_fields: &ModelProjection,
+    sql_family: SqlFamily,
 ) -> crate::Result<ManyRecords> {
     let field_names = selected_fields.db_names().map(String::from).collect();
     let idents: Vec<_> = selected_fields.type_identifiers_with_arities();
@@ -47,7 +49,7 @@ pub async fn get_many_records(
         let mut futures = FuturesUnordered::new();
 
         for args in batches.into_iter() {
-            let query = read::get_records(model, selected_fields.as_columns(), args);
+            let query = read::get_records(model, selected_fields.as_columns(), args, sql_family);
             futures.push(conn.filter(query.into(), idents.as_slice()));
         }
 
@@ -61,7 +63,7 @@ pub async fn get_many_records(
             records.order_by(order_by)
         }
     } else {
-        let query = read::get_records(model, selected_fields.as_columns(), query_arguments);
+        let query = read::get_records(model, selected_fields.as_columns(), query_arguments, sql_family);
 
         for item in conn.filter(query.into(), idents.as_slice()).await?.into_iter() {
             records.push(Record::from(item))
@@ -140,10 +142,11 @@ pub async fn count_by_model(
     conn: &dyn QueryExt,
     model: &ModelRef,
     query_arguments: QueryArguments,
+    sql_family: SqlFamily,
 ) -> crate::Result<usize> {
     // We need to retain copies of those values for post processing below.
     let (first, last) = (query_arguments.first.clone(), query_arguments.last.clone());
-    let query = read::count_by_model(model, query_arguments);
+    let query = read::count_by_model(model, query_arguments, sql_family);
     let result = conn.find_int(query).await? as usize;
 
     // The way records are retrieved with query args requires us to adjust the one-off overfetch.

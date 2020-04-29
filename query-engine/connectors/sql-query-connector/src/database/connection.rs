@@ -6,7 +6,10 @@ use connector_interface::{
 };
 use prisma_models::prelude::*;
 use prisma_value::PrismaValue;
-use quaint::{connector::TransactionCapable, prelude::ConnectionInfo};
+use quaint::{
+    connector::{SqlFamily, TransactionCapable},
+    prelude::ConnectionInfo,
+};
 
 pub struct SqlConnection<'a, C> {
     inner: C,
@@ -29,6 +32,10 @@ where
             Ok(o) => Ok(o),
             Err(err) => Err(err.into_connector_error(&self.connection_info)),
         }
+    }
+
+    fn sql_family(&self) -> SqlFamily {
+        self.connection_info.sql_family()
     }
 }
 
@@ -57,7 +64,9 @@ where
         filter: &'b Filter,
         selected_fields: &'b ModelProjection,
     ) -> connector::IO<'b, Option<SingleRecord>> {
-        IO::new(self.catch(async move { read::get_single_record(&self.inner, model, filter, selected_fields).await }))
+        IO::new(self.catch(async move {
+            read::get_single_record(&self.inner, model, filter, selected_fields, self.sql_family()).await
+        }))
     }
 
     fn get_many_records<'b>(
@@ -66,11 +75,9 @@ where
         query_arguments: QueryArguments,
         selected_fields: &'b ModelProjection,
     ) -> connector::IO<'b, ManyRecords> {
-        IO::new(
-            self.catch(
-                async move { read::get_many_records(&self.inner, model, query_arguments, selected_fields).await },
-            ),
-        )
+        IO::new(self.catch(async move {
+            read::get_many_records(&self.inner, model, query_arguments, selected_fields, self.sql_family()).await
+        }))
     }
 
     fn get_related_m2m_record_ids<'b>(
@@ -84,7 +91,11 @@ where
     }
 
     fn count_by_model<'b>(&'b self, model: &'b ModelRef, query_arguments: QueryArguments) -> connector::IO<'b, usize> {
-        IO::new(self.catch(async move { read::count_by_model(&self.inner, model, query_arguments).await }))
+        IO::new(
+            self.catch(
+                async move { read::count_by_model(&self.inner, model, query_arguments, self.sql_family()).await },
+            ),
+        )
     }
 }
 
@@ -102,11 +113,17 @@ where
         record_filter: RecordFilter,
         args: WriteArgs,
     ) -> connector::IO<Vec<RecordProjection>> {
-        IO::new(self.catch(async move { write::update_records(&self.inner, model, record_filter, args).await }))
+        IO::new(self.catch(async move {
+            write::update_records(&self.inner, model, record_filter, args, self.sql_family()).await
+        }))
     }
 
     fn delete_records<'a>(&'a self, model: &'a ModelRef, record_filter: RecordFilter) -> connector::IO<usize> {
-        IO::new(self.catch(async move { write::delete_records(&self.inner, model, record_filter).await }))
+        IO::new(
+            self.catch(
+                async move { write::delete_records(&self.inner, model, record_filter, self.sql_family()).await },
+            ),
+        )
     }
 
     fn connect<'a>(

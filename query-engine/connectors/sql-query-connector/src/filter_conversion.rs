@@ -1,6 +1,6 @@
 use connector_interface::filter::*;
 use prisma_models::prelude::*;
-use quaint::ast::*;
+use quaint::{ast::*, connector::SqlFamily};
 
 #[derive(Clone, Copy, Debug)]
 /// A distinction in aliasing to separate the parent table and the joined data
@@ -60,7 +60,7 @@ pub trait AliasedCondition {
     ///
     /// Alias should be used only when nesting, making the top level queries
     /// more explicit.
-    fn aliased_cond(self, alias: Option<Alias>) -> ConditionTree<'static>;
+    fn aliased_cond(self, alias: Option<Alias>, sql_family: SqlFamily) -> ConditionTree<'static>;
 }
 
 trait AliasedSelect {
@@ -69,20 +69,20 @@ trait AliasedSelect {
     ///
     /// Alias should be used only when nesting, making the top level queries
     /// more explicit.
-    fn aliased_sel(self, alias: Option<Alias>) -> Select<'static>;
+    fn aliased_sel(self, alias: Option<Alias>, sql_family: SqlFamily) -> Select<'static>;
 }
 
 impl AliasedCondition for Filter {
     /// Conversion from a `Filter` to a query condition tree. Aliased when in a nested `SELECT`.
-    fn aliased_cond(self, alias: Option<Alias>) -> ConditionTree<'static> {
+    fn aliased_cond(self, alias: Option<Alias>, sql_family: SqlFamily) -> ConditionTree<'static> {
         match self {
             Filter::And(mut filters) => match filters.len() {
                 n if n == 0 => ConditionTree::NoCondition,
-                n if n == 1 => filters.pop().unwrap().aliased_cond(alias),
+                n if n == 1 => filters.pop().unwrap().aliased_cond(alias, sql_family),
                 _ => {
                     let exprs = filters
                         .into_iter()
-                        .map(|f| f.aliased_cond(alias))
+                        .map(|f| f.aliased_cond(alias, sql_family))
                         .map(Expression::from)
                         .collect();
 
@@ -91,11 +91,11 @@ impl AliasedCondition for Filter {
             },
             Filter::Or(mut filters) => match filters.len() {
                 n if n == 0 => ConditionTree::NegativeCondition,
-                n if n == 1 => filters.pop().unwrap().aliased_cond(alias),
+                n if n == 1 => filters.pop().unwrap().aliased_cond(alias, sql_family),
                 _ => {
                     let exprs = filters
                         .into_iter()
-                        .map(|f| f.aliased_cond(alias))
+                        .map(|f| f.aliased_cond(alias, sql_family))
                         .map(Expression::from)
                         .collect();
 
@@ -104,20 +104,20 @@ impl AliasedCondition for Filter {
             },
             Filter::Not(mut filters) => match filters.len() {
                 n if n == 0 => ConditionTree::NoCondition,
-                n if n == 1 => filters.pop().unwrap().aliased_cond(alias).not(),
+                n if n == 1 => filters.pop().unwrap().aliased_cond(alias, sql_family).not(),
                 _ => {
                     let exprs = filters
                         .into_iter()
-                        .map(|f| f.aliased_cond(alias).not())
+                        .map(|f| f.aliased_cond(alias, sql_family).not())
                         .map(Expression::from)
                         .collect();
 
                     ConditionTree::And(exprs)
                 }
             },
-            Filter::Scalar(filter) => filter.aliased_cond(alias),
-            Filter::OneRelationIsNull(filter) => filter.aliased_cond(alias),
-            Filter::Relation(filter) => filter.aliased_cond(alias),
+            Filter::Scalar(filter) => filter.aliased_cond(alias, sql_family),
+            Filter::OneRelationIsNull(filter) => filter.aliased_cond(alias, sql_family),
+            Filter::Relation(filter) => filter.aliased_cond(alias, sql_family),
             Filter::BoolFilter(b) => {
                 if b {
                     ConditionTree::NoCondition
@@ -133,11 +133,26 @@ impl AliasedCondition for Filter {
 
 impl AliasedCondition for ScalarFilter {
     /// Conversion from a `ScalarFilter` to a query condition tree. Aliased when in a nested `SELECT`.
-    fn aliased_cond(self, alias: Option<Alias>) -> ConditionTree<'static> {
-        fn compare(comparable: impl Comparable<'static>, cond: ScalarCondition) -> ConditionTree<'static> {
+    fn aliased_cond(self, alias: Option<Alias>, sql_family: SqlFamily) -> ConditionTree<'static> {
+        fn compare<T>(comparable: T, cond: ScalarCondition, sql_family: SqlFamily) -> ConditionTree<'static>
+        where
+            T: Comparable<'static> + Castable<'static> + Into<Expression<'static>> + Clone,
+        {
             let condition = match cond {
                 ScalarCondition::Equals(PrismaValue::Null) => comparable.is_null(),
                 ScalarCondition::NotEquals(PrismaValue::Null) => comparable.is_not_null(),
+                ScalarCondition::Equals(value @ PrismaValue::Json(_)) if sql_family.is_postgres() => {
+                    comparable.equals(value)
+                }
+                ScalarCondition::NotEquals(value @ PrismaValue::Json(_)) if sql_family.is_postgres() => {
+                    comparable.not_equals(value)
+                }
+                ScalarCondition::Equals(value @ PrismaValue::Json(_)) if sql_family.is_mysql() => {
+                    Expression::from(Value::Boolean(true)).equals(mysql_json_equality(comparable, value))
+                }
+                ScalarCondition::NotEquals(value @ PrismaValue::Json(_)) if sql_family.is_mysql() => {
+                    Expression::from(Value::Boolean(false)).equals(mysql_json_equality(comparable, value))
+                }
                 ScalarCondition::Equals(value) => comparable.equals(value),
                 ScalarCondition::NotEquals(value) => comparable.not_equals(value),
                 ScalarCondition::Contains(value) => comparable.like(format!("{}", value)),
@@ -182,30 +197,49 @@ impl AliasedCondition for ScalarFilter {
         }
 
         match (alias, self.projection) {
-            (Some(alias), ScalarProjection::Single(field)) => {
-                compare(field.as_column().table(alias.to_string(None)), self.condition)
-            }
+            (Some(alias), ScalarProjection::Single(field)) => compare(
+                field.as_column().table(alias.to_string(None)),
+                self.condition,
+                sql_family,
+            ),
             (Some(alias), ScalarProjection::Compound(fields)) => {
                 let columns: Vec<Column<'static>> = fields
                     .into_iter()
                     .map(|field| field.as_column().table(alias.to_string(None)))
                     .collect();
 
-                compare(Row::from(columns), self.condition)
+                compare(Expression::from(Row::from(columns)), self.condition, sql_family)
             }
-            (None, ScalarProjection::Single(field)) => compare(field.as_column(), self.condition),
+            (None, ScalarProjection::Single(field)) => compare(field.as_column(), self.condition, sql_family),
             (None, ScalarProjection::Compound(fields)) => {
                 let columns: Vec<Column<'static>> = fields.into_iter().map(|field| field.as_column()).collect();
 
-                compare(Row::from(columns), self.condition)
+                compare(Expression::from(Row::from(columns)), self.condition, sql_family)
             }
         }
     }
 }
 
+fn mysql_json_equality<T>(comparable: T, value: PrismaValue) -> ConditionTree<'static>
+where
+    T: Into<Expression<'static>> + Clone,
+{
+    ConditionTree::default()
+        .and(
+            quaint::ast::FunctionCall::new("JSON_CONTAINS")
+                .arg(comparable.clone())
+                .arg(value.clone()),
+        )
+        .and(
+            quaint::ast::FunctionCall::new("JSON_CONTAINS")
+                .arg(value)
+                .arg(comparable),
+        )
+}
+
 impl AliasedCondition for RelationFilter {
     /// Conversion from a `RelationFilter` to a query condition tree. Aliased when in a nested `SELECT`.
-    fn aliased_cond(self, alias: Option<Alias>) -> ConditionTree<'static> {
+    fn aliased_cond(self, alias: Option<Alias>, sql_family: SqlFamily) -> ConditionTree<'static> {
         let identifier = self.field.model().primary_identifier();
         let ids = identifier.as_columns();
 
@@ -215,7 +249,7 @@ impl AliasedCondition for RelationFilter {
         };
 
         let condition = self.condition.clone();
-        let sub_select = self.aliased_sel(alias.map(|a| a.inc(AliasMode::Table)));
+        let sub_select = self.aliased_sel(alias.map(|a| a.inc(AliasMode::Table)), sql_family);
 
         let comparison = match condition {
             RelationCondition::AtLeastOneRelatedRecord => Row::from(columns).in_selection(sub_select),
@@ -230,7 +264,7 @@ impl AliasedCondition for RelationFilter {
 
 impl AliasedSelect for RelationFilter {
     /// The subselect part of the `RelationFilter` `ConditionTree`.
-    fn aliased_sel(self, alias: Option<Alias>) -> Select<'static> {
+    fn aliased_sel(self, alias: Option<Alias>, sql_family: SqlFamily) -> Select<'static> {
         let alias = alias.unwrap_or(Alias::default());
         let condition = self.condition.clone();
         let relation = self.field.relation();
@@ -261,7 +295,7 @@ impl AliasedSelect for RelationFilter {
             // Don't do the useless join
             let conditions = self
                 .nested_filter
-                .aliased_cond(Some(alias))
+                .aliased_cond(Some(alias), sql_family)
                 .invert_if(condition.invert_of_subselect());
 
             let select_base = Select::from_table(relation.as_table().alias(alias.to_string(None))).so_that(conditions);
@@ -284,7 +318,7 @@ impl AliasedSelect for RelationFilter {
 
             let conditions = self
                 .nested_filter
-                .aliased_cond(Some(alias.flip(AliasMode::Join)))
+                .aliased_cond(Some(alias.flip(AliasMode::Join)), sql_family)
                 .invert_if(condition.invert_of_subselect());
 
             let join = related_table
@@ -301,7 +335,7 @@ impl AliasedSelect for RelationFilter {
 
 impl AliasedCondition for OneRelationIsNullFilter {
     /// Conversion from a `OneRelationIsNullFilter` to a query condition tree. Aliased when in a nested `SELECT`.
-    fn aliased_cond(self, alias: Option<Alias>) -> ConditionTree<'static> {
+    fn aliased_cond(self, alias: Option<Alias>, _sql_family: SqlFamily) -> ConditionTree<'static> {
         let alias = alias.map(|a| a.to_string(None));
 
         let condition = if self.field.relation_is_inlined_in_parent() {
