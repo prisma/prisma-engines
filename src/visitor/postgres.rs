@@ -118,6 +118,54 @@ impl<'a> Visitor<'a> for Postgres<'a> {
         self.write("','")?;
         self.write(")")
     }
+
+    fn visit_condition_equals(&mut self, left: Expression<'a>, right: Expression<'a>) -> fmt::Result {
+        if cfg!(feature = "json-1") {
+            let (left_is_json, right_is_json) = (left.is_json_value(), right.is_json_value());
+
+            self.visit_expression(left)?;
+
+            if right_is_json {
+                self.write("::jsonb")?;
+            }
+
+            self.write(" = ")?;
+
+            if left_is_json {
+                self.write("::jsonb")?;
+            }
+
+            self.visit_expression(right)
+        } else {
+            self.visit_expression(left)?;
+            self.write(" = ")?;
+            self.visit_expression(right)
+        }
+    }
+
+    fn visit_condition_not_equals(&mut self, left: Expression<'a>, right: Expression<'a>) -> fmt::Result {
+        if cfg!(feature = "json-1") {
+            let (left_is_json, right_is_json) = (left.is_json_value(), right.is_json_value());
+
+            self.visit_expression(left)?;
+
+            if right_is_json {
+                self.write("::jsonb")?;
+            }
+
+            self.write(" <> ")?;
+
+            if left_is_json {
+                self.write("::jsonb")?;
+            }
+
+            self.visit_expression(right)
+        } else {
+            self.visit_expression(left)?;
+            self.write(" <> ")?;
+            self.visit_expression(right)
+        }
+    }
 }
 
 #[cfg(test)]
@@ -196,6 +244,37 @@ mod tests {
     fn test_limit_and_offset_when_only_limit_is_set() {
         let expected = expected_values("SELECT \"users\".* FROM \"users\" LIMIT $1", vec![10]);
         let query = Select::from_table("users").limit(10);
+        let (sql, params) = Postgres::build(query);
+
+        assert_eq!(expected.0, sql);
+        assert_eq!(expected.1, params);
+    }
+
+    #[cfg(feature = "json-1")]
+    #[test]
+    fn equality_with_a_json_value() {
+        let expected = expected_values(
+            r#"SELECT "users".* FROM "users" WHERE "jsonField"::jsonb = $1"#,
+            vec![serde_json::json!({"a": "b"})],
+        );
+
+        let query = Select::from_table("users").so_that(Column::from("jsonField").equals(serde_json::json!({"a":"b"})));
+        let (sql, params) = Postgres::build(query);
+
+        assert_eq!(expected.0, sql);
+        assert_eq!(expected.1, params);
+    }
+
+    #[cfg(feature = "json-1")]
+    #[test]
+    fn difference_with_a_json_value() {
+        let expected = expected_values(
+            r#"SELECT "users".* FROM "users" WHERE "jsonField"::jsonb <> $1"#,
+            vec![serde_json::json!({"a": "b"})],
+        );
+
+        let query =
+            Select::from_table("users").so_that(Column::from("jsonField").not_equals(serde_json::json!({"a":"b"})));
         let (sql, params) = Postgres::build(query);
 
         assert_eq!(expected.0, sql);

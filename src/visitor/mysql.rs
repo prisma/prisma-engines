@@ -9,6 +9,20 @@ pub struct Mysql<'a> {
     parameters: Vec<Value<'a>>,
 }
 
+impl<'a> Mysql<'a> {
+    fn visit_regular_equality_comparison(&mut self, left: Expression<'a>, right: Expression<'a>) -> fmt::Result {
+        self.visit_expression(left)?;
+        self.write(" = ")?;
+        self.visit_expression(right)
+    }
+
+    fn visit_regular_difference_comparison(&mut self, left: Expression<'a>, right: Expression<'a>) -> fmt::Result {
+        self.visit_expression(left)?;
+        self.write(" <> ")?;
+        self.visit_expression(right)
+    }
+}
+
 impl<'a> Visitor<'a> for Mysql<'a> {
     const C_BACKTICK: &'static str = "`";
     const C_WILDCARD: &'static str = "%";
@@ -105,6 +119,66 @@ impl<'a> Visitor<'a> for Mysql<'a> {
     fn visit_aggregate_to_string(&mut self, value: Expression<'a>) -> fmt::Result {
         self.write(" GROUP_CONCAT")?;
         self.surround_with("(", ")", |ref mut s| s.visit_expression(value))
+    }
+
+    fn visit_condition_equals(&mut self, left: Expression<'a>, right: Expression<'a>) -> fmt::Result {
+        #[cfg(feature = "json-1")]
+        {
+            if right.is_json_value() || left.is_json_value() {
+                self.write("JSON_CONTAINS")?;
+                self.surround_with("(", ")", |s| {
+                    s.visit_expression(left.clone())?;
+                    s.write(", ")?;
+                    s.visit_expression(right.clone())
+                })?;
+
+                self.write(" AND ")?;
+
+                self.write("JSON_CONTAINS")?;
+                self.surround_with("(", ")", |s| {
+                    s.visit_expression(right)?;
+                    s.write(", ")?;
+                    s.visit_expression(left)
+                })
+            } else {
+                self.visit_regular_equality_comparison(left, right)
+            }
+        }
+
+        #[cfg(not(feature = "json-1"))]
+        {
+            self.visit_regular_equality_comparison(left, right)
+        }
+    }
+
+    fn visit_condition_not_equals(&mut self, left: Expression<'a>, right: Expression<'a>) -> fmt::Result {
+        #[cfg(feature = "json-1")]
+        {
+            if right.is_json_value() || left.is_json_value() {
+                self.write("NOT JSON_CONTAINS")?;
+                self.surround_with("(", ")", |s| {
+                    s.visit_expression(left.clone())?;
+                    s.write(", ")?;
+                    s.visit_expression(right.clone())
+                })?;
+
+                self.write(" OR ")?;
+
+                self.write("NOT JSON_CONTAINS")?;
+                self.surround_with("(", ")", |s| {
+                    s.visit_expression(right)?;
+                    s.write(", ")?;
+                    s.visit_expression(left)
+                })
+            } else {
+                self.visit_regular_difference_comparison(left, right)
+            }
+        }
+
+        #[cfg(not(feature = "json-1"))]
+        {
+            self.visit_regular_difference_comparison(left, right)
+        }
     }
 }
 
@@ -214,5 +288,36 @@ mod tests {
             ],
             params
         );
+    }
+
+    #[cfg(feature = "json-1")]
+    #[test]
+    fn equality_with_a_json_value() {
+        let expected = expected_values(
+            r#"SELECT `users`.* FROM `users` WHERE JSON_CONTAINS(`jsonField`, ?) AND JSON_CONTAINS(?, `jsonField`)"#,
+            vec![serde_json::json!({"a": "b"}), serde_json::json!({"a": "b"})],
+        );
+
+        let query = Select::from_table("users").so_that(Column::from("jsonField").equals(serde_json::json!({"a":"b"})));
+        let (sql, params) = Mysql::build(query);
+
+        assert_eq!(expected.0, sql);
+        assert_eq!(expected.1, params);
+    }
+
+    #[cfg(feature = "json-1")]
+    #[test]
+    fn difference_with_a_json_value() {
+        let expected = expected_values(
+            r#"SELECT `users`.* FROM `users` WHERE NOT JSON_CONTAINS(`jsonField`, ?) OR NOT JSON_CONTAINS(?, `jsonField`)"#,
+            vec![serde_json::json!({"a": "b"}), serde_json::json!({"a": "b"})],
+        );
+
+        let query =
+            Select::from_table("users").so_that(Column::from("jsonField").not_equals(serde_json::json!({"a":"b"})));
+        let (sql, params) = Mysql::build(query);
+
+        assert_eq!(expected.0, sql);
+        assert_eq!(expected.1, params);
     }
 }

@@ -7,6 +7,17 @@ pub struct Expression<'a> {
     pub(crate) alias: Option<Cow<'a, str>>,
 }
 
+impl<'a> Expression<'a> {
+    #[cfg(feature = "json-1")]
+    pub(crate) fn is_json_value(&self) -> bool {
+        match &self.kind {
+            ExpressionKind::Parameterized(Value::Json(_)) => true,
+            ExpressionKind::Value(expr) => expr.is_json_value(),
+            _ => false,
+        }
+    }
+}
+
 /// An expression we can compare and use in database queries.
 #[derive(Debug, Clone, PartialEq)]
 pub enum ExpressionKind<'a> {
