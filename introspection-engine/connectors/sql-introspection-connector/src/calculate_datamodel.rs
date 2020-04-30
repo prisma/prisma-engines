@@ -18,8 +18,8 @@ pub fn calculate_datamodel(schema: &SqlSchema, family: &SqlFamily) -> SqlIntrosp
         .tables
         .iter()
         .any(|table| is_prisma_1_point_1_or_2_join_table(&table));
-    let mut uses_on_delete = false; //should check all foreign keys -> needs default onDelete option
-    let mut always_has_created_at_updated_at = false; //should check all models
+    let mut uses_on_delete = false;
+    let mut always_has_created_at_updated_at = false;
     let mut uses_non_prisma_types = false; // should check all scalar fields and needs mapping SQLFamily -> Types
 
     //Currently from Migration Engine
@@ -47,6 +47,7 @@ pub fn calculate_datamodel(schema: &SqlSchema, family: &SqlFamily) -> SqlIntrosp
         let mut model = Model::new(table.name.clone(), None);
 
         for column in &table.columns {
+            // todo check actually used columntypes here
             let field = calculate_scalar_field(&table, &column);
             model.add_field(field);
         }
@@ -60,6 +61,9 @@ pub fn calculate_datamodel(schema: &SqlSchema, family: &SqlFamily) -> SqlIntrosp
                 .iter()
                 .any(|c| matches!(model_copy.find_field(c).unwrap().field_type, FieldType::Unsupported(_)))
         }) {
+            if foreign_key.on_delete_action != ForeignKeyAction::SetNull {
+                uses_on_delete = true
+            }
             model.add_field(calculate_relation_field(schema, table, foreign_key));
         }
 
@@ -73,6 +77,10 @@ pub fn calculate_datamodel(schema: &SqlSchema, family: &SqlFamily) -> SqlIntrosp
 
         if table.primary_key_columns().len() > 1 {
             model.id_fields = table.primary_key_columns();
+        }
+
+        if !model.has_created_at_and_updated_at() {
+            always_has_created_at_updated_at = false
         }
 
         data_model.add_model(model);
@@ -145,9 +153,9 @@ pub fn calculate_datamodel(schema: &SqlSchema, family: &SqlFamily) -> SqlIntrosp
     debug!("Done calculating data model {:?}", data_model);
 
     let version = match family {
-        SqlFamily::Sqlite if has_migration_table && !uses_on_delete && !uses_non_prisma_types => Version::PRISMA_2,
-        SqlFamily::Sqlite => Version::NON_PRISMA,
-        SqlFamily::Mysql if has_migration_table && !uses_on_delete && !uses_non_prisma_types => Version::PRISMA_2,
+        SqlFamily::Sqlite if has_migration_table && !uses_on_delete && !uses_non_prisma_types => Version::Prisma2,
+        SqlFamily::Sqlite => Version::NonPrisma,
+        SqlFamily::Mysql if has_migration_table && !uses_on_delete && !uses_non_prisma_types => Version::Prisma2,
         SqlFamily::Mysql
             if !has_migration_table
                 && !uses_on_delete
@@ -155,7 +163,7 @@ pub fn calculate_datamodel(schema: &SqlSchema, family: &SqlFamily) -> SqlIntrosp
                 && always_has_created_at_updated_at
                 && !has_prisma_1_1_or_2_join_table =>
         {
-            Version::PRISMA_1
+            Version::Prisma1
         }
         SqlFamily::Mysql
             if !has_migration_table
@@ -164,10 +172,10 @@ pub fn calculate_datamodel(schema: &SqlSchema, family: &SqlFamily) -> SqlIntrosp
                 && always_has_created_at_updated_at
                 && !has_prisma_1_join_table =>
         {
-            Version::PRISMA_1_1
+            Version::Prisma11
         }
-        SqlFamily::Mysql => Version::NON_PRISMA,
-        SqlFamily::Postgres if has_migration_table && !uses_on_delete && !uses_non_prisma_types => Version::PRISMA_2,
+        SqlFamily::Mysql => Version::NonPrisma,
+        SqlFamily::Postgres if has_migration_table && !uses_on_delete && !uses_non_prisma_types => Version::Prisma2,
         SqlFamily::Postgres
             if !has_migration_table
                 && !uses_on_delete
@@ -175,7 +183,7 @@ pub fn calculate_datamodel(schema: &SqlSchema, family: &SqlFamily) -> SqlIntrosp
                 && always_has_created_at_updated_at
                 && !has_prisma_1_1_or_2_join_table =>
         {
-            Version::PRISMA_1
+            Version::Prisma1
         }
         SqlFamily::Postgres
             if !has_migration_table
@@ -184,9 +192,9 @@ pub fn calculate_datamodel(schema: &SqlSchema, family: &SqlFamily) -> SqlIntrosp
                 && always_has_created_at_updated_at
                 && !has_prisma_1_join_table =>
         {
-            Version::PRISMA_1_1
+            Version::Prisma11
         }
-        SqlFamily::Postgres => Version::NON_PRISMA,
+        SqlFamily::Postgres => Version::NonPrisma,
     };
 
     Ok(IntrospectionResult {

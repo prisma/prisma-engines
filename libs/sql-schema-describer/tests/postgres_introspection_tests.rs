@@ -70,6 +70,7 @@ async fn all_postgres_column_types_must_work() {
             name: "array_bin_col".into(),
             tpe: ColumnType {
                 data_type: "_bytea".into(),
+                full_data_type: "_bytea".into(),
                 family: ColumnTypeFamily::Binary,
                 arity: ColumnArity::List,
             },
@@ -80,6 +81,7 @@ async fn all_postgres_column_types_must_work() {
             name: "array_bool_col".into(),
             tpe: ColumnType {
                 data_type: "_bool".into(),
+                full_data_type: "_bool".into(),
                 family: ColumnTypeFamily::Boolean,
                 arity: ColumnArity::List,
             },
@@ -90,6 +92,7 @@ async fn all_postgres_column_types_must_work() {
             name: "array_date_col".into(),
             tpe: ColumnType {
                 data_type: "_date".into(),
+                full_data_type: "_date".into(),
                 family: ColumnTypeFamily::DateTime,
                 arity: ColumnArity::List,
             },
@@ -100,6 +103,7 @@ async fn all_postgres_column_types_must_work() {
             name: "array_double_col".into(),
             tpe: ColumnType {
                 data_type: "_float8".into(),
+                full_data_type: "_float8".into(),
                 family: ColumnTypeFamily::Float,
                 arity: ColumnArity::List,
             },
@@ -110,6 +114,7 @@ async fn all_postgres_column_types_must_work() {
             name: "array_float_col".into(),
             tpe: ColumnType {
                 data_type: "_float8".into(),
+                full_data_type: "_float8".into(),
                 family: ColumnTypeFamily::Float,
                 arity: ColumnArity::List,
             },
@@ -120,6 +125,7 @@ async fn all_postgres_column_types_must_work() {
             name: "array_int_col".into(),
             tpe: ColumnType {
                 data_type: "_int4".into(),
+                full_data_type: "_int4".into(),
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::List,
             },
@@ -130,6 +136,7 @@ async fn all_postgres_column_types_must_work() {
             name: "array_text_col".into(),
             tpe: ColumnType {
                 data_type: "_text".into(),
+                full_data_type: "_text".into(),
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::List,
             },
@@ -140,6 +147,7 @@ async fn all_postgres_column_types_must_work() {
             name: "array_varchar_col".into(),
             tpe: ColumnType {
                 data_type: "_varchar".into(),
+                full_data_type: "_varchar".into(),
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::List,
             },
@@ -150,6 +158,7 @@ async fn all_postgres_column_types_must_work() {
             name: "binary_col".into(),
             tpe: ColumnType {
                 data_type: "bytea".into(),
+                full_data_type: "bytea".into(),
                 family: ColumnTypeFamily::Binary,
                 arity: ColumnArity::Required,
             },
@@ -160,6 +169,7 @@ async fn all_postgres_column_types_must_work() {
             name: "boolean_col".into(),
             tpe: ColumnType {
                 data_type: "bool".into(),
+                full_data_type: "bool".into(),
                 family: ColumnTypeFamily::Boolean,
                 arity: ColumnArity::Required,
             },
@@ -170,6 +180,7 @@ async fn all_postgres_column_types_must_work() {
             name: "date_time_col".into(),
             tpe: ColumnType {
                 data_type: "date".into(),
+                full_data_type: "date".into(),
                 family: ColumnTypeFamily::DateTime,
                 arity: ColumnArity::Required,
             },
@@ -181,6 +192,7 @@ async fn all_postgres_column_types_must_work() {
             name: "double_col".into(),
             tpe: ColumnType {
                 data_type: "float8".into(),
+                full_data_type: "float8".into(),
                 family: ColumnTypeFamily::Float,
                 arity: ColumnArity::Required,
             },
@@ -192,6 +204,7 @@ async fn all_postgres_column_types_must_work() {
             name: "float_col".into(),
             tpe: ColumnType {
                 data_type: "float8".into(),
+                full_data_type: "float8".into(),
                 family: ColumnTypeFamily::Float,
                 arity: ColumnArity::Required,
             },
@@ -203,6 +216,7 @@ async fn all_postgres_column_types_must_work() {
             name: "int_col".into(),
             tpe: ColumnType {
                 data_type: "int4".into(),
+                full_data_type: "int4".into(),
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
             },
@@ -214,6 +228,7 @@ async fn all_postgres_column_types_must_work() {
             name: "primary_col".into(),
             tpe: ColumnType {
                 data_type: "int4".into(),
+                full_data_type: "int4".into(),
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
             },
@@ -228,6 +243,7 @@ async fn all_postgres_column_types_must_work() {
             name: "string1_col".into(),
             tpe: ColumnType {
                 data_type: "text".into(),
+                full_data_type: "text".into(),
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
             },
@@ -239,6 +255,7 @@ async fn all_postgres_column_types_must_work() {
             name: "string2_col".into(),
             tpe: ColumnType {
                 data_type: "varchar".into(),
+                full_data_type: "varchar".into(),
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
             },
@@ -250,6 +267,7 @@ async fn all_postgres_column_types_must_work() {
             name: "bigint_col".into(),
             tpe: ColumnType {
                 data_type: "int8".into(),
+                full_data_type: "int8".into(),
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
             },
@@ -261,6 +279,7 @@ async fn all_postgres_column_types_must_work() {
             name: "bigserial_col".into(),
             tpe: ColumnType {
                 data_type: "int8".into(),
+                full_data_type: "int8".into(),
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
             },
@@ -275,6 +294,7 @@ async fn all_postgres_column_types_must_work() {
             name: "bit_col".into(),
             tpe: ColumnType {
                 data_type: "bit".into(),
+                full_data_type: "bit".into(),
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
             },
@@ -286,6 +306,7 @@ async fn all_postgres_column_types_must_work() {
             name: "bit_varying_col".into(),
             tpe: ColumnType {
                 data_type: "varbit".into(),
+                full_data_type: "varbit".into(),
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
             },
@@ -297,6 +318,7 @@ async fn all_postgres_column_types_must_work() {
             name: "box_col".into(),
             tpe: ColumnType {
                 data_type: "box".into(),
+                full_data_type: "box".into(),
                 family: ColumnTypeFamily::Geometric,
                 arity: ColumnArity::Required,
             },
@@ -308,6 +330,7 @@ async fn all_postgres_column_types_must_work() {
             name: "char_col".into(),
             tpe: ColumnType {
                 data_type: "bpchar".into(),
+                full_data_type: "bpchar".into(),
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
             },
@@ -319,6 +342,7 @@ async fn all_postgres_column_types_must_work() {
             name: "circle_col".into(),
             tpe: ColumnType {
                 data_type: "circle".into(),
+                full_data_type: "circle".into(),
                 family: ColumnTypeFamily::Geometric,
                 arity: ColumnArity::Required,
             },
@@ -330,6 +354,7 @@ async fn all_postgres_column_types_must_work() {
             name: "interval_col".into(),
             tpe: ColumnType {
                 data_type: "interval".into(),
+                full_data_type: "interval".into(),
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
             },
@@ -341,6 +366,7 @@ async fn all_postgres_column_types_must_work() {
             name: "line_col".into(),
             tpe: ColumnType {
                 data_type: "line".into(),
+                full_data_type: "line".into(),
                 family: ColumnTypeFamily::Geometric,
                 arity: ColumnArity::Required,
             },
@@ -352,6 +378,7 @@ async fn all_postgres_column_types_must_work() {
             name: "lseg_col".into(),
             tpe: ColumnType {
                 data_type: "lseg".into(),
+                full_data_type: "lseg".into(),
                 family: ColumnTypeFamily::Geometric,
                 arity: ColumnArity::Required,
             },
@@ -363,6 +390,7 @@ async fn all_postgres_column_types_must_work() {
             name: "numeric_col".into(),
             tpe: ColumnType {
                 data_type: "numeric".into(),
+                full_data_type: "numeric".into(),
                 family: ColumnTypeFamily::Float,
                 arity: ColumnArity::Required,
             },
@@ -374,6 +402,7 @@ async fn all_postgres_column_types_must_work() {
             name: "path_col".into(),
             tpe: ColumnType {
                 data_type: "path".into(),
+                full_data_type: "path".into(),
                 family: ColumnTypeFamily::Geometric,
                 arity: ColumnArity::Required,
             },
@@ -385,6 +414,7 @@ async fn all_postgres_column_types_must_work() {
             name: "pg_lsn_col".into(),
             tpe: ColumnType {
                 data_type: "pg_lsn".into(),
+                full_data_type: "pg_lsn".into(),
                 family: ColumnTypeFamily::LogSequenceNumber,
                 arity: ColumnArity::Required,
             },
@@ -396,6 +426,7 @@ async fn all_postgres_column_types_must_work() {
             name: "polygon_col".into(),
             tpe: ColumnType {
                 data_type: "polygon".into(),
+                full_data_type: "polygon".into(),
                 family: ColumnTypeFamily::Geometric,
                 arity: ColumnArity::Required,
             },
@@ -407,6 +438,7 @@ async fn all_postgres_column_types_must_work() {
             name: "smallint_col".into(),
             tpe: ColumnType {
                 data_type: "int2".into(),
+                full_data_type: "int2".into(),
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
             },
@@ -418,6 +450,7 @@ async fn all_postgres_column_types_must_work() {
             name: "smallserial_col".into(),
             tpe: ColumnType {
                 data_type: "int2".into(),
+                full_data_type: "int2".into(),
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
             },
@@ -432,6 +465,7 @@ async fn all_postgres_column_types_must_work() {
             name: "serial_col".into(),
             tpe: ColumnType {
                 data_type: "int4".into(),
+                full_data_type: "int4".into(),
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
             },
@@ -446,6 +480,7 @@ async fn all_postgres_column_types_must_work() {
             name: "time_col".into(),
             tpe: ColumnType {
                 data_type: "time".into(),
+                full_data_type: "time".into(),
                 family: ColumnTypeFamily::DateTime,
                 arity: ColumnArity::Required,
             },
@@ -457,6 +492,7 @@ async fn all_postgres_column_types_must_work() {
             name: "time_with_zone_col".into(),
             tpe: ColumnType {
                 data_type: "timetz".into(),
+                full_data_type: "timetz".into(),
                 family: ColumnTypeFamily::DateTime,
                 arity: ColumnArity::Required,
             },
@@ -468,6 +504,7 @@ async fn all_postgres_column_types_must_work() {
             name: "timestamp_col".into(),
             tpe: ColumnType {
                 data_type: "timestamp".into(),
+                full_data_type: "timestamp".into(),
                 family: ColumnTypeFamily::DateTime,
                 arity: ColumnArity::Required,
             },
@@ -479,6 +516,7 @@ async fn all_postgres_column_types_must_work() {
             name: "timestamp_with_zone_col".into(),
             tpe: ColumnType {
                 data_type: "timestamptz".into(),
+                full_data_type: "timestamptz".into(),
                 family: ColumnTypeFamily::DateTime,
                 arity: ColumnArity::Required,
             },
@@ -490,6 +528,7 @@ async fn all_postgres_column_types_must_work() {
             name: "tsquery_col".into(),
             tpe: ColumnType {
                 data_type: "tsquery".into(),
+                full_data_type: "tsquery".into(),
                 family: ColumnTypeFamily::TextSearch,
                 arity: ColumnArity::Required,
             },
@@ -501,6 +540,7 @@ async fn all_postgres_column_types_must_work() {
             name: "tsvector_col".into(),
             tpe: ColumnType {
                 data_type: "tsvector".into(),
+                full_data_type: "tsvector".into(),
                 family: ColumnTypeFamily::TextSearch,
                 arity: ColumnArity::Required,
             },
@@ -512,6 +552,7 @@ async fn all_postgres_column_types_must_work() {
             name: "txid_col".into(),
             tpe: ColumnType {
                 data_type: "txid_snapshot".into(),
+                full_data_type: "txid_snapshot".into(),
                 family: ColumnTypeFamily::TransactionId,
                 arity: ColumnArity::Required,
             },
@@ -523,6 +564,7 @@ async fn all_postgres_column_types_must_work() {
             name: "json_col".into(),
             tpe: ColumnType {
                 data_type: "json".into(),
+                full_data_type: "json".into(),
                 family: ColumnTypeFamily::Json,
                 arity: ColumnArity::Required,
             },
@@ -534,6 +576,7 @@ async fn all_postgres_column_types_must_work() {
             name: "jsonb_col".into(),
             tpe: ColumnType {
                 data_type: "jsonb".into(),
+                full_data_type: "jsonb".into(),
                 family: ColumnTypeFamily::Json,
                 arity: ColumnArity::Required,
             },
@@ -545,6 +588,7 @@ async fn all_postgres_column_types_must_work() {
             name: "uuid_col".into(),
             tpe: ColumnType {
                 data_type: "uuid".into(),
+                full_data_type: "uuid".into(),
                 family: ColumnTypeFamily::Uuid,
                 arity: ColumnArity::Required,
             },
@@ -608,6 +652,7 @@ async fn postgres_foreign_key_on_delete_must_be_handled() {
                     name: "city".into(),
                     tpe: ColumnType {
                         data_type: "int4".into(),
+                        full_data_type: "int4".into(),
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
                     },
@@ -618,6 +663,7 @@ async fn postgres_foreign_key_on_delete_must_be_handled() {
                     name: "city_cascade".into(),
                     tpe: ColumnType {
                         data_type: "int4".into(),
+                        full_data_type: "int4".into(),
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
                     },
@@ -628,6 +674,7 @@ async fn postgres_foreign_key_on_delete_must_be_handled() {
                     name: "city_restrict".into(),
                     tpe: ColumnType {
                         data_type: "int4".into(),
+                        full_data_type: "int4".into(),
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
                     },
@@ -638,6 +685,7 @@ async fn postgres_foreign_key_on_delete_must_be_handled() {
                     name: "city_set_default".into(),
                     tpe: ColumnType {
                         data_type: "int4".into(),
+                        full_data_type: "int4".into(),
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
                     },
@@ -648,6 +696,7 @@ async fn postgres_foreign_key_on_delete_must_be_handled() {
                     name: "city_set_null".into(),
                     tpe: ColumnType {
                         data_type: "int4".into(),
+                        full_data_type: "int4".into(),
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
                     },
@@ -658,6 +707,7 @@ async fn postgres_foreign_key_on_delete_must_be_handled() {
                     name: "id".into(),
                     tpe: ColumnType {
                         data_type: "int4".into(),
+                        full_data_type: "int4".into(),
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Required,
                     },

@@ -1,9 +1,27 @@
 use crate::*;
 use barrel::types;
+use introspection_connector::Version;
 use test_harness::*;
 
 #[test_each_connector(tags("sqlite"))]
-async fn introspecting_a_table_enums_should_return_alphabetically_even_when_in_different_order(api: &TestApi) {
+async fn introspect_sqlite_prisma2(api: &TestApi) {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("_Migration", |t| {
+                t.add_column("id", types::primary());
+            });
+            migration.create_table("Book", |t| {
+                t.add_column("id", types::primary());
+            });
+        })
+        .await;
+
+    let result = dbg!(api.introspect_version().await);
+    assert_eq!(result, Version::Prisma2);
+}
+
+#[test_each_connector(tags("sqlite"))]
+async fn introspect_sqlite_non_prisma(api: &TestApi) {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Book", |t| {
@@ -13,7 +31,7 @@ async fn introspecting_a_table_enums_should_return_alphabetically_even_when_in_d
         .await;
 
     let result = dbg!(api.introspect_version().await);
-    custom_assert(&result, "");
+    assert_eq!(result, Version::NonPrisma);
 }
 
 // #[test_each_connector(tags("mysql"))]

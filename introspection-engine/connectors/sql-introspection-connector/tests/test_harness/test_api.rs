@@ -1,5 +1,5 @@
 use super::misc_helpers::*;
-use introspection_connector::{DatabaseMetadata, IntrospectionConnector};
+use introspection_connector::{DatabaseMetadata, IntrospectionConnector, Version};
 use quaint::{
     prelude::{Queryable, SqlFamily},
     single::Quaint,
@@ -30,9 +30,9 @@ impl TestApi {
         datamodel::render_datamodel_to_string(&introspection_result.datamodel).expect("Datamodel rendering failed")
     }
 
-    pub async fn introspect_version(&self) -> String {
+    pub async fn introspect_version(&self) -> Version {
         let introspection_result = self.introspection_connector.introspect().await.unwrap();
-        introspection_result.version.to_string()
+        introspection_result.version
     }
 
     pub async fn introspection_warnings(&self) -> String {
