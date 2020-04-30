@@ -304,7 +304,10 @@ impl QueryDocumentParser {
 
                     None => match field.field_type {
                         InputType::Opt(_) => None,
-                        _ => Some(Err(QueryParserError::RequiredValueNotSetError)),
+                        _ => Some(Err(QueryParserError::FieldValidationError {
+                            field_name: field.name.clone(),
+                            inner: Box::new(QueryParserError::RequiredValueNotSetError),
+                        })),
                     },
                 }
             })

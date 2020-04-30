@@ -148,9 +148,10 @@ impl<'a> FilterObjectTypeBuilder<'a> {
             .into_iter()
             .map(|arg| {
                 let field_name = format!("{}{}", field.name, arg.suffix);
-                let typ = InputType::opt(InputType::object(Weak::clone(&related_input_type)));
+                let obj = InputType::object(Weak::clone(&related_input_type));
+                let typ = if arg.suffix == "" { InputType::null(obj) } else { obj };
 
-                input_field(field_name, typ, None)
+                input_field(field_name, InputType::opt(typ), None)
             })
             .collect();
 
