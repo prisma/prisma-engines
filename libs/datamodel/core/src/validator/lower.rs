@@ -72,6 +72,7 @@ impl LowerDmlToAst {
                 .map(|v| ast::EnumValue {
                     name: ast::Identifier::new(&v.name),
                     directives: self.directives.enm_value.serialize(v, datamodel).unwrap(),
+                    documentation: v.documentation.clone().map(|text| ast::Comment { text }),
                     span: ast::Span::empty(),
                     commented_out: v.commented_out,
                 })

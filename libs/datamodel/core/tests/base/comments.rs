@@ -1,18 +1,15 @@
 use crate::common::*;
 use datamodel::common::ScalarType;
 
-// TODO: figure out if this is a feature we want (the weird definition of `firstName`). I don't think so.
 #[test]
-#[ignore]
 fn parse_comments_without_crasing_or_loosing_info() {
     let dml = r#"
-    // This is a comment
-    model User { // This is a comment
+    // comment 1
+    model User { // comment 2
         id Int @id
-        firstName // Also a comment.
-        String
-        // This is also a comment
-        lastName String // This is a comment
+        firstName String // comment 3
+        // comment 4
+        lastName String // comment 5
     }
     "#;
 

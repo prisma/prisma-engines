@@ -9,14 +9,19 @@ pub struct ErrorCollection {
 }
 
 impl ErrorCollection {
-    /// Creates a new, empty error collection.
     pub fn new() -> ErrorCollection {
         ErrorCollection { errors: Vec::new() }
     }
 
-    /// Adds an error.
     pub fn push(&mut self, err: DatamodelError) {
         self.errors.push(err)
+    }
+
+    pub fn push_opt(&mut self, err: Option<DatamodelError>) {
+        match err {
+            Some(err) => self.push(err),
+            None => {}
+        }
     }
 
     /// Returns true, if there is at least one error

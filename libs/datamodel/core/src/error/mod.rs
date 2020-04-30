@@ -107,6 +107,9 @@ pub enum DatamodelError {
     #[fail(display = "Error validating source `{}`: {}", source, message)]
     SourceValidationError { message: String, source: String, span: Span },
 
+    #[fail(display = "Error validating enum `{}`: {}", enum_name, message)]
+    EnumValidationError { message: String, enum_name: String, span: Span },
+
     #[fail(display = "Error validating: {}", message)]
     ValidationError { message: String, span: Span  },
 }
@@ -251,6 +254,14 @@ impl DatamodelError {
         }
     }
 
+    pub fn new_enum_validation_error(message: &str, enum_name: &str, span: Span) -> DatamodelError {
+        DatamodelError::EnumValidationError {
+            message: String::from(message),
+            r#enum_name: String::from(enum_name),
+            span,
+        }
+    }
+
     pub fn new_field_validation_error(message: &str, model: &str, field: &str, span: Span) -> DatamodelError {
         DatamodelError::FieldValidationError {
             message: message.to_owned(),
@@ -360,6 +371,7 @@ impl DatamodelError {
             DatamodelError::ScalarListFieldsAreNotSupported {span, ..} => *span,
             DatamodelError::FieldValidationError {span , ..} => *span,
             DatamodelError::SourceValidationError {span, ..} => *span,
+            DatamodelError::EnumValidationError {span, ..} => *span,
         }
     }
     pub fn description(&self) -> String {

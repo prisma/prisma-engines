@@ -222,6 +222,10 @@ impl<'a> Renderer<'a> {
                 self.write(&attributes_builder.to_string());
             }
 
+            if let Some(comment) = &value.documentation {
+                self.write(&format!(" // {}", comment.text.as_str()));
+            }
+
             self.end_line();
         }
 

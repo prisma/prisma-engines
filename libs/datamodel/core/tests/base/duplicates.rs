@@ -115,7 +115,7 @@ fn fail_on_duplicate_enum_value() {
     errors.assert_is(DatamodelError::new_duplicate_enum_value_error(
         "Role",
         "Moderator",
-        Span::new(57, 66),
+        Span::new(57, 67),
     ));
 }
 

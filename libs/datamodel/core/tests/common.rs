@@ -3,6 +3,7 @@ extern crate datamodel;
 use self::datamodel::IndexDefinition;
 use datamodel::{common::ScalarType, dml, error::*};
 use datamodel_connector::ScalarFieldType;
+use pretty_assertions::assert_eq;
 
 pub trait FieldAsserts {
     fn assert_base_type(&self, t: &ScalarType) -> &Self;

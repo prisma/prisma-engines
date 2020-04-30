@@ -1,5 +1,6 @@
 use super::{Comment, Directive, Identifier, Span};
 use crate::ast::{Argument, SourceConfig};
+use crate::error::ErrorCollection;
 
 pub trait WithSpan {
     fn span(&self) -> &Span;
@@ -15,6 +16,14 @@ pub trait WithIdentifier {
 
 pub trait WithDirectives {
     fn directives(&self) -> &Vec<Directive>;
+
+    fn validate_directives(&self) -> ErrorCollection {
+        let mut errors = ErrorCollection::new();
+        for directive in self.directives() {
+            errors.push_opt(directive.name.validate("Directive").err());
+        }
+        errors
+    }
 }
 
 pub trait WithDocumentation {
