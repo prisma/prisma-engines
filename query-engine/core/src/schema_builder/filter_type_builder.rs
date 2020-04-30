@@ -130,8 +130,14 @@ impl<'a> FilterObjectTypeBuilder<'a> {
                 let field_name = format!("{}{}", field.name, arg.suffix);
                 let mapped = self.map_required_input_type(&field);
 
-                if arg.is_list {
+                if arg.is_list && field.is_required {
                     input_field(field_name, InputType::opt(InputType::list(mapped)), None)
+                } else if arg.is_list && !field.is_required {
+                    input_field(
+                        field_name,
+                        InputType::opt(InputType::null(InputType::list(mapped))),
+                        None,
+                    )
                 } else {
                     input_field(field_name, InputType::opt(mapped), None)
                 }
