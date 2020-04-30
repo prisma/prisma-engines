@@ -276,7 +276,6 @@ impl QueryDocumentParser {
         object: BTreeMap<String, QueryValue>,
         schema_object: InputObjectTypeStrongRef,
     ) -> QueryParserResult<ParsedInputMap> {
-        dbg!(&object);
         let left: HashSet<&str> = schema_object
             .get_fields()
             .iter()
@@ -294,8 +293,6 @@ impl QueryDocumentParser {
             .filter_map(|unset_field_name| {
                 let field = schema_object.find_field(*unset_field_name).unwrap();
                 let default_pair = field.default_value.clone().map(|def| (&field.name, def));
-
-                dbg!(&field);
 
                 // If the input field has a default, add the default to the result.
                 // If it's not optional and has no default, a required field has not been provided.
@@ -320,7 +317,7 @@ impl QueryDocumentParser {
                 object
                     .into_iter()
                     .map(|(k, v)| match schema_object.find_field(k.as_str()) {
-                        Some(field) => Self::parse_input_field(dbg!(v), dbg!(&field)).map(|parsed| (k, parsed)),
+                        Some(field) => Self::parse_input_field(v, &field).map(|parsed| (k, parsed)),
 
                         None => Err(QueryParserError::FieldValidationError {
                             field_name: k.clone(),
