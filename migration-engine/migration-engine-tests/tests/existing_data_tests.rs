@@ -735,12 +735,12 @@ async fn enum_variants_can_be_added_without_data_loss(api: &TestApi) -> TestResu
     {
         let cat_inserts = quaint::ast::Insert::multi_into(api.render_table_name("Cat"), vec!["id", "mood"])
             .values((
-                ParameterizedValue::Text(Cow::Borrowed("felix")),
-                ParameterizedValue::Enum(Cow::Borrowed("HUNGRY")),
+                Value::Text(Cow::Borrowed("felix")),
+                Value::Enum(Cow::Borrowed("HUNGRY")),
             ))
             .values((
-                ParameterizedValue::Text(Cow::Borrowed("mittens")),
-                ParameterizedValue::Enum(Cow::Borrowed("HAPPY")),
+                Value::Text(Cow::Borrowed("mittens")),
+                Value::Enum(Cow::Borrowed("HAPPY")),
             ));
 
         api.database().query(cat_inserts.into()).await?;
@@ -773,39 +773,26 @@ async fn enum_variants_can_be_added_without_data_loss(api: &TestApi) -> TestResu
     // Assertions
     {
         let cat_data = api.dump_table("Cat").await?;
-        let cat_data: Vec<Vec<quaint::ast::ParameterizedValue>> =
+        let cat_data: Vec<Vec<quaint::ast::Value>> =
             cat_data.into_iter().map(|row| row.into_iter().collect()).collect();
 
         let expected_cat_data = if api.sql_family().is_mysql() {
             vec![
-                vec![
-                    ParameterizedValue::Text("felix".into()),
-                    ParameterizedValue::Text("HUNGRY".into()),
-                ],
-                vec![
-                    ParameterizedValue::Text("mittens".into()),
-                    ParameterizedValue::Text("HAPPY".into()),
-                ],
+                vec![Value::Text("felix".into()), Value::Text("HUNGRY".into())],
+                vec![Value::Text("mittens".into()), Value::Text("HAPPY".into())],
             ]
         } else {
             vec![
-                vec![
-                    ParameterizedValue::Text("felix".into()),
-                    ParameterizedValue::Enum("HUNGRY".into()),
-                ],
-                vec![
-                    ParameterizedValue::Text("mittens".into()),
-                    ParameterizedValue::Enum("HAPPY".into()),
-                ],
+                vec![Value::Text("felix".into()), Value::Enum("HUNGRY".into())],
+                vec![Value::Text("mittens".into()), Value::Enum("HAPPY".into())],
             ]
         };
 
         assert_eq!(cat_data, expected_cat_data);
 
         let human_data = api.dump_table("Human").await?;
-        let human_data: Vec<Vec<ParameterizedValue>> =
-            human_data.into_iter().map(|row| row.into_iter().collect()).collect();
-        let expected_human_data: Vec<Vec<ParameterizedValue>> = Vec::new();
+        let human_data: Vec<Vec<Value>> = human_data.into_iter().map(|row| row.into_iter().collect()).collect();
+        let expected_human_data: Vec<Vec<Value>> = Vec::new();
         assert_eq!(human_data, expected_human_data);
 
         if api.sql_family().is_mysql() {
@@ -856,12 +843,12 @@ async fn enum_variants_can_be_dropped_without_data_loss(api: &TestApi) -> TestRe
     {
         let cat_inserts = quaint::ast::Insert::multi_into(api.render_table_name("Cat"), &["id", "mood"])
             .values((
-                ParameterizedValue::Text(Cow::Borrowed("felix")),
-                ParameterizedValue::Enum(Cow::Borrowed("HUNGRY")),
+                Value::Text(Cow::Borrowed("felix")),
+                Value::Enum(Cow::Borrowed("HUNGRY")),
             ))
             .values((
-                ParameterizedValue::Text(Cow::Borrowed("mittens")),
-                ParameterizedValue::Enum(Cow::Borrowed("HAPPY")),
+                Value::Text(Cow::Borrowed("mittens")),
+                Value::Enum(Cow::Borrowed("HAPPY")),
             ));
 
         api.database().query(cat_inserts.into()).await?;
@@ -893,39 +880,26 @@ async fn enum_variants_can_be_dropped_without_data_loss(api: &TestApi) -> TestRe
     // Assertions
     {
         let cat_data = api.dump_table("Cat").await?;
-        let cat_data: Vec<Vec<quaint::ast::ParameterizedValue>> =
+        let cat_data: Vec<Vec<quaint::ast::Value>> =
             cat_data.into_iter().map(|row| row.into_iter().collect()).collect();
 
         let expected_cat_data = if api.sql_family().is_mysql() {
             vec![
-                vec![
-                    ParameterizedValue::Text("felix".into()),
-                    ParameterizedValue::Text("HUNGRY".into()),
-                ],
-                vec![
-                    ParameterizedValue::Text("mittens".into()),
-                    ParameterizedValue::Text("HAPPY".into()),
-                ],
+                vec![Value::Text("felix".into()), Value::Text("HUNGRY".into())],
+                vec![Value::Text("mittens".into()), Value::Text("HAPPY".into())],
             ]
         } else {
             vec![
-                vec![
-                    ParameterizedValue::Text("felix".into()),
-                    ParameterizedValue::Enum("HUNGRY".into()),
-                ],
-                vec![
-                    ParameterizedValue::Text("mittens".into()),
-                    ParameterizedValue::Enum("HAPPY".into()),
-                ],
+                vec![Value::Text("felix".into()), Value::Enum("HUNGRY".into())],
+                vec![Value::Text("mittens".into()), Value::Enum("HAPPY".into())],
             ]
         };
 
         assert_eq!(cat_data, expected_cat_data);
 
         let human_data = api.dump_table("Human").await?;
-        let human_data: Vec<Vec<ParameterizedValue>> =
-            human_data.into_iter().map(|row| row.into_iter().collect()).collect();
-        let expected_human_data: Vec<Vec<ParameterizedValue>> = Vec::new();
+        let human_data: Vec<Vec<Value>> = human_data.into_iter().map(|row| row.into_iter().collect()).collect();
+        let expected_human_data: Vec<Vec<Value>> = Vec::new();
         assert_eq!(human_data, expected_human_data);
 
         if api.sql_family().is_mysql() {

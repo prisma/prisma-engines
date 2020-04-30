@@ -1,4 +1,4 @@
-package writes.scalarLists
+package writes.dataTypes.scalarLists
 
 import org.scalatest.{FlatSpec, Matchers}
 import util.ConnectorCapability.{JoinRelationLinksCapability, ScalarListsCapability}

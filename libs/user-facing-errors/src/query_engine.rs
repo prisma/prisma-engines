@@ -220,3 +220,9 @@ pub struct ConnectedRecordsNotFound {
 pub struct InputError {
     pub details: String,
 }
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(code = "P2020", message = "Value out of range for the type. ${details}")]
+pub struct ValueOutOfRange {
+    pub details: String,
+}

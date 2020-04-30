@@ -112,7 +112,7 @@ impl MigrationPersistence for SqlMigrationPersistence<'_> {
             .value(DATABASE_MIGRATION_COLUMN, database_migration_json)
             .value(ERRORS_COLUMN, errors_json)
             .value(STARTED_AT_COLUMN, self.convert_datetime(migration.started_at))
-            .value(FINISHED_AT_COLUMN, ParameterizedValue::Null);
+            .value(FINISHED_AT_COLUMN, Value::Null);
 
         match self.sql_family() {
             SqlFamily::Sqlite | SqlFamily::Mysql => {
@@ -138,7 +138,7 @@ impl MigrationPersistence for SqlMigrationPersistence<'_> {
         crate::catch(self.connection_info(), async {
             let finished_at_value = match params.finished_at {
                 Some(x) => self.convert_datetime(x),
-                None => ParameterizedValue::Null,
+                None => Value::Null,
             };
             let errors_json = serde_json::to_string(&params.errors).unwrap();
             let query = Update::table(self.table())
@@ -203,19 +203,19 @@ impl<'a> SqlMigrationPersistence<'a> {
         }
     }
 
-    fn convert_datetime(&self, datetime: DateTime<Utc>) -> ParameterizedValue {
+    fn convert_datetime(&self, datetime: DateTime<Utc>) -> Value {
         match self.sql_family() {
-            SqlFamily::Sqlite => ParameterizedValue::Integer(datetime.timestamp_millis()),
-            SqlFamily::Postgres => ParameterizedValue::DateTime(datetime),
-            SqlFamily::Mysql => ParameterizedValue::DateTime(datetime),
+            SqlFamily::Sqlite => Value::Integer(datetime.timestamp_millis()),
+            SqlFamily::Postgres => Value::DateTime(datetime),
+            SqlFamily::Mysql => Value::DateTime(datetime),
         }
     }
 }
 
-fn convert_parameterized_date_value(db_value: &ParameterizedValue) -> DateTime<Utc> {
+fn convert_parameterized_date_value(db_value: &Value) -> DateTime<Utc> {
     match db_value {
-        ParameterizedValue::Integer(x) => timestamp_to_datetime(*x),
-        ParameterizedValue::DateTime(x) => x.clone(),
+        Value::Integer(x) => timestamp_to_datetime(*x),
+        Value::DateTime(x) => x.clone(),
         x => unimplemented!("Got unsupported value {:?} in date conversion", x),
     }
 }
@@ -240,7 +240,7 @@ fn parse_rows_new(result_set: ResultSet) -> Vec<Migration> {
             let errors_json: String = row[ERRORS_COLUMN].to_string().unwrap();
 
             let finished_at = match &row[FINISHED_AT_COLUMN] {
-                ParameterizedValue::Null => None,
+                Value::Null => None,
                 x => Some(convert_parameterized_date_value(x)),
             };
 

@@ -125,6 +125,7 @@ impl LowerDmlToAst {
             PrismaValue::Int(value) => ast::Expression::NumericValue(value.to_string(), ast::Span::empty()),
             PrismaValue::Null => ast::Expression::ConstantValue("null".to_string(), ast::Span::empty()),
             PrismaValue::Uuid(val) => ast::Expression::StringValue(val.to_string(), ast::Span::empty()),
+            PrismaValue::Json(val) => ast::Expression::StringValue(val.to_string(), ast::Span::empty()),
             PrismaValue::List(vec) => ast::Expression::Array(
                 vec.iter().map(|pv| Self::lower_prisma_value(pv)).collect(),
                 ast::Span::empty(),

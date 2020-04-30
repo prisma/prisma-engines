@@ -18,7 +18,9 @@ fn function_returns_result(func: &ItemFn) -> bool {
     }
 }
 
-/// We do this because Intellij only recognizes functions annotated with #[test] *before* macro expansion as tests. This way we can add it manually, and the test macro will strip it.
+/// We do this because Intellij only recognizes functions annotated with #[test]
+/// *before* macro expansion as tests. This way we can add it manually, and the
+/// test macro will strip it.
 fn strip_test_attribute(function: &mut ItemFn) {
     let new_attrs = function
         .attrs

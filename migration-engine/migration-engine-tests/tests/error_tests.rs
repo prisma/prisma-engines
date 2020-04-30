@@ -370,3 +370,32 @@ async fn unique_constraint_errors_in_migrations_must_return_a_known_error(api: &
 
     Ok(())
 }
+
+#[test_each_connector(tags("mysql_5_6"))]
+async fn json_fields_must_be_rejected(api: &TestApi) -> TestResult {
+    let dm = format!(
+        r#"
+        {}
+
+        model Test {{
+            id Int @id
+            j Json
+        }}
+
+        "#,
+        api.datasource()
+    );
+
+    let result = api.infer(dm).send().await?;
+
+    assert_eq!(
+        result
+            .errors
+            .into_iter()
+            .map(|error| error.description.clone())
+            .collect::<Vec<String>>(),
+        &["The `Json` data type used in Test.j is not supported on MySQL 5.6."]
+    );
+
+    Ok(())
+}

@@ -3,7 +3,7 @@ use super::{
 };
 use crate::{query_graph::*, Query};
 use prisma_models::RecordProjection;
-use std::convert::TryInto;
+use std::{collections::VecDeque, convert::TryInto};
 
 pub struct Expressionista;
 
@@ -42,7 +42,7 @@ impl Expressionista {
         let mut direct_children = graph.direct_child_pairs(&node);
 
         // Find the positions of all result returning graph nodes.
-        let result_positions: Vec<usize> = direct_children
+        let mut result_positions: Vec<usize> = direct_children
             .iter()
             .enumerate()
             .filter_map(|(ix, (_, child_node))| {
@@ -53,6 +53,10 @@ impl Expressionista {
                 }
             })
             .collect();
+
+        // Start removing the highest indices first to not invalidate subsequent removals.
+        result_positions.sort();
+        result_positions.reverse();
 
         let result_subgraphs: Vec<(EdgeRef, NodeRef)> = result_positions
             .into_iter()
@@ -74,6 +78,8 @@ impl Expressionista {
             let result_exp = Self::fold_result_scopes(graph, result_subgraphs)?;
             expressions.push(result_exp);
         }
+
+        graph.mark_visited(&node);
 
         let is_result = graph.is_result_node(&node);
         let node_id = node.id();
@@ -113,8 +119,9 @@ impl Expressionista {
         node: &NodeRef,
         parent_edges: Vec<EdgeRef>,
     ) -> InterpretationResult<Expression> {
-        let child_pairs = graph.direct_child_pairs(node);
+        graph.mark_visited(node);
 
+        let child_pairs = graph.direct_child_pairs(node);
         let exprs: Vec<Expression> = child_pairs
             .into_iter()
             .map(|(_, node)| Self::build_expression(graph, &node, graph.incoming_edges(&node)))
@@ -129,6 +136,8 @@ impl Expressionista {
         node: &NodeRef,
         parent_edges: Vec<EdgeRef>,
     ) -> InterpretationResult<Expression> {
+        graph.mark_visited(node);
+
         let node_id = node.id();
         let child_pairs = graph.direct_child_pairs(node);
 
@@ -181,6 +190,8 @@ impl Expressionista {
     ) -> InterpretationResult<Expression> {
         match graph.node_content(node).unwrap() {
             Node::Flow(Flow::If(_)) => {
+                graph.mark_visited(node);
+
                 let child_pairs = graph.child_pairs(node);
 
                 // Graph validation guarantees this succeeds.
@@ -304,6 +315,8 @@ impl Expressionista {
         graph: &mut QueryGraph,
         result_subgraphs: Vec<(EdgeRef, NodeRef)>,
     ) -> InterpretationResult<Expression> {
+        // if the subgraphs all point to the same result node, we fold them in sequence
+        // if not, we can separate them with a getfirstnonempty
         let bindings: Vec<Binding> = result_subgraphs
             .into_iter()
             .map(|(_, node)| {
@@ -316,12 +329,47 @@ impl Expressionista {
             .collect::<InterpretationResult<Vec<Binding>>>()?;
 
         let result_binding_names = bindings.iter().map(|b| b.name.clone()).collect();
+        let result_nodes = graph.result_nodes();
 
-        Ok(Expression::Let {
-            bindings,
-            expressions: vec![Expression::GetFirstNonEmpty {
-                binding_names: result_binding_names,
-            }],
-        })
+        if result_nodes.len() == 1 {
+            let mut exprs: VecDeque<Expression> = bindings
+                .into_iter()
+                .map(|binding| Expression::Let {
+                    bindings: vec![binding],
+                    expressions: vec![],
+                })
+                .collect();
+
+            if let Some(Expression::Let { bindings, expressions }) = exprs.back_mut() {
+                expressions.push(Expression::Get {
+                    binding_name: bindings
+                        .last()
+                        .map(|b| b.name.clone())
+                        .expect("Expected let binding to have at least one expr."),
+                })
+            }
+
+            let first = exprs.pop_front().unwrap();
+            let folded = exprs.into_iter().fold(first, |mut acc, next| {
+                if let Expression::Let {
+                    bindings: _,
+                    ref mut expressions,
+                } = acc
+                {
+                    expressions.push(next);
+                }
+
+                acc
+            });
+
+            Ok(folded)
+        } else {
+            Ok(Expression::Let {
+                bindings,
+                expressions: vec![Expression::GetFirstNonEmpty {
+                    binding_names: result_binding_names,
+                }],
+            })
+        }
     }
 }

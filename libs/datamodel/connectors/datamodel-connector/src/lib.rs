@@ -17,6 +17,8 @@ pub trait Connector {
     fn supports_relations_over_non_unique_criteria(&self) -> bool;
 
     fn supports_enums(&self) -> bool;
+
+    fn supports_json(&self) -> bool;
 }
 
 #[derive(Debug, Clone, PartialEq)]

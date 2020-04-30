@@ -341,6 +341,9 @@ fn convert_prisma_value(value: PrismaValue, st: &ScalarType) -> Result<PrismaVal
     let item_value = match (st, value) {
         (ScalarType::String, PrismaValue::String(s)) => PrismaValue::String(s),
 
+        (ScalarType::Json, PrismaValue::String(s)) => PrismaValue::Json(s),
+        (ScalarType::Json, PrismaValue::Json(s)) => PrismaValue::Json(s),
+
         (ScalarType::Int, PrismaValue::Float(f)) => PrismaValue::Int(f.to_i64().unwrap()),
         (ScalarType::Int, PrismaValue::Int(i)) => PrismaValue::Int(i),
 

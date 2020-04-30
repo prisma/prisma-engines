@@ -50,6 +50,12 @@ impl<'a> Validator<'a> {
                 errors_for_model.append(the_errors);
             }
 
+            if let Err(ref mut the_errors) =
+                self.validate_field_types(ast_schema.find_model(&model.name).expect(STATE_ERROR), model)
+            {
+                errors_for_model.append(the_errors);
+            }
+
             if let Err(ref mut the_errors) = self.validate_base_fields_for_relation(
                 schema,
                 ast_schema.find_model(&model.name).expect(STATE_ERROR),
@@ -138,6 +144,40 @@ impl<'a> Validator<'a> {
                     &field.name,
                     ast_field.span,
                 ));
+            }
+        }
+
+        if errors.has_errors() {
+            Err(errors)
+        } else {
+            Ok(())
+        }
+    }
+
+    fn validate_field_types(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), ErrorCollection> {
+        let mut errors = ErrorCollection::new();
+
+        for field in model.fields() {
+            let ast_field = ast_model
+                .fields
+                .iter()
+                .find(|ast_field| ast_field.name.name == field.name)
+                .unwrap();
+
+            if let Some(dml::ScalarType::Json) = field.field_type.scalar_type() {
+                // TODO: this is really ugly
+                let supports_json_type = match self.source {
+                    Some(source) => source.connector().supports_json(),
+                    None => false,
+                };
+                if !supports_json_type {
+                    errors.push(DatamodelError::new_field_validation_error(
+                        &format!("Field `{}` in model `{}` can't be of type Json. The current connector does not support the Json type.", &field.name, &model.name),
+                        &model.name,
+                        &field.name,
+                        ast_field.span.clone(),
+                    ));
+                }
             }
         }
 

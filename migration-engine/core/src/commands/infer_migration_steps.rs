@@ -47,6 +47,8 @@ impl<'a> MigrationCommand for InferMigrationStepsCommand<'a> {
             datamodel::lift_ast(&assumed_datamodel_ast).map_err(CommandError::ProducedBadDatamodel)?;
 
         let next_datamodel = parse_datamodel(&cmd.input.datamodel)?;
+        let version_check_errors = connector.check_database_version_compatibility(&next_datamodel);
+
         let next_datamodel_ast = parse(&cmd.input.datamodel).map_err(|err| {
             CommandError::Input(anyhow::anyhow!("{}", err.to_pretty_string("", &cmd.input.datamodel)))
         })?;
@@ -104,7 +106,7 @@ impl<'a> MigrationCommand for InferMigrationStepsCommand<'a> {
             datamodel: datamodel::render_datamodel_to_string(&next_datamodel).unwrap(),
             datamodel_steps: returned_datamodel_steps,
             database_steps: serde_json::Value::Array(database_steps),
-            errors: vec![],
+            errors: version_check_errors,
             warnings,
             general_errors: vec![],
             unexecutable_migrations,

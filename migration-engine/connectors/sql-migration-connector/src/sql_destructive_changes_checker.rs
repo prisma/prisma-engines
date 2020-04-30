@@ -1,8 +1,8 @@
 mod sql_unexecutable_migration;
 
 use crate::{
-    AddColumn, AlterColumn, Component, DropColumn, DropTable, DropTables, SqlError, SqlMigration, SqlMigrationStep,
-    SqlResult, TableChange,
+    sql_schema_differ::DiffingOptions, AddColumn, AlterColumn, Component, DropColumn, DropTable, DropTables, SqlError,
+    SqlMigration, SqlMigrationStep, SqlResult, TableChange,
 };
 use migration_connector::{
     ConnectorResult, DestructiveChangeDiagnostics, DestructiveChangesChecker, MigrationWarning, UnexecutableMigration,
@@ -171,7 +171,10 @@ impl SqlDestructiveChangesChecker<'_> {
             .column(&alter_column.name)
             .expect("unsupported column renaming");
 
+        let diffing_options = DiffingOptions::from_database_info(self.database_info());
+
         let differ = crate::sql_schema_differ::ColumnDiffer {
+            diffing_options: &diffing_options,
             previous: previous_column,
             next: &alter_column.column,
         };

@@ -206,6 +206,7 @@ impl From<quaint::error::Error> for SqlError {
             e @ QuaintKind::ResultIndexOutOfBounds { .. } => SqlError::QueryError(e.into()),
             e @ QuaintKind::ResultTypeMismatch { .. } => SqlError::QueryError(e.into()),
             e @ QuaintKind::LengthMismatch { .. } => SqlError::QueryError(e.into()),
+            e @ QuaintKind::ValueOutOfRange { .. } => SqlError::QueryError(e.into()),
             e @ QuaintKind::DatabaseUrlIsInvalid { .. } => SqlError::ConnectionError(e),
             e @ QuaintKind::DatabaseDoesNotExist { .. } => SqlError::ConnectionError(e),
             e @ QuaintKind::AuthenticationFailed { .. } => SqlError::ConnectionError(e),
@@ -215,6 +216,7 @@ impl From<quaint::error::Error> for SqlError {
             e @ QuaintKind::ConnectTimeout { .. } => SqlError::ConnectionError(e.into()),
             e @ QuaintKind::Timeout(..) => SqlError::ConnectionError(e.into()),
             e @ QuaintKind::TlsError { .. } => Self::ConnectionError(e.into()),
+            e @ QuaintKind::ValueOutOfRange { .. } => todo!(),
         }
     }
 }

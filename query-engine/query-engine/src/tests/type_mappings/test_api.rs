@@ -55,6 +55,10 @@ impl TestApi {
     pub fn is_mysql_5_6(&self) -> bool {
         self.connector_name == "mysql_5_6"
     }
+
+    pub fn is_maria_db(&self) -> bool {
+        self.connector_name == "mysql_mariadb"
+    }
 }
 
 #[derive(Debug)]

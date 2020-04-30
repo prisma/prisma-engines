@@ -7,6 +7,7 @@ pub struct DeclarativeConnector {
     pub supports_scalar_lists: bool,
     pub supports_relations_over_non_unique_criteria: bool,
     pub supports_enums: bool,
+    pub supports_json: bool,
 }
 
 impl Connector for DeclarativeConnector {
@@ -35,6 +36,10 @@ impl Connector for DeclarativeConnector {
 
     fn supports_enums(&self) -> bool {
         self.supports_enums
+    }
+
+    fn supports_json(&self) -> bool {
+        self.supports_json
     }
 }
 

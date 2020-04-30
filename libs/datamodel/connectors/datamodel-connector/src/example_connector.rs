@@ -10,6 +10,7 @@ impl ExampleConnector {
             supports_scalar_lists: false,
             supports_relations_over_non_unique_criteria: false,
             supports_enums: false,
+            supports_json: false,
         }
     }
 
@@ -20,6 +21,7 @@ impl ExampleConnector {
             supports_scalar_lists: false,
             supports_relations_over_non_unique_criteria: true,
             supports_enums: true,
+            supports_json: true,
         }
     }
 
@@ -84,6 +86,7 @@ impl ExampleConnector {
             supports_scalar_lists: true,
             supports_relations_over_non_unique_criteria: false,
             supports_enums: true,
+            supports_json: true,
         }
     }
 }

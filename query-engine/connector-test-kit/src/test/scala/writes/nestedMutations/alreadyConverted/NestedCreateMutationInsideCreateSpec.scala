@@ -58,6 +58,8 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
             s"""mutation {
           |  createParent(data: {
           |    p: "p1"
+          |    p_1: "p_1"
+          |    p_2: "p_2"
           |    childReq: {
           |      create: {
           |        c: "c1"
@@ -90,6 +92,8 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
           """mutation {
             |  createParent(data: {
             |    p: "p1"
+            |    p_1: "p_1"
+            |    p_2: "p_2"
             |    childOpt: {
             |      create: {
             |        c: "c1"
@@ -126,7 +130,15 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
             |    p_1: "p_1"
             |    p_2: "p_2"
             |    childrenOpt: {
-            |      create: [{c: "c1"},{c:"c2"}]
+            |      create: [{
+            |        c: "c1"
+            |        c_1: "c_1"
+            |        c_2: "c_2"
+            |      },{
+            |        c:"c2"
+            |        c_1: "c2_1"
+            |        c_2: "c2_2"
+            |      }]
             |    }
             |  }){
             |   childrenOpt{
@@ -189,8 +201,18 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
           """mutation {
             |  createParent(data: {
             |    p: "p1"
+            |    p_1: "p_1"
+            |    p_2: "p_2"
             |    childrenOpt: {
-            |      create: [{c: "c1"},{c: "c2"}]
+            |      create: [{
+            |        c: "c1"
+            |        c_1: "c_1"
+            |        c_2: "c_2"
+            |      },{
+            |        c:"c2"
+            |        c_1: "c2_1"
+            |        c_2: "c2_2"
+            |      }]
             |    }
             |  }){
             |   childrenOpt{
@@ -218,6 +240,8 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
           """mutation {
             |  createParent(data: {
             |    p: "p1"
+            |    p_1: "p_1"
+            |    p_2: "p_2"
             |    childReq: {
             |      create: {
             |        c: "c1"
@@ -251,8 +275,14 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
           """mutation {
             |  createParent(data: {
             |    p: "p1"
+            |    p_1: "p_1"
+            |    p_2: "p_2"
             |    childOpt: {
-            |      create: {c: "c1"}
+            |      create: {
+            |        c: "c1"
+            |        c_1: "c_1"
+            |        c_2: "c_2"
+            |      }
             |    }
             |  }){
             |   childOpt{
@@ -296,8 +326,18 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
           """mutation {
             |  createParent(data: {
             |    p: "p1"
+            |    p_1: "p_1"
+            |    p_2: "p_2"
             |    childrenOpt: {
-            |      create: [{c: "c1"},{c:"c2"}]
+            |      create: [{
+            |        c: "c1"
+            |        c_1: "c_1"
+            |        c_2: "c_2"
+            |      },{
+            |        c:"c2"
+            |        c_1: "c2_1"
+            |        c_2: "c2_2"
+            |      }]
             |    }
             |  }){
             |   childrenOpt{
@@ -487,7 +527,7 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
 
     val errorTarget = () match {
       case _ if connectorTag == ConnectorTag.MySqlConnectorTag => "constraint: `unique`"
-      case _ => "fields: (`unique`)"
+      case _                                                   => "fields: (`unique`)"
     }
 
     server.queryThatMustFail(
@@ -548,7 +588,7 @@ class NestedCreateMutationInsideCreateSpec extends WordSpecLike with Matchers wi
 
     val errorTarget = () match {
       case _ if connectorTag == ConnectorTag.MySqlConnectorTag => "constraint: `uniquePost`"
-      case _ => "fields: (`uniquePost`)"
+      case _                                                   => "fields: (`uniquePost`)"
     }
 
     server.queryThatMustFail(
