@@ -53,7 +53,7 @@ fn parse_function(token: &pest::iterators::Pair<'_, Rule>) -> Expression {
     let mut arguments: Vec<Expression> = vec![];
 
     match_children! { token, current,
-        Rule::identifier => name = Some(current.as_str().to_string()),
+        Rule::non_empty_identifier => name = Some(current.as_str().to_string()),
         Rule::argument_value => arguments.push(parse_arg_value(&current)),
         _ => unreachable!("Encountered impossible function during parsing: {:?}", current.tokens())
     };
@@ -87,12 +87,12 @@ fn parse_arg_value(token: &pest::iterators::Pair<'_, Rule>) -> Expression {
 fn parse_doc_comment(token: &pest::iterators::Pair<'_, Rule>) -> String {
     match_first! { token, current,
         Rule::doc_content => {
-            let mut comment = String::from(current.as_str());
-            // Remove new line character.
-            comment.truncate(comment.len() - 1);
-            comment
+            String::from(current.as_str().trim())
         },
-        _ => unreachable!("Encountered impossible doc comment during parsing: {:?}", current.tokens())
+        Rule::doc_comment => {
+            parse_doc_comment(&current)
+        },
+        x => unreachable!("Encountered impossible doc comment during parsing: {:?}, {:?}", x, current.tokens())
     }
 }
 
@@ -169,7 +169,7 @@ fn parse_directive_arg(token: &pest::iterators::Pair<'_, Rule>) -> Argument {
 // Base type parsing
 fn parse_base_type(token: &pest::iterators::Pair<'_, Rule>) -> String {
     match_first! { token, current,
-        Rule::identifier => current.as_str().to_string(),
+        Rule::non_empty_identifier => current.as_str().to_string(),
         _ => unreachable!("Encountered impossible type during parsing: {:?}", current.tokens())
     }
 }
@@ -195,14 +195,14 @@ fn parse_field_type(token: &pest::iterators::Pair<'_, Rule>) -> Result<(FieldAri
     }
 }
 
-fn parse_field(token: &pest::iterators::Pair<'_, Rule>) -> Result<Field, DatamodelError> {
+fn parse_field(model_name: &str, token: &pest::iterators::Pair<'_, Rule>) -> Result<Field, DatamodelError> {
     let mut name: Option<Identifier> = None;
     let mut directives: Vec<Directive> = Vec::new();
     let mut field_type: Option<((FieldArity, String), Span)> = None;
     let mut comments: Vec<String> = Vec::new();
 
     match_children! { token, current,
-        Rule::identifier => name = Some(current.to_id()),
+        Rule::non_empty_identifier => name = Some(current.to_id()),
         Rule::field_type => field_type = Some(
             (
                 parse_field_type(&current)?,
@@ -213,6 +213,7 @@ fn parse_field(token: &pest::iterators::Pair<'_, Rule>) -> Result<Field, Datamod
             "Field declarations don't require a `:`.",
             Span::from_pest(current.as_span()))),
         Rule::directive => directives.push(parse_directive(&current)),
+        Rule::doc_comment_and_new_line => comments.push(parse_doc_comment(&current)),
         Rule::doc_comment => comments.push(parse_doc_comment(&current)),
         _ => unreachable!("Encountered impossible field declaration during parsing: {:?}", current.tokens())
     }
@@ -231,10 +232,11 @@ fn parse_field(token: &pest::iterators::Pair<'_, Rule>) -> Result<Field, Datamod
             span: Span::from_pest(token.as_span()),
             is_commented_out: false,
         }),
-        _ => panic!(
-            "Encountered impossible field declaration during parsing: {:?}",
-            token.as_str()
-        ),
+        _ => Err(DatamodelError::new_model_validation_error(
+            &format!("This field declaration is invalid. It is either missing a name or a type."),
+            model_name,
+            Span::from_pest(token.as_span()),
+        )),
     }
 }
 // Model parsing
@@ -252,14 +254,15 @@ fn parse_model(token: &pest::iterators::Pair<'_, Rule>) -> Result<Model, ErrorCo
                 "Model declarations have to be indicated with the `model` keyword.",
                 Span::from_pest(current.as_span()))
         ) },
-        Rule::identifier => name = Some(current.to_id()),
+        Rule::non_empty_identifier => name = Some(current.to_id()),
         Rule::directive => directives.push(parse_directive(&current)),
         Rule::field_declaration => {
-            match parse_field(&current) {
+            match parse_field(&name.as_ref().unwrap().name, &current) {
                 Ok(field) => fields.push(field),
                 Err(err) => errors.push(err)
             }
         },
+        Rule::doc_comment_and_new_line => comments.push(parse_doc_comment(&current)),
         Rule::doc_comment => comments.push(parse_doc_comment(&current)),
         Rule::UNTIL_END_OF_LINE => {},
         _ => unreachable!("Encountered impossible model declaration during parsing: {:?}", current.tokens())
@@ -293,7 +296,7 @@ fn parse_enum(token: &pest::iterators::Pair<'_, Rule>) -> Result<Enum, ErrorColl
 
     match_children! { token, current,
         Rule::ENUM_KEYWORD => { },
-        Rule::identifier => name = Some(current.to_id()),
+        Rule::non_empty_identifier => name = Some(current.to_id()),
         Rule::block_level_directive => directives.push(parse_directive(&current)),
         Rule::enum_field_declaration => {
             match parse_enum_value(&name.as_ref().unwrap().name, &current) {
@@ -302,6 +305,7 @@ fn parse_enum(token: &pest::iterators::Pair<'_, Rule>) -> Result<Enum, ErrorColl
             }
         },
         Rule::doc_comment => comments.push(parse_doc_comment(&current)),
+        Rule::doc_comment_and_new_line => comments.push(parse_doc_comment(&current)),
         _ => unreachable!("Encountered impossible enum declaration during parsing: {:?}", current.tokens())
     }
 
@@ -326,10 +330,12 @@ fn parse_enum(token: &pest::iterators::Pair<'_, Rule>) -> Result<Enum, ErrorColl
 fn parse_enum_value(enum_name: &str, token: &pest::iterators::Pair<'_, Rule>) -> Result<EnumValue, DatamodelError> {
     let mut name: Option<Identifier> = None;
     let mut directives: Vec<Directive> = vec![];
+    let mut comments: Vec<String> = vec![];
 
     //todo validate that the identifier is valid???
     match_children! { token, current,
-        Rule::identifier => name = Some(current.to_id()),
+        Rule::non_empty_identifier => name = Some(current.to_id()),
+        Rule::maybe_empty_identifier => name = Some(current.to_id()),
         Rule::directive => directives.push(parse_directive(&current)),
         Rule::number => {
             return Err(DatamodelError::new_enum_validation_error(
@@ -338,13 +344,20 @@ fn parse_enum_value(enum_name: &str, token: &pest::iterators::Pair<'_, Rule>) ->
                 Span::from_pest(token.as_span()))
             );
         },
-        _ => unreachable!("Encountered impossible enum value declaration during parsing: {:?}", current.tokens())
+        Rule::doc_comment => {
+            comments.push(parse_doc_comment(&current));
+        },
+        Rule::doc_comment_and_new_line => {
+            comments.push(parse_doc_comment(&current));
+        },
+        _ => unreachable!("Encountered impossible enum value declaration during parsing: {:?}", current.as_str())
     }
 
     match name {
         Some(name) => Ok(EnumValue {
             name,
             directives,
+            documentation: doc_comments_to_string(&comments),
             span: Span::from_pest(token.as_span()),
             commented_out: false,
         }),
@@ -360,7 +373,7 @@ fn parse_key_value(token: &pest::iterators::Pair<'_, Rule>) -> Argument {
     let mut value: Option<Expression> = None;
 
     match_children! { token, current,
-        Rule::identifier => name = Some(current.to_id()),
+        Rule::non_empty_identifier => name = Some(current.to_id()),
         Rule::expression => value = Some(parse_expression(&current)),
         _ => unreachable!("Encountered impossible source property declaration during parsing: {:?}", current.tokens())
     }
@@ -386,9 +399,10 @@ fn parse_source(token: &pest::iterators::Pair<'_, Rule>) -> SourceConfig {
 
     match_children! { token, current,
         Rule::DATASOURCE_KEYWORD => { },
-        Rule::identifier => name = Some(current.to_id()),
+        Rule::non_empty_identifier => name = Some(current.to_id()),
         Rule::key_value => properties.push(parse_key_value(&current)),
         Rule::doc_comment => comments.push(parse_doc_comment(&current)),
+        Rule::doc_comment_and_new_line => comments.push(parse_doc_comment(&current)),
         _ => unreachable!("Encountered impossible source declaration during parsing: {:?}", current.tokens())
     };
 
@@ -414,9 +428,10 @@ fn parse_generator(token: &pest::iterators::Pair<'_, Rule>) -> GeneratorConfig {
 
     match_children! { token, current,
         Rule::GENERATOR_KEYWORD => { },
-        Rule::identifier => name = Some(current.to_id()),
+        Rule::non_empty_identifier => name = Some(current.to_id()),
         Rule::key_value => properties.push(parse_key_value(&current)),
         Rule::doc_comment => comments.push(parse_doc_comment(&current)),
+        Rule::doc_comment_and_new_line => comments.push(parse_doc_comment(&current)),
         _ => unreachable!("Encountered impossible generator declaration during parsing: {:?}", current.tokens())
     };
 
@@ -443,7 +458,7 @@ fn parse_type(token: &pest::iterators::Pair<'_, Rule>) -> Field {
 
     match_children! { token, current,
         Rule::TYPE_KEYWORD => { },
-        Rule::identifier => name = Some(current.to_id()),
+        Rule::non_empty_identifier => name = Some(current.to_id()),
         Rule::base_type => {
             base_type = Some((parse_base_type(&current), Span::from_pest(current.as_span())))
         },
@@ -521,6 +536,7 @@ pub fn parse(datamodel_string: &str) -> Result<SchemaAst, ErrorCollection> {
             })
         }
         Err(err) => {
+            dbg!(&err);
             let location = match err.location {
                 pest::error::InputLocation::Pos(pos) => Span::new(pos, pos),
                 pest::error::InputLocation::Span((from, to)) => Span::new(from, to),
@@ -555,7 +571,8 @@ fn rule_to_string(rule: Rule) -> &'static str {
         Rule::enum_field_declaration => "enum field declaration",
         Rule::block_level_directive => "block level directive",
         Rule::EOI => "end of input",
-        Rule::identifier => "alphanumeric identifier",
+        Rule::non_empty_identifier => "alphanumeric identifier",
+        Rule::maybe_empty_identifier => "alphanumeric identifier",
         Rule::numeric_literal => "numeric literal",
         Rule::string_literal => "string literal",
         Rule::boolean_literal => "boolean literal",
@@ -579,6 +596,7 @@ fn rule_to_string(rule: Rule) -> &'static str {
         Rule::string_any => "any character",
         Rule::string_escaped_interpolation => "string interpolation",
         Rule::doc_comment => "documentation comment",
+        Rule::doc_comment_and_new_line => "multi line documentation comment",
         Rule::number => "number",
 
         // Those are helpers, so we get better error messages:

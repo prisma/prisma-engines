@@ -47,6 +47,7 @@ pub struct EnumValue {
     /// The enum value as it will be stored in the database.
     pub directives: Vec<Directive>,
     /// The location of this enum value in the text representation.
+    pub documentation: Option<Comment>,
     pub span: Span,
     pub commented_out: bool,
 }

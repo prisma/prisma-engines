@@ -55,7 +55,7 @@ fn relation_must_error_when_base_field_does_not_exist() {
     "#;
 
     let errors = parse_error(dml);
-    errors.assert_is(DatamodelError::new_validation_error("The argument fields must refer only to existing fields. The following fields do not exist in this model: userId", Span::new(162, 217)));
+    errors.assert_is(DatamodelError::new_validation_error("The argument fields must refer only to existing fields. The following fields do not exist in this model: userId", Span::new(162, 218)));
 }
 
 #[test]
@@ -84,8 +84,8 @@ fn relation_must_error_when_base_field_is_not_scalar() {
     "#;
 
     let errors = parse_error(dml);
-    errors.assert_is_at(0,DatamodelError::new_validation_error("The argument fields must refer only to scalar fields. But it is referencing the following relation fields: other", Span::new(210, 264)));
-    errors.assert_is_at(1,DatamodelError::new_directive_validation_error("The type of the field `other` in the model `Post` is not matching the type of the referenced field `id` in model `User`.","@relation", Span::new(210, 264)));
+    errors.assert_is_at(0,DatamodelError::new_validation_error("The argument fields must refer only to scalar fields. But it is referencing the following relation fields: other", Span::new(210, 265)));
+    errors.assert_is_at(1,DatamodelError::new_directive_validation_error("The type of the field `other` in the model `Post` is not matching the type of the referenced field `id` in model `User`.","@relation", Span::new(210, 265)));
 }
 
 #[test]
@@ -137,7 +137,7 @@ fn optional_relation_field_must_error_when_one_underlying_field_is_required() {
     "#;
 
     let errors = parse_error(dml);
-    errors.assert_is(DatamodelError::new_validation_error("The relation field `user` uses the scalar fields userFirstName, userLastName. At least one of those fields is required. Hence the relation field must be required as well.", Span::new(338, 443)));
+    errors.assert_is(DatamodelError::new_validation_error("The relation field `user` uses the scalar fields userFirstName, userLastName. At least one of those fields is required. Hence the relation field must be required as well.", Span::new(338, 444)));
 }
 
 #[test]
@@ -189,7 +189,7 @@ fn required_relation_field_must_error_when_all_underlying_fields_are_optional() 
     "#;
 
     let errors = parse_error(dml);
-    errors.assert_is(DatamodelError::new_validation_error("The relation field `user` uses the scalar fields userFirstName, userLastName. All those fields are optional. Hence the relation field must be optional as well.", Span::new(340, 445)));
+    errors.assert_is(DatamodelError::new_validation_error("The relation field `user` uses the scalar fields userFirstName, userLastName. All those fields are optional. Hence the relation field must be optional as well.", Span::new(340, 446)));
 }
 
 #[test]
@@ -210,7 +210,7 @@ fn relation_must_error_when_referenced_field_does_not_exist() {
     "#;
 
     let errors = parse_error(dml);
-    errors.assert_is(DatamodelError::new_validation_error("The argument `references` must refer only to existing fields in the related model `User`. The following fields do not exist in the related model: fooBar", Span::new(181, 240)));
+    errors.assert_is(DatamodelError::new_validation_error("The argument `references` must refer only to existing fields in the related model `User`. The following fields do not exist in the related model: fooBar", Span::new(181, 241)));
 }
 
 #[test]
@@ -231,7 +231,7 @@ fn relation_must_error_when_referenced_field_is_not_scalar() {
     "#;
 
     let errors = parse_error(dml);
-    errors.assert_is(DatamodelError::new_validation_error("The argument `references` must refer only to scalar fields in the related model `User`. But it is referencing the following relation fields: posts", Span::new(181, 239)));
+    errors.assert_is(DatamodelError::new_validation_error("The argument `references` must refer only to scalar fields in the related model `User`. But it is referencing the following relation fields: posts", Span::new(181, 240)));
 }
 
 #[test]
@@ -252,7 +252,7 @@ fn relation_must_error_when_referenced_fields_are_not_a_unique_criteria() {
     "#;
 
     let errors = parse_error(dml);
-    errors.assert_is(DatamodelError::new_validation_error("The argument `references` must refer to a unique criteria in the related model `User`. But it is referencing the following fields that are not a unique criteria: firstName", Span::new(213, 283)));
+    errors.assert_is(DatamodelError::new_validation_error("The argument `references` must refer to a unique criteria in the related model `User`. But it is referencing the following fields that are not a unique criteria: firstName", Span::new(213, 284)));
 }
 
 #[allow(non_snake_case)]
@@ -302,7 +302,7 @@ fn relation_must_error_when_referenced_fields_are_multiple_uniques() {
     "#;
 
     let errors = parse_error(dml);
-    errors.assert_is(DatamodelError::new_validation_error("The argument `references` must refer to a unique criteria in the related model `User`. But it is referencing the following fields that are not a unique criteria: id, firstName", Span::new(191, 329)));
+    errors.assert_is(DatamodelError::new_validation_error("The argument `references` must refer to a unique criteria in the related model `User`. But it is referencing the following fields that are not a unique criteria: id, firstName", Span::new(191, 330)));
 }
 
 #[test]
@@ -322,7 +322,7 @@ fn relation_must_error_when_types_of_base_field_and_referenced_field_do_not_matc
     "#;
 
     let errors = parse_error(dml);
-    errors.assert_is(DatamodelError::new_directive_validation_error("The type of the field `userId` in the model `Post` is not matching the type of the referenced field `id` in model `User`.","@relation", Span::new(204, 264)));
+    errors.assert_is(DatamodelError::new_directive_validation_error("The type of the field `userId` in the model `Post` is not matching the type of the referenced field `id` in model `User`.","@relation", Span::new(204, 265)));
 }
 
 #[test]
@@ -366,7 +366,7 @@ fn must_error_when_fields_argument_is_missing_for_one_to_many() {
     errors.assert_is(DatamodelError::new_directive_validation_error(
         "The relation field `user` on Model `Post` must specify the `fields` argument in the @relation directive.",
         "@relation",
-        Span::new(172, 214),
+        Span::new(172, 215),
     ));
 }
 
@@ -420,7 +420,7 @@ fn must_error_fields_or_references_argument_is_placed_on_wrong_side_for_one_to_m
     errors.assert_is(
         DatamodelError::new_directive_validation_error(
             "The relation field `posts` on Model `User` must not specify the `fields` or `references` argument in the @relation directive. You must only specify it on the opposite field `user` on model `Post`.",
-            "@relation", Span::new(208, 267)
+            "@relation", Span::new(208, 268)
         ),
     );
 }
@@ -479,14 +479,14 @@ fn must_error_when_fields_argument_is_missing_for_one_to_one() {
         0,
         DatamodelError::new_directive_validation_error(
             "The relation fields `post` on Model `User` and `user` on Model `Post` do not provide the `fields` argument in the @relation directive. You have to provide it on one of the two fields.", 
-            "@relation", Span::new(77, 91)
+            "@relation", Span::new(77, 92)
         ),
     );
     errors.assert_is_at(
         1,
         DatamodelError::new_directive_validation_error(
             "The relation fields `user` on Model `Post` and `post` on Model `User` do not provide the `fields` argument in the @relation directive. You have to provide it on one of the two fields.", 
-       "@relation", Span::new(170, 212)
+       "@relation", Span::new(170, 213)
         ),
     );
 }
@@ -547,14 +547,14 @@ fn must_error_when_fields_and_references_argument_are_placed_on_different_sides_
         0,
         DatamodelError::new_directive_validation_error(
             "The relation field `post` on Model `User` provides the `references` argument in the @relation directive. And the related field `user` on Model `Post` provides the `fields` argument. You must provide both arguments on the same side.",
-            "@relation", Span::new(99, 141)
+            "@relation", Span::new(99, 142)
         ),
     );
     errors.assert_is_at(
         1,
         DatamodelError::new_directive_validation_error(
             "The relation field `user` on Model `Post` provides the `fields` argument in the @relation directive. And the related field `post` on Model `User` provides the `references` argument. You must provide both arguments on the same side.",
-            "@relation", Span::new(220, 262)
+            "@relation", Span::new(220, 263)
         ),
     );
 }
@@ -581,14 +581,14 @@ fn must_error_when_fields_or_references_argument_is_placed_on_both_sides_for_one
             0,
             DatamodelError::new_directive_validation_error(
                 "The relation fields `post` on Model `User` and `user` on Model `Post` both provide the `references` argument in the @relation directive. You have to provide it only on one of the two fields.",
-                "@relation", Span::new(99, 159)
+                "@relation", Span::new(99, 160)
             ),
         );
     errors.assert_is_at(
             1,
             DatamodelError::new_directive_validation_error(
                 "The relation fields `post` on Model `User` and `user` on Model `Post` both provide the `fields` argument in the @relation directive. You have to provide it only on one of the two fields.",
-                "@relation", Span::new(99, 159)
+                "@relation", Span::new(99, 160)
             ),
         );
 
@@ -596,7 +596,7 @@ fn must_error_when_fields_or_references_argument_is_placed_on_both_sides_for_one
         2,
         DatamodelError::new_directive_validation_error(
             "The relation fields `user` on Model `Post` and `post` on Model `User` both provide the `references` argument in the @relation directive. You have to provide it only on one of the two fields.",
-            "@relation", Span::new(238, 298)
+            "@relation", Span::new(238, 299)
         ),
     );
 
@@ -604,7 +604,7 @@ fn must_error_when_fields_or_references_argument_is_placed_on_both_sides_for_one
         3,
         DatamodelError::new_directive_validation_error(
             "The relation fields `user` on Model `Post` and `post` on Model `User` both provide the `fields` argument in the @relation directive. You have to provide it only on one of the two fields.",
-            "@relation", Span::new(238,298)
+            "@relation", Span::new(238,299)
         ),
     );
 }
@@ -622,10 +622,10 @@ fn must_error_for_required_one_to_one_self_relations() {
     let errors = parse_error(dml);
     errors.assert_is_at(
         0,
-        DatamodelError::new_field_validation_error("The relation fields `friend` and `friendOf` on Model `User` are both required. This is not allowed for a self relation because it would not be possible to create a record.", "User", "friend", Span::new(83, 151)),
+        DatamodelError::new_field_validation_error("The relation fields `friend` and `friendOf` on Model `User` are both required. This is not allowed for a self relation because it would not be possible to create a record.", "User", "friend", Span::new(83, 152)),
     );
     errors.assert_is_at(
         1,
-        DatamodelError::new_field_validation_error("The relation fields `friendOf` and `friend` on Model `User` are both required. This is not allowed for a self relation because it would not be possible to create a record.", "User", "friendOf", Span::new(162, 196)),
+        DatamodelError::new_field_validation_error("The relation fields `friendOf` and `friend` on Model `User` are both required. This is not allowed for a self relation because it would not be possible to create a record.", "User", "friendOf", Span::new(162, 197)),
     );
 }

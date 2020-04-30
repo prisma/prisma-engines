@@ -144,12 +144,11 @@ enum Colors {
 "#;
 
     // moving the comment to the top is not ideal. Just want to capture the current behavior in a test.
-    let expected = r#"// comment
-enum Colors {
+    let expected = r#"enum Colors {
   RED
   BLUE
   GREEN
-  ORANGE
+  ORANGE // comment
 }"#;
 
     let mut buf = Vec::new();

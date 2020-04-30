@@ -97,9 +97,8 @@ fn must_return_good_error_messages_for_numbers_in_enums() {
     "#;
 
     let errors = parse_error(dml);
-    errors.assert_is(DatamodelError::new_enum_validation_error(
-        "The enum value `1` is not valid. Enum values must not start with a number.",
-        "MyEnum",
+    errors.assert_is(DatamodelError::new_validation_error(
+        "The name of a Enum Value must not start with a number.",
         Span::new(27, 28),
     ));
 }
