@@ -71,7 +71,6 @@ pub trait UpdateInputTypeBuilderExtension<'a>: InputTypeBuilderBase<'a> + Create
                 let field_is_opposite_relation_field = parent_field
                     .as_ref()
                     .and_then(|pf| {
-                        // TODO: The original version compared full case classes. Is this solution here enough?
                         if pf.related_field().name == rf.name {
                             Some(pf)
                         } else {

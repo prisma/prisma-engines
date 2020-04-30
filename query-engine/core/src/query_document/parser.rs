@@ -149,9 +149,8 @@ impl QueryDocumentParser {
             (_, InputType::Opt(ref inner))                  => Self::parse_input_value(value, inner),
 
             // Handle null inputs
-            (QueryValue::Null, InputType::Null(_))           => Ok(ParsedInputValue::Single(PrismaValue::Null)),
-            (_, InputType::Null(ref inner))           => Self::parse_input_value(value, inner),
-
+            (QueryValue::Null, InputType::Null(_))          => Ok(ParsedInputValue::Single(PrismaValue::Null)),
+            (_, InputType::Null(ref inner))                 => Self::parse_input_value(value, inner),
 
             // The optional handling above guarantees that if we hit a Null here, a required value is missing.
             (QueryValue::Null, _)                           => Err(QueryParserError::RequiredValueNotSetError),
@@ -159,8 +158,8 @@ impl QueryDocumentParser {
             // Scalar and enum handling.
             (_, InputType::Scalar(scalar))                  => Self::parse_scalar(value, &scalar).map(ParsedInputValue::Single),
             (QueryValue::Enum(_), InputType::Enum(et))      => Self::parse_enum(value, et),
-            (QueryValue::String(_), InputType::Enum(et))      => Self::parse_enum(value, et),
-            (QueryValue::Boolean(_), InputType::Enum(et))      => Self::parse_enum(value, et),
+            (QueryValue::String(_), InputType::Enum(et))    => Self::parse_enum(value, et),
+            (QueryValue::Boolean(_), InputType::Enum(et))   => Self::parse_enum(value, et),
 
             // List and object handling.
             (QueryValue::List(values), InputType::List(l))  => Self::parse_list(values.clone(), &l).map(ParsedInputValue::List),
