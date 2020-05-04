@@ -1,6 +1,6 @@
 use crate::{error::ConnectorError, steps::*};
 use chrono::{DateTime, Utc};
-use datamodel::{ast::SchemaAst, Datamodel};
+use datamodel::{ast::SchemaAst, error::ErrorCollection, Datamodel};
 use serde::Serialize;
 
 /// This trait is implemented by each connector. It provides a generic API to store and retrieve [Migration](struct.Migration.html) records.
@@ -75,16 +75,6 @@ pub struct Migration {
     pub finished_at: Option<DateTime<Utc>>,
 }
 
-impl Migration {
-    pub fn parse_datamodel(&self) -> Datamodel {
-        datamodel::parse_datamodel(&self.datamodel_string).unwrap()
-    }
-
-    pub fn parse_schema_ast(&self) -> SchemaAst {
-        datamodel::parse_schema_ast(&self.datamodel_string).unwrap()
-    }
-}
-
 /// Updates to be made to a persisted [Migration](struct.Migration.html).
 #[derive(Debug, Clone)]
 pub struct MigrationUpdateParams {
@@ -149,16 +139,12 @@ impl Migration {
         datetime
     }
 
-    pub fn datamodel_ast(&self) -> SchemaAst {
-        datamodel::ast::parser::parse(&self.datamodel_string)
-            .ok()
-            .unwrap_or_else(SchemaAst::empty)
+    pub fn parse_datamodel(&self) -> Result<Datamodel, (ErrorCollection, String)> {
+        datamodel::parse_datamodel(&self.datamodel_string).map_err(|err| (err, self.datamodel_string.clone()))
     }
 
-    pub fn datamodel(&self) -> Datamodel {
-        datamodel::lift_ast(&self.datamodel_ast())
-            .ok()
-            .unwrap_or_else(Datamodel::empty)
+    pub fn parse_schema_ast(&self) -> Result<SchemaAst, (ErrorCollection, String)> {
+        datamodel::parse_schema_ast(&self.datamodel_string).map_err(|err| (err, self.datamodel_string.clone()))
     }
 }
 
