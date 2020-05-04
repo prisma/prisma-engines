@@ -1459,7 +1459,7 @@ async fn column_defaults_must_be_migrated(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector(log = "debug")]
+#[test_each_connector(log = "debug,sql_schema_describer=info")]
 async fn escaped_string_defaults_are_not_arbitrarily_migrated(api: &TestApi) -> TestResult {
     use quaint::ast::*;
 
@@ -1473,10 +1473,7 @@ async fn escaped_string_defaults_are_not_arbitrarily_migrated(api: &TestApi) -> 
         }
     "#;
 
-    let output = api.infer_apply(dm1).send().await?.into_inner();
-
-    anyhow::ensure!(!output.datamodel_steps.is_empty(), "Yes migration");
-    anyhow::ensure!(output.warnings.is_empty(), "No warnings");
+    api.infer_apply(dm1).send().await?.assert_green()?.into_inner();
 
     let insert = Insert::single_into(api.render_table_name("Fruit"))
         .value("id", "apple-id")
@@ -1486,16 +1483,14 @@ async fn escaped_string_defaults_are_not_arbitrarily_migrated(api: &TestApi) -> 
 
     api.database().query(insert.into()).await?;
 
-    let output = api.infer_apply(dm1).send().await?.assert_green()?.into_inner();
-
-    anyhow::ensure!(output.datamodel_steps.is_empty(), "No migration");
+    api.infer_apply(dm1).send().await?.assert_green()?.assert_no_steps()?;
 
     let sql_schema = api.describe_database().await?;
     let table = sql_schema.table_bang("Fruit");
 
     assert_eq!(
         table.column("sideNames").and_then(|c| c.default.clone()),
-        Some(DefaultValue::VALUE(PrismaValue::String("top\ndown".to_string())))
+        Some(DefaultValue::VALUE(PrismaValue::String("top\\ndown".to_string())))
     );
     assert_eq!(
         table.column("contains").and_then(|c| c.default.clone()),

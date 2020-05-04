@@ -1,7 +1,7 @@
 //! SQLite description.
 use super::*;
 use quaint::{ast::Value, prelude::Queryable};
-use std::{sync::Arc, collections::HashMap, convert::TryInto};
+use std::{sync::Arc, collections::HashMap, convert::TryInto, borrow::Cow};
 use tracing::debug;
 
 pub struct SqlSchemaDescriber {
@@ -167,9 +167,9 @@ impl SqlSchemaDescriber {
                                         None => DefaultValue::DBGENERATED(default_string),
                                     },
                                 },
-                                ColumnTypeFamily::String => {
-                                    DefaultValue::VALUE(PrismaValue::String(unquote_string(default_string)))
-                                }
+                                ColumnTypeFamily::String => DefaultValue::VALUE(PrismaValue::String(
+                                    unquote_sqlite_string_default(&default_string).into(),
+                                )),
                                 ColumnTypeFamily::DateTime => match default_string.to_lowercase()
                                     == "current_timestamp".to_string()
                                     || default_string.to_lowercase() == "datetime(\'now\')".to_string()
@@ -441,6 +441,12 @@ fn get_column_type(tpe: &str, arity: ColumnArity) -> ColumnType {
         family: family,
         arity,
     }
+}
+
+fn unquote_sqlite_string_default(s: &str) -> Cow<'_, str> {
+    const SQLITE_STRING_DEFAULT_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"^\\'(.*)\\'$"#).unwrap());
+
+    SQLITE_STRING_DEFAULT_RE.replace(s, "$1")
 }
 
 /// Returns whether a table is one of the SQLite system tables.

@@ -61,7 +61,7 @@ impl super::SqlRenderer for SqliteRenderer {
             (DefaultValue::NOW, _) => unreachable!("NOW default on non-datetime column"),
             (DefaultValue::VALUE(val), ColumnTypeFamily::DateTime) => format!("'{}'", val).into(),
             (DefaultValue::VALUE(val), _) => format!("{}", val).into(),
-            (DefaultValue::SEQUENCE(_), _) => todo!("rendering of sequence defaults"),
+            (DefaultValue::SEQUENCE(_), _) => unreachable!("rendering of sequence defaults"),
         }
     }
 }
