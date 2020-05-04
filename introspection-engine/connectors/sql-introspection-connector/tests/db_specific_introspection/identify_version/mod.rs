@@ -43,12 +43,13 @@ async fn introspect_postgres_non_prisma(api: &TestApi) {
         .execute(|migration| {
             migration.create_table("Book", |t| {
                 t.add_column("id", types::primary());
+                t.inject_custom("location   point");
             });
         })
         .await;
 
     let result = dbg!(api.introspect_version().await);
-    assert_eq!(result, Version::NonPrisma);
+    assert_eq!(result, Version::NonPrisma); //todo could also be P1 or P11
 }
 
 #[test_each_connector(tags("postgres"))]

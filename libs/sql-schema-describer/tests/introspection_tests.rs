@@ -14,18 +14,34 @@ use crate::common::*;
 use crate::test_api::*;
 use prisma_value::PrismaValue;
 
-fn int_type(db_type: SqlFamily) -> String {
+fn int_full_data_type(db_type: SqlFamily) -> String {
     match db_type {
         SqlFamily::Postgres => "int4".to_string(),
+        SqlFamily::Sqlite => "INTEGER".to_string(),
+        SqlFamily::Mysql => "int(11)".to_string(),
+    }
+}
+
+fn int_data_type(db_type: SqlFamily) -> String {
+    match db_type {
+        SqlFamily::Postgres => "integer".to_string(),
         SqlFamily::Sqlite => "INTEGER".to_string(),
         SqlFamily::Mysql => "int".to_string(),
     }
 }
 
-fn varchar_type(db_type: SqlFamily, length: u64) -> String {
+fn varchar_data_type(db_type: SqlFamily, length: u64) -> String {
+    match db_type {
+        SqlFamily::Postgres => "character varying".to_string(),
+        SqlFamily::Mysql => "varchar".to_string(),
+        SqlFamily::Sqlite => format!("VARCHAR({})", length),
+    }
+}
+
+fn varchar_full_data_type(db_type: SqlFamily, length: u64) -> String {
     match db_type {
         SqlFamily::Postgres => "varchar".to_string(),
-        SqlFamily::Mysql => "varchar".to_string(),
+        SqlFamily::Mysql => format!("varchar({})", length),
         SqlFamily::Sqlite => format!("VARCHAR({})", length),
     }
 }
@@ -47,8 +63,8 @@ async fn is_required_must_work(api: &TestApi) {
         Column {
             name: "column1".to_string(),
             tpe: ColumnType {
-                data_type: int_type(api.sql_family()),
-                full_data_type: int_type(api.sql_family()),
+                data_type: int_data_type(api.sql_family()),
+                full_data_type: int_full_data_type(api.sql_family()),
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
             },
@@ -58,8 +74,8 @@ async fn is_required_must_work(api: &TestApi) {
         Column {
             name: "column2".to_string(),
             tpe: ColumnType {
-                data_type: int_type(api.sql_family()),
-                full_data_type: int_type(api.sql_family()),
+                data_type: int_data_type(api.sql_family()),
+                full_data_type: int_full_data_type(api.sql_family()),
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Nullable,
             },
@@ -98,8 +114,8 @@ async fn foreign_keys_must_work(api: &TestApi) {
     let expected_columns = vec![Column {
         name: "city".to_string(),
         tpe: ColumnType {
-            data_type: int_type(api.sql_family()),
-            full_data_type: int_type(api.sql_family()),
+            data_type: int_data_type(api.sql_family()),
+            full_data_type: int_full_data_type(api.sql_family()),
             family: ColumnTypeFamily::Int,
             arity: ColumnArity::Required,
         },
@@ -181,8 +197,8 @@ async fn multi_column_foreign_keys_must_work(api: &TestApi) {
         Column {
             name: "city".to_string(),
             tpe: ColumnType {
-                data_type: int_type(api.sql_family()),
-                full_data_type: int_type(api.sql_family()),
+                data_type: int_data_type(api.sql_family()),
+                full_data_type: int_full_data_type(api.sql_family()),
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
             },
@@ -192,8 +208,8 @@ async fn multi_column_foreign_keys_must_work(api: &TestApi) {
         Column {
             name: "city_name".to_string(),
             tpe: ColumnType {
-                data_type: varchar_type(api.sql_family(), 255),
-                full_data_type: varchar_type(api.sql_family(), 255),
+                data_type: varchar_data_type(api.sql_family(), 255),
+                full_data_type: varchar_full_data_type(api.sql_family(), 255),
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
             },
@@ -254,8 +270,8 @@ async fn names_with_hyphens_must_work(api: &TestApi) {
     let expected_columns = vec![Column {
         name: "column-1".to_string(),
         tpe: ColumnType {
-            data_type: int_type(api.sql_family()),
-            full_data_type: int_type(api.sql_family()),
+            data_type: int_data_type(api.sql_family()),
+            full_data_type: int_full_data_type(api.sql_family()),
             family: ColumnTypeFamily::Int,
             arity: ColumnArity::Required,
         },
@@ -290,17 +306,12 @@ async fn composite_primary_keys_must_work(api: &TestApi) {
 
     let schema = api.describe().await.expect("describe failed");
     let table = schema.get_table("User").expect("couldn't get User table");
-    let (exp_int, exp_varchar) = match api.sql_family() {
-        SqlFamily::Sqlite => ("INTEGER", "VARCHAR(255)"),
-        SqlFamily::Mysql => ("int", "varchar"),
-        SqlFamily::Postgres => ("int4", "varchar"),
-    };
     let mut expected_columns = vec![
         Column {
             name: "id".to_string(),
             tpe: ColumnType {
-                data_type: exp_int.to_string(),
-                full_data_type: exp_int.to_string(),
+                data_type: int_data_type(api.sql_family()),
+                full_data_type: int_full_data_type(api.sql_family()),
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
             },
@@ -310,8 +321,8 @@ async fn composite_primary_keys_must_work(api: &TestApi) {
         Column {
             name: "name".to_string(),
             tpe: ColumnType {
-                data_type: exp_varchar.to_string(),
-                full_data_type: exp_varchar.to_string(),
+                data_type: varchar_data_type(api.sql_family(), 255),
+                full_data_type: varchar_full_data_type(api.sql_family(), 255),
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
             },
@@ -357,8 +368,8 @@ async fn indices_must_work(api: &TestApi) {
         Column {
             name: "count".to_string(),
             tpe: ColumnType {
-                data_type: int_type(api.sql_family()),
-                full_data_type: int_type(api.sql_family()),
+                data_type: int_data_type(api.sql_family()),
+                full_data_type: int_full_data_type(api.sql_family()),
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
             },
@@ -368,8 +379,8 @@ async fn indices_must_work(api: &TestApi) {
         Column {
             name: "id".to_string(),
             tpe: ColumnType {
-                data_type: int_type(api.sql_family()),
-                full_data_type: int_type(api.sql_family()),
+                data_type: int_data_type(api.sql_family()),
+                full_data_type: int_full_data_type(api.sql_family()),
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
             },
@@ -423,8 +434,8 @@ async fn column_uniqueness_must_be_detected(api: &TestApi) {
         Column {
             name: "uniq1".to_string(),
             tpe: ColumnType {
-                data_type: int_type(api.sql_family()),
-                full_data_type: int_type(api.sql_family()),
+                data_type: int_data_type(api.sql_family()),
+                full_data_type: int_full_data_type(api.sql_family()),
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
             },
@@ -434,8 +445,8 @@ async fn column_uniqueness_must_be_detected(api: &TestApi) {
         Column {
             name: "uniq2".to_string(),
             tpe: ColumnType {
-                data_type: int_type(api.sql_family()),
-                full_data_type: int_type(api.sql_family()),
+                data_type: int_data_type(api.sql_family()),
+                full_data_type: int_full_data_type(api.sql_family()),
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
             },
@@ -505,8 +516,8 @@ async fn defaults_must_work(api: &TestApi) {
     let expected_columns = vec![Column {
         name: "id".to_string(),
         tpe: ColumnType {
-            data_type: int_type(api.sql_family()),
-            full_data_type: int_type(api.sql_family()),
+            data_type: int_data_type(api.sql_family()),
+            full_data_type: int_full_data_type(api.sql_family()),
             family: ColumnTypeFamily::Int,
             arity: ColumnArity::Nullable,
         },
