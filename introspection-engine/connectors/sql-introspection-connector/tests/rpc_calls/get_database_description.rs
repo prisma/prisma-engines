@@ -1,12 +1,20 @@
 use crate::{test_harness::*, BarrelMigrationExecutor};
 use barrel::types;
 
-#[test_each_connector(tags("mysql"))]
+#[test_each_connector(tags("mysql_5_6", "mariadb"))]
 async fn database_description_for_mysql_should_work(api: &TestApi) {
     let barrel = api.barrel();
     setup(&barrel, api.db_name()).await;
     let result = dbg!(api.get_database_description().await);
     assert_eq!(result, "{\"tables\":[{\"name\":\"Blog\",\"columns\":[{\"name\":\"id\",\"tpe\":{\"dataType\":\"int\",\"fullDataType\":\"int(11)\",\"family\":\"int\",\"arity\":\"required\"},\"default\":null,\"autoIncrement\":true},{\"name\":\"string\",\"tpe\":{\"dataType\":\"text\",\"fullDataType\":\"text\",\"family\":\"string\",\"arity\":\"required\"},\"default\":null,\"autoIncrement\":false}],\"indices\":[],\"primaryKey\":{\"columns\":[\"id\"],\"sequence\":null},\"foreignKeys\":[]}],\"enums\":[],\"sequences\":[]}".to_string());
+}
+
+#[test_each_connector(tags("mysql_8"))]
+async fn database_description_for_mysql_8_should_work(api: &TestApi) {
+    let barrel = api.barrel();
+    setup(&barrel, api.db_name()).await;
+    let result = dbg!(api.get_database_description().await);
+    assert_eq!(result, "{\"tables\":[{\"name\":\"Blog\",\"columns\":[{\"name\":\"id\",\"tpe\":{\"dataType\":\"int\",\"fullDataType\":\"int\",\"family\":\"int\",\"arity\":\"required\"},\"default\":null,\"autoIncrement\":true},{\"name\":\"string\",\"tpe\":{\"dataType\":\"text\",\"fullDataType\":\"text\",\"family\":\"string\",\"arity\":\"required\"},\"default\":null,\"autoIncrement\":false}],\"indices\":[],\"primaryKey\":{\"columns\":[\"id\"],\"sequence\":null},\"foreignKeys\":[]}],\"enums\":[],\"sequences\":[]}".to_string());
 }
 
 #[test_each_connector(tags("postgres"))]
