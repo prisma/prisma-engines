@@ -41,6 +41,7 @@ impl<'a> GqlTypeRenderer<'a> {
                 let (substring, subctx) = self.render_input_type(opt, ctx);
                 (substring.trim_end_matches('!').to_owned(), subctx)
             }
+            InputType::Null(ref inner) => self.render_input_type(inner, ctx), // Nullability has no representation in GQL
             InputType::Scalar(ScalarType::Enum(et)) => {
                 let (_, subctx) = et.into_renderer().render(ctx);
                 (format!("{}!", et.name()), subctx)

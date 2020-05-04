@@ -124,17 +124,14 @@ class SelfRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "Filter Queries along OneToOne self relations" should "succeed with null filter" in {
-
-    val filterWifeNull = s"""query{songs (
-                                          where: {
-                                            creator: {
-                                              wife: null
-                                                }
-                                              }
-                                            ) {
-                                              title
-                                            }
-                                          }""".stripMargin
+    val filterWifeNull =
+      s"""
+         |query {
+         |  songs(where: { creator: { wife: null } }) {
+         |    title
+         |  }
+         |}
+       """.stripMargin
 
     server.query(filterWifeNull, project, dataContains = "{\"songs\":[{\"title\":\"Bicycle\"},{\"title\":\"Gasag\"}]}")
   }
@@ -155,8 +152,7 @@ class SelfRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
     server.query(filterWifeNull, project, dataContains = "{\"songs\":[{\"title\":\"My Girl\"},{\"title\":\"Imagine\"}]}")
   }
 
-  "Filter Queries along OneToMany self relations" should "fail with  null filter" taggedAs (IgnoreMongo) in {
-
+  "Filter Queries along OneToMany self relations" should "fail with null filter" taggedAs (IgnoreMongo) in {
     val filterDaughterNull = s"""query {
        songs (
           where: {
@@ -172,8 +168,8 @@ class SelfRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
     server.queryThatMustFail(
       filterDaughterNull,
       project,
-      errorCode = 2019, // 3033,
-      errorContains = """Error in query graph construction: InputError(\"A value is required for the `none` filter on `daughters`\")"""
+      errorCode = 2012,
+      errorContains = "Missing a required value at `Query.songs.where.SongWhereInput.creator.HumanWhereInput.daughters_none`"
     )
   }
 
@@ -251,7 +247,6 @@ class SelfRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "Filter Queries along ManyToMany self relations" should "give an error with null" taggedAs (IgnoreMongo) in {
-
     val filterGroupies = s"""
        query {
           songs (
@@ -270,8 +265,8 @@ class SelfRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
     server.queryThatMustFail(
       filterGroupies,
       project,
-      errorCode = 2019,
-      errorContains = """Input error. A value is required for the `some` filter on `fans`"""
+      errorCode = 2012,
+      errorContains = """Missing a required value at `Query.songs.where.SongWhereInput.creator.HumanWhereInput.fans_every.HumanWhereInput.fans_some`"""
     )
   }
 

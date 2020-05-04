@@ -148,8 +148,8 @@ class UpsertMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
          |}
       """.stripMargin,
       project,
-      errorCode = 2011,
-      errorContains = "Null constraint violation on the fields: (`reqString`)"
+      errorCode = 2012,
+      errorContains = "Missing a required value at `Mutation.upsertWithDefaultValue.create.WithDefaultValueCreateInput.reqString`"
     )
   }
 

@@ -130,8 +130,14 @@ impl<'a> FilterObjectTypeBuilder<'a> {
                 let field_name = format!("{}{}", field.name, arg.suffix);
                 let mapped = self.map_required_input_type(&field);
 
-                if arg.is_list {
+                if arg.is_list && field.is_required {
                     input_field(field_name, InputType::opt(InputType::list(mapped)), None)
+                } else if arg.is_list && !field.is_required {
+                    input_field(
+                        field_name,
+                        InputType::opt(InputType::null(InputType::list(mapped))),
+                        None,
+                    )
                 } else {
                     input_field(field_name, InputType::opt(mapped), None)
                 }
@@ -148,9 +154,10 @@ impl<'a> FilterObjectTypeBuilder<'a> {
             .into_iter()
             .map(|arg| {
                 let field_name = format!("{}{}", field.name, arg.suffix);
-                let typ = InputType::opt(InputType::object(Weak::clone(&related_input_type)));
+                let obj = InputType::object(Weak::clone(&related_input_type));
+                let typ = if arg.suffix == "" { InputType::null(obj) } else { obj };
 
-                input_field(field_name, typ, None)
+                input_field(field_name, InputType::opt(typ), None)
             })
             .collect();
 

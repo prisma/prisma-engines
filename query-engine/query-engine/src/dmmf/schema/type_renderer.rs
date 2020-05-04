@@ -25,10 +25,12 @@ impl<'a> DMMFTypeRenderer<'a> {
                     kind: TypeKind::Object,
                     is_required: true,
                     is_list: false,
+                    is_nullable: false,
                 };
 
                 type_info
             }
+
             InputType::Enum(et) => {
                 et.into_renderer().render(ctx);
                 let type_info = DMMFTypeInfo {
@@ -36,22 +38,33 @@ impl<'a> DMMFTypeRenderer<'a> {
                     kind: TypeKind::Enum,
                     is_required: true,
                     is_list: false,
+                    is_nullable: false,
                 };
 
                 type_info
             }
+
             InputType::List(ref l) => {
                 let mut type_info = self.render_input_type(l, ctx);
                 type_info.is_list = true;
 
                 type_info
             }
-            InputType::Opt(ref opt) => {
-                let mut type_info = self.render_input_type(opt, ctx);
+
+            InputType::Opt(ref inner) => {
+                let mut type_info = self.render_input_type(inner, ctx);
                 type_info.is_required = false;
 
                 type_info
             }
+
+            InputType::Null(ref inner) => {
+                let mut type_info = self.render_input_type(inner, ctx);
+                type_info.is_nullable = true;
+
+                type_info
+            }
+
             InputType::Scalar(ScalarType::Enum(et)) => {
                 et.into_renderer().render(ctx);
                 let type_info = DMMFTypeInfo {
@@ -59,10 +72,12 @@ impl<'a> DMMFTypeRenderer<'a> {
                     kind: TypeKind::Scalar,
                     is_required: true,
                     is_list: false,
+                    is_nullable: false,
                 };
 
                 type_info
             }
+
             InputType::Scalar(ref scalar) => {
                 let stringified = match scalar {
                     ScalarType::String => "String",
@@ -81,6 +96,7 @@ impl<'a> DMMFTypeRenderer<'a> {
                     kind: TypeKind::Scalar,
                     is_required: true,
                     is_list: false,
+                    is_nullable: false,
                 };
 
                 type_info
@@ -98,6 +114,7 @@ impl<'a> DMMFTypeRenderer<'a> {
                     kind: TypeKind::Object,
                     is_required: true,
                     is_list: false,
+                    is_nullable: false,
                 };
 
                 type_info
@@ -109,6 +126,7 @@ impl<'a> DMMFTypeRenderer<'a> {
                     kind: TypeKind::Enum,
                     is_required: true,
                     is_list: false,
+                    is_nullable: false,
                 };
 
                 type_info
@@ -132,6 +150,7 @@ impl<'a> DMMFTypeRenderer<'a> {
                     kind: TypeKind::Scalar,
                     is_required: true,
                     is_list: false,
+                    is_nullable: false,
                 };
 
                 type_info
@@ -154,6 +173,7 @@ impl<'a> DMMFTypeRenderer<'a> {
                     kind: TypeKind::Scalar,
                     is_required: true,
                     is_list: false,
+                    is_nullable: false,
                 };
 
                 type_info

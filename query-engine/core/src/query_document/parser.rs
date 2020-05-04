@@ -16,11 +16,10 @@ pub struct QueryDocumentParser;
 // Todo:
 // - Use error collections instead of letting first error win.
 // - UUID ids are not encoded in any useful way in the schema.
-// - Alias handling in query names.
 impl QueryDocumentParser {
     /// Parses and validates a set of selections against a schema (output) object.
-    /// On an output object, nullability designates whether or not an output field can be null
-    /// (in contrast, nullability on an input object means whether or not a field as to be provided).
+    /// On an output object, optional types designate whether or not an output field can be nulled.
+    /// In contrast, nullable and optional types on an input object are separate concepts.
     /// The above is the reason we don't need to check nullability here, as it is done by the output
     /// validation in the serialization step.
     pub fn parse_object(
@@ -85,7 +84,6 @@ impl QueryDocumentParser {
     }
 
     /// Parses and validates selection arguments against a schema defined field.
-    // Todo if needed at some point, argument default handling can be added here.
     pub fn parse_arguments(
         schema_field: &FieldRef,
         given_arguments: &[(String, QueryValue)],
@@ -116,30 +114,26 @@ impl QueryDocumentParser {
                     .find(|given_argument| given_argument.0 == schema_arg.name)
                     .cloned();
 
-                // If the arg can be found, parse the provided query value into a list / object / PrismaValue.
-                //
-                // If the arg can _not_ be found, pretend the arg was provided with a Null.
-                // Run the validation against the Null value to check if it needs to be provided, but disregard the result if it succeeded.
-                let (selection_arg, retain) = match selection_arg {
-                    Some(arg) => (arg, true),
-                    None => ((schema_arg.name.clone(), QueryValue::Null), false),
+                let arg_type = &schema_arg.argument_type;
+
+                // If optional and not present ignore the field, else commence regular parsing.
+                let parsed = match (selection_arg, arg_type) {
+                    (None, InputType::Opt(_)) => None,
+                    (Some((_, value)), _) => Some(Self::parse_input_value(value, &schema_arg.argument_type)),
+                    _ => Some(Err(QueryParserError::RequiredValueNotSetError)),
                 };
 
-                let result = Self::parse_input_value(selection_arg.1, &schema_arg.argument_type)
-                    .map(|value| ParsedArgument {
-                        name: schema_arg.name.clone(),
-                        value,
-                    })
-                    .map_err(|err| QueryParserError::ArgumentValidationError {
-                        argument: schema_arg.name.clone(),
-                        inner: Box::new(err),
-                    });
-
-                if result.is_err() || retain {
-                    Some(result)
-                } else {
-                    None
-                }
+                parsed.map(|result| {
+                    result
+                        .map(|value| ParsedArgument {
+                            name: schema_arg.name.clone(),
+                            value,
+                        })
+                        .map_err(|err| QueryParserError::ArgumentValidationError {
+                            argument: schema_arg.name.clone(),
+                            inner: Box::new(err),
+                        })
+                })
             })
             .collect::<Vec<QueryParserResult<ParsedArgument>>>()
             .into_iter()
@@ -151,9 +145,12 @@ impl QueryDocumentParser {
     pub fn parse_input_value(value: QueryValue, input_type: &InputType) -> QueryParserResult<ParsedInputValue> {
         // todo figure out what is up with enums
         match (&value, input_type) {
-            // Handle null inputs
-            (QueryValue::Null, InputType::Opt(_))           => Ok(ParsedInputValue::Single(PrismaValue::Null)),
+            // Handle optional inputs
             (_, InputType::Opt(ref inner))                  => Self::parse_input_value(value, inner),
+
+            // Handle null inputs
+            (QueryValue::Null, InputType::Null(_))          => Ok(ParsedInputValue::Single(PrismaValue::Null)),
+            (_, InputType::Null(ref inner))                 => Self::parse_input_value(value, inner),
 
             // The optional handling above guarantees that if we hit a Null here, a required value is missing.
             (QueryValue::Null, _)                           => Err(QueryParserError::RequiredValueNotSetError),
@@ -161,8 +158,8 @@ impl QueryDocumentParser {
             // Scalar and enum handling.
             (_, InputType::Scalar(scalar))                  => Self::parse_scalar(value, &scalar).map(ParsedInputValue::Single),
             (QueryValue::Enum(_), InputType::Enum(et))      => Self::parse_enum(value, et),
-            (QueryValue::String(_), InputType::Enum(et))      => Self::parse_enum(value, et),
-            (QueryValue::Boolean(_), InputType::Enum(et))      => Self::parse_enum(value, et),
+            (QueryValue::String(_), InputType::Enum(et))    => Self::parse_enum(value, et),
+            (QueryValue::Boolean(_), InputType::Enum(et))   => Self::parse_enum(value, et),
 
             // List and object handling.
             (QueryValue::List(values), InputType::List(l))  => Self::parse_list(values.clone(), &l).map(ParsedInputValue::List),
@@ -297,23 +294,26 @@ impl QueryDocumentParser {
                 let field = schema_object.find_field(*unset_field_name).unwrap();
                 let default_pair = field.default_value.clone().map(|def| (&field.name, def));
 
+                // If the input field has a default, add the default to the result.
+                // If it's not optional and has no default, a required field has not been provided.
                 match default_pair {
-                    // If the input field has a default, add the default to the result.
                     Some((k, dv)) => dv.get().map(|pv| match Self::parse_input_field(pv.into(), &field) {
                         Ok(value) => Ok((k.clone(), value)),
                         Err(err) => Err(err),
                     }),
-                    // Finally, if nothing is found, parse the input value with Null but disregard the result,
-                    // except errors, which are propagated.
-                    None => match Self::parse_input_field(QueryValue::Null, &field) {
-                        Ok(_) => None,
-                        Err(err) => Some(Err(err)),
+
+                    None => match field.field_type {
+                        InputType::Opt(_) => None,
+                        _ => Some(Err(QueryParserError::FieldValidationError {
+                            field_name: field.name.clone(),
+                            inner: Box::new(QueryParserError::RequiredValueNotSetError),
+                        })),
                     },
                 }
             })
             .collect::<QueryParserResult<Vec<_>>>()
             .and_then(|defaults| {
-                // Checks all fields on the provided input object. This will catch extra, unknown fields and parsing errors.
+                // Checks all fields on the provided input object. This will catch extra / unknown fields and parsing errors.
                 object
                     .into_iter()
                     .map(|(k, v)| match schema_object.find_field(k.as_str()) {
