@@ -103,12 +103,12 @@ fn scalar_list_types_are_not_supported_by_default() {
 
     errors.assert_is_at(
         0,
-        DatamodelError::new_scalar_list_fields_are_not_supported("Post", "comments", Span::new(106, 125)),
+        DatamodelError::new_scalar_list_fields_are_not_supported("Post", "comments", Span::new(106, 126)),
     );
 
     errors.assert_is_at(
         1,
-        DatamodelError::new_scalar_list_fields_are_not_supported("Post", "enums", Span::new(134, 151)),
+        DatamodelError::new_scalar_list_fields_are_not_supported("Post", "enums", Span::new(134, 152)),
     );
 }
 
@@ -141,12 +141,12 @@ fn scalar_list_types_are_not_supported_by_mysql() {
 
     errors.assert_is_at(
         0,
-        DatamodelError::new_scalar_list_fields_are_not_supported("Post", "comments", Span::new(174, 191)),
+        DatamodelError::new_scalar_list_fields_are_not_supported("Post", "comments", Span::new(174, 192)),
     );
 
     errors.assert_is_at(
         1,
-        DatamodelError::new_scalar_list_fields_are_not_supported("Post", "enums", Span::new(200, 215)),
+        DatamodelError::new_scalar_list_fields_are_not_supported("Post", "enums", Span::new(200, 216)),
     );
 }
 
@@ -164,7 +164,7 @@ fn json_type_must_work_for_some_connectors() {
         "Field `json` in model `User` can\'t be of type Json. The current connector does not support the Json type.",
         "User",
         "json",
-        Span::new(50, 59),
+        Span::new(50, 60),
     ));
 
     // SQLite does not support it
@@ -172,7 +172,7 @@ fn json_type_must_work_for_some_connectors() {
         "Field `json` in model `User` can\'t be of type Json. The current connector does not support the Json type.",
         "User",
         "json",
-        Span::new(139, 148),
+        Span::new(139, 149),
     ));
 
     // Postgres does support it

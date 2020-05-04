@@ -1,8 +1,7 @@
 use crate::{
     database_info::DatabaseInfo,
     sql_migration::*,
-    sql_renderer::sqlite_quoted,
-    sql_renderer::SqlRenderer,
+    sql_renderer::{Quoted, SqlRenderer},
     sql_schema_differ::{ColumnDiffer, DiffingOptions, SqlSchemaDiff, TableDiffer},
     SqlFamily, SqlResult,
 };
@@ -64,7 +63,7 @@ pub(super) fn fix(
     }
 
     result.push(SqlMigrationStep::RawSql {
-        raw: format!("PRAGMA {}.foreign_key_check;", sqlite_quoted(schema_name)),
+        raw: format!("PRAGMA {}.foreign_key_check;", Quoted::sqlite_ident(schema_name)),
     });
 
     result.push(SqlMigrationStep::RawSql {
@@ -182,8 +181,8 @@ fn copy_current_table_into_new_table(
     write!(
         query,
         "INSERT INTO {}.{} (",
-        sqlite_quoted(schema_name),
-        sqlite_quoted(&differ.next.name)
+        Quoted::sqlite_ident(schema_name),
+        Quoted::sqlite_ident(&differ.next.name)
     )?;
 
     let mut destination_columns = intersection_columns
@@ -197,7 +196,7 @@ fn copy_current_table_into_new_table(
         .peekable();
 
     while let Some(destination_column) = destination_columns.next() {
-        write!(query, "{}", sqlite_quoted(destination_column))?;
+        write!(query, "{}", Quoted::sqlite_ident(destination_column))?;
 
         if destination_columns.peek().is_some() {
             write!(query, ", ")?;
@@ -208,11 +207,11 @@ fn copy_current_table_into_new_table(
 
     let mut source_columns = intersection_columns
         .iter()
-        .map(|s| format!("{}", sqlite_quoted(s)))
+        .map(|s| format!("{}", Quoted::sqlite_ident(s)))
         .chain(columns_that_became_required_with_a_default.iter().map(|columns| {
             format!(
                 "coalesce({column_name}, {default_value}) AS {column_name}",
-                column_name = sqlite_quoted(columns.name()),
+                column_name = Quoted::sqlite_ident(columns.name()),
                 default_value = SqlRenderer::for_family(&SqlFamily::Sqlite).render_default(
                     columns
                         .next
@@ -236,8 +235,8 @@ fn copy_current_table_into_new_table(
     write!(
         query,
         " FROM {}.{}",
-        sqlite_quoted(schema_name),
-        sqlite_quoted(&differ.previous.name)
+        Quoted::sqlite_ident(schema_name),
+        Quoted::sqlite_ident(&differ.previous.name)
     )?;
 
     steps.push(SqlMigrationStep::RawSql { raw: query });

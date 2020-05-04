@@ -36,7 +36,9 @@ impl<'a> MigrationCommand for InferMigrationStepsCommand<'a> {
 
         let last_migration = migration_persistence.last().await?;
         let current_datamodel_ast = if let Some(migration) = last_migration.as_ref() {
-            migration.parse_schema_ast()
+            migration
+                .parse_schema_ast()
+                .map_err(|(err, schema)| CommandError::InvalidPersistedDatamodel(err, schema))?
         } else {
             SchemaAst::empty()
         };
@@ -76,11 +78,13 @@ impl<'a> MigrationCommand for InferMigrationStepsCommand<'a> {
                 let last_non_watch_applied_migration = migration_persistence.last_non_watch_applied_migration().await?;
                 let last_non_watch_datamodel_ast = last_non_watch_applied_migration
                     .as_ref()
-                    .map(|m| m.datamodel_ast())
-                    .unwrap_or_else(SchemaAst::empty);
+                    .map(|m| m.parse_schema_ast())
+                    .unwrap_or_else(|| Ok(SchemaAst::empty()))
+                    .map_err(|(err, schema)| CommandError::InvalidPersistedDatamodel(err, schema))?;
                 let last_non_watch_datamodel = last_non_watch_applied_migration
                     .map(|m| m.parse_datamodel())
-                    .unwrap_or_else(Datamodel::empty);
+                    .unwrap_or_else(|| Ok(Datamodel::empty()))
+                    .map_err(|(err, schema)| CommandError::InvalidPersistedDatamodel(err, schema))?;
                 let datamodel_steps = engine
                     .datamodel_migration_steps_inferrer()
                     .infer(&last_non_watch_datamodel_ast, &next_datamodel_ast);

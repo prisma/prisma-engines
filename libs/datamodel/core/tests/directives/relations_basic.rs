@@ -118,7 +118,7 @@ fn must_error_when_non_existing_fields_are_used() {
     errors.assert_is(
         DatamodelError::new_validation_error(
             "The argument fields must refer only to existing fields. The following fields do not exist in this model: authorFirstName, authorLastName", 
-                Span::new(232, 331)
+                Span::new(232, 332)
         )
     );
 }

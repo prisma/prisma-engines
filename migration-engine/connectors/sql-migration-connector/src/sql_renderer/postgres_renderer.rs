@@ -1,20 +1,16 @@
 use super::common::*;
 use crate::{sql_schema_helpers::*, SqlFamily};
 use sql_schema_describer::*;
-use std::fmt::Write as _;
 
 pub struct PostgresRenderer {}
+
 impl super::SqlRenderer for PostgresRenderer {
     fn sql_family(&self) -> SqlFamily {
         SqlFamily::Postgres
     }
 
-    fn write_quoted(&self, buf: &mut String, name: &str) -> std::fmt::Result {
-        write!(buf, "{}", quoted(name))
-    }
-
-    fn quote(&self, name: &str) -> String {
-        quoted(name).to_string()
+    fn quote<'a>(&self, name: &'a str) -> Quoted<&'a str> {
+        Quoted::postgres_ident(name)
     }
 
     fn render_column(&self, _schema_name: &str, column: ColumnRef<'_>, _add_fk_prefix: bool) -> String {
@@ -35,12 +31,15 @@ impl super::SqlRenderer for PostgresRenderer {
     }
 
     fn render_references(&self, schema_name: &str, foreign_key: &ForeignKey) -> String {
-        let referenced_columns = foreign_key.referenced_columns.iter().map(quoted).join(",");
+        let referenced_columns = foreign_key
+            .referenced_columns
+            .iter()
+            .map(Quoted::postgres_ident)
+            .join(",");
 
         format!(
-            "REFERENCES {}.{}({}) {}  ON UPDATE CASCADE",
-            quoted(schema_name),
-            quoted(&foreign_key.referenced_table),
+            "REFERENCES {}({}) {}  ON UPDATE CASCADE",
+            self.quote_with_schema(schema_name, &foreign_key.referenced_table),
             referenced_columns,
             render_on_delete(&foreign_key.on_delete_action)
         )
@@ -59,40 +58,8 @@ pub(crate) fn render_column_type(t: &ColumnType) -> String {
         ColumnTypeFamily::Float => format!("Decimal(65,30) {}", array),
         ColumnTypeFamily::Int => format!("integer {}", array),
         ColumnTypeFamily::String => format!("text {}", array),
-        ColumnTypeFamily::Enum(name) => format!("{}{}", quoted(name), array),
+        ColumnTypeFamily::Enum(name) => format!("{}{}", Quoted::postgres_ident(name), array),
         ColumnTypeFamily::Json => format!("jsonb {}", array),
         x => unimplemented!("{:?} not handled yet", x),
-    }
-}
-
-pub(crate) fn quoted_string<T>(t: T) -> PostgresQuotedString<T> {
-    PostgresQuotedString(t)
-}
-
-#[derive(Debug)]
-pub(crate) struct PostgresQuotedString<T>(T);
-
-impl<T> std::fmt::Display for PostgresQuotedString<T>
-where
-    T: std::fmt::Display,
-{
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "'{}'", self.0)
-    }
-}
-
-pub(crate) fn quoted<T>(t: T) -> PostgresQuoted<T> {
-    PostgresQuoted(t)
-}
-
-#[derive(Debug)]
-pub(crate) struct PostgresQuoted<T>(T);
-
-impl<T> std::fmt::Display for PostgresQuoted<T>
-where
-    T: std::fmt::Display,
-{
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, r#""{}""#, self.0)
     }
 }

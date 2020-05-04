@@ -47,20 +47,17 @@ impl<'a> ApplyMigrationCommand<'a> {
         let migration_persistence = connector.migration_persistence();
 
         let last_migration = migration_persistence.last().await?;
-        let (current_datamodel_string, current_datamodel_ast) = last_migration
-            .map(|migration| {
-                let ast = migration.datamodel_ast();
-                (migration.datamodel_string, ast)
-            })
-            .unwrap_or_else(|| (String::new(), SchemaAst::empty()));
-        let current_datamodel = datamodel::lift_ast(&current_datamodel_ast)
-            .map_err(|err| CommandError::InvalidPersistedDatamodel(err, current_datamodel_string))?;
+        let current_datamodel = last_migration
+            .map(|migration| migration.parse_datamodel())
+            .unwrap_or_else(|| Ok(Datamodel::empty()))
+            .map_err(|(err, schema)| CommandError::InvalidPersistedDatamodel(err, schema))?;
 
         let last_non_watch_datamodel = migration_persistence
             .last_non_watch_migration()
             .await?
-            .map(|m| m.datamodel_ast())
-            .unwrap_or_else(SchemaAst::empty);
+            .map(|m| m.parse_schema_ast())
+            .unwrap_or_else(|| Ok(SchemaAst::empty()))
+            .map_err(|(err, schema)| CommandError::InvalidPersistedDatamodel(err, schema))?;
         let next_datamodel_ast = engine
             .datamodel_calculator()
             .infer(&last_non_watch_datamodel, self.input.steps.as_slice())?;
@@ -91,14 +88,15 @@ impl<'a> ApplyMigrationCommand<'a> {
         }
 
         let last_migration = migration_persistence.last().await?;
-        let (current_datamodel_string, current_datamodel_ast) = last_migration
-            .map(|migration| {
-                let ast = migration.datamodel_ast();
-                (migration.datamodel_string, ast)
-            })
-            .unwrap_or_else(|| (String::new(), SchemaAst::empty()));
-        let current_datamodel = datamodel::lift_ast(&current_datamodel_ast)
-            .map_err(|err| CommandError::InvalidPersistedDatamodel(err, current_datamodel_string))?;
+        let current_datamodel_ast = last_migration
+            .as_ref()
+            .map(|migration| migration.parse_schema_ast())
+            .unwrap_or_else(|| Ok(SchemaAst::empty()))
+            .map_err(|(err, schema)| CommandError::InvalidPersistedDatamodel(err, schema))?;
+        let current_datamodel = last_migration
+            .map(|migration| migration.parse_datamodel())
+            .unwrap_or_else(|| Ok(Datamodel::empty()))
+            .map_err(|(err, schema)| CommandError::InvalidPersistedDatamodel(err, schema))?;
 
         let next_datamodel_ast = engine
             .datamodel_calculator()

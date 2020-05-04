@@ -1,4 +1,9 @@
-pub const RESERVED_MODEL_NAMES: [&str; 105] = [
+pub const RESERVED_MODEL_NAMES: [&str; 108] = [
+    // reserved GraphQL words
+    "Query",
+    "Mutation",
+    "Subscription",
+    // Misc
     "dmmf",
     "PromiseType",
     "PromiseReturnType",

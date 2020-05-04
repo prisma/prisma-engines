@@ -1,3 +1,4 @@
+use crate::ast::WithDirectives;
 use crate::{
     ast, configuration, dml,
     error::{DatamodelError, ErrorCollection},
@@ -23,6 +24,10 @@ impl<'a> Validator<'a> {
 
     pub fn validate(&self, ast_schema: &ast::SchemaAst, schema: &mut dml::Datamodel) -> Result<(), ErrorCollection> {
         let mut all_errors = ErrorCollection::new();
+
+        if let Err(ref mut errs) = self.validate_names(ast_schema) {
+            all_errors.append(errs);
+        }
 
         // Model level validations.
         for model in schema.models() {
@@ -120,6 +125,32 @@ impl<'a> Validator<'a> {
         } else {
             Ok(())
         }
+    }
+
+    fn validate_names(&self, ast_schema: &ast::SchemaAst) -> Result<(), ErrorCollection> {
+        let mut errors = ErrorCollection::new();
+
+        for model in ast_schema.models() {
+            errors.push_opt(model.name.validate("Model").err());
+            errors.append(&mut model.validate_directives());
+
+            for field in model.fields.iter() {
+                errors.push_opt(field.name.validate("Field").err());
+                errors.append(&mut field.validate_directives());
+            }
+        }
+
+        for enum_decl in ast_schema.enums() {
+            errors.push_opt(enum_decl.name.validate("Enum").err());
+            errors.append(&mut enum_decl.validate_directives());
+
+            for enum_value in enum_decl.values.iter() {
+                errors.push_opt(enum_value.name.validate("Enum Value").err());
+                errors.append(&mut enum_value.validate_directives());
+            }
+        }
+
+        errors.ok()
     }
 
     fn validate_field_arities(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), ErrorCollection> {
