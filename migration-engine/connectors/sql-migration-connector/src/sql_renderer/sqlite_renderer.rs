@@ -2,7 +2,7 @@ use super::common::*;
 use crate::{sql_schema_helpers::*, SqlFamily};
 use prisma_models::PrismaValue;
 use sql_schema_describer::*;
-use std::{borrow::Cow, fmt::Write as _};
+use std::borrow::Cow;
 
 pub struct SqliteRenderer;
 

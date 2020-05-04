@@ -12,7 +12,6 @@ use crate::{sql_schema_helpers::ColumnRef, SqlFamily};
 use mysql_renderer::MySqlRenderer;
 use once_cell::sync::Lazy;
 use postgres_renderer::PostgresRenderer;
-use prisma_value::PrismaValue;
 use regex::Regex;
 use sql_schema_describer::*;
 use sqlite_renderer::SqliteRenderer;
