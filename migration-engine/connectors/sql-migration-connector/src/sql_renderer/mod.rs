@@ -10,9 +10,7 @@ pub(crate) use postgres_renderer::render_column_type as postgres_render_column_t
 
 use crate::{sql_schema_helpers::ColumnRef, SqlFamily};
 use mysql_renderer::MySqlRenderer;
-use once_cell::sync::Lazy;
 use postgres_renderer::PostgresRenderer;
-use regex::Regex;
 use sql_schema_describer::*;
 use sqlite_renderer::SqliteRenderer;
 use std::borrow::Cow;
@@ -44,10 +42,4 @@ impl dyn SqlRenderer {
             SqlFamily::Sqlite => Box::new(SqliteRenderer {}),
         }
     }
-}
-
-fn escape_string_literal(s: &str) -> Cow<'_, str> {
-    const STRING_LITERAL_CHARACTER_TO_ESCAPE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"'|\\"#).unwrap());
-
-    STRING_LITERAL_CHARACTER_TO_ESCAPE_RE.replace_all(s, "\\$0")
 }

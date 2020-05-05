@@ -591,8 +591,7 @@ fn extract_enum_values(full_data_type: &&str) -> Vec<String> {
 }
 
 fn unescape_and_unquote_default_string(default: String, flavour: &Flavour) -> String {
-    const MYSQL_ESCAPING_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"\\(.)"#).unwrap());
-
+    const MYSQL_ESCAPING_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"\\(.)|'(')"#).unwrap());
     const MARIADB_QUOTES_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"^'(.*)'$"#).unwrap());
 
     if !MYSQL_ESCAPING_RE.is_match(&default) && !MARIADB_QUOTES_RE.is_match(&default) {
@@ -605,5 +604,5 @@ fn unescape_and_unquote_default_string(default: String, flavour: &Flavour) -> St
         default.into()
     };
 
-    MYSQL_ESCAPING_RE.replace_all(maybe_unquoted.as_ref(), "$1").into()
+    MYSQL_ESCAPING_RE.replace_all(maybe_unquoted.as_ref(), "$1$2").into()
 }

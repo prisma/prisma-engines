@@ -1,6 +1,8 @@
 use super::common::*;
 use crate::{sql_schema_helpers::*, SqlFamily};
+use once_cell::sync::Lazy;
 use prisma_models::PrismaValue;
+use regex::Regex;
 use sql_schema_describer::*;
 use std::borrow::Cow;
 
@@ -52,7 +54,7 @@ impl super::SqlRenderer for PostgresRenderer {
             (DefaultValue::DBGENERATED(val), _) => val.as_str().into(),
             (DefaultValue::VALUE(PrismaValue::String(val)), ColumnTypeFamily::String)
             | (DefaultValue::VALUE(PrismaValue::Enum(val)), ColumnTypeFamily::Enum(_)) => {
-                format!("E'{}'", super::escape_string_literal(&val)).into()
+                format!("E'{}'", escape_string_literal(&val)).into()
             }
             (DefaultValue::NOW, ColumnTypeFamily::DateTime) => "CURRENT_TIMESTAMP".into(),
             (DefaultValue::NOW, _) => unreachable!("NOW default on non-datetime column"),
@@ -79,4 +81,10 @@ pub(crate) fn render_column_type(t: &ColumnType) -> String {
         ColumnTypeFamily::Json => format!("jsonb {}", array),
         x => unimplemented!("{:?} not handled yet", x),
     }
+}
+
+fn escape_string_literal(s: &str) -> Cow<'_, str> {
+    const STRING_LITERAL_CHARACTER_TO_ESCAPE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"'|\\"#).unwrap());
+
+    STRING_LITERAL_CHARACTER_TO_ESCAPE_RE.replace_all(s, "\\$0")
 }
