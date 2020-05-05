@@ -1,12 +1,14 @@
+mod common;
+mod sqlite;
+mod test_api;
+
+use common::*;
 use barrel::{types, Migration};
 use pretty_assertions::assert_eq;
 use sql_schema_describer::*;
-
-mod common;
-mod sqlite;
-
-use common::*;
+use test_macros::test_each_connector;
 use sqlite::*;
+use test_api::{sqlite_test_api, TestApi};
 
 #[tokio::test]
 async fn sqlite_column_types_must_work() {
@@ -267,4 +269,17 @@ async fn sqlite_text_primary_keys_must_be_inferred_on_table_and_not_as_separate_
             sequence: None
         }
     );
+}
+
+#[test_each_connector(tags("sqlite"))]
+async fn escaped_string_defaults_must_be_unescaped(api: &TestApi) -> TestResult {
+    let create_table = r#"
+        CREATE TABLE "{0}".string_defaults_test (
+            id INTEGER PRIMARY KEY,
+            regular VARCHAR NOT NULL DEFAULT 'meow, says the cat',
+            escaped VARCHAR NOT NULL DEFAULT '"That\'s a lot of fish!" - Godzilla, 1998'
+        );
+    "#;
+
+    Ok(())
 }

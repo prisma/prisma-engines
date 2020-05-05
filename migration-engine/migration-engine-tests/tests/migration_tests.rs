@@ -1473,7 +1473,12 @@ async fn escaped_string_defaults_are_not_arbitrarily_migrated(api: &TestApi) -> 
         }
     "#;
 
-    api.infer_apply(dm1).send().await?.assert_green()?.into_inner();
+    api.infer_apply(dm1)
+        .migration_id(Some("first migration"))
+        .send()
+        .await?
+        .assert_green()?
+        .into_inner();
 
     let insert = Insert::single_into(api.render_table_name("Fruit"))
         .value("id", "apple-id")
@@ -1483,7 +1488,12 @@ async fn escaped_string_defaults_are_not_arbitrarily_migrated(api: &TestApi) -> 
 
     api.database().query(insert.into()).await?;
 
-    api.infer_apply(dm1).send().await?.assert_green()?.assert_no_steps()?;
+    api.infer_apply(dm1)
+        .migration_id(Some("second migration"))
+        .send()
+        .await?
+        .assert_green()?
+        .assert_no_steps()?;
 
     let sql_schema = api.describe_database().await?;
     let table = sql_schema.table_bang("Fruit");

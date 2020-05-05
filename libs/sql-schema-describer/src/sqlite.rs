@@ -446,7 +446,7 @@ fn get_column_type(tpe: &str, arity: ColumnArity) -> ColumnType {
 fn unquote_sqlite_string_default(s: &str) -> Cow<'_, str> {
     const SQLITE_STRING_DEFAULT_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"^\\'(.*)\\'$"#).unwrap());
 
-    SQLITE_STRING_DEFAULT_RE.replace(s, "$1")
+    dbg!(SQLITE_STRING_DEFAULT_RE.replace(dbg!(s), "$1"))
 }
 
 /// Returns whether a table is one of the SQLite system tables.

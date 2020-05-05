@@ -1,6 +1,8 @@
 use super::common::*;
 use crate::{sql_schema_helpers::*, SqlFamily};
+use once_cell::sync::Lazy;
 use prisma_models::PrismaValue;
+use regex::Regex;
 use sql_schema_describer::*;
 use std::borrow::Cow;
 
@@ -55,7 +57,7 @@ impl super::SqlRenderer for SqliteRenderer {
             (DefaultValue::DBGENERATED(val), _) => val.as_str().into(),
             (DefaultValue::VALUE(PrismaValue::String(val)), ColumnTypeFamily::String)
             | (DefaultValue::VALUE(PrismaValue::Enum(val)), ColumnTypeFamily::Enum(_)) => {
-                format!("'{}'", super::escape_quotes(&val)).into()
+                format!("'{}'", dbg!(escape_quotes(dbg!(&val)))).into()
             }
             (DefaultValue::NOW, ColumnTypeFamily::DateTime) => "CURRENT_TIMESTAMP".into(),
             (DefaultValue::NOW, _) => unreachable!("NOW default on non-datetime column"),
@@ -77,4 +79,10 @@ impl SqliteRenderer {
             x => unimplemented!("{:?} not handled yet", x),
         }
     }
+}
+
+fn escape_quotes(s: &str) -> Cow<'_, str> {
+    const STRING_LITERAL_CHARACTER_TO_ESCAPE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"'"#).unwrap());
+
+    STRING_LITERAL_CHARACTER_TO_ESCAPE_RE.replace_all(s, "'$0")
 }

@@ -2,9 +2,7 @@
 use super::*;
 use quaint::prelude::Queryable;
 use regex::Regex;
-use std::collections::HashMap;
-use std::convert::TryInto;
-use std::sync::Arc;
+use std::{borrow::Cow, collections::HashMap, convert::TryInto, sync::Arc};
 use tracing::debug;
 
 pub struct SqlSchemaDescriber {
@@ -699,13 +697,13 @@ fn is_autoincrement(value: &str, schema_name: &str, table_name: &str, column_nam
         .unwrap_or(false)
 }
 
-fn unsuffix_default_literal<'a>(literal: &'a str, data_type: &str, full_data_type: &str) -> Option<&'a str> {
+fn unsuffix_default_literal<'a>(literal: &'a str, data_type: &str, full_data_type: &str) -> Option<Cow<'a, str>> {
     dbg!(literal);
-    const POSTGRES_STRING_DEFAULT_RE: Lazy<regex::Regex> =
-        Lazy::new(|| regex::Regex::new(r#"(?ms)^B?'(.*)'$"#).unwrap());
-
-    const POSTGRES_DATA_TYPE_SUFFIX_RE: Lazy<regex::Regex> =
-        Lazy::new(|| regex::Regex::new(r#"(?ms)^(.*)::(\\")?(.*)(\\")?$"#).unwrap());
+    dbg!(format!("{}", literal));
+    const POSTGRES_STRING_DEFAULT_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"(?ms)^B?'(.*)'$"#).unwrap());
+    const POSTGRES_DEFAULT_UNESCAPE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"\\(["'])|'(')"#).unwrap());
+    const POSTGRES_DATA_TYPE_SUFFIX_RE: Lazy<Regex> =
+        Lazy::new(|| Regex::new(r#"(?ms)^(.*)::(\\")?(.*)(\\")?$"#).unwrap());
 
     let captures = POSTGRES_DATA_TYPE_SUFFIX_RE.captures(literal)?;
     let suffix = captures.get(3).unwrap().as_str();
@@ -715,10 +713,22 @@ fn unsuffix_default_literal<'a>(literal: &'a str, data_type: &str, full_data_typ
     }
 
     let raw = captures.get(1).unwrap().as_str();
+    let raw = POSTGRES_DEFAULT_UNESCAPE_RE.replace_all(raw, "$1");
 
-    let captures = dbg!(POSTGRES_STRING_DEFAULT_RE.captures(raw))?;
+    match raw {
+        Cow::Owned(raw) => {
+            let captures = dbg!(POSTGRES_STRING_DEFAULT_RE.captures(&raw))?;
+            let first_capture = captures.get(1).unwrap().as_str().to_owned();
 
-    dbg!(Some(captures.get(1).unwrap().as_str()))
+            dbg!(Some(first_capture.into()))
+        }
+        Cow::Borrowed(raw) => {
+            let captures = dbg!(POSTGRES_STRING_DEFAULT_RE.captures(&raw))?;
+            let first_capture = captures.get(1).unwrap().as_str();
+
+            dbg!(Some(first_capture.into()))
+        }
+    }
 }
 
 #[cfg(test)]
