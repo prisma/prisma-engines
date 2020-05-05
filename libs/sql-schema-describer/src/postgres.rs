@@ -701,7 +701,7 @@ fn unsuffix_default_literal<'a>(literal: &'a str, data_type: &str, full_data_typ
     dbg!(literal);
     dbg!(format!("{}", literal));
     const POSTGRES_STRING_DEFAULT_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"(?ms)^B?'(.*)'$"#).unwrap());
-    const POSTGRES_DEFAULT_UNESCAPE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"\\(["'])|'(')"#).unwrap());
+    const POSTGRES_DEFAULT_UNESCAPE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"(?ms)\\(["'])|'(')"#).unwrap());
     const POSTGRES_DATA_TYPE_SUFFIX_RE: Lazy<Regex> =
         Lazy::new(|| Regex::new(r#"(?ms)^(.*)::(\\")?(.*)(\\")?$"#).unwrap());
 
@@ -713,7 +713,7 @@ fn unsuffix_default_literal<'a>(literal: &'a str, data_type: &str, full_data_typ
     }
 
     let raw = captures.get(1).unwrap().as_str();
-    let raw = POSTGRES_DEFAULT_UNESCAPE_RE.replace_all(raw, "$1");
+    let raw = dbg!(POSTGRES_DEFAULT_UNESCAPE_RE.replace_all(dbg!(raw), "$1$2"));
 
     match raw {
         Cow::Owned(raw) => {
