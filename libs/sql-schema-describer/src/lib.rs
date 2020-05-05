@@ -1,6 +1,6 @@
 //! Database description.
 
-use failure::Fail;
+use thiserror::Error;
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
 use regex::Regex;
@@ -14,10 +14,10 @@ pub mod postgres;
 pub mod sqlite;
 
 /// description errors.
-#[derive(Debug, Fail)]
+#[derive(Debug, Error)]
 pub enum SqlSchemaDescriberError {
     /// An unknown error occurred.
-    #[fail(display = "unknown")]
+    #[error("unknown")]
     UnknownError,
 }
 

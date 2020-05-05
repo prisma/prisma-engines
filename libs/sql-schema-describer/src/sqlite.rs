@@ -1,9 +1,7 @@
 //! SQLite description.
 use super::*;
-use failure::_core::convert::TryInto;
 use quaint::{ast::Value, prelude::Queryable};
-use std::collections::HashMap;
-use std::sync::Arc;
+use std::{sync::Arc, collections::HashMap, convert::TryInto};
 use tracing::debug;
 
 pub struct SqlSchemaDescriber {
