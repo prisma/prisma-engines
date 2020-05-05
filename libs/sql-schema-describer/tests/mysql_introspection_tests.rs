@@ -1,10 +1,12 @@
+mod mysql;
+mod test_api;
+
+use crate::mysql::*;
 use barrel::{types, Migration};
 use pretty_assertions::assert_eq;
 use sql_schema_describer::*;
-
-mod mysql;
-
-use crate::mysql::*;
+use test_api::*;
+use test_macros::*;
 
 #[tokio::test]
 async fn all_mysql_column_types_must_work() {
@@ -809,4 +811,52 @@ async fn mysql_introspected_default_strings_should_be_unescaped() {
     let actual_default = column.default.as_ref().unwrap().as_value().unwrap();
 
     assert_eq!(actual_default, &expected_default);
+}
+
+#[test_each_connector(tags("mysql"))]
+async fn escaped_quotes_in_string_defaults_must_be_unescaped(api: &TestApi) -> TestResult {
+    let create_table = format!(
+        r#"
+            CREATE TABLE `{0}`.`string_defaults_test` (
+                `id` INTEGER PRIMARY KEY,
+                `regular` VARCHAR(200) NOT NULL DEFAULT 'meow, says the cat',
+                `escaped` VARCHAR(200) NOT NULL DEFAULT '\"That\'s a lot of fish!\" - Godzilla, 1998'
+            );
+        "#,
+        api.schema_name()
+    );
+
+    api.database().query_raw(&create_table, &[]).await?;
+
+    let schema = api.describe().await?;
+
+    let table = schema.table_bang("string_defaults_test");
+
+    let regular_column_default = table
+        .column_bang("regular")
+        .default
+        .as_ref()
+        .unwrap()
+        .as_value()
+        .unwrap()
+        .clone()
+        .into_string()
+        .unwrap();
+
+    assert_eq!(regular_column_default, "meow, says the cat");
+
+    let escaped_column_default = table
+        .column_bang("escaped")
+        .default
+        .as_ref()
+        .unwrap()
+        .as_value()
+        .unwrap()
+        .clone()
+        .into_string()
+        .unwrap();
+
+    assert_eq!(escaped_column_default, r#""That's a lot of fish!" - Godzilla, 1998"#);
+
+    Ok(())
 }
