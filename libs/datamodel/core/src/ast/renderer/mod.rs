@@ -2,6 +2,8 @@ mod string_builder;
 mod table;
 
 use crate::ast;
+use once_cell::sync::Lazy;
+use regex::Regex;
 
 pub use string_builder::StringBuilder;
 pub use table::TableFormat;
@@ -382,8 +384,10 @@ impl<'a> Renderer<'a> {
     }
 
     fn render_str(target: &mut dyn LineWriteable, param: &str) {
+        const STRING_LITERAL_ESCAPE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"""#).unwrap());
+
         target.write("\"");
-        target.write(param);
+        target.write(STRING_LITERAL_ESCAPE_RE.replace_all(param, "\\$0").as_ref());
         target.write("\"");
     }
 }

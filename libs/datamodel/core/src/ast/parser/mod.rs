@@ -12,6 +12,9 @@ pub struct PrismaDatamodelParser;
 
 use crate::ast::*;
 use crate::error::{DatamodelError, ErrorCollection};
+use once_cell::sync::Lazy;
+use regex::Regex;
+use std::borrow::Cow;
 
 trait ToIdentifier {
     fn to_id(&self) -> Identifier;
@@ -28,9 +31,15 @@ impl ToIdentifier for pest::iterators::Pair<'_, Rule> {
 
 fn parse_string_literal(token: &pest::iterators::Pair<'_, Rule>) -> String {
     return match_first! { token, current,
-        Rule::string_content => current.as_str().to_string(),
+        Rule::string_content => unescape_string_literal(current.as_str()).into_owned(),
         _ => unreachable!("Encountered impossible string content during parsing: {:?}", current.tokens())
     };
+}
+
+fn unescape_string_literal(original: &str) -> Cow<'_, str> {
+    const STRING_LITERAL_UNESCAPE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"\\(")"#).unwrap());
+
+    dbg!(STRING_LITERAL_UNESCAPE_RE.replace_all(dbg!(original), "$1"))
 }
 
 // Expressions

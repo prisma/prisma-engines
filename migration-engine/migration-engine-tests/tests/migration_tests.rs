@@ -1508,7 +1508,7 @@ async fn escaped_string_defaults_are_not_arbitrarily_migrated(api: &TestApi) -> 
     );
     assert_eq!(
         table.column("seasonality").and_then(|c| c.default.clone()),
-        Some(DefaultValue::VALUE(PrismaValue::String("\"summer\"".to_string())))
+        Some(DefaultValue::VALUE(PrismaValue::String(r#""summer""#.to_string())))
     );
 
     Ok(())
