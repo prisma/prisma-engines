@@ -444,10 +444,10 @@ fn get_column_type(tpe: &str, arity: ColumnArity) -> ColumnType {
 }
 
 fn unquote_sqlite_string_default(s: &str) -> Cow<'_, str> {
-    const SQLITE_STRING_DEFAULT_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"^'(.*)'$"#).unwrap());
+    const SQLITE_STRING_DEFAULT_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"(?ms)^'(.*)'$|^"(.*)"$"#).unwrap());
     const SQLITE_ESCAPED_CHARACTER_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"''"#).unwrap());
 
-    match SQLITE_STRING_DEFAULT_RE.replace(s, "$1") {
+    match SQLITE_STRING_DEFAULT_RE.replace(s, "$1$2") {
         Cow::Borrowed(s) => SQLITE_ESCAPED_CHARACTER_RE.replace_all(s, "'"),
         Cow::Owned(s) => SQLITE_ESCAPED_CHARACTER_RE.replace_all(&s, "'").into_owned().into(),
     }

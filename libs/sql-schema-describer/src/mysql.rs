@@ -592,17 +592,17 @@ fn extract_enum_values(full_data_type: &&str) -> Vec<String> {
 
 fn unescape_and_unquote_default_string(default: String, flavour: &Flavour) -> String {
     const MYSQL_ESCAPING_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"\\(.)|'(')"#).unwrap());
-    const MARIADB_QUOTES_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"^'(.*)'$"#).unwrap());
+    const MARIADB_NEWLINE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"\\n"#).unwrap());
 
-    if !MYSQL_ESCAPING_RE.is_match(&default) && !MARIADB_QUOTES_RE.is_match(&default) {
-        return default;
-    }
+    eprintln!("default: {}", default);
 
     let maybe_unquoted: Cow<str> = if matches!(flavour, Flavour::MariaDb) {
-        MARIADB_QUOTES_RE.replace_all(&default, "$1")
+        let unquoted: &str = &default[1..(default.len() - 1)];
+
+        MARIADB_NEWLINE_RE.replace_all(unquoted, "\n")
     } else {
         default.into()
     };
 
-    MYSQL_ESCAPING_RE.replace_all(maybe_unquoted.as_ref(), "$1$2").into()
+    dbg!(MYSQL_ESCAPING_RE.replace_all(maybe_unquoted.as_ref(), "$1$2").into())
 }

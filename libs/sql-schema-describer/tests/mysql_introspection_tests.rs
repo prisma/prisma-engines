@@ -820,7 +820,7 @@ async fn escaped_quotes_in_string_defaults_must_be_unescaped(api: &TestApi) -> T
             CREATE TABLE `{0}`.`string_defaults_test` (
                 `id` INTEGER PRIMARY KEY,
                 `regular` VARCHAR(200) NOT NULL DEFAULT 'meow, says the cat',
-                `escaped` VARCHAR(200) NOT NULL DEFAULT '\"That\'s a lot of fish!\" - Godzilla, 1998'
+                `escaped` VARCHAR(200) NOT NULL DEFAULT '\"That\'s a lot of fish!\"\n- Godzilla, 1998'
             );
         "#,
         api.schema_name()
@@ -856,7 +856,11 @@ async fn escaped_quotes_in_string_defaults_must_be_unescaped(api: &TestApi) -> T
         .into_string()
         .unwrap();
 
-    assert_eq!(escaped_column_default, r#""That's a lot of fish!" - Godzilla, 1998"#);
+    assert_eq!(
+        escaped_column_default,
+        r#""That's a lot of fish!"
+- Godzilla, 1998"#
+    );
 
     Ok(())
 }

@@ -387,7 +387,12 @@ impl<'a> Renderer<'a> {
         const STRING_LITERAL_ESCAPE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"""#).unwrap());
 
         target.write("\"");
-        target.write(STRING_LITERAL_ESCAPE_RE.replace_all(param, "\\$0").as_ref());
+        target.write(
+            &STRING_LITERAL_ESCAPE_RE
+                .replace_all(param, "\\$0")
+                .as_ref()
+                .replace("\n", "\\n"),
+        );
         target.write("\"");
     }
 }

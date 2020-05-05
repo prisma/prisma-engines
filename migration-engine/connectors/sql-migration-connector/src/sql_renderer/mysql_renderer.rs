@@ -109,3 +109,16 @@ fn escape_string_literal(s: &str) -> Cow<'_, str> {
 
     STRING_LITERAL_CHARACTER_TO_ESCAPE_RE.replace_all(s, "'$0")
 }
+
+// fn escape_string_literal(s: &str) -> Cow<'_, str> {
+//     const SINGLE_QUOTE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"'"#).unwrap());
+//     const STRING_LITERAL_CHARACTER_TO_ESCAPE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"\\"#).unwrap());
+
+//     match SINGLE_QUOTE_RE.replace_all(s, "'$0") {
+//         Cow::Borrowed(s) => STRING_LITERAL_CHARACTER_TO_ESCAPE_RE.replace_all(s, "\\$0"),
+//         Cow::Owned(s) => STRING_LITERAL_CHARACTER_TO_ESCAPE_RE
+//             .replace_all(&s, "\\$0")
+//             .into_owned()
+//             .into(),
+//     }
+// }

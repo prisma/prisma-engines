@@ -38,8 +38,12 @@ fn parse_string_literal(token: &pest::iterators::Pair<'_, Rule>) -> String {
 
 fn unescape_string_literal(original: &str) -> Cow<'_, str> {
     const STRING_LITERAL_UNESCAPE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"\\(")"#).unwrap());
+    const STRING_LITERAL_NEWLINE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"\\n"#).unwrap());
 
-    STRING_LITERAL_UNESCAPE_RE.replace_all(original, "$1")
+    match STRING_LITERAL_UNESCAPE_RE.replace_all(original, "$1") {
+        Cow::Owned(s) => STRING_LITERAL_NEWLINE_RE.replace(&s, "\n").into_owned().into(),
+        Cow::Borrowed(s) => STRING_LITERAL_NEWLINE_RE.replace(s, "\n"),
+    }
 }
 
 // Expressions

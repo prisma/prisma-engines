@@ -1500,7 +1500,7 @@ async fn escaped_string_defaults_are_not_arbitrarily_migrated(api: &TestApi) -> 
 
     assert_eq!(
         table.column("sideNames").and_then(|c| c.default.clone()),
-        Some(DefaultValue::VALUE(PrismaValue::String("top\\ndown".to_string())))
+        Some(DefaultValue::VALUE(PrismaValue::String("top\ndown".to_string())))
     );
     assert_eq!(
         table.column("contains").and_then(|c| c.default.clone()),
