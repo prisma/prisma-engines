@@ -2,13 +2,13 @@ mod common;
 mod sqlite;
 mod test_api;
 
-use common::*;
 use barrel::{types, Migration};
+use common::*;
 use pretty_assertions::assert_eq;
 use sql_schema_describer::*;
-use test_macros::test_each_connector;
 use sqlite::*;
-use test_api::{sqlite_test_api, TestApi};
+use test_api::{sqlite_test_api, TestApi, TestResult};
+use test_macros::test_each_connector;
 
 #[tokio::test]
 async fn sqlite_column_types_must_work() {
@@ -272,14 +272,49 @@ async fn sqlite_text_primary_keys_must_be_inferred_on_table_and_not_as_separate_
 }
 
 #[test_each_connector(tags("sqlite"))]
-async fn escaped_string_defaults_must_be_unescaped(api: &TestApi) -> TestResult {
-    let create_table = r#"
-        CREATE TABLE "{0}".string_defaults_test (
-            id INTEGER PRIMARY KEY,
-            regular VARCHAR NOT NULL DEFAULT 'meow, says the cat',
-            escaped VARCHAR NOT NULL DEFAULT '"That\'s a lot of fish!" - Godzilla, 1998'
-        );
-    "#;
+async fn escaped_quotes_in_string_defaults_must_be_unescaped(api: &TestApi) -> TestResult {
+    let create_table = format!(
+        r#"
+            CREATE TABLE "{0}"."string_defaults_test" (
+                id INTEGER PRIMARY KEY,
+                regular VARCHAR NOT NULL DEFAULT 'meow, says the cat',
+                escaped VARCHAR NOT NULL DEFAULT '"That''s a lot of fish!" - Godzilla, 1998'
+            );
+        "#,
+        api.schema_name()
+    );
+
+    api.database().query_raw(&create_table, &[]).await?;
+
+    let schema = api.describe().await?;
+
+    let table = schema.table_bang("string_defaults_test");
+
+    let regular_column_default = table
+        .column_bang("regular")
+        .default
+        .as_ref()
+        .unwrap()
+        .as_value()
+        .unwrap()
+        .clone()
+        .into_string()
+        .unwrap();
+
+    assert_eq!(regular_column_default, "meow, says the cat");
+
+    let escaped_column_default = table
+        .column_bang("escaped")
+        .default
+        .as_ref()
+        .unwrap()
+        .as_value()
+        .unwrap()
+        .clone()
+        .into_string()
+        .unwrap();
+
+    assert_eq!(escaped_column_default, r#""That's a lot of fish!" - Godzilla, 1998"#);
 
     Ok(())
 }

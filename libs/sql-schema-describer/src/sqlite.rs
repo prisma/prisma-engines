@@ -1,7 +1,7 @@
 //! SQLite description.
 use super::*;
 use quaint::{ast::Value, prelude::Queryable};
-use std::{sync::Arc, collections::HashMap, convert::TryInto, borrow::Cow};
+use std::{borrow::Cow, collections::HashMap, convert::TryInto, sync::Arc};
 use tracing::debug;
 
 pub struct SqlSchemaDescriber {
@@ -444,9 +444,13 @@ fn get_column_type(tpe: &str, arity: ColumnArity) -> ColumnType {
 }
 
 fn unquote_sqlite_string_default(s: &str) -> Cow<'_, str> {
-    const SQLITE_STRING_DEFAULT_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"^\\'(.*)\\'$"#).unwrap());
+    const SQLITE_STRING_DEFAULT_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"^'(.*)'$"#).unwrap());
+    const SQLITE_ESCAPED_CHARACTER_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"''"#).unwrap());
 
-    dbg!(SQLITE_STRING_DEFAULT_RE.replace(dbg!(s), "$1"))
+    match SQLITE_STRING_DEFAULT_RE.replace(s, "$1") {
+        Cow::Borrowed(s) => SQLITE_ESCAPED_CHARACTER_RE.replace_all(s, "'"),
+        Cow::Owned(s) => SQLITE_ESCAPED_CHARACTER_RE.replace_all(&s, "'").into_owned().into(),
+    }
 }
 
 /// Returns whether a table is one of the SQLite system tables.
