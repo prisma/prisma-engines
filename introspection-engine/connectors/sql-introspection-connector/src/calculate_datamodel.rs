@@ -12,28 +12,43 @@ use tracing::debug;
 pub fn calculate_datamodel(schema: &SqlSchema, family: &SqlFamily) -> SqlIntrospectionResult<IntrospectionResult> {
     debug!("Calculating data model.");
 
-    let has_migration_table = schema.tables.iter().any(|table| is_migration_table(&table));
+    let migration_table = schema.tables.iter().any(|table| is_migration_table(&table));
     let has_prisma_1_join_table = schema.tables.iter().any(|table| is_prisma_1_point_0_join_table(&table));
     let has_prisma_1_1_or_2_join_table = schema
         .tables
         .iter()
         .any(|table| is_prisma_1_point_1_or_2_join_table(&table));
     let mut uses_on_delete = false;
-    let mut always_has_created_at_updated_at = false;
-    let mut uses_non_prisma_types = false; // should check all scalar fields and needs mapping SQLFamily -> Types
+    let mut always_has_created_at_updated_at = true;
+    let mut uses_non_prisma_types = false;
 
+    //todo always specific id types, no compound ids, always an id
     //Currently from Migration Engine
     //Types positive list, complicated by enums -.-
 
-    // SQLITE   Types
-    // "BOOLEAN","DATE","REAL","INTEGER","TEXT"
-    // POSTGRES Types
-    // Array types are only a P2 thing on Postgres
-    // "boolean", "timestamp(3)", "Decimal(65,30)", "integer", "text"
-    // native enums are only a P2 thing "ENUM_NAME"
-    // MYSQL    Types
-    // "boolean","datetime(3)", "Decimal(65,30)", "int", "varchar()",
-    // native enums are only a P2 thing "ENUM()"
+    let sqlite_types = vec![
+        ("BOOLEAN", "BOOLEAN"),
+        ("DATE", "DATE"),
+        ("REAL", "REAL"),
+        ("INTEGER", "INTEGER"),
+        ("TEXT", "TEXT"),
+    ];
+    let postgres_types = vec![
+        ("boolean", "bool"),
+        ("timestamp without time zone", "timestamp"),
+        ("numeric", "numeric"),
+        ("integer", "int4"),
+        ("text", "text"),
+    ];
+    let mysql_types = vec![
+        ("tinyint", "tinyint(1)"),
+        ("datetime", "datetime(3)"),
+        ("decimal", "decimal(65,30)"),
+        ("int", "int"),
+        ("int", "int(11)"),
+        ("varchar", "varchar(191)"),
+        ("text", "text"),
+    ];
 
     let mut data_model = Datamodel::new();
     for table in schema
@@ -47,7 +62,14 @@ pub fn calculate_datamodel(schema: &SqlSchema, family: &SqlFamily) -> SqlIntrosp
         let mut model = Model::new(table.name.clone(), None);
 
         for column in &table.columns {
-            // todo check actually used columntypes here
+            println!("DT: {}, FDT: {}", &column.tpe.data_type, &column.tpe.full_data_type);
+            match (&column.tpe.data_type, &column.tpe.full_data_type, family) {
+                (dt, fdt, SqlFamily::Postgres) if !postgres_types.contains(&(dt, fdt)) => uses_non_prisma_types = true,
+                (dt, fdt, SqlFamily::Mysql) if !mysql_types.contains(&(dt, fdt)) => uses_non_prisma_types = true,
+                (dt, fdt, SqlFamily::Sqlite) if !sqlite_types.contains(&(dt, fdt)) => uses_non_prisma_types = true,
+                _ => (),
+            };
+
             let field = calculate_scalar_field(&table, &column);
             model.add_field(field);
         }
@@ -83,6 +105,7 @@ pub fn calculate_datamodel(schema: &SqlSchema, family: &SqlFamily) -> SqlIntrosp
             always_has_created_at_updated_at = false
         }
 
+        println!("{:?}", model);
         data_model.add_model(model);
     }
 
@@ -152,12 +175,18 @@ pub fn calculate_datamodel(schema: &SqlSchema, family: &SqlFamily) -> SqlIntrosp
 
     debug!("Done calculating data model {:?}", data_model);
 
+    println!("MigrationTable: {}", migration_table);
+    println!("UsesOnDelete: {}", uses_on_delete);
+    println!("UsesNonPrismaTypes: {}", uses_non_prisma_types);
+    println!("AlwaysCreatedAtUpdatedAt: {}", always_has_created_at_updated_at);
+    println!("Prisma11Or2JoinTable: {}", has_prisma_1_1_or_2_join_table);
+
     let version = match family {
-        SqlFamily::Sqlite if has_migration_table && !uses_on_delete && !uses_non_prisma_types => Version::Prisma2,
+        SqlFamily::Sqlite if migration_table && !uses_on_delete && !uses_non_prisma_types => Version::Prisma2,
         SqlFamily::Sqlite => Version::NonPrisma,
-        SqlFamily::Mysql if has_migration_table && !uses_on_delete && !uses_non_prisma_types => Version::Prisma2,
+        SqlFamily::Mysql if migration_table && !uses_on_delete && !uses_non_prisma_types => Version::Prisma2,
         SqlFamily::Mysql
-            if !has_migration_table
+            if !migration_table
                 && !uses_on_delete
                 && !uses_non_prisma_types
                 && always_has_created_at_updated_at
@@ -166,31 +195,23 @@ pub fn calculate_datamodel(schema: &SqlSchema, family: &SqlFamily) -> SqlIntrosp
             Version::Prisma1
         }
         SqlFamily::Mysql
-            if !has_migration_table
-                && !uses_on_delete
-                && !uses_non_prisma_types
-                && always_has_created_at_updated_at
-                && !has_prisma_1_join_table =>
+            if !migration_table && !uses_on_delete && !uses_non_prisma_types && !has_prisma_1_join_table =>
         {
             Version::Prisma11
         }
         SqlFamily::Mysql => Version::NonPrisma,
-        SqlFamily::Postgres if has_migration_table && !uses_on_delete && !uses_non_prisma_types => Version::Prisma2,
         SqlFamily::Postgres
-            if !has_migration_table
-                && !uses_on_delete
-                && !uses_non_prisma_types
-                && always_has_created_at_updated_at
-                && !has_prisma_1_1_or_2_join_table =>
-        {
-            Version::Prisma1
-        }
-        SqlFamily::Postgres
-            if !has_migration_table
+            if !migration_table
                 && !uses_on_delete
                 && !uses_non_prisma_types
                 && always_has_created_at_updated_at
                 && !has_prisma_1_join_table =>
+        {
+            Version::Prisma1
+        }
+        SqlFamily::Postgres if migration_table && !uses_on_delete && !uses_non_prisma_types => Version::Prisma2,
+        SqlFamily::Postgres
+            if !migration_table && !uses_on_delete && !uses_non_prisma_types && !has_prisma_1_1_or_2_join_table =>
         {
             Version::Prisma11
         }
