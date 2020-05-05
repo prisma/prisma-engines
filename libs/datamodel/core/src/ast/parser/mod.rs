@@ -39,7 +39,7 @@ fn parse_string_literal(token: &pest::iterators::Pair<'_, Rule>) -> String {
 fn unescape_string_literal(original: &str) -> Cow<'_, str> {
     const STRING_LITERAL_UNESCAPE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"\\(")"#).unwrap());
 
-    dbg!(STRING_LITERAL_UNESCAPE_RE.replace_all(dbg!(original), "$1"))
+    STRING_LITERAL_UNESCAPE_RE.replace_all(original, "$1")
 }
 
 // Expressions

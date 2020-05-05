@@ -718,7 +718,7 @@ fn unsuffix_default_literal<'a>(literal: &'a str, data_type: &str, full_data_typ
             let captures = POSTGRES_STRING_DEFAULT_RE.captures(&raw)?;
             let first_capture = captures.get(1).unwrap().as_str().to_owned();
 
-            dbg!(Some(first_capture.into()))
+            Some(first_capture.into())
         }
         Cow::Borrowed(raw) => {
             let captures = POSTGRES_STRING_DEFAULT_RE.captures(&raw)?;
