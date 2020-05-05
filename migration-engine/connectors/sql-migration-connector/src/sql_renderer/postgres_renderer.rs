@@ -52,12 +52,12 @@ impl super::SqlRenderer for PostgresRenderer {
             (DefaultValue::DBGENERATED(val), _) => val.as_str().into(),
             (DefaultValue::VALUE(PrismaValue::String(val)), ColumnTypeFamily::String)
             | (DefaultValue::VALUE(PrismaValue::Enum(val)), ColumnTypeFamily::Enum(_)) => {
-                format!("E'{}'", super::escape_quotes(&val)).into()
+                format!("E'{}'", super::escape_string_literal(&val)).into()
             }
             (DefaultValue::NOW, ColumnTypeFamily::DateTime) => "CURRENT_TIMESTAMP".into(),
             (DefaultValue::NOW, _) => unreachable!("NOW default on non-datetime column"),
             (DefaultValue::VALUE(val), ColumnTypeFamily::DateTime) => format!("'{}'", val).into(),
-            (DefaultValue::VALUE(val), _) => format!("{}", val).into(),
+            (DefaultValue::VALUE(val), _) => val.to_string().into(),
             (DefaultValue::SEQUENCE(_), _) => todo!("rendering of sequence defaults"),
         }
     }

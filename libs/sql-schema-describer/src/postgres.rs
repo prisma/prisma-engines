@@ -698,10 +698,8 @@ fn is_autoincrement(value: &str, schema_name: &str, table_name: &str, column_nam
 }
 
 fn unsuffix_default_literal<'a>(literal: &'a str, data_type: &str, full_data_type: &str) -> Option<Cow<'a, str>> {
-    dbg!(literal);
-    dbg!(format!("{}", literal));
     const POSTGRES_STRING_DEFAULT_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"(?ms)^B?'(.*)'$"#).unwrap());
-    const POSTGRES_DEFAULT_UNESCAPE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"(?ms)\\(["'])|'(')"#).unwrap());
+    const POSTGRES_DEFAULT_UNESCAPE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"(?ms)\\(["'\\])|'(')"#).unwrap());
     const POSTGRES_DATA_TYPE_SUFFIX_RE: Lazy<Regex> =
         Lazy::new(|| Regex::new(r#"(?ms)^(.*)::(\\")?(.*)(\\")?$"#).unwrap());
 
@@ -713,20 +711,20 @@ fn unsuffix_default_literal<'a>(literal: &'a str, data_type: &str, full_data_typ
     }
 
     let raw = captures.get(1).unwrap().as_str();
-    let raw = dbg!(POSTGRES_DEFAULT_UNESCAPE_RE.replace_all(dbg!(raw), "$1$2"));
+    let raw = POSTGRES_DEFAULT_UNESCAPE_RE.replace_all(raw, "$1$2");
 
     match raw {
         Cow::Owned(raw) => {
-            let captures = dbg!(POSTGRES_STRING_DEFAULT_RE.captures(&raw))?;
+            let captures = POSTGRES_STRING_DEFAULT_RE.captures(&raw)?;
             let first_capture = captures.get(1).unwrap().as_str().to_owned();
 
             dbg!(Some(first_capture.into()))
         }
         Cow::Borrowed(raw) => {
-            let captures = dbg!(POSTGRES_STRING_DEFAULT_RE.captures(&raw))?;
+            let captures = POSTGRES_STRING_DEFAULT_RE.captures(&raw)?;
             let first_capture = captures.get(1).unwrap().as_str();
 
-            dbg!(Some(first_capture.into()))
+            Some(first_capture.into())
         }
     }
 }

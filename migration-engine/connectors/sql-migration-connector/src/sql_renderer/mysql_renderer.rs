@@ -58,7 +58,7 @@ impl super::SqlRenderer for MySqlRenderer {
             (DefaultValue::DBGENERATED(val), _) => val.as_str().into(),
             (DefaultValue::VALUE(PrismaValue::String(val)), ColumnTypeFamily::String)
             | (DefaultValue::VALUE(PrismaValue::Enum(val)), ColumnTypeFamily::Enum(_)) => {
-                format!("'{}'", super::escape_quotes(&val)).into()
+                format!("'{}'", super::escape_string_literal(&val)).into()
             }
             (DefaultValue::NOW, ColumnTypeFamily::DateTime) => "CURRENT_TIMESTAMP".into(),
             (DefaultValue::NOW, _) => unreachable!("NOW default on non-datetime column"),
