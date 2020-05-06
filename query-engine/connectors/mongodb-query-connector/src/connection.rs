@@ -9,49 +9,45 @@ use prisma_models::prelude::*;
 pub struct MongodbConnection {}
 
 impl Connection for MongodbConnection {
-    fn start_transaction<'a>(&'a self) -> IO<'a, Box<dyn Transaction<'a> + 'a>> {
+    fn start_transaction(&self) -> IO<'_, Box<dyn Transaction<'_> + '_>> {
         panic!("Mongodb transactions are not yet supported");
     }
 }
 
 impl ReadOperations for MongodbConnection {
-    fn get_single_record<'b>(
-        &'b self,
-        _model: &'b ModelRef,
-        _filter: &'b Filter,
-        _selected_fields: &'b ModelProjection,
-    ) -> connector::IO<'b, Option<SingleRecord>> {
+    fn get_single_record(
+        &self,
+        _model: &ModelRef,
+        _filter: &Filter,
+        _selected_fields: &ModelProjection,
+    ) -> connector::IO<'_, Option<SingleRecord>> {
         IO::new(async move {
             todo!();
         })
     }
 
-    fn get_many_records<'b>(
-        &'b self,
-        _model: &'b ModelRef,
+    fn get_many_records(
+        &self,
+        _model: &ModelRef,
         _query_arguments: QueryArguments,
-        _selected_fields: &'b ModelProjection,
-    ) -> connector::IO<'b, ManyRecords> {
+        _selected_fields: &ModelProjection,
+    ) -> connector::IO<'_, ManyRecords> {
         IO::new(async move {
             todo!();
         })
     }
 
-    fn get_related_m2m_record_ids<'b>(
-        &'b self,
-        _from_field: &'b RelationFieldRef,
-        _from_record_ids: &'b [RecordProjection],
-    ) -> connector::IO<'b, Vec<(RecordProjection, RecordProjection)>> {
+    fn get_related_m2m_record_ids(
+        &self,
+        _from_field: &RelationFieldRef,
+        _from_record_ids: &[RecordProjection],
+    ) -> connector::IO<'_, Vec<(RecordProjection, RecordProjection)>> {
         IO::new(async move {
             todo!();
         })
     }
 
-    fn count_by_model<'b>(
-        &'b self,
-        _model: &'b ModelRef,
-        _query_arguments: QueryArguments,
-    ) -> connector::IO<'b, usize> {
+    fn count_by_model(&self, _model: &ModelRef, _query_arguments: QueryArguments) -> connector::IO<'_, usize> {
         IO::new(async move {
             todo!();
         })
@@ -59,46 +55,42 @@ impl ReadOperations for MongodbConnection {
 }
 
 impl WriteOperations for MongodbConnection {
-    fn create_record<'a>(&'a self, _model: &'a ModelRef, _args: WriteArgs) -> connector::IO<'_, RecordProjection> {
+    fn create_record(&self, _model: &ModelRef, _args: WriteArgs) -> connector::IO<'_, RecordProjection> {
         panic!("Write operations should be implemented on Transactions only");
     }
 
-    fn update_records<'b>(
-        &'b self,
-        _model: &'b ModelRef,
+    fn update_records(
+        &self,
+        _model: &ModelRef,
         _record_filter: RecordFilter,
         _args: WriteArgs,
-    ) -> connector::IO<'b, Vec<RecordProjection>> {
+    ) -> connector::IO<'_, Vec<RecordProjection>> {
         panic!("Write operations should be implemented on Transactions only");
     }
 
-    fn delete_records<'b>(&'b self, _model: &'b ModelRef, _record_filter: RecordFilter) -> connector::IO<'b, usize> {
+    fn delete_records(&self, _model: &ModelRef, _record_filter: RecordFilter) -> connector::IO<'_, usize> {
         panic!("Write operations should be implemented on Transactions only");
     }
 
-    fn connect<'a>(
-        &'a self,
-        _field: &'a RelationFieldRef,
-        _parent_id: &'a RecordProjection,
-        _child_ids: &'a [RecordProjection],
+    fn connect(
+        &self,
+        _field: &RelationFieldRef,
+        _parent_id: &RecordProjection,
+        _child_ids: &[RecordProjection],
     ) -> connector::IO<'_, ()> {
         panic!("Write operations should be implemented on Transactions only");
     }
 
-    fn disconnect<'a>(
-        &'a self,
-        _field: &'a RelationFieldRef,
-        _parent_id: &'a RecordProjection,
-        _child_ids: &'a [RecordProjection],
+    fn disconnect(
+        &self,
+        _field: &RelationFieldRef,
+        _parent_id: &RecordProjection,
+        _child_ids: &[RecordProjection],
     ) -> connector::IO<'_, ()> {
         panic!("Write operations should be implemented on Transactions only");
     }
 
-    fn execute_raw<'a>(
-        &'a self,
-        _query: String,
-        _parameters: Vec<PrismaValue>,
-    ) -> connector::IO<'_, serde_json::Value> {
+    fn execute_raw(&self, _query: String, _parameters: Vec<PrismaValue>) -> connector::IO<'_, serde_json::Value> {
         panic!("Write operations should be implemented on Transactions only");
     }
 }
