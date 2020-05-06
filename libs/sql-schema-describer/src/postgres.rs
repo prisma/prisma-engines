@@ -699,34 +699,34 @@ fn is_autoincrement(value: &str, schema_name: &str, table_name: &str, column_nam
 
 fn unsuffix_default_literal<'a>(literal: &'a str, data_type: &str, full_data_type: &str) -> Option<Cow<'a, str>> {
     const POSTGRES_STRING_DEFAULT_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"(?ms)^B?'(.*)'$"#).unwrap());
-    const POSTGRES_DEFAULT_UNESCAPE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"(?ms)\\(["'\\])|'(')"#).unwrap());
+
+    // TEST FAILURE: this matches twice,  eliminating the second ' (maybe?)
+    const POSTGRES_DEFAULT_QUOTE_UNESCAPE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"'(')"#).unwrap());
+    const POSTGRES_DEFAULT_BACKSLASH_UNESCAPE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"\\(["'\\])"#).unwrap());
     const POSTGRES_DATA_TYPE_SUFFIX_RE: Lazy<Regex> =
         Lazy::new(|| Regex::new(r#"(?ms)^(.*)::(\\")?(.*)(\\")?$"#).unwrap());
 
     let captures = POSTGRES_DATA_TYPE_SUFFIX_RE.captures(literal)?;
     let suffix = captures.get(3).unwrap().as_str();
 
+    dbg!(literal);
+
     if suffix != data_type && suffix != full_data_type {
-        return None;
+        return dbg!(None);
     }
 
     let raw = captures.get(1).unwrap().as_str();
-    let raw = POSTGRES_DEFAULT_UNESCAPE_RE.replace_all(raw, "$1$2");
+    let raw = POSTGRES_DEFAULT_BACKSLASH_UNESCAPE_RE
+        .replace_all(
+            &POSTGRES_DEFAULT_QUOTE_UNESCAPE_RE.replace_all(raw, "$1").into_owned(),
+            "$1",
+        )
+        .into_owned();
 
-    match raw {
-        Cow::Owned(raw) => {
-            let captures = POSTGRES_STRING_DEFAULT_RE.captures(&raw)?;
-            let first_capture = captures.get(1).unwrap().as_str().to_owned();
+    let captures = POSTGRES_STRING_DEFAULT_RE.captures(&raw)?;
+    let first_capture = captures.get(1).unwrap().as_str().to_owned();
 
-            Some(first_capture.into())
-        }
-        Cow::Borrowed(raw) => {
-            let captures = POSTGRES_STRING_DEFAULT_RE.captures(&raw)?;
-            let first_capture = captures.get(1).unwrap().as_str();
-
-            Some(first_capture.into())
-        }
-    }
+    Some(first_capture.into())
 }
 
 #[cfg(test)]
