@@ -127,7 +127,7 @@ fn database_schema_without_primary_key_is_serializable() {
                 name: "column1".to_string(),
                 tpe: ColumnType {
                     data_type: "integer".to_string(),
-                    full_data_type: "integer".to_string(),
+                    full_data_type: "int".to_string(),
                     family: ColumnTypeFamily::Int,
                     arity: ColumnArity::Nullable,
                 },
