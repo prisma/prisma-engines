@@ -64,7 +64,7 @@ async fn all_mysql_column_types_must_work() {
             name: "primary_col".to_string(),
             tpe: ColumnType {
                 data_type: "int".to_string(),
-                full_data_type: "int".to_string(),
+                full_data_type: "int(11)".to_string(),
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
             },
@@ -76,7 +76,7 @@ async fn all_mysql_column_types_must_work() {
             name: "int_col".to_string(),
             tpe: ColumnType {
                 data_type: "int".to_string(),
-                full_data_type: "int".to_string(),
+                full_data_type: "int(11)".to_string(),
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
             },
@@ -88,7 +88,7 @@ async fn all_mysql_column_types_must_work() {
             name: "smallint_col".to_string(),
             tpe: ColumnType {
                 data_type: "smallint".to_string(),
-                full_data_type: "smallint".to_string(),
+                full_data_type: "smallint(6)".to_string(),
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
             },
@@ -100,7 +100,7 @@ async fn all_mysql_column_types_must_work() {
             name: "tinyint4_col".to_string(),
             tpe: ColumnType {
                 data_type: "tinyint".to_string(),
-                full_data_type: "tinyint".to_string(),
+                full_data_type: "tinyint(4)".to_string(),
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
             },
@@ -111,7 +111,7 @@ async fn all_mysql_column_types_must_work() {
             name: "tinyint1_col".to_string(),
             tpe: ColumnType {
                 data_type: "tinyint".to_string(),
-                full_data_type: "tinyint".to_string(),
+                full_data_type: "tinyint(1)".to_string(),
                 family: ColumnTypeFamily::Boolean,
                 arity: ColumnArity::Required,
             },
@@ -123,7 +123,7 @@ async fn all_mysql_column_types_must_work() {
             name: "mediumint_col".to_string(),
             tpe: ColumnType {
                 data_type: "mediumint".to_string(),
-                full_data_type: "mediumint".to_string(),
+                full_data_type: "mediumint(9)".to_string(),
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
             },
@@ -135,7 +135,7 @@ async fn all_mysql_column_types_must_work() {
             name: "bigint_col".to_string(),
             tpe: ColumnType {
                 data_type: "bigint".to_string(),
-                full_data_type: "bigint".to_string(),
+                full_data_type: "bigint(20)".to_string(),
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
             },
@@ -147,7 +147,7 @@ async fn all_mysql_column_types_must_work() {
             name: "decimal_col".to_string(),
             tpe: ColumnType {
                 data_type: "decimal".to_string(),
-                full_data_type: "decimal".to_string(),
+                full_data_type: "decimal(10,0)".to_string(),
                 family: ColumnTypeFamily::Float,
                 arity: ColumnArity::Required,
             },
@@ -159,7 +159,7 @@ async fn all_mysql_column_types_must_work() {
             name: "numeric_col".to_string(),
             tpe: ColumnType {
                 data_type: "decimal".to_string(),
-                full_data_type: "decimal".to_string(),
+                full_data_type: "decimal(10,0)".to_string(),
                 family: ColumnTypeFamily::Float,
                 arity: ColumnArity::Required,
             },
@@ -243,7 +243,7 @@ async fn all_mysql_column_types_must_work() {
             name: "year_col".to_string(),
             tpe: ColumnType {
                 data_type: "year".to_string(),
-                full_data_type: "year".to_string(),
+                full_data_type: "year(4)".to_string(),
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
             },
@@ -255,7 +255,7 @@ async fn all_mysql_column_types_must_work() {
             name: "char_col".to_string(),
             tpe: ColumnType {
                 data_type: "char".to_string(),
-                full_data_type: "char".to_string(),
+                full_data_type: "char(1)".to_string(),
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
             },
@@ -267,7 +267,7 @@ async fn all_mysql_column_types_must_work() {
             name: "varchar_col".to_string(),
             tpe: ColumnType {
                 data_type: "varchar".to_string(),
-                full_data_type: "varchar".to_string(),
+                full_data_type: "varchar(255)".to_string(),
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
             },
@@ -327,7 +327,7 @@ async fn all_mysql_column_types_must_work() {
             name: "enum_col".to_string(),
             tpe: ColumnType {
                 data_type: "enum".to_string(),
-                full_data_type: "enum".to_string(),
+                full_data_type: "enum(\'a\',\'b\')".to_string(),
                 family: ColumnTypeFamily::Enum("User_enum_col".into()),
                 arity: ColumnArity::Required,
             },
@@ -339,7 +339,7 @@ async fn all_mysql_column_types_must_work() {
             name: "set_col".to_string(),
             tpe: ColumnType {
                 data_type: "set".to_string(),
-                full_data_type: "set".to_string(),
+                full_data_type: "set(\'a\',\'b\')".to_string(),
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
             },
@@ -351,7 +351,7 @@ async fn all_mysql_column_types_must_work() {
             name: "binary_col".to_string(),
             tpe: ColumnType {
                 data_type: "binary".to_string(),
-                full_data_type: "binary".to_string(),
+                full_data_type: "binary(1)".to_string(),
                 family: ColumnTypeFamily::Binary,
                 arity: ColumnArity::Required,
             },
@@ -363,7 +363,7 @@ async fn all_mysql_column_types_must_work() {
             name: "varbinary_col".to_string(),
             tpe: ColumnType {
                 data_type: "varbinary".to_string(),
-                full_data_type: "varbinary".to_string(),
+                full_data_type: "varbinary(255)".to_string(),
                 family: ColumnTypeFamily::Binary,
                 arity: ColumnArity::Required,
             },
@@ -577,7 +577,7 @@ async fn mysql_foreign_key_on_delete_must_be_handled() {
                     name: "city".to_string(),
                     tpe: ColumnType {
                         data_type: "int".to_string(),
-                        full_data_type: "int".to_string(),
+                        full_data_type: "int(11)".to_string(),
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
                     },
@@ -588,7 +588,7 @@ async fn mysql_foreign_key_on_delete_must_be_handled() {
                     name: "city_cascade".to_string(),
                     tpe: ColumnType {
                         data_type: "int".to_string(),
-                        full_data_type: "int".to_string(),
+                        full_data_type: "int(11)".to_string(),
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
                     },
@@ -599,7 +599,7 @@ async fn mysql_foreign_key_on_delete_must_be_handled() {
                     name: "city_restrict".to_string(),
                     tpe: ColumnType {
                         data_type: "int".to_string(),
-                        full_data_type: "int".to_string(),
+                        full_data_type: "int(11)".to_string(),
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
                     },
@@ -610,7 +610,7 @@ async fn mysql_foreign_key_on_delete_must_be_handled() {
                     name: "city_set_null".to_string(),
                     tpe: ColumnType {
                         data_type: "int".to_string(),
-                        full_data_type: "int".to_string(),
+                        full_data_type: "int(11)".to_string(),
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
                     },
@@ -621,7 +621,7 @@ async fn mysql_foreign_key_on_delete_must_be_handled() {
                     name: "id".to_string(),
                     tpe: ColumnType {
                         data_type: "int".to_string(),
-                        full_data_type: "int".to_string(),
+                        full_data_type: "int(11)".to_string(),
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Required,
                     },
