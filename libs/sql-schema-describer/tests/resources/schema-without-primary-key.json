@@ -6,7 +6,8 @@
         {
           "name": "column1",
           "tpe": {
-            "raw": "integer",
+            "dataType": "integer",
+            "fullDataType": "int",
             "family": "int",
           "arity": "nullable"
           },
