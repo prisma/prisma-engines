@@ -69,7 +69,7 @@ async fn all_postgres_column_types_must_work() {
         Column {
             name: "array_bin_col".into(),
             tpe: ColumnType {
-                data_type: "_bytea".into(),
+                data_type: "ARRAY".into(),
                 full_data_type: "_bytea".into(),
                 family: ColumnTypeFamily::Binary,
                 arity: ColumnArity::List,
@@ -80,7 +80,7 @@ async fn all_postgres_column_types_must_work() {
         Column {
             name: "array_bool_col".into(),
             tpe: ColumnType {
-                data_type: "_bool".into(),
+                data_type: "ARRAY".into(),
                 full_data_type: "_bool".into(),
                 family: ColumnTypeFamily::Boolean,
                 arity: ColumnArity::List,
@@ -91,7 +91,7 @@ async fn all_postgres_column_types_must_work() {
         Column {
             name: "array_date_col".into(),
             tpe: ColumnType {
-                data_type: "_date".into(),
+                data_type: "ARRAY".into(),
                 full_data_type: "_date".into(),
                 family: ColumnTypeFamily::DateTime,
                 arity: ColumnArity::List,
@@ -102,7 +102,7 @@ async fn all_postgres_column_types_must_work() {
         Column {
             name: "array_double_col".into(),
             tpe: ColumnType {
-                data_type: "_float8".into(),
+                data_type: "ARRAY".into(),
                 full_data_type: "_float8".into(),
                 family: ColumnTypeFamily::Float,
                 arity: ColumnArity::List,
@@ -113,7 +113,7 @@ async fn all_postgres_column_types_must_work() {
         Column {
             name: "array_float_col".into(),
             tpe: ColumnType {
-                data_type: "_float8".into(),
+                data_type: "ARRAY".into(),
                 full_data_type: "_float8".into(),
                 family: ColumnTypeFamily::Float,
                 arity: ColumnArity::List,
@@ -124,7 +124,7 @@ async fn all_postgres_column_types_must_work() {
         Column {
             name: "array_int_col".into(),
             tpe: ColumnType {
-                data_type: "_int4".into(),
+                data_type: "ARRAY".into(),
                 full_data_type: "_int4".into(),
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::List,
@@ -135,7 +135,7 @@ async fn all_postgres_column_types_must_work() {
         Column {
             name: "array_text_col".into(),
             tpe: ColumnType {
-                data_type: "_text".into(),
+                data_type: "ARRAY".into(),
                 full_data_type: "_text".into(),
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::List,
@@ -146,7 +146,7 @@ async fn all_postgres_column_types_must_work() {
         Column {
             name: "array_varchar_col".into(),
             tpe: ColumnType {
-                data_type: "_varchar".into(),
+                data_type: "ARRAY".into(),
                 full_data_type: "_varchar".into(),
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::List,
@@ -168,7 +168,7 @@ async fn all_postgres_column_types_must_work() {
         Column {
             name: "boolean_col".into(),
             tpe: ColumnType {
-                data_type: "bool".into(),
+                data_type: "boolean".into(),
                 full_data_type: "bool".into(),
                 family: ColumnTypeFamily::Boolean,
                 arity: ColumnArity::Required,
@@ -191,7 +191,7 @@ async fn all_postgres_column_types_must_work() {
         Column {
             name: "double_col".into(),
             tpe: ColumnType {
-                data_type: "float8".into(),
+                data_type: "double precision".into(),
                 full_data_type: "float8".into(),
                 family: ColumnTypeFamily::Float,
                 arity: ColumnArity::Required,
@@ -203,7 +203,7 @@ async fn all_postgres_column_types_must_work() {
         Column {
             name: "float_col".into(),
             tpe: ColumnType {
-                data_type: "float8".into(),
+                data_type: "double precision".into(),
                 full_data_type: "float8".into(),
                 family: ColumnTypeFamily::Float,
                 arity: ColumnArity::Required,
@@ -215,7 +215,7 @@ async fn all_postgres_column_types_must_work() {
         Column {
             name: "int_col".into(),
             tpe: ColumnType {
-                data_type: "int4".into(),
+                data_type: "integer".into(),
                 full_data_type: "int4".into(),
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
@@ -227,7 +227,7 @@ async fn all_postgres_column_types_must_work() {
         Column {
             name: "primary_col".into(),
             tpe: ColumnType {
-                data_type: "int4".into(),
+                data_type: "integer".into(),
                 full_data_type: "int4".into(),
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
@@ -254,7 +254,7 @@ async fn all_postgres_column_types_must_work() {
         Column {
             name: "string2_col".into(),
             tpe: ColumnType {
-                data_type: "varchar".into(),
+                data_type: "character varying".into(),
                 full_data_type: "varchar".into(),
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
@@ -266,7 +266,7 @@ async fn all_postgres_column_types_must_work() {
         Column {
             name: "bigint_col".into(),
             tpe: ColumnType {
-                data_type: "int8".into(),
+                data_type: "bigint".into(),
                 full_data_type: "int8".into(),
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
@@ -278,7 +278,7 @@ async fn all_postgres_column_types_must_work() {
         Column {
             name: "bigserial_col".into(),
             tpe: ColumnType {
-                data_type: "int8".into(),
+                data_type: "bigint".into(),
                 full_data_type: "int8".into(),
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
@@ -305,7 +305,7 @@ async fn all_postgres_column_types_must_work() {
         Column {
             name: "bit_varying_col".into(),
             tpe: ColumnType {
-                data_type: "varbit".into(),
+                data_type: "bit varying".into(),
                 full_data_type: "varbit".into(),
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
@@ -329,7 +329,7 @@ async fn all_postgres_column_types_must_work() {
         Column {
             name: "char_col".into(),
             tpe: ColumnType {
-                data_type: "bpchar".into(),
+                data_type: "character".into(),
                 full_data_type: "bpchar".into(),
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
@@ -437,7 +437,7 @@ async fn all_postgres_column_types_must_work() {
         Column {
             name: "smallint_col".into(),
             tpe: ColumnType {
-                data_type: "int2".into(),
+                data_type: "smallint".into(),
                 full_data_type: "int2".into(),
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
@@ -449,7 +449,7 @@ async fn all_postgres_column_types_must_work() {
         Column {
             name: "smallserial_col".into(),
             tpe: ColumnType {
-                data_type: "int2".into(),
+                data_type: "smallint".into(),
                 full_data_type: "int2".into(),
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
@@ -464,7 +464,7 @@ async fn all_postgres_column_types_must_work() {
         Column {
             name: "serial_col".into(),
             tpe: ColumnType {
-                data_type: "int4".into(),
+                data_type: "integer".into(),
                 full_data_type: "int4".into(),
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
@@ -479,7 +479,7 @@ async fn all_postgres_column_types_must_work() {
         Column {
             name: "time_col".into(),
             tpe: ColumnType {
-                data_type: "time".into(),
+                data_type: "time without time zone".into(),
                 full_data_type: "time".into(),
                 family: ColumnTypeFamily::DateTime,
                 arity: ColumnArity::Required,
@@ -491,7 +491,7 @@ async fn all_postgres_column_types_must_work() {
         Column {
             name: "time_with_zone_col".into(),
             tpe: ColumnType {
-                data_type: "timetz".into(),
+                data_type: "time with time zone".into(),
                 full_data_type: "timetz".into(),
                 family: ColumnTypeFamily::DateTime,
                 arity: ColumnArity::Required,
@@ -503,7 +503,7 @@ async fn all_postgres_column_types_must_work() {
         Column {
             name: "timestamp_col".into(),
             tpe: ColumnType {
-                data_type: "timestamp".into(),
+                data_type: "timestamp without time zone".into(),
                 full_data_type: "timestamp".into(),
                 family: ColumnTypeFamily::DateTime,
                 arity: ColumnArity::Required,
@@ -515,7 +515,7 @@ async fn all_postgres_column_types_must_work() {
         Column {
             name: "timestamp_with_zone_col".into(),
             tpe: ColumnType {
-                data_type: "timestamptz".into(),
+                data_type: "timestamp with time zone".into(),
                 full_data_type: "timestamptz".into(),
                 family: ColumnTypeFamily::DateTime,
                 arity: ColumnArity::Required,
@@ -651,7 +651,7 @@ async fn postgres_foreign_key_on_delete_must_be_handled() {
                 Column {
                     name: "city".into(),
                     tpe: ColumnType {
-                        data_type: "int4".into(),
+                        data_type: "integer".into(),
                         full_data_type: "int4".into(),
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
@@ -662,7 +662,7 @@ async fn postgres_foreign_key_on_delete_must_be_handled() {
                 Column {
                     name: "city_cascade".into(),
                     tpe: ColumnType {
-                        data_type: "int4".into(),
+                        data_type: "integer".into(),
                         full_data_type: "int4".into(),
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
@@ -673,7 +673,7 @@ async fn postgres_foreign_key_on_delete_must_be_handled() {
                 Column {
                     name: "city_restrict".into(),
                     tpe: ColumnType {
-                        data_type: "int4".into(),
+                        data_type: "integer".into(),
                         full_data_type: "int4".into(),
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
@@ -684,7 +684,7 @@ async fn postgres_foreign_key_on_delete_must_be_handled() {
                 Column {
                     name: "city_set_default".into(),
                     tpe: ColumnType {
-                        data_type: "int4".into(),
+                        data_type: "integer".into(),
                         full_data_type: "int4".into(),
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
@@ -695,7 +695,7 @@ async fn postgres_foreign_key_on_delete_must_be_handled() {
                 Column {
                     name: "city_set_null".into(),
                     tpe: ColumnType {
-                        data_type: "int4".into(),
+                        data_type: "integer".into(),
                         full_data_type: "int4".into(),
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
@@ -706,7 +706,7 @@ async fn postgres_foreign_key_on_delete_must_be_handled() {
                 Column {
                     name: "id".into(),
                     tpe: ColumnType {
-                        data_type: "int4".into(),
+                        data_type: "integer".into(),
                         full_data_type: "int4".into(),
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Required,
