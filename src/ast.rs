@@ -8,7 +8,7 @@
 mod column;
 mod compare;
 mod conditions;
-mod conjuctive;
+mod conjunctive;
 mod delete;
 mod expression;
 mod function;
@@ -29,7 +29,7 @@ mod values;
 pub use column::Column;
 pub use compare::{Comparable, Compare};
 pub use conditions::ConditionTree;
-pub use conjuctive::Conjuctive;
+pub use conjunctive::Conjunctive;
 pub use delete::Delete;
 pub use expression::*;
 pub use function::*;

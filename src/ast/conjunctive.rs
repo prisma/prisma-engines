@@ -1,7 +1,7 @@
 use crate::ast::{ConditionTree, Expression};
 
-/// `AND`, `OR` and `NOT` conjuctive implementations.
-pub trait Conjuctive<'a> {
+/// `AND`, `OR` and `NOT` conjunctive implementations.
+pub trait Conjunctive<'a> {
     /// Builds an `AND` condition having `self` as the left leaf and `other` as the right.
     ///
     /// ```rust
@@ -46,7 +46,7 @@ pub trait Conjuctive<'a> {
     fn not(self) -> ConditionTree<'a>;
 }
 
-impl<'a, T> Conjuctive<'a> for T
+impl<'a, T> Conjunctive<'a> for T
 where
     T: Into<Expression<'a>>,
 {
