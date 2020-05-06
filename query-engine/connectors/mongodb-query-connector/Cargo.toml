@@ -1,0 +1,27 @@
+[package]
+name = "mongodb-query-connector"
+version = "0.0.0"
+authors = []
+edition = "2018"
+
+[dependencies.mongodb]
+url = "https://github.com/mongodb/mongo-rust-driver.git"
+branch = "master"
+
+[dependencies.connector-interface]
+path = "../query-connector"
+package = "query-connector"
+
+[dependencies.prisma-models]
+path = "../../../libs/prisma-models"
+features = ["sql-ext"]
+
+[dependencies.prisma-value]
+path = "../../../libs/prisma-value"
+
+[dependencies.datamodel]
+path = "../../../libs/datamodel/core"
+
+
+[dependencies]
+serde_json = "1.0.50"

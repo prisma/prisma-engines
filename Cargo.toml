@@ -8,6 +8,7 @@ members = [
   "migration-engine/connectors/sql-migration-connector",
   "migration-engine/core",
   "migration-engine/migration-engine-tests",
+  "query-engine/connectors/mongodb-query-connector",
   "query-engine/connectors/query-connector",
   "query-engine/connectors/sql-query-connector",
   "query-engine/core",
