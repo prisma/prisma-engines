@@ -1,5 +1,4 @@
 use super::*;
-use crate::{ParsedField, QueryGraph, QueryGraphBuilderResult};
 use once_cell::sync::OnceCell;
 use prisma_models::{dml, InternalDataModelRef, ModelRef};
 use std::{
@@ -151,59 +150,18 @@ pub struct Field {
     pub name: String,
     pub arguments: Vec<Argument>,
     pub field_type: OutputTypeRef,
-    pub query_builder: Option<SchemaQueryBuilder>,
+
+    /// Relevant for resolving top level queries.
+    pub query_info: Option<QueryInfo>,
 }
 
-/// Todo rework description.
-/// A query builder allows to attach queries to the schema:
-/// on a field:
-/// - A `ModelQueryBuilder` builds queries specific to models, such as `findOne<Model>`.
-///   It requires additional context compared to a `GenericQueryBuilder`.
-///
-/// - A `GenericQueryBuilder` is a query builder that requires no additional context but
-///   the parsed query document data from the incoming query and is thus not associated to any particular
-///   model. The `ResetData` query is such an example.
 #[derive(Debug)]
-pub enum SchemaQueryBuilder {
-    ModelQueryBuilder(ModelQueryBuilder),
-    GenericQueryBuilder(GenericQueryBuilder),
-}
-
-impl SchemaQueryBuilder {
-    pub fn build(&self, parsed_field: ParsedField) -> QueryGraphBuilderResult<QueryGraph> {
-        match self {
-            Self::ModelQueryBuilder(m) => m.build(parsed_field),
-            _ => unimplemented!(),
-        }
-    }
-}
-
-pub type QueryBuilderFn = dyn (Fn(ModelRef, ParsedField) -> QueryGraphBuilderResult<QueryGraph>) + Send + Sync;
-
-/// Designates a specific top-level operation on a corresponding model.
-#[derive(DebugStub)]
-pub struct ModelQueryBuilder {
-    pub model: ModelRef,
+pub struct QueryInfo {
+    pub model: Option<ModelRef>,
     pub tag: QueryTag,
-
-    /// An associated builder is responsible for building queries
-    /// that the executer will execute. The result info is required
-    /// by the serialization to correctly build the response.
-    #[debug_stub = "#BuilderFn#"]
-    pub builder_fn: Box<QueryBuilderFn>,
 }
 
-impl ModelQueryBuilder {
-    pub fn new(model: ModelRef, tag: QueryTag, builder_fn: Box<QueryBuilderFn>) -> Self {
-        Self { model, tag, builder_fn }
-    }
-
-    pub fn build(&self, parsed_field: ParsedField) -> QueryGraphBuilderResult<QueryGraph> {
-        (self.builder_fn)(Arc::clone(&self.model), parsed_field)
-    }
-}
-
-/// Designates top level model queries. Used for DMMF serialization.
+/// A `QueryTag` designates a top level query possible with Prisma.
 #[derive(Debug, Clone, PartialEq)]
 pub enum QueryTag {
     FindOne,
@@ -215,6 +173,7 @@ pub enum QueryTag {
     DeleteMany,
     UpsertOne,
     Aggregate,
+    Raw,
 }
 
 impl fmt::Display for QueryTag {
@@ -229,15 +188,11 @@ impl fmt::Display for QueryTag {
             QueryTag::DeleteMany => "deleteMany",
             QueryTag::UpsertOne => "upsertOne",
             QueryTag::Aggregate => "aggregate",
+            QueryTag::Raw => "raw",
         };
 
         s.fmt(f)
     }
-}
-
-#[derive(Debug, Clone)]
-pub struct GenericQueryBuilder {
-    // WIP
 }
 
 #[derive(Debug)]

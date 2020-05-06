@@ -1,16 +1,13 @@
 use super::*;
 
-pub struct ArgumentBuilder<'a> {
-    input_type_builder: Weak<InputTypeBuilder<'a>>,
-    object_type_builder: Weak<ObjectTypeBuilder<'a>>,
+pub struct ArgumentBuilder {
+    input_type_builder: Weak<InputTypeBuilder>,
+    object_type_builder: Weak<ObjectTypeBuilder>,
 }
 
 /// Builder responsible for building the arguments required by the top-level fields of mutations.
-impl<'a> ArgumentBuilder<'a> {
-    pub fn new(
-        input_type_builder: Weak<InputTypeBuilder<'a>>,
-        object_type_builder: Weak<ObjectTypeBuilder<'a>>,
-    ) -> Self {
+impl ArgumentBuilder {
+    pub fn new(input_type_builder: Weak<InputTypeBuilder>, object_type_builder: Weak<ObjectTypeBuilder>) -> Self {
         ArgumentBuilder {
             input_type_builder,
             object_type_builder,

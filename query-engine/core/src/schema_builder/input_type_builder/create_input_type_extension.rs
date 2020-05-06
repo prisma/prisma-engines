@@ -1,6 +1,6 @@
 use super::*;
 
-pub trait CreateInputTypeBuilderExtension<'a>: InputTypeBuilderBase<'a> {
+pub trait CreateInputTypeBuilderExtension: InputTypeBuilderBase {
     /// Builds the create input type (<x>CreateInput / <x>CreateWithout<y>Input)
     #[rustfmt::skip]
     fn create_input_type(&self, model: ModelRef, parent_field: Option<RelationFieldRef>) -> InputObjectTypeRef {

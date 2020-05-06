@@ -2,14 +2,13 @@ use super::*;
 
 /// Filter object and scalar filter object type builder.
 #[derive(Debug)]
-pub struct FilterObjectTypeBuilder<'a> {
-    capabilities: &'a SupportedCapabilities,
+pub struct FilterObjectTypeBuilder {
     input_object_cache: TypeRefCache<InputObjectType>,
 }
 
-impl<'a> InputBuilderExtensions for FilterObjectTypeBuilder<'a> {}
+impl InputBuilderExtensions for FilterObjectTypeBuilder {}
 
-impl<'a> CachedBuilder<InputObjectType> for FilterObjectTypeBuilder<'a> {
+impl CachedBuilder<InputObjectType> for FilterObjectTypeBuilder {
     fn get_cache(&self) -> &TypeRefCache<InputObjectType> {
         &self.input_object_cache
     }
@@ -19,10 +18,9 @@ impl<'a> CachedBuilder<InputObjectType> for FilterObjectTypeBuilder<'a> {
     }
 }
 
-impl<'a> FilterObjectTypeBuilder<'a> {
-    pub fn new(capabilities: &'a SupportedCapabilities) -> Self {
+impl FilterObjectTypeBuilder {
+    pub fn new() -> Self {
         FilterObjectTypeBuilder {
-            capabilities,
             input_object_cache: TypeRefCache::new(),
         }
     }
@@ -63,11 +61,7 @@ impl<'a> FilterObjectTypeBuilder<'a> {
     }
 
     pub fn filter_object_type(&self, model: ModelRef) -> InputObjectTypeRef {
-        if self.capabilities.has(ConnectorCapability::MongoJoinRelationLinks) {
-            self.build_mongo_filter_object(model)
-        } else {
-            self.build_filter_object(model)
-        }
+        self.build_filter_object(model)
     }
 
     fn build_filter_object(&self, model: ModelRef) -> InputObjectTypeRef {
@@ -117,10 +111,6 @@ impl<'a> FilterObjectTypeBuilder<'a> {
 
         input_object.set_fields(fields);
         weak_ref
-    }
-
-    fn build_mongo_filter_object(&self, _model: ModelRef) -> InputObjectTypeRef {
-        unimplemented!()
     }
 
     fn map_input_field(&self, field: ScalarFieldRef) -> Vec<InputField> {

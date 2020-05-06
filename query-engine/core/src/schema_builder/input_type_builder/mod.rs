@@ -8,7 +8,7 @@ pub use create_input_type_extension::*;
 pub use input_builder_extensions::*;
 pub use update_input_type_extension::*;
 
-pub trait InputTypeBuilderBase<'a>: CachedBuilder<InputObjectType> + InputBuilderExtensions {
+pub trait InputTypeBuilderBase: CachedBuilder<InputObjectType> + InputBuilderExtensions {
     /// Builds scalar input fields using the mapper and the given, prefiltered, scalar fields.
     /// The mapper is responsible for mapping the fields to input types.
     fn scalar_input_fields<T, F>(
@@ -242,7 +242,7 @@ pub trait InputTypeBuilderBase<'a>: CachedBuilder<InputObjectType> + InputBuilde
         InputType::object(Arc::downgrade(&input_object))
     }
 
-    fn get_filter_object_builder(&self) -> Arc<FilterObjectTypeBuilder<'a>>;
+    fn get_filter_object_builder(&self) -> Arc<FilterObjectTypeBuilder>;
 }
 
 /// Central builder for input types.
@@ -250,13 +250,13 @@ pub trait InputTypeBuilderBase<'a>: CachedBuilder<InputObjectType> + InputBuilde
 /// It doesn't use options to represent if a type should be rendered or not.
 /// Instead, empty input types (i.e. without fields) will be rendered and must be filtered on higher layers.
 #[derive(Debug)]
-pub struct InputTypeBuilder<'a> {
+pub struct InputTypeBuilder {
     internal_data_model: InternalDataModelRef,
     input_type_cache: TypeRefCache<InputObjectType>,
-    filter_object_builder: Weak<FilterObjectTypeBuilder<'a>>,
+    filter_object_builder: Weak<FilterObjectTypeBuilder>,
 }
 
-impl<'a> CachedBuilder<InputObjectType> for InputTypeBuilder<'a> {
+impl CachedBuilder<InputObjectType> for InputTypeBuilder {
     fn get_cache(&self) -> &TypeRefCache<InputObjectType> {
         &self.input_type_cache
     }
@@ -266,22 +266,22 @@ impl<'a> CachedBuilder<InputObjectType> for InputTypeBuilder<'a> {
     }
 }
 
-impl<'a> InputTypeBuilderBase<'a> for InputTypeBuilder<'a> {
-    fn get_filter_object_builder(&self) -> Arc<FilterObjectTypeBuilder<'a>> {
+impl InputTypeBuilderBase for InputTypeBuilder {
+    fn get_filter_object_builder(&self) -> Arc<FilterObjectTypeBuilder> {
         self.filter_object_builder
             .upgrade()
             .expect("Invariant violation: Expected input type builder reference to be valid")
     }
 }
 
-impl<'a> InputBuilderExtensions for InputTypeBuilder<'a> {}
-impl<'a> CreateInputTypeBuilderExtension<'a> for InputTypeBuilder<'a> {}
-impl<'a> UpdateInputTypeBuilderExtension<'a> for InputTypeBuilder<'a> {}
+impl InputBuilderExtensions for InputTypeBuilder {}
+impl CreateInputTypeBuilderExtension for InputTypeBuilder {}
+impl UpdateInputTypeBuilderExtension for InputTypeBuilder {}
 
-impl<'a> InputTypeBuilder<'a> {
+impl InputTypeBuilder {
     pub fn new(
         internal_data_model: InternalDataModelRef,
-        filter_object_builder: Weak<FilterObjectTypeBuilder<'a>>,
+        filter_object_builder: Weak<FilterObjectTypeBuilder>,
     ) -> Self {
         InputTypeBuilder {
             internal_data_model,

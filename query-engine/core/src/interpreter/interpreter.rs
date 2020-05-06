@@ -33,7 +33,7 @@ impl Env {
 }
 pub struct QueryInterpreter<'conn, 'tx> {
     pub(crate) conn: ConnectionLike<'conn, 'tx>,
-    log: SegQueue<String>,
+    // log: SegQueue<String>,
 }
 
 impl<'conn, 'tx> QueryInterpreter<'conn, 'tx>
@@ -51,7 +51,7 @@ where
         //     log.push("\n".to_string());
         // }
 
-        Self { conn, log }
+        Self { conn }
     }
 
     pub fn interpret(

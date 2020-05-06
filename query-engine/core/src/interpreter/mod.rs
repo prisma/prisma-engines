@@ -12,5 +12,6 @@ pub use expression::*;
 pub use expressionista::*;
 pub use formatters::*;
 pub use interpreter::*;
+pub use result::*;
 
 type InterpretationResult<T> = std::result::Result<T, InterpreterError>;

@@ -2,18 +2,17 @@ use super::*;
 use prisma_models::OrderBy;
 
 #[derive(Debug)]
-pub struct ObjectTypeBuilder<'a> {
+pub struct ObjectTypeBuilder {
     internal_data_model: InternalDataModelRef,
     with_relations: bool,
-    capabilities: &'a SupportedCapabilities,
-    input_type_builder: Weak<InputTypeBuilder<'a>>,
-    filter_object_type_builder: Weak<FilterObjectTypeBuilder<'a>>,
+    input_type_builder: Weak<InputTypeBuilder>,
+    filter_object_type_builder: Weak<FilterObjectTypeBuilder>,
     object_type_cache: TypeRefCache<ObjectType>,
 }
 
-impl<'a> InputBuilderExtensions for ObjectTypeBuilder<'a> {}
+impl InputBuilderExtensions for ObjectTypeBuilder {}
 
-impl<'a> CachedBuilder<ObjectType> for ObjectTypeBuilder<'a> {
+impl CachedBuilder<ObjectType> for ObjectTypeBuilder {
     fn get_cache(&self) -> &TypeRefCache<ObjectType> {
         &self.object_type_cache
     }
@@ -23,19 +22,17 @@ impl<'a> CachedBuilder<ObjectType> for ObjectTypeBuilder<'a> {
     }
 }
 
-impl<'a> ObjectTypeBuilder<'a> {
+impl ObjectTypeBuilder {
     /// Initializes a new ObjectTypeBuilder and constructs the
     pub fn new(
         internal_data_model: InternalDataModelRef,
         with_relations: bool,
-        capabilities: &'a SupportedCapabilities,
-        filter_object_type_builder: Weak<FilterObjectTypeBuilder<'a>>,
-        input_type_builder: Weak<InputTypeBuilder<'a>>,
+        filter_object_type_builder: Weak<FilterObjectTypeBuilder>,
+        input_type_builder: Weak<InputTypeBuilder>,
     ) -> Self {
         ObjectTypeBuilder {
             internal_data_model,
             with_relations,
-            capabilities,
             filter_object_type_builder,
             input_type_builder,
             object_type_cache: TypeRefCache::new(),

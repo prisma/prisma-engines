@@ -6,14 +6,14 @@ type BoxedExpression = Box<Expression>;
 type BindingName = String;
 
 /// They do not represent a fundamental building block like `Expression`
-/// but custom, build-in functionality.
+/// but build-in functionality to form the core logic of the program.
 pub enum FnInvocation {
     Get(BindingName),
     Query(Query),
     Diff(BindingName, BindingName),
-    // Raise
-    // Inject
-    // Filter
+    // Raise for runtime interpretation errors
+    // Inject for argument injection
+    // Filter for injecting filters
 }
 
 impl FnInvocation {
@@ -25,7 +25,7 @@ impl FnInvocation {
     // functions defined here
 }
 
-/// Fundamental building blocks of the interpreted language.
+/// Fundamental building blocks of the interpreter.
 pub enum Expression {
     Sequence(Vec<Expression>),
     Invoke(FnInvocation),

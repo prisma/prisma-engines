@@ -1,6 +1,6 @@
 use super::*;
 
-pub trait UpdateInputTypeBuilderExtension<'a>: InputTypeBuilderBase<'a> + CreateInputTypeBuilderExtension<'a> {
+pub trait UpdateInputTypeBuilderExtension: InputTypeBuilderBase + CreateInputTypeBuilderExtension {
     /// Builds "<x>UpdateInput" input object type.
     fn update_input_type(&self, model: ModelRef) -> InputObjectTypeRef {
         let name = format!("{}UpdateInput", model.name.clone());

@@ -1,5 +1,4 @@
 use super::*;
-use crate::{query_graph_builder::*, Query, QueryGraph};
 use prisma_models::dml;
 use prisma_value::PrismaValue;
 
@@ -20,50 +19,43 @@ pub enum BuildMode {
 /// and hands down references to the individual initializers as required.
 ///
 /// Circular dependency schema building requires special consideration.
-/// Assume a data model looks like this, with arrows indicating some kind of relation between models:
+/// Assume a datamodel with models A, B, C form a dependency graph as pictured:
 ///
 /// ```text
-///       +---+
-///   +---+ B +<---+
-///   |   +---+    |
-///   v            |
-/// +-+-+        +-+-+      +---+
-/// | A +------->+ C +<-----+ D |
-/// +---+        +---+      +---+
+/// ┌───┐
+/// │ A │◀─────┐
+/// └───┘      │
+///   │        │
+///   ▼        │
+/// ┌───┐    ┌───┐
+/// │ B │───▶│ C │
+/// └───┘    └───┘
 /// ```
 ///
-/// The above would cause infinite builder recursion circular
-/// dependency (A -> B -> C -> A) in relations (for example in filter building).
+/// The above would cause an infinite recursion because of the circular
+/// dependency in the relations (a good example is filter building).
 ///
-/// Without caching, processing D (in fact, visiting any type after the intial computation) would also
-/// trigger a complete recomputation of A, B, C.
-///
-/// Hence, all builders that produce input or output object types are required to
-/// implement CachedBuilder in some form to break recursive type building.
+/// To circuit break, all builders that produce input or output object types
+/// implement `CachedBuilder`.
 ///
 /// Additionally, the cache also acts as the component to prevent memory leaks from circular dependencies
-/// in the query schema later on, as described on the QuerySchema type.
+/// in the query schema later on, as described on the `QuerySchema` type.
 /// The cache can be consumed to produce a list of strong references to the individual input and output
-/// object types, which are then moved to the query schema to keep weak references alive (see TypeRefCache for additional infos).
-pub struct QuerySchemaBuilder<'a> {
+/// object types, which are then moved to the query schema to keep weak references alive
+/// (see `TypeRefCache` for additional documentation).
+pub struct QuerySchemaBuilder {
     mode: BuildMode,
     internal_data_model: InternalDataModelRef,
-    _capabilities: &'a SupportedCapabilities,
-    object_type_builder: Arc<ObjectTypeBuilder<'a>>,
-    input_type_builder: Arc<InputTypeBuilder<'a>>,
-    argument_builder: ArgumentBuilder<'a>,
-    filter_object_type_builder: Arc<FilterObjectTypeBuilder<'a>>,
+    object_type_builder: Arc<ObjectTypeBuilder>,
+    input_type_builder: Arc<InputTypeBuilder>,
+    argument_builder: ArgumentBuilder,
+    filter_object_type_builder: Arc<FilterObjectTypeBuilder>,
     enable_raw_queries: bool,
 }
 
-impl<'a> QuerySchemaBuilder<'a> {
-    pub fn new(
-        internal_data_model: &InternalDataModelRef,
-        capabilities: &'a SupportedCapabilities,
-        mode: BuildMode,
-        enable_raw_queries: bool,
-    ) -> Self {
-        let filter_object_type_builder = Arc::new(FilterObjectTypeBuilder::new(capabilities));
+impl QuerySchemaBuilder {
+    pub fn new(internal_data_model: &InternalDataModelRef, mode: BuildMode, enable_raw_queries: bool) -> Self {
+        let filter_object_type_builder = Arc::new(FilterObjectTypeBuilder::new());
         let input_type_builder = Arc::new(InputTypeBuilder::new(
             Arc::clone(internal_data_model),
             Arc::downgrade(&filter_object_type_builder),
@@ -72,7 +64,6 @@ impl<'a> QuerySchemaBuilder<'a> {
         let object_type_builder = Arc::new(ObjectTypeBuilder::new(
             Arc::clone(internal_data_model),
             true,
-            capabilities,
             Arc::downgrade(&filter_object_type_builder),
             Arc::downgrade(&input_type_builder),
         ));
@@ -84,7 +75,6 @@ impl<'a> QuerySchemaBuilder<'a> {
 
         QuerySchemaBuilder {
             internal_data_model: Arc::clone(internal_data_model),
-            _capabilities: capabilities,
             mode,
             object_type_builder,
             input_type_builder,
@@ -207,19 +197,10 @@ impl<'a> QuerySchemaBuilder<'a> {
                     OutputType::opt(OutputType::object(
                         self.object_type_builder.map_model_object_type(&model),
                     )),
-                    Some(SchemaQueryBuilder::ModelQueryBuilder(ModelQueryBuilder::new(
-                        Arc::clone(&model),
-                        QueryTag::FindOne,
-                        Box::new(|model, parsed_field| {
-                            let mut graph = QueryGraph::new();
-                            let query = ReadOneRecordBuilder::new(parsed_field, model).build()?;
-
-                            // Todo: This (and all following query graph validations) should be unified in the query graph builders mod.
-                            // callers should not have to care about calling validations explicitly.
-                            graph.create_node(Query::Read(query));
-                            Ok(graph)
-                        }),
-                    ))),
+                    Some(QueryInfo {
+                        model: Some(Arc::clone(&model)),
+                        tag: QueryTag::FindOne,
+                    }),
                 )
             })
     }
@@ -238,17 +219,10 @@ impl<'a> QuerySchemaBuilder<'a> {
             OutputType::list(OutputType::object(
                 self.object_type_builder.map_model_object_type(&model),
             )),
-            Some(SchemaQueryBuilder::ModelQueryBuilder(ModelQueryBuilder::new(
-                Arc::clone(&model),
-                QueryTag::FindMany,
-                Box::new(|model, parsed_field| {
-                    let mut graph = QueryGraph::new();
-                    let query = ReadManyRecordsBuilder::new(parsed_field, model).build()?;
-
-                    graph.create_node(Query::Read(query));
-                    Ok(graph)
-                }),
-            ))),
+            Some(QueryInfo {
+                model: Some(Arc::clone(&model)),
+                tag: QueryTag::FindMany,
+            }),
         )
     }
 
@@ -263,17 +237,10 @@ impl<'a> QuerySchemaBuilder<'a> {
             field_name,
             vec![],
             OutputType::object(self.object_type_builder.aggregation_object_type(&model)),
-            Some(SchemaQueryBuilder::ModelQueryBuilder(ModelQueryBuilder::new(
-                Arc::clone(&model),
-                QueryTag::Aggregate,
-                Box::new(|model, parsed_field| {
-                    let mut graph = QueryGraph::new();
-                    let query = AggregateRecordsBuilder::new(parsed_field, model).build()?;
-
-                    graph.create_node(Query::Read(query));
-                    Ok(graph)
-                }),
-            ))),
+            Some(QueryInfo {
+                model: Some(Arc::clone(&model)),
+                tag: QueryTag::Aggregate,
+            }),
         )
     }
 
@@ -289,7 +256,10 @@ impl<'a> QuerySchemaBuilder<'a> {
                 ),
             ],
             OutputType::json(),
-            None,
+            Some(QueryInfo {
+                model: None,
+                tag: QueryTag::Raw,
+            }),
         )
     }
 
@@ -309,16 +279,10 @@ impl<'a> QuerySchemaBuilder<'a> {
             field_name,
             args,
             OutputType::object(self.object_type_builder.map_model_object_type(&model)),
-            Some(SchemaQueryBuilder::ModelQueryBuilder(ModelQueryBuilder::new(
-                Arc::clone(&model),
-                QueryTag::CreateOne,
-                Box::new(|model, parsed_field| {
-                    let mut graph = QueryGraph::new();
-
-                    write::create_record(&mut graph, model, parsed_field)?;
-                    Ok(graph)
-                }),
-            ))),
+            Some(QueryInfo {
+                model: Some(Arc::clone(&model)),
+                tag: QueryTag::CreateOne,
+            }),
         )
     }
 
@@ -336,16 +300,10 @@ impl<'a> QuerySchemaBuilder<'a> {
                 OutputType::opt(OutputType::object(
                     self.object_type_builder.map_model_object_type(&model),
                 )),
-                Some(SchemaQueryBuilder::ModelQueryBuilder(ModelQueryBuilder::new(
-                    Arc::clone(&model),
-                    QueryTag::DeleteOne,
-                    Box::new(|model, parsed_field| {
-                        let mut graph = QueryGraph::new();
-
-                        write::delete_record(&mut graph, model, parsed_field)?;
-                        Ok(graph)
-                    }),
-                ))),
+                Some(QueryInfo {
+                    model: Some(Arc::clone(&model)),
+                    tag: QueryTag::DeleteOne,
+                }),
             )
         })
     }
@@ -362,16 +320,10 @@ impl<'a> QuerySchemaBuilder<'a> {
             field_name,
             arguments,
             OutputType::object(self.object_type_builder.batch_payload_object_type()),
-            Some(SchemaQueryBuilder::ModelQueryBuilder(ModelQueryBuilder::new(
-                Arc::clone(&model),
-                QueryTag::DeleteMany,
-                Box::new(|model, parsed_field| {
-                    let mut graph = QueryGraph::new();
-
-                    write::delete_many_records(&mut graph, model, parsed_field)?;
-                    Ok(graph)
-                }),
-            ))),
+            Some(QueryInfo {
+                model: Some(Arc::clone(&model)),
+                tag: QueryTag::DeleteMany,
+            }),
         )
     }
 
@@ -387,16 +339,10 @@ impl<'a> QuerySchemaBuilder<'a> {
                 OutputType::opt(OutputType::object(
                     self.object_type_builder.map_model_object_type(&model),
                 )),
-                Some(SchemaQueryBuilder::ModelQueryBuilder(ModelQueryBuilder::new(
-                    Arc::clone(&model),
-                    QueryTag::UpdateOne,
-                    Box::new(|model, parsed_field| {
-                        let mut graph = QueryGraph::new();
-
-                        write::update_record(&mut graph, model, parsed_field)?;
-                        Ok(graph)
-                    }),
-                ))),
+                Some(QueryInfo {
+                    model: Some(Arc::clone(&model)),
+                    tag: QueryTag::UpdateOne,
+                }),
             )
         })
     }
@@ -413,16 +359,10 @@ impl<'a> QuerySchemaBuilder<'a> {
             field_name,
             arguments,
             OutputType::object(self.object_type_builder.batch_payload_object_type()),
-            Some(SchemaQueryBuilder::ModelQueryBuilder(ModelQueryBuilder::new(
-                Arc::clone(&model),
-                QueryTag::UpdateMany,
-                Box::new(|model, parsed_field| {
-                    let mut graph = QueryGraph::new();
-
-                    write::update_many_records(&mut graph, model, parsed_field)?;
-                    Ok(graph)
-                }),
-            ))),
+            Some(QueryInfo {
+                model: Some(Arc::clone(&model)),
+                tag: QueryTag::UpdateMany,
+            }),
         )
     }
 
@@ -436,16 +376,10 @@ impl<'a> QuerySchemaBuilder<'a> {
                 field_name,
                 args,
                 OutputType::object(self.object_type_builder.map_model_object_type(&model)),
-                Some(SchemaQueryBuilder::ModelQueryBuilder(ModelQueryBuilder::new(
-                    Arc::clone(&model),
-                    QueryTag::UpsertOne,
-                    Box::new(|model, parsed_field| {
-                        let mut graph = QueryGraph::new();
-
-                        write::upsert_record(&mut graph, model, parsed_field)?;
-                        Ok(graph)
-                    }),
-                ))),
+                Some(QueryInfo {
+                    model: Some(Arc::clone(&model)),
+                    tag: QueryTag::UpsertOne,
+                }),
             )
         })
     }
