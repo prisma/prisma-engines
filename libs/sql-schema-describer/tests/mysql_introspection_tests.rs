@@ -783,8 +783,6 @@ async fn constraints_from_other_databases_should_not_be_introspected() {
     );
 }
 
-// When multiple databases exist on a mysql instance, and they share names for foreign key
-// constraints, introspecting one database should not yield constraints from the other.
 #[tokio::test]
 async fn mysql_introspected_default_strings_should_be_unescaped() {
     let db_name = "mysql_introspected_default_strings_should_be_unescaped";

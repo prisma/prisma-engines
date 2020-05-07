@@ -594,8 +594,6 @@ fn unescape_and_unquote_default_string(default: String, flavour: &Flavour) -> St
     const MYSQL_ESCAPING_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"\\(.)|'(')"#).unwrap());
     const MARIADB_NEWLINE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"\\n"#).unwrap());
 
-    eprintln!("default: {}", default);
-
     let maybe_unquoted: Cow<str> = if matches!(flavour, Flavour::MariaDb) {
         let unquoted: &str = &default[1..(default.len() - 1)];
 
