@@ -86,11 +86,11 @@ impl RenderContext {
         self.schema.borrow_mut().output_types.push(output_type);
     }
 
-    pub fn add_mapping(&self, name: String, operation: Option<&SchemaQueryBuilder>) {
-        operation.into_iter().for_each(|op| {
-            if let SchemaQueryBuilder::ModelQueryBuilder(m) = op {
-                let model_name = m.model.name.clone();
-                let tag_str = format!("{}", m.tag);
+    pub fn add_mapping(&self, name: String, query_info: Option<&QueryInfo>) {
+        if let Some(info) = query_info {
+            if let Some(ref model) = info.model {
+                let model_name = model.name.clone();
+                let tag_str = format!("{}", info.tag);
                 let mut mappings = self.mappings.borrow_mut();
                 let mapping = mappings.iter().find(|mapping| mapping.model_name == model_name);
 
@@ -104,7 +104,7 @@ impl RenderContext {
                     }
                 };
             }
-        });
+        };
     }
 }
 

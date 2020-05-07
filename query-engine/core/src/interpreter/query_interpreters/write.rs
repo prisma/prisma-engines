@@ -4,7 +4,6 @@ use crate::{
     QueryResult,
 };
 use connector::{ConnectionLike, Filter, WriteOperations};
-use prisma_value::PrismaValue;
 
 pub async fn execute<'a, 'b>(
     tx: &'a ConnectionLike<'a, 'b>,
@@ -18,16 +17,12 @@ pub async fn execute<'a, 'b>(
         WriteQuery::DeleteManyRecords(q) => delete_many(tx, q).await,
         WriteQuery::ConnectRecords(q) => connect(tx, q).await,
         WriteQuery::DisconnectRecords(q) => disconnect(tx, q).await,
-        WriteQuery::Raw { query, parameters } => execute_raw(tx, query, parameters).await,
+        WriteQuery::Raw(q) => execute_raw(tx, q).await,
     }
 }
 
-async fn execute_raw<'a, 'b>(
-    tx: &'a ConnectionLike<'a, 'b>,
-    query: String,
-    parameters: Vec<PrismaValue>,
-) -> InterpretationResult<QueryResult> {
-    let res = tx.execute_raw(query, parameters).await?;
+async fn execute_raw<'a, 'b>(tx: &'a ConnectionLike<'a, 'b>, q: RawQuery) -> InterpretationResult<QueryResult> {
+    let res = tx.execute_raw(q.query, q.parameters).await?;
     Ok(QueryResult::Json(res))
 }
 

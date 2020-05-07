@@ -50,12 +50,12 @@ impl QueryDocumentParser {
                     inner: Box::new(err),
                 })
             })
-            .collect::<QueryParserResult<Vec<ParsedField>>>()
+            .collect::<QueryParserResult<Vec<FieldPair>>>()
             .map(|fields| ParsedObject { fields })
     }
 
     /// Parses and validates a selection against a schema (output) field.
-    fn parse_field(selection: &Selection, schema_field: &FieldRef) -> QueryParserResult<ParsedField> {
+    fn parse_field(selection: &Selection, schema_field: &FieldRef) -> QueryParserResult<FieldPair> {
         // Parse and validate all provided arguments for the field
         Self::parse_arguments(schema_field, selection.arguments())
             .and_then(|arguments| {
@@ -70,12 +70,17 @@ impl QueryDocumentParser {
                     None => None,
                 };
 
-                Ok(ParsedField {
+                let schema_field = Arc::clone(schema_field);
+                let parsed_field = ParsedField {
                     name: selection.name().to_string(),
                     alias: selection.alias().clone(),
                     arguments,
                     nested_fields,
-                    schema_field: Arc::clone(schema_field),
+                };
+
+                Ok(FieldPair {
+                    parsed_field,
+                    schema_field,
                 })
             })
             .map_err(|err| QueryParserError::FieldValidationError {

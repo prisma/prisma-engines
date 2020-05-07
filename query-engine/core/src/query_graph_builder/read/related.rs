@@ -24,7 +24,15 @@ impl Builder<ReadQuery> for ReadRelatedRecordsBuilder {
         let args = extractors::extract_query_args(self.field.arguments, &self.model)?;
         let name = self.field.name;
         let alias = self.field.alias;
-        let sub_selections = self.field.nested_fields.unwrap().fields;
+        let sub_selections = self
+            .field
+            .nested_fields
+            .unwrap()
+            .fields
+            .into_iter()
+            .map(|fp| fp.parsed_field)
+            .collect::<Vec<_>>();
+
         let selection_order: Vec<String> = collect_selection_order(&sub_selections);
         let selected_fields = collect_selected_fields(&sub_selections, &self.model);
         let nested = collect_nested_queries(sub_selections, &self.model)?;

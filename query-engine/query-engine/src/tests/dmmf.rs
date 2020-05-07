@@ -1,5 +1,5 @@
 use prisma_models::DatamodelConverter;
-use query_core::{BuildMode, QuerySchema, QuerySchemaBuilder, SupportedCapabilities};
+use query_core::{BuildMode, QuerySchema, QuerySchemaBuilder};
 use serial_test::serial;
 use std::sync::Arc;
 
@@ -80,7 +80,7 @@ fn must_not_fail_on_missing_env_vars_in_a_datasource() {
             provider = "postgresql"
             url = env("MISSING_ENV_VAR")
         }
-        
+
         model Blog {
             blogId String @id
         }
@@ -101,9 +101,9 @@ fn get_query_schema(datamodel_string: &str) -> (QuerySchema, datamodel::dml::Dat
     let dm = datamodel::parse_datamodel_and_ignore_env_errors(datamodel_string).unwrap();
     let internal_dm_template = DatamodelConverter::convert(&dm);
     let internal_ref = internal_dm_template.build("db".to_owned());
-    let supported_capabilities = SupportedCapabilities::empty();
+
     (
-        QuerySchemaBuilder::new(&internal_ref, &supported_capabilities, BuildMode::Modern, false).build(),
+        QuerySchemaBuilder::new(&internal_ref, BuildMode::Modern, false).build(),
         dm,
     )
 }

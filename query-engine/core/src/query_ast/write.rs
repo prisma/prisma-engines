@@ -13,10 +13,7 @@ pub enum WriteQuery {
     DeleteManyRecords(DeleteManyRecords),
     ConnectRecords(ConnectRecords),
     DisconnectRecords(DisconnectRecords),
-    Raw {
-        query: String,
-        parameters: Vec<PrismaValue>,
-    },
+    Raw(RawQuery),
 }
 
 impl WriteQuery {
@@ -60,10 +57,7 @@ impl WriteQuery {
             Self::DeleteManyRecords(_) => false,
             Self::ConnectRecords(_) => false,
             Self::DisconnectRecords(_) => false,
-            Self::Raw {
-                query: _,
-                parameters: _,
-            } => unimplemented!(),
+            Self::Raw(_) => false,
         }
     }
 
@@ -76,10 +70,7 @@ impl WriteQuery {
             Self::DeleteManyRecords(q) => Arc::clone(&q.model),
             Self::ConnectRecords(q) => q.relation_field.model(),
             Self::DisconnectRecords(q) => q.relation_field.model(),
-            Self::Raw {
-                query: _,
-                parameters: _,
-            } => unimplemented!(),
+            Self::Raw(_) => unimplemented!(),
         }
     }
 }
@@ -120,7 +111,7 @@ impl std::fmt::Display for WriteQuery {
             Self::DeleteManyRecords(q) => write!(f, "DeleteManyRecords: {}", q.model.name),
             Self::ConnectRecords(_) => write!(f, "ConnectRecords"),
             Self::DisconnectRecords(_) => write!(f, "DisconnectRecords"),
-            Self::Raw { query, parameters } => write!(f, "Raw: {} ({:?})", query, parameters),
+            Self::Raw(raw) => write!(f, "Raw: {} ({:?})", raw.query, raw.parameters),
         }
     }
 }
@@ -169,6 +160,12 @@ pub struct DisconnectRecords {
     pub parent_id: Option<RecordProjection>,
     pub child_ids: Vec<RecordProjection>,
     pub relation_field: RelationFieldRef,
+}
+
+#[derive(Debug, Clone)]
+pub struct RawQuery {
+    pub query: String,
+    pub parameters: Vec<PrismaValue>,
 }
 
 impl FilteredQuery for UpdateRecord {

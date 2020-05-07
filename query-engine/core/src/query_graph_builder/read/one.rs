@@ -33,7 +33,15 @@ impl Builder<ReadQuery> for ReadOneRecordBuilder {
         let name = self.field.name;
         let alias = self.field.alias;
         let model = self.model;
-        let nested_fields = self.field.nested_fields.unwrap().fields;
+        let nested_fields = self
+            .field
+            .nested_fields
+            .unwrap()
+            .fields
+            .into_iter()
+            .map(|fp| fp.parsed_field)
+            .collect::<Vec<_>>();
+
         let selection_order: Vec<String> = collect_selection_order(&nested_fields);
         let selected_fields = collect_selected_fields(&nested_fields, &model);
         let nested = collect_nested_queries(nested_fields, &model)?;

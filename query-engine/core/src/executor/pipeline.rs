@@ -1,15 +1,15 @@
-use crate::{Env, Expression, Expressionista, IrSerializer, QueryInterpreter, QueryType, Response};
+use crate::{Env, Expressionista, IrSerializer, QueryGraph, QueryInterpreter, Response};
 
 pub struct QueryPipeline<'conn, 'tx> {
-    query: QueryType,
+    graph: QueryGraph,
     interpreter: QueryInterpreter<'conn, 'tx>,
     serializer: IrSerializer,
 }
 
 impl<'conn, 'tx> QueryPipeline<'conn, 'tx> {
-    pub fn new(query: QueryType, interpreter: QueryInterpreter<'conn, 'tx>, serializer: IrSerializer) -> Self {
+    pub fn new(graph: QueryGraph, interpreter: QueryInterpreter<'conn, 'tx>, serializer: IrSerializer) -> Self {
         Self {
-            query,
+            graph,
             interpreter,
             serializer,
         }
@@ -17,31 +17,11 @@ impl<'conn, 'tx> QueryPipeline<'conn, 'tx> {
 
     pub async fn execute(self) -> crate::Result<Response> {
         let serializer = self.serializer;
+        let graph = self.graph;
+        let expr = Expressionista::translate(graph)?;
+        let result = self.interpreter.interpret(expr, Env::default(), 0).await;
 
-        match self.query {
-            QueryType::Graph(mut graph) => {
-                // Run final validations and transformations.
-                graph.finalize()?;
-                trace!("{}", graph);
-
-                let expr = Expressionista::translate(graph)?;
-                let result = self.interpreter.interpret(expr, Env::default(), 0).await;
-
-                // trace!("{}", self.interpreter.log_output());
-                Ok(serializer.serialize(result?))
-            }
-            QueryType::Raw { query, parameters } => {
-                trace!("Raw query: {} ({:?})", query, parameters);
-
-                let result = self
-                    .interpreter
-                    .interpret(Expression::raw(query, parameters), Env::default(), 0)
-                    .await;
-
-                // trace!("{}", self.interpreter.log_output());
-
-                Ok(serializer.serialize(result?))
-            }
-        }
+        // trace!("{}", self.interpreter.log_output());
+        Ok(serializer.serialize(result?))
     }
 }

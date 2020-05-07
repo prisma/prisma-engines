@@ -10,8 +10,6 @@ pub struct InterpretingExecutor<C> {
     force_transactions: bool,
 }
 
-// Todo:
-// - Partial execution semantics?
 impl<C> InterpretingExecutor<C>
 where
     C: Connector + Send + Sync,
@@ -34,16 +32,16 @@ where
         let conn = self.connector.get_connection().await?;
 
         // Parse, validate, and extract query graphs from query document.
-        let (query, info) = QueryGraphBuilder::new(query_schema).build(operation)?;
+        let (query_graph, info) = QueryGraphBuilder::new(query_schema).build(operation)?;
 
         // Create pipelines for all separate queries
         let mut responses = Responses::with_capacity(1);
-        let needs_transaction = self.force_transactions || query.needs_transaction();
+        let needs_transaction = self.force_transactions || query_graph.transactional();
 
         let result = if needs_transaction {
             let tx = conn.start_transaction().await?;
             let interpreter = QueryInterpreter::new(ConnectionLike::Transaction(tx.as_ref()));
-            let result = QueryPipeline::new(query, interpreter, info).execute().await;
+            let result = QueryPipeline::new(query_graph, interpreter, info).execute().await;
 
             if result.is_ok() {
                 tx.commit().await?;
@@ -54,7 +52,7 @@ where
             result?
         } else {
             let interpreter = QueryInterpreter::new(ConnectionLike::Connection(conn.as_ref()));
-            QueryPipeline::new(query, interpreter, info).execute().await?
+            QueryPipeline::new(query_graph, interpreter, info).execute().await?
         };
 
         match result {

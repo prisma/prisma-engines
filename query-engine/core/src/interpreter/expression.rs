@@ -51,13 +51,6 @@ pub enum Expression {
     // },
 }
 
-impl Expression {
-    pub fn raw(query: String, parameters: Vec<PrismaValue>) -> Self {
-        let query = Query::Write(WriteQuery::Raw { query, parameters });
-        Self::Query { query }
-    }
-}
-
 pub struct Binding {
     pub name: String,
     pub expr: Expression,

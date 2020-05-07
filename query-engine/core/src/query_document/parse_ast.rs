@@ -9,7 +9,13 @@ pub type ParsedInputMap = BTreeMap<String, ParsedInputValue>;
 
 #[derive(Debug, Clone)]
 pub struct ParsedObject {
-    pub fields: Vec<ParsedField>,
+    pub fields: Vec<FieldPair>,
+}
+
+#[derive(Debug, Clone)]
+pub struct FieldPair {
+    pub parsed_field: ParsedField,
+    pub schema_field: FieldRef,
 }
 
 #[derive(Debug, Clone)]
@@ -18,15 +24,6 @@ pub struct ParsedField {
     pub alias: Option<String>,
     pub arguments: Vec<ParsedArgument>,
     pub nested_fields: Option<ParsedObject>,
-
-    /// Associated schema field
-    pub schema_field: FieldRef,
-}
-
-impl ParsedField {
-    pub fn is_raw_query(&self) -> bool {
-        self.name == "executeRaw"
-    }
 }
 
 #[derive(Debug, Clone)]
@@ -41,15 +38,6 @@ pub enum ParsedInputValue {
     OrderBy(OrderBy),
     List(Vec<ParsedInputValue>),
     Map(ParsedInputMap),
-}
-
-impl ParsedArgument {
-    pub fn into_value(self) -> Option<PrismaValue> {
-        match self.value {
-            ParsedInputValue::Single(val) => Some(val),
-            _ => None,
-        }
-    }
 }
 
 pub trait ArgumentListLookup {

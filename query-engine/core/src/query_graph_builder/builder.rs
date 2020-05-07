@@ -1,57 +1,8 @@
 use super::*;
 use crate::{query_document::*, query_graph::*, schema::*, IrSerializer};
-use prisma_value::PrismaValue;
 
-// TODO: Think about if this is really necessary here, or if the whole code should move into
-// the query_document module, possibly already as part of the parser.
 pub struct QueryGraphBuilder {
     pub query_schema: QuerySchemaRef,
-}
-
-pub enum QueryType {
-    Graph(QueryGraph),
-    Raw {
-        query: String,
-        parameters: Vec<PrismaValue>,
-    },
-}
-
-impl QueryType {
-    pub fn needs_transaction(&self) -> bool {
-        match self {
-            Self::Graph(qg) => qg.needs_transaction(),
-            Self::Raw { .. } => false,
-        }
-    }
-}
-
-#[derive(Default)]
-struct RawArgs {
-    query: String,
-    parameters: Vec<PrismaValue>,
-}
-
-impl RawArgs {
-    fn add_arg(&mut self, arg: Option<ParsedArgument>) {
-        if let Some(arg) = arg {
-            if arg.name == "query" {
-                self.query = arg.into_value().unwrap().into_string().unwrap();
-            } else {
-                self.parameters = arg.into_value().unwrap().into_list().unwrap();
-            }
-        }
-    }
-}
-
-impl From<Vec<ParsedArgument>> for RawArgs {
-    fn from(mut args: Vec<ParsedArgument>) -> Self {
-        let mut ra = Self::default();
-
-        ra.add_arg(args.pop());
-        ra.add_arg(args.pop());
-
-        ra
-    }
 }
 
 impl QueryGraphBuilder {
@@ -60,69 +11,92 @@ impl QueryGraphBuilder {
     }
 
     /// Maps an operation to a query.
-    pub fn build(self, operation: Operation) -> QueryGraphBuilderResult<(QueryType, IrSerializer)> {
+    pub fn build(self, operation: Operation) -> QueryGraphBuilderResult<(QueryGraph, IrSerializer)> {
         match operation {
-            Operation::Read(selection) => self.map_read_operation(selection),
-            Operation::Write(selection) => self.map_write_operation(selection),
+            Operation::Read(selection) => self.build_internal(selection, &self.query_schema.query()),
+            Operation::Write(selection) => self.build_internal(selection, &self.query_schema.mutation()),
         }
     }
 
-    /// Maps a read operation to one or more queries.
-    fn map_read_operation(&self, read_selection: Selection) -> QueryGraphBuilderResult<(QueryType, IrSerializer)> {
-        let query_object = self.query_schema.query();
-        Self::process(read_selection, &query_object)
-    }
+    // /// Maps a read operation to one or more queries.
+    // fn map_read_operation(&self, read_selection: Selection) -> QueryGraphBuilderResult<(QueryGraph, IrSerializer)> {
+    //     let query_object = self.query_schema.query();
+    //     Self::process(read_selection, &query_object)
+    // }
 
-    /// Maps a write operation to one or more queries.
-    fn map_write_operation(&self, write_selection: Selection) -> QueryGraphBuilderResult<(QueryType, IrSerializer)> {
-        let mutation_object = self.query_schema.mutation();
+    // /// Maps a write operation to one or more queries.
+    // fn map_write_operation(&self, write_selection: Selection) -> QueryGraphBuilderResult<(QueryGraph, IrSerializer)> {
+    //     let mutation_object = self.query_schema.mutation();
+    //     let (mut graph, ir_ser) = Self::process(write_selection, &mutation_object)?;
 
-        let (mut graph, ir_ser) = Self::process(write_selection, &mutation_object)?;
+    //     // [DTODO] This needs to  move... and do the right thing
+    //     // if let QueryGraph::Graph(ref mut graph) = graph {
+    //     //     graph.flag_transactional();
+    //     // };
 
-        if let QueryType::Graph(ref mut graph) = graph {
-            graph.flag_transactional();
-        };
+    //     Ok((graph, ir_ser))
+    // }
 
-        Ok((graph, ir_ser))
-    }
-
-    fn process(
+    fn build_internal(
+        &self,
         selection: Selection,
         object: &ObjectTypeStrongRef,
-    ) -> QueryGraphBuilderResult<(QueryType, IrSerializer)> {
+    ) -> QueryGraphBuilderResult<(QueryGraph, IrSerializer)> {
+        // [DTODO] The parsing should not require wrapping.
         let mut selections = vec![selection];
         let mut parsed_object = QueryDocumentParser::parse_object(&selections, object)?;
 
-        let parsed_field = parsed_object.fields.pop().unwrap();
-        let result_info = Self::derive_serializer(&selections.pop().unwrap(), &parsed_field);
+        let field_pair = parsed_object.fields.pop().unwrap();
+        let result_info = Self::derive_serializer(&selections.pop().unwrap(), &field_pair.schema_field);
 
-        let query_type = match &parsed_field.schema_field.clone().query_builder {
-            Some(builder) => Ok(QueryType::Graph(builder.build(parsed_field)?)),
-            None if parsed_field.is_raw_query() => {
-                let raw_args = RawArgs::from(parsed_field.arguments);
-
-                Ok(QueryType::Raw {
-                    query: raw_args.query,
-                    parameters: raw_args.parameters,
-                })
-            }
-            None => Err(QueryGraphBuilderError::SchemaError(format!(
-                "Expected attached query builder on {} object, root level field '{}'.",
+        if field_pair.schema_field.query_info.is_some() {
+            let graph = self.dispatch_build(field_pair)?;
+            Ok((graph, result_info))
+        } else {
+            Err(QueryGraphBuilderError::SchemaError(format!(
+                "Expected query information to be attached on schema object '{}', field '{}'.",
                 object.name(),
-                parsed_field.name
-            ))),
-        }?;
-
-        Ok((query_type, result_info))
+                field_pair.parsed_field.name
+            )))
+        }
     }
 
-    fn derive_serializer(selection: &Selection, field: &ParsedField) -> IrSerializer {
+    fn derive_serializer(selection: &Selection, field: &FieldRef) -> IrSerializer {
         IrSerializer {
             key: selection
                 .alias()
                 .clone()
                 .unwrap_or_else(|| selection.name().to_string()),
-            output_type: field.schema_field.field_type.clone(),
+            output_type: field.field_type.clone(),
         }
+    }
+
+    fn dispatch_build(&self, field_pair: FieldPair) -> QueryGraphBuilderResult<QueryGraph> {
+        let mut graph = QueryGraph::new();
+        let query_info = field_pair.schema_field.query_info.as_ref().unwrap();
+
+        match (&query_info.tag, &query_info.model) {
+            (QueryTag::FindOne, Some(model)) => todo!(),
+            (QueryTag::FindMany, Some(model)) => todo!(),
+            (QueryTag::Aggregate, Some(model)) => todo!(),
+            (QueryTag::CreateOne, Some(model)) => todo!(),
+            (QueryTag::UpdateOne, Some(model)) => todo!(),
+            (QueryTag::UpdateMany, Some(model)) => todo!(),
+            (QueryTag::UpsertOne, Some(model)) => todo!(),
+            (QueryTag::DeleteOne, Some(model)) => todo!(),
+            (QueryTag::DeleteMany, Some(model)) => todo!(),
+            (QueryTag::Raw, _) => write::raw_query(&mut graph, field_pair.parsed_field),
+            (tag, model_opt) => Err(QueryGraphBuilderError::SchemaError(format!(
+                "Query tag '{}' and model '{:?}' combination invalid.",
+                tag,
+                model_opt.as_ref().map(|model| model.name.as_str())
+            ))),
+        }?;
+
+        // Run final transformations.
+        graph.finalize()?;
+        trace!("{}", graph);
+
+        Ok(graph)
     }
 }

@@ -1,8 +1,5 @@
 use crate::{exec_loader, PrismaError, PrismaResult};
-use query_core::{
-    schema::{QuerySchemaRef, SupportedCapabilities},
-    BuildMode, QueryExecutor, QuerySchemaBuilder,
-};
+use query_core::{schema::QuerySchemaRef, BuildMode, QueryExecutor, QuerySchemaBuilder};
 // use prisma_models::InternalDataModelRef;
 use datamodel::{Configuration, Datamodel};
 use prisma_models::DatamodelConverter;
@@ -80,12 +77,7 @@ impl PrismaContext {
 
         // Construct query schema
         let build_mode = if legacy { BuildMode::Legacy } else { BuildMode::Modern };
-
-        let capabilities = SupportedCapabilities::empty(); // todo connector capabilities.
-
-        let schema_builder =
-            QuerySchemaBuilder::new(&internal_data_model, &capabilities, build_mode, enable_raw_queries);
-
+        let schema_builder = QuerySchemaBuilder::new(&internal_data_model, build_mode, enable_raw_queries);
         let query_schema: QuerySchemaRef = Arc::new(schema_builder.build());
 
         Ok(Self {

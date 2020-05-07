@@ -76,11 +76,11 @@ pub struct QueryGraph {
     /// More docs can be found on `swap_marked`.
     marked_node_pairs: Vec<(NodeRef, NodeRef)>,
 
+    /// State marker designating whether or not the graph has undergone finalization.
     finalized: bool,
 
-    /// For now a stupid marker if the query graph needs to be run inside a
-    /// transaction. Should happen if any of the queries is writing data.
-    needs_transaction: bool,
+    /// Marks the entire query graph for execution in a single transaction.
+    transactional: bool,
 }
 
 /// Implementation detail of the QueryGraph.
@@ -97,21 +97,13 @@ impl QueryGraph {
     pub fn finalize(&mut self) -> QueryGraphResult<()> {
         if !self.finalized {
             self.swap_marked()?;
-            // self.insert_reloads()?;
-            // self.insert_result_relation_reloads()?;
             self.finalized = true;
         }
-
-        // self.validate()?;
 
         Ok(())
     }
 
-    // pub fn validate(&self) -> QueryGraphResult<()> {
-    //     after_graph_completion(self)
-    // }
-
-    /// Adds a result node to the graph.
+    /// Marks given node as a (possible) result node of the query graph.
     pub fn add_result_node(&mut self, node: &NodeRef) {
         self.result_nodes.push(node.node_ix.clone());
     }
@@ -155,6 +147,17 @@ impl QueryGraph {
             .collect()
     }
 
+    /// Mark the query graph to run inside of a transaction.
+    pub fn flag_transactional(&mut self) {
+        self.transactional = true;
+    }
+
+    /// If true, the graph should be executed inside of a transaction.
+    pub fn transactional(&self) -> bool {
+        self.transactional
+    }
+
+    /// Creates a node with given query in the graph and returns a `NodeRef` to the created node.
     pub fn create_node(&mut self, q: Query) -> NodeRef {
         let node_ix = self.graph.add_node(q);
 
@@ -162,29 +165,11 @@ impl QueryGraph {
     }
 
     /// Creates an edge with given `content`, originating from node `from` and pointing to node `to`.
-    /// Checks are run after edge creation to ensure validity of the query graph.
     /// Returns an `EdgeRef` to the newly added edge.
-    /// Todo currently panics, change interface to result type.
-    pub fn create_edge(
-        &mut self,
-        from: &NodeRef,
-        to: &NodeRef,
-        content: Option<RelationFieldRef>,
-    ) -> QueryGraphResult<EdgeRef> {
+    pub fn create_edge(&mut self, from: &NodeRef, to: &NodeRef, content: Option<RelationFieldRef>) -> EdgeRef {
         let edge_ix = self.graph.add_edge(from.node_ix, to.node_ix, content);
-        Ok(EdgeRef { edge_ix })
 
-        // after_edge_creation(self, &edge).map(|_| edge)
-    }
-
-    /// Mark the query graph to need a transaction.
-    pub fn flag_transactional(&mut self) {
-        self.needs_transaction = true;
-    }
-
-    /// If true, the graph should be executed inside of a transaction.
-    pub fn needs_transaction(&self) -> bool {
-        self.needs_transaction
+        EdgeRef { edge_ix }
     }
 
     /// Returns a reference to the content of `node`, if the content is still present.
@@ -200,12 +185,14 @@ impl QueryGraph {
     /// Returns the node from where `edge` originates (e.g. source).
     pub fn edge_source(&self, edge: &EdgeRef) -> NodeRef {
         let (node_ix, _) = self.graph.edge_endpoints(edge.edge_ix).unwrap();
+
         NodeRef { node_ix }
     }
 
     /// Returns the node to which `edge` points (e.g. target).
     pub fn edge_target(&self, edge: &EdgeRef) -> NodeRef {
         let (_, node_ix) = self.graph.edge_endpoints(edge.edge_ix).unwrap();
+
         NodeRef { node_ix }
     }
 
@@ -405,7 +392,7 @@ impl QueryGraph {
                     child_node.id()
                 );
 
-                self.create_edge(&parent_of_parent_node, &child_node, None)?;
+                self.create_edge(&parent_of_parent_node, &child_node, None);
             }
 
             // Find existing edge between parent and child. Can only be one at most.
@@ -417,7 +404,7 @@ impl QueryGraph {
             // Remove edge and reinsert edge in reverse.
             if let Some(edge) = existing_edge {
                 let content = self.remove_edge(edge).map(|rf| rf.related_field());
-                self.create_edge(&child_node, &parent_node, content)?;
+                self.create_edge(&child_node, &parent_node, content);
             }
         }
 
