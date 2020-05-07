@@ -14,15 +14,18 @@ pub fn is_migration_table(table: &Table) -> bool {
     table.name == "_Migration"
 }
 
-//todo tighten this condition
-pub(crate) fn is_prisma_1_or_11_list_table(table: &Table) -> bool {
+pub(crate) fn is_relay_table(table: &Table) -> bool {
     table.name == "_RelayId"
+        && table.columns[0].name == "id"
+        && table.columns[1].name.to_lowercase() == "stablemodelidentifier"
 }
 
-//todo tighten this condition
-pub(crate) fn is_relay_table(table: &Table) -> bool {
-    println!("{:?}", table);
-    table.columns.len() == 3 && table.indices.len() >= 1 && table.columns[0].name.to_lowercase() == "nodeid"
+pub(crate) fn is_prisma_1_or_11_list_table(table: &Table) -> bool {
+    table.columns.len() == 3
+        && table.indices.len() >= 1
+        && table.columns[0].name.to_lowercase() == "nodeid"
+        && table.columns[1].name == "position"
+        && table.columns[2].name == "value"
 }
 
 pub(crate) fn is_prisma_1_point_1_or_2_join_table(table: &Table) -> bool {
