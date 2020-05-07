@@ -604,5 +604,5 @@ fn unescape_and_unquote_default_string(default: String, flavour: &Flavour) -> St
         default.into()
     };
 
-    dbg!(MYSQL_ESCAPING_RE.replace_all(maybe_unquoted.as_ref(), "$1$2").into())
+    MYSQL_ESCAPING_RE.replace_all(maybe_unquoted.as_ref(), "$1$2").into()
 }
