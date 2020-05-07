@@ -123,10 +123,14 @@ impl<T: 'static> DirectiveListValidator<T> {
                         }
                     }
                 }
-                None => errors.push(DatamodelError::new_directive_not_known_error(
-                    &directive.name.name,
-                    directive.name.span,
-                )),
+                None => {
+                    if !directive.name.name.is_empty() {
+                        errors.push(DatamodelError::new_directive_not_known_error(
+                            &directive.name.name,
+                            directive.name.span,
+                        ))
+                    }
+                }
             };
         }
 

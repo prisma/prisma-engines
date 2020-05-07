@@ -66,6 +66,7 @@ pub struct DMMFTypeInfo {
     pub kind: TypeKind,
     pub is_required: bool,
     pub is_list: bool,
+    pub is_nullable: bool,
 }
 
 #[derive(Clone, Copy, Debug, Serialize, Deserialize)]

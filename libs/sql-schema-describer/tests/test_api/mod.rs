@@ -17,7 +17,7 @@ pub struct TestApi {
 }
 
 impl TestApi {
-    pub(crate) async fn describe(&self) -> Result<SqlSchema, failure::Error> {
+    pub(crate) async fn describe(&self) -> Result<SqlSchema, anyhow::Error> {
         let db = Arc::clone(&self.database);
         let describer: Box<dyn sql_schema_describer::SqlSchemaDescriberBackend> = match self.sql_family() {
             SqlFamily::Postgres => Box::new(sql_schema_describer::postgres::SqlSchemaDescriber::new(db)),

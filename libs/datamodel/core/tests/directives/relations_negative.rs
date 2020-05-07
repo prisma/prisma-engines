@@ -18,7 +18,7 @@ fn should_fail_on_ambiguous_relations_with_automatic_names_1() {
     let errors = parse_error(dml);
 
     errors.assert_is(
-        DatamodelError::new_model_validation_error("Ambiguous relation detected. The fields `posts` and `more_posts` in model `User` both refer to `Post`. Please provide different relation names for them by adding `@relation(<name>).", "User", Span::new(45, 57)),
+        DatamodelError::new_model_validation_error("Ambiguous relation detected. The fields `posts` and `more_posts` in model `User` both refer to `Post`. Please provide different relation names for them by adding `@relation(<name>).", "User", Span::new(45, 58)),
     );
 }
 
@@ -41,7 +41,7 @@ fn should_fail_on_ambiguous_relations_with_automatic_names_2() {
     let errors = parse_error(dml);
 
     errors.assert_is(
-        DatamodelError::new_model_validation_error("Ambiguous relation detected. The fields `author1` and `author2` in model `Post` both refer to `User`. Please provide different relation names for them by adding `@relation(<name>).", "Post", Span::new(114, 126)),
+        DatamodelError::new_model_validation_error("Ambiguous relation detected. The fields `author1` and `author2` in model `Post` both refer to `User`. Please provide different relation names for them by adding `@relation(<name>).", "Post", Span::new(114, 127)),
     );
 }
 
@@ -65,7 +65,7 @@ fn should_fail_on_ambiguous_relations_with_manual_names_1() {
         DatamodelError::new_model_validation_error(
             "Wrongly named relation detected. The fields `posts` and `more_posts` in model `User` both use the same relation name. Please provide different relation names for them through `@relation(<name>).", 
             "User", 
-            Span::new(45, 81)
+            Span::new(45, 82)
         ),
     );
 }
@@ -91,7 +91,7 @@ fn should_fail_on_ambiguous_relations_with_manual_names_2() {
     errors.assert_is(DatamodelError::new_model_validation_error(
         "Wrongly named relation detected. The fields `posts` and `even_more_posts` in model `User` both use the same relation name. Please provide different relation names for them through `@relation(<name>).",
         "User",
-        Span::new(45, 78),
+        Span::new(45, 79),
     ));
 }
 
@@ -111,7 +111,7 @@ fn should_fail_on_ambiguous_self_relation() {
     errors.assert_is(DatamodelError::new_model_validation_error(
         "Unnamed self relation detected. The fields `father`, `son` and `mother` in model `User` have no relation name. Please provide a relation name for one of them by adding `@relation(<name>).",
         "User",
-        Span::new(45, 56),
+        Span::new(45, 57),
     ));
 }
 
@@ -130,7 +130,7 @@ fn should_fail_on_ambiguous_self_relation_with_two_fields() {
     errors.assert_is(DatamodelError::new_model_validation_error(
         "Ambiguous self relation detected. The fields `child` and `mother` in model `User` both refer to `User`. If they are part of the same relation add the same relation name for them with `@relation(<name>)`.",
         "User",
-        Span::new(57, 67),
+        Span::new(57, 68),
     ));
 }
 
@@ -150,7 +150,7 @@ fn should_fail_on_ambiguous_named_self_relation() {
     errors.assert_is(DatamodelError::new_model_validation_error(
         "Wrongly named self relation detected. The fields `father`, `son` and `mother` in model `User` have the same relation name. At most two relation fields can belong to the same relation and therefore have the same name. Please assign a different relation name to one of them.",
         "User",
-        Span::new(45, 82),
+        Span::new(45, 83),
     ));
 }
 
@@ -174,7 +174,7 @@ fn should_fail_on_conflicting_back_relation_field_name() {
     errors.assert_is(DatamodelError::new_model_validation_error(
         "Automatic related field generation would cause a naming conflict. Please add an explicit opposite relation field.",
         "User",
-        Span::new(90, 107),
+        Span::new(90, 108),
     ));
 }
 

@@ -165,7 +165,7 @@ class DeleteManyRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBa
       project
     )
 
-    val filter = """{ bottom: {veryBottom: {veryBottom_not: null}}}"""
+    val filter = """{ bottom: {veryBottom: {veryBottom: "veryBottom"}}}"""
 
     val firstCount        = topCount
     val filterQueryCount  = server.query(s"""{tops(where: $filter){id}}""", project).pathAsSeq("data.tops").length

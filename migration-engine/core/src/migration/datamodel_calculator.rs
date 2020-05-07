@@ -126,6 +126,7 @@ fn apply_create_enum(datamodel: &mut ast::SchemaAst, step: &steps::CreateEnum) -
         .map(|value_name| ast::EnumValue {
             name: Identifier::new(value_name),
             directives: vec![],
+            documentation: None,
             span: new_span(),
             commented_out: false,
         })
@@ -350,6 +351,7 @@ fn add_enum_values(r#enum: &mut ast::Enum, added_values: &[String]) {
         .extend(added_values.iter().map(|added_name| ast::EnumValue {
             name: Identifier::new(added_name),
             directives: vec![],
+            documentation: None,
             span: new_span(),
             commented_out: false,
         }))

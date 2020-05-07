@@ -28,10 +28,9 @@ class InsertingNullInRequiredFieldsSpec extends FlatSpec with Matchers with ApiS
       project
     )
 
-    if (connectorConfig.name != "mysql56")
-      {
-        server.queryThatMustFail(
-          """mutation b {
+    if (connectorConfig.name != "mysql56") {
+      server.queryThatMustFail(
+        """mutation b {
             |  updateA(
             |    where: { b: "abc" }
             |    data: {
@@ -40,11 +39,11 @@ class InsertingNullInRequiredFieldsSpec extends FlatSpec with Matchers with ApiS
             |    id
             |  }
             |}""",
-          project,
-          errorCode = 2011, // 3020
-          errorContains = "Null constraint violation on the fields: (`key`)"
-        )
-      }
+        project,
+        errorCode = 2012,
+        errorContains = "Missing a required value at `Mutation.updateA.data.AUpdateInput.key`"
+      )
+    }
   }
 
   "Creating a required value as null" should "throw a proper error" in {

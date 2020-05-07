@@ -42,7 +42,6 @@ class FilterSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "Queries" should "display all items if no filter is given" in {
-
     val filter = ""
 
     userUniques(filter) should be(Vector(1, 2, 3, 4))
@@ -51,7 +50,6 @@ class FilterSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "Simple filter" should "work" in {
-
     val filter = """(where: {name: "John"})"""
 
     userUniques(filter) should be(Vector(4))
@@ -60,98 +58,84 @@ class FilterSpec extends FlatSpec with Matchers with ApiSpecBase {
   // todo Null and lists is weird
 
   "Using _in with null" should "return all nodes with null for that field" in {
-
     val filter = """(where: {optional_in: null})"""
 
     userUniques(filter) should be(Vector(1, 2, 3, 4))
   }
 
   "Using _in with [null]" should "return all nodes with null for that field" ignore {
-
     val filter = """(where: {optional_in: ["test", null]})"""
 
     userUniques(filter) should be(Vector(1, 2, 3, 4))
   }
 
-  "Relation Null filter" should "work" ignore { // todo reenable
-
-    val filter = "(where: {ride: null})"
+  "Relation Null filter" should "work" in {
+    val filter = "(where: { ride: null })"
 
     userUniques(filter) should be(Vector(4))
   }
 
   "AND filter" should "work" in {
-
     val filter = """(where: {AND:[{unique_gt: 2},{name_starts_with: "P"}]})"""
 
     userUniques(filter) should be(Vector())
   }
 
   "Empty AND filter" should "work" in {
-
     val filter = """(where: {AND:[]})"""
 
     userUniques(filter) should be(Vector(1, 2, 3, 4))
   }
 
   "OR filter" should "work" taggedAs (IgnoreMongo) in {
-
     val filter = """(where: {OR:[{unique_gt: 2},{name_starts_with: "P"}]})"""
 
     userUniques(filter) should be(Vector(1, 3, 4))
   }
 
   "Empty OR filter" should "work" taggedAs (IgnoreMongo) in {
-
     val filter = """(where: {OR:[]})"""
 
     userUniques(filter) should be(Vector())
   }
 
   "Empty NOT filter" should "work" taggedAs (IgnoreMongo) in {
-
     val filter = """(where: {NOT:[]})"""
 
     userUniques(filter) should be(Vector(1, 2, 3, 4))
   }
 
   "NOT filter" should "work" taggedAs (IgnoreMongo) in {
-
     val filter = """(where: {NOT:{name_starts_with: "P"}})"""
 
     userUniques(filter) should be(Vector(2, 3, 4))
   }
 
   "NOT filter" should "work as list" taggedAs (IgnoreMongo) in {
-
     val filter = """(where: {NOT:[{name_contains: "e"},{unique:1}]})"""
 
     userUniques(filter) should be(Vector(4))
   }
 
   "Nested filter" should "work" in {
-
     val filter = """(where: {ride:{brand_starts_with: "P"}})"""
 
     userUniques(filter) should be(Vector(1))
   }
 
   "Starts with filter" should "work" in {
-
     val filter = """(where: {name_starts_with: "P"})"""
 
     userUniques(filter) should be(Vector(1))
   }
 
   "Contains filter" should "work" in {
-
     val filter = """(where: {name_contains: "n"})"""
 
     userUniques(filter) should be(Vector(2, 4))
   }
 
   "Greater than filter" should "work with floats" in {
-
     val filter = """(where: {size_gt: 100.500000000001})"""
 
     lotUniques(filter) should be(Vector(1))

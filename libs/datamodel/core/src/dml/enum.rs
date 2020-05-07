@@ -73,6 +73,7 @@ pub struct EnumValue {
     pub name: String,
     /// Actual value as defined in the database
     pub database_name: Option<String>,
+    pub documentation: Option<String>,
     /// Has to be commented out.
     pub commented_out: bool,
 }
@@ -83,6 +84,7 @@ impl EnumValue {
         EnumValue {
             name: String::from(name),
             database_name: database_name.map(String::from),
+            documentation: None,
             commented_out: false,
         }
     }
@@ -90,9 +92,7 @@ impl EnumValue {
     /// The effective database name, i.e. the name in the @map annotation, and failing that the
     /// identifier name.
     pub fn final_database_name(&self) -> &str {
-        self.database_name
-            .as_deref()
-            .unwrap_or(self.name.as_str())
+        self.database_name.as_deref().unwrap_or(self.name.as_str())
     }
 }
 
