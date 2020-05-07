@@ -714,18 +714,30 @@ fn unsuffix_default_literal<'a>(literal: &'a str, data_type: &str, full_data_typ
 }
 
 fn process_string_literal<'a>(literal: &'a str) -> Cow<'a, str> {
-    const POSTGRES_STRING_DEFAULT_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"(?ms)^B?'(.*)'$"#).unwrap());
-    const POSTGRES_DEFAULT_QUOTE_UNESCAPE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"'(')"#).unwrap());
-    const POSTGRES_DEFAULT_BACKSLASH_UNESCAPE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"\\(["'\\])"#).unwrap());
+    static POSTGRES_STRING_DEFAULT_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"(?ms)^B?'(.*)'$"#).unwrap());
+    static POSTGRES_DEFAULT_QUOTE_UNESCAPE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"'(')"#).unwrap());
+    static POSTGRES_DEFAULT_BACKSLASH_UNESCAPE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"\\(["'\\])"#).unwrap());
+    static POSTGRES_STRING_DEFAULTS_PIPELINE: &[(&Lazy<Regex>, &str)] = &[
+        (&POSTGRES_STRING_DEFAULT_RE, "$1"),
+        (&POSTGRES_DEFAULT_QUOTE_UNESCAPE_RE, "$1"),
+        (&POSTGRES_DEFAULT_BACKSLASH_UNESCAPE_RE, "$1"),
+    ];
 
-    let quote_unescaped = POSTGRES_DEFAULT_QUOTE_UNESCAPE_RE.replace_all(literal, "$1");
-    let backslash_unescaped = POSTGRES_DEFAULT_BACKSLASH_UNESCAPE_RE.replace_all(literal, "$1");
-
-    todo!()
+    chain_replaces(literal, POSTGRES_STRING_DEFAULTS_PIPELINE)
 }
 
-fn chain_replaces<'a>(s: &'a str, replaces: &[(Regex, &str)]) -> Cow<'a, str> {
+fn chain_replaces<'a>(s: &'a str, replaces: &[(&Lazy<Regex>, &str)]) -> Cow<'a, str> {
     let mut out = Cow::Borrowed(s);
+
+    for (re, replacement) in replaces.iter() {
+        if !re.is_match(out.as_ref()) {
+            continue;
+        }
+
+        let replaced = re.replace_all(out.as_ref(), *replacement);
+
+        out = Cow::Owned(replaced.into_owned())
+    }
 
     out
 }
