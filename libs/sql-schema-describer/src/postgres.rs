@@ -2,9 +2,7 @@
 use super::*;
 use quaint::prelude::Queryable;
 use regex::Regex;
-use std::collections::HashMap;
-use std::convert::TryInto;
-use std::sync::Arc;
+use std::{borrow::Cow, collections::HashMap, convert::TryInto, sync::Arc};
 use tracing::debug;
 
 pub struct SqlSchemaDescriber {
@@ -227,9 +225,9 @@ impl SqlSchemaDescriber {
                             },
                             ColumnTypeFamily::String => {
                                 match unsuffix_default_literal(&default_string, &data_type, &full_data_type) {
-                                    Some(default_literal) => {
-                                        DefaultValue::VALUE(PrismaValue::String(unquote_string(default_literal.into())))
-                                    }
+                                    Some(default_literal) => DefaultValue::VALUE(PrismaValue::String(
+                                        process_string_literal(default_literal.as_ref()).into(),
+                                    )),
                                     None => DefaultValue::DBGENERATED(default_string),
                                 }
                             }
@@ -700,11 +698,9 @@ fn is_autoincrement(value: &str, schema_name: &str, table_name: &str, column_nam
         .unwrap_or(false)
 }
 
-fn unsuffix_default_literal<'a>(literal: &'a str, data_type: &str, full_data_type: &str) -> Option<&'a str> {
-    static POSTGRES_STRING_DEFAULT_RE: Lazy<regex::Regex> = Lazy::new(|| regex::Regex::new(r#"^B?'(.*)'$"#).unwrap());
-
-    static POSTGRES_DATA_TYPE_SUFFIX_RE: Lazy<regex::Regex> =
-        Lazy::new(|| regex::Regex::new(r#"(.*)::(\\")?(.*)(\\")?$"#).unwrap());
+fn unsuffix_default_literal<'a>(literal: &'a str, data_type: &str, full_data_type: &str) -> Option<Cow<'a, str>> {
+    const POSTGRES_DATA_TYPE_SUFFIX_RE: Lazy<Regex> =
+        Lazy::new(|| Regex::new(r#"(?ms)^(.*)::(\\")?(.*)(\\")?$"#).unwrap());
 
     let captures = POSTGRES_DATA_TYPE_SUFFIX_RE.captures(literal)?;
     let suffix = captures.get(3).unwrap().as_str();
@@ -713,11 +709,39 @@ fn unsuffix_default_literal<'a>(literal: &'a str, data_type: &str, full_data_typ
         return None;
     }
 
-    let raw = captures.get(1).unwrap().as_str();
+    let first_capture = captures.get(1).unwrap().as_str();
 
-    let captures = POSTGRES_STRING_DEFAULT_RE.captures(raw)?;
+    Some(first_capture.into())
+}
 
-    Some(captures.get(1).unwrap().as_str())
+// See https://www.postgresql.org/docs/9.3/sql-syntax-lexical.html
+fn process_string_literal<'a>(literal: &'a str) -> Cow<'a, str> {
+    static POSTGRES_STRING_DEFAULT_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"(?ms)^B?'(.*)'$"#).unwrap());
+    static POSTGRES_DEFAULT_QUOTE_UNESCAPE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"'(')"#).unwrap());
+    static POSTGRES_DEFAULT_BACKSLASH_UNESCAPE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"\\(["'\\])"#).unwrap());
+    static POSTGRES_STRING_DEFAULTS_PIPELINE: &[(&Lazy<Regex>, &str)] = &[
+        (&POSTGRES_STRING_DEFAULT_RE, "$1"),
+        (&POSTGRES_DEFAULT_QUOTE_UNESCAPE_RE, "$1"),
+        (&POSTGRES_DEFAULT_BACKSLASH_UNESCAPE_RE, "$1"),
+    ];
+
+    chain_replaces(literal, POSTGRES_STRING_DEFAULTS_PIPELINE)
+}
+
+fn chain_replaces<'a>(s: &'a str, replaces: &[(&Lazy<Regex>, &str)]) -> Cow<'a, str> {
+    let mut out = Cow::Borrowed(s);
+
+    for (re, replacement) in replaces.iter() {
+        if !re.is_match(out.as_ref()) {
+            continue;
+        }
+
+        let replaced = re.replace_all(out.as_ref(), *replacement);
+
+        out = Cow::Owned(replaced.into_owned())
+    }
+
+    out
 }
 
 #[cfg(test)]

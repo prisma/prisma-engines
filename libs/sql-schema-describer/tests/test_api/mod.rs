@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use barrel::Migration;
 use quaint::{
     prelude::{Queryable, SqlFamily},
@@ -6,6 +8,8 @@ use quaint::{
 use sql_schema_describer::*;
 use std::sync::Arc;
 use test_setup::*;
+
+pub type TestResult = anyhow::Result<()>;
 
 pub struct TestApi {
     /// More precise than SqlFamily.

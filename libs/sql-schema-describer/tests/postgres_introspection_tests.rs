@@ -1,12 +1,13 @@
+mod common;
+mod postgres;
+mod test_api;
+
+use crate::{common::*, postgres::*};
 use barrel::{types, Migration};
 use pretty_assertions::assert_eq;
 use sql_schema_describer::*;
-
-mod common;
-mod postgres;
-
-use crate::common::*;
-use crate::postgres::*;
+use test_api::*;
+use test_macros::test_each_connector;
 
 #[tokio::test]
 async fn all_postgres_column_types_must_work() {
@@ -833,4 +834,52 @@ async fn postgres_multi_field_indexes_must_be_inferred_in_the_right_order() {
 
     assert!(!index.tpe.is_unique());
     assert_eq!(&index.columns, &["age", "name"]);
+}
+
+#[test_each_connector(tags("postgres"))]
+async fn escaped_quotes_in_string_defaults_must_be_unescaped(api: &TestApi) -> TestResult {
+    let create_table = format!(
+        r#"
+            CREATE TABLE "{0}"."string_defaults_test" (
+                id INTEGER PRIMARY KEY,
+                regular VARCHAR NOT NULL DEFAULT E'meow, says the cat',
+                escaped VARCHAR NOT NULL DEFAULT E'"That\'s a lot of fish!" - Godzilla, 1998'
+            );
+        "#,
+        api.schema_name()
+    );
+
+    api.database().query_raw(&create_table, &[]).await?;
+
+    let schema = api.describe().await?;
+
+    let table = schema.table_bang("string_defaults_test");
+
+    let regular_column_default = table
+        .column_bang("regular")
+        .default
+        .as_ref()
+        .unwrap()
+        .as_value()
+        .unwrap()
+        .clone()
+        .into_string()
+        .unwrap();
+
+    assert_eq!(regular_column_default, "meow, says the cat");
+
+    let escaped_column_default = table
+        .column_bang("escaped")
+        .default
+        .as_ref()
+        .unwrap()
+        .as_value()
+        .unwrap()
+        .clone()
+        .into_string()
+        .unwrap();
+
+    assert_eq!(escaped_column_default, r#""That's a lot of fish!" - Godzilla, 1998"#);
+
+    Ok(())
 }
