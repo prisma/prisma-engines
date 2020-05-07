@@ -242,7 +242,7 @@ impl<'a> Renderer<'a> {
         self.end_line();
     }
 
-    fn render_field(target: &mut TableFormat, field: &ast::Field, is_commented_out: bool) {
+    pub fn render_field(target: &mut TableFormat, field: &ast::Field, is_commented_out: bool) {
         Self::render_documentation(&mut target.interleave_writer(), field);
 
         let commented_out = if field.is_commented_out || is_commented_out {

@@ -18,6 +18,7 @@ serde_json ={version =  "1.0" ,features = ["preserve_order"]}
 failure = { version = "0.1", features = ["derive"] }
 uuid = { version = "0.8", features = ["serde", "v4"] }
 cuid = { git = "https://github.com/prisma/cuid-rust" }
+bytecount = "0.5"
 
 [dev-dependencies]
 pretty_assertions = "0.6.1"

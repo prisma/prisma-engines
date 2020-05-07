@@ -94,7 +94,7 @@ impl TableFormat {
         }
     }
 
-    fn start_new_line(&mut self) {
+    pub fn start_new_line(&mut self) {
         self.table.push(Row::Regular(Vec::new()));
         self.row += 1;
     }
