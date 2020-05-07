@@ -126,6 +126,7 @@ pub struct Builder {
     manager: QuaintManager,
     connection_info: ConnectionInfo,
     connection_limit: usize,
+    max_idle: Option<u64>,
     max_idle_lifetime: Option<Duration>,
     health_check_interval: Option<Duration>,
     test_on_check_out: bool,
@@ -141,6 +142,7 @@ impl Builder {
             manager,
             connection_info,
             connection_limit,
+            max_idle: None,
             max_idle_lifetime: None,
             health_check_interval: None,
             test_on_check_out: false,
@@ -153,6 +155,16 @@ impl Builder {
     /// - Defaults to two times the number of physical cores plus one.
     pub fn connection_limit(&mut self, connection_limit: usize) {
         self.connection_limit = connection_limit;
+    }
+
+    /// The maximum number of idle connections the pool can contain at the same time. If a
+    /// connection goes idle (a query returns) and there are already this number of idle connections
+    /// in the pool, a connection will be closed immediately. Consider using `max_idle_lifetime` to
+    /// close idle connections less aggressively.
+    ///
+    /// - Defaults to the same value as `connection_limit`.
+    pub fn max_idle(&mut self, max_idle: u64) {
+        self.max_idle = Some(max_idle);
     }
 
     /// A timeout for acquiring a connection with the [`check_out`] method. If
@@ -232,6 +244,7 @@ impl Builder {
 
         let inner = Pool::builder()
             .max_open(self.connection_limit as u64)
+            .max_idle(self.max_idle.unwrap_or(self.connection_limit as u64))
             .max_idle_lifetime(self.max_idle_lifetime)
             .health_check_interval(self.health_check_interval)
             .test_on_check_out(self.test_on_check_out)
