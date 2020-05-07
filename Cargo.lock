@@ -432,6 +432,7 @@ dependencies = [
  "cuid",
  "datamodel-connector",
  "failure",
+ "indoc",
  "once_cell",
  "pest_derive_tmp",
  "pest_tmp",

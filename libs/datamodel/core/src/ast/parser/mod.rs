@@ -41,8 +41,8 @@ fn unescape_string_literal(original: &str) -> Cow<'_, str> {
     const STRING_LITERAL_NEWLINE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"\\n"#).unwrap());
 
     match STRING_LITERAL_UNESCAPE_RE.replace_all(original, "$1") {
-        Cow::Owned(s) => STRING_LITERAL_NEWLINE_RE.replace(&s, "\n").into_owned().into(),
-        Cow::Borrowed(s) => STRING_LITERAL_NEWLINE_RE.replace(s, "\n"),
+        Cow::Owned(s) => STRING_LITERAL_NEWLINE_RE.replace_all(&s, "\n").into_owned().into(),
+        Cow::Borrowed(s) => STRING_LITERAL_NEWLINE_RE.replace_all(s, "\n"),
     }
 }
 
