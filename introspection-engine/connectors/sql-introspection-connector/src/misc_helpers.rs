@@ -9,9 +9,20 @@ use tracing::debug;
 
 //checks
 
-//todo make this more targeted
+//todo tighten this condition
 pub fn is_migration_table(table: &Table) -> bool {
     table.name == "_Migration"
+}
+
+//todo tighten this condition
+pub(crate) fn is_prisma_1_or_11_list_table(table: &Table) -> bool {
+    table.name == "_RelayId"
+}
+
+//todo tighten this condition
+pub(crate) fn is_relay_table(table: &Table) -> bool {
+    println!("{:?}", table);
+    table.columns.len() == 3 && table.indices.len() >= 1 && table.columns[0].name.to_lowercase() == "nodeid"
 }
 
 pub(crate) fn is_prisma_1_point_1_or_2_join_table(table: &Table) -> bool {

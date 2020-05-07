@@ -1,5 +1,6 @@
 use crate::commenting_out_guardrails::commenting_out_guardrails;
 use crate::misc_helpers::*;
+use crate::misc_helpers::{is_prisma_1_or_11_list_table, is_relay_table};
 use crate::sanitize_datamodel_names::sanitize_datamodel_names;
 use crate::SqlIntrospectionResult;
 use datamodel::{dml, Datamodel, FieldType, Model};
@@ -22,10 +23,6 @@ pub fn calculate_datamodel(schema: &SqlSchema, family: &SqlFamily) -> SqlIntrosp
     let mut always_has_created_at_updated_at = true;
     let mut uses_non_prisma_types = false;
 
-    //todo always specific id types, no compound ids, always an id
-    //Currently from Migration Engine
-    //Types positive list, complicated by enums -.-
-
     let sqlite_types = vec![
         ("BOOLEAN", "BOOLEAN"),
         ("DATE", "DATE"),
@@ -47,7 +44,13 @@ pub fn calculate_datamodel(schema: &SqlSchema, family: &SqlFamily) -> SqlIntrosp
         ("int", "int"),
         ("int", "int(11)"),
         ("varchar", "varchar(191)"),
+        ("char", "char(25)"),
+        ("char", "char(36)"),
+        ("varchar", "varchar(25)"),
+        ("varchar", "varchar(36)"),
         ("text", "text"),
+        ("mediumtext", "mediumtext"),
+        ("int", "int(4)"),
     ];
 
     let mut data_model = Datamodel::new();
@@ -83,8 +86,11 @@ pub fn calculate_datamodel(schema: &SqlSchema, family: &SqlFamily) -> SqlIntrosp
                 .iter()
                 .any(|c| matches!(model_copy.find_field(c).unwrap().field_type, FieldType::Unsupported(_)))
         }) {
+            println!("{:?}", foreign_key);
             if foreign_key.on_delete_action != ForeignKeyAction::SetNull {
-                uses_on_delete = true
+                if !is_prisma_1_or_11_list_table(table) && foreign_key.on_delete_action != ForeignKeyAction::Cascade {
+                    uses_on_delete = true
+                }
             }
             model.add_field(calculate_relation_field(schema, table, foreign_key));
         }
@@ -101,7 +107,8 @@ pub fn calculate_datamodel(schema: &SqlSchema, family: &SqlFamily) -> SqlIntrosp
             model.id_fields = table.primary_key_columns();
         }
 
-        if !model.has_created_at_and_updated_at() {
+        if !is_prisma_1_or_11_list_table(table) && !is_relay_table(table) && !model.has_created_at_and_updated_at() {
+            println!("Who am I: {}", table.name);
             always_has_created_at_updated_at = false
         }
 
@@ -218,6 +225,7 @@ pub fn calculate_datamodel(schema: &SqlSchema, family: &SqlFamily) -> SqlIntrosp
         SqlFamily::Postgres => Version::NonPrisma,
     };
 
+    println!("VERSION: {:?}", version);
     Ok(IntrospectionResult {
         datamodel: data_model,
         warnings,
