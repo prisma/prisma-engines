@@ -7,6 +7,7 @@ use std::{
 
 /// The main unit of asynchronous IO. For now just a shell for a boxed `Future`,
 /// allowing access to the metrics and logging of IO.
+#[must_use]
 pub struct DBIO<'a, T>(BoxFuture<'a, crate::Result<T>>);
 
 impl<'a, T> DBIO<'a, T> {
