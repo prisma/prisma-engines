@@ -22,6 +22,7 @@ pub fn calculate_datamodel(schema: &SqlSchema, family: &SqlFamily) -> SqlIntrosp
     let mut uses_on_delete = false;
     let mut always_has_created_at_updated_at = true;
     let mut uses_non_prisma_types = false;
+    let mut has_inline_relations = false;
 
     let sqlite_types = vec![
         ("BOOLEAN", "BOOLEAN"),
@@ -30,6 +31,8 @@ pub fn calculate_datamodel(schema: &SqlSchema, family: &SqlFamily) -> SqlIntrosp
         ("INTEGER", "INTEGER"),
         ("TEXT", "TEXT"),
     ];
+
+    //todo postgres p1 or p11 tests
     let postgres_types = vec![
         ("boolean", "bool"),
         ("timestamp without time zone", "timestamp"),
@@ -86,7 +89,9 @@ pub fn calculate_datamodel(schema: &SqlSchema, family: &SqlFamily) -> SqlIntrosp
                 .iter()
                 .any(|c| matches!(model_copy.find_field(c).unwrap().field_type, FieldType::Unsupported(_)))
         }) {
-            println!("{:?}", foreign_key);
+            if !is_prisma_1_or_11_list_table(table) {
+                has_inline_relations = true;
+            }
             if foreign_key.on_delete_action != ForeignKeyAction::SetNull {
                 if !is_prisma_1_or_11_list_table(table) && foreign_key.on_delete_action != ForeignKeyAction::Cascade {
                     uses_on_delete = true
@@ -108,11 +113,9 @@ pub fn calculate_datamodel(schema: &SqlSchema, family: &SqlFamily) -> SqlIntrosp
         }
 
         if !is_prisma_1_or_11_list_table(table) && !is_relay_table(table) && !model.has_created_at_and_updated_at() {
-            println!("Who am I: {}", table.name);
             always_has_created_at_updated_at = false
         }
 
-        println!("{:?}", model);
         data_model.add_model(model);
     }
 
@@ -185,6 +188,7 @@ pub fn calculate_datamodel(schema: &SqlSchema, family: &SqlFamily) -> SqlIntrosp
     println!("MigrationTable: {}", migration_table);
     println!("UsesOnDelete: {}", uses_on_delete);
     println!("UsesNonPrismaTypes: {}", uses_non_prisma_types);
+    println!("HasInlineRelations: {}", has_inline_relations);
     println!("AlwaysCreatedAtUpdatedAt: {}", always_has_created_at_updated_at);
     println!("Prisma11Or2JoinTable: {}", has_prisma_1_1_or_2_join_table);
 
@@ -197,7 +201,8 @@ pub fn calculate_datamodel(schema: &SqlSchema, family: &SqlFamily) -> SqlIntrosp
                 && !uses_on_delete
                 && !uses_non_prisma_types
                 && always_has_created_at_updated_at
-                && !has_prisma_1_1_or_2_join_table =>
+                && !has_prisma_1_1_or_2_join_table
+                && !has_inline_relations =>
         {
             Version::Prisma1
         }
@@ -212,7 +217,8 @@ pub fn calculate_datamodel(schema: &SqlSchema, family: &SqlFamily) -> SqlIntrosp
                 && !uses_on_delete
                 && !uses_non_prisma_types
                 && always_has_created_at_updated_at
-                && !has_prisma_1_join_table =>
+                && !has_prisma_1_join_table
+                && !has_inline_relations =>
         {
             Version::Prisma1
         }
