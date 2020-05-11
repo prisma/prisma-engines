@@ -18,6 +18,37 @@ pub struct VersionChecker {
     has_inline_relations: bool,
 }
 
+const SQLITE_TYPES: [(&'static str, &'static str); 5] = [
+    ("BOOLEAN", "BOOLEAN"),
+    ("DATE", "DATE"),
+    ("REAL", "REAL"),
+    ("INTEGER", "INTEGER"),
+    ("TEXT", "TEXT"),
+];
+
+const POSTGRES_TYPES: [(&'static str, &'static str); 5] = [
+    ("boolean", "bool"),
+    ("timestamp without time zone", "timestamp"),
+    ("numeric", "numeric"),
+    ("integer", "int4"),
+    ("text", "text"),
+];
+const MYSQL_TYPES: [(&'static str, &'static str); 13] = [
+    ("tinyint", "tinyint(1)"),
+    ("datetime", "datetime(3)"),
+    ("decimal", "decimal(65,30)"),
+    ("int", "int"),
+    ("int", "int(11)"),
+    ("varchar", "varchar(191)"),
+    ("char", "char(25)"),
+    ("char", "char(36)"),
+    ("varchar", "varchar(25)"),
+    ("varchar", "varchar(36)"),
+    ("text", "text"),
+    ("mediumtext", "mediumtext"),
+    ("int", "int(4)"),
+];
+
 impl VersionChecker {
     pub fn new(sql_family: SqlFamily, schema: &SqlSchema) -> VersionChecker {
         VersionChecker {
@@ -36,41 +67,10 @@ impl VersionChecker {
     }
 
     pub fn uses_non_prisma_type(&mut self, tpe: &ColumnType) {
-        let sqlite_types = vec![
-            ("BOOLEAN", "BOOLEAN"),
-            ("DATE", "DATE"),
-            ("REAL", "REAL"),
-            ("INTEGER", "INTEGER"),
-            ("TEXT", "TEXT"),
-        ];
-
-        let postgres_types = vec![
-            ("boolean", "bool"),
-            ("timestamp without time zone", "timestamp"),
-            ("numeric", "numeric"),
-            ("integer", "int4"),
-            ("text", "text"),
-        ];
-        let mysql_types = vec![
-            ("tinyint", "tinyint(1)"),
-            ("datetime", "datetime(3)"),
-            ("decimal", "decimal(65,30)"),
-            ("int", "int"),
-            ("int", "int(11)"),
-            ("varchar", "varchar(191)"),
-            ("char", "char(25)"),
-            ("char", "char(36)"),
-            ("varchar", "varchar(25)"),
-            ("varchar", "varchar(36)"),
-            ("text", "text"),
-            ("mediumtext", "mediumtext"),
-            ("int", "int(4)"),
-        ];
-
         match (&tpe.data_type, &tpe.full_data_type, self.sql_family) {
-            (dt, fdt, SqlFamily::Postgres) if !postgres_types.contains(&(dt, fdt)) => self.uses_non_prisma_types = true,
-            (dt, fdt, SqlFamily::Mysql) if !mysql_types.contains(&(dt, fdt)) => self.uses_non_prisma_types = true,
-            (dt, fdt, SqlFamily::Sqlite) if !sqlite_types.contains(&(dt, fdt)) => self.uses_non_prisma_types = true,
+            (dt, fdt, SqlFamily::Postgres) if !POSTGRES_TYPES.contains(&(dt, fdt)) => self.uses_non_prisma_types = true,
+            (dt, fdt, SqlFamily::Mysql) if !MYSQL_TYPES.contains(&(dt, fdt)) => self.uses_non_prisma_types = true,
+            (dt, fdt, SqlFamily::Sqlite) if !SQLITE_TYPES.contains(&(dt, fdt)) => self.uses_non_prisma_types = true,
             _ => (),
         };
     }
