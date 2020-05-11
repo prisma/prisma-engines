@@ -32,7 +32,6 @@ pub fn calculate_datamodel(schema: &SqlSchema, family: &SqlFamily) -> SqlIntrosp
         ("TEXT", "TEXT"),
     ];
 
-    //todo postgres p1 or p11 tests
     let postgres_types = vec![
         ("boolean", "bool"),
         ("timestamp without time zone", "timestamp"),
@@ -68,7 +67,6 @@ pub fn calculate_datamodel(schema: &SqlSchema, family: &SqlFamily) -> SqlIntrosp
         let mut model = Model::new(table.name.clone(), None);
 
         for column in &table.columns {
-            println!("DT: {}, FDT: {}", &column.tpe.data_type, &column.tpe.full_data_type);
             match (&column.tpe.data_type, &column.tpe.full_data_type, family) {
                 (dt, fdt, SqlFamily::Postgres) if !postgres_types.contains(&(dt, fdt)) => uses_non_prisma_types = true,
                 (dt, fdt, SqlFamily::Mysql) if !mysql_types.contains(&(dt, fdt)) => uses_non_prisma_types = true,
@@ -92,7 +90,6 @@ pub fn calculate_datamodel(schema: &SqlSchema, family: &SqlFamily) -> SqlIntrosp
             if !is_prisma_1_or_11_list_table(table) {
                 has_inline_relations = true;
             }
-            println!("{:?}", foreign_key.on_delete_action);
             if !(foreign_key.on_delete_action == ForeignKeyAction::NoAction
                 || foreign_key.on_delete_action == ForeignKeyAction::SetNull)
             {
@@ -187,14 +184,6 @@ pub fn calculate_datamodel(schema: &SqlSchema, family: &SqlFamily) -> SqlIntrosp
     deduplicate_field_names(&mut data_model);
 
     debug!("Done calculating data model {:?}", data_model);
-
-    println!("MigrationTable: {}", migration_table);
-    println!("UsesOnDelete: {}", uses_on_delete);
-    println!("UsesNonPrismaTypes: {}", uses_non_prisma_types);
-    println!("HasInlineRelations: {}", has_inline_relations);
-    println!("AlwaysCreatedAtUpdatedAt: {}", always_has_created_at_updated_at);
-    println!("Prisma11Or2JoinTable: {}", has_prisma_1_1_or_2_join_table);
-
     let version = match family {
         SqlFamily::Sqlite if migration_table && !uses_on_delete && !uses_non_prisma_types && warnings.is_empty() => {
             Version::Prisma2
@@ -250,7 +239,6 @@ pub fn calculate_datamodel(schema: &SqlSchema, family: &SqlFamily) -> SqlIntrosp
         SqlFamily::Postgres => Version::NonPrisma,
     };
 
-    println!("VERSION: {:?}", version);
     Ok(IntrospectionResult {
         datamodel: data_model,
         warnings,
