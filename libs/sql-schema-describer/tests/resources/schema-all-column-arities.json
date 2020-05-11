@@ -6,7 +6,8 @@
         {
           "name": "column1",
           "tpe": {
-            "raw": "int",
+            "dataType": "integer",
+            "fullDataType": "int",
             "family": "int",
           "arity": "required"
           },
@@ -16,7 +17,8 @@
         {
           "name": "column2",
           "tpe": {
-            "raw": "int",
+            "dataType": "integer",
+            "fullDataType": "int",
             "family": "int",
           "arity": "nullable"
           },
@@ -26,7 +28,8 @@
         {
           "name": "column3",
           "tpe": {
-            "raw": "int",
+            "dataType": "integer",
+            "fullDataType": "int",
             "family": "int",
           "arity": "list"
           },
