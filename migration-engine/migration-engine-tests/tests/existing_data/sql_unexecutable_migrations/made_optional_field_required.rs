@@ -40,7 +40,7 @@ async fn making_an_optional_field_required_with_data_without_a_default_is_unexec
     Ok(())
 }
 
-#[test_each_connector(log = "debug")]
+#[test_each_connector(log = "debug,sql_schema_describer=info")]
 async fn making_an_optional_field_required_with_data_with_a_default_works(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Test {
@@ -62,6 +62,13 @@ async fn making_an_optional_field_required_with_data_with_a_default_works(api: &
         .result_raw()
         .await?;
 
+    api.insert("Test")
+        .value("id", "def")
+        .value("name", "X Æ A-12")
+        .value("age", 7)
+        .result_raw()
+        .await?;
+
     let dm2 = r#"
         model Test {
             id String @id
@@ -76,9 +83,9 @@ async fn making_an_optional_field_required_with_data_with_a_default_works(api: &
         .await?
         .assert_green()?;
 
-    api.assert_schema()
-        .await?
-        .assert_table("Test", |table| table.assert_does_not_have_column("Int"))?;
+    api.assert_schema().await?.assert_table("Test", |table| {
+        table.assert_column("age", |col| col.assert_is_required())
+    })?;
 
     let rows = api
         .select("Test")
@@ -87,7 +94,13 @@ async fn making_an_optional_field_required_with_data_with_a_default_works(api: &
         .column("age")
         .send_debug()
         .await?;
-    assert_eq!(rows, &[&[r#"Text("abc")"#, r#"Text("george")"#, "Integer(84)"]]);
+    assert_eq!(
+        rows,
+        &[
+            &[r#"Text("abc")"#, r#"Text("george")"#, "Integer(84)"],
+            &[r#"Text("def")"#, r#"Text("X Æ A-12")"#, "Integer(7)"],
+        ]
+    );
 
     Ok(())
 }
