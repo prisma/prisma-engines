@@ -183,8 +183,6 @@ async fn introspect_mysql_prisma_1(api: &TestApi) {
                 t.add_column("id", types::primary());
                 t.inject_custom("stableModelIdentifier   int");
             });
-
-            //todo scalar list table
         })
         .await;
 
@@ -208,8 +206,6 @@ async fn introspect_mysql_prisma_1_1(api: &TestApi) {
                 t.add_column("id", types::primary());
                 t.inject_custom("stableModelIdentifier   int");
             });
-
-            //todo inline relation table
         })
         .await;
 

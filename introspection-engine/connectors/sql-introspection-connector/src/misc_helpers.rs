@@ -9,7 +9,6 @@ use tracing::debug;
 
 //checks
 
-//todo tighten this condition
 pub fn is_migration_table(table: &Table) -> bool {
     table.name == "_Migration"
 }
