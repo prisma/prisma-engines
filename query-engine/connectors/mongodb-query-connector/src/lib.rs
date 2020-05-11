@@ -8,5 +8,5 @@
 mod connection;
 mod connector;
 
-pub use connection::MongodbConnection;
-pub use connector::Mongodb;
+pub use connection::Connection;
+pub use connector::Connector;

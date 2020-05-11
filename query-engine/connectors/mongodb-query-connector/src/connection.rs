@@ -1,23 +1,34 @@
 use connector_interface::filter::Filter;
 use connector_interface::{self as connector, QueryArguments, ReadOperations, WriteArgs, WriteOperations};
-use connector_interface::{Connection, RecordFilter, Transaction, IO};
+use connector_interface::{RecordFilter, Transaction, IO};
 
 use prisma_models::prelude::*;
 
+use std::sync::Arc;
+
 /// A connection to a MongoDB database.
 #[derive(Debug)]
-pub struct MongodbConnection {}
+pub struct Connection {
+    client: mongodb::Client,
+}
 
-impl Connection for MongodbConnection {
+impl Connection {
+    /// Create a new instance of `Connection`.
+    pub(crate) fn new(client: mongodb::Client) -> Self {
+        Self { client }
+    }
+}
+
+impl connector_interface::Connection for Connection {
     fn start_transaction(&self) -> IO<'_, Box<dyn Transaction<'_> + '_>> {
         panic!("Mongodb transactions are not yet supported");
     }
 }
 
-impl ReadOperations for MongodbConnection {
+impl ReadOperations for Connection {
     fn get_single_record(
         &self,
-        _model: &ModelRef,
+        _model: &Arc<Model>,
         _filter: &Filter,
         _selected_fields: &ModelProjection,
     ) -> connector::IO<'_, Option<SingleRecord>> {
@@ -54,7 +65,7 @@ impl ReadOperations for MongodbConnection {
     }
 }
 
-impl WriteOperations for MongodbConnection {
+impl WriteOperations for Connection {
     fn create_record(&self, _model: &ModelRef, _args: WriteArgs) -> connector::IO<'_, RecordProjection> {
         panic!("Write operations should be implemented on Transactions only");
     }

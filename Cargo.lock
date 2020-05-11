@@ -1615,6 +1615,7 @@ dependencies = [
  "prisma-value",
  "query-connector",
  "serde_json",
+ "tokio",
 ]
 
 [[package]]

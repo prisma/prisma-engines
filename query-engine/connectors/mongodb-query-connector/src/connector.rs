@@ -1,29 +1,33 @@
 use connector_interface::error::{ConnectorError, ErrorKind};
-use connector_interface::{self, Connection, Connector, IO};
+use connector_interface::{self, IO};
 
+use crate::Connection;
 use mongodb::Client;
 
 /// MongoDB connector for Prisma.
 #[derive(Debug)]
-pub struct Mongodb {
-    addr: String,
+pub struct Connector {
+    client: Client,
 }
 
-impl Mongodb {
-    /// Create a new instance of `Mongodb`.
-    pub fn new(addr: &str) -> Self {
-        Self { addr: addr.to_string() }
+impl Connector {
+    /// Create a new instance of `Connector`.
+    pub async fn new(addr: &str) -> Result<Self, ConnectorError> {
+        let client = Client::with_uri_str(&addr).map_err(|_| {
+            let kind = ErrorKind::InvalidConnectionArguments;
+            ConnectorError::from_kind(kind)
+        })?;
+
+        Ok(Self { client })
     }
 }
 
-impl Connector for Mongodb {
-    fn get_connection(&self) -> IO<'_, Box<dyn Connection + '_>> {
+impl connector_interface::Connector for Connector {
+    fn get_connection(&self) -> IO<'_, Box<dyn connector_interface::Connection + '_>> {
         IO::new(async move {
-            let _client = Client::with_uri_str(&self.addr).map_err(|_| {
-                let kind = ErrorKind::InvalidConnectionArguments;
-                ConnectorError::from_kind(kind)
-            })?;
-            todo!();
+            let client = self.client.clone();
+            let conn = Connection::new(client);
+            Ok(Box::new(conn) as Box<dyn connector_interface::Connection>)
         })
     }
 }
