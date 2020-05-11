@@ -7,30 +7,23 @@ pub struct Expressionista;
 
 impl Expressionista {
     pub fn translate(mut graph: QueryGraph) -> InterpretationResult<Expression> {
-        // graph
-        //     .root_nodes()
-        //     .into_iter()
-        //     .map(|root_node| Self::build_expression(&mut graph, &root_node, vec![]))
-        //     .collect::<InterpretationResult<Vec<Expression>>>()
-        //     .map(|res| Expression::Sequence { seq: res })
-        todo!()
+        let root_node = graph.root_node();
+        Self::translate_query(&mut graph, &root_node, vec![])
     }
 
-    // fn build_expression(
-    //     graph: &mut QueryGraph,
-    //     node: &NodeRef,
-    //     parent_edges: Vec<EdgeRef>,
-    // ) -> InterpretationResult<Expression> {
-    //     match graph
-    //         .node_content(node)
-    //         .expect(&format!("Node content {} was empty", node.id()))
-    //     {
-    //         Node::Query(_) => Self::build_query_expression(graph, node, parent_edges),
-    //         Node::Flow(_) => Self::build_flow_expression(graph, node, parent_edges),
-    //         Node::Computation(_) => Self::build_computation_expression(graph, node, parent_edges),
-    //         Node::Empty => Self::build_empty_expression(graph, node, parent_edges),
-    //     }
-    // }
+    fn translate_query(
+        graph: &mut QueryGraph,
+        node: &NodeRef,
+        parent_edges: Vec<EdgeRef>,
+    ) -> InterpretationResult<Expression> {
+        // gather query information: all outgoing edges that contain dependencies.
+        // this will be part of the query invocation - we need to reload the records if we can't satisfy all.
+
+        // parent edges are the parent scopes that we need access to.
+        // those edges describe the injects and filters we'll have to add.
+
+        todo!()
+    }
 
     // fn build_query_expression(
     //     graph: &mut QueryGraph,
