@@ -258,7 +258,7 @@ impl Model {
         fn has_field(model: &Model, name: &str) -> bool {
             match model
                 .find_field(name)
-                .or(model.find_field(name.to_lowercase().as_ref()))
+                .or_else(|| model.find_field(name.to_lowercase().as_ref()))
             {
                 Some(f) => f.field_type == FieldType::Base(ScalarType::DateTime, None),
                 None => false,

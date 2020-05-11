@@ -4,6 +4,7 @@ mod error;
 mod misc_helpers;
 mod sanitize_datamodel_names;
 mod schema_describer_loading;
+mod version_checker;
 
 use introspection_connector::{
     ConnectorError, ConnectorResult, DatabaseMetadata, IntrospectionConnector, IntrospectionResult,

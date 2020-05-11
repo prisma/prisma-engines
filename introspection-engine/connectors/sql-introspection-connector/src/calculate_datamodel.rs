@@ -1,10 +1,10 @@
 use crate::commenting_out_guardrails::commenting_out_guardrails;
 use crate::misc_helpers::*;
-use crate::misc_helpers::{is_prisma_1_or_11_list_table, is_relay_table};
 use crate::sanitize_datamodel_names::sanitize_datamodel_names;
+use crate::version_checker::VersionChecker;
 use crate::SqlIntrospectionResult;
 use datamodel::{dml, Datamodel, FieldType, Model};
-use introspection_connector::{IntrospectionResult, Version};
+use introspection_connector::IntrospectionResult;
 use quaint::connector::SqlFamily;
 use sql_schema_describer::*;
 use tracing::debug;
@@ -13,48 +13,7 @@ use tracing::debug;
 pub fn calculate_datamodel(schema: &SqlSchema, family: &SqlFamily) -> SqlIntrospectionResult<IntrospectionResult> {
     debug!("Calculating data model.");
 
-    // Detect the version of the database
-    let migration_table = schema.tables.iter().any(|table| is_migration_table(&table));
-    let has_prisma_1_join_table = schema.tables.iter().any(|table| is_prisma_1_point_0_join_table(&table));
-    let has_prisma_1_1_or_2_join_table = schema
-        .tables
-        .iter()
-        .any(|table| is_prisma_1_point_1_or_2_join_table(&table));
-    let mut uses_on_delete = false;
-    let mut always_has_created_at_updated_at = true;
-    let mut uses_non_prisma_types = false;
-    let mut has_inline_relations = false;
-
-    let sqlite_types = vec![
-        ("BOOLEAN", "BOOLEAN"),
-        ("DATE", "DATE"),
-        ("REAL", "REAL"),
-        ("INTEGER", "INTEGER"),
-        ("TEXT", "TEXT"),
-    ];
-
-    let postgres_types = vec![
-        ("boolean", "bool"),
-        ("timestamp without time zone", "timestamp"),
-        ("numeric", "numeric"),
-        ("integer", "int4"),
-        ("text", "text"),
-    ];
-    let mysql_types = vec![
-        ("tinyint", "tinyint(1)"),
-        ("datetime", "datetime(3)"),
-        ("decimal", "decimal(65,30)"),
-        ("int", "int"),
-        ("int", "int(11)"),
-        ("varchar", "varchar(191)"),
-        ("char", "char(25)"),
-        ("char", "char(36)"),
-        ("varchar", "varchar(25)"),
-        ("varchar", "varchar(36)"),
-        ("text", "text"),
-        ("mediumtext", "mediumtext"),
-        ("int", "int(4)"),
-    ];
+    let mut version_check = VersionChecker::new(family.clone(), schema);
 
     let mut data_model = Datamodel::new();
     for table in schema
@@ -68,13 +27,7 @@ pub fn calculate_datamodel(schema: &SqlSchema, family: &SqlFamily) -> SqlIntrosp
         let mut model = Model::new(table.name.clone(), None);
 
         for column in &table.columns {
-            match (&column.tpe.data_type, &column.tpe.full_data_type, family) {
-                (dt, fdt, SqlFamily::Postgres) if !postgres_types.contains(&(dt, fdt)) => uses_non_prisma_types = true,
-                (dt, fdt, SqlFamily::Mysql) if !mysql_types.contains(&(dt, fdt)) => uses_non_prisma_types = true,
-                (dt, fdt, SqlFamily::Sqlite) if !sqlite_types.contains(&(dt, fdt)) => uses_non_prisma_types = true,
-                _ => (),
-            };
-
+            version_check.uses_non_prisma_type(&column.tpe);
             let field = calculate_scalar_field(&table, &column);
             model.add_field(field);
         }
@@ -88,16 +41,8 @@ pub fn calculate_datamodel(schema: &SqlSchema, family: &SqlFamily) -> SqlIntrosp
                 .iter()
                 .any(|c| matches!(model_copy.find_field(c).unwrap().field_type, FieldType::Unsupported(_)))
         }) {
-            if !is_prisma_1_or_11_list_table(table) {
-                has_inline_relations = true;
-            }
-            if !(foreign_key.on_delete_action == ForeignKeyAction::NoAction
-                || foreign_key.on_delete_action == ForeignKeyAction::SetNull)
-            {
-                if !is_prisma_1_or_11_list_table(table) && foreign_key.on_delete_action != ForeignKeyAction::Cascade {
-                    uses_on_delete = true
-                }
-            }
+            version_check.has_inline_relations(table);
+            version_check.uses_on_delete(foreign_key, table);
             model.add_field(calculate_relation_field(schema, table, foreign_key));
         }
 
@@ -113,9 +58,7 @@ pub fn calculate_datamodel(schema: &SqlSchema, family: &SqlFamily) -> SqlIntrosp
             model.id_fields = table.primary_key_columns();
         }
 
-        if !is_prisma_1_or_11_list_table(table) && !is_relay_table(table) && !model.has_created_at_and_updated_at() {
-            always_has_created_at_updated_at = false
-        }
+        version_check.always_has_created_at_updated_at(table, &model);
 
         data_model.add_model(model);
     }
@@ -185,65 +128,11 @@ pub fn calculate_datamodel(schema: &SqlSchema, family: &SqlFamily) -> SqlIntrosp
     deduplicate_field_names(&mut data_model);
 
     debug!("Done calculating data model {:?}", data_model);
-    let version = match family {
-        SqlFamily::Sqlite if migration_table && !uses_on_delete && !uses_non_prisma_types && warnings.is_empty() => {
-            Version::Prisma2
-        }
-        SqlFamily::Sqlite => Version::NonPrisma,
-        SqlFamily::Mysql if migration_table && !uses_on_delete && !uses_non_prisma_types && warnings.is_empty() => {
-            Version::Prisma2
-        }
-        SqlFamily::Mysql
-            if !migration_table
-                && !uses_on_delete
-                && !uses_non_prisma_types
-                && always_has_created_at_updated_at
-                && !has_prisma_1_1_or_2_join_table
-                && !has_inline_relations
-                && warnings.is_empty() =>
-        {
-            Version::Prisma1
-        }
-        SqlFamily::Mysql
-            if !migration_table
-                && !uses_on_delete
-                && !uses_non_prisma_types
-                && !has_prisma_1_join_table
-                && warnings.is_empty() =>
-        {
-            Version::Prisma11
-        }
-        SqlFamily::Mysql => Version::NonPrisma,
-        SqlFamily::Postgres if migration_table && !uses_on_delete && !uses_non_prisma_types && warnings.is_empty() => {
-            Version::Prisma2
-        }
-        SqlFamily::Postgres
-            if !migration_table
-                && !uses_on_delete
-                && !uses_non_prisma_types
-                && always_has_created_at_updated_at
-                && !has_prisma_1_join_table
-                && !has_inline_relations
-                && warnings.is_empty() =>
-        {
-            Version::Prisma1
-        }
-        SqlFamily::Postgres
-            if !migration_table
-                && !uses_on_delete
-                && !uses_non_prisma_types
-                && !has_prisma_1_1_or_2_join_table
-                && warnings.is_empty() =>
-        {
-            Version::Prisma11
-        }
-        SqlFamily::Postgres => Version::NonPrisma,
-    };
 
     Ok(IntrospectionResult {
         datamodel: data_model,
+        version: version_check.version(&warnings),
         warnings,
-        version,
     })
 }
 
