@@ -22,7 +22,6 @@ pub(crate) fn is_relay_table(table: &Table) -> bool {
 
 pub(crate) fn is_prisma_1_or_11_list_table(table: &Table) -> bool {
     table.columns.len() == 3
-        && table.indices.len() >= 1
         && table.columns[0].name.to_lowercase() == "nodeid"
         && table.columns[1].name == "position"
         && table.columns[2].name == "value"

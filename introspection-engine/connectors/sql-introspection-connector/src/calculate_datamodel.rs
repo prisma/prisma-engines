@@ -92,7 +92,10 @@ pub fn calculate_datamodel(schema: &SqlSchema, family: &SqlFamily) -> SqlIntrosp
             if !is_prisma_1_or_11_list_table(table) {
                 has_inline_relations = true;
             }
-            if foreign_key.on_delete_action != ForeignKeyAction::SetNull {
+            println!("{:?}", foreign_key.on_delete_action);
+            if !(foreign_key.on_delete_action == ForeignKeyAction::NoAction
+                || foreign_key.on_delete_action == ForeignKeyAction::SetNull)
+            {
                 if !is_prisma_1_or_11_list_table(table) && foreign_key.on_delete_action != ForeignKeyAction::Cascade {
                     uses_on_delete = true
                 }
@@ -193,38 +196,54 @@ pub fn calculate_datamodel(schema: &SqlSchema, family: &SqlFamily) -> SqlIntrosp
     println!("Prisma11Or2JoinTable: {}", has_prisma_1_1_or_2_join_table);
 
     let version = match family {
-        SqlFamily::Sqlite if migration_table && !uses_on_delete && !uses_non_prisma_types => Version::Prisma2,
+        SqlFamily::Sqlite if migration_table && !uses_on_delete && !uses_non_prisma_types && warnings.is_empty() => {
+            Version::Prisma2
+        }
         SqlFamily::Sqlite => Version::NonPrisma,
-        SqlFamily::Mysql if migration_table && !uses_on_delete && !uses_non_prisma_types => Version::Prisma2,
+        SqlFamily::Mysql if migration_table && !uses_on_delete && !uses_non_prisma_types && warnings.is_empty() => {
+            Version::Prisma2
+        }
         SqlFamily::Mysql
             if !migration_table
                 && !uses_on_delete
                 && !uses_non_prisma_types
                 && always_has_created_at_updated_at
                 && !has_prisma_1_1_or_2_join_table
-                && !has_inline_relations =>
+                && !has_inline_relations
+                && warnings.is_empty() =>
         {
             Version::Prisma1
         }
         SqlFamily::Mysql
-            if !migration_table && !uses_on_delete && !uses_non_prisma_types && !has_prisma_1_join_table =>
+            if !migration_table
+                && !uses_on_delete
+                && !uses_non_prisma_types
+                && !has_prisma_1_join_table
+                && warnings.is_empty() =>
         {
             Version::Prisma11
         }
         SqlFamily::Mysql => Version::NonPrisma,
+        SqlFamily::Postgres if migration_table && !uses_on_delete && !uses_non_prisma_types && warnings.is_empty() => {
+            Version::Prisma2
+        }
         SqlFamily::Postgres
             if !migration_table
                 && !uses_on_delete
                 && !uses_non_prisma_types
                 && always_has_created_at_updated_at
                 && !has_prisma_1_join_table
-                && !has_inline_relations =>
+                && !has_inline_relations
+                && warnings.is_empty() =>
         {
             Version::Prisma1
         }
-        SqlFamily::Postgres if migration_table && !uses_on_delete && !uses_non_prisma_types => Version::Prisma2,
         SqlFamily::Postgres
-            if !migration_table && !uses_on_delete && !uses_non_prisma_types && !has_prisma_1_1_or_2_join_table =>
+            if !migration_table
+                && !uses_on_delete
+                && !uses_non_prisma_types
+                && !has_prisma_1_1_or_2_join_table
+                && warnings.is_empty() =>
         {
             Version::Prisma11
         }

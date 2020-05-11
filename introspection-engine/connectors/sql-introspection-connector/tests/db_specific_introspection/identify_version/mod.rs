@@ -83,6 +83,17 @@ async fn introspect_postgres_prisma_1(api: &TestApi) {
                 t.inject_custom("float Decimal(65,30)");
                 t.inject_custom("boolean boolean");
             });
+            migration.create_table("_RelayId", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom("stableModelIdentifier   Integer");
+            });
+
+            migration.create_table("Book_tags", |t| {
+                t.add_column("nodeid", types::primary());
+                t.add_column("position", types::integer());
+                t.add_column("value", types::integer());
+                t.inject_custom("FOREIGN KEY (\"nodeid\") REFERENCES \"Book\"(\"id\")");
+            });
         })
         .await;
 
@@ -101,6 +112,18 @@ async fn introspect_postgres_prisma_1_1(api: &TestApi) {
                 t.inject_custom("int Integer");
                 t.inject_custom("float Decimal(65,30)");
                 t.inject_custom("boolean boolean");
+            });
+
+            migration.create_table("Page", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom("string text");
+                t.add_column("bookid", types::integer());
+                t.inject_custom("FOREIGN KEY (\"bookid\") REFERENCES \"Book\"(\"id\")");
+            });
+
+            migration.create_table("_RelayId", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom("stableModelIdentifier   Integer");
             });
         })
         .await;
@@ -156,6 +179,12 @@ async fn introspect_mysql_prisma_1(api: &TestApi) {
                 t.inject_custom("float_column Decimal(65,30)");
                 t.inject_custom("boolean_column boolean");
             });
+            migration.create_table("_RelayId", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom("stableModelIdentifier   int");
+            });
+
+            //todo scalar list table
         })
         .await;
 
@@ -175,6 +204,12 @@ async fn introspect_mysql_prisma_1_1(api: &TestApi) {
                 t.inject_custom("float_column Decimal(65,30)");
                 t.inject_custom("boolean_column boolean");
             });
+            migration.create_table("_RelayId", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom("stableModelIdentifier   int");
+            });
+
+            //todo inline relation table
         })
         .await;
 
