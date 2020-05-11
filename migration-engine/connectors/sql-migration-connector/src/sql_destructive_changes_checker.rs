@@ -188,7 +188,7 @@ impl SqlDestructiveChangesChecker<'_> {
 
         let values_count = self.count_values_in_column(&alter_column.name, previous_table).await?;
 
-        if values_count > 0 {
+        if dbg!(values_count > 0) {
             diagnostics.add_warning(MigrationWarning {
                 description: format!(
                                  "You are about to alter the column `{column_name}` on the `{table_name}` table, which still contains {values_count} non-null values. The data in that column will be lost.",
@@ -214,6 +214,8 @@ impl SqlDestructiveChangesChecker<'_> {
 
     fn alter_column_is_safe(&self, differ: &crate::sql_schema_differ::ColumnDiffer<'_>) -> bool {
         use crate::sql_migration::expanded_alter_column::*;
+
+        tracing::warn!(sql_family = ?self.sql_family(), "heeere");
 
         match self.sql_family() {
             SqlFamily::Sqlite => {
@@ -256,16 +258,20 @@ impl SqlDestructiveChangesChecker<'_> {
             SqlFamily::Mysql => {
                 let expanded = expand_mysql_alter_column(differ);
 
+                tracing::warn!(?expanded);
+
                 // We keep the match here to keep the exhaustiveness checking for when we add variants.
                 if let Some(steps) = expanded {
-                    let is_safe = true;
+                    let mut is_safe = true;
 
                     for step in steps {
                         match step {
-                            MysqlAlterColumn::SetDefault(_) | MysqlAlterColumn::DropDefault => (),
+                            MysqlAlterColumn::DropDefault => (),
+                            MysqlAlterColumn::Modify { .. } => is_safe = false,
                         }
                     }
 
+                    tracing::warn!(?is_safe);
                     is_safe
                 } else {
                     false

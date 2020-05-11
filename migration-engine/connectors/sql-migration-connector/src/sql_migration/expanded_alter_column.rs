@@ -1,6 +1,6 @@
-use crate::sql_schema_differ::{ColumnChange, ColumnDiffer, DiffingOptions};
+use crate::sql_schema_differ::{ColumnChange, ColumnChanges, ColumnDiffer, DiffingOptions};
 use quaint::prelude::SqlFamily;
-use sql_schema_describer::{Column, ColumnArity, ColumnType, ColumnTypeFamily};
+use sql_schema_describer::{Column, ColumnArity, ColumnType, ColumnTypeFamily, DefaultValue};
 
 pub(crate) fn expand_alter_column(
     previous_column: &Column,
@@ -28,14 +28,44 @@ pub(crate) fn expand_sqlite_alter_column(_columns: &ColumnDiffer) -> Option<Vec<
 pub(crate) fn expand_mysql_alter_column(columns: &ColumnDiffer) -> Option<Vec<MysqlAlterColumn>> {
     let mut changes: Vec<MysqlAlterColumn> = Vec::new();
 
+    // Whether we should issue a MODIFY statement to redefine the column.
+    let mut modify = false;
+
     for change in columns.all_changes().iter() {
         match change {
             ColumnChange::Default => match (&columns.previous.default, &columns.next.default) {
-                (_, Some(next_default)) => changes.push(MysqlAlterColumn::SetDefault(next_default.clone())),
+                (_, Some(_)) => modify = true,
                 (_, None) => changes.push(MysqlAlterColumn::DropDefault),
             },
+            ColumnChange::Arity | ColumnChange::Type => modify = true,
+            ColumnChange::Renaming => unreachable!("Column renaming on MySQL"),
             _ => return None,
         }
+    }
+
+    if modify {
+        let alter_column = MysqlAlterColumn::Modify {
+            column_type: ColumnType {
+                raw: if !columns.all_changes().type_changed()
+                    && columns
+                        .next
+                        .default
+                        .as_ref()
+                        .map(|default| !matches!(default, DefaultValue::NOW))
+                        .unwrap_or(true)
+                {
+                    columns.previous.tpe.raw.clone()
+                } else {
+                    "".into()
+                },
+                family: columns.next.tpe.family.clone(),
+                arity: columns.next.tpe.arity.clone(),
+            },
+            default: columns.next.default.clone(),
+            changes: columns.all_changes(),
+        };
+
+        return Some(vec![alter_column]);
     }
 
     Some(changes)
@@ -90,10 +120,13 @@ pub(crate) enum PostgresAlterColumn {
 /// https://dev.mysql.com/doc/refman/8.0/en/alter-table.html
 #[derive(Debug)]
 pub(crate) enum MysqlAlterColumn {
-    SetDefault(sql_schema_describer::DefaultValue),
+    // SetDefault(sql_schema_describer::DefaultValue),
     DropDefault,
-    // Not used yet:
-    // Rename { previous_name: String, next_name: String },
+    Modify {
+        column_type: ColumnType,
+        default: Option<DefaultValue>,
+        changes: ColumnChanges,
+    },
 }
 
 #[derive(Debug)]

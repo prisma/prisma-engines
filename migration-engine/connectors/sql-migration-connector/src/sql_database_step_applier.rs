@@ -1,9 +1,12 @@
 use crate::*;
-use sql_renderer::{postgres_render_column_type, rendered_step::RenderedStep, IteratorJoin, Quoted, SqlRenderer};
+use sql_renderer::{
+    mysql_render_column_type, postgres_render_column_type, rendered_step::RenderedStep, IteratorJoin, Quoted,
+    SqlRenderer,
+};
 use sql_schema_describer::*;
 use sql_schema_differ::DiffingOptions;
 use sql_schema_helpers::{walk_columns, ColumnRef};
-use std::fmt::Write as _;
+use std::{borrow::Cow, fmt::Write as _};
 use tracing_futures::Instrument;
 
 pub struct SqlDatabaseStepApplier<'a> {
@@ -273,6 +276,7 @@ fn render_raw_sql(
                             renderer,
                             current_schema.get_table(&table.name).unwrap().column(&name).unwrap(),
                             &column,
+                            &next_schema,
                             &DiffingOptions::from_database_info(database_info),
                         ) {
                             Some(safe_sql) => {
@@ -445,6 +449,7 @@ fn safe_alter_column(
     renderer: &dyn SqlRenderer,
     previous_column: &Column,
     next_column: &Column,
+    next_schema: &SqlSchema,
     diffing_options: &DiffingOptions,
 ) -> Option<Vec<String>> {
     use crate::sql_migration::expanded_alter_column::*;
@@ -480,11 +485,35 @@ fn safe_alter_column(
             .into_iter()
             .map(|step| match step {
                 MysqlAlterColumn::DropDefault => format!("{} DROP DEFAULT", &alter_column_prefix),
-                MysqlAlterColumn::SetDefault(new_default) => format!(
-                    "{} SET DEFAULT {}",
-                    &alter_column_prefix,
-                    renderer.render_default(&new_default, &next_column.tpe.family)
+                MysqlAlterColumn::Modify {
+                    column_type,
+                    default,
+                    changes: _,
+                } => format!(
+                    "MODIFY {column_name} {column_type} {nullability} {default}",
+                    column_name = Quoted::mysql_ident(&next_column.name),
+                    column_type = Some(column_type.raw.clone())
+                        .filter(|r| !r.is_empty())
+                        .unwrap_or_else(|| {
+                            mysql_render_column_type(&column_type, default.as_ref(), next_schema)
+                                .unwrap()
+                                .into_owned()
+                        }),
+                    nullability = if column_type.arity.is_required() {
+                        "NOT NULL "
+                    } else {
+                        ""
+                    },
+                    default = default
+                        .as_ref()
+                        .map(|default| format!("DEFAULT {}", renderer.render_default(default, &column_type.family)))
+                        .unwrap_or_else(String::new),
                 ),
+                // MysqlAlterColumn::SetDefault(new_default) => format!(
+                //     "{} SET DEFAULT ({})",
+                //     &alter_column_prefix,
+                //     renderer.render_default(&new_default, &next_column.tpe.family)
+                // ),
             })
             .collect(),
         ExpandedAlterColumn::Sqlite(_steps) => vec![],

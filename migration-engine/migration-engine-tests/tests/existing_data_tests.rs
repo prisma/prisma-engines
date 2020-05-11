@@ -158,7 +158,7 @@ async fn altering_a_column_with_non_null_values_should_warn(api: &TestApi) -> Te
     Ok(())
 }
 
-#[test_each_connector(log = "debug")]
+#[test_each_connector(log = "debug,sql_schema_describer=info")]
 async fn column_defaults_can_safely_be_changed(api: &TestApi) -> TestResult {
     let combinations = &[
         ("Meow", Some(PrismaValue::String("Cats".to_string())), None),
@@ -256,7 +256,14 @@ async fn column_defaults_can_safely_be_changed(api: &TestApi) -> TestResult {
                     .unwrap_or_else(String::new)
             );
 
-            api.infer_apply(&dm2).send().await?.assert_green()?;
+            let response = api.infer_apply(&dm2).force(Some(true)).send().await?;
+
+            if api.is_mysql() {
+                // On MySQL we have warnings because MODIFY needs to restate the type of the column, and that may be wrong.
+                response.assert_executable()?;
+            } else {
+                response.assert_green()?;
+            }
         }
 
         // Check that the data is still there
@@ -291,6 +298,29 @@ async fn column_defaults_can_safely_be_changed(api: &TestApi) -> TestResult {
             })?;
         }
     }
+
+    Ok(())
+}
+
+#[test_each_connector(log = "debug")]
+async fn set_default_current_timestamp_on_existing_column_works(api: &TestApi) -> TestResult {
+    let dm1 = r#"
+        model User {
+            id Int @id
+            created_at DateTime
+        }
+    "#;
+
+    api.infer_apply(dm1).send().await?.assert_green()?;
+
+    let dm2 = r#"
+        model User {
+            id Int @id
+            created_at DateTime @default(now())
+        }
+    "#;
+
+    api.infer_apply(dm2).send().await?.assert_green()?;
 
     Ok(())
 }
