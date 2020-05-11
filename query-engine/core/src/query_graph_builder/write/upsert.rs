@@ -1,6 +1,6 @@
 use super::*;
 use crate::{
-    query_ast::*, query_graph::QueryGraph, ArgumentListLookup, InputAssertions, ParsedField, ParsedInputMap,
+    query_ast::*, query_graph::QueryGraph, ArgumentList, InputAssertions, ParsedField, ParsedInputMap,
     ReadOneRecordBuilder,
 };
 use connector::IdFilter;

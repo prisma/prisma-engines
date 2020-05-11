@@ -16,7 +16,7 @@ pub use transformers::*;
 
 use crate::Query;
 use petgraph::{graph::*, visit::EdgeRef as PEdgeRef, *};
-use prisma_models::RelationFieldRef;
+use prisma_models::{ModelProjection, RelationFieldRef};
 
 pub type QueryGraphResult<T> = std::result::Result<T, QueryGraphError>;
 
@@ -84,7 +84,57 @@ pub struct QueryGraph {
 }
 
 /// Implementation detail of the QueryGraph.
-type InnerGraph = Graph<Query, Option<RelationFieldRef>>;
+type InnerGraph = Graph<Query, Option<QueryDependency>>;
+
+/// A `QueryDependency` expresses that one query requires a certain set of fields to be returned from the
+/// dependent query in order to be able to satisfy it's execution requirements.
+#[derive(Debug)]
+pub enum QueryDependency {
+    /// Filter the dependent query by the data of the parent query.
+    FilterBy(DependencyType),
+
+    /// Inject data into the dependent query from the parent query.
+    InjectInto(DependencyType),
+}
+
+impl QueryDependency {
+    pub fn flip(self) -> Self {
+        match self {
+            Self::FilterBy(typ) => Self::FilterBy(typ.flip()),
+            Self::InjectInto(typ) => Self::InjectInto(typ.flip()),
+        }
+    }
+}
+
+#[derive(Debug)]
+pub enum DependencyType {
+    /// Depend on a specific combination of fields of the parent query.
+    Projection(ModelProjection),
+
+    /// Depend on the linking fields of the contained relation field of the parent query (i.e. opposing model).
+    Relation(RelationFieldRef),
+}
+
+impl DependencyType {
+    pub fn flip(self) -> Self {
+        match self {
+            Self::Relation(rf) => Self::Relation(rf.related_field()),
+            x => x,
+        }
+    }
+}
+
+impl From<ModelProjection> for DependencyType {
+    fn from(p: ModelProjection) -> Self {
+        Self::Projection(p)
+    }
+}
+
+impl From<RelationFieldRef> for DependencyType {
+    fn from(p: RelationFieldRef) -> Self {
+        Self::Relation(p)
+    }
+}
 
 impl QueryGraph {
     pub fn new() -> Self {
@@ -129,12 +179,13 @@ impl QueryGraph {
                 .is_some()
     }
 
-    /// Returns all root nodes of the graph.
+    /// Returns the root node of the graph.
     /// A root node is defined by having no incoming edges.
-    pub fn root_nodes(&self) -> Vec<NodeRef> {
+    /// More than one root node found results in a panic.
+    pub fn root_node(&self) -> NodeRef {
         let graph = &self.graph;
 
-        graph
+        let mut nodes = graph
             .node_indices()
             .filter_map(|ix| {
                 if let Some(_) = graph.edges_directed(ix, Direction::Incoming).next() {
@@ -144,7 +195,17 @@ impl QueryGraph {
                 }
             })
             .map(|node_ix: NodeIndex| NodeRef { node_ix })
-            .collect()
+            .collect::<Vec<_>>();
+
+        if nodes.len() != 1 {
+            panic!(format!(
+                "Expected query graph to contain exactly one root node, found: {} ({:?})",
+                nodes.len(),
+                nodes,
+            ))
+        } else {
+            nodes.pop().unwrap()
+        }
     }
 
     /// Mark the query graph to run inside of a transaction.
@@ -166,7 +227,7 @@ impl QueryGraph {
 
     /// Creates an edge with given `content`, originating from node `from` and pointing to node `to`.
     /// Returns an `EdgeRef` to the newly added edge.
-    pub fn create_edge(&mut self, from: &NodeRef, to: &NodeRef, content: Option<RelationFieldRef>) -> EdgeRef {
+    pub fn create_edge(&mut self, from: &NodeRef, to: &NodeRef, content: Option<QueryDependency>) -> EdgeRef {
         let edge_ix = self.graph.add_edge(from.node_ix, to.node_ix, content);
 
         EdgeRef { edge_ix }
@@ -178,7 +239,7 @@ impl QueryGraph {
     }
 
     /// Returns a reference to the content of `edge`, if the content is still present.
-    pub fn edge_content(&self, edge: &EdgeRef) -> &Option<RelationFieldRef> {
+    pub fn edge_content(&self, edge: &EdgeRef) -> &Option<QueryDependency> {
         self.graph.edge_weight(edge.edge_ix).unwrap()
     }
 
@@ -220,7 +281,7 @@ impl QueryGraph {
 
     /// Completely removes the edge from the graph, returning it's content.
     /// This operation is destructive on the underlying graph and invalidates references.
-    pub fn remove_edge(&mut self, edge: EdgeRef) -> Option<RelationFieldRef> {
+    pub fn remove_edge(&mut self, edge: EdgeRef) -> Option<QueryDependency> {
         self.graph.remove_edge(edge.edge_ix).unwrap()
     }
 
@@ -317,7 +378,7 @@ impl QueryGraph {
     /// exection order, and no relational dependency.
     ///
     /// An edge existing between `parent` and `child` will change direction and will point from `child` to `parent` instead,
-    /// flipping a stored relation field reference, if any.
+    /// flipping the query dependency (e.g. changing the relation field to the opposing one), if any.
     ///
     /// ## Example transformation
     /// Given the marked pairs `[(A, B), (B, C), (B, D)]` and a graph (depicting the state before the transformation):
@@ -381,7 +442,7 @@ impl QueryGraph {
         marked.reverse(); // [DTODO]: Marked operation order is currently breaking if done bottom-up. Investigate how to fix it.
 
         for (parent_node, child_node) in marked {
-            // All parents of `parent_node` are becoming a parent of `child_node` as well, except flow nodes.
+            // All parents of `parent_node` are becoming a parent of `child_node` as well.
             let parent_edges = self.incoming_edges(&parent_node);
             for parent_edge in parent_edges {
                 let parent_of_parent_node = self.edge_source(&parent_edge);
@@ -401,9 +462,10 @@ impl QueryGraph {
                 .find_edge(parent_node.node_ix, child_node.node_ix)
                 .map(|edge_ix| EdgeRef { edge_ix });
 
-            // Remove edge and reinsert edge in reverse.
+            // Remove edge and reinsert edge in reverse with the content reversed as well, if possible.
             if let Some(edge) = existing_edge {
-                let content = self.remove_edge(edge).map(|rf| rf.related_field());
+                let content = self.remove_edge(edge).map(|dep| dep.flip());
+
                 self.create_edge(&child_node, &parent_node, content);
             }
         }

@@ -2,16 +2,17 @@ use super::*;
 use std::fmt::{self, Display};
 
 pub fn format(graph: &QueryGraph) -> String {
+    let root_node = vec![graph.root_node()];
     format!(
-        "---- Query Graph ----\nResult Nodes: {}\nMarked Nodes: {}\nRoot Nodes: {}\n\n{}\n----------------------",
+        "---- Query Graph ----\nResult Nodes: {}\nMarked Nodes: {}\nRoot Node: {}\n\n{}\n----------------------",
         fmt_raw_indices(&graph.result_nodes),
         fmt_node_tuples(&graph.marked_node_pairs),
-        fmt_node_list(&graph.root_nodes()),
-        stringify_nodes(graph, graph.root_nodes(), &mut Vec::new()).join("\n\n")
+        fmt_node_list(&root_node),
+        stringify_nodes(graph, &root_node, &mut Vec::new()).join("\n\n")
     )
 }
 
-fn stringify_nodes(graph: &QueryGraph, nodes: Vec<NodeRef>, seen_nodes: &mut Vec<NodeRef>) -> Vec<String> {
+fn stringify_nodes(graph: &QueryGraph, nodes: &[NodeRef], seen_nodes: &mut Vec<NodeRef>) -> Vec<String> {
     let mut rendered_nodes = vec![];
 
     for node in nodes {
@@ -19,7 +20,7 @@ fn stringify_nodes(graph: &QueryGraph, nodes: Vec<NodeRef>, seen_nodes: &mut Vec
             continue;
         }
 
-        seen_nodes.push(node);
+        seen_nodes.push(node.clone());
         let mut node_child_info = vec![];
 
         let children: Vec<NodeRef> = graph
@@ -31,7 +32,7 @@ fn stringify_nodes(graph: &QueryGraph, nodes: Vec<NodeRef>, seen_nodes: &mut Vec
                     "Child (edge {}): Node {} - {:?}",
                     child_edge.id(),
                     child_node.id(),
-                    graph.edge_content(child_edge).as_ref().map(|rf| &rf.name)
+                    graph.edge_content(child_edge).as_ref()
                 ));
 
                 child_node
@@ -45,27 +46,33 @@ fn stringify_nodes(graph: &QueryGraph, nodes: Vec<NodeRef>, seen_nodes: &mut Vec
             node_child_info.join("\n  ")
         ));
 
-        rendered_nodes.append(&mut stringify_nodes(graph, children, seen_nodes));
+        rendered_nodes.append(&mut stringify_nodes(graph, &children, seen_nodes));
     }
 
     rendered_nodes
 }
 
-// impl Display for Flow {
-//     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-//         match self {
-//             Self::If(_) => write!(f, "(If (condition func)"),
-//         }
-//     }
-// }
+impl Display for DependencyType {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let s = match self {
+            Self::Projection(p) => format!("Projection ({} | {:?})", p.model().name, p.names().collect::<Vec<_>>()),
+            Self::Relation(rf) => format!("Relation ({})", rf.name),
+        };
 
-// impl Display for Computation {
-//     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-//         match self {
-//             Self::Diff(_) => write!(f, "Diff"),
-//         }
-//     }
-// }
+        write!(f, "{}", s)
+    }
+}
+
+impl Display for QueryDependency {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let s = match self {
+            Self::FilterBy(f) => format!("FilterBy {}", f),
+            Self::InjectInto(i) => format!("InjectInto {}", i),
+        };
+
+        write!(f, "{}", s)
+    }
+}
 
 // impl Display for Node {
 //     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {

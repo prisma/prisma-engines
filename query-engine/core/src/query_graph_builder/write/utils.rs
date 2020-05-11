@@ -1,8 +1,4 @@
-use crate::{
-    query_ast::*,
-    query_graph::{NodeRef, QueryGraph},
-    ParsedInputValue, QueryGraphBuilderError, QueryGraphBuilderResult,
-};
+use crate::{query_ast::*, query_graph::*, ParsedInputValue, QueryGraphBuilderError, QueryGraphBuilderResult};
 use connector::{Filter, IdFilter, QueryArguments, WriteArgs};
 use itertools::Itertools;
 use prisma_models::{ModelProjection, ModelRef, RelationFieldRef};
@@ -25,6 +21,20 @@ pub fn node_is_create(graph: &QueryGraph, node: &NodeRef) -> bool {
     // }
 
     todo!()
+}
+
+pub fn filter_edge<T>(t: T) -> QueryDependency
+where
+    T: Into<DependencyType>,
+{
+    QueryDependency::FilterBy(t.into())
+}
+
+pub fn injection_edge<T>(t: T) -> QueryDependency
+where
+    T: Into<DependencyType>,
+{
+    QueryDependency::InjectInto(t.into())
 }
 
 /// Produces a non-failing read query that fetches the requested projection of records for a given filterable.

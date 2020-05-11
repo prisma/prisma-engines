@@ -11,6 +11,7 @@ mod write_args_parser;
 pub mod utils;
 
 use super::*;
+use utils::*;
 
 // Expose top level write operation builder functions.
 pub use create::create_record;

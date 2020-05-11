@@ -1,7 +1,5 @@
 use super::*;
-use crate::{
-    query_ast::*, query_graph::QueryGraph, ArgumentListLookup, FilteredQuery, ParsedField, ReadOneRecordBuilder,
-};
+use crate::{query_ast::*, query_graph::QueryGraph, ArgumentList, FilteredQuery, ParsedField, ReadOneRecordBuilder};
 use connector::filter::Filter;
 use prisma_models::ModelRef;
 use std::{convert::TryInto, sync::Arc};

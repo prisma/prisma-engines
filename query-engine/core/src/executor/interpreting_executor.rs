@@ -36,9 +36,9 @@ where
 
         // Create pipelines for all separate queries
         let mut responses = Responses::with_capacity(1);
-        let needs_transaction = self.force_transactions || query_graph.transactional();
+        let is_transactional = self.force_transactions || query_graph.transactional();
 
-        let result = if needs_transaction {
+        let result = if is_transactional {
             let tx = conn.start_transaction().await?;
             let interpreter = QueryInterpreter::new(ConnectionLike::Transaction(tx.as_ref()));
             let result = QueryPipeline::new(query_graph, interpreter, info).execute().await;

@@ -40,12 +40,25 @@ pub enum ParsedInputValue {
     Map(ParsedInputMap),
 }
 
-pub trait ArgumentListLookup {
-    fn lookup(&mut self, name: &str) -> Option<ParsedArgument>;
+pub trait ArgumentList {
+    /// Plucks (removes) and returns argument with `name` from the underlying data.
+    /// Expects argument with `name` to be present, panics otherwise.
+    fn pluck_required(&mut self, name: &str) -> ParsedArgument;
+
+    /// Plucks (removes) and returns argument with `name` from the underlying data
+    /// if it exists, `None` otherwise.
+    fn pluck_optional(&mut self, name: &str) -> Option<ParsedArgument>;
 }
 
-impl ArgumentListLookup for Vec<ParsedArgument> {
-    fn lookup(&mut self, name: &str) -> Option<ParsedArgument> {
+impl ArgumentList for Vec<ParsedArgument> {
+    fn pluck_required(&mut self, name: &str) -> ParsedArgument {
+        self.pluck_optional(name).expect(&format!(
+            "No argument named '{}' found in argument list '{:?}'.",
+            name, self
+        ))
+    }
+
+    fn pluck_optional(&mut self, name: &str) -> Option<ParsedArgument> {
         self.iter().position(|arg| arg.name == name).map(|pos| self.remove(pos))
     }
 }

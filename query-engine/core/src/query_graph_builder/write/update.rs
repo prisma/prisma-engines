@@ -3,7 +3,7 @@ use crate::query_graph_builder::write::write_args_parser::*;
 use crate::{
     query_ast::*,
     query_graph::{NodeRef, QueryGraph},
-    ArgumentListLookup, InputAssertions, ParsedField, ParsedInputMap, ReadOneRecordBuilder,
+    ArgumentList, InputAssertions, ParsedField, ParsedInputMap, ReadOneRecordBuilder,
 };
 use connector::{Filter, IdFilter};
 use prisma_models::ModelRef;

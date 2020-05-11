@@ -18,7 +18,7 @@ impl Builder<ReadQuery> for ReadOneRecordBuilder {
     /// Builds a read query tree from a parsed top-level field of a query
     /// Unwraps are safe because of query validation that ensures conformity to the query schema.
     fn build(mut self) -> QueryGraphBuilderResult<ReadQuery> {
-        let filter = match self.field.arguments.lookup("where") {
+        let filter = match self.field.arguments.pluck_optional("where") {
             Some(where_arg) => {
                 let arg: ParsedInputMap = where_arg.value.try_into()?;
 
