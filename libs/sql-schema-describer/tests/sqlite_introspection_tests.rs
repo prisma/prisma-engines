@@ -331,3 +331,36 @@ async fn escaped_quotes_in_string_defaults_must_be_unescaped(api: &TestApi) -> T
 
     Ok(())
 }
+
+#[test_each_connector(tags("sqlite"))]
+async fn escaped_backslashes_in_string_literals_must_be_unescaped(api: &TestApi) -> TestResult {
+    let create_table = format!(
+        r#"
+            CREATE TABLE "{0}"."test" (
+                model_name_space VARCHAR(255) NOT NULL DEFAULT 'xyz\Datasource\Model'
+            );
+        "#,
+        api.schema_name()
+    );
+
+    api.database().query_raw(&create_table, &[]).await?;
+
+    let schema = api.describe().await?;
+
+    let table = schema.table_bang("test");
+
+    let default = table
+        .column_bang("model_name_space")
+        .default
+        .as_ref()
+        .unwrap()
+        .as_value()
+        .unwrap()
+        .clone()
+        .into_string()
+        .unwrap();
+
+    assert_eq!(default, "xyz\\Datasource\\Model");
+
+    Ok(())
+}

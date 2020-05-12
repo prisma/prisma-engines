@@ -718,7 +718,8 @@ fn unsuffix_default_literal<'a>(literal: &'a str, data_type: &str, full_data_typ
 fn process_string_literal<'a>(literal: &'a str) -> Cow<'a, str> {
     static POSTGRES_STRING_DEFAULT_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"(?ms)^B?'(.*)'$"#).unwrap());
     static POSTGRES_DEFAULT_QUOTE_UNESCAPE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"'(')"#).unwrap());
-    static POSTGRES_DEFAULT_BACKSLASH_UNESCAPE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"\\(["'\\])"#).unwrap());
+    static POSTGRES_DEFAULT_BACKSLASH_UNESCAPE_RE: Lazy<Regex> =
+        Lazy::new(|| Regex::new(r#"\\(["']|\\[^\\])"#).unwrap());
     static POSTGRES_STRING_DEFAULTS_PIPELINE: &[(&Lazy<Regex>, &str)] = &[
         (&POSTGRES_STRING_DEFAULT_RE, "$1"),
         (&POSTGRES_DEFAULT_QUOTE_UNESCAPE_RE, "$1"),

@@ -596,7 +596,7 @@ fn extract_enum_values(full_data_type: &&str) -> Vec<String> {
 // In addition, MariaDB will return string literals with the quotes and extra backslashes around
 // control characters like `\n`.
 fn unescape_and_unquote_default_string(default: String, flavour: &Flavour) -> String {
-    const MYSQL_ESCAPING_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"\\(.)|'(')"#).unwrap());
+    const MYSQL_ESCAPING_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"\\('|\\[^\\])|'(')"#).unwrap());
     const MARIADB_NEWLINE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"\\n"#).unwrap());
 
     let maybe_unquoted: Cow<str> = if matches!(flavour, Flavour::MariaDb) {
