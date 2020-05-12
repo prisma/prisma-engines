@@ -111,15 +111,15 @@ impl Standardiser {
 
         let mut missing_back_relation_fields = Vec::new();
         for model in &schema.models {
-            missing_back_relation_fields
-                .append(&mut self.find_missing_back_relation_fields(&model, schema, ast_schema)?);
+            let mut missing_for_model = self.find_missing_back_relation_fields(&model, schema, ast_schema)?;
+            missing_back_relation_fields.append(&mut missing_for_model);
         }
 
         for missing_back_relation_field in missing_back_relation_fields {
             let model = schema
                 .find_model(&missing_back_relation_field.model)
                 .expect(STATE_ERROR);
-            let field_name = missing_back_relation_field.field;
+            let field_name = &missing_back_relation_field.field.name;
 
             if model.find_field(&field_name).is_some() {
                 let source_model = schema
@@ -139,13 +139,7 @@ impl Standardiser {
                     .find_model_mut(&missing_back_relation_field.model)
                     .expect(STATE_ERROR);
 
-                let mut back_relation_field = dml::Field::new_generated(
-                    &field_name,
-                    dml::FieldType::Relation(missing_back_relation_field.relation_info),
-                );
-
-                back_relation_field.arity = missing_back_relation_field.arity;
-                model_mut.add_field(back_relation_field);
+                model_mut.add_field(missing_back_relation_field.field);
 
                 for underlying_field in missing_back_relation_field.underlying_fields.into_iter() {
                     if !model_mut.has_field(&underlying_field.name) {
@@ -192,12 +186,13 @@ impl Standardiser {
                             name: rel.name.clone(),
                             on_delete: OnDeleteStrategy::None,
                         };
+                        let mut back_relation_field =
+                            dml::Field::new_generated(&model.name, dml::FieldType::Relation(relation_info));
+                        back_relation_field.arity = dml::FieldArity::List;
 
                         result.push(AddMissingBackRelationField {
                             model: rel.to.clone(),
-                            field: model.name.clone(),
-                            arity: dml::FieldArity::List,
-                            relation_info,
+                            field: back_relation_field,
                             related_model: model.name.to_string(),
                             related_field: field.name.to_string(),
                             underlying_fields: vec![],
@@ -264,13 +259,15 @@ impl Standardiser {
                             on_delete: OnDeleteStrategy::None,
                         };
 
+                        let mut back_relation_field =
+                            dml::Field::new_generated(&model.name, dml::FieldType::Relation(relation_info));
+                        back_relation_field.arity = dml::FieldArity::Optional;
+
                         result.push(AddMissingBackRelationField {
                             model: rel.to.clone(),
-                            field: model.name.clone(),
-                            arity: dml::FieldArity::Optional,
-                            relation_info,
-                            related_model: model.name.to_string(),
-                            related_field: field.name.to_string(),
+                            field: back_relation_field,
+                            related_model: model.name.to_owned(),
+                            related_field: field.name.to_owned(),
                             underlying_fields: underlying_fields_to_add,
                         });
                     };
@@ -349,9 +346,7 @@ impl Standardiser {
 #[derive(Debug)]
 struct AddMissingBackRelationField {
     model: String,
-    field: String,
-    arity: dml::FieldArity,
-    relation_info: dml::RelationInfo,
+    field: dml::Field,
     related_model: String,
     related_field: String,
     underlying_fields: Vec<dml::Field>,
