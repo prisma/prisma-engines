@@ -46,7 +46,7 @@ where
     D: DatabaseMigrationMarker + 'static,
 {
     let connector = engine.connector();
-    let database_migration = connector.deserialize_database_migration(migration.database_migration);
+    let database_migration = connector.deserialize_database_migration(migration.database_migration)?;
     let database_steps_json = connector
         .database_migration_step_applier()
         .render_steps_pretty(&database_migration)?;
