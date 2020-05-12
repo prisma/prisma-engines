@@ -92,3 +92,19 @@ fn strings_with_newlines_roundtrip() {
 
     assert_eq!(input, rendered);
 }
+
+#[test]
+fn strings_with_multiple_escaped_characters_roundtrip() {
+    let dm = indoc!(
+        r#"
+        model FilmQuote {
+          id             Int    @id
+          favouriteQuote String @default("\"That's a lot of fish\"\n - Godzilla (1998)")
+        }"#
+    );
+
+    let dml = datamodel::parse_datamodel(dm).unwrap();
+    let rendered = datamodel::render_datamodel_to_string(&dml).unwrap();
+
+    assert_eq!(dm, rendered);
+}
