@@ -31,7 +31,7 @@ impl<'a> MigrationCommand for UnapplyMigrationCommand<'a> {
             },
             Some(migration_to_rollback) => {
                 let database_migration =
-                    connector.deserialize_database_migration(migration_to_rollback.database_migration.clone());
+                    connector.deserialize_database_migration(migration_to_rollback.database_migration.clone())?;
 
                 let destructive_changes_checker = connector.destructive_changes_checker();
 
