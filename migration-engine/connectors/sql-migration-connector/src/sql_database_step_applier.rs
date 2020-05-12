@@ -492,7 +492,7 @@ fn safe_alter_column(
                 } => format!(
                     "MODIFY {column_name} {column_type} {nullability} {default}",
                     column_name = Quoted::mysql_ident(&next_column.name),
-                    column_type = Some(column_type.raw.clone())
+                    column_type = Some(column_type.full_data_type.clone())
                         .filter(|r| !r.is_empty())
                         .unwrap_or_else(|| {
                             mysql_render_column_type(&column_type, default.as_ref(), next_schema)

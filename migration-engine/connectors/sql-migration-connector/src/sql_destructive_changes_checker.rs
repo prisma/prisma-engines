@@ -1,8 +1,9 @@
 mod sql_unexecutable_migration;
 
 use crate::{
-    sql_schema_differ::DiffingOptions, AddColumn, AlterColumn, Component, DropColumn, DropTable, DropTables, SqlError,
-    SqlMigration, SqlMigrationStep, SqlResult, TableChange,
+    sql_schema_differ::{self, DiffingOptions},
+    AddColumn, AlterColumn, Component, DropColumn, DropTable, DropTables, SqlError, SqlMigration, SqlMigrationStep,
+    SqlResult, TableChange,
 };
 use migration_connector::{
     ConnectorResult, DestructiveChangeDiagnostics, DestructiveChangesChecker, MigrationWarning, UnexecutableMigration,
@@ -173,7 +174,7 @@ impl SqlDestructiveChangesChecker<'_> {
 
         let diffing_options = DiffingOptions::from_database_info(self.database_info());
 
-        let differ = crate::sql_schema_differ::ColumnDiffer {
+        let differ = sql_schema_differ::ColumnDiffer {
             diffing_options: &diffing_options,
             previous: previous_column,
             next: &alter_column.column,
@@ -186,12 +187,12 @@ impl SqlDestructiveChangesChecker<'_> {
         self.check_for_column_arity_change(&previous_table.name, &differ, diagnostics)
             .await?;
 
-        let values_count = self.count_values_in_column(&alter_column.name, previous_table).await?;
+        let values_count = self.count_rows_in_table(&previous_table.name).await?;
 
-        if dbg!(values_count > 0) {
+        if values_count > 0 {
             diagnostics.add_warning(MigrationWarning {
                 description: format!(
-                                 "You are about to alter the column `{column_name}` on the `{table_name}` table, which still contains {values_count} non-null values. The data in that column will be lost.",
+                                 "You are about to alter the column `{column_name}` on the `{table_name}` table, which still contains {values_count} values. The data in that column may be lost.",
                                  column_name=alter_column.name,
                                  table_name=&previous_table.name,
                                  values_count=values_count,
@@ -291,7 +292,7 @@ impl SqlDestructiveChangesChecker<'_> {
         if !differ.all_changes().arity_changed()
             || !differ.next.tpe.arity.is_required()
             || rows_count == 0
-            || differ.next.default.is_some()
+            || (!self.sql_family().is_mysql() && differ.next.default.is_some())
         {
             return Ok(());
         }

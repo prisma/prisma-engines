@@ -46,7 +46,8 @@ pub(crate) fn expand_mysql_alter_column(columns: &ColumnDiffer) -> Option<Vec<My
     if modify {
         let alter_column = MysqlAlterColumn::Modify {
             column_type: ColumnType {
-                raw: if !columns.all_changes().type_changed()
+                data_type: "".into(),
+                full_data_type: if !columns.all_changes().type_changed()
                     && columns
                         .next
                         .default
@@ -54,7 +55,7 @@ pub(crate) fn expand_mysql_alter_column(columns: &ColumnDiffer) -> Option<Vec<My
                         .map(|default| !matches!(default, DefaultValue::NOW))
                         .unwrap_or(true)
                 {
-                    columns.previous.tpe.raw.clone()
+                    columns.previous.tpe.full_data_type.clone()
                 } else {
                     "".into()
                 },

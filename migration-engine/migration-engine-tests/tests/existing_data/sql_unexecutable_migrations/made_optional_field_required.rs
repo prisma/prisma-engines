@@ -77,11 +77,17 @@ async fn making_an_optional_field_required_with_data_with_a_default_works(api: &
         }
     "#;
 
-    api.infer_apply(&dm2)
+    let output = api
+        .infer_apply(&dm2)
         .migration_id(Some("apply-dm2"))
+        .force(Some(true))
         .send()
         .await?
-        .assert_green()?;
+        .assert_executable()?
+        .assert_no_error()?
+        .into_inner();
+
+    anyhow::ensure!(output.warnings.len() == 1, "There should be one warning.");
 
     api.assert_schema().await?.assert_table("Test", |table| {
         table.assert_column("age", |col| col.assert_is_required())

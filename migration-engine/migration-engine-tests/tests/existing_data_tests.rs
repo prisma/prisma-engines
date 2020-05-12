@@ -82,7 +82,7 @@ async fn dropping_a_column_with_non_null_values_should_warn(api: &TestApi) {
 }
 
 #[test_each_connector]
-async fn altering_a_column_without_non_null_values_should_not_warn(api: &TestApi) {
+async fn altering_a_column_without_non_null_values_should_warn(api: &TestApi) -> TestResult {
     let dm = r#"
         model Test {
             id String @id @default(cuid())
@@ -105,11 +105,23 @@ async fn altering_a_column_without_non_null_values_should_not_warn(api: &TestApi
         }
     "#;
 
-    let result = api.infer_and_apply(&dm2).await;
-    let final_database_schema = &result.sql_schema;
+    let result = api.infer_apply(&dm2).send().await?.into_inner();
 
-    assert_ne!(&original_database_schema, final_database_schema);
-    assert!(result.migration_output.warnings.is_empty());
+    api.assert_schema().await?.assert_equals(&original_database_schema)?;
+
+    // This one should warn because it would fail on MySQL. TODO: improve the message.
+
+    assert_eq!(
+        result.warnings,
+        &[MigrationWarning {
+            description:
+                "You are about to alter the column `puppiesCount` on the `Test` table, which still contains 2 values. \
+                 The data in that column may be lost."
+                    .to_owned()
+        }]
+    );
+
+    Ok(())
 }
 
 #[test_each_connector]
@@ -145,10 +157,9 @@ async fn altering_a_column_with_non_null_values_should_warn(api: &TestApi) -> Te
     assert_eq!(
         migration_output.warnings,
         &[MigrationWarning {
-            description:
-                "You are about to alter the column `age` on the `Test` table, which still contains 2 non-null values. \
-                 The data in that column will be lost."
-                    .to_owned()
+            description: "You are about to alter the column `age` on the `Test` table, which still contains 2 values. \
+                 The data in that column may be lost."
+                .to_owned()
         }]
     );
 
@@ -352,7 +363,6 @@ async fn changing_a_column_from_required_to_optional_should_work(api: &TestApi) 
 
     let migration_output = api.infer_apply(&dm2).send().await?.into_inner();
 
-    // On MySQL we can't safely restate the type in a CHANGE clause, so this change is still destructive.
     if api.is_mysql() {
         anyhow::ensure!(
             migration_output.warnings.len() == 1,
@@ -362,7 +372,7 @@ async fn changing_a_column_from_required_to_optional_should_work(api: &TestApi) 
 
         assert_eq!(
             migration_output.warnings.get(0).unwrap().description,
-            "You are about to alter the column `age` on the `Test` table, which still contains 2 non-null values. The data in that column will be lost.",
+            "You are about to alter the column `age` on the `Test` table, which still contains 2 values. The data in that column may be lost.",
         );
 
         api.assert_schema().await?.assert_equals(&original_database_schema)?;
@@ -426,10 +436,9 @@ async fn changing_a_column_from_optional_to_required_must_warn(api: &TestApi) ->
     assert_eq!(
         migration_output.warnings,
         &[MigrationWarning {
-            description:
-                "You are about to alter the column `age` on the `Test` table, which still contains 2 non-null values. \
-                 The data in that column will be lost."
-                    .to_owned()
+            description: "You are about to alter the column `age` on the `Test` table, which still contains 2 values. \
+                 The data in that column may be lost."
+                .to_owned()
         }]
     );
 
@@ -656,7 +665,7 @@ async fn altering_the_type_of_a_column_in_a_non_empty_table_always_warns(api: &T
         &[MigrationWarning {
             // TODO: the message should say that altering the type of a column is not guaranteed to preserve the data, but the database is going to do its best.
             // Also think about timeouts.
-            description: "You are about to alter the column `dogs` on the `User` table, which still contains 1 non-null values. The data in that column will be lost.".to_owned()
+            description: "You are about to alter the column `dogs` on the `User` table, which still contains 1 values. The data in that column may be lost.".to_owned()
         }]
     );
 
@@ -704,7 +713,7 @@ async fn migrating_a_required_column_from_int_to_string_should_warn_and_cast(api
     "#;
 
     let expected_warning = MigrationWarning {
-        description: "You are about to alter the column `serialNumber` on the `Test` table, which still contains 1 non-null values. The data in that column will be lost.".to_owned(),
+        description: "You are about to alter the column `serialNumber` on the `Test` table, which still contains 1 values. The data in that column may be lost.".to_owned(),
     };
 
     // Apply once without forcing
