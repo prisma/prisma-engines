@@ -57,6 +57,11 @@ where
             Ok(())
         })
     }
+
+    /// Return the version of the underlying database, queried directly from the source. This
+    /// corresponds to the `version()` function on PostgreSQL for example. The version string is
+    /// returned directly without any form of parsing or normalization.
+    fn version<'a>(&'a self) -> DBIO<'a, Option<String>>;
 }
 
 /// A thing that can start a new transaction.

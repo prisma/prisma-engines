@@ -325,6 +325,22 @@ impl Queryable for Mysql {
             Ok(())
         })
     }
+
+    fn version<'a>(&'a self) -> DBIO<'a, Option<String>> {
+        let fut = async move {
+            let query = r#"SELECT @@GLOBAL.version version"#;
+
+            let rows = self.query_raw(query, &[]).await?;
+
+            let version_string = rows
+                .get(0)
+                .and_then(|row| row.get("version").and_then(|version| version.to_string()));
+
+            Ok(version_string)
+        };
+
+        DBIO::new(fut)
+    }
 }
 
 #[cfg(test)]

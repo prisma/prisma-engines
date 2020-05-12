@@ -7,6 +7,7 @@
 //! [PostgreSQL](struct.PostgreSql.html) and [SQLite](struct.Sqlite.html) connect
 //! to the corresponding databases and implement the
 //! [Queryable](trait.Queryable.html) trait for generalized querying interface.
+
 mod queryable;
 mod result_set;
 mod transaction;
