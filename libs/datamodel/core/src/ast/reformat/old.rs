@@ -7,7 +7,10 @@ use std::cell::RefCell;
 
 type Token<'a> = pest::iterators::Pair<'a, Rule>;
 
-pub struct ReformatterOld {}
+pub struct ReformatterOld<'a> {
+    input: &'a str,
+    missing_back_relation_fields: Result<Vec<MissingField>, crate::error::ErrorCollection>,
+}
 
 fn count_lines(text: &str) -> usize {
     bytecount::count(text.as_bytes(), b'\n')
@@ -36,14 +39,47 @@ fn comment(target: &mut dyn LineWriteable, comment_text: &str) {
     target.end_line();
 }
 
-impl ReformatterOld {
-    pub fn reformat_to(input: &str, output: &mut dyn std::io::Write, ident_width: usize) {
-        let mut ast = PrismaDatamodelParser::parse(Rule::datamodel, input).unwrap(); // TODO: Handle error.
-        let mut top_formatter = RefCell::new(Renderer::new(output, ident_width));
-        Self::reformat_top(&mut top_formatter, &ast.next().unwrap());
+impl<'a> ReformatterOld<'a> {
+    pub fn new(input: &'a str) -> Self {
+        let missing_back_relation_fields = Self::find_all_missing_fields(&input);
+        ReformatterOld {
+            input,
+            missing_back_relation_fields,
+        }
     }
 
-    fn reformat_top(target: &mut RefCell<Renderer>, token: &Token) {
+    // this finds all auto generated fields, that are added during auto generation AND are missing from the original input.
+    fn find_all_missing_fields(schema_string: &str) -> Result<Vec<MissingField>, crate::error::ErrorCollection> {
+        let schema_ast = crate::parse_schema_ast(&schema_string)?;
+        let datamodel = crate::lift_ast(&schema_ast)?;
+        let lowerer = crate::validator::LowerDmlToAst::new();
+        let mut result = Vec::new();
+
+        for model in datamodel.models() {
+            let ast_model = schema_ast.find_model(&model.name).unwrap();
+
+            for field in model.fields() {
+                if ast_model.fields.iter().find(|f| &f.name.name == &field.name).is_none() {
+                    let ast_field = lowerer.lower_field(&field, &datamodel)?;
+
+                    result.push(MissingField {
+                        model: model.name.clone(),
+                        field: ast_field,
+                    });
+                }
+            }
+        }
+
+        Ok(result)
+    }
+
+    pub fn reformat_to(&self, output: &mut dyn std::io::Write, ident_width: usize) {
+        let mut ast = PrismaDatamodelParser::parse(Rule::datamodel, self.input).unwrap(); // TODO: Handle error.
+        let mut top_formatter = RefCell::new(Renderer::new(output, ident_width));
+        self.reformat_top(&mut top_formatter, &ast.next().unwrap());
+    }
+
+    fn reformat_top(&self, target: &mut RefCell<Renderer>, token: &Token) {
         let mut types_table = TableFormat::new();
         let mut types_mode = false;
 
@@ -87,7 +123,7 @@ impl ReformatterOld {
                         comment(target.get_mut(), current.as_str());
                     }
                 }
-                Rule::model_declaration => Self::reformat_model(target, &current),
+                Rule::model_declaration => self.reformat_model(target, &current),
                 Rule::enum_declaration => Self::reformat_enum(target, &current),
                 Rule::source_block => Self::reformat_config_block(target.get_mut(), &current),
                 Rule::generator_block => Self::reformat_config_block(target.get_mut(), &current),
@@ -184,10 +220,12 @@ impl ReformatterOld {
         }
     }
 
-    fn reformat_model(target: &mut RefCell<Renderer>, token: &Token) {
+    fn reformat_model(&self, target: &mut RefCell<Renderer>, token: &Token) {
         let mut table = RefCell::new(TableFormat::new());
         // Switch to skip whitespace in 'model xxxx {'
         let mut skip_whitespace = false;
+
+        let mut model_name = "";
 
         for current in token.clone().into_inner() {
             match current.as_rule() {
@@ -201,7 +239,8 @@ impl ReformatterOld {
 
                 Rule::non_empty_identifier | Rule::maybe_empty_identifier => {
                     // Begin.
-                    target.get_mut().write(&format!("model {} {{", current.as_str()));
+                    model_name = current.as_str();
+                    target.get_mut().write(&format!("model {} {{", model_name));
                     target.get_mut().maybe_end_line();
                     target.get_mut().indent_up();
                 }
@@ -210,6 +249,7 @@ impl ReformatterOld {
                     table.get_mut().render(target.get_mut());
                     table = RefCell::new(TableFormat::new());
                     Self::reformat_directive(target.get_mut(), &current, "@@");
+                    table.get_mut().end_line();
                 }
                 Rule::field_declaration => Self::reformat_field(&mut table, &current),
                 // Doc comments are to be placed OUTSIDE of table block.
@@ -237,24 +277,12 @@ impl ReformatterOld {
             }
         }
 
-        //        target.get_mut().write("post Post @relation(\"MyRelation\")");
-        table.get_mut().start_new_line();
-        let ast_field: crate::ast::Field = crate::ast::Field {
-            documentation: None,
-            name: crate::ast::Identifier::new("relationField"),
-            span: crate::ast::Span::empty(),
-            directives: vec![crate::ast::Directive::new(
-                "relation",
-                vec![crate::ast::Argument::new_string("name", "MyRelation")],
-            )],
-            field_type: crate::ast::Identifier::new("OtherModel"),
-            arity: crate::ast::FieldArity::Optional,
-            default_value: None,
-            is_commented_out: false,
-        };
-        Renderer::render_field(table.get_mut(), &ast_field, false);
-
-        //        table.get_mut().start_new_line();
+        // TODO: what to do on error?
+        for missing_back_relation_field in self.missing_back_relation_fields.as_ref().unwrap().iter() {
+            if missing_back_relation_field.model == model_name {
+                Renderer::render_field(table.get_mut(), &missing_back_relation_field.field, false);
+            }
+        }
 
         // End.
         table.get_mut().render(target.get_mut());
@@ -596,4 +624,10 @@ impl ReformatterOld {
 
         target.write(")");
     }
+}
+
+#[derive(Debug)]
+pub struct MissingField {
+    pub model: String,
+    pub field: crate::ast::Field,
 }

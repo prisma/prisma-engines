@@ -28,8 +28,8 @@ impl Reformatter {
         //        }
         //
         //        render_schema_ast_to(output, &ast, 2);
-
-        ReformatterOld::reformat_to(input, output, _ident_width)
+        let reformatter = ReformatterOld::new(input);
+        reformatter.reformat_to(output, _ident_width)
     }
 
     pub fn reformat_to_string(input: &str) -> String {
