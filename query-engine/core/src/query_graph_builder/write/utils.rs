@@ -23,18 +23,18 @@ pub fn node_is_create(graph: &QueryGraph, node: &NodeRef) -> bool {
     todo!()
 }
 
-pub fn filter_edge<T>(t: T) -> QueryDependency
+pub fn inject_filter<T>(t: T) -> QueryDependency
 where
     T: Into<DependencyType>,
 {
-    QueryDependency::FilterBy(t.into())
+    QueryDependency::InjectFilter(t.into())
 }
 
-pub fn injection_edge<T>(t: T) -> QueryDependency
+pub fn inject_data<T>(t: T) -> QueryDependency
 where
     T: Into<DependencyType>,
 {
-    QueryDependency::InjectInto(t.into())
+    QueryDependency::InjectData(t.into())
 }
 
 /// Produces a non-failing read query that fetches the requested projection of records for a given filterable.

@@ -21,7 +21,11 @@ pub fn create_record(graph: &mut QueryGraph, model: &ModelRef, mut field: Parsed
     let read_node = graph.create_node(Query::Read(read_query));
 
     graph.add_result_node(&read_node);
-    graph.create_edge(&create_node, &read_node, Some(filter_edge(model.primary_identifier())));
+    graph.create_edge(
+        &create_node,
+        &read_node,
+        Some(inject_filter(model.primary_identifier())),
+    );
     graph.flag_transactional();
 
     Ok(())

@@ -8,22 +8,47 @@ pub struct Expressionista;
 impl Expressionista {
     pub fn translate(mut graph: QueryGraph) -> InterpretationResult<Expression> {
         let root_node = graph.root_node();
-        Self::translate_query(&mut graph, &root_node, vec![])
+        Self::translate_query(&mut graph, &root_node)
     }
 
     fn translate_query(
         graph: &mut QueryGraph,
         node: &NodeRef,
-        parent_edges: Vec<EdgeRef>,
+        // parent_edges: Vec<EdgeRef>,
     ) -> InterpretationResult<Expression> {
+        let query = graph.node_content(node);
+        let outgoing_deps = graph.outgoing_edges(node);
+        let incoming_deps = graph.incoming_edges(node);
+
+        let transformers: Vec<_> = incoming_deps
+            .into_iter()
+            .filter_map(|parent_edge| {
+                let dep = graph.edge_content(&parent_edge);
+                let parent_node = graph.edge_source(&parent_edge);
+
+                match dep {
+                    Some(QueryDependency::InjectFilter(f)) => {
+                        Some(QueryTransformer::InjectFilter(f.clone().into(), parent_node.id()))
+                    }
+                    Some(QueryDependency::InjectData(i)) => {
+                        Some(QueryTransformer::InjectData(i.clone().into(), parent_node.id()))
+                    }
+                    None => None,
+                }
+            })
+            .collect();
+
+        let test_expr = Expression::Invoke(FnInvocation::Query(Box::new(Expression::Invoke(
+            FnInvocation::TransformQuery(query.clone(), transformers),
+        ))));
+
         // gather query information: all outgoing edges that contain dependencies.
         // this will be part of the query invocation - we need to reload the records if we can't satisfy all.
 
-        // parent edges are the parent scopes that we need access to.
-        // those edges describe the injects and filters we'll have to add.
-
         todo!()
     }
+
+    // fn query_connector()
 
     // fn build_query_expression(
     //     graph: &mut QueryGraph,
@@ -48,6 +73,7 @@ impl Expressionista {
 
     //     let result_subgraphs: Vec<(EdgeRef, NodeRef)> = result_positions
     //         .into_iter()
+
     //         .map(|pos| direct_children.remove(pos))
     //         .collect();
 

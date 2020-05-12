@@ -91,22 +91,22 @@ type InnerGraph = Graph<Query, Option<QueryDependency>>;
 #[derive(Debug)]
 pub enum QueryDependency {
     /// Filter the dependent query by the data of the parent query.
-    FilterBy(DependencyType),
+    InjectFilter(DependencyType),
 
     /// Inject data into the dependent query from the parent query.
-    InjectInto(DependencyType),
+    InjectData(DependencyType),
 }
 
 impl QueryDependency {
     pub fn flip(self) -> Self {
         match self {
-            Self::FilterBy(typ) => Self::FilterBy(typ.flip()),
-            Self::InjectInto(typ) => Self::InjectInto(typ.flip()),
+            Self::InjectFilter(typ) => Self::InjectFilter(typ.flip()),
+            Self::InjectData(typ) => Self::InjectData(typ.flip()),
         }
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum DependencyType {
     /// Depend on a specific combination of fields of the parent query.
     Projection(ModelProjection),
@@ -120,6 +120,15 @@ impl DependencyType {
         match self {
             Self::Relation(rf) => Self::Relation(rf.related_field()),
             x => x,
+        }
+    }
+}
+
+impl Into<ModelProjection> for DependencyType {
+    fn into(self) -> ModelProjection {
+        match self {
+            DependencyType::Projection(p) => p,
+            DependencyType::Relation(r) => r.linking_fields(),
         }
     }
 }

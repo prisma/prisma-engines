@@ -66,8 +66,8 @@ impl Display for DependencyType {
 impl Display for QueryDependency {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let s = match self {
-            Self::FilterBy(f) => format!("FilterBy {}", f),
-            Self::InjectInto(i) => format!("InjectInto {}", i),
+            Self::InjectFilter(f) => format!("InjectFilter {}", f),
+            Self::InjectData(i) => format!("InjectData {}", i),
         };
 
         write!(f, "{}", s)
