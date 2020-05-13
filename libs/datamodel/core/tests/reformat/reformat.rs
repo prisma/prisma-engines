@@ -132,30 +132,28 @@ model a {
 
 #[test]
 fn reformatting_enums_must_work() {
-    let input = r#"
-enum Colors {
+    let input = r#"enum Colors {
   RED
   BLUE
   GREEN
-  
+
   // comment
   ORANGE
-}
-"#;
-
-    // moving the comment to the top is not ideal. Just want to capture the current behavior in a test.
-    let expected = r#"enum Colors {
-  RED
-  BLUE
-  GREEN
-  ORANGE // comment
 }"#;
+
+    //    // moving the comment to the top is not ideal. Just want to capture the current behavior in a test.
+    //    let expected = r#"enum Colors {
+    //  RED
+    //  BLUE
+    //  GREEN
+    //  ORANGE // comment
+    //}"#;
 
     let mut buf = Vec::new();
     datamodel::ast::reformat::Reformatter::reformat_to(&input, &mut buf, 2);
     let actual = str::from_utf8(&buf).expect("unable to convert to string");
     println!("{}", actual);
-    assert_eq!(actual, expected);
+    assert_eq!(actual, input);
 }
 
 #[test]
@@ -175,5 +173,6 @@ fn reformatting_must_work_when_env_var_is_missing() {
     let mut buf = Vec::new();
     datamodel::ast::reformat::Reformatter::reformat_to(&input, &mut buf, 2);
     let actual = str::from_utf8(&buf).expect("unable to convert to string");
-    assert_eq!(expected, actual);
+    println!("{}", actual);
+    assert_eq!(actual, expected);
 }

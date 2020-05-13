@@ -134,10 +134,7 @@ impl<'a> ReformatterOld<'a> {
                     Self::reformat_type_declaration(&mut types_table, &current);
                 }
                 Rule::EOI => {}
-                _ => unreachable!(
-                    "Encounterd impossible datamodel declaration during parsing: {:?}",
-                    current.tokens()
-                ),
+                _ => Self::reformat_generic_token(&mut types_table, &current, false),
             }
         }
     }
@@ -184,10 +181,7 @@ impl<'a> ReformatterOld<'a> {
                 Rule::doc_comment | Rule::doc_comment_and_new_line => {
                     comment(&mut table.interleave_writer(), current.as_str())
                 }
-                _ => unreachable!(
-                    "Encounterd impossible source declaration during parsing: {:?}",
-                    current.tokens()
-                ),
+                _ => Self::reformat_generic_token(&mut table, &current, skip_whitespace),
             };
         }
 
@@ -212,10 +206,7 @@ impl<'a> ReformatterOld<'a> {
                 Rule::doc_comment | Rule::doc_comment_and_new_line => {
                     panic!("Comments inside config key/value not supported yet.")
                 }
-                _ => unreachable!(
-                    "Encounterd impossible source property declaration during parsing: {:?}",
-                    current.tokens()
-                ),
+                _ => Self::reformat_generic_token(target, &current, false),
             }
         }
     }
@@ -270,10 +261,7 @@ impl<'a> ReformatterOld<'a> {
                 Rule::doc_comment | Rule::doc_comment_and_new_line => {
                     comment(&mut table.get_mut().interleave_writer(), current.as_str())
                 }
-                _ => unreachable!(
-                    "Encounterd impossible model declaration during parsing: {:?}",
-                    current.tokens()
-                ),
+                _ => Self::reformat_generic_token(table.get_mut(), &current, true),
             }
         }
 
@@ -299,7 +287,7 @@ impl<'a> ReformatterOld<'a> {
         let mut skip_whitespace = false;
 
         for current in token.clone().into_inner() {
-            match current.as_rule() {
+            match dbg!(current.as_rule()) {
                 Rule::ENUM_KEYWORD => {
                     skip_whitespace = true;
                 }
@@ -319,7 +307,7 @@ impl<'a> ReformatterOld<'a> {
                     table = TableFormat::new();
                     Self::reformat_directive(target.get_mut(), &current, "@@");
                 }
-                Rule::enum_field_declaration => table.write(current.as_str()),
+                Rule::enum_field_declaration => Self::reformat_enum_entry(&mut table, &current),
                 // Doc comments are to be placed OUTSIDE of table block.
                 Rule::doc_comment | Rule::doc_comment_and_new_line => comment(target.get_mut(), current.as_str()),
                 Rule::WHITESPACE => {
@@ -338,20 +326,45 @@ impl<'a> ReformatterOld<'a> {
                 Rule::doc_comment | Rule::doc_comment_and_new_line => {
                     comment(&mut table.interleave_writer(), current.as_str())
                 }
-                _ => unreachable!(
-                    "Encounterd impossible enum declaration during parsing: {:?}",
-                    current.tokens()
-                ),
+                _ => Self::reformat_generic_token(&mut table, &current, true),
             }
         }
 
         // End.
         table.render(target.get_mut());
         target.get_mut().indent_down();
-        target.get_mut().end_line();
-        target.get_mut().write("\n}");
+        //        target.get_mut().end_line();
+        target.get_mut().write("}");
         target.get_mut().maybe_end_line();
         target.get_mut().maybe_end_line();
+    }
+
+    fn reformat_enum_entry(target: &mut TableFormat, token: &Token) {
+        for current in token.clone().into_inner() {
+            match current.as_rule() {
+                Rule::non_empty_identifier => target.write(current.as_str()),
+                Rule::WHITESPACE => {}
+                _ => Self::reformat_generic_token(target, &current, false),
+            }
+        }
+    }
+
+    fn reformat_generic_token(target: &mut TableFormat, token: &Token, skip_whitespace: bool) {
+        //        println!("generic token: |{:?}|", token.as_str());
+        match token.as_rule() {
+            Rule::NEWLINE => target.end_line(),
+            Rule::doc_comment_and_new_line => comment(target, token.as_str()),
+            Rule::WHITESPACE => {
+                //                newlines(target, token.as_str(), "m");
+                if !skip_whitespace {
+                    target.write(token.as_str());
+                }
+            }
+            _ => unreachable!(
+                "Encountered impossible enum declaration during parsing: {:?}",
+                token.clone().tokens()
+            ),
+        }
     }
 
     fn reformat_field(target: &mut RefCell<TableFormat>, token: &Token) {
@@ -384,7 +397,7 @@ impl<'a> ReformatterOld<'a> {
                     }
                 }
                 Rule::WHITESPACE => newlines(target.get_mut(), current.as_str(), "f"),
-                _ => unreachable!("Encounterd impossible field during parsing: {:?}", current.tokens()),
+                _ => Self::reformat_generic_token(target.get_mut(), &current, false),
             }
         }
 

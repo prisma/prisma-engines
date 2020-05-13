@@ -12,6 +12,7 @@
 
 // Treat every whitespace the same for now.
 WHITESPACE = @{ SPACE_SEPARATOR | "\t" }
+NEWLINE = { "\n" | "\r\n" | "\r" }
 UNTIL_END_OF_LINE = _{ WHITESPACE* ~ NEWLINE }
 // the any part is to not crash on comments next to an open block, see test `parse_comments_without_crasing_or_loosing_info`
 BLOCK_OPEN = @{ "{" ~ (!NEWLINE ~ ANY)* ~ UNTIL_END_OF_LINE }

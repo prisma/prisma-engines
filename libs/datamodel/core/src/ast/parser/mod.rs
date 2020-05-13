@@ -624,6 +624,7 @@ fn rule_to_string(rule: Rule) -> &'static str {
 
         // Atomic and helper rules should not surface, we still add them for debugging.
         Rule::WHITESPACE => "",
+        Rule::NEWLINE => "newline",
         Rule::string_escaped_predefined => "escaped unicode char",
         Rule::string_escape => "escaped unicode char",
         Rule::string_interpolate_escape => "string interpolation",
