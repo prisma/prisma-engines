@@ -4,8 +4,8 @@ use std::fmt::{self, Display};
 pub fn format(graph: &QueryGraph) -> String {
     let root_node = vec![graph.root_node()];
     format!(
-        "---- Query Graph ----\nResult Nodes: {}\nMarked Nodes: {}\nRoot Node: {}\n\n{}\n----------------------",
-        fmt_raw_indices(&graph.result_nodes),
+        "---- Query Graph ----\nResult Node: {:?}\nMarked Nodes: {}\nRoot Node: {}\n\n{}\n----------------------",
+        fmt_raw_indices(&graph.result_node.clone().into_iter().collect::<Vec<_>>()),
         fmt_node_tuples(&graph.marked_node_pairs),
         fmt_node_list(&root_node),
         stringify_nodes(graph, &root_node, &mut Vec::new()).join("\n\n")

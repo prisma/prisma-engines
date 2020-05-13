@@ -65,10 +65,10 @@ impl EdgeRef {
 pub struct QueryGraph {
     graph: InnerGraph,
 
-    /// Designates the nodes that are returning the result of the entire QueryGraph.
-    /// If no nodes are set, the interpretation will take the result of the
+    /// Designates the node that is returning the result of the entire QueryGraph.
+    /// If no node is set, the interpretation will take the result of the
     /// last statement derived from the graph.
-    result_nodes: Vec<NodeIndex>,
+    result_node: Option<NodeIndex>,
 
     /// Pairs of nodes marked for parent child swap.
     /// The first `NodeRef` of the tuple is the parent, the second one the child.
@@ -163,16 +163,16 @@ impl QueryGraph {
     }
 
     /// Marks given node as a (possible) result node of the query graph.
-    pub fn add_result_node(&mut self, node: &NodeRef) {
-        self.result_nodes.push(node.node_ix.clone());
+    pub fn mark_result_node(&mut self, node: &NodeRef) {
+        self.result_node = Some(node.node_ix.clone());
     }
 
-    /// Checks if the given node is marked as one of the result nodes in the graph.
+    /// Checks if the given node is marked as the result node in the graph.
     pub fn is_result_node(&self, node: &NodeRef) -> bool {
-        self.result_nodes
-            .iter()
-            .find(|rn| rn.index() == node.node_ix.index())
-            .is_some()
+        self.result_node
+            .as_ref()
+            .map(|ix| ix.index() == node.node_ix.index())
+            .unwrap_or(false)
     }
 
     /// Checks if the subgraph starting at the given node contains the node designated as the overall result.
