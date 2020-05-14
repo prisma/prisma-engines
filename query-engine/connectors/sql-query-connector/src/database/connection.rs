@@ -39,12 +39,14 @@ impl<C> Connection for SqlConnection<C>
 where
     C: QueryExt + TransactionCapable + Send + Sync + 'static,
 {
-    async fn start_transaction<'a>(&'a self) -> crate::Result<Box<dyn Transaction + 'a>> {
+    async fn start_transaction<'a>(&'a self) -> connector::Result<Box<dyn Transaction + 'a>> {
         let fut_tx = self.inner.start_transaction();
-        let connection_info = self.connection_info;
-
-        let tx: quaint::connector::Transaction = fut_tx.await.map_err(SqlError::from)?;
-        Ok(Box::new(SqlConnectorTransaction::new(tx, &connection_info)) as Box<dyn Transaction>)
+        let connection_info = &self.connection_info;
+        self.catch(async move {
+            let tx: quaint::connector::Transaction = fut_tx.await.map_err(SqlError::from)?;
+            Ok(Box::new(SqlConnectorTransaction::new(tx, &connection_info)) as Box<dyn Transaction>)
+        })
+        .await
     }
 }
 

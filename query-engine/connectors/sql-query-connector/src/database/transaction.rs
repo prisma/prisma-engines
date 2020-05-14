@@ -15,7 +15,7 @@ pub struct SqlConnectorTransaction<'tx> {
 }
 
 impl<'tx> SqlConnectorTransaction<'tx> {
-    pub fn new<'b: 'tx>(tx: quaint::connector::Transaction, connection_info: &ConnectionInfo) -> Self {
+    pub fn new<'b: 'tx>(tx: quaint::connector::Transaction<'tx>, connection_info: &ConnectionInfo) -> Self {
         let connection_info = connection_info.clone();
         Self {
             inner: tx,
