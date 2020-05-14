@@ -413,6 +413,15 @@ pub enum DefaultValue {
     DBGENERATED(String),
 }
 
+impl DefaultValue {
+    pub fn as_value(&self) -> Option<&PrismaValue> {
+        match self {
+            DefaultValue::VALUE(v) => Some(v),
+            _ => None,
+        }
+    }
+}
+
 static RE_NUM: Lazy<Regex> = Lazy::new(|| Regex::new(r"^'?(\d+)'?$").expect("compile regex"));
 static RE_FLOAT: Lazy<Regex> = Lazy::new(|| Regex::new(r"^'?([^']+)'?$").expect("compile regex"));
 
