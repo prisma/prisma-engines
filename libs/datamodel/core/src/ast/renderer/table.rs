@@ -26,6 +26,13 @@ impl TableFormat {
         }
     }
 
+    fn reset(&mut self) {
+        self.table = Vec::new();
+        self.row = -1;
+        self.line_ending = true;
+        self.maybe_new_line = false;
+    }
+
     pub fn interleave_writer(&mut self) -> TableFormatInterleaveWrapper {
         TableFormatInterleaveWrapper {
             formatter: self,
@@ -99,7 +106,7 @@ impl TableFormat {
         self.row += 1;
     }
 
-    pub fn render(&self, target: &mut dyn LineWriteable) {
+    pub fn render(&mut self, target: &mut dyn LineWriteable) {
         // First, measure cols
         let mut len = 0;
 
@@ -139,6 +146,8 @@ impl TableFormat {
 
             target.end_line();
         }
+
+        self.reset()
     }
 }
 

@@ -122,13 +122,13 @@ impl<'a> ReformatterOld<'a> {
             if current.is_top_level_element() {
                 // separate top level elements with new lines
                 if seen_at_least_one_top_level_element {
-                    println!("rendering newline");
+                    //                    println!("rendering newline");
                     target.get_mut().write("\n");
                 }
                 seen_at_least_one_top_level_element = true;
             }
 
-            //            println!("token: |{:?}|", current.as_str());
+            //            println!("top level: |{:?}|", current.as_str());
 
             match current.as_rule() {
                 Rule::doc_comment | Rule::doc_comment_and_new_line => {
@@ -138,10 +138,10 @@ impl<'a> ReformatterOld<'a> {
                         comment(target.get_mut(), current.as_str());
                     }
                 }
-                Rule::model_declaration => self.reformat_model(target, &current),
+                Rule::model_declaration => self.reformat_model(target.get_mut(), &current),
                 Rule::enum_declaration => Self::reformat_enum(target, &current),
-                Rule::source_block => Self::reformat_config_block(target.get_mut(), &current),
-                Rule::generator_block => Self::reformat_config_block(target.get_mut(), &current),
+                Rule::source_block => self.reformat_datasource(target.get_mut(), &current),
+                Rule::generator_block => self.reformat_generator(target.get_mut(), &current),
                 Rule::type_declaration => {
                     if !types_mode {
                         panic!("Renderer not in type mode.");
@@ -159,56 +159,33 @@ impl<'a> ReformatterOld<'a> {
         target.get_mut().write("");
     }
 
-    fn reformat_config_block(target: &mut Renderer, token: &Token) {
-        let mut table = TableFormat::new();
-        // Switch to skip whitespace in 'datasource xxxx {'
-        let mut skip_whitespace = false;
+    fn reformat_datasource(&self, target: &mut Renderer, token: &Token) {
+        self.reformat_block_element(
+            "datasource",
+            target,
+            token,
+            Box::new(|table, _, token| match token.as_rule() {
+                Rule::DATASOURCE_KEYWORD => {}
+                Rule::key_value => Self::reformat_key_value(table, &token),
+                _ => Self::reformat_generic_token(table, &token, true),
+            }),
+        );
+    }
 
-        for current in token.clone().into_inner() {
-            match current.as_rule() {
-                Rule::GENERATOR_KEYWORD => {
-                    skip_whitespace = true;
-                    target.write("generator ");
+    fn reformat_generator(&self, target: &mut Renderer, token: &Token) {
+        self.reformat_block_element(
+            "generator",
+            target,
+            token,
+            Box::new(|table, _, token| {
+                //
+                match token.as_rule() {
+                    Rule::GENERATOR_KEYWORD => {}
+                    Rule::key_value => Self::reformat_key_value(table, &token),
+                    _ => Self::reformat_generic_token(table, &token, true),
                 }
-                Rule::DATASOURCE_KEYWORD => {
-                    skip_whitespace = true;
-                    target.write("datasource ");
-                }
-                Rule::BLOCK_OPEN => {
-                    skip_whitespace = false;
-                    target.write(" {");
-                    target.maybe_end_line();
-                    target.indent_up();
-                }
-                Rule::BLOCK_CLOSE => {}
-                Rule::non_empty_identifier | Rule::maybe_empty_identifier => target.write(current.as_str()),
-                Rule::key_value => Self::reformat_key_value(&mut table, &current),
-                Rule::doc_comment | Rule::doc_comment_and_new_line => comment(target, current.as_str()),
-                Rule::WHITESPACE => {
-                    if !skip_whitespace {
-                        // TODO: This is duplicate.
-                        let lines = count_lines(current.as_str());
-
-                        if lines > 1 || (lines == 1 && table.line_empty()) {
-                            // Reset the table layout on more than one newline.
-                            table.render(target);
-                            table = TableFormat::new();
-                        }
-
-                        newlines(&mut table, current.as_str(), "m");
-                    }
-                }
-                Rule::doc_comment | Rule::doc_comment_and_new_line => {
-                    comment(&mut table.interleave_writer(), current.as_str())
-                }
-                _ => Self::reformat_generic_token(&mut table, &current, skip_whitespace),
-            };
-        }
-
-        table.render(target);
-        target.indent_down();
-        target.write("}");
-        target.maybe_end_line();
+            }),
+        );
     }
 
     fn reformat_key_value(target: &mut TableFormat, token: &Token) {
@@ -230,14 +207,65 @@ impl<'a> ReformatterOld<'a> {
         }
     }
 
-    fn reformat_model(&self, target: &mut RefCell<Renderer>, token: &Token) {
-        let mut table = RefCell::new(TableFormat::new());
-        let mut model_name = "";
+    fn reformat_model(&self, target: &mut Renderer, token: &Token) {
+        self.reformat_block_element_internal(
+            "model",
+            target,
+            &token,
+            Box::new(|table, renderer, token| {
+                match token.as_rule() {
+                    Rule::MODEL_KEYWORD => {}
+                    Rule::directive => {
+                        // model level Directives reset the table. -> .render() does that
+                        table.render(renderer);
+                        Self::reformat_directive(renderer, &token, "@@");
+                        //                        table.end_line();
+                    }
+                    Rule::field_declaration => Self::reformat_field(table, &token),
+                    _ => Self::reformat_generic_token(table, &token, true),
+                }
+            }),
+            Box::new(|table, _, model_name| {
+                // TODO: what is the right thing to do on error?
+                if let Ok(missing_fields) = self.missing_fields.as_ref() {
+                    for missing_back_relation_field in missing_fields.iter() {
+                        if missing_back_relation_field.model.as_str() == model_name {
+                            Renderer::render_field(table, &missing_back_relation_field.field, false);
+                        }
+                    }
+                }
+            }),
+        );
+    }
+
+    fn reformat_block_element(
+        &self,
+        block_type: &'static str,
+        renderer: &'a mut Renderer,
+        token: &'a Token,
+        the_fn: Box<dyn Fn(&mut TableFormat, &mut Renderer, &Token) -> () + 'a>,
+    ) {
+        self.reformat_block_element_internal(block_type, renderer, token, the_fn, {
+            // a no op
+            Box::new(|_, _, _| ())
+        })
+    }
+
+    fn reformat_block_element_internal(
+        &self,
+        block_type: &'static str,
+        renderer: &'a mut Renderer,
+        token: &'a Token,
+        the_fn: Box<dyn Fn(&mut TableFormat, &mut Renderer, &Token) -> () + 'a>,
+        after_fn: Box<dyn Fn(&mut TableFormat, &mut Renderer, &str) -> () + 'a>,
+    ) {
+        let mut table = TableFormat::new();
+        let mut block_name = "";
         let mut render_new_lines = false;
 
         for current in token.clone().into_inner() {
+            //            println!("block: {:?}", current.as_str());
             match current.as_rule() {
-                Rule::MODEL_KEYWORD => {}
                 Rule::BLOCK_OPEN => {
                     render_new_lines = true; // do not render newlines before the block
                 }
@@ -245,50 +273,35 @@ impl<'a> ReformatterOld<'a> {
 
                 Rule::non_empty_identifier | Rule::maybe_empty_identifier => {
                     // Begin.
-                    model_name = current.as_str();
-                    target.get_mut().write(&format!("model {} {{", model_name));
-                    target.get_mut().maybe_end_line();
-                    target.get_mut().indent_up();
+                    block_name = current.as_str();
+                    renderer.write(&format!("{} {} {{", block_type, block_name));
+                    renderer.maybe_end_line();
+                    renderer.indent_up();
                 }
-                Rule::directive => {
-                    // Directives reset the table.
-                    table.get_mut().render(target.get_mut());
-                    table = RefCell::new(TableFormat::new());
-                    Self::reformat_directive(target.get_mut(), &current, "@@");
-                    table.get_mut().end_line();
-                }
-                Rule::field_declaration => Self::reformat_field(&mut table, &current),
                 // Doc comments are to be placed OUTSIDE of table block.
-                Rule::doc_comment | Rule::doc_comment_and_new_line => comment(target.get_mut(), current.as_str()),
+                Rule::doc_comment | Rule::doc_comment_and_new_line => comment(renderer, current.as_str()),
                 Rule::NEWLINE => {
                     if render_new_lines {
                         // Reset the table layout on a newline.
-                        table.get_mut().render(target.get_mut());
-                        table = RefCell::new(TableFormat::new());
-                        target.get_mut().end_line();
+                        table.render(renderer);
+                        table = TableFormat::new();
+                        renderer.end_line();
                     }
                 }
                 Rule::doc_comment | Rule::doc_comment_and_new_line => {
-                    comment(&mut table.get_mut().interleave_writer(), current.as_str())
+                    comment(&mut table.interleave_writer(), current.as_str())
                 }
-                _ => Self::reformat_generic_token(table.get_mut(), &current, true),
+                _ => the_fn(&mut table, renderer, &current),
             }
         }
 
-        // TODO: what is the right thing to do on error?
-        if let Ok(missing_fields) = self.missing_fields.as_ref() {
-            for missing_back_relation_field in missing_fields.iter() {
-                if missing_back_relation_field.model == model_name {
-                    Renderer::render_field(table.get_mut(), &missing_back_relation_field.field, false);
-                }
-            }
-        }
+        after_fn(&mut table, renderer, block_name);
 
         // End.
-        table.get_mut().render(target.get_mut());
-        target.get_mut().indent_down();
-        target.get_mut().write("}");
-        target.get_mut().maybe_end_line();
+        table.render(renderer);
+        renderer.indent_down();
+        renderer.write("}");
+        renderer.maybe_end_line();
     }
 
     // TODO: This is very similar to model reformating.
@@ -381,7 +394,7 @@ impl<'a> ReformatterOld<'a> {
         }
     }
 
-    fn reformat_field(target: &mut RefCell<TableFormat>, token: &Token) {
+    fn reformat_field(target: &mut TableFormat, token: &Token) {
         let mut identifier = None;
         let mut directives_started = false;
 
@@ -391,31 +404,29 @@ impl<'a> ReformatterOld<'a> {
                     identifier = Some(String::from(current.as_str()))
                 }
                 Rule::field_type => {
-                    target
-                        .get_mut()
-                        .write(&identifier.clone().expect("Unknown field identifier."));
-                    target.get_mut().write(&Self::reformat_field_type(&current));
+                    target.write(&identifier.clone().expect("Unknown field identifier."));
+                    target.write(&Self::reformat_field_type(&current));
                 }
                 Rule::directive => {
                     directives_started = true;
-                    Self::reformat_directive(&mut target.get_mut().column_locked_writer_for(2), &current, "@")
+                    Self::reformat_directive(&mut target.column_locked_writer_for(2), &current, "@")
                 }
                 Rule::doc_comment | Rule::doc_comment_and_new_line => {
-                    comment(&mut target.get_mut().interleave_writer(), current.as_str())
+                    comment(&mut target.interleave_writer(), current.as_str())
                 }
                 Rule::doc_comment | Rule::doc_comment_and_new_line => {
                     if directives_started {
-                        comment(&mut target.get_mut().column_locked_writer_for(2), current.as_str());
+                        comment(&mut target.column_locked_writer_for(2), current.as_str());
                     } else {
-                        comment(target.get_mut(), current.as_str());
+                        comment(target, current.as_str());
                     }
                 }
-                Rule::WHITESPACE => newlines(target.get_mut(), current.as_str(), "f"),
-                _ => Self::reformat_generic_token(target.get_mut(), &current, false),
+                Rule::WHITESPACE => newlines(target, current.as_str(), "f"),
+                _ => Self::reformat_generic_token(target, &current, false),
             }
         }
 
-        target.get_mut().maybe_end_line();
+        target.maybe_end_line();
     }
 
     fn reformat_type_declaration(target: &mut TableFormat, token: &Token) {

@@ -54,7 +54,7 @@ impl<'a> Renderer<'a> {
                     }
                 }
                 other => {
-                    if let Some(renderer) = &type_renderer {
+                    if let Some(renderer) = &mut type_renderer {
                         renderer.render(self);
                         type_renderer = None;
                     }

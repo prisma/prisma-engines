@@ -206,13 +206,11 @@ model Post {
 }
 
 #[test]
-fn new_lines_between_blocks_must_be_reduced_to_one() {
+fn new_lines_between_blocks_must_be_reduced_to_one_simple() {
     let input = r#"model Post {
   id Int @id
 }
 
-
-// My Blog
 
 model Blog {
   id Int @id
@@ -223,9 +221,129 @@ model Blog {
   id Int @id
 }
 
-// My Blog
 model Blog {
   id Int @id
+}
+"#;
+
+    assert_reformat(input, expected);
+}
+
+#[test]
+fn new_lines_between_blocks_must_be_reduced_to_one_complex() {
+    let input = r#"model Post {
+  id Int @id
+}
+
+
+model Blog {
+  id Int @id
+}
+
+
+datasource mydb {
+  provider = "sqlite"
+  url      = "file:dev.db"
+}
+
+
+enum Status {
+  ACTIVE
+  DONE
+}
+
+
+type MyString = String
+
+
+generator js {
+    provider = "js"
+}
+"#;
+
+    let expected = r#"model Post {
+  id Int @id
+}
+
+model Blog {
+  id Int @id
+}
+
+datasource mydb {
+  provider = "sqlite"
+  url      = "file:dev.db"
+}
+
+enum Status {
+  ACTIVE
+  DONE
+}
+
+type MyString = String
+
+generator js {
+  provider = "js"
+}
+"#;
+
+    assert_reformat(input, expected);
+}
+
+#[test]
+fn model_level_directives_reset_the_table_layout() {
+    let input = r#"model Post {
+  id Int @id
+  aVeryLongName  String
+  @@index([a])
+  alsoAVeryLongName String
+}
+"#;
+
+    let expected = r#"model Post {
+  id            Int    @id
+  aVeryLongName String
+  @@index([a])
+  alsoAVeryLongName String
+}
+"#;
+
+    assert_reformat(input, expected);
+}
+
+#[test]
+fn back_relation_fields_must_be_added() {
+    let input = r#"model Blog {
+  id    Int     @id
+  posts Post[]
+}
+
+model Post {
+  id Int   @id
+}
+
+model Post2 {
+  id     Int  @id
+  blogId Int
+  Blog   Blog @relation(fields: [blogId], references: [id])
+}
+"#;
+
+    let expected = r#"model Blog {
+  id    Int     @id
+  posts Post[]
+  Post2 Post2[]
+}
+
+model Post {
+  id     Int   @id
+  Blog   Blog? @relation(fields: [blogId], references: [id])
+  blogId Int?
+}
+
+model Post2 {
+  id     Int  @id
+  blogId Int
+  Blog   Blog @relation(fields: [blogId], references: [id])
 }
 "#;
 
@@ -237,6 +355,6 @@ fn assert_reformat(schema: &str, expected_result: &str) {
     let mut buf = Vec::new();
     datamodel::ast::reformat::Reformatter::reformat_to(&schema, &mut buf, 2);
     let result = str::from_utf8(&buf).expect("unable to convert to string");
-    println!("result: {:?}", result);
+    println!("result: {}", result);
     assert_eq!(result, expected_result);
 }
