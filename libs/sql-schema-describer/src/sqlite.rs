@@ -234,7 +234,7 @@ impl SqlSchemaDescriber {
                 if pk_cols.len() == 1 {
                     let pk_col = &columns[0];
                     for col in cols.iter_mut() {
-                        if &col.name == pk_col && &col.tpe.raw.to_lowercase() == "integer" {
+                        if &col.name == pk_col && &col.tpe.data_type.to_lowercase() == "integer" {
                             debug!(
                                 "Detected that the primary key column corresponds to rowid and \
                                  is auto incrementing"
@@ -437,8 +437,9 @@ fn get_column_type(tpe: &str, arity: ColumnArity) -> ColumnType {
         data_type => ColumnTypeFamily::Unsupported(data_type.into()),
     };
     ColumnType {
-        raw: tpe.to_string(),
-        family: family,
+        data_type: tpe.to_string(),
+        full_data_type: tpe.to_string(),
+        family,
         arity,
     }
 }
