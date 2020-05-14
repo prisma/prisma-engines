@@ -1,27 +1,106 @@
 use super::{expression::*, Env, InterpretationResult, InterpreterError};
-use crate::{query_graph::*, Query};
+use crate::{query_graph::*, Query, WriteQuery};
 use prisma_models::ModelProjection;
 use std::convert::TryInto;
 
 pub struct Expressionista;
 
+// WIP Assumptions:
+// - Result node is always found on the first or second level of the query graph -> We can simply order the result node to the back
+// - The dependencies expressed in the graph guarantee that whatever expression is returned from translating a node does indeed return the necessary
+//   data as a result of the entire expression evaluation.
 impl Expressionista {
     pub fn translate(mut graph: QueryGraph) -> InterpretationResult<Expression> {
         let root_node = graph.root_node();
-        Self::translate_query(&mut graph, &root_node)
+        Self::translate_node(&mut graph, &root_node)
     }
 
-    fn translate_query(graph: &mut QueryGraph, node: &NodeRef) -> InterpretationResult<Expression> {
+    fn translate_node(graph: &mut QueryGraph, node: &NodeRef) -> InterpretationResult<Expression> {
         let node_id = node.id();
         let query = graph.node_content(node);
-        let outgoing_deps = graph.outgoing_edges(node);
-        let incoming_deps = graph.incoming_edges(node);
+        let outgoing_edges = graph.outgoing_edges(node);
+        let incoming_edges = graph.incoming_edges(node);
 
-        let transformers: Vec<_> = incoming_deps
+        let transformers: Vec<_> = Self::collect_query_transformers(graph, &incoming_edges);
+        let expected_return_projection = Self::collect_expected_projection(graph, &outgoing_edges);
+        let query_expr = Self::query_transform_expression(query.clone(), transformers);
+
+        Ok(Self::translate_query(query))
+    }
+
+    fn translate_query(query: &Query) -> Expression {
+        match query {
+            Query::Write(WriteQuery::CreateRecord(cr)) => translate_create_record(),
+            _ => todo!(),
+        }
+    }
+
+    fn translate_create_record(graph: &QueryGraph) -> Expression {
+        // A simple create is straight-forward, not much to do around it.
+    }
+
+    // WIP signature
+    fn reload_records_conditionally(
+        graph: &QueryGraph,
+        node_id: String,
+        query: &Query,
+        query_expr: Expression,
+        child_expr: Option<Expression>,
+        expected_return_projection: Option<ModelProjection>,
+    ) -> Expression {
+        match (expected_return_projection, child_expr) {
+            // Reload necessary, dependent queries present.
+            (Some(p), Some(ce)) if !query.returns(&p) => {
+                let reload_query_expr = Self::derive_reload_query_expression(query, node_id.clone(), p);
+
+                Expression::Let {
+                    bindings: vec![Binding {
+                        name: node_id.clone(), // todo use query name? Or maybe separate meta info.
+                        expr: query_expr,
+                    }],
+                    inner: Box::new(Expression::Let {
+                        bindings: vec![Binding {
+                            name: node_id,
+                            expr: reload_query_expr,
+                        }],
+                        inner: Box::new(ce),
+                    }),
+                }
+            }
+
+            // Reload necessary, no dependent queries present.
+            (Some(p), None) if !query.returns(&p) => {
+                let reload_query_expr = Self::derive_reload_query_expression(query, node_id.clone(), p);
+
+                Expression::Let {
+                    bindings: vec![Binding {
+                        name: node_id.clone(),
+                        expr: query_expr,
+                    }],
+                    inner: Box::new(reload_query_expr),
+                }
+            }
+
+            // No reload necessary, dependent children present.
+            (_, Some(ce)) => Expression::Let {
+                bindings: vec![Binding {
+                    name: node_id.clone(),
+                    expr: query_expr,
+                }],
+                inner: Box::new(ce),
+            },
+
+            // No reload necessary, no dependent children present.
+            (_, None) => query_expr,
+        }
+    }
+
+    fn collect_query_transformers(graph: &QueryGraph, incoming_edges: &[EdgeRef]) -> Vec<QueryTransformer> {
+        incoming_edges
             .into_iter()
             .filter_map(|parent_edge| {
-                let dep = graph.edge_content(&parent_edge);
-                let parent_node = graph.edge_source(&parent_edge);
+                let dep = graph.edge_content(parent_edge);
+                let parent_node = graph.edge_source(parent_edge);
 
                 match dep {
                     Some(QueryDependency::InjectFilter(f)) => {
@@ -33,19 +112,15 @@ impl Expressionista {
                     None => None,
                 }
             })
-            .collect();
+            .collect()
+    }
 
-        let query_expr = if transformers.is_empty() {
-            Expression::Invoke(FnInvocation::Query(Box::new(Expression::Data(Data::Query(
-                query.clone(),
-            )))))
-        } else {
-            Expression::Invoke(FnInvocation::Query(Box::new(Expression::Invoke(
-                FnInvocation::TransformQuery(query.clone(), transformers),
-            ))))
-        };
+    fn collect_expected_projection(graph: &QueryGraph, outgoing_edges: &[EdgeRef]) -> Option<ModelProjection> {
+        if outgoing_edges.is_empty() {
+            return None;
+        }
 
-        let expected_projections: Vec<ModelProjection> = outgoing_deps
+        let expected_projections = outgoing_edges
             .into_iter()
             .filter_map(|parent_edge| {
                 let dep = graph.edge_content(&parent_edge);
@@ -60,36 +135,28 @@ impl Expressionista {
             })
             .collect();
 
-        let expected_projection = ModelProjection::union(expected_projections);
-
-        // if no children, no let necessary
-
-        let expr = if !query.returns(&expected_projection) {
-            let (reload_query, dependency) = Self::derive_reload_query(query, expected_projection);
-
-            Expression::Let {
-                bindings: vec![Binding {
-                    name: node_id.clone(), // todo use query name? Or maybe separate meta info.
-                    expr: query_expr,
-                }],
-                inner: Box::new(Expression::Let {
-                    bindings: vec![Binding {
-                        name: node_id,
-                        expr: Expression::Invoke(FnInvocation::Query(Box::new(Expression::Data(Data::Query(
-                            reload_query,
-                        ))))),
-                    }],
-                    inner: todo!(), // Child nodes here
-                }),
-            }
-        } else {
-            todo!()
-        };
-
-        Ok(expr)
+        Some(ModelProjection::union(expected_projections))
     }
 
-    fn derive_reload_query(query: &Query, projection: ModelProjection) -> (Query, ModelProjection) {
+    fn query_transform_expression(query: Query, transformers: Vec<QueryTransformer>) -> Expression {
+        if transformers.is_empty() {
+            Expression::Data(Data::Query(query.clone()))
+        } else {
+            Expression::Invoke(FnInvocation::TransformQuery(query.clone(), transformers))
+        }
+    }
+
+    fn derive_reload_query_expression(
+        query: &Query,
+        parent_query_id: String,
+        projection: ModelProjection,
+    ) -> Expression {
+        // let model =
+
+        // Expression::Invoke(FnInvocation::Query(Box::new(Expression::Data(Data::Query(
+        //     reload_query,
+        // )))))
+
         todo!()
     }
 
