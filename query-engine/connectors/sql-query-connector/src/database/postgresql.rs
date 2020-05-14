@@ -36,11 +36,10 @@ impl FromSource for PostgreSql {
 
 #[async_trait]
 impl Connector for PostgreSql {
-    async fn get_connection<'a>(&'a self) -> connector_interface::Result<Box<dyn Connection + 'a>> {
+    async fn get_connection<'a>(&'a self) -> connector_interface::Result<Box<dyn Connection + 'static>> {
         super::catch(&self.connection_info, async move {
             let conn = self.pool.check_out().await.map_err(SqlError::from)?;
             let conn = SqlConnection::new(conn, &self.connection_info);
-
             Ok(Box::new(conn) as Box<dyn Connection>)
         })
         .await
