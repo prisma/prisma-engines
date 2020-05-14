@@ -2,8 +2,9 @@ use super::connection::SqlConnection;
 use crate::{FromSource, SqlError};
 use async_trait::async_trait;
 use connector_interface::{
+    self as connector,
     error::{ConnectorError, ErrorKind},
-    Connection, Connector, IO,
+    Connection, Connector,
 };
 use datamodel::Source;
 use quaint::{connector::SqliteParams, error::ErrorKind as QuaintKind, pooled::Quaint, prelude::ConnectionInfo};
@@ -80,13 +81,15 @@ fn invalid_file_path_error(file_path: &str, connection_info: &ConnectionInfo) ->
     .into_connector_error(&connection_info)
 }
 
+#[async_trait]
 impl Connector for Sqlite {
-    fn get_connection<'a>(&'a self) -> IO<Box<dyn Connection + 'a>> {
-        IO::new(super::catch(&self.connection_info(), async move {
+    async fn get_connection<'a>(&'a self) -> connector::Result<Box<dyn Connection + 'a>> {
+        super::catch(&self.connection_info(), async move {
             let conn = self.pool.check_out().await.map_err(SqlError::from)?;
             let conn = SqlConnection::new(conn, self.connection_info());
 
             Ok(Box::new(conn) as Box<dyn Connection>)
-        }))
+        })
+        .await
     }
 }
