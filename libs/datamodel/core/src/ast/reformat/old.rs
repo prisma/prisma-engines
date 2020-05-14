@@ -9,7 +9,7 @@ type Token<'a> = pest::iterators::Pair<'a, Rule>;
 
 pub struct ReformatterOld<'a> {
     input: &'a str,
-    missing_back_relation_fields: Result<Vec<MissingField>, crate::error::ErrorCollection>,
+    missing_fields: Result<Vec<MissingField>, crate::error::ErrorCollection>,
 }
 
 fn count_lines(text: &str) -> usize {
@@ -32,20 +32,34 @@ fn comment(target: &mut dyn LineWriteable, comment_text: &str) {
 
     if !target.line_empty() {
         // Prefix with whitespace seperator.
-        target.write(&format!(" {}", trimmed));
+        target.write(trimmed);
     } else {
         target.write(trimmed);
     }
     target.end_line();
 }
 
+trait TokenExtensions {
+    fn is_top_level_element(&self) -> bool;
+}
+
+impl TokenExtensions for Token<'_> {
+    fn is_top_level_element(&self) -> bool {
+        match self.as_rule() {
+            Rule::model_declaration => true,
+            Rule::enum_declaration => true,
+            Rule::source_block => true,
+            Rule::generator_block => true,
+            Rule::type_declaration => true,
+            _ => false,
+        }
+    }
+}
+
 impl<'a> ReformatterOld<'a> {
     pub fn new(input: &'a str) -> Self {
-        let missing_back_relation_fields = Self::find_all_missing_fields(&input);
-        ReformatterOld {
-            input,
-            missing_back_relation_fields,
-        }
+        let missing_fields = Self::find_all_missing_fields(&input);
+        ReformatterOld { input, missing_fields }
     }
 
     // this finds all auto generated fields, that are added during auto generation AND are missing from the original input.
@@ -82,6 +96,7 @@ impl<'a> ReformatterOld<'a> {
     fn reformat_top(&self, target: &mut RefCell<Renderer>, token: &Token) {
         let mut types_table = TableFormat::new();
         let mut types_mode = false;
+        let mut seen_at_least_one_top_level_element = false;
 
         for current in token.clone().into_inner() {
             match current.as_rule() {
@@ -100,22 +115,22 @@ impl<'a> ReformatterOld<'a> {
                     }
                 }
             };
-            match current.as_rule() {
-                Rule::WHITESPACE => {
-                    if types_mode {
-                        let lines = count_lines(current.as_str());
 
-                        if lines > 1 || (lines == 1 && types_table.line_empty()) {
-                            // Reset the table layout on more than one newline.
-                            types_table.render(target.get_mut());
-                            types_table = TableFormat::new();
-                        }
-
-                        newlines(&mut types_table, current.as_str(), "m");
-                    } else {
-                        newlines(target.get_mut(), current.as_str(), "d")
-                    }
+            // new line handling outside of blocks:
+            // * fold multiple new lines between blocks into one
+            // * all new lines before the first block get removed
+            if current.is_top_level_element() {
+                // separate top level elements with new lines
+                if seen_at_least_one_top_level_element {
+                    println!("rendering newline");
+                    target.get_mut().write("\n");
                 }
+                seen_at_least_one_top_level_element = true;
+            }
+
+            //            println!("token: |{:?}|", current.as_str());
+
+            match current.as_rule() {
                 Rule::doc_comment | Rule::doc_comment_and_new_line => {
                     if types_mode {
                         comment(&mut types_table.interleave_writer(), current.as_str());
@@ -134,9 +149,14 @@ impl<'a> ReformatterOld<'a> {
                     Self::reformat_type_declaration(&mut types_table, &current);
                 }
                 Rule::EOI => {}
-                _ => Self::reformat_generic_token(&mut types_table, &current, false),
+                Rule::WHITESPACE => {} // we don't want to retain whitespace at the top level. Just within the blocks.
+                Rule::NEWLINE => {} // Do not render user provided newlines. We have a strong opinionation about new lines on the top level.
+                _ => Self::reformat_generic_token(target.get_mut(), &current, false),
             }
         }
+
+        // FLUSH IT. Otherwise pending new lines do not get rendered.
+        target.get_mut().write("");
     }
 
     fn reformat_config_block(target: &mut Renderer, token: &Token) {
@@ -189,7 +209,6 @@ impl<'a> ReformatterOld<'a> {
         target.indent_down();
         target.write("}");
         target.maybe_end_line();
-        target.maybe_end_line();
     }
 
     fn reformat_key_value(target: &mut TableFormat, token: &Token) {
@@ -213,18 +232,14 @@ impl<'a> ReformatterOld<'a> {
 
     fn reformat_model(&self, target: &mut RefCell<Renderer>, token: &Token) {
         let mut table = RefCell::new(TableFormat::new());
-        // Switch to skip whitespace in 'model xxxx {'
-        let mut skip_whitespace = false;
-
         let mut model_name = "";
+        let mut render_new_lines = false;
 
         for current in token.clone().into_inner() {
             match current.as_rule() {
-                Rule::MODEL_KEYWORD => {
-                    skip_whitespace = true;
-                }
+                Rule::MODEL_KEYWORD => {}
                 Rule::BLOCK_OPEN => {
-                    skip_whitespace = false;
+                    render_new_lines = true; // do not render newlines before the block
                 }
                 Rule::BLOCK_CLOSE => {}
 
@@ -245,17 +260,12 @@ impl<'a> ReformatterOld<'a> {
                 Rule::field_declaration => Self::reformat_field(&mut table, &current),
                 // Doc comments are to be placed OUTSIDE of table block.
                 Rule::doc_comment | Rule::doc_comment_and_new_line => comment(target.get_mut(), current.as_str()),
-                Rule::WHITESPACE => {
-                    if !skip_whitespace {
-                        let lines = count_lines(current.as_str());
-
-                        if lines > 1 || (lines == 1 && table.get_mut().line_empty()) {
-                            // Reset the table layout on more than one newline.
-                            table.get_mut().render(target.get_mut());
-                            table = RefCell::new(TableFormat::new());
-                        }
-
-                        newlines(table.get_mut(), current.as_str(), "m");
+                Rule::NEWLINE => {
+                    if render_new_lines {
+                        // Reset the table layout on a newline.
+                        table.get_mut().render(target.get_mut());
+                        table = RefCell::new(TableFormat::new());
+                        target.get_mut().end_line();
                     }
                 }
                 Rule::doc_comment | Rule::doc_comment_and_new_line => {
@@ -265,10 +275,12 @@ impl<'a> ReformatterOld<'a> {
             }
         }
 
-        // TODO: what to do on error?
-        for missing_back_relation_field in self.missing_back_relation_fields.as_ref().unwrap().iter() {
-            if missing_back_relation_field.model == model_name {
-                Renderer::render_field(table.get_mut(), &missing_back_relation_field.field, false);
+        // TODO: what is the right thing to do on error?
+        if let Ok(missing_fields) = self.missing_fields.as_ref() {
+            for missing_back_relation_field in missing_fields.iter() {
+                if missing_back_relation_field.model == model_name {
+                    Renderer::render_field(table.get_mut(), &missing_back_relation_field.field, false);
+                }
             }
         }
 
@@ -276,7 +288,6 @@ impl<'a> ReformatterOld<'a> {
         table.get_mut().render(target.get_mut());
         target.get_mut().indent_down();
         target.get_mut().write("}");
-        target.get_mut().maybe_end_line();
         target.get_mut().maybe_end_line();
     }
 
@@ -287,7 +298,7 @@ impl<'a> ReformatterOld<'a> {
         let mut skip_whitespace = false;
 
         for current in token.clone().into_inner() {
-            match dbg!(current.as_rule()) {
+            match current.as_rule() {
                 Rule::ENUM_KEYWORD => {
                     skip_whitespace = true;
                 }
@@ -336,7 +347,6 @@ impl<'a> ReformatterOld<'a> {
         //        target.get_mut().end_line();
         target.get_mut().write("}");
         target.get_mut().maybe_end_line();
-        target.get_mut().maybe_end_line();
     }
 
     fn reformat_enum_entry(target: &mut TableFormat, token: &Token) {
@@ -349,7 +359,8 @@ impl<'a> ReformatterOld<'a> {
         }
     }
 
-    fn reformat_generic_token(target: &mut TableFormat, token: &Token, skip_whitespace: bool) {
+    // TODO: do we still need skip_whitespace??
+    fn reformat_generic_token(target: &mut dyn LineWriteable, token: &Token, skip_whitespace: bool) {
         //        println!("generic token: |{:?}|", token.as_str());
         match token.as_rule() {
             Rule::NEWLINE => target.end_line(),
@@ -359,6 +370,9 @@ impl<'a> ReformatterOld<'a> {
                 if !skip_whitespace {
                     target.write(token.as_str());
                 }
+            }
+            Rule::CATCH_ALL => {
+                target.write(token.as_str());
             }
             _ => unreachable!(
                 "Encountered impossible enum declaration during parsing: {:?}",

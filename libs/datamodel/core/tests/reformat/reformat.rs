@@ -12,7 +12,8 @@ fn test_reformat_model() {
 
     let expected = r#"model User {
   id Int @id
-}"#;
+}
+"#;
 
     let mut buf = Vec::new();
     datamodel::ast::reformat::Reformatter::reformat_to(&input, &mut buf, 2);
@@ -32,7 +33,8 @@ fn test_reformat_config() {
     let expected = r#"datasource pg {
   provider = "postgresql"
   url      = "postgresql://"
-}"#;
+}
+"#;
 
     let mut buf = Vec::new();
     datamodel::ast::reformat::Reformatter::reformat_to(&input, &mut buf, 2);
@@ -52,7 +54,8 @@ fn test_reformat_tabs() {
     let expected = r#"datasource pg {
   provider = "postgresql"
   url      = "postgresql://"
-}"#;
+}
+"#;
 
     let mut buf = Vec::new();
     // replaces \t placeholder with a real tab
@@ -139,7 +142,8 @@ fn reformatting_enums_must_work() {
 
   // comment
   ORANGE
-}"#;
+}
+"#;
 
     //    // moving the comment to the top is not ideal. Just want to capture the current behavior in a test.
     //    let expected = r#"enum Colors {
@@ -168,11 +172,71 @@ fn reformatting_must_work_when_env_var_is_missing() {
     let expected = r#"datasource pg {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+"#;
+
+    assert_reformat(input, expected);
+}
+
+#[test]
+fn invalid_lines_must_not_break_reformatting() {
+    let input = r#"$ /a/b/c:.
+model Post {
+  id Int @id
+}
+"#;
+
+    assert_reformat(input, input);
+}
+
+#[test]
+fn new_lines_before_first_block_must_be_removed() {
+    let input = r#"
+
+model Post {
+  id Int @id
 }"#;
 
+    let expected = r#"model Post {
+  id Int @id
+}
+"#;
+
+    assert_reformat(input, expected);
+}
+
+#[test]
+fn new_lines_between_blocks_must_be_reduced_to_one() {
+    let input = r#"model Post {
+  id Int @id
+}
+
+
+// My Blog
+
+model Blog {
+  id Int @id
+}
+"#;
+
+    let expected = r#"model Post {
+  id Int @id
+}
+
+// My Blog
+model Blog {
+  id Int @id
+}
+"#;
+
+    assert_reformat(input, expected);
+}
+
+fn assert_reformat(schema: &str, expected_result: &str) {
+    println!("schema: {:?}", schema);
     let mut buf = Vec::new();
-    datamodel::ast::reformat::Reformatter::reformat_to(&input, &mut buf, 2);
-    let actual = str::from_utf8(&buf).expect("unable to convert to string");
-    println!("{}", actual);
-    assert_eq!(actual, expected);
+    datamodel::ast::reformat::Reformatter::reformat_to(&schema, &mut buf, 2);
+    let result = str::from_utf8(&buf).expect("unable to convert to string");
+    println!("result: {:?}", result);
+    assert_eq!(result, expected_result);
 }
