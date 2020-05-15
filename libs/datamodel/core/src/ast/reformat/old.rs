@@ -139,7 +139,7 @@ impl<'a> ReformatterOld<'a> {
                     }
                 }
                 Rule::model_declaration => self.reformat_model(target.get_mut(), &current),
-                Rule::enum_declaration => Self::reformat_enum(target, &current),
+                Rule::enum_declaration => self.reformat_enum(target.get_mut(), &current),
                 Rule::source_block => self.reformat_datasource(target.get_mut(), &current),
                 Rule::generator_block => self.reformat_generator(target.get_mut(), &current),
                 Rule::type_declaration => {
@@ -304,62 +304,24 @@ impl<'a> ReformatterOld<'a> {
         renderer.maybe_end_line();
     }
 
-    // TODO: This is very similar to model reformating.
-    fn reformat_enum(target: &mut RefCell<Renderer>, token: &Token) {
-        let mut table = TableFormat::new();
-        // Switch to skip whitespace in 'enum xxxx {'
-        let mut skip_whitespace = false;
-
-        for current in token.clone().into_inner() {
-            match current.as_rule() {
-                Rule::ENUM_KEYWORD => {
-                    skip_whitespace = true;
-                }
-                Rule::BLOCK_OPEN => {
-                    skip_whitespace = false;
-                }
-                Rule::BLOCK_CLOSE => {}
-
-                Rule::non_empty_identifier | Rule::maybe_empty_identifier => {
-                    // Begin.
-                    target.get_mut().write(&format!("enum {} {{", current.as_str()));
-                    target.get_mut().maybe_end_line();
-                    target.get_mut().indent_up();
-                }
-                Rule::directive => {
-                    table.render(target.get_mut());
-                    table = TableFormat::new();
-                    Self::reformat_directive(target.get_mut(), &current, "@@");
-                }
-                Rule::enum_field_declaration => Self::reformat_enum_entry(&mut table, &current),
-                // Doc comments are to be placed OUTSIDE of table block.
-                Rule::doc_comment | Rule::doc_comment_and_new_line => comment(target.get_mut(), current.as_str()),
-                Rule::WHITESPACE => {
-                    if !skip_whitespace {
-                        let lines = count_lines(current.as_str());
-
-                        if lines > 1 || (lines == 1 && table.line_empty()) {
-                            // Reset the table layout on more than one newline.
-                            table.render(target.get_mut());
-                            table = TableFormat::new();
-                        }
-
-                        newlines(&mut table, current.as_str(), "m");
+    fn reformat_enum(&self, target: &mut Renderer, token: &Token) {
+        self.reformat_block_element(
+            "enum",
+            target,
+            token,
+            Box::new(|table, target, token| {
+                //
+                match token.as_rule() {
+                    Rule::ENUM_KEYWORD => {}
+                    Rule::directive => {
+                        table.render(target);
+                        Self::reformat_directive(target, token, "@@");
                     }
+                    Rule::enum_field_declaration => Self::reformat_enum_entry(table, token),
+                    _ => Self::reformat_generic_token(table, token, true),
                 }
-                Rule::doc_comment | Rule::doc_comment_and_new_line => {
-                    comment(&mut table.interleave_writer(), current.as_str())
-                }
-                _ => Self::reformat_generic_token(&mut table, &current, true),
-            }
-        }
-
-        // End.
-        table.render(target.get_mut());
-        target.get_mut().indent_down();
-        //        target.get_mut().end_line();
-        target.get_mut().write("}");
-        target.get_mut().maybe_end_line();
+            }),
+        );
     }
 
     fn reformat_enum_entry(target: &mut TableFormat, token: &Token) {
