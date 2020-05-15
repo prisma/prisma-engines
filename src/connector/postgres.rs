@@ -3,7 +3,7 @@ mod error;
 
 use crate::{
     ast::{Query, Value},
-    connector::{metrics, queryable::*, ResultSet, DBIO},
+    connector::{metrics, queryable::*, ResultSet, Transaction, DBIO},
     error::{Error, ErrorKind},
     visitor::{self, Visitor},
 };
@@ -44,6 +44,7 @@ impl std::fmt::Debug for PostgresClient {
 #[derive(Debug)]
 pub struct PostgreSql {
     client: PostgresClient,
+    pg_bouncer: bool,
     socket_timeout: Option<Duration>,
 }
 
@@ -223,9 +224,15 @@ impl PostgresUrl {
         let mut host = None;
         let mut socket_timeout = None;
         let mut connect_timeout = None;
+        let mut pg_bouncer = false;
 
         for (k, v) in url.query_pairs() {
             match k.as_ref() {
+                "pgbouncer" => {
+                    pg_bouncer = v
+                        .parse()
+                        .map_err(|_| Error::builder(ErrorKind::InvalidConnectionArguments).build())?;
+                }
                 "sslmode" => {
                     match v.as_ref() {
                         "disable" => ssl_mode = SslMode::Disable,
@@ -315,6 +322,7 @@ impl PostgresUrl {
             host,
             connect_timeout,
             socket_timeout,
+            pg_bouncer,
         })
     }
 
@@ -352,6 +360,7 @@ pub(crate) struct PostgresUrlQueryParams {
     connection_limit: Option<usize>,
     schema: String,
     ssl_mode: SslMode,
+    pg_bouncer: bool,
     host: Option<String>,
     socket_timeout: Option<Duration>,
     connect_timeout: Option<Duration>,
@@ -415,6 +424,7 @@ impl PostgreSql {
         Ok(Self {
             client: PostgresClient(Mutex::new(client)),
             socket_timeout: url.query_params.socket_timeout,
+            pg_bouncer: url.query_params.pg_bouncer,
         })
     }
 
@@ -437,7 +447,7 @@ impl PostgreSql {
     }
 }
 
-impl TransactionCapable for PostgreSql {}
+impl TransactionCapable for PostgreSql where Self: Sized + Sync {}
 
 impl Queryable for PostgreSql {
     fn query<'a>(&'a self, q: Query<'a>) -> DBIO<'a, ResultSet> {
@@ -505,6 +515,16 @@ impl Queryable for PostgreSql {
         };
 
         DBIO::new(fut)
+    }
+
+    fn server_reset_query<'a>(&'a self, tx: &'a Transaction<'a>) -> DBIO<'a, ()> {
+        DBIO::new(async move {
+            if self.pg_bouncer {
+                tx.raw_cmd("DEALLOCATE ALL").await
+            } else {
+                Ok(())
+            }
+        })
     }
 }
 

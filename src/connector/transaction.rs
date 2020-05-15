@@ -12,8 +12,12 @@ pub struct Transaction<'a> {
 
 impl<'a> Transaction<'a> {
     pub(crate) async fn new(inner: &'a dyn Queryable) -> crate::Result<Transaction<'a>> {
+        let this = Self { inner };
+
         inner.raw_cmd("BEGIN").await?;
-        Ok(Self { inner })
+        inner.server_reset_query(&this).await?;
+
+        Ok(this)
     }
 
     /// Commit the changes to the database and consume the transaction.

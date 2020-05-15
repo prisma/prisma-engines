@@ -62,6 +62,11 @@ where
     /// corresponds to the `version()` function on PostgreSQL for example. The version string is
     /// returned directly without any form of parsing or normalization.
     fn version<'a>(&'a self) -> DBIO<'a, Option<String>>;
+
+    /// Execute an arbitrary function in the beginning of each transaction.
+    fn server_reset_query<'a>(&'a self, _: &'a Transaction<'a>) -> DBIO<'a, ()> {
+        DBIO::new(futures::future::ready(Ok(())))
+    }
 }
 
 /// A thing that can start a new transaction.
@@ -71,6 +76,6 @@ where
 {
     /// Starts a new transaction
     fn start_transaction(&self) -> DBIO<Transaction> {
-        DBIO::new(async move { Transaction::new(self).await })
+        DBIO::new(async move { Ok(Transaction::new(self).await?) })
     }
 }

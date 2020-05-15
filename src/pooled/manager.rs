@@ -7,7 +7,7 @@ use crate::connector::PostgresUrl;
 
 use crate::{
     ast,
-    connector::{self, Queryable, TransactionCapable, DBIO},
+    connector::{self, Queryable, Transaction, TransactionCapable, DBIO},
     error::Error,
 };
 use mobc::{Connection as MobcPooled, Manager};
@@ -43,6 +43,10 @@ impl Queryable for PooledConnection {
 
     fn version<'a>(&'a self) -> DBIO<'a, Option<String>> {
         self.inner.version()
+    }
+
+    fn server_reset_query<'a>(&'a self, tx: &'a Transaction<'a>) -> DBIO<'a, ()> {
+        self.inner.server_reset_query(tx)
     }
 }
 
