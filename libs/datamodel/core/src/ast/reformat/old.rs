@@ -275,9 +275,6 @@ impl<'a> ReformatterOld<'a> {
                         renderer.end_line();
                     }
                 }
-                Rule::doc_comment | Rule::doc_comment_and_new_line => {
-                    comment(&mut table.interleave_writer(), current.as_str())
-                }
                 _ => the_fn(&mut table, renderer, &current),
             }
         }
@@ -340,7 +337,6 @@ impl<'a> ReformatterOld<'a> {
 
     fn reformat_field(target: &mut TableFormat, token: &Token) {
         let mut identifier = None;
-        let mut directives_started = false;
 
         for current in token.clone().into_inner() {
             match current.as_rule() {
@@ -351,18 +347,8 @@ impl<'a> ReformatterOld<'a> {
                     target.write(&identifier.clone().expect("Unknown field identifier."));
                     target.write(&Self::reformat_field_type(&current));
                 }
-                Rule::directive => {
-                    directives_started = true;
-                    Self::reformat_directive(&mut target.column_locked_writer_for(2), &current, "@")
-                }
+                Rule::directive => Self::reformat_directive(&mut target.column_locked_writer_for(2), &current, "@"),
                 Rule::doc_comment | Rule::doc_comment_and_new_line => comment(target, current.as_str()),
-                Rule::doc_comment | Rule::doc_comment_and_new_line => {
-                    if directives_started {
-                        comment(&mut target.column_locked_writer_for(2), current.as_str());
-                    } else {
-                        comment(target, current.as_str());
-                    }
-                }
                 Rule::NEWLINE => {} // we do the new lines ourselves
                 _ => Self::reformat_generic_token(target, &current),
             }
@@ -373,7 +359,6 @@ impl<'a> ReformatterOld<'a> {
 
     fn reformat_type_declaration(target: &mut TableFormat, token: &Token) {
         let mut identifier = None;
-        let mut directives_started = false;
 
         for current in token.clone().into_inner() {
             match current.as_rule() {
@@ -388,18 +373,10 @@ impl<'a> ReformatterOld<'a> {
                     target.write(&Self::get_identifier(&current));
                 }
                 Rule::directive => {
-                    directives_started = true;
                     Self::reformat_directive(&mut target.column_locked_writer_for(4), &current, "@");
                 }
                 Rule::doc_comment | Rule::doc_comment_and_new_line => {
                     comment(&mut target.interleave_writer(), current.as_str())
-                }
-                Rule::doc_comment | Rule::doc_comment_and_new_line => {
-                    if directives_started {
-                        comment(&mut target.column_locked_writer_for(4), current.as_str());
-                    } else {
-                        comment(&mut target.interleave_writer(), current.as_str());
-                    }
                 }
                 Rule::NEWLINE => {}
                 _ => Self::reformat_generic_token(target, &current),
