@@ -401,7 +401,7 @@ async fn all_mysql_identifier_types_work(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector(tags("mysql"))]
+#[test_each_connector(tags("mysql"), ignore("mariadb", "mysql_5_6"))]
 async fn all_mysql_types_work_as_filter(api: &TestApi) -> TestResult {
     api.execute_sql(&create_types_table_sql(api)).await?;
 
@@ -435,7 +435,7 @@ async fn all_mysql_types_work_as_filter(api: &TestApi) -> TestResult {
                     string_text_mediumtext: \"medium dolphins\"
                     string_text_longtext: \"long dolphins\"
                     string_enum: \"jellicle_cats\"
-                    # json: \"{\\\"name\\\": null}\"
+                    json: \"{\\\"name\\\": null}\"
                 }
             ) {
                 id
