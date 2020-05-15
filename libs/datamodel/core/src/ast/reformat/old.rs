@@ -313,9 +313,10 @@ impl<'a> ReformatterOld<'a> {
                 //
                 match token.as_rule() {
                     Rule::ENUM_KEYWORD => {}
-                    Rule::directive => {
+                    Rule::block_level_directive => {
                         table.render(target);
                         Self::reformat_directive(target, token, "@@");
+                        table.end_line();
                     }
                     Rule::enum_field_declaration => Self::reformat_enum_entry(table, token),
                     _ => Self::reformat_generic_token(table, token, true),
@@ -329,6 +330,7 @@ impl<'a> ReformatterOld<'a> {
             match current.as_rule() {
                 Rule::non_empty_identifier => target.write(current.as_str()),
                 Rule::WHITESPACE => {}
+                Rule::directive => Self::reformat_directive(&mut target.column_locked_writer_for(2), &current, "@"),
                 _ => Self::reformat_generic_token(target, &current, false),
             }
         }
@@ -462,6 +464,7 @@ impl<'a> ReformatterOld<'a> {
     }
 
     fn reformat_directive(target: &mut dyn LineWriteable, token: &Token, owl: &str) {
+        let token = Self::unpack_token_to_find_matching_rule(token.clone(), Rule::directive);
         for current in token.clone().into_inner() {
             match current.as_rule() {
                 Rule::directive_name => {
@@ -479,6 +482,20 @@ impl<'a> ReformatterOld<'a> {
                 Rule::directive_arguments => Self::reformat_directive_args(target, &current),
                 _ => unreachable!("Encounterd impossible directive during parsing: {:?}", current.tokens()),
             }
+        }
+    }
+
+    fn unpack_token_to_find_matching_rule(token: Token, rule: Rule) -> Token {
+        if token.as_rule() == rule {
+            token
+        } else {
+            let error_msg = format!("Token matching rule {:?} not found in: {:?}", &rule, &token.as_str());
+            for token in token.into_inner() {
+                if token.as_rule() == rule {
+                    return token;
+                }
+            }
+            panic!(error_msg)
         }
     }
 

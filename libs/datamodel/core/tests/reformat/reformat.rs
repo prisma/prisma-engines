@@ -136,28 +136,29 @@ model a {
 #[test]
 fn reformatting_enums_must_work() {
     let input = r#"enum Colors {
-  RED
+  RED @map("rett")
   BLUE
   GREEN
 
   // comment
-  ORANGE
+  ORANGE_AND_KIND_OF_RED @map("super_color")
+  
+  @@map("the_colors")
+}
+"#;
+    let expected = r#"enum Colors {
+  RED    @map("rett")
+  BLUE
+  GREEN
+
+  // comment
+  ORANGE_AND_KIND_OF_RED  @map("super_color")
+
+  @@map("the_colors")
 }
 "#;
 
-    //    // moving the comment to the top is not ideal. Just want to capture the current behavior in a test.
-    //    let expected = r#"enum Colors {
-    //  RED
-    //  BLUE
-    //  GREEN
-    //  ORANGE // comment
-    //}"#;
-
-    let mut buf = Vec::new();
-    datamodel::ast::reformat::Reformatter::reformat_to(&input, &mut buf, 2);
-    let actual = str::from_utf8(&buf).expect("unable to convert to string");
-    println!("{}", actual);
-    assert_eq!(actual, input);
+    assert_reformat(input, expected);
 }
 
 #[test]
