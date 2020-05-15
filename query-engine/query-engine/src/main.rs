@@ -70,8 +70,7 @@ async fn main() -> Result<(), AnyError> {
                     HttpServer::builder(config, datamodel)
                         .legacy(opts.legacy)
                         .enable_raw_queries(opts.enable_raw_queries)
-                        .enable_playground(opts.enable_playground)
-                        .force_transactions(opts.always_force_transactions),
+                        .enable_playground(opts.enable_playground),
                 )
             };
 

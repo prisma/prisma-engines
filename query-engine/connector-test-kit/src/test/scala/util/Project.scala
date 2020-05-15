@@ -42,7 +42,7 @@ case class Project(
       }
     }
 
-    val url = s"postgresql://postgres:prisma@$host:6432/db?schema=$id&connection_limit=1"
+    val url = s"postgresql://postgres:prisma@$host:6432/db?schema=$id&connection_limit=1&pgbouncer=true"
 
     val config =
       s"""

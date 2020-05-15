@@ -44,7 +44,6 @@ pub struct TestApi {
     connection_info: ConnectionInfo,
     migration_api: MigrationApi<sql_migration_connector::SqlMigrationConnector, sql_migration_connector::SqlMigration>,
     config: String,
-    is_pgbouncer: bool,
 }
 
 impl TestApi {
@@ -75,7 +74,6 @@ impl TestApi {
 
         let context = PrismaContext::builder(config, dml)
             .enable_raw_queries(true)
-            .force_transactions(self.is_pgbouncer)
             .build()
             .await
             .unwrap();
@@ -125,7 +123,6 @@ pub async fn mysql_8_test_api(db_name: &str) -> TestApi {
         connection_info,
         migration_api,
         config,
-        is_pgbouncer: false,
     }
 }
 
@@ -142,7 +139,6 @@ pub async fn mysql_5_6_test_api(db_name: &str) -> TestApi {
         connection_info,
         migration_api,
         config,
-        is_pgbouncer: false,
     }
 }
 
@@ -159,7 +155,6 @@ pub async fn mysql_test_api(db_name: &str) -> TestApi {
         connection_info,
         migration_api,
         config,
-        is_pgbouncer: false,
     }
 }
 
@@ -176,7 +171,6 @@ pub async fn mysql_mariadb_test_api(db_name: &str) -> TestApi {
         connection_info,
         migration_api,
         config,
-        is_pgbouncer: false,
     }
 }
 
@@ -193,7 +187,6 @@ pub async fn postgres9_test_api(db_name: &str) -> TestApi {
         connection_info,
         migration_api,
         config,
-        is_pgbouncer: false,
     }
 }
 
@@ -210,7 +203,6 @@ pub async fn postgres_test_api(db_name: &str) -> TestApi {
         connection_info,
         migration_api,
         config,
-        is_pgbouncer: false,
     }
 }
 
@@ -227,7 +219,6 @@ pub async fn postgres11_test_api(db_name: &str) -> TestApi {
         connection_info,
         migration_api,
         config,
-        is_pgbouncer: true,
     }
 }
 
@@ -244,7 +235,6 @@ pub async fn postgres12_test_api(db_name: &str) -> TestApi {
         connection_info,
         migration_api,
         config,
-        is_pgbouncer: false,
     }
 }
 
@@ -261,7 +251,6 @@ pub async fn sqlite_test_api(db_name: &str) -> TestApi {
         connection_info,
         migration_api,
         config,
-        is_pgbouncer: false,
     }
 }
 

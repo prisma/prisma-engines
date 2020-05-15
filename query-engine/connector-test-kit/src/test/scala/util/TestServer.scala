@@ -85,7 +85,6 @@ case class TestServer() extends PlayJsonExtensions with LogSupport {
           Seq(
             EnvVars.prismaBinaryPath,
             "--enable-raw-queries",
-            "--always-force-transactions",
             "cli",
             "execute-request",
             "--legacy",
@@ -102,7 +101,6 @@ case class TestServer() extends PlayJsonExtensions with LogSupport {
           Seq(
             EnvVars.prismaBinaryPath,
             "--enable-raw-queries",
-            "--always-force-transactions",
             "cli",
             "execute-request",
             encoded_query

@@ -36,7 +36,6 @@ pub struct HttpServerBuilder {
     config: Configuration,
     datamodel: Datamodel,
     legacy_mode: bool,
-    force_transactions: bool,
     enable_raw_queries: bool,
     enable_playground: bool,
 }
@@ -44,11 +43,6 @@ pub struct HttpServerBuilder {
 impl HttpServerBuilder {
     pub fn legacy(mut self, val: bool) -> Self {
         self.legacy_mode = val;
-        self
-    }
-
-    pub fn force_transactions(mut self, val: bool) -> Self {
-        self.force_transactions = val;
         self
     }
 
@@ -65,7 +59,6 @@ impl HttpServerBuilder {
     pub async fn build_and_run(self, address: SocketAddr) -> PrismaResult<()> {
         let ctx = PrismaContext::builder(self.config, self.datamodel)
             .legacy(self.legacy_mode)
-            .force_transactions(self.force_transactions)
             .enable_raw_queries(self.enable_raw_queries)
             .build()
             .await?;
@@ -82,7 +75,6 @@ impl HttpServer {
             config,
             datamodel,
             legacy_mode: false,
-            force_transactions: false,
             enable_raw_queries: false,
             enable_playground: false,
         }

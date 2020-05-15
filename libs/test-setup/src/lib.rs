@@ -47,7 +47,7 @@ pub fn pgbouncer_url(db_name: &str) -> String {
     let (host, port) = db_host_and_port_for_pgbouncer();
 
     format!(
-        "postgresql://postgres:prisma@{}:{}/{}?schema={}",
+        "postgresql://postgres:prisma@{}:{}/{}?schema={}&pgbouncer=true",
         host, port, db_name, SCHEMA_NAME
     )
 }
