@@ -213,10 +213,14 @@ fn new_lines_between_blocks_must_be_reduced_to_one_complex() {
 }
 
 
+// model comment
+
 model Blog {
   id Int @id
 }
 
+
+// source comment
 
 datasource mydb {
   provider = "sqlite"
@@ -224,17 +228,30 @@ datasource mydb {
 }
 
 
+// enum comment
+
 enum Status {
   ACTIVE
   DONE
 }
 
 
+// type alias comment
+
 type MyString = String
 
 
+// generator comment
+
 generator js {
     provider = "js"
+}
+
+
+// another model comment
+
+model Comment {
+  id Int @id
 }
 "#;
 
@@ -242,24 +259,34 @@ generator js {
   id Int @id
 }
 
+// model comment
 model Blog {
   id Int @id
 }
 
+// source comment
 datasource mydb {
   provider = "sqlite"
   url      = "file:dev.db"
 }
 
+// enum comment
 enum Status {
   ACTIVE
   DONE
 }
 
+// type alias comment
 type MyString = String
 
+// generator comment
 generator js {
   provider = "js"
+}
+
+// another model comment
+model Comment {
+  id Int @id
 }
 "#;
 

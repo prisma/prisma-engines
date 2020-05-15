@@ -424,8 +424,9 @@ impl<'a> ReformatterOld<'a> {
                     }
                 }
                 Rule::WHITESPACE => newlines(target, current.as_str(), "t"),
+                Rule::NEWLINE => {}
                 _ => unreachable!(
-                    "Encounterd impossible custom type during parsing: {:?}",
+                    "Encounterd impossible custom type during formatting: {:?}",
                     current.tokens()
                 ),
             }

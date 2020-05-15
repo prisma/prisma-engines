@@ -464,6 +464,7 @@ fn parse_type(token: &pest::iterators::Pair<'_, Rule>) -> Field {
         },
         Rule::directive => directives.push(parse_directive(&current)),
         Rule::doc_comment => comments.push(parse_doc_comment(&current)),
+        Rule::doc_comment_and_new_line => comments.push(parse_doc_comment(&current)),
         _ => unreachable!("Encountered impossible custom type during parsing: {:?}", current.tokens())
     }
 
