@@ -12,17 +12,6 @@ pub struct ReformatterOld<'a> {
     missing_fields: Result<Vec<MissingField>, crate::error::ErrorCollection>,
 }
 
-fn count_lines(text: &str) -> usize {
-    bytecount::count(text.as_bytes(), b'\n')
-}
-
-fn newlines(target: &mut dyn LineWriteable, text: &str, _identifier: &str) {
-    for _i in 0..count_lines(text) {
-        // target.write(&format!("{}{}", i, identifier));
-        target.end_line();
-    }
-}
-
 fn comment(target: &mut dyn LineWriteable, comment_text: &str) {
     let trimmed = if comment_text.ends_with("\n") {
         &comment_text[0..comment_text.len() - 1] // slice away line break.
@@ -149,9 +138,8 @@ impl<'a> ReformatterOld<'a> {
                     Self::reformat_type_declaration(&mut types_table, &current);
                 }
                 Rule::EOI => {}
-                Rule::WHITESPACE => {} // we don't want to retain whitespace at the top level. Just within the blocks.
                 Rule::NEWLINE => {} // Do not render user provided newlines. We have a strong opinionation about new lines on the top level.
-                _ => Self::reformat_generic_token(target.get_mut(), &current, false),
+                _ => Self::reformat_generic_token(target.get_mut(), &current),
             }
         }
 
@@ -167,7 +155,7 @@ impl<'a> ReformatterOld<'a> {
             Box::new(|table, _, token| match token.as_rule() {
                 Rule::DATASOURCE_KEYWORD => {}
                 Rule::key_value => Self::reformat_key_value(table, &token),
-                _ => Self::reformat_generic_token(table, &token, true),
+                _ => Self::reformat_generic_token(table, &token),
             }),
         );
     }
@@ -182,7 +170,7 @@ impl<'a> ReformatterOld<'a> {
                 match token.as_rule() {
                     Rule::GENERATOR_KEYWORD => {}
                     Rule::key_value => Self::reformat_key_value(table, &token),
-                    _ => Self::reformat_generic_token(table, &token, true),
+                    _ => Self::reformat_generic_token(table, &token),
                 }
             }),
         );
@@ -198,11 +186,10 @@ impl<'a> ReformatterOld<'a> {
                 Rule::expression => {
                     Self::reformat_expression(&mut target.column_locked_writer_for(2), &current);
                 }
-                Rule::WHITESPACE => {}
                 Rule::doc_comment | Rule::doc_comment_and_new_line => {
                     panic!("Comments inside config key/value not supported yet.")
                 }
-                _ => Self::reformat_generic_token(target, &current, false),
+                _ => Self::reformat_generic_token(target, &current),
             }
         }
     }
@@ -222,7 +209,7 @@ impl<'a> ReformatterOld<'a> {
                         //                        table.end_line();
                     }
                     Rule::field_declaration => Self::reformat_field(table, &token),
-                    _ => Self::reformat_generic_token(table, &token, true),
+                    _ => Self::reformat_generic_token(table, &token),
                 }
             }),
             Box::new(|table, _, model_name| {
@@ -319,7 +306,7 @@ impl<'a> ReformatterOld<'a> {
                         table.end_line();
                     }
                     Rule::enum_field_declaration => Self::reformat_enum_entry(table, token),
-                    _ => Self::reformat_generic_token(table, token, true),
+                    _ => Self::reformat_generic_token(table, token),
                 }
             }),
         );
@@ -329,30 +316,23 @@ impl<'a> ReformatterOld<'a> {
         for current in token.clone().into_inner() {
             match current.as_rule() {
                 Rule::non_empty_identifier => target.write(current.as_str()),
-                Rule::WHITESPACE => {}
                 Rule::directive => Self::reformat_directive(&mut target.column_locked_writer_for(2), &current, "@"),
-                _ => Self::reformat_generic_token(target, &current, false),
+                _ => Self::reformat_generic_token(target, &current),
             }
         }
     }
 
-    // TODO: do we still need skip_whitespace??
-    fn reformat_generic_token(target: &mut dyn LineWriteable, token: &Token, skip_whitespace: bool) {
+    fn reformat_generic_token(target: &mut dyn LineWriteable, token: &Token) {
         //        println!("generic token: |{:?}|", token.as_str());
         match token.as_rule() {
             Rule::NEWLINE => target.end_line(),
             Rule::doc_comment_and_new_line => comment(target, token.as_str()),
-            Rule::WHITESPACE => {
-                //                newlines(target, token.as_str(), "m");
-                if !skip_whitespace {
-                    target.write(token.as_str());
-                }
-            }
+            Rule::WHITESPACE => {} // we are very opinionated about whitespace and hence ignore user input
             Rule::CATCH_ALL => {
                 target.write(token.as_str());
             }
             _ => unreachable!(
-                "Encountered impossible enum declaration during parsing: {:?}",
+                "Encountered impossible enum declaration during formatting: {:?}",
                 token.clone().tokens()
             ),
         }
@@ -375,9 +355,7 @@ impl<'a> ReformatterOld<'a> {
                     directives_started = true;
                     Self::reformat_directive(&mut target.column_locked_writer_for(2), &current, "@")
                 }
-                Rule::doc_comment | Rule::doc_comment_and_new_line => {
-                    comment(&mut target.interleave_writer(), current.as_str())
-                }
+                Rule::doc_comment | Rule::doc_comment_and_new_line => comment(target, current.as_str()),
                 Rule::doc_comment | Rule::doc_comment_and_new_line => {
                     if directives_started {
                         comment(&mut target.column_locked_writer_for(2), current.as_str());
@@ -385,8 +363,8 @@ impl<'a> ReformatterOld<'a> {
                         comment(target, current.as_str());
                     }
                 }
-                Rule::WHITESPACE => newlines(target, current.as_str(), "f"),
-                _ => Self::reformat_generic_token(target, &current, false),
+                Rule::NEWLINE => {} // we do the new lines ourselves
+                _ => Self::reformat_generic_token(target, &current),
             }
         }
 
@@ -423,12 +401,8 @@ impl<'a> ReformatterOld<'a> {
                         comment(&mut target.interleave_writer(), current.as_str());
                     }
                 }
-                Rule::WHITESPACE => newlines(target, current.as_str(), "t"),
                 Rule::NEWLINE => {}
-                _ => unreachable!(
-                    "Encounterd impossible custom type during formatting: {:?}",
-                    current.tokens()
-                ),
+                _ => Self::reformat_generic_token(target, &current),
             }
         }
 
@@ -444,10 +418,7 @@ impl<'a> ReformatterOld<'a> {
                 Rule::optional_type => builder.write("?"),
                 Rule::base_type => {}
                 Rule::list_type => builder.write("[]"),
-                _ => unreachable!(
-                    "Encounterd impossible field type during parsing: {:?}",
-                    current.tokens()
-                ),
+                _ => Self::reformat_generic_token(&mut builder, &current),
             }
         }
 
@@ -476,12 +447,12 @@ impl<'a> ReformatterOld<'a> {
                     target.write(owl);
                     target.write(current.as_str());
                 }
-                Rule::WHITESPACE => {}
                 Rule::doc_comment | Rule::doc_comment_and_new_line => {
                     panic!("Comments inside attributes not supported yet.")
                 }
                 Rule::directive_arguments => Self::reformat_directive_args(target, &current),
-                _ => unreachable!("Encounterd impossible directive during parsing: {:?}", current.tokens()),
+                Rule::NEWLINE => {}
+                _ => Self::reformat_generic_token(target, &current),
             }
         }
     }
@@ -519,14 +490,10 @@ impl<'a> ReformatterOld<'a> {
                     }
                     Self::reformat_arg_value(&mut builder, &current);
                 }
-                Rule::WHITESPACE => {}
                 Rule::doc_comment | Rule::doc_comment_and_new_line => {
                     panic!("Comments inside attribute argument list not supported yet.")
                 }
-                _ => unreachable!(
-                    "Encounterd impossible directive argument list during parsing: {:?}",
-                    current.tokens()
-                ),
+                _ => Self::reformat_generic_token(target, &current),
             };
         }
 
@@ -545,14 +512,10 @@ impl<'a> ReformatterOld<'a> {
                     target.write(": ");
                 }
                 Rule::argument_value => Self::reformat_arg_value(target, &current),
-                Rule::WHITESPACE => {}
                 Rule::doc_comment | Rule::doc_comment_and_new_line => {
                     panic!("Comments inside attribute argument not supported yet.")
                 }
-                _ => unreachable!(
-                    "Encounterd impossible directive argument during parsing: {:?}",
-                    current.tokens()
-                ),
+                _ => Self::reformat_generic_token(target, &current),
             };
         }
     }
@@ -561,14 +524,10 @@ impl<'a> ReformatterOld<'a> {
         for current in token.clone().into_inner() {
             match current.as_rule() {
                 Rule::expression => Self::reformat_expression(target, &current),
-                Rule::WHITESPACE => {}
                 Rule::doc_comment | Rule::doc_comment_and_new_line => {
                     panic!("Comments inside attributes not supported yet.")
                 }
-                _ => unreachable!(
-                    "Encounterd impossible argument value during parsing: {:?}",
-                    current.tokens()
-                ),
+                _ => Self::reformat_generic_token(target, &current),
             };
         }
     }
@@ -583,11 +542,10 @@ impl<'a> ReformatterOld<'a> {
                 Rule::constant_literal => target.write(current.as_str()),
                 Rule::function => Self::reformat_function_expression(target, &current),
                 Rule::array_expression => Self::reformat_array_expression(target, &current),
-                Rule::WHITESPACE => {}
                 Rule::doc_comment | Rule::doc_comment_and_new_line => {
                     panic!("Comments inside expressions not supported yet.")
                 }
-                _ => unreachable!("Encounterd impossible literal during parsing: {:?}", current.tokens()),
+                _ => Self::reformat_generic_token(target, &current),
             }
         }
     }
@@ -605,11 +563,10 @@ impl<'a> ReformatterOld<'a> {
                     Self::reformat_expression(target, &current);
                     expr_count += 1;
                 }
-                Rule::WHITESPACE => {}
                 Rule::doc_comment | Rule::doc_comment_and_new_line => {
                     panic!("Comments inside expressions not supported yet.")
                 }
-                _ => unreachable!("Encounterd impossible array during parsing: {:?}", current.tokens()),
+                _ => Self::reformat_generic_token(target, &current),
             }
         }
 
@@ -632,11 +589,10 @@ impl<'a> ReformatterOld<'a> {
                     Self::reformat_arg_value(target, &current);
                     expr_count += 1;
                 }
-                Rule::WHITESPACE => {}
                 Rule::doc_comment | Rule::doc_comment_and_new_line => {
                     panic!("Comments inside expressions not supported yet.")
                 }
-                _ => unreachable!("Encounterd impossible function during parsing: {:?}", current.tokens()),
+                _ => Self::reformat_generic_token(target, &current),
             }
         }
 

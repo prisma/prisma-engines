@@ -3,7 +3,7 @@ use pretty_assertions::assert_eq;
 use std::str;
 
 #[test]
-fn test_reformat_model() {
+fn test_reformat_model_simple() {
     let input = r#"
         model User { 
             id               Int                   @id 
@@ -12,6 +12,28 @@ fn test_reformat_model() {
 
     let expected = r#"model User {
   id Int @id
+}
+"#;
+
+    assert_reformat(input, expected);
+}
+
+#[test]
+fn test_reformat_model_complex() {
+    let input = r#"
+        model User { 
+            id Int @id
+            fieldA String    @unique // comment on the side
+            // comment before
+            anotherWeirdField Int 
+        }
+    "#;
+
+    let expected = r#"model User {
+  id                Int    @id
+  fieldA            String @unique // comment on the side
+  // comment before
+  anotherWeirdField Int
 }
 "#;
 
