@@ -39,7 +39,6 @@ pub(crate) fn expand_mysql_alter_column(columns: &ColumnDiffer) -> Option<Vec<My
             },
             ColumnChange::Arity | ColumnChange::Type => modify = true,
             ColumnChange::Renaming => unreachable!("Column renaming on MySQL"),
-            _ => return None,
         }
     }
 
@@ -83,16 +82,16 @@ pub(crate) fn expand_postgres_alter_column(columns: &ColumnDiffer) -> Option<Vec
             },
             ColumnChange::Arity => match (&columns.previous.tpe.arity, &columns.next.tpe.arity) {
                 (ColumnArity::Required, ColumnArity::Nullable) => changes.push(PostgresAlterColumn::DropNotNull),
-                _ => return None,
+                _ => return None, // TODO: set not null
             },
             ColumnChange::Type => match (&columns.previous.tpe.family, &columns.next.tpe.family) {
                 // Ints can be cast to text.
                 (ColumnTypeFamily::Int, ColumnTypeFamily::String) => {
                     changes.push(PostgresAlterColumn::SetType(columns.next.tpe.clone()))
                 }
-                _ => return None,
+                _ => return None, // TODO
             },
-            ColumnChange::Renaming => unreachable!("column renaming"),
+            ColumnChange::Renaming => unreachable!("Column renaming on Postgres"),
         }
     }
 

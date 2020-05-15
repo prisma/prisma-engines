@@ -1,13 +1,9 @@
 use super::{common::*, SqlRenderer};
 use crate::{sql_schema_helpers::ColumnRef, SqlFamily};
-<<<<<<< HEAD
 use once_cell::sync::Lazy;
 use prisma_models::PrismaValue;
 use regex::Regex;
-use sql_schema_describer::*;
-=======
 use sql_schema_describer::{self, ColumnType, ColumnTypeFamily, DefaultValue, ForeignKey, SqlSchema};
->>>>>>> 7eb60150... .
 use std::borrow::Cow;
 
 const VARCHAR_LENGTH_PREFIX: &str = "(191)";
