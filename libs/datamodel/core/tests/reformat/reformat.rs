@@ -260,7 +260,7 @@ enum Status {
 
 // type alias comment
 
-type MyString = String
+type MyString = String          @default("FooBar")
 
 
 // generator comment
@@ -299,7 +299,7 @@ enum Status {
 }
 
 // type alias comment
-type MyString = String
+type MyString = String @default("FooBar")
 
 // generator comment
 generator js {

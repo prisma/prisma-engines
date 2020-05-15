@@ -329,7 +329,7 @@ impl<'a> ReformatterOld<'a> {
                 target.write(token.as_str());
             }
             _ => unreachable!(
-                "Encountered impossible enum declaration during formatting: {:?}",
+                "Encountered impossible declaration during formatting: {:?}",
                 token.clone().tokens()
             ),
         }
