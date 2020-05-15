@@ -5,7 +5,6 @@ use pest::Parser;
 // do multiple mutable borrows inside a match statement.
 use super::helpers::*;
 use crate::common::WritableString;
-use std::cell::RefCell;
 
 pub struct Reformatter<'a> {
     input: &'a str,
@@ -45,7 +44,7 @@ impl<'a> Reformatter<'a> {
 
     pub fn reformat_to(&self, output: &mut dyn std::io::Write, ident_width: usize) {
         let mut ast = PrismaDatamodelParser::parse(Rule::datamodel, self.input).unwrap(); // TODO: Handle error.
-        let mut top_formatter = RefCell::new(Renderer::new(output, ident_width));
+        let mut top_formatter = Renderer::new(output, ident_width);
         self.reformat_top(&mut top_formatter, &ast.next().unwrap());
     }
 
@@ -55,7 +54,7 @@ impl<'a> Reformatter<'a> {
         result.into()
     }
 
-    fn reformat_top(&self, target: &mut RefCell<Renderer>, token: &Token) {
+    fn reformat_top(&self, target: &mut Renderer, token: &Token) {
         let mut types_table = TableFormat::new();
         let mut types_mode = false;
         let mut seen_at_least_one_top_level_element = false;
@@ -71,9 +70,9 @@ impl<'a> Reformatter<'a> {
                     if types_mode {
                         types_mode = false;
                         // For all other ones, reset types_table.
-                        types_table.render(target.get_mut());
+                        types_table.render(target);
                         types_table = TableFormat::new();
-                        target.get_mut().maybe_end_line();
+                        target.maybe_end_line();
                     }
                 }
             };
@@ -85,7 +84,7 @@ impl<'a> Reformatter<'a> {
                 // separate top level elements with new lines
                 if seen_at_least_one_top_level_element {
                     //                    println!("rendering newline");
-                    target.get_mut().write("\n");
+                    target.write("\n");
                 }
                 seen_at_least_one_top_level_element = true;
             }
@@ -97,13 +96,13 @@ impl<'a> Reformatter<'a> {
                     if types_mode {
                         comment(&mut types_table.interleave_writer(), current.as_str());
                     } else {
-                        comment(target.get_mut(), current.as_str());
+                        comment(target, current.as_str());
                     }
                 }
-                Rule::model_declaration => self.reformat_model(target.get_mut(), &current),
-                Rule::enum_declaration => self.reformat_enum(target.get_mut(), &current),
-                Rule::source_block => self.reformat_datasource(target.get_mut(), &current),
-                Rule::generator_block => self.reformat_generator(target.get_mut(), &current),
+                Rule::model_declaration => self.reformat_model(target, &current),
+                Rule::enum_declaration => self.reformat_enum(target, &current),
+                Rule::source_block => self.reformat_datasource(target, &current),
+                Rule::generator_block => self.reformat_generator(target, &current),
                 Rule::type_declaration => {
                     if !types_mode {
                         panic!("Renderer not in type mode.");
@@ -112,12 +111,12 @@ impl<'a> Reformatter<'a> {
                 }
                 Rule::EOI => {}
                 Rule::NEWLINE => {} // Do not render user provided newlines. We have a strong opinionation about new lines on the top level.
-                _ => Self::reformat_generic_token(target.get_mut(), &current),
+                _ => Self::reformat_generic_token(target, &current),
             }
         }
 
         // FLUSH IT. Otherwise pending new lines do not get rendered.
-        target.get_mut().write("");
+        target.write("");
     }
 
     fn reformat_datasource(&self, target: &mut Renderer, token: &Token) {
