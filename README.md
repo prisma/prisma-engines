@@ -76,7 +76,6 @@ USAGE:
     query-engine [FLAGS] [OPTIONS] [SUBCOMMAND]
 
 FLAGS:
-        --always-force-transactions    Runs all queries in a transaction, including all the reads
         --enable-raw-queries           Enables raw SQL queries with executeRaw mutation
     -h, --help                         Prints help information
         --legacy                       Switches query schema generation to Prisma 1 compatible mode

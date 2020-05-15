@@ -9,7 +9,6 @@ pub struct TestApi {
     provider: &'static str,
     database_string: String,
     connection: Quaint,
-    is_pgbouncer: bool,
 }
 
 impl TestApi {
@@ -44,7 +43,6 @@ impl TestApi {
 
         let context = PrismaContext::builder(config, dml.clone())
             .enable_raw_queries(true)
-            .force_transactions(self.is_pgbouncer)
             .build()
             .await
             .unwrap();
@@ -130,7 +128,6 @@ pub async fn mysql_8_test_api(db_name: &str) -> TestApi {
         connection: Quaint::new(&mysql_url).await.unwrap(),
         database_string: mysql_url,
         provider: "mysql",
-        is_pgbouncer: false,
     }
 }
 
@@ -146,7 +143,6 @@ pub async fn mysql_5_6_test_api(db_name: &str) -> TestApi {
         connection: Quaint::new(&mysql_url).await.unwrap(),
         database_string: mysql_url,
         provider: "mysql",
-        is_pgbouncer: false,
     }
 }
 
@@ -162,7 +158,6 @@ pub async fn mysql_test_api(db_name: &str) -> TestApi {
         connection: Quaint::new(&mysql_url).await.unwrap(),
         database_string: mysql_url,
         provider: "mysql",
-        is_pgbouncer: false,
     }
 }
 
@@ -178,7 +173,6 @@ pub async fn mysql_mariadb_test_api(db_name: &str) -> TestApi {
         connection: Quaint::new(&mysql_url).await.unwrap(),
         database_string: mysql_url,
         provider: "mysql",
-        is_pgbouncer: false,
     }
 }
 
@@ -194,7 +188,6 @@ pub async fn postgres_test_api(db_name: &str) -> TestApi {
         connection: Quaint::new(&postgres_url).await.unwrap(),
         database_string: postgres_url,
         provider: "postgres",
-        is_pgbouncer: false,
     }
 }
 
@@ -210,7 +203,6 @@ pub async fn postgres9_test_api(db_name: &str) -> TestApi {
         connection: Quaint::new(&postgres_url).await.unwrap(),
         database_string: postgres_url,
         provider: "postgres",
-        is_pgbouncer: false,
     }
 }
 
@@ -226,7 +218,6 @@ pub async fn postgres11_test_api(db_name: &str) -> TestApi {
         connection: Quaint::new(&postgres_url).await.unwrap(),
         database_string: postgres_url,
         provider: "postgres",
-        is_pgbouncer: false,
     }
 }
 
@@ -242,6 +233,5 @@ pub async fn postgres12_test_api(db_name: &str) -> TestApi {
         connection: Quaint::new(&postgres_url).await.unwrap(),
         database_string: postgres_url,
         provider: "postgres",
-        is_pgbouncer: false,
     }
 }

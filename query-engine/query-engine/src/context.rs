@@ -21,7 +21,6 @@ pub struct PrismaContext {
 
 pub struct ContextBuilder {
     legacy: bool,
-    force_transactions: bool,
     enable_raw_queries: bool,
     datamodel: Datamodel,
     config: Configuration,
@@ -33,37 +32,19 @@ impl ContextBuilder {
         self
     }
 
-    pub fn force_transactions(mut self, val: bool) -> Self {
-        self.force_transactions = val;
-        self
-    }
-
     pub fn enable_raw_queries(mut self, val: bool) -> Self {
         self.enable_raw_queries = val;
         self
     }
 
     pub async fn build(self) -> PrismaResult<PrismaContext> {
-        PrismaContext::new(
-            self.config,
-            self.datamodel,
-            self.legacy,
-            self.force_transactions,
-            self.enable_raw_queries,
-        )
-        .await
+        PrismaContext::new(self.config, self.datamodel, self.legacy, self.enable_raw_queries).await
     }
 }
 
 impl PrismaContext {
     /// Initializes a new Prisma context.
-    async fn new(
-        config: Configuration,
-        dm: Datamodel,
-        legacy: bool,
-        force_transactions: bool,
-        enable_raw_queries: bool,
-    ) -> PrismaResult<Self> {
+    async fn new(config: Configuration, dm: Datamodel, legacy: bool, enable_raw_queries: bool) -> PrismaResult<Self> {
         let template = DatamodelConverter::convert(&dm);
 
         // We only support one data source at the moment, so take the first one (default not exposed yet).
@@ -73,7 +54,7 @@ impl PrismaContext {
             .ok_or_else(|| PrismaError::ConfigurationError("No valid data source found".into()))?;
 
         // Load executor
-        let (db_name, executor) = exec_loader::load(&**data_source, force_transactions).await?;
+        let (db_name, executor) = exec_loader::load(&**data_source).await?;
 
         // Build internal data model
         let internal_data_model = template.build(db_name);
@@ -98,7 +79,6 @@ impl PrismaContext {
     pub fn builder(config: Configuration, datamodel: Datamodel) -> ContextBuilder {
         ContextBuilder {
             legacy: false,
-            force_transactions: false,
             enable_raw_queries: false,
             datamodel,
             config,
