@@ -378,9 +378,7 @@ model Post2 {
 
 fn assert_reformat(schema: &str, expected_result: &str) {
     println!("schema: {:?}", schema);
-    let mut buf = Vec::new();
-    datamodel::ast::reformat::Reformatter::reformat_to(&schema, &mut buf, 2);
-    let result = str::from_utf8(&buf).expect("unable to convert to string");
+    let result = datamodel::ast::reformat::Reformatter::new(&schema).reformat_to_string();
     println!("result: {}", result);
     assert_eq!(result, expected_result);
 }

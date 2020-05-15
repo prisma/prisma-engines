@@ -3,52 +3,19 @@ use pest::Parser;
 
 // We have to use RefCell as rust cannot
 // do multiple mutable borrows inside a match statement.
+use super::helpers::*;
+use crate::common::WritableString;
 use std::cell::RefCell;
 
-type Token<'a> = pest::iterators::Pair<'a, Rule>;
-
-pub struct ReformatterOld<'a> {
+pub struct Reformatter<'a> {
     input: &'a str,
     missing_fields: Result<Vec<MissingField>, crate::error::ErrorCollection>,
 }
 
-fn comment(target: &mut dyn LineWriteable, comment_text: &str) {
-    let trimmed = if comment_text.ends_with("\n") {
-        &comment_text[0..comment_text.len() - 1] // slice away line break.
-    } else {
-        &comment_text
-    };
-
-    if !target.line_empty() {
-        // Prefix with whitespace seperator.
-        target.write(trimmed);
-    } else {
-        target.write(trimmed);
-    }
-    target.end_line();
-}
-
-trait TokenExtensions {
-    fn is_top_level_element(&self) -> bool;
-}
-
-impl TokenExtensions for Token<'_> {
-    fn is_top_level_element(&self) -> bool {
-        match self.as_rule() {
-            Rule::model_declaration => true,
-            Rule::enum_declaration => true,
-            Rule::source_block => true,
-            Rule::generator_block => true,
-            Rule::type_declaration => true,
-            _ => false,
-        }
-    }
-}
-
-impl<'a> ReformatterOld<'a> {
+impl<'a> Reformatter<'a> {
     pub fn new(input: &'a str) -> Self {
         let missing_fields = Self::find_all_missing_fields(&input);
-        ReformatterOld { input, missing_fields }
+        Reformatter { input, missing_fields }
     }
 
     // this finds all auto generated fields, that are added during auto generation AND are missing from the original input.
@@ -80,6 +47,12 @@ impl<'a> ReformatterOld<'a> {
         let mut ast = PrismaDatamodelParser::parse(Rule::datamodel, self.input).unwrap(); // TODO: Handle error.
         let mut top_formatter = RefCell::new(Renderer::new(output, ident_width));
         self.reformat_top(&mut top_formatter, &ast.next().unwrap());
+    }
+
+    pub fn reformat_to_string(&self) -> String {
+        let mut result = WritableString::new();
+        self.reformat_to(&mut result, 2);
+        result.into()
     }
 
     fn reformat_top(&self, target: &mut RefCell<Renderer>, token: &Token) {
@@ -316,22 +289,6 @@ impl<'a> ReformatterOld<'a> {
                 Rule::directive => Self::reformat_directive(&mut target.column_locked_writer_for(2), &current, "@"),
                 _ => Self::reformat_generic_token(target, &current),
             }
-        }
-    }
-
-    fn reformat_generic_token(target: &mut dyn LineWriteable, token: &Token) {
-        //        println!("generic token: |{:?}|", token.as_str());
-        match token.as_rule() {
-            Rule::NEWLINE => target.end_line(),
-            Rule::doc_comment_and_new_line => comment(target, token.as_str()),
-            Rule::WHITESPACE => {} // we are very opinionated about whitespace and hence ignore user input
-            Rule::CATCH_ALL => {
-                target.write(token.as_str());
-            }
-            _ => unreachable!(
-                "Encountered impossible declaration during formatting: {:?}",
-                token.clone().tokens()
-            ),
         }
     }
 
@@ -574,6 +531,22 @@ impl<'a> ReformatterOld<'a> {
         }
 
         target.write(")");
+    }
+
+    fn reformat_generic_token(target: &mut dyn LineWriteable, token: &Token) {
+        //        println!("generic token: |{:?}|", token.as_str());
+        match token.as_rule() {
+            Rule::NEWLINE => target.end_line(),
+            Rule::doc_comment_and_new_line => comment(target, token.as_str()),
+            Rule::WHITESPACE => {} // we are very opinionated about whitespace and hence ignore user input
+            Rule::CATCH_ALL => {
+                target.write(token.as_str());
+            }
+            _ => unreachable!(
+                "Encountered impossible declaration during formatting: {:?}",
+                token.clone().tokens()
+            ),
+        }
     }
 }
 
