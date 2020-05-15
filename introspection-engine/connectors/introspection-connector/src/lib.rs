@@ -56,6 +56,8 @@ pub struct IntrospectionResultOutput {
     pub datamodel: String,
     /// warnings
     pub warnings: Vec<Warning>,
+    /// version
+    pub version: Version,
 }
 
 impl fmt::Display for IntrospectionResultOutput {
