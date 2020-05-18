@@ -93,6 +93,7 @@ impl RpcImpl {
                     )
                     .map_err(Error::from)?,
                     warnings: introspection_result.warnings,
+                    version: introspection_result.version,
                 };
 
                 Ok(result)
