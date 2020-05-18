@@ -41,6 +41,28 @@ fn test_reformat_model_complex() {
 }
 
 #[test]
+fn comments_in_a_model_must_not_move() {
+    let input = r#"
+        model User {
+          id     Int    @id
+          // Comment
+          email  String @unique
+          // Comment 2
+        }
+    "#;
+
+    let expected = r#"model User {
+  id    Int    @id
+  // Comment
+  email String @unique
+  // Comment 2
+}
+"#;
+
+    assert_reformat(input, expected);
+}
+
+#[test]
 fn test_reformat_config() {
     let input = r#"
         datasource pg { 

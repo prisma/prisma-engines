@@ -238,7 +238,9 @@ impl<'a> Reformatter<'a> {
                     renderer.indent_up();
                 }
                 // Doc comments are to be placed OUTSIDE of table block.
-                Rule::doc_comment | Rule::doc_comment_and_new_line => comment(renderer, current.as_str()),
+                Rule::doc_comment | Rule::doc_comment_and_new_line => {
+                    comment(&mut table.interleave_writer(), current.as_str())
+                }
                 Rule::NEWLINE => {
                     if render_new_lines {
                         // Reset the table layout on a newline.
@@ -304,7 +306,9 @@ impl<'a> Reformatter<'a> {
                     target.write(&Self::reformat_field_type(&current));
                 }
                 Rule::directive => Self::reformat_directive(&mut target.column_locked_writer_for(2), &current, "@"),
-                Rule::doc_comment | Rule::doc_comment_and_new_line => comment(target, current.as_str()),
+                Rule::doc_comment | Rule::doc_comment_and_new_line => {
+                    comment(&mut target.interleave_writer(), current.as_str())
+                }
                 Rule::NEWLINE => {} // we do the new lines ourselves
                 _ => Self::reformat_generic_token(target, &current),
             }
