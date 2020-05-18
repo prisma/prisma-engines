@@ -89,7 +89,7 @@ impl<'a> Reformatter<'a> {
                 seen_at_least_one_top_level_element = true;
             }
 
-            //            println!("top level: |{:?}|", current.as_str());
+            //            println!("top level: {:?} |{:?}|", current.as_rule(), current.as_str());
 
             match current.as_rule() {
                 Rule::doc_comment | Rule::doc_comment_and_new_line => {
@@ -108,6 +108,11 @@ impl<'a> Reformatter<'a> {
                         panic!("Renderer not in type mode.");
                     }
                     Self::reformat_type_declaration(&mut types_table, &current);
+                }
+                Rule::comment_block => {
+                    for comment_token in current.clone().into_inner() {
+                        comment(target, comment_token.as_str());
+                    }
                 }
                 Rule::EOI => {}
                 Rule::NEWLINE => {} // Do not render user provided newlines. We have a strong opinionation about new lines on the top level.
@@ -306,9 +311,10 @@ impl<'a> Reformatter<'a> {
                     target.write(&Self::reformat_field_type(&current));
                 }
                 Rule::directive => Self::reformat_directive(&mut target.column_locked_writer_for(2), &current, "@"),
-                Rule::doc_comment | Rule::doc_comment_and_new_line => {
-                    comment(&mut target.interleave_writer(), current.as_str())
-                }
+                // This is a comment at the end of a field.
+                Rule::doc_comment => comment(target, current.as_str()),
+                // This is a comment before the field declaration. Hence it must be interlevaed.
+                Rule::doc_comment_and_new_line => comment(&mut target.interleave_writer(), current.as_str()),
                 Rule::NEWLINE => {} // we do the new lines ourselves
                 _ => Self::reformat_generic_token(target, &current),
             }

@@ -25,15 +25,15 @@ fn test_reformat_model_complex() {
             id Int @id
             fieldA String    @unique // comment on the side
             // comment before
-            anotherWeirdField Int 
+            anotherWeirdFieldName Int 
         }
     "#;
 
     let expected = r#"model User {
-  id                Int    @id
-  fieldA            String @unique // comment on the side
+  id                    Int    @id
+  fieldA                String @unique // comment on the side
   // comment before
-  anotherWeirdField Int
+  anotherWeirdFieldName Int
 }
 "#;
 
@@ -57,6 +57,38 @@ fn comments_in_a_model_must_not_move() {
   email String @unique
   // Comment 2
 }
+"#;
+
+    assert_reformat(input, expected);
+}
+
+#[test]
+fn commented_models_dont_get_removed() {
+    let input = r#"
+        // model One {
+        //   id Int @id
+        // }
+        
+        model Two {
+          id Int @id
+        }
+        
+        // model Three {
+        //   id Int @id
+        // }
+    "#;
+
+    let expected = r#"// model One {
+//   id Int @id
+// }
+
+model Two {
+  id Int @id
+}
+
+// model Three {
+//   id Int @id
+// }
 "#;
 
     assert_reformat(input, expected);
@@ -113,11 +145,12 @@ model a {
 
     // TODO: that the inner comment is moved to the top is not ideal
     let expected = r#"model a {
-  // bs  b[] @relation(references: [a])
   one Int
   two Int
+  // bs  b[] @relation(references: [a])
   @@id([one, two])
 }
+
 /// ajlsdkfkjasflk
 // model ok {}
 "#;
@@ -139,13 +172,13 @@ model a {
 // ajlsdkfkjasflk
 "#;
 
-    // TODO: that the inner comment is moved to the top is not ideal
     let expected = r#"model a {
-  // bs  b[] @relation(references: [a])
   one Int
   two Int
+  // bs  b[] @relation(references: [a])
   @@id([one, two])
 }
+
 // ajlsdkfkjasflk
 // ajlsdkfkjasflk
 "#;
@@ -250,7 +283,9 @@ model Blog {
     assert_reformat(input, expected);
 }
 
+// TODO: this will only work if we bring back `///` comments. The idea is that `//` are generally not moved. `///` would get attributed to the next block. Hence this test would work again.
 #[test]
+#[ignore]
 fn new_lines_between_blocks_must_be_reduced_to_one_complex() {
     let input = r#"model Post {
   id Int @id

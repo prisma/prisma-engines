@@ -513,7 +513,7 @@ pub fn parse(datamodel_string: &str) -> Result<SchemaAst, ErrorCollection> {
                 Rule::source_block => top_level_definitions.push(Top::Source(parse_source(&current))),
                 Rule::generator_block => top_level_definitions.push(Top::Generator(parse_generator(&current))),
                 Rule::type_declaration => top_level_definitions.push(Top::Type(parse_type(&current))),
-                Rule::doc_comment => (),
+                Rule::comment_block => (),
                 Rule::EOI => {},
                 Rule::CATCH_ALL => {
                     errors.push(DatamodelError::new_validation_error(
@@ -598,6 +598,7 @@ fn rule_to_string(rule: Rule) -> &'static str {
         Rule::string_escaped_interpolation => "string interpolation",
         Rule::doc_comment => "documentation comment",
         Rule::doc_comment_and_new_line => "multi line documentation comment",
+        Rule::comment_block => "comment block",
         Rule::number => "number",
 
         // Those are helpers, so we get better error messages:

@@ -15,6 +15,7 @@ impl TokenExtensions for Token<'_> {
             Rule::source_block => true,
             Rule::generator_block => true,
             Rule::type_declaration => true,
+            Rule::comment_block => true,
             _ => false,
         }
     }
@@ -26,6 +27,8 @@ pub fn comment(target: &mut dyn LineWriteable, comment_text: &str) {
     } else {
         &comment_text
     };
+
+    let trimmed = trimmed.trim();
 
     if !target.line_empty() {
         // Prefix with whitespace seperator.
