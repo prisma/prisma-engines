@@ -1,8 +1,9 @@
 use connector_interface::error::{ConnectorError, ErrorKind};
-use connector_interface::{self, IO};
+use connector_interface::{self};
 
 use crate::Connection;
 use mongodb::Client;
+use async_trait::async_trait;
 
 /// MongoDB connector for Prisma.
 #[derive(Debug)]
@@ -22,12 +23,11 @@ impl Connector {
     }
 }
 
+#[async_trait]
 impl connector_interface::Connector for Connector {
-    fn get_connection(&self) -> IO<'_, Box<dyn connector_interface::Connection + '_>> {
-        IO::new(async move {
+    async fn get_connection(&self) -> connector_interface::Result<Box<dyn connector_interface::Connection>> {
             let client = self.client.clone();
             let conn = Connection::new(client);
             Ok(Box::new(conn) as Box<dyn connector_interface::Connection>)
-        })
     }
 }

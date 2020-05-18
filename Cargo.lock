@@ -195,7 +195,7 @@ dependencies = [
  "rand 0.7.3",
  "serde",
  "serde_json",
- "time",
+ "time 0.1.43",
 ]
 
 [[package]]
@@ -551,9 +551,9 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bc4bfcfacb61d231109d1d55202c1f33263319668b168843e02ad4652725ec9c"
 dependencies = [
  "heck",
- "proc-macro2 1.0.10",
- "quote 1.0.3",
- "syn 1.0.17",
+ "proc-macro2 1.0.12",
+ "quote 1.0.4",
+ "syn 1.0.20",
 ]
 
 [[package]]
@@ -563,10 +563,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "22deed3a8124cff5fa835713fa105621e43bbdc46690c3a6b68328a012d350d4"
 dependencies = [
  "proc-macro-error",
- "proc-macro2 1.0.10",
- "quote 1.0.3",
+ "proc-macro2 1.0.12",
+ "quote 1.0.4",
  "rustversion",
- "syn 1.0.17",
+ "syn 1.0.20",
  "synstructure",
 ]
 
@@ -1596,7 +1596,7 @@ dependencies = [
  "sha-1",
  "sha2",
  "stringprep",
- "time",
+ "time 0.1.43",
  "trust-dns-proto",
  "trust-dns-resolver",
  "typed-builder",
@@ -1609,6 +1609,7 @@ dependencies = [
 name = "mongodb-query-connector"
 version = "0.0.0"
 dependencies = [
+ "async-trait",
  "datamodel",
  "mongodb",
  "prisma-models",
@@ -2612,9 +2613,9 @@ version = "1.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b3bba175698996010c4f6dce5e7f173b6eb781fce25d2cfc45e27091ce0b79f6"
 dependencies = [
- "proc-macro2 1.0.10",
- "quote 1.0.3",
- "syn 1.0.17",
+ "proc-macro2 1.0.12",
+ "quote 1.0.4",
+ "syn 1.0.20",
 ]
 
 [[package]]
@@ -2750,9 +2751,9 @@ version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4070d2c9b9d258465ad1d82aabb985b84cd9a3afa94da25ece5a9938ba5f1606"
 dependencies = [
- "proc-macro2 1.0.10",
- "quote 1.0.3",
- "syn 1.0.17",
+ "proc-macro2 1.0.12",
+ "quote 1.0.4",
+ "syn 1.0.20",
 ]
 
 [[package]]
@@ -3485,7 +3486,7 @@ dependencies = [
  "async-trait",
  "backtrace",
  "enum-as-inner",
- "futures 0.3.4",
+ "futures 0.3.5",
  "idna 0.2.0",
  "lazy_static",
  "log",
@@ -3504,7 +3505,7 @@ checksum = "f085d781daf33a804ffd401a41c7d0bbb3506851e7284484802955f3315547c1"
 dependencies = [
  "backtrace",
  "cfg-if",
- "futures 0.3.4",
+ "futures 0.3.5",
  "ipconfig",
  "lazy_static",
  "log",
