@@ -129,6 +129,8 @@ async fn making_an_optional_field_required_with_data_with_a_default_is_unexecuta
         .await?
         .assert_green()?;
 
+    let initial_schema = api.assert_schema().await?.into_schema();
+
     api.insert("Test")
         .value("id", "abc")
         .value("name", "george")
@@ -156,18 +158,13 @@ async fn making_an_optional_field_required_with_data_with_a_default_is_unexecuta
         .force(Some(false))
         .send()
         .await?
-        .assert_executable()?
+        .assert_unexecutable(&[
+            "Made the column `age` on table `Test` required, but there are existing NULL values.".into(),
+        ])?
         .assert_no_error()?
         .into_inner();
 
-    dbg!(&output);
-
-    assert_eq!(output.warnings, &[]);
-    anyhow::ensure!(output.warnings.len() == 1, "There should be one warning.");
-
-    api.assert_schema().await?.assert_table("Test", |table| {
-        table.assert_column("age", |col| col.assert_is_required())
-    })?;
+    api.assert_schema().await?.assert_equals(&initial_schema)?;
 
     let rows = api
         .select("Test")
@@ -180,7 +177,7 @@ async fn making_an_optional_field_required_with_data_with_a_default_is_unexecuta
     assert_eq!(
         rows,
         &[
-            &[r#"Text("abc")"#, r#"Text("george")"#, "Integer(84)"],
+            &[r#"Text("abc")"#, r#"Text("george")"#, "Null"],
             &[r#"Text("def")"#, r#"Text("X Æ A-12")"#, "Integer(7)"],
         ]
     );

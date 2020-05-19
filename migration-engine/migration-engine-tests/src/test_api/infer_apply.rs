@@ -135,6 +135,26 @@ impl<'a> InferApplyAssertion<'a> {
         Ok(self)
     }
 
+    pub fn assert_warnings(self, expected_messages: &[String]) -> AssertionResult<Self> {
+        anyhow::ensure!(
+            self.result.warnings.len() == expected_messages.len(),
+            "Expected {} warnings, got {:?}",
+            expected_messages.len(),
+            self.result.warnings
+        );
+
+        for (expected, actual) in expected_messages.iter().zip(
+            self.result
+                .unexecutable_migrations
+                .iter()
+                .map(|w| w.description.as_str()),
+        ) {
+            assert_eq!(actual, expected);
+        }
+
+        Ok(self)
+    }
+
     pub fn into_inner(self) -> MigrationStepsResultOutput {
         self.result
     }

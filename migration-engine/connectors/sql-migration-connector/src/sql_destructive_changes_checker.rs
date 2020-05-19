@@ -182,12 +182,12 @@ impl SqlDestructiveChangesChecker<'_> {
             next: &alter_column.column,
         };
 
+        self.check_for_column_arity_change(&previous_table.name, &differ, diagnostics)
+            .await?;
+
         if self.alter_column_is_safe(&differ) {
             return Ok(());
         }
-
-        self.check_for_column_arity_change(&previous_table.name, &differ, diagnostics)
-            .await?;
 
         let values_count = self.count_rows_in_table(&previous_table.name).await?;
 
@@ -273,7 +273,11 @@ impl SqlDestructiveChangesChecker<'_> {
                     for step in steps {
                         match step {
                             MysqlAlterColumn::DropDefault => (),
-                            MysqlAlterColumn::Modify { .. } => is_safe = false,
+                            MysqlAlterColumn::Modify {
+                                column_type,
+                                default,
+                                changes,
+                            } => is_safe = false,
                         }
                     }
 
@@ -299,7 +303,6 @@ impl SqlDestructiveChangesChecker<'_> {
         if dbg!(!differ.all_changes().arity_changed())
             || dbg!(!differ.next.tpe.arity.is_required())
             || dbg!(rows_count == 0)
-            || dbg!((!self.sql_family().is_mysql() && differ.next.default.is_some()))
             || null_values_count == 0
         {
             return Ok(());
