@@ -182,12 +182,12 @@ impl SqlDestructiveChangesChecker<'_> {
             next: &alter_column.column,
         };
 
-        self.check_for_column_arity_change(&previous_table.name, &differ, diagnostics)
-            .await?;
-
         if self.alter_column_is_safe(&differ) {
             return Ok(());
         }
+
+        self.check_for_column_arity_change(&previous_table.name, &differ, diagnostics)
+            .await?;
 
         let values_count = self.count_rows_in_table(&previous_table.name).await?;
 

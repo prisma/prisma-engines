@@ -78,17 +78,13 @@ async fn making_an_optional_field_required_with_only_non_null_data_works(api: &T
         }
     "#;
 
-    let output = api
-        .infer_apply(&dm2)
+    api.infer_apply(&dm2)
         .migration_id(Some("apply-dm2"))
         .force(Some(false))
         .send()
         .await?
         .assert_green()?
         .into_inner();
-
-    // assert_eq!(output.warnings, &[]);
-    // anyhow::ensure!(output.warnings.len() == 1, "There should be one warning.");
 
     api.assert_schema().await?.assert_table("Test", |table| {
         table.assert_column("age", |col| col.assert_is_required())
@@ -152,13 +148,15 @@ async fn making_an_optional_field_required_with_data_with_a_default_is_unexecuta
         }
     "#;
 
-    let output = api
-        .infer_apply(&dm2)
+    api.infer_apply(&dm2)
         .migration_id(Some("apply-dm2"))
         .force(Some(false))
         .send()
         .await?
         .assert_unexecutable(&[
+            "Made the column `age` on table `Test` required, but there are existing NULL values.".into(),
+        ])?
+        .assert_warnings(&[
             "Made the column `age` on table `Test` required, but there are existing NULL values.".into(),
         ])?
         .assert_no_error()?
