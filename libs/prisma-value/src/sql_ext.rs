@@ -36,7 +36,7 @@ impl<'a> From<PrismaValue> for Value<'a> {
             PrismaValue::Null => Value::Null,
             PrismaValue::Uuid(u) => u.to_string().into(),
             PrismaValue::List(l) => Value::Array(l.into_iter().map(|x| x.into()).collect()),
-            PrismaValue::Json(s) => Value::Text(s.into()),
+            PrismaValue::Json(s) => Value::Json(serde_json::from_str(&s).unwrap()),
         }
     }
 }

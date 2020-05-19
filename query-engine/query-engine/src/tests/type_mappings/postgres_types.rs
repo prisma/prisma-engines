@@ -583,8 +583,8 @@ async fn all_postgres_types_work_as_filter(api: &TestApi) -> TestResult {
                     time_timetz: "2020-03-05T08:00:00.000"
                     boolean_boolean: true
                     network_inet: "192.168.100.14"
-                    #json_json: "{ \"isJson\": true }"
-                    #json_jsonb: "{ \"isJSONB\": true }"
+                    json_json: "{ \"isJson\": true }"
+                    json_jsonb: "{ \"isJSONB\": true }"
                 }
             ) {
                 id
