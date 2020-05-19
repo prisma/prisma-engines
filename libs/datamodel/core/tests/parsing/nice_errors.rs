@@ -189,3 +189,23 @@ fn optional_list_fields_must_error() {
         Span::new(51, 60),
     ));
 }
+
+#[test]
+fn incomplete_last_line_must_error_nicely() {
+    // https://github.com/prisma/vscode/issues/140
+    // If a user types on the very last line we did not error nicely.
+    // a new line fixed the problem but this is not nice.
+    let dml = r#"model User {
+        id Int @id
+        names String
+    }
+
+    model Bl"#;
+
+    let error = parse_error(dml);
+
+    error.assert_is(DatamodelError::new_validation_error(
+        "This line is invalid. It does not start with any known Prisma schema keyword.",
+        Span::new(64, 72),
+    ));
+}

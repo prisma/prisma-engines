@@ -28,7 +28,7 @@ INTERPOLATION_END = { "}" }
 
 LEGACY_COLON = { ":" }
 
-CATCH_ALL = @{ (WHITESPACE | LETTER | NUMBER | PUNCTUATION | SYMBOL)* ~ NEWLINE }
+CATCH_ALL = @{ (WHITESPACE | LETTER | NUMBER | PUNCTUATION | SYMBOL)+ ~ NEWLINE? }
 
 doc_content = @{ (!NEWLINE ~ ANY)* }
 doc_comment = { WHITESPACE* ~ "//" ~ doc_content }

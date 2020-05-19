@@ -393,6 +393,24 @@ fn model_level_directives_reset_the_table_layout() {
     assert_reformat(input, expected);
 }
 
+#[test]
+fn incomplete_last_line_must_not_stop_reformatting() {
+    // https://github.com/prisma/vscode/issues/140
+    // If a user types on the very last line we did not error nicely.
+    // a new line fixed the problem but this is not nice.
+    let input = r#"model User {
+  id       Int       @id
+}
+model Bl"#;
+
+    let expected = r#"model User {
+  id Int @id
+}
+model Bl"#;
+
+    assert_reformat(input, expected);
+}
+
 fn assert_reformat(schema: &str, expected_result: &str) {
     println!("schema: {:?}", schema);
     let result = datamodel::ast::reformat::Reformatter::new(&schema).reformat_to_string();
