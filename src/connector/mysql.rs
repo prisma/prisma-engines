@@ -917,4 +917,50 @@ VALUES (1, 'Joe', 27, 20000.00 );
             matches!(result.unwrap_err().kind(), ErrorKind::ValueOutOfRange { message } if message == "Unsigned integers larger than 9_223_372_036_854_775_807 are currently not handled.")
         );
     }
+
+    #[tokio::test]
+    async fn json_filtering_works() {
+        let conn = Quaint::new(&CONN_STR).await.unwrap();
+
+        let create_table = r#"
+            CREATE TABLE `table_with_json` (
+                id int4 AUTO_INCREMENT PRIMARY KEY,
+                obj json
+            )
+        "#;
+
+        let drop_table = r#"DROP TABLE IF EXISTS `table_with_json`"#;
+
+        let insert = Insert::single_into("table_with_json").value("obj", serde_json::json!({ "a": "a" }));
+        let second_insert = Insert::single_into("table_with_json").value("obj", serde_json::json!({ "a": "b" }));
+
+        conn.query_raw(drop_table, &[]).await.unwrap();
+        conn.query_raw(create_table, &[]).await.unwrap();
+        conn.query(insert.into()).await.unwrap();
+        conn.query(second_insert.into()).await.unwrap();
+
+        // Equals
+        {
+            let select = Select::from_table("table_with_json")
+                .value(asterisk())
+                .so_that(Column::from("obj").equals(Value::Json(serde_json::json!({ "a": "b" }))));
+
+            let result = conn.query(select.into()).await.unwrap();
+
+            assert_eq!(result.len(), 1);
+            assert_eq!(result.get(0).unwrap().get("id").unwrap(), &Value::Integer(2))
+        }
+
+        // Not equals
+        {
+            let select = Select::from_table("table_with_json")
+                .value(asterisk())
+                .so_that(Column::from("obj").not_equals(Value::Json(serde_json::json!({ "a": "a" }))));
+
+            let result = conn.query(select.into()).await.unwrap();
+
+            assert_eq!(result.len(), 1);
+            assert_eq!(result.get(0).unwrap().get("id").unwrap(), &Value::Integer(2))
+        }
+    }
 }

@@ -454,16 +454,8 @@ pub trait Visitor<'a> {
     /// A comparison expression
     fn visit_compare(&mut self, compare: Compare<'a>) -> fmt::Result {
         match compare {
-            Compare::Equals(left, right) => {
-                self.visit_expression(*left)?;
-                self.write(" = ")?;
-                self.visit_expression(*right)
-            }
-            Compare::NotEquals(left, right) => {
-                self.visit_expression(*left)?;
-                self.write(" <> ")?;
-                self.visit_expression(*right)
-            }
+            Compare::Equals(left, right) => self.visit_condition_equals(*left, *right),
+            Compare::NotEquals(left, right) => self.visit_condition_not_equals(*left, *right),
             Compare::LessThan(left, right) => {
                 self.visit_expression(*left)?;
                 self.write(" < ")?;
@@ -687,6 +679,18 @@ pub trait Visitor<'a> {
                 self.visit_expression(*right)
             }
         }
+    }
+
+    fn visit_condition_equals(&mut self, left: Expression<'a>, right: Expression<'a>) -> fmt::Result {
+        self.visit_expression(left)?;
+        self.write(" = ")?;
+        self.visit_expression(right)
+    }
+
+    fn visit_condition_not_equals(&mut self, left: Expression<'a>, right: Expression<'a>) -> fmt::Result {
+        self.visit_expression(left)?;
+        self.write(" <> ")?;
+        self.visit_expression(right)
     }
 
     /// A visit in the `ORDER BY` section of the query
