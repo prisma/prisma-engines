@@ -403,6 +403,11 @@ async fn changing_a_column_from_required_to_optional_should_work(api: &TestApi) 
 }
 
 #[test_each_connector]
+async fn changing_an_array_column_to_scalar_must_warn(api: &TestApi) -> TestResult {
+    todo!()
+}
+
+#[test_each_connector]
 async fn changing_a_column_from_optional_to_required_must_warn(api: &TestApi) -> TestResult {
     let dm = r#"
         model Test {
@@ -435,11 +440,17 @@ async fn changing_a_column_from_optional_to_required_must_warn(api: &TestApi) ->
 
     assert_eq!(
         migration_output.warnings,
-        &[MigrationWarning {
-            description: "You are about to alter the column `age` on the `Test` table, which still contains 2 values. \
+        &[
+            MigrationWarning {
+                description:
+                    "You are about to alter the column `age` on the `Test` table, which still contains 2 values. \
                  The data in that column may be lost."
-                .to_owned()
-        }]
+                        .to_owned()
+            },
+            MigrationWarning {
+                description: "This should warn that if there are existing null values, it will fail.".to_owned()
+            }
+        ]
     );
 
     // Check that no data was lost.

@@ -474,6 +474,7 @@ fn safe_alter_column(
                     renderer.render_default(&new_default, &next_column.tpe.family)
                 ),
                 PostgresAlterColumn::DropNotNull => format!("{} DROP NOT NULL", &alter_column_prefix),
+                PostgresAlterColumn::SetNotNull => format!("{} SET NOT NULL", &alter_column_prefix),
                 PostgresAlterColumn::SetType(ty) => format!(
                     "{} SET DATA TYPE {}",
                     &alter_column_prefix,

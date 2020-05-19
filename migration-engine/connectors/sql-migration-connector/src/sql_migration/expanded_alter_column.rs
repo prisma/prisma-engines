@@ -1,6 +1,7 @@
 use crate::sql_schema_differ::{ColumnChange, ColumnChanges, ColumnDiffer, DiffingOptions};
 use quaint::prelude::SqlFamily;
 use sql_schema_describer::{Column, ColumnArity, ColumnType, ColumnTypeFamily, DefaultValue};
+use std::cmp::Ordering;
 
 pub(crate) fn expand_alter_column(
     previous_column: &Column,
@@ -82,18 +83,24 @@ pub(crate) fn expand_postgres_alter_column(columns: &ColumnDiffer) -> Option<Vec
             },
             ColumnChange::Arity => match (&columns.previous.tpe.arity, &columns.next.tpe.arity) {
                 (ColumnArity::Required, ColumnArity::Nullable) => changes.push(PostgresAlterColumn::DropNotNull),
-                _ => return None, // TODO: set not null
+                (ColumnArity::Nullable, ColumnArity::Required) => changes.push(PostgresAlterColumn::SetNotNull),
+                (ColumnArity::List, _) | (_, ColumnArity::List) => {
+                    changes.push(PostgresAlterColumn::SetType(columns.next.tpe.clone()))
+                }
+                _ => unreachable!("Unreachable arity change"),
             },
             ColumnChange::Type => match (&columns.previous.tpe.family, &columns.next.tpe.family) {
                 // Ints can be cast to text.
                 (ColumnTypeFamily::Int, ColumnTypeFamily::String) => {
                     changes.push(PostgresAlterColumn::SetType(columns.next.tpe.clone()))
                 }
-                _ => return None, // TODO
+                _ => return None,
             },
             ColumnChange::Renaming => unreachable!("Column renaming on Postgres"),
         }
     }
+
+    changes.sort_by(|a, b| a.partial_cmp(b).unwrap_or(Ordering::Equal));
 
     Some(changes)
 }
@@ -105,16 +112,23 @@ pub(crate) enum ExpandedAlterColumn {
     Sqlite(Vec<SqliteAlterColumn>),
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 /// https://www.postgresql.org/docs/9.1/sql-altertable.html
 pub(crate) enum PostgresAlterColumn {
     SetDefault(sql_schema_describer::DefaultValue),
     DropDefault,
     DropNotNull,
     SetType(ColumnType),
-    // Not used yet:
-    // SetNotNull,
-    // Rename { previous_name: String, next_name: String },
+    SetNotNull,
+}
+
+impl PartialOrd for PostgresAlterColumn {
+    fn partial_cmp(&self, other: &PostgresAlterColumn) -> Option<Ordering> {
+        match (self, other) {
+            (PostgresAlterColumn::SetDefault(_), _) => Some(Ordering::Less),
+            _ => None,
+        }
+    }
 }
 
 /// https://dev.mysql.com/doc/refman/8.0/en/alter-table.html

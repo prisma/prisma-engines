@@ -10,6 +10,8 @@ use migration_connector::{
 };
 use quaint::{ast::*, prelude::SqlFamily};
 use sql_schema_describer::{ColumnArity, SqlSchema};
+use sql_schema_differ::ColumnDiffer;
+use sql_unexecutable_migration::SqlUnexecutableMigration;
 
 pub struct SqlDestructiveChangesChecker<'a> {
     pub connector: &'a crate::SqlMigrationConnector,
@@ -42,8 +44,8 @@ impl SqlDestructiveChangesChecker<'_> {
         Ok(())
     }
 
-    async fn count_values_in_column(&self, column_name: &str, table: &sql_schema_describer::Table) -> SqlResult<i64> {
-        let query = Select::from_table((self.schema_name(), table.name.as_str()))
+    async fn count_values_in_column(&self, column_name: &str, table_name: &str) -> SqlResult<i64> {
+        let query = Select::from_table((self.schema_name(), table_name))
             .value(count(quaint::ast::Column::new(column_name)))
             .so_that(column_name.is_not_null());
 
@@ -98,7 +100,7 @@ impl SqlDestructiveChangesChecker<'_> {
         table: &sql_schema_describer::Table,
         diagnostics: &mut DestructiveChangeDiagnostics,
     ) -> SqlResult<()> {
-        let values_count = self.count_values_in_column(&drop_column.name, table).await?;
+        let values_count = self.count_values_in_column(&drop_column.name, &table.name).await?;
 
         if values_count > 0 {
             diagnostics.add_warning(MigrationWarning {
@@ -140,7 +142,7 @@ impl SqlDestructiveChangesChecker<'_> {
             return Ok(());
         }
 
-        let typed_unexecutable = sql_unexecutable_migration::SqlUnexecutableMigration::AddedRequiredFieldToTable {
+        let typed_unexecutable = SqlUnexecutableMigration::AddedRequiredFieldToTable {
             column: add_column.column.name.clone(),
             rows_count: Some(rows_count as u64),
             table: table.name.clone(),
@@ -238,6 +240,8 @@ impl SqlDestructiveChangesChecker<'_> {
             SqlFamily::Postgres => {
                 let expanded = expand_postgres_alter_column(differ);
 
+                dbg!(&expanded);
+
                 // We keep the match here to keep the exhaustiveness checking for when we add variants.
                 if let Some(steps) = expanded {
                     let mut is_safe = true;
@@ -246,12 +250,13 @@ impl SqlDestructiveChangesChecker<'_> {
                         match step {
                             PostgresAlterColumn::SetDefault(_)
                             | PostgresAlterColumn::DropDefault
-                            | PostgresAlterColumn::DropNotNull => (),
+                            | PostgresAlterColumn::DropNotNull
+                            | PostgresAlterColumn::SetNotNull => (),
                             PostgresAlterColumn::SetType(_) => is_safe = false,
                         }
                     }
 
-                    is_safe
+                    dbg!(is_safe)
                 } else {
                     false
                 }
@@ -284,26 +289,29 @@ impl SqlDestructiveChangesChecker<'_> {
     async fn check_for_column_arity_change(
         &self,
         table_name: &str,
-        differ: &crate::sql_schema_differ::ColumnDiffer<'_>,
+        differ: &ColumnDiffer<'_>,
         diagnostics: &mut DestructiveChangeDiagnostics,
     ) -> SqlResult<()> {
         let rows_count = self.count_rows_in_table(table_name).await?;
+        let values_count = self.count_values_in_column(&differ.previous.name, table_name).await?;
+        let null_values_count = rows_count - values_count;
 
-        if !differ.all_changes().arity_changed()
-            || !differ.next.tpe.arity.is_required()
-            || rows_count == 0
-            || (!self.sql_family().is_mysql() && differ.next.default.is_some())
+        if dbg!(!differ.all_changes().arity_changed())
+            || dbg!(!differ.next.tpe.arity.is_required())
+            || dbg!(rows_count == 0)
+            || dbg!((!self.sql_family().is_mysql() && differ.next.default.is_some()))
+            || null_values_count == 0
         {
             return Ok(());
         }
 
-        let typed_unexecutable = sql_unexecutable_migration::SqlUnexecutableMigration::MadeOptionalFieldRequired {
+        let typed_unexecutable = SqlUnexecutableMigration::MadeOptionalFieldRequired {
             table: table_name.to_owned(),
             column: differ.previous.name.clone(),
         };
 
         diagnostics.unexecutable_migrations.push(UnexecutableMigration {
-            description: format!("{}", typed_unexecutable),
+            description: typed_unexecutable.to_string(),
         });
 
         Ok(())

@@ -116,7 +116,12 @@ impl<'a> InferApplyAssertion<'a> {
     }
 
     pub fn assert_unexecutable(self, expected_messages: &[String]) -> AssertionResult<Self> {
-        assert_eq!(self.result.unexecutable_migrations.len(), expected_messages.len());
+        anyhow::ensure!(
+            self.result.unexecutable_migrations.len() == expected_messages.len(),
+            "Expected {} unexecutable migration errors, got {:?}",
+            expected_messages.len(),
+            self.result.unexecutable_migrations
+        );
 
         for (expected, actual) in expected_messages.iter().zip(
             self.result
