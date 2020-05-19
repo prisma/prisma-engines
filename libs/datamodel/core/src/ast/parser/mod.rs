@@ -215,7 +215,7 @@ fn parse_field(model_name: &str, token: &pest::iterators::Pair<'_, Rule>) -> Res
         Rule::directive => directives.push(parse_directive(&current)),
         Rule::doc_comment_and_new_line => comments.push(parse_doc_comment(&current)),
         Rule::doc_comment => comments.push(parse_doc_comment(&current)),
-        _ => unreachable!("Encountered impossible field declaration during parsing: {:?}", current.tokens())
+        _ => parsing_catch_all(&current)
     }
 
     match (name, field_type) {
@@ -239,6 +239,18 @@ fn parse_field(model_name: &str, token: &pest::iterators::Pair<'_, Rule>) -> Res
         )),
     }
 }
+
+fn parsing_catch_all(token: &pest::iterators::Pair<'_, Rule>) {
+    match token.as_rule() {
+        Rule::comment | Rule::comment_and_new_line => {}
+        x => unreachable!(
+            "Encountered impossible field declaration during parsing: {:?} {:?}",
+            &x,
+            token.clone().tokens()
+        ),
+    }
+}
+
 // Model parsing
 fn parse_model(token: &pest::iterators::Pair<'_, Rule>) -> Result<Model, ErrorCollection> {
     let mut errors = ErrorCollection::new();
@@ -270,7 +282,7 @@ fn parse_model(token: &pest::iterators::Pair<'_, Rule>) -> Result<Model, ErrorCo
                 "This line is not a valid field or directive definition.",
                 Span::from_pest(current.as_span()))
         ) },
-        _ => unreachable!("Encountered impossible model declaration during parsing: {:?}", current.tokens())
+        _ => parsing_catch_all(&current)
     }
 
     errors.ok()?;
@@ -311,7 +323,12 @@ fn parse_enum(token: &pest::iterators::Pair<'_, Rule>) -> Result<Enum, ErrorColl
         },
         Rule::doc_comment => comments.push(parse_doc_comment(&current)),
         Rule::doc_comment_and_new_line => comments.push(parse_doc_comment(&current)),
-        _ => unreachable!("Encountered impossible enum declaration during parsing: {:?}", current.tokens())
+        Rule::BLOCK_LEVEL_CATCH_ALL => { errors.push(
+            DatamodelError::new_validation_error(
+                "This line is not a enum value definition.",
+                Span::from_pest(current.as_span()))
+        ) },
+        _ => parsing_catch_all(&current)
     }
 
     errors.ok()?;
@@ -355,7 +372,7 @@ fn parse_enum_value(enum_name: &str, token: &pest::iterators::Pair<'_, Rule>) ->
         Rule::doc_comment_and_new_line => {
             comments.push(parse_doc_comment(&current));
         },
-        _ => unreachable!("Encountered impossible enum value declaration during parsing: {:?}", current.as_str())
+        _ => parsing_catch_all(&current)
     }
 
     match name {
@@ -408,7 +425,7 @@ fn parse_source(token: &pest::iterators::Pair<'_, Rule>) -> SourceConfig {
         Rule::key_value => properties.push(parse_key_value(&current)),
         Rule::doc_comment => comments.push(parse_doc_comment(&current)),
         Rule::doc_comment_and_new_line => comments.push(parse_doc_comment(&current)),
-        _ => unreachable!("Encountered impossible source declaration during parsing: {:?}", current.tokens())
+        _ => parsing_catch_all(&current)
     };
 
     match name {
@@ -437,7 +454,7 @@ fn parse_generator(token: &pest::iterators::Pair<'_, Rule>) -> GeneratorConfig {
         Rule::key_value => properties.push(parse_key_value(&current)),
         Rule::doc_comment => comments.push(parse_doc_comment(&current)),
         Rule::doc_comment_and_new_line => comments.push(parse_doc_comment(&current)),
-        _ => unreachable!("Encountered impossible generator declaration during parsing: {:?}", current.tokens())
+        _ => parsing_catch_all(&current)
     };
 
     match name {
@@ -603,6 +620,8 @@ fn rule_to_string(rule: Rule) -> &'static str {
         Rule::string_escaped_interpolation => "string interpolation",
         Rule::doc_comment => "documentation comment",
         Rule::doc_comment_and_new_line => "multi line documentation comment",
+        Rule::comment => "comment",
+        Rule::comment_and_new_line => "comment and new line",
         Rule::comment_block => "comment block",
         Rule::number => "number",
 

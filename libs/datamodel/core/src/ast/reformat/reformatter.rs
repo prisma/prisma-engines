@@ -228,7 +228,7 @@ impl<'a> Reformatter<'a> {
         let mut render_new_lines = false;
 
         for current in token.clone().into_inner() {
-            //            println!("block: {:?}", current.as_str());
+            //            println!("block: {:?} |{:?}|", current.as_rule(), current.as_str());
             match current.as_rule() {
                 Rule::BLOCK_OPEN => {
                     render_new_lines = true; // do not render newlines before the block
@@ -243,7 +243,7 @@ impl<'a> Reformatter<'a> {
                     renderer.indent_up();
                 }
                 // Doc comments are to be placed OUTSIDE of table block.
-                Rule::doc_comment | Rule::doc_comment_and_new_line => {
+                Rule::doc_comment | Rule::comment_and_new_line | Rule::doc_comment_and_new_line => {
                     comment(&mut table.interleave_writer(), current.as_str())
                 }
                 Rule::NEWLINE => {
@@ -546,9 +546,9 @@ impl<'a> Reformatter<'a> {
         //        println!("generic token: |{:?}|", token.as_str());
         match token.as_rule() {
             Rule::NEWLINE => target.end_line(),
-            Rule::doc_comment_and_new_line => comment(target, token.as_str()),
+            Rule::doc_comment_and_new_line | Rule::comment => comment(target, token.as_str()),
             Rule::WHITESPACE => {} // we are very opinionated about whitespace and hence ignore user input
-            Rule::CATCH_ALL => {
+            Rule::CATCH_ALL | Rule::BLOCK_LEVEL_CATCH_ALL => {
                 target.write(token.as_str());
             }
             _ => unreachable!(

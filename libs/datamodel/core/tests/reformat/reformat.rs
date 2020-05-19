@@ -131,7 +131,7 @@ fn test_reformat_tabs() {
 }
 
 #[test]
-fn test_floating_doc_comment() {
+fn test_floating_doc_comments_1() {
     let input = r#"
 model a {
   one Int
@@ -143,7 +143,6 @@ model a {
 /// ajlsdkfkjasflk
 // model ok {}"#;
 
-    // TODO: that the inner comment is moved to the top is not ideal
     let expected = r#"model a {
   one Int
   two Int
@@ -159,7 +158,7 @@ model a {
 }
 
 #[test]
-fn test_floating_doc_comments() {
+fn test_floating_doc_comments_2() {
     let input = r#"
 model a {
   one Int

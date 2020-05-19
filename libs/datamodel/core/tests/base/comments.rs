@@ -4,12 +4,12 @@ use datamodel::common::ScalarType;
 #[test]
 fn parse_comments_without_crasing_or_loosing_info() {
     let dml = r#"
-    // comment 1
-    model User { // comment 2
+    /// comment 1
+    model User { /// comment 2
         id Int @id
-        firstName String // comment 3
-        // comment 4
-        lastName String // comment 5
+        firstName String /// comment 3
+        /// comment 4
+        lastName String /// comment 5
     }
     "#;
 

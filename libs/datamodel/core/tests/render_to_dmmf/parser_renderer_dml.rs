@@ -2,8 +2,10 @@ extern crate datamodel;
 use crate::common::*;
 use pretty_assertions::assert_eq;
 
-// TODO: test `onDelete` back once `prisma migrate` is a thing
-const DATAMODEL_STRING: &str = r#"model User {
+#[test]
+fn test_parser_renderer_via_dml() {
+    // TODO: test `onDelete` back once `prisma migrate` is a thing
+    let input = r#"model User {
   id        Int      @id
   createdAt DateTime
   email     String   @unique
@@ -77,17 +79,17 @@ enum CategoryEnum {
   C
 }"#;
 
-#[test]
-fn test_parser_renderer_via_dml() {
-    let dml = parse(DATAMODEL_STRING);
+    let dml = parse(input);
     let rendered = datamodel::render_datamodel_to_string(&dml).unwrap();
 
     print!("{}", rendered);
 
-    assert_eq!(DATAMODEL_STRING, rendered);
+    assert_eq!(input, rendered);
 }
 
-const MANY_TO_MANY_DATAMODEL: &str = r#"model Blog {
+#[test]
+fn test_parser_renderer_many_to_many_via_dml() {
+    let input = r#"model Blog {
   id        Int      @id
   name      String
   viewCount Int
@@ -108,35 +110,33 @@ model Post {
   blog   Blog   @relation(fields: [blogId], references: [id])
 }"#;
 
-#[test]
-fn test_parser_renderer_many_to_many_via_dml() {
-    let dml = parse(MANY_TO_MANY_DATAMODEL);
+    let dml = parse(input);
     let rendered = datamodel::render_datamodel_to_string(&dml).unwrap();
 
     print!("{}", rendered);
 
-    assert_eq!(rendered, MANY_TO_MANY_DATAMODEL);
+    assert_eq!(rendered, input);
 }
 
-const DATAMODEL_STRING_WITH_COMMENTS: &str = r#"// Cool user model
+#[test]
+fn test_parser_renderer_model_with_comments_via_dml() {
+    let input = r#"/// Cool user model
 model User {
   id        Int      @id
-  // Created at field
+  /// Created at field
   createdAt DateTime
   email     String   @unique
-  // Name field.
-  // Multi line comment.
+  /// Name field.
+  /// Multi line comment.
   name      String?
 
   @@map("user")
 }"#;
 
-#[test]
-fn test_parser_renderer_model_with_comments_via_dml() {
-    let dml = parse(DATAMODEL_STRING_WITH_COMMENTS);
+    let dml = parse(input);
     let rendered = datamodel::render_datamodel_to_string(&dml).unwrap();
 
     print!("{}", rendered);
 
-    assert_eq!(rendered, DATAMODEL_STRING_WITH_COMMENTS);
+    assert_eq!(rendered, input);
 }
