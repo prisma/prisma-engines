@@ -12,15 +12,21 @@ class CreateMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
   val schema =
     """
     |model ScalarModel {
-    |   id          String @id @default(cuid())
-    |   optString   String?
-    |   optInt      Int?
-    |   optFloat    Float?
-    |   optBoolean  Boolean?
-    |   optEnum     MyEnum?
-    |   optDateTime DateTime?
-    |   optUnique   String? @unique
-    |   createdAt   DateTime @default(now())
+    |    id          String @id @default(cuid())
+    |    optString   String?
+    |    optInt      Int?
+    |    optFloat    Float?
+    |    optBoolean  Boolean?
+    |    optEnum     MyEnum?
+    |    optDateTime DateTime?
+    |    optUnique   String? @unique
+    |    createdAt   DateTime @default(now())
+    |    relId       String?
+    |    optRel      RelatedModel? @relation(fields: [relId], references: [id])
+    |}
+    |
+    |model RelatedModel {
+    |    id String @id @default(cuid())
     |}
     |
     |enum MyEnum {
@@ -152,5 +158,17 @@ class CreateMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
       errorContains =
         """↳ createScalarModel (field)\n    ↳ data (argument)\n      ↳ ScalarModelCreateInput (object)\n        ↳ optEnum (field)\n          ↳ Error parsing value: Enum value 'NOPE' is invalid for enum type MyEnum."""
     )
+  }
+
+  "A Create Mutation" should "create with an optional relation set to null." in {
+    val res = server.query(
+      """mutation {
+        |  createScalarModel(data: {
+        |    optRel: null
+        |  }){ relId }}""".stripMargin,
+      project = project
+    )
+
+    res should be("""{"data":{"createScalarModel":{"relId":null}}}""".parseJson)
   }
 }
