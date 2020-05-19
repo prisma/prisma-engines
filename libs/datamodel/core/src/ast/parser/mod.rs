@@ -265,6 +265,11 @@ fn parse_model(token: &pest::iterators::Pair<'_, Rule>) -> Result<Model, ErrorCo
         Rule::doc_comment_and_new_line => comments.push(parse_doc_comment(&current)),
         Rule::doc_comment => comments.push(parse_doc_comment(&current)),
         Rule::UNTIL_END_OF_LINE => {},
+        Rule::BLOCK_LEVEL_CATCH_ALL => { errors.push(
+            DatamodelError::new_validation_error(
+                "This line is not a valid field or directive definition.",
+                Span::from_pest(current.as_span()))
+        ) },
         _ => unreachable!("Encountered impossible model declaration during parsing: {:?}", current.tokens())
     }
 
@@ -613,6 +618,7 @@ fn rule_to_string(rule: Rule) -> &'static str {
         Rule::INTERPOLATION_END => "string interpolation end",
         Rule::UNTIL_END_OF_LINE => "until end of line",
         Rule::CATCH_ALL => "CATCH ALL",
+        Rule::BLOCK_LEVEL_CATCH_ALL => "BLOCK LEVEL CATCH ALL",
 
         // Those are top level things and will never surface.
         Rule::datamodel => "datamodel declaration",

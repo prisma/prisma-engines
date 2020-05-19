@@ -209,3 +209,21 @@ fn incomplete_last_line_must_error_nicely() {
         Span::new(64, 72),
     ));
 }
+
+#[test]
+fn invalid_field_line_must_error_nicely() {
+    // https://github.com/prisma/vscode/issues/140
+    // If a user types on the very last line we did not error nicely.
+    // a new line fixed the problem but this is not nice.
+    let dml = r#"model User {
+        id    Int @id
+        foo   Bar Bla
+    }"#;
+
+    let error = parse_error(dml);
+
+    error.assert_is(DatamodelError::new_validation_error(
+        "This line is not a valid field or directive definition.",
+        Span::new(43, 57),
+    ));
+}

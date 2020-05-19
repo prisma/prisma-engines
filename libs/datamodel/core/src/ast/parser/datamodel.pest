@@ -28,7 +28,9 @@ INTERPOLATION_END = { "}" }
 
 LEGACY_COLON = { ":" }
 
-CATCH_ALL = @{ (WHITESPACE | LETTER | NUMBER | PUNCTUATION | SYMBOL)+ ~ NEWLINE? }
+CATCH_ALL = @{ (!NEWLINE ~ ANY)+ ~ NEWLINE? }
+
+BLOCK_LEVEL_CATCH_ALL = { !BLOCK_CLOSE ~ CATCH_ALL}
 
 doc_content = @{ (!NEWLINE ~ ANY)* }
 doc_comment = { WHITESPACE* ~ "//" ~ doc_content }
@@ -108,7 +110,7 @@ type_declaration = { (doc_comment_and_new_line | NEWLINE)* ~ TYPE_KEYWORD ~ non_
 // ######################################
 // Model declarations
 // ######################################
-model_declaration = { doc_comment_and_new_line? ~ (MODEL_KEYWORD | TYPE_KEYWORD) ~ non_empty_identifier ~ BLOCK_OPEN ~ ( field_declaration | ( "@@" ~ directive ) | NEWLINE | doc_comment_and_new_line)* ~ BLOCK_CLOSE }
+model_declaration = { doc_comment_and_new_line? ~ (MODEL_KEYWORD | TYPE_KEYWORD) ~ non_empty_identifier ~ BLOCK_OPEN ~ ( field_declaration | ( "@@" ~ directive ) | NEWLINE | doc_comment_and_new_line | BLOCK_LEVEL_CATCH_ALL )* ~ BLOCK_CLOSE }
 
 // ######################################
 // Enum declarations
