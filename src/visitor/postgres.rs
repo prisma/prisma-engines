@@ -119,52 +119,56 @@ impl<'a> Visitor<'a> for Postgres<'a> {
         self.write(")")
     }
 
+    #[cfg(feature = "json-1")]
     fn visit_condition_equals(&mut self, left: Expression<'a>, right: Expression<'a>) -> fmt::Result {
-        if cfg!(feature = "json-1") {
-            let (left_is_json, right_is_json) = (left.is_json_value(), right.is_json_value());
+        let (left_is_json, right_is_json) = (left.is_json_value(), right.is_json_value());
 
-            self.visit_expression(left)?;
+        self.visit_expression(left)?;
 
-            if right_is_json {
-                self.write("::jsonb")?;
-            }
-
-            self.write(" = ")?;
-
-            if left_is_json {
-                self.write("::jsonb")?;
-            }
-
-            self.visit_expression(right)
-        } else {
-            self.visit_expression(left)?;
-            self.write(" = ")?;
-            self.visit_expression(right)
+        if right_is_json {
+            self.write("::jsonb")?;
         }
+
+        self.write(" = ")?;
+
+        if left_is_json {
+            self.write("::jsonb")?;
+        }
+
+        self.visit_expression(right)
     }
 
+    #[cfg(not(feature = "json-1"))]
+    fn visit_condition_equals(&mut self, left: Expression<'a>, right: Expression<'a>) -> fmt::Result {
+        self.visit_expression(left)?;
+        self.write(" = ")?;
+        self.visit_expression(right)
+    }
+
+    #[cfg(feature = "json-1")]
     fn visit_condition_not_equals(&mut self, left: Expression<'a>, right: Expression<'a>) -> fmt::Result {
-        if cfg!(feature = "json-1") {
-            let (left_is_json, right_is_json) = (left.is_json_value(), right.is_json_value());
+        let (left_is_json, right_is_json) = (left.is_json_value(), right.is_json_value());
 
-            self.visit_expression(left)?;
+        self.visit_expression(left)?;
 
-            if right_is_json {
-                self.write("::jsonb")?;
-            }
-
-            self.write(" <> ")?;
-
-            if left_is_json {
-                self.write("::jsonb")?;
-            }
-
-            self.visit_expression(right)
-        } else {
-            self.visit_expression(left)?;
-            self.write(" <> ")?;
-            self.visit_expression(right)
+        if right_is_json {
+            self.write("::jsonb")?;
         }
+
+        self.write(" <> ")?;
+
+        if left_is_json {
+            self.write("::jsonb")?;
+        }
+
+        self.visit_expression(right)
+    }
+
+    #[cfg(not(feature = "json-1"))]
+    fn visit_condition_not_equals(&mut self, left: Expression<'a>, right: Expression<'a>) -> fmt::Result {
+        self.visit_expression(left)?;
+        self.write(" <> ")?;
+        self.visit_expression(right)
     }
 }
 
