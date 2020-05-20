@@ -525,7 +525,7 @@ impl<'a> Reformatter<'a> {
     }
 
     fn reformat_function_expression(target: &mut dyn LineWriteable, token: &Token) {
-        let mut expr_count = 0;
+        let mut has_seen_one_argument = false;
 
         for current in token.clone().into_inner() {
             match current.as_rule() {
@@ -533,12 +533,12 @@ impl<'a> Reformatter<'a> {
                     target.write(current.as_str());
                     target.write("(");
                 }
-                Rule::argument_value => {
-                    if expr_count > 0 {
+                Rule::expression => {
+                    if has_seen_one_argument {
                         target.write(", ");
                     }
-                    Self::reformat_arg_value(target, &current);
-                    expr_count += 1;
+                    Self::reformat_expression(target, &current);
+                    has_seen_one_argument = true;
                 }
                 Rule::doc_comment | Rule::doc_comment_and_new_line => {
                     panic!("Comments inside expressions not supported yet.")

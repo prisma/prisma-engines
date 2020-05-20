@@ -74,7 +74,7 @@ fn parse_function(token: &pest::iterators::Pair<'_, Rule>) -> Expression {
 
     match_children! { token, current,
         Rule::non_empty_identifier => name = Some(current.as_str().to_string()),
-        Rule::argument_value => arguments.push(parse_arg_value(&current)),
+        Rule::expression => arguments.push(parse_expression(&current)),
         _ => unreachable!("Encountered impossible function during parsing: {:?}", current.tokens())
     };
 

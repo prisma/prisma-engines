@@ -87,19 +87,21 @@ non_empty_identifier = @{ ASCII_ALPHANUMERIC ~ maybe_empty_identifier }
 
 WHITESPACE = @{ SPACE_SEPARATOR | "\t" } // tabs are also whitespace
 NEWLINE = { "\n" | "\r\n" | "\r" }
+
 // the any part is to not crash on comments next to an open block, see test `parse_comments_without_crasing_or_loosing_info`
 BLOCK_OPEN = { "{" ~ (!NEWLINE ~ ANY)* ~ NEWLINE }
 BLOCK_CLOSE = { "}" }
+
 // those rules are silent because we don't want to handle the tokens
 MODEL_KEYWORD = _{ "model" }
 ENUM_KEYWORD = _{ "enum" }
 GENERATOR_KEYWORD = _{ "generator" }
 DATASOURCE_KEYWORD = _{ "datasource" }
+INTERPOLATION_START = _{ "${" }
+INTERPOLATION_END = _{ "}" }
 
 // rules that we want to handle explicitly
 TYPE_KEYWORD = { "type" }
-INTERPOLATION_START = { "${" }
-INTERPOLATION_END = { "}" }
 LEGACY_COLON = { ":" }
 
 CATCH_ALL = { (!NEWLINE ~ ANY)+ ~ NEWLINE? }
@@ -108,7 +110,7 @@ BLOCK_LEVEL_CATCH_ALL = { !BLOCK_CLOSE ~ CATCH_ALL }
 // ######################################
 // Expressions & Functions
 // ######################################
-function = { non_empty_identifier ~ "(" ~ (argument_value ~ ("," ~ argument_value)*)? ~ ")" }
+function = { non_empty_identifier ~ "(" ~ (expression ~ ("," ~ expression)*)? ~ ")" }
 array_expression = { "[" ~ expression ~ ( "," ~ expression )* ~ "]" }
 expression = { array_expression | function | numeric_literal | string_literal | boolean_literal | constant_literal }
 
