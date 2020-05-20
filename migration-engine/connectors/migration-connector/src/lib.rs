@@ -17,8 +17,8 @@ pub use migration_applier::*;
 pub use migration_persistence::*;
 pub use steps::MigrationStep;
 
-use user_facing_errors::migration_engine::DatabaseMigrationFormatChanged;
 use std::fmt::Debug;
+use user_facing_errors::migration_engine::DatabaseMigrationFormatChanged;
 
 /// The top-level trait for connectors. This is the abstraction the migration engine core relies on to
 /// interface with different database backends.
@@ -68,7 +68,10 @@ pub trait MigrationConnector: Send + Sync + 'static {
 
     // TODO: figure out if this is the best way to do this or move to a better place/interface
     // this is placed here so i can use the associated type
-    fn deserialize_database_migration(&self, json: serde_json::Value) -> Result<Self::DatabaseMigration, DatabaseMigrationFormatChanged>;
+    fn deserialize_database_migration(
+        &self,
+        json: serde_json::Value,
+    ) -> Result<Self::DatabaseMigration, DatabaseMigrationFormatChanged>;
 
     /// See [MigrationStepApplier](trait.MigrationStepApplier.html).
     fn migration_applier<'a>(&'a self) -> Box<dyn MigrationApplier<Self::DatabaseMigration> + Send + Sync + 'a> {

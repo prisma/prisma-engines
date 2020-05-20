@@ -237,7 +237,10 @@ impl MigrationConnector for SqlMigrationConnector {
         Box::new(SqlDestructiveChangesChecker { connector: self })
     }
 
-    fn deserialize_database_migration(&self, json: serde_json::Value) -> Result<SqlMigration, DatabaseMigrationFormatChanged> {
+    fn deserialize_database_migration(
+        &self,
+        json: serde_json::Value,
+    ) -> Result<SqlMigration, DatabaseMigrationFormatChanged> {
         serde_json::from_value(json).map_err(|_| DatabaseMigrationFormatChanged)
     }
 }
