@@ -1,6 +1,8 @@
 use pretty_assertions::assert_eq;
 
-const DATAMODEL_STRING: &str = r#"model User {
+#[test]
+fn test_parser_renderer_via_ast() {
+    let input = r#"model User {
   id        Int      @id
   createdAt DateTime
   email     String   @unique
@@ -67,18 +69,12 @@ enum CategoryEnum {
   B
   C
 }"#;
-
-#[test]
-fn test_parser_renderer_via_ast() {
-    let ast = parse_to_ast(DATAMODEL_STRING).expect("failed to parse");
-    let rendered = render_schema_ast_to_string(&ast);
-
-    print!("{}", rendered);
-
-    assert_eq!(DATAMODEL_STRING, rendered);
+    assert_rendered(input, input);
 }
 
-const MANY_TO_MANY_DATAMODEL: &str = r#"model Blog {
+#[test]
+fn test_parser_renderer_many_to_many_via_ast() {
+    let input = r#"model Blog {
   id        Int      @id
   name      String
   viewCount Int
@@ -98,18 +94,12 @@ model Post {
   tags  String[]
   blog  Blog
 }"#;
-
-#[test]
-fn test_parser_renderer_many_to_many_via_ast() {
-    let ast = parse_to_ast(MANY_TO_MANY_DATAMODEL).unwrap();
-    let rendered = render_schema_ast_to_string(&ast);
-
-    print!("{}", rendered);
-
-    assert_eq!(rendered, MANY_TO_MANY_DATAMODEL);
+    assert_rendered(input, input);
 }
 
-const DATAMODEL_WITH_TYPES: &str = r#"type ID = Int @id
+#[test]
+fn test_parser_renderer_types_via_ast() {
+    let input = r#"type ID = Int @id
 
 model Author {
   id      ID
@@ -117,17 +107,12 @@ model Author {
   authors Blog[]  @relation("AuthorToBlogs")
 }"#;
 
-#[test]
-fn test_parser_renderer_types_via_ast() {
-    let ast = parse_to_ast(DATAMODEL_WITH_TYPES).expect("failed to parse");
-    let rendered = render_schema_ast_to_string(&ast);
-
-    print!("{}", rendered);
-
-    assert_eq!(rendered, DATAMODEL_WITH_TYPES);
+    assert_rendered(input, input);
 }
 
-const DATAMODEL_WITH_SOURCE: &str = r#"datasource pg1 {
+#[test]
+fn test_parser_renderer_sources_via_ast() {
+    let input = r#"datasource pg1 {
   provider = "Postgres"
   url      = "https://localhost/postgres1"
 }
@@ -138,17 +123,12 @@ model Author {
   authors Blog[]  @relation("AuthorToBlogs")
 }"#;
 
-#[test]
-fn test_parser_renderer_sources_via_ast() {
-    let ast = parse_to_ast(DATAMODEL_WITH_SOURCE).expect("failed to parse");
-    let rendered = render_schema_ast_to_string(&ast);
-
-    print!("{}", rendered);
-
-    assert_eq!(rendered, DATAMODEL_WITH_SOURCE);
+    assert_eq!(input, input);
 }
 
-const DATAMODEL_WITH_SOURCE_AND_COMMENTS: &str = r#"/// Super cool postgres source.
+#[test]
+fn test_parser_renderer_sources_and_comments_via_ast() {
+    let input = r#"/// Super cool postgres source.
 datasource pg1 {
   provider = "postgres"
   url      = "https://localhost/postgres1"
@@ -162,14 +142,7 @@ model Author {
   createdAt DateTime @default(now())
 }"#;
 
-#[test]
-fn test_parser_renderer_sources_and_comments_via_ast() {
-    let ast = parse_to_ast(DATAMODEL_WITH_SOURCE_AND_COMMENTS).expect("failed to parse");
-    let rendered = render_schema_ast_to_string(&ast);
-
-    print!("{}", rendered);
-
-    assert_eq!(rendered, DATAMODEL_WITH_SOURCE_AND_COMMENTS);
+    assert_rendered(input, input);
 }
 
 #[test]
@@ -203,9 +176,13 @@ model Author {
 }"#;
     // replaces \t placeholder with a real tab
     let tabbed_dm = input.replace("\\t", "\t");
-    let ast = parse_to_ast(&tabbed_dm).expect("failed to parse");
+    assert_rendered(&tabbed_dm, &expected.replace("\\t", "\t"));
+}
+
+fn assert_rendered(input: &str, expected: &str) {
+    let ast = parse_to_ast(&input).expect("failed to parse");
     let rendered = render_schema_ast_to_string(&ast);
-    assert_eq!(rendered, expected.replace("\\t", "\t"));
+    assert_eq!(rendered, expected);
 }
 
 fn render_schema_ast_to_string(schema: &datamodel::ast::SchemaAst) -> String {
