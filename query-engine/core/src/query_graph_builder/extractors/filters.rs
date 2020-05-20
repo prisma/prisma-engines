@@ -276,7 +276,7 @@ fn handle_compound_field(fields: Vec<ScalarFieldRef>, value: ParsedInputValue) -
     let filters: Vec<Filter> = fields
         .into_iter()
         .map(|sf| {
-            let pv: PrismaValue = input_map.remove(sf.db_name()).unwrap().try_into()?;
+            let pv: PrismaValue = input_map.remove(&sf.name).unwrap().try_into()?;
             Ok(sf.equals(pv))
         })
         .collect::<QueryGraphBuilderResult<Vec<_>>>()?;
