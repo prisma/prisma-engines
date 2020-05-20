@@ -96,8 +96,14 @@ impl<'a> InferApplyAssertion<'a> {
     pub fn assert_no_steps(self) -> AssertionResult<Self> {
         anyhow::ensure!(
             self.result.datamodel_steps.is_empty(),
-            "Assertion failed. Datamodel migration steps should be empty, but found {:?}",
+            "Assertion failed. Datamodel migration steps should be empty, but found {:#?}",
             self.result.datamodel_steps
+        );
+
+        anyhow::ensure!(
+            self.result.database_steps.as_array().unwrap().is_empty(),
+            "Assertion failed. Database migration steps should be empty, but found {:#?}",
+            self.result.database_steps
         );
 
         Ok(self)

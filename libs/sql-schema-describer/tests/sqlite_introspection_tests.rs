@@ -1,12 +1,14 @@
-use barrel::{types, Migration};
-use pretty_assertions::assert_eq;
-use sql_schema_describer::*;
-
 mod common;
 mod sqlite;
+mod test_api;
 
+use barrel::{types, Migration};
 use common::*;
+use pretty_assertions::assert_eq;
+use sql_schema_describer::*;
 use sqlite::*;
+use test_api::{sqlite_test_api, TestApi, TestResult};
+use test_macros::test_each_connector;
 
 #[tokio::test]
 async fn sqlite_column_types_must_work() {
@@ -28,7 +30,8 @@ async fn sqlite_column_types_must_work() {
         Column {
             name: "int_col".to_string(),
             tpe: ColumnType {
-                raw: "int".to_string(),
+                data_type: "int".to_string(),
+                full_data_type: "int".to_string(),
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
             },
@@ -38,7 +41,8 @@ async fn sqlite_column_types_must_work() {
         Column {
             name: "int4_col".to_string(),
             tpe: ColumnType {
-                raw: "INTEGER".to_string(),
+                data_type: "INTEGER".to_string(),
+                full_data_type: "INTEGER".to_string(),
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
             },
@@ -48,7 +52,8 @@ async fn sqlite_column_types_must_work() {
         Column {
             name: "text_col".to_string(),
             tpe: ColumnType {
-                raw: "TEXT".to_string(),
+                data_type: "TEXT".to_string(),
+                full_data_type: "TEXT".to_string(),
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
             },
@@ -58,7 +63,8 @@ async fn sqlite_column_types_must_work() {
         Column {
             name: "real_col".to_string(),
             tpe: ColumnType {
-                raw: "REAL".to_string(),
+                data_type: "REAL".to_string(),
+                full_data_type: "REAL".to_string(),
                 family: ColumnTypeFamily::Float,
                 arity: ColumnArity::Required,
             },
@@ -68,7 +74,8 @@ async fn sqlite_column_types_must_work() {
         Column {
             name: "primary_col".to_string(),
             tpe: ColumnType {
-                raw: "INTEGER".to_string(),
+                data_type: "INTEGER".to_string(),
+                full_data_type: "INTEGER".to_string(),
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
             },
@@ -78,7 +85,8 @@ async fn sqlite_column_types_must_work() {
         Column {
             name: "decimal_col".to_string(),
             tpe: ColumnType {
-                raw: "decimal (5, 3)".to_string(),
+                data_type: "decimal (5, 3)".to_string(),
+                full_data_type: "decimal (5, 3)".to_string(),
                 family: ColumnTypeFamily::Float,
                 arity: ColumnArity::Required,
             },
@@ -131,7 +139,8 @@ async fn sqlite_foreign_key_on_delete_must_be_handled() {
                 Column {
                     name: "city".to_string(),
                     tpe: ColumnType {
-                        raw: "INTEGER".to_string(),
+                        data_type: "INTEGER".to_string(),
+                        full_data_type: "INTEGER".to_string(),
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
                     },
@@ -141,7 +150,8 @@ async fn sqlite_foreign_key_on_delete_must_be_handled() {
                 Column {
                     name: "city_cascade".to_string(),
                     tpe: ColumnType {
-                        raw: "INTEGER".to_string(),
+                        data_type: "INTEGER".to_string(),
+                        full_data_type: "INTEGER".to_string(),
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
                     },
@@ -151,7 +161,8 @@ async fn sqlite_foreign_key_on_delete_must_be_handled() {
                 Column {
                     name: "city_restrict".to_string(),
                     tpe: ColumnType {
-                        raw: "INTEGER".to_string(),
+                        data_type: "INTEGER".to_string(),
+                        full_data_type: "INTEGER".to_string(),
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
                     },
@@ -161,7 +172,8 @@ async fn sqlite_foreign_key_on_delete_must_be_handled() {
                 Column {
                     name: "city_set_default".to_string(),
                     tpe: ColumnType {
-                        raw: "INTEGER".to_string(),
+                        data_type: "INTEGER".to_string(),
+                        full_data_type: "INTEGER".to_string(),
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
                     },
@@ -171,7 +183,8 @@ async fn sqlite_foreign_key_on_delete_must_be_handled() {
                 Column {
                     name: "city_set_null".to_string(),
                     tpe: ColumnType {
-                        raw: "INTEGER".to_string(),
+                        data_type: "INTEGER".to_string(),
+                        full_data_type: "INTEGER".to_string(),
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
                     },
@@ -181,7 +194,8 @@ async fn sqlite_foreign_key_on_delete_must_be_handled() {
                 Column {
                     name: "id".to_string(),
                     tpe: ColumnType {
-                        raw: "INTEGER".to_string(),
+                        data_type: "INTEGER".to_string(),
+                        full_data_type: "INTEGER".to_string(),
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Required,
                     },
@@ -267,4 +281,86 @@ async fn sqlite_text_primary_keys_must_be_inferred_on_table_and_not_as_separate_
             sequence: None
         }
     );
+}
+
+#[test_each_connector(tags("sqlite"))]
+async fn escaped_quotes_in_string_defaults_must_be_unescaped(api: &TestApi) -> TestResult {
+    let create_table = format!(
+        r#"
+            CREATE TABLE "{0}"."string_defaults_test" (
+                id INTEGER PRIMARY KEY,
+                regular VARCHAR NOT NULL DEFAULT 'meow, says the cat',
+                escaped VARCHAR NOT NULL DEFAULT '"That''s a lot of fish!"
+- Godzilla, 1998'
+            );
+        "#,
+        api.schema_name()
+    );
+
+    api.database().query_raw(&create_table, &[]).await?;
+
+    let schema = api.describe().await?;
+
+    let table = schema.table_bang("string_defaults_test");
+
+    let regular_column_default = table
+        .column_bang("regular")
+        .default
+        .as_ref()
+        .unwrap()
+        .as_value()
+        .unwrap()
+        .clone()
+        .into_string()
+        .unwrap();
+
+    assert_eq!(regular_column_default, "meow, says the cat");
+
+    let escaped_column_default = table
+        .column_bang("escaped")
+        .default
+        .as_ref()
+        .unwrap()
+        .as_value()
+        .unwrap()
+        .clone()
+        .into_string()
+        .unwrap();
+
+    assert_eq!(escaped_column_default, "\"That's a lot of fish!\"\n- Godzilla, 1998");
+
+    Ok(())
+}
+
+#[test_each_connector(tags("sqlite"))]
+async fn escaped_backslashes_in_string_literals_must_be_unescaped(api: &TestApi) -> TestResult {
+    let create_table = format!(
+        r#"
+            CREATE TABLE "{0}"."test" (
+                model_name_space VARCHAR(255) NOT NULL DEFAULT 'xyz\Datasource\Model'
+            );
+        "#,
+        api.schema_name()
+    );
+
+    api.database().query_raw(&create_table, &[]).await?;
+
+    let schema = api.describe().await?;
+
+    let table = schema.table_bang("test");
+
+    let default = table
+        .column_bang("model_name_space")
+        .default
+        .as_ref()
+        .unwrap()
+        .as_value()
+        .unwrap()
+        .clone()
+        .into_string()
+        .unwrap();
+
+    assert_eq!(default, "xyz\\Datasource\\Model");
+
+    Ok(())
 }

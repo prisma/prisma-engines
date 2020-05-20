@@ -1,28 +1,33 @@
 use crate::commenting_out_guardrails::commenting_out_guardrails;
 use crate::misc_helpers::*;
 use crate::sanitize_datamodel_names::sanitize_datamodel_names;
+use crate::version_checker::VersionChecker;
 use crate::SqlIntrospectionResult;
 use datamodel::{dml, Datamodel, FieldType, Model};
 use introspection_connector::IntrospectionResult;
+use quaint::connector::SqlFamily;
 use sql_schema_describer::*;
 use tracing::debug;
 
 /// Calculate a data model from a database schema.
-pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<IntrospectionResult> {
+pub fn calculate_datamodel(schema: &SqlSchema, family: &SqlFamily) -> SqlIntrospectionResult<IntrospectionResult> {
     debug!("Calculating data model.");
+
+    let mut version_check = VersionChecker::new(family.clone(), schema);
 
     let mut data_model = Datamodel::new();
     for table in schema
         .tables
         .iter()
         .filter(|table| !is_migration_table(&table))
-        .filter(|table| !is_prisma_1_point_1_join_table(&table))
+        .filter(|table| !is_prisma_1_point_1_or_2_join_table(&table))
         .filter(|table| !is_prisma_1_point_0_join_table(&table))
     {
         debug!("Calculating model: {}", table.name);
         let mut model = Model::new(table.name.clone(), None);
 
         for column in &table.columns {
+            version_check.uses_non_prisma_type(&column.tpe);
             let field = calculate_scalar_field(&table, &column);
             model.add_field(field);
         }
@@ -36,6 +41,8 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Introspecti
                 .iter()
                 .any(|c| matches!(model_copy.find_field(c).unwrap().field_type, FieldType::Unsupported(_)))
         }) {
+            version_check.has_inline_relations(table);
+            version_check.uses_on_delete(foreign_key, table);
             model.add_field(calculate_relation_field(schema, table, foreign_key));
         }
 
@@ -50,6 +57,8 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Introspecti
         if table.primary_key_columns().len() > 1 {
             model.id_fields = table.primary_key_columns();
         }
+
+        version_check.always_has_created_at_updated_at(table, &model);
 
         data_model.add_model(model);
     }
@@ -91,7 +100,7 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Introspecti
     for table in schema
         .tables
         .iter()
-        .filter(|table| is_prisma_1_point_1_join_table(&table) || is_prisma_1_point_0_join_table(&table))
+        .filter(|table| is_prisma_1_point_1_or_2_join_table(&table) || is_prisma_1_point_0_join_table(&table))
     {
         if let (Some(f), Some(s)) = (table.foreign_keys.get(0), table.foreign_keys.get(1)) {
             let is_self_relation = f.referenced_table == s.referenced_table;
@@ -122,6 +131,7 @@ pub fn calculate_model(schema: &SqlSchema) -> SqlIntrospectionResult<Introspecti
 
     Ok(IntrospectionResult {
         datamodel: data_model,
+        version: version_check.version(&warnings),
         warnings,
     })
 }

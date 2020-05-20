@@ -6,7 +6,8 @@
         {
           "name": "column1",
           "tpe": {
-            "raw": "integer",
+            "dataType": "integer",
+            "fullDataType": "int",
             "family": "int",
           "arity": "required"
           },
@@ -16,7 +17,8 @@
         {
           "name": "column2",
           "tpe": {
-            "raw": "varchar(255)",
+            "dataType": "varchar(255)",
+            "fullDataType": "varchar(255)",
             "family": "string",
           "arity": "nullable"
           },
@@ -28,7 +30,8 @@
         {
           "name": "column3",
           "tpe": {
-            "raw": "integer",
+            "dataType": "integer",
+            "fullDataType": "integer",
             "family": "int",
           "arity": "required"
           },
@@ -69,7 +72,8 @@
         {
           "name": "id",
           "tpe": {
-            "raw": "integer",
+            "dataType": "integer",
+            "fullDataType": "integer",
             "family": "int",
           "arity": "required"
           },

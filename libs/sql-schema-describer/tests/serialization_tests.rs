@@ -27,7 +27,8 @@ fn database_schema_is_serializable() {
                     Column {
                         name: "column1".to_string(),
                         tpe: ColumnType {
-                            raw: "integer".to_string(),
+                            data_type: "integer".to_string(),
+                            full_data_type: "int".to_string(),
                             family: ColumnTypeFamily::Int,
                             arity: ColumnArity::Required,
                         },
@@ -37,7 +38,8 @@ fn database_schema_is_serializable() {
                     Column {
                         name: "column2".to_string(),
                         tpe: ColumnType {
-                            raw: "varchar(255)".to_string(),
+                            data_type: "varchar(255)".to_string(),
+                            full_data_type: "varchar(255)".to_string(),
                             family: ColumnTypeFamily::String,
                             arity: ColumnArity::Nullable,
                         },
@@ -47,7 +49,8 @@ fn database_schema_is_serializable() {
                     Column {
                         name: "column3".to_string(),
                         tpe: ColumnType {
-                            raw: "integer".to_string(),
+                            data_type: "integer".to_string(),
+                            full_data_type: "integer".to_string(),
                             family: ColumnTypeFamily::Int,
                             arity: ColumnArity::Required,
                         },
@@ -77,7 +80,8 @@ fn database_schema_is_serializable() {
                 columns: vec![Column {
                     name: "id".to_string(),
                     tpe: ColumnType {
-                        raw: "integer".to_string(),
+                        data_type: "integer".to_string(),
+                        full_data_type: "integer".to_string(),
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Required,
                     },
@@ -122,7 +126,8 @@ fn database_schema_without_primary_key_is_serializable() {
             columns: vec![Column {
                 name: "column1".to_string(),
                 tpe: ColumnType {
-                    raw: "integer".to_string(),
+                    data_type: "integer".to_string(),
+                    full_data_type: "int".to_string(),
                     family: ColumnTypeFamily::Int,
                     arity: ColumnArity::Nullable,
                 },
@@ -170,7 +175,8 @@ fn database_schema_is_serializable_for_every_column_type_family() {
     .map(|(i, family)| Column {
         name: format!("column{}", i + 1),
         tpe: ColumnType {
-            raw: "raw type".to_string(),
+            data_type: "raw type".to_string(),
+            full_data_type: "full raw type".to_string(),
             family: family.to_owned(),
             arity: ColumnArity::Nullable,
         },
@@ -210,7 +216,8 @@ fn database_schema_is_serializable_for_every_column_arity() {
         .map(|(i, arity)| Column {
             name: format!("column{}", i + 1),
             tpe: ColumnType {
-                raw: "int".to_string(),
+                data_type: "integer".to_string(),
+                full_data_type: "int".to_string(),
                 family: ColumnTypeFamily::Int,
                 arity: arity.to_owned(),
             },
@@ -251,7 +258,8 @@ fn database_schema_is_serializable_for_every_foreign_key_action() {
                 Column {
                     name: "column1".to_string(),
                     tpe: ColumnType {
-                        raw: "int".to_string(),
+                        data_type: "integer".to_string(),
+                        full_data_type: "int".to_string(),
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
                     },
@@ -261,7 +269,8 @@ fn database_schema_is_serializable_for_every_foreign_key_action() {
                 Column {
                     name: "column2".to_string(),
                     tpe: ColumnType {
-                        raw: "int".to_string(),
+                        data_type: "integer".to_string(),
+                        full_data_type: "int".to_string(),
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
                     },
@@ -271,7 +280,8 @@ fn database_schema_is_serializable_for_every_foreign_key_action() {
                 Column {
                     name: "column3".to_string(),
                     tpe: ColumnType {
-                        raw: "int".to_string(),
+                        data_type: "integer".to_string(),
+                        full_data_type: "int".to_string(),
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
                     },
@@ -281,7 +291,8 @@ fn database_schema_is_serializable_for_every_foreign_key_action() {
                 Column {
                     name: "column4".to_string(),
                     tpe: ColumnType {
-                        raw: "int".to_string(),
+                        data_type: "integer".to_string(),
+                        full_data_type: "int".to_string(),
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
                     },
@@ -291,7 +302,8 @@ fn database_schema_is_serializable_for_every_foreign_key_action() {
                 Column {
                     name: "column5".to_string(),
                     tpe: ColumnType {
-                        raw: "int".to_string(),
+                        data_type: "integer".to_string(),
+                        full_data_type: "int".to_string(),
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
                     },

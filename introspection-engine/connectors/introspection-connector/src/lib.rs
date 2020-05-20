@@ -25,12 +25,22 @@ pub struct DatabaseMetadata {
     pub size_in_bytes: usize,
 }
 
+#[derive(Serialize, Deserialize, Debug, PartialEq)]
+pub enum Version {
+    NonPrisma,
+    Prisma1,
+    Prisma11,
+    Prisma2,
+}
+
 #[derive(Debug)]
 pub struct IntrospectionResult {
     /// Datamodel
     pub datamodel: Datamodel,
     /// warnings
     pub warnings: Vec<Warning>,
+    /// version
+    pub version: Version,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -46,6 +56,8 @@ pub struct IntrospectionResultOutput {
     pub datamodel: String,
     /// warnings
     pub warnings: Vec<Warning>,
+    /// version
+    pub version: Version,
 }
 
 impl fmt::Display for IntrospectionResultOutput {

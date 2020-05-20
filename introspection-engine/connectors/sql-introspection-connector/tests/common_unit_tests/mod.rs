@@ -4,7 +4,8 @@ use datamodel::{
 };
 use pretty_assertions::assert_eq;
 use prisma_value::PrismaValue;
-use sql_introspection_connector::calculate_datamodel::calculate_model;
+use quaint::connector::SqlFamily;
+use sql_introspection_connector::calculate_datamodel::calculate_datamodel;
 use sql_schema_describer::*;
 
 #[test]
@@ -82,7 +83,8 @@ fn a_data_model_can_be_generated_from_a_schema() {
                 .map(|family| Column {
                     name: family.to_string(),
                     tpe: ColumnType {
-                        raw: "raw".to_string(),
+                        data_type: "raw".to_string(),
+                        full_data_type: "raw".to_string(),
                         family: family.to_owned(),
                         arity: ColumnArity::Nullable,
                     },
@@ -100,7 +102,7 @@ fn a_data_model_can_be_generated_from_a_schema() {
         enums: vec![],
         sequences: vec![],
     };
-    let introspection_result = calculate_model(&schema).expect("calculate data model");
+    let introspection_result = calculate_datamodel(&schema, &SqlFamily::Postgres).expect("calculate data model");
 
     assert_eq!(introspection_result.datamodel, ref_data_model);
 }
@@ -169,7 +171,8 @@ fn arity_is_preserved_when_generating_data_model_from_a_schema() {
                 Column {
                     name: "optional".to_string(),
                     tpe: ColumnType {
-                        raw: "raw".to_string(),
+                        data_type: "raw".to_string(),
+                        full_data_type: "raw".to_string(),
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
                     },
@@ -179,7 +182,8 @@ fn arity_is_preserved_when_generating_data_model_from_a_schema() {
                 Column {
                     name: "required".to_string(),
                     tpe: ColumnType {
-                        raw: "raw".to_string(),
+                        data_type: "raw".to_string(),
+                        full_data_type: "raw".to_string(),
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Required,
                     },
@@ -189,7 +193,8 @@ fn arity_is_preserved_when_generating_data_model_from_a_schema() {
                 Column {
                     name: "list".to_string(),
                     tpe: ColumnType {
-                        raw: "raw".to_string(),
+                        data_type: "raw".to_string(),
+                        full_data_type: "raw".to_string(),
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::List,
                     },
@@ -207,7 +212,7 @@ fn arity_is_preserved_when_generating_data_model_from_a_schema() {
         enums: vec![],
         sequences: vec![],
     };
-    let introspection_result = calculate_model(&schema).expect("calculate data model");
+    let introspection_result = calculate_datamodel(&schema, &SqlFamily::Postgres).expect("calculate data model");
 
     assert_eq!(introspection_result.datamodel, ref_data_model);
 }
@@ -306,7 +311,8 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
                 Column {
                     name: "no_default".to_string(),
                     tpe: ColumnType {
-                        raw: "raw".to_string(),
+                        data_type: "raw".to_string(),
+                        full_data_type: "raw".to_string(),
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
                     },
@@ -316,7 +322,8 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
                 Column {
                     name: "int_default".to_string(),
                     tpe: ColumnType {
-                        raw: "raw".to_string(),
+                        data_type: "raw".to_string(),
+                        full_data_type: "raw".to_string(),
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
                     },
@@ -326,7 +333,8 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
                 Column {
                     name: "bool_default".to_string(),
                     tpe: ColumnType {
-                        raw: "raw".to_string(),
+                        data_type: "raw".to_string(),
+                        full_data_type: "raw".to_string(),
                         family: ColumnTypeFamily::Boolean,
                         arity: ColumnArity::Nullable,
                     },
@@ -336,7 +344,8 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
                 Column {
                     name: "float_default".to_string(),
                     tpe: ColumnType {
-                        raw: "raw".to_string(),
+                        data_type: "raw".to_string(),
+                        full_data_type: "raw".to_string(),
                         family: ColumnTypeFamily::Float,
                         arity: ColumnArity::Nullable,
                     },
@@ -346,7 +355,8 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
                 Column {
                     name: "string_default".to_string(),
                     tpe: ColumnType {
-                        raw: "raw".to_string(),
+                        data_type: "raw".to_string(),
+                        full_data_type: "raw".to_string(),
                         family: ColumnTypeFamily::String,
                         arity: ColumnArity::Nullable,
                     },
@@ -365,7 +375,7 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
         enums: vec![],
         sequences: vec![],
     };
-    let introspection_result = calculate_model(&schema).expect("calculate data model");
+    let introspection_result = calculate_datamodel(&schema, &SqlFamily::Postgres).expect("calculate data model");
 
     assert_eq!(introspection_result.datamodel, ref_data_model);
 }
@@ -457,7 +467,8 @@ fn primary_key_is_preserved_when_generating_data_model_from_a_schema() {
                 columns: vec![Column {
                     name: "primary".to_string(),
                     tpe: ColumnType {
-                        raw: "integer".to_string(),
+                        data_type: "integer".to_string(),
+                        full_data_type: "integer".to_string(),
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Required,
                     },
@@ -476,7 +487,8 @@ fn primary_key_is_preserved_when_generating_data_model_from_a_schema() {
                 columns: vec![Column {
                     name: "primary".to_string(),
                     tpe: ColumnType {
-                        raw: "integer".to_string(),
+                        data_type: "integer".to_string(),
+                        full_data_type: "integer".to_string(),
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Required,
                     },
@@ -495,7 +507,8 @@ fn primary_key_is_preserved_when_generating_data_model_from_a_schema() {
                 columns: vec![Column {
                     name: "primary".to_string(),
                     tpe: ColumnType {
-                        raw: "integer".to_string(),
+                        data_type: "integer".to_string(),
+                        full_data_type: "integer".to_string(),
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Required,
                     },
@@ -517,7 +530,7 @@ fn primary_key_is_preserved_when_generating_data_model_from_a_schema() {
         enums: vec![],
         sequences: vec![],
     };
-    let introspection_result = calculate_model(&schema).expect("calculate data model");
+    let introspection_result = calculate_datamodel(&schema, &SqlFamily::Postgres).expect("calculate data model");
 
     assert_eq!(introspection_result.datamodel, ref_data_model);
 }
@@ -573,7 +586,8 @@ fn uniqueness_is_preserved_when_generating_data_model_from_a_schema() {
                 Column {
                     name: "non_unique".to_string(),
                     tpe: ColumnType {
-                        raw: "raw".to_string(),
+                        data_type: "raw".to_string(),
+                        full_data_type: "raw".to_string(),
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
                     },
@@ -583,7 +597,8 @@ fn uniqueness_is_preserved_when_generating_data_model_from_a_schema() {
                 Column {
                     name: "unique".to_string(),
                     tpe: ColumnType {
-                        raw: "raw".to_string(),
+                        data_type: "raw".to_string(),
+                        full_data_type: "raw".to_string(),
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Required,
                     },
@@ -602,7 +617,7 @@ fn uniqueness_is_preserved_when_generating_data_model_from_a_schema() {
         enums: vec![],
         sequences: vec![],
     };
-    let introspection_result = calculate_model(&schema).expect("calculate data model");
+    let introspection_result = calculate_datamodel(&schema, &SqlFamily::Postgres).expect("calculate data model");
 
     assert_eq!(introspection_result.datamodel, ref_data_model);
 }
@@ -750,7 +765,8 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
                     Column {
                         name: "id".to_string(),
                         tpe: ColumnType {
-                            raw: "integer".to_string(),
+                            data_type: "integer".to_string(),
+                            full_data_type: "integer".to_string(),
                             family: ColumnTypeFamily::Int,
                             arity: ColumnArity::Required,
                         },
@@ -760,7 +776,8 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
                     Column {
                         name: "name".to_string(),
                         tpe: ColumnType {
-                            raw: "text".to_string(),
+                            data_type: "text".to_string(),
+                            full_data_type: "text".to_string(),
                             family: ColumnTypeFamily::String,
                             arity: ColumnArity::Required,
                         },
@@ -781,7 +798,8 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
                     Column {
                         name: "id".to_string(),
                         tpe: ColumnType {
-                            raw: "integer".to_string(),
+                            data_type: "integer".to_string(),
+                            full_data_type: "integer".to_string(),
                             family: ColumnTypeFamily::Int,
                             arity: ColumnArity::Required,
                         },
@@ -791,7 +809,8 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
                     Column {
                         name: "city-id".to_string(),
                         tpe: ColumnType {
-                            raw: "integer".to_string(),
+                            data_type: "integer".to_string(),
+                            full_data_type: "integer".to_string(),
                             family: ColumnTypeFamily::Int,
                             arity: ColumnArity::Required,
                         },
@@ -801,7 +820,8 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
                     Column {
                         name: "city-name".to_string(),
                         tpe: ColumnType {
-                            raw: "text".to_string(),
+                            data_type: "text".to_string(),
+                            full_data_type: "text".to_string(),
                             family: ColumnTypeFamily::String,
                             arity: ColumnArity::Required,
                         },
@@ -827,7 +847,7 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
         enums: vec![],
         sequences: vec![],
     };
-    let introspection_result = calculate_model(&schema).expect("calculate data model");
+    let introspection_result = calculate_datamodel(&schema, &SqlFamily::Postgres).expect("calculate data model");
 
     assert_eq!(introspection_result.datamodel, expected_data_model);
 }
@@ -900,7 +920,8 @@ fn multi_field_uniques_are_preserved_when_generating_data_model_from_a_schema() 
                 Column {
                     name: "id".to_string(),
                     tpe: ColumnType {
-                        raw: "integer".to_string(),
+                        data_type: "integer".to_string(),
+                        full_data_type: "integer".to_string(),
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Required,
                     },
@@ -910,7 +931,8 @@ fn multi_field_uniques_are_preserved_when_generating_data_model_from_a_schema() 
                 Column {
                     name: "name".to_string(),
                     tpe: ColumnType {
-                        raw: "text".to_string(),
+                        data_type: "text".to_string(),
+                        full_data_type: "text".to_string(),
                         family: ColumnTypeFamily::String,
                         arity: ColumnArity::Required,
                     },
@@ -920,7 +942,8 @@ fn multi_field_uniques_are_preserved_when_generating_data_model_from_a_schema() 
                 Column {
                     name: "lastname".to_string(),
                     tpe: ColumnType {
-                        raw: "text".to_string(),
+                        data_type: "text".to_string(),
+                        full_data_type: "text".to_string(),
                         family: ColumnTypeFamily::String,
                         arity: ColumnArity::Required,
                     },
@@ -942,7 +965,7 @@ fn multi_field_uniques_are_preserved_when_generating_data_model_from_a_schema() 
         enums: vec![],
         sequences: vec![],
     };
-    let introspection_result = calculate_model(&schema).expect("calculate data model");
+    let introspection_result = calculate_datamodel(&schema, &SqlFamily::Postgres).expect("calculate data model");
 
     assert_eq!(introspection_result.datamodel, ref_data_model);
 }
@@ -1077,7 +1100,8 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                     Column {
                         name: "id".to_string(),
                         tpe: ColumnType {
-                            raw: "integer".to_string(),
+                            data_type: "integer".to_string(),
+                            full_data_type: "integer".to_string(),
                             family: ColumnTypeFamily::Int,
                             arity: ColumnArity::Required,
                         },
@@ -1087,7 +1111,8 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                     Column {
                         name: "name".to_string(),
                         tpe: ColumnType {
-                            raw: "text".to_string(),
+                            data_type: "text".to_string(),
+                            full_data_type: "text".to_string(),
                             family: ColumnTypeFamily::String,
                             arity: ColumnArity::Required,
                         },
@@ -1108,7 +1133,8 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                     Column {
                         name: "id".to_string(),
                         tpe: ColumnType {
-                            raw: "integer".to_string(),
+                            data_type: "integer".to_string(),
+                            full_data_type: "integer".to_string(),
                             family: ColumnTypeFamily::Int,
                             arity: ColumnArity::Required,
                         },
@@ -1118,7 +1144,8 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                     Column {
                         name: "city_id".to_string(),
                         tpe: ColumnType {
-                            raw: "integer".to_string(),
+                            data_type: "integer".to_string(),
+                            full_data_type: "integer".to_string(),
                             family: ColumnTypeFamily::Int,
                             arity: ColumnArity::Required,
                         },
@@ -1143,7 +1170,7 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
         enums: vec![],
         sequences: vec![],
     };
-    let introspection_result = calculate_model(&schema).expect("calculate data model");
+    let introspection_result = calculate_datamodel(&schema, &SqlFamily::Postgres).expect("calculate data model");
 
     assert_eq!(introspection_result.datamodel, ref_data_model);
 }
@@ -1182,7 +1209,7 @@ fn enums_are_preserved_when_generating_data_model_from_a_schema() {
         }],
         sequences: vec![],
     };
-    let introspection_result = calculate_model(&schema).expect("calculate data model");
+    let introspection_result = calculate_datamodel(&schema, &SqlFamily::Postgres).expect("calculate data model");
 
     assert_eq!(introspection_result.datamodel, ref_data_model);
 }

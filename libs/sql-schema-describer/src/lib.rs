@@ -1,12 +1,12 @@
 //! Database description.
 
-use thiserror::Error;
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
 use regex::Regex;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use std::{fmt, str::FromStr};
+use thiserror::Error;
 use tracing::debug;
 
 pub mod mysql;
@@ -232,8 +232,10 @@ impl Column {
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ColumnType {
-    /// The raw SQL type.
-    pub raw: String,
+    /// The SQL data type.
+    pub data_type: String,
+    /// The full SQL data type.
+    pub full_data_type: String,
     /// The family of the raw type.
     pub family: ColumnTypeFamily,
     /// The arity of the column.
@@ -243,7 +245,8 @@ pub struct ColumnType {
 impl ColumnType {
     pub fn pure(family: ColumnTypeFamily, arity: ColumnArity) -> ColumnType {
         ColumnType {
-            raw: "".to_string(),
+            data_type: "".to_string(),
+            full_data_type: "".to_string(),
             family,
             arity,
         }
@@ -408,6 +411,15 @@ pub enum DefaultValue {
     SEQUENCE(String),
     /// An unrecognized Default Value
     DBGENERATED(String),
+}
+
+impl DefaultValue {
+    pub fn as_value(&self) -> Option<&PrismaValue> {
+        match self {
+            DefaultValue::VALUE(v) => Some(v),
+            _ => None,
+        }
+    }
 }
 
 static RE_NUM: Lazy<Regex> = Lazy::new(|| Regex::new(r"^'?(\d+)'?$").expect("compile regex"));

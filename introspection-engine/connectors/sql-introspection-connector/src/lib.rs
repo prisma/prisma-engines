@@ -4,6 +4,7 @@ mod error;
 mod misc_helpers;
 mod sanitize_datamodel_names;
 mod schema_describer_loading;
+mod version_checker;
 
 use introspection_connector::{
     ConnectorError, ConnectorResult, DatabaseMetadata, IntrospectionConnector, IntrospectionResult,
@@ -85,7 +86,9 @@ impl IntrospectionConnector for SqlIntrospectionConnector {
         let sql_schema = self.catch(self.describe()).await?;
         tracing::debug!("SQL Schema Describer is done: {:?}", sql_schema);
 
-        let introspection_result = calculate_datamodel::calculate_model(&sql_schema).unwrap();
+        let family = self.connection_info.sql_family();
+
+        let introspection_result = calculate_datamodel::calculate_datamodel(&sql_schema, &family).unwrap();
         tracing::debug!("Calculating datamodel is done: {:?}", sql_schema);
         Ok(introspection_result)
     }

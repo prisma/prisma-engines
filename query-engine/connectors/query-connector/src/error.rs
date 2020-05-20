@@ -48,7 +48,7 @@ pub enum ErrorKind {
     #[fail(display = "Column does not exist")]
     ColumnDoesNotExist,
 
-    #[fail(display = "Error creating a database connection.")]
+    #[fail(display = "Error creating a database connection. ({})", _0)]
     ConnectionError(Error),
 
     #[fail(display = "Error querying the database: {}", _0)]

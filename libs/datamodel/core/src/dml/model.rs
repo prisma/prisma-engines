@@ -252,6 +252,21 @@ impl Model {
     pub fn has_index(&self, index: &IndexDefinition) -> bool {
         self.indices.iter().any(|own_index| own_index == index)
     }
+
+    pub fn has_created_at_and_updated_at(&self) -> bool {
+        /// Finds a field by name.
+        fn has_field(model: &Model, name: &str) -> bool {
+            match model
+                .find_field(name)
+                .or_else(|| model.find_field(name.to_lowercase().as_ref()))
+            {
+                Some(f) => f.field_type == FieldType::Base(ScalarType::DateTime, None),
+                None => false,
+            }
+        }
+
+        has_field(self, "createdAt") && has_field(self, "updatedAt")
+    }
 }
 
 impl WithName for Model {

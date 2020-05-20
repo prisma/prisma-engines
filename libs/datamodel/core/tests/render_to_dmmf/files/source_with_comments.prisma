@@ -1,13 +1,13 @@
 /// Super cool postgres source.
- datasource pg1 {
-   provider = "postgresql"
-   url      = "postgresql://"
- }
+datasource pg1 {
+  provider = "postgresql"
+  url      = "postgresql://"
+}
 
- /// My author model.
- model Author {
-   id        Int      @id
-   /// Name of the author.
-   name      String?
-   createdAt DateTime @default(now())
- }
+/// My author model.
+model Author {
+  id        Int      @id
+  /// Name of the author.
+  name      String?
+  createdAt DateTime @default(now())
+}

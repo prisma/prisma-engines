@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use barrel::Migration;
 use quaint::{
     prelude::{Queryable, SqlFamily},

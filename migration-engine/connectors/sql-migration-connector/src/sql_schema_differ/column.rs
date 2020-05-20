@@ -68,7 +68,7 @@ impl<'a> ColumnDiffer<'a> {
     ///
     /// - Postgres autoincrement fields get inferred with a default, which we want to ignore.
     ///
-    /// - We bail on a number of cases that are too complex to deal with right now or underspecified, like strings containing escaped characters.
+    /// - We bail on a number of cases that are too complex to deal with right now or underspecified.
     fn defaults_match(&self) -> bool {
         if self.previous.auto_increment {
             return true;

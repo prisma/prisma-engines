@@ -1,8 +1,27 @@
 use super::*;
 use quaint::prelude::Queryable;
 use std::collections::{BTreeMap, HashMap};
-use std::sync::Arc;
+use std::{borrow::Cow, sync::Arc};
 use tracing::debug;
+
+fn is_mariadb(version: &str) -> bool {
+    version.contains("MariaDB")
+}
+
+enum Flavour {
+    Mysql,
+    MariaDb,
+}
+
+impl Flavour {
+    fn from_version(version_string: &str) -> Self {
+        if is_mariadb(version_string) {
+            Self::MariaDb
+        } else {
+            Self::Mysql
+        }
+    }
+}
 
 pub struct SqlSchemaDescriber {
     conn: Arc<dyn Queryable + Send + Sync + 'static>,
@@ -26,10 +45,15 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
 
     async fn describe(&self, schema: &str) -> SqlSchemaDescriberResult<SqlSchema> {
         debug!("describing schema '{}'", schema);
+        let version = self.conn.version().await.ok().flatten();
+        let flavour = version
+            .as_ref()
+            .map(|s| Flavour::from_version(s))
+            .unwrap_or(Flavour::Mysql);
 
         let table_names = self.get_table_names(schema).await;
         let mut tables = Vec::with_capacity(table_names.len());
-        let mut columns = get_all_columns(self.conn.as_ref(), schema).await;
+        let mut columns = get_all_columns(self.conn.as_ref(), schema, &flavour).await;
         let mut indexes = get_all_indexes(self.conn.as_ref(), schema).await;
         let mut fks = get_foreign_keys(self.conn.as_ref(), schema).await;
 
@@ -145,7 +169,11 @@ impl SqlSchemaDescriber {
     }
 }
 
-async fn get_all_columns(conn: &dyn Queryable, schema_name: &str) -> HashMap<String, (Vec<Column>, Vec<Enum>)> {
+async fn get_all_columns(
+    conn: &dyn Queryable,
+    schema_name: &str,
+    flavour: &Flavour,
+) -> HashMap<String, (Vec<Column>, Vec<Enum>)> {
     // We alias all the columns because MySQL column names are case-insensitive in queries, but the
     // information schema column names became upper-case in MySQL 8, causing the code fetching
     // the result values by column name below to fail.
@@ -240,9 +268,9 @@ async fn get_all_columns(conn: &dyn Queryable, schema_name: &str) -> HashMap<Str
                             Some(PrismaValue::Int(0)) => DefaultValue::VALUE(PrismaValue::Boolean(false)),
                             _ => DefaultValue::DBGENERATED(default_string),
                         },
-                        ColumnTypeFamily::String => {
-                            DefaultValue::VALUE(PrismaValue::String(unquote_string(default_string)))
-                        }
+                        ColumnTypeFamily::String => DefaultValue::VALUE(PrismaValue::String(
+                            unescape_and_unquote_default_string(default_string, flavour),
+                        )),
                         //todo check other now() definitions
                         ColumnTypeFamily::DateTime => match default_string.to_lowercase()
                             == "current_timestamp".to_string()
@@ -539,7 +567,8 @@ fn get_column_type_and_enum(
     };
 
     let tpe = ColumnType {
-        raw: data_type.to_string(),
+        data_type: data_type.to_owned(),
+        full_data_type: full_data_type.to_owned(),
         family: family.clone(),
         arity,
     };
@@ -560,4 +589,23 @@ fn extract_enum_values(full_data_type: &&str) -> Vec<String> {
     let len = &full_data_type.len() - 1;
     let vals = &full_data_type[5..len];
     vals.split(",").map(|v| unquote_string(v.into())).collect()
+}
+
+// See https://dev.mysql.com/doc/refman/8.0/en/string-literals.html
+//
+// In addition, MariaDB will return string literals with the quotes and extra backslashes around
+// control characters like `\n`.
+fn unescape_and_unquote_default_string(default: String, flavour: &Flavour) -> String {
+    const MYSQL_ESCAPING_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"\\('|\\[^\\])|'(')"#).unwrap());
+    const MARIADB_NEWLINE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"\\n"#).unwrap());
+
+    let maybe_unquoted: Cow<str> = if matches!(flavour, Flavour::MariaDb) {
+        let unquoted: &str = &default[1..(default.len() - 1)];
+
+        MARIADB_NEWLINE_RE.replace_all(unquoted, "\n")
+    } else {
+        default.into()
+    };
+
+    MYSQL_ESCAPING_RE.replace_all(maybe_unquoted.as_ref(), "$1$2").into()
 }
