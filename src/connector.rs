@@ -12,8 +12,6 @@ mod queryable;
 mod result_set;
 mod transaction;
 
-mod dbio;
-
 #[cfg(feature = "mysql")]
 pub(crate) mod mysql;
 #[cfg(feature = "postgresql")]
@@ -33,6 +31,5 @@ pub use connection_info::*;
 
 pub(crate) mod metrics;
 pub use self::result_set::*;
-pub use dbio::DBIO;
 pub use queryable::*;
 pub use transaction::*;
