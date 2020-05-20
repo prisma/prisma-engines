@@ -43,7 +43,7 @@ impl<'a> Reformatter<'a> {
     }
 
     pub fn reformat_to(&self, output: &mut dyn std::io::Write, ident_width: usize) {
-        let mut ast = PrismaDatamodelParser::parse(Rule::datamodel, self.input).unwrap(); // TODO: Handle error.
+        let mut ast = PrismaDatamodelParser::parse(Rule::schema, self.input).unwrap(); // TODO: Handle error.
         let mut top_formatter = Renderer::new(output, ident_width);
         self.reformat_top(&mut top_formatter, &ast.next().unwrap());
     }
@@ -63,7 +63,7 @@ impl<'a> Reformatter<'a> {
             match current.as_rule() {
                 Rule::WHITESPACE => {}
                 Rule::doc_comment | Rule::doc_comment_and_new_line => {}
-                Rule::type_declaration => {
+                Rule::type_alias => {
                     types_mode = true;
                 }
                 _ => {
@@ -103,11 +103,11 @@ impl<'a> Reformatter<'a> {
                 Rule::enum_declaration => self.reformat_enum(target, &current),
                 Rule::source_block => self.reformat_datasource(target, &current),
                 Rule::generator_block => self.reformat_generator(target, &current),
-                Rule::type_declaration => {
+                Rule::type_alias => {
                     if !types_mode {
                         panic!("Renderer not in type mode.");
                     }
-                    Self::reformat_type_declaration(&mut types_table, &current);
+                    Self::reformat_type_alias(&mut types_table, &current);
                 }
                 Rule::comment_block => {
                     for comment_token in current.clone().into_inner() {
@@ -130,7 +130,6 @@ impl<'a> Reformatter<'a> {
             target,
             token,
             Box::new(|table, _, token| match token.as_rule() {
-                Rule::DATASOURCE_KEYWORD => {}
                 Rule::key_value => Self::reformat_key_value(table, &token),
                 _ => Self::reformat_generic_token(table, &token),
             }),
@@ -145,7 +144,6 @@ impl<'a> Reformatter<'a> {
             Box::new(|table, _, token| {
                 //
                 match token.as_rule() {
-                    Rule::GENERATOR_KEYWORD => {}
                     Rule::key_value => Self::reformat_key_value(table, &token),
                     _ => Self::reformat_generic_token(table, &token),
                 }
@@ -178,7 +176,6 @@ impl<'a> Reformatter<'a> {
             &token,
             Box::new(|table, renderer, token| {
                 match token.as_rule() {
-                    Rule::MODEL_KEYWORD => {}
                     Rule::directive => {
                         // model level Directives reset the table. -> .render() does that
                         table.render(renderer);
@@ -287,13 +284,12 @@ impl<'a> Reformatter<'a> {
             Box::new(|table, target, token| {
                 //
                 match token.as_rule() {
-                    Rule::ENUM_KEYWORD => {}
                     Rule::block_level_directive => {
                         table.render(target);
                         Self::reformat_directive(target, token, "@@");
                         table.end_line();
                     }
-                    Rule::enum_field_declaration => Self::reformat_enum_entry(table, token),
+                    Rule::enum_value_declaration => Self::reformat_enum_entry(table, token),
                     _ => Self::reformat_generic_token(table, token),
                 }
             }),
@@ -335,7 +331,7 @@ impl<'a> Reformatter<'a> {
         target.maybe_end_line();
     }
 
-    fn reformat_type_declaration(target: &mut TableFormat, token: &Token) {
+    fn reformat_type_alias(target: &mut TableFormat, token: &Token) {
         let mut identifier = None;
 
         for current in token.clone().into_inner() {

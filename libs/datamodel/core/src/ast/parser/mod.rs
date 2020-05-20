@@ -280,7 +280,6 @@ fn parse_model(token: &pest::iterators::Pair<'_, Rule>) -> Result<Model, ErrorCo
     let mut comment: Option<Comment> = None;
 
     match_children! { token, current,
-        Rule::MODEL_KEYWORD => { },
         Rule::TYPE_KEYWORD => { errors.push(
             DatamodelError::new_legacy_parser_error(
                 "Model declarations have to be indicated with the `model` keyword.",
@@ -297,7 +296,6 @@ fn parse_model(token: &pest::iterators::Pair<'_, Rule>) -> Result<Model, ErrorCo
         Rule::comment_block => {
             comment = Some(parse_comment_block(&current))
         },
-        Rule::UNTIL_END_OF_LINE => {},
         Rule::BLOCK_LEVEL_CATCH_ALL => { errors.push(
             DatamodelError::new_validation_error(
                 "This line is not a valid field or directive definition.",
@@ -333,10 +331,9 @@ fn parse_enum(token: &pest::iterators::Pair<'_, Rule>) -> Result<Enum, ErrorColl
     let mut comments: Vec<String> = Vec::new();
 
     match_children! { token, current,
-        Rule::ENUM_KEYWORD => { },
         Rule::non_empty_identifier => name = Some(current.to_id()),
         Rule::block_level_directive => directives.push(parse_directive(&current)),
-        Rule::enum_field_declaration => {
+        Rule::enum_value_declaration => {
             match parse_enum_value(&name.as_ref().unwrap().name, &current) {
                 Ok(enum_value) => values.push(enum_value),
                 Err(err) => errors.push(err)
@@ -441,7 +438,6 @@ fn parse_source(token: &pest::iterators::Pair<'_, Rule>) -> SourceConfig {
     let mut comment: Option<Comment> = None;
 
     match_children! { token, current,
-        Rule::DATASOURCE_KEYWORD => { },
         Rule::non_empty_identifier => name = Some(current.to_id()),
         Rule::key_value => properties.push(parse_key_value(&current)),
         Rule::comment_block => {
@@ -471,7 +467,6 @@ fn parse_generator(token: &pest::iterators::Pair<'_, Rule>) -> GeneratorConfig {
     let mut comments: Vec<String> = Vec::new();
 
     match_children! { token, current,
-        Rule::GENERATOR_KEYWORD => { },
         Rule::non_empty_identifier => name = Some(current.to_id()),
         Rule::key_value => properties.push(parse_key_value(&current)),
         Rule::doc_comment => comments.push(parse_doc_comment(&current)),
@@ -554,7 +549,7 @@ fn parse_comment_block(token: &pest::iterators::Pair<'_, Rule>) -> Comment {
 /// Parses a Prisma V2 datamodel document into an internal AST representation.
 pub fn parse(datamodel_string: &str) -> Result<SchemaAst, ErrorCollection> {
     let mut errors = ErrorCollection::new();
-    let datamodel_result = PrismaDatamodelParser::parse(Rule::datamodel, datamodel_string);
+    let datamodel_result = PrismaDatamodelParser::parse(Rule::schema, datamodel_string);
 
     match datamodel_result {
         Ok(mut datamodel_wrapped) => {
@@ -572,7 +567,7 @@ pub fn parse(datamodel_string: &str) -> Result<SchemaAst, ErrorCollection> {
                 },
                 Rule::source_block => top_level_definitions.push(Top::Source(parse_source(&current))),
                 Rule::generator_block => top_level_definitions.push(Top::Generator(parse_generator(&current))),
-                Rule::type_declaration => top_level_definitions.push(Top::Type(parse_type(&current))),
+                Rule::type_alias => top_level_definitions.push(Top::Type(parse_type(&current))),
                 Rule::comment_block => (),
                 Rule::EOI => {},
                 Rule::CATCH_ALL => {
@@ -629,7 +624,7 @@ fn rule_to_string(rule: Rule) -> &'static str {
         Rule::source_block => "source definition",
         Rule::generator_block => "generator definition",
         Rule::arbitrary_block => "arbitrary block",
-        Rule::enum_field_declaration => "enum field declaration",
+        Rule::enum_value_declaration => "enum field declaration",
         Rule::block_level_directive => "block level directive",
         Rule::EOI => "end of input",
         Rule::non_empty_identifier => "alphanumeric identifier",
@@ -652,7 +647,7 @@ fn rule_to_string(rule: Rule) -> &'static str {
         Rule::list_type => "list type",
         Rule::field_type => "field type",
         Rule::field_declaration => "field declaration",
-        Rule::type_declaration => "type declaration",
+        Rule::type_alias => "type alias",
         Rule::key_value => "configuration property",
         Rule::string_any => "any character",
         Rule::string_escaped_interpolation => "string interpolation",
@@ -673,12 +668,11 @@ fn rule_to_string(rule: Rule) -> &'static str {
         Rule::DATASOURCE_KEYWORD => "\"datasource\" keyword",
         Rule::INTERPOLATION_START => "string interpolation start",
         Rule::INTERPOLATION_END => "string interpolation end",
-        Rule::UNTIL_END_OF_LINE => "until end of line",
         Rule::CATCH_ALL => "CATCH ALL",
         Rule::BLOCK_LEVEL_CATCH_ALL => "BLOCK LEVEL CATCH ALL",
 
         // Those are top level things and will never surface.
-        Rule::datamodel => "datamodel declaration",
+        Rule::schema => "schema",
         Rule::string_interpolated => "string interpolated",
 
         // Legacy stuff should never be suggested

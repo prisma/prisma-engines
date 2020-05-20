@@ -14,7 +14,7 @@ impl TokenExtensions for Token<'_> {
             Rule::enum_declaration => true,
             Rule::source_block => true,
             Rule::generator_block => true,
-            Rule::type_declaration => true,
+            Rule::type_alias => true,
             Rule::comment_block => true,
             _ => false,
         }
