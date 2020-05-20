@@ -1,5 +1,27 @@
 # Changelog
 
+## v0.2.0-alpha.12
+
+- Pgbouncer support
+- Simplify connector traits
+- Specialize equality comparisons for JSON in AST visitor
+- Add version() method to Queryable
+- Rename "conjuctive" to "conjunctive"
+- Set mobc max_idle to the same as max_open by default
+- Fix a broken dependency with sqlite feature
+- Aliasing expressions
+- AST types revamp. Merging DatabaseValue to Expression.
+- Rename ParameterizedValue to Value
+- Test and handle issues related to mysql unsigned integers
+- Add json handling for MySQL
+- Convert MySQL NEWDECIMAL to a numeric value
+- Upgrade mysql_async to 0.23
+- Do not crash the whole system if no connection on Postgres
+- Do not panic when system time is weird
+- Add and implement ErrorKind for length mismatches
+- Function should also be Aliasable
+- Make `Column` as `Aliasable`
+
 ## v0.2.0-alpha.11
 
 - `impl From<&&str> for Column`
