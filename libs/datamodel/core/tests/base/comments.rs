@@ -25,9 +25,7 @@ fn parse_comments_without_crasing_or_loosing_info() {
         .assert_base_type(&ScalarType::String);
 }
 
-// TODO: figure out if this is a feature we want. I don't think so.
 #[test]
-#[ignore]
 fn accept_a_comment_at_the_end() {
     let dml = r#"
     model User {

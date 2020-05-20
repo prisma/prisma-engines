@@ -87,7 +87,6 @@ fn nice_error_missing_directive_name() {
     ));
 }
 
-// TODO: This case is not nice because the "{ }" belong to the declaration.
 #[test]
 fn nice_error_missing_braces() {
     let dml = r#"

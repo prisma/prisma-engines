@@ -12,7 +12,6 @@ pub struct Generator {
     output: Option<String>,
     #[serde(default = "Vec::new")]
     binary_targets: Vec<String>,
-    // Todo: This is a bad choice, PrismaValue is probably better.
     config: HashMap<String, String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     documentation: Option<String>,

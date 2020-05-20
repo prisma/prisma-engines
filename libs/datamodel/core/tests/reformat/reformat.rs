@@ -286,7 +286,6 @@ model Blog {
     assert_reformat(input, expected);
 }
 
-// TODO: this will only work if we bring back `///` comments. The idea is that `//` are generally not moved. `///` would get attributed to the next block. Hence this test would work again.
 #[test]
 fn multiple_new_lines_between_top_level_elements_must_be_reduced_to_a_single_one() {
     let input = r#"model Post {
