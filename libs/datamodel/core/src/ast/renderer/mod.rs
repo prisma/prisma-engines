@@ -79,7 +79,13 @@ impl<'a> Renderer<'a> {
     fn render_documentation(target: &mut dyn LineWriteable, obj: &dyn ast::WithDocumentation) {
         if let Some(doc) = &obj.documentation() {
             for line in doc.text.split('\n') {
-                target.write("/// ");
+                // We comment out objects in introspection. Those are put into `//` comments.
+                // We use the documentation on the object to render an explanation for why that happened. It's nice if this explanation is also in a `//` instead of a `///` comment.
+                if obj.is_commented_out() {
+                    target.write("// ");
+                } else {
+                    target.write("/// ");
+                }
                 target.write(line);
                 target.end_line();
             }
@@ -160,7 +166,7 @@ impl<'a> Renderer<'a> {
 
     fn render_model(&mut self, model: &ast::Model) {
         let comment_out = if model.commented_out {
-            "/// ".to_string()
+            "// ".to_string()
         } else {
             "".to_string()
         };
@@ -206,7 +212,7 @@ impl<'a> Renderer<'a> {
             //todo do the commenting out
 
             let commented_out = if value.commented_out {
-                "/// ".to_string()
+                "// ".to_string()
             } else {
                 "".to_string()
             };
@@ -246,7 +252,7 @@ impl<'a> Renderer<'a> {
         Self::render_documentation(&mut target.interleave_writer(), field);
 
         let commented_out = if field.is_commented_out || is_commented_out {
-            "/// ".to_string()
+            "// ".to_string()
         } else {
             "".to_string()
         };
