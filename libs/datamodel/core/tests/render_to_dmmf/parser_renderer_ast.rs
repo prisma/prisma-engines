@@ -172,7 +172,9 @@ fn test_parser_renderer_sources_and_comments_via_ast() {
     assert_eq!(rendered, DATAMODEL_WITH_SOURCE_AND_COMMENTS);
 }
 
-const DATAMODEL_WITH_TABS: &str = r#"/// Super cool postgres source.
+#[test]
+fn test_parser_renderer_with_tabs() {
+    let input = r#"/// Super cool postgres source.
 datasource\tpg1\t{
 \tprovider\t=\t\t"postgres"
 \turl\t=\t"https://localhost/postgres1"
@@ -186,7 +188,7 @@ model\tAuthor\t{
 \tcreatedAt\tDateTime\t@default(now())
 }"#;
 
-const DATAMODEL_WITH_SPACES: &str = r#"/// Super cool postgres source.
+    let expected = r#"/// Super cool postgres source.
 datasource pg1 {
   provider = "postgres"
   url      = "https://localhost/postgres1"
@@ -199,14 +201,11 @@ model Author {
   name      String?
   createdAt DateTime @default(now())
 }"#;
-
-#[test]
-fn test_parser_renderer_with_tabs() {
     // replaces \t placeholder with a real tab
-    let tabbed_dm = DATAMODEL_WITH_TABS.replace("\\t", "\t");
+    let tabbed_dm = input.replace("\\t", "\t");
     let ast = parse_to_ast(&tabbed_dm).expect("failed to parse");
     let rendered = render_schema_ast_to_string(&ast);
-    assert_eq!(rendered, DATAMODEL_WITH_SPACES.replace("\\t", "\t"));
+    assert_eq!(rendered, expected.replace("\\t", "\t"));
 }
 
 fn render_schema_ast_to_string(schema: &datamodel::ast::SchemaAst) -> String {

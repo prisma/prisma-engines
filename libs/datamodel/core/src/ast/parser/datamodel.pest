@@ -107,31 +107,31 @@ field_declaration = { doc_comment_and_new_line* ~ non_empty_identifier ~ LEGACY_
 // ######################################
 // Custom type declarations
 // ######################################
-type_declaration = { (doc_comment_and_new_line | NEWLINE)* ~ TYPE_KEYWORD ~ non_empty_identifier ~ "=" ~ (base_type ~ ( "@" ~ directive )+ | base_type)  }
+type_declaration = { comment_block? ~ TYPE_KEYWORD ~ non_empty_identifier ~ "=" ~ (base_type ~ ( "@" ~ directive )+ | base_type)  }
 
 // ######################################
 // Model declarations
 // ######################################
-model_declaration = { doc_comment_and_new_line? ~ (MODEL_KEYWORD | TYPE_KEYWORD) ~ non_empty_identifier ~ BLOCK_OPEN ~ ( field_declaration | ( "@@" ~ directive ) | NEWLINE | doc_comment_and_new_line | comment_and_new_line | BLOCK_LEVEL_CATCH_ALL )* ~ BLOCK_CLOSE }
+model_declaration = { comment_block? ~ (MODEL_KEYWORD | TYPE_KEYWORD) ~ non_empty_identifier ~ BLOCK_OPEN ~ ( field_declaration | ( "@@" ~ directive ) | NEWLINE | doc_comment_and_new_line | comment_and_new_line | BLOCK_LEVEL_CATCH_ALL )* ~ BLOCK_CLOSE }
 
 // ######################################
 // Enum declarations
 // ######################################
 enum_field_declaration = { doc_comment_and_new_line* ~ (non_empty_identifier ~ ( "@" ~ directive )+ | non_empty_identifier) ~ doc_comment? ~ comment? ~ NEWLINE }
-enum_declaration = { doc_comment_and_new_line? ~ ENUM_KEYWORD ~ non_empty_identifier ~ BLOCK_OPEN ~ (enum_field_declaration | block_level_directive | NEWLINE | doc_comment_and_new_line | comment_and_new_line | BLOCK_LEVEL_CATCH_ALL)* ~ BLOCK_CLOSE }
+enum_declaration = { comment_block? ~ ENUM_KEYWORD ~ non_empty_identifier ~ BLOCK_OPEN ~ (enum_field_declaration | block_level_directive | NEWLINE | doc_comment_and_new_line | comment_and_new_line | BLOCK_LEVEL_CATCH_ALL)* ~ BLOCK_CLOSE }
 
 // ######################################
 // Source block
 // ######################################
 key_value = { non_empty_identifier ~ "=" ~ expression ~ NEWLINE }
-source_block = { doc_comment_and_new_line? ~ DATASOURCE_KEYWORD ~ non_empty_identifier ~ BLOCK_OPEN ~ (key_value | doc_comment | comment | NEWLINE)* ~ BLOCK_CLOSE }
+source_block = { comment_block? ~ DATASOURCE_KEYWORD ~ non_empty_identifier ~ BLOCK_OPEN ~ (key_value | doc_comment | comment | NEWLINE)* ~ BLOCK_CLOSE }
 
 // ######################################
 // Generator block
 // ######################################
-generator_block = { doc_comment_and_new_line? ~ GENERATOR_KEYWORD ~ non_empty_identifier ~ BLOCK_OPEN ~ (key_value | doc_comment | comment | NEWLINE)* ~ BLOCK_CLOSE }
+generator_block = { comment_block? ~ GENERATOR_KEYWORD ~ non_empty_identifier ~ BLOCK_OPEN ~ (key_value | doc_comment | comment | NEWLINE)* ~ BLOCK_CLOSE }
 
-arbitrary_block = { doc_comment_and_new_line? ~ non_empty_identifier ~ BLOCK_OPEN ~ ((!BLOCK_CLOSE ~ ANY) | NEWLINE)* ~ BLOCK_CLOSE }
+arbitrary_block = { comment_block? ~ non_empty_identifier ~ BLOCK_OPEN ~ ((!BLOCK_CLOSE ~ ANY) | NEWLINE)* ~ BLOCK_CLOSE }
 
 // ######################################
 // Datamodel

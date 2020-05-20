@@ -183,7 +183,6 @@ impl<'a> Reformatter<'a> {
                         // model level Directives reset the table. -> .render() does that
                         table.render(renderer);
                         Self::reformat_directive(renderer, &token, "@@");
-                        //                        table.end_line();
                     }
                     Rule::field_declaration => Self::reformat_field(table, &token),
                     _ => Self::reformat_generic_token(table, &token),
@@ -225,13 +224,13 @@ impl<'a> Reformatter<'a> {
     ) {
         let mut table = TableFormat::new();
         let mut block_name = "";
-        let mut render_new_lines = false;
+        let mut block_has_opened = false;
 
         for current in token.clone().into_inner() {
-            //            println!("block: {:?} |{:?}|", current.as_rule(), current.as_str());
+            //println!("block: {:?} |{:?}|", current.as_rule(), current.as_str());
             match current.as_rule() {
                 Rule::BLOCK_OPEN => {
-                    render_new_lines = true; // do not render newlines before the block
+                    block_has_opened = true;
                 }
                 Rule::BLOCK_CLOSE => {}
 
@@ -242,12 +241,25 @@ impl<'a> Reformatter<'a> {
                     renderer.maybe_end_line();
                     renderer.indent_up();
                 }
-                // Doc comments are to be placed OUTSIDE of table block.
+                Rule::comment_block => {
+                    for current in current.clone().into_inner() {
+                        if block_has_opened {
+                            comment(&mut table.interleave_writer(), current.as_str())
+                        } else {
+                            comment(renderer, current.as_str())
+                        }
+                    }
+                }
                 Rule::doc_comment | Rule::comment_and_new_line | Rule::doc_comment_and_new_line => {
-                    comment(&mut table.interleave_writer(), current.as_str())
+                    if block_has_opened {
+                        comment(&mut table.interleave_writer(), current.as_str())
+                    } else {
+                        comment(renderer, current.as_str())
+                    }
                 }
                 Rule::NEWLINE => {
-                    if render_new_lines {
+                    if block_has_opened {
+                        // do not render newlines before the block
                         // Reset the table layout on a newline.
                         table.render(renderer);
                         table = TableFormat::new();
@@ -546,7 +558,14 @@ impl<'a> Reformatter<'a> {
         //        println!("generic token: |{:?}|", token.as_str());
         match token.as_rule() {
             Rule::NEWLINE => target.end_line(),
-            Rule::doc_comment_and_new_line | Rule::comment => comment(target, token.as_str()),
+            Rule::comment_block => {
+                for token in token.clone().into_inner() {
+                    Self::reformat_generic_token(target, &token)
+                }
+            }
+            Rule::doc_comment_and_new_line | Rule::doc_comment | Rule::comment_and_new_line | Rule::comment => {
+                comment(target, token.as_str())
+            }
             Rule::WHITESPACE => {} // we are very opinionated about whitespace and hence ignore user input
             Rule::CATCH_ALL | Rule::BLOCK_LEVEL_CATCH_ALL => {
                 target.write(token.as_str());

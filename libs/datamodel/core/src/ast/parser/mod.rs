@@ -262,7 +262,7 @@ fn parse_field(model_name: &str, token: &pest::iterators::Pair<'_, Rule>) -> Res
 
 fn parsing_catch_all(token: &pest::iterators::Pair<'_, Rule>) {
     match token.as_rule() {
-        Rule::comment | Rule::comment_and_new_line => {}
+        Rule::comment | Rule::comment_and_new_line | Rule::comment_block => {}
         x => unreachable!(
             "Encountered impossible field declaration during parsing: {:?} {:?}",
             &x,
@@ -277,7 +277,7 @@ fn parse_model(token: &pest::iterators::Pair<'_, Rule>) -> Result<Model, ErrorCo
     let mut name: Option<Identifier> = None;
     let mut directives: Vec<Directive> = vec![];
     let mut fields: Vec<Field> = vec![];
-    let mut comments: Vec<String> = Vec::new();
+    let mut comment: Option<Comment> = None;
 
     match_children! { token, current,
         Rule::MODEL_KEYWORD => { },
@@ -294,8 +294,9 @@ fn parse_model(token: &pest::iterators::Pair<'_, Rule>) -> Result<Model, ErrorCo
                 Err(err) => errors.push(err)
             }
         },
-        Rule::doc_comment_and_new_line => comments.push(parse_doc_comment(&current)),
-        Rule::doc_comment => comments.push(parse_doc_comment(&current)),
+        Rule::comment_block => {
+            comment = Some(parse_comment_block(&current))
+        },
         Rule::UNTIL_END_OF_LINE => {},
         Rule::BLOCK_LEVEL_CATCH_ALL => { errors.push(
             DatamodelError::new_validation_error(
@@ -312,7 +313,7 @@ fn parse_model(token: &pest::iterators::Pair<'_, Rule>) -> Result<Model, ErrorCo
             name,
             fields,
             directives,
-            documentation: doc_comments_to_string(&comments),
+            documentation: comment,
             span: Span::from_pest(token.as_span()),
             commented_out: false,
         }),
@@ -437,14 +438,15 @@ fn parse_key_value(token: &pest::iterators::Pair<'_, Rule>) -> Argument {
 fn parse_source(token: &pest::iterators::Pair<'_, Rule>) -> SourceConfig {
     let mut name: Option<Identifier> = None;
     let mut properties: Vec<Argument> = vec![];
-    let mut comments: Vec<String> = Vec::new();
+    let mut comment: Option<Comment> = None;
 
     match_children! { token, current,
         Rule::DATASOURCE_KEYWORD => { },
         Rule::non_empty_identifier => name = Some(current.to_id()),
         Rule::key_value => properties.push(parse_key_value(&current)),
-        Rule::doc_comment => comments.push(parse_doc_comment(&current)),
-        Rule::doc_comment_and_new_line => comments.push(parse_doc_comment(&current)),
+        Rule::comment_block => {
+            comment = Some(parse_comment_block(&current))
+        },
         _ => parsing_catch_all(&current)
     };
 
@@ -452,7 +454,7 @@ fn parse_source(token: &pest::iterators::Pair<'_, Rule>) -> SourceConfig {
         Some(name) => SourceConfig {
             name,
             properties,
-            documentation: doc_comments_to_string(&comments),
+            documentation: comment,
             span: Span::from_pest(token.as_span()),
         },
         _ => panic!(
@@ -496,7 +498,7 @@ fn parse_type(token: &pest::iterators::Pair<'_, Rule>) -> Field {
     let mut name: Option<Identifier> = None;
     let mut directives: Vec<Directive> = vec![];
     let mut base_type: Option<(String, Span)> = None;
-    let mut comments: Vec<String> = Vec::new();
+    let mut comment: Option<Comment> = None;
 
     match_children! { token, current,
         Rule::TYPE_KEYWORD => { },
@@ -505,8 +507,9 @@ fn parse_type(token: &pest::iterators::Pair<'_, Rule>) -> Field {
             base_type = Some((parse_base_type(&current), Span::from_pest(current.as_span())))
         },
         Rule::directive => directives.push(parse_directive(&current)),
-        Rule::doc_comment => comments.push(parse_doc_comment(&current)),
-        Rule::doc_comment_and_new_line => comments.push(parse_doc_comment(&current)),
+        Rule::comment_block => {
+            comment = Some(parse_comment_block(&current))
+        },
         _ => unreachable!("Encountered impossible custom type during parsing: {:?}", current.tokens())
     }
 
@@ -520,7 +523,7 @@ fn parse_type(token: &pest::iterators::Pair<'_, Rule>) -> Field {
             arity: FieldArity::Required,
             default_value: None,
             directives,
-            documentation: doc_comments_to_string(&comments),
+            documentation: comment,
             span: Span::from_pest(token.as_span()),
             is_commented_out: false,
         },
@@ -528,6 +531,21 @@ fn parse_type(token: &pest::iterators::Pair<'_, Rule>) -> Field {
             "Encountered impossible custom type declaration during parsing: {:?}",
             token.as_str()
         ),
+    }
+}
+
+fn parse_comment_block(token: &pest::iterators::Pair<'_, Rule>) -> Comment {
+    let mut comments: Vec<String> = Vec::new();
+    for comment in token.clone().into_inner() {
+        match comment.as_rule() {
+            Rule::doc_comment | Rule::doc_comment_and_new_line => comments.push(parse_doc_comment(&comment)),
+            Rule::comment | Rule::comment_and_new_line => {}
+            _ => parsing_catch_all(&comment),
+        }
+    }
+
+    Comment {
+        text: comments.join("\n"),
     }
 }
 

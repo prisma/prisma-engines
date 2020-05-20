@@ -21,18 +21,22 @@ fn test_reformat_model_simple() {
 #[test]
 fn test_reformat_model_complex() {
     let input = r#"
+        /// model doc comment
         model User { 
-            id Int @id
+            id Int @id // doc comment on the side
             fieldA String    @unique // comment on the side
             // comment before
+            /// doc comment before
             anotherWeirdFieldName Int 
         }
     "#;
 
-    let expected = r#"model User {
-  id                    Int    @id
+    let expected = r#"/// model doc comment
+model User {
+  id                    Int    @id     // doc comment on the side
   fieldA                String @unique // comment on the side
   // comment before
+  /// doc comment before
   anotherWeirdFieldName Int
 }
 "#;
@@ -284,84 +288,128 @@ model Blog {
 
 // TODO: this will only work if we bring back `///` comments. The idea is that `//` are generally not moved. `///` would get attributed to the next block. Hence this test would work again.
 #[test]
-#[ignore]
-fn new_lines_between_blocks_must_be_reduced_to_one_complex() {
+fn multiple_new_lines_between_top_level_elements_must_be_reduced_to_a_single_one() {
     let input = r#"model Post {
   id Int @id
 }
 
 
-// model comment
+// free floating comment
+/// free floating doc comment
 
+
+// model comment
+/// model doc comment
 model Blog {
   id Int @id
 }
 
 
-// source comment
+// free floating comment
+/// free floating doc comment
 
+
+/// source doc comment
+// source comment
 datasource mydb {
   provider = "sqlite"
   url      = "file:dev.db"
 }
 
 
-// enum comment
+// free floating comment
+/// free floating doc comment
 
+// enum comment
+/// enum doc comment
 enum Status {
   ACTIVE
   DONE
 }
 
 
-// type alias comment
+// free floating comment
+/// free floating doc comment
 
+// type alias comment
+/// type alias doc comment
 type MyString = String          @default("FooBar")
 
 
-// generator comment
+// free floating comment
+/// free floating doc comment
 
+// generator comment
+/// generator doc comment
 generator js {
     provider = "js"
 }
 
 
-// another model comment
+// free floating comment
+/// free floating doc comment
 
+/// another model doc comment
+// another model comment
 model Comment {
   id Int @id
 }
 "#;
 
+    // TODO: the formatting of the type alias is not nice
     let expected = r#"model Post {
   id Int @id
 }
 
+// free floating comment
+/// free floating doc comment
+
 // model comment
+/// model doc comment
 model Blog {
   id Int @id
 }
 
+// free floating comment
+/// free floating doc comment
+
+/// source doc comment
 // source comment
 datasource mydb {
   provider = "sqlite"
   url      = "file:dev.db"
 }
 
+// free floating comment
+/// free floating doc comment
+
 // enum comment
+/// enum doc comment
 enum Status {
   ACTIVE
   DONE
 }
 
+// free floating comment
+/// free floating doc comment
+
 // type alias comment
-type MyString = String @default("FooBar")
+/// type alias doc comment
+type                       MyString = String @default("FooBar")
+
+// free floating comment
+/// free floating doc comment
 
 // generator comment
+/// generator doc comment
 generator js {
   provider = "js"
 }
 
+// free floating comment
+/// free floating doc comment
+
+/// another model doc comment
 // another model comment
 model Comment {
   id Int @id
