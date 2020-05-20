@@ -3,10 +3,11 @@ mod error;
 
 use crate::{
     ast::{Query, Value},
-    connector::{metrics, queryable::*, ResultSet, Transaction, DBIO},
+    connector::{metrics, queryable::*, ResultSet, Transaction},
     error::{Error, ErrorKind},
     visitor::{self, Visitor},
 };
+use async_trait::async_trait;
 use futures::{future::FutureExt, lock::Mutex};
 use native_tls::{Certificate, Identity, TlsConnector};
 use percent_encoding::percent_decode;
@@ -447,20 +448,21 @@ impl PostgreSql {
     }
 }
 
-impl TransactionCapable for PostgreSql where Self: Sized + Sync {}
+impl TransactionCapable for PostgreSql {}
 
+#[async_trait]
 impl Queryable for PostgreSql {
-    fn query<'a>(&'a self, q: Query<'a>) -> DBIO<'a, ResultSet> {
+    async fn query(&self, q: Query<'_>) -> crate::Result<ResultSet> {
         let (sql, params) = visitor::Postgres::build(q);
-        DBIO::new(async move { self.query_raw(sql.as_str(), &params[..]).await })
+        self.query_raw(sql.as_str(), &params[..]).await
     }
 
-    fn execute<'a>(&'a self, q: Query<'a>) -> DBIO<'a, u64> {
+    async fn execute(&self, q: Query<'_>) -> crate::Result<u64> {
         let (sql, params) = visitor::Postgres::build(q);
-        DBIO::new(async move { self.execute_raw(sql.as_str(), &params[..]).await })
+        self.execute_raw(sql.as_str(), &params[..]).await
     }
 
-    fn query_raw<'a>(&'a self, sql: &'a str, params: &'a [Value<'a>]) -> DBIO<'a, ResultSet> {
+    async fn query_raw(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<ResultSet> {
         metrics::query("postgres.query_raw", sql, params, move || async move {
             let client = self.client.0.lock().await;
             let stmt = self.timeout(client.prepare(sql)).await?;
@@ -477,9 +479,10 @@ impl Queryable for PostgreSql {
 
             Ok(result)
         })
+        .await
     }
 
-    fn execute_raw<'a>(&'a self, sql: &'a str, params: &'a [Value<'a>]) -> DBIO<'a, u64> {
+    async fn execute_raw(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<u64> {
         metrics::query("postgres.execute_raw", sql, params, move || async move {
             let client = self.client.0.lock().await;
             let stmt = self.timeout(client.prepare(sql)).await?;
@@ -490,41 +493,36 @@ impl Queryable for PostgreSql {
 
             Ok(changes)
         })
+        .await
     }
 
-    fn raw_cmd<'a>(&'a self, cmd: &'a str) -> DBIO<'a, ()> {
+    async fn raw_cmd(&self, cmd: &str) -> crate::Result<()> {
         metrics::query("postgres.raw_cmd", cmd, &[], move || async move {
             let client = self.client.0.lock().await;
             self.timeout(client.simple_query(cmd)).await?;
 
             Ok(())
         })
+        .await
     }
 
-    fn version<'a>(&'a self) -> DBIO<'a, Option<String>> {
-        let fut = async move {
-            let query = r#"SELECT version()"#;
+    async fn version(&self) -> crate::Result<Option<String>> {
+        let query = r#"SELECT version()"#;
+        let rows = self.query_raw(query, &[]).await?;
 
-            let rows = self.query_raw(query, &[]).await?;
+        let version_string = rows
+            .get(0)
+            .and_then(|row| row.get("version").and_then(|version| version.to_string()));
 
-            let version_string = rows
-                .get(0)
-                .and_then(|row| row.get("version").and_then(|version| version.to_string()));
-
-            Ok(version_string)
-        };
-
-        DBIO::new(fut)
+        Ok(version_string)
     }
 
-    fn server_reset_query<'a>(&'a self, tx: &'a Transaction<'a>) -> DBIO<'a, ()> {
-        DBIO::new(async move {
-            if self.pg_bouncer {
-                tx.raw_cmd("DEALLOCATE ALL").await
-            } else {
-                Ok(())
-            }
-        })
+    async fn server_reset_query(&self, tx: &Transaction<'_>) -> crate::Result<()> {
+        if self.pg_bouncer {
+            tx.raw_cmd("DEALLOCATE ALL").await
+        } else {
+            Ok(())
+        }
     }
 }
 

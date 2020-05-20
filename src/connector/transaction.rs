@@ -1,5 +1,6 @@
 use super::*;
 use crate::ast::*;
+use async_trait::async_trait;
 
 /// A representation of an SQL database transaction. If not commited, a
 /// transaction will be rolled back by default when dropped.
@@ -35,28 +36,29 @@ impl<'a> Transaction<'a> {
     }
 }
 
+#[async_trait]
 impl<'a> Queryable for Transaction<'a> {
-    fn query<'b>(&'b self, q: Query<'b>) -> DBIO<'b, ResultSet> {
-        self.inner.query(q)
+    async fn query(&self, q: Query<'_>) -> crate::Result<ResultSet> {
+        self.inner.query(q).await
     }
 
-    fn execute<'b>(&'b self, q: Query<'b>) -> DBIO<'b, u64> {
-        self.inner.execute(q)
+    async fn execute(&self, q: Query<'_>) -> crate::Result<u64> {
+        self.inner.execute(q).await
     }
 
-    fn query_raw<'b>(&'b self, sql: &'b str, params: &'b [Value]) -> DBIO<'b, ResultSet> {
-        self.inner.query_raw(sql, params)
+    async fn query_raw(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<ResultSet> {
+        self.inner.query_raw(sql, params).await
     }
 
-    fn execute_raw<'b>(&'b self, sql: &'b str, params: &'b [Value<'b>]) -> DBIO<'b, u64> {
-        self.inner.execute_raw(sql, params)
+    async fn execute_raw(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<u64> {
+        self.inner.execute_raw(sql, params).await
     }
 
-    fn raw_cmd<'b>(&'b self, cmd: &'b str) -> DBIO<'b, ()> {
-        self.inner.raw_cmd(cmd)
+    async fn raw_cmd(&self, cmd: &str) -> crate::Result<()> {
+        self.inner.raw_cmd(cmd).await
     }
 
-    fn version<'b>(&'b self) -> DBIO<'b, Option<String>> {
-        self.inner.version()
+    async fn version(&self) -> crate::Result<Option<String>> {
+        self.inner.version().await
     }
 }

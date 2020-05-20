@@ -1,13 +1,12 @@
-use async_trait::async_trait;
-
 #[cfg(feature = "mysql")]
 use crate::connector::MysqlUrl;
 #[cfg(feature = "postgresql")]
 use crate::connector::PostgresUrl;
+use async_trait::async_trait;
 
 use crate::{
     ast,
-    connector::{self, Queryable, Transaction, TransactionCapable, DBIO},
+    connector::{self, Queryable, Transaction, TransactionCapable},
     error::Error,
 };
 use mobc::{Connection as MobcPooled, Manager};
@@ -20,33 +19,34 @@ pub struct PooledConnection {
 
 impl TransactionCapable for PooledConnection {}
 
+#[async_trait]
 impl Queryable for PooledConnection {
-    fn query<'a>(&'a self, q: ast::Query<'a>) -> DBIO<'a, connector::ResultSet> {
-        self.inner.query(q)
+    async fn query(&self, q: ast::Query<'_>) -> crate::Result<connector::ResultSet> {
+        self.inner.query(q).await
     }
 
-    fn execute<'a>(&'a self, q: ast::Query<'a>) -> DBIO<'a, u64> {
-        self.inner.execute(q)
+    async fn execute(&self, q: ast::Query<'_>) -> crate::Result<u64> {
+        self.inner.execute(q).await
     }
 
-    fn query_raw<'a>(&'a self, sql: &'a str, params: &'a [ast::Value]) -> DBIO<'a, connector::ResultSet> {
-        self.inner.query_raw(sql, params)
+    async fn query_raw(&self, sql: &str, params: &[ast::Value<'_>]) -> crate::Result<connector::ResultSet> {
+        self.inner.query_raw(sql, params).await
     }
 
-    fn execute_raw<'a>(&'a self, sql: &'a str, params: &'a [ast::Value]) -> DBIO<'a, u64> {
-        self.inner.execute_raw(sql, params)
+    async fn execute_raw(&self, sql: &str, params: &[ast::Value<'_>]) -> crate::Result<u64> {
+        self.inner.execute_raw(sql, params).await
     }
 
-    fn raw_cmd<'a>(&'a self, cmd: &'a str) -> DBIO<'a, ()> {
-        self.inner.raw_cmd(cmd)
+    async fn raw_cmd(&self, cmd: &str) -> crate::Result<()> {
+        self.inner.raw_cmd(cmd).await
     }
 
-    fn version<'a>(&'a self) -> DBIO<'a, Option<String>> {
-        self.inner.version()
+    async fn version(&self) -> crate::Result<Option<String>> {
+        self.inner.version().await
     }
 
-    fn server_reset_query<'a>(&'a self, tx: &'a Transaction<'a>) -> DBIO<'a, ()> {
-        self.inner.server_reset_query(tx)
+    async fn server_reset_query(&self, tx: &Transaction<'_>) -> crate::Result<()> {
+        self.inner.server_reset_query(tx).await
     }
 }
 

@@ -3,11 +3,11 @@ mod error;
 
 use crate::{
     ast::{Query, Value},
-    connector::{metrics, queryable::*, ResultSet, DBIO},
+    connector::{metrics, queryable::*, ResultSet},
     error::{Error, ErrorKind},
     visitor::{self, Visitor},
 };
-use futures::future;
+use async_trait::async_trait;
 use rusqlite::NO_PARAMS;
 use std::{collections::HashSet, convert::TryFrom, path::Path, time::Duration};
 use tokio::sync::Mutex;
@@ -156,18 +156,19 @@ impl Sqlite {
 
 impl TransactionCapable for Sqlite {}
 
+#[async_trait]
 impl Queryable for Sqlite {
-    fn query<'a>(&'a self, q: Query<'a>) -> DBIO<'a, ResultSet> {
+    async fn query(&self, q: Query<'_>) -> crate::Result<ResultSet> {
         let (sql, params) = visitor::Sqlite::build(q);
-        DBIO::new(async move { self.query_raw(&sql, &params).await })
+        self.query_raw(&sql, &params).await
     }
 
-    fn execute<'a>(&'a self, q: Query<'a>) -> DBIO<'a, u64> {
+    async fn execute(&self, q: Query<'_>) -> crate::Result<u64> {
         let (sql, params) = visitor::Sqlite::build(q);
-        DBIO::new(async move { self.execute_raw(&sql, &params).await })
+        self.execute_raw(&sql, &params).await
     }
 
-    fn query_raw<'a>(&'a self, sql: &'a str, params: &'a [Value]) -> DBIO<'a, ResultSet> {
+    async fn query_raw(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<ResultSet> {
         metrics::query("sqlite.query_raw", sql, params, move || async move {
             let client = self.client.lock().await;
 
@@ -184,9 +185,10 @@ impl Queryable for Sqlite {
 
             Ok(result)
         })
+        .await
     }
 
-    fn execute_raw<'a>(&'a self, sql: &'a str, params: &'a [Value<'a>]) -> DBIO<'a, u64> {
+    async fn execute_raw(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<u64> {
         metrics::query("sqlite.query_raw", sql, params, move || async move {
             let client = self.client.lock().await;
             let mut stmt = client.prepare_cached(sql)?;
@@ -194,18 +196,20 @@ impl Queryable for Sqlite {
 
             Ok(res)
         })
+        .await
     }
 
-    fn raw_cmd<'a>(&'a self, cmd: &'a str) -> DBIO<'a, ()> {
+    async fn raw_cmd(&self, cmd: &str) -> crate::Result<()> {
         metrics::query("sqlite.raw_cmd", cmd, &[], move || async move {
             let client = self.client.lock().await;
             client.execute_batch(cmd)?;
             Ok(())
         })
+        .await
     }
 
-    fn version<'a>(&'a self) -> DBIO<'a, Option<String>> {
-        DBIO::new(future::ready(Ok(Some(rusqlite::version().into()))))
+    async fn version(&self) -> crate::Result<Option<String>> {
+        Ok(Some(rusqlite::version().into()))
     }
 }
 

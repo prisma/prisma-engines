@@ -34,7 +34,7 @@ single-postgresql = ["postgresql", "json-1", "uuid-0_8", "chrono-0_4", "array"]
 single-mysql = ["mysql", "json-1", "uuid-0_8", "chrono-0_4"]
 single-sqlite = ["sqlite", "json-1", "uuid-0_8", "chrono-0_4"]
 
-pooled = ["mobc", "async-trait"]
+pooled = ["mobc"]
 sqlite = ["rusqlite", "libsqlite3-sys", "tokio/sync"]
 json-1 = ["serde_json", "base64"]
 postgresql = ["rust_decimal/postgres", "native-tls", "tokio-postgres", "postgres-native-tls", "array", "bytes", "tokio", "bit-vec"]
@@ -54,6 +54,7 @@ num_cpus = "1.12"
 rust_decimal = "=1.1.0"
 futures = "0.3"
 thiserror = "1.0"
+async-trait = "0.1"
 
 uuid = { version = "0.8", optional = true }
 chrono = { version = "0.4", optional = true }
@@ -77,7 +78,6 @@ mobc = { version = "0.5.7", optional = true }
 bytes = { version = "0.5", optional = true }
 tokio = { version = "0.2", features = ["rt-threaded", "macros", "sync"], optional = true}
 serde = { version = "1.0", optional = true }
-async-trait = { version = "0.1", optional = true }
 bit-vec = { version = "0.6.1", optional = true }
 
 [dev-dependencies]

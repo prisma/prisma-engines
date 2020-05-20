@@ -2,9 +2,9 @@
 
 use crate::{
     ast,
-    connector::{self, ConnectionInfo, Queryable, SqlFamily, TransactionCapable, DBIO},
+    connector::{self, ConnectionInfo, Queryable, SqlFamily, TransactionCapable},
 };
-use futures::lock::Mutex;
+use async_trait::async_trait;
 use std::{fmt, sync::Arc};
 use url::Url;
 
@@ -14,7 +14,7 @@ use std::convert::TryFrom;
 /// The main entry point and an abstraction over a database connection.
 #[derive(Clone)]
 pub struct Quaint {
-    inner: Arc<Mutex<Box<dyn Queryable + Send + Sync>>>,
+    inner: Arc<dyn Queryable + Send + Sync>,
     connection_info: Arc<ConnectionInfo>,
 }
 
@@ -99,29 +99,27 @@ impl Quaint {
 
                 sqlite.attach_database(&params.db_name).await?;
 
-                Mutex::new(Box::new(sqlite) as Box<dyn Queryable + Send + Sync>)
+                Arc::new(sqlite) as Arc<dyn Queryable + Send + Sync>
             }
             #[cfg(feature = "mysql")]
             "mysql" => {
                 let url = connector::MysqlUrl::new(url)?;
                 let mysql = connector::Mysql::new(url)?;
 
-                Mutex::new(Box::new(mysql) as Box<dyn Queryable + Send + Sync>)
+                Arc::new(mysql) as Arc<dyn Queryable + Send + Sync>
             }
             #[cfg(feature = "postgresql")]
             "postgres" | "postgresql" => {
                 let url = connector::PostgresUrl::new(url)?;
                 let psql = connector::PostgreSql::new(url).await?;
 
-                Mutex::new(Box::new(psql) as Box<dyn Queryable + Send + Sync>)
+                Arc::new(psql) as Arc<dyn Queryable + Send + Sync>
             }
             _ => unimplemented!("Supported url schemes: file or sqlite, mysql, postgres or postgresql."),
         };
 
         let connection_info = Arc::new(ConnectionInfo::from_url(url_str)?);
         Self::log_start(connection_info.sql_family(), 1);
-
-        let inner = Arc::new(inner);
 
         Ok(Self { inner, connection_info })
     }
@@ -143,28 +141,29 @@ impl Quaint {
     }
 }
 
+#[async_trait]
 impl Queryable for Quaint {
-    fn query<'a>(&'a self, q: ast::Query<'a>) -> DBIO<'a, connector::ResultSet> {
-        DBIO::new(async move { self.inner.lock().await.query(q).await })
+    async fn query(&self, q: ast::Query<'_>) -> crate::Result<connector::ResultSet> {
+        self.inner.query(q).await
     }
 
-    fn execute<'a>(&'a self, q: ast::Query<'a>) -> DBIO<'a, u64> {
-        DBIO::new(async move { self.inner.lock().await.execute(q).await })
+    async fn execute(&self, q: ast::Query<'_>) -> crate::Result<u64> {
+        self.inner.execute(q).await
     }
 
-    fn query_raw<'a>(&'a self, sql: &'a str, params: &'a [ast::Value]) -> DBIO<'a, connector::ResultSet> {
-        DBIO::new(async move { self.inner.lock().await.query_raw(sql, params).await })
+    async fn query_raw(&self, sql: &str, params: &[ast::Value<'_>]) -> crate::Result<connector::ResultSet> {
+        self.inner.query_raw(sql, params).await
     }
 
-    fn execute_raw<'a>(&'a self, sql: &'a str, params: &'a [ast::Value]) -> DBIO<'a, u64> {
-        DBIO::new(async move { self.inner.lock().await.execute_raw(sql, params).await })
+    async fn execute_raw(&self, sql: &str, params: &[ast::Value<'_>]) -> crate::Result<u64> {
+        self.inner.execute_raw(sql, params).await
     }
 
-    fn raw_cmd<'a>(&'a self, cmd: &'a str) -> DBIO<'a, ()> {
-        DBIO::new(async move { self.inner.lock().await.raw_cmd(cmd).await })
+    async fn raw_cmd(&self, cmd: &str) -> crate::Result<()> {
+        self.inner.raw_cmd(cmd).await
     }
 
-    fn version<'a>(&'a self) -> DBIO<'a, Option<String>> {
-        DBIO::new(async move { self.inner.lock().await.version().await })
+    async fn version(&self) -> crate::Result<Option<String>> {
+        self.inner.version().await
     }
 }

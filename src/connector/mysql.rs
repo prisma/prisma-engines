@@ -1,6 +1,7 @@
 mod conversion;
 mod error;
 
+use async_trait::async_trait;
 use mysql_async::{self as my, prelude::Queryable as _, Conn};
 use percent_encoding::percent_decode;
 use std::{borrow::Cow, future::Future, path::Path, time::Duration};
@@ -9,7 +10,7 @@ use url::Url;
 
 use crate::{
     ast::{Query, Value},
-    connector::{metrics, queryable::*, ResultSet, DBIO},
+    connector::{metrics, queryable::*, ResultSet},
     error::{Error, ErrorKind},
     visitor::{self, Visitor},
 };
@@ -264,18 +265,19 @@ impl Mysql {
 
 impl TransactionCapable for Mysql {}
 
+#[async_trait]
 impl Queryable for Mysql {
-    fn query<'a>(&'a self, q: Query<'a>) -> DBIO<'a, ResultSet> {
+    async fn query(&self, q: Query<'_>) -> crate::Result<ResultSet> {
         let (sql, params) = visitor::Mysql::build(q);
-        DBIO::new(async move { self.query_raw(&sql, &params).await })
+        self.query_raw(&sql, &params).await
     }
 
-    fn execute<'a>(&'a self, q: Query<'a>) -> DBIO<'a, u64> {
+    async fn execute(&self, q: Query<'_>) -> crate::Result<u64> {
         let (sql, params) = visitor::Mysql::build(q);
-        DBIO::new(async move { self.execute_raw(&sql, &params).await })
+        self.execute_raw(&sql, &params).await
     }
 
-    fn query_raw<'a>(&'a self, sql: &'a str, params: &'a [Value]) -> DBIO<'a, ResultSet> {
+    async fn query_raw(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<ResultSet> {
         metrics::query("mysql.query_raw", sql, params, move || async move {
             let conn = self.get_conn().await?;
             let results = self
@@ -305,9 +307,10 @@ impl Queryable for Mysql {
 
             Ok(result_set)
         })
+        .await
     }
 
-    fn execute_raw<'a>(&'a self, sql: &'a str, params: &'a [Value<'a>]) -> DBIO<'a, u64> {
+    async fn execute_raw(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<u64> {
         metrics::query("mysql.execute_raw", sql, params, move || async move {
             let conn = self.get_conn().await?;
             let results = self
@@ -315,31 +318,28 @@ impl Queryable for Mysql {
                 .await?;
             Ok(results.affected_rows())
         })
+        .await
     }
 
-    fn raw_cmd<'a>(&'a self, cmd: &'a str) -> DBIO<'a, ()> {
+    async fn raw_cmd(&self, cmd: &str) -> crate::Result<()> {
         metrics::query("mysql.raw_cmd", cmd, &[], move || async move {
             let conn = self.get_conn().await?;
             self.timeout(conn.query(cmd)).await?;
 
             Ok(())
         })
+        .await
     }
 
-    fn version<'a>(&'a self) -> DBIO<'a, Option<String>> {
-        let fut = async move {
-            let query = r#"SELECT @@GLOBAL.version version"#;
+    async fn version(&self) -> crate::Result<Option<String>> {
+        let query = r#"SELECT @@GLOBAL.version version"#;
+        let rows = self.query_raw(query, &[]).await?;
 
-            let rows = self.query_raw(query, &[]).await?;
+        let version_string = rows
+            .get(0)
+            .and_then(|row| row.get("version").and_then(|version| version.to_string()));
 
-            let version_string = rows
-                .get(0)
-                .and_then(|row| row.get("version").and_then(|version| version.to_string()));
-
-            Ok(version_string)
-        };
-
-        DBIO::new(fut)
+        Ok(version_string)
     }
 }
 
