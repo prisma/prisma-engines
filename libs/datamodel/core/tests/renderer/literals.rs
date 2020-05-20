@@ -94,6 +94,22 @@ fn strings_with_newlines_roundtrip() {
 }
 
 #[test]
+fn strings_with_backslashes_roundtrip() {
+    let input = indoc!(
+        r#"
+        model Category {
+          id   String @id
+          name String @default("xyz\\Datasource\\Model")
+        }"#
+    );
+
+    let dml = datamodel::parse_datamodel(input).unwrap();
+    let rendered = datamodel::render_datamodel_to_string(&dml).unwrap();
+
+    assert_eq!(input, rendered);
+}
+
+#[test]
 fn strings_with_multiple_escaped_characters_roundtrip() {
     let dm = indoc!(
         r#"
@@ -107,4 +123,31 @@ fn strings_with_multiple_escaped_characters_roundtrip() {
     let rendered = datamodel::render_datamodel_to_string(&dml).unwrap();
 
     assert_eq!(dm, rendered);
+}
+
+#[test]
+fn internal_escaped_values_are_rendered_correctly() {
+    let dm = indoc!(
+        r#"
+        model FilmQuote {
+          id             Int    @id
+        }"#
+    );
+
+    let expected_dm = indoc!(
+        r#"
+        model FilmQuote {
+          id Int @default("xyz\\Datasource\\Model") @id
+        }"#
+    );
+
+    let mut dml = datamodel::parse_datamodel(dm).unwrap();
+
+    dml.models[0].fields[0].default_value = Some(DefaultValue::Single(PrismaValue::String(
+        "xyz\\Datasource\\Model".to_string(),
+    )));
+
+    let rendered = datamodel::render_datamodel_to_string(&dml).unwrap();
+
+    assert_eq!(expected_dm, rendered);
 }

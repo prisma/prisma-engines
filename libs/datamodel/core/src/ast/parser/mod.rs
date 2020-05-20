@@ -38,11 +38,18 @@ fn parse_string_literal(token: &pest::iterators::Pair<'_, Rule>) -> String {
 
 fn unescape_string_literal(original: &str) -> Cow<'_, str> {
     const STRING_LITERAL_UNESCAPE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"\\(")"#).unwrap());
+    const STRING_LITERAL_BACKSLASHES_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"\\\\"#).unwrap());
     const STRING_LITERAL_NEWLINE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"\\n"#).unwrap());
 
-    match STRING_LITERAL_UNESCAPE_RE.replace_all(original, "$1") {
-        Cow::Owned(s) => STRING_LITERAL_NEWLINE_RE.replace_all(&s, "\n").into_owned().into(),
-        Cow::Borrowed(s) => STRING_LITERAL_NEWLINE_RE.replace_all(s, "\n"),
+    match STRING_LITERAL_UNESCAPE_RE.replace_all(original, "\"") {
+        Cow::Owned(s) => match STRING_LITERAL_NEWLINE_RE.replace_all(&s, "\n") {
+            Cow::Owned(s) => STRING_LITERAL_BACKSLASHES_RE.replace_all(&s, "\\").into_owned().into(),
+            Cow::Borrowed(s) => STRING_LITERAL_BACKSLASHES_RE.replace_all(s, "\\").into_owned().into(),
+        },
+        Cow::Borrowed(s) => match STRING_LITERAL_NEWLINE_RE.replace_all(s, "\n") {
+            Cow::Owned(s) => STRING_LITERAL_BACKSLASHES_RE.replace_all(&s, "\\").into_owned().into(),
+            Cow::Borrowed(s) => STRING_LITERAL_BACKSLASHES_RE.replace_all(s, "\\").into_owned().into(),
+        },
     }
 }
 

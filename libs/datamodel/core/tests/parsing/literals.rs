@@ -2,7 +2,7 @@ use indoc::indoc;
 use pretty_assertions::assert_eq;
 
 #[test]
-fn strings_with_quotes_are_unescpaed() {
+fn strings_with_quotes_are_unescaped() {
     let input = indoc!(
         r#"
         model Category {
