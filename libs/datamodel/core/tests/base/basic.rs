@@ -52,11 +52,11 @@ fn parse_basic_enum() {
 #[test]
 fn parse_comments() {
     let dml = r#"
-    // The user model.
+    /// The user model.
     model User {
         id Int @id
-        // The first name.
-        // Can be multi-line.
+        /// The first name.
+        /// Can be multi-line.
         firstName String
         lastName String
     }

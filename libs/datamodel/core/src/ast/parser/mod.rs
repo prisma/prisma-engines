@@ -74,7 +74,7 @@ fn parse_function(token: &pest::iterators::Pair<'_, Rule>) -> Expression {
 
     match_children! { token, current,
         Rule::non_empty_identifier => name = Some(current.as_str().to_string()),
-        Rule::argument_value => arguments.push(parse_arg_value(&current)),
+        Rule::expression => arguments.push(parse_expression(&current)),
         _ => unreachable!("Encountered impossible function during parsing: {:?}", current.tokens())
     };
 
@@ -235,7 +235,7 @@ fn parse_field(model_name: &str, token: &pest::iterators::Pair<'_, Rule>) -> Res
         Rule::directive => directives.push(parse_directive(&current)),
         Rule::doc_comment_and_new_line => comments.push(parse_doc_comment(&current)),
         Rule::doc_comment => comments.push(parse_doc_comment(&current)),
-        _ => unreachable!("Encountered impossible field declaration during parsing: {:?}", current.tokens())
+        _ => parsing_catch_all(&current)
     }
 
     match (name, field_type) {
@@ -259,16 +259,27 @@ fn parse_field(model_name: &str, token: &pest::iterators::Pair<'_, Rule>) -> Res
         )),
     }
 }
+
+fn parsing_catch_all(token: &pest::iterators::Pair<'_, Rule>) {
+    match token.as_rule() {
+        Rule::comment | Rule::comment_and_new_line | Rule::comment_block => {}
+        x => unreachable!(
+            "Encountered impossible field declaration during parsing: {:?} {:?}",
+            &x,
+            token.clone().tokens()
+        ),
+    }
+}
+
 // Model parsing
 fn parse_model(token: &pest::iterators::Pair<'_, Rule>) -> Result<Model, ErrorCollection> {
     let mut errors = ErrorCollection::new();
     let mut name: Option<Identifier> = None;
     let mut directives: Vec<Directive> = vec![];
     let mut fields: Vec<Field> = vec![];
-    let mut comments: Vec<String> = Vec::new();
+    let mut comment: Option<Comment> = None;
 
     match_children! { token, current,
-        Rule::MODEL_KEYWORD => { },
         Rule::TYPE_KEYWORD => { errors.push(
             DatamodelError::new_legacy_parser_error(
                 "Model declarations have to be indicated with the `model` keyword.",
@@ -282,10 +293,15 @@ fn parse_model(token: &pest::iterators::Pair<'_, Rule>) -> Result<Model, ErrorCo
                 Err(err) => errors.push(err)
             }
         },
-        Rule::doc_comment_and_new_line => comments.push(parse_doc_comment(&current)),
-        Rule::doc_comment => comments.push(parse_doc_comment(&current)),
-        Rule::UNTIL_END_OF_LINE => {},
-        _ => unreachable!("Encountered impossible model declaration during parsing: {:?}", current.tokens())
+        Rule::comment_block => {
+            comment = Some(parse_comment_block(&current))
+        },
+        Rule::BLOCK_LEVEL_CATCH_ALL => { errors.push(
+            DatamodelError::new_validation_error(
+                "This line is not a valid field or directive definition.",
+                Span::from_pest(current.as_span()))
+        ) },
+        _ => parsing_catch_all(&current)
     }
 
     errors.ok()?;
@@ -295,7 +311,7 @@ fn parse_model(token: &pest::iterators::Pair<'_, Rule>) -> Result<Model, ErrorCo
             name,
             fields,
             directives,
-            documentation: doc_comments_to_string(&comments),
+            documentation: comment,
             span: Span::from_pest(token.as_span()),
             commented_out: false,
         }),
@@ -315,10 +331,9 @@ fn parse_enum(token: &pest::iterators::Pair<'_, Rule>) -> Result<Enum, ErrorColl
     let mut comments: Vec<String> = Vec::new();
 
     match_children! { token, current,
-        Rule::ENUM_KEYWORD => { },
         Rule::non_empty_identifier => name = Some(current.to_id()),
         Rule::block_level_directive => directives.push(parse_directive(&current)),
-        Rule::enum_field_declaration => {
+        Rule::enum_value_declaration => {
             match parse_enum_value(&name.as_ref().unwrap().name, &current) {
                 Ok(enum_value) => values.push(enum_value),
                 Err(err) => errors.push(err)
@@ -326,7 +341,12 @@ fn parse_enum(token: &pest::iterators::Pair<'_, Rule>) -> Result<Enum, ErrorColl
         },
         Rule::doc_comment => comments.push(parse_doc_comment(&current)),
         Rule::doc_comment_and_new_line => comments.push(parse_doc_comment(&current)),
-        _ => unreachable!("Encountered impossible enum declaration during parsing: {:?}", current.tokens())
+        Rule::BLOCK_LEVEL_CATCH_ALL => { errors.push(
+            DatamodelError::new_validation_error(
+                "This line is not a enum value definition.",
+                Span::from_pest(current.as_span()))
+        ) },
+        _ => parsing_catch_all(&current)
     }
 
     errors.ok()?;
@@ -370,7 +390,7 @@ fn parse_enum_value(enum_name: &str, token: &pest::iterators::Pair<'_, Rule>) ->
         Rule::doc_comment_and_new_line => {
             comments.push(parse_doc_comment(&current));
         },
-        _ => unreachable!("Encountered impossible enum value declaration during parsing: {:?}", current.as_str())
+        _ => parsing_catch_all(&current)
     }
 
     match name {
@@ -415,22 +435,22 @@ fn parse_key_value(token: &pest::iterators::Pair<'_, Rule>) -> Argument {
 fn parse_source(token: &pest::iterators::Pair<'_, Rule>) -> SourceConfig {
     let mut name: Option<Identifier> = None;
     let mut properties: Vec<Argument> = vec![];
-    let mut comments: Vec<String> = Vec::new();
+    let mut comment: Option<Comment> = None;
 
     match_children! { token, current,
-        Rule::DATASOURCE_KEYWORD => { },
         Rule::non_empty_identifier => name = Some(current.to_id()),
         Rule::key_value => properties.push(parse_key_value(&current)),
-        Rule::doc_comment => comments.push(parse_doc_comment(&current)),
-        Rule::doc_comment_and_new_line => comments.push(parse_doc_comment(&current)),
-        _ => unreachable!("Encountered impossible source declaration during parsing: {:?}", current.tokens())
+        Rule::comment_block => {
+            comment = Some(parse_comment_block(&current))
+        },
+        _ => parsing_catch_all(&current)
     };
 
     match name {
         Some(name) => SourceConfig {
             name,
             properties,
-            documentation: doc_comments_to_string(&comments),
+            documentation: comment,
             span: Span::from_pest(token.as_span()),
         },
         _ => panic!(
@@ -447,12 +467,11 @@ fn parse_generator(token: &pest::iterators::Pair<'_, Rule>) -> GeneratorConfig {
     let mut comments: Vec<String> = Vec::new();
 
     match_children! { token, current,
-        Rule::GENERATOR_KEYWORD => { },
         Rule::non_empty_identifier => name = Some(current.to_id()),
         Rule::key_value => properties.push(parse_key_value(&current)),
         Rule::doc_comment => comments.push(parse_doc_comment(&current)),
         Rule::doc_comment_and_new_line => comments.push(parse_doc_comment(&current)),
-        _ => unreachable!("Encountered impossible generator declaration during parsing: {:?}", current.tokens())
+        _ => parsing_catch_all(&current)
     };
 
     match name {
@@ -474,7 +493,7 @@ fn parse_type(token: &pest::iterators::Pair<'_, Rule>) -> Field {
     let mut name: Option<Identifier> = None;
     let mut directives: Vec<Directive> = vec![];
     let mut base_type: Option<(String, Span)> = None;
-    let mut comments: Vec<String> = Vec::new();
+    let mut comment: Option<Comment> = None;
 
     match_children! { token, current,
         Rule::TYPE_KEYWORD => { },
@@ -483,7 +502,9 @@ fn parse_type(token: &pest::iterators::Pair<'_, Rule>) -> Field {
             base_type = Some((parse_base_type(&current), Span::from_pest(current.as_span())))
         },
         Rule::directive => directives.push(parse_directive(&current)),
-        Rule::doc_comment => comments.push(parse_doc_comment(&current)),
+        Rule::comment_block => {
+            comment = Some(parse_comment_block(&current))
+        },
         _ => unreachable!("Encountered impossible custom type during parsing: {:?}", current.tokens())
     }
 
@@ -497,7 +518,7 @@ fn parse_type(token: &pest::iterators::Pair<'_, Rule>) -> Field {
             arity: FieldArity::Required,
             default_value: None,
             directives,
-            documentation: doc_comments_to_string(&comments),
+            documentation: comment,
             span: Span::from_pest(token.as_span()),
             is_commented_out: false,
         },
@@ -508,12 +529,27 @@ fn parse_type(token: &pest::iterators::Pair<'_, Rule>) -> Field {
     }
 }
 
+fn parse_comment_block(token: &pest::iterators::Pair<'_, Rule>) -> Comment {
+    let mut comments: Vec<String> = Vec::new();
+    for comment in token.clone().into_inner() {
+        match comment.as_rule() {
+            Rule::doc_comment | Rule::doc_comment_and_new_line => comments.push(parse_doc_comment(&comment)),
+            Rule::comment | Rule::comment_and_new_line => {}
+            _ => parsing_catch_all(&comment),
+        }
+    }
+
+    Comment {
+        text: comments.join("\n"),
+    }
+}
+
 // Whole datamodel parsing
 
 /// Parses a Prisma V2 datamodel document into an internal AST representation.
 pub fn parse(datamodel_string: &str) -> Result<SchemaAst, ErrorCollection> {
     let mut errors = ErrorCollection::new();
-    let datamodel_result = PrismaDatamodelParser::parse(Rule::datamodel, datamodel_string);
+    let datamodel_result = PrismaDatamodelParser::parse(Rule::schema, datamodel_string);
 
     match datamodel_result {
         Ok(mut datamodel_wrapped) => {
@@ -531,8 +567,8 @@ pub fn parse(datamodel_string: &str) -> Result<SchemaAst, ErrorCollection> {
                 },
                 Rule::source_block => top_level_definitions.push(Top::Source(parse_source(&current))),
                 Rule::generator_block => top_level_definitions.push(Top::Generator(parse_generator(&current))),
-                Rule::type_declaration => top_level_definitions.push(Top::Type(parse_type(&current))),
-                Rule::doc_comment => (),
+                Rule::type_alias => top_level_definitions.push(Top::Type(parse_type(&current))),
+                Rule::comment_block => (),
                 Rule::EOI => {},
                 Rule::CATCH_ALL => {
                     errors.push(DatamodelError::new_validation_error(
@@ -588,7 +624,7 @@ fn rule_to_string(rule: Rule) -> &'static str {
         Rule::source_block => "source definition",
         Rule::generator_block => "generator definition",
         Rule::arbitrary_block => "arbitrary block",
-        Rule::enum_field_declaration => "enum field declaration",
+        Rule::enum_value_declaration => "enum field declaration",
         Rule::block_level_directive => "block level directive",
         Rule::EOI => "end of input",
         Rule::non_empty_identifier => "alphanumeric identifier",
@@ -611,12 +647,15 @@ fn rule_to_string(rule: Rule) -> &'static str {
         Rule::list_type => "list type",
         Rule::field_type => "field type",
         Rule::field_declaration => "field declaration",
-        Rule::type_declaration => "type declaration",
+        Rule::type_alias => "type alias",
         Rule::key_value => "configuration property",
         Rule::string_any => "any character",
         Rule::string_escaped_interpolation => "string interpolation",
         Rule::doc_comment => "documentation comment",
         Rule::doc_comment_and_new_line => "multi line documentation comment",
+        Rule::comment => "comment",
+        Rule::comment_and_new_line => "comment and new line",
+        Rule::comment_block => "comment block",
         Rule::number => "number",
 
         // Those are helpers, so we get better error messages:
@@ -629,11 +668,11 @@ fn rule_to_string(rule: Rule) -> &'static str {
         Rule::DATASOURCE_KEYWORD => "\"datasource\" keyword",
         Rule::INTERPOLATION_START => "string interpolation start",
         Rule::INTERPOLATION_END => "string interpolation end",
-        Rule::UNTIL_END_OF_LINE => "until end of line",
         Rule::CATCH_ALL => "CATCH ALL",
+        Rule::BLOCK_LEVEL_CATCH_ALL => "BLOCK LEVEL CATCH ALL",
 
         // Those are top level things and will never surface.
-        Rule::datamodel => "datamodel declaration",
+        Rule::schema => "schema",
         Rule::string_interpolated => "string interpolated",
 
         // Legacy stuff should never be suggested
@@ -644,6 +683,7 @@ fn rule_to_string(rule: Rule) -> &'static str {
 
         // Atomic and helper rules should not surface, we still add them for debugging.
         Rule::WHITESPACE => "",
+        Rule::NEWLINE => "newline",
         Rule::string_escaped_predefined => "escaped unicode char",
         Rule::string_escape => "escaped unicode char",
         Rule::string_interpolate_escape => "string interpolation",

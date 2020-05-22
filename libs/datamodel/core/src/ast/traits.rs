@@ -28,6 +28,8 @@ pub trait WithDirectives {
 
 pub trait WithDocumentation {
     fn documentation(&self) -> &Option<Comment>;
+
+    fn is_commented_out(&self) -> bool;
 }
 
 // generic implementations

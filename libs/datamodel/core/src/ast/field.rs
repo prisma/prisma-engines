@@ -42,6 +42,10 @@ impl WithDocumentation for Field {
     fn documentation(&self) -> &Option<Comment> {
         &self.documentation
     }
+
+    fn is_commented_out(&self) -> bool {
+        self.is_commented_out
+    }
 }
 
 #[derive(Copy, Debug, Clone, PartialEq)]
