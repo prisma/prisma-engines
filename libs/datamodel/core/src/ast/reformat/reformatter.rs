@@ -58,7 +58,7 @@ impl<'a> Reformatter<'a> {
         self.reformat_top(&mut renderer, &ast.next().unwrap());
         let result = target_string.into();
         // all schemas must end with a newline
-        if result.ends_with('\n'){
+        if result.ends_with('\n') {
             result
         } else {
             format!("{}\n", result)
