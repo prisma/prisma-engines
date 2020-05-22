@@ -293,16 +293,17 @@ fn relation_must_error_when_referenced_fields_are_multiple_uniques() {
     }
 
     model Post {
-        id Int @id
-        text String
-        userName Int        
+        id       Int    @id
+        text     String
+        userId   Int
+        userName String        
         // the relation is referencing two uniques. That is too much.
-        user User @relation(fields: [userName], references: [id, firstName])
+        user User @relation(fields: [userId, userName], references: [id, firstName])
     }
     "#;
 
     let errors = parse_error(dml);
-    errors.assert_is(DatamodelError::new_validation_error("The argument `references` must refer to a unique criteria in the related model `User`. But it is referencing the following fields that are not a unique criteria: id, firstName", Span::new(261, 330)));
+    errors.assert_is(DatamodelError::new_validation_error("The argument `references` must refer to a unique criteria in the related model `User`. But it is referencing the following fields that are not a unique criteria: id, firstName", Span::new(298, 375)));
 }
 
 #[test]
