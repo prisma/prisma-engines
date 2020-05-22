@@ -63,7 +63,7 @@ directive = { (directive_name ~ directive_arguments | directive_name) }
 // This is a poor-mans version of name spacing. Not used right now. Unclear if we need it going forward.
 directive_name = @{ (maybe_empty_identifier ~ ".")? ~ maybe_empty_identifier }
 // If arguments are supplied there might be one unnamed argument. Additionally there are multiple named arguments.
-directive_arguments = { "(" ~ (((argument | argument_value) ~ ("," ~ argument)*)?) ~ ")" }
+directive_arguments = { "(" ~ (((argument | argument_value) ~ ("," ~ (argument | argument_value))*)?) ~ ")" }
 
 argument = { (argument_name ~ ":" ~ argument_value) }
 argument_name = { (!":" ~ non_empty_identifier)+ }

@@ -98,7 +98,11 @@ impl<T: 'static> DirectiveListValidator<T> {
                         ));
                     }
 
-                    if let Err(mut errs) = arguments.check_for_duplicate_arguments() {
+                    if let Err(mut errs) = arguments.check_for_duplicate_named_arguments() {
+                        errors.append(&mut errs);
+                    }
+
+                    if let Err(mut errs) = arguments.check_for_multiple_unnamed_arguments(&directive.name.name) {
                         errors.append(&mut errs);
                     }
 

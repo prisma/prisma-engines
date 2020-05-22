@@ -24,6 +24,22 @@ fn basic_unique_index_must_work() {
 }
 
 #[test]
+fn multiple_unnamed_arguments_must_error() {
+    let dml = r#"
+    model User {
+        id        Int    @id
+        firstName String
+        lastName  String
+
+        @@unique(firstName,lastName)
+    }
+    "#;
+
+    let errors = parse_error(dml);
+    errors.assert_is(DatamodelError::new_directive_validation_error("You provided multiple unnamed arguments. This is not possible. Did you forget the brackets? Did you mean `[firstName, lastName]`?", "unique", Span::new(108,134)));
+}
+
+#[test]
 fn multi_field_unique_indexes_on_relation_fields_must_not_work() {
     let dml = r#"
     model User {
