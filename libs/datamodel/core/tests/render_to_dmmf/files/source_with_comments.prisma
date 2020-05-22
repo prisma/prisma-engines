@@ -9,5 +9,4 @@ model Author {
   id        Int      @id
   /// Name of the author.
   name      String?
-  createdAt DateTime @default(now())
 }
