@@ -63,9 +63,6 @@ pub struct PrismaOpt {
     /// Switches query schema generation to Prisma 1 compatible mode.
     #[structopt(long, short)]
     pub legacy: bool,
-    /// Runs all queries in a transaction, including all the reads.
-    #[structopt(long, short = "t")]
-    pub always_force_transactions: bool,
     /// Enables raw SQL queries with executeRaw mutation
     #[structopt(long, short = "r")]
     pub enable_raw_queries: bool,

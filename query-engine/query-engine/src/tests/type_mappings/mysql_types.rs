@@ -401,7 +401,7 @@ async fn all_mysql_identifier_types_work(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector(tags("mysql"))]
+#[test_each_connector(tags("mysql"), ignore("mariadb", "mysql_5_6"))]
 async fn all_mysql_types_work_as_filter(api: &TestApi) -> TestResult {
     api.execute_sql(&create_types_table_sql(api)).await?;
 
@@ -435,7 +435,108 @@ async fn all_mysql_types_work_as_filter(api: &TestApi) -> TestResult {
                     string_text_mediumtext: \"medium dolphins\"
                     string_text_longtext: \"long dolphins\"
                     string_enum: \"jellicle_cats\"
-                    # json: \"{\\\"name\\\": null}\"
+                    json: \"{\\\"name\\\": null}\"
+                }
+            ) {
+                id
+            }
+        }
+    ";
+
+    let response = engine.request(query).await;
+
+    let expected_json = json!({ "data": { "findManytypes": [{ "id": 1 }] } });
+
+    assert_eq!(response, expected_json);
+
+    Ok(())
+}
+
+#[test_each_connector(tags("mysql_5_6"))]
+async fn all_mysql_types_work_as_filter_56(api: &TestApi) -> TestResult {
+    api.execute_sql(&create_types_table_sql(api)).await?;
+
+    let (_datamodel, engine) = api.introspect_and_start_query_engine().await?;
+
+    engine.request(CREATE_ONE_TYPES_QUERY).await;
+
+    let query = "
+        query {
+            findManytypes(
+                where: {
+                    numeric_integer_tinyint: 12,
+                    numeric_integer_smallint: 350,
+                    numeric_integer_int: 9002,
+                    numeric_integer_bigint: 30000,
+                    numeric_floating_decimal: 3.14
+                    # numeric_floating_float: -32.0
+                    numeric_fixed_double: 0.14
+                    numeric_fixed_real: 12.12
+                    numeric_bit: 4
+                    numeric_boolean: true
+                    date_date: \"2020-02-27T00:00:00Z\"
+                    date_datetime: \"2020-02-27T19:10:22Z\"
+                    date_timestamp: \"2020-02-27T19:11:22Z\"
+                    # date_time: \"2020-02-20T12:50:01Z\"
+                    date_year: 2012
+                    string_char: \"make dolphins easy\"
+                    string_varchar: \"dolphins of varying characters\"
+                    string_text_tinytext: \"tiny dolphins\"
+                    string_text_text: \"dolphins\"
+                    string_text_mediumtext: \"medium dolphins\"
+                    string_text_longtext: \"long dolphins\"
+                    string_enum: \"jellicle_cats\"
+                }
+            ) {
+                id
+            }
+        }
+    ";
+
+    let response = engine.request(query).await;
+
+    let expected_json = json!({ "data": { "findManytypes": [{ "id": 1 }] } });
+
+    assert_eq!(response, expected_json);
+
+    Ok(())
+}
+
+#[test_each_connector(tags("mariadb"))]
+async fn all_mysql_types_work_as_filter_mariadb(api: &TestApi) -> TestResult {
+    api.execute_sql(&create_types_table_sql(api)).await?;
+
+    let (_datamodel, engine) = api.introspect_and_start_query_engine().await?;
+
+    engine.request(CREATE_ONE_TYPES_QUERY).await;
+
+    let query = "
+        query {
+            findManytypes(
+                where: {
+                    numeric_integer_tinyint: 12,
+                    numeric_integer_smallint: 350,
+                    numeric_integer_int: 9002,
+                    numeric_integer_bigint: 30000,
+                    numeric_floating_decimal: 3.14
+                    # numeric_floating_float: -32.0
+                    numeric_fixed_double: 0.14
+                    numeric_fixed_real: 12.12
+                    numeric_bit: 4
+                    numeric_boolean: true
+                    date_date: \"2020-02-27T00:00:00Z\"
+                    date_datetime: \"2020-02-27T19:10:22Z\"
+                    date_timestamp: \"2020-02-27T19:11:22Z\"
+                    # date_time: \"2020-02-20T12:50:01Z\"
+                    date_year: 2012
+                    string_char: \"make dolphins easy\"
+                    string_varchar: \"dolphins of varying characters\"
+                    string_text_tinytext: \"tiny dolphins\"
+                    string_text_text: \"dolphins\"
+                    string_text_mediumtext: \"medium dolphins\"
+                    string_text_longtext: \"long dolphins\"
+                    string_enum: \"jellicle_cats\"
+                    json: \"{\\\"name\\\":null}\"
                 }
             ) {
                 id

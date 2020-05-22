@@ -317,9 +317,9 @@ async fn introspecting_a_default_value_as_dbgenerated_should_work(api: &TestApi)
                 id                                  Int         @default(autoincrement()) @id
                 int_static                          Int?        @default(2)
                 string_static_char                  String?     @default("test")
-                string_static_null                  String?     
+                string_static_null                  String?
                 string_static_text                  String?     @default("test")
-                string_static_varchar               String?     @default("test")                             
+                string_static_varchar               String?     @default("test")
             }
         "#;
 

@@ -1,12 +1,12 @@
 //! Database description.
 
-use thiserror::Error;
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
 use regex::Regex;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use std::{fmt, str::FromStr};
+use thiserror::Error;
 use tracing::debug;
 
 pub mod mysql;
@@ -411,6 +411,15 @@ pub enum DefaultValue {
     SEQUENCE(String),
     /// An unrecognized Default Value
     DBGENERATED(String),
+}
+
+impl DefaultValue {
+    pub fn as_value(&self) -> Option<&PrismaValue> {
+        match self {
+            DefaultValue::VALUE(v) => Some(v),
+            _ => None,
+        }
+    }
 }
 
 static RE_NUM: Lazy<Regex> = Lazy::new(|| Regex::new(r"^'?(\d+)'?$").expect("compile regex"));

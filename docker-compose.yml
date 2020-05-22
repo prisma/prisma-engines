@@ -10,8 +10,6 @@ services:
       DB_PASSWORD: "prisma"
       POOL_MODE: "transaction"
       MAX_CLIENT_CONN: "1000"
-      SERVER_RESET_QUERY_ALWAYS: "1"
-      SERVER_RESET_QUERY: "DEALLOCATE ALL"
     networks:
       - databases
     ports:

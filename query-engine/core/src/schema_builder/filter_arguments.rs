@@ -121,7 +121,7 @@ pub fn get_field_filters<'a>(field: &ModelField) -> Vec<&'a FilterArgument> {
             TypeIdentifier::Boolean => vec![&args.base],
             TypeIdentifier::Enum(_) => vec![&args.base, &args.inclusion],
             TypeIdentifier::DateTime => vec![&args.base, &args.inclusion, &args.alphanumeric],
-            TypeIdentifier::Json => vec![],
+            TypeIdentifier::Json => vec![&args.base],
         },
     };
 

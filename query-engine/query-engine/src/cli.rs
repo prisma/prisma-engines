@@ -19,7 +19,6 @@ pub struct ExecuteRequest {
     query: String,
     datamodel: Datamodel,
     config: Configuration,
-    force_transactions: bool,
     enable_raw_queries: bool,
 }
 
@@ -68,7 +67,6 @@ impl TryFrom<&PrismaOpt> for CliCommand {
                 })),
                 CliOpt::ExecuteRequest(input) => Ok(CliCommand::ExecuteRequest(ExecuteRequest {
                     query: input.query.clone(),
-                    force_transactions: opts.always_force_transactions,
                     enable_raw_queries: opts.enable_raw_queries,
                     legacy: input.legacy,
                     datamodel: opts.datamodel(false)?,
@@ -127,7 +125,6 @@ impl CliCommand {
 
         let ctx = PrismaContext::builder(request.config, request.datamodel)
             .legacy(request.legacy)
-            .force_transactions(request.force_transactions)
             .enable_raw_queries(request.enable_raw_queries)
             .build()
             .await?;

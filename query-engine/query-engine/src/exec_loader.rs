@@ -13,7 +13,6 @@ use sql_connector::*;
 
 pub async fn load(
     source: &(dyn Source + Send + Sync),
-    force_transactions: bool,
 ) -> PrismaResult<(String, Box<dyn QueryExecutor + Send + Sync + 'static>)> {
     match source.connector_type() {
         #[cfg(feature = "sql")]
@@ -23,7 +22,7 @@ pub async fn load(
         MYSQL_SOURCE_NAME => mysql(source).await,
 
         #[cfg(feature = "sql")]
-        POSTGRES_SOURCE_NAME => postgres(source, force_transactions).await,
+        POSTGRES_SOURCE_NAME => postgres(source).await,
 
         x => Err(PrismaError::ConfigurationError(format!(
             "Unsupported connector type: {}",
@@ -49,7 +48,6 @@ async fn sqlite(
 #[cfg(feature = "sql")]
 async fn postgres(
     source: &(dyn Source + Send + Sync),
-    force_transactions: bool,
 ) -> PrismaResult<(String, Box<dyn QueryExecutor + Send + Sync + 'static>)> {
     trace!("Loading Postgres connector...");
 
@@ -62,6 +60,11 @@ async fn postgres(
         .unwrap_or_else(|| String::from("public"));
 
     let psql = PostgreSql::from_source(source).await?;
+
+    let force_transactions = params
+        .get("pgbouncer")
+        .and_then(|flag| flag.parse().ok())
+        .unwrap_or(false);
 
     trace!("Loaded Postgres connector.");
     Ok((db_name, sql_executor("postgres", psql, force_transactions)))

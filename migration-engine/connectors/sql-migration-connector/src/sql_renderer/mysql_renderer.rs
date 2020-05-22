@@ -1,5 +1,8 @@
-use super::common::*;
+use super::{common::*, SqlRenderer};
 use crate::{sql_schema_helpers::ColumnRef, SqlFamily};
+use once_cell::sync::Lazy;
+use prisma_models::PrismaValue;
+use regex::Regex;
 use sql_schema_describer::*;
 use std::borrow::Cow;
 
@@ -7,7 +10,7 @@ const VARCHAR_LENGTH_PREFIX: &str = "(191)";
 
 pub struct MySqlRenderer {}
 
-impl super::SqlRenderer for MySqlRenderer {
+impl SqlRenderer for MySqlRenderer {
     fn sql_family(&self) -> SqlFamily {
         SqlFamily::Mysql
     }
@@ -51,6 +54,21 @@ impl super::SqlRenderer for MySqlRenderer {
             render_on_delete(&foreign_key.on_delete_action)
         )
     }
+
+    fn render_default<'a>(&self, default: &'a DefaultValue, family: &ColumnTypeFamily) -> Cow<'a, str> {
+        match (default, family) {
+            (DefaultValue::DBGENERATED(val), _) => val.as_str().into(),
+            (DefaultValue::VALUE(PrismaValue::String(val)), ColumnTypeFamily::String)
+            | (DefaultValue::VALUE(PrismaValue::Enum(val)), ColumnTypeFamily::Enum(_)) => {
+                format!("'{}'", escape_string_literal(&val)).into()
+            }
+            (DefaultValue::NOW, ColumnTypeFamily::DateTime) => "CURRENT_TIMESTAMP".into(),
+            (DefaultValue::NOW, _) => unreachable!("NOW default on non-datetime column"),
+            (DefaultValue::VALUE(val), ColumnTypeFamily::DateTime) => format!("'{}'", val).into(),
+            (DefaultValue::VALUE(val), _) => format!("{}", val).into(),
+            (DefaultValue::SEQUENCE(_), _) => todo!("rendering of sequence defaults"),
+        }
+    }
 }
 
 impl MySqlRenderer {
@@ -84,4 +102,10 @@ impl MySqlRenderer {
             x => unimplemented!("{:?} not handled yet", x),
         }
     }
+}
+
+fn escape_string_literal(s: &str) -> Cow<'_, str> {
+    const STRING_LITERAL_CHARACTER_TO_ESCAPE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"'"#).unwrap());
+
+    STRING_LITERAL_CHARACTER_TO_ESCAPE_RE.replace_all(s, "'$0")
 }
