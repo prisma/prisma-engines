@@ -326,6 +326,31 @@ fn relation_must_error_when_types_of_base_field_and_referenced_field_do_not_matc
 }
 
 #[test]
+fn relation_must_error_when_number_of_fields_and_references_is_not_equal() {
+    let dml = r#"
+    model User {
+        id        Int @id
+        firstName String
+        posts     Post[]
+    }
+
+    model Post {
+        id       Int     @id
+        userId   Int
+        userName String
+        user     User    @relation(fields: [userId, userName], references: [id])
+    }
+    "#;
+
+    let errors = parse_error(dml);
+    errors.assert_is(DatamodelError::new_directive_validation_error(
+        "You must specify the same number of fields in `fields` and `references`.",
+        "@relation",
+        Span::new(200, 273),
+    ));
+}
+
+#[test]
 fn relation_must_succeed_when_type_alias_is_used_for_referenced_field() {
     let dml = r#"
     type CustomId = Int @id @default(autoincrement())
