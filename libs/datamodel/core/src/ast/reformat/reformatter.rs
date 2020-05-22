@@ -43,15 +43,26 @@ impl<'a> Reformatter<'a> {
     }
 
     pub fn reformat_to(&self, output: &mut dyn std::io::Write, ident_width: usize) {
-        let mut ast = PrismaDatamodelParser::parse(Rule::schema, self.input).unwrap(); // TODO: Handle error.
-        let mut top_formatter = Renderer::new(output, ident_width);
-        self.reformat_top(&mut top_formatter, &ast.next().unwrap());
+        let result = self.reformat_internal(ident_width);
+        write!(output, "{}", result).unwrap()
     }
 
     pub fn reformat_to_string(&self) -> String {
-        let mut result = WritableString::new();
-        self.reformat_to(&mut result, 2);
-        result.into()
+        self.reformat_internal(2)
+    }
+
+    fn reformat_internal(&self, ident_width: usize) -> String {
+        let mut ast = PrismaDatamodelParser::parse(Rule::schema, self.input).unwrap(); // TODO: Handle error.
+        let mut target_string = WritableString::new();
+        let mut renderer = Renderer::new(&mut target_string, ident_width);
+        self.reformat_top(&mut renderer, &ast.next().unwrap());
+        let result = target_string.into();
+        // all schemas must end with a newline
+        if result.ends_with('\n') {
+            result
+        } else {
+            format!("{}\n", result)
+        }
     }
 
     fn reformat_top(&self, target: &mut Renderer, token: &Token) {

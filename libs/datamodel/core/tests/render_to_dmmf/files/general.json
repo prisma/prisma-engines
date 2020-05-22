@@ -34,6 +34,7 @@
           "isId": true,
           "isReadOnly": false,
           "type": "Int",
+          "hasDefaultValue": false,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -46,6 +47,7 @@
           "isId": false,
           "isReadOnly": false,
           "type": "DateTime",
+          "hasDefaultValue": false,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -58,6 +60,7 @@
           "isId": false,
           "isReadOnly": false,
           "type": "String",
+          "hasDefaultValue": false,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -70,6 +73,7 @@
           "isId": false,
           "isReadOnly": false,
           "type": "String",
+          "hasDefaultValue": false,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -82,6 +86,7 @@
           "isId": false,
           "isReadOnly": false,
           "type": "Post",
+          "hasDefaultValue": false,
           "relationName": "author",
           "relationFromFields": [],
           "relationToFields": [],
@@ -98,6 +103,7 @@
           "isId": false,
           "isReadOnly": false,
           "type": "Profile",
+          "hasDefaultValue": false,
           "relationName": "ProfileToUser",
           "relationFromFields": [],
           "relationToFields": [],
@@ -124,6 +130,7 @@
           "isId": true,
           "isReadOnly": false,
           "type": "Int",
+          "hasDefaultValue": false,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -136,6 +143,7 @@
           "isId": false,
           "isReadOnly": true,
           "type": "Int",
+          "hasDefaultValue": false,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -148,6 +156,7 @@
           "isId": false,
           "isReadOnly": false,
           "type": "User",
+          "hasDefaultValue": false,
           "relationName": "ProfileToUser",
           "relationFromFields": [
             "userId"
@@ -168,6 +177,7 @@
           "isId": false,
           "isReadOnly": false,
           "type": "String",
+          "hasDefaultValue": false,
           "isGenerated": false,
           "isUpdatedAt": false
         }
@@ -190,6 +200,7 @@
           "isId": false,
           "isReadOnly": false,
           "type": "Int",
+          "hasDefaultValue": false,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -202,6 +213,7 @@
           "isId": false,
           "isReadOnly": false,
           "type": "DateTime",
+          "hasDefaultValue": false,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -214,6 +226,7 @@
           "isId": false,
           "isReadOnly": false,
           "type": "DateTime",
+          "hasDefaultValue": false,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -226,7 +239,7 @@
           "isId": false,
           "isReadOnly": false,
           "type": "String",
-          "default": "Default-Title",
+          "hasDefaultValue": true,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -239,7 +252,7 @@
           "isId": false,
           "isReadOnly": false,
           "type": "Boolean",
-          "default": false,
+          "hasDefaultValue": true,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -252,7 +265,7 @@
           "isId": false,
           "isReadOnly": false,
           "type": "Boolean",
-          "default": false,
+          "hasDefaultValue": true,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -265,6 +278,7 @@
           "isId": false,
           "isReadOnly": true,
           "type": "Int",
+          "hasDefaultValue": false,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -277,6 +291,7 @@
           "isId": false,
           "isReadOnly": false,
           "type": "User",
+          "hasDefaultValue": false,
           "relationName": "author",
           "relationFromFields": [
             "authorId"
@@ -297,6 +312,7 @@
           "isId": false,
           "isReadOnly": false,
           "type": "PostToCategory",
+          "hasDefaultValue": false,
           "relationName": "PostToPostToCategory",
           "relationFromFields": [],
           "relationToFields": [],
@@ -326,6 +342,7 @@
           "isId": true,
           "isReadOnly": false,
           "type": "Int",
+          "hasDefaultValue": false,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -338,6 +355,7 @@
           "isId": false,
           "isReadOnly": false,
           "type": "String",
+          "hasDefaultValue": false,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -350,6 +368,7 @@
           "isId": false,
           "isReadOnly": false,
           "type": "PostToCategory",
+          "hasDefaultValue": false,
           "relationName": "CategoryToPostToCategory",
           "relationFromFields": [],
           "relationToFields": [],
@@ -366,6 +385,7 @@
           "isId": false,
           "isReadOnly": false,
           "type": "CategoryEnum",
+          "hasDefaultValue": false,
           "isGenerated": false,
           "isUpdatedAt": false
         }
@@ -388,6 +408,7 @@
           "isId": true,
           "isReadOnly": false,
           "type": "Int",
+          "hasDefaultValue": false,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -400,6 +421,7 @@
           "isId": false,
           "isReadOnly": true,
           "type": "String",
+          "hasDefaultValue": false,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -412,6 +434,7 @@
           "isId": false,
           "isReadOnly": true,
           "type": "DateTime",
+          "hasDefaultValue": false,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -424,6 +447,7 @@
           "isId": false,
           "isReadOnly": true,
           "type": "Int",
+          "hasDefaultValue": false,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -436,6 +460,7 @@
           "isId": false,
           "isReadOnly": false,
           "type": "Post",
+          "hasDefaultValue": false,
           "relationName": "PostToPostToCategory",
           "relationFromFields": [
             "postTitle",
@@ -458,6 +483,7 @@
           "isId": false,
           "isReadOnly": false,
           "type": "Category",
+          "hasDefaultValue": false,
           "relationName": "CategoryToPostToCategory",
           "relationFromFields": [
             "categoryId"
@@ -488,6 +514,7 @@
           "isId": true,
           "isReadOnly": false,
           "type": "Int",
+          "hasDefaultValue": false,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -500,6 +527,7 @@
           "isId": false,
           "isReadOnly": true,
           "type": "Int",
+          "hasDefaultValue": false,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -512,6 +540,7 @@
           "isId": false,
           "isReadOnly": false,
           "type": "B",
+          "hasDefaultValue": false,
           "relationName": "AToB",
           "relationFromFields": [
             "bId"
@@ -542,6 +571,7 @@
           "isId": true,
           "isReadOnly": false,
           "type": "Int",
+          "hasDefaultValue": false,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -554,6 +584,7 @@
           "isId": false,
           "isReadOnly": false,
           "type": "A",
+          "hasDefaultValue": false,
           "relationName": "AToB",
           "relationFromFields": [],
           "relationToFields": [],

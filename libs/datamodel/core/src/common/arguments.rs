@@ -25,7 +25,7 @@ impl<'a> Arguments<'a> {
     }
 
     /// Checks if arguments occur twice and returns an appropriate error list.
-    pub fn check_for_duplicate_arguments(&self) -> Result<(), ErrorCollection> {
+    pub fn check_for_duplicate_named_arguments(&self) -> Result<(), ErrorCollection> {
         let mut arg_names: HashSet<&'a str> = HashSet::new();
         let mut errors = ErrorCollection::new();
 
@@ -33,10 +33,31 @@ impl<'a> Arguments<'a> {
             if arg_names.contains::<&str>(&(&arg.name.name as &str)) {
                 errors.push(DatamodelError::new_duplicate_argument_error(&arg.name.name, arg.span));
             }
-            arg_names.insert(&arg.name.name);
+            if !arg.is_unnamed() {
+                arg_names.insert(&arg.name.name);
+            }
         }
 
         errors.ok()
+    }
+
+    pub fn check_for_multiple_unnamed_arguments(&self, directive_name: &str) -> Result<(), ErrorCollection> {
+        let mut unnamed_values: Vec<String> = Vec::new();
+        for arg in self.arguments {
+            if arg.is_unnamed() {
+                unnamed_values.push(arg.value.render_to_string());
+            }
+        }
+
+        if unnamed_values.len() > 1 {
+            Err(DatamodelError::new_directive_validation_error(
+                &format!("You provided multiple unnamed arguments. This is not possible. Did you forget the brackets? Did you mean `[{}]`?", unnamed_values.join(", ")),
+                directive_name,
+                self.span.clone()).into()
+            )
+        } else {
+            Ok(())
+        }
     }
 
     /// Checks if arguments were not accessed and raises the appropriate errors.

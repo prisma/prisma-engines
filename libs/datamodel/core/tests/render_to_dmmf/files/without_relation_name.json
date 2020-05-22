@@ -15,6 +15,7 @@
           "isId": true,
           "isReadOnly": false,
           "type": "Int",
+          "hasDefaultValue": false,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -27,6 +28,7 @@
           "isId": false,
           "isReadOnly": false,
           "type": "Post",
+          "hasDefaultValue": false,
           "relationName": "PostToUser",
           "relationFromFields": [],
           "relationToFields": [],
@@ -53,6 +55,7 @@
           "isId": true,
           "isReadOnly": false,
           "type": "Int",
+          "hasDefaultValue": false,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -65,6 +68,7 @@
           "isId": false,
           "isReadOnly": true,
           "type": "Int",
+          "hasDefaultValue": false,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -77,6 +81,7 @@
           "isId": false,
           "isReadOnly": false,
           "type": "User",
+          "hasDefaultValue": false,
           "relationName": "PostToUser",
           "relationFromFields": [
             "userId"

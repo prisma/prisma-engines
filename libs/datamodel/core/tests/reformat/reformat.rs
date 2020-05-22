@@ -3,6 +3,16 @@ use pretty_assertions::assert_eq;
 use std::str;
 
 #[test]
+fn must_add_new_line_to_end_of_schema() {
+    let input = r#"// a comment"#;
+
+    let expected = r#"// a comment
+"#;
+
+    assert_reformat(input, expected);
+}
+
+#[test]
 fn test_reformat_model_simple() {
     let input = r#"
         model User { 
@@ -452,7 +462,8 @@ model Bl"#;
     let expected = r#"model User {
   id Int @id
 }
-model Bl"#;
+model Bl
+"#;
 
     assert_reformat(input, expected);
 }

@@ -293,16 +293,17 @@ fn relation_must_error_when_referenced_fields_are_multiple_uniques() {
     }
 
     model Post {
-        id Int @id
-        text String
-        userName Int        
+        id       Int    @id
+        text     String
+        userId   Int
+        userName String        
         // the relation is referencing two uniques. That is too much.
-        user User @relation(fields: [userName], references: [id, firstName])
+        user User @relation(fields: [userId, userName], references: [id, firstName])
     }
     "#;
 
     let errors = parse_error(dml);
-    errors.assert_is(DatamodelError::new_validation_error("The argument `references` must refer to a unique criteria in the related model `User`. But it is referencing the following fields that are not a unique criteria: id, firstName", Span::new(261, 330)));
+    errors.assert_is(DatamodelError::new_validation_error("The argument `references` must refer to a unique criteria in the related model `User`. But it is referencing the following fields that are not a unique criteria: id, firstName", Span::new(298, 375)));
 }
 
 #[test]
@@ -323,6 +324,31 @@ fn relation_must_error_when_types_of_base_field_and_referenced_field_do_not_matc
 
     let errors = parse_error(dml);
     errors.assert_is(DatamodelError::new_directive_validation_error("The type of the field `userId` in the model `Post` is not matching the type of the referenced field `id` in model `User`.","@relation", Span::new(204, 265)));
+}
+
+#[test]
+fn relation_must_error_when_number_of_fields_and_references_is_not_equal() {
+    let dml = r#"
+    model User {
+        id        Int @id
+        firstName String
+        posts     Post[]
+    }
+
+    model Post {
+        id       Int     @id
+        userId   Int
+        userName String
+        user     User    @relation(fields: [userId, userName], references: [id])
+    }
+    "#;
+
+    let errors = parse_error(dml);
+    errors.assert_is(DatamodelError::new_directive_validation_error(
+        "You must specify the same number of fields in `fields` and `references`.",
+        "@relation",
+        Span::new(200, 273),
+    ));
 }
 
 #[test]
