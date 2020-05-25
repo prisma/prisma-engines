@@ -328,7 +328,7 @@ fn parse_enum(token: &pest::iterators::Pair<'_, Rule>) -> Result<Enum, ErrorColl
     let mut name: Option<Identifier> = None;
     let mut directives: Vec<Directive> = vec![];
     let mut values: Vec<EnumValue> = vec![];
-    let mut comments: Vec<String> = Vec::new();
+    let mut comment: Option<Comment> = None;
 
     match_children! { token, current,
         Rule::non_empty_identifier => name = Some(current.to_id()),
@@ -339,8 +339,9 @@ fn parse_enum(token: &pest::iterators::Pair<'_, Rule>) -> Result<Enum, ErrorColl
                 Err(err) => errors.push(err)
             }
         },
-        Rule::doc_comment => comments.push(parse_doc_comment(&current)),
-        Rule::doc_comment_and_new_line => comments.push(parse_doc_comment(&current)),
+        Rule::comment_block => {
+            comment = Some(parse_comment_block(&current))
+        },
         Rule::BLOCK_LEVEL_CATCH_ALL => { errors.push(
             DatamodelError::new_validation_error(
                 "This line is not a enum value definition.",
@@ -356,7 +357,7 @@ fn parse_enum(token: &pest::iterators::Pair<'_, Rule>) -> Result<Enum, ErrorColl
             name,
             values,
             directives,
-            documentation: doc_comments_to_string(&comments),
+            documentation: comment,
             span: Span::from_pest(token.as_span()),
         }),
         _ => panic!(
