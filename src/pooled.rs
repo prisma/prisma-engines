@@ -241,11 +241,18 @@ impl Builder {
 
         #[cfg(not(feature = "tracing-log"))]
         {
-            info!("Starting a {} pool with {} connections.", family, self.connection_limit);
+            info!(
+                "Starting a {} pool with up to {} connections.",
+                family, self.connection_limit
+            );
         }
         #[cfg(feature = "tracing-log")]
         {
-            tracing::info!("Starting a {} pool with {} connections.", family, self.connection_limit);
+            tracing::info!(
+                "Starting a {} pool with up to {} connections.",
+                family,
+                self.connection_limit
+            );
         }
 
         let inner = Pool::builder()
