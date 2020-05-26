@@ -16,6 +16,10 @@ async fn introspecting_a_simple_table_with_gql_types_must_work(api: &TestApi) {
                 t.add_column("int", types::integer());
                 t.add_column("string", types::text());
             });
+            migration.create_table("_RelayId", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom("stableModelIdentifier   Integer");
+            });
         })
         .await;
 
