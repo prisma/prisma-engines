@@ -3,8 +3,9 @@ use crate::misc_helpers::*;
 use crate::sanitize_datamodel_names::sanitize_datamodel_names;
 use crate::version_checker::VersionChecker;
 use crate::SqlIntrospectionResult;
-use datamodel::{dml, Datamodel, FieldType, Model};
-use introspection_connector::IntrospectionResult;
+use datamodel::{dml, Datamodel, FieldType, Model, ValueGenerator};
+use introspection_connector::{IntrospectionResult, Version, Warning};
+use prisma_value::PrismaValue;
 use quaint::connector::SqlFamily;
 use sql_schema_describer::*;
 use tracing::debug;
@@ -124,15 +125,124 @@ pub fn calculate_datamodel(schema: &SqlSchema, family: &SqlFamily) -> SqlIntrosp
 
     //todo sanitizing might need to be adjusted to also change the fields in the RelationInfo
     sanitize_datamodel_names(&mut data_model);
-    let warnings = commenting_out_guardrails(&mut data_model);
+
+    let mut warnings: Vec<Warning> = vec![];
+    let mut commenting_out_warnings = commenting_out_guardrails(&mut data_model);
+    warnings.append(commenting_out_warnings.as_mut());
 
     deduplicate_field_names(&mut data_model);
 
-    debug!("Done calculating data model {:?}", data_model);
+    let version = version_check.version(&warnings);
 
+    //--------------------------------------------------------------------------------
+
+    //add testing
+    // Mysql
+    // uuid, cuid
+    // Postgres
+    // uuid, cuid
+
+    let mut needs_to_be_changed = vec![]; //collect all model fields that need to be changed, and their target type
+
+    match version {
+        Version::Prisma1 | Version::Prisma11 => {
+            for model in data_model.models {
+                let id_field = model.fields.iter().find(|f| f.is_id).unwrap();
+                //get column
+                //check type / sql family
+
+                let (cuid, uuid) = match (&tpe.data_type, &tpe.full_data_type, sql_family) {
+                    (char, char25, SqlFamily::Postgres) => needs_to_be_changed.push((
+                        ModelAndField {
+                            model: "".into(),
+                            field: "".into(),
+                        },
+                        true,
+                    )),
+                    (char, char36, SqlFamily::Postgres) => needs_to_be_changed.push((
+                        ModelAndField {
+                            model: "".into(),
+                            field: "".into(),
+                        },
+                        false,
+                    )),
+                    (char, char25, SqlFamily::Mysql) => needs_to_be_changed.push((
+                        ModelAndField {
+                            model: "".into(),
+                            field: "".into(),
+                        },
+                        true,
+                    )),
+                    (char, char36, SqlFamily::Mysql) => needs_to_be_changed.push((
+                        ModelAndField {
+                            model: "".into(),
+                            field: "".into(),
+                        },
+                        false,
+                    )),
+                    _ => (),
+                };
+            }
+        }
+        _ => (),
+    }
+
+    let mut inferred_cuids = vec![];
+    let mut inferred_cuids = vec![];
+
+    //iterate over needs to be changed
+
+    for (mf, cuid) in needs_to_be_changed {
+        if cuid {
+            let field = data_model
+                .models
+                .iter()
+                .find(|m| m.name == mf.model)
+                .unwrap()
+                .fields
+                .find(|f| f.name == mf.field)
+                .unwrap();
+            field.defaultvalue == Some(dml::DefaultValue::Expression(ValueGenerator::new_cuid()));
+            inferred_cuids.push(mf);
+        } else {
+            let field = data_model
+                .models
+                .iter()
+                .find(|m| m.name == mf.model)
+                .unwrap()
+                .fields
+                .find(|f| f.name == mf.field)
+                .unwrap();
+            field.defaultvalue == Some(dml::DefaultValue::Expression(ValueGenerator::new_uuid()));
+            inferred_uuids.push(mf);
+        }
+    }
+
+    if !inferred_cuids.is_empty() {
+        warnings.push(Warning {
+            code: 5,
+            message:
+                "These id fields had a `@default(cuid())` added because we believe the schema was created by Prisma 1."
+                    .into(),
+            affected: serde_json::to_value(&inferred_cuids).unwrap(),
+        })
+    }
+
+    if !inferred_uuids.is_empty() {
+        warnings.push(Warning {
+            code: 5,
+            message:
+                "These id fields had a `@default(uuid())` added because we believe the schema was created by Prisma 1."
+                    .into(),
+            affected: serde_json::to_value(&inferred_uuids).unwrap(),
+        })
+    }
+    //--------------------------------------------------------------------
+
+    debug!("Done calculating data model {:?}", data_model);
     Ok(IntrospectionResult {
         datamodel: data_model,
-        version: version_check.version(&warnings),
+        version,
         warnings,
     })
 }
