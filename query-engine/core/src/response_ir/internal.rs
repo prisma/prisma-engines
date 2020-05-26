@@ -188,7 +188,7 @@ fn serialize_objects(
 
     // Write all fields, nested and list fields unordered into a map, afterwards order all into the final order.
     // If nothing is written to the object, write null instead.
-    for record in dbg!(result.scalars.records).into_iter() {
+    for record in result.scalars.records.into_iter() {
         let record_id = Some(record.projection(&scalar_db_field_names, &result.model_id)?);
 
         if !object_mapping.contains_key(&record.parent_id) {
@@ -203,7 +203,6 @@ fn serialize_objects(
             let field = typ.find_field(scalar_field_name).unwrap();
 
             if !field.field_type.is_object() {
-                dbg!(scalar_field_name);
                 object.insert(scalar_field_name.to_owned(), serialize_scalar(val, &field.field_type)?);
             }
         }
@@ -299,8 +298,6 @@ fn process_nested_results(
 }
 
 fn serialize_scalar(value: PrismaValue, typ: &OutputTypeRef) -> crate::Result<Item> {
-    dbg!(&value);
-    dbg!(typ);
     match (&value, typ.as_ref()) {
         (PrismaValue::Null, OutputType::Opt(_)) => Ok(Item::Value(PrismaValue::Null)),
         (_, OutputType::Opt(inner)) => serialize_scalar(value, inner),
