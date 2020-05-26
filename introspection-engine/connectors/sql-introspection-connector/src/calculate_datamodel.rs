@@ -22,6 +22,7 @@ pub fn calculate_datamodel(schema: &SqlSchema, family: &SqlFamily) -> SqlIntrosp
         .filter(|table| !is_migration_table(&table))
         .filter(|table| !is_prisma_1_point_1_or_2_join_table(&table))
         .filter(|table| !is_prisma_1_point_0_join_table(&table))
+        .filter(|table| !is_relay_table(&table))
     {
         debug!("Calculating model: {}", table.name);
         let mut model = Model::new(table.name.clone(), None);
