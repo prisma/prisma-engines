@@ -48,7 +48,13 @@ pub fn collect_selection_order(from: &[ParsedField]) -> Vec<String> {
 pub fn collect_selected_fields(from: &[ParsedField], model: &ModelRef) -> ModelProjection {
     let selected_fields = from
         .iter()
-        .map(|selected_field| model.fields().find_from_all(&selected_field.name).unwrap().clone())
+        .filter_map(|selected_field| {
+            model
+                .fields()
+                .find_from_scalar(&selected_field.name)
+                .ok()
+                .map(|sf| sf.into())
+        })
         .collect::<Vec<Field>>();
 
     let selected_projection = ModelProjection::new(selected_fields);
