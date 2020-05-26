@@ -1,29 +1,110 @@
-datasource db {
-  provider = "postgresql"
-  url      = "postgresql://postgres:prisma@localhost:5432"
+datasource chinook {
+  provider = "sqlite"
+  url      = "file:./db/Chinook.db"
 }
 
-model User {
-  id                  String   @default(cuid()) @id
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
-  updatedBy           String?
-  updatedByUser       User?    @relation("UserUpdatedByToUser", fields: [updatedBy], references: [id])
-  active              Boolean  @default(true)
-  email               String   @unique
-  name                String?
-  registryAccessToken String   @unique
-  User                User[]   @relation("UserUpdatedByToUser")
+model Album {
+  id       Int     @id @map("AlbumId")
+  Title    String  @default("TestDefaultTitle")
+  ArtistId Int
+  Tracks   Track[]
+  Artist   Artist  @relation(fields: [ArtistId], references: [id])
 }
 
-model ModelA {
-  id   String  @default(cuid()) @id
-  test Boolean @default(true)
-  b_id String?
-  b    ModelB? @relation(fields: [b_id], references: [id])
+model Track {
+  id           Int           @id @map("TrackId")
+  Name         String
+  Composer     String?
+  Milliseconds Int
+  UnitPrice    Float
+  AlbumId      Int?
+  GenreId      Int?
+  MediaTypeId  Int
+  MediaType    MediaType     @relation(fields: [MediaTypeId], references: [id])
+  Genre        Genre?        @relation(fields: [GenreId], references: [id])
+  Album        Album?        @relation(fields: [AlbumId], references: [id])
+  InvoiceLines InvoiceLine[]
 }
 
-model ModelB {
-  id  String  @default(cuid()) @id
-  gql String?
+model MediaType {
+  id    Int     @id @map("MediaTypeId")
+  Name  String?
+  Track Track[]
+}
+
+model Genre {
+  id     Int     @id @map("GenreId")
+  Name   String?
+  Tracks Track[]
+}
+
+model Artist {
+  id     Int     @id @map("ArtistId")
+  Name   String?
+  Albums Album[]
+}
+
+model Customer {
+  id           Int       @id @map("CustomerId")
+  FirstName    String
+  LastName     String
+  Company      String?
+  Address      String?
+  City         String?
+  State        String?
+  Country      String?
+  PostalCode   String?
+  Phone        String?
+  Fax          String?
+  Email        String
+  SupportRepId Int?
+  SupportRep   Employee? @relation(fields: [SupportRepId], references: [id])
+  Invoices     Invoice[]
+}
+
+model Employee {
+  id         Int        @id @map("EmployeeId")
+  FirstName  String
+  LastName   String
+  Title      String?
+  BirthDate  DateTime?
+  HireDate   DateTime?
+  Address    String?
+  City       String?
+  State      String?
+  Country    String?
+  PostalCode String?
+  Phone      String?
+  Fax        String?
+  Email      String?
+  Customers  Customer[]
+}
+
+model Invoice {
+  id                Int           @id @map("InvoiceId")
+  InvoiceDate       DateTime
+  BillingAddress    String?
+  BillingCity       String?
+  BillingState      String?
+  BillingCountry    String?
+  BillingPostalCode String?
+  Total             Float
+  CustomerId        Int
+  Customer          Customer      @relation(fields: [CustomerId], references: [id])
+  Lines             InvoiceLine[]
+}
+
+model InvoiceLine {
+  id        Int     @id @map("InvoiceLineId")
+  UnitPrice Float
+  Quantity  Int
+  InvoiceId Int
+  TrackId   Int
+  Invoice   Invoice @relation(fields: [InvoiceId], references: [id])
+  Track     Track   @relation(fields: [TrackId], references: [id])
+}
+
+model Playlist {
+  id   Int     @id @map("PlaylistId")
+  Name String?
 }
