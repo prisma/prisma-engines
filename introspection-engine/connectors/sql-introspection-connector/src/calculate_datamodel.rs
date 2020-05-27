@@ -5,7 +5,6 @@ use crate::version_checker::VersionChecker;
 use crate::SqlIntrospectionResult;
 use datamodel::{dml, Datamodel, FieldType, Model, ValueGenerator};
 use introspection_connector::{IntrospectionResult, Version, Warning};
-use prisma_value::PrismaValue;
 use quaint::connector::SqlFamily;
 use sql_schema_describer::*;
 use tracing::debug;
@@ -135,48 +134,62 @@ pub fn calculate_datamodel(schema: &SqlSchema, family: &SqlFamily) -> SqlIntrosp
     let version = version_check.version(&warnings);
 
     //--------------------------------------------------------------------------------
-
+    use crate::commenting_out_guardrails::ModelAndField;
     //add testing
     // Mysql
     // uuid, cuid
     // Postgres
     // uuid, cuid
 
+    //fetch character maximum length for postgres https://www.postgresql.org/docs/9.5/infoschema-columns.html
+
     let mut needs_to_be_changed = vec![]; //collect all model fields that need to be changed, and their target type
 
+    let varchar = "varchar".to_string();
+    let varchar_25 = "varchar(25)".to_string();
+    let varchar_36 = "varchar(36)".to_string();
     match version {
-        Version::Prisma1 | Version::Prisma11 => {
-            for model in data_model.models {
+        _ => {
+            // Version::Prisma1 | Version::Prisma11 => {
+            for model in &data_model.models {
                 let id_field = model.fields.iter().find(|f| f.is_id).unwrap();
-                //get column
-                //check type / sql family
+                let table = schema.tables.iter().find(|t| t.name == model.name).unwrap();
+                let column = table
+                    .columns
+                    .iter()
+                    .find(|c| &c.name == id_field.database_name.as_ref().unwrap_or(&id_field.name))
+                    .unwrap();
 
-                let (cuid, uuid) = match (&tpe.data_type, &tpe.full_data_type, sql_family) {
-                    (char, char25, SqlFamily::Postgres) => needs_to_be_changed.push((
+                println!("{}", &column.tpe.data_type);
+                println!("{}", &column.tpe.full_data_type);
+                match (&column.tpe.data_type, &column.tpe.full_data_type, family) {
+                    (dt, fdt, SqlFamily::Postgres) if *dt == varchar && *fdt == varchar_25 => {
+                        needs_to_be_changed.push((
+                            ModelAndField {
+                                model: model.name.clone(),
+                                field: id_field.name.clone(),
+                            },
+                            true,
+                        ))
+                    }
+                    (varchar, varchar25, SqlFamily::Postgres) => needs_to_be_changed.push((
                         ModelAndField {
-                            model: "".into(),
-                            field: "".into(),
-                        },
-                        true,
-                    )),
-                    (char, char36, SqlFamily::Postgres) => needs_to_be_changed.push((
-                        ModelAndField {
-                            model: "".into(),
-                            field: "".into(),
+                            model: model.name.clone(),
+                            field: id_field.name.clone(),
                         },
                         false,
                     )),
-                    (char, char25, SqlFamily::Mysql) => needs_to_be_changed.push((
+                    (dt, fdt, SqlFamily::Mysql) if *dt == varchar && *fdt == varchar_25 => needs_to_be_changed.push((
                         ModelAndField {
-                            model: "".into(),
-                            field: "".into(),
+                            model: model.name.clone(),
+                            field: id_field.name.clone(),
                         },
                         true,
                     )),
-                    (char, char36, SqlFamily::Mysql) => needs_to_be_changed.push((
+                    (dt, fdt, SqlFamily::Mysql) if *dt == varchar && *fdt == varchar_36 => needs_to_be_changed.push((
                         ModelAndField {
-                            model: "".into(),
-                            field: "".into(),
+                            model: model.name.clone(),
+                            field: id_field.name.clone(),
                         },
                         false,
                     )),
@@ -188,32 +201,21 @@ pub fn calculate_datamodel(schema: &SqlSchema, family: &SqlFamily) -> SqlIntrosp
     }
 
     let mut inferred_cuids = vec![];
-    let mut inferred_cuids = vec![];
+    let mut inferred_uuids = vec![];
 
     //iterate over needs to be changed
 
     for (mf, cuid) in needs_to_be_changed {
+        let field = &mut data_model
+            .find_model_mut(&mf.model)
+            .unwrap()
+            .find_field_mut(&mf.field)
+            .unwrap();
         if cuid {
-            let field = data_model
-                .models
-                .iter()
-                .find(|m| m.name == mf.model)
-                .unwrap()
-                .fields
-                .find(|f| f.name == mf.field)
-                .unwrap();
-            field.defaultvalue == Some(dml::DefaultValue::Expression(ValueGenerator::new_cuid()));
+            field.default_value = Some(dml::DefaultValue::Expression(ValueGenerator::new_cuid()));
             inferred_cuids.push(mf);
         } else {
-            let field = data_model
-                .models
-                .iter()
-                .find(|m| m.name == mf.model)
-                .unwrap()
-                .fields
-                .find(|f| f.name == mf.field)
-                .unwrap();
-            field.defaultvalue == Some(dml::DefaultValue::Expression(ValueGenerator::new_uuid()));
+            field.default_value = Some(dml::DefaultValue::Expression(ValueGenerator::new_uuid()));
             inferred_uuids.push(mf);
         }
     }
@@ -230,7 +232,7 @@ pub fn calculate_datamodel(schema: &SqlSchema, family: &SqlFamily) -> SqlIntrosp
 
     if !inferred_uuids.is_empty() {
         warnings.push(Warning {
-            code: 5,
+            code: 6,
             message:
                 "These id fields had a `@default(uuid())` added because we believe the schema was created by Prisma 1."
                     .into(),
