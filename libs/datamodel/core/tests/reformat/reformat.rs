@@ -109,6 +109,44 @@ model Two {
 }
 
 #[test]
+fn a_comment_in_datasource_must_not_add_extra_newlines() {
+    let input = r#"
+        datasource pg { 
+            provider = "postgresql"
+            url = "postgresql://"
+            // a comment
+        }
+    "#;
+
+    let expected = r#"datasource pg {
+  provider = "postgresql"
+  url      = "postgresql://"
+  // a comment
+}
+"#;
+
+    assert_reformat(input, expected);
+}
+
+#[test]
+fn a_comment_in_generator_must_not_add_extra_newlines() {
+    let input = r#"
+        generator js { 
+            provider = "js"
+            // a comment
+        }
+    "#;
+
+    let expected = r#"generator js {
+  provider = "js"
+  // a comment
+}
+"#;
+
+    assert_reformat(input, expected);
+}
+
+#[test]
 fn test_reformat_config() {
     let input = r#"
         datasource pg { 
