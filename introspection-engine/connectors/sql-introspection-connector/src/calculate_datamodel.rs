@@ -135,24 +135,20 @@ pub fn calculate_datamodel(schema: &SqlSchema, family: &SqlFamily) -> SqlIntrosp
 
     //--------------------------------------------------------------------------------
     use crate::commenting_out_guardrails::ModelAndField;
-
-    //fetch character maximum length for postgres https://www.postgresql.org/docs/9.5/infoschema-columns.html
-
     let mut needs_to_be_changed = vec![];
 
-    let varchar = "varchar".to_string();
-    let character_varying = "character varying".to_string();
-    let varchar_25 = "varchar(25)".to_string();
-    let varchar_36 = "varchar(36)".to_string();
+    let varchar = "varchar";
+    let character_varying = "character varying";
+    let varchar_25 = "varchar(25)";
+    let varchar_36 = "varchar(36)";
+
     match version {
-        _ => {
-            //todo  Version::Prisma1 | Version::Prisma11 => {
+        Version::Prisma1 | Version::Prisma11 => {
             for model in &data_model.models {
                 let id_field = model.fields.iter().find(|f| f.is_id).unwrap();
                 let table = schema.table(&model.name).unwrap();
-                let column = table
-                    .column(id_field.database_name.as_ref().unwrap_or(&id_field.name))
-                    .unwrap();
+                let column_name = id_field.database_name.as_ref().unwrap_or(&id_field.name);
+                let column = table.column(column_name).unwrap();
 
                 let model_and_field = ModelAndField {
                     model: model.name.clone(),
@@ -167,16 +163,16 @@ pub fn calculate_datamodel(schema: &SqlSchema, family: &SqlFamily) -> SqlIntrosp
                     &column.tpe.character_maximum_length,
                     family,
                 ) {
-                    (dt, fdt, Some(25), SqlFamily::Postgres) if *dt == character_varying && *fdt == varchar => {
+                    (dt, fdt, Some(25), SqlFamily::Postgres) if dt == character_varying && fdt == varchar => {
                         needs_to_be_changed.push((model_and_field, true))
                     }
-                    (dt, fdt, Some(36), SqlFamily::Postgres) if *dt == character_varying && *fdt == varchar => {
+                    (dt, fdt, Some(36), SqlFamily::Postgres) if dt == character_varying && fdt == varchar => {
                         needs_to_be_changed.push((model_and_field, false))
                     }
-                    (dt, fdt, Some(25), SqlFamily::Mysql) if *dt == varchar && *fdt == varchar_25 => {
+                    (dt, fdt, Some(25), SqlFamily::Mysql) if dt == varchar && fdt == varchar_25 => {
                         needs_to_be_changed.push((model_and_field, true))
                     }
-                    (dt, fdt, Some(36), SqlFamily::Mysql) if *dt == varchar && *fdt == varchar_36 => {
+                    (dt, fdt, Some(36), SqlFamily::Mysql) if dt == varchar && fdt == varchar_36 => {
                         needs_to_be_changed.push((model_and_field, false))
                     }
                     _ => (),

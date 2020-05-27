@@ -202,7 +202,6 @@ async fn get_all_columns(
 
     for col in rows {
         debug!("Got column: {:?}", col);
-        println!("{:?}", col);
         let table_name = col
             .get("table_name")
             .and_then(|x| x.to_string())

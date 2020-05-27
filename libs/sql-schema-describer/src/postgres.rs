@@ -160,7 +160,6 @@ impl SqlSchemaDescriber {
 
         for col in rows {
             debug!("Got column: {:?}", col);
-            println!("{:?}", col);
             let table_name = col
                 .get("table_name")
                 .and_then(|x| x.to_string())
@@ -203,11 +202,6 @@ impl SqlSchemaDescriber {
             } else {
                 ColumnArity::Nullable
             };
-
-            // let character_maximum_length = match character_maximum_length.as_ref() {
-            //     "null" => None,
-            //     x => Some(x.parse::<u64>().unwrap()),
-            // };
 
             let tpe = get_column_type(
                 data_type.as_ref(),
