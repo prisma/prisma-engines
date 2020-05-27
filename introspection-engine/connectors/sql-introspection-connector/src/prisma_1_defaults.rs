@@ -22,7 +22,8 @@ pub fn add_prisma_1_id_defaults(
         Version::Prisma1 | Version::Prisma11 => {
             for model in &data_model.models {
                 let id_field = model.fields.iter().find(|f| f.is_id).unwrap();
-                let table = schema.table(&model.name).unwrap();
+                let table_name = model.database_name.as_ref().unwrap_or(&model.name);
+                let table = schema.table(table_name).unwrap();
                 let column_name = id_field.database_name.as_ref().unwrap_or(&id_field.name);
                 let column = table.column(column_name).unwrap();
 
