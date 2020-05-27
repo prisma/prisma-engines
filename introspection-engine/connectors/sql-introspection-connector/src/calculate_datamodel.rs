@@ -60,6 +60,7 @@ pub fn calculate_datamodel(schema: &SqlSchema, family: &SqlFamily) -> SqlIntrosp
         }
 
         version_check.always_has_created_at_updated_at(table, &model);
+        version_check.always_has_singular_id(table, &model);
 
         data_model.add_model(model);
     }
@@ -133,6 +134,7 @@ pub fn calculate_datamodel(schema: &SqlSchema, family: &SqlFamily) -> SqlIntrosp
 
     let version = version_check.version(&warnings);
 
+    //todo move this
     //--------------------------------------------------------------------------------
     use crate::commenting_out_guardrails::ModelAndField;
     let mut needs_to_be_changed = vec![];

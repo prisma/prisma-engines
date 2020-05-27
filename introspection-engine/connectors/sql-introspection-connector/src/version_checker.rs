@@ -14,6 +14,7 @@ pub struct VersionChecker {
     has_prisma_1_1_or_2_join_table: bool,
     uses_on_delete: bool,
     always_has_created_at_updated_at: bool,
+    always_has_singular_id: bool,
     uses_non_prisma_types: bool,
     has_inline_relations: bool,
 }
@@ -66,6 +67,7 @@ impl VersionChecker {
                 .any(|table| is_prisma_1_point_1_or_2_join_table(&table)),
             uses_on_delete: false,
             always_has_created_at_updated_at: true,
+            always_has_singular_id: true,
             uses_non_prisma_types: false,
             has_inline_relations: false,
         }
@@ -100,6 +102,12 @@ impl VersionChecker {
         }
     }
 
+    pub fn always_has_singular_id(&mut self, table: &Table, model: &Model) {
+        if !is_prisma_1_or_11_list_table(table) && !is_relay_table(table) && !model.has_single_id_field() {
+            self.always_has_singular_id = false
+        }
+    }
+
     pub fn version(&self, warnings: &Vec<Warning>) -> Version {
         match self.sql_family {
             SqlFamily::Sqlite
@@ -124,6 +132,7 @@ impl VersionChecker {
                     && !self.uses_on_delete
                     && !self.uses_non_prisma_types
                     && self.always_has_created_at_updated_at
+                    && self.always_has_singular_id
                     && !self.has_prisma_1_1_or_2_join_table
                     && !self.has_inline_relations
                     && warnings.is_empty() =>
@@ -134,6 +143,7 @@ impl VersionChecker {
                 if !self.migration_table
                     && !self.uses_on_delete
                     && !self.uses_non_prisma_types
+                    && self.always_has_singular_id
                     && !self.has_prisma_1_join_table
                     && warnings.is_empty() =>
             {
@@ -155,6 +165,7 @@ impl VersionChecker {
                     && self.always_has_created_at_updated_at
                     && !self.has_prisma_1_join_table
                     && !self.has_inline_relations
+                    && self.always_has_singular_id
                     && warnings.is_empty() =>
             {
                 Version::Prisma1
@@ -164,6 +175,7 @@ impl VersionChecker {
                     && !self.uses_on_delete
                     && !self.uses_non_prisma_types
                     && !self.has_prisma_1_1_or_2_join_table
+                    && self.always_has_singular_id
                     && warnings.is_empty() =>
             {
                 Version::Prisma11

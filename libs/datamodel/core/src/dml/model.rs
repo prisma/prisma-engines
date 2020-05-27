@@ -198,6 +198,11 @@ impl Model {
         self.fields().filter(|x| x.is_id)
     }
 
+    /// Determines whether there is a singular primary key
+    pub fn has_single_id_field(&self) -> bool {
+        self.singular_id_fields().count() == 1
+    }
+
     /// Finds a field with a certain relation guarantee.
     /// exclude_field are necessary to avoid corner cases with self-relations (e.g. we must not recognize a field as its own related field).
     pub fn related_field(&self, to: &str, relation_name: &str, exclude_field: &str) -> Option<&Field> {
