@@ -1,10 +1,11 @@
 use crate::commenting_out_guardrails::commenting_out_guardrails;
 use crate::misc_helpers::*;
+use crate::prisma_1_defaults::*;
 use crate::sanitize_datamodel_names::sanitize_datamodel_names;
 use crate::version_checker::VersionChecker;
 use crate::SqlIntrospectionResult;
-use datamodel::{dml, Datamodel, FieldType, Model, ValueGenerator};
-use introspection_connector::{IntrospectionResult, Version, Warning};
+use datamodel::{dml, Datamodel, FieldType, Model};
+use introspection_connector::{IntrospectionResult, Warning};
 use quaint::connector::SqlFamily;
 use sql_schema_describer::*;
 use tracing::debug;
@@ -134,94 +135,7 @@ pub fn calculate_datamodel(schema: &SqlSchema, family: &SqlFamily) -> SqlIntrosp
 
     let version = version_check.version(&warnings);
 
-    //todo move this
-    //--------------------------------------------------------------------------------
-    use crate::commenting_out_guardrails::ModelAndField;
-    let mut needs_to_be_changed = vec![];
-
-    let varchar = "varchar";
-    let character_varying = "character varying";
-    let varchar_25 = "varchar(25)";
-    let varchar_36 = "varchar(36)";
-
-    match version {
-        Version::Prisma1 | Version::Prisma11 => {
-            for model in &data_model.models {
-                let id_field = model.fields.iter().find(|f| f.is_id).unwrap();
-                let table = schema.table(&model.name).unwrap();
-                let column_name = id_field.database_name.as_ref().unwrap_or(&id_field.name);
-                let column = table.column(column_name).unwrap();
-
-                let model_and_field = ModelAndField {
-                    model: model.name.clone(),
-                    field: id_field.name.clone(),
-                };
-
-                println!("{}", &column.tpe.data_type);
-                println!("{}", &column.tpe.full_data_type);
-                match (
-                    &column.tpe.data_type,
-                    &column.tpe.full_data_type,
-                    &column.tpe.character_maximum_length,
-                    family,
-                ) {
-                    (dt, fdt, Some(25), SqlFamily::Postgres) if dt == character_varying && fdt == varchar => {
-                        needs_to_be_changed.push((model_and_field, true))
-                    }
-                    (dt, fdt, Some(36), SqlFamily::Postgres) if dt == character_varying && fdt == varchar => {
-                        needs_to_be_changed.push((model_and_field, false))
-                    }
-                    (dt, fdt, Some(25), SqlFamily::Mysql) if dt == varchar && fdt == varchar_25 => {
-                        needs_to_be_changed.push((model_and_field, true))
-                    }
-                    (dt, fdt, Some(36), SqlFamily::Mysql) if dt == varchar && fdt == varchar_36 => {
-                        needs_to_be_changed.push((model_and_field, false))
-                    }
-                    _ => (),
-                };
-            }
-        }
-        _ => (),
-    }
-
-    let mut inferred_cuids = vec![];
-    let mut inferred_uuids = vec![];
-
-    for (mf, cuid) in needs_to_be_changed {
-        let field = &mut data_model
-            .find_model_mut(&mf.model)
-            .unwrap()
-            .find_field_mut(&mf.field)
-            .unwrap();
-        if cuid {
-            field.default_value = Some(dml::DefaultValue::Expression(ValueGenerator::new_cuid()));
-            inferred_cuids.push(mf);
-        } else {
-            field.default_value = Some(dml::DefaultValue::Expression(ValueGenerator::new_uuid()));
-            inferred_uuids.push(mf);
-        }
-    }
-
-    if !inferred_cuids.is_empty() {
-        warnings.push(Warning {
-            code: 5,
-            message:
-                "These id fields had a `@default(cuid())` added because we believe the schema was created by Prisma 1."
-                    .into(),
-            affected: serde_json::to_value(&inferred_cuids).unwrap(),
-        })
-    }
-
-    if !inferred_uuids.is_empty() {
-        warnings.push(Warning {
-            code: 6,
-            message:
-                "These id fields had a `@default(uuid())` added because we believe the schema was created by Prisma 1."
-                    .into(),
-            affected: serde_json::to_value(&inferred_uuids).unwrap(),
-        })
-    }
-    //--------------------------------------------------------------------
+    add_prisma_1_id_defaults(family, &version, &mut data_model, schema, &mut warnings);
 
     debug!("Done calculating data model {:?}", data_model);
     Ok(IntrospectionResult {

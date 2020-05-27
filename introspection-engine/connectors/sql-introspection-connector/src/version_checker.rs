@@ -27,7 +27,6 @@ const SQLITE_TYPES: [(&'static str, &'static str); 5] = [
     ("TEXT", "TEXT"),
 ];
 
-//todo adjust tests for added types
 const POSTGRES_TYPES: [(&'static str, &'static str); 9] = [
     ("boolean", "bool"),
     ("timestamp without time zone", "timestamp"),
