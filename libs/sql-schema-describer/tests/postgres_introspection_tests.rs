@@ -72,6 +72,8 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "ARRAY".into(),
                 full_data_type: "_bytea".into(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::Binary,
                 arity: ColumnArity::List,
             },
@@ -83,6 +85,8 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "ARRAY".into(),
                 full_data_type: "_bool".into(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::Boolean,
                 arity: ColumnArity::List,
             },
@@ -94,6 +98,8 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "ARRAY".into(),
                 full_data_type: "_date".into(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::DateTime,
                 arity: ColumnArity::List,
             },
@@ -105,6 +111,8 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "ARRAY".into(),
                 full_data_type: "_float8".into(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::Float,
                 arity: ColumnArity::List,
             },
@@ -116,6 +124,8 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "ARRAY".into(),
                 full_data_type: "_float8".into(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::Float,
                 arity: ColumnArity::List,
             },
@@ -127,6 +137,8 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "ARRAY".into(),
                 full_data_type: "_int4".into(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::List,
             },
@@ -138,6 +150,8 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "ARRAY".into(),
                 full_data_type: "_text".into(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::List,
             },
@@ -149,6 +163,8 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "ARRAY".into(),
                 full_data_type: "_varchar".into(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::List,
             },
@@ -160,6 +176,8 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "bytea".into(),
                 full_data_type: "bytea".into(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::Binary,
                 arity: ColumnArity::Required,
             },
@@ -171,6 +189,8 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "boolean".into(),
                 full_data_type: "bool".into(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::Boolean,
                 arity: ColumnArity::Required,
             },
@@ -182,6 +202,8 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "date".into(),
                 full_data_type: "date".into(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::DateTime,
                 arity: ColumnArity::Required,
             },
@@ -194,6 +216,8 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "double precision".into(),
                 full_data_type: "float8".into(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::Float,
                 arity: ColumnArity::Required,
             },
@@ -206,6 +230,8 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "double precision".into(),
                 full_data_type: "float8".into(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::Float,
                 arity: ColumnArity::Required,
             },
@@ -218,6 +244,8 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "integer".into(),
                 full_data_type: "int4".into(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
             },
@@ -230,6 +258,8 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "integer".into(),
                 full_data_type: "int4".into(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
             },
@@ -245,6 +275,8 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "text".into(),
                 full_data_type: "text".into(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
             },
@@ -257,6 +289,8 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "character varying".into(),
                 full_data_type: "varchar".into(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
             },
@@ -269,6 +303,8 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "bigint".into(),
                 full_data_type: "int8".into(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
             },
@@ -281,6 +317,8 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "bigint".into(),
                 full_data_type: "int8".into(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
             },
@@ -296,6 +334,8 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "bit".into(),
                 full_data_type: "bit".into(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
             },
@@ -308,6 +348,8 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "bit varying".into(),
                 full_data_type: "varbit".into(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
             },
@@ -320,6 +362,8 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "box".into(),
                 full_data_type: "box".into(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::Geometric,
                 arity: ColumnArity::Required,
             },
@@ -332,6 +376,8 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "character".into(),
                 full_data_type: "bpchar".into(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
             },
@@ -344,6 +390,8 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "circle".into(),
                 full_data_type: "circle".into(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::Geometric,
                 arity: ColumnArity::Required,
             },
@@ -356,6 +404,8 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "interval".into(),
                 full_data_type: "interval".into(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
             },
@@ -368,6 +418,8 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "line".into(),
                 full_data_type: "line".into(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::Geometric,
                 arity: ColumnArity::Required,
             },
@@ -380,6 +432,8 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "lseg".into(),
                 full_data_type: "lseg".into(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::Geometric,
                 arity: ColumnArity::Required,
             },
@@ -392,6 +446,8 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "numeric".into(),
                 full_data_type: "numeric".into(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::Float,
                 arity: ColumnArity::Required,
             },
@@ -404,6 +460,8 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "path".into(),
                 full_data_type: "path".into(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::Geometric,
                 arity: ColumnArity::Required,
             },
@@ -416,6 +474,8 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "pg_lsn".into(),
                 full_data_type: "pg_lsn".into(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::LogSequenceNumber,
                 arity: ColumnArity::Required,
             },
@@ -428,6 +488,8 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "polygon".into(),
                 full_data_type: "polygon".into(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::Geometric,
                 arity: ColumnArity::Required,
             },
@@ -440,6 +502,8 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "smallint".into(),
                 full_data_type: "int2".into(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
             },
@@ -452,6 +516,8 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "smallint".into(),
                 full_data_type: "int2".into(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
             },
@@ -467,6 +533,8 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "integer".into(),
                 full_data_type: "int4".into(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
             },
@@ -482,6 +550,8 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "time without time zone".into(),
                 full_data_type: "time".into(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::DateTime,
                 arity: ColumnArity::Required,
             },
@@ -494,6 +564,8 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "time with time zone".into(),
                 full_data_type: "timetz".into(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::DateTime,
                 arity: ColumnArity::Required,
             },
@@ -506,6 +578,8 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "timestamp without time zone".into(),
                 full_data_type: "timestamp".into(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::DateTime,
                 arity: ColumnArity::Required,
             },
@@ -518,6 +592,8 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "timestamp with time zone".into(),
                 full_data_type: "timestamptz".into(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::DateTime,
                 arity: ColumnArity::Required,
             },
@@ -530,6 +606,8 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "tsquery".into(),
                 full_data_type: "tsquery".into(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::TextSearch,
                 arity: ColumnArity::Required,
             },
@@ -542,6 +620,8 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "tsvector".into(),
                 full_data_type: "tsvector".into(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::TextSearch,
                 arity: ColumnArity::Required,
             },
@@ -554,6 +634,8 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "txid_snapshot".into(),
                 full_data_type: "txid_snapshot".into(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::TransactionId,
                 arity: ColumnArity::Required,
             },
@@ -566,6 +648,8 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "json".into(),
                 full_data_type: "json".into(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::Json,
                 arity: ColumnArity::Required,
             },
@@ -578,6 +662,8 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "jsonb".into(),
                 full_data_type: "jsonb".into(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::Json,
                 arity: ColumnArity::Required,
             },
@@ -590,6 +676,8 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "uuid".into(),
                 full_data_type: "uuid".into(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::Uuid,
                 arity: ColumnArity::Required,
             },
@@ -654,6 +742,8 @@ async fn postgres_foreign_key_on_delete_must_be_handled() {
                     tpe: ColumnType {
                         data_type: "integer".into(),
                         full_data_type: "int4".into(),
+                        character_maximum_length: None,
+
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
                     },
@@ -665,6 +755,8 @@ async fn postgres_foreign_key_on_delete_must_be_handled() {
                     tpe: ColumnType {
                         data_type: "integer".into(),
                         full_data_type: "int4".into(),
+                        character_maximum_length: None,
+
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
                     },
@@ -676,6 +768,8 @@ async fn postgres_foreign_key_on_delete_must_be_handled() {
                     tpe: ColumnType {
                         data_type: "integer".into(),
                         full_data_type: "int4".into(),
+                        character_maximum_length: None,
+
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
                     },
@@ -687,6 +781,8 @@ async fn postgres_foreign_key_on_delete_must_be_handled() {
                     tpe: ColumnType {
                         data_type: "integer".into(),
                         full_data_type: "int4".into(),
+                        character_maximum_length: None,
+
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
                     },
@@ -698,6 +794,8 @@ async fn postgres_foreign_key_on_delete_must_be_handled() {
                     tpe: ColumnType {
                         data_type: "integer".into(),
                         full_data_type: "int4".into(),
+                        character_maximum_length: None,
+
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
                     },
@@ -709,6 +807,8 @@ async fn postgres_foreign_key_on_delete_must_be_handled() {
                     tpe: ColumnType {
                         data_type: "integer".into(),
                         full_data_type: "int4".into(),
+                        character_maximum_length: None,
+
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Required,
                     },

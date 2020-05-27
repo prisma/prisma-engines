@@ -67,6 +67,7 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "int".to_string(),
                 full_data_type: "int(11)".to_string(),
+                character_maximum_length: None,
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
             },
@@ -79,6 +80,8 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "int".to_string(),
                 full_data_type: "int(11)".to_string(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
             },
@@ -91,6 +94,7 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "smallint".to_string(),
                 full_data_type: "smallint(6)".to_string(),
+                character_maximum_length: None,
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
             },
@@ -103,6 +107,8 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "tinyint".to_string(),
                 full_data_type: "tinyint(4)".to_string(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
             },
@@ -114,6 +120,8 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "tinyint".to_string(),
                 full_data_type: "tinyint(1)".to_string(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::Boolean,
                 arity: ColumnArity::Required,
             },
@@ -126,6 +134,8 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "mediumint".to_string(),
                 full_data_type: "mediumint(9)".to_string(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
             },
@@ -138,6 +148,8 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "bigint".to_string(),
                 full_data_type: "bigint(20)".to_string(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
             },
@@ -150,6 +162,8 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "decimal".to_string(),
                 full_data_type: "decimal(10,0)".to_string(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::Float,
                 arity: ColumnArity::Required,
             },
@@ -162,6 +176,8 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "decimal".to_string(),
                 full_data_type: "decimal(10,0)".to_string(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::Float,
                 arity: ColumnArity::Required,
             },
@@ -174,6 +190,8 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "float".to_string(),
                 full_data_type: "float".to_string(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::Float,
                 arity: ColumnArity::Required,
             },
@@ -186,6 +204,8 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "double".to_string(),
                 full_data_type: "double".to_string(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::Float,
                 arity: ColumnArity::Required,
             },
@@ -198,6 +218,8 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "date".to_string(),
                 full_data_type: "date".to_string(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::DateTime,
                 arity: ColumnArity::Required,
             },
@@ -210,6 +232,8 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "time".to_string(),
                 full_data_type: "time".to_string(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::DateTime,
                 arity: ColumnArity::Required,
             },
@@ -222,6 +246,8 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "datetime".to_string(),
                 full_data_type: "datetime".to_string(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::DateTime,
                 arity: ColumnArity::Required,
             },
@@ -234,6 +260,8 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "timestamp".to_string(),
                 full_data_type: "timestamp".to_string(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::DateTime,
                 arity: ColumnArity::Required,
             },
@@ -246,6 +274,8 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "year".to_string(),
                 full_data_type: "year(4)".to_string(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
             },
@@ -258,6 +288,8 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "char".to_string(),
                 full_data_type: "char(1)".to_string(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
             },
@@ -270,6 +302,8 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "varchar".to_string(),
                 full_data_type: "varchar(255)".to_string(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
             },
@@ -282,6 +316,8 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "text".to_string(),
                 full_data_type: "text".to_string(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
             },
@@ -294,6 +330,8 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "tinytext".to_string(),
                 full_data_type: "tinytext".to_string(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
             },
@@ -306,6 +344,8 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "mediumtext".to_string(),
                 full_data_type: "mediumtext".to_string(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
             },
@@ -318,6 +358,8 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "longtext".to_string(),
                 full_data_type: "longtext".to_string(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
             },
@@ -330,6 +372,8 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "enum".to_string(),
                 full_data_type: "enum(\'a\',\'b\')".to_string(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::Enum("User_enum_col".into()),
                 arity: ColumnArity::Required,
             },
@@ -342,6 +386,8 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "set".to_string(),
                 full_data_type: "set(\'a\',\'b\')".to_string(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
             },
@@ -354,6 +400,8 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "binary".to_string(),
                 full_data_type: "binary(1)".to_string(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::Binary,
                 arity: ColumnArity::Required,
             },
@@ -366,6 +414,8 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "varbinary".to_string(),
                 full_data_type: "varbinary(255)".to_string(),
+                character_maximum_length: Some(255),
+
                 family: ColumnTypeFamily::Binary,
                 arity: ColumnArity::Required,
             },
@@ -378,6 +428,8 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "blob".to_string(),
                 full_data_type: "blob".to_string(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::Binary,
                 arity: ColumnArity::Required,
             },
@@ -390,6 +442,8 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "tinyblob".to_string(),
                 full_data_type: "tinyblob".to_string(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::Binary,
                 arity: ColumnArity::Required,
             },
@@ -402,6 +456,8 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "mediumblob".to_string(),
                 full_data_type: "mediumblob".to_string(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::Binary,
                 arity: ColumnArity::Required,
             },
@@ -414,6 +470,8 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "longblob".to_string(),
                 full_data_type: "longblob".to_string(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::Binary,
                 arity: ColumnArity::Required,
             },
@@ -426,6 +484,8 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "geometry".to_string(),
                 full_data_type: "geometry".to_string(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::Geometric,
                 arity: ColumnArity::Required,
             },
@@ -438,6 +498,8 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "point".to_string(),
                 full_data_type: "point".to_string(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::Geometric,
                 arity: ColumnArity::Required,
             },
@@ -450,6 +512,8 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "linestring".to_string(),
                 full_data_type: "linestring".to_string(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::Geometric,
                 arity: ColumnArity::Required,
             },
@@ -462,6 +526,8 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "polygon".to_string(),
                 full_data_type: "polygon".to_string(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::Geometric,
                 arity: ColumnArity::Required,
             },
@@ -474,6 +540,8 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "multipoint".to_string(),
                 full_data_type: "multipoint".to_string(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::Geometric,
                 arity: ColumnArity::Required,
             },
@@ -486,6 +554,8 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "multilinestring".to_string(),
                 full_data_type: "multilinestring".to_string(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::Geometric,
                 arity: ColumnArity::Required,
             },
@@ -498,6 +568,8 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "multipolygon".to_string(),
                 full_data_type: "multipolygon".to_string(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::Geometric,
                 arity: ColumnArity::Required,
             },
@@ -510,6 +582,8 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "geometrycollection".to_string(),
                 full_data_type: "geometrycollection".to_string(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::Geometric,
                 arity: ColumnArity::Required,
             },
@@ -522,6 +596,8 @@ async fn all_mysql_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "json".to_string(),
                 full_data_type: "json".to_string(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::Json,
                 arity: ColumnArity::Required,
             },
@@ -580,6 +656,8 @@ async fn mysql_foreign_key_on_delete_must_be_handled() {
                     tpe: ColumnType {
                         data_type: "int".to_string(),
                         full_data_type: "int(11)".to_string(),
+                        character_maximum_length: None,
+
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
                     },
@@ -591,6 +669,8 @@ async fn mysql_foreign_key_on_delete_must_be_handled() {
                     tpe: ColumnType {
                         data_type: "int".to_string(),
                         full_data_type: "int(11)".to_string(),
+                        character_maximum_length: None,
+
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
                     },
@@ -602,6 +682,8 @@ async fn mysql_foreign_key_on_delete_must_be_handled() {
                     tpe: ColumnType {
                         data_type: "int".to_string(),
                         full_data_type: "int(11)".to_string(),
+                        character_maximum_length: None,
+
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
                     },
@@ -613,6 +695,8 @@ async fn mysql_foreign_key_on_delete_must_be_handled() {
                     tpe: ColumnType {
                         data_type: "int".to_string(),
                         full_data_type: "int(11)".to_string(),
+                        character_maximum_length: None,
+
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
                     },
@@ -624,6 +708,8 @@ async fn mysql_foreign_key_on_delete_must_be_handled() {
                     tpe: ColumnType {
                         data_type: "int".to_string(),
                         full_data_type: "int(11)".to_string(),
+                        character_maximum_length: None,
+
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Required,
                     },

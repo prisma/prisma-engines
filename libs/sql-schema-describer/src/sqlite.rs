@@ -439,6 +439,7 @@ fn get_column_type(tpe: &str, arity: ColumnArity) -> ColumnType {
     ColumnType {
         data_type: tpe.to_string(),
         full_data_type: tpe.to_string(),
+        character_maximum_length: None,
         family,
         arity,
     }

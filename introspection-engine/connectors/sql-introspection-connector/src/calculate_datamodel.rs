@@ -141,10 +141,12 @@ pub fn calculate_datamodel(schema: &SqlSchema, family: &SqlFamily) -> SqlIntrosp
     let mut needs_to_be_changed = vec![];
 
     let varchar = "varchar".to_string();
+    let character_varying = "character varying".to_string();
     let varchar_25 = "varchar(25)".to_string();
     let varchar_36 = "varchar(36)".to_string();
     match version {
-        Version::Prisma1 | Version::Prisma11 => {
+        _ => {
+            //todo  Version::Prisma1 | Version::Prisma11 => {
             for model in &data_model.models {
                 let id_field = model.fields.iter().find(|f| f.is_id).unwrap();
                 let table = schema.table(&model.name).unwrap();
@@ -159,17 +161,22 @@ pub fn calculate_datamodel(schema: &SqlSchema, family: &SqlFamily) -> SqlIntrosp
 
                 println!("{}", &column.tpe.data_type);
                 println!("{}", &column.tpe.full_data_type);
-                match (&column.tpe.data_type, &column.tpe.full_data_type, family) {
-                    (dt, fdt, SqlFamily::Postgres) if *dt == varchar && *fdt == varchar_25 => {
+                match (
+                    &column.tpe.data_type,
+                    &column.tpe.full_data_type,
+                    &column.tpe.character_maximum_length,
+                    family,
+                ) {
+                    (dt, fdt, Some(25), SqlFamily::Postgres) if *dt == character_varying && *fdt == varchar => {
                         needs_to_be_changed.push((model_and_field, true))
                     }
-                    (dt, fdt, SqlFamily::Postgres) if *dt == varchar && *fdt == varchar_36 => {
+                    (dt, fdt, Some(36), SqlFamily::Postgres) if *dt == character_varying && *fdt == varchar => {
                         needs_to_be_changed.push((model_and_field, false))
                     }
-                    (dt, fdt, SqlFamily::Mysql) if *dt == varchar && *fdt == varchar_25 => {
+                    (dt, fdt, Some(25), SqlFamily::Mysql) if *dt == varchar && *fdt == varchar_25 => {
                         needs_to_be_changed.push((model_and_field, true))
                     }
-                    (dt, fdt, SqlFamily::Mysql) if *dt == varchar && *fdt == varchar_36 => {
+                    (dt, fdt, Some(36), SqlFamily::Mysql) if *dt == varchar && *fdt == varchar_36 => {
                         needs_to_be_changed.push((model_and_field, false))
                     }
                     _ => (),

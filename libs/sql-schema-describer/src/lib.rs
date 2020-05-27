@@ -237,7 +237,7 @@ pub struct ColumnType {
     /// The full SQL data type.
     pub full_data_type: String,
     /// The maximum length for character or string bit types if specified.
-    pub character_maximum_length: Option<u64>,
+    pub character_maximum_length: Option<i64>,
     /// The family of the raw type.
     pub family: ColumnTypeFamily,
     /// The arity of the column.
@@ -245,7 +245,7 @@ pub struct ColumnType {
 }
 
 impl ColumnType {
-    pub fn pure(family: ColumnTypeFamily, arity: ColumnArity) -> ColumnType {
+    pub fn pure(family: ColumnTypeFamily, arity: ColumnArity) -> Self {
         ColumnType {
             data_type: "".to_string(),
             full_data_type: "".to_string(),
