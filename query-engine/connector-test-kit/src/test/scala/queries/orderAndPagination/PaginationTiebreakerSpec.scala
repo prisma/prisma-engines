@@ -23,10 +23,11 @@ class PaginationTiebreakerSpec extends FlatSpec with Matchers with ApiSpecBase {
     createData()
   }
 
-  //region After
-
+  /**
+    * After Cur
+    */
   "After with ties and default order " should "work" in {
-    val initial = server.query("""{users{numFollowers, pos}}""", project)
+    val initial = server.query("""{ users { numFollowers, pos } }""", project)
 
     initial.toString() should be(
       """{"data":{"users":[{"numFollowers":9,"pos":1},{"numFollowers":9,"pos":2},{"numFollowers":9,"pos":3},{"numFollowers":10,"pos":4},{"numFollowers":10,"pos":5},{"numFollowers":10,"pos":6}]}}""")
@@ -35,7 +36,7 @@ class PaginationTiebreakerSpec extends FlatSpec with Matchers with ApiSpecBase {
       .query(
         """
           |query {
-          |  users(  where: {pos: 3}) {
+          |  users(where: { pos: 3 }) {
           |    id
           |    numFollowers
           |    pos
@@ -262,11 +263,11 @@ class PaginationTiebreakerSpec extends FlatSpec with Matchers with ApiSpecBase {
   //endregion
 
   private def createData(): Unit = {
-    server.query("""mutation { createUser(data: {numFollowers: 9, pos: 1}) { id } }""", project)
-    server.query("""mutation { createUser(data: {numFollowers: 9, pos: 2}) { id } }""", project)
-    server.query("""mutation { createUser(data: {numFollowers: 9, pos: 3}) { id } }""", project)
-    server.query("""mutation { createUser(data: {numFollowers: 10, pos: 4}) { id } }""", project)
-    server.query("""mutation { createUser(data: {numFollowers: 10, pos: 5}) { id } }""", project)
-    server.query("""mutation { createUser(data: {numFollowers: 10, pos: 6}) { id } }""", project)
+    server.query("""mutation { createUser(data: { numFollowers: 9, pos: 1 }) { id } }""", project)
+    server.query("""mutation { createUser(data: { numFollowers: 9, pos: 2 }) { id } }""", project)
+    server.query("""mutation { createUser(data: { numFollowers: 9, pos: 3 }) { id } }""", project)
+    server.query("""mutation { createUser(data: { numFollowers: 10, pos: 4 }) { id } }""", project)
+    server.query("""mutation { createUser(data: { numFollowers: 10, pos: 5 }) { id } }""", project)
+    server.query("""mutation { createUser(data: { numFollowers: 10, pos: 6 }) { id } }""", project)
   }
 }

@@ -9,27 +9,19 @@ pub struct SkipAndLimit {
 
 #[derive(Debug, Default, Clone)]
 pub struct QueryArguments {
-    pub after: Option<RecordProjection>,
-    pub before: Option<RecordProjection>,
-    pub skip: Option<i64>,
-    pub first: Option<i64>,
-    pub last: Option<i64>,
+    pub cursor: Option<RecordProjection>,
+    pub take: Option<i64>,
     pub filter: Option<Filter>,
     pub order_by: Option<OrderBy>,
 }
 
 impl QueryArguments {
     fn needs_reversed_order(&self) -> bool {
-        self.last.is_some()
+        self.take.map(|t| t < 0).unwrap_or(false)
     }
 
     fn needs_implicit_ordering(&self) -> bool {
-        self.skip.is_some()
-            || self.after.is_some()
-            || self.first.is_some()
-            || self.before.is_some()
-            || self.last.is_some()
-            || self.order_by.is_some()
+        self.cursor.is_some() || self.take.is_some() || self.order_by.is_some()
     }
 
     pub fn ordering_directions(&self) -> OrderDirections {
@@ -41,7 +33,7 @@ impl QueryArguments {
     }
 
     pub fn is_with_pagination(&self) -> bool {
-        self.last.or(self.first).or(self.skip).is_some()
+        self.take.is_some()
     }
 
     pub fn window_limits(&self) -> (i64, i64) {
