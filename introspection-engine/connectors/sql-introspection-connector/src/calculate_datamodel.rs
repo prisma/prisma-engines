@@ -135,64 +135,43 @@ pub fn calculate_datamodel(schema: &SqlSchema, family: &SqlFamily) -> SqlIntrosp
 
     //--------------------------------------------------------------------------------
     use crate::commenting_out_guardrails::ModelAndField;
-    //add testing
-    // Mysql
-    // uuid, cuid
-    // Postgres
-    // uuid, cuid
 
     //fetch character maximum length for postgres https://www.postgresql.org/docs/9.5/infoschema-columns.html
 
-    let mut needs_to_be_changed = vec![]; //collect all model fields that need to be changed, and their target type
+    let mut needs_to_be_changed = vec![];
 
     let varchar = "varchar".to_string();
     let varchar_25 = "varchar(25)".to_string();
     let varchar_36 = "varchar(36)".to_string();
     match version {
-        _ => {
-            // Version::Prisma1 | Version::Prisma11 => {
+        Version::Prisma1 | Version::Prisma11 => {
             for model in &data_model.models {
                 let id_field = model.fields.iter().find(|f| f.is_id).unwrap();
-                let table = schema.tables.iter().find(|t| t.name == model.name).unwrap();
+                let table = schema.table(&model.name).unwrap();
                 let column = table
-                    .columns
-                    .iter()
-                    .find(|c| &c.name == id_field.database_name.as_ref().unwrap_or(&id_field.name))
+                    .column(id_field.database_name.as_ref().unwrap_or(&id_field.name))
                     .unwrap();
+
+                let model_and_field = ModelAndField {
+                    model: model.name.clone(),
+                    field: id_field.name.clone(),
+                };
 
                 println!("{}", &column.tpe.data_type);
                 println!("{}", &column.tpe.full_data_type);
                 match (&column.tpe.data_type, &column.tpe.full_data_type, family) {
                     (dt, fdt, SqlFamily::Postgres) if *dt == varchar && *fdt == varchar_25 => {
-                        needs_to_be_changed.push((
-                            ModelAndField {
-                                model: model.name.clone(),
-                                field: id_field.name.clone(),
-                            },
-                            true,
-                        ))
+                        needs_to_be_changed.push((model_and_field, true))
                     }
-                    (varchar, varchar25, SqlFamily::Postgres) => needs_to_be_changed.push((
-                        ModelAndField {
-                            model: model.name.clone(),
-                            field: id_field.name.clone(),
-                        },
-                        false,
-                    )),
-                    (dt, fdt, SqlFamily::Mysql) if *dt == varchar && *fdt == varchar_25 => needs_to_be_changed.push((
-                        ModelAndField {
-                            model: model.name.clone(),
-                            field: id_field.name.clone(),
-                        },
-                        true,
-                    )),
-                    (dt, fdt, SqlFamily::Mysql) if *dt == varchar && *fdt == varchar_36 => needs_to_be_changed.push((
-                        ModelAndField {
-                            model: model.name.clone(),
-                            field: id_field.name.clone(),
-                        },
-                        false,
-                    )),
+                    (dt, fdt, SqlFamily::Postgres) if *dt == varchar && *fdt == varchar_36 => {
+                        needs_to_be_changed.push((model_and_field, false))
+                    }
+                    (dt, fdt, SqlFamily::Mysql) if *dt == varchar && *fdt == varchar_25 => {
+                        needs_to_be_changed.push((model_and_field, true))
+                    }
+                    (dt, fdt, SqlFamily::Mysql) if *dt == varchar && *fdt == varchar_36 => {
+                        needs_to_be_changed.push((model_and_field, false))
+                    }
                     _ => (),
                 };
             }
@@ -202,8 +181,6 @@ pub fn calculate_datamodel(schema: &SqlSchema, family: &SqlFamily) -> SqlIntrosp
 
     let mut inferred_cuids = vec![];
     let mut inferred_uuids = vec![];
-
-    //iterate over needs to be changed
 
     for (mf, cuid) in needs_to_be_changed {
         let field = &mut data_model

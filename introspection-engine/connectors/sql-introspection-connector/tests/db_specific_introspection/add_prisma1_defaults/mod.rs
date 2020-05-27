@@ -1,6 +1,8 @@
 use crate::*;
 use test_harness::*;
 
+//todo validate warnings
+
 #[test_each_connector(tags("postgres"))]
 async fn add_cuid_default_for_postgres(api: &TestApi) {
     api.barrel()
