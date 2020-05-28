@@ -27,7 +27,7 @@ pub fn extract_query_args(arguments: Vec<ParsedArgument>, model: &ModelRef) -> Q
                     }),
 
                     "skip" => Ok(QueryArguments {
-                        skip: arg.value.try_into()?,
+                        skip: extract_skip(arg.value)?,
                         ..res
                     }),
 
@@ -53,6 +53,19 @@ pub fn extract_query_args(arguments: Vec<ParsedArgument>, model: &ModelRef) -> Q
                 result
             }
         })
+}
+
+fn extract_skip(value: ParsedInputValue) -> QueryGraphBuilderResult<Option<i64>> {
+    let val: Option<i64> = value.try_into()?;
+
+    match val {
+        Some(val) if val < 0 => Err(QueryGraphBuilderError::AssertionError(format!(
+            "Invalid value for skip argument: Value can only be positive, found: {}",
+            val,
+        ))),
+
+        val => Ok(val),
+    }
 }
 
 fn extract_cursor(value: ParsedInputValue, model: &ModelRef) -> QueryGraphBuilderResult<Option<RecordProjection>> {

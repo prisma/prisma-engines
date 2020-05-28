@@ -23,9 +23,6 @@ class PaginationTiebreakerSpec extends FlatSpec with Matchers with ApiSpecBase {
     createData()
   }
 
-  /**
-    * After Cur
-    */
   "After with ties and default order " should "work" in {
     val initial = server.query("""{ users { numFollowers, pos } }""", project)
 
@@ -55,7 +52,7 @@ class PaginationTiebreakerSpec extends FlatSpec with Matchers with ApiSpecBase {
          |  users(
          |  after: {
          |    id: "$after"
-       |    }
+         |  }
          |  ){numFollowers, pos}
          |}
       """,

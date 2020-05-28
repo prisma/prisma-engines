@@ -29,31 +29,31 @@ pub fn build(query_arguments: &QueryArguments, model: ModelRef) -> ConditionTree
                 .columns(columns.clone())
                 .so_that(where_condition);
 
-            // A negative `take` value
+            // A negative `take` value signifies that values should be taken before the cursor, requiring a different ordering.
             let compare = match (query_arguments.take, sort_order) {
                 (Some(t), SortOrder::Ascending) if t < 0 => order_row
                     .clone()
                     .equals(select_query.clone())
-                    .and(cursor_row.clone().less_than(values))
-                    .or(order_row.less_than(select_query)),
+                    .and(cursor_row.clone().less_than_or_equals(values))
+                    .or(order_row.less_than_or_equals(select_query)),
 
                 (Some(t), SortOrder::Descending) if t < 0 => order_row
                     .clone()
                     .equals(select_query.clone())
-                    .and(cursor_row.clone().less_than(values))
-                    .or(order_row.greater_than(select_query)),
+                    .and(cursor_row.clone().less_than_or_equals(values))
+                    .or(order_row.greater_than_or_equals(select_query)),
 
                 (_, SortOrder::Ascending) => order_row
                     .clone()
                     .equals(select_query.clone())
-                    .and(cursor_row.clone().greater_than(values))
-                    .or(order_row.greater_than(select_query)),
+                    .and(cursor_row.clone().greater_than_or_equals(values))
+                    .or(order_row.greater_than_or_equals(select_query)),
 
                 (_, SortOrder::Descending) => order_row
                     .clone()
                     .equals(select_query.clone())
-                    .and(cursor_row.clone().greater_than(values))
-                    .or(order_row.less_than(select_query)),
+                    .and(cursor_row.clone().greater_than_or_equals(values))
+                    .or(order_row.less_than_or_equals(select_query)),
             };
 
             ConditionTree::single(compare)

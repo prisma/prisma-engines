@@ -35,6 +35,7 @@ pub async fn get_many_records(
     mut query_arguments: QueryArguments,
     selected_fields: &ModelProjection,
 ) -> crate::Result<ManyRecords> {
+    let reversed = query_arguments.needs_reversed_order();
     let field_names = selected_fields.db_names().map(String::from).collect();
     let idents: Vec<_> = selected_fields.type_identifiers_with_arities();
     let mut records = ManyRecords::new(field_names);
@@ -66,6 +67,10 @@ pub async fn get_many_records(
         for item in conn.filter(query.into(), idents.as_slice()).await?.into_iter() {
             records.push(Record::from(item))
         }
+    }
+
+    if reversed {
+        records.reverse();
     }
 
     Ok(records)

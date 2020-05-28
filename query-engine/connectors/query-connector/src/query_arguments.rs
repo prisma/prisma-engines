@@ -17,6 +17,7 @@ pub struct QueryArguments {
 }
 
 impl QueryArguments {
+    // [DTODO] This is a SQL implementation detail leaking into the core abstractions. Needs to move into the SQL connector.
     pub fn needs_reversed_order(&self) -> bool {
         self.take.map(|t| t < 0).unwrap_or(false)
     }
@@ -36,32 +37,6 @@ impl QueryArguments {
     pub fn take_abs(&self) -> Option<i64> {
         self.take.clone().map(|t| if t < 0 { t * -1 } else { t })
     }
-
-    // pub fn is_with_pagination(&self) -> bool {
-    //     self.take.is_some()
-    // }
-
-    // pub fn window_limits(&self) -> (i64, i64) {
-    //     let skip = self.skip.unwrap_or(0) + 1;
-
-    //     match self.last.or(self.first) {
-    //         Some(limited_count) => (skip, limited_count + skip),
-    //         None => (skip, 100_000_000),
-    //     }
-    // }
-
-    // pub fn skip_and_limit(&self) -> SkipAndLimit {
-    //     match self.last.or(self.first) {
-    //         Some(limited_count) => SkipAndLimit {
-    //             skip: self.skip.unwrap_or(0) as usize,
-    //             limit: Some((limited_count + 1) as usize),
-    //         },
-    //         None => SkipAndLimit {
-    //             skip: self.skip.unwrap_or(0) as usize,
-    //             limit: None,
-    //         },
-    //     }
-    // }
 
     pub fn can_batch(&self) -> bool {
         self.filter.as_ref().map(|filter| filter.can_batch()).unwrap_or(false)
