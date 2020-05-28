@@ -1,3 +1,5 @@
+#![deny(missing_docs)]
+
 use super::dmmf;
 use crate::{
     context::PrismaContext,
@@ -14,7 +16,6 @@ use serde_json::json;
 use tide::http::{headers, mime, StatusCode};
 use tide::{Body, Request, Response};
 
-use std::collections::HashMap;
 use std::net::SocketAddr;
 use std::sync::Arc;
 
@@ -35,11 +36,21 @@ impl Clone for State {
 
 /// A builder for `HttpServer`.
 pub struct HttpServerBuilder {
+    /// The address we listen on.
     addr: SocketAddr,
+    /// The server configuration passed.
     config: Configuration,
+    /// The Prisma data model.
     datamodel: Datamodel,
+    /// Are we listening in legacy mode?
     legacy_mode: bool,
+    /// Do we enable raw queries?
+    ///
+    /// Note: this has security implications.
     enable_raw_queries: bool,
+    /// Do we enable the GraphQL playground?
+    ///
+    /// Note: this has security implications.
     enable_playground: bool,
 }
 
@@ -129,7 +140,6 @@ impl HttpServer {
         // trace!("Initialized in {}ms", now.elapsed().as_millis());
 
         info!("Started http server on {}:{}", addr.ip(), addr.port());
-
         app.listen(addr).await?;
         Ok(())
     }
@@ -140,7 +150,7 @@ impl HttpServer {
 async fn graphql_handler(mut req: Request<State>) -> tide::Result {
     let body = req.body_json().await?;
     let path = req.url().path().to_owned();
-    let headers = collect_tide_headers(&req);
+    let headers = req.iter().map(|(k, v)| (format!("{}", k), format!("{}", v))).collect();
     let cx = req.state().cx.clone();
     let req = PrismaRequest { body, path, headers };
     let result = GraphQlRequestHandler.handle(req, &cx).await;
@@ -192,14 +202,7 @@ async fn server_info_handler(req: Request<State>) -> tide::Result {
         "version": env!("CARGO_PKG_VERSION"),
         "primary_connector": req.state().cx.primary_connector(),
     });
-
     let mut res = Response::new(StatusCode::Ok);
     res.set_body(Body::from_json(&body)?);
     Ok(res)
-}
-
-// NOTE(yoshuawuyts): We should expose AsRef<Headers> from Tide directly.
-// But even better would be to pass http_types::Headers down directly.
-fn collect_tide_headers(req: &Request<State>) -> HashMap<String, String> {
-    req.iter().map(|(k, v)| (format!("{}", k), format!("{}", v))).collect()
 }
