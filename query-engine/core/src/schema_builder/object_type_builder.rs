@@ -149,6 +149,7 @@ impl<'a> ObjectTypeBuilder<'a> {
             self.order_by_argument(&model),
             argument("cursor", unique_input_type.clone(), None),
             argument("take", InputType::opt(InputType::int()), None),
+            argument("skip", InputType::opt(InputType::int()), None),
         ]
     }
 
