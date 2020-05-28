@@ -190,7 +190,7 @@ fn optional_list_fields_must_error() {
 }
 
 #[test]
-fn incomplete_last_line_must_error_nicely() {
+fn invalid_lines_at_the_top_level_must_render_nicely() {
     // https://github.com/prisma/vscode/issues/140
     // If a user types on the very last line we did not error nicely.
     // a new line fixed the problem but this is not nice.
@@ -206,6 +206,41 @@ fn incomplete_last_line_must_error_nicely() {
     error.assert_is(DatamodelError::new_validation_error(
         "This line is invalid. It does not start with any known Prisma schema keyword.",
         Span::new(64, 72),
+    ));
+}
+
+#[test]
+fn invalid_lines_in_datasources_must_render_nicely() {
+    let dml = r#"
+    datasource mydb {
+        provider = "postgres"
+        url = "postgresql://localhost"
+        this is an invalid line
+    }
+    "#;
+
+    let error = parse_error(dml);
+
+    error.assert_is(DatamodelError::new_validation_error(
+        "This line is not a valid definition within a datasource.",
+        Span::new(100, 124),
+    ));
+}
+
+#[test]
+fn invalid_lines_in_generators_must_render_nicely() {
+    let dml = r#"
+    generator js {
+        provider = "js"
+        this is an invalid line
+    }
+    "#;
+
+    let error = parse_error(dml);
+
+    error.assert_is(DatamodelError::new_validation_error(
+        "This line is not a valid definition within a generator.",
+        Span::new(52, 76),
     ));
 }
 

@@ -351,6 +351,44 @@ model Post {
 }
 
 #[test]
+fn reformatting_an_invalid_datasource_block_must_work() {
+    let input = r#"datasource db {
+  provider = "postgresql"
+  url = env("POSTGRESQL_URL")
+  test
+}
+"#;
+
+    let expected = r#"datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRESQL_URL")
+  test
+}
+"#;
+
+    assert_reformat(input, expected);
+}
+
+#[test]
+fn reformatting_an_invalid_generator_block_must_work() {
+    let input = r#"generator js {
+  provider = "js"
+  output = "../wherever"
+  test
+}
+"#;
+
+    let expected = r#"generator js {
+  provider = "js"
+  output   = "../wherever"
+  test
+}
+"#;
+
+    assert_reformat(input, expected);
+}
+
+#[test]
 fn incomplete_field_definitions_in_a_model_must_not_get_removed() {
     // incomplete field definitions are handled in a special way in the grammar to allow nice errors. See `nice_error.rs:nice_error_missing_type`
     // Hence the block level catch does not apply here. So we must test this specifically.

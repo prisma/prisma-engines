@@ -41,8 +41,8 @@ type_alias = { comment_block? ~ TYPE_KEYWORD ~ non_empty_identifier ~ "=" ~ (bas
 // ######################################
 // Other kind of blocks
 // ######################################
-source_block = { comment_block? ~ DATASOURCE_KEYWORD ~ non_empty_identifier ~ BLOCK_OPEN ~ (key_value | doc_comment_and_new_line | comment_and_new_line | NEWLINE)* ~ BLOCK_CLOSE }
-generator_block = { comment_block? ~ GENERATOR_KEYWORD ~ non_empty_identifier ~ BLOCK_OPEN ~ (key_value | doc_comment_and_new_line | comment_and_new_line | NEWLINE)* ~ BLOCK_CLOSE }
+source_block = { comment_block? ~ DATASOURCE_KEYWORD ~ non_empty_identifier ~ BLOCK_OPEN ~ (key_value | doc_comment_and_new_line | comment_and_new_line | NEWLINE | BLOCK_LEVEL_CATCH_ALL)* ~ BLOCK_CLOSE }
+generator_block = { comment_block? ~ GENERATOR_KEYWORD ~ non_empty_identifier ~ BLOCK_OPEN ~ (key_value | doc_comment_and_new_line | comment_and_new_line | NEWLINE | BLOCK_LEVEL_CATCH_ALL)* ~ BLOCK_CLOSE }
 key_value = { non_empty_identifier ~ "=" ~ expression ~ NEWLINE }
 
 // a block definition without a keyword. Is not valid. Just acts as a catch for the parser to display a nice error.
