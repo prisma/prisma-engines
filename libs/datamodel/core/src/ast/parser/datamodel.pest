@@ -122,7 +122,7 @@ number = @{ ASCII_DIGIT+ }
 numeric_literal = @{ ("-")? ~ ASCII_DIGIT+ ~("." ~ ASCII_DIGIT+)? }
 
 // String, with support for escaped stuff and interpolations.
-string_escaped_predefined = { "n" | "r" | "t" | "\\" | "0" | "\"" | "'" | INTERPOLATION_START }
+string_escaped_predefined = { "n" | "r" | "t" | "\\" | "0" | "\"" | "'" | SPACE_SEPARATOR | INTERPOLATION_START }
 string_escape     = { "\\" ~ string_escaped_predefined }
 // This is only used to escape the parser. The string above is still treated as atomic.
 string_interpolate_escape = !{ (INTERPOLATION_START ~ expression ~ INTERPOLATION_END) }
