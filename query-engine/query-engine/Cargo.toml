@@ -11,7 +11,8 @@ graphql = ["graphql-parser"]
 
 [dependencies]
 futures = "0.3"
-tide = "0.9.0"
+# tide = "0.9.0"
+tide = { path = "../../../tide" }
 tokio = { version = "=0.2.13", features = ["rt-threaded", "macros"] }
 
 async-trait = "0.1"

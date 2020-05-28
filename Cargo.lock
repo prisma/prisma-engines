@@ -3165,8 +3165,6 @@ dependencies = [
 [[package]]
 name = "tide"
 version = "0.9.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e9620c27936f084db0613d82507e3c6e8be64cb1a26e0c721a2796b5a8c7a515"
 dependencies = [
  "async-h1",
  "async-sse",

@@ -7,30 +7,37 @@ use crate::{
     },
     PrismaResult,
 };
+
 use datamodel::{Configuration, Datamodel};
-use hyper::header;
-use hyper::service::{make_service_fn, service_fn};
-use hyper::{Body, Error, Method, Request, Response, Server, StatusCode};
 use query_core::schema::QuerySchemaRenderer;
 use serde_json::json;
-use std::net::SocketAddr;
-use std::{sync::Arc, time::Instant};
+use tide::http::{headers, mime, StatusCode};
+use tide::{Body, Request, Response};
 
-#[derive(RustEmbed)]
-#[folder = "static_files"]
-struct StaticFiles;
+use std::net::SocketAddr;
+use std::sync::Arc;
 
 //// Shared application state.
-pub(crate) struct RequestContext {
-    context: Arc<PrismaContext>,
+pub(crate) struct State {
+    cx: Arc<PrismaContext>,
     graphql_request_handler: GraphQlRequestHandler,
     enable_playground: bool,
 }
 
-impl RequestContext {
+impl Clone for State {
+    fn clone(&self) -> Self {
+        Self {
+            cx: self.cx.clone(),
+            graphql_request_handler: GraphQlRequestHandler,
+            enable_playground: self.enable_playground,
+        }
+    }
+}
+
+impl State {
     //// Access the shared application state.
     pub(crate) fn context(&self) -> &Arc<PrismaContext> {
-        &self.context
+        &self.cx
     }
 }
 
@@ -102,154 +109,95 @@ impl HttpServer {
     }
 
     /// Start the HTTP server with the default options enabled.
-    async fn run(address: SocketAddr, context: PrismaContext, enable_playground: bool) -> PrismaResult<()> {
-        let now = Instant::now();
+    async fn run(addr: SocketAddr, cx: PrismaContext, enable_playground: bool) -> PrismaResult<()> {
+        // let now = Instant::now();
 
-        let ctx = Arc::new(RequestContext {
-            context: Arc::new(context),
+        let ctx = State {
+            cx: Arc::new(cx),
             graphql_request_handler: GraphQlRequestHandler,
             enable_playground,
-        });
-
-        let service = make_service_fn(|_| {
-            let ctx = ctx.clone();
-
-            async { Ok::<_, Error>(service_fn(move |req| Self::routes(ctx.clone(), req))) }
-        });
-
-        let server = Server::bind(&address).serve(service);
-
-        trace!("Initialized in {}ms", now.elapsed().as_millis());
-        info!("Started http server on {}:{}", address.ip(), address.port());
-
-        server.await.unwrap();
-
-        Ok(())
-    }
-
-    async fn routes(ctx: Arc<RequestContext>, req: Request<Body>) -> std::result::Result<Response<Body>, Error> {
-        let start = Instant::now();
-
-        let mut res = match (req.method(), req.uri().path()) {
-            (&Method::POST, "/") => {
-                let (parts, body) = req.into_parts();
-
-                let bytes = hyper::body::to_bytes(body).await?;
-
-                match serde_json::from_slice(bytes.as_ref()) {
-                    Ok(body) => {
-                        let req = PrismaRequest {
-                            body,
-                            path: parts.uri.path().into(),
-                            headers: parts
-                                .headers
-                                .iter()
-                                .map(|(k, v)| (format!("{}", k), v.to_str().unwrap().into()))
-                                .collect(),
-                        };
-
-                        Self::http_handler(req, ctx).await
-                    }
-                    Err(_) => {
-                        let mut bad_request = Response::default();
-                        *bad_request.status_mut() = StatusCode::BAD_REQUEST;
-                        bad_request
-                    }
-                }
-            }
-
-            (&Method::GET, "/") if ctx.enable_playground => Self::playground_handler(),
-            (&Method::GET, "/status") => Self::status_handler(),
-
-            (&Method::GET, "/sdl") => Self::sdl_handler(ctx),
-            (&Method::GET, "/dmmf") => Self::dmmf_handler(ctx),
-            (&Method::GET, "/server_info") => Self::server_info_handler(ctx),
-
-            _ => {
-                let mut not_found = Response::default();
-                *not_found.status_mut() = StatusCode::NOT_FOUND;
-                not_found
-            }
         };
 
-        let elapsed = Instant::now().duration_since(start).as_micros() as u64;
-        res.headers_mut().insert("x-elapsed", elapsed.into());
-
-        Ok(res)
-    }
-
-    async fn http_handler(req: PrismaRequest<GraphQlBody>, cx: Arc<RequestContext>) -> Response<Body> {
-        let result = cx.graphql_request_handler.handle(req, cx.context()).await;
-        let bytes = serde_json::to_vec(&result).unwrap();
-
-        Response::builder()
-            .status(StatusCode::OK)
-            .header(header::CONTENT_TYPE, "application/json")
-            .body(Body::from(bytes))
-            .unwrap()
-    }
-
-    fn status_handler() -> Response<Body> {
-        let body_data = json!({"status": "ok"});
-        let bytes = serde_json::to_vec(&body_data).unwrap();
-
-        Response::builder()
-            .status(StatusCode::OK)
-            .header(header::CONTENT_TYPE, "application/json")
-            .body(Body::from(bytes))
-            .unwrap()
-    }
-
-    fn playground_handler() -> Response<Body> {
-        let index_html = StaticFiles::get("playground.html").unwrap();
-
-        Response::builder()
-            .status(StatusCode::OK)
-            .header(header::CONTENT_TYPE, "text/html")
-            .body(Body::from(index_html.into_owned()))
-            .unwrap()
-    }
-
-    /// Handler for the playground to work with the SDL-rendered query schema.
-    /// Serves a raw SDL string created from the query schema.
-    fn sdl_handler(cx: Arc<RequestContext>) -> Response<Body> {
-        let rendered = GraphQLSchemaRenderer::render(Arc::clone(&cx.context.query_schema()));
-
-        Response::builder()
-            .status(StatusCode::OK)
-            .header(header::CONTENT_TYPE, "application/text")
-            .body(Body::from(rendered))
-            .unwrap()
-    }
-
-    /// Renders the Data Model Meta Format.
-    /// Only callable if prisma was initialized using a v2 data model.
-    fn dmmf_handler(cx: Arc<RequestContext>) -> Response<Body> {
-        let dmmf = dmmf::render_dmmf(cx.context.datamodel(), Arc::clone(cx.context.query_schema()));
-
-        let bytes = serde_json::to_vec(&dmmf).unwrap();
-
-        Response::builder()
-            .status(StatusCode::OK)
-            .header(header::CONTENT_TYPE, "application/json")
-            .body(Body::from(bytes))
-            .unwrap()
-    }
-
-    /// Simple status endpoint
-    fn server_info_handler(cx: Arc<RequestContext>) -> Response<Body> {
-        let json = json!({
-            "commit": env!("GIT_HASH"),
-            "version": env!("CARGO_PKG_VERSION"),
-            "primary_connector": cx.context.primary_connector(),
+        let mut app = tide::with_state(ctx);
+        app.at("/").post(|req: Request<State>| async move {
+            // let body = req.body_json().await.status(StatusCode::BadRequest)?;
+            // let path = req.url().path().as_str().to_owned();
+            // let headers = req.headers().clone();
+            // let res = Self::http_handler(req, ctx).await.status(StatusCode::BadRequest)?;
+            // Ok(res)
+            // TODO: impl
+            Ok(Response::new(StatusCode::Ok))
         });
 
-        let bytes = serde_json::to_vec(&json).unwrap();
+        app.at("/").get(playground_handler);
+        app.at("/status").get(|_| async move {
+            let body = json!({"status": "ok"});
+            let mut res = Response::new(StatusCode::Ok);
+            res.set_body(Body::from_json(&body)?);
+            Ok(res)
+        });
+        app.at("/sdl").get(sdl_handler);
+        app.at("/dmmf").get(dmmf_handler);
+        app.at("/server_info").get(server_info_handler);
 
-        Response::builder()
-            .status(StatusCode::OK)
-            .header(header::CONTENT_TYPE, "application/json")
-            .body(Body::from(bytes))
-            .unwrap()
+        // TODO(yoshuawuyts): change this to a middleware.
+        // let elapsed = Instant::now().duration_since(start).as_micros() as u64;
+        // res.headers_mut().insert("x-elapsed", elapsed.into());
+        // trace!("Initialized in {}ms", now.elapsed().as_millis());
+
+        info!("Started http server on {}:{}", addr.ip(), addr.port());
+
+        app.listen(addr).await?;
+        Ok(())
     }
+}
+
+async fn http_handler(req: PrismaRequest<GraphQlBody>, cx: State) -> tide::Result {
+    let result = cx.graphql_request_handler.handle(req, cx.context()).await;
+    let mut res = Response::new(StatusCode::Ok);
+    res.set_body(Body::from_json(&result)?);
+    Ok(res)
+}
+
+async fn playground_handler(req: Request<State>) -> tide::Result {
+    if !req.state().enable_playground {
+        return Ok(Response::new(StatusCode::NotFound));
+    }
+
+    let mut res = Response::new(StatusCode::Ok);
+    res.set_body(include_bytes!("../static_files/playground.html").to_vec());
+    res = res.set_header(headers::CONTENT_ENCODING, mime::HTML);
+    Ok(res)
+}
+
+/// Handler for the playground to work with the SDL-rendered query schema.
+/// Serves a raw SDL string created from the query schema.
+async fn sdl_handler(req: Request<State>) -> tide::Result {
+    let body = GraphQLSchemaRenderer::render(Arc::clone(&req.state().cx.query_schema()));
+    let mut res = Response::new(StatusCode::Ok);
+    res.set_body(body);
+    res = res.set_header(headers::CONTENT_ENCODING, mime::PLAIN);
+    Ok(res)
+}
+
+/// Renders the Data Model Meta Format.
+/// Only callable if prisma was initialized using a v2 data model.
+async fn dmmf_handler(req: Request<State>) -> tide::Result {
+    let result = dmmf::render_dmmf(req.state().cx.datamodel(), Arc::clone(req.state().cx.query_schema()));
+    let mut res = Response::new(StatusCode::Ok);
+    res.set_body(Body::from_json(&result)?);
+    Ok(res)
+}
+
+/// Simple status endpoint
+async fn server_info_handler(req: Request<State>) -> tide::Result {
+    let body = json!({
+        "commit": env!("GIT_HASH"),
+        "version": env!("CARGO_PKG_VERSION"),
+        "primary_connector": req.state().cx.primary_connector(),
+    });
+
+    let mut res = Response::new(StatusCode::Ok);
+    res.set_body(Body::from_json(&body)?);
+    Ok(res)
 }

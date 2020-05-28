@@ -1,7 +1,5 @@
 #[macro_use]
 extern crate tracing;
-#[macro_use]
-extern crate rust_embed;
 
 use cli::*;
 use error::*;
