@@ -83,7 +83,6 @@ fn serialize_record_selection(
     is_list: bool,
     is_optional: bool,
 ) -> crate::Result<CheckedItemsWithParents> {
-    let query_args = record_selection.query_arguments.clone();
     let name = record_selection.name.clone();
 
     match typ.borrow() {
@@ -98,7 +97,7 @@ fn serialize_record_selection(
                 (true, opt) => {
                     result
                         .into_iter()
-                        .map(|(parent, mut items)| {
+                        .map(|(parent, items)| {
                             if !opt {
                                 // Check that all items are non-null
                                 if items.iter().any(|item| match item {
@@ -112,8 +111,6 @@ fn serialize_record_selection(
                                 }
                             }
 
-                            // Trim excess records
-                            trim_records(&mut items, &query_args);
                             Ok((parent, Item::Ref(ItemRef::new(Item::list(items)))))
                         })
                         .collect()

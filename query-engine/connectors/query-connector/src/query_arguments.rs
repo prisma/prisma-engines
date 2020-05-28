@@ -11,17 +11,18 @@ pub struct SkipAndLimit {
 pub struct QueryArguments {
     pub cursor: Option<RecordProjection>,
     pub take: Option<i64>,
+    pub skip: Option<i64>,
     pub filter: Option<Filter>,
     pub order_by: Option<OrderBy>,
 }
 
 impl QueryArguments {
-    fn needs_reversed_order(&self) -> bool {
+    pub fn needs_reversed_order(&self) -> bool {
         self.take.map(|t| t < 0).unwrap_or(false)
     }
 
     fn needs_implicit_ordering(&self) -> bool {
-        self.cursor.is_some() || self.take.is_some() || self.order_by.is_some()
+        self.skip.is_some() || self.cursor.is_some() || self.take.is_some() || self.order_by.is_some()
     }
 
     pub fn ordering_directions(&self) -> OrderDirections {
@@ -32,31 +33,35 @@ impl QueryArguments {
         }
     }
 
-    pub fn is_with_pagination(&self) -> bool {
-        self.take.is_some()
+    pub fn take_abs(&self) -> Option<i64> {
+        self.take.clone().map(|t| if t < 0 { t * -1 } else { t })
     }
 
-    pub fn window_limits(&self) -> (i64, i64) {
-        let skip = self.skip.unwrap_or(0) + 1;
+    // pub fn is_with_pagination(&self) -> bool {
+    //     self.take.is_some()
+    // }
 
-        match self.last.or(self.first) {
-            Some(limited_count) => (skip, limited_count + skip),
-            None => (skip, 100_000_000),
-        }
-    }
+    // pub fn window_limits(&self) -> (i64, i64) {
+    //     let skip = self.skip.unwrap_or(0) + 1;
 
-    pub fn skip_and_limit(&self) -> SkipAndLimit {
-        match self.last.or(self.first) {
-            Some(limited_count) => SkipAndLimit {
-                skip: self.skip.unwrap_or(0) as usize,
-                limit: Some((limited_count + 1) as usize),
-            },
-            None => SkipAndLimit {
-                skip: self.skip.unwrap_or(0) as usize,
-                limit: None,
-            },
-        }
-    }
+    //     match self.last.or(self.first) {
+    //         Some(limited_count) => (skip, limited_count + skip),
+    //         None => (skip, 100_000_000),
+    //     }
+    // }
+
+    // pub fn skip_and_limit(&self) -> SkipAndLimit {
+    //     match self.last.or(self.first) {
+    //         Some(limited_count) => SkipAndLimit {
+    //             skip: self.skip.unwrap_or(0) as usize,
+    //             limit: Some((limited_count + 1) as usize),
+    //         },
+    //         None => SkipAndLimit {
+    //             skip: self.skip.unwrap_or(0) as usize,
+    //             limit: None,
+    //         },
+    //     }
+    // }
 
     pub fn can_batch(&self) -> bool {
         self.filter.as_ref().map(|filter| filter.can_batch()).unwrap_or(false)
@@ -65,22 +70,18 @@ impl QueryArguments {
     pub fn batched(self) -> Vec<Self> {
         match self.filter {
             Some(filter) => {
-                let after = self.after;
-                let before = self.before;
+                let cursor = self.cursor;
+                let take = self.take;
                 let skip = self.skip;
-                let first = self.first;
-                let last = self.last;
                 let order_by = self.order_by;
 
                 filter
                     .batched()
                     .into_iter()
                     .map(|filter| QueryArguments {
-                        after: after.clone(),
-                        before: before.clone(),
+                        cursor: cursor.clone(),
+                        take: take.clone(),
                         skip: skip.clone(),
-                        first: first.clone(),
-                        last: last.clone(),
                         filter: Some(filter),
                         order_by: order_by.clone(),
                     })

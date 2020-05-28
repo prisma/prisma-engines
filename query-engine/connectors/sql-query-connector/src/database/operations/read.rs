@@ -141,17 +141,8 @@ pub async fn count_by_model(
     model: &ModelRef,
     query_arguments: QueryArguments,
 ) -> crate::Result<usize> {
-    // We need to retain copies of those values for post processing below.
-    let (first, last) = (query_arguments.first.clone(), query_arguments.last.clone());
     let query = read::count_by_model(model, query_arguments);
-    let result = conn.find_int(query).await? as usize;
+    let count = conn.find_int(query).await? as usize;
 
-    // The way records are retrieved with query args requires us to adjust the one-off overfetch.
-    let result = match (first, last) {
-        (Some(f), _) if result > f as usize => result - 1,
-        (_, Some(l)) if result > l as usize => result - 1,
-        _ => result,
-    };
-
-    Ok(result)
+    Ok(count)
 }
