@@ -27,15 +27,13 @@ const SQLITE_TYPES: [(&'static str, &'static str); 5] = [
     ("TEXT", "TEXT"),
 ];
 
-const POSTGRES_TYPES: [(&'static str, &'static str); 9] = [
+const POSTGRES_TYPES: [(&'static str, &'static str); 7] = [
     ("boolean", "bool"),
     ("timestamp without time zone", "timestamp"),
     ("numeric", "numeric"),
     ("integer", "int4"),
     ("text", "text"),
     ("character", "char"),
-    ("character", "char"),
-    ("character varying", "varchar"),
     ("character varying", "varchar"),
 ];
 const MYSQL_TYPES: [(&'static str, &'static str); 13] = [
