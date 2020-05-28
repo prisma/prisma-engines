@@ -289,8 +289,7 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "character varying".into(),
                 full_data_type: "varchar".into(),
-                character_maximum_length: None,
-
+                character_maximum_length: Some(1),
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
             },
@@ -318,7 +317,6 @@ async fn all_postgres_column_types_must_work() {
                 data_type: "bigint".into(),
                 full_data_type: "int8".into(),
                 character_maximum_length: None,
-
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
             },
@@ -334,8 +332,7 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "bit".into(),
                 full_data_type: "bit".into(),
-                character_maximum_length: None,
-
+                character_maximum_length: Some(1),
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
             },
@@ -348,8 +345,7 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "bit varying".into(),
                 full_data_type: "varbit".into(),
-                character_maximum_length: None,
-
+                character_maximum_length: Some(1),
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
             },
@@ -363,7 +359,6 @@ async fn all_postgres_column_types_must_work() {
                 data_type: "box".into(),
                 full_data_type: "box".into(),
                 character_maximum_length: None,
-
                 family: ColumnTypeFamily::Geometric,
                 arity: ColumnArity::Required,
             },
@@ -376,8 +371,7 @@ async fn all_postgres_column_types_must_work() {
             tpe: ColumnType {
                 data_type: "character".into(),
                 full_data_type: "bpchar".into(),
-                character_maximum_length: None,
-
+                character_maximum_length: Some(1),
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
             },
@@ -391,7 +385,6 @@ async fn all_postgres_column_types_must_work() {
                 data_type: "circle".into(),
                 full_data_type: "circle".into(),
                 character_maximum_length: None,
-
                 family: ColumnTypeFamily::Geometric,
                 arity: ColumnArity::Required,
             },
@@ -405,7 +398,6 @@ async fn all_postgres_column_types_must_work() {
                 data_type: "interval".into(),
                 full_data_type: "interval".into(),
                 character_maximum_length: None,
-
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
             },
@@ -419,7 +411,6 @@ async fn all_postgres_column_types_must_work() {
                 data_type: "line".into(),
                 full_data_type: "line".into(),
                 character_maximum_length: None,
-
                 family: ColumnTypeFamily::Geometric,
                 arity: ColumnArity::Required,
             },
@@ -433,7 +424,6 @@ async fn all_postgres_column_types_must_work() {
                 data_type: "lseg".into(),
                 full_data_type: "lseg".into(),
                 character_maximum_length: None,
-
                 family: ColumnTypeFamily::Geometric,
                 arity: ColumnArity::Required,
             },
@@ -447,7 +437,6 @@ async fn all_postgres_column_types_must_work() {
                 data_type: "numeric".into(),
                 full_data_type: "numeric".into(),
                 character_maximum_length: None,
-
                 family: ColumnTypeFamily::Float,
                 arity: ColumnArity::Required,
             },
@@ -461,7 +450,6 @@ async fn all_postgres_column_types_must_work() {
                 data_type: "path".into(),
                 full_data_type: "path".into(),
                 character_maximum_length: None,
-
                 family: ColumnTypeFamily::Geometric,
                 arity: ColumnArity::Required,
             },
@@ -475,7 +463,6 @@ async fn all_postgres_column_types_must_work() {
                 data_type: "pg_lsn".into(),
                 full_data_type: "pg_lsn".into(),
                 character_maximum_length: None,
-
                 family: ColumnTypeFamily::LogSequenceNumber,
                 arity: ColumnArity::Required,
             },
@@ -489,7 +476,6 @@ async fn all_postgres_column_types_must_work() {
                 data_type: "polygon".into(),
                 full_data_type: "polygon".into(),
                 character_maximum_length: None,
-
                 family: ColumnTypeFamily::Geometric,
                 arity: ColumnArity::Required,
             },
@@ -503,7 +489,6 @@ async fn all_postgres_column_types_must_work() {
                 data_type: "smallint".into(),
                 full_data_type: "int2".into(),
                 character_maximum_length: None,
-
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
             },
@@ -517,7 +502,6 @@ async fn all_postgres_column_types_must_work() {
                 data_type: "smallint".into(),
                 full_data_type: "int2".into(),
                 character_maximum_length: None,
-
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
             },
@@ -534,7 +518,6 @@ async fn all_postgres_column_types_must_work() {
                 data_type: "integer".into(),
                 full_data_type: "int4".into(),
                 character_maximum_length: None,
-
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
             },
@@ -551,7 +534,6 @@ async fn all_postgres_column_types_must_work() {
                 data_type: "time without time zone".into(),
                 full_data_type: "time".into(),
                 character_maximum_length: None,
-
                 family: ColumnTypeFamily::DateTime,
                 arity: ColumnArity::Required,
             },
