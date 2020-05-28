@@ -221,7 +221,11 @@ async fn multi_column_foreign_keys_must_work(api: &TestApi) {
             tpe: ColumnType {
                 data_type: varchar_data_type(api, 255),
                 full_data_type: varchar_full_data_type(api, 255),
-                character_maximum_length: Some(255),
+                character_maximum_length: if api.sql_family() == SqlFamily::Sqlite {
+                    None
+                } else {
+                    Some(255)
+                },
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
             },
@@ -339,7 +343,11 @@ async fn composite_primary_keys_must_work(api: &TestApi) {
             tpe: ColumnType {
                 data_type: varchar_data_type(api, 255),
                 full_data_type: varchar_full_data_type(api, 255),
-                character_maximum_length: Some(255),
+                character_maximum_length: if api.sql_family() == SqlFamily::Sqlite {
+                    None
+                } else {
+                    Some(255)
+                },
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
             },
