@@ -32,8 +32,6 @@ pub fn add_prisma_1_id_defaults(
                     field: id_field.name.clone(),
                 };
 
-                println!("{}", &column.tpe.data_type);
-                println!("{}", &column.tpe.full_data_type);
                 match (
                     &column.tpe.data_type,
                     &column.tpe.full_data_type,
