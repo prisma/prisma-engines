@@ -57,7 +57,7 @@ async fn main() -> Result<(), AnyError> {
         Err(PrismaError::InvocationError(_)) => {
             set_panic_hook()?;
             let ip = opts.host.parse().expect("Host was not a valid IP address");
-            let address = SocketAddr::new(ip, opts.port);
+            let addr = SocketAddr::new(ip, opts.port);
 
             eprintln!("Printing to stderr for debugging");
             eprintln!("Listening on {}:{}", opts.host, opts.port);
@@ -67,7 +67,7 @@ async fn main() -> Result<(), AnyError> {
                 let datamodel = opts.datamodel(false)?;
 
                 PrismaResult::<HttpServerBuilder>::Ok(
-                    HttpServer::builder(config, datamodel)
+                    HttpServer::builder(addr, config, datamodel)
                         .legacy(opts.legacy)
                         .enable_raw_queries(opts.enable_raw_queries)
                         .enable_playground(opts.enable_playground),
@@ -83,7 +83,7 @@ async fn main() -> Result<(), AnyError> {
                 Ok(builder) => builder,
             };
 
-            if let Err(err) = builder.build_and_run(address).await {
+            if let Err(err) = builder.build().await {
                 info!("Encountered error during initialization:");
                 err.render_as_json().expect("error rendering");
                 process::exit(1);

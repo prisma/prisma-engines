@@ -20,6 +20,7 @@ use std::{sync::Arc, time::Instant};
 #[folder = "static_files"]
 struct StaticFiles;
 
+//// Shared application state.
 pub(crate) struct RequestContext {
     context: Arc<PrismaContext>,
     graphql_request_handler: GraphQlRequestHandler,
@@ -27,12 +28,15 @@ pub(crate) struct RequestContext {
 }
 
 impl RequestContext {
+    //// Access the shared application state.
     pub(crate) fn context(&self) -> &Arc<PrismaContext> {
         &self.context
     }
 }
 
+/// A builder for `HttpServer`.
 pub struct HttpServerBuilder {
+    addr: SocketAddr,
     config: Configuration,
     datamodel: Datamodel,
     legacy_mode: bool,
@@ -41,45 +45,63 @@ pub struct HttpServerBuilder {
 }
 
 impl HttpServerBuilder {
+    /// Create a new instance of `HttpServerBuilder`.
+    fn new(addr: SocketAddr, config: Configuration, datamodel: Datamodel) -> Self {
+        Self {
+            addr,
+            config,
+            datamodel,
+            legacy_mode: false,
+            enable_playground: false,
+            enable_raw_queries: false,
+        }
+    }
+
+    /// Enable "legacy mode" for prisma-engines.
     pub fn legacy(mut self, val: bool) -> Self {
         self.legacy_mode = val;
         self
     }
 
+    /// Enable raw queries for prisma-engines.
+    ///
+    /// # Security
+    ///
+    /// Enabling this setting will allow arbtrary queries to be executed against
+    /// the server. This has security implications when exposing Prisma on a
+    /// public port.
     pub fn enable_raw_queries(mut self, val: bool) -> Self {
         self.enable_raw_queries = val;
         self
     }
 
+    /// Enable the GraphQL playground.
     pub fn enable_playground(mut self, val: bool) -> Self {
         self.enable_playground = val;
         self
     }
 
-    pub async fn build_and_run(self, address: SocketAddr) -> PrismaResult<()> {
+    /// Start the server.
+    pub async fn build(self) -> PrismaResult<()> {
         let ctx = PrismaContext::builder(self.config, self.datamodel)
             .legacy(self.legacy_mode)
             .enable_raw_queries(self.enable_raw_queries)
             .build()
             .await?;
 
-        HttpServer::run(address, ctx, self.enable_playground).await
+        HttpServer::run(self.addr, ctx, self.enable_playground).await
     }
 }
 
 pub struct HttpServer;
 
 impl HttpServer {
-    pub fn builder(config: Configuration, datamodel: Datamodel) -> HttpServerBuilder {
-        HttpServerBuilder {
-            config,
-            datamodel,
-            legacy_mode: false,
-            enable_raw_queries: false,
-            enable_playground: false,
-        }
+    /// Create a new HTTP server builder.
+    pub fn builder(addr: SocketAddr, config: Configuration, datamodel: Datamodel) -> HttpServerBuilder {
+        HttpServerBuilder::new(addr, config, datamodel)
     }
 
+    /// Start the HTTP server with the default options enabled.
     async fn run(address: SocketAddr, context: PrismaContext, enable_playground: bool) -> PrismaResult<()> {
         let now = Instant::now();
 

@@ -11,8 +11,7 @@ graphql = ["graphql-parser"]
 
 [dependencies]
 futures = "0.3"
-http = "0.2"
-hyper = "0.13"
+tide = "0.9.0"
 tokio = { version = "=0.2.13", features = ["rt-threaded", "macros"] }
 
 async-trait = "0.1"
