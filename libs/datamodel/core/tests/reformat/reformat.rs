@@ -43,11 +43,31 @@ fn test_reformat_model_complex() {
 
     let expected = r#"/// model doc comment
 model User {
-  id                    Int    @id     // doc comment on the side
+  id                    Int    @id // doc comment on the side
   fieldA                String @unique // comment on the side
   // comment before
   /// doc comment before
   anotherWeirdFieldName Int
+}
+"#;
+
+    assert_reformat(input, expected);
+}
+
+#[test]
+fn catch_all_in_a_block_must_not_influence_table_layout() {
+    let input = r#"
+model Post {
+  id   Int @id
+  this is an invalid line
+  anotherField String
+}
+"#;
+
+    let expected = r#"model Post {
+  id           Int    @id
+  this is an invalid line
+  anotherField String
 }
 "#;
 
@@ -70,6 +90,42 @@ fn comments_in_a_model_must_not_move() {
   // Comment
   email String @unique
   // Comment 2
+}
+"#;
+
+    assert_reformat(input, expected);
+}
+
+#[test]
+fn end_of_line_comments_must_not_influence_table_layout_in_models() {
+    let input = r#"model Test {
+  id  Int   @id    // Comment 1
+  foo String     // Comment 2
+  bar bar? @relation(fields: [id], references: [id]) // Comment 3
+}
+"#;
+
+    let expected = r#"model Test {
+  id  Int    @id // Comment 1
+  foo String // Comment 2
+  bar bar?   @relation(fields: [id], references: [id]) // Comment 3
+}
+"#;
+
+    assert_reformat(input, expected);
+}
+
+#[test]
+fn end_of_line_comments_must_not_influence_table_layout_in_enums() {
+    let input = r#"enum Foo {
+    ONE @map("short")     // COMMENT 1
+    TWO @map("a_very_long_name")    // COMMENT 2
+}
+"#;
+
+    let expected = r#"enum Foo {
+  ONE  @map("short") // COMMENT 1
+  TWO  @map("a_very_long_name") // COMMENT 2
 }
 "#;
 
@@ -288,6 +344,58 @@ fn invalid_lines_must_not_break_reformatting() {
     let input = r#"$ /a/b/c:.
 model Post {
   id Int @id
+}
+"#;
+
+    assert_reformat(input, input);
+}
+
+#[test]
+fn reformatting_an_invalid_datasource_block_must_work() {
+    let input = r#"datasource db {
+  provider = "postgresql"
+  url = env("POSTGRESQL_URL")
+  test
+}
+"#;
+
+    let expected = r#"datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRESQL_URL")
+  test
+}
+"#;
+
+    assert_reformat(input, expected);
+}
+
+#[test]
+fn reformatting_an_invalid_generator_block_must_work() {
+    let input = r#"generator js {
+  provider = "js"
+  output = "../wherever"
+  test
+}
+"#;
+
+    let expected = r#"generator js {
+  provider = "js"
+  output   = "../wherever"
+  test
+}
+"#;
+
+    assert_reformat(input, expected);
+}
+
+#[test]
+fn incomplete_field_definitions_in_a_model_must_not_get_removed() {
+    // incomplete field definitions are handled in a special way in the grammar to allow nice errors. See `nice_error.rs:nice_error_missing_type`
+    // Hence the block level catch does not apply here. So we must test this specifically.
+    let input = r#"model Post {
+  id   Int      @id
+  tags String[]
+  test // an incomplete field
 }
 "#;
 

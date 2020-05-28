@@ -433,7 +433,8 @@ fn parse_key_value(token: &pest::iterators::Pair<'_, Rule>) -> Argument {
 }
 
 // Source parsing
-fn parse_source(token: &pest::iterators::Pair<'_, Rule>) -> SourceConfig {
+fn parse_source(token: &pest::iterators::Pair<'_, Rule>) -> Result<SourceConfig, ErrorCollection> {
+    let mut errors = ErrorCollection::new();
     let mut name: Option<Identifier> = None;
     let mut properties: Vec<Argument> = vec![];
     let mut comment: Option<Comment> = None;
@@ -444,16 +445,23 @@ fn parse_source(token: &pest::iterators::Pair<'_, Rule>) -> SourceConfig {
         Rule::comment_block => {
             comment = Some(parse_comment_block(&current))
         },
+        Rule::BLOCK_LEVEL_CATCH_ALL => { errors.push(
+            DatamodelError::new_validation_error(
+                "This line is not a valid definition within a datasource.",
+                Span::from_pest(current.as_span()))
+        ) },
         _ => parsing_catch_all(&current)
     };
 
+    errors.ok()?;
+
     match name {
-        Some(name) => SourceConfig {
+        Some(name) => Ok(SourceConfig {
             name,
             properties,
             documentation: comment,
             span: Span::from_pest(token.as_span()),
-        },
+        }),
         _ => panic!(
             "Encountered impossible source declaration during parsing, name is missing: {:?}",
             token.as_str()
@@ -462,7 +470,8 @@ fn parse_source(token: &pest::iterators::Pair<'_, Rule>) -> SourceConfig {
 }
 
 // Generator parsing
-fn parse_generator(token: &pest::iterators::Pair<'_, Rule>) -> GeneratorConfig {
+fn parse_generator(token: &pest::iterators::Pair<'_, Rule>) -> Result<GeneratorConfig, ErrorCollection> {
+    let mut errors = ErrorCollection::new();
     let mut name: Option<Identifier> = None;
     let mut properties: Vec<Argument> = vec![];
     let mut comments: Vec<String> = Vec::new();
@@ -472,16 +481,23 @@ fn parse_generator(token: &pest::iterators::Pair<'_, Rule>) -> GeneratorConfig {
         Rule::key_value => properties.push(parse_key_value(&current)),
         Rule::doc_comment => comments.push(parse_doc_comment(&current)),
         Rule::doc_comment_and_new_line => comments.push(parse_doc_comment(&current)),
+        Rule::BLOCK_LEVEL_CATCH_ALL => { errors.push(
+            DatamodelError::new_validation_error(
+                "This line is not a valid definition within a generator.",
+                Span::from_pest(current.as_span()))
+        ) },
         _ => parsing_catch_all(&current)
     };
 
+    errors.ok()?;
+
     match name {
-        Some(name) => GeneratorConfig {
+        Some(name) => Ok(GeneratorConfig {
             name,
             properties,
             documentation: doc_comments_to_string(&comments),
             span: Span::from_pest(token.as_span()),
-        },
+        }),
         _ => panic!(
             "Encountered impossible generator declaration during parsing, name is missing: {:?}",
             token.as_str()
@@ -566,8 +582,14 @@ pub fn parse(datamodel_string: &str) -> Result<SchemaAst, ErrorCollection> {
                     Ok(enm) => top_level_definitions.push(Top::Enum(enm)),
                     Err(mut err) => errors.append(&mut err)
                 },
-                Rule::source_block => top_level_definitions.push(Top::Source(parse_source(&current))),
-                Rule::generator_block => top_level_definitions.push(Top::Generator(parse_generator(&current))),
+                Rule::source_block => match parse_source(&current) {
+                    Ok(source) => top_level_definitions.push(Top::Source(source)),
+                    Err(mut err) => errors.append(&mut err)
+                },
+                Rule::generator_block => match parse_generator(&current) {
+                    Ok(generator) => top_level_definitions.push(Top::Generator(generator)),
+                    Err(mut err) => errors.append(&mut err)
+                },
                 Rule::type_alias => top_level_definitions.push(Top::Type(parse_type(&current))),
                 Rule::comment_block => (),
                 Rule::EOI => {},
