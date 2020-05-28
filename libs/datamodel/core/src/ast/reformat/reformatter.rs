@@ -322,15 +322,12 @@ impl<'a> Reformatter<'a> {
     }
 
     fn reformat_field(target: &mut TableFormat, token: &Token) {
-        let mut identifier = None;
-
         for current in token.clone().into_inner() {
             match current.as_rule() {
                 Rule::non_empty_identifier | Rule::maybe_empty_identifier => {
-                    identifier = Some(String::from(current.as_str()))
+                    target.write(current.as_str());
                 }
                 Rule::field_type => {
-                    target.write(&identifier.clone().expect("Unknown field identifier."));
                     target.write(&Self::reformat_field_type(&current));
                 }
                 Rule::directive => Self::reformat_directive(&mut target.column_locked_writer_for(2), &current, "@"),

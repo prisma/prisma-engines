@@ -4,6 +4,7 @@ use std::cmp::max;
 
 const COLUMN_SPACING: usize = 1;
 
+#[derive(Debug)]
 pub enum Row {
     // the 2nd String is an arbitrary String that does not influence the table layout. We use it for end of line comments.
     Regular(Vec<String>, String),
@@ -16,6 +17,7 @@ impl Row {
     }
 }
 
+#[derive(Debug)]
 pub struct TableFormat {
     pub table: Vec<Row>,
     row: i32,

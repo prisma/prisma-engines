@@ -351,6 +351,20 @@ model Post {
 }
 
 #[test]
+fn incomplete_field_definitions_in_a_model_must_not_get_removed() {
+    // incomplete field definitions are handled in a special way in the grammar to allow nice errors. See `nice_error.rs:nice_error_missing_type`
+    // Hence the block level catch does not apply here. So we must test this specifically.
+    let input = r#"model Post {
+  id   Int      @id
+  tags String[]
+  test // an incomplete field
+}
+"#;
+
+    assert_reformat(input, input);
+}
+
+#[test]
 fn new_lines_before_first_block_must_be_removed() {
     let input = r#"
 
