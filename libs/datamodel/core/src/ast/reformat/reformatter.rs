@@ -315,6 +315,7 @@ impl<'a> Reformatter<'a> {
             match current.as_rule() {
                 Rule::non_empty_identifier => target.write(current.as_str()),
                 Rule::directive => Self::reformat_directive(&mut target.column_locked_writer_for(2), &current, "@"),
+                Rule::doc_comment | Rule::comment => target.append_suffix_to_current_row(current.as_str()),
                 _ => Self::reformat_generic_token(target, &current),
             }
         }
@@ -334,7 +335,7 @@ impl<'a> Reformatter<'a> {
                 }
                 Rule::directive => Self::reformat_directive(&mut target.column_locked_writer_for(2), &current, "@"),
                 // This is a comment at the end of a field.
-                Rule::doc_comment => comment(target, current.as_str()),
+                Rule::doc_comment | Rule::comment => target.append_suffix_to_current_row(current.as_str()),
                 // This is a comment before the field declaration. Hence it must be interlevaed.
                 Rule::doc_comment_and_new_line => comment(&mut target.interleave_writer(), current.as_str()),
                 Rule::NEWLINE => {} // we do the new lines ourselves

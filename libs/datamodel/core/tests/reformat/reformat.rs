@@ -43,7 +43,7 @@ fn test_reformat_model_complex() {
 
     let expected = r#"/// model doc comment
 model User {
-  id                    Int    @id     // doc comment on the side
+  id                    Int    @id // doc comment on the side
   fieldA                String @unique // comment on the side
   // comment before
   /// doc comment before
@@ -90,6 +90,42 @@ fn comments_in_a_model_must_not_move() {
   // Comment
   email String @unique
   // Comment 2
+}
+"#;
+
+    assert_reformat(input, expected);
+}
+
+#[test]
+fn end_of_line_comments_must_not_influence_table_layout_in_models() {
+    let input = r#"model Test {
+  id  Int   @id    // Comment 1
+  foo String     // Comment 2
+  bar bar? @relation(fields: [id], references: [id]) // Comment 3
+}
+"#;
+
+    let expected = r#"model Test {
+  id  Int    @id // Comment 1
+  foo String // Comment 2
+  bar bar?   @relation(fields: [id], references: [id]) // Comment 3
+}
+"#;
+
+    assert_reformat(input, expected);
+}
+
+#[test]
+fn end_of_line_comments_must_not_influence_table_layout_in_enums() {
+    let input = r#"enum Foo {
+    ONE @map("short")     // COMMENT 1
+    TWO @map("a_very_long_name")    // COMMENT 2
+}
+"#;
+
+    let expected = r#"enum Foo {
+  ONE  @map("short") // COMMENT 1
+  TWO  @map("a_very_long_name") // COMMENT 2
 }
 "#;
 
