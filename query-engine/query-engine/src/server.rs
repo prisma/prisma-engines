@@ -2,7 +2,7 @@ use super::dmmf;
 use crate::{
     context::PrismaContext,
     request_handlers::{
-        graphql::{GraphQLSchemaRenderer, GraphQlBody, GraphQlRequestHandler},
+        graphql::{GraphQLSchemaRenderer, GraphQlRequestHandler},
         PrismaRequest, RequestHandler,
     },
     PrismaResult,
@@ -14,13 +14,13 @@ use serde_json::json;
 use tide::http::{headers, mime, StatusCode};
 use tide::{Body, Request, Response};
 
+use std::collections::HashMap;
 use std::net::SocketAddr;
 use std::sync::Arc;
 
 //// Shared application state.
 pub(crate) struct State {
     cx: Arc<PrismaContext>,
-    graphql_request_handler: GraphQlRequestHandler,
     enable_playground: bool,
 }
 
@@ -28,16 +28,8 @@ impl Clone for State {
     fn clone(&self) -> Self {
         Self {
             cx: self.cx.clone(),
-            graphql_request_handler: GraphQlRequestHandler,
             enable_playground: self.enable_playground,
         }
-    }
-}
-
-impl State {
-    //// Access the shared application state.
-    pub(crate) fn context(&self) -> &Arc<PrismaContext> {
-        &self.cx
     }
 }
 
@@ -114,31 +106,22 @@ impl HttpServer {
 
         let ctx = State {
             cx: Arc::new(cx),
-            graphql_request_handler: GraphQlRequestHandler,
             enable_playground,
         };
 
         let mut app = tide::with_state(ctx);
-        app.at("/").post(|req: Request<State>| async move {
-            // let body = req.body_json().await.status(StatusCode::BadRequest)?;
-            // let path = req.url().path().as_str().to_owned();
-            // let headers = req.headers().clone();
-            // let res = Self::http_handler(req, ctx).await.status(StatusCode::BadRequest)?;
-            // Ok(res)
-            // TODO: impl
-            Ok(Response::new(StatusCode::Ok))
-        });
-
+        app.at("/").post(graphql_handler);
         app.at("/").get(playground_handler);
+        app.at("/sdl").get(sdl_handler);
+        app.at("/dmmf").get(dmmf_handler);
+        app.at("/server_info").get(server_info_handler);
         app.at("/status").get(|_| async move {
+            // TODO(yoshuawuyts): turn this into a one-liner once `From<serde::Value> for tide::Response` exists.
             let body = json!({"status": "ok"});
             let mut res = Response::new(StatusCode::Ok);
             res.set_body(Body::from_json(&body)?);
             Ok(res)
         });
-        app.at("/sdl").get(sdl_handler);
-        app.at("/dmmf").get(dmmf_handler);
-        app.at("/server_info").get(server_info_handler);
 
         // TODO(yoshuawuyts): change this to a middleware.
         // let elapsed = Instant::now().duration_since(start).as_micros() as u64;
@@ -152,13 +135,26 @@ impl HttpServer {
     }
 }
 
-async fn http_handler(req: PrismaRequest<GraphQlBody>, cx: State) -> tide::Result {
-    let result = cx.graphql_request_handler.handle(req, cx.context()).await;
+/// The main query handler. This handles incoming GraphQL queries and passes it
+/// to the query engine.
+async fn graphql_handler(mut req: Request<State>) -> tide::Result {
+    let body = req.body_json().await?;
+    let path = req.url().path().to_owned();
+    let headers = collect_tide_headers(&req);
+    let cx = req.state().cx.clone();
+    let req = PrismaRequest { body, path, headers };
+    let result = GraphQlRequestHandler.handle(req, &cx).await;
     let mut res = Response::new(StatusCode::Ok);
     res.set_body(Body::from_json(&result)?);
     Ok(res)
 }
 
+/// Expose the GraphQL playground if enabled.
+///
+/// # Security
+///
+/// In production exposing the playground is equivalent to exposing the database
+/// on a port. This should never be enabled on production servers.
 async fn playground_handler(req: Request<State>) -> tide::Result {
     if !req.state().enable_playground {
         return Ok(Response::new(StatusCode::NotFound));
@@ -200,4 +196,10 @@ async fn server_info_handler(req: Request<State>) -> tide::Result {
     let mut res = Response::new(StatusCode::Ok);
     res.set_body(Body::from_json(&body)?);
     Ok(res)
+}
+
+// NOTE(yoshuawuyts): We should expose AsRef<Headers> from Tide directly.
+// But even better would be to pass http_types::Headers down directly.
+fn collect_tide_headers(req: &Request<State>) -> HashMap<String, String> {
+    req.iter().map(|(k, v)| (format!("{}", k), format!("{}", v))).collect()
 }
