@@ -66,7 +66,7 @@ impl TableFormat {
         }
     }
 
-    fn interleave(&mut self, text: &str) {
+    pub fn interleave(&mut self, text: &str) {
         self.table.push(Row::Interleaved(String::from(text)));
         // We've just ended a line.
         self.line_ending = false;
@@ -108,20 +108,20 @@ impl TableFormat {
 
     pub fn render(&mut self, target: &mut dyn LineWriteable) {
         // First, measure cols
-        let mut len = 0;
+        let mut max_number_of_columns = 0;
 
         for row in &self.table {
             if let Row::Regular(row) = row {
-                len = max(len, row.len());
+                max_number_of_columns = max(max_number_of_columns, row.len());
             }
         }
 
-        let mut cols_width = vec![0; len];
+        let mut max_widths_for_each_column = vec![0; max_number_of_columns];
 
         for row in &self.table {
             if let Row::Regular(row) = row {
                 for (i, col) in row.iter().enumerate() {
-                    cols_width[i] = max(cols_width[i], col.len());
+                    max_widths_for_each_column[i] = max(max_widths_for_each_column[i], col.len());
                 }
             }
         }
@@ -134,7 +134,7 @@ impl TableFormat {
                         let spacing = if i == row.len() - 1 {
                             0 // Do not space last column.
                         } else {
-                            cols_width[i] - col.len() + COLUMN_SPACING
+                            max_widths_for_each_column[i] - col.len() + COLUMN_SPACING
                         };
                         target.write(&format!("{}{}", col, " ".repeat(spacing)));
                     }

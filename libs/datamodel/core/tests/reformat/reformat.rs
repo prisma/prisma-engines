@@ -55,6 +55,26 @@ model User {
 }
 
 #[test]
+fn catch_all_in_a_block_must_not_influence_table_layout() {
+    let input = r#"
+model Post {
+  id   Int @id
+  this is an invalid line
+  anotherField String
+}
+"#;
+
+    let expected = r#"model Post {
+  id           Int    @id
+  this is an invalid line
+  anotherField String
+}
+"#;
+
+    assert_reformat(input, expected);
+}
+
+#[test]
 fn comments_in_a_model_must_not_move() {
     let input = r#"
         model User {

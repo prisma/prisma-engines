@@ -274,6 +274,9 @@ impl<'a> Reformatter<'a> {
                         renderer.end_line();
                     }
                 }
+                Rule::BLOCK_LEVEL_CATCH_ALL => {
+                    table.interleave(strip_new_line(current.as_str()));
+                }
                 _ => the_fn(&mut table, renderer, &current),
             }
         }
