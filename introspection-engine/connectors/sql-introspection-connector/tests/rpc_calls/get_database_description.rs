@@ -14,7 +14,7 @@ async fn database_description_for_mysql_8_should_work(api: &TestApi) {
     let barrel = api.barrel();
     setup(&barrel, api.db_name()).await;
     let result = dbg!(api.get_database_description().await);
-    assert_eq!(result, "{\"tables\":[{\"name\":\"Blog\",\"columns\":[{\"name\":\"id\",\"tpe\":{\"dataType\":\"int\",\"fullDataType\":\"int\",\"characterMaximumLength\":null,\"family\":\"int\",\"arity\":\"required\"},\"default\":null,\"autoIncrement\":true},{\"name\":\"string\",\"tpe\":{\"dataType\":\"text\",\"fullDataType\":\"text\",\"characterMaximumLength\":null,\"family\":\"string\",\"arity\":\"required\"},\"default\":null,\"autoIncrement\":false}],\"indices\":[],\"primaryKey\":{\"columns\":[\"id\"],\"sequence\":null},\"foreignKeys\":[]}],\"enums\":[],\"sequences\":[]}".to_string());
+    assert_eq!(result, "{\"tables\":[{\"name\":\"Blog\",\"columns\":[{\"name\":\"id\",\"tpe\":{\"dataType\":\"int\",\"fullDataType\":\"int\",\"characterMaximumLength\":null,\"family\":\"int\",\"arity\":\"required\"},\"default\":null,\"autoIncrement\":true},{\"name\":\"string\",\"tpe\":{\"dataType\":\"text\",\"fullDataType\":\"text\",\"characterMaximumLength\":65535,\"family\":\"string\",\"arity\":\"required\"},\"default\":null,\"autoIncrement\":false}],\"indices\":[],\"primaryKey\":{\"columns\":[\"id\"],\"sequence\":null},\"foreignKeys\":[]}],\"enums\":[],\"sequences\":[]}".to_string());
 }
 
 #[test_each_connector(tags("postgres"))]
