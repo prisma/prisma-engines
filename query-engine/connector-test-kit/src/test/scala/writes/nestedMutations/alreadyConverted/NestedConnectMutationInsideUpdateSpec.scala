@@ -66,7 +66,8 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
            |}""",
         project,
         errorCode = 2014,
-        errorContains = """Error in query graph construction: RelationViolation(RelationViolation { relation_name: \"ChildToParent\", model_a_name: \"Child\", model_b_name: \"Parent\" })"""
+        errorContains =
+          """Error in query graph construction: RelationViolation(RelationViolation { relation_name: \"ChildToParent\", model_a_name: \"Child\", model_b_name: \"Parent\" })"""
       )
     }
   }
@@ -724,7 +725,7 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
            |      childrenOpt: {connect: $child}
            |    }
            |  ){
-           |    childrenOpt(first:10, orderBy: c_ASC) {
+           |    childrenOpt(take:10, orderBy: c_ASC) {
            |      c
            |    }
            |  }

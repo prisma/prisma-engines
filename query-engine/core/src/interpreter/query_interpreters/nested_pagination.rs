@@ -27,7 +27,7 @@ impl NestedPagination {
             let values: Vec<_> = r
                 .parent_id
                 .as_ref()
-                .expect("parent id must be set on all records in order to paginate")
+                .expect("Parent id must be set on all records in order to paginate")
                 .values()
                 .collect();
             values
