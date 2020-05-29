@@ -19,7 +19,7 @@ pub struct VersionChecker {
     has_inline_relations: bool,
 }
 
-const SQLITE_TYPES: [(&'static str, &'static str); 5] = [
+const SQLITE_TYPES: &'static [(&'static str, &'static str)] = &[
     ("BOOLEAN", "BOOLEAN"),
     ("DATE", "DATE"),
     ("REAL", "REAL"),
@@ -27,7 +27,7 @@ const SQLITE_TYPES: [(&'static str, &'static str); 5] = [
     ("TEXT", "TEXT"),
 ];
 
-const POSTGRES_TYPES: [(&'static str, &'static str); 7] = [
+const POSTGRES_TYPES: &'static [(&'static str, &'static str)] = &[
     ("boolean", "bool"),
     ("timestamp without time zone", "timestamp"),
     ("numeric", "numeric"),
@@ -36,7 +36,7 @@ const POSTGRES_TYPES: [(&'static str, &'static str); 7] = [
     ("character", "char"),
     ("character varying", "varchar"),
 ];
-const MYSQL_TYPES: [(&'static str, &'static str); 13] = [
+const MYSQL_TYPES: &'static [(&'static str, &'static str)] = &[
     ("tinyint", "tinyint(1)"),
     ("datetime", "datetime(3)"),
     ("decimal", "decimal(65,30)"),
