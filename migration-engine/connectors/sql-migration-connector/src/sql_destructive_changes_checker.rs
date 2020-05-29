@@ -136,6 +136,7 @@ impl SqlDestructiveChangesChecker<'_> {
         use crate::sql_migration::expanded_alter_column::*;
 
         match self.sql_family() {
+            SqlFamily::Mssql => todo!("Greetings from Redmond"),
             SqlFamily::Sqlite => {
                 let arity_change_is_safe = match (&differ.previous.tpe.arity, &differ.next.tpe.arity) {
                     // column became required

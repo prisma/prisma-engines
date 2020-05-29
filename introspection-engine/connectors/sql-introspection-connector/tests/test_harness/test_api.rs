@@ -64,6 +64,7 @@ impl TestApi {
                 SqlFamily::Mysql => barrel::SqlVariant::Mysql,
                 SqlFamily::Postgres => barrel::SqlVariant::Pg,
                 SqlFamily::Sqlite => barrel::SqlVariant::Sqlite,
+                SqlFamily::Mssql => todo!("Greetings from Redmond"),
             },
         }
     }

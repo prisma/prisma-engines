@@ -16,6 +16,22 @@ use rust_decimal::prelude::FromPrimitive;
 #[cfg(feature = "sql-ext")]
 pub use sql_ext::*;
 
+#[derive(Clone, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize)]
+pub enum TypeHint {
+    String,
+    Float,
+    Boolean,
+    Enum,
+    Json,
+    DateTime,
+    UUID,
+    Int,
+    Array,
+    Char,
+    Bytes,
+    Unknown,
+}
+
 #[derive(Debug, PartialEq, Clone, Eq, Hash, Serialize, Deserialize, PartialOrd, Ord)]
 #[serde(untagged)]
 pub enum PrismaValue {
@@ -23,7 +39,9 @@ pub enum PrismaValue {
     Boolean(bool),
     Enum(String),
     Int(i64),
-    Null,
+
+    #[serde(serialize_with = "serialize_null")]
+    Null(TypeHint),
     Uuid(Uuid),
     List(PrismaListValue),
     Json(String),
@@ -51,7 +69,7 @@ impl TryFrom<serde_json::Value> for PrismaValue {
                 let vals: PrismaValueResult<Vec<PrismaValue>> = v.into_iter().map(PrismaValue::try_from).collect();
                 Ok(PrismaValue::List(vals?))
             }
-            serde_json::Value::Null => Ok(PrismaValue::Null),
+            serde_json::Value::Null => Ok(PrismaValue::Null(TypeHint::Unknown)),
             serde_json::Value::Bool(b) => Ok(PrismaValue::Boolean(b)),
             serde_json::Value::Number(num) => {
                 if num.is_i64() {
@@ -76,6 +94,13 @@ where
     format!("{}", stringify_date(date)).serialize(serializer)
 }
 
+fn serialize_null<S>(_: &TypeHint, serializer: S) -> Result<S::Ok, S::Error>
+where
+    S: Serializer,
+{
+    Option::<u8>::None.serialize(serializer)
+}
+
 fn serialize_decimal<S>(decimal: &Decimal, serializer: S) -> Result<S::Ok, S::Error>
 where
     S: Serializer,
@@ -84,9 +109,16 @@ where
 }
 
 impl PrismaValue {
+    pub fn null<I>(hint: I) -> Self
+    where
+        I: Into<TypeHint>,
+    {
+        Self::Null(hint.into())
+    }
+
     pub fn is_null(&self) -> bool {
         match self {
-            PrismaValue::Null => true,
+            PrismaValue::Null(_) => true,
             _ => false,
         }
     }
@@ -123,7 +155,7 @@ impl fmt::Display for PrismaValue {
             PrismaValue::DateTime(x) => x.fmt(f),
             PrismaValue::Enum(x) => x.fmt(f),
             PrismaValue::Int(x) => x.fmt(f),
-            PrismaValue::Null => "null".fmt(f),
+            PrismaValue::Null(_) => "null".fmt(f),
             PrismaValue::Uuid(x) => x.fmt(f),
             PrismaValue::Json(x) => x.fmt(f),
             PrismaValue::List(x) => {

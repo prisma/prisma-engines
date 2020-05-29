@@ -89,8 +89,8 @@ async fn adding_a_unique_constraint_when_existing_data_respects_it_works(api: &T
     assert_eq!(
         rows,
         &[
-            &[r#"Text("abc")"#, r#"Text("george")"#],
-            &[r#"Text("def")"#, r#"Text("georgina")"#]
+            &[r#"Text(Some("abc"))"#, r#"Text(Some("george"))"#],
+            &[r#"Text(Some("def"))"#, r#"Text(Some("georgina"))"#]
         ]
     );
 

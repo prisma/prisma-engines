@@ -1,5 +1,5 @@
 use super::{
-    builtin::{MySqlSourceDefinition, PostgresSourceDefinition, SqliteSourceDefinition},
+    builtin::{MSSqlSourceDefinition, MySqlSourceDefinition, PostgresSourceDefinition, SqliteSourceDefinition},
     traits::{Source, SourceDefinition},
 };
 use crate::ast;
@@ -127,5 +127,6 @@ fn get_builtin_sources() -> Vec<Box<dyn SourceDefinition>> {
         Box::new(MySqlSourceDefinition::new()),
         Box::new(PostgresSourceDefinition::new()),
         Box::new(SqliteSourceDefinition::new()),
+        Box::new(MSSqlSourceDefinition::new()),
     ]
 }

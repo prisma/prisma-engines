@@ -15,6 +15,7 @@ tracing = "0.1"
 
 [dependencies.quaint]
 git = "https://github.com/prisma/quaint"
+branch = "mssql-support"
 features = ["mysql", "postgresql", "sqlite"]
 optional = true
 

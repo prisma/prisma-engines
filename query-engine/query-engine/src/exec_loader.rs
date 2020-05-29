@@ -1,7 +1,7 @@
 use crate::{PrismaError, PrismaResult};
 use connector::Connector;
 use datamodel::{
-    configuration::{MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME},
+    configuration::{MSSQL_SOURCE_NAME, MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME},
     Source,
 };
 use query_core::executor::{InterpretingExecutor, QueryExecutor};
@@ -23,6 +23,9 @@ pub async fn load(
 
         #[cfg(feature = "sql")]
         POSTGRES_SOURCE_NAME => postgres(source).await,
+
+        #[cfg(feature = "sql")]
+        MSSQL_SOURCE_NAME => mssql(source).await,
 
         x => Err(PrismaError::ConfigurationError(format!(
             "Unsupported connector type: {}",
@@ -88,6 +91,33 @@ async fn mysql(
 
     trace!("Loaded MySQL connector.");
     Ok((db_name, sql_executor("mysql", mysql, false)))
+}
+
+#[cfg(feature = "sql")]
+async fn mssql(
+    source: &(dyn Source + Send + Sync),
+) -> PrismaResult<(String, Box<dyn QueryExecutor + Send + Sync + 'static>)> {
+    trace!("Loading SQL Server connector...");
+
+    let mssql = Mssql::from_source(source).await?;
+
+    let mut splitted = source.url().value.split(";");
+    splitted.next();
+
+    let mut params: HashMap<String, String> = splitted
+        .map(|kv| {
+            let mut splitted = kv.split("=");
+            let key = splitted.next().unwrap();
+            let value = splitted.next().unwrap();
+
+            (key.to_lowercase(), value.to_string())
+        })
+        .collect();
+
+    let db_name = params.remove("database").unwrap_or_else(|| String::from("master"));
+
+    trace!("Loaded SQL Server connector.");
+    Ok((db_name, sql_executor("mssql", mssql, false)))
 }
 
 #[cfg(feature = "sql")]

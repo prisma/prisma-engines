@@ -79,6 +79,7 @@ impl TestApi {
             SqlFamily::Mysql => mysql_test_config("unreachable"),
             SqlFamily::Postgres => postgres_12_test_config("unreachable"),
             SqlFamily::Sqlite => sqlite_test_config("unreachable"),
+            SqlFamily::Mssql => todo!("Greetings from Redmond"),
         }
     }
 
@@ -145,6 +146,7 @@ impl TestApi {
                 SqlFamily::Mysql => barrel::SqlVariant::Mysql,
                 SqlFamily::Postgres => barrel::SqlVariant::Pg,
                 SqlFamily::Sqlite => barrel::SqlVariant::Sqlite,
+                SqlFamily::Mssql => todo!("Greetings from Redmond"),
             },
         }
     }

@@ -1,3 +1,5 @@
+mod mssql_source;
+mod mssql_source_definition;
 mod mysql_source;
 mod mysql_source_definition;
 mod postgres_source;
@@ -6,6 +8,8 @@ mod shared_validation;
 mod sqlite_source;
 mod sqlite_source_definition;
 
+pub use mssql_source::*;
+pub use mssql_source_definition::*;
 pub use mysql_source::*;
 pub use mysql_source_definition::*;
 pub use postgres_source::*;

@@ -94,6 +94,7 @@ impl SqlMigrationConnector {
                     debug!("{}", sql_str);
                     self.conn().query_raw(&sql_str, &[]).await?;
                 }
+                ConnectionInfo::Mssql(_) => todo!("Greetings from Redmond"),
             };
 
             Ok(())

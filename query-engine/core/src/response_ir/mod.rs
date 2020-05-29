@@ -13,7 +13,7 @@ mod internal;
 use crate::{CoreError, ExpressionResult, OutputType, OutputTypeRef, QueryResult, QueryValue};
 use indexmap::IndexMap;
 use internal::*;
-use prisma_models::PrismaValue;
+use prisma_models::{PrismaValue, TypeHint};
 use serde::ser::{Serialize, SerializeMap, SerializeSeq, Serializer};
 use std::{borrow::Borrow, fmt, sync::Arc};
 
@@ -180,7 +180,7 @@ pub enum Item {
 
 impl Item {
     pub fn null() -> Self {
-        Self::Value(PrismaValue::Null)
+        Self::Value(PrismaValue::Null(TypeHint::Unknown))
     }
 
     pub fn list(inner: Vec<Item>) -> Self {
@@ -274,7 +274,7 @@ impl IrSerializer {
                         // Todo: The following checks feel out of place. This probably needs to be handled already one level deeper.
                         let result = if result.is_empty() {
                             match self.output_type.borrow() {
-                                OutputType::Opt(_) => Item::Value(PrismaValue::Null),
+                                OutputType::Opt(_) => Item::Value(PrismaValue::Null(TypeHint::Unknown)),
                                 OutputType::List(_) => Item::list(Vec::new()),
                                 other => return Response::Error(ResponseError::from(CoreError::SerializationError(format!(
                                     "Invalid response data: the query result was required, but an empty {:?} was returned instead.",

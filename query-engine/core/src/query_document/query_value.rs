@@ -33,7 +33,7 @@ impl From<PrismaValue> for QueryValue {
             PrismaValue::Enum(s) => Self::Enum(s),
             PrismaValue::List(l) => Self::List(l.into_iter().map(QueryValue::from).collect()),
             PrismaValue::Int(i) => Self::Int(i),
-            PrismaValue::Null => Self::Null,
+            PrismaValue::Null(_) => Self::Null,
             PrismaValue::Uuid(u) => Self::String(u.to_hyphenated().to_string()),
             PrismaValue::Json(s) => Self::String(s),
         }

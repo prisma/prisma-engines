@@ -1,4 +1,5 @@
 mod connection;
+mod mssql;
 mod mysql;
 mod postgresql;
 mod sqlite;
@@ -10,6 +11,7 @@ use async_trait::async_trait;
 use connector_interface::{error::ConnectorError, Connector};
 use datamodel::Source;
 
+pub use mssql::*;
 pub use mysql::*;
 pub use postgresql::*;
 pub use sqlite::*;

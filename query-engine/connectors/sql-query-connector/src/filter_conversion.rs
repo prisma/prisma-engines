@@ -136,8 +136,8 @@ impl AliasedCondition for ScalarFilter {
     fn aliased_cond(self, alias: Option<Alias>) -> ConditionTree<'static> {
         fn compare(comparable: impl Comparable<'static>, cond: ScalarCondition) -> ConditionTree<'static> {
             let condition = match cond {
-                ScalarCondition::Equals(PrismaValue::Null) => comparable.is_null(),
-                ScalarCondition::NotEquals(PrismaValue::Null) => comparable.is_not_null(),
+                ScalarCondition::Equals(PrismaValue::Null(_)) => comparable.is_null(),
+                ScalarCondition::NotEquals(PrismaValue::Null(_)) => comparable.is_not_null(),
                 ScalarCondition::Equals(value) => comparable.equals(value),
                 ScalarCondition::NotEquals(value) => comparable.not_equals(value),
                 ScalarCondition::Contains(value) => comparable.like(format!("{}", value)),
