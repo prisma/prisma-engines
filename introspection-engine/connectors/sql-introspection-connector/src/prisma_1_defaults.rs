@@ -4,6 +4,11 @@ use introspection_connector::{Version, Warning};
 use quaint::connector::SqlFamily;
 use sql_schema_describer::SqlSchema;
 
+const VARCHAR: &str = "varchar";
+const CHARACTER_VARYING: &str = "character varying";
+const VARCHAR_25: &str = "varchar(25)";
+const VARCHAR_36: &str = "varchar(36)";
+
 pub fn add_prisma_1_id_defaults(
     family: &SqlFamily,
     version: &Version,
@@ -12,11 +17,6 @@ pub fn add_prisma_1_id_defaults(
     warnings: &mut Vec<Warning>,
 ) {
     let mut needs_to_be_changed = vec![];
-
-    let varchar = "varchar";
-    let character_varying = "character varying";
-    let varchar_25 = "varchar(25)";
-    let varchar_36 = "varchar(36)";
 
     match version {
         Version::Prisma1 | Version::Prisma11 => {
@@ -38,16 +38,16 @@ pub fn add_prisma_1_id_defaults(
                     &column.tpe.character_maximum_length,
                     family,
                 ) {
-                    (dt, fdt, Some(25), SqlFamily::Postgres) if dt == character_varying && fdt == varchar => {
+                    (dt, fdt, Some(25), SqlFamily::Postgres) if dt == CHARACTER_VARYING && fdt == VARCHAR => {
                         needs_to_be_changed.push((model_and_field, true))
                     }
-                    (dt, fdt, Some(36), SqlFamily::Postgres) if dt == character_varying && fdt == varchar => {
+                    (dt, fdt, Some(36), SqlFamily::Postgres) if dt == CHARACTER_VARYING && fdt == VARCHAR => {
                         needs_to_be_changed.push((model_and_field, false))
                     }
-                    (dt, fdt, Some(25), SqlFamily::Mysql) if dt == varchar && fdt == varchar_25 => {
+                    (dt, fdt, Some(25), SqlFamily::Mysql) if dt == VARCHAR && fdt == VARCHAR_25 => {
                         needs_to_be_changed.push((model_and_field, true))
                     }
-                    (dt, fdt, Some(36), SqlFamily::Mysql) if dt == varchar && fdt == varchar_36 => {
+                    (dt, fdt, Some(36), SqlFamily::Mysql) if dt == VARCHAR && fdt == VARCHAR_36 => {
                         needs_to_be_changed.push((model_and_field, false))
                     }
                     _ => (),
