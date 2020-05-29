@@ -39,7 +39,7 @@ pub fn connect_nested_query(
             "set" => connect_nested_set(graph, &parent, &parent_relation_field, value, &child_model)?,
             "updateMany" => connect_nested_update_many(graph, &parent, &parent_relation_field, value, &child_model)?,
             "deleteMany" => connect_nested_delete_many(graph, &parent, &parent_relation_field, value, &child_model)?,
-            _ => (),
+            _ => panic!("Unhandled nested operation: {}", field_name),
         };
     }
 

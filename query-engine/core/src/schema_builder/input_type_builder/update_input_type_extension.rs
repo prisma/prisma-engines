@@ -98,6 +98,7 @@ pub trait UpdateInputTypeBuilderExtension<'a>: InputTypeBuilderBase<'a> + Create
                             append_opt(&mut fields, self.nested_update_many_field(Arc::clone(&rf)));
                             append_opt(&mut fields, self.nested_delete_many_field(Arc::clone(&rf)));
                             append_opt(&mut fields, self.nested_upsert_field(Arc::clone(&rf)));
+                            append_opt(&mut fields, self.nested_connect_or_create_field(Arc::clone(&rf)));
 
                             input_object.set_fields(fields);
                             Arc::downgrade(&input_object)
