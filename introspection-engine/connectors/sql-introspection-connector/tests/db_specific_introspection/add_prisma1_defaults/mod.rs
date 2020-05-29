@@ -51,7 +51,7 @@ async fn add_cuid_default_for_mysql(api: &TestApi) {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Book", |t| {
-                t.inject_custom("id varchar(25) Not Null Primary Key");
+                t.inject_custom("id char(25) Not Null Primary Key");
             });
         })
         .await;
@@ -72,7 +72,7 @@ async fn add_uuid_default_for_mysql(api: &TestApi) {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Book", |t| {
-                t.inject_custom("id varchar(36) Not Null Primary Key");
+                t.inject_custom("id char(36) Not Null Primary Key");
             });
         })
         .await;
