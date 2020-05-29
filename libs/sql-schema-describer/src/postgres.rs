@@ -141,6 +141,7 @@ impl SqlSchemaDescriber {
                 column_name,
                 data_type,
                 udt_name as full_data_type,
+                character_maximum_length,
                 column_default,
                 is_nullable,
                 is_identity,
@@ -172,6 +173,7 @@ impl SqlSchemaDescriber {
                 .get("full_data_type")
                 .and_then(|x| x.to_string())
                 .expect("get full_data_type aka udt_name");
+            let character_maximum_length = col.get("character_maximum_length").and_then(|x| x.as_i64());
             let is_identity_str = col
                 .get("is_identity")
                 .and_then(|x| x.to_string())
@@ -200,7 +202,14 @@ impl SqlSchemaDescriber {
             } else {
                 ColumnArity::Nullable
             };
-            let tpe = get_column_type(data_type.as_ref(), &full_data_type, arity, enums);
+
+            let tpe = get_column_type(
+                data_type.as_ref(),
+                &full_data_type,
+                character_maximum_length,
+                arity,
+                enums,
+            );
 
             let default = match col.get("column_default") {
                 None => None,
@@ -601,7 +610,13 @@ struct IndexRow {
     sequence_name: Option<String>,
 }
 
-fn get_column_type<'a>(data_type: &str, full_data_type: &'a str, arity: ColumnArity, enums: &Vec<Enum>) -> ColumnType {
+fn get_column_type<'a>(
+    data_type: &str,
+    full_data_type: &'a str,
+    character_maximum_length: Option<i64>,
+    arity: ColumnArity,
+    enums: &Vec<Enum>,
+) -> ColumnType {
     use ColumnTypeFamily::*;
     let trim = |name: &'a str| name.trim_start_matches("_");
     let enum_exists = |name: &'a str| enums.iter().any(|e| e.name == name);
@@ -651,6 +666,7 @@ fn get_column_type<'a>(data_type: &str, full_data_type: &'a str, arity: ColumnAr
     ColumnType {
         data_type: data_type.to_owned(),
         full_data_type: full_data_type.to_owned(),
+        character_maximum_length,
         family,
         arity,
     }

@@ -65,4 +65,8 @@ impl Argument {
             span: Span::empty(),
         }
     }
+
+    pub fn is_unnamed(&self) -> bool {
+        self.name.name == ""
+    }
 }

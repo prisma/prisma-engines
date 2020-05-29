@@ -12,5 +12,4 @@ generator foo {
 model Author {
   id        Int      @id
   name      String?
-  createdAt DateTime @default(now())
 }

@@ -10,6 +10,7 @@ macro_rules! match_children (
                 Rule::WHITESPACE => { },
                 Rule::BLOCK_OPEN => { },
                 Rule::BLOCK_CLOSE => { },
+                Rule::NEWLINE => { },
                 $(
                     $pattern => $result
                 ),*
@@ -29,7 +30,8 @@ macro_rules! match_first (
                 .filter(|rule|
                     rule.as_rule() != Rule::BLOCK_CLOSE &&
                     rule.as_rule() != Rule::BLOCK_OPEN &&
-                    rule.as_rule() != Rule::WHITESPACE
+                    rule.as_rule() != Rule::WHITESPACE &&
+                    rule.as_rule() != Rule::NEWLINE
                 )
                 .next().unwrap();
             match $current.as_rule() {

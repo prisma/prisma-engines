@@ -4,11 +4,20 @@ use std::cmp::max;
 
 const COLUMN_SPACING: usize = 1;
 
+#[derive(Debug)]
 pub enum Row {
-    Regular(Vec<String>),
+    // the 2nd String is an arbitrary String that does not influence the table layout. We use it for end of line comments.
+    Regular(Vec<String>, String),
     Interleaved(String),
 }
 
+impl Row {
+    fn new_regular() -> Row {
+        Row::Regular(Vec::new(), "".to_owned())
+    }
+}
+
+#[derive(Debug)]
 pub struct TableFormat {
     pub table: Vec<Row>,
     row: i32,
@@ -24,6 +33,13 @@ impl TableFormat {
             line_ending: true,
             maybe_new_line: false,
         }
+    }
+
+    fn reset(&mut self) {
+        self.table = Vec::new();
+        self.row = -1;
+        self.line_ending = true;
+        self.maybe_new_line = false;
     }
 
     pub fn interleave_writer(&mut self) -> TableFormatInterleaveWrapper {
@@ -49,7 +65,7 @@ impl TableFormat {
         }
 
         let index = match &self.table[self.row as usize] {
-            Row::Regular(row) => row.len() - 1,
+            Row::Regular(row, _) => row.len() - 1,
             Row::Interleaved(_) => panic!("Cannot lock col in interleaved mode"),
         };
 
@@ -59,7 +75,7 @@ impl TableFormat {
         }
     }
 
-    fn interleave(&mut self, text: &str) {
+    pub fn interleave(&mut self, text: &str) {
         self.table.push(Row::Interleaved(String::from(text)));
         // We've just ended a line.
         self.line_ending = false;
@@ -79,7 +95,7 @@ impl TableFormat {
         }
 
         match &mut self.table[self.row as usize] {
-            Row::Regular(row) => {
+            Row::Regular(row, _) => {
                 while row.len() <= index {
                     row.push(String::new());
                 }
@@ -94,27 +110,34 @@ impl TableFormat {
         }
     }
 
-    fn start_new_line(&mut self) {
-        self.table.push(Row::Regular(Vec::new()));
+    pub fn append_suffix_to_current_row(&mut self, text: &str) {
+        match &mut self.table[self.row as usize] {
+            Row::Regular(_, suffix) => suffix.push_str(text),
+            _ => panic!("State error: Not inside a regular table row."),
+        }
+    }
+
+    pub fn start_new_line(&mut self) {
+        self.table.push(Row::new_regular());
         self.row += 1;
     }
 
-    pub fn render(&self, target: &mut dyn LineWriteable) {
+    pub fn render(&mut self, target: &mut dyn LineWriteable) {
         // First, measure cols
-        let mut len = 0;
+        let mut max_number_of_columns = 0;
 
         for row in &self.table {
-            if let Row::Regular(row) = row {
-                len = max(len, row.len());
+            if let Row::Regular(row, _) = row {
+                max_number_of_columns = max(max_number_of_columns, row.len());
             }
         }
 
-        let mut cols_width = vec![0; len];
+        let mut max_widths_for_each_column = vec![0; max_number_of_columns];
 
         for row in &self.table {
-            if let Row::Regular(row) = row {
+            if let Row::Regular(row, _) = row {
                 for (i, col) in row.iter().enumerate() {
-                    cols_width[i] = max(cols_width[i], col.len());
+                    max_widths_for_each_column[i] = max(max_widths_for_each_column[i], col.len());
                 }
             }
         }
@@ -122,14 +145,17 @@ impl TableFormat {
         // Then, render
         for row in &self.table {
             match row {
-                Row::Regular(row) => {
+                Row::Regular(row, suffix) => {
                     for (i, col) in row.iter().enumerate() {
                         let spacing = if i == row.len() - 1 {
                             0 // Do not space last column.
                         } else {
-                            cols_width[i] - col.len() + COLUMN_SPACING
+                            max_widths_for_each_column[i] - col.len() + COLUMN_SPACING
                         };
                         target.write(&format!("{}{}", col, " ".repeat(spacing)));
+                    }
+                    if !suffix.is_empty() {
+                        target.write(&format!(" {}", suffix));
                     }
                 }
                 Row::Interleaved(text) => {
@@ -139,6 +165,8 @@ impl TableFormat {
 
             target.end_line();
         }
+
+        self.reset()
     }
 }
 
@@ -153,7 +181,7 @@ impl LineWriteable for TableFormat {
         let trimmed = text.trim();
 
         match &mut self.table[self.row as usize] {
-            Row::Regular(row) => row.push(String::from(trimmed)),
+            Row::Regular(row, _) => row.push(String::from(trimmed)),
             _ => panic!("State error: Not inside a regular table row."),
         }
     }
@@ -224,7 +252,7 @@ impl<'a> LineWriteable for ColumnLockedWriter<'a> {
             true
         } else {
             match &self.formatter.table.last().unwrap() {
-                Row::Regular(row) => row.len() <= self.column || row[self.column].is_empty(),
+                Row::Regular(row, _) => row.len() <= self.column || row[self.column].is_empty(),
                 Row::Interleaved(s) => s.is_empty(),
             }
         }

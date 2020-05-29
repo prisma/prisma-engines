@@ -506,6 +506,17 @@ impl<'a> Validator<'a> {
                     }
                 }
 
+                if !rel_info.fields.is_empty()
+                    && !rel_info.to_fields.is_empty()
+                    && rel_info.fields.len() != rel_info.to_fields.len()
+                {
+                    errors.push(DatamodelError::new_directive_validation_error(
+                        &format!("You must specify the same number of fields in `fields` and `references`.",),
+                        RELATION_DIRECTIVE_NAME,
+                        ast_field.span.clone(),
+                    ));
+                }
+
                 if !fields_with_wrong_type.is_empty() && !errors.has_errors() {
                     // don't output too much errors
                     errors.append_vec(fields_with_wrong_type);

@@ -2,32 +2,50 @@ use crate::common::*;
 use datamodel::common::ScalarType;
 
 #[test]
-fn parse_comments_without_crasing_or_loosing_info() {
+fn comments_must_work_in_models() {
     let dml = r#"
-    // comment 1
-    model User { // comment 2
+    /// comment 1
+    model User { /// comment 2
         id Int @id
-        firstName String // comment 3
-        // comment 4
-        lastName String // comment 5
+        firstName String /// comment 3
+        /// comment 4
+        lastName String /// comment 5
     }
     "#;
 
     let schema = parse(dml);
-    let user_model = schema.assert_has_model("User");
-    user_model.assert_is_embedded(false);
-    user_model.assert_has_field("id").assert_base_type(&ScalarType::Int);
+    let user_model = schema.assert_has_model("User").assert_with_documentation("comment 1");
     user_model
         .assert_has_field("firstName")
-        .assert_base_type(&ScalarType::String);
+        .assert_with_documentation("comment 3");
     user_model
         .assert_has_field("lastName")
-        .assert_base_type(&ScalarType::String);
+        .assert_with_documentation("comment 4\ncomment 5");
 }
 
-// TODO: figure out if this is a feature we want. I don't think so.
 #[test]
-#[ignore]
+fn comments_must_work_in_enums() {
+    let dml = r#"
+    // Line 1
+    // Line 2
+    /// Documentation Comment Enum
+    enum Role {
+      // Comment above
+      /// Documentation Comment Enum Value 1
+      USER // Comment on the side
+      // Comment below
+    }"#;
+
+    // must not crash
+    let schema = parse(dml);
+    schema
+        .assert_has_enum("Role")
+        .assert_with_documentation("Documentation Comment Enum")
+        .assert_has_value("USER")
+        .assert_with_documentation("Documentation Comment Enum Value 1");
+}
+
+#[test]
 fn accept_a_comment_at_the_end() {
     let dml = r#"
     model User {
@@ -53,21 +71,6 @@ fn accept_a_doc_comment_at_the_end() {
     let user_model = schema.assert_has_model("User");
     user_model.assert_is_embedded(false);
     user_model.assert_has_field("id").assert_base_type(&ScalarType::Int);
-}
-
-#[test]
-fn comments_must_work_in_enums() {
-    let dml = r#"
-    // Line 1
-    // Line 2
-    enum Role {
-      // Comment above
-      USER // Comment on the side
-      // Comment below
-    }"#;
-
-    // must not crash
-    let _ = parse(dml);
 }
 
 #[test]

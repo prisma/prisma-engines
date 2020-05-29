@@ -182,6 +182,7 @@ async fn get_all_columns(
                 column_name column_name,
                 data_type data_type,
                 column_type full_data_type,
+                character_maximum_length character_maximum_length, 
                 column_default column_default,
                 is_nullable is_nullable,
                 extra extra,
@@ -201,7 +202,6 @@ async fn get_all_columns(
 
     for col in rows {
         debug!("Got column: {:?}", col);
-
         let table_name = col
             .get("table_name")
             .and_then(|x| x.to_string())
@@ -215,6 +215,7 @@ async fn get_all_columns(
             .get("full_data_type")
             .and_then(|x| x.to_string())
             .expect("get full_data_type aka column_type");
+        let character_maximum_length = col.get("character_maximum_length").and_then(|x| x.as_i64());
         let is_nullable = col
             .get("is_nullable")
             .and_then(|x| x.to_string())
@@ -231,7 +232,15 @@ async fn get_all_columns(
         } else {
             ColumnArity::Nullable
         };
-        let (tpe, enum_option) = get_column_type_and_enum(&table_name, &name, &data_type, &full_data_type, arity);
+
+        let (tpe, enum_option) = get_column_type_and_enum(
+            &table_name,
+            &name,
+            &data_type,
+            &full_data_type,
+            character_maximum_length,
+            arity,
+        );
         let extra = col
             .get("extra")
             .and_then(|x| x.to_string())
@@ -520,6 +529,7 @@ fn get_column_type_and_enum(
     column_name: &str,
     data_type: &str,
     full_data_type: &str,
+    character_maximum_length: Option<i64>,
     arity: ColumnArity,
 ) -> (ColumnType, Option<Enum>) {
     let family = match (data_type, full_data_type) {
@@ -569,6 +579,7 @@ fn get_column_type_and_enum(
     let tpe = ColumnType {
         data_type: data_type.to_owned(),
         full_data_type: full_data_type.to_owned(),
+        character_maximum_length,
         family: family.clone(),
         arity,
     };

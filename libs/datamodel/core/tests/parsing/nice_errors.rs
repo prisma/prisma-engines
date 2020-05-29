@@ -87,7 +87,6 @@ fn nice_error_missing_directive_name() {
     ));
 }
 
-// TODO: This case is not nice because the "{ }" belong to the declaration.
 #[test]
 fn nice_error_missing_braces() {
     let dml = r#"
@@ -187,5 +186,78 @@ fn optional_list_fields_must_error() {
     error.assert_is(DatamodelError::new_legacy_parser_error(
         "Optional lists are not supported. Use either `Type[]` or `Type?`.",
         Span::new(51, 60),
+    ));
+}
+
+#[test]
+fn invalid_lines_at_the_top_level_must_render_nicely() {
+    // https://github.com/prisma/vscode/issues/140
+    // If a user types on the very last line we did not error nicely.
+    // a new line fixed the problem but this is not nice.
+    let dml = r#"model User {
+        id Int @id
+        names String
+    }
+
+    model Bl"#;
+
+    let error = parse_error(dml);
+
+    error.assert_is(DatamodelError::new_validation_error(
+        "This line is invalid. It does not start with any known Prisma schema keyword.",
+        Span::new(64, 72),
+    ));
+}
+
+#[test]
+fn invalid_lines_in_datasources_must_render_nicely() {
+    let dml = r#"
+    datasource mydb {
+        provider = "postgres"
+        url = "postgresql://localhost"
+        this is an invalid line
+    }
+    "#;
+
+    let error = parse_error(dml);
+
+    error.assert_is(DatamodelError::new_validation_error(
+        "This line is not a valid definition within a datasource.",
+        Span::new(100, 124),
+    ));
+}
+
+#[test]
+fn invalid_lines_in_generators_must_render_nicely() {
+    let dml = r#"
+    generator js {
+        provider = "js"
+        this is an invalid line
+    }
+    "#;
+
+    let error = parse_error(dml);
+
+    error.assert_is(DatamodelError::new_validation_error(
+        "This line is not a valid definition within a generator.",
+        Span::new(52, 76),
+    ));
+}
+
+#[test]
+fn invalid_field_line_must_error_nicely() {
+    // https://github.com/prisma/vscode/issues/140
+    // If a user types on the very last line we did not error nicely.
+    // a new line fixed the problem but this is not nice.
+    let dml = r#"model User {
+        id    Int @id
+        foo   Bar Bla
+    }"#;
+
+    let error = parse_error(dml);
+
+    error.assert_is(DatamodelError::new_validation_error(
+        "This line is not a valid field or directive definition.",
+        Span::new(43, 57),
     ));
 }

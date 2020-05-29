@@ -27,10 +27,10 @@ pub fn run(opts: FormatOpts) {
             let file = File::open(&file_name).expect(&format!("Unable to open file {}", file_name.display()));
             let mut stream = BufWriter::new(file);
 
-            Reformatter::reformat_to(&datamodel_string, &mut stream, opts.tabwidth);
+            Reformatter::new(&datamodel_string).reformat_to(&mut stream, opts.tabwidth);
         }
         None => {
-            Reformatter::reformat_to(&datamodel_string, &mut io::stdout().lock(), opts.tabwidth);
+            Reformatter::new(&datamodel_string).reformat_to(&mut io::stdout().lock(), opts.tabwidth);
         }
     }
 }

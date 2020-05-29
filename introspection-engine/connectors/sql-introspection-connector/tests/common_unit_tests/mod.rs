@@ -82,12 +82,7 @@ fn a_data_model_can_be_generated_from_a_schema() {
                 .iter()
                 .map(|family| Column {
                     name: family.to_string(),
-                    tpe: ColumnType {
-                        data_type: "raw".to_string(),
-                        full_data_type: "raw".to_string(),
-                        family: family.to_owned(),
-                        arity: ColumnArity::Nullable,
-                    },
+                    tpe: ColumnType::pure(family.to_owned(), ColumnArity::Nullable),
                     default: None,
                     auto_increment: false,
                 })
@@ -170,34 +165,19 @@ fn arity_is_preserved_when_generating_data_model_from_a_schema() {
             columns: vec![
                 Column {
                     name: "optional".to_string(),
-                    tpe: ColumnType {
-                        data_type: "raw".to_string(),
-                        full_data_type: "raw".to_string(),
-                        family: ColumnTypeFamily::Int,
-                        arity: ColumnArity::Nullable,
-                    },
+                    tpe: ColumnType::pure(ColumnTypeFamily::Int, ColumnArity::Nullable),
                     default: None,
                     auto_increment: false,
                 },
                 Column {
                     name: "required".to_string(),
-                    tpe: ColumnType {
-                        data_type: "raw".to_string(),
-                        full_data_type: "raw".to_string(),
-                        family: ColumnTypeFamily::Int,
-                        arity: ColumnArity::Required,
-                    },
+                    tpe: ColumnType::pure(ColumnTypeFamily::Int, ColumnArity::Required),
                     default: None,
                     auto_increment: true,
                 },
                 Column {
                     name: "list".to_string(),
-                    tpe: ColumnType {
-                        data_type: "raw".to_string(),
-                        full_data_type: "raw".to_string(),
-                        family: ColumnTypeFamily::Int,
-                        arity: ColumnArity::List,
-                    },
+                    tpe: ColumnType::pure(ColumnTypeFamily::Int, ColumnArity::List),
                     default: None,
                     auto_increment: false,
                 },
@@ -310,56 +290,31 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
             columns: vec![
                 Column {
                     name: "no_default".to_string(),
-                    tpe: ColumnType {
-                        data_type: "raw".to_string(),
-                        full_data_type: "raw".to_string(),
-                        family: ColumnTypeFamily::Int,
-                        arity: ColumnArity::Nullable,
-                    },
+                    tpe: ColumnType::pure(ColumnTypeFamily::Int, ColumnArity::Nullable),
                     default: None,
                     auto_increment: false,
                 },
                 Column {
                     name: "int_default".to_string(),
-                    tpe: ColumnType {
-                        data_type: "raw".to_string(),
-                        full_data_type: "raw".to_string(),
-                        family: ColumnTypeFamily::Int,
-                        arity: ColumnArity::Nullable,
-                    },
+                    tpe: ColumnType::pure(ColumnTypeFamily::Int, ColumnArity::Nullable),
                     default: Some(DefaultValue::VALUE(PrismaValue::Int(1))),
                     auto_increment: false,
                 },
                 Column {
                     name: "bool_default".to_string(),
-                    tpe: ColumnType {
-                        data_type: "raw".to_string(),
-                        full_data_type: "raw".to_string(),
-                        family: ColumnTypeFamily::Boolean,
-                        arity: ColumnArity::Nullable,
-                    },
+                    tpe: ColumnType::pure(ColumnTypeFamily::Boolean, ColumnArity::Nullable),
                     default: Some(DefaultValue::VALUE(PrismaValue::Boolean(true))),
                     auto_increment: false,
                 },
                 Column {
                     name: "float_default".to_string(),
-                    tpe: ColumnType {
-                        data_type: "raw".to_string(),
-                        full_data_type: "raw".to_string(),
-                        family: ColumnTypeFamily::Float,
-                        arity: ColumnArity::Nullable,
-                    },
+                    tpe: ColumnType::pure(ColumnTypeFamily::Float, ColumnArity::Nullable),
                     default: Some(DefaultValue::VALUE(PrismaValue::new_float(1.0))),
                     auto_increment: false,
                 },
                 Column {
                     name: "string_default".to_string(),
-                    tpe: ColumnType {
-                        data_type: "raw".to_string(),
-                        full_data_type: "raw".to_string(),
-                        family: ColumnTypeFamily::String,
-                        arity: ColumnArity::Nullable,
-                    },
+                    tpe: ColumnType::pure(ColumnTypeFamily::String, ColumnArity::Nullable),
                     default: Some(DefaultValue::VALUE(PrismaValue::String("default".to_string()))),
                     auto_increment: false,
                 },
@@ -469,6 +424,7 @@ fn primary_key_is_preserved_when_generating_data_model_from_a_schema() {
                     tpe: ColumnType {
                         data_type: "integer".to_string(),
                         full_data_type: "integer".to_string(),
+                        character_maximum_length: None,
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Required,
                     },
@@ -489,6 +445,7 @@ fn primary_key_is_preserved_when_generating_data_model_from_a_schema() {
                     tpe: ColumnType {
                         data_type: "integer".to_string(),
                         full_data_type: "integer".to_string(),
+                        character_maximum_length: None,
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Required,
                     },
@@ -509,6 +466,8 @@ fn primary_key_is_preserved_when_generating_data_model_from_a_schema() {
                     tpe: ColumnType {
                         data_type: "integer".to_string(),
                         full_data_type: "integer".to_string(),
+                        character_maximum_length: None,
+
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Required,
                     },
@@ -585,23 +544,13 @@ fn uniqueness_is_preserved_when_generating_data_model_from_a_schema() {
             columns: vec![
                 Column {
                     name: "non_unique".to_string(),
-                    tpe: ColumnType {
-                        data_type: "raw".to_string(),
-                        full_data_type: "raw".to_string(),
-                        family: ColumnTypeFamily::Int,
-                        arity: ColumnArity::Nullable,
-                    },
+                    tpe: ColumnType::pure(ColumnTypeFamily::Int, ColumnArity::Nullable),
                     default: None,
                     auto_increment: false,
                 },
                 Column {
                     name: "unique".to_string(),
-                    tpe: ColumnType {
-                        data_type: "raw".to_string(),
-                        full_data_type: "raw".to_string(),
-                        family: ColumnTypeFamily::Int,
-                        arity: ColumnArity::Required,
-                    },
+                    tpe: ColumnType::pure(ColumnTypeFamily::Int, ColumnArity::Required),
                     default: None,
                     auto_increment: false,
                 },
@@ -767,6 +716,8 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
                         tpe: ColumnType {
                             data_type: "integer".to_string(),
                             full_data_type: "integer".to_string(),
+                            character_maximum_length: None,
+
                             family: ColumnTypeFamily::Int,
                             arity: ColumnArity::Required,
                         },
@@ -778,6 +729,8 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
                         tpe: ColumnType {
                             data_type: "text".to_string(),
                             full_data_type: "text".to_string(),
+                            character_maximum_length: None,
+
                             family: ColumnTypeFamily::String,
                             arity: ColumnArity::Required,
                         },
@@ -800,6 +753,8 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
                         tpe: ColumnType {
                             data_type: "integer".to_string(),
                             full_data_type: "integer".to_string(),
+                            character_maximum_length: None,
+
                             family: ColumnTypeFamily::Int,
                             arity: ColumnArity::Required,
                         },
@@ -811,6 +766,8 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
                         tpe: ColumnType {
                             data_type: "integer".to_string(),
                             full_data_type: "integer".to_string(),
+                            character_maximum_length: None,
+
                             family: ColumnTypeFamily::Int,
                             arity: ColumnArity::Required,
                         },
@@ -822,6 +779,8 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
                         tpe: ColumnType {
                             data_type: "text".to_string(),
                             full_data_type: "text".to_string(),
+                            character_maximum_length: None,
+
                             family: ColumnTypeFamily::String,
                             arity: ColumnArity::Required,
                         },
@@ -922,6 +881,8 @@ fn multi_field_uniques_are_preserved_when_generating_data_model_from_a_schema() 
                     tpe: ColumnType {
                         data_type: "integer".to_string(),
                         full_data_type: "integer".to_string(),
+                        character_maximum_length: None,
+
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Required,
                     },
@@ -933,6 +894,8 @@ fn multi_field_uniques_are_preserved_when_generating_data_model_from_a_schema() 
                     tpe: ColumnType {
                         data_type: "text".to_string(),
                         full_data_type: "text".to_string(),
+                        character_maximum_length: None,
+
                         family: ColumnTypeFamily::String,
                         arity: ColumnArity::Required,
                     },
@@ -944,6 +907,8 @@ fn multi_field_uniques_are_preserved_when_generating_data_model_from_a_schema() 
                     tpe: ColumnType {
                         data_type: "text".to_string(),
                         full_data_type: "text".to_string(),
+                        character_maximum_length: None,
+
                         family: ColumnTypeFamily::String,
                         arity: ColumnArity::Required,
                     },
@@ -1102,6 +1067,8 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                         tpe: ColumnType {
                             data_type: "integer".to_string(),
                             full_data_type: "integer".to_string(),
+                            character_maximum_length: None,
+
                             family: ColumnTypeFamily::Int,
                             arity: ColumnArity::Required,
                         },
@@ -1113,6 +1080,8 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                         tpe: ColumnType {
                             data_type: "text".to_string(),
                             full_data_type: "text".to_string(),
+                            character_maximum_length: None,
+
                             family: ColumnTypeFamily::String,
                             arity: ColumnArity::Required,
                         },
@@ -1135,6 +1104,8 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                         tpe: ColumnType {
                             data_type: "integer".to_string(),
                             full_data_type: "integer".to_string(),
+                            character_maximum_length: None,
+
                             family: ColumnTypeFamily::Int,
                             arity: ColumnArity::Required,
                         },
@@ -1146,6 +1117,8 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                         tpe: ColumnType {
                             data_type: "integer".to_string(),
                             full_data_type: "integer".to_string(),
+                            character_maximum_length: None,
+
                             family: ColumnTypeFamily::Int,
                             arity: ColumnArity::Required,
                         },

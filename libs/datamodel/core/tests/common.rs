@@ -34,7 +34,13 @@ pub trait ModelAsserts {
 }
 
 pub trait EnumAsserts {
-    fn assert_has_value(&self, t: &str) -> &Self;
+    fn assert_has_value(&self, t: &str) -> &dml::EnumValue;
+
+    fn assert_with_documentation(&self, t: &str) -> &Self;
+}
+
+pub trait EnumValueAsserts {
+    fn assert_with_documentation(&self, t: &str) -> &Self;
 }
 
 pub trait DatamodelAsserts {
@@ -230,12 +236,25 @@ impl ModelAsserts for dml::Model {
 }
 
 impl EnumAsserts for dml::Enum {
-    fn assert_has_value(&self, t: &str) -> &Self {
+    fn assert_has_value(&self, t: &str) -> &dml::EnumValue {
         let pred = t.to_owned();
+
         self.values
             .iter()
             .find(|x| *x.name == pred)
-            .expect(format!("Field {} not found", t).as_str());
+            .expect(format!("Enum Value {} not found", t).as_str())
+    }
+
+    fn assert_with_documentation(&self, t: &str) -> &Self {
+        assert_eq!(self.documentation, Some(t.to_owned()));
+
+        self
+    }
+}
+
+impl EnumValueAsserts for dml::EnumValue {
+    fn assert_with_documentation(&self, t: &str) -> &Self {
+        assert_eq!(self.documentation, Some(t.to_owned()));
 
         self
     }

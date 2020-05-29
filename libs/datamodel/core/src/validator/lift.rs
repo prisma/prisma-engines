@@ -129,6 +129,7 @@ impl<'a> LiftAstToDml<'a> {
     /// Internal: Validates an enum value AST node.
     fn lift_enum_value(&self, ast_enum_value: &ast::EnumValue) -> Result<dml::EnumValue, ErrorCollection> {
         let mut enum_value = dml::EnumValue::new(&ast_enum_value.name.name, None);
+        enum_value.documentation = ast_enum_value.documentation.clone().map(|comment| comment.text);
 
         self.directives
             .enm_value

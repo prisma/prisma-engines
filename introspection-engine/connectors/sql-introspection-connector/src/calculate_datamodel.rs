@@ -1,10 +1,11 @@
 use crate::commenting_out_guardrails::commenting_out_guardrails;
 use crate::misc_helpers::*;
+use crate::prisma_1_defaults::*;
 use crate::sanitize_datamodel_names::sanitize_datamodel_names;
 use crate::version_checker::VersionChecker;
 use crate::SqlIntrospectionResult;
 use datamodel::{dml, Datamodel, FieldType, Model};
-use introspection_connector::IntrospectionResult;
+use introspection_connector::{IntrospectionResult, Warning};
 use quaint::connector::SqlFamily;
 use sql_schema_describer::*;
 use tracing::debug;
@@ -22,6 +23,7 @@ pub fn calculate_datamodel(schema: &SqlSchema, family: &SqlFamily) -> SqlIntrosp
         .filter(|table| !is_migration_table(&table))
         .filter(|table| !is_prisma_1_point_1_or_2_join_table(&table))
         .filter(|table| !is_prisma_1_point_0_join_table(&table))
+        .filter(|table| !is_relay_table(&table))
     {
         debug!("Calculating model: {}", table.name);
         let mut model = Model::new(table.name.clone(), None);
@@ -59,6 +61,7 @@ pub fn calculate_datamodel(schema: &SqlSchema, family: &SqlFamily) -> SqlIntrosp
         }
 
         version_check.always_has_created_at_updated_at(table, &model);
+        version_check.always_has_singular_id(table, &model);
 
         data_model.add_model(model);
     }
@@ -123,15 +126,21 @@ pub fn calculate_datamodel(schema: &SqlSchema, family: &SqlFamily) -> SqlIntrosp
 
     //todo sanitizing might need to be adjusted to also change the fields in the RelationInfo
     sanitize_datamodel_names(&mut data_model);
-    let warnings = commenting_out_guardrails(&mut data_model);
+
+    let mut warnings: Vec<Warning> = vec![];
+    let mut commenting_out_warnings = commenting_out_guardrails(&mut data_model);
+    warnings.append(commenting_out_warnings.as_mut());
 
     deduplicate_field_names(&mut data_model);
 
-    debug!("Done calculating data model {:?}", data_model);
+    let version = version_check.version(&warnings);
 
+    add_prisma_1_id_defaults(family, &version, &mut data_model, schema, &mut warnings);
+
+    debug!("Done calculating data model {:?}", data_model);
     Ok(IntrospectionResult {
         datamodel: data_model,
-        version: version_check.version(&warnings),
+        version,
         warnings,
     })
 }

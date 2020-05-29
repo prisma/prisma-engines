@@ -22,7 +22,6 @@ pub struct Renderer<'a> {
     indent_width: usize,
 }
 
-// TODO: It would be soooo cool if we could pass format strings around.
 impl<'a> Renderer<'a> {
     pub fn new(stream: &'a mut dyn std::io::Write, indent_width: usize) -> Renderer<'a> {
         Renderer {
@@ -54,7 +53,7 @@ impl<'a> Renderer<'a> {
                     }
                 }
                 other => {
-                    if let Some(renderer) = &type_renderer {
+                    if let Some(renderer) = &mut type_renderer {
                         renderer.render(self);
                         type_renderer = None;
                     }
@@ -79,7 +78,13 @@ impl<'a> Renderer<'a> {
     fn render_documentation(target: &mut dyn LineWriteable, obj: &dyn ast::WithDocumentation) {
         if let Some(doc) = &obj.documentation() {
             for line in doc.text.split('\n') {
-                target.write("// ");
+                // We comment out objects in introspection. Those are put into `//` comments.
+                // We use the documentation on the object to render an explanation for why that happened. It's nice if this explanation is also in a `//` instead of a `///` comment.
+                if obj.is_commented_out() {
+                    target.write("// ");
+                } else {
+                    target.write("/// ");
+                }
                 target.write(line);
                 target.end_line();
             }
@@ -242,7 +247,7 @@ impl<'a> Renderer<'a> {
         self.end_line();
     }
 
-    fn render_field(target: &mut TableFormat, field: &ast::Field, is_commented_out: bool) {
+    pub fn render_field(target: &mut TableFormat, field: &ast::Field, is_commented_out: bool) {
         Self::render_documentation(&mut target.interleave_writer(), field);
 
         let commented_out = if field.is_commented_out || is_commented_out {

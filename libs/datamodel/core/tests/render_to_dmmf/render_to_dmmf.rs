@@ -19,7 +19,7 @@ fn test_dmmf_rendering() {
         println!("TESTING: {}", test_case);
         let datamodel_string = load_from_file(format!("{}.prisma", test_case).as_str());
         let dml = parse(&datamodel_string);
-        dbg!(&dml);
+        // dbg!(&dml);
         let dmmf_string = datamodel::json::dmmf::render_to_dmmf(&dml);
         //        println!("DMMF: \n{}", dmmf_string);
         assert_eq_json(

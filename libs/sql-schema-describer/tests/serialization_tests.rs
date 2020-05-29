@@ -29,6 +29,8 @@ fn database_schema_is_serializable() {
                         tpe: ColumnType {
                             data_type: "integer".to_string(),
                             full_data_type: "int".to_string(),
+                            character_maximum_length: None,
+
                             family: ColumnTypeFamily::Int,
                             arity: ColumnArity::Required,
                         },
@@ -40,6 +42,8 @@ fn database_schema_is_serializable() {
                         tpe: ColumnType {
                             data_type: "varchar(255)".to_string(),
                             full_data_type: "varchar(255)".to_string(),
+                            character_maximum_length: None,
+
                             family: ColumnTypeFamily::String,
                             arity: ColumnArity::Nullable,
                         },
@@ -51,6 +55,8 @@ fn database_schema_is_serializable() {
                         tpe: ColumnType {
                             data_type: "integer".to_string(),
                             full_data_type: "integer".to_string(),
+                            character_maximum_length: None,
+
                             family: ColumnTypeFamily::Int,
                             arity: ColumnArity::Required,
                         },
@@ -82,6 +88,8 @@ fn database_schema_is_serializable() {
                     tpe: ColumnType {
                         data_type: "integer".to_string(),
                         full_data_type: "integer".to_string(),
+                        character_maximum_length: None,
+
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Required,
                     },
@@ -128,6 +136,8 @@ fn database_schema_without_primary_key_is_serializable() {
                 tpe: ColumnType {
                     data_type: "integer".to_string(),
                     full_data_type: "int".to_string(),
+                    character_maximum_length: None,
+
                     family: ColumnTypeFamily::Int,
                     arity: ColumnArity::Nullable,
                 },
@@ -177,6 +187,8 @@ fn database_schema_is_serializable_for_every_column_type_family() {
         tpe: ColumnType {
             data_type: "raw type".to_string(),
             full_data_type: "full raw type".to_string(),
+            character_maximum_length: None,
+
             family: family.to_owned(),
             arity: ColumnArity::Nullable,
         },
@@ -218,6 +230,8 @@ fn database_schema_is_serializable_for_every_column_arity() {
             tpe: ColumnType {
                 data_type: "integer".to_string(),
                 full_data_type: "int".to_string(),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::Int,
                 arity: arity.to_owned(),
             },
@@ -260,6 +274,8 @@ fn database_schema_is_serializable_for_every_foreign_key_action() {
                     tpe: ColumnType {
                         data_type: "integer".to_string(),
                         full_data_type: "int".to_string(),
+                        character_maximum_length: None,
+
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
                     },
@@ -271,6 +287,8 @@ fn database_schema_is_serializable_for_every_foreign_key_action() {
                     tpe: ColumnType {
                         data_type: "integer".to_string(),
                         full_data_type: "int".to_string(),
+                        character_maximum_length: None,
+
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
                     },
@@ -282,6 +300,8 @@ fn database_schema_is_serializable_for_every_foreign_key_action() {
                     tpe: ColumnType {
                         data_type: "integer".to_string(),
                         full_data_type: "int".to_string(),
+                        character_maximum_length: None,
+
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
                     },
@@ -293,6 +313,8 @@ fn database_schema_is_serializable_for_every_foreign_key_action() {
                     tpe: ColumnType {
                         data_type: "integer".to_string(),
                         full_data_type: "int".to_string(),
+                        character_maximum_length: None,
+
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
                     },
@@ -304,6 +326,8 @@ fn database_schema_is_serializable_for_every_foreign_key_action() {
                     tpe: ColumnType {
                         data_type: "integer".to_string(),
                         full_data_type: "int".to_string(),
+                        character_maximum_length: None,
+
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
                     },
