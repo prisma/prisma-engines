@@ -8,9 +8,9 @@ struct Model {
 }
 
 #[derive(Serialize, Debug)]
-struct ModelAndField {
-    model: String,
-    field: String,
+pub struct ModelAndField {
+    pub model: String,
+    pub field: String,
 }
 
 #[derive(Serialize, Debug)]

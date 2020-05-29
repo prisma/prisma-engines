@@ -69,6 +69,7 @@ async fn is_required_must_work(api: &TestApi) {
             tpe: ColumnType {
                 data_type: int_data_type(api),
                 full_data_type: int_full_data_type(api),
+                character_maximum_length: None,
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
             },
@@ -80,6 +81,8 @@ async fn is_required_must_work(api: &TestApi) {
             tpe: ColumnType {
                 data_type: int_data_type(api),
                 full_data_type: int_full_data_type(api),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Nullable,
             },
@@ -120,6 +123,8 @@ async fn foreign_keys_must_work(api: &TestApi) {
         tpe: ColumnType {
             data_type: int_data_type(api),
             full_data_type: int_full_data_type(api),
+            character_maximum_length: None,
+
             family: ColumnTypeFamily::Int,
             arity: ColumnArity::Required,
         },
@@ -203,6 +208,8 @@ async fn multi_column_foreign_keys_must_work(api: &TestApi) {
             tpe: ColumnType {
                 data_type: int_data_type(api),
                 full_data_type: int_full_data_type(api),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
             },
@@ -214,6 +221,11 @@ async fn multi_column_foreign_keys_must_work(api: &TestApi) {
             tpe: ColumnType {
                 data_type: varchar_data_type(api, 255),
                 full_data_type: varchar_full_data_type(api, 255),
+                character_maximum_length: if api.sql_family() == SqlFamily::Sqlite {
+                    None
+                } else {
+                    Some(255)
+                },
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
             },
@@ -276,6 +288,8 @@ async fn names_with_hyphens_must_work(api: &TestApi) {
         tpe: ColumnType {
             data_type: int_data_type(api),
             full_data_type: int_full_data_type(api),
+            character_maximum_length: None,
+
             family: ColumnTypeFamily::Int,
             arity: ColumnArity::Required,
         },
@@ -316,6 +330,8 @@ async fn composite_primary_keys_must_work(api: &TestApi) {
             tpe: ColumnType {
                 data_type: int_data_type(api),
                 full_data_type: int_full_data_type(api),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
             },
@@ -327,6 +343,11 @@ async fn composite_primary_keys_must_work(api: &TestApi) {
             tpe: ColumnType {
                 data_type: varchar_data_type(api, 255),
                 full_data_type: varchar_full_data_type(api, 255),
+                character_maximum_length: if api.sql_family() == SqlFamily::Sqlite {
+                    None
+                } else {
+                    Some(255)
+                },
                 family: ColumnTypeFamily::String,
                 arity: ColumnArity::Required,
             },
@@ -374,6 +395,8 @@ async fn indices_must_work(api: &TestApi) {
             tpe: ColumnType {
                 data_type: int_data_type(api),
                 full_data_type: int_full_data_type(api),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
             },
@@ -385,6 +408,8 @@ async fn indices_must_work(api: &TestApi) {
             tpe: ColumnType {
                 data_type: int_data_type(api),
                 full_data_type: int_full_data_type(api),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
             },
@@ -440,6 +465,8 @@ async fn column_uniqueness_must_be_detected(api: &TestApi) {
             tpe: ColumnType {
                 data_type: int_data_type(api),
                 full_data_type: int_full_data_type(api),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
             },
@@ -451,6 +478,8 @@ async fn column_uniqueness_must_be_detected(api: &TestApi) {
             tpe: ColumnType {
                 data_type: int_data_type(api),
                 full_data_type: int_full_data_type(api),
+                character_maximum_length: None,
+
                 family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
             },
@@ -522,6 +551,8 @@ async fn defaults_must_work(api: &TestApi) {
         tpe: ColumnType {
             data_type: int_data_type(api),
             full_data_type: int_full_data_type(api),
+            character_maximum_length: None,
+
             family: ColumnTypeFamily::Int,
             arity: ColumnArity::Nullable,
         },

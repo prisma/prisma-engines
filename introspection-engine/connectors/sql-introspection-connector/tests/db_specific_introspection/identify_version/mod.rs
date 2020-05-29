@@ -3,6 +3,9 @@ use barrel::types;
 use introspection_connector::Version;
 use test_harness::*;
 
+//todo adjust tests for added types
+//todo adjust tests for new singular id rule for p1
+
 //Sqlite
 #[test_each_connector(tags("sqlite"))]
 async fn introspect_sqlite_non_prisma(api: &TestApi) {
