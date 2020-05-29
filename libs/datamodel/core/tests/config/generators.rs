@@ -40,6 +40,33 @@ fn serialize_generators_to_cmf() {
 }
 
 #[test]
+fn back_slashes_in_providers_must_work() {
+    let schema = r#"
+        generator mygen {
+          provider = "../folder\ with\ space/my\ generator.js"
+        }
+    "#;
+
+    let config = datamodel::parse_configuration(schema).unwrap();
+    let rendered = datamodel::json::mcf::generators_to_json(&config.generators);
+    //    print!("{:?}", &config.generators);
+
+    let expected = r#"[
+        {
+          "name": "mygen",
+          "provider": "../folder\\ with\\ space/my\\ generator.js",
+          "output": null,
+          "binaryTargets": [],
+          "config": {}
+        }
+    ]"#;
+
+    print!("{}", &rendered);
+
+    assert_eq_json(&rendered, expected);
+}
+
+#[test]
 fn new_lines_in_generator_must_work() {
     let schema = r#"
         generator go {

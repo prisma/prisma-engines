@@ -62,15 +62,15 @@ class CountAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase 
   }
 
   "Counting with all sorts of query arguments" should "work" in {
-    val i1 = createItem("1")
-    createItem("2")
+    createItem("1")
+    val i2 = createItem("2")
     createItem("3")
     createItem("4")
 
     val result = server.query(
       """{
         |  aggregateItem {
-        |    count(first: 2)
+        |    count(take: 2)
         |  }
         |}
       """.stripMargin,
@@ -82,7 +82,7 @@ class CountAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase 
     val result2 = server.query(
       """{
         |  aggregateItem {
-        |    count(first: 5)
+        |    count(take: 5)
         |  }
         |}
       """.stripMargin,
@@ -94,7 +94,7 @@ class CountAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase 
     val result3 = server.query(
       """{
         |  aggregateItem {
-        |    count(last: 5)
+        |    count(take: -5)
         |  }
         |}
       """.stripMargin,
@@ -142,7 +142,7 @@ class CountAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase 
     val result7 = server.query(
       s"""{
         |  aggregateItem {
-        |    count(after: { id: "${i1.pathAsString("data.createItem.id")}" })
+        |    count(cursor: { id: "${i2.pathAsString("data.createItem.id")}" })
         |  }
         |}
       """.stripMargin,

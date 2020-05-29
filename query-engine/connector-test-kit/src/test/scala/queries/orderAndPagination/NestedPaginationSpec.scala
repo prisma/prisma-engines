@@ -5,10 +5,7 @@ import play.api.libs.json.Json
 import util.ConnectorCapability.JoinRelationLinksCapability
 import util._
 
-class ExtendedPaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
-
-  override def runOnlyForCapabilities: Set[ConnectorCapability] = Set(JoinRelationLinksCapability)
-
+class NestedPaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
   val testDataModels = {
     val s1 = """
       model Top {
@@ -66,7 +63,6 @@ class ExtendedPaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "All data" should "be there" in {
-
     testDataModels.testV11 { project =>
       createData(project)
       val result = server.query(
@@ -83,92 +79,33 @@ class ExtendedPaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
     }
   }
 
-  //region Skip
+  /******************
+    * Cursor tests. *
+    *****************/
+  // WIP - This requires fixes
+//  "Middle level cursor" should "return all items after and including the cursor and return nothing for other tops" in {
+//    testDataModels.testV11 { project =>
+//      createData(project)
+//      val result = server.query(
+//        """
+//          |{
+//          |  tops{t, middles(cursor: { m: "M22" }){ m }}
+//          |
+//          |}
+//        """,
+//        project
+//      )
+//
+//      //{"data":{"tops":[{"t":"T1","middles":[]},{"t":"T2","middles":[{"m":"M22"},{"m":"M23"}]},{"t":"T3","middles":[{"m":"M31"},{"m":"M32"},{"m":"M33"}]}]}}
+//      result.toString() should be(
+//        """{"data":{"tops":[{"t":"T1","middles":[{"m":"M12"},{"m":"M13"}]},{"t":"T2","middles":[{"m":"M22"},{"m":"M23"}]},{"t":"T3","middles":[{"m":"M32"},{"m":"M33"}]}]}}""")
+//    }
+//  }
 
-  "Top level Skip 0 " should "skip no items" in {
-    testDataModels.testV11 { project =>
-      createData(project)
-      val result = server.query(
-        """
-        |{
-        |  tops(skip: 0){t, middles{m}}
-        |}
-      """,
-        project
-      )
-
-      result.toString() should be(
-        """{"data":{"tops":[{"t":"T1","middles":[{"m":"M11"},{"m":"M12"},{"m":"M13"}]},{"t":"T2","middles":[{"m":"M21"},{"m":"M22"},{"m":"M23"}]},{"t":"T3","middles":[{"m":"M31"},{"m":"M32"},{"m":"M33"}]}]}}""")
-    }
-  }
-
-  "Top level Skip 1 " should "skip the first item" in {
-    testDataModels.testV11 { project =>
-      createData(project)
-      val result = server.query(
-        """
-        |{
-        |  tops(skip: 1){t, middles{m}}
-        |}
-      """,
-        project
-      )
-
-      result.toString() should be(
-        """{"data":{"tops":[{"t":"T2","middles":[{"m":"M21"},{"m":"M22"},{"m":"M23"}]},{"t":"T3","middles":[{"m":"M31"},{"m":"M32"},{"m":"M33"}]}]}}""")
-    }
-  }
-
-  "Top level Skip 3 " should "skip all items" in {
-    testDataModels.testV11 { project =>
-      createData(project)
-      val result = server.query(
-        """
-        |{
-        |  tops(skip: 3){t, middles{m}}
-        |}
-      """,
-        project
-      )
-
-      result.toString() should be("""{"data":{"tops":[]}}""")
-    }
-  }
-
-  "Top level Skip 4 " should "skip all items" in {
-    testDataModels.testV11 { project =>
-      createData(project)
-      val result = server.query(
-        """
-        |{
-        |  tops(skip: 4){t, middles{m}}
-        |}
-      """,
-        project
-      )
-
-      result.toString() should be("""{"data":{"tops":[]}}""")
-    }
-  }
-
-  "Middle level Skip 0 " should "skip no items" in {
-    testDataModels.testV11 { project =>
-      createData(project)
-      val result = server.query(
-        """
-        |{
-        |  tops{t, middles(skip: 0){m}}
-        |}
-      """,
-        project
-      )
-
-      result.toString() should be(
-        """{"data":{"tops":[{"t":"T1","middles":[{"m":"M11"},{"m":"M12"},{"m":"M13"}]},{"t":"T2","middles":[{"m":"M21"},{"m":"M22"},{"m":"M23"}]},{"t":"T3","middles":[{"m":"M31"},{"m":"M32"},{"m":"M33"}]}]}}""")
-    }
-  }
-
-  "Middle level Skip 1 " should "skip the first item" in {
+  /****************
+    * Skip tests. *
+    ***************/
+  "Middle level skip 1" should "skip the first item" in {
     testDataModels.testV11 { project =>
       createData(project)
       val result = server.query(
@@ -185,7 +122,7 @@ class ExtendedPaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
     }
   }
 
-  "Middle level Skip 3 " should "skip all items" in {
+  "Middle level skip 3" should "skip all items" in {
     testDataModels.testV11 { project =>
       createData(project)
       val result = server.query(
@@ -201,7 +138,7 @@ class ExtendedPaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
     }
   }
 
-  "Middle level Skip 4 " should "skip all items" in {
+  "Middle level skip 4" should "skip all items" in {
     testDataModels.testV11 { project =>
       createData(project)
       val result = server.query(
@@ -217,7 +154,7 @@ class ExtendedPaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
     }
   }
 
-  "Bottom level Skip 0 " should "skip no items" in {
+  "Bottom level skip 0" should "skip no items" in {
     testDataModels.testV11 { project =>
       createData(project)
       val result = server.query(
@@ -234,7 +171,7 @@ class ExtendedPaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
     }
   }
 
-  "Bottom level Skip 1 " should "skip the first item" in {
+  "Bottom level skip 1" should "skip the first item" in {
     testDataModels.testV11 { project =>
       createData(project)
       val result = server.query(
@@ -251,7 +188,7 @@ class ExtendedPaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
     }
   }
 
-  "Bottom level Skip 3 " should "skip all items" in {
+  "Bottom level skip 3" should "skip all items" in {
     testDataModels.testV11 { project =>
       createData(project)
       val result = server.query(
@@ -268,7 +205,7 @@ class ExtendedPaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
     }
   }
 
-  "Bottom level Skip 4 " should "skip all items" in {
+  "Bottom level skip 4" should "skip all items" in {
     testDataModels.testV11 { project =>
       createData(project)
       val result = server.query(
@@ -285,83 +222,16 @@ class ExtendedPaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
     }
   }
 
-  //endregion
-
-  //region First
-
-  "Top level First 0 " should "return no items" in {
+  /**************
+    * Take tests *
+   **************/
+  "Middle level take 0" should "return no items" in {
     testDataModels.testV11 { project =>
       createData(project)
       val result = server.query(
         """
         |{
-        |  tops(first: 0){t, middles{m}}
-        |}
-      """,
-        project
-      )
-
-      result.toString() should be("""{"data":{"tops":[]}}""")
-    }
-  }
-
-  "Top level First 1 " should "return only the first item" in {
-    testDataModels.testV11 { project =>
-      createData(project)
-      val result = server.query(
-        """
-        |{
-        |  tops(first: 1){t, middles{m}}
-        |}
-      """,
-        project
-      )
-
-      result.toString() should be("""{"data":{"tops":[{"t":"T1","middles":[{"m":"M11"},{"m":"M12"},{"m":"M13"}]}]}}""")
-    }
-  }
-
-  "Top level First 3 " should "return all items" in {
-    testDataModels.testV11 { project =>
-      createData(project)
-      val result = server.query(
-        """
-        |{
-        |  tops(first: 3){t, middles{m}}
-        |}
-      """,
-        project
-      )
-
-      result.toString() should be(
-        """{"data":{"tops":[{"t":"T1","middles":[{"m":"M11"},{"m":"M12"},{"m":"M13"}]},{"t":"T2","middles":[{"m":"M21"},{"m":"M22"},{"m":"M23"}]},{"t":"T3","middles":[{"m":"M31"},{"m":"M32"},{"m":"M33"}]}]}}""")
-    }
-  }
-
-  "Top level First 4 " should "return all items" in {
-    testDataModels.testV11 { project =>
-      createData(project)
-      val result = server.query(
-        """
-        |{
-        |  tops(first: 4){t, middles{m}}
-        |}
-      """,
-        project
-      )
-
-      result.toString() should be(
-        """{"data":{"tops":[{"t":"T1","middles":[{"m":"M11"},{"m":"M12"},{"m":"M13"}]},{"t":"T2","middles":[{"m":"M21"},{"m":"M22"},{"m":"M23"}]},{"t":"T3","middles":[{"m":"M31"},{"m":"M32"},{"m":"M33"}]}]}}""")
-    }
-  }
-
-  "Middle level First 0 " should "return no items" in {
-    testDataModels.testV11 { project =>
-      createData(project)
-      val result = server.query(
-        """
-        |{
-        |  tops{t, middles(first: 0){m}}
+        |  tops{t, middles(take: 0){m}}
         |}
       """,
         project
@@ -371,13 +241,13 @@ class ExtendedPaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
     }
   }
 
-  "Middle level First 1 " should "return the first item" in {
+  "Middle level take 1" should "return the first item" in {
     testDataModels.testV11 { project =>
       createData(project)
       val result = server.query(
         """
         |{
-        |  tops{t, middles(first: 1){m}}
+        |  tops{t, middles(take: 1){m}}
         |}
       """,
         project
@@ -388,13 +258,13 @@ class ExtendedPaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
     }
   }
 
-  "Middle level First 3 " should "return all items" in {
+  "Middle level take 3" should "return all items" in {
     testDataModels.testV11 { project =>
       createData(project)
       val result = server.query(
         """
         |{
-        |  tops{t, middles(first: 3){m}}
+        |  tops{t, middles(take: 3){m}}
         |}
       """,
         project
@@ -405,13 +275,13 @@ class ExtendedPaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
     }
   }
 
-  "Middle level First 4 " should "return all items" in {
+  "Middle level take 4" should "return all items" in {
     testDataModels.testV11 { project =>
       createData(project)
       val result = server.query(
         """
         |{
-        |  tops{t, middles(first: 4){m}}
+        |  tops{t, middles(take: 4){m}}
         |}
       """,
         project
@@ -422,13 +292,13 @@ class ExtendedPaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
     }
   }
 
-  "Bottom level First 0 " should "return no items" in {
+  "Bottom level take 0" should "return no items" in {
     testDataModels.testV11 { project =>
       createData(project)
       val result = server.query(
         """
         |{
-        |  tops{middles{bottoms(first: 0){b}}}
+        |  tops{middles{bottoms(take: 0){b}}}
         |}
       """,
         project
@@ -439,13 +309,13 @@ class ExtendedPaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
     }
   }
 
-  "Bottom level First 1 " should "return the first item" in {
+  "Bottom level take 1" should "return the first item" in {
     testDataModels.testV11 { project =>
       createData(project)
       val result = server.query(
         """
         |{
-        |  tops{middles{bottoms(first:1){b}}}
+        |  tops{middles{bottoms(take:1){b}}}
         |}
       """,
         project
@@ -456,13 +326,13 @@ class ExtendedPaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
     }
   }
 
-  "Bottom level First 3 " should "return all items" in {
+  "Bottom level take 3" should "return all items" in {
     testDataModels.testV11 { project =>
       createData(project)
       val result = server.query(
         """
         |{
-        |  tops{middles{bottoms(first: 3){b}}}
+        |  tops{middles{bottoms(take: 3){b}}}
         |}
       """,
         project
@@ -474,13 +344,13 @@ class ExtendedPaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
 
   }
 
-  "Bottom level First 4 " should "return all items" in {
+  "Bottom level take 4" should "return all items" in {
     testDataModels.testV11 { project =>
       createData(project)
       val result = server.query(
         """
         |{
-        |  tops{middles{bottoms(first: 4){b}}}
+        |  tops{middles{bottoms(take: 4){b}}}
         |}
       """,
         project
@@ -491,99 +361,13 @@ class ExtendedPaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
     }
   }
 
-  //endregion
-
-  //region Last
-
-  "Top level Last 0 " should "return no items" in {
+  "Middle level take -1" should "return the last item" in {
     testDataModels.testV11 { project =>
       createData(project)
       val result = server.query(
         """
         |{
-        |  tops(last: 0){t, middles{m}}
-        |}
-      """,
-        project
-      )
-
-      result.toString() should be("""{"data":{"tops":[]}}""")
-    }
-  }
-
-  "Top level Last 1 " should "return only the last item" in {
-    testDataModels.testV11 { project =>
-      createData(project)
-      val result = server.query(
-        """
-        |{
-        |  tops(last: 1){t, middles{m}}
-        |}
-      """,
-        project
-      )
-
-      result.toString() should be("""{"data":{"tops":[{"t":"T3","middles":[{"m":"M31"},{"m":"M32"},{"m":"M33"}]}]}}""")
-    }
-  }
-
-  "Top level Last 3 " should "return all items" in {
-    testDataModels.testV11 { project =>
-      createData(project)
-      val result = server.query(
-        """
-        |{
-        |  tops(last: 3){t, middles{m}}
-        |}
-      """,
-        project
-      )
-
-      result.toString() should be(
-        """{"data":{"tops":[{"t":"T1","middles":[{"m":"M11"},{"m":"M12"},{"m":"M13"}]},{"t":"T2","middles":[{"m":"M21"},{"m":"M22"},{"m":"M23"}]},{"t":"T3","middles":[{"m":"M31"},{"m":"M32"},{"m":"M33"}]}]}}""")
-    }
-  }
-
-  "Top level Last 4 " should "return all items" in {
-    testDataModels.testV11 { project =>
-      createData(project)
-      val result = server.query(
-        """
-        |{
-        |  tops(last: 4){t, middles{m}}
-        |}
-      """,
-        project
-      )
-
-      result.toString() should be(
-        """{"data":{"tops":[{"t":"T1","middles":[{"m":"M11"},{"m":"M12"},{"m":"M13"}]},{"t":"T2","middles":[{"m":"M21"},{"m":"M22"},{"m":"M23"}]},{"t":"T3","middles":[{"m":"M31"},{"m":"M32"},{"m":"M33"}]}]}}""")
-    }
-  }
-
-  "Middle level Last 0 " should "return no items" in {
-    testDataModels.testV11 { project =>
-      createData(project)
-      val result = server.query(
-        """
-        |{
-        |  tops{t, middles(last: 0){m}}
-        |}
-      """,
-        project
-      )
-
-      result.toString() should be("""{"data":{"tops":[{"t":"T1","middles":[]},{"t":"T2","middles":[]},{"t":"T3","middles":[]}]}}""")
-    }
-  }
-
-  "Middle level Last 1 " should "return the last item" in {
-    testDataModels.testV11 { project =>
-      createData(project)
-      val result = server.query(
-        """
-        |{
-        |  tops{t, middles(last: 1){m}}
+        |  tops{t, middles(take: -1){m}}
         |}
       """,
         project
@@ -594,13 +378,13 @@ class ExtendedPaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
     }
   }
 
-  "Middle level Last 3 " should "return all items" in {
+  "Middle level take -3" should "return all items" in {
     testDataModels.testV11 { project =>
       createData(project)
       val result = server.query(
         """
         |{
-        |  tops{t, middles(last: 3){m}}
+        |  tops{t, middles(take: -3){m}}
         |}
       """,
         project
@@ -611,13 +395,13 @@ class ExtendedPaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
     }
   }
 
-  "Middle level Last 4 " should "return all items" in {
+  "Middle level take -4" should "return all items" in {
     testDataModels.testV11 { project =>
       createData(project)
       val result = server.query(
         """
         |{
-        |  tops{t, middles(last: 4){m}}
+        |  tops{t, middles(take: -4){m}}
         |}
       """,
         project
@@ -628,30 +412,13 @@ class ExtendedPaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
     }
   }
 
-  "Bottom level Last 0 " should "return no items" in {
+  "Bottom level take -1" should "return the last item" in {
     testDataModels.testV11 { project =>
       createData(project)
       val result = server.query(
         """
         |{
-        |  tops{middles{bottoms(last: 0){b}}}
-        |}
-      """,
-        project
-      )
-
-      result.toString() should be(
-        """{"data":{"tops":[{"middles":[{"bottoms":[]},{"bottoms":[]},{"bottoms":[]}]},{"middles":[{"bottoms":[]},{"bottoms":[]},{"bottoms":[]}]},{"middles":[{"bottoms":[]},{"bottoms":[]},{"bottoms":[]}]}]}}""")
-    }
-  }
-
-  "Bottom level Last 1 " should "return the last item" in {
-    testDataModels.testV11 { project =>
-      createData(project)
-      val result = server.query(
-        """
-        |{
-        |  tops{middles{bottoms(last:1){b}}}
+        |  tops{middles{bottoms(take:-1){b}}}
         |}
       """,
         project
@@ -662,13 +429,13 @@ class ExtendedPaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
     }
   }
 
-  "Bottom level Last 3 " should "return all items" in {
+  "Bottom level take -3" should "return all items" in {
     testDataModels.testV11 { project =>
       createData(project)
       val result = server.query(
         """
         |{
-        |  tops{middles{bottoms(last: 3){b}}}
+        |  tops{middles{bottoms(take: -3){b}}}
         |}
       """,
         project
@@ -679,13 +446,13 @@ class ExtendedPaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
     }
   }
 
-  "Bottom level Last 4 " should "return all items" in {
+  "Bottom level take -4" should "return all items" in {
     testDataModels.testV11 { project =>
       createData(project)
       val result = server.query(
         """
         |{
-        |  tops{middles{bottoms(last: 4){b}}}
+        |  tops{middles{bottoms(take: -4){b}}}
         |}
       """,
         project
@@ -696,17 +463,16 @@ class ExtendedPaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
     }
   }
 
-  //endregion
-
-  //region Skip  First
-
-  "Top level Skip 1 First 1 " should "return the second item" in {
+  /**********************
+    * Skip + Take tests *
+    *********************/
+  "Top level skip 1 take 1" should "return the second item" in {
     testDataModels.testV11 { project =>
       createData(project)
       val result = server.query(
         """
         |{
-        |  tops(skip: 1, first: 1){t, middles{m}}
+        |  tops(skip: 1, take: 1){t, middles{m}}
         |}
       """,
         project
@@ -716,13 +482,13 @@ class ExtendedPaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
     }
   }
 
-  "Top level  Skip 1 First 3 " should "return only the last two items" in {
+  "Top level  skip 1 take 3" should "return only the last two items" in {
     testDataModels.testV11 { project =>
       createData(project)
       val result = server.query(
         """
         |{
-        |  tops(skip: 1, first: 3){t, middles{m}}
+        |  tops(skip: 1, take: 3){t, middles{m}}
         |}
       """,
         project
@@ -733,13 +499,13 @@ class ExtendedPaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
     }
   }
 
-  "Middle level Skip 1 First 1 " should "return the second" in {
+  "Middle level skip 1 take 1" should "return the second" in {
     testDataModels.testV11 { project =>
       createData(project)
       val result = server.query(
         """
         |{
-        |  tops{t, middles(skip: 1, first: 1){m}}
+        |  tops{t, middles(skip: 1, take: 1){m}}
         |}
       """,
         project
@@ -750,13 +516,13 @@ class ExtendedPaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
     }
   }
 
-  "Middle level Skip 1 First 3 " should "return the last two items" in {
+  "Middle level skip 1 take 3" should "return the last two items" in {
     testDataModels.testV11 { project =>
       createData(project)
       val result = server.query(
         """
         |{
-        |  tops{t, middles(skip: 1, first: 3){m}}
+        |  tops{t, middles(skip: 1, take: 3){m}}
         |}
       """,
         project
@@ -767,17 +533,13 @@ class ExtendedPaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
     }
   }
 
-  //endregion
-
-  //region Skip Last
-
-  "Top level Skip 1 Last 1 " should "return the second item" in {
+  "Top level skip 1 take -1" should "return the second item" in {
     testDataModels.testV11 { project =>
       createData(project)
       val result = server.query(
         """
         |{
-        |  tops(skip: 1, last: 1){t, middles{m}}
+        |  tops(skip: 1, take: -1){t, middles{m}}
         |}
       """,
         project
@@ -787,13 +549,13 @@ class ExtendedPaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
     }
   }
 
-  "Top level  Skip 1 Last 3 " should "return only the first two items" in {
+  "Top level skip 1 take -3" should "return only the first two items" in {
     testDataModels.testV11 { project =>
       createData(project)
       val result = server.query(
         """
         |{
-        |  tops(skip: 1, last: 3){t, middles{m}}
+        |  tops(skip: 1, take: -3){t, middles{m}}
         |}
       """,
         project
@@ -804,13 +566,13 @@ class ExtendedPaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
     }
   }
 
-  "Middle level Skip 1 Last 1 " should "return the second" in {
+  "Middle level skip 1 take -1" should "return the second" in {
     testDataModels.testV11 { project =>
       createData(project)
       val result = server.query(
         """
         |{
-        |  tops{t, middles(skip: 1, last: 1){m}}
+        |  tops{t, middles(skip: 1, take: -1){m}}
         |}
       """,
         project
@@ -821,13 +583,13 @@ class ExtendedPaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
     }
   }
 
-  "Middle level Skip 1 Last 3 " should "return the first two items" in {
+  "Middle level skip 1 take -3" should "return the first two items" in {
     testDataModels.testV11 { project =>
       createData(project)
       val result = server.query(
         """
         |{
-        |  tops{t, middles(skip: 1, last: 3){m}}
+        |  tops{t, middles(skip: 1, take: -3){m}}
         |}
       """,
         project
@@ -838,50 +600,16 @@ class ExtendedPaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
     }
   }
 
-  //endregion
-
-  //region Order First
-
-  "Top level OrderBy First 1 " should "return the last item" in {
+  /*************************
+    * Skip + take + order. *
+    ************************/
+  "Middle orderBy take 1" should "return the last item" in {
     testDataModels.testV11 { project =>
       createData(project)
       val result = server.query(
         """
         |{
-        |  tops(orderBy: t_DESC, first: 1){t, middles{m}}
-        |}
-      """,
-        project
-      )
-
-      result.toString() should be("""{"data":{"tops":[{"t":"T3","middles":[{"m":"M31"},{"m":"M32"},{"m":"M33"}]}]}}""")
-    }
-  }
-
-  "Top level  OrderBy First 3 " should "return all items in reverse order" in {
-    testDataModels.testV11 { project =>
-      createData(project)
-      val result = server.query(
-        """
-        |{
-        |  tops(orderBy: t_DESC, first: 3){t, middles{m}}
-        |}
-      """,
-        project
-      )
-
-      result.toString() should be(
-        """{"data":{"tops":[{"t":"T3","middles":[{"m":"M31"},{"m":"M32"},{"m":"M33"}]},{"t":"T2","middles":[{"m":"M21"},{"m":"M22"},{"m":"M23"}]},{"t":"T1","middles":[{"m":"M11"},{"m":"M12"},{"m":"M13"}]}]}}""")
-    }
-  }
-
-  "Middle OrderBy First 1 " should "return the last item" in {
-    testDataModels.testV11 { project =>
-      createData(project)
-      val result = server.query(
-        """
-        |{
-        |  tops{t, middles(orderBy: m_DESC, first: 1){m}}
+        |  tops{t, middles(orderBy: m_DESC, take: 1){m}}
         |}
       """,
         project
@@ -892,13 +620,13 @@ class ExtendedPaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
     }
   }
 
-  "Middle level OrderBy First 3 " should "return all items in reverse order" in {
+  "Middle level orderBy take 3" should "return all items in reverse order" in {
     testDataModels.testV11 { project =>
       createData(project)
       val result = server.query(
         """
         |{
-        |  tops{t, middles(orderBy: m_DESC, first: 3){m}}
+        |  tops{t, middles(orderBy: m_DESC, take: 3){m}}
         |}
       """,
         project
@@ -908,8 +636,6 @@ class ExtendedPaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
         """{"data":{"tops":[{"t":"T1","middles":[{"m":"M13"},{"m":"M12"},{"m":"M11"}]},{"t":"T2","middles":[{"m":"M23"},{"m":"M22"},{"m":"M21"}]},{"t":"T3","middles":[{"m":"M33"},{"m":"M32"},{"m":"M31"}]}]}}""")
     }
   }
-
-  //endregion
 
   private def createData(project: Project): Unit = {
     server.query(

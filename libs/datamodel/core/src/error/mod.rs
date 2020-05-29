@@ -104,7 +104,7 @@ pub enum DatamodelError {
     #[fail(display = "Error validating field `{}` in model `{}`: {}", field, model, message)]
     FieldValidationError { message: String, model: String, field: String, span: Span },
 
-    #[fail(display = "Error validating source `{}`: {}", source, message)]
+    #[fail(display = "Error validating datasource `{}`: {}", source, message)]
     SourceValidationError { message: String, source: String, span: Span },
 
     #[fail(display = "Error validating enum `{}`: {}", enum_name, message)]

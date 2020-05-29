@@ -3,7 +3,8 @@ pub const RESERVED_MODEL_NAMES: [&str; 108] = [
     "Query",
     "Mutation",
     "Subscription",
-    // Misc
+    // The source of the following list is from prisma-client-js. Any edit should be done in both places.
+    // https://github.com/prisma/prisma/blob/master/src/packages/client/src/generation/generateClient.ts#L443
     "dmmf",
     "PromiseType",
     "PromiseReturnType",
