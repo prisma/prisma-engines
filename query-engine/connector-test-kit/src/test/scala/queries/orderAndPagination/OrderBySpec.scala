@@ -21,8 +21,7 @@ class OrderBySpec extends FlatSpec with Matchers with ApiSpecBase {
     createNeedsTiebreakers()
   }
 
-
-   // we are no longer using id ordering by default
+  // we are no longer using id ordering by default
   "The order when not giving an order by" should "be by Id ascending and therefore oldest first" ignore {
     val resultWithOrderByImplicitlySpecified = server.query(
       """
@@ -55,7 +54,7 @@ class OrderBySpec extends FlatSpec with Matchers with ApiSpecBase {
     val result = server.query(
       """
         |{
-        |  needsTiebreakers(last: 3) {
+        |  needsTiebreakers(take: -3) {
         |    order
         |  }
         |}
@@ -100,7 +99,7 @@ class OrderBySpec extends FlatSpec with Matchers with ApiSpecBase {
     val result = server.query(
       """
         |{
-        |  needsTiebreakers(orderBy: name_ASC, last: 3) {
+        |  needsTiebreakers(orderBy: name_ASC, take: -3) {
         |    order
         |  }
         |}
@@ -130,7 +129,7 @@ class OrderBySpec extends FlatSpec with Matchers with ApiSpecBase {
     val result = server.query(
       """
         |{
-        |  needsTiebreakers(orderBy: name_DESC, last: 3) {
+        |  needsTiebreakers(orderBy: name_DESC, take: -3) {
         |    order
         |  }
         |}

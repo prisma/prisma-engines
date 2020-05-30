@@ -9,35 +9,25 @@ use std::convert::TryInto;
 
 /// Expects the caller to know that it is structurally guaranteed that query arguments can be extracted,
 /// e.g. that the query schema guarantees that required fields are present.
-/// Errors occur if conversions fail unexpectedly.
+/// Errors occur if conversions fail.
 pub fn extract_query_args(arguments: Vec<ParsedArgument>, model: &ModelRef) -> QueryGraphBuilderResult<QueryArguments> {
     arguments
         .into_iter()
         .fold(Ok(QueryArguments::default()), |result, arg| {
             if let Ok(res) = result {
                 match arg.name.as_str() {
+                    "cursor" => Ok(QueryArguments {
+                        cursor: extract_cursor(arg.value, model)?,
+                        ..res
+                    }),
+
+                    "take" => Ok(QueryArguments {
+                        take: arg.value.try_into()?,
+                        ..res
+                    }),
+
                     "skip" => Ok(QueryArguments {
-                        skip: arg.value.try_into()?,
-                        ..res
-                    }),
-
-                    "first" => Ok(QueryArguments {
-                        first: arg.value.try_into()?,
-                        ..res
-                    }),
-
-                    "last" => Ok(QueryArguments {
-                        last: arg.value.try_into()?,
-                        ..res
-                    }),
-
-                    "after" => Ok(QueryArguments {
-                        after: extract_cursor(arg.value, model)?,
-                        ..res
-                    }),
-
-                    "before" => Ok(QueryArguments {
-                        before: extract_cursor(arg.value, model)?,
+                        skip: extract_skip(arg.value)?,
                         ..res
                     }),
 
@@ -63,6 +53,19 @@ pub fn extract_query_args(arguments: Vec<ParsedArgument>, model: &ModelRef) -> Q
                 result
             }
         })
+}
+
+fn extract_skip(value: ParsedInputValue) -> QueryGraphBuilderResult<Option<i64>> {
+    let val: Option<i64> = value.try_into()?;
+
+    match val {
+        Some(val) if val < 0 => Err(QueryGraphBuilderError::AssertionError(format!(
+            "Invalid value for skip argument: Value can only be positive, found: {}",
+            val,
+        ))),
+
+        val => Ok(val),
+    }
 }
 
 fn extract_cursor(value: ParsedInputValue, model: &ModelRef) -> QueryGraphBuilderResult<Option<RecordProjection>> {

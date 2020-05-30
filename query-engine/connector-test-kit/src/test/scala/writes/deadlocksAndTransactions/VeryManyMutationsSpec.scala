@@ -98,7 +98,7 @@ class VeryManyMutationsSpec extends FlatSpec with Matchers with ApiSpecBase with
     // The Postgres communication protocol uses a signed 16 bit integer to identify the number of query parameters.
     // so you can't execute a query that contains more than 32.768 of them.
     // source: https://github.com/sfackler/rust-postgres/issues/356#issuecomment-391415848
-    server.query(s"""query {middles(first: 32500) { top { int } }}""", project)
+    server.query(s"""query {middles(take: 32500) { top { int } }}""", project)
   }
 
   "Expanding relations for a for 40000 records" should "work" taggedAs (IgnorePostgres) in {

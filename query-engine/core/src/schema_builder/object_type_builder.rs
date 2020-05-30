@@ -147,11 +147,9 @@ impl<'a> ObjectTypeBuilder<'a> {
         vec![
             self.where_argument(&model),
             self.order_by_argument(&model),
+            argument("cursor", unique_input_type.clone(), None),
+            argument("take", InputType::opt(InputType::int()), None),
             argument("skip", InputType::opt(InputType::int()), None),
-            argument("after", unique_input_type.clone(), None),
-            argument("before", unique_input_type, None),
-            argument("first", InputType::opt(InputType::int()), None),
-            argument("last", InputType::opt(InputType::int()), None),
         ]
     }
 

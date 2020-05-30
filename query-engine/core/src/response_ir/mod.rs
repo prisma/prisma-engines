@@ -9,7 +9,6 @@
 //! Note: The code itself can be considered WIP. It is clear when reading the code that there are missing abstractions
 //! and a restructure might be necessary (good example is the default value handling sprinkled all over the place).
 mod internal;
-mod utils;
 
 use crate::{CoreError, ExpressionResult, OutputType, OutputTypeRef, QueryResult, QueryValue};
 use indexmap::IndexMap;
@@ -17,7 +16,6 @@ use internal::*;
 use prisma_models::PrismaValue;
 use serde::ser::{Serialize, SerializeMap, SerializeSeq, Serializer};
 use std::{borrow::Borrow, fmt, sync::Arc};
-use utils::*;
 
 /// A `key -> value` map to an IR item
 pub type Map = IndexMap<String, Item>;

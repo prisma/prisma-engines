@@ -11,8 +11,8 @@ impl NestedPagination {
     pub fn new_from_query_args(args: &QueryArguments) -> NestedPagination {
         NestedPagination {
             skip: args.skip.clone(),
-            take: args.last.or(args.first).clone(),
-            needs_reversing: args.last.is_some(),
+            take: args.take_abs(),
+            needs_reversing: args.needs_reversed_order(),
         }
     }
 
@@ -20,13 +20,14 @@ impl NestedPagination {
         if !self.must_apply_pagination() {
             return;
         }
+
         // replacement for SQL order by
         // TODO: this must also handle secondary order bys
         many_records.records.sort_by_key(|r| {
             let values: Vec<_> = r
                 .parent_id
                 .as_ref()
-                .expect("parent id must be set on all records in order to paginate")
+                .expect("Parent id must be set on all records in order to paginate")
                 .values()
                 .collect();
             values
