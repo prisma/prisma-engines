@@ -32,16 +32,16 @@ pub fn connect_nested_query(
 
     for (field_name, value) in data_map {
         match field_name.as_str() {
-            "create" => connect_nested_create(graph, parent, &parent_relation_field, value, &child_model)?,
-            "update" => connect_nested_update(graph, &parent, &parent_relation_field, value, &child_model)?,
-            "upsert" => connect_nested_upsert(graph, parent, &parent_relation_field, value)?,
-            "delete" => connect_nested_delete(graph, &parent, &parent_relation_field, value, &child_model)?,
-            "connect" => connect_nested_connect(graph, parent, &parent_relation_field, value, &child_model)?,
-            "disconnect" => connect_nested_disconnect(graph, parent, &parent_relation_field, value, &child_model)?,
-            "set" => connect_nested_set(graph, &parent, &parent_relation_field, value, &child_model)?,
-            "updateMany" => connect_nested_update_many(graph, &parent, &parent_relation_field, value, &child_model)?,
-            "deleteMany" => connect_nested_delete_many(graph, &parent, &parent_relation_field, value, &child_model)?,
-            "connectOrCreate" => connect_nested_connect_or_create(graph, parent, &parent_relation_field, value)?,
+            "create" => nested_create(graph, parent, &parent_relation_field, value, &child_model)?,
+            "update" => nested_update(graph, &parent, &parent_relation_field, value, &child_model)?,
+            "upsert" => nested_upsert(graph, parent, &parent_relation_field, value)?,
+            "delete" => nested_delete(graph, &parent, &parent_relation_field, value, &child_model)?,
+            "connect" => nested_connect(graph, parent, &parent_relation_field, value, &child_model)?,
+            "disconnect" => nested_disconnect(graph, parent, &parent_relation_field, value, &child_model)?,
+            "set" => nested_set(graph, &parent, &parent_relation_field, value, &child_model)?,
+            "updateMany" => nested_update_many(graph, &parent, &parent_relation_field, value, &child_model)?,
+            "deleteMany" => nested_delete_many(graph, &parent, &parent_relation_field, value, &child_model)?,
+            "connectOrCreate" => nested_connect_or_create(graph, parent, &parent_relation_field, value, &child_model)?,
             _ => panic!("Unhandled nested operation: {}", field_name),
         };
     }

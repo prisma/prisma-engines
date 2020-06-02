@@ -15,7 +15,7 @@ use std::sync::Arc;
 ///
 /// The resulting graph can take multiple forms, based on the relation type to the parent model.
 /// Information on the graph shapes can be found on the individual handlers.
-pub fn connect_nested_connect(
+pub fn nested_connect(
     graph: &mut QueryGraph,
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
@@ -153,6 +153,9 @@ fn handle_many_to_many(
 ///
 /// Checks are performed to ensure that the correct number of records got connected.
 /// If the check fails a runtime error occurs.
+///
+/// We do not need to do relation requirement checks because the many side of the relation can't be required,
+/// and if the one side is required it's automatically satisfied because the record to connect has to exist.
 fn handle_one_to_many(
     graph: &mut QueryGraph,
     parent_node: NodeRef,
