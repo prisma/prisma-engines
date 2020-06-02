@@ -27,11 +27,6 @@ async fn adding_a_model_for_an_existing_table_must_work(api: &TestApi) -> TestRe
     Ok(())
 }
 
-#[test]
-fn bigint_columns_must_work() {
-    // TODO: port when barrel supports arbitray primary keys
-}
-
 #[test_each_connector]
 async fn removing_a_model_for_a_table_that_is_already_deleted_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
