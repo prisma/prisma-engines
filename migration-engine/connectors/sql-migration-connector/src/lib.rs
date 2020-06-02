@@ -46,7 +46,7 @@ pub struct SqlMigrationConnector {
     pub schema_name: String,
     pub database: Arc<dyn Queryable + Send + Sync + 'static>,
     pub database_info: DatabaseInfo,
-    pub database_describer: Arc<dyn SqlSchemaDescriberBackend + Send + Sync + 'static>,
+    pub database_describer: Box<dyn SqlSchemaDescriberBackend + Send + Sync + 'static>,
 }
 
 impl SqlMigrationConnector {
@@ -55,19 +55,19 @@ impl SqlMigrationConnector {
         let schema_name = connection.connection_info().schema_name().to_owned();
         let conn = Arc::new(connection) as Arc<dyn Queryable + Send + Sync>;
 
-        let describer: Arc<dyn SqlSchemaDescriberBackend + Send + Sync + 'static> = match database_info.sql_family() {
-            SqlFamily::Mysql => Arc::new(sql_schema_describer::mysql::SqlSchemaDescriber::new(Arc::clone(&conn))),
-            SqlFamily::Postgres => Arc::new(sql_schema_describer::postgres::SqlSchemaDescriber::new(Arc::clone(
+        let describer: Box<dyn SqlSchemaDescriberBackend + Send + Sync + 'static> = match database_info.sql_family() {
+            SqlFamily::Mysql => Box::new(sql_schema_describer::mysql::SqlSchemaDescriber::new(Arc::clone(&conn))),
+            SqlFamily::Postgres => Box::new(sql_schema_describer::postgres::SqlSchemaDescriber::new(Arc::clone(
                 &conn,
             ))),
-            SqlFamily::Sqlite => Arc::new(sql_schema_describer::sqlite::SqlSchemaDescriber::new(Arc::clone(&conn))),
+            SqlFamily::Sqlite => Box::new(sql_schema_describer::sqlite::SqlSchemaDescriber::new(Arc::clone(&conn))),
         };
 
         Ok(Self {
             database_info,
             schema_name,
             database: conn,
-            database_describer: Arc::clone(&describer),
+            database_describer: describer,
         })
     }
 
