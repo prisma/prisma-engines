@@ -43,31 +43,18 @@ use user_facing_errors::migration_engine::DatabaseMigrationFormatChanged;
 const CONNECTION_TIMEOUT: Duration = Duration::from_secs(10);
 
 pub struct SqlMigrationConnector {
-    pub schema_name: String,
     pub database: Arc<dyn Queryable + Send + Sync + 'static>,
     pub database_info: DatabaseInfo,
-    pub database_describer: Box<dyn SqlSchemaDescriberBackend + Send + Sync + 'static>,
 }
 
 impl SqlMigrationConnector {
     pub async fn new(database_str: &str) -> ConnectorResult<Self> {
         let (connection, database_info) = connect(database_str).await?;
-        let schema_name = connection.connection_info().schema_name().to_owned();
         let conn = Arc::new(connection) as Arc<dyn Queryable + Send + Sync>;
-
-        let describer: Box<dyn SqlSchemaDescriberBackend + Send + Sync + 'static> = match database_info.sql_family() {
-            SqlFamily::Mysql => Box::new(sql_schema_describer::mysql::SqlSchemaDescriber::new(Arc::clone(&conn))),
-            SqlFamily::Postgres => Box::new(sql_schema_describer::postgres::SqlSchemaDescriber::new(Arc::clone(
-                &conn,
-            ))),
-            SqlFamily::Sqlite => Box::new(sql_schema_describer::sqlite::SqlSchemaDescriber::new(Arc::clone(&conn))),
-        };
 
         Ok(Self {
             database_info,
-            schema_name,
             database: conn,
-            database_describer: describer,
         })
     }
 
@@ -146,7 +133,7 @@ impl SqlMigrationConnector {
                 }
             }
             ConnectionInfo::Postgres(_) => {
-                let schema_sql = format!("CREATE SCHEMA IF NOT EXISTS \"{}\";", &self.schema_name);
+                let schema_sql = format!("CREATE SCHEMA IF NOT EXISTS \"{}\";", &self.schema_name());
 
                 debug!("{}", schema_sql);
 
@@ -155,7 +142,7 @@ impl SqlMigrationConnector {
             ConnectionInfo::Mysql(_) => {
                 let schema_sql = format!(
                     "CREATE SCHEMA IF NOT EXISTS `{}` DEFAULT CHARACTER SET latin1;",
-                    &self.schema_name
+                    &self.schema_name()
                 );
 
                 debug!("{}", schema_sql);
