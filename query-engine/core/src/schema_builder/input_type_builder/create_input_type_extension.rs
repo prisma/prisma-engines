@@ -9,51 +9,10 @@ pub trait CreateInputTypeBuilderExtension<'a>: InputTypeBuilderBase<'a> {
             })
     }
 
-    // fn nested_connect_or_create_input_object(&self, parent_field: RelationFieldRef) -> Option<InputObjectTypeRef> {
-    //     if parent_field.is_list {
-    //         self.nested_connect_or_create_list_input_object(parent_field)
-    //     } else {
-    //         self.nested_connect_or_create_nonlist_input_object(parent_field)
-    //     }
-    // }
-
-    // /// Builds "<x>CreateOrConnectWithWhereUniqueNestedInput" / "<x>CreateOrConnectWithWhereUniqueWithout<y>Input" input object types.
-    // fn nested_connect_or_create_list_input_object(&self, parent_field: RelationFieldRef) -> Option<InputObjectTypeRef> {
-    //     let related_model = parent_field.related_model();
-    //     let where_object = self.where_unique_object_type(&related_model);
-    //     let create_object = self.create_input_type(Arc::clone(&related_model), Some(Arc::clone(&parent_field)));
-
-    //     if where_object.into_arc().is_empty() || create_object.into_arc().is_empty() {
-    //         return None;
-    //     }
-
-    //     let type_name = format!(
-    //         "{}ConnectOrCreateWithWhereUniqueWithout{}Input",
-    //         related_model.name.clone(),
-    //         capitalize(parent_field.related_field().name.clone())
-    //     );
-
-    //     match self.get_cache().get(&type_name) {
-    //         None => {
-    //             let input_object = Arc::new(init_input_object_type(type_name.clone()));
-    //             self.cache(type_name, Arc::clone(&input_object));
-
-    //             let fields = vec![
-    //                 input_field("where", InputType::object(where_object), None),
-    //                 input_field("create", InputType::object(create_object), None),
-    //             ];
-
-    //             input_object.set_fields(fields);
-    //             Some(Arc::downgrade(&input_object))
-    //         }
-    //         x => x,
-    //     }
-    // }
-
     /// Builds "<x>CreateOrConnectNestedInput" input object types.
     fn nested_connect_or_create_input_object(&self, parent_field: RelationFieldRef) -> Option<InputObjectTypeRef> {
-        dbg!(&parent_field);
         let related_model = parent_field.related_model();
+
         let where_object = self.where_unique_object_type(&related_model);
         let create_object = self.create_input_type(Arc::clone(&related_model), Some(Arc::clone(&parent_field)));
 
@@ -61,7 +20,11 @@ pub trait CreateInputTypeBuilderExtension<'a>: InputTypeBuilderBase<'a> {
             return None;
         }
 
-        let type_name = format!("{}CreateOrConnectNestedInput", related_model.name.clone(),);
+        let type_name = format!(
+            "{}CreateOrConnectWithout{}Input",
+            related_model.name.clone(),
+            parent_field.model().name
+        );
 
         match self.get_cache().get(&type_name) {
             None => {
