@@ -41,20 +41,29 @@ impl SchemaAssertion {
         Ok(self)
     }
 
+    fn find_table(&self, table_name: &str) -> anyhow::Result<&sql_schema_describer::Table> {
+        match self.0.table(table_name) {
+            Ok(table) => Ok(table),
+            Err(_) => Err(anyhow::anyhow!(
+                "assert_has_table failed. Table {} not found. Tables in database: {:?}",
+                table_name,
+                self.0.tables.iter().map(|table| &table.name).collect::<Vec<_>>()
+            )),
+        }
+    }
+
+    pub fn assert_has_table(self, table_name: &str) -> AssertionResult<Self> {
+        self.find_table(table_name)?;
+        Ok(self)
+    }
+
     pub fn assert_table<F>(self, table_name: &str, table_assertions: F) -> AssertionResult<Self>
     where
         F: for<'a> FnOnce(TableAssertion<'a>) -> AssertionResult<TableAssertion<'a>>,
     {
-        let table_result = self.0.table(table_name);
-        let table = table_result.map(TableAssertion).map_err(|_| {
-            anyhow::anyhow!(
-                "assert_table failed. Table {} not found. Tables in database: {:?}",
-                table_name,
-                self.0.tables.iter().map(|table| &table.name).collect::<Vec<_>>()
-            )
-        })?;
+        let table = self.find_table(table_name)?;
 
-        table_assertions(table)?;
+        table_assertions(TableAssertion(table))?;
 
         Ok(self)
     }

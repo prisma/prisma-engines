@@ -65,3 +65,34 @@ async fn adding_a_scalar_list_for_a_model_with_id_type_int_must_work(api: &TestA
     assert_eq!(enum_column.tpe.family, ColumnTypeFamily::Enum("Status".to_owned()));
     assert_eq!(enum_column.tpe.arity, ColumnArity::List);
 }
+
+// Reference for the tables created by PostGIS: https://postgis.net/docs/manual-1.4/ch04.html#id418599
+#[test_each_connector(tags("postgres"))]
+async fn existing_postgis_tables_must_not_be_migrated(api: &TestApi) -> TestResult {
+    let create_spatial_ref_sys_table = "CREATE TABLE IF NOT EXISTS \"spatial_ref_sys\" ( id SERIAL PRIMARY KEY )";
+    // The capitalized Geometry is intentional here, because we want the matching to be case-insensitive.
+    let create_geometry_columns_table = "CREATE TABLE IF NOT EXiSTS \"Geometry_columns\" ( id SERIAL PRIMARY KEY )";
+
+    api.database().execute_raw(create_spatial_ref_sys_table, &[]).await?;
+    api.database().execute_raw(create_geometry_columns_table, &[]).await?;
+
+    api.assert_schema()
+        .await?
+        .assert_has_table("spatial_ref_sys")?
+        .assert_has_table("Geometry_columns")?;
+
+    let schema = "";
+
+    api.infer_apply(schema)
+        .send()
+        .await?
+        .assert_green()?
+        .assert_no_steps()?;
+
+    api.assert_schema()
+        .await?
+        .assert_has_table("spatial_ref_sys")?
+        .assert_has_table("Geometry_columns")?;
+
+    Ok(())
+}

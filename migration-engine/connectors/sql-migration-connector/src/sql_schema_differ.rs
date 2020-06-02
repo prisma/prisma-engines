@@ -8,19 +8,35 @@ pub(crate) use table::TableDiffer;
 
 use crate::*;
 use enums::EnumDiffer;
+use once_cell::sync::Lazy;
+use regex::RegexSet;
 use sql_schema_describer::*;
 use tracing::debug;
 
 #[derive(Debug)]
-#[cfg_attr(test, derive(Default))]
 pub(crate) struct DiffingOptions {
     is_mariadb: bool,
+    ignore_tables: Lazy<RegexSet>,
 }
 
 impl DiffingOptions {
     pub(crate) fn from_database_info(database_info: &DatabaseInfo) -> Self {
         DiffingOptions {
             is_mariadb: database_info.is_mariadb(),
+            ignore_tables: match database_info.sql_family() {
+                SqlFamily::Postgres => POSTGRES_IGNORED_TABLES,
+                _ => EMPTY_REGEXSET,
+            },
+        }
+    }
+}
+
+#[cfg(test)]
+impl Default for DiffingOptions {
+    fn default() -> Self {
+        DiffingOptions {
+            is_mariadb: false,
+            ignore_tables: EMPTY_REGEXSET,
         }
     }
 }
@@ -377,14 +393,18 @@ impl<'schema> SqlSchemaDiffer<'schema> {
         self.previous
             .tables
             .iter()
-            .filter(|table| table.name != MIGRATION_TABLE_NAME)
+            .filter(move |table| !self.table_is_ignored(&table.name))
     }
 
     fn next_tables(&self) -> impl Iterator<Item = &Table> {
         self.next
             .tables
             .iter()
-            .filter(|table| table.name != MIGRATION_TABLE_NAME)
+            .filter(move |table| !self.table_is_ignored(&table.name))
+    }
+
+    fn table_is_ignored(&self, table_name: &str) -> bool {
+        table_name == MIGRATION_TABLE_NAME || self.diffing_options.ignore_tables.is_match(&table_name)
     }
 
     fn enum_pairs(&self) -> impl Iterator<Item = EnumDiffer<'_>> {
@@ -464,3 +484,14 @@ fn tables_match(previous: &Table, next: &Table) -> bool {
 fn enums_match(previous: &Enum, next: &Enum) -> bool {
     previous.name == next.name
 }
+
+const POSTGRES_IGNORED_TABLES: Lazy<RegexSet> = Lazy::new(|| {
+    RegexSet::new(&[
+        // PostGIS. Reference: https://postgis.net/docs/manual-1.4/ch04.html#id418599
+        "(?i)^spatial_ref_sys$",
+        "(?i)^geometry_columns$",
+    ])
+    .unwrap()
+});
+
+const EMPTY_REGEXSET: Lazy<RegexSet> = Lazy::new(|| RegexSet::new::<_, &&str>(&[]).unwrap());
