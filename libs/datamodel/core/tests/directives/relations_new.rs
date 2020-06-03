@@ -655,3 +655,53 @@ fn must_error_for_required_one_to_one_self_relations() {
         DatamodelError::new_field_validation_error("The relation fields `friendOf` and `friend` on Model `User` are both required. This is not allowed for a self relation because it would not be possible to create a record.", "User", "friendOf", Span::new(162, 197)),
     );
 }
+
+#[test]
+fn must_error_when_non_id_field_is_referenced_in_a_many_to_many() {
+    let dml = r#"
+    model Post {
+      id         Int        @id
+      slug       Int        @unique 
+      categories Category[] @relation(references: [id])
+   }
+   
+   model Category {
+     id    Int    @id @default(autoincrement())
+     posts Post[] @relation(references: [slug])
+   }"#;
+
+    let errors = parse_error(dml);
+    errors.assert_is_at(
+        0,
+        DatamodelError::new_validation_error(
+            "Many to many relations must always reference the id field of the related model. Change the argument `references` to use the id field of the related model `Post`. But it is referencing the following fields that are not the id: slug",  
+            Span::new(225, 268)
+        ),
+    );
+}
+
+#[test]
+fn must_error_when_many_to_many_is_not_possible_due_to_missing_id() {
+    let dml = r#"
+    // Post does not have @id
+    model Post {
+     slug       Int        @unique 
+     categories Category[]
+   }
+   
+   model Category {
+     id    Int    @id @default(autoincrement())
+     posts Post[]
+   }"#;
+
+    let errors = parse_error(dml);
+    errors.assert_is_at(
+        0,
+        DatamodelError::new_field_validation_error(
+            "The relation field `posts` on Model `Category` references `Post` which does not have an `@id` field. Models without `@id` can not be part of a many to many relation. Use an explicit intermediate Model to represent this relationship.", 
+            "Category",
+            "posts", 
+            Span::new(193, 206)
+        ),
+    );
+}

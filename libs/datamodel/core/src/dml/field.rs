@@ -96,8 +96,7 @@ pub struct Field {
     /// Indicates if the field is unique.
     pub is_unique: bool,
 
-    /// If set, signals that this field is an id field, or
-    /// primary key.
+    /// true if this field marked with @id.
     pub is_id: bool,
 
     /// Comments associated with this field.
