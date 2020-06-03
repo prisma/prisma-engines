@@ -52,6 +52,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "eab1c04a571841102f5345a8fc0f6bb3d31c315dec879b5c6e42e40ce7ffa34e"
 
 [[package]]
+name = "async-attributes"
+version = "1.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "efd3d156917d94862e779f356c5acae312b08fd3121e792c857d7928c8088423"
+dependencies = [
+ "quote 1.0.6",
+ "syn 1.0.22",
+]
+
+[[package]]
 name = "async-h1"
 version = "2.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -86,6 +96,7 @@ version = "1.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a45cee2749d880d7066e328a7e161c7470ced883b2fd000ca4643e9f1dd5083a"
 dependencies = [
+ "async-attributes",
  "async-task",
  "crossbeam-utils",
  "futures-channel",
@@ -1643,19 +1654,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "nix"
-version = "0.17.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "50e4785f2c3b7589a0d0c1dd60285e1188adac4006e8abd6dd578e1567027363"
-dependencies = [
- "bitflags",
- "cc",
- "cfg-if",
- "libc",
- "void",
-]
-
-[[package]]
 name = "num"
 version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2249,6 +2247,7 @@ name = "query-engine"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "async-std",
  "async-trait",
  "base64 0.10.1",
  "datamodel",
@@ -2274,6 +2273,7 @@ dependencies = [
  "serde",
  "serde_json",
  "serial_test",
+ "smol",
  "sql-migration-connector",
  "sql-query-connector",
  "structopt",
@@ -2706,20 +2706,23 @@ checksum = "c7cb5678e1615754284ec264d9bb5b4c27d2018577fd90ac0ceb578591ed5ee4"
 
 [[package]]
 name = "smol"
-version = "0.1.10"
+version = "0.1.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "686c634ad1873fffef6aed20f180eede424fbf3bb31802394c90fd7335a661b7"
+checksum = "845f5e7db6b614a8f4f59e565c3035f0fab2f71c9537ff0119eddb60d866cae3"
 dependencies = [
  "async-task",
- "crossbeam",
+ "crossbeam-deque",
+ "crossbeam-queue",
+ "crossbeam-utils",
  "futures-io",
  "futures-util",
- "nix",
+ "libc",
  "once_cell",
  "piper",
  "scoped-tls-hkt",
  "slab",
  "socket2",
+ "tokio",
  "wepoll-binding",
 ]
 

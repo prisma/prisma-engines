@@ -16,6 +16,10 @@ tide = { path = "../../../tide" }
 tokio = { version = "=0.2.13", features = ["rt-threaded", "macros"] }
 async-std = { version = "1.6.0", features = ["attributes"] }
 
+ # NOTE(yoshuawuyts): we can remove this dependency once async-std 1.7.0 is released.
+ # We pull this in to force the `tokio02` feature for async-std.
+smol = { version = "0.1.11", features = ["tokio02"] }
+
 async-trait = "0.1"
 prisma-inflector = { path = "../../libs/prisma-inflector" }
 datamodel = { path = "../../libs/datamodel/core" }

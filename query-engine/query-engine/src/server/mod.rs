@@ -9,20 +9,33 @@ use crate::{
     },
     PrismaResult,
 };
+use elapsed_middleware::ElapsedMiddleware;
 
 use datamodel::{Configuration, Datamodel};
 use query_core::schema::QuerySchemaRenderer;
 use serde_json::json;
-use tide::http::{headers, mime, StatusCode};
+use tide::http::{mime, StatusCode};
 use tide::{Body, Request, Response};
 
 use std::net::SocketAddr;
 use std::sync::Arc;
 
+mod elapsed_middleware;
+
 //// Shared application state.
 pub(crate) struct State {
     cx: Arc<PrismaContext>,
     enable_playground: bool,
+}
+
+impl State {
+    /// Create a new instance of `State`.
+    fn new(cx: PrismaContext, enable_playground: bool) -> Self {
+        Self {
+            cx: Arc::new(cx),
+            enable_playground,
+        }
+    }
 }
 
 impl Clone for State {
@@ -113,31 +126,15 @@ impl HttpServer {
 
     /// Start the HTTP server with the default options enabled.
     async fn run(addr: SocketAddr, cx: PrismaContext, enable_playground: bool) -> PrismaResult<()> {
-        // let now = Instant::now();
+        let mut app = tide::with_state(State::new(cx, enable_playground));
+        app.middleware(ElapsedMiddleware::new());
 
-        let ctx = State {
-            cx: Arc::new(cx),
-            enable_playground,
-        };
-
-        let mut app = tide::with_state(ctx);
         app.at("/").post(graphql_handler);
         app.at("/").get(playground_handler);
         app.at("/sdl").get(sdl_handler);
         app.at("/dmmf").get(dmmf_handler);
         app.at("/server_info").get(server_info_handler);
-        app.at("/status").get(|_| async move {
-            // TODO(yoshuawuyts): turn this into a one-liner once `From<serde::Value> for tide::Response` exists.
-            let body = json!({"status": "ok"});
-            let mut res = Response::new(StatusCode::Ok);
-            res.set_body(Body::from_json(&body)?);
-            Ok(res)
-        });
-
-        // TODO(yoshuawuyts): change this to a middleware.
-        // let elapsed = Instant::now().duration_since(start).as_micros() as u64;
-        // res.headers_mut().insert("x-elapsed", elapsed.into());
-        // trace!("Initialized in {}ms", now.elapsed().as_millis());
+        app.at("/status").get(|_| async move { Ok(json!({"status": "ok"})) });
 
         info!("Started http server on {}:{}", addr.ip(), addr.port());
         app.listen(addr).await?;
@@ -172,18 +169,15 @@ async fn playground_handler(req: Request<State>) -> tide::Result {
 
     let mut res = Response::new(StatusCode::Ok);
     res.set_body(include_bytes!("../../static_files/playground.html").to_vec());
-    res.insert_header(headers::CONTENT_ENCODING, mime::HTML);
+    res.set_content_type(mime::HTML);
     Ok(res)
 }
 
 /// Handler for the playground to work with the SDL-rendered query schema.
 /// Serves a raw SDL string created from the query schema.
-async fn sdl_handler(req: Request<State>) -> tide::Result {
-    let body = GraphQLSchemaRenderer::render(Arc::clone(&req.state().cx.query_schema()));
-    let mut res = Response::new(StatusCode::Ok);
-    res.set_body(body);
-    res.insert_header(headers::CONTENT_ENCODING, mime::PLAIN);
-    Ok(res)
+async fn sdl_handler(req: Request<State>) -> tide::Result<impl Into<Response>> {
+    let schema = Arc::clone(&req.state().cx.query_schema());
+    Ok(GraphQLSchemaRenderer::render(schema))
 }
 
 /// Renders the Data Model Meta Format.
@@ -196,13 +190,10 @@ async fn dmmf_handler(req: Request<State>) -> tide::Result {
 }
 
 /// Simple status endpoint
-async fn server_info_handler(req: Request<State>) -> tide::Result {
-    let body = json!({
+async fn server_info_handler(req: Request<State>) -> tide::Result<impl Into<Response>> {
+    Ok(json!({
         "commit": env!("GIT_HASH"),
         "version": env!("CARGO_PKG_VERSION"),
         "primary_connector": req.state().cx.primary_connector(),
-    });
-    let mut res = Response::new(StatusCode::Ok);
-    res.set_body(Body::from_json(&body)?);
-    Ok(res)
+    }))
 }
