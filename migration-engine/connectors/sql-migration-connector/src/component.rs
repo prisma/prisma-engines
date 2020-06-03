@@ -11,7 +11,7 @@ pub(crate) trait Component {
     }
 
     fn connection_info(&self) -> &ConnectionInfo {
-        self.connector().connection_info()
+        self.connector().database_info.connection_info()
     }
 
     fn conn(&self) -> &dyn Queryable {

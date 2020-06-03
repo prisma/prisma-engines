@@ -256,6 +256,43 @@ async fn bad_datasource_url_and_provider_combinations_must_return_a_proper_error
     assert_eq!(json_error, expected);
 }
 
+#[test_each_connector(tags("mysql_8"))]
+async fn connections_to_system_databases_must_be_rejected(_api: &TestApi) -> TestResult {
+    let names = &["", "mysql", "sys", "performance_schema"];
+    for name in names {
+        dbg!(name);
+        let dm = format!(
+            r#"
+                datasource db {{
+                    provider = "mysql"
+                    url = "{}"
+                }}
+            "#,
+            mysql_8_url(name),
+        );
+
+        // "mysql" is the default in Quaint.
+        let name = if name == &"" { "mysql" } else { name };
+
+        let error = RpcApi::new(&dm).await.map(drop).unwrap_err();
+
+        let json_error = serde_json::to_value(&render_error(error)).unwrap();
+
+        let expected = json!({
+            "is_panic": false,
+            "message": format!("The `{}` database is a system database, it should not be altered with prisma migrate. Please connect to another database.", name),
+            "meta": {
+                "database_name": name,
+            },
+            "error_code": "P3004",
+        });
+
+        assert_eq!(json_error, expected);
+    }
+
+    Ok(())
+}
+
 #[test_each_connector(tags("sqlite"))]
 async fn command_errors_must_return_an_unknown_error(api: &TestApi) {
     let steps = vec![MigrationStep::DeleteModel(DeleteModel {

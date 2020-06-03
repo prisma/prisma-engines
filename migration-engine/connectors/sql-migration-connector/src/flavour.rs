@@ -2,9 +2,11 @@
 //! in order to avoid cluttering the connector with conditionals. This is a private implementation
 //! detail of the SQL connector.
 
-use crate::{database_info::DatabaseInfo, SqlResult};
+use crate::{database_info::DatabaseInfo, CheckDatabaseInfoResult, SqlResult, SystemDatabase};
 use futures::{future::BoxFuture, FutureExt};
+use once_cell::sync::Lazy;
 use quaint::connector::Queryable;
+use regex::RegexSet;
 use std::{fs, path::PathBuf};
 
 pub(crate) fn from_database_info(database_info: &DatabaseInfo) -> Box<dyn SqlFlavour + Send + Sync + 'static> {
@@ -19,9 +21,13 @@ pub(crate) fn from_database_info(database_info: &DatabaseInfo) -> Box<dyn SqlFla
     }
 }
 
-pub trait SqlFlavour {
+pub(crate) trait SqlFlavour {
+    fn check_database_info(&self, _database_info: &DatabaseInfo) -> CheckDatabaseInfoResult {
+        Ok(())
+    }
+
     fn create_database<'a>(&'a self, _db_name: &'a str, _conn: &'a dyn Queryable) -> BoxFuture<'a, SqlResult<()>> {
-        async { Ok(()) }.boxed()
+        futures::future::ready(Ok(())).boxed()
     }
 
     fn initialize<'a>(
@@ -34,6 +40,26 @@ pub trait SqlFlavour {
 struct MysqlFlavour;
 
 impl SqlFlavour for MysqlFlavour {
+    fn check_database_info(&self, database_info: &DatabaseInfo) -> CheckDatabaseInfoResult {
+        const MYSQL_SYSTEM_DATABASES: Lazy<regex::RegexSet> = Lazy::new(|| {
+            RegexSet::new(&[
+                "(?i)^mysql$",
+                "(?i)^information_schema$",
+                "(?i)^performance_schema$",
+                "(?i)^sys$",
+            ])
+            .unwrap()
+        });
+
+        let db_name = database_info.connection_info().schema_name();
+
+        if MYSQL_SYSTEM_DATABASES.is_match(db_name) {
+            return Err(SystemDatabase(db_name.to_owned()));
+        }
+
+        Ok(())
+    }
+
     fn create_database<'a>(&'a self, db_name: &'a str, conn: &'a dyn Queryable) -> BoxFuture<'a, SqlResult<()>> {
         async move {
             let query = format!("CREATE DATABASE `{}`", db_name);
@@ -97,6 +123,7 @@ impl SqlFlavour for PostgresFlavour {
         }
         .boxed()
     }
+
     fn initialize<'a>(
         &'a self,
         conn: &'a dyn Queryable,

@@ -30,18 +30,7 @@ use sql_database_migration_inferrer::*;
 use sql_database_step_applier::*;
 use sql_destructive_changes_checker::*;
 use sql_migration_persistence::*;
-<<<<<<< HEAD
-use sql_schema_describer::SqlSchemaDescriberBackend;
-use std::{
-    collections::HashMap,
-    fs,
-    path::{self, PathBuf},
-    sync::Arc,
-    time::Duration,
-};
-=======
-use std::{sync::Arc, time::Duration};
->>>>>>> 8aa1dda8... Introduce SqlFlavour trait to avoid proliferation of conditionals
+use std::{collections::HashMap, path, sync::Arc, time::Duration};
 use tracing::debug;
 use url::Url;
 use user_facing_errors::migration_engine::DatabaseMigrationFormatChanged;
@@ -56,50 +45,17 @@ pub struct SqlMigrationConnector {
 
 impl SqlMigrationConnector {
     pub async fn new(database_str: &str) -> ConnectorResult<Self> {
-<<<<<<< HEAD
         let (connection, database_info) = connect(database_str).await?;
-=======
-        let connection_info =
-            ConnectionInfo::from_url(database_str).map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
-
-        let connection_fut = async {
-            let connection = Quaint::new(database_str)
-                .await
-                .map_err(SqlError::from)
-                .map_err(|err: SqlError| err.into_connector_error(&connection_info))?;
-
-            // async connections can be lazy, so we issue a simple query to fail early if the database
-            // is not reachable.
-            connection
-                .query_raw("SELECT 1", &[])
-                .await
-                .map_err(SqlError::from)
-                .map_err(|err| err.into_connector_error(&connection.connection_info()))?;
-
-            Ok(connection)
-        };
-
-        let connection = tokio::time::timeout(CONNECTION_TIMEOUT, connection_fut)
-            .await
-            .map_err(|_elapsed| {
-                SqlError::from(ErrorKind::ConnectTimeout("Tokio timer".into())).into_connector_error(&connection_info)
-            })??;
-
-        let database_info = DatabaseInfo::new(&connection, connection.connection_info().clone())
-            .await
-            .map_err(|sql_error| sql_error.into_connector_error(&connection_info))?;
-
->>>>>>> 8aa1dda8... Introduce SqlFlavour trait to avoid proliferation of conditionals
-        let conn = Arc::new(connection) as Arc<dyn Queryable + Send + Sync>;
+        let flavour = flavour::from_database_info(&database_info);
+        flavour.check_database_info(&database_info)?;
 
         Ok(Self {
-            flavour: flavour::from_database_info(&database_info),
+            flavour,
             database_info,
-            database: conn,
+            database: Arc::new(connection),
         })
     }
 
-<<<<<<< HEAD
     pub async fn create_database(database_str: &str) -> ConnectorResult<String> {
         use anyhow::Context;
         use futures::future::TryFutureExt;
@@ -163,50 +119,11 @@ impl SqlMigrationConnector {
         }
     }
 
-    async fn initialize_impl(&self) -> SqlResult<()> {
-        match self.database_info.connection_info() {
-            ConnectionInfo::Sqlite { file_path, .. } => {
-                let path_buf = PathBuf::from(&file_path);
-                match path_buf.parent() {
-                    Some(parent_directory) => {
-                        fs::create_dir_all(parent_directory).expect("creating the database folders failed")
-                    }
-                    None => {}
-                }
-            }
-            ConnectionInfo::Postgres(_) => {
-                let schema_sql = format!("CREATE SCHEMA IF NOT EXISTS \"{}\";", &self.schema_name());
-
-                debug!("{}", schema_sql);
-
-                self.database.query_raw(&schema_sql, &[]).await?;
-            }
-            ConnectionInfo::Mysql(_) => {
-                let schema_sql = format!(
-                    "CREATE SCHEMA IF NOT EXISTS `{}` DEFAULT CHARACTER SET latin1;",
-                    &self.schema_name()
-                );
-
-                debug!("{}", schema_sql);
-
-                self.database.query_raw(&schema_sql, &[]).await?;
-            }
-        }
-
-        Ok(())
-    }
-
-    fn connection_info(&self) -> &ConnectionInfo {
-        self.database_info.connection_info()
-    }
-
-=======
->>>>>>> 8aa1dda8... Introduce SqlFlavour trait to avoid proliferation of conditionals
     async fn drop_database(&self) -> ConnectorResult<()> {
         use quaint::ast::Value;
 
-        catch(self.connection_info(), async {
-            match &self.connection_info() {
+        catch(self.database_info.connection_info(), async {
+            match &self.database_info.connection_info() {
                 ConnectionInfo::Postgres(_) => {
                     let sql_str = format!(r#"DROP SCHEMA "{}" CASCADE;"#, self.schema_name());
                     debug!("{}", sql_str);
@@ -246,7 +163,7 @@ impl MigrationConnector for SqlMigrationConnector {
     type DatabaseMigration = SqlMigration;
 
     fn connector_type(&self) -> &'static str {
-        self.connection_info().sql_family().as_str()
+        self.database_info.connection_info().sql_family().as_str()
     }
 
     async fn create_database(database_str: &str) -> ConnectorResult<String> {
@@ -255,8 +172,8 @@ impl MigrationConnector for SqlMigrationConnector {
 
     async fn initialize(&self) -> ConnectorResult<()> {
         catch(
-            self.connection_info(),
-            self.flavour.initialize(self.database.as_ref(), self.database_info()),
+            self.database_info.connection_info(),
+            self.flavour.initialize(self.database.as_ref(), &self.database_info),
         )
         .await?;
 
@@ -330,7 +247,7 @@ async fn connect(database_str: &str) -> ConnectorResult<(Quaint, DatabaseInfo)> 
             .map_err(SqlError::from)
             .map_err(|err| err.into_connector_error(&connection.connection_info()))?;
 
-        Ok(connection)
+        Ok::<_, ConnectorError>(connection)
     };
 
     let connection = tokio::time::timeout(CONNECTION_TIMEOUT, connection_fut)
