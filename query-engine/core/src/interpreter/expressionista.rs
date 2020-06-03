@@ -222,6 +222,8 @@ impl Expressionista {
                             then: vec![then_expr],
                             else_: else_expr,
                         }),
+
+                        Flow::Return(_) => todo!(),
                     }
                 });
 

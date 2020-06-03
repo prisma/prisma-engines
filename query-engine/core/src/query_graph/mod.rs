@@ -59,6 +59,9 @@ pub enum Flow {
     /// Expresses a conditional control flow in the graph.
     /// Possible outgoing edges are `then` and `else`, each at most once, with `then` required to be present.
     If(Box<dyn FnOnce() -> bool + Send + Sync + 'static>),
+
+    /// Returns a fixed set of record projections.
+    Return(Option<Vec<RecordProjection>>),
 }
 
 impl Flow {

@@ -55,6 +55,7 @@ impl Display for Flow {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             Self::If(_) => write!(f, "(If (condition func)"),
+            Self::Return(_) => write!(f, "(return projections)"),
         }
     }
 }
