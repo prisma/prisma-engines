@@ -35,14 +35,14 @@ pub fn nested_connect_or_create(
 /// Handles a nested connect-or-create many-to-many relation case.
 /// ```text
 ///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ┐
-///          Parent       ────────────────────────┐
-///    └ ─ ─ ─ ─ ─ ─ ─ ─ ┘         │              │
-///             │                                 │
-///             │                  │              │
-///             │                                 │
-///             ▼                  ▼              │
-///    ┌─────────────────┐  ┌ ─ ─ ─ ─ ─ ─         │
-/// ┌──│   Read Child    │      Result   │        │
+/// ┌──      Parent       ────────────────────────┐
+/// │  └ ─ ─ ─ ─ ─ ─ ─ ─ ┘         │              │
+/// │           │                                 │
+/// │           │                  │              │
+/// │           │                                 │
+/// │           ▼                  ▼              │
+/// │  ┌─────────────────┐  ┌ ─ ─ ─ ─ ─ ─         │
+/// ├──│   Read Child    │      Result   │        │
 /// │  └─────────────────┘  └ ─ ─ ─ ─ ─ ─         │
 /// │           │                                 │
 /// │           │                                 │
@@ -73,7 +73,52 @@ fn handle_many_to_many(
     values: Vec<ParsedInputValue>,
     child_model: &ModelRef,
 ) -> QueryGraphBuilderResult<()> {
-    todo!()
+    for value in values {
+        let mut value: ParsedInputMap = value.try_into()?;
+
+        let where_arg = value.remove("where").unwrap();
+        let where_map: ParsedInputMap = where_arg.try_into()?;
+
+        let create_arg = value.remove("create").unwrap();
+        let create_map: ParsedInputMap = create_arg.try_into()?;
+
+        let filter = extract_unique_filter(where_map, &child_model)?;
+        let read_node = graph.create_node(utils::read_ids_infallible(
+            child_model.clone(),
+            child_model.primary_identifier(),
+            filter,
+        ));
+
+        let create_node = create::create_record_node(graph, Arc::clone(child_model), create_map)?;
+        let if_node = graph.create_node(Flow::default_if());
+
+        let connect_exists_node =
+            connect::connect_records_node(graph, &parent_node, &read_node, &parent_relation_field, 1)?;
+
+        let _connect_create_node =
+            connect::connect_records_node(graph, &parent_node, &create_node, &parent_relation_field, 1)?;
+
+        graph.create_edge(&parent_node, &read_node, QueryGraphDependency::ExecutionOrder)?;
+        graph.create_edge(
+            &read_node,
+            &if_node,
+            QueryGraphDependency::ParentProjection(
+                child_model.primary_identifier(),
+                Box::new(|if_node, child_ids| {
+                    if let Node::Flow(Flow::If(_)) = if_node {
+                        Ok(Node::Flow(Flow::If(Box::new(move || !child_ids.is_empty()))))
+                    } else {
+                        Ok(if_node)
+                    }
+                }),
+            ),
+        )?;
+
+        graph.create_edge(&if_node, &connect_exists_node, QueryGraphDependency::Then)?;
+        graph.create_edge(&if_node, &create_node, QueryGraphDependency::Else)?;
+    }
+
+    Ok(())
 }
 
 fn handle_one_to_many(
