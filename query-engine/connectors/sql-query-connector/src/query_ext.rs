@@ -1,4 +1,4 @@
-use crate::{error::*, AliasedCondition, RawQuery, SqlRow, ToSqlRow};
+use crate::{error::*, AliasedCondition, SqlRow, ToSqlRow};
 use async_trait::async_trait;
 use connector_interface::{filter::Filter, RecordFilter};
 use datamodel::FieldArity;
@@ -10,7 +10,7 @@ use quaint::{
     pooled::PooledConnection,
 };
 
-use serde_json::{Map, Number, Value};
+use serde_json::{Map, Value};
 use std::{convert::TryFrom, panic::AssertUnwindSafe};
 
 impl<'t> QueryExt for connector::Transaction<'t> {}
@@ -34,34 +34,42 @@ pub trait QueryExt: Queryable + Send + Sync {
 
     /// Execute a singular SQL query in the database, returning an arbitrary
     /// JSON `Value` as a result.
-    async fn raw_json<'a>(&'a self, q: RawQuery<'a>) -> std::result::Result<Value, crate::error::RawError> {
-        if q.is_select() {
-            let result_set = AssertUnwindSafe(self.query_raw(q.query(), q.parameters()))
-                .catch_unwind()
-                .await??;
+    async fn raw_json<'a>(
+        &'a self,
+        q: String,
+        params: Vec<PrismaValue>,
+    ) -> std::result::Result<Value, crate::error::RawError> {
+        let params: Vec<_> = params.into_iter().map(quaint::ast::Value::from).collect();
+        let result_set = AssertUnwindSafe(self.query_raw(&q, &params)).catch_unwind().await??;
 
-            let columns: Vec<String> = result_set.columns().into_iter().map(ToString::to_string).collect();
-            let mut result = Vec::new();
+        let columns: Vec<String> = result_set.columns().into_iter().map(ToString::to_string).collect();
+        let mut result = Vec::new();
 
-            for row in result_set.into_iter() {
-                let mut object = Map::new();
+        for row in result_set.into_iter() {
+            let mut object = Map::new();
 
-                for (idx, p_value) in row.into_iter().enumerate() {
-                    let column_name: String = columns[idx].clone();
-                    object.insert(column_name, Value::from(p_value));
-                }
-
-                result.push(Value::Object(object));
+            for (idx, p_value) in row.into_iter().enumerate() {
+                let column_name: String = columns[idx].clone();
+                object.insert(column_name, Value::from(p_value));
             }
 
-            Ok(Value::Array(result))
-        } else {
-            let changes = AssertUnwindSafe(self.execute_raw(q.query(), q.parameters()))
-                .catch_unwind()
-                .await??;
-
-            Ok(Value::Number(Number::from(changes)))
+            result.push(Value::Object(object));
         }
+
+        Ok(Value::Array(result))
+    }
+
+    /// Execute a singular SQL query in the database, returning the number of
+    /// affected rows.
+    async fn raw_count<'a>(
+        &'a self,
+        q: String,
+        params: Vec<PrismaValue>,
+    ) -> std::result::Result<usize, crate::error::RawError> {
+        let params: Vec<_> = params.into_iter().map(quaint::ast::Value::from).collect();
+        let changes = AssertUnwindSafe(self.execute_raw(&q, &params)).catch_unwind().await??;
+
+        Ok(changes as usize)
     }
 
     /// Select one row from the database.

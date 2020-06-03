@@ -100,7 +100,14 @@ impl<'conn, 'tx> WriteOperations for ConnectionLike<'conn, 'tx> {
         }
     }
 
-    async fn execute_raw(&self, query: String, parameters: Vec<PrismaValue>) -> crate::Result<serde_json::Value> {
+    async fn query_raw(&self, query: String, parameters: Vec<PrismaValue>) -> crate::Result<serde_json::Value> {
+        match self {
+            Self::Connection(c) => c.query_raw(query, parameters).await,
+            Self::Transaction(tx) => tx.query_raw(query, parameters).await,
+        }
+    }
+
+    async fn execute_raw(&self, query: String, parameters: Vec<PrismaValue>) -> crate::Result<usize> {
         match self {
             Self::Connection(c) => c.execute_raw(query, parameters).await,
             Self::Transaction(tx) => tx.execute_raw(query, parameters).await,

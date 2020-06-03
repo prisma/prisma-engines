@@ -1,7 +1,7 @@
 use crate::{
     interpreter::{InterpretationResult, InterpreterError},
     query_ast::*,
-    QueryResult,
+    QueryResult, RawQueryType,
 };
 use connector::{ConnectionLike, WriteOperations};
 use prisma_value::PrismaValue;
@@ -18,8 +18,24 @@ pub async fn execute<'a, 'b>(
         WriteQuery::DeleteManyRecords(q) => delete_many(tx, q).await,
         WriteQuery::ConnectRecords(q) => connect(tx, q).await,
         WriteQuery::DisconnectRecords(q) => disconnect(tx, q).await,
-        WriteQuery::Raw { query, parameters } => execute_raw(tx, query, parameters).await,
+        WriteQuery::Raw {
+            query,
+            parameters,
+            raw_type,
+        } => match raw_type {
+            RawQueryType::Execute => execute_raw(tx, query, parameters).await,
+            RawQueryType::Query => query_raw(tx, query, parameters).await,
+        },
     }
+}
+
+async fn query_raw<'a, 'b>(
+    tx: &'a ConnectionLike<'a, 'b>,
+    query: String,
+    parameters: Vec<PrismaValue>,
+) -> InterpretationResult<QueryResult> {
+    let res = tx.query_raw(query, parameters).await?;
+    Ok(QueryResult::Json(res))
 }
 
 async fn execute_raw<'a, 'b>(
@@ -28,7 +44,9 @@ async fn execute_raw<'a, 'b>(
     parameters: Vec<PrismaValue>,
 ) -> InterpretationResult<QueryResult> {
     let res = tx.execute_raw(query, parameters).await?;
-    Ok(QueryResult::Json(res))
+    let num = serde_json::Value::Number(serde_json::Number::from(res));
+
+    Ok(QueryResult::Json(num))
 }
 
 async fn create_one<'a, 'b>(tx: &'a ConnectionLike<'a, 'b>, q: CreateRecord) -> InterpretationResult<QueryResult> {
