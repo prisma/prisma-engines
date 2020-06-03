@@ -176,6 +176,7 @@ impl<'a> QuerySchemaBuilder<'a> {
 
         if self.enable_raw_queries {
             fields.push(self.create_execute_raw_field());
+            fields.push(self.create_query_raw_field());
         }
 
         let strong_ref = Arc::new(object_type("Mutation", fields, None));
@@ -280,6 +281,22 @@ impl<'a> QuerySchemaBuilder<'a> {
     fn create_execute_raw_field(&self) -> Field {
         field(
             "executeRaw",
+            vec![
+                argument("query", InputType::string(), None),
+                argument(
+                    "parameters",
+                    InputType::opt(InputType::json_list()),
+                    Some(dml::DefaultValue::Single(PrismaValue::String("[]".into()))),
+                ),
+            ],
+            OutputType::json(),
+            None,
+        )
+    }
+
+    fn create_query_raw_field(&self) -> Field {
+        field(
+            "queryRaw",
             vec![
                 argument("query", InputType::string(), None),
                 argument(

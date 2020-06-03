@@ -13,6 +13,7 @@ pub enum QueryType {
     Raw {
         query: String,
         parameters: Vec<PrismaValue>,
+        raw_type: RawQueryType,
     },
 }
 
@@ -96,17 +97,21 @@ impl QueryGraphBuilder {
         let parsed_field = parsed_object.fields.pop().unwrap();
         let result_info = Self::derive_serializer(&selections.pop().unwrap(), &parsed_field);
 
-        let query_type = match &parsed_field.schema_field.clone().query_builder {
-            Some(builder) => Ok(QueryType::Graph(builder.build(parsed_field)?)),
-            None if parsed_field.is_raw_query() => {
+        let schema_field = parsed_field.schema_field.clone();
+        let builder = schema_field.query_builder();
+
+        let query_type = match (builder, parsed_field.raw_query_type()) {
+            (Some(builder), None) => Ok(QueryType::Graph(builder.build(parsed_field)?)),
+            (_, Some(raw_type)) => {
                 let raw_args = RawArgs::from(parsed_field.arguments);
 
                 Ok(QueryType::Raw {
                     query: raw_args.query,
                     parameters: raw_args.parameters,
+                    raw_type,
                 })
             }
-            None => Err(QueryGraphBuilderError::SchemaError(format!(
+            (None, None) => Err(QueryGraphBuilderError::SchemaError(format!(
                 "Expected attached query builder on {} object, root level field '{}'.",
                 object.name(),
                 parsed_field.name

@@ -162,5 +162,13 @@ pub trait WriteOperations {
 
     /// Execute the raw query in the database as-is. The `parameters` are
     /// parameterized values for databases that support prepared statements.
-    async fn execute_raw(&self, query: String, parameters: Vec<PrismaValue>) -> crate::Result<serde_json::Value>;
+    ///
+    /// Returns the number of rows affected.
+    async fn execute_raw(&self, query: String, parameters: Vec<PrismaValue>) -> crate::Result<usize>;
+
+    /// Execute the raw query in the database as-is. The `parameters` are
+    /// parameterized values for databases that support prepared statements.
+    ///
+    /// Returns resulting rows as JSON.
+    async fn query_raw(&self, query: String, parameters: Vec<PrismaValue>) -> crate::Result<serde_json::Value>;
 }
