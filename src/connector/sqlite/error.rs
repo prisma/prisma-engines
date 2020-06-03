@@ -5,6 +5,13 @@ use rusqlite::types::FromSqlError;
 impl From<rusqlite::Error> for Error {
     fn from(e: rusqlite::Error) -> Error {
         match e {
+            rusqlite::Error::ExecuteReturnedResults => {
+                let mut builder = Error::builder(ErrorKind::QueryError(e.into()));
+                builder.set_original_message("Execute returned results, which is not allowed in SQLite.");
+
+                builder.build()
+            }
+
             rusqlite::Error::QueryReturnedNoRows => Error::builder(ErrorKind::NotFound).build(),
 
             rusqlite::Error::SqliteFailure(
