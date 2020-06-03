@@ -5,11 +5,7 @@
 mod error;
 mod formatters;
 mod guard;
-mod invariance_rules;
 mod transformers;
-
-#[cfg(test)]
-mod tests;
 
 pub use error::*;
 pub use formatters::*;
@@ -20,7 +16,6 @@ use crate::{
 };
 use connector::{IdFilter, QueryArguments};
 use guard::*;
-use invariance_rules::*;
 use petgraph::{graph::*, visit::EdgeRef as PEdgeRef, *};
 use prisma_models::{ModelProjection, ModelRef, RecordProjection};
 use std::{borrow::Borrow, collections::HashSet};
@@ -206,17 +201,10 @@ impl QueryGraph {
         if !self.finalized {
             self.swap_marked()?;
             self.insert_reloads()?;
-            // self.insert_result_relation_reloads()?;
             self.finalized = true;
         }
 
-        self.validate()?;
-
         Ok(())
-    }
-
-    pub fn validate(&self) -> QueryGraphResult<()> {
-        after_graph_completion(self)
     }
 
     /// Returns a NodeRef to the result node that occurs in the subtree, if it exists.
@@ -312,7 +300,7 @@ impl QueryGraph {
         let edge_ix = self.graph.add_edge(from.node_ix, to.node_ix, Guard::new(content));
         let edge = EdgeRef { edge_ix };
 
-        after_edge_creation(self, &edge).map(|_| edge)
+        Ok(edge)
     }
 
     /// Mark the query graph to need a transaction.

@@ -194,6 +194,8 @@ impl Expressionista {
 
                 let child_pairs = graph.child_pairs(node);
 
+                // Todo: check for different edges. If any other dependency exists, the if must be in a let binding and the result of the
+
                 // Graph validation guarantees this succeeds.
                 let (mut then_pair, mut else_pair): (Vec<(EdgeRef, NodeRef)>, Vec<(EdgeRef, NodeRef)>) = child_pairs
                     .into_iter()
@@ -223,6 +225,7 @@ impl Expressionista {
                             else_: else_expr,
                         }),
 
+                        // todo this is probably incorrect here
                         Flow::Return(_) => todo!(),
                     }
                 });
