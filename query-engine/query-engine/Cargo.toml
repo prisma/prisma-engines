@@ -12,7 +12,7 @@ graphql = ["graphql-parser"]
 [dependencies]
 futures = "0.3"
 # tide = "0.9.0"
-tide = { path = "../../../tide" }
+tide = { git = "https://github.com/http-rs/tide", branch = "master" }
 tokio = { version = "=0.2.13", features = ["rt-threaded", "macros"] }
 async-std = { version = "1.6.0", features = ["attributes"] }
 
