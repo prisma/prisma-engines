@@ -14,6 +14,7 @@ futures = "0.3"
 # tide = "0.9.0"
 tide = { path = "../../../tide" }
 tokio = { version = "=0.2.13", features = ["rt-threaded", "macros"] }
+async-std = { version = "1.6.0", features = ["attributes"] }
 
 async-trait = "0.1"
 prisma-inflector = { path = "../../libs/prisma-inflector" }

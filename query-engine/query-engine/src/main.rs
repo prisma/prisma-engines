@@ -39,7 +39,7 @@ static LOG_FORMAT: Lazy<LogFormat> =
 pub type PrismaResult<T> = Result<T, PrismaError>;
 type AnyError = Box<dyn Error + Send + Sync + 'static>;
 
-#[tokio::main]
+#[async_std::main]
 async fn main() -> Result<(), AnyError> {
     init_logger()?;
     let opts = PrismaOpt::from_args();

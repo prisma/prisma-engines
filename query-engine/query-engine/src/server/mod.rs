@@ -171,8 +171,8 @@ async fn playground_handler(req: Request<State>) -> tide::Result {
     }
 
     let mut res = Response::new(StatusCode::Ok);
-    res.set_body(include_bytes!("../static_files/playground.html").to_vec());
-    res = res.set_header(headers::CONTENT_ENCODING, mime::HTML);
+    res.set_body(include_bytes!("../../static_files/playground.html").to_vec());
+    res.insert_header(headers::CONTENT_ENCODING, mime::HTML);
     Ok(res)
 }
 
@@ -182,7 +182,7 @@ async fn sdl_handler(req: Request<State>) -> tide::Result {
     let body = GraphQLSchemaRenderer::render(Arc::clone(&req.state().cx.query_schema()));
     let mut res = Response::new(StatusCode::Ok);
     res.set_body(body);
-    res = res.set_header(headers::CONTENT_ENCODING, mime::PLAIN);
+    res.insert_header(headers::CONTENT_ENCODING, mime::PLAIN);
     Ok(res)
 }
 
