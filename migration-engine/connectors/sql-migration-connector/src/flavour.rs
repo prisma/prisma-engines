@@ -7,7 +7,8 @@ use futures::{future::BoxFuture, FutureExt};
 use once_cell::sync::Lazy;
 use quaint::connector::Queryable;
 use regex::RegexSet;
-use std::{fs, path::PathBuf};
+use sql_schema_describer::{SqlSchema, SqlSchemaDescriberBackend};
+use std::{fs, path::PathBuf, sync::Arc};
 
 pub(crate) fn from_database_info(database_info: &DatabaseInfo) -> Box<dyn SqlFlavour + Send + Sync + 'static> {
     use quaint::prelude::ConnectionInfo;
@@ -21,6 +22,7 @@ pub(crate) fn from_database_info(database_info: &DatabaseInfo) -> Box<dyn SqlFla
     }
 }
 
+#[async_trait::async_trait]
 pub(crate) trait SqlFlavour {
     fn check_database_info(&self, _database_info: &DatabaseInfo) -> CheckDatabaseInfoResult {
         Ok(())
@@ -29,6 +31,12 @@ pub(crate) trait SqlFlavour {
     fn create_database<'a>(&'a self, _db_name: &'a str, _conn: &'a dyn Queryable) -> BoxFuture<'a, SqlResult<()>> {
         futures::future::ready(Ok(())).boxed()
     }
+
+    async fn describe_schema<'a>(
+        &'a self,
+        schema_name: &'a str,
+        conn: Arc<dyn Queryable + Send + Sync>,
+    ) -> SqlResult<SqlSchema>;
 
     fn initialize<'a>(
         &'a self,
@@ -39,6 +47,7 @@ pub(crate) trait SqlFlavour {
 
 struct MysqlFlavour;
 
+#[async_trait::async_trait]
 impl SqlFlavour for MysqlFlavour {
     fn check_database_info(&self, database_info: &DatabaseInfo) -> CheckDatabaseInfoResult {
         const MYSQL_SYSTEM_DATABASES: Lazy<regex::RegexSet> = Lazy::new(|| {
@@ -70,6 +79,16 @@ impl SqlFlavour for MysqlFlavour {
         .boxed()
     }
 
+    async fn describe_schema<'a>(
+        &'a self,
+        schema_name: &'a str,
+        conn: Arc<dyn Queryable + Send + Sync>,
+    ) -> SqlResult<SqlSchema> {
+        Ok(sql_schema_describer::mysql::SqlSchemaDescriber::new(conn)
+            .describe(schema_name)
+            .await?)
+    }
+
     fn initialize<'a>(
         &'a self,
         conn: &'a dyn Queryable,
@@ -93,7 +112,18 @@ struct SqliteFlavour {
     file_path: String,
 }
 
+#[async_trait::async_trait]
 impl SqlFlavour for SqliteFlavour {
+    async fn describe_schema<'a>(
+        &'a self,
+        schema_name: &'a str,
+        conn: Arc<dyn Queryable + Send + Sync>,
+    ) -> SqlResult<SqlSchema> {
+        Ok(sql_schema_describer::sqlite::SqlSchemaDescriber::new(conn)
+            .describe(schema_name)
+            .await?)
+    }
+
     fn initialize<'a>(
         &'a self,
         _conn: &'a dyn Queryable,
@@ -113,6 +143,7 @@ impl SqlFlavour for SqliteFlavour {
 
 struct PostgresFlavour;
 
+#[async_trait::async_trait]
 impl SqlFlavour for PostgresFlavour {
     fn create_database<'a>(&'a self, db_name: &'a str, conn: &'a dyn Queryable) -> BoxFuture<'a, SqlResult<()>> {
         async move {
@@ -122,6 +153,16 @@ impl SqlFlavour for PostgresFlavour {
             Ok(())
         }
         .boxed()
+    }
+
+    async fn describe_schema<'a>(
+        &'a self,
+        schema_name: &'a str,
+        conn: Arc<dyn Queryable + Send + Sync>,
+    ) -> SqlResult<SqlSchema> {
+        Ok(sql_schema_describer::postgres::SqlSchemaDescriber::new(conn)
+            .describe(schema_name)
+            .await?)
     }
 
     fn initialize<'a>(

@@ -1,6 +1,6 @@
 use crate::{DatabaseInfo, SqlMigrationConnector, SqlResult};
 use quaint::prelude::{ConnectionInfo, Queryable, SqlFamily};
-use sql_schema_describer::{SqlSchema, SqlSchemaDescriberBackend};
+use sql_schema_describer::SqlSchema;
 
 #[async_trait::async_trait]
 pub(crate) trait Component {
@@ -23,28 +23,7 @@ pub(crate) trait Component {
     }
 
     async fn describe(&self) -> SqlResult<SqlSchema> {
-        let conn = self.connector().database.clone();
-        let schema_name = self.schema_name();
-
-        let schema = match self.connection_info().sql_family() {
-            SqlFamily::Postgres => {
-                sql_schema_describer::postgres::SqlSchemaDescriber::new(conn)
-                    .describe(schema_name)
-                    .await?
-            }
-            SqlFamily::Mysql => {
-                sql_schema_describer::mysql::SqlSchemaDescriber::new(conn)
-                    .describe(schema_name)
-                    .await?
-            }
-            SqlFamily::Sqlite => {
-                sql_schema_describer::sqlite::SqlSchemaDescriber::new(conn)
-                    .describe(schema_name)
-                    .await?
-            }
-        };
-
-        Ok(schema)
+        self.connector().describe().await
     }
 
     fn sql_family(&self) -> SqlFamily {
