@@ -81,6 +81,9 @@ pub struct PrismaOpt {
     #[structopt(long = "debug", short = "d")]
     pub enable_debug_mode: bool,
 
+    #[structopt(env = "RUST_LOG_FORMAT")]
+    log_format: Option<String>,
+
     #[structopt(subcommand)]
     pub subcommand: Option<Subcommand>,
 
@@ -142,6 +145,14 @@ impl PrismaOpt {
         };
 
         config_result.map_err(|errors| PrismaError::ConversionError(errors, datamodel_str.to_string()))
+    }
+
+    /// Extract the log format from on the RUST_LOG_FORMAT env var.
+    pub(crate) fn log_format(&self) -> crate::LogFormat {
+        match self.log_format.as_ref().map(|s| s.as_str()) {
+            Some("devel") => crate::LogFormat::Text,
+            _ => crate::LogFormat::Json,
+        }
     }
 }
 

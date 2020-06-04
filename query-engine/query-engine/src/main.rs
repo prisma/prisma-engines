@@ -3,7 +3,6 @@ extern crate tracing;
 
 use cli::CliCommand;
 use error::PrismaError;
-use once_cell::sync::Lazy;
 use opt::PrismaOpt;
 use request_handlers::PrismaResponse;
 use std::{error::Error, process};
@@ -29,18 +28,11 @@ pub enum LogFormat {
     Json,
 }
 
-static LOG_FORMAT: Lazy<LogFormat> =
-    Lazy::new(|| match std::env::var("RUST_LOG_FORMAT").as_ref().map(|s| s.as_str()) {
-        Ok("devel") => LogFormat::Text,
-        _ => LogFormat::Json,
-    });
-
 pub type PrismaResult<T> = Result<T, PrismaError>;
 type AnyError = Box<dyn Error + Send + Sync + 'static>;
 
 #[async_std::main]
 async fn main() -> Result<(), AnyError> {
-    init_logger()?;
     return main().await.map_err(|err| {
         info!("Encountered error during initialization:");
         err.render_as_json().expect("error rendering");
@@ -49,11 +41,12 @@ async fn main() -> Result<(), AnyError> {
 
     async fn main() -> Result<(), PrismaError> {
         let opts = PrismaOpt::from_args();
+        init_logger(&opts);
         feature_flags::initialize(opts.raw_feature_flags.as_slice())?;
         match CliCommand::from_opt(&opts)? {
             Some(cmd) => cmd.execute().await?,
             None => {
-                set_panic_hook();
+                set_panic_hook(&opts);
                 server::listen(opts).await?;
             }
         }
@@ -61,14 +54,14 @@ async fn main() -> Result<(), AnyError> {
     }
 }
 
-fn init_logger() -> Result<(), AnyError> {
-    match *LOG_FORMAT {
+fn init_logger(opts: &PrismaOpt) {
+    match opts.log_format() {
         LogFormat::Text => {
             let subscriber = FmtSubscriber::builder()
                 .with_env_filter(EnvFilter::from_default_env())
                 .finish();
 
-            subscriber::set_global_default(subscriber)?;
+            subscriber::set_global_default(subscriber).expect("Could not initialize logger");
         }
         LogFormat::Json => {
             let subscriber = FmtSubscriber::builder()
@@ -76,15 +69,13 @@ fn init_logger() -> Result<(), AnyError> {
                 .with_env_filter(EnvFilter::from_default_env())
                 .finish();
 
-            subscriber::set_global_default(subscriber)?;
+            subscriber::set_global_default(subscriber).expect("Could not initialize logger");
         }
     }
-
-    Ok(())
 }
 
-fn set_panic_hook() {
-    match *LOG_FORMAT {
+fn set_panic_hook(opts: &PrismaOpt) {
+    match opts.log_format() {
         LogFormat::Text => (),
         LogFormat::Json => {
             std::panic::set_hook(Box::new(|info| {
