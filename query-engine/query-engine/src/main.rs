@@ -6,7 +6,7 @@ use error::PrismaError;
 use once_cell::sync::Lazy;
 use opt::PrismaOpt;
 use request_handlers::{PrismaRequest, PrismaResponse, RequestHandler};
-use std::{convert::TryFrom, error::Error, process};
+use std::{error::Error, process};
 use structopt::StructOpt;
 use tracing::subscriber;
 use tracing_subscriber::{EnvFilter, FmtSubscriber};
@@ -41,32 +41,23 @@ type AnyError = Box<dyn Error + Send + Sync + 'static>;
 #[async_std::main]
 async fn main() -> Result<(), AnyError> {
     init_logger()?;
-    let opts = PrismaOpt::from_args();
+    return main().await.map_err(|err| {
+        info!("Encountered error during initialization:");
+        err.render_as_json().expect("error rendering");
+        process::exit(1)
+    });
 
-    match CliCommand::try_from(&opts) {
-        Ok(cmd) => {
-            if let Err(err) = cmd.execute().await {
-                info!("Encountered error during initialization:");
-                err.render_as_json().expect("error rendering");
-                process::exit(1);
+    async fn main() -> Result<(), PrismaError> {
+        let opts = PrismaOpt::from_args();
+        match CliCommand::from_opt(&opts)? {
+            Some(cmd) => cmd.execute().await?,
+            None => {
+                set_panic_hook();
+                server::listen(opts).await?;
             }
         }
-        Err(PrismaError::InvocationError(_)) => {
-            set_panic_hook()?;
-            if let Err(err) = server::listen(opts).await {
-                info!("Encountered error during initialization:");
-                err.render_as_json().expect("error rendering");
-                process::exit(1);
-            };
-        }
-        Err(err) => {
-            info!("Encountered error during initialization:");
-            err.render_as_json().expect("error rendering");
-            process::exit(1);
-        }
+        Ok(())
     }
-
-    Ok(())
 }
 
 fn init_logger() -> Result<(), AnyError> {
@@ -91,7 +82,7 @@ fn init_logger() -> Result<(), AnyError> {
     Ok(())
 }
 
-fn set_panic_hook() -> Result<(), AnyError> {
+fn set_panic_hook() {
     match *LOG_FORMAT {
         LogFormat::Text => (),
         LogFormat::Json => {
@@ -122,6 +113,4 @@ fn set_panic_hook() -> Result<(), AnyError> {
             }));
         }
     }
-
-    Ok(())
 }
