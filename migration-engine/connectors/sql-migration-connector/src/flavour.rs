@@ -2,19 +2,30 @@
 //! in order to avoid cluttering the connector with conditionals. This is a private implementation
 //! detail of the SQL connector.
 
-use crate::{database_info::DatabaseInfo, CheckDatabaseInfoResult, SqlResult, SystemDatabase};
+use crate::{
+    catch, connect, database_info::DatabaseInfo, CheckDatabaseInfoResult, SqlError, SqlResult, SystemDatabase,
+};
+use futures::future::TryFutureExt;
+use migration_connector::{ConnectorError, ConnectorResult};
 use once_cell::sync::Lazy;
-use quaint::connector::Queryable;
+use quaint::{
+    connector::{ConnectionInfo, MysqlUrl, PostgresUrl, Queryable},
+    single::Quaint,
+};
 use regex::RegexSet;
 use sql_schema_describer::{SqlSchema, SqlSchemaDescriberBackend};
-use std::{fs, path::PathBuf, sync::Arc};
+use std::{
+    collections::HashMap,
+    fs,
+    path::{Path, PathBuf},
+    sync::Arc,
+};
+use url::Url;
 
-pub(crate) fn from_database_info(database_info: &DatabaseInfo) -> Box<dyn SqlFlavour + Send + Sync + 'static> {
-    use quaint::prelude::ConnectionInfo;
-
-    match database_info.connection_info() {
-        ConnectionInfo::Mysql(_) => Box::new(MysqlFlavour),
-        ConnectionInfo::Postgres(_) => Box::new(PostgresFlavour),
+pub(crate) fn from_connection_info(connection_info: &ConnectionInfo) -> Box<dyn SqlFlavour + Send + Sync + 'static> {
+    match connection_info {
+        ConnectionInfo::Mysql(url) => Box::new(MysqlFlavour(url.clone())),
+        ConnectionInfo::Postgres(url) => Box::new(PostgresFlavour(url.clone())),
         ConnectionInfo::Sqlite { file_path, .. } => Box::new(SqliteFlavour {
             file_path: file_path.clone(),
         }),
@@ -29,7 +40,7 @@ pub(crate) trait SqlFlavour {
     }
 
     /// Create a database called `dbname` on the server, if applicable.
-    async fn create_database(&self, dbname: &str, conn: &dyn Queryable) -> SqlResult<()>;
+    async fn create_database(&self, database_url: &str) -> ConnectorResult<String>;
 
     /// Introspect the SQL schema.
     async fn describe_schema<'a>(
@@ -42,7 +53,7 @@ pub(crate) trait SqlFlavour {
     async fn initialize(&self, conn: &dyn Queryable, database_info: &DatabaseInfo) -> SqlResult<()>;
 }
 
-struct MysqlFlavour;
+struct MysqlFlavour(MysqlUrl);
 
 #[async_trait::async_trait]
 impl SqlFlavour for MysqlFlavour {
@@ -66,11 +77,21 @@ impl SqlFlavour for MysqlFlavour {
         Ok(())
     }
 
-    async fn create_database(&self, db_name: &str, conn: &dyn Queryable) -> SqlResult<()> {
-        let query = format!("CREATE DATABASE `{}`", db_name);
-        conn.query_raw(&query, &[]).await?;
+    async fn create_database(&self, database_str: &str) -> ConnectorResult<String> {
+        let mut url = Url::parse(database_str).unwrap();
+        url.set_path("/mysql");
+        let (conn, _) = connect(&url.to_string()).await?;
 
-        Ok(())
+        let db_name = self.0.dbname();
+
+        let query = format!("CREATE DATABASE `{}`", db_name);
+        catch(
+            conn.connection_info(),
+            conn.query_raw(&query, &[]).map_err(SqlError::from),
+        )
+        .await?;
+
+        Ok(db_name.to_owned())
     }
 
     async fn describe_schema<'a>(
@@ -101,8 +122,25 @@ struct SqliteFlavour {
 
 #[async_trait::async_trait]
 impl SqlFlavour for SqliteFlavour {
-    async fn create_database(&self, _db_name: &str, _conn: &dyn Queryable) -> SqlResult<()> {
-        Ok(())
+    async fn create_database(&self, database_str: &str) -> ConnectorResult<String> {
+        use anyhow::Context;
+
+        let path = Path::new(&self.file_path);
+        if path.exists() {
+            return Ok(self.file_path.clone());
+        }
+
+        let dir = path.parent();
+
+        if let Some((dir, false)) = dir.map(|dir| (dir, dir.exists())) {
+            std::fs::create_dir_all(dir)
+                .context("Creating SQLite database parent directory.")
+                .map_err(|io_err| ConnectorError::from_kind(migration_connector::ErrorKind::Generic(io_err.into())))?;
+        }
+
+        connect(database_str).await?;
+
+        Ok(self.file_path.clone())
     }
 
     async fn describe_schema<'a>(
@@ -128,15 +166,24 @@ impl SqlFlavour for SqliteFlavour {
     }
 }
 
-struct PostgresFlavour;
+struct PostgresFlavour(PostgresUrl);
 
 #[async_trait::async_trait]
 impl SqlFlavour for PostgresFlavour {
-    async fn create_database(&self, db_name: &str, conn: &dyn Queryable) -> SqlResult<()> {
-        let query = format!("CREATE DATABASE \"{}\"", db_name);
-        conn.query_raw(&query, &[]).await?;
+    async fn create_database(&self, database_str: &str) -> ConnectorResult<String> {
+        let url = Url::parse(database_str).unwrap();
+        let db_name = self.0.dbname();
 
-        Ok(())
+        let (conn, _) = create_postgres_admin_conn(url).await?;
+
+        let query = format!("CREATE DATABASE \"{}\"", db_name);
+        catch(
+            conn.connection_info(),
+            conn.query_raw(&query, &[]).map_err(SqlError::from),
+        )
+        .await?;
+
+        Ok(db_name.to_owned())
     }
 
     async fn describe_schema<'a>(
@@ -159,4 +206,48 @@ impl SqlFlavour for PostgresFlavour {
 
         Ok(())
     }
+}
+
+/// Try to connect as an admin to a postgres database. We try to pick a default database from which
+/// we can create another database.
+async fn create_postgres_admin_conn(mut url: Url) -> ConnectorResult<(Quaint, DatabaseInfo)> {
+    use migration_connector::ErrorKind;
+
+    let candidate_default_databases = &["postgres", "template1"];
+
+    let mut params: HashMap<String, String> = url.query_pairs().into_owned().collect();
+    params.remove("schema");
+    let params: Vec<String> = params.into_iter().map(|(k, v)| format!("{}={}", k, v)).collect();
+    let params: String = params.join("&");
+    url.set_query(Some(&params));
+
+    let mut conn = None;
+
+    for database_name in candidate_default_databases {
+        url.set_path(&format!("/{}", database_name));
+        match connect(url.as_str()).await {
+            // If the database does not exist, try the next one.
+            Err(err) => match &err.kind {
+                migration_connector::ErrorKind::DatabaseDoesNotExist { .. } => (),
+                _other_outcome => {
+                    conn = Some(Err(err));
+                    break;
+                }
+            },
+            // If the outcome is anything else, use this.
+            other_outcome => {
+                conn = Some(other_outcome);
+                break;
+            }
+        }
+    }
+
+    let conn = conn
+        .ok_or_else(|| {
+            ConnectorError::from_kind(ErrorKind::DatabaseCreationFailed {
+                explanation: "Prisma could not connect to a default database (`postgres` or `template1`), it cannot create the specified database.".to_owned()
+            })
+        })??;
+
+    Ok(conn)
 }

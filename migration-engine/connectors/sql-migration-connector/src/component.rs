@@ -23,7 +23,7 @@ pub(crate) trait Component {
     }
 
     async fn describe(&self) -> SqlResult<SqlSchema> {
-        self.connector().describe().await
+        self.connector().describe_schema().await
     }
 
     fn sql_family(&self) -> SqlFamily {

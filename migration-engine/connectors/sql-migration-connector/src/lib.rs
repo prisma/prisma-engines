@@ -31,9 +31,8 @@ use sql_database_step_applier::*;
 use sql_destructive_changes_checker::*;
 use sql_migration_persistence::*;
 use sql_schema_describer::SqlSchema;
-use std::{collections::HashMap, path, sync::Arc, time::Duration};
+use std::{sync::Arc, time::Duration};
 use tracing::debug;
-use url::Url;
 use user_facing_errors::migration_engine::DatabaseMigrationFormatChanged;
 
 const CONNECTION_TIMEOUT: Duration = Duration::from_secs(10);
@@ -47,7 +46,7 @@ pub struct SqlMigrationConnector {
 impl SqlMigrationConnector {
     pub async fn new(database_str: &str) -> ConnectorResult<Self> {
         let (connection, database_info) = connect(database_str).await?;
-        let flavour = flavour::from_database_info(&database_info);
+        let flavour = flavour::from_connection_info(database_info.connection_info());
         flavour.check_database_info(&database_info)?;
 
         Ok(Self {
@@ -58,66 +57,10 @@ impl SqlMigrationConnector {
     }
 
     pub async fn create_database(database_str: &str) -> ConnectorResult<String> {
-        use anyhow::Context;
-        use futures::future::TryFutureExt;
-
-        match ConnectionInfo::from_url(database_str).ok() {
-            Some(ConnectionInfo::Postgres(postgres_url)) => {
-                let url = Url::parse(database_str).unwrap();
-                let db_name = postgres_url.dbname();
-
-                let (conn, _) = create_postgres_admin_conn(url).await?;
-
-                let query = format!("CREATE DATABASE \"{}\"", db_name);
-                catch(
-                    conn.connection_info(),
-                    conn.query_raw(&query, &[]).map_err(SqlError::from),
-                )
-                .await?;
-
-                Ok(db_name.to_owned())
-            }
-            Some(ConnectionInfo::Sqlite { file_path, .. }) => {
-                let path = path::Path::new(&file_path);
-                if path.exists() {
-                    return Ok(file_path);
-                }
-
-                let dir = path.parent();
-
-                if let Some((dir, false)) = dir.map(|dir| (dir, dir.exists())) {
-                    std::fs::create_dir_all(dir)
-                        .context("Creating SQLite database parent directory.")
-                        .map_err(|io_err| {
-                            ConnectorError::from_kind(migration_connector::ErrorKind::Generic(io_err.into()))
-                        })?;
-                }
-
-                connect(database_str).await?;
-
-                Ok(file_path)
-            }
-            Some(ConnectionInfo::Mysql(mysql_url)) => {
-                let mut url = Url::parse(database_str).unwrap();
-                url.set_path("/mysql");
-                let (conn, _) = connect(&url.to_string()).await?;
-
-                let db_name = mysql_url.dbname();
-
-                let query = format!("CREATE DATABASE `{}`", db_name);
-                catch(
-                    conn.connection_info(),
-                    conn.query_raw(&query, &[]).map_err(SqlError::from),
-                )
-                .await?;
-
-                Ok(db_name.to_owned())
-            }
-            None => unreachable!(
-                "Invalid URL or unsupported connector in the datasource ({:?})",
-                database_str
-            ),
-        }
+        let connection_info =
+            ConnectionInfo::from_url(database_str).map_err(|err| ConnectorError::url_parse_error(err, database_str))?;
+        let flavour = flavour::from_connection_info(&connection_info);
+        flavour.create_database(database_str).await
     }
 
     async fn drop_database(&self) -> ConnectorResult<()> {
@@ -158,7 +101,7 @@ impl SqlMigrationConnector {
         Ok(())
     }
 
-    async fn describe(&self) -> SqlResult<SqlSchema> {
+    async fn describe_schema(&self) -> SqlResult<SqlSchema> {
         let conn = self.connector().database.clone();
         let schema_name = self.schema_name();
 
@@ -270,48 +213,4 @@ async fn connect(database_str: &str) -> ConnectorResult<(Quaint, DatabaseInfo)> 
         .map_err(|sql_error| sql_error.into_connector_error(&connection_info))?;
 
     Ok((connection, database_info))
-}
-
-/// Try to connect as an admin to a postgres database. We try to pick a default database from which
-/// we can create another database.
-async fn create_postgres_admin_conn(mut url: Url) -> ConnectorResult<(Quaint, DatabaseInfo)> {
-    use migration_connector::ErrorKind;
-
-    let candidate_default_databases = &["postgres", "template1"];
-
-    let mut params: HashMap<String, String> = url.query_pairs().into_owned().collect();
-    params.remove("schema");
-    let params: Vec<String> = params.into_iter().map(|(k, v)| format!("{}={}", k, v)).collect();
-    let params: String = params.join("&");
-    url.set_query(Some(&params));
-
-    let mut conn = None;
-
-    for database_name in candidate_default_databases {
-        url.set_path(&format!("/{}", database_name));
-        match connect(url.as_str()).await {
-            // If the database does not exist, try the next one.
-            Err(err) => match &err.kind {
-                migration_connector::ErrorKind::DatabaseDoesNotExist { .. } => (),
-                _other_outcome => {
-                    conn = Some(Err(err));
-                    break;
-                }
-            },
-            // If the outcome is anything else, use this.
-            other_outcome => {
-                conn = Some(other_outcome);
-                break;
-            }
-        }
-    }
-
-    let conn = conn
-        .ok_or_else(|| {
-            ConnectorError::from_kind(ErrorKind::DatabaseCreationFailed {
-                explanation: "Prisma could not connect to a default database (`postgres` or `template1`), it cannot create the specified database.".to_owned()
-            })
-        })??;
-
-    Ok(conn)
 }
