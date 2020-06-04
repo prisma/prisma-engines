@@ -8,6 +8,10 @@ async fn add_cuid_default_for_postgres(api: &TestApi) {
             migration.create_table("Book", |t| {
                 t.inject_custom("id varchar(25) Not Null Primary Key");
             });
+            migration.create_table("_RelayId", |t| {
+                t.inject_custom("id character varying(25) Primary Key ");
+                t.inject_custom("stableModelIdentifier character varying(25) Not Null");
+            });
         })
         .await;
 
@@ -30,6 +34,10 @@ async fn add_uuid_default_for_postgres(api: &TestApi) {
             migration.create_table("Book", |t| {
                 t.inject_custom("id varchar(36) Not Null Primary Key");
             });
+            migration.create_table("_RelayId", |t| {
+                t.inject_custom("id character varying(25) Primary Key ");
+                t.inject_custom("stableModelIdentifier character varying(25) Not Null");
+            });
         })
         .await;
 
@@ -50,6 +58,10 @@ async fn add_cuid_default_for_mysql(api: &TestApi) {
         .execute(|migration| {
             migration.create_table("Book", |t| {
                 t.inject_custom("id char(25) Not Null Primary Key");
+            });
+            migration.create_table("_RelayId", |t| {
+                t.inject_custom("id character varying(25) Primary Key ");
+                t.inject_custom("stableModelIdentifier character varying(25) Not Null");
             });
         })
         .await;
@@ -72,6 +84,10 @@ async fn add_uuid_default_for_mysql(api: &TestApi) {
             migration.create_table("Book", |t| {
                 t.inject_custom("id char(36) Not Null Primary Key");
             });
+            migration.create_table("_RelayId", |t| {
+                t.inject_custom("id character varying(25) Primary Key ");
+                t.inject_custom("stableModelIdentifier character varying(25) Not Null");
+            });
         })
         .await;
 
@@ -79,6 +95,7 @@ async fn add_uuid_default_for_mysql(api: &TestApi) {
             model Book {
                 id  String @default(uuid()) @id
             }
+            
         "#;
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);

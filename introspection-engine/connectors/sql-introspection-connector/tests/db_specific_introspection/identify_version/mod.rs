@@ -3,28 +3,6 @@ use barrel::types;
 use introspection_connector::Version;
 use test_harness::*;
 
-// 1.20 Postgres
-// CREATE TABLE default$default."User120" (
-// id character varying(25) PRIMARY KEY,
-// name text NOT NULL,
-// float numeric(65,30),
-// bool boolean,
-// time timestamp(3) without time zone,
-// json text,
-// int integer
-// );
-
-//1.34 Postgres
-// CREATE TABLE default$default."User134" (
-// id character varying(25) PRIMARY KEY,
-// name text NOT NULL,
-// float numeric(65,30),
-// bool boolean,
-// time timestamp(3) without time zone,
-// json text,
-// int integer
-// );
-
 //Sqlite
 #[test_each_connector(tags("sqlite"))]
 async fn introspect_sqlite_non_prisma(api: &TestApi) {
