@@ -5,10 +5,10 @@ datasource chinook {
 
 model ModelA {
   id   String @id @default(cuid())
-  c_id String
+  //c_id String
 
   manyB ModelB[] // M:N
-  oneC  ModelC @relation(fields: [c_id], references: [id]) // 1:1
+  //oneC  ModelC @relation(fields: [c_id], references: [id]) // 1:1
   manyD ModelD[] // M:1
 }
 
@@ -20,7 +20,7 @@ model ModelB {
 
 model ModelC {
   id   String @id @default(cuid())
-  oneA ModelA
+  //oneA ModelA
 }
 
 model ModelD {

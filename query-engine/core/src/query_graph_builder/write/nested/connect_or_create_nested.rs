@@ -172,6 +172,9 @@ fn one_to_many_inlined_child(
     child_model: &ModelRef,
 ) -> QueryGraphBuilderResult<()> {
     for value in values {
+        let parent_link = parent_relation_field.linking_fields();
+        let child_link = parent_relation_field.related_field().linking_fields();
+
         let mut value: ParsedInputMap = value.try_into()?;
 
         let where_arg = value.remove("where").unwrap();
@@ -183,7 +186,7 @@ fn one_to_many_inlined_child(
         let filter = extract_unique_filter(where_map, &child_model)?;
         let read_node = graph.create_node(utils::read_ids_infallible(
             child_model.clone(),
-            child_model.primary_identifier(),
+            child_link.clone(),
             filter.clone(),
         ));
 
@@ -209,9 +212,6 @@ fn one_to_many_inlined_child(
                 }),
             ),
         )?;
-
-        let parent_link = parent_relation_field.linking_fields();
-        let child_link = parent_relation_field.related_field().linking_fields();
 
         graph.create_edge(
             &parent_node,
@@ -262,14 +262,138 @@ fn one_to_many_inlined_child(
     Ok(())
 }
 
+/// Handles one-to-many-relation cases where the inlining is done on the parent.
+/// This implies that the parent model is the many side of the relation, which
+/// also implies that there can only be one `value` in `values`.
+///
+///    ┌─────────────────┐
+/// ┌──│   Read Child    │
+/// │  └─────────────────┘
+/// │           │
+/// │           │
+/// │           │
+/// │           ▼
+/// │  ┌─────────────────┐
+/// │  │   If (exists)   │──┬────Else───┐
+/// │  └─────────────────┘  │           │
+/// │           │           │           │
+/// │         Then          │           │
+/// │           │           │           │
+/// │           ▼           │           ▼
+/// │  ┌─────────────────┐  │  ┌─────────────────┐
+/// ├─▶│   Return Link   │  │  │  Create Child   │
+/// │  └─────────────────┘  │  └─────────────────┘
+/// │                       │           │
+/// │                       │           │
+/// │                       │           │
+/// │                       │           ▼
+/// │  ┌ ─ ─ ─ ─ ─ ─ ─ ─ ┐  │  ┌─────────────────┐
+/// └─▶      Parent       ◀─┘  │   Return Link   │
+///    └ ─ ─ ─ ─ ─ ─ ─ ─ ┘     └─────────────────┘
+///             │
+///             ▼
+///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ┐
+///          Result
+///    └ ─ ─ ─ ─ ─ ─ ─ ─ ┘
 fn one_to_many_inlined_parent(
     graph: &mut QueryGraph,
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
-    values: Vec<ParsedInputValue>,
+    mut values: Vec<ParsedInputValue>,
     child_model: &ModelRef,
 ) -> QueryGraphBuilderResult<()> {
-    todo!()
+    let parent_link = parent_relation_field.linking_fields();
+    let child_link = parent_relation_field.related_field().linking_fields();
+
+    let value = values.pop().unwrap();
+    let mut value: ParsedInputMap = value.try_into()?;
+
+    let where_arg = value.remove("where").unwrap();
+    let where_map: ParsedInputMap = where_arg.try_into()?;
+
+    let create_arg = value.remove("create").unwrap();
+    let create_map: ParsedInputMap = create_arg.try_into()?;
+
+    let filter = extract_unique_filter(where_map, &child_model)?;
+    let read_node = graph.create_node(utils::read_ids_infallible(
+        child_model.clone(),
+        child_link.clone(),
+        filter.clone(),
+    ));
+
+    graph.mark_nodes(&parent_node, &read_node);
+    graph.create_edge(&parent_node, &read_node, QueryGraphDependency::ExecutionOrder)?;
+
+    let if_node = graph.create_node(Flow::default_if());
+    let create_node = create::create_record_node(graph, Arc::clone(child_model), create_map)?;
+    let return_existing = graph.create_node(Flow::Return(None));
+    let return_create = graph.create_node(Flow::Return(None));
+
+    graph.create_edge(
+        &read_node,
+        &if_node,
+        QueryGraphDependency::ParentProjection(
+            child_model.primary_identifier(),
+            Box::new(|if_node, child_ids| {
+                if let Node::Flow(Flow::If(_)) = if_node {
+                    Ok(Node::Flow(Flow::If(Box::new(move || !child_ids.is_empty()))))
+                } else {
+                    Ok(if_node)
+                }
+            }),
+        ),
+    )?;
+
+    graph.create_edge(&if_node, &return_existing, QueryGraphDependency::Then)?;
+    graph.create_edge(&if_node, &create_node, QueryGraphDependency::Else)?;
+
+    graph.create_edge(
+        &if_node,
+        &parent_node,
+        QueryGraphDependency::ParentProjection(
+            child_link.clone(),
+            Box::new(move |mut parent, mut child_ids| {
+                let child_id = child_ids.pop().unwrap();
+                if let Node::Query(Query::Write(ref mut wq)) = parent {
+                    wq.inject_projection_into_args(parent_link.assimilate(child_id)?);
+                }
+
+                Ok(parent)
+            }),
+        ),
+    )?;
+
+    graph.create_edge(
+        &read_node,
+        &return_existing,
+        QueryGraphDependency::ParentProjection(
+            child_link.clone(),
+            Box::new(move |return_node, child_ids| {
+                if let Node::Flow(Flow::Return(_)) = return_node {
+                    Ok(Node::Flow(Flow::Return(Some(child_ids))))
+                } else {
+                    Ok(return_node)
+                }
+            }),
+        ),
+    )?;
+
+    graph.create_edge(
+        &create_node,
+        &return_create,
+        QueryGraphDependency::ParentProjection(
+            child_link,
+            Box::new(move |return_node, child_ids| {
+                if let Node::Flow(Flow::Return(_)) = return_node {
+                    Ok(Node::Flow(Flow::Return(Some(child_ids))))
+                } else {
+                    Ok(return_node)
+                }
+            }),
+        ),
+    )?;
+
+    Ok(())
 }
 
 fn handle_one_to_one(
