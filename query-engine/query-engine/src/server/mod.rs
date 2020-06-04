@@ -12,7 +12,6 @@ use serde_json::json;
 use tide::http::{mime, StatusCode};
 use tide::{Body, Request, Response};
 
-use std::net::SocketAddr;
 use std::sync::Arc;
 
 mod elapsed_middleware;
@@ -47,8 +46,6 @@ impl Clone for State {
 
 /// Create a new server and listen.
 pub async fn listen(opts: PrismaOpt) -> PrismaResult<()> {
-    let ip = opts.host.parse().expect("Host was not a valid IP address");
-    let addr = SocketAddr::new(ip, opts.port);
     let config = opts.configuration(false)?;
     let datamodel = opts.datamodel(false)?;
     let cx = PrismaContext::builder(config, datamodel)
@@ -67,8 +64,7 @@ pub async fn listen(opts: PrismaOpt) -> PrismaResult<()> {
     app.at("/server_info").get(server_info_handler);
     app.at("/status").get(|_| async move { Ok(json!({"status": "ok"})) });
 
-    info!("Started http server on {}:{}", addr.ip(), addr.port());
-    app.listen(addr).await?;
+    app.listen((&*opts.host, opts.port)).await?;
     Ok(())
 }
 
