@@ -1902,7 +1902,8 @@ async fn references_to_models_with_compound_primary_keys_must_work(api: &TestApi
     Ok(())
 }
 
-#[test_each_connector]
+// TODO: marcus must discuss with Tom if those are still needed
+//#[test_each_connector]
 async fn join_tables_between_models_with_compound_primary_keys_must_work(api: &TestApi) -> TestResult {
     let dm = r#"
         model Human {
@@ -1941,7 +1942,8 @@ async fn join_tables_between_models_with_compound_primary_keys_must_work(api: &T
     Ok(())
 }
 
-#[test_each_connector]
+// TODO: marcus must discuss with Tom if those are still needed
+//#[test_each_connector]
 async fn join_tables_between_models_with_mapped_compound_primary_keys_must_work(api: &TestApi) -> TestResult {
     let dm = r#"
         model Human {
