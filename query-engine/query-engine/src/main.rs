@@ -5,7 +5,7 @@ use cli::CliCommand;
 use error::PrismaError;
 use once_cell::sync::Lazy;
 use opt::PrismaOpt;
-use request_handlers::{PrismaRequest, PrismaResponse, RequestHandler};
+use request_handlers::PrismaResponse;
 use std::{error::Error, process};
 use structopt::StructOpt;
 use tracing::subscriber;
