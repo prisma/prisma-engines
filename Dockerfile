@@ -22,4 +22,4 @@ RUN mv target/release/migration-engine /usr/bin
 WORKDIR /
 
 RUN rm -rf /usr/src
-CMD /usr/bin/query-engine --host 0.0.0.0
+CMD /usr/bin/query-engine --host 0.0.0.0 --enable-playground
