@@ -208,7 +208,7 @@ impl Expressionista {
 
         match graph.node_content(node).unwrap() {
             Node::Flow(Flow::If(_)) => Self::translate_if_node(graph, node, parent_edges),
-            Node::Flow(Flow::Return(p)) => todo!(),
+            Node::Flow(Flow::Return(p)) => Self::translate_return_node(graph, node, parent_edges),
             _ => unreachable!(),
         }
     }
@@ -277,6 +277,30 @@ impl Expressionista {
             }
         });
 
+        Self::transform_node(graph, parent_edges, node, into_expr)
+    }
+
+    fn translate_return_node(
+        graph: &mut QueryGraph,
+        node: &NodeRef,
+        parent_edges: Vec<EdgeRef>,
+    ) -> InterpretationResult<Expression> {
+        let into_expr = Box::new(move |node: Node| {
+            let flow: Flow = node.try_into()?;
+
+            if let Flow::Return(result) = flow {
+                let result = match result {
+                    Some(r) => ExpressionResult::RawProjections(r),
+                    None => ExpressionResult::Empty,
+                };
+
+                Ok(Expression::Return { result })
+            } else {
+                unreachable!()
+            }
+        });
+
+        let node = graph.pluck_node(node);
         Self::transform_node(graph, parent_edges, node, into_expr)
     }
 

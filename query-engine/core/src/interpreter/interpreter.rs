@@ -13,6 +13,7 @@ use prisma_models::prelude::*;
 #[derive(Debug, Clone)]
 pub enum ExpressionResult {
     Query(QueryResult),
+    RawProjections(Vec<RecordProjection>),
     Computation(ComputationResult),
     Empty,
 }
@@ -57,6 +58,13 @@ impl ExpressionResult {
 
                 _ => None,
             },
+
+            Self::RawProjections(p) => p
+                .clone()
+                .into_iter()
+                .map(|p| model_projection.assimilate(p))
+                .collect::<std::result::Result<Vec<_>, _>>()
+                .ok(),
 
             _ => None,
         };
