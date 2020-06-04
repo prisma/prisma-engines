@@ -1,17 +1,13 @@
 #![deny(missing_docs)]
 
-use super::dmmf;
-use crate::{
-    context::PrismaContext,
-    request_handlers::{
-        graphql::{GraphQLSchemaRenderer, GraphQlRequestHandler},
-        PrismaRequest, RequestHandler,
-    },
-    PrismaResult,
-};
+use crate::context::PrismaContext;
+use crate::dmmf;
+use crate::opt::PrismaOpt;
+use crate::request_handlers::graphql::{GraphQLSchemaRenderer, GraphQlRequestHandler};
+use crate::request_handlers::{PrismaRequest, RequestHandler};
+use crate::PrismaResult;
 use elapsed_middleware::ElapsedMiddleware;
 
-use datamodel::{Configuration, Datamodel};
 use query_core::schema::QuerySchemaRenderer;
 use serde_json::json;
 use tide::http::{mime, StatusCode};
@@ -47,99 +43,31 @@ impl Clone for State {
     }
 }
 
-/// A builder for `HttpServer`.
-pub struct HttpServerBuilder {
-    /// The address we listen on.
-    addr: SocketAddr,
-    /// The server configuration passed.
-    config: Configuration,
-    /// The Prisma data model.
-    datamodel: Datamodel,
-    /// Are we listening in legacy mode?
-    legacy_mode: bool,
-    /// Do we enable raw queries?
-    ///
-    /// Note: this has security implications.
-    enable_raw_queries: bool,
-    /// Do we enable the GraphQL playground?
-    ///
-    /// Note: this has security implications.
-    enable_playground: bool,
-}
+/// Create a new server and listen.
+pub async fn listen(opts: PrismaOpt) -> PrismaResult<()> {
+    let ip = opts.host.parse().expect("Host was not a valid IP address");
+    let addr = SocketAddr::new(ip, opts.port);
+    let config = opts.configuration(false)?;
+    let datamodel = opts.datamodel(false)?;
+    let cx = PrismaContext::builder(config, datamodel)
+        .legacy(opts.legacy)
+        .enable_raw_queries(opts.enable_raw_queries)
+        .build()
+        .await?;
 
-impl HttpServerBuilder {
-    /// Create a new instance of `HttpServerBuilder`.
-    fn new(addr: SocketAddr, config: Configuration, datamodel: Datamodel) -> Self {
-        Self {
-            addr,
-            config,
-            datamodel,
-            legacy_mode: false,
-            enable_playground: false,
-            enable_raw_queries: false,
-        }
-    }
+    let mut app = tide::with_state(State::new(cx, opts.enable_playground));
+    app.middleware(ElapsedMiddleware::new());
 
-    /// Enable "legacy mode" for prisma-engines.
-    pub fn legacy(mut self, val: bool) -> Self {
-        self.legacy_mode = val;
-        self
-    }
+    app.at("/").post(graphql_handler);
+    app.at("/").get(playground_handler);
+    app.at("/sdl").get(sdl_handler);
+    app.at("/dmmf").get(dmmf_handler);
+    app.at("/server_info").get(server_info_handler);
+    app.at("/status").get(|_| async move { Ok(json!({"status": "ok"})) });
 
-    /// Enable raw queries for prisma-engines.
-    ///
-    /// # Security
-    ///
-    /// Enabling this setting will allow arbtrary queries to be executed against
-    /// the server. This has security implications when exposing Prisma on a
-    /// public port.
-    pub fn enable_raw_queries(mut self, val: bool) -> Self {
-        self.enable_raw_queries = val;
-        self
-    }
-
-    /// Enable the GraphQL playground.
-    pub fn enable_playground(mut self, val: bool) -> Self {
-        self.enable_playground = val;
-        self
-    }
-
-    /// Start the server.
-    pub async fn build(self) -> PrismaResult<()> {
-        let ctx = PrismaContext::builder(self.config, self.datamodel)
-            .legacy(self.legacy_mode)
-            .enable_raw_queries(self.enable_raw_queries)
-            .build()
-            .await?;
-
-        HttpServer::run(self.addr, ctx, self.enable_playground).await
-    }
-}
-
-pub struct HttpServer;
-
-impl HttpServer {
-    /// Create a new HTTP server builder.
-    pub fn builder(addr: SocketAddr, config: Configuration, datamodel: Datamodel) -> HttpServerBuilder {
-        HttpServerBuilder::new(addr, config, datamodel)
-    }
-
-    /// Start the HTTP server with the default options enabled.
-    async fn run(addr: SocketAddr, cx: PrismaContext, enable_playground: bool) -> PrismaResult<()> {
-        let mut app = tide::with_state(State::new(cx, enable_playground));
-        app.middleware(ElapsedMiddleware::new());
-
-        app.at("/").post(graphql_handler);
-        app.at("/").get(playground_handler);
-        app.at("/sdl").get(sdl_handler);
-        app.at("/dmmf").get(dmmf_handler);
-        app.at("/server_info").get(server_info_handler);
-        app.at("/status").get(|_| async move { Ok(json!({"status": "ok"})) });
-
-        info!("Started http server on {}:{}", addr.ip(), addr.port());
-        app.listen(addr).await?;
-        Ok(())
-    }
+    info!("Started http server on {}:{}", addr.ip(), addr.port());
+    app.listen(addr).await?;
+    Ok(())
 }
 
 /// The main query handler. This handles incoming GraphQL queries and passes it
