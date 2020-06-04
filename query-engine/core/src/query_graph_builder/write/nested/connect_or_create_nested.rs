@@ -128,6 +128,147 @@ fn handle_one_to_many(
     values: Vec<ParsedInputValue>,
     child_model: &ModelRef,
 ) -> QueryGraphBuilderResult<()> {
+    if parent_relation_field.is_inlined_on_enclosing_model() {
+        one_to_many_inlined_parent(graph, parent_node, parent_relation_field, values, child_model)
+    } else {
+        one_to_many_inlined_child(graph, parent_node, parent_relation_field, values, child_model)
+    }
+}
+
+/// Handles one-to-many-relation cases where the inlining is done on the child.
+/// This implies that the child model is the many side of the relation.
+///
+/// ```text
+///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ┐
+/// ┌──      Parent       ────────────────────────┐
+/// │  └ ─ ─ ─ ─ ─ ─ ─ ─ ┘         │              │
+/// │           │                                 │
+/// │           │                  │              │
+/// │           │                                 │
+/// │           ▼                  ▼              │
+/// │  ┌─────────────────┐  ┌ ─ ─ ─ ─ ─ ─         │
+/// │  │   Read Child    │      Result   │        │
+/// │  └─────────────────┘  └ ─ ─ ─ ─ ─ ─         │
+/// │           │                                 │
+/// │           │                                 │
+/// │           │                                 │
+/// │           ▼                                 │
+/// │  ┌─────────────────┐                        │
+/// │  │   If (exists)   │────Else────┐           │
+/// │  └─────────────────┘            │           │
+/// │           │                     │           │
+/// │         Then                    │           │
+/// │           │                     │           │
+/// │           ▼                     ▼           │
+/// │  ┌─────────────────┐   ┌─────────────────┐  │
+/// └─▶│  Update Child   │   │  Create Child   │◀─┘
+///    └─────────────────┘   └─────────────────┘
+/// ```
+fn one_to_many_inlined_child(
+    graph: &mut QueryGraph,
+    parent_node: NodeRef,
+    parent_relation_field: &RelationFieldRef,
+    values: Vec<ParsedInputValue>,
+    child_model: &ModelRef,
+) -> QueryGraphBuilderResult<()> {
+    for value in values {
+        let mut value: ParsedInputMap = value.try_into()?;
+
+        let where_arg = value.remove("where").unwrap();
+        let where_map: ParsedInputMap = where_arg.try_into()?;
+
+        let create_arg = value.remove("create").unwrap();
+        let create_map: ParsedInputMap = create_arg.try_into()?;
+
+        let filter = extract_unique_filter(where_map, &child_model)?;
+        let read_node = graph.create_node(utils::read_ids_infallible(
+            child_model.clone(),
+            child_model.primary_identifier(),
+            filter.clone(),
+        ));
+
+        let if_node = graph.create_node(Flow::default_if());
+        let update_child_node = utils::update_records_node_placeholder(graph, filter, Arc::clone(child_model));
+        let create_node = create::create_record_node(graph, Arc::clone(child_model), create_map)?;
+
+        graph.create_edge(&parent_node, &read_node, QueryGraphDependency::ExecutionOrder)?;
+        graph.create_edge(&if_node, &update_child_node, QueryGraphDependency::Then)?;
+        graph.create_edge(&if_node, &create_node, QueryGraphDependency::Else)?;
+
+        graph.create_edge(
+            &read_node,
+            &if_node,
+            QueryGraphDependency::ParentProjection(
+                child_model.primary_identifier(),
+                Box::new(|if_node, child_ids| {
+                    if let Node::Flow(Flow::If(_)) = if_node {
+                        Ok(Node::Flow(Flow::If(Box::new(move || !child_ids.is_empty()))))
+                    } else {
+                        Ok(if_node)
+                    }
+                }),
+            ),
+        )?;
+
+        let parent_link = parent_relation_field.linking_fields();
+        let child_link = parent_relation_field.related_field().linking_fields();
+
+        graph.create_edge(
+            &parent_node,
+            &create_node,
+            QueryGraphDependency::ParentProjection(
+                parent_link.clone(),
+                Box::new(move |mut update_node, mut parent_ids| {
+                    let parent_id = match parent_ids.pop() {
+                        Some(id) => Ok(id),
+                        None => Err(QueryGraphBuilderError::AssertionError(format!(
+                            "[Query Graph] Expected a valid parent ID to be present for a nested connect or create."
+                        ))),
+                    }?;
+
+                    if let Node::Query(Query::Write(ref mut wq)) = update_node {
+                        wq.inject_projection_into_args(child_link.assimilate(parent_id)?);
+                    }
+
+                    Ok(update_node)
+                }),
+            ),
+        )?;
+
+        let child_link = parent_relation_field.related_field().linking_fields();
+        graph.create_edge(
+            &parent_node,
+            &update_child_node,
+            QueryGraphDependency::ParentProjection(
+                parent_link,
+                Box::new(move |mut update_node, mut parent_ids| {
+                    let parent_id = match parent_ids.pop() {
+                        Some(id) => Ok(id),
+                        None => Err(QueryGraphBuilderError::AssertionError(format!(
+                            "[Query Graph] Expected a valid parent ID to be present for a nested connect or create."
+                        ))),
+                    }?;
+
+                    if let Node::Query(Query::Write(ref mut wq)) = update_node {
+                        wq.inject_projection_into_args(child_link.assimilate(parent_id)?);
+                    }
+
+                    Ok(update_node)
+                }),
+            ),
+        )?;
+    }
+
+    Ok(())
+}
+
+fn one_to_many_inlined_parent(
+    graph: &mut QueryGraph,
+    parent_node: NodeRef,
+    parent_relation_field: &RelationFieldRef,
+    values: Vec<ParsedInputValue>,
+    child_model: &ModelRef,
+) -> QueryGraphBuilderResult<()> {
     todo!()
 }
 

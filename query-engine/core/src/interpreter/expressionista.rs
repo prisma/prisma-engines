@@ -208,7 +208,7 @@ impl Expressionista {
 
         match graph.node_content(node).unwrap() {
             Node::Flow(Flow::If(_)) => Self::translate_if_node(graph, node, parent_edges),
-            Node::Flow(Flow::Return(p)) => Self::translate_return_node(graph, node, parent_edges),
+            Node::Flow(Flow::Return(_)) => Self::translate_return_node(graph, node, parent_edges),
             _ => unreachable!(),
         }
     }
