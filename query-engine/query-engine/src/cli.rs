@@ -1,17 +1,19 @@
+use crate::request_handlers::graphql::{self, GraphQlBody};
+
 use crate::{
     context::PrismaContext,
     dmmf,
     opt::{CliOpt, PrismaOpt, Subcommand},
-    request_handlers::{graphql::*, PrismaRequest, RequestHandler},
     PrismaResult,
 };
+
 use datamodel::{Configuration, Datamodel};
 use prisma_models::DatamodelConverter;
 use query_core::{
     schema::{QuerySchemaRef, SupportedCapabilities},
     BuildMode, QuerySchemaBuilder,
 };
-use std::{collections::HashMap, sync::Arc};
+use std::sync::Arc;
 
 pub struct ExecuteRequest {
     legacy: bool,
@@ -120,22 +122,18 @@ impl CliCommand {
         let decoded = base64::decode(&request.query)?;
         let decoded_request = String::from_utf8(decoded)?;
 
-        let ctx = PrismaContext::builder(request.config, request.datamodel)
+        let cx = PrismaContext::builder(request.config, request.datamodel)
             .legacy(request.legacy)
             .enable_raw_queries(request.enable_raw_queries)
             .build()
             .await?;
+        let cx = Arc::new(cx);
 
-        let req = PrismaRequest {
-            body: serde_json::from_str(&decoded_request).unwrap(),
-            headers: HashMap::new(),
-            path: String::new(),
-        };
+        let body: GraphQlBody = serde_json::from_str(&decoded_request)?;
+        let res = graphql::handle(body, cx).await;
+        let res = serde_json::to_string(&res).unwrap();
 
-        let response = GraphQlRequestHandler.handle(req, &Arc::new(ctx)).await;
-        let response = serde_json::to_string(&response).unwrap();
-
-        let encoded_response = base64::encode(&response);
+        let encoded_response = base64::encode(&res);
         println!("Response: {}", encoded_response); // reason for prefix is explained in TestServer.scala
 
         Ok(())

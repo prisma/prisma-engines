@@ -1,6 +1,6 @@
 use super::protocol_adapter::GraphQLProtocolAdapter;
-use crate::{context::PrismaContext, PrismaError, PrismaRequest, PrismaResponse, PrismaResult, RequestHandler};
-use async_trait::async_trait;
+use crate::{context::PrismaContext, PrismaResponse, PrismaResult};
+
 use futures::{future, FutureExt};
 use graphql_parser as gql;
 use indexmap::IndexMap;
@@ -8,7 +8,7 @@ use query_core::{
     response_ir, BatchDocument, CompactedDocument, CoreError, Item, Operation, QueryDocument, QueryValue, Responses,
 };
 use serde::{Deserialize, Serialize};
-use std::{collections::HashMap, convert::TryFrom, panic::AssertUnwindSafe, sync::Arc};
+use std::{collections::HashMap, panic::AssertUnwindSafe, sync::Arc};
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -47,11 +47,10 @@ impl From<&str> for SingleQuery {
     }
 }
 
-impl TryFrom<GraphQlBody> for QueryDocument {
-    type Error = PrismaError;
-
-    fn try_from(body: GraphQlBody) -> PrismaResult<Self> {
-        match body {
+impl GraphQlBody {
+    /// Convert a `GraphQlBody` into a `QueryDocument`.
+    pub(crate) fn into_doc(self) -> PrismaResult<QueryDocument> {
+        match self {
             GraphQlBody::Single(body) => {
                 let gql_doc = gql::parse_query(&body.query)?;
                 let operation = GraphQLProtocolAdapter::convert(gql_doc, body.operation_name)?;
@@ -74,32 +73,21 @@ impl TryFrom<GraphQlBody> for QueryDocument {
     }
 }
 
-pub struct GraphQlRequestHandler;
+/// Handle a Graphql request.
+pub(crate) async fn handle(body: GraphQlBody, cx: Arc<PrismaContext>) -> PrismaResponse {
+    debug!("Incoming GraphQL query: {:?}", body);
 
-#[allow(unused_variables)]
-#[async_trait]
-impl RequestHandler for GraphQlRequestHandler {
-    type Body = GraphQlBody;
+    match body.into_doc() {
+        Ok(QueryDocument::Single(query)) => handle_single_query(query, cx.clone()).await,
+        Ok(QueryDocument::Multi(batch)) => match batch.compact() {
+            BatchDocument::Multi(batch) => handle_batch(batch, &cx).await,
+            BatchDocument::Compact(compacted) => handle_compacted(compacted, &cx).await,
+        },
+        Err(err) => {
+            let mut responses = response_ir::Responses::default();
+            responses.insert_error(err);
 
-    async fn handle<S>(&self, req: S, ctx: &Arc<PrismaContext>) -> PrismaResponse
-    where
-        S: Into<PrismaRequest<Self::Body>> + Send + Sync + 'static,
-    {
-        let request = req.into();
-        debug!("Incoming GraphQL query: {:?}", request.body);
-
-        match QueryDocument::try_from(request.body) {
-            Ok(QueryDocument::Single(query)) => handle_single_query(query, ctx.clone()).await,
-            Ok(QueryDocument::Multi(batch)) => match batch.compact() {
-                BatchDocument::Multi(batch) => handle_batch(batch, ctx).await,
-                BatchDocument::Compact(compacted) => handle_compacted(compacted, ctx).await,
-            },
-            Err(err) => {
-                let mut responses = response_ir::Responses::default();
-                responses.insert_error(err);
-
-                PrismaResponse::Single(responses)
-            }
+            PrismaResponse::Single(responses)
         }
     }
 }
