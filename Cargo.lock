@@ -2672,6 +2672,7 @@ dependencies = [
  "tracing",
  "tracing-attributes",
  "tracing-futures",
+ "tracing-log",
  "tracing-subscriber",
  "url 2.1.1",
  "user-facing-errors",

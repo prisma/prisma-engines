@@ -81,7 +81,8 @@ pub struct PrismaOpt {
     #[structopt(long = "debug", short = "d")]
     pub enable_debug_mode: bool,
 
-    #[structopt(env = "RUST_LOG_FORMAT")]
+    /// Set the log format.
+    #[structopt(long = "log-format", env = "RUST_LOG_FORMAT")]
     log_format: Option<String>,
 
     #[structopt(subcommand)]
