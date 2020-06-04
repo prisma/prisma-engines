@@ -6,6 +6,28 @@ use test_harness::*;
 //todo adjust tests for added types
 //todo adjust tests for new singular id rule for p1
 
+// 1.20 Postgres
+// CREATE TABLE default$default."User120" (
+// id character varying(25) PRIMARY KEY,
+// name text NOT NULL,
+// float numeric(65,30),
+// bool boolean,
+// time timestamp(3) without time zone,
+// json text,
+// int integer
+// );
+
+//1.34 Postgres
+// CREATE TABLE default$default."User134" (
+// id character varying(25) PRIMARY KEY,
+// name text NOT NULL,
+// float numeric(65,30),
+// bool boolean,
+// time timestamp(3) without time zone,
+// json text,
+// int integer
+// );
+
 //Sqlite
 #[test_each_connector(tags("sqlite"))]
 async fn introspect_sqlite_non_prisma(api: &TestApi) {
@@ -78,7 +100,7 @@ async fn introspect_postgres_prisma_1(api: &TestApi) {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Book", |t| {
-                t.add_column("id", types::primary());
+                t.inject_custom("id character varying(25) Not Null Primary Key");
                 t.inject_custom("createdAt timestamp(3)");
                 t.inject_custom("updatedAt timestamp(3)");
                 t.inject_custom("string text");
@@ -87,15 +109,15 @@ async fn introspect_postgres_prisma_1(api: &TestApi) {
                 t.inject_custom("boolean boolean");
             });
             migration.create_table("_RelayId", |t| {
-                t.add_column("id", types::primary());
-                t.inject_custom("stableModelIdentifier   Integer");
+                t.inject_custom("id character varying(25) Primary Key ");
+                t.inject_custom("stableModelIdentifier character varying(25) Not Null");
             });
 
             migration.create_table("Book_tags", |t| {
-                t.add_column("nodeid", types::primary());
-                t.add_column("position", types::integer());
-                t.add_column("value", types::integer());
-                t.inject_custom("FOREIGN KEY (\"nodeid\") REFERENCES \"Book\"(\"id\")");
+                t.inject_custom("nodeid character varying(25) references \"Book\"(\"id\")");
+                t.inject_custom("position integer");
+                t.inject_custom("value integer NOT NULL");
+                t.inject_custom("CONSTRAINT \"BookTags_list_pkey\" PRIMARY KEY (\"nodeid\", \"position\")");
             });
         })
         .await;

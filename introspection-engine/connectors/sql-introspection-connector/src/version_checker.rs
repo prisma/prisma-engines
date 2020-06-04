@@ -5,7 +5,7 @@ use crate::misc_helpers::{
 use datamodel::Model;
 use introspection_connector::{Version, Warning};
 use quaint::connector::SqlFamily;
-use sql_schema_describer::{ColumnType, ForeignKey, ForeignKeyAction, SqlSchema, Table};
+use sql_schema_describer::{ColumnType, ForeignKey, ForeignKeyAction, PrimaryKey, SqlSchema, Table};
 
 pub struct VersionChecker {
     sql_family: SqlFamily,
@@ -14,10 +14,20 @@ pub struct VersionChecker {
     has_prisma_1_1_or_2_join_table: bool,
     uses_on_delete: bool,
     always_has_created_at_updated_at: bool,
-    always_has_singular_id: bool,
+    always_has_p1_compatible_id: bool,
     uses_non_prisma_types: bool,
     has_inline_relations: bool,
 }
+
+const CHAR: &str = "char";
+const CHAR_25: &str = "char(25)";
+const CHAR_36: &str = "char(36)";
+const INT: &str = "int";
+const INT_11: &str = "int(11)";
+const INTEGER: &str = "integer";
+const INT_4: &str = "int4";
+const VARCHAR: &str = "varchar";
+const CHARACTER_VARYING: &str = "character varying";
 
 const SQLITE_TYPES: &'static [(&'static str, &'static str)] = &[
     ("BOOLEAN", "BOOLEAN"),
@@ -33,7 +43,6 @@ const POSTGRES_TYPES: &'static [(&'static str, &'static str)] = &[
     ("numeric", "numeric"),
     ("integer", "int4"),
     ("text", "text"),
-    ("character", "char"),
     ("character varying", "varchar"),
 ];
 const MYSQL_TYPES: &'static [(&'static str, &'static str)] = &[
@@ -64,7 +73,7 @@ impl VersionChecker {
                 .any(|table| is_prisma_1_point_1_or_2_join_table(&table)),
             uses_on_delete: false,
             always_has_created_at_updated_at: true,
-            always_has_singular_id: true,
+            always_has_p1_compatible_id: true,
             uses_non_prisma_types: false,
             has_inline_relations: false,
         }
@@ -99,13 +108,44 @@ impl VersionChecker {
         }
     }
 
-    pub fn always_has_singular_id(&mut self, table: &Table, model: &Model) {
-        if !is_prisma_1_or_11_list_table(table) && !is_relay_table(table) && !model.has_single_id_field() {
-            self.always_has_singular_id = false
+    pub fn has_p1_compatible_primary_key_column(&mut self, table: &Table) {
+        if !is_prisma_1_or_11_list_table(table) && !is_relay_table(table) {
+            if let Some(PrimaryKey { columns, .. }) = &table.primary_key {
+                if columns.len() == 1 {
+                    let tpe = &table.column_bang(columns.first().unwrap()).tpe;
+
+                    println!("{:?}", tpe);
+                    match (
+                        &tpe.data_type,
+                        &tpe.full_data_type,
+                        &tpe.character_maximum_length,
+                        self.sql_family,
+                    ) {
+                        (dt, fdt, Some(25), SqlFamily::Mysql) if dt == CHAR && fdt == CHAR_25 => (),
+                        (dt, fdt, Some(36), SqlFamily::Mysql) if dt == CHAR && fdt == CHAR_36 => (),
+                        (dt, fdt, None, SqlFamily::Mysql) if dt == INT && fdt == INT_11 => (),
+                        (dt, fdt, Some(25), SqlFamily::Postgres) if dt == CHARACTER_VARYING && fdt == VARCHAR => (),
+                        (dt, fdt, Some(36), SqlFamily::Postgres) if dt == CHARACTER_VARYING && fdt == VARCHAR => (),
+                        (dt, fdt, None, SqlFamily::Postgres) if dt == INTEGER && fdt == INT_4 => (),
+                        _ => self.always_has_p1_compatible_id = false,
+                    }
+                }
+            }
         }
     }
 
     pub fn version(&self, warnings: &Vec<Warning>) -> Version {
+        dbg!(self.sql_family);
+        dbg!(self.migration_table);
+        dbg!(self.uses_on_delete);
+        dbg!(self.uses_non_prisma_types);
+        dbg!(self.always_has_created_at_updated_at);
+        dbg!(self.always_has_p1_compatible_id);
+        dbg!(self.has_prisma_1_1_or_2_join_table);
+        dbg!(self.has_prisma_1_join_table);
+        dbg!(self.has_inline_relations);
+        dbg!(warnings); //todo should only be the non-default-id warnings.
+
         match self.sql_family {
             SqlFamily::Sqlite
                 if self.migration_table
@@ -129,7 +169,7 @@ impl VersionChecker {
                     && !self.uses_on_delete
                     && !self.uses_non_prisma_types
                     && self.always_has_created_at_updated_at
-                    && self.always_has_singular_id
+                    && self.always_has_p1_compatible_id
                     && !self.has_prisma_1_1_or_2_join_table
                     && !self.has_inline_relations
                     && warnings.is_empty() =>
@@ -140,7 +180,7 @@ impl VersionChecker {
                 if !self.migration_table
                     && !self.uses_on_delete
                     && !self.uses_non_prisma_types
-                    && self.always_has_singular_id
+                    && self.always_has_p1_compatible_id
                     && !self.has_prisma_1_join_table
                     && warnings.is_empty() =>
             {
@@ -162,7 +202,7 @@ impl VersionChecker {
                     && self.always_has_created_at_updated_at
                     && !self.has_prisma_1_join_table
                     && !self.has_inline_relations
-                    && self.always_has_singular_id
+                    && self.always_has_p1_compatible_id
                     && warnings.is_empty() =>
             {
                 Version::Prisma1
@@ -172,7 +212,7 @@ impl VersionChecker {
                     && !self.uses_on_delete
                     && !self.uses_non_prisma_types
                     && !self.has_prisma_1_1_or_2_join_table
-                    && self.always_has_singular_id
+                    && self.always_has_p1_compatible_id
                     && warnings.is_empty() =>
             {
                 Version::Prisma11
