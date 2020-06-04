@@ -114,7 +114,7 @@ impl VersionChecker {
                 if columns.len() == 1 {
                     let tpe = &table.column_bang(columns.first().unwrap()).tpe;
 
-                    println!("{:?}", tpe);
+                    dbg!(tpe);
                     match (
                         &tpe.data_type,
                         &tpe.full_data_type,
@@ -123,7 +123,7 @@ impl VersionChecker {
                     ) {
                         (dt, fdt, Some(25), SqlFamily::Mysql) if dt == CHAR && fdt == CHAR_25 => (),
                         (dt, fdt, Some(36), SqlFamily::Mysql) if dt == CHAR && fdt == CHAR_36 => (),
-                        (dt, fdt, None, SqlFamily::Mysql) if dt == INT && fdt == INT_11 => (),
+                        (dt, fdt, None, SqlFamily::Mysql) if dt == INT && (fdt == INT_11 || fdt == INT) => (),
                         (dt, fdt, Some(25), SqlFamily::Postgres) if dt == CHARACTER_VARYING && fdt == VARCHAR => (),
                         (dt, fdt, Some(36), SqlFamily::Postgres) if dt == CHARACTER_VARYING && fdt == VARCHAR => (),
                         (dt, fdt, None, SqlFamily::Postgres) if dt == INTEGER && fdt == INT_4 => (),

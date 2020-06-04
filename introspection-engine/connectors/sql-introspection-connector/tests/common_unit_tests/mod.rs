@@ -88,10 +88,7 @@ fn a_data_model_can_be_generated_from_a_schema() {
                 })
                 .collect(),
             indices: vec![],
-            primary_key: Some(PrimaryKey {
-                columns: vec!["primary_col".to_string()],
-                sequence: None,
-            }),
+            primary_key: None,
             foreign_keys: vec![],
         }],
         enums: vec![],

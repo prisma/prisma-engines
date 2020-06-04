@@ -3,9 +3,6 @@ use barrel::types;
 use introspection_connector::Version;
 use test_harness::*;
 
-//todo adjust tests for added types
-//todo adjust tests for new singular id rule for p1
-
 // 1.20 Postgres
 // CREATE TABLE default$default."User120" (
 // id character varying(25) PRIMARY KEY,
@@ -131,7 +128,7 @@ async fn introspect_postgres_prisma_1_1(api: &TestApi) {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Book", |t| {
-                t.add_column("id", types::primary());
+                t.inject_custom("id character varying(36) Not Null Primary Key");
                 t.inject_custom("date timestamp(3)");
                 t.inject_custom("string text");
                 t.inject_custom("int Integer");
@@ -140,15 +137,14 @@ async fn introspect_postgres_prisma_1_1(api: &TestApi) {
             });
 
             migration.create_table("Page", |t| {
-                t.add_column("id", types::primary());
+                t.inject_custom("id character varying(36) Not Null Primary Key");
                 t.inject_custom("string text");
-                t.add_column("bookid", types::integer());
-                t.inject_custom("FOREIGN KEY (\"bookid\") REFERENCES \"Book\"(\"id\")");
+                t.inject_custom("bookid character varying(36) REFERENCES \"Book\"(\"id\")");
             });
 
             migration.create_table("_RelayId", |t| {
-                t.add_column("id", types::primary());
-                t.inject_custom("stableModelIdentifier   Integer");
+                t.inject_custom("id character varying(36) Primary Key ");
+                t.inject_custom("stableModelIdentifier character varying(36) Not Null");
             });
         })
         .await;
@@ -196,7 +192,7 @@ async fn introspect_mysql_prisma_1(api: &TestApi) {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Book", |t| {
-                t.add_column("id", types::primary());
+                t.inject_custom("id char(25) Not Null Primary Key");
                 t.inject_custom("createdAt datetime(3)");
                 t.inject_custom("updatedAt datetime(3)");
                 t.inject_custom("string_column text");
@@ -205,8 +201,8 @@ async fn introspect_mysql_prisma_1(api: &TestApi) {
                 t.inject_custom("boolean_column boolean");
             });
             migration.create_table("_RelayId", |t| {
-                t.add_column("id", types::primary());
-                t.inject_custom("stableModelIdentifier   int");
+                t.inject_custom("id char(25) Not Null Primary Key");
+                t.inject_custom("stableModelIdentifier   char(25)");
             });
         })
         .await;
@@ -220,16 +216,17 @@ async fn introspect_mysql_prisma_1_1(api: &TestApi) {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Book", |t| {
-                t.add_column("id", types::primary());
+                t.inject_custom("id char(36) Not Null Primary Key");
                 t.inject_custom("datetime_column datetime(3)");
                 t.inject_custom("string_column text");
                 t.inject_custom("integer_column int");
                 t.inject_custom("float_column Decimal(65,30)");
                 t.inject_custom("boolean_column boolean");
             });
+
             migration.create_table("_RelayId", |t| {
-                t.add_column("id", types::primary());
-                t.inject_custom("stableModelIdentifier   int");
+                t.inject_custom("id char(36) Not Null Primary Key");
+                t.inject_custom("stableModelIdentifier   char(36)");
             });
         })
         .await;
