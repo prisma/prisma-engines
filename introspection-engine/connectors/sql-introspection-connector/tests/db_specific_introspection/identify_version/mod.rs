@@ -46,6 +46,7 @@ async fn introspect_sqlite_non_prisma_due_to_types(api: &TestApi) {
         .execute(|migration| {
             migration.create_table("_Migration", |t| {
                 t.add_column("name", types::primary());
+                t.add_column("revision", types::text());
                 t.add_column("datamodel", types::text());
                 t.add_column("status", types::text());
                 t.add_column("applied", types::text());
@@ -73,6 +74,7 @@ async fn introspect_sqlite_prisma2(api: &TestApi) {
         .execute(|migration| {
             migration.create_table("_Migration", |t| {
                 t.add_column("name", types::primary());
+                t.add_column("revision", types::text());
                 t.add_column("datamodel", types::text());
                 t.add_column("status", types::text());
                 t.add_column("applied", types::text());
@@ -177,6 +179,7 @@ async fn introspect_postgres_prisma2(api: &TestApi) {
         .execute(|migration| {
             migration.create_table("_Migration", |t| {
                 t.add_column("name", types::primary());
+                t.add_column("revision", types::text());
                 t.add_column("datamodel", types::text());
                 t.add_column("status", types::text());
                 t.add_column("applied", types::text());
@@ -268,6 +271,7 @@ async fn introspect_mysql_prisma2(api: &TestApi) {
         .execute(|migration| {
             migration.create_table("_Migration", |t| {
                 t.add_column("name", types::primary());
+                t.add_column("revision", types::text());
                 t.add_column("datamodel", types::text());
                 t.add_column("status", types::text());
                 t.add_column("applied", types::text());

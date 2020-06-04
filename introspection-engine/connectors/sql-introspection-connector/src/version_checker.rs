@@ -9,7 +9,8 @@ use sql_schema_describer::{ColumnType, ForeignKey, ForeignKeyAction, PrimaryKey,
 
 pub struct VersionChecker {
     sql_family: SqlFamily,
-    migration_table: bool,
+    has_migration_table: bool,
+    has_relay_table: bool,
     has_prisma_1_join_table: bool,
     has_prisma_1_1_or_2_join_table: bool,
     uses_on_delete: bool,
@@ -69,7 +70,8 @@ impl VersionChecker {
     pub fn new(sql_family: SqlFamily, schema: &SqlSchema) -> VersionChecker {
         VersionChecker {
             sql_family,
-            migration_table: schema.tables.iter().any(|table| is_migration_table(&table)),
+            has_migration_table: schema.tables.iter().any(|table| is_migration_table(&table)),
+            has_relay_table: schema.tables.iter().any(|table| is_relay_table(&table)),
             has_prisma_1_join_table: schema.tables.iter().any(|table| is_prisma_1_point_0_join_table(&table)),
             has_prisma_1_1_or_2_join_table: schema
                 .tables
@@ -142,7 +144,8 @@ impl VersionChecker {
 
     pub fn version(&self, warnings: &Vec<Warning>) -> Version {
         dbg!(self.sql_family);
-        dbg!(self.migration_table);
+        dbg!(self.has_migration_table);
+        dbg!(self.has_relay_table);
         dbg!(self.uses_on_delete);
         dbg!(self.uses_non_prisma_types);
         dbg!(self.always_has_created_at_updated_at);
@@ -150,11 +153,12 @@ impl VersionChecker {
         dbg!(self.has_prisma_1_1_or_2_join_table);
         dbg!(self.has_prisma_1_join_table);
         dbg!(self.has_inline_relations);
-        dbg!(warnings); //todo should only be the non-default-id warnings.
+        dbg!(warnings);
 
         match self.sql_family {
             SqlFamily::Sqlite
-                if self.migration_table
+                if self.has_migration_table
+                    && !self.has_relay_table
                     && !self.uses_on_delete
                     && !self.uses_non_prisma_types
                     && warnings.is_empty() =>
@@ -163,7 +167,8 @@ impl VersionChecker {
             }
             SqlFamily::Sqlite => Version::NonPrisma,
             SqlFamily::Mysql
-                if self.migration_table
+                if self.has_migration_table
+                    && !self.has_relay_table
                     && !self.uses_on_delete
                     && !self.uses_non_prisma_types
                     && warnings.is_empty() =>
@@ -171,7 +176,8 @@ impl VersionChecker {
                 Version::Prisma2
             }
             SqlFamily::Mysql
-                if !self.migration_table
+                if !self.has_migration_table
+                    && self.has_relay_table
                     && !self.uses_on_delete
                     && !self.uses_non_prisma_types
                     && self.always_has_created_at_updated_at
@@ -183,7 +189,8 @@ impl VersionChecker {
                 Version::Prisma1
             }
             SqlFamily::Mysql
-                if !self.migration_table
+                if !self.has_migration_table
+                    && self.has_relay_table
                     && !self.uses_on_delete
                     && !self.uses_non_prisma_types
                     && self.always_has_p1_compatible_id
@@ -194,7 +201,8 @@ impl VersionChecker {
             }
             SqlFamily::Mysql => Version::NonPrisma,
             SqlFamily::Postgres
-                if self.migration_table
+                if self.has_migration_table
+                    && !self.has_relay_table
                     && !self.uses_on_delete
                     && !self.uses_non_prisma_types
                     && warnings.is_empty() =>
@@ -202,7 +210,8 @@ impl VersionChecker {
                 Version::Prisma2
             }
             SqlFamily::Postgres
-                if !self.migration_table
+                if !self.has_migration_table
+                    && self.has_relay_table
                     && !self.uses_on_delete
                     && !self.uses_non_prisma_types
                     && self.always_has_created_at_updated_at
@@ -214,7 +223,8 @@ impl VersionChecker {
                 Version::Prisma1
             }
             SqlFamily::Postgres
-                if !self.migration_table
+                if !self.has_migration_table
+                    && self.has_relay_table
                     && !self.uses_on_delete
                     && !self.uses_non_prisma_types
                     && !self.has_prisma_1_1_or_2_join_table
