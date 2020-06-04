@@ -37,6 +37,9 @@ pub trait MigrationConnector: Send + Sync + 'static {
     /// Hook to perform connector-specific initialization.
     async fn initialize(&self) -> ConnectorResult<()>;
 
+    /// Create the database with the provided URL.
+    async fn create_database(database_str: &str) -> ConnectorResult<String>;
+
     /// Drop all database state.
     async fn reset(&self) -> ConnectorResult<()>;
 

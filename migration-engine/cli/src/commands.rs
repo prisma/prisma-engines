@@ -4,7 +4,7 @@ mod tests;
 
 use error::CliError;
 use futures::FutureExt;
-use sql_migration_connector::SqlMigrationConnector;
+use migration_core::migration_api;
 use structopt::StructOpt;
 
 #[derive(Debug, StructOpt)]
@@ -60,11 +60,40 @@ enum CliCommand {
 }
 
 async fn connect_to_database(database_str: &str) -> Result<String, CliError> {
-    SqlMigrationConnector::new(database_str).await?;
+    let datamodel = datasource_from_database_str(database_str)?;
+    migration_api(&datamodel).await?;
     Ok("Connection successful".to_owned())
 }
 
-async fn create_database(datasource: &str) -> Result<String, CliError> {
-    let db_name = SqlMigrationConnector::create_database(datasource).await?;
+async fn create_database(database_str: &str) -> Result<String, CliError> {
+    let datamodel = datasource_from_database_str(database_str)?;
+    let db_name = migration_core::create_database(&datamodel).await?;
     Ok(format!("Database '{}' was successfully created.", db_name))
+}
+
+fn datasource_from_database_str(database_str: &str) -> Result<String, CliError> {
+    let provider = match database_str.split(':').next() {
+        Some("postgres") => "postgresql",
+        Some("file") => "sqlite",
+        Some(other) => other,
+        None => {
+            return Err(CliError::Other(anyhow::anyhow!(
+                "Invalid database string format: {}",
+                database_str
+            )))
+        }
+    };
+
+    let schema = format!(
+        r#"
+            datasource db {{
+                provider = "{provider}"
+                url = "{url}"
+            }}
+        "#,
+        provider = provider,
+        url = database_str,
+    );
+
+    Ok(schema)
 }

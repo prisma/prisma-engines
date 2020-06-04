@@ -24,7 +24,7 @@ fn mysql_url(db: Option<&str>) -> String {
 
 #[tokio::test]
 async fn test_connecting_with_a_working_mysql_connection_string() {
-    let result = run(&["--datasource", &mysql_url(None), "can-connect-to-database"])
+    let result = run(&["--datasource", &mysql_url(Some("mysql")), "can-connect-to-database"])
         .await
         .unwrap();
 

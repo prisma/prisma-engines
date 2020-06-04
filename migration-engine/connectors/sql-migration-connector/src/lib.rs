@@ -218,6 +218,10 @@ impl MigrationConnector for SqlMigrationConnector {
         self.connection_info().sql_family().as_str()
     }
 
+    async fn create_database(database_str: &str) -> ConnectorResult<String> {
+        Self::create_database(database_str).await
+    }
+
     async fn initialize(&self) -> ConnectorResult<()> {
         catch(self.connection_info(), self.initialize_impl()).await?;
 
