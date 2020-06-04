@@ -3,7 +3,6 @@
 //! detail of the SQL connector.
 
 use crate::{database_info::DatabaseInfo, CheckDatabaseInfoResult, SqlResult, SystemDatabase};
-use futures::{future::BoxFuture, FutureExt};
 use once_cell::sync::Lazy;
 use quaint::connector::Queryable;
 use regex::RegexSet;
@@ -24,20 +23,22 @@ pub(crate) fn from_database_info(database_info: &DatabaseInfo) -> Box<dyn SqlFla
 
 #[async_trait::async_trait]
 pub(crate) trait SqlFlavour {
+    /// Optionally validate the database info.
     fn check_database_info(&self, _database_info: &DatabaseInfo) -> CheckDatabaseInfoResult {
         Ok(())
     }
 
-    fn create_database<'a>(&'a self, _db_name: &'a str, _conn: &'a dyn Queryable) -> BoxFuture<'a, SqlResult<()>> {
-        futures::future::ready(Ok(())).boxed()
-    }
+    /// Create a database called `dbname` on the server, if applicable.
+    async fn create_database(&self, dbname: &str, conn: &dyn Queryable) -> SqlResult<()>;
 
+    /// Introspect the SQL schema.
     async fn describe_schema<'a>(
         &'a self,
         schema_name: &'a str,
         conn: Arc<dyn Queryable + Send + Sync>,
     ) -> SqlResult<SqlSchema>;
 
+    /// Create the database schema.
     async fn initialize(&self, conn: &dyn Queryable, database_info: &DatabaseInfo) -> SqlResult<()>;
 }
 
@@ -65,14 +66,11 @@ impl SqlFlavour for MysqlFlavour {
         Ok(())
     }
 
-    fn create_database<'a>(&'a self, db_name: &'a str, conn: &'a dyn Queryable) -> BoxFuture<'a, SqlResult<()>> {
-        async move {
-            let query = format!("CREATE DATABASE `{}`", db_name);
-            conn.query_raw(&query, &[]).await?;
+    async fn create_database(&self, db_name: &str, conn: &dyn Queryable) -> SqlResult<()> {
+        let query = format!("CREATE DATABASE `{}`", db_name);
+        conn.query_raw(&query, &[]).await?;
 
-            Ok(())
-        }
-        .boxed()
+        Ok(())
     }
 
     async fn describe_schema<'a>(
@@ -103,6 +101,10 @@ struct SqliteFlavour {
 
 #[async_trait::async_trait]
 impl SqlFlavour for SqliteFlavour {
+    async fn create_database(&self, _db_name: &str, _conn: &dyn Queryable) -> SqlResult<()> {
+        Ok(())
+    }
+
     async fn describe_schema<'a>(
         &'a self,
         schema_name: &'a str,
@@ -130,14 +132,11 @@ struct PostgresFlavour;
 
 #[async_trait::async_trait]
 impl SqlFlavour for PostgresFlavour {
-    fn create_database<'a>(&'a self, db_name: &'a str, conn: &'a dyn Queryable) -> BoxFuture<'a, SqlResult<()>> {
-        async move {
-            let query = format!("CREATE DATABASE \"{}\"", db_name);
-            conn.query_raw(&query, &[]).await?;
+    async fn create_database(&self, db_name: &str, conn: &dyn Queryable) -> SqlResult<()> {
+        let query = format!("CREATE DATABASE \"{}\"", db_name);
+        conn.query_raw(&query, &[]).await?;
 
-            Ok(())
-        }
-        .boxed()
+        Ok(())
     }
 
     async fn describe_schema<'a>(
