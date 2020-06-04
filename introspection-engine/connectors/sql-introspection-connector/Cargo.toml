@@ -27,6 +27,7 @@ once_cell = "1.3"
 [dependencies.quaint]
 git = "https://github.com/prisma/quaint"
 features = ["single"]
+branch = "experiment/cache-prepared-statements"
 
 [dev-dependencies]
 barrel = { version = "0.6.5-alpha.0", features = ["sqlite3", "mysql", "pg"] }

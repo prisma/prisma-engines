@@ -15,7 +15,7 @@ user-facing-errors = { path = "../../libs/user-facing-errors" }
 anyhow = "1.0.26"
 futures = "0.3"
 json-rpc-stdio = { path = "../../libs/json-rpc-stdio" }
-quaint = { git = "https://github.com/prisma/quaint", optional = true }
+quaint = { git = "https://github.com/prisma/quaint", optional = true, branch = "experiment/cache-prepared-statements" }
 serde_json = "1.0"
 structopt = "0.3.8"
 thiserror = "1.0.9"

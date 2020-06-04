@@ -17,6 +17,7 @@ tokio = "=0.2.13"
 
 [dependencies.quaint]
 git = "https://github.com/prisma/quaint"
+branch = "experiment/cache-prepared-statements"
 features = ["full", "tracing-log"]
 
 [dependencies.connector-interface]

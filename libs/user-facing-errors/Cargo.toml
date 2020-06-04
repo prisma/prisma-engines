@@ -16,6 +16,7 @@ tracing = "0.1"
 [dependencies.quaint]
 git = "https://github.com/prisma/quaint"
 features = ["mysql", "postgresql", "sqlite"]
+branch = "experiment/cache-prepared-statements"
 optional = true
 
 [features]
