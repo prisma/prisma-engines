@@ -19,8 +19,9 @@ pub struct VersionChecker {
     has_inline_relations: bool,
 }
 
-//todo more ideas for tightening
-//P1/P11 were not using db level default values
+// More ideas for tightening
+// P1/P11 were not using db level default values
+// P2 does not have a relay table
 
 const CHAR: &str = "char";
 const CHAR_25: &str = "char(25)";

@@ -45,7 +45,16 @@ async fn introspect_sqlite_non_prisma_due_to_types(api: &TestApi) {
     api.barrel()
         .execute(|migration| {
             migration.create_table("_Migration", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("name", types::primary());
+                t.add_column("datamodel", types::text());
+                t.add_column("status", types::text());
+                t.add_column("applied", types::text());
+                t.add_column("rolled_back", types::text());
+                t.add_column("datamodel_steps", types::text());
+                t.add_column("database_migration", types::text());
+                t.add_column("errors", types::text());
+                t.add_column("started_at", types::text());
+                t.add_column("finished_at", types::text());
             });
             migration.create_table("Book", |t| {
                 t.add_column("id", types::primary());
@@ -63,7 +72,16 @@ async fn introspect_sqlite_prisma2(api: &TestApi) {
     api.barrel()
         .execute(|migration| {
             migration.create_table("_Migration", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("name", types::primary());
+                t.add_column("datamodel", types::text());
+                t.add_column("status", types::text());
+                t.add_column("applied", types::text());
+                t.add_column("rolled_back", types::text());
+                t.add_column("datamodel_steps", types::text());
+                t.add_column("database_migration", types::text());
+                t.add_column("errors", types::text());
+                t.add_column("started_at", types::text());
+                t.add_column("finished_at", types::text());
             });
             migration.create_table("Book", |t| {
                 t.add_column("id", types::primary());
@@ -158,7 +176,16 @@ async fn introspect_postgres_prisma2(api: &TestApi) {
     api.barrel()
         .execute(|migration| {
             migration.create_table("_Migration", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("name", types::primary());
+                t.add_column("datamodel", types::text());
+                t.add_column("status", types::text());
+                t.add_column("applied", types::text());
+                t.add_column("rolled_back", types::text());
+                t.add_column("datamodel_steps", types::text());
+                t.add_column("database_migration", types::text());
+                t.add_column("errors", types::text());
+                t.add_column("started_at", types::text());
+                t.add_column("finished_at", types::text());
             });
             migration.create_table("Book", |t| {
                 t.add_column("id", types::primary());
@@ -240,7 +267,16 @@ async fn introspect_mysql_prisma2(api: &TestApi) {
     api.barrel()
         .execute(|migration| {
             migration.create_table("_Migration", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("name", types::primary());
+                t.add_column("datamodel", types::text());
+                t.add_column("status", types::text());
+                t.add_column("applied", types::text());
+                t.add_column("rolled_back", types::text());
+                t.add_column("datamodel_steps", types::text());
+                t.add_column("database_migration", types::text());
+                t.add_column("errors", types::text());
+                t.add_column("started_at", types::text());
+                t.add_column("finished_at", types::text());
             });
             migration.create_table("Book", |t| {
                 t.add_column("id", types::primary());
