@@ -30,13 +30,15 @@ impl<'conn, 'tx> QueryPipeline<'conn, 'tx> {
                 trace!("{}", self.interpreter.log_output());
                 Ok(serializer.serialize(result?))
             }
-            QueryType::Raw { query, parameters } => {
+            QueryType::Raw {
+                query,
+                parameters,
+                raw_type,
+            } => {
                 trace!("Raw query: {} ({:?})", query, parameters);
 
-                let result = self
-                    .interpreter
-                    .interpret(Expression::raw(query, parameters), Env::default(), 0)
-                    .await;
+                let query = Expression::raw(query, parameters, raw_type);
+                let result = self.interpreter.interpret(query, Env::default(), 0).await;
 
                 trace!("{}", self.interpreter.log_output());
 

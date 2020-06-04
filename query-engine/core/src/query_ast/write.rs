@@ -1,5 +1,6 @@
 //! Write query AST
 use super::FilteredQuery;
+use crate::RawQueryType;
 use connector::{filter::Filter, RecordFilter, WriteArgs};
 use prisma_models::prelude::*;
 use std::sync::Arc;
@@ -16,6 +17,7 @@ pub enum WriteQuery {
     Raw {
         query: String,
         parameters: Vec<PrismaValue>,
+        raw_type: RawQueryType,
     },
 }
 
@@ -60,10 +62,7 @@ impl WriteQuery {
             Self::DeleteManyRecords(_) => false,
             Self::ConnectRecords(_) => false,
             Self::DisconnectRecords(_) => false,
-            Self::Raw {
-                query: _,
-                parameters: _,
-            } => unimplemented!(),
+            Self::Raw { .. } => unimplemented!(),
         }
     }
 
@@ -76,10 +75,7 @@ impl WriteQuery {
             Self::DeleteManyRecords(q) => Arc::clone(&q.model),
             Self::ConnectRecords(q) => q.relation_field.model(),
             Self::DisconnectRecords(q) => q.relation_field.model(),
-            Self::Raw {
-                query: _,
-                parameters: _,
-            } => unimplemented!(),
+            Self::Raw { .. } => unimplemented!(),
         }
     }
 }
@@ -120,7 +116,11 @@ impl std::fmt::Display for WriteQuery {
             Self::DeleteManyRecords(q) => write!(f, "DeleteManyRecords: {}", q.model.name),
             Self::ConnectRecords(_) => write!(f, "ConnectRecords"),
             Self::DisconnectRecords(_) => write!(f, "DisconnectRecords"),
-            Self::Raw { query, parameters } => write!(f, "Raw: {} ({:?})", query, parameters),
+            Self::Raw {
+                query,
+                parameters,
+                raw_type,
+            } => write!(f, "Raw ({:?}): {} ({:?})", raw_type, query, parameters),
         }
     }
 }

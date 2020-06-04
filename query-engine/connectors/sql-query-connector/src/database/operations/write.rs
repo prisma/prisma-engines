@@ -1,4 +1,4 @@
-use crate::{error::SqlError, query_builder::write, QueryExt, RawQuery};
+use crate::{error::SqlError, query_builder::write, QueryExt};
 use connector_interface::*;
 use prisma_models::*;
 use prisma_value::PrismaValue;
@@ -140,14 +140,21 @@ pub async fn disconnect(
     Ok(())
 }
 
+/// Execute a plain SQL query with the given parameters, returning the number of
+/// affected rows.
+pub async fn execute_raw(conn: &dyn QueryExt, query: String, parameters: Vec<PrismaValue>) -> crate::Result<usize> {
+    let value = conn.raw_count(query, parameters).await?;
+    Ok(value)
+}
+
 /// Execute a plain SQL query with the given parameters, returning the answer as
 /// a JSON `Value`.
-pub async fn execute_raw(
+pub async fn query_raw(
     conn: &dyn QueryExt,
     query: String,
     parameters: Vec<PrismaValue>,
 ) -> crate::Result<serde_json::Value> {
-    let value = conn.raw_json(RawQuery::new(query, parameters)).await?;
+    let value = conn.raw_json(query, parameters).await?;
     Ok(value)
 }
 

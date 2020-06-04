@@ -154,6 +154,12 @@ pub struct Field {
     pub query_builder: Option<SchemaQueryBuilder>,
 }
 
+impl Field {
+    pub fn query_builder(&self) -> Option<&SchemaQueryBuilder> {
+        self.query_builder.as_ref()
+    }
+}
+
 /// Todo rework description.
 /// A query builder allows to attach queries to the schema:
 /// on a field:
