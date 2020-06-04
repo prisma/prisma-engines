@@ -38,11 +38,7 @@ pub(crate) trait SqlFlavour {
         conn: Arc<dyn Queryable + Send + Sync>,
     ) -> SqlResult<SqlSchema>;
 
-    fn initialize<'a>(
-        &'a self,
-        conn: &'a dyn Queryable,
-        database_info: &'a DatabaseInfo,
-    ) -> BoxFuture<'a, SqlResult<()>>;
+    async fn initialize(&self, conn: &dyn Queryable, database_info: &DatabaseInfo) -> SqlResult<()>;
 }
 
 struct MysqlFlavour;
@@ -89,22 +85,15 @@ impl SqlFlavour for MysqlFlavour {
             .await?)
     }
 
-    fn initialize<'a>(
-        &'a self,
-        conn: &'a dyn Queryable,
-        database_info: &'a DatabaseInfo,
-    ) -> BoxFuture<'a, SqlResult<()>> {
-        async move {
-            let schema_sql = format!(
-                "CREATE SCHEMA IF NOT EXISTS `{}` DEFAULT CHARACTER SET latin1;",
-                database_info.connection_info().schema_name()
-            );
+    async fn initialize(&self, conn: &dyn Queryable, database_info: &DatabaseInfo) -> SqlResult<()> {
+        let schema_sql = format!(
+            "CREATE SCHEMA IF NOT EXISTS `{}` DEFAULT CHARACTER SET latin1;",
+            database_info.connection_info().schema_name()
+        );
 
-            conn.query_raw(&schema_sql, &[]).await?;
+        conn.query_raw(&schema_sql, &[]).await?;
 
-            Ok(())
-        }
-        .boxed()
+        Ok(())
     }
 }
 
@@ -124,11 +113,7 @@ impl SqlFlavour for SqliteFlavour {
             .await?)
     }
 
-    fn initialize<'a>(
-        &'a self,
-        _conn: &'a dyn Queryable,
-        _database_info: &'a DatabaseInfo,
-    ) -> BoxFuture<'a, SqlResult<()>> {
+    async fn initialize(&self, _conn: &dyn Queryable, _database_info: &DatabaseInfo) -> SqlResult<()> {
         let path_buf = PathBuf::from(&self.file_path);
         match path_buf.parent() {
             Some(parent_directory) => {
@@ -137,7 +122,7 @@ impl SqlFlavour for SqliteFlavour {
             None => {}
         }
 
-        futures::future::ready(Ok(())).boxed()
+        Ok(())
     }
 }
 
@@ -165,21 +150,14 @@ impl SqlFlavour for PostgresFlavour {
             .await?)
     }
 
-    fn initialize<'a>(
-        &'a self,
-        conn: &'a dyn Queryable,
-        database_info: &'a DatabaseInfo,
-    ) -> BoxFuture<'a, SqlResult<()>> {
-        async move {
-            let schema_sql = format!(
-                "CREATE SCHEMA IF NOT EXISTS \"{}\";",
-                &database_info.connection_info().schema_name()
-            );
+    async fn initialize(&self, conn: &dyn Queryable, database_info: &DatabaseInfo) -> SqlResult<()> {
+        let schema_sql = format!(
+            "CREATE SCHEMA IF NOT EXISTS \"{}\";",
+            &database_info.connection_info().schema_name()
+        );
 
-            conn.query_raw(&schema_sql, &[]).await?;
+        conn.query_raw(&schema_sql, &[]).await?;
 
-            Ok(())
-        }
-        .boxed()
+        Ok(())
     }
 }
