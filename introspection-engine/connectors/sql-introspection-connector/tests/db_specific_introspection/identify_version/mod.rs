@@ -139,11 +139,6 @@ async fn introspect_postgres_prisma_1_1(api: &TestApi) {
                 t.inject_custom("string text");
                 t.inject_custom("bookid character varying(36) REFERENCES \"Book\"(\"id\")");
             });
-
-            migration.create_table("_RelayId", |t| {
-                t.inject_custom("id character varying(36) Primary Key ");
-                t.inject_custom("stableModelIdentifier character varying(36) Not Null");
-            });
         })
         .await;
 
@@ -231,11 +226,6 @@ async fn introspect_mysql_prisma_1_1(api: &TestApi) {
                 t.inject_custom("float_column Decimal(65,30)");
                 t.inject_custom("boolean_column boolean");
             });
-
-            migration.create_table("_RelayId", |t| {
-                t.inject_custom("id char(36) Not Null Primary Key");
-                t.inject_custom("stableModelIdentifier   char(36)");
-            });
         })
         .await;
 
@@ -268,25 +258,4 @@ async fn introspect_mysql_prisma2(api: &TestApi) {
 
     let result = dbg!(api.introspect_version().await);
     assert_eq!(result, Version::Prisma2);
-}
-
-#[test_each_connector(tags("mysql"))]
-async fn introspect_mysql_with_false_migration_table(api: &TestApi) {
-    api.barrel()
-        .execute(|migration| {
-            migration.create_table("_Migration", |t| {
-                t.add_column("name", types::primary());
-                t.add_column("revision", types::text());
-                t.add_column("datamodel", types::text());
-                t.add_column("status", types::text());
-                t.add_column("applied", types::text());
-            });
-            migration.create_table("Book", |t| {
-                t.add_column("id", types::primary());
-            });
-        })
-        .await;
-
-    let result = dbg!(api.introspect_version().await);
-    assert_eq!(result, Version::NonPrisma);
 }

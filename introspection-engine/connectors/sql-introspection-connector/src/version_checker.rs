@@ -20,7 +20,7 @@ pub struct VersionChecker {
     has_inline_relations: bool,
 }
 
-// More ideas for tightening
+// todo More ideas for possible tightening
 // P1/P11 were not using db level default values
 
 const CHAR: &str = "char";
@@ -84,7 +84,7 @@ impl VersionChecker {
         }
     }
 
-    //todo
+    //todo Possible further tightening
     //P1/P11 only limited strings to specific lengths on ids
     pub fn uses_non_prisma_type(&mut self, tpe: &ColumnType) {
         match (&tpe.data_type, &tpe.full_data_type, self.sql_family) {
