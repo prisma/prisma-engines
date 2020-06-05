@@ -544,11 +544,20 @@ impl QueryGraph {
                     .node_content(&parent_of_parent_node)
                     .expect("Expected marked nodes to be non-empty.")
                 {
-                    Node::Flow(_) => {
-                        let content = self
-                            .remove_edge(parent_edge)
-                            .expect("Expected edges between marked nodes to be non-empty.");
-                        self.create_edge(&parent_of_parent_node, &child_node, content)?;
+                    // Exception rule: Only swap `Then` and `Else` edges.
+                    Node::Flow(Flow::If(_)) => {
+                        let do_swap = match self.edge_content(&parent_edge) {
+                            Some(QueryGraphDependency::Then) => true,
+                            Some(QueryGraphDependency::Else) => true,
+                            _ => false,
+                        };
+
+                        if do_swap {
+                            let content = self
+                                .remove_edge(parent_edge)
+                                .expect("Expected edges between marked nodes to be non-empty.");
+                            self.create_edge(&parent_of_parent_node, &child_node, content)?;
+                        }
                     }
 
                     _ => {
