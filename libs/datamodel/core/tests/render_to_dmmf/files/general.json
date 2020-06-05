@@ -242,6 +242,7 @@
           "isReadOnly": false,
           "type": "String",
           "hasDefaultValue": true,
+          "default": "Default-Title",
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -255,6 +256,7 @@
           "isReadOnly": false,
           "type": "Boolean",
           "hasDefaultValue": true,
+          "default": false,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -268,6 +270,7 @@
           "isReadOnly": false,
           "type": "Boolean",
           "hasDefaultValue": true,
+          "default": false,
           "isGenerated": false,
           "isUpdatedAt": false
         },

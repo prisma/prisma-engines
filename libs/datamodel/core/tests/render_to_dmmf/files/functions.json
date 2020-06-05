@@ -29,6 +29,10 @@
           "isReadOnly": false,
           "type": "DateTime",
           "hasDefaultValue": true,
+          "default": {
+            "name": "now",
+            "args": []
+          },
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -42,6 +46,10 @@
           "isReadOnly": false,
           "type": "String",
           "hasDefaultValue": true,
+          "default": {
+            "name": "cuid",
+            "args": []
+          },
           "isGenerated": false,
           "isUpdatedAt": false
         }
