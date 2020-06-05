@@ -3,7 +3,8 @@
 use crate::context::PrismaContext;
 use crate::dmmf;
 use crate::opt::PrismaOpt;
-use crate::request_handlers::graphql::{self, GraphQLSchemaRenderer, GraphQlBody};
+use crate::request_handlers::graphql::{GraphQLSchemaRenderer, GraphQlRequestHandler};
+use crate::request_handlers::{PrismaRequest, RequestHandler};
 use crate::PrismaResult;
 use elapsed_middleware::ElapsedMiddleware;
 
@@ -72,9 +73,12 @@ pub async fn listen(opts: PrismaOpt) -> PrismaResult<()> {
 /// The main query handler. This handles incoming GraphQL queries and passes it
 /// to the query engine.
 async fn graphql_handler(mut req: Request<State>) -> tide::Result {
-    let body: GraphQlBody = req.body_json().await?;
+    let body = req.body_json().await?;
+    let path = req.url().path().to_owned();
+    let headers = req.iter().map(|(k, v)| (format!("{}", k), format!("{}", v))).collect();
     let cx = req.state().cx.clone();
-    let result = graphql::handle(body, cx).await;
+    let req = PrismaRequest { body, path, headers };
+    let result = GraphQlRequestHandler.handle(req, &cx).await;
     let mut res = Response::new(StatusCode::Ok);
     res.set_body(Body::from_json(&result)?);
     Ok(res)
