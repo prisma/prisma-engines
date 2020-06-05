@@ -1922,9 +1922,9 @@ dependencies = [
 
 [[package]]
 name = "pin-project-lite"
-version = "0.1.6"
+version = "0.1.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9df32da11d84f3a7d70205549562966279adb900e080fad3dccd8e64afccf0ad"
+checksum = "282adbf10f2698a7a77f8e983a74b2d18176c19a7fd32a45446139ae7b02b715"
 
 [[package]]
 name = "pin-utils"
@@ -2153,7 +2153,7 @@ dependencies = [
 [[package]]
 name = "quaint"
 version = "0.2.0-alpha.12"
-source = "git+https://github.com/prisma/quaint?branch=experiment/cache-prepared-statements#7d0d6ae9e02247fff6665a14b71b6cb65430d940"
+source = "git+https://github.com/prisma/quaint?branch=experiment/cache-prepared-statements#d6752d1cf9e7bd5f1cf2262ce619112ee7a8d972"
 dependencies = [
  "async-trait",
  "base64 0.11.0",
@@ -2801,9 +2801,12 @@ checksum = "dba1a27d3efae4351c8051072d619e3ade2820635c3958d826bfea39d59b54c8"
 
 [[package]]
 name = "standback"
-version = "0.2.8"
+version = "0.2.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "47e4b8c631c998468961a9ea159f064c5c8499b95b5e4a34b77849d45949d540"
+checksum = "b0437cfb83762844799a60e1e3b489d5ceb6a650fbacb86437badc1b6d87b246"
+dependencies = [
+ "version_check",
+]
 
 [[package]]
 name = "static_assertions"
@@ -3070,7 +3073,7 @@ dependencies = [
 [[package]]
 name = "tide"
 version = "0.9.0"
-source = "git+https://github.com/http-rs/tide#12c2e22a52ff889631f0fba4c44319fb818520fc"
+source = "git+https://github.com/http-rs/tide#4034f3369ff1d1057376e32c683d1468cca1d65c"
 dependencies = [
  "async-h1",
  "async-sse",
