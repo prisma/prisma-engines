@@ -11,14 +11,9 @@ graphql = ["graphql-parser"]
 
 [dependencies]
 futures = "0.3"
-# tide = "0.9.0"
-tide = { git = "https://github.com/http-rs/tide", branch = "master" }
+http = "0.2"
+hyper = "0.13"
 tokio = { version = "=0.2.13", features = ["rt-threaded", "macros"] }
-async-std = { version = "1.6.0", features = ["attributes"] }
-
- # NOTE(yoshuawuyts): we can remove this dependency once async-std 1.7.0 is released.
- # We pull this in to force the `tokio02` feature for async-std.
-smol = { version = "0.1.11", features = ["tokio02"] }
 
 async-trait = "0.1"
 prisma-inflector = { path = "../../libs/prisma-inflector" }
@@ -31,6 +26,7 @@ graphql-parser = { git = "https://github.com/prisma/graphql-parser", optional = 
 serde = { version = "1.0", features = ["derive"] }
 serde_json = { version = "1.0", features = [ "preserve_order" ] }
 base64 = "0.10"
+rust-embed = { version = "5.2" }
 failure = { version = "0.1" }
 indexmap = { version = "1.0", features = [ "serde-1" ] }
 itertools = "0.8"

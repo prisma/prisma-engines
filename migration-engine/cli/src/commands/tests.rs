@@ -51,18 +51,18 @@ async fn test_connecting_with_a_working_psql_connection_string() {
     assert_eq!(result, "Connection successful");
 }
 
-#[tokio::test]
-async fn test_connecting_with_a_working_psql_connection_string_with_postgres_scheme() {
-    let result = run(&[
-        "--datasource",
-        &postgres_url_with_scheme(None, "postgres"),
-        "can-connect-to-database",
-    ])
-    .await
-    .unwrap();
+// #[tokio::test]
+// async fn test_connecting_with_a_working_psql_connection_string_with_postgres_scheme() {
+//     let result = run(&[
+//         "--datasource",
+//         &postgres_url_with_scheme(None, "postgres"),
+//         "can-connect-to-database",
+//     ])
+//     .await
+//     .unwrap();
 
-    assert_eq!(result, "Connection successful");
-}
+//     assert_eq!(result, "Connection successful");
+// }
 
 #[tokio::test]
 async fn test_connecting_with_a_non_working_psql_connection_string() {

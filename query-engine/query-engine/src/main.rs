@@ -1,12 +1,15 @@
 #[macro_use]
 extern crate tracing;
+#[macro_use]
+extern crate rust_embed;
 
-use cli::CliCommand;
-use error::PrismaError;
+use cli::*;
+use error::*;
 use once_cell::sync::Lazy;
-use opt::PrismaOpt;
-use request_handlers::PrismaResponse;
-use std::{error::Error, process};
+use opt::*;
+use request_handlers::{PrismaRequest, PrismaResponse, RequestHandler};
+use server::{HttpServer, HttpServerBuilder};
+use std::{convert::TryFrom, error::Error, net::SocketAddr, process};
 use structopt::StructOpt;
 use tracing::subscriber;
 use tracing_subscriber::{EnvFilter, FmtSubscriber};
@@ -38,26 +41,62 @@ static LOG_FORMAT: Lazy<LogFormat> =
 pub type PrismaResult<T> = Result<T, PrismaError>;
 type AnyError = Box<dyn Error + Send + Sync + 'static>;
 
-#[async_std::main]
+#[tokio::main]
 async fn main() -> Result<(), AnyError> {
     init_logger()?;
-    return main().await.map_err(|err| {
-        info!("Encountered error during initialization:");
-        err.render_as_json().expect("error rendering");
-        process::exit(1)
-    });
+    let opts = PrismaOpt::from_args();
 
-    async fn main() -> Result<(), PrismaError> {
-        let opts = PrismaOpt::from_args();
-        match CliCommand::from_opt(&opts)? {
-            Some(cmd) => cmd.execute().await?,
-            None => {
-                set_panic_hook();
-                server::listen(opts).await?;
+    match CliCommand::try_from(&opts) {
+        Ok(cmd) => {
+            if let Err(err) = cmd.execute().await {
+                info!("Encountered error during initialization:");
+                err.render_as_json().expect("error rendering");
+                process::exit(1);
             }
         }
-        Ok(())
+        Err(PrismaError::InvocationError(_)) => {
+            set_panic_hook()?;
+            let ip = opts.host.parse().expect("Host was not a valid IP address");
+            let address = SocketAddr::new(ip, opts.port);
+
+            eprintln!("Printing to stderr for debugging");
+            eprintln!("Listening on {}:{}", opts.host, opts.port);
+
+            let create_builder = move || {
+                let config = opts.configuration(false)?;
+                let datamodel = opts.datamodel(false)?;
+
+                PrismaResult::<HttpServerBuilder>::Ok(
+                    HttpServer::builder(config, datamodel)
+                        .legacy(opts.legacy)
+                        .enable_raw_queries(opts.enable_raw_queries)
+                        .enable_playground(opts.enable_playground),
+                )
+            };
+
+            let builder = match create_builder() {
+                Err(err) => {
+                    info!("Encountered error during initialization:");
+                    err.render_as_json().expect("error rendering");
+                    process::exit(1);
+                }
+                Ok(builder) => builder,
+            };
+
+            if let Err(err) = builder.build_and_run(address).await {
+                info!("Encountered error during initialization:");
+                err.render_as_json().expect("error rendering");
+                process::exit(1);
+            };
+        }
+        Err(err) => {
+            info!("Encountered error during initialization:");
+            err.render_as_json().expect("error rendering");
+            process::exit(1);
+        }
     }
+
+    Ok(())
 }
 
 fn init_logger() -> Result<(), AnyError> {
@@ -82,7 +121,7 @@ fn init_logger() -> Result<(), AnyError> {
     Ok(())
 }
 
-fn set_panic_hook() {
+fn set_panic_hook() -> Result<(), AnyError> {
     match *LOG_FORMAT {
         LogFormat::Text => (),
         LogFormat::Json => {
@@ -113,4 +152,6 @@ fn set_panic_hook() {
             }));
         }
     }
+
+    Ok(())
 }
