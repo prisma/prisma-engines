@@ -68,7 +68,7 @@ tokio-postgres = { version = "0.5", features = ["with-uuid-0_8", "with-chrono-0_
 postgres-native-tls = { version = "0.3", optional = true }
 native-tls = { version = "0.2", optional = true }
 
-mysql_async = { version = "0.23", optional = true }
+mysql_async = { version = "0.24.0-alpha", optional = true }
 
 log = { version = "0.4", features = ["release_max_level_trace"] }
 tracing = { version = "0.1", optional = true }

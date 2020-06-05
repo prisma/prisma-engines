@@ -2,17 +2,17 @@ use crate::error::{DatabaseConstraint, Error, ErrorKind};
 use mysql_async as my;
 use std::io::ErrorKind as IoErrorKind;
 
-impl From<my::error::Error> for Error {
-    fn from(e: my::error::Error) -> Error {
-        use my::error::ServerError;
+impl From<my::Error> for Error {
+    fn from(e: my::Error) -> Error {
+        use my::ServerError;
 
         match e {
-            my::error::Error::Io(io_error) => match io_error.kind() {
+            my::Error::Io(my::IoError::Io(io_error)) => match io_error.kind() {
                 IoErrorKind::ConnectionRefused => Error::builder(ErrorKind::ConnectionError(io_error.into())).build(),
                 _ => Error::builder(ErrorKind::QueryError(io_error.into())).build(),
             },
-            my::error::Error::Driver(e) => Error::builder(ErrorKind::QueryError(e.into())).build(),
-            my::error::Error::Server(ServerError { ref message, code, .. }) if code == 1062 => {
+            my::Error::Driver(e) => Error::builder(ErrorKind::QueryError(e.into())).build(),
+            my::Error::Server(ServerError { ref message, code, .. }) if code == 1062 => {
                 let splitted: Vec<&str> = message.split_whitespace().collect();
                 let splitted: Vec<&str> = splitted.last().map(|s| s.split('\'').collect()).unwrap();
 
@@ -27,7 +27,7 @@ impl From<my::error::Error> for Error {
 
                 builder.build()
             }
-            my::error::Error::Server(ServerError { ref message, code, .. }) if code == 1451 || code == 1452 => {
+            my::Error::Server(ServerError { ref message, code, .. }) if code == 1451 || code == 1452 => {
                 let splitted: Vec<&str> = message.split_whitespace().collect();
                 let splitted: Vec<&str> = splitted[17].split('`').collect();
 
@@ -42,7 +42,7 @@ impl From<my::error::Error> for Error {
 
                 builder.build()
             }
-            my::error::Error::Server(ServerError { ref message, code, .. }) if code == 1263 => {
+            my::Error::Server(ServerError { ref message, code, .. }) if code == 1263 => {
                 let splitted: Vec<&str> = message.split_whitespace().collect();
                 let splitted: Vec<&str> = splitted.last().map(|s| s.split('\'').collect()).unwrap();
 
@@ -55,7 +55,7 @@ impl From<my::error::Error> for Error {
 
                 builder.build()
             }
-            my::error::Error::Server(ServerError { ref message, code, .. }) if code == 1264 => {
+            my::Error::Server(ServerError { ref message, code, .. }) if code == 1264 => {
                 let mut builder = Error::builder(ErrorKind::ValueOutOfRange {
                     message: message.clone(),
                 });
@@ -65,7 +65,7 @@ impl From<my::error::Error> for Error {
 
                 builder.build()
             }
-            my::error::Error::Server(ServerError { ref message, code, .. }) if code == 1364 || code == 1048 => {
+            my::Error::Server(ServerError { ref message, code, .. }) if code == 1364 || code == 1048 => {
                 let splitted: Vec<&str> = message.split_whitespace().collect();
                 let splitted: Vec<&str> = splitted.get(1).map(|s| s.split('\'').collect()).unwrap();
 
@@ -78,7 +78,7 @@ impl From<my::error::Error> for Error {
 
                 builder.build()
             }
-            my::error::Error::Server(ServerError { ref message, code, .. }) if code == 1049 => {
+            my::Error::Server(ServerError { ref message, code, .. }) if code == 1049 => {
                 let splitted: Vec<&str> = message.split_whitespace().collect();
                 let splitted: Vec<&str> = splitted.last().map(|s| s.split('\'').collect()).unwrap();
                 let db_name: String = splitted[1].into();
@@ -90,7 +90,7 @@ impl From<my::error::Error> for Error {
 
                 builder.build()
             }
-            my::error::Error::Server(ServerError { ref message, code, .. }) if code == 1007 => {
+            my::Error::Server(ServerError { ref message, code, .. }) if code == 1007 => {
                 let splitted: Vec<&str> = message.split_whitespace().collect();
                 let splitted: Vec<&str> = splitted[3].split('\'').collect();
                 let db_name: String = splitted[1].into();
@@ -102,7 +102,7 @@ impl From<my::error::Error> for Error {
 
                 builder.build()
             }
-            my::error::Error::Server(ServerError { ref message, code, .. }) if code == 1044 => {
+            my::Error::Server(ServerError { ref message, code, .. }) if code == 1044 => {
                 let splitted: Vec<&str> = message.split_whitespace().collect();
                 let splitted: Vec<&str> = splitted.last().map(|s| s.split('\'').collect()).unwrap();
                 let db_name: String = splitted[1].into();
@@ -114,7 +114,7 @@ impl From<my::error::Error> for Error {
 
                 builder.build()
             }
-            my::error::Error::Server(ServerError { ref message, code, .. }) if code == 1045 => {
+            my::Error::Server(ServerError { ref message, code, .. }) if code == 1045 => {
                 let splitted: Vec<&str> = message.split_whitespace().collect();
                 let splitted: Vec<&str> = splitted[4].split('@').collect();
                 let splitted: Vec<&str> = splitted[0].split('\'').collect();
@@ -127,7 +127,7 @@ impl From<my::error::Error> for Error {
 
                 builder.build()
             }
-            my::error::Error::Server(ServerError {
+            my::Error::Server(ServerError {
                 ref message,
                 code,
                 state: _,
@@ -145,13 +145,13 @@ impl From<my::error::Error> for Error {
 
                 builder.build()
             }
-            my::error::Error::Server(ServerError {
+            my::Error::Server(ServerError {
                 ref message,
                 code,
                 ref state,
             }) => {
                 let kind = ErrorKind::QueryError(
-                    my::error::Error::Server(ServerError {
+                    my::Error::Server(ServerError {
                         message: message.clone(),
                         code,
                         state: state.clone(),

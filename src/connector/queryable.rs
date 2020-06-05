@@ -40,6 +40,9 @@ pub trait Queryable: Send + Sync {
     /// parsing or normalization.
     async fn version(&self) -> crate::Result<Option<String>>;
 
+    /// Use to check if the underlying connection is still alive.
+    async fn ping(&self) -> crate::Result<()>;
+
     /// Execute a `SELECT` query.
     async fn select(&self, q: Select<'_>) -> crate::Result<ResultSet> {
         self.query(q.into()).await

@@ -211,6 +211,10 @@ impl Queryable for Sqlite {
     async fn version(&self) -> crate::Result<Option<String>> {
         Ok(Some(rusqlite::version().into()))
     }
+
+    async fn ping(&self) -> crate::Result<()> {
+        self.raw_cmd("/* PING */").await
+    }
 }
 
 #[cfg(test)]
@@ -534,5 +538,13 @@ mod tests {
             }
             _ => panic!(err),
         }
+    }
+
+    #[tokio::test]
+    async fn pinging() -> crate::Result<()> {
+        let conn = Sqlite::try_from("file:db/test.db").unwrap();
+        assert!(conn.ping().await.is_ok());
+
+        Ok(())
     }
 }

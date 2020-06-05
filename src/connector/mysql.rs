@@ -2,10 +2,10 @@ mod conversion;
 mod error;
 
 use async_trait::async_trait;
-use mysql_async::{self as my, prelude::Queryable as _, Conn};
+use mysql_async::{self as my, prelude::Queryable as _};
 use percent_encoding::percent_decode;
 use std::{borrow::Cow, future::Future, path::Path, time::Duration};
-use tokio::time::timeout;
+use tokio::{sync::Mutex, time::timeout};
 use url::Url;
 
 use crate::{
@@ -18,7 +18,7 @@ use crate::{
 /// A connector interface for the MySQL database.
 #[derive(Debug)]
 pub struct Mysql {
-    pub(crate) pool: my::Pool,
+    pub(crate) conn: Mutex<my::Conn>,
     pub(crate) url: MysqlUrl,
     socket_timeout: Option<Duration>,
     connect_timeout: Option<Duration>,
@@ -118,15 +118,15 @@ impl MysqlUrl {
                 }
                 "sslcert" => {
                     use_ssl = true;
-                    ssl_opts.set_root_cert_path(Some(Path::new(&*v).to_path_buf()));
+                    ssl_opts = ssl_opts.with_root_cert_path(Some(Path::new(&*v).to_path_buf()));
                 }
                 "sslidentity" => {
                     use_ssl = true;
-                    ssl_opts.set_pkcs12_path(Some(Path::new(&*v).to_path_buf()));
+                    ssl_opts = ssl_opts.with_pkcs12_path(Some(Path::new(&*v).to_path_buf()));
                 }
                 "sslpassword" => {
                     use_ssl = true;
-                    ssl_opts.set_password(Some(v.to_string()));
+                    ssl_opts = ssl_opts.with_password(Some(v.to_string()));
                 }
                 "socket" => {
                     socket = Some(v.replace("(", "").replace(")", ""));
@@ -147,7 +147,7 @@ impl MysqlUrl {
                     match v.as_ref() {
                         "strict" => {}
                         "accept_invalid_certs" => {
-                            ssl_opts.set_danger_accept_invalid_certs(true);
+                            ssl_opts = ssl_opts.with_danger_accept_invalid_certs(true);
                         }
                         _ => {
                             #[cfg(not(feature = "tracing-log"))]
@@ -185,27 +185,24 @@ impl MysqlUrl {
     }
 
     pub(crate) fn to_opts_builder(&self) -> my::OptsBuilder {
-        let mut config = my::OptsBuilder::new();
-
-        config.user(Some(self.username()));
-        config.pass(self.password());
-        config.db_name(Some(self.dbname()));
+        let mut config = my::OptsBuilder::default()
+            .user(Some(self.username()))
+            .pass(self.password())
+            .db_name(Some(self.dbname()))
+            .stmt_cache_size(Some(1000))
+            .conn_ttl(Some(Duration::from_secs(5)));
 
         match self.socket() {
             Some(ref socket) => {
-                config.socket(Some(socket));
+                config = config.socket(Some(socket));
             }
             None => {
-                config.ip_or_hostname(self.host());
-                config.tcp_port(self.port());
+                config = config.ip_or_hostname(self.host()).tcp_port(self.port());
             }
         }
 
-        config.stmt_cache_size(Some(1000));
-        config.conn_ttl(Some(Duration::from_secs(5)));
-
         if self.query_params.use_ssl {
-            config.ssl_opts(Some(self.query_params.ssl_opts.clone()));
+            config = config.ssl_opts(Some(self.query_params.ssl_opts.clone()));
         }
 
         config
@@ -224,15 +221,13 @@ pub(crate) struct MysqlUrlQueryParams {
 
 impl Mysql {
     /// Create a new MySQL connection using `OptsBuilder` from the `mysql` crate.
-    pub fn new(url: MysqlUrl) -> crate::Result<Self> {
-        let mut opts = url.to_opts_builder();
-        let pool_opts = my::PoolOptions::with_constraints(my::PoolConstraints::new(1, 1).unwrap());
-        opts.pool_options(pool_opts);
+    pub async fn new(url: MysqlUrl) -> crate::Result<Self> {
+        let opts = url.to_opts_builder();
 
         Ok(Self {
             socket_timeout: url.query_params.socket_timeout,
             connect_timeout: url.query_params.connect_timeout,
-            pool: my::Pool::new(opts),
+            conn: Mutex::new(my::Conn::new(opts).await?),
             url,
         })
     }
@@ -254,13 +249,6 @@ impl Mysql {
             },
         }
     }
-
-    async fn get_conn(&self) -> crate::Result<Conn> {
-        match self.connect_timeout {
-            Some(duration) => Ok(timeout(duration, self.pool.get_conn()).await??),
-            None => Ok(self.pool.get_conn().await?),
-        }
-    }
 }
 
 impl TransactionCapable for Mysql {}
@@ -279,29 +267,22 @@ impl Queryable for Mysql {
 
     async fn query_raw(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<ResultSet> {
         metrics::query("mysql.query_raw", sql, params, move || async move {
-            let conn = self.get_conn().await?;
-            let results = self
-                .timeout(conn.prep_exec(sql, conversion::conv_params(params)))
+            let mut conn = self.conn.lock().await;
+            let stmt = self.timeout(conn.prep(sql)).await?;
+
+            let columns = stmt.columns().iter().map(|s| s.name_str().into_owned()).collect();
+            let mut results = self
+                .timeout(conn.exec_iter(&stmt, conversion::conv_params(params)))
                 .await?;
 
-            let columns = results
-                .columns_ref()
-                .iter()
-                .map(|s| s.name_str().into_owned())
-                .collect();
-
-            let last_id = results.last_insert_id();
             let mut result_set = ResultSet::new(columns, Vec::new());
 
-            let (_, rows) = self
-                .timeout(results.map_and_drop(|mut row| row.take_result_row()))
-                .await?;
-
-            for row in rows.into_iter() {
-                result_set.rows.push(row?);
+            while let Some(mut row) = results.next().await? {
+                let row = row.take_result_row()?;
+                result_set.rows.push(row);
             }
 
-            if let Some(id) = last_id {
+            if let Some(id) = conn.last_insert_id() {
                 result_set.set_last_insert_id(id);
             };
 
@@ -312,10 +293,13 @@ impl Queryable for Mysql {
 
     async fn execute_raw(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<u64> {
         metrics::query("mysql.execute_raw", sql, params, move || async move {
-            let conn = self.get_conn().await?;
+            let mut conn = self.conn.lock().await;
+            let stmt = self.timeout(conn.prep(sql)).await?;
+
             let results = self
-                .timeout(conn.prep_exec(sql, conversion::conv_params(params)))
+                .timeout(conn.exec_iter(&stmt, conversion::conv_params(params)))
                 .await?;
+
             Ok(results.affected_rows())
         })
         .await
@@ -323,8 +307,8 @@ impl Queryable for Mysql {
 
     async fn raw_cmd(&self, cmd: &str) -> crate::Result<()> {
         metrics::query("mysql.raw_cmd", cmd, &[], move || async move {
-            let conn = self.get_conn().await?;
-            self.timeout(conn.query(cmd)).await?;
+            let mut conn = self.conn.lock().await;
+            self.timeout(conn.query_drop(cmd)).await?;
 
             Ok(())
         })
@@ -340,6 +324,11 @@ impl Queryable for Mysql {
             .and_then(|row| row.get("version").and_then(|version| version.to_string()));
 
         Ok(version_string)
+    }
+
+    async fn ping(&self) -> crate::Result<()> {
+        let mut conn = self.conn.lock().await;
+        Ok(conn.ping().await?)
     }
 }
 
@@ -576,8 +565,7 @@ VALUES (1, 'Joe', 27, 20000.00 );
         url.set_path("/this_does_not_exist");
 
         let url = url.as_str().to_string();
-        let conn = Quaint::new(&url).await.unwrap();
-        let res = conn.query_raw("SELECT 1 + 1", &[]).await;
+        let res = Quaint::new(&url).await;
 
         assert!(&res.is_err());
 
@@ -962,5 +950,13 @@ VALUES (1, 'Joe', 27, 20000.00 );
             assert_eq!(result.len(), 1);
             assert_eq!(result.get(0).unwrap().get("id").unwrap(), &Value::Integer(2))
         }
+    }
+
+    #[tokio::test]
+    async fn pinging() -> crate::Result<()> {
+        let conn = Quaint::new(&CONN_STR).await?;
+        assert!(conn.ping().await.is_ok());
+
+        Ok(())
     }
 }

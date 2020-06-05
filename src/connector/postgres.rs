@@ -524,6 +524,10 @@ impl Queryable for PostgreSql {
             Ok(())
         }
     }
+
+    async fn ping(&self) -> crate::Result<()> {
+        self.raw_cmd("/* PING */").await
+    }
 }
 
 #[cfg(test)]
@@ -1079,5 +1083,13 @@ mod tests {
             assert_eq!(result.len(), 1);
             assert_eq!(result.get(0).unwrap().get("id").unwrap(), &Value::Integer(2))
         }
+    }
+
+    #[tokio::test]
+    async fn pinging() -> crate::Result<()> {
+        let conn = Quaint::new(&CONN_STR).await.unwrap();
+        assert!(conn.ping().await.is_ok());
+
+        Ok(())
     }
 }

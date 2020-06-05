@@ -104,7 +104,7 @@ impl Quaint {
             #[cfg(feature = "mysql")]
             "mysql" => {
                 let url = connector::MysqlUrl::new(url)?;
-                let mysql = connector::Mysql::new(url)?;
+                let mysql = connector::Mysql::new(url).await?;
 
                 Arc::new(mysql) as Arc<dyn Queryable + Send + Sync>
             }
@@ -165,5 +165,9 @@ impl Queryable for Quaint {
 
     async fn version(&self) -> crate::Result<Option<String>> {
         self.inner.version().await
+    }
+
+    async fn ping(&self) -> crate::Result<()> {
+        self.inner.ping().await
     }
 }

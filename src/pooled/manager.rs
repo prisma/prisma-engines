@@ -48,6 +48,10 @@ impl Queryable for PooledConnection {
     async fn server_reset_query(&self, tx: &Transaction<'_>) -> crate::Result<()> {
         self.inner.server_reset_query(tx).await
     }
+
+    async fn ping(&self) -> crate::Result<()> {
+        self.inner.ping().await
+    }
 }
 
 #[doc(hidden)]
@@ -82,7 +86,7 @@ impl Manager for QuaintManager {
             #[cfg(feature = "mysql")]
             QuaintManager::Mysql(url) => {
                 use crate::connector::Mysql;
-                Ok(Box::new(Mysql::new(url.clone())?) as Self::Connection)
+                Ok(Box::new(Mysql::new(url.clone()).await?) as Self::Connection)
             }
 
             #[cfg(feature = "postgresql")]
@@ -94,7 +98,7 @@ impl Manager for QuaintManager {
     }
 
     async fn check(&self, conn: Self::Connection) -> crate::Result<Self::Connection> {
-        conn.raw_cmd("SELECT 1").await?;
+        conn.ping().await?;
         Ok(conn)
     }
 }
