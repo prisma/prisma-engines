@@ -1,6 +1,7 @@
 use crate::{
     context::PrismaContext,
     dmmf,
+    error::PrismaError,
     opt::{CliOpt, PrismaOpt, Subcommand},
     request_handlers::{graphql::*, PrismaRequest, RequestHandler},
     PrismaResult,
@@ -11,7 +12,7 @@ use query_core::{
     schema::{QuerySchemaRef, SupportedCapabilities},
     BuildMode, QuerySchemaBuilder,
 };
-use std::{collections::HashMap, sync::Arc};
+use std::{collections::HashMap, convert::TryFrom, sync::Arc};
 
 pub struct ExecuteRequest {
     legacy: bool,
@@ -37,14 +38,14 @@ pub enum CliCommand {
     ExecuteRequest(ExecuteRequest),
 }
 
-impl CliCommand {
-    /// Create a CLI command from a `PrismaOpt` instance.
-    pub(crate) fn from_opt(opts: &PrismaOpt) -> crate::PrismaResult<Option<CliCommand>> {
-        let subcommand = opts.subcommand.as_ref();
-        let subcommand = match subcommand {
-            Some(cmd) => cmd,
-            None => return Ok(None),
-        };
+impl TryFrom<&PrismaOpt> for CliCommand {
+    type Error = PrismaError;
+
+    fn try_from(opts: &PrismaOpt) -> crate::PrismaResult<CliCommand> {
+        let subcommand = opts
+            .subcommand
+            .as_ref()
+            .ok_or_else(|| PrismaError::InvocationError(String::from("cli subcommand not present")))?;
 
         match subcommand {
             Subcommand::Cli(ref cliopts) => match cliopts {
@@ -55,26 +56,28 @@ impl CliCommand {
                         BuildMode::Modern
                     };
 
-                    Ok(Some(CliCommand::Dmmf(DmmfRequest {
+                    Ok(CliCommand::Dmmf(DmmfRequest {
                         datamodel: opts.datamodel(true)?,
                         build_mode,
                         enable_raw_queries: opts.enable_raw_queries,
-                    })))
+                    }))
                 }
-                CliOpt::GetConfig(input) => Ok(Some(CliCommand::GetConfig(GetConfigRequest {
+                CliOpt::GetConfig(input) => Ok(CliCommand::GetConfig(GetConfigRequest {
                     config: opts.configuration(input.ignore_env_var_errors)?,
-                }))),
-                CliOpt::ExecuteRequest(input) => Ok(Some(CliCommand::ExecuteRequest(ExecuteRequest {
+                })),
+                CliOpt::ExecuteRequest(input) => Ok(CliCommand::ExecuteRequest(ExecuteRequest {
                     query: input.query.clone(),
                     enable_raw_queries: opts.enable_raw_queries,
                     legacy: input.legacy,
                     datamodel: opts.datamodel(false)?,
                     config: opts.configuration(false)?,
-                }))),
+                })),
             },
         }
     }
+}
 
+impl CliCommand {
     pub async fn execute(self) -> PrismaResult<()> {
         match self {
             CliCommand::Dmmf(request) => Self::dmmf(request),

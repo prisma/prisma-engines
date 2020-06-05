@@ -3,12 +3,13 @@ extern crate tracing;
 #[macro_use]
 extern crate rust_embed;
 
-use cli::CliCommand;
-use error::PrismaError;
+use cli::*;
+use error::*;
 use once_cell::sync::Lazy;
-use opt::PrismaOpt;
+use opt::*;
 use request_handlers::{PrismaRequest, PrismaResponse, RequestHandler};
-use std::{error::Error, process};
+use server::{HttpServer, HttpServerBuilder};
+use std::{convert::TryFrom, error::Error, net::SocketAddr, process};
 use structopt::StructOpt;
 use tracing::subscriber;
 use tracing_subscriber::{EnvFilter, FmtSubscriber};
@@ -43,19 +44,14 @@ type AnyError = Box<dyn Error + Send + Sync + 'static>;
 #[tokio::main]
 async fn main() -> Result<(), AnyError> {
     init_logger()?;
-    return main().await.map_err(|err| {
-        info!("Encountered error during initialization:");
-        err.render_as_json().expect("error rendering");
-        process::exit(1)
-    });
+    let opts = PrismaOpt::from_args();
 
-    async fn main() -> Result<(), PrismaError> {
-        let opts = PrismaOpt::from_args();
-        match CliCommand::from_opt(&opts)? {
-            Some(cmd) => cmd.execute().await?,
-            None => {
-                set_panic_hook();
-                server::listen(opts).await?;
+    match CliCommand::try_from(&opts) {
+        Ok(cmd) => {
+            if let Err(err) = cmd.execute().await {
+                info!("Encountered error during initialization:");
+                err.render_as_json().expect("error rendering");
+                process::exit(1);
             }
         }
         Err(PrismaError::InvocationError(_)) => {
@@ -99,6 +95,8 @@ async fn main() -> Result<(), AnyError> {
             process::exit(1);
         }
     }
+
+    Ok(())
 }
 
 fn init_logger() -> Result<(), AnyError> {
@@ -123,7 +121,7 @@ fn init_logger() -> Result<(), AnyError> {
     Ok(())
 }
 
-fn set_panic_hook() {
+fn set_panic_hook() -> Result<(), AnyError> {
     match *LOG_FORMAT {
         LogFormat::Text => (),
         LogFormat::Json => {
@@ -154,4 +152,6 @@ fn set_panic_hook() {
             }));
         }
     }
+
+    Ok(())
 }
