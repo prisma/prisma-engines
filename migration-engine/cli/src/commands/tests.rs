@@ -43,26 +43,32 @@ async fn test_connecting_with_a_non_working_mysql_connection_string() {
 
 #[tokio::test]
 async fn test_connecting_with_a_working_psql_connection_string() {
-    let datasource = postgres_url(None);
-    let result = run(&["--datasource", &datasource, "can-connect-to-database"])
+    let url_str = postgres_url(Some("test_connecting_with_a_working_psql_connection_string"));
+    let url = url_str.parse().unwrap();
+    test_setup::create_postgres_database(&url).await.unwrap();
+
+    let result = run(&["--datasource", &url_str, "can-connect-to-database"])
         .await
         .unwrap();
 
     assert_eq!(result, "Connection successful");
 }
 
-// #[tokio::test]
-// async fn test_connecting_with_a_working_psql_connection_string_with_postgres_scheme() {
-//     let result = run(&[
-//         "--datasource",
-//         &postgres_url_with_scheme(None, "postgres"),
-//         "can-connect-to-database",
-//     ])
-//     .await
-//     .unwrap();
+#[tokio::test]
+async fn test_connecting_with_a_working_psql_connection_string_with_postgres_scheme() {
+    let url_str = postgres_url_with_scheme(
+        Some("test_connecting_with_a_working_psql_connection_string_with_postgres_scheme"),
+        "postgres",
+    );
+    let url = url_str.parse().unwrap();
+    test_setup::create_postgres_database(&url).await.unwrap();
 
-//     assert_eq!(result, "Connection successful");
-// }
+    let result = run(&["--datasource", &url_str, "can-connect-to-database"])
+        .await
+        .unwrap();
+
+    assert_eq!(result, "Connection successful");
+}
 
 #[tokio::test]
 async fn test_connecting_with_a_non_working_psql_connection_string() {
