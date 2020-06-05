@@ -72,6 +72,20 @@ fn model_to_dmmf(model: &dml::Model) -> Model {
                 }
             })
             .collect(),
+        unique_indexes: model
+            .indices
+            .iter()
+            .filter_map(|i| {
+                if i.tpe == IndexType::Unique {
+                    Some(UniqueIndex {
+                        name: i.name.clone(),
+                        fields: i.fields.clone(),
+                    })
+                } else {
+                    None
+                }
+            })
+            .collect(),
     }
 }
 

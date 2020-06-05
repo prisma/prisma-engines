@@ -57,6 +57,14 @@ pub struct Model {
     pub documentation: Option<String>,
     pub id_fields: Vec<String>,
     pub unique_fields: Vec<Vec<String>>,
+    pub unique_indexes: Vec<UniqueIndex>,
+}
+
+#[serde(rename_all = "camelCase")]
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct UniqueIndex {
+    pub name: Option<String>,
+    pub fields: Vec<String>,
 }
 
 #[serde(rename_all = "camelCase")]

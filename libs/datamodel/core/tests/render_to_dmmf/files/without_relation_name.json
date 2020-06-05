@@ -39,7 +39,8 @@
       ],
       "isGenerated": false,
       "idFields": [],
-      "uniqueFields": []
+      "uniqueFields": [],
+      "uniqueIndexes": []
     },
     {
       "name": "Post",
@@ -96,7 +97,8 @@
       ],
       "isGenerated": false,
       "idFields": [],
-      "uniqueFields": []
+      "uniqueFields": [],
+      "uniqueIndexes": []
     }
   ]
 }

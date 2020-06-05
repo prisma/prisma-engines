@@ -114,7 +114,8 @@
       ],
       "isGenerated": false,
       "idFields": [],
-      "uniqueFields": []
+      "uniqueFields": [],
+      "uniqueIndexes": []
     },
     {
       "name": "Profile",
@@ -184,7 +185,8 @@
       ],
       "isGenerated": false,
       "idFields": [],
-      "uniqueFields": []
+      "uniqueFields": [],
+      "uniqueIndexes": []
     },
     {
       "name": "Post",
@@ -326,7 +328,8 @@
         "title",
         "createdAt"
       ],
-      "uniqueFields": []
+      "uniqueFields": [],
+      "uniqueIndexes": []
     },
     {
       "name": "Category",
@@ -392,7 +395,8 @@
       ],
       "isGenerated": false,
       "idFields": [],
-      "uniqueFields": []
+      "uniqueFields": [],
+      "uniqueIndexes": []
     },
     {
       "name": "PostToCategory",
@@ -498,7 +502,11 @@
       ],
       "isGenerated": false,
       "idFields": [],
-      "uniqueFields": []
+      "uniqueFields": [["postTitle", "categoryId"]],
+      "uniqueIndexes": [{
+        "name": "MyUniqueIndex",
+        "fields": ["postTitle", "categoryId"]
+      }]
     },
     {
       "name": "A",
@@ -555,7 +563,8 @@
       ],
       "isGenerated": false,
       "idFields": [],
-      "uniqueFields": []
+      "uniqueFields": [],
+      "uniqueIndexes": []
     },
     {
       "name": "B",
@@ -595,7 +604,8 @@
       ],
       "isGenerated": false,
       "idFields": [],
-      "uniqueFields": []
+      "uniqueFields": [],
+      "uniqueIndexes": []
     }
   ]
 }
