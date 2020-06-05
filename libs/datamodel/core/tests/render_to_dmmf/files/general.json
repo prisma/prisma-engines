@@ -114,7 +114,8 @@
       ],
       "isGenerated": false,
       "idFields": [],
-      "uniqueFields": []
+      "uniqueFields": [],
+      "uniqueIndexes": []
     },
     {
       "name": "Profile",
@@ -184,7 +185,8 @@
       ],
       "isGenerated": false,
       "idFields": [],
-      "uniqueFields": []
+      "uniqueFields": [],
+      "uniqueIndexes": []
     },
     {
       "name": "Post",
@@ -240,6 +242,7 @@
           "isReadOnly": false,
           "type": "String",
           "hasDefaultValue": true,
+          "default": "Default-Title",
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -253,6 +256,7 @@
           "isReadOnly": false,
           "type": "Boolean",
           "hasDefaultValue": true,
+          "default": false,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -266,6 +270,7 @@
           "isReadOnly": false,
           "type": "Boolean",
           "hasDefaultValue": true,
+          "default": false,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -326,7 +331,8 @@
         "title",
         "createdAt"
       ],
-      "uniqueFields": []
+      "uniqueFields": [],
+      "uniqueIndexes": []
     },
     {
       "name": "Category",
@@ -392,7 +398,8 @@
       ],
       "isGenerated": false,
       "idFields": [],
-      "uniqueFields": []
+      "uniqueFields": [],
+      "uniqueIndexes": []
     },
     {
       "name": "PostToCategory",
@@ -498,7 +505,11 @@
       ],
       "isGenerated": false,
       "idFields": [],
-      "uniqueFields": []
+      "uniqueFields": [["postTitle", "categoryId"]],
+      "uniqueIndexes": [{
+        "name": "MyUniqueIndex",
+        "fields": ["postTitle", "categoryId"]
+      }]
     },
     {
       "name": "A",
@@ -555,7 +566,8 @@
       ],
       "isGenerated": false,
       "idFields": [],
-      "uniqueFields": []
+      "uniqueFields": [],
+      "uniqueIndexes": []
     },
     {
       "name": "B",
@@ -595,7 +607,8 @@
       ],
       "isGenerated": false,
       "idFields": [],
-      "uniqueFields": []
+      "uniqueFields": [],
+      "uniqueIndexes": []
     }
   ]
 }

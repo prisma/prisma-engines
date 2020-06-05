@@ -50,6 +50,7 @@ model PostToCategory {
   post          Post     @relation(fields: [postTitle, postCreatedAt], references: [title, createdAt])
   category      Category @relation(fields: [categoryId], references: [id])
 
+  @@unique([postTitle, categoryId], name: "MyUniqueIndex")
   @@map("post_to_category")
 }
 
