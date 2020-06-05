@@ -1424,7 +1424,6 @@ dependencies = [
  "migration-core",
  "quaint",
  "serde_json",
- "sql-migration-connector",
  "structopt",
  "tempfile",
  "test-setup",
@@ -2704,6 +2703,7 @@ dependencies = [
  "barrel",
  "chrono",
  "datamodel",
+ "futures 0.3.5",
  "migration-connector",
  "once_cell",
  "prisma-models",
@@ -2718,6 +2718,7 @@ dependencies = [
  "tracing",
  "tracing-error",
  "tracing-futures",
+ "url 2.1.1",
  "user-facing-errors",
 ]
 

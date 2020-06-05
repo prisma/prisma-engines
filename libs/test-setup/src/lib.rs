@@ -344,7 +344,7 @@ fn fetch_db_name<'a>(url: &'a Url, default: &'static str) -> &'a str {
 
 pub async fn create_mysql_database(original_url: &Url) -> Result<Quaint, AnyError> {
     let mut url = original_url.clone();
-    url.set_path("");
+    url.set_path("/mysql");
 
     let db_name = fetch_db_name(&original_url, "mysql");
     debug_assert!(!db_name.is_empty());

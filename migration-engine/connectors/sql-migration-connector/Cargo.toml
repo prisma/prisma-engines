@@ -25,3 +25,5 @@ tracing = "0.1.10"
 tracing-futures = "0.2.0"
 user-facing-errors = { path = "../../../libs/user-facing-errors", features = ["sql"] }
 tracing-error = "0.1.2"
+url = "2.1.1"
+futures = "0.3.5"
