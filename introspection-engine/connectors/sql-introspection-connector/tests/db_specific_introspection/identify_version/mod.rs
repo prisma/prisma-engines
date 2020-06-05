@@ -269,3 +269,24 @@ async fn introspect_mysql_prisma2(api: &TestApi) {
     let result = dbg!(api.introspect_version().await);
     assert_eq!(result, Version::Prisma2);
 }
+
+#[test_each_connector(tags("mysql"))]
+async fn introspect_mysql_with_false_migration_table(api: &TestApi) {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("_Migration", |t| {
+                t.add_column("name", types::primary());
+                t.add_column("revision", types::text());
+                t.add_column("datamodel", types::text());
+                t.add_column("status", types::text());
+                t.add_column("applied", types::text());
+            });
+            migration.create_table("Book", |t| {
+                t.add_column("id", types::primary());
+            });
+        })
+        .await;
+
+    let result = dbg!(api.introspect_version().await);
+    assert_eq!(result, Version::NonPrisma);
+}

@@ -22,7 +22,6 @@ pub struct VersionChecker {
 
 // More ideas for tightening
 // P1/P11 were not using db level default values
-// P2 does not have a relay table
 
 const CHAR: &str = "char";
 const CHAR_25: &str = "char(25)";
@@ -122,7 +121,6 @@ impl VersionChecker {
                 if columns.len() == 1 {
                     let tpe = &table.column_bang(columns.first().unwrap()).tpe;
 
-                    dbg!(tpe);
                     match (
                         &tpe.data_type,
                         &tpe.full_data_type,
@@ -143,18 +141,6 @@ impl VersionChecker {
     }
 
     pub fn version(&self, warnings: &Vec<Warning>) -> Version {
-        dbg!(self.sql_family);
-        dbg!(self.has_migration_table);
-        dbg!(self.has_relay_table);
-        dbg!(self.uses_on_delete);
-        dbg!(self.uses_non_prisma_types);
-        dbg!(self.always_has_created_at_updated_at);
-        dbg!(self.always_has_p1_compatible_id);
-        dbg!(self.has_prisma_1_1_or_2_join_table);
-        dbg!(self.has_prisma_1_join_table);
-        dbg!(self.has_inline_relations);
-        dbg!(warnings);
-
         match self.sql_family {
             SqlFamily::Sqlite
                 if self.has_migration_table
@@ -190,7 +176,7 @@ impl VersionChecker {
             }
             SqlFamily::Mysql
                 if !self.has_migration_table
-                    && self.has_relay_table
+                    && !self.has_relay_table
                     && !self.uses_on_delete
                     && !self.uses_non_prisma_types
                     && self.always_has_p1_compatible_id
@@ -215,7 +201,7 @@ impl VersionChecker {
                     && !self.uses_on_delete
                     && !self.uses_non_prisma_types
                     && self.always_has_created_at_updated_at
-                    && !self.has_prisma_1_join_table
+                    && !self.has_prisma_1_1_or_2_join_table
                     && !self.has_inline_relations
                     && self.always_has_p1_compatible_id
                     && warnings.is_empty() =>
@@ -224,10 +210,10 @@ impl VersionChecker {
             }
             SqlFamily::Postgres
                 if !self.has_migration_table
-                    && self.has_relay_table
+                    && !self.has_relay_table
                     && !self.uses_on_delete
                     && !self.uses_non_prisma_types
-                    && !self.has_prisma_1_1_or_2_join_table
+                    && !self.has_prisma_1_join_table
                     && self.always_has_p1_compatible_id
                     && warnings.is_empty() =>
             {
