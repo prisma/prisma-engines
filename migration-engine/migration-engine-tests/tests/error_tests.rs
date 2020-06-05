@@ -260,7 +260,6 @@ async fn bad_datasource_url_and_provider_combinations_must_return_a_proper_error
 async fn connections_to_system_databases_must_be_rejected(_api: &TestApi) -> TestResult {
     let names = &["", "mysql", "sys", "performance_schema"];
     for name in names {
-        dbg!(name);
         let dm = format!(
             r#"
                 datasource db {{
