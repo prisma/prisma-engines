@@ -61,7 +61,7 @@ pub fn calculate_datamodel(schema: &SqlSchema, family: &SqlFamily) -> SqlIntrosp
         }
 
         version_check.always_has_created_at_updated_at(table, &model);
-        version_check.always_has_singular_id(table, &model);
+        version_check.has_p1_compatible_primary_key_column(table);
 
         data_model.add_model(model);
     }
