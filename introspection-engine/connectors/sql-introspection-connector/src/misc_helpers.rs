@@ -8,9 +8,19 @@ use sql_schema_describer::{
 use tracing::debug;
 
 //checks
-
 pub fn is_migration_table(table: &Table) -> bool {
     table.name == "_Migration"
+        && table.columns.iter().any(|c| c.name.as_str() == "revision")
+        && table.columns.iter().any(|c| c.name.as_str() == "name")
+        && table.columns.iter().any(|c| c.name.as_str() == "datamodel")
+        && table.columns.iter().any(|c| c.name.as_str() == "status")
+        && table.columns.iter().any(|c| c.name.as_str() == "applied")
+        && table.columns.iter().any(|c| c.name.as_str() == "rolled_back")
+        && table.columns.iter().any(|c| c.name.as_str() == "datamodel_steps")
+        && table.columns.iter().any(|c| c.name.as_str() == "database_migration")
+        && table.columns.iter().any(|c| c.name.as_str() == "errors")
+        && table.columns.iter().any(|c| c.name.as_str() == "started_at")
+        && table.columns.iter().any(|c| c.name.as_str() == "finished_at")
 }
 
 pub(crate) fn is_relay_table(table: &Table) -> bool {

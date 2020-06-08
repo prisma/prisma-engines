@@ -4,10 +4,11 @@ use introspection_connector::{Version, Warning};
 use quaint::connector::SqlFamily;
 use sql_schema_describer::SqlSchema;
 
+const CHAR: &str = "char";
 const VARCHAR: &str = "varchar";
 const CHARACTER_VARYING: &str = "character varying";
-const VARCHAR_25: &str = "varchar(25)";
-const VARCHAR_36: &str = "varchar(36)";
+const CHAR_25: &str = "char(25)";
+const CHAR_36: &str = "char(36)";
 
 pub fn add_prisma_1_id_defaults(
     family: &SqlFamily,
@@ -20,7 +21,7 @@ pub fn add_prisma_1_id_defaults(
 
     match version {
         Version::Prisma1 | Version::Prisma11 => {
-            for model in &data_model.models {
+            for model in data_model.models.iter().filter(|m| m.has_single_id_field()) {
                 let id_field = model.fields.iter().find(|f| f.is_id).unwrap();
                 let table_name = model.database_name.as_ref().unwrap_or(&model.name);
                 let table = schema.table(table_name).unwrap();
@@ -44,10 +45,10 @@ pub fn add_prisma_1_id_defaults(
                     (dt, fdt, Some(36), SqlFamily::Postgres) if dt == CHARACTER_VARYING && fdt == VARCHAR => {
                         needs_to_be_changed.push((model_and_field, false))
                     }
-                    (dt, fdt, Some(25), SqlFamily::Mysql) if dt == VARCHAR && fdt == VARCHAR_25 => {
+                    (dt, fdt, Some(25), SqlFamily::Mysql) if dt == CHAR && fdt == CHAR_25 => {
                         needs_to_be_changed.push((model_and_field, true))
                     }
-                    (dt, fdt, Some(36), SqlFamily::Mysql) if dt == VARCHAR && fdt == VARCHAR_36 => {
+                    (dt, fdt, Some(36), SqlFamily::Mysql) if dt == CHAR && fdt == CHAR_36 => {
                         needs_to_be_changed.push((model_and_field, false))
                     }
                     _ => (),

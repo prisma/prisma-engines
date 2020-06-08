@@ -1,6 +1,8 @@
 use super::*;
 use crate::common::ScalarType;
 use crate::{dml, IndexType};
+use prisma_value::PrismaValue;
+use rust_decimal::prelude::ToPrimitive;
 use serde_json;
 
 pub fn render_to_dmmf(schema: &dml::Datamodel) -> String {
@@ -72,6 +74,20 @@ fn model_to_dmmf(model: &dml::Model) -> Model {
                 }
             })
             .collect(),
+        unique_indexes: model
+            .indices
+            .iter()
+            .filter_map(|i| {
+                if i.tpe == IndexType::Unique {
+                    Some(UniqueIndex {
+                        name: i.name.clone(),
+                        fields: i.fields.clone(),
+                    })
+                } else {
+                    None
+                }
+            })
+            .collect(),
     }
 }
 
@@ -88,6 +104,7 @@ fn field_to_dmmf(model: &dml::Model, field: &dml::Field) -> Field {
         is_id: field.is_id,
         is_read_only: a_relation_field_is_based_on_this_field,
         has_default_value: field.default_value.is_some(),
+        default: default_value_to_serde(&field.default_value),
         is_unique: field.is_unique,
         relation_name: get_relation_name(field),
         relation_from_fields: get_relation_from_fields(field),
@@ -107,6 +124,41 @@ fn get_field_kind(field: &dml::Field) -> String {
         dml::FieldType::Base(_, _) => String::from("scalar"),
         _ => unimplemented!("DMMF does not support field type {:?}", field.field_type),
     }
+}
+
+fn default_value_to_serde(dv_opt: &Option<dml::DefaultValue>) -> Option<serde_json::Value> {
+    dv_opt.as_ref().map(|dv| match dv {
+        dml::DefaultValue::Single(value) => prisma_value_to_serde(&value.clone()),
+        dml::DefaultValue::Expression(vg) => function_to_serde(&vg.name, &vg.args),
+    })
+}
+
+fn prisma_value_to_serde(value: &PrismaValue) -> serde_json::Value {
+    match value {
+        PrismaValue::Boolean(val) => serde_json::Value::Bool(*val),
+        PrismaValue::String(val) => serde_json::Value::String(val.clone()),
+        PrismaValue::Enum(val) => serde_json::Value::String(val.clone()),
+        PrismaValue::Float(val) => {
+            serde_json::Value::Number(serde_json::Number::from_f64(val.to_f64().unwrap()).unwrap())
+        }
+        PrismaValue::Int(val) => serde_json::Value::Number(serde_json::Number::from_f64(*val as f64).unwrap()),
+        PrismaValue::DateTime(val) => serde_json::Value::String(val.to_rfc3339()),
+        PrismaValue::Null => serde_json::Value::Null,
+        PrismaValue::Uuid(val) => serde_json::Value::String(val.to_string()),
+        PrismaValue::Json(val) => serde_json::Value::String(val.to_string()),
+        PrismaValue::List(value_vec) => {
+            serde_json::Value::Array(value_vec.iter().map(|pv| prisma_value_to_serde(pv)).collect())
+        }
+    }
+}
+
+fn function_to_serde(name: &str, args: &Vec<PrismaValue>) -> serde_json::Value {
+    let func = Function {
+        name: String::from(name),
+        args: args.iter().map(|arg| prisma_value_to_serde(arg)).collect(),
+    };
+
+    serde_json::to_value(&func).expect("Failed to render function JSON")
 }
 
 fn get_field_type(field: &dml::Field) -> String {

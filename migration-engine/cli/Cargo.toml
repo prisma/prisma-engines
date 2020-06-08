@@ -9,29 +9,28 @@ edition = "2018"
 [dependencies]
 migration-connector = { path = "../connectors/migration-connector" }
 migration-core = { path = "../core" }
-sql-migration-connector = { path = "../connectors/sql-migration-connector", optional = true }
 user-facing-errors = { path = "../../libs/user-facing-errors" }
 
 anyhow = "1.0.26"
 futures = "0.3"
 json-rpc-stdio = { path = "../../libs/json-rpc-stdio" }
-quaint = { git = "https://github.com/prisma/quaint", optional = true }
 serde_json = "1.0"
 structopt = "0.3.8"
 thiserror = "1.0.9"
 tokio = { version = "=0.2.13", features = ["macros"] }
 tracing = "0.1"
 tracing-subscriber = "0.2"
-url = "2.1.1"
 tracing-error = "0.1.2"
 
 [dev-dependencies]
+quaint = { git = "https://github.com/prisma/quaint" }
 tempfile = "3.1.0"
 test-setup = { path = "../../libs/test-setup" }
+url = "2.1.1"
 
 [features]
 default = ["sql"]
-sql = ["quaint", "sql-migration-connector", "migration-core/sql"]
+sql = ["migration-core/sql"]
 
 [[bin]]
 name = "migration-engine"

@@ -12,7 +12,8 @@ trait SchemaBaseV11 extends PlayJsonExtensions {
                         @@id([id_1, id_2])"""
   val noId = ""
 
-  val idOptions = Vector(simpleId, compoundId, noId)
+  val simpleIdOptions = Vector(simpleId)
+  val fullIdOptions   = simpleIdOptions ++ Vector(compoundId, noId)
 
   // FIXME: this must go
   val idReference = "@relation(references: [id])"
@@ -200,7 +201,14 @@ trait SchemaBaseV11 extends PlayJsonExtensions {
       }
     )
 
-    val simple = sys.env.getOrElse("TEST_MODE", "simple") == "simple"
+    val simple = EnvVars.testMode == "simple"
+
+    // we only support singular id fields with implicit many to many relations. https://github.com/prisma/prisma/issues/2262
+    val idOptions = if (onParent.isList && onChild.isList) {
+      simpleIdOptions
+    } else {
+      fullIdOptions
+    }
 
     val datamodelsWithParams = for (parentId <- idOptions;
                                     childId <- idOptions;

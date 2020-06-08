@@ -64,9 +64,10 @@ impl fmt::Display for IntrospectionResultOutput {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
-            "{{\"datamodel\": \"{}\", \"warnings\": {}}}",
+            "{{\"datamodel\": \"{}\", \"warnings\": {}, \"version\": \"{}\"}}",
             self.datamodel,
-            serde_json::to_string(&self.warnings).unwrap()
+            serde_json::to_string(&self.warnings).unwrap(),
+            serde_json::to_string(&self.version).unwrap(),
         )
     }
 }

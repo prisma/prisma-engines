@@ -63,7 +63,7 @@ pub struct PrismaOpt {
     /// Switches query schema generation to Prisma 1 compatible mode.
     #[structopt(long, short)]
     pub legacy: bool,
-    /// Enables raw SQL queries with executeRaw mutation
+    /// Enables raw SQL queries with executeRaw/queryRaw mutation
     #[structopt(long, short = "r")]
     pub enable_raw_queries: bool,
     /// Enables the GraphQL playground

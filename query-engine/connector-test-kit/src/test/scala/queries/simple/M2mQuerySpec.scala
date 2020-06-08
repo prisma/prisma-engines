@@ -9,16 +9,14 @@ class M2mQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
 
   val project: Project = ProjectDsl.fromString { """
                                                    |model Blog {
-                                                   |  slug       String
+                                                   |  slug       String @id
                                                    |  title      String
                                                    |  content    String
                                                    |  categories Category[]
-                                                   |
-                                                   |  @@id([slug, title])
                                                    |}
                                                    |
                                                    |model Category {
-                                                   |  name  String @unique
+                                                   |  name  String @id
                                                    |  blogs Blog[]
                                                    |}
                                                    """.stripMargin }
