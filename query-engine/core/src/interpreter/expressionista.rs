@@ -244,7 +244,6 @@ impl Expressionista {
             .map(|(_, node)| Self::build_expression(graph, &node, graph.incoming_edges(&node)))
             .collect::<InterpretationResult<Vec<_>>>()?;
 
-        // Gamble: Assume that all other dependents can be built now.
         let child_expressions = Self::process_children(graph, if_node_info.other)?;
 
         let node_id = node.id();

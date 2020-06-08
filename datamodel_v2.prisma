@@ -4,12 +4,16 @@ datasource chinook {
 }
 
 model ModelA {
-  id   String @id @default(cuid())
-  //c_id String
+  id   String  @id @default(cuid())
+  c_id String
+  e_id String?
+  f_id String
 
   manyB ModelB[] // M:N
-  //oneC  ModelC @relation(fields: [c_id], references: [id]) // 1:1
+  oneC  ModelC @relation(fields: [c_id], references: [id]) // 1!:1!
   manyD ModelD[] // M:1
+  oneE  ModelE? @relation(fields: [e_id], references: [id]) // 1:1!
+  oneF  ModelF  @relation(fields: [f_id], references: [id]) // 1!:1
 }
 
 model ModelB {
@@ -20,7 +24,7 @@ model ModelB {
 
 model ModelC {
   id   String @id @default(cuid())
-  //oneA ModelA
+  oneA ModelA // 1!:1!
 }
 
 model ModelD {
@@ -28,4 +32,14 @@ model ModelD {
   a_id String
 
   OneA ModelA @relation(fields: [a_id], references: [id])
+}
+
+model ModelE {
+  id   String @id @default(cuid())
+  OneA ModelA
+}
+
+model ModelF {
+  id   String @id @default(cuid())
+  OneA ModelA?
 }
