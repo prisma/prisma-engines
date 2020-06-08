@@ -166,6 +166,37 @@ async fn introspecting_a_table_with_enum_default_values_should_work(api: &TestAp
 }
 
 #[test_each_connector(tags("postgres"))]
+async fn introspecting_a_table_with_enum_default_values_should_work_2(api: &TestApi) {
+    let sql = format!("CREATE Type color as ENUM ('black', 'white')");
+
+    api.database().execute_raw(&sql, &[]).await.unwrap();
+
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("Book", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom("color color Not Null default 'black'::\"color\"");
+            });
+        })
+        .await;
+
+    let dm = r#"
+        model Book {
+            color   color   @default(black)
+            id      Int     @default(autoincrement()) @id
+        }
+
+        enum color{
+            black
+            white
+        }
+    "#;
+
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+}
+
+#[test_each_connector(tags("postgres"))]
 async fn introspecting_a_table_with_enum_default_values_that_look_like_booleans_should_work(api: &TestApi) {
     let sql = format!("CREATE Type Truth as ENUM ( 'true', 'false', 'rumor')");
 
