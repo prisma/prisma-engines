@@ -182,7 +182,6 @@ fn must_add_to_fields_correctly_for_one_to_one_relations() {
 }
 
 #[test]
-#[ignore]
 fn must_add_to_fields_on_both_sides_for_many_to_many_relations() {
     let dml = r#"
     model User {

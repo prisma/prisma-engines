@@ -1,8 +1,6 @@
 use crate::*;
 use test_harness::*;
 
-//todo validate warnings
-
 #[test_each_connector(tags("postgres"))]
 async fn add_cuid_default_for_postgres(api: &TestApi) {
     api.barrel()
@@ -18,6 +16,7 @@ async fn add_cuid_default_for_postgres(api: &TestApi) {
                 id  String @default(cuid()) @id
             }
         "#;
+
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 
@@ -81,6 +80,7 @@ async fn add_uuid_default_for_mysql(api: &TestApi) {
             model Book {
                 id  String @default(uuid()) @id
             }
+            
         "#;
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);

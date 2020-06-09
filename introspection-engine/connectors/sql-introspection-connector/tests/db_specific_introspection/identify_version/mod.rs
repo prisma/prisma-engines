@@ -3,9 +3,6 @@ use barrel::types;
 use introspection_connector::Version;
 use test_harness::*;
 
-//todo adjust tests for added types
-//todo adjust tests for new singular id rule for p1
-
 //Sqlite
 #[test_each_connector(tags("sqlite"))]
 async fn introspect_sqlite_non_prisma(api: &TestApi) {
@@ -26,7 +23,17 @@ async fn introspect_sqlite_non_prisma_due_to_types(api: &TestApi) {
     api.barrel()
         .execute(|migration| {
             migration.create_table("_Migration", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("name", types::primary());
+                t.add_column("revision", types::text());
+                t.add_column("datamodel", types::text());
+                t.add_column("status", types::text());
+                t.add_column("applied", types::text());
+                t.add_column("rolled_back", types::text());
+                t.add_column("datamodel_steps", types::text());
+                t.add_column("database_migration", types::text());
+                t.add_column("errors", types::text());
+                t.add_column("started_at", types::text());
+                t.add_column("finished_at", types::text());
             });
             migration.create_table("Book", |t| {
                 t.add_column("id", types::primary());
@@ -44,7 +51,17 @@ async fn introspect_sqlite_prisma2(api: &TestApi) {
     api.barrel()
         .execute(|migration| {
             migration.create_table("_Migration", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("name", types::primary());
+                t.add_column("revision", types::text());
+                t.add_column("datamodel", types::text());
+                t.add_column("status", types::text());
+                t.add_column("applied", types::text());
+                t.add_column("rolled_back", types::text());
+                t.add_column("datamodel_steps", types::text());
+                t.add_column("database_migration", types::text());
+                t.add_column("errors", types::text());
+                t.add_column("started_at", types::text());
+                t.add_column("finished_at", types::text());
             });
             migration.create_table("Book", |t| {
                 t.add_column("id", types::primary());
@@ -78,7 +95,7 @@ async fn introspect_postgres_prisma_1(api: &TestApi) {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Book", |t| {
-                t.add_column("id", types::primary());
+                t.inject_custom("id character varying(25) Not Null Primary Key");
                 t.inject_custom("createdAt timestamp(3)");
                 t.inject_custom("updatedAt timestamp(3)");
                 t.inject_custom("string text");
@@ -87,15 +104,15 @@ async fn introspect_postgres_prisma_1(api: &TestApi) {
                 t.inject_custom("boolean boolean");
             });
             migration.create_table("_RelayId", |t| {
-                t.add_column("id", types::primary());
-                t.inject_custom("stableModelIdentifier   Integer");
+                t.inject_custom("id character varying(25) Primary Key ");
+                t.inject_custom("stableModelIdentifier character varying(25) Not Null");
             });
 
             migration.create_table("Book_tags", |t| {
-                t.add_column("nodeid", types::primary());
-                t.add_column("position", types::integer());
-                t.add_column("value", types::integer());
-                t.inject_custom("FOREIGN KEY (\"nodeid\") REFERENCES \"Book\"(\"id\")");
+                t.inject_custom("nodeid character varying(25) references \"Book\"(\"id\")");
+                t.inject_custom("position integer");
+                t.inject_custom("value integer NOT NULL");
+                t.inject_custom("CONSTRAINT \"BookTags_list_pkey\" PRIMARY KEY (\"nodeid\", \"position\")");
             });
         })
         .await;
@@ -109,7 +126,7 @@ async fn introspect_postgres_prisma_1_1(api: &TestApi) {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Book", |t| {
-                t.add_column("id", types::primary());
+                t.inject_custom("id character varying(36) Not Null Primary Key");
                 t.inject_custom("date timestamp(3)");
                 t.inject_custom("string text");
                 t.inject_custom("int Integer");
@@ -118,15 +135,9 @@ async fn introspect_postgres_prisma_1_1(api: &TestApi) {
             });
 
             migration.create_table("Page", |t| {
-                t.add_column("id", types::primary());
+                t.inject_custom("id character varying(36) Not Null Primary Key");
                 t.inject_custom("string text");
-                t.add_column("bookid", types::integer());
-                t.inject_custom("FOREIGN KEY (\"bookid\") REFERENCES \"Book\"(\"id\")");
-            });
-
-            migration.create_table("_RelayId", |t| {
-                t.add_column("id", types::primary());
-                t.inject_custom("stableModelIdentifier   Integer");
+                t.inject_custom("bookid character varying(36) REFERENCES \"Book\"(\"id\")");
             });
         })
         .await;
@@ -140,7 +151,17 @@ async fn introspect_postgres_prisma2(api: &TestApi) {
     api.barrel()
         .execute(|migration| {
             migration.create_table("_Migration", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("name", types::primary());
+                t.add_column("revision", types::text());
+                t.add_column("datamodel", types::text());
+                t.add_column("status", types::text());
+                t.add_column("applied", types::text());
+                t.add_column("rolled_back", types::text());
+                t.add_column("datamodel_steps", types::text());
+                t.add_column("database_migration", types::text());
+                t.add_column("errors", types::text());
+                t.add_column("started_at", types::text());
+                t.add_column("finished_at", types::text());
             });
             migration.create_table("Book", |t| {
                 t.add_column("id", types::primary());
@@ -174,7 +195,7 @@ async fn introspect_mysql_prisma_1(api: &TestApi) {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Book", |t| {
-                t.add_column("id", types::primary());
+                t.inject_custom("id char(25) Not Null Primary Key");
                 t.inject_custom("createdAt datetime(3)");
                 t.inject_custom("updatedAt datetime(3)");
                 t.inject_custom("string_column text");
@@ -183,8 +204,8 @@ async fn introspect_mysql_prisma_1(api: &TestApi) {
                 t.inject_custom("boolean_column boolean");
             });
             migration.create_table("_RelayId", |t| {
-                t.add_column("id", types::primary());
-                t.inject_custom("stableModelIdentifier   int");
+                t.inject_custom("id char(25) Not Null Primary Key");
+                t.inject_custom("stableModelIdentifier   char(25)");
             });
         })
         .await;
@@ -198,16 +219,12 @@ async fn introspect_mysql_prisma_1_1(api: &TestApi) {
     api.barrel()
         .execute(|migration| {
             migration.create_table("Book", |t| {
-                t.add_column("id", types::primary());
+                t.inject_custom("id char(36) Not Null Primary Key");
                 t.inject_custom("datetime_column datetime(3)");
                 t.inject_custom("string_column text");
                 t.inject_custom("integer_column int");
                 t.inject_custom("float_column Decimal(65,30)");
                 t.inject_custom("boolean_column boolean");
-            });
-            migration.create_table("_RelayId", |t| {
-                t.add_column("id", types::primary());
-                t.inject_custom("stableModelIdentifier   int");
             });
         })
         .await;
@@ -221,7 +238,17 @@ async fn introspect_mysql_prisma2(api: &TestApi) {
     api.barrel()
         .execute(|migration| {
             migration.create_table("_Migration", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("name", types::primary());
+                t.add_column("revision", types::text());
+                t.add_column("datamodel", types::text());
+                t.add_column("status", types::text());
+                t.add_column("applied", types::text());
+                t.add_column("rolled_back", types::text());
+                t.add_column("datamodel_steps", types::text());
+                t.add_column("database_migration", types::text());
+                t.add_column("errors", types::text());
+                t.add_column("started_at", types::text());
+                t.add_column("finished_at", types::text());
             });
             migration.create_table("Book", |t| {
                 t.add_column("id", types::primary());

@@ -19,4 +19,5 @@ object EnvVars {
   val prismaBinaryPath          = s"$binaryDirectory/query-engine"
   val migrationEngineBinaryPath = s"$binaryDirectory/migration-engine"
   val isBuildkite               = sys.env.get("IS_BUILDKITE").isDefined
+  val testMode                  = sys.env.getOrElse("TEST_MODE", "simple")
 }

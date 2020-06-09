@@ -2,9 +2,3 @@ datasource pg1 {
   provider = "postgresql"
   url      = "postgresql://"
 }
-
-model Author {
-  id        Int      @id
-  name      String?
-  createdAt DateTime @default(now())
-}

@@ -492,15 +492,44 @@ impl<'a> Validator<'a> {
                         })
                         .is_some();
 
+                    let references_singular_id_field = if rel_info.to_fields.len() == 1 {
+                        let field_name = rel_info.to_fields.first().unwrap();
+                        // the unwrap is safe. We error out earlier if an unknown field is referenced.
+                        let referenced_field = related_model.find_field(&field_name).unwrap();
+                        referenced_field.is_id
+                    } else {
+                        false
+                    };
+                    let is_many_to_many = {
+                        // Back relation fields have not been added yet. So we must calculate this on our own.
+                        match related_model.related_field(&model.name, &rel_info.name, &field.name) {
+                            Some(related_field) => field.arity.is_list() && related_field.arity.is_list(),
+                            None => false,
+                        }
+                    };
+
                     let must_reference_unique_criteria = match self.source {
                         Some(source) => !source.connector().supports_relations_over_non_unique_criteria(),
                         None => true,
                     };
+
                     if !references_unique_criteria && must_reference_unique_criteria {
                         errors.push(DatamodelError::new_validation_error(
                             &format!("The argument `references` must refer to a unique criteria in the related model `{}`. But it is referencing the following fields that are not a unique criteria: {}",
                                      &related_model.name,
                                      rel_info.to_fields.join(", ")),
+                            ast_field.span.clone())
+                        );
+                    }
+
+                    // TODO: This error is only valid for connectors that don't support native many to manys.
+                    if is_many_to_many && !references_singular_id_field {
+                        errors.push(DatamodelError::new_validation_error(
+                            &format!(
+                                "Many to many relations must always reference the id field of the related model. Change the argument `references` to use the id field of the related model `{}`. But it is referencing the following fields that are not the id: {}",
+                                &related_model.name,
+                                rel_info.to_fields.join(", ")
+                            ),
                             ast_field.span.clone())
                         );
                     }
@@ -678,6 +707,23 @@ impl<'a> Validator<'a> {
                                 field_span.clone(),
                             ));
                         }
+                    }
+                }
+
+                // MANY TO MANY
+                if field.arity.is_list() && related_field.arity.is_list() {
+                    if !related_model.has_single_id_field() {
+                        errors.push(DatamodelError::new_field_validation_error(
+                            &format!(
+                                "The relation field `{}` on Model `{}` references `{}` which does not have an `@id` field. Models without `@id` can not be part of a many to many relation. Use an explicit intermediate Model to represent this relationship.",
+                                &field.name,
+                                &model.name,
+                                &related_model.name,
+                            ),
+                            &model.name,
+                            &field.name,
+                            field_span.clone(),
+                        ));
                     }
                 }
             }

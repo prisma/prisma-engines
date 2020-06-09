@@ -37,7 +37,8 @@
       "isGenerated": false,
       "documentation": "My author model.",
       "idFields": [],
-      "uniqueFields": []
+      "uniqueFields": [],
+      "uniqueIndexes": []
     }
   ]
 }

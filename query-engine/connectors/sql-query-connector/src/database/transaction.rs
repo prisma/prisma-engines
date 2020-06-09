@@ -126,8 +126,13 @@ impl<'tx> WriteOperations for SqlConnectorTransaction<'tx> {
             .await
     }
 
-    async fn execute_raw(&self, query: String, parameters: Vec<PrismaValue>) -> connector::Result<serde_json::Value> {
+    async fn execute_raw(&self, query: String, parameters: Vec<PrismaValue>) -> connector::Result<usize> {
         self.catch(async move { write::execute_raw(&self.inner, query, parameters).await })
+            .await
+    }
+
+    async fn query_raw(&self, query: String, parameters: Vec<PrismaValue>) -> connector::Result<serde_json::Value> {
+        self.catch(async move { write::query_raw(&self.inner, query, parameters).await })
             .await
     }
 }
