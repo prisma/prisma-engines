@@ -44,7 +44,7 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
              |      create: {c: "c2", c_1: "c", c_2: "2"}
              |    }
              |  }){
-             |  ${t.parent.selection}
+             |    ${t.parent.selection}
              |  }
              |}""",
             project
