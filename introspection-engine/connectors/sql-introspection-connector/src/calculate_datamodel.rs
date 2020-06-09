@@ -29,7 +29,7 @@ pub fn calculate_datamodel(schema: &SqlSchema, family: &SqlFamily) -> SqlIntrosp
         let mut model = Model::new(table.name.clone(), None);
 
         for column in &table.columns {
-            version_check.uses_non_prisma_type(&column.tpe);
+            version_check.check_colum_for_type_and_default_value(&column);
             let field = calculate_scalar_field(&table, &column);
             model.add_field(field);
         }
