@@ -233,6 +233,7 @@ impl QueryGraph {
 
     pub fn mark_visited(&mut self, node: &NodeRef) {
         if !self.visited.contains(&node.node_ix) {
+            trace!("Visited: {}", node.id());
             self.visited.push(node.node_ix);
         }
     }

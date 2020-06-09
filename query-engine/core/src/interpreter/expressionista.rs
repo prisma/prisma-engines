@@ -46,11 +46,11 @@ impl Expressionista {
         node: &NodeRef,
         parent_edges: Vec<EdgeRef>,
     ) -> InterpretationResult<Expression> {
+        graph.mark_visited(&node);
+
         // Child edges are ordered, evaluation order is low to high in the graph, unless other rules override.
         let direct_children = graph.direct_child_pairs(&node);
         let mut child_expressions = Self::process_children(graph, direct_children)?;
-
-        graph.mark_visited(&node);
 
         let is_result = graph.is_result_node(&node);
         let node_id = node.id();
