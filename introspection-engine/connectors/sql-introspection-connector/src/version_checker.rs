@@ -183,7 +183,7 @@ impl VersionChecker {
     }
 
     pub fn version(&self, warnings: &Vec<Warning>) -> Version {
-        debug!(&self);
+        debug!("{:?}", &self);
         match self.sql_family {
             SqlFamily::Sqlite if self.is_prisma_2(warnings) => Version::Prisma2,
             SqlFamily::Sqlite => Version::NonPrisma,
