@@ -256,12 +256,18 @@ impl SqlSchemaDescriber {
                             ColumnTypeFamily::TextSearch => DefaultValue::DBGENERATED(default_string),
                             ColumnTypeFamily::TransactionId => DefaultValue::DBGENERATED(default_string),
                             ColumnTypeFamily::Enum(enum_name) => {
-                                let enum_suffix = format!("::{}", enum_name);
-                                match default_string.ends_with(&enum_suffix) {
-                                    true => DefaultValue::VALUE(PrismaValue::Enum(unquote_string(
-                                        default_string.replace(&enum_suffix, ""),
-                                    ))),
-                                    false => DefaultValue::DBGENERATED(default_string),
+                                let enum_suffix_without_quotes = format!("::{}", enum_name);
+                                let enum_suffix_with_quotes = format!("::\"{}\"", enum_name);
+                                if default_string.ends_with(&enum_suffix_with_quotes) {
+                                    DefaultValue::VALUE(PrismaValue::Enum(unquote_string(
+                                        default_string.replace(&enum_suffix_with_quotes, ""),
+                                    )))
+                                } else if default_string.ends_with(&enum_suffix_without_quotes) {
+                                    DefaultValue::VALUE(PrismaValue::Enum(unquote_string(
+                                        default_string.replace(&enum_suffix_without_quotes, ""),
+                                    )))
+                                } else {
+                                    DefaultValue::DBGENERATED(default_string)
                                 }
                             }
                             ColumnTypeFamily::Unsupported(_) => DefaultValue::DBGENERATED(default_string),
