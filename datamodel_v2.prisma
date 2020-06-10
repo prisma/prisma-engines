@@ -1,45 +1,110 @@
 datasource chinook {
   provider = "sqlite"
-  url      = "file:./db/ConnectOrCreate.db"
+  url      = "file:./db/Chinook.db"
 }
 
-model ModelA {
-  id   String  @id @default(cuid())
-  c_id String
-  e_id String?
-  f_id String
-
-  manyB ModelB[] // M:N
-  oneC  ModelC @relation(fields: [c_id], references: [id]) // 1!:1!
-  manyD ModelD[] // M:1
-  oneE  ModelE? @relation(fields: [e_id], references: [id]) // 1:1!
-  oneF  ModelF  @relation(fields: [f_id], references: [id]) // 1!:1
+model Album {
+  id       Int     @id @map("AlbumId")
+  Title    String  @default("TestDefaultTitle")
+  ArtistId Int
+  Tracks   Track[]
+  Artist   Artist  @relation(fields: [ArtistId], references: [id])
 }
 
-model ModelB {
-  id String @id @default(cuid())
-
-  manyA ModelA[]
+model Track {
+  id           Int           @id @map("TrackId")
+  Name         String
+  Composer     String?
+  Milliseconds Int
+  UnitPrice    Float
+  AlbumId      Int?
+  GenreId      Int?
+  MediaTypeId  Int
+  MediaType    MediaType     @relation(fields: [MediaTypeId], references: [id])
+  Genre        Genre?        @relation(fields: [GenreId], references: [id])
+  Album        Album?        @relation(fields: [AlbumId], references: [id])
+  InvoiceLines InvoiceLine[]
 }
 
-model ModelC {
-  id   String @id @default(cuid())
-  oneA ModelA // 1!:1!
+model MediaType {
+  id    Int     @id @map("MediaTypeId")
+  Name  String?
+  Track Track[]
 }
 
-model ModelD {
-  id   String @id @default(cuid())
-  a_id String
-
-  OneA ModelA @relation(fields: [a_id], references: [id])
+model Genre {
+  id     Int     @id @map("GenreId")
+  Name   String?
+  Tracks Track[]
 }
 
-model ModelE {
-  id   String @id @default(cuid())
-  OneA ModelA
+model Artist {
+  id     Int     @id @map("ArtistId")
+  Name   String?
+  Albums Album[]
 }
 
-model ModelF {
-  id   String @id @default(cuid())
-  OneA ModelA?
+model Customer {
+  id           Int       @id @map("CustomerId")
+  FirstName    String
+  LastName     String
+  Company      String?
+  Address      String?
+  City         String?
+  State        String?
+  Country      String?
+  PostalCode   String?
+  Phone        String?
+  Fax          String?
+  Email        String
+  SupportRepId Int?
+  SupportRep   Employee? @relation(fields: [SupportRepId], references: [id])
+  Invoices     Invoice[]
+}
+
+model Employee {
+  id         Int        @id @map("EmployeeId")
+  FirstName  String
+  LastName   String
+  Title      String?
+  BirthDate  DateTime?
+  HireDate   DateTime?
+  Address    String?
+  City       String?
+  State      String?
+  Country    String?
+  PostalCode String?
+  Phone      String?
+  Fax        String?
+  Email      String?
+  Customers  Customer[]
+}
+
+model Invoice {
+  id                Int           @id @map("InvoiceId")
+  InvoiceDate       DateTime
+  BillingAddress    String?
+  BillingCity       String?
+  BillingState      String?
+  BillingCountry    String?
+  BillingPostalCode String?
+  Total             Float
+  CustomerId        Int
+  Customer          Customer      @relation(fields: [CustomerId], references: [id])
+  Lines             InvoiceLine[]
+}
+
+model InvoiceLine {
+  id        Int     @id @map("InvoiceLineId")
+  UnitPrice Float
+  Quantity  Int
+  InvoiceId Int
+  TrackId   Int
+  Invoice   Invoice @relation(fields: [InvoiceId], references: [id])
+  Track     Track   @relation(fields: [TrackId], references: [id])
+}
+
+model Playlist {
+  id   Int     @id @map("PlaylistId")
+  Name String?
 }
