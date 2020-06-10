@@ -303,7 +303,7 @@ impl Expressionista {
         Self::transform_node(graph, parent_edges, node, into_expr)
     }
 
-    /// Runs transformer functions (e.g. `ParentIdsFn`) via     `Expression::Func` if necessary, or if none present,
+    /// Runs transformer functions (e.g. `ParentIdsFn`) via `Expression::Func` if necessary, or if none present,
     /// builds an expression directly. `into_expr` does the final expression building based on the node coming in.
     fn transform_node(
         graph: &mut QueryGraph,

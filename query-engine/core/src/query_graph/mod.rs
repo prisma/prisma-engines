@@ -598,6 +598,9 @@ impl QueryGraph {
     /// outgoing edges of parent-projection-based transformers, as those hold the `ModelProjection`s
     /// all records of the parent result need to contain in order to satisfy dependencies.
     ///
+    /// If a node needs to be reloaded, ALL edges going out from the reloaded node need to be repointed, not
+    /// only unsatified ones.
+    ///
     /// ## Example
     /// Given a query graph, where 3 children require different set of fields ((A, B), (B, C), (A, D))
     /// to execute their dependent operations:
@@ -643,7 +646,7 @@ impl QueryGraph {
     /// The `Reload` node is always a find many query.
     /// Unwraps are safe because we're operating on the unprocessed state of the graph (`Expressionista` changes that).
     fn insert_reloads(&mut self) -> QueryGraphResult<()> {
-        let reloads: Vec<(NodeRef, ModelRef, Vec<(EdgeRef, ModelProjection)>)> = self
+        let reloads: Vec<(NodeRef, ModelRef, Vec<ModelProjection>)> = self
             .graph
             .node_indices()
             .filter_map(|ix| {
@@ -652,7 +655,7 @@ impl QueryGraph {
                 if let Node::Query(q) = self.node_content(&node).unwrap() {
                     let edges = self.outgoing_edges(&node);
 
-                    let unsatisfied_edges: Vec<_> = edges
+                    let unsatisfied_dependencies: Vec<ModelProjection> = edges
                         .into_iter()
                         .filter_map(|edge| match self.edge_content(&edge).unwrap() {
                             QueryGraphDependency::ParentProjection(ref requested_projection, _)
@@ -663,16 +666,16 @@ impl QueryGraph {
                                     q,
                                     requested_projection.names().collect::<Vec<_>>()
                                 );
-                                Some((edge, requested_projection.clone()))
+                                Some(requested_projection.clone())
                             }
                             _ => None,
                         })
                         .collect();
 
-                    if unsatisfied_edges.is_empty() {
+                    if unsatisfied_dependencies.is_empty() {
                         None
                     } else {
-                        Some((node, q.model(), unsatisfied_edges))
+                        Some((node, q.model(), unsatisfied_dependencies))
                     }
                 } else {
                     None
@@ -680,10 +683,9 @@ impl QueryGraph {
             })
             .collect();
 
-        for (node, model, edges) in reloads {
+        for (node, model, mut identifiers) in reloads {
             // Create reload node and connect it to the `node`.
             let primary_model_id = model.primary_identifier();
-            let (edges, mut identifiers): (Vec<_>, Vec<_>) = edges.into_iter().unzip();
             identifiers.push(primary_model_id.clone());
 
             let read_query = ReadQuery::ManyRecordsQuery(ManyRecordsQuery {
@@ -714,8 +716,8 @@ impl QueryGraph {
                 ),
             )?;
 
-            // Remove unsatisfied edges from node, reattach them to the reload node
-            for edge in edges {
+            // Remove all edges from node to children, reattach them to the reload node
+            for edge in self.outgoing_edges(&node) {
                 let target = self.edge_target(&edge);
                 let content = self.remove_edge(edge).unwrap();
 
