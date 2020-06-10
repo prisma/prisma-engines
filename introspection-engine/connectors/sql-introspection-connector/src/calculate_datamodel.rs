@@ -133,7 +133,7 @@ pub fn calculate_datamodel(schema: &SqlSchema, family: &SqlFamily) -> SqlIntrosp
 
     deduplicate_field_names(&mut data_model);
 
-    let version = version_check.version(&warnings);
+    let version = version_check.version(&warnings, &data_model);
 
     add_prisma_1_id_defaults(family, &version, &mut data_model, schema, &mut warnings);
 

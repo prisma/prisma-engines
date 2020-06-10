@@ -2,7 +2,7 @@ use crate::misc_helpers::{
     is_migration_table, is_prisma_1_or_11_list_table, is_prisma_1_point_0_join_table,
     is_prisma_1_point_1_or_2_join_table, is_relay_table,
 };
-use datamodel::Model;
+use datamodel::{Datamodel, Model};
 use introspection_connector::{Version, Warning};
 use quaint::connector::SqlFamily;
 use sql_schema_describer::{Column, ForeignKey, ForeignKeyAction, PrimaryKey, SqlSchema, Table};
@@ -182,9 +182,10 @@ impl VersionChecker {
             && warnings.is_empty()
     }
 
-    pub fn version(&self, warnings: &Vec<Warning>) -> Version {
+    pub fn version(&self, warnings: &Vec<Warning>, data_model: &Datamodel) -> Version {
         debug!("{:?}", &self);
         match self.sql_family {
+            _ if data_model.enums.is_empty() && data_model.models.is_empty() => Version::NonPrisma,
             SqlFamily::Sqlite if self.is_prisma_2(warnings) => Version::Prisma2,
             SqlFamily::Sqlite => Version::NonPrisma,
             SqlFamily::Mysql if self.is_prisma_2(warnings) => Version::Prisma2,

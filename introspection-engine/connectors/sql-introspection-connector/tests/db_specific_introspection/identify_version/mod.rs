@@ -1,6 +1,7 @@
 use crate::*;
 use barrel::types;
-use introspection_connector::Version;
+use introspection_connector::Version::{NonPrisma, Prisma1, Prisma11};
+use introspection_connector::{IntrospectionConnector, Version};
 use test_harness::*;
 
 //Sqlite
@@ -198,8 +199,8 @@ async fn introspect_mysql_prisma_1(api: &TestApi) {
                 t.inject_custom("id char(25) Not Null Primary Key");
                 t.inject_custom("createdAt datetime(3)");
                 t.inject_custom("updatedAt datetime(3)");
-                t.inject_custom("string_column text");
-                t.inject_custom("integer_column int");
+                t.inject_custom("string_column mediumtext");
+                t.inject_custom("integer_column int(11)");
                 t.inject_custom("float_column Decimal(65,30)");
                 t.inject_custom("boolean_column boolean");
             });
@@ -220,8 +221,8 @@ async fn introspect_mysql_prisma_1_1_if_not_for_default_value(api: &TestApi) {
         .execute(|migration| {
             migration.create_table("Book", |t| {
                 t.inject_custom("id char(25) Not Null Primary Key");
-                t.inject_custom("string_column text");
-                t.inject_custom("integer_column int DEFAULT 5");
+                t.inject_custom("string_column mediumtext");
+                t.inject_custom("integer_column int(11) DEFAULT 5");
                 t.inject_custom("float_column Decimal(65,30)");
                 t.inject_custom("boolean_column boolean");
             });
@@ -239,8 +240,8 @@ async fn introspect_mysql_prisma_1_1(api: &TestApi) {
             migration.create_table("Book", |t| {
                 t.inject_custom("id char(36) Not Null Primary Key");
                 t.inject_custom("datetime_column datetime(3)");
-                t.inject_custom("string_column text");
-                t.inject_custom("integer_column int");
+                t.inject_custom("string_column mediumtext");
+                t.inject_custom("integer_column int(11)");
                 t.inject_custom("float_column Decimal(65,30)");
                 t.inject_custom("boolean_column boolean");
             });
