@@ -189,11 +189,13 @@ where
 ///
 /// We only need to actually update ("disconnect") the existing model if
 /// the relation is also inlined on that models side, so we put that check into the if flow.
+///
+/// Returns a `NodeRef` to the "Read Related" node in the graph illustrated above.
 pub fn insert_existing_1to1_related_model_checks(
     graph: &mut QueryGraph,
     parent_node: &NodeRef,
     parent_relation_field: &RelationFieldRef,
-) -> QueryGraphBuilderResult<()> {
+) -> QueryGraphBuilderResult<NodeRef> {
     let child_model_identifier = parent_relation_field.related_model().primary_identifier();
     let child_linking_fields = parent_relation_field.related_field().linking_fields();
 
@@ -254,7 +256,7 @@ pub fn insert_existing_1to1_related_model_checks(
             Ok(update_existing_child)
          })))?;
 
-    Ok(())
+    Ok(read_existing_children)
 }
 
 /// Inserts checks into the graph that check all required, non-list relations pointing to

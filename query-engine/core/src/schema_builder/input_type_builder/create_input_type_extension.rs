@@ -1,8 +1,49 @@
 use super::*;
 
 pub trait CreateInputTypeBuilderExtension<'a>: InputTypeBuilderBase<'a> {
+    fn nested_connect_or_create_field(&self, field: RelationFieldRef) -> Option<InputField> {
+        self.nested_connect_or_create_input_object(Arc::clone(&field))
+            .map(|input_object| {
+                let input_type = Self::wrap_list_input_object_type(input_object, field.is_list);
+                input_field("connectOrCreate", input_type, None)
+            })
+    }
+
+    /// Builds "<x>CreateOrConnectNestedInput" input object types.
+    fn nested_connect_or_create_input_object(&self, parent_field: RelationFieldRef) -> Option<InputObjectTypeRef> {
+        let related_model = parent_field.related_model();
+
+        let where_object = self.where_unique_object_type(&related_model);
+        let create_object = self.create_input_type(Arc::clone(&related_model), Some(Arc::clone(&parent_field)));
+
+        if where_object.into_arc().is_empty() || create_object.into_arc().is_empty() {
+            return None;
+        }
+
+        let type_name = format!(
+            "{}CreateOrConnectWithout{}Input",
+            related_model.name.clone(),
+            parent_field.model().name
+        );
+
+        match self.get_cache().get(&type_name) {
+            None => {
+                let input_object = Arc::new(init_input_object_type(type_name.clone()));
+                self.cache(type_name, Arc::clone(&input_object));
+
+                let fields = vec![
+                    input_field("where", InputType::object(where_object), None),
+                    input_field("create", InputType::object(create_object), None),
+                ];
+
+                input_object.set_fields(fields);
+                Some(Arc::downgrade(&input_object))
+            }
+            x => x,
+        }
+    }
+
     /// Builds the create input type (<x>CreateInput / <x>CreateWithout<y>Input)
-    #[rustfmt::skip]
     fn create_input_type(&self, model: ModelRef, parent_field: Option<RelationFieldRef>) -> InputObjectTypeRef {
         let name = match parent_field.as_ref().map(|pf| pf.related_field()) {
             Some(ref f) => format!("{}CreateWithout{}Input", model.name, capitalize(f.name.as_str())),
@@ -21,7 +62,7 @@ pub trait CreateInputTypeBuilderExtension<'a>: InputTypeBuilderBase<'a> {
             .fields()
             .scalar_writable()
             .into_iter()
-            .filter(|f|  Self::field_should_be_kept_for_create_input_type(&f))
+            .filter(|f| Self::field_should_be_kept_for_create_input_type(&f))
             .collect();
 
         let mut fields = self.scalar_input_fields(
@@ -29,15 +70,16 @@ pub trait CreateInputTypeBuilderExtension<'a>: InputTypeBuilderBase<'a> {
             "Create",
             scalar_fields,
             |f: ScalarFieldRef| {
-                if f.is_required && f.default_value.is_none() && (f.is_created_at() || f.is_updated_at()) { //todo shouldnt these also be Default Value expressions at some point?
+                if f.is_required && f.default_value.is_none() && (f.is_created_at() || f.is_updated_at()) {
+                    //todo shouldnt these also be Default Value expressions at some point?
                     self.map_optional_input_type(&f)
-                } else if f.is_required && f.default_value.is_none(){
+                } else if f.is_required && f.default_value.is_none() {
                     self.map_required_input_type(&f)
                 } else {
                     self.map_optional_input_type(&f)
                 }
             },
-            true
+            true,
         );
 
         // Compute input fields for relational fields.
@@ -89,7 +131,10 @@ pub trait CreateInputTypeBuilderExtension<'a>: InputTypeBuilderBase<'a> {
 
                             let mut fields = vec![self.nested_create_input_field(Arc::clone(&rf))];
                             let nested_connect = self.nested_connect_input_field(Arc::clone(&rf));
+                            let nested_connect_or_create = self.nested_connect_or_create_field(Arc::clone(&rf));
+
                             append_opt(&mut fields, nested_connect);
+                            append_opt(&mut fields, nested_connect_or_create);
 
                             input_object.set_fields(fields);
                             Arc::downgrade(&input_object)

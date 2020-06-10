@@ -84,7 +84,7 @@ use std::{convert::TryInto, sync::Arc};
 ///                          └─────────────────┘
 /// ```
 /// Todo split this mess up and clean up the code.
-pub fn connect_nested_upsert(
+pub fn nested_upsert(
     graph: &mut QueryGraph,
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
