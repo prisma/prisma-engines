@@ -96,7 +96,8 @@ pub fn mysql_8_url(db_name: &str) -> String {
     let db_name = mysql_safe_identifier(db_name);
 
     format!(
-        "mysql://root:prisma@{host}:{port}/{db_name}?connect_timeout=20&socket_timeout=20",
+        "mysql://root:prisma@{host}:{port}{maybe_slash}{db_name}?connect_timeout=20&socket_timeout=20",
+        maybe_slash = if db_name.is_empty() { "" } else { "/" },
         host = host,
         port = port,
         db_name = db_name,

@@ -1,16 +1,17 @@
 use crate::{DatabaseInfo, SqlMigrationConnector, SqlResult};
 use quaint::prelude::{ConnectionInfo, Queryable, SqlFamily};
+use sql_schema_describer::SqlSchema;
 
 #[async_trait::async_trait]
 pub(crate) trait Component {
     fn connector(&self) -> &SqlMigrationConnector;
 
     fn schema_name(&self) -> &str {
-        &self.connector().schema_name
+        &self.connection_info().schema_name()
     }
 
     fn connection_info(&self) -> &ConnectionInfo {
-        self.connector().connection_info()
+        self.connector().database_info.connection_info()
     }
 
     fn conn(&self) -> &dyn Queryable {
@@ -21,12 +22,8 @@ pub(crate) trait Component {
         &self.connector().database_info
     }
 
-    async fn describe(&self) -> SqlResult<sql_schema_describer::SqlSchema> {
-        Ok(self
-            .connector()
-            .database_describer
-            .describe(&self.schema_name())
-            .await?)
+    async fn describe(&self) -> SqlResult<SqlSchema> {
+        self.connector().describe_schema().await
     }
 
     fn sql_family(&self) -> SqlFamily {
