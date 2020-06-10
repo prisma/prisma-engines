@@ -215,6 +215,24 @@ async fn introspect_mysql_prisma_1(api: &TestApi) {
 }
 
 #[test_each_connector(tags("mysql"))]
+async fn introspect_mysql_prisma_1_1_if_not_for_default_value(api: &TestApi) {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("Book", |t| {
+                t.inject_custom("id char(25) Not Null Primary Key");
+                t.inject_custom("string_column text");
+                t.inject_custom("integer_column int DEFAULT 5");
+                t.inject_custom("float_column Decimal(65,30)");
+                t.inject_custom("boolean_column boolean");
+            });
+        })
+        .await;
+
+    let result = dbg!(api.introspect_version().await);
+    assert_eq!(result, Version::NonPrisma);
+}
+
+#[test_each_connector(tags("mysql"))]
 async fn introspect_mysql_prisma_1_1(api: &TestApi) {
     api.barrel()
         .execute(|migration| {
