@@ -6,7 +6,9 @@ use datamodel::Model;
 use introspection_connector::{Version, Warning};
 use quaint::connector::SqlFamily;
 use sql_schema_describer::{Column, ForeignKey, ForeignKeyAction, PrimaryKey, SqlSchema, Table};
+use tracing::debug;
 
+#[derive(Debug)]
 pub struct VersionChecker {
     sql_family: SqlFamily,
     has_migration_table: bool,
@@ -47,20 +49,20 @@ const POSTGRES_TYPES: &'static [(&'static str, &'static str)] = &[
     ("text", "text"),
     ("character varying", "varchar"),
 ];
+
+const POSTGRES_VAR_CHAR: &'static [(&'static str, &'static str)] = &[("character varying", "varchar")];
+const POSTGRES_VAR_CHAR_LENGTHS: &'static [i64] = &[25, 36, 191];
+
 const MYSQL_TYPES: &'static [(&'static str, &'static str)] = &[
     ("tinyint", "tinyint(1)"),
     ("datetime", "datetime(3)"),
     ("decimal", "decimal(65,30)"),
-    ("int", "int"),
     ("int", "int(11)"),
+    ("int", "int(4)"),
+    ("mediumtext", "mediumtext"),
     ("varchar", "varchar(191)"),
     ("char", "char(25)"),
     ("char", "char(36)"),
-    ("varchar", "varchar(25)"),
-    ("varchar", "varchar(36)"),
-    ("text", "text"),
-    ("mediumtext", "mediumtext"),
-    ("int", "int(4)"),
 ];
 
 impl VersionChecker {
@@ -83,17 +85,22 @@ impl VersionChecker {
         }
     }
 
-    //todo Possible further tightening
-    //P1/P11 only limited strings to specific lengths on ids
-    pub fn check_colum_for_type_and_default_value(&mut self, column: &Column) {
+    pub fn check_column_for_type_and_default_value(&mut self, column: &Column) {
         match (&column.tpe.data_type, &column.tpe.full_data_type, self.sql_family) {
-            (dt, fdt, SqlFamily::Postgres) if !POSTGRES_TYPES.contains(&(dt, fdt)) => self.uses_non_prisma_types = true,
             (dt, fdt, SqlFamily::Mysql) if !MYSQL_TYPES.contains(&(dt, fdt)) => self.uses_non_prisma_types = true,
             (dt, fdt, SqlFamily::Sqlite) if !SQLITE_TYPES.contains(&(dt, fdt)) => self.uses_non_prisma_types = true,
+            (dt, fdt, SqlFamily::Postgres)
+                if POSTGRES_VAR_CHAR.contains(&(dt, fdt))
+                    && column.tpe.character_maximum_length.is_some()
+                    && !POSTGRES_VAR_CHAR_LENGTHS.contains(&column.tpe.character_maximum_length.unwrap()) =>
+            {
+                self.uses_non_prisma_types = true
+            }
+            (dt, fdt, SqlFamily::Postgres) if !POSTGRES_TYPES.contains(&(dt, fdt)) => self.uses_non_prisma_types = true,
             _ => (),
         };
 
-        if column.default.is_some() {
+        if !column.auto_increment && column.default.is_some() {
             self.uses_default_values = true;
         };
     }
@@ -151,6 +158,17 @@ impl VersionChecker {
             && warnings.is_empty()
     }
 
+    fn is_prisma_1_1(&self, warnings: &Vec<Warning>) -> bool {
+        !self.has_migration_table
+            && !self.has_relay_table
+            && !self.uses_on_delete
+            && !self.uses_default_values
+            && !self.uses_non_prisma_types
+            && !self.has_prisma_1_join_table
+            && self.always_has_p1_or_p_1_1_compatible_id
+            && warnings.is_empty()
+    }
+
     fn is_prisma_1(&self, warnings: &Vec<Warning>) -> bool {
         !self.has_migration_table
             && !self.uses_on_delete
@@ -164,18 +182,8 @@ impl VersionChecker {
             && warnings.is_empty()
     }
 
-    fn is_prisma_1_1(&self, warnings: &Vec<Warning>) -> bool {
-        !self.has_migration_table
-            && !self.has_relay_table
-            && !self.uses_on_delete
-            && !self.uses_default_values
-            && !self.uses_non_prisma_types
-            && !self.has_prisma_1_join_table
-            && self.always_has_p1_or_p_1_1_compatible_id
-            && warnings.is_empty()
-    }
-
     pub fn version(&self, warnings: &Vec<Warning>) -> Version {
+        debug!(&self);
         match self.sql_family {
             SqlFamily::Sqlite if self.is_prisma_2(warnings) => Version::Prisma2,
             SqlFamily::Sqlite => Version::NonPrisma,
