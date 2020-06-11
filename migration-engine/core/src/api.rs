@@ -73,7 +73,7 @@ where
     D: DatabaseMigrationMarker + Send + Sync + 'static,
 {
     async fn apply_migration(&self, input: &ApplyMigrationInput) -> CoreResult<MigrationStepsResultOutput> {
-        self.handle_command::<ApplyMigrationCommand>(input)
+        self.handle_command::<ApplyMigrationCommand<'_>>(input)
             .instrument(tracing::info_span!(
                 "ApplyMigration",
                 migration_id = input.migration_id.as_str()
@@ -85,19 +85,19 @@ where
         &self,
         input: &CalculateDatabaseStepsInput,
     ) -> CoreResult<MigrationStepsResultOutput> {
-        self.handle_command::<CalculateDatabaseStepsCommand>(input)
+        self.handle_command::<CalculateDatabaseStepsCommand<'_>>(input)
             .instrument(tracing::info_span!("CalculateDatabaseSteps"))
             .await
     }
 
     async fn calculate_datamodel(&self, input: &CalculateDatamodelInput) -> CoreResult<CalculateDatamodelOutput> {
-        self.handle_command::<CalculateDatamodelCommand>(input)
+        self.handle_command::<CalculateDatamodelCommand<'_>>(input)
             .instrument(tracing::info_span!("CalculateDatamodel"))
             .await
     }
 
     async fn infer_migration_steps(&self, input: &InferMigrationStepsInput) -> CoreResult<MigrationStepsResultOutput> {
-        self.handle_command::<InferMigrationStepsCommand>(input)
+        self.handle_command::<InferMigrationStepsCommand<'_>>(input)
             .instrument(tracing::info_span!(
                 "InferMigrationSteps",
                 migration_id = input.migration_id.as_str()
@@ -112,7 +112,7 @@ where
     }
 
     async fn migration_progress(&self, input: &MigrationProgressInput) -> CoreResult<MigrationProgressOutput> {
-        self.handle_command::<MigrationProgressCommand>(input)
+        self.handle_command::<MigrationProgressCommand<'_>>(input)
             .instrument(tracing::info_span!(
                 "MigrationProgress",
                 migration_id = input.migration_id.as_str()
@@ -127,7 +127,7 @@ where
     }
 
     async fn unapply_migration(&self, input: &UnapplyMigrationInput) -> CoreResult<UnapplyMigrationOutput> {
-        self.handle_command::<UnapplyMigrationCommand>(input)
+        self.handle_command::<UnapplyMigrationCommand<'_>>(input)
             .instrument(tracing::info_span!("UnapplyMigration"))
             .await
     }
