@@ -305,7 +305,7 @@ pub struct Save<'a> {
 }
 
 impl<'a> Save<'a> {
-    fn new(user: &'a User, migration_name: &'static str) -> Self {
+    fn new(user: &'a User<'_>, migration_name: &'static str) -> Self {
         Save { user, migration_name }
     }
 
@@ -360,7 +360,7 @@ pub struct Up<'a> {
 }
 
 impl<'a> Up<'a> {
-    fn new(user: &'a User) -> Self {
+    fn new(user: &'a User<'_>) -> Self {
         Up { user }
     }
 

@@ -34,6 +34,15 @@ struct MigrationRollback {
 )]
 pub struct DatabaseMigrationFormatChanged;
 
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = "P3004",
+    message = "The `${database_name}` database is a system database, it should not be altered with prisma migrate. Please connect to another database."
+)]
+pub struct MigrateSystemDatabase {
+    pub database_name: String,
+}
+
 // Tests
 
 #[cfg(test)]

@@ -26,7 +26,7 @@ use write_args_parser::*;
 /// └─▶│   Update   │
 ///    └────────────┘
 /// ```
-pub fn connect_nested_update(
+pub fn nested_update(
     graph: &mut QueryGraph,
     parent: &NodeRef,
     parent_relation_field: &RelationFieldRef,
@@ -86,7 +86,7 @@ pub fn connect_nested_update(
     Ok(())
 }
 
-pub fn connect_nested_update_many(
+pub fn nested_update_many(
     graph: &mut QueryGraph,
     parent: &NodeRef,
     parent_relation_field: &RelationFieldRef,

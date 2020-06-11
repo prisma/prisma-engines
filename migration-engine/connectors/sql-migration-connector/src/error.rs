@@ -1,7 +1,10 @@
 use migration_connector::{ConnectorError, ErrorKind};
 use quaint::error::{Error as QuaintError, ErrorKind as QuaintKind};
 use thiserror::Error;
-use user_facing_errors::{quaint::render_quaint_error, query_engine::DatabaseConstraint};
+use tracing_error::SpanTrace;
+use user_facing_errors::{
+    migration_engine::MigrateSystemDatabase, quaint::render_quaint_error, query_engine::DatabaseConstraint, KnownError,
+};
 
 pub type SqlResult<T> = Result<T, SqlError>;
 
@@ -69,8 +72,6 @@ pub enum SqlError {
 
 impl SqlError {
     pub(crate) fn into_connector_error(self, connection_info: &super::ConnectionInfo) -> ConnectorError {
-        use tracing_error::SpanTrace;
-
         let context = SpanTrace::capture();
 
         match self {
@@ -190,5 +191,25 @@ impl From<sql_schema_describer::SqlSchemaDescriberError> for SqlError {
 impl From<String> for SqlError {
     fn from(error: String) -> Self {
         SqlError::Generic(anyhow::anyhow!(error))
+    }
+}
+
+pub(crate) type CheckDatabaseInfoResult = Result<(), SystemDatabase>;
+
+#[derive(Debug, Error)]
+#[error("The `{0}` database is a system database, it should not be altered with prisma migrate. Please connect to another database.")]
+pub(crate) struct SystemDatabase(pub(crate) String);
+
+impl From<SystemDatabase> for ConnectorError {
+    fn from(err: SystemDatabase) -> ConnectorError {
+        let user_facing = MigrateSystemDatabase {
+            database_name: err.0.clone(),
+        };
+
+        ConnectorError {
+            user_facing_error: Some(KnownError::new(user_facing).unwrap()),
+            kind: ErrorKind::Generic(err.into()),
+            context: SpanTrace::capture(),
+        }
     }
 }

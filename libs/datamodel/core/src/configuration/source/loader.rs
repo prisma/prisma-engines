@@ -69,8 +69,8 @@ impl SourceLoader {
 
         let url_args = args.arg("url")?;
         let (env_var_for_url, url) = match url_args.as_str_from_env() {
+            _ if ignore_env_var_errors => (None, format!("{}://", provider)), // glorious hack. ask marcus
             Ok((env_var, url)) => (env_var, url.trim().to_owned()),
-            Err(_) if ignore_env_var_errors => (None, format!("{}://", provider)), // glorious hack. ask marcus
             Err(err) => return Err(err),
         };
 
