@@ -10,15 +10,37 @@ pub use declarative_connector::DeclarativeConnector;
 pub use example_connector::ExampleConnector;
 
 pub trait Connector {
+    fn capabilities(&self) -> &Vec<ConnectorCapability>;
+
+    fn has_capability(&self, capability: ConnectorCapability) -> bool {
+        self.capabilities().contains(&capability)
+    }
+
     fn calculate_type(&self, name: &str, args: Vec<i32>) -> Option<ScalarFieldType>;
 
-    fn supports_scalar_lists(&self) -> bool;
+    fn supports_scalar_lists(&self) -> bool {
+        self.has_capability(ConnectorCapability::ScalarLists)
+    }
 
-    fn supports_relations_over_non_unique_criteria(&self) -> bool;
+    fn supports_relations_over_non_unique_criteria(&self) -> bool {
+        self.has_capability(ConnectorCapability::RelationsOverNonUniqueCriteria)
+    }
 
-    fn supports_enums(&self) -> bool;
+    fn supports_enums(&self) -> bool {
+        self.has_capability(ConnectorCapability::Enums)
+    }
 
-    fn supports_json(&self) -> bool;
+    fn supports_json(&self) -> bool {
+        self.has_capability(ConnectorCapability::Json)
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum ConnectorCapability {
+    ScalarLists,
+    RelationsOverNonUniqueCriteria,
+    Enums,
+    Json,
 }
 
 #[derive(Debug, Clone, PartialEq)]

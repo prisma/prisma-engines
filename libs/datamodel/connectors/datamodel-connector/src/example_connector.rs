@@ -1,4 +1,5 @@
 use super::{declarative_connector::*, ScalarType};
+use crate::ConnectorCapability;
 
 pub struct ExampleConnector {}
 
@@ -7,10 +8,7 @@ impl ExampleConnector {
         DeclarativeConnector {
             type_aliases: vec![],
             field_type_constructors: vec![],
-            supports_scalar_lists: false,
-            supports_relations_over_non_unique_criteria: false,
-            supports_enums: false,
-            supports_json: false,
+            capabilities: vec![],
         }
     }
 
@@ -18,10 +16,11 @@ impl ExampleConnector {
         DeclarativeConnector {
             type_aliases: vec![],
             field_type_constructors: vec![],
-            supports_scalar_lists: false,
-            supports_relations_over_non_unique_criteria: true,
-            supports_enums: true,
-            supports_json: true,
+            capabilities: vec![
+                ConnectorCapability::RelationsOverNonUniqueCriteria,
+                ConnectorCapability::Enums,
+                ConnectorCapability::Json,
+            ],
         }
     }
 
@@ -83,10 +82,11 @@ impl ExampleConnector {
         DeclarativeConnector {
             type_aliases,
             field_type_constructors,
-            supports_scalar_lists: true,
-            supports_relations_over_non_unique_criteria: false,
-            supports_enums: true,
-            supports_json: true,
+            capabilities: vec![
+                ConnectorCapability::ScalarLists,
+                ConnectorCapability::Enums,
+                ConnectorCapability::Json,
+            ],
         }
     }
 }
