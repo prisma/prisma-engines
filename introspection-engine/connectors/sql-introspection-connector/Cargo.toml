@@ -33,4 +33,3 @@ barrel = { version = "0.6.5-alpha.0", features = ["sqlite3", "mysql", "pg"] }
 test-macros = { path = "../../../libs/test-macros" }
 test-setup = { path = "../../../libs/test-setup" }
 pretty_assertions = "0.6.1"
-reqwest = "0.10.6"
