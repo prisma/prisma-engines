@@ -7,7 +7,7 @@ use prisma_value::PrismaValue;
 use quaint::ast::*;
 use std::borrow::Cow;
 
-#[test_each_connector]
+#[test_each_connector(log = "debug,sql_schema_describer=info")]
 async fn dropping_a_table_with_rows_should_warn(api: &TestApi) {
     let dm = r#"
         model Test {
@@ -35,7 +35,7 @@ async fn dropping_a_table_with_rows_should_warn(api: &TestApi) {
     assert_eq!(
         migration_output.warnings,
         &[MigrationWarning {
-            description: "You are about to drop the table `Test`, which is not empty (1 rows).".into()
+            description: "You are about to drop the `Test` table, which is not empty (1 rows).".into()
         }]
     );
 }

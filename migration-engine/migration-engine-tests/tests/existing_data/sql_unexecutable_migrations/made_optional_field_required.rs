@@ -27,7 +27,7 @@ async fn making_an_optional_field_required_with_data_without_a_default_is_unexec
     "#;
 
     api.infer_apply(&dm2).send().await?.assert_unexecutable(&[
-        "Made the column `age` on table `Test` required, but there are existing NULL values.".into(),
+        "Made the column `age` on table `Test` required, but there are 1 existing NULL values.".into(),
     ])?;
 
     api.assert_schema()

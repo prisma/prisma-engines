@@ -138,7 +138,7 @@ impl TestApi {
         }
     }
 
-    pub fn barrel(&self) -> BarrelMigrationExecutor {
+    pub fn barrel(&self) -> BarrelMigrationExecutor<'_> {
         BarrelMigrationExecutor {
             api: self,
             sql_variant: match self.sql_family() {
@@ -196,7 +196,7 @@ impl TestApi {
         }
     }
 
-    pub fn select<'a>(&'a self, table_name: &'a str) -> TestApiSelect {
+    pub fn select<'a>(&'a self, table_name: &'a str) -> TestApiSelect<'_> {
         TestApiSelect {
             select: quaint::ast::Select::from_table(self.render_table_name(table_name)),
             api: self,

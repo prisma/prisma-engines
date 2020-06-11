@@ -1,3 +1,5 @@
+#![deny(rust_2018_idioms)]
+
 //! This crate defines the API exposed by the connectors to the migration engine core. The entry point for this API is the [MigrationConnector](trait.MigrationConnector.html) trait.
 
 mod database_migration_inferrer;

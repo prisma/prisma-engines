@@ -1,4 +1,4 @@
-//! This library API is meant for the `test-cli` binary and migration-engine-tests only.
+#![deny(rust_2018_idioms)]
 
 pub mod api;
 pub mod commands;
