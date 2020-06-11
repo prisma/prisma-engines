@@ -96,33 +96,3 @@ impl IntrospectionConnector for SqlIntrospectionConnector {
         Ok(introspection_result)
     }
 }
-
-// async fn introspect(&self) -> ConnectorResult<IntrospectionResult> {
-//     use std::panic;
-//     let sql_schema = self.catch(self.describe()).await?;
-//     tracing::debug!("SQL Schema Describer is done: {:?}", sql_schema);
-//
-//     let family = self.connection_info.sql_family();
-//
-//     let prev_hook = panic::take_hook();
-//     panic::set_hook(Box::new(|_| {}));
-//     let result = panic::catch_unwind(|| calculate_datamodel::calculate_datamodel(&sql_schema, &family).unwrap());
-//     panic::set_hook(prev_hook);
-//
-//     pub fn extract_panic_message(panic_payload: &(dyn std::any::Any + Send + 'static)) -> Option<String> {
-//         panic_payload
-//             .downcast_ref::<&str>()
-//             .map(|s| -> String { (*s).to_owned() })
-//             .or_else(|| panic_payload.downcast_ref::<String>().map(|s| s.to_owned()))
-//     }
-//
-//     match result {
-//         Ok(res) => {
-//             tracing::debug!("Calculating datamodel is done: {:?}", sql_schema);
-//             Ok(res)
-//         }
-//         Err(introspection_error) => Err(ConnectorError::from_kind(ErrorKind::DatabaseSchemaInconsistent {
-//             explanation: extract_panic_message(introspection_error.as_ref()).unwrap(),
-//         })),
-//     }
-// }

@@ -20,3 +20,13 @@ pub struct IntrospectionResultEmpty {
     /// There were no models and no enums detected in the database.
     pub connection_string: String,
 }
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = "P4002",
+    message = "The schema of the introspected database was inconsistent: ${explanation}"
+)]
+pub struct DatabaseSchemaInconsistent {
+    /// The schema was inconsistent and therefore introspection failed.
+    pub explanation: String,
+}
