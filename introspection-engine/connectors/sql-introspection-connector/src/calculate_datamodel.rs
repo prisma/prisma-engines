@@ -45,7 +45,7 @@ pub fn calculate_datamodel(schema: &SqlSchema, family: &SqlFamily) -> SqlIntrosp
         }) {
             version_check.has_inline_relations(table);
             version_check.uses_on_delete(foreign_key, table);
-            model.add_field(calculate_relation_field(schema, table, foreign_key));
+            model.add_field(calculate_relation_field(schema, table, foreign_key)?);
         }
 
         for index in table
@@ -91,7 +91,8 @@ pub fn calculate_datamodel(schema: &SqlSchema, family: &SqlFamily) -> SqlIntrosp
                     .is_none()
                 {
                     let other_model = data_model.find_model(relation_info.to.as_str()).unwrap();
-                    let field = calculate_backrelation_field(schema, model, other_model, relation_field, relation_info);
+                    let field =
+                        calculate_backrelation_field(schema, model, other_model, relation_field, relation_info)?;
 
                     fields_to_be_added.push((other_model.name.clone(), field));
                 }
