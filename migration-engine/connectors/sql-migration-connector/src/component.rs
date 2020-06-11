@@ -2,6 +2,8 @@ use crate::{DatabaseInfo, SqlMigrationConnector, SqlResult};
 use quaint::prelude::{ConnectionInfo, Queryable, SqlFamily};
 use sql_schema_describer::SqlSchema;
 
+/// Implemented by the components of the connector that contain a reference to the connector (like
+/// SqlDestructiveChangeChecker). It lets them conveniently access global resources.
 #[async_trait::async_trait]
 pub(crate) trait Component {
     fn connector(&self) -> &SqlMigrationConnector;
