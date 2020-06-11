@@ -89,7 +89,9 @@ impl IntrospectionConnector for SqlIntrospectionConnector {
 
         let family = self.connection_info.sql_family();
 
-        let introspection_result = calculate_datamodel::calculate_datamodel(&sql_schema, &family).unwrap();
+        let introspection_result = calculate_datamodel::calculate_datamodel(&sql_schema, &family)
+            .map_err(|sql_introspection_error| sql_introspection_error.into_connector_error(&self.connection_info))?;
+
         tracing::debug!("Calculating datamodel is done: {:?}", sql_schema);
         Ok(introspection_result)
     }

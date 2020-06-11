@@ -52,6 +52,12 @@ pub enum ErrorKind {
     #[error("Could not create the database. {}", explanation)]
     DatabaseCreationFailed { explanation: String },
 
+    #[error(
+        "Could not introspect the database since the schema was inconsistent. {}",
+        explanation
+    )]
+    DatabaseSchemaInconsistent { explanation: String },
+
     #[error("Authentication failed for user '{}'", user)]
     AuthenticationFailed { user: String },
 

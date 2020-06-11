@@ -1,7 +1,8 @@
 use introspection_connector::{ConnectorError, ErrorKind};
 use quaint::error::{Error as QuaintError, ErrorKind as QuaintKind};
 use thiserror::Error;
-use user_facing_errors::{quaint::render_quaint_error, query_engine::DatabaseConstraint};
+use user_facing_errors::introspection_engine::DatabaseSchemaInconsistent;
+use user_facing_errors::{quaint::render_quaint_error, query_engine::DatabaseConstraint, KnownError};
 
 pub type SqlResult<T> = Result<T, SqlError>;
 
@@ -65,6 +66,9 @@ pub enum SqlError {
         #[source]
         cause: QuaintKind,
     },
+
+    #[error("An Error occurred because the schema was inconsistent: '{}'", explanation)]
+    SchemaInconsistent { explanation: String },
 }
 
 impl SqlError {
@@ -126,6 +130,13 @@ impl SqlError {
                     },
                 }
             }
+            SqlError::SchemaInconsistent { explanation } => ConnectorError {
+                user_facing_error: KnownError::new(DatabaseSchemaInconsistent {
+                    explanation: explanation.to_owned(),
+                })
+                .ok(),
+                kind: ErrorKind::DatabaseSchemaInconsistent { explanation },
+            },
             error => ConnectorError::from_kind(ErrorKind::QueryError(error.into())),
         }
     }
