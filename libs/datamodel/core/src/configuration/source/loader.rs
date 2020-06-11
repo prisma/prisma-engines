@@ -4,6 +4,7 @@ use super::{
 };
 use crate::ast;
 use crate::common::arguments::Arguments;
+use crate::common::value_validator::ValueListValidator;
 use crate::error::{DatamodelError, ErrorCollection};
 use crate::StringFromEnvVar;
 
@@ -65,11 +66,22 @@ impl SourceLoader {
                 ast_source.span,
             ));
         }
-        let provider = provider_arg.as_str()?;
+        let providers = provider_arg.as_array().to_str_vec()?;
+
+        if providers.is_empty() {
+            return Err(DatamodelError::new_source_validation_error(
+                "The provider argument in a datasource must not be empty",
+                source_name,
+                provider_arg.span(),
+            ));
+        }
 
         let url_args = args.arg("url")?;
         let (env_var_for_url, url) = match url_args.as_str_from_env() {
-            _ if ignore_env_var_errors => (None, format!("{}://", provider)), // glorious hack. ask marcus
+            _ if ignore_env_var_errors => {
+                // glorious hack. ask marcus
+                (None, format!("{}://", providers.first().unwrap()))
+            }
             Ok((env_var, url)) => (env_var, url.trim().to_owned()),
             Err(err) => return Err(err),
         };
@@ -93,12 +105,15 @@ impl SourceLoader {
             ));
         }
 
-        for decl in &self.source_definitions {
+        for definition in &self.source_definitions {
             // The provider given in the config block identifies the source type.
             // TODO: The second condition is a fallback to mitigate the postgres -> postgresql rename. It should be
             // renamed at some point.
-            if provider == decl.connector_type() || (decl.connector_type() == "postgresql" && provider == "postgres") {
-                let source = decl
+            if providers.contains(&definition.connector_type().to_owned())
+                || (definition.connector_type() == "postgresql" && providers.contains(&"postgres".to_owned()))
+            //            if providers == decl.connector_type() || (decl.connector_type() == "postgresql" && providers == "postgres")
+            {
+                let source = definition
                     .create(
                         source_name,
                         StringFromEnvVar {
@@ -116,7 +131,7 @@ impl SourceLoader {
         }
 
         Err(DatamodelError::new_source_not_known_error(
-            &provider,
+            &providers.join(","),
             provider_arg.span(),
         ))
     }
