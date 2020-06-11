@@ -181,7 +181,14 @@ impl From<mobc::Error<Error>> for Error {
     fn from(e: mobc::Error<Error>) -> Self {
         match e {
             mobc::Error::Inner(e) => e,
-            mobc::Error::Timeout => Error::builder(ErrorKind::Timeout("mobc timeout".into())).build(),
+            mobc::Error::Timeout => {
+                let kind = ErrorKind::Timeout("mobc timeout".into());
+
+                let mut builder = Error::builder(kind);
+                builder.set_original_message("Connection timed out.");
+
+                builder.build()
+            },
             e @ mobc::Error::BadConn => Error::builder(ErrorKind::ConnectionError(Box::new(e))).build(),
         }
     }
@@ -190,7 +197,12 @@ impl From<mobc::Error<Error>> for Error {
 #[cfg(any(feature = "postgresql", feature = "mysql"))]
 impl From<tokio::time::Elapsed> for Error {
     fn from(_: tokio::time::Elapsed) -> Self {
-        Error::builder(ErrorKind::Timeout("tokio timeout".into())).build()
+        let kind = ErrorKind::Timeout("tokio timeout".into());
+
+        let mut builder = Error::builder(kind);
+        builder.set_original_message("Query timed out.");
+
+        builder.build()
     }
 }
 

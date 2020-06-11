@@ -293,9 +293,7 @@ impl Queryable for Mysql {
             let last_id = results.last_insert_id();
             let mut result_set = ResultSet::new(columns, Vec::new());
 
-            let (_, rows) = self
-                .timeout(results.map_and_drop(|mut row| row.take_result_row()))
-                .await?;
+            let (_, rows) = self.timeout(results.map(|mut row| row.take_result_row())).await?;
 
             for row in rows.into_iter() {
                 result_set.rows.push(row?);
