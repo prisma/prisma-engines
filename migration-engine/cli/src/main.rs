@@ -1,3 +1,5 @@
+#![deny(rust_2018_idioms)]
+
 mod commands;
 #[cfg(test)]
 mod error_tests;
