@@ -1,9 +1,8 @@
 use super::*;
-use crate::query_graph_builder::write::utils::coerce_vec;
 use crate::{
     query_ast::*,
     query_graph::{Flow, Node, NodeRef, QueryGraph, QueryGraphDependency},
-    InputAssertions, ParsedInputMap, ParsedInputValue,
+    ParsedInputMap, ParsedInputValue,
 };
 use connector::{Filter, IdFilter};
 use prisma_models::{ModelRef, RelationFieldRef};
@@ -609,9 +608,7 @@ fn one_to_one_inlined_parent(
     } else {
         // Perform checks that no existing child in a required relation is violated.
         graph.create_edge(&if_node, &parent_node, QueryGraphDependency::ExecutionOrder)?;
-
-        let read_ex_child_node =
-            utils::insert_existing_1to1_related_model_checks(graph, &parent_node, &parent_relation_field)?;
+        utils::insert_existing_1to1_related_model_checks(graph, &parent_node, &parent_relation_field)?;
 
         let parent_model = parent_relation_field.model();
         let update_parent_node = utils::update_records_node_placeholder(graph, Filter::empty(), parent_model.clone());
