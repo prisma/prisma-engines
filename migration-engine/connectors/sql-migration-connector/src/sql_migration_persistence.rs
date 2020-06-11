@@ -193,7 +193,7 @@ fn migration_table_setup(
 }
 
 impl<'a> SqlMigrationPersistence<'a> {
-    fn table(&self) -> Table {
+    fn table(&self) -> Table<'_> {
         match self.sql_family() {
             SqlFamily::Sqlite => {
                 // sqlite case. Otherwise quaint produces invalid SQL
@@ -203,7 +203,7 @@ impl<'a> SqlMigrationPersistence<'a> {
         }
     }
 
-    fn convert_datetime(&self, datetime: DateTime<Utc>) -> Value {
+    fn convert_datetime(&self, datetime: DateTime<Utc>) -> Value<'_> {
         match self.sql_family() {
             SqlFamily::Sqlite => Value::Integer(datetime.timestamp_millis()),
             SqlFamily::Postgres => Value::DateTime(datetime),
@@ -212,7 +212,7 @@ impl<'a> SqlMigrationPersistence<'a> {
     }
 }
 
-fn convert_parameterized_date_value(db_value: &Value) -> DateTime<Utc> {
+fn convert_parameterized_date_value(db_value: &Value<'_>) -> DateTime<Utc> {
     match db_value {
         Value::Integer(x) => timestamp_to_datetime(*x),
         Value::DateTime(x) => x.clone(),

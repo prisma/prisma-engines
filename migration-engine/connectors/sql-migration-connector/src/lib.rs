@@ -1,3 +1,5 @@
+#![deny(rust_2018_idioms)]
+
 mod component;
 mod database_info;
 mod datamodel_helpers;

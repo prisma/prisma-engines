@@ -140,7 +140,7 @@ impl<'a> SqlSchemaCalculator<'a> {
             });
 
             let multiple_field_indexes = model.indexes().map(|index_definition: &IndexDefinition| {
-                let referenced_fields: Vec<FieldRef> = index_definition
+                let referenced_fields: Vec<FieldRef<'_>> = index_definition
                     .fields
                     .iter()
                     .map(|field_name| model.find_field(field_name).expect("Unknown field in index directive."))
@@ -412,7 +412,7 @@ fn add_one_to_one_relation_unique_index(table: &mut sql::Table, column_names: &[
 }
 
 /// This should match the logic in `prisma_models::Model::primary_identifier`.
-fn first_unique_criterion(model: ModelRef<'_>) -> anyhow::Result<Vec<FieldRef>> {
+fn first_unique_criterion(model: ModelRef<'_>) -> anyhow::Result<Vec<FieldRef<'_>>> {
     // First candidate: the primary key.
     {
         let id_fields: Vec<_> = model.id_fields().collect();
