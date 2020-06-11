@@ -9,14 +9,14 @@ use crate::StringFromEnvVar;
 
 /// Helper struct to load and validate source configuration blocks.
 pub struct SourceLoader {
-    source_declarations: Vec<Box<dyn SourceDefinition>>,
+    source_definitions: Vec<Box<dyn SourceDefinition>>,
 }
 
 impl SourceLoader {
     /// Creates a new, empty source loader.
     pub fn new() -> Self {
         Self {
-            source_declarations: get_builtin_sources(),
+            source_definitions: get_builtin_sources(),
         }
     }
 
@@ -93,7 +93,7 @@ impl SourceLoader {
             ));
         }
 
-        for decl in &self.source_declarations {
+        for decl in &self.source_definitions {
             // The provider given in the config block identifies the source type.
             // TODO: The second condition is a fallback to mitigate the postgres -> postgresql rename. It should be
             // renamed at some point.

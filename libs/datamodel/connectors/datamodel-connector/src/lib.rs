@@ -5,6 +5,7 @@ pub mod scalars;
 
 mod declarative_connector;
 mod example_connector;
+mod multi_provider_connector;
 
 pub use declarative_connector::DeclarativeConnector;
 pub use example_connector::ExampleConnector;
