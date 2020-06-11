@@ -59,6 +59,7 @@ const MYSQL_TYPES: &'static [(&'static str, &'static str)] = &[
     ("decimal", "decimal(65,30)"),
     ("int", "int(11)"),
     ("int", "int(4)"),
+    ("int", "int"),
     ("mediumtext", "mediumtext"),
     ("varchar", "varchar(191)"),
     ("char", "char(25)"),

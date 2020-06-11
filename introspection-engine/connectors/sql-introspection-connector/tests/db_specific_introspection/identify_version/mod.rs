@@ -1,6 +1,6 @@
 use crate::*;
 use barrel::types;
-use introspection_connector::Version::{NonPrisma, Prisma1, Prisma11};
+use introspection_connector::Version::NonPrisma;
 use introspection_connector::{IntrospectionConnector, Version};
 use test_harness::*;
 
@@ -270,7 +270,7 @@ async fn introspect_mysql_prisma2(api: &TestApi) {
                 t.add_column("finished_at", types::text());
             });
             migration.create_table("Book", |t| {
-                t.add_column("id", types::primary());
+                t.inject_custom("id char(36) Not Null Primary Key");
             });
         })
         .await;
