@@ -18,8 +18,7 @@ impl DatabaseInspectionResults {
         self.row_counts.insert(table, row_count);
     }
 
-    /// Returns the row count in the table and the non-null value count in the column.
-    pub(super) fn get_value_count(&self, table: &str, column: &str) -> (Option<i64>, Option<i64>) {
+    pub(super) fn get_row_and_non_null_value_count(&self, table: &str, column: &str) -> (Option<i64>, Option<i64>) {
         (
             self.row_counts.get(table).map(|count| *count),
             self.value_counts

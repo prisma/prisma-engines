@@ -1,8 +1,8 @@
 mod check;
 mod database_inspection_results;
 mod destructive_check_plan;
-mod sql_migration_warning;
-mod sql_unexecutable_migration;
+mod unexecutable_step_check;
+mod warning_check;
 
 use crate::{
     sql_schema_differ::DiffingOptions, AddColumn, AlterColumn, Component, DropColumn, DropTable, DropTables,
@@ -11,9 +11,9 @@ use crate::{
 use destructive_check_plan::DestructiveCheckPlan;
 use migration_connector::{ConnectorResult, DestructiveChangeDiagnostics, DestructiveChangesChecker};
 use quaint::prelude::SqlFamily;
-use sql_migration_warning::SqlMigrationWarning;
 use sql_schema_describer::{ColumnArity, SqlSchema};
-use sql_unexecutable_migration::SqlUnexecutableMigration;
+use unexecutable_step_check::UnexecutableStepCheck;
+use warning_check::SqlMigrationWarning;
 
 /// The SqlDestructiveChangesChecker is responsible for informing users about potentially
 /// destructive or impossible changes that their attempted migrations contain.
@@ -75,7 +75,7 @@ impl SqlDestructiveChangesChecker<'_> {
             return;
         }
 
-        let typed_unexecutable = SqlUnexecutableMigration::AddedRequiredFieldToTable {
+        let typed_unexecutable = UnexecutableStepCheck::AddedRequiredFieldToTable {
             column: add_column.column.name.clone(),
             table: table.name.clone(),
         };
@@ -207,7 +207,7 @@ impl SqlDestructiveChangesChecker<'_> {
             return;
         }
 
-        let typed_unexecutable = sql_unexecutable_migration::SqlUnexecutableMigration::MadeOptionalFieldRequired {
+        let typed_unexecutable = unexecutable_step_check::UnexecutableStepCheck::MadeOptionalFieldRequired {
             table: table_name.to_owned(),
             column: differ.previous.name.clone(),
         };

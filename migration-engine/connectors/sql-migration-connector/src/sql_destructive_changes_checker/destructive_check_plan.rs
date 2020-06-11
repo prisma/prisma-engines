@@ -1,6 +1,6 @@
 use super::{
-    check::Check, database_inspection_results::DatabaseInspectionResults, sql_migration_warning::SqlMigrationWarning,
-    sql_unexecutable_migration::SqlUnexecutableMigration,
+    check::Check, database_inspection_results::DatabaseInspectionResults,
+    unexecutable_step_check::UnexecutableStepCheck, warning_check::SqlMigrationWarning,
 };
 use crate::{SqlError, SqlResult};
 use migration_connector::{DestructiveChangeDiagnostics, MigrationWarning, UnexecutableMigration};
@@ -12,7 +12,7 @@ use quaint::prelude::Queryable;
 #[derive(Debug)]
 pub(super) struct DestructiveCheckPlan {
     warnings: Vec<SqlMigrationWarning>,
-    unexecutable_migrations: Vec<SqlUnexecutableMigration>,
+    unexecutable_migrations: Vec<UnexecutableStepCheck>,
 }
 
 impl DestructiveCheckPlan {
@@ -27,7 +27,7 @@ impl DestructiveCheckPlan {
         self.warnings.push(warning)
     }
 
-    pub(super) fn push_unexecutable(&mut self, unexecutable_migration: SqlUnexecutableMigration) {
+    pub(super) fn push_unexecutable(&mut self, unexecutable_migration: UnexecutableStepCheck) {
         self.unexecutable_migrations.push(unexecutable_migration)
     }
 
@@ -55,7 +55,7 @@ impl DestructiveCheckPlan {
         let mut diagnostics = DestructiveChangeDiagnostics::new();
 
         for unexecutable in &self.unexecutable_migrations {
-            if let Some(message) = unexecutable.render(&results) {
+            if let Some(message) = unexecutable.evaluate(&results) {
                 diagnostics
                     .unexecutable_migrations
                     .push(UnexecutableMigration { description: message })
@@ -63,7 +63,7 @@ impl DestructiveCheckPlan {
         }
 
         for warning in &self.warnings {
-            if let Some(message) = warning.render(&results) {
+            if let Some(message) = warning.evaluate(&results) {
                 diagnostics.warnings.push(MigrationWarning { description: message })
             }
         }
@@ -79,15 +79,15 @@ impl DestructiveCheckPlan {
         schema_name: &str,
         conn: &dyn Queryable,
     ) -> SqlResult<()> {
-        if let Some(table) = check.check_row_count() {
+        if let Some(table) = check.needed_table_row_count() {
             if results.get_row_count(table).is_none() {
                 let count = count_rows_in_table(table, schema_name, conn).await?;
                 results.set_row_count(table.to_owned(), count)
             }
         }
 
-        if let Some((table, column)) = check.check_existing_values() {
-            if let (_, None) = results.get_value_count(table, column) {
+        if let Some((table, column)) = check.needed_column_value_count() {
+            if let (_, None) = results.get_row_and_non_null_value_count(table, column) {
                 let count = count_values_in_column(column, table, schema_name, conn).await?;
                 results.set_value_count(table.to_owned().into(), column.to_owned().into(), count);
             }

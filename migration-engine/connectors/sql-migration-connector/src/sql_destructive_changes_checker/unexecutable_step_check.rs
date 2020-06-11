@@ -1,7 +1,7 @@
 use super::{check::Check, database_inspection_results::DatabaseInspectionResults};
 
 #[derive(Debug)]
-pub(crate) enum SqlUnexecutableMigration {
+pub(crate) enum UnexecutableStepCheck {
     AddedRequiredFieldToTable { table: String, column: String },
     MadeOptionalFieldRequired { table: String, column: String },
     // TODO:
@@ -19,24 +19,24 @@ pub(crate) enum SqlUnexecutableMigration {
     // },
 }
 
-impl Check for SqlUnexecutableMigration {
-    fn check_row_count(&self) -> Option<&str> {
+impl Check for UnexecutableStepCheck {
+    fn needed_table_row_count(&self) -> Option<&str> {
         match self {
-            SqlUnexecutableMigration::MadeOptionalFieldRequired { table, column: _ }
-            | SqlUnexecutableMigration::AddedRequiredFieldToTable { table, column: _ } => Some(table),
+            UnexecutableStepCheck::MadeOptionalFieldRequired { table, column: _ }
+            | UnexecutableStepCheck::AddedRequiredFieldToTable { table, column: _ } => Some(table),
         }
     }
 
-    fn check_existing_values(&self) -> Option<(&str, &str)> {
+    fn needed_column_value_count(&self) -> Option<(&str, &str)> {
         match self {
-            SqlUnexecutableMigration::MadeOptionalFieldRequired { table, column } => Some((table, column)),
-            SqlUnexecutableMigration::AddedRequiredFieldToTable { .. } => None,
+            UnexecutableStepCheck::MadeOptionalFieldRequired { table, column } => Some((table, column)),
+            UnexecutableStepCheck::AddedRequiredFieldToTable { .. } => None,
         }
     }
 
-    fn render<'a>(&self, database_checks: &DatabaseInspectionResults) -> Option<String> {
+    fn evaluate<'a>(&self, database_checks: &DatabaseInspectionResults) -> Option<String> {
         match self {
-            SqlUnexecutableMigration::AddedRequiredFieldToTable { table, column } => {
+            UnexecutableStepCheck::AddedRequiredFieldToTable { table, column } => {
                 let message = |details| {
                     format!(
                         "Added the required column `{column}` to the `{table}` table without a default value. {details}",
@@ -60,8 +60,8 @@ impl Check for SqlUnexecutableMigration {
 
                 Some(message)
             }
-            SqlUnexecutableMigration::MadeOptionalFieldRequired { table, column } => {
-                match database_checks.get_value_count(table, column) {
+            UnexecutableStepCheck::MadeOptionalFieldRequired { table, column } => {
+                match database_checks.get_row_and_non_null_value_count(table, column) {
                     (Some(0), _) => None,
                     (Some(row_count), Some(value_count)) => {
                         let null_value_count = row_count - value_count;
