@@ -1903,6 +1903,106 @@ async fn references_to_models_with_compound_primary_keys_must_work(api: &TestApi
 }
 
 #[test_each_connector]
+async fn join_tables_between_models_with_compound_primary_keys_must_work(api: &TestApi) -> TestResult {
+    let dm = r#"
+        model Human {
+            firstName String
+            lastName String
+            cats HumanToCat[]
+
+            @@id([firstName, lastName])
+        }
+
+        model HumanToCat {
+            human_firstName String
+            human_lastName String
+            cat_id String
+
+            cat Cat @relation(fields: [cat_id], references: [id])
+            human Human @relation(fields: [human_firstName, human_lastName], references: [firstName, lastName])
+
+            @@unique([cat_id, human_firstName, human_lastName])
+            @@index([human_firstName, human_lastName])
+        }
+
+        model Cat {
+            id String @id
+            humans HumanToCat[]
+        }
+    "#;
+
+    api.infer_apply(dm).send().await?.assert_green()?;
+
+    api.assert_schema().await?.assert_table("HumanToCat", |table| {
+        table
+            .assert_has_column("human_firstName")?
+            .assert_has_column("human_lastName")?
+            .assert_has_column("cat_id")?
+            .assert_fk_on_columns(&["human_firstName", "human_lastName"], |fk| {
+                fk.assert_references("Human", &["firstName", "lastName"])?
+                    .assert_cascades_on_delete()
+            })?
+            .assert_fk_on_columns(&["cat_id"], |fk| {
+                fk.assert_references("Cat", &["id"])?.assert_cascades_on_delete()
+            })?
+            .assert_indexes_count(2)?
+            .assert_index_on_columns(&["cat_id", "human_firstName", "human_lastName"], |idx| {
+                idx.assert_is_unique()
+            })?
+            .assert_index_on_columns(&["human_firstName", "human_lastName"], |idx| idx.assert_is_not_unique())
+    })?;
+
+    Ok(())
+}
+
+#[test_each_connector]
+async fn join_tables_between_models_with_mapped_compound_primary_keys_must_work(api: &TestApi) -> TestResult {
+    let dm = r#"
+        model Human {
+            firstName String @map("the_first_name")
+            lastName String @map("the_last_name")
+            cats HumanToCat[]
+
+            @@id([firstName, lastName])
+        }
+
+        model HumanToCat {
+            human_the_first_name String
+            human_the_last_name String
+            cat_id String
+
+            cat Cat @relation(fields: [cat_id], references: [id])
+            human Human @relation(fields: [human_the_first_name, human_the_last_name], references: [firstName, lastName])
+
+            @@unique([human_the_first_name, human_the_last_name, cat_id])
+            @@index([cat_id])
+        }
+
+        model Cat {
+            id String @id
+            humans HumanToCat[]
+        }
+    "#;
+
+    api.infer_apply(dm).send().await?.assert_green()?;
+
+    let sql_schema = api.describe_database().await?;
+
+    sql_schema
+        .assert_table("HumanToCat")?
+        .assert_has_column("human_the_first_name")?
+        .assert_has_column("human_the_last_name")?
+        .assert_has_column("cat_id")?
+        .assert_fk_on_columns(&["human_the_first_name", "human_the_last_name"], |fk| {
+            fk.assert_references("Human", &["the_first_name", "the_last_name"])
+        })?
+        .assert_fk_on_columns(&["cat_id"], |fk| fk.assert_references("Cat", &["id"]))?
+        .assert_indexes_count(2)?;
+
+    Ok(())
+}
+
+#[test_each_connector]
 async fn switching_databases_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
         datasource db {
