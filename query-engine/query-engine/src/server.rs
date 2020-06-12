@@ -14,7 +14,13 @@ use hyper::{Body, Error, Method, Request, Response, Server, StatusCode};
 use query_core::schema::QuerySchemaRenderer;
 use serde_json::json;
 use std::net::SocketAddr;
-use std::{sync::Arc, time::Instant};
+use std::{collections::HashMap, sync::Arc, time::Instant};
+
+/// Debug header that triggers a panic in the request thread.
+static DEBUG_NON_FATAL_HEADER: &str = "x-debug-non-fatal";
+
+/// Debug header that causes the query engine to crash.
+static DEBUG_FATAL_HEADER: &str = "x-debug-fatal";
 
 #[derive(RustEmbed)]
 #[folder = "static_files"]
@@ -24,6 +30,7 @@ pub(crate) struct RequestContext {
     context: Arc<PrismaContext>,
     graphql_request_handler: GraphQlRequestHandler,
     enable_playground: bool,
+    enable_debug_mode: bool,
 }
 
 impl RequestContext {
@@ -38,6 +45,7 @@ pub struct HttpServerBuilder {
     legacy_mode: bool,
     enable_raw_queries: bool,
     enable_playground: bool,
+    enable_debug_mode: bool,
 }
 
 impl HttpServerBuilder {
@@ -56,6 +64,11 @@ impl HttpServerBuilder {
         self
     }
 
+    pub fn enable_debug_mode(mut self, val: bool) -> Self {
+        self.enable_debug_mode = val;
+        self
+    }
+
     pub async fn build_and_run(self, address: SocketAddr) -> PrismaResult<()> {
         let ctx = PrismaContext::builder(self.config, self.datamodel)
             .legacy(self.legacy_mode)
@@ -63,7 +76,7 @@ impl HttpServerBuilder {
             .build()
             .await?;
 
-        HttpServer::run(address, ctx, self.enable_playground).await
+        HttpServer::run(address, ctx, self.enable_playground, self.enable_debug_mode).await
     }
 }
 
@@ -77,16 +90,23 @@ impl HttpServer {
             legacy_mode: false,
             enable_raw_queries: false,
             enable_playground: false,
+            enable_debug_mode: false,
         }
     }
 
-    async fn run(address: SocketAddr, context: PrismaContext, enable_playground: bool) -> PrismaResult<()> {
+    async fn run(
+        address: SocketAddr,
+        context: PrismaContext,
+        enable_playground: bool,
+        enable_debug_mode: bool,
+    ) -> PrismaResult<()> {
         let now = Instant::now();
 
         let ctx = Arc::new(RequestContext {
             context: Arc::new(context),
             graphql_request_handler: GraphQlRequestHandler,
             enable_playground,
+            enable_debug_mode,
         });
 
         let service = make_service_fn(|_| {
@@ -111,6 +131,17 @@ impl HttpServer {
         let mut res = match (req.method(), req.uri().path()) {
             (&Method::POST, "/") => {
                 let (parts, body) = req.into_parts();
+                let headers: HashMap<_, _> = parts
+                    .headers
+                    .iter()
+                    .map(|(k, v)| (format!("{}", k), v.to_str().unwrap().into()))
+                    .collect();
+
+                if ctx.enable_debug_mode {
+                    if let Some(r) = Self::handle_debug_headers(&headers) {
+                        return Ok(r);
+                    }
+                }
 
                 let bytes = hyper::body::to_bytes(body).await?;
 
@@ -119,11 +150,7 @@ impl HttpServer {
                         let req = PrismaRequest {
                             body,
                             path: parts.uri.path().into(),
-                            headers: parts
-                                .headers
-                                .iter()
-                                .map(|(k, v)| (format!("{}", k), v.to_str().unwrap().into()))
-                                .collect(),
+                            headers,
                         };
 
                         Self::http_handler(req, ctx).await
@@ -154,6 +181,28 @@ impl HttpServer {
         res.headers_mut().insert("x-elapsed", elapsed.into());
 
         Ok(res)
+    }
+
+    fn handle_debug_headers(headers: &HashMap<String, String>) -> Option<Response<Body>> {
+        match (headers.get(DEBUG_FATAL_HEADER), headers.get(DEBUG_NON_FATAL_HEADER)) {
+            (Some(_fatal), _) => {
+                info!("Query engine debug fatal error, shutting down.");
+                std::process::exit(1)
+            }
+            (_, Some(_nonfatal)) => {
+                let err = user_facing_errors::Error::from_panic_payload(&String::from("Debug panic"));
+                let bytes = serde_json::to_vec(&err).unwrap();
+
+                Some(
+                    Response::builder()
+                        .status(StatusCode::OK)
+                        .header(header::CONTENT_TYPE, "application/json")
+                        .body(Body::from(bytes))
+                        .unwrap(),
+                )
+            }
+            _ => None,
+        }
     }
 
     async fn http_handler(req: PrismaRequest<GraphQlBody>, cx: Arc<RequestContext>) -> Response<Body> {
