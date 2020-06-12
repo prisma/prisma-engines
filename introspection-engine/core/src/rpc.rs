@@ -78,6 +78,7 @@ impl RpcImpl {
         let connector = RpcImpl::load_connector(&schema).await?;
 
         //todo error handling
+        // we now would necessitate a valid schema, was that the case before???
         let existing_data_model = datamodel::parse_datamodel(&schema).unwrap();
 
         match connector.introspect(&existing_data_model).await {
