@@ -368,21 +368,9 @@ impl QueryGraph {
     ///
     /// Criteria for a direct child (either):
     /// - Every node that only has `parent` as their parent.
-    /// - OR In case of multiple parents, has `parent` as their parent and _all_ other
-    ///   parents are strict ancestors of `parent`, meaning they are "higher up" in the graph.
-    /// - OR All other parents have already been visited before.
+    /// - In case of multiple parents, _all_ parents have already been visited before.
     pub fn is_direct_child(&self, parent: &NodeRef, child: &NodeRef) -> bool {
-        let ancestry_rule = self.incoming_edges(child).into_iter().all(|edge| {
-            let other_parent = self.edge_source(&edge);
-
-            if &other_parent != parent {
-                self.is_ancestor(&other_parent, parent)
-            } else {
-                true
-            }
-        });
-
-        let visitation_rule = self.incoming_edges(child).into_iter().all(|edge| {
+        self.incoming_edges(child).into_iter().all(|edge| {
             let other_parent = self.edge_source(&edge);
 
             if &other_parent != parent {
@@ -390,9 +378,7 @@ impl QueryGraph {
             } else {
                 true
             }
-        });
-
-        ancestry_rule || visitation_rule
+        })
     }
 
     /// Returns a list of child nodes, together with their child edge for the given `node`.
@@ -433,15 +419,6 @@ impl QueryGraph {
                 (edge, target)
             })
             .collect()
-    }
-
-    /// Checks if `ancestor` is in any of the ancestor nodes of `successor_node`.
-    /// Determined by trying to reach `successor_node` from `ancestor`.
-    pub fn is_ancestor(&self, ancestor: &NodeRef, successor_node: &NodeRef) -> bool {
-        self.child_pairs(ancestor)
-            .into_iter()
-            .find(|(_, child_node)| child_node == successor_node || self.is_ancestor(&child_node, &successor_node))
-            .is_some()
     }
 
     /// Internal utility function to collect all edges of defined direction directed to, or originating from, `node`.
