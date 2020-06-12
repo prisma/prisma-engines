@@ -21,7 +21,7 @@ pub trait Source: Send + Sync {
     /// Documentation of this source.
     fn documentation(&self) -> &Option<String>;
 
-    fn connector(&self) -> Box<dyn Connector>;
+    fn connector(&self) -> &Box<dyn Connector>;
 }
 
 /// Trait for source definitions.
@@ -30,11 +30,17 @@ pub trait Source: Send + Sync {
 pub trait SourceDefinition {
     /// Returns the name of the source.
     fn connector_type(&self) -> &'static str;
+
+    fn is_provider(&self, provider: &str) -> bool;
+
+    //    fn can_handl
+
     /// Instantiates a new source, using the given name, url and detailed arguments.
     fn create(
         &self,
         name: &str,
         url: StringFromEnvVar,
         documentation: &Option<String>,
+        connector: Box<dyn Connector>,
     ) -> Result<Box<dyn Source + Send + Sync>, String>;
 }

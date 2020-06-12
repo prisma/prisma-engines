@@ -7,6 +7,7 @@ use crate::common::arguments::Arguments;
 use crate::common::value_validator::ValueListValidator;
 use crate::error::{DatamodelError, ErrorCollection};
 use crate::StringFromEnvVar;
+use datamodel_connector::{Connector, ExampleConnector, MultiProviderConnector};
 
 /// Helper struct to load and validate source configuration blocks.
 pub struct SourceLoader {
@@ -105,35 +106,55 @@ impl SourceLoader {
             ));
         }
 
-        for definition in &self.source_definitions {
-            // The provider given in the config block identifies the source type.
-            // TODO: The second condition is a fallback to mitigate the postgres -> postgresql rename. It should be
-            // renamed at some point.
-            if providers.contains(&definition.connector_type().to_owned())
-                || (definition.connector_type() == "postgresql" && providers.contains(&"postgres".to_owned()))
-            //            if providers == decl.connector_type() || (decl.connector_type() == "postgresql" && providers == "postgres")
-            {
-                let source = definition
-                    .create(
-                        source_name,
-                        StringFromEnvVar {
-                            from_env_var: env_var_for_url,
-                            value: url,
-                        },
-                        &ast_source.documentation.clone().map(|comment| comment.text),
-                    )
-                    .map_err(|err_msg| {
-                        DatamodelError::new_source_validation_error(&err_msg, source_name, url_args.span())
-                    });
+        let documentation = ast_source.documentation.clone().map(|comment| comment.text);
+        let url = StringFromEnvVar {
+            from_env_var: env_var_for_url,
+            value: url,
+        };
 
-                return Ok(Some(source?));
+        let combined_connector = {
+            let connectors: Vec<Box<dyn Connector>> = providers
+                .iter()
+                .filter_map(|provider| {
+                    let connector: Option<Box<dyn Connector>> = match provider.as_str() {
+                        "mysql" => Some(Box::new(ExampleConnector::mysql())),
+                        "postgres" | "postgresql" => Some(Box::new(ExampleConnector::postgres())),
+                        "sqlite" => Some(Box::new(ExampleConnector::sqlite())),
+                        _ => None, // if a connector is not known this is handled by the following code
+                    };
+                    connector
+                })
+                .collect();
+            Box::new(MultiProviderConnector::new(connectors))
+        };
+
+        let mut active_source = None;
+        for provider in &providers {
+            match self.get_source_definition_for_provider(&provider) {
+                Some(sd) => {
+                    active_source = Some(
+                        sd.create(source_name, url, &documentation, combined_connector)
+                            .map_err(|err_msg| {
+                                DatamodelError::new_source_validation_error(&err_msg, source_name, url_args.span())
+                            })?,
+                    );
+                    break;
+                }
+                None => {}
             }
         }
 
-        Err(DatamodelError::new_source_not_known_error(
-            &providers.join(","),
-            provider_arg.span(),
-        ))
+        match active_source {
+            Some(source) => Ok(Some(source)),
+            None => Err(DatamodelError::new_source_not_known_error(
+                &providers.join(","),
+                provider_arg.span(),
+            )),
+        }
+    }
+
+    fn get_source_definition_for_provider(&self, provider: &str) -> Option<&Box<dyn SourceDefinition>> {
+        self.source_definitions.iter().find(|sd| sd.is_provider(provider))
     }
 }
 

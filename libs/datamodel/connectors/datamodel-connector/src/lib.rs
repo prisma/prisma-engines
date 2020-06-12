@@ -9,8 +9,9 @@ mod multi_provider_connector;
 
 pub use declarative_connector::DeclarativeConnector;
 pub use example_connector::ExampleConnector;
+pub use multi_provider_connector::MultiProviderConnector;
 
-pub trait Connector {
+pub trait Connector: Send + Sync {
     fn capabilities(&self) -> &Vec<ConnectorCapability>;
 
     fn has_capability(&self, capability: ConnectorCapability) -> bool {

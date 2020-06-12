@@ -2,7 +2,6 @@ use super::{Connector, ScalarFieldType};
 use crate::ConnectorCapability;
 
 pub struct MultiProviderConnector {
-    connectors: Vec<Box<dyn Connector>>,
     combined_capabilities: Vec<ConnectorCapability>,
 }
 
@@ -20,10 +19,7 @@ impl MultiProviderConnector {
             }
         }
 
-        MultiProviderConnector {
-            connectors,
-            combined_capabilities,
-        }
+        MultiProviderConnector { combined_capabilities }
     }
 }
 

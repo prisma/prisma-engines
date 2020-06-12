@@ -1,17 +1,17 @@
-use crate::configuration::*;
-use datamodel_connector::{Connector, ExampleConnector};
+use crate::{Source, StringFromEnvVar};
+use datamodel_connector::Connector;
 
-pub const MYSQL_SOURCE_NAME: &str = "mysql";
-
-pub struct MySqlSource {
-    pub(super) name: String,
-    pub(super) url: StringFromEnvVar,
-    pub(super) documentation: Option<String>,
+pub struct SimpleSource {
+    pub connector_type: String,
+    pub name: String,
+    pub url: StringFromEnvVar,
+    pub documentation: Option<String>,
+    pub connector: Box<dyn Connector>,
 }
 
-impl Source for MySqlSource {
+impl Source for SimpleSource {
     fn connector_type(&self) -> &str {
-        MYSQL_SOURCE_NAME
+        &self.connector_type
     }
 
     fn name(&self) -> &String {
@@ -33,7 +33,7 @@ impl Source for MySqlSource {
         &self.documentation
     }
 
-    fn connector(&self) -> Box<dyn Connector> {
-        Box::new(ExampleConnector::mysql())
+    fn connector(&self) -> &Box<dyn Connector> {
+        &self.connector
     }
 }
