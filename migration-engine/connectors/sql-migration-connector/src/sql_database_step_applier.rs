@@ -210,10 +210,6 @@ fn render_raw_sql(
                 "PRAGMA foreign_keys=on".to_string(),
             ]),
         },
-        SqlMigrationStep::DropTables(DropTables { names }) => {
-            let fully_qualified_names = names.iter().map(|name| renderer.quote_with_schema(&schema_name, &name));
-            Ok(vec![format!("DROP TABLE {};", fully_qualified_names.join(","))])
-        }
         SqlMigrationStep::RenameTable { name, new_name } => {
             let new_name = match sql_family {
                 SqlFamily::Sqlite => renderer.quote(new_name).to_string(),

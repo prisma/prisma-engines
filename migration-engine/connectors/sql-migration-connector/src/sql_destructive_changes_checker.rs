@@ -5,8 +5,8 @@ mod unexecutable_step_check;
 mod warning_check;
 
 use crate::{
-    sql_schema_differ::DiffingOptions, AddColumn, AlterColumn, Component, DropColumn, DropTable, DropTables,
-    SqlMigration, SqlMigrationStep, SqlResult, TableChange,
+    sql_schema_differ::DiffingOptions, AddColumn, AlterColumn, Component, DropColumn, DropTable, SqlMigration,
+    SqlMigrationStep, SqlResult, TableChange,
 };
 use destructive_check_plan::DestructiveCheckPlan;
 use migration_connector::{ConnectorResult, DestructiveChangeDiagnostics, DestructiveChangesChecker};
@@ -251,11 +251,6 @@ impl SqlDestructiveChangesChecker<'_> {
                 // not, return a warning.
                 SqlMigrationStep::DropTable(DropTable { name }) => {
                     self.check_table_drop(name, &mut plan);
-                }
-                SqlMigrationStep::DropTables(DropTables { names }) => {
-                    for name in names {
-                        self.check_table_drop(name, &mut plan);
-                    }
                 }
                 // SqlMigrationStep::CreateIndex(CreateIndex { table, index }) if index.is_unique() => todo!(),
                 // do nothing
