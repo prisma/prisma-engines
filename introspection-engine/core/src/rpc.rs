@@ -60,6 +60,7 @@ impl RpcImpl {
             .url()
             .to_owned()
             .value;
+
         Ok(Box::new(SqlIntrospectionConnector::new(&url).await?))
     }
 
@@ -73,10 +74,13 @@ impl RpcImpl {
             .url()
             .to_owned()
             .value;
-        let connector = RpcImpl::load_connector(&schema).await?;
-        let data_model = connector.introspect().await;
 
-        match data_model {
+        let connector = RpcImpl::load_connector(&schema).await?;
+
+        //todo error handling
+        let existing_data_model = datamodel::parse_datamodel(&schema).unwrap();
+
+        match connector.introspect(&existing_data_model).await {
             Ok(introspection_result)
                 if introspection_result.datamodel.models.is_empty()
                     && introspection_result.datamodel.enums.is_empty() =>

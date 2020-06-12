@@ -16,7 +16,7 @@ pub trait IntrospectionConnector: Send + Sync + 'static {
 
     async fn get_database_description(&self) -> ConnectorResult<String>;
 
-    async fn introspect(&self) -> ConnectorResult<IntrospectionResult>;
+    async fn introspect(&self, existing_data_model: &Datamodel) -> ConnectorResult<IntrospectionResult>;
 }
 
 #[derive(Serialize, Deserialize, Debug)]
