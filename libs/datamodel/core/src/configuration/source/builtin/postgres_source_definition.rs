@@ -14,10 +14,6 @@ impl PostgresSourceDefinition {
 }
 
 impl SourceDefinition for PostgresSourceDefinition {
-    fn connector_type(&self) -> &'static str {
-        POSTGRES_SOURCE_NAME
-    }
-
     fn is_provider(&self, provider: &str) -> bool {
         provider == POSTGRES_SOURCE_NAME || provider == "postgres"
     }

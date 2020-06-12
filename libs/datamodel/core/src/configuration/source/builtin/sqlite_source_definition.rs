@@ -14,10 +14,6 @@ impl SqliteSourceDefinition {
 }
 
 impl SourceDefinition for SqliteSourceDefinition {
-    fn connector_type(&self) -> &'static str {
-        SQLITE_SOURCE_NAME
-    }
-
     fn is_provider(&self, provider: &str) -> bool {
         provider == SQLITE_SOURCE_NAME
     }

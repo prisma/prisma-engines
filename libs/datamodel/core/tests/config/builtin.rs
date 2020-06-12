@@ -80,7 +80,7 @@ fn fail_to_load_sources_for_invalid_source() {
     let res = datamodel::parse_configuration(invalid_datamodel);
 
     if let Err(error) = res {
-        error.assert_is(DatamodelError::SourceNotKnownError {
+        error.assert_is(DatamodelError::DatasourceProviderNotKnownError {
             source_name: String::from("AStrangeHalfMongoDatabase"),
             span: datamodel::ast::Span::new(49, 76),
         });

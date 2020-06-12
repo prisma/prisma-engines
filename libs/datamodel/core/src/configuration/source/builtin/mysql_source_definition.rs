@@ -14,10 +14,6 @@ impl MySqlSourceDefinition {
 }
 
 impl SourceDefinition for MySqlSourceDefinition {
-    fn connector_type(&self) -> &'static str {
-        MYSQL_SOURCE_NAME
-    }
-
     fn is_provider(&self, provider: &str) -> bool {
         provider == MYSQL_SOURCE_NAME
     }

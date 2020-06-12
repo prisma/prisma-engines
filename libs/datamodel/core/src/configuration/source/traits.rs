@@ -24,16 +24,9 @@ pub trait Source: Send + Sync {
     fn connector(&self) -> &Box<dyn Connector>;
 }
 
-/// Trait for source definitions.
-///
-/// It provides access to the source's name, as well as a factory method.
 pub trait SourceDefinition {
-    /// Returns the name of the source.
-    fn connector_type(&self) -> &'static str;
-
+    /// Passes the provider arg from the datasource. Must return true for all provider names it can handle.
     fn is_provider(&self, provider: &str) -> bool;
-
-    //    fn can_handl
 
     /// Instantiates a new source, using the given name, url and detailed arguments.
     fn create(

@@ -112,45 +112,56 @@ impl SourceLoader {
             value: url,
         };
 
-        let combined_connector = {
-            let connectors: Vec<Box<dyn Connector>> = providers
-                .iter()
-                .filter_map(|provider| {
-                    let connector: Option<Box<dyn Connector>> = match provider.as_str() {
-                        "mysql" => Some(Box::new(ExampleConnector::mysql())),
-                        "postgres" | "postgresql" => Some(Box::new(ExampleConnector::postgres())),
-                        "sqlite" => Some(Box::new(ExampleConnector::sqlite())),
-                        _ => None, // if a connector is not known this is handled by the following code
-                    };
-                    connector
-                })
-                .collect();
-            Box::new(MultiProviderConnector::new(connectors))
-        };
+        let source_definitions: Vec<_> = providers
+            .iter()
+            .filter_map(|provider| self.get_source_definition_for_provider(&provider))
+            .collect();
 
-        let mut active_source = None;
-        for provider in &providers {
-            match self.get_source_definition_for_provider(&provider) {
-                Some(sd) => {
-                    active_source = Some(
-                        sd.create(source_name, url, &documentation, combined_connector)
-                            .map_err(|err_msg| {
-                                DatamodelError::new_source_validation_error(&err_msg, source_name, url_args.span())
-                            })?,
-                    );
-                    break;
-                }
-                None => {}
-            }
-        }
-
-        match active_source {
-            Some(source) => Ok(Some(source)),
-            None => Err(DatamodelError::new_source_not_known_error(
+        if source_definitions.is_empty() {
+            return Err(DatamodelError::new_datasource_provider_not_known_error(
                 &providers.join(","),
                 provider_arg.span(),
-            )),
+            ));
         }
+
+        let results: Vec<_> = source_definitions
+            .iter()
+            .map(|sd| {
+                sd.create(
+                    source_name,
+                    url.clone(),
+                    &documentation,
+                    self.combined_connector(&providers),
+                )
+                .map_err(|err_msg| DatamodelError::new_source_validation_error(&err_msg, source_name, url_args.span()))
+            })
+            .collect();
+
+        // Return the first source that was created successfully.
+        // If no source was created successfully return the first of all errors.
+        let (successes, errors): (Vec<_>, Vec<_>) = results.into_iter().partition(|result| result.is_ok());
+        if !successes.is_empty() {
+            Ok(Some(successes.into_iter().next().unwrap()?))
+        } else {
+            Err(errors.into_iter().next().unwrap().err().unwrap())
+        }
+    }
+
+    // This is separate function because it is called repetitively in a loop above.
+    fn combined_connector(&self, providers: &Vec<String>) -> Box<MultiProviderConnector> {
+        let connectors: Vec<Box<dyn Connector>> = providers
+            .iter()
+            .filter_map(|provider| {
+                let connector: Option<Box<dyn Connector>> = match provider.as_str() {
+                    "mysql" => Some(Box::new(ExampleConnector::mysql())),
+                    "postgres" | "postgresql" => Some(Box::new(ExampleConnector::postgres())),
+                    "sqlite" => Some(Box::new(ExampleConnector::sqlite())),
+                    _ => None, // if a connector is not known this is handled by the following code
+                };
+                connector
+            })
+            .collect();
+        Box::new(MultiProviderConnector::new(connectors))
     }
 
     fn get_source_definition_for_provider(&self, provider: &str) -> Option<&Box<dyn SourceDefinition>> {
