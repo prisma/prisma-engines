@@ -1,6 +1,6 @@
 use super::{
-    builtin::{MySqlSourceDefinition, PostgresSourceDefinition, SqliteSourceDefinition},
-    traits::{Source, SourceDefinition},
+    builtin_datasource_providers::{MySqlDatasourceProvider, PostgresDatasourceProvider, SqliteDatasourceProvider},
+    traits::{DatasourceProvider, Source},
 };
 use crate::ast;
 use crate::common::arguments::Arguments;
@@ -11,14 +11,14 @@ use datamodel_connector::{Connector, ExampleConnector, MultiProviderConnector};
 
 /// Helper struct to load and validate source configuration blocks.
 pub struct SourceLoader {
-    source_definitions: Vec<Box<dyn SourceDefinition>>,
+    source_definitions: Vec<Box<dyn DatasourceProvider>>,
 }
 
 impl SourceLoader {
     /// Creates a new, empty source loader.
     pub fn new() -> Self {
         Self {
-            source_definitions: get_builtin_sources(),
+            source_definitions: get_builtin_datasource_providers(),
         }
     }
 
@@ -111,19 +111,19 @@ impl SourceLoader {
             value: url,
         };
 
-        let source_definitions: Vec<_> = providers
+        let datasource_providers: Vec<_> = providers
             .iter()
-            .filter_map(|provider| self.get_source_definition_for_provider(&provider))
+            .filter_map(|provider| self.get_datasource_provider(&provider))
             .collect();
 
-        if source_definitions.is_empty() {
+        if datasource_providers.is_empty() {
             return Err(DatamodelError::new_datasource_provider_not_known_error(
                 &providers.join(","),
                 provider_arg.span(),
             ));
         }
 
-        let results: Vec<_> = source_definitions
+        let results: Vec<_> = datasource_providers
             .iter()
             .map(|sd| {
                 sd.create(
@@ -163,15 +163,15 @@ impl SourceLoader {
         Box::new(MultiProviderConnector::new(connectors))
     }
 
-    fn get_source_definition_for_provider(&self, provider: &str) -> Option<&Box<dyn SourceDefinition>> {
+    fn get_datasource_provider(&self, provider: &str) -> Option<&Box<dyn DatasourceProvider>> {
         self.source_definitions.iter().find(|sd| sd.is_provider(provider))
     }
 }
 
-fn get_builtin_sources() -> Vec<Box<dyn SourceDefinition>> {
+fn get_builtin_datasource_providers() -> Vec<Box<dyn DatasourceProvider>> {
     vec![
-        Box::new(MySqlSourceDefinition::new()),
-        Box::new(PostgresSourceDefinition::new()),
-        Box::new(SqliteSourceDefinition::new()),
+        Box::new(MySqlDatasourceProvider::new()),
+        Box::new(PostgresDatasourceProvider::new()),
+        Box::new(SqliteDatasourceProvider::new()),
     ]
 }
