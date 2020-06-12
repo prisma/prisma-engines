@@ -35,7 +35,6 @@ use sql_migration_persistence::*;
 use sql_schema_describer::SqlSchema;
 use std::{sync::Arc, time::Duration};
 use tracing::debug;
-use user_facing_errors::migration_engine::DatabaseMigrationFormatChanged;
 
 const CONNECTION_TIMEOUT: Duration = Duration::from_secs(10);
 
@@ -164,11 +163,8 @@ impl MigrationConnector for SqlMigrationConnector {
         Box::new(SqlDestructiveChangesChecker { connector: self })
     }
 
-    fn deserialize_database_migration(
-        &self,
-        json: serde_json::Value,
-    ) -> Result<SqlMigration, DatabaseMigrationFormatChanged> {
-        serde_json::from_value(json).map_err(|_| DatabaseMigrationFormatChanged)
+    fn deserialize_database_migration(&self, json: serde_json::Value) -> Option<SqlMigration> {
+        serde_json::from_value(json).ok()
     }
 }
 

@@ -4,7 +4,6 @@ use migration_connector::*;
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 use thiserror::Error;
-use user_facing_errors::migration_engine::DatabaseMigrationFormatChanged;
 
 #[async_trait::async_trait]
 pub trait MigrationCommand {
@@ -21,9 +20,6 @@ pub type CommandResult<T> = Result<T, CommandError>;
 
 #[derive(Debug, Error)]
 pub enum CommandError {
-    #[error("Database migration format changed.")]
-    DatabaseMigrationFormatChanged(DatabaseMigrationFormatChanged),
-
     /// When there was a bad datamodel as part of the input.
     #[error("{0}")]
     ReceivedBadDatamodel(String),
@@ -54,12 +50,6 @@ pub enum CommandError {
 
     #[error("Error in command input. (error: {0})")]
     Input(#[source] anyhow::Error),
-}
-
-impl From<DatabaseMigrationFormatChanged> for CommandError {
-    fn from(v: DatabaseMigrationFormatChanged) -> Self {
-        CommandError::DatabaseMigrationFormatChanged(v)
-    }
 }
 
 fn render_datamodel_error(err: &datamodel::error::ErrorCollection, schema: Option<&String>) -> String {

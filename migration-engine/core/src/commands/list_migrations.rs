@@ -48,10 +48,10 @@ where
     let connector = engine.connector();
 
     let database_steps_json = match connector.deserialize_database_migration(migration.database_migration) {
-        Ok(database_migration) => connector
+        Some(database_migration) => connector
             .database_migration_step_applier()
             .render_steps_pretty(&database_migration)?,
-        Err(_) => vec![],
+        None => vec![],
     };
 
     Ok(ListMigrationsOutput {
