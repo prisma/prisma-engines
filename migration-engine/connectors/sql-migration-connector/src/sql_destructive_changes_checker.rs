@@ -215,6 +215,7 @@ impl SqlDestructiveChangesChecker<'_> {
         plan.push_unexecutable(typed_unexecutable);
     }
 
+    #[tracing::instrument(skip(self, steps, before), target = "SqlDestructiveChangeChecker::check")]
     async fn check_impl(
         &self,
         steps: &[SqlMigrationStep],
@@ -273,7 +274,6 @@ impl SqlDestructiveChangesChecker<'_> {
 
 #[async_trait::async_trait]
 impl DestructiveChangesChecker<SqlMigration> for SqlDestructiveChangesChecker<'_> {
-    #[tracing::instrument(skip(self, database_migration), target = "SqlDestructiveChangeChecker::check")]
     async fn check(&self, database_migration: &SqlMigration) -> ConnectorResult<DestructiveChangeDiagnostics> {
         self.check_impl(&database_migration.original_steps, &database_migration.before)
             .await
