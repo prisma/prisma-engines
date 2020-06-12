@@ -64,10 +64,6 @@ impl<'a> ModelRef<'a> {
         self.model.indices.iter()
     }
 
-    pub(super) fn model(&self) -> &'a Model {
-        self.model
-    }
-
     pub(super) fn name(&self) -> &'a str {
         &self.model.name
     }

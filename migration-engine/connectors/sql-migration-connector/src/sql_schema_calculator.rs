@@ -220,8 +220,8 @@ impl<'a> SqlSchemaCalculator<'a> {
                     let model_a = ModelRef::new(&relation.model_a, self.data_model);
                     let model_b = ModelRef::new(&relation.model_b, self.data_model);
 
-                    let a_columns = relation_table_columns(&model_a, relation.model_a_column());
-                    let b_columns = relation_table_columns(&model_b, relation.model_b_column());
+                    let a_columns = relation_table_column(&model_a, relation.model_a_column());
+                    let b_columns = relation_table_column(&model_b, relation.model_b_column());
 
                     let foreign_keys = vec![
                         sql::ForeignKey {
@@ -284,37 +284,21 @@ impl<'a> SqlSchemaCalculator<'a> {
     }
 }
 
-fn relation_table_columns(referenced_model: &ModelRef<'_>, reference_field_name: String) -> Vec<sql::Column> {
-    if referenced_model.model().id_fields.is_empty() {
-        let unique_field = referenced_model.fields().find(|f| f.is_unique());
-        let id_field = referenced_model.fields().find(|f| f.is_id());
+fn relation_table_column(referenced_model: &ModelRef<'_>, reference_field_name: String) -> Vec<sql::Column> {
+    let unique_field = referenced_model.fields().find(|f| f.is_unique());
+    let id_field = referenced_model.fields().find(|f| f.is_id());
 
-        let unique_field = id_field.or(unique_field).expect(&format!(
-            "No unique criteria found in model {}",
-            &referenced_model.name()
-        ));
+    let unique_field = id_field.or(unique_field).expect(&format!(
+        "No unique criteria found in model {}",
+        &referenced_model.name()
+    ));
 
-        vec![sql::Column {
-            name: reference_field_name,
-            tpe: column_type(&unique_field),
-            default: None,
-            auto_increment: false,
-        }]
-    } else {
-        referenced_model
-            .id_fields()
-            .map(|referenced_field| sql::Column {
-                name: format!(
-                    "{reference_field_name}_{referenced_column_name}",
-                    reference_field_name = reference_field_name,
-                    referenced_column_name = referenced_field.db_name()
-                ),
-                tpe: column_type(&referenced_field),
-                default: None,
-                auto_increment: false,
-            })
-            .collect()
-    }
+    vec![sql::Column {
+        name: reference_field_name,
+        tpe: column_type(&unique_field),
+        default: None,
+        auto_increment: false,
+    }]
 }
 
 fn migration_value_new(field: &FieldRef<'_>) -> Option<sql_schema_describer::DefaultValue> {
