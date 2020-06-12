@@ -11,9 +11,7 @@ use url::Url;
 #[cfg(feature = "sql")]
 use sql_connector::*;
 
-pub async fn load(
-    source: &(dyn Source + Send + Sync),
-) -> PrismaResult<(String, Box<dyn QueryExecutor + Send + Sync + 'static>)> {
+pub async fn load(source: &(dyn Source)) -> PrismaResult<(String, Box<dyn QueryExecutor + Send + Sync + 'static>)> {
     match source.connector_type() {
         #[cfg(feature = "sql")]
         SQLITE_SOURCE_NAME => sqlite(source).await,
@@ -32,9 +30,7 @@ pub async fn load(
 }
 
 #[cfg(feature = "sql")]
-async fn sqlite(
-    source: &(dyn Source + Send + Sync),
-) -> PrismaResult<(String, Box<dyn QueryExecutor + Send + Sync + 'static>)> {
+async fn sqlite(source: &(dyn Source)) -> PrismaResult<(String, Box<dyn QueryExecutor + Send + Sync + 'static>)> {
     trace!("Loading SQLite connector...");
 
     let sqlite = Sqlite::from_source(source).await?;
@@ -46,9 +42,7 @@ async fn sqlite(
 }
 
 #[cfg(feature = "sql")]
-async fn postgres(
-    source: &(dyn Source + Send + Sync),
-) -> PrismaResult<(String, Box<dyn QueryExecutor + Send + Sync + 'static>)> {
+async fn postgres(source: &(dyn Source)) -> PrismaResult<(String, Box<dyn QueryExecutor + Send + Sync + 'static>)> {
     trace!("Loading Postgres connector...");
 
     let url = Url::parse(&source.url().value)?;
@@ -71,9 +65,7 @@ async fn postgres(
 }
 
 #[cfg(feature = "sql")]
-async fn mysql(
-    source: &(dyn Source + Send + Sync),
-) -> PrismaResult<(String, Box<dyn QueryExecutor + Send + Sync + 'static>)> {
+async fn mysql(source: &(dyn Source)) -> PrismaResult<(String, Box<dyn QueryExecutor + Send + Sync + 'static>)> {
     trace!("Loading MySQL connector...");
 
     let mysql = Mysql::from_source(source).await?;

@@ -24,7 +24,7 @@ impl SourceDefinition for SqliteSourceDefinition {
         url: StringFromEnvVar,
         documentation: &Option<String>,
         connector: Box<dyn Connector>,
-    ) -> Result<Box<dyn Source + Send + Sync>, String> {
+    ) -> Result<Box<dyn Source>, String> {
         let validation_with_file_protocol = validate_url(name, "file:", url.clone());
         let validation_with_sqlite_protocol = validate_url(name, "sqlite://", url);
         Ok(Box::new(SimpleSource {

@@ -35,5 +35,5 @@ pub trait SourceDefinition {
         url: StringFromEnvVar,
         documentation: &Option<String>,
         connector: Box<dyn Connector>,
-    ) -> Result<Box<dyn Source + Send + Sync>, String>;
+    ) -> Result<Box<dyn Source>, String>;
 }

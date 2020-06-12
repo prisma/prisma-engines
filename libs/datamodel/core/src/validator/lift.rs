@@ -15,7 +15,7 @@ use datamodel_connector::{Connector, ExampleConnector};
 /// additional semantics are attached.
 pub struct LiftAstToDml<'a> {
     directives: DirectiveBox,
-    source: Option<&'a Box<dyn configuration::Source + Send + Sync>>,
+    source: Option<&'a Box<dyn configuration::Source>>,
 }
 
 const USE_CONNECTORS_FOR_CUSTOM_TYPES: bool = false; // FEATURE FLAG
@@ -25,7 +25,7 @@ impl<'a> LiftAstToDml<'a> {
     /// the directives defined by the given sources registered.
     ///
     /// The directives defined by the given sources will be namespaced.
-    pub fn new(source: Option<&'a Box<dyn configuration::Source + Send + Sync>>) -> LiftAstToDml {
+    pub fn new(source: Option<&'a Box<dyn configuration::Source>>) -> LiftAstToDml {
         LiftAstToDml {
             directives: DirectiveBox::new(),
             source,

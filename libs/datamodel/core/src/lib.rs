@@ -152,7 +152,7 @@ pub fn parse_configuration_and_ignore_env_errors(
 fn load_sources(
     schema_ast: &SchemaAst,
     ignore_env_var_errors: bool,
-) -> Result<Vec<Box<dyn Source + Send + Sync>>, error::ErrorCollection> {
+) -> Result<Vec<Box<dyn Source>>, error::ErrorCollection> {
     let source_loader = SourceLoader::new();
     source_loader.load_sources(&schema_ast, ignore_env_var_errors)
 }

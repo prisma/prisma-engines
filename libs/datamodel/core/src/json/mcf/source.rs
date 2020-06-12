@@ -11,17 +11,17 @@ pub struct SourceConfig {
     pub documentation: Option<String>,
 }
 
-pub fn render_sources_to_json_value(sources: &[Box<dyn configuration::Source + Send + Sync>]) -> serde_json::Value {
+pub fn render_sources_to_json_value(sources: &[Box<dyn configuration::Source>]) -> serde_json::Value {
     let res = sources_to_json_structs(sources);
     serde_json::to_value(&res).expect("Failed to render JSON.")
 }
 
-pub fn render_sources_to_json(sources: &[Box<dyn configuration::Source + Send + Sync>]) -> String {
+pub fn render_sources_to_json(sources: &[Box<dyn configuration::Source>]) -> String {
     let res = sources_to_json_structs(sources);
     serde_json::to_string_pretty(&res).expect("Failed to render JSON.")
 }
 
-fn sources_to_json_structs(sources: &[Box<dyn configuration::Source + Send + Sync>]) -> Vec<SourceConfig> {
+fn sources_to_json_structs(sources: &[Box<dyn configuration::Source>]) -> Vec<SourceConfig> {
     let mut res: Vec<SourceConfig> = Vec::new();
 
     for source in sources {

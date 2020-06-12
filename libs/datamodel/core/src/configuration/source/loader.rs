@@ -28,14 +28,13 @@ impl SourceLoader {
         &self,
         ast_schema: &ast::SchemaAst,
         ignore_env_var_errors: bool,
-    ) -> Result<Vec<Box<dyn Source + Send + Sync>>, ErrorCollection> {
-        let mut sources: Vec<Box<dyn Source + Send + Sync>> = vec![];
+    ) -> Result<Vec<Box<dyn Source>>, ErrorCollection> {
+        let mut sources = vec![];
         let mut errors = ErrorCollection::new();
 
         for src in &ast_schema.sources() {
             match self.load_source(&src, ignore_env_var_errors) {
-                Ok(Some(loaded_src)) => sources.push(loaded_src),
-                Ok(None) => { /* Source was disabled. */ }
+                Ok(loaded_src) => sources.push(loaded_src),
                 // Lift error to source.
                 Err(DatamodelError::ArgumentNotFound { argument_name, span }) => errors.push(
                     DatamodelError::new_source_argument_not_found_error(&argument_name, &src.name.name, span),
@@ -56,7 +55,7 @@ impl SourceLoader {
         &self,
         ast_source: &ast::SourceConfig,
         ignore_env_var_errors: bool,
-    ) -> Result<Option<Box<dyn Source + Send + Sync>>, DatamodelError> {
+    ) -> Result<Box<dyn Source>, DatamodelError> {
         let source_name = &ast_source.name.name;
         let mut args = Arguments::new(&ast_source.properties, ast_source.span);
 
@@ -141,7 +140,7 @@ impl SourceLoader {
         // If no source was created successfully return the first of all errors.
         let (successes, errors): (Vec<_>, Vec<_>) = results.into_iter().partition(|result| result.is_ok());
         if !successes.is_empty() {
-            Ok(Some(successes.into_iter().next().unwrap()?))
+            Ok(successes.into_iter().next().unwrap()?)
         } else {
             Err(errors.into_iter().next().unwrap().err().unwrap())
         }

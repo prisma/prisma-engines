@@ -24,7 +24,7 @@ impl SourceDefinition for MySqlSourceDefinition {
         url: StringFromEnvVar,
         documentation: &Option<String>,
         connector: Box<dyn Connector>,
-    ) -> Result<Box<dyn Source + Send + Sync>, String> {
+    ) -> Result<Box<dyn Source>, String> {
         Ok(Box::new(SimpleSource {
             name: String::from(name),
             connector_type: MYSQL_SOURCE_NAME.to_owned(),
