@@ -368,19 +368,19 @@ impl QueryGraph {
     ///
     /// Criteria for a direct child (either):
     /// - Every node that only has `parent` as their parent.
-    /// - OR In case of multiple parents, has `parent` as their parent and _all_ other
+    /// - OR in case of multiple parents, has `parent` as their parent and _all_ other
     ///   parents are strict ancestors of `parent`, meaning they are "higher up" in the graph.
     /// - OR All other parents have already been visited before.
     pub fn is_direct_child(&self, parent: &NodeRef, child: &NodeRef) -> bool {
-        let ancestry_rule = self.incoming_edges(child).into_iter().all(|edge| {
-            let other_parent = self.edge_source(&edge);
+        // let ancestry_rule = self.incoming_edges(child).into_iter().all(|edge| {
+        //     let other_parent = self.edge_source(&edge);
 
-            if &other_parent != parent {
-                self.is_ancestor(&other_parent, parent)
-            } else {
-                true
-            }
-        });
+        //     if &other_parent != parent {
+        //         self.is_ancestor(&other_parent, parent)
+        //     } else {
+        //         true
+        //     }
+        // });
 
         let visitation_rule = self.incoming_edges(child).into_iter().all(|edge| {
             let other_parent = self.edge_source(&edge);
@@ -392,7 +392,8 @@ impl QueryGraph {
             }
         });
 
-        ancestry_rule || visitation_rule
+        // ancestry_rule || visitation_rule
+        visitation_rule
     }
 
     /// Returns a list of child nodes, together with their child edge for the given `node`.
