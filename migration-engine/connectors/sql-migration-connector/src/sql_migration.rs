@@ -50,15 +50,6 @@ pub enum SqlMigrationStep {
     AlterEnum(AlterEnum),
 }
 
-/// A helper struct to serialize an [SqlMigrationStep](/sql-migration/enum.SqlMigrationStep.html)
-/// with an additional `raw` field containing the rendered SQL string for that step.
-#[derive(Debug, Serialize, Deserialize, PartialEq)]
-pub struct PrettySqlMigrationStep {
-    #[serde(flatten)]
-    pub step: SqlMigrationStep,
-    pub raw: String,
-}
-
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct CreateTable {
     pub table: Table,

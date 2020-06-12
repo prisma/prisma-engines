@@ -18,7 +18,9 @@ pub use migration_progress::*;
 pub use reset::*;
 pub use unapply_migration::*;
 
-use migration_connector::{MigrationError, MigrationStep, MigrationWarning, UnexecutableMigration};
+use migration_connector::{
+    MigrationError, MigrationStep, MigrationWarning, PrettyDatabaseMigrationStep, UnexecutableMigration,
+};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -26,7 +28,7 @@ use serde::{Deserialize, Serialize};
 pub struct MigrationStepsResultOutput {
     pub datamodel: String,
     pub datamodel_steps: Vec<MigrationStep>,
-    pub database_steps: serde_json::Value,
+    pub database_steps: Vec<PrettyDatabaseMigrationStep>,
     pub warnings: Vec<MigrationWarning>,
     pub errors: Vec<MigrationError>,
     pub general_errors: Vec<String>,

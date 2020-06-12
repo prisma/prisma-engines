@@ -1,7 +1,7 @@
+use migration_connector::PrettyDatabaseMigrationStep;
 use migration_core::commands::AppliedMigration;
 use migration_engine_tests::sql::*;
 use pretty_assertions::assert_eq;
-use sql_migration_connector::PrettySqlMigrationStep;
 
 #[test_each_connector]
 async fn assume_to_be_applied_must_work(api: &TestApi) -> TestResult {
@@ -186,7 +186,7 @@ async fn watch_migrations_must_be_returned_when_transitioning_out_of_watch_mode(
             }
         "#;
 
-    let mut applied_database_steps: Vec<PrettySqlMigrationStep> = Vec::new();
+    let mut applied_database_steps: Vec<PrettyDatabaseMigrationStep> = Vec::new();
 
     let output = api
         .infer_apply(&dm)
@@ -195,8 +195,7 @@ async fn watch_migrations_must_be_returned_when_transitioning_out_of_watch_mode(
         .await?
         .into_inner();
 
-    applied_database_steps
-        .extend(serde_json::from_value::<Vec<PrettySqlMigrationStep>>(output.database_steps).unwrap());
+    applied_database_steps.extend(output.database_steps);
 
     let dm = r#"
             model Blog {
@@ -221,14 +220,15 @@ async fn watch_migrations_must_be_returned_when_transitioning_out_of_watch_mode(
         .await?
         .into_inner();
 
-    applied_database_steps
-        .extend(serde_json::from_value::<Vec<PrettySqlMigrationStep>>(output.database_steps).unwrap());
+    applied_database_steps.extend_from_slice(&output.database_steps);
+
+    // applied_database_steps.extend(output.database_steps.iter().map(|s| s.clone()));
 
     // We added one field/column twice, and two models, so we should have four database steps.
     assert_eq!(applied_database_steps.len(), if api.is_sqlite() { 16 } else { 4 });
 
     let output = api.infer(dm).migration_id(Some("mig02")).send().await?;
-    let returned_steps: Vec<PrettySqlMigrationStep> = serde_json::from_value(output.database_steps).unwrap();
+    let returned_steps: Vec<PrettyDatabaseMigrationStep> = output.database_steps;
 
     let expected_steps_count = if api.is_sqlite() { 9 } else { 3 }; // one AlterTable, two CreateTables
 
@@ -247,7 +247,7 @@ async fn watch_migrations_must_be_returned_in_addition_to_regular_inferred_steps
             }
         "#;
 
-    let mut applied_database_steps: Vec<PrettySqlMigrationStep> = Vec::new();
+    let mut applied_database_steps: Vec<PrettyDatabaseMigrationStep> = Vec::new();
 
     api.infer_apply(&dm)
         .migration_id(Some("mig00"))
@@ -269,8 +269,7 @@ async fn watch_migrations_must_be_returned_in_addition_to_regular_inferred_steps
         .await?
         .into_inner();
 
-    applied_database_steps
-        .extend(serde_json::from_value::<Vec<PrettySqlMigrationStep>>(output.database_steps).unwrap());
+    applied_database_steps.extend_from_slice(&output.database_steps);
 
     let dm = r#"
             model Blog {
@@ -294,8 +293,7 @@ async fn watch_migrations_must_be_returned_in_addition_to_regular_inferred_steps
         .send()
         .await?
         .into_inner();
-    applied_database_steps
-        .extend(serde_json::from_value::<Vec<PrettySqlMigrationStep>>(output.database_steps).unwrap());
+    applied_database_steps.extend_from_slice(&output.database_steps);
 
     // We added one field/column twice, and two models, so we should have four database steps.
     assert_eq!(applied_database_steps.len(), if api.is_sqlite() { 16 } else { 4 });
@@ -321,7 +319,7 @@ async fn watch_migrations_must_be_returned_in_addition_to_regular_inferred_steps
         "#;
 
     let output = api.infer(dm).migration_id(Some("mig02")).send().await?;
-    let returned_steps: Vec<PrettySqlMigrationStep> = serde_json::from_value(output.database_steps).unwrap();
+    let returned_steps: Vec<PrettyDatabaseMigrationStep> = output.database_steps;
 
     let expected_steps_count = if api.is_sqlite() {
         10
