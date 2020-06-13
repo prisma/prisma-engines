@@ -97,6 +97,11 @@ impl Model {
         self.fields().find(|f| f.name == *name)
     }
 
+    /// Finds a field by database name.
+    pub fn find_field_db_name(&self, db_name: &str) -> Option<&Field> {
+        self.fields().find(|f| f.database_name == Some(db_name.to_owned()))
+    }
+
     pub fn has_field(&self, name: &str) -> bool {
         self.find_field(name).is_some()
     }

@@ -35,7 +35,7 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
     // find models with 1to1 relations
     let mut models_with_one_to_one_relation = vec![];
     for model in &datamodel.models {
-        if model.fields.iter().any(|f| match (&f.arity, &f.field_type) {
+        if model.fields().any(|f| match (&f.arity, &f.field_type) {
             (FieldArity::List, _) => false,
             (
                 _,
@@ -48,8 +48,7 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
             ) => {
                 let other_model = datamodel.find_model(to).unwrap();
                 let other_field = other_model
-                    .fields
-                    .iter()
+                    .fields()
                     .find(|f| match &f.field_type {
                         FieldType::Relation(RelationInfo {
                             to: other_to,

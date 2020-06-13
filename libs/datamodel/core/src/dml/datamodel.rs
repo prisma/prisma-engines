@@ -81,6 +81,13 @@ impl Datamodel {
         self.models.iter().find(|model| model.name == name)
     }
 
+    /// Finds a model by database name.
+    pub fn find_model_db_name(&self, db_name: &str) -> Option<&Model> {
+        self.models
+            .iter()
+            .find(|model| model.database_name == Some(db_name.to_owned()))
+    }
+
     /// Finds a model for a field reference by using reference comparison.
     pub fn find_model_by_field_ref(&self, field: &Field) -> Option<&Model> {
         // This uses the memory location of field for equality.

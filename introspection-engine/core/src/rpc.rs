@@ -79,6 +79,7 @@ impl RpcImpl {
 
         //todo error handling
         // we now would necessitate a valid schema, was that the case before???
+        // create warning when previous could not be parsed, add this to the result afterwards
         let existing_data_model = datamodel::parse_datamodel(&schema).unwrap();
 
         match connector.introspect(&existing_data_model).await {
