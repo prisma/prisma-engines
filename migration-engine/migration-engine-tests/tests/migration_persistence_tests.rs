@@ -3,6 +3,22 @@ use migration_engine_tests::*;
 use pretty_assertions::assert_eq;
 use quaint::prelude::SqlFamily;
 
+fn empty_migration(name: String) -> Migration {
+    Migration {
+        name,
+        revision: 0,
+        status: MigrationStatus::Pending,
+        datamodel_string: String::new(),
+        datamodel_steps: Vec::new(),
+        applied: 0,
+        rolled_back: 0,
+        database_migration: serde_json::json!({}),
+        errors: Vec::new(),
+        started_at: Migration::timestamp_without_nanos(),
+        finished_at: None,
+    }
+}
+
 #[test_each_connector]
 async fn last_should_return_none_if_there_is_no_migration(api: &TestApi) {
     let persistence = api.migration_persistence();
@@ -13,7 +29,7 @@ async fn last_should_return_none_if_there_is_no_migration(api: &TestApi) {
 #[test_each_connector]
 async fn last_must_return_none_if_there_is_no_successful_migration(api: &TestApi) -> TestResult {
     let persistence = api.migration_persistence();
-    persistence.create(Migration::empty("my_migration".to_string())).await?;
+    persistence.create(empty_migration("my_migration".to_string())).await?;
     let loaded = persistence.last().await?;
     assert_eq!(loaded, None);
 
@@ -31,15 +47,15 @@ async fn load_all_should_return_empty_if_there_is_no_migration(api: &TestApi) {
 async fn load_all_must_return_all_created_migrations(api: &TestApi) {
     let persistence = api.migration_persistence();
     let migration1 = persistence
-        .create(Migration::empty("migration_1".to_string()))
+        .create(empty_migration("migration_1".to_string()))
         .await
         .unwrap();
     let migration2 = persistence
-        .create(Migration::empty("migration_2".to_string()))
+        .create(empty_migration("migration_2".to_string()))
         .await
         .unwrap();
     let migration3 = persistence
-        .create(Migration::empty("migration_3".to_string()))
+        .create(empty_migration("migration_3".to_string()))
         .await
         .unwrap();
 
@@ -62,7 +78,7 @@ async fn create_should_allow_to_create_a_new_migration(api: &TestApi) {
     "#;
 
     let persistence = api.migration_persistence();
-    let mut migration = Migration::empty("my_migration".to_string());
+    let mut migration = empty_migration("my_migration".to_string());
     migration.status = MigrationStatus::MigrationSuccess;
     migration.datamodel_string = dm.to_owned();
     migration.datamodel_steps = vec![MigrationStep::CreateEnum(CreateEnum {
@@ -89,11 +105,11 @@ async fn create_should_allow_to_create_a_new_migration(api: &TestApi) {
 async fn create_should_increment_revisions(api: &TestApi) {
     let persistence = api.migration_persistence();
     let migration1 = persistence
-        .create(Migration::empty("migration_1".to_string()))
+        .create(empty_migration("migration_1".to_string()))
         .await
         .unwrap();
     let migration2 = persistence
-        .create(Migration::empty("migration_2".to_string()))
+        .create(empty_migration("migration_2".to_string()))
         .await
         .unwrap();
     assert_eq!(migration1.revision + 1, migration2.revision);
@@ -103,7 +119,7 @@ async fn create_should_increment_revisions(api: &TestApi) {
 async fn update_must_work(api: &TestApi) {
     let persistence = api.migration_persistence();
     let migration = persistence
-        .create(Migration::empty("my_migration".to_string()))
+        .create(empty_migration("my_migration".to_string()))
         .await
         .unwrap();
 
@@ -133,12 +149,12 @@ async fn update_must_work(api: &TestApi) {
 async fn migration_is_already_applied_must_work(api: &TestApi) -> TestResult {
     let persistence = api.migration_persistence();
 
-    let mut migration_1 = Migration::empty("migration_1".to_string());
+    let mut migration_1 = empty_migration("migration_1".to_string());
     migration_1.status = MigrationStatus::MigrationSuccess;
 
     persistence.create(migration_1).await?;
 
-    let mut migration_2 = Migration::empty("migration_2".to_string());
+    let mut migration_2 = empty_migration("migration_2".to_string());
     migration_2.status = MigrationStatus::MigrationFailure;
 
     persistence.create(migration_2).await?;

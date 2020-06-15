@@ -137,24 +137,6 @@ impl Migration {
         }
     }
 
-    /// This is only useful for tests. Use `Migration::new()` if you want to initialize a valid
-    /// migration.
-    pub fn empty(name: String) -> Migration {
-        Migration {
-            name,
-            revision: 0,
-            status: MigrationStatus::Pending,
-            datamodel_string: String::new(),
-            datamodel_steps: Vec::new(),
-            applied: 0,
-            rolled_back: 0,
-            database_migration: serde_json::json!({}),
-            errors: Vec::new(),
-            started_at: Self::timestamp_without_nanos(),
-            finished_at: None,
-        }
-    }
-
     pub fn update_params(&self) -> MigrationUpdateParams {
         MigrationUpdateParams {
             name: self.name.clone(),
