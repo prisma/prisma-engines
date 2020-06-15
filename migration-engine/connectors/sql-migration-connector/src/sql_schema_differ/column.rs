@@ -132,6 +132,14 @@ impl ColumnChanges {
     pub(crate) fn arity_changed(&self) -> bool {
         self.changes.iter().any(|c| c.as_ref() == Some(&ColumnChange::Arity))
     }
+
+    pub(crate) fn only_default_changed(&self) -> bool {
+        matches!(self.changes, [None, None, None, Some(ColumnChange::Default)])
+    }
+
+    pub(crate) fn column_was_renamed(&self) -> bool {
+        matches!(self.changes, [Some(ColumnChange::Renaming), _, _, _])
+    }
 }
 
 #[cfg(test)]

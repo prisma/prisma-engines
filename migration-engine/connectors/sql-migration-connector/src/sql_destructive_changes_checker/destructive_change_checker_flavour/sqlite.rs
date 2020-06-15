@@ -2,7 +2,8 @@ use super::DestructiveChangeCheckerFlavour;
 use crate::{
     flavour::SqliteFlavour,
     sql_destructive_changes_checker::{
-        destructive_check_plan::DestructiveCheckPlan, warning_check::SqlMigrationWarning,
+        destructive_check_plan::DestructiveCheckPlan, unexecutable_step_check::UnexecutableStepCheck,
+        warning_check::SqlMigrationWarning,
     },
     sql_schema_differ::ColumnDiffer,
 };
@@ -23,6 +24,16 @@ impl DestructiveChangeCheckerFlavour for SqliteFlavour {
 
         if !columns.all_changes().type_changed() && arity_change_is_safe {
             return;
+        }
+
+        if columns.all_changes().arity_changed()
+            && columns.next.tpe.arity.is_required()
+            && columns.next.default.is_none()
+        {
+            plan.push_unexecutable(UnexecutableStepCheck::MadeOptionalFieldRequired {
+                table: previous_table.name.clone(),
+                column: columns.previous.name.clone(),
+            });
         }
 
         plan.push_warning(SqlMigrationWarning::AlterColumn {

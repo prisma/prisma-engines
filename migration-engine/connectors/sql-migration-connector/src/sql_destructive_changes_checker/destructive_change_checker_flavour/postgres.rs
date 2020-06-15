@@ -3,37 +3,65 @@ use crate::{
     expanded_alter_column::{expand_postgres_alter_column, PostgresAlterColumn},
     flavour::PostgresFlavour,
     sql_destructive_changes_checker::{
-        destructive_check_plan::DestructiveCheckPlan, warning_check::SqlMigrationWarning,
+        destructive_check_plan::DestructiveCheckPlan, unexecutable_step_check::UnexecutableStepCheck,
+        warning_check::SqlMigrationWarning,
     },
     sql_schema_differ::ColumnDiffer,
 };
-use sql_schema_describer::Table;
+use sql_schema_describer::{DefaultValue, Table};
 
 impl DestructiveChangeCheckerFlavour for PostgresFlavour {
     fn check_alter_column(&self, previous_table: &Table, columns: &ColumnDiffer<'_>, plan: &mut DestructiveCheckPlan) {
         let expanded = expand_postgres_alter_column(columns);
 
-        // We keep the match here to keep the exhaustiveness checking for when we add variants.
         if let Some(steps) = expanded {
-            let mut is_safe = true;
-
             for step in steps {
+                // We keep the match here to keep the exhaustiveness checking for when we add variants.
                 match step {
+                    PostgresAlterColumn::SetNotNull => {
+                        plan.push_unexecutable(UnexecutableStepCheck::MadeOptionalFieldRequired {
+                            column: columns.previous.name.clone(),
+                            table: previous_table.name.clone(),
+                        })
+                    }
+                    PostgresAlterColumn::SetType(_) => {
+                        plan.push_warning(SqlMigrationWarning::AlterColumn {
+                            table: previous_table.name.clone(),
+                            column: columns.next.name.clone(),
+                        });
+                    }
                     PostgresAlterColumn::SetDefault(_)
                     | PostgresAlterColumn::DropDefault
                     | PostgresAlterColumn::DropNotNull => (),
-                    PostgresAlterColumn::SetType(_) => is_safe = false,
                 }
             }
-
-            if is_safe {
-                return;
+        } else {
+            // Unexecutable drop and recreate.
+            if columns.all_changes().arity_changed()
+                && columns.next.tpe.arity.is_required()
+                && !default_can_be_rendered(columns.next.default.as_ref())
+            {
+                plan.push_unexecutable(UnexecutableStepCheck::AddedRequiredFieldToTable {
+                    column: columns.previous.name.clone(),
+                    table: previous_table.name.clone(),
+                })
+            } else {
+                // Executable drop and recreate.
+                plan.push_warning(SqlMigrationWarning::AlterColumn {
+                    table: previous_table.name.clone(),
+                    column: columns.next.name.clone(),
+                });
             }
         }
+    }
+}
 
-        plan.push_warning(SqlMigrationWarning::AlterColumn {
-            table: previous_table.name.clone(),
-            column: columns.next.name.clone(),
-        });
+fn default_can_be_rendered(default: Option<&DefaultValue>) -> bool {
+    match default {
+        None => false,
+        Some(DefaultValue::VALUE(_)) => true,
+        Some(DefaultValue::DBGENERATED(expr)) => !expr.is_empty(),
+        Some(DefaultValue::NOW) => true,
+        Some(DefaultValue::SEQUENCE(_)) => false,
     }
 }
