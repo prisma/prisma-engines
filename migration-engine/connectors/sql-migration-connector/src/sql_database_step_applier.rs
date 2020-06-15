@@ -48,20 +48,17 @@ impl DatabaseMigrationStepApplier<SqlMigration> for SqlDatabaseStepApplier<'_> {
         crate::catch(self.connection_info(), fut).await
     }
 
-    fn render_steps_pretty(&self, database_migration: &SqlMigration) -> ConnectorResult<Vec<serde_json::Value>> {
+    fn render_steps_pretty(
+        &self,
+        database_migration: &SqlMigration,
+    ) -> ConnectorResult<Vec<PrettyDatabaseMigrationStep>> {
         render_steps_pretty(
             &database_migration,
             self.renderer().as_ref(),
             self.database_info(),
             &database_migration.before,
             &database_migration.after,
-        )?
-        .into_iter()
-        .map(|pretty_step| {
-            serde_json::to_value(&pretty_step)
-                .map_err(|err| ConnectorError::from_kind(migration_connector::ErrorKind::Generic(err.into())))
-        })
-        .collect()
+        )
     }
 }
 
@@ -108,7 +105,7 @@ fn render_steps_pretty(
     database_info: &DatabaseInfo,
     current_schema: &SqlSchema,
     next_schema: &SqlSchema,
-) -> ConnectorResult<Vec<PrettySqlMigrationStep>> {
+) -> ConnectorResult<Vec<PrettyDatabaseMigrationStep>> {
     let mut steps = Vec::with_capacity(database_migration.corrected_steps.len());
 
     for step in &database_migration.corrected_steps {
@@ -119,8 +116,8 @@ fn render_steps_pretty(
             .join(";\n");
 
         if !sql.is_empty() {
-            steps.push(PrettySqlMigrationStep {
-                step: step.clone(),
+            steps.push(PrettyDatabaseMigrationStep {
+                step: serde_json::to_value(&step).unwrap_or_else(|_| serde_json::json!({})),
                 raw: sql,
             });
         }
@@ -210,10 +207,6 @@ fn render_raw_sql(
                 "PRAGMA foreign_keys=on".to_string(),
             ]),
         },
-        SqlMigrationStep::DropTables(DropTables { names }) => {
-            let fully_qualified_names = names.iter().map(|name| renderer.quote_with_schema(&schema_name, &name));
-            Ok(vec![format!("DROP TABLE {};", fully_qualified_names.join(","))])
-        }
         SqlMigrationStep::RenameTable { name, new_name } => {
             let new_name = match sql_family {
                 SqlFamily::Sqlite => renderer.quote(new_name).to_string(),

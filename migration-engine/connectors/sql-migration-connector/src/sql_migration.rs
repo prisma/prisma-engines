@@ -40,8 +40,6 @@ pub enum SqlMigrationStep {
     CreateTable(CreateTable),
     AlterTable(AlterTable),
     DropTable(DropTable),
-    // TODO: remove this variant on next migration format breaking change.
-    DropTables(DropTables),
     RenameTable { name: String, new_name: String },
     RawSql { raw: String },
     CreateIndex(CreateIndex),
@@ -52,15 +50,6 @@ pub enum SqlMigrationStep {
     AlterEnum(AlterEnum),
 }
 
-/// A helper struct to serialize an [SqlMigrationStep](/sql-migration/enum.SqlMigrationStep.html)
-/// with an additional `raw` field containing the rendered SQL string for that step.
-#[derive(Debug, Serialize, Deserialize, PartialEq)]
-pub struct PrettySqlMigrationStep {
-    #[serde(flatten)]
-    pub step: SqlMigrationStep,
-    pub raw: String,
-}
-
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct CreateTable {
     pub table: Table,
@@ -69,11 +58,6 @@ pub struct CreateTable {
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct DropTable {
     pub name: String,
-}
-
-#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
-pub struct DropTables {
-    pub names: Vec<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]

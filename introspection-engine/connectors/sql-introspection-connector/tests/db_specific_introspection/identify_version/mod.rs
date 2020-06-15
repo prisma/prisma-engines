@@ -1,7 +1,6 @@
 use crate::*;
 use barrel::types;
-use introspection_connector::Version::NonPrisma;
-use introspection_connector::{IntrospectionConnector, Version};
+use introspection_connector::Version;
 use test_harness::*;
 
 //Sqlite
