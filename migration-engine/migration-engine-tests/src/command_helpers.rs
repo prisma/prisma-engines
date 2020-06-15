@@ -1,4 +1,3 @@
-use migration_connector::PrettyDatabaseMigrationStep;
 use migration_core::commands::*;
 use sql_migration_connector::SqlMigrationStep;
 use sql_schema_describer::*;

@@ -1,4 +1,4 @@
-use crate::{error::ConnectorError, steps::*};
+use crate::{error::ConnectorError, steps::*, ConnectorResult};
 use chrono::{DateTime, Utc};
 use datamodel::{ast::SchemaAst, error::ErrorCollection, Datamodel};
 use serde::Serialize;
@@ -31,6 +31,10 @@ pub trait MigrationPersistence: Send + Sync {
 
     /// Returns the last successful Migration.
     async fn last(&self) -> Result<Option<Migration>, ConnectorError>;
+
+    /// Returns the last two successful migrations, for rollback purposes. The tuple will be
+    /// interpreted as (last_migration, second_to_last_migration).
+    async fn last_two_migrations(&self) -> ConnectorResult<(Option<Migration>, Option<Migration>)>;
 
     /// Fetch a migration by name.
     async fn by_name(&self, name: &str) -> Result<Option<Migration>, ConnectorError>;
@@ -256,6 +260,10 @@ impl MigrationPersistence for EmptyMigrationPersistence {
 
     async fn last(&self) -> Result<Option<Migration>, ConnectorError> {
         Ok(None)
+    }
+
+    async fn last_two_migrations(&self) -> ConnectorResult<(Option<Migration>, Option<Migration>)> {
+        Ok((None, None))
     }
 
     async fn by_name(&self, _name: &str) -> Result<Option<Migration>, ConnectorError> {

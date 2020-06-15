@@ -1,9 +1,14 @@
-use crate::Component;
+use crate::{Component, SqlError};
 use barrel::types;
 use chrono::*;
+use futures::TryFutureExt;
 use migration_connector::*;
 use quaint::ast::*;
-use quaint::{connector::ResultSet, prelude::SqlFamily};
+use quaint::{
+    connector::ResultSet,
+    error::Error as QuaintError,
+    prelude::{Queryable, SqlFamily},
+};
 use std::convert::TryFrom;
 
 pub struct SqlMigrationPersistence<'a> {
@@ -70,6 +75,14 @@ impl MigrationPersistence for SqlMigrationPersistence<'_> {
             let result_set = self.conn().query(query.into()).await?;
             Ok(parse_rows_new(result_set).into_iter().next())
         })
+        .await
+    }
+
+    async fn last_two_migrations(&self) -> ConnectorResult<(Option<Migration>, Option<Migration>)> {
+        crate::catch(
+            self.connection_info(),
+            last_applied_migrations(self.conn(), self.table()).map_err(SqlError::from),
+        )
         .await
     }
 
@@ -160,6 +173,24 @@ impl MigrationPersistence for SqlMigrationPersistence<'_> {
         })
         .await
     }
+}
+
+/// Returns the last 2 applied migrations, or a shorter vec in absence of applied migrations.
+async fn last_applied_migrations(
+    conn: &dyn Queryable,
+    table: Table<'_>,
+) -> Result<(Option<Migration>, Option<Migration>), QuaintError> {
+    let conditions = STATUS_COLUMN.equals(MigrationStatus::MigrationSuccess.code());
+    let query = Select::from_table(table)
+        .so_that(conditions)
+        .order_by(REVISION_COLUMN.descend())
+        .limit(2);
+
+    let result_set = conn.query(query.into()).await?;
+    let mut rows = parse_rows_new(result_set).into_iter();
+    let last = rows.next();
+    let second_to_last = rows.next();
+    Ok((last, second_to_last))
 }
 
 fn migration_table_setup_sqlite(t: &mut barrel::Table) {
