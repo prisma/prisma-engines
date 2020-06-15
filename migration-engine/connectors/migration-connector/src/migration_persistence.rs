@@ -30,7 +30,9 @@ pub trait MigrationPersistence: Send + Sync {
     }
 
     /// Returns the last successful Migration.
-    async fn last(&self) -> Result<Option<Migration>, ConnectorError>;
+    async fn last(&self) -> Result<Option<Migration>, ConnectorError> {
+        Ok(self.last_two_migrations().await?.0)
+    }
 
     /// Returns the last two successful migrations, for rollback purposes. The tuple will be
     /// interpreted as (last_migration, second_to_last_migration).
@@ -238,10 +240,6 @@ impl MigrationPersistence for EmptyMigrationPersistence {
 
     async fn reset(&self) -> Result<(), ConnectorError> {
         Ok(())
-    }
-
-    async fn last(&self) -> Result<Option<Migration>, ConnectorError> {
-        Ok(None)
     }
 
     async fn last_two_migrations(&self) -> ConnectorResult<(Option<Migration>, Option<Migration>)> {

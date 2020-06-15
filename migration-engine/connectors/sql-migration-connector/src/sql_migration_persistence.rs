@@ -65,19 +65,6 @@ impl MigrationPersistence for SqlMigrationPersistence<'_> {
         .await
     }
 
-    async fn last(&self) -> Result<Option<Migration>, ConnectorError> {
-        crate::catch(self.connection_info(), async {
-            let conditions = STATUS_COLUMN.equals(MigrationStatus::MigrationSuccess.code());
-            let query = Select::from_table(self.table())
-                .so_that(conditions)
-                .order_by(REVISION_COLUMN.descend());
-
-            let result_set = self.conn().query(query.into()).await?;
-            Ok(parse_rows_new(result_set).into_iter().next())
-        })
-        .await
-    }
-
     async fn last_two_migrations(&self) -> ConnectorResult<(Option<Migration>, Option<Migration>)> {
         crate::catch(
             self.connection_info(),
