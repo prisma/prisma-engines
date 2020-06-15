@@ -7,6 +7,11 @@ pub struct Model {
 }
 
 #[derive(Serialize, Debug)]
+pub struct Enum {
+    pub(crate) enm: String,
+}
+
+#[derive(Serialize, Debug)]
 pub struct ModelAndField {
     pub(crate) model: String,
     pub(crate) field: String,
@@ -75,6 +80,38 @@ pub fn warning_default_uuid_warning(affected: &Vec<ModelAndField>) -> Warning {
         message:
             "These id fields had a `@default(uuid())` added because we believe the schema was created by Prisma 1."
                 .into(),
+        affected: serde_json::to_value(&affected).unwrap(),
+    }
+}
+
+pub fn warning_enriched_with_map_on_model(affected: &Vec<Model>) -> Warning {
+    Warning {
+        code: 7,
+        message: "These models were enriched with @@map information taken from the previous Prisma schema.".into(),
+        affected: serde_json::to_value(&affected).unwrap(),
+    }
+}
+
+pub fn warning_enriched_with_map_on_field(affected: &Vec<ModelAndField>) -> Warning {
+    Warning {
+        code: 8,
+        message: "These fields were enriched with @map information taken from the previous Prisma schema.".into(),
+        affected: serde_json::to_value(&affected).unwrap(),
+    }
+}
+
+pub fn warning_enriched_with_map_on_enum(affected: &Vec<Enum>) -> Warning {
+    Warning {
+        code: 9,
+        message: "These enums were enriched with @@map information taken from the previous Prisma schema.".into(),
+        affected: serde_json::to_value(&affected).unwrap(),
+    }
+}
+
+pub fn warning_enriched_with_map_on_enum_value(affected: &Vec<EnumAndValue>) -> Warning {
+    Warning {
+        code: 10,
+        message: "These enum values were enriched with @map information taken from the previous Prisma schema.".into(),
         affected: serde_json::to_value(&affected).unwrap(),
     }
 }

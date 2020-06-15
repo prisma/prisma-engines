@@ -28,7 +28,6 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) {
 
     // @map on fields
     let mut changed_scalar_field_names = vec![];
-
     for model in &new_data_model.models {
         if let Some(old_model) = &old_data_model.find_model(&model.name) {
             for field in &model.fields {
@@ -50,17 +49,17 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) {
 
     //todo
     // @@map on enums
+
+    //todo
     // @map on enum values
 
-    // @defaults
     //todo
+    // @defaults
     // potential error: what if there was a db default before and then it got removed, now re-introspection makes it virtual
     // you could not get rid of it
 
     //virtual relationfield names
-
     let mut changed_relation_field_names = vec![];
-
     for model in &new_data_model.models {
         for field in &model.fields {
             if let FieldType::Relation(info) = &field.field_type {
