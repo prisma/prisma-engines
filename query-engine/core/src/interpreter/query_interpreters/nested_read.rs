@@ -79,9 +79,8 @@ pub async fn m2m<'a, 'b>(
     }
 
     scalars.records.extend(additional_records);
-    paginator.apply_pagination(&mut scalars);
 
-    Ok(scalars)
+    Ok(paginator.apply_pagination(scalars))
 }
 
 // [DTODO] This is implemented in an inefficient fashion, e.g. too much Arc cloning going on.
@@ -196,6 +195,5 @@ pub async fn one2m<'a, 'b>(
         ));
     }
 
-    paginator.apply_pagination(&mut scalars);
-    Ok(scalars)
+    Ok(paginator.apply_pagination(scalars))
 }

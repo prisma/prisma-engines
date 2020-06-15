@@ -82,25 +82,22 @@ class NestedPaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
   /******************
     * Cursor tests. *
     *****************/
-  // WIP - This requires fixes
-//  "Middle level cursor" should "return all items after and including the cursor and return nothing for other tops" in {
-//    testDataModels.testV11 { project =>
-//      createData(project)
-//      val result = server.query(
-//        """
-//          |{
-//          |  tops{t, middles(cursor: { m: "M22" }){ m }}
-//          |
-//          |}
-//        """,
-//        project
-//      )
-//
-//      //{"data":{"tops":[{"t":"T1","middles":[]},{"t":"T2","middles":[{"m":"M22"},{"m":"M23"}]},{"t":"T3","middles":[{"m":"M31"},{"m":"M32"},{"m":"M33"}]}]}}
-//      result.toString() should be(
-//        """{"data":{"tops":[{"t":"T1","middles":[{"m":"M12"},{"m":"M13"}]},{"t":"T2","middles":[{"m":"M22"},{"m":"M23"}]},{"t":"T3","middles":[{"m":"M32"},{"m":"M33"}]}]}}""")
-//    }
-//  }
+  "Middle level cursor" should "return all items after and including the cursor and return nothing for other tops" in {
+    testDataModels.testV11 { project =>
+      createData(project)
+      val result = server.query(
+        """
+          |{
+          |  tops{t, middles(cursor: { m: "M22" }){ m }}
+          |
+          |}
+        """,
+        project
+      )
+
+      result.toString() should be("""{"data":{"tops":[{"t":"T1","middles":[]},{"t":"T2","middles":[{"m":"M22"},{"m":"M23"}]},{"t":"T3","middles":[]}]}}""")
+    }
+  }
 
   /****************
     * Skip tests. *
@@ -719,5 +716,117 @@ class NestedPaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
       """,
       project
     )
+  }
+
+  // Special case: m:n relations, child is connected to many parents, using cursor pagination
+  // A1 <> B1, B2, B3
+  // A2 <> B2
+  // A3
+  "A many-to-many relationship with multiple connected children" should "return all items correctly with nested cursor pagination" in {
+    val project = SchemaDsl.fromStringV11() {
+      """
+        |model ModelA {
+        |  id    String   @id
+        |  manyB ModelB[]
+        |}
+        |
+        |model ModelB {
+        |  id    String   @id
+        |  manyA ModelA[]
+        |}
+      """.stripMargin
+    }
+    database.setup(project)
+
+    var result = server.query(
+      s"""mutation {
+         |  createOneModelA(
+         |    data: {
+         |      id: "A1"
+         |      manyB: {
+         |        connectOrCreate: [
+         |          { where: { id: "B1" }, create: { id: "B1" } }
+         |          { where: { id: "B2" }, create: { id: "B2" } }
+         |          { where: { id: "B3" }, create: { id: "B3" } }
+         |        ]
+         |      }
+         |    }
+         |  ) {
+         |    id
+         |    manyB {
+         |      id
+         |    }
+         |  }
+         |}
+         |
+      """,
+      project,
+      legacy = false,
+    )
+
+    result.toString() should be("""{"data":{"createOneModelA":{"id":"A1","manyB":[{"id":"B1"},{"id":"B2"},{"id":"B3"}]}}}""")
+
+    result = server.query(
+      s"""mutation {
+         |  createOneModelA(
+         |    data: {
+         |      id: "A2"
+         |      manyB: {
+         |        connectOrCreate: [
+         |          { where: { id: "B2" }, create: { id: "B2" } }
+         |        ]
+         |      }
+         |    }
+         |  ) {
+         |    id
+         |    manyB {
+         |      id
+         |    }
+         |  }
+         |}
+         |
+      """,
+      project,
+      legacy = false,
+    )
+
+    result.toString() should be("""{"data":{"createOneModelA":{"id":"A2","manyB":[{"id":"B2"}]}}}""")
+
+    result = server.query(
+      s"""mutation{
+         |  createOneModelA(data: {
+         |    id: "A3"
+         |  }) {
+         |    id
+         |    manyB {
+         |      id
+         |    }
+         |  }
+         |}
+      """,
+      project,
+      legacy = false,
+    )
+
+    result.toString() should be("""{"data":{"createOneModelA":{"id":"A3","manyB":[]}}}""")
+
+    result = server.query(
+      s"""{
+         |  findManyModelA {
+         |    id
+         |    manyB(cursor: {
+         |      id: "B2"
+         |    }) {
+         |      id
+         |    }
+         |  }
+         |}
+      """,
+      project,
+      legacy = false,
+    )
+
+    result.toString() should be(
+      """{"data":{"findManyModelA":[{"id":"A1","manyB":[{"id":"B2"},{"id":"B3"}]},{"id":"A2","manyB":[{"id":"B2"}]},{"id":"A3","manyB":[]}]}}""")
   }
 }
