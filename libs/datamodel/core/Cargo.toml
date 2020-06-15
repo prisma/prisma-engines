@@ -27,3 +27,7 @@ indoc = "0.3.5"
 pretty_assertions = "0.6.1"
 clap = "2.33"
 serial_test = "*"
+
+[features]
+default = []
+mssql = ["datamodel-connector/mssql"]

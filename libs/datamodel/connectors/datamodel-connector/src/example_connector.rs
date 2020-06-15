@@ -14,6 +14,7 @@ impl ExampleConnector {
         }
     }
 
+    #[cfg(feature = "mssql")]
     pub fn mssql() -> DeclarativeConnector {
         DeclarativeConnector {
             type_aliases: vec![],

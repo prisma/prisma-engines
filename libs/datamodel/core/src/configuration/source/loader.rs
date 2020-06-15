@@ -1,5 +1,8 @@
+#[cfg(feature = "mssql")]
+use super::builtin::MSSqlSourceDefinition;
+
 use super::{
-    builtin::{MSSqlSourceDefinition, MySqlSourceDefinition, PostgresSourceDefinition, SqliteSourceDefinition},
+    builtin::{MySqlSourceDefinition, PostgresSourceDefinition, SqliteSourceDefinition},
     traits::{Source, SourceDefinition},
 };
 use crate::ast;
@@ -127,6 +130,7 @@ fn get_builtin_sources() -> Vec<Box<dyn SourceDefinition>> {
         Box::new(MySqlSourceDefinition::new()),
         Box::new(PostgresSourceDefinition::new()),
         Box::new(SqliteSourceDefinition::new()),
+        #[cfg(feature = "mssql")]
         Box::new(MSSqlSourceDefinition::new()),
     ]
 }

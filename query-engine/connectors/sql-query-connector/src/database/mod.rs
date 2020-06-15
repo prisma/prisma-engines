@@ -1,4 +1,5 @@
 mod connection;
+#[cfg(feature = "mssql")]
 mod mssql;
 mod mysql;
 mod postgresql;
@@ -11,6 +12,7 @@ use async_trait::async_trait;
 use connector_interface::{error::ConnectorError, Connector};
 use datamodel::Source;
 
+#[cfg(feature = "mssql")]
 pub use mssql::*;
 pub use mysql::*;
 pub use postgresql::*;

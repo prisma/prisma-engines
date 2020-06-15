@@ -1,7 +1,8 @@
 use crate::{PrismaError, PrismaResult};
 use connector::Connector;
+
 use datamodel::{
-    configuration::{MSSQL_SOURCE_NAME, MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME},
+    configuration::{MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME},
     Source,
 };
 use query_core::executor::{InterpretingExecutor, QueryExecutor};
@@ -10,6 +11,9 @@ use url::Url;
 
 #[cfg(feature = "sql")]
 use sql_connector::*;
+
+#[cfg(all(feature = "sql", feature = "mssql"))]
+use datamodel::configuration::MSSQL_SOURCE_NAME;
 
 pub async fn load(
     source: &(dyn Source + Send + Sync),
@@ -24,7 +28,7 @@ pub async fn load(
         #[cfg(feature = "sql")]
         POSTGRES_SOURCE_NAME => postgres(source).await,
 
-        #[cfg(feature = "sql")]
+        #[cfg(all(feature = "sql", feature = "mssql"))]
         MSSQL_SOURCE_NAME => mssql(source).await,
 
         x => Err(PrismaError::ConfigurationError(format!(
@@ -93,7 +97,7 @@ async fn mysql(
     Ok((db_name, sql_executor("mysql", mysql, false)))
 }
 
-#[cfg(feature = "sql")]
+#[cfg(all(feature = "sql", feature = "mssql"))]
 async fn mssql(
     source: &(dyn Source + Send + Sync),
 ) -> PrismaResult<(String, Box<dyn QueryExecutor + Send + Sync + 'static>)> {

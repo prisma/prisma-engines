@@ -1,3 +1,5 @@
+#![cfg(feature = "mssql")]
+
 use crate::configuration::*;
 use datamodel_connector::{Connector, ExampleConnector};
 

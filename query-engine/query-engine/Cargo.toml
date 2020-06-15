@@ -8,6 +8,7 @@ edition = "2018"
 default = ["sql", "graphql"]
 sql = ["sql-connector"]
 graphql = ["graphql-parser"]
+mssql = ["datamodel/mssql", "sql-connector/mssql"]
 
 [dependencies]
 futures = "0.3"
