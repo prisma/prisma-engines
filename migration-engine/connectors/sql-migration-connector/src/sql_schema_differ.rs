@@ -3,7 +3,7 @@ mod enums;
 mod index;
 mod table;
 
-pub(crate) use column::{ColumnChange, ColumnDiffer};
+pub(crate) use column::{ColumnChange, ColumnChanges, ColumnDiffer};
 pub(crate) use table::TableDiffer;
 
 use crate::*;

@@ -115,4 +115,15 @@ impl<'a> InferAssertion<'a> {
 
         Ok(self)
     }
+
+    pub fn assert_warnings(self, warnings: &[String]) -> AssertionResult<Self> {
+        for (idx, warning) in warnings.iter().enumerate() {
+            assert_eq!(
+                Some(warning),
+                self.result.warnings.get(idx).map(|warning| &warning.description)
+            );
+        }
+
+        Ok(self)
+    }
 }
