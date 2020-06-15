@@ -48,13 +48,10 @@ impl Expressionista {
     ) -> InterpretationResult<Expression> {
         graph.mark_visited(&node);
 
-        dbg!("Finding direct children...");
         // Child edges are ordered, evaluation order is low to high in the graph, unless other rules override.
         let direct_children = graph.direct_child_pairs(&node);
-        dbg!(&direct_children);
 
         let mut child_expressions = Self::process_children(graph, direct_children)?;
-        dbg!("Child EXPR build");
 
         let is_result = graph.is_result_node(&node);
         let node_id = node.id();
