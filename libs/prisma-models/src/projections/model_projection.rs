@@ -176,3 +176,15 @@ impl IntoIterator for ModelProjection {
         self.fields.into_iter()
     }
 }
+
+impl From<&RecordProjection> for ModelProjection {
+    fn from(p: &RecordProjection) -> Self {
+        let fields = p
+            .pairs
+            .iter()
+            .map(|(field, _)| field.clone().into())
+            .collect::<Vec<_>>();
+
+        Self::new(fields)
+    }
+}
