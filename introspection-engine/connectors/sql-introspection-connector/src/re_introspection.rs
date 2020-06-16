@@ -1,13 +1,24 @@
-use crate::warnings::{warning_enriched_with_map_on_field, warning_enriched_with_map_on_model, Model, ModelAndField};
+use crate::warnings::{
+    warning_enriched_with_map_on_enum, warning_enriched_with_map_on_field, warning_enriched_with_map_on_model, Enum,
+    Model, ModelAndField,
+};
 use datamodel::{Datamodel, FieldType};
 use introspection_connector::Warning;
 
 pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec<Warning> {
+    // Relationnames are similar to virtual relationfields, they can be changed arbitrarily
+
     //todo create a bunch of warnings
     // error handling
     // think about cases where this would not error but could be wrong
     // create warnings for @map
     // do not create warnings for virtual relation field names
+
+    //todo What about references to changed names??? @map and @@map
+    // models       -> relations
+    // fields       -> relations, indexes, id, unique
+    // enums        -> fields
+    // enum values  -> default values
 
     println!("{:#?}", old_data_model);
     println!("{:#?}", new_data_model);
@@ -72,14 +83,38 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec
 
     //todo
     // @@map on enums
+    let mut changed_enum_names = vec![];
+    for enm in &new_data_model.enums {
+        if let Some(old_enum) = old_data_model.find_enum_db_name(&enm.name) {
+            println!("{:?}", enm);
+            println!("{:?}", old_enum);
+            if new_data_model.find_enum(&old_enum.name).is_none() {
+                changed_enum_names.push((Enum { enm: enm.name.clone() }, old_enum.name.clone()))
+            }
+        }
+    }
+    for change in &changed_enum_names {
+        let enm = new_data_model.find_enum_mut(&change.0.enm).unwrap();
+        enm.name = change.1.clone();
+        enm.database_name = Some(change.0.enm.clone());
+    }
+
+    for change in &changed_enum_names {
+        let fields_to_be_changed = new_data_model.find_enum_fields(&change.0.enm);
+
+        for change2 in fields_to_be_changed {
+            let field = new_data_model.find_field_mut(&change2.0, &change2.1).unwrap();
+            field.field_type = FieldType::Enum(change.1.clone());
+        }
+    }
+
+    if !changed_enum_names.is_empty() {
+        let enums = changed_enum_names.iter().map(|c| c.0.clone()).collect();
+        warnings.push(warning_enriched_with_map_on_enum(&enums));
+    }
 
     //todo
     // @map on enum values
-
-    //todo
-    // @defaults
-    // potential error: what if there was a db default before and then it got removed, now re-introspection makes it virtual
-    // you could not get rid of it
 
     //virtual relationfield names
     let mut changed_relation_field_names = vec![];
@@ -109,6 +144,13 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec
         let field = new_data_model.find_field_mut(&change.0.model, &change.0.field).unwrap();
         field.name = change.1;
     }
+
+    //todo
+    // @defaults
+    // potential error: what if there was a db default before and then it got removed, now re-introspection makes it virtual
+    // you could not get rid of it
+
+    println!("{:?}", new_data_model);
 
     warnings
 }

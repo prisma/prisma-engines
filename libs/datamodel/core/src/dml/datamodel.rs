@@ -112,6 +112,11 @@ impl Datamodel {
         self.enums().find(|m| m.name == *name)
     }
 
+    /// Finds an enum by database name.
+    pub fn find_enum_db_name(&self, db_name: &str) -> Option<&Enum> {
+        self.enums().find(|e| e.database_name == Some(db_name.to_owned()))
+    }
+
     /// Finds a model by name and returns a mutable reference.
     pub fn find_model_mut(&mut self, name: &str) -> Option<&mut Model> {
         self.models_mut().find(|m| m.name == *name)
@@ -135,5 +140,18 @@ impl Datamodel {
                 false
             })
         })
+    }
+
+    pub fn find_enum_fields(&mut self, enum_name: &str) -> Vec<(String, String)> {
+        let mut fields = vec![];
+
+        for model in &self.models {
+            for field in &model.fields {
+                if FieldType::Enum(enum_name.to_owned()) == field.field_type {
+                    fields.push((model.name.clone(), field.name.clone()))
+                }
+            }
+        }
+        fields
     }
 }

@@ -6,7 +6,7 @@ pub struct Model {
     pub(crate) model: String,
 }
 
-#[derive(Serialize, Debug)]
+#[derive(Serialize, Debug, Clone)]
 pub struct Enum {
     pub(crate) enm: String,
 }
@@ -24,7 +24,7 @@ pub struct ModelAndFieldAndType {
     pub(crate) tpe: String,
 }
 
-#[derive(Serialize, Debug)]
+#[derive(Serialize, Debug, Clone)]
 pub struct EnumAndValue {
     pub(crate) enm: String,
     pub(crate) value: String,
