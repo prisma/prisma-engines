@@ -1,4 +1,7 @@
-use crate::{ast::*, visitor::Visitor};
+use crate::{
+    ast::*,
+    visitor::{self, Visitor},
+};
 
 use std::fmt::{self, Write};
 
@@ -12,10 +15,11 @@ pub struct Sqlite<'a> {
 }
 
 impl<'a> Visitor<'a> for Sqlite<'a> {
-    const C_BACKTICK: &'static str = "`";
+    const C_BACKTICK_OPEN: &'static str = "`";
+    const C_BACKTICK_CLOSE: &'static str = "`";
     const C_WILDCARD: &'static str = "%";
 
-    fn build<Q>(query: Q) -> (String, Vec<Value<'a>>)
+    fn build<Q>(query: Q) -> crate::Result<(String, Vec<Value<'a>>)>
     where
         Q: Into<Query<'a>>,
     {
@@ -24,55 +28,114 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
             parameters: Vec::with_capacity(128),
         };
 
-        Sqlite::visit_query(&mut sqlite, query.into());
+        Sqlite::visit_query(&mut sqlite, query.into())?;
 
-        (sqlite.query, sqlite.parameters)
+        Ok((sqlite.query, sqlite.parameters))
     }
 
-    fn write<D: fmt::Display>(&mut self, s: D) -> fmt::Result {
-        write!(&mut self.query, "{}", s)
+    fn write<D: fmt::Display>(&mut self, s: D) -> visitor::Result {
+        write!(&mut self.query, "{}", s)?;
+        Ok(())
     }
 
-    fn visit_insert(&mut self, insert: Insert<'a>) -> fmt::Result {
+    fn visit_raw_value(&mut self, value: Value<'a>) -> visitor::Result {
+        let res = match value {
+            Value::Integer(i) => i.map(|i| self.write(i)),
+            Value::Real(r) => r.map(|r| self.write(r)),
+            Value::Text(t) => t.map(|t| self.write(format!("'{}'", t))),
+            Value::Enum(e) => e.map(|e| self.write(e)),
+            Value::Bytes(b) => b.map(|b| self.write(format!("x'{}'", hex::encode(b)))),
+            Value::Boolean(b) => b.map(|b| self.write(b)),
+            Value::Char(c) => c.map(|c| self.write(format!("'{}'", c))),
+            #[cfg(feature = "json-1")]
+            Value::Json(j) => j.map(|j| self.write(format!("'{}'", serde_json::to_string(&j).unwrap()))),
+            #[cfg(all(feature = "array", feature = "postgresql"))]
+            Value::Array(_) => panic!("Arrays not supported in SQLite"),
+            #[cfg(feature = "uuid-0_8")]
+            Value::Uuid(uuid) => uuid.map(|uuid| self.write(format!("'{}'", uuid.to_hyphenated().to_string()))),
+            #[cfg(feature = "chrono-0_4")]
+            Value::DateTime(dt) => dt.map(|dt| self.write(format!("'{}'", dt.to_rfc3339(),))),
+            #[cfg(feature = "chrono-0_4")]
+            Value::Date(date) => date.map(|date| self.write(format!("'{}'", date))),
+            #[cfg(feature = "chrono-0_4")]
+            Value::Time(time) => time.map(|time| self.write(format!("'{}'", time))),
+        };
+
+        match res {
+            Some(res) => res,
+            None => self.write("null"),
+        }
+    }
+
+    fn visit_insert(&mut self, insert: Insert<'a>) -> visitor::Result {
         match insert.on_conflict {
             Some(OnConflict::DoNothing) => self.write("INSERT OR IGNORE")?,
             None => self.write("INSERT")?,
         };
 
-        self.write(" INTO ")?;
-        self.visit_table(insert.table, true)?;
+        if let Some(table) = insert.table {
+            self.write(" INTO ")?;
+            self.visit_table(table, true)?;
+        }
 
-        if insert.values.is_empty() {
-            self.write(" DEFAULT VALUES")?;
-        } else {
-            let columns = insert.columns.len();
+        match insert.values {
+            Expression {
+                kind: ExpressionKind::Row(row),
+                ..
+            } => {
+                if row.values.is_empty() {
+                    self.write(" DEFAULT VALUES")?;
+                } else {
+                    let columns = insert.columns.len();
 
-            self.write(" (")?;
-            for (i, c) in insert.columns.into_iter().enumerate() {
-                self.visit_column(c)?;
+                    self.write(" (")?;
+                    for (i, c) in insert.columns.into_iter().enumerate() {
+                        self.visit_column(c)?;
 
-                if i < (columns - 1) {
-                    self.write(", ")?;
+                        if i < (columns - 1) {
+                            self.write(", ")?;
+                        }
+                    }
+
+                    self.write(")")?;
+                    self.write(" VALUES ")?;
+                    self.visit_row(row)?;
                 }
             }
-            self.write(")")?;
+            Expression {
+                kind: ExpressionKind::Values(values),
+                ..
+            } => {
+                let columns = insert.columns.len();
 
-            self.write(" VALUES ")?;
-            let values = insert.values.len();
+                self.write(" (")?;
+                for (i, c) in insert.columns.into_iter().enumerate() {
+                    self.visit_column(c)?;
 
-            for (i, row) in insert.values.into_iter().enumerate() {
-                self.visit_row(row)?;
+                    if i < (columns - 1) {
+                        self.write(", ")?;
+                    }
+                }
+                self.write(")")?;
 
-                if i < (values - 1) {
-                    self.write(", ")?;
+                self.write(" VALUES ")?;
+                let values_len = values.len();
+
+                for (i, row) in values.into_iter().enumerate() {
+                    self.visit_row(row)?;
+
+                    if i < (values_len - 1) {
+                        self.write(", ")?;
+                    }
                 }
             }
+            expr => self.visit_expression(expr)?,
         }
 
         Ok(())
     }
 
-    fn parameter_substitution(&mut self) -> fmt::Result {
+    fn parameter_substitution(&mut self) -> visitor::Result {
         self.write("?")
     }
 
@@ -80,7 +143,7 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
         self.parameters.push(value);
     }
 
-    fn visit_limit_and_offset(&mut self, limit: Option<Value<'a>>, offset: Option<Value<'a>>) -> fmt::Result {
+    fn visit_limit_and_offset(&mut self, limit: Option<Value<'a>>, offset: Option<Value<'a>>) -> visitor::Result {
         match (limit, offset) {
             (Some(limit), Some(offset)) => {
                 self.write(" LIMIT ")?;
@@ -104,12 +167,12 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
         }
     }
 
-    fn visit_aggregate_to_string(&mut self, value: Expression<'a>) -> fmt::Result {
+    fn visit_aggregate_to_string(&mut self, value: Expression<'a>) -> visitor::Result {
         self.write("GROUP_CONCAT")?;
         self.surround_with("(", ")", |ref mut s| s.visit_expression(value))
     }
 
-    fn visit_values(&mut self, values: Values<'a>) -> fmt::Result {
+    fn visit_values(&mut self, values: Values<'a>) -> visitor::Result {
         self.surround_with("(VALUES ", ")", |ref mut s| {
             let len = values.len();
             for (i, row) in values.into_iter().enumerate() {
@@ -150,7 +213,7 @@ mod tests {
         let expected = expected_values("SELECT ?", vec![1]);
 
         let query = Select::default().value(1);
-        let (sql, params) = Sqlite::build(query);
+        let (sql, params) = Sqlite::build(query).unwrap();
 
         assert_eq!(expected.0, sql);
         assert_eq!(expected.1, params);
@@ -161,7 +224,7 @@ mod tests {
         let expected = expected_values("SELECT ? AS `test`", vec![1]);
 
         let query = Select::default().value(val!(1).alias("test"));
-        let (sql, params) = Sqlite::build(query);
+        let (sql, params) = Sqlite::build(query).unwrap();
 
         assert_eq!(expected.0, sql);
         assert_eq!(expected.1, params);
@@ -170,18 +233,18 @@ mod tests {
     #[test]
     fn test_aliased_null() {
         let expected_sql = "SELECT ? AS `test`";
-        let query = Select::default().value(val!(Value::Null).alias("test"));
-        let (sql, params) = Sqlite::build(query);
+        let query = Select::default().value(val!(Value::Text(None)).alias("test"));
+        let (sql, params) = Sqlite::build(query).unwrap();
 
         assert_eq!(expected_sql, sql);
-        assert_eq!(vec![Value::Null], params);
+        assert_eq!(vec![Value::Text(None)], params);
     }
 
     #[test]
     fn test_select_star_from() {
         let expected_sql = "SELECT `musti`.* FROM `musti`";
         let query = Select::from_table("musti");
-        let (sql, params) = Sqlite::build(query);
+        let (sql, params) = Sqlite::build(query).unwrap();
 
         assert_eq!(expected_sql, sql);
         assert_eq!(default_params(vec![]), params);
@@ -194,15 +257,15 @@ mod tests {
         let expected_sql = "SELECT `vals`.* FROM (VALUES (?,?),(?,?)) AS `vals`";
         let values = Table::from(values!((1, 2), (3, 4))).alias("vals");
         let query = Select::from_table(values);
-        let (sql, params) = Sqlite::build(query);
+        let (sql, params) = Sqlite::build(query).unwrap();
 
         assert_eq!(expected_sql, sql);
         assert_eq!(
             vec![
-                Value::Integer(1),
-                Value::Integer(2),
-                Value::Integer(3),
-                Value::Integer(4),
+                Value::integer(1),
+                Value::integer(2),
+                Value::integer(3),
+                Value::integer(4),
             ],
             params
         );
@@ -216,15 +279,15 @@ mod tests {
         let query = Select::from_table("test")
             .so_that(Row::from((col!("id1"), col!("id2"))).in_selection(values!((1, 2), (3, 4))));
 
-        let (sql, params) = Sqlite::build(query);
+        let (sql, params) = Sqlite::build(query).unwrap();
 
         assert_eq!(expected_sql, sql);
         assert_eq!(
             vec![
-                Value::Integer(1),
-                Value::Integer(2),
-                Value::Integer(3),
-                Value::Integer(4),
+                Value::integer(1),
+                Value::integer(2),
+                Value::integer(3),
+                Value::integer(4),
             ],
             params
         );
@@ -235,7 +298,7 @@ mod tests {
         let mut cols = Row::new();
         cols.push(Column::from("id1"));
 
-        let mut vals = Values::new();
+        let mut vals = Values::new(vec![]);
 
         {
             let mut row1 = Row::new();
@@ -249,11 +312,11 @@ mod tests {
         }
 
         let query = Select::from_table("test").so_that(cols.in_selection(vals));
-        let (sql, params) = Sqlite::build(query);
+        let (sql, params) = Sqlite::build(query).unwrap();
         let expected_sql = "SELECT `test`.* FROM `test` WHERE `id1` IN (?,?)";
 
         assert_eq!(expected_sql, sql);
-        assert_eq!(vec![Value::Integer(1), Value::Integer(2),], params)
+        assert_eq!(vec![Value::integer(1), Value::integer(2),], params)
     }
 
     #[test]
@@ -263,7 +326,7 @@ mod tests {
             .order_by("foo")
             .order_by("baz".ascend())
             .order_by("bar".descend());
-        let (sql, params) = Sqlite::build(query);
+        let (sql, params) = Sqlite::build(query).unwrap();
 
         assert_eq!(expected_sql, sql);
         assert_eq!(default_params(vec![]), params);
@@ -273,7 +336,7 @@ mod tests {
     fn test_select_fields_from() {
         let expected_sql = "SELECT `paw`, `nose` FROM `cat`.`musti`";
         let query = Select::from_table(("cat", "musti")).column("paw").column("nose");
-        let (sql, params) = Sqlite::build(query);
+        let (sql, params) = Sqlite::build(query).unwrap();
 
         assert_eq!(expected_sql, sql);
         assert_eq!(default_params(vec![]), params);
@@ -284,7 +347,7 @@ mod tests {
         let expected = expected_values("SELECT `naukio`.* FROM `naukio` WHERE `word` = ?", vec!["meow"]);
 
         let query = Select::from_table("naukio").so_that("word".equals("meow"));
-        let (sql, params) = Sqlite::build(query);
+        let (sql, params) = Sqlite::build(query).unwrap();
 
         assert_eq!(expected.0, sql);
         assert_eq!(default_params(expected.1), params);
@@ -295,7 +358,7 @@ mod tests {
         let expected = expected_values("SELECT `naukio`.* FROM `naukio` WHERE `word` LIKE ?", vec!["%meow%"]);
 
         let query = Select::from_table("naukio").so_that("word".like("meow"));
-        let (sql, params) = Sqlite::build(query);
+        let (sql, params) = Sqlite::build(query).unwrap();
 
         assert_eq!(expected.0, sql);
         assert_eq!(default_params(expected.1), params);
@@ -309,7 +372,7 @@ mod tests {
         );
 
         let query = Select::from_table("naukio").so_that("word".not_like("meow"));
-        let (sql, params) = Sqlite::build(query);
+        let (sql, params) = Sqlite::build(query).unwrap();
 
         assert_eq!(expected.0, sql);
         assert_eq!(default_params(expected.1), params);
@@ -320,7 +383,7 @@ mod tests {
         let expected = expected_values("SELECT `naukio`.* FROM `naukio` WHERE `word` LIKE ?", vec!["meow%"]);
 
         let query = Select::from_table("naukio").so_that("word".begins_with("meow"));
-        let (sql, params) = Sqlite::build(query);
+        let (sql, params) = Sqlite::build(query).unwrap();
 
         assert_eq!(expected.0, sql);
         assert_eq!(default_params(expected.1), params);
@@ -331,7 +394,7 @@ mod tests {
         let expected = expected_values("SELECT `naukio`.* FROM `naukio` WHERE `word` NOT LIKE ?", vec!["meow%"]);
 
         let query = Select::from_table("naukio").so_that("word".not_begins_with("meow"));
-        let (sql, params) = Sqlite::build(query);
+        let (sql, params) = Sqlite::build(query).unwrap();
 
         assert_eq!(expected.0, sql);
         assert_eq!(default_params(expected.1), params);
@@ -342,7 +405,7 @@ mod tests {
         let expected = expected_values("SELECT `naukio`.* FROM `naukio` WHERE `word` LIKE ?", vec!["%meow"]);
 
         let query = Select::from_table("naukio").so_that("word".ends_into("meow"));
-        let (sql, params) = Sqlite::build(query);
+        let (sql, params) = Sqlite::build(query).unwrap();
 
         assert_eq!(expected.0, sql);
         assert_eq!(default_params(expected.1), params);
@@ -353,7 +416,7 @@ mod tests {
         let expected = expected_values("SELECT `naukio`.* FROM `naukio` WHERE `word` NOT LIKE ?", vec!["%meow"]);
 
         let query = Select::from_table("naukio").so_that("word".not_ends_into("meow"));
-        let (sql, params) = Sqlite::build(query);
+        let (sql, params) = Sqlite::build(query).unwrap();
 
         assert_eq!(expected.0, sql);
         assert_eq!(default_params(expected.1), params);
@@ -363,17 +426,13 @@ mod tests {
     fn test_select_and() {
         let expected_sql = "SELECT `naukio`.* FROM `naukio` WHERE (`word` = ? AND `age` < ? AND `paw` = ?)";
 
-        let expected_params = vec![
-            Value::Text(Cow::from("meow")),
-            Value::Integer(10),
-            Value::Text(Cow::from("warm")),
-        ];
+        let expected_params = vec![Value::text("meow"), Value::integer(10), Value::text("warm")];
 
         let conditions = "word".equals("meow").and("age".less_than(10)).and("paw".equals("warm"));
 
         let query = Select::from_table("naukio").so_that(conditions);
 
-        let (sql, params) = Sqlite::build(query);
+        let (sql, params) = Sqlite::build(query).unwrap();
 
         assert_eq!(expected_sql, sql);
         assert_eq!(default_params(expected_params), params);
@@ -383,17 +442,13 @@ mod tests {
     fn test_select_and_different_execution_order() {
         let expected_sql = "SELECT `naukio`.* FROM `naukio` WHERE (`word` = ? AND (`age` < ? AND `paw` = ?))";
 
-        let expected_params = vec![
-            Value::Text(Cow::from("meow")),
-            Value::Integer(10),
-            Value::Text(Cow::from("warm")),
-        ];
+        let expected_params = vec![Value::text("meow"), Value::integer(10), Value::text("warm")];
 
         let conditions = "word".equals("meow").and("age".less_than(10).and("paw".equals("warm")));
 
         let query = Select::from_table("naukio").so_that(conditions);
 
-        let (sql, params) = Sqlite::build(query);
+        let (sql, params) = Sqlite::build(query).unwrap();
 
         assert_eq!(expected_sql, sql);
         assert_eq!(default_params(expected_params), params);
@@ -403,17 +458,13 @@ mod tests {
     fn test_select_or() {
         let expected_sql = "SELECT `naukio`.* FROM `naukio` WHERE ((`word` = ? OR `age` < ?) AND `paw` = ?)";
 
-        let expected_params = vec![
-            Value::Text(Cow::from("meow")),
-            Value::Integer(10),
-            Value::Text(Cow::from("warm")),
-        ];
+        let expected_params = vec![Value::text("meow"), Value::integer(10), Value::text("warm")];
 
         let conditions = "word".equals("meow").or("age".less_than(10)).and("paw".equals("warm"));
 
         let query = Select::from_table("naukio").so_that(conditions);
 
-        let (sql, params) = Sqlite::build(query);
+        let (sql, params) = Sqlite::build(query).unwrap();
 
         assert_eq!(expected_sql, sql);
         assert_eq!(default_params(expected_params), params);
@@ -423,11 +474,7 @@ mod tests {
     fn test_select_negation() {
         let expected_sql = "SELECT `naukio`.* FROM `naukio` WHERE (NOT ((`word` = ? OR `age` < ?) AND `paw` = ?))";
 
-        let expected_params = vec![
-            Value::Text(Cow::from("meow")),
-            Value::Integer(10),
-            Value::Text(Cow::from("warm")),
-        ];
+        let expected_params = vec![Value::text("meow"), Value::integer(10), Value::text("warm")];
 
         let conditions = "word"
             .equals("meow")
@@ -437,7 +484,7 @@ mod tests {
 
         let query = Select::from_table("naukio").so_that(conditions);
 
-        let (sql, params) = Sqlite::build(query);
+        let (sql, params) = Sqlite::build(query).unwrap();
 
         assert_eq!(expected_sql, sql);
         assert_eq!(default_params(expected_params), params);
@@ -447,16 +494,12 @@ mod tests {
     fn test_with_raw_condition_tree() {
         let expected_sql = "SELECT `naukio`.* FROM `naukio` WHERE (NOT ((`word` = ? OR `age` < ?) AND `paw` = ?))";
 
-        let expected_params = vec![
-            Value::Text(Cow::from("meow")),
-            Value::Integer(10),
-            Value::Text(Cow::from("warm")),
-        ];
+        let expected_params = vec![Value::text("meow"), Value::integer(10), Value::text("warm")];
 
         let conditions = ConditionTree::not("word".equals("meow").or("age".less_than(10)).and("paw".equals("warm")));
         let query = Select::from_table("naukio").so_that(conditions);
 
-        let (sql, params) = Sqlite::build(query);
+        let (sql, params) = Sqlite::build(query).unwrap();
 
         assert_eq!(expected_sql, sql);
         assert_eq!(default_params(expected_params), params);
@@ -468,7 +511,7 @@ mod tests {
 
         let query = Select::from_table("users")
             .inner_join("posts".on(("users", "id").equals(Column::from(("posts", "user_id")))));
-        let (sql, _) = Sqlite::build(query);
+        let (sql, _) = Sqlite::build(query).unwrap();
 
         assert_eq!(expected_sql, sql);
     }
@@ -484,10 +527,10 @@ mod tests {
                 .and(("posts", "published").equals(true))),
         );
 
-        let (sql, params) = Sqlite::build(query);
+        let (sql, params) = Sqlite::build(query).unwrap();
 
         assert_eq!(expected_sql, sql);
-        assert_eq!(default_params(vec![Value::Boolean(true),]), params);
+        assert_eq!(default_params(vec![Value::boolean(true),]), params);
     }
 
     #[test]
@@ -496,7 +539,7 @@ mod tests {
 
         let query = Select::from_table("users")
             .left_join("posts".on(("users", "id").equals(Column::from(("posts", "user_id")))));
-        let (sql, _) = Sqlite::build(query);
+        let (sql, _) = Sqlite::build(query).unwrap();
 
         assert_eq!(expected_sql, sql);
     }
@@ -512,17 +555,17 @@ mod tests {
                 .and(("posts", "published").equals(true))),
         );
 
-        let (sql, params) = Sqlite::build(query);
+        let (sql, params) = Sqlite::build(query).unwrap();
 
         assert_eq!(expected_sql, sql);
-        assert_eq!(default_params(vec![Value::Boolean(true),]), params);
+        assert_eq!(default_params(vec![Value::boolean(true),]), params);
     }
 
     #[test]
     fn test_column_aliasing() {
         let expected_sql = "SELECT `bar` AS `foo` FROM `meow`";
         let query = Select::from_table("meow").column(Column::new("bar").alias("foo"));
-        let (sql, _) = Sqlite::build(query);
+        let (sql, _) = Sqlite::build(query).unwrap();
 
         assert_eq!(expected_sql, sql);
     }
@@ -543,7 +586,7 @@ mod tests {
             .value("age", 42.69)
             .value("nice", true);
 
-        let (sql, params) = Sqlite::build(insert);
+        let (sql, params) = Sqlite::build(insert).unwrap();
 
         conn.execute(&sql, params.as_slice()).unwrap();
         conn
@@ -556,7 +599,7 @@ mod tests {
 
         let conditions = "name".equals("Alice").and("age".less_than(100.0)).and("nice".equals(1));
         let query = Select::from_table("users").so_that(conditions);
-        let (sql_str, params) = Sqlite::build(query);
+        let (sql_str, params) = Sqlite::build(query).unwrap();
 
         #[derive(Debug)]
         struct Person {
@@ -581,5 +624,87 @@ mod tests {
         assert_eq!("Alice", person.name);
         assert_eq!(42.69, person.age);
         assert_eq!(1, person.nice);
+    }
+
+    #[test]
+    fn test_raw_null() {
+        let (sql, params) = Sqlite::build(Select::default().value(Value::Text(None).raw())).unwrap();
+        assert_eq!("SELECT null", sql);
+        assert!(params.is_empty());
+    }
+
+    #[test]
+    fn test_raw_int() {
+        let (sql, params) = Sqlite::build(Select::default().value(1.raw())).unwrap();
+        assert_eq!("SELECT 1", sql);
+        assert!(params.is_empty());
+    }
+
+    #[test]
+    fn test_raw_real() {
+        let (sql, params) = Sqlite::build(Select::default().value(1.3f64.raw())).unwrap();
+        assert_eq!("SELECT 1.3", sql);
+        assert!(params.is_empty());
+    }
+
+    #[test]
+    fn test_raw_text() {
+        let (sql, params) = Sqlite::build(Select::default().value("foo".raw())).unwrap();
+        assert_eq!("SELECT 'foo'", sql);
+        assert!(params.is_empty());
+    }
+
+    #[test]
+    fn test_raw_bytes() {
+        let (sql, params) = Sqlite::build(Select::default().value(Value::bytes(vec![1, 2, 3]).raw())).unwrap();
+        assert_eq!("SELECT x'010203'", sql);
+        assert!(params.is_empty());
+    }
+
+    #[test]
+    fn test_raw_boolean() {
+        let (sql, params) = Sqlite::build(Select::default().value(true.raw())).unwrap();
+        assert_eq!("SELECT true", sql);
+        assert!(params.is_empty());
+
+        let (sql, params) = Sqlite::build(Select::default().value(false.raw())).unwrap();
+        assert_eq!("SELECT false", sql);
+        assert!(params.is_empty());
+    }
+
+    #[test]
+    fn test_raw_char() {
+        let (sql, params) = Sqlite::build(Select::default().value(Value::character('a').raw())).unwrap();
+        assert_eq!("SELECT 'a'", sql);
+        assert!(params.is_empty());
+    }
+
+    #[test]
+    #[cfg(feature = "json-1")]
+    fn test_raw_json() {
+        let (sql, params) = Sqlite::build(Select::default().value(serde_json::json!({ "foo": "bar" }).raw())).unwrap();
+        assert_eq!("SELECT '{\"foo\":\"bar\"}'", sql);
+        assert!(params.is_empty());
+    }
+
+    #[test]
+    #[cfg(feature = "uuid-0_8")]
+    fn test_raw_uuid() {
+        let uuid = uuid::Uuid::new_v4();
+        let (sql, params) = Sqlite::build(Select::default().value(uuid.raw())).unwrap();
+
+        assert_eq!(format!("SELECT '{}'", uuid.to_hyphenated().to_string()), sql);
+
+        assert!(params.is_empty());
+    }
+
+    #[test]
+    #[cfg(feature = "chrono-0_4")]
+    fn test_raw_datetime() {
+        let dt = chrono::Utc::now();
+        let (sql, params) = Sqlite::build(Select::default().value(dt.raw())).unwrap();
+
+        assert_eq!(format!("SELECT '{}'", dt.to_rfc3339(),), sql);
+        assert!(params.is_empty());
     }
 }

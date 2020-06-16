@@ -1,43 +1,78 @@
 use super::Aliasable;
-use crate::ast::{Expression, ExpressionKind, Table};
+use crate::{
+    ast::{Expression, ExpressionKind, Table},
+    Value,
+};
 use std::borrow::Cow;
 
 /// A column definition.
-#[derive(Clone, Debug, Default, PartialEq)]
+#[derive(Clone, Debug, Default)]
 pub struct Column<'a> {
     pub name: Cow<'a, str>,
     pub(crate) table: Option<Table<'a>>,
     pub(crate) alias: Option<Cow<'a, str>>,
+    pub(crate) default: Option<DefaultValue<'a>>,
 }
 
-#[macro_export]
-/// Marks a given string or a tuple as a column. Useful when using a column in
-/// calculations, e.g.
-///
-/// ``` rust
-/// # use quaint::{col, val, ast::*, visitor::{Visitor, Sqlite}};
-/// let join = "dogs".on(("dogs", "slave_id").equals(Column::from(("cats", "master_id"))));
-///
-/// let query = Select::from_table("cats")
-///     .value(Table::from("cats").asterisk())
-///     .value(col!("dogs", "age") - val!(4))
-///     .inner_join(join);
-///
-/// let (sql, params) = Sqlite::build(query);
-///
-/// assert_eq!(
-///     "SELECT `cats`.*, (`dogs`.`age` - ?) FROM `cats` INNER JOIN `dogs` ON `dogs`.`slave_id` = `cats`.`master_id`",
-///     sql
-/// );
-/// ```
-macro_rules! col {
-    ($e1:expr) => {
-        Expression::from(Column::from($e1))
-    };
+/// Defines a default value for a `Column`.
+#[derive(Clone, Debug, PartialEq)]
+pub enum DefaultValue<'a> {
+    /// A static value.
+    Provided(Value<'a>),
+    /// Generated in the database.
+    Generated,
+}
 
-    ($e1:expr, $e2:expr) => {
-        Expression::from(Column::from(($e1, $e2)))
-    };
+impl<'a> Default for DefaultValue<'a> {
+    fn default() -> Self {
+        Self::Generated
+    }
+}
+
+impl<'a, V> From<V> for DefaultValue<'a>
+where
+    V: Into<Value<'a>>,
+{
+    fn from(v: V) -> Self {
+        Self::Provided(v.into())
+    }
+}
+
+impl<'a> PartialEq for Column<'a> {
+    fn eq(&self, other: &Column) -> bool {
+        self.name == other.name && self.table == other.table
+    }
+}
+
+impl<'a> Column<'a> {
+    /// Create a bare version of the column, stripping out all other information
+    /// other than the name.
+    pub(crate) fn into_bare(self) -> Self {
+        Self {
+            name: self.name,
+            table: None,
+            alias: None,
+            default: None,
+        }
+    }
+
+    /// Sets the default value for the column.
+    pub fn default<V>(mut self, value: V) -> Self
+    where
+        V: Into<DefaultValue<'a>>,
+    {
+        self.default = Some(value.into());
+        self
+    }
+
+    /// True when the default value is set and automatically generated in the
+    /// database.
+    pub fn default_autogen(&self) -> bool {
+        self.default
+            .as_ref()
+            .map(|d| d == &DefaultValue::Generated)
+            .unwrap_or(false)
+    }
 }
 
 impl<'a> From<Column<'a>> for Expression<'a> {

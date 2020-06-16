@@ -34,32 +34,41 @@ impl<'a> Select<'a> {
     ///
     /// ```rust
     /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # fn main() -> Result<(), quaint::error::Error> {
     /// let query = Select::from_table("users");
-    /// let (sql, _) = Sqlite::build(query);
+    /// let (sql, _) = Sqlite::build(query)?;
     ///
     /// assert_eq!("SELECT `users`.* FROM `users`", sql);
+    /// # Ok(())
+    /// # }
     /// ```
     ///
     /// The table can be in multiple parts, defining the database.
     ///
     /// ```rust
     /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # fn main() -> Result<(), quaint::error::Error> {
     /// let query = Select::from_table(("crm", "users"));
-    /// let (sql, _) = Sqlite::build(query);
+    /// let (sql, _) = Sqlite::build(query)?;
     ///
     /// assert_eq!("SELECT `crm`.`users`.* FROM `crm`.`users`", sql);
+    /// # Ok(())
+    /// # }
     /// ```
     ///
     /// Selecting from a nested `SELECT`.
     ///
     /// ```rust
     /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # fn main() -> Result<(), quaint::error::Error> {
     /// let select = Table::from(Select::default().value(1)).alias("num");
     /// let query = Select::from_table(select.alias("num"));
-    /// let (sql, params) = Sqlite::build(query);
+    /// let (sql, params) = Sqlite::build(query)?;
     ///
     /// assert_eq!("SELECT `num`.* FROM (SELECT ?) AS `num`", sql);
     /// assert_eq!(vec![Value::from(1)], params);
+    /// # Ok(())
+    /// # }
     /// ```
     ///
     /// Selecting from a set of values.
@@ -67,21 +76,24 @@ impl<'a> Select<'a> {
     /// ```rust
     /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
     /// # use quaint::values;
+    /// # fn main() -> Result<(), quaint::error::Error> {
     /// let expected_sql = "SELECT `vals`.* FROM (VALUES (?,?),(?,?)) AS `vals`";
     /// let values = Table::from(values!((1, 2), (3, 4))).alias("vals");
     /// let query = Select::from_table(values);
-    /// let (sql, params) = Sqlite::build(query);
+    /// let (sql, params) = Sqlite::build(query)?;
     ///
     /// assert_eq!(expected_sql, sql);
     /// assert_eq!(
     ///     vec![
-    ///         Value::Integer(1),
-    ///         Value::Integer(2),
-    ///         Value::Integer(3),
-    ///         Value::Integer(4),
+    ///         Value::from(1),
+    ///         Value::from(2),
+    ///         Value::from(3),
+    ///         Value::from(4),
     ///     ],
     ///     params
     /// );
+    /// # Ok(())
+    /// # }
     /// ```
     pub fn from_table<T>(table: T) -> Self
     where
@@ -97,17 +109,21 @@ impl<'a> Select<'a> {
     ///
     /// ```rust
     /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # fn main() -> Result<(), quaint::error::Error> {
     /// let query = Select::default().value(1);
-    /// let (sql, params) = Sqlite::build(query);
+    /// let (sql, params) = Sqlite::build(query)?;
     ///
     /// assert_eq!("SELECT ?", sql);
     /// assert_eq!(vec![Value::from(1)], params);
+    /// # Ok(())
+    /// # }
     /// ```
     ///
     /// Creating a qualified asterisk to a joined table:
     ///
     /// ```rust
     /// # use quaint::{col, val, ast::*, visitor::{Visitor, Sqlite}};
+    /// # fn main() -> Result<(), quaint::error::Error> {
     /// let join = "dogs".on(("dogs", "slave_id").equals(Column::from(("cats", "master_id"))));
     ///
     /// let query = Select::from_table("cats")
@@ -115,7 +131,7 @@ impl<'a> Select<'a> {
     ///     .value(col!("dogs", "age") - val!(4))
     ///     .inner_join(join);
     ///
-    /// let (sql, params) = Sqlite::build(query);
+    /// let (sql, params) = Sqlite::build(query)?;
     ///
     /// assert_eq!(
     ///     "SELECT `cats`.*, (`dogs`.`age` - ?) FROM `cats` INNER JOIN `dogs` ON `dogs`.`slave_id` = `cats`.`master_id`",
@@ -123,6 +139,8 @@ impl<'a> Select<'a> {
     /// );
     ///
     /// assert_eq!(vec![Value::from(4)], params);
+    /// # Ok(())
+    /// # }
     /// ```
     pub fn value<T>(mut self, value: T) -> Self
     where
@@ -136,14 +154,17 @@ impl<'a> Select<'a> {
     ///
     /// ```rust
     /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # fn main() -> Result<(), quaint::error::Error> {
     /// let query = Select::from_table("users")
     ///     .column("name")
     ///     .column(("users", "id"))
     ///     .column((("crm", "users"), "foo"));
     ///
-    /// let (sql, _) = Sqlite::build(query);
+    /// let (sql, _) = Sqlite::build(query)?;
     ///
     /// assert_eq!("SELECT `name`, `users`.`id`, `crm`.`users`.`foo` FROM `users`", sql);
+    /// # Ok(())
+    /// # }
     /// ```
     pub fn column<T>(mut self, column: T) -> Self
     where
@@ -157,10 +178,13 @@ impl<'a> Select<'a> {
     ///
     /// ```rust
     /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # fn main() -> Result<(), quaint::error::Error> {
     /// let query = Select::from_table("users").columns(vec!["foo", "bar"]);
-    /// let (sql, _) = Sqlite::build(query);
+    /// let (sql, _) = Sqlite::build(query)?;
     ///
     /// assert_eq!("SELECT `foo`, `bar` FROM `users`", sql);
+    /// # Ok(())
+    /// # }
     /// ```
     pub fn columns<T, C>(mut self, columns: T) -> Self
     where
@@ -177,14 +201,17 @@ impl<'a> Select<'a> {
     ///
     /// ```rust
     /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # fn main() -> Result<(), quaint::error::Error> {
     /// let query = Select::from_table("users").so_that("foo".equals("bar"));
-    /// let (sql, params) = Sqlite::build(query);
+    /// let (sql, params) = Sqlite::build(query)?;
     ///
     /// assert_eq!("SELECT `users`.* FROM `users` WHERE `foo` = ?", sql);
     ///
     /// assert_eq!(vec![
     ///    Value::from("bar"),
     /// ], params);
+    /// # Ok(())
+    /// # }
     /// ```
     pub fn so_that<T>(mut self, conditions: T) -> Self
     where
@@ -200,11 +227,12 @@ impl<'a> Select<'a> {
     ///
     /// ```rust
     /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # fn main() -> Result<(), quaint::error::Error> {
     /// let query = Select::from_table("users")
     ///     .so_that("foo".equals("bar"))
     ///     .and_where("lol".equals("wtf"));
     ///
-    /// let (sql, params) = Sqlite::build(query);
+    /// let (sql, params) = Sqlite::build(query)?;
     ///
     /// assert_eq!("SELECT `users`.* FROM `users` WHERE (`foo` = ? AND `lol` = ?)", sql);
     ///
@@ -212,6 +240,8 @@ impl<'a> Select<'a> {
     ///    Value::from("bar"),
     ///    Value::from("wtf"),
     /// ], params);
+    /// # Ok(())
+    /// # }
     /// ```
     pub fn and_where<T>(mut self, conditions: T) -> Self
     where
@@ -232,11 +262,12 @@ impl<'a> Select<'a> {
     ///
     /// ```rust
     /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # fn main() -> Result<(), quaint::error::Error> {
     /// let query = Select::from_table("users")
     ///     .so_that("foo".equals("bar"))
     ///     .or_where("lol".equals("wtf"));
     ///
-    /// let (sql, params) = Sqlite::build(query);
+    /// let (sql, params) = Sqlite::build(query)?;
     ///
     /// assert_eq!("SELECT `users`.* FROM `users` WHERE (`foo` = ? OR `lol` = ?)", sql);
     ///
@@ -244,6 +275,8 @@ impl<'a> Select<'a> {
     ///    Value::from("bar"),
     ///    Value::from("wtf"),
     /// ], params);
+    /// # Ok(())
+    /// # }
     /// ```
     pub fn or_where<T>(mut self, conditions: T) -> Self
     where
@@ -262,14 +295,17 @@ impl<'a> Select<'a> {
     ///
     /// ```rust
     /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # fn main() -> Result<(), quaint::error::Error> {
     /// let join = "posts".alias("p").on(("p", "user_id").equals(Column::from(("users", "id"))));
     /// let query = Select::from_table("users").inner_join(join);
-    /// let (sql, _) = Sqlite::build(query);
+    /// let (sql, _) = Sqlite::build(query)?;
     ///
     /// assert_eq!(
     ///     "SELECT `users`.* FROM `users` INNER JOIN `posts` AS `p` ON `p`.`user_id` = `users`.`id`",
     ///     sql
     /// );
+    /// # Ok(())
+    /// # }
     /// ```
     pub fn inner_join<J>(mut self, join: J) -> Self
     where
@@ -283,9 +319,10 @@ impl<'a> Select<'a> {
     ///
     /// ```rust
     /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # fn main() -> Result<(), quaint::error::Error> {
     /// let join = "posts".alias("p").on(("p", "visible").equals(true));
     /// let query = Select::from_table("users").left_join(join);
-    /// let (sql, params) = Sqlite::build(query);
+    /// let (sql, params) = Sqlite::build(query)?;
     ///
     /// assert_eq!(
     ///     "SELECT `users`.* FROM `users` LEFT JOIN `posts` AS `p` ON `p`.`visible` = ?",
@@ -298,6 +335,8 @@ impl<'a> Select<'a> {
     ///     ],
     ///     params
     /// );
+    /// # Ok(())
+    /// # }
     /// ```
     pub fn left_join<J>(mut self, join: J) -> Self
     where
@@ -311,9 +350,10 @@ impl<'a> Select<'a> {
     ///
     /// ```rust
     /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # fn main() -> Result<(), quaint::error::Error> {
     /// let join = "posts".alias("p").on(("p", "visible").equals(true));
     /// let query = Select::from_table("users").right_join(join);
-    /// let (sql, params) = Sqlite::build(query);
+    /// let (sql, params) = Sqlite::build(query)?;
     ///
     /// assert_eq!(
     ///     "SELECT `users`.* FROM `users` RIGHT JOIN `posts` AS `p` ON `p`.`visible` = ?",
@@ -326,6 +366,8 @@ impl<'a> Select<'a> {
     ///     ],
     ///     params
     /// );
+    /// # Ok(())
+    /// # }
     /// ```
     pub fn right_join<J>(mut self, join: J) -> Self
     where
@@ -339,9 +381,10 @@ impl<'a> Select<'a> {
     ///
     /// ```rust
     /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # fn main() -> Result<(), quaint::error::Error> {
     /// let join = "posts".alias("p").on(("p", "visible").equals(true));
     /// let query = Select::from_table("users").full_join(join);
-    /// let (sql, params) = Sqlite::build(query);
+    /// let (sql, params) = Sqlite::build(query)?;
     ///
     /// assert_eq!(
     ///     "SELECT `users`.* FROM `users` FULL JOIN `posts` AS `p` ON `p`.`visible` = ?",
@@ -354,6 +397,8 @@ impl<'a> Select<'a> {
     ///     ],
     ///     params
     /// );
+    /// # Ok(())
+    /// # }
     /// ```
     pub fn full_join<J>(mut self, join: J) -> Self
     where
@@ -367,14 +412,17 @@ impl<'a> Select<'a> {
     ///
     /// ```rust
     /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # fn main() -> Result<(), quaint::error::Error> {
     /// let query = Select::from_table("users")
     ///     .order_by("foo")
     ///     .order_by("baz".ascend())
     ///     .order_by("bar".descend());
     ///
-    /// let (sql, _) = Sqlite::build(query);
+    /// let (sql, _) = Sqlite::build(query)?;
     ///
     /// assert_eq!("SELECT `users`.* FROM `users` ORDER BY `foo`, `baz` ASC, `bar` DESC", sql);
+    /// # Ok(())
+    /// # }
     pub fn order_by<T>(mut self, value: T) -> Self
     where
         T: IntoOrderDefinition<'a>,
@@ -389,13 +437,16 @@ impl<'a> Select<'a> {
     ///
     /// ```rust
     /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # fn main() -> Result<(), quaint::error::Error> {
     /// let query = Select::from_table("users").column("foo").column("bar")
     ///     .group_by("foo")
     ///     .group_by("bar");
     ///
-    /// let (sql, _) = Sqlite::build(query);
+    /// let (sql, _) = Sqlite::build(query)?;
     ///
     /// assert_eq!("SELECT `foo`, `bar` FROM `users` GROUP BY `foo`, `bar`", sql);
+    /// # Ok(())
+    /// # }
     pub fn group_by<T>(mut self, value: T) -> Self
     where
         T: IntoGroupByDefinition<'a>,
@@ -409,14 +460,17 @@ impl<'a> Select<'a> {
     ///
     /// ```rust
     /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # fn main() -> Result<(), quaint::error::Error> {
     /// let query = Select::from_table("users").column("foo").column("bar")
     ///     .group_by("foo")
     ///     .having("foo".greater_than(100));
     ///
-    /// let (sql, params) = Sqlite::build(query);
+    /// let (sql, params) = Sqlite::build(query)?;
     ///
     /// assert_eq!("SELECT `foo`, `bar` FROM `users` GROUP BY `foo` HAVING `foo` > ?", sql);
     /// assert_eq!(vec![Value::from(100)], params);
+    /// # Ok(())
+    /// # }
     pub fn having<T>(mut self, conditions: T) -> Self
     where
         T: Into<ConditionTree<'a>>,
@@ -429,11 +483,14 @@ impl<'a> Select<'a> {
     ///
     /// ```rust
     /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # fn main() -> Result<(), quaint::error::Error> {
     /// let query = Select::from_table("users").limit(10);
-    /// let (sql, params) = Sqlite::build(query);
+    /// let (sql, params) = Sqlite::build(query)?;
     ///
     /// assert_eq!("SELECT `users`.* FROM `users` LIMIT ?", sql);
     /// assert_eq!(vec![Value::from(10)], params);
+    /// # Ok(())
+    /// # }
     pub fn limit(mut self, limit: usize) -> Self {
         self.limit = Some(Value::from(limit));
         self
@@ -443,11 +500,14 @@ impl<'a> Select<'a> {
     ///
     /// ```rust
     /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # fn main() -> Result<(), quaint::error::Error> {
     /// let query = Select::from_table("users").offset(10);
-    /// let (sql, params) = Sqlite::build(query);
+    /// let (sql, params) = Sqlite::build(query)?;
     ///
     /// assert_eq!("SELECT `users`.* FROM `users` LIMIT ? OFFSET ?", sql);
     /// assert_eq!(vec![Value::from(-1), Value::from(10)], params);
+    /// # Ok(())
+    /// # }
     pub fn offset(mut self, offset: usize) -> Self {
         self.offset = Some(Value::from(offset));
         self

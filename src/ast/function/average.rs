@@ -10,9 +10,12 @@ pub struct Average<'a> {
 ///
 /// ```rust
 /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
+/// # fn main() -> Result<(), quaint::error::Error> {
 /// let query = Select::from_table("users").value(avg("age"));
-/// let (sql, _) = Sqlite::build(query);
+/// let (sql, _) = Sqlite::build(query)?;
 /// assert_eq!("SELECT AVG(`age`) FROM `users`", sql);
+/// # Ok(())
+/// # }
 /// ```
 pub fn avg<'a, C>(col: C) -> Function<'a>
 where

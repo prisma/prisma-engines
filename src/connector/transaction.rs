@@ -12,10 +12,10 @@ pub struct Transaction<'a> {
 }
 
 impl<'a> Transaction<'a> {
-    pub(crate) async fn new(inner: &'a dyn Queryable) -> crate::Result<Transaction<'a>> {
+    pub(crate) async fn new(inner: &'a dyn Queryable, begin_stmt: &str) -> crate::Result<Transaction<'a>> {
         let this = Self { inner };
 
-        inner.raw_cmd("BEGIN").await?;
+        inner.raw_cmd(begin_stmt).await?;
         inner.server_reset_query(&this).await?;
 
         Ok(this)

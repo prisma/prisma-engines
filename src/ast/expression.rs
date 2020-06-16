@@ -23,6 +23,8 @@ impl<'a> Expression<'a> {
 pub enum ExpressionKind<'a> {
     /// Anything that we must parameterize before querying
     Parameterized(Value<'a>),
+    /// A user-provided value we do not parameterize.
+    RawValue(Raw<'a>),
     /// A database column
     Column(Box<Column<'a>>),
     /// Data in a row form, e.g. (1, 2, 3)
@@ -53,47 +55,17 @@ pub fn asterisk() -> Expression<'static> {
     }
 }
 
-#[macro_export]
-/// Marks a given string as a value. Useful when using a value in calculations,
-/// e.g.
-///
-/// ``` rust
-/// # use quaint::{col, val, ast::*, visitor::{Visitor, Sqlite}};
-/// let join = "dogs".on(("dogs", "slave_id").equals(Column::from(("cats", "master_id"))));
-///
-/// let query = Select::from_table("cats")
-///     .value(Table::from("cats").asterisk())
-///     .value(col!("dogs", "age") - val!(4))
-///     .inner_join(join);
-///
-/// let (sql, params) = Sqlite::build(query);
-///
-/// assert_eq!(
-///     "SELECT `cats`.*, (`dogs`.`age` - ?) FROM `cats` INNER JOIN `dogs` ON `dogs`.`slave_id` = `cats`.`master_id`",
-///     sql
-/// );
-/// ```
-macro_rules! val {
-    ($val:expr) => {
-        Expression::from($val)
-    };
-}
-
-macro_rules! expression {
-    ($kind:ident,$paramkind:ident) => {
-        impl<'a> From<$kind<'a>> for Expression<'a> {
-            fn from(that: $kind<'a>) -> Self {
-                Expression {
-                    kind: ExpressionKind::$paramkind(that),
-                    alias: None,
-                }
-            }
-        }
-    };
-}
-
 expression!(Row, Row);
 expression!(Function, Function);
+
+impl<'a> From<Raw<'a>> for Expression<'a> {
+    fn from(r: Raw<'a>) -> Self {
+        Expression {
+            kind: ExpressionKind::RawValue(r),
+            alias: None,
+        }
+    }
+}
 
 impl<'a> From<Values<'a>> for Expression<'a> {
     fn from(p: Values<'a>) -> Self {

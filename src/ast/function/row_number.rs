@@ -31,18 +31,21 @@ impl<'a> RowNumber<'a> {
 ///
 /// ```rust
 /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
+/// # fn main() -> Result<(), quaint::error::Error> {
 /// let fun = Function::from(row_number().order_by("created_at").partition_by("name"));
 ///
 /// let query = Select::from_table("users")
 ///     .column("id")
 ///     .value(fun.alias("num"));
 ///
-/// let (sql, _) = Sqlite::build(query);
+/// let (sql, _) = Sqlite::build(query)?;
 ///
 /// assert_eq!(
 ///     "SELECT `id`, ROW_NUMBER() OVER(PARTITION BY `name` ORDER BY `created_at`) AS `num` FROM `users`",
 ///     sql
 /// );
+/// # Ok(())
+/// # }
 /// ```
 pub fn row_number<'a>() -> RowNumber<'a> {
     RowNumber::default()

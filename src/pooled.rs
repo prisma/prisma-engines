@@ -9,9 +9,10 @@
 //!
 //! Connector type can be one of the following:
 //!
-//! - `sqlite`/`file` opens an SQLite connection
-//! - `mysql` opens a MySQL connection
-//! - `postgres`/`postgresql` opens a PostgreSQL connection
+//! - `sqlite`/`file` opens an SQLite connection.
+//! - `mysql` opens a MySQL connection.
+//! - `postgres`/`postgresql` opens a PostgreSQL connection.
+//! - `sqlserver`/`jdbc:sqlserver` opens a Microsoft SQL Server connection.
 //!
 //! All parameters should be given in the query string format:
 //! `?key1=val1&key2=val2`. All parameters are optional.
@@ -74,6 +75,34 @@
 //! - `connect_timeout` defined in seconds (default: 5). Connecting to a
 //!   database will return a `ConnectTimeout` error if taking more than the
 //!   defined value.
+//!
+//! ## Microsoft SQL Server
+//!
+//! SQL Server is a bit different due to its connection string following the
+//! JDBC standard. It's quite similar to the others: the parameters are delimited
+//! with a `;` instead of `?` or `&`, and the parameter names are camelCase instead
+//! of snake_case.
+//!
+//! - `encrypt` if set to `true` encrypts all traffic over TLS. If `false`, only
+//!   the login details are encrypted.
+//! - `user` sets the login name.
+//! - `password` sets the login password.
+//! - `database` sets the database to connect to.
+//! - `trustServerCertificate` if set to `true`, accepts any kind of certificate
+//!   from the server.
+//! - `socketTimeout` defined in seconds. If set, a query will return a
+//!   `Timeout` error if it fails to resolve before given time.
+//! - `connectTimeout` defined in seconds (default: 5). Connecting to a
+//!   database will return a `ConnectTimeout` error if taking more than the
+//!   defined value.
+//! - `connection:imit` defines the maximum number of connections opened to the
+//!   database.
+//!
+//! Example of a JDBC connection string:
+//!
+//! ```ignore
+//! sqlserver://host:port;database=master;user=SA;password=secret
+//! ```
 //!
 //! To create a new `Quaint` pool connecting to a PostgreSQL database:
 //!
@@ -277,19 +306,17 @@ impl Quaint {
     ///
     /// [module level documentation]: index.html
     pub fn builder(url_str: &str) -> crate::Result<Builder> {
-        let url = Url::parse(url_str)?;
-
-        match url.scheme() {
+        match url_str {
             #[cfg(feature = "sqlite")]
-            "file" | "sqlite" => {
-                let params = crate::connector::SqliteParams::try_from(url_str)?;
+            s if s.starts_with("file") || s.starts_with("sqlite") => {
+                let params = crate::connector::SqliteParams::try_from(s)?;
 
                 let manager = QuaintManager::Sqlite {
                     file_path: params.file_path,
                     db_name: params.db_name,
                 };
 
-                let mut builder = Builder::new(url_str, manager)?;
+                let mut builder = Builder::new(s, manager)?;
 
                 if let Some(limit) = params.connection_limit {
                     builder.connection_limit(limit);
@@ -298,13 +325,13 @@ impl Quaint {
                 Ok(builder)
             }
             #[cfg(feature = "mysql")]
-            "mysql" => {
-                let url = crate::connector::MysqlUrl::new(url)?;
+            s if s.starts_with("mysql") => {
+                let url = crate::connector::MysqlUrl::new(Url::parse(s)?)?;
                 let connection_limit = url.connection_limit();
                 let connect_timeout = url.connect_timeout();
 
                 let manager = QuaintManager::Mysql(url);
-                let mut builder = Builder::new(url_str, manager)?;
+                let mut builder = Builder::new(s, manager)?;
 
                 if let Some(limit) = connection_limit {
                     builder.connection_limit(limit);
@@ -317,13 +344,32 @@ impl Quaint {
                 Ok(builder)
             }
             #[cfg(feature = "postgresql")]
-            "postgres" | "postgresql" => {
-                let url = crate::connector::PostgresUrl::new(url)?;
+            s if s.starts_with("postgres") || s.starts_with("postgresql") => {
+                let url = crate::connector::PostgresUrl::new(Url::parse(s)?)?;
                 let connection_limit = url.connection_limit();
                 let connect_timeout = url.connect_timeout();
 
                 let manager = QuaintManager::Postgres(url);
-                let mut builder = Builder::new(url_str, manager)?;
+                let mut builder = Builder::new(s, manager)?;
+
+                if let Some(limit) = connection_limit {
+                    builder.connection_limit(limit);
+                }
+
+                if let Some(timeout) = connect_timeout {
+                    builder.connect_timeout(timeout);
+                }
+
+                Ok(builder)
+            }
+            #[cfg(feature = "mssql")]
+            s if s.starts_with("jdbc:sqlserver") || s.starts_with("sqlserver") => {
+                let url = crate::connector::MssqlUrl::new(s)?;
+                let connection_limit = url.connection_limit();
+                let connect_timeout = url.connect_timeout();
+
+                let manager = QuaintManager::Mssql(url);
+                let mut builder = Builder::new(s, manager)?;
 
                 if let Some(limit) = connection_limit {
                     builder.connection_limit(limit);

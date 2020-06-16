@@ -453,12 +453,12 @@ impl TransactionCapable for PostgreSql {}
 #[async_trait]
 impl Queryable for PostgreSql {
     async fn query(&self, q: Query<'_>) -> crate::Result<ResultSet> {
-        let (sql, params) = visitor::Postgres::build(q);
+        let (sql, params) = visitor::Postgres::build(q)?;
         self.query_raw(sql.as_str(), &params[..]).await
     }
 
     async fn execute(&self, q: Query<'_>) -> crate::Result<u64> {
-        let (sql, params) = visitor::Postgres::build(q);
+        let (sql, params) = visitor::Postgres::build(q)?;
         self.execute_raw(sql.as_str(), &params[..]).await
     }
 
@@ -696,32 +696,29 @@ mod tests {
 
         let insert = ast::Insert::single_into("types")
             .value("binary_bits", "111011100011")
-            .value(
-                "binary_bits_arr",
-                Value::Array(vec![Value::Text("111011100011".into())]),
-            )
+            .value("binary_bits_arr", Value::array(vec!["111011100011"]))
             .value("bytes_uuid", "111142ec-880b-4062-913d-8eac479ab957")
             .value(
                 "bytes_uuid_arr",
-                Value::Array(vec![
-                    "111142ec-880b-4062-913d-8eac479ab957".into(),
-                    "111142ec-880b-4062-913d-8eac479ab958".into(),
+                Value::array(vec![
+                    "111142ec-880b-4062-913d-8eac479ab957",
+                    "111142ec-880b-4062-913d-8eac479ab958",
                 ]),
             )
             .value("network_inet", "127.0.0.1")
-            .value("network_inet_arr", Value::Array(vec!["127.0.0.1".into()]))
+            .value("network_inet_arr", Value::array(vec!["127.0.0.1"]))
             .value("numeric_float4", 3.14)
-            .value("numeric_float4_arr", Value::Array(vec![3.14.into()]))
+            .value("numeric_float4_arr", Value::array(vec![3.14]))
             .value("numeric_float8", 3.14912932)
-            .value("numeric_decimal", Value::Real("0.00006927".parse().unwrap()))
+            .value("numeric_decimal", Value::real("0.00006927".parse().unwrap()))
             .value("numeric_money", 3.551)
-            .value("time_date", Value::DateTime("2020-03-02T08:00:00Z".parse().unwrap()))
-            .value("time_timetz", Value::DateTime("2020-03-02T08:00:00Z".parse().unwrap()))
-            .value("time_time", Value::DateTime("2020-03-02T08:00:00Z".parse().unwrap()))
+            .value("time_date", Value::date("2020-03-02".parse().unwrap()))
+            .value("time_timetz", Value::datetime("2020-03-02T08:00:00Z".parse().unwrap()))
+            .value("time_time", Value::time("08:00:00".parse().unwrap()))
             .value("text_jsonb", "{\"isJSONB\": true}")
             .value(
                 "time_timestamptz",
-                Value::DateTime("2020-03-02T08:00:00Z".parse().unwrap()),
+                Value::datetime("2020-03-02T08:00:00Z".parse().unwrap()),
             );
         let select = ast::Select::from_table("types").value(ast::asterisk());
 
@@ -735,26 +732,26 @@ mod tests {
             .values;
 
         let expected = &[
-            Value::Integer(1),
-            Value::Text("111011100011".into()),
-            Value::Array(vec![Value::Text("111011100011".into())]),
-            Value::Uuid("111142ec-880b-4062-913d-8eac479ab957".parse().unwrap()),
-            Value::Array(vec![
-                Value::Uuid("111142ec-880b-4062-913d-8eac479ab957".parse().unwrap()),
-                Value::Uuid("111142ec-880b-4062-913d-8eac479ab958".parse().unwrap()),
+            Value::integer(1),
+            Value::text("111011100011"),
+            Value::array(vec!["111011100011"]),
+            Value::uuid("111142ec-880b-4062-913d-8eac479ab957".parse().unwrap()),
+            Value::array(vec![
+                Value::uuid("111142ec-880b-4062-913d-8eac479ab957".parse().unwrap()),
+                Value::uuid("111142ec-880b-4062-913d-8eac479ab958".parse().unwrap()),
             ]),
-            Value::Text("127.0.0.1".into()),
-            Value::Array(vec![Value::Text("127.0.0.1".into())]),
-            Value::Real("3.14".parse().unwrap()),
-            Value::Array(vec![3.14.into()]),
-            Value::Real("3.14912932".parse().unwrap()),
-            Value::Real("0.00006927".parse().unwrap()),
-            Value::Real("3.55".parse().unwrap()),
-            Value::DateTime("1970-01-01T08:00:00Z".parse().unwrap()),
-            Value::DateTime("1970-01-01T08:00:00Z".parse().unwrap()),
-            Value::DateTime("2020-03-02T00:00:00Z".parse().unwrap()),
-            Value::Json(serde_json::json!({ "isJSONB": true })),
-            Value::DateTime("2020-03-02T08:00:00Z".parse().unwrap()),
+            Value::text("127.0.0.1"),
+            Value::array(vec!["127.0.0.1"]),
+            Value::real("3.14".parse().unwrap()),
+            Value::array(vec![3.14]),
+            Value::real("3.14912932".parse().unwrap()),
+            Value::real("0.00006927".parse().unwrap()),
+            Value::real("3.55".parse().unwrap()),
+            Value::time("08:00:00".parse().unwrap()),
+            Value::time("08:00:00".parse().unwrap()),
+            Value::date("2020-03-02".parse().unwrap()),
+            Value::json(serde_json::json!({ "isJSONB": true })),
+            Value::datetime("2020-03-02T08:00:00Z".parse().unwrap()),
         ];
 
         assert_eq!(result, expected);
@@ -784,15 +781,15 @@ mod tests {
         let select = ast::Select::from_table("money_conversion_test").value(ast::asterisk());
         let result = conn.query(select.into()).await.unwrap();
 
-        let expected_first_row = vec![Value::Integer(1), Value::Real("0".parse().unwrap())];
+        let expected_first_row = vec![Value::integer(1), Value::real("0".parse().unwrap())];
 
         assert_eq!(result.get(0).unwrap().values, &expected_first_row);
 
-        let expected_second_row = vec![Value::Integer(2), Value::Real("12".parse().unwrap())];
+        let expected_second_row = vec![Value::integer(2), Value::real("12".parse().unwrap())];
 
         assert_eq!(result.get(1).unwrap().values, &expected_second_row);
 
-        let expected_third_row = vec![Value::Integer(3), Value::Real("855.32".parse().unwrap())];
+        let expected_third_row = vec![Value::integer(3), Value::real("855.32".parse().unwrap())];
 
         assert_eq!(result.get(2).unwrap().values, &expected_third_row);
     }
@@ -824,17 +821,17 @@ mod tests {
         let result = conn.query(select.into()).await.unwrap();
 
         let expected_first_row = vec![
-            Value::Integer(1),
-            Value::Text("000000000000".into()),
-            Value::Text("0000000000".into()),
+            Value::integer(1),
+            Value::text("000000000000"),
+            Value::text("0000000000"),
         ];
 
         assert_eq!(result.get(0).unwrap().values, &expected_first_row);
 
         let expected_second_row = vec![
-            Value::Integer(2),
-            Value::Text("110011000100".into()),
-            Value::Text("110011000100".into()),
+            Value::integer(2),
+            Value::text("110011000100"),
+            Value::text("110011000100"),
         ];
 
         assert_eq!(result.get(1).unwrap().values, &expected_second_row);
@@ -989,7 +986,7 @@ mod tests {
         let err = conn
             .query(
                 Insert::single_into("should_map_null_constraint_errors_test")
-                    .value("id", Value::Null)
+                    .value("id", Option::<i64>::None)
                     .into(),
             )
             .await
@@ -1060,24 +1057,24 @@ mod tests {
         {
             let select = Select::from_table("table_with_json")
                 .value(asterisk())
-                .so_that(Column::from("obj").equals(Value::Json(serde_json::json!({ "a": "b" }))));
+                .so_that(Column::from("obj").equals(Value::json(serde_json::json!({ "a": "b" }))));
 
             let result = conn.query(select.into()).await.unwrap();
 
             assert_eq!(result.len(), 1);
-            assert_eq!(result.get(0).unwrap().get("id").unwrap(), &Value::Integer(2))
+            assert_eq!(result.get(0).unwrap().get("id").unwrap(), &Value::integer(2))
         }
 
         // Not equals
         {
             let select = Select::from_table("table_with_json")
                 .value(asterisk())
-                .so_that(Column::from("obj").not_equals(Value::Json(serde_json::json!({ "a": "a" }))));
+                .so_that(Column::from("obj").not_equals(Value::json(serde_json::json!({ "a": "a" }))));
 
             let result = conn.query(select.into()).await.unwrap();
 
             assert_eq!(result.len(), 1);
-            assert_eq!(result.get(0).unwrap().get("id").unwrap(), &Value::Integer(2))
+            assert_eq!(result.get(0).unwrap().get("id").unwrap(), &Value::integer(2))
         }
     }
 }

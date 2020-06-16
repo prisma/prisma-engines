@@ -268,12 +268,12 @@ impl TransactionCapable for Mysql {}
 #[async_trait]
 impl Queryable for Mysql {
     async fn query(&self, q: Query<'_>) -> crate::Result<ResultSet> {
-        let (sql, params) = visitor::Mysql::build(q);
+        let (sql, params) = visitor::Mysql::build(q)?;
         self.query_raw(&sql, &params).await
     }
 
     async fn execute(&self, q: Query<'_>) -> crate::Result<u64> {
-        let (sql, params) = visitor::Mysql::build(q);
+        let (sql, params) = visitor::Mysql::build(q)?;
         self.execute_raw(&sql, &params).await
     }
 
@@ -485,7 +485,7 @@ VALUES (1, 'Joe', 27, 20000.00 );
 
         assert_eq!(
             roundtripped.into_single().unwrap().at(0).unwrap(),
-            &Value::Bytes(blob.as_slice().into())
+            &Value::Bytes(Some(blob.as_slice().into()))
         );
     }
 
@@ -520,11 +520,11 @@ VALUES (1, 'Joe', 27, 20000.00 );
 
         assert_eq!(
             rows.get(0).unwrap().at(1),
-            Some(&Value::DateTime("1970-01-01T20:12:22Z".parse().unwrap()))
+            Some(&Value::Time(Some("20:12:22".parse().unwrap())))
         );
         assert_eq!(
             rows.get(1).unwrap().at(1),
-            Some(&Value::DateTime("1970-01-01T14:40:22Z".parse().unwrap()))
+            Some(&Value::Time(Some("14:40:22".parse().unwrap())))
         );
     }
 
@@ -559,11 +559,11 @@ VALUES (1, 'Joe', 27, 20000.00 );
 
         assert_eq!(
             rows.get(0).unwrap().at(1),
-            Some(&Value::DateTime("2020-03-15T20:12:22.003Z".parse().unwrap()))
+            Some(&Value::DateTime(Some("2020-03-15T20:12:22.003Z".parse().unwrap())))
         );
         assert_eq!(
             rows.get(1).unwrap().at(1),
-            Some(&Value::DateTime("2003-03-01T13:10:35.789Z".parse().unwrap()))
+            Some(&Value::DateTime(Some("2003-03-01T13:10:35.789Z".parse().unwrap())))
         );
     }
 
@@ -717,12 +717,12 @@ VALUES (1, 'Joe', 27, 20000.00 );
 
         assert_eq!(
             result.get(0).unwrap().get("gb18030").unwrap(),
-            &Value::Text("法式咸派".into())
+            &Value::Text(Some("法式咸派".into()))
         );
 
         assert_eq!(
             result.get(1).unwrap().get("gb18030").unwrap(),
-            &Value::Text("土豆".into())
+            &Value::Text(Some("土豆".into()))
         );
     }
 
@@ -785,7 +785,10 @@ VALUES (1, 'Joe', 27, 20000.00 );
         let conn = Quaint::new(&CONN_STR).await.unwrap();
         let result = conn.query_raw("SELECT SUM(1) AS THEONE", &[]).await.unwrap();
 
-        assert_eq!(result.into_single().unwrap()[0], Value::Real("1.0".parse().unwrap()));
+        assert_eq!(
+            result.into_single().unwrap()[0],
+            Value::Real(Some("1.0".parse().unwrap()))
+        );
     }
 
     #[tokio::test]
@@ -941,24 +944,24 @@ VALUES (1, 'Joe', 27, 20000.00 );
         {
             let select = Select::from_table("table_with_json")
                 .value(asterisk())
-                .so_that(Column::from("obj").equals(Value::Json(serde_json::json!({ "a": "b" }))));
+                .so_that(Column::from("obj").equals(Value::Json(Some(serde_json::json!({ "a": "b" })))));
 
             let result = conn.query(select.into()).await.unwrap();
 
             assert_eq!(result.len(), 1);
-            assert_eq!(result.get(0).unwrap().get("id").unwrap(), &Value::Integer(2))
+            assert_eq!(result.get(0).unwrap().get("id").unwrap(), &Value::Integer(Some(2)))
         }
 
         // Not equals
         {
             let select = Select::from_table("table_with_json")
                 .value(asterisk())
-                .so_that(Column::from("obj").not_equals(Value::Json(serde_json::json!({ "a": "a" }))));
+                .so_that(Column::from("obj").not_equals(Value::Json(Some(serde_json::json!({ "a": "a" })))));
 
             let result = conn.query(select.into()).await.unwrap();
 
             assert_eq!(result.len(), 1);
-            assert_eq!(result.get(0).unwrap().get("id").unwrap(), &Value::Integer(2))
+            assert_eq!(result.get(0).unwrap().get("id").unwrap(), &Value::Integer(Some(2)))
         }
     }
 }

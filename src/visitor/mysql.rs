@@ -1,4 +1,7 @@
-use crate::{ast::*, visitor::Visitor};
+use crate::{
+    ast::*,
+    visitor::{self, Visitor},
+};
 use std::fmt::{self, Write};
 
 /// A visitor to generate queries for the MySQL database.
@@ -10,24 +13,29 @@ pub struct Mysql<'a> {
 }
 
 impl<'a> Mysql<'a> {
-    fn visit_regular_equality_comparison(&mut self, left: Expression<'a>, right: Expression<'a>) -> fmt::Result {
+    fn visit_regular_equality_comparison(&mut self, left: Expression<'a>, right: Expression<'a>) -> visitor::Result {
         self.visit_expression(left)?;
         self.write(" = ")?;
-        self.visit_expression(right)
+        self.visit_expression(right)?;
+
+        Ok(())
     }
 
-    fn visit_regular_difference_comparison(&mut self, left: Expression<'a>, right: Expression<'a>) -> fmt::Result {
+    fn visit_regular_difference_comparison(&mut self, left: Expression<'a>, right: Expression<'a>) -> visitor::Result {
         self.visit_expression(left)?;
         self.write(" <> ")?;
-        self.visit_expression(right)
+        self.visit_expression(right)?;
+
+        Ok(())
     }
 }
 
 impl<'a> Visitor<'a> for Mysql<'a> {
-    const C_BACKTICK: &'static str = "`";
+    const C_BACKTICK_OPEN: &'static str = "`";
+    const C_BACKTICK_CLOSE: &'static str = "`";
     const C_WILDCARD: &'static str = "%";
 
-    fn build<Q>(query: Q) -> (String, Vec<Value<'a>>)
+    fn build<Q>(query: Q) -> crate::Result<(String, Vec<Value<'a>>)>
     where
         Q: Into<Query<'a>>,
     {
@@ -36,54 +44,114 @@ impl<'a> Visitor<'a> for Mysql<'a> {
             parameters: Vec::with_capacity(128),
         };
 
-        Mysql::visit_query(&mut mysql, query.into());
+        Mysql::visit_query(&mut mysql, query.into())?;
 
-        (mysql.query, mysql.parameters)
+        Ok((mysql.query, mysql.parameters))
     }
 
-    fn write<D: fmt::Display>(&mut self, s: D) -> fmt::Result {
-        write!(&mut self.query, "{}", s)
+    fn write<D: fmt::Display>(&mut self, s: D) -> visitor::Result {
+        write!(&mut self.query, "{}", s)?;
+        Ok(())
     }
 
-    fn visit_insert(&mut self, insert: Insert<'a>) -> fmt::Result {
-        match insert.on_conflict {
-            Some(OnConflict::DoNothing) => self.write("INSERT IGNORE INTO ")?,
-            None => self.write("INSERT INTO ")?,
+    fn visit_raw_value(&mut self, value: Value<'a>) -> visitor::Result {
+        let res = match value {
+            Value::Integer(i) => i.map(|i| self.write(i)),
+            Value::Real(r) => r.map(|r| self.write(r)),
+            Value::Text(t) => t.map(|t| self.write(format!("'{}'", t))),
+            Value::Enum(e) => e.map(|e| self.write(e)),
+            Value::Bytes(b) => b.map(|b| self.write(format!("x'{}'", hex::encode(b)))),
+            Value::Boolean(b) => b.map(|b| self.write(b)),
+            Value::Char(c) => c.map(|c| self.write(format!("'{}'", c))),
+            #[cfg(feature = "json-1")]
+            Value::Json(j) => j.map(|j| self.write(format!("CONVERT('{}', JSON)", serde_json::to_string(&j).unwrap()))),
+            #[cfg(all(feature = "array", feature = "postgresql"))]
+            Value::Array(_) => panic!("Arrays not supported in MySQL"),
+            #[cfg(feature = "uuid-0_8")]
+            Value::Uuid(uuid) => uuid.map(|uuid| self.write(format!("'{}'", uuid.to_hyphenated().to_string()))),
+            #[cfg(feature = "chrono-0_4")]
+            Value::DateTime(dt) => dt.map(|dt| self.write(format!("'{}'", dt.to_rfc3339(),))),
+            #[cfg(feature = "chrono-0_4")]
+            Value::Date(date) => date.map(|date| self.write(format!("'{}'", date))),
+            #[cfg(feature = "chrono-0_4")]
+            Value::Time(time) => time.map(|time| self.write(format!("'{}'", time))),
         };
 
-        self.visit_table(insert.table, true)?;
-
-        if insert.values.is_empty() {
-            self.write(" () VALUES ()")
-        } else {
-            let columns = insert.columns.len();
-
-            self.write(" (")?;
-            for (i, c) in insert.columns.into_iter().enumerate() {
-                self.visit_column(c)?;
-
-                if i < (columns - 1) {
-                    self.write(",")?;
-                }
-            }
-            self.write(")")?;
-
-            self.write(" VALUES ")?;
-            let values = insert.values.len();
-
-            for (i, row) in insert.values.into_iter().enumerate() {
-                self.visit_row(row)?;
-
-                if i < (values - 1) {
-                    self.write(", ")?;
-                }
-            }
-
-            Ok(())
+        match res {
+            Some(res) => res,
+            None => self.write("null"),
         }
     }
 
-    fn parameter_substitution(&mut self) -> fmt::Result {
+    fn visit_insert(&mut self, insert: Insert<'a>) -> visitor::Result {
+        match insert.on_conflict {
+            Some(OnConflict::DoNothing) => self.write("INSERT IGNORE ")?,
+            None => self.write("INSERT ")?,
+        };
+
+        if let Some(table) = insert.table {
+            self.write("INTO ")?;
+            self.visit_table(table, true)?;
+        }
+
+        match insert.values {
+            Expression {
+                kind: ExpressionKind::Row(row),
+                ..
+            } => {
+                if row.values.is_empty() {
+                    self.write(" () VALUES ()")?;
+                } else {
+                    let columns = insert.columns.len();
+
+                    self.write(" (")?;
+                    for (i, c) in insert.columns.into_iter().enumerate() {
+                        self.visit_column(c)?;
+
+                        if i < (columns - 1) {
+                            self.write(",")?;
+                        }
+                    }
+
+                    self.write(")")?;
+                    self.write(" VALUES ")?;
+                    self.visit_row(row)?;
+                }
+            }
+            Expression {
+                kind: ExpressionKind::Values(values),
+                ..
+            } => {
+                let columns = insert.columns.len();
+
+                self.write(" (")?;
+                for (i, c) in insert.columns.into_iter().enumerate() {
+                    self.visit_column(c)?;
+
+                    if i < (columns - 1) {
+                        self.write(",")?;
+                    }
+                }
+                self.write(")")?;
+
+                self.write(" VALUES ")?;
+                let values_len = values.len();
+
+                for (i, row) in values.into_iter().enumerate() {
+                    self.visit_row(row)?;
+
+                    if i < (values_len - 1) {
+                        self.write(", ")?;
+                    }
+                }
+            }
+            expr => self.surround_with("(", ")", |ref mut s| s.visit_expression(expr))?,
+        }
+
+        Ok(())
+    }
+
+    fn parameter_substitution(&mut self) -> visitor::Result {
         self.write("?")
     }
 
@@ -91,7 +159,7 @@ impl<'a> Visitor<'a> for Mysql<'a> {
         self.parameters.push(value);
     }
 
-    fn visit_limit_and_offset(&mut self, limit: Option<Value<'a>>, offset: Option<Value<'a>>) -> fmt::Result {
+    fn visit_limit_and_offset(&mut self, limit: Option<Value<'a>>, offset: Option<Value<'a>>) -> visitor::Result {
         match (limit, offset) {
             (Some(limit), Some(offset)) => {
                 self.write(" LIMIT ")?;
@@ -100,7 +168,7 @@ impl<'a> Visitor<'a> for Mysql<'a> {
                 self.write(" OFFSET ")?;
                 self.visit_parameterized(offset)
             }
-            (None, Some(Value::Integer(offset))) if offset < 1 => Ok(()),
+            (None, Some(Value::Integer(Some(offset)))) if offset < 1 => Ok(()),
             (None, Some(offset)) => {
                 self.write(" LIMIT ")?;
                 self.visit_parameterized(Value::from(9_223_372_036_854_775_807i64))?;
@@ -116,12 +184,12 @@ impl<'a> Visitor<'a> for Mysql<'a> {
         }
     }
 
-    fn visit_aggregate_to_string(&mut self, value: Expression<'a>) -> fmt::Result {
+    fn visit_aggregate_to_string(&mut self, value: Expression<'a>) -> visitor::Result {
         self.write(" GROUP_CONCAT")?;
         self.surround_with("(", ")", |ref mut s| s.visit_expression(value))
     }
 
-    fn visit_condition_equals(&mut self, left: Expression<'a>, right: Expression<'a>) -> fmt::Result {
+    fn visit_condition_equals(&mut self, left: Expression<'a>, right: Expression<'a>) -> visitor::Result {
         #[cfg(feature = "json-1")]
         {
             if right.is_json_value() || left.is_json_value() {
@@ -151,7 +219,7 @@ impl<'a> Visitor<'a> for Mysql<'a> {
         }
     }
 
-    fn visit_condition_not_equals(&mut self, left: Expression<'a>, right: Expression<'a>) -> fmt::Result {
+    fn visit_condition_not_equals(&mut self, left: Expression<'a>, right: Expression<'a>) -> visitor::Result {
         #[cfg(feature = "json-1")]
         {
             if right.is_json_value() || left.is_json_value() {
@@ -206,7 +274,7 @@ mod tests {
     #[test]
     fn test_single_row_insert_default_values() {
         let query = Insert::single_into("users");
-        let (sql, params) = Mysql::build(query);
+        let (sql, params) = Mysql::build(query).unwrap();
 
         assert_eq!("INSERT INTO `users` () VALUES ()", sql);
         assert_eq!(default_params(vec![]), params);
@@ -216,7 +284,7 @@ mod tests {
     fn test_single_row_insert() {
         let expected = expected_values("INSERT INTO `users` (`foo`) VALUES (?)", vec![10]);
         let query = Insert::single_into("users").value("foo", 10);
-        let (sql, params) = Mysql::build(query);
+        let (sql, params) = Mysql::build(query).unwrap();
 
         assert_eq!(expected.0, sql);
         assert_eq!(expected.1, params);
@@ -228,7 +296,7 @@ mod tests {
         let query = Insert::multi_into("users", vec!["foo"])
             .values(vec![10])
             .values(vec![11]);
-        let (sql, params) = Mysql::build(query);
+        let (sql, params) = Mysql::build(query).unwrap();
 
         assert_eq!(expected.0, sql);
         assert_eq!(expected.1, params);
@@ -238,7 +306,7 @@ mod tests {
     fn test_limit_and_offset_when_both_are_set() {
         let expected = expected_values("SELECT `users`.* FROM `users` LIMIT ? OFFSET ?", vec![10, 2]);
         let query = Select::from_table("users").limit(10).offset(2);
-        let (sql, params) = Mysql::build(query);
+        let (sql, params) = Mysql::build(query).unwrap();
 
         assert_eq!(expected.0, sql);
         assert_eq!(expected.1, params);
@@ -252,7 +320,7 @@ mod tests {
         );
 
         let query = Select::from_table("users").offset(10);
-        let (sql, params) = Mysql::build(query);
+        let (sql, params) = Mysql::build(query).unwrap();
 
         assert_eq!(expected.0, sql);
         assert_eq!(expected.1, params);
@@ -262,7 +330,7 @@ mod tests {
     fn test_limit_and_offset_when_only_limit_is_set() {
         let expected = expected_values("SELECT `users`.* FROM `users` LIMIT ?", vec![10]);
         let query = Select::from_table("users").limit(10);
-        let (sql, params) = Mysql::build(query);
+        let (sql, params) = Mysql::build(query).unwrap();
 
         assert_eq!(expected.0, sql);
         assert_eq!(expected.1, params);
@@ -276,15 +344,15 @@ mod tests {
         let query = Select::from_table("test")
             .so_that(Row::from((col!("id1"), col!("id2"))).in_selection(values!((1, 2), (3, 4))));
 
-        let (sql, params) = Mysql::build(query);
+        let (sql, params) = Mysql::build(query).unwrap();
 
         assert_eq!(expected_sql, sql);
         assert_eq!(
             vec![
-                Value::Integer(1),
-                Value::Integer(2),
-                Value::Integer(3),
-                Value::Integer(4),
+                Value::integer(1),
+                Value::integer(2),
+                Value::integer(3),
+                Value::integer(4),
             ],
             params
         );
@@ -299,7 +367,7 @@ mod tests {
         );
 
         let query = Select::from_table("users").so_that(Column::from("jsonField").equals(serde_json::json!({"a":"b"})));
-        let (sql, params) = Mysql::build(query);
+        let (sql, params) = Mysql::build(query).unwrap();
 
         assert_eq!(expected.0, sql);
         assert_eq!(expected.1, params);
@@ -315,9 +383,91 @@ mod tests {
 
         let query =
             Select::from_table("users").so_that(Column::from("jsonField").not_equals(serde_json::json!({"a":"b"})));
-        let (sql, params) = Mysql::build(query);
+        let (sql, params) = Mysql::build(query).unwrap();
 
         assert_eq!(expected.0, sql);
         assert_eq!(expected.1, params);
+    }
+
+    #[test]
+    fn test_raw_null() {
+        let (sql, params) = Mysql::build(Select::default().value(Value::Text(None).raw())).unwrap();
+        assert_eq!("SELECT null", sql);
+        assert!(params.is_empty());
+    }
+
+    #[test]
+    fn test_raw_int() {
+        let (sql, params) = Mysql::build(Select::default().value(1.raw())).unwrap();
+        assert_eq!("SELECT 1", sql);
+        assert!(params.is_empty());
+    }
+
+    #[test]
+    fn test_raw_real() {
+        let (sql, params) = Mysql::build(Select::default().value(1.3f64.raw())).unwrap();
+        assert_eq!("SELECT 1.3", sql);
+        assert!(params.is_empty());
+    }
+
+    #[test]
+    fn test_raw_text() {
+        let (sql, params) = Mysql::build(Select::default().value("foo".raw())).unwrap();
+        assert_eq!("SELECT 'foo'", sql);
+        assert!(params.is_empty());
+    }
+
+    #[test]
+    fn test_raw_bytes() {
+        let (sql, params) = Mysql::build(Select::default().value(Value::bytes(vec![1, 2, 3]).raw())).unwrap();
+        assert_eq!("SELECT x'010203'", sql);
+        assert!(params.is_empty());
+    }
+
+    #[test]
+    fn test_raw_boolean() {
+        let (sql, params) = Mysql::build(Select::default().value(true.raw())).unwrap();
+        assert_eq!("SELECT true", sql);
+        assert!(params.is_empty());
+
+        let (sql, params) = Mysql::build(Select::default().value(false.raw())).unwrap();
+        assert_eq!("SELECT false", sql);
+        assert!(params.is_empty());
+    }
+
+    #[test]
+    fn test_raw_char() {
+        let (sql, params) = Mysql::build(Select::default().value(Value::character('a').raw())).unwrap();
+        assert_eq!("SELECT 'a'", sql);
+        assert!(params.is_empty());
+    }
+
+    #[test]
+    #[cfg(feature = "json-1")]
+    fn test_raw_json() {
+        let (sql, params) = Mysql::build(Select::default().value(serde_json::json!({ "foo": "bar" }).raw())).unwrap();
+        assert_eq!("SELECT CONVERT('{\"foo\":\"bar\"}', JSON)", sql);
+        assert!(params.is_empty());
+    }
+
+    #[test]
+    #[cfg(feature = "uuid-0_8")]
+    fn test_raw_uuid() {
+        let uuid = uuid::Uuid::new_v4();
+        let (sql, params) = Mysql::build(Select::default().value(uuid.raw())).unwrap();
+
+        assert_eq!(format!("SELECT '{}'", uuid.to_hyphenated().to_string()), sql);
+
+        assert!(params.is_empty());
+    }
+
+    #[test]
+    #[cfg(feature = "chrono-0_4")]
+    fn test_raw_datetime() {
+        let dt = chrono::Utc::now();
+        let (sql, params) = Mysql::build(Select::default().value(dt.raw())).unwrap();
+
+        assert_eq!(format!("SELECT '{}'", dt.to_rfc3339(),), sql);
+        assert!(params.is_empty());
     }
 }

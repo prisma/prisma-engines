@@ -8,8 +8,8 @@ pub(crate) async fn query<'a, F, T, U>(
     f: F,
 ) -> crate::Result<T>
 where
-    F: FnOnce() -> U + Send + 'a,
-    U: Future<Output = crate::Result<T>> + Send,
+    F: FnOnce() -> U + 'a,
+    U: Future<Output = crate::Result<T>>,
 {
     let start = Instant::now();
     let res = f().await;

@@ -21,6 +21,7 @@
 //! - SQLite
 //! - PostgreSQL
 //! - MySQL
+//! - Microsoft SQL Server
 //!
 //! ### Methods of connecting
 //!
@@ -77,13 +78,14 @@
 //!
 //! ```
 //! # use quaint::{prelude::*, visitor::{Sqlite, Visitor}};
+//! # fn main() -> Result<(), quaint::error::Error> {
 //! let conditions = "word"
 //!     .equals("meow")
 //!     .and("age".less_than(10))
 //!     .and("paw".equals("warm"));
 //!
 //! let query = Select::from_table("naukio").so_that(conditions);
-//! let (sql_str, params) = Sqlite::build(query);
+//! let (sql_str, params) = Sqlite::build(query)?;
 //!
 //! assert_eq!(
 //!     "SELECT `naukio`.* FROM `naukio` WHERE (`word` = ? AND `age` < ? AND `paw` = ?)",
@@ -98,7 +100,12 @@
 //!     ],
 //!     params
 //! );
+//! # Ok(())
+//! # }
 //! ```
+#[macro_use]
+mod macros;
+
 #[cfg(all(
     not(feature = "tracing-log"),
     any(feature = "sqlite", feature = "mysql", feature = "postgresql")

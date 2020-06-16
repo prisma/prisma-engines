@@ -42,25 +42,4 @@ impl<'a> Aliasable<'a> for Function<'a> {
     }
 }
 
-macro_rules! function {
-    ($($kind:ident),*) => (
-        $(
-            impl<'a> From<$kind<'a>> for Function<'a> {
-                fn from(f: $kind<'a>) -> Self {
-                    Function {
-                        typ_: FunctionType::$kind(f),
-                        alias: None,
-                    }
-                }
-            }
-
-            impl<'a> From<$kind<'a>> for Expression<'a> {
-                fn from(f: $kind<'a>) -> Self {
-                    Function::from(f).into()
-                }
-            }
-        )*
-    );
-}
-
 function!(RowNumber, Count, AggregateToString, Average, Sum);

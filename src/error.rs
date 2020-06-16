@@ -167,6 +167,19 @@ impl From<Error> for ErrorKind {
     }
 }
 
+#[cfg(feature = "json-1")]
+impl From<serde_json::Error> for Error {
+    fn from(_: serde_json::Error) -> Self {
+        Self::builder(ErrorKind::ConversionError("Malformed JSON data.")).build()
+    }
+}
+
+impl From<std::fmt::Error> for Error {
+    fn from(_: std::fmt::Error) -> Self {
+        Self::builder(ErrorKind::ConversionError("Problems writing AST into a query string.")).build()
+    }
+}
+
 impl From<num::TryFromIntError> for Error {
     fn from(_: num::TryFromIntError) -> Self {
         Self::builder(ErrorKind::ConversionError(

@@ -14,7 +14,7 @@ use std::convert::TryFrom;
 /// The main entry point and an abstraction over a database connection.
 #[derive(Clone)]
 pub struct Quaint {
-    inner: Arc<dyn Queryable + Send + Sync>,
+    inner: Arc<dyn Queryable>,
     connection_info: Arc<ConnectionInfo>,
 }
 
@@ -89,33 +89,38 @@ impl Quaint {
     ///   database will return a `ConnectTimeout` error if taking more than the
     ///   defined value.
     pub async fn new(url_str: &str) -> crate::Result<Self> {
-        let url = Url::parse(url_str)?;
-
-        let inner = match url.scheme() {
+        let inner = match url_str {
             #[cfg(feature = "sqlite")]
-            "file" | "sqlite" => {
-                let params = connector::SqliteParams::try_from(url_str)?;
+            s if s.starts_with("file") || s.starts_with("sqlite") => {
+                let params = connector::SqliteParams::try_from(s)?;
                 let mut sqlite = connector::Sqlite::new(&params.file_path)?;
 
                 sqlite.attach_database(&params.db_name).await?;
 
-                Arc::new(sqlite) as Arc<dyn Queryable + Send + Sync>
+                Arc::new(sqlite) as Arc<dyn Queryable>
             }
             #[cfg(feature = "mysql")]
-            "mysql" => {
-                let url = connector::MysqlUrl::new(url)?;
+            s if s.starts_with("mysql") => {
+                let url = connector::MysqlUrl::new(Url::parse(s)?)?;
                 let mysql = connector::Mysql::new(url)?;
 
-                Arc::new(mysql) as Arc<dyn Queryable + Send + Sync>
+                Arc::new(mysql) as Arc<dyn Queryable>
             }
             #[cfg(feature = "postgresql")]
-            "postgres" | "postgresql" => {
-                let url = connector::PostgresUrl::new(url)?;
+            s if s.starts_with("postgres") || s.starts_with("postgresql") => {
+                let url = connector::PostgresUrl::new(Url::parse(s)?)?;
                 let psql = connector::PostgreSql::new(url).await?;
 
-                Arc::new(psql) as Arc<dyn Queryable + Send + Sync>
+                Arc::new(psql) as Arc<dyn Queryable>
             }
-            _ => unimplemented!("Supported url schemes: file or sqlite, mysql, postgres or postgresql."),
+            #[cfg(feature = "mssql")]
+            s if s.starts_with("jdbc:sqlserver") || s.starts_with("sqlserver") => {
+                let url = connector::MssqlUrl::new(s)?;
+                let psql = connector::Mssql::new(url).await?;
+
+                Arc::new(psql) as Arc<dyn Queryable>
+            }
+            _ => unimplemented!("Supported url schemes: file or sqlite, mysql, postgresql or sqlserver."),
         };
 
         let connection_info = Arc::new(ConnectionInfo::from_url(url_str)?);
@@ -165,5 +170,9 @@ impl Queryable for Quaint {
 
     async fn version(&self) -> crate::Result<Option<String>> {
         self.inner.version().await
+    }
+
+    fn begin_statement(&self) -> &'static str {
+        self.inner.begin_statement()
     }
 }

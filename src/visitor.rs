@@ -6,22 +6,28 @@
 //! [ast](../ast/index.html) module.
 //!
 //! For prelude, all important imports are in `quaint::visitor::*`;
+mod mssql;
 mod mysql;
 mod postgres;
 mod sqlite;
 
+pub use self::mssql::Mssql;
 pub use self::mysql::Mysql;
 pub use self::postgres::Postgres;
 pub use self::sqlite::Sqlite;
 
 use crate::ast::*;
-use std::{borrow::Cow, fmt};
+use std::fmt;
+
+pub type Result = crate::Result<()>;
 
 /// A function travelling through the query AST, building the final query string
 /// and gathering parameters sent to the database together with the query.
 pub trait Visitor<'a> {
-    /// Backtick character to surround identifiers, such as column and table names.
-    const C_BACKTICK: &'static str;
+    /// Opening backtick character to surround identifiers, such as column and table names.
+    const C_BACKTICK_OPEN: &'static str;
+    /// Closing backtick character to surround identifiers, such as column and table names.
+    const C_BACKTICK_CLOSE: &'static str;
     /// Wildcard character to be used in `LIKE` queries.
     const C_WILDCARD: &'static str;
 
@@ -32,26 +38,31 @@ pub trait Visitor<'a> {
     /// The point of entry for visiting query ASTs.
     ///
     /// ```
-    /// # use quaint::{ast::*, visitor::*};
+    /// # use quaint::{ast::*, visitor::*, error::Error};
+    /// # fn main() -> Result {
     /// let query = Select::from_table("cats");
-    /// let (sqlite, _) = Sqlite::build(query.clone());
-    /// let (psql, _) = Postgres::build(query.clone());
-    /// let (mysql, _) = Mysql::build(query.clone());
+    /// let (sqlite, _) = Sqlite::build(query.clone())?;
+    /// let (psql, _) = Postgres::build(query.clone())?;
+    /// let (mysql, _) = Mysql::build(query.clone())?;
+    /// let (mssql, _) = Mssql::build(query.clone())?;
     ///
     /// assert_eq!("SELECT `cats`.* FROM `cats`", sqlite);
     /// assert_eq!("SELECT \"cats\".* FROM \"cats\"", psql);
     /// assert_eq!("SELECT `cats`.* FROM `cats`", mysql);
+    /// assert_eq!("SELECT [cats].* FROM [cats]", mssql);
+    /// # Ok(())
+    /// # }
     /// ```
-    fn build<Q>(query: Q) -> (String, Vec<Value<'a>>)
+    fn build<Q>(query: Q) -> crate::Result<(String, Vec<Value<'a>>)>
     where
         Q: Into<Query<'a>>;
 
     /// Write to the query.
-    fn write<D: fmt::Display>(&mut self, s: D) -> fmt::Result;
+    fn write<D: fmt::Display>(&mut self, s: D) -> Result;
 
-    fn surround_with<F>(&mut self, begin: &str, end: &str, f: F) -> fmt::Result
+    fn surround_with<F>(&mut self, begin: &str, end: &str, f: F) -> Result
     where
-        F: FnOnce(&mut Self) -> fmt::Result,
+        F: FnOnce(&mut Self) -> Result,
     {
         self.write(begin)?;
         f(self)?;
@@ -63,25 +74,28 @@ pub trait Visitor<'a> {
     fn add_parameter(&mut self, value: Value<'a>);
 
     /// The `LIMIT` and `OFFSET` statement in the query
-    fn visit_limit_and_offset(&mut self, limit: Option<Value<'a>>, offset: Option<Value<'a>>) -> fmt::Result;
+    fn visit_limit_and_offset(&mut self, limit: Option<Value<'a>>, offset: Option<Value<'a>>) -> Result;
 
     /// A walk through an `INSERT` statement
-    fn visit_insert(&mut self, insert: Insert<'a>) -> fmt::Result;
+    fn visit_insert(&mut self, insert: Insert<'a>) -> Result;
 
     /// What to use to substitute a parameter in the query.
-    fn parameter_substitution(&mut self) -> fmt::Result;
+    fn parameter_substitution(&mut self) -> Result;
 
     /// What to use to substitute a parameter in the query.
-    fn visit_aggregate_to_string(&mut self, value: Expression<'a>) -> fmt::Result;
+    fn visit_aggregate_to_string(&mut self, value: Expression<'a>) -> Result;
+
+    /// Visit a non-parameterized value.
+    fn visit_raw_value(&mut self, value: Value<'a>) -> Result;
 
     /// A visit to a value we parameterize
-    fn visit_parameterized(&mut self, value: Value<'a>) -> fmt::Result {
+    fn visit_parameterized(&mut self, value: Value<'a>) -> Result {
         self.add_parameter(value);
         self.parameter_substitution()
     }
 
     /// The join statements in the query
-    fn visit_joins(&mut self, joins: Vec<Join<'a>>) -> fmt::Result {
+    fn visit_joins(&mut self, joins: Vec<Join<'a>>) -> Result {
         for j in joins {
             match j {
                 Join::Inner(data) => {
@@ -106,14 +120,14 @@ pub trait Visitor<'a> {
         Ok(())
     }
 
-    fn visit_join_data(&mut self, data: JoinData<'a>) -> fmt::Result {
+    fn visit_join_data(&mut self, data: JoinData<'a>) -> Result {
         self.visit_table(data.table, true)?;
         self.write(" ON ")?;
         self.visit_conditions(data.conditions)
     }
 
     /// A walk through a `SELECT` statement
-    fn visit_select(&mut self, select: Select<'a>) -> fmt::Result {
+    fn visit_select(&mut self, select: Select<'a>) -> Result {
         self.write("SELECT ")?;
 
         if let Some(table) = select.table {
@@ -121,14 +135,18 @@ pub trait Visitor<'a> {
                 match table.typ {
                     TableType::Query(_) | TableType::Values(_) => match table.alias {
                         Some(ref alias) => {
-                            self.surround_with(Self::C_BACKTICK, Self::C_BACKTICK, |ref mut s| s.write(alias))?;
+                            self.surround_with(Self::C_BACKTICK_OPEN, Self::C_BACKTICK_CLOSE, |ref mut s| {
+                                s.write(alias)
+                            })?;
                             self.write(".*")?;
                         }
                         None => self.write("*")?,
                     },
                     TableType::Table(_) => match table.alias.clone() {
                         Some(ref alias) => {
-                            self.surround_with(Self::C_BACKTICK, Self::C_BACKTICK, |ref mut s| s.write(alias))?;
+                            self.surround_with(Self::C_BACKTICK_OPEN, Self::C_BACKTICK_CLOSE, |ref mut s| {
+                                s.write(alias)
+                            })?;
                             self.write(".*")?;
                         }
                         None => {
@@ -176,7 +194,7 @@ pub trait Visitor<'a> {
     }
 
     /// A walk through an `UPDATE` statement
-    fn visit_update(&mut self, update: Update<'a>) -> fmt::Result {
+    fn visit_update(&mut self, update: Update<'a>) -> Result {
         self.write("UPDATE ")?;
         self.visit_table(update.table, true)?;
 
@@ -205,7 +223,7 @@ pub trait Visitor<'a> {
     }
 
     /// A walk through an `DELETE` statement
-    fn visit_delete(&mut self, delete: Delete<'a>) -> fmt::Result {
+    fn visit_delete(&mut self, delete: Delete<'a>) -> Result {
         self.write("DELETE FROM ")?;
         self.visit_table(delete.table, true)?;
 
@@ -219,11 +237,13 @@ pub trait Visitor<'a> {
 
     /// A helper for delimiting an identifier, surrounding every part with `C_BACKTICK`
     /// and delimiting the values with a `.`
-    fn delimited_identifiers(&mut self, parts: &[&str]) -> fmt::Result {
+    fn delimited_identifiers(&mut self, parts: &[&str]) -> Result {
         let len = parts.len();
 
         for (i, parts) in parts.iter().enumerate() {
-            self.surround_with(Self::C_BACKTICK, Self::C_BACKTICK, |ref mut s| s.write(parts))?;
+            self.surround_with(Self::C_BACKTICK_OPEN, Self::C_BACKTICK_CLOSE, |ref mut s| {
+                s.write(parts)
+            })?;
 
             if i < (len - 1) {
                 self.write(".")?;
@@ -234,19 +254,19 @@ pub trait Visitor<'a> {
     }
 
     /// A walk through a complete `Query` statement
-    fn visit_query(&mut self, query: Query<'a>) {
+    fn visit_query(&mut self, query: Query<'a>) -> Result {
         match query {
-            Query::Select(select) => self.visit_select(*select).unwrap(),
-            Query::Insert(insert) => self.visit_insert(*insert).unwrap(),
-            Query::Update(update) => self.visit_update(*update).unwrap(),
-            Query::Delete(delete) => self.visit_delete(*delete).unwrap(),
-            Query::Union(union) => self.visit_union(union).unwrap(),
-            Query::Raw(string) => self.write(string).unwrap(),
+            Query::Select(select) => self.visit_select(*select),
+            Query::Insert(insert) => self.visit_insert(*insert),
+            Query::Update(update) => self.visit_update(*update),
+            Query::Delete(delete) => self.visit_delete(*delete),
+            Query::Union(union) => self.visit_union(union),
+            Query::Raw(string) => self.write(string),
         }
     }
 
     /// A walk through a union of `SELECT` statements
-    fn visit_union(&mut self, mut ua: Union<'a>) -> fmt::Result {
+    fn visit_union(&mut self, mut ua: Union<'a>) -> Result {
         let len = ua.selects.len();
         let mut types = ua.types.drain(0..);
 
@@ -266,7 +286,7 @@ pub trait Visitor<'a> {
     }
 
     /// The selected columns
-    fn visit_columns(&mut self, columns: Vec<Expression<'a>>) -> fmt::Result {
+    fn visit_columns(&mut self, columns: Vec<Expression<'a>>) -> Result {
         let len = columns.len();
 
         for (i, column) in columns.into_iter().enumerate() {
@@ -280,7 +300,7 @@ pub trait Visitor<'a> {
         Ok(())
     }
 
-    fn visit_operation(&mut self, op: SqlOp<'a>) -> fmt::Result {
+    fn visit_operation(&mut self, op: SqlOp<'a>) -> Result {
         match op {
             SqlOp::Add(left, right) => self.surround_with("(", ")", |ref mut se| {
                 se.visit_expression(left)?;
@@ -311,12 +331,13 @@ pub trait Visitor<'a> {
     }
 
     /// A visit to a value used in an expression
-    fn visit_expression(&mut self, value: Expression<'a>) -> fmt::Result {
+    fn visit_expression(&mut self, value: Expression<'a>) -> Result {
         match value.kind {
             ExpressionKind::Value(value) => self.visit_expression(*value)?,
             ExpressionKind::ConditionTree(tree) => self.visit_conditions(tree)?,
             ExpressionKind::Compare(compare) => self.visit_compare(compare)?,
             ExpressionKind::Parameterized(val) => self.visit_parameterized(val)?,
+            ExpressionKind::RawValue(val) => self.visit_raw_value(val.0)?,
             ExpressionKind::Column(column) => self.visit_column(*column)?,
             ExpressionKind::Row(row) => self.visit_row(row)?,
             ExpressionKind::Select(select) => self.surround_with("(", ")", |ref mut s| s.visit_select(*select))?,
@@ -341,7 +362,13 @@ pub trait Visitor<'a> {
         Ok(())
     }
 
-    fn visit_values(&mut self, values: Values<'a>) -> fmt::Result {
+    fn visit_multiple_tuple_comparison(&mut self, left: Row<'a>, right: Values<'a>, negate: bool) -> Result {
+        self.visit_row(left)?;
+        self.write(if negate { " NOT IN " } else { " IN " })?;
+        self.visit_values(right)
+    }
+
+    fn visit_values(&mut self, values: Values<'a>) -> Result {
         self.surround_with("(", ")", |ref mut s| {
             let len = values.len();
             for (i, row) in values.into_iter().enumerate() {
@@ -356,7 +383,7 @@ pub trait Visitor<'a> {
     }
 
     /// A database table identifier
-    fn visit_table(&mut self, table: Table<'a>, include_alias: bool) -> fmt::Result {
+    fn visit_table(&mut self, table: Table<'a>, include_alias: bool) -> Result {
         match table.typ {
             TableType::Table(table_name) => match table.database {
                 Some(database) => self.delimited_identifiers(&[&*database, &*table_name])?,
@@ -378,7 +405,7 @@ pub trait Visitor<'a> {
     }
 
     /// A database column identifier
-    fn visit_column(&mut self, column: Column<'a>) -> fmt::Result {
+    fn visit_column(&mut self, column: Column<'a>) -> Result {
         match column.table {
             Some(table) => {
                 self.visit_table(table, false)?;
@@ -397,7 +424,7 @@ pub trait Visitor<'a> {
     }
 
     /// A row of data used as an expression
-    fn visit_row(&mut self, row: Row<'a>) -> fmt::Result {
+    fn visit_row(&mut self, row: Row<'a>) -> Result {
         self.surround_with("(", ")", |ref mut s| {
             let len = row.values.len();
             for (i, value) in row.values.into_iter().enumerate() {
@@ -413,7 +440,7 @@ pub trait Visitor<'a> {
     }
 
     /// A walk through the query conditions
-    fn visit_conditions(&mut self, tree: ConditionTree<'a>) -> fmt::Result {
+    fn visit_conditions(&mut self, tree: ConditionTree<'a>) -> Result {
         match tree {
             ConditionTree::And(expressions) => self.surround_with("(", ")", |ref mut s| {
                 let len = expressions.len();
@@ -452,7 +479,7 @@ pub trait Visitor<'a> {
     }
 
     /// A comparison expression
-    fn visit_compare(&mut self, compare: Compare<'a>) -> fmt::Result {
+    fn visit_compare(&mut self, compare: Compare<'a>) -> Result {
         match compare {
             Compare::Equals(left, right) => self.visit_condition_equals(*left, *right),
             Compare::NotEquals(left, right) => self.visit_condition_not_equals(*left, *right),
@@ -530,6 +557,17 @@ pub trait Visitor<'a> {
                     self.visit_parameterized(pv)
                 }
 
+                (
+                    Expression {
+                        kind: ExpressionKind::Row(row),
+                        ..
+                    },
+                    Expression {
+                        kind: ExpressionKind::Values(values),
+                        ..
+                    },
+                ) => self.visit_multiple_tuple_comparison(row, *values, false),
+
                 // expr IN (..)
                 (left, right) => {
                     self.visit_expression(left)?;
@@ -591,6 +629,17 @@ pub trait Visitor<'a> {
                     self.visit_parameterized(pv)
                 }
 
+                (
+                    Expression {
+                        kind: ExpressionKind::Row(row),
+                        ..
+                    },
+                    Expression {
+                        kind: ExpressionKind::Values(values),
+                        ..
+                    },
+                ) => self.visit_multiple_tuple_comparison(row, *values, true),
+
                 // expr IN (..)
                 (left, right) => {
                     self.visit_expression(left)?;
@@ -601,12 +650,12 @@ pub trait Visitor<'a> {
             Compare::Like(left, right) => {
                 self.visit_expression(*left)?;
 
-                self.add_parameter(Value::Text(Cow::from(format!(
+                self.add_parameter(Value::text(format!(
                     "{}{}{}",
                     Self::C_WILDCARD,
                     right,
                     Self::C_WILDCARD
-                ))));
+                )));
 
                 self.write(" LIKE ")?;
                 self.parameter_substitution()
@@ -614,12 +663,12 @@ pub trait Visitor<'a> {
             Compare::NotLike(left, right) => {
                 self.visit_expression(*left)?;
 
-                self.add_parameter(Value::Text(Cow::from(format!(
+                self.add_parameter(Value::text(format!(
                     "{}{}{}",
                     Self::C_WILDCARD,
                     right,
                     Self::C_WILDCARD
-                ))));
+                )));
 
                 self.write(" NOT LIKE ")?;
                 self.parameter_substitution()
@@ -627,7 +676,7 @@ pub trait Visitor<'a> {
             Compare::BeginsWith(left, right) => {
                 self.visit_expression(*left)?;
 
-                self.add_parameter(Value::Text(Cow::from(format!("{}{}", right, Self::C_WILDCARD))));
+                self.add_parameter(Value::text(format!("{}{}", right, Self::C_WILDCARD)));
 
                 self.write(" LIKE ")?;
                 self.parameter_substitution()
@@ -635,7 +684,7 @@ pub trait Visitor<'a> {
             Compare::NotBeginsWith(left, right) => {
                 self.visit_expression(*left)?;
 
-                self.add_parameter(Value::Text(Cow::from(format!("{}{}", right, Self::C_WILDCARD))));
+                self.add_parameter(Value::text(format!("{}{}", right, Self::C_WILDCARD)));
 
                 self.write(" NOT LIKE ")?;
                 self.parameter_substitution()
@@ -643,7 +692,7 @@ pub trait Visitor<'a> {
             Compare::EndsInto(left, right) => {
                 self.visit_expression(*left)?;
 
-                self.add_parameter(Value::Text(Cow::from(format!("{}{}", Self::C_WILDCARD, right,))));
+                self.add_parameter(Value::text(format!("{}{}", Self::C_WILDCARD, right,)));
 
                 self.write(" LIKE ")?;
                 self.parameter_substitution()
@@ -651,7 +700,7 @@ pub trait Visitor<'a> {
             Compare::NotEndsInto(left, right) => {
                 self.visit_expression(*left)?;
 
-                self.add_parameter(Value::Text(Cow::from(format!("{}{}", Self::C_WILDCARD, right,))));
+                self.add_parameter(Value::text(format!("{}{}", Self::C_WILDCARD, right,)));
 
                 self.write(" NOT LIKE ")?;
                 self.parameter_substitution()
@@ -681,20 +730,24 @@ pub trait Visitor<'a> {
         }
     }
 
-    fn visit_condition_equals(&mut self, left: Expression<'a>, right: Expression<'a>) -> fmt::Result {
+    fn visit_condition_equals(&mut self, left: Expression<'a>, right: Expression<'a>) -> Result {
         self.visit_expression(left)?;
         self.write(" = ")?;
-        self.visit_expression(right)
+        self.visit_expression(right)?;
+
+        Ok(())
     }
 
-    fn visit_condition_not_equals(&mut self, left: Expression<'a>, right: Expression<'a>) -> fmt::Result {
+    fn visit_condition_not_equals(&mut self, left: Expression<'a>, right: Expression<'a>) -> Result {
         self.visit_expression(left)?;
         self.write(" <> ")?;
-        self.visit_expression(right)
+        self.visit_expression(right)?;
+
+        Ok(())
     }
 
     /// A visit in the `ORDER BY` section of the query
-    fn visit_ordering(&mut self, ordering: Ordering<'a>) -> fmt::Result {
+    fn visit_ordering(&mut self, ordering: Ordering<'a>) -> Result {
         let len = ordering.0.len();
 
         for (i, (value, ordering)) in ordering.0.into_iter().enumerate() {
@@ -715,7 +768,7 @@ pub trait Visitor<'a> {
     }
 
     /// A visit in the `GROUP BY` section of the query
-    fn visit_grouping(&mut self, grouping: Grouping<'a>) -> fmt::Result {
+    fn visit_grouping(&mut self, grouping: Grouping<'a>) -> Result {
         let len = grouping.0.len();
 
         for (i, value) in grouping.0.into_iter().enumerate() {
@@ -729,7 +782,7 @@ pub trait Visitor<'a> {
         Ok(())
     }
 
-    fn visit_function(&mut self, fun: Function<'a>) -> fmt::Result {
+    fn visit_function(&mut self, fun: Function<'a>) -> Result {
         match fun.typ_ {
             FunctionType::RowNumber(fun_rownum) => {
                 if fun_rownum.over.is_empty() {
@@ -768,7 +821,7 @@ pub trait Visitor<'a> {
         Ok(())
     }
 
-    fn visit_partitioning(&mut self, over: Over<'a>) -> fmt::Result {
+    fn visit_partitioning(&mut self, over: Over<'a>) -> Result {
         if !over.partitioning.is_empty() {
             let len = over.partitioning.len();
             self.write("PARTITION BY ")?;

@@ -23,10 +23,12 @@ Quaint is an abstraction over certain SQL databases. It provides:
 - `full-postgresql`: Pooled support for PostgreSQL
 - `full-mysql`: Pooled support for MySQL
 - `full-sqlite`: Pooled support for SQLite
+- `full-mssql`: Pooled support for Microsoft SQL Server
 - `single`: All connectors, but no pooling
 - `single-postgresql`: Single connection support for PostgreSQL
 - `single-mysql`: Single connection support for MySQL
 - `single-sqlite`: Single connection support for SQLite
+- `single-mssql`: Single connection support for Microsoft SQL Server
 
 ### Goals:
 
@@ -43,8 +45,8 @@ choice.
 
 ### Testing:
 
-- See `.envrc` for connection params. Override variables if different. MySQL and
-  PostgreSQL needs to be running for tests to succeed.
+- See `.envrc` for connection params. Override variables if different. MySQL,
+  PostgreSQL and SQL Server needs to be running for tests to succeed.
 
 Then:
   

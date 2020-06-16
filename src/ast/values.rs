@@ -18,27 +18,62 @@ use serde_json::{Number, Value as JsonValue};
 use uuid::Uuid;
 
 #[cfg(feature = "chrono-0_4")]
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, NaiveDate, NaiveTime, Utc};
 
-/// A value we must parameterize for the prepared statement.
+/// A value written to the query as-is without parameterization.
+#[derive(Debug, Clone, PartialEq)]
+pub struct Raw<'a>(pub(crate) Value<'a>);
+
+pub trait IntoRaw<'a> {
+    fn raw(self) -> Raw<'a>;
+}
+
+impl<'a, T> IntoRaw<'a> for T
+where
+    T: Into<Value<'a>>,
+{
+    fn raw(self) -> Raw<'a> {
+        Raw(self.into())
+    }
+}
+
+/// A value we must parameterize for the prepared statement. Null values should be
+/// defined by their corresponding type variants with a `None` value for best
+/// compatibility.
 #[derive(Debug, Clone, PartialEq)]
 pub enum Value<'a> {
-    Null,
-    Integer(i64),
-    Real(Decimal),
-    Text(Cow<'a, str>),
-    Enum(Cow<'a, str>),
-    Bytes(Cow<'a, [u8]>),
-    Boolean(bool),
-    Char(char),
+    /// 64-bit signed integer.
+    Integer(Option<i64>),
+    /// A decimal value.
+    Real(Option<Decimal>),
+    /// String value.
+    Text(Option<Cow<'a, str>>),
+    /// Database enum value.
+    Enum(Option<Cow<'a, str>>),
+    /// Bytes value.
+    Bytes(Option<Cow<'a, [u8]>>),
+    /// Boolean value.
+    Boolean(Option<bool>),
+    /// A single character.
+    Char(Option<char>),
     #[cfg(all(feature = "array", feature = "postgresql"))]
-    Array(Vec<Value<'a>>),
+    /// An array value (PostgreSQL).
+    Array(Option<Vec<Value<'a>>>),
     #[cfg(feature = "json-1")]
-    Json(serde_json::Value),
+    /// A JSON value.
+    Json(Option<serde_json::Value>),
     #[cfg(feature = "uuid-0_8")]
-    Uuid(Uuid),
+    /// An UUID value.
+    Uuid(Option<Uuid>),
     #[cfg(feature = "chrono-0_4")]
-    DateTime(DateTime<Utc>),
+    /// A datetime value.
+    DateTime(Option<DateTime<Utc>>),
+    #[cfg(feature = "chrono-0_4")]
+    /// A date value.
+    Date(Option<NaiveDate>),
+    #[cfg(feature = "chrono-0_4")]
+    /// A time value.
+    Time(Option<NaiveTime>),
 }
 
 pub(crate) struct Params<'a>(pub(crate) &'a [Value<'a>]);
@@ -61,17 +96,16 @@ impl<'a> fmt::Display for Params<'a> {
 
 impl<'a> fmt::Display for Value<'a> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Value::Null => write!(f, "null"),
-            Value::Integer(val) => write!(f, "{}", val),
-            Value::Real(val) => write!(f, "{}", val),
-            Value::Text(val) => write!(f, "\"{}\"", val),
-            Value::Bytes(val) => write!(f, "<{} bytes blob>", val.len()),
-            Value::Enum(val) => write!(f, "\"{}\"", val),
-            Value::Boolean(val) => write!(f, "{}", val),
-            Value::Char(val) => write!(f, "'{}'", val),
+        let res = match self {
+            Value::Integer(val) => val.map(|v| write!(f, "{}", v)),
+            Value::Real(val) => val.map(|v| write!(f, "{}", v)),
+            Value::Text(val) => val.as_ref().map(|v| write!(f, "\"{}\"", v)),
+            Value::Bytes(val) => val.as_ref().map(|v| write!(f, "<{} bytes blob>", v.len())),
+            Value::Enum(val) => val.as_ref().map(|v| write!(f, "\"{}\"", v)),
+            Value::Boolean(val) => val.map(|v| write!(f, "{}", v)),
+            Value::Char(val) => val.map(|v| write!(f, "'{}'", v)),
             #[cfg(feature = "array")]
-            Value::Array(vals) => {
+            Value::Array(vals) => vals.as_ref().map(|vals| {
                 let len = vals.len();
 
                 write!(f, "[")?;
@@ -83,13 +117,22 @@ impl<'a> fmt::Display for Value<'a> {
                     }
                 }
                 write!(f, "]")
-            }
+            }),
             #[cfg(feature = "json-1")]
-            Value::Json(val) => write!(f, "{}", val),
+            Value::Json(val) => val.as_ref().map(|v| write!(f, "{}", v)),
             #[cfg(feature = "uuid-0_8")]
-            Value::Uuid(val) => write!(f, "{}", val),
+            Value::Uuid(val) => val.map(|v| write!(f, "{}", v)),
             #[cfg(feature = "chrono-0_4")]
-            Value::DateTime(val) => write!(f, "{}", val),
+            Value::DateTime(val) => val.map(|v| write!(f, "{}", v)),
+            #[cfg(feature = "chrono-0_4")]
+            Value::Date(val) => val.map(|v| write!(f, "{}", v)),
+            #[cfg(feature = "chrono-0_4")]
+            Value::Time(val) => val.map(|v| write!(f, "{}", v)),
+        };
+
+        match res {
+            Some(r) => r,
+            None => write!(f, "null"),
         }
     }
 }
@@ -97,38 +140,159 @@ impl<'a> fmt::Display for Value<'a> {
 #[cfg(feature = "json-1")]
 impl<'a> From<Value<'a>> for serde_json::Value {
     fn from(pv: Value<'a>) -> Self {
-        match pv {
-            Value::Null => serde_json::Value::Null,
-            Value::Integer(i) => serde_json::Value::Number(Number::from(i)),
-            Value::Real(d) => serde_json::to_value(d).unwrap(),
-            Value::Text(cow) => serde_json::Value::String(cow.into_owned()),
-            Value::Bytes(bytes) => serde_json::Value::String(base64::encode(&bytes)),
-            Value::Enum(cow) => serde_json::Value::String(cow.into_owned()),
-            Value::Boolean(b) => serde_json::Value::Bool(b),
-            Value::Char(c) => {
+        let res = match pv {
+            Value::Integer(i) => i.map(|i| serde_json::Value::Number(Number::from(i))),
+            Value::Real(d) => d.map(|d| serde_json::to_value(d).unwrap()),
+            Value::Text(cow) => cow.map(|cow| serde_json::Value::String(cow.into_owned())),
+            Value::Bytes(bytes) => bytes.map(|bytes| serde_json::Value::String(base64::encode(&bytes))),
+            Value::Enum(cow) => cow.map(|cow| serde_json::Value::String(cow.into_owned())),
+            Value::Boolean(b) => b.map(|b| serde_json::Value::Bool(b)),
+            Value::Char(c) => c.map(|c| {
                 let bytes = [c as u8];
                 let s = std::str::from_utf8(&bytes)
                     .expect("interpret byte as UTF-8")
                     .to_string();
                 serde_json::Value::String(s)
-            }
+            }),
+            #[cfg(feature = "json-1")]
             Value::Json(v) => v,
             #[cfg(feature = "array")]
-            Value::Array(v) => serde_json::Value::Array(v.into_iter().map(serde_json::Value::from).collect()),
+            Value::Array(v) => {
+                v.map(|v| serde_json::Value::Array(v.into_iter().map(serde_json::Value::from).collect()))
+            }
             #[cfg(feature = "uuid-0_8")]
-            Value::Uuid(u) => serde_json::Value::String(u.to_hyphenated().to_string()),
+            Value::Uuid(u) => u.map(|u| serde_json::Value::String(u.to_hyphenated().to_string())),
             #[cfg(feature = "chrono-0_4")]
-            Value::DateTime(dt) => serde_json::Value::String(dt.to_rfc3339()),
+            Value::DateTime(dt) => dt.map(|dt| serde_json::Value::String(dt.to_rfc3339())),
+            #[cfg(feature = "chrono-0_4")]
+            Value::Date(date) => date.map(|date| serde_json::Value::String(format!("{}", date))),
+            #[cfg(feature = "chrono-0_4")]
+            Value::Time(time) => time.map(|time| serde_json::Value::String(format!("{}", time))),
+        };
+
+        match res {
+            Some(val) => val,
+            None => serde_json::Value::Null,
         }
     }
 }
 
 impl<'a> Value<'a> {
+    /// Creates a new integer value.
+    pub fn integer<I>(value: I) -> Self
+    where
+        I: Into<i64>,
+    {
+        Value::Integer(Some(value.into()))
+    }
+
+    /// Creates a new decimal value.
+    pub fn real(value: Decimal) -> Self {
+        Value::Real(Some(value))
+    }
+
+    /// Creates a new string value.
+    pub fn text<T>(value: T) -> Self
+    where
+        T: Into<Cow<'a, str>>,
+    {
+        Value::Text(Some(value.into()))
+    }
+
+    /// Creates a new enum value.
+    pub fn enum_variant<T>(value: T) -> Self
+    where
+        T: Into<Cow<'a, str>>,
+    {
+        Value::Enum(Some(value.into()))
+    }
+
+    /// Creates a new bytes value.
+    pub fn bytes<B>(value: B) -> Self
+    where
+        B: Into<Cow<'a, [u8]>>,
+    {
+        Value::Bytes(Some(value.into()))
+    }
+
+    /// Creates a new boolean value.
+    pub fn boolean<B>(value: B) -> Self
+    where
+        B: Into<bool>,
+    {
+        Value::Boolean(Some(value.into()))
+    }
+
+    /// Creates a new character value.
+    pub fn character<C>(value: C) -> Self
+    where
+        C: Into<char>,
+    {
+        Value::Char(Some(value.into()))
+    }
+
+    /// Creates a new array value.
+    #[cfg(feature = "array")]
+    pub fn array<I, V>(value: I) -> Self
+    where
+        I: IntoIterator<Item = V>,
+        V: Into<Value<'a>>,
+    {
+        Value::Array(Some(value.into_iter().map(|v| v.into()).collect()))
+    }
+
+    /// Creates a new uuid value.
+    #[cfg(feature = "uuid-0_8")]
+    pub fn uuid(value: Uuid) -> Self {
+        Value::Uuid(Some(value))
+    }
+
+    /// Creates a new datetime value.
+    #[cfg(feature = "chrono-0_4")]
+    pub fn datetime(value: DateTime<Utc>) -> Self {
+        Value::DateTime(Some(value))
+    }
+
+    /// Creates a new date value.
+    #[cfg(feature = "chrono-0_4")]
+    pub fn date(value: NaiveDate) -> Self {
+        Value::Date(Some(value))
+    }
+
+    /// Creates a new time value.
+    #[cfg(feature = "chrono-0_4")]
+    pub fn time(value: NaiveTime) -> Self {
+        Value::Time(Some(value))
+    }
+
+    /// Creates a new JSON value.
+    #[cfg(feature = "json-1")]
+    pub fn json(value: serde_json::Value) -> Self {
+        Value::Json(Some(value))
+    }
+
     /// `true` if the `Value` is null.
     pub fn is_null(&self) -> bool {
         match self {
-            Value::Null => true,
-            _ => false,
+            Value::Integer(i) => i.is_none(),
+            Value::Real(r) => r.is_none(),
+            Value::Text(t) => t.is_none(),
+            Value::Enum(e) => e.is_none(),
+            Value::Bytes(b) => b.is_none(),
+            Value::Boolean(b) => b.is_none(),
+            Value::Char(c) => c.is_none(),
+            #[cfg(feature = "array")]
+            Value::Array(v) => v.is_none(),
+            #[cfg(feature = "uuid-0_8")]
+            Value::Uuid(u) => u.is_none(),
+            #[cfg(feature = "chrono-0_4")]
+            Value::DateTime(dt) => dt.is_none(),
+            #[cfg(feature = "chrono-0_4")]
+            Value::Date(d) => d.is_none(),
+            #[cfg(feature = "chrono-0_4")]
+            Value::Time(t) => t.is_none(),
+            #[cfg(feature = "json-1")]
+            Value::Json(json) => json.is_none(),
         }
     }
 
@@ -143,8 +307,8 @@ impl<'a> Value<'a> {
     /// Returns a &str if the value is text, otherwise `None`.
     pub fn as_str(&self) -> Option<&str> {
         match self {
-            Value::Text(cow) => Some(cow.borrow()),
-            Value::Bytes(cow) => std::str::from_utf8(cow.as_ref()).ok(),
+            Value::Text(Some(cow)) => Some(cow.borrow()),
+            Value::Bytes(Some(cow)) => std::str::from_utf8(cow.as_ref()).ok(),
             _ => None,
         }
     }
@@ -152,7 +316,7 @@ impl<'a> Value<'a> {
     /// Returns a char if the value is a char, otherwise `None`.
     pub fn as_char(&self) -> Option<char> {
         match self {
-            Value::Char(c) => Some(*c),
+            Value::Char(c) => c.clone(),
             _ => None,
         }
     }
@@ -160,8 +324,8 @@ impl<'a> Value<'a> {
     /// Returns a cloned String if the value is text, otherwise `None`.
     pub fn to_string(&self) -> Option<String> {
         match self {
-            Value::Text(cow) => Some(cow.to_string()),
-            Value::Bytes(cow) => std::str::from_utf8(cow.as_ref()).map(|s| s.to_owned()).ok(),
+            Value::Text(Some(cow)) => Some(cow.to_string()),
+            Value::Bytes(Some(cow)) => std::str::from_utf8(cow.as_ref()).map(|s| s.to_owned()).ok(),
             _ => None,
         }
     }
@@ -170,8 +334,8 @@ impl<'a> Value<'a> {
     /// otherwise `None`.
     pub fn into_string(self) -> Option<String> {
         match self {
-            Value::Text(cow) => Some(cow.into_owned()),
-            Value::Bytes(cow) => String::from_utf8(cow.into_owned()).ok(),
+            Value::Text(Some(cow)) => Some(cow.into_owned()),
+            Value::Bytes(Some(cow)) => String::from_utf8(cow.into_owned()).ok(),
             _ => None,
         }
     }
@@ -187,8 +351,8 @@ impl<'a> Value<'a> {
     /// Returns a bytes slice if the value is text or a byte slice, otherwise `None`.
     pub fn as_bytes(&self) -> Option<&[u8]> {
         match self {
-            Value::Text(cow) => Some(cow.as_ref().as_bytes()),
-            Value::Bytes(cow) => Some(cow.as_ref()),
+            Value::Text(Some(cow)) => Some(cow.as_ref().as_bytes()),
+            Value::Bytes(Some(cow)) => Some(cow.as_ref()),
             _ => None,
         }
     }
@@ -196,8 +360,8 @@ impl<'a> Value<'a> {
     /// Returns a cloned `Vec<u8>` if the value is text or a byte slice, otherwise `None`.
     pub fn to_bytes(&self) -> Option<Vec<u8>> {
         match self {
-            Value::Text(cow) => Some(cow.to_string().into_bytes()),
-            Value::Bytes(cow) => Some(cow.to_owned().into()),
+            Value::Text(Some(cow)) => Some(cow.to_string().into_bytes()),
+            Value::Bytes(Some(cow)) => Some(cow.to_owned().into()),
             _ => None,
         }
     }
@@ -213,7 +377,7 @@ impl<'a> Value<'a> {
     /// Returns an i64 if the value is an integer, otherwise `None`.
     pub fn as_i64(&self) -> Option<i64> {
         match self {
-            Value::Integer(i) => Some(*i),
+            Value::Integer(i) => i.clone(),
             _ => None,
         }
     }
@@ -229,7 +393,7 @@ impl<'a> Value<'a> {
     /// Returns a f64 if the value is a real value and the underlying decimal can be converted, otherwise `None`.
     pub fn as_f64(&self) -> Option<f64> {
         match self {
-            Value::Real(d) => d.to_f64(),
+            Value::Real(Some(d)) => d.to_f64(),
             _ => None,
         }
     }
@@ -237,7 +401,7 @@ impl<'a> Value<'a> {
     /// Returns a decimal if the value is a real value, otherwise `None`.
     pub fn as_decimal(&self) -> Option<Decimal> {
         match self {
-            Value::Real(d) => Some(*d),
+            Value::Real(d) => d.clone(),
             _ => None,
         }
     }
@@ -247,7 +411,7 @@ impl<'a> Value<'a> {
         match self {
             Value::Boolean(_) => true,
             // For schemas which don't tag booleans
-            Value::Integer(i) if *i == 0 || *i == 1 => true,
+            Value::Integer(Some(i)) if *i == 0 || *i == 1 => true,
             _ => false,
         }
     }
@@ -255,9 +419,9 @@ impl<'a> Value<'a> {
     /// Returns a bool if the value is a boolean, otherwise `None`.
     pub fn as_bool(&self) -> Option<bool> {
         match self {
-            Value::Boolean(b) => Some(*b),
+            Value::Boolean(b) => b.clone(),
             // For schemas which don't tag booleans
-            Value::Integer(i) if *i == 0 || *i == 1 => Some(*i == 1),
+            Value::Integer(Some(i)) if *i == 0 || *i == 1 => Some(*i == 1),
             _ => None,
         }
     }
@@ -275,7 +439,7 @@ impl<'a> Value<'a> {
     #[cfg(feature = "uuid-0_8")]
     pub fn as_uuid(&self) -> Option<Uuid> {
         match self {
-            Value::Uuid(u) => Some(*u),
+            Value::Uuid(u) => u.clone(),
             _ => None,
         }
     }
@@ -289,11 +453,47 @@ impl<'a> Value<'a> {
         }
     }
 
-    /// Returns a DateTime if the value is a DateTime, otherwise `None`.
+    /// Returns a `DateTime` if the value is a `DateTime`, otherwise `None`.
     #[cfg(feature = "chrono-0_4")]
     pub fn as_datetime(&self) -> Option<DateTime<Utc>> {
         match self {
-            Value::DateTime(dt) => Some(*dt),
+            Value::DateTime(dt) => dt.clone(),
+            _ => None,
+        }
+    }
+
+    /// `true` if the `Value` is a Date.
+    #[cfg(feature = "chrono-0_4")]
+    pub fn is_date(&self) -> bool {
+        match self {
+            Value::Date(_) => true,
+            _ => false,
+        }
+    }
+
+    /// Returns a `NaiveDate` if the value is a `Date`, otherwise `None`.
+    #[cfg(feature = "chrono-0_4")]
+    pub fn as_date(&self) -> Option<NaiveDate> {
+        match self {
+            Value::Date(dt) => dt.clone(),
+            _ => None,
+        }
+    }
+
+    /// `true` if the `Value` is a `Time`.
+    #[cfg(feature = "chrono-0_4")]
+    pub fn is_time(&self) -> bool {
+        match self {
+            Value::Time(_) => true,
+            _ => false,
+        }
+    }
+
+    /// Returns a `NaiveTime` if the value is a `Time`, otherwise `None`.
+    #[cfg(feature = "chrono-0_4")]
+    pub fn as_time(&self) -> Option<NaiveTime> {
+        match self {
+            Value::Time(time) => time.clone(),
             _ => None,
         }
     }
@@ -311,7 +511,7 @@ impl<'a> Value<'a> {
     #[cfg(feature = "json-1")]
     pub fn as_json(&self) -> Option<&serde_json::Value> {
         match self {
-            Value::Json(j) => Some(j),
+            Value::Json(Some(j)) => Some(j),
             _ => None,
         }
     }
@@ -320,7 +520,7 @@ impl<'a> Value<'a> {
     #[cfg(feature = "json-1")]
     pub fn into_json(self) -> Option<serde_json::Value> {
         match self {
-            Value::Json(j) => Some(j),
+            Value::Json(Some(j)) => Some(j),
             _ => None,
         }
     }
@@ -333,7 +533,7 @@ impl<'a> Value<'a> {
         T: TryFrom<Value<'a>>,
     {
         match self {
-            Value::Array(vec) => {
+            Value::Array(Some(vec)) => {
                 let rslt: Result<Vec<_>, _> = vec.into_iter().map(T::try_from).collect();
                 match rslt {
                     Err(_) => None,
@@ -345,47 +545,30 @@ impl<'a> Value<'a> {
     }
 }
 
-impl<'a> From<&'a str> for Value<'a> {
-    fn from(that: &'a str) -> Self {
-        Value::Text(that.into())
-    }
-}
+value!(val: i64, Integer, val);
+value!(val: bool, Boolean, val);
+value!(val: Decimal, Real, val);
+#[cfg(feature = "json-1")]
+value!(val: JsonValue, Json, val);
+#[cfg(feature = "uuid-0_8")]
+value!(val: Uuid, Uuid, val);
+value!(val: &'a str, Text, val.into());
+value!(val: String, Text, val.into());
+value!(val: usize, Integer, i64::try_from(val).unwrap());
+value!(val: i32, Integer, i64::try_from(val).unwrap());
+value!(val: &'a [u8], Bytes, val.into());
+#[cfg(feature = "chrono-0_4")]
+value!(val: DateTime<Utc>, DateTime, val);
+#[cfg(feature = "chrono-0_4")]
+value!(val: chrono::NaiveTime, Text, val.to_string().into());
 
-impl<'a> From<String> for Value<'a> {
-    fn from(that: String) -> Self {
-        Value::Text(that.into())
-    }
-}
+value!(
+    val: f64,
+    Real,
+    Decimal::from_str(&val.to_string()).expect("f64 is not a Decimal")
+);
 
-impl<'a> From<usize> for Value<'a> {
-    fn from(that: usize) -> Self {
-        Value::Integer(i64::try_from(that).unwrap())
-    }
-}
-
-impl<'a> From<i32> for Value<'a> {
-    fn from(that: i32) -> Self {
-        Value::Integer(i64::try_from(that).unwrap())
-    }
-}
-
-impl<'a> From<&'a [u8]> for Value<'a> {
-    fn from(that: &'a [u8]) -> Value<'a> {
-        Value::Bytes(that.into())
-    }
-}
-
-impl<'a, T> From<Option<T>> for Value<'a>
-where
-    T: Into<Value<'a>>,
-{
-    fn from(opt: Option<T>) -> Self {
-        match opt {
-            Some(value) => value.into(),
-            None => Value::Null,
-        }
-    }
-}
+value!(val: f32, Real, Decimal::from_f32(val).expect("f32 is not a Decimal"));
 
 impl<'a> TryFrom<Value<'a>> for i64 {
     type Error = Error;
@@ -449,122 +632,6 @@ impl<'a> TryFrom<Value<'a>> for DateTime<Utc> {
     }
 }
 
-macro_rules! value {
-    ($kind:ident,$paramkind:ident) => {
-        impl<'a> From<$kind> for Value<'a> {
-            fn from(that: $kind) -> Self {
-                Value::$paramkind(that)
-            }
-        }
-    };
-}
-
-value!(i64, Integer);
-value!(bool, Boolean);
-value!(Decimal, Real);
-
-#[cfg(feature = "json-1")]
-value!(JsonValue, Json);
-
-#[cfg(feature = "uuid-0_8")]
-value!(Uuid, Uuid);
-
-#[cfg(feature = "chrono-0_4")]
-impl<'a> From<DateTime<Utc>> for Value<'a> {
-    fn from(that: DateTime<Utc>) -> Self {
-        Value::DateTime(that)
-    }
-}
-
-#[cfg(feature = "chrono-0_4")]
-impl<'a> From<chrono::NaiveTime> for Value<'a> {
-    fn from(that: chrono::NaiveTime) -> Self {
-        Value::Text(that.to_string().into())
-    }
-}
-
-impl<'a> From<f64> for Value<'a> {
-    fn from(that: f64) -> Self {
-        // Decimal::from_f64 is buggy. See https://github.com/paupino/rust-decimal/issues/228
-        let dec = Decimal::from_str(&that.to_string()).expect("f64 is not a Decimal");
-        Value::Real(dec)
-    }
-}
-
-impl<'a> From<f32> for Value<'a> {
-    fn from(that: f32) -> Self {
-        let dec = Decimal::from_f32(that).expect("f32 is not a Decimal");
-        Value::Real(dec)
-    }
-}
-
-/*
- * Here be the database value converters.
- */
-
-#[cfg(all(test, feature = "array", feature = "postgresql"))]
-mod tests {
-    use super::*;
-    #[cfg(feature = "chrono-0_4")]
-    use std::str::FromStr;
-
-    #[test]
-    fn a_parameterized_value_of_ints_can_be_converted_into_a_vec() {
-        let pv = Value::Array(vec![Value::Integer(1)]);
-
-        let values: Vec<i64> = pv.into_vec().expect("convert into Vec<i64>");
-
-        assert_eq!(values, vec![1]);
-    }
-
-    #[test]
-    fn a_parameterized_value_of_reals_can_be_converted_into_a_vec() {
-        let pv = Value::Array(vec![Value::from(1.0)]);
-
-        let values: Vec<f64> = pv.into_vec().expect("convert into Vec<f64>");
-
-        assert_eq!(values, vec![1.0]);
-    }
-
-    #[test]
-    fn a_parameterized_value_of_texts_can_be_converted_into_a_vec() {
-        let pv = Value::Array(vec![Value::Text(Cow::from("test"))]);
-
-        let values: Vec<String> = pv.into_vec().expect("convert into Vec<String>");
-
-        assert_eq!(values, vec!["test"]);
-    }
-
-    #[test]
-    fn a_parameterized_value_of_booleans_can_be_converted_into_a_vec() {
-        let pv = Value::Array(vec![Value::Boolean(true)]);
-
-        let values: Vec<bool> = pv.into_vec().expect("convert into Vec<bool>");
-
-        assert_eq!(values, vec![true]);
-    }
-
-    #[test]
-    #[cfg(feature = "chrono-0_4")]
-    fn a_parameterized_value_of_datetimes_can_be_converted_into_a_vec() {
-        let datetime = DateTime::from_str("2019-07-27T05:30:30Z").expect("parsing date/time");
-        let pv = Value::Array(vec![Value::DateTime(datetime)]);
-
-        let values: Vec<DateTime<Utc>> = pv.into_vec().expect("convert into Vec<DateTime>");
-
-        assert_eq!(values, vec![datetime]);
-    }
-
-    #[test]
-    fn a_parameterized_value_of_an_array_cant_be_converted_into_a_vec_of_the_wrong_type() {
-        let pv = Value::Array(vec![Value::Integer(1)]);
-
-        let rslt: Option<Vec<f64>> = pv.into_vec();
-
-        assert!(rslt.is_none());
-    }
-}
-
 /// An in-memory temporary table. Can be used in some of the databases in a
 /// place of an actual table. Doesn't work in MySQL 5.7.
 #[derive(Debug, Clone, Default, PartialEq)]
@@ -573,9 +640,14 @@ pub struct Values<'a> {
 }
 
 impl<'a> Values<'a> {
+    /// Create a new empty in-memory set of values.
+    pub fn empty() -> Self {
+        Self { rows: Vec::new() }
+    }
+
     /// Create a new in-memory set of values.
-    pub fn new() -> Self {
-        Self::default()
+    pub fn new(rows: Vec<Row<'a>>) -> Self {
+        Self { rows }
     }
 
     /// Create a new in-memory set of values with an allocated capacity.
@@ -645,9 +717,53 @@ impl<'a> IntoIterator for Values<'a> {
     }
 }
 
-#[macro_export]
-macro_rules! values {
-    ($($x:expr),*) => (
-        Values::from(std::iter::empty() $(.chain(std::iter::once(Row::from($x))))*)
-    );
+#[cfg(all(test, feature = "array", feature = "postgresql"))]
+mod tests {
+    use super::*;
+    #[cfg(feature = "chrono-0_4")]
+    use std::str::FromStr;
+
+    #[test]
+    fn a_parameterized_value_of_ints_can_be_converted_into_a_vec() {
+        let pv = Value::array(vec![1]);
+        let values: Vec<i64> = pv.into_vec().expect("convert into Vec<i64>");
+        assert_eq!(values, vec![1]);
+    }
+
+    #[test]
+    fn a_parameterized_value_of_reals_can_be_converted_into_a_vec() {
+        let pv = Value::array(vec![1.0]);
+        let values: Vec<f64> = pv.into_vec().expect("convert into Vec<f64>");
+        assert_eq!(values, vec![1.0]);
+    }
+
+    #[test]
+    fn a_parameterized_value_of_texts_can_be_converted_into_a_vec() {
+        let pv = Value::array(vec!["test"]);
+        let values: Vec<String> = pv.into_vec().expect("convert into Vec<String>");
+        assert_eq!(values, vec!["test"]);
+    }
+
+    #[test]
+    fn a_parameterized_value_of_booleans_can_be_converted_into_a_vec() {
+        let pv = Value::array(vec![true]);
+        let values: Vec<bool> = pv.into_vec().expect("convert into Vec<bool>");
+        assert_eq!(values, vec![true]);
+    }
+
+    #[test]
+    #[cfg(feature = "chrono-0_4")]
+    fn a_parameterized_value_of_datetimes_can_be_converted_into_a_vec() {
+        let datetime = DateTime::from_str("2019-07-27T05:30:30Z").expect("parsing date/time");
+        let pv = Value::array(vec![datetime]);
+        let values: Vec<DateTime<Utc>> = pv.into_vec().expect("convert into Vec<DateTime>");
+        assert_eq!(values, vec![datetime]);
+    }
+
+    #[test]
+    fn a_parameterized_value_of_an_array_cant_be_converted_into_a_vec_of_the_wrong_type() {
+        let pv = Value::array(vec![1]);
+        let rslt: Option<Vec<f64>> = pv.into_vec();
+        assert!(rslt.is_none());
+    }
 }

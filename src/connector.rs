@@ -4,14 +4,17 @@
 //! transactions.
 //!
 //! Connectors for [MySQL](struct.Mysql.html),
-//! [PostgreSQL](struct.PostgreSql.html) and [SQLite](struct.Sqlite.html) connect
-//! to the corresponding databases and implement the
-//! [Queryable](trait.Queryable.html) trait for generalized querying interface.
+//! [PostgreSQL](struct.PostgreSql.html), [SQLite](struct.Sqlite.html) and [SQL
+//! Server](struct.Mssql.html) connect to the corresponding databases and
+//! implement the [Queryable](trait.Queryable.html) trait for generalized
+//! querying interface.
 
 mod queryable;
 mod result_set;
 mod transaction;
 
+#[cfg(feature = "mssql")]
+pub(crate) mod mssql;
 #[cfg(feature = "mysql")]
 pub(crate) mod mysql;
 #[cfg(feature = "postgresql")]
@@ -23,6 +26,8 @@ pub(crate) mod sqlite;
 pub use self::mysql::*;
 #[cfg(feature = "postgresql")]
 pub use self::postgres::*;
+#[cfg(feature = "mssql")]
+pub use mssql::*;
 #[cfg(feature = "sqlite")]
 pub use sqlite::*;
 

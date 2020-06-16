@@ -33,18 +33,21 @@ impl<'a> Update<'a> {
     ///
     /// ```rust
     /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # fn main() -> Result<(), quaint::error::Error> {
     /// let query = Update::table("users").set("foo", 10).set("bar", false);
-    /// let (sql, params) = Sqlite::build(query);
+    /// let (sql, params) = Sqlite::build(query)?;
     ///
     /// assert_eq!("UPDATE `users` SET `foo` = ?, `bar` = ?", sql);
     ///
     /// assert_eq!(
     ///     vec![
-    ///         Value::Integer(10),
-    ///         Value::Boolean(false),
+    ///         Value::from(10),
+    ///         Value::from(false),
     ///     ],
     ///     params,
     /// );
+    /// # Ok(())
+    /// # }
     /// ```
     pub fn set<K, V>(mut self, column: K, value: V) -> Update<'a>
     where
@@ -62,27 +65,31 @@ impl<'a> Update<'a> {
     ///
     /// ```rust
     /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # fn main() -> Result<(), quaint::error::Error> {
     /// let query = Update::table("users").set("foo", 1).so_that("bar".equals(false));
-    /// let (sql, params) = Sqlite::build(query);
+    /// let (sql, params) = Sqlite::build(query)?;
     ///
     /// assert_eq!("UPDATE `users` SET `foo` = ? WHERE `bar` = ?", sql);
     ///
     /// assert_eq!(
     ///     vec![
-    ///         Value::Integer(1),
-    ///         Value::Boolean(false),
+    ///         Value::from(1),
+    ///         Value::from(false),
     ///     ],
     ///     params,
     /// );
+    /// # Ok(())
+    /// # }
     /// ```
     ///
     /// We can also use a nested `SELECT` in the conditions.
     ///
     /// ```rust
     /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # fn main() -> Result<(), quaint::error::Error> {
     /// let select = Select::from_table("bars").column("id").so_that("uniq_val".equals(3));
     /// let query = Update::table("users").set("foo", 1).so_that("bar".equals(select));
-    /// let (sql, params) = Sqlite::build(query);
+    /// let (sql, params) = Sqlite::build(query)?;
     ///
     /// assert_eq!(
     ///     "UPDATE `users` SET `foo` = ? WHERE `bar` = (SELECT `id` FROM `bars` WHERE `uniq_val` = ?)",
@@ -91,11 +98,13 @@ impl<'a> Update<'a> {
     ///
     /// assert_eq!(
     ///     vec![
-    ///         Value::Integer(1),
-    ///         Value::Integer(3),
+    ///         Value::from(1),
+    ///         Value::from(3),
     ///     ],
     ///     params,
     /// );
+    /// # Ok(())
+    /// # }
     /// ```
     pub fn so_that<T>(mut self, conditions: T) -> Self
     where

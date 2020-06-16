@@ -12,11 +12,14 @@ pub struct AggregateToString<'a> {
 ///
 /// ```rust
 /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
+/// # fn main() -> Result<(), quaint::error::Error> {
 /// let query = Select::from_table("users").value(aggregate_to_string(Column::new("firstName")))
 ///     .group_by("firstName");
 ///
-/// let (sql, _) = Sqlite::build(query);
+/// let (sql, _) = Sqlite::build(query)?;
 /// assert_eq!("SELECT GROUP_CONCAT(`firstName`) FROM `users` GROUP BY `firstName`", sql);
+/// # Ok(())
+/// # }
 /// ```
 pub fn aggregate_to_string<'a, T>(expr: T) -> Function<'a>
 where

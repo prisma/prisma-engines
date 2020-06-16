@@ -1,3 +1,5 @@
+#[cfg(feature = "mssql")]
+use crate::connector::MssqlUrl;
 #[cfg(feature = "mysql")]
 use crate::connector::MysqlUrl;
 #[cfg(feature = "postgresql")]
@@ -48,6 +50,10 @@ impl Queryable for PooledConnection {
     async fn server_reset_query(&self, tx: &Transaction<'_>) -> crate::Result<()> {
         self.inner.server_reset_query(tx).await
     }
+
+    fn begin_statement(&self) -> &'static str {
+        self.inner.begin_statement()
+    }
 }
 
 #[doc(hidden)]
@@ -60,11 +66,14 @@ pub enum QuaintManager {
 
     #[cfg(feature = "sqlite")]
     Sqlite { file_path: String, db_name: String },
+
+    #[cfg(feature = "mssql")]
+    Mssql(MssqlUrl),
 }
 
 #[async_trait]
 impl Manager for QuaintManager {
-    type Connection = Box<dyn Queryable + Send + Sync>;
+    type Connection = Box<dyn Queryable>;
     type Error = Error;
 
     async fn connect(&self) -> crate::Result<Self::Connection> {
@@ -89,6 +98,12 @@ impl Manager for QuaintManager {
             QuaintManager::Postgres(url) => {
                 use crate::connector::PostgreSql;
                 Ok(Box::new(PostgreSql::new(url.clone()).await?) as Self::Connection)
+            }
+
+            #[cfg(feature = "mssql")]
+            QuaintManager::Mssql(url) => {
+                use crate::connector::Mssql;
+                Ok(Box::new(Mssql::new(url.clone()).await?) as Self::Connection)
             }
         }
     }
@@ -142,6 +157,29 @@ mod tests {
         let conn_string = format!(
             "{}?connection_limit=10",
             std::env::var("TEST_PSQL").expect("TEST_PSQL connection string not set.")
+        );
+
+        let pool = Quaint::builder(&conn_string).unwrap().build();
+
+        assert_eq!(10, pool.capacity().await as usize);
+    }
+
+    #[tokio::test]
+    #[cfg(feature = "mssql")]
+    async fn mssql_default_connection_limit() {
+        let conn_string = std::env::var("TEST_MSSQL").expect("TEST_MSSQL connection string not set.");
+
+        let pool = Quaint::builder(&conn_string).unwrap().build();
+
+        assert_eq!(num_cpus::get_physical() * 2 + 1, pool.capacity().await as usize);
+    }
+
+    #[tokio::test]
+    #[cfg(feature = "mssql")]
+    async fn mssql_custom_connection_limit() {
+        let conn_string = format!(
+            "{};connectionLimit=10",
+            std::env::var("TEST_MSSQL").expect("TEST_MSSQL connection string not set.")
         );
 
         let pool = Quaint::builder(&conn_string).unwrap().build();

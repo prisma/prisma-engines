@@ -26,14 +26,17 @@ pub trait Joinable<'a> {
     ///
     /// ```rust
     /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # fn main() -> Result<(), quaint::error::Error> {
     /// let join_data = "b".on(("b", "id").equals(Column::from(("a", "id"))));
     /// let query = Select::from_table("a").inner_join(join_data);
-    /// let (sql, _) = Sqlite::build(query);
+    /// let (sql, _) = Sqlite::build(query)?;
     ///
     /// assert_eq!(
     ///     "SELECT `a`.* FROM `a` INNER JOIN `b` ON `b`.`id` = `a`.`id`",
     ///     sql,
     /// );
+    /// # Ok(())
+    /// # }
     /// ```
     fn on<T>(self, conditions: T) -> JoinData<'a>
     where

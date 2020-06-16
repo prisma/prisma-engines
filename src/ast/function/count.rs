@@ -11,9 +11,12 @@ pub struct Count<'a> {
 ///
 /// ```rust
 /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
+/// # fn main() -> Result<(), quaint::error::Error> {
 /// let query = Select::from_table("users").value(count(asterisk()));
-/// let (sql, _) = Sqlite::build(query);
+/// let (sql, _) = Sqlite::build(query)?;
 /// assert_eq!("SELECT COUNT(*) FROM `users`", sql);
+/// # Ok(())
+/// # }
 /// ```
 pub fn count<'a, T>(expr: T) -> Function<'a>
 where

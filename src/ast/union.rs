@@ -42,9 +42,10 @@ impl<'a> Union<'a> {
     ///
     /// ```rust
     /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # fn main() -> Result<(), quaint::error::Error> {
     /// let s1 = Select::default().value(1);
     /// let s2 = Select::default().value(2);
-    /// let (sql, params) = Sqlite::build(Union::new(s1).all(s2));
+    /// let (sql, params) = Sqlite::build(Union::new(s1).all(s2))?;
     ///
     /// assert_eq!("(SELECT ?) UNION ALL (SELECT ?)", sql);
     ///
@@ -52,6 +53,8 @@ impl<'a> Union<'a> {
     ///     Value::from(1),
     ///     Value::from(2)
     /// ], params);
+    /// # Ok(())
+    /// # }
     /// ```
     pub fn all(mut self, q: Select<'a>) -> Self {
         self.selects.push(q);
@@ -64,9 +67,10 @@ impl<'a> Union<'a> {
     ///
     /// ```rust
     /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # fn main() -> Result<(), quaint::error::Error> {
     /// let s1 = Select::default().value(1);
     /// let s2 = Select::default().value(2);
-    /// let (sql, params) = Sqlite::build(Union::new(s1).distinct(s2));
+    /// let (sql, params) = Sqlite::build(Union::new(s1).distinct(s2))?;
     ///
     /// assert_eq!("(SELECT ?) UNION (SELECT ?)", sql);
     ///
@@ -74,6 +78,8 @@ impl<'a> Union<'a> {
     ///     Value::from(1),
     ///     Value::from(2)
     /// ], params);
+    /// # Ok(())
+    /// # }
     /// ```
     pub fn distinct(mut self, q: Select<'a>) -> Self {
         self.selects.push(q);

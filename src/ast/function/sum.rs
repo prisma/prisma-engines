@@ -10,9 +10,12 @@ pub struct Sum<'a> {
 ///
 /// ```rust
 /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
+/// # fn main() -> Result<(), quaint::error::Error> {
 /// let query = Select::from_table("users").value(sum("age").alias("sum"));
-/// let (sql, _) = Sqlite::build(query);
+/// let (sql, _) = Sqlite::build(query)?;
 /// assert_eq!("SELECT SUM(`age`) AS `sum` FROM `users`", sql);
+/// # Ok(())
+/// # }
 /// ```
 pub fn sum<'a, C>(col: C) -> Function<'a>
 where

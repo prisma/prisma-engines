@@ -159,12 +159,12 @@ impl TransactionCapable for Sqlite {}
 #[async_trait]
 impl Queryable for Sqlite {
     async fn query(&self, q: Query<'_>) -> crate::Result<ResultSet> {
-        let (sql, params) = visitor::Sqlite::build(q);
+        let (sql, params) = visitor::Sqlite::build(q)?;
         self.query_raw(&sql, &params).await
     }
 
     async fn execute(&self, q: Query<'_>) -> crate::Result<u64> {
-        let (sql, params) = visitor::Sqlite::build(q);
+        let (sql, params) = visitor::Sqlite::build(q)?;
         self.execute_raw(&sql, &params).await
     }
 
@@ -270,7 +270,7 @@ mod tests {
         let rows = conn.select(query).await.unwrap();
         let row = rows.get(0).unwrap();
 
-        assert_eq!(Value::Integer(1), row["test"]);
+        assert_eq!(Value::integer(1), row["test"]);
     }
 
     #[tokio::test]
@@ -280,7 +280,7 @@ mod tests {
         let rows = conn.select(query).await.unwrap();
         let row = rows.get(0).unwrap();
 
-        assert_eq!(Value::Null, row["test"]);
+        assert!(row["test"].is_null());
     }
 
     #[tokio::test]

@@ -42,7 +42,7 @@ pub fn from_rows<T: DeserializeOwned>(result_set: ResultSet) -> crate::Result<Ve
 /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
 /// #
 /// #   let row = quaint::serde::make_row(vec![
-/// #       ("id", Value::Integer(12)),
+/// #       ("id", Value::from(12)),
 /// #       ("name", "Georgina".into()),
 /// #   ]);
 /// #
@@ -73,7 +73,7 @@ impl<'de> Deserializer<'de> for RowDeserializer {
         let kvs = columns.iter().enumerate().map(move |(v, k)| {
             // The unwrap is safe if `columns` is correct.
             let value = values.get_mut(v).unwrap();
-            let taken_value = std::mem::replace(value, Value::Null);
+            let taken_value = std::mem::replace(value, Value::Integer(None));
             (k.as_str(), taken_value)
         });
 
@@ -107,39 +107,66 @@ impl<'de> Deserializer<'de> for ValueDeserializer<'de> {
         use rust_decimal::prelude::ToPrimitive;
 
         match self.0 {
-            Value::Text(s) => visitor.visit_string(s.into_owned()),
-            Value::Bytes(bytes) => visitor.visit_bytes(bytes.as_ref()),
-            Value::Enum(s) => visitor.visit_string(s.into_owned()),
-            Value::Integer(i) => visitor.visit_i64(i),
-            Value::Boolean(b) => visitor.visit_bool(b),
-            Value::Char(c) => visitor.visit_char(c),
-            Value::Null => visitor.visit_none(),
-            Value::Real(real) => visitor.visit_f64(real.to_f64().unwrap()),
+            Value::Text(Some(s)) => visitor.visit_string(s.into_owned()),
+            Value::Text(None) => visitor.visit_none(),
+            Value::Bytes(Some(bytes)) => visitor.visit_bytes(bytes.as_ref()),
+            Value::Bytes(None) => visitor.visit_none(),
+            Value::Enum(Some(s)) => visitor.visit_string(s.into_owned()),
+            Value::Enum(None) => visitor.visit_none(),
+            Value::Integer(Some(i)) => visitor.visit_i64(i),
+            Value::Integer(None) => visitor.visit_none(),
+            Value::Boolean(Some(b)) => visitor.visit_bool(b),
+            Value::Boolean(None) => visitor.visit_none(),
+            Value::Char(Some(c)) => visitor.visit_char(c),
+            Value::Char(None) => visitor.visit_none(),
+            Value::Real(Some(real)) => visitor.visit_f64(real.to_f64().unwrap()),
+            Value::Real(None) => visitor.visit_none(),
 
             #[cfg(feature = "uuid-0_8")]
-            Value::Uuid(uuid) => visitor.visit_string(uuid.to_string()),
+            Value::Uuid(Some(uuid)) => visitor.visit_string(uuid.to_string()),
+            #[cfg(feature = "uuid-0_8")]
+            Value::Uuid(None) => visitor.visit_none(),
 
             #[cfg(feature = "json-1")]
-            Value::Json(value) => value
-                .into_deserializer()
-                .deserialize_any(visitor)
-                .map_err(|err| serde::de::value::Error::custom(format!("Error deserializing JSON value: {}", err))),
+            Value::Json(Some(value)) => {
+                let de = value.into_deserializer();
+
+                de.deserialize_any(visitor)
+                    .map_err(|err| serde::de::value::Error::custom(format!("Error deserializing JSON value: {}", err)))
+            }
+            #[cfg(feature = "json-1")]
+            Value::Json(None) => visitor.visit_none(),
 
             #[cfg(feature = "chrono-0_4")]
-            Value::DateTime(dt) => visitor.visit_string(dt.to_rfc3339()),
+            Value::DateTime(Some(dt)) => visitor.visit_string(dt.to_rfc3339()),
+            #[cfg(feature = "chrono-0_4")]
+            Value::DateTime(None) => visitor.visit_none(),
+
+            #[cfg(feature = "chrono-0_4")]
+            Value::Date(Some(d)) => visitor.visit_string(format!("{}", d)),
+            #[cfg(feature = "chrono-0_4")]
+            Value::Date(None) => visitor.visit_none(),
+
+            #[cfg(feature = "chrono-0_4")]
+            Value::Time(Some(t)) => visitor.visit_string(format!("{}", t)),
+            #[cfg(feature = "chrono-0_4")]
+            Value::Time(None) => visitor.visit_none(),
 
             #[cfg(all(feature = "array", feature = "postgresql"))]
-            Value::Array(values) => {
+            Value::Array(Some(values)) => {
                 let deserializer = serde::de::value::SeqDeserializer::new(values.into_iter());
                 visitor.visit_seq(deserializer)
             }
+            #[cfg(all(feature = "array", feature = "postgresql"))]
+            Value::Array(None) => visitor.visit_none(),
         }
     }
 
     fn deserialize_option<V: Visitor<'de>>(self, visitor: V) -> Result<V::Value, Self::Error> {
-        match &self.0 {
-            Value::Null => visitor.visit_none(),
-            _ => visitor.visit_some(self),
+        if self.0.is_null() {
+            visitor.visit_none()
+        } else {
+            visitor.visit_some(self)
         }
     }
 
@@ -188,7 +215,7 @@ mod tests {
 
     #[test]
     fn deserialize_user() {
-        let row = make_row(vec![("id", Value::Integer(12)), ("name", "Georgina".into())]);
+        let row = make_row(vec![("id", Value::integer(12)), ("name", "Georgina".into())]);
         let user: User = from_row(row).unwrap();
 
         assert_eq!(
@@ -204,9 +231,9 @@ mod tests {
     #[test]
     fn from_rows_works() {
         let first_row = make_row(vec![
-            ("id", Value::Integer(12)),
+            ("id", Value::integer(12)),
             ("name", "Georgina".into()),
-            ("bio", Value::Null.into()),
+            ("bio", Value::Text(None)),
         ]);
         let second_row = make_row(vec![
             ("id", 33.into()),
@@ -245,11 +272,11 @@ mod tests {
     #[test]
     fn deserialize_cat() {
         let row = make_row(vec![
-            ("age", Value::Real("18.800001".parse().unwrap())),
-            ("birthday", Value::DateTime("2019-08-01T20:00:00Z".parse().unwrap())),
+            ("age", Value::real("18.800001".parse().unwrap())),
+            ("birthday", Value::datetime("2019-08-01T20:00:00Z".parse().unwrap())),
             (
                 "human",
-                Value::Json(serde_json::json!({
+                Value::json(serde_json::json!({
                     "id": 19,
                     "name": "Georgina"
                 })),

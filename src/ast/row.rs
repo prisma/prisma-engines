@@ -38,6 +38,15 @@ impl<'a> Row<'a> {
     }
 }
 
+impl<'a> IntoIterator for Row<'a> {
+    type Item = Expression<'a>;
+    type IntoIter = std::vec::IntoIter<Self::Item>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.values.into_iter()
+    }
+}
+
 impl<'a, T> From<Vec<T>> for Row<'a>
 where
     T: Into<Expression<'a>>,
