@@ -27,16 +27,7 @@ impl NestedPagination {
             many_records.records.reverse();
         }
 
-        many_records.records.iter().for_each(|r| {
-            println!(
-                "[{:?}]: {:?}",
-                r.parent_id.as_ref().map(|p| p.values().collect::<Vec<_>>()),
-                r.values,
-            );
-        });
-        println!(">>>>>>>>>>>>>>>>>>>>>");
-
-        // replacement for SQL order by
+        // Replacement for SQL order by
         // TODO: this must also handle secondary order bys
         many_records.records.sort_by_key(|r| {
             let values: Vec<_> = r
@@ -47,15 +38,6 @@ impl NestedPagination {
                 .collect();
             values
         });
-
-        many_records.records.iter().for_each(|r| {
-            println!(
-                "[{:?}]: {:?}",
-                r.parent_id.as_ref().map(|p| p.values().collect::<Vec<_>>()),
-                r.values,
-            );
-        });
-        println!(">>>>>>>>>>>>>>>>>>>>>");
 
         // If we have a cursor, skip records until we find it for each parent id. Pagination is applied afterwards.
         if let Some(cursor) = &self.cursor {
@@ -79,20 +61,6 @@ impl NestedPagination {
                 // As long as the cursor has not been seen we recheck every record.
                 if !cursor_seen {
                     cursor_seen = record_values == cursor_values;
-                }
-
-                if cursor_seen {
-                    println!(
-                        "Retaining [{:?}]: {:?}",
-                        record.parent_id.as_ref().map(|p| p.values().collect::<Vec<_>>()),
-                        record.values,
-                    );
-                } else {
-                    println!(
-                        "Dropping [{:?}]: {:?}",
-                        record.parent_id.as_ref().map(|p| p.values().collect::<Vec<_>>()),
-                        record.values,
-                    );
                 }
 
                 // If the cursor has been seen for this parent, we retain all records coming afterwards (and including the cursor).
