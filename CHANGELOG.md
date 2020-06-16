@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.2.0-alpha.13
+
+- Fix compilation errors if `json` is not enabled
+- Change phrasing of log message regarding connection count
+- Better errors for execute results in SQLite
+- Use `map` instead of `map_and_drop` on mysql query
+- Support for Microsoft SQL Server
+
 ## v0.2.0-alpha.12
 
 - Pgbouncer support
