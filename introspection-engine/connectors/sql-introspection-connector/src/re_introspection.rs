@@ -86,18 +86,18 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec
     for model in &new_data_model.models {
         for field in &model.fields {
             if let FieldType::Relation(info) = &field.field_type {
-                let old_model = old_data_model.find_model(&model.name).unwrap();
-
-                for old_field in &old_model.fields {
-                    if let FieldType::Relation(old_info) = &old_field.field_type {
-                        if old_info == info {
-                            changed_relation_field_names.push((
-                                ModelAndField {
-                                    model: model.name.clone(),
-                                    field: field.name.clone(),
-                                },
-                                old_field.name.clone(),
-                            ));
+                if let Some(old_model) = old_data_model.find_model(&model.name) {
+                    for old_field in &old_model.fields {
+                        if let FieldType::Relation(old_info) = &old_field.field_type {
+                            if old_info == info {
+                                changed_relation_field_names.push((
+                                    ModelAndField {
+                                        model: model.name.clone(),
+                                        field: field.name.clone(),
+                                    },
+                                    old_field.name.clone(),
+                                ));
+                            }
                         }
                     }
                 }
