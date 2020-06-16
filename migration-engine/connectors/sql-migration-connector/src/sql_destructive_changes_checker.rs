@@ -1,17 +1,19 @@
 mod check;
 mod database_inspection_results;
+mod destructive_change_checker_flavour;
 mod destructive_check_plan;
 mod unexecutable_step_check;
 mod warning_check;
 
+pub(crate) use destructive_change_checker_flavour::DestructiveChangeCheckerFlavour;
+
 use crate::{
-    sql_schema_differ::DiffingOptions, AddColumn, AlterColumn, Component, DropColumn, DropTable, SqlMigration,
-    SqlMigrationStep, SqlResult, TableChange,
+    sql_schema_differ::{ColumnDiffer, DiffingOptions},
+    AddColumn, AlterColumn, Component, DropColumn, DropTable, SqlMigration, SqlMigrationStep, SqlResult, TableChange,
 };
 use destructive_check_plan::DestructiveCheckPlan;
 use migration_connector::{ConnectorResult, DestructiveChangeDiagnostics, DestructiveChangesChecker};
-use quaint::prelude::SqlFamily;
-use sql_schema_describer::{ColumnArity, SqlSchema};
+use sql_schema_describer::SqlSchema;
 use unexecutable_step_check::UnexecutableStepCheck;
 use warning_check::SqlMigrationWarning;
 
@@ -104,22 +106,15 @@ impl SqlDestructiveChangesChecker<'_> {
 
         let diffing_options = DiffingOptions::from_database_info(self.database_info());
 
-        let differ = crate::sql_schema_differ::ColumnDiffer {
+        let differ = ColumnDiffer {
             diffing_options: &diffing_options,
             previous: previous_column,
             next: &alter_column.column,
         };
 
-        if self.alter_column_is_safe(&differ) {
-            return;
-        }
+        self.flavour().check_alter_column(previous_table, &differ, plan);
 
         self.check_for_column_arity_change(&previous_table.name, &differ, plan);
-
-        plan.push_warning(SqlMigrationWarning::AlterColumn {
-            table: previous_table.name.clone(),
-            column: alter_column.column.name.clone(),
-        });
 
         if previous_table.is_part_of_foreign_key(&alter_column.column.name)
             && alter_column.column.default.is_none()
@@ -129,69 +124,6 @@ impl SqlDestructiveChangesChecker<'_> {
                 table: previous_table.name.clone(),
                 column: alter_column.name.clone(),
             });
-        }
-    }
-
-    fn alter_column_is_safe(&self, differ: &crate::sql_schema_differ::ColumnDiffer<'_>) -> bool {
-        use crate::sql_migration::expanded_alter_column::*;
-
-        match self.sql_family() {
-            SqlFamily::Mssql => todo!("Greetings from Redmond"),
-            SqlFamily::Sqlite => {
-                let arity_change_is_safe = match (&differ.previous.tpe.arity, &differ.next.tpe.arity) {
-                    // column became required
-                    (ColumnArity::Nullable, ColumnArity::Required) => false,
-                    // column became nullable
-                    (ColumnArity::Required, ColumnArity::Nullable) => true,
-                    // nothing changed
-                    (ColumnArity::Required, ColumnArity::Required) | (ColumnArity::Nullable, ColumnArity::Nullable) => {
-                        true
-                    }
-                    // not supported on SQLite
-                    (ColumnArity::List, _) | (_, ColumnArity::List) => unreachable!(),
-                };
-
-                !differ.all_changes().type_changed() && arity_change_is_safe
-            }
-            SqlFamily::Postgres => {
-                let expanded = expand_postgres_alter_column(differ);
-
-                // We keep the match here to keep the exhaustiveness checking for when we add variants.
-                if let Some(steps) = expanded {
-                    let mut is_safe = true;
-
-                    for step in steps {
-                        match step {
-                            PostgresAlterColumn::SetDefault(_)
-                            | PostgresAlterColumn::DropDefault
-                            | PostgresAlterColumn::DropNotNull => (),
-                            PostgresAlterColumn::SetType(_) => is_safe = false,
-                        }
-                    }
-
-                    is_safe
-                } else {
-                    false
-                }
-            }
-            SqlFamily::Mysql => {
-                let expanded = expand_mysql_alter_column(differ);
-
-                // We keep the match here to keep the exhaustiveness checking for when we add variants.
-                if let Some(steps) = expanded {
-                    let is_safe = true;
-
-                    for step in steps {
-                        match step {
-                            MysqlAlterColumn::SetDefault(_) | MysqlAlterColumn::DropDefault => (),
-                        }
-                    }
-
-                    is_safe
-                } else {
-                    false
-                }
-            }
         }
     }
 
