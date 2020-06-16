@@ -18,7 +18,6 @@ thiserror = "1.0.16"
 
 [dependencies.quaint]
 git = "https://github.com/prisma/quaint"
-branch = "mssql-support"
 features = ["single", "serde-support"]
 
 [dev-dependencies]

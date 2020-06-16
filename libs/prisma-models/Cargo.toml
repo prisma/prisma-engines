@@ -22,5 +22,5 @@ rand = "0.7"
 datamodel = { path = "../datamodel/core" }
 itertools = "0.8"
 rust_decimal = "1.6"
-quaint = { git = "https://github.com/prisma/quaint", optional = true, features = ["uuid-0_8"], branch = "mssql-support"}
+quaint = { git = "https://github.com/prisma/quaint", optional = true, features = ["uuid-0_8"] }
 prisma-value = { path = "../prisma-value", features = ["sql-ext"] }

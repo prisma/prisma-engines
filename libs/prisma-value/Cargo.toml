@@ -20,6 +20,5 @@ once_cell = "1.3"
 
 [dependencies.quaint]
 git = "https://github.com/prisma/quaint"
-branch = "mssql-support"
 optional = true
 features = ["uuid-0_8", "array", "single-postgresql"]
