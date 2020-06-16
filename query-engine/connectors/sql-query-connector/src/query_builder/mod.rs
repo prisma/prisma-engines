@@ -31,7 +31,7 @@ pub(super) fn conditions<'a>(
     columns: &'a [Column<'static>],
     records: impl IntoIterator<Item = &'a RecordProjection>,
 ) -> ConditionTree<'static> {
-    let mut values = Values::new();
+    let mut values = Values::empty();
 
     for proj in records.into_iter() {
         let vals: Vec<_> = proj.values().collect();

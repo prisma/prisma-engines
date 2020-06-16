@@ -18,6 +18,7 @@ pub(crate) fn expand_alter_column(
         SqlFamily::Sqlite => expand_sqlite_alter_column(&column_differ).map(ExpandedAlterColumn::Sqlite),
         SqlFamily::Mysql => expand_mysql_alter_column(&column_differ).map(ExpandedAlterColumn::Mysql),
         SqlFamily::Postgres => expand_postgres_alter_column(&column_differ).map(ExpandedAlterColumn::Postgres),
+        SqlFamily::Mssql => todo!("Greetings from Redmond"),
     }
 }
 

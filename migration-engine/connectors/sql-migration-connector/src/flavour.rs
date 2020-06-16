@@ -29,6 +29,7 @@ pub(crate) fn from_connection_info(connection_info: &ConnectionInfo) -> Box<dyn 
         ConnectionInfo::Sqlite { file_path, .. } => Box::new(SqliteFlavour {
             file_path: file_path.clone(),
         }),
+        ConnectionInfo::Mssql(_) => todo!("Greetings from Redmond!"),
     }
 }
 

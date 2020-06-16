@@ -183,9 +183,9 @@ fn handle_scalar_field(
     let value: PrismaValue = value.try_into()?;
 
     Ok(match (op, value) {
-        (FilterOp::In, PrismaValue::Null) => field.equals(PrismaValue::Null),
+        (FilterOp::In, PrismaValue::Null(hint)) => field.equals(PrismaValue::Null(hint)),
         (FilterOp::In, PrismaValue::List(values)) => field.is_in(values),
-        (FilterOp::NotIn, PrismaValue::Null) => field.not_equals(PrismaValue::Null),
+        (FilterOp::NotIn, PrismaValue::Null(hint)) => field.not_equals(PrismaValue::Null(hint)),
         (FilterOp::NotIn, PrismaValue::List(values)) => field.not_in(values),
         (FilterOp::Not, val) => field.not_equals(val),
         (FilterOp::Lt, val) => field.less_than(val),

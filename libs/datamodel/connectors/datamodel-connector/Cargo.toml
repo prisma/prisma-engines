@@ -8,3 +8,6 @@ edition = "2018"
 
 [dependencies]
 serde = { version = "1.0.90", features = ["derive"] }
+
+[features]
+mssql = []

@@ -87,11 +87,12 @@ impl TestApi {
         &self.connection_info
     }
 
-    pub fn to_sql_string<'a>(&'a self, query: impl Into<Query<'a>>) -> (String, Vec<Value>) {
+    pub fn to_sql_string<'a>(&'a self, query: impl Into<Query<'a>>) -> quaint::Result<(String, Vec<Value>)> {
         match self.connection_info() {
             ConnectionInfo::Postgres(..) => visitor::Postgres::build(query),
             ConnectionInfo::Mysql(..) => visitor::Mysql::build(query),
             ConnectionInfo::Sqlite { .. } => visitor::Sqlite::build(query),
+            ConnectionInfo::Mssql(_) => todo!("Greetings from Redmond"),
         }
     }
 }

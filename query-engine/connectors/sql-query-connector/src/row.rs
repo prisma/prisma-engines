@@ -1,5 +1,5 @@
 use crate::error::SqlError;
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, NaiveDate, Utc};
 use datamodel::FieldArity;
 use prisma_models::{PrismaValue, Record, TypeIdentifier};
 use quaint::{
@@ -39,13 +39,13 @@ impl ToSqlRow for ResultRow {
         for (i, p_value) in self.into_iter().enumerate().take(row_width) {
             let pv = match &idents[i] {
                 (type_identifier, FieldArity::List) => match p_value {
-                    Value::Array(l) => l
+                    value if value.is_null() => Ok(PrismaValue::List(Vec::new())),
+                    Value::Array(None) => Ok(PrismaValue::List(Vec::new())),
+                    Value::Array(Some(l)) => l
                         .into_iter()
                         .map(|p_value| row_value_to_prisma_value(p_value, &type_identifier))
                         .collect::<crate::Result<Vec<_>>>()
                         .map(|vec| PrismaValue::List(vec)),
-
-                    Value::Null => Ok(PrismaValue::List(Vec::new())),
                     _ => {
                         let error = io::Error::new(
                             io::ErrorKind::InvalidData,
@@ -68,18 +68,18 @@ pub fn row_value_to_prisma_value(p_value: Value, type_identifier: &TypeIdentifie
     Ok(match type_identifier {
         TypeIdentifier::Boolean => match p_value {
             // Value::Array(vec) => PrismaValue::Boolean(b),
-            Value::Null => PrismaValue::Null,
-            Value::Integer(i) => PrismaValue::Boolean(i != 0),
-            Value::Boolean(b) => PrismaValue::Boolean(b),
+            value if value.is_null() => PrismaValue::null(type_identifier.clone()),
+            Value::Integer(Some(i)) => PrismaValue::Boolean(i != 0),
+            Value::Boolean(Some(b)) => PrismaValue::Boolean(b),
             _ => {
                 let error = io::Error::new(io::ErrorKind::InvalidData, "Bool value not stored as bool or int");
                 return Err(SqlError::ConversionError(error.into()));
             }
         },
         TypeIdentifier::Enum(_) => match p_value {
-            Value::Null => PrismaValue::Null,
-            Value::Enum(cow) => PrismaValue::Enum(cow.into_owned()),
-            Value::Text(cow) => PrismaValue::Enum(cow.into_owned()),
+            value if value.is_null() => PrismaValue::null(type_identifier.clone()),
+            Value::Enum(Some(cow)) => PrismaValue::Enum(cow.into_owned()),
+            Value::Text(Some(cow)) => PrismaValue::Enum(cow.into_owned()),
             _ => {
                 let error = io::Error::new(io::ErrorKind::InvalidData, "Enum value not stored as enum");
                 return Err(SqlError::ConversionError(error.into()));
@@ -87,27 +87,27 @@ pub fn row_value_to_prisma_value(p_value: Value, type_identifier: &TypeIdentifie
         },
 
         TypeIdentifier::Json => match p_value {
-            Value::Null => PrismaValue::Null,
-            Value::Text(json) => PrismaValue::Json(json.into()),
-            Value::Json(json) => PrismaValue::Json(json.to_string()),
+            value if value.is_null() => PrismaValue::null(type_identifier.clone()),
+            Value::Text(Some(json)) => PrismaValue::Json(json.into()),
+            Value::Json(Some(json)) => PrismaValue::Json(json.to_string()),
             _ => {
                 let error = io::Error::new(io::ErrorKind::InvalidData, "Json value not stored as text or json");
                 return Err(SqlError::ConversionError(error.into()));
             }
         },
         TypeIdentifier::UUID => match p_value {
-            Value::Null => PrismaValue::Null,
-            Value::Text(uuid) => PrismaValue::Uuid(Uuid::parse_str(&uuid)?),
-            Value::Uuid(uuid) => PrismaValue::Uuid(uuid),
+            value if value.is_null() => PrismaValue::null(type_identifier.clone()),
+            Value::Text(Some(uuid)) => PrismaValue::Uuid(Uuid::parse_str(&uuid)?),
+            Value::Uuid(Some(uuid)) => PrismaValue::Uuid(uuid),
             _ => {
                 let error = io::Error::new(io::ErrorKind::InvalidData, "Uuid value not stored as text or uuid");
                 return Err(SqlError::ConversionError(error.into()));
             }
         },
         TypeIdentifier::DateTime => match p_value {
-            Value::Null => PrismaValue::Null,
-            Value::DateTime(dt) => PrismaValue::DateTime(dt),
-            Value::Integer(ts) => {
+            value if value.is_null() => PrismaValue::null(type_identifier.clone()),
+            Value::DateTime(Some(dt)) => PrismaValue::DateTime(dt),
+            Value::Integer(Some(ts)) => {
                 let nsecs = ((ts % 1000) * 1_000_000) as u32;
                 let secs = (ts / 1000) as i64;
                 let naive = chrono::NaiveDateTime::from_timestamp(secs, nsecs);
@@ -115,7 +115,7 @@ pub fn row_value_to_prisma_value(p_value: Value, type_identifier: &TypeIdentifie
 
                 PrismaValue::DateTime(datetime)
             }
-            Value::Text(dt_string) => {
+            Value::Text(Some(dt_string)) => {
                 let dt = DateTime::parse_from_rfc3339(dt_string.borrow())
                     .or_else(|_| DateTime::parse_from_rfc2822(dt_string.borrow()))
                     .map_err(|err| {
@@ -124,6 +124,15 @@ pub fn row_value_to_prisma_value(p_value: Value, type_identifier: &TypeIdentifie
                     .unwrap();
 
                 PrismaValue::DateTime(dt.with_timezone(&Utc))
+            }
+            Value::Date(Some(d)) => {
+                let dt = DateTime::<Utc>::from_utc(d.and_hms(0, 0, 0), Utc);
+                PrismaValue::DateTime(dt)
+            }
+            Value::Time(Some(t)) => {
+                let d = NaiveDate::from_ymd(1970, 1, 1);
+                let dt = DateTime::<Utc>::from_utc(d.and_time(t), Utc);
+                PrismaValue::DateTime(dt)
             }
             _ => {
                 let error = io::Error::new(
@@ -134,9 +143,9 @@ pub fn row_value_to_prisma_value(p_value: Value, type_identifier: &TypeIdentifie
             }
         },
         TypeIdentifier::Float => match p_value {
-            Value::Null => PrismaValue::Null,
-            Value::Real(f) => PrismaValue::Float(f),
-            Value::Integer(i) => {
+            value if value.is_null() => PrismaValue::null(type_identifier.clone()),
+            Value::Real(Some(f)) => PrismaValue::Float(f),
+            Value::Integer(Some(i)) => {
                 // Decimal::from_f64 is buggy. Issue: https://github.com/paupino/rust-decimal/issues/228
                 PrismaValue::Float(Decimal::from_str(&(i as f64).to_string()).expect("f64 was not a Decimal."))
             }
@@ -156,19 +165,19 @@ pub fn row_value_to_prisma_value(p_value: Value, type_identifier: &TypeIdentifie
             }
         },
         TypeIdentifier::Int => match p_value {
-            Value::Integer(i) => PrismaValue::Int(i),
-            Value::Bytes(bytes) => PrismaValue::Int(interpret_bytes_as_i64(&bytes)),
-            Value::Text(txt) => PrismaValue::Int(
+            Value::Integer(Some(i)) => PrismaValue::Int(i),
+            Value::Bytes(Some(bytes)) => PrismaValue::Int(interpret_bytes_as_i64(&bytes)),
+            Value::Text(Some(txt)) => PrismaValue::Int(
                 i64::from_str(txt.trim_start_matches('\0')).map_err(|err| SqlError::ConversionError(err.into()))?,
             ),
             other => PrismaValue::from(other),
         },
         TypeIdentifier::String => match p_value {
-            Value::Uuid(uuid) => PrismaValue::String(uuid.to_string()),
-            Value::Json(json_value) => {
+            value if value.is_null() => PrismaValue::null(type_identifier.clone()),
+            Value::Uuid(Some(uuid)) => PrismaValue::String(uuid.to_string()),
+            Value::Json(Some(json_value)) => {
                 PrismaValue::String(serde_json::to_string(&json_value).expect("JSON value to string"))
             }
-            Value::Null => PrismaValue::Null,
             other => PrismaValue::from(other),
         },
     })
