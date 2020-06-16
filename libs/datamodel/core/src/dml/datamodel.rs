@@ -102,9 +102,9 @@ impl Datamodel {
     }
 
     /// Finds a mutable field reference by a model and field name.
-    pub fn find_field_mut(&mut self, field: &FieldRef) -> Option<&mut Field> {
+    pub fn find_field_mut(&mut self, model: &str, field: &str) -> Option<&mut Field> {
         // This uses the memory location of field for equality.
-        self.find_model_mut(&field.0)?.find_field_mut(&field.1)
+        self.find_model_mut(model)?.find_field_mut(field)
     }
 
     /// Finds an enum by name.

@@ -39,6 +39,9 @@ async fn re_introspecting_mapped_model_name(api: &TestApi) {
         "#;
     let result = dbg!(api.re_introspect(input_dm).await);
     custom_assert(&result, final_dm);
+    let warnings = api.re_introspect_warnings(input_dm).await;
+
+    assert_eq!(&warnings, "[{\"code\":7,\"message\":\"These models were enriched with @@map information taken from the previous Prisma schema.\",\"affected\":[{\"model\":\"User\"}]}]");
 }
 
 #[test_each_connector(tags("postgres"))]
@@ -73,6 +76,9 @@ async fn re_introspecting_mapped_field_name(api: &TestApi) {
         "#;
     let result = dbg!(api.re_introspect(input_dm).await);
     custom_assert(&result, final_dm);
+
+    let warnings = api.re_introspect_warnings(input_dm).await;
+    assert_eq!(&warnings, "[{\"code\":8,\"message\":\"These fields were enriched with @map information taken from the previous Prisma schema.\",\"affected\":[{\"model\":\"User\",\"field\":\"id\"}]}]");
 }
 
 #[test_each_connector(tags("postgres"))]

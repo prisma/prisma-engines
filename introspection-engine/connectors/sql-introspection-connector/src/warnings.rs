@@ -1,7 +1,7 @@
 use introspection_connector::Warning;
 use serde::Serialize;
 
-#[derive(Serialize, Debug)]
+#[derive(Serialize, Debug, Clone)]
 pub struct Model {
     pub(crate) model: String,
 }
@@ -11,7 +11,7 @@ pub struct Enum {
     pub(crate) enm: String,
 }
 
-#[derive(Serialize, Debug)]
+#[derive(Serialize, Debug, Clone)]
 pub struct ModelAndField {
     pub(crate) model: String,
     pub(crate) field: String,

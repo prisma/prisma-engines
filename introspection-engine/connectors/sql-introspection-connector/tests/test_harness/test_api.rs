@@ -41,6 +41,12 @@ impl TestApi {
         datamodel::render_datamodel_to_string(&introspection_result.datamodel).expect("Datamodel rendering failed")
     }
 
+    pub async fn re_introspect_warnings(&self, data_model_string: &str) -> String {
+        let data_model = datamodel::parse_datamodel(data_model_string).unwrap();
+        let introspection_result = self.introspection_connector.introspect(&data_model).await.unwrap();
+        serde_json::to_string(&introspection_result.warnings).unwrap()
+    }
+
     pub async fn introspect_version(&self) -> Version {
         let introspection_result = self
             .introspection_connector
