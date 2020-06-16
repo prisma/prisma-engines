@@ -49,18 +49,18 @@ impl QueryDocument {
 
 #[derive(Debug)]
 pub enum BatchDocument {
-    Multi(Vec<Operation>),
+    Multi(Vec<Operation>, bool),
     Compact(CompactedDocument),
 }
 
 impl BatchDocument {
-    pub fn new(operations: Vec<Operation>) -> Self {
-        Self::Multi(operations)
+    pub fn new(operations: Vec<Operation>, transactional: bool) -> Self {
+        Self::Multi(operations, transactional)
     }
 
     fn can_compact(&self) -> bool {
         match self {
-            Self::Multi(operations) => match operations.split_first() {
+            Self::Multi(operations, _) => match operations.split_first() {
                 Some((first, rest)) if first.is_find_one() => rest.into_iter().all(|op| {
                     op.is_find_one()
                         && first.name() == op.name()
@@ -78,7 +78,7 @@ impl BatchDocument {
 
     pub fn compact(self) -> Self {
         match self {
-            Self::Multi(operations) if self.can_compact() => Self::Compact(CompactedDocument::from(operations)),
+            Self::Multi(operations, _) if self.can_compact() => Self::Compact(CompactedDocument::from(operations)),
             _ => self,
         }
     }

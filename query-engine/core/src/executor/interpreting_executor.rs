@@ -7,11 +7,12 @@ use connector::{ConnectionLike, Connector};
 pub struct InterpretingExecutor<C> {
     connector: C,
     primary_connector: &'static str,
+
+    /// Flag that forces individual operations to run in a transaction.
+    /// Does _not_ force batches to use transactions.
     force_transactions: bool,
 }
 
-// Todo:
-// - Partial execution semantics?
 impl<C> InterpretingExecutor<C>
 where
     C: Connector + Send + Sync,
@@ -25,18 +26,37 @@ where
     }
 }
 
+// We have to distinguish between per-query needs and per-batch needs for transaction.
+// If a batch is not transactional:
+// - individual writes still need to run in a per-write transaction basis.
+// - We fan out the queries to as many connections as possible
 #[async_trait]
 impl<C> QueryExecutor for InterpretingExecutor<C>
 where
     C: Connector + Send + Sync,
 {
+    // Q: Transactional for a batch can mean 2 things:
+    // - Abort if one op fails, but all can be done in parallel.
+    // - Abort if one op fails, all operations are done in sequence. < This is the common understanding. Validate with product.
+    async fn execute_batch(
+        &self,
+        operations: Vec<Operation>,
+        transactional: bool,
+        query_schema: QuerySchemaRef,
+    ) -> crate::Result<Vec<Responses>> {
+        if transactional {
+            todo!()
+        } else {
+            todo!()
+        }
+    }
+
     async fn execute(&self, operation: Operation, query_schema: QuerySchemaRef) -> crate::Result<Responses> {
         let conn = self.connector.get_connection().await?;
 
-        // Parse, validate, and extract query graphs from query document.
+        // Parse, validate, and extract query graph from query document.
         let (query, info) = QueryGraphBuilder::new(query_schema).build(operation)?;
 
-        // Create pipelines for all separate queries
         let mut responses = Responses::with_capacity(1);
         let needs_transaction = self.force_transactions || query.needs_transaction();
 

@@ -11,6 +11,13 @@ use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, convert::TryFrom, panic::AssertUnwindSafe, sync::Arc};
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", untagged)]
+pub enum GraphQlBody {
+    Single(SingleQuery),
+    Multi(MultiQuery),
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SingleQuery {
     query: String,
@@ -22,13 +29,7 @@ pub struct SingleQuery {
 #[serde(rename_all = "camelCase")]
 pub struct MultiQuery {
     batch: Vec<SingleQuery>,
-}
-
-#[derive(Clone, Debug, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase", untagged)]
-pub enum GraphQlBody {
-    Single(SingleQuery),
-    Multi(MultiQuery),
+    transaction: bool,
 }
 
 impl From<String> for SingleQuery {
@@ -68,7 +69,10 @@ impl TryFrom<GraphQlBody> for QueryDocument {
                     })
                     .collect();
 
-                Ok(QueryDocument::Multi(BatchDocument::new(operations?)))
+                Ok(QueryDocument::Multi(BatchDocument::new(
+                    operations?,
+                    bodies.transaction,
+                )))
             }
         }
     }
@@ -91,7 +95,7 @@ impl RequestHandler for GraphQlRequestHandler {
         match QueryDocument::try_from(request.body) {
             Ok(QueryDocument::Single(query)) => handle_single_query(query, ctx.clone()).await,
             Ok(QueryDocument::Multi(batch)) => match batch.compact() {
-                BatchDocument::Multi(batch) => handle_batch(batch, ctx).await,
+                BatchDocument::Multi(batch, transactional) => handle_batch(batch, transactional, ctx).await,
                 BatchDocument::Compact(compacted) => handle_compacted(compacted, ctx).await,
             },
             Err(err) => {
@@ -130,7 +134,7 @@ async fn handle_single_query(query: Operation, ctx: Arc<PrismaContext>) -> Prism
     PrismaResponse::Single(responses)
 }
 
-async fn handle_batch(queries: Vec<Operation>, ctx: &Arc<PrismaContext>) -> PrismaResponse {
+async fn handle_batch(queries: Vec<Operation>, transactional: bool, ctx: &Arc<PrismaContext>) -> PrismaResponse {
     let mut futures = Vec::with_capacity(queries.len());
 
     for operation in queries.into_iter() {
@@ -160,8 +164,7 @@ async fn handle_compacted(document: CompactedDocument, ctx: &Arc<PrismaContext>)
         .await
     {
         Ok(Ok(mut responses)) => {
-            // We find the response data and make a hash from the given unique
-            // keys.
+            // We find the response data and make a hash from the given unique keys.
             let data = responses
                 .take_data(plural_name)
                 .unwrap()

@@ -15,7 +15,16 @@ use async_trait::async_trait;
 
 #[async_trait]
 pub trait QueryExecutor {
-    async fn execute(&self, query_doc: Operation, query_schema: QuerySchemaRef) -> crate::Result<Responses>;
+    /// Executes a single operation and returns its result.
+    async fn execute(&self, operation: Operation, query_schema: QuerySchemaRef) -> crate::Result<Responses>;
+
+    // Executes a batch of operations as either a fanout of individual operations (non-transactional), or in series (transactional).
+    async fn execute_batch(
+        &self,
+        operations: Vec<Operation>,
+        transactional: bool,
+        query_schema: QuerySchemaRef,
+    ) -> crate::Result<Vec<Responses>>;
 
     fn primary_connector(&self) -> &'static str;
 }
