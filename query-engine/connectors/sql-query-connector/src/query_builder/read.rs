@@ -33,8 +33,8 @@ impl SelectDefinition for QueryArguments {
         let ordering_directions = self.ordering_directions();
         let ordering = Ordering::for_model(&model, ordering_directions);
 
-        let limit = self.take_abs();
-        let skip = self.skip.unwrap_or(0);
+        let limit = if self.ignore_take { None } else { self.take_abs() };
+        let skip = if self.ignore_skip { 0 } else { self.skip.unwrap_or(0) };
 
         let filter: ConditionTree = self
             .filter
