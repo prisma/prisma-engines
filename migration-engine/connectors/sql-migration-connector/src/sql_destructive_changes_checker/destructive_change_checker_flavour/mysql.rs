@@ -28,6 +28,19 @@ impl DestructiveChangeCheckerFlavour for MysqlFlavour {
                         table: previous_table.name.clone(),
                     });
                 } else {
+                    // Not detected as a column migration by us, but it still may be because MODIFY
+                    // requires re-stating the column type.
+                    if !columns.all_changes().type_changed()
+                        && columns.previous.tpe.data_type != columns.next.tpe.data_type
+                    {
+                        plan.push_warning(SqlMigrationWarning::MysqlColumnTypeRestatement {
+                            table: previous_table.name.clone(),
+                            column: columns.previous.name.clone(),
+                            previous_type: columns.previous.tpe.data_type.clone(),
+                            next_type: columns.next.tpe.data_type.clone(),
+                        })
+                    }
+
                     plan.push_warning(SqlMigrationWarning::AlterColumn {
                         table: previous_table.name.clone(),
                         column: columns.next.name.clone(),

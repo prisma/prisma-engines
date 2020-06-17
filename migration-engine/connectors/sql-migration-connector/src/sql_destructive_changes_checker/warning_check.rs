@@ -2,10 +2,28 @@ use super::{check::Check, database_inspection_results::DatabaseInspectionResults
 
 #[derive(Debug)]
 pub(super) enum SqlMigrationWarning {
-    NonEmptyColumnDrop { table: String, column: String },
-    NonEmptyTableDrop { table: String },
-    AlterColumn { table: String, column: String },
-    ForeignKeyDefaultValueRemoved { table: String, column: String },
+    NonEmptyColumnDrop {
+        table: String,
+        column: String,
+    },
+    NonEmptyTableDrop {
+        table: String,
+    },
+    AlterColumn {
+        table: String,
+        column: String,
+    },
+    ForeignKeyDefaultValueRemoved {
+        table: String,
+        column: String,
+    },
+    /// MySQL MODIFY on unrelated changes requires re-stating the type, which can lead to data loss.
+    MysqlColumnTypeRestatement {
+        table: String,
+        column: String,
+        previous_type: String,
+        next_type: String,
+    },
 }
 
 impl Check for SqlMigrationWarning {
@@ -14,7 +32,8 @@ impl Check for SqlMigrationWarning {
             SqlMigrationWarning::NonEmptyTableDrop { table } => Some(table),
             SqlMigrationWarning::NonEmptyColumnDrop { .. }
             | SqlMigrationWarning::AlterColumn { .. }
-            | SqlMigrationWarning::ForeignKeyDefaultValueRemoved { .. } => None,
+            | SqlMigrationWarning::ForeignKeyDefaultValueRemoved { .. }
+            | SqlMigrationWarning::MysqlColumnTypeRestatement { .. } => None,
         }
     }
 
@@ -23,7 +42,8 @@ impl Check for SqlMigrationWarning {
             SqlMigrationWarning::NonEmptyColumnDrop { table, column }
             | SqlMigrationWarning::AlterColumn { table, column } => Some((table, column)),
             SqlMigrationWarning::ForeignKeyDefaultValueRemoved { .. }
-            | SqlMigrationWarning::NonEmptyTableDrop { .. } => None,
+            | SqlMigrationWarning::NonEmptyTableDrop { .. }
+            | SqlMigrationWarning::MysqlColumnTypeRestatement { .. } => None,
         }
     }
 
@@ -48,6 +68,7 @@ impl Check for SqlMigrationWarning {
 
             },
             SqlMigrationWarning::ForeignKeyDefaultValueRemoved { table, column } => Some(format!("The migration is about to remove a default value on the foreign key field `{}.{}`.", table, column)),
+            SqlMigrationWarning::MysqlColumnTypeRestatement { table, column, previous_type, next_type } => Some(format!("The type of the `{column}` column on the `{table}` table will be modified from `{previous_type}` to `{next_type}`.", column = column, table = table, previous_type = previous_type, next_type = next_type)),
         }
     }
 }
