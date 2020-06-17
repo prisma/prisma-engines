@@ -109,7 +109,7 @@ impl<'a> MigrationCommand for InferMigrationStepsCommand<'a> {
         Ok(MigrationStepsResultOutput {
             datamodel: datamodel::render_datamodel_to_string(&next_datamodel).unwrap(),
             datamodel_steps: returned_datamodel_steps,
-            database_steps: serde_json::Value::Array(database_steps),
+            database_steps,
             errors: version_check_errors,
             warnings,
             general_errors: vec![],

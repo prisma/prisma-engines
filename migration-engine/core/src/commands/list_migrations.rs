@@ -46,15 +46,18 @@ where
     D: DatabaseMigrationMarker + 'static,
 {
     let connector = engine.connector();
-    let database_migration = connector.deserialize_database_migration(migration.database_migration)?;
-    let database_steps_json = connector
-        .database_migration_step_applier()
-        .render_steps_pretty(&database_migration)?;
+
+    let database_steps_json = match connector.deserialize_database_migration(migration.database_migration) {
+        Some(database_migration) => connector
+            .database_migration_step_applier()
+            .render_steps_pretty(&database_migration)?,
+        None => vec![],
+    };
 
     Ok(ListMigrationsOutput {
         id: migration.name,
         datamodel_steps: migration.datamodel_steps,
-        database_steps: serde_json::Value::Array(database_steps_json),
+        database_steps: database_steps_json,
         status: migration.status,
         datamodel: migration.datamodel_string,
     })
@@ -65,7 +68,7 @@ where
 pub struct ListMigrationsOutput {
     pub id: String,
     pub datamodel_steps: Vec<MigrationStep>,
-    pub database_steps: serde_json::Value,
+    pub database_steps: Vec<PrettyDatabaseMigrationStep>,
     pub status: MigrationStatus,
     pub datamodel: String,
 }

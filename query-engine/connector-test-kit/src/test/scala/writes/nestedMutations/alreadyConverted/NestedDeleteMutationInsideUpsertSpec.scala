@@ -170,7 +170,6 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
       )
 
       res2.toString should be("""{"data":{"upsertParent":{"childOpt":null}}}""")
-
     }
   }
 

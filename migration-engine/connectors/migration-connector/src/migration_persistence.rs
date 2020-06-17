@@ -1,4 +1,4 @@
-use crate::{error::ConnectorError, steps::*};
+use crate::{error::ConnectorError, steps::*, ConnectorResult};
 use chrono::{DateTime, Utc};
 use datamodel::{ast::SchemaAst, error::ErrorCollection, Datamodel};
 use serde::Serialize;
@@ -30,7 +30,13 @@ pub trait MigrationPersistence: Send + Sync {
     }
 
     /// Returns the last successful Migration.
-    async fn last(&self) -> Result<Option<Migration>, ConnectorError>;
+    async fn last(&self) -> Result<Option<Migration>, ConnectorError> {
+        Ok(self.last_two_migrations().await?.0)
+    }
+
+    /// Returns the last two successful migrations, for rollback purposes. The tuple will be
+    /// interpreted as (last_migration, second_to_last_migration).
+    async fn last_two_migrations(&self) -> ConnectorResult<(Option<Migration>, Option<Migration>)>;
 
     /// Fetch a migration by name.
     async fn by_name(&self, name: &str) -> Result<Option<Migration>, ConnectorError>;
@@ -62,12 +68,15 @@ pub trait MigrationPersistence: Send + Sync {
 /// The representation of a migration as persisted through [MigrationPersistence](trait.MigrationPersistence.html).
 #[derive(Debug, Clone, PartialEq)]
 pub struct Migration {
+    /// The migration id.
     pub name: String,
     pub revision: usize,
     pub status: MigrationStatus,
     pub applied: usize,
     pub rolled_back: usize,
+    /// The _target_ Prisma schema.
     pub datamodel_string: String,
+    /// The schema migration steps to apply to get to the target Prisma schema.
     pub datamodel_steps: Vec<MigrationStep>,
     pub database_migration: serde_json::Value,
     pub errors: Vec<String>,
@@ -99,17 +108,31 @@ pub trait IsWatchMigration {
     fn is_watch_migration(&self) -> bool;
 }
 
+pub struct NewMigration {
+    pub name: String,
+    pub datamodel_string: String,
+    pub datamodel_steps: Vec<MigrationStep>,
+    pub database_migration: serde_json::Value,
+}
+
 impl Migration {
-    pub fn new(name: String) -> Migration {
+    pub fn new(params: NewMigration) -> Migration {
+        let NewMigration {
+            name,
+            datamodel_string,
+            datamodel_steps,
+            database_migration,
+        } = params;
+
         Migration {
-            name: name,
+            name,
             revision: 0,
             status: MigrationStatus::Pending,
-            datamodel_string: String::new(),
+            datamodel_string,
+            datamodel_steps,
             applied: 0,
             rolled_back: 0,
-            datamodel_steps: Vec::new(),
-            database_migration: serde_json::to_value("{}").unwrap(),
+            database_migration,
             errors: Vec::new(),
             started_at: Self::timestamp_without_nanos(),
             finished_at: None,
@@ -219,8 +242,8 @@ impl MigrationPersistence for EmptyMigrationPersistence {
         Ok(())
     }
 
-    async fn last(&self) -> Result<Option<Migration>, ConnectorError> {
-        Ok(None)
+    async fn last_two_migrations(&self) -> ConnectorResult<(Option<Migration>, Option<Migration>)> {
+        Ok((None, None))
     }
 
     async fn by_name(&self, _name: &str) -> Result<Option<Migration>, ConnectorError> {

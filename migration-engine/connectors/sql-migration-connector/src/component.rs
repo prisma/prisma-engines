@@ -1,4 +1,4 @@
-use crate::{DatabaseInfo, SqlMigrationConnector, SqlResult};
+use crate::{flavour::SqlFlavour, DatabaseInfo, SqlMigrationConnector, SqlResult};
 use quaint::prelude::{ConnectionInfo, Queryable, SqlFamily};
 use sql_schema_describer::SqlSchema;
 
@@ -30,6 +30,10 @@ pub(crate) trait Component {
 
     fn sql_family(&self) -> SqlFamily {
         self.connection_info().sql_family()
+    }
+
+    fn flavour(&self) -> &(dyn SqlFlavour + Send + Sync + 'static) {
+        self.connector().flavour.as_ref()
     }
 }
 

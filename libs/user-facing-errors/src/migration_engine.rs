@@ -27,6 +27,7 @@ struct MigrationRollback {
     pub database_error: String,
 }
 
+// No longer used.
 #[derive(Debug, UserFacingError, Serialize)]
 #[user_facing(
     code = "P3003",

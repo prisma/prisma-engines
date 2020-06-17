@@ -116,7 +116,7 @@ impl ModelProjection {
     /// Creates a record projection of the model projection containing only null values.
     pub fn empty_record_projection(&self) -> RecordProjection {
         self.scalar_fields()
-            .map(|f| (f.clone(), PrismaValue::Null))
+            .map(|f| (f.clone(), PrismaValue::null(f.type_identifier.clone())))
             .collect::<Vec<_>>()
             .into()
     }
@@ -174,5 +174,17 @@ impl IntoIterator for ModelProjection {
 
     fn into_iter(self) -> Self::IntoIter {
         self.fields.into_iter()
+    }
+}
+
+impl From<&RecordProjection> for ModelProjection {
+    fn from(p: &RecordProjection) -> Self {
+        let fields = p
+            .pairs
+            .iter()
+            .map(|(field, _)| field.clone().into())
+            .collect::<Vec<_>>();
+
+        Self::new(fields)
     }
 }

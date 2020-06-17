@@ -197,6 +197,7 @@ impl VersionChecker {
             SqlFamily::Postgres if self.is_prisma_1(warnings) => Version::Prisma1,
             SqlFamily::Postgres if self.is_prisma_1_1(warnings) => Version::Prisma11,
             SqlFamily::Postgres => Version::NonPrisma,
+            SqlFamily::Mssql => todo!("Greetings from Redmond"),
         }
     }
 }

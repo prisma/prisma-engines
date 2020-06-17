@@ -35,7 +35,7 @@ async fn making_an_optional_field_required_with_data_without_a_default_is_unexec
         .assert_table("Test", |table| table.assert_does_not_have_column("Int"))?;
 
     let rows = api.select("Test").column("id").column("name").send_debug().await?;
-    assert_eq!(rows, &[&[r#"Text("abc")"#, r#"Text("george")"#]]);
+    assert_eq!(rows, &[&[r#"Text(Some("abc"))"#, r#"Text(Some("george"))"#]]);
 
     Ok(())
 }
@@ -79,7 +79,10 @@ async fn making_an_optional_field_required_with_data_with_a_default_works(api: &
         .column("age")
         .send_debug()
         .await?;
-    assert_eq!(rows, &[&[r#"Text("abc")"#, r#"Text("george")"#, "Integer(84)"]]);
+    assert_eq!(
+        rows,
+        &[&[r#"Text(Some("abc"))"#, r#"Text(Some("george"))"#, "Integer(Some(84))"]]
+    );
 
     Ok(())
 }
