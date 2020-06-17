@@ -51,31 +51,32 @@ impl TryFrom<ColumnData<'static>> for Value<'static> {
             numeric @ ColumnData::Numeric(_) => Value::Real(Decimal::from_sql(&numeric)?),
             #[cfg(feature = "chrono-0_4")]
             dt @ ColumnData::DateTime(_) => {
-                use chrono::{offset::Utc, DateTime, NaiveDateTime};
+                use tiberius::time::chrono::{DateTime, NaiveDateTime, Utc};
 
                 let dt = NaiveDateTime::from_sql(&dt)?.map(|dt| DateTime::<Utc>::from_utc(dt, Utc));
                 Value::DateTime(dt)
             }
             #[cfg(feature = "chrono-0_4")]
             dt @ ColumnData::SmallDateTime(_) => {
-                use chrono::{offset::Utc, DateTime, NaiveDateTime};
+                use tiberius::time::chrono::{DateTime, NaiveDateTime, Utc};
 
                 let dt = NaiveDateTime::from_sql(&dt)?.map(|dt| DateTime::<Utc>::from_utc(dt, Utc));
                 Value::DateTime(dt)
             }
             #[cfg(feature = "chrono-0_4")]
             dt @ ColumnData::Time(_) => {
-                use chrono::NaiveTime;
+                use tiberius::time::chrono::NaiveTime;
+
                 Value::Time(NaiveTime::from_sql(&dt)?)
             }
             #[cfg(feature = "chrono-0_4")]
             dt @ ColumnData::Date(_) => {
-                use chrono::NaiveDate;
+                use tiberius::time::chrono::NaiveDate;
                 Value::Date(NaiveDate::from_sql(&dt)?)
             }
             #[cfg(feature = "chrono-0_4")]
             dt @ ColumnData::DateTime2(_) => {
-                use chrono::{offset::Utc, DateTime, NaiveDateTime};
+                use tiberius::time::chrono::{DateTime, NaiveDateTime, Utc};
 
                 let dt = NaiveDateTime::from_sql(&dt)?.map(|dt| DateTime::<Utc>::from_utc(dt, Utc));
 
@@ -83,7 +84,8 @@ impl TryFrom<ColumnData<'static>> for Value<'static> {
             }
             #[cfg(feature = "chrono-0_4")]
             dt @ ColumnData::DateTimeOffset(_) => {
-                use chrono::{offset::Utc, DateTime};
+                use tiberius::time::chrono::{DateTime, Utc};
+
                 Value::DateTime(DateTime::<Utc>::from_sql(&dt)?)
             }
             ColumnData::Xml(_) => panic!("XML not supprted yet"),
