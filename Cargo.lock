@@ -2160,7 +2160,6 @@ dependencies = [
 [[package]]
 name = "quaint"
 version = "0.2.0-alpha.13"
-source = "git+https://github.com/prisma/quaint#0e8990ac720b57cbc362dab0f99da2374536aeac"
 dependencies = [
  "async-trait",
  "base64 0.11.0",
@@ -2171,6 +2170,7 @@ dependencies = [
  "hex",
  "libsqlite3-sys",
  "log",
+ "lru-cache",
  "metrics",
  "mobc",
  "mysql_async",
