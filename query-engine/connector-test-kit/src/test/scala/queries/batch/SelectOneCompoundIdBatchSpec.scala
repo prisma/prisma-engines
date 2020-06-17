@@ -39,7 +39,7 @@ class SelectOneCompoundIdBatchSpec extends FlatSpec with Matchers with ApiSpecBa
   "one successful query" should "work" in {
     server
       .batch(
-        Array("""query {findOneArtist(where:{firstName_lastName:{firstName:"Musti",lastName:"Naukio"}}) {firstName lastName}}"""),
+        Seq("""query {findOneArtist(where:{firstName_lastName:{firstName:"Musti",lastName:"Naukio"}}) {firstName lastName}}"""),
         transaction = false,
         project,
         legacy = false
@@ -50,7 +50,7 @@ class SelectOneCompoundIdBatchSpec extends FlatSpec with Matchers with ApiSpecBa
   }
 
   "two successful queries and one failing with same selection set" should "work" in {
-    val queries = Array(
+    val queries = Seq(
       """query {findOneArtist(where:{firstName_lastName:{firstName:"Musti",lastName:"Naukio"}}) {firstName lastName}}""",
       """query {findOneArtist(where:{firstName_lastName:{firstName:"NO",lastName:"AVAIL"}}) {firstName lastName}}""",
       """query {findOneArtist(where:{firstName_lastName:{firstName:"Naukio",lastName:"Musti"}}) {firstName lastName}}""",
@@ -62,7 +62,7 @@ class SelectOneCompoundIdBatchSpec extends FlatSpec with Matchers with ApiSpecBa
   }
 
   "two successful queries with selection set in a different order" should "work" in {
-    val queries = Array(
+    val queries = Seq(
       """query {findOneArtist(where:{firstName_lastName:{firstName:"Musti",lastName:"Naukio"}}) {firstName lastName}}""",
       """query {findOneArtist(where:{firstName_lastName:{firstName:"Naukio",lastName:"Musti"}}) {lastName firstName}}""",
     )
@@ -73,7 +73,7 @@ class SelectOneCompoundIdBatchSpec extends FlatSpec with Matchers with ApiSpecBa
   }
 
   "two successful queries with query params in a different order" should "work" in {
-    val queries = Array(
+    val queries = Seq(
       """query {findOneArtist(where:{firstName_lastName:{firstName:"Musti",lastName:"Naukio"}}) {firstName lastName}}""",
       """query {findOneArtist(where:{firstName_lastName:{lastName:"Musti",firstName:"Naukio"}}) {firstName lastName}}""",
     )
@@ -84,7 +84,7 @@ class SelectOneCompoundIdBatchSpec extends FlatSpec with Matchers with ApiSpecBa
   }
 
   "two successful queries and one failing with different selection set" should "work" in {
-    val queries = Array(
+    val queries = Seq(
       """query {findOneArtist(where:{firstName_lastName:{firstName:"Musti",lastName:"Naukio"}}) {firstName lastName}}""",
       """query {findOneArtist(where:{firstName_lastName:{firstName:"NO",lastName:"AVAIL"}}) {lastName}}""",
       """query {findOneArtist(where:{firstName_lastName:{firstName:"Naukio",lastName:"Musti"}}) {firstName lastName}}""",
@@ -98,7 +98,7 @@ class SelectOneCompoundIdBatchSpec extends FlatSpec with Matchers with ApiSpecBa
   "one singular failing query" should "work" in {
 
     server
-      .batch(Array("""query {findOneArtist(where:{firstName_lastName:{firstName:"NO",lastName:"AVAIL"}}) {lastName}}"""),
+      .batch(Seq("""query {findOneArtist(where:{firstName_lastName:{firstName:"NO",lastName:"AVAIL"}}) {lastName}}"""),
              transaction = false,
              project,
              legacy = false)
@@ -108,7 +108,7 @@ class SelectOneCompoundIdBatchSpec extends FlatSpec with Matchers with ApiSpecBa
   }
 
   "one singular failing query out of two" should "work" in {
-    val queries = Array(
+    val queries = Seq(
       """query {findOneArtist(where:{firstName_lastName:{firstName:"Musti",lastName:"Naukio"}}) {firstName lastName}}""",
       """query {findOneArtist(where:{firstName_lastName:{firstName:"NO",lastName:"AVAIL"}}) {firstName lastName}}""",
     )

@@ -31,7 +31,7 @@ case class TestServer() extends PlayJsonExtensions with LogSupport {
   }
 
   def batch(
-      queries: Array[String],
+      queries: Seq[String],
       transaction: Boolean,
       project: Project,
       legacy: Boolean = true,
@@ -72,7 +72,7 @@ case class TestServer() extends PlayJsonExtensions with LogSupport {
     Json.obj("query" -> formattedQuery, "variables" -> Json.obj())
   }
 
-  def createMultiQuery(queries: Array[String], transaction: Boolean): JsValue = {
+  def createMultiQuery(queries: Seq[String], transaction: Boolean): JsValue = {
     Json.obj("batch" -> queries.map(createSingleQuery), "transaction" -> transaction)
   }
 

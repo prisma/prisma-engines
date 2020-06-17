@@ -3,13 +3,10 @@ use indexmap::IndexMap;
 // use internal::*;
 use crate::PrismaError;
 use failure::Fail;
-use prisma_models::PrismaValue;
 use query_core::{
     response_ir::{Item, Map, ResponseData},
     CoreError,
 };
-use serde::ser::{Serialize, SerializeMap, SerializeSeq, Serializer};
-use std::{borrow::Borrow, fmt, sync::Arc};
 
 #[derive(Debug, serde::Serialize, Default, PartialEq)]
 pub struct GQLResponse {
@@ -27,10 +24,6 @@ pub struct GQLError {
 }
 
 impl GQLResponse {
-    pub fn new() -> Self {
-        Self::default()
-    }
-
     pub fn with_capacity(capacity: usize) -> Self {
         Self {
             data: IndexMap::with_capacity(capacity),
@@ -46,10 +39,6 @@ impl GQLResponse {
         self.errors.push(error.into());
     }
 
-    pub fn get_data(&self, key: impl AsRef<str>) -> Option<&Item> {
-        self.data.get(key.as_ref())
-    }
-
     pub fn take_data(&mut self, key: impl AsRef<str>) -> Option<Item> {
         self.data.remove(key.as_ref())
     }
@@ -57,6 +46,14 @@ impl GQLResponse {
 
 impl From<PrismaError> for GQLResponse {
     fn from(err: PrismaError) -> Self {
+        let mut responses = Self::default();
+        responses.insert_error(err);
+        responses
+    }
+}
+
+impl From<GQLError> for GQLResponse {
+    fn from(err: GQLError) -> Self {
         let mut responses = Self::default();
         responses.insert_error(err);
         responses
@@ -89,7 +86,6 @@ impl From<CoreError> for GQLError {
     }
 }
 
-/// Helps to handle gracefully handle errors as a response.
 impl From<PrismaError> for GQLError {
     fn from(other: PrismaError) -> Self {
         match other {
@@ -108,11 +104,11 @@ impl From<ResponseData> for GQLResponse {
     }
 }
 
-// impl From<Map> for GQLResponse {
-//     fn from(data: Map) -> Self {
-//         Self {
-//             data,
-//             ..Default::default()
-//         }
-//     }
-// }
+impl From<CoreError> for GQLResponse {
+    fn from(err: CoreError) -> GQLResponse {
+        let mut gql_response = GQLResponse::default();
+
+        gql_response.insert_error(err);
+        gql_response
+    }
+}
