@@ -66,7 +66,20 @@ pub(crate) fn expand_postgres_alter_column(columns: &ColumnDiffer<'_>) -> Option
             ColumnChange::Arity => match (&columns.previous.tpe.arity, &columns.next.tpe.arity) {
                 (ColumnArity::Required, ColumnArity::Nullable) => changes.push(PostgresAlterColumn::DropNotNull),
                 (ColumnArity::Nullable, ColumnArity::Required) => changes.push(PostgresAlterColumn::SetNotNull),
-                _ => return None,
+                (ColumnArity::List, ColumnArity::Nullable) => {
+                    changes.push(PostgresAlterColumn::SetType(columns.next.tpe.clone()));
+                    changes.push(PostgresAlterColumn::DropNotNull)
+                }
+                (ColumnArity::List, ColumnArity::Required) => {
+                    changes.push(PostgresAlterColumn::SetType(columns.next.tpe.clone()));
+                    changes.push(PostgresAlterColumn::SetNotNull)
+                }
+                (ColumnArity::Nullable, ColumnArity::List) | (ColumnArity::Required, ColumnArity::List) => {
+                    changes.push(PostgresAlterColumn::SetType(columns.next.tpe.clone()))
+                }
+                (ColumnArity::Nullable, ColumnArity::Nullable)
+                | (ColumnArity::Required, ColumnArity::Required)
+                | (ColumnArity::List, ColumnArity::List) => (),
             },
             ColumnChange::Type => match (&columns.previous.tpe.family, &columns.next.tpe.family) {
                 // Ints can be cast to text.
