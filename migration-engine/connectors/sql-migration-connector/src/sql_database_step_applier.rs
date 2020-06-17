@@ -269,7 +269,7 @@ fn render_raw_sql(
                             &find_column(next_schema, &table.name, &column.name)
                                 .expect("Invariant violation: could not find column referred to in AlterColumn."),
                             &DiffingOptions::from_database_info(database_info),
-                        ) {
+                        )? {
                             Some(safe_sql) => {
                                 for line in safe_sql {
                                     lines.push(line)
@@ -445,7 +445,7 @@ fn safe_alter_column(
     previous_column: &Column,
     next_column: &ColumnRef<'_>,
     diffing_options: &DiffingOptions,
-) -> Option<Vec<String>> {
+) -> anyhow::Result<Option<Vec<String>>> {
     use crate::sql_migration::expanded_alter_column::*;
 
     let expanded = crate::sql_migration::expanded_alter_column::expand_alter_column(
@@ -453,12 +453,12 @@ fn safe_alter_column(
         next_column.column,
         &renderer.sql_family(),
         diffing_options,
-    )?;
+    );
 
     let alter_column_prefix = format!("ALTER COLUMN {}", renderer.quote(&previous_column.name));
 
     let steps = match expanded {
-        ExpandedAlterColumn::Postgres(steps) => steps
+        Some(ExpandedAlterColumn::Postgres(steps)) => steps
             .into_iter()
             .map(|step| match step {
                 PostgresAlterColumn::DropDefault => format!("{} DROP DEFAULT", &alter_column_prefix),
@@ -476,18 +476,15 @@ fn safe_alter_column(
                 ),
             })
             .collect(),
-        ExpandedAlterColumn::Mysql(step) => match step {
+        Some(ExpandedAlterColumn::Mysql(step)) => match step {
             MysqlAlterColumn::DropDefault => vec![format!("{} DROP DEFAULT", &alter_column_prefix)],
             MysqlAlterColumn::Modify { new_default, .. } => vec![format!(
                 "MODIFY {column_name} {column_type} {nullability} {default}",
                 column_name = Quoted::mysql_ident(&next_column.name()),
                 column_type = Some(next_column.column.tpe.full_data_type.clone())
                     .filter(|r| !r.is_empty())
-                    .unwrap_or_else(|| {
-                        sql_renderer::mysql_render_column_type(next_column)
-                            .expect("TODO: error handling")
-                            .into_owned()
-                    }),
+                    .map(Ok)
+                    .unwrap_or_else(|| { sql_renderer::mysql_render_column_type(next_column).map(String::from) })?,
                 nullability = if next_column.column.tpe.arity.is_required() {
                     "NOT NULL "
                 } else {
@@ -501,10 +498,11 @@ fn safe_alter_column(
                     .unwrap_or_else(String::new),
             )],
         },
-        ExpandedAlterColumn::Sqlite(_steps) => vec![],
+        Some(ExpandedAlterColumn::Sqlite(_steps)) => vec![],
+        None => return Ok(None),
     };
 
-    Some(steps)
+    Ok(Some(steps))
 }
 
 fn render_create_enum(
