@@ -478,7 +478,7 @@ fn safe_alter_column(
             .collect(),
         ExpandedAlterColumn::Mysql(step) => match step {
             MysqlAlterColumn::DropDefault => vec![format!("{} DROP DEFAULT", &alter_column_prefix)],
-            MysqlAlterColumn::Modify { .. } => vec![format!(
+            MysqlAlterColumn::Modify { new_default, .. } => vec![format!(
                 "MODIFY {column_name} {column_type} {nullability} {default}",
                 column_name = Quoted::mysql_ident(&next_column.name()),
                 column_type = Some(next_column.column.tpe.full_data_type.clone())
@@ -493,11 +493,10 @@ fn safe_alter_column(
                 } else {
                     ""
                 },
-                default = next_column
-                    .default()
+                default = new_default
                     .map(|default| format!(
                         "DEFAULT {}",
-                        renderer.render_default(default, &next_column.column_type().family)
+                        renderer.render_default(&default, &next_column.column_type().family)
                     ))
                     .unwrap_or_else(String::new),
             )],
