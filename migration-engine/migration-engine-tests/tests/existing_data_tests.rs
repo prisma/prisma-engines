@@ -6,7 +6,7 @@ use pretty_assertions::assert_eq;
 use prisma_value::{PrismaValue, TypeHint};
 use quaint::ast::*;
 
-#[test_each_connector(log = "debug,sql_schema_describer=info")]
+#[test_each_connector]
 async fn dropping_a_table_with_rows_should_warn(api: &TestApi) {
     let dm = r#"
         model Test {
@@ -137,6 +137,7 @@ async fn altering_a_column_with_non_null_values_should_warn(api: &TestApi) -> Te
     "#;
 
     let migration_output = api.infer_apply(&dm2).send().await?.into_inner();
+
     // The schema should not change because the migration should not run if there are warnings
     // and the force flag isn't passed.
     api.assert_schema().await?.assert_equals(&original_database_schema)?;
@@ -157,7 +158,7 @@ async fn altering_a_column_with_non_null_values_should_warn(api: &TestApi) -> Te
     Ok(())
 }
 
-#[test_each_connector(log = "debug")]
+#[test_each_connector]
 async fn column_defaults_can_safely_be_changed(api: &TestApi) -> TestResult {
     let combinations = &[
         ("Meow", Some(PrismaValue::String("Cats".to_string())), None),

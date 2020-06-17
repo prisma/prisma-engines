@@ -10,7 +10,7 @@ use quaint::prelude::Queryable;
 /// ([Check](trait.Check.html)) for a given migration. It has an `execute` method that performs
 /// database inspection and renders user-facing messages based on the checks.
 #[derive(Debug)]
-pub(super) struct DestructiveCheckPlan {
+pub(crate) struct DestructiveCheckPlan {
     warnings: Vec<SqlMigrationWarning>,
     unexecutable_migrations: Vec<UnexecutableStepCheck>,
 }
