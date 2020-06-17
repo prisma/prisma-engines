@@ -167,7 +167,7 @@ impl InputAssertions for PrismaValue {
 
     fn assert_non_null(&self) -> QueryParserResult<()> {
         match self {
-            PrismaValue::Null => Err(QueryParserError::AssertionError(format!(
+            PrismaValue::Null(_) => Err(QueryParserError::AssertionError(format!(
                 "You provided a null value for a where clause (or implicit nested selector). Please provide a non null value.",
             ))),
             _ => Ok(())

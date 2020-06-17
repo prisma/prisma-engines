@@ -29,7 +29,7 @@ impl IrSerializer {
                 // Todo: The following checks feel out of place. This probably needs to be handled already one level deeper.
                 let result = if serialized.is_empty() {
                     match self.output_type.borrow() {
-                        OutputType::Opt(_) => Item::Value(PrismaValue::Null),
+                        OutputType::Opt(_) => Item::Value(PrismaValue::Null(TypeHint::Unknown)),
                         OutputType::List(_) => Item::list(Vec::new()),
                         other => return Err(CoreError::SerializationError(format!(
                             "Invalid response data: the query result was required, but an empty {:?} was returned instead.",

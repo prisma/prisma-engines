@@ -148,6 +148,11 @@ where
         let table = sf.model().db_name().to_string();
         let col = sf.db_name().to_string();
 
-        Column::from(((db, table), col))
+        let column = Column::from(((db, table), col));
+
+        match sf.default_value.as_ref().and_then(|d| d.get()) {
+            Some(default) => column.default(default),
+            None => column.default(quaint::ast::DefaultValue::Generated),
+        }
     }
 }

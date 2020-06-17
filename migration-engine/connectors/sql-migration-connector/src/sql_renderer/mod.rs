@@ -40,6 +40,7 @@ impl dyn SqlRenderer {
             SqlFamily::Postgres => Box::new(PostgresRenderer {}),
             SqlFamily::Mysql => Box::new(MySqlRenderer {}),
             SqlFamily::Sqlite => Box::new(SqliteRenderer {}),
+            SqlFamily::Mssql => todo!("Greetings from Redmond"),
         }
     }
 }

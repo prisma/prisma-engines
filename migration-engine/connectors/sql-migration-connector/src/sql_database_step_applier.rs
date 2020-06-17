@@ -206,6 +206,7 @@ fn render_raw_sql(
                 format!("DROP TABLE {};", renderer.quote_with_schema(&schema_name, &name)),
                 "PRAGMA foreign_keys=on".to_string(),
             ]),
+            SqlFamily::Mssql => todo!("Greetings from Redmond"),
         },
         SqlMigrationStep::RenameTable { name, new_name } => {
             let new_name = match sql_family {
@@ -296,6 +297,7 @@ fn render_raw_sql(
                             lines.push(format!("DROP CONSTRAINT IF EXiSTS {}", constraint_name));
                         }
                         SqlFamily::Sqlite => (),
+                        SqlFamily::Mssql => todo!("Greetings from Redmond"),
                     },
                 };
             }
@@ -323,12 +325,14 @@ fn render_raw_sql(
                 "DROP INDEX {}",
                 renderer.quote_with_schema(&schema_name, &name)
             )]),
+            SqlFamily::Mssql => todo!("Greetings from Redmond"),
         },
         SqlMigrationStep::AlterIndex(AlterIndex {
             table,
             index_name,
             index_new_name,
         }) => match sql_family {
+            SqlFamily::Mssql => todo!("Greetings from Redmond"),
             SqlFamily::Mysql => {
                 // MariaDB and MySQL 5.6 do not support `ALTER TABLE ... RENAME INDEX`.
                 if database_info.is_mariadb() || database_info.is_mysql_5_6() {
@@ -431,6 +435,7 @@ fn create_table_suffix(sql_family: SqlFamily) -> &'static str {
         SqlFamily::Sqlite => ")",
         SqlFamily::Postgres => ")",
         SqlFamily::Mysql => "\n) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci",
+        SqlFamily::Mssql => todo!("Greetings from Redmond"),
     }
 }
 

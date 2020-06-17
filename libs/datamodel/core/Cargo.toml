@@ -6,7 +6,7 @@ edition = "2018"
 
 [dependencies]
 prisma-value = { path = "../../prisma-value" }
-rust_decimal = "=1.1.0"
+rust_decimal = "1.6"
 datamodel-connector = { path = "../connectors/datamodel-connector" }
 # Temporary until PR is accepted.
 pest = { version = "2.1.0", package = 'pest_tmp' }
@@ -27,3 +27,7 @@ indoc = "0.3.5"
 pretty_assertions = "0.6.1"
 clap = "2.33"
 serial_test = "*"
+
+[features]
+default = []
+mssql = ["datamodel-connector/mssql"]

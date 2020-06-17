@@ -3,11 +3,10 @@ mod existing_data;
 use migration_connector::MigrationWarning;
 use migration_engine_tests::sql::*;
 use pretty_assertions::assert_eq;
-use prisma_value::PrismaValue;
+use prisma_value::{PrismaValue, TypeHint};
 use quaint::ast::*;
-use std::borrow::Cow;
 
-#[test_each_connector(log = "debug,sql_schema_describer=info")]
+#[test_each_connector]
 async fn dropping_a_table_with_rows_should_warn(api: &TestApi) {
     let dm = r#"
         model Test {
@@ -138,6 +137,7 @@ async fn altering_a_column_with_non_null_values_should_warn(api: &TestApi) -> Te
     "#;
 
     let migration_output = api.infer_apply(&dm2).send().await?.into_inner();
+
     // The schema should not change because the migration should not run if there are warnings
     // and the force flag isn't passed.
     api.assert_schema().await?.assert_equals(&original_database_schema)?;
@@ -158,7 +158,7 @@ async fn altering_a_column_with_non_null_values_should_warn(api: &TestApi) -> Te
     Ok(())
 }
 
-#[test_each_connector(log = "debug")]
+#[test_each_connector]
 async fn column_defaults_can_safely_be_changed(api: &TestApi) -> TestResult {
     let combinations = &[
         ("Meow", Some(PrismaValue::String("Cats".to_string())), None),
@@ -226,14 +226,17 @@ async fn column_defaults_can_safely_be_changed(api: &TestApi) -> TestResult {
                     row.get("name").map(|val| {
                         val.to_string()
                             .map(|val| PrismaValue::String(val))
-                            .unwrap_or(PrismaValue::Null)
+                            .unwrap_or(PrismaValue::Null(TypeHint::String))
                     })
                 })
                 .collect();
 
             assert_eq!(
                 &[
-                    first_default.as_ref().cloned().unwrap_or(PrismaValue::Null),
+                    first_default
+                        .as_ref()
+                        .cloned()
+                        .unwrap_or(PrismaValue::Null(TypeHint::String)),
                     PrismaValue::String("Waterworld".to_string())
                 ],
                 names.as_slice()
@@ -268,13 +271,16 @@ async fn column_defaults_can_safely_be_changed(api: &TestApi) -> TestResult {
                     row.get("name").map(|val| {
                         val.to_string()
                             .map(|val| PrismaValue::String(val))
-                            .unwrap_or(PrismaValue::Null)
+                            .unwrap_or(PrismaValue::Null(TypeHint::String))
                     })
                 })
                 .collect();
             assert_eq!(
                 &[
-                    first_default.as_ref().cloned().unwrap_or(PrismaValue::Null),
+                    first_default
+                        .as_ref()
+                        .cloned()
+                        .unwrap_or(PrismaValue::Null(TypeHint::String)),
                     PrismaValue::String("Waterworld".to_string())
                 ],
                 names.as_slice()
@@ -631,7 +637,7 @@ async fn altering_the_type_of_a_column_in_a_non_empty_table_always_warns(api: &T
     );
 
     let rows = api.select("User").column("dogs").send_debug().await?;
-    assert_eq!(rows, &[["Integer(7)"]]);
+    assert_eq!(rows, &[["Integer(Some(7))"]]);
 
     api.assert_schema().await?.assert_table("User", |table| {
         table.assert_column("dogs", |col| col.assert_type_is_int()?.assert_is_required())
@@ -661,7 +667,7 @@ async fn migrating_a_required_column_from_int_to_string_should_warn_and_cast(api
     let first_row = test.get(0).unwrap();
     assert_eq!(
         format!("{:?} {:?}", first_row.get("id"), first_row.get("serialNumber")),
-        r#"Some(Text("abcd")) Some(Integer(47))"#
+        r#"Some(Text(Some("abcd"))) Some(Integer(Some(47)))"#
     );
 
     let original_schema = api.assert_schema().await?.into_schema();
@@ -700,7 +706,7 @@ async fn migrating_a_required_column_from_int_to_string_should_warn_and_cast(api
         let first_row = test.get(0).unwrap();
         assert_eq!(
             format!("{:?} {:?}", first_row.get("id"), first_row.get("serialNumber")),
-            r#"Some(Text("abcd")) Some(Text("47"))"#
+            r#"Some(Text(Some("abcd"))) Some(Text(Some("47")))"#
         );
     }
 
@@ -734,14 +740,8 @@ async fn enum_variants_can_be_added_without_data_loss(api: &TestApi) -> TestResu
 
     {
         let cat_inserts = quaint::ast::Insert::multi_into(api.render_table_name("Cat"), vec!["id", "mood"])
-            .values((
-                Value::Text(Cow::Borrowed("felix")),
-                Value::Enum(Cow::Borrowed("HUNGRY")),
-            ))
-            .values((
-                Value::Text(Cow::Borrowed("mittens")),
-                Value::Enum(Cow::Borrowed("HAPPY")),
-            ));
+            .values((Value::text("felix"), Value::enum_variant("HUNGRY")))
+            .values((Value::text("mittens"), Value::enum_variant("HAPPY")));
 
         api.database().query(cat_inserts.into()).await?;
     }
@@ -778,13 +778,13 @@ async fn enum_variants_can_be_added_without_data_loss(api: &TestApi) -> TestResu
 
         let expected_cat_data = if api.sql_family().is_mysql() {
             vec![
-                vec![Value::Text("felix".into()), Value::Text("HUNGRY".into())],
-                vec![Value::Text("mittens".into()), Value::Text("HAPPY".into())],
+                vec![Value::text("felix"), Value::text("HUNGRY")],
+                vec![Value::text("mittens"), Value::text("HAPPY")],
             ]
         } else {
             vec![
-                vec![Value::Text("felix".into()), Value::Enum("HUNGRY".into())],
-                vec![Value::Text("mittens".into()), Value::Enum("HAPPY".into())],
+                vec![Value::text("felix"), Value::enum_variant("HUNGRY")],
+                vec![Value::text("mittens"), Value::enum_variant("HAPPY")],
             ]
         };
 
@@ -842,14 +842,8 @@ async fn enum_variants_can_be_dropped_without_data_loss(api: &TestApi) -> TestRe
 
     {
         let cat_inserts = quaint::ast::Insert::multi_into(api.render_table_name("Cat"), &["id", "mood"])
-            .values((
-                Value::Text(Cow::Borrowed("felix")),
-                Value::Enum(Cow::Borrowed("HUNGRY")),
-            ))
-            .values((
-                Value::Text(Cow::Borrowed("mittens")),
-                Value::Enum(Cow::Borrowed("HAPPY")),
-            ));
+            .values((Value::text("felix"), Value::enum_variant("HUNGRY")))
+            .values((Value::text("mittens"), Value::enum_variant("HAPPY")));
 
         api.database().query(cat_inserts.into()).await?;
     }
@@ -885,13 +879,13 @@ async fn enum_variants_can_be_dropped_without_data_loss(api: &TestApi) -> TestRe
 
         let expected_cat_data = if api.sql_family().is_mysql() {
             vec![
-                vec![Value::Text("felix".into()), Value::Text("HUNGRY".into())],
-                vec![Value::Text("mittens".into()), Value::Text("HAPPY".into())],
+                vec![Value::text("felix"), Value::text("HUNGRY")],
+                vec![Value::text("mittens"), Value::text("HAPPY")],
             ]
         } else {
             vec![
-                vec![Value::Text("felix".into()), Value::Enum("HUNGRY".into())],
-                vec![Value::Text("mittens".into()), Value::Enum("HAPPY".into())],
+                vec![Value::text("felix"), Value::enum_variant("HUNGRY")],
+                vec![Value::text("mittens"), Value::enum_variant("HAPPY")],
             ]
         };
 

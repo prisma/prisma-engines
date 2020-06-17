@@ -290,6 +290,7 @@ async fn changing_the_type_of_an_id_field_must_work(api: &TestApi) {
                 SqlFamily::Postgres => Some("A_b_id_fkey".to_owned()),
                 SqlFamily::Mysql => Some("A_ibfk_1".to_owned()),
                 SqlFamily::Sqlite => None,
+                SqlFamily::Mssql => todo!("Greetings from Redmond"),
             },
             columns: vec![column.name.clone()],
             referenced_table: "B".to_string(),
@@ -319,6 +320,7 @@ async fn changing_the_type_of_an_id_field_must_work(api: &TestApi) {
                 SqlFamily::Postgres => Some("A_b_id_fkey".to_owned()),
                 SqlFamily::Mysql => Some("A_ibfk_1".to_owned()),
                 SqlFamily::Sqlite => None,
+                SqlFamily::Mssql => todo!("Greetings from Redmond"),
             },
             columns: vec!["b_id".into()],
             referenced_table: "B".to_string(),
@@ -374,6 +376,7 @@ async fn changing_a_relation_field_to_a_scalar_field_must_work(api: &TestApi) ->
                     SqlFamily::Postgres => Some("A_b_fkey".to_owned()),
                     SqlFamily::Mysql => Some("A_ibfk_1".to_owned()),
                     SqlFamily::Sqlite => None,
+                    SqlFamily::Mssql => todo!("Greetings from Redmond"),
                 },
                 columns: vec!["b".to_owned()],
                 referenced_table: "B".to_string(),
@@ -445,6 +448,7 @@ async fn changing_a_scalar_field_to_a_relation_field_must_work(api: &TestApi) {
                 SqlFamily::Postgres => Some("A_b_fkey".to_owned()),
                 SqlFamily::Mysql => Some("A_ibfk_1".to_owned()),
                 SqlFamily::Sqlite => None,
+                SqlFamily::Mssql => todo!("Greetings from Redmond"),
             },
             columns: vec![column.name.clone()],
             referenced_table: "B".to_string(),
@@ -516,6 +520,7 @@ async fn adding_a_many_to_many_relation_with_custom_name_must_work(api: &TestApi
                     SqlFamily::Postgres => Some("_my_relation_A_fkey".to_owned()),
                     SqlFamily::Mysql => Some("_my_relation_ibfk_1".to_owned()),
                     SqlFamily::Sqlite => None,
+                    SqlFamily::Mssql => todo!("Greetings from Redmond"),
                 },
                 columns: vec![a_column.name.clone()],
                 referenced_table: "A".to_string(),
@@ -527,6 +532,7 @@ async fn adding_a_many_to_many_relation_with_custom_name_must_work(api: &TestApi
                     SqlFamily::Postgres => Some("_my_relation_B_fkey".to_owned()),
                     SqlFamily::Mysql => Some("_my_relation_ibfk_2".to_owned()),
                     SqlFamily::Sqlite => None,
+                    SqlFamily::Mssql => todo!("Greetings from Redmond"),
                 },
                 columns: vec![b_column.name.clone()],
                 referenced_table: "B".to_string(),
@@ -576,6 +582,7 @@ async fn adding_an_inline_relation_must_result_in_a_foreign_key_in_the_model_tab
                     SqlFamily::Postgres => Some("A_bid_fkey".to_owned()),
                     SqlFamily::Mysql => Some("A_ibfk_1".to_owned()),
                     SqlFamily::Sqlite => None,
+                    SqlFamily::Mssql => todo!("Greetings from Redmond"),
                 },
                 columns: vec![b_column.name.clone()],
                 referenced_table: "B".to_string(),
@@ -587,6 +594,7 @@ async fn adding_an_inline_relation_must_result_in_a_foreign_key_in_the_model_tab
                     SqlFamily::Postgres => Some("A_cid_fkey".to_owned()),
                     SqlFamily::Mysql => Some("A_ibfk_2".to_owned()),
                     SqlFamily::Sqlite => None,
+                    SqlFamily::Mssql => todo!("Greetings from Redmond"),
                 },
                 columns: vec![c_column.name.clone()],
                 referenced_table: "C".to_string(),
@@ -623,6 +631,7 @@ async fn specifying_a_db_name_for_an_inline_relation_must_work(api: &TestApi) {
                 SqlFamily::Postgres => Some("A_b_column_fkey".to_owned()),
                 SqlFamily::Mysql => Some("A_ibfk_1".to_owned()),
                 SqlFamily::Sqlite => None,
+                SqlFamily::Mssql => todo!("Greetings from Redmond"),
             },
             columns: vec![column.name.clone()],
             referenced_table: "B".to_string(),
@@ -656,6 +665,7 @@ async fn adding_an_inline_relation_to_a_model_with_an_exotic_id_type(api: &TestA
                 SqlFamily::Postgres => Some("A_b_id_fkey".to_owned()),
                 SqlFamily::Mysql => Some("A_ibfk_1".to_owned()),
                 SqlFamily::Sqlite => None,
+                SqlFamily::Mssql => todo!("Greetings from Redmond"),
             },
             columns: vec![column.name.clone()],
             referenced_table: "B".to_string(),
@@ -728,6 +738,7 @@ async fn moving_an_inline_relation_to_the_other_side_must_work(api: &TestApi) ->
                 SqlFamily::Postgres => Some("A_b_id_fkey".to_owned()),
                 SqlFamily::Sqlite => None,
                 SqlFamily::Mysql => Some("A_ibfk_1".to_owned()),
+                SqlFamily::Mssql => todo!("Greetings from Redmond"),
             },
             columns: vec!["b_id".to_string()],
             referenced_table: "B".to_string(),
@@ -756,6 +767,7 @@ async fn moving_an_inline_relation_to_the_other_side_must_work(api: &TestApi) ->
                 SqlFamily::Postgres => Some("B_a_id_fkey".to_owned()),
                 SqlFamily::Sqlite => None,
                 SqlFamily::Mysql => Some("B_ibfk_1".to_owned()),
+                SqlFamily::Mssql => todo!("Greetings from Redmond"),
             },
             columns: vec!["a_id".to_string()],
             referenced_table: "A".to_string(),
@@ -1228,6 +1240,7 @@ async fn reserved_sql_key_words_must_work(api: &TestApi) {
                 SqlFamily::Postgres => Some("Group_parent_id_fkey".to_owned()),
                 SqlFamily::Mysql => Some("Group_ibfk_1".to_owned()),
                 SqlFamily::Sqlite => None,
+                SqlFamily::Mssql => todo!("Greetings from Redmond"),
             },
             columns: vec!["parent_id".to_string()],
             referenced_table: "Group".to_string(),
@@ -1461,7 +1474,7 @@ async fn column_defaults_must_be_migrated(api: &TestApi) -> TestResult {
 
 #[test_each_connector(log = "debug,sql_schema_describer=info")]
 async fn escaped_string_defaults_are_not_arbitrarily_migrated(api: &TestApi) -> TestResult {
-    use quaint::ast::*;
+    use quaint::ast::Insert;
 
     let dm1 = r#"
         model Fruit {
@@ -1516,7 +1529,7 @@ async fn escaped_string_defaults_are_not_arbitrarily_migrated(api: &TestApi) -> 
 
 #[test_each_connector]
 async fn created_at_does_not_get_arbitrarily_migrated(api: &TestApi) -> TestResult {
-    use quaint::ast::*;
+    use quaint::ast::Insert;
 
     let dm1 = r#"
         model Fruit {
