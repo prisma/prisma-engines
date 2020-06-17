@@ -38,7 +38,12 @@ class SelectOneCompoundIdBatchSpec extends FlatSpec with Matchers with ApiSpecBa
 
   "one successful query" should "work" in {
     server
-      .batch(Array("""query {findOneArtist(where:{firstName_lastName:{firstName:"Musti",lastName:"Naukio"}}) {firstName lastName}}"""), project, legacy = false)
+      .batch(
+        Array("""query {findOneArtist(where:{firstName_lastName:{firstName:"Musti",lastName:"Naukio"}}) {firstName lastName}}"""),
+        transaction = false,
+        project,
+        legacy = false
+      )
       .toString should be(
       """[{"data":{"findOneArtist":{"firstName":"Musti","lastName":"Naukio"}}}]"""
     )
@@ -51,7 +56,7 @@ class SelectOneCompoundIdBatchSpec extends FlatSpec with Matchers with ApiSpecBa
       """query {findOneArtist(where:{firstName_lastName:{firstName:"Naukio",lastName:"Musti"}}) {firstName lastName}}""",
     )
 
-    server.batch(queries, project, legacy = false).toString should be(
+    server.batch(queries, transaction = false, project, legacy = false).toString should be(
       """[{"data":{"findOneArtist":{"firstName":"Musti","lastName":"Naukio"}}},{"data":{"findOneArtist":null}},{"data":{"findOneArtist":{"firstName":"Naukio","lastName":"Musti"}}}]"""
     )
   }
@@ -62,7 +67,7 @@ class SelectOneCompoundIdBatchSpec extends FlatSpec with Matchers with ApiSpecBa
       """query {findOneArtist(where:{firstName_lastName:{firstName:"Naukio",lastName:"Musti"}}) {lastName firstName}}""",
     )
 
-    server.batch(queries, project, legacy = false).toString should be(
+    server.batch(queries, transaction = false, project, legacy = false).toString should be(
       """[{"data":{"findOneArtist":{"firstName":"Musti","lastName":"Naukio"}}},{"data":{"findOneArtist":{"firstName":"Naukio","lastName":"Musti"}}}]"""
     )
   }
@@ -73,7 +78,7 @@ class SelectOneCompoundIdBatchSpec extends FlatSpec with Matchers with ApiSpecBa
       """query {findOneArtist(where:{firstName_lastName:{lastName:"Musti",firstName:"Naukio"}}) {firstName lastName}}""",
     )
 
-    server.batch(queries, project, legacy = false).toString should be(
+    server.batch(queries, transaction = false, project, legacy = false).toString should be(
       """[{"data":{"findOneArtist":{"firstName":"Musti","lastName":"Naukio"}}},{"data":{"findOneArtist":{"firstName":"Naukio","lastName":"Musti"}}}]"""
     )
   }
@@ -85,7 +90,7 @@ class SelectOneCompoundIdBatchSpec extends FlatSpec with Matchers with ApiSpecBa
       """query {findOneArtist(where:{firstName_lastName:{firstName:"Naukio",lastName:"Musti"}}) {firstName lastName}}""",
     )
 
-    server.batch(queries, project, legacy = false).toString should be(
+    server.batch(queries, transaction = false, project, legacy = false).toString should be(
       """[{"data":{"findOneArtist":{"firstName":"Musti","lastName":"Naukio"}}},{"data":{"findOneArtist":null}},{"data":{"findOneArtist":{"firstName":"Naukio","lastName":"Musti"}}}]"""
     )
   }
@@ -93,7 +98,10 @@ class SelectOneCompoundIdBatchSpec extends FlatSpec with Matchers with ApiSpecBa
   "one singular failing query" should "work" in {
 
     server
-      .batch(Array("""query {findOneArtist(where:{firstName_lastName:{firstName:"NO",lastName:"AVAIL"}}) {lastName}}"""), project, legacy = false)
+      .batch(Array("""query {findOneArtist(where:{firstName_lastName:{firstName:"NO",lastName:"AVAIL"}}) {lastName}}"""),
+             transaction = false,
+             project,
+             legacy = false)
       .toString should be(
       """[{"data":{"findOneArtist":null}}]"""
     )
@@ -105,7 +113,7 @@ class SelectOneCompoundIdBatchSpec extends FlatSpec with Matchers with ApiSpecBa
       """query {findOneArtist(where:{firstName_lastName:{firstName:"NO",lastName:"AVAIL"}}) {firstName lastName}}""",
     )
 
-    server.batch(queries, project, legacy = false).toString should be(
+    server.batch(queries, transaction = false, project, legacy = false).toString should be(
       """[{"data":{"findOneArtist":{"firstName":"Musti","lastName":"Naukio"}}},{"data":{"findOneArtist":null}}]"""
     )
   }

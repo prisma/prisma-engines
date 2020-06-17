@@ -50,7 +50,7 @@ class SelectOneSingularIdBatchSpec extends FlatSpec with Matchers with ApiSpecBa
   }
 
   "one successful query" should "work" in {
-    server.batch(Array("""query {findOneArtist(where:{ArtistId: 1}){Name}}"""), project, legacy = false).toString should be(
+    server.batch(Array("""query {findOneArtist(where:{ArtistId: 1}){Name}}"""), transaction = false, project, legacy = false).toString should be(
       """[{"data":{"findOneArtist":{"Name":"ArtistWithoutAlbums"}}}]"""
     )
   }
@@ -62,7 +62,7 @@ class SelectOneSingularIdBatchSpec extends FlatSpec with Matchers with ApiSpecBa
       """query {findOneArtist(where:{ArtistId: 2}){ArtistId, Name}}""",
     )
 
-    server.batch(queries, project, legacy = false).toString should be(
+    server.batch(queries, transaction = false, project, legacy = false).toString should be(
       """[{"data":{"findOneArtist":{"Name":"ArtistWithoutAlbums","ArtistId":1}}},{"data":{"findOneArtist":null}},{"data":{"findOneArtist":{"Name":"ArtistWithOneAlbumWithoutTracks","ArtistId":2}}}]"""
     )
   }
@@ -74,7 +74,7 @@ class SelectOneSingularIdBatchSpec extends FlatSpec with Matchers with ApiSpecBa
       """query {findOneArtist(where:{ArtistId: 2}){Name, ArtistId}}""",
     )
 
-    server.batch(queries, project, legacy = false).toString should be(
+    server.batch(queries, transaction = false, project, legacy = false).toString should be(
       """[{"data":{"findOneArtist":{"ArtistId":1,"Name":"ArtistWithoutAlbums"}}},{"data":{"findOneArtist":null}},{"data":{"findOneArtist":{"Name":"ArtistWithOneAlbumWithoutTracks","ArtistId":2}}}]"""
     )
   }
@@ -86,7 +86,7 @@ class SelectOneSingularIdBatchSpec extends FlatSpec with Matchers with ApiSpecBa
       """query {findOneArtist(where:{ArtistId:420}) {Albums { AlbumId, Title }}}""",
     )
 
-    server.batch(queries, project, legacy = false).toString should be(
+    server.batch(queries, transaction = false, project, legacy = false).toString should be(
       """[{"data":{"findOneArtist":{"Albums":[{"AlbumId":2,"Title":"TheAlbumWithoutTracks"}]}}},{"data":{"findOneArtist":{"Albums":[]}}},{"data":{"findOneArtist":null}}]"""
     )
   }
@@ -98,7 +98,7 @@ class SelectOneSingularIdBatchSpec extends FlatSpec with Matchers with ApiSpecBa
       """query {findOneArtist(where:{ArtistId:420}) {Albums(where:{AlbumId:2}) { AlbumId, Title }}}""",
     )
 
-    server.batch(queries, project, legacy = false).toString should be(
+    server.batch(queries, transaction = false, project, legacy = false).toString should be(
       """[{"data":{"findOneArtist":{"Albums":[{"AlbumId":2,"Title":"TheAlbumWithoutTracks"}]}}},{"data":{"findOneArtist":{"Albums":[]}}},{"data":{"findOneArtist":null}}]"""
     )
   }
@@ -110,13 +110,13 @@ class SelectOneSingularIdBatchSpec extends FlatSpec with Matchers with ApiSpecBa
       """query {findOneArtist(where:{ArtistId:420}) {Albums(where:{AlbumId:2}) { AlbumId, Title }}}""",
     )
 
-    server.batch(queries, project, legacy = false).toString should be(
+    server.batch(queries, transaction = false, project, legacy = false).toString should be(
       """[{"data":{"findOneArtist":{"Albums":[{"AlbumId":2,"Title":"TheAlbumWithoutTracks"}]}}},{"data":{"findOneArtist":{"Albums":[]}}},{"data":{"findOneArtist":null}}]"""
     )
   }
 
   "one singular failing query" should "work" in {
-    server.batch(Array("""query {findOneArtist(where:{ArtistId: 420}){Name}}"""), project, legacy = false).toString should be(
+    server.batch(Array("""query {findOneArtist(where:{ArtistId: 420}){Name}}"""), transaction = false, project, legacy = false).toString should be(
       """[{"data":{"findOneArtist":null}}]"""
     )
   }
@@ -127,7 +127,7 @@ class SelectOneSingularIdBatchSpec extends FlatSpec with Matchers with ApiSpecBa
       """query {findOneArtist(where:{ArtistId: 420}){Name}}""",
     )
 
-    server.batch(queries, project, legacy = false).toString should be(
+    server.batch(queries, transaction = false, project, legacy = false).toString should be(
       """[{"data":{"findOneArtist":{"Name":"ArtistWithoutAlbums"}}},{"data":{"findOneArtist":null}}]"""
     )
   }
@@ -138,7 +138,7 @@ class SelectOneSingularIdBatchSpec extends FlatSpec with Matchers with ApiSpecBa
       """query {findOneArtist(where:{ArtistId: 1}){Name}}""",
     )
 
-    server.batch(queries, project, legacy = false).toString should be(
+    server.batch(queries, transaction = false, project, legacy = false).toString should be(
       """[{"data":{"findOneArtist":{"Name":"ArtistWithoutAlbums"}}},{"data":{"findOneArtist":{"Name":"ArtistWithoutAlbums"}}}]"""
     )
   }
