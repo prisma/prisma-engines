@@ -8,7 +8,7 @@ use crate::{
     },
     sql_schema_differ::ColumnDiffer,
 };
-use sql_schema_describer::{DefaultValue, Table};
+use sql_schema_describer::{ColumnArity, DefaultValue, Table};
 
 impl DestructiveChangeCheckerFlavour for PostgresFlavour {
     fn check_alter_column(&self, previous_table: &Table, columns: &ColumnDiffer<'_>, plan: &mut DestructiveCheckPlan) {
@@ -25,10 +25,19 @@ impl DestructiveChangeCheckerFlavour for PostgresFlavour {
                         })
                     }
                     PostgresAlterColumn::SetType(_) => {
-                        plan.push_warning(SqlMigrationWarning::AlterColumn {
-                            table: previous_table.name.clone(),
-                            column: columns.next.name.clone(),
-                        });
+                        if !matches!(columns.previous.tpe.arity, ColumnArity::List)
+                            && matches!(columns.next.tpe.arity, ColumnArity::List)
+                        {
+                            plan.push_unexecutable(UnexecutableStepCheck::MadeScalarFieldIntoArrayField {
+                                table: previous_table.name.clone(),
+                                column: columns.previous.name.clone(),
+                            })
+                        } else {
+                            plan.push_warning(SqlMigrationWarning::AlterColumn {
+                                table: previous_table.name.clone(),
+                                column: columns.previous.name.clone(),
+                            });
+                        }
                     }
                     PostgresAlterColumn::SetDefault(_)
                     | PostgresAlterColumn::DropDefault
@@ -38,6 +47,7 @@ impl DestructiveChangeCheckerFlavour for PostgresFlavour {
         } else {
             // Unexecutable drop and recreate.
             if columns.all_changes().arity_changed()
+                && columns.previous.tpe.arity.is_nullable()
                 && columns.next.tpe.arity.is_required()
                 && !default_can_be_rendered(columns.next.default.as_ref())
             {

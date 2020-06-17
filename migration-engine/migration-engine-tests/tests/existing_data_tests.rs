@@ -1005,12 +1005,132 @@ async fn set_default_current_timestamp_on_existing_column_works(api: &TestApi) -
     Ok(())
 }
 
-#[test_each_connector(capabilities("scalar_lists"))]
-async fn changing_an_array_column_to_scalar_must_warn(_api: &TestApi) -> TestResult {
-    todo!()
+#[test_each_connector(capabilities("scalar_lists"), log = "debug,sql_schema_describer=info")]
+async fn changing_an_array_column_to_scalar_must_warn(api: &TestApi) -> TestResult {
+    let datasource_block = api.datasource();
+
+    let dm1 = format!(
+        r#"
+        {datasource_block}
+
+        model Film {{
+            id String @id
+            mainProtagonist String[]
+        }}
+        "#,
+        datasource_block = datasource_block,
+    );
+
+    api.infer_apply(&dm1).send().await?.assert_green()?;
+
+    api.insert("Film")
+        .value("id", "film1")
+        .value(
+            "mainProtagonist",
+            Value::Array(Some(vec!["giant shark".into(), "jason statham".into()])),
+        )
+        // .value("mainProtagonist", Value::array(vec!["giant shark", "jason statham"]))
+        .result_raw()
+        .await?;
+
+    let dm2 = format!(
+        r#"
+            {datasource_block}
+
+            model Film {{
+                id String @id
+                mainProtagonist String
+            }}
+            "#,
+        datasource_block = datasource_block,
+    );
+
+    api.infer_apply(&dm2)
+        .force(Some(true))
+        .send()
+        .await?
+        .assert_executable()?
+        .assert_no_error()?
+        .assert_warnings(&["You are about to alter the column `mainProtagonist` on the `Film` table, which still contains 1 non-null values. The data in that column will be lost.".into()])?;
+
+    api.assert_schema().await?.assert_table("Film", |table| {
+        table.assert_column("mainProtagonist", |column| column.assert_is_required())
+    })?;
+
+    let rows = api.select("Film").column("id").column("mainProtagonist").send().await?;
+
+    let rows: Vec<Vec<Value>> = rows
+        .into_iter()
+        .map(|row| row.into_iter().collect::<Vec<_>>())
+        .collect();
+
+    assert_eq!(
+        rows,
+        &[&["film1".into(), "{\"giant shark\",\"jason statham\"}".into()]] // the array got cast ot a string by postgres
+    );
+
+    Ok(())
 }
 
 #[test_each_connector(capabilities("scalar_lists"))]
-async fn changing_a_scalar_column_to_an_array_must_warn(_api: &TestApi) -> TestResult {
-    todo!()
+async fn changing_a_scalar_column_to_an_array_is_unexecutable(api: &TestApi) -> TestResult {
+    let datasource_block = api.datasource();
+
+    let dm1 = format!(
+        r#"
+        {datasource_block}
+
+        model Film {{
+            id String @id
+            mainProtagonist String
+        }}
+        "#,
+        datasource_block = datasource_block,
+    );
+
+    api.infer_apply(&dm1).send().await?.assert_green()?;
+
+    api.insert("Film")
+        .value("id", "film1")
+        .value("mainProtagonist", "left shark")
+        // .value("mainProtagonist", Value::array(vec!["giant shark", "jason statham"]))
+        .result_raw()
+        .await?;
+
+    let dm2 = format!(
+        r#"
+            {datasource_block}
+
+            model Film {{
+                id String @id
+                mainProtagonist String[]
+            }}
+            "#,
+        datasource_block = datasource_block,
+    );
+
+    api.infer_apply(&dm2)
+        .send()
+        .await?
+        .assert_unexecutable(&[
+            "Changed the column `mainProtagonist` on the `Film` table from a scalar field to a list field. There are 1 existing non-null values in that column, this migration step cannot be executed.".into(),
+        ])?
+        // TEMPORARY, until the CLI displays unexecutable migrations.
+        .assert_warnings(&["Changed the column `mainProtagonist` on the `Film` table from a scalar field to a list field. There are 1 existing non-null values in that column, this migration step cannot be executed.".into()])?
+        .assert_no_error()?;
+
+    api.assert_schema().await?.assert_table("Film", |table| {
+        table.assert_column("mainProtagonist", |column| column.assert_is_required())
+    })?;
+
+    let rows = api.select("Film").column("id").column("mainProtagonist").send().await?;
+
+    let rows: Vec<Vec<Value>> = rows
+        .into_iter()
+        .map(|row| row.into_iter().collect::<Vec<_>>())
+        .collect();
+
+    assert_eq!(rows, &[&["film1".into(), Value::text("left shark")]]);
+
+    Ok(())
 }

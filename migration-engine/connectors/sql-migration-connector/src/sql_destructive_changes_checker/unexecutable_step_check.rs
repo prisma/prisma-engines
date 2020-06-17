@@ -4,6 +4,7 @@ use super::{check::Check, database_inspection_results::DatabaseInspectionResults
 pub(crate) enum UnexecutableStepCheck {
     AddedRequiredFieldToTable { table: String, column: String },
     MadeOptionalFieldRequired { table: String, column: String },
+    MadeScalarFieldIntoArrayField { table: String, column: String },
     // TODO:
     // AddedUnimplementableUniqueConstraint {
     //     table: String,
@@ -23,13 +24,15 @@ impl Check for UnexecutableStepCheck {
     fn needed_table_row_count(&self) -> Option<&str> {
         match self {
             UnexecutableStepCheck::MadeOptionalFieldRequired { table, column: _ }
+            | UnexecutableStepCheck::MadeScalarFieldIntoArrayField { table, column: _ }
             | UnexecutableStepCheck::AddedRequiredFieldToTable { table, column: _ } => Some(table),
         }
     }
 
     fn needed_column_value_count(&self) -> Option<(&str, &str)> {
         match self {
-            UnexecutableStepCheck::MadeOptionalFieldRequired { table, column } => Some((table, column)),
+            UnexecutableStepCheck::MadeOptionalFieldRequired { table, column }
+            | UnexecutableStepCheck::MadeScalarFieldIntoArrayField { table, column } => Some((table, column)),
             UnexecutableStepCheck::AddedRequiredFieldToTable { .. } => None,
         }
     }
@@ -48,14 +51,11 @@ impl Check for UnexecutableStepCheck {
 
                 let message = match database_checks.get_row_count(table) {
                     Some(0) => return None, // Adding a required column is possible if there is no data
-                    Some(row_count) => {
-                        message(format_args!(
-                            "There are {row_count} rows in this table, it is not possible to execute this migration.",
-                            row_count = row_count
-                        ))
-                    }
-                    None => message(format_args!("This is not possible if the table is not empty."))
-
+                    Some(row_count) => message(format_args!(
+                        "There are {row_count} rows in this table, it is not possible to execute this migration.",
+                        row_count = row_count
+                    )),
+                    None => message(format_args!("This is not possible if the table is not empty.")),
                 };
 
                 Some(message)
@@ -82,6 +82,21 @@ impl Check for UnexecutableStepCheck {
                         column = column,
                         table = table
                     )),
+                }
+            }
+            UnexecutableStepCheck::MadeScalarFieldIntoArrayField { table, column } => {
+                let message = |details| format!("Changed the column `{column}` on the `{table}` table from a scalar field to a list field. {details}", column = column, table = table, details = details);
+
+                match dbg!(database_checks.get_row_and_non_null_value_count(table, column)) {
+                    (Some(0), _) => return None,
+                    (_, Some(0)) => return None,
+                    (_, Some(value_count)) => Some(message(format_args!(
+                        "There are {} existing non-null values in that column, this migration step cannot be executed.", value_count
+                    ))),
+                    (_, _) => Some(message(format_args!(
+                        "If there are non-null values in that column, this migration step will fail."
+                    )))
+
                 }
             }
             // TODO
