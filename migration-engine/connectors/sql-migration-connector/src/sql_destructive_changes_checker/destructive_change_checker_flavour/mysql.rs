@@ -28,7 +28,6 @@ impl DestructiveChangeCheckerFlavour for MysqlFlavour {
                         table: previous_table.name.clone(),
                     });
                 } else {
-                    // Executable drop and recreate.
                     plan.push_warning(SqlMigrationWarning::AlterColumn {
                         table: previous_table.name.clone(),
                         column: columns.next.name.clone(),
