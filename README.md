@@ -61,3 +61,7 @@ value. They'll be logged at the `INFO` level and are visible when having a
 logger in scope. If using [Tracing](https://github.com/tokio-rs/tracing),
 compiling Quaint with the `tracing-log` feature flag will parameterize the
 logged queries into a more suitable format for Tracing.
+
+## Security
+
+If you have a security issue to report, please contact us at [security@prisma.io](mailto:security@prisma.io?subject=[GitHub]%20Prisma%202%20Security%20Report%20Quaint)
