@@ -69,7 +69,7 @@ class TransactionalBatchSpec extends FlatSpec with Matchers with ApiSpecBase {
     """, project, legacy = false)
 
     val queries = Seq(
-      """mutation { createOneModelB(data: { id: 1, a: { create: { id: 1 } } }) { id }}""", // ModelB gets created before ModelB because of inlining
+      """mutation { createOneModelB(data: { id: 1, a: { create: { id: 1 } } }) { id }}""", // ModelB gets created before ModelA because of inlining
     )
 
     server.batch(queries, transaction = false, project, legacy = false).toString should startWith(
