@@ -41,8 +41,8 @@ class TransactionalBatchSpec extends FlatSpec with Matchers with ApiSpecBase {
       """mutation { createOneModelA(data: { id: 1 }) { id }}""",
     )
 
-    server.batch(queries, transaction = true, project, legacy = false).toString should be(
-      """{"errors":[{"error":"Error occurred during query execution:\nConnectorError(ConnectorError { user_facing_error: Some(KnownError { message: \"Unique constraint failed on the fields: (`id`)\", meta: Object({\"target\": Array([String(\"id\")])}), error_code: \"P2002\" }), kind: UniqueConstraintViolation { constraint: Fields([\"id\"]) } })","user_facing_error":{"is_panic":false,"message":"Unique constraint failed on the fields: (`id`)","meta":{"target":["id"]},"error_code":"P2002"}}]}"""
+    server.batch(queries, transaction = true, project, legacy = false).toString should startWith(
+      """{"errors":[{"error":"Error occurred during query execution:\nConnectorError(ConnectorError { user_facing_error: Some(KnownError { message: \"Unique constraint failed"""
     )
 
     val result = server.query("""
@@ -72,8 +72,8 @@ class TransactionalBatchSpec extends FlatSpec with Matchers with ApiSpecBase {
       """mutation { createOneModelB(data: { id: 1, a: { create: { id: 1 } } }) { id }}""", // ModelB gets created before ModelB because of inlining
     )
 
-    server.batch(queries, transaction = false, project, legacy = false).toString should be(
-      """[{"errors":[{"error":"Error occurred during query execution:\nConnectorError(ConnectorError { user_facing_error: Some(KnownError { message: \"Unique constraint failed on the fields: (`id`)\", meta: Object({\"target\": Array([String(\"id\")])}), error_code: \"P2002\" }), kind: UniqueConstraintViolation { constraint: Fields([\"id\"]) } })","user_facing_error":{"is_panic":false,"message":"Unique constraint failed on the fields: (`id`)","meta":{"target":["id"]},"error_code":"P2002"}}]}]"""
+    server.batch(queries, transaction = false, project, legacy = false).toString should startWith(
+      """[{"errors":[{"error":"Error occurred during query execution:\nConnectorError(ConnectorError { user_facing_error: Some(KnownError { message: \"Unique constraint failed"""
     )
 
     val result = server.query("""
