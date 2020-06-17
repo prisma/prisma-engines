@@ -1,7 +1,7 @@
 use crate::SqlError;
 use datamodel::{
-    Datamodel, DefaultValue as DMLDef, Field, FieldArity, FieldType, IndexDefinition, Model, OnDeleteStrategy,
-    RelationInfo, ScalarType, ValueGenerator as VG,
+    Datamodel, DefaultNames, DefaultValue as DMLDef, Field, FieldArity, FieldType, IndexDefinition, Model,
+    OnDeleteStrategy, RelationInfo, ScalarType, ValueGenerator as VG,
 };
 use sql_schema_describer::{
     Column, ColumnArity, ColumnTypeFamily, DefaultValue as SQLDef, ForeignKey, Index, IndexType, SqlSchema, Table,
@@ -316,20 +316,10 @@ pub(crate) fn calculate_relation_name(schema: &SqlSchema, fk: &ForeignKey, table
                 .filter(|fk| fk.referenced_table == model_with_fk.clone())
                 .collect();
 
-            //unambiguous
-            let name = if fk_to_same_model.len() < 2 && fk_from_other_model_to_this.len() == 0 {
-                if model_with_fk < referenced_model {
-                    format!("{}To{}", model_with_fk, referenced_model)
-                } else {
-                    format!("{}To{}", referenced_model, model_with_fk)
-                }
+            let name = if fk_to_same_model.len() < 2 && fk_from_other_model_to_this.is_empty() {
+                DefaultNames::name_for_unambiguous_relation(model_with_fk, referenced_model)
             } else {
-                //ambiguous
-                if model_with_fk < referenced_model {
-                    format!("{}_{}To{}", model_with_fk, fk_column_name, referenced_model)
-                } else {
-                    format!("{}To{}_{}", referenced_model, model_with_fk, fk_column_name)
-                }
+                DefaultNames::name_for_ambiguous_relation(model_with_fk, referenced_model, &fk_column_name)
             };
 
             Ok(name)

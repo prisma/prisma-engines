@@ -56,8 +56,12 @@ impl DirectiveValidator<dml::Field> for RelationDirectiveValidator {
 
             let mut all_related_ids = related_model.id_field_names();
 
+            dbg!("PRINTING");
+            dbg!(&relation_info);
+            dbg!(&parent_model.name);
             if !relation_info.name.is_empty()
-                && (relation_info.name != DefaultNames::relation_name(&relation_info.to, &parent_model.name)
+                && (relation_info.name
+                    != DefaultNames::name_for_unambiguous_relation(&relation_info.to, &parent_model.name)
                     || parent_model.name == related_model.name)
             {
                 args.push(ast::Argument::new_string("", &relation_info.name));
