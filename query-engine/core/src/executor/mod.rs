@@ -10,13 +10,13 @@ mod pipeline;
 
 pub use interpreting_executor::*;
 
-use crate::{query_document::Operation, response_ir::Responses, schema::QuerySchemaRef};
+use crate::{query_document::Operation, response_ir::ResponseData, schema::QuerySchemaRef};
 use async_trait::async_trait;
 
 #[async_trait]
 pub trait QueryExecutor {
     /// Executes a single operation and returns its result.
-    async fn execute(&self, operation: Operation, query_schema: QuerySchemaRef) -> crate::Result<Responses>;
+    async fn execute(&self, operation: Operation, query_schema: QuerySchemaRef) -> crate::Result<ResponseData>;
 
     // Executes a batch of operations as either a fanout of individual operations (non-transactional), or in series (transactional).
     async fn execute_batch(
@@ -24,7 +24,7 @@ pub trait QueryExecutor {
         operations: Vec<Operation>,
         transactional: bool,
         query_schema: QuerySchemaRef,
-    ) -> crate::Result<Vec<Responses>>;
+    ) -> crate::Result<Vec<crate::Result<ResponseData>>>;
 
     fn primary_connector(&self) -> &'static str;
 }

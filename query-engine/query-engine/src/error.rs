@@ -2,7 +2,7 @@ use connector::error::ConnectorError;
 use datamodel::error::ErrorCollection;
 use failure::{Error, Fail};
 use graphql_parser::query::ParseError as GqlParseError;
-use query_core::{response_ir, CoreError};
+use query_core::CoreError;
 use serde_json;
 
 #[derive(Debug, Fail)]
@@ -85,16 +85,6 @@ impl From<CoreError> for PrismaError {
 impl From<ErrorCollection> for PrismaError {
     fn from(e: ErrorCollection) -> Self {
         PrismaError::DatamodelError(e)
-    }
-}
-
-/// Helps to handle gracefully handle errors as a response.
-impl From<PrismaError> for response_ir::ResponseError {
-    fn from(other: PrismaError) -> Self {
-        match other {
-            PrismaError::CoreError(core_error) => response_ir::ResponseError::from(core_error),
-            err => response_ir::ResponseError::from(user_facing_errors::Error::from_dyn_error(&err.compat())),
-        }
     }
 }
 

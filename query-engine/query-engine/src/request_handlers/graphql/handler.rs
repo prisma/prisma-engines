@@ -1,11 +1,11 @@
-use super::protocol_adapter::GraphQLProtocolAdapter;
+use super::{protocol_adapter::GraphQLProtocolAdapter, GQLResponse};
 use crate::{context::PrismaContext, PrismaError, PrismaRequest, PrismaResponse, PrismaResult, RequestHandler};
 use async_trait::async_trait;
 use futures::{future, FutureExt};
 use graphql_parser as gql;
 use indexmap::IndexMap;
 use query_core::{
-    response_ir, BatchDocument, CompactedDocument, CoreError, Item, Operation, QueryDocument, QueryValue, Responses,
+    BatchDocument, CompactedDocument, CoreError, Item, Operation, QueryDocument, QueryValue, ResponseData,
 };
 use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, convert::TryFrom, panic::AssertUnwindSafe, sync::Arc};
@@ -99,7 +99,7 @@ impl RequestHandler for GraphQlRequestHandler {
                 BatchDocument::Compact(compacted) => handle_compacted(compacted, ctx).await,
             },
             Err(err) => {
-                let mut responses = response_ir::Responses::default();
+                let mut responses = GQLResponse::default();
                 responses.insert_error(err);
 
                 PrismaResponse::Single(responses)
@@ -111,43 +111,56 @@ impl RequestHandler for GraphQlRequestHandler {
 async fn handle_single_query(query: Operation, ctx: Arc<PrismaContext>) -> PrismaResponse {
     use user_facing_errors::Error;
 
-    let responses = match AssertUnwindSafe(handle_graphql_query(query, &*ctx))
+    let gql_response = match AssertUnwindSafe(handle_graphql_query(query, &*ctx))
         .catch_unwind()
         .await
     {
-        Ok(Ok(responses)) => responses,
-        Ok(Err(err)) => {
-            let mut responses = response_ir::Responses::default();
-            responses.insert_error(err);
-            responses
-        }
-        // panicked
+        Ok(Ok(responses)) => responses.into(),
+        Ok(Err(err)) => err.into(),
         Err(err) => {
-            let mut responses = response_ir::Responses::default();
+            // panicked
             let error = Error::from_panic_payload(&err);
-
-            responses.insert_error(error);
-            responses
+            error.into()
         }
     };
 
-    PrismaResponse::Single(responses)
+    PrismaResponse::Single(gql_response)
 }
 
 async fn handle_batch(queries: Vec<Operation>, transactional: bool, ctx: &Arc<PrismaContext>) -> PrismaResponse {
-    let mut futures = Vec::with_capacity(queries.len());
+    // let mut futures = Vec::with_capacity(queries.len());
 
-    for operation in queries.into_iter() {
-        futures.push(tokio::spawn(handle_single_query(operation, ctx.clone())));
-    }
+    // let responses = match AssertUnwindSafe(
+    //     ctx.executor
+    //         .execute_batch(queries, transactional, ctx.query_schema().clone())
+    //         .await
+    //         .map_err(|err| {
+    //             debug!("{}", err);
+    //             let ce: CoreError = err.into();
+    //             ce.into()
+    //         }),
+    // )
+    // .catch_unwind()
+    // .await
+    // {
+    //     Ok(Ok(responses)) => responses,
+    //     Ok(Err(err)) => {
+    //         let mut responses = response_ir::Responses::default();
+    //         responses.insert_error(err);
+    //         responses
+    //     }
+    //     // panicked
+    //     Err(err) => {
+    //         let mut responses = response_ir::Responses::default();
+    //         let error = Error::from_panic_payload(&err);
 
-    let responses = future::join_all(futures)
-        .await
-        .into_iter()
-        .map(|res| res.expect("IO Error in tokio::spawn"))
-        .collect();
+    //         responses.insert_error(error);
+    //         responses
+    //     }
+    // };
 
-    PrismaResponse::Multi(responses)
+    // PrismaResponse::Multi(responses)
+    todo!()
 }
 
 async fn handle_compacted(document: CompactedDocument, ctx: &Arc<PrismaContext>) -> PrismaResponse {
@@ -163,9 +176,11 @@ async fn handle_compacted(document: CompactedDocument, ctx: &Arc<PrismaContext>)
         .catch_unwind()
         .await
     {
-        Ok(Ok(mut responses)) => {
+        Ok(Ok(response_data)) => {
+            let mut gql_response: GQLResponse = response_data.into();
+
             // We find the response data and make a hash from the given unique keys.
-            let data = responses
+            let data = gql_response
                 .take_data(plural_name)
                 .unwrap()
                 .into_list()
@@ -176,7 +191,7 @@ async fn handle_compacted(document: CompactedDocument, ctx: &Arc<PrismaContext>)
                 .into_iter()
                 .map(|args| {
                     let vals: Vec<QueryValue> = args.into_iter().map(|(_, v)| v).collect();
-                    let mut responses = Responses::with_capacity(1);
+                    let mut responses = GQLResponse::with_capacity(1);
 
                     // Copying here is mandatory due to some of the queries
                     // might be repeated with the same arguments in the original
@@ -204,29 +219,17 @@ async fn handle_compacted(document: CompactedDocument, ctx: &Arc<PrismaContext>)
 
             PrismaResponse::Multi(results)
         }
-        Ok(Err(err)) => {
-            let mut responses = response_ir::Responses::default();
-            responses.insert_error(err);
-            PrismaResponse::Single(responses)
-        }
+
+        Ok(Err(err)) => PrismaResponse::Single(err.into()),
+
         // panicked
         Err(err) => {
-            let mut responses = response_ir::Responses::default();
             let error = Error::from_panic_payload(&err);
-
-            responses.insert_error(error);
-            PrismaResponse::Single(responses)
+            PrismaResponse::Single(error.into())
         }
     }
 }
 
-async fn handle_graphql_query(query_doc: Operation, ctx: &PrismaContext) -> PrismaResult<response_ir::Responses> {
-    ctx.executor
-        .execute(query_doc, Arc::clone(ctx.query_schema()))
-        .await
-        .map_err(|err| {
-            debug!("{}", err);
-            let ce: CoreError = err.into();
-            ce.into()
-        })
+async fn handle_graphql_query(query_doc: Operation, ctx: &PrismaContext) -> PrismaResult<ResponseData> {
+    Ok(ctx.executor.execute(query_doc, Arc::clone(ctx.query_schema())).await?)
 }

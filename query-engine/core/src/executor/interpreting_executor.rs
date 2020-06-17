@@ -1,7 +1,8 @@
 use super::{pipeline::QueryPipeline, QueryExecutor};
-use crate::{Operation, QueryGraphBuilder, QueryInterpreter, QuerySchemaRef, Response, Responses};
+use crate::{Operation, QueryGraphBuilder, QueryInterpreter, QuerySchemaRef, ResponseData};
 use async_trait::async_trait;
 use connector::{ConnectionLike, Connector};
+use futures::{future, FutureExt};
 
 /// Central query executor and main entry point into the query core.
 pub struct InterpretingExecutor<C> {
@@ -35,36 +36,65 @@ impl<C> QueryExecutor for InterpretingExecutor<C>
 where
     C: Connector + Send + Sync,
 {
-    // Q: Transactional for a batch can mean 2 things:
-    // - Abort if one op fails, but all can be done in parallel.
-    // - Abort if one op fails, all operations are done in sequence. < This is the common understanding. Validate with product.
     async fn execute_batch(
         &self,
         operations: Vec<Operation>,
         transactional: bool,
         query_schema: QuerySchemaRef,
-    ) -> crate::Result<Vec<Responses>> {
-        if transactional {
-            todo!()
-        } else {
-            todo!()
-        }
+    ) -> crate::Result<Vec<crate::Result<ResponseData>>> {
+        // if transactional {
+        //     let queries = operations
+        //         .into_iter()
+        //         .map(|op| QueryGraphBuilder::new(query_schema.clone()).build(op))
+        //         .collect::<std::result::Result<Vec<_>, _>>()?;
+
+        //     let conn = self.connector.get_connection().await?;
+        //     let tx = conn.start_transaction().await?;
+        //     let mut results = Vec::with_capacity(queries.len());
+
+        //     for (query, info) in queries {
+        //         let interpreter = QueryInterpreter::new(ConnectionLike::Transaction(tx.as_ref()));
+        //         let result = QueryPipeline::new(query, interpreter, info).execute().await;
+
+        //         if !result.is_ok() {
+        //             tx.rollback().await?;
+        //         }
+
+        //         results.push(result?.into());
+        //     }
+
+        //     Ok(results)
+        // } else {
+        //     let mut futures = Vec::with_capacity(operations.len());
+
+        //     for operation in operations {
+        //         futures.push(tokio::spawn(Self::execute(self, operation, query_schema.clone())));
+        //     }
+
+        //     // let responses = future::join_all(futures)
+        //     //     .await
+        //     //     .into_iter()
+        //     //     .map(|res| res.expect("IO Error in tokio::spawn"))
+        //     //     .collect();
+
+        //     // Ok(responses.into_iter().map(|r: Response| r.into()).collect())
+        //     todo!()
+        // }
+
+        todo!()
     }
 
-    async fn execute(&self, operation: Operation, query_schema: QuerySchemaRef) -> crate::Result<Responses> {
+    async fn execute(&self, operation: Operation, query_schema: QuerySchemaRef) -> crate::Result<ResponseData> {
         let conn = self.connector.get_connection().await?;
 
         // Parse, validate, and extract query graph from query document.
-        let (query, info) = QueryGraphBuilder::new(query_schema).build(operation)?;
-
-        let mut responses = Responses::with_capacity(1);
+        let (query, serializer) = QueryGraphBuilder::new(query_schema).build(operation)?;
         let needs_transaction = self.force_transactions || query.needs_transaction();
 
-        let result = if needs_transaction {
+        if needs_transaction {
             let tx = conn.start_transaction().await?;
-
             let interpreter = QueryInterpreter::new(ConnectionLike::Transaction(tx.as_ref()));
-            let result = QueryPipeline::new(query, interpreter, info).execute().await;
+            let result = QueryPipeline::new(query, interpreter, serializer).execute().await;
 
             if result.is_ok() {
                 tx.commit().await?;
@@ -72,18 +102,11 @@ where
                 tx.rollback().await?;
             }
 
-            result?
+            result
         } else {
             let interpreter = QueryInterpreter::new(ConnectionLike::Connection(conn.as_ref()));
-            QueryPipeline::new(query, interpreter, info).execute().await?
-        };
-
-        match result {
-            Response::Data(key, item) => responses.insert_data(key, item),
-            Response::Error(error) => responses.insert_error(error),
+            QueryPipeline::new(query, interpreter, serializer).execute().await
         }
-
-        Ok(responses)
     }
 
     fn primary_connector(&self) -> &'static str {
