@@ -15,10 +15,26 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec
     // do not create warnings for virtual relation field names
 
     //todo What about references to changed names??? @map and @@map
-    // models       -> relations
-    // fields       -> relations, indexes, id, unique
-    // enums        -> fields
+    // models       -> relationfield types, relation names, relationfield names
+    // fields       -> relations (to and from fields), indexes, id, unique
+    // enums        -> field types
     // enum values  -> default values
+    // -
+    // Order                                    Status          Tested
+    // modelnames                               -> done         yes
+    // scalar field names                       -> done         yes
+    // scalar index                             -> done         yes
+    // scalar unique                            -> done         yes
+    // scalar id                                -> done         yes
+    // Relationinfo.to                          -> done         yes
+    // Relationinfo.fields
+    // Relationinfo.to_fields
+    // Relationinfo.name
+    // relation field names                     -> done?
+    // enum names                               -> done
+    // enum types on scalar fields              -> done
+    // enum values
+    // enum values in defaults
 
     println!("{:#?}", old_data_model);
     println!("{:#?}", new_data_model);
@@ -43,11 +59,6 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec
         let model = new_data_model.find_model_mut(&change.0.model).unwrap();
         model.name = change.1.clone();
         model.database_name = Some(change.0.model.clone());
-    }
-
-    if !changed_model_names.is_empty() {
-        let models = changed_model_names.iter().map(|c| c.0.clone()).collect();
-        warnings.push(warning_enriched_with_map_on_model(&models));
     }
 
     // @map on fields
@@ -76,9 +87,63 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec
         field.database_name = Some(change.0.field.clone());
     }
 
+    for change in &changed_scalar_field_names {
+        let model = new_data_model.find_model_mut(&change.0.model).unwrap();
+
+        replace_field_names(&mut model.id_fields, &change.0.field, &change.1);
+        for index in &mut model.indices {
+            replace_field_names(&mut index.fields, &change.0.field, &change.1);
+        }
+    }
+
     if !changed_scalar_field_names.is_empty() {
         let models_and_fields = changed_scalar_field_names.iter().map(|c| c.0.clone()).collect();
         warnings.push(warning_enriched_with_map_on_field(&models_and_fields));
+    }
+
+    for change in &changed_model_names {
+        let fields_to_be_changed = new_data_model.find_relation_fields_for_model(&change.0.model);
+
+        for change2 in fields_to_be_changed {
+            let field = new_data_model.find_field_mut(&change2.0, &change2.1).unwrap();
+
+            if let FieldType::Relation(info) = &mut field.field_type {
+                info.to = change.1.clone();
+            }
+        }
+    }
+
+    // update relation names
+    // (model, field) -> new Relationname
+    for change in &changed_model_names {
+        let fields_to_be_changed = new_data_model.find_relation_fields_for_model(&change.0.model);
+
+        for change2 in fields_to_be_changed {
+            let model = new_data_model.find_model(&change2.0);
+            let field = new_data_model.find_field(&(change2.0, change2.1)).unwrap();
+
+            if let FieldType::Relation(info) = &field.field_type {
+                let other_model = new_data_model.find_model(&info.to).unwrap();
+                //todo I also need the other relationfield and then need to determine which side holds the FK (has non-empty to fields)
+
+                //         // todo adjust relation name, fieldname just be adjusted later by the virtual fieldnames pass
+                //         // we have logic to suppress the output of the relationname when it matches the expected default relationname
+                //         // otherwise re-introspected models will have their relation names changed
+                //         // if you @map a modelname used in a relation that logic needs to take the original name into account not the current name
+            }
+        }
+    }
+
+    //Then with all this information adjust the relation name
+    // let name = if fk_to_same_model.len() < 2 && fk_from_other_model_to_this.is_empty() {
+    //     DefaultNames::name_for_unambiguous_relation(model_with_fk, referenced_model)
+    // } else {
+    //     DefaultNames::name_for_ambiguous_relation(model_with_fk, referenced_model, &fk_column_name)
+    // };
+
+    if !changed_model_names.is_empty() {
+        let models = changed_model_names.iter().map(|c| c.0.clone()).collect();
+        warnings.push(warning_enriched_with_map_on_model(&models));
     }
 
     //todo
@@ -86,8 +151,6 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec
     let mut changed_enum_names = vec![];
     for enm in &new_data_model.enums {
         if let Some(old_enum) = old_data_model.find_enum_db_name(&enm.name) {
-            println!("{:?}", enm);
-            println!("{:?}", old_enum);
             if new_data_model.find_enum(&old_enum.name).is_none() {
                 changed_enum_names.push((Enum { enm: enm.name.clone() }, old_enum.name.clone()))
             }
@@ -150,7 +213,18 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec
     // potential error: what if there was a db default before and then it got removed, now re-introspection makes it virtual
     // you could not get rid of it
 
-    println!("{:?}", new_data_model);
+    println!("{:#?}", new_data_model);
 
     warnings
+}
+
+fn replace_field_names(target: &mut Vec<String>, old_name: &str, new_name: &str) {
+    target
+        .iter_mut()
+        .map(|v| {
+            if v == old_name {
+                *v = new_name.to_string()
+            }
+        })
+        .count();
 }

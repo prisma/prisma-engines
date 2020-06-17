@@ -3,12 +3,6 @@ use crate::{custom_assert, test_each_connector, TestApi};
 use barrel::types;
 use test_harness::*;
 
-//todo What about references to changed names??? @map and @@map
-// models       -> relations
-// fields       -> relations, indexes, id, unique
-// enums        -> fields
-// enum values  -> default values
-
 #[test_each_connector(tags("postgres"))]
 async fn re_introspecting_mapped_model_name(api: &TestApi) {
     let barrel = api.barrel();
@@ -18,6 +12,11 @@ async fn re_introspecting_mapped_model_name(api: &TestApi) {
                 t.add_column("id", types::primary());
             });
 
+            migration.create_table("Post", |t| {
+                t.add_column("id", types::primary());
+                t.add_column("user_id", types::foreign("User", "id").nullable(false).unique(true));
+            });
+
             migration.create_table("Unrelated", |t| {
                 t.add_column("id", types::primary());
             });
@@ -25,20 +24,34 @@ async fn re_introspecting_mapped_model_name(api: &TestApi) {
         .await;
 
     let input_dm = r#"
+            model Post {
+               id               Int @id @default(autoincrement())
+               user_id          Int
+               Custom_User      Custom_User @relation(fields: [user_id], references: [id])
+            }
+            
             model Custom_User {
                id               Int @id @default(autoincrement())
+               Post             Post[]
                
                @@map(name: "User")
             }
         "#;
 
     let final_dm = r#"
+            model Post {
+               id               Int @id @default(autoincrement())
+               user_id          Int
+               Custom_User      Custom_User @relation(fields: [user_id], references: [id])
+            }            
+            
             model Unrelated {
                id               Int @id @default(autoincrement())
             }
             
             model Custom_User {
                id               Int @id @default(autoincrement())
+               Post             Post[]
                
                @@map(name: "User")
             }
@@ -56,7 +69,13 @@ async fn re_introspecting_mapped_field_name(api: &TestApi) {
     let _setup_schema = barrel
         .execute(|migration| {
             migration.create_table("User", |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id_1", types::integer());
+                t.add_column("id_2", types::integer());
+                t.add_column("index", types::integer());
+                t.add_column("unique_1", types::integer());
+                t.add_column("unique_2", types::integer());
+                t.inject_custom("Unique( \"unique_1\", \"unique_2\")");
+                t.inject_custom("CONSTRAINT \"id\" PRIMARY KEY( \"id_1\", \"id_2\")");
             });
 
             migration.create_table("Unrelated", |t| {
@@ -65,9 +84,25 @@ async fn re_introspecting_mapped_field_name(api: &TestApi) {
         })
         .await;
 
+    api.database()
+        .execute_raw(
+            &format!("CREATE INDEX test2 ON \"{}\".\"User\" (\"index\");", api.schema_name()),
+            &[],
+        )
+        .await
+        .unwrap();
+
     let input_dm = r#"
-            model User {
-               custom_id               Int @id @default(autoincrement()) @map("id")
+            model User { 
+                c_id_1      Int     @map("id_1")
+                id_2        Int
+                c_index     Int     @map("index")
+                c_unique_1  Int     @map("unique_1") 
+                unique_2    Int
+                    
+                @@id([c_id_1, id_2])
+                @@index([c_index], name: "test2")
+                @@unique([c_unique_1, unique_2], name: "User_unique_1_unique_2_key")
             }
         "#;
 
@@ -76,15 +111,23 @@ async fn re_introspecting_mapped_field_name(api: &TestApi) {
                id               Int @id @default(autoincrement())
             }
             
-            model User {
-               custom_id               Int @id @default(autoincrement()) @map("id")
+            model User { 
+                c_id_1      Int     @map("id_1")
+                id_2        Int
+                c_index     Int     @map("index")
+                c_unique_1  Int     @map("unique_1") 
+                unique_2    Int
+                    
+                @@id([c_id_1, id_2])
+                @@index([c_index], name: "test2")
+                @@unique([c_unique_1, unique_2], name: "User_unique_1_unique_2_key")
             }
         "#;
     let result = dbg!(api.re_introspect(input_dm).await);
     custom_assert(&result, final_dm);
 
     let warnings = api.re_introspect_warnings(input_dm).await;
-    assert_eq!(&warnings, "[{\"code\":8,\"message\":\"These fields were enriched with @map information taken from the previous Prisma schema.\",\"affected\":[{\"model\":\"User\",\"field\":\"id\"}]}]");
+    assert_eq!(&warnings, "[{\"code\":8,\"message\":\"These fields were enriched with @map information taken from the previous Prisma schema.\",\"affected\":[{\"model\":\"User\",\"field\":\"id_1\"},{\"model\":\"User\",\"field\":\"index\"},{\"model\":\"User\",\"field\":\"unique_1\"}]}]");
 }
 
 #[test_each_connector(tags("postgres"))]
