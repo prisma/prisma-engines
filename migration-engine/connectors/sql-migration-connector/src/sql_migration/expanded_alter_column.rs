@@ -37,10 +37,20 @@ pub(crate) fn expand_mysql_alter_column(columns: &ColumnDiffer<'_>) -> MysqlAlte
         unreachable!("MySQL column renaming.")
     }
 
+    // @default(dbgenerated()) does not give us the information in the prisma schema, so we have to
+    // transfer it from the introspected current state of the database.
+    let new_default = match (&columns.previous.default, &columns.next.default) {
+        (Some(DefaultValue::DBGENERATED(previous)), Some(DefaultValue::DBGENERATED(next)))
+            if next.is_empty() && !previous.is_empty() =>
+        {
+            Some(DefaultValue::DBGENERATED(previous.clone()))
+        }
+        _ => columns.next.default.clone(),
+    };
+
     MysqlAlterColumn::Modify {
         changes: column_changes,
-        column_type: columns.next.tpe.clone(),
-        default: columns.next.default.clone(),
+        new_default,
     }
 }
 
@@ -97,8 +107,7 @@ pub(crate) enum PostgresAlterColumn {
 pub(crate) enum MysqlAlterColumn {
     DropDefault,
     Modify {
-        column_type: ColumnType,
-        default: Option<DefaultValue>,
+        new_default: Option<DefaultValue>,
         changes: ColumnChanges,
     },
 }

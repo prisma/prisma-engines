@@ -425,30 +425,3 @@ async fn removing_a_default_from_a_non_nullable_foreign_key_column_must_warn(api
 
     Ok(())
 }
-
-#[test_each_connector(tags("mysql"))]
-async fn migrating_a_dbgenerated_default_should_warn(api: &TestApi) -> TestResult {
-    let dm1 = r#"
-        model User {
-            id Int @id
-            dogs String @default(dbgenerated())
-        }
-    "#;
-
-    api.infer_apply(dm1).send().await?.assert_green()?;
-
-    let dm2 = r#"
-        model User {
-            id Int @id
-            dogs String? @default(dbgenerated())
-        }
-    "#;
-
-    api.infer_apply(dm2)
-        .send()
-        .await?
-        .assert_executable()?
-        .assert_warnings(&["heh".into()])?;
-
-    Ok(())
-}

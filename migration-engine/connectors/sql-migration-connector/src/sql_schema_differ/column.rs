@@ -76,7 +76,6 @@ impl<'a> ColumnDiffer<'a> {
 
         match (&self.previous.default, &self.next.default) {
             (Some(DefaultValue::VALUE(prev)), Some(DefaultValue::VALUE(next))) => prev == next,
-            (Some(DefaultValue::VALUE(_)), Some(DefaultValue::DBGENERATED(_))) => true,
             (Some(DefaultValue::VALUE(_)), Some(DefaultValue::SEQUENCE(_))) => true,
             (Some(DefaultValue::VALUE(_)), Some(DefaultValue::NOW)) => false,
             (Some(DefaultValue::VALUE(_)), None) => false,
