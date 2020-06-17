@@ -16,29 +16,53 @@ impl<'a> GetRow for SqliteRow<'a> {
             let pv = match self.get_raw(i) {
                 ValueRef::Null => match column.decl_type() {
                     Some("INT")
+                    | Some("int")
                     | Some("INTEGER")
+                    | Some("integer")
                     | Some("SERIAL")
+                    | Some("serial")
                     | Some("TINYINT")
+                    | Some("tinyint")
                     | Some("SMALLINT")
+                    | Some("smallint")
                     | Some("MEDIUMINT")
+                    | Some("mediumint")
                     | Some("BIGINT")
+                    | Some("bigint")
                     | Some("UNSIGNED BIG INT")
+                    | Some("unsigned big int")
                     | Some("INT2")
-                    | Some("INT8") => Value::Integer(None),
+                    | Some("int2")
+                    | Some("INT8")
+                    | Some("int8") => Value::Integer(None),
                     Some("TEXT") | Some("CLOB") => Value::Text(None),
+                    Some("text") | Some("clob") => Value::Text(None),
                     Some(n) if n.starts_with("CHARACTER") => Value::Text(None),
+                    Some(n) if n.starts_with("character") => Value::Text(None),
                     Some(n) if n.starts_with("VARCHAR") => Value::Text(None),
+                    Some(n) if n.starts_with("varchar") => Value::Text(None),
                     Some(n) if n.starts_with("VARYING CHARACTER") => Value::Text(None),
+                    Some(n) if n.starts_with("varying character") => Value::Text(None),
                     Some(n) if n.starts_with("NCHAR") => Value::Text(None),
+                    Some(n) if n.starts_with("nchar") => Value::Text(None),
                     Some(n) if n.starts_with("NATIVE CHARACTER") => Value::Text(None),
+                    Some(n) if n.starts_with("native character") => Value::Text(None),
                     Some(n) if n.starts_with("NVARCHAR") => Value::Text(None),
+                    Some(n) if n.starts_with("nvarchar") => Value::Text(None),
                     Some(n) if n.starts_with("DECIMAL") => Value::Real(None),
+                    Some(n) if n.starts_with("decimal") => Value::Real(None),
                     Some("BLOB") => Value::Bytes(None),
+                    Some("blob") => Value::Bytes(None),
                     Some("NUMERIC") | Some("REAL") | Some("DOUBLE") | Some("DOUBLE PRECISION") | Some("FLOAT") => {
                         Value::Real(None)
                     }
+                    Some("numeric") | Some("real") | Some("double") | Some("double precision") | Some("float") => {
+                        Value::Real(None)
+                    }
                     Some("DATE") | Some("DATETIME") => Value::DateTime(None),
+                    Some("date") | Some("datetime") => Value::DateTime(None),
                     Some("BOOLEAN") => Value::Boolean(None),
+                    Some("boolean") => Value::Boolean(None),
                     Some(n) => panic!("Value {} not supported", n),
                     None => Value::Integer(None),
                 },
