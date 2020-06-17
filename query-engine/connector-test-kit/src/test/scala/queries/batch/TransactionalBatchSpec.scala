@@ -24,10 +24,6 @@ class TransactionalBatchSpec extends FlatSpec with Matchers with ApiSpecBase {
     database.setup(project)
   }
 
-  // Two queries, both suceeding, no problem
-  // Two queries, second one failing, no data in DB
-  // Single query in batch, no transaction, must be transactional in itself (nested creation fails because already exists)
-
   "A transactional batch of successful queries" should "work" in {
     val queries = Seq(
       """mutation { createOneModelA(data: { id: 1 }) { id }}""",
