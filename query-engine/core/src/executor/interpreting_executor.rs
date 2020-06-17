@@ -56,10 +56,6 @@ where
     }
 }
 
-// We have to distinguish between per-query needs and per-batch needs for transaction.
-// If a batch is not transactional:
-// - individual writes still need to run in a per-write transaction basis.
-// - We fan out the queries to as many connections as possible
 #[async_trait]
 impl<C> QueryExecutor for InterpretingExecutor<C>
 where
