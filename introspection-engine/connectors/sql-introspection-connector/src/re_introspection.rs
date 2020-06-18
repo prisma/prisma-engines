@@ -8,6 +8,7 @@ use introspection_connector::Warning;
 pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec<Warning> {
     // Notes
     // Relationnames are similar to virtual relationfields, they can be changed arbitrarily
+    // investigate dmmf / schema / datamodel / internal datamodel and manual @map changes???
 
     //todo think about cases where this would not error but could be wrong:
     // what if introspection already had to apply @maps and the user manually changed them?
@@ -120,7 +121,15 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec
         }
 
         // change RelationInfo.to_fields
-        // on every model, if it point to this model, replace in its to_fields
+        for change in &changed_scalar_field_names {
+            let fields_to_be_changed = new_data_model.find_relation_fields_for_model(&change.0.model);
+            for f in fields_to_be_changed {
+                let field = new_data_model.find_field_mut(&f.0, &f.1).unwrap();
+                if let FieldType::Relation(info) = &mut field.field_type {
+                    replace_field_names(&mut info.to_fields, &change.0.field, &change.1);
+                }
+            }
+        }
     }
 
     // update relation names (needs all fields and models to already be updated)

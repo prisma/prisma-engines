@@ -14,7 +14,7 @@ async fn re_introspecting_mapped_model_and_field_name(api: &TestApi) {
 
             migration.create_table("Post", |t| {
                 t.add_column("id", types::primary());
-                t.add_column("user_id", types::foreign("User", "id").nullable(false).unique(true));
+                t.add_column("user_id", types::foreign("User", "id").nullable(false));
             });
 
             migration.create_table("Unrelated", |t| {
@@ -25,13 +25,13 @@ async fn re_introspecting_mapped_model_and_field_name(api: &TestApi) {
 
     let input_dm = r#"
             model Post {
-               id               Int @id @default(autoincrement())
-               c_user_id          Int @map("user_id")
+               id               Int         @id @default(autoincrement())
+               c_user_id        Int         @map("user_id")
                Custom_User      Custom_User @relation(fields: [c_user_id], references: [c_id])
             }
             
             model Custom_User {
-               c_id               Int @id @default(autoincrement()) @map("id")
+               c_id             Int         @id @default(autoincrement()) @map("id")
                Post             Post[]
                
                @@map(name: "User")
@@ -40,17 +40,17 @@ async fn re_introspecting_mapped_model_and_field_name(api: &TestApi) {
 
     let final_dm = r#"
             model Post {
-               id               Int @id @default(autoincrement())
-               c_user_id          Int @map("user_id")
+               id               Int         @id @default(autoincrement())
+               c_user_id        Int         @map("user_id")
                Custom_User      Custom_User @relation(fields: [c_user_id], references: [c_id])
             }    
             
             model Unrelated {
-               id               Int @id @default(autoincrement())
+               id               Int         @id @default(autoincrement())
             }
             
             model Custom_User {
-               c_id               Int @id @default(autoincrement()) @map("id")
+               c_id             Int         @id @default(autoincrement()) @map("id")
                Post             Post[]
                
                @@map(name: "User")
