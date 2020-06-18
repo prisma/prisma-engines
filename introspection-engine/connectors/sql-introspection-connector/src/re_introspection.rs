@@ -2,7 +2,7 @@ use crate::warnings::{
     warning_enriched_with_map_on_enum, warning_enriched_with_map_on_field, warning_enriched_with_map_on_model, Enum,
     Model, ModelAndField,
 };
-use datamodel::{Datamodel, FieldType};
+use datamodel::{Datamodel, DefaultNames, Field, FieldType, RelationInfo};
 use introspection_connector::Warning;
 
 pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec<Warning> {
@@ -27,9 +27,9 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec
     // scalar id                                -> done         yes
     // Relationinfo.to                          -> done         yes
     // Relationinfo.fields                      -> done         yes
-    // Relationinfo.to_fields
-    // Relationinfo.name
-    // relation field names                     -> done?
+    // Relationinfo.to_fields                   -> done         yes
+    // Relationinfo.name                        -> done         yes
+    // relation field names                     -> done         yes
     // enum names                               -> done         yes
     // enum types on scalar fields              -> done         yes
     // enum values
@@ -133,34 +133,91 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec
     }
 
     // update relation names (needs all fields and models to already be updated)
+    // this only updates relation names where the name of a model changed.
+    // the change of a field name would here not be reflected yet, but these would have been rendered already
     {
+        let mut relation_fields_to_change = vec![];
         for change in &changed_model_names {
-            let fields_to_be_changed = new_data_model.find_relation_fields_for_model(&change.0.model);
+            let changed_model = new_data_model.find_model(&change.1).unwrap();
+            let relation_fields_on_this_model = changed_model
+                .fields()
+                .filter(|f| f.is_relation())
+                .collect::<Vec<&Field>>();
 
-            // (model, field) -> new Relationname
-            for change2 in fields_to_be_changed {
-                let model = new_data_model.find_model(&change2.0);
-                let field = new_data_model.find_field(&(change2.0, change2.1)).unwrap();
+            for rf in &relation_fields_on_this_model {
+                if let FieldType::Relation(info) = &rf.field_type {
+                    let other_model_in_relation = new_data_model.find_model(&info.to).unwrap();
+                    let number_of_relations_to_other_model_in_relation = &relation_fields_on_this_model
+                        .iter()
+                        .filter(|f| match &f.field_type {
+                            FieldType::Relation(other_info) if other_info.to == info.to => true,
+                            _ => false,
+                        })
+                        .count();
 
-                if let FieldType::Relation(info) = &field.field_type {
-                    let other_model = new_data_model.find_model(&info.to).unwrap();
-                    //todo I also need the other relationfield and then need to determine which side holds the FK (has non-empty to fields)
+                    let (other_relation_field, other_info) = other_model_in_relation
+                        .fields()
+                        .find_map(|f| {
+                            match &f.field_type {
+                                FieldType::Relation(other_info)
+                                    if other_info.name == info.name
+                                        && other_info.to == changed_model.name
+                                        // This is to differentiate the opposite field from self in the self relation case.
+                                        && other_info.to_fields != info.to_fields
+                                        && other_info.fields != info.fields =>
+                                {
+                                    Some((f.name.clone(), other_info))
+                                }
+                                _ => None,
+                            }
+                        })
+                        .unwrap();
 
-                    //         // todo adjust relation name, fieldname just be adjusted later by the virtual fieldnames pass
-                    //         // we have logic to suppress the output of the relationname when it matches the expected default relationname
-                    //         // otherwise re-introspected models will have their relation names changed
-                    //         // if you @map a modelname used in a relation that logic needs to take the original name into account not the current name
+                    let (model_with_fk, referenced_model, fk_column_name) = if info.to_fields.is_empty() {
+                        // does not hold the fk
+                        (
+                            &other_model_in_relation.name,
+                            &changed_model.name,
+                            other_info.fields.join("_"),
+                        )
+                    } else {
+                        // holds the fk
+                        (
+                            &changed_model.name,
+                            &other_model_in_relation.name,
+                            info.fields.join("_"),
+                        )
+                    };
+
+                    let unambiguous = number_of_relations_to_other_model_in_relation < &2;
+                    let relation_name = if unambiguous {
+                        DefaultNames::name_for_unambiguous_relation(model_with_fk, referenced_model)
+                    } else {
+                        DefaultNames::name_for_ambiguous_relation(model_with_fk, referenced_model, &fk_column_name)
+                    };
+
+                    relation_fields_to_change.push((
+                        changed_model.name.clone(),
+                        rf.name.clone(),
+                        relation_name.clone(),
+                    ));
+                    relation_fields_to_change.push((
+                        other_model_in_relation.name.clone(),
+                        other_relation_field,
+                        relation_name.clone(),
+                    ));
                 }
             }
         }
-    }
 
-    //Then with all this information adjust the relation name
-    // let name = if fk_to_same_model.len() < 2 && fk_from_other_model_to_this.is_empty() {
-    //     DefaultNames::name_for_unambiguous_relation(model_with_fk, referenced_model)
-    // } else {
-    //     DefaultNames::name_for_ambiguous_relation(model_with_fk, referenced_model, &fk_column_name)
-    // };
+        // change usages in @@id, @@index, @@unique and on RelationInfo.fields
+        for change in &relation_fields_to_change {
+            let field = new_data_model.find_field_mut(&change.0, &change.1).unwrap();
+            if let FieldType::Relation(info) = &mut field.field_type {
+                info.name = change.2.clone();
+            }
+        }
+    }
 
     // @@map on enums
     let mut changed_enum_names = vec![];

@@ -60,7 +60,7 @@ async fn re_introspecting_mapped_model_and_field_name(api: &TestApi) {
     custom_assert(&result, final_dm);
     let warnings = api.re_introspect_warnings(input_dm).await;
 
-    assert_eq!(&warnings, "[{\"code\":7,\"message\":\"These models were enriched with @@map information taken from the previous Prisma schema.\",\"affected\":[{\"model\":\"User\"}]}]");
+    assert_eq!(&warnings, "[{\"code\":7,\"message\":\"These models were enriched with @@map information taken from the previous Prisma schema.\",\"affected\":[{\"model\":\"User\"}]},{\"code\":8,\"message\":\"These fields were enriched with @map information taken from the previous Prisma schema.\",\"affected\":[{\"model\":\"Post\",\"field\":\"user_id\"},{\"model\":\"Custom_User\",\"field\":\"id\"}]}]");
 }
 
 #[test_each_connector(tags("postgres"))]
