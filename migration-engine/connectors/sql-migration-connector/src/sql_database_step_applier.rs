@@ -2,7 +2,7 @@ use crate::*;
 use sql_renderer::{postgres_render_column_type, rendered_step::RenderedStep, IteratorJoin, Quoted, SqlRenderer};
 use sql_schema_describer::*;
 use sql_schema_differ::DiffingOptions;
-use sql_schema_helpers::{walk_columns, ColumnRef};
+use sql_schema_helpers::{find_column, walk_columns, ColumnRef};
 use std::fmt::Write as _;
 use tracing_futures::Instrument;
 
@@ -266,9 +266,10 @@ fn render_raw_sql(
                         match safe_alter_column(
                             renderer,
                             current_schema.get_table(&table.name).unwrap().column(&name).unwrap(),
-                            &column,
+                            &find_column(next_schema, &table.name, &column.name)
+                                .expect("Invariant violation: could not find column referred to in AlterColumn."),
                             &DiffingOptions::from_database_info(database_info),
-                        ) {
+                        )? {
                             Some(safe_sql) => {
                                 for line in safe_sql {
                                     lines.push(line)
@@ -442,31 +443,32 @@ fn create_table_suffix(sql_family: SqlFamily) -> &'static str {
 fn safe_alter_column(
     renderer: &dyn SqlRenderer,
     previous_column: &Column,
-    next_column: &Column,
+    next_column: &ColumnRef<'_>,
     diffing_options: &DiffingOptions,
-) -> Option<Vec<String>> {
+) -> anyhow::Result<Option<Vec<String>>> {
     use crate::sql_migration::expanded_alter_column::*;
 
     let expanded = crate::sql_migration::expanded_alter_column::expand_alter_column(
         previous_column,
-        next_column,
+        next_column.column,
         &renderer.sql_family(),
         diffing_options,
-    )?;
+    );
 
     let alter_column_prefix = format!("ALTER COLUMN {}", renderer.quote(&previous_column.name));
 
     let steps = match expanded {
-        ExpandedAlterColumn::Postgres(steps) => steps
+        Some(ExpandedAlterColumn::Postgres(steps)) => steps
             .into_iter()
             .map(|step| match step {
                 PostgresAlterColumn::DropDefault => format!("{} DROP DEFAULT", &alter_column_prefix),
                 PostgresAlterColumn::SetDefault(new_default) => format!(
                     "{} SET DEFAULT {}",
                     &alter_column_prefix,
-                    renderer.render_default(&new_default, &next_column.tpe.family)
+                    renderer.render_default(&new_default, &next_column.column.tpe.family)
                 ),
                 PostgresAlterColumn::DropNotNull => format!("{} DROP NOT NULL", &alter_column_prefix),
+                PostgresAlterColumn::SetNotNull => format!("{} SET NOT NULL", &alter_column_prefix),
                 PostgresAlterColumn::SetType(ty) => format!(
                     "{} SET DATA TYPE {}",
                     &alter_column_prefix,
@@ -474,21 +476,48 @@ fn safe_alter_column(
                 ),
             })
             .collect(),
-        ExpandedAlterColumn::Mysql(steps) => steps
-            .into_iter()
-            .map(|step| match step {
-                MysqlAlterColumn::DropDefault => format!("{} DROP DEFAULT", &alter_column_prefix),
-                MysqlAlterColumn::SetDefault(new_default) => format!(
-                    "{} SET DEFAULT {}",
-                    &alter_column_prefix,
-                    renderer.render_default(&new_default, &next_column.tpe.family)
-                ),
-            })
-            .collect(),
-        ExpandedAlterColumn::Sqlite(_steps) => vec![],
+        Some(ExpandedAlterColumn::Mysql(step)) => match step {
+            MysqlAlterColumn::DropDefault => vec![format!("{} DROP DEFAULT", &alter_column_prefix)],
+            MysqlAlterColumn::Modify { new_default, changes } => {
+                let column_type: Option<String> = if changes.type_changed() {
+                    Some(next_column.column.tpe.full_data_type.clone())
+                        .filter(|r| !r.is_empty() || r.contains("datetime")) // @default(now()) does not work with datetimes of certain sizes
+                } else {
+                    Some(next_column.column.tpe.full_data_type.clone()).filter(|r| !r.is_empty())
+                    // Some(previous_column.tpe.full_data_type.clone()).filter(|r| !r.is_empty())
+                };
+
+                let column_type = column_type
+                    .map(Ok)
+                    .unwrap_or_else(|| sql_renderer::mysql_render_column_type(next_column).map(String::from))?;
+
+                let default = new_default
+                    .map(|default| {
+                        format!(
+                            "DEFAULT {}",
+                            renderer.render_default(&default, &next_column.column_type().family)
+                        )
+                    })
+                    .unwrap_or_else(String::new);
+
+                vec![format!(
+                    "MODIFY {column_name} {column_type} {nullability} {default}",
+                    column_name = Quoted::mysql_ident(&next_column.name()),
+                    column_type = column_type,
+                    nullability = if next_column.column.tpe.arity.is_required() {
+                        "NOT NULL "
+                    } else {
+                        ""
+                    },
+                    default = default,
+                )]
+            }
+        },
+        Some(ExpandedAlterColumn::Sqlite(_steps)) => vec![],
+        None => return Ok(None),
     };
 
-    Some(steps)
+    Ok(Some(steps))
 }
 
 fn render_create_enum(

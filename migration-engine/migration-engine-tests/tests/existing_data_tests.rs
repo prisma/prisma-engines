@@ -5,6 +5,7 @@ use migration_engine_tests::sql::*;
 use pretty_assertions::assert_eq;
 use prisma_value::{PrismaValue, TypeHint};
 use quaint::ast::*;
+use sql_schema_describer::DefaultValue;
 
 #[test_each_connector]
 async fn dropping_a_table_with_rows_should_warn(api: &TestApi) {
@@ -368,8 +369,8 @@ async fn changing_a_column_from_required_to_optional_should_work(api: &TestApi) 
     Ok(())
 }
 
-#[test_each_connector]
-async fn changing_a_column_from_optional_to_required_must_warn(api: &TestApi) -> TestResult {
+#[test_each_connector(ignore("sqlite"))]
+async fn changing_a_column_from_optional_to_required_is_unexecutable(api: &TestApi) -> TestResult {
     let dm = r#"
         model Test {
             id String @id @default(cuid())
@@ -382,7 +383,8 @@ async fn changing_a_column_from_optional_to_required_must_warn(api: &TestApi) ->
 
     let insert = Insert::multi_into((api.schema_name(), "Test"), &["id", "age"])
         .values(("a", 12))
-        .values(("b", 22));
+        .values(("b", 22))
+        .values(("c", Value::Integer(None)));
 
     api.database().query(insert.into()).await.unwrap();
 
@@ -393,32 +395,85 @@ async fn changing_a_column_from_optional_to_required_must_warn(api: &TestApi) ->
         }
     "#;
 
-    let migration_output = api.infer_apply(&dm2).send().await?.into_inner();
+    api.infer_apply(&dm2)
+        .send()
+        .await?
+        .assert_warnings(&[
+            // This only warns temporarily: it is not executable.
+            "Made the column `age` on table `Test` required, but there are 1 existing NULL values.".into(),
+        ])?
+        .assert_unexecutable(&[
+            "Made the column `age` on table `Test` required, but there are 1 existing NULL values.".into(),
+        ])?
+        .assert_no_error()?;
 
     // The schema should not change because the migration should not run if there are warnings
     // and the force flag isn't passed.
     api.assert_schema().await?.assert_equals(&original_database_schema)?;
 
-    assert_eq!(
-        migration_output.warnings,
-        &[MigrationWarning {
-            description:
-                "You are about to alter the column `age` on the `Test` table, which still contains 2 non-null values. \
-                 The data in that column will be lost."
-                    .to_owned()
-        }]
-    );
+    // Check that no data was lost.
+    {
+        let data = api.dump_table("Test").await?;
+        assert_eq!(data.len(), 3);
+        let ages: Vec<Option<i64>> = data.into_iter().map(|row| row.get("age").unwrap().as_i64()).collect();
+
+        assert_eq!(ages, &[Some(12), Some(22), None]);
+    }
+
+    Ok(())
+}
+
+#[test_each_connector(tags("sqlite"))]
+async fn changing_a_column_from_optional_to_required_must_warn(api: &TestApi) -> TestResult {
+    let dm = r#"
+        model Test {
+            id String @id @default(cuid())
+            age Int?
+        }
+    "#;
+
+    api.infer_apply(&dm).send().await?.assert_green()?;
+
+    let insert = Insert::multi_into((api.schema_name(), "Test"), &["id", "age"])
+        .values(("a", 12))
+        .values(("b", 22))
+        .values(("c", Value::Integer(None)));
+
+    api.database().query(insert.into()).await.unwrap();
+
+    let dm2 = r#"
+        model Test {
+            id String @id @default(cuid())
+            age Int @default(30)
+        }
+    "#;
+
+    // TODO: this should not warn, since this specific migration is safe.
+    api.infer_apply(&dm2)
+        .force(Some(true))
+        .send()
+        .await?
+        .assert_executable()?
+        .assert_no_error()?
+        .assert_warnings(&["You are about to alter the column `age` on the `Test` table, which still contains 2 non-null values. The data in that column will be lost.".into()])?;
+
+    api.assert_schema().await?.assert_table("Test", |table| {
+        table.assert_column("age", |column| {
+            column
+                .assert_default(Some(DefaultValue::VALUE(PrismaValue::Int(30))))?
+                .assert_is_required()
+        })
+    })?;
 
     // Check that no data was lost.
     {
         let data = api.dump_table("Test").await?;
-        assert_eq!(data.len(), 2);
-        let ages: Vec<i64> = data
-            .into_iter()
-            .map(|row| row.get("age").unwrap().as_i64().unwrap())
-            .collect();
+        assert_eq!(data.len(), 3);
+        let ages: Vec<Option<i64>> = data.into_iter().map(|row| row.get("age").unwrap().as_i64()).collect();
 
-        assert_eq!(ages, &[12, 22]);
+        // TODO: this is NOT what users would expect (it's a consequence of the stepped migration
+        // process), we should have a more specific warning for this.
+        assert_eq!(ages, &[Some(12), Some(22), Some(30)]);
     }
 
     Ok(())
@@ -907,6 +962,175 @@ async fn enum_variants_can_be_dropped_without_data_loss(api: &TestApi) -> TestRe
                 .assert_enum("Mood", |enm| enm.assert_values(&["HAPPY", "HUNGRY"]))?;
         };
     }
+
+    Ok(())
+}
+
+#[test_each_connector(log = "debug,sql_schema_describer=info")]
+async fn set_default_current_timestamp_on_existing_column_works(api: &TestApi) -> TestResult {
+    let dm1 = r#"
+        model User {
+            id Int @id
+            created_at DateTime
+        }
+    "#;
+
+    api.infer_apply(dm1).send().await?.assert_green()?;
+
+    let conn = api.database();
+    let insert = Insert::single_into(api.render_table_name("User")).value("id", 5).value(
+        "created_at",
+        Value::DateTime(Some("2020-06-15T14:50:00Z".parse().unwrap())),
+    );
+    conn.execute(insert.into()).await?;
+
+    let dm2 = r#"
+        model User {
+            id Int @id
+            created_at DateTime @default(now())
+        }
+    "#;
+
+    api.infer_apply(dm2)
+        .force(Some(true))
+        .send()
+        .await?
+        .assert_executable()?
+        .assert_warnings(&[])?;
+
+    api.assert_schema().await?.assert_table("User", |table| {
+        table.assert_column("created_at", |column| column.assert_default(Some(DefaultValue::NOW)))
+    })?;
+
+    Ok(())
+}
+
+#[test_each_connector(capabilities("scalar_lists"), log = "debug,sql_schema_describer=info")]
+async fn changing_an_array_column_to_scalar_must_warn(api: &TestApi) -> TestResult {
+    let datasource_block = api.datasource();
+
+    let dm1 = format!(
+        r#"
+        {datasource_block}
+
+        model Film {{
+            id String @id
+            mainProtagonist String[]
+        }}
+        "#,
+        datasource_block = datasource_block,
+    );
+
+    api.infer_apply(&dm1).send().await?.assert_green()?;
+
+    api.insert("Film")
+        .value("id", "film1")
+        .value(
+            "mainProtagonist",
+            Value::Array(Some(vec!["giant shark".into(), "jason statham".into()])),
+        )
+        // .value("mainProtagonist", Value::array(vec!["giant shark", "jason statham"]))
+        .result_raw()
+        .await?;
+
+    let dm2 = format!(
+        r#"
+            {datasource_block}
+
+            model Film {{
+                id String @id
+                mainProtagonist String
+            }}
+            "#,
+        datasource_block = datasource_block,
+    );
+
+    api.infer_apply(&dm2)
+        .force(Some(true))
+        .send()
+        .await?
+        .assert_executable()?
+        .assert_no_error()?
+        .assert_warnings(&["You are about to alter the column `mainProtagonist` on the `Film` table, which still contains 1 non-null values. The data in that column will be lost.".into()])?;
+
+    api.assert_schema().await?.assert_table("Film", |table| {
+        table.assert_column("mainProtagonist", |column| column.assert_is_required())
+    })?;
+
+    let rows = api.select("Film").column("id").column("mainProtagonist").send().await?;
+
+    let rows: Vec<Vec<Value>> = rows
+        .into_iter()
+        .map(|row| row.into_iter().collect::<Vec<_>>())
+        .collect();
+
+    assert_eq!(
+        rows,
+        &[&["film1".into(), "{\"giant shark\",\"jason statham\"}".into()]] // the array got cast ot a string by postgres
+    );
+
+    Ok(())
+}
+
+#[test_each_connector(capabilities("scalar_lists"))]
+async fn changing_a_scalar_column_to_an_array_is_unexecutable(api: &TestApi) -> TestResult {
+    let datasource_block = api.datasource();
+
+    let dm1 = format!(
+        r#"
+        {datasource_block}
+
+        model Film {{
+            id String @id
+            mainProtagonist String
+        }}
+        "#,
+        datasource_block = datasource_block,
+    );
+
+    api.infer_apply(&dm1).send().await?.assert_green()?;
+
+    api.insert("Film")
+        .value("id", "film1")
+        .value("mainProtagonist", "left shark")
+        // .value("mainProtagonist", Value::array(vec!["giant shark", "jason statham"]))
+        .result_raw()
+        .await?;
+
+    let dm2 = format!(
+        r#"
+            {datasource_block}
+
+            model Film {{
+                id String @id
+                mainProtagonist String[]
+            }}
+            "#,
+        datasource_block = datasource_block,
+    );
+
+    api.infer_apply(&dm2)
+        .send()
+        .await?
+        .assert_unexecutable(&[
+            "Changed the column `mainProtagonist` on the `Film` table from a scalar field to a list field. There are 1 existing non-null values in that column, this migration step cannot be executed.".into(),
+        ])?
+        // TEMPORARY, until the CLI displays unexecutable migrations.
+        .assert_warnings(&["Changed the column `mainProtagonist` on the `Film` table from a scalar field to a list field. There are 1 existing non-null values in that column, this migration step cannot be executed.".into()])?
+        .assert_no_error()?;
+
+    api.assert_schema().await?.assert_table("Film", |table| {
+        table.assert_column("mainProtagonist", |column| column.assert_is_required())
+    })?;
+
+    let rows = api.select("Film").column("id").column("mainProtagonist").send().await?;
+
+    let rows: Vec<Vec<Value>> = rows
+        .into_iter()
+        .map(|row| row.into_iter().collect::<Vec<_>>())
+        .collect();
+
+    assert_eq!(rows, &[&["film1".into(), Value::text("left shark")]]);
 
     Ok(())
 }

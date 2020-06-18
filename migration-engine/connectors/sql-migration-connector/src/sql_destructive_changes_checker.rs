@@ -114,8 +114,6 @@ impl SqlDestructiveChangesChecker<'_> {
 
         self.flavour().check_alter_column(previous_table, &differ, plan);
 
-        self.check_for_column_arity_change(&previous_table.name, &differ, plan);
-
         if previous_table.is_part_of_foreign_key(&alter_column.column.name)
             && alter_column.column.default.is_none()
             && previous_column.default.is_some()
@@ -125,27 +123,6 @@ impl SqlDestructiveChangesChecker<'_> {
                 column: alter_column.name.clone(),
             });
         }
-    }
-
-    fn check_for_column_arity_change(
-        &self,
-        table_name: &str,
-        differ: &crate::sql_schema_differ::ColumnDiffer<'_>,
-        plan: &mut DestructiveCheckPlan,
-    ) {
-        if !differ.all_changes().arity_changed()
-            || !differ.next.tpe.arity.is_required()
-            || differ.next.default.is_some()
-        {
-            return;
-        }
-
-        let typed_unexecutable = unexecutable_step_check::UnexecutableStepCheck::MadeOptionalFieldRequired {
-            table: table_name.to_owned(),
-            column: differ.previous.name.clone(),
-        };
-
-        plan.push_unexecutable(typed_unexecutable);
     }
 
     #[tracing::instrument(skip(self, steps, before), target = "SqlDestructiveChangeChecker::check")]

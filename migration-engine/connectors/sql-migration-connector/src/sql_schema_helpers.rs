@@ -9,6 +9,20 @@ pub(crate) fn walk_columns<'a>(schema: &'a SqlSchema) -> impl Iterator<Item = Co
     })
 }
 
+pub(crate) fn find_column<'a>(schema: &'a SqlSchema, table_name: &str, column_name: &str) -> Option<ColumnRef<'a>> {
+    schema
+        .tables
+        .iter()
+        .find(move |table| table.name == table_name)
+        .and_then(move |table| {
+            table
+                .columns
+                .iter()
+                .find(|column| column.name == column_name)
+                .map(|column| ColumnRef { schema, table, column })
+        })
+}
+
 pub(crate) struct ColumnRef<'a> {
     pub(crate) schema: &'a SqlSchema,
     pub(crate) column: &'a Column,
