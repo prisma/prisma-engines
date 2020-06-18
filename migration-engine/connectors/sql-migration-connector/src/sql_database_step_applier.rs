@@ -478,25 +478,40 @@ fn safe_alter_column(
             .collect(),
         Some(ExpandedAlterColumn::Mysql(step)) => match step {
             MysqlAlterColumn::DropDefault => vec![format!("{} DROP DEFAULT", &alter_column_prefix)],
-            MysqlAlterColumn::Modify { new_default, .. } => vec![format!(
-                "MODIFY {column_name} {column_type} {nullability} {default}",
-                column_name = Quoted::mysql_ident(&next_column.name()),
-                column_type = Some(next_column.column.tpe.full_data_type.clone())
-                    .filter(|r| !r.is_empty())
-                    .map(Ok)
-                    .unwrap_or_else(|| { sql_renderer::mysql_render_column_type(next_column).map(String::from) })?,
-                nullability = if next_column.column.tpe.arity.is_required() {
-                    "NOT NULL "
+            MysqlAlterColumn::Modify { new_default, changes } => {
+                let column_type: Option<String> = if changes.type_changed() {
+                    Some(next_column.column.tpe.full_data_type.clone())
+                        .filter(|r| !r.is_empty() || r.contains("datetime")) // @default(now()) does not work with datetimes of certain sizes
                 } else {
-                    ""
-                },
-                default = new_default
-                    .map(|default| format!(
-                        "DEFAULT {}",
-                        renderer.render_default(&default, &next_column.column_type().family)
-                    ))
-                    .unwrap_or_else(String::new),
-            )],
+                    Some(next_column.column.tpe.full_data_type.clone()).filter(|r| !r.is_empty())
+                    // Some(previous_column.tpe.full_data_type.clone()).filter(|r| !r.is_empty())
+                };
+
+                let column_type = column_type
+                    .map(Ok)
+                    .unwrap_or_else(|| sql_renderer::mysql_render_column_type(next_column).map(String::from))?;
+
+                let default = new_default
+                    .map(|default| {
+                        format!(
+                            "DEFAULT {}",
+                            renderer.render_default(&default, &next_column.column_type().family)
+                        )
+                    })
+                    .unwrap_or_else(String::new);
+
+                vec![format!(
+                    "MODIFY {column_name} {column_type} {nullability} {default}",
+                    column_name = Quoted::mysql_ident(&next_column.name()),
+                    column_type = column_type,
+                    nullability = if next_column.column.tpe.arity.is_required() {
+                        "NOT NULL "
+                    } else {
+                        ""
+                    },
+                    default = default,
+                )]
+            }
         },
         Some(ExpandedAlterColumn::Sqlite(_steps)) => vec![],
         None => return Ok(None),
