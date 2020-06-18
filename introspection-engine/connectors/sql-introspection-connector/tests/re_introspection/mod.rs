@@ -4,7 +4,7 @@ use barrel::types;
 use test_harness::*;
 
 #[test_each_connector(tags("postgres"))]
-async fn re_introspecting_mapped_model_name(api: &TestApi) {
+async fn re_introspecting_mapped_model_and_field_name(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute(|migration| {
@@ -26,12 +26,12 @@ async fn re_introspecting_mapped_model_name(api: &TestApi) {
     let input_dm = r#"
             model Post {
                id               Int @id @default(autoincrement())
-               user_id          Int
-               Custom_User      Custom_User @relation(fields: [user_id], references: [id])
+               c_user_id          Int @map("user_id")
+               Custom_User      Custom_User @relation(fields: [c_user_id], references: [c_id])
             }
             
             model Custom_User {
-               id               Int @id @default(autoincrement())
+               c_id               Int @id @default(autoincrement()) @map("id")
                Post             Post[]
                
                @@map(name: "User")
@@ -41,20 +41,20 @@ async fn re_introspecting_mapped_model_name(api: &TestApi) {
     let final_dm = r#"
             model Post {
                id               Int @id @default(autoincrement())
-               user_id          Int
-               Custom_User      Custom_User @relation(fields: [user_id], references: [id])
-            }            
+               c_user_id          Int @map("user_id")
+               Custom_User      Custom_User @relation(fields: [c_user_id], references: [c_id])
+            }    
             
             model Unrelated {
                id               Int @id @default(autoincrement())
             }
             
             model Custom_User {
-               id               Int @id @default(autoincrement())
+               c_id               Int @id @default(autoincrement()) @map("id")
                Post             Post[]
                
                @@map(name: "User")
-            }
+            }  
         "#;
     let result = dbg!(api.re_introspect(input_dm).await);
     custom_assert(&result, final_dm);
