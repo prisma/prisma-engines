@@ -4,6 +4,47 @@ use barrel::types;
 use test_harness::*;
 
 #[test_each_connector(tags("postgres"))]
+async fn re_introspecting_manually_overwritten_mapped_model_name(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("_User", |t| {
+                t.add_column("id", types::primary());
+            });
+
+            migration.create_table("Unrelated", |t| {
+                t.add_column("id", types::primary());
+            });
+        })
+        .await;
+
+    let input_dm = r#"
+            model Custom_User {
+               id               Int         @id @default(autoincrement())
+               
+               @@map(name: "_User")
+            }
+        "#;
+
+    let final_dm = r#"  
+            model Unrelated {
+               id               Int         @id @default(autoincrement())
+            }
+            
+            model Custom_User {
+               id               Int         @id @default(autoincrement()) 
+               
+               @@map(name: "_User")
+            }  
+        "#;
+    let result = dbg!(api.re_introspect(input_dm).await);
+    custom_assert(&result, final_dm);
+    let warnings = api.re_introspect_warnings(input_dm).await;
+
+    assert_eq!(&warnings, "[{\"code\":7,\"message\":\"These models were enriched with @@map information taken from the previous Prisma schema.\",\"affected\":[{\"model\":\"Custom_User\"}]}]");
+}
+
+#[test_each_connector(tags("postgres"))]
 async fn re_introspecting_mapped_model_and_field_name(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel

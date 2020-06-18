@@ -2,16 +2,13 @@ use crate::warnings::{
     warning_enriched_with_map_on_enum, warning_enriched_with_map_on_field, warning_enriched_with_map_on_model, Enum,
     Model, ModelAndField,
 };
-use datamodel::{Datamodel, DefaultNames, Field, FieldType, RelationInfo};
+use datamodel::{Datamodel, DefaultNames, Field, FieldType};
 use introspection_connector::Warning;
 
 pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec<Warning> {
     // Notes
     // Relationnames are similar to virtual relationfields, they can be changed arbitrarily
     // investigate dmmf / schema / datamodel / internal datamodel and manual @map changes???
-
-    //todo think about cases where this would not error but could be wrong:
-    // what if introspection already had to apply @maps and the user manually changed them?
 
     //todo What about references to changed names??? @map and @@map
     // models       -> relationfield types, relation names, relationfield names
@@ -35,6 +32,15 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec
     // enum values
     // enum values in defaults
 
+    //todo introspection sometimes has to use @maps itself, which the user can then manually change
+    // this has to be handled explicitly -.-also influences the naming in the warnings
+    // Order                                    Status          Tested
+    // modelnames                               -> done         yes
+    // scalar field names
+    // enum names
+    // enum values
+    // how does this trickle into references?? Hopefully automatically
+
     println!("{:#?}", old_data_model);
     println!("{:#?}", new_data_model);
 
@@ -42,13 +48,17 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec
     let mut changed_model_names = vec![];
     {
         for model in &new_data_model.models {
-            if let Some(old_model) = old_data_model.find_model_db_name(&model.name) {
+            if let Some(old_model) =
+                old_data_model.find_model_db_name(&model.database_name.as_ref().unwrap_or(&model.name))
+            {
                 if new_data_model.find_model(&old_model.name).is_none() {
                     changed_model_names.push((
                         Model {
                             model: model.name.clone(),
                         },
-                        old_model.name.clone(),
+                        Model {
+                            model: old_model.name.clone(),
+                        },
                     ))
                 }
             }
@@ -57,8 +67,10 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec
         //change model names
         for change in &changed_model_names {
             let model = new_data_model.find_model_mut(&change.0.model).unwrap();
-            model.name = change.1.clone();
-            model.database_name = Some(change.0.model.clone());
+            model.name = change.1.model.clone();
+            if model.database_name.is_none() {
+                model.database_name = Some(change.0.model.clone())
+            };
         }
 
         // change relation types
@@ -71,7 +83,7 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec
                     .unwrap();
 
                 if let FieldType::Relation(info) = &mut field.field_type {
-                    info.to = change.1.clone();
+                    info.to = change.1.model.clone();
                 }
             }
         }
@@ -138,7 +150,7 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec
     {
         let mut relation_fields_to_change = vec![];
         for change in &changed_model_names {
-            let changed_model = new_data_model.find_model(&change.1).unwrap();
+            let changed_model = new_data_model.find_model(&change.1.model).unwrap();
             let relation_fields_on_this_model = changed_model
                 .fields()
                 .filter(|f| f.is_relation())
@@ -286,10 +298,11 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec
     println!("{:#?}", new_data_model);
 
     //warnings
+    //todo adjust them to use the new names
     let mut warnings = vec![];
 
     if !changed_model_names.is_empty() {
-        let models = changed_model_names.iter().map(|c| c.0.clone()).collect();
+        let models = changed_model_names.iter().map(|c| c.1.clone()).collect();
         warnings.push(warning_enriched_with_map_on_model(&models));
     }
 
