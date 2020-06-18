@@ -1,13 +1,13 @@
 on:
   repository_dispatch:
-    types: [trigger-build]
 
 jobs:
   build:
     name: ${{ github.event.client_payload.branch }} Windows engines build ${{ github.event.client_payload.commit }}
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v2
+      - name: $ {{ github.event.client_payload.commit }}
+        uses: actions/checkout@v2
         with:
           ref: ${{ github.event.client_payload.commit }}
 
