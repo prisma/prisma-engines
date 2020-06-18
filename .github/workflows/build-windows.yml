@@ -1,0 +1,23 @@
+on:
+  repository_dispatch:
+    types: [trigger-build]
+
+jobs:
+  build:
+    name: Windows engines build
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+
+      - uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: --release
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: query-engine.exe-${{ github.sha }}
+          path: ${{ github.workspace }}/target/release/query-engine.exe
