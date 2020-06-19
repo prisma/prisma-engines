@@ -1,8 +1,8 @@
 use crate::*;
 use sql_renderer::{postgres_render_column_type, rendered_step::RenderedStep, IteratorJoin, Quoted, SqlRenderer};
 use sql_schema_describer::*;
-use sql_schema_differ::DiffingOptions;
-use sql_schema_helpers::{find_column, walk_columns, ColumnRef};
+use sql_schema_differ::{ColumnDiffer, DiffingOptions};
+use sql_schema_helpers::{find_column, walk_columns, ColumnRef, SqlSchemaExt};
 use std::fmt::Write as _;
 use tracing_futures::Instrument;
 
@@ -265,8 +265,8 @@ fn render_raw_sql(
                     TableChange::AlterColumn(AlterColumn { name, column }) => {
                         match safe_alter_column(
                             renderer,
-                            current_schema.get_table(&table.name).unwrap().column(&name).unwrap(),
-                            &find_column(next_schema, &table.name, &column.name)
+                            current_schema.table_ref(&table.name).unwrap().column(&name).unwrap(),
+                            find_column(next_schema, &table.name, &column.name)
                                 .expect("Invariant violation: could not find column referred to in AlterColumn."),
                             &DiffingOptions::from_database_info(database_info),
                         )? {
@@ -442,20 +442,21 @@ fn create_table_suffix(sql_family: SqlFamily) -> &'static str {
 
 fn safe_alter_column(
     renderer: &dyn SqlRenderer,
-    previous_column: &Column,
-    next_column: &ColumnRef<'_>,
+    previous_column: ColumnRef<'_>,
+    next_column: ColumnRef<'_>,
     diffing_options: &DiffingOptions,
 ) -> anyhow::Result<Option<Vec<String>>> {
     use crate::sql_migration::expanded_alter_column::*;
 
-    let expanded = crate::sql_migration::expanded_alter_column::expand_alter_column(
-        previous_column,
-        next_column.column,
-        &renderer.sql_family(),
+    let differ = ColumnDiffer {
+        previous: previous_column,
+        next: next_column,
         diffing_options,
-    );
+    };
 
-    let alter_column_prefix = format!("ALTER COLUMN {}", renderer.quote(&previous_column.name));
+    let expanded = expand_alter_column(&differ, &renderer.sql_family());
+
+    let alter_column_prefix = format!("ALTER COLUMN {}", renderer.quote(differ.previous.name()));
 
     let steps = match expanded {
         Some(ExpandedAlterColumn::Postgres(steps)) => steps
@@ -480,7 +481,7 @@ fn safe_alter_column(
             MysqlAlterColumn::DropDefault => vec![format!("{} DROP DEFAULT", &alter_column_prefix)],
             MysqlAlterColumn::Modify { new_default, changes } => {
                 let column_type: Option<String> = if changes.type_changed() {
-                    Some(next_column.column.tpe.full_data_type.clone())
+                    Some(next_column.column_type().full_data_type.clone())
                         .filter(|r| !r.is_empty() || r.contains("datetime")) // @default(now()) does not work with datetimes of certain sizes
                 } else {
                     Some(next_column.column.tpe.full_data_type.clone()).filter(|r| !r.is_empty())
@@ -489,7 +490,7 @@ fn safe_alter_column(
 
                 let column_type = column_type
                     .map(Ok)
-                    .unwrap_or_else(|| sql_renderer::mysql_render_column_type(next_column).map(String::from))?;
+                    .unwrap_or_else(|| sql_renderer::mysql_render_column_type(&next_column).map(String::from))?;
 
                 let default = new_default
                     .map(|default| {
@@ -504,7 +505,7 @@ fn safe_alter_column(
                     "MODIFY {column_name} {column_type} {nullability} {default}",
                     column_name = Quoted::mysql_ident(&next_column.name()),
                     column_type = column_type,
-                    nullability = if next_column.column.tpe.arity.is_required() {
+                    nullability = if next_column.arity().is_required() {
                         "NOT NULL "
                     } else {
                         ""

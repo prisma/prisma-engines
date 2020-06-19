@@ -1,10 +1,11 @@
-use sql_schema_describer::{Column, ColumnTypeFamily, DefaultValue};
+use crate::sql_schema_helpers::ColumnRef;
+use sql_schema_describer::{ColumnTypeFamily, DefaultValue};
 
 #[derive(Debug)]
 pub(crate) struct ColumnDiffer<'a> {
     pub(crate) diffing_options: &'a super::DiffingOptions,
-    pub(crate) previous: &'a Column,
-    pub(crate) next: &'a Column,
+    pub(crate) previous: ColumnRef<'a>,
+    pub(crate) next: ColumnRef<'a>,
 }
 
 /// On MariaDB, JSON is an alias for LONGTEXT. https://mariadb.com/kb/en/json-data-type/
@@ -12,9 +13,9 @@ const MARIADB_ALIASES: &[ColumnTypeFamily] = &[ColumnTypeFamily::String, ColumnT
 
 impl<'a> ColumnDiffer<'a> {
     pub(crate) fn name(&self) -> &'a str {
-        debug_assert_eq!(self.previous.name, self.next.name);
+        debug_assert_eq!(self.previous.name(), self.next.name());
 
-        self.previous.name.as_str()
+        self.previous.name()
     }
 
     pub(crate) fn differs_in_something(&self) -> bool {
@@ -22,13 +23,13 @@ impl<'a> ColumnDiffer<'a> {
     }
 
     pub(crate) fn all_changes(&self) -> ColumnChanges {
-        let renaming = if self.previous.name != self.next.name {
+        let renaming = if self.previous.name() != self.next.name() {
             Some(ColumnChange::Renaming)
         } else {
             None
         };
 
-        let arity = if self.previous.tpe.arity != self.next.tpe.arity {
+        let arity = if self.previous.arity() != self.next.arity() {
             Some(ColumnChange::Arity)
         } else {
             None
@@ -53,13 +54,13 @@ impl<'a> ColumnDiffer<'a> {
 
     fn column_type_changed(&self) -> bool {
         if self.diffing_options.is_mariadb
-            && MARIADB_ALIASES.contains(&self.previous.tpe.family)
-            && MARIADB_ALIASES.contains(&self.next.tpe.family)
+            && MARIADB_ALIASES.contains(&self.previous.column_type_family())
+            && MARIADB_ALIASES.contains(&self.next.column_type_family())
         {
             return false;
         }
 
-        self.previous.tpe.family != self.next.tpe.family
+        self.previous.column_type_family() != self.next.column_type_family()
     }
 
     /// There are workarounds to cope with current migration and introspection limitations.
@@ -70,11 +71,11 @@ impl<'a> ColumnDiffer<'a> {
     ///
     /// - We bail on a number of cases that are too complex to deal with right now or underspecified.
     fn defaults_match(&self) -> bool {
-        if self.previous.auto_increment {
+        if self.previous.auto_increment() {
             return true;
         }
 
-        match (&self.previous.default, &self.next.default) {
+        match (&self.previous.default(), &self.next.default()) {
             (Some(DefaultValue::VALUE(prev)), Some(DefaultValue::VALUE(next))) => prev == next,
             (Some(DefaultValue::VALUE(_)), Some(DefaultValue::SEQUENCE(_))) => true,
             (Some(DefaultValue::VALUE(_)), Some(DefaultValue::NOW)) => false,
@@ -138,122 +139,5 @@ impl ColumnChanges {
 
     pub(crate) fn column_was_renamed(&self) -> bool {
         matches!(self.changes, [Some(ColumnChange::Renaming), _, _, _])
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use prisma_value::PrismaValue;
-    use sql_schema_describer::{ColumnArity, ColumnType, ColumnTypeFamily, DefaultValue};
-
-    #[test]
-    #[ignore] // these values should already be cleaned up during introspection / datamodel validation
-    fn quoted_string_defaults_match() {
-        let col_a = Column {
-            name: "A".to_owned(),
-            tpe: ColumnType::pure(ColumnTypeFamily::String, ColumnArity::Required),
-            default: Some(DefaultValue::VALUE(PrismaValue::String("abc".to_owned()))),
-            auto_increment: false,
-        };
-
-        let col_b = Column {
-            name: "A".to_owned(),
-            tpe: ColumnType::pure(ColumnTypeFamily::String, ColumnArity::Required),
-            default: Some(DefaultValue::VALUE(PrismaValue::String(r##""abc""##.to_owned()))),
-            auto_increment: false,
-        };
-
-        let col_c = Column {
-            name: "A".to_owned(),
-            tpe: ColumnType::pure(ColumnTypeFamily::String, ColumnArity::Required),
-            default: Some(DefaultValue::VALUE(PrismaValue::String(r##"'abc'"##.to_owned()))),
-            auto_increment: false,
-        };
-
-        assert!(ColumnDiffer {
-            diffing_options: &Default::default(),
-            previous: &col_a,
-            next: &col_b
-        }
-        .defaults_match());
-
-        assert!(ColumnDiffer {
-            diffing_options: &Default::default(),
-            previous: &col_a,
-            next: &col_c
-        }
-        .defaults_match());
-
-        assert!(ColumnDiffer {
-            diffing_options: &Default::default(),
-            previous: &col_c,
-            next: &col_b
-        }
-        .defaults_match());
-    }
-
-    #[test]
-    fn datetime_defaults_match() {
-        let col_a = Column {
-            name: "A".to_owned(),
-            tpe: ColumnType::pure(ColumnTypeFamily::DateTime, ColumnArity::Required),
-            default: Some(DefaultValue::VALUE(PrismaValue::new_datetime("2019-09-01T08:00:00Z"))),
-            auto_increment: false,
-        };
-
-        let col_b = Column {
-            name: "A".to_owned(),
-            tpe: ColumnType::pure(ColumnTypeFamily::DateTime, ColumnArity::Required),
-            default: Some(DefaultValue::VALUE(PrismaValue::new_datetime(
-                "2019-09-01 08:00:00 UTC",
-            ))),
-            auto_increment: false,
-        };
-
-        assert!(ColumnDiffer {
-            diffing_options: &Default::default(),
-            previous: &col_a,
-            next: &col_b,
-        }
-        .defaults_match());
-    }
-
-    #[test]
-    fn float_defaults_match() {
-        let col_a = Column {
-            name: "A".to_owned(),
-            tpe: ColumnType::pure(ColumnTypeFamily::Float, ColumnArity::Required),
-            default: Some(DefaultValue::VALUE(PrismaValue::new_float(0.33))),
-            auto_increment: false,
-        };
-
-        let col_b = Column {
-            name: "A".to_owned(),
-            tpe: ColumnType::pure(ColumnTypeFamily::Float, ColumnArity::Required),
-            default: Some(DefaultValue::VALUE(PrismaValue::new_float(0.3300))),
-            auto_increment: false,
-        };
-
-        assert!(ColumnDiffer {
-            diffing_options: &Default::default(),
-            previous: &col_a,
-            next: &col_b,
-        }
-        .defaults_match());
-
-        let col_c = Column {
-            name: "A".to_owned(),
-            tpe: ColumnType::pure(ColumnTypeFamily::Float, ColumnArity::Required),
-            default: Some(DefaultValue::VALUE(PrismaValue::new_float(0.34))),
-            auto_increment: false,
-        };
-
-        assert!(!ColumnDiffer {
-            diffing_options: &Default::default(),
-            previous: &col_a,
-            next: &col_c,
-        }
-        .defaults_match());
     }
 }

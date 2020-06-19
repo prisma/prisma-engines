@@ -20,22 +20,22 @@ impl DestructiveChangeCheckerFlavour for PostgresFlavour {
                 match step {
                     PostgresAlterColumn::SetNotNull => {
                         plan.push_unexecutable(UnexecutableStepCheck::MadeOptionalFieldRequired {
-                            column: columns.previous.name.clone(),
+                            column: columns.previous.name().to_owned(),
                             table: previous_table.name.clone(),
                         })
                     }
                     PostgresAlterColumn::SetType(_) => {
-                        if !matches!(columns.previous.tpe.arity, ColumnArity::List)
-                            && matches!(columns.next.tpe.arity, ColumnArity::List)
+                        if !matches!(columns.previous.column.tpe.arity, ColumnArity::List)
+                            && matches!(columns.next.column.tpe.arity, ColumnArity::List)
                         {
                             plan.push_unexecutable(UnexecutableStepCheck::MadeScalarFieldIntoArrayField {
                                 table: previous_table.name.clone(),
-                                column: columns.previous.name.clone(),
+                                column: columns.previous.name().to_owned(),
                             })
                         } else {
                             plan.push_warning(SqlMigrationWarning::AlterColumn {
                                 table: previous_table.name.clone(),
-                                column: columns.previous.name.clone(),
+                                column: columns.previous.name().to_owned(),
                             });
                         }
                     }
@@ -47,19 +47,19 @@ impl DestructiveChangeCheckerFlavour for PostgresFlavour {
         } else {
             // Unexecutable drop and recreate.
             if columns.all_changes().arity_changed()
-                && columns.previous.tpe.arity.is_nullable()
-                && columns.next.tpe.arity.is_required()
-                && !default_can_be_rendered(columns.next.default.as_ref())
+                && columns.previous.column.tpe.arity.is_nullable()
+                && columns.next.column.tpe.arity.is_required()
+                && !default_can_be_rendered(columns.next.default())
             {
                 plan.push_unexecutable(UnexecutableStepCheck::AddedRequiredFieldToTable {
-                    column: columns.previous.name.clone(),
+                    column: columns.previous.name().to_owned(),
                     table: previous_table.name.clone(),
                 })
             } else {
                 // Executable drop and recreate.
                 plan.push_warning(SqlMigrationWarning::AlterColumn {
                     table: previous_table.name.clone(),
-                    column: columns.next.name.clone(),
+                    column: columns.next.name().to_owned(),
                 });
             }
         }

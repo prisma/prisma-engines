@@ -9,6 +9,7 @@ pub(crate) use destructive_change_checker_flavour::DestructiveChangeCheckerFlavo
 
 use crate::{
     sql_schema_differ::{ColumnDiffer, DiffingOptions},
+    sql_schema_helpers::SqlSchemaExt,
     AddColumn, AlterColumn, Component, DropColumn, DropTable, SqlMigration, SqlMigrationStep, SqlResult, TableChange,
 };
 use destructive_check_plan::DestructiveCheckPlan;
@@ -97,26 +98,15 @@ impl SqlDestructiveChangesChecker<'_> {
     fn check_alter_column(
         &self,
         alter_column: &AlterColumn,
-        previous_table: &sql_schema_describer::Table,
+        differ: ColumnDiffer<'_>,
         plan: &mut DestructiveCheckPlan,
     ) {
-        let previous_column = previous_table
-            .column(&alter_column.name)
-            .expect("unsupported column renaming");
-
-        let diffing_options = DiffingOptions::from_database_info(self.database_info());
-
-        let differ = ColumnDiffer {
-            diffing_options: &diffing_options,
-            previous: previous_column,
-            next: &alter_column.column,
-        };
-
-        self.flavour().check_alter_column(previous_table, &differ, plan);
+        let previous_table = &differ.previous.table().table;
+        self.flavour().check_alter_column(&previous_table, &differ, plan);
 
         if previous_table.is_part_of_foreign_key(&alter_column.column.name)
             && alter_column.column.default.is_none()
-            && previous_column.default.is_some()
+            && differ.previous.default().is_some()
         {
             plan.push_warning(SqlMigrationWarning::ForeignKeyDefaultValueRemoved {
                 table: previous_table.name.clone(),
@@ -130,6 +120,7 @@ impl SqlDestructiveChangesChecker<'_> {
         &self,
         steps: &[SqlMigrationStep],
         before: &SqlSchema,
+        after: &SqlSchema,
     ) -> SqlResult<DestructiveChangeDiagnostics> {
         let mut plan = DestructiveCheckPlan::new();
 
@@ -138,19 +129,35 @@ impl SqlDestructiveChangesChecker<'_> {
                 SqlMigrationStep::AlterTable(alter_table) => {
                     // The table in alter_table is the updated table, but we want to
                     // check against the current state of the table.
-                    let before_table = before.get_table(&alter_table.table.name);
+                    let before_table = before.table_ref(&alter_table.table.name);
+                    let after_table = after.table_ref(&alter_table.table.name);
 
-                    if let Some(before_table) = before_table {
+                    if let (Some(before_table), Some(after_table)) = (before_table, after_table) {
                         for change in &alter_table.changes {
                             match *change {
                                 TableChange::DropColumn(ref drop_column) => {
-                                    self.check_column_drop(drop_column, before_table, &mut plan)
+                                    self.check_column_drop(drop_column, &before_table.table, &mut plan)
                                 }
                                 TableChange::AlterColumn(ref alter_column) => {
-                                    self.check_alter_column(alter_column, before_table, &mut plan)
+                                    let previous_column = before_table
+                                        .column(&alter_column.name)
+                                        .expect("unsupported column renaming");
+                                    let next_column = after_table
+                                        .column(&alter_column.name)
+                                        .expect("unsupported column renaming");
+
+                                    let diffing_options = DiffingOptions::from_database_info(self.database_info());
+
+                                    let differ = ColumnDiffer {
+                                        diffing_options: &diffing_options,
+                                        previous: previous_column,
+                                        next: next_column,
+                                    };
+
+                                    self.check_alter_column(alter_column, differ, &mut plan)
                                 }
                                 TableChange::AddColumn(ref add_column) => {
-                                    self.check_add_column(add_column, before_table, &mut plan)
+                                    self.check_add_column(add_column, &before_table.table, &mut plan)
                                 }
                                 _ => (),
                             }
@@ -180,14 +187,22 @@ impl SqlDestructiveChangesChecker<'_> {
 #[async_trait::async_trait]
 impl DestructiveChangesChecker<SqlMigration> for SqlDestructiveChangesChecker<'_> {
     async fn check(&self, database_migration: &SqlMigration) -> ConnectorResult<DestructiveChangeDiagnostics> {
-        self.check_impl(&database_migration.original_steps, &database_migration.before)
-            .await
-            .map_err(|sql_error| sql_error.into_connector_error(&self.connection_info()))
+        self.check_impl(
+            &database_migration.original_steps,
+            &database_migration.before,
+            &database_migration.after,
+        )
+        .await
+        .map_err(|sql_error| sql_error.into_connector_error(&self.connection_info()))
     }
 
     async fn check_unapply(&self, database_migration: &SqlMigration) -> ConnectorResult<DestructiveChangeDiagnostics> {
-        self.check_impl(&database_migration.rollback, &database_migration.after)
-            .await
-            .map_err(|sql_error| sql_error.into_connector_error(&self.connection_info()))
+        self.check_impl(
+            &database_migration.rollback,
+            &database_migration.after,
+            &database_migration.before,
+        )
+        .await
+        .map_err(|sql_error| sql_error.into_connector_error(&self.connection_info()))
     }
 }
