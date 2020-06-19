@@ -310,6 +310,53 @@ async fn changing_the_type_of_an_id_field_must_work(api: &TestApi) -> TestResult
     Ok(())
 }
 
+#[test_each_connector(log = "debug,sql_schema_describer=info")]
+async fn changing_the_type_of_a_field_referenced_by_a_fk_must_work(api: &TestApi) -> TestResult {
+    let dm1 = r#"
+        model A {
+            id Int @id
+            b_id Int
+            b  B   @relation(fields: [b_id], references: [uniq])
+        }
+
+        model B {
+            uniq Int @unique
+            name String
+        }
+    "#;
+
+    api.infer_apply(&dm1).send().await?.assert_green()?;
+
+    api.assert_schema().await?.assert_table("A", |table| {
+        table
+            .assert_column("b_id", |col| col.assert_type_family(ColumnTypeFamily::Int))?
+            .assert_fk_on_columns(&["b_id"], |fk| fk.assert_references("B", &["uniq"]))
+    })?;
+
+    let dm2 = r#"
+        model A {
+            id Int @id
+            b_id String
+            b  B   @relation(fields: [b_id], references: [uniq])
+        }
+
+        model B {
+            uniq String @unique @default(cuid())
+            name String
+        }
+    "#;
+
+    api.infer_apply(&dm2).send().await?.assert_green()?;
+
+    api.assert_schema().await?.assert_table("A", |table| {
+        table
+            .assert_column("b_id", |col| col.assert_type_family(ColumnTypeFamily::String))?
+            .assert_fk_on_columns(&["b_id"], |fk| fk.assert_references("B", &["uniq"]))
+    })?;
+
+    Ok(())
+}
+
 #[test_each_connector]
 async fn updating_db_name_of_a_scalar_field_must_work(api: &TestApi) {
     let dm1 = r#"

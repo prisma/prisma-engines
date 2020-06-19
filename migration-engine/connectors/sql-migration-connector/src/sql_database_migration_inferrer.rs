@@ -111,7 +111,7 @@ fn infer_database_migration_steps_and_fix(
     let corrected_steps = if sql_family.is_sqlite() {
         sqlite::fix(diff, &from, &to, &schema_name, database_info)?
     } else {
-        fix_id_column_type_change(&from, &to, schema_name, diff.into_steps(), sql_family, database_info)?
+        diff.into_steps()
     };
 
     Ok((
@@ -124,73 +124,6 @@ fn infer_database_migration_steps_and_fix(
         .into_steps(),
         corrected_steps,
     ))
-}
-
-fn fix_id_column_type_change(
-    from: &SqlSchema,
-    to: &SqlSchema,
-    _schema_name: &str,
-    steps: Vec<SqlMigrationStep>,
-    sql_family: SqlFamily,
-    database_info: &DatabaseInfo,
-) -> SqlResult<Vec<SqlMigrationStep>> {
-    let has_id_type_change = steps
-        .iter()
-        .find(|step| match step {
-            SqlMigrationStep::AlterTable(alter_table) => {
-                if let Ok(current_table) = from.table(&alter_table.table.name) {
-                    let change_to_id_column = alter_table.changes.iter().find(|c| match c {
-                        TableChange::AlterColumn(alter_column) => {
-                            let current_column = current_table.column_bang(&alter_column.name);
-                            let current_column_type = &current_column.tpe;
-                            let has_type_changed = current_column_type.family != alter_column.column.tpe.family; // TODO: take into account raw type
-                            let is_part_of_pk = current_table
-                                .primary_key
-                                .clone()
-                                .map(|pk| pk.columns)
-                                .unwrap_or(vec![])
-                                .contains(&alter_column.name);
-                            is_part_of_pk && has_type_changed
-                        }
-                        _ => false,
-                    });
-                    change_to_id_column.is_some()
-                } else {
-                    false
-                }
-            }
-            _ => false,
-        })
-        .is_some();
-
-    // TODO: There's probably a much more graceful way to handle this. But this would also involve a lot of data loss probably. Let's tackle that after P Day
-    if has_id_type_change {
-        let tables_to_drop: Vec<String> = from
-            .tables
-            .iter()
-            .filter(|t| t.name != MIGRATION_TABLE_NAME)
-            .map(|t| t.name.clone())
-            .collect();
-        let mut radical_steps = Vec::with_capacity(tables_to_drop.len());
-        radical_steps.extend(
-            tables_to_drop
-                .into_iter()
-                .map(|name| DropTable { name })
-                .map(SqlMigrationStep::DropTable),
-        );
-        let diff_from_empty: SqlSchemaDiff = SqlSchemaDiffer::diff(
-            &SqlSchema::empty(),
-            &to,
-            sql_family,
-            &DiffingOptions::from_database_info(database_info),
-        );
-        let mut steps_from_empty = diff_from_empty.into_steps();
-        radical_steps.append(&mut steps_from_empty);
-
-        Ok(radical_steps)
-    } else {
-        Ok(steps)
-    }
 }
 
 pub fn wrap_as_step<T, F>(steps: Vec<T>, mut wrap_fn: F) -> impl Iterator<Item = SqlMigrationStep>

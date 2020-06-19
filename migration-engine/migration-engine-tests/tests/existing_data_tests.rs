@@ -1134,3 +1134,88 @@ async fn changing_a_scalar_column_to_an_array_is_unexecutable(api: &TestApi) -> 
 
     Ok(())
 }
+
+#[test_each_connector(log = "debug")]
+async fn primary_key_migrations_do_not_cause_data_loss(api: &TestApi) -> TestResult {
+    let dm1 = r#"
+        model Dog {
+            name String
+            passportNumber Int
+
+            @@id([name, passportNumber])
+        }
+
+        model Puppy {
+            id String @id
+            motherName String
+            motherPassportNumber Int
+            mother Dog @relation(fields: [motherName, motherPassportNumber], references: [name, passportNumber])
+        }
+    "#;
+
+    api.infer_apply(dm1).send().await?.assert_green()?;
+
+    api.insert("Dog")
+        .value("name", "Marnie")
+        .value("passportNumber", 8000)
+        .result_raw()
+        .await?;
+
+    api.insert("Puppy")
+        .value("id", "12345")
+        .value("motherName", "Marnie")
+        .value("motherPassportNumber", 8000)
+        .result_raw()
+        .await?;
+
+    let dm2 = r#"
+        model Dog {
+            name String
+            passportNumber String
+
+            @@id([name, passportNumber])
+        }
+
+        model Puppy {
+            id String @id
+            motherName String
+            motherPassportNumber String
+            mother Dog @relation(fields: [motherName, motherPassportNumber], references: [name, passportNumber])
+        }
+    "#;
+
+    api.infer_apply(dm2)
+        .force(Some(true))
+        .send()
+        .await?
+        .assert_executable()?
+        .assert_no_error()?
+        .assert_warnings(&[
+            "You are about to alter the column `passportNumber` on the `Dog` table, which still contains 1 non-null values. The data in that column could be lost.".into(),
+            "You are about to alter the column `motherPassportNumber` on the `Puppy` table, which still contains 1 non-null values. The data in that column could be lost.".into(),
+        ])?;
+
+    api.assert_schema().await?.assert_table("Dog", |table| {
+        table.assert_pk(|pk| pk.assert_columns(&["name", "passportNumber"]))
+    })?;
+
+    let dog = api.select("Dog").column("name").column("passportNumber").send().await?;
+    let dog_row: Vec<quaint::Value> = dog.into_single().unwrap().into_iter().collect();
+    assert_eq!(dog_row, &[Value::text("Marnie"), Value::text("8000")]);
+
+    let puppy = api
+        .select("Puppy")
+        .column("id")
+        .column("motherName")
+        .column("motherPassportNumber")
+        .send()
+        .await?;
+
+    let puppy_row: Vec<quaint::Value> = puppy.into_single().unwrap().into_iter().collect();
+    assert_eq!(
+        puppy_row,
+        &[Value::text("12345"), Value::text("Marnie"), Value::text("8000")]
+    );
+
+    Ok(())
+}

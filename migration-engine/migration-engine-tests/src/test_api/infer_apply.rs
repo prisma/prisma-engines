@@ -89,6 +89,14 @@ impl<'a> InferApplyAssertion<'a> {
     }
 
     pub fn assert_warnings(self, warnings: &[Cow<'_, str>]) -> AssertionResult<Self> {
+        anyhow::ensure!(
+            self.result.warnings.len() == warnings.len(),
+            "Expected {} warnings, got {}.\n{:#?}",
+            warnings.len(),
+            self.result.warnings.len(),
+            self.result.warnings
+        );
+
         for (idx, warning) in warnings.iter().enumerate() {
             assert_eq!(
                 Some(warning.as_ref()),

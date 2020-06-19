@@ -41,6 +41,9 @@ pub(super) fn fix(
             SqlMigrationStep::AddForeignKey(add_foreign_key) if fixed_tables.contains(&add_foreign_key.table) => {
                 // The fixed alter table step will already create the foreign key.
             }
+            SqlMigrationStep::DropForeignKey(drop_foreign_key) if fixed_tables.contains(&drop_foreign_key.table) => {
+                // The fixed alter table step will already create the foreign key.
+            }
             SqlMigrationStep::CreateIndex(ref create_index) if fixed_tables.contains(&create_index.table) => {
                 // The fixed alter table step will already create the index.
             }
@@ -82,9 +85,10 @@ fn needs_fix(alter_table: &AlterTable) -> bool {
             // https://laracasts.com/discuss/channels/general-discussion/migrations-sqlite-general-error-1-cannot-add-a-not-null-column-with-default-value-null
             add_column.column.tpe.arity == ColumnArity::Required
         }
-        TableChange::DropColumn(_) => true,
-        TableChange::AlterColumn(_) => true,
-        TableChange::DropForeignKey(_) => true,
+        TableChange::DropColumn(_)
+        | TableChange::AlterColumn(_)
+        | TableChange::DropPrimaryKey { .. }
+        | TableChange::AddPrimaryKey { .. } => true,
     });
 
     change_that_does_not_work_on_sqlite.is_some()

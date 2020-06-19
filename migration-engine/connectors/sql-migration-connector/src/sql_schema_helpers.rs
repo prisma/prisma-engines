@@ -1,5 +1,5 @@
 use sql_schema_describer::{
-    Column, ColumnArity, ColumnType, ColumnTypeFamily, DefaultValue, ForeignKey, SqlSchema, Table,
+    Column, ColumnArity, ColumnType, ColumnTypeFamily, DefaultValue, ForeignKey, PrimaryKey, SqlSchema, Table,
 };
 
 pub(crate) fn walk_columns<'a>(schema: &'a SqlSchema) -> impl Iterator<Item = ColumnRef<'a>> + 'a {
@@ -37,6 +37,10 @@ impl<'a> ColumnRef<'a> {
         &self.column.tpe.arity
     }
 
+    pub(crate) fn column_type_family(&self) -> &'a ColumnTypeFamily {
+        &self.column.tpe.family
+    }
+
     pub(crate) fn name(&self) -> &'a str {
         &self.column.name
     }
@@ -47,10 +51,6 @@ impl<'a> ColumnRef<'a> {
 
     pub(crate) fn column_type(&self) -> &'a ColumnType {
         &self.column.tpe
-    }
-
-    pub(crate) fn column_type_family(&self) -> &'a ColumnTypeFamily {
-        &self.column.tpe.family
     }
 
     pub(crate) fn auto_increment(&self) -> bool {
@@ -96,12 +96,63 @@ impl<'a> TableRef<'a> {
         })
     }
 
+    pub(crate) fn foreign_keys<'b>(&'b self) -> impl Iterator<Item = ForeignKeyRef<'b, 'a>> + 'b {
+        self.table.foreign_keys.iter().map(move |foreign_key| ForeignKeyRef {
+            foreign_key,
+            table: self,
+        })
+    }
+
     pub(crate) fn name(&self) -> &'a str {
         &self.table.name
     }
 
     pub(crate) fn foreign_key_for_column(&self, column: &str) -> Option<&'a ForeignKey> {
         self.table.foreign_key_for_column(column)
+    }
+
+    pub(crate) fn primary_key(&self) -> Option<&'a PrimaryKey> {
+        self.table.primary_key.as_ref()
+    }
+}
+
+pub(crate) struct ForeignKeyRef<'a, 'schema> {
+    table: &'a TableRef<'schema>,
+    foreign_key: &'schema ForeignKey,
+}
+
+impl<'a, 'schema> ForeignKeyRef<'a, 'schema> {
+    pub(crate) fn constrained_columns<'b>(&'b self) -> impl Iterator<Item = ColumnRef<'a>> + 'b {
+        self.table()
+            .columns()
+            .filter(move |column| self.foreign_key.columns.contains(&column.column.name))
+    }
+
+    pub(crate) fn constraint_name(&self) -> Option<&'a str> {
+        self.foreign_key.constraint_name.as_ref().map(String::as_str)
+    }
+
+    pub(crate) fn inner(&self) -> &'a ForeignKey {
+        self.foreign_key
+    }
+
+    pub(crate) fn referenced_columns_count(&self) -> usize {
+        self.foreign_key.referenced_columns.len()
+    }
+
+    pub(crate) fn referenced_table(&self) -> TableRef<'a> {
+        TableRef {
+            schema: self.table.schema,
+            table: self
+                .table
+                .schema
+                .table(&self.foreign_key.referenced_table)
+                .expect("foreign key references unknown table"),
+        }
+    }
+
+    pub(crate) fn table(&self) -> &'a TableRef<'schema> {
+        self.table
     }
 }
 

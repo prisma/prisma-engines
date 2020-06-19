@@ -242,10 +242,41 @@ fn render_raw_sql(
                 Ok(vec![add_constraint])
             }
         },
+        SqlMigrationStep::DropForeignKey(DropForeignKey { table, constraint_name }) => match sql_family {
+            SqlFamily::Mysql => Ok(vec![format!(
+                "ALTER TABLE {table} DROP FOREIGN KEY {constraint_name}",
+                table = renderer.quote_with_schema(&schema_name, table),
+                constraint_name = Quoted::mysql_ident(constraint_name),
+            )]),
+            SqlFamily::Postgres => Ok(vec![format!(
+                "ALTER TABLE {table} DROP CONSTRAINT {constraint_name}",
+                table = renderer.quote_with_schema(&schema_name, table),
+                constraint_name = Quoted::postgres_ident(constraint_name),
+            )]),
+            SqlFamily::Sqlite => Ok(Vec::new()),
+            SqlFamily::Mssql => todo!("Greetings from Redmond"),
+        },
+
         SqlMigrationStep::AlterTable(AlterTable { table, changes }) => {
             let mut lines = Vec::new();
             for change in changes {
                 match change {
+                    TableChange::DropPrimaryKey { constraint_name } => match renderer.sql_family() {
+                        SqlFamily::Mysql => lines.push(format!("DROP PRIMARY KEY")),
+                        SqlFamily::Postgres => lines.push(format!(
+                            "DROP CONSTRAINT {}",
+                            Quoted::postgres_ident(
+                                constraint_name
+                                    .as_ref()
+                                    .expect("Missing constraint name for DROP CONSTRAINT on Postgres.")
+                            )
+                        )),
+                        _ => (),
+                    },
+                    TableChange::AddPrimaryKey { columns } => lines.push(format!(
+                        "ADD PRIMARY KEY ({})",
+                        columns.iter().map(|colname| renderer.quote(colname)).join(", ")
+                    )),
                     TableChange::AddColumn(AddColumn { column }) => {
                         let column = ColumnRef {
                             table,
@@ -285,18 +316,6 @@ fn render_raw_sql(
                             }
                         }
                     }
-                    TableChange::DropForeignKey(DropForeignKey { constraint_name }) => match sql_family {
-                        SqlFamily::Mysql => {
-                            let constraint_name = renderer.quote(&constraint_name);
-                            lines.push(format!("DROP FOREIGN KEY {}", constraint_name));
-                        }
-                        SqlFamily::Postgres => {
-                            let constraint_name = renderer.quote(&constraint_name);
-                            lines.push(format!("DROP CONSTRAINT IF EXiSTS {}", constraint_name));
-                        }
-                        SqlFamily::Sqlite => (),
-                        SqlFamily::Mssql => todo!("Greetings from Redmond"),
-                    },
                 };
             }
 
