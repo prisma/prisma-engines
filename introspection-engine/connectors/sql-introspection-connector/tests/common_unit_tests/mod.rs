@@ -183,6 +183,7 @@ fn arity_is_preserved_when_generating_data_model_from_a_schema() {
             primary_key: Some(PrimaryKey {
                 columns: vec!["required".to_string()],
                 sequence: None,
+                constraint_name: None,
             }),
             foreign_keys: vec![],
         }],
@@ -432,6 +433,7 @@ fn primary_key_is_preserved_when_generating_data_model_from_a_schema() {
                 primary_key: Some(PrimaryKey {
                     columns: vec!["primary".to_string()],
                     sequence: None,
+                    constraint_name: None,
                 }),
                 foreign_keys: vec![],
             },
@@ -453,6 +455,7 @@ fn primary_key_is_preserved_when_generating_data_model_from_a_schema() {
                 primary_key: Some(PrimaryKey {
                     columns: vec!["primary".to_string()],
                     sequence: None,
+                    constraint_name: None,
                 }),
                 foreign_keys: vec![],
             },
@@ -479,6 +482,7 @@ fn primary_key_is_preserved_when_generating_data_model_from_a_schema() {
                         initial_value: 1,
                         allocation_size: 1,
                     }),
+                    constraint_name: None,
                 }),
                 foreign_keys: vec![],
             },
@@ -739,6 +743,7 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
                 primary_key: Some(PrimaryKey {
                     columns: vec!["id".to_string()],
                     sequence: None,
+                    constraint_name: None,
                 }),
                 foreign_keys: vec![],
             },
@@ -789,6 +794,7 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
                 primary_key: Some(PrimaryKey {
                     columns: vec!["id".to_string()],
                     sequence: None,
+                    constraint_name: None,
                 }),
                 foreign_keys: vec![ForeignKey {
                     // what does this mean? the from columns are not targeting a specific to column?
@@ -921,6 +927,7 @@ fn multi_field_uniques_are_preserved_when_generating_data_model_from_a_schema() 
             primary_key: Some(PrimaryKey {
                 columns: vec!["id".to_string()],
                 sequence: None,
+                constraint_name: None,
             }),
             foreign_keys: vec![],
         }],
@@ -1090,6 +1097,7 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                 primary_key: Some(PrimaryKey {
                     columns: vec!["id".to_string()],
                     sequence: None,
+                    constraint_name: None,
                 }),
                 foreign_keys: vec![],
             },
@@ -1127,6 +1135,7 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                 primary_key: Some(PrimaryKey {
                     columns: vec!["id".to_string()],
                     sequence: None,
+                    constraint_name: None,
                 }),
                 foreign_keys: vec![ForeignKey {
                     constraint_name: None,

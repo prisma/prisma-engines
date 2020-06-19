@@ -182,7 +182,7 @@ async fn get_all_columns(
                 column_name column_name,
                 data_type data_type,
                 column_type full_data_type,
-                character_maximum_length character_maximum_length, 
+                character_maximum_length character_maximum_length,
                 column_default column_default,
                 is_nullable is_nullable,
                 extra extra,
@@ -378,6 +378,7 @@ async fn get_all_indexes(
                         Some(PrimaryKey {
                             columns: vec![column_name],
                             sequence: None,
+                            constraint_name: None,
                         }),
                     );
                 }

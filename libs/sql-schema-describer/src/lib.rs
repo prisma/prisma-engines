@@ -200,6 +200,8 @@ pub struct PrimaryKey {
     pub columns: Vec<String>,
     /// The sequence optionally seeding this primary key.
     pub sequence: Option<Sequence>,
+    /// The name of the primary key constraint, when available.
+    pub constraint_name: Option<String>,
 }
 
 impl PrimaryKey {

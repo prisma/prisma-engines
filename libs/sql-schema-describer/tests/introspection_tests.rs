@@ -372,6 +372,11 @@ async fn composite_primary_keys_must_work(api: &TestApi) {
             primary_key: Some(PrimaryKey {
                 columns: vec!["id".to_string(), "name".to_string()],
                 sequence: None,
+                constraint_name: if api.sql_family().is_postgres() {
+                    Some("User_pkey".into())
+                } else {
+                    None
+                },
             }),
             foreign_keys: vec![],
         }
@@ -445,6 +450,11 @@ async fn indices_must_work(api: &TestApi) {
             primary_key: Some(PrimaryKey {
                 columns: vec!["id".to_string()],
                 sequence: pk_sequence,
+                constraint_name: if api.sql_family().is_postgres() {
+                    Some("User_pkey".into())
+                } else {
+                    None
+                },
             }),
             foreign_keys: vec![],
         }

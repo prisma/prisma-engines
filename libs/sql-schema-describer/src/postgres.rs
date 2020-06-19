@@ -515,6 +515,7 @@ impl SqlSchemaDescriber {
                         entry.1 = Some(PrimaryKey {
                             columns: vec![column_name],
                             sequence,
+                            constraint_name: Some(name.clone()),
                         });
                     }
                 }
