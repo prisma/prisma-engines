@@ -3,7 +3,10 @@ on:
 
 jobs:
   build:
-    name: ${{ github.event.client_payload.branch }} Windows engines build ${{ github.event.client_payload.commit }}
+    name: "[${{ github.event.client_payload.id }}] Windows engines build ${{ github.event.client_payload.commit }}"
+    env:
+      SQLITE_MAX_VARIABLE_NUMBER: 250000
+      SQLITE_MAX_EXPR_DEPTH: 10000
     runs-on: windows-latest
     steps:
       - name: $ {{ github.event.client_payload.commit }}
@@ -22,5 +25,5 @@ jobs:
 
       - uses: actions/upload-artifact@v2
         with:
-          name: query-engine.exe-${{ github.event.client_payload.commit }}
-          path: ${{ github.workspace }}/target/release/query-engine.exe
+          name: binaries
+          path: ${{ github.workspace }}/target/release/*.exe
