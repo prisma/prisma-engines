@@ -1,4 +1,6 @@
-use sql_schema_describer::{Column, ColumnType, DefaultValue, ForeignKey, SqlSchema, Table};
+use sql_schema_describer::{
+    Column, ColumnArity, ColumnType, ColumnTypeFamily, DefaultValue, ForeignKey, SqlSchema, Table,
+};
 
 pub(crate) fn walk_columns<'a>(schema: &'a SqlSchema) -> impl Iterator<Item = ColumnRef<'a>> + 'a {
     schema.tables.iter().flat_map(move |table| {
@@ -23,6 +25,7 @@ pub(crate) fn find_column<'a>(schema: &'a SqlSchema, table_name: &str, column_na
         })
 }
 
+#[derive(Debug, Clone, Copy)]
 pub(crate) struct ColumnRef<'a> {
     pub(crate) schema: &'a SqlSchema,
     pub(crate) column: &'a Column,
@@ -30,6 +33,10 @@ pub(crate) struct ColumnRef<'a> {
 }
 
 impl<'a> ColumnRef<'a> {
+    pub(crate) fn arity(&self) -> &ColumnArity {
+        &self.column.tpe.arity
+    }
+
     pub(crate) fn name(&self) -> &'a str {
         &self.column.name
     }
@@ -40,6 +47,10 @@ impl<'a> ColumnRef<'a> {
 
     pub(crate) fn column_type(&self) -> &'a ColumnType {
         &self.column.tpe
+    }
+
+    pub(crate) fn column_type_family(&self) -> &'a ColumnTypeFamily {
+        &self.column.tpe.family
     }
 
     pub(crate) fn auto_increment(&self) -> bool {
@@ -71,6 +82,18 @@ pub(crate) struct TableRef<'a> {
 impl<'a> TableRef<'a> {
     pub(crate) fn new(schema: &'a SqlSchema, table: &'a Table) -> Self {
         Self { schema, table }
+    }
+
+    pub(crate) fn column(&self, column_name: &str) -> Option<ColumnRef<'a>> {
+        self.columns().find(|column| column.name() == column_name)
+    }
+
+    pub(crate) fn columns<'b>(&'b self) -> impl Iterator<Item = ColumnRef<'a>> + 'b {
+        self.table.columns.iter().map(move |column| ColumnRef {
+            column,
+            schema: self.schema,
+            table: self.table,
+        })
     }
 
     pub(crate) fn name(&self) -> &'a str {

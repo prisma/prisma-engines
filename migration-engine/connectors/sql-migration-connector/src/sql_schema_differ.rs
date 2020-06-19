@@ -202,7 +202,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
     fn drop_columns<'a>(differ: &'a TableDiffer<'schema>) -> impl Iterator<Item = TableChange> + 'a {
         differ.dropped_columns().map(|column| {
             let change = DropColumn {
-                name: column.name.clone(),
+                name: column.name().to_owned(),
             };
 
             TableChange::DropColumn(change)
@@ -211,7 +211,9 @@ impl<'schema> SqlSchemaDiffer<'schema> {
 
     fn add_columns<'a>(differ: &'a TableDiffer<'schema>) -> impl Iterator<Item = TableChange> + 'a {
         differ.added_columns().map(move |column| {
-            let change = AddColumn { column: column.clone() };
+            let change = AddColumn {
+                column: column.column.clone(),
+            };
 
             TableChange::AddColumn(change)
         })
@@ -221,14 +223,14 @@ impl<'schema> SqlSchemaDiffer<'schema> {
         table_differ.column_pairs().filter_map(move |column_differ| {
             let previous_fk = table_differ
                 .previous
-                .foreign_key_for_column(&column_differ.previous.name);
+                .foreign_key_for_column(column_differ.previous.name());
 
-            let next_fk = table_differ.next.foreign_key_for_column(&column_differ.next.name);
+            let next_fk = table_differ.next.foreign_key_for_column(column_differ.next.name());
 
             if column_differ.differs_in_something() || foreign_key_changed(previous_fk, next_fk) {
                 let change = AlterColumn {
-                    name: column_differ.previous.name.clone(),
-                    column: column_differ.next.clone(),
+                    name: column_differ.previous.name().to_owned(),
+                    column: column_differ.next.column.clone(),
                 };
 
                 return Some(TableChange::AlterColumn(change));

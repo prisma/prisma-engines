@@ -22,15 +22,15 @@ impl DestructiveChangeCheckerFlavour for MysqlFlavour {
             MysqlAlterColumn::Modify { .. } => {
                 // Column went from optional to required. This is unexecutable unless the table is
                 // empty or the column has no existing NULLs.
-                if columns.all_changes().arity_changed() && columns.next.tpe.arity.is_required() {
+                if columns.all_changes().arity_changed() && columns.next.column.tpe.arity.is_required() {
                     plan.push_unexecutable(UnexecutableStepCheck::MadeOptionalFieldRequired {
-                        column: columns.previous.name.clone(),
+                        column: columns.previous.name().to_owned(),
                         table: previous_table.name.clone(),
                     });
                 } else {
                     plan.push_warning(SqlMigrationWarning::AlterColumn {
                         table: previous_table.name.clone(),
-                        column: columns.next.name.clone(),
+                        column: columns.next.name().to_owned(),
                     });
                 }
             }

@@ -172,8 +172,8 @@ fn copy_current_table_into_new_table(
         .column_pairs()
         .filter(|columns| {
             columns.all_changes().arity_changed()
-                && columns.next.tpe.arity.is_required()
-                && columns.next.default.is_some()
+                && columns.next.column.tpe.arity.is_required()
+                && columns.next.column.default.is_some()
         })
         .collect();
     let intersection_columns: Vec<&str> = differ
@@ -225,10 +225,11 @@ fn copy_current_table_into_new_table(
                 default_value = SqlRenderer::for_family(&SqlFamily::Sqlite).render_default(
                     columns
                         .next
+                        .column
                         .default
                         .as_ref()
                         .expect("default on required column with default"),
-                    &columns.next.tpe.family
+                    &columns.next.column.tpe.family
                 )
             )
         }))
