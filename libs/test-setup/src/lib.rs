@@ -38,7 +38,7 @@ pub fn postgres_9_url(db_name: &str) -> String {
     let (host, port) = db_host_and_port_postgres_9();
 
     format!(
-        "postgresql://postgres:prisma@{}:{}/{}?schema={}",
+        "postgresql://postgres:prisma@{}:{}/{}?schema={}&statement_cache_size=0",
         host, port, db_name, SCHEMA_NAME
     )
 }
@@ -56,7 +56,7 @@ pub fn postgres_10_url(db_name: &str) -> String {
     let (host, port) = db_host_and_port_postgres_10();
 
     format!(
-        "postgresql://postgres:prisma@{}:{}/{}?schema={}",
+        "postgresql://postgres:prisma@{}:{}/{}?schema={}&statement_cache_size=0",
         host, port, db_name, SCHEMA_NAME
     )
 }
@@ -65,7 +65,7 @@ pub fn postgres_11_url(db_name: &str) -> String {
     let (host, port) = db_host_and_port_postgres_11();
 
     format!(
-        "postgresql://postgres:prisma@{}:{}/{}?schema={}",
+        "postgresql://postgres:prisma@{}:{}/{}?schema={}&statement_cache_size=0",
         host, port, db_name, SCHEMA_NAME
     )
 }
@@ -74,7 +74,7 @@ pub fn postgres_12_url(db_name: &str) -> String {
     let (host, port) = db_host_and_port_postgres_12();
 
     format!(
-        "postgresql://postgres:prisma@{}:{}/{}?schema={}",
+        "postgresql://postgres:prisma@{}:{}/{}?schema={}&statement_cache_size=0",
         host, port, db_name, SCHEMA_NAME
     )
 }

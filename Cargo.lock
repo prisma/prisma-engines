@@ -1474,6 +1474,7 @@ dependencies = [
  "tracing",
  "tracing-error",
  "tracing-futures",
+ "url 2.1.1",
  "user-facing-errors",
 ]
 
