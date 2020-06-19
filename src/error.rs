@@ -1,5 +1,5 @@
 //! Error module
-use std::{fmt, io, num};
+use std::{borrow::Cow, fmt, io, num};
 use thiserror::Error;
 
 #[derive(Debug, PartialEq, Eq)]
@@ -133,7 +133,7 @@ pub enum ErrorKind {
     DatabaseUrlIsInvalid(String),
 
     #[error("Conversion failed: {}", _0)]
-    ConversionError(&'static str),
+    ConversionError(Cow<'static, str>),
 
     #[error("The value provided for column {:?} is too long.", column)]
     LengthMismatch { column: Option<String> },
@@ -161,6 +161,16 @@ pub enum ErrorKind {
     FromRowError(serde::de::value::Error),
 }
 
+impl ErrorKind {
+    pub(crate) fn value_out_of_range(msg: impl Into<String>) -> Self {
+        Self::ValueOutOfRange { message: msg.into() }
+    }
+
+    pub(crate) fn conversion(msg: impl Into<Cow<'static, str>>) -> Self {
+        Self::ConversionError(msg.into())
+    }
+}
+
 impl From<Error> for ErrorKind {
     fn from(e: Error) -> Self {
         e.kind
@@ -170,19 +180,19 @@ impl From<Error> for ErrorKind {
 #[cfg(feature = "json-1")]
 impl From<serde_json::Error> for Error {
     fn from(_: serde_json::Error) -> Self {
-        Self::builder(ErrorKind::ConversionError("Malformed JSON data.")).build()
+        Self::builder(ErrorKind::conversion("Malformed JSON data.")).build()
     }
 }
 
 impl From<std::fmt::Error> for Error {
     fn from(_: std::fmt::Error) -> Self {
-        Self::builder(ErrorKind::ConversionError("Problems writing AST into a query string.")).build()
+        Self::builder(ErrorKind::conversion("Problems writing AST into a query string.")).build()
     }
 }
 
 impl From<num::TryFromIntError> for Error {
     fn from(_: num::TryFromIntError) -> Self {
-        Self::builder(ErrorKind::ConversionError(
+        Self::builder(ErrorKind::conversion(
             "Couldn't convert an integer (possible overflow).",
         ))
         .build()
@@ -201,7 +211,7 @@ impl From<mobc::Error<Error>> for Error {
                 builder.set_original_message("Connection timed out.");
 
                 builder.build()
-            },
+            }
             e @ mobc::Error::BadConn => Error::builder(ErrorKind::ConnectionError(Box::new(e))).build(),
         }
     }
@@ -234,6 +244,6 @@ impl From<io::Error> for Error {
 
 impl From<std::string::FromUtf8Error> for Error {
     fn from(_: std::string::FromUtf8Error) -> Error {
-        Error::builder(ErrorKind::ConversionError("Couldn't convert data to UTF-8")).build()
+        Error::builder(ErrorKind::conversion("Couldn't convert data to UTF-8")).build()
     }
 }

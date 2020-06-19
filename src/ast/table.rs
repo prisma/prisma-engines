@@ -81,7 +81,7 @@ impl<'a> Table<'a> {
                     Some(DefaultValue::Generated) => None,
                     None => {
                         let kind =
-                            ErrorKind::ConversionError("A unique column missing from insert and table has no default.");
+                            ErrorKind::conversion("A unique column missing from insert and table has no default.");
 
                         return Err(Error::builder(kind).build());
                     }

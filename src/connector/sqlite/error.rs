@@ -5,6 +5,25 @@ use rusqlite::types::FromSqlError;
 impl From<rusqlite::Error> for Error {
     fn from(e: rusqlite::Error) -> Error {
         match e {
+            rusqlite::Error::ToSqlConversionFailure(error) => match error.downcast::<Error>() {
+                Ok(error) => *error,
+                Err(error) => {
+                    let mut builder = Error::builder(ErrorKind::QueryError(error.into()));
+
+                    builder.set_original_message("Could not interpret parameters in an SQLite query.");
+
+                    builder.build()
+                }
+            },
+            rusqlite::Error::InvalidQuery => {
+                let mut builder = Error::builder(ErrorKind::QueryError(e.into()));
+
+                builder.set_original_message(
+                    "Could not interpret the query or its parameters. Check the syntax and parameter types.",
+                );
+
+                builder.build()
+            }
             rusqlite::Error::ExecuteReturnedResults => {
                 let mut builder = Error::builder(ErrorKind::QueryError(e.into()));
                 builder.set_original_message("Execute returned results, which is not allowed in SQLite.");

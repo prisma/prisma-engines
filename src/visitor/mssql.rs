@@ -4,6 +4,7 @@ use crate::{
         Column, Expression, ExpressionKind, Insert, IntoRaw, Merge, OnConflict, Order, Ordering, Row, Table, TableType,
         Using, Values,
     },
+    error::{Error, ErrorKind},
     visitor, Value,
 };
 use std::{convert::TryFrom, fmt::Write};
@@ -113,7 +114,15 @@ impl<'a> Visitor<'a> for Mssql<'a> {
             #[cfg(feature = "json-1")]
             Value::Json(j) => j.map(|j| self.write(format!("'{}'", serde_json::to_string(&j).unwrap()))),
             #[cfg(all(feature = "array", feature = "postgresql"))]
-            Value::Array(_) => panic!("Arrays not supported in T-SQL"),
+            Value::Array(_) => {
+                let msg = "Arrays are not supported in T-SQL.";
+                let kind = ErrorKind::conversion(msg);
+
+                let mut builder = Error::builder(kind);
+                builder.set_original_message(msg);
+
+                Err(builder.build())?
+            }
             #[cfg(feature = "uuid-0_8")]
             Value::Uuid(uuid) => uuid.map(|uuid| {
                 let s = format!("CONVERT(uniqueidentifier, N'{}')", uuid.to_hyphenated().to_string());

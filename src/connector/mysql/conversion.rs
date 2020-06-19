@@ -1,63 +1,234 @@
-use crate::{ast::Value, connector::queryable::TakeRow, error::ErrorKind};
+use crate::{
+    ast::Value,
+    connector::{queryable::TakeRow, TypeIdentifier},
+    error::{Error, ErrorKind},
+};
 #[cfg(feature = "chrono-0_4")]
 use chrono::{DateTime, Datelike, NaiveDate, NaiveDateTime, NaiveTime, Timelike, Utc};
-use mysql_async as my;
-use mysql_async::Value as MyValue;
+use mysql_async::{self as my, consts::ColumnType};
 use rust_decimal::prelude::ToPrimitive;
 use std::convert::TryFrom;
 
-pub fn conv_params<'a>(params: &[Value<'a>]) -> my::Params {
+pub fn conv_params<'a>(params: &[Value<'a>]) -> crate::Result<my::Params> {
     if params.is_empty() {
         // If we don't use explicit 'Empty',
         // mysql crashes with 'internal error: entered unreachable code'
-        my::Params::Empty
+        Ok(my::Params::Empty)
     } else {
-        my::Params::Positional(params.iter().map(|x| x.into()).collect::<Vec<my::Value>>())
+        let mut values = Vec::with_capacity(params.len());
+
+        for pv in params {
+            let res = match pv {
+                Value::Integer(i) => i.map(|i| my::Value::Int(i)),
+                Value::Real(f) => match f {
+                    Some(f) => {
+                        let floating = f.to_f64().ok_or_else(|| {
+                            let msg = "Decimal is not a f64.";
+                            let kind = ErrorKind::conversion(msg);
+
+                            Error::builder(kind).build()
+                        })?;
+
+                        Some(my::Value::Double(floating))
+                    }
+                    None => None,
+                },
+                Value::Text(s) => s.clone().map(|s| my::Value::Bytes((&*s).as_bytes().to_vec())),
+                Value::Bytes(bytes) => bytes.clone().map(|bytes| my::Value::Bytes(bytes.into_owned())),
+                Value::Enum(s) => s.clone().map(|s| my::Value::Bytes((&*s).as_bytes().to_vec())),
+                Value::Boolean(b) => b.map(|b| my::Value::Int(b as i64)),
+                Value::Char(c) => c.map(|c| my::Value::Bytes(vec![c as u8])),
+                #[cfg(feature = "json-1")]
+                Value::Json(s) => match s {
+                    Some(ref s) => {
+                        let json = serde_json::to_string(s)?;
+                        let bytes = json.into_bytes();
+
+                        Some(my::Value::Bytes(bytes))
+                    }
+                    None => None,
+                },
+                #[cfg(feature = "array")]
+                Value::Array(_) => {
+                    let msg = "Arrays are not supported in MySQL.";
+                    let kind = ErrorKind::conversion(msg);
+
+                    let mut builder = Error::builder(kind);
+                    builder.set_original_message(msg);
+
+                    Err(builder.build())?
+                }
+                #[cfg(feature = "uuid-0_8")]
+                Value::Uuid(u) => u.map(|u| my::Value::Bytes(u.to_hyphenated().to_string().into_bytes())),
+                #[cfg(feature = "chrono-0_4")]
+                Value::Date(d) => {
+                    d.map(|d| my::Value::Date(d.year() as u16, d.month() as u8, d.day() as u8, 0, 0, 0, 0))
+                }
+                #[cfg(feature = "chrono-0_4")]
+                Value::Time(t) => {
+                    t.map(|t| my::Value::Time(false, 0, t.hour() as u8, t.minute() as u8, t.second() as u8, 0))
+                }
+                #[cfg(feature = "chrono-0_4")]
+                Value::DateTime(dt) => dt.map(|dt| {
+                    my::Value::Date(
+                        dt.year() as u16,
+                        dt.month() as u8,
+                        dt.day() as u8,
+                        dt.hour() as u8,
+                        dt.minute() as u8,
+                        dt.second() as u8,
+                        dt.timestamp_subsec_micros(),
+                    )
+                }),
+            };
+
+            match res {
+                Some(val) => values.push(val),
+                None => values.push(my::Value::NULL),
+            }
+        }
+
+        Ok(my::Params::Positional(values))
+    }
+}
+
+impl TypeIdentifier for my::Column {
+    fn is_real(&self) -> bool {
+        use ColumnType::*;
+
+        matches!(
+            self.column_type(),
+            MYSQL_TYPE_DECIMAL | MYSQL_TYPE_FLOAT | MYSQL_TYPE_DOUBLE | MYSQL_TYPE_NEWDECIMAL
+        )
+    }
+
+    fn is_integer(&self) -> bool {
+        use ColumnType::*;
+
+        matches!(
+            self.column_type(),
+            MYSQL_TYPE_TINY | MYSQL_TYPE_SHORT | MYSQL_TYPE_LONG | MYSQL_TYPE_LONGLONG | MYSQL_TYPE_YEAR
+        )
+    }
+
+    fn is_datetime(&self) -> bool {
+        use ColumnType::*;
+
+        matches!(
+            self.column_type(),
+            MYSQL_TYPE_TIMESTAMP | MYSQL_TYPE_DATETIME | MYSQL_TYPE_TIMESTAMP2 | MYSQL_TYPE_DATETIME2
+        )
+    }
+
+    fn is_time(&self) -> bool {
+        use ColumnType::*;
+
+        matches!(self.column_type(), MYSQL_TYPE_TIME | MYSQL_TYPE_TIME2)
+    }
+
+    fn is_date(&self) -> bool {
+        use ColumnType::*;
+
+        matches!(self.column_type(), MYSQL_TYPE_DATE | MYSQL_TYPE_NEWDATE)
+    }
+
+    fn is_text(&self) -> bool {
+        use ColumnType::*;
+
+        let is_defined_text = matches!(
+            self.column_type(),
+            MYSQL_TYPE_VARCHAR | MYSQL_TYPE_VAR_STRING | MYSQL_TYPE_STRING
+        );
+
+        let is_bytes_but_text = matches!(
+            self.column_type(),
+            MYSQL_TYPE_TINY_BLOB | MYSQL_TYPE_MEDIUM_BLOB | MYSQL_TYPE_LONG_BLOB | MYSQL_TYPE_BLOB
+        ) && self.character_set() != 63;
+
+        is_defined_text || is_bytes_but_text
+    }
+
+    fn is_bytes(&self) -> bool {
+        use ColumnType::*;
+
+        matches!(
+            self.column_type(),
+            MYSQL_TYPE_TINY_BLOB | MYSQL_TYPE_MEDIUM_BLOB | MYSQL_TYPE_LONG_BLOB | MYSQL_TYPE_BLOB
+        ) && self.character_set() == 63
+    }
+
+    fn is_bool(&self) -> bool {
+        self.column_type() == ColumnType::MYSQL_TYPE_BIT
+    }
+
+    fn is_json(&self) -> bool {
+        self.column_type() == ColumnType::MYSQL_TYPE_JSON
+    }
+
+    fn is_enum(&self) -> bool {
+        self.column_type() == ColumnType::MYSQL_TYPE_ENUM
+    }
+
+    fn is_null(&self) -> bool {
+        self.column_type() == ColumnType::MYSQL_TYPE_NULL
     }
 }
 
 impl TakeRow for my::Row {
-    fn take_result_row<'b>(&'b mut self) -> crate::Result<Vec<Value<'static>>> {
+    fn take_result_row(&mut self) -> crate::Result<Vec<Value<'static>>> {
         fn convert(row: &mut my::Row, i: usize) -> crate::Result<Value<'static>> {
-            use mysql_async::consts::ColumnType::*;
-
             let value = row.take(i).ok_or_else(|| {
-                crate::error::Error::builder(ErrorKind::ConversionError("Index out of bounds")).build()
+                let msg = "Index out of bounds";
+                let kind = ErrorKind::conversion(msg);
+
+                Error::builder(kind).build()
             })?;
 
             let column = row.columns_ref().get(i).ok_or_else(|| {
-                crate::error::Error::builder(ErrorKind::ConversionError("Index out of bounds")).build()
+                let msg = "Index out of bounds";
+                let kind = ErrorKind::conversion(msg);
+
+                Error::builder(kind).build()
             })?;
 
             let res = match value {
                 // JSON is returned as bytes.
                 #[cfg(feature = "json-1")]
-                my::Value::Bytes(b) if column.column_type() == MYSQL_TYPE_JSON => {
-                    serde_json::from_slice(&b).map(|val| Value::json(val)).map_err(|_e| {
-                        crate::error::Error::builder(ErrorKind::ConversionError("Unable to convert bytes to JSON"))
-                            .build()
+                my::Value::Bytes(b) if column.is_json() => {
+                    serde_json::from_slice(&b).map(|val| Value::json(val)).map_err(|_| {
+                        let msg = "Unable to convert bytes to JSON";
+                        let kind = ErrorKind::conversion(msg);
+
+                        Error::builder(kind).build()
                     })?
                 }
                 // NEWDECIMAL returned as bytes. See https://mariadb.com/kb/en/resultset-row/#decimal-binary-encoding
-                my::Value::Bytes(b) if column.column_type() == MYSQL_TYPE_NEWDECIMAL => Value::real(
-                    String::from_utf8(b)
-                        .expect("MySQL NEWDECIMAL as string")
-                        .parse()
-                        .map_err(|_err| {
-                            crate::error::Error::builder(ErrorKind::ConversionError("mysql NEWDECIMAL conversion"))
-                                .build()
-                        })?,
-                ),
+                my::Value::Bytes(b) if column.is_real() => {
+                    let s = String::from_utf8(b).map_err(|_| {
+                        let msg = "Could not convert NEWDECIMAL from bytes to String.";
+                        let kind = ErrorKind::conversion(msg);
+
+                        Error::builder(kind).build()
+                    })?;
+
+                    let dec = s.parse().map_err(|_| {
+                        let msg = "Could not convert NEWDECIMAL string to a Decimal.";
+                        let kind = ErrorKind::conversion(msg);
+
+                        Error::builder(kind).build()
+                    })?;
+
+                    Value::real(dec)
+                }
                 // https://dev.mysql.com/doc/internals/en/character-set.html
                 my::Value::Bytes(b) if column.character_set() == 63 => Value::bytes(b),
                 my::Value::Bytes(s) => Value::text(String::from_utf8(s)?),
                 my::Value::Int(i) => Value::integer(i),
                 my::Value::UInt(i) => Value::integer(i64::try_from(i).map_err(|_| {
-                    let builder = crate::error::Error::builder(ErrorKind::ValueOutOfRange {
-                        message: "Unsigned integers larger than 9_223_372_036_854_775_807 are currently not handled."
-                            .into(),
-                    });
-                    builder.build()
+                    let msg = "Unsigned integers larger than 9_223_372_036_854_775_807 are currently not handled.";
+                    let kind = ErrorKind::value_out_of_range(msg);
+
+                    Error::builder(kind).build()
                 })?),
                 my::Value::Float(f) => Value::from(f),
                 my::Value::Double(f) => Value::from(f),
@@ -73,57 +244,54 @@ impl TakeRow for my::Row {
                 #[cfg(feature = "chrono-0_4")]
                 my::Value::Time(is_neg, days, hours, minutes, seconds, micros) => {
                     if is_neg {
-                        let kind = ErrorKind::ConversionError("Failed to convert a negative time");
-                        return Err(crate::error::Error::builder(kind).build());
+                        let kind = ErrorKind::conversion("Failed to convert a negative time");
+                        Err(Error::builder(kind).build())?
                     }
 
                     if days != 0 {
-                        let kind = ErrorKind::ConversionError("Failed to read a MySQL `time` as duration");
-                        return Err(crate::error::Error::builder(kind).build());
+                        let kind = ErrorKind::conversion("Failed to read a MySQL `time` as duration");
+                        Err(Error::builder(kind).build())?
                     }
 
                     let time = NaiveTime::from_hms_micro(hours.into(), minutes.into(), seconds.into(), micros);
                     Value::time(time)
                 }
-                my::Value::NULL => match column.column_type() {
-                    MYSQL_TYPE_DECIMAL | MYSQL_TYPE_FLOAT | MYSQL_TYPE_DOUBLE | MYSQL_TYPE_NEWDECIMAL => {
-                        Value::Real(None)
-                    }
-                    MYSQL_TYPE_NULL => Value::Integer(None),
-                    MYSQL_TYPE_TINY | MYSQL_TYPE_SHORT | MYSQL_TYPE_LONG | MYSQL_TYPE_LONGLONG => Value::Integer(None),
+                my::Value::NULL => match column {
+                    t if t.is_real() => Value::Real(None),
+                    t if t.is_null() => Value::Integer(None),
+                    t if t.is_integer() => Value::Integer(None),
                     #[cfg(feature = "chrono-0_4")]
-                    MYSQL_TYPE_TIMESTAMP
-                    | MYSQL_TYPE_TIME
-                    | MYSQL_TYPE_DATE
-                    | MYSQL_TYPE_DATETIME
-                    | MYSQL_TYPE_YEAR
-                    | MYSQL_TYPE_NEWDATE
-                    | MYSQL_TYPE_TIMESTAMP2
-                    | MYSQL_TYPE_DATETIME2
-                    | MYSQL_TYPE_TIME2 => Value::DateTime(None),
-                    MYSQL_TYPE_VARCHAR | MYSQL_TYPE_VAR_STRING | MYSQL_TYPE_STRING => Value::Text(None),
-                    MYSQL_TYPE_BIT => Value::Boolean(None),
+                    t if t.is_datetime() => Value::DateTime(None),
+                    #[cfg(feature = "chrono-0_4")]
+                    t if t.is_time() => Value::Time(None),
+                    #[cfg(feature = "chrono-0_4")]
+                    t if t.is_date() => Value::Date(None),
+                    t if t.is_text() => Value::Text(None),
+                    t if t.is_bytes() => Value::Bytes(None),
+                    t if t.is_bool() => Value::Boolean(None),
                     #[cfg(feature = "json-1")]
-                    MYSQL_TYPE_JSON => Value::Json(None),
-                    MYSQL_TYPE_ENUM => Value::Enum(None),
-                    MYSQL_TYPE_TINY_BLOB | MYSQL_TYPE_MEDIUM_BLOB | MYSQL_TYPE_LONG_BLOB | MYSQL_TYPE_BLOB
-                        if column.character_set() == 63 =>
-                    {
-                        Value::Bytes(None)
+                    t if t.is_json() => Value::Json(None),
+                    t if t.is_enum() => Value::Enum(None),
+                    typ => {
+                        let msg = format!(
+                            "Value of type {:?} is not supported with the current configuration",
+                            typ
+                        );
+
+                        let kind = ErrorKind::conversion(msg);
+                        Err(Error::builder(kind).build())?
                     }
-                    MYSQL_TYPE_TINY_BLOB | MYSQL_TYPE_MEDIUM_BLOB | MYSQL_TYPE_LONG_BLOB | MYSQL_TYPE_BLOB => {
-                        Value::Text(None)
-                    }
-                    typ => panic!(
-                        "Value of type {:?} is not supported with the current configuration",
-                        typ
-                    ),
                 },
                 #[cfg(not(feature = "chrono-0_4"))]
-                typ => panic!(
-                    "Value of type {:?} is not supported with the current configuration",
-                    typ
-                ),
+                typ => {
+                    let msg = format!(
+                        "Value of type {:?} is not supported with the current configuration",
+                        typ
+                    );
+
+                    let kind = ErrorKind::conversion(msg);
+                    Err(Error::builder(kind).build())?
+                }
             };
 
             Ok(res)
@@ -136,49 +304,5 @@ impl TakeRow for my::Row {
         }
 
         Ok(row)
-    }
-}
-
-impl<'a> From<Value<'a>> for MyValue {
-    fn from(pv: Value<'a>) -> MyValue {
-        let res = match pv {
-            Value::Integer(i) => i.map(|i| MyValue::Int(i)),
-            Value::Real(f) => f.map(|f| MyValue::Double(f.to_f64().expect("Decimal is not a f64."))),
-            Value::Text(s) => s.map(|s| MyValue::Bytes((&*s).as_bytes().to_vec())),
-            Value::Bytes(bytes) => bytes.map(|bytes| MyValue::Bytes(bytes.into_owned())),
-            Value::Enum(s) => s.map(|s| MyValue::Bytes((&*s).as_bytes().to_vec())),
-            Value::Boolean(b) => b.map(|b| MyValue::Int(b as i64)),
-            Value::Char(c) => c.map(|c| MyValue::Bytes(vec![c as u8])),
-            #[cfg(feature = "json-1")]
-            Value::Json(json) => json.map(|json| {
-                let s = serde_json::to_string(&json).expect("Cannot convert JSON to String.");
-                MyValue::Bytes(s.into_bytes())
-            }),
-            #[cfg(feature = "array")]
-            Value::Array(_) => unimplemented!("Arrays are not supported for mysql."),
-            #[cfg(feature = "uuid-0_8")]
-            Value::Uuid(u) => u.map(|u| MyValue::Bytes(u.to_hyphenated().to_string().into_bytes())),
-            #[cfg(feature = "chrono-0_4")]
-            Value::Date(d) => d.map(|d| MyValue::Date(d.year() as u16, d.month() as u8, d.day() as u8, 0, 0, 0, 0)),
-            #[cfg(feature = "chrono-0_4")]
-            Value::Time(t) => t.map(|t| MyValue::Time(false, 0, t.hour() as u8, t.minute() as u8, t.second() as u8, 0)),
-            #[cfg(feature = "chrono-0_4")]
-            Value::DateTime(dt) => dt.map(|dt| {
-                MyValue::Date(
-                    dt.year() as u16,
-                    dt.month() as u8,
-                    dt.day() as u8,
-                    dt.hour() as u8,
-                    dt.minute() as u8,
-                    dt.second() as u8,
-                    dt.timestamp_subsec_micros(),
-                )
-            }),
-        };
-
-        match res {
-            Some(val) => val,
-            None => MyValue::NULL,
-        }
     }
 }

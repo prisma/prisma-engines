@@ -595,10 +595,10 @@ fn string_to_bits(s: &str) -> crate::Result<BitVec> {
             '0' => bits.push(false),
             '1' => bits.push(true),
             _ => {
-                return Err(Error::builder(ErrorKind::ConversionError(
-                    "Unexpected character for bits input. Expected only 1 and 0.",
-                ))
-                .build())
+                let msg = "Unexpected character for bits input. Expected only 1 and 0.";
+                let kind = ErrorKind::conversion(msg);
+
+                Err(Error::builder(kind).build())?
             }
         }
     }

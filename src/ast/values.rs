@@ -426,6 +426,15 @@ impl<'a> Value<'a> {
         }
     }
 
+    /// `true` if the `Value` is an Array.
+    #[cfg(feature = "array")]
+    pub fn is_array(&self) -> bool {
+        match self {
+            Value::Array(_) => true,
+            _ => false,
+        }
+    }
+
     /// `true` if the `Value` is of UUID type.
     #[cfg(feature = "uuid-0_8")]
     pub fn is_uuid(&self) -> bool {
@@ -576,7 +585,7 @@ impl<'a> TryFrom<Value<'a>> for i64 {
     fn try_from(value: Value<'a>) -> Result<i64, Self::Error> {
         value
             .as_i64()
-            .ok_or_else(|| Error::builder(ErrorKind::ConversionError("Not an i64")).build())
+            .ok_or_else(|| Error::builder(ErrorKind::conversion("Not an i64")).build())
     }
 }
 
@@ -586,7 +595,7 @@ impl<'a> TryFrom<Value<'a>> for Decimal {
     fn try_from(value: Value<'a>) -> Result<Decimal, Self::Error> {
         value
             .as_decimal()
-            .ok_or_else(|| Error::builder(ErrorKind::ConversionError("Not a decimal")).build())
+            .ok_or_else(|| Error::builder(ErrorKind::conversion("Not a decimal")).build())
     }
 }
 
@@ -597,7 +606,7 @@ impl<'a> TryFrom<Value<'a>> for f64 {
         value
             .as_decimal()
             .and_then(|d| d.to_f64())
-            .ok_or_else(|| Error::builder(ErrorKind::ConversionError("Not a f64")).build())
+            .ok_or_else(|| Error::builder(ErrorKind::conversion("Not a f64")).build())
     }
 }
 
@@ -607,7 +616,7 @@ impl<'a> TryFrom<Value<'a>> for String {
     fn try_from(value: Value<'a>) -> Result<String, Self::Error> {
         value
             .into_string()
-            .ok_or_else(|| Error::builder(ErrorKind::ConversionError("Not a string")).build())
+            .ok_or_else(|| Error::builder(ErrorKind::conversion("Not a string")).build())
     }
 }
 
@@ -617,7 +626,7 @@ impl<'a> TryFrom<Value<'a>> for bool {
     fn try_from(value: Value<'a>) -> Result<bool, Self::Error> {
         value
             .as_bool()
-            .ok_or_else(|| Error::builder(ErrorKind::ConversionError("Not a bool")).build())
+            .ok_or_else(|| Error::builder(ErrorKind::conversion("Not a bool")).build())
     }
 }
 
@@ -628,7 +637,7 @@ impl<'a> TryFrom<Value<'a>> for DateTime<Utc> {
     fn try_from(value: Value<'a>) -> Result<DateTime<Utc>, Self::Error> {
         value
             .as_datetime()
-            .ok_or_else(|| Error::builder(ErrorKind::ConversionError("Not a datetime")).build())
+            .ok_or_else(|| Error::builder(ErrorKind::conversion("Not a datetime")).build())
     }
 }
 

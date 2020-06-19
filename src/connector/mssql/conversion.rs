@@ -1,10 +1,29 @@
-use crate::ast::Value;
+use crate::{
+    ast::Value,
+    error::{Error, ErrorKind},
+};
 use rust_decimal::{prelude::FromPrimitive, Decimal};
 use std::convert::TryFrom;
 use tiberius::{ColumnData, FromSql, IntoSql, ToSql};
 
-pub fn conv_params<'a>(params: &'a [Value<'a>]) -> Vec<&'a dyn ToSql> {
-    params.iter().map(|x| x as &dyn ToSql).collect::<Vec<_>>()
+pub fn conv_params<'a>(params: &'a [Value<'a>]) -> crate::Result<Vec<&'a dyn ToSql>> {
+    let mut converted = Vec::with_capacity(params.len());
+
+    for param in params.iter() {
+        if param.is_array() {
+            let msg = "Arrays are not supported in T-SQL.";
+            let kind = ErrorKind::conversion(msg);
+
+            let mut builder = Error::builder(kind);
+            builder.set_original_message(msg);
+
+            Err(builder.build())?
+        } else {
+            converted.push(param as &dyn ToSql)
+        }
+    }
+
+    Ok(converted)
 }
 
 impl<'a> ToSql for Value<'a> {
@@ -17,8 +36,6 @@ impl<'a> ToSql for Value<'a> {
             Value::Enum(val) => val.to_sql(),
             Value::Boolean(val) => val.to_sql(),
             Value::Char(val) => val.as_ref().map(|val| format!("{}", val)).into_sql(),
-            #[cfg(feature = "array")]
-            Value::Array(_) => panic!("Arrays not supported in MSSQL"),
             #[cfg(feature = "json-1")]
             Value::Json(val) => val.as_ref().map(|val| serde_json::to_string(&val).unwrap()).into_sql(),
             #[cfg(feature = "uuid-0_8")]
@@ -29,6 +46,7 @@ impl<'a> ToSql for Value<'a> {
             Value::Date(val) => val.to_sql(),
             #[cfg(feature = "chrono-0_4")]
             Value::Time(val) => val.to_sql(),
+            p => todo!("Type {:?} is not supported", p),
         }
     }
 }

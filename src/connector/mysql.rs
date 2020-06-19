@@ -281,7 +281,7 @@ impl Queryable for Mysql {
         metrics::query("mysql.query_raw", sql, params, move || async move {
             let conn = self.get_conn().await?;
             let results = self
-                .timeout(conn.prep_exec(sql, conversion::conv_params(params)))
+                .timeout(conn.prep_exec(sql, conversion::conv_params(params)?))
                 .await?;
 
             let columns = results
@@ -312,7 +312,7 @@ impl Queryable for Mysql {
         metrics::query("mysql.execute_raw", sql, params, move || async move {
             let conn = self.get_conn().await?;
             let results = self
-                .timeout(conn.prep_exec(sql, conversion::conv_params(params)))
+                .timeout(conn.prep_exec(sql, conversion::conv_params(params)?))
                 .await?;
             Ok(results.affected_rows())
         })

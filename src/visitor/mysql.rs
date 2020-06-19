@@ -1,5 +1,6 @@
 use crate::{
     ast::*,
+    error::{Error, ErrorKind},
     visitor::{self, Visitor},
 };
 use std::fmt::{self, Write};
@@ -64,9 +65,23 @@ impl<'a> Visitor<'a> for Mysql<'a> {
             Value::Boolean(b) => b.map(|b| self.write(b)),
             Value::Char(c) => c.map(|c| self.write(format!("'{}'", c))),
             #[cfg(feature = "json-1")]
-            Value::Json(j) => j.map(|j| self.write(format!("CONVERT('{}', JSON)", serde_json::to_string(&j).unwrap()))),
+            Value::Json(j) => match j {
+                Some(ref j) => {
+                    let s = serde_json::to_string(&j)?;
+                    Some(self.write(format!("CONVERT('{}', JSON)", s)))
+                }
+                None => None,
+            },
             #[cfg(all(feature = "array", feature = "postgresql"))]
-            Value::Array(_) => panic!("Arrays not supported in MySQL"),
+            Value::Array(_) => {
+                let msg = "Arrays are not supported in MySQL.";
+                let kind = ErrorKind::conversion(msg);
+
+                let mut builder = Error::builder(kind);
+                builder.set_original_message(msg);
+
+                Err(builder.build())?
+            }
             #[cfg(feature = "uuid-0_8")]
             Value::Uuid(uuid) => uuid.map(|uuid| self.write(format!("'{}'", uuid.to_hyphenated().to_string()))),
             #[cfg(feature = "chrono-0_4")]

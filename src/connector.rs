@@ -9,9 +9,12 @@
 //! implement the [Queryable](trait.Queryable.html) trait for generalized
 //! querying interface.
 
+mod connection_info;
+pub(crate) mod metrics;
 mod queryable;
 mod result_set;
 mod transaction;
+mod type_identifier;
 
 #[cfg(feature = "mssql")]
 pub(crate) mod mssql;
@@ -26,15 +29,12 @@ pub(crate) mod sqlite;
 pub use self::mysql::*;
 #[cfg(feature = "postgresql")]
 pub use self::postgres::*;
+pub use self::result_set::*;
+pub use connection_info::*;
 #[cfg(feature = "mssql")]
 pub use mssql::*;
+pub use queryable::*;
 #[cfg(feature = "sqlite")]
 pub use sqlite::*;
-
-mod connection_info;
-pub use connection_info::*;
-
-pub(crate) mod metrics;
-pub use self::result_set::*;
-pub use queryable::*;
 pub use transaction::*;
+pub(crate) use type_identifier::*;

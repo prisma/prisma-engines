@@ -170,7 +170,7 @@ impl Queryable for Mssql {
     async fn query_raw(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<ResultSet> {
         metrics::query("mssql.query_raw", sql, params, move || async move {
             let mut client = self.client.lock().await;
-            let params = conversion::conv_params(params);
+            let params = conversion::conv_params(params)?;
             let query = client.query(sql, params.as_slice());
 
             let results = self.timeout(query).await?;
@@ -204,7 +204,7 @@ impl Queryable for Mssql {
     async fn execute_raw(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<u64> {
         metrics::query("mssql.execute_raw", sql, params, move || async move {
             let mut client = self.client.lock().await;
-            let params = conversion::conv_params(params);
+            let params = conversion::conv_params(params)?;
             let query = client.execute(sql, params.as_slice());
 
             let changes = self.timeout(query).await?.total();
@@ -265,13 +265,13 @@ impl MssqlUrl {
                         let key = split
                             .next()
                             .ok_or_else(|| {
-                                let kind = ErrorKind::ConversionError("Malformed connection string key");
+                                let kind = ErrorKind::conversion("Malformed connection string key");
                                 Error::builder(kind).build()
                             })?
                             .trim();
 
                         let value = split.next().ok_or_else(|| {
-                            let kind = ErrorKind::ConversionError("Malformed connection string value");
+                            let kind = ErrorKind::conversion("Malformed connection string value");
                             Error::builder(kind).build()
                         })?;
 
@@ -324,7 +324,7 @@ impl MssqlUrl {
                 })
             }
             _ => {
-                let kind = ErrorKind::ConversionError("Malformed connection string");
+                let kind = ErrorKind::conversion("Malformed connection string");
                 Err(Error::builder(kind).build())
             }
         }

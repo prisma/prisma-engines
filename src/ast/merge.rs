@@ -83,12 +83,12 @@ impl<'a> TryFrom<Insert<'a>> for Merge<'a> {
 
     fn try_from(insert: Insert<'a>) -> crate::Result<Self> {
         let table = insert.table.ok_or_else(|| {
-            let kind = ErrorKind::ConversionError("Insert needs to point to a table for conversion to Merge.");
+            let kind = ErrorKind::conversion("Insert needs to point to a table for conversion to Merge.");
             Error::builder(kind).build()
         })?;
 
         if table.index_definitions.is_empty() {
-            let kind = ErrorKind::ConversionError("Insert table needs schema metadata for conversion to Merge.");
+            let kind = ErrorKind::conversion("Insert table needs schema metadata for conversion to Merge.");
             return Err(Error::builder(kind).build());
         }
 
@@ -127,7 +127,7 @@ impl<'a> TryFrom<Insert<'a>> for Merge<'a> {
             }
             ExpressionKind::Select(select) => Query::from(*select),
             _ => {
-                let kind = ErrorKind::ConversionError("Insert type not supported.");
+                let kind = ErrorKind::conversion("Insert type not supported.");
                 return Err(Error::builder(kind).build());
             }
         };
