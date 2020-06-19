@@ -11,6 +11,7 @@ use enums::EnumDiffer;
 use once_cell::sync::Lazy;
 use regex::RegexSet;
 use sql_schema_describer::*;
+use sql_schema_helpers::TableRef;
 use tracing::debug;
 
 #[derive(Debug)]
@@ -177,15 +178,8 @@ impl<'schema> SqlSchemaDiffer<'schema> {
 
     fn alter_tables(&self) -> Vec<AlterTable> {
         // TODO: this does not diff primary key columns yet
-        let mut result = Vec::new();
-        for previous_table in &self.previous.tables {
-            if let Ok(next_table) = self.next.table(&previous_table.name) {
-                let differ = TableDiffer {
-                    diffing_options: &self.diffing_options,
-                    previous: &previous_table,
-                    next: &next_table,
-                };
-
+        self.table_pairs()
+            .filter_map(|differ| {
                 let changes: Vec<TableChange> = Self::drop_foreign_keys(&differ)
                     .chain(Self::drop_columns(&differ))
                     .chain(Self::add_columns(&differ))
@@ -194,15 +188,15 @@ impl<'schema> SqlSchemaDiffer<'schema> {
 
                 if !changes.is_empty() {
                     let update = AlterTable {
-                        table: next_table.clone(),
+                        table: differ.next.table.clone(),
                         changes,
                     };
-                    result.push(update);
+                    return Some(update);
                 }
-            }
-        }
 
-        result
+                None
+            })
+            .collect()
     }
 
     fn drop_columns<'a>(differ: &'a TableDiffer<'schema>) -> impl Iterator<Item = TableChange> + 'a {
@@ -251,7 +245,8 @@ impl<'schema> SqlSchemaDiffer<'schema> {
             .map(move |dropped_foreign_key_name| {
                 debug!(
                     "Dropping foreign key '{}' on table '{}'",
-                    &dropped_foreign_key_name, &differ.previous.name
+                    &dropped_foreign_key_name,
+                    &differ.previous.name()
                 );
                 let drop_step = DropForeignKey {
                     constraint_name: dropped_foreign_key_name.clone(),
@@ -277,7 +272,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
         for tables in self.table_pairs() {
             for index in tables.created_indexes() {
                 let create = CreateIndex {
-                    table: tables.next.name.clone(),
+                    table: tables.next.name().to_owned(),
                     index: index.clone(),
                 };
 
@@ -295,11 +290,11 @@ impl<'schema> SqlSchemaDiffer<'schema> {
             for index in tables.dropped_indexes() {
                 // On MySQL, foreign keys automatically create indexes. These foreign-key-created
                 // indexes should only be dropped as part of the foreign key.
-                if self.sql_family.is_mysql() && index::index_covers_fk(&tables.previous, index) {
+                if self.sql_family.is_mysql() && index::index_covers_fk(&tables.previous.table, index) {
                     continue;
                 }
                 drop_indexes.push(DropIndex {
-                    table: tables.previous.name.clone(),
+                    table: tables.previous.name().to_owned(),
                     name: index.name.clone(),
                 })
             }
@@ -355,8 +350,8 @@ impl<'schema> SqlSchemaDiffer<'schema> {
                 .find(move |next_table| tables_match(previous_table, next_table))
                 .map(move |next_table| TableDiffer {
                     diffing_options: &self.diffing_options,
-                    previous: previous_table,
-                    next: next_table,
+                    previous: TableRef::new(self.previous, previous_table),
+                    next: TableRef::new(self.next, next_table),
                 })
         })
     }
@@ -368,7 +363,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
                 alter_indexes.push(AlterIndex {
                     index_name: previous_index.name.clone(),
                     index_new_name: renamed_index.name.clone(),
-                    table: differ.next.name.clone(),
+                    table: differ.next.name().to_owned(),
                 })
             })
         });
@@ -440,7 +435,7 @@ fn push_created_foreign_keys<'a, 'schema>(
 ) {
     table_pairs.for_each(|differ| {
         added_foreign_keys.extend(differ.created_foreign_keys().map(|created_fk| AddForeignKey {
-            table: differ.next.name.clone(),
+            table: differ.next.name().to_owned(),
             foreign_key: created_fk.clone(),
         }))
     })

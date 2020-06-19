@@ -1,10 +1,11 @@
 use super::column::ColumnDiffer;
-use sql_schema_describer::{Column, ForeignKey, Index, Table};
+use crate::sql_schema_helpers::TableRef;
+use sql_schema_describer::{Column, ForeignKey, Index};
 
 pub(crate) struct TableDiffer<'a> {
     pub(crate) diffing_options: &'a super::DiffingOptions,
-    pub(crate) previous: &'a Table,
-    pub(crate) next: &'a Table,
+    pub(crate) previous: TableRef<'a>,
+    pub(crate) next: TableRef<'a>,
 }
 
 impl<'schema> TableDiffer<'schema> {
@@ -79,27 +80,27 @@ impl<'schema> TableDiffer<'schema> {
     }
 
     fn previous_columns(&self) -> impl Iterator<Item = &'schema Column> {
-        self.previous.columns.iter()
+        self.previous.table.columns.iter()
     }
 
     fn next_columns(&self) -> impl Iterator<Item = &'schema Column> {
-        self.next.columns.iter()
+        self.next.table.columns.iter()
     }
 
     fn previous_foreign_keys(&self) -> impl Iterator<Item = &ForeignKey> {
-        self.previous.foreign_keys.iter()
+        self.previous.table.foreign_keys.iter()
     }
 
     fn next_foreign_keys(&self) -> impl Iterator<Item = &ForeignKey> {
-        self.next.foreign_keys.iter()
+        self.next.table.foreign_keys.iter()
     }
 
     fn previous_indexes<'a>(&'a self) -> impl Iterator<Item = &'schema Index> + 'a {
-        self.previous.indices.iter()
+        self.previous.table.indices.iter()
     }
 
     fn next_indexes<'a>(&'a self) -> impl Iterator<Item = &'schema Index> + 'a {
-        self.next.indices.iter()
+        self.next.table.indices.iter()
     }
 }
 

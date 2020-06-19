@@ -52,7 +52,7 @@ impl<'a> ColumnRef<'a> {
 
     pub(crate) fn table(&self) -> TableRef<'a> {
         TableRef {
-            _schema: self.schema,
+            schema: self.schema,
             table: self.table,
         }
     }
@@ -62,17 +62,35 @@ impl<'a> ColumnRef<'a> {
     }
 }
 
+#[derive(Clone, Copy)]
 pub(crate) struct TableRef<'a> {
-    _schema: &'a SqlSchema,
-    table: &'a Table,
+    pub(crate) schema: &'a SqlSchema,
+    pub(crate) table: &'a Table,
 }
 
 impl<'a> TableRef<'a> {
+    pub(crate) fn new(schema: &'a SqlSchema, table: &'a Table) -> Self {
+        Self { schema, table }
+    }
+
     pub(crate) fn name(&self) -> &'a str {
         &self.table.name
     }
 
     pub(crate) fn foreign_key_for_column(&self, column: &str) -> Option<&'a ForeignKey> {
         self.table.foreign_key_for_column(column)
+    }
+}
+
+pub(crate) trait SqlSchemaExt {
+    fn table_ref<'a>(&'a self, name: &str) -> Option<TableRef<'a>>;
+}
+
+impl SqlSchemaExt for SqlSchema {
+    fn table_ref<'a>(&'a self, name: &str) -> Option<TableRef<'a>> {
+        Some(TableRef {
+            table: self.table(name).ok()?,
+            schema: self,
+        })
     }
 }

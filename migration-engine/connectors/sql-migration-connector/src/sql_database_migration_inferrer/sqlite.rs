@@ -3,9 +3,10 @@ use crate::{
     sql_migration::*,
     sql_renderer::{Quoted, SqlRenderer},
     sql_schema_differ::{ColumnDiffer, DiffingOptions, SqlSchemaDiff, TableDiffer},
+    sql_schema_helpers::{SqlSchemaExt, TableRef},
     SqlFamily, SqlResult,
 };
-use sql_schema_describer::{ColumnArity, SqlSchema, Table};
+use sql_schema_describer::{ColumnArity, SqlSchema};
 
 pub(super) fn fix(
     diff: SqlSchemaDiff,
@@ -96,15 +97,24 @@ fn sqlite_fix_table(
     schema_name: &str,
     database_info: &DatabaseInfo,
 ) -> SqlResult<impl Iterator<Item = SqlMigrationStep>> {
-    let current_table = current_database_schema.table(table_name)?;
-    let next_table = next_database_schema.table(table_name)?;
-    Ok(fix_table(&current_table, &next_table, &schema_name, database_info).into_iter())
+    let current_table = current_database_schema
+        .table_ref(table_name)
+        .expect("SQLite table referenced in migration not found.");
+    let next_table = next_database_schema
+        .table_ref(table_name)
+        .expect("SQLite table referenced in migration not found.");
+    Ok(fix_table(current_table, next_table, &schema_name, database_info).into_iter())
 }
 
-fn fix_table(current: &Table, next: &Table, schema_name: &str, database_info: &DatabaseInfo) -> Vec<SqlMigrationStep> {
+fn fix_table(
+    current: TableRef<'_>,
+    next: TableRef<'_>,
+    schema_name: &str,
+    database_info: &DatabaseInfo,
+) -> Vec<SqlMigrationStep> {
     // based on 'Making Other Kinds Of Table Schema Changes' from https://www.sqlite.org/lang_altertable.html
-    let name_of_temporary_table = format!("new_{}", &next.name);
-    let mut temporary_table = next.clone();
+    let name_of_temporary_table = format!("new_{}", &next.name());
+    let mut temporary_table = next.table.clone();
     temporary_table.name = name_of_temporary_table.clone();
 
     let mut result = Vec::new();
@@ -121,25 +131,25 @@ fn fix_table(current: &Table, next: &Table, schema_name: &str, database_info: &D
         TableDiffer {
             diffing_options: &diffing_options,
             previous: current,
-            next: &temporary_table,
+            next: TableRef::new(next.schema, &temporary_table),
         },
         schema_name,
     )
     .unwrap();
 
     result.push(SqlMigrationStep::DropTable(DropTable {
-        name: current.name.clone(),
+        name: current.name().to_owned(),
     }));
 
     result.push(SqlMigrationStep::RenameTable {
         name: name_of_temporary_table,
-        new_name: next.name.clone(),
+        new_name: next.name().to_owned(),
     });
 
     // Recreate the indices
-    result.extend(next.indices.iter().map(|index| {
+    result.extend(next.table.indices.iter().map(|index| {
         SqlMigrationStep::CreateIndex(CreateIndex {
-            table: next.name.clone(),
+            table: next.name().to_owned(),
             index: index.clone(),
         })
     }));
@@ -182,7 +192,7 @@ fn copy_current_table_into_new_table(
         query,
         "INSERT INTO {}.{} (",
         Quoted::sqlite_ident(schema_name),
-        Quoted::sqlite_ident(&differ.next.name)
+        Quoted::sqlite_ident(&differ.next.name())
     )?;
 
     let mut destination_columns = intersection_columns
@@ -236,7 +246,7 @@ fn copy_current_table_into_new_table(
         query,
         " FROM {}.{}",
         Quoted::sqlite_ident(schema_name),
-        Quoted::sqlite_ident(&differ.previous.name)
+        Quoted::sqlite_ident(&differ.previous.name())
     )?;
 
     steps.push(SqlMigrationStep::RawSql { raw: query });
