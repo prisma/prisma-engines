@@ -58,6 +58,9 @@
 //!   transaction, a deallocation query `DEALLOCATE ALL` is executed right after
 //!   `BEGIN` to avoid possible collisions with statements created in other
 //!   sessions.
+//! - `statement_cache_size`, number of prepared statements kept cached.
+//!   Defaults to 500, which means caching is off. If `pgbouncer` mode is enabled,
+//!   caching is always off.
 //!
 //! ## MySQL
 //!

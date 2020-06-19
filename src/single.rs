@@ -71,6 +71,15 @@ impl Quaint {
     /// - `connect_timeout` defined in seconds (default: 5). Connecting to a
     ///   database will return a `ConnectTimeout` error if taking more than the
     ///   defined value.
+    /// - `pgbouncer` either `true` or `false`. If set, allows usage with the
+    ///   pgBouncer connection pool in transaction mode. Additionally a transaction
+    ///   is required for every query for the mode to work. When starting a new
+    ///   transaction, a deallocation query `DEALLOCATE ALL` is executed right after
+    ///   `BEGIN` to avoid possible collisions with statements created in other
+    ///   sessions.
+    /// - `statement_cache_size`, number of prepared statements kept cached.
+    ///   Defaults to 500, which means caching is off. If `pgbouncer` mode is enabled,
+    ///   caching is always off.
     ///
     /// MySQL:
     ///

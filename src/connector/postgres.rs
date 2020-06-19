@@ -9,6 +9,7 @@ use crate::{
 };
 use async_trait::async_trait;
 use futures::{future::FutureExt, lock::Mutex};
+use lru_cache::LruCache;
 use native_tls::{Certificate, Identity, TlsConnector};
 use percent_encoding::percent_decode;
 use postgres_native_tls::MakeTlsConnector;
@@ -19,7 +20,7 @@ use std::{
     time::Duration,
 };
 use tokio::time::timeout;
-use tokio_postgres::{config::SslMode, Client, Config};
+use tokio_postgres::{config::SslMode, Client, Config, Statement};
 use url::Url;
 
 pub(crate) const DEFAULT_SCHEMA: &str = "public";
@@ -33,7 +34,7 @@ impl<T> std::fmt::Debug for Hidden<T> {
     }
 }
 
-struct PostgresClient(Mutex<Client>);
+struct PostgresClient(Client);
 
 impl std::fmt::Debug for PostgresClient {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -47,6 +48,7 @@ pub struct PostgreSql {
     client: PostgresClient,
     pg_bouncer: bool,
     socket_timeout: Option<Duration>,
+    statement_cache: Mutex<LruCache<String, Statement>>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -214,6 +216,14 @@ impl PostgresUrl {
         self.query_params.connect_timeout
     }
 
+    pub(crate) fn cache(&self) -> LruCache<String, Statement> {
+        if self.query_params.pg_bouncer == true {
+            LruCache::new(0)
+        } else {
+            LruCache::new(self.query_params.statement_cache_size)
+        }
+    }
+
     fn parse_query_params(url: &Url) -> Result<PostgresUrlQueryParams, Error> {
         let mut connection_limit = None;
         let mut schema = String::from(DEFAULT_SCHEMA);
@@ -226,6 +236,7 @@ impl PostgresUrl {
         let mut socket_timeout = None;
         let mut connect_timeout = None;
         let mut pg_bouncer = false;
+        let mut statement_cache_size = 500;
 
         for (k, v) in url.query_pairs() {
             match k.as_ref() {
@@ -255,6 +266,11 @@ impl PostgresUrl {
                 }
                 "sslpassword" => {
                     identity_password = Some(v.to_string());
+                }
+                "statement_cache_size" => {
+                    statement_cache_size = v
+                        .parse()
+                        .map_err(|_| Error::builder(ErrorKind::InvalidConnectionArguments).build())?;
                 }
                 "sslaccept" => {
                     match v.as_ref() {
@@ -324,6 +340,7 @@ impl PostgresUrl {
             connect_timeout,
             socket_timeout,
             pg_bouncer,
+            statement_cache_size,
         })
     }
 
@@ -365,6 +382,7 @@ pub(crate) struct PostgresUrlQueryParams {
     host: Option<String>,
     socket_timeout: Option<Duration>,
     connect_timeout: Option<Duration>,
+    statement_cache_size: usize,
 }
 
 impl PostgreSql {
@@ -423,9 +441,10 @@ impl PostgreSql {
         client.simple_query(session_variables.as_str()).await?;
 
         Ok(Self {
-            client: PostgresClient(Mutex::new(client)),
+            client: PostgresClient(client),
             socket_timeout: url.query_params.socket_timeout,
             pg_bouncer: url.query_params.pg_bouncer,
+            statement_cache: Mutex::new(url.cache()),
         })
     }
 
@@ -446,6 +465,39 @@ impl PostgreSql {
             },
         }
     }
+
+    async fn fetch_cached(&self, sql: &str) -> crate::Result<Statement> {
+        let mut cache = self.statement_cache.lock().await;
+
+        match cache.get_mut(sql) {
+            Some(stmt) => {
+                #[cfg(not(feature = "tracing-log"))]
+                {
+                    trace!("CACHE HIT: \"{}\"", sql);
+                }
+                #[cfg(feature = "tracing-log")]
+                {
+                    tracing::trace!("CACHE HIT: \"{}\"", sql);
+                }
+
+                Ok(stmt.clone()) // arc'd
+            }
+            None => {
+                #[cfg(not(feature = "tracing-log"))]
+                {
+                    trace!("CACHE MISS: \"{}\"", sql);
+                }
+                #[cfg(feature = "tracing-log")]
+                {
+                    tracing::trace!("CACHE MISS: \"{}\"", sql);
+                }
+
+                let stmt = self.timeout(self.client.0.prepare(sql)).await?;
+                cache.insert(sql.to_string(), stmt.clone());
+                Ok(stmt)
+            }
+        }
+    }
 }
 
 impl TransactionCapable for PostgreSql {}
@@ -464,11 +516,10 @@ impl Queryable for PostgreSql {
 
     async fn query_raw(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<ResultSet> {
         metrics::query("postgres.query_raw", sql, params, move || async move {
-            let client = self.client.0.lock().await;
-            let stmt = self.timeout(client.prepare(sql)).await?;
+            let stmt = self.fetch_cached(sql).await?;
 
             let rows = self
-                .timeout(client.query(&stmt, conversion::conv_params(params).as_slice()))
+                .timeout(self.client.0.query(&stmt, conversion::conv_params(params).as_slice()))
                 .await?;
 
             let mut result = ResultSet::new(stmt.to_column_names(), Vec::new());
@@ -484,11 +535,10 @@ impl Queryable for PostgreSql {
 
     async fn execute_raw(&self, sql: &str, params: &[Value<'_>]) -> crate::Result<u64> {
         metrics::query("postgres.execute_raw", sql, params, move || async move {
-            let client = self.client.0.lock().await;
-            let stmt = self.timeout(client.prepare(sql)).await?;
+            let stmt = self.fetch_cached(sql).await?;
 
             let changes = self
-                .timeout(client.execute(&stmt, conversion::conv_params(params).as_slice()))
+                .timeout(self.client.0.execute(&stmt, conversion::conv_params(params).as_slice()))
                 .await?;
 
             Ok(changes)
@@ -498,8 +548,7 @@ impl Queryable for PostgreSql {
 
     async fn raw_cmd(&self, cmd: &str) -> crate::Result<()> {
         metrics::query("postgres.raw_cmd", cmd, &[], move || async move {
-            let client = self.client.0.lock().await;
-            self.timeout(client.simple_query(cmd)).await?;
+            self.timeout(self.client.0.simple_query(cmd)).await?;
 
             Ok(())
         })
@@ -555,6 +604,25 @@ mod tests {
         let url = PostgresUrl::new(Url::parse("postgresql:///dbname?host=%2Fvar%2Frun%2Fpostgresql").unwrap()).unwrap();
         assert_eq!("dbname", url.dbname());
         assert_eq!("/var/run/postgresql", url.host());
+    }
+
+    #[test]
+    fn should_allow_changing_of_cache_size() {
+        let url =
+            PostgresUrl::new(Url::parse("postgresql:///localhost:5432/foo?statement_cache_size=420").unwrap()).unwrap();
+        assert_eq!(420, url.cache().capacity());
+    }
+
+    #[test]
+    fn should_have_default_cache_size() {
+        let url = PostgresUrl::new(Url::parse("postgresql:///localhost:5432/foo").unwrap()).unwrap();
+        assert_eq!(500, url.cache().capacity());
+    }
+
+    #[test]
+    fn should_not_enable_caching_with_pgbouncer() {
+        let url = PostgresUrl::new(Url::parse("postgresql:///localhost:5432/foo?pgbouncer=true").unwrap()).unwrap();
+        assert_eq!(0, url.cache().capacity());
     }
 
     #[test]

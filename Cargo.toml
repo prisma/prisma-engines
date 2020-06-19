@@ -36,10 +36,21 @@ single-mysql = ["mysql", "json-1", "uuid-0_8", "chrono-0_4"]
 single-sqlite = ["sqlite", "json-1", "uuid-0_8", "chrono-0_4"]
 single-mssql = ["mssql"]
 
+postgresql = [
+    "rust_decimal/tokio-pg",
+    "native-tls",
+    "tokio-postgres",
+    "postgres-native-tls",
+    "array",
+    "bytes",
+    "tokio",
+    "bit-vec",
+    "lru-cache"
+]
+
 pooled = ["mobc"]
 sqlite = ["rusqlite", "libsqlite3-sys", "tokio/sync"]
 json-1 = ["serde_json", "base64"]
-postgresql = ["rust_decimal/tokio-pg", "native-tls", "tokio-postgres", "postgres-native-tls", "array", "bytes", "tokio", "bit-vec"]
 uuid-0_8 = ["uuid"]
 chrono-0_4 = ["chrono"]
 mysql = ["mysql_async", "tokio"]
@@ -64,6 +75,7 @@ uuid = { version = "0.8", optional = true }
 chrono = { version = "0.4", optional = true }
 serde_json = { version = "1.0.48", optional = true }
 base64 = { version = "0.11.0", optional = true }
+lru-cache = { version = "0.1", optional = true }
 
 rusqlite = { version = "0.21", features = ["chrono", "bundled"], optional = true }
 libsqlite3-sys = { version = "0.17", default-features = false, features = ["bundled"], optional = true }
