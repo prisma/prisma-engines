@@ -76,7 +76,6 @@ impl<'a> ColumnDiffer<'a> {
 
         match (&self.previous.default, &self.next.default) {
             (Some(DefaultValue::VALUE(prev)), Some(DefaultValue::VALUE(next))) => prev == next,
-            (Some(DefaultValue::VALUE(_)), Some(DefaultValue::DBGENERATED(_))) => true,
             (Some(DefaultValue::VALUE(_)), Some(DefaultValue::SEQUENCE(_))) => true,
             (Some(DefaultValue::VALUE(_)), Some(DefaultValue::NOW)) => false,
             (Some(DefaultValue::VALUE(_)), None) => false,
@@ -131,6 +130,14 @@ impl ColumnChanges {
 
     pub(crate) fn arity_changed(&self) -> bool {
         self.changes.iter().any(|c| c.as_ref() == Some(&ColumnChange::Arity))
+    }
+
+    pub(crate) fn only_default_changed(&self) -> bool {
+        matches!(self.changes, [None, None, None, Some(ColumnChange::Default)])
+    }
+
+    pub(crate) fn column_was_renamed(&self) -> bool {
+        matches!(self.changes, [Some(ColumnChange::Renaming), _, _, _])
     }
 }
 

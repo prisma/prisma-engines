@@ -2207,6 +2207,7 @@ dependencies = [
  "rust_decimal",
  "serde",
  "serde_json",
+ "tokio",
  "tracing",
  "user-facing-errors",
  "uuid",

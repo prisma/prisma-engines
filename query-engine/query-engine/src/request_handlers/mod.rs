@@ -10,7 +10,7 @@ use std::{collections::HashMap, fmt::Debug, sync::Arc};
 #[derive(Debug, serde::Serialize, PartialEq)]
 #[serde(untagged)]
 pub enum PrismaResponse {
-    Single(response_ir::Responses),
+    Single(GQLResponse),
     Multi(Vec<PrismaResponse>),
 }
 

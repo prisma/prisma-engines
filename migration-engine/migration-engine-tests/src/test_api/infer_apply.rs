@@ -3,6 +3,7 @@ use migration_core::{
     api::GenericApi,
     commands::{ApplyMigrationInput, InferMigrationStepsInput, MigrationStepsResultOutput},
 };
+use std::borrow::Cow;
 
 pub struct InferApply<'a> {
     api: &'a dyn GenericApi,
@@ -87,6 +88,20 @@ impl<'a> InferApplyAssertion<'a> {
         Ok(self)
     }
 
+    pub fn assert_warnings(self, warnings: &[Cow<'_, str>]) -> AssertionResult<Self> {
+        for (idx, warning) in warnings.iter().enumerate() {
+            assert_eq!(
+                Some(warning.as_ref()),
+                self.result
+                    .warnings
+                    .get(idx)
+                    .map(|warning| warning.description.as_str())
+            );
+        }
+
+        Ok(self)
+    }
+
     pub fn assert_no_error(self) -> AssertionResult<Self> {
         assert!(self.result.general_errors.is_empty());
 
@@ -116,7 +131,13 @@ impl<'a> InferApplyAssertion<'a> {
     }
 
     pub fn assert_unexecutable(self, expected_messages: &[String]) -> AssertionResult<Self> {
-        assert_eq!(self.result.unexecutable_migrations.len(), expected_messages.len());
+        anyhow::ensure!(
+            self.result.unexecutable_migrations.len() == expected_messages.len(),
+            "Expected {} unexecutable step errors, got {}.\n({:#?})",
+            expected_messages.len(),
+            self.result.unexecutable_migrations.len(),
+            self.result.unexecutable_migrations,
+        );
 
         for (expected, actual) in expected_messages.iter().zip(
             self.result

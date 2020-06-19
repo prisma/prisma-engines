@@ -322,6 +322,9 @@ fn migration_value_new(field: &FieldRef<'_>) -> Option<sql_schema_describer::Def
         dml::DefaultValue::Expression(expression) if expression.name == "now" && expression.args.is_empty() => {
             return Some(sql_schema_describer::DefaultValue::NOW)
         }
+        dml::DefaultValue::Expression(expression) if expression.name == "dbgenerated" && expression.args.is_empty() => {
+            return Some(sql_schema_describer::DefaultValue::DBGENERATED(String::new()))
+        }
         dml::DefaultValue::Expression(_) => return None,
     };
 

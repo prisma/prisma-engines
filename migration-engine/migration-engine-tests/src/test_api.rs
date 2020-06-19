@@ -240,7 +240,7 @@ impl<'a> TestApiSelect<'a> {
     }
 
     pub async fn send_debug(self) -> Result<Vec<Vec<String>>, anyhow::Error> {
-        let rows = self.api.database().query(self.select.into()).await?;
+        let rows = self.send().await?;
 
         let rows: Vec<Vec<String>> = rows
             .into_iter()
@@ -248,6 +248,10 @@ impl<'a> TestApiSelect<'a> {
             .collect();
 
         Ok(rows)
+    }
+
+    pub async fn send(self) -> anyhow::Result<quaint::prelude::ResultSet> {
+        Ok(self.api.database().query(self.select.into()).await?)
     }
 }
 

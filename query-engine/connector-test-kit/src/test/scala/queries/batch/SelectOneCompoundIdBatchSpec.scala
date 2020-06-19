@@ -38,54 +38,59 @@ class SelectOneCompoundIdBatchSpec extends FlatSpec with Matchers with ApiSpecBa
 
   "one successful query" should "work" in {
     server
-      .batch(Array("""query {findOneArtist(where:{firstName_lastName:{firstName:"Musti",lastName:"Naukio"}}) {firstName lastName}}"""), project, legacy = false)
+      .batch(
+        Seq("""query {findOneArtist(where:{firstName_lastName:{firstName:"Musti",lastName:"Naukio"}}) {firstName lastName}}"""),
+        transaction = false,
+        project,
+        legacy = false
+      )
       .toString should be(
       """[{"data":{"findOneArtist":{"firstName":"Musti","lastName":"Naukio"}}}]"""
     )
   }
 
   "two successful queries and one failing with same selection set" should "work" in {
-    val queries = Array(
+    val queries = Seq(
       """query {findOneArtist(where:{firstName_lastName:{firstName:"Musti",lastName:"Naukio"}}) {firstName lastName}}""",
       """query {findOneArtist(where:{firstName_lastName:{firstName:"NO",lastName:"AVAIL"}}) {firstName lastName}}""",
       """query {findOneArtist(where:{firstName_lastName:{firstName:"Naukio",lastName:"Musti"}}) {firstName lastName}}""",
     )
 
-    server.batch(queries, project, legacy = false).toString should be(
+    server.batch(queries, transaction = false, project, legacy = false).toString should be(
       """[{"data":{"findOneArtist":{"firstName":"Musti","lastName":"Naukio"}}},{"data":{"findOneArtist":null}},{"data":{"findOneArtist":{"firstName":"Naukio","lastName":"Musti"}}}]"""
     )
   }
 
   "two successful queries with selection set in a different order" should "work" in {
-    val queries = Array(
+    val queries = Seq(
       """query {findOneArtist(where:{firstName_lastName:{firstName:"Musti",lastName:"Naukio"}}) {firstName lastName}}""",
       """query {findOneArtist(where:{firstName_lastName:{firstName:"Naukio",lastName:"Musti"}}) {lastName firstName}}""",
     )
 
-    server.batch(queries, project, legacy = false).toString should be(
+    server.batch(queries, transaction = false, project, legacy = false).toString should be(
       """[{"data":{"findOneArtist":{"firstName":"Musti","lastName":"Naukio"}}},{"data":{"findOneArtist":{"firstName":"Naukio","lastName":"Musti"}}}]"""
     )
   }
 
   "two successful queries with query params in a different order" should "work" in {
-    val queries = Array(
+    val queries = Seq(
       """query {findOneArtist(where:{firstName_lastName:{firstName:"Musti",lastName:"Naukio"}}) {firstName lastName}}""",
       """query {findOneArtist(where:{firstName_lastName:{lastName:"Musti",firstName:"Naukio"}}) {firstName lastName}}""",
     )
 
-    server.batch(queries, project, legacy = false).toString should be(
+    server.batch(queries, transaction = false, project, legacy = false).toString should be(
       """[{"data":{"findOneArtist":{"firstName":"Musti","lastName":"Naukio"}}},{"data":{"findOneArtist":{"firstName":"Naukio","lastName":"Musti"}}}]"""
     )
   }
 
   "two successful queries and one failing with different selection set" should "work" in {
-    val queries = Array(
+    val queries = Seq(
       """query {findOneArtist(where:{firstName_lastName:{firstName:"Musti",lastName:"Naukio"}}) {firstName lastName}}""",
       """query {findOneArtist(where:{firstName_lastName:{firstName:"NO",lastName:"AVAIL"}}) {lastName}}""",
       """query {findOneArtist(where:{firstName_lastName:{firstName:"Naukio",lastName:"Musti"}}) {firstName lastName}}""",
     )
 
-    server.batch(queries, project, legacy = false).toString should be(
+    server.batch(queries, transaction = false, project, legacy = false).toString should be(
       """[{"data":{"findOneArtist":{"firstName":"Musti","lastName":"Naukio"}}},{"data":{"findOneArtist":null}},{"data":{"findOneArtist":{"firstName":"Naukio","lastName":"Musti"}}}]"""
     )
   }
@@ -93,19 +98,22 @@ class SelectOneCompoundIdBatchSpec extends FlatSpec with Matchers with ApiSpecBa
   "one singular failing query" should "work" in {
 
     server
-      .batch(Array("""query {findOneArtist(where:{firstName_lastName:{firstName:"NO",lastName:"AVAIL"}}) {lastName}}"""), project, legacy = false)
+      .batch(Seq("""query {findOneArtist(where:{firstName_lastName:{firstName:"NO",lastName:"AVAIL"}}) {lastName}}"""),
+             transaction = false,
+             project,
+             legacy = false)
       .toString should be(
       """[{"data":{"findOneArtist":null}}]"""
     )
   }
 
   "one singular failing query out of two" should "work" in {
-    val queries = Array(
+    val queries = Seq(
       """query {findOneArtist(where:{firstName_lastName:{firstName:"Musti",lastName:"Naukio"}}) {firstName lastName}}""",
       """query {findOneArtist(where:{firstName_lastName:{firstName:"NO",lastName:"AVAIL"}}) {firstName lastName}}""",
     )
 
-    server.batch(queries, project, legacy = false).toString should be(
+    server.batch(queries, transaction = false, project, legacy = false).toString should be(
       """[{"data":{"findOneArtist":{"firstName":"Musti","lastName":"Naukio"}}},{"data":{"findOneArtist":null}}]"""
     )
   }
