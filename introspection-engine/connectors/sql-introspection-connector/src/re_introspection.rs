@@ -41,8 +41,8 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec
     // enum values
     // how does this trickle into references?? Hopefully automatically
 
-    println!("{:#?}", old_data_model);
-    println!("{:#?}", new_data_model);
+    // println!("{:#?}", old_data_model);
+    // println!("{:#?}", new_data_model);
 
     //@@map on models
     let mut changed_model_names = vec![];
@@ -295,7 +295,7 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec
     // potential error: what if there was a db default before and then it got removed, now re-introspection makes it virtual
     // you could not get rid of it
 
-    println!("{:#?}", new_data_model);
+    // println!("{:#?}", new_data_model);
 
     //warnings
     //todo adjust them to use the new names

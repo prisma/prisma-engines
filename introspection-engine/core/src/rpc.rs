@@ -43,7 +43,11 @@ impl Rpc for RpcImpl {
     }
 
     fn introspect(&self, input: IntrospectionInput) -> RpcFutureResult<IntrospectionResultOutput> {
-        Box::new(Self::introspect_internal(input.schema).boxed().compat())
+        Box::new(
+            Self::introspect_internal(input.schema, input.reintrospect)
+                .boxed()
+                .compat(),
+        )
     }
 }
 
@@ -65,7 +69,7 @@ impl RpcImpl {
         Ok(Box::new(SqlIntrospectionConnector::new(&url).await?))
     }
 
-    pub async fn introspect_internal(schema: String) -> RpcResult<IntrospectionResultOutput> {
+    pub async fn introspect_internal(schema: String, reintrospect: bool) -> RpcResult<IntrospectionResultOutput> {
         let config = datamodel::parse_configuration(&schema).map_err(Error::from)?;
         let url = config
             .datasources
@@ -87,7 +91,7 @@ impl RpcImpl {
             }
         };
 
-        match connector.introspect(&input_data_model).await {
+        match connector.introspect(&input_data_model, reintrospect).await {
             Ok(introspection_result)
                 if introspection_result.datamodel.models.is_empty()
                     && introspection_result.datamodel.enums.is_empty() =>
@@ -98,7 +102,7 @@ impl RpcImpl {
             }
             Ok(introspection_result) => {
                 let warnings = match could_not_parse_input_data_model {
-                    true => {
+                    true if reintrospect => {
                         let mut warnings = introspection_result.warnings;
                         warnings.push(Warning {
                         code: 0,
@@ -109,7 +113,7 @@ impl RpcImpl {
                     });
                         warnings
                     }
-                    false => introspection_result.warnings,
+                    _ => introspection_result.warnings,
                 };
 
                 let result = IntrospectionResultOutput {
@@ -144,7 +148,66 @@ impl RpcImpl {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+// {"id":3,"jsonrpc":"2.0","method":"getDatabaseDescription","params":[{"schema":{}}]}
+#[derive(Debug, Serialize)]
 pub struct IntrospectionInput {
     pub(crate) schema: String,
+    pub(crate) reintrospect: bool,
+}
+
+use serde::de::{Deserialize, Deserializer, Error as SerdeError, MapAccess, Visitor};
+use std::fmt;
+
+impl<'de> Deserialize<'de> for IntrospectionInput {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        #[derive(Deserialize)]
+        #[serde(field_identifier, rename_all = "lowercase")]
+        enum Field {
+            Schema,
+            Reintrospect,
+        }
+
+        struct IntrospectionInputVisitor;
+
+        impl<'de> Visitor<'de> for IntrospectionInputVisitor {
+            type Value = IntrospectionInput;
+
+            fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+                formatter.write_str("struct IntrospectionInput")
+            }
+
+            fn visit_map<V>(self, mut map: V) -> Result<IntrospectionInput, V::Error>
+            where
+                V: MapAccess<'de>,
+            {
+                let mut schema = None;
+                let mut reintrospect = None;
+                while let Some(key) = map.next_key()? {
+                    match key {
+                        Field::Schema => {
+                            if schema.is_some() {
+                                return Err(SerdeError::duplicate_field("schema"));
+                            }
+                            schema = Some(map.next_value()?);
+                        }
+                        Field::Reintrospect => {
+                            if reintrospect.is_some() {
+                                return Err(SerdeError::duplicate_field("reintrospect"));
+                            }
+                            reintrospect = Some(map.next_value()?);
+                        }
+                    }
+                }
+                let schema = schema.ok_or_else(|| SerdeError::missing_field("schema"))?;
+                let reintrospect = reintrospect.or(Some(true)).unwrap();
+                Ok(IntrospectionInput { schema, reintrospect })
+            }
+        }
+
+        const FIELDS: &'static [&'static str] = &["schema", "reintrospect"];
+        deserializer.deserialize_struct("IntrospectionInput", FIELDS, IntrospectionInputVisitor)
+    }
 }

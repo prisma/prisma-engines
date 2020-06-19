@@ -87,7 +87,11 @@ impl IntrospectionConnector for SqlIntrospectionConnector {
         Ok(description)
     }
 
-    async fn introspect(&self, existing_data_model: &Datamodel) -> ConnectorResult<IntrospectionResult> {
+    async fn introspect(
+        &self,
+        existing_data_model: &Datamodel,
+        reintrospect: bool,
+    ) -> ConnectorResult<IntrospectionResult> {
         let sql_schema = self.catch(self.describe()).await?;
         tracing::debug!("SQL Schema Describer is done: {:?}", sql_schema);
 
@@ -98,11 +102,12 @@ impl IntrospectionConnector for SqlIntrospectionConnector {
 
         tracing::debug!("Calculating datamodel is done: {:?}", sql_schema);
 
-        let mut re_introspected_data_model = introspection_result.datamodel.clone();
-        let mut re_introspection_warnings = enrich(&existing_data_model, &mut re_introspected_data_model);
-
-        introspection_result.datamodel = re_introspected_data_model;
-        introspection_result.warnings.append(&mut re_introspection_warnings);
+        if reintrospect {
+            let mut re_introspected_data_model = introspection_result.datamodel.clone();
+            let mut re_introspection_warnings = enrich(&existing_data_model, &mut re_introspected_data_model);
+            introspection_result.datamodel = re_introspected_data_model;
+            introspection_result.warnings.append(&mut re_introspection_warnings);
+        }
 
         Ok(introspection_result)
     }
