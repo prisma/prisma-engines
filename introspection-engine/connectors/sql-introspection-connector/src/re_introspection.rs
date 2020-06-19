@@ -95,7 +95,9 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec
         for model in &new_data_model.models {
             if let Some(old_model) = &old_data_model.find_model(&model.name) {
                 for field in &model.fields {
-                    if let Some(old_field) = old_model.find_field_db_name(&field.name) {
+                    if let Some(old_field) =
+                        old_model.find_field_db_name(&field.database_name.as_ref().unwrap_or(&field.name))
+                    {
                         if model.find_field(&old_field.name).is_none() {
                             changed_scalar_field_names.push((
                                 ModelAndField {
@@ -114,7 +116,9 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec
         for change in &changed_scalar_field_names {
             let field = new_data_model.find_field_mut(&change.0.model, &change.0.field).unwrap();
             field.name = change.1.clone();
-            field.database_name = Some(change.0.field.clone());
+            if field.database_name.is_none() {
+                field.database_name = Some(change.0.field.clone())
+            };
         }
 
         // change usages in @@id, @@index, @@unique and on RelationInfo.fields

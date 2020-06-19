@@ -45,6 +45,46 @@ async fn re_introspecting_manually_overwritten_mapped_model_name(api: &TestApi) 
 }
 
 #[test_each_connector(tags("postgres"))]
+async fn re_introspecting_manually_overwritten_mapped_field_name(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::primary());
+                t.add_column("_test", types::integer());
+            });
+
+            migration.create_table("Unrelated", |t| {
+                t.add_column("id", types::primary());
+            });
+        })
+        .await;
+
+    let input_dm = r#"
+            model User {
+               id               Int         @id @default(autoincrement())
+               custom_test      Int         @map("_test")
+            }
+        "#;
+
+    let final_dm = r#"  
+            model Unrelated {
+               id               Int         @id @default(autoincrement())
+            }
+            
+            model User {
+               id               Int         @id @default(autoincrement()) 
+               custom_test      Int         @map("_test")
+            }  
+        "#;
+    let result = dbg!(api.re_introspect(input_dm).await);
+    custom_assert(&result, final_dm);
+    let warnings = api.re_introspect_warnings(input_dm).await;
+
+    assert_eq!(&warnings, "[{\"code\":8,\"message\":\"These fields were enriched with @map information taken from the previous Prisma schema.\",\"affected\":[{\"model\":\"User\",\"field\":\"test\"}]}]");
+}
+
+#[test_each_connector(tags("postgres"))]
 async fn re_introspecting_mapped_model_and_field_name(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
@@ -95,6 +135,66 @@ async fn re_introspecting_mapped_model_and_field_name(api: &TestApi) {
                Post             Post[]
                
                @@map(name: "User")
+            }  
+        "#;
+    let result = dbg!(api.re_introspect(input_dm).await);
+    custom_assert(&result, final_dm);
+    let warnings = api.re_introspect_warnings(input_dm).await;
+
+    assert_eq!(&warnings, "[{\"code\":7,\"message\":\"These models were enriched with @@map information taken from the previous Prisma schema.\",\"affected\":[{\"model\":\"Custom_User\"}]},{\"code\":8,\"message\":\"These fields were enriched with @map information taken from the previous Prisma schema.\",\"affected\":[{\"model\":\"Post\",\"field\":\"user_id\"},{\"model\":\"Custom_User\",\"field\":\"id\"}]}]");
+}
+
+#[test_each_connector(tags("postgres"))]
+async fn re_introspecting_manually_mapped_model_and_field_name(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("_User", |t| {
+                t.add_column("_id", types::primary());
+            });
+
+            migration.create_table("Post", |t| {
+                t.add_column("id", types::primary());
+                t.add_column("user_id", types::foreign("_User", "_id").nullable(false));
+            });
+
+            migration.create_table("Unrelated", |t| {
+                t.add_column("id", types::primary());
+            });
+        })
+        .await;
+
+    let input_dm = r#"
+            model Post {
+               id               Int         @id @default(autoincrement())
+               c_user_id        Int         @map("user_id")
+               Custom_User      Custom_User @relation(fields: [c_user_id], references: [c_id])
+            }
+            
+            model Custom_User {
+               c_id             Int         @id @default(autoincrement()) @map("_id")
+               Post             Post[]
+               
+               @@map(name: "_User")
+            }
+        "#;
+
+    let final_dm = r#"
+            model Post {
+               id               Int         @id @default(autoincrement())
+               c_user_id        Int         @map("user_id")
+               Custom_User      Custom_User @relation(fields: [c_user_id], references: [c_id])
+            }    
+            
+            model Unrelated {
+               id               Int         @id @default(autoincrement())
+            }
+            
+            model Custom_User {
+               c_id             Int         @id @default(autoincrement()) @map("_id")
+               Post             Post[]
+               
+               @@map(name: "_User")
             }  
         "#;
     let result = dbg!(api.re_introspect(input_dm).await);
