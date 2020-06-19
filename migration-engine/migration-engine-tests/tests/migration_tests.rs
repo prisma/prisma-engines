@@ -268,66 +268,46 @@ async fn update_type_of_scalar_field_must_work(api: &TestApi) {
 }
 
 #[test_each_connector]
-async fn changing_the_type_of_an_id_field_must_work(api: &TestApi) {
+async fn changing_the_type_of_an_id_field_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
-            model A {
-                id Int @id
-                b_id Int
-                b  B   @relation(fields: [b_id], references: [id])
-            }
-            model B {
-                id Int @id
-            }
-        "#;
-    let result = api.infer_and_apply(&dm1).await.sql_schema;
-    let table = result.table_bang("A");
-    let column = table.column_bang("b_id");
-    assert_eq!(column.tpe.family, ColumnTypeFamily::Int);
-    assert_eq!(
-        table.foreign_keys,
-        &[ForeignKey {
-            constraint_name: match api.sql_family() {
-                SqlFamily::Postgres => Some("A_b_id_fkey".to_owned()),
-                SqlFamily::Mysql => Some("A_ibfk_1".to_owned()),
-                SqlFamily::Sqlite => None,
-                SqlFamily::Mssql => todo!("Greetings from Redmond"),
-            },
-            columns: vec![column.name.clone()],
-            referenced_table: "B".to_string(),
-            referenced_columns: vec!["id".to_string()],
-            on_delete_action: ForeignKeyAction::Cascade,
-        }]
-    );
+        model A {
+            id Int @id
+            b_id Int
+            b  B   @relation(fields: [b_id], references: [id])
+        }
+        model B {
+            id Int @id
+        }
+    "#;
+
+    api.infer_apply(&dm1).send().await?.assert_green()?;
+
+    api.assert_schema().await?.assert_table("A", |table| {
+        table
+            .assert_column("b_id", |col| col.assert_type_family(ColumnTypeFamily::Int))?
+            .assert_fk_on_columns(&["b_id"], |fk| fk.assert_references("B", &["id"]))
+    })?;
 
     let dm2 = r#"
-            model A {
-                id Int @id
-                b_id String
-                b  B   @relation(fields: [b_id], references: [id])
-            }
-            model B {
-                id String @id @default(cuid())
-            }
-        "#;
-    let result = api.infer_and_apply(&dm2).await.sql_schema;
-    let table = result.table_bang("A");
-    let column = table.column_bang("b_id");
-    assert_eq!(column.tpe.family, ColumnTypeFamily::String);
-    assert_eq!(
-        table.foreign_keys,
-        &[ForeignKey {
-            constraint_name: match api.sql_family() {
-                SqlFamily::Postgres => Some("A_b_id_fkey".to_owned()),
-                SqlFamily::Mysql => Some("A_ibfk_1".to_owned()),
-                SqlFamily::Sqlite => None,
-                SqlFamily::Mssql => todo!("Greetings from Redmond"),
-            },
-            columns: vec!["b_id".into()],
-            referenced_table: "B".to_string(),
-            referenced_columns: vec!["id".to_string()],
-            on_delete_action: ForeignKeyAction::Cascade,
-        }]
-    );
+        model A {
+            id Int @id
+            b_id String
+            b  B   @relation(fields: [b_id], references: [id])
+        }
+        model B {
+            id String @id @default(cuid())
+        }
+    "#;
+
+    api.infer_apply(&dm2).send().await?.assert_green()?;
+
+    api.assert_schema().await?.assert_table("A", |table| {
+        table
+            .assert_column("b_id", |col| col.assert_type_family(ColumnTypeFamily::String))?
+            .assert_fk_on_columns(&["b_id"], |fk| fk.assert_references("B", &["id"]))
+    })?;
+
+    Ok(())
 }
 
 #[test_each_connector]
