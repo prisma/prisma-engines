@@ -50,6 +50,11 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
         }
     }
 
+    //todo more stuff to handle when commenting out. (Maybe it is easier to just work on supporting it.)
+    // models with empty names?
+    // also needs to follow the field references (relations, indexes, ids...)
+    // also needs to drop usages of removed enum values
+
     // fields with an empty name
     for model in &mut datamodel.models {
         for field in &mut model.fields {

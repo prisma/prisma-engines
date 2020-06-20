@@ -10,6 +10,8 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec
     // Relationnames are similar to virtual relationfields, they can be changed arbitrarily
     // investigate dmmf / schema / datamodel / internal datamodel and manual @map changes???
 
+    // todo investigate keeping of old manual custom relation names
+
     //todo What about references to changed names??? @map and @@map
     // models       -> relationfield types, relation names, relationfield names
     // fields       -> relations (to and from fields), indexes, id, unique
@@ -25,7 +27,7 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec
     // Relationinfo.to                          -> done         yes
     // Relationinfo.fields                      -> done         yes
     // Relationinfo.to_fields                   -> done         yes
-    // Relationinfo.name                        -> done         yes
+    // Relationinfo.name                        -> done         yes   -> what if you want to keep that from before?
     // relation field names                     -> done         yes
     // enum names                               -> done         yes
     // enum types on scalar fields              -> done         yes
