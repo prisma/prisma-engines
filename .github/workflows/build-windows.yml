@@ -23,6 +23,15 @@ jobs:
           command: build
           args: --release
 
+      - name: Test binaries
+        run: |
+          cd ${{ github.workspace }}/target/release/
+          query-engine.exe --version
+          introspection-engine.exe --version
+          migration-engine.exe --version
+          prisma-fmt.exe --version
+          test-cli.exe --version
+
       - uses: actions/upload-artifact@v2
         with:
           name: binaries
