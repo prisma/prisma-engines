@@ -17,6 +17,14 @@ jobs:
         with:
           ref: ${{ github.event.client_payload.commit }}
 
+      - name: Cache Rust dependencies
+        uses: actions/cache@v1.1.2
+        with:
+          path: target
+          key: ${{ runner.OS }}-build-${{ hashFiles('**\Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.OS }}-build-
+            
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
