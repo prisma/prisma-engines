@@ -1,6 +1,7 @@
 use crate::error::DatamodelError;
 use crate::validator::directive::{Args, DirectiveValidator};
 use crate::{ast, dml, IndexDefinition, IndexType};
+use std::collections::HashMap;
 
 /// Prismas builtin `@unique` directive.
 pub struct FieldLevelUniqueDirectiveValidator {}
@@ -132,6 +133,19 @@ trait IndexDirectiveBase<T>: DirectiveValidator<T> {
             .collect();
         index_def.fields = fields;
 
+        let duplicated_fields = find_duplicates(&index_def.fields);
+        if !duplicated_fields.is_empty() {
+            return Err(DatamodelError::new_model_validation_error(
+                &format!(
+                    "The {}index definition refers to the fields {} multiple times.",
+                    if index_type == IndexType::Unique { "unique " } else { "" },
+                    duplicated_fields.join(", ")
+                ),
+                &obj.name,
+                args.span(),
+            ));
+        }
+
         let undefined_fields: Vec<String> = index_def
             .fields
             .iter()
@@ -211,4 +225,22 @@ trait IndexDirectiveBase<T>: DirectiveValidator<T> {
 
         Ok(directives)
     }
+}
+
+// returns the items that are contained multiple times in the provided vector
+fn find_duplicates(items: &Vec<String>) -> Vec<String> {
+    let mut counts = HashMap::new();
+    for item in items.iter() {
+        let entry = counts.entry(item).or_insert(0);
+        *entry += 1;
+    }
+
+    let mut result = Vec::new();
+    for (key, count) in counts.into_iter() {
+        if count > 1 {
+            result.push(key.to_owned());
+        }
+    }
+
+    result
 }
