@@ -1,7 +1,9 @@
 use crate::common::ErrorAsserts;
 use datamodel::error::DatamodelError;
 
-const DATAMODEL: &str = r#"
+#[test]
+fn serialize_generators_to_cmf() {
+    let schema: &str = r#"
 generator js1 {
     provider = "javascript"
     output = "../../js"
@@ -11,11 +13,6 @@ generator go {
     provider = "go"
     binaryTargets = ["a", "b"]
 }"#;
-
-#[test]
-fn serialize_generators_to_cmf() {
-    let config = datamodel::parse_configuration(DATAMODEL).unwrap();
-    let rendered = datamodel::json::mcf::generators_to_json(&config.generators);
 
     let expected = r#"[
   {
@@ -36,9 +33,7 @@ fn serialize_generators_to_cmf() {
   }
 ]"#;
 
-    print!("{}", &rendered);
-
-    assert_eq_json(&rendered, expected);
+    assert_mcf(&schema, &expected);
 }
 
 #[test]
@@ -86,10 +81,6 @@ fn back_slashes_in_providers_must_work() {
         }
     "#;
 
-    let config = datamodel::parse_configuration(schema).unwrap();
-    let rendered = datamodel::json::mcf::generators_to_json(&config.generators);
-    //    print!("{:?}", &config.generators);
-
     let expected = r#"[
         {
           "name": "mygen",
@@ -101,9 +92,7 @@ fn back_slashes_in_providers_must_work() {
         }
     ]"#;
 
-    print!("{}", &rendered);
-
-    assert_eq_json(&rendered, expected);
+    assert_mcf(&schema, &expected);
 }
 
 #[test]
@@ -116,9 +105,6 @@ fn new_lines_in_generator_must_work() {
         }
     "#;
 
-    let config = datamodel::parse_configuration(schema).unwrap();
-    let rendered = datamodel::json::mcf::generators_to_json(&config.generators);
-
     let expected = r#"[
         {
           "name": "go",
@@ -130,9 +116,28 @@ fn new_lines_in_generator_must_work() {
         }
     ]"#;
 
-    print!("{}", &rendered);
+    assert_mcf(&schema, &expected);
+}
 
-    assert_eq_json(&rendered, expected);
+#[test]
+fn fail_to_load_generator_with_options_missing() {
+    let schema = r#"
+generator js1 {
+    no_provider = "javascript"
+    output = "../../js"
+}
+    "#;
+    let res = datamodel::parse_configuration(schema);
+
+    if let Err(error) = res {
+        error.assert_is(DatamodelError::GeneratorArgumentNotFound {
+            argument_name: String::from("provider"),
+            generator_name: String::from("js1"),
+            span: datamodel::ast::Span::new(1, 73),
+        });
+    } else {
+        panic!("Expected error.")
+    }
 }
 
 fn assert_mcf(schema: &str, expected_mcf: &str) {
@@ -149,26 +154,4 @@ fn assert_eq_json(a: &str, b: &str) {
     let json_b: serde_json::Value = serde_json::from_str(b).expect("The String b was not valid JSON.");
 
     assert_eq!(json_a, json_b);
-}
-
-const INVALID_DATAMODEL: &str = r#"
-generator js1 {
-    no_provider = "javascript"
-    output = "../../js"
-}
-"#;
-
-#[test]
-fn fail_to_load_generator_with_options_missing() {
-    let res = datamodel::parse_configuration(INVALID_DATAMODEL);
-
-    if let Err(error) = res {
-        error.assert_is(DatamodelError::GeneratorArgumentNotFound {
-            argument_name: String::from("provider"),
-            generator_name: String::from("js1"),
-            span: datamodel::ast::Span::new(1, 73),
-        });
-    } else {
-        panic!("Expected error.")
-    }
 }
