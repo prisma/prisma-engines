@@ -468,16 +468,28 @@ impl PostgreSql {
 
     async fn fetch_cached(&self, sql: &str) -> crate::Result<Statement> {
         let mut cache = self.statement_cache.lock().await;
+        let capacity = cache.capacity();
+        let stored = cache.len();
 
         match cache.get_mut(sql) {
             Some(stmt) => {
                 #[cfg(not(feature = "tracing-log"))]
                 {
-                    trace!("CACHE HIT: \"{}\"", sql);
+                    trace!(
+                        "CACHE HIT! (query: \"{}\", capacity: {}, stored: {})",
+                        sql,
+                        capacity,
+                        stored,
+                    );
                 }
                 #[cfg(feature = "tracing-log")]
                 {
-                    tracing::trace!("CACHE HIT: \"{}\"", sql);
+                    tracing::trace!(
+                        message = "CACHE HIT!",
+                        query = sql,
+                        capacity = capacity,
+                        stored = stored,
+                    );
                 }
 
                 Ok(stmt.clone()) // arc'd
@@ -485,11 +497,21 @@ impl PostgreSql {
             None => {
                 #[cfg(not(feature = "tracing-log"))]
                 {
-                    trace!("CACHE MISS: \"{}\"", sql);
+                    trace!(
+                        "CACHE MISS! (query: \"{}\", capacity: {}, stored: {}",
+                        sql,
+                        capacity,
+                        stored,
+                    );
                 }
                 #[cfg(feature = "tracing-log")]
                 {
-                    tracing::trace!("CACHE MISS: \"{}\"", sql);
+                    tracing::trace!(
+                        message = "CACHE MISS!",
+                        query = sql,
+                        capacity = capacity,
+                        stored = stored,
+                    );
                 }
 
                 let stmt = self.timeout(self.client.0.prepare(sql)).await?;
