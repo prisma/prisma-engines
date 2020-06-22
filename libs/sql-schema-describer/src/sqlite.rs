@@ -234,7 +234,10 @@ impl SqlSchemaDescriber {
                 if pk_cols.len() == 1 {
                     let pk_col = &columns[0];
                     for col in cols.iter_mut() {
-                        if &col.name == pk_col && &col.tpe.data_type.to_lowercase() == "integer" {
+                        if &col.name == pk_col
+                            && &col.tpe.data_type.to_lowercase() == "integer"
+                            && table_has_autoincrement_primary_key(self.conn.as_ref(), table, schema).await
+                        {
                             debug!(
                                 "Detected that the primary key column corresponds to rowid and \
                                  is auto incrementing"
@@ -443,6 +446,22 @@ fn get_column_type(tpe: &str, arity: ColumnArity) -> ColumnType {
         family,
         arity,
     }
+}
+
+async fn table_has_autoincrement_primary_key(conn: &dyn Queryable, table_name: &str, schema_name: &str) -> bool {
+    const AUTOINCREMENT_PK_RE: Lazy<Regex> =
+        Lazy::new(|| Regex::new(r#"(?i)integer.*primary key.*autoincrement"#).unwrap());
+
+    let query = format!(
+        "SELECT sql FROM \"{schema_name}\".sqlite_master WHERE type = 'table' AND name = '{table_name}'",
+        schema_name = schema_name,
+        table_name = table_name
+    );
+
+    let result = conn.query_raw(&query, &[]).await.unwrap();
+    let raw_sql = result.into_single().unwrap().get("sql").unwrap().to_string().unwrap();
+
+    AUTOINCREMENT_PK_RE.is_match(&raw_sql)
 }
 
 // "A string constant is formed by enclosing the string in single quotes ('). A single quote within
