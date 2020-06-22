@@ -22,4 +22,5 @@ members = [
   "libs/user-facing-errors",
   "libs/prisma-models",
   "libs/prisma-value",
+  "libs/feature-flags",
 ]
