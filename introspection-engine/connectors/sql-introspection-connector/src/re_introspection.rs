@@ -3,10 +3,10 @@ use crate::warnings::{
     warning_enriched_with_map_on_model, Enum, EnumAndValue, Model, ModelAndField,
 };
 use datamodel::{Datamodel, DefaultNames, DefaultValue, Field, FieldType};
-use introspection_connector::Warning;
+use introspection_connector::IntrospectionResult;
 use prisma_value::PrismaValue;
 
-pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec<Warning> {
+pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut IntrospectionResult) {
     // todo Notes
     // Relationnames are similar to virtual relationfields, they can be changed arbitrarily
     // investigate dmmf / schema / datamodel / internal datamodel and manual @map changes???
@@ -44,6 +44,8 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec
 
     // println!("{:#?}", old_data_model);
     // println!("{:#?}", new_data_model);
+
+    let new_data_model = &mut introspection_result.datamodel;
 
     //@@map on models
     let mut changed_model_names = vec![];
@@ -346,29 +348,34 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec
 
     //warnings
     //todo adjust them to use the new names
-    let mut warnings = vec![];
 
     if !changed_model_names.is_empty() {
         let models = changed_model_names.iter().map(|c| c.1.clone()).collect();
-        warnings.push(warning_enriched_with_map_on_model(&models));
+        introspection_result
+            .warnings
+            .push(warning_enriched_with_map_on_model(&models));
     }
 
     if !changed_scalar_field_names.is_empty() {
         let models_and_fields = changed_scalar_field_names.iter().map(|c| c.0.clone()).collect();
-        warnings.push(warning_enriched_with_map_on_field(&models_and_fields));
+        introspection_result
+            .warnings
+            .push(warning_enriched_with_map_on_field(&models_and_fields));
     }
 
     if !changed_enum_names.is_empty() {
         let enums = changed_enum_names.iter().map(|c| c.0.clone()).collect();
-        warnings.push(warning_enriched_with_map_on_enum(&enums));
+        introspection_result
+            .warnings
+            .push(warning_enriched_with_map_on_enum(&enums));
     }
 
     if !changed_enum_values.is_empty() {
         let enums_and_values = changed_enum_values.iter().map(|c| c.0.clone()).collect();
-        warnings.push(warning_enriched_with_map_on_enum_value(&enums_and_values));
+        introspection_result
+            .warnings
+            .push(warning_enriched_with_map_on_enum_value(&enums_and_values));
     }
-
-    warnings
 }
 
 fn replace_field_names(target: &mut Vec<String>, old_name: &str, new_name: &str) {

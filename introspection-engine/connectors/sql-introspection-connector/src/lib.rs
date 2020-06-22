@@ -103,10 +103,7 @@ impl IntrospectionConnector for SqlIntrospectionConnector {
         tracing::debug!("Calculating datamodel is done: {:?}", sql_schema);
 
         if reintrospect {
-            let mut re_introspected_data_model = introspection_result.datamodel.clone();
-            let mut re_introspection_warnings = enrich(&existing_data_model, &mut re_introspected_data_model);
-            introspection_result.datamodel = re_introspected_data_model;
-            introspection_result.warnings.append(&mut re_introspection_warnings);
+            enrich(&existing_data_model, &mut introspection_result);
         }
 
         Ok(introspection_result)
