@@ -195,6 +195,26 @@ fn must_error_when_unknown_fields_are_used() {
 }
 
 #[test]
+fn must_error_when_using_the_same_field_multiple_times() {
+    let dml = r#"
+    model User {
+        id    Int    @id
+        email String @unique
+
+        @@unique([email, email])
+    }
+    "#;
+
+    let errors = parse_error(dml);
+
+    errors.assert_is(DatamodelError::new_model_validation_error(
+        "The unique index definition refers to the fields email multiple times.",
+        "User",
+        Span::new(83, 105),
+    ));
+}
+
+#[test]
 fn unique_directives_must_serialize_to_valid_dml() {
     let dml = r#"
         model User {
