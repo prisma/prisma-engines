@@ -1,3 +1,11 @@
+//! How to implement a feature flag for Prisma:
+//! - Add a bool field to the `FeatureFlags` struct.
+//! - Add the str equivalent of the flag to the `add_flag` function match.
+//!
+//! How to use a feature flag:
+//! - Make sure that the flags are initialized in the app stack with `feature_flags::initialize(_)`.
+//! - Use the flag in crates that have a dependency on the feature flags crate with: `feature_flags::get().<bool_flag_name>`.
+
 use failure::Fail;
 use once_cell::sync::OnceCell;
 
@@ -14,17 +22,17 @@ pub type Result<T> = std::result::Result<T, FeatureFlagError>;
 #[derive(Debug, Default)]
 pub struct FeatureFlags {
     /// Transactional batches support in the QE.
-    pub transactions: bool,
+    pub transaction: bool,
 
     /// `connectOrCreate` nested query in the QE.
-    pub create_or_connect: bool,
+    pub connect_or_create: bool,
 }
 
 impl FeatureFlags {
     fn add_flag(&mut self, flag: &str) -> Result<()> {
         match flag {
-            "transaction" => self.transactions = true,
-            "createOrConnect" => self.create_or_connect = true,
+            "transaction" => self.transaction = true,
+            "connectOrCreate" => self.connect_or_create = true,
             _ => Err(FeatureFlagError::InvalidFlag(flag.to_owned()))?,
         };
 
@@ -34,11 +42,11 @@ impl FeatureFlags {
 
 /// Initializes the feature flags with given flags.
 /// Noop if already initialized.
-pub fn initialize<'a>(from: impl Iterator<Item = &'a str>) -> Result<()> {
+pub fn initialize(from: &[String]) -> Result<()> {
     FEATURE_FLAGS
         .get_or_try_init(|| {
             from.into_iter().try_fold(FeatureFlags::default(), |mut acc, flag| {
-                acc.add_flag(flag)?;
+                acc.add_flag(&flag)?;
                 Ok(acc)
             })
         })

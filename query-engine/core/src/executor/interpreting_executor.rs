@@ -79,6 +79,13 @@ where
         query_schema: QuerySchemaRef,
     ) -> crate::Result<Vec<crate::Result<ResponseData>>> {
         if transactional {
+            // Transactional batches are currently experimental
+            if !feature_flags::get().transaction {
+                return Err(crate::CoreError::UnsupportedFeatureError(
+                    "Batch transactions (experimental feature, needs to be enabled).".to_owned(),
+                ));
+            }
+
             let queries = operations
                 .into_iter()
                 .map(|op| QueryGraphBuilder::new(query_schema.clone()).build(op))
