@@ -1,9 +1,10 @@
 use crate::warnings::{
-    warning_enriched_with_map_on_enum, warning_enriched_with_map_on_field, warning_enriched_with_map_on_model, Enum,
-    Model, ModelAndField,
+    warning_enriched_with_map_on_enum, warning_enriched_with_map_on_enum_value, warning_enriched_with_map_on_field,
+    warning_enriched_with_map_on_model, Enum, EnumAndValue, Model, ModelAndField,
 };
-use datamodel::{Datamodel, DefaultNames, Field, FieldType};
+use datamodel::{Datamodel, DefaultNames, DefaultValue, Field, FieldType};
 use introspection_connector::Warning;
+use prisma_value::PrismaValue;
 
 pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec<Warning> {
     // Notes
@@ -266,7 +267,47 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec
     }
 
     // todo @map on enum values
-    {}
+    let mut changed_enum_values = vec![];
+    {
+        for enm in &new_data_model.enums {
+            if let Some(old_enum) = old_data_model.find_enum(&enm.name) {
+                for value in &enm.values {
+                    if let Some(old_value) =
+                        old_enum.find_value_db_name(value.database_name.as_ref().unwrap_or(&value.name.to_owned()))
+                    {
+                        if enm.find_value(&old_value.name).is_none() {
+                            changed_enum_values.push((
+                                EnumAndValue {
+                                    enm: enm.name.clone(),
+                                    value: value.name.clone(),
+                                },
+                                old_value.name.clone(),
+                            ))
+                        }
+                    }
+                }
+            }
+        }
+        for change in &changed_enum_values {
+            let enm = new_data_model.find_enum_mut(&change.0.enm).unwrap();
+            let value = enm.find_value_mut(&change.0.value).unwrap();
+            value.name = change.1.clone();
+            if value.database_name.is_none() {
+                value.database_name = Some(change.0.value.clone());
+            }
+        }
+
+        for change in &changed_enum_values {
+            let fields_to_be_changed = new_data_model.find_enum_fields(&change.0.enm);
+
+            for change2 in fields_to_be_changed {
+                let field = new_data_model.find_field_mut(&change2.0, &change2.1).unwrap();
+                if field.default_value == Some(DefaultValue::Single(PrismaValue::Enum(change.0.value.clone()))) {
+                    field.default_value = Some(DefaultValue::Single(PrismaValue::Enum(change.1.clone())));
+                }
+            }
+        }
+    }
 
     //virtual relationfield names
     let mut changed_relation_field_names = vec![];
@@ -322,6 +363,11 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec
     if !changed_enum_names.is_empty() {
         let enums = changed_enum_names.iter().map(|c| c.0.clone()).collect();
         warnings.push(warning_enriched_with_map_on_enum(&enums));
+    }
+
+    if !changed_enum_values.is_empty() {
+        let enums_and_values = changed_enum_values.iter().map(|c| c.0.clone()).collect();
+        warnings.push(warning_enriched_with_map_on_enum_value(&enums_and_values));
     }
 
     warnings

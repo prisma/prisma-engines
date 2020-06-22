@@ -108,10 +108,10 @@ pub fn warning_enriched_with_map_on_enum(affected: &Vec<Enum>) -> Warning {
     }
 }
 
-// pub fn warning_enriched_with_map_on_enum_value(affected: &Vec<EnumAndValue>) -> Warning {
-//     Warning {
-//         code: 10,
-//         message: "These enum values were enriched with @map information taken from the previous Prisma schema.".into(),
-//         affected: serde_json::to_value(&affected).unwrap(),
-//     }
-// }
+pub fn warning_enriched_with_map_on_enum_value(affected: &Vec<EnumAndValue>) -> Warning {
+    Warning {
+        code: 10,
+        message: "These enum values were enriched with @map information taken from the previous Prisma schema.".into(),
+        affected: serde_json::to_value(&affected).unwrap(),
+    }
+}
