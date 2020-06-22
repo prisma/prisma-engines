@@ -148,7 +148,7 @@ async fn adding_an_id_field_of_type_int_must_work_for_sqlite(api: &TestApi) {
     let result = api.infer_and_apply(&dm2).await.sql_schema;
     let column = result.table_bang("Test").column_bang("myId");
 
-    assert_eq!(column.auto_increment, true);
+    assert_eq!(column.auto_increment, false);
 }
 
 #[test_each_connector]
