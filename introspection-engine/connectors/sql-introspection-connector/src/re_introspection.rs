@@ -7,11 +7,10 @@ use introspection_connector::Warning;
 use prisma_value::PrismaValue;
 
 pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec<Warning> {
-    // Notes
+    // todo Notes
     // Relationnames are similar to virtual relationfields, they can be changed arbitrarily
     // investigate dmmf / schema / datamodel / internal datamodel and manual @map changes???
-
-    // todo investigate keeping of old manual custom relation names
+    // investigate keeping of old manual custom relation names
 
     //todo What about references to changed names??? @map and @@map
     // models       -> relationfield types, relation names, relationfield names
@@ -39,10 +38,9 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec
     // this has to be handled explicitly -.-also influences the naming in the warnings
     // Order                                    Status          Tested
     // modelnames                               -> done         yes
-    // scalar field names
-    // enum names
-    // enum values
-    // how does this trickle into references?? Hopefully automatically
+    // scalar field names                       -> done         yes
+    // enum names                               -> done         yes
+    // enum values                              -> done         yes
 
     // println!("{:#?}", old_data_model);
     // println!("{:#?}", new_data_model);
@@ -152,7 +150,7 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec
     }
 
     // update relation names (needs all fields and models to already be updated)
-    // this only updates relation names where the name of a model changed.
+    // todo this only updates relation names where the name of a model changed.
     // the change of a field name would here not be reflected yet, but these would have been rendered already
     {
         let mut relation_fields_to_change = vec![];
@@ -266,7 +264,7 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec
         }
     }
 
-    // todo @map on enum values
+    // @map on enum values
     let mut changed_enum_values = vec![];
     {
         for enm in &new_data_model.enums {
@@ -383,5 +381,3 @@ fn replace_field_names(target: &mut Vec<String>, old_name: &str, new_name: &str)
         })
         .count();
 }
-
-// fn replace_enums_in_default_values

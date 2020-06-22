@@ -379,7 +379,57 @@ async fn re_introspecting_mapped_enum_value_name(api: &TestApi) {
     assert_eq!(&warnings, "[{\"code\":10,\"message\":\"These enum values were enriched with @map information taken from the previous Prisma schema.\",\"affected\":[{\"enm\":\"color\",\"value\":\"black\"}]}]");
 }
 
-//todo manually re-remapped enum values
+#[test_each_connector(tags("postgres"))]
+async fn re_introspecting_manually_remapped_enum_value_name(api: &TestApi) {
+    let sql = format!("CREATE Type color as ENUM ( '_black', 'white')");
+    api.database().execute_raw(&sql, &[]).await.unwrap();
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom("color  color Not Null Default('_black')");
+            });
+
+            migration.create_table("Unrelated", |t| {
+                t.add_column("id", types::primary());
+            });
+        })
+        .await;
+
+    let input_dm = r#"
+            model User {
+               color            color @default(BLACK)            
+               id               Int @id @default(autoincrement())
+            }
+            
+            enum color{
+                BLACK @map("_black")
+                white
+            }
+        "#;
+
+    let final_dm = r#"
+            model Unrelated {
+               id               Int @id @default(autoincrement())
+            }
+            
+             model User {
+               color            color @default(BLACK)            
+               id               Int @id @default(autoincrement())
+            }
+            
+            enum color{
+                BLACK @map("_black")
+                white
+            }
+        "#;
+    let result = dbg!(api.re_introspect(input_dm).await);
+    custom_assert(&result, final_dm);
+    let warnings = api.re_introspect_warnings(input_dm).await;
+
+    assert_eq!(&warnings, "[{\"code\":10,\"message\":\"These enum values were enriched with @map information taken from the previous Prisma schema.\",\"affected\":[{\"enm\":\"color\",\"value\":\"black\"}]}]");
+}
 
 #[test_each_connector(tags("postgres"))]
 async fn re_introspecting_manually_re_mapped_enum_name(api: &TestApi) {
