@@ -58,3 +58,4 @@ sql-migration-connector = { path = "../../migration-engine/connectors/sql-migrat
 indoc = "0.3"
 anyhow = "1"
 serial_test = "*"
+chrono = "0.4"
