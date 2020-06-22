@@ -19,12 +19,22 @@ impl DirectiveValidator<dml::Field> for FieldLevelUniqueDirectiveValidator {
             );
         }
 
-        if let dml::FieldType::Relation(_) = obj.field_type {
+        if let dml::FieldType::Relation(rel_info) = &obj.field_type {
+            let suggestion = if rel_info.fields.len() == 1 {
+                format!(" Did you mean to put it on `{}`?", rel_info.fields.first().unwrap())
+            } else if rel_info.fields.len() > 1 {
+                format!(" Did you mean to provide `@@unique([{}])`?", rel_info.fields.join(", "))
+            } else {
+                // no suggestion possible
+                String::new()
+            };
+
             return self.new_directive_validation_error(
                 &format!(
-                    "The field `{}` is a relation field and cannot be marked with `{}`. Only scalar fields can be made unique.",
-                    &obj.name,
-                    self.directive_name()
+                    "The field `{field_name}` is a relation field and cannot be marked with `{directive_name}`. Only scalar fields can be made unique.{suggestion}",
+                    field_name = &obj.name,
+                    directive_name  = self.directive_name(),
+                    suggestion = suggestion
                 ),
                 args.span(),
             );
@@ -181,11 +191,38 @@ trait IndexDirectiveBase<T>: DirectiveValidator<T> {
         }
 
         if !referenced_relation_fields.is_empty() {
+            let mut suggested_fields = Vec::new();
+            let mut had_successful_replacement = false;
+
+            for f in &index_def.fields {
+                if let Some(field) = obj.find_field(&f) {
+                    if let dml::FieldType::Relation(rel_info) = &field.field_type {
+                        for underlying_field in &rel_info.fields {
+                            suggested_fields.push(underlying_field.to_owned());
+                            had_successful_replacement = true;
+                        }
+                    } else {
+                        suggested_fields.push(field.name.clone());
+                    }
+                }
+            }
+
+            let suggestion = if had_successful_replacement {
+                format!(
+                    " Did you mean `@@{directive_name}([{fields}])`?",
+                    directive_name = directive_name(index_type),
+                    fields = suggested_fields.join(", ")
+                )
+            } else {
+                String::new()
+            };
+
             return Err(DatamodelError::new_model_validation_error(
                 &format!(
-                    "The {}index definition refers to the relation fields {}. Index definitions must reference only scalar fields.",
-                    if index_type == IndexType::Unique { "unique " } else { "" },
-                    referenced_relation_fields.join(", ")
+                    "The {prefix}index definition refers to the relation fields {the_fields}. Index definitions must reference only scalar fields.{suggestion}",
+                    prefix = if index_type == IndexType::Unique { "unique " } else { "" },
+                    the_fields = referenced_relation_fields.join(", "),
+                    suggestion = suggestion
                 ),
                 &obj.name,
                 args.span(),
@@ -224,6 +261,14 @@ trait IndexDirectiveBase<T>: DirectiveValidator<T> {
             .collect();
 
         Ok(directives)
+    }
+}
+
+fn directive_name(index_type: dml::IndexType) -> &'static str {
+    if index_type == dml::IndexType::Unique {
+        "unique"
+    } else {
+        "index"
     }
 }
 
