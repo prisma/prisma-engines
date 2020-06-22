@@ -1,6 +1,7 @@
 //! How to implement a feature flag for Prisma:
 //! - Add a bool field to the `FeatureFlags` struct.
 //! - Add the str equivalent of the flag to the `add_flag` function match.
+//! - Add the str equivalent of the flag to the `enable_all()` function.
 //!
 //! How to use a feature flag:
 //! - Make sure that the flags are initialized in the app stack with `feature_flags::initialize(_)`.
@@ -31,12 +32,18 @@ pub struct FeatureFlags {
 impl FeatureFlags {
     fn add_flag(&mut self, flag: &str) -> Result<()> {
         match flag {
+            "all" => self.enable_all(),
             "transaction" => self.transaction = true,
             "connectOrCreate" => self.connect_or_create = true,
             _ => Err(FeatureFlagError::InvalidFlag(flag.to_owned()))?,
         };
 
         Ok(())
+    }
+
+    fn enable_all(&mut self) {
+        self.transaction = true;
+        self.connect_or_create = true;
     }
 }
 
