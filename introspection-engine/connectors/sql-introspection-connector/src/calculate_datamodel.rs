@@ -128,9 +128,7 @@ pub fn calculate_datamodel(schema: &SqlSchema, family: &SqlFamily) -> SqlIntrosp
     //todo sanitizing might need to be adjusted to also change the fields in the RelationInfo
     sanitize_datamodel_names(&mut data_model);
 
-    let mut warnings: Vec<Warning> = vec![];
-    let mut commenting_out_warnings = commenting_out_guardrails(&mut data_model);
-    warnings.append(commenting_out_warnings.as_mut());
+    let mut warnings: Vec<Warning> = commenting_out_guardrails(&mut data_model);
 
     deduplicate_field_names(&mut data_model);
 

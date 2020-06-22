@@ -83,8 +83,7 @@ impl Datamodel {
 
     /// Finds a model by database name.
     pub fn find_model_db_name(&self, db_name: &str) -> Option<&Model> {
-        self.models
-            .iter()
+        self.models()
             .find(|model| model.database_name == Some(db_name.to_owned()))
     }
 

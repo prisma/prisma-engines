@@ -107,8 +107,6 @@ impl TestApi {
     }
 }
 
-//todo  how to pass in the schema in the tests optionally
-
 pub async fn mysql_test_api(db_name: &'static str) -> TestApi {
     let db_name = test_setup::mysql_safe_identifier(db_name);
     let url = mysql_url(db_name.as_ref());
