@@ -84,7 +84,7 @@ impl Datamodel {
     /// Finds a model by database name.
     pub fn find_model_db_name(&self, db_name: &str) -> Option<&Model> {
         self.models()
-            .find(|model| model.database_name == Some(db_name.to_owned()))
+            .find(|model| model.database_name.as_deref() == Some(db_name))
     }
 
     /// Finds a model for a field reference by using reference comparison.
