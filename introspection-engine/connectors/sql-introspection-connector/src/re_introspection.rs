@@ -241,7 +241,7 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec
     let mut changed_enum_names = vec![];
     {
         for enm in &new_data_model.enums {
-            if let Some(old_enum) = old_data_model.find_enum_db_name(&enm.name) {
+            if let Some(old_enum) = old_data_model.find_enum_db_name(&enm.database_name.as_ref().unwrap_or(&enm.name)) {
                 if new_data_model.find_enum(&old_enum.name).is_none() {
                     changed_enum_names.push((Enum { enm: enm.name.clone() }, old_enum.name.clone()))
                 }
@@ -250,7 +250,9 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec
         for change in &changed_enum_names {
             let enm = new_data_model.find_enum_mut(&change.0.enm).unwrap();
             enm.name = change.1.clone();
-            enm.database_name = Some(change.0.enm.clone());
+            if enm.database_name.is_none() {
+                enm.database_name = Some(change.0.enm.clone());
+            }
         }
 
         for change in &changed_enum_names {
