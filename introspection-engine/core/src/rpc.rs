@@ -202,7 +202,7 @@ impl<'de> Deserialize<'de> for IntrospectionInput {
                     }
                 }
                 let schema = schema.ok_or_else(|| SerdeError::missing_field("schema"))?;
-                let reintrospect = reintrospect.or(Some(true)).unwrap();
+                let reintrospect = reintrospect.or(Some(false)).unwrap();
                 Ok(IntrospectionInput { schema, reintrospect })
             }
         }
