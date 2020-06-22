@@ -23,6 +23,7 @@ fn serialize_generators_to_cmf() {
     "provider": "javascript",
     "output": "../../js",
     "binaryTargets": [],
+    "experimentalFeatures": [],
     "config": {}
   },
   {
@@ -30,6 +31,7 @@ fn serialize_generators_to_cmf() {
     "provider": "go",
     "output": null,
     "binaryTargets": ["a","b"],
+    "experimentalFeatures": [],
     "config": {}
   }
 ]"#;
@@ -37,6 +39,43 @@ fn serialize_generators_to_cmf() {
     print!("{}", &rendered);
 
     assert_eq_json(&rendered, expected);
+}
+
+#[test]
+fn experimental_features_setting_must_work() {
+    // make sure both single value and array syntax work
+    let schema = r#"
+        generator js {
+            provider = "javascript"
+            experimentalFeatures = "foo"
+        }
+        
+        generator go {
+            provider = "go"
+            experimentalFeatures = ["foo", "bar"]
+        } 
+    "#;
+
+    let expected = r#"[
+  {
+    "name": "js",
+    "provider": "javascript",
+    "output":null,
+    "binaryTargets": [],
+    "experimentalFeatures": ["foo"],
+    "config": {}
+  },
+  {
+    "name": "go",
+    "provider": "go",
+    "output":null,
+    "binaryTargets": [],
+    "experimentalFeatures": ["foo", "bar"],
+    "config": {}
+  }
+]"#;
+
+    assert_mcf(&schema, &expected);
 }
 
 #[test]
@@ -57,6 +96,7 @@ fn back_slashes_in_providers_must_work() {
           "provider": "../folder\\ with\\ space/my\\ generator.js",
           "output": null,
           "binaryTargets": [],
+          "experimentalFeatures": [],
           "config": {}
         }
     ]"#;
@@ -85,6 +125,7 @@ fn new_lines_in_generator_must_work() {
           "provider": "go",
           "output": null,
           "binaryTargets": ["b","c"],
+          "experimentalFeatures": [],
           "config": {}
         }
     ]"#;
@@ -92,6 +133,15 @@ fn new_lines_in_generator_must_work() {
     print!("{}", &rendered);
 
     assert_eq_json(&rendered, expected);
+}
+
+fn assert_mcf(schema: &str, expected_mcf: &str) {
+    let config = datamodel::parse_configuration(schema).unwrap();
+    let rendered = datamodel::json::mcf::generators_to_json(&config.generators);
+
+    print!("{}", &expected_mcf);
+
+    assert_eq_json(&rendered, expected_mcf);
 }
 
 fn assert_eq_json(a: &str, b: &str) {
