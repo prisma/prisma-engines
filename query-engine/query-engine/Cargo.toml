@@ -17,6 +17,7 @@ hyper = "0.13"
 tokio = { version = "=0.2.13", features = ["rt-threaded", "macros"] }
 
 async-trait = "0.1"
+feature-flags = { path = "../../libs/feature-flags" }
 prisma-inflector = { path = "../../libs/prisma-inflector" }
 datamodel = { path = "../../libs/datamodel/core" }
 prisma-models = { path = "../../libs/prisma-models" }

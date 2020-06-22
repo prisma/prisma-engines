@@ -667,6 +667,14 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7360491ce676a36bf9bb3c56c1aa791658183a54d2744120f27285738d90465a"
 
 [[package]]
+name = "feature-flags"
+version = "0.1.0"
+dependencies = [
+ "failure",
+ "once_cell",
+]
+
+[[package]]
 name = "fixedbitset"
 version = "0.1.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2223,6 +2231,7 @@ dependencies = [
  "crossbeam-queue",
  "debug_stub_derive",
  "failure",
+ "feature-flags",
  "futures 0.3.5",
  "im",
  "indexmap",
@@ -2252,6 +2261,7 @@ dependencies = [
  "chrono",
  "datamodel",
  "failure",
+ "feature-flags",
  "futures 0.3.5",
  "graphql-parser",
  "http",

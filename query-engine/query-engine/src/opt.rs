@@ -83,6 +83,9 @@ pub struct PrismaOpt {
 
     #[structopt(subcommand)]
     pub subcommand: Option<Subcommand>,
+
+    #[structopt(long = "enable-experimental", use_delimiter = true)]
+    pub raw_feature_flags: Vec<String>,
 }
 
 #[derive(Debug, Deserialize)]

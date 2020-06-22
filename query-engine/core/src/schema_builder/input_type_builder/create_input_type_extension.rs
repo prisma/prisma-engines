@@ -131,10 +131,12 @@ pub trait CreateInputTypeBuilderExtension<'a>: InputTypeBuilderBase<'a> {
 
                             let mut fields = vec![self.nested_create_input_field(Arc::clone(&rf))];
                             let nested_connect = self.nested_connect_input_field(Arc::clone(&rf));
-                            let nested_connect_or_create = self.nested_connect_or_create_field(Arc::clone(&rf));
-
                             append_opt(&mut fields, nested_connect);
-                            append_opt(&mut fields, nested_connect_or_create);
+
+                            if feature_flags::get().connect_or_create {
+                                let nested_connect_or_create = self.nested_connect_or_create_field(Arc::clone(&rf));
+                                append_opt(&mut fields, nested_connect_or_create);
+                            }
 
                             input_object.set_fields(fields);
                             Arc::downgrade(&input_object)
