@@ -1,7 +1,7 @@
 use crate::SqlError;
 use datamodel::{
-    Datamodel, DefaultValue as DMLDef, Field, FieldArity, FieldType, IndexDefinition, Model, OnDeleteStrategy,
-    RelationInfo, ScalarType, ValueGenerator as VG,
+    Datamodel, DefaultNames, DefaultValue as DMLDef, Field, FieldArity, FieldType, IndexDefinition, Model,
+    OnDeleteStrategy, RelationInfo, ScalarType, ValueGenerator as VG,
 };
 use sql_schema_describer::{
     Column, ColumnArity, ColumnTypeFamily, DefaultValue as SQLDef, ForeignKey, Index, IndexType, SqlSchema, Table,
@@ -11,17 +11,17 @@ use tracing::debug;
 //checks
 pub fn is_migration_table(table: &Table) -> bool {
     table.name == "_Migration"
-        && table.columns.iter().any(|c| c.name.as_str() == "revision")
-        && table.columns.iter().any(|c| c.name.as_str() == "name")
-        && table.columns.iter().any(|c| c.name.as_str() == "datamodel")
-        && table.columns.iter().any(|c| c.name.as_str() == "status")
-        && table.columns.iter().any(|c| c.name.as_str() == "applied")
-        && table.columns.iter().any(|c| c.name.as_str() == "rolled_back")
-        && table.columns.iter().any(|c| c.name.as_str() == "datamodel_steps")
-        && table.columns.iter().any(|c| c.name.as_str() == "database_migration")
-        && table.columns.iter().any(|c| c.name.as_str() == "errors")
-        && table.columns.iter().any(|c| c.name.as_str() == "started_at")
-        && table.columns.iter().any(|c| c.name.as_str() == "finished_at")
+        && table.columns.iter().any(|c| c.name == "revision")
+        && table.columns.iter().any(|c| c.name == "name")
+        && table.columns.iter().any(|c| c.name == "datamodel")
+        && table.columns.iter().any(|c| c.name == "status")
+        && table.columns.iter().any(|c| c.name == "applied")
+        && table.columns.iter().any(|c| c.name == "rolled_back")
+        && table.columns.iter().any(|c| c.name == "datamodel_steps")
+        && table.columns.iter().any(|c| c.name == "database_migration")
+        && table.columns.iter().any(|c| c.name == "errors")
+        && table.columns.iter().any(|c| c.name == "started_at")
+        && table.columns.iter().any(|c| c.name == "finished_at")
 }
 
 pub(crate) fn is_relay_table(table: &Table) -> bool {
@@ -44,7 +44,7 @@ pub(crate) fn is_prisma_1_point_1_or_2_join_table(table: &Table) -> bool {
 pub(crate) fn is_prisma_1_point_0_join_table(table: &Table) -> bool {
     table.columns.len() == 3
         && table.indices.len() >= 2
-        && table.columns.iter().any(|c| c.name.as_str() == "id")
+        && table.columns.iter().any(|c| c.name == "id")
         && common_prisma_m_to_n_relation_conditions(table)
 }
 
@@ -302,34 +302,24 @@ pub(crate) fn calculate_relation_name(schema: &SqlSchema, fk: &ForeignKey, table
     let fk_to_same_model: Vec<&ForeignKey> = table
         .foreign_keys
         .iter()
-        .filter(|fk| fk.referenced_table == referenced_model.clone())
+        .filter(|fk| &fk.referenced_table == referenced_model)
         .collect();
 
     match schema.table(referenced_model) {
         Err(table_name) => Err(SqlError::SchemaInconsistent {
             explanation: format!("Table {} not found.", table_name),
         }),
-        Ok(table) => {
-            let fk_from_other_model_to_this: Vec<&ForeignKey> = table
+        Ok(other_table) => {
+            let fk_from_other_model_to_this: Vec<&ForeignKey> = other_table
                 .foreign_keys
                 .iter()
-                .filter(|fk| fk.referenced_table == model_with_fk.clone())
+                .filter(|fk| &fk.referenced_table == model_with_fk)
                 .collect();
 
-            //unambiguous
-            let name = if fk_to_same_model.len() < 2 && fk_from_other_model_to_this.len() == 0 {
-                if model_with_fk < referenced_model {
-                    format!("{}To{}", model_with_fk, referenced_model)
-                } else {
-                    format!("{}To{}", referenced_model, model_with_fk)
-                }
+            let name = if fk_to_same_model.len() < 2 && fk_from_other_model_to_this.is_empty() {
+                DefaultNames::name_for_unambiguous_relation(model_with_fk, referenced_model)
             } else {
-                //ambiguous
-                if model_with_fk < referenced_model {
-                    format!("{}_{}To{}", model_with_fk, fk_column_name, referenced_model)
-                } else {
-                    format!("{}To{}_{}", referenced_model, model_with_fk, fk_column_name)
-                }
+                DefaultNames::name_for_ambiguous_relation(model_with_fk, referenced_model, &fk_column_name)
             };
 
             Ok(name)

@@ -336,7 +336,7 @@ impl TempRelationHolder {
         } else if field == &self.field_b {
             RelationSide::B
         } else {
-            panic!("this field is not part of hte relations")
+            panic!("this field is not part of the relations")
         }
     }
 
