@@ -3,7 +3,7 @@ on:
 
 jobs:
   build:
-    name: "[${{ github.event.client_payload.id }}] Windows engines build ${{ github.event.client_payload.commit }}"
+    name: "Windows engines build ${{ github.event.client_payload.commit }}"
     env:
       SQLITE_MAX_VARIABLE_NUMBER: 250000
       SQLITE_MAX_EXPR_DEPTH: 10000
