@@ -1,3 +1,5 @@
+#![deny(rust_2018_idioms)]
+
 mod assertions;
 mod command_helpers;
 mod misc_helpers;

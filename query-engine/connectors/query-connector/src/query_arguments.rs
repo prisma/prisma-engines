@@ -14,6 +14,14 @@ pub struct QueryArguments {
     pub skip: Option<i64>,
     pub filter: Option<Filter>,
     pub order_by: Option<OrderBy>,
+
+    /// Temporary marker to indicate whether or not the
+    /// `skip` argument should be ignored when building queries.
+    pub ignore_skip: bool,
+
+    /// Temporary marker to indicate whether or not the
+    /// `take` argument should be ignored when building queries.
+    pub ignore_take: bool,
 }
 
 impl QueryArguments {
@@ -49,6 +57,8 @@ impl QueryArguments {
                 let take = self.take;
                 let skip = self.skip;
                 let order_by = self.order_by;
+                let ignore_skip = self.ignore_skip;
+                let ignore_take = self.ignore_take;
 
                 filter
                     .batched()
@@ -59,6 +69,8 @@ impl QueryArguments {
                         skip: skip.clone(),
                         filter: Some(filter),
                         order_by: order_by.clone(),
+                        ignore_skip,
+                        ignore_take,
                     })
                     .collect()
             }

@@ -71,7 +71,7 @@ impl SqlSchema {
     pub fn table(&self, name: &str) -> core::result::Result<&Table, String> {
         match self.tables.iter().find(|t| t.name == name) {
             Some(t) => Ok(t),
-            None => Err(format!("Table {} not found", name)),
+            None => Err(format!("{}", name)),
         }
     }
 

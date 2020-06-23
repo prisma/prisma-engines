@@ -311,14 +311,10 @@ impl Standardiser {
 
         for (model_name, field_name, rel_info) in unnamed_relations {
             // Embedding side.
-            let field = datamodel
-                .find_model_mut(&model_name)
-                .expect(STATE_ERROR)
-                .find_field_mut(&field_name)
-                .expect(STATE_ERROR);
+            let field = datamodel.find_field_mut(&model_name, &field_name).expect(STATE_ERROR);
 
             if let dml::FieldType::Relation(rel) = &mut field.field_type {
-                rel.name = DefaultNames::relation_name(&model_name, &rel_info.to);
+                rel.name = DefaultNames::name_for_unambiguous_relation(&model_name, &rel_info.to);
             } else {
                 panic!("Tried to name a non-existing relation.");
             }

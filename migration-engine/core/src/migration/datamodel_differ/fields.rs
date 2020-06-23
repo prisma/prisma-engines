@@ -27,7 +27,7 @@ impl<'a> FieldDiffer<'a> {
         })
     }
 
-    pub(crate) fn directive_pairs(&self) -> impl Iterator<Item = DirectiveDiffer> {
+    pub(crate) fn directive_pairs(&self) -> impl Iterator<Item = DirectiveDiffer<'_>> {
         self.previous_directives().filter_map(move |previous_directive| {
             self.next_directives()
                 .find(|next_directive| directives_match(previous_directive, next_directive))

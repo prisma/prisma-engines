@@ -108,10 +108,21 @@ impl<'a> InferAssertion<'a> {
         );
 
         anyhow::ensure!(
-            self.result.database_steps.as_array().unwrap().is_empty(),
+            self.result.database_steps.is_empty(),
             "Assertion failed. Database migration steps should be empty, but found {:#?}",
             self.result.database_steps
         );
+
+        Ok(self)
+    }
+
+    pub fn assert_warnings(self, warnings: &[String]) -> AssertionResult<Self> {
+        for (idx, warning) in warnings.iter().enumerate() {
+            assert_eq!(
+                Some(warning),
+                self.result.warnings.get(idx).map(|warning| &warning.description)
+            );
+        }
 
         Ok(self)
     }

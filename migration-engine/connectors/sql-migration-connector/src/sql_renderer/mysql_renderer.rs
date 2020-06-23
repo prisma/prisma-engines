@@ -21,7 +21,7 @@ impl SqlRenderer for MySqlRenderer {
 
     fn render_column(&self, _schema_name: &str, column: ColumnRef<'_>, _add_fk_prefix: bool) -> String {
         let column_name = self.quote(column.name());
-        let tpe_str = self.render_column_type(&column).unwrap();
+        let tpe_str = render_column_type(&column).unwrap();
         let nullability_str = render_nullability(&column);
         let default_str = column
             .default()
@@ -71,36 +71,34 @@ impl SqlRenderer for MySqlRenderer {
     }
 }
 
-impl MySqlRenderer {
-    fn render_column_type(&self, column: &ColumnRef<'_>) -> anyhow::Result<Cow<'static, str>> {
-        match &column.column_type().family {
-            ColumnTypeFamily::Boolean => Ok("boolean".into()),
-            ColumnTypeFamily::DateTime => {
-                // CURRENT_TIMESTAMP has up to second precision, not more.
-                if let Some(DefaultValue::NOW) = column.default() {
-                    return Ok("datetime".into());
-                } else {
-                    Ok("datetime(3)".into())
-                }
+pub(crate) fn render_column_type(column: &ColumnRef<'_>) -> anyhow::Result<Cow<'static, str>> {
+    match &column.column_type().family {
+        ColumnTypeFamily::Boolean => Ok("boolean".into()),
+        ColumnTypeFamily::DateTime => {
+            // CURRENT_TIMESTAMP has up to second precision, not more.
+            if let Some(DefaultValue::NOW) = column.default() {
+                return Ok("datetime".into());
+            } else {
+                Ok("datetime(3)".into())
             }
-            ColumnTypeFamily::Float => Ok("Decimal(65,30)".into()),
-            ColumnTypeFamily::Int => Ok("int".into()),
-            // we use varchar right now as mediumtext doesn't allow default values
-            // a bigger length would not allow to use such a column as primary key
-            ColumnTypeFamily::String => Ok(format!("varchar{}", VARCHAR_LENGTH_PREFIX).into()),
-            ColumnTypeFamily::Enum(enum_name) => {
-                let r#enum = column
-                    .schema()
-                    .get_enum(&enum_name)
-                    .ok_or_else(|| anyhow::anyhow!("Could not render the variants of enum `{}`", enum_name))?;
-
-                let variants: String = r#enum.values.iter().map(Quoted::mysql_string).join(", ");
-
-                Ok(format!("ENUM({})", variants).into())
-            }
-            ColumnTypeFamily::Json => Ok("json".into()),
-            x => unimplemented!("{:?} not handled yet", x),
         }
+        ColumnTypeFamily::Float => Ok("Decimal(65,30)".into()),
+        ColumnTypeFamily::Int => Ok("int".into()),
+        // we use varchar right now as mediumtext doesn't allow default values
+        // a bigger length would not allow to use such a column as primary key
+        ColumnTypeFamily::String => Ok(format!("varchar{}", VARCHAR_LENGTH_PREFIX).into()),
+        ColumnTypeFamily::Enum(enum_name) => {
+            let r#enum = column
+                .schema()
+                .get_enum(&enum_name)
+                .ok_or_else(|| anyhow::anyhow!("Could not render the variants of enum `{}`", enum_name))?;
+
+            let variants: String = r#enum.values.iter().map(Quoted::mysql_string).join(", ");
+
+            Ok(format!("ENUM({})", variants).into())
+        }
+        ColumnTypeFamily::Json => Ok("json".into()),
+        x => unimplemented!("{:?} not handled yet", x),
     }
 }
 

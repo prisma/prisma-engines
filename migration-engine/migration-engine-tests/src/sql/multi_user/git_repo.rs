@@ -13,7 +13,7 @@ impl GitRepo {
     }
 
     /// Returns whether we can merge the other user.
-    pub(crate) fn prepare_merge(&self, other: &GitRepo) -> anyhow::Result<(git2::Commit, git2::Index)> {
+    pub(crate) fn prepare_merge(&self, other: &GitRepo) -> anyhow::Result<(git2::Commit<'_>, git2::Index)> {
         let mut remote = self.remote(&other.name, other.root_dir.as_os_str().to_str().unwrap())?;
         let mut fo = git2::FetchOptions::new();
         remote.fetch(&["master"], Some(&mut fo), Some("Test suite fetch"))?;
@@ -31,18 +31,18 @@ impl GitRepo {
         Ok((last_commit, index))
     }
 
-    fn remote(&self, name: &str, url: &str) -> anyhow::Result<git2::Remote> {
+    fn remote(&self, name: &str, url: &str) -> anyhow::Result<git2::Remote<'_>> {
         self.repo
             .find_remote(name)
             .or_else(|_err| self.repo.remote(name, url))
             .map_err(Into::into)
     }
 
-    fn git_commit_author(&self) -> anyhow::Result<git2::Signature> {
+    fn git_commit_author(&self) -> anyhow::Result<git2::Signature<'_>> {
         Ok(git2::Signature::now(self.name, self.name)?)
     }
 
-    fn find_last_commit(&self) -> Option<git2::Commit> {
+    fn find_last_commit(&self) -> Option<git2::Commit<'_>> {
         self.repo.head().and_then(|r| r.peel_to_commit()).ok()
     }
 
@@ -54,7 +54,7 @@ impl GitRepo {
         let tree = self.repo.find_object(oid, None)?;
 
         let last_commit = self.find_last_commit();
-        let commit_parents: Vec<&git2::Commit> = if let Some(commit) = last_commit.as_ref() {
+        let commit_parents: Vec<&git2::Commit<'_>> = if let Some(commit) = last_commit.as_ref() {
             vec![commit]
         } else {
             Vec::new()

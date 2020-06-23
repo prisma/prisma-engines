@@ -6,7 +6,7 @@ use std::net::SocketAddr;
 use query_engine::{
     opt::PrismaOpt, cli::CliCommand, error::PrismaError,
     server::{HttpServerBuilder, HttpServer}, AnyError,
-    set_panic_hook, init_logger, PrismaResult,
+    set_panic_hook, init_logger, init_feature_flags, PrismaResult,
 };
 use structopt::StructOpt;
 use std::convert::TryFrom;
@@ -15,6 +15,7 @@ use std::convert::TryFrom;
 async fn main() -> Result<(), AnyError> {
     init_logger()?;
     let opts = PrismaOpt::from_args();
+    init_feature_flags(&opts);
 
     match CliCommand::try_from(&opts) {
         Ok(cmd) => {
@@ -40,7 +41,8 @@ async fn main() -> Result<(), AnyError> {
                     HttpServer::builder(config, datamodel)
                         .legacy(opts.legacy)
                         .enable_raw_queries(opts.enable_raw_queries)
-                        .enable_playground(opts.enable_playground),
+                        .enable_playground(opts.enable_playground)
+                        .enable_debug_mode(opts.enable_debug_mode),
                 )
             };
 

@@ -1,4 +1,4 @@
-use crate::{Env, Expression, Expressionista, IrSerializer, QueryInterpreter, QueryType, Response};
+use crate::{Env, Expression, Expressionista, IrSerializer, QueryInterpreter, QueryType, ResponseData};
 
 pub struct QueryPipeline<'conn, 'tx> {
     query: QueryType,
@@ -15,7 +15,7 @@ impl<'conn, 'tx> QueryPipeline<'conn, 'tx> {
         }
     }
 
-    pub async fn execute(self) -> crate::Result<Response> {
+    pub async fn execute(self) -> crate::Result<ResponseData> {
         let serializer = self.serializer;
 
         match self.query {
@@ -28,7 +28,7 @@ impl<'conn, 'tx> QueryPipeline<'conn, 'tx> {
                 let result = self.interpreter.interpret(expr, Env::default(), 0).await;
 
                 trace!("{}", self.interpreter.log_output());
-                Ok(serializer.serialize(result?))
+                serializer.serialize(result?)
             }
             QueryType::Raw {
                 query,
@@ -42,7 +42,7 @@ impl<'conn, 'tx> QueryPipeline<'conn, 'tx> {
 
                 trace!("{}", self.interpreter.log_output());
 
-                Ok(serializer.serialize(result?))
+                serializer.serialize(result?)
             }
         }
     }

@@ -1,30 +1,9 @@
+use crate::warnings::{
+    warning_enum_values_with_empty_names, warning_fields_with_empty_names, warning_models_without_identifier,
+    warning_unsupported_types, EnumAndValue, Model, ModelAndField, ModelAndFieldAndType,
+};
 use datamodel::{Datamodel, FieldArity, FieldType, RelationInfo};
 use introspection_connector::Warning;
-use serde::Serialize;
-
-#[derive(Serialize, Debug)]
-struct Model {
-    model: String,
-}
-
-#[derive(Serialize, Debug)]
-pub struct ModelAndField {
-    pub model: String,
-    pub field: String,
-}
-
-#[derive(Serialize, Debug)]
-struct ModelAndFieldType {
-    model: String,
-    field: String,
-    tpe: String,
-}
-
-#[derive(Serialize, Debug)]
-struct EnumAndValue {
-    enm: String,
-    value: String,
-}
 
 pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
     let mut models_without_identifiers = vec![];
@@ -35,7 +14,7 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
     // find models with 1to1 relations
     let mut models_with_one_to_one_relation = vec![];
     for model in &datamodel.models {
-        if model.fields.iter().any(|f| match (&f.arity, &f.field_type) {
+        if model.fields().any(|f| match (&f.arity, &f.field_type) {
             (FieldArity::List, _) => false,
             (
                 _,
@@ -48,8 +27,7 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
             ) => {
                 let other_model = datamodel.find_model(to).unwrap();
                 let other_field = other_model
-                    .fields
-                    .iter()
+                    .fields()
                     .find(|f| match &f.field_type {
                         FieldType::Relation(RelationInfo {
                             to: other_to,
@@ -71,6 +49,11 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
             models_with_one_to_one_relation.push(model.name.clone())
         }
     }
+
+    //todo more stuff to handle when commenting out. (Maybe it is easier to just work on supporting it.)
+    // models with empty names?
+    // also needs to follow the field references (relations, indexes, ids...)
+    // also needs to drop usages of removed enum values
 
     // fields with an empty name
     for model in &mut datamodel.models {
@@ -112,7 +95,7 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
         for field in &mut model.fields {
             if let FieldType::Unsupported(tpe) = &field.field_type {
                 field.is_commented_out = true;
-                unsupported_types.push(ModelAndFieldType {
+                unsupported_types.push(ModelAndFieldAndType {
                     model: model.name.clone(),
                     field: field.name.clone(),
                     tpe: tpe.clone(),
@@ -163,37 +146,19 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
     let mut warnings = vec![];
 
     if !models_without_identifiers.is_empty() {
-        warnings.push(Warning {
-            code: 1,
-            message: "These models do not have a unique identifier or id and are therefore commented out.".into(),
-            affected: serde_json::to_value(&models_without_identifiers).unwrap(),
-        })
+        warnings.push(warning_models_without_identifier(&models_without_identifiers))
     }
 
     if !fields_with_empty_names.is_empty() {
-        warnings.push(Warning {
-            code: 2,
-            message: "These fields were commented out because of invalid names. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]*."
-                .into(),
-            affected: serde_json::to_value(&fields_with_empty_names).unwrap(),
-        })
+        warnings.push(warning_fields_with_empty_names(&fields_with_empty_names))
     }
 
     if !unsupported_types.is_empty() {
-        warnings.push(Warning {
-            code: 3,
-            message: "These fields were commented out because we currently do not support their types.".into(),
-            affected: serde_json::to_value(&unsupported_types).unwrap(),
-        })
+        warnings.push(warning_unsupported_types(&unsupported_types))
     }
 
     if !enum_values_with_empty_names.is_empty() {
-        warnings.push(Warning {
-            code: 4,
-            message: "These enum values were commented out because of invalid names. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]*."
-                .into(),
-            affected: serde_json::to_value(&enum_values_with_empty_names).unwrap(),
-        })
+        warnings.push(warning_enum_values_with_empty_names(&enum_values_with_empty_names))
     }
 
     warnings

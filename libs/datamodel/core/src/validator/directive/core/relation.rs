@@ -55,11 +55,10 @@ impl DirectiveValidator<dml::Field> for RelationDirectiveValidator {
                 .unwrap_or_else(|| panic!("Related model not found: {}.", relation_info.to));
 
             let mut all_related_ids = related_model.id_field_names();
+            let has_default_name = relation_info.name
+                == DefaultNames::name_for_unambiguous_relation(&relation_info.to, &parent_model.name);
 
-            if !relation_info.name.is_empty()
-                && (relation_info.name != DefaultNames::relation_name(&relation_info.to, &parent_model.name)
-                    || parent_model.name == related_model.name)
-            {
+            if !relation_info.name.is_empty() && (!has_default_name || parent_model.name == related_model.name) {
                 args.push(ast::Argument::new_string("", &relation_info.name));
             }
 

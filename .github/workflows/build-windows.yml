@@ -1,0 +1,29 @@
+on:
+  repository_dispatch:
+
+jobs:
+  build:
+    name: "Windows engines build ${{ github.event.client_payload.commit }}"
+    env:
+      SQLITE_MAX_VARIABLE_NUMBER: 250000
+      SQLITE_MAX_EXPR_DEPTH: 10000
+    runs-on: windows-latest
+    steps:
+      - name: Checkout ${{ github.event.client_payload.commit }}
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.client_payload.commit }}
+
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+
+      - uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: --release
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: binaries
+          path: ${{ github.workspace }}/target/release/*.exe

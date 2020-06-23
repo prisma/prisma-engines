@@ -6,6 +6,7 @@ mod postgres_renderer;
 mod sqlite_renderer;
 
 pub(crate) use common::{IteratorJoin, Quoted, QuotedWithSchema};
+pub(crate) use mysql_renderer::render_column_type as mysql_render_column_type;
 pub(crate) use postgres_renderer::render_column_type as postgres_render_column_type;
 
 use crate::{sql_schema_helpers::ColumnRef, SqlFamily};
@@ -40,6 +41,7 @@ impl dyn SqlRenderer {
             SqlFamily::Postgres => Box::new(PostgresRenderer {}),
             SqlFamily::Mysql => Box::new(MySqlRenderer {}),
             SqlFamily::Sqlite => Box::new(SqliteRenderer {}),
+            SqlFamily::Mssql => todo!("Greetings from Redmond"),
         }
     }
 }

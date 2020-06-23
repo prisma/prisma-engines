@@ -1,3 +1,6 @@
+#[cfg(feature = "mssql")]
+use super::builtin::MSSqlSourceDefinition;
+
 use super::{
     builtin::{MySqlSourceDefinition, PostgresSourceDefinition, SqliteSourceDefinition},
     traits::{Source, SourceDefinition},
@@ -69,8 +72,8 @@ impl SourceLoader {
 
         let url_args = args.arg("url")?;
         let (env_var_for_url, url) = match url_args.as_str_from_env() {
+            _ if ignore_env_var_errors => (None, format!("{}://", provider)), // glorious hack. ask marcus
             Ok((env_var, url)) => (env_var, url.trim().to_owned()),
-            Err(_) if ignore_env_var_errors => (None, format!("{}://", provider)), // glorious hack. ask marcus
             Err(err) => return Err(err),
         };
 
@@ -127,5 +130,7 @@ fn get_builtin_sources() -> Vec<Box<dyn SourceDefinition>> {
         Box::new(MySqlSourceDefinition::new()),
         Box::new(PostgresSourceDefinition::new()),
         Box::new(SqliteSourceDefinition::new()),
+        #[cfg(feature = "mssql")]
+        Box::new(MSSqlSourceDefinition::new()),
     ]
 }

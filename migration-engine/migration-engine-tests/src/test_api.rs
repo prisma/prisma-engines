@@ -79,6 +79,7 @@ impl TestApi {
             SqlFamily::Mysql => mysql_test_config("unreachable"),
             SqlFamily::Postgres => postgres_12_test_config("unreachable"),
             SqlFamily::Sqlite => sqlite_test_config("unreachable"),
+            SqlFamily::Mssql => todo!("Greetings from Redmond"),
         }
     }
 
@@ -138,13 +139,14 @@ impl TestApi {
         }
     }
 
-    pub fn barrel(&self) -> BarrelMigrationExecutor {
+    pub fn barrel(&self) -> BarrelMigrationExecutor<'_> {
         BarrelMigrationExecutor {
             api: self,
             sql_variant: match self.sql_family() {
                 SqlFamily::Mysql => barrel::SqlVariant::Mysql,
                 SqlFamily::Postgres => barrel::SqlVariant::Pg,
                 SqlFamily::Sqlite => barrel::SqlVariant::Sqlite,
+                SqlFamily::Mssql => todo!("Greetings from Redmond"),
             },
         }
     }
@@ -196,7 +198,7 @@ impl TestApi {
         }
     }
 
-    pub fn select<'a>(&'a self, table_name: &'a str) -> TestApiSelect {
+    pub fn select<'a>(&'a self, table_name: &'a str) -> TestApiSelect<'_> {
         TestApiSelect {
             select: quaint::ast::Select::from_table(self.render_table_name(table_name)),
             api: self,
@@ -238,7 +240,7 @@ impl<'a> TestApiSelect<'a> {
     }
 
     pub async fn send_debug(self) -> Result<Vec<Vec<String>>, anyhow::Error> {
-        let rows = self.api.database().query(self.select.into()).await?;
+        let rows = self.send().await?;
 
         let rows: Vec<Vec<String>> = rows
             .into_iter()
@@ -246,6 +248,10 @@ impl<'a> TestApiSelect<'a> {
             .collect();
 
         Ok(rows)
+    }
+
+    pub async fn send(self) -> anyhow::Result<quaint::prelude::ResultSet> {
+        Ok(self.api.database().query(self.select.into()).await?)
     }
 }
 

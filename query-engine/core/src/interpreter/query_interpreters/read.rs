@@ -97,8 +97,8 @@ fn read_related<'a, 'b>(
         let is_m2m = relation.is_many_to_many();
         let paginator = NestedPagination::new_from_query_args(&query.args);
 
-        query.args.take = None;
-        query.args.skip = None;
+        query.args.ignore_take = true;
+        query.args.ignore_skip = true;
 
         let scalars = if is_m2m {
             nested_read::m2m(tx, &query, parent_result, paginator).await?

@@ -1,7 +1,7 @@
 use super::Parsable;
 
 /// Holds information about a relation field.
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, Clone)]
 pub struct RelationInfo {
     /// The target model of the relation.
     pub to: String,
@@ -14,6 +14,16 @@ pub struct RelationInfo {
     /// A strategy indicating what happens when
     /// a related node is deleted.
     pub on_delete: OnDeleteStrategy,
+}
+
+impl PartialEq for RelationInfo {
+    //ignores the relation name for reintrospection
+    fn eq(&self, other: &Self) -> bool {
+        self.to == other.to
+            && self.fields == other.fields
+            && self.to_fields == other.to_fields
+            && self.on_delete == other.on_delete
+    }
 }
 
 impl RelationInfo {

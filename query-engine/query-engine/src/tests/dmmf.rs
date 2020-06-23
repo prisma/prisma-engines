@@ -80,7 +80,7 @@ fn must_not_fail_on_missing_env_vars_in_a_datasource() {
             provider = "postgresql"
             url = env("MISSING_ENV_VAR")
         }
-        
+
         model Blog {
             blogId String @id
         }
@@ -98,10 +98,13 @@ fn must_not_fail_on_missing_env_vars_in_a_datasource() {
 }
 
 fn get_query_schema(datamodel_string: &str) -> (QuerySchema, datamodel::dml::Datamodel) {
+    feature_flags::initialize(&vec![String::from("all")]).unwrap();
+
     let dm = datamodel::parse_datamodel_and_ignore_env_errors(datamodel_string).unwrap();
     let internal_dm_template = DatamodelConverter::convert(&dm);
     let internal_ref = internal_dm_template.build("db".to_owned());
     let supported_capabilities = SupportedCapabilities::empty();
+
     (
         QuerySchemaBuilder::new(&internal_ref, &supported_capabilities, BuildMode::Modern, false).build(),
         dm,

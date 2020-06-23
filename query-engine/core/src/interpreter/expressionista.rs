@@ -7,6 +7,14 @@ use std::{collections::VecDeque, convert::TryInto};
 
 pub struct Expressionista;
 
+/// Helper accumulator struct.
+#[derive(Default)]
+struct IfNodeAcc {
+    then: Option<(EdgeRef, NodeRef)>,
+    _else: Option<(EdgeRef, NodeRef)>,
+    other: Vec<(EdgeRef, NodeRef)>,
+}
+
 impl Expressionista {
     pub fn translate(mut graph: QueryGraph) -> InterpretationResult<Expression> {
         graph
@@ -38,11 +46,52 @@ impl Expressionista {
         node: &NodeRef,
         parent_edges: Vec<EdgeRef>,
     ) -> InterpretationResult<Expression> {
-        // Child edges are ordered, evaluation order is low to high in the graph, unless other rules override.
-        let mut direct_children = graph.direct_child_pairs(&node);
+        graph.mark_visited(&node);
 
+        // Child edges are ordered, evaluation order is low to high in the graph, unless other rules override.
+        let direct_children = graph.direct_child_pairs(&node);
+
+        let mut child_expressions = Self::process_children(graph, direct_children)?;
+
+        let is_result = graph.is_result_node(&node);
+        let node_id = node.id();
+        let node = graph.pluck_node(&node);
+        let into_expr = Box::new(|node: Node| {
+            let query: Query = node.try_into()?;
+            Ok(Expression::Query { query })
+        });
+
+        let expr = Self::transform_node(graph, parent_edges, node, into_expr)?;
+
+        if child_expressions.is_empty() {
+            Ok(expr)
+        } else {
+            let node_binding_name = node_id.clone();
+
+            // Add a final statement to the evaluation if the current node has child nodes and is supposed to be the
+            // final result, to make sure it propagates upwards.
+            if is_result {
+                child_expressions.push(Expression::Get {
+                    binding_name: node_binding_name.clone(),
+                });
+            }
+
+            Ok(Expression::Let {
+                bindings: vec![Binding {
+                    name: node_binding_name,
+                    expr,
+                }],
+                expressions: child_expressions,
+            })
+        }
+    }
+
+    fn process_children(
+        graph: &mut QueryGraph,
+        mut child_pairs: Vec<(EdgeRef, NodeRef)>,
+    ) -> InterpretationResult<Vec<Expression>> {
         // Find the positions of all result returning graph nodes.
-        let mut result_positions: Vec<usize> = direct_children
+        let mut result_positions: Vec<usize> = child_pairs
             .iter()
             .enumerate()
             .filter_map(|(ix, (_, child_node))| {
@@ -60,12 +109,12 @@ impl Expressionista {
 
         let result_subgraphs: Vec<(EdgeRef, NodeRef)> = result_positions
             .into_iter()
-            .map(|pos| direct_children.remove(pos))
+            .map(|pos| child_pairs.remove(pos))
             .collect();
 
-        // Because we split from right to left, everything remaining in `direct_children`
+        // Because we split from right to left, everything remaining in `child_pairs`
         // doesn't belong into results, and is executed before all result scopes.
-        let mut expressions: Vec<Expression> = direct_children
+        let mut expressions: Vec<Expression> = child_pairs
             .into_iter()
             .map(|(_, node)| {
                 let edges = graph.incoming_edges(&node);
@@ -79,39 +128,7 @@ impl Expressionista {
             expressions.push(result_exp);
         }
 
-        graph.mark_visited(&node);
-
-        let is_result = graph.is_result_node(&node);
-        let node_id = node.id();
-        let node = graph.pluck_node(&node);
-        let into_expr = Box::new(|node: Node| {
-            let query: Query = node.try_into()?;
-            Ok(Expression::Query { query })
-        });
-
-        let expr = Self::transform_node(graph, parent_edges, node, into_expr)?;
-
-        if expressions.is_empty() {
-            Ok(expr)
-        } else {
-            let node_binding_name = node_id.clone();
-
-            // Add a final statement to the evaluation if the current node has child nodes and is supposed to be the
-            // final result, to make sure it propagates upwards.
-            if is_result {
-                expressions.push(Expression::Get {
-                    binding_name: node_binding_name.clone(),
-                });
-            }
-
-            Ok(Expression::Let {
-                bindings: vec![Binding {
-                    name: node_binding_name,
-                    expr,
-                }],
-                expressions,
-            })
-        }
+        Ok(expressions)
     }
 
     fn build_empty_expression(
@@ -188,47 +205,103 @@ impl Expressionista {
         node: &NodeRef,
         parent_edges: Vec<EdgeRef>,
     ) -> InterpretationResult<Expression> {
+        graph.mark_visited(node);
+
         match graph.node_content(node).unwrap() {
-            Node::Flow(Flow::If(_)) => {
-                graph.mark_visited(node);
-
-                let child_pairs = graph.child_pairs(node);
-
-                // Graph validation guarantees this succeeds.
-                let (mut then_pair, mut else_pair): (Vec<(EdgeRef, NodeRef)>, Vec<(EdgeRef, NodeRef)>) = child_pairs
-                    .into_iter()
-                    .partition(|(edge, _)| match graph.edge_content(&edge).unwrap() {
-                        QueryGraphDependency::Then => true,
-                        QueryGraphDependency::Else => false,
-                        _ => unreachable!(),
-                    });
-
-                let then_pair = then_pair.pop().unwrap();
-                let else_pair = else_pair.pop();
-
-                // Build expressions for both arms. They are treated as separate root nodes.
-                let then_expr = Self::build_expression(graph, &then_pair.1, graph.incoming_edges(&then_pair.1))?;
-                let else_expr = else_pair
-                    .into_iter()
-                    .map(|(_, node)| Self::build_expression(graph, &node, graph.incoming_edges(&node)))
-                    .collect::<InterpretationResult<Vec<Expression>>>()?;
-
-                let node = graph.pluck_node(node);
-                let into_expr = Box::new(move |node: Node| {
-                    let flow: Flow = node.try_into()?;
-                    match flow {
-                        Flow::If(cond_fn) => Ok(Expression::If {
-                            func: cond_fn,
-                            then: vec![then_expr],
-                            else_: else_expr,
-                        }),
-                    }
-                });
-
-                Self::transform_node(graph, parent_edges, node, into_expr)
-            }
+            Node::Flow(Flow::If(_)) => Self::translate_if_node(graph, node, parent_edges),
+            Node::Flow(Flow::Return(_)) => Self::translate_return_node(graph, node, parent_edges),
             _ => unreachable!(),
         }
+    }
+
+    fn translate_if_node(
+        graph: &mut QueryGraph,
+        node: &NodeRef,
+        parent_edges: Vec<EdgeRef>,
+    ) -> InterpretationResult<Expression> {
+        let child_pairs = graph.direct_child_pairs(node);
+
+        let if_node_info = child_pairs
+            .into_iter()
+            .fold(IfNodeAcc::default(), |mut acc, (edge, node)| {
+                match graph.edge_content(&edge) {
+                    Some(QueryGraphDependency::Then) => acc.then = Some((edge, node)),
+                    Some(QueryGraphDependency::Else) => acc._else = Some((edge, node)),
+                    _ => acc.other.push((edge, node)),
+                };
+
+                acc
+            });
+
+        let then_pair = if_node_info
+            .then
+            .expect("Expected if-node to always have a then edge to another node.");
+
+        // Build expressions for both arms.
+        let then_expr = Self::build_expression(graph, &then_pair.1, graph.incoming_edges(&then_pair.1))?;
+        let else_expr = if_node_info
+            ._else
+            .into_iter()
+            .map(|(_, node)| Self::build_expression(graph, &node, graph.incoming_edges(&node)))
+            .collect::<InterpretationResult<Vec<_>>>()?;
+
+        let child_expressions = Self::process_children(graph, if_node_info.other)?;
+
+        let node_id = node.id();
+        let node = graph.pluck_node(node);
+        let into_expr = Box::new(move |node: Node| {
+            let flow: Flow = node.try_into()?;
+
+            if let Flow::If(cond_fn) = flow {
+                let if_expr = Expression::If {
+                    func: cond_fn,
+                    then: vec![then_expr],
+                    else_: else_expr,
+                };
+
+                let expr = if child_expressions.len() > 0 {
+                    Expression::Let {
+                        bindings: vec![Binding {
+                            name: node_id,
+                            expr: if_expr,
+                        }],
+                        expressions: child_expressions,
+                    }
+                } else {
+                    if_expr
+                };
+
+                Ok(expr)
+            } else {
+                unreachable!()
+            }
+        });
+
+        Self::transform_node(graph, parent_edges, node, into_expr)
+    }
+
+    fn translate_return_node(
+        graph: &mut QueryGraph,
+        node: &NodeRef,
+        parent_edges: Vec<EdgeRef>,
+    ) -> InterpretationResult<Expression> {
+        let into_expr = Box::new(move |node: Node| {
+            let flow: Flow = node.try_into()?;
+
+            if let Flow::Return(result) = flow {
+                let result = match result {
+                    Some(r) => ExpressionResult::RawProjections(r),
+                    None => ExpressionResult::Empty,
+                };
+
+                Ok(Expression::Return { result })
+            } else {
+                unreachable!()
+            }
+        });
+
+        let node = graph.pluck_node(node);
+        Self::transform_node(graph, parent_edges, node, into_expr)
     }
 
     /// Runs transformer functions (e.g. `ParentIdsFn`) via `Expression::Func` if necessary, or if none present,

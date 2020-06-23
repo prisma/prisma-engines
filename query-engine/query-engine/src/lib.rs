@@ -38,6 +38,15 @@ static LOG_FORMAT: Lazy<LogFormat> =
 pub type PrismaResult<T> = Result<T, PrismaError>;
 pub type AnyError = Box<dyn Error + Send + Sync + 'static>;
 
+pub fn init_feature_flags(opts: &opt::PrismaOpt) {
+    if let Err(err) = feature_flags::initialize(opts.raw_feature_flags.as_slice()) {
+        let err: PrismaError = err.into();
+
+        info!("Encountered error during initialization:");
+        err.render_as_json().expect("error rendering");
+        std::process::exit(1);
+    }
+}
 
 pub fn init_logger() -> Result<(), AnyError> {
 	match *LOG_FORMAT {

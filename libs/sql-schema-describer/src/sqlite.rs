@@ -143,8 +143,8 @@ impl SqlSchemaDescriber {
 
                 let default = match row.get("dflt_value") {
                     None => None,
-                    Some(Value::Null) => None,
-                    Some(Value::Text(cow_string)) => {
+                    Some(val) if val.is_null() => None,
+                    Some(Value::Text(Some(cow_string))) => {
                         let default_string = cow_string.to_string();
 
                         if default_string.to_lowercase() == "null" {

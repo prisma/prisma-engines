@@ -1,4 +1,5 @@
 use super::misc_helpers::*;
+use datamodel::Datamodel;
 use introspection_connector::{DatabaseMetadata, IntrospectionConnector, Version};
 use quaint::{
     prelude::{Queryable, SqlFamily},
@@ -26,17 +27,49 @@ impl TestApi {
     }
 
     pub async fn introspect(&self) -> String {
-        let introspection_result = self.introspection_connector.introspect().await.unwrap();
+        let introspection_result = self
+            .introspection_connector
+            .introspect(&Datamodel::new(), false)
+            .await
+            .unwrap();
         datamodel::render_datamodel_to_string(&introspection_result.datamodel).expect("Datamodel rendering failed")
     }
 
+    pub async fn re_introspect(&self, data_model_string: &str) -> String {
+        let data_model = datamodel::parse_datamodel(data_model_string).unwrap();
+        let introspection_result = self
+            .introspection_connector
+            .introspect(&data_model, true)
+            .await
+            .unwrap();
+        datamodel::render_datamodel_to_string(&introspection_result.datamodel).expect("Datamodel rendering failed")
+    }
+
+    pub async fn re_introspect_warnings(&self, data_model_string: &str) -> String {
+        let data_model = datamodel::parse_datamodel(data_model_string).unwrap();
+        let introspection_result = self
+            .introspection_connector
+            .introspect(&data_model, true)
+            .await
+            .unwrap();
+        serde_json::to_string(&introspection_result.warnings).unwrap()
+    }
+
     pub async fn introspect_version(&self) -> Version {
-        let introspection_result = self.introspection_connector.introspect().await.unwrap();
+        let introspection_result = self
+            .introspection_connector
+            .introspect(&Datamodel::new(), false)
+            .await
+            .unwrap();
         introspection_result.version
     }
 
     pub async fn introspection_warnings(&self) -> String {
-        let introspection_result = self.introspection_connector.introspect().await.unwrap();
+        let introspection_result = self
+            .introspection_connector
+            .introspect(&Datamodel::new(), false)
+            .await
+            .unwrap();
         serde_json::to_string(&introspection_result.warnings).unwrap()
     }
 
@@ -64,6 +97,7 @@ impl TestApi {
                 SqlFamily::Mysql => barrel::SqlVariant::Mysql,
                 SqlFamily::Postgres => barrel::SqlVariant::Pg,
                 SqlFamily::Sqlite => barrel::SqlVariant::Sqlite,
+                SqlFamily::Mssql => todo!("Greetings from Redmond"),
             },
         }
     }
