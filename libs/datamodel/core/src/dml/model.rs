@@ -175,7 +175,7 @@ impl Model {
             let mut unique_required_fields: Vec<_> = self
                 .fields
                 .iter()
-                .filter(|field| field.is_unique && (field.arity == FieldArity::Required || allow_optional))
+                .filter(|field| field.is_unique && (field.arity.is_required() || allow_optional))
                 .map(|f| UniqueCriteria::new(vec![f]))
                 .collect();
 
@@ -188,9 +188,14 @@ impl Model {
                 .indices
                 .iter()
                 .filter(|id| id.tpe == IndexType::Unique)
-                .map(|id| {
-                    let fields = id.fields.iter().map(|f| self.find_field(&f).unwrap()).collect();
-                    UniqueCriteria::new(fields)
+                .filter_map(|id| {
+                    let fields: Vec<_> = id.fields.iter().map(|f| self.find_field(&f).unwrap()).collect();
+                    let all_fields_are_required = fields.iter().all(|f| f.arity.is_required() || allow_optional);
+                    if all_fields_are_required {
+                        Some(UniqueCriteria::new(fields))
+                    } else {
+                        None
+                    }
                 })
                 .collect();
 

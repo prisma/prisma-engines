@@ -34,8 +34,10 @@ impl<'a> Validator<'a> {
             // Having a separate error collection allows checking whether any error has occurred for a model.
             let mut errors_for_model = ErrorCollection::new();
 
-            if let Err(err) = self.validate_model_has_id(ast_schema.find_model(&model.name).expect(STATE_ERROR), model)
-            {
+            if let Err(err) = self.validate_model_has_strict_unique_criteria(
+                ast_schema.find_model(&model.name).expect(STATE_ERROR),
+                model,
+            ) {
                 errors_for_model.push(err);
             }
             if let Err(err) = self.validate_model_name(ast_schema.find_model(&model.name).expect(STATE_ERROR), model) {
@@ -219,8 +221,11 @@ impl<'a> Validator<'a> {
         }
     }
 
-    fn validate_model_has_id(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), DatamodelError> {
-        // TODO: replace with unique criteria function
+    fn validate_model_has_strict_unique_criteria(
+        &self,
+        ast_model: &ast::Model,
+        model: &dml::Model,
+    ) -> Result<(), DatamodelError> {
         let multiple_single_field_id_error = Err(DatamodelError::new_model_validation_error(
             "At most one field must be marked as the id field with the `@id` directive.",
             &model.name,
@@ -229,12 +234,6 @@ impl<'a> Validator<'a> {
 
         let multiple_id_criteria_error = Err(DatamodelError::new_model_validation_error(
             "Each model must have at most one id criteria. You can't have `@id` and `@@id` at the same time.",
-            &model.name,
-            ast_model.span,
-        ));
-
-        let missing_id_criteria_error = Err(DatamodelError::new_model_validation_error(
-            "Each model must have at least one unique criteria. Either mark a single field with `@id`, `@unique` or add a multi field criterion with `@@id([])` or `@@unique([])` to the model.",
             &model.name,
             ast_model.span,
         ));
@@ -250,10 +249,30 @@ impl<'a> Validator<'a> {
             return multiple_id_criteria_error;
         }
 
-        // TODO: nice error if something is only a loose unique criteria. E.g. the following criteria were not considered because they contain optional fields..
-
-        //        let loose_criterias
-        //        let suffix =
+        let loose_criterias = model.loose_unique_criterias();
+        let suffix = if loose_criterias.is_empty() {
+            "".to_string()
+        } else {
+            let criteria_descriptions: Vec<_> = loose_criterias
+                .iter()
+                .map(|criteria| {
+                    let field_names: Vec<_> = criteria.fields.iter().map(|f| f.name.clone()).collect();
+                    format!("- {}", field_names.join(", "))
+                })
+                .collect();
+            format!(
+                " The following unique criterias were not considered as they contain fields that are not required:\n{}",
+                criteria_descriptions.join("\n")
+            )
+        };
+        let missing_id_criteria_error = Err(DatamodelError::new_model_validation_error(
+            &format!(
+                "Each model must have at least one unique criteria that has only required fields. Either mark a single field with `@id`, `@unique` or add a multi field criterion with `@@id([])` or `@@unique([])` to the model.{suffix}",
+                suffix = suffix
+            ),
+            &model.name,
+            ast_model.span,
+        ));
 
         if model.strict_unique_criterias().is_empty() {
             return missing_id_criteria_error;
