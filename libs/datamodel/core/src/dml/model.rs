@@ -137,11 +137,13 @@ impl Model {
     }
 
     /// optional unique fields are NOT considered a unique criteria
+    /// used for: A Model must have at least one STRICT unique criteria.
     pub fn strict_unique_criterias(&self) -> Vec<UniqueCriteria> {
         self.unique_criterias(false)
     }
 
     /// optional unique fields are considered a unique criteria
+    /// used for: A relation must reference one LOOSE unique criteria. (nulls are okay in this case)
     pub fn loose_unique_criterias(&self) -> Vec<UniqueCriteria> {
         self.unique_criterias(true)
     }

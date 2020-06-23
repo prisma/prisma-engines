@@ -2,7 +2,7 @@ use crate::ast::WithDirectives;
 use crate::{
     ast, configuration, dml,
     error::{DatamodelError, ErrorCollection},
-    FieldArity, IndexType,
+    FieldArity,
 };
 
 /// Helper for validating a datamodel.
@@ -241,8 +241,6 @@ impl<'a> Validator<'a> {
 
         let has_single_field_id = model.singular_id_fields().next().is_some();
         let has_multi_field_id = !model.id_fields.is_empty();
-        let has_single_field_unique = model.fields().find(|f| f.is_unique).is_some();
-        let has_multi_field_unique = model.indices.iter().find(|i| i.tpe == IndexType::Unique).is_some();
 
         if model.singular_id_fields().count() > 1 {
             return multiple_single_field_id_error;
@@ -252,11 +250,16 @@ impl<'a> Validator<'a> {
             return multiple_id_criteria_error;
         }
 
-        if has_single_field_id || has_multi_field_id || has_single_field_unique || has_multi_field_unique {
-            Ok(())
-        } else {
-            missing_id_criteria_error
+        // TODO: nice error if something is only a loose unique criteria. E.g. the following criteria were not considered because they contain optional fields..
+
+        //        let loose_criterias
+        //        let suffix =
+
+        if model.strict_unique_criterias().is_empty() {
+            return missing_id_criteria_error;
         }
+
+        Ok(())
     }
 
     fn validate_model_name(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), DatamodelError> {
