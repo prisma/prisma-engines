@@ -85,7 +85,7 @@ async fn sqlite_column_types_must_work() {
                 arity: ColumnArity::Required,
             },
             default: None,
-            auto_increment: false,
+            auto_increment: true,
         },
         Column {
             name: "decimal_col".to_string(),
@@ -120,9 +120,9 @@ async fn sqlite_column_types_must_work() {
 #[tokio::test]
 async fn sqlite_foreign_key_on_delete_must_be_handled() {
     let sql = format!(
-        "CREATE TABLE \"{0}\".City (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT);
+        "CREATE TABLE \"{0}\".City (id INTEGER NOT NULL PRIMARY KEY);
          CREATE TABLE \"{0}\".User (
-            id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+            id INTEGER NOT NULL PRIMARY KEY,
             city INTEGER REFERENCES City(id) ON DELETE NO ACTION,
             city_cascade INTEGER REFERENCES City(id) ON DELETE CASCADE,
             city_restrict INTEGER REFERENCES City (id) ON DELETE RESTRICT,
@@ -374,42 +374,6 @@ async fn escaped_backslashes_in_string_literals_must_be_unescaped(api: &TestApi)
         .unwrap();
 
     assert_eq!(default, "xyz\\Datasource\\Model");
-
-    Ok(())
-}
-
-#[test_each_connector(tags("sqlite"))]
-async fn integer_primary_key_autoincrement_must_introspect_properly(api: &TestApi) -> TestResult {
-    let create_table = |table_name, autoincrement| {
-        format!(
-            r#"
-            CREATE TABLE "{schema_name}"."{table_name}" (
-                id INTEGER PRIMARY KEY {autoincrement},
-                other TEXT
-            );
-        "#,
-            schema_name = api.schema_name(),
-            table_name = table_name,
-            autoincrement = autoincrement,
-        )
-    };
-
-    api.database().query_raw(&create_table("test1", ""), &[]).await?;
-    api.database()
-        .query_raw(&create_table("test2", "AUTOINCREMENT"), &[])
-        .await?;
-
-    let schema = api.describe().await?;
-
-    let assert_autoincrement = |table_name, expect_autoincrement, schema: &SqlSchema| {
-        let table = schema.table_bang(table_name);
-        let id_col = table.column_bang("id");
-
-        assert_eq!(id_col.auto_increment, expect_autoincrement);
-    };
-
-    assert_autoincrement("test1", false, &schema);
-    assert_autoincrement("test2", true, &schema);
 
     Ok(())
 }

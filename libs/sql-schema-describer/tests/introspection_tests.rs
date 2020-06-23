@@ -421,7 +421,7 @@ async fn indices_must_work(api: &TestApi) {
             },
 
             default,
-            auto_increment: !api.sql_family().is_sqlite(),
+            auto_increment: true,
         },
     ];
     let pk_sequence = match api.sql_family() {
