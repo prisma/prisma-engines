@@ -143,7 +143,7 @@ impl Model {
     }
 
     /// optional unique fields are considered a unique criteria
-    /// used for: A relation must reference one LOOSE unique criteria. (nulls are okay in this case)
+    /// used for: A relation must reference one LOOSE unique criteria. (optional fields are okay in this case)
     pub fn loose_unique_criterias(&self) -> Vec<UniqueCriteria> {
         self.unique_criterias(true)
     }
@@ -190,8 +190,8 @@ impl Model {
                 .filter(|id| id.tpe == IndexType::Unique)
                 .filter_map(|id| {
                     let fields: Vec<_> = id.fields.iter().map(|f| self.find_field(&f).unwrap()).collect();
-                    let all_fields_are_required = fields.iter().all(|f| f.arity.is_required() || allow_optional);
-                    if all_fields_are_required {
+                    let all_fields_are_required = fields.iter().all(|f| f.arity.is_required());
+                    if all_fields_are_required || allow_optional {
                         Some(UniqueCriteria::new(fields))
                     } else {
                         None
