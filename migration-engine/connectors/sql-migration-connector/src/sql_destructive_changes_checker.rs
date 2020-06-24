@@ -16,7 +16,7 @@ use destructive_check_plan::DestructiveCheckPlan;
 use migration_connector::{ConnectorResult, DestructiveChangeDiagnostics, DestructiveChangesChecker};
 use sql_schema_describer::SqlSchema;
 use unexecutable_step_check::UnexecutableStepCheck;
-use warning_check::SqlMigrationWarning;
+use warning_check::SqlMigrationWarningCheck;
 
 /// The SqlDestructiveChangesChecker is responsible for informing users about potentially
 /// destructive or impossible changes that their attempted migrations contain.
@@ -41,7 +41,7 @@ impl Component for SqlDestructiveChangesChecker<'_> {
 
 impl SqlDestructiveChangesChecker<'_> {
     fn check_table_drop(&self, table_name: &str, plan: &mut DestructiveCheckPlan) {
-        plan.push_warning(SqlMigrationWarning::NonEmptyTableDrop {
+        plan.push_warning(SqlMigrationWarningCheck::NonEmptyTableDrop {
             table: table_name.to_owned(),
         });
     }
@@ -53,7 +53,7 @@ impl SqlDestructiveChangesChecker<'_> {
         table: &sql_schema_describer::Table,
         plan: &mut DestructiveCheckPlan,
     ) {
-        plan.push_warning(SqlMigrationWarning::NonEmptyColumnDrop {
+        plan.push_warning(SqlMigrationWarningCheck::NonEmptyColumnDrop {
             table: table.name.clone(),
             column: drop_column.name.clone(),
         });
@@ -108,7 +108,7 @@ impl SqlDestructiveChangesChecker<'_> {
             && alter_column.column.default.is_none()
             && differ.previous.default().is_some()
         {
-            plan.push_warning(SqlMigrationWarning::ForeignKeyDefaultValueRemoved {
+            plan.push_warning(SqlMigrationWarningCheck::ForeignKeyDefaultValueRemoved {
                 table: previous_table.name.clone(),
                 column: alter_column.name.clone(),
             });
@@ -160,7 +160,7 @@ impl SqlDestructiveChangesChecker<'_> {
                                     self.check_add_column(add_column, &before_table.table, &mut plan)
                                 }
                                 TableChange::DropPrimaryKey { .. } => {
-                                    plan.push_warning(SqlMigrationWarning::PrimaryKeyChange {
+                                    plan.push_warning(SqlMigrationWarningCheck::PrimaryKeyChange {
                                         table: alter_table.table.name.clone(),
                                     })
                                 }

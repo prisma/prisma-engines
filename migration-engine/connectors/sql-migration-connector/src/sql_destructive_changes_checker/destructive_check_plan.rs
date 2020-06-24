@@ -1,6 +1,6 @@
 use super::{
     check::Check, database_inspection_results::DatabaseInspectionResults,
-    unexecutable_step_check::UnexecutableStepCheck, warning_check::SqlMigrationWarning,
+    unexecutable_step_check::UnexecutableStepCheck, warning_check::SqlMigrationWarningCheck,
 };
 use crate::{SqlError, SqlResult};
 use migration_connector::{DestructiveChangeDiagnostics, MigrationWarning, UnexecutableMigration};
@@ -15,7 +15,7 @@ const DESTRUCTIVE_TIMEOUT_DURATION: Duration = Duration::from_secs(60);
 /// database inspection and renders user-facing messages based on the checks.
 #[derive(Debug)]
 pub(crate) struct DestructiveCheckPlan {
-    warnings: Vec<SqlMigrationWarning>,
+    warnings: Vec<SqlMigrationWarningCheck>,
     unexecutable_migrations: Vec<UnexecutableStepCheck>,
 }
 
@@ -27,7 +27,7 @@ impl DestructiveCheckPlan {
         }
     }
 
-    pub(super) fn push_warning(&mut self, warning: SqlMigrationWarning) {
+    pub(super) fn push_warning(&mut self, warning: SqlMigrationWarningCheck) {
         self.warnings.push(warning)
     }
 
