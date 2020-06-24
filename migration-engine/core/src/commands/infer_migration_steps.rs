@@ -46,7 +46,7 @@ impl<'a> MigrationCommand for InferMigrationStepsCommand<'a> {
             .datamodel_calculator()
             .infer(&current_datamodel_ast, assume_to_be_applied.as_slice())?;
         let assumed_datamodel =
-            datamodel::lift_ast(&assumed_datamodel_ast).map_err(CommandError::ProducedBadDatamodel)?;
+            datamodel::lift_ast_to_datamodel(&assumed_datamodel_ast).map_err(CommandError::ProducedBadDatamodel)?;
 
         let next_datamodel = parse_datamodel(&cmd.input.datamodel)?;
         let version_check_errors = connector.check_database_version_compatibility(&next_datamodel);

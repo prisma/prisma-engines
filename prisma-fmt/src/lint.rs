@@ -11,7 +11,7 @@ pub fn run(opts: LintOpts) {
         .expect("Unable to read from stdin.");
 
     let datamodel_result = if opts.no_env_errors {
-        datamodel::parse_datamodel_and_ignore_env_errors(&datamodel_string)
+        datamodel::parse_datamodel_and_ignore_datasource_urls(&datamodel_string)
     } else {
         datamodel::parse_datamodel(&datamodel_string)
     };
