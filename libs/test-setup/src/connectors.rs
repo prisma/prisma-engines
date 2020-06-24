@@ -28,9 +28,17 @@ fn mysql_capabilities() -> Capabilities {
     Capabilities::ENUMS | Capabilities::JSON
 }
 
+fn mysql_5_6_capabilities() -> Capabilities {
+    Capabilities::ENUMS
+}
+
 fn infer_capabilities(tags: Tags) -> Capabilities {
     if tags.intersects(Tags::POSTGRES) {
         return postgres_capabilities();
+    }
+
+    if tags.intersects(Tags::MYSQL_5_6) {
+        return mysql_5_6_capabilities();
     }
 
     if tags.intersects(Tags::MYSQL) {

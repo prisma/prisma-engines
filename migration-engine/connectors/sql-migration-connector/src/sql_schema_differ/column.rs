@@ -1,4 +1,5 @@
 use crate::sql_schema_helpers::ColumnRef;
+use prisma_models::PrismaValue;
 use sql_schema_describer::{ColumnTypeFamily, DefaultValue};
 
 #[derive(Debug)]
@@ -75,7 +76,33 @@ impl<'a> ColumnDiffer<'a> {
             return true;
         }
 
+        // JSON defaults on MySQL should be ignored.
+        if self.diffing_options.sql_family().is_mysql()
+            && (self.previous.column_type_family().is_json() || self.next.column_type_family().is_json())
+        {
+            return true;
+        }
+
         match (&self.previous.default(), &self.next.default()) {
+            // Avoid naive string comparisons for JSON defaults.
+            (
+                Some(DefaultValue::VALUE(PrismaValue::Json(prev_json))),
+                Some(DefaultValue::VALUE(PrismaValue::Json(next_json))),
+            )
+            | (
+                Some(DefaultValue::VALUE(PrismaValue::String(prev_json))),
+                Some(DefaultValue::VALUE(PrismaValue::Json(next_json))),
+            )
+            | (
+                Some(DefaultValue::VALUE(PrismaValue::Json(prev_json))),
+                Some(DefaultValue::VALUE(PrismaValue::String(next_json))),
+            ) => serde_json::from_str::<serde_json::Value>(prev_json)
+                .and_then(|prev_json| {
+                    serde_json::from_str::<serde_json::Value>(next_json).map(|next_json| (prev_json, next_json))
+                })
+                .map(|(prev_json, next_json)| prev_json == next_json)
+                .unwrap_or_else(|_| true),
+
             (Some(DefaultValue::VALUE(prev)), Some(DefaultValue::VALUE(next))) => prev == next,
             (Some(DefaultValue::VALUE(_)), Some(DefaultValue::SEQUENCE(_))) => true,
             (Some(DefaultValue::VALUE(_)), Some(DefaultValue::NOW)) => false,

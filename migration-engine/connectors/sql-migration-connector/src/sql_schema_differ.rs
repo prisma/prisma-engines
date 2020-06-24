@@ -17,10 +17,15 @@ use sql_schema_helpers::TableRef;
 #[derive(Debug)]
 pub(crate) struct DiffingOptions {
     is_mariadb: bool,
+    sql_family: SqlFamily,
     ignore_tables: Lazy<RegexSet>,
 }
 
 impl DiffingOptions {
+    pub(crate) fn sql_family(&self) -> SqlFamily {
+        self.sql_family
+    }
+
     pub(crate) fn from_database_info(database_info: &DatabaseInfo) -> Self {
         DiffingOptions {
             is_mariadb: database_info.is_mariadb(),
@@ -28,6 +33,7 @@ impl DiffingOptions {
                 SqlFamily::Postgres => POSTGRES_IGNORED_TABLES,
                 _ => EMPTY_REGEXSET,
             },
+            sql_family: database_info.sql_family(),
         }
     }
 }
@@ -38,6 +44,7 @@ impl Default for DiffingOptions {
         DiffingOptions {
             is_mariadb: false,
             ignore_tables: EMPTY_REGEXSET,
+            sql_family: SqlFamily::Postgres,
         }
     }
 }

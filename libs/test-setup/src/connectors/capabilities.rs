@@ -1,4 +1,5 @@
 use bitflags::bitflags;
+use std::{error::Error, fmt::Display, str::FromStr};
 
 bitflags! {
     pub struct Capabilities: u8 {
@@ -11,7 +12,7 @@ bitflags! {
 #[derive(Debug)]
 pub struct UnknownCapabilityError(String);
 
-impl std::fmt::Display for UnknownCapabilityError {
+impl Display for UnknownCapabilityError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let available_capability_names: Vec<&str> = CAPABILITY_NAMES.iter().map(|(name, _)| *name).collect();
 
@@ -23,9 +24,9 @@ impl std::fmt::Display for UnknownCapabilityError {
     }
 }
 
-impl std::error::Error for UnknownCapabilityError {}
+impl Error for UnknownCapabilityError {}
 
-impl std::str::FromStr for Capabilities {
+impl FromStr for Capabilities {
     type Err = UnknownCapabilityError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
