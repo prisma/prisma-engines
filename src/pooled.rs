@@ -49,7 +49,7 @@
 //!   `postgresql:///dbname?host=/var/run/postgresql`.
 //! - `socket_timeout` defined in seconds. If set, a query will return a
 //!   `Timeout` error if it fails to resolve before given time.
-//! - `connect_timeout` defined in seconds (default: 5). Connecting to a
+//! - `connect_timeout` defined in seconds. Connecting to a
 //!   database will return a `ConnectTimeout` error if taking more than the
 //!   defined value.
 //! - `pgbouncer` either `true` or `false`. If set, allows usage with the
@@ -75,7 +75,7 @@
 //!   socket. When set, the host parameter is dismissed.
 //! - `socket_timeout` defined in seconds. If set, a query will return a
 //!   `Timeout` error if it fails to resolve before given time.
-//! - `connect_timeout` defined in seconds (default: 5). Connecting to a
+//! - `connect_timeout` defined in seconds. Connecting to a
 //!   database will return a `ConnectTimeout` error if taking more than the
 //!   defined value.
 //!

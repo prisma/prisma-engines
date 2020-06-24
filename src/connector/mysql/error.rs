@@ -1,16 +1,12 @@
 use crate::error::{DatabaseConstraint, Error, ErrorKind};
 use mysql_async as my;
-use std::io::ErrorKind as IoErrorKind;
 
 impl From<my::error::Error> for Error {
     fn from(e: my::error::Error) -> Error {
         use my::error::ServerError;
 
         match e {
-            my::error::Error::Io(io_error) => match io_error.kind() {
-                IoErrorKind::ConnectionRefused => Error::builder(ErrorKind::ConnectionError(io_error.into())).build(),
-                _ => Error::builder(ErrorKind::QueryError(io_error.into())).build(),
-            },
+            my::error::Error::Io(io_error) => Error::builder(ErrorKind::ConnectionError(io_error.into())).build(),
             my::error::Error::Driver(e) => Error::builder(ErrorKind::QueryError(e.into())).build(),
             my::error::Error::Server(ServerError { ref message, code, .. }) if code == 1062 => {
                 let splitted: Vec<&str> = message.split_whitespace().collect();
