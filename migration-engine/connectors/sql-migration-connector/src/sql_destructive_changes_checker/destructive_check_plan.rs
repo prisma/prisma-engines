@@ -8,6 +8,8 @@ use quaint::prelude::Queryable;
 use std::time::Duration;
 use tokio::time::{timeout, Elapsed};
 
+const DESTRUCTIVE_TIMEOUT_DURATION: Duration = Duration::from_secs(60);
+
 /// A DestructiveCheckPlan is the collection of destructive change checks
 /// ([Check](trait.Check.html)) for a given migration. It has an `execute` method that performs
 /// database inspection and renders user-facing messages based on the checks.
@@ -59,7 +61,7 @@ impl DestructiveCheckPlan {
         };
 
         // Ignore the timeout error, we will still return useful warnings.
-        match timeout(destructive_check_timeout_duration(), inspection).await {
+        match timeout(DESTRUCTIVE_TIMEOUT_DURATION, inspection).await {
             Ok(Ok(())) | Err(Elapsed { .. }) => (),
             Ok(Err(err)) => return Err(err),
         };
@@ -164,10 +166,4 @@ async fn count_values_in_column(
         })?;
 
     Ok(values_count)
-}
-
-/// The time we let the destructive check database inspection queries to run, in total. Currently
-/// hardcoded to 1 minute.
-fn destructive_check_timeout_duration() -> Duration {
-    Duration::from_secs(60)
 }
