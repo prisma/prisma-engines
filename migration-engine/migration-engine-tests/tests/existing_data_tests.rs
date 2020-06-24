@@ -148,7 +148,7 @@ async fn altering_a_column_with_non_null_values_should_warn(api: &TestApi) -> Te
         &[MigrationWarning {
             description:
                 "You are about to alter the column `age` on the `Test` table, which still contains 2 non-null values. \
-                 The data in that column will be lost."
+                 The data in that column could be lost."
                     .to_owned()
         }]
     );
@@ -339,7 +339,7 @@ async fn changing_a_column_from_required_to_optional_should_work(api: &TestApi) 
 
         assert_eq!(
             migration_output.warnings.get(0).unwrap().description,
-            "You are about to alter the column `age` on the `Test` table, which still contains 2 non-null values. The data in that column will be lost.",
+            "You are about to alter the column `age` on the `Test` table, which still contains 2 non-null values. The data in that column could be lost.",
         );
 
         api.assert_schema().await?.assert_equals(&original_database_schema)?;
@@ -455,7 +455,7 @@ async fn changing_a_column_from_optional_to_required_must_warn(api: &TestApi) ->
         .await?
         .assert_executable()?
         .assert_no_error()?
-        .assert_warnings(&["You are about to alter the column `age` on the `Test` table, which still contains 2 non-null values. The data in that column will be lost.".into()])?;
+        .assert_warnings(&["You are about to alter the column `age` on the `Test` table, which still contains 2 non-null values. The data in that column could be lost.".into()])?;
 
     api.assert_schema().await?.assert_table("Test", |table| {
         table.assert_column("age", |column| {
@@ -687,7 +687,7 @@ async fn altering_the_type_of_a_column_in_a_non_empty_table_always_warns(api: &T
         &[MigrationWarning {
             // TODO: the message should say that altering the type of a column is not guaranteed to preserve the data, but the database is going to do its best.
             // Also think about timeouts.
-            description: "You are about to alter the column `dogs` on the `User` table, which still contains 1 non-null values. The data in that column will be lost.".to_owned()
+            description: "You are about to alter the column `dogs` on the `User` table, which still contains 1 non-null values. The data in that column could be lost.".to_owned()
         }]
     );
 
@@ -735,7 +735,7 @@ async fn migrating_a_required_column_from_int_to_string_should_warn_and_cast(api
     "#;
 
     let expected_warning = MigrationWarning {
-        description: "You are about to alter the column `serialNumber` on the `Test` table, which still contains 1 non-null values. The data in that column will be lost.".to_owned(),
+        description: "You are about to alter the column `serialNumber` on the `Test` table, which still contains 1 non-null values. The data in that column could be lost.".to_owned(),
     };
 
     // Apply once without forcing
@@ -1051,7 +1051,7 @@ async fn changing_an_array_column_to_scalar_must_warn(api: &TestApi) -> TestResu
         .await?
         .assert_executable()?
         .assert_no_error()?
-        .assert_warnings(&["You are about to alter the column `mainProtagonist` on the `Film` table, which still contains 1 non-null values. The data in that column will be lost.".into()])?;
+        .assert_warnings(&["You are about to alter the column `mainProtagonist` on the `Film` table, which still contains 1 non-null values. The data in that column could be lost.".into()])?;
 
     api.assert_schema().await?.assert_table("Film", |table| {
         table.assert_column("mainProtagonist", |column| column.assert_is_required())
