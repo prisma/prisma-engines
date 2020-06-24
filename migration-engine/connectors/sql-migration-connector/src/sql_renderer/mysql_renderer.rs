@@ -25,6 +25,7 @@ impl SqlRenderer for MySqlRenderer {
         let nullability_str = render_nullability(&column);
         let default_str = column
             .default()
+            .filter(|default| !matches!(default, DefaultValue::DBGENERATED(_)))
             .map(|default| format!("DEFAULT {}", self.render_default(default, &column.column.tpe.family)))
             .unwrap_or_else(String::new);
         let foreign_key = column.table().foreign_key_for_column(column.name());

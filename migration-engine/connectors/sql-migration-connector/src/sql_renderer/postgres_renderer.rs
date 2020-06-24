@@ -23,6 +23,7 @@ impl super::SqlRenderer for PostgresRenderer {
         let nullability_str = render_nullability(&column);
         let default_str = column
             .default()
+            .filter(|default| !matches!(default, DefaultValue::DBGENERATED(_)))
             .map(|default| format!("DEFAULT {}", self.render_default(default, &column.column.tpe.family)))
             .unwrap_or_else(String::new);
         let is_serial = column.auto_increment();

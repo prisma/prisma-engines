@@ -2085,3 +2085,23 @@ async fn adding_mutual_references_on_existing_tables_works(api: &TestApi) -> Tes
 
     Ok(())
 }
+
+#[test_each_connector]
+async fn schemas_with_dbgenerated_work(api: &TestApi) -> TestResult {
+    let dm1 = r#"
+    model User {
+        age         Int?
+        createdAt   DateTime  @default(dbgenerated())
+        email       String?
+        firstName   String    @default("")
+        id          Int       @default(autoincrement()) @id
+        lastName    String    @default("")
+        password    String?
+        updatedAt   DateTime  @default(dbgenerated())
+    }
+    "#;
+
+    api.infer_apply(dm1).send().await?.assert_green()?;
+
+    Ok(())
+}
