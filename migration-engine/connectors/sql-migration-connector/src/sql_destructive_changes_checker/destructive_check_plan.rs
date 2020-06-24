@@ -5,6 +5,8 @@ use super::{
 use crate::{SqlError, SqlResult};
 use migration_connector::{DestructiveChangeDiagnostics, MigrationWarning, UnexecutableMigration};
 use quaint::prelude::Queryable;
+use std::time::Duration;
+use tokio::time::{timeout, Elapsed};
 
 /// A DestructiveCheckPlan is the collection of destructive change checks
 /// ([Check](trait.Check.html)) for a given migration. It has an `execute` method that performs
@@ -43,14 +45,24 @@ impl DestructiveCheckPlan {
     ) -> SqlResult<DestructiveChangeDiagnostics> {
         let mut results = DatabaseInspectionResults::default();
 
-        for unexecutable in &self.unexecutable_migrations {
-            self.inspect_for_check(unexecutable, &mut results, schema_name, conn)
-                .await?;
-        }
+        let inspection = async {
+            for unexecutable in &self.unexecutable_migrations {
+                self.inspect_for_check(unexecutable, &mut results, schema_name, conn)
+                    .await?;
+            }
 
-        for warning in &self.warnings {
-            self.inspect_for_check(warning, &mut results, schema_name, conn).await?;
-        }
+            for warning in &self.warnings {
+                self.inspect_for_check(warning, &mut results, schema_name, conn).await?;
+            }
+
+            Ok::<(), SqlError>(())
+        };
+
+        // Ignore the timeout error, we will still return useful warnings.
+        match timeout(destructive_check_timeout_duration(), inspection).await {
+            Ok(Ok(())) | Err(Elapsed { .. }) => (),
+            Ok(Err(err)) => return Err(err),
+        };
 
         let mut diagnostics = DestructiveChangeDiagnostics::new();
 
@@ -152,4 +164,10 @@ async fn count_values_in_column(
         })?;
 
     Ok(values_count)
+}
+
+/// The time we let the destructive check database inspection queries to run, in total. Currently
+/// hardcoded to 1 minute.
+fn destructive_check_timeout_duration() -> Duration {
+    Duration::from_secs(60)
 }
