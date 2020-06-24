@@ -106,6 +106,7 @@ where
                 results.push(Ok(result?));
             }
 
+            tx.commit().await?;
             Ok(results)
         } else {
             let mut futures = Vec::with_capacity(operations.len());
