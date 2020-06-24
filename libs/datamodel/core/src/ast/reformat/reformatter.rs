@@ -20,7 +20,7 @@ impl<'a> Reformatter<'a> {
     // this finds all auto generated fields, that are added during auto generation AND are missing from the original input.
     fn find_all_missing_fields(schema_string: &str) -> Result<Vec<MissingField>, crate::error::ErrorCollection> {
         let schema_ast = crate::parse_schema_ast(&schema_string)?;
-        let datamodel = crate::parse_datamodel_and_ignore_env_errors(&schema_string)?;
+        let datamodel = crate::parse_datamodel_and_ignore_datasource_urls(&schema_string)?;
         let lowerer = crate::validator::LowerDmlToAst::new();
         let mut result = Vec::new();
 

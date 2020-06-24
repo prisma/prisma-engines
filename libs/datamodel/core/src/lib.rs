@@ -70,7 +70,7 @@ pub fn parse_datamodel(datamodel_string: &str) -> Result<Datamodel, error::Error
     parse_datamodel_internal(datamodel_string, false)
 }
 
-pub fn parse_datamodel_and_ignore_env_errors(datamodel_string: &str) -> Result<Datamodel, error::ErrorCollection> {
+pub fn parse_datamodel_and_ignore_datasource_urls(datamodel_string: &str) -> Result<Datamodel, error::ErrorCollection> {
     parse_datamodel_internal(datamodel_string, true)
 }
 
@@ -96,10 +96,10 @@ pub fn parse_datamodel_or_pretty_error(datamodel_string: &str, file_name: &str) 
 
 fn parse_datamodel_internal(
     datamodel_string: &str,
-    ignore_env_var_errors: bool,
+    ignore_datasource_urls: bool,
 ) -> Result<Datamodel, error::ErrorCollection> {
     let ast = ast::parser::parse(datamodel_string)?;
-    let sources = load_sources(&ast, ignore_env_var_errors)?;
+    let sources = load_sources(&ast, ignore_datasource_urls)?;
     let validator = ValidationPipeline::with_sources(&sources);
 
     validator.validate(&ast)
@@ -107,9 +107,10 @@ fn parse_datamodel_internal(
 
 /// Validates a [Schema AST](/ast/struct.SchemaAst.html) and returns its
 /// [Datamodel](/struct.Datamodel.html).
-pub fn lift_ast(ast: &ast::SchemaAst) -> Result<Datamodel, error::ErrorCollection> {
+pub fn lift_ast_to_datamodel(ast: &ast::SchemaAst) -> Result<Datamodel, error::ErrorCollection> {
     let mut errors = error::ErrorCollection::new();
-    let sources = load_sources(ast, false)?;
+    // we are not interested in the sources in this case. Hence we can ignore the datasource urls.
+    let sources = load_sources(ast, true)?;
     let validator = ValidationPipeline::with_sources(&sources);
 
     match validator.validate(&ast) {
@@ -152,10 +153,10 @@ pub fn parse_configuration_and_ignore_env_errors(
 
 fn load_sources(
     schema_ast: &SchemaAst,
-    ignore_env_var_errors: bool,
+    ignore_datasource_urls: bool,
 ) -> Result<Vec<Box<dyn Source + Send + Sync>>, error::ErrorCollection> {
     let source_loader = SourceLoader::new();
-    source_loader.load_sources(&schema_ast, ignore_env_var_errors)
+    source_loader.load_sources(&schema_ast, ignore_datasource_urls)
 }
 
 //

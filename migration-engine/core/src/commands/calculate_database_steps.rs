@@ -38,12 +38,13 @@ impl<'a> MigrationCommand for CalculateDatabaseStepsCommand<'a> {
             .datamodel_calculator()
             .infer(&SchemaAst::empty(), &assume_to_be_applied)?;
         let assumed_datamodel =
-            datamodel::lift_ast(&assumed_datamodel_ast).map_err(CommandError::ProducedBadDatamodel)?;
+            datamodel::lift_ast_to_datamodel(&assumed_datamodel_ast).map_err(CommandError::ProducedBadDatamodel)?;
 
         let next_datamodel_ast = engine
             .datamodel_calculator()
             .infer(&assumed_datamodel_ast, &steps_to_apply)?;
-        let next_datamodel = datamodel::lift_ast(&next_datamodel_ast).map_err(CommandError::ProducedBadDatamodel)?;
+        let next_datamodel =
+            datamodel::lift_ast_to_datamodel(&next_datamodel_ast).map_err(CommandError::ProducedBadDatamodel)?;
 
         let database_migration = connector
             .database_migration_inferrer()

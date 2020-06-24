@@ -114,7 +114,7 @@ impl PrismaOpt {
         let datamodel_str = self.datamodel_str()?;
 
         let datamodel = if ignore_env_errors {
-            datamodel::parse_datamodel_and_ignore_env_errors(datamodel_str)
+            datamodel::parse_datamodel_and_ignore_datasource_urls(datamodel_str)
         } else {
             datamodel::parse_datamodel(datamodel_str)
         };
