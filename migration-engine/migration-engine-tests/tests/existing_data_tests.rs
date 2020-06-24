@@ -1191,6 +1191,7 @@ async fn primary_key_migrations_do_not_cause_data_loss(api: &TestApi) -> TestRes
         .assert_executable()?
         .assert_no_error()?
         .assert_warnings(&[
+            "The migration will change the primary key for the `Dog` table. If it partially fails, the table could be left without primary key constraint.".into(),
             "You are about to alter the column `passportNumber` on the `Dog` table, which still contains 1 non-null values. The data in that column could be lost.".into(),
             "You are about to alter the column `motherPassportNumber` on the `Puppy` table, which still contains 1 non-null values. The data in that column could be lost.".into(),
         ])?;

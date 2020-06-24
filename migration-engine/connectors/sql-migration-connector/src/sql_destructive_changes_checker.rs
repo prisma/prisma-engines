@@ -159,6 +159,11 @@ impl SqlDestructiveChangesChecker<'_> {
                                 TableChange::AddColumn(ref add_column) => {
                                     self.check_add_column(add_column, &before_table.table, &mut plan)
                                 }
+                                TableChange::DropPrimaryKey { .. } => {
+                                    plan.push_warning(SqlMigrationWarning::PrimaryKeyChange {
+                                        table: alter_table.table.name.clone(),
+                                    })
+                                }
                                 _ => (),
                             }
                         }

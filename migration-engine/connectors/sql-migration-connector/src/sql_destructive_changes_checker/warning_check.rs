@@ -6,12 +6,15 @@ pub(super) enum SqlMigrationWarning {
     NonEmptyTableDrop { table: String },
     AlterColumn { table: String, column: String },
     ForeignKeyDefaultValueRemoved { table: String, column: String },
+    PrimaryKeyChange { table: String },
 }
 
 impl Check for SqlMigrationWarning {
     fn needed_table_row_count(&self) -> Option<&str> {
         match self {
-            SqlMigrationWarning::NonEmptyTableDrop { table } => Some(table),
+            SqlMigrationWarning::NonEmptyTableDrop { table } | SqlMigrationWarning::PrimaryKeyChange { table } => {
+                Some(table)
+            }
             SqlMigrationWarning::NonEmptyColumnDrop { .. }
             | SqlMigrationWarning::AlterColumn { .. }
             | SqlMigrationWarning::ForeignKeyDefaultValueRemoved { .. } => None,
@@ -23,7 +26,8 @@ impl Check for SqlMigrationWarning {
             SqlMigrationWarning::NonEmptyColumnDrop { table, column }
             | SqlMigrationWarning::AlterColumn { table, column } => Some((table, column)),
             SqlMigrationWarning::ForeignKeyDefaultValueRemoved { .. }
-            | SqlMigrationWarning::NonEmptyTableDrop { .. } => None,
+            | SqlMigrationWarning::NonEmptyTableDrop { .. }
+            | SqlMigrationWarning::PrimaryKeyChange { .. } => None,
         }
     }
 
@@ -48,6 +52,10 @@ impl Check for SqlMigrationWarning {
 
             },
             SqlMigrationWarning::ForeignKeyDefaultValueRemoved { table, column } => Some(format!("The migration is about to remove a default value on the foreign key field `{}.{}`.", table, column)),
+            SqlMigrationWarning::PrimaryKeyChange { table } => match database_check_results.get_row_count(table) {
+                Some(0) => None,
+                _ => Some(format!("The migration will change the primary key for the `{table}` table. If it partially fails, the table could be left without primary key constraint.", table = table)),
+            }
         }
     }
 }
