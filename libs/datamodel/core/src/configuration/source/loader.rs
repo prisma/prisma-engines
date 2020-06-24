@@ -28,13 +28,13 @@ impl SourceLoader {
     pub fn load_sources(
         &self,
         ast_schema: &ast::SchemaAst,
-        ignore_env_var_errors: bool,
+        ignore_datasource_urls: bool,
     ) -> Result<Vec<Box<dyn Source + Send + Sync>>, ErrorCollection> {
         let mut sources: Vec<Box<dyn Source + Send + Sync>> = vec![];
         let mut errors = ErrorCollection::new();
 
         for src in &ast_schema.sources() {
-            match self.load_source(&src, ignore_env_var_errors) {
+            match self.load_source(&src, ignore_datasource_urls) {
                 Ok(Some(loaded_src)) => sources.push(loaded_src),
                 Ok(None) => { /* Source was disabled. */ }
                 // Lift error to source.
@@ -56,7 +56,7 @@ impl SourceLoader {
     fn load_source(
         &self,
         ast_source: &ast::SourceConfig,
-        ignore_env_var_errors: bool,
+        ignore_datasource_urls: bool,
     ) -> Result<Option<Box<dyn Source + Send + Sync>>, DatamodelError> {
         let source_name = &ast_source.name.name;
         let mut args = Arguments::new(&ast_source.properties, ast_source.span);
@@ -72,7 +72,7 @@ impl SourceLoader {
 
         let url_args = args.arg("url")?;
         let (env_var_for_url, url) = match url_args.as_str_from_env() {
-            _ if ignore_env_var_errors => (None, format!("{}://", provider)), // glorious hack. ask marcus
+            _ if ignore_datasource_urls => (None, format!("{}://", provider)), // glorious hack. ask marcus
             Ok((env_var, url)) => (env_var, url.trim().to_owned()),
             Err(err) => return Err(err),
         };

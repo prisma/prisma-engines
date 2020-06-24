@@ -20,13 +20,13 @@ fn skipping_of_env_vars() {
     parse_error(dml);
 
     // must not fail when ignore flag is set
-    if let Err(err) = datamodel::parse_datamodel_and_ignore_env_errors(dml) {
+    if let Err(err) = datamodel::parse_datamodel_and_ignore_datasource_urls(dml) {
         panic!("Skipping env var errors did not work. Error was {:?}", err)
     }
 
     // must not fail with invalid env var set and ignore flag is set
     std::env::set_var("POSTGRES_URL", "mysql://"); // wrong protocol
-    if let Err(err) = datamodel::parse_datamodel_and_ignore_env_errors(dml) {
+    if let Err(err) = datamodel::parse_datamodel_and_ignore_datasource_urls(dml) {
         panic!("Skipping env var errors did not work. Error was {:?}", err)
     }
 
