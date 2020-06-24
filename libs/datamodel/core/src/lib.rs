@@ -107,8 +107,9 @@ fn parse_datamodel_internal(
 
 /// Validates a [Schema AST](/ast/struct.SchemaAst.html) and returns its
 /// [Datamodel](/struct.Datamodel.html).
-pub fn lift_ast(ast: &ast::SchemaAst) -> Result<Datamodel, error::ErrorCollection> {
+pub fn lift_ast_to_datamodel(ast: &ast::SchemaAst) -> Result<Datamodel, error::ErrorCollection> {
     let mut errors = error::ErrorCollection::new();
+    // we are not interested in the sources in this case. Hence we can ignore the datasource urls.
     let sources = load_sources(ast, true)?;
     let validator = ValidationPipeline::with_sources(&sources);
 

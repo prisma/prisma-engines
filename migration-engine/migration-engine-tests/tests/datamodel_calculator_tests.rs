@@ -412,8 +412,8 @@ fn test(dm1: SchemaAst, dm2: SchemaAst) {
     let steps = infer(&dm1, &dm2);
     let result = calculate(&dm1, steps);
 
-    let dm2 = datamodel::lift_ast(&dm2).unwrap();
-    let result = datamodel::lift_ast(&result).unwrap();
+    let dm2 = datamodel::lift_ast_to_datamodel(&dm2).unwrap();
+    let result = datamodel::lift_ast_to_datamodel(&result).unwrap();
     assert_eq!(dm2, result);
 }
 
