@@ -110,7 +110,7 @@ pub trait UpdateInputTypeBuilderExtension<'a>: InputTypeBuilderBase<'a> + Create
 
                     Some(input_field(
                         rf.name.clone(),
-                        InputType::opt(InputType::object(input_object)),
+                        InputType::opt(InputType::null(InputType::object(input_object))),
                         None,
                     ))
                 }
@@ -227,7 +227,7 @@ pub trait UpdateInputTypeBuilderExtension<'a>: InputTypeBuilderBase<'a> + Create
     /// Builds "updateMany" field for nested updates (on relation fields).
     fn nested_update_many_field(&self, field: RelationFieldRef) -> Option<InputField> {
         self.nested_update_many_input_object(field).map(|input_object| {
-            let input_type = InputType::opt(InputType::list(InputType::object(input_object)));
+            let input_type = InputType::opt(InputType::null(InputType::list(InputType::object(input_object))));
             input_field("updateMany", input_type, None)
         })
     }
