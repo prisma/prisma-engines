@@ -73,7 +73,7 @@ impl SqlMigrationConnector {
                     let sql_str = format!(r#"DROP SCHEMA "{}" CASCADE;"#, self.schema_name());
                     debug!("{}", sql_str);
 
-                    self.conn().query_raw(&sql_str, &[]).await.ok();
+                    self.conn().raw_cmd(&sql_str).await.ok();
                 }
                 ConnectionInfo::Sqlite { file_path, .. } => {
                     self.conn()
@@ -91,7 +91,7 @@ impl SqlMigrationConnector {
                 ConnectionInfo::Mysql(_) => {
                     let sql_str = format!(r#"DROP SCHEMA `{}`;"#, self.schema_name());
                     debug!("{}", sql_str);
-                    self.conn().query_raw(&sql_str, &[]).await?;
+                    self.conn().raw_cmd(&sql_str).await?;
                 }
                 ConnectionInfo::Mssql(_) => todo!("Greetings from Redmond"),
             };
@@ -192,7 +192,7 @@ async fn connect(database_str: &str) -> ConnectorResult<(Quaint, DatabaseInfo)> 
         // async connections can be lazy, so we issue a simple query to fail early if the database
         // is not reachable.
         connection
-            .query_raw("SELECT 1", &[])
+            .raw_cmd("SELECT 1")
             .await
             .map_err(SqlError::from)
             .map_err(|err| err.into_connector_error(&connection.connection_info()))?;

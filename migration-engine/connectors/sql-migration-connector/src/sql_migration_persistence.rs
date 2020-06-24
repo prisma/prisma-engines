@@ -44,7 +44,7 @@ impl MigrationPersistence for SqlMigrationPersistence<'_> {
                 SqlFamily::Mssql => todo!("Greetings from Detroit^H Redmond"),
             };
 
-            self.conn().query_raw(&sql_str, &[]).await.ok();
+            self.conn().raw_cmd(&sql_str).await.ok();
 
             Ok(())
         };

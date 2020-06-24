@@ -84,10 +84,7 @@ impl SqlDatabaseStepApplier<'_> {
         {
             tracing::debug!(index, %sql_string);
 
-            let result = self.conn().query_raw(&sql_string, &[]).await;
-
-            // TODO: this does not evaluate the results of SQLites PRAGMA foreign_key_check
-            result?;
+            self.conn().raw_cmd(&sql_string).await?;
         }
 
         let has_more = steps.get(index + 1).is_some();
