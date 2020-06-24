@@ -156,7 +156,7 @@ fn render_raw_sql(
                     };
                     renderer.render_column(&schema_name, column, false)
                 })
-                .join(",");
+                .join(",\n");
 
             let mut create_table = format!(
                 "CREATE TABLE {} (\n{}",
