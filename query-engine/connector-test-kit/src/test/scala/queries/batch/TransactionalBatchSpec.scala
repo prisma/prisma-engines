@@ -24,6 +24,11 @@ class TransactionalBatchSpec extends FlatSpec with Matchers with ApiSpecBase {
     database.setup(project)
   }
 
+  override protected def beforeEach(): Unit = {
+    super.beforeEach()
+    database.truncateProjectTables(project)
+  }
+
   "A transactional batch of successful queries" should "work" in {
     val queries = Seq(
       """mutation { createOneModelA(data: { id: 1 }) { id }}""",
