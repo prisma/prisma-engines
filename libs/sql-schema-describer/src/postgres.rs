@@ -260,11 +260,11 @@ impl SqlSchemaDescriber {
                                 let enum_suffix_with_quotes = format!("::\"{}\"", enum_name);
                                 if default_string.ends_with(&enum_suffix_with_quotes) {
                                     DefaultValue::VALUE(PrismaValue::Enum(unquote_string(
-                                        default_string.replace(&enum_suffix_with_quotes, ""),
+                                        &default_string.replace(&enum_suffix_with_quotes, ""),
                                     )))
                                 } else if default_string.ends_with(&enum_suffix_without_quotes) {
                                     DefaultValue::VALUE(PrismaValue::Enum(unquote_string(
-                                        default_string.replace(&enum_suffix_without_quotes, ""),
+                                        &default_string.replace(&enum_suffix_without_quotes, ""),
                                     )))
                                 } else {
                                     DefaultValue::DBGENERATED(default_string)
