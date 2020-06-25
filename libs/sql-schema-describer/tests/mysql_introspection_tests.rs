@@ -581,6 +581,7 @@ async fn all_mysql_column_types_must_work() {
             primary_key: Some(PrimaryKey {
                 columns: vec!["primary_col".to_string()],
                 sequence: None,
+                constraint_name: None,
             }),
             foreign_keys: vec![],
         }
@@ -702,6 +703,7 @@ async fn mysql_foreign_key_on_delete_must_be_handled() {
             primary_key: Some(PrimaryKey {
                 columns: vec!["id".to_string()],
                 sequence: None,
+                constraint_name: None,
             }),
             foreign_keys: vec![
                 ForeignKey {

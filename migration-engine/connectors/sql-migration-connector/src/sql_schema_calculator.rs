@@ -119,13 +119,14 @@ impl<'a> SqlSchemaCalculator<'a> {
                 })
                 .collect();
 
-            let primary_key = sql::PrimaryKey {
+            let primary_key = Some(sql::PrimaryKey {
                 columns: model
                     .id_fields()
                     .map(|field| field.db_name().to_owned())
                     .collect(),
                 sequence: None,
-            };
+                constraint_name: None,
+            }).filter(|pk| !pk.columns.is_empty());
 
             let single_field_indexes = model.fields().filter_map(|f| {
                 if f.is_unique() {
@@ -172,7 +173,7 @@ impl<'a> SqlSchemaCalculator<'a> {
                 name: model.database_name().to_owned(),
                 columns,
                 indices: single_field_indexes.chain(multiple_field_indexes).collect(),
-                primary_key: Some(primary_key),
+                primary_key,
                 foreign_keys: Vec::new(),
             };
 

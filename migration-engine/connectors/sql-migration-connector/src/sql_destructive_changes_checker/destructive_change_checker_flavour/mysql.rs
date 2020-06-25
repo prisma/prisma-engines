@@ -4,7 +4,7 @@ use crate::{
     flavour::MysqlFlavour,
     sql_destructive_changes_checker::{
         destructive_check_plan::DestructiveCheckPlan, unexecutable_step_check::UnexecutableStepCheck,
-        warning_check::SqlMigrationWarning,
+        warning_check::SqlMigrationWarningCheck,
     },
     sql_schema_differ::ColumnDiffer,
 };
@@ -28,7 +28,7 @@ impl DestructiveChangeCheckerFlavour for MysqlFlavour {
                         table: previous_table.name.clone(),
                     });
                 } else {
-                    plan.push_warning(SqlMigrationWarning::AlterColumn {
+                    plan.push_warning(SqlMigrationWarningCheck::AlterColumn {
                         table: previous_table.name.clone(),
                         column: columns.next.name().to_owned(),
                     });
