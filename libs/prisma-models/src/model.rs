@@ -27,6 +27,7 @@ pub struct Model {
     manifestation: Option<String>,
     fields: OnceCell<Fields>,
     indexes: OnceCell<Vec<Index>>,
+    primary_identifier: OnceCell<ModelProjection>,
     dml_model: datamodel::Model,
 
     #[debug_stub = "#InternalDataModelWeakRef#"]
@@ -41,6 +42,7 @@ impl ModelTemplate {
             manifestation: self.manifestation,
             fields: OnceCell::new(),
             indexes: OnceCell::new(),
+            primary_identifier: OnceCell::new(),
             dml_model: self.dml_model,
             internal_data_model,
         });
@@ -88,16 +90,18 @@ impl Model {
     /// the identifier is not to be mistaken for a stable, external identifier, but has to be understood as
     /// implementation detail that is used to reason over a fixed set of fields.
     pub fn primary_identifier(&self) -> ModelProjection {
-        let dml_fields = self.dml_model.first_unique_criterion();
-        let fields: Vec<_> = dml_fields
-            .iter()
-            .map(|dml_field| {
-                let field = self.fields().find_from_all(&dml_field.name).expect(&format!("Error finding primary identifier: The parser field {} does not exist in the query engine datamodel.", &dml_field.name));
-                field.clone()
-            })
-            .collect();
+        self.primary_identifier.get_or_init(||{
+            let dml_fields = self.dml_model.first_unique_criterion();
+            let fields: Vec<_> = dml_fields
+                .iter()
+                .map(|dml_field| {
+                    let field = self.fields().find_from_all(&dml_field.name).expect(&format!("Error finding primary identifier: The parser field {} does not exist in the query engine datamodel.", &dml_field.name));
+                    field.clone()
+                })
+                .collect();
 
-        ModelProjection::new(fields)
+            ModelProjection::new(fields)
+        }).clone()
     }
 
     pub fn fields(&self) -> &Fields {
