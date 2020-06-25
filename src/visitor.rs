@@ -811,6 +811,10 @@ pub trait Visitor<'a> {
                 self.write("SUM")?;
                 self.surround_with("(", ")", |ref mut s| s.visit_column(sum.column))?;
             }
+            FunctionType::Lower(lower) => {
+                self.write("LOWER")?;
+                self.surround_with("(", ")", |ref mut s| s.visit_column(lower.column))?;
+            }
         };
 
         if let Some(alias) = fun.alias {
