@@ -2,26 +2,26 @@ use super::Function;
 use crate::ast::Expression;
 
 #[derive(Debug, Clone, PartialEq)]
-pub struct Lower<'a> {
+pub struct Upper<'a> {
     pub(crate) expression: Box<Expression<'a>>,
 }
 
-/// Converts the result of the expression into lowercase string.
+/// Converts the result of the expression into uppercase string.
 ///
 /// ```rust
 /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
 /// # fn main() -> Result<(), quaint::error::Error> {
-/// let query = Select::from_table("users").value(lower(Column::from("name")));
+/// let query = Select::from_table("users").value(upper(Column::from("name")));
 /// let (sql, _) = Sqlite::build(query)?;
-/// assert_eq!("SELECT LOWER(`name`) FROM `users`", sql);
+/// assert_eq!("SELECT UPPER(`name`) FROM `users`", sql);
 /// # Ok(())
 /// # }
 /// ```
-pub fn lower<'a, E>(expression: E) -> Function<'a>
+pub fn upper<'a, E>(expression: E) -> Function<'a>
 where
     E: Into<Expression<'a>>,
 {
-    let fun = Lower {
+    let fun = Upper {
         expression: Box::new(expression.into()),
     };
 

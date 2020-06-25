@@ -535,4 +535,28 @@ mod tests {
             _ => panic!(err),
         }
     }
+
+    #[tokio::test]
+    async fn upper_fun() {
+        let conn = Sqlite::try_from("file:db/test.db").unwrap();
+        let select = Select::default().value(upper("foo").alias("val"));
+
+        let res = conn.query(select.into()).await.unwrap();
+        let row = res.get(0).unwrap();
+        let val = row.get("val").unwrap().as_str();
+
+        assert_eq!(Some("FOO"), val);
+    }
+
+    #[tokio::test]
+    async fn lower_fun() {
+        let conn = Sqlite::try_from("file:db/test.db").unwrap();
+        let select = Select::default().value(lower("BAR").alias("val"));
+
+        let res = conn.query(select.into()).await.unwrap();
+        let row = res.get(0).unwrap();
+        let val = row.get("val").unwrap().as_str();
+
+        assert_eq!(Some("bar"), val);
+    }
 }
