@@ -8,7 +8,7 @@ use std::{
 pub type ModelRef = Arc<Model>;
 pub type ModelWeakRef = Weak<Model>;
 
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct ModelTemplate {
     pub name: String,
     pub is_embedded: bool,
@@ -16,6 +16,7 @@ pub struct ModelTemplate {
     pub manifestation: Option<String>,
     pub id_field_names: Vec<String>,
     pub indexes: Vec<IndexTemplate>,
+    pub dml_model: datamodel::Model,
 }
 
 #[derive(DebugStub)]
@@ -26,6 +27,7 @@ pub struct Model {
     manifestation: Option<String>,
     fields: OnceCell<Fields>,
     indexes: OnceCell<Vec<Index>>,
+    dml_model: datamodel::Model,
 
     #[debug_stub = "#InternalDataModelWeakRef#"]
     pub internal_data_model: InternalDataModelWeakRef,
@@ -36,9 +38,10 @@ impl ModelTemplate {
         let model = Arc::new(Model {
             name: self.name,
             is_embedded: self.is_embedded,
+            manifestation: self.manifestation,
             fields: OnceCell::new(),
             indexes: OnceCell::new(),
-            manifestation: self.manifestation,
+            dml_model: self.dml_model,
             internal_data_model,
         });
 
@@ -91,28 +94,16 @@ impl Model {
     /// 3. If no scalar unique is found, take the first compound unique found. All fields must be required.
     /// 4. If all of the above fails, we panic. Models with no unique / ID are not supported (yet).
     pub fn primary_identifier(&self) -> ModelProjection {
-        let fields: Vec<_> = self
-            .fields()
-            .id()
-            .or_else(|| {
-                self.fields()
-                    .scalar()
-                    .into_iter()
-                    .find(|sf| sf.is_unique && sf.is_required)
-                    .map(|x| vec![x])
+        let dml_fields = self.dml_model.first_unique_criterion();
+        let fields: Vec<_> = dml_fields
+            .iter()
+            .map(|dml_field| {
+                let field = self.fields().find_from_all(&dml_field.name).expect(&format!("Error finding primary identifier: The parser field {} does not exist in the query engine datamodel.", &dml_field.name));
+                field.clone()
             })
-            .or_else(|| {
-                self.unique_indexes()
-                    .into_iter()
-                    .find(|index| index.fields().into_iter().all(|f| f.is_required))
-                    .map(|index| index.fields().into_iter().map(|f| f.into()).collect())
-            })
-            .expect(&format!(
-                "Unable to resolve a primary identifier for model {}.",
-                self.name
-            ));
+            .collect();
 
-        ModelProjection::new(fields.into_iter().map(Into::into).collect())
+        ModelProjection::new(fields)
     }
 
     pub fn fields(&self) -> &Fields {

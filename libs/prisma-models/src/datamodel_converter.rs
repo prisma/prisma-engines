@@ -62,6 +62,7 @@ impl<'a> DatamodelConverter<'a> {
                 manifestation: model.database_name().map(|s| s.to_owned()),
                 id_field_names: model.id_fields.clone(),
                 indexes: self.convert_indexes(&model),
+                dml_model: model.clone(),
             })
             .collect()
     }
