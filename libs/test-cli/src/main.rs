@@ -46,6 +46,8 @@ struct DmmfCommand {
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
+    init_logger();
+
     match Command::from_args() {
         Command::Dmmf(cmd) => generate_dmmf(&cmd).await?,
         Command::Introspect { url, file_path } => {
@@ -214,4 +216,22 @@ async fn generate_dmmf(cmd: &DmmfCommand) -> anyhow::Result<()> {
     cmd.wait_with_output()?;
 
     Ok(())
+}
+
+fn init_logger() {
+    use tracing_error::ErrorLayer;
+    use tracing_subscriber::prelude::*;
+
+    use tracing_subscriber::{EnvFilter, FmtSubscriber};
+
+    let subscriber = FmtSubscriber::builder()
+        .with_env_filter(EnvFilter::from_default_env())
+        .with_ansi(false)
+        .with_writer(std::io::stderr)
+        .finish()
+        .with(ErrorLayer::default());
+
+    tracing::subscriber::set_global_default(subscriber)
+        .map_err(|err| eprintln!("Error initializing the global logger: {}", err))
+        .ok();
 }
