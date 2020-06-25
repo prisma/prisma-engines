@@ -40,7 +40,7 @@ impl<'schema> TableDiffer<'schema> {
         })
     }
 
-    pub(crate) fn created_foreign_keys<'a>(&'a self) -> impl Iterator<Item = ForeignKeyRef<'a, 'schema>> + 'a {
+    pub(crate) fn created_foreign_keys(&self) -> impl Iterator<Item = ForeignKeyRef<'_, 'schema>> {
         self.next_foreign_keys().filter(move |next_fk| {
             self.previous_foreign_keys()
                 .find(|previous_fk| super::foreign_keys_match(previous_fk, next_fk))
@@ -48,7 +48,7 @@ impl<'schema> TableDiffer<'schema> {
         })
     }
 
-    pub(crate) fn dropped_foreign_keys<'a>(&'a self) -> impl Iterator<Item = ForeignKeyRef<'a, 'schema>> + 'a {
+    pub(crate) fn dropped_foreign_keys(&self) -> impl Iterator<Item = ForeignKeyRef<'_, 'schema>> {
         self.previous_foreign_keys().filter(move |previous_fk| {
             self.next_foreign_keys()
                 .find(|next_fk| super::foreign_keys_match(previous_fk, next_fk))
@@ -80,6 +80,7 @@ impl<'schema> TableDiffer<'schema> {
         })
     }
 
+    /// The primary key present in `next` but not `previous`, if applicable.
     pub(crate) fn created_primary_key(&self) -> Option<&'schema PrimaryKey> {
         match (self.previous.primary_key(), self.next.primary_key()) {
             (None, Some(pk)) => Some(pk),
@@ -95,6 +96,7 @@ impl<'schema> TableDiffer<'schema> {
         }
     }
 
+    /// The primary key present in `previous` but not `next`, if applicable.
     pub(crate) fn dropped_primary_key(&self) -> Option<&'schema PrimaryKey> {
         match (self.previous.primary_key(), self.next.primary_key()) {
             (Some(pk), None) => Some(pk),

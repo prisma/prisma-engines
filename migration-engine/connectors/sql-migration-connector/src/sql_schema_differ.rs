@@ -251,7 +251,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
             .created_primary_key()
             .filter(|pk| !pk.columns.is_empty())
             .map(|pk| TableChange::AddPrimaryKey {
-                columns: dbg!(pk).columns.clone(),
+                columns: pk.columns.clone(),
             })
     }
 

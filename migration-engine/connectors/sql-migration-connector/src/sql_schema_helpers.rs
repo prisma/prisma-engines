@@ -129,7 +129,7 @@ impl<'a, 'schema> ForeignKeyRef<'a, 'schema> {
     }
 
     pub(crate) fn constraint_name(&self) -> Option<&'a str> {
-        self.foreign_key.constraint_name.as_ref().map(String::as_str)
+        self.foreign_key.constraint_name.as_deref()
     }
 
     pub(crate) fn inner(&self) -> &'a ForeignKey {
