@@ -152,7 +152,7 @@ impl<'a> LiftAstToDml<'a> {
             let validator = ValueValidator::new(value);
 
             if let dml::FieldType::Base(base_type, _) = &field_type {
-                match validator.as_default_value(*base_type) {
+                match validator.as_default_value_for_scalar_type(*base_type) {
                     Ok(dv) => field.default_value = Some(dv),
                     Err(err) => errors.push(err),
                 };
