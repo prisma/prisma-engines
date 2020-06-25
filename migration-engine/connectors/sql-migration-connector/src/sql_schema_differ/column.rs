@@ -96,12 +96,7 @@ impl<'a> ColumnDiffer<'a> {
             | (
                 Some(DefaultValue::VALUE(PrismaValue::Json(prev_json))),
                 Some(DefaultValue::VALUE(PrismaValue::String(next_json))),
-            ) => serde_json::from_str::<serde_json::Value>(prev_json)
-                .and_then(|prev_json| {
-                    serde_json::from_str::<serde_json::Value>(next_json).map(|next_json| (prev_json, next_json))
-                })
-                .map(|(prev_json, next_json)| prev_json == next_json)
-                .unwrap_or_else(|_| true),
+            ) => json_defaults_match(prev_json, next_json),
 
             (Some(DefaultValue::VALUE(prev)), Some(DefaultValue::VALUE(next))) => prev == next,
             (Some(DefaultValue::VALUE(_)), Some(DefaultValue::SEQUENCE(_))) => true,
@@ -132,6 +127,13 @@ impl<'a> ColumnDiffer<'a> {
             (_, Some(DefaultValue::DBGENERATED(_))) => true,
         }
     }
+}
+
+fn json_defaults_match(previous: &str, next: &str) -> bool {
+    serde_json::from_str::<serde_json::Value>(previous)
+        .and_then(|previous| serde_json::from_str::<serde_json::Value>(next).map(|next| (previous, next)))
+        .map(|(previous, next)| previous == next)
+        .unwrap_or(true)
 }
 
 #[derive(Debug, Clone, PartialEq)]
