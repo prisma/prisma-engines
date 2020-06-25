@@ -1,18 +1,19 @@
+use crate::request_handlers::graphql::{self, GraphQlBody};
+
 use crate::{
     context::PrismaContext,
     dmmf,
-    error::PrismaError,
     opt::{CliOpt, PrismaOpt, Subcommand},
-    request_handlers::{graphql::*, PrismaRequest, RequestHandler},
     PrismaResult,
 };
+
 use datamodel::{Configuration, Datamodel};
 use prisma_models::DatamodelConverter;
 use query_core::{
     schema::{QuerySchemaRef, SupportedCapabilities},
     BuildMode, QuerySchemaBuilder,
 };
-use std::{collections::HashMap, convert::TryFrom, sync::Arc};
+use std::sync::Arc;
 
 pub struct ExecuteRequest {
     legacy: bool,
@@ -38,14 +39,14 @@ pub enum CliCommand {
     ExecuteRequest(ExecuteRequest),
 }
 
-impl TryFrom<&PrismaOpt> for CliCommand {
-    type Error = PrismaError;
-
-    fn try_from(opts: &PrismaOpt) -> crate::PrismaResult<CliCommand> {
-        let subcommand = opts
-            .subcommand
-            .as_ref()
-            .ok_or_else(|| PrismaError::InvocationError(String::from("cli subcommand not present")))?;
+impl CliCommand {
+    /// Create a CLI command from a `PrismaOpt` instance.
+    pub(crate) fn from_opt(opts: &PrismaOpt) -> crate::PrismaResult<Option<CliCommand>> {
+        let subcommand = opts.subcommand.as_ref();
+        let subcommand = match subcommand {
+            Some(cmd) => cmd,
+            None => return Ok(None),
+        };
 
         match subcommand {
             Subcommand::Cli(ref cliopts) => match cliopts {
@@ -56,28 +57,26 @@ impl TryFrom<&PrismaOpt> for CliCommand {
                         BuildMode::Modern
                     };
 
-                    Ok(CliCommand::Dmmf(DmmfRequest {
+                    Ok(Some(CliCommand::Dmmf(DmmfRequest {
                         datamodel: opts.datamodel(true)?,
                         build_mode,
                         enable_raw_queries: opts.enable_raw_queries,
-                    }))
+                    })))
                 }
-                CliOpt::GetConfig(input) => Ok(CliCommand::GetConfig(GetConfigRequest {
+                CliOpt::GetConfig(input) => Ok(Some(CliCommand::GetConfig(GetConfigRequest {
                     config: opts.configuration(input.ignore_env_var_errors)?,
-                })),
-                CliOpt::ExecuteRequest(input) => Ok(CliCommand::ExecuteRequest(ExecuteRequest {
+                }))),
+                CliOpt::ExecuteRequest(input) => Ok(Some(CliCommand::ExecuteRequest(ExecuteRequest {
                     query: input.query.clone(),
                     enable_raw_queries: opts.enable_raw_queries,
                     legacy: input.legacy,
                     datamodel: opts.datamodel(false)?,
                     config: opts.configuration(false)?,
-                })),
+                }))),
             },
         }
     }
-}
 
-impl CliCommand {
     pub async fn execute(self) -> PrismaResult<()> {
         match self {
             CliCommand::Dmmf(request) => Self::dmmf(request),
@@ -123,22 +122,18 @@ impl CliCommand {
         let decoded = base64::decode(&request.query)?;
         let decoded_request = String::from_utf8(decoded)?;
 
-        let ctx = PrismaContext::builder(request.config, request.datamodel)
+        let cx = PrismaContext::builder(request.config, request.datamodel)
             .legacy(request.legacy)
             .enable_raw_queries(request.enable_raw_queries)
             .build()
             .await?;
+        let cx = Arc::new(cx);
 
-        let req = PrismaRequest {
-            body: serde_json::from_str(&decoded_request).unwrap(),
-            headers: HashMap::new(),
-            path: String::new(),
-        };
+        let body: GraphQlBody = serde_json::from_str(&decoded_request)?;
+        let res = graphql::handle(body, cx).await;
+        let res = serde_json::to_string(&res).unwrap();
 
-        let response = GraphQlRequestHandler.handle(req, &Arc::new(ctx)).await;
-        let response = serde_json::to_string(&response).unwrap();
-
-        let encoded_response = base64::encode(&response);
+        let encoded_response = base64::encode(&res);
         println!("Response: {}", encoded_response); // reason for prefix is explained in TestServer.scala
 
         Ok(())
