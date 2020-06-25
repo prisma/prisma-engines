@@ -87,12 +87,6 @@ impl Model {
     /// The identifier is nothing but an internal convention to have an anchor point for querying, or in other words,
     /// the identifier is not to be mistaken for a stable, external identifier, but has to be understood as
     /// implementation detail that is used to reason over a fixed set of fields.
-    ///
-    /// The rules for determining the primary identifier are as follows:
-    /// 1. If an ID definition (single or multi-part doesn't matter) is present, take that one.
-    /// 2. If no ID definition is found, take the first scalar unique found that is required.
-    /// 3. If no scalar unique is found, take the first compound unique found. All fields must be required.
-    /// 4. If all of the above fails, we panic. Models with no unique / ID are not supported (yet).
     pub fn primary_identifier(&self) -> ModelProjection {
         let dml_fields = self.dml_model.first_unique_criterion();
         let fields: Vec<_> = dml_fields

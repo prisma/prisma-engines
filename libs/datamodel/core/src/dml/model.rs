@@ -148,7 +148,7 @@ impl Model {
         self.unique_criterias(true)
     }
 
-    // returns the order of unique criterias ordered based on their precedence
+    /// returns the order of unique criterias ordered based on their precedence
     fn unique_criterias(&self, allow_optional: bool) -> Vec<UniqueCriteria> {
         let mut result = Vec::new();
         // first candidate: the singular id field
@@ -182,7 +182,7 @@ impl Model {
             result.append(&mut unique_required_fields);
         }
 
-        // fourth candidate: any multi-field unique constraint.
+        // fourth candidate: any multi-field unique constraint where all fields are required
         {
             let mut unique_field_combi = self
                 .indices
