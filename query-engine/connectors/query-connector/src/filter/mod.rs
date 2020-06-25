@@ -9,9 +9,6 @@ mod list;
 mod relation;
 mod scalar;
 
-use prisma_models::dml;
-use prisma_models::prelude::*;
-
 pub use id_filter::*;
 pub use list::*;
 pub use relation::*;
@@ -152,92 +149,4 @@ impl From<bool> for Filter {
     fn from(b: bool) -> Self {
         Filter::BoolFilter(b)
     }
-}
-
-/// Creates a test data model for the unit tests in this module.
-pub fn test_data_model() -> InternalDataModelRef {
-    let user_field_templates = vec![
-        FieldTemplate::Scalar(ScalarFieldTemplate {
-            name: "id".to_owned(),
-            type_identifier: TypeIdentifier::String,
-            is_required: true,
-            is_list: false,
-            is_unique: false,
-            is_id: false,
-            is_auto_generated_int_id: false,
-            behaviour: None,
-            internal_enum: None,
-            arity: dml::FieldArity::Optional,
-            default_value: None,
-            db_name: None,
-        }),
-        FieldTemplate::Scalar(ScalarFieldTemplate {
-            name: "name".to_owned(),
-            type_identifier: TypeIdentifier::String,
-            is_required: false,
-            is_list: false,
-            is_unique: false,
-            is_id: false,
-            is_auto_generated_int_id: false,
-            behaviour: None,
-            internal_enum: None,
-            arity: dml::FieldArity::Optional,
-            default_value: None,
-            db_name: None,
-        }),
-        FieldTemplate::Relation(RelationFieldTemplate {
-            name: "sites".to_owned(),
-            is_required: false,
-            is_id: false,
-            is_list: false,
-            is_unique: false,
-            is_auto_generated_int_id: false,
-            relation_name: "bar".to_owned(),
-            relation_side: RelationSide::A,
-            relation_info: dml::RelationInfo::new(""),
-        }),
-    ];
-
-    let site_field_templates = vec![FieldTemplate::Scalar(ScalarFieldTemplate {
-        name: "name".to_owned(),
-        type_identifier: TypeIdentifier::String,
-        is_required: false,
-        is_list: false,
-        is_unique: false,
-        is_id: false,
-        is_auto_generated_int_id: false,
-        behaviour: None,
-        internal_enum: None,
-        arity: dml::FieldArity::Optional,
-        default_value: None,
-        db_name: None,
-    })];
-
-    let model_templates = vec![
-        ModelTemplate {
-            name: "User".to_owned(),
-            is_embedded: false,
-            fields: user_field_templates,
-            manifestation: None,
-            id_field_names: vec![],
-            indexes: vec![],
-        },
-        ModelTemplate {
-            name: "Site".to_owned(),
-            is_embedded: false,
-            fields: site_field_templates,
-            manifestation: None,
-            id_field_names: vec![],
-            indexes: vec![],
-        },
-    ];
-
-    let project_template = InternalDataModelTemplate {
-        models: model_templates,
-        relations: vec![],
-        enums: vec![],
-        version: None,
-    };
-
-    project_template.build("some_db_name".to_owned())
 }
