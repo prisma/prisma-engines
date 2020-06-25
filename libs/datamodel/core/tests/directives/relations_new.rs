@@ -683,6 +683,32 @@ fn must_error_when_non_id_field_is_referenced_in_a_many_to_many() {
 }
 
 #[test]
+fn must_error_nicely_when_a_many_to_many_is_not_possible() {
+    // many 2 many is not possible because Post does not have a singular id field
+    let dml = r#"
+    model Post {
+      id         Int        
+      slug       Int        @unique 
+      categories Category[] @relation(references: [id])
+      
+      @@id([id, slug])
+   }
+   
+   model Category {
+     id    Int    @id @default(autoincrement())
+     posts Post[] @relation(references: [slug])
+   }"#;
+
+    let errors = parse_error(dml);
+    errors.assert_is_at(0, DatamodelError::new_field_validation_error(
+        "The relation field `posts` on Model `Category` references `Post` which does not have an `@id` field. Models without `@id` can not be part of a many to many relation. Use an explicit intermediate Model to represent this relationship.",
+        "Category",
+        "posts",
+        Span::new(252, 295)
+    ));
+}
+
+#[test]
 fn must_error_when_many_to_many_is_not_possible_due_to_missing_id() {
     let dml = r#"
     // Post does not have @id
