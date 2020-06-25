@@ -467,7 +467,7 @@ pub fn parse_float(value: &str) -> Option<PrismaValue> {
     }
 }
 
-pub fn unquote_string(val: String) -> String {
+pub fn unquote_string(val: &str) -> String {
     val.trim_start_matches('\'')
         .trim_end_matches('\'')
         .trim_start_matches('\\')
@@ -485,7 +485,7 @@ mod tests {
     fn unquoting_works() {
         let quoted_str = "'abc $$ def'".to_string();
 
-        assert_eq!(unquote_string(quoted_str), "abc $$ def");
+        assert_eq!(unquote_string(&quoted_str), "abc $$ def");
 
         assert_eq!(unquote_string("heh ".into()), "heh ");
     }
