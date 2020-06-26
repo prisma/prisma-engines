@@ -39,9 +39,8 @@ pub enum SqlMigrationStep {
     AddForeignKey(AddForeignKey),
     CreateTable(CreateTable),
     AlterTable(AlterTable),
+    DropForeignKey(DropForeignKey),
     DropTable(DropTable),
-    // TODO: remove this variant on next migration format breaking change.
-    DropTables(DropTables),
     RenameTable { name: String, new_name: String },
     RawSql { raw: String },
     CreateIndex(CreateIndex),
@@ -50,15 +49,6 @@ pub enum SqlMigrationStep {
     CreateEnum(CreateEnum),
     DropEnum(DropEnum),
     AlterEnum(AlterEnum),
-}
-
-/// A helper struct to serialize an [SqlMigrationStep](/sql-migration/enum.SqlMigrationStep.html)
-/// with an additional `raw` field containing the rendered SQL string for that step.
-#[derive(Debug, Serialize, Deserialize, PartialEq)]
-pub struct PrettySqlMigrationStep {
-    #[serde(flatten)]
-    pub step: SqlMigrationStep,
-    pub raw: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
@@ -72,11 +62,6 @@ pub struct DropTable {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
-pub struct DropTables {
-    pub names: Vec<String>,
-}
-
-#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct AlterTable {
     pub table: Table,
     pub changes: Vec<TableChange>,
@@ -87,7 +72,8 @@ pub enum TableChange {
     AddColumn(AddColumn),
     AlterColumn(AlterColumn),
     DropColumn(DropColumn),
-    DropForeignKey(DropForeignKey),
+    DropPrimaryKey { constraint_name: Option<String> },
+    AddPrimaryKey { columns: Vec<String> },
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
@@ -114,6 +100,7 @@ pub struct AddForeignKey {
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct DropForeignKey {
+    pub table: String,
     pub constraint_name: String,
 }
 

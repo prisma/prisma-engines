@@ -27,13 +27,13 @@ impl SourceLoader {
     pub fn load_sources(
         &self,
         ast_schema: &ast::SchemaAst,
-        ignore_env_var_errors: bool,
+        ignore_datasource_urls: bool,
     ) -> Result<Vec<Box<dyn Source>>, ErrorCollection> {
         let mut sources = vec![];
         let mut errors = ErrorCollection::new();
 
         for src in &ast_schema.sources() {
-            match self.load_source(&src, ignore_env_var_errors) {
+            match self.load_source(&src, ignore_datasource_urls) {
                 Ok(loaded_src) => sources.push(loaded_src),
                 // Lift error to source.
                 Err(DatamodelError::ArgumentNotFound { argument_name, span }) => errors.push(
@@ -54,7 +54,7 @@ impl SourceLoader {
     fn load_source(
         &self,
         ast_source: &ast::SourceConfig,
-        ignore_env_var_errors: bool,
+        ignore_datasource_urls: bool,
     ) -> Result<Box<dyn Source>, DatamodelError> {
         let source_name = &ast_source.name.name;
         let mut args = Arguments::new(&ast_source.properties, ast_source.span);
@@ -78,7 +78,7 @@ impl SourceLoader {
 
         let url_args = args.arg("url")?;
         let (env_var_for_url, url) = match url_args.as_str_from_env() {
-            _ if ignore_env_var_errors => {
+            _ if ignore_datasource_urls => {
                 // glorious hack. ask marcus
                 (None, format!("{}://", providers.first().unwrap()))
             }

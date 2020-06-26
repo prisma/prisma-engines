@@ -94,7 +94,7 @@ impl WriteArgs {
             .map(|field| {
                 let val = match self.get_field_value(field.db_name()) {
                     Some(val) => val.clone(),
-                    None => PrismaValue::Null,
+                    None => PrismaValue::null(field.type_identifier.clone()),
                 };
 
                 (field.clone(), val.clone())

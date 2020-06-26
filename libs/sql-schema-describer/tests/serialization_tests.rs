@@ -72,6 +72,7 @@ fn database_schema_is_serializable() {
                 primary_key: Some(PrimaryKey {
                     columns: vec!["column1".to_string()],
                     sequence: None,
+                    constraint_name: None,
                 }),
                 foreign_keys: vec![ForeignKey {
                     constraint_name: None,
@@ -100,6 +101,7 @@ fn database_schema_is_serializable() {
                 primary_key: Some(PrimaryKey {
                     columns: vec!["id".to_string()],
                     sequence: None,
+                    constraint_name: None,
                 }),
                 foreign_keys: vec![],
             },

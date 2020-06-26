@@ -251,6 +251,26 @@ impl<'a> TableAssertion<'a> {
 pub struct ColumnAssertion<'a>(&'a Column);
 
 impl<'a> ColumnAssertion<'a> {
+    pub fn assert_auto_increments(self) -> AssertionResult<Self> {
+        anyhow::ensure!(
+            self.0.auto_increment,
+            "Assertion failed. Expected column `{}` to be auto-incrementing.",
+            self.0.name,
+        );
+
+        Ok(self)
+    }
+
+    pub fn assert_no_auto_increment(self) -> AssertionResult<Self> {
+        anyhow::ensure!(
+            !self.0.auto_increment,
+            "Assertion failed. Expected column `{}` not to be auto-incrementing.",
+            self.0.name,
+        );
+
+        Ok(self)
+    }
+
     pub fn assert_default(self, expected: Option<DefaultValue>) -> AssertionResult<Self> {
         let found = &self.0.default;
 
@@ -355,6 +375,15 @@ pub struct PrimaryKeyAssertion<'a>(&'a PrimaryKey);
 impl<'a> PrimaryKeyAssertion<'a> {
     pub fn assert_columns(self, column_names: &[&str]) -> AssertionResult<Self> {
         assert_eq!(self.0.columns, column_names);
+
+        Ok(self)
+    }
+
+    pub fn assert_has_sequence(self) -> AssertionResult<Self> {
+        anyhow::ensure!(
+            self.0.sequence.is_some(),
+            "Assertion failed: expected a sequence on the primary, found none."
+        );
 
         Ok(self)
     }

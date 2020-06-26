@@ -1,7 +1,6 @@
 use crate::*;
 use barrel::types;
-use introspection_connector::Version::NonPrisma;
-use introspection_connector::{IntrospectionConnector, Version};
+use introspection_connector::Version;
 use test_harness::*;
 
 //Sqlite
@@ -277,4 +276,12 @@ async fn introspect_mysql_prisma2(api: &TestApi) {
 
     let result = dbg!(api.introspect_version().await);
     assert_eq!(result, Version::Prisma2);
+}
+
+#[test_each_connector(tags("mysql"))]
+async fn introspect_mysql_non_prisma_empty(api: &TestApi) {
+    api.barrel().execute(|_migration| {}).await;
+
+    let result = dbg!(api.introspect_version().await);
+    assert_eq!(result, Version::NonPrisma);
 }

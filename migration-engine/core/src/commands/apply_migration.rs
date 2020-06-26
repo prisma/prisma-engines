@@ -117,7 +117,8 @@ impl<'a> ApplyMigrationCommand<'a> {
         D: DatabaseMigrationMarker + Send + Sync + 'static,
     {
         let connector = engine.connector();
-        let next_datamodel = datamodel::lift_ast(&next_schema_ast).map_err(CommandError::ProducedBadDatamodel)?;
+        let next_datamodel =
+            datamodel::lift_ast_to_datamodel(&next_schema_ast).map_err(CommandError::ProducedBadDatamodel)?;
         let migration_persistence = connector.migration_persistence();
 
         let database_migration = connector
@@ -133,11 +134,13 @@ impl<'a> ApplyMigrationCommand<'a> {
 
         let database_migration_json = database_migration.serialize();
 
-        let mut migration = Migration::new(self.input.migration_id.clone());
-        migration.datamodel_steps = self.input.steps.clone();
-        migration.database_migration = database_migration_json;
-        migration.datamodel_string =
-            datamodel::render_schema_ast_to_string(&next_schema_ast).map_err(CommandError::ProducedBadDatamodel)?;
+        let migration = Migration::new(NewMigration {
+            name: self.input.migration_id.clone(),
+            datamodel_steps: self.input.steps.clone(),
+            datamodel_string: datamodel::render_schema_ast_to_string(&next_schema_ast)
+                .map_err(CommandError::ProducedBadDatamodel)?,
+            database_migration: database_migration_json,
+        });
 
         let diagnostics = connector
             .destructive_changes_checker()
@@ -170,7 +173,7 @@ impl<'a> ApplyMigrationCommand<'a> {
         Ok(MigrationStepsResultOutput {
             datamodel: datamodel::render_datamodel_to_string(&next_datamodel).unwrap(),
             datamodel_steps: self.input.steps.clone(),
-            database_steps: serde_json::Value::Array(database_steps_json_pretty),
+            database_steps: database_steps_json_pretty,
             errors,
             warnings,
             general_errors: Vec::new(),

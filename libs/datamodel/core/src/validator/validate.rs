@@ -2,7 +2,7 @@ use crate::ast::WithDirectives;
 use crate::{
     ast, configuration, dml,
     error::{DatamodelError, ErrorCollection},
-    FieldArity, IndexType,
+    FieldArity,
 };
 
 /// Helper for validating a datamodel.
@@ -14,7 +14,9 @@ pub struct Validator<'a> {
 
 /// State error message. Seeing this error means something went really wrong internally. It's the datamodel equivalent of a bluescreen.
 const STATE_ERROR: &str = "Failed lookup of model, field or optional property during internal processing. This means that the internal representation was mutated incorrectly.";
-const RELATION_DIRECTIVE_NAME: &str = "@relation";
+const RELATION_DIRECTIVE_NAME: &str = "relation";
+const RELATION_DIRECTIVE_NAME_WITH_AT: &str = "@relation";
+const PRISMA_FORMAT_HINT: &str = "You can run `prisma format` to fix this automatically.";
 
 impl<'a> Validator<'a> {
     /// Creates a new instance, with all builtin directives registered.
@@ -34,8 +36,10 @@ impl<'a> Validator<'a> {
             // Having a separate error collection allows checking whether any error has occurred for a model.
             let mut errors_for_model = ErrorCollection::new();
 
-            if let Err(err) = self.validate_model_has_id(ast_schema.find_model(&model.name).expect(STATE_ERROR), model)
-            {
+            if let Err(err) = self.validate_model_has_strict_unique_criteria(
+                ast_schema.find_model(&model.name).expect(STATE_ERROR),
+                model,
+            ) {
                 errors_for_model.push(err);
             }
             if let Err(err) = self.validate_model_name(ast_schema.find_model(&model.name).expect(STATE_ERROR), model) {
@@ -219,8 +223,11 @@ impl<'a> Validator<'a> {
         }
     }
 
-    fn validate_model_has_id(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), DatamodelError> {
-        // TODO: replace with unique criteria function
+    fn validate_model_has_strict_unique_criteria(
+        &self,
+        ast_model: &ast::Model,
+        model: &dml::Model,
+    ) -> Result<(), DatamodelError> {
         let multiple_single_field_id_error = Err(DatamodelError::new_model_validation_error(
             "At most one field must be marked as the id field with the `@id` directive.",
             &model.name,
@@ -233,16 +240,8 @@ impl<'a> Validator<'a> {
             ast_model.span,
         ));
 
-        let missing_id_criteria_error = Err(DatamodelError::new_model_validation_error(
-            "Each model must have at least one unique criteria. Either mark a single field with `@id`, `@unique` or add a multi field criterion with `@@id([])` or `@@unique([])` to the model.",
-            &model.name,
-            ast_model.span,
-        ));
-
         let has_single_field_id = model.singular_id_fields().next().is_some();
         let has_multi_field_id = !model.id_fields.is_empty();
-        let has_single_field_unique = model.fields().find(|f| f.is_unique).is_some();
-        let has_multi_field_unique = model.indices.iter().find(|i| i.tpe == IndexType::Unique).is_some();
 
         if model.singular_id_fields().count() > 1 {
             return multiple_single_field_id_error;
@@ -252,11 +251,36 @@ impl<'a> Validator<'a> {
             return multiple_id_criteria_error;
         }
 
-        if has_single_field_id || has_multi_field_id || has_single_field_unique || has_multi_field_unique {
-            Ok(())
+        let loose_criterias = model.loose_unique_criterias();
+        let suffix = if loose_criterias.is_empty() {
+            "".to_string()
         } else {
-            missing_id_criteria_error
+            let criteria_descriptions: Vec<_> = loose_criterias
+                .iter()
+                .map(|criteria| {
+                    let field_names: Vec<_> = criteria.fields.iter().map(|f| f.name.clone()).collect();
+                    format!("- {}", field_names.join(", "))
+                })
+                .collect();
+            format!(
+                " The following unique criterias were not considered as they contain fields that are not required:\n{}",
+                criteria_descriptions.join("\n")
+            )
+        };
+        let missing_id_criteria_error = Err(DatamodelError::new_model_validation_error(
+            &format!(
+                "Each model must have at least one unique criteria that has only required fields. Either mark a single field with `@id`, `@unique` or add a multi field criterion with `@@id([])` or `@@unique([])` to the model.{suffix}",
+                suffix = suffix
+            ),
+            &model.name,
+            ast_model.span,
+        ));
+
+        if model.strict_unique_criterias().is_empty() {
+            return missing_id_criteria_error;
         }
+
+        Ok(())
     }
 
     fn validate_model_name(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), DatamodelError> {
@@ -523,7 +547,8 @@ impl<'a> Validator<'a> {
                     }
 
                     // TODO: This error is only valid for connectors that don't support native many to manys.
-                    if is_many_to_many && !references_singular_id_field {
+                    // We only render this error if there's a singular id field. Otherwise we render a better error in a different function.
+                    if is_many_to_many && !references_singular_id_field && related_model.has_single_id_field() {
                         errors.push(DatamodelError::new_validation_error(
                             &format!(
                                 "Many to many relations must always reference the id field of the related model. Change the argument `references` to use the id field of the related model `{}`. But it is referencing the following fields that are not the id: {}",
@@ -592,8 +617,8 @@ impl<'a> Validator<'a> {
                     if rel_info.fields.is_empty() {
                         errors.push(DatamodelError::new_directive_validation_error(
                             &format!(
-                                "The relation field `{}` on Model `{}` must specify the `fields` argument in the {} directive.",
-                                &field.name, &model.name, RELATION_DIRECTIVE_NAME
+                                "The relation field `{}` on Model `{}` must specify the `fields` argument in the {} directive. {}",
+                                &field.name, &model.name, RELATION_DIRECTIVE_NAME_WITH_AT, PRISMA_FORMAT_HINT
                             ),
                             RELATION_DIRECTIVE_NAME,
                             field_span.clone(),
@@ -604,7 +629,7 @@ impl<'a> Validator<'a> {
                         errors.push(DatamodelError::new_directive_validation_error(
                             &format!(
                                 "The relation field `{}` on Model `{}` must specify the `references` argument in the {} directive.",
-                                &field.name, &model.name, RELATION_DIRECTIVE_NAME
+                                &field.name, &model.name, RELATION_DIRECTIVE_NAME_WITH_AT
                             ),
                             RELATION_DIRECTIVE_NAME,
                             field_span.clone(),
@@ -617,7 +642,7 @@ impl<'a> Validator<'a> {
                         errors.push(DatamodelError::new_directive_validation_error(
                             &format!(
                                 "The relation field `{}` on Model `{}` must not specify the `fields` or `references` argument in the {} directive. You must only specify it on the opposite field `{}` on model `{}`.",
-                                &field.name, &model.name, RELATION_DIRECTIVE_NAME, &related_field.name, &related_model.name
+                                &field.name, &model.name, RELATION_DIRECTIVE_NAME_WITH_AT, &related_field.name, &related_model.name
                             ),
                             RELATION_DIRECTIVE_NAME,
                             field_span.clone(),
@@ -645,7 +670,7 @@ impl<'a> Validator<'a> {
                         errors.push(DatamodelError::new_directive_validation_error(
                             &format!(
                                 "The relation fields `{}` on Model `{}` and `{}` on Model `{}` do not provide the `fields` argument in the {} directive. You have to provide it on one of the two fields.",
-                                &field.name, &model.name, &related_field.name, &related_model.name, RELATION_DIRECTIVE_NAME
+                                &field.name, &model.name, &related_field.name, &related_model.name, RELATION_DIRECTIVE_NAME_WITH_AT
                             ),
                             RELATION_DIRECTIVE_NAME,
                             field_span.clone(),
@@ -656,7 +681,7 @@ impl<'a> Validator<'a> {
                         errors.push(DatamodelError::new_directive_validation_error(
                             &format!(
                                 "The relation fields `{}` on Model `{}` and `{}` on Model `{}` do not provide the `references` argument in the {} directive. You have to provide it on one of the two fields.",
-                                &field.name, &model.name, &related_field.name, &related_model.name, RELATION_DIRECTIVE_NAME
+                                &field.name, &model.name, &related_field.name, &related_model.name, RELATION_DIRECTIVE_NAME_WITH_AT
                             ),
                             RELATION_DIRECTIVE_NAME,
                             field_span.clone(),
@@ -667,7 +692,7 @@ impl<'a> Validator<'a> {
                         errors.push(DatamodelError::new_directive_validation_error(
                             &format!(
                                 "The relation fields `{}` on Model `{}` and `{}` on Model `{}` both provide the `references` argument in the {} directive. You have to provide it only on one of the two fields.",
-                                &field.name, &model.name, &related_field.name, &related_model.name, RELATION_DIRECTIVE_NAME
+                                &field.name, &model.name, &related_field.name, &related_model.name, RELATION_DIRECTIVE_NAME_WITH_AT
                             ),
                             RELATION_DIRECTIVE_NAME,
                             field_span.clone(),
@@ -678,7 +703,7 @@ impl<'a> Validator<'a> {
                         errors.push(DatamodelError::new_directive_validation_error(
                             &format!(
                                 "The relation fields `{}` on Model `{}` and `{}` on Model `{}` both provide the `fields` argument in the {} directive. You have to provide it only on one of the two fields.",
-                                &field.name, &model.name, &related_field.name, &related_model.name, RELATION_DIRECTIVE_NAME
+                                &field.name, &model.name, &related_field.name, &related_model.name, RELATION_DIRECTIVE_NAME_WITH_AT
                             ),
                             RELATION_DIRECTIVE_NAME,
                             field_span.clone(),
@@ -690,7 +715,7 @@ impl<'a> Validator<'a> {
                             errors.push(DatamodelError::new_directive_validation_error(
                                 &format!(
                                 "The relation field `{}` on Model `{}` provides the `fields` argument in the {} directive. And the related field `{}` on Model `{}` provides the `references` argument. You must provide both arguments on the same side.",
-                                &field.name, &model.name, RELATION_DIRECTIVE_NAME, &related_field.name, &related_model.name,
+                                &field.name, &model.name, RELATION_DIRECTIVE_NAME_WITH_AT, &related_field.name, &related_model.name,
                             ),
                             RELATION_DIRECTIVE_NAME,
                             field_span.clone(),
@@ -701,7 +726,7 @@ impl<'a> Validator<'a> {
                             errors.push(DatamodelError::new_directive_validation_error(
                                 &format!(
                                     "The relation field `{}` on Model `{}` provides the `references` argument in the {} directive. And the related field `{}` on Model `{}` provides the `fields` argument. You must provide both arguments on the same side.",
-                                    &field.name, &model.name, RELATION_DIRECTIVE_NAME, &related_field.name, &related_model.name,
+                                    &field.name, &model.name, RELATION_DIRECTIVE_NAME_WITH_AT, &related_field.name, &related_model.name,
                                 ),
                                 RELATION_DIRECTIVE_NAME,
                                 field_span.clone(),

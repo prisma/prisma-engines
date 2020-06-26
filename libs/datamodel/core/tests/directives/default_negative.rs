@@ -2,7 +2,7 @@ use crate::common::*;
 use datamodel::{ast::Span, error::DatamodelError};
 
 #[test]
-fn should_error_if_default_value_for_relation_field() {
+fn must_error_if_default_value_for_relation_field() {
     let dml = r#"
     model Model {
         id Int @id
@@ -24,7 +24,7 @@ fn should_error_if_default_value_for_relation_field() {
 }
 
 #[test]
-fn should_error_if_default_value_for_list() {
+fn must_error_if_default_value_for_list() {
     let dml = r#"
     model Model {
         id Int @id
@@ -42,7 +42,7 @@ fn should_error_if_default_value_for_list() {
 }
 
 #[test]
-fn should_error_if_default_value_type_missmatch() {
+fn must_error_if_default_value_type_missmatch() {
     let dml = r#"
     model Model {
         id Int @id
@@ -60,7 +60,7 @@ fn should_error_if_default_value_type_missmatch() {
 }
 
 #[test]
-fn should_error_if_default_value_parser_error() {
+fn must_error_if_default_value_parser_error() {
     let dml = r#"
     model Model {
         id Int @id
@@ -78,7 +78,7 @@ fn should_error_if_default_value_parser_error() {
 }
 
 #[test]
-fn should_error_if_unknown_function_is_used() {
+fn must_error_if_unknown_function_is_used() {
     let dml = r#"
     model Model {
         id Int @id
@@ -92,5 +92,23 @@ fn should_error_if_unknown_function_is_used() {
         "The function unknown_function is not a known function.",
         "default",
         Span::new(68, 86),
+    ));
+}
+
+#[test]
+fn must_error_if_now_function_is_used_for_fields_that_are_not_datetime() {
+    let dml = r#"
+    model Model {
+        id  Int    @id
+        foo String @default(now())
+    }
+    "#;
+
+    let errors = parse_error(dml);
+
+    errors.assert_is(DatamodelError::new_directive_validation_error(
+        "The function `now()` can not be used on fields of type `String`.",
+        "default",
+        Span::new(70, 75),
     ));
 }

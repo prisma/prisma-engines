@@ -35,7 +35,6 @@ use sql_migration_persistence::*;
 use sql_schema_describer::SqlSchema;
 use std::{sync::Arc, time::Duration};
 use tracing::debug;
-use user_facing_errors::migration_engine::DatabaseMigrationFormatChanged;
 
 const CONNECTION_TIMEOUT: Duration = Duration::from_secs(10);
 
@@ -74,7 +73,7 @@ impl SqlMigrationConnector {
                     let sql_str = format!(r#"DROP SCHEMA "{}" CASCADE;"#, self.schema_name());
                     debug!("{}", sql_str);
 
-                    self.conn().query_raw(&sql_str, &[]).await.ok();
+                    self.conn().raw_cmd(&sql_str).await.ok();
                 }
                 ConnectionInfo::Sqlite { file_path, .. } => {
                     self.conn()
@@ -92,8 +91,9 @@ impl SqlMigrationConnector {
                 ConnectionInfo::Mysql(_) => {
                     let sql_str = format!(r#"DROP SCHEMA `{}`;"#, self.schema_name());
                     debug!("{}", sql_str);
-                    self.conn().query_raw(&sql_str, &[]).await?;
+                    self.conn().raw_cmd(&sql_str).await?;
                 }
+                ConnectionInfo::Mssql(_) => todo!("Greetings from Redmond"),
             };
 
             Ok(())
@@ -164,11 +164,8 @@ impl MigrationConnector for SqlMigrationConnector {
         Box::new(SqlDestructiveChangesChecker { connector: self })
     }
 
-    fn deserialize_database_migration(
-        &self,
-        json: serde_json::Value,
-    ) -> Result<SqlMigration, DatabaseMigrationFormatChanged> {
-        serde_json::from_value(json).map_err(|_| DatabaseMigrationFormatChanged)
+    fn deserialize_database_migration(&self, json: serde_json::Value) -> Option<SqlMigration> {
+        serde_json::from_value(json).ok()
     }
 }
 
@@ -195,7 +192,7 @@ async fn connect(database_str: &str) -> ConnectorResult<(Quaint, DatabaseInfo)> 
         // async connections can be lazy, so we issue a simple query to fail early if the database
         // is not reachable.
         connection
-            .query_raw("SELECT 1", &[])
+            .raw_cmd("SELECT 1")
             .await
             .map_err(SqlError::from)
             .map_err(|err| err.into_connector_error(&connection.connection_info()))?;

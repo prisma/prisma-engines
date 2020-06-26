@@ -3,7 +3,8 @@
 //! detail of the SQL connector.
 
 use crate::{
-    catch, connect, database_info::DatabaseInfo, CheckDatabaseInfoResult, SqlError, SqlResult, SystemDatabase,
+    catch, connect, database_info::DatabaseInfo, sql_destructive_changes_checker::DestructiveChangeCheckerFlavour,
+    CheckDatabaseInfoResult, SqlError, SqlResult, SystemDatabase,
 };
 use futures::future::TryFutureExt;
 use migration_connector::{ConnectorError, ConnectorResult};
@@ -29,11 +30,12 @@ pub(crate) fn from_connection_info(connection_info: &ConnectionInfo) -> Box<dyn 
         ConnectionInfo::Sqlite { file_path, .. } => Box::new(SqliteFlavour {
             file_path: file_path.clone(),
         }),
+        ConnectionInfo::Mssql(_) => todo!("Greetings from Redmond!"),
     }
 }
 
 #[async_trait::async_trait]
-pub(crate) trait SqlFlavour {
+pub(crate) trait SqlFlavour: DestructiveChangeCheckerFlavour {
     /// Optionally validate the database info.
     fn check_database_info(&self, _database_info: &DatabaseInfo) -> CheckDatabaseInfoResult {
         Ok(())
@@ -53,7 +55,7 @@ pub(crate) trait SqlFlavour {
     async fn initialize(&self, conn: &dyn Queryable, database_info: &DatabaseInfo) -> SqlResult<()>;
 }
 
-struct MysqlFlavour(MysqlUrl);
+pub(crate) struct MysqlFlavour(MysqlUrl);
 
 #[async_trait::async_trait]
 impl SqlFlavour for MysqlFlavour {
@@ -85,11 +87,7 @@ impl SqlFlavour for MysqlFlavour {
         let db_name = self.0.dbname();
 
         let query = format!("CREATE DATABASE `{}`", db_name);
-        catch(
-            conn.connection_info(),
-            conn.query_raw(&query, &[]).map_err(SqlError::from),
-        )
-        .await?;
+        catch(conn.connection_info(), conn.raw_cmd(&query).map_err(SqlError::from)).await?;
 
         Ok(db_name.to_owned())
     }
@@ -110,13 +108,13 @@ impl SqlFlavour for MysqlFlavour {
             database_info.connection_info().schema_name()
         );
 
-        conn.query_raw(&schema_sql, &[]).await?;
+        conn.raw_cmd(&schema_sql).await?;
 
         Ok(())
     }
 }
 
-struct SqliteFlavour {
+pub(crate) struct SqliteFlavour {
     file_path: String,
 }
 
@@ -166,7 +164,7 @@ impl SqlFlavour for SqliteFlavour {
     }
 }
 
-struct PostgresFlavour(PostgresUrl);
+pub(crate) struct PostgresFlavour(PostgresUrl);
 
 #[async_trait::async_trait]
 impl SqlFlavour for PostgresFlavour {
@@ -177,11 +175,7 @@ impl SqlFlavour for PostgresFlavour {
         let (conn, _) = create_postgres_admin_conn(url).await?;
 
         let query = format!("CREATE DATABASE \"{}\"", db_name);
-        catch(
-            conn.connection_info(),
-            conn.query_raw(&query, &[]).map_err(SqlError::from),
-        )
-        .await?;
+        catch(conn.connection_info(), conn.raw_cmd(&query).map_err(SqlError::from)).await?;
 
         Ok(db_name.to_owned())
     }
@@ -202,7 +196,7 @@ impl SqlFlavour for PostgresFlavour {
             &database_info.connection_info().schema_name()
         );
 
-        conn.query_raw(&schema_sql, &[]).await?;
+        conn.raw_cmd(&schema_sql).await?;
 
         Ok(())
     }

@@ -1535,7 +1535,7 @@ fn infer_CreateSource() {
         MigrationStep::CreateArgument(CreateArgument {
             location: source_location.clone().into_argument_location(),
             argument: "url".to_owned(),
-            value: MigrationExpression("\"postgresql://some-host:1234\"".to_owned()),
+            value: MigrationExpression("\"***\"".to_owned()),
         }),
     ];
 
@@ -1576,7 +1576,7 @@ fn infer_Arguments_on_Datasources() {
         r#"
         datasource pg {
             provider = "postgres"
-            url = "postgresql://some-host:1234"
+            url = "postgresql://this-got-changed:4567"
             a = 2
             c = true
         }"#,
@@ -1587,6 +1587,7 @@ fn infer_Arguments_on_Datasources() {
     let argument_location = source_location.into_argument_location();
 
     let steps = infer(&dm1, &dm2);
+    // although the URL got changed we DO NOT expect an UpdateArgument for it (because of URL masking. Talk to tom)
     let expected = &[
         MigrationStep::CreateArgument(CreateArgument {
             location: argument_location.clone(),

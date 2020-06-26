@@ -1,5 +1,5 @@
 use migration_core::commands::*;
-use sql_migration_connector::{PrettySqlMigrationStep, SqlMigrationStep};
+use sql_migration_connector::SqlMigrationStep;
 use sql_schema_describer::*;
 
 #[derive(Debug)]
@@ -10,9 +10,7 @@ pub struct InferAndApplyOutput {
 
 impl InferAndApplyOutput {
     pub fn sql_migration(&self) -> Vec<SqlMigrationStep> {
-        let steps: Vec<PrettySqlMigrationStep> =
-            serde_json::from_value(self.migration_output.database_steps.clone()).unwrap();
-        steps.into_iter().map(|pretty_step| pretty_step.step).collect()
+        self.migration_output.sql_migration()
     }
 }
 
@@ -22,7 +20,9 @@ pub trait MigrationStepsResultOutputExt {
 
 impl MigrationStepsResultOutputExt for MigrationStepsResultOutput {
     fn sql_migration(&self) -> Vec<SqlMigrationStep> {
-        let steps: Vec<PrettySqlMigrationStep> = serde_json::from_value(self.database_steps.clone()).unwrap();
-        steps.into_iter().map(|pretty_step| pretty_step.step).collect()
+        self.database_steps
+            .iter()
+            .map(|pretty_step| serde_json::from_value(pretty_step.step.clone()).unwrap())
+            .collect()
     }
 }

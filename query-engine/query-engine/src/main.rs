@@ -45,6 +45,7 @@ type AnyError = Box<dyn Error + Send + Sync + 'static>;
 async fn main() -> Result<(), AnyError> {
     init_logger()?;
     let opts = PrismaOpt::from_args();
+    init_feature_flags(&opts);
 
     match CliCommand::try_from(&opts) {
         Ok(cmd) => {
@@ -70,7 +71,8 @@ async fn main() -> Result<(), AnyError> {
                     HttpServer::builder(config, datamodel)
                         .legacy(opts.legacy)
                         .enable_raw_queries(opts.enable_raw_queries)
-                        .enable_playground(opts.enable_playground),
+                        .enable_playground(opts.enable_playground)
+                        .enable_debug_mode(opts.enable_debug_mode),
                 )
             };
 
@@ -119,6 +121,16 @@ fn init_logger() -> Result<(), AnyError> {
     }
 
     Ok(())
+}
+
+fn init_feature_flags(opts: &PrismaOpt) {
+    if let Err(err) = feature_flags::initialize(opts.raw_feature_flags.as_slice()) {
+        let err: PrismaError = err.into();
+
+        info!("Encountered error during initialization:");
+        err.render_as_json().expect("error rendering");
+        process::exit(1);
+    }
 }
 
 fn set_panic_hook() -> Result<(), AnyError> {

@@ -67,7 +67,7 @@ fn indexes_on_relation_fields_must_error() {
 
     let errors = parse_error(dml);
     errors.assert_is(DatamodelError::new_model_validation_error(
-        "The index definition refers to the relation fields identification. Index definitions must reference only scalar fields.",
+        "The index definition refers to the relation fields identification. Index definitions must reference only scalar fields. Did you mean `@@index([identificationId])`?",
         "User",
         Span::new(195,218),
     ));

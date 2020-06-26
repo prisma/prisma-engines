@@ -44,7 +44,7 @@ impl WriteArgsParser {
                     }
 
                     Field::Relation(ref rf) => match v {
-                        ParsedInputValue::Single(PrismaValue::Null) => (),
+                        ParsedInputValue::Single(PrismaValue::Null(_)) => (),
                         _ => args.nested.push((Arc::clone(rf), v.try_into()?)),
                     },
                 };

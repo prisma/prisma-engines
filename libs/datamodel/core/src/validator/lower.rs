@@ -35,7 +35,7 @@ impl LowerDmlToAst {
             }
         }
 
-        Ok(ast::SchemaAst { tops: tops })
+        Ok(ast::SchemaAst { tops })
     }
 
     pub fn lower_model(&self, model: &dml::Model, datamodel: &dml::Datamodel) -> Result<ast::Model, ErrorCollection> {
@@ -124,7 +124,7 @@ impl LowerDmlToAst {
             PrismaValue::DateTime(value) => ast::Expression::StringValue(value.to_rfc3339(), ast::Span::empty()),
             PrismaValue::Float(value) => ast::Expression::NumericValue(value.to_string(), ast::Span::empty()),
             PrismaValue::Int(value) => ast::Expression::NumericValue(value.to_string(), ast::Span::empty()),
-            PrismaValue::Null => ast::Expression::ConstantValue("null".to_string(), ast::Span::empty()),
+            PrismaValue::Null(_) => ast::Expression::ConstantValue("null".to_string(), ast::Span::empty()),
             PrismaValue::Uuid(val) => ast::Expression::StringValue(val.to_string(), ast::Span::empty()),
             PrismaValue::Json(val) => ast::Expression::StringValue(val.to_string(), ast::Span::empty()),
             PrismaValue::List(vec) => ast::Expression::Array(

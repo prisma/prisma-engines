@@ -1,17 +1,21 @@
 use super::{
     check::Check, database_inspection_results::DatabaseInspectionResults,
-    unexecutable_step_check::UnexecutableStepCheck, warning_check::SqlMigrationWarning,
+    unexecutable_step_check::UnexecutableStepCheck, warning_check::SqlMigrationWarningCheck,
 };
 use crate::{SqlError, SqlResult};
 use migration_connector::{DestructiveChangeDiagnostics, MigrationWarning, UnexecutableMigration};
 use quaint::prelude::Queryable;
+use std::time::Duration;
+use tokio::time::{timeout, Elapsed};
+
+const DESTRUCTIVE_TIMEOUT_DURATION: Duration = Duration::from_secs(60);
 
 /// A DestructiveCheckPlan is the collection of destructive change checks
 /// ([Check](trait.Check.html)) for a given migration. It has an `execute` method that performs
 /// database inspection and renders user-facing messages based on the checks.
 #[derive(Debug)]
-pub(super) struct DestructiveCheckPlan {
-    warnings: Vec<SqlMigrationWarning>,
+pub(crate) struct DestructiveCheckPlan {
+    warnings: Vec<SqlMigrationWarningCheck>,
     unexecutable_migrations: Vec<UnexecutableStepCheck>,
 }
 
@@ -23,7 +27,7 @@ impl DestructiveCheckPlan {
         }
     }
 
-    pub(super) fn push_warning(&mut self, warning: SqlMigrationWarning) {
+    pub(super) fn push_warning(&mut self, warning: SqlMigrationWarningCheck) {
         self.warnings.push(warning)
     }
 
@@ -43,14 +47,24 @@ impl DestructiveCheckPlan {
     ) -> SqlResult<DestructiveChangeDiagnostics> {
         let mut results = DatabaseInspectionResults::default();
 
-        for unexecutable in &self.unexecutable_migrations {
-            self.inspect_for_check(unexecutable, &mut results, schema_name, conn)
-                .await?;
-        }
+        let inspection = async {
+            for unexecutable in &self.unexecutable_migrations {
+                self.inspect_for_check(unexecutable, &mut results, schema_name, conn)
+                    .await?;
+            }
 
-        for warning in &self.warnings {
-            self.inspect_for_check(warning, &mut results, schema_name, conn).await?;
-        }
+            for warning in &self.warnings {
+                self.inspect_for_check(warning, &mut results, schema_name, conn).await?;
+            }
+
+            Ok::<(), SqlError>(())
+        };
+
+        // Ignore the timeout error, we will still return useful warnings.
+        match timeout(DESTRUCTIVE_TIMEOUT_DURATION, inspection).await {
+            Ok(Ok(())) | Err(Elapsed { .. }) => (),
+            Ok(Err(err)) => return Err(err),
+        };
 
         let mut diagnostics = DestructiveChangeDiagnostics::new();
 

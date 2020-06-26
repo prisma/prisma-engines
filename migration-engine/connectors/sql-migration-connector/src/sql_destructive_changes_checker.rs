@@ -1,19 +1,22 @@
 mod check;
 mod database_inspection_results;
+mod destructive_change_checker_flavour;
 mod destructive_check_plan;
 mod unexecutable_step_check;
 mod warning_check;
 
+pub(crate) use destructive_change_checker_flavour::DestructiveChangeCheckerFlavour;
+
 use crate::{
-    sql_schema_differ::DiffingOptions, AddColumn, AlterColumn, Component, DropColumn, DropTable, DropTables,
-    SqlMigration, SqlMigrationStep, SqlResult, TableChange,
+    sql_schema_differ::{ColumnDiffer, DiffingOptions},
+    sql_schema_helpers::SqlSchemaExt,
+    AddColumn, AlterColumn, Component, DropColumn, DropTable, SqlMigration, SqlMigrationStep, SqlResult, TableChange,
 };
 use destructive_check_plan::DestructiveCheckPlan;
 use migration_connector::{ConnectorResult, DestructiveChangeDiagnostics, DestructiveChangesChecker};
-use quaint::prelude::SqlFamily;
-use sql_schema_describer::{ColumnArity, SqlSchema};
+use sql_schema_describer::SqlSchema;
 use unexecutable_step_check::UnexecutableStepCheck;
-use warning_check::SqlMigrationWarning;
+use warning_check::SqlMigrationWarningCheck;
 
 /// The SqlDestructiveChangesChecker is responsible for informing users about potentially
 /// destructive or impossible changes that their attempted migrations contain.
@@ -38,7 +41,7 @@ impl Component for SqlDestructiveChangesChecker<'_> {
 
 impl SqlDestructiveChangesChecker<'_> {
     fn check_table_drop(&self, table_name: &str, plan: &mut DestructiveCheckPlan) {
-        plan.push_warning(SqlMigrationWarning::NonEmptyTableDrop {
+        plan.push_warning(SqlMigrationWarningCheck::NonEmptyTableDrop {
             table: table_name.to_owned(),
         });
     }
@@ -50,7 +53,7 @@ impl SqlDestructiveChangesChecker<'_> {
         table: &sql_schema_describer::Table,
         plan: &mut DestructiveCheckPlan,
     ) {
-        plan.push_warning(SqlMigrationWarning::NonEmptyColumnDrop {
+        plan.push_warning(SqlMigrationWarningCheck::NonEmptyColumnDrop {
             table: table.name.clone(),
             column: drop_column.name.clone(),
         });
@@ -95,130 +98,29 @@ impl SqlDestructiveChangesChecker<'_> {
     fn check_alter_column(
         &self,
         alter_column: &AlterColumn,
-        previous_table: &sql_schema_describer::Table,
+        differ: ColumnDiffer<'_>,
         plan: &mut DestructiveCheckPlan,
     ) {
-        let previous_column = previous_table
-            .column(&alter_column.name)
-            .expect("unsupported column renaming");
-
-        let diffing_options = DiffingOptions::from_database_info(self.database_info());
-
-        let differ = crate::sql_schema_differ::ColumnDiffer {
-            diffing_options: &diffing_options,
-            previous: previous_column,
-            next: &alter_column.column,
-        };
-
-        if self.alter_column_is_safe(&differ) {
-            return;
-        }
-
-        self.check_for_column_arity_change(&previous_table.name, &differ, plan);
-
-        plan.push_warning(SqlMigrationWarning::AlterColumn {
-            table: previous_table.name.clone(),
-            column: alter_column.column.name.clone(),
-        });
+        let previous_table = &differ.previous.table().table;
+        self.flavour().check_alter_column(&previous_table, &differ, plan);
 
         if previous_table.is_part_of_foreign_key(&alter_column.column.name)
             && alter_column.column.default.is_none()
-            && previous_column.default.is_some()
+            && differ.previous.default().is_some()
         {
-            plan.push_warning(SqlMigrationWarning::ForeignKeyDefaultValueRemoved {
+            plan.push_warning(SqlMigrationWarningCheck::ForeignKeyDefaultValueRemoved {
                 table: previous_table.name.clone(),
                 column: alter_column.name.clone(),
             });
         }
     }
 
-    fn alter_column_is_safe(&self, differ: &crate::sql_schema_differ::ColumnDiffer<'_>) -> bool {
-        use crate::sql_migration::expanded_alter_column::*;
-
-        match self.sql_family() {
-            SqlFamily::Sqlite => {
-                let arity_change_is_safe = match (&differ.previous.tpe.arity, &differ.next.tpe.arity) {
-                    // column became required
-                    (ColumnArity::Nullable, ColumnArity::Required) => false,
-                    // column became nullable
-                    (ColumnArity::Required, ColumnArity::Nullable) => true,
-                    // nothing changed
-                    (ColumnArity::Required, ColumnArity::Required) | (ColumnArity::Nullable, ColumnArity::Nullable) => {
-                        true
-                    }
-                    // not supported on SQLite
-                    (ColumnArity::List, _) | (_, ColumnArity::List) => unreachable!(),
-                };
-
-                !differ.all_changes().type_changed() && arity_change_is_safe
-            }
-            SqlFamily::Postgres => {
-                let expanded = expand_postgres_alter_column(differ);
-
-                // We keep the match here to keep the exhaustiveness checking for when we add variants.
-                if let Some(steps) = expanded {
-                    let mut is_safe = true;
-
-                    for step in steps {
-                        match step {
-                            PostgresAlterColumn::SetDefault(_)
-                            | PostgresAlterColumn::DropDefault
-                            | PostgresAlterColumn::DropNotNull => (),
-                            PostgresAlterColumn::SetType(_) => is_safe = false,
-                        }
-                    }
-
-                    is_safe
-                } else {
-                    false
-                }
-            }
-            SqlFamily::Mysql => {
-                let expanded = expand_mysql_alter_column(differ);
-
-                // We keep the match here to keep the exhaustiveness checking for when we add variants.
-                if let Some(steps) = expanded {
-                    let is_safe = true;
-
-                    for step in steps {
-                        match step {
-                            MysqlAlterColumn::SetDefault(_) | MysqlAlterColumn::DropDefault => (),
-                        }
-                    }
-
-                    is_safe
-                } else {
-                    false
-                }
-            }
-        }
-    }
-
-    fn check_for_column_arity_change(
-        &self,
-        table_name: &str,
-        differ: &crate::sql_schema_differ::ColumnDiffer<'_>,
-        plan: &mut DestructiveCheckPlan,
-    ) {
-        if !differ.all_changes().arity_changed()
-            || !differ.next.tpe.arity.is_required()
-            || differ.next.default.is_some()
-        {
-            return;
-        }
-
-        let typed_unexecutable = unexecutable_step_check::UnexecutableStepCheck::MadeOptionalFieldRequired {
-            table: table_name.to_owned(),
-            column: differ.previous.name.clone(),
-        };
-
-        plan.push_unexecutable(typed_unexecutable);
-    }
-
+    #[tracing::instrument(skip(self, steps, before), target = "SqlDestructiveChangeChecker::check")]
     async fn check_impl(
         &self,
         steps: &[SqlMigrationStep],
         before: &SqlSchema,
+        after: &SqlSchema,
     ) -> SqlResult<DestructiveChangeDiagnostics> {
         let mut plan = DestructiveCheckPlan::new();
 
@@ -227,19 +129,40 @@ impl SqlDestructiveChangesChecker<'_> {
                 SqlMigrationStep::AlterTable(alter_table) => {
                     // The table in alter_table is the updated table, but we want to
                     // check against the current state of the table.
-                    let before_table = before.get_table(&alter_table.table.name);
+                    let before_table = before.table_ref(&alter_table.table.name);
+                    let after_table = after.table_ref(&alter_table.table.name);
 
-                    if let Some(before_table) = before_table {
+                    if let (Some(before_table), Some(after_table)) = (before_table, after_table) {
                         for change in &alter_table.changes {
                             match *change {
                                 TableChange::DropColumn(ref drop_column) => {
-                                    self.check_column_drop(drop_column, before_table, &mut plan)
+                                    self.check_column_drop(drop_column, &before_table.table, &mut plan)
                                 }
                                 TableChange::AlterColumn(ref alter_column) => {
-                                    self.check_alter_column(alter_column, before_table, &mut plan)
+                                    let previous_column = before_table
+                                        .column(&alter_column.name)
+                                        .expect("unsupported column renaming");
+                                    let next_column = after_table
+                                        .column(&alter_column.name)
+                                        .expect("unsupported column renaming");
+
+                                    let diffing_options = DiffingOptions::from_database_info(self.database_info());
+
+                                    let differ = ColumnDiffer {
+                                        diffing_options: &diffing_options,
+                                        previous: previous_column,
+                                        next: next_column,
+                                    };
+
+                                    self.check_alter_column(alter_column, differ, &mut plan)
                                 }
                                 TableChange::AddColumn(ref add_column) => {
-                                    self.check_add_column(add_column, before_table, &mut plan)
+                                    self.check_add_column(add_column, &before_table.table, &mut plan)
+                                }
+                                TableChange::DropPrimaryKey { .. } => {
+                                    plan.push_warning(SqlMigrationWarningCheck::PrimaryKeyChange {
+                                        table: alter_table.table.name.clone(),
+                                    })
                                 }
                                 _ => (),
                             }
@@ -250,11 +173,6 @@ impl SqlDestructiveChangesChecker<'_> {
                 // not, return a warning.
                 SqlMigrationStep::DropTable(DropTable { name }) => {
                     self.check_table_drop(name, &mut plan);
-                }
-                SqlMigrationStep::DropTables(DropTables { names }) => {
-                    for name in names {
-                        self.check_table_drop(name, &mut plan);
-                    }
                 }
                 // SqlMigrationStep::CreateIndex(CreateIndex { table, index }) if index.is_unique() => todo!(),
                 // do nothing
@@ -273,16 +191,23 @@ impl SqlDestructiveChangesChecker<'_> {
 
 #[async_trait::async_trait]
 impl DestructiveChangesChecker<SqlMigration> for SqlDestructiveChangesChecker<'_> {
-    #[tracing::instrument(skip(self, database_migration), target = "SqlDestructiveChangeChecker::check")]
     async fn check(&self, database_migration: &SqlMigration) -> ConnectorResult<DestructiveChangeDiagnostics> {
-        self.check_impl(&database_migration.original_steps, &database_migration.before)
-            .await
-            .map_err(|sql_error| sql_error.into_connector_error(&self.connection_info()))
+        self.check_impl(
+            &database_migration.original_steps,
+            &database_migration.before,
+            &database_migration.after,
+        )
+        .await
+        .map_err(|sql_error| sql_error.into_connector_error(&self.connection_info()))
     }
 
     async fn check_unapply(&self, database_migration: &SqlMigration) -> ConnectorResult<DestructiveChangeDiagnostics> {
-        self.check_impl(&database_migration.rollback, &database_migration.after)
-            .await
-            .map_err(|sql_error| sql_error.into_connector_error(&self.connection_info()))
+        self.check_impl(
+            &database_migration.rollback,
+            &database_migration.after,
+            &database_migration.before,
+        )
+        .await
+        .map_err(|sql_error| sql_error.into_connector_error(&self.connection_info()))
     }
 }
