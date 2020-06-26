@@ -118,6 +118,24 @@ fn must_error_for_empty_urls() {
 }
 
 #[test]
+fn must_error_for_empty_provider_arrays() {
+    let schema = r#"
+        datasource myds {
+            provider = []
+            url = "postgres://"
+        }
+    "#;
+
+    let config = datamodel::parse_configuration(schema);
+    assert!(config.is_err());
+    let errors = config.err().expect("This must error");
+    errors.assert_is(DatamodelError::new_validation_error(
+        "This line is not a valid definition within a datasource.",
+        Span::new(39, 53),
+    ));
+}
+
+#[test]
 #[serial]
 fn must_error_for_empty_urls_derived_from_env_vars() {
     std::env::set_var("DB_URL", "  ");
