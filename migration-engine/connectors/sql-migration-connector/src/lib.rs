@@ -1,4 +1,5 @@
 #![deny(rust_2018_idioms)]
+#![deny(unsafe_code)]
 
 mod component;
 mod database_info;
