@@ -156,6 +156,8 @@ impl SourceLoader {
                     "mysql" => Some(Box::new(ExampleConnector::mysql())),
                     "postgres" | "postgresql" => Some(Box::new(ExampleConnector::postgres())),
                     "sqlite" => Some(Box::new(ExampleConnector::sqlite())),
+                    #[cfg(feature = "mssql")]
+                    "sqlserver" => Some(Box::new(ExampleConnector::mssql())),
                     _ => None, // if a connector is not known this is handled by the following code
                 };
                 connector
@@ -174,5 +176,7 @@ fn get_builtin_datasource_providers() -> Vec<Box<dyn DatasourceProvider>> {
         Box::new(MySqlDatasourceProvider::new()),
         Box::new(PostgresDatasourceProvider::new()),
         Box::new(SqliteDatasourceProvider::new()),
+        #[cfg(feature = "mssql")]
+        Box::new(MsSqlSourceDefinition::new()),
     ]
 }

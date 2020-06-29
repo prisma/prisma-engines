@@ -6,6 +6,7 @@ pub const SQLITE_SOURCE_NAME: &str = "sqlite";
 pub const POSTGRES_SOURCE_NAME: &str = "postgresql";
 const POSTGRES_SOURCE_NAME_HEROKU: &str = "postgres";
 pub const MYSQL_SOURCE_NAME: &str = "mysql";
+pub const MSSQL_SOURCE_NAME: &str = "sqlserver";
 
 pub struct SqliteDatasourceProvider {}
 
@@ -116,5 +117,36 @@ fn validate_url(name: &str, expected_protocol: &str, url: StringFromEnvVar) -> R
             "The URL for datasource `{}` must start with the protocol `{}`.",
             name, expected_protocol
         ))
+    }
+}
+
+pub struct MsSqlDatasourceProvider {}
+impl MsSqlDatasourceProvider {
+    pub fn new() -> Self {
+        Self {}
+    }
+}
+
+impl DatasourceProvider for MsSqlDatasourceProvider {
+    fn is_provider(&self, provider: &str) -> bool {
+        provider == MSSQL_SOURCE_NAME
+    }
+
+    fn create(
+        &self,
+        name: &str,
+        provider: Vec<String>,
+        url: StringFromEnvVar,
+        documentation: &Option<String>,
+        connector: Box<dyn Connector>,
+    ) -> Result<Datasource, String> {
+        Ok(Datasource {
+            name: String::from(name),
+            provider,
+            active_provider: MSSQL_SOURCE_NAME.to_owned(),
+            url: validate_url(name, "sqlserver://", url)?,
+            documentation: documentation.clone(),
+            connector,
+        })
     }
 }
