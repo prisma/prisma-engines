@@ -27,7 +27,7 @@ pub async fn migration_api(datamodel: &str) -> CoreResult<Arc<dyn api::GenericAp
         .first()
         .ok_or_else(|| CommandError::Generic(anyhow::anyhow!("There is no datasource in the schema.")))?;
 
-    let connector = match source.connector_type() {
+    let connector = match &source.active_provider {
         #[cfg(feature = "sql")]
         provider if POSTGRES_SOURCE_NAME == provider => {
             let mut u = url::Url::parse(&source.url().value).unwrap();
@@ -51,7 +51,7 @@ pub async fn migration_api(datamodel: &str) -> CoreResult<Arc<dyn api::GenericAp
             SqlMigrationConnector::new(u.as_str()).await?
         }
         #[cfg(feature = "sql")]
-        provider if [MYSQL_SOURCE_NAME, SQLITE_SOURCE_NAME].contains(&provider) => {
+        provider if [MYSQL_SOURCE_NAME, SQLITE_SOURCE_NAME].contains(&provider.as_str()) => {
             SqlMigrationConnector::new(&source.url().value).await?
         }
         x => unimplemented!("Connector {} is not supported yet", x),
@@ -70,8 +70,8 @@ pub async fn create_database(datamodel: &str) -> CoreResult<String> {
         .first()
         .ok_or_else(|| CommandError::Generic(anyhow::anyhow!("There is no datasource in the schema.")))?;
 
-    match source.connector_type() {
-        provider if [MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME].contains(&provider) => {
+    match &source.active_provider {
+        provider if [MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME].contains(&provider.as_str()) => {
             Ok(SqlMigrationConnector::create_database(&source.url().value).await?)
         }
         x => unimplemented!("Connector {} is not supported yet", x),

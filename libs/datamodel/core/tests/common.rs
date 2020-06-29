@@ -50,6 +50,7 @@ pub trait DatamodelAsserts {
 
 pub trait ErrorAsserts {
     fn assert_is(&self, error: DatamodelError) -> &Self;
+    fn assert_is_message(&self, msg: &str) -> &Self;
     fn assert_is_at(&self, index: usize, error: DatamodelError) -> &Self;
     fn assert_length(&self, length: usize) -> &Self;
 }
@@ -264,6 +265,16 @@ impl ErrorAsserts for ErrorCollection {
     fn assert_is(&self, error: DatamodelError) -> &Self {
         if self.errors.len() == 1 {
             assert_eq!(self.errors[0], error);
+        } else {
+            panic!("Expected exactly one validation error. Errors are: {:?}", &self);
+        }
+
+        self
+    }
+
+    fn assert_is_message(&self, msg: &str) -> &Self {
+        if self.errors.len() == 1 {
+            assert_eq!(self.errors[0].description(), msg);
         } else {
             panic!("Expected exactly one validation error. Errors are: {:?}", &self);
         }

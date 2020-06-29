@@ -9,7 +9,7 @@ use crate::{
 ///
 /// When validating, we check if the datamodel is valid, and generate errors otherwise.
 pub struct Validator<'a> {
-    source: Option<&'a Box<dyn configuration::Source + Send + Sync>>,
+    source: Option<&'a configuration::Datasource>,
 }
 
 /// State error message. Seeing this error means something went really wrong internally. It's the datamodel equivalent of a bluescreen.
@@ -20,7 +20,7 @@ const PRISMA_FORMAT_HINT: &str = "You can run `prisma format` to fix this automa
 
 impl<'a> Validator<'a> {
     /// Creates a new instance, with all builtin directives registered.
-    pub fn new(source: Option<&'a Box<dyn configuration::Source + Send + Sync>>) -> Validator {
+    pub fn new(source: Option<&'a configuration::Datasource>) -> Validator {
         Self { source }
     }
 
@@ -162,7 +162,7 @@ impl<'a> Validator<'a> {
 
         // TODO: this is really ugly
         let scalar_lists_are_supported = match self.source {
-            Some(source) => source.connector().supports_scalar_lists(),
+            Some(source) => source.combined_connector.supports_scalar_lists(),
             None => false,
         };
 
@@ -202,7 +202,7 @@ impl<'a> Validator<'a> {
             if let Some(dml::ScalarType::Json) = field.field_type.scalar_type() {
                 // TODO: this is really ugly
                 let supports_json_type = match self.source {
-                    Some(source) => source.connector().supports_json(),
+                    Some(source) => source.combined_connector.supports_json(),
                     None => false,
                 };
                 if !supports_json_type {
@@ -533,7 +533,7 @@ impl<'a> Validator<'a> {
                     };
 
                     let must_reference_unique_criteria = match self.source {
-                        Some(source) => !source.connector().supports_relations_over_non_unique_criteria(),
+                        Some(source) => !source.combined_connector.supports_relations_over_non_unique_criteria(),
                         None => true,
                     };
 

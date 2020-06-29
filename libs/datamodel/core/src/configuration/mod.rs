@@ -8,7 +8,7 @@ use serde::Serialize;
 
 pub struct Configuration {
     pub generators: Vec<Generator>,
-    pub datasources: Vec<Box<dyn Source + Send + Sync>>,
+    pub datasources: Vec<Datasource>,
 }
 
 #[serde(rename_all = "camelCase")]
@@ -16,4 +16,13 @@ pub struct Configuration {
 pub struct StringFromEnvVar {
     pub from_env_var: Option<String>,
     pub value: String,
+}
+
+impl StringFromEnvVar {
+    pub fn plain_value(value: String) -> StringFromEnvVar {
+        StringFromEnvVar {
+            from_env_var: None,
+            value,
+        }
+    }
 }

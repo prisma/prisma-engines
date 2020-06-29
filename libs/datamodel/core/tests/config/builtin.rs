@@ -32,7 +32,8 @@ fn serialize_builtin_sources_to_dmmf() {
     let expected = r#"[
   {
     "name": "pg1",
-    "connectorType": "postgresql",
+    "provider": ["postgresql"],
+    "activeProvider": "postgresql",
     "url": {
       "fromEnvVar": null,
       "value": "postgresql://localhost/postgres1"
@@ -40,7 +41,8 @@ fn serialize_builtin_sources_to_dmmf() {
   },
   {
     "name": "pg2",
-    "connectorType": "postgresql",
+    "provider": ["postgresql"],
+    "activeProvider": "postgresql",
     "url": {
       "fromEnvVar": "pg2",
       "value": "postgresql://localhost/postgres2"
@@ -48,7 +50,8 @@ fn serialize_builtin_sources_to_dmmf() {
   },
   {
     "name": "sqlite1",
-    "connectorType": "sqlite",
+    "provider": ["sqlite"],
+    "activeProvider": "sqlite",
     "url": {
       "fromEnvVar": null,
       "value": "sqlite://file.db"
@@ -56,7 +59,8 @@ fn serialize_builtin_sources_to_dmmf() {
   },
   {
     "name": "mysql1",
-    "connectorType": "mysql",
+    "provider": ["mysql"],
+    "activeProvider": "mysql",
     "url": {
       "fromEnvVar": null,
       "value": "mysql://localhost"
@@ -80,7 +84,7 @@ fn fail_to_load_sources_for_invalid_source() {
     let res = datamodel::parse_configuration(invalid_datamodel);
 
     if let Err(error) = res {
-        error.assert_is(DatamodelError::SourceNotKnownError {
+        error.assert_is(DatamodelError::DatasourceProviderNotKnownError {
             source_name: String::from("AStrangeHalfMongoDatabase"),
             span: datamodel::ast::Span::new(49, 76),
         });
