@@ -1,4 +1,4 @@
-use super::{DatasourceProvider, SimpleSource, Source};
+use super::{Datasource, DatasourceProvider};
 use crate::StringFromEnvVar;
 use datamodel_connector::Connector;
 
@@ -26,16 +26,16 @@ impl DatasourceProvider for SqliteDatasourceProvider {
         url: StringFromEnvVar,
         documentation: &Option<String>,
         connector: Box<dyn Connector>,
-    ) -> Result<Box<dyn Source>, String> {
+    ) -> Result<Datasource, String> {
         let validation_with_file_protocol = validate_url(name, "file:", url.clone());
         let validation_with_sqlite_protocol = validate_url(name, "sqlite://", url);
-        Ok(Box::new(SimpleSource {
+        Ok(Datasource {
             name: String::from(name),
             connector_type: SQLITE_SOURCE_NAME.to_owned(),
             url: validation_with_file_protocol.or(validation_with_sqlite_protocol)?,
             documentation: documentation.clone(),
             connector,
-        }))
+        })
     }
 }
 
@@ -58,17 +58,17 @@ impl DatasourceProvider for PostgresDatasourceProvider {
         url: StringFromEnvVar,
         documentation: &Option<String>,
         connector: Box<dyn Connector>,
-    ) -> Result<Box<dyn Source>, String> {
+    ) -> Result<Datasource, String> {
         let high_prio_validation = validate_url(name, "postgresql://", url.clone());
         let low_prio_validation = validate_url(name, "postgres://", url); // for postgres urls on heroku -> https://devcenter.heroku.com/articles/heroku-postgresql#spring-java
 
-        Ok(Box::new(SimpleSource {
+        Ok(Datasource {
             name: String::from(name),
             connector_type: POSTGRES_SOURCE_NAME.to_owned(),
             url: low_prio_validation.or(high_prio_validation)?,
             documentation: documentation.clone(),
             connector,
-        }))
+        })
     }
 }
 
@@ -91,14 +91,14 @@ impl DatasourceProvider for MySqlDatasourceProvider {
         url: StringFromEnvVar,
         documentation: &Option<String>,
         connector: Box<dyn Connector>,
-    ) -> Result<Box<dyn Source>, String> {
-        Ok(Box::new(SimpleSource {
+    ) -> Result<Datasource, String> {
+        Ok(Datasource {
             name: String::from(name),
             connector_type: MYSQL_SOURCE_NAME.to_owned(),
             url: validate_url(name, "mysql://", url)?,
             documentation: documentation.clone(),
             connector,
-        }))
+        })
     }
 }
 

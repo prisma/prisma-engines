@@ -5,7 +5,7 @@ use connector_interface::{
     error::{ConnectorError, ErrorKind},
     Connection, Connector,
 };
-use datamodel::Source;
+use datamodel::Datasource;
 use quaint::{pooled::Quaint, prelude::ConnectionInfo};
 use std::time::Duration;
 
@@ -16,7 +16,7 @@ pub struct PostgreSql {
 
 #[async_trait]
 impl FromSource for PostgreSql {
-    async fn from_source(source: &dyn Source) -> connector_interface::Result<Self> {
+    async fn from_source(source: &Datasource) -> connector_interface::Result<Self> {
         let connection_info = ConnectionInfo::from_url(&source.url().value)
             .map_err(|err| ConnectorError::from_kind(ErrorKind::ConnectionError(err.into())))?;
 

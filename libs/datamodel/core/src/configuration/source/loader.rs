@@ -1,12 +1,12 @@
 use super::{
     builtin_datasource_providers::{MySqlDatasourceProvider, PostgresDatasourceProvider, SqliteDatasourceProvider},
-    traits::{DatasourceProvider, Source},
+    datasource_provider::DatasourceProvider,
 };
-use crate::ast;
 use crate::common::arguments::Arguments;
 use crate::common::value_validator::ValueListValidator;
 use crate::error::{DatamodelError, ErrorCollection};
 use crate::StringFromEnvVar;
+use crate::{ast, Datasource};
 use datamodel_connector::{Connector, ExampleConnector, MultiProviderConnector};
 
 /// Helper struct to load and validate source configuration blocks.
@@ -28,7 +28,7 @@ impl SourceLoader {
         &self,
         ast_schema: &ast::SchemaAst,
         ignore_datasource_urls: bool,
-    ) -> Result<Vec<Box<dyn Source>>, ErrorCollection> {
+    ) -> Result<Vec<Datasource>, ErrorCollection> {
         let mut sources = vec![];
         let mut errors = ErrorCollection::new();
 
@@ -55,7 +55,7 @@ impl SourceLoader {
         &self,
         ast_source: &ast::SourceConfig,
         ignore_datasource_urls: bool,
-    ) -> Result<Box<dyn Source>, DatamodelError> {
+    ) -> Result<Datasource, DatamodelError> {
         let source_name = &ast_source.name.name;
         let mut args = Arguments::new(&ast_source.properties, ast_source.span);
 

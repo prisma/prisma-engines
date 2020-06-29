@@ -8,7 +8,7 @@ use serde::Serialize;
 
 pub struct Configuration {
     pub generators: Vec<Generator>,
-    pub datasources: Vec<Box<dyn Source>>,
+    pub datasources: Vec<Datasource>,
 }
 
 #[serde(rename_all = "camelCase")]
