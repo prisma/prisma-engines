@@ -5,11 +5,9 @@ pub mod scalars;
 
 mod builtin_connectors;
 mod declarative_connector;
-mod multi_provider_connector;
 
 pub use builtin_connectors::BuiltinConnectors;
 pub use declarative_connector::DeclarativeConnector;
-pub use multi_provider_connector::MultiProviderConnector;
 
 pub trait Connector: Send + Sync {
     fn capabilities(&self) -> &Vec<ConnectorCapability>;

@@ -7,7 +7,7 @@ use crate::common::value_validator::ValueListValidator;
 use crate::error::{DatamodelError, ErrorCollection};
 use crate::StringFromEnvVar;
 use crate::{ast, Datasource};
-use datamodel_connector::{Connector, MultiProviderConnector};
+use datamodel_connector::{BuiltinConnectors, Connector};
 
 /// Helper struct to load and validate source configuration blocks.
 pub struct SourceLoader {
@@ -135,7 +135,7 @@ impl SourceLoader {
 
         let combined_connector: Box<dyn Connector> = {
             let connectors = all_datasource_providers.iter().map(|sd| sd.connector()).collect();
-            Box::new(MultiProviderConnector::new(connectors))
+            BuiltinConnectors::combined(connectors)
         };
 
         // The first provider that can handle the URL is used to construct the Datasource.

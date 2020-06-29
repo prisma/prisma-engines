@@ -1,9 +1,30 @@
-use super::{declarative_connector::*, ScalarType};
+use super::{declarative_connector::*, Connector, ScalarType};
 use crate::ConnectorCapability;
 
 pub struct BuiltinConnectors {}
 
 impl BuiltinConnectors {
+    // returns a connector representing the intersection of all provided connectors
+    pub fn combined(connectors: Vec<Box<dyn Connector>>) -> Box<dyn Connector> {
+        // the standard library does not seem to offer an elegant way to do this. Don't want to pull in a dependency for this.
+        let mut combined_capabilities = vec![];
+        for connector in &connectors {
+            for capability in connector.capabilities() {
+                let supported_by_all_connectors = connectors.iter().all(|c| c.has_capability(*capability));
+
+                if supported_by_all_connectors {
+                    combined_capabilities.push(*capability);
+                }
+            }
+        }
+
+        Box::new(DeclarativeConnector {
+            type_aliases: Vec::new(),
+            field_type_constructors: Vec::new(),
+            capabilities: combined_capabilities,
+        })
+    }
+
     pub fn sqlite() -> DeclarativeConnector {
         DeclarativeConnector {
             type_aliases: vec![],
