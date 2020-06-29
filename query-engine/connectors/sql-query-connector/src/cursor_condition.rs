@@ -35,25 +35,25 @@ pub fn build(query_arguments: &QueryArguments, model: ModelRef) -> ConditionTree
                     .clone()
                     .equals(select_query.clone())
                     .and(cursor_row.clone().less_than_or_equals(values))
-                    .or(order_row.less_than_or_equals(select_query)),
+                    .or(order_row.less_than(select_query)),
 
                 (Some(t), SortOrder::Descending) if t < 0 => order_row
                     .clone()
                     .equals(select_query.clone())
                     .and(cursor_row.clone().less_than_or_equals(values))
-                    .or(order_row.greater_than_or_equals(select_query)),
+                    .or(order_row.greater_than(select_query)),
 
                 (_, SortOrder::Ascending) => order_row
                     .clone()
                     .equals(select_query.clone())
                     .and(cursor_row.clone().greater_than_or_equals(values))
-                    .or(order_row.greater_than_or_equals(select_query)),
+                    .or(order_row.greater_than(select_query)),
 
                 (_, SortOrder::Descending) => order_row
                     .clone()
                     .equals(select_query.clone())
                     .and(cursor_row.clone().greater_than_or_equals(values))
-                    .or(order_row.less_than_or_equals(select_query)),
+                    .or(order_row.less_than(select_query)),
             };
 
             ConditionTree::single(compare)
