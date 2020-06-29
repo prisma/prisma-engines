@@ -1,9 +1,9 @@
 use super::{declarative_connector::*, ScalarType};
 use crate::ConnectorCapability;
 
-pub struct ExampleConnector {}
+pub struct BuiltinConnectors {}
 
-impl ExampleConnector {
+impl BuiltinConnectors {
     pub fn sqlite() -> DeclarativeConnector {
         DeclarativeConnector {
             type_aliases: vec![],

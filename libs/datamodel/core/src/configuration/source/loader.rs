@@ -7,7 +7,7 @@ use crate::common::value_validator::ValueListValidator;
 use crate::error::{DatamodelError, ErrorCollection};
 use crate::StringFromEnvVar;
 use crate::{ast, Datasource};
-use datamodel_connector::{Connector, ExampleConnector, MultiProviderConnector};
+use datamodel_connector::{BuiltinConnectors, Connector, MultiProviderConnector};
 
 /// Helper struct to load and validate source configuration blocks.
 pub struct SourceLoader {
@@ -153,11 +153,11 @@ impl SourceLoader {
             .iter()
             .filter_map(|provider| {
                 let connector: Option<Box<dyn Connector>> = match provider.as_str() {
-                    "mysql" => Some(Box::new(ExampleConnector::mysql())),
-                    "postgres" | "postgresql" => Some(Box::new(ExampleConnector::postgres())),
-                    "sqlite" => Some(Box::new(ExampleConnector::sqlite())),
+                    "mysql" => Some(Box::new(BuiltinConnectors::mysql())),
+                    "postgres" | "postgresql" => Some(Box::new(BuiltinConnectors::postgres())),
+                    "sqlite" => Some(Box::new(BuiltinConnectors::sqlite())),
                     #[cfg(feature = "mssql")]
-                    "sqlserver" => Some(Box::new(ExampleConnector::mssql())),
+                    "sqlserver" => Some(Box::new(BuiltinConnectors::mssql())),
                     _ => None, // if a connector is not known this is handled by the following code
                 };
                 connector

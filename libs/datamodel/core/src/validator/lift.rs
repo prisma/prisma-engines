@@ -6,7 +6,7 @@ use crate::{
     configuration, dml,
     error::{DatamodelError, ErrorCollection},
 };
-use datamodel_connector::{Connector, ExampleConnector};
+use datamodel_connector::{BuiltinConnectors, Connector};
 
 /// Helper for lifting a datamodel.
 ///
@@ -200,7 +200,7 @@ impl<'a> LiftAstToDml<'a> {
 
         if let Ok(scalar_type) = ScalarType::from_str(type_name) {
             if USE_CONNECTORS_FOR_CUSTOM_TYPES {
-                let pg_connector = ExampleConnector::postgres();
+                let pg_connector = BuiltinConnectors::postgres();
                 let args = vec![]; // TODO: figure out args
                 let pg_type_specification = ast_field
                     .directives
@@ -261,7 +261,7 @@ impl<'a> LiftAstToDml<'a> {
             attrs.append(&mut custom_type.directives.clone());
             Ok((field_type, attrs))
         } else if USE_CONNECTORS_FOR_CUSTOM_TYPES {
-            let pg_connector = ExampleConnector::postgres();
+            let pg_connector = BuiltinConnectors::postgres();
             let args = vec![]; // TODO: figure out args
 
             if let Some(x) = pg_connector.calculate_type(&ast_field.field_type.name, args) {

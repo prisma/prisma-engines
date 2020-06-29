@@ -3,12 +3,12 @@ use crate::scalars::ScalarType;
 pub mod error;
 pub mod scalars;
 
+mod builtin_connectors;
 mod declarative_connector;
-mod example_connector;
 mod multi_provider_connector;
 
+pub use builtin_connectors::BuiltinConnectors;
 pub use declarative_connector::DeclarativeConnector;
-pub use example_connector::ExampleConnector;
 pub use multi_provider_connector::MultiProviderConnector;
 
 pub trait Connector: Send + Sync {
