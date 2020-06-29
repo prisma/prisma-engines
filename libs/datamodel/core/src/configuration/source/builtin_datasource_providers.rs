@@ -23,6 +23,7 @@ impl DatasourceProvider for SqliteDatasourceProvider {
     fn create(
         &self,
         name: &str,
+        provider: Vec<String>,
         url: StringFromEnvVar,
         documentation: &Option<String>,
         connector: Box<dyn Connector>,
@@ -31,7 +32,8 @@ impl DatasourceProvider for SqliteDatasourceProvider {
         let validation_with_sqlite_protocol = validate_url(name, "sqlite://", url);
         Ok(Datasource {
             name: String::from(name),
-            connector_type: SQLITE_SOURCE_NAME.to_owned(),
+            provider,
+            active_provider: SQLITE_SOURCE_NAME.to_owned(),
             url: validation_with_file_protocol.or(validation_with_sqlite_protocol)?,
             documentation: documentation.clone(),
             connector,
@@ -55,6 +57,7 @@ impl DatasourceProvider for PostgresDatasourceProvider {
     fn create(
         &self,
         name: &str,
+        provider: Vec<String>,
         url: StringFromEnvVar,
         documentation: &Option<String>,
         connector: Box<dyn Connector>,
@@ -64,7 +67,8 @@ impl DatasourceProvider for PostgresDatasourceProvider {
 
         Ok(Datasource {
             name: String::from(name),
-            connector_type: POSTGRES_SOURCE_NAME.to_owned(),
+            provider,
+            active_provider: POSTGRES_SOURCE_NAME.to_owned(),
             url: low_prio_validation.or(high_prio_validation)?,
             documentation: documentation.clone(),
             connector,
@@ -88,13 +92,15 @@ impl DatasourceProvider for MySqlDatasourceProvider {
     fn create(
         &self,
         name: &str,
+        provider: Vec<String>,
         url: StringFromEnvVar,
         documentation: &Option<String>,
         connector: Box<dyn Connector>,
     ) -> Result<Datasource, String> {
         Ok(Datasource {
             name: String::from(name),
-            connector_type: MYSQL_SOURCE_NAME.to_owned(),
+            provider,
+            active_provider: MYSQL_SOURCE_NAME.to_owned(),
             url: validate_url(name, "mysql://", url)?,
             documentation: documentation.clone(),
             connector,

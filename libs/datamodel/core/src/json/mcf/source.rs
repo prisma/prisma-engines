@@ -5,7 +5,8 @@ use serde_json;
 #[derive(Debug, serde::Serialize)]
 pub struct SourceConfig {
     pub name: String,
-    pub connector_type: String,
+    pub provider: Vec<String>,
+    pub active_provider: String,
     pub url: StringFromEnvVar,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub documentation: Option<String>,
@@ -33,9 +34,10 @@ fn sources_to_json_structs(sources: &[configuration::Datasource]) -> Vec<SourceC
 
 fn source_to_json_struct(source: &configuration::Datasource) -> SourceConfig {
     SourceConfig {
-        name: source.name().clone(),
-        connector_type: String::from(source.connector_type()),
+        name: source.name.clone(),
+        provider: source.provider.clone(),
+        active_provider: source.active_provider.to_string(),
         url: source.url().clone(),
-        documentation: source.documentation().clone(),
+        documentation: source.documentation.clone(),
     }
 }

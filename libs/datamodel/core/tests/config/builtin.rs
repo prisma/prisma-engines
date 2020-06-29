@@ -32,7 +32,8 @@ fn serialize_builtin_sources_to_dmmf() {
     let expected = r#"[
   {
     "name": "pg1",
-    "connectorType": "postgresql",
+    "provider": ["postgresql"],
+    "activeProvider": "postgresql",
     "url": {
       "fromEnvVar": null,
       "value": "postgresql://localhost/postgres1"
@@ -40,7 +41,8 @@ fn serialize_builtin_sources_to_dmmf() {
   },
   {
     "name": "pg2",
-    "connectorType": "postgresql",
+    "provider": ["postgresql"],
+    "activeProvider": "postgresql",
     "url": {
       "fromEnvVar": "pg2",
       "value": "postgresql://localhost/postgres2"
@@ -48,7 +50,8 @@ fn serialize_builtin_sources_to_dmmf() {
   },
   {
     "name": "sqlite1",
-    "connectorType": "sqlite",
+    "provider": ["sqlite"],
+    "activeProvider": "sqlite",
     "url": {
       "fromEnvVar": null,
       "value": "sqlite://file.db"
@@ -56,7 +59,8 @@ fn serialize_builtin_sources_to_dmmf() {
   },
   {
     "name": "mysql1",
-    "connectorType": "mysql",
+    "provider": ["mysql"],
+    "activeProvider": "mysql",
     "url": {
       "fromEnvVar": null,
       "value": "mysql://localhost"

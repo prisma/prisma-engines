@@ -3,9 +3,12 @@ use datamodel::{ast::Span, error::DatamodelError};
 use pretty_assertions::assert_eq;
 use serial_test::serial;
 
-const DATAMODEL: &str = r#"
+#[test]
+#[serial]
+fn serialize_sources_to_dmmf() {
+    let dml = r#"
 datasource db1 {
-    provider = "postgresql"
+    provider = ["sqlite", "postgresql"]
     url = env("URL_CUSTOM_1")
 }
 
@@ -29,17 +32,15 @@ model Post {
 }
 "#;
 
-#[test]
-#[serial]
-fn serialize_sources_to_dmmf() {
     std::env::set_var("URL_CUSTOM_1", "postgresql://localhost");
-    let config = datamodel::parse_configuration(DATAMODEL).unwrap();
+    let config = datamodel::parse_configuration(dml).unwrap();
     let rendered = datamodel::json::mcf::render_sources_to_json(&config.datasources);
 
     let expected = r#"[
   {
     "name": "db1",
-    "connectorType": "postgresql",
+    "provider": ["sqlite", "postgresql"],
+    "activeProvider": "postgresql",
     "url": {
         "fromEnvVar": "URL_CUSTOM_1",
         "value": "postgresql://localhost"       
@@ -47,7 +48,8 @@ fn serialize_sources_to_dmmf() {
   },
   {
     "name": "db2",
-    "connectorType": "mysql",
+    "provider": ["mysql"],
+    "activeProvider": "mysql",
     "url": {
         "fromEnvVar": null,
         "value": "mysql://localhost"      
@@ -225,7 +227,8 @@ fn new_lines_in_source_must_work() {
     let expected = r#"[
         {
           "name": "ds",
-          "connectorType": "postgresql",
+          "provider": ["postgresql"],
+          "activeProvider": "postgresql",
           "url": {
               "fromEnvVar": null,
               "value": "postgresql://localhost"       

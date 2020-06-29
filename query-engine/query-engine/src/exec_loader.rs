@@ -16,7 +16,7 @@ use sql_connector::*;
 use datamodel::configuration::MSSQL_SOURCE_NAME;
 
 pub async fn load(source: &Datasource) -> PrismaResult<(String, Box<dyn QueryExecutor + Send + Sync + 'static>)> {
-    match source.connector_type() {
+    match source.active_provider.as_str() {
         #[cfg(feature = "sql")]
         SQLITE_SOURCE_NAME => sqlite(source).await,
 

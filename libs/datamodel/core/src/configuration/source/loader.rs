@@ -128,6 +128,7 @@ impl SourceLoader {
             .map(|sd| {
                 sd.create(
                     source_name,
+                    providers.clone(),
                     url.clone(),
                     &documentation,
                     self.combined_connector(&providers),

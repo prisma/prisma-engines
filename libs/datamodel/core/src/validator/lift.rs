@@ -90,7 +90,7 @@ impl<'a> LiftAstToDml<'a> {
         let mut errors = ErrorCollection::new();
 
         let supports_enums = match self.source {
-            Some(source) => source.connector().supports_enums(),
+            Some(source) => source.connector.supports_enums(),
             None => true,
         };
         if !supports_enums {

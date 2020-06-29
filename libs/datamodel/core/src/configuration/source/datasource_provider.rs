@@ -9,6 +9,7 @@ pub trait DatasourceProvider {
     fn create(
         &self,
         name: &str,
+        provider: Vec<String>,
         url: StringFromEnvVar,
         documentation: &Option<String>,
         connector: Box<dyn Connector>,
