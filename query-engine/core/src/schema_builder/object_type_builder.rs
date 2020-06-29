@@ -229,12 +229,37 @@ impl<'a> ObjectTypeBuilder<'a> {
         return_cached!(self.get_cache(), &name);
 
         let object = ObjectTypeStrongRef::new(ObjectType::new(&name, Some(ModelRef::clone(model))));
-        let arguments = self.many_records_arguments(model);
-        let fields = vec![field("count", arguments, OutputType::int(), None)];
+        let fields = vec![
+            field("count", vec![], OutputType::int(), None),
+            field("avg", vec![], self.wrap_opt_object(self.avg_object_type(&model)), None),
+            field("sum", vec![], self.wrap_opt_object(self.sum_object_type(&model)), None),
+            field("min", vec![], self.wrap_opt_object(self.min_object_type(&model)), None),
+            field("max", vec![], self.wrap_opt_object(self.max_object_type(&model)), None),
+        ];
 
         object.set_fields(fields);
         self.cache(name, ObjectTypeStrongRef::clone(&object));
 
         ObjectTypeStrongRef::downgrade(&object)
+    }
+
+    fn avg_object_type(&self, model: &ModelRef) -> ObjectTypeRef {
+        todo!()
+    }
+
+    fn max_object_type(&self, model: &ModelRef) -> ObjectTypeRef {
+        todo!()
+    }
+
+    fn min_object_type(&self, model: &ModelRef) -> ObjectTypeRef {
+        todo!()
+    }
+
+    fn sum_object_type(&self, model: &ModelRef) -> ObjectTypeRef {
+        todo!()
+    }
+
+    fn wrap_opt_object(&self, o: ObjectTypeRef) -> OutputType {
+        OutputType::opt(OutputType::object(o))
     }
 }
