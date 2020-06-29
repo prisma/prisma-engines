@@ -162,7 +162,7 @@ impl<'a> Validator<'a> {
 
         // TODO: this is really ugly
         let scalar_lists_are_supported = match self.source {
-            Some(source) => source.connector.supports_scalar_lists(),
+            Some(source) => source.combined_connector.supports_scalar_lists(),
             None => false,
         };
 
@@ -202,7 +202,7 @@ impl<'a> Validator<'a> {
             if let Some(dml::ScalarType::Json) = field.field_type.scalar_type() {
                 // TODO: this is really ugly
                 let supports_json_type = match self.source {
-                    Some(source) => source.connector.supports_json(),
+                    Some(source) => source.combined_connector.supports_json(),
                     None => false,
                 };
                 if !supports_json_type {
@@ -533,7 +533,7 @@ impl<'a> Validator<'a> {
                     };
 
                     let must_reference_unique_criteria = match self.source {
-                        Some(source) => !source.connector.supports_relations_over_non_unique_criteria(),
+                        Some(source) => !source.combined_connector.supports_relations_over_non_unique_criteria(),
                         None => true,
                     };
 

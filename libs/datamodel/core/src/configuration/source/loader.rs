@@ -7,7 +7,7 @@ use crate::common::value_validator::ValueListValidator;
 use crate::error::{DatamodelError, ErrorCollection};
 use crate::StringFromEnvVar;
 use crate::{ast, Datasource};
-use datamodel_connector::{BuiltinConnectors, Connector, MultiProviderConnector};
+use datamodel_connector::{Connector, MultiProviderConnector};
 
 /// Helper struct to load and validate source configuration blocks.
 pub struct SourceLoader {
@@ -111,59 +111,50 @@ impl SourceLoader {
             value: url,
         };
 
-        let datasource_providers: Vec<_> = providers
+        let all_datasource_providers: Vec<_> = providers
             .iter()
             .filter_map(|provider| self.get_datasource_provider(&provider))
             .collect();
 
-        if datasource_providers.is_empty() {
+        if all_datasource_providers.is_empty() {
             return Err(DatamodelError::new_datasource_provider_not_known_error(
                 &providers.join(","),
                 provider_arg.span(),
             ));
         }
 
-        let results: Vec<_> = datasource_providers
+        let validated_providers: Vec<_> = all_datasource_providers
             .iter()
             .map(|sd| {
-                sd.create(
-                    source_name,
-                    providers.clone(),
-                    url.clone(),
-                    &documentation,
-                    self.combined_connector(&providers),
-                )
-                .map_err(|err_msg| DatamodelError::new_source_validation_error(&err_msg, source_name, url_args.span()))
+                let url_check_result = sd.can_handle_url(source_name, &url).map_err(|err_msg| {
+                    DatamodelError::new_source_validation_error(&err_msg, source_name, url_args.span())
+                });
+                url_check_result.map(|_| sd)
             })
             .collect();
 
-        // Return the first source that was created successfully.
-        // If no source was created successfully return the first of all errors.
-        let (successes, errors): (Vec<_>, Vec<_>) = results.into_iter().partition(|result| result.is_ok());
+        let combined_connector: Box<dyn Connector> = {
+            let connectors = all_datasource_providers.iter().map(|sd| sd.connector()).collect();
+            Box::new(MultiProviderConnector::new(connectors))
+        };
+
+        // The first provider that can handle the URL is used to construct the Datasource.
+        // If no provider can handle it, return the first error.
+        let (successes, errors): (Vec<_>, Vec<_>) = validated_providers.into_iter().partition(|result| result.is_ok());
         if !successes.is_empty() {
-            Ok(successes.into_iter().next().unwrap()?)
+            let first_successful_provider = successes.into_iter().next().unwrap()?;
+            Ok(Datasource {
+                name: source_name.to_string(),
+                provider: providers,
+                active_provider: first_successful_provider.canonical_name().to_string(),
+                url,
+                documentation: documentation.clone(),
+                combined_connector,
+                active_connector: first_successful_provider.connector(),
+            })
         } else {
             Err(errors.into_iter().next().unwrap().err().unwrap())
         }
-    }
-
-    // This is separate function because it is called repetitively in a loop above.
-    fn combined_connector(&self, providers: &Vec<String>) -> Box<MultiProviderConnector> {
-        let connectors: Vec<Box<dyn Connector>> = providers
-            .iter()
-            .filter_map(|provider| {
-                let connector: Option<Box<dyn Connector>> = match provider.as_str() {
-                    "mysql" => Some(Box::new(BuiltinConnectors::mysql())),
-                    "postgres" | "postgresql" => Some(Box::new(BuiltinConnectors::postgres())),
-                    "sqlite" => Some(Box::new(BuiltinConnectors::sqlite())),
-                    #[cfg(feature = "mssql")]
-                    "sqlserver" => Some(Box::new(BuiltinConnectors::mssql())),
-                    _ => None, // if a connector is not known this is handled by the following code
-                };
-                connector
-            })
-            .collect();
-        Box::new(MultiProviderConnector::new(connectors))
     }
 
     fn get_datasource_provider(&self, provider: &str) -> Option<&Box<dyn DatasourceProvider>> {

@@ -1,6 +1,6 @@
-use super::{Datasource, DatasourceProvider};
+use super::DatasourceProvider;
 use crate::StringFromEnvVar;
-use datamodel_connector::Connector;
+use datamodel_connector::{BuiltinConnectors, Connector};
 
 pub const SQLITE_SOURCE_NAME: &str = "sqlite";
 pub const POSTGRES_SOURCE_NAME: &str = "postgresql";
@@ -21,24 +21,18 @@ impl DatasourceProvider for SqliteDatasourceProvider {
         provider == SQLITE_SOURCE_NAME
     }
 
-    fn create(
-        &self,
-        name: &str,
-        provider: Vec<String>,
-        url: StringFromEnvVar,
-        documentation: &Option<String>,
-        connector: Box<dyn Connector>,
-    ) -> Result<Datasource, String> {
-        let validation_with_file_protocol = validate_url(name, "file:", url.clone());
+    fn canonical_name(&self) -> &str {
+        SQLITE_SOURCE_NAME
+    }
+
+    fn can_handle_url(&self, name: &str, url: &StringFromEnvVar) -> Result<(), String> {
+        let validation_with_file_protocol = validate_url(name, "file:", url);
         let validation_with_sqlite_protocol = validate_url(name, "sqlite://", url);
-        Ok(Datasource {
-            name: String::from(name),
-            provider,
-            active_provider: SQLITE_SOURCE_NAME.to_owned(),
-            url: validation_with_file_protocol.or(validation_with_sqlite_protocol)?,
-            documentation: documentation.clone(),
-            connector,
-        })
+        validation_with_file_protocol.or(validation_with_sqlite_protocol)
+    }
+
+    fn connector(&self) -> Box<dyn Connector> {
+        Box::new(BuiltinConnectors::sqlite())
     }
 }
 
@@ -55,25 +49,18 @@ impl DatasourceProvider for PostgresDatasourceProvider {
         provider == POSTGRES_SOURCE_NAME || provider == POSTGRES_SOURCE_NAME_HEROKU
     }
 
-    fn create(
-        &self,
-        name: &str,
-        provider: Vec<String>,
-        url: StringFromEnvVar,
-        documentation: &Option<String>,
-        connector: Box<dyn Connector>,
-    ) -> Result<Datasource, String> {
-        let high_prio_validation = validate_url(name, "postgresql://", url.clone());
-        let low_prio_validation = validate_url(name, "postgres://", url); // for postgres urls on heroku -> https://devcenter.heroku.com/articles/heroku-postgresql#spring-java
+    fn canonical_name(&self) -> &str {
+        POSTGRES_SOURCE_NAME
+    }
 
-        Ok(Datasource {
-            name: String::from(name),
-            provider,
-            active_provider: POSTGRES_SOURCE_NAME.to_owned(),
-            url: low_prio_validation.or(high_prio_validation)?,
-            documentation: documentation.clone(),
-            connector,
-        })
+    fn can_handle_url(&self, name: &str, url: &StringFromEnvVar) -> Result<(), String> {
+        let high_prio_validation = validate_url(name, "postgresql://", url);
+        let low_prio_validation = validate_url(name, "postgres://", url); // for postgres urls on heroku -> https://devcenter.heroku.com/articles/heroku-postgresql#spring-java
+        low_prio_validation.or(high_prio_validation)
+    }
+
+    fn connector(&self) -> Box<dyn Connector> {
+        Box::new(BuiltinConnectors::postgres())
     }
 }
 
@@ -90,33 +77,16 @@ impl DatasourceProvider for MySqlDatasourceProvider {
         provider == MYSQL_SOURCE_NAME
     }
 
-    fn create(
-        &self,
-        name: &str,
-        provider: Vec<String>,
-        url: StringFromEnvVar,
-        documentation: &Option<String>,
-        connector: Box<dyn Connector>,
-    ) -> Result<Datasource, String> {
-        Ok(Datasource {
-            name: String::from(name),
-            provider,
-            active_provider: MYSQL_SOURCE_NAME.to_owned(),
-            url: validate_url(name, "mysql://", url)?,
-            documentation: documentation.clone(),
-            connector,
-        })
+    fn canonical_name(&self) -> &str {
+        MYSQL_SOURCE_NAME
     }
-}
 
-fn validate_url(name: &str, expected_protocol: &str, url: StringFromEnvVar) -> Result<StringFromEnvVar, String> {
-    if url.value.starts_with(expected_protocol) {
-        Ok(url)
-    } else {
-        Err(format!(
-            "The URL for datasource `{}` must start with the protocol `{}`.",
-            name, expected_protocol
-        ))
+    fn can_handle_url(&self, name: &str, url: &StringFromEnvVar) -> Result<(), String> {
+        validate_url(name, "mysql://", url)
+    }
+
+    fn connector(&self) -> Box<dyn Connector> {
+        Box::new(BuiltinConnectors::mysql())
     }
 }
 
@@ -127,26 +97,32 @@ impl MsSqlDatasourceProvider {
     }
 }
 
+#[cfg(feature = "mssql")]
 impl DatasourceProvider for MsSqlDatasourceProvider {
     fn is_provider(&self, provider: &str) -> bool {
         provider == MSSQL_SOURCE_NAME
     }
 
-    fn create(
-        &self,
-        name: &str,
-        provider: Vec<String>,
-        url: StringFromEnvVar,
-        documentation: &Option<String>,
-        connector: Box<dyn Connector>,
-    ) -> Result<Datasource, String> {
-        Ok(Datasource {
-            name: String::from(name),
-            provider,
-            active_provider: MSSQL_SOURCE_NAME.to_owned(),
-            url: validate_url(name, "sqlserver://", url)?,
-            documentation: documentation.clone(),
-            connector,
-        })
+    fn canonical_name(&self) -> &str {
+        MSSQL_SOURCE_NAME
+    }
+
+    fn can_handle_url(&self, name: &str, url: &StringFromEnvVar) -> Result<(), String> {
+        validate_url(name, "sqlserver://", url)
+    }
+
+    fn connector(&self) -> Box<dyn Connector> {
+        Box::new(BuiltinConnectors::mssql())
+    }
+}
+
+fn validate_url(name: &str, expected_protocol: &str, url: &StringFromEnvVar) -> Result<(), String> {
+    if url.value.starts_with(expected_protocol) {
+        Ok(())
+    } else {
+        Err(format!(
+            "The URL for datasource `{}` must start with the protocol `{}`.",
+            name, expected_protocol
+        ))
     }
 }

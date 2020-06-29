@@ -7,7 +7,9 @@ pub struct Datasource {
     pub active_provider: String,
     pub url: StringFromEnvVar,
     pub documentation: Option<String>,
-    pub connector: Box<dyn Connector>,
+    // a connector representing the intersection of all providers specified
+    pub combined_connector: Box<dyn Connector>,
+    pub active_connector: Box<dyn Connector>,
 }
 
 impl Datasource {
