@@ -35,6 +35,8 @@ pub trait Connector: Send + Sync {
     }
 }
 
+/// Not all Databases are created equal. Hence connectors for our datasources support different capabilities.
+/// These are used during schema validation. E.g. if a connector does not support enums an error will be raised.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum ConnectorCapability {
     ScalarLists,

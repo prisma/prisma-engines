@@ -14,15 +14,7 @@ pub struct Configuration {
 #[serde(rename_all = "camelCase")]
 #[derive(Clone, Debug, Serialize)]
 pub struct StringFromEnvVar {
+    /// contains the name of env var if the value was read from one
     pub from_env_var: Option<String>,
     pub value: String,
-}
-
-impl StringFromEnvVar {
-    pub fn plain_value(value: String) -> StringFromEnvVar {
-        StringFromEnvVar {
-            from_env_var: None,
-            value,
-        }
-    }
 }

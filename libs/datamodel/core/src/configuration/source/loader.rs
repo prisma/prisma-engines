@@ -125,11 +125,11 @@ impl SourceLoader {
 
         let validated_providers: Vec<_> = all_datasource_providers
             .iter()
-            .map(|sd| {
-                let url_check_result = sd.can_handle_url(source_name, &url).map_err(|err_msg| {
+            .map(|provider| {
+                let url_check_result = provider.can_handle_url(source_name, &url).map_err(|err_msg| {
                     DatamodelError::new_source_validation_error(&err_msg, source_name, url_args.span())
                 });
-                url_check_result.map(|_| sd)
+                url_check_result.map(|_| provider)
             })
             .collect();
 
