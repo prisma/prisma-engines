@@ -102,13 +102,8 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
                         old_model.find_field_db_name(&field.database_name.as_ref().unwrap_or(&field.name))
                     {
                         if model.find_field(&old_field.name).is_none() {
-                            changed_scalar_field_names.push((
-                                ModelAndField {
-                                    model: model.name.clone(),
-                                    field: field.name.clone(),
-                                },
-                                old_field.name.clone(),
-                            ))
+                            let mf = ModelAndField::new(&model.name, &field.name);
+                            changed_scalar_field_names.push((mf, old_field.name.clone()))
                         }
                     }
                 }
@@ -267,13 +262,8 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
                         old_enum.find_value_db_name(value.database_name.as_ref().unwrap_or(&value.name.to_owned()))
                     {
                         if enm.find_value(&old_value.name).is_none() {
-                            changed_enum_values.push((
-                                EnumAndValue {
-                                    enm: enm.name.clone(),
-                                    value: value.name.clone(),
-                                },
-                                old_value.name.clone(),
-                            ))
+                            let ev = EnumAndValue::new(&enm.name, &value.name);
+                            changed_enum_values.push((ev, old_value.name.clone()))
                         }
                     }
                 }
@@ -316,13 +306,8 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
                                 let other_old_info = old_data_model.find_related_info(&old_info);
                                 let other_new_info = new_data_model.find_related_info(&new_info);
                                 if old_info == new_info && other_old_info == other_new_info {
-                                    changed_relation_field_names.push((
-                                        ModelAndField {
-                                            model: model.name.clone(),
-                                            field: field.name.clone(),
-                                        },
-                                        old_field.name.clone(),
-                                    ));
+                                    let mf = ModelAndField::new(&model.name, &field.name);
+                                    changed_relation_field_names.push((mf, old_field.name.clone()));
                                 }
                             }
                         }
