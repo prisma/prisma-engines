@@ -169,4 +169,12 @@ impl Datamodel {
         }
         fields
     }
+
+    /// Returns (model_name, field_name) for all relation fields pointing to a specific model.
+    pub fn find_relation_field_for_info(&self, info: &RelationInfo) -> &Field {
+        self.find_model(&info.to)
+            .unwrap()
+            .find_relation_field_by_relation_name(&info.name)
+            .unwrap()
+    }
 }

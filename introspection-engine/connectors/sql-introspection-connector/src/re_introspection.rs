@@ -326,37 +326,9 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
                     if let Some(old_model) = old_data_model.find_model(&model.name) {
                         for old_field in &old_model.fields {
                             if let FieldType::Relation(old_info) = &old_field.field_type {
-                                //todo this only hits the correct one on the fk side
-                                // on the non-fk side this can be ambiguous
-
-                                //find other old_info
-
-                                let other_old_field = old_data_model
-                                    .find_model(&old_info.to)
-                                    .unwrap()
-                                    .fields()
-                                    .find(|f| {
-                                        if let FieldType::Relation(other_old_info) = &f.field_type {
-                                            old_info.name == other_old_info.name
-                                        } else {
-                                            false
-                                        }
-                                    })
-                                    .unwrap();
-
+                                let other_old_field = old_data_model.find_relation_field_for_info(&old_info);
                                 if let FieldType::Relation(other_old_info) = &other_old_field.field_type {
-                                    let other_new_field = new_data_model
-                                        .find_model(&new_info.to)
-                                        .unwrap()
-                                        .fields()
-                                        .find(|f| {
-                                            if let FieldType::Relation(other_new_info) = &f.field_type {
-                                                new_info.name == other_new_info.name
-                                            } else {
-                                                false
-                                            }
-                                        })
-                                        .unwrap();
+                                    let other_new_field = new_data_model.find_relation_field_for_info(&new_info);
 
                                     if let FieldType::Relation(other_new_info) = &other_new_field.field_type {
                                         if old_info == new_info && other_old_info == other_new_info {
@@ -378,7 +350,6 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
         }
 
         for changed_relation_field_name in changed_relation_field_names {
-            println!("{:?}", changed_relation_field_name);
             let field = new_data_model
                 .find_field_mut(
                     &changed_relation_field_name.0.model,
