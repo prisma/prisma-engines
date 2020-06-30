@@ -42,8 +42,8 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
     // enum names                               -> done         yes
     // enum values                              -> done         yes
 
-    // println!("{:#?}", old_data_model);
-    // println!("{:#?}", new_data_model);
+    println!("{:#?}", old_data_model);
+    println!("{:#?}", introspection_result.datamodel);
 
     let new_data_model = &mut introspection_result.datamodel;
 
@@ -322,18 +322,53 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
     {
         for model in &new_data_model.models {
             for field in &model.fields {
-                if let FieldType::Relation(info) = &field.field_type {
+                if let FieldType::Relation(new_info) = &field.field_type {
                     if let Some(old_model) = old_data_model.find_model(&model.name) {
                         for old_field in &old_model.fields {
                             if let FieldType::Relation(old_info) = &old_field.field_type {
-                                if old_info == info {
-                                    changed_relation_field_names.push((
-                                        ModelAndField {
-                                            model: model.name.clone(),
-                                            field: field.name.clone(),
-                                        },
-                                        old_field.name.clone(),
-                                    ));
+                                //todo this only hits the correct one on the fk side
+                                // on the non-fk side this can be ambiguous
+
+                                //find other old_info
+
+                                let other_old_field = old_data_model
+                                    .find_model(&old_info.to)
+                                    .unwrap()
+                                    .fields()
+                                    .find(|f| {
+                                        if let FieldType::Relation(other_old_info) = &f.field_type {
+                                            old_info.name == other_old_info.name
+                                        } else {
+                                            false
+                                        }
+                                    })
+                                    .unwrap();
+
+                                if let FieldType::Relation(other_old_info) = &other_old_field.field_type {
+                                    let other_new_field = new_data_model
+                                        .find_model(&new_info.to)
+                                        .unwrap()
+                                        .fields()
+                                        .find(|f| {
+                                            if let FieldType::Relation(other_new_info) = &f.field_type {
+                                                new_info.name == other_new_info.name
+                                            } else {
+                                                false
+                                            }
+                                        })
+                                        .unwrap();
+
+                                    if let FieldType::Relation(other_new_info) = &other_new_field.field_type {
+                                        if old_info == new_info && other_old_info == other_new_info {
+                                            changed_relation_field_names.push((
+                                                ModelAndField {
+                                                    model: model.name.clone(),
+                                                    field: field.name.clone(),
+                                                },
+                                                old_field.name.clone(),
+                                            ));
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -343,6 +378,7 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
         }
 
         for changed_relation_field_name in changed_relation_field_names {
+            println!("{:?}", changed_relation_field_name);
             let field = new_data_model
                 .find_field_mut(
                     &changed_relation_field_name.0.model,
@@ -357,7 +393,7 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
     // potential error: what if there was a db default before and then it got removed, now re-introspection makes it virtual
     // you could not get rid of it
 
-    // println!("{:#?}", new_data_model);
+    println!("{:#?}", new_data_model);
 
     //warnings
     //todo adjust them to use the new names
