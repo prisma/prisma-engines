@@ -170,11 +170,30 @@ impl Datamodel {
         fields
     }
 
-    /// Returns (model_name, field_name) for all relation fields pointing to a specific model.
-    pub fn find_relation_field_for_info(&self, info: &RelationInfo) -> &Field {
+    /// Finds a relation field related to a relation info
+    pub fn find_related_field_for_info(&self, info: &RelationInfo) -> &Field {
         self.find_model(&info.to)
             .unwrap()
-            .find_relation_field_by_relation_name(&info.name)
+            .fields()
+            .find(|f| match &f.field_type {
+                FieldType::Relation(other_info) => {
+                    other_info.name == info.name
+                    // This is to differentiate the opposite field from self in the self relation case.
+                    && other_info.to_fields != info.to_fields
+                    && other_info.fields != info.fields
+                }
+                _ => false,
+            })
             .unwrap()
+    }
+
+    /// Returns (model_name, field_name) for all relation fields pointing to a specific model.
+    pub fn find_related_info(&self, info: &RelationInfo) -> &RelationInfo {
+        let field = self.find_related_field_for_info(info);
+
+        match &field.field_type {
+            FieldType::Relation(relation_info) => return relation_info,
+            _ => panic!(),
+        }
     }
 }

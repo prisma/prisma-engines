@@ -119,14 +119,6 @@ impl Model {
         })
     }
 
-    /// Finds a relation field by relation name and returns a reference.
-    pub fn find_relation_field_by_relation_name(&self, relation_name: &str) -> Option<&Field> {
-        self.fields().find(|f| match &f.field_type {
-            FieldType::Relation(info) => info.name == *relation_name,
-            _ => false,
-        })
-    }
-
     /// Finds the name of all id fields
     pub fn id_field_names(&self) -> Vec<String> {
         let singular_id_field = self.singular_id_fields().next();

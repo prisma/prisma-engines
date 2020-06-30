@@ -176,23 +176,10 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
                         })
                         .count();
 
-                    let (other_relation_field, other_info) = other_model_in_relation
-                        .fields()
-                        .find_map(|f| {
-                            match &f.field_type {
-                                FieldType::Relation(other_info)
-                                    if other_info.name == info.name
-                                        && other_info.to == changed_model.name
-                                        // This is to differentiate the opposite field from self in the self relation case.
-                                        && other_info.to_fields != info.to_fields
-                                        && other_info.fields != info.fields =>
-                                {
-                                    Some((f.name.clone(), other_info))
-                                }
-                                _ => None,
-                            }
-                        })
-                        .unwrap();
+                    let (other_relation_field, other_info) = (
+                        new_data_model.find_related_field_for_info(info).name.clone(),
+                        new_data_model.find_related_info(info),
+                    );
 
                     let (model_with_fk, referenced_model, fk_column_name) = if info.to_fields.is_empty() {
                         // does not hold the fk
@@ -326,21 +313,16 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
                     if let Some(old_model) = old_data_model.find_model(&model.name) {
                         for old_field in &old_model.fields {
                             if let FieldType::Relation(old_info) = &old_field.field_type {
-                                let other_old_field = old_data_model.find_relation_field_for_info(&old_info);
-                                if let FieldType::Relation(other_old_info) = &other_old_field.field_type {
-                                    let other_new_field = new_data_model.find_relation_field_for_info(&new_info);
-
-                                    if let FieldType::Relation(other_new_info) = &other_new_field.field_type {
-                                        if old_info == new_info && other_old_info == other_new_info {
-                                            changed_relation_field_names.push((
-                                                ModelAndField {
-                                                    model: model.name.clone(),
-                                                    field: field.name.clone(),
-                                                },
-                                                old_field.name.clone(),
-                                            ));
-                                        }
-                                    }
+                                let other_old_info = old_data_model.find_related_info(&old_info);
+                                let other_new_info = new_data_model.find_related_info(&new_info);
+                                if old_info == new_info && other_old_info == other_new_info {
+                                    changed_relation_field_names.push((
+                                        ModelAndField {
+                                            model: model.name.clone(),
+                                            field: field.name.clone(),
+                                        },
+                                        old_field.name.clone(),
+                                    ));
                                 }
                             }
                         }
