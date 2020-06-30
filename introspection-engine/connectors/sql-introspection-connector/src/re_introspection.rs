@@ -42,8 +42,8 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
     // enum names                               -> done         yes
     // enum values                              -> done         yes
 
-    println!("{:#?}", old_data_model);
-    println!("{:#?}", introspection_result.datamodel);
+    // println!("{:#?}", old_data_model);
+    // println!("{:#?}", introspection_result.datamodel);
 
     let new_data_model = &mut introspection_result.datamodel;
 
@@ -171,10 +171,8 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
                         })
                         .count();
 
-                    let (other_relation_field, other_info) = (
-                        new_data_model.find_related_field_for_info(info).name.clone(),
-                        new_data_model.find_related_info(info),
-                    );
+                    let other_relation_field = new_data_model.find_related_field_for_info(info).name.clone();
+                    let other_info = new_data_model.find_related_info(info);
 
                     let (model_with_fk, referenced_model, fk_column_name) = if info.to_fields.is_empty() {
                         // does not hold the fk
@@ -305,6 +303,8 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
                             if let FieldType::Relation(old_info) = &old_field.field_type {
                                 let other_old_info = old_data_model.find_related_info(&old_info);
                                 let other_new_info = new_data_model.find_related_info(&new_info);
+                                //the relationinfos of both sides need to be compared since the relationinfo of the
+                                // non-fk side does not contain enough information to uniquely identify the correct relationfield
                                 if old_info == new_info && other_old_info == other_new_info {
                                     let mf = ModelAndField::new(&model.name, &field.name);
                                     changed_relation_field_names.push((mf, old_field.name.clone()));
@@ -331,7 +331,7 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
     // potential error: what if there was a db default before and then it got removed, now re-introspection makes it virtual
     // you could not get rid of it
 
-    println!("{:#?}", new_data_model);
+    // println!("{:#?}", new_data_model);
 
     //warnings
     //todo adjust them to use the new names
