@@ -263,21 +263,25 @@ impl EnumValueAsserts for dml::EnumValue {
 
 impl ErrorAsserts for ErrorCollection {
     fn assert_is(&self, error: DatamodelError) -> &Self {
-        if self.errors.len() == 1 {
-            assert_eq!(self.errors[0], error);
-        } else {
-            panic!("Expected exactly one validation error. Errors are: {:?}", &self);
-        }
+        assert_eq!(
+            self.errors.len(),
+            1,
+            "Expected exactly one validation error. Errors are: {:?}",
+            &self
+        );
+        assert_eq!(self.errors[0], error);
 
         self
     }
 
     fn assert_is_message(&self, msg: &str) -> &Self {
-        if self.errors.len() == 1 {
-            assert_eq!(self.errors[0].description(), msg);
-        } else {
-            panic!("Expected exactly one validation error. Errors are: {:?}", &self);
-        }
+        assert_eq!(
+            self.errors.len(),
+            1,
+            "Expected exactly one validation error. Errors are: {:?}",
+            &self
+        );
+        assert_eq!(self.errors[0].description(), msg);
 
         self
     }
@@ -288,16 +292,15 @@ impl ErrorAsserts for ErrorCollection {
     }
 
     fn assert_length(&self, length: usize) -> &Self {
-        if self.errors.len() == length {
-            self
-        } else {
-            panic!(
-                "Expected exactly {} validation errors, but got {}. The errors were {:?}",
-                length,
-                self.errors.len(),
-                &self.errors,
-            );
-        }
+        assert_eq!(
+            self.errors.len(),
+            length,
+            "Expected exactly {} validation errors, but got {}. The errors were {:?}",
+            length,
+            self.errors.len(),
+            &self.errors,
+        );
+        self
     }
 }
 

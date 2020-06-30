@@ -33,15 +33,11 @@ impl BuiltinConnectors {
         }
     }
 
-    #[cfg(feature = "mssql")]
     pub fn mssql() -> DeclarativeConnector {
         DeclarativeConnector {
             type_aliases: vec![],
             field_type_constructors: vec![],
-            supports_scalar_lists: false,
-            supports_relations_over_non_unique_criteria: false,
-            supports_enums: false,
-            supports_json: false,
+            capabilities: vec![],
         }
     }
 
