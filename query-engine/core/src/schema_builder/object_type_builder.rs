@@ -224,6 +224,7 @@ impl<'a> ObjectTypeBuilder<'a> {
     }
 
     /// Builds aggregation object type for given model (e.g. AggregateUser).
+    /// [DTODO] Factor the aggregate schema code into something more concise.
     pub fn aggregation_object_type(&self, model: &ModelRef) -> ObjectTypeRef {
         let name = format!("Aggregate{}", capitalize(&model.name));
         return_cached!(self.get_cache(), &name);

@@ -79,6 +79,33 @@ impl From<RecordProjection> for RecordFilter {
     }
 }
 
+#[derive(Debug, Clone)]
+pub enum Aggregator {
+    /// Counts all records of the model that match the query.
+    Count,
+
+    /// Compute average for each field contained.
+    Average(Vec<ScalarFieldRef>),
+
+    /// Compute mininum for each field contained.
+    Min(Vec<ScalarFieldRef>),
+
+    /// Compute maximum for each field contained.
+    Max(Vec<ScalarFieldRef>),
+}
+
+/// Result of an aggregation operation on a model or field.
+/// It is expected that the type of any contained `PrismaValue` matches
+/// the `TypeIdentifier` of the accompanying `ScalarFieldRef`.
+#[derive(Debug, Clone)]
+pub enum AggregationResult {
+    Count(usize),
+    Average(ScalarFieldRef, f64),
+    Sum(ScalarFieldRef, PrismaValue),
+    Min(ScalarFieldRef, PrismaValue),
+    Max(ScalarFieldRef, PrismaValue),
+}
+
 #[async_trait]
 pub trait ReadOperations {
     /// Gets a single record or `None` back from the database.
@@ -121,8 +148,16 @@ pub trait ReadOperations {
         from_record_ids: &[RecordProjection],
     ) -> crate::Result<Vec<(RecordProjection, RecordProjection)>>;
 
-    // return the number of items from the `Model`, filtered by the given `QueryArguments`.
-    async fn count_by_model(&self, model: &ModelRef, query_arguments: QueryArguments) -> crate::Result<usize>;
+    /// Aggregates records for a specific model based on the given queries.
+    /// Whether or not the queries can be executed in a single query or
+    /// requires multiple roundtrips to the underlying data source is at the
+    /// discretion of the implementing connector.
+    async fn aggregate_records(
+        &self,
+        model: &ModelRef,
+        aggregations: Vec<Aggregator>,
+        query_arguments: QueryArguments,
+    ) -> crate::Result<Vec<AggregationResult>>;
 }
 
 #[async_trait]

@@ -1,8 +1,9 @@
 use super::*;
 use crate::{
     schema::{IntoArc, ObjectTypeStrongRef, OutputType, OutputTypeRef, ScalarType},
-    AggregationQueryResult, CoreError, EnumType, QueryResult, RecordAggregation, RecordSelection,
+    CoreError, EnumType, QueryResult, RecordAggregation, RecordSelection,
 };
+use connector::AggregationResult;
 use indexmap::IndexMap;
 use prisma_models::{InternalEnum, PrismaValue, RecordProjection};
 use rust_decimal::prelude::ToPrimitive;
@@ -63,13 +64,33 @@ fn serialize_aggregation(record_aggregation: RecordAggregation) -> crate::Result
     let mut envelope = CheckedItemsWithParents::new();
     let mut inner_map: Map = IndexMap::with_capacity(record_aggregation.results.len());
 
+    let ordering = record_aggregation.selection_order;
+
     for result in record_aggregation.results {
         match result {
-            AggregationQueryResult::Count(name, count) => {
-                inner_map.insert(name, Item::Value(PrismaValue::Int(count as i64)));
+            AggregationResult::Count(count) => {
+                inner_map.insert("count".to_owned(), Item::Value(PrismaValue::Int(count as i64)));
+            }
+            AggregationResult::Average(field, value) => {
+                // inner_map.insert(name, Item::Value(PrismaValue::Int(count as i64)));
+                todo!()
+            }
+            AggregationResult::Min(field, value) => {
+                // inner_map.insert(name, Item::Value(PrismaValue::Int(count as i64)));
+                todo!()
+            }
+            AggregationResult::Max(field, value) => {
+                // inner_map.insert(name, Item::Value(PrismaValue::Int(count as i64)));
+                todo!()
+            }
+            AggregationResult::Sum(field, value) => {
+                // inner_map.insert(name, Item::Value(PrismaValue::Int(count as i64)));
+                todo!()
             }
         }
     }
+
+    // sort
 
     envelope.insert(None, Item::Map(inner_map));
 

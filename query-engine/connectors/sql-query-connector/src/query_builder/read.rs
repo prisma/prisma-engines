@@ -67,10 +67,10 @@ where
     columns.fold(query.into_select(model), |acc, col| acc.column(col))
 }
 
-pub fn count_by_model(model: &ModelRef, query_arguments: QueryArguments) -> Select<'static> {
-    let selected_columns = model.primary_identifier().as_columns();
-    let base_query = get_records(model, selected_columns, query_arguments);
-    let table = Table::from(base_query).alias("sub");
+// pub fn count_by_model(model: &ModelRef, query_arguments: QueryArguments) -> Select<'static> {
+//     let selected_columns = model.primary_identifier().as_columns();
+//     let base_query = get_records(model, selected_columns, query_arguments);
+//     let table = Table::from(base_query).alias("sub");
 
-    Select::from_table(table).value(count(asterisk()))
-}
+//     Select::from_table(table).value(count(asterisk()))
+// }

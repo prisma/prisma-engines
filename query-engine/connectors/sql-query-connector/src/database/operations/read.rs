@@ -141,13 +141,15 @@ pub async fn get_related_m2m_record_ids(
         .collect())
 }
 
-pub async fn count_by_model(
+pub async fn aggregate(
     conn: &dyn QueryExt,
     model: &ModelRef,
+    aggregations: Vec<Aggregator>,
     query_arguments: QueryArguments,
-) -> crate::Result<usize> {
-    let query = read::count_by_model(model, query_arguments);
-    let count = conn.find_int(query).await? as usize;
+) -> crate::Result<Vec<AggregationResult>> {
+    // let query = read::count_by_model(model, query_arguments);
+    // let count = conn.find_int(query).await? as usize;
 
-    Ok(count)
+    // Ok(count)
+    todo!()
 }
