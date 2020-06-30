@@ -97,7 +97,6 @@ impl MsSqlDatasourceProvider {
     }
 }
 
-#[cfg(feature = "mssql")]
 impl DatasourceProvider for MsSqlDatasourceProvider {
     fn is_provider(&self, provider: &str) -> bool {
         provider == MSSQL_SOURCE_NAME
