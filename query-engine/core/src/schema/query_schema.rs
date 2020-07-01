@@ -256,6 +256,9 @@ pub struct Argument {
 #[derive(DebugStub)]
 pub struct InputObjectType {
     pub name: String,
+    /// If true this means that _exactly_ one of the contained fields must be specified in an incoming query.
+    /// This allows clients to handle this input type in a special way and ensure this invariant in a typesafe way.
+    pub is_one_of: bool,
 
     #[debug_stub = "#Input Fields Cell#"]
     pub fields: OnceCell<Vec<InputFieldRef>>,
