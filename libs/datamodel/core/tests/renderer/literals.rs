@@ -18,7 +18,8 @@ fn strings_with_quotes_render_as_escaped_literals() {
         model Category {
           id   String @id
           name String @default("a \" b\"c d")
-        }"#
+        }
+        "#
     );
 
     let mut dml = datamodel::parse_datamodel(input).unwrap();
