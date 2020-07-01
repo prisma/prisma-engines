@@ -232,10 +232,14 @@ impl<'a> ObjectTypeBuilder<'a> {
         let object = ObjectTypeStrongRef::new(ObjectType::new(&name, Some(ModelRef::clone(model))));
         let mut fields = vec![self.count_field()];
 
-        append_opt(&mut fields, self.avg_field(&model));
-        append_opt(&mut fields, self.sum_field(&model));
-        append_opt(&mut fields, self.max_field(&model));
-        append_opt(&mut fields, self.min_field(&model));
+        append_opt(
+            &mut fields,
+            self.numeric_aggregation_field("avg", &model, Some(OutputType::float())),
+        );
+
+        append_opt(&mut fields, self.numeric_aggregation_field("sum", &model, None));
+        append_opt(&mut fields, self.numeric_aggregation_field("min", &model, None));
+        append_opt(&mut fields, self.numeric_aggregation_field("max", &model, None));
 
         object.set_fields(fields);
         self.cache(name, ObjectTypeStrongRef::clone(&object));
@@ -247,45 +251,40 @@ impl<'a> ObjectTypeBuilder<'a> {
         field("count", vec![], OutputType::int(), None)
     }
 
-    fn avg_field(&self, model: &ModelRef) -> Option<Field> {
+    /// Returns an aggregation field with given name if the model contains any numeric fields.
+    /// Fields inside the object type of the field may have a fixed output type.
+    fn numeric_aggregation_field(
+        &self,
+        name: &str,
+        model: &ModelRef,
+        fixed_field_type: Option<OutputType>,
+    ) -> Option<Field> {
         let numeric_fields = Self::collect_numeric_fields(model);
 
         if numeric_fields.is_empty() {
             None
         } else {
-            let object_type = self.wrap_opt_object(self.avg_object_type(model, &numeric_fields));
-            Some(field("avg", vec![], object_type, None))
+            let object_type = self.wrap_opt_object(self.map_numeric_field_aggregation_object(
+                model,
+                name,
+                &numeric_fields,
+                fixed_field_type,
+            ));
+
+            Some(field(name, vec![], object_type, None))
         }
     }
 
-    fn avg_object_type(&self, model: &ModelRef, fields: &[ScalarFieldRef]) -> ObjectTypeRef {
-        let name = format!("{}AvgAggregateOutputType", capitalize(&model.name));
-        return_cached!(self.get_cache(), &name);
-
-        let fields: Vec<Field> = fields
-            .into_iter()
-            .map(|sf| field(sf.name.clone(), vec![], OutputType::float(), None))
-            .collect();
-
-        let object = Arc::new(object_type(name.clone(), fields, None));
-        self.cache(name, object.clone());
-
-        Arc::downgrade(&object)
-    }
-
-    fn sum_field(&self, model: &ModelRef) -> Option<Field> {
-        let numeric_fields = Self::collect_numeric_fields(model);
-
-        if numeric_fields.is_empty() {
-            None
-        } else {
-            let object_type = self.wrap_opt_object(self.sum_object_type(model, &numeric_fields));
-            Some(field("sum", vec![], object_type, None))
-        }
-    }
-
-    fn sum_object_type(&self, model: &ModelRef, fields: &[ScalarFieldRef]) -> ObjectTypeRef {
-        let name = format!("{}SumAggregateOutputType", capitalize(&model.name));
+    /// Maps the object type for aggregations that operate on a (numeric) field level, rather than the entire model.
+    /// Fields inside the object may have a fixed output type.
+    fn map_numeric_field_aggregation_object(
+        &self,
+        model: &ModelRef,
+        suffix: &str,
+        fields: &[ScalarFieldRef],
+        fixed_field_type: Option<OutputType>,
+    ) -> ObjectTypeRef {
+        let name = format!("{}{}AggregateOutputType", capitalize(&model.name), capitalize(suffix));
         return_cached!(self.get_cache(), &name);
 
         let fields: Vec<Field> = fields
@@ -294,73 +293,9 @@ impl<'a> ObjectTypeBuilder<'a> {
                 field(
                     sf.name.clone(),
                     vec![],
-                    self.map_output_type(&ModelField::Scalar(sf.clone())),
-                    None,
-                )
-            })
-            .collect();
-
-        let object = Arc::new(object_type(name.clone(), fields, None));
-        self.cache(name, object.clone());
-
-        Arc::downgrade(&object)
-    }
-
-    fn max_field(&self, model: &ModelRef) -> Option<Field> {
-        let numeric_fields = Self::collect_numeric_fields(model);
-
-        if numeric_fields.is_empty() {
-            None
-        } else {
-            let object_type = self.wrap_opt_object(self.max_object_type(model, &numeric_fields));
-            Some(field("max", vec![], object_type, None))
-        }
-    }
-
-    fn max_object_type(&self, model: &ModelRef, fields: &[ScalarFieldRef]) -> ObjectTypeRef {
-        let name = format!("{}MaxAggregateOutputType", capitalize(&model.name));
-        return_cached!(self.get_cache(), &name);
-
-        let fields: Vec<Field> = fields
-            .into_iter()
-            .map(|sf| {
-                field(
-                    sf.name.clone(),
-                    vec![],
-                    self.map_output_type(&ModelField::Scalar(sf.clone())),
-                    None,
-                )
-            })
-            .collect();
-
-        let object = Arc::new(object_type(name.clone(), fields, None));
-        self.cache(name, object.clone());
-
-        Arc::downgrade(&object)
-    }
-
-    fn min_field(&self, model: &ModelRef) -> Option<Field> {
-        let numeric_fields = Self::collect_numeric_fields(model);
-
-        if numeric_fields.is_empty() {
-            None
-        } else {
-            let object_type = self.wrap_opt_object(self.min_object_type(model, &numeric_fields));
-            Some(field("min", vec![], object_type, None))
-        }
-    }
-
-    fn min_object_type(&self, model: &ModelRef, fields: &[ScalarFieldRef]) -> ObjectTypeRef {
-        let name = format!("{}MinAggregateOutputType", capitalize(&model.name));
-        return_cached!(self.get_cache(), &name);
-
-        let fields: Vec<Field> = fields
-            .into_iter()
-            .map(|sf| {
-                field(
-                    sf.name.clone(),
-                    vec![],
-                    self.map_output_type(&ModelField::Scalar(sf.clone())),
+                    fixed_field_type
+                        .clone()
+                        .unwrap_or(self.map_output_type(&ModelField::Scalar(sf.clone()))),
                     None,
                 )
             })

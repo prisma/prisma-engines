@@ -373,7 +373,7 @@ impl InputType {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum OutputType {
     Enum(EnumTypeRef),
     List(OutputTypeRef),
