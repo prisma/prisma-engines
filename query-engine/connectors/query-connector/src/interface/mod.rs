@@ -87,6 +87,9 @@ pub enum Aggregator {
     /// Compute average for each field contained.
     Average(Vec<ScalarFieldRef>),
 
+    /// Compute sum for each field contained.
+    Sum(Vec<ScalarFieldRef>),
+
     /// Compute mininum for each field contained.
     Min(Vec<ScalarFieldRef>),
 

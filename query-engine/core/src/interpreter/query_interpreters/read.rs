@@ -136,21 +136,23 @@ async fn aggregate<'a, 'b>(
     tx: &'a ConnectionLike<'a, 'b>,
     aggregate: AggregateRecordsQuery,
 ) -> InterpretationResult<QueryResult> {
-    let mut results = vec![];
+    // let mut results = vec![];
 
-    for query in aggregate.queries {
-        match query {
-            AggregationQuery::Count(name, args) => {
-                let result = tx.count_by_model(&aggregate.model, args).await?;
-                results.push(AggregationQueryResult::Count(name, result));
-            }
-        }
-    }
+    // for query in aggregate.queries {
+    //     match query {
+    //         AggregationQuery::Count(name, args) => {
+    //             let result = tx.count_by_model(&aggregate.model, args).await?;
+    //             results.push(AggregationQueryResult::Count(name, result));
+    //         }
+    //     }
+    // }
 
-    Ok(QueryResult::RecordAggregation(RecordAggregation {
-        fields: aggregate.selection_order,
-        results,
-    }))
+    // Ok(QueryResult::RecordAggregation(RecordAggregation {
+    //     fields: aggregate.selection_order,
+    //     results,
+    // }))
+
+    todo!()
 }
 
 fn process_nested<'a, 'b>(

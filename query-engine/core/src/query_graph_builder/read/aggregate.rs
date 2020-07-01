@@ -18,6 +18,7 @@ impl AggregateRecordsBuilder {
         let query = match field.name.as_str() {
             "count" => Aggregator::Count,
             "avg" => Aggregator::Average(Self::resolve_fields(model, field)),
+            "sum" => Aggregator::Sum(Self::resolve_fields(model, field)),
             "min" => Aggregator::Min(Self::resolve_fields(model, field)),
             "max" => Aggregator::Max(Self::resolve_fields(model, field)),
             _ => unreachable!(),
@@ -70,6 +71,8 @@ impl Builder<ReadQuery> for AggregateRecordsBuilder {
             .into_iter()
             .map(|field| Self::resolve_query(field, &model))
             .collect::<QueryGraphBuilderResult<_>>()?;
+
+        dbg!(&queries);
 
         Ok(ReadQuery::AggregateRecordsQuery(AggregateRecordsQuery {
             name,
