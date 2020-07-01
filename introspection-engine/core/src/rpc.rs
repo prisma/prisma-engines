@@ -148,66 +148,13 @@ impl RpcImpl {
     }
 }
 
-// {"id":3,"jsonrpc":"2.0","method":"getDatabaseDescription","params":[{"schema":{}}]}
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct IntrospectionInput {
     pub(crate) schema: String,
+    #[serde(default = "default_false")]
     pub(crate) reintrospect: bool,
 }
 
-use serde::de::{Deserialize, Deserializer, Error as SerdeError, MapAccess, Visitor};
-use std::fmt;
-
-impl<'de> Deserialize<'de> for IntrospectionInput {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: Deserializer<'de>,
-    {
-        #[derive(Deserialize)]
-        #[serde(field_identifier, rename_all = "lowercase")]
-        enum Field {
-            Schema,
-            Reintrospect,
-        }
-
-        struct IntrospectionInputVisitor;
-
-        impl<'de> Visitor<'de> for IntrospectionInputVisitor {
-            type Value = IntrospectionInput;
-
-            fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-                formatter.write_str("struct IntrospectionInput")
-            }
-
-            fn visit_map<V>(self, mut map: V) -> Result<IntrospectionInput, V::Error>
-            where
-                V: MapAccess<'de>,
-            {
-                let mut schema = None;
-                let mut reintrospect = None;
-                while let Some(key) = map.next_key()? {
-                    match key {
-                        Field::Schema => {
-                            if schema.is_some() {
-                                return Err(SerdeError::duplicate_field("schema"));
-                            }
-                            schema = Some(map.next_value()?);
-                        }
-                        Field::Reintrospect => {
-                            if reintrospect.is_some() {
-                                return Err(SerdeError::duplicate_field("reintrospect"));
-                            }
-                            reintrospect = Some(map.next_value()?);
-                        }
-                    }
-                }
-                let schema = schema.ok_or_else(|| SerdeError::missing_field("schema"))?;
-                let reintrospect = reintrospect.or(Some(false)).unwrap();
-                Ok(IntrospectionInput { schema, reintrospect })
-            }
-        }
-
-        const FIELDS: &'static [&'static str] = &["schema", "reintrospect"];
-        deserializer.deserialize_struct("IntrospectionInput", FIELDS, IntrospectionInputVisitor)
-    }
+fn default_false() -> bool {
+    false
 }
