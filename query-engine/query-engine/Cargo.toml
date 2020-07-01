@@ -12,8 +12,6 @@ mssql = ["datamodel/mssql", "sql-connector/mssql"]
 
 [dependencies]
 futures = "0.3"
-http = "0.2"
-hyper = "0.13"
 tokio = { version = "=0.2.13", features = ["rt-threaded", "macros"] }
 
 async-trait = "0.1"
@@ -27,8 +25,9 @@ sql-connector = { path = "../connectors/sql-query-connector", optional = true, p
 graphql-parser = { git = "https://github.com/prisma/graphql-parser", optional = true }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = { version = "1.0", features = [ "preserve_order" ] }
+tide = "0.10.0"
+async-std = { version = "1.6.2", features = ["attributes", "tokio02"] }
 base64 = "0.10"
-rust-embed = { version = "5.2" }
 failure = { version = "0.1" }
 indexmap = { version = "1.0", features = [ "serde-1" ] }
 itertools = "0.8"
