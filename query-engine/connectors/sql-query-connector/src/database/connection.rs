@@ -87,10 +87,10 @@ where
     async fn aggregate_records(
         &self,
         model: &ModelRef,
-        aggregations: Vec<Aggregator>,
+        aggregators: Vec<Aggregator>,
         query_arguments: QueryArguments,
     ) -> connector::Result<Vec<AggregationResult>> {
-        self.catch(async move { read::aggregate(&self.inner, model, aggregations, query_arguments).await })
+        self.catch(async move { read::aggregate(&self.inner, model, aggregators, query_arguments).await })
             .await
     }
 }

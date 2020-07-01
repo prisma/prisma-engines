@@ -39,16 +39,15 @@ impl<'conn, 'tx> ReadOperations for ConnectionLike<'conn, 'tx> {
         }
     }
 
-    // This will eventually become a more generic `aggregate`
     async fn aggregate_records(
         &self,
         model: &ModelRef,
-        aggregations: Vec<Aggregator>,
+        aggregators: Vec<Aggregator>,
         query_arguments: QueryArguments,
     ) -> crate::Result<Vec<AggregationResult>> {
         match self {
-            Self::Connection(c) => c.aggregate_records(model, aggregations, query_arguments).await,
-            Self::Transaction(tx) => tx.aggregate_records(model, aggregations, query_arguments).await,
+            Self::Connection(c) => c.aggregate_records(model, aggregators, query_arguments).await,
+            Self::Transaction(tx) => tx.aggregate_records(model, aggregators, query_arguments).await,
         }
     }
 }

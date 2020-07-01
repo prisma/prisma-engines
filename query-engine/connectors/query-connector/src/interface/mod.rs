@@ -159,7 +159,7 @@ pub trait ReadOperations {
     async fn aggregate_records(
         &self,
         model: &ModelRef,
-        aggregations: Vec<Aggregator>,
+        aggregators: Vec<Aggregator>,
         query_arguments: QueryArguments,
     ) -> crate::Result<Vec<AggregationResult>>;
 }

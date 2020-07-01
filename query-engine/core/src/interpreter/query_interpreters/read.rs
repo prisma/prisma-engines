@@ -134,11 +134,11 @@ fn read_related<'a, 'b>(
 
 async fn aggregate<'a, 'b>(
     tx: &'a ConnectionLike<'a, 'b>,
-    aggregate: AggregateRecordsQuery,
+    query: AggregateRecordsQuery,
 ) -> InterpretationResult<QueryResult> {
-    let selection_order = aggregate.selection_order;
+    let selection_order = query.selection_order;
     let results = tx
-        .aggregate_records(&aggregate.model, aggregate.aggregators, aggregate.args)
+        .aggregate_records(&query.model, query.aggregators, query.args)
         .await?;
 
     Ok(QueryResult::RecordAggregation(RecordAggregation {

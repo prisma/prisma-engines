@@ -72,8 +72,6 @@ impl Builder<ReadQuery> for AggregateRecordsBuilder {
             .map(|field| Self::resolve_query(field, &model))
             .collect::<QueryGraphBuilderResult<_>>()?;
 
-        dbg!(&aggregators);
-
         Ok(ReadQuery::AggregateRecordsQuery(AggregateRecordsQuery {
             name,
             alias,
