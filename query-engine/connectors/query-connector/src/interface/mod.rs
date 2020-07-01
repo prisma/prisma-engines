@@ -98,12 +98,13 @@ pub enum Aggregator {
 }
 
 /// Result of an aggregation operation on a model or field.
-/// It is expected that the type of any contained `PrismaValue` matches
-/// the `TypeIdentifier` of the accompanying `ScalarFieldRef`.
+/// It is expected that the type of a `PrismaValue` matches the `TypeIdentifier`
+/// of the accompanying `ScalarFieldRef` for `Sum`, `Min` and `Max`.
+/// `Count` and `Average` are expected to be of `int` and `float` types, respectively.
 #[derive(Debug, Clone)]
 pub enum AggregationResult {
-    Count(usize),
-    Average(ScalarFieldRef, f64),
+    Count(PrismaValue),
+    Average(ScalarFieldRef, PrismaValue),
     Sum(ScalarFieldRef, PrismaValue),
     Min(ScalarFieldRef, PrismaValue),
     Max(ScalarFieldRef, PrismaValue),

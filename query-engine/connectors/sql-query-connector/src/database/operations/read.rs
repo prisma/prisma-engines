@@ -3,6 +3,7 @@ use crate::{
     QueryExt, SqlError,
 };
 use connector_interface::*;
+use datamodel::FieldArity;
 use futures::stream::{FuturesUnordered, StreamExt};
 use prisma_models::*;
 use quaint::ast::*;
@@ -147,19 +148,77 @@ pub async fn aggregate(
     aggregators: Vec<Aggregator>,
     query_arguments: QueryArguments,
 ) -> crate::Result<Vec<AggregationResult>> {
-    let mut results = vec![];
+    // let mut results = vec![];
+    let query = read::aggregate(model, &aggregators, query_arguments);
 
-    for aggregator in aggregators {
-        match aggregator {
-            Aggregator::Count => {
-                let query = read::aggregate_count(model, query_arguments.clone());
-                let count = conn.find_int(query).await? as usize;
+    let idents: Vec<_> = aggregators
+        .iter()
+        .flat_map(|aggregator| match aggregator {
+            Aggregator::Count => vec![(TypeIdentifier::Int, FieldArity::Required)],
 
-                results.push(AggregationResult::Count(count));
-            }
+            Aggregator::Average(fields) => fields
+                .iter()
+                .map(|_field| (TypeIdentifier::Float, FieldArity::Required))
+                .collect(),
+
+            Aggregator::Sum(fields) => fields
+                .iter()
+                .map(|f| (f.type_identifier.clone(), FieldArity::Required))
+                .collect(),
+
+            Aggregator::Min(fields) => fields
+                .iter()
+                .map(|f| (f.type_identifier.clone(), FieldArity::Required))
+                .collect(),
+
+            Aggregator::Max(fields) => fields
+                .iter()
+                .map(|f| (f.type_identifier.clone(), FieldArity::Required))
+                .collect(),
+
             _ => unimplemented!(),
-        }
-    }
+        })
+        .collect();
 
-    Ok(results)
+    let mut rows = conn.filter(query.into(), idents.as_slice()).await?;
+    dbg!(&rows);
+
+    let row = rows
+        .pop()
+        .expect("Expected exactly one return row for aggregation query.");
+
+    let mut values = row.values;
+    values.reverse();
+
+    // Untangle results
+    Ok(aggregators
+        .iter()
+        .flat_map(|aggregator| match aggregator {
+            Aggregator::Count => vec![AggregationResult::Count(values.pop().unwrap())],
+            Aggregator::Average(fields) => fields
+                .iter()
+                .map(|field| AggregationResult::Average(field.clone(), values.pop().unwrap()))
+                .collect(),
+            _ => unimplemented!(),
+        })
+        .collect())
+
+    // todo!()
+
+    // columns.fold(query.into_select(model), |acc, col| acc.column(col))
+    // let idents: Vec<_> = selected_fields.type_identifiers_with_arities();
+
+    // for aggregator in aggregators {
+    //     match aggregator {
+    //         Aggregator::Count => {
+    //             let query = read::aggregate_count(model, query_arguments.clone());
+    //             let count = conn.find_int(query).await? as usize;
+
+    //             results.push(AggregationResult::Count(count));
+    //         }
+    //         _ => unimplemented!(),
+    //     }
+    // }
+
+    // Ok(results)
 }

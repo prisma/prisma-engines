@@ -1,5 +1,5 @@
 use crate::{cursor_condition, filter_conversion::AliasedCondition, ordering::Ordering};
-use connector_interface::{filter::Filter, QueryArguments};
+use connector_interface::{filter::Filter, Aggregator, QueryArguments};
 use prisma_models::*;
 use quaint::ast::*;
 use std::sync::Arc;
@@ -67,10 +67,14 @@ where
     columns.fold(query.into_select(model), |acc, col| acc.column(col))
 }
 
-pub fn aggregate_count(model: &ModelRef, query_arguments: QueryArguments) -> Select<'static> {
-    let selected_columns = model.primary_identifier().as_columns();
-    let base_query = get_records(model, selected_columns, query_arguments);
-    let table = Table::from(base_query).alias("sub");
+pub fn aggregate(model: &ModelRef, aggregators: &[Aggregator], args: QueryArguments) -> Select<'static> {
+    let base = args.into_select(model);
 
-    Select::from_table(table).value(count(asterisk()))
+    aggregators.into_iter().fold(base, |select, next_op| match next_op {
+        Aggregator::Count => select.value(count(asterisk())),
+        Aggregator::Average(fields) => fields
+            .into_iter()
+            .fold(select, |select, next_field| select.value(avg(next_field.as_column()))),
+        _ => unimplemented!(),
+    })
 }

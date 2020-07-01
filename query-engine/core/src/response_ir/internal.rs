@@ -6,7 +6,7 @@ use crate::{
 use connector::AggregationResult;
 use indexmap::IndexMap;
 use prisma_models::{InternalEnum, PrismaValue, RecordProjection};
-use rust_decimal::prelude::ToPrimitive;
+use rust_decimal::prelude::{Decimal, FromPrimitive, ToPrimitive};
 use std::{borrow::Borrow, collections::HashMap};
 
 /// A grouping of items to their parent record.
@@ -61,107 +61,58 @@ pub fn serialize_internal(
 }
 
 fn serialize_aggregation(record_aggregation: RecordAggregation) -> crate::Result<CheckedItemsWithParents> {
-    let mut envelope = CheckedItemsWithParents::new();
-    let mut inner_map: Map = IndexMap::with_capacity(record_aggregation.results.len());
-
     let ordering = record_aggregation.selection_order;
     let results = record_aggregation.results;
 
-    let mut grouped = HashMap::with_capacity(ordering.len());
+    let mut flattened = HashMap::with_capacity(ordering.len());
 
     for result in results {
         match result {
             AggregationResult::Count(count) => {
-                grouped.insert("count".to_owned(), Item::Value(PrismaValue::Int(count as i64)));
+                flattened.insert("count".to_owned(), Item::Value(count));
             }
+
             AggregationResult::Average(field, value) => {
-                if !grouped.contains_key("avg") {
-                    grouped.insert("avg".to_owned(), Item::Map(Map::new()));
-                }
-
-                use rust_decimal::{prelude::FromPrimitive, Decimal};
-                // use num_tra
-
-                let map = match grouped.get_mut("avg").unwrap() {
-                    Item::Map(ref mut m) => m.insert(
-                        field.name.clone(),
-                        Item::Value(PrismaValue::Float(
-                            Decimal::from_f64(value).expect("Expected valid f64 value"),
-                        )),
-                    ),
-                    _ => unreachable!(),
-                };
-
-                // inner_map.insert(name, Item::Value(PrismaValue::Int(count as i64)));
-                todo!()
+                flattened.insert(format!("avg_{}", &field.name), Item::Value(value));
             }
-            AggregationResult::Min(field, value) => {
-                // inner_map.insert(name, Item::Value(PrismaValue::Int(count as i64)));
-                todo!()
-            }
-            AggregationResult::Max(field, value) => {
-                // inner_map.insert(name, Item::Value(PrismaValue::Int(count as i64)));
-                todo!()
-            }
+
             AggregationResult::Sum(field, value) => {
-                // inner_map.insert(name, Item::Value(PrismaValue::Int(count as i64)));
-                todo!()
+                flattened.insert(format!("sum_{}", &field.name), Item::Value(value));
+            }
+
+            AggregationResult::Min(field, value) => {
+                flattened.insert(format!("min_{}", &field.name), Item::Value(value));
+            }
+
+            AggregationResult::Max(field, value) => {
+                flattened.insert(format!("max_{}", &field.name), Item::Value(value));
             }
         }
     }
 
-    // for (query, field_order) in ordering {
-    //     match query.as_str() {
-    //         "count" => {
-    //             results.remove_item(item);
-    //             todo!()
-    //         }
-    //         "average" => todo!(),
-    //         "sum" => todo!(),
-    //         "min" => todo!(),
-    //         "max" => todo!(),
-    //     }
-    // }
+    // Reorder fields based on the original query selection.
+    let mut inner_map: Map = IndexMap::with_capacity(ordering.len());
+    for (query, field_order) in ordering {
+        if let Some(order) = field_order {
+            let mut nested_map = Map::new();
 
-    // for result in  {
-    //     match result {
-    //         AggregationResult::Count(count) => {
-    //             inner_map.insert("count".to_owned(), Item::Value(PrismaValue::Int(count as i64)));
-    //         }
-    //         AggregationResult::Average(field, value) => {
-    //             let field_order = ordering.iter().find(|(key, _)| key == "avg");
-    //             let mut avg_map = Map::new();
+            for field in order {
+                let item = flattened.remove(&format!("{}_{}", query, field)).unwrap();
+                nested_map.insert(field, item);
+            }
 
-    //             let results =
+            inner_map.insert(query, Item::Map(nested_map));
+        } else {
+            let item = flattened.remove(&query).unwrap();
+            inner_map.insert(query, item);
+        }
+    }
 
-    //             inner_map.insert("avg".to_owned(), Item::Map(avg_map));
-
-    //             // inner_map.insert(name, Item::Value(PrismaValue::Int(count as i64)));
-    //             todo!()
-    //         }
-    //         AggregationResult::Min(field, value) => {
-    //             // inner_map.insert(name, Item::Value(PrismaValue::Int(count as i64)));
-    //             todo!()
-    //         }
-    //         AggregationResult::Max(field, value) => {
-    //             // inner_map.insert(name, Item::Value(PrismaValue::Int(count as i64)));
-    //             todo!()
-    //         }
-    //         AggregationResult::Sum(field, value) => {
-    //             // inner_map.insert(name, Item::Value(PrismaValue::Int(count as i64)));
-    //             todo!()
-    //         }
-    //     }
-    // }
-
-    // sort
-
+    let mut envelope = CheckedItemsWithParents::new();
     envelope.insert(None, Item::Map(inner_map));
 
     Ok(envelope)
 }
-
-// fn insert_ordered(order: , results: Vec<AggregationResult>)
 
 fn serialize_record_selection(
     record_selection: RecordSelection,
