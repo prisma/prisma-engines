@@ -38,7 +38,8 @@ fn strings_with_quotes_roundtrip() {
         model Category {
           id   String @id
           name String @default("a \" b\"c d")
-        }"#
+        }
+        "#
     );
 
     let dml = datamodel::parse_datamodel(input).unwrap();
@@ -62,7 +63,8 @@ fn strings_with_newlines_render_as_escaped_literals() {
         model Category {
           id   String @id
           name String @default("Jean\nClaude\nVan\nDamme")
-        }"#
+        }
+        "#
     );
 
     let mut dml = datamodel::parse_datamodel(input).unwrap();
@@ -84,7 +86,8 @@ fn strings_with_newlines_roundtrip() {
         model Category {
           id   String @id
           name String @default("Jean\nClaude\nVan\nDamme")
-        }"#
+        }
+        "#
     );
 
     let dml = datamodel::parse_datamodel(input).unwrap();
@@ -100,7 +103,8 @@ fn strings_with_backslashes_roundtrip() {
         model Category {
           id   String @id
           name String @default("xyz\\Datasource\\Model")
-        }"#
+        }
+        "#
     );
 
     let dml = datamodel::parse_datamodel(input).unwrap();
@@ -116,7 +120,8 @@ fn strings_with_multiple_escaped_characters_roundtrip() {
         model FilmQuote {
           id             Int    @id
           favouriteQuote String @default("\"That's a lot of fish\"\n - Godzilla (1998)")
-        }"#
+        }
+        "#
     );
 
     let dml = datamodel::parse_datamodel(dm).unwrap();
@@ -138,7 +143,8 @@ fn internal_escaped_values_are_rendered_correctly() {
         r#"
         model FilmQuote {
           id Int @default("xyz\\Datasource\\Model") @id
-        }"#
+        }
+        "#
     );
 
     let mut dml = datamodel::parse_datamodel(dm).unwrap();

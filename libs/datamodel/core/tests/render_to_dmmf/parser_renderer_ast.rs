@@ -68,7 +68,8 @@ enum CategoryEnum {
   A
   B
   C
-}"#;
+}
+"#;
     assert_rendered(input, input);
 }
 
@@ -93,7 +94,8 @@ model Post {
   title String
   tags  String[]
   blog  Blog
-}"#;
+}
+"#;
     assert_rendered(input, input);
 }
 
@@ -105,7 +107,8 @@ model Author {
   id      ID
   name    String?
   authors Blog[]  @relation("AuthorToBlogs")
-}"#;
+}
+"#;
 
     assert_rendered(input, input);
 }
@@ -121,7 +124,8 @@ model Author {
   id      ID
   name    String?
   authors Blog[]  @relation("AuthorToBlogs")
-}"#;
+}
+"#;
 
     assert_eq!(input, input);
 }
@@ -140,7 +144,8 @@ model Author {
   /// Name of the author.
   name      String?
   createdAt DateTime @default(now())
-}"#;
+}
+"#;
 
     assert_rendered(input, input);
 }
@@ -173,7 +178,8 @@ model Author {
   /// Name of the author.
   name      String?
   createdAt DateTime @default(now())
-}"#;
+}
+"#;
     // replaces \t placeholder with a real tab
     let tabbed_dm = input.replace("\\t", "\t");
     assert_rendered(&tabbed_dm, &expected.replace("\\t", "\t"));
