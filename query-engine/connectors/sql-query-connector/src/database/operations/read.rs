@@ -144,12 +144,22 @@ pub async fn get_related_m2m_record_ids(
 pub async fn aggregate(
     conn: &dyn QueryExt,
     model: &ModelRef,
-    aggregations: Vec<Aggregator>,
+    aggregators: Vec<Aggregator>,
     query_arguments: QueryArguments,
 ) -> crate::Result<Vec<AggregationResult>> {
-    // let query = read::count_by_model(model, query_arguments);
-    // let count = conn.find_int(query).await? as usize;
+    let mut results = vec![];
 
-    // Ok(count)
-    todo!()
+    for aggregator in aggregators {
+        match aggregator {
+            Aggregator::Count => {
+                let query = read::aggregate_count(model, query_arguments.clone());
+                let count = conn.find_int(query).await? as usize;
+
+                results.push(AggregationResult::Count(count));
+            }
+            _ => unimplemented!(),
+        }
+    }
+
+    Ok(results)
 }

@@ -65,13 +65,33 @@ fn serialize_aggregation(record_aggregation: RecordAggregation) -> crate::Result
     let mut inner_map: Map = IndexMap::with_capacity(record_aggregation.results.len());
 
     let ordering = record_aggregation.selection_order;
+    let results = record_aggregation.results;
 
-    for result in record_aggregation.results {
+    let mut grouped = HashMap::with_capacity(ordering.len());
+
+    for result in results {
         match result {
             AggregationResult::Count(count) => {
-                inner_map.insert("count".to_owned(), Item::Value(PrismaValue::Int(count as i64)));
+                grouped.insert("count".to_owned(), Item::Value(PrismaValue::Int(count as i64)));
             }
             AggregationResult::Average(field, value) => {
+                if !grouped.contains_key("avg") {
+                    grouped.insert("avg".to_owned(), Item::Map(Map::new()));
+                }
+
+                use rust_decimal::{prelude::FromPrimitive, Decimal};
+                // use num_tra
+
+                let map = match grouped.get_mut("avg").unwrap() {
+                    Item::Map(ref mut m) => m.insert(
+                        field.name.clone(),
+                        Item::Value(PrismaValue::Float(
+                            Decimal::from_f64(value).expect("Expected valid f64 value"),
+                        )),
+                    ),
+                    _ => unreachable!(),
+                };
+
                 // inner_map.insert(name, Item::Value(PrismaValue::Int(count as i64)));
                 todo!()
             }
@@ -90,13 +110,58 @@ fn serialize_aggregation(record_aggregation: RecordAggregation) -> crate::Result
         }
     }
 
+    // for (query, field_order) in ordering {
+    //     match query.as_str() {
+    //         "count" => {
+    //             results.remove_item(item);
+    //             todo!()
+    //         }
+    //         "average" => todo!(),
+    //         "sum" => todo!(),
+    //         "min" => todo!(),
+    //         "max" => todo!(),
+    //     }
+    // }
+
+    // for result in  {
+    //     match result {
+    //         AggregationResult::Count(count) => {
+    //             inner_map.insert("count".to_owned(), Item::Value(PrismaValue::Int(count as i64)));
+    //         }
+    //         AggregationResult::Average(field, value) => {
+    //             let field_order = ordering.iter().find(|(key, _)| key == "avg");
+    //             let mut avg_map = Map::new();
+
+    //             let results =
+
+    //             inner_map.insert("avg".to_owned(), Item::Map(avg_map));
+
+    //             // inner_map.insert(name, Item::Value(PrismaValue::Int(count as i64)));
+    //             todo!()
+    //         }
+    //         AggregationResult::Min(field, value) => {
+    //             // inner_map.insert(name, Item::Value(PrismaValue::Int(count as i64)));
+    //             todo!()
+    //         }
+    //         AggregationResult::Max(field, value) => {
+    //             // inner_map.insert(name, Item::Value(PrismaValue::Int(count as i64)));
+    //             todo!()
+    //         }
+    //         AggregationResult::Sum(field, value) => {
+    //             // inner_map.insert(name, Item::Value(PrismaValue::Int(count as i64)));
+    //             todo!()
+    //         }
+    //     }
+    // }
+
     // sort
 
     envelope.insert(None, Item::Map(inner_map));
 
-    // [DTODO] Ordering when we have more queries
     Ok(envelope)
 }
+
+// fn insert_ordered(order: , results: Vec<AggregationResult>)
 
 fn serialize_record_selection(
     record_selection: RecordSelection,

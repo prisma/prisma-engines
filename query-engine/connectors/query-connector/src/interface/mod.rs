@@ -151,8 +151,8 @@ pub trait ReadOperations {
         from_record_ids: &[RecordProjection],
     ) -> crate::Result<Vec<(RecordProjection, RecordProjection)>>;
 
-    /// Aggregates records for a specific model based on the given queries.
-    /// Whether or not the queries can be executed in a single query or
+    /// Aggregates records for a specific model based on the given aggregators.
+    /// Whether or not the aggregations can be executed in a single query or
     /// requires multiple roundtrips to the underlying data source is at the
     /// discretion of the implementing connector.
     async fn aggregate_records(

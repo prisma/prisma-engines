@@ -67,12 +67,12 @@ impl Builder<ReadQuery> for AggregateRecordsBuilder {
         let selection_order = Self::collect_selection_tree(&nested_fields);
         let args = extractors::extract_query_args(self.field.arguments, &model)?;
 
-        let queries: Vec<_> = nested_fields
+        let aggregators: Vec<_> = nested_fields
             .into_iter()
             .map(|field| Self::resolve_query(field, &model))
             .collect::<QueryGraphBuilderResult<_>>()?;
 
-        dbg!(&queries);
+        dbg!(&aggregators);
 
         Ok(ReadQuery::AggregateRecordsQuery(AggregateRecordsQuery {
             name,
@@ -80,7 +80,7 @@ impl Builder<ReadQuery> for AggregateRecordsBuilder {
             model,
             selection_order,
             args,
-            queries,
+            aggregators,
         }))
     }
 }

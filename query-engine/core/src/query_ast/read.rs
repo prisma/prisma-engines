@@ -136,7 +136,7 @@ pub struct AggregateRecordsQuery {
     pub model: ModelRef,
     pub selection_order: Vec<(String, Option<Vec<String>>)>,
     pub args: QueryArguments,
-    pub queries: Vec<Aggregator>,
+    pub aggregators: Vec<Aggregator>,
 }
 
 impl FilteredQuery for RecordQuery {
