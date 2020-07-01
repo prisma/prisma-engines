@@ -5,61 +5,29 @@ use serial_test::serial;
 
 #[test]
 #[serial]
-fn serialize_sources_to_dmmf() {
-    let dml = r#"
+fn must_error_if_multiple_datasources_are_defined() {
+    let schema = r#"
 datasource db1 {
-    provider = ["sqlite", "postgresql"]
-    url = env("URL_CUSTOM_1")
+    provider = "postgresql"
+    url = "postgresql://localhost"
 }
 
 datasource db2 {
     provider = "mysql"
     url = "mysql://localhost"
 }
-
-
-model User {
-    id Int @id
-    firstName String @custom_1.mapToInt
-    lastName String @custom_1.mapToInt
-    email String
-}
-
-model Post {
-    id Int @id
-    likes String @custom_2.mapToInt
-    comments Int
-}
 "#;
 
-    std::env::set_var("URL_CUSTOM_1", "postgresql://localhost");
-    let config = datamodel::parse_configuration(dml).unwrap();
-    let rendered = datamodel::json::mcf::render_sources_to_json(&config.datasources);
-
-    let expected = r#"[
-  {
-    "name": "db1",
-    "provider": ["sqlite", "postgresql"],
-    "activeProvider": "postgresql",
-    "url": {
-        "fromEnvVar": "URL_CUSTOM_1",
-        "value": "postgresql://localhost"       
-    }
-  },
-  {
-    "name": "db2",
-    "provider": ["mysql"],
-    "activeProvider": "mysql",
-    "url": {
-        "fromEnvVar": null,
-        "value": "mysql://localhost"      
-    }
-  }
-]"#;
-
-    println!("{}", rendered);
-
-    assert_eq_json(&rendered, expected);
+    let errors = parse_error(&schema);
+    errors.assert_length(2);
+    errors.assert_is_at(
+        0,
+        DatamodelError::new_source_validation_error("You defined more than one datasource. This is not allowed yet because support for multiple databases has not been implemented yet.", "db1", Span::new(1, 82)),
+    );
+    errors.assert_is_at(
+        1,
+        DatamodelError::new_source_validation_error("You defined more than one datasource. This is not allowed yet because support for multiple databases has not been implemented yet.", "db2", Span::new(84, 155)),
+    );
 }
 
 #[test]
@@ -325,6 +293,27 @@ fn must_succeed_with_overrides() {
         from_env_var: None,
         value: url.to_string(),
     });
+}
+
+#[test]
+#[serial]
+fn fail_to_load_sources_for_invalid_source() {
+    let invalid_datamodel: &str = r#"
+        datasource pg1 {
+            provider = "AStrangeHalfMongoDatabase"
+            url = "https://localhost/postgres1"
+        }
+    "#;
+    let res = datamodel::parse_configuration(invalid_datamodel);
+
+    if let Err(error) = res {
+        error.assert_is(DatamodelError::DatasourceProviderNotKnownError {
+            source_name: String::from("AStrangeHalfMongoDatabase"),
+            span: datamodel::ast::Span::new(49, 76),
+        });
+    } else {
+        panic!("Expected error.")
+    }
 }
 
 fn assert_eq_json(a: &str, b: &str) {

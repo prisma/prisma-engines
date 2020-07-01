@@ -43,6 +43,16 @@ impl SourceLoader {
             }
         }
 
+        if sources.len() > 1 {
+            for src in &ast_schema.sources() {
+                errors.push(DatamodelError::new_source_validation_error(
+                    &format!("You defined more than one datasource. This is not allowed yet because support for multiple databases has not been implemented yet."),
+                    &src.name.name,
+                    src.span.clone(),
+                ));
+            }
+        }
+
         if errors.has_errors() {
             Err(errors)
         } else {
