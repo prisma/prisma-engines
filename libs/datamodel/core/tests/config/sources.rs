@@ -1,5 +1,5 @@
 use crate::common::*;
-use datamodel::{ast::Span, error::DatamodelError};
+use datamodel::{ast::Span, error::DatamodelError, StringFromEnvVar};
 use pretty_assertions::assert_eq;
 use serial_test::serial;
 
@@ -239,6 +239,92 @@ fn new_lines_in_source_must_work() {
     println!("{}", rendered);
 
     assert_eq_json(&rendered, expected);
+}
+
+#[test]
+#[serial]
+fn must_error_if_env_var_is_missing() {
+    let schema = r#"
+        datasource ds {
+          provider = "postgresql"
+          url = env("DATABASE_URL")        
+        }
+    "#;
+
+    let result = datamodel::parse_configuration(schema);
+    assert!(result.is_err());
+    let errors = result.err().unwrap();
+    errors.assert_is(DatamodelError::new_environment_functional_evaluation_error(
+        "DATABASE_URL",
+        Span::new(75, 94),
+    ));
+}
+
+#[test]
+#[serial]
+fn must_succeed_if_env_var_is_missing_but_override_was_provided() {
+    let schema = r#"
+        datasource ds {
+          provider = "postgresql"
+          url = env("DATABASE_URL")        
+        }
+    "#;
+
+    let url = "postgres://localhost";
+    let overrides = vec![("ds".to_string(), url.to_string())];
+    let config = datamodel::parse_configuration_with_url_overrides(schema, overrides).unwrap();
+    let data_source = config.datasources.first().unwrap();
+
+    data_source.assert_name("ds");
+    data_source.assert_url(StringFromEnvVar {
+        from_env_var: None,
+        value: url.to_string(),
+    });
+}
+
+#[test]
+#[serial]
+fn must_succeed_if_env_var_exists_and_override_was_provided() {
+    let schema = r#"
+        datasource ds {
+          provider = "postgresql"
+          url = env("DATABASE_URL")        
+        }
+    "#;
+    std::env::set_var("DATABASE_URL", "postgres://hostfoo");
+
+    let url = "postgres://hostbar";
+    let overrides = vec![("ds".to_string(), url.to_string())];
+    let config = datamodel::parse_configuration_with_url_overrides(schema, overrides).unwrap();
+    let data_source = config.datasources.first().unwrap();
+
+    data_source.assert_name("ds");
+    data_source.assert_url(StringFromEnvVar {
+        from_env_var: None,
+        value: url.to_string(),
+    });
+}
+
+#[test]
+#[serial]
+fn must_succeed_with_overrides() {
+    let schema = r#"
+        datasource ds {
+          provider = "postgresql"
+          url = "postgres://hostfoo"     
+        }
+    "#;
+
+    let url = "postgres://hostbar";
+    let overrides = vec![("ds".to_string(), url.to_string())];
+    let config = datamodel::parse_configuration_with_url_overrides(schema, overrides).unwrap();
+    let data_source = config.datasources.first().unwrap();
+
+    data_source.assert_name("ds");
+    data_source.assert_url(StringFromEnvVar {
+        from_env_var: None,
+        value: url.to_string(),
+    });
 }
 
 fn assert_eq_json(a: &str, b: &str) {

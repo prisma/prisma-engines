@@ -9,31 +9,31 @@ use crate::StringFromEnvVar;
 use crate::{ast, Datasource};
 use datamodel_connector::{BuiltinConnectors, Connector};
 
-/// Helper struct to load and validate source configuration blocks.
 pub struct SourceLoader {
     source_definitions: Vec<Box<dyn DatasourceProvider>>,
 }
 
 impl SourceLoader {
-    /// Creates a new, empty source loader.
     pub fn new() -> Self {
         Self {
             source_definitions: get_builtin_datasource_providers(),
         }
     }
 
-    /// Loads all source config blocks form the given AST,
-    /// and returns a Source instance for each.
+    /// Loads all datasources from the provided schema AST.
+    /// - `ignore_datasource_urls`: datasource URLs are not parsed. They are replaced with dummy values.
+    /// - `datasource_url_overrides`: datasource URLs are not parsed and overridden with the provided ones.
     pub fn load_sources(
         &self,
         ast_schema: &ast::SchemaAst,
         ignore_datasource_urls: bool,
+        datasource_url_overrides: Vec<(String, String)>,
     ) -> Result<Vec<Datasource>, ErrorCollection> {
         let mut sources = vec![];
         let mut errors = ErrorCollection::new();
 
         for src in &ast_schema.sources() {
-            match self.load_source(&src, ignore_datasource_urls) {
+            match self.load_source(&src, ignore_datasource_urls, &datasource_url_overrides) {
                 Ok(loaded_src) => sources.push(loaded_src),
                 // Lift error to source.
                 Err(DatamodelError::ArgumentNotFound { argument_name, span }) => errors.push(
@@ -50,11 +50,11 @@ impl SourceLoader {
         }
     }
 
-    /// Internal: Loads a single source from a source config block in the datamodel.
     fn load_source(
         &self,
         ast_source: &ast::SourceConfig,
         ignore_datasource_urls: bool,
+        datasource_url_overrides: &Vec<(String, String)>,
     ) -> Result<Datasource, DatamodelError> {
         let source_name = &ast_source.name.name;
         let mut args = Arguments::new(&ast_source.properties, ast_source.span);
@@ -77,13 +77,22 @@ impl SourceLoader {
         }
 
         let url_args = args.arg("url")?;
-        let (env_var_for_url, url) = match url_args.as_str_from_env() {
-            _ if ignore_datasource_urls => {
+        let override_url = datasource_url_overrides
+            .iter()
+            .find(|x| &x.0 == source_name)
+            .map(|x| &x.1);
+
+        let (env_var_for_url, url) = match (url_args.as_str_from_env(), override_url) {
+            (_, _) if ignore_datasource_urls => {
                 // glorious hack. ask marcus
                 (None, format!("{}://", providers.first().unwrap()))
             }
-            Ok((env_var, url)) => (env_var, url.trim().to_owned()),
-            Err(err) => return Err(err),
+            (_, Some(url)) => {
+                debug!("overwriting datasource `{}` with url '{}'", &source_name, &url);
+                (None, url.to_owned())
+            }
+            (Ok((env_var, url)), _) => (env_var, url.trim().to_owned()),
+            (Err(err), _) => return Err(err),
         };
 
         if url.is_empty() {
