@@ -1,5 +1,6 @@
 use crate::{
     query_builder::{self, read},
+    row::SqlRow,
     QueryExt, SqlError,
 };
 use connector_interface::*;
@@ -148,46 +149,50 @@ pub async fn aggregate(
     aggregators: Vec<Aggregator>,
     query_arguments: QueryArguments,
 ) -> crate::Result<Vec<AggregationResult>> {
-    // let mut results = vec![];
     let query = read::aggregate(model, &aggregators, query_arguments);
-
-    let idents: Vec<_> = aggregators
-        .iter()
-        .flat_map(|aggregator| match aggregator {
-            Aggregator::Count => vec![(TypeIdentifier::Int, FieldArity::Required)],
-
-            Aggregator::Average(fields) => fields
-                .iter()
-                .map(|_field| (TypeIdentifier::Float, FieldArity::Required))
-                .collect(),
-
-            Aggregator::Sum(fields) => fields
-                .iter()
-                .map(|f| (f.type_identifier.clone(), FieldArity::Required))
-                .collect(),
-
-            Aggregator::Min(fields) => fields
-                .iter()
-                .map(|f| (f.type_identifier.clone(), FieldArity::Required))
-                .collect(),
-
-            Aggregator::Max(fields) => fields
-                .iter()
-                .map(|f| (f.type_identifier.clone(), FieldArity::Required))
-                .collect(),
-        })
-        .collect();
+    let idents = extract_query_idents(&aggregators);
 
     let mut rows = conn.filter(query.into(), idents.as_slice()).await?;
     let row = rows
         .pop()
         .expect("Expected exactly one return row for aggregation query.");
 
+    Ok(parse_aggregation_row(&aggregators, row))
+}
+
+fn extract_query_idents(aggregators: &[Aggregator]) -> Vec<(TypeIdentifier, FieldArity)> {
+    aggregators
+        .iter()
+        .flat_map(|aggregator| match aggregator {
+            Aggregator::Count => vec![(TypeIdentifier::Int, FieldArity::Required)],
+            Aggregator::Average(fields) => map_aggregator_fields(&fields, Some(TypeIdentifier::Float)),
+            Aggregator::Sum(fields) => map_aggregator_fields(&fields, None),
+            Aggregator::Min(fields) => map_aggregator_fields(&fields, None),
+            Aggregator::Max(fields) => map_aggregator_fields(&fields, None),
+        })
+        .collect()
+}
+
+fn map_aggregator_fields(
+    fields: &[ScalarFieldRef],
+    fixed_type: Option<TypeIdentifier>,
+) -> Vec<(TypeIdentifier, FieldArity)> {
+    fields
+        .into_iter()
+        .map(|f| {
+            (
+                fixed_type.clone().unwrap_or(f.type_identifier.clone()),
+                FieldArity::Required,
+            )
+        })
+        .collect()
+}
+
+fn parse_aggregation_row(aggregators: &[Aggregator], row: SqlRow) -> Vec<AggregationResult> {
     let mut values = row.values;
     values.reverse();
 
-    // Untangle results
-    Ok(aggregators
+    aggregators
         .iter()
         .flat_map(|aggregator| match aggregator {
             Aggregator::Count => vec![AggregationResult::Count(values.pop().unwrap())],
@@ -212,24 +217,5 @@ pub async fn aggregate(
                 .map(|field| AggregationResult::Max(field.clone(), values.pop().unwrap()))
                 .collect(),
         })
-        .collect())
-
-    // todo!()
-
-    // columns.fold(query.into_select(model), |acc, col| acc.column(col))
-    // let idents: Vec<_> = selected_fields.type_identifiers_with_arities();
-
-    // for aggregator in aggregators {
-    //     match aggregator {
-    //         Aggregator::Count => {
-    //             let query = read::aggregate_count(model, query_arguments.clone());
-    //             let count = conn.find_int(query).await? as usize;
-
-    //             results.push(AggregationResult::Count(count));
-    //         }
-    //         _ => unimplemented!(),
-    //     }
-    // }
-
-    // Ok(results)
+        .collect()
 }
