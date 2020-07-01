@@ -819,6 +819,14 @@ pub trait Visitor<'a> {
                 self.write("UPPER")?;
                 self.surround_with("(", ")", |ref mut s| s.visit_expression(*upper.expression))?;
             }
+            FunctionType::Minimum(min) => {
+                self.write("MIN")?;
+                self.surround_with("(", ")", |ref mut s| s.visit_column(min.column))?;
+            }
+            FunctionType::Maximum(max) => {
+                self.write("MAX")?;
+                self.surround_with("(", ")", |ref mut s| s.visit_column(max.column))?;
+            }
         };
 
         if let Some(alias) = fun.alias {

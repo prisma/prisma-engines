@@ -1,17 +1,21 @@
 mod aggregate_to_string;
 mod average;
 mod count;
+mod lower;
+mod maximum;
+mod minimum;
 mod row_number;
 mod sum;
-mod lower;
 mod upper;
 
 pub use aggregate_to_string::*;
 pub use average::*;
 pub use count::*;
+pub use lower::*;
+pub use maximum::*;
+pub use minimum::*;
 pub use row_number::*;
 pub use sum::*;
-pub use lower::*;
 pub use upper::*;
 
 use super::{Aliasable, Expression};
@@ -34,6 +38,8 @@ pub(crate) enum FunctionType<'a> {
     Sum(Sum<'a>),
     Lower(Lower<'a>),
     Upper(Upper<'a>),
+    Minimum(Minimum<'a>),
+    Maximum(Maximum<'a>),
 }
 
 impl<'a> Aliasable<'a> for Function<'a> {
@@ -48,4 +54,14 @@ impl<'a> Aliasable<'a> for Function<'a> {
     }
 }
 
-function!(RowNumber, Count, AggregateToString, Average, Sum, Lower, Upper);
+function!(
+    RowNumber,
+    Count,
+    AggregateToString,
+    Average,
+    Sum,
+    Lower,
+    Upper,
+    Minimum,
+    Maximum
+);
