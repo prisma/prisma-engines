@@ -175,14 +175,10 @@ pub async fn aggregate(
                 .iter()
                 .map(|f| (f.type_identifier.clone(), FieldArity::Required))
                 .collect(),
-
-            _ => unimplemented!(),
         })
         .collect();
 
     let mut rows = conn.filter(query.into(), idents.as_slice()).await?;
-    dbg!(&rows);
-
     let row = rows
         .pop()
         .expect("Expected exactly one return row for aggregation query.");
@@ -195,11 +191,26 @@ pub async fn aggregate(
         .iter()
         .flat_map(|aggregator| match aggregator {
             Aggregator::Count => vec![AggregationResult::Count(values.pop().unwrap())],
+
             Aggregator::Average(fields) => fields
                 .iter()
                 .map(|field| AggregationResult::Average(field.clone(), values.pop().unwrap()))
                 .collect(),
-            _ => unimplemented!(),
+
+            Aggregator::Sum(fields) => fields
+                .iter()
+                .map(|field| AggregationResult::Sum(field.clone(), values.pop().unwrap()))
+                .collect(),
+
+            Aggregator::Min(fields) => fields
+                .iter()
+                .map(|field| AggregationResult::Min(field.clone(), values.pop().unwrap()))
+                .collect(),
+
+            Aggregator::Max(fields) => fields
+                .iter()
+                .map(|field| AggregationResult::Max(field.clone(), values.pop().unwrap()))
+                .collect(),
         })
         .collect())
 

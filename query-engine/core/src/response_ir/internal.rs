@@ -6,7 +6,7 @@ use crate::{
 use connector::AggregationResult;
 use indexmap::IndexMap;
 use prisma_models::{InternalEnum, PrismaValue, RecordProjection};
-use rust_decimal::prelude::{Decimal, FromPrimitive, ToPrimitive};
+use rust_decimal::prelude::ToPrimitive;
 use std::{borrow::Borrow, collections::HashMap};
 
 /// A grouping of items to their parent record.

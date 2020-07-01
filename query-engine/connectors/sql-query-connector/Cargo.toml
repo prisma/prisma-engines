@@ -1,53 +1,53 @@
 [package]
-name = "sql-query-connector"
-version = "0.1.0"
 authors = []
 edition = "2018"
+name = "sql-query-connector"
+version = "0.1.0"
 
 [dependencies]
-itertools = "0.8"
-serde_json = "1.0"
-uuid = "0.8"
-failure = "0.1"
-rand = "0.7"
 async-trait = "0.1"
+failure = "0.1"
 futures = "0.3"
+itertools = "0.8"
+rand = "0.7"
 rust_decimal = "1.6"
+serde_json = "1.0"
 tokio = "=0.2.13"
+uuid = "0.8"
 
 [dependencies.quaint]
-git = "https://github.com/prisma/quaint"
 features = ["full", "tracing-log"]
+git = "https://github.com/prisma/quaint"
 
 [dependencies.connector-interface]
-path = "../query-connector"
 package = "query-connector"
+path = "../query-connector"
 
 [dependencies.prisma-models]
-path = "../../../libs/prisma-models"
 features = ["sql-ext"]
+path = "../../../libs/prisma-models"
 
 [dependencies.prisma-value]
-path = "../../../libs/prisma-value"
 features = ["sql-ext"]
+path = "../../../libs/prisma-value"
 
 [dependencies.chrono]
-version = "0.4"
 features = ["serde"]
+version = "0.4"
 
 [dependencies.datamodel]
 path = "../../../libs/datamodel/core"
 
 [dependencies.serde]
-version = "1.0"
 features = ["derive"]
+version = "1.0"
 
 [dependencies.cuid]
 git = "https://github.com/prisma/cuid-rust"
 
 [dependencies.user-facing-errors]
-path = "../../../libs/user-facing-errors"
 features = ["sql"]
+path = "../../../libs/user-facing-errors"
 
 [features]
 mssql = ["datamodel/mssql"]
