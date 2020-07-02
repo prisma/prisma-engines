@@ -11,7 +11,7 @@ use std::{convert::TryInto, sync::Arc};
 /// Handles nested create cases.
 /// The resulting graph can take multiple forms, based on the relation type to the parent model.
 /// Information on the graph shapes can be found on the individual handlers.
-pub fn connect_nested_create(
+pub fn nested_create(
     graph: &mut QueryGraph,
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,

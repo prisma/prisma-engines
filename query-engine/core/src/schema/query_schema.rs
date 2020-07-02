@@ -1,7 +1,7 @@
 use super::*;
 use crate::{ParsedField, QueryGraph, QueryGraphBuilderResult};
 use once_cell::sync::OnceCell;
-use prisma_models::{dml, InternalDataModelRef, ModelRef};
+use prisma_models::{dml, InternalDataModelRef, ModelRef, TypeHint};
 use std::{
     borrow::Borrow,
     boxed::Box,
@@ -154,6 +154,12 @@ pub struct Field {
     pub query_builder: Option<SchemaQueryBuilder>,
 }
 
+impl Field {
+    pub fn query_builder(&self) -> Option<&SchemaQueryBuilder> {
+        self.query_builder.as_ref()
+    }
+}
+
 /// Todo rework description.
 /// A query builder allows to attach queries to the schema:
 /// on a field:
@@ -250,6 +256,9 @@ pub struct Argument {
 #[derive(DebugStub)]
 pub struct InputObjectType {
     pub name: String,
+    /// If true this means that _exactly_ one of the contained fields must be specified in an incoming query.
+    /// This allows clients to handle this input type in a special way and ensure this invariant in a typesafe way.
+    pub is_one_of: bool,
 
     #[debug_stub = "#Input Fields Cell#"]
     pub fields: OnceCell<Vec<InputFieldRef>>,
@@ -302,6 +311,19 @@ pub enum InputType {
     /// A nullable input denotes that, if provided, a given input can be null.
     /// This makes no assumption about if an input needs to be provided or not.
     Null(Box<InputType>),
+}
+
+impl From<&InputType> for TypeHint {
+    fn from(i: &InputType) -> Self {
+        match i {
+            InputType::Opt(inner) => (&**inner).into(),
+            InputType::Null(inner) => (&**inner).into(),
+            InputType::Scalar(st) => st.into(),
+            InputType::Enum(_) => TypeHint::Enum,
+            InputType::List(_) => TypeHint::Array,
+            InputType::Object(_) => TypeHint::Unknown,
+        }
+    }
 }
 
 impl InputType {
@@ -444,6 +466,22 @@ pub enum ScalarType {
     Json,
     JsonList,
     UUID,
+}
+
+impl From<&ScalarType> for TypeHint {
+    fn from(t: &ScalarType) -> Self {
+        match t {
+            ScalarType::String => TypeHint::String,
+            ScalarType::Int => TypeHint::Int,
+            ScalarType::Float => TypeHint::Float,
+            ScalarType::Boolean => TypeHint::Boolean,
+            ScalarType::Enum(_) => TypeHint::Enum,
+            ScalarType::DateTime => TypeHint::DateTime,
+            ScalarType::Json => TypeHint::Json,
+            ScalarType::JsonList => TypeHint::Json,
+            ScalarType::UUID => TypeHint::UUID,
+        }
+    }
 }
 
 impl From<EnumType> for OutputType {

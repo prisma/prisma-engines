@@ -1,7 +1,7 @@
 use crate::interpreter::query_interpreters::nested_pagination::NestedPagination;
 use crate::{interpreter::InterpretationResult, query_ast::*};
 use connector::{self, filter::Filter, ConnectionLike, QueryArguments, ReadOperations, ScalarCompare};
-use prisma_models::{ManyRecords, ModelProjection, RecordProjection, RelationFieldRef};
+use prisma_models::{ManyRecords, ModelProjection, Record, RecordProjection, RelationFieldRef};
 use prisma_value::PrismaValue;
 use std::collections::HashMap;
 
@@ -61,27 +61,39 @@ pub async fn m2m<'a, 'b>(
     }
 
     let fields = &scalars.field_names;
-    let mut additional_records = vec![];
+    let mut additional_records: Vec<(usize, Vec<Record>)> = vec![];
 
-    for record in scalars.records.iter_mut() {
+    for (index, record) in scalars.records.iter_mut().enumerate() {
         let record_id = record.projection(fields, &child_model_id)?;
         let mut parent_ids = id_map.remove(&record_id).expect("1");
         let first = parent_ids.pop().expect("2");
 
         record.parent_id = Some(first);
 
+        let mut more_records = vec![];
+
         for parent_id in parent_ids {
             let mut record = record.clone();
 
             record.parent_id = Some(parent_id);
-            additional_records.push(record);
+            more_records.push(record);
+        }
+
+        if !more_records.is_empty() {
+            additional_records.push((index + 1, more_records));
         }
     }
 
-    scalars.records.extend(additional_records);
-    paginator.apply_pagination(&mut scalars);
+    // Start to insert in the back to keep other indices valid.
+    additional_records.reverse();
 
-    Ok(scalars)
+    for (index, records) in additional_records {
+        for (offset, record) in records.into_iter().enumerate() {
+            scalars.records.insert(index + offset, record);
+        }
+    }
+
+    Ok(paginator.apply_pagination(scalars))
 }
 
 // [DTODO] This is implemented in an inefficient fashion, e.g. too much Arc cloning going on.
@@ -135,7 +147,7 @@ pub async fn one2m<'a, 'b>(
 
     let uniq_projections = uniq_projections
         .into_iter()
-        .filter(|p| !p.contains(&PrismaValue::Null))
+        .filter(|p| !p.iter().any(|v| v.is_null()))
         .collect();
 
     let filter = child_link_id.is_in(uniq_projections);
@@ -196,6 +208,5 @@ pub async fn one2m<'a, 'b>(
         ));
     }
 
-    paginator.apply_pagination(&mut scalars);
-    Ok(scalars)
+    Ok(paginator.apply_pagination(scalars))
 }

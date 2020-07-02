@@ -1,10 +1,12 @@
 use super::column::ColumnDiffer;
-use sql_schema_describer::{Column, ForeignKey, Index, Table};
+use crate::sql_schema_helpers::ForeignKeyRef;
+use crate::sql_schema_helpers::{ColumnRef, TableRef};
+use sql_schema_describer::{Index, PrimaryKey};
 
 pub(crate) struct TableDiffer<'a> {
     pub(crate) diffing_options: &'a super::DiffingOptions,
-    pub(crate) previous: &'a Table,
-    pub(crate) next: &'a Table,
+    pub(crate) previous: TableRef<'a>,
+    pub(crate) next: TableRef<'a>,
 }
 
 impl<'schema> TableDiffer<'schema> {
@@ -12,7 +14,7 @@ impl<'schema> TableDiffer<'schema> {
         self.previous_columns()
             .filter_map(move |previous_column| {
                 self.next_columns()
-                    .find(|next_column| columns_match(previous_column, next_column))
+                    .find(|next_column| columns_match(&previous_column, next_column))
                     .map(|next_column| (previous_column, next_column))
             })
             .map(move |(previous, next)| ColumnDiffer {
@@ -22,7 +24,7 @@ impl<'schema> TableDiffer<'schema> {
             })
     }
 
-    pub(crate) fn dropped_columns<'a>(&'a self) -> impl Iterator<Item = &'schema Column> + 'a {
+    pub(crate) fn dropped_columns<'a>(&'a self) -> impl Iterator<Item = ColumnRef<'schema>> + 'a {
         self.previous_columns().filter(move |previous_column| {
             self.next_columns()
                 .find(|next_column| columns_match(previous_column, next_column))
@@ -30,7 +32,7 @@ impl<'schema> TableDiffer<'schema> {
         })
     }
 
-    pub(crate) fn added_columns<'a>(&'a self) -> impl Iterator<Item = &'schema Column> + 'a {
+    pub(crate) fn added_columns<'a>(&'a self) -> impl Iterator<Item = ColumnRef<'schema>> + 'a {
         self.next_columns().filter(move |next_column| {
             self.previous_columns()
                 .find(|previous_column| columns_match(previous_column, next_column))
@@ -38,7 +40,7 @@ impl<'schema> TableDiffer<'schema> {
         })
     }
 
-    pub(crate) fn created_foreign_keys(&self) -> impl Iterator<Item = &ForeignKey> {
+    pub(crate) fn created_foreign_keys(&self) -> impl Iterator<Item = ForeignKeyRef<'_, 'schema>> {
         self.next_foreign_keys().filter(move |next_fk| {
             self.previous_foreign_keys()
                 .find(|previous_fk| super::foreign_keys_match(previous_fk, next_fk))
@@ -46,7 +48,7 @@ impl<'schema> TableDiffer<'schema> {
         })
     }
 
-    pub(crate) fn dropped_foreign_keys(&self) -> impl Iterator<Item = &ForeignKey> {
+    pub(crate) fn dropped_foreign_keys(&self) -> impl Iterator<Item = ForeignKeyRef<'_, 'schema>> {
         self.previous_foreign_keys().filter(move |previous_fk| {
             self.next_foreign_keys()
                 .find(|next_fk| super::foreign_keys_match(previous_fk, next_fk))
@@ -78,33 +80,77 @@ impl<'schema> TableDiffer<'schema> {
         })
     }
 
-    fn previous_columns(&self) -> impl Iterator<Item = &'schema Column> {
-        self.previous.columns.iter()
+    /// The primary key present in `next` but not `previous`, if applicable.
+    pub(crate) fn created_primary_key(&self) -> Option<&'schema PrimaryKey> {
+        match (self.previous.primary_key(), self.next.primary_key()) {
+            (None, Some(pk)) => Some(pk),
+            (Some(previous_pk), Some(next_pk)) if previous_pk.columns != next_pk.columns => Some(next_pk),
+            (Some(previous_pk), Some(next_pk)) => {
+                if self.primary_key_column_changed(previous_pk) {
+                    Some(next_pk)
+                } else {
+                    None
+                }
+            }
+            _ => None,
+        }
     }
 
-    fn next_columns(&self) -> impl Iterator<Item = &'schema Column> {
-        self.next.columns.iter()
+    /// The primary key present in `previous` but not `next`, if applicable.
+    pub(crate) fn dropped_primary_key(&self) -> Option<&'schema PrimaryKey> {
+        match (self.previous.primary_key(), self.next.primary_key()) {
+            (Some(pk), None) => Some(pk),
+            (Some(previous_pk), Some(next_pk)) if previous_pk.columns != next_pk.columns => Some(previous_pk),
+            (Some(previous_pk), Some(_next_pk)) => {
+                if self.primary_key_column_changed(previous_pk) {
+                    Some(previous_pk)
+                } else {
+                    None
+                }
+            }
+            _ => None,
+        }
     }
 
-    fn previous_foreign_keys(&self) -> impl Iterator<Item = &ForeignKey> {
-        self.previous.foreign_keys.iter()
+    /// Returns true if any of the columns of the primary key changed type.
+    fn primary_key_column_changed(&self, previous_pk: &PrimaryKey) -> bool {
+        self.column_pairs()
+            .filter(|columns| {
+                previous_pk
+                    .columns
+                    .iter()
+                    .any(|pk_col| pk_col == columns.previous.name())
+            })
+            .any(|columns| columns.all_changes().type_changed())
     }
 
-    fn next_foreign_keys(&self) -> impl Iterator<Item = &ForeignKey> {
-        self.next.foreign_keys.iter()
+    fn previous_columns<'a>(&'a self) -> impl Iterator<Item = ColumnRef<'schema>> + 'a {
+        self.previous.columns()
+    }
+
+    fn next_columns<'a>(&'a self) -> impl Iterator<Item = ColumnRef<'schema>> + 'a {
+        self.next.columns()
+    }
+
+    fn previous_foreign_keys<'a>(&'a self) -> impl Iterator<Item = ForeignKeyRef<'a, 'schema>> + 'a {
+        self.previous.foreign_keys()
+    }
+
+    fn next_foreign_keys<'a>(&'a self) -> impl Iterator<Item = ForeignKeyRef<'a, 'schema>> + 'a {
+        self.next.foreign_keys()
     }
 
     fn previous_indexes<'a>(&'a self) -> impl Iterator<Item = &'schema Index> + 'a {
-        self.previous.indices.iter()
+        self.previous.table.indices.iter()
     }
 
     fn next_indexes<'a>(&'a self) -> impl Iterator<Item = &'schema Index> + 'a {
-        self.next.indices.iter()
+        self.next.table.indices.iter()
     }
 }
 
-fn columns_match(a: &Column, b: &Column) -> bool {
-    a.name == b.name
+pub(crate) fn columns_match(a: &ColumnRef<'_>, b: &ColumnRef<'_>) -> bool {
+    a.name() == b.name()
 }
 
 /// Compare two SQL indexes and return whether they only differ by name.

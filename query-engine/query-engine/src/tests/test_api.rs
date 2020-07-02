@@ -1,7 +1,7 @@
 use crate::{
     context::PrismaContext,
-    request_handlers::{GraphQlBody, GraphQlRequestHandler, RequestHandler, SingleQuery},
-    PrismaRequest, PrismaResponse,
+    request_handlers::{graphql, GraphQlBody, SingleQuery},
+    PrismaResponse,
 };
 use migration_connector::*;
 use migration_core::{
@@ -14,7 +14,7 @@ use quaint::{
     visitor::{self, Visitor},
 };
 use sql_migration_connector::SqlMigrationConnector;
-use std::{collections::HashMap, sync::Arc};
+use std::sync::Arc;
 use test_setup::*;
 
 pub struct QueryEngine {
@@ -27,13 +27,9 @@ impl QueryEngine {
     }
 
     pub async fn request(&self, body: impl Into<SingleQuery>) -> serde_json::Value {
-        let request = PrismaRequest {
-            body: GraphQlBody::Single(body.into()),
-            headers: HashMap::new(),
-            path: String::new(),
-        };
-
-        match GraphQlRequestHandler.handle(request, &self.context).await {
+        let body = GraphQlBody::Single(body.into());
+        let cx = self.context.clone();
+        match graphql::handle(body, cx).await {
             PrismaResponse::Single(response) => serde_json::to_value(response).unwrap(),
             _ => unreachable!(),
         }
@@ -44,7 +40,6 @@ pub struct TestApi {
     connection_info: ConnectionInfo,
     migration_api: MigrationApi<sql_migration_connector::SqlMigrationConnector, sql_migration_connector::SqlMigration>,
     config: String,
-    is_pgbouncer: bool,
 }
 
 impl TestApi {
@@ -75,7 +70,6 @@ impl TestApi {
 
         let context = PrismaContext::builder(config, dml)
             .enable_raw_queries(true)
-            .force_transactions(self.is_pgbouncer)
             .build()
             .await
             .unwrap();
@@ -89,11 +83,12 @@ impl TestApi {
         &self.connection_info
     }
 
-    pub fn to_sql_string<'a>(&'a self, query: impl Into<Query<'a>>) -> (String, Vec<Value>) {
+    pub fn to_sql_string<'a>(&'a self, query: impl Into<Query<'a>>) -> quaint::Result<(String, Vec<Value>)> {
         match self.connection_info() {
             ConnectionInfo::Postgres(..) => visitor::Postgres::build(query),
             ConnectionInfo::Mysql(..) => visitor::Mysql::build(query),
             ConnectionInfo::Sqlite { .. } => visitor::Sqlite::build(query),
+            ConnectionInfo::Mssql(_) => todo!("Greetings from Redmond"),
         }
     }
 }
@@ -125,7 +120,6 @@ pub async fn mysql_8_test_api(db_name: &str) -> TestApi {
         connection_info,
         migration_api,
         config,
-        is_pgbouncer: false,
     }
 }
 
@@ -142,7 +136,6 @@ pub async fn mysql_5_6_test_api(db_name: &str) -> TestApi {
         connection_info,
         migration_api,
         config,
-        is_pgbouncer: false,
     }
 }
 
@@ -159,7 +152,6 @@ pub async fn mysql_test_api(db_name: &str) -> TestApi {
         connection_info,
         migration_api,
         config,
-        is_pgbouncer: false,
     }
 }
 
@@ -176,7 +168,6 @@ pub async fn mysql_mariadb_test_api(db_name: &str) -> TestApi {
         connection_info,
         migration_api,
         config,
-        is_pgbouncer: false,
     }
 }
 
@@ -193,7 +184,6 @@ pub async fn postgres9_test_api(db_name: &str) -> TestApi {
         connection_info,
         migration_api,
         config,
-        is_pgbouncer: false,
     }
 }
 
@@ -210,7 +200,6 @@ pub async fn postgres_test_api(db_name: &str) -> TestApi {
         connection_info,
         migration_api,
         config,
-        is_pgbouncer: false,
     }
 }
 
@@ -227,7 +216,6 @@ pub async fn postgres11_test_api(db_name: &str) -> TestApi {
         connection_info,
         migration_api,
         config,
-        is_pgbouncer: true,
     }
 }
 
@@ -244,7 +232,6 @@ pub async fn postgres12_test_api(db_name: &str) -> TestApi {
         connection_info,
         migration_api,
         config,
-        is_pgbouncer: false,
     }
 }
 
@@ -261,7 +248,6 @@ pub async fn sqlite_test_api(db_name: &str) -> TestApi {
         connection_info,
         migration_api,
         config,
-        is_pgbouncer: false,
     }
 }
 

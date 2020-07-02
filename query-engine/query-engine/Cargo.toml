@@ -8,14 +8,14 @@ edition = "2018"
 default = ["sql", "graphql"]
 sql = ["sql-connector"]
 graphql = ["graphql-parser"]
+mssql = ["datamodel/mssql", "sql-connector/mssql"]
 
 [dependencies]
 futures = "0.3"
-http = "0.2"
-hyper = "0.13"
 tokio = { version = "=0.2.13", features = ["rt-threaded", "macros"] }
 
 async-trait = "0.1"
+feature-flags = { path = "../../libs/feature-flags" }
 prisma-inflector = { path = "../../libs/prisma-inflector" }
 datamodel = { path = "../../libs/datamodel/core" }
 prisma-models = { path = "../../libs/prisma-models" }
@@ -25,14 +25,15 @@ sql-connector = { path = "../connectors/sql-query-connector", optional = true, p
 graphql-parser = { git = "https://github.com/prisma/graphql-parser", optional = true }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = { version = "1.0", features = [ "preserve_order" ] }
+tide = "0.10.0"
+async-std = { version = "1.6.2", features = ["attributes", "tokio02"] }
 base64 = "0.10"
-rust-embed = { version = "5.2" }
 failure = { version = "0.1" }
 indexmap = { version = "1.0", features = [ "serde-1" ] }
 itertools = "0.8"
 url = "2.1"
 structopt = "0.3"
-rust_decimal = "=1.1.0"
+rust_decimal = "1.6"
 once_cell = "1.3"
 
 tracing = "0.1"
@@ -57,3 +58,4 @@ sql-migration-connector = { path = "../../migration-engine/connectors/sql-migrat
 indoc = "0.3"
 anyhow = "1"
 serial_test = "*"
+chrono = "0.4"

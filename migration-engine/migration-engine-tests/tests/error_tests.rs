@@ -249,11 +249,47 @@ async fn bad_datasource_url_and_provider_combinations_must_return_a_proper_error
 
     let expected = json!({
         "is_panic": false,
-        "message": "Error in datamodel: Error validating source `db`: The URL for datasource `db` must start with the protocol `sqlite://`.",
+        "message": "Error in datamodel: Error validating datasource `db`: The URL for datasource `db` must start with the protocol `sqlite://`.",
         "backtrace": null,
     });
 
     assert_eq!(json_error, expected);
+}
+
+#[test_each_connector(tags("mysql_8"))]
+async fn connections_to_system_databases_must_be_rejected(_api: &TestApi) -> TestResult {
+    let names = &["", "mysql", "sys", "performance_schema"];
+    for name in names {
+        let dm = format!(
+            r#"
+                datasource db {{
+                    provider = "mysql"
+                    url = "{}"
+                }}
+            "#,
+            mysql_8_url(name),
+        );
+
+        // "mysql" is the default in Quaint.
+        let name = if name == &"" { "mysql" } else { name };
+
+        let error = RpcApi::new(&dm).await.map(drop).unwrap_err();
+
+        let json_error = serde_json::to_value(&render_error(error)).unwrap();
+
+        let expected = json!({
+            "is_panic": false,
+            "message": format!("The `{}` database is a system database, it should not be altered with prisma migrate. Please connect to another database.", name),
+            "meta": {
+                "database_name": name,
+            },
+            "error_code": "P3004",
+        });
+
+        assert_eq!(json_error, expected);
+    }
+
+    Ok(())
 }
 
 #[test_each_connector(tags("sqlite"))]

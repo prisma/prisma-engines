@@ -21,7 +21,7 @@ impl DirectiveValidator<dml::Field> for DefaultDirectiveValidator {
         if let dml::FieldType::Base(scalar_type, _) = field.field_type {
             let dv = args
                 .default_arg("value")?
-                .as_default_value(scalar_type)
+                .as_default_value_for_scalar_type(scalar_type)
                 .map_err(|e| self.wrap_in_directive_validation_error(&e))?;
 
             field.default_value = Some(dv);

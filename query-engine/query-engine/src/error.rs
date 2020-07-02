@@ -1,8 +1,9 @@
 use connector::error::ConnectorError;
 use datamodel::error::ErrorCollection;
 use failure::{Error, Fail};
+use feature_flags::FeatureFlagError;
 use graphql_parser::query::ParseError as GqlParseError;
-use query_core::{response_ir, CoreError};
+use query_core::CoreError;
 use serde_json;
 
 #[derive(Debug, Fail)]
@@ -40,6 +41,9 @@ pub enum PrismaError {
 
     #[fail(display = "{}", _0)]
     QueryConversionError(String),
+
+    #[fail(display = "{}", _0)]
+    FeatureError(String),
 }
 
 impl PrismaError {
@@ -88,16 +92,6 @@ impl From<ErrorCollection> for PrismaError {
     }
 }
 
-/// Helps to handle gracefully handle errors as a response.
-impl From<PrismaError> for response_ir::ResponseError {
-    fn from(other: PrismaError) -> Self {
-        match other {
-            PrismaError::CoreError(core_error) => response_ir::ResponseError::from(core_error),
-            err => response_ir::ResponseError::from(user_facing_errors::Error::from_dyn_error(&err.compat())),
-        }
-    }
-}
-
 impl From<url::ParseError> for PrismaError {
     fn from(e: url::ParseError) -> PrismaError {
         PrismaError::ConfigurationError(format!("Error parsing connection string: {}", e))
@@ -137,5 +131,11 @@ impl From<GqlParseError> for PrismaError {
 impl From<ConnectorError> for PrismaError {
     fn from(e: ConnectorError) -> PrismaError {
         PrismaError::ConnectorError(e)
+    }
+}
+
+impl From<FeatureFlagError> for PrismaError {
+    fn from(e: FeatureFlagError) -> Self {
+        PrismaError::FeatureError(e.to_string())
     }
 }

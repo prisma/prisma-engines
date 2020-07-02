@@ -1,7 +1,7 @@
 //! SQLite description.
 use super::*;
 use quaint::{ast::Value, prelude::Queryable};
-use std::{collections::HashMap, convert::TryInto, sync::Arc};
+use std::{borrow::Cow, collections::HashMap, convert::TryInto, sync::Arc};
 use tracing::debug;
 
 pub struct SqlSchemaDescriber {
@@ -143,8 +143,8 @@ impl SqlSchemaDescriber {
 
                 let default = match row.get("dflt_value") {
                     None => None,
-                    Some(Value::Null) => None,
-                    Some(Value::Text(cow_string)) => {
+                    Some(val) if val.is_null() => None,
+                    Some(Value::Text(Some(cow_string))) => {
                         let default_string = cow_string.to_string();
 
                         if default_string.to_lowercase() == "null" {
@@ -167,9 +167,9 @@ impl SqlSchemaDescriber {
                                         None => DefaultValue::DBGENERATED(default_string),
                                     },
                                 },
-                                ColumnTypeFamily::String => {
-                                    DefaultValue::VALUE(PrismaValue::String(unquote_string(default_string)))
-                                }
+                                ColumnTypeFamily::String => DefaultValue::VALUE(PrismaValue::String(
+                                    unquote_sqlite_string_default(&default_string).into(),
+                                )),
                                 ColumnTypeFamily::DateTime => match default_string.to_lowercase()
                                     == "current_timestamp".to_string()
                                     || default_string.to_lowercase() == "datetime(\'now\')".to_string()
@@ -248,6 +248,7 @@ impl SqlSchemaDescriber {
                 Some(PrimaryKey {
                     columns,
                     sequence: None,
+                    constraint_name: None,
                 })
             }
         };
@@ -439,8 +440,24 @@ fn get_column_type(tpe: &str, arity: ColumnArity) -> ColumnType {
     ColumnType {
         data_type: tpe.to_string(),
         full_data_type: tpe.to_string(),
+        character_maximum_length: None,
         family,
         arity,
+    }
+}
+
+// "A string constant is formed by enclosing the string in single quotes ('). A single quote within
+// the string can be encoded by putting two single quotes in a row - as in Pascal. C-style escapes
+// using the backslash character are not supported because they are not standard SQL."
+//
+// - https://www.sqlite.org/lang_expr.html
+fn unquote_sqlite_string_default(s: &str) -> Cow<'_, str> {
+    const SQLITE_STRING_DEFAULT_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"(?ms)^'(.*)'$|^"(.*)"$"#).unwrap());
+    const SQLITE_ESCAPED_CHARACTER_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"''"#).unwrap());
+
+    match SQLITE_STRING_DEFAULT_RE.replace(s, "$1$2") {
+        Cow::Borrowed(s) => SQLITE_ESCAPED_CHARACTER_RE.replace_all(s, "'"),
+        Cow::Owned(s) => SQLITE_ESCAPED_CHARACTER_RE.replace_all(&s, "'").into_owned().into(),
     }
 }
 

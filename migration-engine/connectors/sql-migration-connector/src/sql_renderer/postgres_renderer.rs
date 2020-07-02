@@ -1,6 +1,10 @@
 use super::common::*;
 use crate::{sql_schema_helpers::*, SqlFamily};
+use once_cell::sync::Lazy;
+use prisma_models::PrismaValue;
+use regex::Regex;
 use sql_schema_describer::*;
+use std::borrow::Cow;
 
 pub struct PostgresRenderer {}
 
@@ -19,6 +23,7 @@ impl super::SqlRenderer for PostgresRenderer {
         let nullability_str = render_nullability(&column);
         let default_str = column
             .default()
+            .filter(|default| !matches!(default, DefaultValue::DBGENERATED(_)))
             .map(|default| format!("DEFAULT {}", self.render_default(default, &column.column.tpe.family)))
             .unwrap_or_else(String::new);
         let is_serial = column.auto_increment();
@@ -44,6 +49,21 @@ impl super::SqlRenderer for PostgresRenderer {
             render_on_delete(&foreign_key.on_delete_action)
         )
     }
+
+    fn render_default<'a>(&self, default: &'a DefaultValue, family: &ColumnTypeFamily) -> Cow<'a, str> {
+        match (default, family) {
+            (DefaultValue::DBGENERATED(val), _) => val.as_str().into(),
+            (DefaultValue::VALUE(PrismaValue::String(val)), ColumnTypeFamily::String)
+            | (DefaultValue::VALUE(PrismaValue::Enum(val)), ColumnTypeFamily::Enum(_)) => {
+                format!("E'{}'", escape_string_literal(&val)).into()
+            }
+            (DefaultValue::NOW, ColumnTypeFamily::DateTime) => "CURRENT_TIMESTAMP".into(),
+            (DefaultValue::NOW, _) => unreachable!("NOW default on non-datetime column"),
+            (DefaultValue::VALUE(val), ColumnTypeFamily::DateTime) => format!("'{}'", val).into(),
+            (DefaultValue::VALUE(val), _) => val.to_string().into(),
+            (DefaultValue::SEQUENCE(_), _) => todo!("rendering of sequence defaults"),
+        }
+    }
 }
 
 pub(crate) fn render_column_type(t: &ColumnType) -> String {
@@ -62,4 +82,10 @@ pub(crate) fn render_column_type(t: &ColumnType) -> String {
         ColumnTypeFamily::Json => format!("jsonb {}", array),
         x => unimplemented!("{:?} not handled yet", x),
     }
+}
+
+fn escape_string_literal(s: &str) -> Cow<'_, str> {
+    const STRING_LITERAL_CHARACTER_TO_ESCAPE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"'|\\"#).unwrap());
+
+    STRING_LITERAL_CHARACTER_TO_ESCAPE_RE.replace_all(s, "\\$0")
 }

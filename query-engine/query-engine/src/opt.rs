@@ -48,32 +48,44 @@ pub struct PrismaOpt {
     /// The hostname or IP the query engine should bind to.
     #[structopt(long, short = "H", default_value = "127.0.0.1")]
     pub host: String,
+
     /// The port the query engine should bind to.
     #[structopt(long, short, env, default_value = "4466")]
     pub port: u16,
+
     /// Path to the Prisma datamodel file
     #[structopt(long, env = "PRISMA_DML_PATH", parse(from_os_str = load_datamodel_file))]
     datamodel_path: Option<String>,
+
     /// Base64 encoded Prisma datamodel
     #[structopt(long, env = "PRISMA_DML", parse(try_from_str = parse_base64_string))]
     datamodel: Option<String>,
+
     /// Base64 encoded datasources, overwriting the ones in the datamodel
     #[structopt(long, env, parse(try_from_str = parse_base64_string))]
     overwrite_datasources: Option<String>,
+
     /// Switches query schema generation to Prisma 1 compatible mode.
     #[structopt(long, short)]
     pub legacy: bool,
-    /// Runs all queries in a transaction, including all the reads.
-    #[structopt(long, short = "t")]
-    pub always_force_transactions: bool,
-    /// Enables raw SQL queries with executeRaw mutation
+
+    /// Enables raw SQL queries with executeRaw/queryRaw mutation
     #[structopt(long, short = "r")]
     pub enable_raw_queries: bool,
+
     /// Enables the GraphQL playground
     #[structopt(long, short = "g")]
     pub enable_playground: bool,
+
+    /// Enables server debug features.
+    #[structopt(long = "debug", short = "d")]
+    pub enable_debug_mode: bool,
+
     #[structopt(subcommand)]
     pub subcommand: Option<Subcommand>,
+
+    #[structopt(long = "enable-experimental", use_delimiter = true)]
+    pub raw_feature_flags: Vec<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -102,7 +114,7 @@ impl PrismaOpt {
         let datamodel_str = self.datamodel_str()?;
 
         let datamodel = if ignore_env_errors {
-            datamodel::parse_datamodel_and_ignore_env_errors(datamodel_str)
+            datamodel::parse_datamodel_and_ignore_datasource_urls(datamodel_str)
         } else {
             datamodel::parse_datamodel(datamodel_str)
         };
@@ -130,7 +142,7 @@ impl PrismaOpt {
 
                     for datasource_override in datasource_overwrites {
                         for datasource in &mut configuration.datasources {
-                            if &datasource_override.name == datasource.name() {
+                            if datasource_override.name == datasource.name {
                                 debug!(
                                     "overwriting datasource {} with url {}",
                                     &datasource_override.name, &datasource_override.url

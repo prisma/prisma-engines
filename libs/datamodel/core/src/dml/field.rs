@@ -96,8 +96,7 @@ pub struct Field {
     /// Indicates if the field is unique.
     pub is_unique: bool,
 
-    /// If set, signals that this field is an id field, or
-    /// primary key.
+    /// true if this field marked with @id.
     pub is_id: bool,
 
     /// Comments associated with this field.
@@ -124,6 +123,13 @@ impl Field {
 
     pub fn db_name(&self) -> &str {
         self.database_name.as_ref().unwrap_or(&self.name)
+    }
+
+    pub fn is_relation(&self) -> bool {
+        match self.field_type {
+            FieldType::Relation(_) => true,
+            _ => false,
+        }
     }
 }
 

@@ -7,6 +7,7 @@ edition = "2018"
 [dependencies]
 prisma-models = { path = "../../libs/prisma-models" }
 prisma-value = { path = "../../libs/prisma-value" }
+feature-flags = { path = "../../libs/feature-flags" }
 prisma-inflector = { path = "../../libs/prisma-inflector" }
 connector = { path = "../connectors/query-connector", package = "query-connector" }
 failure = { version =  "0.1", features = ["derive"] }
@@ -24,5 +25,6 @@ im = "13.0"
 futures = "0.3"
 async-trait = "0.1"
 crossbeam-queue = "0.2"
-rust_decimal = "=1.1.0"
+rust_decimal = "1.6"
 user-facing-errors = { path = "../../libs/user-facing-errors" }
+tokio = { version = "=0.2.13" }

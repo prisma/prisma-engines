@@ -69,7 +69,7 @@ pub enum DatamodelError {
     FunctionNotKnownError { function_name: String, span: Span },
 
     #[fail(display = "Datasource provider not known: \"{}\".", source_name)]
-    SourceNotKnownError { source_name: String, span: Span },
+    DatasourceProviderNotKnownError { source_name: String, span: Span },
 
     #[fail(display = "\"{}\" is not a valid value for {}.", raw_value, literal_type)]
     LiteralParseError { literal_type: String, raw_value: String, span: Span },
@@ -104,7 +104,7 @@ pub enum DatamodelError {
     #[fail(display = "Error validating field `{}` in model `{}`: {}", field, model, message)]
     FieldValidationError { message: String, model: String, field: String, span: Span },
 
-    #[fail(display = "Error validating source `{}`: {}", source, message)]
+    #[fail(display = "Error validating datasource `{}`: {}", source, message)]
     SourceValidationError { message: String, source: String, span: Span },
 
     #[fail(display = "Error validating enum `{}`: {}", enum_name, message)]
@@ -315,8 +315,8 @@ impl DatamodelError {
         DatamodelError::FunctionNotKnownError { function_name: String::from(function_name), span }
     }
 
-    pub fn new_source_not_known_error(source_name: &str, span: Span) -> DatamodelError {
-        DatamodelError::SourceNotKnownError { source_name: String::from(source_name), span }
+    pub fn new_datasource_provider_not_known_error(source_name: &str, span: Span) -> DatamodelError {
+        DatamodelError::DatasourceProviderNotKnownError { source_name: String::from(source_name), span }
     }
 
     pub fn new_value_parser_error(expected_type: &str, parser_error: &str, raw: &str, span: Span) -> DatamodelError {
@@ -348,7 +348,7 @@ impl DatamodelError {
             DatamodelError::DirectiveNotKnownError { span, .. } => *span,
             DatamodelError::ReservedScalarTypeError { span, .. } => *span,
             DatamodelError::FunctionNotKnownError { span, .. } => *span,
-            DatamodelError::SourceNotKnownError { span, .. } => *span,
+            DatamodelError::DatasourceProviderNotKnownError { span, .. } => *span,
             DatamodelError::LiteralParseError { span, .. } => *span,
             DatamodelError::TypeNotFoundError { span, .. } => *span,
             DatamodelError::ScalarTypeNotFoundError { span, .. } => *span,

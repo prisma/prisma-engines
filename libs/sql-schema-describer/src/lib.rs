@@ -71,7 +71,7 @@ impl SqlSchema {
     pub fn table(&self, name: &str) -> core::result::Result<&Table, String> {
         match self.tables.iter().find(|t| t.name == name) {
             Some(t) => Ok(t),
-            None => Err(format!("Table {} not found", name)),
+            None => Err(format!("{}", name)),
         }
     }
 
@@ -200,6 +200,8 @@ pub struct PrimaryKey {
     pub columns: Vec<String>,
     /// The sequence optionally seeding this primary key.
     pub sequence: Option<Sequence>,
+    /// The name of the primary key constraint, when available.
+    pub constraint_name: Option<String>,
 }
 
 impl PrimaryKey {
@@ -236,6 +238,8 @@ pub struct ColumnType {
     pub data_type: String,
     /// The full SQL data type.
     pub full_data_type: String,
+    /// The maximum length for character or string bit types if specified.
+    pub character_maximum_length: Option<i64>,
     /// The family of the raw type.
     pub family: ColumnTypeFamily,
     /// The arity of the column.
@@ -243,10 +247,11 @@ pub struct ColumnType {
 }
 
 impl ColumnType {
-    pub fn pure(family: ColumnTypeFamily, arity: ColumnArity) -> ColumnType {
+    pub fn pure(family: ColumnTypeFamily, arity: ColumnArity) -> Self {
         ColumnType {
             data_type: "".to_string(),
             full_data_type: "".to_string(),
+            character_maximum_length: None,
             family,
             arity,
         }
@@ -413,6 +418,15 @@ pub enum DefaultValue {
     DBGENERATED(String),
 }
 
+impl DefaultValue {
+    pub fn as_value(&self) -> Option<&PrismaValue> {
+        match self {
+            DefaultValue::VALUE(v) => Some(v),
+            _ => None,
+        }
+    }
+}
+
 static RE_NUM: Lazy<Regex> = Lazy::new(|| Regex::new(r"^'?(\d+)'?$").expect("compile regex"));
 static RE_FLOAT: Lazy<Regex> = Lazy::new(|| Regex::new(r"^'?([^']+)'?$").expect("compile regex"));
 
@@ -455,7 +469,7 @@ pub fn parse_float(value: &str) -> Option<PrismaValue> {
     }
 }
 
-pub fn unquote_string(val: String) -> String {
+pub fn unquote_string(val: &str) -> String {
     val.trim_start_matches('\'')
         .trim_end_matches('\'')
         .trim_start_matches('\\')
@@ -473,7 +487,7 @@ mod tests {
     fn unquoting_works() {
         let quoted_str = "'abc $$ def'".to_string();
 
-        assert_eq!(unquote_string(quoted_str), "abc $$ def");
+        assert_eq!(unquote_string(&quoted_str), "abc $$ def");
 
         assert_eq!(unquote_string("heh ".into()), "heh ");
     }

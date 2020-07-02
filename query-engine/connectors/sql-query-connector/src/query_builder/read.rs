@@ -33,6 +33,9 @@ impl SelectDefinition for QueryArguments {
         let ordering_directions = self.ordering_directions();
         let ordering = Ordering::for_model(&model, ordering_directions);
 
+        let limit = if self.ignore_take { None } else { self.take_abs() };
+        let skip = if self.ignore_skip { 0 } else { self.skip.unwrap_or(0) };
+
         let filter: ConditionTree = self
             .filter
             .map(|f| f.aliased_cond(None))
@@ -42,11 +45,6 @@ impl SelectDefinition for QueryArguments {
             (ConditionTree::NoCondition, cursor) => cursor,
             (filter, ConditionTree::NoCondition) => filter,
             (filter, cursor) => ConditionTree::and(filter, cursor),
-        };
-
-        let (skip, limit) = match self.last.or(self.first) {
-            Some(c) => (self.skip.unwrap_or(0), Some(c + 1)), // +1 to see if there's more data
-            None => (self.skip.unwrap_or(0), None),
         };
 
         let select_ast = Select::from_table(model.as_table())

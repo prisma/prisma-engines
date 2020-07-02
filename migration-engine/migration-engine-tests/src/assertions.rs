@@ -41,20 +41,29 @@ impl SchemaAssertion {
         Ok(self)
     }
 
+    fn find_table(&self, table_name: &str) -> anyhow::Result<&sql_schema_describer::Table> {
+        match self.0.table(table_name) {
+            Ok(table) => Ok(table),
+            Err(_) => Err(anyhow::anyhow!(
+                "assert_has_table failed. Table {} not found. Tables in database: {:?}",
+                table_name,
+                self.0.tables.iter().map(|table| &table.name).collect::<Vec<_>>()
+            )),
+        }
+    }
+
+    pub fn assert_has_table(self, table_name: &str) -> AssertionResult<Self> {
+        self.find_table(table_name)?;
+        Ok(self)
+    }
+
     pub fn assert_table<F>(self, table_name: &str, table_assertions: F) -> AssertionResult<Self>
     where
         F: for<'a> FnOnce(TableAssertion<'a>) -> AssertionResult<TableAssertion<'a>>,
     {
-        let table_result = self.0.table(table_name);
-        let table = table_result.map(TableAssertion).map_err(|_| {
-            anyhow::anyhow!(
-                "assert_table failed. Table {} not found. Tables in database: {:?}",
-                table_name,
-                self.0.tables.iter().map(|table| &table.name).collect::<Vec<_>>()
-            )
-        })?;
+        let table = self.find_table(table_name)?;
 
-        table_assertions(table)?;
+        table_assertions(TableAssertion(table))?;
 
         Ok(self)
     }
@@ -242,6 +251,26 @@ impl<'a> TableAssertion<'a> {
 pub struct ColumnAssertion<'a>(&'a Column);
 
 impl<'a> ColumnAssertion<'a> {
+    pub fn assert_auto_increments(self) -> AssertionResult<Self> {
+        anyhow::ensure!(
+            self.0.auto_increment,
+            "Assertion failed. Expected column `{}` to be auto-incrementing.",
+            self.0.name,
+        );
+
+        Ok(self)
+    }
+
+    pub fn assert_no_auto_increment(self) -> AssertionResult<Self> {
+        anyhow::ensure!(
+            !self.0.auto_increment,
+            "Assertion failed. Expected column `{}` not to be auto-incrementing.",
+            self.0.name,
+        );
+
+        Ok(self)
+    }
+
     pub fn assert_default(self, expected: Option<DefaultValue>) -> AssertionResult<Self> {
         let found = &self.0.default;
 
@@ -346,6 +375,15 @@ pub struct PrimaryKeyAssertion<'a>(&'a PrimaryKey);
 impl<'a> PrimaryKeyAssertion<'a> {
     pub fn assert_columns(self, column_names: &[&str]) -> AssertionResult<Self> {
         assert_eq!(self.0.columns, column_names);
+
+        Ok(self)
+    }
+
+    pub fn assert_has_sequence(self) -> AssertionResult<Self> {
+        anyhow::ensure!(
+            self.0.sequence.is_some(),
+            "Assertion failed: expected a sequence on the primary, found none."
+        );
 
         Ok(self)
     }

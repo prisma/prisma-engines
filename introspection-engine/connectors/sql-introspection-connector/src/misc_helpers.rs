@@ -1,6 +1,7 @@
+use crate::SqlError;
 use datamodel::{
-    Datamodel, DefaultValue as DMLDef, Field, FieldArity, FieldType, IndexDefinition, Model, OnDeleteStrategy,
-    RelationInfo, ScalarType, ValueGenerator as VG,
+    Datamodel, DefaultNames, DefaultValue as DMLDef, Field, FieldArity, FieldType, IndexDefinition, Model,
+    OnDeleteStrategy, RelationInfo, ScalarType, ValueGenerator as VG,
 };
 use sql_schema_describer::{
     Column, ColumnArity, ColumnTypeFamily, DefaultValue as SQLDef, ForeignKey, Index, IndexType, SqlSchema, Table,
@@ -8,9 +9,19 @@ use sql_schema_describer::{
 use tracing::debug;
 
 //checks
-
 pub fn is_migration_table(table: &Table) -> bool {
     table.name == "_Migration"
+        && table.columns.iter().any(|c| c.name == "revision")
+        && table.columns.iter().any(|c| c.name == "name")
+        && table.columns.iter().any(|c| c.name == "datamodel")
+        && table.columns.iter().any(|c| c.name == "status")
+        && table.columns.iter().any(|c| c.name == "applied")
+        && table.columns.iter().any(|c| c.name == "rolled_back")
+        && table.columns.iter().any(|c| c.name == "datamodel_steps")
+        && table.columns.iter().any(|c| c.name == "database_migration")
+        && table.columns.iter().any(|c| c.name == "errors")
+        && table.columns.iter().any(|c| c.name == "started_at")
+        && table.columns.iter().any(|c| c.name == "finished_at")
 }
 
 pub(crate) fn is_relay_table(table: &Table) -> bool {
@@ -33,7 +44,7 @@ pub(crate) fn is_prisma_1_point_1_or_2_join_table(table: &Table) -> bool {
 pub(crate) fn is_prisma_1_point_0_join_table(table: &Table) -> bool {
     table.columns.len() == 3
         && table.indices.len() >= 2
-        && table.columns.iter().any(|c| c.name.as_str() == "id")
+        && table.columns.iter().any(|c| c.name == "id")
         && common_prisma_m_to_n_relation_conditions(table)
 }
 
@@ -150,11 +161,15 @@ pub(crate) fn calculate_scalar_field(table: &Table, column: &Column) -> Field {
     }
 }
 
-pub(crate) fn calculate_relation_field(schema: &SqlSchema, table: &Table, foreign_key: &ForeignKey) -> Field {
+pub(crate) fn calculate_relation_field(
+    schema: &SqlSchema,
+    table: &Table,
+    foreign_key: &ForeignKey,
+) -> Result<Field, SqlError> {
     debug!("Handling foreign key  {:?}", foreign_key);
 
     let field_type = FieldType::Relation(RelationInfo {
-        name: calculate_relation_name(schema, foreign_key, table),
+        name: calculate_relation_name(schema, foreign_key, table)?,
         fields: foreign_key.columns.clone(),
         to: foreign_key.referenced_table.clone(),
         to_fields: foreign_key.referenced_columns.clone(),
@@ -173,7 +188,7 @@ pub(crate) fn calculate_relation_field(schema: &SqlSchema, table: &Table, foreig
     };
 
     // todo Should this be an extra type? It uses just a small subset of the features of a scalar field
-    Field {
+    Ok(Field {
         name: foreign_key.referenced_table.clone(),
         arity,
         field_type, // todo we could remove relation out of the type and make relationinfo part of RelationField
@@ -185,7 +200,7 @@ pub(crate) fn calculate_relation_field(schema: &SqlSchema, table: &Table, foreig
         is_generated: false,
         is_updated_at: false,
         is_commented_out: false,
-    }
+    })
 }
 
 pub(crate) fn calculate_backrelation_field(
@@ -194,53 +209,58 @@ pub(crate) fn calculate_backrelation_field(
     other_model: &Model,
     relation_field: &Field,
     relation_info: &RelationInfo,
-) -> Field {
-    let table = schema.table_bang(&model.name);
+) -> Result<Field, SqlError> {
+    match schema.table(&model.name) {
+        Err(table_name) => Err(SqlError::SchemaInconsistent {
+            explanation: format!("Table {} not found.", table_name),
+        }),
+        Ok(table) => {
+            let field_type = FieldType::Relation(RelationInfo {
+                name: relation_info.name.clone(),
+                to: model.name.clone(),
+                fields: vec![],
+                to_fields: vec![],
+                on_delete: OnDeleteStrategy::None,
+            });
 
-    let field_type = FieldType::Relation(RelationInfo {
-        name: relation_info.name.clone(),
-        to: model.name.clone(),
-        fields: vec![],
-        to_fields: vec![],
-        on_delete: OnDeleteStrategy::None,
-    });
+            let other_is_unique = || match &relation_info.fields.len() {
+                1 => {
+                    let column_name = &relation_info.fields.first().unwrap();
+                    table.is_column_unique(column_name)
+                }
+                _ => table
+                    .indices
+                    .iter()
+                    .any(|i| columns_match(&i.columns, &relation_info.fields) && i.tpe == IndexType::Unique),
+            };
 
-    let other_is_unique = || match &relation_info.fields.len() {
-        1 => {
-            let column_name = &relation_info.fields.first().unwrap();
-            table.is_column_unique(column_name)
+            let arity = match relation_field.arity {
+                FieldArity::Required | FieldArity::Optional if other_is_unique() => FieldArity::Optional,
+                FieldArity::Required | FieldArity::Optional => FieldArity::List,
+                FieldArity::List => FieldArity::Optional,
+            };
+
+            //if the backrelation name would be duplicate, probably due to being a selfrelation
+            let name = if model.name == other_model.name && relation_field.name == model.name {
+                format!("other_{}", model.name.clone())
+            } else {
+                model.name.clone()
+            };
+
+            Ok(Field {
+                name,
+                arity,
+                field_type,
+                database_name: None,
+                default_value: None,
+                is_unique: false,
+                is_id: false,
+                documentation: None,
+                is_generated: false,
+                is_updated_at: false,
+                is_commented_out: false,
+            })
         }
-        _ => table
-            .indices
-            .iter()
-            .any(|i| columns_match(&i.columns, &relation_info.fields) && i.tpe == IndexType::Unique),
-    };
-
-    let arity = match relation_field.arity {
-        FieldArity::Required | FieldArity::Optional if other_is_unique() => FieldArity::Optional,
-        FieldArity::Required | FieldArity::Optional => FieldArity::List,
-        FieldArity::List => FieldArity::Optional,
-    };
-
-    //if the backrelation name would be duplicate, probably due to being a selfrelation
-    let name = if model.name == other_model.name && relation_field.name == model.name {
-        format!("other_{}", model.name.clone())
-    } else {
-        model.name.clone()
-    };
-
-    Field {
-        name,
-        arity,
-        field_type,
-        database_name: None,
-        default_value: None,
-        is_unique: false,
-        is_id: false,
-        documentation: None,
-        is_generated: false,
-        is_updated_at: false,
-        is_commented_out: false,
     }
 }
 
@@ -273,7 +293,7 @@ pub(crate) fn is_sequence(column: &Column, table: &Table) -> bool {
         .unwrap_or(false)
 }
 
-pub(crate) fn calculate_relation_name(schema: &SqlSchema, fk: &ForeignKey, table: &Table) -> String {
+pub(crate) fn calculate_relation_name(schema: &SqlSchema, fk: &ForeignKey, table: &Table) -> Result<String, SqlError> {
     //this is not called for prisma many to many relations. for them the name is just the name of the join table.
     let referenced_model = &fk.referenced_table;
     let model_with_fk = &table.name;
@@ -282,29 +302,27 @@ pub(crate) fn calculate_relation_name(schema: &SqlSchema, fk: &ForeignKey, table
     let fk_to_same_model: Vec<&ForeignKey> = table
         .foreign_keys
         .iter()
-        .filter(|fk| fk.referenced_table == referenced_model.clone())
+        .filter(|fk| &fk.referenced_table == referenced_model)
         .collect();
 
-    let fk_from_other_model_to_this: Vec<&ForeignKey> = schema
-        .table_bang(referenced_model)
-        .foreign_keys
-        .iter()
-        .filter(|fk| fk.referenced_table == model_with_fk.clone())
-        .collect();
+    match schema.table(referenced_model) {
+        Err(table_name) => Err(SqlError::SchemaInconsistent {
+            explanation: format!("Table {} not found.", table_name),
+        }),
+        Ok(other_table) => {
+            let fk_from_other_model_to_this: Vec<&ForeignKey> = other_table
+                .foreign_keys
+                .iter()
+                .filter(|fk| &fk.referenced_table == model_with_fk)
+                .collect();
 
-    //unambiguous
-    if fk_to_same_model.len() < 2 && fk_from_other_model_to_this.len() == 0 {
-        if model_with_fk < referenced_model {
-            format!("{}To{}", model_with_fk, referenced_model)
-        } else {
-            format!("{}To{}", referenced_model, model_with_fk)
-        }
-    } else {
-        //ambiguous
-        if model_with_fk < referenced_model {
-            format!("{}_{}To{}", model_with_fk, fk_column_name, referenced_model)
-        } else {
-            format!("{}To{}_{}", referenced_model, model_with_fk, fk_column_name)
+            let name = if fk_to_same_model.len() < 2 && fk_from_other_model_to_this.is_empty() {
+                DefaultNames::name_for_unambiguous_relation(model_with_fk, referenced_model)
+            } else {
+                DefaultNames::name_for_ambiguous_relation(model_with_fk, referenced_model, &fk_column_name)
+            };
+
+            Ok(name)
         }
     }
 }

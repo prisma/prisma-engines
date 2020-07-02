@@ -27,6 +27,23 @@ struct MigrationRollback {
     pub database_error: String,
 }
 
+// No longer used.
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = "P3003",
+    message = "The format of migrations changed, the saved migrations are no longer valid. To solve this problem, please follow the steps at: https://pris.ly/d/migrate#troubleshooting"
+)]
+pub struct DatabaseMigrationFormatChanged;
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = "P3004",
+    message = "The `${database_name}` database is a system database, it should not be altered with prisma migrate. Please connect to another database."
+)]
+pub struct MigrateSystemDatabase {
+    pub database_name: String,
+}
+
 // Tests
 
 #[cfg(test)]

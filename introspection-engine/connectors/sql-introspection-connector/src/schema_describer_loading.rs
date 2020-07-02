@@ -30,6 +30,7 @@ pub async fn load_describer(url: &str) -> Result<(Box<dyn SqlSchemaDescriberBack
         ))),
         SqlFamily::Mysql => Box::new(sql_schema_describer::mysql::SqlSchemaDescriber::new(Arc::new(wrapper))),
         SqlFamily::Sqlite => Box::new(sql_schema_describer::sqlite::SqlSchemaDescriber::new(Arc::new(wrapper))),
+        SqlFamily::Mssql => todo!("Greetings from Redmond"),
     };
 
     Ok((describer, connection_info))

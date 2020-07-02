@@ -105,6 +105,25 @@ impl DirectiveValidator<dml::Model> for ModelLevelIdDirectiveValidator {
             ));
         }
 
+        // the unwrap is safe because we error on undefined fields before
+        let fields_that_are_not_required: Vec<_> = obj
+            .id_fields
+            .iter()
+            .filter(|field| !obj.find_field(&field).unwrap().arity.is_required())
+            .map(|field| field.to_string())
+            .collect();
+
+        if !fields_that_are_not_required.is_empty() {
+            return Err(DatamodelError::new_model_validation_error(
+                &format!(
+                    "The id definition refers to the optional fields {}. Id definitions must reference only required fields.",
+                    fields_that_are_not_required.join(", ")
+                ),
+                &obj.name,
+                args.span(),
+            ));
+        }
+
         Ok(())
     }
 

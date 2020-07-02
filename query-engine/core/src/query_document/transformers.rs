@@ -49,7 +49,7 @@ impl TryInto<Option<ParsedInputMap>> for ParsedInputValue {
 
     fn try_into(self) -> QueryParserResult<Option<ParsedInputMap>> {
         match self {
-            ParsedInputValue::Single(PrismaValue::Null) => Ok(None),
+            ParsedInputValue::Single(PrismaValue::Null(_)) => Ok(None),
             ParsedInputValue::Map(val) => Ok(Some(val)),
             v => Err(QueryParserError::AssertionError(format!(
                 "Attempted conversion of non-map ParsedInputValue ({:?}) into Option map failed.",
@@ -82,7 +82,7 @@ impl TryInto<Option<String>> for ParsedInputValue {
         match prisma_value {
             PrismaValue::String(s) => Ok(Some(s)),
             PrismaValue::Enum(s) => Ok(Some(s)),
-            PrismaValue::Null => Ok(None),
+            PrismaValue::Null(_) => Ok(None),
             v => Err(QueryParserError::AssertionError(format!(
                 "Attempted conversion of non-String Prisma value type ({:?}) into String failed.",
                 v
@@ -113,7 +113,7 @@ impl TryInto<Option<f64>> for ParsedInputValue {
 
         match prisma_value {
             PrismaValue::Float(d) => Ok(d.to_f64()),
-            PrismaValue::Null => Ok(None),
+            PrismaValue::Null(_) => Ok(None),
             v => Err(QueryParserError::AssertionError(format!(
                 "Attempted conversion of non-float Prisma value type ({:?}) into float failed.",
                 v
@@ -130,7 +130,7 @@ impl TryInto<Option<bool>> for ParsedInputValue {
 
         match prisma_value {
             PrismaValue::Boolean(b) => Ok(Some(b)),
-            PrismaValue::Null => Ok(None),
+            PrismaValue::Null(_) => Ok(None),
             v => Err(QueryParserError::AssertionError(format!(
                 "Attempted conversion of non-bool Prisma value type ({:?}) into bool failed.",
                 v
@@ -147,7 +147,7 @@ impl TryInto<Option<DateTime<Utc>>> for ParsedInputValue {
 
         match prisma_value {
             PrismaValue::DateTime(dt) => Ok(Some(dt)),
-            PrismaValue::Null => Ok(None),
+            PrismaValue::Null(_) => Ok(None),
             v => Err(QueryParserError::AssertionError(format!(
                 "Attempted conversion of non-DateTime Prisma value type ({:?}) into DateTime failed.",
                 v
@@ -164,7 +164,7 @@ impl TryInto<Option<i64>> for ParsedInputValue {
 
         match prisma_value {
             PrismaValue::Int(i) => Ok(Some(i)),
-            PrismaValue::Null => Ok(None),
+            PrismaValue::Null(_) => Ok(None),
             v => Err(QueryParserError::AssertionError(format!(
                 "Attempted conversion of non-int Prisma value type ({:?}) into int failed.",
                 v

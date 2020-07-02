@@ -68,7 +68,7 @@ class NonEmbeddedOrderBySpec extends FlatSpec with Matchers with ApiSpecBase {
         |{
         |  list(where: {name: "1"}) {
         |    name
-        |    todos(first:10){
+        |    todos(take:10){
         |      title
         |    }
         |  }
@@ -98,7 +98,7 @@ class NonEmbeddedOrderBySpec extends FlatSpec with Matchers with ApiSpecBase {
         |{
         |  todo(where: {title: "1"}) {
         |    title
-        |    lists(first:10){
+        |    lists(take:10){
         |      name
         |    }
         |  }

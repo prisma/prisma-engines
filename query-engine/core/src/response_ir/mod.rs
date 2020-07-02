@@ -9,15 +9,17 @@
 //! Note: The code itself can be considered WIP. It is clear when reading the code that there are missing abstractions
 //! and a restructure might be necessary (good example is the default value handling sprinkled all over the place).
 mod internal;
-mod utils;
+mod ir_serializer;
+mod response;
 
-use crate::{CoreError, ExpressionResult, OutputType, OutputTypeRef, QueryResult, QueryValue};
+use crate::QueryValue;
 use indexmap::IndexMap;
-use internal::*;
-use prisma_models::PrismaValue;
+use prisma_models::{PrismaValue, TypeHint};
 use serde::ser::{Serialize, SerializeMap, SerializeSeq, Serializer};
-use std::{borrow::Borrow, fmt, sync::Arc};
-use utils::*;
+use std::{fmt, sync::Arc};
+
+pub use ir_serializer::*;
+pub use response::*;
 
 /// A `key -> value` map to an IR item
 pub type Map = IndexMap<String, Item>;
@@ -88,84 +90,6 @@ impl<'a> IntoIterator for &'a List {
 /// Convenience type wrapper for Arc<Item>.
 pub type ItemRef = Arc<Item>;
 
-#[derive(Debug, serde::Serialize, PartialEq)]
-pub struct ResponseError {
-    error: String,
-    user_facing_error: user_facing_errors::Error,
-}
-
-impl From<user_facing_errors::Error> for ResponseError {
-    fn from(err: user_facing_errors::Error) -> ResponseError {
-        ResponseError {
-            error: err.message().to_owned(),
-            user_facing_error: err,
-        }
-    }
-}
-
-impl From<crate::error::CoreError> for ResponseError {
-    fn from(err: crate::error::CoreError) -> ResponseError {
-        ResponseError {
-            error: format!("{}", err),
-            user_facing_error: err.into(),
-        }
-    }
-}
-
-/// A response can either be some `key-value` data representation
-/// or an error that occured.
-#[derive(Debug)]
-pub enum Response {
-    Data(String, Item),
-    Error(ResponseError),
-}
-
-#[derive(Debug, serde::Serialize, Default, PartialEq)]
-pub struct Responses {
-    #[serde(skip_serializing_if = "IndexMap::is_empty")]
-    data: Map,
-    #[serde(skip_serializing_if = "Vec::is_empty")]
-    errors: Vec<ResponseError>,
-}
-
-impl Responses {
-    pub fn new() -> Self {
-        Self::default()
-    }
-
-    pub fn with_capacity(capacity: usize) -> Self {
-        Self {
-            data: IndexMap::with_capacity(capacity),
-            ..Default::default()
-        }
-    }
-
-    pub fn insert_data(&mut self, key: impl Into<String>, item: Item) {
-        self.data.insert(key.into(), item);
-    }
-
-    pub fn insert_error(&mut self, error: impl Into<ResponseError>) {
-        self.errors.push(error.into());
-    }
-
-    pub fn get_data(&self, key: impl AsRef<str>) -> Option<&Item> {
-        self.data.get(key.as_ref())
-    }
-
-    pub fn take_data(&mut self, key: impl AsRef<str>) -> Option<Item> {
-        self.data.remove(key.as_ref())
-    }
-}
-
-impl From<Map> for Responses {
-    fn from(data: Map) -> Self {
-        Self {
-            data,
-            ..Default::default()
-        }
-    }
-}
-
 /// An IR item that either expands to a subtype or leaf-record.
 #[derive(Debug, Clone, PartialEq)]
 pub enum Item {
@@ -182,7 +106,7 @@ pub enum Item {
 
 impl Item {
     pub fn null() -> Self {
-        Self::Value(PrismaValue::Null)
+        Self::Value(PrismaValue::Null(TypeHint::Unknown))
     }
 
     pub fn list(inner: Vec<Item>) -> Self {
@@ -249,53 +173,6 @@ impl Serialize for Item {
             Self::Value(pv) => pv.serialize(serializer),
             Self::Json(value) => value.serialize(serializer),
             Self::Ref(item_ref) => item_ref.serialize(serializer),
-        }
-    }
-}
-
-#[derive(Debug)]
-pub struct IrSerializer {
-    /// Serialization key for root DataItem
-    /// Note: This will change
-    pub key: String,
-
-    /// Output type describing the possible shape of the result
-    pub output_type: OutputTypeRef,
-}
-
-impl IrSerializer {
-    pub fn serialize(&self, result: ExpressionResult) -> Response {
-        match result {
-            ExpressionResult::Query(QueryResult::Json(json)) => Response::Data(self.key.clone(), Item::Json(json)),
-            ExpressionResult::Query(r) => {
-                match serialize_internal(r, &self.output_type, false, false) {
-                    Ok(result) => {
-                        // On the top level, each result boils down to a exactly a single serialized result.
-                        // All checks for lists and optionals have already been performed during the recursion,
-                        // so we just unpack the only result possible.
-                        // Todo: The following checks feel out of place. This probably needs to be handled already one level deeper.
-                        let result = if result.is_empty() {
-                            match self.output_type.borrow() {
-                                OutputType::Opt(_) => Item::Value(PrismaValue::Null),
-                                OutputType::List(_) => Item::list(Vec::new()),
-                                other => return Response::Error(ResponseError::from(CoreError::SerializationError(format!(
-                                    "Invalid response data: the query result was required, but an empty {:?} was returned instead.",
-                                    other
-                                )))),
-                            }
-                        } else {
-                            let (_, item) = result.into_iter().take(1).next().unwrap();
-                            item
-                        };
-
-                        Response::Data(self.key.clone(), result)
-                    }
-                    Err(err) => Response::Error(err.into()),
-                }
-            }
-
-            ExpressionResult::Empty => panic!("Domain logic error: Attempted to serialize empty result."),
-            ExpressionResult::Computation(_) => panic!("Domain logic error: Attempted to serialize non-query result."),
         }
     }
 }

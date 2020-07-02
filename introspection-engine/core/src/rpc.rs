@@ -1,8 +1,9 @@
 use crate::command_error::CommandError;
 use crate::error::Error;
 use crate::error_rendering::render_jsonrpc_error;
+use datamodel::Datamodel;
 use futures::{FutureExt, TryFutureExt};
-use introspection_connector::{DatabaseMetadata, IntrospectionConnector, IntrospectionResultOutput};
+use introspection_connector::{DatabaseMetadata, IntrospectionConnector, IntrospectionResultOutput, Warning};
 use jsonrpc_derive::rpc;
 use serde_derive::*;
 use sql_introspection_connector::SqlIntrospectionConnector;
@@ -42,7 +43,11 @@ impl Rpc for RpcImpl {
     }
 
     fn introspect(&self, input: IntrospectionInput) -> RpcFutureResult<IntrospectionResultOutput> {
-        Box::new(Self::introspect_internal(input.schema).boxed().compat())
+        Box::new(
+            Self::introspect_internal(input.schema, input.reintrospect)
+                .boxed()
+                .compat(),
+        )
     }
 }
 
@@ -60,10 +65,11 @@ impl RpcImpl {
             .url()
             .to_owned()
             .value;
+
         Ok(Box::new(SqlIntrospectionConnector::new(&url).await?))
     }
 
-    pub async fn introspect_internal(schema: String) -> RpcResult<IntrospectionResultOutput> {
+    pub async fn introspect_internal(schema: String, reintrospect: bool) -> RpcResult<IntrospectionResultOutput> {
         let config = datamodel::parse_configuration(&schema).map_err(Error::from)?;
         let url = config
             .datasources
@@ -73,10 +79,19 @@ impl RpcImpl {
             .url()
             .to_owned()
             .value;
-        let connector = RpcImpl::load_connector(&schema).await?;
-        let data_model = connector.introspect().await;
 
-        match data_model {
+        let connector = RpcImpl::load_connector(&schema).await?;
+
+        let mut could_not_parse_input_data_model = false;
+        let input_data_model = match datamodel::parse_datamodel(&schema) {
+            Ok(existing_data_model) => existing_data_model,
+            Err(_) => {
+                could_not_parse_input_data_model = true;
+                Datamodel::new()
+            }
+        };
+
+        match connector.introspect(&input_data_model, reintrospect).await {
             Ok(introspection_result)
                 if introspection_result.datamodel.models.is_empty()
                     && introspection_result.datamodel.enums.is_empty() =>
@@ -86,13 +101,29 @@ impl RpcImpl {
                 )))
             }
             Ok(introspection_result) => {
+                let warnings = match could_not_parse_input_data_model {
+                    true if reintrospect => {
+                        let mut warnings = introspection_result.warnings;
+                        warnings.push(Warning {
+                        code: 0,
+                        message:
+                        "The input datamodel could not be parsed. This means it was not used to enrich the introspected datamodel with previous manual changes."
+                            .into(),
+                        affected: serde_json::Value::Null,
+                    });
+                        warnings
+                    }
+                    _ => introspection_result.warnings,
+                };
+
                 let result = IntrospectionResultOutput {
                     datamodel: datamodel::render_datamodel_and_config_to_string(
                         &introspection_result.datamodel,
                         &config,
                     )
                     .map_err(Error::from)?,
-                    warnings: introspection_result.warnings,
+                    warnings,
+                    version: introspection_result.version,
                 };
 
                 Ok(result)
@@ -120,4 +151,10 @@ impl RpcImpl {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct IntrospectionInput {
     pub(crate) schema: String,
+    #[serde(default = "default_false")]
+    pub(crate) reintrospect: bool,
+}
+
+fn default_false() -> bool {
+    false
 }

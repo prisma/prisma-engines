@@ -97,6 +97,11 @@ impl Model {
         self.fields().find(|f| f.name == *name)
     }
 
+    /// Finds a field by database name.
+    pub fn find_field_db_name(&self, db_name: &str) -> Option<&Field> {
+        self.fields().find(|f| f.database_name.as_deref() == Some(db_name))
+    }
+
     pub fn has_field(&self, name: &str) -> bool {
         self.find_field(name).is_some()
     }
@@ -132,16 +137,18 @@ impl Model {
     }
 
     /// optional unique fields are NOT considered a unique criteria
+    /// used for: A Model must have at least one STRICT unique criteria.
     pub fn strict_unique_criterias(&self) -> Vec<UniqueCriteria> {
         self.unique_criterias(false)
     }
 
     /// optional unique fields are considered a unique criteria
+    /// used for: A relation must reference one LOOSE unique criteria. (optional fields are okay in this case)
     pub fn loose_unique_criterias(&self) -> Vec<UniqueCriteria> {
         self.unique_criterias(true)
     }
 
-    // returns the order of unique criterias ordered based on their precedence
+    /// returns the order of unique criterias ordered based on their precedence
     fn unique_criterias(&self, allow_optional: bool) -> Vec<UniqueCriteria> {
         let mut result = Vec::new();
         // first candidate: the singular id field
@@ -168,22 +175,27 @@ impl Model {
             let mut unique_required_fields: Vec<_> = self
                 .fields
                 .iter()
-                .filter(|field| field.is_unique && (field.arity == FieldArity::Required || allow_optional))
+                .filter(|field| field.is_unique && (field.arity.is_required() || allow_optional))
                 .map(|f| UniqueCriteria::new(vec![f]))
                 .collect();
 
             result.append(&mut unique_required_fields);
         }
 
-        // fourth candidate: any multi-field unique constraint.
+        // fourth candidate: any multi-field unique constraint where all fields are required
         {
             let mut unique_field_combi = self
                 .indices
                 .iter()
                 .filter(|id| id.tpe == IndexType::Unique)
-                .map(|id| {
-                    let fields = id.fields.iter().map(|f| self.find_field(&f).unwrap()).collect();
-                    UniqueCriteria::new(fields)
+                .filter_map(|id| {
+                    let fields: Vec<_> = id.fields.iter().map(|f| self.find_field(&f).unwrap()).collect();
+                    let all_fields_are_required = fields.iter().all(|f| f.arity.is_required());
+                    if all_fields_are_required || allow_optional {
+                        Some(UniqueCriteria::new(fields))
+                    } else {
+                        None
+                    }
                 })
                 .collect();
 
@@ -196,6 +208,11 @@ impl Model {
     /// Finds the name of all id fields
     pub fn singular_id_fields(&self) -> impl std::iter::Iterator<Item = &Field> {
         self.fields().filter(|x| x.is_id)
+    }
+
+    /// Determines whether there is a singular primary key
+    pub fn has_single_id_field(&self) -> bool {
+        self.singular_id_fields().count() == 1
     }
 
     /// Finds a field with a certain relation guarantee.

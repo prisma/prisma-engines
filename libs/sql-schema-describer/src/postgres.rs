@@ -2,9 +2,7 @@
 use super::*;
 use quaint::prelude::Queryable;
 use regex::Regex;
-use std::collections::HashMap;
-use std::convert::TryInto;
-use std::sync::Arc;
+use std::{borrow::Cow, collections::HashMap, convert::TryInto, sync::Arc};
 use tracing::debug;
 
 pub struct SqlSchemaDescriber {
@@ -143,6 +141,7 @@ impl SqlSchemaDescriber {
                 column_name,
                 data_type,
                 udt_name as full_data_type,
+                character_maximum_length,
                 column_default,
                 is_nullable,
                 is_identity,
@@ -173,6 +172,7 @@ impl SqlSchemaDescriber {
                 .get("full_data_type")
                 .and_then(|x| x.to_string())
                 .expect("get full_data_type aka udt_name");
+            let character_maximum_length = col.get("character_maximum_length").and_then(|x| x.as_i64());
             let is_identity_str = col
                 .get("is_identity")
                 .and_then(|x| x.to_string())
@@ -201,7 +201,14 @@ impl SqlSchemaDescriber {
             } else {
                 ColumnArity::Nullable
             };
-            let tpe = get_column_type(data_type.as_ref(), &full_data_type, arity, enums);
+
+            let tpe = get_column_type(
+                data_type.as_ref(),
+                &full_data_type,
+                character_maximum_length,
+                arity,
+                enums,
+            );
 
             let default = match col.get("column_default") {
                 None => None,
@@ -226,9 +233,9 @@ impl SqlSchemaDescriber {
                             },
                             ColumnTypeFamily::String => {
                                 match unsuffix_default_literal(&default_string, &data_type, &full_data_type) {
-                                    Some(default_literal) => {
-                                        DefaultValue::VALUE(PrismaValue::String(unquote_string(default_literal.into())))
-                                    }
+                                    Some(default_literal) => DefaultValue::VALUE(PrismaValue::String(
+                                        process_string_literal(default_literal.as_ref()).into(),
+                                    )),
                                     None => DefaultValue::DBGENERATED(default_string),
                                 }
                             }
@@ -248,12 +255,18 @@ impl SqlSchemaDescriber {
                             ColumnTypeFamily::TextSearch => DefaultValue::DBGENERATED(default_string),
                             ColumnTypeFamily::TransactionId => DefaultValue::DBGENERATED(default_string),
                             ColumnTypeFamily::Enum(enum_name) => {
-                                let enum_suffix = format!("::{}", enum_name);
-                                match default_string.ends_with(&enum_suffix) {
-                                    true => DefaultValue::VALUE(PrismaValue::Enum(unquote_string(
-                                        default_string.replace(&enum_suffix, ""),
-                                    ))),
-                                    false => DefaultValue::DBGENERATED(default_string),
+                                let enum_suffix_without_quotes = format!("::{}", enum_name);
+                                let enum_suffix_with_quotes = format!("::\"{}\"", enum_name);
+                                if default_string.ends_with(&enum_suffix_with_quotes) {
+                                    DefaultValue::VALUE(PrismaValue::Enum(unquote_string(
+                                        &default_string.replace(&enum_suffix_with_quotes, ""),
+                                    )))
+                                } else if default_string.ends_with(&enum_suffix_without_quotes) {
+                                    DefaultValue::VALUE(PrismaValue::Enum(unquote_string(
+                                        &default_string.replace(&enum_suffix_without_quotes, ""),
+                                    )))
+                                } else {
+                                    DefaultValue::DBGENERATED(default_string)
                                 }
                             }
                             ColumnTypeFamily::Unsupported(_) => DefaultValue::DBGENERATED(default_string),
@@ -501,6 +514,7 @@ impl SqlSchemaDescriber {
                         entry.1 = Some(PrimaryKey {
                             columns: vec![column_name],
                             sequence,
+                            constraint_name: Some(name.clone()),
                         });
                     }
                 }
@@ -602,7 +616,13 @@ struct IndexRow {
     sequence_name: Option<String>,
 }
 
-fn get_column_type<'a>(data_type: &str, full_data_type: &'a str, arity: ColumnArity, enums: &Vec<Enum>) -> ColumnType {
+fn get_column_type<'a>(
+    data_type: &str,
+    full_data_type: &'a str,
+    character_maximum_length: Option<i64>,
+    arity: ColumnArity,
+    enums: &Vec<Enum>,
+) -> ColumnType {
     use ColumnTypeFamily::*;
     let trim = |name: &'a str| name.trim_start_matches("_");
     let enum_exists = |name: &'a str| enums.iter().any(|e| e.name == name);
@@ -652,6 +672,7 @@ fn get_column_type<'a>(data_type: &str, full_data_type: &'a str, arity: ColumnAr
     ColumnType {
         data_type: data_type.to_owned(),
         full_data_type: full_data_type.to_owned(),
+        character_maximum_length,
         family,
         arity,
     }
@@ -699,11 +720,9 @@ fn is_autoincrement(value: &str, schema_name: &str, table_name: &str, column_nam
         .unwrap_or(false)
 }
 
-fn unsuffix_default_literal<'a>(literal: &'a str, data_type: &str, full_data_type: &str) -> Option<&'a str> {
-    static POSTGRES_STRING_DEFAULT_RE: Lazy<regex::Regex> = Lazy::new(|| regex::Regex::new(r#"^B?'(.*)'$"#).unwrap());
-
-    static POSTGRES_DATA_TYPE_SUFFIX_RE: Lazy<regex::Regex> =
-        Lazy::new(|| regex::Regex::new(r#"(.*)::(\\")?(.*)(\\")?$"#).unwrap());
+fn unsuffix_default_literal<'a>(literal: &'a str, data_type: &str, full_data_type: &str) -> Option<Cow<'a, str>> {
+    const POSTGRES_DATA_TYPE_SUFFIX_RE: Lazy<Regex> =
+        Lazy::new(|| Regex::new(r#"(?ms)^(.*)::(\\")?(.*)(\\")?$"#).unwrap());
 
     let captures = POSTGRES_DATA_TYPE_SUFFIX_RE.captures(literal)?;
     let suffix = captures.get(3).unwrap().as_str();
@@ -712,11 +731,40 @@ fn unsuffix_default_literal<'a>(literal: &'a str, data_type: &str, full_data_typ
         return None;
     }
 
-    let raw = captures.get(1).unwrap().as_str();
+    let first_capture = captures.get(1).unwrap().as_str();
 
-    let captures = POSTGRES_STRING_DEFAULT_RE.captures(raw)?;
+    Some(first_capture.into())
+}
 
-    Some(captures.get(1).unwrap().as_str())
+// See https://www.postgresql.org/docs/9.3/sql-syntax-lexical.html
+fn process_string_literal<'a>(literal: &'a str) -> Cow<'a, str> {
+    static POSTGRES_STRING_DEFAULT_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"(?ms)^B?'(.*)'$"#).unwrap());
+    static POSTGRES_DEFAULT_QUOTE_UNESCAPE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"'(')"#).unwrap());
+    static POSTGRES_DEFAULT_BACKSLASH_UNESCAPE_RE: Lazy<Regex> =
+        Lazy::new(|| Regex::new(r#"\\(["']|\\[^\\])"#).unwrap());
+    static POSTGRES_STRING_DEFAULTS_PIPELINE: &[(&Lazy<Regex>, &str)] = &[
+        (&POSTGRES_STRING_DEFAULT_RE, "$1"),
+        (&POSTGRES_DEFAULT_QUOTE_UNESCAPE_RE, "$1"),
+        (&POSTGRES_DEFAULT_BACKSLASH_UNESCAPE_RE, "$1"),
+    ];
+
+    chain_replaces(literal, POSTGRES_STRING_DEFAULTS_PIPELINE)
+}
+
+fn chain_replaces<'a>(s: &'a str, replaces: &[(&Lazy<Regex>, &str)]) -> Cow<'a, str> {
+    let mut out = Cow::Borrowed(s);
+
+    for (re, replacement) in replaces.iter() {
+        if !re.is_match(out.as_ref()) {
+            continue;
+        }
+
+        let replaced = re.replace_all(out.as_ref(), *replacement);
+
+        out = Cow::Owned(replaced.into_owned())
+    }
+
+    out
 }
 
 #[cfg(test)]

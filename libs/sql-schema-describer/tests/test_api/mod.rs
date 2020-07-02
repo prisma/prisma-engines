@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use barrel::Migration;
 use quaint::{
     prelude::{Queryable, SqlFamily},
@@ -6,6 +8,8 @@ use quaint::{
 use sql_schema_describer::*;
 use std::sync::Arc;
 use test_setup::*;
+
+pub type TestResult = anyhow::Result<()>;
 
 pub struct TestApi {
     /// More precise than SqlFamily.
@@ -23,6 +27,7 @@ impl TestApi {
             SqlFamily::Postgres => Box::new(sql_schema_describer::postgres::SqlSchemaDescriber::new(db)),
             SqlFamily::Sqlite => Box::new(sql_schema_describer::sqlite::SqlSchemaDescriber::new(db)),
             SqlFamily::Mysql => Box::new(sql_schema_describer::mysql::SqlSchemaDescriber::new(db)),
+            SqlFamily::Mssql => todo!("Greetings from Redmond"),
         };
 
         Ok(describer.describe(self.schema_name()).await?)
@@ -52,6 +57,7 @@ impl TestApi {
                 SqlFamily::Mysql => barrel::SqlVariant::Mysql,
                 SqlFamily::Postgres => barrel::SqlVariant::Pg,
                 SqlFamily::Sqlite => barrel::SqlVariant::Sqlite,
+                SqlFamily::Mssql => todo!("Hey Barrel, greetings from Redmond"),
             },
         }
     }

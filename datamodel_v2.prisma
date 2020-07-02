@@ -1,10 +1,10 @@
 datasource chinook {
   provider = "sqlite"
-  url = "file:./db/Chinook.db"
+  url      = "file:./db/Chinook.db"
 }
 
 model Album {
-  id       Int     @id @map(name: "AlbumId")
+  id       Int     @id @map("AlbumId")
   Title    String  @default("TestDefaultTitle")
   ArtistId Int
   Tracks   Track[]
@@ -12,7 +12,7 @@ model Album {
 }
 
 model Track {
-  id           Int @id       @map(name:"TrackId")
+  id           Int           @id @map("TrackId")
   Name         String
   Composer     String?
   Milliseconds Int
@@ -27,24 +27,25 @@ model Track {
 }
 
 model MediaType {
-  id   Int     @id @map(name:"MediaTypeId")
-  Name String?
+  id    Int     @id @map("MediaTypeId")
+  Name  String?
+  Track Track[]
 }
 
 model Genre {
-  id     Int     @id @map(name:"GenreId")
+  id     Int     @id @map("GenreId")
   Name   String?
   Tracks Track[]
 }
 
 model Artist {
-  id     Int     @id @map(name:"ArtistId")
+  id     Int     @id @map("ArtistId")
   Name   String?
   Albums Album[]
 }
 
 model Customer {
-  id           Int       @id @map(name:"CustomerId")
+  id           Int       @id @map("CustomerId")
   FirstName    String
   LastName     String
   Company      String?
@@ -62,7 +63,7 @@ model Customer {
 }
 
 model Employee {
-  id         Int       @id @map(name:"EmployeeId")
+  id         Int        @id @map("EmployeeId")
   FirstName  String
   LastName   String
   Title      String?
@@ -80,7 +81,7 @@ model Employee {
 }
 
 model Invoice {
-  id                Int           @id @map(name:"InvoiceId")
+  id                Int           @id @map("InvoiceId")
   InvoiceDate       DateTime
   BillingAddress    String?
   BillingCity       String?
@@ -94,7 +95,7 @@ model Invoice {
 }
 
 model InvoiceLine {
-  id        Int     @id @map(name:"InvoiceLineId")
+  id        Int     @id @map("InvoiceLineId")
   UnitPrice Float
   Quantity  Int
   InvoiceId Int
@@ -104,6 +105,6 @@ model InvoiceLine {
 }
 
 model Playlist {
-  id   Int     @id @map(name:"PlaylistId")
+  id   Int     @id @map("PlaylistId")
   Name String?
 }

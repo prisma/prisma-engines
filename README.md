@@ -76,8 +76,7 @@ USAGE:
     query-engine [FLAGS] [OPTIONS] [SUBCOMMAND]
 
 FLAGS:
-        --always-force-transactions    Runs all queries in a transaction, including all the reads
-        --enable-raw-queries           Enables raw SQL queries with executeRaw mutation
+        --enable-raw-queries           Enables raw SQL queries with executeRaw/queryRaw mutation
     -h, --help                         Prints help information
         --legacy                       Switches query schema generation to Prisma 1 compatible mode
     -V, --version                      Prints version information
@@ -168,3 +167,7 @@ Run `cargo test` in the repository root.
 ## WIP Coding Guidelines
 - Prevent compiler warnings
 - Use Rust formatting (`cargo fmt`)
+
+## Security
+
+If you have a security issue to report, please contact us at [security@prisma.io](mailto:security@prisma.io?subject=[GitHub]%20Prisma%202%20Security%20Report%20Engines)

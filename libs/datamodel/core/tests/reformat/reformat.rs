@@ -3,7 +3,17 @@ use pretty_assertions::assert_eq;
 use std::str;
 
 #[test]
-fn test_reformat_model() {
+fn must_add_new_line_to_end_of_schema() {
+    let input = r#"// a comment"#;
+
+    let expected = r#"// a comment
+"#;
+
+    assert_reformat(input, expected);
+}
+
+#[test]
+fn test_reformat_model_simple() {
     let input = r#"
         model User { 
             id               Int                   @id 
@@ -12,12 +22,184 @@ fn test_reformat_model() {
 
     let expected = r#"model User {
   id Int @id
-}"#;
+}
+"#;
 
-    let mut buf = Vec::new();
-    datamodel::ast::reformat::Reformatter::reformat_to(&input, &mut buf, 2);
-    let actual = str::from_utf8(&buf).expect("unable to convert to string");
-    assert_eq!(expected, actual);
+    assert_reformat(input, expected);
+}
+
+#[test]
+fn test_reformat_model_complex() {
+    let input = r#"
+        /// model doc comment
+        model User { 
+            id Int @id // doc comment on the side
+            fieldA String    @unique // comment on the side
+            // comment before
+            /// doc comment before
+            anotherWeirdFieldName Int 
+        }
+    "#;
+
+    let expected = r#"/// model doc comment
+model User {
+  id                    Int    @id // doc comment on the side
+  fieldA                String @unique // comment on the side
+  // comment before
+  /// doc comment before
+  anotherWeirdFieldName Int
+}
+"#;
+
+    assert_reformat(input, expected);
+}
+
+#[test]
+fn catch_all_in_a_block_must_not_influence_table_layout() {
+    let input = r#"
+model Post {
+  id   Int @id
+  this is an invalid line
+  anotherField String
+}
+"#;
+
+    let expected = r#"model Post {
+  id           Int    @id
+  this is an invalid line
+  anotherField String
+}
+"#;
+
+    assert_reformat(input, expected);
+}
+
+#[test]
+fn comments_in_a_model_must_not_move() {
+    let input = r#"
+        model User {
+          id     Int    @id
+          // Comment
+          email  String @unique
+          // Comment 2
+        }
+    "#;
+
+    let expected = r#"model User {
+  id    Int    @id
+  // Comment
+  email String @unique
+  // Comment 2
+}
+"#;
+
+    assert_reformat(input, expected);
+}
+
+#[test]
+fn end_of_line_comments_must_not_influence_table_layout_in_models() {
+    let input = r#"model Test {
+  id  Int   @id    // Comment 1
+  foo String     // Comment 2
+  bar bar? @relation(fields: [id], references: [id]) // Comment 3
+}
+"#;
+
+    let expected = r#"model Test {
+  id  Int    @id // Comment 1
+  foo String // Comment 2
+  bar bar?   @relation(fields: [id], references: [id]) // Comment 3
+}
+"#;
+
+    assert_reformat(input, expected);
+}
+
+#[test]
+fn end_of_line_comments_must_not_influence_table_layout_in_enums() {
+    let input = r#"enum Foo {
+    ONE @map("short")     // COMMENT 1
+    TWO @map("a_very_long_name")    // COMMENT 2
+}
+"#;
+
+    let expected = r#"enum Foo {
+  ONE  @map("short") // COMMENT 1
+  TWO  @map("a_very_long_name") // COMMENT 2
+}
+"#;
+
+    assert_reformat(input, expected);
+}
+
+#[test]
+fn commented_models_dont_get_removed() {
+    let input = r#"
+        // model One {
+        //   id Int @id
+        // }
+        
+        model Two {
+          id Int @id
+        }
+        
+        // model Three {
+        //   id Int @id
+        // }
+    "#;
+
+    let expected = r#"// model One {
+//   id Int @id
+// }
+
+model Two {
+  id Int @id
+}
+
+// model Three {
+//   id Int @id
+// }
+"#;
+
+    assert_reformat(input, expected);
+}
+
+#[test]
+fn a_comment_in_datasource_must_not_add_extra_newlines() {
+    let input = r#"
+        datasource pg { 
+            provider = "postgresql"
+            url = "postgresql://"
+            // a comment
+        }
+    "#;
+
+    let expected = r#"datasource pg {
+  provider = "postgresql"
+  url      = "postgresql://"
+  // a comment
+}
+"#;
+
+    assert_reformat(input, expected);
+}
+
+#[test]
+fn a_comment_in_generator_must_not_add_extra_newlines() {
+    let input = r#"
+        generator js { 
+            provider = "js"
+            // a comment
+        }
+    "#;
+
+    let expected = r#"generator js {
+  provider = "js"
+  // a comment
+}
+"#;
+
+    assert_reformat(input, expected);
 }
 
 #[test]
@@ -32,12 +214,10 @@ fn test_reformat_config() {
     let expected = r#"datasource pg {
   provider = "postgresql"
   url      = "postgresql://"
-}"#;
+}
+"#;
 
-    let mut buf = Vec::new();
-    datamodel::ast::reformat::Reformatter::reformat_to(&input, &mut buf, 2);
-    let actual = str::from_utf8(&buf).expect("unable to convert to string");
-    assert_eq!(expected, actual);
+    assert_reformat(input, expected);
 }
 
 #[test]
@@ -52,17 +232,14 @@ fn test_reformat_tabs() {
     let expected = r#"datasource pg {
   provider = "postgresql"
   url      = "postgresql://"
-}"#;
+}
+"#;
 
-    let mut buf = Vec::new();
-    // replaces \t placeholder with a real tab
-    datamodel::ast::reformat::Reformatter::reformat_to(&input.replace("\\t", "\t"), &mut buf, 2);
-    let actual = str::from_utf8(&buf).expect("unable to convert to string");
-    assert_eq!(expected, actual);
+    assert_reformat(&input.replace("\\t", "\t"), expected);
 }
 
 #[test]
-fn test_floating_doc_comment() {
+fn test_floating_doc_comments_1() {
     let input = r#"
 model a {
   one Int
@@ -74,8 +251,7 @@ model a {
 /// ajlsdkfkjasflk
 // model ok {}"#;
 
-    let _expected = r#"
-model a {
+    let expected = r#"model a {
   one Int
   two Int
   // bs  b[] @relation(references: [a])
@@ -83,18 +259,14 @@ model a {
 }
 
 /// ajlsdkfkjasflk
-// model ok {}"#;
+// model ok {}
+"#;
 
-    let mut buf = Vec::new();
-    // replaces \t placeholder with a real tab
-    datamodel::ast::reformat::Reformatter::reformat_to(&input.replace("\\t", "\t"), &mut buf, 2);
-    // FIXME: This is ignored. See explanation in following test for details on why.
-    //    let actual = str::from_utf8(&buf).expect("unable to convert to string");
-    //    assert_eq!(expected, actual);
+    assert_reformat(input, expected);
 }
 
 #[test]
-fn test_floating_doc_comments() {
+fn test_floating_doc_comments_2() {
     let input = r#"
 model a {
   one Int
@@ -107,8 +279,7 @@ model a {
 // ajlsdkfkjasflk
 "#;
 
-    let _expected = r#"
-model a {
+    let expected = r#"model a {
   one Int
   two Int
   // bs  b[] @relation(references: [a])
@@ -116,46 +287,38 @@ model a {
 }
 
 // ajlsdkfkjasflk
-// ajlsdkfkjasflk"#;
+// ajlsdkfkjasflk
+"#;
 
-    let mut buf = Vec::new();
-    // replaces \t placeholder with a real tab
-    datamodel::ast::reformat::Reformatter::reformat_to(&input.replace("\\t", "\t"), &mut buf, 2);
-    let _actual = str::from_utf8(&buf).expect("unable to convert to string");
-    // FIXME: the assertion is ignored for now. We just make sure that the reformatting at least does not crash.
-    // FIXME: It's hard to implement this because the reformatting does not operate purely on the AST anymore and goes through dml layer and back.
-    // FIXME: This means that the following information gets lost:
-    // FIXME: 1. The commented field gets simply assigned to the model. It is not known where it was originally placed.
-    // FIXME: 2. The floating comments are not present in the dml representation at all. They get lost.
-    //    assert_eq!(expected, actual);
+    assert_reformat(input, expected);
 }
 
 #[test]
 fn reformatting_enums_must_work() {
-    let input = r#"
-enum Colors {
-  RED
+    let input = r#"enum Colors {
+  RED @map("rett")
   BLUE
   GREEN
-  
+
   // comment
-  ORANGE
+  ORANGE_AND_KIND_OF_RED @map("super_color")
+  
+  @@map("the_colors")
+}
+"#;
+    let expected = r#"enum Colors {
+  RED    @map("rett")
+  BLUE
+  GREEN
+
+  // comment
+  ORANGE_AND_KIND_OF_RED  @map("super_color")
+
+  @@map("the_colors")
 }
 "#;
 
-    // moving the comment to the top is not ideal. Just want to capture the current behavior in a test.
-    let expected = r#"enum Colors {
-  RED
-  BLUE
-  GREEN
-  ORANGE // comment
-}"#;
-
-    let mut buf = Vec::new();
-    datamodel::ast::reformat::Reformatter::reformat_to(&input, &mut buf, 2);
-    let actual = str::from_utf8(&buf).expect("unable to convert to string");
-    println!("{}", actual);
-    assert_eq!(actual, expected);
+    assert_reformat(input, expected);
 }
 
 #[test]
@@ -170,10 +333,290 @@ fn reformatting_must_work_when_env_var_is_missing() {
     let expected = r#"datasource pg {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+"#;
+
+    assert_reformat(input, expected);
+}
+
+#[test]
+fn invalid_lines_must_not_break_reformatting() {
+    let input = r#"$ /a/b/c:.
+model Post {
+  id Int @id
+}
+"#;
+
+    assert_reformat(input, input);
+}
+
+#[test]
+fn reformatting_an_invalid_datasource_block_must_work() {
+    let input = r#"datasource db {
+  provider = "postgresql"
+  url = env("POSTGRESQL_URL")
+  test
+}
+"#;
+
+    let expected = r#"datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRESQL_URL")
+  test
+}
+"#;
+
+    assert_reformat(input, expected);
+}
+
+#[test]
+fn reformatting_an_invalid_generator_block_must_work() {
+    let input = r#"generator js {
+  provider = "js"
+  output = "../wherever"
+  test
+}
+"#;
+
+    let expected = r#"generator js {
+  provider = "js"
+  output   = "../wherever"
+  test
+}
+"#;
+
+    assert_reformat(input, expected);
+}
+
+#[test]
+fn incomplete_field_definitions_in_a_model_must_not_get_removed() {
+    // incomplete field definitions are handled in a special way in the grammar to allow nice errors. See `nice_error.rs:nice_error_missing_type`
+    // Hence the block level catch does not apply here. So we must test this specifically.
+    let input = r#"model Post {
+  id   Int      @id
+  tags String[]
+  test // an incomplete field
+}
+"#;
+
+    assert_reformat(input, input);
+}
+
+#[test]
+fn new_lines_before_first_block_must_be_removed() {
+    let input = r#"
+
+model Post {
+  id Int @id
 }"#;
 
-    let mut buf = Vec::new();
-    datamodel::ast::reformat::Reformatter::reformat_to(&input, &mut buf, 2);
-    let actual = str::from_utf8(&buf).expect("unable to convert to string");
-    assert_eq!(expected, actual);
+    let expected = r#"model Post {
+  id Int @id
+}
+"#;
+
+    assert_reformat(input, expected);
+}
+
+#[test]
+fn new_lines_between_blocks_must_be_reduced_to_one_simple() {
+    let input = r#"model Post {
+  id Int @id
+}
+
+
+model Blog {
+  id Int @id
+}
+"#;
+
+    let expected = r#"model Post {
+  id Int @id
+}
+
+model Blog {
+  id Int @id
+}
+"#;
+
+    assert_reformat(input, expected);
+}
+
+#[test]
+fn multiple_new_lines_between_top_level_elements_must_be_reduced_to_a_single_one() {
+    let input = r#"model Post {
+  id Int @id
+}
+
+
+// free floating comment
+/// free floating doc comment
+
+
+// model comment
+/// model doc comment
+model Blog {
+  id Int @id
+}
+
+
+// free floating comment
+/// free floating doc comment
+
+
+/// source doc comment
+// source comment
+datasource mydb {
+  provider = "sqlite"
+  url      = "file:dev.db"
+}
+
+
+// free floating comment
+/// free floating doc comment
+
+// enum comment
+/// enum doc comment
+enum Status {
+  ACTIVE
+  DONE
+}
+
+
+// free floating comment
+/// free floating doc comment
+
+// type alias comment
+/// type alias doc comment
+type MyString = String          @default("FooBar")
+
+
+// free floating comment
+/// free floating doc comment
+
+// generator comment
+/// generator doc comment
+generator js {
+    provider = "js"
+}
+
+
+// free floating comment
+/// free floating doc comment
+
+/// another model doc comment
+// another model comment
+model Comment {
+  id Int @id
+}
+"#;
+
+    // TODO: the formatting of the type alias is not nice
+    let expected = r#"model Post {
+  id Int @id
+}
+
+// free floating comment
+/// free floating doc comment
+
+// model comment
+/// model doc comment
+model Blog {
+  id Int @id
+}
+
+// free floating comment
+/// free floating doc comment
+
+/// source doc comment
+// source comment
+datasource mydb {
+  provider = "sqlite"
+  url      = "file:dev.db"
+}
+
+// free floating comment
+/// free floating doc comment
+
+// enum comment
+/// enum doc comment
+enum Status {
+  ACTIVE
+  DONE
+}
+
+// free floating comment
+/// free floating doc comment
+
+// type alias comment
+/// type alias doc comment
+type                       MyString = String @default("FooBar")
+
+// free floating comment
+/// free floating doc comment
+
+// generator comment
+/// generator doc comment
+generator js {
+  provider = "js"
+}
+
+// free floating comment
+/// free floating doc comment
+
+/// another model doc comment
+// another model comment
+model Comment {
+  id Int @id
+}
+"#;
+
+    assert_reformat(input, expected);
+}
+
+#[test]
+fn model_level_directives_reset_the_table_layout() {
+    let input = r#"model Post {
+  id Int @id
+  aVeryLongName  String
+  @@index([a])
+  alsoAVeryLongName String
+}
+"#;
+
+    let expected = r#"model Post {
+  id            Int    @id
+  aVeryLongName String
+  @@index([a])
+  alsoAVeryLongName String
+}
+"#;
+
+    assert_reformat(input, expected);
+}
+
+#[test]
+fn incomplete_last_line_must_not_stop_reformatting() {
+    // https://github.com/prisma/vscode/issues/140
+    // If a user types on the very last line we did not error nicely.
+    // a new line fixed the problem but this is not nice.
+    let input = r#"model User {
+  id       Int       @id
+}
+model Bl"#;
+
+    let expected = r#"model User {
+  id Int @id
+}
+model Bl
+"#;
+
+    assert_reformat(input, expected);
+}
+
+fn assert_reformat(schema: &str, expected_result: &str) {
+    println!("schema: {:?}", schema);
+    let result = datamodel::ast::reformat::Reformatter::new(&schema).reformat_to_string();
+    println!("result: {}", result);
+    assert_eq!(result, expected_result);
 }

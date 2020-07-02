@@ -3,9 +3,9 @@ use crate::{FromSource, SqlError};
 use async_trait::async_trait;
 use connector_interface::{
     error::{ConnectorError, ErrorKind},
-    Connection, Connector, IO,
+    Connection, Connector,
 };
-use datamodel::Source;
+use datamodel::Datasource;
 use quaint::{pooled::Quaint, prelude::ConnectionInfo};
 use std::time::Duration;
 
@@ -16,7 +16,7 @@ pub struct PostgreSql {
 
 #[async_trait]
 impl FromSource for PostgreSql {
-    async fn from_source(source: &dyn Source) -> connector_interface::Result<Self> {
+    async fn from_source(source: &Datasource) -> connector_interface::Result<Self> {
         let connection_info = ConnectionInfo::from_url(&source.url().value)
             .map_err(|err| ConnectorError::from_kind(ErrorKind::ConnectionError(err.into())))?;
 
@@ -34,13 +34,14 @@ impl FromSource for PostgreSql {
     }
 }
 
+#[async_trait]
 impl Connector for PostgreSql {
-    fn get_connection<'a>(&'a self) -> IO<Box<dyn Connection + 'a>> {
-        IO::new(super::catch(&self.connection_info, async move {
+    async fn get_connection<'a>(&'a self) -> connector_interface::Result<Box<dyn Connection + 'static>> {
+        super::catch(&self.connection_info, async move {
             let conn = self.pool.check_out().await.map_err(SqlError::from)?;
             let conn = SqlConnection::new(conn, &self.connection_info);
-
             Ok(Box::new(conn) as Box<dyn Connection>)
-        }))
+        })
+        .await
     }
 }

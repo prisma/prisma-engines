@@ -149,7 +149,7 @@ impl QueryDocumentParser {
             (_, InputType::Opt(ref inner))                  => Self::parse_input_value(value, inner),
 
             // Handle null inputs
-            (QueryValue::Null, InputType::Null(_))          => Ok(ParsedInputValue::Single(PrismaValue::Null)),
+            (QueryValue::Null, InputType::Null(inner))          => Ok(ParsedInputValue::Single(PrismaValue::null(&**inner))),
             (_, InputType::Null(ref inner))                 => Self::parse_input_value(value, inner),
 
             // The optional handling above guarantees that if we hit a Null here, a required value is missing.
@@ -173,7 +173,7 @@ impl QueryDocumentParser {
     #[rustfmt::skip]
     pub fn parse_scalar(value: QueryValue, scalar_type: &ScalarType) -> QueryParserResult<PrismaValue> {
         match (value, scalar_type.clone()) {
-            (QueryValue::Null, _)                         => Ok(PrismaValue::Null),
+            (QueryValue::Null, typ)                       => Ok(PrismaValue::null(&typ)),
             (QueryValue::String(s), ScalarType::String)   => Ok(PrismaValue::String(s)),
             (QueryValue::String(s), ScalarType::DateTime) => Self::parse_datetime(s.as_str()).map(PrismaValue::DateTime),
             (QueryValue::String(s), ScalarType::Json) => Ok(PrismaValue::Json(Self::parse_json(&s).map(|_| s)?)),

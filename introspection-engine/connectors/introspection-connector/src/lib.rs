@@ -16,7 +16,11 @@ pub trait IntrospectionConnector: Send + Sync + 'static {
 
     async fn get_database_description(&self) -> ConnectorResult<String>;
 
-    async fn introspect(&self) -> ConnectorResult<IntrospectionResult>;
+    async fn introspect(
+        &self,
+        existing_data_model: &Datamodel,
+        reintrospect: bool,
+    ) -> ConnectorResult<IntrospectionResult>;
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -56,15 +60,18 @@ pub struct IntrospectionResultOutput {
     pub datamodel: String,
     /// warnings
     pub warnings: Vec<Warning>,
+    /// version
+    pub version: Version,
 }
 
 impl fmt::Display for IntrospectionResultOutput {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
-            "{{\"datamodel\": \"{}\", \"warnings\": {}}}",
+            "{{\"datamodel\": \"{}\", \"warnings\": {}, \"version\": \"{}\"}}",
             self.datamodel,
-            serde_json::to_string(&self.warnings).unwrap()
+            serde_json::to_string(&self.warnings).unwrap(),
+            serde_json::to_string(&self.version).unwrap(),
         )
     }
 }

@@ -34,7 +34,13 @@ pub trait ModelAsserts {
 }
 
 pub trait EnumAsserts {
-    fn assert_has_value(&self, t: &str) -> &Self;
+    fn assert_has_value(&self, t: &str) -> &dml::EnumValue;
+
+    fn assert_with_documentation(&self, t: &str) -> &Self;
+}
+
+pub trait EnumValueAsserts {
+    fn assert_with_documentation(&self, t: &str) -> &Self;
 }
 
 pub trait DatamodelAsserts {
@@ -44,6 +50,7 @@ pub trait DatamodelAsserts {
 
 pub trait ErrorAsserts {
     fn assert_is(&self, error: DatamodelError) -> &Self;
+    fn assert_is_message(&self, msg: &str) -> &Self;
     fn assert_is_at(&self, index: usize, error: DatamodelError) -> &Self;
     fn assert_length(&self, length: usize) -> &Self;
 }
@@ -230,12 +237,25 @@ impl ModelAsserts for dml::Model {
 }
 
 impl EnumAsserts for dml::Enum {
-    fn assert_has_value(&self, t: &str) -> &Self {
+    fn assert_has_value(&self, t: &str) -> &dml::EnumValue {
         let pred = t.to_owned();
+
         self.values
             .iter()
             .find(|x| *x.name == pred)
-            .expect(format!("Field {} not found", t).as_str());
+            .expect(format!("Enum Value {} not found", t).as_str())
+    }
+
+    fn assert_with_documentation(&self, t: &str) -> &Self {
+        assert_eq!(self.documentation, Some(t.to_owned()));
+
+        self
+    }
+}
+
+impl EnumValueAsserts for dml::EnumValue {
+    fn assert_with_documentation(&self, t: &str) -> &Self {
+        assert_eq!(self.documentation, Some(t.to_owned()));
 
         self
     }
@@ -243,11 +263,25 @@ impl EnumAsserts for dml::Enum {
 
 impl ErrorAsserts for ErrorCollection {
     fn assert_is(&self, error: DatamodelError) -> &Self {
-        if self.errors.len() == 1 {
-            assert_eq!(self.errors[0], error);
-        } else {
-            panic!("Expected exactly one validation error. Errors are: {:?}", &self);
-        }
+        assert_eq!(
+            self.errors.len(),
+            1,
+            "Expected exactly one validation error. Errors are: {:?}",
+            &self
+        );
+        assert_eq!(self.errors[0], error);
+
+        self
+    }
+
+    fn assert_is_message(&self, msg: &str) -> &Self {
+        assert_eq!(
+            self.errors.len(),
+            1,
+            "Expected exactly one validation error. Errors are: {:?}",
+            &self
+        );
+        assert_eq!(self.errors[0].description(), msg);
 
         self
     }
@@ -258,16 +292,15 @@ impl ErrorAsserts for ErrorCollection {
     }
 
     fn assert_length(&self, length: usize) -> &Self {
-        if self.errors.len() == length {
-            self
-        } else {
-            panic!(
-                "Expected exactly {} validation errors, but got {}. The errors were {:?}",
-                length,
-                self.errors.len(),
-                &self.errors,
-            );
-        }
+        assert_eq!(
+            self.errors.len(),
+            length,
+            "Expected exactly {} validation errors, but got {}. The errors were {:?}",
+            length,
+            self.errors.len(),
+            &self.errors,
+        );
+        self
     }
 }
 

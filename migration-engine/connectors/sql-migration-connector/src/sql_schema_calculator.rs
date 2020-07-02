@@ -119,13 +119,14 @@ impl<'a> SqlSchemaCalculator<'a> {
                 })
                 .collect();
 
-            let primary_key = sql::PrimaryKey {
+            let primary_key = Some(sql::PrimaryKey {
                 columns: model
                     .id_fields()
                     .map(|field| field.db_name().to_owned())
                     .collect(),
                 sequence: None,
-            };
+                constraint_name: None,
+            }).filter(|pk| !pk.columns.is_empty());
 
             let single_field_indexes = model.fields().filter_map(|f| {
                 if f.is_unique() {
@@ -140,7 +141,7 @@ impl<'a> SqlSchemaCalculator<'a> {
             });
 
             let multiple_field_indexes = model.indexes().map(|index_definition: &IndexDefinition| {
-                let referenced_fields: Vec<FieldRef> = index_definition
+                let referenced_fields: Vec<FieldRef<'_>> = index_definition
                     .fields
                     .iter()
                     .map(|field_name| model.find_field(field_name).expect("Unknown field in index directive."))
@@ -172,7 +173,7 @@ impl<'a> SqlSchemaCalculator<'a> {
                 name: model.database_name().to_owned(),
                 columns,
                 indices: single_field_indexes.chain(multiple_field_indexes).collect(),
-                primary_key: Some(primary_key),
+                primary_key,
                 foreign_keys: Vec::new(),
             };
 
@@ -220,8 +221,8 @@ impl<'a> SqlSchemaCalculator<'a> {
                     let model_a = ModelRef::new(&relation.model_a, self.data_model);
                     let model_b = ModelRef::new(&relation.model_b, self.data_model);
 
-                    let a_columns = relation_table_columns(&model_a, relation.model_a_column());
-                    let b_columns = relation_table_columns(&model_b, relation.model_b_column());
+                    let a_columns = relation_table_column(&model_a, relation.model_a_column());
+                    let b_columns = relation_table_column(&model_b, relation.model_b_column());
 
                     let foreign_keys = vec![
                         sql::ForeignKey {
@@ -284,37 +285,21 @@ impl<'a> SqlSchemaCalculator<'a> {
     }
 }
 
-fn relation_table_columns(referenced_model: &ModelRef<'_>, reference_field_name: String) -> Vec<sql::Column> {
-    if referenced_model.model().id_fields.is_empty() {
-        let unique_field = referenced_model.fields().find(|f| f.is_unique());
-        let id_field = referenced_model.fields().find(|f| f.is_id());
+fn relation_table_column(referenced_model: &ModelRef<'_>, reference_field_name: String) -> Vec<sql::Column> {
+    let unique_field = referenced_model.fields().find(|f| f.is_unique());
+    let id_field = referenced_model.fields().find(|f| f.is_id());
 
-        let unique_field = id_field.or(unique_field).expect(&format!(
-            "No unique criteria found in model {}",
-            &referenced_model.name()
-        ));
+    let unique_field = id_field.or(unique_field).expect(&format!(
+        "No unique criteria found in model {}",
+        &referenced_model.name()
+    ));
 
-        vec![sql::Column {
-            name: reference_field_name,
-            tpe: column_type(&unique_field),
-            default: None,
-            auto_increment: false,
-        }]
-    } else {
-        referenced_model
-            .id_fields()
-            .map(|referenced_field| sql::Column {
-                name: format!(
-                    "{reference_field_name}_{referenced_column_name}",
-                    reference_field_name = reference_field_name,
-                    referenced_column_name = referenced_field.db_name()
-                ),
-                tpe: column_type(&referenced_field),
-                default: None,
-                auto_increment: false,
-            })
-            .collect()
-    }
+    vec![sql::Column {
+        name: reference_field_name,
+        tpe: column_type(&unique_field),
+        default: None,
+        auto_increment: false,
+    }]
 }
 
 fn migration_value_new(field: &FieldRef<'_>) -> Option<sql_schema_describer::DefaultValue> {
@@ -337,6 +322,9 @@ fn migration_value_new(field: &FieldRef<'_>) -> Option<sql_schema_describer::Def
         },
         dml::DefaultValue::Expression(expression) if expression.name == "now" && expression.args.is_empty() => {
             return Some(sql_schema_describer::DefaultValue::NOW)
+        }
+        dml::DefaultValue::Expression(expression) if expression.name == "dbgenerated" && expression.args.is_empty() => {
+            return Some(sql_schema_describer::DefaultValue::DBGENERATED(String::new()))
         }
         dml::DefaultValue::Expression(_) => return None,
     };
@@ -412,7 +400,7 @@ fn add_one_to_one_relation_unique_index(table: &mut sql::Table, column_names: &[
 }
 
 /// This should match the logic in `prisma_models::Model::primary_identifier`.
-fn first_unique_criterion(model: ModelRef<'_>) -> anyhow::Result<Vec<FieldRef>> {
+fn first_unique_criterion(model: ModelRef<'_>) -> anyhow::Result<Vec<FieldRef<'_>>> {
     // First candidate: the primary key.
     {
         let id_fields: Vec<_> = model.id_fields().collect();

@@ -99,6 +99,10 @@ pub trait UpdateInputTypeBuilderExtension<'a>: InputTypeBuilderBase<'a> + Create
                             append_opt(&mut fields, self.nested_delete_many_field(Arc::clone(&rf)));
                             append_opt(&mut fields, self.nested_upsert_field(Arc::clone(&rf)));
 
+                            if feature_flags::get().connect_or_create {
+                                append_opt(&mut fields, self.nested_connect_or_create_field(Arc::clone(&rf)));
+                            }
+
                             input_object.set_fields(fields);
                             Arc::downgrade(&input_object)
                         }
@@ -106,7 +110,7 @@ pub trait UpdateInputTypeBuilderExtension<'a>: InputTypeBuilderBase<'a> + Create
 
                     Some(input_field(
                         rf.name.clone(),
-                        InputType::opt(InputType::object(input_object)),
+                        InputType::opt(InputType::null(InputType::object(input_object))),
                         None,
                     ))
                 }
@@ -223,7 +227,7 @@ pub trait UpdateInputTypeBuilderExtension<'a>: InputTypeBuilderBase<'a> + Create
     /// Builds "updateMany" field for nested updates (on relation fields).
     fn nested_update_many_field(&self, field: RelationFieldRef) -> Option<InputField> {
         self.nested_update_many_input_object(field).map(|input_object| {
-            let input_type = InputType::opt(InputType::list(InputType::object(input_object)));
+            let input_type = InputType::opt(InputType::null(InputType::list(InputType::object(input_object))));
             input_field("updateMany", input_type, None)
         })
     }

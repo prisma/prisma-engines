@@ -10,10 +10,10 @@ model User {
 }
 
 model Profile {
-  id     Int  @id
+  id     Int    @id
   userId Int
-  user   User @relation(fields: [userId], references: [id])
-  bio  String
+  user   User   @relation(fields: [userId], references: [id])
+  bio    String
 
   @@map("profile")
 }
@@ -26,7 +26,6 @@ model Post {
   wasLiked   Boolean          @default(false)
   published  Boolean          @default(false)
   authorId   Int
-
   author     User             @relation("author", fields: [authorId], references: [id])
   categories PostToCategory[]
 
@@ -44,14 +43,14 @@ model Category {
 }
 
 model PostToCategory {
-  id            Int @id
+  id            Int      @id
   postTitle     String
   postCreatedAt DateTime
   categoryId    Int
+  post          Post     @relation(fields: [postTitle, postCreatedAt], references: [title, createdAt])
+  category      Category @relation(fields: [categoryId], references: [id])
 
-  post     Post     @relation(fields: [postTitle, postCreatedAt], references: [title, createdAt])
-  category Category @relation(fields: [categoryId], references: [id])
-
+  @@unique([postTitle, categoryId], name: "MyUniqueIndex")
   @@map("post_to_category")
 }
 

@@ -38,7 +38,7 @@ pub fn postgres_9_url(db_name: &str) -> String {
     let (host, port) = db_host_and_port_postgres_9();
 
     format!(
-        "postgresql://postgres:prisma@{}:{}/{}?schema={}",
+        "postgresql://postgres:prisma@{}:{}/{}?schema={}&statement_cache_size=0",
         host, port, db_name, SCHEMA_NAME
     )
 }
@@ -47,7 +47,7 @@ pub fn pgbouncer_url(db_name: &str) -> String {
     let (host, port) = db_host_and_port_for_pgbouncer();
 
     format!(
-        "postgresql://postgres:prisma@{}:{}/{}?schema={}",
+        "postgresql://postgres:prisma@{}:{}/{}?schema={}&pgbouncer=true",
         host, port, db_name, SCHEMA_NAME
     )
 }
@@ -56,7 +56,7 @@ pub fn postgres_10_url(db_name: &str) -> String {
     let (host, port) = db_host_and_port_postgres_10();
 
     format!(
-        "postgresql://postgres:prisma@{}:{}/{}?schema={}",
+        "postgresql://postgres:prisma@{}:{}/{}?schema={}&statement_cache_size=0",
         host, port, db_name, SCHEMA_NAME
     )
 }
@@ -65,7 +65,7 @@ pub fn postgres_11_url(db_name: &str) -> String {
     let (host, port) = db_host_and_port_postgres_11();
 
     format!(
-        "postgresql://postgres:prisma@{}:{}/{}?schema={}",
+        "postgresql://postgres:prisma@{}:{}/{}?schema={}&statement_cache_size=0",
         host, port, db_name, SCHEMA_NAME
     )
 }
@@ -74,7 +74,7 @@ pub fn postgres_12_url(db_name: &str) -> String {
     let (host, port) = db_host_and_port_postgres_12();
 
     format!(
-        "postgresql://postgres:prisma@{}:{}/{}?schema={}",
+        "postgresql://postgres:prisma@{}:{}/{}?schema={}&statement_cache_size=0",
         host, port, db_name, SCHEMA_NAME
     )
 }
@@ -96,7 +96,8 @@ pub fn mysql_8_url(db_name: &str) -> String {
     let db_name = mysql_safe_identifier(db_name);
 
     format!(
-        "mysql://root:prisma@{host}:{port}/{db_name}?connect_timeout=20&socket_timeout=20",
+        "mysql://root:prisma@{host}:{port}{maybe_slash}{db_name}?connect_timeout=20&socket_timeout=20",
+        maybe_slash = if db_name.is_empty() { "" } else { "/" },
         host = host,
         port = port,
         db_name = db_name,
@@ -344,7 +345,7 @@ fn fetch_db_name<'a>(url: &'a Url, default: &'static str) -> &'a str {
 
 pub async fn create_mysql_database(original_url: &Url) -> Result<Quaint, AnyError> {
     let mut url = original_url.clone();
-    url.set_path("");
+    url.set_path("/mysql");
 
     let db_name = fetch_db_name(&original_url, "mysql");
     debug_assert!(!db_name.is_empty());

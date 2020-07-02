@@ -15,6 +15,7 @@
           "isId": true,
           "isReadOnly": false,
           "type": "Int",
+          "hasDefaultValue": false,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -27,6 +28,7 @@
           "isId": false,
           "isReadOnly": false,
           "type": "DateTime",
+          "hasDefaultValue": true,
           "default": {
             "name": "now",
             "args": []
@@ -43,6 +45,7 @@
           "isId": false,
           "isReadOnly": false,
           "type": "String",
+          "hasDefaultValue": true,
           "default": {
             "name": "cuid",
             "args": []
@@ -53,7 +56,8 @@
       ],
       "isGenerated": false,
       "idFields": [],
-      "uniqueFields": []
+      "uniqueFields": [],
+      "uniqueIndexes": []
     }
   ]
 }

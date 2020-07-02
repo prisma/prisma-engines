@@ -268,64 +268,93 @@ async fn update_type_of_scalar_field_must_work(api: &TestApi) {
 }
 
 #[test_each_connector]
-async fn changing_the_type_of_an_id_field_must_work(api: &TestApi) {
+async fn changing_the_type_of_an_id_field_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
-            model A {
-                id Int @id
-                b_id Int
-                b  B   @relation(fields: [b_id], references: [id])
-            }
-            model B {
-                id Int @id
-            }
-        "#;
-    let result = api.infer_and_apply(&dm1).await.sql_schema;
-    let table = result.table_bang("A");
-    let column = table.column_bang("b_id");
-    assert_eq!(column.tpe.family, ColumnTypeFamily::Int);
-    assert_eq!(
-        table.foreign_keys,
-        &[ForeignKey {
-            constraint_name: match api.sql_family() {
-                SqlFamily::Postgres => Some("A_b_id_fkey".to_owned()),
-                SqlFamily::Mysql => Some("A_ibfk_1".to_owned()),
-                SqlFamily::Sqlite => None,
-            },
-            columns: vec![column.name.clone()],
-            referenced_table: "B".to_string(),
-            referenced_columns: vec!["id".to_string()],
-            on_delete_action: ForeignKeyAction::Cascade,
-        }]
-    );
+        model A {
+            id Int @id
+            b_id Int
+            b  B   @relation(fields: [b_id], references: [id])
+        }
+        model B {
+            id Int @id
+        }
+    "#;
+
+    api.infer_apply(&dm1).send().await?.assert_green()?;
+
+    api.assert_schema().await?.assert_table("A", |table| {
+        table
+            .assert_column("b_id", |col| col.assert_type_family(ColumnTypeFamily::Int))?
+            .assert_fk_on_columns(&["b_id"], |fk| fk.assert_references("B", &["id"]))
+    })?;
 
     let dm2 = r#"
-            model A {
-                id Int @id
-                b_id String
-                b  B   @relation(fields: [b_id], references: [id])
-            }
-            model B {
-                id String @id @default(cuid())
-            }
-        "#;
-    let result = api.infer_and_apply(&dm2).await.sql_schema;
-    let table = result.table_bang("A");
-    let column = table.column_bang("b_id");
-    assert_eq!(column.tpe.family, ColumnTypeFamily::String);
-    assert_eq!(
-        table.foreign_keys,
-        &[ForeignKey {
-            constraint_name: match api.sql_family() {
-                SqlFamily::Postgres => Some("A_b_id_fkey".to_owned()),
-                SqlFamily::Mysql => Some("A_ibfk_1".to_owned()),
-                SqlFamily::Sqlite => None,
-            },
-            columns: vec!["b_id".into()],
-            referenced_table: "B".to_string(),
-            referenced_columns: vec!["id".to_string()],
-            on_delete_action: ForeignKeyAction::Cascade,
-        }]
-    );
+        model A {
+            id Int @id
+            b_id String
+            b  B   @relation(fields: [b_id], references: [id])
+        }
+        model B {
+            id String @id @default(cuid())
+        }
+    "#;
+
+    api.infer_apply(&dm2).send().await?.assert_green()?;
+
+    api.assert_schema().await?.assert_table("A", |table| {
+        table
+            .assert_column("b_id", |col| col.assert_type_family(ColumnTypeFamily::String))?
+            .assert_fk_on_columns(&["b_id"], |fk| fk.assert_references("B", &["id"]))
+    })?;
+
+    Ok(())
+}
+
+#[test_each_connector(log = "debug,sql_schema_describer=info")]
+async fn changing_the_type_of_a_field_referenced_by_a_fk_must_work(api: &TestApi) -> TestResult {
+    let dm1 = r#"
+        model A {
+            id Int @id
+            b_id Int
+            b  B   @relation(fields: [b_id], references: [uniq])
+        }
+
+        model B {
+            uniq Int @unique
+            name String
+        }
+    "#;
+
+    api.infer_apply(&dm1).send().await?.assert_green()?;
+
+    api.assert_schema().await?.assert_table("A", |table| {
+        table
+            .assert_column("b_id", |col| col.assert_type_family(ColumnTypeFamily::Int))?
+            .assert_fk_on_columns(&["b_id"], |fk| fk.assert_references("B", &["uniq"]))
+    })?;
+
+    let dm2 = r#"
+        model A {
+            id Int @id
+            b_id String
+            b  B   @relation(fields: [b_id], references: [uniq])
+        }
+
+        model B {
+            uniq String @unique @default(cuid())
+            name String
+        }
+    "#;
+
+    api.infer_apply(&dm2).send().await?.assert_green()?;
+
+    api.assert_schema().await?.assert_table("A", |table| {
+        table
+            .assert_column("b_id", |col| col.assert_type_family(ColumnTypeFamily::String))?
+            .assert_fk_on_columns(&["b_id"], |fk| fk.assert_references("B", &["uniq"]))
+    })?;
+
+    Ok(())
 }
 
 #[test_each_connector]
@@ -374,6 +403,7 @@ async fn changing_a_relation_field_to_a_scalar_field_must_work(api: &TestApi) ->
                     SqlFamily::Postgres => Some("A_b_fkey".to_owned()),
                     SqlFamily::Mysql => Some("A_ibfk_1".to_owned()),
                     SqlFamily::Sqlite => None,
+                    SqlFamily::Mssql => todo!("Greetings from Redmond"),
                 },
                 columns: vec!["b".to_owned()],
                 referenced_table: "B".to_string(),
@@ -445,6 +475,7 @@ async fn changing_a_scalar_field_to_a_relation_field_must_work(api: &TestApi) {
                 SqlFamily::Postgres => Some("A_b_fkey".to_owned()),
                 SqlFamily::Mysql => Some("A_ibfk_1".to_owned()),
                 SqlFamily::Sqlite => None,
+                SqlFamily::Mssql => todo!("Greetings from Redmond"),
             },
             columns: vec![column.name.clone()],
             referenced_table: "B".to_string(),
@@ -516,6 +547,7 @@ async fn adding_a_many_to_many_relation_with_custom_name_must_work(api: &TestApi
                     SqlFamily::Postgres => Some("_my_relation_A_fkey".to_owned()),
                     SqlFamily::Mysql => Some("_my_relation_ibfk_1".to_owned()),
                     SqlFamily::Sqlite => None,
+                    SqlFamily::Mssql => todo!("Greetings from Redmond"),
                 },
                 columns: vec![a_column.name.clone()],
                 referenced_table: "A".to_string(),
@@ -527,6 +559,7 @@ async fn adding_a_many_to_many_relation_with_custom_name_must_work(api: &TestApi
                     SqlFamily::Postgres => Some("_my_relation_B_fkey".to_owned()),
                     SqlFamily::Mysql => Some("_my_relation_ibfk_2".to_owned()),
                     SqlFamily::Sqlite => None,
+                    SqlFamily::Mssql => todo!("Greetings from Redmond"),
                 },
                 columns: vec![b_column.name.clone()],
                 referenced_table: "B".to_string(),
@@ -576,6 +609,7 @@ async fn adding_an_inline_relation_must_result_in_a_foreign_key_in_the_model_tab
                     SqlFamily::Postgres => Some("A_bid_fkey".to_owned()),
                     SqlFamily::Mysql => Some("A_ibfk_1".to_owned()),
                     SqlFamily::Sqlite => None,
+                    SqlFamily::Mssql => todo!("Greetings from Redmond"),
                 },
                 columns: vec![b_column.name.clone()],
                 referenced_table: "B".to_string(),
@@ -587,6 +621,7 @@ async fn adding_an_inline_relation_must_result_in_a_foreign_key_in_the_model_tab
                     SqlFamily::Postgres => Some("A_cid_fkey".to_owned()),
                     SqlFamily::Mysql => Some("A_ibfk_2".to_owned()),
                     SqlFamily::Sqlite => None,
+                    SqlFamily::Mssql => todo!("Greetings from Redmond"),
                 },
                 columns: vec![c_column.name.clone()],
                 referenced_table: "C".to_string(),
@@ -623,6 +658,7 @@ async fn specifying_a_db_name_for_an_inline_relation_must_work(api: &TestApi) {
                 SqlFamily::Postgres => Some("A_b_column_fkey".to_owned()),
                 SqlFamily::Mysql => Some("A_ibfk_1".to_owned()),
                 SqlFamily::Sqlite => None,
+                SqlFamily::Mssql => todo!("Greetings from Redmond"),
             },
             columns: vec![column.name.clone()],
             referenced_table: "B".to_string(),
@@ -656,6 +692,7 @@ async fn adding_an_inline_relation_to_a_model_with_an_exotic_id_type(api: &TestA
                 SqlFamily::Postgres => Some("A_b_id_fkey".to_owned()),
                 SqlFamily::Mysql => Some("A_ibfk_1".to_owned()),
                 SqlFamily::Sqlite => None,
+                SqlFamily::Mssql => todo!("Greetings from Redmond"),
             },
             columns: vec![column.name.clone()],
             referenced_table: "B".to_string(),
@@ -728,6 +765,7 @@ async fn moving_an_inline_relation_to_the_other_side_must_work(api: &TestApi) ->
                 SqlFamily::Postgres => Some("A_b_id_fkey".to_owned()),
                 SqlFamily::Sqlite => None,
                 SqlFamily::Mysql => Some("A_ibfk_1".to_owned()),
+                SqlFamily::Mssql => todo!("Greetings from Redmond"),
             },
             columns: vec!["b_id".to_string()],
             referenced_table: "B".to_string(),
@@ -756,6 +794,7 @@ async fn moving_an_inline_relation_to_the_other_side_must_work(api: &TestApi) ->
                 SqlFamily::Postgres => Some("B_a_id_fkey".to_owned()),
                 SqlFamily::Sqlite => None,
                 SqlFamily::Mysql => Some("B_ibfk_1".to_owned()),
+                SqlFamily::Mssql => todo!("Greetings from Redmond"),
             },
             columns: vec!["a_id".to_string()],
             referenced_table: "A".to_string(),
@@ -1228,6 +1267,7 @@ async fn reserved_sql_key_words_must_work(api: &TestApi) {
                 SqlFamily::Postgres => Some("Group_parent_id_fkey".to_owned()),
                 SqlFamily::Mysql => Some("Group_ibfk_1".to_owned()),
                 SqlFamily::Sqlite => None,
+                SqlFamily::Mssql => todo!("Greetings from Redmond"),
             },
             columns: vec!["parent_id".to_string()],
             referenced_table: "Group".to_string(),
@@ -1459,14 +1499,13 @@ async fn column_defaults_must_be_migrated(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_each_connector]
+#[test_each_connector(log = "debug,sql_schema_describer=info")]
 async fn escaped_string_defaults_are_not_arbitrarily_migrated(api: &TestApi) -> TestResult {
-    use quaint::ast::*;
+    use quaint::ast::Insert;
 
     let dm1 = r#"
         model Fruit {
             id String @id @default(cuid())
-            name String @default("ba\0nana")
             seasonality String @default("\"summer\"")
             contains String @default("'potassium'")
             sideNames String @default("top\ndown")
@@ -1474,50 +1513,42 @@ async fn escaped_string_defaults_are_not_arbitrarily_migrated(api: &TestApi) -> 
         }
     "#;
 
-    let output = api.infer_apply(dm1).send().await?.into_inner();
-
-    anyhow::ensure!(!output.datamodel_steps.is_empty(), "Yes migration");
-    anyhow::ensure!(output.warnings.is_empty(), "No warnings");
+    api.infer_apply(dm1)
+        .migration_id(Some("first migration"))
+        .send()
+        .await?
+        .assert_green()?
+        .into_inner();
 
     let insert = Insert::single_into(api.render_table_name("Fruit"))
         .value("id", "apple-id")
-        .value("name", "apple")
         .value("sideNames", "stem and the other one")
         .value("contains", "'vitamin C'")
         .value("seasonality", "september");
 
     api.database().query(insert.into()).await?;
 
-    let output = api.infer_apply(dm1).send().await?.assert_green()?.into_inner();
-
-    anyhow::ensure!(output.datamodel_steps.is_empty(), "No migration");
+    api.infer_apply(dm1)
+        .migration_id(Some("second migration"))
+        .send()
+        .await?
+        .assert_green()?
+        .assert_no_steps()?;
 
     let sql_schema = api.describe_database().await?;
     let table = sql_schema.table_bang("Fruit");
 
     assert_eq!(
-        table.column("name").and_then(|c| c.default.clone()),
-        Some(if api.is_mysql() && !api.connector_name().contains("mariadb") {
-            DefaultValue::VALUE(PrismaValue::String("ba\u{0}nana".to_string()))
-        } else {
-            DefaultValue::VALUE(PrismaValue::String("ba\\0nana".to_string()))
-        })
-    );
-    assert_eq!(
         table.column("sideNames").and_then(|c| c.default.clone()),
-        Some(if api.is_mysql() && !api.connector_name().contains("mariadb") {
-            DefaultValue::VALUE(PrismaValue::String("top\ndown".to_string()))
-        } else {
-            DefaultValue::VALUE(PrismaValue::String("top\\ndown".to_string()))
-        })
+        Some(DefaultValue::VALUE(PrismaValue::String("top\ndown".to_string())))
     );
     assert_eq!(
         table.column("contains").and_then(|c| c.default.clone()),
-        Some(DefaultValue::VALUE(PrismaValue::String("potassium".to_string())))
+        Some(DefaultValue::VALUE(PrismaValue::String("'potassium'".to_string())))
     );
     assert_eq!(
         table.column("seasonality").and_then(|c| c.default.clone()),
-        Some(DefaultValue::VALUE(PrismaValue::String("summer".to_string())))
+        Some(DefaultValue::VALUE(PrismaValue::String(r#""summer""#.to_string())))
     );
 
     Ok(())
@@ -1525,7 +1556,7 @@ async fn escaped_string_defaults_are_not_arbitrarily_migrated(api: &TestApi) -> 
 
 #[test_each_connector]
 async fn created_at_does_not_get_arbitrarily_migrated(api: &TestApi) -> TestResult {
-    use quaint::ast::*;
+    use quaint::ast::Insert;
 
     let dm1 = r#"
         model Fruit {
@@ -1917,34 +1948,48 @@ async fn join_tables_between_models_with_compound_primary_keys_must_work(api: &T
         model Human {
             firstName String
             lastName String
-            cats Cat[]
+            cats HumanToCat[]
 
             @@id([firstName, lastName])
         }
 
+        model HumanToCat {
+            human_firstName String
+            human_lastName String
+            cat_id String
+
+            cat Cat @relation(fields: [cat_id], references: [id])
+            human Human @relation(fields: [human_firstName, human_lastName], references: [firstName, lastName])
+
+            @@unique([cat_id, human_firstName, human_lastName])
+            @@index([human_firstName, human_lastName])
+        }
+
         model Cat {
             id String @id
-            humans Human[]
+            humans HumanToCat[]
         }
     "#;
 
     api.infer_apply(dm).send().await?.assert_green()?;
 
-    api.assert_schema().await?.assert_table("_CatToHuman", |table| {
+    api.assert_schema().await?.assert_table("HumanToCat", |table| {
         table
-            .assert_has_column("B_firstName")?
-            .assert_has_column("B_lastName")?
-            .assert_has_column("A")?
-            .assert_fk_on_columns(&["B_firstName", "B_lastName"], |fk| {
+            .assert_has_column("human_firstName")?
+            .assert_has_column("human_lastName")?
+            .assert_has_column("cat_id")?
+            .assert_fk_on_columns(&["human_firstName", "human_lastName"], |fk| {
                 fk.assert_references("Human", &["firstName", "lastName"])?
                     .assert_cascades_on_delete()
             })?
-            .assert_fk_on_columns(&["A"], |fk| {
+            .assert_fk_on_columns(&["cat_id"], |fk| {
                 fk.assert_references("Cat", &["id"])?.assert_cascades_on_delete()
             })?
             .assert_indexes_count(2)?
-            .assert_index_on_columns(&["A", "B_firstName", "B_lastName"], |idx| idx.assert_is_unique())?
-            .assert_index_on_columns(&["B_firstName", "B_lastName"], |idx| idx.assert_is_not_unique())
+            .assert_index_on_columns(&["cat_id", "human_firstName", "human_lastName"], |idx| {
+                idx.assert_is_unique()
+            })?
+            .assert_index_on_columns(&["human_firstName", "human_lastName"], |idx| idx.assert_is_not_unique())
     })?;
 
     Ok(())
@@ -1956,14 +2001,26 @@ async fn join_tables_between_models_with_mapped_compound_primary_keys_must_work(
         model Human {
             firstName String @map("the_first_name")
             lastName String @map("the_last_name")
-            cats Cat[]
+            cats HumanToCat[]
 
             @@id([firstName, lastName])
         }
 
+        model HumanToCat {
+            human_the_first_name String
+            human_the_last_name String
+            cat_id String
+
+            cat Cat @relation(fields: [cat_id], references: [id])
+            human Human @relation(fields: [human_the_first_name, human_the_last_name], references: [firstName, lastName])
+
+            @@unique([human_the_first_name, human_the_last_name, cat_id])
+            @@index([cat_id])
+        }
+
         model Cat {
             id String @id
-            humans Human[]
+            humans HumanToCat[]
         }
     "#;
 
@@ -1972,14 +2029,14 @@ async fn join_tables_between_models_with_mapped_compound_primary_keys_must_work(
     let sql_schema = api.describe_database().await?;
 
     sql_schema
-        .assert_table("_CatToHuman")?
-        .assert_has_column("B_the_first_name")?
-        .assert_has_column("B_the_last_name")?
-        .assert_has_column("A")?
-        .assert_fk_on_columns(&["B_the_first_name", "B_the_last_name"], |fk| {
+        .assert_table("HumanToCat")?
+        .assert_has_column("human_the_first_name")?
+        .assert_has_column("human_the_last_name")?
+        .assert_has_column("cat_id")?
+        .assert_fk_on_columns(&["human_the_first_name", "human_the_last_name"], |fk| {
             fk.assert_references("Human", &["the_first_name", "the_last_name"])
         })?
-        .assert_fk_on_columns(&["A"], |fk| fk.assert_references("Cat", &["id"]))?
+        .assert_fk_on_columns(&["cat_id"], |fk| fk.assert_references("Cat", &["id"]))?
         .assert_indexes_count(2)?;
 
     Ok(())
@@ -2052,6 +2109,26 @@ async fn adding_mutual_references_on_existing_tables_works(api: &TestApi) -> Tes
     "#;
 
     api.infer_apply(dm2).send().await?.assert_green()?;
+
+    Ok(())
+}
+
+#[test_each_connector]
+async fn schemas_with_dbgenerated_work(api: &TestApi) -> TestResult {
+    let dm1 = r#"
+    model User {
+        age         Int?
+        createdAt   DateTime  @default(dbgenerated())
+        email       String?
+        firstName   String    @default("")
+        id          Int       @default(autoincrement()) @id
+        lastName    String    @default("")
+        password    String?
+        updatedAt   DateTime  @default(dbgenerated())
+    }
+    "#;
+
+    api.infer_apply(dm1).send().await?.assert_green()?;
 
     Ok(())
 }

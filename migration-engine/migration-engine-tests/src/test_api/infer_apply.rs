@@ -3,6 +3,7 @@ use migration_core::{
     api::GenericApi,
     commands::{ApplyMigrationInput, InferMigrationStepsInput, MigrationStepsResultOutput},
 };
+use std::borrow::Cow;
 
 pub struct InferApply<'a> {
     api: &'a dyn GenericApi,
@@ -87,6 +88,28 @@ impl<'a> InferApplyAssertion<'a> {
         Ok(self)
     }
 
+    pub fn assert_warnings(self, warnings: &[Cow<'_, str>]) -> AssertionResult<Self> {
+        anyhow::ensure!(
+            self.result.warnings.len() == warnings.len(),
+            "Expected {} warnings, got {}.\n{:#?}",
+            warnings.len(),
+            self.result.warnings.len(),
+            self.result.warnings
+        );
+
+        for (idx, warning) in warnings.iter().enumerate() {
+            assert_eq!(
+                Some(warning.as_ref()),
+                self.result
+                    .warnings
+                    .get(idx)
+                    .map(|warning| warning.description.as_str())
+            );
+        }
+
+        Ok(self)
+    }
+
     pub fn assert_no_error(self) -> AssertionResult<Self> {
         assert!(self.result.general_errors.is_empty());
 
@@ -96,8 +119,14 @@ impl<'a> InferApplyAssertion<'a> {
     pub fn assert_no_steps(self) -> AssertionResult<Self> {
         anyhow::ensure!(
             self.result.datamodel_steps.is_empty(),
-            "Assertion failed. Datamodel migration steps should be empty, but found {:?}",
+            "Assertion failed. Datamodel migration steps should be empty, but found {:#?}",
             self.result.datamodel_steps
+        );
+
+        anyhow::ensure!(
+            self.result.database_steps.is_empty(),
+            "Assertion failed. Database migration steps should be empty, but found {:#?}",
+            self.result.database_steps
         );
 
         Ok(self)
@@ -110,7 +139,13 @@ impl<'a> InferApplyAssertion<'a> {
     }
 
     pub fn assert_unexecutable(self, expected_messages: &[String]) -> AssertionResult<Self> {
-        assert_eq!(self.result.unexecutable_migrations.len(), expected_messages.len());
+        anyhow::ensure!(
+            self.result.unexecutable_migrations.len() == expected_messages.len(),
+            "Expected {} unexecutable step errors, got {}.\n({:#?})",
+            expected_messages.len(),
+            self.result.unexecutable_migrations.len(),
+            self.result.unexecutable_migrations,
+        );
 
         for (expected, actual) in expected_messages.iter().zip(
             self.result

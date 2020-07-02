@@ -8,12 +8,13 @@ use serde::Serialize;
 
 pub struct Configuration {
     pub generators: Vec<Generator>,
-    pub datasources: Vec<Box<dyn Source + Send + Sync>>,
+    pub datasources: Vec<Datasource>,
 }
 
 #[serde(rename_all = "camelCase")]
 #[derive(Clone, Debug, Serialize)]
 pub struct StringFromEnvVar {
+    /// contains the name of env var if the value was read from one
     pub from_env_var: Option<String>,
     pub value: String,
 }

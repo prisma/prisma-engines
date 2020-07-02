@@ -7,7 +7,7 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-rust_decimal = "=1.1.0"
+rust_decimal = "1.6"
 prisma-value = { path = "../../../libs/prisma-value" }
 async-trait = "0.1.17"
 introspection-connector = { path = "../introspection-connector" }

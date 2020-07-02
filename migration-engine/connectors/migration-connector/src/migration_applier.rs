@@ -95,7 +95,7 @@ where
         database_migration: &T,
     ) -> ConnectorResult<()> {
         let mut step = 0;
-        while self.step_applier.unapply_step(&database_migration, step).await? {
+        while self.step_applier.apply_step(&database_migration, step).await? {
             step += 1;
             migration_updates.rolled_back += 1;
             self.migration_persistence.update(&migration_updates).await?;

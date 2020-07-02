@@ -1,3 +1,6 @@
+#![deny(rust_2018_idioms)]
+#![deny(unsafe_code)]
+
 //! This crate defines the API exposed by the connectors to the migration engine core. The entry point for this API is the [MigrationConnector](trait.MigrationConnector.html) trait.
 
 mod database_migration_inferrer;
@@ -33,11 +36,11 @@ pub trait MigrationConnector: Send + Sync + 'static {
     /// the connector name. The SQL connector for example can return "postgresql", "mysql" or "sqlite".
     fn connector_type(&self) -> &'static str;
 
-    /// Create a new database with the passed in name.
-    async fn create_database(&self, create: &str) -> ConnectorResult<()>;
-
     /// Hook to perform connector-specific initialization.
     async fn initialize(&self) -> ConnectorResult<()>;
+
+    /// Create the database with the provided URL.
+    async fn create_database(database_str: &str) -> ConnectorResult<String>;
 
     /// Drop all database state.
     async fn reset(&self) -> ConnectorResult<()>;
@@ -67,7 +70,7 @@ pub trait MigrationConnector: Send + Sync + 'static {
 
     // TODO: figure out if this is the best way to do this or move to a better place/interface
     // this is placed here so i can use the associated type
-    fn deserialize_database_migration(&self, json: serde_json::Value) -> Self::DatabaseMigration;
+    fn deserialize_database_migration(&self, json: serde_json::Value) -> Option<Self::DatabaseMigration>;
 
     /// See [MigrationStepApplier](trait.MigrationStepApplier.html).
     fn migration_applier<'a>(&'a self) -> Box<dyn MigrationApplier<Self::DatabaseMigration> + Send + Sync + 'a> {

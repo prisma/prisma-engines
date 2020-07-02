@@ -1,9 +1,14 @@
-use crate::Component;
+use crate::{Component, SqlError};
 use barrel::types;
 use chrono::*;
+use futures::TryFutureExt;
 use migration_connector::*;
 use quaint::ast::*;
-use quaint::{connector::ResultSet, prelude::SqlFamily};
+use quaint::{
+    connector::ResultSet,
+    error::Error as QuaintError,
+    prelude::{Queryable, SqlFamily},
+};
 use std::convert::TryFrom;
 
 pub struct SqlMigrationPersistence<'a> {
@@ -36,9 +41,10 @@ impl MigrationPersistence for SqlMigrationPersistence<'_> {
                     m.create_table(MIGRATION_TABLE_NAME, migration_table_setup_mysql);
                     m.make_from(barrel::SqlVariant::Mysql)
                 }
+                SqlFamily::Mssql => todo!("Greetings from Detroit^H Redmond"),
             };
 
-            self.conn().query_raw(&sql_str, &[]).await.ok();
+            self.conn().raw_cmd(&sql_str).await.ok();
 
             Ok(())
         };
@@ -60,16 +66,11 @@ impl MigrationPersistence for SqlMigrationPersistence<'_> {
         .await
     }
 
-    async fn last(&self) -> Result<Option<Migration>, ConnectorError> {
-        crate::catch(self.connection_info(), async {
-            let conditions = STATUS_COLUMN.equals(MigrationStatus::MigrationSuccess.code());
-            let query = Select::from_table(self.table())
-                .so_that(conditions)
-                .order_by(REVISION_COLUMN.descend());
-
-            let result_set = self.conn().query(query.into()).await?;
-            Ok(parse_rows_new(result_set).into_iter().next())
-        })
+    async fn last_two_migrations(&self) -> ConnectorResult<(Option<Migration>, Option<Migration>)> {
+        crate::catch(
+            self.connection_info(),
+            last_applied_migrations(self.conn(), self.table()).map_err(SqlError::from),
+        )
         .await
     }
 
@@ -112,7 +113,7 @@ impl MigrationPersistence for SqlMigrationPersistence<'_> {
             .value(DATABASE_MIGRATION_COLUMN, database_migration_json)
             .value(ERRORS_COLUMN, errors_json)
             .value(STARTED_AT_COLUMN, self.convert_datetime(migration.started_at))
-            .value(FINISHED_AT_COLUMN, Value::Null);
+            .value(FINISHED_AT_COLUMN, Option::<DateTime<Utc>>::None);
 
         match self.sql_family() {
             SqlFamily::Sqlite | SqlFamily::Mysql => {
@@ -129,6 +130,7 @@ impl MigrationPersistence for SqlMigrationPersistence<'_> {
                     cloned.revision = row["revision"].as_i64().unwrap() as usize;
                 });
             }
+            SqlFamily::Mssql => todo!("Greetings from Redmond"),
         }
 
         Ok(cloned)
@@ -138,7 +140,7 @@ impl MigrationPersistence for SqlMigrationPersistence<'_> {
         crate::catch(self.connection_info(), async {
             let finished_at_value = match params.finished_at {
                 Some(x) => self.convert_datetime(x),
-                None => Value::Null,
+                None => Value::from(Option::<DateTime<Utc>>::None),
             };
             let errors_json = serde_json::to_string(&params.errors).unwrap();
             let query = Update::table(self.table())
@@ -160,6 +162,24 @@ impl MigrationPersistence for SqlMigrationPersistence<'_> {
         })
         .await
     }
+}
+
+/// Returns the last 2 applied migrations, or a shorter vec in absence of applied migrations.
+async fn last_applied_migrations(
+    conn: &dyn Queryable,
+    table: Table<'_>,
+) -> Result<(Option<Migration>, Option<Migration>), QuaintError> {
+    let conditions = STATUS_COLUMN.equals(MigrationStatus::MigrationSuccess.code());
+    let query = Select::from_table(table)
+        .so_that(conditions)
+        .order_by(REVISION_COLUMN.descend())
+        .limit(2);
+
+    let result_set = conn.query(query.into()).await?;
+    let mut rows = parse_rows_new(result_set).into_iter();
+    let last = rows.next();
+    let second_to_last = rows.next();
+    Ok((last, second_to_last))
 }
 
 fn migration_table_setup_sqlite(t: &mut barrel::Table) {
@@ -193,7 +213,7 @@ fn migration_table_setup(
 }
 
 impl<'a> SqlMigrationPersistence<'a> {
-    fn table(&self) -> Table {
+    fn table(&self) -> Table<'_> {
         match self.sql_family() {
             SqlFamily::Sqlite => {
                 // sqlite case. Otherwise quaint produces invalid SQL
@@ -203,19 +223,20 @@ impl<'a> SqlMigrationPersistence<'a> {
         }
     }
 
-    fn convert_datetime(&self, datetime: DateTime<Utc>) -> Value {
+    fn convert_datetime(&self, datetime: DateTime<Utc>) -> Value<'_> {
         match self.sql_family() {
-            SqlFamily::Sqlite => Value::Integer(datetime.timestamp_millis()),
-            SqlFamily::Postgres => Value::DateTime(datetime),
-            SqlFamily::Mysql => Value::DateTime(datetime),
+            SqlFamily::Sqlite => Value::integer(datetime.timestamp_millis()),
+            SqlFamily::Postgres => Value::datetime(datetime),
+            SqlFamily::Mysql => Value::datetime(datetime),
+            SqlFamily::Mssql => Value::datetime(datetime),
         }
     }
 }
 
-fn convert_parameterized_date_value(db_value: &Value) -> DateTime<Utc> {
+fn convert_parameterized_date_value(db_value: &Value<'_>) -> DateTime<Utc> {
     match db_value {
-        Value::Integer(x) => timestamp_to_datetime(*x),
-        Value::DateTime(x) => x.clone(),
+        Value::Integer(Some(x)) => timestamp_to_datetime(*x),
+        Value::DateTime(Some(x)) => x.clone(),
         x => unimplemented!("Got unsupported value {:?} in date conversion", x),
     }
 }
@@ -240,7 +261,7 @@ fn parse_rows_new(result_set: ResultSet) -> Vec<Migration> {
             let errors_json: String = row[ERRORS_COLUMN].to_string().unwrap();
 
             let finished_at = match &row[FINISHED_AT_COLUMN] {
-                Value::Null => None,
+                v if v.is_null() => None,
                 x => Some(convert_parameterized_date_value(x)),
             };
 

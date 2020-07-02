@@ -6,7 +6,7 @@ use crate::{
     configuration, dml,
     error::{DatamodelError, ErrorCollection},
 };
-use datamodel_connector::{Connector, ExampleConnector};
+use datamodel_connector::{BuiltinConnectors, Connector};
 
 /// Helper for lifting a datamodel.
 ///
@@ -15,7 +15,7 @@ use datamodel_connector::{Connector, ExampleConnector};
 /// additional semantics are attached.
 pub struct LiftAstToDml<'a> {
     directives: DirectiveBox,
-    source: Option<&'a Box<dyn configuration::Source + Send + Sync>>,
+    source: Option<&'a configuration::Datasource>,
 }
 
 const USE_CONNECTORS_FOR_CUSTOM_TYPES: bool = false; // FEATURE FLAG
@@ -25,7 +25,7 @@ impl<'a> LiftAstToDml<'a> {
     /// the directives defined by the given sources registered.
     ///
     /// The directives defined by the given sources will be namespaced.
-    pub fn new(source: Option<&'a Box<dyn configuration::Source + Send + Sync>>) -> LiftAstToDml {
+    pub fn new(source: Option<&'a configuration::Datasource>) -> LiftAstToDml {
         LiftAstToDml {
             directives: DirectiveBox::new(),
             source,
@@ -90,7 +90,7 @@ impl<'a> LiftAstToDml<'a> {
         let mut errors = ErrorCollection::new();
 
         let supports_enums = match self.source {
-            Some(source) => source.connector().supports_enums(),
+            Some(source) => source.combined_connector.supports_enums(),
             None => true,
         };
         if !supports_enums {
@@ -129,6 +129,7 @@ impl<'a> LiftAstToDml<'a> {
     /// Internal: Validates an enum value AST node.
     fn lift_enum_value(&self, ast_enum_value: &ast::EnumValue) -> Result<dml::EnumValue, ErrorCollection> {
         let mut enum_value = dml::EnumValue::new(&ast_enum_value.name.name, None);
+        enum_value.documentation = ast_enum_value.documentation.clone().map(|comment| comment.text);
 
         self.directives
             .enm_value
@@ -151,7 +152,7 @@ impl<'a> LiftAstToDml<'a> {
             let validator = ValueValidator::new(value);
 
             if let dml::FieldType::Base(base_type, _) = &field_type {
-                match validator.as_default_value(*base_type) {
+                match validator.as_default_value_for_scalar_type(*base_type) {
                     Ok(dv) => field.default_value = Some(dv),
                     Err(err) => errors.push(err),
                 };
@@ -199,7 +200,7 @@ impl<'a> LiftAstToDml<'a> {
 
         if let Ok(scalar_type) = ScalarType::from_str(type_name) {
             if USE_CONNECTORS_FOR_CUSTOM_TYPES {
-                let pg_connector = ExampleConnector::postgres();
+                let pg_connector = BuiltinConnectors::postgres();
                 let args = vec![]; // TODO: figure out args
                 let pg_type_specification = ast_field
                     .directives
@@ -260,7 +261,7 @@ impl<'a> LiftAstToDml<'a> {
             attrs.append(&mut custom_type.directives.clone());
             Ok((field_type, attrs))
         } else if USE_CONNECTORS_FOR_CUSTOM_TYPES {
-            let pg_connector = ExampleConnector::postgres();
+            let pg_connector = BuiltinConnectors::postgres();
             let args = vec![]; // TODO: figure out args
 
             if let Some(x) = pg_connector.calculate_type(&ast_field.field_type.name, args) {

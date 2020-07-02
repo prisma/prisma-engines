@@ -18,7 +18,7 @@ fn main() {
         .get_matches();
 
     let file_name = matches.value_of("INPUT").unwrap();
-    let file = fs::read_to_string(&file_name).expect(&format!("Unable to open file {}", file_name));
+    let file_content = fs::read_to_string(&file_name).expect(&format!("Unable to open file {}", file_name));
 
-    datamodel::ast::reformat::Reformatter::reformat_to(&file, &mut std::io::stdout().lock(), 2);
+    datamodel::ast::reformat::Reformatter::new(&file_content).reformat_to(&mut std::io::stdout().lock(), 2);
 }

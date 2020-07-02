@@ -91,7 +91,10 @@ pub trait InputTypeBuilderBase<'a>: CachedBuilder<InputObjectType> + InputBuilde
         let name = format!("{}WhereUniqueInput", model.name);
         return_cached!(self.get_cache(), &name);
 
-        let input_object = Arc::new(init_input_object_type(name.clone()));
+        let mut x = init_input_object_type(name.clone());
+        x.is_one_of = true;
+
+        let input_object = Arc::new(x);
         self.cache(name, Arc::clone(&input_object));
 
         // Single unique or ID fields.

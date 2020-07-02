@@ -52,35 +52,3 @@ fn test_render_relation_name_on_self_relations() {
 
     assert_eq!(rendered, input);
 }
-
-// TODO: this is probably obsolete
-#[test]
-#[ignore]
-fn test_exclude_to_fields_id() {
-    let input = r#"
-        model Todo {
-            id Int @id
-        }
-
-        model User {
-            id Int @id
-            todo Todo @relation(references: [id])
-        }
-    "#;
-
-    let expected = r#"model Todo {
-  id Int @id
-}
-
-model User {
-  id   Int  @id
-  todo Todo
-}"#;
-
-    let dml = parse(input);
-    let rendered = datamodel::render_datamodel_to_string(&dml).unwrap();
-
-    print!("{}", rendered);
-
-    assert_eq!(rendered, expected);
-}

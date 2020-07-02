@@ -15,6 +15,7 @@
           "isId": true,
           "isReadOnly": false,
           "type": "Int",
+          "hasDefaultValue": false,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -27,31 +28,17 @@
           "isId": false,
           "isReadOnly": false,
           "type": "String",
+          "hasDefaultValue": false,
           "isGenerated": false,
           "isUpdatedAt": false,
           "documentation": "Name of the author."
-        },
-        {
-          "name": "createdAt",
-          "kind": "scalar",
-          "isList": false,
-          "isRequired": true,
-          "isUnique": false,
-          "isId": false,
-          "isReadOnly": false,
-          "type": "DateTime",
-          "default": {
-            "name": "now",
-            "args": []
-          },
-          "isGenerated": false,
-          "isUpdatedAt": false
         }
       ],
       "isGenerated": false,
       "documentation": "My author model.",
       "idFields": [],
-      "uniqueFields": []
+      "uniqueFields": [],
+      "uniqueIndexes": []
     }
   ]
 }

@@ -74,6 +74,20 @@ fn model_to_dmmf(model: &dml::Model) -> Model {
                 }
             })
             .collect(),
+        unique_indexes: model
+            .indices
+            .iter()
+            .filter_map(|i| {
+                if i.tpe == IndexType::Unique {
+                    Some(UniqueIndex {
+                        name: i.name.clone(),
+                        fields: i.fields.clone(),
+                    })
+                } else {
+                    None
+                }
+            })
+            .collect(),
     }
 }
 
@@ -89,6 +103,7 @@ fn field_to_dmmf(model: &dml::Model, field: &dml::Field) -> Field {
         is_list: field.arity == dml::FieldArity::List,
         is_id: field.is_id,
         is_read_only: a_relation_field_is_based_on_this_field,
+        has_default_value: field.default_value.is_some(),
         default: default_value_to_serde(&field.default_value),
         is_unique: field.is_unique,
         relation_name: get_relation_name(field),
@@ -111,6 +126,41 @@ fn get_field_kind(field: &dml::Field) -> String {
     }
 }
 
+fn default_value_to_serde(dv_opt: &Option<dml::DefaultValue>) -> Option<serde_json::Value> {
+    dv_opt.as_ref().map(|dv| match dv {
+        dml::DefaultValue::Single(value) => prisma_value_to_serde(&value.clone()),
+        dml::DefaultValue::Expression(vg) => function_to_serde(&vg.name, &vg.args),
+    })
+}
+
+fn prisma_value_to_serde(value: &PrismaValue) -> serde_json::Value {
+    match value {
+        PrismaValue::Boolean(val) => serde_json::Value::Bool(*val),
+        PrismaValue::String(val) => serde_json::Value::String(val.clone()),
+        PrismaValue::Enum(val) => serde_json::Value::String(val.clone()),
+        PrismaValue::Float(val) => {
+            serde_json::Value::Number(serde_json::Number::from_f64(val.to_f64().unwrap()).unwrap())
+        }
+        PrismaValue::Int(val) => serde_json::Value::Number(serde_json::Number::from_f64(*val as f64).unwrap()),
+        PrismaValue::DateTime(val) => serde_json::Value::String(val.to_rfc3339()),
+        PrismaValue::Null(_) => serde_json::Value::Null,
+        PrismaValue::Uuid(val) => serde_json::Value::String(val.to_string()),
+        PrismaValue::Json(val) => serde_json::Value::String(val.to_string()),
+        PrismaValue::List(value_vec) => {
+            serde_json::Value::Array(value_vec.iter().map(|pv| prisma_value_to_serde(pv)).collect())
+        }
+    }
+}
+
+fn function_to_serde(name: &str, args: &Vec<PrismaValue>) -> serde_json::Value {
+    let func = Function {
+        name: String::from(name),
+        args: args.iter().map(|arg| prisma_value_to_serde(arg)).collect(),
+    };
+
+    serde_json::to_value(&func).expect("Failed to render function JSON")
+}
+
 fn get_field_type(field: &dml::Field) -> String {
     match &field.field_type {
         dml::FieldType::Relation(relation_info) => relation_info.to.clone(),
@@ -123,41 +173,6 @@ fn get_field_type(field: &dml::Field) -> String {
 
 fn type_to_string(scalar: &ScalarType) -> String {
     scalar.to_string()
-}
-
-fn default_value_to_serde(dv_opt: &Option<dml::DefaultValue>) -> Option<serde_json::Value> {
-    dv_opt.as_ref().map(|dv| match dv {
-        dml::DefaultValue::Single(value) => value_to_serde(&value.clone()),
-        dml::DefaultValue::Expression(vg) => function_to_serde(&vg.name, &vg.args),
-    })
-}
-
-fn value_to_serde(value: &PrismaValue) -> serde_json::Value {
-    match value {
-        PrismaValue::Boolean(val) => serde_json::Value::Bool(*val),
-        PrismaValue::String(val) => serde_json::Value::String(val.clone()),
-        PrismaValue::Enum(val) => serde_json::Value::String(val.clone()),
-        PrismaValue::Float(val) => {
-            serde_json::Value::Number(serde_json::Number::from_f64(val.to_f64().unwrap()).unwrap())
-        }
-        PrismaValue::Int(val) => serde_json::Value::Number(serde_json::Number::from_f64(*val as f64).unwrap()),
-        PrismaValue::DateTime(val) => serde_json::Value::String(val.to_rfc3339()),
-        PrismaValue::Null => serde_json::Value::Null,
-        PrismaValue::Uuid(val) => serde_json::Value::String(val.to_string()),
-        PrismaValue::Json(val) => serde_json::Value::String(val.to_string()),
-        PrismaValue::List(value_vec) => {
-            serde_json::Value::Array(value_vec.iter().map(|pv| value_to_serde(pv)).collect())
-        }
-    }
-}
-
-fn function_to_serde(name: &str, args: &Vec<PrismaValue>) -> serde_json::Value {
-    let func = Function {
-        name: String::from(name),
-        args: args.iter().map(|arg| value_to_serde(arg)).collect(),
-    };
-
-    serde_json::to_value(&func).expect("Failed to render function JSON")
 }
 
 fn get_relation_name(field: &dml::Field) -> Option<String> {

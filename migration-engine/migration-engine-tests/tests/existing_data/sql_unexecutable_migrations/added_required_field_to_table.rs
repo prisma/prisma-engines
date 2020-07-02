@@ -31,10 +31,10 @@ async fn adding_a_required_field_to_an_existing_table_with_data_without_a_defaul
         .force(Some(false))
         .send()
         .await?
-        .assert_unexecutable(&[format!("Added the required column `age` to the `Test` table without a default value. There are Some(1) rows in this table, it is not possible.")])?;
+        .assert_unexecutable(&[format!("Added the required column `age` to the `Test` table without a default value. There are 1 rows in this table, it is not possible to execute this migration.")])?;
 
     let rows = api.select("Test").column("id").column("name").send_debug().await?;
-    assert_eq!(rows, &[&[r#"Text("abc")"#, r#"Text("george")"#]]);
+    assert_eq!(rows, &[&[r#"Text(Some("abc"))"#, r#"Text(Some("george"))"#]]);
 
     Ok(())
 }
@@ -73,7 +73,15 @@ async fn adding_a_required_field_with_a_default_to_an_existing_table_works(api: 
         .column("age")
         .send_debug()
         .await?;
-    assert_eq!(rows, &[&[r#"Text("abc")"#, r#"Text("george")"#, r#"Integer(45)"#]]);
+
+    assert_eq!(
+        rows,
+        &[&[
+            r#"Text(Some("abc"))"#,
+            r#"Text(Some("george"))"#,
+            r#"Integer(Some(45))"#
+        ]]
+    );
 
     Ok(())
 }

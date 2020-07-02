@@ -15,6 +15,7 @@
           "isId": true,
           "isReadOnly": false,
           "type": "Int",
+          "hasDefaultValue": false,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -27,6 +28,7 @@
           "isId": false,
           "isReadOnly": false,
           "type": "Post",
+          "hasDefaultValue": false,
           "relationName": "PostToUser",
           "relationFromFields": [],
           "relationToFields": [],
@@ -37,7 +39,8 @@
       ],
       "isGenerated": false,
       "idFields": [],
-      "uniqueFields": []
+      "uniqueFields": [],
+      "uniqueIndexes": []
     },
     {
       "name": "Post",
@@ -53,6 +56,7 @@
           "isId": true,
           "isReadOnly": false,
           "type": "Int",
+          "hasDefaultValue": false,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -65,6 +69,7 @@
           "isId": false,
           "isReadOnly": true,
           "type": "Int",
+          "hasDefaultValue": false,
           "isGenerated": false,
           "isUpdatedAt": false
         },
@@ -77,6 +82,7 @@
           "isId": false,
           "isReadOnly": false,
           "type": "User",
+          "hasDefaultValue": false,
           "relationName": "PostToUser",
           "relationFromFields": [
             "userId"
@@ -91,7 +97,8 @@
       ],
       "isGenerated": false,
       "idFields": [],
-      "uniqueFields": []
+      "uniqueFields": [],
+      "uniqueIndexes": []
     }
   ]
 }

@@ -1,20 +1,22 @@
 use crate::database::operations::*;
 use crate::SqlError;
+use async_trait::async_trait;
 use connector_interface::{
     self as connector, filter::Filter, QueryArguments, ReadOperations, RecordFilter, Transaction, WriteArgs,
-    WriteOperations, IO,
+    WriteOperations,
 };
 use prisma_models::prelude::*;
 use prisma_value::PrismaValue;
 use quaint::prelude::ConnectionInfo;
 
-pub struct SqlConnectorTransaction<'a> {
-    inner: quaint::connector::Transaction<'a>,
-    connection_info: &'a ConnectionInfo,
+pub struct SqlConnectorTransaction<'tx> {
+    inner: quaint::connector::Transaction<'tx>,
+    connection_info: ConnectionInfo,
 }
 
-impl<'a> SqlConnectorTransaction<'a> {
-    pub fn new<'b: 'a>(tx: quaint::connector::Transaction<'a>, connection_info: &'b ConnectionInfo) -> Self {
+impl<'tx> SqlConnectorTransaction<'tx> {
+    pub fn new<'b: 'tx>(tx: quaint::connector::Transaction<'tx>, connection_info: &ConnectionInfo) -> Self {
+        let connection_info = connection_info.clone();
         Self {
             inner: tx,
             connection_info,
@@ -32,91 +34,105 @@ impl<'a> SqlConnectorTransaction<'a> {
     }
 }
 
-impl<'a> Transaction<'a> for SqlConnectorTransaction<'a> {
-    fn commit<'b>(&'b self) -> IO<'b, ()> {
-        IO::new(self.catch(async move { Ok(self.inner.commit().await.map_err(SqlError::from)?) }))
+#[async_trait]
+impl<'tx> Transaction for SqlConnectorTransaction<'tx> {
+    async fn commit(&self) -> connector::Result<()> {
+        self.catch(async move { Ok(self.inner.commit().await.map_err(SqlError::from)?) })
+            .await
     }
 
-    fn rollback<'b>(&'b self) -> IO<'b, ()> {
-        IO::new(self.catch(async move { Ok(self.inner.rollback().await.map_err(SqlError::from)?) }))
+    async fn rollback(&self) -> connector::Result<()> {
+        self.catch(async move { Ok(self.inner.rollback().await.map_err(SqlError::from)?) })
+            .await
     }
 }
 
-impl<'a> ReadOperations for SqlConnectorTransaction<'a> {
-    fn get_single_record<'b>(
-        &'b self,
-        model: &'b ModelRef,
-        filter: &'b Filter,
-        selected_fields: &'b ModelProjection,
-    ) -> connector::IO<'b, Option<SingleRecord>> {
-        IO::new(self.catch(async move { read::get_single_record(&self.inner, model, filter, selected_fields).await }))
+#[async_trait]
+impl<'tx> ReadOperations for SqlConnectorTransaction<'tx> {
+    async fn get_single_record(
+        &self,
+        model: &ModelRef,
+        filter: &Filter,
+        selected_fields: &ModelProjection,
+    ) -> connector::Result<Option<SingleRecord>> {
+        self.catch(async move { read::get_single_record(&self.inner, model, filter, selected_fields).await })
+            .await
     }
 
-    fn get_many_records<'b>(
-        &'b self,
-        model: &'b ModelRef,
+    async fn get_many_records(
+        &self,
+        model: &ModelRef,
         query_arguments: QueryArguments,
-        selected_fields: &'b ModelProjection,
-    ) -> connector::IO<'b, ManyRecords> {
-        IO::new(
-            self.catch(
-                async move { read::get_many_records(&self.inner, model, query_arguments, selected_fields).await },
-            ),
-        )
+        selected_fields: &ModelProjection,
+    ) -> connector::Result<ManyRecords> {
+        self.catch(async move { read::get_many_records(&self.inner, model, query_arguments, selected_fields).await })
+            .await
     }
 
-    fn get_related_m2m_record_ids<'b>(
-        &'b self,
-        from_field: &'b RelationFieldRef,
-        from_record_ids: &'b [RecordProjection],
-    ) -> connector::IO<'b, Vec<(RecordProjection, RecordProjection)>> {
-        IO::new(
-            self.catch(async move { read::get_related_m2m_record_ids(&self.inner, from_field, from_record_ids).await }),
-        )
+    async fn get_related_m2m_record_ids(
+        &self,
+        from_field: &RelationFieldRef,
+        from_record_ids: &[RecordProjection],
+    ) -> connector::Result<Vec<(RecordProjection, RecordProjection)>> {
+        self.catch(async move { read::get_related_m2m_record_ids(&self.inner, from_field, from_record_ids).await })
+            .await
     }
 
-    fn count_by_model<'b>(&'b self, model: &'b ModelRef, query_arguments: QueryArguments) -> connector::IO<'b, usize> {
-        IO::new(self.catch(async move { read::count_by_model(&self.inner, model, query_arguments).await }))
+    async fn count_by_model(&self, model: &ModelRef, query_arguments: QueryArguments) -> connector::Result<usize> {
+        self.catch(async move { read::count_by_model(&self.inner, model, query_arguments).await })
+            .await
     }
 }
 
-impl<'a> WriteOperations for SqlConnectorTransaction<'a> {
-    fn create_record<'b>(&'b self, model: &'b ModelRef, args: WriteArgs) -> connector::IO<RecordProjection> {
-        IO::new(self.catch(async move { write::create_record(&self.inner, model, args).await }))
+#[async_trait]
+impl<'tx> WriteOperations for SqlConnectorTransaction<'tx> {
+    async fn create_record(&self, model: &ModelRef, args: WriteArgs) -> connector::Result<RecordProjection> {
+        self.catch(async move { write::create_record(&self.inner, model, args).await })
+            .await
     }
 
-    fn update_records<'b>(
-        &'b self,
-        model: &'b ModelRef,
+    async fn update_records(
+        &self,
+        model: &ModelRef,
         record_filter: RecordFilter,
         args: WriteArgs,
-    ) -> connector::IO<Vec<RecordProjection>> {
-        IO::new(self.catch(async move { write::update_records(&self.inner, model, record_filter, args).await }))
+    ) -> connector::Result<Vec<RecordProjection>> {
+        self.catch(async move { write::update_records(&self.inner, model, record_filter, args).await })
+            .await
     }
 
-    fn delete_records<'b>(&'b self, model: &'b ModelRef, record_filter: RecordFilter) -> connector::IO<usize> {
-        IO::new(self.catch(async move { write::delete_records(&self.inner, model, record_filter).await }))
+    async fn delete_records(&self, model: &ModelRef, record_filter: RecordFilter) -> connector::Result<usize> {
+        self.catch(async move { write::delete_records(&self.inner, model, record_filter).await })
+            .await
     }
 
-    fn connect<'b>(
-        &'b self,
-        field: &'b RelationFieldRef,
-        parent_id: &'b RecordProjection,
-        child_ids: &'b [RecordProjection],
-    ) -> connector::IO<()> {
-        IO::new(self.catch(async move { write::connect(&self.inner, field, parent_id, child_ids).await }))
+    async fn connect(
+        &self,
+        field: &RelationFieldRef,
+        parent_id: &RecordProjection,
+        child_ids: &[RecordProjection],
+    ) -> connector::Result<()> {
+        self.catch(async move { write::connect(&self.inner, field, parent_id, child_ids).await })
+            .await
     }
 
-    fn disconnect<'b>(
-        &'b self,
-        field: &'b RelationFieldRef,
-        parent_id: &'b RecordProjection,
-        child_ids: &'b [RecordProjection],
-    ) -> connector::IO<()> {
-        IO::new(self.catch(async move { write::disconnect(&self.inner, field, parent_id, child_ids).await }))
+    async fn disconnect(
+        &self,
+        field: &RelationFieldRef,
+        parent_id: &RecordProjection,
+        child_ids: &[RecordProjection],
+    ) -> connector::Result<()> {
+        self.catch(async move { write::disconnect(&self.inner, field, parent_id, child_ids).await })
+            .await
     }
 
-    fn execute_raw(&self, query: String, parameters: Vec<PrismaValue>) -> connector::IO<serde_json::Value> {
-        IO::new(self.catch(async move { write::execute_raw(&self.inner, query, parameters).await }))
+    async fn execute_raw(&self, query: String, parameters: Vec<PrismaValue>) -> connector::Result<usize> {
+        self.catch(async move { write::execute_raw(&self.inner, query, parameters).await })
+            .await
+    }
+
+    async fn query_raw(&self, query: String, parameters: Vec<PrismaValue>) -> connector::Result<serde_json::Value> {
+        self.catch(async move { write::query_raw(&self.inner, query, parameters).await })
+            .await
     }
 }

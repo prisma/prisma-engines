@@ -7,44 +7,122 @@
 // to consume any whitespace after X, if Y is not present.
 
 // ######################################
-// Global (builtin) expressions
+// Schema - the root of all rules
+// ######################################
+schema = { SOI ~ NEWLINE* ~ (model_declaration | enum_declaration | source_block | generator_block | type_alias | arbitrary_block | comment_block | NEWLINE | CATCH_ALL)* ~ EOI }
+
+// ######################################
+// Model
+// ######################################
+model_declaration = { comment_block? ~ (MODEL_KEYWORD | TYPE_KEYWORD) ~ non_empty_identifier ~ BLOCK_OPEN ~ ( field_declaration | ( "@@" ~ directive ) | NEWLINE | doc_comment_and_new_line | comment_and_new_line | BLOCK_LEVEL_CATCH_ALL )* ~ BLOCK_CLOSE }
+
+field_declaration = { doc_comment_and_new_line* ~ non_empty_identifier ~ LEGACY_COLON? ~ (field_type ~ ( "@" ~ directive )+ | field_type)? ~ doc_comment? ~ comment? ~ NEWLINE }
+
+
+// ######################################
+// Field Type
 // ######################################
 
-// Treat every whitespace the same for now.
-WHITESPACE = @{ SPACE_SEPARATOR | "\t" }
-UNTIL_END_OF_LINE = _{ WHITESPACE* ~ NEWLINE }
-// the any part is to not crash on comments next to an open block, see test `parse_comments_without_crasing_or_loosing_info`
-BLOCK_OPEN = @{ "{" ~ (!NEWLINE ~ ANY)* ~ UNTIL_END_OF_LINE }
-BLOCK_CLOSE = @{ "}" }
-MODEL_KEYWORD = @{ "model" }
-TYPE_KEYWORD = @{ "type" }
-ENUM_KEYWORD = @{ "enum" }
-GENERATOR_KEYWORD = @{ "generator" }
-DATASOURCE_KEYWORD = @{ "datasource" }
+// Pest is greedy, order is very important here.
+field_type = { unsupported_optional_list_type | list_type | optional_type | legacy_required_type | legacy_list_type | base_type }
 
-INTERPOLATION_START = { "${" }
-INTERPOLATION_END = { "}" }
+base_type = { non_empty_identifier } // Called base type to not conflict with type rust keyword
+list_type = { non_empty_identifier ~ "[]" }
+optional_type = { non_empty_identifier ~ "?" }
+unsupported_optional_list_type = { non_empty_identifier ~ "[]" ~ "?" }
+legacy_required_type = { non_empty_identifier ~ "!" }
+legacy_list_type = { "[" ~ non_empty_identifier ~ "]" }
 
-LEGACY_COLON = { ":" }
+// ######################################
+// Type Alias
+// ######################################
+type_alias = { comment_block? ~ TYPE_KEYWORD ~ non_empty_identifier ~ "=" ~ (base_type ~ ( "@" ~ directive )+ | base_type)  }
 
-CATCH_ALL = @{ (WHITESPACE | LETTER | NUMBER | PUNCTUATION | SYMBOL)* ~ NEWLINE }
+// ######################################
+// Other kind of blocks
+// ######################################
+source_block = { comment_block? ~ DATASOURCE_KEYWORD ~ non_empty_identifier ~ BLOCK_OPEN ~ (key_value | doc_comment_and_new_line | comment_and_new_line | NEWLINE | BLOCK_LEVEL_CATCH_ALL)* ~ BLOCK_CLOSE }
+generator_block = { comment_block? ~ GENERATOR_KEYWORD ~ non_empty_identifier ~ BLOCK_OPEN ~ (key_value | doc_comment_and_new_line | comment_and_new_line | NEWLINE | BLOCK_LEVEL_CATCH_ALL)* ~ BLOCK_CLOSE }
+key_value = { non_empty_identifier ~ "=" ~ expression ~ NEWLINE }
 
-doc_content = @{ (!NEWLINE ~ ANY)* }
-doc_comment = { "//" ~ doc_content }
+// a block definition without a keyword. Is not valid. Just acts as a catch for the parser to display a nice error.
+arbitrary_block = { comment_block? ~ non_empty_identifier ~ BLOCK_OPEN ~ ((!BLOCK_CLOSE ~ ANY) | NEWLINE)* ~ BLOCK_CLOSE }
+
+// ######################################
+// Enum
+// ######################################
+enum_declaration = { comment_block? ~ ENUM_KEYWORD ~ non_empty_identifier ~ BLOCK_OPEN ~ (enum_value_declaration | block_level_directive | NEWLINE | doc_comment_and_new_line | comment_and_new_line | BLOCK_LEVEL_CATCH_ALL)* ~ BLOCK_CLOSE }
+enum_value_declaration = { doc_comment_and_new_line* ~ (non_empty_identifier ~ ( "@" ~ directive )+ | non_empty_identifier) ~ doc_comment? ~ comment? ~ NEWLINE }
+
+// ######################################
+// Directives
+// ######################################
+block_level_directive = { "@@" ~ directive ~ NEWLINE }
+// A directive may have no arguments at all.
+directive = { (directive_name ~ directive_arguments | directive_name) }
+// This is a poor-mans version of name spacing. Not used right now. Unclear if we need it going forward.
+directive_name = @{ (maybe_empty_identifier ~ ".")? ~ maybe_empty_identifier }
+// If arguments are supplied there might be one unnamed argument. Additionally there are multiple named arguments.
+directive_arguments = { "(" ~ (((argument | argument_value) ~ ("," ~ (argument | argument_value))*)?) ~ ")" }
+
+argument = { (argument_name ~ ":" ~ argument_value) }
+argument_name = { (!":" ~ non_empty_identifier)+ }
+argument_value = { expression }
+
+// ######################################
+// Comments and Documentation Comments
+// ######################################
+comment_block = ${ (doc_comment_and_new_line | doc_comment | comment_and_new_line | comment) + }
 doc_comment_and_new_line = ${ doc_comment ~ NEWLINE }
+doc_comment = { WHITESPACE* ~ "///" ~ doc_content }
+comment_and_new_line = ${ comment ~ NEWLINE }
+comment = { WHITESPACE* ~ (!"///") ~ "//" ~ doc_content }
+doc_content = @{ (!NEWLINE ~ ANY)* }
 
 // ######################################
-// Base building blocks
+// shared building blocks
 // ######################################
 maybe_empty_identifier = @{ ( "_" | "-" | ASCII_ALPHANUMERIC)* }
 non_empty_identifier = @{ ASCII_ALPHANUMERIC ~ maybe_empty_identifier }
+
+WHITESPACE = @{ SPACE_SEPARATOR | "\t" } // tabs are also whitespace
+NEWLINE = { "\n" | "\r\n" | "\r" }
+
+// the any part is to not crash on comments next to an open block, see test `parse_comments_without_crasing_or_loosing_info`
+BLOCK_OPEN = { "{" ~ (!NEWLINE ~ ANY)* ~ NEWLINE }
+BLOCK_CLOSE = { "}" }
+
+// those rules are silent because we don't want to handle the tokens
+MODEL_KEYWORD = _{ "model" }
+ENUM_KEYWORD = _{ "enum" }
+GENERATOR_KEYWORD = _{ "generator" }
+DATASOURCE_KEYWORD = _{ "datasource" }
+INTERPOLATION_START = _{ "${" }
+INTERPOLATION_END = _{ "}" }
+
+// rules that we want to handle explicitly
+TYPE_KEYWORD = { "type" }
+LEGACY_COLON = { ":" }
+
+CATCH_ALL = { (!NEWLINE ~ ANY)+ ~ NEWLINE? }
+BLOCK_LEVEL_CATCH_ALL = { !BLOCK_CLOSE ~ CATCH_ALL }
+
+// ######################################
+// Expressions & Functions
+// ######################################
+function = { non_empty_identifier ~ "(" ~ (expression ~ ("," ~ expression)*)? ~ ")" }
+array_expression = { "[" ~ expression ~ ( "," ~ expression )* ~ "]" }
+expression = { array_expression | function | numeric_literal | string_literal | boolean_literal | constant_literal }
+
+// ######################################
+// Literals / Values
+// ######################################
 number = @{ ASCII_DIGIT+ }
 
-// Literals
 numeric_literal = @{ ("-")? ~ ASCII_DIGIT+ ~("." ~ ASCII_DIGIT+)? }
 
 // String, with support for escaped stuff and interpolations.
-string_escaped_predefined = { "n" | "r" | "t" | "\\" | "0" | "\"" | "'" | INTERPOLATION_START }
+string_escaped_predefined = { "n" | "r" | "t" | "\\" | "0" | "\"" | "'" | SPACE_SEPARATOR | INTERPOLATION_START }
 string_escape     = { "\\" ~ string_escaped_predefined }
 // This is only used to escape the parser. The string above is still treated as atomic.
 string_interpolate_escape = !{ (INTERPOLATION_START ~ expression ~ INTERPOLATION_END) }
@@ -56,85 +134,6 @@ boolean_true  = { "true" }
 boolean_false = { "false" }
 boolean_literal =  @{ boolean_true | boolean_false }
 constant_literal = @{ non_empty_identifier }
-
-// ######################################
-// Expression support
-// ######################################
-
-function = { non_empty_identifier ~ "(" ~ (argument_value ~ ("," ~ argument_value)*)? ~ ")" }
-array_expression = { "[" ~ expression ~ ( "," ~ expression )* ~ "]" }
-expression = { array_expression | function | numeric_literal | string_literal | boolean_literal | constant_literal }
-
-// ######################################
-// Arguments
-// ######################################
-argument_name = { (!":" ~ non_empty_identifier)+ }
-argument_value = { expression }
-argument = { (argument_name ~ ":" ~ argument_value) }
-
-// ######################################
-// Directives
-// ######################################
-directive_arguments = { "(" ~ (((argument | argument_value) ~ ("," ~ argument)*)?) ~ ")" }
-// This is a poor-mans version of namespacing
-directive_name = @{ (maybe_empty_identifier ~ ".")? ~ maybe_empty_identifier }
-// A directive either has one unnamed argument or any number of named arguments or no argument.
-directive = { (directive_name ~ directive_arguments | directive_name) }
-block_level_directive = { "@@" ~ directive ~ NEWLINE }
-
-// ######################################
-// Field declarations
-// ######################################
-base_type = { non_empty_identifier } // Called base type to not conflict with type rust keyword
-list_type = { non_empty_identifier ~ "[]" }
-optional_type = { non_empty_identifier ~ "?" }
-unsupported_optional_list_type = { non_empty_identifier ~ "[]" ~ "?" }
-legacy_required_type = { non_empty_identifier ~ "!" }
-legacy_list_type = { "[" ~ non_empty_identifier ~ "]" }
-
-// Pest is greedy, order is very important here.
-field_type = { unsupported_optional_list_type | list_type | optional_type | legacy_required_type | legacy_list_type | base_type }
-
-// Field
-// TODO: We want to force a line break after a field declaration.
-// For this, we have to rely on pests new '-' operator.
-// Progress tracked here: https://github.com/pest-parser/pest/issues/271
-
-field_declaration = { doc_comment_and_new_line* ~ non_empty_identifier ~ LEGACY_COLON? ~ (field_type ~ ( "@" ~ directive )+ | field_type)? ~ doc_comment? ~ NEWLINE }
-
-// ######################################
-// Custom type declarations
-// ######################################
-type_declaration = { doc_comment_and_new_line* ~ TYPE_KEYWORD ~ non_empty_identifier ~ "=" ~ (base_type ~ ( "@" ~ directive )+ | base_type)  }
-
-// ######################################
-// Model declarations
-// ######################################
-model_declaration = { (UNTIL_END_OF_LINE | doc_comment_and_new_line)* ~ (MODEL_KEYWORD | TYPE_KEYWORD) ~ non_empty_identifier ~ BLOCK_OPEN ~ ( field_declaration | ( "@@" ~ directive ) | NEWLINE | doc_comment_and_new_line)* ~ BLOCK_CLOSE }
-
-// ######################################
-// Enum declarations
-// ######################################
-enum_field_declaration = { doc_comment_and_new_line* ~ (non_empty_identifier ~ ( "@" ~ directive )+ | non_empty_identifier) ~ doc_comment? ~ NEWLINE }
-enum_declaration = { doc_comment_and_new_line* ~ ENUM_KEYWORD ~ non_empty_identifier ~ BLOCK_OPEN ~ (enum_field_declaration | block_level_directive | NEWLINE | doc_comment_and_new_line)* ~ BLOCK_CLOSE }
-
-// ######################################
-// Source block
-// ######################################
-key_value = { non_empty_identifier ~ "=" ~ expression ~ NEWLINE }
-source_block = { doc_comment_and_new_line* ~ DATASOURCE_KEYWORD ~ non_empty_identifier ~ BLOCK_OPEN ~ (key_value | doc_comment | NEWLINE)* ~ BLOCK_CLOSE }
-
-// ######################################
-// Generator block
-// ######################################
-generator_block = { doc_comment_and_new_line* ~ GENERATOR_KEYWORD ~ non_empty_identifier ~ BLOCK_OPEN ~ (key_value | doc_comment | NEWLINE)* ~ BLOCK_CLOSE }
-
-arbitrary_block = { doc_comment_and_new_line* ~ non_empty_identifier ~ BLOCK_OPEN ~ ((!BLOCK_CLOSE ~ ANY) | NEWLINE)* ~ BLOCK_CLOSE }
-
-// ######################################
-// Datamodel
-// ######################################
-datamodel = { SOI ~ NEWLINE* ~ (((arbitrary_block | model_declaration | enum_declaration | source_block | generator_block | type_declaration | doc_comment) ~ NEWLINE*) | CATCH_ALL)* ~ EOI }
 
 // ######################################
 // String Interpolation

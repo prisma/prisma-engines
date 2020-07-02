@@ -37,6 +37,10 @@ impl WithDocumentation for Enum {
     fn documentation(&self) -> &Option<Comment> {
         &self.documentation
     }
+
+    fn is_commented_out(&self) -> bool {
+        false
+    }
 }
 
 /// An enum value definition.

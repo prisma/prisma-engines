@@ -1,63 +1,85 @@
-use crate::sql_schema_differ::{ColumnChange, ColumnDiffer, DiffingOptions};
+use crate::sql_schema_differ::{ColumnChange, ColumnChanges, ColumnDiffer};
 use quaint::prelude::SqlFamily;
-use sql_schema_describer::{Column, ColumnArity, ColumnType, ColumnTypeFamily};
+use sql_schema_describer::{ColumnArity, ColumnType, ColumnTypeFamily, DefaultValue};
 
 pub(crate) fn expand_alter_column(
-    previous_column: &Column,
-    next_column: &Column,
+    column_differ: &ColumnDiffer<'_>,
     sql_family: &SqlFamily,
-    diffing_options: &DiffingOptions,
 ) -> Option<ExpandedAlterColumn> {
-    let column_differ = ColumnDiffer {
-        diffing_options,
-        previous: previous_column,
-        next: next_column,
-    };
-
     match sql_family {
         SqlFamily::Sqlite => expand_sqlite_alter_column(&column_differ).map(ExpandedAlterColumn::Sqlite),
-        SqlFamily::Mysql => expand_mysql_alter_column(&column_differ).map(ExpandedAlterColumn::Mysql),
+        SqlFamily::Mysql => Some(ExpandedAlterColumn::Mysql(expand_mysql_alter_column(&column_differ))),
         SqlFamily::Postgres => expand_postgres_alter_column(&column_differ).map(ExpandedAlterColumn::Postgres),
+        SqlFamily::Mssql => todo!("Greetings from Redmond"),
     }
 }
 
-pub(crate) fn expand_sqlite_alter_column(_columns: &ColumnDiffer) -> Option<Vec<SqliteAlterColumn>> {
+pub(crate) fn expand_sqlite_alter_column(_columns: &ColumnDiffer<'_>) -> Option<Vec<SqliteAlterColumn>> {
     None
 }
 
-pub(crate) fn expand_mysql_alter_column(columns: &ColumnDiffer) -> Option<Vec<MysqlAlterColumn>> {
-    let mut changes: Vec<MysqlAlterColumn> = Vec::new();
+pub(crate) fn expand_mysql_alter_column(columns: &ColumnDiffer<'_>) -> MysqlAlterColumn {
+    let column_changes = columns.all_changes();
 
-    for change in columns.all_changes().iter() {
-        match change {
-            ColumnChange::Default => match (&columns.previous.default, &columns.next.default) {
-                (_, Some(next_default)) => changes.push(MysqlAlterColumn::SetDefault(next_default.clone())),
-                (_, None) => changes.push(MysqlAlterColumn::DropDefault),
-            },
-            _ => return None,
-        }
+    if column_changes.only_default_changed() && columns.next.default().is_none() {
+        return MysqlAlterColumn::DropDefault;
     }
 
-    Some(changes)
+    if column_changes.column_was_renamed() {
+        unreachable!("MySQL column renaming.")
+    }
+
+    // @default(dbgenerated()) does not give us the information in the prisma schema, so we have to
+    // transfer it from the introspected current state of the database.
+    let new_default = match (&columns.previous.default(), &columns.next.default()) {
+        (Some(DefaultValue::DBGENERATED(previous)), Some(DefaultValue::DBGENERATED(next)))
+            if next.is_empty() && !previous.is_empty() =>
+        {
+            Some(DefaultValue::DBGENERATED(previous.clone()))
+        }
+        _ => columns.next.default().cloned(),
+    };
+
+    MysqlAlterColumn::Modify {
+        changes: column_changes,
+        new_default,
+    }
 }
 
-pub(crate) fn expand_postgres_alter_column(columns: &ColumnDiffer) -> Option<Vec<PostgresAlterColumn>> {
+pub(crate) fn expand_postgres_alter_column(columns: &ColumnDiffer<'_>) -> Option<Vec<PostgresAlterColumn>> {
     let mut changes = Vec::new();
 
     for change in columns.all_changes().iter() {
         match change {
-            ColumnChange::Default => match (&columns.previous.default, &columns.next.default) {
-                (_, Some(next_default)) => changes.push(PostgresAlterColumn::SetDefault(next_default.clone())),
+            ColumnChange::Default => match (&columns.previous.default(), &columns.next.default()) {
+                (_, Some(next_default)) => changes.push(PostgresAlterColumn::SetDefault((**next_default).clone())),
                 (_, None) => changes.push(PostgresAlterColumn::DropDefault),
             },
-            ColumnChange::Arity => match (&columns.previous.tpe.arity, &columns.next.tpe.arity) {
+            ColumnChange::Arity => match (&columns.previous.arity(), &columns.next.arity()) {
                 (ColumnArity::Required, ColumnArity::Nullable) => changes.push(PostgresAlterColumn::DropNotNull),
-                _ => return None,
+                (ColumnArity::Nullable, ColumnArity::Required) => changes.push(PostgresAlterColumn::SetNotNull),
+                (ColumnArity::List, ColumnArity::Nullable) => {
+                    changes.push(PostgresAlterColumn::SetType(columns.next.column_type().clone()));
+                    changes.push(PostgresAlterColumn::DropNotNull)
+                }
+                (ColumnArity::List, ColumnArity::Required) => {
+                    changes.push(PostgresAlterColumn::SetType(columns.next.column_type().clone()));
+                    changes.push(PostgresAlterColumn::SetNotNull)
+                }
+                (ColumnArity::Nullable, ColumnArity::List) | (ColumnArity::Required, ColumnArity::List) => {
+                    changes.push(PostgresAlterColumn::SetType(columns.next.column_type().clone()))
+                }
+                (ColumnArity::Nullable, ColumnArity::Nullable)
+                | (ColumnArity::Required, ColumnArity::Required)
+                | (ColumnArity::List, ColumnArity::List) => (),
             },
-            ColumnChange::Type => match (&columns.previous.tpe.family, &columns.next.tpe.family) {
+            ColumnChange::Type => match (
+                &columns.previous.column_type_family(),
+                &columns.next.column_type_family(),
+            ) {
                 // Ints can be cast to text.
                 (ColumnTypeFamily::Int, ColumnTypeFamily::String) => {
-                    changes.push(PostgresAlterColumn::SetType(columns.next.tpe.clone()))
+                    changes.push(PostgresAlterColumn::SetType(columns.next.column_type().clone()))
                 }
                 _ => return None,
             },
@@ -71,7 +93,7 @@ pub(crate) fn expand_postgres_alter_column(columns: &ColumnDiffer) -> Option<Vec
 #[derive(Debug)]
 pub(crate) enum ExpandedAlterColumn {
     Postgres(Vec<PostgresAlterColumn>),
-    Mysql(Vec<MysqlAlterColumn>),
+    Mysql(MysqlAlterColumn),
     Sqlite(Vec<SqliteAlterColumn>),
 }
 
@@ -82,22 +104,23 @@ pub(crate) enum PostgresAlterColumn {
     DropDefault,
     DropNotNull,
     SetType(ColumnType),
-    // Not used yet:
-    // SetNotNull,
-    // Rename { previous_name: String, next_name: String },
+    SetNotNull,
 }
 
 /// https://dev.mysql.com/doc/refman/8.0/en/alter-table.html
+///
+/// We don't use SET DEFAULT because it can't be used to set the default to an expression on most
+/// MySQL versions. We use MODIFY for default changes instead.
 #[derive(Debug)]
 pub(crate) enum MysqlAlterColumn {
-    SetDefault(sql_schema_describer::DefaultValue),
     DropDefault,
-    // Not used yet:
-    // Rename { previous_name: String, next_name: String },
+    Modify {
+        new_default: Option<DefaultValue>,
+        changes: ColumnChanges,
+    },
 }
 
 #[derive(Debug)]
 pub(crate) enum SqliteAlterColumn {
-    // Not used yet:
-// Rename { previous_name: String, next_name: String },
+    // Not used yet
 }
