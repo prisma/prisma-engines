@@ -1,4 +1,5 @@
 extern crate datamodel;
+use self::datamodel::Datamodel;
 use crate::common::*;
 use pretty_assertions::assert_eq;
 
@@ -142,4 +143,23 @@ model User {
     print!("{}", rendered);
 
     assert_eq!(rendered, input);
+}
+
+#[test]
+fn experimental_features_roundtrip() {
+    let input = r#"generator client {
+  provider             = "prisma-client-js"
+  experimentalFeatures = ["connectOrCreate", "transactionApi"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = "postgresql://test"
+}"#;
+
+    let dml = datamodel::parse_configuration(input).unwrap();
+    let rendered = datamodel::render_datamodel_and_config_to_string(&Datamodel::new(), &dml).unwrap();
+
+    print!("{}", rendered);
+    assert_eq!(input, rendered);
 }
