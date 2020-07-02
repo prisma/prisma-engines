@@ -344,21 +344,27 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
     }
 
     if !changed_scalar_field_names.is_empty() {
-        let models_and_fields = changed_scalar_field_names.iter().map(|c| c.0.clone()).collect();
+        let models_and_fields = changed_scalar_field_names
+            .iter()
+            .map(|c| ModelAndField::new(&c.0.model, &c.1))
+            .collect();
         introspection_result
             .warnings
             .push(warning_enriched_with_map_on_field(&models_and_fields));
     }
 
     if !changed_enum_names.is_empty() {
-        let enums = changed_enum_names.iter().map(|c| c.0.clone()).collect();
+        let enums = changed_enum_names.iter().map(|c| Enum::new(&c.1)).collect();
         introspection_result
             .warnings
             .push(warning_enriched_with_map_on_enum(&enums));
     }
 
     if !changed_enum_values.is_empty() {
-        let enums_and_values = changed_enum_values.iter().map(|c| c.0.clone()).collect();
+        let enums_and_values = changed_enum_values
+            .iter()
+            .map(|c| EnumAndValue::new(&c.0.enm, &c.1))
+            .collect();
         introspection_result
             .warnings
             .push(warning_enriched_with_map_on_enum_value(&enums_and_values));
