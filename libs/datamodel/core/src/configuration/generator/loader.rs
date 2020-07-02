@@ -102,13 +102,13 @@ impl GeneratorLoader {
         }
 
         if !&generator.experimental_features.is_empty() {
-            let features: &Vec<ast::Expression> = &generator
+            let features: Vec<ast::Expression> = generator
                 .experimental_features
                 .iter()
                 .map(|f| ast::Expression::StringValue(f.to_owned(), ast::Span::empty()))
                 .collect::<Vec<ast::Expression>>();
 
-            arguments.push(ast::Argument::new_array("experimentalFeatures", features.to_owned()));
+            arguments.push(ast::Argument::new_array("experimentalFeatures", features));
         }
 
         let platform_values: Vec<ast::Expression> = generator
