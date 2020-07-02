@@ -68,25 +68,56 @@ where
 }
 
 pub fn aggregate(model: &ModelRef, aggregators: &[Aggregator], args: QueryArguments) -> Select<'static> {
-    let base = args.into_select(model);
+    let columns = extract_columns(model, &aggregators);
+    let sub_query = get_records(model, columns.into_iter(), args);
+    let sub_table = Table::from(sub_query);
 
-    aggregators.into_iter().fold(base, |select, next_op| match next_op {
-        Aggregator::Count => select.value(count(asterisk())),
+    aggregators
+        .into_iter()
+        .fold(Select::from_table(sub_table), |select, next_op| match next_op {
+            Aggregator::Count => select.value(count(asterisk())),
 
-        Aggregator::Average(fields) => fields
-            .into_iter()
-            .fold(select, |select, next_field| select.value(avg(next_field.as_column()))),
+            Aggregator::Average(fields) => fields.into_iter().fold(select, |select, next_field| {
+                select.value(avg(col_alias("avg", &next_field.name)))
+            }),
 
-        Aggregator::Sum(fields) => fields
-            .into_iter()
-            .fold(select, |select, next_field| select.value(sum(next_field.as_column()))),
+            Aggregator::Sum(fields) => fields.into_iter().fold(select, |select, next_field| {
+                select.value(sum(col_alias("sum", &next_field.name)))
+            }),
 
-        Aggregator::Min(fields) => fields
-            .into_iter()
-            .fold(select, |select, next_field| select.value(min(next_field.as_column()))),
+            Aggregator::Min(fields) => fields.into_iter().fold(select, |select, next_field| {
+                select.value(min(col_alias("min", &next_field.name)))
+            }),
 
-        Aggregator::Max(fields) => fields
-            .into_iter()
-            .fold(select, |select, next_field| select.value(max(next_field.as_column()))),
-    })
+            Aggregator::Max(fields) => fields.into_iter().fold(select, |select, next_field| {
+                select.value(max(col_alias("max", &next_field.name)))
+            }),
+        })
+}
+
+fn extract_columns(model: &ModelRef, aggregators: &[Aggregator]) -> Vec<Column<'static>> {
+    aggregators
+        .iter()
+        .flat_map(|aggregator| match aggregator {
+            Aggregator::Count => model.primary_identifier().as_columns().collect(),
+            Aggregator::Average(fields) => map_aggregator_field_columns("avg", fields),
+            Aggregator::Sum(fields) => map_aggregator_field_columns("sum", fields),
+            Aggregator::Min(fields) => map_aggregator_field_columns("min", fields),
+            Aggregator::Max(fields) => map_aggregator_field_columns("max", fields),
+        })
+        .collect()
+}
+
+fn map_aggregator_field_columns(prefix: &str, fields: &[ScalarFieldRef]) -> Vec<Column<'static>> {
+    fields
+        .into_iter()
+        .map(|f| {
+            let col = f.as_column();
+            col.alias(col_alias(prefix, &f.name))
+        })
+        .collect()
+}
+
+fn col_alias(prefix: &str, field_name: &str) -> String {
+    format!("{}_{}", prefix, field_name)
 }

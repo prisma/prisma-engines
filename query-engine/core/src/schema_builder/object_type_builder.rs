@@ -237,9 +237,11 @@ impl<'a> ObjectTypeBuilder<'a> {
             self.numeric_aggregation_field("avg", &model, Some(OutputType::float())),
         );
 
-        append_opt(&mut fields, self.numeric_aggregation_field("sum", &model, None));
-        append_opt(&mut fields, self.numeric_aggregation_field("min", &model, None));
-        append_opt(&mut fields, self.numeric_aggregation_field("max", &model, None));
+        if feature_flags::get().aggregations {
+            append_opt(&mut fields, self.numeric_aggregation_field("sum", &model, None));
+            append_opt(&mut fields, self.numeric_aggregation_field("min", &model, None));
+            append_opt(&mut fields, self.numeric_aggregation_field("max", &model, None));
+        }
 
         object.set_fields(fields);
         self.cache(name, ObjectTypeStrongRef::clone(&object));

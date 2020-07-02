@@ -165,15 +165,15 @@ fn extract_query_idents(aggregators: &[Aggregator]) -> Vec<(TypeIdentifier, Fiel
         .iter()
         .flat_map(|aggregator| match aggregator {
             Aggregator::Count => vec![(TypeIdentifier::Int, FieldArity::Required)],
-            Aggregator::Average(fields) => map_aggregator_fields(&fields, Some(TypeIdentifier::Float)),
-            Aggregator::Sum(fields) => map_aggregator_fields(&fields, None),
-            Aggregator::Min(fields) => map_aggregator_fields(&fields, None),
-            Aggregator::Max(fields) => map_aggregator_fields(&fields, None),
+            Aggregator::Average(fields) => map_aggregator_field_types(&fields, Some(TypeIdentifier::Float)),
+            Aggregator::Sum(fields) => map_aggregator_field_types(&fields, None),
+            Aggregator::Min(fields) => map_aggregator_field_types(&fields, None),
+            Aggregator::Max(fields) => map_aggregator_field_types(&fields, None),
         })
         .collect()
 }
 
-fn map_aggregator_fields(
+fn map_aggregator_field_types(
     fields: &[ScalarFieldRef],
     fixed_type: Option<TypeIdentifier>,
 ) -> Vec<(TypeIdentifier, FieldArity)> {
