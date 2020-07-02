@@ -2,6 +2,7 @@ use super::dmmf::get_query_schema;
 use crate::dmmf::*;
 use codegen::{Scope, Struct, Type};
 use serial_test::serial;
+use std::collections::HashMap;
 use std::fs::File;
 use std::io::prelude::*;
 use std::sync::Arc;
@@ -18,9 +19,10 @@ fn client_generator_test() {
         }
 
         model Post {
-            postId   String  @id
-            title    String
-            subTitle String
+            postId      String  @id
+            title       String
+            subTitle    String
+            subSubTitle String?
             
             @@unique([title, subTitle])
         }
@@ -51,6 +53,25 @@ fn client_generator_test() {
             for field in input.fields.iter() {
                 input_struct.field(&format!("pub {}", &field.name), map_type(&field.input_type));
             }
+            let impl_block = scope.new_impl(&input.name);
+            let constructor = impl_block.new_fn("new").vis("pub").ret(&input.name).line("todo!()");
+            for field in input.fields.iter() {
+                if field.input_type.is_required {
+                    constructor.arg(&field.name, map_type(&field.input_type));
+                }
+            }
+
+            for field in input.fields.iter() {
+                if !field.input_type.is_required {
+                    impl_block
+                        .new_fn(&field.name)
+                        .vis("pub")
+                        .arg_self()
+                        .arg(&field.name, map_type(&field.input_type))
+                        .ret(&input.name)
+                        .line("todo!()");
+                }
+            }
         }
     }
 
@@ -79,24 +100,76 @@ fn client_generator_test() {
         .find(|ot| ot.name == "Mutation")
         .unwrap();
 
-    let _ = new_struct(&mut scope, "PrismaClient");
+    let client = new_struct(&mut scope, "PrismaClient");
+
+    for model in model_output_types.iter() {
+        let the_name = format!("{}Operations", &model.name);
+        client.field(&format!("pub {}", &model.name), the_name.to_string());
+
+        //        let the_impl = scope.new_impl(&the_name);
+        //        operation_impls_for_model.insert(model.name.to_string(), the_impl);
+    }
+
+    let mut operation_impls_for_model: HashMap<String, codegen::Impl> = HashMap::new();
+    for model in model_output_types.iter() {
+        let the_name = format!("{}Operations", &model.name);
+        scope.new_struct(&the_name).vis("pub");
+    }
+
+    for model in model_output_types.iter() {
+        let the_name = format!("{}Operations", &model.name);
+        let the_impl = codegen::Impl::new(the_name);
+        operation_impls_for_model.insert(model.name.to_string(), the_impl);
+    }
+
+    for query_field in query_type.fields.iter() {
+        if let Some(model) = query_field.model.as_ref() {
+            let function = {
+                let the_impl = operation_impls_for_model.get_mut(model.as_str()).unwrap();
+
+                let model_stripped_from_name = query_field.name.trim_end_matches(model);
+                the_impl.new_fn(&model_stripped_from_name).arg_ref_self()
+            };
+
+            function.arg_ref_self();
+            for arg in query_field.args.iter() {
+                let arg_name = if &arg.name == "where" { "where_" } else { &arg.name };
+
+                function.arg(arg_name, &map_type(&arg.input_type)).vis("pub");
+            }
+            function.ret(&map_type(&query_field.output_type));
+            function.line("todo!()");
+        }
+    }
+
     let client_impl = scope.new_impl("PrismaClient");
     client_impl.new_fn("new").vis("pub").ret("PrismaClient").line("todo!()");
 
     for query_field in query_type.fields.iter() {
-        let function = client_impl.new_fn(&query_field.name);
-        function.arg_ref_self();
-        for arg in query_field.args.iter() {
-            let arg_name = if &arg.name == "where" { "where_" } else { &arg.name };
+        if query_field.model.is_none() {
+            let function = client_impl.new_fn(&query_field.name);
 
-            function.arg(arg_name, &map_type(&arg.input_type)).vis("pub");
+            function.arg_ref_self();
+            for arg in query_field.args.iter() {
+                let arg_name = if &arg.name == "where" { "where_" } else { &arg.name };
+
+                function.arg(arg_name, &map_type(&arg.input_type)).vis("pub");
+            }
+            function.ret(&map_type(&query_field.output_type));
+            function.line("todo!()");
         }
-        function.ret(&map_type(&query_field.output_type));
-        function.line("todo!()");
     }
 
     for mutation_field in mutation_type.fields.iter() {
-        let function = client_impl.new_fn(&mutation_field.name);
+        //        let function = client_impl.new_fn(&mutation_field.name);
+        let model = mutation_field.model.as_ref().unwrap();
+        let function = {
+            let the_impl = operation_impls_for_model.get_mut(model.as_str()).unwrap();
+
+            let model_stripped_from_name = mutation_field.name.trim_end_matches(model);
+            the_impl.new_fn(&model_stripped_from_name).arg_ref_self()
+        };
+
         function.arg_ref_self();
         for arg in mutation_field.args.iter() {
             let arg_name = if &arg.name == "where" { "where_" } else { &arg.name };
@@ -105,6 +178,10 @@ fn client_generator_test() {
             function.ret(&map_type(&mutation_field.output_type));
         }
         function.line("todo!()");
+    }
+
+    for (_, impl_to_push) in operation_impls_for_model.into_iter() {
+        scope.push_impl(impl_to_push);
     }
 
     for an_enum in dmmf.schema.enums.iter() {
@@ -123,12 +200,12 @@ fn map_type(dmmf_type: &DMMFTypeInfo) -> Type {
         x => x,
     };
 
-    if dmmf_type.is_nullable {
-        let mut tpe = Type::new("Option");
+    if dmmf_type.is_list {
+        let mut tpe = Type::new("Vec");
         tpe.generic(x);
         tpe
-    } else if dmmf_type.is_list {
-        let mut tpe = Type::new("Vec");
+    } else if !dmmf_type.is_required {
+        let mut tpe = Type::new("Option");
         tpe.generic(x);
         tpe
     } else {

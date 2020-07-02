@@ -33,6 +33,7 @@ impl DMMFFieldRenderer {
             name: field.name.clone(),
             args,
             output_type,
+            model: field.model.clone(),
         };
 
         ctx.add_mapping(field.name.clone(), field.query_builder.as_ref());

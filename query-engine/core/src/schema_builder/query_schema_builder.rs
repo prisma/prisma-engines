@@ -222,6 +222,7 @@ impl<'a> QuerySchemaBuilder<'a> {
                         }),
                     ))),
                 )
+                .set_model(&model.name)
             })
     }
 
@@ -251,6 +252,7 @@ impl<'a> QuerySchemaBuilder<'a> {
                 }),
             ))),
         )
+        .set_model(&model.name)
     }
 
     /// Builds an "aggregate" query field (e.g. "aggregateUser") for given model.
@@ -276,6 +278,7 @@ impl<'a> QuerySchemaBuilder<'a> {
                 }),
             ))),
         )
+        .set_model(&model.name)
     }
 
     fn create_execute_raw_field(&self) -> Field {
@@ -337,6 +340,7 @@ impl<'a> QuerySchemaBuilder<'a> {
                 }),
             ))),
         )
+        .set_model(&model.name)
     }
 
     /// Builds a delete mutation field (e.g. deleteUser) for given model.
@@ -364,6 +368,7 @@ impl<'a> QuerySchemaBuilder<'a> {
                     }),
                 ))),
             )
+            .set_model(&model.name)
         })
     }
 
@@ -390,6 +395,7 @@ impl<'a> QuerySchemaBuilder<'a> {
                 }),
             ))),
         )
+        .set_model(&model.name)
     }
 
     /// Builds an update mutation field (e.g. updateUser) for given model.
@@ -415,6 +421,7 @@ impl<'a> QuerySchemaBuilder<'a> {
                     }),
                 ))),
             )
+            .set_model(&model.name)
         })
     }
 
@@ -441,6 +448,7 @@ impl<'a> QuerySchemaBuilder<'a> {
                 }),
             ))),
         )
+        .set_model(&model.name)
     }
 
     /// Builds an upsert mutation field (e.g. upsertUser) for given model.
@@ -464,6 +472,7 @@ impl<'a> QuerySchemaBuilder<'a> {
                     }),
                 ))),
             )
+            .set_model(&model.name)
         })
     }
 

@@ -77,6 +77,7 @@ where
         arguments,
         field_type: Arc::new(field_type),
         query_builder,
+        model: None,
     }
 }
 

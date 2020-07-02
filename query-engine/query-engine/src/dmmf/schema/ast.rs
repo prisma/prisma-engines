@@ -22,6 +22,7 @@ pub struct DMMFField {
     pub name: String,
     pub args: Vec<DMMFArgument>,
     pub output_type: DMMFTypeInfo,
+    pub model: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

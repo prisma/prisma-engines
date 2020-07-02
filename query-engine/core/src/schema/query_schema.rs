@@ -152,11 +152,19 @@ pub struct Field {
     pub arguments: Vec<Argument>,
     pub field_type: OutputTypeRef,
     pub query_builder: Option<SchemaQueryBuilder>,
+    // set if this can be attributed to a Model somehow
+    pub model: Option<String>,
 }
 
 impl Field {
     pub fn query_builder(&self) -> Option<&SchemaQueryBuilder> {
         self.query_builder.as_ref()
+    }
+
+    pub fn set_model(self, model: &str) -> Self {
+        let mut mut_self = self;
+        mut_self.model = Some(model.to_string());
+        mut_self
     }
 }
 
