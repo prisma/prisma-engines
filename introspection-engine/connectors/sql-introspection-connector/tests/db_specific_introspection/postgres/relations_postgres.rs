@@ -748,7 +748,7 @@ async fn introspecting_a_relation_based_on_an_unsupported_type_should_drop_it(ap
     );
 
     let result = dbg!(api.introspect().await);
-    assert_eq!(&result, "model Post {\n  id                  Int      @default(autoincrement()) @id\n  // This type is currently not supported.\n  // user_network_mac macaddr?\n}\n\nmodel User {\n  id             Int     @default(autoincrement()) @id\n  // This type is currently not supported.\n  // network_mac macaddr @unique\n}");
+    assert_eq!(&result, "model Post {\n  id                  Int      @default(autoincrement()) @id\n  // This type is currently not supported.\n  // user_network_mac macaddr?\n}\n\nmodel User {\n  id             Int     @default(autoincrement()) @id\n  // This type is currently not supported.\n  // network_mac macaddr @unique\n}\n");
 }
 
 // #[test_each_connector(tags("postgres"))]
