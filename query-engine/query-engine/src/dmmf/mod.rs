@@ -2,7 +2,7 @@ mod schema;
 
 use datamodel;
 use query_core::schema::{QuerySchemaRef, QuerySchemaRenderer};
-use schema::*;
+pub use schema::*;
 use serde::{ser::SerializeMap, Serialize, Serializer};
 use std::cmp::Ordering;
 use std::{cell::RefCell, collections::HashMap};

@@ -120,7 +120,7 @@ fn must_not_fail_on_missing_env_vars_in_a_datasource() {
         .expect("finding BlogCreateInput");
 }
 
-fn get_query_schema(datamodel_string: &str) -> (QuerySchema, datamodel::dml::Datamodel) {
+pub fn get_query_schema(datamodel_string: &str) -> (QuerySchema, datamodel::dml::Datamodel) {
     feature_flags::initialize(&vec![String::from("all")]).unwrap();
 
     let dm = datamodel::parse_datamodel_and_ignore_datasource_urls(datamodel_string).unwrap();
