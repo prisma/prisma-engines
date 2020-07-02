@@ -4,7 +4,7 @@ import org.scalatest.{FlatSpec, Matchers}
 import play.api.libs.json.JsNull
 import util._
 
-class SumAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
+class MinAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
   val project = SchemaDsl.fromStringV11() {
     """model Item {
       |  id    String @id @default(cuid())
@@ -35,11 +35,11 @@ class SumAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     )
   }
 
-  "Summing with no records in the database" should "return null" in {
+  "Calculating min with no records in the database" should "return null" in {
     val result = server.query(
       s"""{
          |  aggregateItem {
-         |    sum {
+         |    min {
          |      float
          |      int
          |    }
@@ -48,18 +48,18 @@ class SumAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       project
     )
 
-    result.pathAsJsValue("data.aggregateItem.sum.float") should be(JsNull)
-    result.pathAsJsValue("data.aggregateItem.sum.int") should be(JsNull)
+    result.pathAsJsValue("data.aggregateItem.min.float") should be(JsNull)
+    result.pathAsJsValue("data.aggregateItem.min.int") should be(JsNull)
   }
 
-  "Summing with some records in the database" should "return the correct sum" in {
+  "Calculating min with some records in the database" should "return the correct minima" in {
     createItem(5.5, 5)
     createItem(4.5, 10)
 
     val result = server.query(
       s"""{
          |  aggregateItem {
-         |    sum {
+         |    min {
          |      float
          |      int
          |    }
@@ -68,11 +68,11 @@ class SumAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       project
     )
 
-    result.pathAsDouble("data.aggregateItem.sum.float") should be(10.0)
-    result.pathAsInt("data.aggregateItem.sum.int") should be(15)
+    result.pathAsDouble("data.aggregateItem.min.float") should be(4.5)
+    result.pathAsDouble("data.aggregateItem.min.int") should be(5)
   }
 
-  "Summing with all sorts of query arguments" should "work" in {
+  "Calculating min with all sorts of query arguments" should "work" in {
     createItem(5.5, 5, Some("1"))
     createItem(4.5, 10, Some("2"))
     createItem(1.5, 2, Some("3"))
@@ -81,7 +81,7 @@ class SumAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     var result = server.query(
       """{
         |  aggregateItem(take: 2) {
-        |    sum {
+        |    min {
         |      float
         |      int
         |    }
@@ -91,13 +91,13 @@ class SumAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       project
     )
 
-    result.pathAsDouble("data.aggregateItem.sum.float") should be(10.0)
-    result.pathAsInt("data.aggregateItem.sum.int") should be(15)
+    result.pathAsDouble("data.aggregateItem.min.float") should be(4.5)
+    result.pathAsInt("data.aggregateItem.min.int") should be(5)
 
     result = server.query(
       """{
         |  aggregateItem(take: 5) {
-        |    sum {
+        |    min {
         |      float
         |      int
         |    }
@@ -107,13 +107,13 @@ class SumAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       project
     )
 
-    result.pathAsDouble("data.aggregateItem.sum.float") should be(11.5)
-    result.pathAsInt("data.aggregateItem.sum.int") should be(18)
+    result.pathAsDouble("data.aggregateItem.min.float") should be(0.0)
+    result.pathAsInt("data.aggregateItem.min.int") should be(1)
 
     result = server.query(
       """{
         |  aggregateItem(take: -5) {
-        |    sum {
+        |    min {
         |      float
         |      int
         |    }
@@ -123,13 +123,13 @@ class SumAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       project
     )
 
-    result.pathAsDouble("data.aggregateItem.sum.float") should be(11.5)
-    result.pathAsInt("data.aggregateItem.sum.int") should be(18)
+    result.pathAsDouble("data.aggregateItem.min.float") should be(0.0)
+    result.pathAsInt("data.aggregateItem.min.int") should be(1)
 
     result = server.query(
       """{
         |  aggregateItem(where: { id_gt: "2" }) {
-        |    sum {
+        |    min {
         |      float
         |      int
         |    }
@@ -139,13 +139,13 @@ class SumAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       project
     )
 
-    result.pathAsDouble("data.aggregateItem.sum.float") should be(1.5)
-    result.pathAsInt("data.aggregateItem.sum.int") should be(3)
+    result.pathAsDouble("data.aggregateItem.min.float") should be(0.0)
+    result.pathAsInt("data.aggregateItem.min.int") should be(1)
 
     result = server.query(
       """{
         |  aggregateItem(skip: 2) {
-        |    sum {
+        |    min {
         |      float
         |      int
         |    }
@@ -155,13 +155,13 @@ class SumAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       project
     )
 
-    result.pathAsDouble("data.aggregateItem.sum.float") should be(1.5)
-    result.pathAsInt("data.aggregateItem.sum.int") should be(3)
+    result.pathAsDouble("data.aggregateItem.min.float") should be(0.0)
+    result.pathAsInt("data.aggregateItem.min.int") should be(1)
 
     result = server.query(
       s"""{
         |  aggregateItem(cursor: { id: "3" }) {
-        |    sum {
+        |    min {
         |      float
         |      int
         |    }
@@ -171,7 +171,7 @@ class SumAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       project
     )
 
-    result.pathAsDouble("data.aggregateItem.sum.float") should be(1.5)
-    result.pathAsInt("data.aggregateItem.sum.int") should be(3)
+    result.pathAsDouble("data.aggregateItem.min.float") should be(0.0)
+    result.pathAsInt("data.aggregateItem.min.int") should be(1)
   }
 }
