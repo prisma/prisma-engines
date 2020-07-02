@@ -70,7 +70,7 @@ where
 pub fn aggregate(model: &ModelRef, aggregators: &[Aggregator], args: QueryArguments) -> Select<'static> {
     let columns = extract_columns(model, &aggregators);
     let sub_query = get_records(model, columns.into_iter(), args);
-    let sub_table = Table::from(sub_query);
+    let sub_table = Table::from(sub_query).alias("sub");
 
     aggregators
         .into_iter()
