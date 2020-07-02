@@ -36,6 +36,7 @@ fn client_generator_test() {
 
     let mut scope = Scope::new();
 
+    scope.raw("#![allow(non_snake_case, dead_code, unused_variables, non_camel_case_types)]");
     scope.raw("/// INPUT TYPES");
     for input in inputs.iter() {
         if input.is_one_of {
@@ -104,6 +105,13 @@ fn client_generator_test() {
             function.ret(&map_type(&mutation_field.output_type));
         }
         function.line("todo!()");
+    }
+
+    for an_enum in dmmf.schema.enums.iter() {
+        let the_enum = scope.new_enum(&an_enum.name).vis("pub");
+        for variant in an_enum.values.iter() {
+            the_enum.new_variant(&variant);
+        }
     }
 
     write_to_disk(&scope.to_string());
