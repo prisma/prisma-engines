@@ -39,13 +39,6 @@ impl<'a> SqlSchemaCalculator<'a> {
 
         tables.append(&mut relation_tables);
 
-        // guarantee same sorting as in the sql-schema-describer
-        for table in &mut tables {
-            table
-                .columns
-                .sort_unstable_by(|a, b| a.name.as_str().cmp(b.name.as_str()));
-        }
-
         let enums = self.calculate_enums();
         let sequences = Vec::new();
 

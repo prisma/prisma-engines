@@ -148,7 +148,7 @@ impl SqlSchemaDescriber {
                 data_type
             FROM information_schema.columns
             WHERE table_schema = $1
-            COLLATE "default"
+            ORDER BY column_name
         "#;
 
         let rows = self
