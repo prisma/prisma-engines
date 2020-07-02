@@ -7,7 +7,7 @@ import util._
 class CountAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
   val project = SchemaDsl.fromStringV11() {
     """model Item {
-      |  id    String @id @default(cuid())
+      |  id   String @id @default(cuid())
       |  name String
       |}
     """.stripMargin
