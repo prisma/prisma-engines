@@ -32,6 +32,7 @@ async fn unapply_must_work(api: &TestApi) -> TestResult {
         .assert_table("Test", |table| table.assert_does_not_have_column("field"))?
         .into_schema();
 
+    println!("{:?}", &result1);
     api.unapply_migration().send().await?;
     api.assert_schema().await?.assert_equals(&result1)?;
 
