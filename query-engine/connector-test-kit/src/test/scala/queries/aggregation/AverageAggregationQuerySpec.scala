@@ -21,8 +21,8 @@ class AverageAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBas
 
   def createItem(float: Double, int: Int, id: Option[String] = None) = {
     val idString = id match {
-      case Some(id) => s"""id: "$id","""
-      case None     => ""
+      case Some(i) => s"""id: "$i","""
+      case None    => ""
     }
 
     server.query(
