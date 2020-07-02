@@ -77,7 +77,8 @@ enum CategoryEnum {
   A
   B
   C
-}"#;
+}
+"#;
 
     let dml = parse(input);
     let rendered = datamodel::render_datamodel_to_string(&dml).unwrap();
@@ -108,7 +109,8 @@ model Post {
   title  String
   blogId Int
   blog   Blog   @relation(fields: [blogId], references: [id])
-}"#;
+}
+"#;
 
     let dml = parse(input);
     let rendered = datamodel::render_datamodel_to_string(&dml).unwrap();
@@ -131,7 +133,8 @@ model User {
   name      String?
 
   @@map("user")
-}"#;
+}
+"#;
 
     let dml = parse(input);
     let rendered = datamodel::render_datamodel_to_string(&dml).unwrap();
