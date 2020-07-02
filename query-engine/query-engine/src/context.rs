@@ -54,7 +54,7 @@ impl PrismaContext {
             .ok_or_else(|| PrismaError::ConfigurationError("No valid data source found".into()))?;
 
         // Load executor
-        let (db_name, executor) = exec_loader::load(&**data_source).await?;
+        let (db_name, executor) = exec_loader::load(&data_source).await?;
 
         // Build internal data model
         let internal_data_model = template.build(db_name);

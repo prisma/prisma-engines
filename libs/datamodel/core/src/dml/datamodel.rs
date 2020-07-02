@@ -169,4 +169,31 @@ impl Datamodel {
         }
         fields
     }
+
+    /// Finds a relation field related to a relation info
+    pub fn find_related_field_for_info(&self, info: &RelationInfo) -> &Field {
+        self.find_model(&info.to)
+            .expect("The model referred to by a RelationInfo should always exist.")
+            .fields()
+            .find(|f| match &f.field_type {
+                FieldType::Relation(other_info) => {
+                    other_info.name == info.name
+                    // This is to differentiate the opposite field from self in the self relation case.
+                    && other_info.to_fields != info.to_fields
+                    && other_info.fields != info.fields
+                }
+                _ => false,
+            })
+            .expect("Every RelationInfo should have a complementary RelationInfo on the opposite relation field.")
+    }
+
+    /// Returns (model_name, field_name) for all relation fields pointing to a specific model.
+    pub fn find_related_info(&self, info: &RelationInfo) -> &RelationInfo {
+        let field = self.find_related_field_for_info(info);
+
+        match &field.field_type {
+            FieldType::Relation(relation_info) => return relation_info,
+            _ => unreachable!("Every relation field has a relation info."),
+        }
+    }
 }

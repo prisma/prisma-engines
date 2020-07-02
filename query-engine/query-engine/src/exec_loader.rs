@@ -3,7 +3,7 @@ use connector::Connector;
 
 use datamodel::{
     configuration::{MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME},
-    Source,
+    Datasource,
 };
 use query_core::executor::{InterpretingExecutor, QueryExecutor};
 use std::{collections::HashMap, path::PathBuf};
@@ -15,10 +15,8 @@ use sql_connector::*;
 #[cfg(all(feature = "sql", feature = "mssql"))]
 use datamodel::configuration::MSSQL_SOURCE_NAME;
 
-pub async fn load(
-    source: &(dyn Source + Send + Sync),
-) -> PrismaResult<(String, Box<dyn QueryExecutor + Send + Sync + 'static>)> {
-    match source.connector_type() {
+pub async fn load(source: &Datasource) -> PrismaResult<(String, Box<dyn QueryExecutor + Send + Sync + 'static>)> {
+    match source.active_provider.as_str() {
         #[cfg(feature = "sql")]
         SQLITE_SOURCE_NAME => sqlite(source).await,
 
@@ -39,9 +37,7 @@ pub async fn load(
 }
 
 #[cfg(feature = "sql")]
-async fn sqlite(
-    source: &(dyn Source + Send + Sync),
-) -> PrismaResult<(String, Box<dyn QueryExecutor + Send + Sync + 'static>)> {
+async fn sqlite(source: &Datasource) -> PrismaResult<(String, Box<dyn QueryExecutor + Send + Sync + 'static>)> {
     trace!("Loading SQLite connector...");
 
     let sqlite = Sqlite::from_source(source).await?;
@@ -53,9 +49,7 @@ async fn sqlite(
 }
 
 #[cfg(feature = "sql")]
-async fn postgres(
-    source: &(dyn Source + Send + Sync),
-) -> PrismaResult<(String, Box<dyn QueryExecutor + Send + Sync + 'static>)> {
+async fn postgres(source: &Datasource) -> PrismaResult<(String, Box<dyn QueryExecutor + Send + Sync + 'static>)> {
     trace!("Loading Postgres connector...");
 
     let url = Url::parse(&source.url().value)?;
@@ -78,9 +72,7 @@ async fn postgres(
 }
 
 #[cfg(feature = "sql")]
-async fn mysql(
-    source: &(dyn Source + Send + Sync),
-) -> PrismaResult<(String, Box<dyn QueryExecutor + Send + Sync + 'static>)> {
+async fn mysql(source: &Datasource) -> PrismaResult<(String, Box<dyn QueryExecutor + Send + Sync + 'static>)> {
     trace!("Loading MySQL connector...");
 
     let mysql = Mysql::from_source(source).await?;
@@ -98,9 +90,7 @@ async fn mysql(
 }
 
 #[cfg(all(feature = "sql", feature = "mssql"))]
-async fn mssql(
-    source: &(dyn Source + Send + Sync),
-) -> PrismaResult<(String, Box<dyn QueryExecutor + Send + Sync + 'static>)> {
+async fn mssql(source: &Datasource) -> PrismaResult<(String, Box<dyn QueryExecutor + Send + Sync + 'static>)> {
     trace!("Loading SQL Server connector...");
 
     let mssql = Mssql::from_source(source).await?;

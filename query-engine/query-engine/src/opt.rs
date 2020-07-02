@@ -142,7 +142,7 @@ impl PrismaOpt {
 
                     for datasource_override in datasource_overwrites {
                         for datasource in &mut configuration.datasources {
-                            if &datasource_override.name == datasource.name() {
+                            if datasource_override.name == datasource.name {
                                 debug!(
                                     "overwriting datasource {} with url {}",
                                     &datasource_override.name, &datasource_override.url

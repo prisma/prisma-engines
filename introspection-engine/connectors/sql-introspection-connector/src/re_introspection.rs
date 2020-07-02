@@ -43,7 +43,7 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
     // enum values                              -> done         yes
 
     // println!("{:#?}", old_data_model);
-    // println!("{:#?}", new_data_model);
+    // println!("{:#?}", introspection_result.datamodel);
 
     let new_data_model = &mut introspection_result.datamodel;
 
@@ -102,13 +102,8 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
                         old_model.find_field_db_name(&field.database_name.as_ref().unwrap_or(&field.name))
                     {
                         if model.find_field(&old_field.name).is_none() {
-                            changed_scalar_field_names.push((
-                                ModelAndField {
-                                    model: model.name.clone(),
-                                    field: field.name.clone(),
-                                },
-                                old_field.name.clone(),
-                            ))
+                            let mf = ModelAndField::new(&model.name, &field.name);
+                            changed_scalar_field_names.push((mf, old_field.name.clone()))
                         }
                     }
                 }
@@ -176,23 +171,8 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
                         })
                         .count();
 
-                    let (other_relation_field, other_info) = other_model_in_relation
-                        .fields()
-                        .find_map(|f| {
-                            match &f.field_type {
-                                FieldType::Relation(other_info)
-                                    if other_info.name == info.name
-                                        && other_info.to == changed_model.name
-                                        // This is to differentiate the opposite field from self in the self relation case.
-                                        && other_info.to_fields != info.to_fields
-                                        && other_info.fields != info.fields =>
-                                {
-                                    Some((f.name.clone(), other_info))
-                                }
-                                _ => None,
-                            }
-                        })
-                        .unwrap();
+                    let other_relation_field = new_data_model.find_related_field_for_info(info).name.clone();
+                    let other_info = new_data_model.find_related_info(info);
 
                     let (model_with_fk, referenced_model, fk_column_name) = if info.to_fields.is_empty() {
                         // does not hold the fk
@@ -280,13 +260,8 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
                         old_enum.find_value_db_name(value.database_name.as_ref().unwrap_or(&value.name.to_owned()))
                     {
                         if enm.find_value(&old_value.name).is_none() {
-                            changed_enum_values.push((
-                                EnumAndValue {
-                                    enm: enm.name.clone(),
-                                    value: value.name.clone(),
-                                },
-                                old_value.name.clone(),
-                            ))
+                            let ev = EnumAndValue::new(&enm.name, &value.name);
+                            changed_enum_values.push((ev, old_value.name.clone()))
                         }
                     }
                 }
@@ -322,18 +297,17 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
     {
         for model in &new_data_model.models {
             for field in &model.fields {
-                if let FieldType::Relation(info) = &field.field_type {
+                if let FieldType::Relation(new_info) = &field.field_type {
                     if let Some(old_model) = old_data_model.find_model(&model.name) {
                         for old_field in &old_model.fields {
                             if let FieldType::Relation(old_info) = &old_field.field_type {
-                                if old_info == info {
-                                    changed_relation_field_names.push((
-                                        ModelAndField {
-                                            model: model.name.clone(),
-                                            field: field.name.clone(),
-                                        },
-                                        old_field.name.clone(),
-                                    ));
+                                let other_old_info = old_data_model.find_related_info(&old_info);
+                                let other_new_info = new_data_model.find_related_info(&new_info);
+                                //the relationinfos of both sides need to be compared since the relationinfo of the
+                                // non-fk side does not contain enough information to uniquely identify the correct relationfield
+                                if old_info == new_info && other_old_info == other_new_info {
+                                    let mf = ModelAndField::new(&model.name, &field.name);
+                                    changed_relation_field_names.push((mf, old_field.name.clone()));
                                 }
                             }
                         }

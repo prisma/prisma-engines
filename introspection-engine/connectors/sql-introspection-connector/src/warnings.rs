@@ -17,6 +17,15 @@ pub struct ModelAndField {
     pub(crate) field: String,
 }
 
+impl ModelAndField {
+    pub fn new(model: &str, field: &str) -> Self {
+        ModelAndField {
+            model: model.to_owned(),
+            field: field.to_owned(),
+        }
+    }
+}
+
 #[derive(Serialize, Debug)]
 pub struct ModelAndFieldAndType {
     pub(crate) model: String,
@@ -28,6 +37,15 @@ pub struct ModelAndFieldAndType {
 pub struct EnumAndValue {
     pub(crate) enm: String,
     pub(crate) value: String,
+}
+
+impl EnumAndValue {
+    pub fn new(enm: &str, value: &str) -> Self {
+        EnumAndValue {
+            enm: enm.to_owned(),
+            value: value.to_owned(),
+        }
+    }
 }
 
 pub fn warning_models_without_identifier(affected: &Vec<Model>) -> Warning {

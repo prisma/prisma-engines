@@ -488,6 +488,64 @@ async fn re_introspecting_manually_re_mapped_enum_name(api: &TestApi) {
 }
 
 #[test_each_connector(tags("postgres"))]
+async fn re_introspecting_multiple_changed_relation_names(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("Employee", |t| {
+                t.add_column("id", types::primary());
+            });
+            migration.create_table("Schedule", |t| {
+                t.add_column("id", types::primary());
+                t.add_column("morningEmployeeId", types::foreign("Employee", "id"));
+                t.add_column("eveningEmployeeId", types::foreign("Employee", "id"));
+            });
+            migration.create_table("Unrelated", |t| {
+                t.add_column("id", types::primary());
+            });
+        })
+        .await;
+
+    let input_dm = r#"
+            model Employee {
+                  id                                            Int         @default(autoincrement()) @id
+                  A                                             Schedule[]  @relation("EmployeeToSchedule_eveningEmployeeId")
+                  Schedule_EmployeeToSchedule_morningEmployeeId Schedule[]  @relation("EmployeeToSchedule_morningEmployeeId")
+            }
+            
+            model Schedule {
+                  eveningEmployeeId                             Int
+                  id                                            Int         @default(autoincrement()) @id
+                  morningEmployeeId                             Int
+                  Employee_EmployeeToSchedule_eveningEmployeeId Employee    @relation("EmployeeToSchedule_eveningEmployeeId", fields: [eveningEmployeeId], references: [id])
+                  Employee_EmployeeToSchedule_morningEmployeeId Employee    @relation("EmployeeToSchedule_morningEmployeeId", fields: [morningEmployeeId], references: [id])
+            }
+        "#;
+
+    let final_dm = r#"
+             model Employee {
+                  id                                            Int         @default(autoincrement()) @id
+                  A                                             Schedule[]  @relation("EmployeeToSchedule_eveningEmployeeId")
+                  Schedule_EmployeeToSchedule_morningEmployeeId Schedule[]  @relation("EmployeeToSchedule_morningEmployeeId")
+            }
+            
+            model Schedule {
+                  eveningEmployeeId                             Int
+                  id                                            Int         @default(autoincrement()) @id
+                  morningEmployeeId                             Int
+                  Employee_EmployeeToSchedule_eveningEmployeeId Employee    @relation("EmployeeToSchedule_eveningEmployeeId", fields: [eveningEmployeeId], references: [id])
+                  Employee_EmployeeToSchedule_morningEmployeeId Employee    @relation("EmployeeToSchedule_morningEmployeeId", fields: [morningEmployeeId], references: [id])
+            }
+
+            model Unrelated {
+               id               Int @id @default(autoincrement())
+            }
+        "#;
+    let result = dbg!(api.re_introspect(input_dm).await);
+    custom_assert(&result, final_dm);
+}
+
+#[test_each_connector(tags("postgres"))]
 async fn re_introspecting_custom_virtual_relation_field_names(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel

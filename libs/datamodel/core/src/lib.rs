@@ -154,7 +154,7 @@ pub fn parse_configuration_and_ignore_env_errors(
 fn load_sources(
     schema_ast: &SchemaAst,
     ignore_datasource_urls: bool,
-) -> Result<Vec<Box<dyn Source + Send + Sync>>, error::ErrorCollection> {
+) -> Result<Vec<Datasource>, error::ErrorCollection> {
     let source_loader = SourceLoader::new();
     source_loader.load_sources(&schema_ast, ignore_datasource_urls)
 }
