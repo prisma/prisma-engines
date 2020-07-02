@@ -35,6 +35,7 @@ pub struct DMMFArgument {
 #[serde(rename_all = "camelCase")]
 pub struct DMMFInputType {
     pub name: String,
+    pub is_one_of: bool,
     pub fields: Vec<DMMFInputField>,
 }
 

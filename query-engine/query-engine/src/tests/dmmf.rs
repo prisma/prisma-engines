@@ -74,6 +74,29 @@ fn dmmf_create_inputs_without_fields_for_parent_records_are_correct() {
 
 #[test]
 #[serial]
+fn where_unique_inputs_must_be_flagged_as_union() {
+    let dm = r#"
+        model Blog {
+            blogId String @id
+        }
+    "#;
+
+    let (query_schema, datamodel) = get_query_schema(dm);
+
+    let dmmf = crate::dmmf::render_dmmf(&datamodel, Arc::new(query_schema));
+
+    let inputs = &dmmf.schema.input_types;
+
+    let where_unique_input = inputs
+        .iter()
+        .find(|input| input.name == "BlogWhereUniqueInput")
+        .expect("finding BlogWhereUniqueInput");
+
+    assert!(where_unique_input.is_one_of);
+}
+
+#[test]
+#[serial]
 fn must_not_fail_on_missing_env_vars_in_a_datasource() {
     let dm = r#"
         datasource pg {
