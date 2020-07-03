@@ -26,7 +26,7 @@ async fn sqlite_column_types_must_work() {
     let inspector = get_sqlite_describer(&full_sql, "sqlite_column_types_must_work").await;
     let result = inspector.describe(SCHEMA).await.expect("describing");
     let table = result.get_table("User").expect("couldn't get User table");
-    let mut expected_columns = vec![
+    let expected_columns = vec![
         Column {
             name: "int_col".to_string(),
             tpe: ColumnType {
