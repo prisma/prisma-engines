@@ -24,6 +24,7 @@ async fn remapping_fields_with_invalid_characters_should_work(api: &TestApi) {
 
     let dm = r#"
             model User {
+               id     Int @id @default(autoincrement())
                a      String @map("_a")
                b      String @map("*b")
                c      String @map("?c")
@@ -33,7 +34,6 @@ async fn remapping_fields_with_invalid_characters_should_work(api: &TestApi) {
                g_a    String @map("g a")
                h1     String
                h_a    String @map("h-a")
-               id     Int @id @default(autoincrement())
             }
         "#;
     let result = dbg!(api.introspect().await);
@@ -250,8 +250,8 @@ async fn remapping_enum_names_should_work(api: &TestApi) {
 
     let dm = r#"
         model Book {
-            color   color
             id      Int     @default(autoincrement()) @id
+            color   color
         }
 
         enum color {
@@ -280,8 +280,8 @@ async fn remapping_enum_values_should_work(api: &TestApi) {
 
     let dm = r#"
         model Book {
-            color   color
             id      Int     @default(autoincrement()) @id
+            color   color
         }
 
         enum color {
@@ -336,8 +336,8 @@ async fn remapping_enum_default_values_should_work(api: &TestApi) {
 
     let dm = r#"
         model Book {
-            color   color   @default(b_lack)
             id      Int     @default(autoincrement()) @id
+            color   color   @default(b_lack)
         }
 
         enum color{

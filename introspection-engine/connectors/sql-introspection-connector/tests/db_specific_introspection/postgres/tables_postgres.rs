@@ -147,8 +147,8 @@ async fn introspecting_a_table_with_multi_column_unique_index_must_work(api: &Te
 
     let dm = r#"
             model User {
-                firstname String
                 id      Int @id @default(autoincrement())
+                firstname String
                 lastname String
                 @@unique([firstname, lastname], name: "test")
             }
@@ -172,8 +172,8 @@ async fn introspecting_a_table_with_required_and_optional_columns_must_work(api:
     let dm = r#"
             model User {
                 id      Int @id @default(autoincrement())
-                optionalname String?
                 requiredname String
+                optionalname String?
             }
         "#;
     let result = dbg!(api.introspect().await);
@@ -224,10 +224,10 @@ async fn introspecting_a_table_with_default_values_should_work(api: &TestApi) {
     let dm = r#"
             model User {
                 a String
+                id      Int @id @default(autoincrement())
                 bool Boolean @default(false)
                 bool2 Boolean @default(false)
                 float Float @default(5.3)
-                id      Int @id @default(autoincrement())
                 int Int @default(5)
                 string String @default("Test")
             }
@@ -364,21 +364,22 @@ async fn introspecting_default_values_should_work(api: &TestApi) {
 
     let dm = r#"
             model Test {
-                boolean_boolean     Boolean?        @default(false)
                 id                  Int         @id @default(autoincrement())
-                numeric_decimal     Float?          @default(1234.1234)
-                numeric_float4      Float?          @default(123.1234)
-                numeric_float8      Float?          @default(123.1234)
                 numeric_int2        Int?            @default(2)
                 numeric_int4        Int?            @default(4)
                 numeric_int8        Int?            @default(8)
+                boolean_boolean     Boolean?        @default(false)
+                numeric_decimal     Float?          @default(1234.1234)
+                numeric_float4      Float?          @default(123.1234)
+                numeric_float8      Float?          @default(123.1234)
                 string_char         String?         @default("abcdefgh")
-                string_text         String?         @default("abcdefgh")
                 string_varchar      String?         @default("abcd")
-                time_date           DateTime?       @default(dbgenerated())
-                time_time           DateTime?       @default(now())
+                string_text         String?         @default("abcdefgh")
                 time_timestamp      DateTime?       @default(now())
                 time_timestamptz    DateTime?       @default(now())
+                time_date           DateTime?       @default(dbgenerated())
+                time_time           DateTime?       @default(now())
+               
             }
         "#;
 
@@ -420,22 +421,22 @@ async fn introspecting_a_default_value_as_dbgenerated_should_work(api: &TestApi)
 
     let dm = r#"
             model Test {
-                boolean_static          Boolean?    @default(true)
-                datetime_now            DateTime?   @default(now())
-                datetime_now_current    DateTime?   @default(now())
-                datetime_now_lc         DateTime?   @default(now())
-                enum_static             color?      @default(black)
-                float_static            Float?      @default(1.43)
                 id                      Int         @default(autoincrement()) @id
-                int_function            Int?        @default(dbgenerated())
-                int_sequence            Int?        @default(dbgenerated())
-                int_serial              Int        @default(autoincrement())
-                int_static              Int?        @default(2)
-                string_function         String?     @default(dbgenerated())
-                string_static_char      String?     @default("test")
                 string_static_text      String?     @default("test")
                 string_static_text_null String?
+                string_static_char      String?     @default("test")
                 string_static_varchar   String?     @default("test")
+                string_function         String?     @default(dbgenerated())
+                int_static              Int?        @default(2)
+                int_serial              Int        @default(autoincrement())
+                int_function            Int?        @default(dbgenerated())
+                int_sequence            Int?        @default(dbgenerated())    
+                float_static            Float?      @default(1.43)
+                boolean_static          Boolean?    @default(true)
+                datetime_now_current    DateTime?   @default(now())
+                datetime_now            DateTime?   @default(now())
+                datetime_now_lc         DateTime?   @default(now())
+                enum_static             color?      @default(black)
             }
 
            enum color{
