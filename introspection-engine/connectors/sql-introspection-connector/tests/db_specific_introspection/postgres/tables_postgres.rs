@@ -563,7 +563,7 @@ async fn introspecting_an_unsupported_type_should_and_commenting_it_out_should_a
     );
 
     let result = dbg!(api.introspect().await);
-    assert_eq!(&result, "model Test {\n  id             Int     @unique\n  dummy          Int\n  // This type is currently not supported.\n  // network_mac macaddr\n}");
+    assert_eq!(&result, "model Test {\n  id             Int     @unique\n  dummy          Int\n  // This type is currently not supported.\n  // network_mac macaddr\n}\n");
 }
 
 #[test_each_connector(tags("postgres"))]
