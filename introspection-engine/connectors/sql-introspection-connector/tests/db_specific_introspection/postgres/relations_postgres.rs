@@ -403,8 +403,8 @@ async fn introspecting_a_many_to_many_relation_with_an_id_should_work(api: &Test
 
             model PostsToUsers {
                 id      Int  @id
-                post_id Int
                 user_id Int
+                post_id Int
                 Post    Post @relation(fields: [post_id], references: [id])
                 User    User @relation(fields: [user_id], references: [id])
             }

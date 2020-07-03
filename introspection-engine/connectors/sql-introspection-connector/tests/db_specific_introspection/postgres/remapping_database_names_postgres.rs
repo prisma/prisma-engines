@@ -32,8 +32,8 @@ async fn remapping_fields_with_invalid_characters_should_work(api: &TestApi) {
                e      String @map(")e")
                f      String @map("/f")
                g_a    String @map("g a")
-               h1     String
                h_a    String @map("h-a")
+               h1     String
             }
         "#;
     let result = dbg!(api.introspect().await);

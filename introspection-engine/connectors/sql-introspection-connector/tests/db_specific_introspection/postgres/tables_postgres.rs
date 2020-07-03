@@ -26,8 +26,8 @@ async fn introspecting_a_simple_table_with_gql_types_must_work(api: &TestApi) {
     let dm = r#"
             model Blog {
                 bool    Boolean
-                date    DateTime
                 float   Float
+                date    DateTime
                 id      Int @id @default(autoincrement())
                 int     Int
                 string  String
@@ -99,8 +99,8 @@ async fn introspecting_a_table_with_compound_primary_keys_must_work(api: &TestAp
         .await;
     let dm = r#"
             model Blog {
-                authorId String
                 id Int
+                authorId String
                 @@id([id, authorId])
             }
         "#;
@@ -123,8 +123,8 @@ async fn introspecting_a_table_with_unique_index_must_work(api: &TestApi) {
 
     let dm = r#"
             model Blog {
-                authorId String @unique
                 id      Int @id @default(autoincrement())
+                authorId String @unique
             }
         "#;
     let result = dbg!(api.introspect().await);
@@ -368,7 +368,6 @@ async fn introspecting_default_values_should_work(api: &TestApi) {
                 numeric_int2        Int?            @default(2)
                 numeric_int4        Int?            @default(4)
                 numeric_int8        Int?            @default(8)
-                boolean_boolean     Boolean?        @default(false)
                 numeric_decimal     Float?          @default(1234.1234)
                 numeric_float4      Float?          @default(123.1234)
                 numeric_float8      Float?          @default(123.1234)
@@ -379,7 +378,7 @@ async fn introspecting_default_values_should_work(api: &TestApi) {
                 time_timestamptz    DateTime?       @default(now())
                 time_date           DateTime?       @default(dbgenerated())
                 time_time           DateTime?       @default(now())
-               
+                boolean_boolean     Boolean?        @default(false)
             }
         "#;
 
@@ -564,7 +563,7 @@ async fn introspecting_an_unsupported_type_should_and_commenting_it_out_should_a
     );
 
     let result = dbg!(api.introspect().await);
-    assert_eq!(&result, "model Test {\n  dummy          Int\n  id             Int     @unique\n  // This type is currently not supported.\n  // network_mac macaddr\n}");
+    assert_eq!(&result, "model Test {\n  id             Int     @unique\n  dummy          Int\n  // This type is currently not supported.\n  // network_mac macaddr\n}");
 }
 
 #[test_each_connector(tags("postgres"))]
