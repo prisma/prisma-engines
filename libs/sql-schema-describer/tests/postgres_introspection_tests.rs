@@ -774,7 +774,7 @@ async fn postgres_foreign_key_on_delete_must_be_handled() {
                     auto_increment: false,
                 },
                 Column {
-                    name: "city_set_default".into(),
+                    name: "city_set_null".into(),
                     tpe: ColumnType {
                         data_type: "integer".into(),
                         full_data_type: "int4".into(),
@@ -787,7 +787,7 @@ async fn postgres_foreign_key_on_delete_must_be_handled() {
                     auto_increment: false,
                 },
                 Column {
-                    name: "city_set_null".into(),
+                    name: "city_set_default".into(),
                     tpe: ColumnType {
                         data_type: "integer".into(),
                         full_data_type: "int4".into(),
