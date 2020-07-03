@@ -216,7 +216,6 @@ impl SqlSchemaDescriber {
             })
             .collect();
 
-
         let primary_key = match pk_cols.is_empty() {
             true => {
                 debug!("Determined that table has no primary key");
