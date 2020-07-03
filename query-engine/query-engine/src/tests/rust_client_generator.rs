@@ -34,16 +34,92 @@ fn client_generator_test() {
     let (query_schema, datamodel) = get_query_schema(dm);
 
     let dmmf = crate::dmmf::render_dmmf(&datamodel, Arc::new(query_schema));
+    let query_type = dmmf.schema.query_type();
+    let mutation_type = dmmf.schema.mutation_type();
 
     dbg!(&dmmf);
 
-    let inputs = &dmmf.schema.input_types;
-
     let mut scope = Scope::new();
 
+    // ignore some warnings in the generated code for now while prototyping
     scope.raw("#![allow(non_snake_case, dead_code, unused_variables, non_camel_case_types)]");
+
+    construct_input_types(&mut scope, &dmmf.schema.input_types);
+    construct_output_types(&mut scope, &dmmf.schema.output_types);
+
+    create_prisma_client_impl(&mut scope, &query_type);
+
+    let mut client = codegen::Struct::new("PrismaClient");
+    client.vis("pub");
+
+    let mut fields_grouped_by_model: HashMap<String, Vec<&DMMFField>> = HashMap::new();
+    for field in query_type.fields.iter().chain(mutation_type.fields.iter()) {
+        if let Some(model) = field.model.as_ref() {
+            let fields_vec = fields_grouped_by_model.entry(model.to_string()).or_insert(vec![]);
+            fields_vec.push(&field)
+        }
+    }
+
+    let model_impls = generate_operation_impls_for_models(&fields_grouped_by_model);
+    for model_impl in model_impls.into_iter() {
+        scope.push_struct(model_impl.the_struct);
+        scope.push_impl(model_impl.the_impl);
+
+        client.field(&format!("pub {}", &model_impl.model), model_impl.struct_name);
+    }
+
+    scope.push_struct(client);
+
+    for an_enum in create_enums(&dmmf.schema.enums).into_iter() {
+        scope.push_enum(an_enum);
+    }
+
+    write_to_disk(&scope.to_string());
+}
+
+fn generate_operation_impls_for_models(fields_grouped_by_model: &HashMap<String, Vec<&DMMFField>>) -> Vec<ModelImpl> {
+    let mut ret = vec![];
+    for (model, fields) in fields_grouped_by_model.iter() {
+        let the_name = format!("{}Operations", &model);
+        let mut the_struct = codegen::Struct::new(&the_name);
+        the_struct.vis("pub");
+
+        let mut the_impl = codegen::Impl::new(&the_name);
+        for field in fields.iter() {
+            let model_stripped_from_name = field.name.trim_end_matches(model);
+            let function = the_impl.new_fn(&model_stripped_from_name).arg_ref_self();
+
+            function.arg_ref_self();
+            for arg in field.args.iter() {
+                let arg_name = if &arg.name == "where" { "where_" } else { &arg.name };
+
+                function.arg(arg_name, &map_type(&arg.input_type)).vis("pub");
+            }
+            function.ret(&map_type(&field.output_type));
+            function.line("todo!()");
+        }
+
+        ret.push(ModelImpl {
+            model: model.to_string(),
+            struct_name: the_name.to_string(),
+            the_struct,
+            the_impl,
+        });
+    }
+
+    ret
+}
+
+struct ModelImpl {
+    model: String,
+    struct_name: String,
+    the_struct: codegen::Struct,
+    the_impl: codegen::Impl,
+}
+
+fn construct_input_types(scope: &mut Scope, input_types: &Vec<DMMFInputType>) {
     scope.raw("/// INPUT TYPES");
-    for input in inputs.iter() {
+    for input in input_types.iter() {
         if input.is_one_of {
             let input_enum = scope.new_enum(&input.name).vis("pub");
             for field in input.fields.iter() {
@@ -52,7 +128,7 @@ fn client_generator_test() {
                     .tuple(&field.input_type.typ);
             }
         } else {
-            let input_struct = new_struct(&mut scope, &input.name);
+            let input_struct = new_pub_struct(scope, &input.name);
             for field in input.fields.iter() {
                 if !field.input_type.typ.ends_with("WhereInput") {
                     // TODO: this needs boxing in the generated code.
@@ -80,77 +156,44 @@ fn client_generator_test() {
             }
         }
     }
+}
 
+fn construct_output_types(scope: &mut Scope, output_types: &Vec<DMMFOutputType>) {
     scope.raw("/// OUTPUT TYPES");
 
     let non_model_types = vec!["Query", "Mutation"];
-    let model_output_types: Vec<_> = dmmf
-        .schema
-        .output_types
+    let model_output_types: Vec<_> = output_types
         .iter()
         .filter(|ot| !non_model_types.contains(&ot.name.as_str()))
         .collect();
 
     for output in model_output_types.iter() {
-        let output_struct = new_struct(&mut scope, &output.name);
+        let output_struct = new_pub_struct(scope, &output.name);
         for field in output.fields.iter() {
             output_struct.field(&format!("pub {}", &field.name), map_type(&field.output_type));
         }
     }
+}
 
-    let query_type = dmmf.schema.output_types.iter().find(|ot| ot.name == "Query").unwrap();
-    let mutation_type = dmmf
-        .schema
-        .output_types
-        .iter()
-        .find(|ot| ot.name == "Mutation")
-        .unwrap();
-
-    let client = new_struct(&mut scope, "PrismaClient");
-
-    for model in model_output_types.iter() {
-        let the_name = format!("{}Operations", &model.name);
-        client.field(&format!("pub {}", &model.name), the_name.to_string());
-
-        //        let the_impl = scope.new_impl(&the_name);
-        //        operation_impls_for_model.insert(model.name.to_string(), the_impl);
-    }
-
-    let mut operation_impls_for_model: HashMap<String, codegen::Impl> = HashMap::new();
-    for model in model_output_types.iter() {
-        let the_name = format!("{}Operations", &model.name);
-        scope.new_struct(&the_name).vis("pub");
-    }
-
-    for model in model_output_types.iter() {
-        let the_name = format!("{}Operations", &model.name);
-        let the_impl = codegen::Impl::new(the_name);
-        operation_impls_for_model.insert(model.name.to_string(), the_impl);
-    }
-
-    for query_field in query_type.fields.iter() {
-        if let Some(model) = query_field.model.as_ref() {
-            let function = {
-                let the_impl = operation_impls_for_model.get_mut(model.as_str()).unwrap();
-
-                let model_stripped_from_name = query_field.name.trim_end_matches(model);
-                the_impl.new_fn(&model_stripped_from_name).arg_ref_self()
-            };
-
-            function.arg_ref_self();
-            for arg in query_field.args.iter() {
-                let arg_name = if &arg.name == "where" { "where_" } else { &arg.name };
-
-                function.arg(arg_name, &map_type(&arg.input_type)).vis("pub");
-            }
-            function.ret(&map_type(&query_field.output_type));
-            function.line("todo!()");
+fn create_enums(enums: &Vec<DMMFEnum>) -> Vec<codegen::Enum> {
+    let mut ret = vec![];
+    for an_enum in enums.iter() {
+        let mut the_enum = codegen::Enum::new(&an_enum.name);
+        the_enum.vis("pub");
+        for variant in an_enum.values.iter() {
+            the_enum.new_variant(&variant);
         }
+        ret.push(the_enum);
     }
 
+    ret
+}
+
+fn create_prisma_client_impl(scope: &mut Scope, query_type: &DMMFOutputType) {
     let client_impl = scope.new_impl("PrismaClient");
     client_impl.new_fn("new").vis("pub").ret("PrismaClient").line("todo!()");
 
+    // all fields that don't have a model set are added as global operations
     for query_field in query_type.fields.iter() {
         if query_field.model.is_none() {
             let function = client_impl.new_fn(&query_field.name);
@@ -165,39 +208,6 @@ fn client_generator_test() {
             function.line("todo!()");
         }
     }
-
-    for mutation_field in mutation_type.fields.iter() {
-        //        let function = client_impl.new_fn(&mutation_field.name);
-        let model = mutation_field.model.as_ref().unwrap();
-        let function = {
-            let the_impl = operation_impls_for_model.get_mut(model.as_str()).unwrap();
-
-            let model_stripped_from_name = mutation_field.name.trim_end_matches(model);
-            the_impl.new_fn(&model_stripped_from_name).arg_ref_self()
-        };
-
-        function.arg_ref_self();
-        for arg in mutation_field.args.iter() {
-            let arg_name = if &arg.name == "where" { "where_" } else { &arg.name };
-
-            function.arg(arg_name, &map_type(&arg.input_type)).vis("pub");
-            function.ret(&map_type(&mutation_field.output_type));
-        }
-        function.line("todo!()");
-    }
-
-    for (_, impl_to_push) in operation_impls_for_model.into_iter() {
-        scope.push_impl(impl_to_push);
-    }
-
-    for an_enum in dmmf.schema.enums.iter() {
-        let the_enum = scope.new_enum(&an_enum.name).vis("pub");
-        for variant in an_enum.values.iter() {
-            the_enum.new_variant(&variant);
-        }
-    }
-
-    write_to_disk(&scope.to_string());
 }
 
 fn map_type(dmmf_type: &DMMFTypeInfo) -> Type {
@@ -219,7 +229,7 @@ fn map_type(dmmf_type: &DMMFTypeInfo) -> Type {
     }
 }
 
-fn new_struct<'a>(scope: &'a mut Scope, name: &str) -> &'a mut Struct {
+fn new_pub_struct<'a>(scope: &'a mut Scope, name: &str) -> &'a mut Struct {
     scope.new_struct(name).vis("pub")
 }
 
@@ -264,5 +274,20 @@ impl DmmfInputFieldExtensions for DMMFInputField {
         } else {
             self.name.to_string()
         }
+    }
+}
+
+trait DmmfSchemaExtensions {
+    fn query_type(&self) -> &DMMFOutputType;
+    fn mutation_type(&self) -> &DMMFOutputType;
+}
+
+impl DmmfSchemaExtensions for DMMFSchema {
+    fn query_type(&self) -> &DMMFOutputType {
+        self.output_types.iter().find(|ot| ot.name == "Query").unwrap()
+    }
+
+    fn mutation_type(&self) -> &DMMFOutputType {
+        self.output_types.iter().find(|ot| ot.name == "Mutation").unwrap()
     }
 }
