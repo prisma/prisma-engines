@@ -189,8 +189,6 @@ async fn get_all_columns(
                 table_name table_name
             FROM information_schema.columns
             WHERE table_schema = ?
-            ORDER BY column_name
-            COLLATE utf8_general_ci
         ";
 
     let mut map = HashMap::new();
