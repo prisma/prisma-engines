@@ -16,6 +16,7 @@ fn client_generator_test() {
         model Blog {
             blogId String @id
             name   String
+            posts  Post[]
         }
 
         model Post {
@@ -23,6 +24,8 @@ fn client_generator_test() {
             title       String
             subTitle    String
             subSubTitle String?
+            blogId      String
+            blog        Blog @relation(fields: blogId, references: blogId)
             
             @@unique([title, subTitle])
         }
@@ -51,23 +54,26 @@ fn client_generator_test() {
         } else {
             let input_struct = new_struct(&mut scope, &input.name);
             for field in input.fields.iter() {
-                input_struct.field(&format!("pub {}", &field.name), map_type(&field.input_type));
+                if !field.input_type.typ.ends_with("WhereInput") {
+                    // TODO: this needs boxing in the generated code.
+                    input_struct.field(&format!("pub {}", &field.name()), map_type(&field.input_type));
+                }
             }
             let impl_block = scope.new_impl(&input.name);
             let constructor = impl_block.new_fn("new").vis("pub").ret(&input.name).line("todo!()");
             for field in input.fields.iter() {
                 if field.input_type.is_required {
-                    constructor.arg(&field.name, map_type(&field.input_type));
+                    constructor.arg(&field.name(), map_type(&field.input_type));
                 }
             }
 
             for field in input.fields.iter() {
                 if !field.input_type.is_required {
                     impl_block
-                        .new_fn(&field.name)
+                        .new_fn(&field.name())
                         .vis("pub")
                         .arg_self()
-                        .arg(&field.name, map_type(&field.input_type))
+                        .arg(&field.name(), map_type(&field.input_type))
                         .ret(&input.name)
                         .line("todo!()");
                 }
@@ -243,6 +249,20 @@ impl NameNormalizer for String {
         match c.next() {
             None => String::new(),
             Some(f) => f.to_uppercase().collect::<String>() + c.as_str(),
+        }
+    }
+}
+
+trait DmmfInputFieldExtensions {
+    fn name(&self) -> String;
+}
+
+impl DmmfInputFieldExtensions for DMMFInputField {
+    fn name(&self) -> String {
+        if self.name == "where" {
+            format!("{}_", self.name)
+        } else {
+            self.name.to_string()
         }
     }
 }
