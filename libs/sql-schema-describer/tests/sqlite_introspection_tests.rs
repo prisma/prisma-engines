@@ -100,7 +100,6 @@ async fn sqlite_column_types_must_work() {
             auto_increment: false,
         },
     ];
-    expected_columns.sort_unstable_by_key(|c| c.name.to_owned());
 
     assert_eq!(
         table,
