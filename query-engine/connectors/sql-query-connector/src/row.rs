@@ -18,7 +18,7 @@ pub struct SqlRow {
 }
 
 impl SqlRow {
-    pub fn as_aggregation_results(self, aggregators: &[Aggregator]) -> Vec<AggregationResult> {
+    pub fn into_aggregation_results(self, aggregators: &[Aggregator]) -> Vec<AggregationResult> {
         let mut values = self.values;
         values.reverse();
 

@@ -158,5 +158,5 @@ pub async fn aggregate(
         .pop()
         .expect("Expected exactly one return row for aggregation query.");
 
-    Ok(row.as_aggregation_results(&aggregators))
+    Ok(row.into_aggregation_results(&aggregators))
 }
