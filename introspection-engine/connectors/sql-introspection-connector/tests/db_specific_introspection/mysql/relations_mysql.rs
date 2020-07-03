@@ -154,8 +154,8 @@ async fn introspecting_a_one_to_one_relation_referencing_non_id_should_work(api:
             }
                   
             model User {
-                email String? @unique
                 id    Int     @default(autoincrement()) @id
+                email String? @unique
                 Post  Post?
             }
         "#;
