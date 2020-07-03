@@ -41,7 +41,7 @@ async fn re_introspecting_manually_overwritten_mapped_model_name(api: &TestApi) 
     custom_assert(&result, final_dm);
     let warnings = api.re_introspect_warnings(input_dm).await;
 
-    assert_eq!(&warnings, "[{\"code\":7,\"message\":\"These models were enriched with @@map information taken from the previous Prisma schema.\",\"affected\":[{\"model\":\"Custom_User\"}]}]");
+    assert_eq_json(&warnings, "[{\"code\":7,\"message\":\"These models were enriched with @@map information taken from the previous Prisma schema.\",\"affected\":[{\"model\":\"Custom_User\"}]}]");
 }
 
 #[test_each_connector(tags("postgres"))]
@@ -81,7 +81,7 @@ async fn re_introspecting_manually_overwritten_mapped_field_name(api: &TestApi) 
     custom_assert(&result, final_dm);
     let warnings = api.re_introspect_warnings(input_dm).await;
 
-    assert_eq!(&warnings, "[{\"code\":8,\"message\":\"These fields were enriched with @map information taken from the previous Prisma schema.\",\"affected\":[{\"model\":\"User\",\"field\":\"custom_test\"}]}]");
+    assert_eq_json(&warnings, "[{\"code\":8,\"message\":\"These fields were enriched with @map information taken from the previous Prisma schema.\",\"affected\":[{\"model\":\"User\",\"field\":\"custom_test\"}]}]");
 }
 
 #[test_each_connector(tags("postgres"))]
@@ -141,7 +141,7 @@ async fn re_introspecting_mapped_model_and_field_name(api: &TestApi) {
     custom_assert(&result, final_dm);
     let warnings = api.re_introspect_warnings(input_dm).await;
 
-    assert_eq!(&warnings, "[{\"code\":7,\"message\":\"These models were enriched with @@map information taken from the previous Prisma schema.\",\"affected\":[{\"model\":\"Custom_User\"}]},{\"code\":8,\"message\":\"These fields were enriched with @map information taken from the previous Prisma schema.\",\"affected\":[{\"model\":\"Post\",\"field\":\"c_user_id\"},{\"model\":\"Custom_User\",\"field\":\"c_id\"}]}]");
+    assert_eq_json(&warnings, "[{\"code\":7,\"message\":\"These models were enriched with @@map information taken from the previous Prisma schema.\",\"affected\":[{\"model\":\"Custom_User\"}]},{\"code\":8,\"message\":\"These fields were enriched with @map information taken from the previous Prisma schema.\",\"affected\":[{\"model\":\"Post\",\"field\":\"c_user_id\"},{\"model\":\"Custom_User\",\"field\":\"c_id\"}]}]");
 }
 
 #[test_each_connector(tags("postgres"))]
@@ -201,7 +201,7 @@ async fn re_introspecting_manually_mapped_model_and_field_name(api: &TestApi) {
     custom_assert(&result, final_dm);
     let warnings = api.re_introspect_warnings(input_dm).await;
 
-    assert_eq!(&warnings, "[{\"code\":7,\"message\":\"These models were enriched with @@map information taken from the previous Prisma schema.\",\"affected\":[{\"model\":\"Custom_User\"}]},{\"code\":8,\"message\":\"These fields were enriched with @map information taken from the previous Prisma schema.\",\"affected\":[{\"model\":\"Post\",\"field\":\"c_user_id\"},{\"model\":\"Custom_User\",\"field\":\"c_id\"}]}]");
+    assert_eq_json(&warnings, "[{\"code\":7,\"message\":\"These models were enriched with @@map information taken from the previous Prisma schema.\",\"affected\":[{\"model\":\"Custom_User\"}]},{\"code\":8,\"message\":\"These fields were enriched with @map information taken from the previous Prisma schema.\",\"affected\":[{\"model\":\"Post\",\"field\":\"c_user_id\"},{\"model\":\"Custom_User\",\"field\":\"c_id\"}]}]");
 }
 
 #[test_each_connector(tags("postgres"))]
@@ -268,7 +268,8 @@ async fn re_introspecting_mapped_field_name(api: &TestApi) {
     custom_assert(&result, final_dm);
 
     let warnings = api.re_introspect_warnings(input_dm).await;
-    assert_eq!(&warnings, "[{\"code\":8,\"message\":\"These fields were enriched with @map information taken from the previous Prisma schema.\",\"affected\":[{\"model\":\"User\",\"field\":\"c_id_1\"},{\"model\":\"User\",\"field\":\"c_index\"},{\"model\":\"User\",\"field\":\"c_unique_1\"}]}]");
+
+    assert_eq_json(&warnings, "[{\"code\":8,\"message\":\"These fields were enriched with @map information taken from the previous Prisma schema.\",\"affected\":[{\"model\":\"User\",\"field\":\"c_id_1\"},{\"model\":\"User\",\"field\":\"c_index\"},{\"model\":\"User\",\"field\":\"c_unique_1\"}]}]");
 }
 
 #[test_each_connector(tags("postgres"))]
@@ -324,7 +325,7 @@ async fn re_introspecting_mapped_enum_name(api: &TestApi) {
     custom_assert(&result, final_dm);
     let warnings = api.re_introspect_warnings(input_dm).await;
 
-    assert_eq!(&warnings, "[{\"code\":9,\"message\":\"These enums were enriched with @@map information taken from the previous Prisma schema.\",\"affected\":[{\"enm\":\"BlackNWhite\"}]}]");
+    assert_eq_json(&warnings, "[{\"code\":9,\"message\":\"These enums were enriched with @@map information taken from the previous Prisma schema.\",\"affected\":[{\"enm\":\"BlackNWhite\"}]}]");
 }
 
 #[test_each_connector(tags("postgres"))]
@@ -376,7 +377,7 @@ async fn re_introspecting_mapped_enum_value_name(api: &TestApi) {
     custom_assert(&result, final_dm);
     let warnings = api.re_introspect_warnings(input_dm).await;
 
-    assert_eq!(&warnings, "[{\"code\":10,\"message\":\"These enum values were enriched with @map information taken from the previous Prisma schema.\",\"affected\":[{\"enm\":\"color\",\"value\":\"BLACK\"}]}]");
+    assert_eq_json(&warnings, "[{\"code\":10,\"message\":\"These enum values were enriched with @map information taken from the previous Prisma schema.\",\"affected\":[{\"enm\":\"color\",\"value\":\"BLACK\"}]}]");
 }
 
 #[test_each_connector(tags("postgres"))]
@@ -428,7 +429,7 @@ async fn re_introspecting_manually_remapped_enum_value_name(api: &TestApi) {
     custom_assert(&result, final_dm);
     let warnings = api.re_introspect_warnings(input_dm).await;
 
-    assert_eq!(&warnings, "[{\"code\":10,\"message\":\"These enum values were enriched with @map information taken from the previous Prisma schema.\",\"affected\":[{\"enm\":\"color\",\"value\":\"BLACK\"}]}]");
+    assert_eq_json(&warnings, "[{\"code\":10,\"message\":\"These enum values were enriched with @map information taken from the previous Prisma schema.\",\"affected\":[{\"enm\":\"color\",\"value\":\"BLACK\"}]}]");
 }
 
 #[test_each_connector(tags("postgres"))]
@@ -484,7 +485,7 @@ async fn re_introspecting_manually_re_mapped_enum_name(api: &TestApi) {
     custom_assert(&result, final_dm);
     let warnings = api.re_introspect_warnings(input_dm).await;
 
-    assert_eq!(&warnings, "[{\"code\":9,\"message\":\"These enums were enriched with @@map information taken from the previous Prisma schema.\",\"affected\":[{\"enm\":\"BlackNWhite\"}]}]");
+    assert_eq_json(&warnings, "[{\"code\":9,\"message\":\"These enums were enriched with @@map information taken from the previous Prisma schema.\",\"affected\":[{\"enm\":\"BlackNWhite\"}]}]");
 }
 
 #[test_each_connector(tags("postgres"))]

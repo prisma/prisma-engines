@@ -82,16 +82,9 @@ fn must_render_generated_back_relation_fields() {
 
     model Post {
         post_id Int @id
-    }
-    "#;
+    }"#;
 
-    let schema = parse(dml);
-
-    let rendered = dbg!(render_datamodel_to_string(&schema).unwrap());
-
-    assert_eq!(
-        rendered,
-        r#"model User {
+    let expected = r#"model User {
   id    Int    @id
   posts Post[]
 }
@@ -100,8 +93,14 @@ model Post {
   post_id Int   @id
   User    User? @relation(fields: [userId], references: [id])
   userId  Int?
-}"#
-    );
+}
+"#;
+
+    let schema = parse(dml);
+
+    let rendered = dbg!(render_datamodel_to_string(&schema).unwrap());
+
+    assert_eq!(rendered, expected);
 }
 
 #[test]

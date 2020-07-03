@@ -73,6 +73,7 @@ impl<'a> Renderer<'a> {
                 }
             };
         }
+        writeln!(self.stream).expect("Writer error.");
     }
 
     fn render_documentation(target: &mut dyn LineWriteable, obj: &dyn ast::WithDocumentation) {
