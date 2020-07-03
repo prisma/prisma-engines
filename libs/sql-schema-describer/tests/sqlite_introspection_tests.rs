@@ -144,6 +144,18 @@ async fn sqlite_foreign_key_on_delete_must_be_handled() {
             name: "User".to_string(),
             columns: vec![
                 Column {
+                    name: "id".to_string(),
+                    tpe: ColumnType {
+                        data_type: "INTEGER".to_string(),
+                        full_data_type: "INTEGER".to_string(),
+                        character_maximum_length: None,
+                        family: ColumnTypeFamily::Int,
+                        arity: ColumnArity::Required,
+                    },
+                    default: None,
+                    auto_increment: true,
+                },
+                Column {
                     name: "city".to_string(),
                     tpe: ColumnType {
                         data_type: "INTEGER".to_string(),
@@ -203,18 +215,6 @@ async fn sqlite_foreign_key_on_delete_must_be_handled() {
                     },
                     default: None,
                     auto_increment: false,
-                },
-                Column {
-                    name: "id".to_string(),
-                    tpe: ColumnType {
-                        data_type: "INTEGER".to_string(),
-                        full_data_type: "INTEGER".to_string(),
-                        character_maximum_length: None,
-                        family: ColumnTypeFamily::Int,
-                        arity: ColumnArity::Required,
-                    },
-                    default: None,
-                    auto_increment: true,
                 },
             ],
             indices: vec![],

@@ -721,6 +721,20 @@ async fn postgres_foreign_key_on_delete_must_be_handled() {
             name: "User".into(),
             columns: vec![
                 Column {
+                    name: "id".into(),
+                    tpe: ColumnType {
+                        data_type: "integer".into(),
+                        full_data_type: "int4".into(),
+                        character_maximum_length: None,
+
+                        family: ColumnTypeFamily::Int,
+                        arity: ColumnArity::Required,
+                    },
+
+                    default: None,
+                    auto_increment: false,
+                },
+                Column {
                     name: "city".into(),
                     tpe: ColumnType {
                         data_type: "integer".into(),
@@ -782,20 +796,6 @@ async fn postgres_foreign_key_on_delete_must_be_handled() {
                         family: ColumnTypeFamily::Int,
                         arity: ColumnArity::Nullable,
                     },
-                    default: None,
-                    auto_increment: false,
-                },
-                Column {
-                    name: "id".into(),
-                    tpe: ColumnType {
-                        data_type: "integer".into(),
-                        full_data_type: "int4".into(),
-                        character_maximum_length: None,
-
-                        family: ColumnTypeFamily::Int,
-                        arity: ColumnArity::Required,
-                    },
-
                     default: None,
                     auto_increment: false,
                 },
