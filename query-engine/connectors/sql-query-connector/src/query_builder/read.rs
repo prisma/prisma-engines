@@ -1,5 +1,6 @@
 use crate::{cursor_condition, filter_conversion::AliasedCondition, ordering::Ordering};
 use connector_interface::{filter::Filter, Aggregator, QueryArguments};
+use itertools::Itertools;
 use prisma_models::*;
 use quaint::ast::*;
 use std::sync::Arc;
@@ -67,6 +68,30 @@ where
     columns.fold(query.into_select(model), |acc, col| acc.column(col))
 }
 
+/// Generates a query of the form:
+/// ```sql
+/// SELECT
+///     COUNT(*),
+///     SUM(`float`),
+///     SUM(`int`),
+///     AVG(`float`),
+///     AVG(`int`),
+///     MIN(`float`),
+///     MIN(`int`),
+///     MAX(`float`),
+///     MAX(`int`)
+/// FROM
+///     (
+///         SELECT
+///             `Table`.`id`,
+///             `Table`.`float`,
+///             `Table`.`int`
+///         FROM
+///             `Table`
+///         WHERE
+///             1 = 1
+///     ) AS `sub`;
+/// ```
 pub fn aggregate(model: &ModelRef, aggregators: &[Aggregator], args: QueryArguments) -> Select<'static> {
     let columns = extract_columns(model, &aggregators);
     let sub_query = get_records(model, columns.into_iter(), args);
@@ -77,47 +102,36 @@ pub fn aggregate(model: &ModelRef, aggregators: &[Aggregator], args: QueryArgume
         .fold(Select::from_table(sub_table), |select, next_op| match next_op {
             Aggregator::Count => select.value(count(asterisk())),
 
-            Aggregator::Average(fields) => fields.into_iter().fold(select, |select, next_field| {
-                select.value(avg(col_alias("avg", &next_field.name)))
-            }),
+            Aggregator::Average(fields) => fields
+                .into_iter()
+                .fold(select, |select, next_field| select.value(avg(next_field.name.clone()))),
 
-            Aggregator::Sum(fields) => fields.into_iter().fold(select, |select, next_field| {
-                select.value(sum(col_alias("sum", &next_field.name)))
-            }),
+            Aggregator::Sum(fields) => fields
+                .into_iter()
+                .fold(select, |select, next_field| select.value(sum(next_field.name.clone()))),
 
-            Aggregator::Min(fields) => fields.into_iter().fold(select, |select, next_field| {
-                select.value(min(col_alias("min", &next_field.name)))
-            }),
+            Aggregator::Min(fields) => fields
+                .into_iter()
+                .fold(select, |select, next_field| select.value(min(next_field.name.clone()))),
 
-            Aggregator::Max(fields) => fields.into_iter().fold(select, |select, next_field| {
-                select.value(max(col_alias("max", &next_field.name)))
-            }),
+            Aggregator::Max(fields) => fields
+                .into_iter()
+                .fold(select, |select, next_field| select.value(max(next_field.name.clone()))),
         })
 }
 
 fn extract_columns(model: &ModelRef, aggregators: &[Aggregator]) -> Vec<Column<'static>> {
-    aggregators
+    let fields: Vec<_> = aggregators
         .iter()
         .flat_map(|aggregator| match aggregator {
-            Aggregator::Count => model.primary_identifier().as_columns().collect(),
-            Aggregator::Average(fields) => map_aggregator_field_columns("avg", fields),
-            Aggregator::Sum(fields) => map_aggregator_field_columns("sum", fields),
-            Aggregator::Min(fields) => map_aggregator_field_columns("min", fields),
-            Aggregator::Max(fields) => map_aggregator_field_columns("max", fields),
+            Aggregator::Count => model.primary_identifier().scalar_fields().collect(),
+            Aggregator::Average(fields) => fields.clone(),
+            Aggregator::Sum(fields) => fields.clone(),
+            Aggregator::Min(fields) => fields.clone(),
+            Aggregator::Max(fields) => fields.clone(),
         })
-        .collect()
-}
+        .unique_by(|field| field.name.clone())
+        .collect();
 
-fn map_aggregator_field_columns(prefix: &str, fields: &[ScalarFieldRef]) -> Vec<Column<'static>> {
-    fields
-        .into_iter()
-        .map(|f| {
-            let col = f.as_column();
-            col.alias(col_alias(prefix, &f.name))
-        })
-        .collect()
-}
-
-fn col_alias(prefix: &str, field_name: &str) -> String {
-    format!("{}_{}", prefix, field_name)
+    fields.as_columns().collect()
 }

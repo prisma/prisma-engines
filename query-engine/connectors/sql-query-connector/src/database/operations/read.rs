@@ -1,10 +1,8 @@
 use crate::{
     query_builder::{self, read},
-    row::SqlRow,
     QueryExt, SqlError,
 };
 use connector_interface::*;
-use datamodel::FieldArity;
 use futures::stream::{FuturesUnordered, StreamExt};
 use prisma_models::*;
 use quaint::ast::*;
@@ -150,72 +148,15 @@ pub async fn aggregate(
     query_arguments: QueryArguments,
 ) -> crate::Result<Vec<AggregationResult>> {
     let query = read::aggregate(model, &aggregators, query_arguments);
-    let idents = extract_query_idents(&aggregators);
+    let idents: Vec<_> = aggregators
+        .iter()
+        .flat_map(|aggregator| aggregator.identifiers())
+        .collect();
 
     let mut rows = conn.filter(query.into(), idents.as_slice()).await?;
     let row = rows
         .pop()
         .expect("Expected exactly one return row for aggregation query.");
 
-    Ok(parse_aggregation_row(&aggregators, row))
-}
-
-fn extract_query_idents(aggregators: &[Aggregator]) -> Vec<(TypeIdentifier, FieldArity)> {
-    aggregators
-        .iter()
-        .flat_map(|aggregator| match aggregator {
-            Aggregator::Count => vec![(TypeIdentifier::Int, FieldArity::Required)],
-            Aggregator::Average(fields) => map_aggregator_field_types(&fields, Some(TypeIdentifier::Float)),
-            Aggregator::Sum(fields) => map_aggregator_field_types(&fields, None),
-            Aggregator::Min(fields) => map_aggregator_field_types(&fields, None),
-            Aggregator::Max(fields) => map_aggregator_field_types(&fields, None),
-        })
-        .collect()
-}
-
-fn map_aggregator_field_types(
-    fields: &[ScalarFieldRef],
-    fixed_type: Option<TypeIdentifier>,
-) -> Vec<(TypeIdentifier, FieldArity)> {
-    fields
-        .into_iter()
-        .map(|f| {
-            (
-                fixed_type.clone().unwrap_or(f.type_identifier.clone()),
-                FieldArity::Required,
-            )
-        })
-        .collect()
-}
-
-fn parse_aggregation_row(aggregators: &[Aggregator], row: SqlRow) -> Vec<AggregationResult> {
-    let mut values = row.values;
-    values.reverse();
-
-    aggregators
-        .iter()
-        .flat_map(|aggregator| match aggregator {
-            Aggregator::Count => vec![AggregationResult::Count(values.pop().unwrap())],
-
-            Aggregator::Average(fields) => fields
-                .iter()
-                .map(|field| AggregationResult::Average(field.clone(), values.pop().unwrap()))
-                .collect(),
-
-            Aggregator::Sum(fields) => fields
-                .iter()
-                .map(|field| AggregationResult::Sum(field.clone(), values.pop().unwrap()))
-                .collect(),
-
-            Aggregator::Min(fields) => fields
-                .iter()
-                .map(|field| AggregationResult::Min(field.clone(), values.pop().unwrap()))
-                .collect(),
-
-            Aggregator::Max(fields) => fields
-                .iter()
-                .map(|field| AggregationResult::Max(field.clone(), values.pop().unwrap()))
-                .collect(),
-        })
-        .collect()
+    Ok(row.as_aggregation_results(&aggregators))
 }

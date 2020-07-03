@@ -4,6 +4,7 @@ pub use dispatch::*;
 
 use crate::{Filter, QueryArguments, WriteArgs};
 use async_trait::async_trait;
+use dml::FieldArity;
 use prisma_models::*;
 use prisma_value::PrismaValue;
 
@@ -95,6 +96,33 @@ pub enum Aggregator {
 
     /// Compute maximum for each field contained.
     Max(Vec<ScalarFieldRef>),
+}
+
+impl Aggregator {
+    pub fn identifiers(&self) -> Vec<(TypeIdentifier, FieldArity)> {
+        match self {
+            Aggregator::Count => vec![(TypeIdentifier::Int, FieldArity::Required)],
+            Aggregator::Average(fields) => Self::map_field_types(&fields, Some(TypeIdentifier::Float)),
+            Aggregator::Sum(fields) => Self::map_field_types(&fields, None),
+            Aggregator::Min(fields) => Self::map_field_types(&fields, None),
+            Aggregator::Max(fields) => Self::map_field_types(&fields, None),
+        }
+    }
+
+    fn map_field_types(
+        fields: &[ScalarFieldRef],
+        fixed_type: Option<TypeIdentifier>,
+    ) -> Vec<(TypeIdentifier, FieldArity)> {
+        fields
+            .into_iter()
+            .map(|f| {
+                (
+                    fixed_type.clone().unwrap_or(f.type_identifier.clone()),
+                    FieldArity::Required,
+                )
+            })
+            .collect()
+    }
 }
 
 /// Result of an aggregation operation on a model or field.
