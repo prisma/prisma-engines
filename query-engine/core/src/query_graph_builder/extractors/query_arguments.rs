@@ -36,6 +36,11 @@ pub fn extract_query_args(arguments: Vec<ParsedArgument>, model: &ModelRef) -> Q
                         ..res
                     }),
 
+                    "distinct" => Ok(QueryArguments {
+                        distinct: arg.value.try_into()?,
+                        ..res
+                    }),
+
                     "where" => {
                         let val: Option<ParsedInputMap> = arg.value.try_into()?;
                         match val {

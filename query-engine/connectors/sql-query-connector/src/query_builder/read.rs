@@ -51,6 +51,12 @@ impl SelectDefinition for QueryArguments {
             .so_that(conditions)
             .offset(skip as usize);
 
+        let select_ast = if self.distinct {
+            select_ast.distinct()
+        } else {
+            select_ast
+        };
+
         let select_ast = ordering.into_iter().fold(select_ast, |acc, ord| acc.order_by(ord));
 
         match limit {

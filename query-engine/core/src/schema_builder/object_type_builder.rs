@@ -144,13 +144,19 @@ impl<'a> ObjectTypeBuilder<'a> {
             self.input_type_builder.into_arc().where_unique_object_type(model),
         ));
 
-        vec![
+        let mut args = vec![
             self.where_argument(&model),
             self.order_by_argument(&model),
             argument("cursor", unique_input_type.clone(), None),
             argument("take", InputType::opt(InputType::int()), None),
             argument("skip", InputType::opt(InputType::int()), None),
-        ]
+        ];
+
+        if feature_flags::get().distinct {
+            args.push(argument("distinct", InputType::opt(InputType::boolean()), None));
+        }
+
+        args
     }
 
     /// Builds "where" argument.

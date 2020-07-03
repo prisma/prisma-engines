@@ -172,3 +172,19 @@ impl TryInto<Option<i64>> for ParsedInputValue {
         }
     }
 }
+
+impl TryInto<bool> for ParsedInputValue {
+    type Error = QueryParserError;
+
+    fn try_into(self) -> QueryParserResult<bool> {
+        let prisma_value: PrismaValue = self.try_into()?;
+
+        match prisma_value {
+            PrismaValue::Boolean(b) => Ok(b),
+            v => Err(QueryParserError::AssertionError(format!(
+                "Attempted conversion of non-boolean Prisma value type ({:?}) into bool failed.",
+                v
+            ))),
+        }
+    }
+}
