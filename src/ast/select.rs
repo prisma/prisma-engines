@@ -3,6 +3,7 @@ use crate::ast::*;
 /// A builder for a `SELECT` statement.
 #[derive(Debug, PartialEq, Clone, Default)]
 pub struct Select<'a> {
+    pub(crate) distinct: bool,
     pub(crate) table: Option<Box<Table<'a>>>,
     pub(crate) columns: Vec<Expression<'a>>,
     pub(crate) conditions: Option<ConditionTree<'a>>,
@@ -192,6 +193,23 @@ impl<'a> Select<'a> {
         C: Into<Column<'a>>,
     {
         self.columns = columns.into_iter().map(|c| c.into().into()).collect();
+        self
+    }
+
+    /// Adds `DISTINCT` to the select query.
+    ///
+    /// ```rust
+    /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # fn main() -> Result<(), quaint::error::Error> {
+    /// let query = Select::from_table("users").column("foo").column("bar").distinct();
+    /// let (sql, _) = Sqlite::build(query)?;
+    ///
+    /// assert_eq!("SELECT DISTINCT `foo`, `bar` FROM `users`", sql);
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn distinct(mut self) -> Self {
+        self.distinct = true;
         self
     }
 

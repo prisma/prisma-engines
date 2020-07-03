@@ -130,6 +130,10 @@ pub trait Visitor<'a> {
     fn visit_select(&mut self, select: Select<'a>) -> Result {
         self.write("SELECT ")?;
 
+        if select.distinct {
+            self.write("DISTINCT ")?;
+        }
+
         if let Some(table) = select.table {
             if select.columns.is_empty() {
                 match table.typ {

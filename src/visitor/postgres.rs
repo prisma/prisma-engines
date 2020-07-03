@@ -347,6 +347,28 @@ mod tests {
         assert_eq!(expected.1, params);
     }
 
+    #[test]
+    fn test_distinct() {
+        let expected_sql = "SELECT DISTINCT \"bar\" FROM \"test\"";
+        let query = Select::from_table("test").column(Column::new("bar")).distinct();
+        let (sql, _) = Postgres::build(query).unwrap();
+
+        assert_eq!(expected_sql, sql);
+    }
+
+    #[test]
+    fn test_distinct_with_subquery() {
+        let expected_sql = "SELECT DISTINCT (SELECT $1 FROM \"test2\"), \"bar\" FROM \"test\"";
+        let query = Select::from_table("test")
+            .value(Select::from_table("test2").value(val!(1)))
+            .column(Column::new("bar"))
+            .distinct();
+
+        let (sql, _) = Postgres::build(query).unwrap();
+
+        assert_eq!(expected_sql, sql);
+    }
+
     #[cfg(feature = "json-1")]
     #[test]
     fn equality_with_a_json_value() {
