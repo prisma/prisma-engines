@@ -232,12 +232,12 @@ impl<'a> ObjectTypeBuilder<'a> {
         let object = ObjectTypeStrongRef::new(ObjectType::new(&name, Some(ModelRef::clone(model))));
         let mut fields = vec![self.count_field()];
 
-        append_opt(
-            &mut fields,
-            self.numeric_aggregation_field("avg", &model, Some(OutputType::float())),
-        );
-
         if feature_flags::get().aggregations {
+            append_opt(
+                &mut fields,
+                self.numeric_aggregation_field("avg", &model, Some(OutputType::float())),
+            );
+
             append_opt(&mut fields, self.numeric_aggregation_field("sum", &model, None));
             append_opt(&mut fields, self.numeric_aggregation_field("min", &model, None));
             append_opt(&mut fields, self.numeric_aggregation_field("max", &model, None));
