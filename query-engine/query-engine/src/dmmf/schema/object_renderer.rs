@@ -38,6 +38,7 @@ impl DMMFObjectRenderer {
 
         let input_type = DMMFInputType {
             name: input_object.name.clone(),
+            is_one_of: input_object.is_one_of,
             fields: rendered_fields,
         };
 

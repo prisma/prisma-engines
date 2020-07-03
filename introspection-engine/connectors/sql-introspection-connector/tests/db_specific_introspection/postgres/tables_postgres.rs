@@ -300,7 +300,7 @@ async fn introspecting_a_table_without_uniques_should_comment_it_out(api: &TestA
         })
         .await;
 
-    let dm = "// The underlying table does not contain a unique identifier and can therefore currently not be handled.\n// model Post {\n  // id      Int\n  // user_id Int\n  // User    User @relation(fields: [user_id], references: [id])\n// }\n\nmodel User {\n  id Int @default(autoincrement()) @id\n}";
+    let dm = "// The underlying table does not contain a unique identifier and can therefore currently not be handled.\n// model Post {\n  // id      Int\n  // user_id Int\n  // User    User @relation(fields: [user_id], references: [id])\n// }\n\nmodel User {\n  id Int @default(autoincrement()) @id\n}\n";
 
     let result = dbg!(api.introspect().await);
     assert_eq!(&result, dm);
@@ -468,7 +468,7 @@ async fn introspecting_an_unsupported_type_should_comment_it_out(api: &TestApi) 
     );
 
     let result = dbg!(api.introspect().await);
-    assert_eq!(&result, "model Test {\n  id             Int      @default(autoincrement()) @id\n  network_inet   String?\n  // This type is currently not supported.\n  // network_mac macaddr?\n}");
+    assert_eq!(&result, "model Test {\n  id             Int      @default(autoincrement()) @id\n  network_inet   String?\n  // This type is currently not supported.\n  // network_mac macaddr?\n}\n");
 }
 
 #[test_each_connector(tags("postgres"))]
@@ -563,7 +563,7 @@ async fn introspecting_an_unsupported_type_should_and_commenting_it_out_should_a
     );
 
     let result = dbg!(api.introspect().await);
-    assert_eq!(&result, "model Test {\n  dummy          Int\n  id             Int     @unique\n  // This type is currently not supported.\n  // network_mac macaddr\n}");
+    assert_eq!(&result, "model Test {\n  dummy          Int\n  id             Int     @unique\n  // This type is currently not supported.\n  // network_mac macaddr\n}\n");
 }
 
 #[test_each_connector(tags("postgres"))]
@@ -585,5 +585,5 @@ async fn introspecting_a_table_with_only_an_unsupported_id_type_should_comment_i
     );
 
     let result = dbg!(api.introspect().await);
-    assert_eq!(&result, "// The underlying table does not contain a unique identifier and can therefore currently not be handled.\n// model Test {\n  // dummy       Int\n  // This type is currently not supported.\n  // network_mac macaddr @id\n// }");
+    assert_eq!(&result, "// The underlying table does not contain a unique identifier and can therefore currently not be handled.\n// model Test {\n  // dummy       Int\n  // This type is currently not supported.\n  // network_mac macaddr @id\n// }\n");
 }

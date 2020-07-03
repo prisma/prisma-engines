@@ -11,6 +11,12 @@ pub struct Enum {
     pub(crate) enm: String,
 }
 
+impl Enum {
+    pub fn new(name: &str) -> Self {
+        Enum { enm: name.to_owned() }
+    }
+}
+
 #[derive(Serialize, Debug, Clone)]
 pub struct ModelAndField {
     pub(crate) model: String,
