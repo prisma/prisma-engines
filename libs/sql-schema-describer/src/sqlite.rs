@@ -215,7 +215,7 @@ impl SqlSchemaDescriber {
                 col
             })
             .collect();
-        cols.sort_unstable_by_key(|col| col.name.clone());
+
 
         let primary_key = match pk_cols.is_empty() {
             true => {

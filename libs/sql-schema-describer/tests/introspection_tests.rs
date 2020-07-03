@@ -402,19 +402,6 @@ async fn indices_must_work(api: &TestApi) {
     };
     let expected_columns = vec![
         Column {
-            name: "count".to_string(),
-            tpe: ColumnType {
-                data_type: int_data_type(api),
-                full_data_type: int_full_data_type(api),
-                character_maximum_length: None,
-
-                family: ColumnTypeFamily::Int,
-                arity: ColumnArity::Required,
-            },
-            default: None,
-            auto_increment: false,
-        },
-        Column {
             name: "id".to_string(),
             tpe: ColumnType {
                 data_type: int_data_type(api),
@@ -427,6 +414,19 @@ async fn indices_must_work(api: &TestApi) {
 
             default,
             auto_increment: true,
+        },
+        Column {
+            name: "count".to_string(),
+            tpe: ColumnType {
+                data_type: int_data_type(api),
+                full_data_type: int_full_data_type(api),
+                character_maximum_length: None,
+
+                family: ColumnTypeFamily::Int,
+                arity: ColumnArity::Required,
+            },
+            default: None,
+            auto_increment: false,
         },
     ];
     let pk_sequence = match api.sql_family() {
