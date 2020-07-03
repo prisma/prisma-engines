@@ -189,6 +189,7 @@ async fn get_all_columns(
                 table_name table_name
             FROM information_schema.columns
             WHERE table_schema = ?
+            ORDER BY ordinal_position
         ";
 
     let mut map = HashMap::new();
