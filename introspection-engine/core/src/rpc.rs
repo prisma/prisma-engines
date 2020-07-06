@@ -82,55 +82,40 @@ impl RpcImpl {
             .map_err(|err| render_jsonrpc_error(err, &schema))?;
 
         let mut could_not_parse_input_data_model = false;
-        let input_data_model = match datamodel::parse_datamodel(&schema) {
-            Ok(existing_data_model) => existing_data_model,
-            Err(_) => {
-                could_not_parse_input_data_model = true;
-                Datamodel::new()
+        let input_data_model = datamodel::parse_datamodel(&schema).unwrap_or_else(|_| {
+            could_not_parse_input_data_model = true;
+            Datamodel::new()
+        });
+
+        let result = match connector.introspect(&input_data_model, reintrospect).await {
+            Ok(mut introspection_result) => {
+                if introspection_result.datamodel.models.is_empty() && introspection_result.datamodel.enums.is_empty() {
+                    Err(Error::from(CommandError::IntrospectionResultEmpty(url.to_string())))
+                } else {
+                    if could_not_parse_input_data_model && reintrospect {
+                        introspection_result.warnings.push(Warning {
+                            code: 0,
+                            message:
+                            "The input datamodel could not be parsed. This means it was not used to enrich the introspected datamodel with previous manual changes."
+                                .into(),
+                            affected: serde_json::Value::Null,
+                        })
+                    };
+
+                    match datamodel::render_datamodel_and_config_to_string(&introspection_result.datamodel, &config) {
+                        Err(e) => Err(Error::from(e)),
+                        Ok(dm) => Ok(IntrospectionResultOutput {
+                            datamodel: dm,
+                            warnings: introspection_result.warnings,
+                            version: introspection_result.version,
+                        }),
+                    }
+                }
             }
+            Err(e) => Err(Error::from(e)),
         };
 
-        match connector.introspect(&input_data_model, reintrospect).await {
-            Ok(introspection_result)
-                if introspection_result.datamodel.models.is_empty()
-                    && introspection_result.datamodel.enums.is_empty() =>
-            {
-                Err(render_jsonrpc_error(
-                    Error::from(CommandError::IntrospectionResultEmpty(url.to_string())),
-                    &schema,
-                ))
-            }
-            Ok(introspection_result) => {
-                let warnings = match could_not_parse_input_data_model {
-                    true if reintrospect => {
-                        let mut warnings = introspection_result.warnings;
-                        warnings.push(Warning {
-                        code: 0,
-                        message:
-                        "The input datamodel could not be parsed. This means it was not used to enrich the introspected datamodel with previous manual changes."
-                            .into(),
-                        affected: serde_json::Value::Null,
-                    });
-                        warnings
-                    }
-                    _ => introspection_result.warnings,
-                };
-
-                let result = IntrospectionResultOutput {
-                    datamodel: datamodel::render_datamodel_and_config_to_string(
-                        &introspection_result.datamodel,
-                        &config,
-                    )
-                    .map_err(Error::from)
-                    .map_err(|err| render_jsonrpc_error(err, &schema))?,
-                    warnings,
-                    version: introspection_result.version,
-                };
-
-                Ok(result)
-            }
-            Err(e) => Err(render_jsonrpc_error(Error::from(e), &schema)),
-        }
+        result.map_err(|e| render_jsonrpc_error(e, &schema))
     }
 
     pub async fn list_databases_internal(schema: String) -> RpcResult<Vec<String>> {
