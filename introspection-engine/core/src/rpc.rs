@@ -93,13 +93,7 @@ impl RpcImpl {
                     Err(Error::from(CommandError::IntrospectionResultEmpty(url.to_string())))
                 } else {
                     if could_not_parse_input_data_model && reintrospect {
-                        introspection_result.warnings.push(Warning {
-                            code: 0,
-                            message:
-                            "The input datamodel could not be parsed. This means it was not used to enrich the introspected datamodel with previous manual changes."
-                                .into(),
-                            affected: serde_json::Value::Null,
-                        })
+                        introspection_result.warnings.push(Warning::new_datamodel_parsing())
                     };
 
                     match datamodel::render_datamodel_and_config_to_string(&introspection_result.datamodel, &config) {
