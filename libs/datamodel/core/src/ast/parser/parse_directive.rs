@@ -1,5 +1,4 @@
-use super::parse_expression::parse_arg_value;
-use super::*;
+use super::{helpers::ToIdentifier, parse_expression::parse_arg_value, Rule};
 use crate::ast::*;
 
 pub fn parse_directive(token: &pest::iterators::Pair<'_, Rule>) -> Directive {

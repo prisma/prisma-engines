@@ -1,10 +1,12 @@
+use super::{
+    helpers::{parsing_catch_all, ToIdentifier},
+    parse_comments::*,
+    parse_directive::parse_directive,
+    parse_types::parse_field_type,
+    Rule,
+};
 use crate::ast::*;
 use crate::error::DatamodelError;
-
-use super::{
-    helpers::parsing_catch_all, helpers::ToIdentifier, parse_comments::*, parse_directive,
-    parse_types::parse_field_type, Rule,
-};
 
 pub fn parse_field(model_name: &str, token: &pest::iterators::Pair<'_, Rule>) -> Result<Field, DatamodelError> {
     let mut name: Option<Identifier> = None;

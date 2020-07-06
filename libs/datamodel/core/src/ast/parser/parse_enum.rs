@@ -1,4 +1,9 @@
-use super::{helpers::parsing_catch_all, parse_comments::*, *};
+use super::{
+    helpers::{parsing_catch_all, ToIdentifier},
+    parse_comments::*,
+    parse_directive::parse_directive,
+    Rule,
+};
 use crate::ast::*;
 use crate::error::{DatamodelError, ErrorCollection};
 

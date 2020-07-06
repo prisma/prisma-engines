@@ -1,5 +1,5 @@
 use super::Rule;
-use crate::ast::*;
+use crate::ast::{Identifier, Span};
 
 pub trait ToIdentifier {
     fn to_id(&self) -> Identifier;

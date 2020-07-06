@@ -1,11 +1,3 @@
-use pest::Parser;
-
-// This is how PEG grammars work:
-// https://pest.rs/book/grammars/peg.html
-
-// This is the basic syntax of Pest grammar files:
-// https://pest.rs/book/grammars/syntax.html#cheat-sheet
-
 mod helpers;
 mod parse_comments;
 mod parse_directive;
@@ -16,24 +8,25 @@ mod parse_model;
 mod parse_source_and_generator;
 mod parse_types;
 
-#[derive(Parser)]
-#[grammar = "ast/parser/datamodel.pest"]
-pub struct PrismaDatamodelParser;
+use pest::Parser;
 
-use crate::ast::*;
+use crate::ast::{SchemaAst, Span, Top};
 use crate::error::{DatamodelError, ErrorCollection};
-use helpers::ToIdentifier;
-use once_cell::sync::Lazy;
-use parse_comments::parse_comment_block;
-use parse_directive::parse_directive;
 use parse_enum::parse_enum;
 use parse_model::parse_model;
 use parse_source_and_generator::{parse_generator, parse_source};
 use parse_types::parse_type_alias;
-use regex::Regex;
-use std::borrow::Cow;
 // TODO: why does this need to be public?
 pub use parse_expression::parse_expression;
+
+// This is how PEG grammars work:
+// https://pest.rs/book/grammars/peg.html
+
+// This is the basic syntax of Pest grammar files:
+// https://pest.rs/book/grammars/syntax.html#cheat-sheet
+#[derive(Parser)]
+#[grammar = "ast/parser/datamodel.pest"]
+pub struct PrismaDatamodelParser;
 
 /// Parses a Prisma V2 datamodel document into an internal AST representation.
 pub fn parse(datamodel_string: &str) -> Result<SchemaAst, ErrorCollection> {

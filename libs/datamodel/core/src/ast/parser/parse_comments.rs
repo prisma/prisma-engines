@@ -1,5 +1,5 @@
-use super::{helpers::parsing_catch_all, *};
-use crate::ast::*;
+use super::{helpers::parsing_catch_all, Rule};
+use crate::ast::Comment;
 
 pub fn parse_comment_block(token: &pest::iterators::Pair<'_, Rule>) -> Comment {
     let mut comments: Vec<String> = Vec::new();

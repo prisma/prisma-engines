@@ -1,10 +1,12 @@
-use crate::ast::*;
-use crate::error::{DatamodelError, ErrorCollection};
-
 use super::{
-    helpers::parsing_catch_all, helpers::ToIdentifier, parse_comments::*, parse_directive, parse_field::parse_field,
+    helpers::{parsing_catch_all, ToIdentifier},
+    parse_comments::*,
+    parse_directive::parse_directive,
+    parse_field::parse_field,
     Rule,
 };
+use crate::ast::*;
+use crate::error::{DatamodelError, ErrorCollection};
 
 // Model parsing
 pub fn parse_model(token: &pest::iterators::Pair<'_, Rule>) -> Result<Model, ErrorCollection> {
