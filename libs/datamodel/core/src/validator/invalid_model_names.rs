@@ -64,6 +64,7 @@ pub const RESERVED_MODEL_NAMES: [&str; 108] = [
     "PrismaClientInitializationError",
     "PrismaClientRustPanicError",
     "PrismaVersion",
+    "transaction",
     "Transaction",
     // JavaScript keywords
     "await",
