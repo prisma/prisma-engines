@@ -1,8 +1,9 @@
 use super::*;
 use crate::{
     schema::{IntoArc, ObjectTypeStrongRef, OutputType, OutputTypeRef, ScalarType},
-    AggregationQueryResult, CoreError, EnumType, QueryResult, RecordAggregation, RecordSelection,
+    CoreError, EnumType, QueryResult, RecordAggregation, RecordSelection,
 };
+use connector::AggregationResult;
 use indexmap::IndexMap;
 use prisma_models::{InternalEnum, PrismaValue, RecordProjection};
 use rust_decimal::prelude::ToPrimitive;
@@ -60,20 +61,56 @@ pub fn serialize_internal(
 }
 
 fn serialize_aggregation(record_aggregation: RecordAggregation) -> crate::Result<CheckedItemsWithParents> {
-    let mut envelope = CheckedItemsWithParents::new();
-    let mut inner_map: Map = IndexMap::with_capacity(record_aggregation.results.len());
+    let ordering = record_aggregation.selection_order;
+    let results = record_aggregation.results;
 
-    for result in record_aggregation.results {
+    let mut flattened = HashMap::with_capacity(ordering.len());
+
+    for result in results {
         match result {
-            AggregationQueryResult::Count(name, count) => {
-                inner_map.insert(name, Item::Value(PrismaValue::Int(count as i64)));
+            AggregationResult::Count(count) => {
+                flattened.insert("count".to_owned(), Item::Value(count));
+            }
+
+            AggregationResult::Average(field, value) => {
+                flattened.insert(format!("avg_{}", &field.name), Item::Value(value));
+            }
+
+            AggregationResult::Sum(field, value) => {
+                flattened.insert(format!("sum_{}", &field.name), Item::Value(value));
+            }
+
+            AggregationResult::Min(field, value) => {
+                flattened.insert(format!("min_{}", &field.name), Item::Value(value));
+            }
+
+            AggregationResult::Max(field, value) => {
+                flattened.insert(format!("max_{}", &field.name), Item::Value(value));
             }
         }
     }
 
+    // Reorder fields based on the original query selection.
+    let mut inner_map: Map = IndexMap::with_capacity(ordering.len());
+    for (query, field_order) in ordering {
+        if let Some(order) = field_order {
+            let mut nested_map = Map::new();
+
+            for field in order {
+                let item = flattened.remove(&format!("{}_{}", query, field)).unwrap();
+                nested_map.insert(field, item);
+            }
+
+            inner_map.insert(query, Item::Map(nested_map));
+        } else {
+            let item = flattened.remove(&query).unwrap();
+            inner_map.insert(query, item);
+        }
+    }
+
+    let mut envelope = CheckedItemsWithParents::new();
     envelope.insert(None, Item::Map(inner_map));
 
-    // [DTODO] Ordering when we have more queries
     Ok(envelope)
 }
 

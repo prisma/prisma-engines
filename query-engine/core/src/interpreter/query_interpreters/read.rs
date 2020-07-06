@@ -134,21 +134,15 @@ fn read_related<'a, 'b>(
 
 async fn aggregate<'a, 'b>(
     tx: &'a ConnectionLike<'a, 'b>,
-    aggregate: AggregateRecordsQuery,
+    query: AggregateRecordsQuery,
 ) -> InterpretationResult<QueryResult> {
-    let mut results = vec![];
-
-    for query in aggregate.queries {
-        match query {
-            AggregationQuery::Count(name, args) => {
-                let result = tx.count_by_model(&aggregate.model, args).await?;
-                results.push(AggregationQueryResult::Count(name, result));
-            }
-        }
-    }
+    let selection_order = query.selection_order;
+    let results = tx
+        .aggregate_records(&query.model, query.aggregators, query.args)
+        .await?;
 
     Ok(QueryResult::RecordAggregation(RecordAggregation {
-        fields: aggregate.selection_order,
+        selection_order,
         results,
     }))
 }

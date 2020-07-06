@@ -27,6 +27,9 @@ pub struct FeatureFlags {
 
     /// `connectOrCreate` nested query in the QE.
     pub connect_or_create: bool,
+
+    /// Basic aggregation support.
+    pub aggregations: bool,
 }
 
 impl FeatureFlags {
@@ -35,6 +38,7 @@ impl FeatureFlags {
             "all" => self.enable_all(),
             "transaction" => self.transaction = true,
             "connectOrCreate" => self.connect_or_create = true,
+            "aggregations" => self.aggregations = true,
             _ => Err(FeatureFlagError::InvalidFlag(flag.to_owned()))?,
         };
 
@@ -44,6 +48,7 @@ impl FeatureFlags {
     fn enable_all(&mut self) {
         self.transaction = true;
         self.connect_or_create = true;
+        self.aggregations = true;
     }
 }
 

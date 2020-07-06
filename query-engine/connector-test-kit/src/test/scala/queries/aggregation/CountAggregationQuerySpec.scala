@@ -5,12 +5,9 @@ import util.ConnectorCapability.Prisma2Capability
 import util._
 
 class CountAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
-
-  override def doNotRunForCapabilities: Set[ConnectorCapability] = Set()
-
   val project = SchemaDsl.fromStringV11() {
     """model Item {
-      |  id    String @id @default(cuid())
+      |  id   String @id @default(cuid())
       |  name String
       |}
     """.stripMargin
@@ -69,8 +66,8 @@ class CountAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase 
 
     val result = server.query(
       """{
-        |  aggregateItem {
-        |    count(take: 2)
+        |  aggregateItem(take: 2) {
+        |    count
         |  }
         |}
       """.stripMargin,
@@ -81,8 +78,8 @@ class CountAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase 
 
     val result2 = server.query(
       """{
-        |  aggregateItem {
-        |    count(take: 5)
+        |  aggregateItem(take: 5) {
+        |    count
         |  }
         |}
       """.stripMargin,
@@ -93,8 +90,8 @@ class CountAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase 
 
     val result3 = server.query(
       """{
-        |  aggregateItem {
-        |    count(take: -5)
+        |  aggregateItem(take: -5) {
+        |    count
         |  }
         |}
       """.stripMargin,
@@ -105,8 +102,8 @@ class CountAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase 
 
     val result4 = server.query(
       """{
-        |  aggregateItem {
-        |    count(where: { name_gt: "2" })
+        |  aggregateItem(where: { name_gt: "2" }) {
+        |    count
         |  }
         |}
       """.stripMargin,
@@ -117,8 +114,8 @@ class CountAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase 
 
     val result5 = server.query(
       """{
-        |  aggregateItem {
-        |    count(where: { name_gt: "1" } orderBy: name_DESC)
+        |  aggregateItem(where: { name_gt: "1" } orderBy: name_DESC) {
+        |    count
         |  }
         |}
       """.stripMargin,
@@ -129,8 +126,8 @@ class CountAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase 
 
     val result6 = server.query(
       """{
-        |  aggregateItem {
-        |    count(skip: 2)
+        |  aggregateItem(skip: 2) {
+        |    count
         |  }
         |}
       """.stripMargin,
@@ -141,8 +138,8 @@ class CountAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase 
 
     val result7 = server.query(
       s"""{
-        |  aggregateItem {
-        |    count(cursor: { id: "${i2.pathAsString("data.createItem.id")}" })
+        |  aggregateItem(cursor: { id: "${i2.pathAsString("data.createItem.id")}" }) {
+        |    count
         |  }
         |}
       """.stripMargin,

@@ -1,6 +1,7 @@
 use super::*;
-use crate::{query_document::ParsedField, AggregateRecordsQuery, AggregationQuery, ReadQuery};
-use prisma_models::ModelRef;
+use crate::{query_document::ParsedField, AggregateRecordsQuery, ReadQuery};
+use connector::Aggregator;
+use prisma_models::{ModelRef, ScalarFieldRef};
 
 pub struct AggregateRecordsBuilder {
     field: ParsedField,
@@ -12,15 +13,48 @@ impl AggregateRecordsBuilder {
         Self { field, model }
     }
 
-    fn resolve_query(field: ParsedField, model: &ModelRef) -> QueryGraphBuilderResult<AggregationQuery> {
-        let query = match field.name {
-            name if &name == "count" => {
-                AggregationQuery::Count(name, extractors::extract_query_args(field.arguments, model)?)
-            }
+    /// Resolves the given field as a aggregation query.
+    fn resolve_query(field: ParsedField, model: &ModelRef) -> QueryGraphBuilderResult<Aggregator> {
+        let query = match field.name.as_str() {
+            "count" => Aggregator::Count,
+            "avg" => Aggregator::Average(Self::resolve_fields(model, field)),
+            "sum" => Aggregator::Sum(Self::resolve_fields(model, field)),
+            "min" => Aggregator::Min(Self::resolve_fields(model, field)),
+            "max" => Aggregator::Max(Self::resolve_fields(model, field)),
             _ => unreachable!(),
         };
 
         Ok(query)
+    }
+
+    fn resolve_fields(model: &ModelRef, field: ParsedField) -> Vec<ScalarFieldRef> {
+        let fields = field.nested_fields.unwrap().fields;
+        let scalars = model.fields().scalar();
+
+        fields
+            .into_iter()
+            .map(|f| {
+                scalars
+                    .iter()
+                    .find_map(|sf| if sf.name == f.name { Some(sf.clone()) } else { None })
+                    .expect("Expected validation to guarantee valid aggregation fields.")
+            })
+            .collect()
+    }
+
+    fn collect_selection_tree(fields: &[ParsedField]) -> Vec<(String, Option<Vec<String>>)> {
+        fields
+            .into_iter()
+            .map(|field| {
+                (
+                    field.name.clone(),
+                    field
+                        .nested_fields
+                        .as_ref()
+                        .map(|nested_object| nested_object.fields.iter().map(|f| f.name.clone()).collect()),
+                )
+            })
+            .collect()
     }
 }
 
@@ -30,9 +64,10 @@ impl Builder<ReadQuery> for AggregateRecordsBuilder {
         let alias = self.field.alias;
         let model = self.model;
         let nested_fields = self.field.nested_fields.unwrap().fields;
-        let selection_order: Vec<String> = collect_selection_order(&nested_fields);
+        let selection_order = Self::collect_selection_tree(&nested_fields);
+        let args = extractors::extract_query_args(self.field.arguments, &model)?;
 
-        let queries: Vec<_> = nested_fields
+        let aggregators: Vec<_> = nested_fields
             .into_iter()
             .map(|field| Self::resolve_query(field, &model))
             .collect::<QueryGraphBuilderResult<_>>()?;
@@ -42,7 +77,8 @@ impl Builder<ReadQuery> for AggregateRecordsBuilder {
             alias,
             model,
             selection_order,
-            queries,
+            args,
+            aggregators,
         }))
     }
 }

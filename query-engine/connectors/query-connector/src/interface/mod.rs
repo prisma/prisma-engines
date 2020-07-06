@@ -4,6 +4,7 @@ pub use dispatch::*;
 
 use crate::{Filter, QueryArguments, WriteArgs};
 use async_trait::async_trait;
+use dml::FieldArity;
 use prisma_models::*;
 use prisma_value::PrismaValue;
 
@@ -79,6 +80,64 @@ impl From<RecordProjection> for RecordFilter {
     }
 }
 
+#[derive(Debug, Clone)]
+pub enum Aggregator {
+    /// Counts all records of the model that match the query.
+    Count,
+
+    /// Compute average for each field contained.
+    Average(Vec<ScalarFieldRef>),
+
+    /// Compute sum for each field contained.
+    Sum(Vec<ScalarFieldRef>),
+
+    /// Compute mininum for each field contained.
+    Min(Vec<ScalarFieldRef>),
+
+    /// Compute maximum for each field contained.
+    Max(Vec<ScalarFieldRef>),
+}
+
+impl Aggregator {
+    pub fn identifiers(&self) -> Vec<(TypeIdentifier, FieldArity)> {
+        match self {
+            Aggregator::Count => vec![(TypeIdentifier::Int, FieldArity::Required)],
+            Aggregator::Average(fields) => Self::map_field_types(&fields, Some(TypeIdentifier::Float)),
+            Aggregator::Sum(fields) => Self::map_field_types(&fields, None),
+            Aggregator::Min(fields) => Self::map_field_types(&fields, None),
+            Aggregator::Max(fields) => Self::map_field_types(&fields, None),
+        }
+    }
+
+    fn map_field_types(
+        fields: &[ScalarFieldRef],
+        fixed_type: Option<TypeIdentifier>,
+    ) -> Vec<(TypeIdentifier, FieldArity)> {
+        fields
+            .into_iter()
+            .map(|f| {
+                (
+                    fixed_type.clone().unwrap_or(f.type_identifier.clone()),
+                    FieldArity::Required,
+                )
+            })
+            .collect()
+    }
+}
+
+/// Result of an aggregation operation on a model or field.
+/// It is expected that the type of a `PrismaValue` matches the `TypeIdentifier`
+/// of the accompanying `ScalarFieldRef` for `Sum`, `Min` and `Max`.
+/// `Count` and `Average` are expected to be of `int` and `float` types, respectively.
+#[derive(Debug, Clone)]
+pub enum AggregationResult {
+    Count(PrismaValue),
+    Average(ScalarFieldRef, PrismaValue),
+    Sum(ScalarFieldRef, PrismaValue),
+    Min(ScalarFieldRef, PrismaValue),
+    Max(ScalarFieldRef, PrismaValue),
+}
+
 #[async_trait]
 pub trait ReadOperations {
     /// Gets a single record or `None` back from the database.
@@ -121,8 +180,16 @@ pub trait ReadOperations {
         from_record_ids: &[RecordProjection],
     ) -> crate::Result<Vec<(RecordProjection, RecordProjection)>>;
 
-    // return the number of items from the `Model`, filtered by the given `QueryArguments`.
-    async fn count_by_model(&self, model: &ModelRef, query_arguments: QueryArguments) -> crate::Result<usize>;
+    /// Aggregates records for a specific model based on the given aggregators.
+    /// Whether or not the aggregations can be executed in a single query or
+    /// requires multiple roundtrips to the underlying data source is at the
+    /// discretion of the implementing connector.
+    async fn aggregate_records(
+        &self,
+        model: &ModelRef,
+        aggregators: Vec<Aggregator>,
+        query_arguments: QueryArguments,
+    ) -> crate::Result<Vec<AggregationResult>>;
 }
 
 #[async_trait]

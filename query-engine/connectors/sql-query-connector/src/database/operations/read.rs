@@ -141,13 +141,22 @@ pub async fn get_related_m2m_record_ids(
         .collect())
 }
 
-pub async fn count_by_model(
+pub async fn aggregate(
     conn: &dyn QueryExt,
     model: &ModelRef,
+    aggregators: Vec<Aggregator>,
     query_arguments: QueryArguments,
-) -> crate::Result<usize> {
-    let query = read::count_by_model(model, query_arguments);
-    let count = conn.find_int(query).await? as usize;
+) -> crate::Result<Vec<AggregationResult>> {
+    let query = read::aggregate(model, &aggregators, query_arguments);
+    let idents: Vec<_> = aggregators
+        .iter()
+        .flat_map(|aggregator| aggregator.identifiers())
+        .collect();
 
-    Ok(count)
+    let mut rows = conn.filter(query.into(), idents.as_slice()).await?;
+    let row = rows
+        .pop()
+        .expect("Expected exactly one return row for aggregation query.");
+
+    Ok(row.into_aggregation_results(&aggregators))
 }
