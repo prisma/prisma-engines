@@ -4,7 +4,7 @@ use crate::{
     QueryGraphBuilderError, QueryGraphBuilderResult,
 };
 use connector::QueryArguments;
-use prisma_models::{ModelRef, PrismaValue, RecordProjection, ScalarFieldRef};
+use prisma_models::{Field, ModelProjection, ModelRef, PrismaValue, RecordProjection, ScalarFieldRef};
 use std::convert::TryInto;
 
 /// Expects the caller to know that it is structurally guaranteed that query arguments can be extracted,
@@ -37,7 +37,7 @@ pub fn extract_query_args(arguments: Vec<ParsedArgument>, model: &ModelRef) -> Q
                     }),
 
                     "distinct" => Ok(QueryArguments {
-                        distinct: arg.value.try_into()?,
+                        distinct: Some(extract_distinct(arg.value)?),
                         ..res
                     }),
 
@@ -58,6 +58,21 @@ pub fn extract_query_args(arguments: Vec<ParsedArgument>, model: &ModelRef) -> Q
                 result
             }
         })
+}
+
+fn extract_distinct(value: ParsedInputValue) -> QueryGraphBuilderResult<ModelProjection> {
+    let fields: Vec<Field> = match value {
+        ParsedInputValue::List(list) => list
+            .into_iter()
+            .map(|element| {
+                let field: ScalarFieldRef = element.try_into()?;
+                Ok(field.into())
+            })
+            .collect::<QueryGraphBuilderResult<Vec<_>>>()?,
+        _ => unreachable!(),
+    };
+
+    Ok(ModelProjection::new(fields))
 }
 
 fn extract_skip(value: ParsedInputValue) -> QueryGraphBuilderResult<Option<i64>> {

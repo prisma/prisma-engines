@@ -93,7 +93,7 @@ pub async fn m2m<'a, 'b>(
         }
     }
 
-    Ok(paginator.apply_pagination(scalars))
+    Ok(paginator.apply(scalars))
 }
 
 // [DTODO] This is implemented in an inefficient fashion, e.g. too much Arc cloning going on.
@@ -208,5 +208,5 @@ pub async fn one2m<'a, 'b>(
         ));
     }
 
-    Ok(paginator.apply_pagination(scalars))
+    Ok(paginator.apply(scalars))
 }

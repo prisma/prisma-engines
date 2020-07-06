@@ -1,11 +1,13 @@
 use connector::QueryArguments;
-use prisma_models::{ManyRecords, ModelProjection, RecordProjection};
+use itertools::Itertools;
+use prisma_models::{ManyRecords, ModelProjection, Record, RecordProjection};
 
 pub struct NestedPagination {
     skip: Option<i64>,
     take: Option<i64>,
     cursor: Option<RecordProjection>,
     needs_reversing: bool,
+    distinct: Option<ModelProjection>,
 }
 
 impl NestedPagination {
@@ -15,21 +17,18 @@ impl NestedPagination {
             take: args.take_abs(),
             cursor: args.cursor.clone(),
             needs_reversing: args.needs_reversed_order(),
+            distinct: args.distinct.clone(),
         }
     }
 
-    pub fn apply_pagination(&self, mut many_records: ManyRecords) -> ManyRecords {
-        if !self.must_apply_pagination() {
-            return many_records;
-        }
-
+    pub fn apply(&self, mut records: ManyRecords) -> ManyRecords {
         if self.needs_reversing {
-            many_records.records.reverse();
+            records.records.reverse();
         }
 
         // Replacement for SQL order by
         // TODO: this must also handle secondary order bys
-        many_records.records.sort_by_key(|r| {
+        records.records.sort_by_key(|r| {
             let values: Vec<_> = r
                 .parent_id
                 .as_ref()
@@ -38,6 +37,43 @@ impl NestedPagination {
                 .collect();
             values
         });
+
+        let records = self.apply_distinct(records);
+        self.apply_pagination(records)
+    }
+
+    fn apply_distinct(&self, mut records: ManyRecords) -> ManyRecords {
+        let distinct = if let Some(ref distinct) = self.distinct {
+            distinct
+        } else {
+            return records;
+        };
+
+        let field_names = &records.field_names;
+
+        let new_records: Vec<Record> = records
+            .records
+            .into_iter()
+            .group_by(|record| record.parent_id.clone())
+            .into_iter()
+            .flat_map(|(_, group)| {
+                let filtered: Vec<_> = group
+                    .into_iter()
+                    .unique_by(|record| record.projection(&field_names, &distinct).unwrap())
+                    .collect();
+
+                filtered
+            })
+            .collect();
+
+        records.records = new_records;
+        records
+    }
+
+    fn apply_pagination(&self, mut many_records: ManyRecords) -> ManyRecords {
+        if !self.must_apply_pagination() {
+            return many_records;
+        }
 
         // If we have a cursor, skip records until we find it for each parent id. Pagination is applied afterwards.
         if let Some(cursor) = &self.cursor {

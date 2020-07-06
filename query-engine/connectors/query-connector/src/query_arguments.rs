@@ -11,7 +11,7 @@ pub struct SkipAndLimit {
 /// - `cursor`, `take`, `skip` page through the data.
 /// - `filter` scopes the data by defining conditions (akin to `WHERE` in SQL).
 /// - `order_by` defines the ordering of records.
-/// - `distinct` designates whether or not the record set of a query should be distinct
+/// - `distinct` designates the fields on which the records should be distinct
 ///   on the (scalar) fields selected in the query.
 /// - The `ignore_*` flags are a temporary bandaid to tell the connector to do not
 ///   include certain constraints when building queries, because the core is already
@@ -23,7 +23,7 @@ pub struct QueryArguments {
     pub skip: Option<i64>,
     pub filter: Option<Filter>,
     pub order_by: Option<OrderBy>,
-    pub distinct: bool,
+    pub distinct: Option<ModelProjection>,
     pub ignore_skip: bool,
     pub ignore_take: bool,
 }
@@ -74,7 +74,7 @@ impl QueryArguments {
                         skip: skip.clone(),
                         filter: Some(filter),
                         order_by: order_by.clone(),
-                        distinct,
+                        distinct: distinct.clone(),
                         ignore_skip,
                         ignore_take,
                     })

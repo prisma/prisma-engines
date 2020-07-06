@@ -30,6 +30,7 @@ impl<'a> DMMFEnumRenderer<'a> {
         match self.enum_type {
             EnumType::Internal(i) => i.external_values(),
             EnumType::OrderBy(ord) => ord.values(),
+            EnumType::FieldRef(f) => f.values(),
         }
     }
 }

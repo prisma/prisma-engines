@@ -6,7 +6,7 @@
 //! assume the data has to be because of the structural guarantees of the query schema validation.
 use super::*;
 use chrono::prelude::*;
-use prisma_models::{OrderBy, PrismaValue};
+use prisma_models::{OrderBy, PrismaValue, ScalarFieldRef};
 use rust_decimal::prelude::ToPrimitive;
 use std::convert::TryInto;
 
@@ -99,6 +99,20 @@ impl TryInto<OrderBy> for ParsedInputValue {
             Self::OrderBy(ord) => Ok(ord),
             v => Err(QueryParserError::AssertionError(format!(
                 "Attempted conversion of non-order-by enum ({:?}) into order by enum value failed.",
+                v
+            ))),
+        }
+    }
+}
+
+impl TryInto<ScalarFieldRef> for ParsedInputValue {
+    type Error = QueryParserError;
+
+    fn try_into(self) -> QueryParserResult<ScalarFieldRef> {
+        match self {
+            Self::ScalarField(f) => Ok(f),
+            v => Err(QueryParserError::AssertionError(format!(
+                "Attempted conversion of non-field-ref enum ({:?}) into scalar field reference value failed.",
                 v
             ))),
         }

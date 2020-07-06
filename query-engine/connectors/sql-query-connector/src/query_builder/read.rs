@@ -51,8 +51,10 @@ impl SelectDefinition for QueryArguments {
             .so_that(conditions)
             .offset(skip as usize);
 
-        let select_ast = if self.distinct {
-            select_ast.distinct()
+        let select_ast: Select<'static> = if let Some(fields) = self.distinct {
+            fields
+                .scalar_fields()
+                .fold(select_ast, |select, field| select.group_by(field.as_column()))
         } else {
             select_ast
         };
