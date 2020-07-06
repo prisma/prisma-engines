@@ -63,12 +63,21 @@ fn read_one<'conn, 'tx>(
 /// Queries a set of records.
 fn read_many<'a, 'b>(
     tx: &'a ConnectionLike<'a, 'b>,
-    query: ManyRecordsQuery,
+    mut query: ManyRecordsQuery,
 ) -> BoxFuture<'a, InterpretationResult<QueryResult>> {
     let fut = async move {
-        let scalars = tx
-            .get_many_records(&query.model, query.args.clone(), &query.selected_fields)
-            .await?;
+        // If the query specifies distinct, we need to lift up pagination and distinct processing to the core.
+        let scalars = if query.args.distinct.is_some() {
+            let processor = InMemoryRecordProcessor::new_from_query_args(&mut query.args);
+            let scalars = tx
+                .get_many_records(&query.model, query.args.clone(), &query.selected_fields)
+                .await?;
+
+            processor.apply(scalars)
+        } else {
+            tx.get_many_records(&query.model, query.args.clone(), &query.selected_fields)
+                .await?
+        };
 
         let model_id = query.model.primary_identifier();
         let nested: Vec<QueryResult> = process_nested(tx, query.nested, Some(&scalars)).await?;
@@ -95,11 +104,7 @@ fn read_related<'a, 'b>(
     let fut = async move {
         let relation = query.parent_field.relation();
         let is_m2m = relation.is_many_to_many();
-        let processor = InMemoryRecordProcessor::new_from_query_args(&query.args);
-
-        query.args.distinct = None;
-        query.args.ignore_take = true;
-        query.args.ignore_skip = true;
+        let processor = InMemoryRecordProcessor::new_from_query_args(&mut query.args);
 
         let scalars = if is_m2m {
             nested_read::m2m(tx, &query, parent_result, processor).await?

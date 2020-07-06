@@ -12,14 +12,20 @@ pub struct InMemoryRecordProcessor {
 }
 
 impl InMemoryRecordProcessor {
-    pub fn new_from_query_args(args: &QueryArguments) -> Self {
-        Self {
+    pub fn new_from_query_args(args: &mut QueryArguments) -> Self {
+        let processor = Self {
             skip: args.skip.clone(),
             take: args.take_abs(),
             cursor: args.cursor.clone(),
             needs_reversing: args.needs_reversed_order(),
             distinct: args.distinct.clone(),
-        }
+        };
+
+        args.distinct = None;
+        args.ignore_take = true;
+        args.ignore_skip = true;
+
+        processor
     }
 
     pub fn apply(&self, mut records: ManyRecords) -> ManyRecords {
@@ -27,46 +33,66 @@ impl InMemoryRecordProcessor {
             records.records.reverse();
         }
 
-        // Replacement for SQL order by
-        // TODO: this must also handle secondary order bys
+        let records = if Self::is_nested(&records) {
+            Self::order_by_parent(records)
+        } else {
+            records
+        };
+
+        let records = self.apply_distinct(records);
+        self.apply_pagination(records)
+    }
+
+    fn order_by_parent(mut records: ManyRecords) -> ManyRecords {
         records.records.sort_by_key(|r| {
             let values: Vec<_> = r
                 .parent_id
                 .as_ref()
-                .expect("Parent id must be set on all records in order to paginate")
+                .expect("Expected parent IDs to be set when ordering by parent ID.")
                 .values()
                 .collect();
 
             values
         });
 
-        let records = self.apply_distinct(records);
-        self.apply_pagination(records)
+        records
+    }
+
+    fn is_nested(records: &ManyRecords) -> bool {
+        records.records.first().map(|x| x.parent_id.is_some()).unwrap_or(false)
     }
 
     fn apply_distinct(&self, mut records: ManyRecords) -> ManyRecords {
+        let field_names = &records.field_names;
+
         let distinct = if let Some(ref distinct) = self.distinct {
-            distinct
+            distinct.clone()
         } else {
             return records;
         };
 
-        let field_names = &records.field_names;
+        let new_records: Vec<Record> = if Self::is_nested(&records) {
+            records
+                .records
+                .into_iter()
+                .group_by(|record| record.parent_id.clone())
+                .into_iter()
+                .flat_map(|(_, group)| {
+                    let filtered: Vec<_> = group
+                        .into_iter()
+                        .unique_by(|record| record.projection(&field_names, &distinct).unwrap())
+                        .collect();
 
-        let new_records: Vec<Record> = records
-            .records
-            .into_iter()
-            .group_by(|record| record.parent_id.clone())
-            .into_iter()
-            .flat_map(|(_, group)| {
-                let filtered: Vec<_> = group
-                    .into_iter()
-                    .unique_by(|record| record.projection(&field_names, &distinct).unwrap())
-                    .collect();
-
-                filtered
-            })
-            .collect();
+                    filtered
+                })
+                .collect()
+        } else {
+            records
+                .records
+                .into_iter()
+                .unique_by(|record| record.projection(&field_names, &distinct).unwrap())
+                .collect()
+        };
 
         records.records = new_records;
         records

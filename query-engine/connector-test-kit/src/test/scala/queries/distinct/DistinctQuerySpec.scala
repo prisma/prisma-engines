@@ -78,7 +78,7 @@ class DistinctQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       legacy = false
     )
 
-    result.toString() should be("""{"data":{"findManyModelA":[{"data":{"findManyModelA":[{"fieldA":"1","fieldB":1},{"fieldA":"2","fieldB":2}]}}]}}""")
+    result.toString() should be("""{"data":{"findManyModelA":[{"fieldA":"1","fieldB":1},{"fieldA":"2","fieldB":2}]}}""")
   }
 
   "Select distinct with skip" should "return only distinct records after the skip" in {
@@ -121,9 +121,10 @@ class DistinctQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
 
   "Select distinct with ordering on a non-distinct-by field" should "return only distinct records, ordered correctly" in {
     // CUIDs are linear ordered in time
-    createRecord("1", 1)
+    createRecord("1", 1) // Lowest ID
     createRecord("2", 2)
     createRecord("1", 1)
+    createRecord("3", 1) // Highest ID
 
     val result = server.query(
       s"""{
@@ -136,15 +137,19 @@ class DistinctQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
       legacy = false
     )
 
-    result.toString() should be("""{"data":{"findManyModelA":[{"fieldA":"2","fieldB":2},{"fieldA":"1","fieldB":1}]}}""")
+    // 3, 1
+    // 1, 1
+    // 2, 2
+    result.toString() should be("""{"data":{"findManyModelA":[{"fieldA":"3","fieldB":1},{"fieldA":"1","fieldB":1},{"fieldA":"2","fieldB":2}]}}""")
   }
 
+  // todo change to comparable ids
   "Select distinct on top level and relation" should "return only distinct records for top record, and only for those the distinct relation records" in {
-    createRecord("1", 1, Some(Seq("3", "1", "1", "2", "1")))
+    createRecord("1", 1, Some(Seq("3", "1", "1", "2", "1"))) // Lowest ID (nested: lowest first, highest last)
     createRecord("1", 1, Some(Seq("1", "2")))
     createRecord("1", 3, None)
     createRecord("1", 4, Some(Seq("1", "1")))
-    createRecord("1", 5, Some(Seq("2", "3", "2")))
+    createRecord("1", 5, Some(Seq("2", "3", "2"))) // Highest ID (nested: lowest first, highest last)
 
     val result = server.query(
       s"""{
