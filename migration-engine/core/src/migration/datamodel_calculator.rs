@@ -173,7 +173,6 @@ fn apply_create_field(datamodel: &mut ast::SchemaAst, step: &steps::CreateField)
         field_type: new_ident(tpe.clone()),
         span: new_span(),
         directives: Vec::new(),
-        default_value: None,
         is_commented_out: false,
     };
     model.fields.push(field);
@@ -483,7 +482,6 @@ fn apply_create_type_alias(
         documentation: None,
         name: new_ident(step.type_alias.clone()),
         span: new_span(),
-        default_value: None,
         arity: step.arity.into(),
         directives: vec![],
         field_type: new_ident(step.r#type.clone()),
