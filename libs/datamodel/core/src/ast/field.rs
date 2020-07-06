@@ -8,8 +8,6 @@ pub struct Field {
     pub name: Identifier,
     /// The aritiy of the field.
     pub arity: FieldArity,
-    /// The default value of the field.
-    pub default_value: Option<Expression>,
     /// The directives of this field.
     pub directives: Vec<Directive>,
     /// The comments for this field.
