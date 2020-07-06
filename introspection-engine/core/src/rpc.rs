@@ -1,7 +1,7 @@
 use crate::command_error::CommandError;
 use crate::error::Error;
 use crate::error_rendering::render_jsonrpc_error;
-use datamodel::Datamodel;
+use datamodel::{Configuration, Datamodel};
 use futures::{FutureExt, TryFutureExt};
 use introspection_connector::{DatabaseMetadata, IntrospectionConnector, IntrospectionResultOutput, Warning};
 use jsonrpc_derive::rpc;
@@ -56,8 +56,11 @@ impl RpcImpl {
         RpcImpl
     }
 
-    async fn load_connector(schema: &String) -> Result<Box<dyn IntrospectionConnector>, Error> {
+    async fn load_connector(
+        schema: &String,
+    ) -> Result<(Configuration, String, Box<dyn IntrospectionConnector>), Error> {
         let config = datamodel::parse_configuration(&schema)?;
+
         let url = config
             .datasources
             .first()
@@ -66,21 +69,17 @@ impl RpcImpl {
             .to_owned()
             .value;
 
-        Ok(Box::new(SqlIntrospectionConnector::new(&url).await?))
+        Ok((
+            config,
+            url.clone(),
+            Box::new(SqlIntrospectionConnector::new(&url).await?),
+        ))
     }
 
     pub async fn introspect_internal(schema: String, reintrospect: bool) -> RpcResult<IntrospectionResultOutput> {
-        let config = datamodel::parse_configuration(&schema).map_err(Error::from)?;
-        let url = config
-            .datasources
-            .first()
-            .ok_or_else(|| CommandError::Generic(anyhow::anyhow!("There is no datasource in the schema.")))
-            .map_err(Error::from)?
-            .url()
-            .to_owned()
-            .value;
-
-        let connector = RpcImpl::load_connector(&schema).await?;
+        let (config, url, connector) = RpcImpl::load_connector(&schema)
+            .await
+            .map_err(|err| render_jsonrpc_error(err, &schema))?;
 
         let mut could_not_parse_input_data_model = false;
         let input_data_model = match datamodel::parse_datamodel(&schema) {
@@ -96,9 +95,10 @@ impl RpcImpl {
                 if introspection_result.datamodel.models.is_empty()
                     && introspection_result.datamodel.enums.is_empty() =>
             {
-                Err(render_jsonrpc_error(Error::from(
-                    CommandError::IntrospectionResultEmpty(url.to_string()),
-                )))
+                Err(render_jsonrpc_error(
+                    Error::from(CommandError::IntrospectionResultEmpty(url.to_string())),
+                    &schema,
+                ))
             }
             Ok(introspection_result) => {
                 let warnings = match could_not_parse_input_data_model {
@@ -121,30 +121,46 @@ impl RpcImpl {
                         &introspection_result.datamodel,
                         &config,
                     )
-                    .map_err(Error::from)?,
+                    .map_err(Error::from)
+                    .map_err(|err| render_jsonrpc_error(err, &schema))?,
                     warnings,
                     version: introspection_result.version,
                 };
 
                 Ok(result)
             }
-            Err(e) => Err(render_jsonrpc_error(Error::from(e))),
+            Err(e) => Err(render_jsonrpc_error(Error::from(e), &schema)),
         }
     }
 
     pub async fn list_databases_internal(schema: String) -> RpcResult<Vec<String>> {
-        let connector = RpcImpl::load_connector(&schema).await?;
-        Ok(connector.list_databases().await.map_err(Error::from)?)
+        let (_, _, connector) = RpcImpl::load_connector(&schema)
+            .await
+            .map_err(|e| render_jsonrpc_error(e, &schema))?;
+        Ok(connector
+            .list_databases()
+            .await
+            .map_err(|e| render_jsonrpc_error(Error::from(e), &schema))?)
     }
 
     pub async fn get_database_description(schema: String) -> RpcResult<String> {
-        let connector = RpcImpl::load_connector(&schema).await?;
-        Ok(connector.get_database_description().await.map_err(Error::from)?)
+        let (_, _, connector) = RpcImpl::load_connector(&schema)
+            .await
+            .map_err(|e| render_jsonrpc_error(e, &schema))?;
+        Ok(connector
+            .get_database_description()
+            .await
+            .map_err(|e| render_jsonrpc_error(Error::from(e), &schema))?)
     }
 
     pub async fn get_database_metadata_internal(schema: String) -> RpcResult<DatabaseMetadata> {
-        let connector = RpcImpl::load_connector(&schema).await?;
-        Ok(connector.get_metadata().await.map_err(Error::from)?)
+        let (_, _, connector) = RpcImpl::load_connector(&schema)
+            .await
+            .map_err(|err| render_jsonrpc_error(err, &schema))?;
+        Ok(connector
+            .get_metadata()
+            .await
+            .map_err(|e| render_jsonrpc_error(Error::from(e), &schema))?)
     }
 }
 
