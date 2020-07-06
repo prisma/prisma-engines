@@ -18,12 +18,7 @@ pub fn render_error(crate_error: Error, schema: &str) -> UserFacingError {
             .into()
         }
         Error::DatamodelError(errors) => {
-            let error = user_facing_errors::UnknownError {
-                message: errors.to_pretty_string("schema.prisma", schema),
-                backtrace: Some(format!("{:?}", user_facing_errors::new_backtrace())),
-            };
-
-            user_facing_errors::Error::from(error)
+            UserFacingError::new_non_panic_with_current_backtrace(errors.to_pretty_string("schema.prisma", schema))
         }
         _ => UserFacingError::from_dyn_error(&crate_error),
     }
