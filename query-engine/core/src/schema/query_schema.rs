@@ -270,6 +270,8 @@ pub struct InputObjectType {
 
     #[debug_stub = "#Input Fields Cell#"]
     pub fields: OnceCell<Vec<InputFieldRef>>,
+
+    pub model: Option<String>,
 }
 
 impl InputObjectType {

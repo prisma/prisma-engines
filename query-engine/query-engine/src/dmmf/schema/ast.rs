@@ -38,6 +38,7 @@ pub struct DMMFInputType {
     pub name: String,
     pub is_one_of: bool,
     pub fields: Vec<DMMFInputField>,
+    pub model: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

@@ -52,7 +52,9 @@ pub trait CreateInputTypeBuilderExtension<'a>: InputTypeBuilderBase<'a> {
 
         return_cached!(self.get_cache(), &name);
 
-        let input_object = Arc::new(init_input_object_type(name.clone()));
+        let mut input_object = init_input_object_type(name.clone());
+        input_object.model = Some(model.name.to_string());
+        let input_object = Arc::new(input_object);
 
         // Cache empty object for circuit breaking
         self.cache(name, Arc::clone(&input_object));

@@ -40,6 +40,7 @@ impl DMMFObjectRenderer {
             name: input_object.name.clone(),
             is_one_of: input_object.is_one_of,
             fields: rendered_fields,
+            model: input_object.model.clone(),
         };
 
         ctx.add_input_type(input_type);

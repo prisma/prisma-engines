@@ -61,11 +61,25 @@ fn client_generator_test() {
     }
 
     let model_impls = generate_operation_impls_for_models(&fields_grouped_by_model);
+    let model_inputs = construct_input_types_2(&dmmf.schema.input_types);
+
     for model_impl in model_impls.into_iter() {
+        let mut model_impl = model_impl;
+
+        let inputs_for_model: Vec<_> = model_inputs.iter().filter(|mi| mi.model == model_impl.model).collect();
+        for input_for_model in inputs_for_model.iter() {
+            model_impl.the_impl.push_fn(input_for_model.constructor.clone());
+        }
+
         scope.push_struct(model_impl.the_struct);
         scope.push_impl(model_impl.the_impl);
 
         client.field(&format!("pub {}", &model_impl.model), model_impl.struct_name);
+    }
+
+    for model_input in model_inputs.into_iter() {
+        scope.push_struct(model_input.the_struct);
+        scope.push_impl(model_input.the_impl);
     }
 
     scope.push_struct(client);
@@ -110,6 +124,7 @@ fn generate_operation_impls_for_models(fields_grouped_by_model: &HashMap<String,
     ret
 }
 
+#[derive(Debug, Clone)]
 struct ModelImpl {
     model: String,
     struct_name: String,
@@ -120,6 +135,9 @@ struct ModelImpl {
 fn construct_input_types(scope: &mut Scope, input_types: &Vec<DMMFInputType>) {
     scope.raw("/// INPUT TYPES");
     for input in input_types.iter() {
+        if input.model.is_some() {
+            continue;
+        }
         if input.is_one_of {
             let input_enum = scope.new_enum(&input.name).vis("pub");
             for field in input.fields.iter() {
@@ -130,8 +148,8 @@ fn construct_input_types(scope: &mut Scope, input_types: &Vec<DMMFInputType>) {
         } else {
             let input_struct = new_pub_struct(scope, &input.name);
             for field in input.fields.iter() {
+                // TODO: this needs boxing in the generated code.
                 if !field.input_type.typ.ends_with("WhereInput") {
-                    // TODO: this needs boxing in the generated code.
                     input_struct.field(&format!("pub {}", &field.name()), map_type(&field.input_type));
                 }
             }
@@ -156,6 +174,66 @@ fn construct_input_types(scope: &mut Scope, input_types: &Vec<DMMFInputType>) {
             }
         }
     }
+}
+
+fn construct_input_types_2(input_types: &Vec<DMMFInputType>) -> Vec<ModelInputType> {
+    let mut ret = vec![];
+
+    //    scope.raw("/// INPUT TYPES");
+    for input in input_types.iter() {
+        if input.model.is_none() {
+            continue;
+        }
+        if input.is_one_of {
+            continue;
+        } else {
+            let mut input_struct = codegen::Struct::new(&input.name);
+            for field in input.fields.iter() {
+                // TODO: this needs boxing in the generated code.
+                if !field.input_type.typ.ends_with("WhereInput") {
+                    input_struct.field(&format!("pub {}", &field.name()), map_type(&field.input_type));
+                }
+            }
+            let mut impl_block = codegen::Impl::new(&input.name);
+            let mut constructor = codegen::Function::new(&input.name);
+            constructor.vis("pub").ret(&input.name).line("todo!()");
+
+            for field in input.fields.iter() {
+                if field.input_type.is_required {
+                    constructor.arg(&field.name(), map_type(&field.input_type));
+                }
+            }
+
+            for field in input.fields.iter() {
+                if !field.input_type.is_required {
+                    impl_block
+                        .new_fn(&field.name())
+                        .vis("pub")
+                        .arg_self()
+                        .arg(&field.name(), map_type(&field.input_type))
+                        .ret(&input.name)
+                        .line("todo!()");
+                }
+            }
+
+            ret.push(ModelInputType {
+                model: input.model.as_ref().unwrap().clone(),
+                the_struct: input_struct,
+                the_impl: impl_block,
+                constructor,
+            })
+        }
+    }
+
+    ret
+}
+
+#[derive(Debug, Clone)]
+struct ModelInputType {
+    model: String,
+    the_struct: codegen::Struct,
+    the_impl: codegen::Impl,
+    constructor: codegen::Function,
 }
 
 fn construct_output_types(scope: &mut Scope, output_types: &Vec<DMMFOutputType>) {

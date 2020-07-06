@@ -31,7 +31,9 @@ impl<'a> FilterObjectTypeBuilder<'a> {
         let object_name = format!("{}ScalarWhereInput", model.name);
         return_cached!(self.get_cache(), &object_name);
 
-        let input_object = Arc::new(init_input_object_type(object_name.clone()));
+        let mut input_object = init_input_object_type(object_name.clone());
+        input_object.model = Some(model.name.to_string());
+        let input_object = Arc::new(input_object);
         self.cache(object_name, Arc::clone(&input_object));
 
         let weak_ref = Arc::downgrade(&input_object);
@@ -74,7 +76,9 @@ impl<'a> FilterObjectTypeBuilder<'a> {
         let name = format!("{}WhereInput", model.name.clone());
         return_cached!(self.input_object_cache, &name);
 
-        let input_object = Arc::new(init_input_object_type(name.clone()));
+        let mut input_object = init_input_object_type(name.clone());
+        input_object.model = Some(model.name.to_string());
+        let input_object = Arc::new(input_object);
         self.cache(name, Arc::clone(&input_object));
 
         let weak_ref = Arc::downgrade(&input_object);
