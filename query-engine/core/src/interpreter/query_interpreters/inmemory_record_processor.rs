@@ -2,7 +2,8 @@ use connector::QueryArguments;
 use itertools::Itertools;
 use prisma_models::{ManyRecords, ModelProjection, Record, RecordProjection};
 
-pub struct NestedPagination {
+/// Allows to manipulate a set of records in-memory instead of on the database level.
+pub struct InMemoryRecordProcessor {
     skip: Option<i64>,
     take: Option<i64>,
     cursor: Option<RecordProjection>,
@@ -10,9 +11,9 @@ pub struct NestedPagination {
     distinct: Option<ModelProjection>,
 }
 
-impl NestedPagination {
-    pub fn new_from_query_args(args: &QueryArguments) -> NestedPagination {
-        NestedPagination {
+impl InMemoryRecordProcessor {
+    pub fn new_from_query_args(args: &QueryArguments) -> Self {
+        Self {
             skip: args.skip.clone(),
             take: args.take_abs(),
             cursor: args.cursor.clone(),
@@ -35,6 +36,7 @@ impl NestedPagination {
                 .expect("Parent id must be set on all records in order to paginate")
                 .values()
                 .collect();
+
             values
         });
 

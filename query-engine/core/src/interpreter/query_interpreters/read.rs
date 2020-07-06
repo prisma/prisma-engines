@@ -1,8 +1,8 @@
 use super::*;
-use crate::interpreter::query_interpreters::nested_pagination::NestedPagination;
 use crate::{interpreter::InterpretationResult, query_ast::*, result_ast::*};
 use connector::{self, ConnectionLike, ReadOperations};
 use futures::future::{BoxFuture, FutureExt};
+use inmemory_record_processor::InMemoryRecordProcessor;
 use prisma_models::ManyRecords;
 
 pub fn execute<'a, 'b>(
@@ -95,14 +95,14 @@ fn read_related<'a, 'b>(
     let fut = async move {
         let relation = query.parent_field.relation();
         let is_m2m = relation.is_many_to_many();
-        let paginator = NestedPagination::new_from_query_args(&query.args);
+        let processor = InMemoryRecordProcessor::new_from_query_args(&query.args);
 
         query.args.distinct = None;
         query.args.ignore_take = true;
         query.args.ignore_skip = true;
 
         let scalars = if is_m2m {
-            nested_read::m2m(tx, &query, parent_result, paginator).await?
+            nested_read::m2m(tx, &query, parent_result, processor).await?
         } else {
             nested_read::one2m(
                 tx,
@@ -111,7 +111,7 @@ fn read_related<'a, 'b>(
                 parent_result,
                 query.args.clone(),
                 &query.selected_fields,
-                paginator,
+                processor,
             )
             .await?
         };
