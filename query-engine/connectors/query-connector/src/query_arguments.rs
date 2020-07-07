@@ -11,8 +11,7 @@ pub struct SkipAndLimit {
 /// - `cursor`, `take`, `skip` page through the data.
 /// - `filter` scopes the data by defining conditions (akin to `WHERE` in SQL).
 /// - `order_by` defines the ordering of records.
-/// - `distinct` designates the fields on which the records should be distinct
-///   on the (scalar) fields selected in the query.
+/// - `distinct` designates the fields on which the records should be distinct.
 /// - The `ignore_*` flags are a temporary bandaid to tell the connector to do not
 ///   include certain constraints when building queries, because the core is already
 ///   performing these action in a different manner (e.g. in-memory on all records).
