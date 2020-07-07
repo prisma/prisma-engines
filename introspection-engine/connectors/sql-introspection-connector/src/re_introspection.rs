@@ -55,14 +55,7 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
                 old_data_model.find_model_db_name(&model.database_name.as_ref().unwrap_or(&model.name))
             {
                 if new_data_model.find_model(&old_model.name).is_none() {
-                    changed_model_names.push((
-                        Model {
-                            model: model.name.clone(),
-                        },
-                        Model {
-                            model: old_model.name.clone(),
-                        },
-                    ))
+                    changed_model_names.push((Model::new(&model.name), Model::new(&old_model.name)))
                 }
             }
         }
