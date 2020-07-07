@@ -744,7 +744,7 @@ async fn introspecting_a_relation_based_on_an_unsupported_type_should_drop_it(ap
     let warnings = dbg!(api.introspection_warnings().await);
     assert_eq!(
         &warnings,
-        "[{\"code\":3,\"message\":\"These fields were commented out because we currently do not support their types.\",\"affected\":[{\"model\":\"Post\",\"field\":\"user_network_mac\",\"tpe\":\"macaddr\"},{\"model\":\"User\",\"field\":\"network_mac\",\"tpe\":\"macaddr\"}]}]"
+        "[{\"code\":3,\"message\":\"These fields were commented out because Prisma currently does not support their types.\",\"affected\":[{\"model\":\"Post\",\"field\":\"user_network_mac\",\"tpe\":\"macaddr\"},{\"model\":\"User\",\"field\":\"network_mac\",\"tpe\":\"macaddr\"}]}]"
     );
 
     let result = dbg!(api.introspect().await);
