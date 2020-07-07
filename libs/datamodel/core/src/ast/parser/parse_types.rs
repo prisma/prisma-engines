@@ -29,7 +29,6 @@ pub fn parse_type_alias(token: &pest::iterators::Pair<'_, Rule>) -> Field {
             },
             name,
             arity: FieldArity::Required,
-            default_value: None,
             directives,
             documentation: comment,
             span: Span::from_pest(token.as_span()),

@@ -39,7 +39,6 @@ pub fn parse_field(model_name: &str, token: &pest::iterators::Pair<'_, Rule>) ->
             },
             name,
             arity,
-            default_value: None,
             directives,
             documentation: doc_comments_to_string(&comments),
             span: Span::from_pest(token.as_span()),
