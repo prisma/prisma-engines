@@ -1,5 +1,6 @@
 use crate::error::SqlError;
 use chrono::{DateTime, NaiveDate, Utc};
+use connector_interface::{AggregationResult, Aggregator};
 use datamodel::FieldArity;
 use prisma_models::{PrismaValue, Record, TypeIdentifier};
 use quaint::{
@@ -14,6 +15,40 @@ use uuid::Uuid;
 #[derive(Debug, Clone, Default)]
 pub struct SqlRow {
     pub values: Vec<PrismaValue>,
+}
+
+impl SqlRow {
+    pub fn into_aggregation_results(self, aggregators: &[Aggregator]) -> Vec<AggregationResult> {
+        let mut values = self.values;
+        values.reverse();
+
+        aggregators
+            .iter()
+            .flat_map(|aggregator| match aggregator {
+                Aggregator::Count => vec![AggregationResult::Count(values.pop().unwrap())],
+
+                Aggregator::Average(fields) => fields
+                    .iter()
+                    .map(|field| AggregationResult::Average(field.clone(), values.pop().unwrap()))
+                    .collect(),
+
+                Aggregator::Sum(fields) => fields
+                    .iter()
+                    .map(|field| AggregationResult::Sum(field.clone(), values.pop().unwrap()))
+                    .collect(),
+
+                Aggregator::Min(fields) => fields
+                    .iter()
+                    .map(|field| AggregationResult::Min(field.clone(), values.pop().unwrap()))
+                    .collect(),
+
+                Aggregator::Max(fields) => fields
+                    .iter()
+                    .map(|field| AggregationResult::Max(field.clone(), values.pop().unwrap()))
+                    .collect(),
+            })
+            .collect()
+    }
 }
 
 impl From<SqlRow> for Record {

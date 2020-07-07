@@ -155,7 +155,8 @@ fn experimental_features_roundtrip() {
 datasource db {
   provider = "postgresql"
   url      = "postgresql://test"
-}"#;
+}
+"#;
 
     let dml = datamodel::parse_configuration(input).unwrap();
     let rendered = datamodel::render_datamodel_and_config_to_string(&Datamodel::new(), &dml).unwrap();

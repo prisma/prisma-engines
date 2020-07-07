@@ -1,7 +1,6 @@
 use super::DirectiveBox;
 use crate::{
     ast,
-    common::value_validator::ValueValidator,
     common::ScalarType,
     configuration, dml,
     error::{DatamodelError, ErrorCollection},
@@ -148,23 +147,7 @@ impl<'a> LiftAstToDml<'a> {
         field.documentation = ast_field.documentation.clone().map(|comment| comment.text);
         field.arity = self.lift_field_arity(&ast_field.arity);
 
-        if let Some(value) = &ast_field.default_value {
-            let validator = ValueValidator::new(value);
-
-            if let dml::FieldType::Base(base_type, _) = &field_type {
-                match validator.as_default_value_for_scalar_type(*base_type) {
-                    Ok(dv) => field.default_value = Some(dv),
-                    Err(err) => errors.push(err),
-                };
-            } else {
-                errors.push(DatamodelError::new_validation_error(
-                    "Found default value for a non-scalar type.",
-                    validator.span(),
-                ))
-            }
-        }
-
-        // We merge arttributes so we can fail on duplicates.
+        // We merge attributes so we can fail on duplicates.
         let attributes = [&extra_attributes[..], &ast_field.directives[..]].concat();
 
         if let Err(mut err) = self.directives.field.validate_and_apply(&attributes, &mut field) {

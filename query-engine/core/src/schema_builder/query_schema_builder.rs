@@ -255,6 +255,7 @@ impl<'a> QuerySchemaBuilder<'a> {
 
     /// Builds an "aggregate" query field (e.g. "aggregateUser") for given model.
     fn aggregation_field(&self, model: ModelRef) -> Field {
+        let args = self.object_type_builder.many_records_arguments(&model);
         let field_name = self.pluralize_internal(
             format!("aggregate{}", model.name.clone()), // Has no legacy counterpart.
             format!("aggregate{}", model.name.clone()),
@@ -262,7 +263,7 @@ impl<'a> QuerySchemaBuilder<'a> {
 
         field(
             field_name,
-            vec![],
+            args,
             OutputType::object(self.object_type_builder.aggregation_object_type(&model)),
             Some(SchemaQueryBuilder::ModelQueryBuilder(ModelQueryBuilder::new(
                 Arc::clone(&model),

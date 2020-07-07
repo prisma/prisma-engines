@@ -1,9 +1,14 @@
 extern crate datamodel;
 
-use self::datamodel::IndexDefinition;
+use self::datamodel::{IndexDefinition, StringFromEnvVar};
 use datamodel::{common::ScalarType, dml, error::*};
 use datamodel_connector::ScalarFieldType;
 use pretty_assertions::assert_eq;
+
+pub trait DatasourceAsserts {
+    fn assert_name(&self, name: &str) -> &Self;
+    fn assert_url(&self, url: StringFromEnvVar) -> &Self;
+}
 
 pub trait FieldAsserts {
     fn assert_base_type(&self, t: &ScalarType) -> &Self;
@@ -53,6 +58,18 @@ pub trait ErrorAsserts {
     fn assert_is_message(&self, msg: &str) -> &Self;
     fn assert_is_at(&self, index: usize, error: DatamodelError) -> &Self;
     fn assert_length(&self, length: usize) -> &Self;
+}
+
+impl DatasourceAsserts for datamodel::Datasource {
+    fn assert_name(&self, name: &str) -> &Self {
+        assert_eq!(&self.name, name);
+        &self
+    }
+
+    fn assert_url(&self, url: StringFromEnvVar) -> &Self {
+        assert_eq!(self.url, url);
+        &self
+    }
 }
 
 impl FieldAsserts for dml::Field {

@@ -61,7 +61,7 @@ pub struct PrismaOpt {
     #[structopt(long, env = "PRISMA_DML", parse(try_from_str = parse_base64_string))]
     datamodel: Option<String>,
 
-    /// Base64 encoded datasources, overwriting the ones in the datamodel
+    /// Base64 encoded datasource urls, overwriting the ones in the schema
     #[structopt(long, env, parse(try_from_str = parse_base64_string))]
     overwrite_datasources: Option<String>,
 
@@ -128,33 +128,20 @@ impl PrismaOpt {
     pub fn configuration(&self, ignore_env_errors: bool) -> PrismaResult<Configuration> {
         let datamodel_str = self.datamodel_str()?;
 
-        let config_result = if ignore_env_errors {
-            datamodel::parse_configuration_and_ignore_env_errors(datamodel_str)
+        let datasource_url_overrides: Vec<(String, String)> = if let Some(ref json) = self.overwrite_datasources {
+            let datasource_url_overrides: Vec<SourceOverride> = serde_json::from_str(&json)?;
+            datasource_url_overrides.into_iter().map(|x| (x.name, x.url)).collect()
         } else {
-            datamodel::parse_configuration(datamodel_str)
+            vec![]
         };
 
-        match config_result {
-            Err(errors) => Err(PrismaError::ConversionError(errors, datamodel_str.to_string())),
-            Ok(mut configuration) => {
-                if let Some(ref overwrites) = self.overwrite_datasources {
-                    let datasource_overwrites: Vec<SourceOverride> = serde_json::from_str(&overwrites)?;
+        let config_result = if ignore_env_errors {
+            datamodel::parse_configuration_and_ignore_datasource_urls(datamodel_str)
+        } else {
+            datamodel::parse_configuration_with_url_overrides(datamodel_str, datasource_url_overrides)
+        };
 
-                    for datasource_override in datasource_overwrites {
-                        for datasource in &mut configuration.datasources {
-                            if datasource_override.name == datasource.name {
-                                debug!(
-                                    "overwriting datasource {} with url {}",
-                                    &datasource_override.name, &datasource_override.url
-                                );
-                                datasource.set_url(&datasource_override.url);
-                            }
-                        }
-                    }
-                }
-                Ok(configuration)
-            }
-        }
+        config_result.map_err(|errors| PrismaError::ConversionError(errors, datamodel_str.to_string()))
     }
 }
 

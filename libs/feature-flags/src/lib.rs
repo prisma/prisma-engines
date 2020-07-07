@@ -30,6 +30,9 @@ pub struct FeatureFlags {
 
     /// Distinct select query support.
     pub distinct: bool,
+
+    /// Basic aggregation support.
+    pub aggregations: bool,
 }
 
 impl FeatureFlags {
@@ -39,6 +42,7 @@ impl FeatureFlags {
             "transaction" => self.transaction = true,
             "connectOrCreate" => self.connect_or_create = true,
             "distinct" => self.distinct = true,
+            "aggregations" => self.aggregations = true,
             _ => Err(FeatureFlagError::InvalidFlag(flag.to_owned()))?,
         };
 
@@ -49,6 +53,7 @@ impl FeatureFlags {
         self.transaction = true;
         self.connect_or_create = true;
         self.distinct = true;
+        self.aggregations = true;
     }
 }
 

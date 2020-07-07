@@ -75,6 +75,8 @@ trait PlayJsonExtensions extends JsonUtils {
 
     def pathAsDouble(path: String): Double = pathAs[JsNumber](path).value.toDouble
 
+    def pathAsInt(path: String): Double = pathAs[JsNumber](path).value.toInt
+
     def pathAsBool(path: String): Boolean = pathAs[JsBoolean](path).value
 
     def getFirstErrorMessage = jsValue.pathAsSeq("errors").head.pathAsString("message")
@@ -118,7 +120,6 @@ trait PlayJsonExtensions extends JsonUtils {
       val errors = json.pathAsSeq("errors")
       require(requirement = errors.size == errorCount, message = s"expected exactly $errorCount errors, but got ${errors.size} instead.")
 
-
       if (errorCode != 0) {
         val errorCodeInResult = errors.head.pathAsString("user_facing_error.error_code").stripPrefix("P")
         require(
@@ -127,16 +128,16 @@ trait PlayJsonExtensions extends JsonUtils {
         )
       }
 
-      errorMetaContains.foreach({case (path, expectedJsonString) =>  {
-        val expectedJson = Json.parse(expectedJsonString)
-        val foundValue = errors.head.pathAsJsValue(s"user_facing_error.meta.$path")
+      errorMetaContains.foreach({
+        case (path, expectedJsonString) => {
+          val expectedJson = Json.parse(expectedJsonString)
+          val foundValue   = errors.head.pathAsJsValue(s"user_facing_error.meta.$path")
 
-        require(
-          requirement = expectedJson == foundValue,
-          message = s"Expected the error metadata to be `$expectedJson` but found `${foundValue}`"
-
-        )
-      }
+          require(
+            requirement = expectedJson == foundValue,
+            message = s"Expected the error metadata to be `$expectedJson` but found `${foundValue}`"
+          )
+        }
       })
 
       if (errorContains != "") {
