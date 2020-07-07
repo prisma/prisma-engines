@@ -86,7 +86,10 @@ impl SqlFlavour for MysqlFlavour {
 
         let db_name = self.0.dbname();
 
-        let query = format!("CREATE DATABASE `{}`", db_name);
+        let query = format!(
+            "CREATE DATABASE `{}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;",
+            db_name
+        );
         catch(conn.connection_info(), conn.raw_cmd(&query).map_err(SqlError::from)).await?;
 
         Ok(db_name.to_owned())
