@@ -6,6 +6,12 @@
 // want the concat operator ~ between X and Y
 // to consume any whitespace after X, if Y is not present.
 
+// This is how PEG grammars work:
+// https://pest.rs/book/grammars/peg.html
+
+// This is the basic syntax of Pest grammar files:
+// https://pest.rs/book/grammars/syntax.html#cheat-sheet
+
 // ######################################
 // Schema - the root of all rules
 // ######################################
