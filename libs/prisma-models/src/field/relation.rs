@@ -15,11 +15,8 @@ pub type RelationFieldWeak = Weak<RelationField>;
 #[derive(Debug)]
 pub struct RelationFieldTemplate {
     pub name: String,
-    pub is_id: bool,
     pub is_required: bool,
     pub is_list: bool,
-    pub is_unique: bool,
-    pub is_auto_generated_int_id: bool,
     pub relation_name: String,
     pub relation_side: RelationSide,
     pub relation_info: RelationInfo,
@@ -28,10 +25,8 @@ pub struct RelationFieldTemplate {
 #[derive(DebugStub, Clone)]
 pub struct RelationField {
     pub name: String,
-    pub is_id: bool,
     pub is_required: bool,
     pub is_list: bool,
-    pub is_auto_generated_int_id: bool,
     pub relation_name: String,
     pub relation_side: RelationSide,
     pub relation: OnceCell<RelationWeakRef>,
@@ -39,8 +34,6 @@ pub struct RelationField {
 
     #[debug_stub = "#ModelWeakRef#"]
     pub model: ModelWeakRef,
-
-    pub(crate) is_unique: bool,
     pub(crate) fields: OnceCell<Vec<ScalarFieldWeak>>,
 }
 
@@ -51,10 +44,8 @@ impl Hash for RelationField {
         self.name.hash(state);
         self.is_required.hash(state);
         self.is_list.hash(state);
-        self.is_auto_generated_int_id.hash(state);
         self.relation_name.hash(state);
         self.relation_side.hash(state);
-        self.is_unique.hash(state);
         self.model().hash(state);
     }
 }
@@ -64,10 +55,8 @@ impl PartialEq for RelationField {
         self.name == other.name
             && self.is_required == other.is_required
             && self.is_list == other.is_list
-            && self.is_auto_generated_int_id == other.is_auto_generated_int_id
             && self.relation_name == other.relation_name
             && self.relation_side == other.relation_side
-            && self.is_unique == other.is_unique
             && self.model() == other.model()
     }
 }
@@ -99,11 +88,8 @@ impl RelationFieldTemplate {
     pub fn build(self, model: ModelWeakRef) -> RelationFieldRef {
         Arc::new(RelationField {
             name: self.name,
-            is_id: self.is_id,
             is_required: self.is_required,
             is_list: self.is_list,
-            is_auto_generated_int_id: self.is_auto_generated_int_id,
-            is_unique: self.is_unique,
             relation_name: self.relation_name,
             relation_side: self.relation_side,
             model,
@@ -154,10 +140,6 @@ impl RelationField {
 
     pub fn is_optional(&self) -> bool {
         !self.is_required
-    }
-
-    pub fn is_unique(&self) -> bool {
-        self.is_unique
     }
 
     pub fn model(&self) -> ModelRef {

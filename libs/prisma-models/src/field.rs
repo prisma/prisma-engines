@@ -102,7 +102,7 @@ impl Field {
     pub fn is_id(&self) -> bool {
         match self {
             Field::Scalar(sf) => sf.is_id,
-            Field::Relation(rf) => rf.is_id,
+            Field::Relation(_) => false,
         }
     }
 
@@ -130,7 +130,7 @@ impl Field {
     pub fn is_unique(&self) -> bool {
         match self {
             Field::Scalar(ref sf) => sf.unique(),
-            Field::Relation(ref rf) => rf.is_id || rf.is_unique,
+            Field::Relation(_) => false,
         }
     }
 
