@@ -4,7 +4,7 @@ use introspection_connector::ConnectorError;
 use jsonrpc_core::types::Error as JsonRpcError;
 use user_facing_errors::{introspection_engine::IntrospectionResultEmpty, Error as UserFacingError, KnownError};
 
-pub fn render_error(crate_error: Error) -> UserFacingError {
+pub fn render_error(crate_error: Error, schema: &str) -> UserFacingError {
     match crate_error {
         Error::ConnectorError(ConnectorError {
             user_facing_error: Some(user_facing_error),
@@ -17,12 +17,15 @@ pub fn render_error(crate_error: Error) -> UserFacingError {
             .unwrap()
             .into()
         }
+        Error::DatamodelError(errors) => {
+            UserFacingError::new_non_panic_with_current_backtrace(errors.to_pretty_string("schema.prisma", schema))
+        }
         _ => UserFacingError::from_dyn_error(&crate_error),
     }
 }
 
-pub(super) fn render_jsonrpc_error(crate_error: Error) -> JsonRpcError {
-    let prisma_error = render_error(crate_error);
+pub(super) fn render_jsonrpc_error(crate_error: Error, schema: &str) -> JsonRpcError {
+    let prisma_error = render_error(crate_error, schema);
 
     let error_rendering_result: Result<_, _> = serde_json::to_value(&prisma_error).map(|data| JsonRpcError {
         // We separate the JSON-RPC error code (defined by the JSON-RPC spec) from the
@@ -46,11 +49,5 @@ fn fallback_jsonrpc_error(err: impl std::error::Error) -> JsonRpcError {
         code: jsonrpc_core::types::error::ErrorCode::ServerError(4466),
         message: "The migration engine encountered an error and failed to render it.".to_string(),
         data: Some(serde_json::json!({ "backtrace": null, "message": format!("{}", err) })),
-    }
-}
-
-impl From<Error> for JsonRpcError {
-    fn from(e: Error) -> Self {
-        render_jsonrpc_error(e)
     }
 }

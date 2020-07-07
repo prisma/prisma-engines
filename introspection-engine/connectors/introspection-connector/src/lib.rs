@@ -54,6 +54,18 @@ pub struct Warning {
     pub affected: Value,
 }
 
+impl Warning {
+    pub fn new_datamodel_parsing() -> Self {
+        Warning {
+            code: 0,
+            message:
+            "The input datamodel could not be parsed. This means it was not used to enrich the introspected datamodel with previous manual changes."
+                .into(),
+            affected: serde_json::Value::Null,
+        }
+    }
+}
+
 #[derive(Debug, Deserialize, Serialize)]
 pub struct IntrospectionResultOutput {
     /// Datamodel
