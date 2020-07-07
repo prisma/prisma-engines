@@ -464,7 +464,7 @@ async fn introspecting_an_unsupported_type_should_comment_it_out(api: &TestApi) 
     let warnings = dbg!(api.introspection_warnings().await);
     assert_eq!(
         &warnings,
-        "[{\"code\":3,\"message\":\"These fields were commented out because we currently do not support their types.\",\"affected\":[{\"model\":\"Test\",\"field\":\"network_mac\",\"tpe\":\"macaddr\"}]}]"
+        "[{\"code\":3,\"message\":\"These fields were commented out because Prisma currently does not support their types.\",\"affected\":[{\"model\":\"Test\",\"field\":\"network_mac\",\"tpe\":\"macaddr\"}]}]"
     );
 
     let result = dbg!(api.introspect().await);
@@ -559,7 +559,7 @@ async fn introspecting_an_unsupported_type_should_and_commenting_it_out_should_a
     let warnings = dbg!(api.introspection_warnings().await);
     assert_eq!(
         &warnings,
-        "[{\"code\":3,\"message\":\"These fields were commented out because we currently do not support their types.\",\"affected\":[{\"model\":\"Test\",\"field\":\"network_mac\",\"tpe\":\"macaddr\"}]}]"
+        "[{\"code\":3,\"message\":\"These fields were commented out because Prisma currently does not support their types.\",\"affected\":[{\"model\":\"Test\",\"field\":\"network_mac\",\"tpe\":\"macaddr\"}]}]"
     );
 
     let result = dbg!(api.introspect().await);
@@ -581,7 +581,7 @@ async fn introspecting_a_table_with_only_an_unsupported_id_type_should_comment_i
     let warnings = dbg!(api.introspection_warnings().await);
     assert_eq!(
         &warnings,
-        "[{\"code\":1,\"message\":\"These models do not have a unique identifier or id and are therefore commented out.\",\"affected\":[{\"model\":\"Test\"}]},{\"code\":3,\"message\":\"These fields were commented out because we currently do not support their types.\",\"affected\":[{\"model\":\"Test\",\"field\":\"network_mac\",\"tpe\":\"macaddr\"}]}]"
+        "[{\"code\":1,\"message\":\"The following models were commented out as they do not have a unique identifier or id. This is currently not supported by Prisma.\",\"affected\":[{\"model\":\"Test\"}]},{\"code\":3,\"message\":\"These fields were commented out because Prisma currently does not support their types.\",\"affected\":[{\"model\":\"Test\",\"field\":\"network_mac\",\"tpe\":\"macaddr\"}]}]"
     );
 
     let result = dbg!(api.introspect().await);
