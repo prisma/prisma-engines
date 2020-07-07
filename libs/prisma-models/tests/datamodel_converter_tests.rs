@@ -537,7 +537,6 @@ trait FieldAssertions {
     fn assert_type_identifier(&self, ti: TypeIdentifier) -> &Self;
     fn assert_optional(&self) -> &Self;
     fn assert_list(&self) -> &Self;
-    fn assert_unique(&self) -> &Self;
 }
 
 trait ScalarFieldAssertions {
@@ -546,6 +545,7 @@ trait ScalarFieldAssertions {
     fn assert_no_behaviour(&self) -> &Self;
     fn assert_is_auto_generated_int_id_by_db(&self) -> &Self;
     fn assert_is_id(&self) -> &Self;
+    fn assert_unique(&self) -> &Self;
 }
 
 trait RelationFieldAssertions {
@@ -566,11 +566,6 @@ impl FieldAssertions for ScalarField {
 
     fn assert_list(&self) -> &Self {
         assert!(self.is_list);
-        self
-    }
-
-    fn assert_unique(&self) -> &Self {
-        assert!(self.unique());
         self
     }
 }
@@ -600,6 +595,11 @@ impl ScalarFieldAssertions for ScalarField {
         assert!(self.is_id);
         self
     }
+
+    fn assert_unique(&self) -> &Self {
+        assert!(self.unique());
+        self
+    }
 }
 
 impl FieldAssertions for RelationField {
@@ -614,11 +614,6 @@ impl FieldAssertions for RelationField {
 
     fn assert_list(&self) -> &Self {
         assert!(self.is_list);
-        self
-    }
-
-    fn assert_unique(&self) -> &Self {
-        assert!(self.is_unique());
         self
     }
 }
