@@ -29,7 +29,7 @@ pub use parse_expression::parse_expression;
 pub struct PrismaDatamodelParser;
 
 /// Parses a Prisma V2 datamodel document into an internal AST representation.
-pub fn parse(datamodel_string: &str) -> Result<SchemaAst, ErrorCollection> {
+pub fn parse_schema(datamodel_string: &str) -> Result<SchemaAst, ErrorCollection> {
     let mut errors = ErrorCollection::new();
     let datamodel_result = PrismaDatamodelParser::parse(Rule::schema, datamodel_string);
 

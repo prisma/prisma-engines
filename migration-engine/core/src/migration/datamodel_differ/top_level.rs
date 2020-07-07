@@ -196,7 +196,7 @@ fn type_aliases_match(previous: &ast::Field, next: &ast::Field) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use datamodel::ast::parser::parse;
+    use datamodel::ast::parser::parse_schema;
 
     #[test]
     fn datamodel_differ_top_level_methods_work() {
@@ -218,7 +218,7 @@ mod tests {
             B 
         }
         "#;
-        let previous = parse(previous).unwrap();
+        let previous = parse_schema(previous).unwrap();
         let next = r#"
         model Author {
             id Int @id
@@ -237,7 +237,7 @@ mod tests {
             B 
         }
         "#;
-        let next = parse(next).unwrap();
+        let next = parse_schema(next).unwrap();
 
         let differ = TopDiffer {
             previous: &previous,

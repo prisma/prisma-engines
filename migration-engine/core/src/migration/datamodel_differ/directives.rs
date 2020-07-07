@@ -76,7 +76,7 @@ fn arguments_are_identical(previous: &ast::Argument, next: &ast::Argument) -> bo
 mod tests {
     use super::super::{ModelDiffer, TopDiffer};
     use super::*;
-    use datamodel::ast::parser::parse;
+    use datamodel::ast::parser::parse_schema;
 
     fn dog_model_custom_directive_test(test_fn: impl FnOnce(DirectiveDiffer<'_>)) {
         let previous = r#"
@@ -86,7 +86,7 @@ mod tests {
             @@customDirective(hasFur: true, animalType: "Mammal")
         }
         "#;
-        let previous = parse(previous).unwrap();
+        let previous = parse_schema(previous).unwrap();
         let next = r#"
         model Dog {
             id Int @id
@@ -94,7 +94,7 @@ mod tests {
             @@customDirective(animalType: "Mammals", legs: 4)
         }
         "#;
-        let next = parse(next).unwrap();
+        let next = parse_schema(next).unwrap();
 
         let differ = TopDiffer {
             previous: &previous,
