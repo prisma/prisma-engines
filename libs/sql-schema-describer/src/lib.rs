@@ -293,6 +293,12 @@ pub enum ColumnTypeFamily {
     Unsupported(String),
 }
 
+impl ColumnTypeFamily {
+    pub fn is_json(&self) -> bool {
+        matches!(self, ColumnTypeFamily::Json)
+    }
+}
+
 impl fmt::Display for ColumnTypeFamily {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let str = match self {

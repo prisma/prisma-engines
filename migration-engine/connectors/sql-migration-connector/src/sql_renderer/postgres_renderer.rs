@@ -60,6 +60,7 @@ impl super::SqlRenderer for PostgresRenderer {
             (DefaultValue::NOW, ColumnTypeFamily::DateTime) => "CURRENT_TIMESTAMP".into(),
             (DefaultValue::NOW, _) => unreachable!("NOW default on non-datetime column"),
             (DefaultValue::VALUE(val), ColumnTypeFamily::DateTime) => format!("'{}'", val).into(),
+            (DefaultValue::VALUE(PrismaValue::String(val)), ColumnTypeFamily::Json) => format!("'{}'", val).into(),
             (DefaultValue::VALUE(val), _) => val.to_string().into(),
             (DefaultValue::SEQUENCE(_), _) => todo!("rendering of sequence defaults"),
         }

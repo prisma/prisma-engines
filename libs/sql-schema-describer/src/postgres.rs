@@ -249,7 +249,11 @@ impl SqlSchemaDescriber {
                                 }
                             }
                             ColumnTypeFamily::Binary => DefaultValue::DBGENERATED(default_string),
-                            ColumnTypeFamily::Json => DefaultValue::DBGENERATED(default_string),
+                            // JSON/JSONB defaults come in the '{}'::jsonb form.
+                            ColumnTypeFamily::Json => unsuffix_default_literal(&default_string, "jsonb", "jsonb")
+                                .or(unsuffix_default_literal(&default_string, "json", "json"))
+                                .map(|default| DefaultValue::VALUE(PrismaValue::Json(unquote_string(&default))))
+                                .unwrap_or_else(move || DefaultValue::DBGENERATED(default_string)),
                             ColumnTypeFamily::Uuid => DefaultValue::DBGENERATED(default_string),
                             ColumnTypeFamily::Geometric => DefaultValue::DBGENERATED(default_string),
                             ColumnTypeFamily::LogSequenceNumber => DefaultValue::DBGENERATED(default_string),
