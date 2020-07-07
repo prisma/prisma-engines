@@ -23,12 +23,12 @@ impl DirectiveValidator<dml::Model> for MapDirectiveValidator {
 }
 
 pub struct MapDirectiveValidatorForField {}
-impl DirectiveValidator<dml::Field> for MapDirectiveValidatorForField {
+impl DirectiveValidator<dml::ScalarField> for MapDirectiveValidatorForField {
     fn directive_name(&self) -> &str {
         DIRECTIVE_NAME
     }
 
-    fn validate_and_apply(&self, args: &mut Args, obj: &mut dml::Field) -> Result<(), DatamodelError> {
+    fn validate_and_apply(&self, args: &mut Args, obj: &mut dml::ScalarField) -> Result<(), DatamodelError> {
         if obj.field_type.is_relation() {
             return self.new_directive_validation_error(
                 &format!(
@@ -41,7 +41,7 @@ impl DirectiveValidator<dml::Field> for MapDirectiveValidatorForField {
         internal_validate_and_apply(args, obj)
     }
 
-    fn serialize(&self, obj: &dml::Field, _datamodel: &Datamodel) -> Result<Vec<Directive>, DatamodelError> {
+    fn serialize(&self, obj: &dml::ScalarField, _datamodel: &Datamodel) -> Result<Vec<Directive>, DatamodelError> {
         internal_serialize(obj)
     }
 }

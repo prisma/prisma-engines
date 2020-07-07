@@ -13,7 +13,7 @@ impl ast::WithDirectives for Vec<ast::Directive> {
 pub fn field_validation_error(
     message: &str,
     model: &dml::Model,
-    field: &dml::Field,
+    field: &dml::ScalarField,
     ast: &ast::SchemaAst,
 ) -> DatamodelError {
     DatamodelError::new_model_validation_error(

@@ -6,12 +6,12 @@ use std::collections::HashMap;
 /// Prismas builtin `@unique` directive.
 pub struct FieldLevelUniqueDirectiveValidator {}
 
-impl DirectiveValidator<dml::Field> for FieldLevelUniqueDirectiveValidator {
+impl DirectiveValidator<dml::ScalarField> for FieldLevelUniqueDirectiveValidator {
     fn directive_name(&self) -> &'static str {
         &"unique"
     }
 
-    fn validate_and_apply(&self, args: &mut Args, obj: &mut dml::Field) -> Result<(), DatamodelError> {
+    fn validate_and_apply(&self, args: &mut Args, obj: &mut dml::ScalarField) -> Result<(), DatamodelError> {
         if obj.is_id {
             return self.new_directive_validation_error(
                 "Fields that are marked as id should not have an additional @unique.",
@@ -47,7 +47,7 @@ impl DirectiveValidator<dml::Field> for FieldLevelUniqueDirectiveValidator {
 
     fn serialize(
         &self,
-        field: &dml::Field,
+        field: &dml::ScalarField,
         _datamodel: &dml::Datamodel,
     ) -> Result<Vec<ast::Directive>, DatamodelError> {
         if field.is_unique {

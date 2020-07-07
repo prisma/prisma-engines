@@ -2,7 +2,7 @@ use crate::warnings::{
     warning_enriched_with_map_on_enum, warning_enriched_with_map_on_enum_value, warning_enriched_with_map_on_field,
     warning_enriched_with_map_on_model, Enum, EnumAndValue, Model, ModelAndField,
 };
-use datamodel::{Datamodel, DefaultNames, DefaultValue, Field, FieldType};
+use datamodel::{Datamodel, DefaultNames, DefaultValue, FieldType, ScalarField};
 use introspection_connector::IntrospectionResult;
 use prisma_value::PrismaValue;
 
@@ -148,20 +148,13 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
         let mut relation_fields_to_change = vec![];
         for changed_model_name in &changed_model_names {
             let changed_model = new_data_model.find_model(&changed_model_name.1.model).unwrap();
-            let relation_fields_on_this_model = changed_model
-                .fields()
-                .filter(|f| f.is_relation())
-                .collect::<Vec<&Field>>();
 
             for rf in &relation_fields_on_this_model {
                 if let FieldType::Relation(info) = &rf.field_type {
                     let other_model_in_relation = new_data_model.find_model(&info.to).unwrap();
-                    let number_of_relations_to_other_model_in_relation = &relation_fields_on_this_model
-                        .iter()
-                        .filter(|f| match &f.field_type {
-                            FieldType::Relation(other_info) if other_info.to == info.to => true,
-                            _ => false,
-                        })
+                    let number_of_relations_to_other_model_in_relation = changed_model
+                        .relation_fields()
+                        .filter(|f| f.relation_info.to == info.to)
                         .count();
 
                     let other_relation_field = new_data_model.find_related_field_for_info(info).name.clone();

@@ -91,7 +91,7 @@ fn model_to_dmmf(model: &dml::Model) -> Model {
     }
 }
 
-fn field_to_dmmf(model: &dml::Model, field: &dml::Field) -> Field {
+fn field_to_dmmf(model: &dml::Model, field: &dml::ScalarField) -> Field {
     let a_relation_field_is_based_on_this_field: bool = model.fields.iter().any(|f| match &f.field_type {
         dml::FieldType::Relation(rel_info) => rel_info.fields.contains(&field.name),
         _ => false,
@@ -117,7 +117,7 @@ fn field_to_dmmf(model: &dml::Model, field: &dml::Field) -> Field {
     }
 }
 
-fn get_field_kind(field: &dml::Field) -> String {
+fn get_field_kind(field: &dml::ScalarField) -> String {
     match field.field_type {
         dml::FieldType::Relation(_) => String::from("object"),
         dml::FieldType::Enum(_) => String::from("enum"),
@@ -161,7 +161,7 @@ fn function_to_serde(name: &str, args: &Vec<PrismaValue>) -> serde_json::Value {
     serde_json::to_value(&func).expect("Failed to render function JSON")
 }
 
-fn get_field_type(field: &dml::Field) -> String {
+fn get_field_type(field: &dml::ScalarField) -> String {
     match &field.field_type {
         dml::FieldType::Relation(relation_info) => relation_info.to.clone(),
         dml::FieldType::Enum(t) => t.clone(),
@@ -175,28 +175,28 @@ fn type_to_string(scalar: &ScalarType) -> String {
     scalar.to_string()
 }
 
-fn get_relation_name(field: &dml::Field) -> Option<String> {
+fn get_relation_name(field: &dml::ScalarField) -> Option<String> {
     match &field.field_type {
         dml::FieldType::Relation(relation_info) => Some(relation_info.name.clone()),
         _ => None,
     }
 }
 
-fn get_relation_from_fields(field: &dml::Field) -> Option<Vec<String>> {
+fn get_relation_from_fields(field: &dml::ScalarField) -> Option<Vec<String>> {
     match &field.field_type {
         dml::FieldType::Relation(relation_info) => Some(relation_info.fields.clone()),
         _ => None,
     }
 }
 
-fn get_relation_to_fields(field: &dml::Field) -> Option<Vec<String>> {
+fn get_relation_to_fields(field: &dml::ScalarField) -> Option<Vec<String>> {
     match &field.field_type {
         dml::FieldType::Relation(relation_info) => Some(relation_info.to_fields.clone()),
         _ => None,
     }
 }
 
-fn get_relation_delete_strategy(field: &dml::Field) -> Option<String> {
+fn get_relation_delete_strategy(field: &dml::ScalarField) -> Option<String> {
     match &field.field_type {
         dml::FieldType::Relation(relation_info) => Some(relation_info.on_delete.to_string()),
         _ => None,

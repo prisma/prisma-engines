@@ -7,11 +7,11 @@ use crate::{ast, dml};
 /// Prismas builtin `@relation` directive.
 pub struct RelationDirectiveValidator {}
 
-impl DirectiveValidator<dml::Field> for RelationDirectiveValidator {
+impl DirectiveValidator<dml::ScalarField> for RelationDirectiveValidator {
     fn directive_name(&self) -> &'static str {
         &"relation"
     }
-    fn validate_and_apply(&self, args: &mut Args, field: &mut dml::Field) -> Result<(), DatamodelError> {
+    fn validate_and_apply(&self, args: &mut Args, field: &mut dml::ScalarField) -> Result<(), DatamodelError> {
         if let dml::FieldType::Relation(relation_info) = &mut field.field_type {
             if let Ok(name_arg) = args.default_arg("name") {
                 let name = name_arg.as_str()?;
@@ -43,7 +43,11 @@ impl DirectiveValidator<dml::Field> for RelationDirectiveValidator {
         }
     }
 
-    fn serialize(&self, field: &dml::Field, datamodel: &dml::Datamodel) -> Result<Vec<ast::Directive>, DatamodelError> {
+    fn serialize(
+        &self,
+        field: &dml::ScalarField,
+        datamodel: &dml::Datamodel,
+    ) -> Result<Vec<ast::Directive>, DatamodelError> {
         if let dml::FieldType::Relation(relation_info) = &field.field_type {
             let mut args = Vec::new();
 

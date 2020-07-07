@@ -1,7 +1,7 @@
 use crate::SqlError;
 use datamodel::{
-    Datamodel, DefaultNames, DefaultValue as DMLDef, Field, FieldArity, FieldType, IndexDefinition, Model,
-    OnDeleteStrategy, RelationInfo, ScalarType, ValueGenerator as VG,
+    Datamodel, DefaultNames, DefaultValue as DMLDef, FieldArity, FieldType, IndexDefinition, Model, OnDeleteStrategy,
+    RelationField, RelationInfo, ScalarField, ScalarType, ValueGenerator as VG,
 };
 use sql_schema_describer::{
     Column, ColumnArity, ColumnTypeFamily, DefaultValue as SQLDef, ForeignKey, Index, IndexType, SqlSchema, Table,
@@ -82,14 +82,18 @@ fn common_prisma_m_to_n_relation_conditions(table: &Table) -> bool {
 
 //calculators
 
-pub fn calculate_many_to_many_field(foreign_key: &ForeignKey, relation_name: String, is_self_relation: bool) -> Field {
-    let field_type = FieldType::Relation(RelationInfo {
+pub fn calculate_many_to_many_field(
+    foreign_key: &ForeignKey,
+    relation_name: String,
+    is_self_relation: bool,
+) -> RelationField {
+    let info = FRelationInfo {
         name: relation_name,
         fields: vec![],
         to: foreign_key.referenced_table.clone(),
         to_fields: foreign_key.referenced_columns.clone(),
         on_delete: OnDeleteStrategy::None,
-    });
+    };
 
     let basename = foreign_key.referenced_table.clone();
 
@@ -98,17 +102,13 @@ pub fn calculate_many_to_many_field(foreign_key: &ForeignKey, relation_name: Str
         false => basename,
     };
 
-    Field {
+    RelationField {
         name,
         arity: FieldArity::List,
-        field_type,
+        relation_info: info,
         database_name: None,
-        default_value: None,
-        is_unique: false,
-        is_id: false,
         documentation: None,
         is_generated: false,
-        is_updated_at: false,
         is_commented_out: false,
     }
 }
@@ -127,7 +127,7 @@ pub(crate) fn calculate_index(index: &Index) -> IndexDefinition {
     index_definition
 }
 
-pub(crate) fn calculate_scalar_field(table: &Table, column: &Column) -> Field {
+pub(crate) fn calculate_scalar_field(table: &Table, column: &Column) -> ScalarField {
     debug!("Handling column {:?}", column);
     let field_type = calculate_scalar_field_type(&column);
     let (is_commented_out, documentation) = match field_type {
@@ -146,7 +146,7 @@ pub(crate) fn calculate_scalar_field(table: &Table, column: &Column) -> Field {
     let default_value = calculate_default(table, &column, &arity);
     let is_unique = table.is_column_unique(&column.name) && !is_id;
 
-    Field {
+    ScalarField {
         name: column.name.clone(),
         arity,
         field_type,
@@ -165,16 +165,16 @@ pub(crate) fn calculate_relation_field(
     schema: &SqlSchema,
     table: &Table,
     foreign_key: &ForeignKey,
-) -> Result<Field, SqlError> {
+) -> Result<RelationField, SqlError> {
     debug!("Handling foreign key  {:?}", foreign_key);
 
-    let field_type = FieldType::Relation(RelationInfo {
+    let info = RelationInfo {
         name: calculate_relation_name(schema, foreign_key, table)?,
         fields: foreign_key.columns.clone(),
         to: foreign_key.referenced_table.clone(),
         to_fields: foreign_key.referenced_columns.clone(),
         on_delete: OnDeleteStrategy::None,
-    });
+    };
 
     let columns: Vec<&Column> = foreign_key
         .columns
@@ -187,18 +187,13 @@ pub(crate) fn calculate_relation_field(
         false => FieldArity::Required,
     };
 
-    // todo Should this be an extra type? It uses just a small subset of the features of a scalar field
-    Ok(Field {
+    Ok(RelationField {
         name: foreign_key.referenced_table.clone(),
         arity,
-        field_type, // todo we could remove relation out of the type and make relationinfo part of RelationField
+        relation_info: info,
         database_name: None,
-        default_value: None,
-        is_unique: false,
-        is_id: false,
         documentation: None,
         is_generated: false,
-        is_updated_at: false,
         is_commented_out: false,
     })
 }
@@ -207,21 +202,21 @@ pub(crate) fn calculate_backrelation_field(
     schema: &SqlSchema,
     model: &Model,
     other_model: &Model,
-    relation_field: &Field,
+    relation_field: &ScalarField,
     relation_info: &RelationInfo,
-) -> Result<Field, SqlError> {
+) -> Result<RelationField, SqlError> {
     match schema.table(&model.name) {
         Err(table_name) => Err(SqlError::SchemaInconsistent {
             explanation: format!("Table {} not found.", table_name),
         }),
         Ok(table) => {
-            let field_type = FieldType::Relation(RelationInfo {
+            let info = RelationInfo {
                 name: relation_info.name.clone(),
                 to: model.name.clone(),
                 fields: vec![],
                 to_fields: vec![],
                 on_delete: OnDeleteStrategy::None,
-            });
+            };
 
             let other_is_unique = || match &relation_info.fields.len() {
                 1 => {
@@ -247,17 +242,14 @@ pub(crate) fn calculate_backrelation_field(
                 model.name.clone()
             };
 
-            Ok(Field {
+            Ok(RelationField {
                 name,
                 arity,
-                field_type,
+                relation_info: info,
                 database_name: None,
-                default_value: None,
-                is_unique: false,
-                is_id: false,
+
                 documentation: None,
                 is_generated: false,
-                is_updated_at: false,
                 is_commented_out: false,
             })
         }

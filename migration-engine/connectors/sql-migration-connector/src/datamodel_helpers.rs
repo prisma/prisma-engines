@@ -1,6 +1,6 @@
 use datamodel::{
     dml::{
-        Datamodel, DefaultValue, Enum, Field, FieldArity, FieldType, IndexDefinition, Model, ScalarType,
+        Datamodel, DefaultValue, Enum, FieldArity, FieldType, IndexDefinition, Model, ScalarField, ScalarType,
         WithDatabaseName,
     },
     RelationInfo,
@@ -104,7 +104,7 @@ impl<'a> ModelRef<'a> {
 pub(super) struct FieldRef<'a> {
     datamodel: &'a Datamodel,
     model: &'a Model,
-    field: &'a Field,
+    field: &'a ScalarField,
 }
 
 impl<'a> FieldRef<'a> {

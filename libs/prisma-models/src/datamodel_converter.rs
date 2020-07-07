@@ -277,8 +277,8 @@ pub struct TempRelationHolder {
     pub name: String,
     pub model_a: dml::Model,
     pub model_b: dml::Model,
-    pub field_a: dml::Field,
-    pub field_b: dml::Field,
+    pub field_a: dml::ScalarField,
+    pub field_b: dml::ScalarField,
     pub manifestation: TempManifestationHolder,
 }
 
@@ -287,7 +287,7 @@ pub enum TempManifestationHolder {
     Inline {
         in_table_of_model: String,
         /// The relation field.
-        field: dml::Field,
+        field: dml::ScalarField,
         /// The name of the (dml) fields referenced by the relation.
         referenced_fields: Vec<String>,
     },
@@ -324,11 +324,11 @@ impl TempRelationHolder {
         self.field_a.is_list() && self.field_b.is_list()
     }
 
-    fn is_for_model_and_field(&self, model: &dml::Model, field: &dml::Field) -> bool {
+    fn is_for_model_and_field(&self, model: &dml::Model, field: &dml::ScalarField) -> bool {
         (&self.model_a == model && &self.field_a == field) || (&self.model_b == model && &self.field_b == field)
     }
 
-    fn relation_side(&self, field: &dml::Field) -> RelationSide {
+    fn relation_side(&self, field: &dml::ScalarField) -> RelationSide {
         if field == &self.field_a {
             RelationSide::A
         } else if field == &self.field_b {
@@ -369,7 +369,7 @@ trait DatamodelFieldExtensions {
     // fn default_value(&self) -> Option<dml::DefaultValue>; todo this is not applicable anymore
 }
 
-impl DatamodelFieldExtensions for dml::Field {
+impl DatamodelFieldExtensions for dml::ScalarField {
     fn type_identifier(&self) -> TypeIdentifier {
         match &self.field_type {
             dml::FieldType::Enum(x) => TypeIdentifier::Enum(x.clone()),

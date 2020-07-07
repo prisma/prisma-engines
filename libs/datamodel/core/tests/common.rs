@@ -30,7 +30,7 @@ pub trait FieldAsserts {
 }
 
 pub trait ModelAsserts {
-    fn assert_has_field(&self, t: &str) -> &dml::Field;
+    fn assert_has_field(&self, t: &str) -> &dml::ScalarField;
     fn assert_is_embedded(&self, t: bool) -> &Self;
     fn assert_with_db_name(&self, t: &str) -> &Self;
     fn assert_with_documentation(&self, t: &str) -> &Self;
@@ -72,7 +72,7 @@ impl DatasourceAsserts for datamodel::Datasource {
     }
 }
 
-impl FieldAsserts for dml::Field {
+impl FieldAsserts for dml::ScalarField {
     fn assert_base_type(&self, t: &ScalarType) -> &Self {
         if let dml::FieldType::Base(base_type, _) = &self.field_type {
             assert_eq!(base_type, t);
@@ -214,7 +214,7 @@ impl DatamodelAsserts for dml::Datamodel {
 }
 
 impl ModelAsserts for dml::Model {
-    fn assert_has_field(&self, t: &str) -> &dml::Field {
+    fn assert_has_field(&self, t: &str) -> &dml::ScalarField {
         self.find_field(&t.to_owned())
             .expect(format!("Field {} not found", t).as_str())
     }

@@ -1,7 +1,7 @@
 use crate::common::*;
 use datamodel::ast::Span;
 use datamodel::error::DatamodelError;
-use datamodel::{render_datamodel_to_string, Field, FieldArity, FieldType};
+use datamodel::{render_datamodel_to_string, FieldArity, FieldType, ScalarField};
 use datamodel_connector::scalars::ScalarType;
 use pretty_assertions::assert_eq;
 
@@ -626,7 +626,7 @@ fn must_handle_conflicts_with_existing_fields_if_types_are_compatible() {
 
     let schema = parse(dml);
     let post = schema.assert_has_model("Post");
-    let blog_id_fields: Vec<&Field> = post.fields.iter().filter(|f| &f.name == "blogId").collect();
+    let blog_id_fields: Vec<&ScalarField> = post.fields.iter().filter(|f| &f.name == "blogId").collect();
     dbg!(&post.fields);
     assert_eq!(blog_id_fields.len(), 1);
 

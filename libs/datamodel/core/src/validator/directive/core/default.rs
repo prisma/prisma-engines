@@ -7,12 +7,12 @@ use prisma_value::PrismaValue;
 /// Prismas builtin `@default` directive.
 pub struct DefaultDirectiveValidator {}
 
-impl DirectiveValidator<dml::Field> for DefaultDirectiveValidator {
+impl DirectiveValidator<dml::ScalarField> for DefaultDirectiveValidator {
     fn directive_name(&self) -> &'static str {
         &"default"
     }
 
-    fn validate_and_apply(&self, args: &mut Args, field: &mut dml::Field) -> Result<(), DatamodelError> {
+    fn validate_and_apply(&self, args: &mut Args, field: &mut dml::ScalarField) -> Result<(), DatamodelError> {
         // If we allow list default values, we need to adjust the types below properly for that case.
         if field.arity == dml::FieldArity::List {
             return self.new_directive_validation_error("Cannot set a default value on list field.", args.span());
@@ -49,7 +49,7 @@ impl DirectiveValidator<dml::Field> for DefaultDirectiveValidator {
 
     fn serialize(
         &self,
-        field: &dml::Field,
+        field: &dml::ScalarField,
         _datamodel: &dml::Datamodel,
     ) -> Result<Vec<ast::Directive>, DatamodelError> {
         if let Some(default_value) = &field.default_value {

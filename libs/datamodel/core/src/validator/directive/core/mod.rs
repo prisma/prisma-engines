@@ -11,8 +11,8 @@ mod updated_at;
 mod utils;
 
 /// Returns a directive list validator containing all builtin field directives.
-pub fn new_builtin_field_directives() -> DirectiveListValidator<dml::Field> {
-    let mut validator = DirectiveListValidator::<dml::Field>::new();
+pub fn new_builtin_field_directives() -> DirectiveListValidator<dml::FieldWrapper> {
+    let mut validator = DirectiveListValidator::<dml::FieldWrapper>::new();
 
     validator.add(Box::new(map::MapDirectiveValidatorForField {}));
     validator.add(Box::new(id::IdDirectiveValidator {}));

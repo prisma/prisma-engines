@@ -88,20 +88,22 @@ impl Datamodel {
     }
 
     /// Finds a model for a field reference by using reference comparison.
-    pub fn find_model_by_field_ref(&self, field: &Field) -> Option<&Model> {
+    pub fn find_model_by_field_ref(&self, field: &ScalarField) -> Option<&Model> {
         // This uses the memory location of field for equality.
-        self.models()
-            .find(|m| m.fields().any(|f| f as *const Field == field as *const Field))
+        self.models().find(|m| {
+            m.fields()
+                .any(|f| f as *const ScalarField == field as *const ScalarField)
+        })
     }
 
     /// Finds a field reference by a model and field name.
-    pub fn find_field(&self, field: &FieldRef) -> Option<&Field> {
+    pub fn find_field(&self, field: &FieldRef) -> Option<&ScalarField> {
         // This uses the memory location of field for equality.
         self.find_model(&field.0)?.find_field(&field.1)
     }
 
     /// Finds a mutable field reference by a model and field name.
-    pub fn find_field_mut(&mut self, model: &str, field: &str) -> Option<&mut Field> {
+    pub fn find_field_mut(&mut self, model: &str, field: &str) -> Option<&mut ScalarField> {
         // This uses the memory location of field for equality.
         self.find_model_mut(model)?.find_field_mut(field)
     }
@@ -128,16 +130,11 @@ impl Datamodel {
 
     /// Finds a field with a certain relation guarantee.
     /// exclude_field are necessary to avoid corner cases with self-relations (e.g. we must not recognize a field as its own related field).
-    pub fn related_field(&self, from: &str, to: &str, name: &str, exclude_field: &str) -> Option<&Field> {
+    pub fn related_field(&self, from: &str, to: &str, name: &str, exclude_field: &str) -> Option<&RelationField> {
         self.find_model(&to).and_then(|related_model| {
-            related_model.fields().find(|f| {
-                if let FieldType::Relation(rel_info) = &f.field_type {
-                    if rel_info.to == from && rel_info.name == name && f.name != exclude_field {
-                        return true;
-                    }
-                }
-                false
-            })
+            related_model
+                .relation_fields()
+                .find(|f| f.relation_info.to == from && f.relation_info.name == name && f.name != exclude_field)
         })
     }
     /// Returns (model_name, field_name) for all fields using a specific enum.
@@ -171,7 +168,7 @@ impl Datamodel {
     }
 
     /// Finds a relation field related to a relation info
-    pub fn find_related_field_for_info(&self, info: &RelationInfo) -> &Field {
+    pub fn find_related_field_for_info(&self, info: &RelationInfo) -> &ScalarField {
         self.find_model(&info.to)
             .expect("The model referred to by a RelationInfo should always exist.")
             .fields()

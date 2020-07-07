@@ -1,6 +1,6 @@
 use datamodel::{
-    common::ScalarType, dml, Datamodel, DefaultValue as DMLDefault, Field, FieldArity, FieldType, IndexDefinition,
-    Model, OnDeleteStrategy, RelationInfo, ValueGenerator,
+    common::ScalarType, dml, Datamodel, DefaultValue as DMLDefault, FieldArity, FieldType, IndexDefinition, Model,
+    OnDeleteStrategy, RelationInfo, ScalarField, ValueGenerator,
 };
 use pretty_assertions::assert_eq;
 use prisma_value::PrismaValue;
@@ -56,7 +56,7 @@ fn a_data_model_can_be_generated_from_a_schema() {
                             Some("This type is currently not supported.".to_string()),
                         ),
                     };
-                    Field {
+                    ScalarField {
                         name: col_type.to_string(),
                         arity: FieldArity::Optional,
                         field_type,
@@ -109,7 +109,7 @@ fn arity_is_preserved_when_generating_data_model_from_a_schema() {
             is_embedded: false,
             is_commented_out: false,
             fields: vec![
-                Field {
+                ScalarField {
                     name: "optional".to_string(),
                     arity: FieldArity::Optional,
                     field_type: FieldType::Base(ScalarType::Int, None),
@@ -122,7 +122,7 @@ fn arity_is_preserved_when_generating_data_model_from_a_schema() {
                     is_updated_at: false,
                     is_commented_out: false,
                 },
-                Field {
+                ScalarField {
                     name: "required".to_string(),
                     arity: FieldArity::Required,
                     field_type: FieldType::Base(ScalarType::Int, None),
@@ -135,7 +135,7 @@ fn arity_is_preserved_when_generating_data_model_from_a_schema() {
                     is_updated_at: false,
                     is_commented_out: false,
                 },
-                Field {
+                ScalarField {
                     name: "list".to_string(),
                     arity: FieldArity::List,
                     field_type: FieldType::Base(ScalarType::Int, None),
@@ -205,7 +205,7 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
             is_embedded: false,
             is_commented_out: false,
             fields: vec![
-                Field {
+                ScalarField {
                     name: "no_default".to_string(),
                     arity: FieldArity::Optional,
                     field_type: FieldType::Base(ScalarType::Int, None),
@@ -218,7 +218,7 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
                     is_updated_at: false,
                     is_commented_out: false,
                 },
-                Field {
+                ScalarField {
                     name: "int_default".to_string(),
                     arity: FieldArity::Optional,
                     field_type: FieldType::Base(ScalarType::Int, None),
@@ -231,7 +231,7 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
                     is_updated_at: false,
                     is_commented_out: false,
                 },
-                Field {
+                ScalarField {
                     name: "bool_default".to_string(),
                     arity: FieldArity::Optional,
                     field_type: FieldType::Base(ScalarType::Boolean, None),
@@ -244,7 +244,7 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
                     is_updated_at: false,
                     is_commented_out: false,
                 },
-                Field {
+                ScalarField {
                     name: "float_default".to_string(),
                     arity: FieldArity::Optional,
                     field_type: FieldType::Base(ScalarType::Float, None),
@@ -257,7 +257,7 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
                     is_updated_at: false,
                     is_commented_out: false,
                 },
-                Field {
+                ScalarField {
                     name: "string_default".to_string(),
                     arity: FieldArity::Optional,
                     field_type: FieldType::Base(ScalarType::String, None),
@@ -344,7 +344,7 @@ fn primary_key_is_preserved_when_generating_data_model_from_a_schema() {
                 documentation: None,
                 is_embedded: false,
                 is_commented_out: false,
-                fields: vec![Field {
+                fields: vec![ScalarField {
                     name: "primary".to_string(),
                     arity: FieldArity::Required,
                     field_type: FieldType::Base(ScalarType::Int, None),
@@ -368,7 +368,7 @@ fn primary_key_is_preserved_when_generating_data_model_from_a_schema() {
                 documentation: None,
                 is_embedded: false,
                 is_commented_out: false,
-                fields: vec![Field {
+                fields: vec![ScalarField {
                     name: "primary".to_string(),
                     arity: FieldArity::Required,
                     field_type: FieldType::Base(ScalarType::Int, None),
@@ -392,7 +392,7 @@ fn primary_key_is_preserved_when_generating_data_model_from_a_schema() {
                 documentation: None,
                 is_embedded: false,
                 is_commented_out: false,
-                fields: vec![Field {
+                fields: vec![ScalarField {
                     name: "primary".to_string(),
                     arity: FieldArity::Required,
                     field_type: FieldType::Base(ScalarType::Int, None),
@@ -505,7 +505,7 @@ fn uniqueness_is_preserved_when_generating_data_model_from_a_schema() {
             is_embedded: false,
             is_commented_out: false,
             fields: vec![
-                Field {
+                ScalarField {
                     name: "non_unique".to_string(),
                     arity: FieldArity::Optional,
                     field_type: FieldType::Base(ScalarType::Int, None),
@@ -518,7 +518,7 @@ fn uniqueness_is_preserved_when_generating_data_model_from_a_schema() {
                     is_updated_at: false,
                     is_commented_out: false,
                 },
-                Field {
+                ScalarField {
                     name: "unique".to_string(),
                     arity: FieldArity::Required,
                     field_type: FieldType::Base(ScalarType::Int, None),
@@ -583,7 +583,7 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
                 is_embedded: false,
                 is_commented_out: false,
                 fields: vec![
-                    Field {
+                    ScalarField {
                         name: "id".to_string(),
                         arity: FieldArity::Required,
                         field_type: FieldType::Base(ScalarType::Int, None),
@@ -596,7 +596,7 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
                         is_updated_at: false,
                         is_commented_out: false,
                     },
-                    Field {
+                    ScalarField {
                         name: "name".to_string(),
                         arity: FieldArity::Required,
                         field_type: FieldType::Base(ScalarType::String, None),
@@ -609,7 +609,7 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
                         is_updated_at: false,
                         is_commented_out: false,
                     },
-                    Field {
+                    ScalarField {
                         name: "User".to_string(),
                         field_type: FieldType::Relation(RelationInfo {
                             to: "User".to_string(),
@@ -640,7 +640,7 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
                 is_embedded: false,
                 is_commented_out: false,
                 fields: vec![
-                    Field {
+                    ScalarField {
                         name: "id".to_string(),
                         arity: FieldArity::Required,
                         field_type: FieldType::Base(ScalarType::Int, None),
@@ -653,7 +653,7 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
                         is_updated_at: false,
                         is_commented_out: false,
                     },
-                    Field {
+                    ScalarField {
                         name: "city_id".to_string(),
                         arity: FieldArity::Required,
                         field_type: FieldType::Base(ScalarType::Int, None),
@@ -666,7 +666,7 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
                         is_updated_at: false,
                         is_commented_out: false,
                     },
-                    Field {
+                    ScalarField {
                         name: "city_name".to_string(),
                         field_type: FieldType::Base(ScalarType::String, None),
                         arity: FieldArity::Required,
@@ -679,7 +679,7 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
                         is_updated_at: false,
                         is_commented_out: false,
                     },
-                    Field {
+                    ScalarField {
                         name: "City".to_string(),
                         arity: FieldArity::Required,
                         field_type: FieldType::Relation(RelationInfo {
@@ -824,7 +824,7 @@ fn multi_field_uniques_are_preserved_when_generating_data_model_from_a_schema() 
             is_embedded: false,
             is_commented_out: false,
             fields: vec![
-                Field {
+                ScalarField {
                     name: "id".to_string(),
                     arity: FieldArity::Required,
                     field_type: FieldType::Base(ScalarType::Int, None),
@@ -837,7 +837,7 @@ fn multi_field_uniques_are_preserved_when_generating_data_model_from_a_schema() 
                     is_updated_at: false,
                     is_commented_out: false,
                 },
-                Field {
+                ScalarField {
                     name: "name".to_string(),
                     arity: FieldArity::Required,
                     field_type: FieldType::Base(ScalarType::String, None),
@@ -850,7 +850,7 @@ fn multi_field_uniques_are_preserved_when_generating_data_model_from_a_schema() 
                     is_updated_at: false,
                     is_commented_out: false,
                 },
-                Field {
+                ScalarField {
                     name: "lastname".to_string(),
                     arity: FieldArity::Required,
                     field_type: FieldType::Base(ScalarType::String, None),
@@ -950,7 +950,7 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                 is_embedded: false,
                 is_commented_out: false,
                 fields: vec![
-                    Field {
+                    ScalarField {
                         name: "id".to_string(),
                         arity: FieldArity::Required,
                         field_type: FieldType::Base(ScalarType::Int, None),
@@ -963,7 +963,7 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                         is_updated_at: false,
                         is_commented_out: false,
                     },
-                    Field {
+                    ScalarField {
                         name: "name".to_string(),
                         arity: FieldArity::Required,
                         field_type: FieldType::Base(ScalarType::String, None),
@@ -976,7 +976,7 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                         is_updated_at: false,
                         is_commented_out: false,
                     },
-                    Field {
+                    ScalarField {
                         name: "User".to_string(),
                         arity: FieldArity::List,
                         field_type: FieldType::Relation(RelationInfo {
@@ -1007,7 +1007,7 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                 is_embedded: false,
                 is_commented_out: false,
                 fields: vec![
-                    Field {
+                    ScalarField {
                         name: "id".to_string(),
                         arity: FieldArity::Required,
                         field_type: FieldType::Base(ScalarType::Int, None),
@@ -1020,7 +1020,7 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                         is_updated_at: false,
                         is_commented_out: false,
                     },
-                    Field {
+                    ScalarField {
                         name: "city_id".to_string(),
                         field_type: FieldType::Base(ScalarType::Int, None),
                         arity: FieldArity::Required,
@@ -1033,7 +1033,7 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                         is_updated_at: false,
                         is_commented_out: false,
                     },
-                    Field {
+                    ScalarField {
                         name: "City".to_string(),
                         arity: FieldArity::Required,
                         field_type: FieldType::Relation(RelationInfo {

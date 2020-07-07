@@ -75,9 +75,78 @@ impl FieldType {
     }
 }
 
+pub(crate) enum FieldWrapper {
+    Field(ScalarField),
+    RelationField(RelationField),
+}
+
+impl FieldWrapper {
+    pub fn is_scalar(&self) -> bool {
+        match self {
+            FieldWrapper::Field(_) => true,
+            FieldWrapper::RelationField(_) => false,
+        }
+    }
+
+    pub fn is_relation(&self) -> bool {
+        match self {
+            FieldWrapper::Field(_) => false,
+            FieldWrapper::RelationField(_) => true,
+        }
+    }
+}
+
+/// Represents a relation field in a model.
+#[derive(Debug, PartialEq, Clone)]
+pub struct RelationField {
+    /// Name of the field.
+    pub name: String,
+
+    /// The field's type.
+    pub relation_info: RelationInfo,
+
+    /// The field's arity.
+    pub arity: FieldArity,
+
+    /// The database internal name.
+    pub database_name: Option<String>,
+
+    /// Comments associated with this field.
+    pub documentation: Option<String>,
+
+    /// signals that this field was internally generated (only back relation fields as of now)
+    pub is_generated: bool,
+
+    /// Indicates if this field has to be commented out.
+    pub is_commented_out: bool,
+}
+
+impl RelationField {
+    /// Creates a new field with the given name and type.
+    pub fn new(name: &str, info: RelationInfo) -> Self {
+        RelationField {
+            name: String::from(name),
+            arity: FieldArity::Required,
+            relation_info: info,
+            database_name: None,
+            documentation: None,
+            is_generated: false,
+            is_commented_out: false,
+        }
+    }
+    /// Creates a new field with the given name and type, marked as generated and optional.
+    pub fn new_generated(name: &str, info: RelationInfo) -> Self {
+        let mut field = Self::new(name, info);
+        field.arity = FieldArity::Optional;
+        field.is_generated = true;
+
+        field
+    }
+}
+
 /// Represents a field in a model.
 #[derive(Debug, PartialEq, Clone)]
-pub struct Field {
+pub struct ScalarField {
     /// Name of the field.
     pub name: String,
 
@@ -113,7 +182,32 @@ pub struct Field {
     pub is_commented_out: bool,
 }
 
-impl Field {
+impl ScalarField {
+    /// Creates a new field with the given name and type.
+    pub fn new(name: &str, field_type: FieldType) -> ScalarField {
+        ScalarField {
+            name: String::from(name),
+            arity: FieldArity::Required,
+            field_type,
+            database_name: None,
+            default_value: None,
+            is_unique: false,
+            is_id: false,
+            documentation: None,
+            is_generated: false,
+            is_updated_at: false,
+            is_commented_out: false,
+        }
+    }
+    /// Creates a new field with the given name and type, marked as generated and optional.
+    pub fn new_generated(name: &str, field_type: FieldType) -> ScalarField {
+        let mut field = Self::new(name, field_type);
+        field.arity = FieldArity::Optional;
+        field.is_generated = true;
+
+        field
+    }
+
     pub fn points_to_model(&self, name: &str) -> bool {
         match &self.field_type {
             FieldType::Relation(rel_info) if rel_info.to == name => true,
@@ -133,7 +227,7 @@ impl Field {
     }
 }
 
-impl WithName for Field {
+impl WithName for ScalarField {
     fn name(&self) -> &String {
         &self.name
     }
@@ -142,39 +236,12 @@ impl WithName for Field {
     }
 }
 
-impl WithDatabaseName for Field {
+impl WithDatabaseName for ScalarField {
     fn database_name(&self) -> Option<&str> {
         self.database_name.as_deref()
     }
 
     fn set_database_name(&mut self, database_name: Option<String>) {
         self.database_name = database_name;
-    }
-}
-
-impl Field {
-    /// Creates a new field with the given name and type.
-    pub fn new(name: &str, field_type: FieldType) -> Field {
-        Field {
-            name: String::from(name),
-            arity: FieldArity::Required,
-            field_type,
-            database_name: None,
-            default_value: None,
-            is_unique: false,
-            is_id: false,
-            documentation: None,
-            is_generated: false,
-            is_updated_at: false,
-            is_commented_out: false,
-        }
-    }
-    /// Creates a new field with the given name and type, marked as generated and optional.
-    pub fn new_generated(name: &str, field_type: FieldType) -> Field {
-        let mut field = Self::new(name, field_type);
-        field.arity = FieldArity::Optional;
-        field.is_generated = true;
-
-        field
     }
 }

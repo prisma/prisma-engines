@@ -5,12 +5,12 @@ use crate::{ast, dml};
 /// Prismas builtin `@updatedAt` directive.
 pub struct UpdatedAtDirectiveValidator {}
 
-impl DirectiveValidator<dml::Field> for UpdatedAtDirectiveValidator {
+impl DirectiveValidator<dml::ScalarField> for UpdatedAtDirectiveValidator {
     fn directive_name(&self) -> &'static str {
         &"updatedAt"
     }
 
-    fn validate_and_apply(&self, args: &mut Args, obj: &mut dml::Field) -> Result<(), DatamodelError> {
+    fn validate_and_apply(&self, args: &mut Args, obj: &mut dml::ScalarField) -> Result<(), DatamodelError> {
         if let dml::FieldType::Base(dml::ScalarType::DateTime, _) = obj.field_type {
             // everything good
         } else {
@@ -34,7 +34,7 @@ impl DirectiveValidator<dml::Field> for UpdatedAtDirectiveValidator {
 
     fn serialize(
         &self,
-        field: &dml::Field,
+        field: &dml::ScalarField,
         _datamodel: &dml::Datamodel,
     ) -> Result<Vec<ast::Directive>, DatamodelError> {
         if field.is_updated_at {

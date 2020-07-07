@@ -5,13 +5,13 @@ use crate::{ast, dml};
 /// Prismas builtin `@primary` directive.
 pub struct IdDirectiveValidator {}
 
-impl DirectiveValidator<dml::Field> for IdDirectiveValidator {
+impl DirectiveValidator<dml::ScalarField> for IdDirectiveValidator {
     fn directive_name(&self) -> &'static str {
         &"id"
     }
 
     // TODO In which form is this still required or needs to change? Default values are handling the id strategy now.
-    fn validate_and_apply(&self, args: &mut Args, obj: &mut dml::Field) -> Result<(), DatamodelError> {
+    fn validate_and_apply(&self, args: &mut Args, obj: &mut dml::ScalarField) -> Result<(), DatamodelError> {
         if obj.arity != dml::FieldArity::Required {
             return self.new_directive_validation_error("Fields that are marked as id must be required.", args.span());
         }
@@ -34,7 +34,7 @@ impl DirectiveValidator<dml::Field> for IdDirectiveValidator {
 
     fn serialize(
         &self,
-        field: &dml::Field,
+        field: &dml::ScalarField,
         _datamodel: &dml::Datamodel,
     ) -> Result<Vec<ast::Directive>, DatamodelError> {
         if field.is_id {

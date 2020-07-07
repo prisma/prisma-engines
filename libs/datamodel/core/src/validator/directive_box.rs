@@ -5,7 +5,7 @@ use super::directive::{
 use crate::dml;
 
 pub struct DirectiveBox {
-    pub field: DirectiveListValidator<dml::Field>,
+    pub field: DirectiveListValidator<dml::FieldWrapper>,
     pub model: DirectiveListValidator<dml::Model>,
     pub enm: DirectiveListValidator<dml::Enum>,
     pub enm_value: DirectiveListValidator<dml::EnumValue>,
