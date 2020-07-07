@@ -148,7 +148,7 @@ async fn altering_a_column_with_non_null_values_should_warn(api: &TestApi) -> Te
         &[MigrationWarning {
             description:
                 "You are about to alter the column `age` on the `Test` table, which still contains 2 non-null values. \
-                 The data in that column will be lost."
+                 The data in that column could be lost."
                     .to_owned()
         }]
     );
@@ -339,7 +339,7 @@ async fn changing_a_column_from_required_to_optional_should_work(api: &TestApi) 
 
         assert_eq!(
             migration_output.warnings.get(0).unwrap().description,
-            "You are about to alter the column `age` on the `Test` table, which still contains 2 non-null values. The data in that column will be lost.",
+            "You are about to alter the column `age` on the `Test` table, which still contains 2 non-null values. The data in that column could be lost.",
         );
 
         api.assert_schema().await?.assert_equals(&original_database_schema)?;
@@ -455,7 +455,7 @@ async fn changing_a_column_from_optional_to_required_must_warn(api: &TestApi) ->
         .await?
         .assert_executable()?
         .assert_no_error()?
-        .assert_warnings(&["You are about to alter the column `age` on the `Test` table, which still contains 2 non-null values. The data in that column will be lost.".into()])?;
+        .assert_warnings(&["You are about to alter the column `age` on the `Test` table, which still contains 2 non-null values. The data in that column could be lost.".into()])?;
 
     api.assert_schema().await?.assert_table("Test", |table| {
         table.assert_column("age", |column| {
@@ -687,7 +687,7 @@ async fn altering_the_type_of_a_column_in_a_non_empty_table_always_warns(api: &T
         &[MigrationWarning {
             // TODO: the message should say that altering the type of a column is not guaranteed to preserve the data, but the database is going to do its best.
             // Also think about timeouts.
-            description: "You are about to alter the column `dogs` on the `User` table, which still contains 1 non-null values. The data in that column will be lost.".to_owned()
+            description: "You are about to alter the column `dogs` on the `User` table, which still contains 1 non-null values. The data in that column could be lost.".to_owned()
         }]
     );
 
@@ -735,7 +735,7 @@ async fn migrating_a_required_column_from_int_to_string_should_warn_and_cast(api
     "#;
 
     let expected_warning = MigrationWarning {
-        description: "You are about to alter the column `serialNumber` on the `Test` table, which still contains 1 non-null values. The data in that column will be lost.".to_owned(),
+        description: "You are about to alter the column `serialNumber` on the `Test` table, which still contains 1 non-null values. The data in that column could be lost.".to_owned(),
     };
 
     // Apply once without forcing
@@ -1051,7 +1051,7 @@ async fn changing_an_array_column_to_scalar_must_warn(api: &TestApi) -> TestResu
         .await?
         .assert_executable()?
         .assert_no_error()?
-        .assert_warnings(&["You are about to alter the column `mainProtagonist` on the `Film` table, which still contains 1 non-null values. The data in that column will be lost.".into()])?;
+        .assert_warnings(&["You are about to alter the column `mainProtagonist` on the `Film` table, which still contains 1 non-null values. The data in that column could be lost.".into()])?;
 
     api.assert_schema().await?.assert_table("Film", |table| {
         table.assert_column("mainProtagonist", |column| column.assert_is_required())
@@ -1131,6 +1131,92 @@ async fn changing_a_scalar_column_to_an_array_is_unexecutable(api: &TestApi) -> 
         .collect();
 
     assert_eq!(rows, &[&["film1".into(), Value::text("left shark")]]);
+
+    Ok(())
+}
+
+#[test_each_connector(log = "debug")]
+async fn primary_key_migrations_do_not_cause_data_loss(api: &TestApi) -> TestResult {
+    let dm1 = r#"
+        model Dog {
+            name String
+            passportNumber Int
+
+            @@id([name, passportNumber])
+        }
+
+        model Puppy {
+            id String @id
+            motherName String
+            motherPassportNumber Int
+            mother Dog @relation(fields: [motherName, motherPassportNumber], references: [name, passportNumber])
+        }
+    "#;
+
+    api.infer_apply(dm1).send().await?.assert_green()?;
+
+    api.insert("Dog")
+        .value("name", "Marnie")
+        .value("passportNumber", 8000)
+        .result_raw()
+        .await?;
+
+    api.insert("Puppy")
+        .value("id", "12345")
+        .value("motherName", "Marnie")
+        .value("motherPassportNumber", 8000)
+        .result_raw()
+        .await?;
+
+    let dm2 = r#"
+        model Dog {
+            name String
+            passportNumber String
+
+            @@id([name, passportNumber])
+        }
+
+        model Puppy {
+            id String @id
+            motherName String
+            motherPassportNumber String
+            mother Dog @relation(fields: [motherName, motherPassportNumber], references: [name, passportNumber])
+        }
+    "#;
+
+    api.infer_apply(dm2)
+        .force(Some(true))
+        .send()
+        .await?
+        .assert_executable()?
+        .assert_no_error()?
+        .assert_warnings(&[
+            "The migration will change the primary key for the `Dog` table. If it partially fails, the table could be left without primary key constraint.".into(),
+            "You are about to alter the column `passportNumber` on the `Dog` table, which still contains 1 non-null values. The data in that column could be lost.".into(),
+            "You are about to alter the column `motherPassportNumber` on the `Puppy` table, which still contains 1 non-null values. The data in that column could be lost.".into(),
+        ])?;
+
+    api.assert_schema().await?.assert_table("Dog", |table| {
+        table.assert_pk(|pk| pk.assert_columns(&["name", "passportNumber"]))
+    })?;
+
+    let dog = api.select("Dog").column("name").column("passportNumber").send().await?;
+    let dog_row: Vec<quaint::Value> = dog.into_single().unwrap().into_iter().collect();
+    assert_eq!(dog_row, &[Value::text("Marnie"), Value::text("8000")]);
+
+    let puppy = api
+        .select("Puppy")
+        .column("id")
+        .column("motherName")
+        .column("motherPassportNumber")
+        .send()
+        .await?;
+
+    let puppy_row: Vec<quaint::Value> = puppy.into_single().unwrap().into_iter().collect();
+    assert_eq!(
+        puppy_row,
+        &[Value::text("12345"), Value::text("Marnie"), Value::text("8000")]
+    );
 
     Ok(())
 }

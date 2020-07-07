@@ -224,17 +224,105 @@ impl<'a> ObjectTypeBuilder<'a> {
     }
 
     /// Builds aggregation object type for given model (e.g. AggregateUser).
+    /// [DTODO] Factor the aggregate schema code into something more concise.
     pub fn aggregation_object_type(&self, model: &ModelRef) -> ObjectTypeRef {
         let name = format!("Aggregate{}", capitalize(&model.name));
         return_cached!(self.get_cache(), &name);
 
         let object = ObjectTypeStrongRef::new(ObjectType::new(&name, Some(ModelRef::clone(model))));
-        let arguments = self.many_records_arguments(model);
-        let fields = vec![field("count", arguments, OutputType::int(), None)];
+        let mut fields = vec![self.count_field()];
+
+        if feature_flags::get().aggregations {
+            append_opt(
+                &mut fields,
+                self.numeric_aggregation_field("avg", &model, Some(OutputType::float())),
+            );
+
+            append_opt(&mut fields, self.numeric_aggregation_field("sum", &model, None));
+            append_opt(&mut fields, self.numeric_aggregation_field("min", &model, None));
+            append_opt(&mut fields, self.numeric_aggregation_field("max", &model, None));
+        }
 
         object.set_fields(fields);
         self.cache(name, ObjectTypeStrongRef::clone(&object));
 
         ObjectTypeStrongRef::downgrade(&object)
+    }
+
+    fn count_field(&self) -> Field {
+        field("count", vec![], OutputType::int(), None)
+    }
+
+    /// Returns an aggregation field with given name if the model contains any numeric fields.
+    /// Fields inside the object type of the field may have a fixed output type.
+    fn numeric_aggregation_field(
+        &self,
+        name: &str,
+        model: &ModelRef,
+        fixed_field_type: Option<OutputType>,
+    ) -> Option<Field> {
+        let numeric_fields = Self::collect_numeric_fields(model);
+
+        if numeric_fields.is_empty() {
+            None
+        } else {
+            let object_type = self.wrap_opt_object(self.map_numeric_field_aggregation_object(
+                model,
+                name,
+                &numeric_fields,
+                fixed_field_type,
+            ));
+
+            Some(field(name, vec![], object_type, None))
+        }
+    }
+
+    /// Maps the object type for aggregations that operate on a (numeric) field level, rather than the entire model.
+    /// Fields inside the object may have a fixed output type.
+    fn map_numeric_field_aggregation_object(
+        &self,
+        model: &ModelRef,
+        suffix: &str,
+        fields: &[ScalarFieldRef],
+        fixed_field_type: Option<OutputType>,
+    ) -> ObjectTypeRef {
+        let name = format!("{}{}AggregateOutputType", capitalize(&model.name), capitalize(suffix));
+        return_cached!(self.get_cache(), &name);
+
+        let fields: Vec<Field> = fields
+            .into_iter()
+            .map(|sf| {
+                field(
+                    sf.name.clone(),
+                    vec![],
+                    fixed_field_type
+                        .clone()
+                        .unwrap_or(self.map_output_type(&ModelField::Scalar(sf.clone()))),
+                    None,
+                )
+            })
+            .collect();
+
+        let object = Arc::new(object_type(name.clone(), fields, None));
+        self.cache(name, object.clone());
+
+        Arc::downgrade(&object)
+    }
+
+    fn collect_numeric_fields(model: &ModelRef) -> Vec<ScalarFieldRef> {
+        model
+            .fields()
+            .scalar()
+            .into_iter()
+            .filter(|f| match f.type_identifier {
+                TypeIdentifier::Int => true,
+                TypeIdentifier::Float => true,
+                _ => false,
+            })
+            .collect()
+    }
+
+    fn wrap_opt_object(&self, o: ObjectTypeRef) -> OutputType {
+        OutputType::opt(OutputType::object(o))
     }
 }

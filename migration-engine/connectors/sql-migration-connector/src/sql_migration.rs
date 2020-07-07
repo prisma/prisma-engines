@@ -39,6 +39,7 @@ pub enum SqlMigrationStep {
     AddForeignKey(AddForeignKey),
     CreateTable(CreateTable),
     AlterTable(AlterTable),
+    DropForeignKey(DropForeignKey),
     DropTable(DropTable),
     RenameTable { name: String, new_name: String },
     RawSql { raw: String },
@@ -71,7 +72,8 @@ pub enum TableChange {
     AddColumn(AddColumn),
     AlterColumn(AlterColumn),
     DropColumn(DropColumn),
-    DropForeignKey(DropForeignKey),
+    DropPrimaryKey { constraint_name: Option<String> },
+    AddPrimaryKey { columns: Vec<String> },
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
@@ -98,6 +100,7 @@ pub struct AddForeignKey {
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct DropForeignKey {
+    pub table: String,
     pub constraint_name: String,
 }
 

@@ -7,6 +7,7 @@ use std::collections::HashMap;
 static EMPTY_ENUM_PLACEHOLDER: &'static str = "EMPTY_ENUM_VALUE";
 static EMPTY_STRING: &'static str = "";
 
+//todo sanitizing might need to be adjusted to also change the fields in the RelationInfo
 pub fn sanitize_datamodel_names(datamodel: &mut Datamodel) {
     let mut enum_renames = HashMap::new();
 

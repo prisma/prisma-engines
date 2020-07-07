@@ -91,3 +91,23 @@ fn id_must_error_when_multi_field_is_referring_to_undefined_fields() {
         Span::new(58, 67),
     ));
 }
+
+#[test]
+fn must_error_when_multi_field_is_referring_to_fields_that_are_not_required() {
+    let dml = r#"
+    model Model {
+      a String
+      b String?
+      c String?
+
+      @@id([a,b,c])
+    }
+    "#;
+    let errors = parse_error(dml);
+
+    errors.assert_is(DatamodelError::new_model_validation_error(
+        "The id definition refers to the optional fields b, c. Id definitions must reference only required fields.",
+        "Model",
+        Span::new(75, 86),
+    ));
+}

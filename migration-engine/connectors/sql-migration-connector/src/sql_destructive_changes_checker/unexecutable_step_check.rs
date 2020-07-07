@@ -87,7 +87,7 @@ impl Check for UnexecutableStepCheck {
             UnexecutableStepCheck::MadeScalarFieldIntoArrayField { table, column } => {
                 let message = |details| format!("Changed the column `{column}` on the `{table}` table from a scalar field to a list field. {details}", column = column, table = table, details = details);
 
-                match dbg!(database_checks.get_row_and_non_null_value_count(table, column)) {
+                match database_checks.get_row_and_non_null_value_count(table, column) {
                     (Some(0), _) => return None,
                     (_, Some(0)) => return None,
                     (_, Some(value_count)) => Some(message(format_args!(

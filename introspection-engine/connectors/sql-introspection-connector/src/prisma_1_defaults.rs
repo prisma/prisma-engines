@@ -1,4 +1,4 @@
-use crate::commenting_out_guardrails::ModelAndField;
+use crate::warnings::{warning_default_cuid_warning, warning_default_uuid_warning, ModelAndField};
 use datamodel::{dml, Datamodel, ValueGenerator};
 use introspection_connector::{Version, Warning};
 use quaint::connector::SqlFamily;
@@ -77,22 +77,10 @@ pub fn add_prisma_1_id_defaults(
     }
 
     if !inferred_cuids.is_empty() {
-        warnings.push(Warning {
-            code: 5,
-            message:
-                "These id fields had a `@default(cuid())` added because we believe the schema was created by Prisma 1."
-                    .into(),
-            affected: serde_json::to_value(&inferred_cuids).unwrap(),
-        })
+        warnings.push(warning_default_cuid_warning(&inferred_cuids))
     }
 
     if !inferred_uuids.is_empty() {
-        warnings.push(Warning {
-            code: 6,
-            message:
-                "These id fields had a `@default(uuid())` added because we believe the schema was created by Prisma 1."
-                    .into(),
-            affected: serde_json::to_value(&inferred_uuids).unwrap(),
-        })
+        warnings.push(warning_default_uuid_warning(&inferred_uuids))
     }
 }

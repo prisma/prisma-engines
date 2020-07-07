@@ -13,6 +13,13 @@ pub(crate) fn custom_assert(left: &str, right: &str) {
     assert_eq!(left, reformatted_expected);
 }
 
+pub(crate) fn assert_eq_json(a: &str, b: &str) {
+    let json_a: serde_json::Value = serde_json::from_str(a).expect("The String a was not valid JSON.");
+    let json_b: serde_json::Value = serde_json::from_str(b).expect("The String b was not valid JSON.");
+
+    assert_eq!(json_a, json_b);
+}
+
 // barrel
 
 pub struct BarrelMigrationExecutor {

@@ -48,6 +48,8 @@ extern crate pest; // Pest grammar generation on compile time.
 extern crate pest_derive;
 #[macro_use]
 extern crate failure; // Failure enum display derivation
+#[macro_use]
+extern crate tracing;
 
 pub mod ast;
 pub mod common;
@@ -57,6 +59,7 @@ pub mod error;
 pub mod json;
 pub mod validator;
 
+pub use common::DefaultNames;
 pub use configuration::*;
 pub use dml::*;
 
@@ -69,7 +72,7 @@ pub fn parse_datamodel(datamodel_string: &str) -> Result<Datamodel, error::Error
     parse_datamodel_internal(datamodel_string, false)
 }
 
-pub fn parse_datamodel_and_ignore_env_errors(datamodel_string: &str) -> Result<Datamodel, error::ErrorCollection> {
+pub fn parse_datamodel_and_ignore_datasource_urls(datamodel_string: &str) -> Result<Datamodel, error::ErrorCollection> {
     parse_datamodel_internal(datamodel_string, true)
 }
 
@@ -95,10 +98,10 @@ pub fn parse_datamodel_or_pretty_error(datamodel_string: &str, file_name: &str) 
 
 fn parse_datamodel_internal(
     datamodel_string: &str,
-    ignore_env_var_errors: bool,
+    ignore_datasource_urls: bool,
 ) -> Result<Datamodel, error::ErrorCollection> {
     let ast = ast::parser::parse(datamodel_string)?;
-    let sources = load_sources(&ast, ignore_env_var_errors)?;
+    let sources = load_sources(&ast, ignore_datasource_urls, vec![])?;
     let validator = ValidationPipeline::with_sources(&sources);
 
     validator.validate(&ast)
@@ -106,9 +109,10 @@ fn parse_datamodel_internal(
 
 /// Validates a [Schema AST](/ast/struct.SchemaAst.html) and returns its
 /// [Datamodel](/struct.Datamodel.html).
-pub fn lift_ast(ast: &ast::SchemaAst) -> Result<Datamodel, error::ErrorCollection> {
+pub fn lift_ast_to_datamodel(ast: &ast::SchemaAst) -> Result<Datamodel, error::ErrorCollection> {
     let mut errors = error::ErrorCollection::new();
-    let sources = load_sources(ast, false)?;
+    // we are not interested in the sources in this case. Hence we can ignore the datasource urls.
+    let sources = load_sources(ast, true, vec![])?;
     let validator = ValidationPipeline::with_sources(&sources);
 
     match validator.validate(&ast) {
@@ -127,7 +131,7 @@ pub fn parse_schema_ast(datamodel_string: &str) -> Result<SchemaAst, error::Erro
 /// Loads all configuration blocks from a datamodel using the built-in source definitions.
 pub fn parse_configuration(datamodel_string: &str) -> Result<Configuration, error::ErrorCollection> {
     let ast = ast::parser::parse(datamodel_string)?;
-    let datasources = load_sources(&ast, false)?;
+    let datasources = load_sources(&ast, false, vec![])?;
     let generators = GeneratorLoader::load_generators_from_ast(&ast)?;
 
     Ok(Configuration {
@@ -136,11 +140,26 @@ pub fn parse_configuration(datamodel_string: &str) -> Result<Configuration, erro
     })
 }
 
-pub fn parse_configuration_and_ignore_env_errors(
+/// - `datasource_url_overrides`: the tuples consist of datasource name and url
+pub fn parse_configuration_with_url_overrides(
+    schema: &str,
+    datasource_url_overrides: Vec<(String, String)>,
+) -> Result<Configuration, error::ErrorCollection> {
+    let ast = ast::parser::parse(schema)?;
+    let datasources = load_sources(&ast, false, datasource_url_overrides)?;
+    let generators = GeneratorLoader::load_generators_from_ast(&ast)?;
+
+    Ok(Configuration {
+        datasources,
+        generators,
+    })
+}
+
+pub fn parse_configuration_and_ignore_datasource_urls(
     datamodel_string: &str,
 ) -> Result<Configuration, error::ErrorCollection> {
     let ast = ast::parser::parse(datamodel_string)?;
-    let datasources = load_sources(&ast, true)?;
+    let datasources = load_sources(&ast, true, vec![])?;
     let generators = GeneratorLoader::load_generators_from_ast(&ast)?;
 
     Ok(Configuration {
@@ -151,10 +170,11 @@ pub fn parse_configuration_and_ignore_env_errors(
 
 fn load_sources(
     schema_ast: &SchemaAst,
-    ignore_env_var_errors: bool,
-) -> Result<Vec<Box<dyn Source + Send + Sync>>, error::ErrorCollection> {
+    ignore_datasource_urls: bool,
+    datasource_url_overrides: Vec<(String, String)>,
+) -> Result<Vec<Datasource>, error::ErrorCollection> {
     let source_loader = SourceLoader::new();
-    source_loader.load_sources(&schema_ast, ignore_env_var_errors)
+    source_loader.load_sources(&schema_ast, ignore_datasource_urls, datasource_url_overrides)
 }
 
 //

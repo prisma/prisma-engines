@@ -687,6 +687,7 @@ async fn all_postgres_column_types_must_work() {
                     initial_value: 1,
                     allocation_size: 1,
                 },),
+                constraint_name: Some("User_pkey".into()),
             }),
             foreign_keys: vec![],
         }
@@ -803,6 +804,7 @@ async fn postgres_foreign_key_on_delete_must_be_handled() {
             primary_key: Some(PrimaryKey {
                 columns: vec!["id".into()],
                 sequence: None,
+                constraint_name: Some("User_pkey".into()),
             }),
             foreign_keys: vec![
                 ForeignKey {

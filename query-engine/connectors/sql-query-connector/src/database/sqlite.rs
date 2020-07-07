@@ -6,7 +6,7 @@ use connector_interface::{
     error::{ConnectorError, ErrorKind},
     Connection, Connector,
 };
-use datamodel::Source;
+use datamodel::Datasource;
 use quaint::{connector::SqliteParams, error::ErrorKind as QuaintKind, pooled::Quaint, prelude::ConnectionInfo};
 use std::{convert::TryFrom, time::Duration};
 
@@ -27,7 +27,7 @@ impl Sqlite {
 
 #[async_trait]
 impl FromSource for Sqlite {
-    async fn from_source(source: &dyn Source) -> connector_interface::Result<Sqlite> {
+    async fn from_source(source: &Datasource) -> connector_interface::Result<Sqlite> {
         let connection_info = ConnectionInfo::from_url(&source.url().value)
             .map_err(|err| ConnectorError::from_kind(ErrorKind::ConnectionError(err.into())))?;
 

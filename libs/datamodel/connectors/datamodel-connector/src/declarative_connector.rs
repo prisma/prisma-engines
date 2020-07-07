@@ -1,16 +1,18 @@
 use super::{Connector, ScalarFieldType, ScalarType};
+use crate::ConnectorCapability;
 
 #[derive(Debug)]
 pub struct DeclarativeConnector {
     pub type_aliases: Vec<TypeAlias>,
     pub field_type_constructors: Vec<FieldTypeConstructor>,
-    pub supports_scalar_lists: bool,
-    pub supports_relations_over_non_unique_criteria: bool,
-    pub supports_enums: bool,
-    pub supports_json: bool,
+    pub capabilities: Vec<ConnectorCapability>,
 }
 
 impl Connector for DeclarativeConnector {
+    fn capabilities(&self) -> &Vec<ConnectorCapability> {
+        &self.capabilities
+    }
+
     fn calculate_type(&self, name: &str, args: Vec<i32>) -> Option<ScalarFieldType> {
         match self.get_type_alias(name) {
             Some(alias) => self.calculate_type(&alias.aliased_to, args),
@@ -24,22 +26,6 @@ impl Connector for DeclarativeConnector {
                 }
             }),
         }
-    }
-
-    fn supports_scalar_lists(&self) -> bool {
-        self.supports_scalar_lists
-    }
-
-    fn supports_relations_over_non_unique_criteria(&self) -> bool {
-        self.supports_relations_over_non_unique_criteria
-    }
-
-    fn supports_enums(&self) -> bool {
-        self.supports_enums
-    }
-
-    fn supports_json(&self) -> bool {
-        self.supports_json
     }
 }
 

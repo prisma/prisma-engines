@@ -82,7 +82,20 @@ impl TryFrom<serde_json::Value> for PrismaValue {
                     Ok(PrismaValue::Float(dec))
                 }
             }
-            serde_json::Value::Object(_) => Err(ConversionFailure::new("nested JSON object", "PrismaValue")),
+            serde_json::Value::Object(obj) => match obj.get("prisma__type").as_ref().and_then(|s| s.as_str()) {
+                Some("date") => {
+                    let value = obj
+                        .get("prisma__value")
+                        .and_then(|v| v.as_str())
+                        .ok_or_else(|| ConversionFailure::new("JSON date object", "PrismaValue"))?;
+
+                    let date = DateTime::parse_from_rfc3339(value)
+                        .map_err(|_| ConversionFailure::new("JSON date object", "PrismaValue"))?;
+
+                    Ok(PrismaValue::DateTime(date.into()))
+                }
+                _ => Ok(PrismaValue::Json(serde_json::to_string(&obj).unwrap())),
+            },
         }
     }
 }

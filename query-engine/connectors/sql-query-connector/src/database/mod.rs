@@ -10,7 +10,7 @@ pub(crate) mod operations;
 
 use async_trait::async_trait;
 use connector_interface::{error::ConnectorError, Connector};
-use datamodel::Source;
+use datamodel::Datasource;
 
 #[cfg(feature = "mssql")]
 pub use mssql::*;
@@ -20,7 +20,7 @@ pub use sqlite::*;
 
 #[async_trait]
 pub trait FromSource {
-    async fn from_source(source: &dyn Source) -> connector_interface::Result<Self>
+    async fn from_source(source: &Datasource) -> connector_interface::Result<Self>
     where
         Self: Connector + Sized;
 }

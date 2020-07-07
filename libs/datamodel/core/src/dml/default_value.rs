@@ -1,3 +1,4 @@
+use super::ScalarType;
 use chrono::Utc;
 use prisma_value::PrismaValue;
 use std::fmt;
@@ -55,16 +56,28 @@ impl ValueGenerator {
         ValueGenerator::new("uuid".to_owned(), vec![]).unwrap()
     }
 
-    pub fn generate(&self) -> Option<PrismaValue> {
-        self.generator.invoke()
-    }
-
     fn name(&self) -> &str {
         &self.name
     }
 
     fn args(&self) -> &[PrismaValue] {
         &self.args
+    }
+
+    pub fn generate(&self) -> Option<PrismaValue> {
+        self.generator.invoke()
+    }
+
+    pub fn check_compatibility_with_scalar_type(&self, scalar_type: ScalarType) -> std::result::Result<(), String> {
+        if self.generator.can_handle(scalar_type) {
+            Ok(())
+        } else {
+            Err(format!(
+                "The function `{}()` can not be used on fields of type `{}`.",
+                &self.name,
+                scalar_type.to_string()
+            ))
+        }
     }
 }
 
@@ -89,13 +102,24 @@ impl ValueGeneratorFn {
         }
     }
 
-    pub fn invoke(&self) -> Option<PrismaValue> {
+    fn invoke(&self) -> Option<PrismaValue> {
         match self {
             Self::UUID => Self::generate_uuid(),
             Self::CUID => Self::generate_cuid(),
             Self::Now => Self::generate_now(),
             Self::Autoincrement => None,
             Self::DbGenerated => None,
+        }
+    }
+
+    fn can_handle(&self, scalar_type: ScalarType) -> bool {
+        match (self, scalar_type) {
+            (Self::UUID, ScalarType::String) => true,
+            (Self::CUID, ScalarType::String) => true,
+            (Self::Now, ScalarType::DateTime) => true,
+            (Self::Autoincrement, ScalarType::Int) => true,
+            (Self::DbGenerated, _) => true,
+            _ => false,
         }
     }
 

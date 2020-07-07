@@ -1,4 +1,4 @@
-use connector::QueryArguments;
+use connector::{AggregationResult, QueryArguments};
 use prisma_models::{ManyRecords, ModelProjection, RecordProjection};
 
 #[derive(Debug, Clone)]
@@ -36,14 +36,9 @@ pub struct RecordSelection {
 
 #[derive(Debug, Clone)]
 pub struct RecordAggregation {
-    /// Holds an ordered list of selected field names for each contained record.
-    pub fields: Vec<String>,
+    /// Ordered list of selected fields as defined by the original incoming query.
+    pub selection_order: Vec<(String, Option<Vec<String>>)>,
 
     /// Actual aggregation results.
-    pub results: Vec<AggregationQueryResult>,
-}
-
-#[derive(Debug, Clone)]
-pub enum AggregationQueryResult {
-    Count(String, usize),
+    pub results: Vec<AggregationResult>,
 }

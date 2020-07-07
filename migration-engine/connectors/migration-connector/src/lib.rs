@@ -1,4 +1,5 @@
 #![deny(rust_2018_idioms)]
+#![deny(unsafe_code)]
 
 //! This crate defines the API exposed by the connectors to the migration engine core. The entry point for this API is the [MigrationConnector](trait.MigrationConnector.html) trait.
 

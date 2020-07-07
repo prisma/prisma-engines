@@ -1,5 +1,6 @@
 use crate::{cursor_condition, filter_conversion::AliasedCondition, ordering::Ordering};
-use connector_interface::{filter::Filter, QueryArguments};
+use connector_interface::{filter::Filter, Aggregator, QueryArguments};
+use itertools::Itertools;
 use prisma_models::*;
 use quaint::ast::*;
 use std::sync::Arc;
@@ -67,10 +68,70 @@ where
     columns.fold(query.into_select(model), |acc, col| acc.column(col))
 }
 
-pub fn count_by_model(model: &ModelRef, query_arguments: QueryArguments) -> Select<'static> {
-    let selected_columns = model.primary_identifier().as_columns();
-    let base_query = get_records(model, selected_columns, query_arguments);
-    let table = Table::from(base_query).alias("sub");
+/// Generates a query of the form:
+/// ```sql
+/// SELECT
+///     COUNT(*),
+///     SUM(`float`),
+///     SUM(`int`),
+///     AVG(`float`),
+///     AVG(`int`),
+///     MIN(`float`),
+///     MIN(`int`),
+///     MAX(`float`),
+///     MAX(`int`)
+/// FROM
+///     (
+///         SELECT
+///             `Table`.`id`,
+///             `Table`.`float`,
+///             `Table`.`int`
+///         FROM
+///             `Table`
+///         WHERE
+///             1 = 1
+///     ) AS `sub`;
+/// ```
+pub fn aggregate(model: &ModelRef, aggregators: &[Aggregator], args: QueryArguments) -> Select<'static> {
+    let columns = extract_columns(model, &aggregators);
+    let sub_query = get_records(model, columns.into_iter(), args);
+    let sub_table = Table::from(sub_query).alias("sub");
 
-    Select::from_table(table).value(count(asterisk()))
+    aggregators
+        .into_iter()
+        .fold(Select::from_table(sub_table), |select, next_op| match next_op {
+            Aggregator::Count => select.value(count(asterisk())),
+
+            Aggregator::Average(fields) => fields
+                .into_iter()
+                .fold(select, |select, next_field| select.value(avg(next_field.name.clone()))),
+
+            Aggregator::Sum(fields) => fields
+                .into_iter()
+                .fold(select, |select, next_field| select.value(sum(next_field.name.clone()))),
+
+            Aggregator::Min(fields) => fields
+                .into_iter()
+                .fold(select, |select, next_field| select.value(min(next_field.name.clone()))),
+
+            Aggregator::Max(fields) => fields
+                .into_iter()
+                .fold(select, |select, next_field| select.value(max(next_field.name.clone()))),
+        })
+}
+
+fn extract_columns(model: &ModelRef, aggregators: &[Aggregator]) -> Vec<Column<'static>> {
+    let fields: Vec<_> = aggregators
+        .iter()
+        .flat_map(|aggregator| match aggregator {
+            Aggregator::Count => model.primary_identifier().scalar_fields().collect(),
+            Aggregator::Average(fields) => fields.clone(),
+            Aggregator::Sum(fields) => fields.clone(),
+            Aggregator::Min(fields) => fields.clone(),
+            Aggregator::Max(fields) => fields.clone(),
+        })
+        .unique_by(|field| field.name.clone())
+        .collect();
+
+    fields.as_columns().collect()
 }

@@ -34,6 +34,11 @@ impl Enum {
         self.values.iter()
     }
 
+    /// Gets a mutable iterator over all fields.
+    pub fn values_mut(&mut self) -> std::slice::IterMut<EnumValue> {
+        self.values.iter_mut()
+    }
+
     /// Gets an iterator over all fields.
     pub fn database_values(&self) -> Vec<String> {
         self.values
@@ -42,8 +47,17 @@ impl Enum {
             .collect()
     }
 
-    pub fn find_value(&self, value: &str) -> &EnumValue {
-        self.values.iter().find(|ev| ev.name == value).unwrap()
+    pub fn find_value(&self, value: &str) -> Option<&EnumValue> {
+        self.values().find(|ev| ev.name == value)
+    }
+
+    /// Finds an enum  value by database name.
+    pub fn find_value_db_name(&self, db_name: &str) -> Option<&EnumValue> {
+        self.values().find(|v| v.database_name == Some(db_name.to_owned()))
+    }
+
+    pub fn find_value_mut(&mut self, value: &str) -> Option<&mut EnumValue> {
+        self.values_mut().find(|ev| ev.name == value)
     }
 }
 

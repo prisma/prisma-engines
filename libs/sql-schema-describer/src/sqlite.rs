@@ -248,6 +248,7 @@ impl SqlSchemaDescriber {
                 Some(PrimaryKey {
                     columns,
                     sequence: None,
+                    constraint_name: None,
                 })
             }
         };

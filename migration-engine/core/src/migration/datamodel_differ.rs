@@ -17,6 +17,7 @@ use top_level::TopDiffer;
 
 use crate::migration::datamodel_differ::source::SourceArgumentsDiffer;
 use datamodel::ast;
+use datamodel::ast::Expression;
 use migration_connector::steps::{
     self, ArgumentLocation, DirectiveLocation, DirectivePath, MigrationStep, SourceLocation,
 };
@@ -205,7 +206,7 @@ fn push_updated_sources<'a>(steps: &mut Steps, sources: impl Iterator<Item = Sou
         });
 
         for argument in source.created_arguments() {
-            push_created_argument(steps, &location.clone(), argument);
+            push_created_source_argument(steps, &location, argument)
         }
 
         for argument in source.deleted_arguments() {
@@ -213,7 +214,12 @@ fn push_updated_sources<'a>(steps: &mut Steps, sources: impl Iterator<Item = Sou
         }
 
         for (prev, next) in source.argument_pairs() {
-            push_updated_argument(steps, &location.clone(), prev, next)
+            // we are comparing the schema stored in the Migrations table with the user provided one
+            // the one in the Migrations table has the mask. The user provided does not have it.
+            // this would lead to unnecessary updates all the time.
+            if prev.name.name != "url" {
+                push_updated_argument(steps, &location.clone(), prev, next)
+            }
         }
     }
 }
@@ -231,8 +237,19 @@ fn push_created_sources<'a>(steps: &mut Steps, sources: impl Iterator<Item = &'a
         });
 
         for argument in &created_source.properties {
-            push_created_argument(steps, &location, argument);
+            push_created_source_argument(steps, &location, argument)
         }
+    }
+}
+
+fn push_created_source_argument<'a>(steps: &mut Steps, location: &steps::ArgumentLocation, argument: &ast::Argument) {
+    // Datasource URLs should always be masked here. Otherwise they will end up in clear text in `steps.json` or the Readme in the migrations folder.
+    if argument.name.name == "url" {
+        let mut cloned = argument.clone();
+        cloned.value = Expression::StringValue("***".to_string(), argument.value.span());
+        push_created_argument(steps, &location, &cloned);
+    } else {
+        push_created_argument(steps, &location, argument);
     }
 }
 

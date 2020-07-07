@@ -11,8 +11,8 @@ use enums::EnumDiffer;
 use once_cell::sync::Lazy;
 use regex::RegexSet;
 use sql_schema_describer::*;
+use sql_schema_helpers::ForeignKeyRef;
 use sql_schema_helpers::TableRef;
-use tracing::debug;
 
 #[derive(Debug)]
 pub(crate) struct DiffingOptions {
@@ -53,6 +53,7 @@ pub struct SqlSchemaDiffer<'a> {
 #[derive(Debug, Clone)]
 pub struct SqlSchemaDiff {
     pub add_foreign_keys: Vec<AddForeignKey>,
+    pub drop_foreign_keys: Vec<DropForeignKey>,
     pub drop_tables: Vec<DropTable>,
     pub create_tables: Vec<CreateTable>,
     pub alter_tables: Vec<AlterTable>,
@@ -65,15 +66,14 @@ pub struct SqlSchemaDiff {
 }
 
 impl SqlSchemaDiff {
+    /// Translate the diff into steps that should be executed in order. The general idea in the
+    /// ordering of steps is to drop obsolete constraints first, alter/create tables, then add the new constraints.
     pub fn into_steps(self) -> Vec<SqlMigrationStep> {
         wrap_as_step(self.create_enums, SqlMigrationStep::CreateEnum)
             .chain(wrap_as_step(self.alter_enums, SqlMigrationStep::AlterEnum))
             .chain(wrap_as_step(self.drop_indexes, SqlMigrationStep::DropIndex))
-            // Order matters: we must create tables before `alter_table`s because we could
-            // be adding foreign keys to the new tables there.
+            .chain(wrap_as_step(self.drop_foreign_keys, SqlMigrationStep::DropForeignKey))
             .chain(wrap_as_step(self.create_tables, SqlMigrationStep::CreateTable))
-            // Order matters: we must run `alter table`s before `drop`s because we want to
-            // drop foreign keys before the tables they are pointing to.
             .chain(wrap_as_step(self.alter_tables, SqlMigrationStep::AlterTable))
             // Order matters: we must create indexes after ALTER TABLEs because the indexes can be
             // on fields that are dropped/created there.
@@ -106,15 +106,15 @@ impl<'schema> SqlSchemaDiffer<'schema> {
 
     fn diff_internal(&self) -> SqlSchemaDiff {
         let alter_indexes: Vec<_> = self.alter_indexes();
-        let (drop_tables, drop_foreign_keys) = self.drop_tables();
-        let mut alter_tables = self.alter_tables();
-        alter_tables.extend(drop_foreign_keys.into_iter());
+        let (drop_tables, mut drop_foreign_keys) = self.drop_tables();
+        self.drop_foreign_keys(&mut drop_foreign_keys);
 
         SqlSchemaDiff {
             add_foreign_keys: self.add_foreign_keys(),
+            drop_foreign_keys,
             drop_tables,
             create_tables: self.create_tables(),
-            alter_tables,
+            alter_tables: self.alter_tables(),
             create_indexes: self.create_indexes(),
             drop_indexes: self.drop_indexes(),
             alter_indexes,
@@ -134,7 +134,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
 
     // We drop the foreign keys of dropped tables first, so we can drop tables in whatever order we
     // please later.
-    fn drop_tables(&self) -> (Vec<DropTable>, Vec<AlterTable>) {
+    fn drop_tables(&self) -> (Vec<DropTable>, Vec<DropForeignKey>) {
         let (dropped_tables_count, dropped_fks_count) = self.dropped_tables().fold((0, 0), |(tables, fks), item| {
             (tables + 1, fks + item.foreign_keys.len())
         });
@@ -153,14 +153,12 @@ impl<'schema> SqlSchemaDiffer<'schema> {
                 .iter()
                 .filter_map(|fk| fk.constraint_name.as_ref())
             {
-                let alter_table = AlterTable {
-                    table: dropped_table.clone(),
-                    changes: vec![TableChange::DropForeignKey(DropForeignKey {
-                        constraint_name: fk_name.clone(),
-                    })],
+                let drop_foreign_key = DropForeignKey {
+                    table: dropped_table.name.clone(),
+                    constraint_name: fk_name.clone(),
                 };
 
-                dropped_foreign_keys.push(alter_table);
+                dropped_foreign_keys.push(drop_foreign_key);
             }
         }
 
@@ -177,24 +175,23 @@ impl<'schema> SqlSchemaDiffer<'schema> {
     }
 
     fn alter_tables(&self) -> Vec<AlterTable> {
-        // TODO: this does not diff primary key columns yet
         self.table_pairs()
-            .filter_map(|differ| {
-                let changes: Vec<TableChange> = Self::drop_foreign_keys(&differ)
-                    .chain(Self::drop_columns(&differ))
-                    .chain(Self::add_columns(&differ))
-                    .chain(Self::alter_columns(&differ))
+            .filter_map(|tables| {
+                // Order matters.
+                let changes: Vec<TableChange> = Self::drop_primary_key(&tables)
+                    .into_iter()
+                    .chain(Self::drop_columns(&tables))
+                    .chain(Self::add_columns(&tables))
+                    .chain(Self::alter_columns(&tables))
+                    .chain(Self::add_primary_key(&tables))
                     .collect();
 
-                if !changes.is_empty() {
-                    let update = AlterTable {
-                        table: differ.next.table.clone(),
+                Some(changes)
+                    .filter(|changes| !changes.is_empty())
+                    .map(|changes| AlterTable {
+                        table: tables.next.table.clone(),
                         changes,
-                    };
-                    return Some(update);
-                }
-
-                None
+                    })
             })
             .collect()
     }
@@ -221,13 +218,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
 
     fn alter_columns<'a>(table_differ: &'a TableDiffer<'schema>) -> impl Iterator<Item = TableChange> + 'a {
         table_differ.column_pairs().filter_map(move |column_differ| {
-            let previous_fk = table_differ
-                .previous
-                .foreign_key_for_column(column_differ.previous.name());
-
-            let next_fk = table_differ.next.foreign_key_for_column(column_differ.next.name());
-
-            if column_differ.differs_in_something() || foreign_key_changed(previous_fk, next_fk) {
+            if column_differ.differs_in_something() {
                 let change = AlterColumn {
                     name: column_differ.previous.name().to_owned(),
                     column: column_differ.next.column.clone(),
@@ -240,21 +231,34 @@ impl<'schema> SqlSchemaDiffer<'schema> {
         })
     }
 
-    fn drop_foreign_keys<'a>(differ: &'a TableDiffer<'schema>) -> impl Iterator<Item = TableChange> + 'a {
+    fn drop_foreign_keys<'a>(&'a self, drop_foreign_keys: &mut Vec<DropForeignKey>) {
+        for differ in self.table_pairs() {
+            let table_name = differ.previous.name();
+            for dropped_foreign_key_name in differ
+                .dropped_foreign_keys()
+                .filter_map(|foreign_key| foreign_key.constraint_name())
+            {
+                drop_foreign_keys.push(DropForeignKey {
+                    table: table_name.to_owned(),
+                    constraint_name: dropped_foreign_key_name.to_owned(),
+                })
+            }
+        }
+    }
+
+    fn add_primary_key(differ: &TableDiffer<'_>) -> Option<TableChange> {
         differ
-            .dropped_foreign_keys()
-            .filter_map(|foreign_key| foreign_key.constraint_name.as_ref())
-            .map(move |dropped_foreign_key_name| {
-                debug!(
-                    "Dropping foreign key '{}' on table '{}'",
-                    &dropped_foreign_key_name,
-                    &differ.previous.name()
-                );
-                let drop_step = DropForeignKey {
-                    constraint_name: dropped_foreign_key_name.clone(),
-                };
-                TableChange::DropForeignKey(drop_step)
+            .created_primary_key()
+            .filter(|pk| !pk.columns.is_empty())
+            .map(|pk| TableChange::AddPrimaryKey {
+                columns: pk.columns.clone(),
             })
+    }
+
+    fn drop_primary_key(differ: &TableDiffer<'_>) -> Option<TableChange> {
+        differ.dropped_primary_key().map(|pk| TableChange::DropPrimaryKey {
+            constraint_name: pk.constraint_name.clone(),
+        })
     }
 
     fn create_indexes(&self) -> Vec<CreateIndex> {
@@ -438,7 +442,7 @@ fn push_created_foreign_keys<'a, 'schema>(
     table_pairs.for_each(|differ| {
         added_foreign_keys.extend(differ.created_foreign_keys().map(|created_fk| AddForeignKey {
             table: differ.next.name().to_owned(),
-            foreign_key: created_fk.clone(),
+            foreign_key: created_fk.inner().clone(),
         }))
     })
 }
@@ -455,23 +459,34 @@ fn push_foreign_keys_from_created_tables<'a>(
     }
 }
 
-/// Compare two [ForeignKey](/sql-schema-describer/struct.ForeignKey.html)s and return whether a
-/// migration needs to be applied.
-fn foreign_key_changed(previous: Option<&ForeignKey>, next: Option<&ForeignKey>) -> bool {
-    match (previous, next) {
-        (None, None) => false,
-        (Some(previous), Some(next)) => !foreign_keys_match(previous, next),
-        _ => true,
-    }
-}
-
 /// Compare two [ForeignKey](/sql-schema-describer/struct.ForeignKey.html)s and return whether they
 /// should be considered equivalent for schema diffing purposes.
-fn foreign_keys_match(previous: &ForeignKey, next: &ForeignKey) -> bool {
-    previous.referenced_table == next.referenced_table
-        && previous.referenced_columns == next.referenced_columns
-        && previous.columns == next.columns
-        && previous.on_delete_action == next.on_delete_action
+fn foreign_keys_match(previous: &ForeignKeyRef<'_, '_>, next: &ForeignKeyRef<'_, '_>) -> bool {
+    // Foreign keys point to different tables.
+    if previous.referenced_table().name() != next.referenced_table().name() {
+        return false;
+    }
+
+    // Foreign keys point to different columns.
+    if previous.referenced_columns_count() != next.referenced_columns_count() {
+        return false;
+    }
+
+    // Foreign keys constrain different columns.
+    if previous.constrained_columns().count() != next.constrained_columns().count() {
+        return false;
+    }
+
+    // Foreign keys constrain the same columns in a different order, or their types changed.
+    for (previous_column, next_column) in previous.constrained_columns().zip(next.constrained_columns()) {
+        if previous_column.name() != next_column.name()
+            || previous_column.column_type_family() != next_column.column_type_family()
+        {
+            return false;
+        }
+    }
+
+    true
 }
 
 fn tables_match(previous: &Table, next: &Table) -> bool {

@@ -9,7 +9,8 @@ use std::collections::HashMap;
 const PROVIDER_KEY: &str = "provider";
 const OUTPUT_KEY: &str = "output";
 const BINARY_TARGETS_KEY: &str = "binaryTargets";
-const FIRST_CLASS_PROPERTIES: &[&str] = &[PROVIDER_KEY, OUTPUT_KEY, BINARY_TARGETS_KEY];
+const EXPERIMENTAL_FEATURES_KEY: &str = "experimentalFeatures";
+const FIRST_CLASS_PROPERTIES: &[&str] = &[PROVIDER_KEY, OUTPUT_KEY, BINARY_TARGETS_KEY, EXPERIMENTAL_FEATURES_KEY];
 
 pub struct GeneratorLoader {}
 
@@ -53,6 +54,11 @@ impl GeneratorLoader {
             None => Vec::new(),
         };
 
+        let experimental_features = match args.arg(EXPERIMENTAL_FEATURES_KEY).ok() {
+            Some(x) => x.as_array().to_str_vec()?,
+            None => Vec::new(),
+        };
+
         for prop in &ast_generator.properties {
             let is_first_class_prop = FIRST_CLASS_PROPERTIES.iter().any(|k| *k == prop.name.name);
             if is_first_class_prop {
@@ -67,6 +73,7 @@ impl GeneratorLoader {
             provider,
             output,
             binary_targets,
+            experimental_features,
             config: properties,
             documentation: ast_generator.documentation.clone().map(|comment| comment.text),
         })
@@ -92,6 +99,16 @@ impl GeneratorLoader {
 
         if let Some(output) = &generator.output {
             arguments.push(ast::Argument::new_string("output", &output));
+        }
+
+        if !&generator.experimental_features.is_empty() {
+            let features: Vec<ast::Expression> = generator
+                .experimental_features
+                .iter()
+                .map(|f| ast::Expression::StringValue(f.to_owned(), ast::Span::empty()))
+                .collect::<Vec<ast::Expression>>();
+
+            arguments.push(ast::Argument::new_array("experimentalFeatures", features));
         }
 
         let platform_values: Vec<ast::Expression> = generator

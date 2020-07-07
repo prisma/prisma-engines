@@ -87,11 +87,7 @@ impl SqlFlavour for MysqlFlavour {
         let db_name = self.0.dbname();
 
         let query = format!("CREATE DATABASE `{}`", db_name);
-        catch(
-            conn.connection_info(),
-            conn.query_raw(&query, &[]).map_err(SqlError::from),
-        )
-        .await?;
+        catch(conn.connection_info(), conn.raw_cmd(&query).map_err(SqlError::from)).await?;
 
         Ok(db_name.to_owned())
     }
@@ -112,7 +108,7 @@ impl SqlFlavour for MysqlFlavour {
             database_info.connection_info().schema_name()
         );
 
-        conn.query_raw(&schema_sql, &[]).await?;
+        conn.raw_cmd(&schema_sql).await?;
 
         Ok(())
     }
@@ -179,11 +175,7 @@ impl SqlFlavour for PostgresFlavour {
         let (conn, _) = create_postgres_admin_conn(url).await?;
 
         let query = format!("CREATE DATABASE \"{}\"", db_name);
-        catch(
-            conn.connection_info(),
-            conn.query_raw(&query, &[]).map_err(SqlError::from),
-        )
-        .await?;
+        catch(conn.connection_info(), conn.raw_cmd(&query).map_err(SqlError::from)).await?;
 
         Ok(db_name.to_owned())
     }
@@ -204,7 +196,7 @@ impl SqlFlavour for PostgresFlavour {
             &database_info.connection_info().schema_name()
         );
 
-        conn.query_raw(&schema_sql, &[]).await?;
+        conn.raw_cmd(&schema_sql).await?;
 
         Ok(())
     }

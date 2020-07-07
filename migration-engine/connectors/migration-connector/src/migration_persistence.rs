@@ -163,7 +163,8 @@ impl Migration {
     }
 
     pub fn parse_datamodel(&self) -> Result<Datamodel, (ErrorCollection, String)> {
-        datamodel::parse_datamodel(&self.datamodel_string).map_err(|err| (err, self.datamodel_string.clone()))
+        datamodel::parse_datamodel_and_ignore_datasource_urls(&self.datamodel_string)
+            .map_err(|err| (err, self.datamodel_string.clone()))
     }
 
     pub fn parse_schema_ast(&self) -> Result<SchemaAst, (ErrorCollection, String)> {

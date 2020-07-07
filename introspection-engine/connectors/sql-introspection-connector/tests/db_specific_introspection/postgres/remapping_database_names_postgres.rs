@@ -361,7 +361,7 @@ async fn remapping_field_names_to_empty_should_comment_them_out(api: &TestApi) {
         })
         .await;
 
-    let dm = "model User {\n  // This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*\n  // 1 String @map(\"1\")\n  last Int    @default(autoincrement()) @id\n}";
+    let dm = "model User {\n  // This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*\n  // 1 String @map(\"1\")\n  last Int    @default(autoincrement()) @id\n}\n";
 
     let result = dbg!(api.introspect().await);
     assert_eq!(&result, dm);

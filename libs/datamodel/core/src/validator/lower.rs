@@ -87,7 +87,6 @@ impl LowerDmlToAst {
         Ok(ast::Field {
             name: ast::Identifier::new(&field.name),
             arity: self.lower_field_arity(field.arity),
-            default_value: field.default_value.clone().map(|dv| Self::lower_default_value(dv)),
             directives: self.directives.field.serialize(field, datamodel)?,
             field_type: self.lower_type(&field.field_type),
             documentation: field.documentation.clone().map(|text| ast::Comment { text }),

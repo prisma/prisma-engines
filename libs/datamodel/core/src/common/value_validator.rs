@@ -197,10 +197,13 @@ impl ValueValidator {
         }
     }
 
-    pub fn as_default_value(&self, scalar_type: ScalarType) -> Result<DefaultValue, DatamodelError> {
+    pub fn as_default_value_for_scalar_type(&self, scalar_type: ScalarType) -> Result<DefaultValue, DatamodelError> {
         match &self.value {
             ast::Expression::Function(name, _, _) => {
                 let generator = self.get_value_generator(&name)?;
+                generator
+                    .check_compatibility_with_scalar_type(scalar_type)
+                    .map_err(|err_msg| DatamodelError::new_functional_evaluation_error(&err_msg, self.span()))?;
                 Ok(DefaultValue::Expression(generator))
             }
             _ => {

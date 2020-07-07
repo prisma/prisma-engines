@@ -117,7 +117,8 @@ impl<'a> ApplyMigrationCommand<'a> {
         D: DatabaseMigrationMarker + Send + Sync + 'static,
     {
         let connector = engine.connector();
-        let next_datamodel = datamodel::lift_ast(&next_schema_ast).map_err(CommandError::ProducedBadDatamodel)?;
+        let next_datamodel =
+            datamodel::lift_ast_to_datamodel(&next_schema_ast).map_err(CommandError::ProducedBadDatamodel)?;
         let migration_persistence = connector.migration_persistence();
 
         let database_migration = connector

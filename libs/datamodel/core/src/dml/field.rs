@@ -124,6 +124,13 @@ impl Field {
     pub fn db_name(&self) -> &str {
         self.database_name.as_ref().unwrap_or(&self.name)
     }
+
+    pub fn is_relation(&self) -> bool {
+        match self.field_type {
+            FieldType::Relation(_) => true,
+            _ => false,
+        }
+    }
 }
 
 impl WithName for Field {

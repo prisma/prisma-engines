@@ -23,17 +23,22 @@ impl super::SqlRenderer for SqliteRenderer {
         let nullability_str = render_nullability(&column);
         let default_str = column
             .default()
-            .map(|default| format!("DEFAULT {}", self.render_default(default, &column.column.tpe.family)))
+            .filter(|default| !matches!(default, DefaultValue::DBGENERATED(_)))
+            .map(|default| format!(" DEFAULT {}", self.render_default(default, &column.column.tpe.family)))
             .unwrap_or_else(String::new);
         let auto_increment_str = if column.auto_increment() {
-            "PRIMARY KEY AUTOINCREMENT"
+            " PRIMARY KEY AUTOINCREMENT"
         } else {
             ""
         };
 
         format!(
-            "{} {} {} {} {}",
-            column_name, tpe_str, nullability_str, default_str, auto_increment_str
+            "{column_name} {tpe_str} {nullability_str}{default_str}{auto_increment}",
+            column_name = column_name,
+            tpe_str = tpe_str,
+            nullability_str = nullability_str,
+            default_str = default_str,
+            auto_increment = auto_increment_str
         )
     }
 
