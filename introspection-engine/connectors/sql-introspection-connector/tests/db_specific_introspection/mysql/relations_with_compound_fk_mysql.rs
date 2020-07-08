@@ -303,21 +303,24 @@ async fn compound_foreign_keys_should_work_for_one_to_one_relations_with_separat
         .await;
 
     let dm = r#"
-           model Post {
-               id           Int    @id
-               user_id      Int
-               user_age     Int 
-               user         User   @relation(fields: ["user_id", "user_age"], references:[id, age])
-           }
+    model Post {
+      id       Int  @default(autoincrement()) @id
+      user_id  Int  @unique
+      user_age Int  @unique
+      User     User @relation(fields: [user_id, user_age], references: [id, age])
+            
+      @@index([user_id, user_age], name: \"user_id_2\")
+    }
+              
+    model User {
+      id   Int    @default(autoincrement()) @id
+      age  Int
+      Post Post[]
+                    
+      @@unique([id, age], name: \"user_unique\")
+    }
+    "#;
 
-           model User {
-              age           Int
-              id            Int    @id
-              post          Post?
-
-              @@unique([id, age], name: "user_unique")
-           }
-       "#;
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
