@@ -41,7 +41,7 @@ async fn main() -> Result<(), AnyError> {
 
     async fn main() -> Result<(), PrismaError> {
         let opts = PrismaOpt::from_args();
-        init_logger(&opts);
+        init_logger(opts.log_format());
         feature_flags::initialize(opts.raw_feature_flags.as_slice())?;
         match CliCommand::from_opt(&opts)? {
             Some(cmd) => cmd.execute().await?,
@@ -54,11 +54,11 @@ async fn main() -> Result<(), AnyError> {
     }
 }
 
-fn init_logger(opts: &PrismaOpt) {
+fn init_logger(log_format: LogFormat) {
     // Enable `tide` logs to be captured.
     let filter = EnvFilter::from_default_env().add_directive("tide=info".parse().unwrap());
 
-    match opts.log_format() {
+    match log_format {
         LogFormat::Text => {
             let subscriber = FmtSubscriber::builder().with_env_filter(filter).finish();
             subscriber::set_global_default(subscriber).expect("Could not initialize logger");
@@ -71,34 +71,31 @@ fn init_logger(opts: &PrismaOpt) {
 }
 
 fn set_panic_hook(log_format: LogFormat) {
-    match log_format {
-        LogFormat::Text => (),
-        LogFormat::Json => {
-            std::panic::set_hook(Box::new(|info| {
-                let payload = info
-                    .payload()
-                    .downcast_ref::<String>()
-                    .map(Clone::clone)
-                    .unwrap_or_else(|| info.payload().downcast_ref::<&str>().unwrap().to_string());
+    if let LogFormat::Json = log_format {
+        std::panic::set_hook(Box::new(|info| {
+            let payload = info
+                .payload()
+                .downcast_ref::<String>()
+                .map(Clone::clone)
+                .unwrap_or_else(|| info.payload().downcast_ref::<&str>().unwrap().to_string());
 
-                match info.location() {
-                    Some(location) => {
-                        tracing::event!(
-                            tracing::Level::ERROR,
-                            message = "PANIC",
-                            reason = payload.as_str(),
-                            file = location.file(),
-                            line = location.line(),
-                            column = location.column(),
-                        );
-                    }
-                    None => {
-                        tracing::event!(tracing::Level::ERROR, message = "PANIC", reason = payload.as_str());
-                    }
+            match info.location() {
+                Some(location) => {
+                    tracing::event!(
+                        tracing::Level::ERROR,
+                        message = "PANIC",
+                        reason = payload.as_str(),
+                        file = location.file(),
+                        line = location.line(),
+                        column = location.column(),
+                    );
                 }
+                None => {
+                    tracing::event!(tracing::Level::ERROR, message = "PANIC", reason = payload.as_str());
+                }
+            }
 
-                std::process::exit(255);
-            }));
-        }
+            std::process::exit(255);
+        }));
     }
 }
