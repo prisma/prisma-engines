@@ -46,7 +46,7 @@ async fn main() -> Result<(), AnyError> {
         match CliCommand::from_opt(&opts)? {
             Some(cmd) => cmd.execute().await?,
             None => {
-                set_panic_hook(&opts);
+                set_panic_hook(opts.log_format());
                 server::listen(opts).await?;
             }
         }
@@ -70,8 +70,8 @@ fn init_logger(opts: &PrismaOpt) {
     }
 }
 
-fn set_panic_hook(opts: &PrismaOpt) {
-    match opts.log_format() {
+fn set_panic_hook(log_format: LogFormat) {
+    match log_format {
         LogFormat::Text => (),
         LogFormat::Json => {
             std::panic::set_hook(Box::new(|info| {
