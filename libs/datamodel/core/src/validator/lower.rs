@@ -83,19 +83,18 @@ impl LowerDmlToAst {
         })
     }
 
-    pub fn lower_field(
-        &self,
-        field: &dml::ScalarField,
-        datamodel: &dml::Datamodel,
-    ) -> Result<ast::Field, ErrorCollection> {
+    pub fn lower_field(&self, field: &dml::Field, datamodel: &dml::Datamodel) -> Result<ast::Field, ErrorCollection> {
         Ok(ast::Field {
-            name: ast::Identifier::new(&field.name),
-            arity: self.lower_field_arity(field.arity),
+            name: ast::Identifier::new(&field.name()),
+            arity: self.lower_field_arity(field.arity().clone()),
             directives: self.directives.field.serialize(field, datamodel)?,
-            field_type: self.lower_type(&field.field_type),
-            documentation: field.documentation.clone().map(|text| ast::Comment { text }),
+            field_type: self.lower_type(&field.field_type()),
+            documentation: field
+                .documentation()
+                .clone()
+                .map(|text| ast::Comment { text: text.to_string() }),
             span: ast::Span::empty(),
-            is_commented_out: field.is_commented_out,
+            is_commented_out: field.is_commented_out(),
         })
     }
 

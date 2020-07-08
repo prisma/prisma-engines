@@ -91,37 +91,38 @@ fn model_to_dmmf(model: &dml::Model) -> Model {
     }
 }
 
-fn field_to_dmmf(model: &dml::Model, field: &dml::ScalarField) -> Field {
+fn field_to_dmmf(model: &dml::Model, field: &dml::Field) -> Field {
     let a_relation_field_is_based_on_this_field: bool = model
         .relation_fields()
-        .any(|f| f.relation_info.fields.contains(&field.name));
+        .any(|f| f.relation_info.fields.contains(&field.name().to_string()));
+
     Field {
-        name: field.name.clone(),
+        name: field.name().to_string(),
         kind: get_field_kind(field),
-        is_required: field.arity == dml::FieldArity::Required,
-        is_list: field.arity == dml::FieldArity::List,
-        is_id: field.is_id,
+        is_required: *field.arity() == dml::FieldArity::Required,
+        is_list: *field.arity() == dml::FieldArity::List,
+        is_id: field.is_id(),
         is_read_only: a_relation_field_is_based_on_this_field,
-        has_default_value: field.default_value.is_some(),
-        default: default_value_to_serde(&field.default_value),
-        is_unique: field.is_unique,
+        has_default_value: field.default_value().is_some(),
+        default: default_value_to_serde(&field.default_value().map(|v| v.to_owned())),
+        is_unique: field.is_unique(),
         relation_name: get_relation_name(field),
         relation_from_fields: get_relation_from_fields(field),
         relation_to_fields: get_relation_to_fields(field),
         relation_on_delete: get_relation_delete_strategy(field),
         field_type: get_field_type(field),
-        is_generated: Some(field.is_generated),
-        is_updated_at: Some(field.is_updated_at),
-        documentation: field.documentation.clone(),
+        is_generated: Some(field.is_generated()),
+        is_updated_at: Some(field.is_updated_at()),
+        documentation: field.documentation().map(|v| v.to_owned()),
     }
 }
 
-fn get_field_kind(field: &dml::ScalarField) -> String {
-    match field.field_type {
+fn get_field_kind(field: &dml::Field) -> String {
+    match field.field_type() {
         dml::FieldType::Relation(_) => String::from("object"),
         dml::FieldType::Enum(_) => String::from("enum"),
         dml::FieldType::Base(_, _) => String::from("scalar"),
-        _ => unimplemented!("DMMF does not support field type {:?}", field.field_type),
+        _ => unimplemented!("DMMF does not support field type {:?}", field.field_type()),
     }
 }
 
@@ -160,8 +161,8 @@ fn function_to_serde(name: &str, args: &Vec<PrismaValue>) -> serde_json::Value {
     serde_json::to_value(&func).expect("Failed to render function JSON")
 }
 
-fn get_field_type(field: &dml::ScalarField) -> String {
-    match &field.field_type {
+fn get_field_type(field: &dml::Field) -> String {
+    match &field.field_type() {
         dml::FieldType::Relation(relation_info) => relation_info.to.clone(),
         dml::FieldType::Enum(t) => t.clone(),
         dml::FieldType::Unsupported(t) => t.clone(),
@@ -174,30 +175,30 @@ fn type_to_string(scalar: &ScalarType) -> String {
     scalar.to_string()
 }
 
-fn get_relation_name(field: &dml::ScalarField) -> Option<String> {
-    match &field.field_type {
-        dml::FieldType::Relation(relation_info) => Some(relation_info.name.clone()),
+fn get_relation_name(field: &dml::Field) -> Option<String> {
+    match &field {
+        dml::Field::RelationField(rf) => Some(rf.relation_info.name.clone()),
         _ => None,
     }
 }
 
-fn get_relation_from_fields(field: &dml::ScalarField) -> Option<Vec<String>> {
-    match &field.field_type {
-        dml::FieldType::Relation(relation_info) => Some(relation_info.fields.clone()),
+fn get_relation_from_fields(field: &dml::Field) -> Option<Vec<String>> {
+    match &field {
+        dml::Field::RelationField(rf) => Some(rf.relation_info.fields.clone()),
         _ => None,
     }
 }
 
-fn get_relation_to_fields(field: &dml::ScalarField) -> Option<Vec<String>> {
-    match &field.field_type {
-        dml::FieldType::Relation(relation_info) => Some(relation_info.to_fields.clone()),
+fn get_relation_to_fields(field: &dml::Field) -> Option<Vec<String>> {
+    match &field {
+        dml::Field::RelationField(rf) => Some(rf.relation_info.to_fields.clone()),
         _ => None,
     }
 }
 
-fn get_relation_delete_strategy(field: &dml::ScalarField) -> Option<String> {
-    match &field.field_type {
-        dml::FieldType::Relation(relation_info) => Some(relation_info.on_delete.to_string()),
+fn get_relation_delete_strategy(field: &dml::Field) -> Option<String> {
+    match &field {
+        dml::Field::RelationField(rf) => Some(rf.relation_info.on_delete.to_string()),
         _ => None,
     }
 }

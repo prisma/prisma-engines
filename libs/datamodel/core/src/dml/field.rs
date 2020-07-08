@@ -103,6 +103,20 @@ impl Field {
         }
     }
 
+    pub fn documentation(&self) -> Option<&str> {
+        match self {
+            Field::ScalarField(sf) => sf.documentation.as_deref(),
+            Field::RelationField(rf) => rf.documentation.as_deref(),
+        }
+    }
+
+    pub fn is_commented_out(&self) -> bool {
+        match self {
+            Field::ScalarField(sf) => sf.is_commented_out,
+            Field::RelationField(rf) => rf.is_commented_out,
+        }
+    }
+
     pub fn arity(&self) -> &FieldArity {
         match &self {
             Field::ScalarField(sf) => &sf.arity,
@@ -110,10 +124,10 @@ impl Field {
         }
     }
 
-    pub fn field_type(&self) -> &FieldType {
+    pub fn field_type(&self) -> FieldType {
         match &self {
-            Field::ScalarField(sf) => &sf.field_type,
-            Field::RelationField(rf) => &FieldType::Relation(rf.relation_info.clone()),
+            Field::ScalarField(sf) => sf.field_type.clone(),
+            Field::RelationField(rf) => FieldType::Relation(rf.relation_info.clone()),
         }
     }
 
@@ -128,6 +142,58 @@ impl Field {
         match &self {
             Field::ScalarField(sf) => sf.is_updated_at,
             Field::RelationField(_) => false,
+        }
+    }
+
+    pub fn is_unique(&self) -> bool {
+        match &self {
+            Field::ScalarField(sf) => sf.is_unique,
+            Field::RelationField(_) => false,
+        }
+    }
+
+    pub fn is_id(&self) -> bool {
+        match &self {
+            Field::ScalarField(sf) => sf.is_id,
+            Field::RelationField(_) => false,
+        }
+    }
+
+    pub fn is_generated(&self) -> bool {
+        match &self {
+            Field::ScalarField(sf) => sf.is_generated,
+            Field::RelationField(rf) => rf.is_generated,
+        }
+    }
+}
+
+impl WithName for Field {
+    fn name(&self) -> &String {
+        match self {
+            Field::ScalarField(sf) => sf.name(),
+            Field::RelationField(rf) => rf.name(),
+        }
+    }
+    fn set_name(&mut self, name: &str) {
+        match self {
+            Field::ScalarField(sf) => sf.set_name(name),
+            Field::RelationField(rf) => rf.set_name(name),
+        }
+    }
+}
+
+impl WithDatabaseName for Field {
+    fn database_name(&self) -> Option<&str> {
+        match self {
+            Field::ScalarField(sf) => sf.database_name.as_deref(),
+            Field::RelationField(_) => None,
+        }
+    }
+
+    fn set_database_name(&mut self, database_name: Option<String>) {
+        match self {
+            Field::ScalarField(sf) => sf.set_database_name(database_name),
+            Field::RelationField(_) => (),
         }
     }
 }
@@ -272,6 +338,15 @@ impl WithName for ScalarField {
     }
 }
 
+impl WithName for RelationField {
+    fn name(&self) -> &String {
+        &self.name
+    }
+    fn set_name(&mut self, name: &str) {
+        self.name = String::from(name)
+    }
+}
+
 impl WithDatabaseName for ScalarField {
     fn database_name(&self) -> Option<&str> {
         self.database_name.as_deref()
@@ -279,5 +354,15 @@ impl WithDatabaseName for ScalarField {
 
     fn set_database_name(&mut self, database_name: Option<String>) {
         self.database_name = database_name;
+    }
+}
+
+impl WithDatabaseName for RelationField {
+    fn database_name(&self) -> Option<&str> {
+        None
+    }
+
+    fn set_database_name(&mut self, _database_name: Option<String>) {
+        unreachable!("Relationfields do not have a database name")
     }
 }
