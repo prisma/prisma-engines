@@ -2,7 +2,7 @@
 //! Structures represent parsed and validated parts of the query document, used by the query builders.
 use super::{QueryParserError, QueryParserResult};
 use crate::FieldRef;
-use prisma_models::{OrderBy, PrismaValue};
+use prisma_models::{OrderBy, PrismaValue, ScalarFieldRef};
 use std::collections::BTreeMap;
 
 pub type ParsedInputMap = BTreeMap<String, ParsedInputValue>;
@@ -54,6 +54,7 @@ pub struct ParsedArgument {
 pub enum ParsedInputValue {
     Single(PrismaValue),
     OrderBy(OrderBy),
+    ScalarField(ScalarFieldRef),
     List(Vec<ParsedInputValue>),
     Map(ParsedInputMap),
 }
@@ -105,6 +106,7 @@ impl InputAssertions for ParsedInputValue {
             Self::Map(m) => m.assert_non_null()?,
             Self::Single(v) => v.assert_non_null()?,
             Self::OrderBy(_) => (),
+            Self::ScalarField(_) => (),
         };
 
         Ok(())

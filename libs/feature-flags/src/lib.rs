@@ -1,7 +1,7 @@
 //! How to implement a feature flag for Prisma:
-//! - Add a bool field to the `FeatureFlags` struct.
-//! - Add the str equivalent of the flag to the `add_flag` function match.
-//! - Add the str equivalent of the flag to the `enable_all()` function.
+//! - Add the desired identifier to the `flags!` macro invocation
+//!
+//! Note: the stringified version of that ident will be used as the string flag name.
 //!
 //! How to use a feature flag:
 //! - Make sure that the flags are initialized in the app stack with `feature_flags::initialize(_)`.
@@ -20,37 +20,42 @@ pub enum FeatureFlagError {
 
 pub type Result<T> = std::result::Result<T, FeatureFlagError>;
 
-#[derive(Debug, Default)]
-pub struct FeatureFlags {
-    /// Transactional batches support in the QE.
-    pub transaction: bool,
+macro_rules! flags {
+    ($( $field:ident ),*) => {
+        #[derive(Debug, Default)]
+        pub struct FeatureFlags {
+            $(
+                pub $field: bool,
+            )*
+        }
 
-    /// `connectOrCreate` nested query in the QE.
-    pub connect_or_create: bool,
+        impl FeatureFlags {
+            fn add_flag(&mut self, flag: &str) -> Result<()> {
+                match flag {
+                    "all" => self.enable_all(),
+                    $(
+                        stringify!($field) => self.$field = true,
+                    )*
+                    _ => Err(FeatureFlagError::InvalidFlag(flag.to_owned()))?,
+                };
 
-    /// Basic aggregation support.
-    pub aggregations: bool,
+                Ok(())
+            }
+
+            fn enable_all(&mut self) {
+                $(
+                    self.$field = true;
+                )*
+            }
+        }
+    };
 }
 
-impl FeatureFlags {
-    fn add_flag(&mut self, flag: &str) -> Result<()> {
-        match flag {
-            "all" => self.enable_all(),
-            "transaction" => self.transaction = true,
-            "connectOrCreate" => self.connect_or_create = true,
-            "aggregations" => self.aggregations = true,
-            _ => Err(FeatureFlagError::InvalidFlag(flag.to_owned()))?,
-        };
-
-        Ok(())
-    }
-
-    fn enable_all(&mut self) {
-        self.transaction = true;
-        self.connect_or_create = true;
-        self.aggregations = true;
-    }
-}
+// `transaction`: Transactional batches support in the QE.
+// `connect_or_create`: `connectOrCreate` nested query in the QE.
+// `distinct: Distinct select query support.
+// `aggregations`: Basic aggregation support.
+flags!(transaction, connect_or_create, distinct, aggregations);
 
 /// Initializes the feature flags with given flags.
 /// Noop if already initialized.

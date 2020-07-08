@@ -1,43 +1,107 @@
 use connector::QueryArguments;
-use prisma_models::{ManyRecords, ModelProjection, RecordProjection};
+use itertools::Itertools;
+use prisma_models::{ManyRecords, ModelProjection, Record, RecordProjection};
 
-pub struct NestedPagination {
+/// Allows to manipulate a set of records in-memory instead of on the database level.
+pub struct InMemoryRecordProcessor {
     skip: Option<i64>,
     take: Option<i64>,
     cursor: Option<RecordProjection>,
     needs_reversing: bool,
+    distinct: Option<ModelProjection>,
 }
 
-impl NestedPagination {
-    pub fn new_from_query_args(args: &QueryArguments) -> NestedPagination {
-        NestedPagination {
+impl InMemoryRecordProcessor {
+    pub fn new_from_query_args(args: &mut QueryArguments) -> Self {
+        let processor = Self {
             skip: args.skip.clone(),
             take: args.take_abs(),
             cursor: args.cursor.clone(),
             needs_reversing: args.needs_reversed_order(),
-        }
+            distinct: args.distinct.clone(),
+        };
+
+        args.distinct = None;
+        args.ignore_take = true;
+        args.ignore_skip = true;
+
+        processor
     }
 
-    pub fn apply_pagination(&self, mut many_records: ManyRecords) -> ManyRecords {
-        if !self.must_apply_pagination() {
-            return many_records;
-        }
-
+    pub fn apply(&self, mut records: ManyRecords) -> ManyRecords {
         if self.needs_reversing {
-            many_records.records.reverse();
+            records.records.reverse();
         }
 
-        // Replacement for SQL order by
-        // TODO: this must also handle secondary order bys
-        many_records.records.sort_by_key(|r| {
+        let records = if Self::is_nested(&records) {
+            Self::order_by_parent(records)
+        } else {
+            records
+        };
+
+        let records = self.apply_distinct(records);
+        self.apply_pagination(records)
+    }
+
+    fn order_by_parent(mut records: ManyRecords) -> ManyRecords {
+        records.records.sort_by_key(|r| {
             let values: Vec<_> = r
                 .parent_id
                 .as_ref()
-                .expect("Parent id must be set on all records in order to paginate")
+                .expect("Expected parent IDs to be set when ordering by parent ID.")
                 .values()
                 .collect();
+
             values
         });
+
+        records
+    }
+
+    fn is_nested(records: &ManyRecords) -> bool {
+        records.records.first().map(|x| x.parent_id.is_some()).unwrap_or(false)
+    }
+
+    fn apply_distinct(&self, mut records: ManyRecords) -> ManyRecords {
+        let field_names = &records.field_names;
+
+        let distinct = if let Some(ref distinct) = self.distinct {
+            distinct.clone()
+        } else {
+            return records;
+        };
+
+        let new_records: Vec<Record> = if Self::is_nested(&records) {
+            records
+                .records
+                .into_iter()
+                .group_by(|record| record.parent_id.clone())
+                .into_iter()
+                .flat_map(|(_, group)| {
+                    let filtered: Vec<_> = group
+                        .into_iter()
+                        .unique_by(|record| record.projection(&field_names, &distinct).unwrap())
+                        .collect();
+
+                    filtered
+                })
+                .collect()
+        } else {
+            records
+                .records
+                .into_iter()
+                .unique_by(|record| record.projection(&field_names, &distinct).unwrap())
+                .collect()
+        };
+
+        records.records = new_records;
+        records
+    }
+
+    fn apply_pagination(&self, mut many_records: ManyRecords) -> ManyRecords {
+        if !self.must_apply_pagination() {
+            return many_records;
+        }
 
         // If we have a cursor, skip records until we find it for each parent id. Pagination is applied afterwards.
         if let Some(cursor) = &self.cursor {
