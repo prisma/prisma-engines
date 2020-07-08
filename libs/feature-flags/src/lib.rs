@@ -1,3 +1,4 @@
+#![allow(non_snake_case)]
 //! How to implement a feature flag for Prisma:
 //! - Add the desired identifier to the `flags!` macro invocation
 //!
@@ -52,10 +53,10 @@ macro_rules! flags {
 }
 
 // `transaction`: Transactional batches support in the QE.
-// `connect_or_create`: `connectOrCreate` nested query in the QE.
+// `connectOrCreate`: `connectOrCreate` nested query in the QE.
 // `distinct: Distinct select query support.
 // `aggregations`: Basic aggregation support.
-flags!(transaction, connect_or_create, distinct, aggregations);
+flags!(transaction, connectOrCreate, distinct, aggregations);
 
 /// Initializes the feature flags with given flags.
 /// Noop if already initialized.
