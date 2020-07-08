@@ -109,6 +109,27 @@ impl Field {
             Field::RelationField(rf) => &rf.arity,
         }
     }
+
+    pub fn field_type(&self) -> &FieldType {
+        match &self {
+            Field::ScalarField(sf) => &sf.field_type,
+            Field::RelationField(rf) => &FieldType::Relation(rf.relation_info.clone()),
+        }
+    }
+
+    pub fn default_value(&self) -> Option<&DefaultValue> {
+        match &self {
+            Field::ScalarField(sf) => sf.default_value.as_ref(),
+            Field::RelationField(_) => None,
+        }
+    }
+
+    pub fn is_updated_at(&self) -> bool {
+        match &self {
+            Field::ScalarField(sf) => sf.is_updated_at,
+            Field::RelationField(_) => false,
+        }
+    }
 }
 
 /// Represents a relation field in a model.

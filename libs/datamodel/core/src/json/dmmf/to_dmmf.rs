@@ -92,10 +92,9 @@ fn model_to_dmmf(model: &dml::Model) -> Model {
 }
 
 fn field_to_dmmf(model: &dml::Model, field: &dml::ScalarField) -> Field {
-    let a_relation_field_is_based_on_this_field: bool = model.fields.iter().any(|f| match &f.field_type {
-        dml::FieldType::Relation(rel_info) => rel_info.fields.contains(&field.name),
-        _ => false,
-    });
+    let a_relation_field_is_based_on_this_field: bool = model
+        .relation_fields()
+        .any(|f| f.relation_info.fields.contains(&field.name));
     Field {
         name: field.name.clone(),
         kind: get_field_kind(field),

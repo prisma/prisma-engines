@@ -33,14 +33,10 @@ impl Standardiser {
         let schema_copy = schema.clone();
 
         // Iterate and mutate models.
-        for model_idx in 0..schema.models.len() {
-            let cloned_model = schema.models[model_idx].clone();
-            let unique_criteria = self.unique_criteria(&cloned_model);
-            let model = &mut schema.models[model_idx];
+        for model in schema.models_mut() {
+            let unique_criteria = self.unique_criteria(&model);
 
-            for field_index in 0..model.relation_fields().len() {
-                let field = &mut model.relation_fields()[field_index];
-
+            for field in model.relation_fields_mut() {
                 let rel_info = &mut field.relation_info;
                 let related_model = schema_copy.find_model(&rel_info.to).expect(STATE_ERROR);
                 let related_field = related_model
@@ -126,7 +122,7 @@ impl Standardiser {
                 errors.push(field_validation_error(
                                 "Automatic related field generation would cause a naming conflict. Please add an explicit opposite relation field.",
                                 &source_model,
-                                &source_field,
+                                &Field::RelationField(source_field.clone()),
                                 &ast_schema,
                             ));
             } else {
@@ -203,7 +199,7 @@ impl Standardiser {
                             // This prevents name conflicts with existing fields on the model
                             let mut f = f;
                             if let Some(existing_field) = related_model.find_field(&f.name) {
-                                if !existing_field.field_type.is_compatible_with(&f.field_type) {
+                                if !existing_field.field_type().is_compatible_with(&f.field_type) {
                                     f.name = format!("{}_{}", &f.name, &rel_info.name);
                                 }
                             }
@@ -220,7 +216,7 @@ impl Standardiser {
                                         // field with name does not exist yet
                                         Some(f)
                                     }
-                                    Some(other) if other.field_type.is_compatible_with(&f.field_type) => {
+                                    Some(other) if other.field_type().is_compatible_with(&f.field_type) => {
                                         // field with name exists and its type is compatible. We must not add it since we would have a duplicate.
                                         None
                                     }

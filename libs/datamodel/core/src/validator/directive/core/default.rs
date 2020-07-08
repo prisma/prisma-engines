@@ -7,25 +7,25 @@ use prisma_value::PrismaValue;
 /// Prismas builtin `@default` directive.
 pub struct DefaultDirectiveValidator {}
 
-impl DirectiveValidator<dml::ScalarField> for DefaultDirectiveValidator {
+impl DirectiveValidator<dml::Field> for DefaultDirectiveValidator {
     fn directive_name(&self) -> &'static str {
         &"default"
     }
 
-    fn validate_and_apply(&self, args: &mut Args, field: &mut dml::ScalarField) -> Result<(), DatamodelError> {
+    fn validate_and_apply(&self, args: &mut Args, field: &mut dml::Field) -> Result<(), DatamodelError> {
         // If we allow list default values, we need to adjust the types below properly for that case.
-        if field.arity == dml::FieldArity::List {
+        if *field.arity() == dml::FieldArity::List {
             return self.new_directive_validation_error("Cannot set a default value on list field.", args.span());
         }
 
-        if let dml::FieldType::Base(scalar_type, _) = field.field_type {
+        if let dml::FieldType::Base(scalar_type, _) = field.field_type() {
             let dv = args
                 .default_arg("value")?
-                .as_default_value_for_scalar_type(scalar_type)
+                .as_default_value_for_scalar_type(scalar_type.clone())
                 .map_err(|e| self.wrap_in_directive_validation_error(&e))?;
 
             field.default_value = Some(dv);
-        } else if let dml::FieldType::Enum(_) = &field.field_type {
+        } else if let dml::FieldType::Enum(_) = &field.field_type() {
             let default_arg = args.default_arg("value")?;
 
             match default_arg.as_constant_literal() {
@@ -49,10 +49,10 @@ impl DirectiveValidator<dml::ScalarField> for DefaultDirectiveValidator {
 
     fn serialize(
         &self,
-        field: &dml::ScalarField,
+        field: &dml::Field,
         _datamodel: &dml::Datamodel,
     ) -> Result<Vec<ast::Directive>, DatamodelError> {
-        if let Some(default_value) = &field.default_value {
+        if let Some(default_value) = field.default_value() {
             return Ok(vec![ast::Directive::new(
                 self.directive_name(),
                 vec![ast::Argument::new(

@@ -5,42 +5,41 @@ use crate::{ast, dml};
 /// Prismas builtin `@primary` directive.
 pub struct IdDirectiveValidator {}
 
-impl DirectiveValidator<dml::ScalarField> for IdDirectiveValidator {
+impl DirectiveValidator<dml::Field> for IdDirectiveValidator {
     fn directive_name(&self) -> &'static str {
         &"id"
     }
 
-    // TODO In which form is this still required or needs to change? Default values are handling the id strategy now.
-    fn validate_and_apply(&self, args: &mut Args, obj: &mut dml::ScalarField) -> Result<(), DatamodelError> {
-        if obj.arity != dml::FieldArity::Required {
-            return self.new_directive_validation_error("Fields that are marked as id must be required.", args.span());
-        }
-
-        if let dml::FieldType::Relation(_) = obj.field_type {
-            return self.new_directive_validation_error(
+    fn validate_and_apply(&self, args: &mut Args, obj: &mut dml::Field) -> Result<(), DatamodelError> {
+        if let dml::Field::ScalarField(sf) = obj {
+            if sf.arity == dml::FieldArity::Required {
+                sf.is_id = true;
+                Ok(())
+            } else {
+                self.new_directive_validation_error("Fields that are marked as id must be required.", args.span())
+            }
+        } else {
+            self.new_directive_validation_error(
                 &format!(
                     "The field `{}` is a relation field and cannot be marked with `@{}`. Only scalar fields can be declared as id.",
-                    &obj.name,
+                    &obj.name(),
                     self.directive_name()
                 ),
                 args.span(),
-            );
+            )
         }
-
-        obj.is_id = true;
-
-        Ok(())
     }
 
     fn serialize(
         &self,
-        field: &dml::ScalarField,
+        field: &dml::Field,
         _datamodel: &dml::Datamodel,
     ) -> Result<Vec<ast::Directive>, DatamodelError> {
-        if field.is_id {
-            return Ok(vec![ast::Directive::new(self.directive_name(), Vec::new())]);
+        if let dml::Field::ScalarField(sf) = field {
+            if sf.is_id {
+                return Ok(vec![ast::Directive::new(self.directive_name(), Vec::new())]);
+            }
         }
-
         Ok(vec![])
     }
 }
