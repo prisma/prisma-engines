@@ -23,11 +23,11 @@ async fn introspecting_a_simple_table_with_gql_types_must_work(api: &TestApi) {
     let dm = r#"
             model Blog {
                 bool    Boolean
-                date    DateTime
                 float   Float
+                date    DateTime
                 id      Int @id @default(autoincrement())
-                int     Int
                 integer Int
+                int     Int
                 string  String
             }
         "#;
@@ -50,8 +50,8 @@ async fn introspecting_a_table_with_compound_primary_keys_must_work(api: &TestAp
 
     let dm = r#"
             model Blog {
-                authorId String
                 id Int
+                authorId String
                 @@id([id, authorId])
             }
         "#;
@@ -74,8 +74,8 @@ async fn introspecting_a_table_with_unique_index_must_work(api: &TestApi) {
 
     let dm = r#"
             model Blog {
-                authorId String @unique
                 id Int @id @default(autoincrement())
+                authorId String @unique
             }
         "#;
     let result = dbg!(api.introspect().await);
@@ -98,8 +98,8 @@ async fn introspecting_a_table_with_multi_column_unique_index_must_work(api: &Te
 
     let dm = r#"
             model User {
-                firstname String
                 id Int @id @default(autoincrement())
+                firstname String
                 lastname String
                 @@unique([firstname, lastname], name: "test")
             }
@@ -124,8 +124,8 @@ async fn introspecting_a_table_with_required_and_optional_columns_must_work(api:
     let dm = r#"
             model User {
                 id Int @id @default(autoincrement())
-                optionalname String?
                 requiredname String
+                optionalname String?
             }
         "#;
     let result = dbg!(api.introspect().await);
@@ -175,10 +175,10 @@ async fn introspecting_a_table_with_default_values_should_work(api: &TestApi) {
     let dm = r#"
             model User {
                 a String
+                id Int @id @default(autoincrement())
                 bool Boolean @default(false)
                 bool2 Boolean @default(false)
                 float Float @default(5.3)
-                id Int @id @default(autoincrement())
                 int Int @default(5)
                 string String @default("Test")
             }
@@ -307,19 +307,19 @@ async fn introspecting_a_default_value_as_dbgenerated_should_work(api: &TestApi)
 
     let dm = r#"
             model Test {
-                boolean_static_1                    Boolean?    @default(true)
-                boolean_static_true                 Boolean?    @default(true)
-                datetime_datetime_now_localtime     DateTime?   @default(now())
-                datetime_now_current_timestamp      DateTime?   @default(now())
-                datetime_now_current_timestamp_lc   DateTime?   @default(now())
-                datetime_now_datetime_now           DateTime?   @default(now())
-                float_static                        Float?      @default(1.43)
                 id                                  Int         @default(autoincrement()) @id
-                int_static                          Int?        @default(2)
                 string_static_char                  String?     @default("test")
                 string_static_null                  String?
                 string_static_text                  String?     @default("test")
                 string_static_varchar               String?     @default("test")
+                int_static                          Int?        @default(2)
+                float_static                        Float?      @default(1.43)
+                boolean_static_1                    Boolean?    @default(true)
+                boolean_static_true                 Boolean?    @default(true)
+                datetime_now_current_timestamp      DateTime?   @default(now())
+                datetime_now_current_timestamp_lc   DateTime?   @default(now())
+                datetime_now_datetime_now           DateTime?   @default(now())
+                datetime_datetime_now_localtime     DateTime?   @default(now())
             }
         "#;
 

@@ -165,8 +165,8 @@ async fn introspecting_a_one_to_one_relation_referencing_non_id_should_work(api:
         .await;
     let dm = r#"
             model User {
-                email String? @unique
                 id    Int     @default(autoincrement()) @id
+                email String? @unique
                 Post  Post?
             }
             
@@ -432,8 +432,8 @@ async fn introspecting_a_many_to_many_relation_with_an_id_should_work(api: &Test
             
             model PostsToUsers {
                 id      Int    @default(autoincrement()) @id
-                post_id Int
                 user_id Int
+                post_id Int
                 Post    Post   @relation(fields: [post_id], references: [id])
                 User    User   @relation(fields: [user_id], references: [id])
             }
@@ -462,9 +462,9 @@ async fn introspecting_a_self_relation_should_work(api: &TestApi) {
 
     let dm = r#"
             model User {
-                direct_report                       Int?
                 id                                  Int    @default(autoincrement()) @id
                 recruited_by                        Int?
+                direct_report                       Int?
                 User_UserToUser_direct_report       User?  @relation("UserToUser_direct_report", fields: [direct_report], references: [id])
                 User_UserToUser_recruited_by        User?  @relation("UserToUser_recruited_by", fields: [recruited_by], references: [id])
                 other_User_UserToUser_direct_report User[] @relation("UserToUser_direct_report")

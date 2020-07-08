@@ -123,8 +123,8 @@ async fn introspecting_a_one_to_one_relation_referencing_non_id_should_work(api:
             }
 
             model User {
-                email String? @unique
                 id    Int     @default(autoincrement()) @id
+                email String? @unique
                 Post  Post?
             }
         "#;
@@ -403,8 +403,8 @@ async fn introspecting_a_many_to_many_relation_with_an_id_should_work(api: &Test
 
             model PostsToUsers {
                 id      Int  @id
-                post_id Int
                 user_id Int
+                post_id Int
                 Post    Post @relation(fields: [post_id], references: [id])
                 User    User @relation(fields: [user_id], references: [id])
             }
@@ -433,9 +433,9 @@ async fn introspecting_a_self_relation_should_work(api: &TestApi) {
         .await;
     let dm = r#"
             model User {
-                direct_report                       Int?
                 id                                  Int    @default(autoincrement()) @id
                 recruited_by                        Int?
+                direct_report                       Int?
                 User_UserToUser_direct_report       User?  @relation("UserToUser_direct_report", fields: [direct_report], references: [id])
                 User_UserToUser_recruited_by        User?  @relation("UserToUser_recruited_by", fields: [recruited_by], references: [id])
                 other_User_UserToUser_direct_report User[] @relation("UserToUser_direct_report")
@@ -713,10 +713,10 @@ async fn introspecting_relations_should_avoid_name_clashes_2(api: &TestApi) {
             }
 
             model y {
-               fk_x_1               String
-               fk_x_2               String
                id                   String @id
                x                    String
+               fk_x_1               String
+               fk_x_2               String
                x_xToy_fk_x_1_fk_x_2 x      @relation("xToy_fk_x_1_fk_x_2", fields: [fk_x_1, fk_x_2], references: [y, id])
                x_x_yToy             x[]    @relation("x_yToy")
             }
