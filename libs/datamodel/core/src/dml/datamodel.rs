@@ -142,7 +142,7 @@ impl Datamodel {
         let mut fields = vec![];
 
         for model in &self.models {
-            for field in &model.fields {
+            for field in &model.scalar_fields() {
                 if FieldType::Enum(enum_name.to_owned()) == field.field_type {
                     fields.push((model.name.clone(), field.name.clone()))
                 }
@@ -155,12 +155,9 @@ impl Datamodel {
     pub fn find_relation_fields_for_model(&mut self, model_name: &str) -> Vec<(String, String)> {
         let mut fields = vec![];
         for model in &self.models {
-            for field in &model.fields {
-                match &field.field_type {
-                    FieldType::Relation(RelationInfo { to: m_name, .. }) if model_name == m_name => {
-                        fields.push((model.name.clone(), field.name.clone()))
-                    }
-                    _ => (),
+            for field in &model.relation_fields() {
+                if field.relation_info.to == model_name {
+                    fields.push((model.name.clone(), field.name.clone()))
                 }
             }
         }
@@ -168,29 +165,21 @@ impl Datamodel {
     }
 
     /// Finds a relation field related to a relation info
-    pub fn find_related_field_for_info(&self, info: &RelationInfo) -> &ScalarField {
+    pub fn find_related_field_for_info(&self, info: &RelationInfo) -> &RelationField {
         self.find_model(&info.to)
             .expect("The model referred to by a RelationInfo should always exist.")
-            .fields()
-            .find(|f| match &f.field_type {
-                FieldType::Relation(other_info) => {
-                    other_info.name == info.name
+            .relation_fields()
+            .find(|f| {
+                f.relation_info.name == info.name
                     // This is to differentiate the opposite field from self in the self relation case.
-                    && other_info.to_fields != info.to_fields
-                    && other_info.fields != info.fields
-                }
-                _ => false,
+                    && f.relation_info.to_fields != info.to_fields
+                    && f.relation_info.fields != info.fields
             })
             .expect("Every RelationInfo should have a complementary RelationInfo on the opposite relation field.")
     }
 
     /// Returns (model_name, field_name) for all relation fields pointing to a specific model.
     pub fn find_related_info(&self, info: &RelationInfo) -> &RelationInfo {
-        let field = self.find_related_field_for_info(info);
-
-        match &field.field_type {
-            FieldType::Relation(relation_info) => return relation_info,
-            _ => unreachable!("Every relation field has a relation info."),
-        }
+        &self.find_related_field_for_info(info).relation_info
     }
 }

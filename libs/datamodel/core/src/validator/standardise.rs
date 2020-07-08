@@ -1,8 +1,6 @@
 use super::common::*;
 use crate::error::DatamodelError;
-use crate::{
-    ast, common::names::*, dml, error::ErrorCollection, FieldWrapper, OnDeleteStrategy, ScalarField, UniqueCriteria,
-};
+use crate::{ast, common::names::*, dml, error::ErrorCollection, Field, OnDeleteStrategy, ScalarField, UniqueCriteria};
 
 /// Helper for standardsing a datamodel.
 ///
@@ -89,7 +87,7 @@ impl Standardiser {
                     {
                         rel_info.fields = underlying_fields.iter().map(|f| f.name.clone()).collect();
                         for underlying_field in underlying_fields {
-                            model.add_field(FieldWrapper::Field(underlying_field));
+                            model.add_field(Field::ScalarField(underlying_field));
                         }
                     }
                 }
@@ -136,11 +134,11 @@ impl Standardiser {
                     .find_model_mut(&missing_back_relation_field.model)
                     .expect(STATE_ERROR);
 
-                model_mut.add_field(FieldWrapper::RelationField(missing_back_relation_field.field));
+                model_mut.add_field(Field::RelationField(missing_back_relation_field.field));
 
                 for underlying_field in missing_back_relation_field.underlying_fields.into_iter() {
                     if !model_mut.has_field(&underlying_field.name) {
-                        model_mut.add_field(FieldWrapper::Field(underlying_field));
+                        model_mut.add_field(Field::ScalarField(underlying_field));
                     }
                 }
             }

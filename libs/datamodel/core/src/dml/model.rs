@@ -1,5 +1,5 @@
 use super::*;
-use crate::FieldWrapper;
+use crate::Field;
 
 /// Represents a model in a prisma datamodel.
 #[derive(Debug, PartialEq, Clone)]
@@ -7,7 +7,7 @@ pub struct Model {
     /// Name of the model.
     pub name: String,
     /// Fields of the model.
-    pub fields: Vec<FieldWrapper>,
+    pub fields: Vec<Field>,
     /// Comments associated with this model.
     pub documentation: Option<String>,
     /// The database internal name of this model.
@@ -74,17 +74,17 @@ impl Model {
     }
 
     /// Adds a field to this model.
-    pub fn add_field(&mut self, field: FieldWrapper) {
+    pub fn add_field(&mut self, field: Field) {
         self.fields.push(field)
     }
 
     /// Removes a field with the given name from this model.
     pub fn remove_field(&mut self, name: &str) {
-        self.fields.retain(|f| f.name != name);
+        self.fields.retain(|f| f.name() == name)
     }
 
     /// Gets an iterator over all fields.
-    pub fn fields(&self) -> std::slice::Iter<FieldWrapper> {
+    pub fn fields(&self) -> std::slice::Iter<Field> {
         self.fields.iter()
     }
 
@@ -93,7 +93,7 @@ impl Model {
         self.fields
             .iter()
             .filter_map(|fw| match fw {
-                FieldWrapper::Field(sf) => Some(sf),
+                Field::ScalarField(sf) => Some(sf),
                 _ => None,
             })
             .collect()
@@ -104,7 +104,7 @@ impl Model {
         self.fields
             .iter()
             .filter_map(|fw| match fw {
-                FieldWrapper::RelationField(rf) => Some(rf),
+                Field::RelationField(rf) => Some(rf),
                 _ => None,
             })
             .collect()

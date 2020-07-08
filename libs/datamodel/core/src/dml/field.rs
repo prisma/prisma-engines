@@ -75,23 +75,31 @@ impl FieldType {
     }
 }
 
-pub(crate) enum FieldWrapper {
-    Field(ScalarField),
+#[derive(Debug, PartialEq, Clone)]
+pub enum Field {
+    ScalarField(ScalarField),
     RelationField(RelationField),
 }
 
-impl FieldWrapper {
+impl Field {
     pub fn is_scalar(&self) -> bool {
         match self {
-            FieldWrapper::Field(_) => true,
-            FieldWrapper::RelationField(_) => false,
+            Field::ScalarField(_) => true,
+            Field::RelationField(_) => false,
         }
     }
 
     pub fn is_relation(&self) -> bool {
         match self {
-            FieldWrapper::Field(_) => false,
-            FieldWrapper::RelationField(_) => true,
+            Field::ScalarField(_) => false,
+            Field::RelationField(_) => true,
+        }
+    }
+
+    pub fn name(&self) -> &str {
+        match &self {
+            Field::ScalarField(sf) => &sf.name,
+            Field::RelationField(rf) => &rf.name,
         }
     }
 }

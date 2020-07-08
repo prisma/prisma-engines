@@ -202,7 +202,7 @@ pub(crate) fn calculate_backrelation_field(
     schema: &SqlSchema,
     model: &Model,
     other_model: &Model,
-    relation_field: &ScalarField,
+    relation_field: &RelationField,
     relation_info: &RelationInfo,
 ) -> Result<RelationField, SqlError> {
     match schema.table(&model.name) {
