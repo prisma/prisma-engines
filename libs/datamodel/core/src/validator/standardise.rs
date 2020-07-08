@@ -116,12 +116,12 @@ impl Standardiser {
                 .expect(STATE_ERROR);
             let field_name = &missing_back_relation_field.field.name;
 
-            if model.find_field(&field_name).is_some() {
+            if model.find_relation_field(&field_name).is_some() {
                 let source_model = schema
                     .find_model(&missing_back_relation_field.related_model)
                     .expect(STATE_ERROR);
                 let source_field = source_model
-                    .find_field(&missing_back_relation_field.related_field)
+                    .find_relation_field(&missing_back_relation_field.related_field)
                     .expect(STATE_ERROR);
                 errors.push(field_validation_error(
                                 "Automatic related field generation would cause a naming conflict. Please add an explicit opposite relation field.",

@@ -88,16 +88,23 @@ impl Datamodel {
     }
 
     /// Finds a model for a field reference by using reference comparison.
-    pub fn find_model_by_field_ref(&self, field: &ScalarField) -> Option<&Model> {
+    pub fn find_model_by_field_ref(&self, field: &Field) -> Option<&Model> {
+        // This uses the memory location of field for equality.
+        self.models()
+            .find(|m| m.fields().any(|f| f as *const Field == field as *const Field))
+    }
+
+    /// Finds a model for a field reference by using reference comparison.
+    pub fn find_model_by_relation_field_ref(&self, field: &RelationField) -> Option<&Model> {
         // This uses the memory location of field for equality.
         self.models().find(|m| {
-            m.fields()
-                .any(|f| f as *const ScalarField == field as *const ScalarField)
+            m.relation_fields()
+                .any(|f| f as *const RelationField == field as *const RelationField)
         })
     }
 
     /// Finds a field reference by a model and field name.
-    pub fn find_field(&self, field: &FieldRef) -> Option<&ScalarField> {
+    pub fn find_field(&self, field: &FieldRef) -> Option<&Field> {
         // This uses the memory location of field for equality.
         self.find_model(&field.0)?.find_field(&field.1)
     }
@@ -142,7 +149,7 @@ impl Datamodel {
         let mut fields = vec![];
 
         for model in &self.models {
-            for field in &model.scalar_fields() {
+            for field in model.scalar_fields() {
                 if FieldType::Enum(enum_name.to_owned()) == field.field_type {
                     fields.push((model.name.clone(), field.name.clone()))
                 }
@@ -155,7 +162,7 @@ impl Datamodel {
     pub fn find_relation_fields_for_model(&mut self, model_name: &str) -> Vec<(String, String)> {
         let mut fields = vec![];
         for model in &self.models {
-            for field in &model.relation_fields() {
+            for field in model.relation_fields() {
                 if field.relation_info.to == model_name {
                     fields.push((model.name.clone(), field.name.clone()))
                 }

@@ -94,7 +94,7 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
                     if let Some(old_field) =
                         old_model.find_field_db_name(&field.database_name.as_ref().unwrap_or(&field.name))
                     {
-                        if model.find_field(&old_field.name).is_none() {
+                        if model.find_scalar_field(&old_field.name).is_none() {
                             let mf = ModelAndField::new(&model.name, &field.name);
                             changed_scalar_field_names.push((mf, old_field.name.clone()))
                         }

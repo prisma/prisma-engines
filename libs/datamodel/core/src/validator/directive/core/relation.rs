@@ -45,64 +45,63 @@ impl DirectiveValidator<dml::ScalarField> for RelationDirectiveValidator {
 
     fn serialize(
         &self,
-        field: &dml::ScalarField,
+        field: &dml::RelationField,
         datamodel: &dml::Datamodel,
     ) -> Result<Vec<ast::Directive>, DatamodelError> {
-        if let dml::FieldType::Relation(relation_info) = &field.field_type {
-            let mut args = Vec::new();
+        let mut args = Vec::new();
+        let relation_info = &field.relation_info;
 
-            // These unwraps must be safe.
-            let parent_model = datamodel.find_model_by_field_ref(field).unwrap();
+        // These unwraps must be safe.
+        let parent_model = datamodel.find_model_by_relation_field_ref(field).unwrap();
 
-            let related_model = datamodel
-                .find_model(&relation_info.to)
-                .unwrap_or_else(|| panic!("Related model not found: {}.", relation_info.to));
+        let related_model = datamodel
+            .find_model(&relation_info.to)
+            .unwrap_or_else(|| panic!("Related model not found: {}.", relation_info.to));
 
-            let mut all_related_ids = related_model.id_field_names();
-            let has_default_name = relation_info.name
-                == DefaultNames::name_for_unambiguous_relation(&relation_info.to, &parent_model.name);
+        let mut all_related_ids = related_model.id_field_names();
+        let has_default_name =
+            relation_info.name == DefaultNames::name_for_unambiguous_relation(&relation_info.to, &parent_model.name);
 
-            if !relation_info.name.is_empty() && (!has_default_name || parent_model.name == related_model.name) {
-                args.push(ast::Argument::new_string("", &relation_info.name));
+        if !relation_info.name.is_empty() && (!has_default_name || parent_model.name == related_model.name) {
+            args.push(ast::Argument::new_string("", &relation_info.name));
+        }
+
+        let mut relation_fields = relation_info.to_fields.clone();
+
+        relation_fields.sort();
+        all_related_ids.sort();
+
+        if !relation_info.fields.is_empty() {
+            let mut fields: Vec<ast::Expression> = Vec::new();
+            for field in &relation_info.fields {
+                fields.push(ast::Expression::ConstantValue(field.clone(), ast::Span::empty()));
             }
 
-            let mut relation_fields = relation_info.to_fields.clone();
+            args.push(ast::Argument::new_array("fields", fields));
+        }
 
-            relation_fields.sort();
-            all_related_ids.sort();
-
-            if !relation_info.fields.is_empty() {
-                let mut fields: Vec<ast::Expression> = Vec::new();
-                for field in &relation_info.fields {
-                    fields.push(ast::Expression::ConstantValue(field.clone(), ast::Span::empty()));
-                }
-
-                args.push(ast::Argument::new_array("fields", fields));
-            }
-
-            // if we are on the physical field
-            if !relation_info.to_fields.is_empty() {
-                let mut related_fields: Vec<ast::Expression> = Vec::with_capacity(relation_info.to_fields.len());
-                for related_field in &relation_info.to_fields {
-                    related_fields.push(ast::Expression::ConstantValue(
-                        related_field.clone(),
-                        ast::Span::empty(),
-                    ));
-                }
-
-                args.push(ast::Argument::new_array("references", related_fields));
-            }
-
-            if relation_info.on_delete != dml::OnDeleteStrategy::None {
-                args.push(ast::Argument::new_constant(
-                    "onDelete",
-                    &relation_info.on_delete.to_string(),
+        // if we are on the physical field
+        if !relation_info.to_fields.is_empty() {
+            let mut related_fields: Vec<ast::Expression> = Vec::with_capacity(relation_info.to_fields.len());
+            for related_field in &relation_info.to_fields {
+                related_fields.push(ast::Expression::ConstantValue(
+                    related_field.clone(),
+                    ast::Span::empty(),
                 ));
             }
 
-            if !args.is_empty() {
-                return Ok(vec![ast::Directive::new(self.directive_name(), args)]);
-            }
+            args.push(ast::Argument::new_array("references", related_fields));
+        }
+
+        if relation_info.on_delete != dml::OnDeleteStrategy::None {
+            args.push(ast::Argument::new_constant(
+                "onDelete",
+                &relation_info.on_delete.to_string(),
+            ));
+        }
+
+        if !args.is_empty() {
+            return Ok(vec![ast::Directive::new(self.directive_name(), args)]);
         }
 
         Ok(vec![])

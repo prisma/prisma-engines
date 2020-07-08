@@ -348,30 +348,27 @@ impl<'a> Validator<'a> {
             let unknown_fields: Vec<String> = rel_info
                 .fields
                 .iter()
-                .filter(|base_field| model.find_field(&base_field).is_none())
+                .filter(|base_field| model.find_scalar_field(&base_field).is_none())
                 .map(|f| f.clone())
                 .collect();
 
             let referenced_relation_fields: Vec<String> = rel_info
                 .fields
                 .iter()
-                .filter(|base_field| match model.find_field(&base_field) {
-                    None => false,
-                    Some(scalar_field) => scalar_field.field_type.is_relation(),
-                })
+                .filter(|base_field| model.find_scalar_field(&base_field).is_some())
                 .map(|f| f.clone())
                 .collect();
 
             let at_least_one_underlying_field_is_required = rel_info
                 .fields
                 .iter()
-                .filter_map(|base_field| model.find_field(&base_field))
+                .filter_map(|base_field| model.find_scalar_field(&base_field))
                 .any(|f| f.arity.is_required());
 
             let all_underlying_fields_are_optional = rel_info
                 .fields
                 .iter()
-                .map(|base_field| match model.find_field(&base_field) {
+                .map(|base_field| match model.find_scalar_field(&base_field) {
                     Some(f) => f.arity.is_optional(),
                     None => false,
                 })
@@ -442,24 +439,21 @@ impl<'a> Validator<'a> {
             let unknown_fields: Vec<String> = rel_info
                 .to_fields
                 .iter()
-                .filter(|referenced_field| related_model.find_field(&referenced_field).is_none())
+                .filter(|referenced_field| related_model.find_scalar_field(&referenced_field).is_none())
                 .map(|f| f.clone())
                 .collect();
 
             let referenced_relation_fields: Vec<String> = rel_info
                 .to_fields
                 .iter()
-                .filter(|base_field| match related_model.find_field(&base_field) {
-                    None => false,
-                    Some(scalar_field) => scalar_field.field_type.is_relation(),
-                })
+                .filter(|base_field| related_model.find_scalar_field(&base_field).is_some())
                 .map(|f| f.clone())
                 .collect();
 
             let fields_with_wrong_type: Vec<DatamodelError> = rel_info.fields.iter().zip(rel_info.to_fields.iter())
                     .filter_map(|(base_field, referenced_field)| {
-                        let base_field = model.find_field(&base_field)?;
-                        let referenced_field = related_model.find_field(&referenced_field)?;
+                        let base_field = model.find_scalar_field(&base_field)?;
+                        let referenced_field = related_model.find_scalar_field(&referenced_field)?;
 
                         if !base_field.field_type.is_compatible_with(&referenced_field.field_type) {
                             Some(DatamodelError::new_directive_validation_error(
@@ -517,7 +511,7 @@ impl<'a> Validator<'a> {
                 let references_singular_id_field = if rel_info.to_fields.len() == 1 {
                     let field_name = rel_info.to_fields.first().unwrap();
                     // the unwrap is safe. We error out earlier if an unknown field is referenced.
-                    let referenced_field = related_model.find_field(&field_name).unwrap();
+                    let referenced_field = related_model.find_scalar_field(&field_name).unwrap();
                     referenced_field.is_id
                 } else {
                     false

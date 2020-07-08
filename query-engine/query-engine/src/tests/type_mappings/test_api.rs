@@ -84,7 +84,7 @@ impl<'a> ModelAssertions<'a> {
     pub fn assert_field_type(self, name: &str, r#type: datamodel::dml::ScalarType) -> anyhow::Result<Self> {
         let field = self
             .0
-            .find_field(name)
+            .find_scalar_field(name)
             .ok_or_else(|| anyhow::anyhow!("Assertion error: could not find field {}", name))?;
 
         anyhow::ensure!(
@@ -101,7 +101,7 @@ impl<'a> ModelAssertions<'a> {
     pub fn assert_field_enum_type(self, name: &str, enum_name: &str) -> anyhow::Result<Self> {
         let field = self
             .0
-            .find_field(name)
+            .find_scalar_field(name)
             .ok_or_else(|| anyhow::anyhow!("Assertion error: could not find field {}", name))?;
 
         anyhow::ensure!(

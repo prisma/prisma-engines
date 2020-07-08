@@ -654,7 +654,7 @@ fn must_handle_conflicts_with_existing_fields_if_types_are_incompatible() {
     dbg!(&post.fields);
 
     let underlying_field = post.find_field("blogId_BlogToPost").unwrap();
-    assert!(underlying_field.arity.is_optional());
+    assert!(underlying_field.arity().is_optional());
     assert_eq!(underlying_field.field_type, FieldType::Base(ScalarType::String, None));
 
     let field = post.assert_has_field("Blog");

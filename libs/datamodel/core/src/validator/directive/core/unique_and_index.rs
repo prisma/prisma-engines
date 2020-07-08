@@ -171,10 +171,7 @@ trait IndexDirectiveBase<T>: DirectiveValidator<T> {
         let referenced_relation_fields: Vec<String> = index_def
             .fields
             .iter()
-            .filter(|field| match obj.find_field(&field) {
-                Some(field) => field.field_type.is_relation(),
-                None => false,
-            })
+            .filter(|field| obj.find_relation_field(&field).is_some())
             .map(|f| f.to_owned())
             .collect();
 
@@ -195,14 +192,16 @@ trait IndexDirectiveBase<T>: DirectiveValidator<T> {
             let mut had_successful_replacement = false;
 
             for f in &index_def.fields {
-                if let Some(field) = obj.find_field(&f) {
-                    if let dml::FieldType::Relation(rel_info) = &field.field_type {
-                        for underlying_field in &rel_info.fields {
-                            suggested_fields.push(underlying_field.to_owned());
-                            had_successful_replacement = true;
-                        }
-                    } else {
-                        suggested_fields.push(field.name.clone());
+                if let Some(rf) = obj.find_relation_field(&f) {
+                    for underlying_field in &rf.relation_info.fields {
+                        suggested_fields.push(underlying_field.to_owned());
+                        had_successful_replacement = true;
+                    }
+                }
+
+                if let Some(sf) = obj.find_scalar_field(&f) {
+                    {
+                        suggested_fields.push(sf.name.clone());
                     }
                 }
             }

@@ -245,7 +245,7 @@ impl<'a> RelationFieldRef<'a> {
             .iter()
             .map(move |field| {
                 let model = self.referenced_model();
-                let field = model.find_field(field.as_str())
+                let field = model.find_scalar_field(field.as_str())
                 .expect(&format!("Unable to resolve field {} on {}, Expected relation `references` to point to fields on the related model.", field, model.name));
 
                 field.db_name()

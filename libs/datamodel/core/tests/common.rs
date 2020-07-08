@@ -214,7 +214,7 @@ impl DatamodelAsserts for dml::Datamodel {
 }
 
 impl ModelAsserts for dml::Model {
-    fn assert_has_field(&self, t: &str) -> &dml::ScalarField {
+    fn assert_has_field(&self, t: &str) -> &dml::Field {
         self.find_field(&t.to_owned())
             .expect(format!("Field {} not found", t).as_str())
     }

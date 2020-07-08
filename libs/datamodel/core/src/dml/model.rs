@@ -89,35 +89,50 @@ impl Model {
     }
 
     /// Gets an iterator over all scalar fields.
-    pub fn scalar_fields(&self) -> std::slice::Iter<ScalarField> {
-        self.fields
-            .iter()
-            .filter_map(|fw| match fw {
-                Field::ScalarField(sf) => Some(sf),
-                _ => None,
-            })
-            .collect()
+    pub fn scalar_fields<'a>(&'a self) -> impl Iterator<Item = &'a ScalarField> + 'a {
+        self.fields().filter_map(|fw| match fw {
+            Field::RelationField(_) => None,
+            Field::ScalarField(sf) => Some(sf),
+        })
     }
 
-    /// Gets an iterator over all scalar fields.
-    pub fn relation_fields(&self) -> std::slice::Iter<RelationField> {
-        self.fields
-            .iter()
-            .filter_map(|fw| match fw {
-                Field::RelationField(rf) => Some(rf),
-                _ => None,
-            })
-            .collect()
+    /// Gets an iterator over all relation fields.
+    pub fn relation_fields<'a>(&'a self) -> impl Iterator<Item = &'a RelationField> + 'a {
+        self.fields().filter_map(|fw| match fw {
+            Field::RelationField(rf) => Some(rf),
+            Field::ScalarField(_) => None,
+        })
     }
 
-    /// Gets a mutable iterator over all fields.
-    pub fn fields_mut(&mut self) -> std::slice::IterMut<ScalarField> {
-        self.scalar_fields().iter_mut()
+    /// Gets a mutable iterator over all scalar fields.
+    pub fn scalar_fields_mut<'a>(&'a mut self) -> impl Iterator<Item = &'a mut ScalarField> + 'a {
+        self.fields.iter_mut().filter_map(|fw| match fw {
+            Field::RelationField(_) => None,
+            Field::ScalarField(sf) => Some(sf),
+        })
+    }
+
+    /// Gets a mutable iterator over all relation fields.
+    pub fn relation_fields_mut<'a>(&'a mut self) -> impl Iterator<Item = &'a mut RelationField> + 'a {
+        self.fields.iter_mut().filter_map(|fw| match fw {
+            Field::RelationField(rf) => Some(rf),
+            Field::ScalarField(_) => None,
+        })
     }
 
     /// Finds a field by name.
-    pub fn find_field(&self, name: &str) -> Option<&ScalarField> {
+    pub fn find_field(&self, name: &str) -> Option<&Field> {
+        self.fields().find(|f| f.name() == name)
+    }
+
+    /// Finds a scalar field by name.
+    pub fn find_scalar_field(&self, name: &str) -> Option<&ScalarField> {
         self.scalar_fields().find(|f| f.name == *name)
+    }
+
+    /// Finds a scalar field by name.
+    pub fn find_relation_field(&self, name: &str) -> Option<&RelationField> {
+        self.relation_fields().find(|f| f.name == *name)
     }
 
     /// Finds a field by database name.
@@ -132,15 +147,12 @@ impl Model {
 
     /// Finds a field by name and returns a mutable reference.
     pub fn find_field_mut(&mut self, name: &str) -> Option<&mut ScalarField> {
-        self.fields_mut().find(|f| f.name == *name)
+        self.scalar_fields_mut().find(|f| f.name == *name)
     }
 
     /// Finds a relation field by name and returns a mutable reference.
-    pub fn find_relation_field_mut(&mut self, name: &str) -> Option<&mut ScalarField> {
-        self.fields_mut().find(|f| match f.field_type {
-            FieldType::Relation(_) => f.name == *name,
-            _ => false,
-        })
+    pub fn find_relation_field_mut(&mut self, name: &str) -> Option<&mut RelationField> {
+        self.relation_fields_mut().find(|rf| rf.name == *name)
     }
 
     /// Finds the name of all id fields
@@ -187,7 +199,11 @@ impl Model {
 
         // second candidate: the multi field id
         {
-            let id_fields: Vec<_> = self.id_fields.iter().map(|f| self.find_field(&f).unwrap()).collect();
+            let id_fields: Vec<_> = self
+                .id_fields
+                .iter()
+                .map(|f| self.find_scalar_field(&f).unwrap())
+                .collect();
 
             if !id_fields.is_empty() {
                 result.push(UniqueCriteria::new(id_fields));
@@ -212,7 +228,7 @@ impl Model {
                 .iter()
                 .filter(|id| id.tpe == IndexType::Unique)
                 .filter_map(|id| {
-                    let fields: Vec<_> = id.fields.iter().map(|f| self.find_field(&f).unwrap()).collect();
+                    let fields: Vec<_> = id.fields.iter().map(|f| self.find_scalar_field(&f).unwrap()).collect();
                     let all_fields_are_required = fields.iter().all(|f| f.arity.is_required());
                     if all_fields_are_required || allow_optional {
                         Some(UniqueCriteria::new(fields))
@@ -241,24 +257,18 @@ impl Model {
     /// Finds a field with a certain relation guarantee.
     /// exclude_field are necessary to avoid corner cases with self-relations (e.g. we must not recognize a field as its own related field).
     pub fn related_field(&self, to: &str, relation_name: &str, exclude_field: &str) -> Option<&RelationField> {
-        self.relation_fields().find(|f| {
-            f.relation_info.to == to
-                && f.relation_info.name == relation_name
-                && (self.name != to || f.name != exclude_field)
+        self.relation_fields().find(|rf| {
+            rf.relation_info.to == to
+                && rf.relation_info.name == relation_name
+                && (self.name != to || rf.name != exclude_field)
         })
     }
 
     /// Finds a mutable field with a certain relation guarantee.
-    pub fn related_field_mut(&mut self, to: &str, name: &str, exclude_field: &str) -> Option<&mut ScalarField> {
+    pub fn related_field_mut(&mut self, to: &str, name: &str, exclude_field: &str) -> Option<&mut RelationField> {
         let self_name = self.name.clone();
-        self.fields_mut().find(|f| {
-            if let FieldType::Relation(rel_info) = &f.field_type {
-                if rel_info.to == to && rel_info.name == name && (self_name != to || f.name != exclude_field) {
-                    return true;
-                }
-            }
-
-            false
+        self.relation_fields_mut().find(|rf| {
+            rf.relation_info.to == to && rf.relation_info.name == name && (self_name != to || rf.name != exclude_field)
         })
     }
 
@@ -289,8 +299,8 @@ impl Model {
         /// Finds a field by name.
         fn has_field(model: &Model, name: &str) -> bool {
             match model
-                .find_field(name)
-                .or_else(|| model.find_field(name.to_lowercase().as_ref()))
+                .find_scalar_field(name)
+                .or_else(|| model.find_scalar_field(name.to_lowercase().as_ref()))
             {
                 Some(f) => f.field_type == FieldType::Base(ScalarType::DateTime, None),
                 None => false,

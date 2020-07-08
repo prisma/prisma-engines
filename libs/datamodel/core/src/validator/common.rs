@@ -13,13 +13,13 @@ impl ast::WithDirectives for Vec<ast::Directive> {
 pub fn field_validation_error(
     message: &str,
     model: &dml::Model,
-    field: &dml::ScalarField,
+    field: &dml::Field,
     ast: &ast::SchemaAst,
 ) -> DatamodelError {
     DatamodelError::new_model_validation_error(
         message,
         &model.name,
-        ast.find_field(&model.name, &field.name)
+        ast.find_field(&model.name, &field.name())
             .expect(ERROR_GEN_STATE_ERROR)
             .span,
     )

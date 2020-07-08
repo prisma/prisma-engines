@@ -102,6 +102,13 @@ impl Field {
             Field::RelationField(rf) => &rf.name,
         }
     }
+
+    pub fn arity(&self) -> &FieldArity {
+        match &self {
+            Field::ScalarField(sf) => &sf.arity,
+            Field::RelationField(rf) => &rf.arity,
+        }
+    }
 }
 
 /// Represents a relation field in a model.

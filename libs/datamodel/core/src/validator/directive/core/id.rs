@@ -77,7 +77,7 @@ impl DirectiveValidator<dml::Model> for ModelLevelIdDirectiveValidator {
             .id_fields
             .iter()
             .filter(|field| match obj.find_field(&field) {
-                Some(field) => field.field_type.is_relation(),
+                Some(field) => field.is_relation(),
                 None => false,
             })
             .map(|f| f.to_owned())
@@ -109,7 +109,7 @@ impl DirectiveValidator<dml::Model> for ModelLevelIdDirectiveValidator {
         let fields_that_are_not_required: Vec<_> = obj
             .id_fields
             .iter()
-            .filter(|field| !obj.find_field(&field).unwrap().arity.is_required())
+            .filter(|field| !obj.find_field(&field).unwrap().arity().is_required())
             .map(|field| field.to_string())
             .collect();
 
