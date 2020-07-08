@@ -55,9 +55,6 @@ async fn main() -> Result<(), AnyError> {
 }
 
 fn init_logger(opts: &PrismaOpt) {
-    // Create a bridge between `log` and `tracing`.
-    tracing_log::LogTracer::init().expect("Could not initialize logger (LogTracer)");
-
     // Enable `tide` logs to be captured.
     let filter = EnvFilter::from_default_env().add_directive("tide=info".parse().unwrap());
 
