@@ -5,6 +5,7 @@ mod command;
 mod infer_migration_steps;
 mod list_migrations;
 mod migration_progress;
+mod push_schema;
 mod reset;
 mod unapply_migration;
 
@@ -15,6 +16,7 @@ pub use command::*;
 pub use infer_migration_steps::*;
 pub use list_migrations::*;
 pub use migration_progress::*;
+pub use push_schema::{PushSchemaCommand, PushSchemaInput, PushSchemaOutput};
 pub use reset::*;
 pub use unapply_migration::*;
 

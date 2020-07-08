@@ -55,6 +55,7 @@ pub trait GenericApi: Send + Sync + 'static {
     async fn reset(&self, input: &serde_json::Value) -> CoreResult<serde_json::Value>;
     async fn unapply_migration(&self, input: &UnapplyMigrationInput) -> CoreResult<UnapplyMigrationOutput>;
     fn migration_persistence<'a>(&'a self) -> Box<dyn MigrationPersistence + 'a>;
+    async fn push_schema(&self, input: &PushSchemaInput) -> CoreResult<PushSchemaOutput>;
     fn connector_type(&self) -> &'static str;
 
     fn render_error(&self, error: crate::error::Error) -> user_facing_errors::Error {
@@ -129,6 +130,12 @@ where
     async fn unapply_migration(&self, input: &UnapplyMigrationInput) -> CoreResult<UnapplyMigrationOutput> {
         self.handle_command::<UnapplyMigrationCommand<'_>>(input)
             .instrument(tracing::info_span!("UnapplyMigration"))
+            .await
+    }
+
+    async fn push_schema(&self, input: &PushSchemaInput) -> CoreResult<PushSchemaOutput> {
+        self.handle_command::<PushSchemaCommand<'_>>(input)
+            .instrument(tracing::info_span!("PushSchema"))
             .await
     }
 

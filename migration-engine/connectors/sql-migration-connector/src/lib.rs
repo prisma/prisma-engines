@@ -143,6 +143,20 @@ impl MigrationConnector for SqlMigrationConnector {
         Ok(())
     }
 
+    async fn push_schema(&self, schema: &datamodel::Datamodel) -> ConnectorResult<()> {
+        let inferrer = self.database_migration_inferrer();
+        let applier = self.database_migration_step_applier();
+
+        let sql_migration = inferrer.infer(schema, schema, &[]).await?;
+        let mut step = 0;
+
+        while applier.apply_step(&sql_migration, step).await? {
+            step += 1
+        }
+
+        Ok(())
+    }
+
     /// Optionally check that the features implied by the provided datamodel are all compatible with
     /// the specific database version being used.
     fn check_database_version_compatibility(&self, datamodel: &datamodel::dml::Datamodel) -> Vec<MigrationError> {

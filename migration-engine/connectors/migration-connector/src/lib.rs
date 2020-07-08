@@ -45,6 +45,8 @@ pub trait MigrationConnector: Send + Sync + 'static {
     /// Drop all database state.
     async fn reset(&self) -> ConnectorResult<()>;
 
+    async fn push_schema(&self, schema: &datamodel::Datamodel) -> ConnectorResult<()>;
+
     /// Optionally check that the features implied by the provided datamodel are all compatible with
     /// the specific database version being used.
     fn check_database_version_compatibility(

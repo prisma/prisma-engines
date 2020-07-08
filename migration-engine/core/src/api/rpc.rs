@@ -21,6 +21,7 @@ enum RpcCommand {
     Reset,
     CalculateDatamodel,
     CalculateDatabaseSteps,
+    PushSchema,
 }
 
 impl RpcCommand {
@@ -34,6 +35,7 @@ impl RpcCommand {
             RpcCommand::Reset => "reset",
             RpcCommand::CalculateDatamodel => "calculateDatamodel",
             RpcCommand::CalculateDatabaseSteps => "calculateDatabaseSteps",
+            RpcCommand::PushSchema => "pushSchema",
         }
     }
 }
@@ -118,6 +120,7 @@ impl RpcApi {
     ) -> Result<serde_json::Value, RunCommandError> {
         tracing::debug!(?cmd, "running the command");
         match cmd {
+            RpcCommand::PushSchema => todo!(),
             RpcCommand::InferMigrationSteps => {
                 let input: InferMigrationStepsInput = params.clone().parse()?;
                 render(executor.infer_migration_steps(&input).await?)

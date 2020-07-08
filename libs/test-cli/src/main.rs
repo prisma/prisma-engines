@@ -1,5 +1,7 @@
 use anyhow::Context;
 use colored::Colorize;
+use migration_core::commands::PushSchemaInput;
+use std::io::Read;
 use structopt::*;
 
 #[derive(StructOpt)]
@@ -28,6 +30,15 @@ enum Command {
     },
     /// Generate DMMF from a schema, or directly from a database URl.
     Dmmf(DmmfCommand),
+    /// Push a prisma schema directly to the database, without interacting with migrations.
+    PushSchema(PushSchema),
+}
+
+#[derive(StructOpt)]
+struct PushSchema {
+    schema_path: String,
+    #[structopt(long)]
+    force: bool,
 }
 
 #[derive(StructOpt)]
@@ -49,6 +60,7 @@ async fn main() -> anyhow::Result<()> {
     init_logger();
 
     match Command::from_args() {
+        Command::PushSchema(cmd) => push_schema(&cmd).await?,
         Command::Dmmf(cmd) => generate_dmmf(&cmd).await?,
         Command::Introspect { url, file_path } => {
             if url.as_ref().xor(file_path.as_ref()).is_none() {
@@ -234,4 +246,19 @@ fn init_logger() {
     tracing::subscriber::set_global_default(subscriber)
         .map_err(|err| eprintln!("Error initializing the global logger: {}", err))
         .ok();
+}
+
+async fn push_schema(cmd: &PushSchema) -> anyhow::Result<()> {
+    let schema = read_datamodel_from_file(&cmd.schema_path).context("Error reading the schema from file")?;
+    let api = migration_core::migration_api(&schema).await?;
+
+    api.push_schema(&PushSchemaInput {
+        schema,
+        force: cmd.force,
+    })
+    .await?;
+
+    eprintln!("{}{}", "✔️".bold(), "Schema pushed to database.".green());
+
+    Ok(())
 }
