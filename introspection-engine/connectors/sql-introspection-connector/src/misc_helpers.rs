@@ -87,7 +87,7 @@ pub fn calculate_many_to_many_field(
     relation_name: String,
     is_self_relation: bool,
 ) -> RelationField {
-    let info = FRelationInfo {
+    let info = RelationInfo {
         name: relation_name,
         fields: vec![],
         to: foreign_key.referenced_table.clone(),

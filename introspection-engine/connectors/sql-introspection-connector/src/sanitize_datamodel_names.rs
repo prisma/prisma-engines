@@ -1,4 +1,4 @@
-use datamodel::{Datamodel, DefaultValue, FieldType, ValueGenerator};
+use datamodel::{Datamodel, DefaultValue, FieldType, ValueGenerator, WithDatabaseName, WithName};
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
 use regex::Regex;
@@ -69,18 +69,18 @@ pub fn sanitize_datamodel_names(datamodel: &mut Datamodel) {
                         }
                     };
 
-                    if field.database_name.is_none() {
-                        field.database_name = field_db_name;
+                    if field.database_name().is_none() {
+                        field.set_database_name(field_db_name);
                     }
                 }
                 _ => {
-                    if field.database_name.is_none() {
-                        field.database_name = field_db_name;
+                    if field.database_name().is_none() {
+                        field.set_database_name(field_db_name);
                     }
                 }
             }
 
-            field.name = sanitized_field_name.clone();
+            field.set_name(&sanitized_field_name);
             id_field_option.map(|id_field| *id_field = sanitized_field_name.clone());
         }
 

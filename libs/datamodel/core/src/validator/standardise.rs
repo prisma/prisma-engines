@@ -33,57 +33,64 @@ impl Standardiser {
         let schema_copy = schema.clone();
 
         // Iterate and mutate models.
-        for model in schema.models_mut() {
-            let unique_criteria = self.unique_criteria(&model);
+        for model_idx in 0..schema.models.len() {
+            let cloned_model = schema.models[model_idx].clone();
+            let unique_criteria = self.unique_criteria(&cloned_model);
+            let model = &mut schema.models[model_idx];
 
-            for field in model.relation_fields_mut() {
-                let rel_info = &mut field.relation_info;
-                let related_model = schema_copy.find_model(&rel_info.to).expect(STATE_ERROR);
-                let related_field = related_model
-                    .related_field(model.name.clone().as_str(), &rel_info.name, &field.name)
-                    .unwrap();
-                let related_model_name = &related_model.name;
-                let is_m2m = field.arity.is_list() && related_field.arity.is_list();
+            for field_index in 0..model.fields.len() {
+                let field = &mut model.fields[field_index];
 
-                let related_field_rel = &related_field.relation_info;
+                if let Field::RelationField(field) = field {
+                    // for field in model.relation_fields_mut() {
+                    let rel_info = &mut field.relation_info;
+                    let related_model = schema_copy.find_model(&rel_info.to).expect(STATE_ERROR);
+                    let related_field = related_model
+                        .related_field(model.name.clone().as_str(), &rel_info.name, &field.name)
+                        .unwrap();
+                    let related_model_name = &related_model.name;
+                    let is_m2m = field.arity.is_list() && related_field.arity.is_list();
 
-                let embed_here = match (field.arity, related_field.arity) {
-                    // many to many
-                    (dml::FieldArity::List, dml::FieldArity::List) => true,
-                    // one to many
-                    (_, dml::FieldArity::List) => true,
-                    // many to one
-                    (dml::FieldArity::List, _) => false,
-                    // one to one
-                    (_, _) => match (&model.name, related_model_name) {
-                        (x, y) if x < y => true,
-                        (x, y) if x > y => false,
-                        // SELF RELATIONS
-                        _ => field.name < related_field.name,
-                    },
-                };
+                    let related_field_rel = &related_field.relation_info;
 
-                let underlying_fields =
-                    self.underlying_fields_for_unique_criteria(&unique_criteria, model.name.clone().as_ref());
+                    let embed_here = match (field.arity, related_field.arity) {
+                        // many to many
+                        (dml::FieldArity::List, dml::FieldArity::List) => true,
+                        // one to many
+                        (_, dml::FieldArity::List) => true,
+                        // many to one
+                        (dml::FieldArity::List, _) => false,
+                        // one to one
+                        (_, _) => match (&model.name, related_model_name) {
+                            (x, y) if x < y => true,
+                            (x, y) if x > y => false,
+                            // SELF RELATIONS
+                            _ => field.name < related_field.name,
+                        },
+                    };
 
-                if embed_here {
-                    // user input has precedence
-                    if rel_info.to_fields.is_empty() && related_field_rel.to_fields.is_empty() {
-                        rel_info.to_fields = related_model
-                            .first_unique_criterion()
-                            .iter()
-                            .map(|f| f.name.to_owned())
-                            .collect();
-                    }
+                    let underlying_fields =
+                        self.underlying_fields_for_unique_criteria(&unique_criteria, model.name.clone().as_ref());
 
-                    // user input has precedence
-                    if !is_m2m
-                        && (rel_info.fields.is_empty() && related_field_rel.fields.is_empty())
-                        && field.is_generated
-                    {
-                        rel_info.fields = underlying_fields.iter().map(|f| f.name.clone()).collect();
-                        for underlying_field in underlying_fields {
-                            model.add_field(Field::ScalarField(underlying_field));
+                    if embed_here {
+                        // user input has precedence
+                        if rel_info.to_fields.is_empty() && related_field_rel.to_fields.is_empty() {
+                            rel_info.to_fields = related_model
+                                .first_unique_criterion()
+                                .iter()
+                                .map(|f| f.name.to_owned())
+                                .collect();
+                        }
+
+                        // user input has precedence
+                        if !is_m2m
+                            && (rel_info.fields.is_empty() && related_field_rel.fields.is_empty())
+                            && field.is_generated
+                        {
+                            rel_info.fields = underlying_fields.iter().map(|f| f.name.clone()).collect();
+                            for underlying_field in underlying_fields {
+                                model.add_field(Field::ScalarField(underlying_field));
+                            }
                         }
                     }
                 }
