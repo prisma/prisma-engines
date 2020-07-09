@@ -452,16 +452,16 @@ impl<'a> Validator<'a> {
 
             let fields_with_wrong_type: Vec<DatamodelError> = rel_info.fields.iter().zip(rel_info.to_fields.iter())
                     .filter_map(|(base_field, referenced_field)| {
-                        let base_field = model.find_scalar_field(&base_field)?;
-                        let referenced_field = related_model.find_scalar_field(&referenced_field)?;
+                        let base_field = model.find_field(&base_field)?;
+                        let referenced_field = related_model.find_field(&referenced_field)?;
 
-                        if !base_field.field_type.is_compatible_with(&referenced_field.field_type) {
+                        if !base_field.field_type().is_compatible_with(&referenced_field.field_type()) {
                             Some(DatamodelError::new_directive_validation_error(
                                 &format!(
                                     "The type of the field `{}` in the model `{}` is not matching the type of the referenced field `{}` in model `{}`.",
-                                    &base_field.name,
+                                    &base_field.name(),
                                     &model.name,
-                                    &referenced_field.name,
+                                    &referenced_field.name(),
                                     &related_model.name
                                 ),
                                 RELATION_DIRECTIVE_NAME,

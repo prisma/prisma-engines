@@ -515,7 +515,7 @@ fn must_add_back_relation_fields_for_self_relations() {
     let schema = parse(dml);
     let model = schema.assert_has_model("Human");
     model
-        .assert_has_scalar_field("son")
+        .assert_has_relation_field("son")
         .assert_relation_to("Human")
         .assert_arity(&FieldArity::Optional)
         .assert_relation_to_fields(&["id"]);

@@ -204,22 +204,16 @@ impl FieldAsserts for dml::ScalarField {
 }
 
 impl FieldAsserts for dml::RelationField {
-    fn assert_base_type(&self, t: &ScalarType) -> &Self {
+    fn assert_base_type(&self, _t: &ScalarType) -> &Self {
         panic!("Scalar expected, but found relation");
-
-        self
     }
 
-    fn assert_enum_type(&self, en: &str) -> &Self {
+    fn assert_enum_type(&self, _en: &str) -> &Self {
         panic!("Enum expected, but found relation");
-
-        self
     }
 
-    fn assert_connector_type(&self, sft: &ScalarFieldType) -> &Self {
+    fn assert_connector_type(&self, _sft: &ScalarFieldType) -> &Self {
         panic!("Connector Specific Type expected, but found relation");
-
-        self
     }
 
     fn assert_relation_name(&self, t: &str) -> &Self {
