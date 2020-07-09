@@ -1,6 +1,8 @@
 use anyhow::Context;
 use colored::Colorize;
-use migration_core::commands::PushSchemaInput;
+use migration_connector::ImperativeMigration;
+use migration_core::commands::{GenerateImperativeMigrationInput, PushSchemaInput};
+use std::{fs::File, io::Read};
 use structopt::*;
 
 #[derive(StructOpt)]
@@ -31,6 +33,18 @@ enum Command {
     Dmmf(DmmfCommand),
     /// Push a prisma schema directly to the database, without interacting with migrations.
     PushSchema(PushSchema),
+    /// Save an imperative migration based on the provided schema and migrations folder.
+    MigrateSave(MigrateSave),
+}
+
+#[derive(Debug, StructOpt)]
+struct MigrateSave {
+    #[structopt(long)]
+    schema_path: String,
+    #[structopt(long)]
+    migrations_folder_path: String,
+    #[structopt(long)]
+    migration_name: String,
 }
 
 #[derive(StructOpt)]
@@ -59,6 +73,7 @@ async fn main() -> anyhow::Result<()> {
     init_logger();
 
     match Command::from_args() {
+        Command::MigrateSave(cmd) => generate_migration(&cmd).await?,
         Command::PushSchema(cmd) => push_schema(&cmd).await?,
         Command::Dmmf(cmd) => generate_dmmf(&cmd).await?,
         Command::Introspect { url, file_path } => {
@@ -298,4 +313,31 @@ async fn push_schema(cmd: &PushSchema) -> anyhow::Result<()> {
     }
 
     Ok(())
+}
+
+async fn generate_migration(cmd: &MigrateSave) -> anyhow::Result<()> {
+    let target_schema = read_datamodel_from_file(&cmd.schema_path)?;
+    let migrations = read_migrations_from_folder(&cmd.migrations_folder_path)?;
+
+    let input = GenerateImperativeMigrationInput {
+        target_schema,
+        migrations,
+        migration_name,
+    };
+
+    todo!()
+}
+
+async fn read_migrations_from_folder(path: &str) -> Result<Vec<ImperativeMigration>, anyhow::Error> {
+    let mut migrations = Vec::new();
+
+    for entry in std::fs::read_dir(path).context("error reading from migrations directory")? {
+        let entry = entry?;
+        let full_path = std::path::Path::new(path).join(entry.path());
+
+        let file = File::open(full_path).context("error opening a migration file")?;
+        migrations.push(serde_json::from_reader(file).context("error deserializing a migration")?);
+    }
+
+    Ok(migrations)
 }

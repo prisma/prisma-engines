@@ -191,6 +191,7 @@ impl MigrationConnector for SqlMigrationConnector {
         past_migrations: &[ImperativeMigration],
         schema: &Datamodel,
         schema_string: &str,
+        migration_name: &str,
     ) -> ConnectorResult<(ImperativeMigration, SqlMigration)> {
         let temporary_database = self.flavour.create_temporary_database().await?;
         let inferrer = self.database_migration_inferrer();
@@ -209,6 +210,7 @@ impl MigrationConnector for SqlMigrationConnector {
             .map(|pretty| pretty.raw)
             .collect();
         let imperative_migration = ImperativeMigration {
+            name: format!("{:04}-{}", past_migrations.len(), migration_name),
             steps: imperative_migration_steps,
             prisma_schema: schema_string.to_owned(),
         };

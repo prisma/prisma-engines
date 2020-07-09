@@ -3423,6 +3423,7 @@ dependencies = [
  "anyhow",
  "colored",
  "introspection-core",
+ "migration-connector",
  "migration-core",
  "serde_json",
  "structopt",

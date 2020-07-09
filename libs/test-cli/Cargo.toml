@@ -11,6 +11,7 @@ anyhow = "1.0.26"
 colored = "1.9.2"
 structopt = "0.3.8"
 migration-core = { path = "../../migration-engine/core" }
+migration-connector = { path = "../../migration-engine/connectors/migration-connector" }
 introspection-core = { path = "../../introspection-engine/core" }
 tokio = "=0.2.13"
 serde_json = "1.0.44"

@@ -88,6 +88,7 @@ pub trait MigrationConnector: Send + Sync + 'static {
         past_migrations: &[ImperativeMigration],
         schema: &Datamodel,
         schema_string: &str,
+        migration_name: &str,
     ) -> ConnectorResult<(ImperativeMigration, Self::DatabaseMigration)>;
 }
 
@@ -101,6 +102,7 @@ pub type ConnectorResult<T> = Result<T, ConnectorError>;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ImperativeMigration {
+    pub name: String,
     pub steps: Vec<String>,
     pub prisma_schema: String,
 }

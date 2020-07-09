@@ -12,6 +12,7 @@ pub struct GenerateImperativeMigrationCommand<'a> {
 pub struct GenerateImperativeMigrationInput {
     target_schema: String,
     migrations: Vec<ImperativeMigration>,
+    migration_name: String,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -41,7 +42,7 @@ impl<'a> MigrationCommand for GenerateImperativeMigrationCommand<'a> {
         let schema = parse_datamodel(schema_string)?;
 
         let (imperative_migration, database_migration) = connector
-            .generate_imperative_migration(&input.migrations, &schema, schema_string)
+            .generate_imperative_migration(&input.migrations, &schema, schema_string, &input.migration_name)
             .await?;
 
         let check_results = checker.pure_check(&database_migration)?;
