@@ -304,10 +304,7 @@ impl Standardiser {
 
         for (model_name, field_name, rel_info) in unnamed_relations {
             // Embedding side.
-            let field = datamodel
-                .find_relation_field_mut(&model_name, &field_name)
-                .expect(STATE_ERROR);
-
+            let field = datamodel.find_relation_field_mut(&model_name, &field_name);
             field.relation_info.name = DefaultNames::name_for_unambiguous_relation(&model_name, &rel_info.to);
         }
     }

@@ -62,7 +62,7 @@ pub fn add_prisma_1_id_defaults(
     let mut inferred_uuids = vec![];
 
     for (mf, cuid) in needs_to_be_changed {
-        let field = &mut data_model.find_scalar_field_mut(&mf.model, &mf.field).unwrap();
+        let field = &mut data_model.find_scalar_field_mut(&mf.model, &mf.field);
         if cuid {
             field.default_value = Some(dml::DefaultValue::Expression(ValueGenerator::new_cuid()));
             inferred_cuids.push(mf);

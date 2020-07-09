@@ -74,10 +74,7 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
             let fields_to_be_changed = new_data_model.find_relation_fields_for_model(&changed_model_name.0.model);
 
             for relation_field in fields_to_be_changed {
-                let field = new_data_model
-                    .find_relation_field_mut(&relation_field.0, &relation_field.1)
-                    .unwrap();
-
+                let field = new_data_model.find_relation_field_mut(&relation_field.0, &relation_field.1);
                 field.relation_info.to = changed_model_name.1.model.clone();
             }
         }
@@ -103,9 +100,7 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
 
         //change field name
         for changed_field_name in &changed_scalar_field_names {
-            let field = new_data_model
-                .find_scalar_field_mut(&changed_field_name.0.model, &changed_field_name.0.field)
-                .unwrap();
+            let field = new_data_model.find_scalar_field_mut(&changed_field_name.0.model, &changed_field_name.0.field);
             field.name = changed_field_name.1.clone();
             if field.database_name.is_none() {
                 field.database_name = Some(changed_field_name.0.field.clone())
@@ -133,7 +128,7 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
         for changed_field_name in &changed_scalar_field_names {
             let fields_to_be_changed = new_data_model.find_relation_fields_for_model(&changed_field_name.0.model);
             for f in fields_to_be_changed {
-                let field = new_data_model.find_relation_field_mut(&f.0, &f.1).unwrap();
+                let field = new_data_model.find_relation_field_mut(&f.0, &f.1);
                 replace_field_names(
                     &mut field.relation_info.to_fields,
                     &changed_field_name.0.field,
@@ -196,9 +191,7 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
 
         // change usages in @@id, @@index, @@unique and on RelationInfo.fields
         for changed_relation_field in &relation_fields_to_change {
-            let field = new_data_model
-                .find_relation_field_mut(&changed_relation_field.0, &changed_relation_field.1)
-                .unwrap();
+            let field = new_data_model.find_relation_field_mut(&changed_relation_field.0, &changed_relation_field.1);
             field.relation_info.name = changed_relation_field.2.clone();
         }
     }
@@ -225,7 +218,7 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
             let fields_to_be_changed = new_data_model.find_enum_fields(&changed_enum_name.0.enm);
 
             for change2 in fields_to_be_changed {
-                let field = new_data_model.find_scalar_field_mut(&change2.0, &change2.1).unwrap();
+                let field = new_data_model.find_scalar_field_mut(&change2.0, &change2.1);
                 field.field_type = FieldType::Enum(changed_enum_name.1.clone());
             }
         }
@@ -261,7 +254,7 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
             let fields_to_be_changed = new_data_model.find_enum_fields(&changed_enum_value.0.enm);
 
             for field in fields_to_be_changed {
-                let field = new_data_model.find_scalar_field_mut(&field.0, &field.1).unwrap();
+                let field = new_data_model.find_scalar_field_mut(&field.0, &field.1);
                 if field.default_value
                     == Some(DefaultValue::Single(PrismaValue::Enum(
                         changed_enum_value.0.value.clone(),
@@ -300,7 +293,6 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
                     &changed_relation_field_name.0.model,
                     &changed_relation_field_name.0.field,
                 )
-                .unwrap()
                 .name = changed_relation_field_name.1;
         }
     }
