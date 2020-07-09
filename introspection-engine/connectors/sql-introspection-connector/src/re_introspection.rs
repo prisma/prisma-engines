@@ -159,8 +159,8 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
                     .filter(|f| f.relation_info.to == info.to)
                     .count();
 
-                let other_relation_field = new_data_model.find_related_field_for_info(&info).name.clone();
-                let other_info = new_data_model.find_related_info(&info);
+                let other_relation_field = new_data_model.find_related_field_for_info_bang(&info, &rf.name);
+                let other_info = &other_relation_field.relation_info;
 
                 let (model_with_fk, referenced_model, fk_column_name) = if info.to_fields.is_empty() {
                     // does not hold the fk
@@ -188,7 +188,7 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
                 relation_fields_to_change.push((changed_model.name.clone(), rf.name.clone(), relation_name.clone()));
                 relation_fields_to_change.push((
                     other_model_in_relation.name.clone(),
-                    other_relation_field,
+                    other_relation_field.name.clone(),
                     relation_name.clone(),
                 ));
             }
@@ -284,8 +284,12 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
                     for old_field in old_model.relation_fields() {
                         let old_info = &old_field.relation_info;
 
-                        let other_old_info = old_data_model.find_related_info(&old_info);
-                        let other_new_info = new_data_model.find_related_info(&new_info);
+                        let other_old_info = &old_data_model
+                            .find_related_field_for_info_bang(&old_info, &old_field.name)
+                            .relation_info;
+                        let other_new_info = &new_data_model
+                            .find_related_field_for_info_bang(&new_info, &field.name)
+                            .relation_info;
                         //the relationinfos of both sides need to be compared since the relationinfo of the
                         // non-fk side does not contain enough information to uniquely identify the correct relationfield
                         if old_info == new_info && other_old_info == other_new_info {

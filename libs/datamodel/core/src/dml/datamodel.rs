@@ -178,7 +178,7 @@ impl Datamodel {
     }
 
     /// Finds a relation field related to a relation info
-    pub fn find_related_field_for_info(&self, info: &RelationInfo) -> &RelationField {
+    pub fn find_related_field_for_info(&self, info: &RelationInfo, exclude: &str) -> Option<&RelationField> {
         self.find_model(&info.to)
             .expect("The model referred to by a RelationInfo should always exist.")
             .relation_fields()
@@ -186,14 +186,13 @@ impl Datamodel {
                 f.relation_info.name == info.name
                     && (f.relation_info.to != info.to ||
                     // This is to differentiate the opposite field from self in the self relation case.
-                    (f.relation_info.to_fields != info.to_fields
-                    && f.relation_info.fields != info.fields)|| f.relation_info.to != info.to)
+                    f.name != exclude)
             })
-            .expect("Every RelationInfo should have a complementary RelationInfo on the opposite relation field.")
     }
 
-    /// Returns (model_name, field_name) for all relation fields pointing to a specific model.
-    pub fn find_related_info(&self, info: &RelationInfo) -> &RelationInfo {
-        &self.find_related_field_for_info(info).relation_info
+    // This is used once we assume the datamodel to be internally valid
+    pub fn find_related_field_for_info_bang(&self, info: &RelationInfo, exclude: &str) -> &RelationField {
+        self.find_related_field_for_info(info, exclude)
+            .expect("Every RelationInfo should have a complementary RelationInfo on the opposite relation field.")
     }
 }

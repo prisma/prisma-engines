@@ -86,12 +86,7 @@ pub fn introspect(
         for relation_field in model.relation_fields() {
             let relation_info = &relation_field.relation_info;
             if data_model
-                .related_field(
-                    &model.name,
-                    &relation_info.to,
-                    &relation_info.name,
-                    &relation_field.name,
-                )
+                .find_related_field_for_info(&relation_info, &relation_field.name)
                 .is_none()
             {
                 let other_model = data_model.find_model(relation_info.to.as_str()).unwrap();

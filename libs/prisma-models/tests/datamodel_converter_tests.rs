@@ -472,6 +472,24 @@ fn ambiguous_relations() {
     post.assert_relation_field("blog2").assert_relation_name("Relation2");
 }
 
+#[test]
+fn implicit_many_to_many_relation() {
+    let datamodel = convert(
+        r#"model Post {
+                    id         String @id @default(cuid())
+                    identifier Int?   @unique
+                    related    Post[] @relation(name: "RelatedPosts")
+                    parents   Post[] @relation(name: "RelatedPosts")
+                  }
+                  "#,
+    );
+
+    let post = datamodel.assert_model("Post");
+    post.assert_relation_field("related");
+
+    post.assert_relation_field("parents");
+}
+
 fn convert(datamodel: &str) -> Arc<InternalDataModel> {
     let datamodel = datamodel::parse_datamodel(datamodel).unwrap();
     let template = DatamodelConverter::convert(&datamodel);

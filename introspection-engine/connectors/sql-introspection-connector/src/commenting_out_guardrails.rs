@@ -17,7 +17,7 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
         if model.relation_fields().any(|f| match f.arity {
             FieldArity::List => false,
             _ => {
-                let other_field = datamodel.find_related_field_for_info(&f.relation_info);
+                let other_field = datamodel.find_related_field_for_info_bang(&f.relation_info, &f.name);
 
                 match other_field.arity {
                     FieldArity::Optional | FieldArity::Required => true,
