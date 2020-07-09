@@ -194,7 +194,7 @@ pub(crate) fn calculate_backrelation_field(
             explanation: format!("Table {} not found.", table_name),
         }),
         Ok(table) => {
-            let relation_info = RelationInfo {
+            let new_relation_info = RelationInfo {
                 name: relation_info.name.clone(),
                 to: model.name.clone(),
                 fields: vec![],
@@ -202,7 +202,9 @@ pub(crate) fn calculate_backrelation_field(
                 on_delete: OnDeleteStrategy::None,
             };
 
-            let other_is_unique = || match &relation_info.fields.len() {
+            println!("{:?}", table);
+
+            let other_is_unique = match &relation_info.fields.len() {
                 1 => {
                     let column_name = &relation_info.fields.first().unwrap();
                     table.is_column_unique(column_name)
@@ -213,8 +215,10 @@ pub(crate) fn calculate_backrelation_field(
                     .any(|i| columns_match(&i.columns, &relation_info.fields) && i.tpe == IndexType::Unique),
             };
 
+            println!("{}", other_is_unique);
+
             let arity = match relation_field.arity {
-                FieldArity::Required | FieldArity::Optional if other_is_unique() => FieldArity::Optional,
+                FieldArity::Required | FieldArity::Optional if other_is_unique => FieldArity::Optional,
                 FieldArity::Required | FieldArity::Optional => FieldArity::List,
                 FieldArity::List => FieldArity::Optional,
             };
@@ -226,7 +230,7 @@ pub(crate) fn calculate_backrelation_field(
                 model.name.clone()
             };
 
-            Ok(RelationField::new(&name, arity, relation_info))
+            Ok(RelationField::new(&name, arity, new_relation_info))
         }
     }
 }
