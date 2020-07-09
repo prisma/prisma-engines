@@ -609,23 +609,19 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
                         is_updated_at: false,
                         is_commented_out: false,
                     }),
-                    Field::ScalarField(ScalarField {
+                    Field::RelationField(RelationField {
                         name: "User".to_string(),
-                        field_type: FieldType::Relation(RelationInfo {
+                        relation_info: RelationInfo {
                             to: "User".to_string(),
                             fields: vec![],
                             to_fields: vec![],
                             name: "CityToUser".to_string(),
                             on_delete: OnDeleteStrategy::None,
-                        }),
+                        },
                         arity: FieldArity::List,
                         database_name: None,
-                        default_value: None,
-                        is_unique: false,
-                        is_id: false,
                         documentation: None,
                         is_generated: false,
-                        is_updated_at: false,
                         is_commented_out: false,
                     }),
                 ],
