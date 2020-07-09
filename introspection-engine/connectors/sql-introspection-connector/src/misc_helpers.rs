@@ -202,8 +202,6 @@ pub(crate) fn calculate_backrelation_field(
                 on_delete: OnDeleteStrategy::None,
             };
 
-            println!("{:?}", table);
-
             let other_is_unique = match &relation_info.fields.len() {
                 1 => {
                     let column_name = &relation_info.fields.first().unwrap();
@@ -214,8 +212,6 @@ pub(crate) fn calculate_backrelation_field(
                     .iter()
                     .any(|i| columns_match(&i.columns, &relation_info.fields) && i.tpe == IndexType::Unique),
             };
-
-            println!("{}", other_is_unique);
 
             let arity = match relation_field.arity {
                 FieldArity::Required | FieldArity::Optional if other_is_unique => FieldArity::Optional,
