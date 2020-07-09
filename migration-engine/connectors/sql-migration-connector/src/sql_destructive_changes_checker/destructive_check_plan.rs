@@ -35,6 +35,27 @@ impl DestructiveCheckPlan {
         self.unexecutable_migrations.push(unexecutable_migration)
     }
 
+    pub(super) fn pure_check(&self) -> DestructiveChangeDiagnostics {
+        let mut results = DatabaseInspectionResults::default();
+        let mut diagnostics = DestructiveChangeDiagnostics::new();
+
+        for unexecutable in &self.unexecutable_migrations {
+            if let Some(message) = unexecutable.evaluate(&results) {
+                diagnostics
+                    .unexecutable_migrations
+                    .push(UnexecutableMigration { description: message })
+            }
+        }
+
+        for warning in &self.warnings {
+            if let Some(message) = warning.evaluate(&results) {
+                diagnostics.warnings.push(MigrationWarning { description: message })
+            }
+        }
+
+        diagnostics
+    }
+
     /// Inspect the current database state to qualify and render destructive change warnings and
     /// errors.
     ///

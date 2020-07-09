@@ -1,6 +1,5 @@
-use super::{CommandError, MigrationCommand};
+use super::MigrationCommand;
 use crate::parse_datamodel;
-use datamodel::Datamodel;
 use migration_connector::{DatabaseMigrationMarker, MigrationConnector};
 use serde::{Deserialize, Serialize};
 
@@ -14,7 +13,7 @@ impl<'a> MigrationCommand for PushSchemaCommand<'a> {
     type Output = PushSchemaOutput;
 
     async fn execute<C, D>(
-        input: &Self::Input,
+        input: &PushSchemaInput,
         engine: &crate::migration_engine::MigrationEngine<C, D>,
     ) -> super::CommandResult<Self::Output>
     where

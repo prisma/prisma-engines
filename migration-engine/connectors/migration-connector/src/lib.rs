@@ -20,6 +20,7 @@ pub use migration_applier::*;
 pub use migration_persistence::*;
 pub use steps::MigrationStep;
 
+use datamodel::Datamodel;
 use serde::{Deserialize, Serialize};
 use std::fmt::Debug;
 
@@ -82,7 +83,12 @@ pub trait MigrationConnector: Send + Sync + 'static {
         Box::new(applier)
     }
 
-    async fn generate_imperative_migration(&self) -> ConnectorResult<(ImperativeMigration, Self::DatabaseMigration)>;
+    async fn generate_imperative_migration(
+        &self,
+        past_migrations: &[ImperativeMigration],
+        schema: &Datamodel,
+        schema_string: &str,
+    ) -> ConnectorResult<(ImperativeMigration, Self::DatabaseMigration)>;
 }
 
 pub trait DatabaseMigrationMarker: Debug + Send + Sync {
@@ -95,5 +101,6 @@ pub type ConnectorResult<T> = Result<T, ConnectorError>;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ImperativeMigration {
-    steps: Vec<String>,
+    pub steps: Vec<String>,
+    pub prisma_schema: String,
 }

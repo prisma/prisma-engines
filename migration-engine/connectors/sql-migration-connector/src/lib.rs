@@ -22,7 +22,8 @@ pub use sql_migration_persistence::MIGRATION_TABLE_NAME;
 
 use component::Component;
 use database_info::DatabaseInfo;
-use flavour::SqlFlavour;
+use datamodel::Datamodel;
+use flavour::{SqlFlavour, TemporaryDatabase};
 use migration_connector::*;
 use quaint::{
     error::ErrorKind,
@@ -110,6 +111,22 @@ impl SqlMigrationConnector {
 
         self.flavour.describe_schema(schema_name, conn).await
     }
+
+    #[tracing::instrument(skip(self, migrations, db))]
+    async fn apply_imperative_migrations(
+        &self,
+        migrations: &[ImperativeMigration],
+        db: &TemporaryDatabase,
+    ) -> SqlResult<()> {
+        for migration in migrations {
+            for step in &migration.steps {
+                tracing::debug!(step = step.as_str(), "Applying migration step.");
+                db.conn.raw_cmd(step).await?;
+            }
+        }
+
+        Ok(())
+    }
 }
 
 #[async_trait::async_trait]
@@ -169,12 +186,36 @@ impl MigrationConnector for SqlMigrationConnector {
         serde_json::from_value(json).ok()
     }
 
-    async fn generate_imperative_migration(&self) -> ConnectorResult<(ImperativeMigration, SqlMigration)> {
+    async fn generate_imperative_migration(
+        &self,
+        past_migrations: &[ImperativeMigration],
+        schema: &Datamodel,
+        schema_string: &str,
+    ) -> ConnectorResult<(ImperativeMigration, SqlMigration)> {
         let temporary_database = self.flavour.create_temporary_database().await?;
+        let inferrer = self.database_migration_inferrer();
+        let applier = self.database_migration_step_applier();
+
+        catch(
+            self.connection_info(),
+            self.apply_imperative_migrations(past_migrations, &temporary_database),
+        )
+        .await?;
+
+        let sql_migration = inferrer.infer(schema, schema, &[]).await?;
+        let imperative_migration_steps = applier
+            .render_steps_pretty(&sql_migration)?
+            .into_iter()
+            .map(|pretty| pretty.raw)
+            .collect();
+        let imperative_migration = ImperativeMigration {
+            steps: imperative_migration_steps,
+            prisma_schema: schema_string.to_owned(),
+        };
 
         self.flavour.drop_temporary_database(&temporary_database).await?;
 
-        todo!()
+        Ok((imperative_migration, sql_migration))
     }
 }
 

@@ -115,13 +115,7 @@ impl SqlDestructiveChangesChecker<'_> {
         }
     }
 
-    #[tracing::instrument(skip(self, steps, before), target = "SqlDestructiveChangeChecker::check")]
-    async fn check_impl(
-        &self,
-        steps: &[SqlMigrationStep],
-        before: &SqlSchema,
-        after: &SqlSchema,
-    ) -> SqlResult<DestructiveChangeDiagnostics> {
+    fn plan(&self, steps: &[SqlMigrationStep], before: &SqlSchema, after: &SqlSchema) -> DestructiveCheckPlan {
         let mut plan = DestructiveCheckPlan::new();
 
         for step in steps {
@@ -180,6 +174,17 @@ impl SqlDestructiveChangesChecker<'_> {
             }
         }
 
+        plan
+    }
+
+    #[tracing::instrument(skip(self, steps, before), target = "SqlDestructiveChangeChecker::check")]
+    async fn check_impl(
+        &self,
+        steps: &[SqlMigrationStep],
+        before: &SqlSchema,
+        after: &SqlSchema,
+    ) -> SqlResult<DestructiveChangeDiagnostics> {
+        let mut plan = self.plan(steps, before, after);
         let mut diagnostics = plan.execute(self.schema_name(), self.conn()).await?;
 
         // Temporary, for better reporting.
@@ -209,5 +214,14 @@ impl DestructiveChangesChecker<SqlMigration> for SqlDestructiveChangesChecker<'_
         )
         .await
         .map_err(|sql_error| sql_error.into_connector_error(&self.connection_info()))
+    }
+
+    fn pure_check(&self, database_migration: &SqlMigration) -> ConnectorResult<DestructiveChangeDiagnostics> {
+        let plan = self.plan(
+            &database_migration.original_steps,
+            &database_migration.before,
+            &database_migration.after,
+        );
+        Ok(plan.pure_check())
     }
 }
