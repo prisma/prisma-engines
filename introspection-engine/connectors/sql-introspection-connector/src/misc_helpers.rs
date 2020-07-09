@@ -102,14 +102,7 @@ pub fn calculate_many_to_many_field(
         false => basename,
     };
 
-    RelationField {
-        name,
-        arity: FieldArity::List,
-        relation_info,
-        documentation: None,
-        is_generated: false,
-        is_commented_out: false,
-    }
+    RelationField::new(&name, FieldArity::List, relation_info)
 }
 
 pub(crate) fn calculate_index(index: &Index) -> IndexDefinition {
@@ -167,7 +160,7 @@ pub(crate) fn calculate_relation_field(
 ) -> Result<RelationField, SqlError> {
     debug!("Handling foreign key  {:?}", foreign_key);
 
-    let info = RelationInfo {
+    let relation_info = RelationInfo {
         name: calculate_relation_name(schema, foreign_key, table)?,
         fields: foreign_key.columns.clone(),
         to: foreign_key.referenced_table.clone(),
@@ -186,14 +179,7 @@ pub(crate) fn calculate_relation_field(
         false => FieldArity::Required,
     };
 
-    Ok(RelationField {
-        name: foreign_key.referenced_table.clone(),
-        arity,
-        relation_info: info,
-        documentation: None,
-        is_generated: false,
-        is_commented_out: false,
-    })
+    Ok(RelationField::new(&foreign_key.referenced_table, arity, relation_info))
 }
 
 pub(crate) fn calculate_backrelation_field(
@@ -208,7 +194,7 @@ pub(crate) fn calculate_backrelation_field(
             explanation: format!("Table {} not found.", table_name),
         }),
         Ok(table) => {
-            let info = RelationInfo {
+            let relation_info = RelationInfo {
                 name: relation_info.name.clone(),
                 to: model.name.clone(),
                 fields: vec![],
@@ -240,14 +226,7 @@ pub(crate) fn calculate_backrelation_field(
                 model.name.clone()
             };
 
-            Ok(RelationField {
-                name,
-                arity,
-                relation_info: info,
-                documentation: None,
-                is_generated: false,
-                is_commented_out: false,
-            })
+            Ok(RelationField::new(&name, arity, relation_info))
         }
     }
 }

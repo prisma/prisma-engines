@@ -229,11 +229,11 @@ pub struct RelationField {
 
 impl RelationField {
     /// Creates a new field with the given name and type.
-    pub fn new(name: &str, info: RelationInfo) -> Self {
+    pub fn new(name: &str, arity: FieldArity, relation_info: RelationInfo) -> Self {
         RelationField {
             name: String::from(name),
-            arity: FieldArity::Required,
-            relation_info: info,
+            arity,
+            relation_info,
             documentation: None,
             is_generated: false,
             is_commented_out: false,
@@ -241,8 +241,7 @@ impl RelationField {
     }
     /// Creates a new field with the given name and type, marked as generated and optional.
     pub fn new_generated(name: &str, info: RelationInfo) -> Self {
-        let mut field = Self::new(name, info);
-        field.arity = FieldArity::Optional;
+        let mut field = Self::new(name, FieldArity::Optional, info);
         field.is_generated = true;
 
         field
@@ -307,10 +306,10 @@ pub struct ScalarField {
 
 impl ScalarField {
     /// Creates a new field with the given name and type.
-    pub fn new(name: &str, field_type: FieldType) -> ScalarField {
+    pub fn new(name: &str, arity: FieldArity, field_type: FieldType) -> ScalarField {
         ScalarField {
             name: String::from(name),
-            arity: FieldArity::Required,
+            arity,
             field_type,
             database_name: None,
             default_value: None,
@@ -324,8 +323,7 @@ impl ScalarField {
     }
     /// Creates a new field with the given name and type, marked as generated and optional.
     pub fn new_generated(name: &str, field_type: FieldType) -> ScalarField {
-        let mut field = Self::new(name, field_type);
-        field.arity = FieldArity::Optional;
+        let mut field = Self::new(name, FieldArity::Optional, field_type);
         field.is_generated = true;
 
         field

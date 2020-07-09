@@ -290,12 +290,11 @@ impl Standardiser {
             .fields
             .iter()
             .map(|f| {
-                let mut underlying_field = ScalarField::new(
+                ScalarField::new(
                     &format!("{}{}", model_name.camel_case(), f.name.pascal_case()),
+                    dml::FieldArity::Optional,
                     f.field_type.clone(),
-                );
-                underlying_field.arity = dml::FieldArity::Optional;
-                underlying_field
+                )
             })
             .collect()
     }

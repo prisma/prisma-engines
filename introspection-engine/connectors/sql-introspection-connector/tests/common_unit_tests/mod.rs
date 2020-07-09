@@ -609,20 +609,17 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
                         is_updated_at: false,
                         is_commented_out: false,
                     }),
-                    Field::RelationField(RelationField {
-                        name: "User".to_string(),
-                        relation_info: RelationInfo {
+                    Field::RelationField(RelationField::new(
+                        "User",
+                        FieldArity::List,
+                        RelationInfo {
                             to: "User".to_string(),
                             fields: vec![],
                             to_fields: vec![],
                             name: "CityToUser".to_string(),
                             on_delete: OnDeleteStrategy::None,
                         },
-                        arity: FieldArity::List,
-                        documentation: None,
-                        is_generated: false,
-                        is_commented_out: false,
-                    }),
+                    )),
                 ],
                 is_generated: false,
                 indices: vec![],
@@ -674,20 +671,17 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
                         is_updated_at: false,
                         is_commented_out: false,
                     }),
-                    Field::RelationField(RelationField {
-                        name: "City".to_string(),
-                        arity: FieldArity::Required,
-                        relation_info: RelationInfo {
+                    Field::RelationField(RelationField::new(
+                        "City",
+                        FieldArity::Required,
+                        RelationInfo {
                             name: "CityToUser".to_string(),
                             to: "City".to_string(),
                             fields: vec!["city_id".to_string(), "city_name".to_string()],
                             to_fields: vec!["id".to_string(), "name".to_string()],
                             on_delete: OnDeleteStrategy::None,
                         },
-                        documentation: None,
-                        is_generated: false,
-                        is_commented_out: false,
-                    }),
+                    )),
                 ],
                 is_generated: false,
                 indices: vec![],
@@ -966,20 +960,17 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                         is_updated_at: false,
                         is_commented_out: false,
                     }),
-                    Field::RelationField(RelationField {
-                        name: "User".to_string(),
-                        arity: FieldArity::List,
-                        relation_info: RelationInfo {
+                    Field::RelationField(RelationField::new(
+                        "User",
+                        FieldArity::List,
+                        RelationInfo {
                             to: "User".to_string(),
                             fields: vec![],
                             to_fields: vec![],
                             name: "CityToUser".to_string(),
                             on_delete: OnDeleteStrategy::None,
                         },
-                        documentation: None,
-                        is_generated: false,
-                        is_commented_out: false,
-                    }),
+                    )),
                 ],
                 is_generated: false,
                 indices: vec![],
@@ -1018,20 +1009,17 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
                         is_updated_at: false,
                         is_commented_out: false,
                     }),
-                    Field::RelationField(RelationField {
-                        name: "City".to_string(),
-                        arity: FieldArity::Required,
-                        relation_info: RelationInfo {
+                    Field::RelationField(RelationField::new(
+                        "City",
+                        FieldArity::Required,
+                        RelationInfo {
                             name: "CityToUser".to_string(),
                             to: "City".to_string(),
                             fields: vec!["city_id".to_string()],
                             to_fields: vec!["id".to_string()],
                             on_delete: OnDeleteStrategy::None,
                         },
-                        documentation: None,
-                        is_generated: false,
-                        is_commented_out: false,
-                    }),
+                    )),
                 ],
                 is_generated: false,
                 indices: vec![],

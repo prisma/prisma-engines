@@ -146,15 +146,15 @@ impl<'a> LiftAstToDml<'a> {
 
         let mut field = match field_type {
             FieldType::Relation(info) => {
-                let mut field = dml::RelationField::new(&ast_field.name.name, info);
+                let arity = self.lift_field_arity(&ast_field.arity);
+                let mut field = dml::RelationField::new(&ast_field.name.name, arity, info);
                 field.documentation = ast_field.documentation.clone().map(|comment| comment.text);
-                field.arity = self.lift_field_arity(&ast_field.arity);
                 Field::RelationField(field)
             }
             x => {
-                let mut field = dml::ScalarField::new(&ast_field.name.name, x);
+                let arity = self.lift_field_arity(&ast_field.arity);
+                let mut field = dml::ScalarField::new(&ast_field.name.name, arity, x);
                 field.documentation = ast_field.documentation.clone().map(|comment| comment.text);
-                field.arity = self.lift_field_arity(&ast_field.arity);
                 Field::ScalarField(field)
             }
         };
