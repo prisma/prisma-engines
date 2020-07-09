@@ -225,7 +225,7 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
             let fields_to_be_changed = new_data_model.find_enum_fields(&changed_enum_name.0.enm);
 
             for change2 in fields_to_be_changed {
-                let field = new_data_model.find_field_mut(&change2.0, &change2.1).unwrap();
+                let field = new_data_model.find_scalar_field_mut(&change2.0, &change2.1).unwrap();
                 field.field_type = FieldType::Enum(changed_enum_name.1.clone());
             }
         }

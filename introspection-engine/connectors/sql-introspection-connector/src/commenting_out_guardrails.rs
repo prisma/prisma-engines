@@ -117,7 +117,7 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
     for model_without_identifier in &models_without_identifiers {
         for model in &mut datamodel.models {
             model
-                .relation_fields_mut()
+                .fields
                 .retain(|f| !f.points_to_model(model_without_identifier.model.as_ref()));
         }
     }

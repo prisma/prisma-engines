@@ -1,4 +1,4 @@
-use datamodel::{Datamodel, DefaultValue, FieldType, ValueGenerator, WithDatabaseName, WithName};
+use datamodel::{Datamodel, DefaultValue, Field, FieldType, ValueGenerator, WithName};
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
 use regex::Regex;
@@ -18,8 +18,9 @@ pub fn sanitize_datamodel_names(datamodel: &mut Datamodel) {
             let (sanitized_field_name, field_db_name) = sanitize_name(field.name().to_string());
             let id_field_option = model.id_fields.iter_mut().find(|name| **name == field.name());
 
-            match &mut field.field_type() {
-                FieldType::Relation(info) => {
+            match field {
+                Field::RelationField(rf) => {
+                    let info = &mut rf.relation_info;
                     info.name = sanitize_name(info.name.clone()).0;
                     info.to = sanitize_name(info.to.clone()).0;
                     info.to_fields = info
@@ -33,53 +34,57 @@ pub fn sanitize_datamodel_names(datamodel: &mut Datamodel) {
                         .map(|f: &std::string::String| sanitize_name(f.clone()).0)
                         .collect();
                 }
-                FieldType::Enum(enum_name) => {
-                    let (sanitized_enum_name, enum_db_name) =
-                        if *enum_name == format!("{}_{}", model.name, field.name()) {
-                            //MySql
-                            if model_db_name.is_none() && field_db_name.is_none() {
-                                (enum_name.clone(), None)
-                            } else {
-                                (
-                                    format!("{}_{}", sanitized_model_name, sanitized_field_name),
-                                    Some(enum_name.clone()),
-                                )
-                            }
-                        } else {
-                            sanitize_name(enum_name.clone())
-                        };
+                Field::ScalarField(sf) => {
+                    match &sf.field_type {
+                        FieldType::Enum(enum_name) => {
+                            let (sanitized_enum_name, enum_db_name) =
+                                if *enum_name == format!("{}_{}", model.name, sf.name) {
+                                    //MySql
+                                    if model_db_name.is_none() && field_db_name.is_none() {
+                                        (enum_name.clone(), None)
+                                    } else {
+                                        (
+                                            format!("{}_{}", sanitized_model_name, sanitized_field_name),
+                                            Some(enum_name.clone()),
+                                        )
+                                    }
+                                } else {
+                                    sanitize_name(enum_name.clone())
+                                };
 
-                    if let Some(old_name) = enum_db_name {
-                        enum_renames.insert(old_name.clone(), (sanitized_enum_name.clone(), Some(old_name.clone())));
-                    };
-
-                    *enum_name = sanitized_enum_name;
-
-                    if let Some(DefaultValue::Single(PrismaValue::Enum(value))) = &mut field.default_value() {
-                        if EMPTY_STRING == value {
-                            *value = EMPTY_ENUM_PLACEHOLDER.to_string();
-                        } else {
-                            let (sanitized_value, _) = sanitize_name(value.to_string());
-
-                            field.default_value = if sanitized_value == EMPTY_STRING.to_string() {
-                                Some(DefaultValue::Expression(ValueGenerator::new_dbgenerated()))
-                            } else {
-                                Some(DefaultValue::Single(PrismaValue::Enum(sanitized_value)))
+                            if let Some(old_name) = enum_db_name {
+                                enum_renames
+                                    .insert(old_name.clone(), (sanitized_enum_name.clone(), Some(old_name.clone())));
                             };
-                        }
-                    };
 
-                    if field.database_name().is_none() {
-                        field.set_database_name(field_db_name);
-                    }
-                }
-                _ => {
-                    if field.database_name().is_none() {
-                        field.set_database_name(field_db_name);
+                            *enum_name = sanitized_enum_name;
+
+                            if let Some(DefaultValue::Single(PrismaValue::Enum(value))) = &mut sf.default_value {
+                                if EMPTY_STRING == value {
+                                    *value = EMPTY_ENUM_PLACEHOLDER.to_string();
+                                } else {
+                                    let (sanitized_value, _) = sanitize_name(value.to_string());
+
+                                    sf.default_value = if sanitized_value == EMPTY_STRING.to_string() {
+                                        Some(DefaultValue::Expression(ValueGenerator::new_dbgenerated()))
+                                    } else {
+                                        Some(DefaultValue::Single(PrismaValue::Enum(sanitized_value)))
+                                    };
+                                }
+                            };
+
+                            if sf.database_name.is_none() {
+                                sf.database_name = field_db_name;
+                            }
+                        }
+                        _ => {
+                            if sf.database_name.is_none() {
+                                sf.database_name = field_db_name;
+                            }
+                        }
                     }
                 }
             }
-
             field.set_name(&sanitized_field_name);
             id_field_option.map(|id_field| *id_field = sanitized_field_name.clone());
         }

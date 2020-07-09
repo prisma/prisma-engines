@@ -165,6 +165,13 @@ impl Field {
             Field::RelationField(rf) => rf.is_generated,
         }
     }
+
+    pub fn points_to_model(&self, name: &str) -> bool {
+        match self {
+            Field::ScalarField(_) => false,
+            Field::RelationField(rf) => rf.points_to_model(name),
+        }
+    }
 }
 
 impl WithName for Field {
