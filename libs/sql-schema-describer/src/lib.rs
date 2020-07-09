@@ -1,4 +1,5 @@
 #![allow(clippy::trivial_regex)] // this is allowed, because we want to do CoW replaces and these regexes will grow.
+#![allow(clippy::match_bool)] // we respectfully disagree that it makes the code less readable.
 
 //! Database description. This crate is used heavily in the introspection and migration engines.
 

@@ -390,10 +390,9 @@ async fn get_all_indexes(
                 Index {
                     name: index_name,
                     columns: vec![column_name],
-                    tpe: if is_unique {
-                        IndexType::Unique
-                    } else {
-                        IndexType::Normal
+                    tpe: match is_unique {
+                        true => IndexType::Unique,
+                        false => IndexType::Normal,
                     },
                 },
             );

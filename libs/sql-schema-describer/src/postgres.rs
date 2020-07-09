@@ -218,13 +218,10 @@ impl SqlSchemaDescriber {
                         Some(match &tpe.family {
                             ColumnTypeFamily::Int => match parse_int(&default_string) {
                                 Some(int_value) => DefaultValue::VALUE(int_value),
-                                None => {
-                                    if is_autoincrement(&default_string, schema, &table_name, &col_name) {
-                                        DefaultValue::SEQUENCE(default_string)
-                                    } else {
-                                        DefaultValue::DBGENERATED(default_string)
-                                    }
-                                }
+                                None => match is_autoincrement(&default_string, schema, &table_name, &col_name) {
+                                    true => DefaultValue::SEQUENCE(default_string),
+                                    false => DefaultValue::DBGENERATED(default_string),
+                                },
                             },
                             ColumnTypeFamily::Float => match parse_float(&default_string) {
                                 Some(float_value) => DefaultValue::VALUE(float_value),
@@ -532,10 +529,9 @@ impl SqlSchemaDescriber {
                     entry.0.push(Index {
                         name,
                         columns: vec![column_name],
-                        tpe: if is_unique {
-                            IndexType::Unique
-                        } else {
-                            IndexType::Normal
+                        tpe: match is_unique {
+                            true => IndexType::Unique,
+                            false => IndexType::Normal,
                         },
                     })
                 }

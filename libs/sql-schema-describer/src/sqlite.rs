@@ -370,10 +370,9 @@ impl SqlSchemaDescriber {
             let name = row.get("name").and_then(|x| x.to_string()).expect("get name");
             let mut index = Index {
                 name: name.clone(),
-                tpe: if is_unique {
-                    IndexType::Unique
-                } else {
-                    IndexType::Normal
+                tpe: match is_unique {
+                    true => IndexType::Unique,
+                    false => IndexType::Normal,
                 },
                 columns: vec![],
             };
