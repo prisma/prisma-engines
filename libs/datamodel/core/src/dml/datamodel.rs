@@ -184,9 +184,10 @@ impl Datamodel {
             .relation_fields()
             .find(|f| {
                 f.relation_info.name == info.name
+                    && (f.relation_info.to != info.to ||
                     // This is to differentiate the opposite field from self in the self relation case.
-                    && f.relation_info.to_fields != info.to_fields
-                    && f.relation_info.fields != info.fields
+                    (f.relation_info.to_fields != info.to_fields
+                    && f.relation_info.fields != info.fields)|| f.relation_info.to != info.to)
             })
             .expect("Every RelationInfo should have a complementary RelationInfo on the opposite relation field.")
     }
