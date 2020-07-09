@@ -3151,6 +3151,7 @@ dependencies = [
  "serde",
  "serde_json",
  "sql-schema-describer",
+ "tempfile",
  "thiserror",
  "tokio",
  "tracing",

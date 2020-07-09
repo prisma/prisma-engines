@@ -168,6 +168,14 @@ impl MigrationConnector for SqlMigrationConnector {
     fn deserialize_database_migration(&self, json: serde_json::Value) -> Option<SqlMigration> {
         serde_json::from_value(json).ok()
     }
+
+    async fn generate_imperative_migration(&self) -> ConnectorResult<(ImperativeMigration, SqlMigration)> {
+        let temporary_database = self.flavour.create_temporary_database().await?;
+
+        self.flavour.drop_temporary_database(&temporary_database).await?;
+
+        todo!()
+    }
 }
 
 pub(crate) async fn catch<O>(

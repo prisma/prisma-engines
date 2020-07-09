@@ -34,6 +34,12 @@ pub(crate) fn from_connection_info(connection_info: &ConnectionInfo) -> Box<dyn 
     }
 }
 
+pub(crate) struct TemporaryDatabase {
+    pub(crate) name: String,
+    pub(crate) schema_name: String,
+    pub(crate) conn: Quaint,
+}
+
 #[async_trait::async_trait]
 pub(crate) trait SqlFlavour: DestructiveChangeCheckerFlavour {
     /// Optionally validate the database info.
@@ -43,6 +49,15 @@ pub(crate) trait SqlFlavour: DestructiveChangeCheckerFlavour {
 
     /// Create a database called `dbname` on the server, if applicable.
     async fn create_database(&self, database_url: &str) -> ConnectorResult<String>;
+
+    /// Create a temporary database and connect to it.
+    async fn create_temporary_database(&self) -> ConnectorResult<TemporaryDatabase> {
+        todo!("create_temporary_database")
+    }
+
+    async fn drop_temporary_database(&self, temporary_database: &TemporaryDatabase) -> ConnectorResult<()> {
+        todo!("drop_temporary_database")
+    }
 
     /// Introspect the SQL schema.
     async fn describe_schema<'a>(
@@ -162,6 +177,26 @@ impl SqlFlavour for SqliteFlavour {
             }
             None => {}
         }
+
+        Ok(())
+    }
+
+    async fn create_temporary_database(&self) -> ConnectorResult<TemporaryDatabase> {
+        let tempdir = tempfile::tempdir().expect("temporary directory creation");
+        let file_path = tempdir.path().join("migrationdb.sqlite");
+        let file_path = file_path.to_str().unwrap();
+        let url = format!("file:{}", file_path);
+        let (conn, database_info) = crate::connect(&url).await?;
+
+        Ok(TemporaryDatabase {
+            name: file_path.to_owned(),
+            conn,
+            schema_name: database_info.connection_info().schema_name().to_owned(),
+        })
+    }
+
+    async fn drop_temporary_database(&self, temporary_database: &TemporaryDatabase) -> ConnectorResult<()> {
+        std::fs::remove_file(&temporary_database.name).expect("failed to delete temporary sqlite database");
 
         Ok(())
     }

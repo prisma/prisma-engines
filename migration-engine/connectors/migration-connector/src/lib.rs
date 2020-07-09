@@ -20,6 +20,7 @@ pub use migration_applier::*;
 pub use migration_persistence::*;
 pub use steps::MigrationStep;
 
+use serde::{Deserialize, Serialize};
 use std::fmt::Debug;
 
 /// The top-level trait for connectors. This is the abstraction the migration engine core relies on to
@@ -80,6 +81,8 @@ pub trait MigrationConnector: Send + Sync + 'static {
         };
         Box::new(applier)
     }
+
+    async fn generate_imperative_migration(&self) -> ConnectorResult<(ImperativeMigration, Self::DatabaseMigration)>;
 }
 
 pub trait DatabaseMigrationMarker: Debug + Send + Sync {
@@ -89,3 +92,8 @@ pub trait DatabaseMigrationMarker: Debug + Send + Sync {
 /// Shorthand for a [Result](https://doc.rust-lang.org/std/result/enum.Result.html) where the error
 /// variant is a [ConnectorError](/error/enum.ConnectorError.html).
 pub type ConnectorResult<T> = Result<T, ConnectorError>;
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct ImperativeMigration {
+    steps: Vec<String>,
+}
