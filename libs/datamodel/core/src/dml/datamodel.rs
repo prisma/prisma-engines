@@ -141,15 +141,6 @@ impl Datamodel {
         self.enums_mut().find(|m| m.name == *name)
     }
 
-    /// Finds a field with a certain relation guarantee.
-    /// exclude_field are necessary to avoid corner cases with self-relations (e.g. we must not recognize a field as its own related field).
-    pub fn related_field(&self, from: &str, to: &str, name: &str, exclude_field: &str) -> Option<&RelationField> {
-        self.find_model(&to).and_then(|related_model| {
-            related_model
-                .relation_fields()
-                .find(|f| f.relation_info.to == from && f.relation_info.name == name && f.name != exclude_field)
-        })
-    }
     /// Returns (model_name, field_name) for all fields using a specific enum.
     pub fn find_enum_fields(&mut self, enum_name: &str) -> Vec<(String, String)> {
         let mut fields = vec![];
@@ -191,8 +182,8 @@ impl Datamodel {
     }
 
     // This is used once we assume the datamodel to be internally valid
-    pub fn find_related_field_for_info_bang(&self, info: &RelationInfo, exclude: &str) -> &RelationField {
-        self.find_related_field_for_info(info, exclude)
+    pub fn find_related_field_bang(&self, rf: &RelationField) -> &RelationField {
+        self.find_related_field_for_info(&rf.relation_info, &rf.name)
             .expect("Every RelationInfo should have a complementary RelationInfo on the opposite relation field.")
     }
 }

@@ -149,7 +149,7 @@ impl<'a> DatamodelConverter<'a> {
                     .find_model(&to)
                     .unwrap_or_else(|| panic!("Related model {} not found", to));
 
-                let related_field = datamodel.find_related_field_for_info_bang(&field.relation_info, &field.name);
+                let related_field = datamodel.find_related_field_bang(&field);
 
                 let related_field_info: &dml::RelationInfo = &related_field.relation_info;
 

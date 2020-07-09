@@ -2,7 +2,7 @@ use crate::warnings::{
     warning_enum_values_with_empty_names, warning_fields_with_empty_names, warning_models_without_identifier,
     warning_unsupported_types, EnumAndValue, Model, ModelAndField, ModelAndFieldAndType,
 };
-use datamodel::{Datamodel, FieldArity, FieldType};
+use datamodel::{Datamodel, FieldType};
 use introspection_connector::Warning;
 
 pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
@@ -14,17 +14,10 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
     // find models with 1to1 relations
     let mut models_with_one_to_one_relation = vec![];
     for model in &datamodel.models {
-        if model.relation_fields().any(|f| match f.arity {
-            FieldArity::List => false,
-            _ => {
-                let other_field = datamodel.find_related_field_for_info_bang(&f.relation_info, &f.name);
-
-                match other_field.arity {
-                    FieldArity::Optional | FieldArity::Required => true,
-                    FieldArity::List => false,
-                }
-            }
-        }) {
+        if model
+            .relation_fields()
+            .any(|f| !f.is_list() && !datamodel.find_related_field_bang(&f).is_list())
+        {
             models_with_one_to_one_relation.push(model.name.clone())
         }
     }
