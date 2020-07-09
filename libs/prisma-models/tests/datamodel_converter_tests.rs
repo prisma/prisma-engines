@@ -592,7 +592,7 @@ impl ScalarFieldAssertions for ScalarField {
     }
 
     fn assert_is_id(&self) -> &Self {
-        assert!(self.is_id);
+        assert!(self.is_id());
         self
     }
 
