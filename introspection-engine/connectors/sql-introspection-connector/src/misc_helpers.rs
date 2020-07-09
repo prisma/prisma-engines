@@ -111,12 +111,12 @@ pub(crate) fn calculate_index(index: &Index) -> IndexDefinition {
         IndexType::Unique => datamodel::dml::IndexType::Unique,
         IndexType::Normal => datamodel::dml::IndexType::Normal,
     };
-    let index_definition: IndexDefinition = IndexDefinition {
+
+    IndexDefinition {
         name: Some(index.name.clone()),
         fields: index.columns.clone(),
         tpe,
-    };
-    index_definition
+    }
 }
 
 pub(crate) fn calculate_scalar_field(table: &Table, column: &Column) -> ScalarField {

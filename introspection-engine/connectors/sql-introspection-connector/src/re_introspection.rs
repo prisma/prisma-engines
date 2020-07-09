@@ -156,7 +156,7 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
                 let other_model_in_relation = new_data_model.find_model(&info.to).unwrap();
                 let number_of_relations_to_other_model_in_relation = changed_model
                     .relation_fields()
-                    .filter(|f| f.relation_info.to == info.to)
+                    .filter(|f| f.points_to_model(&info.to))
                     .count();
 
                 let other_relation_field = new_data_model.find_related_field_bang(&rf);
@@ -278,17 +278,14 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
     {
         for model in &new_data_model.models {
             for field in model.relation_fields() {
-                let new_info = &field.relation_info;
-
                 if let Some(old_model) = old_data_model.find_model(&model.name) {
                     for old_field in old_model.relation_fields() {
-                        let old_info = &old_field.relation_info;
-
-                        let other_old_info = &old_data_model.find_related_field_bang(&old_field).relation_info;
-                        let other_new_info = &new_data_model.find_related_field_bang(&field).relation_info;
                         //the relationinfos of both sides need to be compared since the relationinfo of the
                         // non-fk side does not contain enough information to uniquely identify the correct relationfield
-                        if old_info == new_info && other_old_info == other_new_info {
+                        if &old_field.relation_info == &field.relation_info
+                            && &old_data_model.find_related_field_bang(&old_field).relation_info
+                                == &new_data_model.find_related_field_bang(&field).relation_info
+                        {
                             let mf = ModelAndField::new(&model.name, &field.name);
                             changed_relation_field_names.push((mf, old_field.name.clone()));
                         }
@@ -298,13 +295,13 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
         }
 
         for changed_relation_field_name in changed_relation_field_names {
-            let field = new_data_model
+            new_data_model
                 .find_relation_field_mut(
                     &changed_relation_field_name.0.model,
                     &changed_relation_field_name.0.field,
                 )
-                .unwrap();
-            field.name = changed_relation_field_name.1;
+                .unwrap()
+                .name = changed_relation_field_name.1;
         }
     }
 
