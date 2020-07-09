@@ -101,10 +101,7 @@ impl DirectiveValidator<dml::Field> for RelationDirectiveValidator {
             if !args.is_empty() {
                 return Ok(vec![ast::Directive::new(self.directive_name(), args)]);
             }
-
-            Ok(vec![])
-        } else {
-            unreachable!("Should only be Relationfields.")
         }
+        Ok(vec![])
     }
 }

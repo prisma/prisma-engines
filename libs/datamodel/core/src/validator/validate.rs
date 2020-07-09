@@ -348,14 +348,14 @@ impl<'a> Validator<'a> {
             let unknown_fields: Vec<String> = rel_info
                 .fields
                 .iter()
-                .filter(|base_field| model.find_scalar_field(&base_field).is_none())
+                .filter(|base_field| model.find_field(&base_field).is_none())
                 .map(|f| f.clone())
                 .collect();
 
             let referenced_relation_fields: Vec<String> = rel_info
                 .fields
                 .iter()
-                .filter(|base_field| model.find_scalar_field(&base_field).is_some())
+                .filter(|base_field| model.find_relation_field(&base_field).is_some())
                 .map(|f| f.clone())
                 .collect();
 
@@ -439,14 +439,14 @@ impl<'a> Validator<'a> {
             let unknown_fields: Vec<String> = rel_info
                 .to_fields
                 .iter()
-                .filter(|referenced_field| related_model.find_scalar_field(&referenced_field).is_none())
+                .filter(|referenced_field| related_model.find_field(&referenced_field).is_none())
                 .map(|f| f.clone())
                 .collect();
 
             let referenced_relation_fields: Vec<String> = rel_info
                 .to_fields
                 .iter()
-                .filter(|base_field| related_model.find_scalar_field(&base_field).is_some())
+                .filter(|base_field| related_model.find_relation_field(&base_field).is_some())
                 .map(|f| f.clone())
                 .collect();
 
