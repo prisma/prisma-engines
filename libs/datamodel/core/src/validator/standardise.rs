@@ -46,7 +46,7 @@ impl Standardiser {
                     let rel_info = &mut field.relation_info;
                     let related_model = schema_copy.find_model(&rel_info.to).expect(STATE_ERROR);
                     let related_field = related_model
-                        .related_field(model.name.clone().as_str(), &rel_info.name, &field.name)
+                        .related_field(&model.name, &rel_info.name, &field.name)
                         .unwrap();
                     let related_model_name = &related_model.name;
                     let is_m2m = field.arity.is_list() && related_field.arity.is_list();
@@ -69,8 +69,7 @@ impl Standardiser {
                         },
                     };
 
-                    let underlying_fields =
-                        self.underlying_fields_for_unique_criteria(&unique_criteria, model.name.clone().as_ref());
+                    let underlying_fields = self.underlying_fields_for_unique_criteria(&unique_criteria, &model.name);
 
                     if embed_here {
                         // user input has precedence

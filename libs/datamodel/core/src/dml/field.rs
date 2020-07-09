@@ -217,9 +217,6 @@ pub struct RelationField {
     /// The field's arity.
     pub arity: FieldArity,
 
-    /// The database internal name.
-    pub database_name: Option<String>,
-
     /// Comments associated with this field.
     pub documentation: Option<String>,
 
@@ -237,7 +234,6 @@ impl RelationField {
             name: String::from(name),
             arity: FieldArity::Required,
             relation_info: info,
-            database_name: None,
             documentation: None,
             is_generated: false,
             is_commented_out: false,

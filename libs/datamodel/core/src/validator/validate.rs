@@ -49,9 +49,10 @@ impl<'a> Validator<'a> {
             if let Err(err) = self.validate_relations_not_ambiguous(ast_schema, model) {
                 errors_for_model.push(err);
             }
-            if let Err(err) = self.validate_embedded_types_have_no_back_relation(ast_schema, schema, model) {
-                errors_for_model.push(err);
-            }
+
+            // if let Err(err) = self.validate_embedded_types_have_no_back_relation(ast_schema, schema, model) {
+            //     errors_for_model.push(err);
+            // }
 
             if let Err(ref mut the_errors) =
                 self.validate_field_arities(ast_schema.find_model(&model.name).expect(STATE_ERROR), model)
@@ -298,36 +299,35 @@ impl<'a> Validator<'a> {
         }
     }
 
-    /// Ensures that embedded types do not have back relations
-    /// to their parent types.
-    fn validate_embedded_types_have_no_back_relation(
-        &self,
-        ast_schema: &ast::SchemaAst,
-        datamodel: &dml::Datamodel,
-        model: &dml::Model,
-    ) -> Result<(), DatamodelError> {
-        if model.is_embedded {
-            for field in model.relation_fields() {
-                if !field.is_generated {
-                    let rel_info = &field.relation_info;
-                    // TODO: I am not sure if this check is d'accord with the query engine.
-                    let related = datamodel.find_model(&rel_info.to).unwrap();
-                    let related_field = related.related_field(&model.name, &rel_info.name, &field.name).unwrap();
-
-                    if rel_info.to_fields.is_empty() && !related_field.is_generated {
-                        // TODO: Refactor that out, it's way too much boilerplate.
-                        return Err(DatamodelError::new_model_validation_error(
-                            "Embedded models cannot have back relation fields.",
-                            &model.name,
-                            ast_schema.find_field(&model.name, &field.name).expect(STATE_ERROR).span,
-                        ));
-                    }
-                }
-            }
-        }
-
-        Ok(())
-    }
+    // /// Ensures that embedded types do not have back relations
+    // /// to their parent types.
+    // fn validate_embedded_types_have_no_back_relation(
+    //     &self,
+    //     ast_schema: &ast::SchemaAst,
+    //     datamodel: &dml::Datamodel,
+    //     model: &dml::Model,
+    // ) -> Result<(), DatamodelError> {
+    //     if model.is_embedded {
+    //         for field in model.relation_fields() {
+    //             if !field.is_generated {
+    //                 let rel_info = &field.relation_info;
+    //                 // TODO: I am not sure if this check is d'accord with the query engine.
+    //                 let related_field = datamodel.find_related_field_bang(&field);
+    //
+    //                 if rel_info.to_fields.is_empty() && !related_field.is_generated {
+    //                     // TODO: Refactor that out, it's way too much boilerplate.
+    //                     return Err(DatamodelError::new_model_validation_error(
+    //                         "Embedded models cannot have back relation fields.",
+    //                         &model.name,
+    //                         ast_schema.find_field(&model.name, &field.name).expect(STATE_ERROR).span,
+    //                     ));
+    //                 }
+    //             }
+    //         }
+    //     }
+    //
+    //     Ok(())
+    // }
 
     fn validate_base_fields_for_relation(
         &self,

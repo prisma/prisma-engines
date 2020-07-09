@@ -87,7 +87,7 @@ pub fn calculate_many_to_many_field(
     relation_name: String,
     is_self_relation: bool,
 ) -> RelationField {
-    let info = RelationInfo {
+    let relation_info = RelationInfo {
         name: relation_name,
         fields: vec![],
         to: foreign_key.referenced_table.clone(),
@@ -105,8 +105,7 @@ pub fn calculate_many_to_many_field(
     RelationField {
         name,
         arity: FieldArity::List,
-        relation_info: info,
-        database_name: None,
+        relation_info,
         documentation: None,
         is_generated: false,
         is_commented_out: false,
@@ -191,7 +190,6 @@ pub(crate) fn calculate_relation_field(
         name: foreign_key.referenced_table.clone(),
         arity,
         relation_info: info,
-        database_name: None,
         documentation: None,
         is_generated: false,
         is_commented_out: false,
@@ -246,8 +244,6 @@ pub(crate) fn calculate_backrelation_field(
                 name,
                 arity,
                 relation_info: info,
-                database_name: None,
-
                 documentation: None,
                 is_generated: false,
                 is_commented_out: false,
