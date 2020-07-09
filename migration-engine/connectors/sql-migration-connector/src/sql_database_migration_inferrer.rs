@@ -64,7 +64,7 @@ impl DatabaseMigrationInferrer<SqlMigration> for SqlDatabaseMigrationInferrer<'_
     }
 }
 
-fn infer(
+pub(crate) fn infer(
     current_database_schema: &SqlSchema,
     expected_database_schema: &SqlSchema,
     schema_name: &str,

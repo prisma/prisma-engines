@@ -203,7 +203,27 @@ impl MigrationConnector for SqlMigrationConnector {
         )
         .await?;
 
-        let sql_migration = inferrer.infer(schema, schema, &[]).await?;
+        let current_database_schema = self
+            .flavour()
+            .describe_schema(
+                &temporary_database.schema_name,
+                Arc::new(temporary_database.conn.clone()),
+            )
+            .await
+            .expect("introspection failed");
+        let expected_database_schema =
+            sql_schema_calculator::SqlSchemaCalculator::calculate(schema, self.database_info())
+                .expect("schema calculation error");
+
+        let sql_migration = sql_database_migration_inferrer::infer(
+            &current_database_schema,
+            &expected_database_schema,
+            &temporary_database.schema_name,
+            self.sql_family(),
+            self.database_info(),
+        )
+        .expect("Database migration inferrer failed");
+
         let imperative_migration_steps = applier
             .render_steps_pretty(&sql_migration)?
             .into_iter()

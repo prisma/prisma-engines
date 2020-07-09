@@ -36,6 +36,7 @@ pub(crate) fn from_connection_info(connection_info: &ConnectionInfo) -> Box<dyn 
 
 pub(crate) struct TemporaryDatabase {
     pub(crate) name: String,
+    pub(crate) temp_dir: Option<tempfile::TempDir>,
     pub(crate) schema_name: String,
     pub(crate) conn: Quaint,
 }
@@ -184,6 +185,7 @@ impl SqlFlavour for SqliteFlavour {
     async fn create_temporary_database(&self) -> ConnectorResult<TemporaryDatabase> {
         let tempdir = tempfile::tempdir().expect("temporary directory creation");
         let file_path = tempdir.path().join("migrationdb.sqlite");
+        tracing::info!(file_path = ?file_path, "Creating temporary sqlite database.");
         let file_path = file_path.to_str().unwrap();
         let url = format!("file:{}", file_path);
         let (conn, database_info) = crate::connect(&url).await?;
@@ -191,13 +193,12 @@ impl SqlFlavour for SqliteFlavour {
         Ok(TemporaryDatabase {
             name: file_path.to_owned(),
             conn,
+            temp_dir: Some(tempdir),
             schema_name: database_info.connection_info().schema_name().to_owned(),
         })
     }
 
-    async fn drop_temporary_database(&self, temporary_database: &TemporaryDatabase) -> ConnectorResult<()> {
-        std::fs::remove_file(&temporary_database.name).expect("failed to delete temporary sqlite database");
-
+    async fn drop_temporary_database(&self, _temporary_database: &TemporaryDatabase) -> ConnectorResult<()> {
         Ok(())
     }
 }

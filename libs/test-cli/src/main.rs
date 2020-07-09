@@ -152,7 +152,7 @@ async fn main() -> anyhow::Result<()> {
 }
 
 fn read_datamodel_from_file(path: &str) -> std::io::Result<String> {
-    use std::{fs::File, io::Read, path::Path};
+    use std::path::Path;
 
     eprintln!("{} {}", "reading the prisma schema from".bold(), path.yellow());
 
@@ -274,7 +274,7 @@ async fn push_schema(cmd: &PushSchema) -> anyhow::Result<()> {
         .await?;
 
     if response.warnings.len() > 0 {
-        eprintln!("⚠️ {}", "Warnings".bright_yellow().bold());
+        eprintln!("⚠️  {}", "Warnings".bright_yellow().bold());
 
         for warning in &response.warnings {
             eprintln!("- {}", warning.bright_yellow())
@@ -282,7 +282,7 @@ async fn push_schema(cmd: &PushSchema) -> anyhow::Result<()> {
     }
 
     if response.unexecutable.len() > 0 {
-        eprintln!("☢️ {}", "Unexecutable steps".bright_red().bold());
+        eprintln!("☢️  {}", "Unexecutable steps".bright_red().bold());
 
         for unexecutable in &response.unexecutable {
             eprintln!("- {}", unexecutable.bright_red())
@@ -330,7 +330,7 @@ async fn generate_migration(cmd: &MigrateSave) -> anyhow::Result<()> {
     let response = api.generate_imperative_migration(&input).await?;
 
     if response.warnings.len() > 0 {
-        eprintln!("⚠️ {}", "Warnings".bright_yellow().bold());
+        eprintln!("⚠️  {}", "Warnings".bright_yellow().bold());
 
         for warning in &response.warnings {
             eprintln!("- {}", warning.bright_yellow())
@@ -338,7 +338,7 @@ async fn generate_migration(cmd: &MigrateSave) -> anyhow::Result<()> {
     }
 
     if response.unexecutable.len() > 0 {
-        eprintln!("☢️ {}", "Unexecutable steps".bright_red().bold());
+        eprintln!("☢️  {}", "Unexecutable steps".bright_red().bold());
 
         for unexecutable in &response.unexecutable {
             eprintln!("- {}", unexecutable.bright_red())
@@ -374,11 +374,17 @@ fn read_migrations_from_folder(path: &str) -> Result<Vec<ImperativeMigration>, a
 
     for entry in std::fs::read_dir(path).context("error reading from migrations directory")? {
         let entry = entry?;
-        let full_path = std::path::Path::new(path).join(entry.path());
 
-        let file = File::open(full_path).context("error opening a migration file")?;
+        if !entry.file_type()?.is_file() {
+            continue;
+        }
+
+        let file = File::open(entry.path()).context("error opening a migration file")?;
         migrations.push(serde_json::from_reader(file).context("error deserializing a migration")?);
     }
+
+    // Ensure migrations are ordered. This is not guaranteed by read_dir().
+    migrations.sort_by(|a: &ImperativeMigration, b| a.name.cmp(&b.name));
 
     Ok(migrations)
 }
