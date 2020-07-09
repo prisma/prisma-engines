@@ -27,7 +27,7 @@ fn resolve_relation() {
         .assert_has_scalar_field("firstName")
         .assert_base_type(&ScalarType::String);
     user_model
-        .assert_has_scalar_field("posts")
+        .assert_has_relation_field("posts")
         .assert_relation_to("Post")
         .assert_arity(&dml::FieldArity::List);
 
@@ -35,7 +35,7 @@ fn resolve_relation() {
     post_model
         .assert_has_scalar_field("text")
         .assert_base_type(&ScalarType::String);
-    post_model.assert_has_scalar_field("user").assert_relation_to("User");
+    post_model.assert_has_relation_field("user").assert_relation_to("User");
 }
 
 #[test]
@@ -59,7 +59,7 @@ fn resolve_related_field() {
 
     let post_model = schema.assert_has_model("Post");
     post_model
-        .assert_has_scalar_field("user")
+        .assert_has_relation_field("user")
         .assert_relation_to("User")
         .assert_relation_to_fields(&["firstName"]);
 }
@@ -89,7 +89,7 @@ fn resolve_related_fields() {
 
     let post_model = schema.assert_has_model("Post");
     post_model
-        .assert_has_scalar_field("user")
+        .assert_has_relation_field("user")
         .assert_relation_to("User")
         .assert_relation_base_fields(&["authorFirstName", "authorLastName"])
         .assert_relation_to_fields(&["firstName", "lastName"]);

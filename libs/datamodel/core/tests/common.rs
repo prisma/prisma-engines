@@ -84,16 +84,6 @@ impl FieldAsserts for dml::ScalarField {
         self
     }
 
-    fn assert_connector_type(&self, sft: &ScalarFieldType) -> &Self {
-        if let dml::FieldType::ConnectorSpecific(t) = &self.field_type {
-            assert_eq!(t, sft);
-        } else {
-            panic!("Connector Specific Type expected, but found {:?}", self.field_type);
-        }
-
-        self
-    }
-
     fn assert_enum_type(&self, en: &str) -> &Self {
         if let dml::FieldType::Enum(enum_type) = &self.field_type {
             assert_eq!(enum_type, en);
@@ -104,11 +94,11 @@ impl FieldAsserts for dml::ScalarField {
         self
     }
 
-    fn assert_relation_to(&self, t: &str) -> &Self {
-        if let dml::FieldType::Relation(info) = &self.field_type {
-            assert_eq!(info.to, t);
+    fn assert_connector_type(&self, sft: &ScalarFieldType) -> &Self {
+        if let dml::FieldType::ConnectorSpecific(t) = &self.field_type {
+            assert_eq!(t, sft);
         } else {
-            panic!("Relation expected, but found {:?}", self.field_type);
+            panic!("Connector Specific Type expected, but found {:?}", self.field_type);
         }
 
         self
@@ -117,6 +107,16 @@ impl FieldAsserts for dml::ScalarField {
     fn assert_relation_name(&self, t: &str) -> &Self {
         if let dml::FieldType::Relation(info) = &self.field_type {
             assert_eq!(info.name, t.to_owned());
+        } else {
+            panic!("Relation expected, but found {:?}", self.field_type);
+        }
+
+        self
+    }
+
+    fn assert_relation_to(&self, t: &str) -> &Self {
+        if let dml::FieldType::Relation(info) = &self.field_type {
+            assert_eq!(info.to, t);
         } else {
             panic!("Relation expected, but found {:?}", self.field_type);
         }
@@ -134,9 +134,9 @@ impl FieldAsserts for dml::ScalarField {
         self
     }
 
-    fn assert_relation_base_fields(&self, t: &[&str]) -> &Self {
+    fn assert_relation_to_fields(&self, t: &[&str]) -> &Self {
         if let dml::FieldType::Relation(info) = &self.field_type {
-            assert_eq!(info.fields, t);
+            assert_eq!(info.to_fields, t);
         } else {
             panic!("Relation expected, but found {:?}", self.field_type);
         }
@@ -144,9 +144,9 @@ impl FieldAsserts for dml::ScalarField {
         self
     }
 
-    fn assert_relation_to_fields(&self, t: &[&str]) -> &Self {
+    fn assert_relation_base_fields(&self, t: &[&str]) -> &Self {
         if let dml::FieldType::Relation(info) = &self.field_type {
-            assert_eq!(info.to_fields, t);
+            assert_eq!(info.fields, t);
         } else {
             panic!("Relation expected, but found {:?}", self.field_type);
         }
@@ -178,14 +178,14 @@ impl FieldAsserts for dml::ScalarField {
         self
     }
 
-    fn assert_is_id(&self) -> &Self {
-        assert!(self.is_id);
+    fn assert_is_generated(&self, b: bool) -> &Self {
+        assert_eq!(self.is_generated, b);
 
         self
     }
 
-    fn assert_is_generated(&self, b: bool) -> &Self {
-        assert_eq!(self.is_generated, b);
+    fn assert_is_id(&self) -> &Self {
+        assert!(self.is_id);
 
         self
     }
@@ -198,6 +198,104 @@ impl FieldAsserts for dml::ScalarField {
 
     fn assert_is_updated_at(&self, b: bool) -> &Self {
         assert_eq!(self.is_updated_at, b);
+
+        self
+    }
+}
+
+impl FieldAsserts for dml::RelationField {
+    fn assert_base_type(&self, t: &ScalarType) -> &Self {
+        panic!("Scalar expected, but found relation");
+
+        self
+    }
+
+    fn assert_enum_type(&self, en: &str) -> &Self {
+        panic!("Enum expected, but found relation");
+
+        self
+    }
+
+    fn assert_connector_type(&self, sft: &ScalarFieldType) -> &Self {
+        panic!("Connector Specific Type expected, but found relation");
+
+        self
+    }
+
+    fn assert_relation_name(&self, t: &str) -> &Self {
+        assert_eq!(self.relation_info.name, t.to_owned());
+
+        self
+    }
+
+    fn assert_relation_to(&self, t: &str) -> &Self {
+        assert_eq!(self.relation_info.to, t);
+
+        self
+    }
+
+    fn assert_relation_delete_strategy(&self, t: dml::OnDeleteStrategy) -> &Self {
+        assert_eq!(self.relation_info.on_delete, t);
+
+        self
+    }
+
+    fn assert_relation_to_fields(&self, t: &[&str]) -> &Self {
+        assert_eq!(self.relation_info.to_fields, t);
+
+        self
+    }
+
+    fn assert_relation_base_fields(&self, t: &[&str]) -> &Self {
+        assert_eq!(self.relation_info.fields, t);
+
+        self
+    }
+
+    fn assert_arity(&self, arity: &dml::FieldArity) -> &Self {
+        assert_eq!(self.arity, *arity);
+
+        self
+    }
+
+    fn assert_with_db_name(&self, t: &str) -> &Self {
+        assert_eq!(None, Some(t.to_owned()));
+
+        self
+    }
+
+    fn assert_with_documentation(&self, t: &str) -> &Self {
+        assert_eq!(self.documentation, Some(t.to_owned()));
+
+        self
+    }
+
+    fn assert_default_value(&self, t: dml::DefaultValue) -> &Self {
+        assert_eq!(None, Some(t));
+
+        self
+    }
+
+    fn assert_is_generated(&self, b: bool) -> &Self {
+        assert_eq!(self.is_generated, b);
+
+        self
+    }
+
+    fn assert_is_id(&self) -> &Self {
+        assert!(false);
+
+        self
+    }
+
+    fn assert_is_unique(&self, b: bool) -> &Self {
+        assert_eq!(false, b);
+
+        self
+    }
+
+    fn assert_is_updated_at(&self, b: bool) -> &Self {
+        assert_eq!(false, b);
 
         self
     }
