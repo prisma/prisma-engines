@@ -251,13 +251,51 @@ async fn push_schema(cmd: &PushSchema) -> anyhow::Result<()> {
     let schema = read_datamodel_from_file(&cmd.schema_path).context("Error reading the schema from file")?;
     let api = migration_core::migration_api(&schema).await?;
 
-    api.push_schema(&PushSchemaInput {
-        schema,
-        force: cmd.force,
-    })
-    .await?;
+    let response = api
+        .push_schema(&PushSchemaInput {
+            schema,
+            force: cmd.force,
+        })
+        .await?;
 
-    eprintln!("{}{}", "✔️".bold(), "Schema pushed to database.".green());
+    if response.warnings.len() > 0 {
+        eprintln!("⚠️ {}", "Warnings".bright_yellow().bold());
+
+        for warning in &response.warnings {
+            eprintln!("- {}", warning.bright_yellow())
+        }
+    }
+
+    if response.unexecutable.len() > 0 {
+        eprintln!("☢️ {}", "Unexecutable steps".bright_red().bold());
+
+        for unexecutable in &response.unexecutable {
+            eprintln!("- {}", unexecutable.bright_red())
+        }
+    }
+
+    if response.executed_steps > 0 {
+        eprintln!(
+            "{}  {}",
+            "✔️".bold(),
+            format!("Schema pushed to database. ({} steps)", response.executed_steps).green()
+        );
+    } else {
+        if response.had_no_changes_to_push() {
+            eprintln!(
+                "{}  {}",
+                "✔️".bold(),
+                "No changes to push. Prisma schema and database are in sync.".green()
+            );
+        } else {
+            eprintln!(
+                "{}  {}",
+                "❌".bold(),
+                "The schema was not pushed. Pass the --force flag to ignore warnings."
+            );
+            std::process::exit(1);
+        }
+    }
 
     Ok(())
 }

@@ -31,13 +31,12 @@ impl<'a> MigrationCommand for PushSchemaCommand<'a> {
 
         let checks = checker.check(&sql_migration).await?;
 
-        if !checks.unexecutable_migrations.is_empty() {}
+        let mut step = 0u32;
 
-        match (checks.warnings.len(), input.force) {
-            (0, _) | (_, true) => {
-                let mut step = 0;
-
-                while applier.apply_step(&sql_migration, step).await? {
+        match (checks.unexecutable_migrations.len(), checks.warnings.len(), input.force) {
+            (unexecutable, _, _) if unexecutable > 0 => (),
+            (0, 0, _) | (0, _, true) => {
+                while applier.apply_step(&sql_migration, step as usize).await? {
                     step += 1
                 }
             }
@@ -45,6 +44,7 @@ impl<'a> MigrationCommand for PushSchemaCommand<'a> {
         }
 
         Ok(PushSchemaOutput {
+            executed_steps: step,
             warnings: checks.warnings.into_iter().map(|warning| warning.description).collect(),
             unexecutable: checks
                 .unexecutable_migrations
@@ -67,6 +67,13 @@ pub struct PushSchemaInput {
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PushSchemaOutput {
-    warnings: Vec<String>,
-    unexecutable: Vec<String>,
+    pub warnings: Vec<String>,
+    pub unexecutable: Vec<String>,
+    pub executed_steps: u32,
+}
+
+impl PushSchemaOutput {
+    pub fn had_no_changes_to_push(&self) -> bool {
+        self.warnings.is_empty() && self.unexecutable.is_empty() && self.executed_steps == 0
+    }
 }
