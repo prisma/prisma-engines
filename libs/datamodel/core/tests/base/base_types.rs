@@ -18,14 +18,16 @@ fn parse_scalar_types() {
     let schema = parse(dml);
     let user_model = schema.assert_has_model("User");
     user_model
-        .assert_has_field("firstName")
+        .assert_has_scalar_field("firstName")
         .assert_base_type(&ScalarType::String);
-    user_model.assert_has_field("age").assert_base_type(&ScalarType::Int);
     user_model
-        .assert_has_field("isPro")
+        .assert_has_scalar_field("age")
+        .assert_base_type(&ScalarType::Int);
+    user_model
+        .assert_has_scalar_field("isPro")
         .assert_base_type(&ScalarType::Boolean);
     user_model
-        .assert_has_field("averageGrade")
+        .assert_has_scalar_field("averageGrade")
         .assert_base_type(&ScalarType::Float);
 }
 
@@ -55,20 +57,20 @@ fn parse_field_arity() {
     let schema = parse(dml);
     let post_model = schema.assert_has_model("Post");
     post_model
-        .assert_has_field("text")
+        .assert_has_scalar_field("text")
         .assert_base_type(&ScalarType::String)
         .assert_arity(&dml::FieldArity::Required);
     post_model
-        .assert_has_field("photo")
+        .assert_has_scalar_field("photo")
         .assert_base_type(&ScalarType::String)
         .assert_arity(&dml::FieldArity::Optional);
     post_model
-        .assert_has_field("comments")
+        .assert_has_scalar_field("comments")
         .assert_base_type(&ScalarType::String)
         .assert_arity(&dml::FieldArity::List);
 
     post_model
-        .assert_has_field("enums")
+        .assert_has_scalar_field("enums")
         .assert_enum_type("Enum")
         .assert_arity(&dml::FieldArity::List);
 }
@@ -178,12 +180,12 @@ fn json_type_must_work_for_some_connectors() {
     // Postgres does support it
     parse(&format!("{}\n{}", POSTGRES_SOURCE, dml))
         .assert_has_model("User")
-        .assert_has_field("json")
+        .assert_has_scalar_field("json")
         .assert_base_type(&ScalarType::Json);
 
     // MySQL does support it
     parse(&format!("{}\n{}", MYSQL_SOURCE, dml))
         .assert_has_model("User")
-        .assert_has_field("json")
+        .assert_has_scalar_field("json")
         .assert_base_type(&ScalarType::Json);
 }

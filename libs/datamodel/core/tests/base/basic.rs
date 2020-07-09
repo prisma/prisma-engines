@@ -17,10 +17,10 @@ fn parse_basic_model() {
     let user_model = schema.assert_has_model("User");
     user_model.assert_is_embedded(false);
     user_model
-        .assert_has_field("firstName")
+        .assert_has_scalar_field("firstName")
         .assert_base_type(&ScalarType::String);
     user_model
-        .assert_has_field("lastName")
+        .assert_has_scalar_field("lastName")
         .assert_base_type(&ScalarType::String);
 }
 
@@ -66,7 +66,7 @@ fn parse_comments() {
     let user_model = schema.assert_has_model("User");
     user_model.assert_with_documentation("The user model.");
     user_model
-        .assert_has_field("firstName")
+        .assert_has_scalar_field("firstName")
         .assert_with_documentation("The first name.\nCan be multi-line.");
 }
 

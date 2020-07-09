@@ -75,12 +75,10 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
 
             for relation_field in fields_to_be_changed {
                 let field = new_data_model
-                    .find_field_mut(&relation_field.0, &relation_field.1)
+                    .find_relation_field_mut(&relation_field.0, &relation_field.1)
                     .unwrap();
 
-                if let FieldType::Relation(info) = &mut field.field_type {
-                    info.to = changed_model_name.1.model.clone();
-                }
+                field.relation_info.to = changed_model_name.1.model.clone();
             }
         }
     }
@@ -90,7 +88,7 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
     {
         for model in &new_data_model.models {
             if let Some(old_model) = &old_data_model.find_model(&model.name) {
-                for field in &model.fields {
+                for field in model.scalar_fields() {
                     if let Some(old_field) =
                         old_model.find_field_db_name(&field.database_name.as_ref().unwrap_or(&field.name))
                     {
@@ -106,7 +104,7 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
         //change field name
         for changed_field_name in &changed_scalar_field_names {
             let field = new_data_model
-                .find_field_mut(&changed_field_name.0.model, &changed_field_name.0.field)
+                .find_scalar_field_mut(&changed_field_name.0.model, &changed_field_name.0.field)
                 .unwrap();
             field.name = changed_field_name.1.clone();
             if field.database_name.is_none() {
@@ -122,10 +120,12 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
             for index in &mut model.indices {
                 replace_field_names(&mut index.fields, &changed_field_name.0.field, &changed_field_name.1);
             }
-            for field in &mut model.fields {
-                if let FieldType::Relation(info) = &mut field.field_type {
-                    replace_field_names(&mut info.fields, &changed_field_name.0.field, &changed_field_name.1);
-                }
+            for mut field in &mut model.relation_fields() {
+                replace_field_names(
+                    &mut &field.relation_info.fields,
+                    &changed_field_name.0.field,
+                    &changed_field_name.1,
+                );
             }
         }
 
@@ -133,10 +133,12 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
         for changed_field_name in &changed_scalar_field_names {
             let fields_to_be_changed = new_data_model.find_relation_fields_for_model(&changed_field_name.0.model);
             for f in fields_to_be_changed {
-                let field = new_data_model.find_field_mut(&f.0, &f.1).unwrap();
-                if let FieldType::Relation(info) = &mut field.field_type {
-                    replace_field_names(&mut info.to_fields, &changed_field_name.0.field, &changed_field_name.1);
-                }
+                let field = new_data_model.find_relation_field_mut(&f.0, &f.1).unwrap();
+                replace_field_names(
+                    &mut field.relation_info.to_fields,
+                    &changed_field_name.0.field,
+                    &changed_field_name.1,
+                );
             }
         }
     }
@@ -150,61 +152,54 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
             let changed_model = new_data_model.find_model(&changed_model_name.1.model).unwrap();
 
             for rf in changed_model.relation_fields() {
-                if let FieldType::Relation(info) = &rf.field_type {
-                    let other_model_in_relation = new_data_model.find_model(&info.to).unwrap();
-                    let number_of_relations_to_other_model_in_relation = changed_model
-                        .relation_fields()
-                        .filter(|f| f.relation_info.to == info.to)
-                        .count();
+                let info = &rf.relation_info;
+                let other_model_in_relation = new_data_model.find_model(&info.to).unwrap();
+                let number_of_relations_to_other_model_in_relation = changed_model
+                    .relation_fields()
+                    .filter(|f| f.relation_info.to == info.to)
+                    .count();
 
-                    let other_relation_field = new_data_model.find_related_field_for_info(info).name.clone();
-                    let other_info = new_data_model.find_related_info(info);
+                let other_relation_field = new_data_model.find_related_field_for_info(&info).name.clone();
+                let other_info = new_data_model.find_related_info(&info);
 
-                    let (model_with_fk, referenced_model, fk_column_name) = if info.to_fields.is_empty() {
-                        // does not hold the fk
-                        (
-                            &other_model_in_relation.name,
-                            &changed_model.name,
-                            other_info.fields.join("_"),
-                        )
-                    } else {
-                        // holds the fk
-                        (
-                            &changed_model.name,
-                            &other_model_in_relation.name,
-                            info.fields.join("_"),
-                        )
-                    };
+                let (model_with_fk, referenced_model, fk_column_name) = if info.to_fields.is_empty() {
+                    // does not hold the fk
+                    (
+                        &other_model_in_relation.name,
+                        &changed_model.name,
+                        other_info.fields.join("_"),
+                    )
+                } else {
+                    // holds the fk
+                    (
+                        &changed_model.name,
+                        &other_model_in_relation.name,
+                        info.fields.join("_"),
+                    )
+                };
 
-                    let unambiguous = number_of_relations_to_other_model_in_relation < &2;
-                    let relation_name = if unambiguous {
-                        DefaultNames::name_for_unambiguous_relation(model_with_fk, referenced_model)
-                    } else {
-                        DefaultNames::name_for_ambiguous_relation(model_with_fk, referenced_model, &fk_column_name)
-                    };
+                let unambiguous = number_of_relations_to_other_model_in_relation < 2;
+                let relation_name = if unambiguous {
+                    DefaultNames::name_for_unambiguous_relation(model_with_fk, referenced_model)
+                } else {
+                    DefaultNames::name_for_ambiguous_relation(model_with_fk, referenced_model, &fk_column_name)
+                };
 
-                    relation_fields_to_change.push((
-                        changed_model.name.clone(),
-                        rf.name.clone(),
-                        relation_name.clone(),
-                    ));
-                    relation_fields_to_change.push((
-                        other_model_in_relation.name.clone(),
-                        other_relation_field,
-                        relation_name.clone(),
-                    ));
-                }
+                relation_fields_to_change.push((changed_model.name.clone(), rf.name.clone(), relation_name.clone()));
+                relation_fields_to_change.push((
+                    other_model_in_relation.name.clone(),
+                    other_relation_field,
+                    relation_name.clone(),
+                ));
             }
         }
 
         // change usages in @@id, @@index, @@unique and on RelationInfo.fields
         for changed_relation_field in &relation_fields_to_change {
             let field = new_data_model
-                .find_field_mut(&changed_relation_field.0, &changed_relation_field.1)
+                .find_relation_field_mut(&changed_relation_field.0, &changed_relation_field.1)
                 .unwrap();
-            if let FieldType::Relation(info) = &mut field.field_type {
-                info.name = changed_relation_field.2.clone();
-            }
+            field.relation_info.name = changed_relation_field.2.clone();
         }
     }
 
@@ -266,7 +261,7 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
             let fields_to_be_changed = new_data_model.find_enum_fields(&changed_enum_value.0.enm);
 
             for field in fields_to_be_changed {
-                let field = new_data_model.find_field_mut(&field.0, &field.1).unwrap();
+                let field = new_data_model.find_scalar_field_mut(&field.0, &field.1).unwrap();
                 if field.default_value
                     == Some(DefaultValue::Single(PrismaValue::Enum(
                         changed_enum_value.0.value.clone(),
@@ -282,20 +277,20 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
     let mut changed_relation_field_names = vec![];
     {
         for model in &new_data_model.models {
-            for field in &model.fields {
-                if let FieldType::Relation(new_info) = &field.field_type {
-                    if let Some(old_model) = old_data_model.find_model(&model.name) {
-                        for old_field in &old_model.fields {
-                            if let FieldType::Relation(old_info) = &old_field.field_type {
-                                let other_old_info = old_data_model.find_related_info(&old_info);
-                                let other_new_info = new_data_model.find_related_info(&new_info);
-                                //the relationinfos of both sides need to be compared since the relationinfo of the
-                                // non-fk side does not contain enough information to uniquely identify the correct relationfield
-                                if old_info == new_info && other_old_info == other_new_info {
-                                    let mf = ModelAndField::new(&model.name, &field.name);
-                                    changed_relation_field_names.push((mf, old_field.name.clone()));
-                                }
-                            }
+            for field in model.relation_fields() {
+                let new_info = &field.relation_info;
+
+                if let Some(old_model) = old_data_model.find_model(&model.name) {
+                    for old_field in old_model.relation_fields() {
+                        let old_info = &old_field.relation_info;
+
+                        let other_old_info = old_data_model.find_related_info(&old_info);
+                        let other_new_info = new_data_model.find_related_info(&new_info);
+                        //the relationinfos of both sides need to be compared since the relationinfo of the
+                        // non-fk side does not contain enough information to uniquely identify the correct relationfield
+                        if old_info == new_info && other_old_info == other_new_info {
+                            let mf = ModelAndField::new(&model.name, &field.name);
+                            changed_relation_field_names.push((mf, old_field.name.clone()));
                         }
                     }
                 }
@@ -304,7 +299,7 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
 
         for changed_relation_field_name in changed_relation_field_names {
             let field = new_data_model
-                .find_field_mut(
+                .find_relation_field_mut(
                     &changed_relation_field_name.0.model,
                     &changed_relation_field_name.0.field,
                 )

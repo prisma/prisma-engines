@@ -1,5 +1,5 @@
 use crate::warnings::{warning_default_cuid_warning, warning_default_uuid_warning, ModelAndField};
-use datamodel::{dml, Datamodel, ValueGenerator};
+use datamodel::{dml, Datamodel, ValueGenerator, WithDatabaseName};
 use introspection_connector::{Version, Warning};
 use quaint::connector::SqlFamily;
 use sql_schema_describer::SqlSchema;
@@ -22,10 +22,10 @@ pub fn add_prisma_1_id_defaults(
     match version {
         Version::Prisma1 | Version::Prisma11 => {
             for model in data_model.models.iter().filter(|m| m.has_single_id_field()) {
-                let id_field = model.fields.iter().find(|f| f.is_id).unwrap();
+                let id_field = model.scalar_fields().find(|f| f.is_id).unwrap();
                 let table_name = model.database_name.as_ref().unwrap_or(&model.name);
                 let table = schema.table(table_name).unwrap();
-                let column_name = id_field.database_name.as_ref().unwrap_or(&id_field.name);
+                let column_name = id_field.database_name().as_ref().unwrap_or(&&*id_field.name);
                 let column = table.column(column_name).unwrap();
 
                 let model_and_field = ModelAndField {
@@ -65,7 +65,7 @@ pub fn add_prisma_1_id_defaults(
         let field = &mut data_model
             .find_model_mut(&mf.model)
             .unwrap()
-            .find_field_mut(&mf.field)
+            .find_scalar_field_mut(&mf.field)
             .unwrap();
         if cuid {
             field.default_value = Some(dml::DefaultValue::Expression(ValueGenerator::new_cuid()));

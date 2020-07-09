@@ -16,7 +16,7 @@ fn correctly_handle_server_side_now_function() {
     let user_model = schema.assert_has_model("User");
     user_model.assert_is_embedded(false);
     user_model
-        .assert_has_field("signupDate")
+        .assert_has_scalar_field("signupDate")
         .assert_base_type(&ScalarType::DateTime)
         .assert_default_value(DefaultValue::Expression(ValueGenerator::new_now()));
 }
@@ -36,7 +36,7 @@ fn correctly_handle_server_side_cuid_function() {
     let user_model = schema.assert_has_model("User");
     user_model.assert_is_embedded(false);
     user_model
-        .assert_has_field("someId")
+        .assert_has_scalar_field("someId")
         .assert_base_type(&ScalarType::String)
         .assert_default_value(DefaultValue::Expression(ValueGenerator::new_cuid()));
 }
@@ -56,7 +56,7 @@ fn correctly_handle_server_side_uuid_function() {
     let user_model = schema.assert_has_model("User");
     user_model.assert_is_embedded(false);
     user_model
-        .assert_has_field("someId")
+        .assert_has_scalar_field("someId")
         .assert_base_type(&ScalarType::String)
         .assert_default_value(DefaultValue::Expression(ValueGenerator::new_uuid()));
 }

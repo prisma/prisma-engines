@@ -28,7 +28,7 @@ pub fn introspect(
         for column in &table.columns {
             version_check.check_column_for_type_and_default_value(&column);
             let field = calculate_scalar_field(&table, &column);
-            model.add_field(Field::Scalar(field));
+            model.add_field(Field::ScalarField(field));
         }
 
         let mut foreign_keys_copy = table.foreign_keys.clone();

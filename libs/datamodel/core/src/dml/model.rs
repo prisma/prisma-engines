@@ -146,7 +146,7 @@ impl Model {
     }
 
     /// Finds a field by name and returns a mutable reference.
-    pub fn find_field_mut(&mut self, name: &str) -> Option<&mut ScalarField> {
+    pub fn find_scalar_field_mut(&mut self, name: &str) -> Option<&mut ScalarField> {
         self.scalar_fields_mut().find(|f| f.name == *name)
     }
 

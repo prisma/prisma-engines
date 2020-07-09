@@ -30,7 +30,8 @@ pub trait FieldAsserts {
 }
 
 pub trait ModelAsserts {
-    fn assert_has_field(&self, t: &str) -> &dml::ScalarField;
+    fn assert_has_scalar_field(&self, t: &str) -> &dml::ScalarField;
+    fn assert_has_relation_field(&self, t: &str) -> &dml::RelationField;
     fn assert_is_embedded(&self, t: bool) -> &Self;
     fn assert_with_db_name(&self, t: &str) -> &Self;
     fn assert_with_documentation(&self, t: &str) -> &Self;
@@ -214,8 +215,13 @@ impl DatamodelAsserts for dml::Datamodel {
 }
 
 impl ModelAsserts for dml::Model {
-    fn assert_has_field(&self, t: &str) -> &dml::Field {
-        self.find_field(&t.to_owned())
+    fn assert_has_scalar_field(&self, t: &str) -> &dml::ScalarField {
+        self.find_scalar_field(&t.to_owned())
+            .expect(format!("Field {} not found", t).as_str())
+    }
+
+    fn assert_has_relation_field(&self, t: &str) -> &dml::RelationField {
+        self.find_relation_field(&t.to_owned())
             .expect(format!("Field {} not found", t).as_str())
     }
 

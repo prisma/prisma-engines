@@ -338,20 +338,17 @@ pub(crate) fn calculate_scalar_field_type(column: &Column) -> FieldType {
 // misc
 
 pub fn deduplicate_field_names(datamodel: &mut Datamodel) {
-    let mut duplicated_relation_fields = Vec::new();
+    let mut duplicated_relation_fields = vec![];
 
     for model in &datamodel.models {
-        for field in &model.fields {
-            let is_duplicated = model.fields.iter().filter(|f| field.name == f.name).count() > 1;
-
-            if let FieldType::Relation(RelationInfo {
-                name: relation_name, ..
-            }) = &field.field_type
-            {
-                if is_duplicated {
-                    duplicated_relation_fields.push((model.name.clone(), field.name.clone(), relation_name.clone()));
-                }
-            };
+        for field in model.relation_fields() {
+            if model.fields.iter().filter(|f| field.name == f.name()).count() > 1 {
+                duplicated_relation_fields.push((
+                    model.name.clone(),
+                    field.name.clone(),
+                    field.relation_info.name.clone(),
+                ));
+            }
         }
     }
 

@@ -244,6 +244,24 @@ impl RelationField {
 
         field
     }
+
+    pub fn points_to_model(&self, name: &str) -> bool {
+        self.relation_info.to == name
+    }
+
+    pub fn is_list(&self) -> bool {
+        match self.arity {
+            FieldArity::List => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_required(&self) -> bool {
+        match self.arity {
+            FieldArity::Required => true,
+            _ => false,
+        }
+    }
 }
 
 /// Represents a field in a model.
@@ -310,22 +328,8 @@ impl ScalarField {
         field
     }
 
-    pub fn points_to_model(&self, name: &str) -> bool {
-        match &self.field_type {
-            FieldType::Relation(rel_info) if rel_info.to == name => true,
-            _ => false,
-        }
-    }
-
     pub fn db_name(&self) -> &str {
         self.database_name.as_ref().unwrap_or(&self.name)
-    }
-
-    pub fn is_relation(&self) -> bool {
-        match self.field_type {
-            FieldType::Relation(_) => true,
-            _ => false,
-        }
     }
 }
 

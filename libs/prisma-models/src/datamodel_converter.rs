@@ -70,41 +70,38 @@ impl<'a> DatamodelConverter<'a> {
     fn convert_fields(&self, model: &dml::Model) -> Vec<FieldTemplate> {
         model
             .fields()
-            .map(|field| match field.field_type() {
-                dml::FieldType::Relation(ref ri) => {
+            .map(|field| match field {
+                dml::Field::RelationField(rf) => {
                     let relation = self
                         .relations
                         .iter()
-                        .find(|r| r.is_for_model_and_field(model, field))
+                        .find(|r| r.is_for_model_and_field(model, rf))
                         .unwrap_or_else(|| {
-                            panic!(
-                                "Did not find a relation for model {} and field {}",
-                                model.name, field.name
-                            )
+                            panic!("Did not find a relation for model {} and field {}", model.name, rf.name)
                         });
 
                     FieldTemplate::Relation(RelationFieldTemplate {
-                        name: field.name.clone(),
-                        is_required: field.is_required(),
-                        is_list: field.is_list(),
-                        relation_name: relation.name(),
-                        relation_side: relation.relation_side(field),
-                        relation_info: ri.clone(),
+                        name: rf.name.clone(),
+                        is_required: rf.is_required(),
+                        is_list: rf.is_list(),
+                        relation_name: relation.name.clone(),
+                        relation_side: relation.relation_side(rf),
+                        relation_info: rf.relation_info.clone(),
                     })
                 }
-                _ => FieldTemplate::Scalar(ScalarFieldTemplate {
-                    name: field.name.clone(),
-                    type_identifier: field.type_identifier(),
-                    is_required: field.is_required(),
-                    is_list: field.is_list(),
-                    is_unique: field.is_unique(&model),
-                    is_id: field.is_id(&model),
-                    is_auto_generated_int_id: field.is_auto_generated_int_id(),
-                    behaviour: field.behaviour(),
-                    internal_enum: field.internal_enum(self.datamodel),
-                    db_name: field.database_name.clone(),
-                    arity: field.arity,
-                    default_value: field.default_value.clone(),
+                dml::Field::ScalarField(sf) => FieldTemplate::Scalar(ScalarFieldTemplate {
+                    name: sf.name.clone(),
+                    type_identifier: sf.type_identifier(),
+                    is_required: sf.is_required(),
+                    is_list: sf.is_list(),
+                    is_unique: sf.is_unique,
+                    is_id: sf.is_id,
+                    is_auto_generated_int_id: sf.is_auto_generated_int_id(),
+                    behaviour: sf.behaviour(),
+                    internal_enum: sf.internal_enum(self.datamodel),
+                    db_name: sf.database_name.clone(),
+                    arity: sf.arity,
+                    default_value: sf.default_value.clone(),
                 }),
             })
             .collect()
@@ -149,7 +146,6 @@ impl<'a> DatamodelConverter<'a> {
                 } = &field.relation_info;
 
                 let related_model = datamodel
-                    .fin
                     .find_model(&to)
                     .unwrap_or_else(|| panic!("Related model {} not found", to));
 
@@ -228,7 +224,7 @@ impl<'a> DatamodelConverter<'a> {
                                 }
                             }
                             (Some(_), Some(_)) => {
-                                panic!("It's not allowed that both sides of a relation specify the inline policy. The field was {} on model {}. The related field was {} on model {}.", field.name(), model.name, related_field.name(), related_model.name)
+                                panic!("It's not allowed that both sides of a relation specify the inline policy. The field was {} on model {}. The related field was {} on model {}.", field.name, model.name, related_field.name, related_model.name)
                             }
                         },
                     };
@@ -300,11 +296,11 @@ impl TempRelationHolder {
         self.field_a.is_list() && self.field_b.is_list()
     }
 
-    fn is_for_model_and_field(&self, model: &dml::Model, field: &dml::ScalarField) -> bool {
+    fn is_for_model_and_field(&self, model: &dml::Model, field: &dml::RelationField) -> bool {
         (&self.model_a == model && &self.field_a == field) || (&self.model_b == model && &self.field_b == field)
     }
 
-    fn relation_side(&self, field: &dml::ScalarField) -> RelationSide {
+    fn relation_side(&self, field: &dml::RelationField) -> RelationSide {
         if field == &self.field_a {
             RelationSide::A
         } else if field == &self.field_b {
@@ -331,6 +327,7 @@ impl TempRelationHolder {
     }
 }
 
+//todo rework for shared ones between scalar and rf
 trait DatamodelFieldExtensions {
     fn type_identifier(&self) -> TypeIdentifier;
     fn is_required(&self) -> bool;

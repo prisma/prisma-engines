@@ -2,7 +2,7 @@ use crate::warnings::{
     warning_enum_values_with_empty_names, warning_fields_with_empty_names, warning_models_without_identifier,
     warning_unsupported_types, EnumAndValue, Model, ModelAndField, ModelAndFieldAndType,
 };
-use datamodel::{Datamodel, FieldArity, FieldType, RelationInfo, WithName};
+use datamodel::{Datamodel, FieldArity, FieldType};
 use introspection_connector::Warning;
 
 pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
@@ -98,7 +98,7 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
             && !model
                 .fields
                 .iter()
-                .any(|f| (f.is_id || f.is_unique) && !f.is_commented_out)
+                .any(|f| (f.is_id() || f.is_unique()) && !f.is_commented_out())
             && !model.indices.iter().any(|i| i.is_unique())
             && !models_with_one_to_one_relation.contains(&model.name)
         {
@@ -117,7 +117,7 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
     for model_without_identifier in &models_without_identifiers {
         for model in &mut datamodel.models {
             model
-                .fields
+                .relation_fields_mut()
                 .retain(|f| !f.points_to_model(model_without_identifier.model.as_ref()));
         }
     }
