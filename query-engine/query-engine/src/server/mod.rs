@@ -65,7 +65,7 @@ pub async fn listen(opts: PrismaOpt) -> PrismaResult<()> {
     app.at("/status").get(|_| async move { Ok(json!({"status": "ok"})) });
 
     // NOTE: This println is essential for the correct working of the client.
-    println!("Started http server");
+    info!("Started http server");
 
     // Start the Tide server and log the server details.
     app.listen((&*opts.host, opts.port)).await?;
