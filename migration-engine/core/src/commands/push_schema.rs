@@ -23,10 +23,35 @@ impl<'a> MigrationCommand for PushSchemaCommand<'a> {
     {
         let connector = engine.connector();
         let schema = parse_datamodel(&input.schema)?;
+        let inferrer = connector.database_migration_inferrer();
+        let applier = connector.database_migration_step_applier();
+        let checker = connector.destructive_changes_checker();
 
-        connector.push_schema(&schema).await?;
+        let sql_migration = inferrer.infer(&schema, &schema, &[]).await?;
 
-        Ok(PushSchemaOutput {})
+        let checks = checker.check(&sql_migration).await?;
+
+        if !checks.unexecutable_migrations.is_empty() {}
+
+        match (checks.warnings.len(), input.force) {
+            (0, _) | (_, true) => {
+                let mut step = 0;
+
+                while applier.apply_step(&sql_migration, step).await? {
+                    step += 1
+                }
+            }
+            _ => (),
+        }
+
+        Ok(PushSchemaOutput {
+            warnings: checks.warnings.into_iter().map(|warning| warning.description).collect(),
+            unexecutable: checks
+                .unexecutable_migrations
+                .into_iter()
+                .map(|unexecutable| unexecutable.description)
+                .collect(),
+        })
     }
 }
 
@@ -41,4 +66,7 @@ pub struct PushSchemaInput {
 
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct PushSchemaOutput {}
+pub struct PushSchemaOutput {
+    warnings: Vec<String>,
+    unexecutable: Vec<String>,
+}

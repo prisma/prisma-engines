@@ -1,7 +1,6 @@
 use anyhow::Context;
 use colored::Colorize;
 use migration_core::commands::PushSchemaInput;
-use std::io::Read;
 use structopt::*;
 
 #[derive(StructOpt)]
