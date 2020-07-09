@@ -57,7 +57,7 @@ pub fn sanitize_datamodel_names(datamodel: &mut Datamodel) {
                                     .insert(old_name.clone(), (sanitized_enum_name.clone(), Some(old_name.clone())));
                             };
 
-                            *enum_name = sanitized_enum_name;
+                            sf.field_type = FieldType::Enum(sanitized_enum_name);
 
                             if let Some(DefaultValue::Single(PrismaValue::Enum(value))) = &mut sf.default_value {
                                 if EMPTY_STRING == value {

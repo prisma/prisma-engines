@@ -3,7 +3,7 @@ use datamodel::{
         Datamodel, DefaultValue, Enum, FieldArity, FieldType, IndexDefinition, Model, ScalarField, ScalarType,
         WithDatabaseName,
     },
-    RelationField, RelationInfo,
+    RelationField,
 };
 
 pub(crate) fn walk_models<'a>(datamodel: &'a Datamodel) -> impl Iterator<Item = ModelRef<'a>> + 'a {

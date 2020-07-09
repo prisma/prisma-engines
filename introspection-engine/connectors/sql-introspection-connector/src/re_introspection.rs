@@ -120,9 +120,9 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
             for index in &mut model.indices {
                 replace_field_names(&mut index.fields, &changed_field_name.0.field, &changed_field_name.1);
             }
-            for mut field in &mut model.relation_fields() {
+            for field in model.relation_fields_mut() {
                 replace_field_names(
-                    &mut &field.relation_info.fields,
+                    &mut field.relation_info.fields,
                     &changed_field_name.0.field,
                     &changed_field_name.1,
                 );

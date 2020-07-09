@@ -1,5 +1,5 @@
 use crate::warnings::{warning_default_cuid_warning, warning_default_uuid_warning, ModelAndField};
-use datamodel::{dml, Datamodel, ValueGenerator, WithDatabaseName};
+use datamodel::{dml, Datamodel, ValueGenerator};
 use introspection_connector::{Version, Warning};
 use quaint::connector::SqlFamily;
 use sql_schema_describer::SqlSchema;
@@ -25,7 +25,7 @@ pub fn add_prisma_1_id_defaults(
                 let id_field = model.scalar_fields().find(|f| f.is_id).unwrap();
                 let table_name = model.database_name.as_ref().unwrap_or(&model.name);
                 let table = schema.table(table_name).unwrap();
-                let column_name = id_field.database_name().as_ref().unwrap_or(&&*id_field.name);
+                let column_name = id_field.database_name.as_ref().unwrap_or(&id_field.name);
                 let column = table.column(column_name).unwrap();
 
                 let model_and_field = ModelAndField {

@@ -36,6 +36,8 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
 
     // fields with an empty name
     for model in &mut datamodel.models {
+        let model_name = model.name.clone();
+
         for field in model.scalar_fields_mut() {
             if field.name == "".to_string() {
                 field.documentation = Some(
@@ -46,7 +48,7 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
                 field.is_commented_out = true;
 
                 fields_with_empty_names.push(ModelAndField {
-                    model: model.name.clone(),
+                    model: model_name.clone(),
                     field: field.name.clone(),
                 })
             }
@@ -71,11 +73,13 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
 
     // fields with unsupported as datatype
     for model in &mut datamodel.models {
-        for field in &mut model.scalar_fields_mut() {
+        let model_name = model.name.clone();
+
+        for field in model.scalar_fields_mut() {
             if let FieldType::Unsupported(tpe) = &field.field_type {
                 field.is_commented_out = true;
                 unsupported_types.push(ModelAndFieldAndType {
-                    model: model.name.clone(),
+                    model: model_name.clone(),
                     field: field.name.clone(),
                     tpe: tpe.clone(),
                 })
