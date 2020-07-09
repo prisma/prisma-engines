@@ -106,3 +106,9 @@ pub struct ImperativeMigration {
     pub steps: Vec<String>,
     pub prisma_schema: String,
 }
+
+impl ImperativeMigration {
+    pub fn is_empty(&self) -> bool {
+        self.steps.is_empty()
+    }
+}

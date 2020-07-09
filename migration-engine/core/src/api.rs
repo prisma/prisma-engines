@@ -56,6 +56,10 @@ pub trait GenericApi: Send + Sync + 'static {
     async fn unapply_migration(&self, input: &UnapplyMigrationInput) -> CoreResult<UnapplyMigrationOutput>;
     fn migration_persistence<'a>(&'a self) -> Box<dyn MigrationPersistence + 'a>;
     async fn push_schema(&self, input: &PushSchemaInput) -> CoreResult<PushSchemaOutput>;
+    async fn generate_imperative_migration(
+        &self,
+        input: &GenerateImperativeMigrationInput,
+    ) -> CoreResult<GenerateImperativeMigrationOutput>;
     fn connector_type(&self) -> &'static str;
 
     fn render_error(&self, error: crate::error::Error) -> user_facing_errors::Error {
@@ -136,6 +140,18 @@ where
     async fn push_schema(&self, input: &PushSchemaInput) -> CoreResult<PushSchemaOutput> {
         self.handle_command::<PushSchemaCommand<'_>>(input)
             .instrument(tracing::info_span!("PushSchema"))
+            .await
+    }
+
+    async fn generate_imperative_migration(
+        &self,
+        input: &GenerateImperativeMigrationInput,
+    ) -> CoreResult<GenerateImperativeMigrationOutput> {
+        self.handle_command::<GenerateImperativeMigrationCommand<'_>>(input)
+            .instrument(tracing::info_span!(
+                "GenerateImperativeMigration",
+                name = input.migration_name.as_str(),
+            ))
             .await
     }
 

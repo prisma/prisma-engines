@@ -10,16 +10,16 @@ pub struct GenerateImperativeMigrationCommand<'a> {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct GenerateImperativeMigrationInput {
-    target_schema: String,
-    migrations: Vec<ImperativeMigration>,
-    migration_name: String,
+    pub target_schema: String,
+    pub migrations: Vec<ImperativeMigration>,
+    pub migration_name: String,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct GenerateImperativeMigrationOutput {
-    warnings: Vec<String>,
-    unexecutable: Vec<String>,
-    migration: ImperativeMigration,
+    pub warnings: Vec<String>,
+    pub unexecutable: Vec<String>,
+    pub migration: ImperativeMigration,
 }
 
 #[async_trait::async_trait]

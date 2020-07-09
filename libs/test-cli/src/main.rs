@@ -319,16 +319,57 @@ async fn generate_migration(cmd: &MigrateSave) -> anyhow::Result<()> {
     let target_schema = read_datamodel_from_file(&cmd.schema_path)?;
     let migrations = read_migrations_from_folder(&cmd.migrations_folder_path)?;
 
+    let api = migration_core::migration_api(&target_schema).await?;
+
     let input = GenerateImperativeMigrationInput {
         target_schema,
         migrations,
-        migration_name,
+        migration_name: cmd.migration_name.clone(),
     };
 
-    todo!()
+    let response = api.generate_imperative_migration(&input).await?;
+
+    if response.warnings.len() > 0 {
+        eprintln!("⚠️ {}", "Warnings".bright_yellow().bold());
+
+        for warning in &response.warnings {
+            eprintln!("- {}", warning.bright_yellow())
+        }
+    }
+
+    if response.unexecutable.len() > 0 {
+        eprintln!("☢️ {}", "Unexecutable steps".bright_red().bold());
+
+        for unexecutable in &response.unexecutable {
+            eprintln!("- {}", unexecutable.bright_red())
+        }
+    }
+
+    if response.migration.is_empty() {
+        eprintln!(
+            "{}  {}",
+            "✔️".bold(),
+            "The migrations are up-to-date, no new migration was generated.".green()
+        );
+
+        return Ok(());
+    }
+
+    let migration_file_path =
+        std::path::Path::new(&cmd.migrations_folder_path).join(&format!("{}.json", response.migration.name));
+    let file = std::fs::File::create(&migration_file_path)?;
+    serde_json::to_writer_pretty(file, &response.migration)?;
+
+    eprintln!(
+        "{}  {}",
+        "✔️".bold(),
+        format!("Migration written to {}.", migration_file_path.to_string_lossy()).green()
+    );
+
+    Ok(())
 }
 
-async fn read_migrations_from_folder(path: &str) -> Result<Vec<ImperativeMigration>, anyhow::Error> {
+fn read_migrations_from_folder(path: &str) -> Result<Vec<ImperativeMigration>, anyhow::Error> {
     let mut migrations = Vec::new();
 
     for entry in std::fs::read_dir(path).context("error reading from migrations directory")? {
