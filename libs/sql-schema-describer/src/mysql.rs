@@ -280,12 +280,9 @@ async fn get_all_columns(
                             unescape_and_unquote_default_string(default_string, flavour),
                         )),
                         //todo check other now() definitions
-                        ColumnTypeFamily::DateTime => match default_string.to_lowercase()
-                            == "current_timestamp".to_string()
-                            || default_string.to_lowercase() == "current_timestamp()".to_string()
-                        {
-                            true => DefaultValue::NOW,
-                            false => DefaultValue::DBGENERATED(default_string),
+                        ColumnTypeFamily::DateTime => match default_string.to_lowercase().as_str() {
+                            "current_timestamp" | "current_timestamp()" => DefaultValue::NOW,
+                            _ => DefaultValue::DBGENERATED(default_string),
                         },
                         ColumnTypeFamily::Binary => DefaultValue::DBGENERATED(default_string),
                         ColumnTypeFamily::Json => DefaultValue::DBGENERATED(default_string),
@@ -353,8 +350,9 @@ async fn get_all_indexes(
 
         // Multi-column indices will return more than one row (with different column_name values).
         // We cannot assume that one row corresponds to one index.
-        let (ref mut indexes_map, ref mut primary_key): &mut (_, Option<PrimaryKey>) =
-            map.entry(table_name).or_insert((BTreeMap::new(), None));
+        let (ref mut indexes_map, ref mut primary_key): &mut (_, Option<PrimaryKey>) = map
+            .entry(table_name)
+            .or_insert((BTreeMap::<String, Index>::new(), None));
 
         let is_pk = index_name.to_lowercase() == "primary";
         if is_pk {
@@ -382,24 +380,23 @@ async fn get_all_indexes(
                     );
                 }
             };
-        } else {
-            if indexes_map.contains_key(&index_name) {
-                indexes_map.get_mut(&index_name).map(|index: &mut Index| {
-                    index.columns.push(column_name);
-                });
-            } else {
-                indexes_map.insert(
-                    index_name.clone(),
-                    Index {
-                        name: index_name,
-                        columns: vec![column_name],
-                        tpe: match is_unique {
-                            true => IndexType::Unique,
-                            false => IndexType::Normal,
-                        },
-                    },
-                );
+        } else if indexes_map.contains_key(&index_name) {
+            if let Some(index) = indexes_map.get_mut(&index_name) {
+                index.columns.push(column_name);
             }
+        } else {
+            indexes_map.insert(
+                index_name.clone(),
+                Index {
+                    name: index_name,
+                    columns: vec![column_name],
+                    tpe: if is_unique {
+                        IndexType::Unique
+                    } else {
+                        IndexType::Normal
+                    },
+                },
+            );
         }
     }
 
@@ -483,7 +480,7 @@ async fn get_foreign_keys(conn: &dyn Queryable, schema_name: &str) -> HashMap<St
             "set default" => ForeignKeyAction::SetDefault,
             "restrict" => ForeignKeyAction::Restrict,
             "no action" => ForeignKeyAction::NoAction,
-            s @ _ => panic!(format!("Unrecognized on delete action '{}'", s)),
+            s => panic!(format!("Unrecognized on delete action '{}'", s)),
         };
 
         let intermediate_fks = map.entry(table_name).or_default();
@@ -599,7 +596,7 @@ fn get_column_type_and_enum(
 fn extract_enum_values(full_data_type: &&str) -> Vec<String> {
     let len = &full_data_type.len() - 1;
     let vals = &full_data_type[5..len];
-    vals.split(",").map(|v| unquote_string(v.into())).collect()
+    vals.split(',').map(|v| unquote_string(v)).collect()
 }
 
 // See https://dev.mysql.com/doc/refman/8.0/en/string-literals.html
@@ -607,8 +604,8 @@ fn extract_enum_values(full_data_type: &&str) -> Vec<String> {
 // In addition, MariaDB will return string literals with the quotes and extra backslashes around
 // control characters like `\n`.
 fn unescape_and_unquote_default_string(default: String, flavour: &Flavour) -> String {
-    const MYSQL_ESCAPING_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"\\('|\\[^\\])|'(')"#).unwrap());
-    const MARIADB_NEWLINE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"\\n"#).unwrap());
+    static MYSQL_ESCAPING_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"\\('|\\[^\\])|'(')"#).unwrap());
+    static MARIADB_NEWLINE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"\\n"#).unwrap());
 
     let maybe_unquoted: Cow<str> = if matches!(flavour, Flavour::MariaDb) {
         let unquoted: &str = &default[1..(default.len() - 1)];

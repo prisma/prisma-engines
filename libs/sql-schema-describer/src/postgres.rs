@@ -132,7 +132,7 @@ impl SqlSchemaDescriber {
         }
     }
 
-    async fn get_columns(&self, schema: &str, enums: &Vec<Enum>) -> HashMap<String, Vec<Column>> {
+    async fn get_columns(&self, schema: &str, enums: &[Enum]) -> HashMap<String, Vec<Column>> {
         let mut columns: HashMap<String, Vec<Column>> = HashMap::new();
 
         let sql = r#"
@@ -218,10 +218,13 @@ impl SqlSchemaDescriber {
                         Some(match &tpe.family {
                             ColumnTypeFamily::Int => match parse_int(&default_string) {
                                 Some(int_value) => DefaultValue::VALUE(int_value),
-                                None => match is_autoincrement(&default_string, schema, &table_name, &col_name) {
-                                    true => DefaultValue::SEQUENCE(default_string),
-                                    false => DefaultValue::DBGENERATED(default_string),
-                                },
+                                None => {
+                                    if is_autoincrement(&default_string, schema, &table_name, &col_name) {
+                                        DefaultValue::SEQUENCE(default_string)
+                                    } else {
+                                        DefaultValue::DBGENERATED(default_string)
+                                    }
+                                }
                             },
                             ColumnTypeFamily::Float => match parse_float(&default_string) {
                                 Some(float_value) => DefaultValue::VALUE(float_value),
@@ -240,17 +243,15 @@ impl SqlSchemaDescriber {
                                 }
                             }
                             ColumnTypeFamily::DateTime => {
-                                match default_string.to_lowercase() == "now()".to_string()
-                                    || default_string.to_lowercase() == "current_timestamp".to_string()
-                                {
-                                    true => DefaultValue::NOW,
-                                    false => DefaultValue::DBGENERATED(default_string), //todo parse values
+                                match default_string.to_lowercase().as_str() {
+                                    "now()" | "current_timestamp" => DefaultValue::NOW,
+                                    _ => DefaultValue::DBGENERATED(default_string), //todo parse values
                                 }
                             }
                             ColumnTypeFamily::Binary => DefaultValue::DBGENERATED(default_string),
                             // JSON/JSONB defaults come in the '{}'::jsonb form.
                             ColumnTypeFamily::Json => unsuffix_default_literal(&default_string, "jsonb", "jsonb")
-                                .or(unsuffix_default_literal(&default_string, "json", "json"))
+                                .or_else(|| unsuffix_default_literal(&default_string, "json", "json"))
                                 .map(|default| DefaultValue::VALUE(PrismaValue::Json(unquote_string(&default))))
                                 .unwrap_or_else(move || DefaultValue::DBGENERATED(default_string)),
                             ColumnTypeFamily::Uuid => DefaultValue::DBGENERATED(default_string),
@@ -429,7 +430,7 @@ impl SqlSchemaDescriber {
     async fn get_indices(
         &self,
         schema: &str,
-        sequences: &Vec<Sequence>,
+        sequences: &[Sequence],
     ) -> HashMap<String, (Vec<Index>, Option<PrimaryKey>)> {
         let mut indexes_map = HashMap::new();
 
@@ -509,7 +510,7 @@ impl SqlSchemaDescriber {
                         let sequence = sequence_name.and_then(|sequence_name| {
                             let captures = RE_SEQ.captures(&sequence_name).expect("get captures");
                             let sequence_name = captures.get(1).expect("get capture").as_str();
-                            sequences.iter().find(|s| &s.name == sequence_name).map(|sequence| {
+                            sequences.iter().find(|s| s.name == sequence_name).map(|sequence| {
                                 debug!("Got sequence corresponding to primary key: {:#?}", sequence);
                                 sequence.clone()
                             })
@@ -529,11 +530,12 @@ impl SqlSchemaDescriber {
                     existing_index.columns.push(column_name);
                 } else {
                     entry.0.push(Index {
-                        name: name,
+                        name,
                         columns: vec![column_name],
-                        tpe: match is_unique {
-                            true => IndexType::Unique,
-                            false => IndexType::Normal,
+                        tpe: if is_unique {
+                            IndexType::Unique
+                        } else {
+                            IndexType::Normal
                         },
                     })
                 }
@@ -594,7 +596,7 @@ impl SqlSchemaDescriber {
             let name = row.get("name").and_then(|x| x.to_string()).unwrap();
             let value = row.get("value").and_then(|x| x.to_string()).unwrap();
 
-            let values = enum_values.entry(name).or_insert(vec![]);
+            let values = enum_values.entry(name).or_insert_with(Vec::new);
             values.push(value);
         }
 
@@ -625,15 +627,15 @@ fn get_column_type<'a>(
     full_data_type: &'a str,
     character_maximum_length: Option<i64>,
     arity: ColumnArity,
-    enums: &Vec<Enum>,
+    enums: &[Enum],
 ) -> ColumnType {
     use ColumnTypeFamily::*;
-    let trim = |name: &'a str| name.trim_start_matches("_");
+    let trim = |name: &'a str| name.trim_start_matches('_');
     let enum_exists = |name: &'a str| enums.iter().any(|e| e.name == name);
 
     let family: ColumnTypeFamily = match full_data_type {
         x if data_type == "USER-DEFINED" && enum_exists(x) => Enum(x.to_owned()),
-        x if data_type == "ARRAY" && x.starts_with("_") && enum_exists(trim(x)) => Enum(trim(x).to_owned()),
+        x if data_type == "ARRAY" && x.starts_with('_') && enum_exists(trim(x)) => Enum(trim(x).to_owned()),
         "int2" | "_int2" => Int,
         "int4" | "_int4" => Int,
         "int8" | "_int8" => Int,
@@ -725,7 +727,7 @@ fn is_autoincrement(value: &str, schema_name: &str, table_name: &str, column_nam
 }
 
 fn unsuffix_default_literal<'a>(literal: &'a str, data_type: &str, full_data_type: &str) -> Option<Cow<'a, str>> {
-    const POSTGRES_DATA_TYPE_SUFFIX_RE: Lazy<Regex> =
+    static POSTGRES_DATA_TYPE_SUFFIX_RE: Lazy<Regex> =
         Lazy::new(|| Regex::new(r#"(?ms)^(.*)::(\\")?(.*)(\\")?$"#).unwrap());
 
     let captures = POSTGRES_DATA_TYPE_SUFFIX_RE.captures(literal)?;
@@ -741,7 +743,7 @@ fn unsuffix_default_literal<'a>(literal: &'a str, data_type: &str, full_data_typ
 }
 
 // See https://www.postgresql.org/docs/9.3/sql-syntax-lexical.html
-fn process_string_literal<'a>(literal: &'a str) -> Cow<'a, str> {
+fn process_string_literal(literal: &str) -> Cow<'_, str> {
     static POSTGRES_STRING_DEFAULT_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"(?ms)^B?'(.*)'$"#).unwrap());
     static POSTGRES_DEFAULT_QUOTE_UNESCAPE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"'(')"#).unwrap());
     static POSTGRES_DEFAULT_BACKSLASH_UNESCAPE_RE: Lazy<Regex> =
