@@ -19,6 +19,10 @@ impl DefaultValue {
             Self::Expression(g) => g.generate(),
         }
     }
+
+    pub fn new_db_generated() -> Self {
+        DefaultValue::Expression(ValueGenerator::new_dbgenerated())
+    }
 }
 
 #[derive(Clone)]
