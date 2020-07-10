@@ -2,6 +2,7 @@ use crate::{error::ConnectorError, steps::*, ConnectorResult};
 use chrono::{DateTime, Utc};
 use datamodel::{ast::SchemaAst, error::ErrorCollection, Datamodel};
 use serde::Serialize;
+use std::str::FromStr;
 
 /// This trait is implemented by each connector. It provides a generic API to store and retrieve [Migration](struct.Migration.html) records.
 #[async_trait::async_trait]
@@ -143,12 +144,12 @@ impl Migration {
         MigrationUpdateParams {
             name: self.name.clone(),
             new_name: self.name.clone(),
-            revision: self.revision.clone(),
-            status: self.status.clone(),
+            revision: self.revision,
+            status: self.status,
             applied: self.applied,
             rolled_back: self.rolled_back,
             errors: self.errors.clone(),
-            finished_at: self.finished_at.clone(),
+            finished_at: self.finished_at,
         }
     }
 
@@ -202,19 +203,6 @@ impl MigrationStatus {
         }
     }
 
-    pub fn from_str(s: String) -> MigrationStatus {
-        match s.as_ref() {
-            "Pending" => MigrationStatus::Pending,
-            "MigrationInProgress" => MigrationStatus::MigrationInProgress,
-            "MigrationSuccess" => MigrationStatus::MigrationSuccess,
-            "MigrationFailure" => MigrationStatus::MigrationFailure,
-            "RollingBack" => MigrationStatus::RollingBack,
-            "RollbackSuccess" => MigrationStatus::RollbackSuccess,
-            "RollbackFailure" => MigrationStatus::RollbackFailure,
-            _ => panic!("MigrationStatus {:?} is not known", s),
-        }
-    }
-
     pub fn is_success(&self) -> bool {
         match self {
             MigrationStatus::MigrationSuccess => true,
@@ -227,6 +215,25 @@ impl MigrationStatus {
             MigrationStatus::Pending => true,
             _ => false,
         }
+    }
+}
+
+impl FromStr for MigrationStatus {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let status = match s {
+            "Pending" => MigrationStatus::Pending,
+            "MigrationInProgress" => MigrationStatus::MigrationInProgress,
+            "MigrationSuccess" => MigrationStatus::MigrationSuccess,
+            "MigrationFailure" => MigrationStatus::MigrationFailure,
+            "RollingBack" => MigrationStatus::RollingBack,
+            "RollbackSuccess" => MigrationStatus::RollbackSuccess,
+            "RollbackFailure" => MigrationStatus::RollbackFailure,
+            _ => return Err(format!("MigrationStatus {:?} is not known", s)),
+        };
+
+        Ok(status)
     }
 }
 
