@@ -1,11 +1,11 @@
 use super::{
-    helpers::{parsing_catch_all, ToIdentifier, TokenExtensions},
+    helpers::{parsing_catch_all, ToIdentifier, Token, TokenExtensions},
     parse_expression::parse_arg_value,
     Rule,
 };
 use crate::ast::*;
 
-pub fn parse_directive(token: &pest::iterators::Pair<'_, Rule>) -> Directive {
+pub fn parse_directive(token: &Token) -> Directive {
     let mut name: Option<Identifier> = None;
     let mut arguments: Vec<Argument> = vec![];
 
@@ -28,7 +28,7 @@ pub fn parse_directive(token: &pest::iterators::Pair<'_, Rule>) -> Directive {
     }
 }
 
-fn parse_directive_args(token: &pest::iterators::Pair<'_, Rule>, arguments: &mut Vec<Argument>) {
+fn parse_directive_args(token: &Token, arguments: &mut Vec<Argument>) {
     for current in token.filtered_children().into_iter() {
         match current.as_rule() {
             // This is a named arg.
@@ -44,7 +44,7 @@ fn parse_directive_args(token: &pest::iterators::Pair<'_, Rule>, arguments: &mut
     }
 }
 
-fn parse_directive_arg(token: &pest::iterators::Pair<'_, Rule>) -> Argument {
+fn parse_directive_arg(token: &Token) -> Argument {
     let mut name: Option<Identifier> = None;
     let mut argument: Option<Expression> = None;
 

@@ -1,5 +1,5 @@
 use super::{
-    helpers::{parsing_catch_all, ToIdentifier},
+    helpers::{parsing_catch_all, ToIdentifier, Token},
     parse_comments::*,
     parse_directive::parse_directive,
     Rule,
@@ -8,7 +8,7 @@ use crate::ast::parser::helpers::TokenExtensions;
 use crate::ast::*;
 use crate::error::{DatamodelError, ErrorCollection};
 
-pub fn parse_enum(token: &pest::iterators::Pair<'_, Rule>) -> Result<Enum, ErrorCollection> {
+pub fn parse_enum(token: &Token) -> Result<Enum, ErrorCollection> {
     let mut errors = ErrorCollection::new();
     let mut name: Option<Identifier> = None;
     let mut directives: Vec<Directive> = vec![];
@@ -49,7 +49,7 @@ pub fn parse_enum(token: &pest::iterators::Pair<'_, Rule>) -> Result<Enum, Error
     }
 }
 
-fn parse_enum_value(enum_name: &str, token: &pest::iterators::Pair<'_, Rule>) -> Result<EnumValue, DatamodelError> {
+fn parse_enum_value(enum_name: &str, token: &Token) -> Result<EnumValue, DatamodelError> {
     let mut name: Option<Identifier> = None;
     let mut directives: Vec<Directive> = vec![];
     let mut comments: Vec<String> = vec![];

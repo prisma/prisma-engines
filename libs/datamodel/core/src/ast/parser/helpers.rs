@@ -14,7 +14,7 @@ impl ToIdentifier for pest::iterators::Pair<'_, Rule> {
     }
 }
 
-pub fn parsing_catch_all(token: &pest::iterators::Pair<'_, Rule>, kind: &str) {
+pub fn parsing_catch_all(token: &Token, kind: &str) {
     match token.as_rule() {
         Rule::comment | Rule::comment_and_new_line | Rule::comment_block => {}
         x => unreachable!(

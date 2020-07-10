@@ -1,5 +1,5 @@
 use super::{
-    helpers::{parsing_catch_all, ToIdentifier, TokenExtensions},
+    helpers::{parsing_catch_all, ToIdentifier, Token, TokenExtensions},
     parse_comments::*,
     parse_expression::parse_expression,
     Rule,
@@ -7,7 +7,7 @@ use super::{
 use crate::ast::*;
 use crate::error::{DatamodelError, ErrorCollection};
 
-pub fn parse_source(token: &pest::iterators::Pair<'_, Rule>) -> Result<SourceConfig, ErrorCollection> {
+pub fn parse_source(token: &Token) -> Result<SourceConfig, ErrorCollection> {
     let mut errors = ErrorCollection::new();
     let mut name: Option<Identifier> = None;
     let mut properties: Vec<Argument> = vec![];
@@ -42,7 +42,7 @@ pub fn parse_source(token: &pest::iterators::Pair<'_, Rule>) -> Result<SourceCon
     }
 }
 
-pub fn parse_generator(token: &pest::iterators::Pair<'_, Rule>) -> Result<GeneratorConfig, ErrorCollection> {
+pub fn parse_generator(token: &Token) -> Result<GeneratorConfig, ErrorCollection> {
     let mut errors = ErrorCollection::new();
     let mut name: Option<Identifier> = None;
     let mut properties: Vec<Argument> = vec![];
@@ -78,7 +78,7 @@ pub fn parse_generator(token: &pest::iterators::Pair<'_, Rule>) -> Result<Genera
     }
 }
 
-fn parse_key_value(token: &pest::iterators::Pair<'_, Rule>) -> Argument {
+fn parse_key_value(token: &Token) -> Argument {
     let mut name: Option<Identifier> = None;
     let mut value: Option<Expression> = None;
 

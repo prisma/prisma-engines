@@ -1,5 +1,5 @@
 use super::{
-    helpers::{parsing_catch_all, ToIdentifier, TokenExtensions},
+    helpers::{parsing_catch_all, ToIdentifier, Token, TokenExtensions},
     parse_comments::parse_comment_block,
     parse_directive::parse_directive,
     Rule,
@@ -7,7 +7,7 @@ use super::{
 use crate::ast::*;
 use crate::error::DatamodelError;
 
-pub fn parse_type_alias(token: &pest::iterators::Pair<'_, Rule>) -> Field {
+pub fn parse_type_alias(token: &Token) -> Field {
     let mut name: Option<Identifier> = None;
     let mut directives: Vec<Directive> = vec![];
     let mut base_type: Option<(String, Span)> = None;
@@ -44,7 +44,7 @@ pub fn parse_type_alias(token: &pest::iterators::Pair<'_, Rule>) -> Field {
     }
 }
 
-pub fn parse_field_type(token: &pest::iterators::Pair<'_, Rule>) -> Result<(FieldArity, String), DatamodelError> {
+pub fn parse_field_type(token: &Token) -> Result<(FieldArity, String), DatamodelError> {
     let current = token.first_child();
     match current.as_rule() {
         Rule::optional_type => Ok((FieldArity::Optional, parse_base_type(&current))),
@@ -66,7 +66,7 @@ pub fn parse_field_type(token: &pest::iterators::Pair<'_, Rule>) -> Result<(Fiel
     }
 }
 
-fn parse_base_type(token: &pest::iterators::Pair<'_, Rule>) -> String {
+fn parse_base_type(token: &Token) -> String {
     let current = token.first_child();
     match current.as_rule() {
         Rule::non_empty_identifier => current.as_str().to_string(),

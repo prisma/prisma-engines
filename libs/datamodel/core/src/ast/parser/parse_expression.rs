@@ -2,11 +2,11 @@ use once_cell::sync::Lazy;
 use regex::Regex;
 use std::borrow::Cow;
 
-use super::helpers::{parsing_catch_all, TokenExtensions};
+use super::helpers::{parsing_catch_all, Token, TokenExtensions};
 use super::Rule;
 use crate::ast::*;
 
-pub fn parse_expression(token: &pest::iterators::Pair<'_, Rule>) -> Expression {
+pub fn parse_expression(token: &Token) -> Expression {
     let first_child = token.first_child();
     let span = Span::from_pest(first_child.as_span());
     match first_child.as_rule() {
@@ -23,7 +23,7 @@ pub fn parse_expression(token: &pest::iterators::Pair<'_, Rule>) -> Expression {
     }
 }
 
-fn parse_function(token: &pest::iterators::Pair<'_, Rule>) -> Expression {
+fn parse_function(token: &Token) -> Expression {
     let mut name: Option<String> = None;
     let mut arguments: Vec<Expression> = vec![];
 
@@ -41,7 +41,7 @@ fn parse_function(token: &pest::iterators::Pair<'_, Rule>) -> Expression {
     }
 }
 
-fn parse_array(token: &pest::iterators::Pair<'_, Rule>) -> Expression {
+fn parse_array(token: &Token) -> Expression {
     let mut elements: Vec<Expression> = vec![];
 
     for current in token.filtered_children().into_iter() {
@@ -54,7 +54,7 @@ fn parse_array(token: &pest::iterators::Pair<'_, Rule>) -> Expression {
     Expression::Array(elements, Span::from_pest(token.as_span()))
 }
 
-pub fn parse_arg_value(token: &pest::iterators::Pair<'_, Rule>) -> Expression {
+pub fn parse_arg_value(token: &Token) -> Expression {
     let current = token.first_child();
     match current.as_rule() {
         Rule::expression => parse_expression(&current),
@@ -62,7 +62,7 @@ pub fn parse_arg_value(token: &pest::iterators::Pair<'_, Rule>) -> Expression {
     }
 }
 
-fn parse_string_literal(token: &pest::iterators::Pair<'_, Rule>) -> String {
+fn parse_string_literal(token: &Token) -> String {
     let current = token.first_child();
     match current.as_rule() {
         Rule::string_content => unescape_string_literal(current.as_str()).into_owned(),

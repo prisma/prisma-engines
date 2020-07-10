@@ -4,7 +4,7 @@ use super::{
 };
 use crate::ast::Comment;
 
-pub fn parse_comment_block(token: &pest::iterators::Pair<'_, Rule>) -> Comment {
+pub fn parse_comment_block(token: &Token) -> Comment {
     let mut comments: Vec<String> = Vec::new();
     for comment in token.clone().into_inner() {
         match comment.as_rule() {

@@ -1,5 +1,5 @@
 use super::{
-    helpers::{parsing_catch_all, ToIdentifier, TokenExtensions},
+    helpers::{parsing_catch_all, ToIdentifier, Token, TokenExtensions},
     parse_comments::*,
     parse_directive::parse_directive,
     parse_field::parse_field,
@@ -8,7 +8,7 @@ use super::{
 use crate::ast::*;
 use crate::error::{DatamodelError, ErrorCollection};
 
-pub fn parse_model(token: &pest::iterators::Pair<'_, Rule>) -> Result<Model, ErrorCollection> {
+pub fn parse_model(token: &Token) -> Result<Model, ErrorCollection> {
     let mut errors = ErrorCollection::new();
     let mut name: Option<Identifier> = None;
     let mut directives: Vec<Directive> = vec![];
