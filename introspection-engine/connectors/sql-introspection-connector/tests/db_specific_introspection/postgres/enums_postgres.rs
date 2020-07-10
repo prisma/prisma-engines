@@ -22,9 +22,9 @@ async fn introspecting_a_table_enums_should_work(api: &TestApi) {
 
     let dm = r#"
         model Book {
+            id      Int     @default(autoincrement()) @id
             color   color
             color2  color2
-            id      Int     @default(autoincrement()) @id
         }
 
         enum color{
@@ -70,9 +70,9 @@ async fn introspecting_a_table_enums_should_return_alphabetically_even_when_in_d
 
     let dm = r#"
         model Book {
-            color   color
-            color2  color2
             id      Int     @default(autoincrement()) @id
+            color2  color2
+            color   color
         }
 
         enum color{
@@ -120,8 +120,8 @@ async fn introspecting_a_table_enums_array_should_work(api: &TestApi) {
         }
 
         model Book {
-            color   color[]
             id      Int     @default(autoincrement()) @id
+            color   color[]
         }
 
         enum color{
@@ -151,8 +151,8 @@ async fn introspecting_a_table_with_enum_default_values_should_work(api: &TestAp
 
     let dm = r#"
         model Book {
-            color   color   @default(black)
             id      Int     @default(autoincrement()) @id
+            color   color   @default(black)
         }
 
         enum color{
@@ -182,8 +182,8 @@ async fn introspecting_a_table_with_enum_default_values_should_work_2(api: &Test
 
     let dm = r#"
         model Book {
-            color   color   @default(black)
             id      Int     @default(autoincrement()) @id
+            color   color   @default(black)
         }
 
         enum color{
@@ -213,8 +213,8 @@ async fn introspecting_a_table_with_enum_default_values_that_look_like_booleans_
 
     let dm = r#"
         model News {
-            confirmed   truth   @default(true)
             id          Int     @default(autoincrement()) @id
+            confirmed   truth   @default(true)
         }
 
         enum truth{
@@ -289,8 +289,8 @@ async fn introspecting_a_table_with_an_enum_default_value_that_is_an_empty_strin
 
     let dm = r#"
         model News {
-            content     strings     @default(EMPTY_ENUM_VALUE)
             id          Int         @default(autoincrement()) @id
+            content     strings     @default(EMPTY_ENUM_VALUE)
         }
 
         enum strings{

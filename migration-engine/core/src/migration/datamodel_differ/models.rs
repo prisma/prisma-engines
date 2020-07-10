@@ -140,7 +140,7 @@ pub(super) fn directive_is_repeated(directive: &&ast::Directive) -> bool {
 mod tests {
     use super::super::TopDiffer;
     use super::*;
-    use datamodel::ast::parser::parse;
+    use datamodel::ast::parser::parse_schema;
 
     fn dog_datamodels_test(test_fn: impl FnOnce(ModelDiffer<'_>)) {
         let previous = r#"
@@ -160,7 +160,7 @@ mod tests {
             Curly
         }
         "#;
-        let previous = parse(previous).unwrap();
+        let previous = parse_schema(previous).unwrap();
         let next = r#"
         model Dog {
             id Int @id
@@ -172,7 +172,7 @@ mod tests {
             @@customDirective(hasFur: "Most of the time")
         }
         "#;
-        let next = parse(next).unwrap();
+        let next = parse_schema(next).unwrap();
 
         let top_differ = TopDiffer {
             previous: &previous,
@@ -267,7 +267,7 @@ mod tests {
                 @@unique([c, d])
             }
         "#;
-        let previous = parse(previous).unwrap();
+        let previous = parse_schema(previous).unwrap();
         let next = r#"
             model Test {
                 id Int @id
@@ -281,7 +281,7 @@ mod tests {
                 @@unique([b, d])
             }
         "#;
-        let next = parse(next).unwrap();
+        let next = parse_schema(next).unwrap();
 
         let top_differ = TopDiffer {
             previous: &previous,

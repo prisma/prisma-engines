@@ -24,11 +24,11 @@ async fn introspecting_native_arrays_should_work(api: &TestApi) {
             }
 
             model Post {
-               bools    Boolean []
-               floats   Float []
                id      Int @id @default(autoincrement())
                ints     Int []
+               bools    Boolean []
                strings  String []
+               floats   Float []
                }
         "#;
     let result = dbg!(api.introspect().await);

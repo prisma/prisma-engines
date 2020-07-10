@@ -1,4 +1,4 @@
-use crate::interpreter::query_interpreters::nested_pagination::NestedPagination;
+use super::inmemory_record_processor::InMemoryRecordProcessor;
 use crate::{interpreter::InterpretationResult, query_ast::*};
 use connector::{self, filter::Filter, ConnectionLike, QueryArguments, ReadOperations, ScalarCompare};
 use prisma_models::{ManyRecords, ModelProjection, Record, RecordProjection, RelationFieldRef};
@@ -9,7 +9,7 @@ pub async fn m2m<'a, 'b>(
     tx: &'a ConnectionLike<'a, 'b>,
     query: &RelatedRecordsQuery,
     parent_result: Option<&'a ManyRecords>,
-    paginator: NestedPagination,
+    processor: InMemoryRecordProcessor,
 ) -> InterpretationResult<ManyRecords> {
     let parent_field = &query.parent_field;
     let child_link_id = parent_field.related_field().linking_fields();
@@ -93,7 +93,7 @@ pub async fn m2m<'a, 'b>(
         }
     }
 
-    Ok(paginator.apply_pagination(scalars))
+    Ok(processor.apply(scalars))
 }
 
 // [DTODO] This is implemented in an inefficient fashion, e.g. too much Arc cloning going on.
@@ -104,7 +104,7 @@ pub async fn one2m<'a, 'b>(
     parent_result: Option<&'a ManyRecords>,
     query_args: QueryArguments,
     selected_fields: &ModelProjection,
-    paginator: NestedPagination,
+    processor: InMemoryRecordProcessor,
 ) -> InterpretationResult<ManyRecords> {
     let parent_model_id = parent_field.model().primary_identifier();
     let parent_link_id = parent_field.linking_fields();
@@ -208,5 +208,5 @@ pub async fn one2m<'a, 'b>(
         ));
     }
 
-    Ok(paginator.apply_pagination(scalars))
+    Ok(processor.apply(scalars))
 }

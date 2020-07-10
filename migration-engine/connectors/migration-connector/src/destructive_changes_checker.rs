@@ -70,7 +70,7 @@ pub struct MigrationError {
     pub field: Option<String>,
 }
 
-#[derive(Debug, Serialize, PartialEq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq)]
 pub struct UnexecutableMigration {
     pub description: String,
 }

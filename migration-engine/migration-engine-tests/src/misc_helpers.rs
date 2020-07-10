@@ -7,7 +7,7 @@ use test_setup::*;
 pub type TestResult = Result<(), anyhow::Error>;
 
 pub fn parse(datamodel_string: &str) -> SchemaAst {
-    parser::parse(datamodel_string).unwrap()
+    parser::parse_schema(datamodel_string).unwrap()
 }
 
 pub(super) async fn mysql_migration_connector(url_str: &str) -> SqlMigrationConnector {

@@ -310,8 +310,8 @@ async fn re_introspecting_mapped_enum_name(api: &TestApi) {
             }
             
              model User {
-               color            BlackNWhite            
                id               Int @id @default(autoincrement())
+               color            BlackNWhite            
             }
             
             enum BlackNWhite{
@@ -348,8 +348,8 @@ async fn re_introspecting_mapped_enum_value_name(api: &TestApi) {
 
     let input_dm = r#"
             model User {
-               color            color @default(BLACK)            
                id               Int @id @default(autoincrement())
+               color            color @default(BLACK)            
             }
             
             enum color{
@@ -364,8 +364,8 @@ async fn re_introspecting_mapped_enum_value_name(api: &TestApi) {
             }
             
              model User {
-               color            color @default(BLACK)            
                id               Int @id @default(autoincrement())
+               color            color @default(BLACK)            
             }
             
             enum color{
@@ -400,8 +400,8 @@ async fn re_introspecting_manually_remapped_enum_value_name(api: &TestApi) {
 
     let input_dm = r#"
             model User {
-               color            color @default(BLACK)            
                id               Int @id @default(autoincrement())
+               color            color @default(BLACK)            
             }
             
             enum color{
@@ -416,8 +416,8 @@ async fn re_introspecting_manually_remapped_enum_value_name(api: &TestApi) {
             }
             
              model User {
-               color            color @default(BLACK)            
                id               Int @id @default(autoincrement())
+               color            color @default(BLACK)            
             }
             
             enum color{
@@ -470,8 +470,8 @@ async fn re_introspecting_manually_re_mapped_enum_name(api: &TestApi) {
             }
             
              model User {
-               color            BlackNWhite            
                id               Int @id @default(autoincrement())
+               color            BlackNWhite            
             }
             
             enum BlackNWhite{
@@ -515,9 +515,9 @@ async fn re_introspecting_multiple_changed_relation_names(api: &TestApi) {
             }
             
             model Schedule {
-                  eveningEmployeeId                             Int
                   id                                            Int         @default(autoincrement()) @id
                   morningEmployeeId                             Int
+                  eveningEmployeeId                             Int
                   Employee_EmployeeToSchedule_eveningEmployeeId Employee    @relation("EmployeeToSchedule_eveningEmployeeId", fields: [eveningEmployeeId], references: [id])
                   Employee_EmployeeToSchedule_morningEmployeeId Employee    @relation("EmployeeToSchedule_morningEmployeeId", fields: [morningEmployeeId], references: [id])
             }
@@ -531,9 +531,9 @@ async fn re_introspecting_multiple_changed_relation_names(api: &TestApi) {
             }
             
             model Schedule {
-                  eveningEmployeeId                             Int
                   id                                            Int         @default(autoincrement()) @id
                   morningEmployeeId                             Int
+                  eveningEmployeeId                             Int
                   Employee_EmployeeToSchedule_eveningEmployeeId Employee    @relation("EmployeeToSchedule_eveningEmployeeId", fields: [eveningEmployeeId], references: [id])
                   Employee_EmployeeToSchedule_morningEmployeeId Employee    @relation("EmployeeToSchedule_morningEmployeeId", fields: [morningEmployeeId], references: [id])
             }

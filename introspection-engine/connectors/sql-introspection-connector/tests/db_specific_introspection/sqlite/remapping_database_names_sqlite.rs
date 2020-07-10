@@ -23,16 +23,16 @@ async fn remapping_fields_with_invalid_characters_should_work(api: &TestApi) {
         .await;
     let dm = r#"
             model User {
+               id     Int @id @default(autoincrement())
+               a      String @map("_a")
+               b      String @map("*b")
+               c      String @map("?c")
                d      String @map("(d")
                e      String @map(")e")
-               b      String @map("*b")
                f      String @map("/f")
-               c      String @map("?c")
-               a      String @map("_a")
                g_a    String @map("g a")
                h_a    String @map("h-a")
                h1     String
-               id     Int @id @default(autoincrement())
             }
         "#;
     let result = dbg!(api.introspect().await);
@@ -131,8 +131,8 @@ async fn remapping_models_in_compound_relations_should_work(api: &TestApi) {
 
     let dm = r#"
             model User_with_Space {
-                age  Int
                 id   Int   @default(autoincrement()) @id
+                age  Int
                 Post Post?
                   
                 @@map("User with Space")
@@ -141,8 +141,8 @@ async fn remapping_models_in_compound_relations_should_work(api: &TestApi) {
                       
             model Post {
                 id              Int             @default(autoincrement()) @id
-                user_age        Int
                 user_id         Int
+                user_age        Int
                 User_with_Space User_with_Space  @relation(fields: [user_id, user_age], references: [id, age])
                               
                 @@unique([user_id, user_age], name: "sqlite_autoindex_Post_1")
@@ -175,8 +175,8 @@ async fn remapping_fields_in_compound_relations_should_work(api: &TestApi) {
 
     let dm = r#"
             model User {
-                age_that_is_invalid Int   @map("age-that-is-invalid")
                 id                  Int   @default(autoincrement()) @id
+                age_that_is_invalid Int   @map("age-that-is-invalid")
                 Post                Post?
                     
                 @@unique([id, age_that_is_invalid], name: "sqlite_autoindex_User_1")
@@ -184,8 +184,8 @@ async fn remapping_fields_in_compound_relations_should_work(api: &TestApi) {
                 
             model Post {
                 id       Int  @default(autoincrement()) @id
-                user_age Int
                 user_id  Int
+                user_age Int
                 User     User @relation(fields: [user_id, user_age], references: [id, age_that_is_invalid])
                     
                 @@unique([user_id, user_age], name: "sqlite_autoindex_Post_1")

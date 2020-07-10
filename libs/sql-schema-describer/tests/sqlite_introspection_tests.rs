@@ -26,7 +26,7 @@ async fn sqlite_column_types_must_work() {
     let inspector = get_sqlite_describer(&full_sql, "sqlite_column_types_must_work").await;
     let result = inspector.describe(SCHEMA).await.expect("describing");
     let table = result.get_table("User").expect("couldn't get User table");
-    let mut expected_columns = vec![
+    let expected_columns = vec![
         Column {
             name: "int_col".to_string(),
             tpe: ColumnType {
@@ -100,7 +100,6 @@ async fn sqlite_column_types_must_work() {
             auto_increment: false,
         },
     ];
-    expected_columns.sort_unstable_by_key(|c| c.name.to_owned());
 
     assert_eq!(
         table,
@@ -143,6 +142,18 @@ async fn sqlite_foreign_key_on_delete_must_be_handled() {
         Table {
             name: "User".to_string(),
             columns: vec![
+                Column {
+                    name: "id".to_string(),
+                    tpe: ColumnType {
+                        data_type: "INTEGER".to_string(),
+                        full_data_type: "INTEGER".to_string(),
+                        character_maximum_length: None,
+                        family: ColumnTypeFamily::Int,
+                        arity: ColumnArity::Required,
+                    },
+                    default: None,
+                    auto_increment: true,
+                },
                 Column {
                     name: "city".to_string(),
                     tpe: ColumnType {
@@ -203,18 +214,6 @@ async fn sqlite_foreign_key_on_delete_must_be_handled() {
                     },
                     default: None,
                     auto_increment: false,
-                },
-                Column {
-                    name: "id".to_string(),
-                    tpe: ColumnType {
-                        data_type: "INTEGER".to_string(),
-                        full_data_type: "INTEGER".to_string(),
-                        character_maximum_length: None,
-                        family: ColumnTypeFamily::Int,
-                        arity: ColumnArity::Required,
-                    },
-                    default: None,
-                    auto_increment: true,
                 },
             ],
             indices: vec![],

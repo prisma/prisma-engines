@@ -156,10 +156,9 @@ pub trait ReadOperations {
     /// Gets multiple records from the database.
     ///
     /// - The `ModelRef` represents the datamodel and its relations.
-    /// - The `QueryArguments` defines the filter and ordering of the returned
-    ///   data, other parameters are currently not necessary due to windowing
-    ///   handled in the core.
-    /// - The `SelectedFields` defines the values to be returned.
+    /// - The `QueryArguments` defines various constraints (see docs for detailed explanation).
+    /// - The `SelectedFields` defines the fields (e.g. columns or document fields)
+    ///   to be returned as a projection of fields of the model it queries.
     async fn get_many_records(
         &self,
         model: &ModelRef,

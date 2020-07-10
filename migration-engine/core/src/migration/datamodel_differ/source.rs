@@ -45,7 +45,7 @@ impl<'a> SourceArgumentsDiffer<'a> {
 mod tests {
     use super::super::TopDiffer;
     use super::*;
-    use datamodel::ast::parser::parse;
+    use datamodel::ast::parser::parse_schema;
 
     fn custom_datasource_test_setup(test_fn: impl FnOnce(SourceArgumentsDiffer<'_>)) {
         let previous = r#"
@@ -54,14 +54,14 @@ mod tests {
             foo = "yes"
         }
         "#;
-        let previous = parse(previous).unwrap();
+        let previous = parse_schema(previous).unwrap();
         let next = r#"
         datasource mydb {
             provider = "somecustom"
             bar = "no"
         }
         "#;
-        let next = parse(next).unwrap();
+        let next = parse_schema(next).unwrap();
 
         let differ = TopDiffer {
             previous: &previous,

@@ -6,7 +6,7 @@
 //! assume the data has to be because of the structural guarantees of the query schema validation.
 use super::*;
 use chrono::prelude::*;
-use prisma_models::{OrderBy, PrismaValue};
+use prisma_models::{OrderBy, PrismaValue, ScalarFieldRef};
 use rust_decimal::prelude::ToPrimitive;
 use std::convert::TryInto;
 
@@ -105,6 +105,20 @@ impl TryInto<OrderBy> for ParsedInputValue {
     }
 }
 
+impl TryInto<ScalarFieldRef> for ParsedInputValue {
+    type Error = QueryParserError;
+
+    fn try_into(self) -> QueryParserResult<ScalarFieldRef> {
+        match self {
+            Self::ScalarField(f) => Ok(f),
+            v => Err(QueryParserError::AssertionError(format!(
+                "Attempted conversion of non-field-ref enum ({:?}) into scalar field reference value failed.",
+                v
+            ))),
+        }
+    }
+}
+
 impl TryInto<Option<f64>> for ParsedInputValue {
     type Error = QueryParserError;
 
@@ -167,6 +181,22 @@ impl TryInto<Option<i64>> for ParsedInputValue {
             PrismaValue::Null(_) => Ok(None),
             v => Err(QueryParserError::AssertionError(format!(
                 "Attempted conversion of non-int Prisma value type ({:?}) into int failed.",
+                v
+            ))),
+        }
+    }
+}
+
+impl TryInto<bool> for ParsedInputValue {
+    type Error = QueryParserError;
+
+    fn try_into(self) -> QueryParserResult<bool> {
+        let prisma_value: PrismaValue = self.try_into()?;
+
+        match prisma_value {
+            PrismaValue::Boolean(b) => Ok(b),
+            v => Err(QueryParserError::AssertionError(format!(
+                "Attempted conversion of non-boolean Prisma value type ({:?}) into bool failed.",
                 v
             ))),
         }

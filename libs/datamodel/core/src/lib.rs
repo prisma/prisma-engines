@@ -100,7 +100,7 @@ fn parse_datamodel_internal(
     datamodel_string: &str,
     ignore_datasource_urls: bool,
 ) -> Result<Datamodel, error::ErrorCollection> {
-    let ast = ast::parser::parse(datamodel_string)?;
+    let ast = ast::parser::parse_schema(datamodel_string)?;
     let sources = load_sources(&ast, ignore_datasource_urls, vec![])?;
     let validator = ValidationPipeline::with_sources(&sources);
 
@@ -125,12 +125,12 @@ pub fn lift_ast_to_datamodel(ast: &ast::SchemaAst) -> Result<Datamodel, error::E
 }
 
 pub fn parse_schema_ast(datamodel_string: &str) -> Result<SchemaAst, error::ErrorCollection> {
-    ast::parser::parse(datamodel_string)
+    ast::parser::parse_schema(datamodel_string)
 }
 
 /// Loads all configuration blocks from a datamodel using the built-in source definitions.
 pub fn parse_configuration(datamodel_string: &str) -> Result<Configuration, error::ErrorCollection> {
-    let ast = ast::parser::parse(datamodel_string)?;
+    let ast = ast::parser::parse_schema(datamodel_string)?;
     let datasources = load_sources(&ast, false, vec![])?;
     let generators = GeneratorLoader::load_generators_from_ast(&ast)?;
 
@@ -145,7 +145,7 @@ pub fn parse_configuration_with_url_overrides(
     schema: &str,
     datasource_url_overrides: Vec<(String, String)>,
 ) -> Result<Configuration, error::ErrorCollection> {
-    let ast = ast::parser::parse(schema)?;
+    let ast = ast::parser::parse_schema(schema)?;
     let datasources = load_sources(&ast, false, datasource_url_overrides)?;
     let generators = GeneratorLoader::load_generators_from_ast(&ast)?;
 
@@ -158,7 +158,7 @@ pub fn parse_configuration_with_url_overrides(
 pub fn parse_configuration_and_ignore_datasource_urls(
     datamodel_string: &str,
 ) -> Result<Configuration, error::ErrorCollection> {
-    let ast = ast::parser::parse(datamodel_string)?;
+    let ast = ast::parser::parse_schema(datamodel_string)?;
     let datasources = load_sources(&ast, true, vec![])?;
     let generators = GeneratorLoader::load_generators_from_ast(&ast)?;
 

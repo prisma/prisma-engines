@@ -9,6 +9,9 @@ jobs:
       SQLITE_MAX_EXPR_DEPTH: 10000
     runs-on: windows-latest
     steps:
+      - name: Output link to real commit
+        run: echo ${{ github.repository }}/commit/${{ github.event.client_payload.commit }}
+
       - name: Checkout ${{ github.event.client_payload.commit }}
         uses: actions/checkout@v2
         with:

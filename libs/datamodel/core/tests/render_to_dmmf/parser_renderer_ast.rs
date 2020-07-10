@@ -199,5 +199,5 @@ fn render_schema_ast_to_string(schema: &datamodel::ast::SchemaAst) -> String {
 }
 
 fn parse_to_ast(datamodel_string: &str) -> Result<datamodel::ast::SchemaAst, datamodel::error::ErrorCollection> {
-    datamodel::ast::parser::parse(datamodel_string)
+    datamodel::ast::parser::parse_schema(datamodel_string)
 }

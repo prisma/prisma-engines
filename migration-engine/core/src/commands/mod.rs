@@ -32,6 +32,5 @@ pub struct MigrationStepsResultOutput {
     pub warnings: Vec<MigrationWarning>,
     pub errors: Vec<MigrationError>,
     pub general_errors: Vec<String>,
-    #[serde(skip)]
     pub unexecutable_migrations: Vec<UnexecutableMigration>,
 }

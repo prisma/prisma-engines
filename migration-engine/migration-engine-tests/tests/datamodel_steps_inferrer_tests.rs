@@ -1614,5 +1614,5 @@ fn infer(dm1: &SchemaAst, dm2: &SchemaAst) -> Vec<MigrationStep> {
 }
 
 fn parse(input: &str) -> SchemaAst {
-    parser::parse(input).unwrap()
+    parser::parse_schema(input).unwrap()
 }

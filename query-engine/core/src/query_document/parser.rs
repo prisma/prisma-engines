@@ -253,20 +253,25 @@ impl QueryDocumentParser {
             }
         };
 
+        let err = |name: &str| {
+            Err(QueryParserError::ValueParseError(format!(
+                "Enum value '{}' is invalid for enum type {}",
+                raw, name
+            )))
+        };
+
         match typ.borrow() {
             EnumType::Internal(i) => match i.map_input_value(&raw) {
                 Some(value) => Ok(ParsedInputValue::Single(value)),
-                None => Err(QueryParserError::ValueParseError(format!(
-                    "Enum value '{}' is invalid for enum type {}",
-                    raw, i.name
-                ))),
+                None => err(&i.name),
             },
             EnumType::OrderBy(ord) => match ord.value_for(raw.as_str()) {
                 Some(val) => Ok(ParsedInputValue::OrderBy(val.clone())),
-                None => Err(QueryParserError::ValueParseError(format!(
-                    "Enum value '{}' is invalid for enum type {}",
-                    raw, ord.name
-                ))),
+                None => err(&ord.name),
+            },
+            EnumType::FieldRef(f) => match f.value_for(raw.as_str()) {
+                Some(value) => Ok(ParsedInputValue::ScalarField(value.clone())),
+                None => err(&f.name),
             },
         }
     }

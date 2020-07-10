@@ -308,16 +308,16 @@ async fn compound_foreign_keys_should_work_for_one_to_many_relations_with_non_un
     let dm = r#"
             model Post {
                 id       Int  @default(autoincrement()) @id
-                user_age Int
                 user_id  Int
+                user_age Int
                 User     User @relation(fields: [user_id, user_age], references: [id, age])
                 
                 @@index([user_id, user_age], name: "test")
             }
             
             model User {
-                age  Int
                 id   Int    @default(autoincrement()) @id
+                age  Int
                 Post Post[]
                 
                 @@unique([id, age], name: "user_unique")

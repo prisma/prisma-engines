@@ -7,6 +7,14 @@ pub struct SkipAndLimit {
     pub limit: Option<usize>,
 }
 
+/// `QueryArguments` define various constraints queried data should fulfill:
+/// - `cursor`, `take`, `skip` page through the data.
+/// - `filter` scopes the data by defining conditions (akin to `WHERE` in SQL).
+/// - `order_by` defines the ordering of records.
+/// - `distinct` designates the fields on which the records should be distinct.
+/// - The `ignore_*` flags are a temporary bandaid to tell the connector to do not
+///   include certain constraints when building queries, because the core is already
+///   performing these action in a different manner (e.g. in-memory on all records).
 #[derive(Debug, Default, Clone)]
 pub struct QueryArguments {
     pub cursor: Option<RecordProjection>,
@@ -14,13 +22,8 @@ pub struct QueryArguments {
     pub skip: Option<i64>,
     pub filter: Option<Filter>,
     pub order_by: Option<OrderBy>,
-
-    /// Temporary marker to indicate whether or not the
-    /// `skip` argument should be ignored when building queries.
+    pub distinct: Option<ModelProjection>,
     pub ignore_skip: bool,
-
-    /// Temporary marker to indicate whether or not the
-    /// `take` argument should be ignored when building queries.
     pub ignore_take: bool,
 }
 
@@ -57,6 +60,7 @@ impl QueryArguments {
                 let take = self.take;
                 let skip = self.skip;
                 let order_by = self.order_by;
+                let distinct = self.distinct;
                 let ignore_skip = self.ignore_skip;
                 let ignore_take = self.ignore_take;
 
@@ -69,6 +73,7 @@ impl QueryArguments {
                         skip: skip.clone(),
                         filter: Some(filter),
                         order_by: order_by.clone(),
+                        distinct: distinct.clone(),
                         ignore_skip,
                         ignore_take,
                     })
