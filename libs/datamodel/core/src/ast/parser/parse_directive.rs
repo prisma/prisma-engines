@@ -1,5 +1,5 @@
 use super::{
-    helpers::{ToIdentifier, TokenExtensions},
+    helpers::{parsing_catch_all, ToIdentifier, TokenExtensions},
     parse_expression::parse_arg_value,
     Rule,
 };
@@ -14,11 +14,7 @@ pub fn parse_directive(token: &pest::iterators::Pair<'_, Rule>) -> Directive {
             Rule::directive => return parse_directive(&current),
             Rule::directive_name => name = Some(current.to_id()),
             Rule::directive_arguments => parse_directive_args(&current, &mut arguments),
-            _ => unreachable!(
-                "Encountered impossible directive during parsing: {:?} \n {:?}",
-                token,
-                current.tokens()
-            ),
+            _ => parsing_catch_all(&current, "directive"),
         }
     }
 
@@ -43,10 +39,7 @@ fn parse_directive_args(token: &pest::iterators::Pair<'_, Rule>, arguments: &mut
                 value: parse_arg_value(&current),
                 span: Span::from_pest(current.as_span()),
             }),
-            _ => unreachable!(
-                "Encountered impossible directive argument during parsing: {:?}",
-                current.tokens()
-            ),
+            _ => parsing_catch_all(&current, "directive arguments"),
         }
     }
 }
@@ -59,10 +52,7 @@ fn parse_directive_arg(token: &pest::iterators::Pair<'_, Rule>) -> Argument {
         match current.as_rule() {
             Rule::argument_name => name = Some(current.to_id()),
             Rule::argument_value => argument = Some(parse_arg_value(&current)),
-            _ => unreachable!(
-                "Encountered impossible directive argument during parsing: {:?}",
-                current.tokens()
-            ),
+            _ => parsing_catch_all(&current, "directive argument"),
         }
     }
 

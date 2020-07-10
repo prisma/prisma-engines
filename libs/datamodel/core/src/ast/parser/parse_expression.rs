@@ -2,7 +2,7 @@ use once_cell::sync::Lazy;
 use regex::Regex;
 use std::borrow::Cow;
 
-use super::helpers::TokenExtensions;
+use super::helpers::{parsing_catch_all, TokenExtensions};
 use super::Rule;
 use crate::ast::*;
 
@@ -31,7 +31,7 @@ fn parse_function(token: &pest::iterators::Pair<'_, Rule>) -> Expression {
         match current.as_rule() {
             Rule::non_empty_identifier => name = Some(current.as_str().to_string()),
             Rule::expression => arguments.push(parse_expression(&current)),
-            _ => unreachable!("Encountered impossible function during parsing: {:?}", current.tokens()),
+            _ => parsing_catch_all(&current, "function"),
         }
     }
 
@@ -47,7 +47,7 @@ fn parse_array(token: &pest::iterators::Pair<'_, Rule>) -> Expression {
     for current in token.filtered_children().into_iter() {
         match current.as_rule() {
             Rule::expression => elements.push(parse_expression(&current)),
-            _ => unreachable!("Encountered impossible array during parsing: {:?}", current.tokens()),
+            _ => parsing_catch_all(&current, "array"),
         }
     }
 

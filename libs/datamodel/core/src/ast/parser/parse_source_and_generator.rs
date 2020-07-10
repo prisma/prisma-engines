@@ -7,7 +7,6 @@ use super::{
 use crate::ast::*;
 use crate::error::{DatamodelError, ErrorCollection};
 
-// Source parsing
 pub fn parse_source(token: &pest::iterators::Pair<'_, Rule>) -> Result<SourceConfig, ErrorCollection> {
     let mut errors = ErrorCollection::new();
     let mut name: Option<Identifier> = None;
@@ -23,7 +22,7 @@ pub fn parse_source(token: &pest::iterators::Pair<'_, Rule>) -> Result<SourceCon
                 "This line is not a valid definition within a datasource.",
                 Span::from_pest(current.as_span()),
             )),
-            _ => parsing_catch_all(&current),
+            _ => parsing_catch_all(&current, "source"),
         }
     }
 
@@ -43,7 +42,6 @@ pub fn parse_source(token: &pest::iterators::Pair<'_, Rule>) -> Result<SourceCon
     }
 }
 
-// Generator parsing
 pub fn parse_generator(token: &pest::iterators::Pair<'_, Rule>) -> Result<GeneratorConfig, ErrorCollection> {
     let mut errors = ErrorCollection::new();
     let mut name: Option<Identifier> = None;
@@ -60,7 +58,7 @@ pub fn parse_generator(token: &pest::iterators::Pair<'_, Rule>) -> Result<Genera
                 "This line is not a valid definition within a generator.",
                 Span::from_pest(current.as_span()),
             )),
-            _ => parsing_catch_all(&current),
+            _ => parsing_catch_all(&current, "generator"),
         }
     }
 

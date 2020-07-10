@@ -10,7 +10,7 @@ pub fn parse_comment_block(token: &pest::iterators::Pair<'_, Rule>) -> Comment {
         match comment.as_rule() {
             Rule::doc_comment | Rule::doc_comment_and_new_line => comments.push(parse_doc_comment(&comment)),
             Rule::comment | Rule::comment_and_new_line => {}
-            _ => parsing_catch_all(&comment),
+            _ => parsing_catch_all(&comment, "comment block"),
         }
     }
 

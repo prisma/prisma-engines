@@ -27,7 +27,7 @@ pub fn parse_field(model_name: &str, token: &pest::iterators::Pair<'_, Rule>) ->
             Rule::directive => directives.push(parse_directive(&current)),
             Rule::doc_comment_and_new_line => comments.push(parse_doc_comment(&current)),
             Rule::doc_comment => comments.push(parse_doc_comment(&current)),
-            _ => parsing_catch_all(&current),
+            _ => parsing_catch_all(&current, "field"),
         }
     }
 

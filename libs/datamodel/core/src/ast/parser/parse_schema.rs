@@ -1,7 +1,7 @@
 use pest::Parser;
 
 use super::{
-    helpers::TokenExtensions,
+    helpers::{parsing_catch_all, TokenExtensions},
     parse_enum::parse_enum,
     parse_model::parse_model,
     parse_source_and_generator::{parse_generator, parse_source},
@@ -50,10 +50,7 @@ pub fn parse_schema(datamodel_string: &str) -> Result<SchemaAst, ErrorCollection
                         &format!("This block is invalid. It does not start with any known Prisma schema keyword."),
                         Span::from_pest(current.as_span()),
                     )),
-                    _ => panic!(
-                        "Encountered impossible datamodel declaration during parsing: {:?}",
-                        current.tokens()
-                    ),
+                    _ => parsing_catch_all(&current, "datamodel"),
                 }
             }
 

@@ -8,7 +8,6 @@ use crate::ast::parser::helpers::TokenExtensions;
 use crate::ast::*;
 use crate::error::{DatamodelError, ErrorCollection};
 
-// Enum parsing
 pub fn parse_enum(token: &pest::iterators::Pair<'_, Rule>) -> Result<Enum, ErrorCollection> {
     let mut errors = ErrorCollection::new();
     let mut name: Option<Identifier> = None;
@@ -29,7 +28,7 @@ pub fn parse_enum(token: &pest::iterators::Pair<'_, Rule>) -> Result<Enum, Error
                 "This line is not a enum value definition.",
                 Span::from_pest(current.as_span()),
             )),
-            _ => parsing_catch_all(&current),
+            _ => parsing_catch_all(&current, "enum"),
         }
     }
 
@@ -50,7 +49,6 @@ pub fn parse_enum(token: &pest::iterators::Pair<'_, Rule>) -> Result<Enum, Error
     }
 }
 
-// Enum value parsing
 fn parse_enum_value(enum_name: &str, token: &pest::iterators::Pair<'_, Rule>) -> Result<EnumValue, DatamodelError> {
     let mut name: Option<Identifier> = None;
     let mut directives: Vec<Directive> = vec![];
@@ -78,7 +76,7 @@ fn parse_enum_value(enum_name: &str, token: &pest::iterators::Pair<'_, Rule>) ->
             Rule::doc_comment_and_new_line => {
                 comments.push(parse_doc_comment(&current));
             }
-            _ => parsing_catch_all(&current),
+            _ => parsing_catch_all(&current, "enum value"),
         }
     }
 

@@ -1,5 +1,5 @@
 use super::{
-    helpers::{ToIdentifier, TokenExtensions},
+    helpers::{parsing_catch_all, ToIdentifier, TokenExtensions},
     parse_comments::parse_comment_block,
     parse_directive::parse_directive,
     Rule,
@@ -20,10 +20,7 @@ pub fn parse_type_alias(token: &pest::iterators::Pair<'_, Rule>) -> Field {
             Rule::base_type => base_type = Some((parse_base_type(&current), Span::from_pest(current.as_span()))),
             Rule::directive => directives.push(parse_directive(&current)),
             Rule::comment_block => comment = Some(parse_comment_block(&current)),
-            _ => unreachable!(
-                "Encountered impossible custom type during parsing: {:?}",
-                current.tokens()
-            ),
+            _ => parsing_catch_all(&current, "custom type"),
         }
     }
 

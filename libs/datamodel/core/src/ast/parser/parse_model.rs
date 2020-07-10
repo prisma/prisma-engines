@@ -8,7 +8,6 @@ use super::{
 use crate::ast::*;
 use crate::error::{DatamodelError, ErrorCollection};
 
-// Model parsing
 pub fn parse_model(token: &pest::iterators::Pair<'_, Rule>) -> Result<Model, ErrorCollection> {
     let mut errors = ErrorCollection::new();
     let mut name: Option<Identifier> = None;
@@ -33,7 +32,7 @@ pub fn parse_model(token: &pest::iterators::Pair<'_, Rule>) -> Result<Model, Err
                 "This line is not a valid field or directive definition.",
                 Span::from_pest(current.as_span()),
             )),
-            _ => parsing_catch_all(&current),
+            _ => parsing_catch_all(&current, "model"),
         }
     }
 
