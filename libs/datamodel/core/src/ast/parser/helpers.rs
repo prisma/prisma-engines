@@ -24,3 +24,25 @@ pub fn parsing_catch_all(token: &pest::iterators::Pair<'_, Rule>) {
         ),
     }
 }
+
+pub type Token<'a> = pest::iterators::Pair<'a, Rule>;
+
+pub trait TokenExtensions {
+    fn first_child(&self) -> Token;
+}
+
+// this is not implemented for Token because auto completion does not work then
+impl TokenExtensions for pest::iterators::Pair<'_, Rule> {
+    fn first_child(&self) -> Token<'_> {
+        self.clone()
+            .into_inner()
+            .filter(|rule| {
+                rule.as_rule() != Rule::BLOCK_CLOSE
+                    && rule.as_rule() != Rule::BLOCK_OPEN
+                    && rule.as_rule() != Rule::WHITESPACE
+                    && rule.as_rule() != Rule::NEWLINE
+            })
+            .next()
+            .unwrap()
+    }
+}

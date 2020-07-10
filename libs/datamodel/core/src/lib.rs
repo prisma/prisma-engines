@@ -19,30 +19,6 @@ macro_rules! match_children (
     );
 );
 
-// Macro to match the first child in a parse tree
-#[macro_use]
-macro_rules! match_first (
-    ($token:ident, $current:ident, $($pattern:pat => $result:expr),*) => ( {
-            // Explicit clone, as into_inner consumes the pair.
-        // We only need a reference to the pair later for logging.
-            let $current = $token.clone()
-                .into_inner()
-                .filter(|rule|
-                    rule.as_rule() != Rule::BLOCK_CLOSE &&
-                    rule.as_rule() != Rule::BLOCK_OPEN &&
-                    rule.as_rule() != Rule::WHITESPACE &&
-                    rule.as_rule() != Rule::NEWLINE
-                )
-                .next().unwrap();
-            match $current.as_rule() {
-                $(
-                    $pattern => $result
-                ),*
-            }
-        }
-    );
-);
-
 extern crate pest; // Pest grammar generation on compile time.
 #[macro_use]
 extern crate pest_derive;

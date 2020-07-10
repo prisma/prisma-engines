@@ -1,4 +1,7 @@
-use super::{helpers::parsing_catch_all, Rule};
+use super::{
+    helpers::{parsing_catch_all, Token, TokenExtensions},
+    Rule,
+};
 use crate::ast::Comment;
 
 pub fn parse_comment_block(token: &pest::iterators::Pair<'_, Rule>) -> Comment {
@@ -16,16 +19,16 @@ pub fn parse_comment_block(token: &pest::iterators::Pair<'_, Rule>) -> Comment {
     }
 }
 
-// Documentation parsing
-pub fn parse_doc_comment(token: &pest::iterators::Pair<'_, Rule>) -> String {
-    match_first! { token, current,
-        Rule::doc_content => {
-            String::from(current.as_str().trim())
-        },
-        Rule::doc_comment => {
-            parse_doc_comment(&current)
-        },
-        x => unreachable!("Encountered impossible doc comment during parsing: {:?}, {:?}", x, current.tokens())
+pub fn parse_doc_comment(token: &Token) -> String {
+    let child = token.first_child();
+    match child.as_rule() {
+        Rule::doc_content => String::from(child.as_str().trim()),
+        Rule::doc_comment => parse_doc_comment(&child),
+        x => unreachable!(
+            "Encountered impossible doc comment during parsing: {:?}, {:?}",
+            x,
+            child.tokens()
+        ),
     }
 }
 
