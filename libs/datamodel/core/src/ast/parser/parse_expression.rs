@@ -6,9 +6,6 @@ use super::helpers::TokenExtensions;
 use super::Rule;
 use crate::ast::*;
 
-// Expressions
-
-/// Parses an expression, given a Pest parser token.
 pub fn parse_expression(token: &pest::iterators::Pair<'_, Rule>) -> Expression {
     let first_child = token.first_child();
     let span = Span::from_pest(first_child.as_span());
@@ -30,11 +27,13 @@ fn parse_function(token: &pest::iterators::Pair<'_, Rule>) -> Expression {
     let mut name: Option<String> = None;
     let mut arguments: Vec<Expression> = vec![];
 
-    match_children! { token, current,
-        Rule::non_empty_identifier => name = Some(current.as_str().to_string()),
-        Rule::expression => arguments.push(parse_expression(&current)),
-        _ => unreachable!("Encountered impossible function during parsing: {:?}", current.tokens())
-    };
+    for current in token.filtered_children().into_iter() {
+        match current.as_rule() {
+            Rule::non_empty_identifier => name = Some(current.as_str().to_string()),
+            Rule::expression => arguments.push(parse_expression(&current)),
+            _ => unreachable!("Encountered impossible function during parsing: {:?}", current.tokens()),
+        }
+    }
 
     match name {
         Some(name) => Expression::Function(name, arguments, Span::from_pest(token.as_span())),
@@ -45,10 +44,12 @@ fn parse_function(token: &pest::iterators::Pair<'_, Rule>) -> Expression {
 fn parse_array(token: &pest::iterators::Pair<'_, Rule>) -> Expression {
     let mut elements: Vec<Expression> = vec![];
 
-    match_children! { token, current,
-        Rule::expression => elements.push(parse_expression(&current)),
-        _ => unreachable!("Encountered impossible array during parsing: {:?}", current.tokens())
-    };
+    for current in token.filtered_children().into_iter() {
+        match current.as_rule() {
+            Rule::expression => elements.push(parse_expression(&current)),
+            _ => unreachable!("Encountered impossible array during parsing: {:?}", current.tokens()),
+        }
+    }
 
     Expression::Array(elements, Span::from_pest(token.as_span()))
 }

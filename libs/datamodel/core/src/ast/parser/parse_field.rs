@@ -1,5 +1,5 @@
 use super::{
-    helpers::{parsing_catch_all, ToIdentifier},
+    helpers::{parsing_catch_all, ToIdentifier, TokenExtensions},
     parse_comments::*,
     parse_directive::parse_directive,
     parse_types::parse_field_type,
@@ -14,21 +14,21 @@ pub fn parse_field(model_name: &str, token: &pest::iterators::Pair<'_, Rule>) ->
     let mut field_type: Option<((FieldArity, String), Span)> = None;
     let mut comments: Vec<String> = Vec::new();
 
-    match_children! { token, current,
-        Rule::non_empty_identifier => name = Some(current.to_id()),
-        Rule::field_type => field_type = Some(
-            (
-                parse_field_type(&current)?,
-                Span::from_pest(current.as_span())
-            )
-        ),
-        Rule::LEGACY_COLON => return Err(DatamodelError::new_legacy_parser_error(
-            "Field declarations don't require a `:`.",
-            Span::from_pest(current.as_span()))),
-        Rule::directive => directives.push(parse_directive(&current)),
-        Rule::doc_comment_and_new_line => comments.push(parse_doc_comment(&current)),
-        Rule::doc_comment => comments.push(parse_doc_comment(&current)),
-        _ => parsing_catch_all(&current)
+    for current in token.filtered_children().into_iter() {
+        match current.as_rule() {
+            Rule::non_empty_identifier => name = Some(current.to_id()),
+            Rule::field_type => field_type = Some((parse_field_type(&current)?, Span::from_pest(current.as_span()))),
+            Rule::LEGACY_COLON => {
+                return Err(DatamodelError::new_legacy_parser_error(
+                    "Field declarations don't require a `:`.",
+                    Span::from_pest(current.as_span()),
+                ))
+            }
+            Rule::directive => directives.push(parse_directive(&current)),
+            Rule::doc_comment_and_new_line => comments.push(parse_doc_comment(&current)),
+            Rule::doc_comment => comments.push(parse_doc_comment(&current)),
+            _ => parsing_catch_all(&current),
+        }
     }
 
     match (name, field_type) {

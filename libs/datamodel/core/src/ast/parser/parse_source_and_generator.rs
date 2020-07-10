@@ -1,5 +1,5 @@
 use super::{
-    helpers::{parsing_catch_all, ToIdentifier},
+    helpers::{parsing_catch_all, ToIdentifier, TokenExtensions},
     parse_comments::*,
     parse_expression::parse_expression,
     Rule,
@@ -14,19 +14,18 @@ pub fn parse_source(token: &pest::iterators::Pair<'_, Rule>) -> Result<SourceCon
     let mut properties: Vec<Argument> = vec![];
     let mut comment: Option<Comment> = None;
 
-    match_children! { token, current,
-        Rule::non_empty_identifier => name = Some(current.to_id()),
-        Rule::key_value => properties.push(parse_key_value(&current)),
-        Rule::comment_block => {
-            comment = Some(parse_comment_block(&current))
-        },
-        Rule::BLOCK_LEVEL_CATCH_ALL => { errors.push(
-            DatamodelError::new_validation_error(
+    for current in token.filtered_children().into_iter() {
+        match current.as_rule() {
+            Rule::non_empty_identifier => name = Some(current.to_id()),
+            Rule::key_value => properties.push(parse_key_value(&current)),
+            Rule::comment_block => comment = Some(parse_comment_block(&current)),
+            Rule::BLOCK_LEVEL_CATCH_ALL => errors.push(DatamodelError::new_validation_error(
                 "This line is not a valid definition within a datasource.",
-                Span::from_pest(current.as_span()))
-        ) },
-        _ => parsing_catch_all(&current)
-    };
+                Span::from_pest(current.as_span()),
+            )),
+            _ => parsing_catch_all(&current),
+        }
+    }
 
     errors.ok()?;
 
@@ -51,18 +50,19 @@ pub fn parse_generator(token: &pest::iterators::Pair<'_, Rule>) -> Result<Genera
     let mut properties: Vec<Argument> = vec![];
     let mut comments: Vec<String> = Vec::new();
 
-    match_children! { token, current,
-        Rule::non_empty_identifier => name = Some(current.to_id()),
-        Rule::key_value => properties.push(parse_key_value(&current)),
-        Rule::doc_comment => comments.push(parse_doc_comment(&current)),
-        Rule::doc_comment_and_new_line => comments.push(parse_doc_comment(&current)),
-        Rule::BLOCK_LEVEL_CATCH_ALL => { errors.push(
-            DatamodelError::new_validation_error(
+    for current in token.filtered_children().into_iter() {
+        match current.as_rule() {
+            Rule::non_empty_identifier => name = Some(current.to_id()),
+            Rule::key_value => properties.push(parse_key_value(&current)),
+            Rule::doc_comment => comments.push(parse_doc_comment(&current)),
+            Rule::doc_comment_and_new_line => comments.push(parse_doc_comment(&current)),
+            Rule::BLOCK_LEVEL_CATCH_ALL => errors.push(DatamodelError::new_validation_error(
                 "This line is not a valid definition within a generator.",
-                Span::from_pest(current.as_span()))
-        ) },
-        _ => parsing_catch_all(&current)
-    };
+                Span::from_pest(current.as_span()),
+            )),
+            _ => parsing_catch_all(&current),
+        }
+    }
 
     errors.ok()?;
 
@@ -84,10 +84,15 @@ fn parse_key_value(token: &pest::iterators::Pair<'_, Rule>) -> Argument {
     let mut name: Option<Identifier> = None;
     let mut value: Option<Expression> = None;
 
-    match_children! { token, current,
-        Rule::non_empty_identifier => name = Some(current.to_id()),
-        Rule::expression => value = Some(parse_expression(&current)),
-        _ => unreachable!("Encountered impossible source property declaration during parsing: {:?}", current.tokens())
+    for current in token.filtered_children().into_iter() {
+        match current.as_rule() {
+            Rule::non_empty_identifier => name = Some(current.to_id()),
+            Rule::expression => value = Some(parse_expression(&current)),
+            _ => unreachable!(
+                "Encountered impossible source property declaration during parsing: {:?}",
+                current.tokens()
+            ),
+        }
     }
 
     match (name, value) {

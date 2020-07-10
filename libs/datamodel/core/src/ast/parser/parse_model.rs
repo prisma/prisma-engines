@@ -1,5 +1,5 @@
 use super::{
-    helpers::{parsing_catch_all, ToIdentifier},
+    helpers::{parsing_catch_all, ToIdentifier, TokenExtensions},
     parse_comments::*,
     parse_directive::parse_directive,
     parse_field::parse_field,
@@ -16,29 +16,25 @@ pub fn parse_model(token: &pest::iterators::Pair<'_, Rule>) -> Result<Model, Err
     let mut fields: Vec<Field> = vec![];
     let mut comment: Option<Comment> = None;
 
-    match_children! { token, current,
-        Rule::TYPE_KEYWORD => { errors.push(
-            DatamodelError::new_legacy_parser_error(
+    for current in token.filtered_children().into_iter() {
+        match current.as_rule() {
+            Rule::TYPE_KEYWORD => errors.push(DatamodelError::new_legacy_parser_error(
                 "Model declarations have to be indicated with the `model` keyword.",
-                Span::from_pest(current.as_span()))
-        ) },
-        Rule::non_empty_identifier => name = Some(current.to_id()),
-        Rule::directive => directives.push(parse_directive(&current)),
-        Rule::field_declaration => {
-            match parse_field(&name.as_ref().unwrap().name, &current) {
+                Span::from_pest(current.as_span()),
+            )),
+            Rule::non_empty_identifier => name = Some(current.to_id()),
+            Rule::directive => directives.push(parse_directive(&current)),
+            Rule::field_declaration => match parse_field(&name.as_ref().unwrap().name, &current) {
                 Ok(field) => fields.push(field),
-                Err(err) => errors.push(err)
-            }
-        },
-        Rule::comment_block => {
-            comment = Some(parse_comment_block(&current))
-        },
-        Rule::BLOCK_LEVEL_CATCH_ALL => { errors.push(
-            DatamodelError::new_validation_error(
+                Err(err) => errors.push(err),
+            },
+            Rule::comment_block => comment = Some(parse_comment_block(&current)),
+            Rule::BLOCK_LEVEL_CATCH_ALL => errors.push(DatamodelError::new_validation_error(
                 "This line is not a valid field or directive definition.",
-                Span::from_pest(current.as_span()))
-        ) },
-        _ => parsing_catch_all(&current)
+                Span::from_pest(current.as_span()),
+            )),
+            _ => parsing_catch_all(&current),
+        }
     }
 
     errors.ok()?;

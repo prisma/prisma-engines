@@ -13,17 +13,18 @@ pub fn parse_type_alias(token: &pest::iterators::Pair<'_, Rule>) -> Field {
     let mut base_type: Option<(String, Span)> = None;
     let mut comment: Option<Comment> = None;
 
-    match_children! { token, current,
-        Rule::TYPE_KEYWORD => { },
-        Rule::non_empty_identifier => name = Some(current.to_id()),
-        Rule::base_type => {
-            base_type = Some((parse_base_type(&current), Span::from_pest(current.as_span())))
-        },
-        Rule::directive => directives.push(parse_directive(&current)),
-        Rule::comment_block => {
-            comment = Some(parse_comment_block(&current))
-        },
-        _ => unreachable!("Encountered impossible custom type during parsing: {:?}", current.tokens())
+    for current in token.filtered_children().into_iter() {
+        match current.as_rule() {
+            Rule::TYPE_KEYWORD => {}
+            Rule::non_empty_identifier => name = Some(current.to_id()),
+            Rule::base_type => base_type = Some((parse_base_type(&current), Span::from_pest(current.as_span()))),
+            Rule::directive => directives.push(parse_directive(&current)),
+            Rule::comment_block => comment = Some(parse_comment_block(&current)),
+            _ => unreachable!(
+                "Encountered impossible custom type during parsing: {:?}",
+                current.tokens()
+            ),
+        }
     }
 
     match (name, base_type) {

@@ -29,6 +29,8 @@ pub type Token<'a> = pest::iterators::Pair<'a, Rule>;
 
 pub trait TokenExtensions {
     fn first_child(&self) -> Token;
+
+    fn filtered_children(&self) -> Vec<Token>;
 }
 
 // this is not implemented for Token because auto completion does not work then
@@ -44,5 +46,17 @@ impl TokenExtensions for pest::iterators::Pair<'_, Rule> {
             })
             .next()
             .unwrap()
+    }
+
+    fn filtered_children(&self) -> Vec<Token> {
+        self.clone()
+            .into_inner()
+            .filter(|rule| {
+                rule.as_rule() != Rule::BLOCK_CLOSE
+                    && rule.as_rule() != Rule::BLOCK_OPEN
+                    && rule.as_rule() != Rule::WHITESPACE
+                    && rule.as_rule() != Rule::NEWLINE
+            })
+            .collect()
     }
 }

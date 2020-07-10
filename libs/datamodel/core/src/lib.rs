@@ -1,24 +1,3 @@
-// Load macros first - Global Macros used for parsing.
-// Macro to match all children in a parse tree
-#[macro_use]
-macro_rules! match_children (
-    ($token:ident, $current:ident, $($pattern:pat => $result:expr),*) => (
-        // Explicit clone, as into_inner consumes the pair.
-        // We only need a reference to the pair later for logging.
-        for $current in $token.clone().into_inner() {
-            match $current.as_rule() {
-                Rule::WHITESPACE => { },
-                Rule::BLOCK_OPEN => { },
-                Rule::BLOCK_CLOSE => { },
-                Rule::NEWLINE => { },
-                $(
-                    $pattern => $result
-                ),*
-            }
-        }
-    );
-);
-
 extern crate pest; // Pest grammar generation on compile time.
 #[macro_use]
 extern crate pest_derive;
