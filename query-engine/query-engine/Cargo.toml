@@ -12,11 +12,9 @@ sql = ["sql-connector"]
 
 [dependencies]
 futures = "0.3"
-tokio = {version = "=0.2.13", features = ["rt-threaded", "macros"]}
-
 anyhow = "1.0"
-async-std = {version = "1.6.2", features = ["attributes", "tokio02"]}
 async-trait = "0.1"
+async-std = { version = "1.6.2", features = ["attributes", "unstable"] }
 base64 = "0.10"
 connector = {path = "../connectors/query-connector", package = "query-connector"}
 datamodel = {path = "../../libs/datamodel/core"}
@@ -24,10 +22,10 @@ feature-flags = {path = "../../libs/feature-flags"}
 graphql-parser = {git = "https://github.com/prisma/graphql-parser", optional = true}
 indexmap = {version = "1.0", features = ["serde-1"]}
 itertools = "0.8"
+rust_decimal = "1.7"
 once_cell = "1.3"
 prisma-models = {path = "../../libs/prisma-models"}
 query-core = {path = "../core"}
-rust_decimal = {git = "https://github.com/pimeys/rust-decimal", branch = "pgbouncer-mode"}
 serde = {version = "1.0", features = ["derive"]}
 serde_json = {version = "1.0", features = ["preserve_order"]}
 sql-connector = {path = "../connectors/sql-query-connector", optional = true, package = "sql-query-connector"}
@@ -48,13 +46,12 @@ user-facing-errors = {path = "../../libs/user-facing-errors"}
 rustc_version = "0.2.3"
 
 [dev-dependencies]
-anyhow = "1"
-chrono = "0.4"
+quaint = { git = "https://github.com/prisma/quaint", features = ["full", "tracing-log", "runtime-async-std"], branch = "sqlx" }
+migration-connector = { path = "../../migration-engine/connectors/migration-connector" }
 indoc = "0.3"
+chrono = "0.4"
 introspection-core = {path = "../../introspection-engine/core"}
-migration-connector = {path = "../../migration-engine/connectors/migration-connector"}
 migration-core = {path = "../../migration-engine/core"}
-quaint = {git = "https://github.com/prisma/quaint", features = ["full", "tracing-log"]}
 serial_test = "*"
 sql-migration-connector = {path = "../../migration-engine/connectors/sql-migration-connector"}
 test-macros = {path = "../../libs/test-macros"}

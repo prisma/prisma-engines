@@ -19,16 +19,17 @@ pub async fn get_postgres_describer(sql: &str, db_name: &str) -> postgres::SqlSc
         .unwrap();
 
     let drop_schema = format!("DROP SCHEMA IF EXISTS \"{}\" CASCADE;", SCHEMA);
-    client.raw_cmd(&drop_schema).await.expect("dropping schema");
+    client.raw_cmd(drop_schema.as_str()).await.expect("dropping schema");
 
     debug!("Creating Postgres schema '{}'", SCHEMA);
     client
-        .raw_cmd(format!("CREATE SCHEMA \"{}\";", SCHEMA).as_str())
+        .raw_cmd(&format!("CREATE SCHEMA \"{}\";", SCHEMA))
         .await
         .expect("creating schema");
 
     let sql_string = sql.to_string();
     let statements: Vec<&str> = sql_string.split(";").filter(|s| !s.is_empty()).collect();
+
     for statement in statements {
         debug!("Executing migration statement: '{}'", statement);
         client.raw_cmd(statement).await.expect("executing migration statement");

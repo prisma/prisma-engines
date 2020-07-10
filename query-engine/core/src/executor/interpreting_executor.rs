@@ -113,7 +113,7 @@ where
 
             for operation in operations {
                 let conn = self.connector.get_connection().await?;
-                futures.push(tokio::spawn(Self::execute_single_operation(
+                futures.push(async_std::task::spawn(Self::execute_single_operation(
                     operation,
                     conn,
                     self.force_transactions,
@@ -121,11 +121,7 @@ where
                 )));
             }
 
-            let responses: Vec<_> = future::join_all(futures)
-                .await
-                .into_iter()
-                .map(|res| res.expect("IO Error in tokio::spawn"))
-                .collect();
+            let responses: Vec<_> = future::join_all(futures).await;
 
             Ok(responses)
         }

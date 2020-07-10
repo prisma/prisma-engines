@@ -181,7 +181,7 @@ fn test_each_connector_async_wrapper_functions(
                     #test_fn_name(&api).await#optional_unwrap
                 }#optional_logging;
 
-                test_setup::runtime::run_with_tokio(fut)
+                test_setup::runtime::with_runtime(fut)
             }
         };
 

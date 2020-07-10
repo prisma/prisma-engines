@@ -85,7 +85,7 @@ pub async fn update_records(
     };
 
     for update in updates {
-        conn.query(update).await?;
+        conn.execute(update).await?;
     }
 
     Ok(merge_write_args(ids, id_args))
@@ -106,7 +106,7 @@ pub async fn delete_records(
     }
 
     for delete in write::delete_many(model, ids.as_slice()) {
-        conn.query(delete).await?;
+        conn.execute(delete).await?;
     }
 
     Ok(count)
@@ -121,7 +121,7 @@ pub async fn connect(
     child_ids: &[RecordProjection],
 ) -> crate::Result<()> {
     let query = write::create_relation_table_records(field, parent_id, child_ids);
-    conn.query(query).await?;
+    conn.execute(query).await?;
 
     Ok(())
 }

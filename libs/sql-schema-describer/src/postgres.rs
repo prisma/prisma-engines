@@ -57,7 +57,7 @@ impl SqlSchemaDescriber {
     async fn get_databases(&self) -> Vec<String> {
         debug!("Getting databases");
         let sql = "select schema_name from information_schema.schemata;";
-        let rows = self.conn.query_raw(sql, &[]).await.expect("get schema names ");
+        let rows = self.conn.query_raw(sql, vec![]).await.expect("get schema names ");
         let names = rows
             .into_iter()
             .map(|row| {
@@ -80,7 +80,7 @@ impl SqlSchemaDescriber {
             ORDER BY table_name";
         let rows = self
             .conn
-            .query_raw(sql, &[schema.into()])
+            .query_raw(sql, vec![schema.into()])
             .await
             .expect("get table names ");
         let names = rows
@@ -102,7 +102,11 @@ impl SqlSchemaDescriber {
             "SELECT SUM(pg_total_relation_size(quote_ident(schemaname) || '.' || quote_ident(tablename)))::BIGINT as size
              FROM pg_tables
              WHERE schemaname = $1::text";
-        let result = self.conn.query_raw(sql, &[schema.into()]).await.expect("get db size ");
+        let result = self
+            .conn
+            .query_raw(sql, vec![schema.into()])
+            .await
+            .expect("get db size ");
         let size: i64 = result
             .first()
             .map(|row| row.get("size").and_then(|x| x.as_i64()).unwrap_or(0))
@@ -153,7 +157,7 @@ impl SqlSchemaDescriber {
 
         let rows = self
             .conn
-            .query_raw(&sql, &[schema.into()])
+            .query_raw(&sql, vec![schema.into()])
             .await
             .expect("querying for columns");
 
@@ -342,7 +346,7 @@ impl SqlSchemaDescriber {
         // objects.
         let result_set = self
             .conn
-            .query_raw(&sql, &[schema.into()])
+            .query_raw(&sql, vec![schema.into()])
             .await
             .expect("querying for foreign keys");
         let mut intermediate_fks: HashMap<i64, (String, ForeignKey)> = HashMap::new();
@@ -476,7 +480,7 @@ impl SqlSchemaDescriber {
         debug!("Getting indices: {}", sql);
         let rows = self
             .conn
-            .query_raw(&sql, &[schema.into()])
+            .query_raw(&sql, vec![schema.into()])
             .await
             .expect("querying for indices");
 
@@ -544,7 +548,7 @@ impl SqlSchemaDescriber {
                   WHERE sequence_schema = $1";
         let rows = self
             .conn
-            .query_raw(&sql, &[schema.into()])
+            .query_raw(&sql, vec![schema.into()])
             .await
             .expect("querying for sequences");
         let sequences = rows
@@ -581,7 +585,7 @@ impl SqlSchemaDescriber {
             JOIN pg_catalog.pg_namespace n ON n.oid = t.typnamespace
             WHERE n.nspname = $1
             ORDER BY name, value";
-        let rows = self.conn.query_raw(&sql, &[schema.into()]).await.unwrap();
+        let rows = self.conn.query_raw(&sql, vec![schema.into()]).await.unwrap();
         let mut enum_values: HashMap<String, Vec<String>> = HashMap::new();
         for row in rows.into_iter() {
             debug!("Got enum row: {:?}", row);

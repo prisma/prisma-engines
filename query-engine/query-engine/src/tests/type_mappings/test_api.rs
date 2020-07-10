@@ -26,12 +26,13 @@ impl TestApi {
     }
 
     pub async fn execute_sql(&self, sql: &str) -> anyhow::Result<()> {
-        self.connection.execute_raw(sql, &[]).await?;
+        self.connection.raw_cmd(sql).await?;
 
         Ok(())
     }
 
     pub async fn introspect_and_start_query_engine(&self) -> anyhow::Result<(DatamodelAssertions, QueryEngine)> {
+        feature_flags::initialize(&vec![String::from("all")]).unwrap();
         let datasource = self.datasource();
 
         let introspection_result = introspection_core::RpcImpl::introspect_internal(datasource, false, false)

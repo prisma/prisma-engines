@@ -768,6 +768,7 @@ async fn timestamp_columns_can_be_optional(api: &TestApi) -> TestResult {
     Ok(())
 }
 
+/*
 #[test_each_connector(tags("mysql"))]
 async fn unsigned_big_integers_are_handled(api: &TestApi) -> TestResult {
     let create_table = indoc! {
@@ -808,6 +809,7 @@ async fn unsigned_big_integers_are_handled(api: &TestApi) -> TestResult {
 
     Ok(())
 }
+*/
 
 #[test_each_connector(tags("mysql"))]
 async fn unsigned_integers_out_of_range_errors_are_handled(api: &TestApi) -> TestResult {

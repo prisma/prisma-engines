@@ -3,10 +3,10 @@ use super::{
     unexecutable_step_check::UnexecutableStepCheck, warning_check::SqlMigrationWarningCheck,
 };
 use crate::{SqlError, SqlResult};
+use async_std::future::{timeout, TimeoutError};
 use migration_connector::{DestructiveChangeDiagnostics, MigrationWarning, UnexecutableMigration};
 use quaint::prelude::Queryable;
 use std::time::Duration;
-use tokio::time::{timeout, Elapsed};
 
 const DESTRUCTIVE_TIMEOUT_DURATION: Duration = Duration::from_secs(60);
 
@@ -62,7 +62,7 @@ impl DestructiveCheckPlan {
 
         // Ignore the timeout error, we will still return useful warnings.
         match timeout(DESTRUCTIVE_TIMEOUT_DURATION, inspection).await {
-            Ok(Ok(())) | Err(Elapsed { .. }) => (),
+            Ok(Ok(())) | Err(TimeoutError { .. }) => (),
             Ok(Err(err)) => return Err(err),
         };
 

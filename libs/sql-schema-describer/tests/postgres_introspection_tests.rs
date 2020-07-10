@@ -9,7 +9,7 @@ use sql_schema_describer::*;
 use test_api::*;
 use test_macros::test_each_connector;
 
-#[tokio::test]
+#[async_std::test]
 async fn all_postgres_column_types_must_work() {
     let mut migration = Migration::new().schema(SCHEMA);
     migration.create_table("User", move |t| {
@@ -694,7 +694,7 @@ async fn all_postgres_column_types_must_work() {
     );
 }
 
-#[tokio::test]
+#[async_std::test]
 async fn postgres_foreign_key_on_delete_must_be_handled() {
     let sql = format!(
         "CREATE TABLE \"{0}\".\"City\" (id INT PRIMARY KEY);
@@ -847,7 +847,7 @@ async fn postgres_foreign_key_on_delete_must_be_handled() {
     );
 }
 
-#[tokio::test]
+#[async_std::test]
 async fn postgres_enums_must_work() {
     let inspector = get_postgres_describer(
         &format!("CREATE TYPE \"{}\".\"mood\" AS ENUM ('sad', 'ok', 'happy')", SCHEMA),
@@ -868,7 +868,7 @@ async fn postgres_enums_must_work() {
     );
 }
 
-#[tokio::test]
+#[async_std::test]
 async fn postgres_sequences_must_work() {
     let inspector = get_postgres_describer(
         &format!("CREATE SEQUENCE \"{}\".\"test\"", SCHEMA),
@@ -889,7 +889,7 @@ async fn postgres_sequences_must_work() {
     );
 }
 
-#[tokio::test]
+#[async_std::test]
 async fn postgres_multi_field_indexes_must_be_inferred_in_the_right_order() {
     let schema = format!(
         r##"
@@ -933,7 +933,7 @@ async fn escaped_quotes_in_string_defaults_must_be_unescaped(api: &TestApi) -> T
         api.schema_name()
     );
 
-    api.database().query_raw(&create_table, &[]).await?;
+    api.database().raw_cmd(&create_table).await?;
 
     let schema = api.describe().await?;
 
@@ -976,7 +976,7 @@ async fn escaped_backslashes_in_string_literals_must_be_unescaped(api: &TestApi)
         )
     "#;
 
-    api.database().query_raw(&create_table, &[]).await?;
+    api.database().raw_cmd(&create_table).await?;
 
     let schema = api.describe().await?;
 

@@ -44,6 +44,8 @@ pub struct TestApi {
 
 impl TestApi {
     pub async fn create_engine(&self, datamodel: &str) -> anyhow::Result<QueryEngine> {
+        feature_flags::initialize(&vec![String::from("all")]).unwrap();
+
         let datamodel_string = format!("{}\n\n{}", self.config, datamodel);
         let migration_id = "test-cli-migration".to_owned();
 

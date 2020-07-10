@@ -1,9 +1,12 @@
 use futures::compat::*;
+use futures::{
+    io::{AsyncBufReadExt, AsyncRead, AsyncWrite, AsyncWriteExt},
+    TryStreamExt,
+};
 use jsonrpc_core::IoHandler;
-use tokio::io::{AsyncBufReadExt, AsyncRead, AsyncWrite, AsyncWriteExt};
 
 pub async fn run(handler: &IoHandler) -> std::io::Result<()> {
-    run_with_io(handler, tokio::io::stdin(), tokio::io::stdout()).await
+    run_with_io(handler, async_std::io::stdin(), async_std::io::stdout()).await
 }
 
 async fn run_with_io(
@@ -11,11 +14,11 @@ async fn run_with_io(
     input: impl AsyncRead + Unpin,
     output: impl AsyncWrite + Unpin,
 ) -> std::io::Result<()> {
-    let input = tokio::io::BufReader::new(input);
+    let input = futures::io::BufReader::new(input);
     let mut input_lines = input.lines();
-    let mut output = tokio::io::BufWriter::new(output);
+    let mut output = futures::io::BufWriter::new(output);
 
-    while let Some(line) = input_lines.next_line().await? {
+    while let Some(line) = input_lines.try_next().await? {
         let response = handle_request(&handler, &line).await;
         output.write_all(response.as_bytes()).await?;
         output.write_all(b"\n").await?;

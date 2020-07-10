@@ -199,13 +199,13 @@ pub async fn test_api_helper_for_postgres(url: String, db_name: &'static str) ->
         "DROP SCHEMA IF EXISTS \"{}\" CASCADE;",
         connection_info.schema_name()
     ));
-    database.query_raw(&drop_schema, &[]).await.ok();
+    database.raw_cmd(&drop_schema).await.ok();
 
     let create_schema = dbg!(format!(
         "CREATE SCHEMA IF NOT EXISTS \"{}\";",
         connection_info.schema_name()
     ));
-    database.query_raw(&create_schema, &[]).await.ok();
+    database.raw_cmd(&create_schema).await.ok();
     let introspection_connector = SqlIntrospectionConnector::new(&url).await.unwrap();
 
     TestApi {

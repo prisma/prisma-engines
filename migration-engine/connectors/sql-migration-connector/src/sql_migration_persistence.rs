@@ -57,7 +57,7 @@ impl MigrationPersistence for SqlMigrationPersistence<'_> {
 
         crate::catch(self.connection_info(), async {
             self.conn()
-                .query(Delete::from_table((self.schema_name(), MIGRATION_TABLE_NAME)).into())
+                .execute(Delete::from_table((self.schema_name(), MIGRATION_TABLE_NAME)).into())
                 .await
                 .ok();
 
@@ -156,7 +156,7 @@ impl MigrationPersistence for SqlMigrationPersistence<'_> {
                         .and(REVISION_COLUMN.equals(params.revision)),
                 );
 
-            self.conn().query(query.into()).await?;
+            self.conn().execute(query.into()).await?;
 
             Ok(())
         })

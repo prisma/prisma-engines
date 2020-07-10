@@ -8,7 +8,7 @@ use sql_schema_describer::*;
 use test_api::*;
 use test_macros::*;
 
-#[tokio::test]
+#[async_std::test]
 async fn all_mysql_column_types_must_work() {
     let db_name = "all_mysql_column_types_must_work";
 
@@ -588,7 +588,7 @@ async fn all_mysql_column_types_must_work() {
     );
 }
 
-#[tokio::test]
+#[async_std::test]
 async fn mysql_foreign_key_on_delete_must_be_handled() {
     let db_name = "mysql_foreign_key_on_delete_must_be_handled";
 
@@ -739,7 +739,7 @@ async fn mysql_foreign_key_on_delete_must_be_handled() {
     );
 }
 
-#[tokio::test]
+#[async_std::test]
 async fn mysql_multi_field_indexes_must_be_inferred() {
     let db_name = "mysql_multi_field_indexes_must_be_inferred";
 
@@ -766,7 +766,7 @@ async fn mysql_multi_field_indexes_must_be_inferred() {
     );
 }
 
-#[tokio::test]
+#[async_std::test]
 async fn mysql_join_table_unique_indexes_must_be_inferred() {
     let db_name = "mysql_join_table_unique_indexes_must_be_inferred";
 
@@ -806,7 +806,7 @@ async fn mysql_join_table_unique_indexes_must_be_inferred() {
 
 // When multiple databases exist on a mysql instance, and they share names for foreign key
 // constraints, introspecting one database should not yield constraints from the other.
-#[tokio::test]
+#[async_std::test]
 async fn constraints_from_other_databases_should_not_be_introspected() {
     let db_name = "constraints_from_other_databases_should_not_be_introspected";
 
@@ -874,7 +874,7 @@ async fn constraints_from_other_databases_should_not_be_introspected() {
     );
 }
 
-#[tokio::test]
+#[async_std::test]
 async fn mysql_introspected_default_strings_should_be_unescaped() {
     let db_name = "mysql_introspected_default_strings_should_be_unescaped";
 
@@ -915,7 +915,7 @@ async fn escaped_quotes_in_string_defaults_must_be_unescaped(api: &TestApi) -> T
         api.schema_name()
     );
 
-    api.database().query_raw(&create_table, &[]).await?;
+    api.database().raw_cmd(&create_table).await?;
 
     let schema = api.describe().await?;
 
@@ -962,7 +962,7 @@ async fn escaped_backslashes_in_string_literals_must_be_unescaped(api: &TestApi)
         )
     "#;
 
-    api.database().query_raw(&create_table, &[]).await?;
+    api.database().raw_cmd(&create_table).await?;
 
     let schema = api.describe().await?;
 

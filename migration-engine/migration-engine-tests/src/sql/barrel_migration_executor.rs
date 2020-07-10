@@ -37,7 +37,7 @@ impl BarrelMigrationExecutor<'_> {
 
 async fn run_full_sql(database: &Arc<dyn Queryable + Send + Sync>, full_sql: &str) -> anyhow::Result<()> {
     for sql in full_sql.split(";").filter(|sql| !sql.is_empty()) {
-        database.query_raw(&sql, &[]).await?;
+        database.raw_cmd(&sql).await?;
     }
 
     Ok(())

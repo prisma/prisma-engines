@@ -78,14 +78,14 @@ impl SqlMigrationConnector {
                 }
                 ConnectionInfo::Sqlite { file_path, .. } => {
                     self.conn()
-                        .query_raw("DETACH DATABASE ?", &[Value::from(self.schema_name())])
+                        .execute_raw("DETACH DATABASE ?", vec![Value::from(self.schema_name())])
                         .await
                         .ok();
                     std::fs::remove_file(file_path).ok(); // ignore potential errors
                     self.conn()
-                        .query_raw(
+                        .execute_raw(
                             "ATTACH DATABASE ? AS ?",
-                            &[Value::from(file_path.as_str()), Value::from(self.schema_name())],
+                            vec![Value::from(file_path.as_str()), Value::from(self.schema_name())],
                         )
                         .await?;
                 }
@@ -201,11 +201,11 @@ async fn connect(database_str: &str) -> ConnectorResult<(Quaint, DatabaseInfo)> 
         Ok::<_, ConnectorError>(connection)
     };
 
-    let connection = tokio::time::timeout(CONNECTION_TIMEOUT, connection_fut)
+    let connection = async_std::future::timeout(CONNECTION_TIMEOUT, connection_fut)
         .await
         .map_err(|_elapsed| {
             // TODO: why...
-            SqlError::from(ErrorKind::ConnectTimeout("Tokio timer".into())).into_connector_error(&connection_info)
+            SqlError::from(ErrorKind::ConnectTimeout("Runtime timer".into())).into_connector_error(&connection_info)
         })??;
 
     let database_info = DatabaseInfo::new(&connection, connection.connection_info().clone())

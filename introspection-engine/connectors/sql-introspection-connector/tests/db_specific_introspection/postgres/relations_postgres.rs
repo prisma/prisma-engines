@@ -178,12 +178,11 @@ async fn introspecting_duplicate_fks_should_ignore_one_of_them(api: &TestApi) {
         .await;
 
     api.database()
-        .execute_raw(
+        .raw_cmd(
             &format!(
                 "Alter table \"{}\".\"Post\" ADD CONSTRAINT fk_duplicate FOREIGN KEY (\"user_id\") REFERENCES \"User\" (\"id\");",
                 api.schema_name()
             ),
-            &[],
         )
         .await
         .unwrap();
@@ -255,24 +254,18 @@ async fn introspecting_a_prisma_many_to_many_relation_should_work(api: &TestApi)
         .await;
 
     api.database()
-        .execute_raw(
-            &format!(
-                "CREATE UNIQUE INDEX test ON \"{}\".\"_PostToUser\" (\"a\", \"b\");",
-                api.schema_name()
-            ),
-            &[],
-        )
+        .raw_cmd(&format!(
+            "CREATE UNIQUE INDEX test ON \"{}\".\"_PostToUser\" (\"a\", \"b\");",
+            api.schema_name()
+        ))
         .await
         .unwrap();
 
     api.database()
-        .execute_raw(
-            &format!(
-                "CREATE INDEX test2 ON \"{}\".\"_PostToUser\" (\"b\");",
-                api.schema_name()
-            ),
-            &[],
-        )
+        .raw_cmd(&format!(
+            "CREATE INDEX test2 ON \"{}\".\"_PostToUser\" (\"b\");",
+            api.schema_name()
+        ))
         .await
         .unwrap();
 
@@ -560,24 +553,18 @@ async fn introspecting_prisma_10_relations_should_work(api: &TestApi) {
         .await;
 
     api.database()
-        .execute_raw(
-            &format!(
-                "CREATE UNIQUE INDEX  double on \"{}\".\"_BookRoyalty\" (\"a\", \"b\");",
-                api.schema_name()
-            ),
-            &[],
-        )
+        .raw_cmd(&format!(
+            "CREATE UNIQUE INDEX  double on \"{}\".\"_BookRoyalty\" (\"a\", \"b\");",
+            api.schema_name()
+        ))
         .await
         .unwrap();
 
     api.database()
-        .execute_raw(
-            &format!(
-                "CREATE INDEX single on \"{}\".\"_BookRoyalty\" (\"b\");",
-                api.schema_name()
-            ),
-            &[],
-        )
+        .raw_cmd(&format!(
+            "CREATE INDEX single on \"{}\".\"_BookRoyalty\" (\"b\");",
+            api.schema_name()
+        ))
         .await
         .unwrap();
 
@@ -649,34 +636,27 @@ async fn introspecting_relations_should_avoid_name_clashes_2(api: &TestApi) {
         .await;
 
     api.database()
-        .execute_raw(
-            &format!(
-                "CREATE UNIQUE INDEX unique_y_id on \"{}\".\"x\" (\"id\", \"y\");",
-                api.schema_name()
-            ),
-            &[],
-        )
+        .raw_cmd(&format!(
+            "CREATE UNIQUE INDEX unique_y_id on \"{}\".\"x\" (\"id\", \"y\");",
+            api.schema_name()
+        ))
         .await
         .unwrap();
 
     api.database()
-        .execute_raw(
-            &format!(
-                "Alter table \"{}\".\"x\" ADD CONSTRAINT fk_y FOREIGN KEY (\"y\") REFERENCES \"y\" (\"id\");",
-                api.schema_name()
-            ),
-            &[],
-        )
+        .raw_cmd(&format!(
+            "Alter table \"{}\".\"x\" ADD CONSTRAINT fk_y FOREIGN KEY (\"y\") REFERENCES \"y\" (\"id\");",
+            api.schema_name()
+        ))
         .await
         .unwrap();
 
     api.database()
-        .execute_raw(
+        .raw_cmd(
             &format!(
                 "Alter table \"{}\".\"y\" ADD CONSTRAINT fk_y_x FOREIGN KEY (\"fk_x_1\", \"fk_x_2\") REFERENCES \"x\" (\"y\",\"id\");",
                 api.schema_name()
             ),
-            &[],
         )
         .await
         .unwrap();

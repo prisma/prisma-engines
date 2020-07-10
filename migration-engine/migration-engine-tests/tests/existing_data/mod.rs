@@ -19,7 +19,7 @@ async fn dropping_a_table_with_rows_should_warn(api: &TestApi) {
     let conn = api.database();
     let insert = Insert::single_into((api.schema_name(), "Test")).value("id", "test");
 
-    conn.query(insert.into()).await.unwrap();
+    conn.execute(insert.into()).await.unwrap();
 
     let dm = "";
 
@@ -55,7 +55,7 @@ async fn dropping_a_column_with_non_null_values_should_warn(api: &TestApi) {
         .values(("a", 7))
         .values(("b", 8));
 
-    api.database().query(insert.into()).await.unwrap();
+    api.database().execute(insert.into()).await.unwrap();
 
     // Drop the `favouriteAnimal` column.
     let dm = r#"
@@ -96,7 +96,7 @@ async fn altering_a_column_without_non_null_values_should_not_warn(api: &TestApi
         .values(("a",))
         .values(("b",));
 
-    api.database().query(insert.into()).await.unwrap();
+    api.database().execute(insert.into()).await.unwrap();
 
     let dm2 = r#"
         model Test {
@@ -128,7 +128,7 @@ async fn altering_a_column_with_non_null_values_should_warn(api: &TestApi) -> Te
         .values(("a", 12))
         .values(("b", 22));
 
-    api.database().query(insert.into()).await.unwrap();
+    api.database().execute(insert.into()).await.unwrap();
 
     let dm2 = r#"
         model Test {
@@ -212,13 +212,13 @@ async fn column_defaults_can_safely_be_changed(api: &TestApi) -> TestResult {
 
             let query = Insert::single_into(api.render_table_name(model_name)).value("id", "abc");
 
-            api.database().query(query.into()).await?;
+            api.database().execute(query.into()).await?;
 
             let query = Insert::single_into(api.render_table_name(model_name))
                 .value("id", "def")
                 .value("name", "Waterworld");
 
-            api.database().query(query.into()).await?;
+            api.database().execute(query.into()).await?;
 
             let data = api.dump_table(model_name).await?;
             let names: Vec<PrismaValue> = data
@@ -318,7 +318,7 @@ async fn changing_a_column_from_required_to_optional_should_work(api: &TestApi) 
         .values(("a", 12))
         .values(("b", 22));
 
-    api.database().query(insert.into()).await.unwrap();
+    api.database().execute(insert.into()).await.unwrap();
 
     let dm2 = r#"
         model Test {
@@ -386,7 +386,7 @@ async fn changing_a_column_from_optional_to_required_is_unexecutable(api: &TestA
         .values(("b", 22))
         .values(("c", Value::Integer(None)));
 
-    api.database().query(insert.into()).await.unwrap();
+    api.database().execute(insert.into()).await.unwrap();
 
     let dm2 = r#"
         model Test {
@@ -439,7 +439,7 @@ async fn changing_a_column_from_optional_to_required_must_warn(api: &TestApi) ->
         .values(("b", 22))
         .values(("c", Value::Integer(None)));
 
-    api.database().query(insert.into()).await.unwrap();
+    api.database().execute(insert.into()).await.unwrap();
 
     let dm2 = r#"
         model Test {
@@ -510,12 +510,12 @@ async fn dropping_a_table_referenced_by_foreign_keys_must_work(api: &TestApi) ->
     let insert = Insert::single_into(api.render_table_name("Category"))
         .value("name", "desserts")
         .value("id", id);
-    api.database().query(insert.into()).await?;
+    api.database().execute(insert.into()).await?;
 
     let insert = Insert::single_into(api.render_table_name("Recipe"))
         .value("categoryId", id)
         .value("id", id);
-    api.database().query(insert.into()).await?;
+    api.database().execute(insert.into()).await?;
 
     let dm2 = r#"
         model Recipe {
@@ -553,7 +553,7 @@ async fn string_columns_do_not_get_arbitrarily_migrated(api: &TestApi) -> TestRe
         .value("email", "george@prisma.io")
         .value("kindle_email", "george+kindle@prisma.io");
 
-    api.database().query(insert.into()).await?;
+    api.database().execute(insert.into()).await?;
 
     let dm2 = r#"
         model User {
@@ -670,7 +670,7 @@ async fn altering_the_type_of_a_column_in_a_non_empty_table_always_warns(api: &T
         .value("name", "Shinzo")
         .value("dogs", 7);
 
-    api.database().query(insert.into()).await?;
+    api.database().execute(insert.into()).await?;
 
     let dm2 = r#"
         model User {
@@ -798,7 +798,7 @@ async fn enum_variants_can_be_added_without_data_loss(api: &TestApi) -> TestResu
             .values((Value::text("felix"), Value::enum_variant("HUNGRY")))
             .values((Value::text("mittens"), Value::enum_variant("HAPPY")));
 
-        api.database().query(cat_inserts.into()).await?;
+        api.database().execute(cat_inserts.into()).await?;
     }
 
     let dm2 = r#"
@@ -893,7 +893,7 @@ async fn enum_variants_can_be_dropped_without_data_loss(api: &TestApi) -> TestRe
             .values((Value::text("felix"), Value::enum_variant("HUNGRY")))
             .values((Value::text("mittens"), Value::enum_variant("HAPPY")));
 
-        api.database().query(cat_inserts.into()).await?;
+        api.database().execute(cat_inserts.into()).await?;
     }
 
     let dm2 = r#"

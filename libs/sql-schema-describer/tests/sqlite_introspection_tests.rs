@@ -10,7 +10,7 @@ use sqlite::*;
 use test_api::{sqlite_test_api, TestApi, TestResult};
 use test_macros::test_each_connector;
 
-#[tokio::test]
+#[async_std::test]
 async fn sqlite_column_types_must_work() {
     let mut migration = Migration::new().schema(SCHEMA);
     migration.create_table("User", move |t| {
@@ -117,7 +117,7 @@ async fn sqlite_column_types_must_work() {
     );
 }
 
-#[tokio::test]
+#[async_std::test]
 async fn sqlite_foreign_key_on_delete_must_be_handled() {
     let sql = format!(
         "CREATE TABLE \"{0}\".City (id INTEGER NOT NULL PRIMARY KEY);
@@ -263,7 +263,7 @@ async fn sqlite_foreign_key_on_delete_must_be_handled() {
     );
 }
 
-#[tokio::test]
+#[async_std::test]
 async fn sqlite_text_primary_keys_must_be_inferred_on_table_and_not_as_separate_indexes() {
     let mut migration = Migration::new().schema(SCHEMA);
     migration.create_table("User", move |t| {
@@ -312,7 +312,7 @@ async fn escaped_quotes_in_string_defaults_must_be_unescaped(api: &TestApi) -> T
         api.schema_name()
     );
 
-    api.database().query_raw(&create_table, &[]).await?;
+    api.database().raw_cmd(&create_table).await?;
 
     let schema = api.describe().await?;
 
@@ -358,7 +358,7 @@ async fn escaped_backslashes_in_string_literals_must_be_unescaped(api: &TestApi)
         api.schema_name()
     );
 
-    api.database().query_raw(&create_table, &[]).await?;
+    api.database().raw_cmd(&create_table).await?;
 
     let schema = api.describe().await?;
 

@@ -48,7 +48,7 @@ impl BarrelMigrationExecutor {
 async fn run_full_sql(database: &Arc<dyn Queryable + Send + Sync>, full_sql: &str) {
     for sql in full_sql.split(";") {
         if sql != "" {
-            database.query_raw(&sql, &[]).await.unwrap();
+            database.raw_cmd(&sql).await.unwrap();
         }
     }
 }

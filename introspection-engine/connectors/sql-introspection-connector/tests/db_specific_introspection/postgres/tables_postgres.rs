@@ -391,8 +391,8 @@ async fn introspecting_a_default_value_as_dbgenerated_should_work(api: &TestApi)
     let sequence = format!("CREATE SEQUENCE test_seq START 1");
     let color = format!("CREATE Type color as Enum ('black', 'white')");
 
-    api.database().execute_raw(&sequence, &[]).await.unwrap();
-    api.database().execute_raw(&color, &[]).await.unwrap();
+    api.database().raw_cmd(&sequence).await.unwrap();
+    api.database().raw_cmd(&color).await.unwrap();
 
     let barrel = api.barrel();
     let _setup_schema = barrel
@@ -469,8 +469,8 @@ async fn introspecting_a_legacy_m_to_n_relation_should_work(api: &TestApi) {
     let unique = "CREATE UNIQUE INDEX _CategoryToPost_AB_unique ON \"_CategoryToPost\"(\"a\",\"b\" )";
     let index = "CREATE  INDEX _CategoryToPost_AB_index ON \"_CategoryToPost\"(\"b\" )";
 
-    api.database().execute_raw(unique, &[]).await.unwrap();
-    api.database().execute_raw(index, &[]).await.unwrap();
+    api.database().raw_cmd(unique).await.unwrap();
+    api.database().raw_cmd(index).await.unwrap();
 
     let dm = r#"
             model Category {

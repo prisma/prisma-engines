@@ -70,6 +70,7 @@ fn must_forbid_env_functions_in_provider_field_even_if_missing() {
 }
 
 #[test]
+#[serial]
 fn must_error_for_empty_urls() {
     let schema = r#"
         datasource myds {
@@ -88,6 +89,7 @@ fn must_error_for_empty_urls() {
 }
 
 #[test]
+#[serial]
 fn must_error_for_empty_provider_arrays() {
     let schema = r#"
         datasource myds {
@@ -126,6 +128,7 @@ fn must_error_for_empty_urls_derived_from_env_vars() {
 }
 
 #[test]
+#[serial]
 fn must_error_if_wrong_protocol_is_used_for_mysql() {
     let schema = r#"
         datasource myds {
@@ -144,6 +147,7 @@ fn must_error_if_wrong_protocol_is_used_for_mysql() {
 }
 
 #[test]
+#[serial]
 fn must_error_if_wrong_protocol_is_used_for_postgresql() {
     let schema = r#"
         datasource myds {
@@ -162,6 +166,7 @@ fn must_error_if_wrong_protocol_is_used_for_postgresql() {
 }
 
 #[test]
+#[serial]
 fn must_error_if_wrong_protocol_is_used_for_sqlite() {
     let schema = r#"
         datasource myds {
@@ -180,6 +185,7 @@ fn must_error_if_wrong_protocol_is_used_for_sqlite() {
 }
 
 #[test]
+#[serial]
 fn new_lines_in_source_must_work() {
     let schema = r#"
         datasource ds {

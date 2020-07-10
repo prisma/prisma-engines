@@ -5,10 +5,9 @@ name = "datamodel"
 version = "0.1.0"
 
 [dependencies]
-datamodel-connector = {path = "../connectors/datamodel-connector"}
-prisma-value = {path = "../../prisma-value"}
-rust_decimal = {git = "https://github.com/pimeys/rust-decimal", branch = "pgbouncer-mode"}
-# Temporary until PR is accepted.
+prisma-value = { path = "../../prisma-value" }
+rust_decimal = "1.7"
+datamodel-connector = { path = "../connectors/datamodel-connector" }
 bytecount = "0.5"
 chrono = {version = "0.4.6", features = ["serde"]}
 colored = "1.8.0"

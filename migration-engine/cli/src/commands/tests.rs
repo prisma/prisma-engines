@@ -22,7 +22,7 @@ fn mysql_url(db: Option<&str>) -> String {
     test_setup::mysql_url(db.unwrap_or(""))
 }
 
-#[tokio::test]
+#[async_std::test]
 async fn test_connecting_with_a_working_mysql_connection_string() {
     let db_name = "test_connecting_with_a_working_mysql_connection_string";
     let url = mysql_url(Some(db_name));
@@ -36,7 +36,7 @@ async fn test_connecting_with_a_working_mysql_connection_string() {
     assert_eq!(result, "Connection successful");
 }
 
-#[tokio::test]
+#[async_std::test]
 async fn test_connecting_with_a_non_working_mysql_connection_string() {
     let datasource = mysql_url(Some("this_does_not_exist"));
     let err = run(&["--datasource", &datasource, "can-connect-to-database"])
@@ -46,7 +46,7 @@ async fn test_connecting_with_a_non_working_mysql_connection_string() {
     assert_eq!("P1003", err.error_code().unwrap());
 }
 
-#[tokio::test]
+#[async_std::test]
 async fn test_connecting_with_a_working_psql_connection_string() {
     let url_str = postgres_url(Some("test_connecting_with_a_working_psql_connection_string"));
     let url = url_str.parse().unwrap();
@@ -59,7 +59,7 @@ async fn test_connecting_with_a_working_psql_connection_string() {
     assert_eq!(result, "Connection successful");
 }
 
-#[tokio::test]
+#[async_std::test]
 async fn test_connecting_with_a_working_psql_connection_string_with_postgres_scheme() {
     let url_str = postgres_url_with_scheme(
         Some("test_connecting_with_a_working_psql_connection_string_with_postgres_scheme"),
@@ -75,7 +75,7 @@ async fn test_connecting_with_a_working_psql_connection_string_with_postgres_sch
     assert_eq!(result, "Connection successful");
 }
 
-#[tokio::test]
+#[async_std::test]
 async fn test_connecting_with_a_non_working_psql_connection_string() {
     let datasource = postgres_url(Some("this_does_not_exist"));
     let err = run(&["--datasource", &datasource, "can-connect-to-database"])
@@ -85,7 +85,7 @@ async fn test_connecting_with_a_non_working_psql_connection_string() {
     assert_eq!("P1003", err.error_code().unwrap());
 }
 
-#[tokio::test]
+#[async_std::test]
 async fn test_create_mysql_database() {
     let url = mysql_url(Some("this_should_exist"));
 
@@ -104,9 +104,7 @@ async fn test_create_mysql_database() {
             let uri = mysql_url(None);
             let conn = Quaint::new(&uri).await.unwrap();
 
-            conn.execute_raw("DROP DATABASE `this_should_exist`", &[])
-                .await
-                .unwrap();
+            conn.raw_cmd("DROP DATABASE `this_should_exist`").await.unwrap();
         }
 
         res.unwrap();
@@ -115,7 +113,7 @@ async fn test_create_mysql_database() {
     }
 }
 
-#[tokio::test]
+#[async_std::test]
 async fn test_create_psql_database() {
     let db_name = "this_should_exist";
 
@@ -124,7 +122,7 @@ async fn test_create_psql_database() {
 
         let conn = Quaint::new(&url).await.unwrap();
 
-        conn.execute_raw("DROP DATABASE IF EXISTS \"this_should_exist\"", &[])
+        conn.raw_cmd("DROP DATABASE IF EXISTS \"this_should_exist\"")
             .await
             .unwrap();
     };
@@ -144,7 +142,7 @@ async fn test_create_psql_database() {
     res.unwrap();
 }
 
-#[tokio::test]
+#[async_std::test]
 async fn test_create_sqlite_database() {
     let base_dir = tempfile::tempdir().unwrap();
 

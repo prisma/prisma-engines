@@ -56,7 +56,7 @@ async fn destructive_change_checks_run_on_unapply_migration(api: &TestApi) -> Te
         .value("id", "the-id")
         .value("field", "meow");
 
-    api.database().query(query.into()).await?;
+    api.database().execute(query.into()).await?;
 
     let output = api.unapply_migration().force(Some(false)).send().await?;
 

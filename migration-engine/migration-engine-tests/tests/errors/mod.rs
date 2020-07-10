@@ -6,7 +6,7 @@ use quaint::prelude::*;
 use serde_json::json;
 use url::Url;
 
-#[tokio::test]
+#[async_std::test]
 async fn authentication_failure_must_return_a_known_error_on_postgres() {
     let mut url: Url = postgres_10_url("test-db").parse().unwrap();
 
@@ -41,7 +41,7 @@ async fn authentication_failure_must_return_a_known_error_on_postgres() {
     assert_eq!(json_error, expected);
 }
 
-#[tokio::test]
+#[async_std::test]
 async fn authentication_failure_must_return_a_known_error_on_mysql() {
     let mut url: Url = mysql_url("authentication_failure_must_return_a_known_error_on_mysql")
         .parse()
@@ -78,7 +78,7 @@ async fn authentication_failure_must_return_a_known_error_on_mysql() {
     assert_eq!(json_error, expected);
 }
 
-#[tokio::test]
+#[async_std::test]
 async fn unreachable_database_must_return_a_proper_error_on_mysql() {
     let mut url: Url = mysql_url("unreachable_database_must_return_a_proper_error_on_mysql")
         .parse()
@@ -115,7 +115,7 @@ async fn unreachable_database_must_return_a_proper_error_on_mysql() {
     assert_eq!(json_error, expected);
 }
 
-#[tokio::test]
+#[async_std::test]
 async fn unreachable_database_must_return_a_proper_error_on_postgres() {
     let mut url: Url = postgres_10_url("unreachable_database_must_return_a_proper_error_on_postgres")
         .parse()
@@ -152,7 +152,7 @@ async fn unreachable_database_must_return_a_proper_error_on_postgres() {
     assert_eq!(json_error, expected);
 }
 
-#[tokio::test]
+#[async_std::test]
 async fn database_does_not_exist_must_return_a_proper_error() {
     let mut url: Url = mysql_url("database_does_not_exist_must_return_a_proper_error")
         .parse()
@@ -188,16 +188,14 @@ async fn database_does_not_exist_must_return_a_proper_error() {
     assert_eq!(json_error, expected);
 }
 
-#[tokio::test]
+#[async_std::test]
 async fn database_access_denied_must_return_a_proper_error_in_rpc() {
     let db_name = "dbaccessdeniedinrpc";
     let url: Url = mysql_url(db_name).parse().unwrap();
     let conn = create_mysql_database(&url).await.unwrap();
 
-    conn.execute_raw("DROP USER IF EXISTS jeanyves", &[]).await.unwrap();
-    conn.execute_raw("CREATE USER jeanyves IDENTIFIED BY '1234'", &[])
-        .await
-        .unwrap();
+    conn.raw_cmd("DROP USER IF EXISTS jeanyves").await.unwrap();
+    conn.raw_cmd("CREATE USER jeanyves IDENTIFIED BY '1234'").await.unwrap();
 
     let mut url: Url = url.clone();
     url.set_username("jeanyves").unwrap();
@@ -230,7 +228,7 @@ async fn database_access_denied_must_return_a_proper_error_in_rpc() {
     assert_eq!(json_error, expected);
 }
 
-#[tokio::test]
+#[async_std::test]
 async fn bad_datasource_url_and_provider_combinations_must_return_a_proper_error() {
     let db_name = "bad_datasource_url_and_provider_combinations_must_return_a_proper_error";
     let dm = format!(

@@ -273,24 +273,18 @@ async fn introspecting_a_prisma_many_to_many_relation_should_work(api: &TestApi)
         .await;
 
     api.database()
-        .execute_raw(
-            &format!(
-                "CREATE UNIQUE INDEX \"{}\".test ON \"_PostToUser\" (\"A\", \"B\");",
-                api.schema_name(),
-            ),
-            &[],
-        )
+        .raw_cmd(&format!(
+            "CREATE UNIQUE INDEX \"{}\".test ON \"_PostToUser\" (\"A\", \"B\");",
+            api.schema_name(),
+        ))
         .await
         .unwrap();
 
     api.database()
-        .execute_raw(
-            &format!(
-                "CREATE INDEX \"{}\".test2 ON \"_PostToUser\" (\"B\");",
-                api.schema_name(),
-            ),
-            &[],
-        )
+        .raw_cmd(&format!(
+            "CREATE INDEX \"{}\".test2 ON \"_PostToUser\" (\"B\");",
+            api.schema_name(),
+        ))
         .await
         .unwrap();
 

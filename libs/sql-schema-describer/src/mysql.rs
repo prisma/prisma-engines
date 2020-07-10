@@ -81,7 +81,7 @@ impl SqlSchemaDescriber {
     async fn get_databases(&self) -> Vec<String> {
         debug!("Getting databases");
         let sql = "select schema_name as schema_name from information_schema.schemata;";
-        let rows = self.conn.query_raw(sql, &[]).await.expect("get schema names ");
+        let rows = self.conn.query_raw(sql, Vec::new()).await.expect("get schema names ");
         let names = rows
             .into_iter()
             .map(|row| {
@@ -104,7 +104,7 @@ impl SqlSchemaDescriber {
             ORDER BY table_name";
         let rows = self
             .conn
-            .query_raw(sql, &[schema.into()])
+            .query_raw(sql, vec![schema.into()])
             .await
             .expect("get table names ");
         let names = rows
@@ -130,7 +130,11 @@ impl SqlSchemaDescriber {
             FROM information_schema.TABLES
             WHERE table_schema = ?
         "#;
-        let result = self.conn.query_raw(sql, &[schema.into()]).await.expect("get db size ");
+        let result = self
+            .conn
+            .query_raw(sql, vec![schema.into()])
+            .await
+            .expect("get db size ");
         let size = result
             .first()
             .and_then(|row| {
@@ -195,7 +199,7 @@ async fn get_all_columns(
     let mut map = HashMap::new();
 
     let rows = conn
-        .query_raw(sql, &[schema_name.into()])
+        .query_raw(sql, vec![schema_name.into()])
         .await
         .expect("querying for columns");
 
@@ -335,7 +339,7 @@ async fn get_all_indexes(
             ";
     debug!("describing indices, SQL: {}", sql);
     let rows = conn
-        .query_raw(sql, &[schema_name.into()])
+        .query_raw(sql, vec![schema_name.into()])
         .await
         .expect("querying for indices");
 
@@ -435,7 +439,7 @@ async fn get_foreign_keys(conn: &dyn Queryable, schema_name: &str) -> HashMap<St
     debug!("describing table foreign keys, SQL: '{}'", sql);
 
     let result_set = conn
-        .query_raw(sql, &[schema_name.into(), schema_name.into()])
+        .query_raw(sql, vec![schema_name.into(), schema_name.into()])
         .await
         .expect("querying for foreign keys");
 

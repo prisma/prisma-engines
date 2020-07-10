@@ -64,7 +64,7 @@ async fn get_database_version(connection: &Quaint, connection_info: &ConnectionI
         SqlFamily::Mysql => {
             let query = r#"SELECT @@GLOBAL.version version"#;
 
-            let rows = connection.query_raw(query, &[]).await?;
+            let rows = connection.query_raw(query, vec![]).await?;
 
             let version_string = rows
                 .get(0)

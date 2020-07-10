@@ -1,0 +1,11 @@
+- ScalarListsQuerySpec
+  - full scalar list
+    - should return full list for enum
+- CreateMutationListSpec
+  - A Create Mutation
+    - should create and return items with listvalues
+  - A Create Mutation
+    - should create and return items with empty listvalues
+- UpdateManyListSpec
+  - The updateMany Mutation
+    - should update Lists of Enums

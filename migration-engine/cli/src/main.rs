@@ -40,7 +40,7 @@ impl SubCommand {
     }
 }
 
-#[tokio::main]
+#[async_std::main]
 async fn main() {
     user_facing_errors::set_panic_hook();
     logger::init_logger();

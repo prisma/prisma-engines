@@ -11,7 +11,7 @@ use structopt::StructOpt;
 #[structopt(version = env!("GIT_HASH"))]
 pub struct IntrospectionOpt {}
 
-#[tokio::main]
+#[async_std::main]
 async fn main() {
     init_logger();
 

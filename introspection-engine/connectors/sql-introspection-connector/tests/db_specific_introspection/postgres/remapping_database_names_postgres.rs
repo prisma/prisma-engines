@@ -237,7 +237,7 @@ async fn remapping_fields_in_compound_relations_should_work(api: &TestApi) {
 #[test_each_connector(tags("postgres"))]
 async fn remapping_enum_names_should_work(api: &TestApi) {
     let sql1 = format!("CREATE Type _color as ENUM ('black')");
-    api.database().execute_raw(&sql1, &[]).await.unwrap();
+    api.database().raw_cmd(&sql1).await.unwrap();
 
     api.barrel()
         .execute(|migration| {
@@ -267,7 +267,7 @@ async fn remapping_enum_names_should_work(api: &TestApi) {
 #[test_each_connector(tags("postgres"))]
 async fn remapping_enum_values_should_work(api: &TestApi) {
     let sql1 = format!("CREATE Type Color as ENUM ('b lack', 'w hite')");
-    api.database().execute_raw(&sql1, &[]).await.unwrap();
+    api.database().raw_cmd(&sql1).await.unwrap();
 
     api.barrel()
         .execute(|migration| {
@@ -323,7 +323,7 @@ async fn remapping_compound_primary_keys_should_work(api: &TestApi) {
 async fn remapping_enum_default_values_should_work(api: &TestApi) {
     let sql = format!("CREATE Type color as ENUM ( 'b lack', 'white')");
 
-    api.database().execute_raw(&sql, &[]).await.unwrap();
+    api.database().raw_cmd(&sql).await.unwrap();
 
     api.barrel()
         .execute(|migration| {

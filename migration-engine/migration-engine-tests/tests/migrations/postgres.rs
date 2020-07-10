@@ -73,8 +73,8 @@ async fn existing_postgis_tables_must_not_be_migrated(api: &TestApi) -> TestResu
     // The capitalized Geometry is intentional here, because we want the matching to be case-insensitive.
     let create_geometry_columns_table = "CREATE TABLE IF NOT EXiSTS \"Geometry_columns\" ( id SERIAL PRIMARY KEY )";
 
-    api.database().execute_raw(create_spatial_ref_sys_table, &[]).await?;
-    api.database().execute_raw(create_geometry_columns_table, &[]).await?;
+    api.database().raw_cmd(create_spatial_ref_sys_table).await?;
+    api.database().raw_cmd(create_geometry_columns_table).await?;
 
     api.assert_schema()
         .await?

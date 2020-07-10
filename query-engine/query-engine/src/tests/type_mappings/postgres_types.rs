@@ -93,7 +93,7 @@ const CREATE_ONE_TYPES_QUERY: &str = indoc! {
                 # time_interval: "3 hours"
                 boolean_boolean: true
                 # network_cidr: "192.168.100.14/24"
-                network_inet: "192.168.100.14"
+                network_inet: "192.168.100.14/32"
                 # network_mac: "12:33:ed:44:49:36"
                 # search_tsvector: "''a'' ''dump'' ''dumps'' ''fox'' ''in'' ''the''"
                 # search_tsquery: "''foxy cat''"
@@ -177,7 +177,7 @@ fn create_one_types_response() -> serde_json::Value {
                 "time_time": "1970-01-01T08:00:00.000Z",
                 "time_timetz": "1970-01-01T08:00:00.000Z",
                 "boolean_boolean": true,
-                "network_inet": "192.168.100.14",
+                "network_inet": "192.168.100.14/32",
                 "json_json": "{\"isJson\":true}",
                 "json_jsonb": "{\"isJSONB\":true}",
             }
@@ -369,7 +369,7 @@ const CREATE_ONE_ARRAY_TYPES_QUERY: &str = indoc!(
                 time_time: { set: ["2020-03-05T08:00:00.000"] }
                 time_timetz: { set: ["2020-03-05T08:00:00.000"] }
                 boolean_boolean: { set: [true, true, false, true] }
-                network_inet: { set: ["192.168.100.14"] }
+                network_inet: { set: ["192.168.100.14/32"] }
                 json_json: { set: ["{ \"isJson\": true }"] }
                 json_jsonb: { set: ["{ \"isJSONB\": true }"] }
             }
@@ -426,7 +426,7 @@ fn create_one_array_types_response() -> serde_json::Value {
                 "time_time": ["1970-01-01T08:00:00.000Z"],
                 "time_timetz": ["1970-01-01T08:00:00.000Z"],
                 "boolean_boolean": [true, true, false, true],
-                "network_inet": ["192.168.100.14"],
+                "network_inet": ["192.168.100.14/32"],
                 "json_json": ["{\"isJson\":true}"],
                 "json_jsonb": ["{\"isJSONB\":true}"],
             }
@@ -503,7 +503,7 @@ async fn all_postgres_id_types_work(api: &TestApi) -> TestResult {
         ("time", "\"1970-01-01T12:33:00.050Z\""),
         ("timetz", "\"1970-01-01T12:33:00.050Z\""),
         ("boolean", "true"),
-        ("inet", "\"127.0.0.4\""),
+        ("inet", "\"127.0.0.4/32\""),
         // ("json", "\"{ \\\"isThisPrimaryKeyReallyJSON\\\": true }\""),
         ("jsonb", "\"{\\\"isThisPrimaryKeyReallyJSON\\\":true}\""),
     ];
@@ -582,7 +582,7 @@ async fn all_postgres_types_work_as_filter(api: &TestApi) -> TestResult {
                     time_time: "2020-03-05T08:00:00.000"
                     time_timetz: "2020-03-05T08:00:00.000"
                     boolean_boolean: true
-                    network_inet: "192.168.100.14"
+                    network_inet: "192.168.100.14/32"
                     json_json: "{ \"isJson\": true }"
                     json_jsonb: "{ \"isJSONB\": true }"
                 }
@@ -639,7 +639,7 @@ const CREATE_TYPES_TABLE_WITH_DEFAULTS: &str = indoc! {
         boolean_boolean boolean NOT NULL DEFAULT TRUE,
 
         -- network_cidr cidr,
-        network_inet inet NOT NULL DEFAULT '127.0.0.3',
+        network_inet inet NOT NULL DEFAULT '127.0.0.3/32',
         -- network_mac  macaddr,
 
         -- search_tsvector tsvector,
@@ -727,7 +727,7 @@ async fn postgres_db_level_defaults_work(api: &TestApi) -> TestResult {
                 "time_time": "1970-01-01T08:09:10.000Z",
                 "time_timetz": "1970-01-01T08:09:10.000Z",
                 "boolean_boolean": true,
-                "network_inet": "127.0.0.3",
+                "network_inet": "127.0.0.3/32",
                 "json_json": "{\"name\":null}",
                 "json_jsonb": "{\"name\":null}",
             }
@@ -772,7 +772,7 @@ const CREATE_TYPES_TABLE_WITH_ARRAY_DEFAULTS: &str = indoc! {
         boolean_boolean boolean[] NOT NULL DEFAULT '{ true, true, true, false }',
 
         -- network_cidr cidr[],
-        network_inet inet[] NOT NULL DEFAULT '{"127.0.0.3", "127.0.0.4"}',
+        network_inet inet[] NOT NULL DEFAULT '{"127.0.0.3/32", "127.0.0.4/32"}',
 
         json_json json[] NOT NULL DEFAULT '{"true", "[]", "{ \"isJson\": true }"}',
         json_jsonb jsonb[] NOT NULL DEFAULT '{"true", "[]", "{ \"isJson\": true }"}'
@@ -847,7 +847,7 @@ async fn postgres_db_level_array_defaults_work(api: &TestApi) -> TestResult {
                 "time_time": ["1970-01-01T12:30:00.000Z", "1970-01-01T13:30:00.000Z"],
                 "time_timetz": ["1970-01-01T12:30:00.000Z", "1970-01-01T13:30:00.000Z"],
                 "boolean_boolean": [true, true, true, false],
-                "network_inet": ["127.0.0.3", "127.0.0.4"],
+                "network_inet": ["127.0.0.3/32", "127.0.0.4/32"],
                 "json_json": ["true", "[]", "{\"isJson\":true}"],
                 "json_jsonb": ["true", "[]", "{\"isJson\":true}"],
             }

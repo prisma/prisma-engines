@@ -69,7 +69,7 @@ impl SqlSchemaDescriber {
     async fn get_databases(&self) -> Vec<String> {
         debug!("Getting databases");
         let sql = "PRAGMA database_list;";
-        let rows = self.conn.query_raw(sql, &[]).await.expect("get schema names ");
+        let rows = self.conn.query_raw(sql, vec![]).await.expect("get schema names ");
         let names = rows
             .into_iter()
             .map(|row| {
@@ -87,7 +87,7 @@ impl SqlSchemaDescriber {
     async fn get_table_names(&self, schema: &str) -> Vec<String> {
         let sql = format!(r#"SELECT name FROM "{}".sqlite_master WHERE type='table'"#, schema);
         debug!("describing table names with query: '{}'", sql);
-        let result_set = self.conn.query_raw(&sql, &[]).await.expect("get table names");
+        let result_set = self.conn.query_raw(&sql, vec![]).await.expect("get table names");
         let names = result_set
             .into_iter()
             .map(|row| row.get("name").and_then(|x| x.to_string()).unwrap())
@@ -100,7 +100,7 @@ impl SqlSchemaDescriber {
     async fn get_size(&self, _schema: &str) -> usize {
         debug!("Getting db size");
         let sql = r#"SELECT page_count * page_size as size FROM pragma_page_count(), pragma_page_size();"#;
-        let result = self.conn.query_raw(&sql, &[]).await.expect("get db size ");
+        let result = self.conn.query_raw(&sql, vec![]).await.expect("get db size ");
         let size: i64 = result
             .first()
             .map(|row| row.get("size").and_then(|x| x.as_i64()).unwrap_or(0))
@@ -126,8 +126,9 @@ impl SqlSchemaDescriber {
     async fn get_columns(&self, schema: &str, table: &str) -> (Vec<Column>, Option<PrimaryKey>) {
         let sql = format!(r#"PRAGMA "{}".table_info ("{}")"#, schema, table);
         debug!("describing table columns, query: '{}'", sql);
-        let result_set = self.conn.query_raw(&sql, &[]).await.unwrap();
+        let result_set = self.conn.query_raw(&sql, vec![]).await.unwrap();
         let mut pk_cols: HashMap<i64, String> = HashMap::new();
+
         let mut cols: Vec<Column> = result_set
             .into_iter()
             .map(|row| {
@@ -260,7 +261,11 @@ impl SqlSchemaDescriber {
 
         let sql = format!(r#"PRAGMA "{}".foreign_key_list("{}");"#, schema, table);
         debug!("describing table foreign keys, SQL: '{}'", sql);
-        let result_set = self.conn.query_raw(&sql, &[]).await.expect("querying for foreign keys");
+        let result_set = self
+            .conn
+            .query_raw(&sql, vec![])
+            .await
+            .expect("querying for foreign keys");
 
         // Since one foreign key with multiple columns will be represented here as several
         // rows with the same ID, we have to use an intermediate representation that gets
@@ -356,7 +361,7 @@ impl SqlSchemaDescriber {
     async fn get_indices(&self, schema: &str, table: &str) -> Vec<Index> {
         let sql = format!(r#"PRAGMA "{}".index_list("{}");"#, schema, table);
         debug!("describing table indices, SQL: '{}'", sql);
-        let result_set = self.conn.query_raw(&sql, &[]).await.expect("querying for indices");
+        let result_set = self.conn.query_raw(&sql, vec![]).await.expect("querying for indices");
         debug!("Got indices description results: {:?}", result_set);
 
         let mut indices = Vec::new();
@@ -379,7 +384,11 @@ impl SqlSchemaDescriber {
 
             let sql = format!(r#"PRAGMA "{}".index_info("{}");"#, schema, name);
             debug!("describing table index '{}', SQL: '{}'", name, sql);
-            let result_set = self.conn.query_raw(&sql, &[]).await.expect("querying for index info");
+            let result_set = self
+                .conn
+                .query_raw(&sql, vec![])
+                .await
+                .expect("querying for index info");
             debug!("Got index description results: {:?}", result_set);
             for row in result_set.into_iter() {
                 let pos = row.get("seqno").and_then(|x| x.as_i64()).expect("get seqno") as usize;
