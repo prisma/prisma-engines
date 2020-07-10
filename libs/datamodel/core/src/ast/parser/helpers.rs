@@ -1,18 +1,7 @@
 use super::Rule;
 use crate::ast::{Identifier, Span};
 
-pub trait ToIdentifier {
-    fn to_id(&self) -> Identifier;
-}
-
-impl ToIdentifier for pest::iterators::Pair<'_, Rule> {
-    fn to_id(&self) -> Identifier {
-        Identifier {
-            name: String::from(self.as_str()),
-            span: Span::from_pest(self.as_span()),
-        }
-    }
-}
+pub type Token<'a> = pest::iterators::Pair<'a, Rule>;
 
 pub fn parsing_catch_all(token: &Token, kind: &str) {
     match token.as_rule() {
@@ -26,7 +15,19 @@ pub fn parsing_catch_all(token: &Token, kind: &str) {
     }
 }
 
-pub type Token<'a> = pest::iterators::Pair<'a, Rule>;
+pub trait ToIdentifier {
+    fn to_id(&self) -> Identifier;
+}
+
+// this is not implemented for Token because auto completion does not work then
+impl ToIdentifier for pest::iterators::Pair<'_, Rule> {
+    fn to_id(&self) -> Identifier {
+        Identifier {
+            name: String::from(self.as_str()),
+            span: Span::from_pest(self.as_span()),
+        }
+    }
+}
 
 pub trait TokenExtensions {
     fn first_child(&self) -> Token;
