@@ -25,10 +25,10 @@ impl DirectiveValidator<dml::Field> for UpdatedAtDirectiveValidator {
                 return Ok(());
             }
         }
-        return self.new_directive_validation_error(
+        self.new_directive_validation_error(
             "Fields that are marked with @updatedAt must be of type DateTime.",
             args.span(),
-        );
+        )
     }
 
     fn serialize(

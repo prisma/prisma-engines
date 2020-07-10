@@ -210,15 +210,15 @@ impl Standardiser {
                     let underlying_field_names = underlying_fields.iter().map(|f| f.name.clone()).collect();
                     let underlying_fields_to_add = underlying_fields
                             .into_iter()
-                            .filter_map(|f| {
+                            .filter(|f| {
                                 match related_model.find_field(&f.name) {
                                     None => {
                                         // field with name does not exist yet
-                                        Some(f)
+                                        true
                                     }
                                     Some(other) if other.field_type().is_compatible_with(&f.field_type) => {
                                         // field with name exists and its type is compatible. We must not add it since we would have a duplicate.
-                                        None
+                                        false
                                     }
                                     _ => {
                                         // field with name exists and the type is incompatible.
@@ -235,7 +235,7 @@ impl Standardiser {
                                                 .expect(ERROR_GEN_STATE_ERROR)
                                                 .span,
                                         ));
-                                        None
+                                        false
                                     }
                                 }
                             })

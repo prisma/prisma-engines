@@ -210,7 +210,7 @@ impl<'a> Validator<'a> {
                         &format!("Field `{}` in model `{}` can't be of type Json. The current connector does not support the Json type.", &field.name, &model.name),
                         &model.name,
                         &field.name,
-                        ast_field.span.clone(),
+                        ast_field.span,
                     ));
                 }
             }
@@ -291,7 +291,7 @@ impl<'a> Validator<'a> {
                     &model.name
                 ),
                 &model.name,
-                ast_model.span.clone(),
+                ast_model.span,
             ))
         } else {
             Ok(())
@@ -348,14 +348,14 @@ impl<'a> Validator<'a> {
                 .fields
                 .iter()
                 .filter(|base_field| model.find_field(&base_field).is_none())
-                .map(|f| f.clone())
+                .cloned()
                 .collect();
 
             let referenced_relation_fields: Vec<String> = rel_info
                 .fields
                 .iter()
                 .filter(|base_field| model.find_relation_field(&base_field).is_some())
-                .map(|f| f.clone())
+                .cloned()
                 .collect();
 
             let at_least_one_underlying_field_is_required = rel_info
@@ -377,14 +377,14 @@ impl<'a> Validator<'a> {
             if !unknown_fields.is_empty() {
                 errors.push(DatamodelError::new_validation_error(
                         &format!("The argument fields must refer only to existing fields. The following fields do not exist in this model: {}", unknown_fields.join(", ")),
-                        ast_field.span.clone())
+                        ast_field.span)
                     );
             }
 
             if !referenced_relation_fields.is_empty() {
                 errors.push(DatamodelError::new_validation_error(
                         &format!("The argument fields must refer only to scalar fields. But it is referencing the following relation fields: {}", referenced_relation_fields.join(", ")),
-                        ast_field.span.clone())
+                        ast_field.span)
                     );
             }
 
@@ -395,7 +395,7 @@ impl<'a> Validator<'a> {
                             &field.name,
                             rel_info.fields.join(", ")
                         ),
-                        ast_field.span.clone())
+                        ast_field.span)
                     );
             }
 
@@ -406,7 +406,7 @@ impl<'a> Validator<'a> {
                             &field.name,
                             rel_info.fields.join(", ")
                         ),
-                        ast_field.span.clone())
+                        ast_field.span)
                     );
             }
         }
@@ -439,14 +439,14 @@ impl<'a> Validator<'a> {
                 .to_fields
                 .iter()
                 .filter(|referenced_field| related_model.find_field(&referenced_field).is_none())
-                .map(|f| f.clone())
+                .cloned()
                 .collect();
 
             let referenced_relation_fields: Vec<String> = rel_info
                 .to_fields
                 .iter()
                 .filter(|base_field| related_model.find_relation_field(&base_field).is_some())
-                .map(|f| f.clone())
+                .cloned()
                 .collect();
 
             let fields_with_wrong_type: Vec<DatamodelError> = rel_info.fields.iter().zip(rel_info.to_fields.iter())
@@ -464,7 +464,7 @@ impl<'a> Validator<'a> {
                                     &related_model.name
                                 ),
                                 RELATION_DIRECTIVE_NAME,
-                                ast_field.span.clone(),
+                                ast_field.span,
                             ))
                         } else {
                             None
@@ -477,7 +477,7 @@ impl<'a> Validator<'a> {
                         &format!("The argument `references` must refer only to existing fields in the related model `{}`. The following fields do not exist in the related model: {}",
                                  &related_model.name,
                                  unknown_fields.join(", ")),
-                        ast_field.span.clone())
+                        ast_field.span)
                     );
             }
 
@@ -486,26 +486,21 @@ impl<'a> Validator<'a> {
                         &format!("The argument `references` must refer only to scalar fields in the related model `{}`. But it is referencing the following relation fields: {}",
                                  &related_model.name,
                                  referenced_relation_fields.join(", ")),
-                        ast_field.span.clone())
+                        ast_field.span)
                     );
             }
 
             if !rel_info.to_fields.is_empty() && !errors.has_errors() {
                 // when we have other errors already don't push this error additionally
-                let references_unique_criteria = related_model
-                    .loose_unique_criterias()
-                    .iter()
-                    .find(|criteria| {
-                        let mut criteria_field_names: Vec<_> =
-                            criteria.fields.iter().map(|f| f.name.to_owned()).collect();
-                        criteria_field_names.sort();
+                let references_unique_criteria = related_model.loose_unique_criterias().iter().any(|criteria| {
+                    let mut criteria_field_names: Vec<_> = criteria.fields.iter().map(|f| f.name.to_owned()).collect();
+                    criteria_field_names.sort();
 
-                        let mut to_fields_sorted = rel_info.to_fields.clone();
-                        to_fields_sorted.sort();
+                    let mut to_fields_sorted = rel_info.to_fields.clone();
+                    to_fields_sorted.sort();
 
-                        criteria_field_names == to_fields_sorted
-                    })
-                    .is_some();
+                    criteria_field_names == to_fields_sorted
+                });
 
                 let references_singular_id_field = if rel_info.to_fields.len() == 1 {
                     let field_name = rel_info.to_fields.first().unwrap();
@@ -533,7 +528,7 @@ impl<'a> Validator<'a> {
                             &format!("The argument `references` must refer to a unique criteria in the related model `{}`. But it is referencing the following fields that are not a unique criteria: {}",
                                      &related_model.name,
                                      rel_info.to_fields.join(", ")),
-                            ast_field.span.clone())
+                            ast_field.span)
                         );
                 }
 
@@ -546,7 +541,7 @@ impl<'a> Validator<'a> {
                                 &related_model.name,
                                 rel_info.to_fields.join(", ")
                             ),
-                            ast_field.span.clone())
+                            ast_field.span)
                         );
                 }
             }
@@ -556,9 +551,9 @@ impl<'a> Validator<'a> {
                 && rel_info.fields.len() != rel_info.to_fields.len()
             {
                 errors.push(DatamodelError::new_directive_validation_error(
-                    &format!("You must specify the same number of fields in `fields` and `references`.",),
+                    "You must specify the same number of fields in `fields` and `references`.",
                     RELATION_DIRECTIVE_NAME,
-                    ast_field.span.clone(),
+                    ast_field.span,
                 ));
             }
 
@@ -589,7 +584,7 @@ impl<'a> Validator<'a> {
                 .iter()
                 .find(|ast_field| ast_field.name.name == field.name)
                 .map(|ast_field| ast_field.span)
-                .unwrap_or(ast::Span::empty());
+                .unwrap_or_else(ast::Span::empty);
 
             let rel_info = &field.relation_info;
             let related_model = datamodel.find_model(&rel_info.to).expect(STATE_ERROR);
@@ -608,7 +603,7 @@ impl<'a> Validator<'a> {
                                 &field.name, &model.name, RELATION_DIRECTIVE_NAME_WITH_AT, PRISMA_FORMAT_HINT
                             ),
                             RELATION_DIRECTIVE_NAME,
-                            field_span.clone(),
+                            field_span,
                         ));
                 }
 
@@ -619,22 +614,23 @@ impl<'a> Validator<'a> {
                                 &field.name, &model.name, RELATION_DIRECTIVE_NAME_WITH_AT
                             ),
                             RELATION_DIRECTIVE_NAME,
-                            field_span.clone(),
+                            field_span,
                         ));
                 }
             }
 
-            if field.is_list() && !related_field.is_list() {
-                if !rel_info.fields.is_empty() || !rel_info.to_fields.is_empty() {
-                    errors.push(DatamodelError::new_directive_validation_error(
+            if field.is_list()
+                && !related_field.is_list()
+                && (!rel_info.fields.is_empty() || !rel_info.to_fields.is_empty())
+            {
+                errors.push(DatamodelError::new_directive_validation_error(
                             &format!(
                                 "The relation field `{}` on Model `{}` must not specify the `fields` or `references` argument in the {} directive. You must only specify it on the opposite field `{}` on model `{}`.",
                                 &field.name, &model.name, RELATION_DIRECTIVE_NAME_WITH_AT, &related_field.name, &related_model.name
                             ),
                             RELATION_DIRECTIVE_NAME,
-                            field_span.clone(),
+                            field_span,
                         ));
-                }
             }
 
             // required ONE TO ONE SELF RELATION
@@ -647,7 +643,7 @@ impl<'a> Validator<'a> {
                         ),
                         &model.name,
                         &field.name,
-                        field_span.clone(),
+                        field_span,
                     ));
             }
 
@@ -660,7 +656,7 @@ impl<'a> Validator<'a> {
                                 &field.name, &model.name, &related_field.name, &related_model.name, RELATION_DIRECTIVE_NAME_WITH_AT
                             ),
                             RELATION_DIRECTIVE_NAME,
-                            field_span.clone(),
+                            field_span,
                         ));
                 }
 
@@ -671,7 +667,7 @@ impl<'a> Validator<'a> {
                                 &field.name, &model.name, &related_field.name, &related_model.name, RELATION_DIRECTIVE_NAME_WITH_AT
                             ),
                             RELATION_DIRECTIVE_NAME,
-                            field_span.clone(),
+                            field_span,
                         ));
                 }
 
@@ -682,7 +678,7 @@ impl<'a> Validator<'a> {
                                 &field.name, &model.name, &related_field.name, &related_model.name, RELATION_DIRECTIVE_NAME_WITH_AT
                             ),
                             RELATION_DIRECTIVE_NAME,
-                            field_span.clone(),
+                            field_span,
                         ));
                 }
 
@@ -693,7 +689,7 @@ impl<'a> Validator<'a> {
                                 &field.name, &model.name, &related_field.name, &related_model.name, RELATION_DIRECTIVE_NAME_WITH_AT
                             ),
                             RELATION_DIRECTIVE_NAME,
-                            field_span.clone(),
+                            field_span,
                         ));
                 }
 
@@ -705,7 +701,7 @@ impl<'a> Validator<'a> {
                                 &field.name, &model.name, RELATION_DIRECTIVE_NAME_WITH_AT, &related_field.name, &related_model.name,
                             ),
                             RELATION_DIRECTIVE_NAME,
-                            field_span.clone(),
+                            field_span,
                             ));
                     }
 
@@ -716,16 +712,15 @@ impl<'a> Validator<'a> {
                                     &field.name, &model.name, RELATION_DIRECTIVE_NAME_WITH_AT, &related_field.name, &related_model.name,
                                 ),
                                 RELATION_DIRECTIVE_NAME,
-                                field_span.clone(),
+                                field_span,
                             ));
                     }
                 }
             }
 
             // MANY TO MANY
-            if field.is_list() && related_field.is_list() {
-                if !related_model.has_single_id_field() {
-                    errors.push(DatamodelError::new_field_validation_error(
+            if field.is_list() && related_field.is_list() && !related_model.has_single_id_field() {
+                errors.push(DatamodelError::new_field_validation_error(
                             &format!(
                                 "The relation field `{}` on Model `{}` references `{}` which does not have an `@id` field. Models without `@id` can not be part of a many to many relation. Use an explicit intermediate Model to represent this relationship.",
                                 &field.name,
@@ -734,9 +729,8 @@ impl<'a> Validator<'a> {
                             ),
                             &model.name,
                             &field.name,
-                            field_span.clone(),
+                            field_span,
                         ));
-                }
             }
         }
 

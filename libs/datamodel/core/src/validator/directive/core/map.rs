@@ -6,7 +6,7 @@ use crate::{ast, dml, Datamodel, WithDatabaseName};
 /// Prismas builtin `@map` directive.
 pub struct MapDirectiveValidator {}
 
-const DIRECTIVE_NAME: &'static str = "map";
+const DIRECTIVE_NAME: &str = "map";
 
 impl DirectiveValidator<dml::Model> for MapDirectiveValidator {
     fn directive_name(&self) -> &str {

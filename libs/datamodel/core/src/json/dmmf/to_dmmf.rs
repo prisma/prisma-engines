@@ -3,7 +3,6 @@ use crate::common::ScalarType;
 use crate::{dml, IndexType};
 use prisma_value::PrismaValue;
 use rust_decimal::prelude::ToPrimitive;
-use serde_json;
 
 pub fn render_to_dmmf(schema: &dml::Datamodel) -> String {
     let dmmf = schema_to_dmmf(schema);
@@ -94,7 +93,7 @@ fn model_to_dmmf(model: &dml::Model) -> Model {
 fn field_to_dmmf(model: &dml::Model, field: &dml::Field) -> Field {
     let a_relation_field_is_based_on_this_field: bool = model
         .relation_fields()
-        .any(|f| f.relation_info.fields.iter().any(|f| f == &field.name()));
+        .any(|f| f.relation_info.fields.iter().any(|f| f == field.name()));
 
     Field {
         name: field.name().to_string(),
@@ -152,7 +151,7 @@ fn prisma_value_to_serde(value: &PrismaValue) -> serde_json::Value {
     }
 }
 
-fn function_to_serde(name: &str, args: &Vec<PrismaValue>) -> serde_json::Value {
+fn function_to_serde(name: &str, args: &[PrismaValue]) -> serde_json::Value {
     let func = Function {
         name: String::from(name),
         args: args.iter().map(|arg| prisma_value_to_serde(arg)).collect(),

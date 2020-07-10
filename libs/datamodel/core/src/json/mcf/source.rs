@@ -1,5 +1,4 @@
 use crate::{configuration, StringFromEnvVar};
-use serde_json;
 
 #[serde(rename_all = "camelCase")]
 #[derive(Debug, serde::Serialize)]

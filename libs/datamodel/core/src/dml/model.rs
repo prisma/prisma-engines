@@ -188,11 +188,8 @@ impl Model {
         let mut result = Vec::new();
         // first candidate: the singular id field
         {
-            let mut singular_id_fields = self.singular_id_fields();
-
-            match singular_id_fields.next() {
-                Some(x) => result.push(UniqueCriteria::new(vec![x])),
-                None => {}
+            if let Some(x) = self.singular_id_fields().next() {
+                result.push(UniqueCriteria::new(vec![x]))
             }
         }
 

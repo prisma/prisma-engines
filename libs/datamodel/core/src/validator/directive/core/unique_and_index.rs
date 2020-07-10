@@ -276,7 +276,7 @@ fn directive_name(index_type: dml::IndexType) -> &'static str {
 }
 
 // returns the items that are contained multiple times in the provided vector
-fn find_duplicates(items: &Vec<String>) -> Vec<String> {
+fn find_duplicates(items: &[String]) -> Vec<String> {
     let mut counts = HashMap::new();
     for item in items.iter() {
         let entry = counts.entry(item).or_insert(0);
