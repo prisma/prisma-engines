@@ -118,8 +118,7 @@ pub fn introspect(
     }
 
     for (model, field) in fields_to_be_added {
-        let model = data_model.find_model_mut(&model).unwrap();
-        model.add_field(Field::RelationField(field));
+        data_model.find_model_mut(&model).add_field(Field::RelationField(field));
     }
 
     Ok(())

@@ -11,16 +11,12 @@ pub enum FieldArity {
 }
 
 impl FieldArity {
-    pub fn is_singular(&self) -> bool {
-        self == &FieldArity::Required || self == &FieldArity::Optional
+    pub fn is_list(&self) -> bool {
+        self == &Self::List
     }
 
-    pub fn verbal_display(&self) -> &'static str {
-        match self {
-            FieldArity::Required => "required",
-            FieldArity::Optional => "optional",
-            FieldArity::List => "list",
-        }
+    pub fn is_singular(&self) -> bool {
+        !self.is_list()
     }
 
     pub fn is_required(&self) -> bool {
@@ -31,8 +27,12 @@ impl FieldArity {
         self == &Self::Optional
     }
 
-    pub fn is_list(&self) -> bool {
-        self == &Self::List
+    pub fn verbal_display(&self) -> &'static str {
+        match self {
+            FieldArity::Required => "required",
+            FieldArity::Optional => "optional",
+            FieldArity::List => "list",
+        }
     }
 }
 
@@ -82,13 +82,6 @@ pub enum Field {
 }
 
 impl Field {
-    pub fn is_scalar(&self) -> bool {
-        match self {
-            Field::ScalarField(_) => true,
-            Field::RelationField(_) => false,
-        }
-    }
-
     pub fn is_relation(&self) -> bool {
         match self {
             Field::ScalarField(_) => false,
@@ -251,18 +244,16 @@ impl RelationField {
         self.relation_info.to == name
     }
 
-    pub fn is_list(&self) -> bool {
-        match self.arity {
-            FieldArity::List => true,
-            _ => false,
-        }
+    pub fn is_required(&self) -> bool {
+        self.arity.is_required()
     }
 
-    pub fn is_required(&self) -> bool {
-        match self.arity {
-            FieldArity::Required => true,
-            _ => false,
-        }
+    pub fn is_list(&self) -> bool {
+        self.arity.is_list()
+    }
+
+    pub fn is_optional(&self) -> bool {
+        self.arity.is_optional()
     }
 }
 
@@ -331,6 +322,18 @@ impl ScalarField {
 
     pub fn db_name(&self) -> &str {
         self.database_name.as_ref().unwrap_or(&self.name)
+    }
+
+    pub fn is_required(&self) -> bool {
+        self.arity.is_required()
+    }
+
+    pub fn is_list(&self) -> bool {
+        self.arity.is_list()
+    }
+
+    pub fn is_optional(&self) -> bool {
+        self.arity.is_optional()
     }
 }
 

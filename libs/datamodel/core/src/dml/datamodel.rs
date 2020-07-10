@@ -112,19 +112,12 @@ impl Datamodel {
     /// Finds a mutable scalar field reference by a model and field name.
     pub fn find_scalar_field_mut(&mut self, model: &str, field: &str) -> &mut ScalarField {
         // This uses the memory location of field for equality.
-        self.find_model_mut(model)
-            .expect("We assume an internally valid datamodel before mutating.")
-            .find_scalar_field_mut(field)
-            .expect("We assume an internally valid datamodel before mutating.")
+        self.find_model_mut(model).find_scalar_field_mut(field)
     }
 
     /// Finds a mutable relation field reference by a model and field name.
     pub fn find_relation_field_mut(&mut self, model: &str, field: &str) -> &mut RelationField {
-        // This uses the memory location of field for equality.
-        self.find_model_mut(model)
-            .expect("We assume an internally valid datamodel before mutating.")
-            .find_relation_field_mut(field)
-            .expect("We assume an internally valid datamodel before mutating.")
+        self.find_model_mut(model).find_relation_field_mut(field)
     }
 
     /// Finds an enum by name.
@@ -138,8 +131,10 @@ impl Datamodel {
     }
 
     /// Finds a model by name and returns a mutable reference.
-    pub fn find_model_mut(&mut self, name: &str) -> Option<&mut Model> {
-        self.models_mut().find(|m| m.name == *name)
+    pub fn find_model_mut(&mut self, name: &str) -> &mut Model {
+        self.models_mut()
+            .find(|m| m.name == *name)
+            .expect("We assume an internally valid datamodel before mutating.")
     }
 
     /// Finds an enum by name and returns a mutable reference.

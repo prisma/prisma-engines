@@ -132,9 +132,7 @@ impl Standardiser {
                                 &ast_schema,
                             ));
             } else {
-                let model_mut = schema
-                    .find_model_mut(&missing_back_relation_field.model)
-                    .expect(STATE_ERROR);
+                let model_mut = schema.find_model_mut(&missing_back_relation_field.model);
 
                 model_mut.add_field(Field::RelationField(missing_back_relation_field.field));
 

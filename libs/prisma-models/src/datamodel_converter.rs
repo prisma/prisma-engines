@@ -327,19 +327,14 @@ impl TempRelationHolder {
     }
 }
 
-//todo rework for shared ones between scalar and rf
 trait DatamodelFieldExtensions {
     fn type_identifier(&self) -> TypeIdentifier;
-    fn is_required(&self) -> bool;
-    fn is_list(&self) -> bool;
     fn is_unique(&self, model: &dml::Model) -> bool;
     fn is_id(&self, model: &dml::Model) -> bool;
     fn is_auto_generated_int_id(&self) -> bool;
     fn behaviour(&self) -> Option<FieldBehaviour>;
-    fn final_db_name(&self) -> String;
     fn internal_enum(&self, datamodel: &dml::Datamodel) -> Option<InternalEnum>;
     fn internal_enum_value(&self, enum_value: &dml::EnumValue) -> InternalEnumValue;
-    // fn default_value(&self) -> Option<dml::DefaultValue>; todo this is not applicable anymore
 }
 
 impl DatamodelFieldExtensions for dml::ScalarField {
@@ -360,14 +355,6 @@ impl DatamodelFieldExtensions for dml::ScalarField {
                 unimplemented!("Connector Specific types are not supported here yet")
             }
         }
-    }
-
-    fn is_required(&self) -> bool {
-        self.arity == dml::FieldArity::Required
-    }
-
-    fn is_list(&self) -> bool {
-        self.arity == dml::FieldArity::List
     }
 
     fn is_unique(&self, model: &dml::Model) -> bool {
@@ -405,10 +392,6 @@ impl DatamodelFieldExtensions for dml::ScalarField {
         }
     }
 
-    fn final_db_name(&self) -> String {
-        self.final_database_name().to_owned()
-    }
-
     fn internal_enum(&self, datamodel: &dml::Datamodel) -> Option<InternalEnum> {
         match self.field_type {
             dml::FieldType::Enum(ref name) => {
@@ -430,8 +413,4 @@ impl DatamodelFieldExtensions for dml::ScalarField {
             database_name: enum_value.database_name.clone(),
         }
     }
-
-    // fn default_value(&self) -> Option<dml::DefaultValue> {
-    //     self.default_value.clone()
-    // }
 }

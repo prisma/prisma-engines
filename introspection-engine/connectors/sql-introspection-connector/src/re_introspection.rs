@@ -62,7 +62,7 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
 
         //change model names
         for changed_model_name in &changed_model_names {
-            let model = new_data_model.find_model_mut(&changed_model_name.0.model).unwrap();
+            let model = new_data_model.find_model_mut(&changed_model_name.0.model);
             model.name = changed_model_name.1.model.clone();
             if model.database_name.is_none() {
                 model.database_name = Some(changed_model_name.0.model.clone())
@@ -109,7 +109,7 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
 
         // change usages in @@id, @@index, @@unique and on RelationInfo.fields
         for changed_field_name in &changed_scalar_field_names {
-            let model = new_data_model.find_model_mut(&changed_field_name.0.model).unwrap();
+            let model = new_data_model.find_model_mut(&changed_field_name.0.model);
 
             replace_field_names(&mut model.id_fields, &changed_field_name.0.field, &changed_field_name.1);
             for index in &mut model.indices {

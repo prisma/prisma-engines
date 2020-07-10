@@ -330,12 +330,7 @@ pub fn deduplicate_field_names(datamodel: &mut Datamodel) {
     duplicated_relation_fields
         .iter()
         .for_each(|(model, field, relation_name)| {
-            let mut field = datamodel
-                .find_model_mut(model)
-                .unwrap()
-                .find_relation_field_mut(field)
-                .unwrap();
-
+            let mut field = datamodel.find_model_mut(model).find_relation_field_mut(field);
             //todo self vs normal relation?
             field.name = format!("{}_{}", field.name, &relation_name);
         });

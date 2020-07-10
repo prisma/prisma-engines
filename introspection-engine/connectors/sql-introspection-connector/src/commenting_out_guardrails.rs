@@ -82,7 +82,7 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
 
     // use unsupported types to drop @@id / @@unique /@@index
     for mf in &unsupported_types {
-        let model = datamodel.find_model_mut(&mf.model).unwrap();
+        let model = datamodel.find_model_mut(&mf.model);
         model.indices.retain(|i| !i.fields.contains(&mf.field));
         if model.id_fields.contains(&mf.field) {
             model.id_fields = vec![]
