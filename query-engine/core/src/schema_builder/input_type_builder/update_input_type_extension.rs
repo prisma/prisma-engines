@@ -371,8 +371,12 @@ pub trait UpdateInputTypeBuilderExtension<'a>: InputTypeBuilderBase<'a> + Create
     }
 
     fn field_should_be_kept_for_update_input_type(field: &ScalarFieldRef) -> bool {
-        // We forbid updating auto-increment integer ID fields as this can create problems with the
-        // underlying sequences. We do the same for creates.
+        // We forbid updating auto-increment integer unique fields as this can create problems with the
+        // underlying sequences.
         !field.is_auto_generated_int_id
+            && !matches!(
+                (&field.type_identifier, field.unique(), field.is_autoincrement),
+                (TypeIdentifier::Int, true, true)
+            )
     }
 }
