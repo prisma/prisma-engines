@@ -252,8 +252,7 @@ impl Standardiser {
                         on_delete: OnDeleteStrategy::None,
                     };
 
-                    let mut back_relation_field = dml::RelationField::new_generated(&model.name, relation_info);
-                    back_relation_field.arity = dml::FieldArity::Optional;
+                    let back_relation_field = dml::RelationField::new_generated(&model.name, relation_info);
 
                     result.push(AddMissingBackRelationField {
                         model: rel_info.to.clone(),

@@ -2,7 +2,6 @@ use crate::ast::WithDirectives;
 use crate::{
     ast, configuration, dml,
     error::{DatamodelError, ErrorCollection},
-    FieldArity,
 };
 
 /// Helper for validating a datamodel.
@@ -168,7 +167,7 @@ impl<'a> Validator<'a> {
         };
 
         for field in model.scalar_fields() {
-            if field.arity == FieldArity::List && !scalar_lists_are_supported {
+            if field.is_list() && !scalar_lists_are_supported {
                 let ast_field = ast_model
                     .fields
                     .iter()
@@ -365,15 +364,15 @@ impl<'a> Validator<'a> {
                 .filter_map(|base_field| model.find_scalar_field(&base_field))
                 .any(|f| f.arity.is_required());
 
-            let all_underlying_fields_are_optional = rel_info
-                .fields
-                .iter()
-                .map(|base_field| match model.find_scalar_field(&base_field) {
-                    Some(f) => f.arity.is_optional(),
-                    None => false,
-                })
-                .all(|x| x)
-                && !rel_info.fields.is_empty(); // TODO: hack to maintain backwards compatibility for test schemas that don't specify fields yet
+            let all_underlying_fields_are_optional =
+                rel_info
+                    .fields
+                    .iter()
+                    .any(|base_field| match model.find_scalar_field(&base_field) {
+                        Some(f) => !f.arity.is_optional(),
+                        None => true,
+                    })
+                    && !rel_info.fields.is_empty(); // TODO: hack to maintain backwards compatibility for test schemas that don't specify fields yet
 
             if !unknown_fields.is_empty() {
                 errors.push(DatamodelError::new_validation_error(
