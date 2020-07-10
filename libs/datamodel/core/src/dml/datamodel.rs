@@ -87,20 +87,9 @@ impl Datamodel {
             .find(|model| model.database_name.as_deref() == Some(db_name))
     }
 
-    /// Finds a model for a field reference by using reference comparison.
-    pub fn find_model_by_field_ref(&self, field: &Field) -> Option<&Model> {
-        // This uses the memory location of field for equality.
-        self.models()
-            .find(|m| m.fields().any(|f| f as *const Field == field as *const Field))
-    }
-
-    /// Finds a model for a field reference by using reference comparison.
+    /// Finds parent  model for a field reference.
     pub fn find_model_by_relation_field_ref(&self, field: &RelationField) -> Option<&Model> {
-        // This uses the memory location of field for equality.
-        self.models().find(|m| {
-            m.relation_fields()
-                .any(|f| f as *const RelationField == field as *const RelationField)
-        })
+        self.find_model(&self.find_related_field_bang(&field).relation_info.to)
     }
 
     /// Finds a field reference by a model and field name.

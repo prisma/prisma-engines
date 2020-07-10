@@ -206,9 +206,7 @@ trait IndexDirectiveBase<T>: DirectiveValidator<T> {
                 }
 
                 if let Some(sf) = obj.find_scalar_field(&f) {
-                    {
-                        suggested_fields.push(sf.name.clone());
-                    }
+                    suggested_fields.push(sf.name.clone());
                 }
             }
 
