@@ -86,12 +86,11 @@ impl LowerDmlToAst {
     pub fn lower_field(&self, field: &dml::Field, datamodel: &dml::Datamodel) -> Result<ast::Field, ErrorCollection> {
         Ok(ast::Field {
             name: ast::Identifier::new(&field.name()),
-            arity: self.lower_field_arity(field.arity().clone()),
+            arity: self.lower_field_arity(field.arity()),
             directives: self.directives.field.serialize(field, datamodel)?,
             field_type: self.lower_type(&field.field_type()),
             documentation: field
                 .documentation()
-                .clone()
                 .map(|text| ast::Comment { text: text.to_string() }),
             span: ast::Span::empty(),
             is_commented_out: field.is_commented_out(),
@@ -99,7 +98,7 @@ impl LowerDmlToAst {
     }
 
     /// Internal: Lowers a field's arity.
-    fn lower_field_arity(&self, field_arity: dml::FieldArity) -> ast::FieldArity {
+    fn lower_field_arity(&self, field_arity: &dml::FieldArity) -> ast::FieldArity {
         match field_arity {
             dml::FieldArity::Required => ast::FieldArity::Required,
             dml::FieldArity::Optional => ast::FieldArity::Optional,

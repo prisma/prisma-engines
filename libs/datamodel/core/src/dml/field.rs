@@ -52,13 +52,6 @@ pub enum FieldType {
 }
 
 impl FieldType {
-    pub fn is_relation(&self) -> bool {
-        match self {
-            Self::Relation(_) => true,
-            _ => false,
-        }
-    }
-
     pub fn is_compatible_with(&self, other: &Self) -> bool {
         match (self, other) {
             (Self::Base(a, _), Self::Base(b, _)) => a == b, // the name of the type alias is not important for the comparison
@@ -320,6 +313,7 @@ impl ScalarField {
         field
     }
 
+    //todo use withdatabasename::final_database_name instead
     pub fn db_name(&self) -> &str {
         self.database_name.as_ref().unwrap_or(&self.name)
     }

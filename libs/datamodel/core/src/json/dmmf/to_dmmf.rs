@@ -94,7 +94,7 @@ fn model_to_dmmf(model: &dml::Model) -> Model {
 fn field_to_dmmf(model: &dml::Model, field: &dml::Field) -> Field {
     let a_relation_field_is_based_on_this_field: bool = model
         .relation_fields()
-        .any(|f| f.relation_info.fields.contains(&field.name().to_string()));
+        .any(|f| f.relation_info.fields.iter().any(|f| f == &field.name()));
 
     Field {
         name: field.name().to_string(),
@@ -104,7 +104,7 @@ fn field_to_dmmf(model: &dml::Model, field: &dml::Field) -> Field {
         is_id: field.is_id(),
         is_read_only: a_relation_field_is_based_on_this_field,
         has_default_value: field.default_value().is_some(),
-        default: default_value_to_serde(&field.default_value().map(|v| v.to_owned())),
+        default: default_value_to_serde(&field.default_value().cloned()),
         is_unique: field.is_unique(),
         relation_name: get_relation_name(field),
         relation_from_fields: get_relation_from_fields(field),
@@ -122,7 +122,7 @@ fn get_field_kind(field: &dml::Field) -> String {
         dml::FieldType::Relation(_) => String::from("object"),
         dml::FieldType::Enum(_) => String::from("enum"),
         dml::FieldType::Base(_, _) => String::from("scalar"),
-        _ => unimplemented!("DMMF does not support field type {:?}", field.field_type()),
+        tpe => unimplemented!("DMMF does not support field type {:?}", tpe),
     }
 }
 

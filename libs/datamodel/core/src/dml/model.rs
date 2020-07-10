@@ -78,11 +78,6 @@ impl Model {
         self.fields.push(field)
     }
 
-    /// Removes a field with the given name from this model.
-    pub fn remove_field(&mut self, name: &str) {
-        self.fields.retain(|f| f.name() == name)
-    }
-
     /// Gets an iterator over all fields.
     pub fn fields(&self) -> std::slice::Iter<Field> {
         self.fields.iter()
@@ -136,7 +131,7 @@ impl Model {
     }
 
     /// Finds a field by database name.
-    pub fn find_field_db_name(&self, db_name: &str) -> Option<&ScalarField> {
+    pub fn find_scalar_field_db_name(&self, db_name: &str) -> Option<&ScalarField> {
         self.scalar_fields()
             .find(|f| f.database_name.as_deref() == Some(db_name))
     }
@@ -268,14 +263,6 @@ impl Model {
         })
     }
 
-    /// Finds a mutable field with a certain relation guarantee.
-    pub fn related_field_mut(&mut self, to: &str, name: &str, exclude_field: &str) -> Option<&mut RelationField> {
-        let self_name = self.name.clone();
-        self.relation_fields_mut().find(|rf| {
-            rf.relation_info.to == to && rf.relation_info.name == name && (self_name != to || rf.name != exclude_field)
-        })
-    }
-
     /// Checks if this is a relation model. A relation model has exactly
     /// two relations, which are required.
     pub fn is_relation_model(&self) -> bool {
@@ -285,18 +272,8 @@ impl Model {
             == 2
     }
 
-    /// Checks if this is a pure relation model.
-    /// It has only two fields, both of them are required relations.
-    pub fn is_pure_relation_model(&self) -> bool {
-        self.is_relation_model() && self.fields.len() == 2
-    }
-
     pub fn add_index(&mut self, index: IndexDefinition) {
         self.indices.push(index)
-    }
-
-    pub fn has_index(&self, index: &IndexDefinition) -> bool {
-        self.indices.iter().any(|own_index| own_index == index)
     }
 
     pub fn has_created_at_and_updated_at(&self) -> bool {

@@ -42,7 +42,6 @@ impl Standardiser {
                 let field = &mut model.fields[field_index];
 
                 if let Field::RelationField(field) = field {
-                    // for field in model.relation_fields_mut() {
                     let rel_info = &mut field.relation_info;
                     let related_model = schema_copy.find_model(&rel_info.to).expect(STATE_ERROR);
                     let related_field = related_model

@@ -87,7 +87,7 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
             if let Some(old_model) = &old_data_model.find_model(&model.name) {
                 for field in model.scalar_fields() {
                     if let Some(old_field) =
-                        old_model.find_field_db_name(&field.database_name.as_ref().unwrap_or(&field.name))
+                        old_model.find_scalar_field_db_name(&field.database_name.as_ref().unwrap_or(&field.name))
                     {
                         if model.find_scalar_field(&old_field.name).is_none() {
                             let mf = ModelAndField::new(&model.name, &field.name);
