@@ -92,3 +92,117 @@ async fn introspecting_an_enum_with_an_invalid_value_as_default_should_work(api:
     let result = dbg!(api.introspect().await);
     assert_eq!(&result, "model News {\n  id     Int    @default(autoincrement()) @id\n  status status @default(dbgenerated())\n}\n\nenum status {\n  // 1 @map(\"1\")\n  UNDEFINED\n}\n");
 }
+
+#[test_each_connector(tags("postgres"))]
+async fn introspecting_an_unsupported_type_should_and_commenting_it_out_should_also_drop_its_usages(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("Test", |t| {
+                t.add_column("id", types::integer().unique(true));
+                t.add_column("dummy", types::integer());
+                t.inject_custom("network_mac  macaddr");
+                t.add_index("unique", types::index(vec!["network_mac", "dummy"]).unique(true));
+                t.add_index("non_unique", types::index(vec!["network_mac", "dummy"]).unique(false));
+                t.inject_custom("Primary Key (\"network_mac\", \"dummy\")");
+            });
+        })
+        .await;
+
+    let warnings = dbg!(api.introspection_warnings().await);
+    assert_eq!(
+        &warnings,
+        "[{\"code\":3,\"message\":\"These fields were commented out because Prisma currently does not support their types.\",\"affected\":[{\"model\":\"Test\",\"field\":\"network_mac\",\"tpe\":\"macaddr\"}]}]"
+    );
+
+    let result = dbg!(api.introspect().await);
+    assert_eq!(&result, "model Test {\n  id             Int     @unique\n  dummy          Int\n  // This type is currently not supported.\n  // network_mac macaddr\n}\n");
+}
+
+#[test_each_connector(tags("postgres"))]
+async fn introspecting_a_table_with_only_an_unsupported_id_type_should_comment_it_out(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("Test", |t| {
+                t.add_column("dummy", types::integer());
+                t.inject_custom("network_mac  macaddr Primary Key");
+            });
+        })
+        .await;
+
+    let warnings = dbg!(api.introspection_warnings().await);
+    assert_eq!(
+        &warnings,
+        "[{\"code\":1,\"message\":\"The following models were commented out as they do not have a unique identifier or id. This is currently not supported by Prisma.\",\"affected\":[{\"model\":\"Test\"}]},{\"code\":3,\"message\":\"These fields were commented out because Prisma currently does not support their types.\",\"affected\":[{\"model\":\"Test\",\"field\":\"network_mac\",\"tpe\":\"macaddr\"}]}]"
+    );
+
+    let result = dbg!(api.introspect().await);
+    assert_eq!(&result, "// The underlying table does not contain a unique identifier and can therefore currently not be handled.\n// model Test {\n  // dummy       Int\n  // This type is currently not supported.\n  // network_mac macaddr @id\n// }\n");
+}
+
+#[test_each_connector(tags("postgres"))]
+async fn introspecting_an_unsupported_type_should_comment_it_out(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("Test", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom("network_inet inet");
+                t.inject_custom("network_mac  macaddr");
+            });
+        })
+        .await;
+
+    let warnings = dbg!(api.introspection_warnings().await);
+    assert_eq!(
+        &warnings,
+        "[{\"code\":3,\"message\":\"These fields were commented out because Prisma currently does not support their types.\",\"affected\":[{\"model\":\"Test\",\"field\":\"network_mac\",\"tpe\":\"macaddr\"}]}]"
+    );
+
+    let result = dbg!(api.introspect().await);
+    assert_eq!(&result, "model Test {\n  id             Int      @default(autoincrement()) @id\n  network_inet   String?\n  // This type is currently not supported.\n  // network_mac macaddr?\n}\n");
+}
+
+#[test_each_connector(tags("postgres"))]
+async fn remapping_field_names_to_empty_should_comment_them_out(api: &TestApi) {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("1", types::text());
+                t.add_column("last", types::primary());
+            });
+        })
+        .await;
+
+    let dm = "model User {\n  // This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*\n  // 1 String @map(\"1\")\n  last Int    @default(autoincrement()) @id\n}\n";
+
+    let result = dbg!(api.introspect().await);
+    assert_eq!(&result, dm);
+}
+
+#[test_each_connector(tags("postgres"))]
+async fn introspecting_a_relation_based_on_an_unsupported_field_name_should_drop_it(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom("\"1\"  integer Not null Unique");
+            });
+            migration.create_table("Post", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom("user_1 integer REFERENCES \"User\"(\"1\")");
+            });
+        })
+        .await;
+
+    let warnings = dbg!(api.introspection_warnings().await);
+    assert_eq!(
+        &warnings,
+        "[{\"code\":2,\"message\":\"These fields were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` directive.\",\"affected\":[{\"model\":\"User\",\"field\":\"1\"}]}]"
+    );
+
+    let result = dbg!(api.introspect().await);
+    assert_eq!(&result, "model Post {\n  id     Int   @default(autoincrement()) @id\n  user_1 Int?\n  User   User? @relation(fields: [user_1], references: [])\n}\n\nmodel User {\n  id   Int    @default(autoincrement()) @id\n  // This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*\n  // 1 Int    @map(\"1\") @unique\n  Post Post[]\n}\n");
+}
