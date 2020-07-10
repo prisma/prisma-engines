@@ -15,24 +15,12 @@ impl FieldArity {
         self == &Self::List
     }
 
-    pub fn is_singular(&self) -> bool {
-        !self.is_list()
-    }
-
     pub fn is_required(&self) -> bool {
         self == &Self::Required
     }
 
     pub fn is_optional(&self) -> bool {
         self == &Self::Optional
-    }
-
-    pub fn verbal_display(&self) -> &'static str {
-        match self {
-            FieldArity::Required => "required",
-            FieldArity::Optional => "optional",
-            FieldArity::List => "list",
-        }
     }
 }
 
@@ -245,6 +233,10 @@ impl RelationField {
         self.arity.is_list()
     }
 
+    pub fn is_singular(&self) -> bool {
+        !self.is_list()
+    }
+
     pub fn is_optional(&self) -> bool {
         self.arity.is_optional()
     }
@@ -324,6 +316,10 @@ impl ScalarField {
 
     pub fn is_list(&self) -> bool {
         self.arity.is_list()
+    }
+
+    pub fn is_singular(&self) -> bool {
+        !self.is_list()
     }
 
     pub fn is_optional(&self) -> bool {

@@ -42,15 +42,12 @@ impl Standardiser {
                 let field = &mut model.fields[field_index];
 
                 if let Field::RelationField(field) = field {
-                    let rel_info = &mut field.relation_info;
-                    let related_model = schema_copy.find_model(&rel_info.to).expect(STATE_ERROR);
-                    let related_field = related_model
-                        .related_field(&model.name, &rel_info.name, &field.name)
-                        .unwrap();
+                    let related_model = schema_copy.find_model(&field.relation_info.to).expect(STATE_ERROR);
+                    let related_field = schema_copy.find_related_field_bang(field);
                     let related_model_name = &related_model.name;
-                    let is_m2m = field.arity.is_list() && related_field.arity.is_list();
-
-                    let related_field_rel = &related_field.relation_info;
+                    let is_m2m = field.is_list() && related_field.is_list();
+                    let rel_info = &mut field.relation_info;
+                    let related_field_rel_info = &related_field.relation_info;
 
                     let embed_here = match (field.arity, related_field.arity) {
                         // many to many
@@ -72,7 +69,7 @@ impl Standardiser {
 
                     if embed_here {
                         // user input has precedence
-                        if rel_info.to_fields.is_empty() && related_field_rel.to_fields.is_empty() {
+                        if rel_info.to_fields.is_empty() && related_field_rel_info.to_fields.is_empty() {
                             rel_info.to_fields = related_model
                                 .first_unique_criterion()
                                 .iter()
@@ -82,7 +79,7 @@ impl Standardiser {
 
                         // user input has precedence
                         if !is_m2m
-                            && (rel_info.fields.is_empty() && related_field_rel.fields.is_empty())
+                            && (rel_info.fields.is_empty() && related_field_rel_info.fields.is_empty())
                             && field.is_generated
                         {
                             rel_info.fields = underlying_fields.iter().map(|f| f.name.clone()).collect();
@@ -172,7 +169,7 @@ impl Standardiser {
             }
 
             if !back_field_exists {
-                if field.arity.is_singular() {
+                if field.is_singular() {
                     let relation_info = dml::RelationInfo {
                         to: model.name.clone(),
                         fields: vec![],

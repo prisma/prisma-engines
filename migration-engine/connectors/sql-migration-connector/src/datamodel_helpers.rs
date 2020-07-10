@@ -195,11 +195,7 @@ impl<'a> RelationFieldRef<'a> {
     }
 
     pub(crate) fn is_one_to_one(&self) -> bool {
-        self.arity().is_singular()
-            && self
-                .opposite_side()
-                .map(|rel| rel.arity().is_singular())
-                .unwrap_or(false)
+        self.field.is_singular() && self.opposite_side().map(|rel| rel.field.is_singular()).unwrap_or(false)
     }
 
     pub(crate) fn is_virtual(&self) -> bool {

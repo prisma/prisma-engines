@@ -213,7 +213,7 @@ impl Model {
         {
             let mut unique_required_fields: Vec<_> = self
                 .scalar_fields()
-                .filter(|field| field.is_unique && (field.arity.is_required() || allow_optional))
+                .filter(|field| field.is_unique && (field.is_required() || allow_optional))
                 .map(|f| UniqueCriteria::new(vec![f]))
                 .collect();
 
@@ -228,7 +228,7 @@ impl Model {
                 .filter(|id| id.tpe == IndexType::Unique)
                 .filter_map(|id| {
                     let fields: Vec<_> = id.fields.iter().map(|f| self.find_scalar_field(&f).unwrap()).collect();
-                    let all_fields_are_required = fields.iter().all(|f| f.arity.is_required());
+                    let all_fields_are_required = fields.iter().all(|f| f.is_required());
                     if all_fields_are_required || allow_optional {
                         Some(UniqueCriteria::new(fields))
                     } else {

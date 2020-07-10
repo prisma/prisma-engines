@@ -362,17 +362,17 @@ impl<'a> Validator<'a> {
                 .fields
                 .iter()
                 .filter_map(|base_field| model.find_scalar_field(&base_field))
-                .any(|f| f.arity.is_required());
+                .any(|f| f.is_required());
 
-            let all_underlying_fields_are_optional =
-                rel_info
-                    .fields
-                    .iter()
-                    .any(|base_field| match model.find_scalar_field(&base_field) {
-                        Some(f) => !f.arity.is_optional(),
-                        None => true,
-                    })
-                    && !rel_info.fields.is_empty(); // TODO: hack to maintain backwards compatibility for test schemas that don't specify fields yet
+            let all_underlying_fields_are_optional = rel_info
+                .fields
+                .iter()
+                .map(|base_field| match model.find_scalar_field(&base_field) {
+                    Some(f) => f.is_optional(),
+                    None => false,
+                })
+                .all(|x| x)
+                && !rel_info.fields.is_empty(); // TODO: hack to maintain backwards compatibility for test schemas that don't specify fields yet
 
             if !unknown_fields.is_empty() {
                 errors.push(DatamodelError::new_validation_error(
@@ -388,7 +388,7 @@ impl<'a> Validator<'a> {
                     );
             }
 
-            if at_least_one_underlying_field_is_required && !field.arity.is_required() {
+            if at_least_one_underlying_field_is_required && !field.is_required() {
                 errors.push(DatamodelError::new_validation_error(
                         &format!(
                             "The relation field `{}` uses the scalar fields {}. At least one of those fields is required. Hence the relation field must be required as well.",
@@ -399,7 +399,7 @@ impl<'a> Validator<'a> {
                     );
             }
 
-            if all_underlying_fields_are_optional && field.arity.is_required() {
+            if all_underlying_fields_are_optional && field.is_required() {
                 errors.push(DatamodelError::new_validation_error(
                         &format!(
                             "The relation field `{}` uses the scalar fields {}. All those fields are optional. Hence the relation field must be optional as well.",
@@ -518,7 +518,7 @@ impl<'a> Validator<'a> {
                 let is_many_to_many = {
                     // Back relation fields have not been added yet. So we must calculate this on our own.
                     match related_model.related_field(&model.name, &rel_info.name, &field.name) {
-                        Some(related_field) => field.arity.is_list() && related_field.arity.is_list(),
+                        Some(related_field) => field.is_list() && related_field.is_list(),
                         None => false,
                     }
                 };
@@ -600,7 +600,7 @@ impl<'a> Validator<'a> {
             let related_field_rel_info = &related_field.relation_info;
 
             // ONE TO MANY
-            if field.arity.is_singular() && related_field.arity.is_list() {
+            if field.is_singular() && related_field.is_list() {
                 if rel_info.fields.is_empty() {
                     errors.push(DatamodelError::new_directive_validation_error(
                             &format!(
@@ -624,7 +624,7 @@ impl<'a> Validator<'a> {
                 }
             }
 
-            if field.arity.is_list() && related_field.arity.is_singular() {
+            if field.is_list() && !related_field.is_list() {
                 if !rel_info.fields.is_empty() || !rel_info.to_fields.is_empty() {
                     errors.push(DatamodelError::new_directive_validation_error(
                             &format!(
@@ -639,7 +639,7 @@ impl<'a> Validator<'a> {
 
             // required ONE TO ONE SELF RELATION
             let is_self_relation = model.name == related_model.name;
-            if is_self_relation && field.arity.is_required() && related_field.arity.is_required() {
+            if is_self_relation && field.is_required() && related_field.is_required() {
                 errors.push(DatamodelError::new_field_validation_error(
                         &format!(
                             "The relation fields `{}` and `{}` on Model `{}` are both required. This is not allowed for a self relation because it would not be possible to create a record.",
@@ -652,7 +652,7 @@ impl<'a> Validator<'a> {
             }
 
             // ONE TO ONE
-            if field.arity.is_singular() && related_field.arity.is_singular() {
+            if field.is_singular() && related_field.is_singular() {
                 if rel_info.fields.is_empty() && related_field_rel_info.fields.is_empty() {
                     errors.push(DatamodelError::new_directive_validation_error(
                             &format!(
@@ -723,7 +723,7 @@ impl<'a> Validator<'a> {
             }
 
             // MANY TO MANY
-            if field.arity.is_list() && related_field.arity.is_list() {
+            if field.is_list() && related_field.is_list() {
                 if !related_model.has_single_id_field() {
                     errors.push(DatamodelError::new_field_validation_error(
                             &format!(
