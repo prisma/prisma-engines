@@ -349,18 +349,7 @@ impl WithDatabaseName for ScalarField {
     fn database_name(&self) -> Option<&str> {
         self.database_name.as_deref()
     }
-
     fn set_database_name(&mut self, database_name: Option<String>) {
         self.database_name = database_name;
-    }
-}
-
-impl WithDatabaseName for RelationField {
-    fn database_name(&self) -> Option<&str> {
-        None
-    }
-
-    fn set_database_name(&mut self, _database_name: Option<String>) {
-        unreachable!("Relationfields do not have a database name")
     }
 }
