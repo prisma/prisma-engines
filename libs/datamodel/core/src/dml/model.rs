@@ -260,15 +260,6 @@ impl Model {
         })
     }
 
-    /// Checks if this is a relation model. A relation model has exactly
-    /// two relations, which are required.
-    pub fn is_relation_model(&self) -> bool {
-        self.relation_fields()
-            .filter(|f| f.arity == FieldArity::Required)
-            .count()
-            == 2
-    }
-
     pub fn add_index(&mut self, index: IndexDefinition) {
         self.indices.push(index)
     }

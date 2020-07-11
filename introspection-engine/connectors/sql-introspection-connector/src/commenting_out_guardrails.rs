@@ -113,9 +113,11 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
     // remove their backrelations
     for model_without_identifier in &models_without_identifiers {
         for model in &mut datamodel.models {
-            model
-                .fields
-                .retain(|f| !f.points_to_model(model_without_identifier.model.as_ref()));
+            for field in model.relation_fields_mut() {
+                if field.points_to_model(&model_without_identifier.model) {
+                    field.is_commented_out = true;
+                }
+            }
         }
     }
 

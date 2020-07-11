@@ -49,7 +49,6 @@ impl DirectiveValidator<dml::Field> for RelationDirectiveValidator {
 
             let relation_info = &rf.relation_info;
 
-            // These unwraps must be safe.
             let parent_model = datamodel.find_model_by_relation_field_ref(rf).unwrap();
 
             let related_model = datamodel
