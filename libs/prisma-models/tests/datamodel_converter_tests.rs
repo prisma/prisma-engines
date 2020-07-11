@@ -472,6 +472,24 @@ fn ambiguous_relations() {
     post.assert_relation_field("blog2").assert_relation_name("Relation2");
 }
 
+#[test]
+fn implicit_many_to_many_relation() {
+    let datamodel = convert(
+        r#"model Post {
+                    id         String @id @default(cuid())
+                    identifier Int?   @unique
+                    related    Post[] @relation(name: "RelatedPosts")
+                    parents   Post[] @relation(name: "RelatedPosts")
+                  }
+                  "#,
+    );
+
+    let post = datamodel.assert_model("Post");
+    post.assert_relation_field("related");
+
+    post.assert_relation_field("parents");
+}
+
 fn convert(datamodel: &str) -> Arc<InternalDataModel> {
     let datamodel = datamodel::parse_datamodel(datamodel).unwrap();
     let template = DatamodelConverter::convert(&datamodel);
@@ -537,7 +555,6 @@ trait FieldAssertions {
     fn assert_type_identifier(&self, ti: TypeIdentifier) -> &Self;
     fn assert_optional(&self) -> &Self;
     fn assert_list(&self) -> &Self;
-    fn assert_unique(&self) -> &Self;
 }
 
 trait ScalarFieldAssertions {
@@ -546,6 +563,7 @@ trait ScalarFieldAssertions {
     fn assert_no_behaviour(&self) -> &Self;
     fn assert_is_auto_generated_int_id_by_db(&self) -> &Self;
     fn assert_is_id(&self) -> &Self;
+    fn assert_unique(&self) -> &Self;
 }
 
 trait RelationFieldAssertions {
@@ -566,11 +584,6 @@ impl FieldAssertions for ScalarField {
 
     fn assert_list(&self) -> &Self {
         assert!(self.is_list);
-        self
-    }
-
-    fn assert_unique(&self) -> &Self {
-        assert!(self.unique());
         self
     }
 }
@@ -597,7 +610,12 @@ impl ScalarFieldAssertions for ScalarField {
     }
 
     fn assert_is_id(&self) -> &Self {
-        assert!(self.is_id);
+        assert!(self.is_id());
+        self
+    }
+
+    fn assert_unique(&self) -> &Self {
+        assert!(self.unique());
         self
     }
 }
@@ -614,11 +632,6 @@ impl FieldAssertions for RelationField {
 
     fn assert_list(&self) -> &Self {
         assert!(self.is_list);
-        self
-    }
-
-    fn assert_unique(&self) -> &Self {
-        assert!(self.is_unique());
         self
     }
 }

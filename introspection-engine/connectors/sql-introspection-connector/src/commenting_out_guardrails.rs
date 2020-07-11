@@ -2,7 +2,7 @@ use crate::warnings::{
     warning_enum_values_with_empty_names, warning_fields_with_empty_names, warning_models_without_identifier,
     warning_unsupported_types, EnumAndValue, Model, ModelAndField, ModelAndFieldAndType,
 };
-use datamodel::{Datamodel, FieldArity, FieldType, RelationInfo};
+use datamodel::{Datamodel, FieldType};
 use introspection_connector::Warning;
 
 pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
@@ -14,38 +14,10 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
     // find models with 1to1 relations
     let mut models_with_one_to_one_relation = vec![];
     for model in &datamodel.models {
-        if model.fields().any(|f| match (&f.arity, &f.field_type) {
-            (FieldArity::List, _) => false,
-            (
-                _,
-                FieldType::Relation(RelationInfo {
-                    to,
-                    to_fields: _,
-                    name: relation_name,
-                    ..
-                }),
-            ) => {
-                let other_model = datamodel.find_model(to).unwrap();
-                let other_field = other_model
-                    .fields()
-                    .find(|f| match &f.field_type {
-                        FieldType::Relation(RelationInfo {
-                            to: other_to,
-                            to_fields: _,
-                            name: other_relation_name,
-                            ..
-                        }) if other_to == &model.name && relation_name == other_relation_name => true,
-                        _ => false,
-                    })
-                    .unwrap();
-
-                match other_field.arity {
-                    FieldArity::Optional | FieldArity::Required => true,
-                    FieldArity::List => false,
-                }
-            }
-            _ => false,
-        }) {
+        if model
+            .relation_fields()
+            .any(|f| !f.is_list() && !datamodel.find_related_field_bang(&f).is_list())
+        {
             models_with_one_to_one_relation.push(model.name.clone())
         }
     }
@@ -57,7 +29,9 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
 
     // fields with an empty name
     for model in &mut datamodel.models {
-        for field in &mut model.fields {
+        let model_name = model.name.clone();
+
+        for field in model.scalar_fields_mut() {
             if field.name == "".to_string() {
                 field.documentation = Some(
                     "This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*"
@@ -67,7 +41,7 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
                 field.is_commented_out = true;
 
                 fields_with_empty_names.push(ModelAndField {
-                    model: model.name.clone(),
+                    model: model_name.clone(),
                     field: field.name.clone(),
                 })
             }
@@ -92,11 +66,13 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
 
     // fields with unsupported as datatype
     for model in &mut datamodel.models {
-        for field in &mut model.fields {
+        let model_name = model.name.clone();
+
+        for field in model.scalar_fields_mut() {
             if let FieldType::Unsupported(tpe) = &field.field_type {
                 field.is_commented_out = true;
                 unsupported_types.push(ModelAndFieldAndType {
-                    model: model.name.clone(),
+                    model: model_name.clone(),
                     field: field.name.clone(),
                     tpe: tpe.clone(),
                 })
@@ -106,7 +82,7 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
 
     // use unsupported types to drop @@id / @@unique /@@index
     for mf in &unsupported_types {
-        let model = datamodel.find_model_mut(&mf.model).unwrap();
+        let model = datamodel.find_model_mut(&mf.model);
         model.indices.retain(|i| !i.fields.contains(&mf.field));
         if model.id_fields.contains(&mf.field) {
             model.id_fields = vec![]
@@ -119,7 +95,7 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
             && !model
                 .fields
                 .iter()
-                .any(|f| (f.is_id || f.is_unique) && !f.is_commented_out)
+                .any(|f| (f.is_id() || f.is_unique()) && !f.is_commented_out())
             && !model.indices.iter().any(|i| i.is_unique())
             && !models_with_one_to_one_relation.contains(&model.name)
         {
@@ -137,9 +113,11 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
     // remove their backrelations
     for model_without_identifier in &models_without_identifiers {
         for model in &mut datamodel.models {
-            model
-                .fields
-                .retain(|f| !f.points_to_model(model_without_identifier.model.as_ref()));
+            for field in model.relation_fields_mut() {
+                if field.points_to_model(&model_without_identifier.model) {
+                    field.is_commented_out = true;
+                }
+            }
         }
     }
 

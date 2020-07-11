@@ -1,4 +1,5 @@
 use super::*;
+use crate::Field;
 
 /// Represents a model in a prisma datamodel.
 #[derive(Debug, PartialEq, Clone)]
@@ -47,11 +48,11 @@ pub enum IndexType {
 
 #[derive(Debug)]
 pub struct UniqueCriteria<'a> {
-    pub fields: Vec<&'a Field>,
+    pub fields: Vec<&'a ScalarField>,
 }
 
 impl<'a> UniqueCriteria<'a> {
-    pub fn new(fields: Vec<&'a Field>) -> UniqueCriteria<'a> {
+    pub fn new(fields: Vec<&'a ScalarField>) -> UniqueCriteria<'a> {
         UniqueCriteria { fields }
     }
 }
@@ -77,29 +78,62 @@ impl Model {
         self.fields.push(field)
     }
 
-    /// Removes a field with the given name from this model.
-    pub fn remove_field(&mut self, name: &str) {
-        self.fields.retain(|f| f.name != name);
-    }
-
     /// Gets an iterator over all fields.
     pub fn fields(&self) -> std::slice::Iter<Field> {
         self.fields.iter()
     }
 
-    /// Gets a mutable iterator over all fields.
-    pub fn fields_mut(&mut self) -> std::slice::IterMut<Field> {
-        self.fields.iter_mut()
+    /// Gets an iterator over all scalar fields.
+    pub fn scalar_fields<'a>(&'a self) -> impl Iterator<Item = &'a ScalarField> + 'a {
+        self.fields().filter_map(|fw| match fw {
+            Field::RelationField(_) => None,
+            Field::ScalarField(sf) => Some(sf),
+        })
+    }
+
+    /// Gets an iterator over all relation fields.
+    pub fn relation_fields<'a>(&'a self) -> impl Iterator<Item = &'a RelationField> + 'a {
+        self.fields().filter_map(|fw| match fw {
+            Field::RelationField(rf) => Some(rf),
+            Field::ScalarField(_) => None,
+        })
+    }
+
+    /// Gets a mutable iterator over all scalar fields.
+    pub fn scalar_fields_mut<'a>(&'a mut self) -> impl Iterator<Item = &'a mut ScalarField> + 'a {
+        self.fields.iter_mut().filter_map(|fw| match fw {
+            Field::RelationField(_) => None,
+            Field::ScalarField(sf) => Some(sf),
+        })
+    }
+
+    /// Gets a mutable iterator over all relation fields.
+    pub fn relation_fields_mut<'a>(&'a mut self) -> impl Iterator<Item = &'a mut RelationField> + 'a {
+        self.fields.iter_mut().filter_map(|fw| match fw {
+            Field::RelationField(rf) => Some(rf),
+            Field::ScalarField(_) => None,
+        })
     }
 
     /// Finds a field by name.
     pub fn find_field(&self, name: &str) -> Option<&Field> {
-        self.fields().find(|f| f.name == *name)
+        self.fields().find(|f| f.name() == name)
+    }
+
+    /// Finds a scalar field by name.
+    pub fn find_scalar_field(&self, name: &str) -> Option<&ScalarField> {
+        self.scalar_fields().find(|f| f.name == *name)
+    }
+
+    /// Finds a scalar field by name.
+    pub fn find_relation_field(&self, name: &str) -> Option<&RelationField> {
+        self.relation_fields().find(|f| f.name == *name)
     }
 
     /// Finds a field by database name.
-    pub fn find_field_db_name(&self, db_name: &str) -> Option<&Field> {
-        self.fields().find(|f| f.database_name.as_deref() == Some(db_name))
+    pub fn find_scalar_field_db_name(&self, db_name: &str) -> Option<&ScalarField> {
+        self.scalar_fields()
+            .find(|f| f.database_name.as_deref() == Some(db_name))
     }
 
     pub fn has_field(&self, name: &str) -> bool {
@@ -107,16 +141,17 @@ impl Model {
     }
 
     /// Finds a field by name and returns a mutable reference.
-    pub fn find_field_mut(&mut self, name: &str) -> Option<&mut Field> {
-        self.fields_mut().find(|f| f.name == *name)
+    pub fn find_scalar_field_mut(&mut self, name: &str) -> &mut ScalarField {
+        self.scalar_fields_mut()
+            .find(|f| f.name == *name)
+            .expect("We assume an internally valid datamodel before mutating.")
     }
 
     /// Finds a relation field by name and returns a mutable reference.
-    pub fn find_relation_field_mut(&mut self, name: &str) -> Option<&mut Field> {
-        self.fields_mut().find(|f| match f.field_type {
-            FieldType::Relation(_) => f.name == *name,
-            _ => false,
-        })
+    pub fn find_relation_field_mut(&mut self, name: &str) -> &mut RelationField {
+        self.relation_fields_mut()
+            .find(|rf| rf.name == *name)
+            .expect("We assume an internally valid datamodel before mutating.")
     }
 
     /// Finds the name of all id fields
@@ -129,7 +164,7 @@ impl Model {
     }
 
     /// This should match the logic in `prisma_models::Model::primary_identifier`.
-    pub fn first_unique_criterion(&self) -> Vec<&Field> {
+    pub fn first_unique_criterion(&self) -> Vec<&ScalarField> {
         match self.strict_unique_criterias().first() {
             Some(criteria) => criteria.fields.clone(),
             None => panic!("Could not find the first unique criteria on model {}", self.name()),
@@ -153,17 +188,18 @@ impl Model {
         let mut result = Vec::new();
         // first candidate: the singular id field
         {
-            let mut singular_id_fields = self.singular_id_fields();
-
-            match singular_id_fields.next() {
-                Some(x) => result.push(UniqueCriteria::new(vec![x])),
-                None => {}
+            if let Some(x) = self.singular_id_fields().next() {
+                result.push(UniqueCriteria::new(vec![x]))
             }
         }
 
         // second candidate: the multi field id
         {
-            let id_fields: Vec<_> = self.id_fields.iter().map(|f| self.find_field(&f).unwrap()).collect();
+            let id_fields: Vec<_> = self
+                .id_fields
+                .iter()
+                .map(|f| self.find_scalar_field(&f).unwrap())
+                .collect();
 
             if !id_fields.is_empty() {
                 result.push(UniqueCriteria::new(id_fields));
@@ -173,9 +209,8 @@ impl Model {
         // third candidate: a required scalar field with a unique index.
         {
             let mut unique_required_fields: Vec<_> = self
-                .fields
-                .iter()
-                .filter(|field| field.is_unique && (field.arity.is_required() || allow_optional))
+                .scalar_fields()
+                .filter(|field| field.is_unique && (field.is_required() || allow_optional))
                 .map(|f| UniqueCriteria::new(vec![f]))
                 .collect();
 
@@ -189,8 +224,8 @@ impl Model {
                 .iter()
                 .filter(|id| id.tpe == IndexType::Unique)
                 .filter_map(|id| {
-                    let fields: Vec<_> = id.fields.iter().map(|f| self.find_field(&f).unwrap()).collect();
-                    let all_fields_are_required = fields.iter().all(|f| f.arity.is_required());
+                    let fields: Vec<_> = id.fields.iter().map(|f| self.find_scalar_field(&f).unwrap()).collect();
+                    let all_fields_are_required = fields.iter().all(|f| f.is_required());
                     if all_fields_are_required || allow_optional {
                         Some(UniqueCriteria::new(fields))
                     } else {
@@ -206,8 +241,8 @@ impl Model {
     }
 
     /// Finds the name of all id fields
-    pub fn singular_id_fields(&self) -> impl std::iter::Iterator<Item = &Field> {
-        self.fields().filter(|x| x.is_id)
+    pub fn singular_id_fields(&self) -> impl std::iter::Iterator<Item = &ScalarField> {
+        self.scalar_fields().filter(|x| x.is_id)
     }
 
     /// Determines whether there is a singular primary key
@@ -217,65 +252,24 @@ impl Model {
 
     /// Finds a field with a certain relation guarantee.
     /// exclude_field are necessary to avoid corner cases with self-relations (e.g. we must not recognize a field as its own related field).
-    pub fn related_field(&self, to: &str, relation_name: &str, exclude_field: &str) -> Option<&Field> {
-        self.fields().find(|f| {
-            if let FieldType::Relation(rel_info) = &f.field_type {
-                if rel_info.to == to && rel_info.name == relation_name && (self.name != to || f.name != exclude_field) {
-                    return true;
-                }
-            }
-            false
+    pub fn related_field(&self, to: &str, relation_name: &str, exclude_field: &str) -> Option<&RelationField> {
+        self.relation_fields().find(|rf| {
+            rf.relation_info.to == to
+                && rf.relation_info.name == relation_name
+                && (self.name != to || rf.name != exclude_field)
         })
-    }
-
-    /// Finds a mutable field with a certain relation guarantee.
-    pub fn related_field_mut(&mut self, to: &str, name: &str, exclude_field: &str) -> Option<&mut Field> {
-        let self_name = self.name.clone();
-        self.fields_mut().find(|f| {
-            if let FieldType::Relation(rel_info) = &f.field_type {
-                if rel_info.to == to && rel_info.name == name && (self_name != to || f.name != exclude_field) {
-                    return true;
-                }
-            }
-
-            false
-        })
-    }
-
-    /// Checks if this is a relation model. A relation model has exactly
-    /// two relations, which are required.
-    pub fn is_relation_model(&self) -> bool {
-        let related_fields = self.fields().filter(|f| -> bool {
-            if let FieldType::Relation(_) = f.field_type {
-                f.arity == FieldArity::Required
-            } else {
-                false
-            }
-        });
-
-        related_fields.count() == 2
-    }
-
-    /// Checks if this is a pure relation model.
-    /// It has only two fields, both of them are required relations.
-    pub fn is_pure_relation_model(&self) -> bool {
-        self.is_relation_model() && self.fields.len() == 2
     }
 
     pub fn add_index(&mut self, index: IndexDefinition) {
         self.indices.push(index)
     }
 
-    pub fn has_index(&self, index: &IndexDefinition) -> bool {
-        self.indices.iter().any(|own_index| own_index == index)
-    }
-
     pub fn has_created_at_and_updated_at(&self) -> bool {
         /// Finds a field by name.
         fn has_field(model: &Model, name: &str) -> bool {
             match model
-                .find_field(name)
-                .or_else(|| model.find_field(name.to_lowercase().as_ref()))
+                .find_scalar_field(name)
+                .or_else(|| model.find_scalar_field(name.to_lowercase().as_ref()))
             {
                 Some(f) => f.field_type == FieldType::Base(ScalarType::DateTime, None),
                 None => false,

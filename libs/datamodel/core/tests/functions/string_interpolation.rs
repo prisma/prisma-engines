@@ -15,7 +15,7 @@ fn should_not_remove_whitespace() {
     let user_model = schema.assert_has_model("User");
     user_model.assert_is_embedded(false);
     user_model
-        .assert_has_field("firstName")
+        .assert_has_scalar_field("firstName")
         .assert_base_type(&ScalarType::String)
         .assert_default_value(dml::DefaultValue::Single(PrismaValue::String(String::from(
             "This is a string with whitespace",
@@ -35,7 +35,7 @@ fn should_not_try_to_interpret_comments_in_strings() {
     let user_model = schema.assert_has_model("User");
     user_model.assert_is_embedded(false);
     user_model
-        .assert_has_field("firstName")
+        .assert_has_scalar_field("firstName")
         .assert_base_type(&ScalarType::String)
         .assert_default_value(dml::DefaultValue::Single(PrismaValue::String(String::from(
             "This is a string with a // Comment",

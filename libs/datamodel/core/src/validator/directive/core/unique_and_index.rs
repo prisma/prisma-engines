@@ -12,18 +12,17 @@ impl DirectiveValidator<dml::Field> for FieldLevelUniqueDirectiveValidator {
     }
 
     fn validate_and_apply(&self, args: &mut Args, obj: &mut dml::Field) -> Result<(), DatamodelError> {
-        if obj.is_id {
-            return self.new_directive_validation_error(
-                "Fields that are marked as id should not have an additional @unique.",
-                args.span(),
-            );
-        }
-
-        if let dml::FieldType::Relation(rel_info) = &obj.field_type {
-            let suggestion = if rel_info.fields.len() == 1 {
-                format!(" Did you mean to put it on `{}`?", rel_info.fields.first().unwrap())
-            } else if rel_info.fields.len() > 1 {
-                format!(" Did you mean to provide `@@unique([{}])`?", rel_info.fields.join(", "))
+        if let dml::Field::RelationField(rf) = obj {
+            let suggestion = if rf.relation_info.fields.len() == 1 {
+                format!(
+                    " Did you mean to put it on `{}`?",
+                    rf.relation_info.fields.first().unwrap()
+                )
+            } else if rf.relation_info.fields.len() > 1 {
+                format!(
+                    " Did you mean to provide `@@unique([{}])`?",
+                    rf.relation_info.fields.join(", ")
+                )
             } else {
                 // no suggestion possible
                 String::new()
@@ -32,16 +31,22 @@ impl DirectiveValidator<dml::Field> for FieldLevelUniqueDirectiveValidator {
             return self.new_directive_validation_error(
                 &format!(
                     "The field `{field_name}` is a relation field and cannot be marked with `{directive_name}`. Only scalar fields can be made unique.{suggestion}",
-                    field_name = &obj.name,
+                    field_name = rf.name,
                     directive_name  = self.directive_name(),
                     suggestion = suggestion
                 ),
                 args.span(),
             );
+        } else if let dml::Field::ScalarField(sf) = obj {
+            if sf.is_id {
+                return self.new_directive_validation_error(
+                    "Fields that are marked as id should not have an additional @unique.",
+                    args.span(),
+                );
+            } else {
+                sf.is_unique = true;
+            }
         }
-
-        obj.is_unique = true;
-
         Ok(())
     }
 
@@ -50,10 +55,11 @@ impl DirectiveValidator<dml::Field> for FieldLevelUniqueDirectiveValidator {
         field: &dml::Field,
         _datamodel: &dml::Datamodel,
     ) -> Result<Vec<ast::Directive>, DatamodelError> {
-        if field.is_unique {
-            return Ok(vec![ast::Directive::new(self.directive_name(), vec![])]);
+        if let dml::Field::ScalarField(sf) = field {
+            if sf.is_unique {
+                return Ok(vec![ast::Directive::new(self.directive_name(), vec![])]);
+            }
         }
-
         Ok(vec![])
     }
 }
@@ -171,10 +177,7 @@ trait IndexDirectiveBase<T>: DirectiveValidator<T> {
         let referenced_relation_fields: Vec<String> = index_def
             .fields
             .iter()
-            .filter(|field| match obj.find_field(&field) {
-                Some(field) => field.field_type.is_relation(),
-                None => false,
-            })
+            .filter(|field| obj.find_relation_field(&field).is_some())
             .map(|f| f.to_owned())
             .collect();
 
@@ -195,15 +198,15 @@ trait IndexDirectiveBase<T>: DirectiveValidator<T> {
             let mut had_successful_replacement = false;
 
             for f in &index_def.fields {
-                if let Some(field) = obj.find_field(&f) {
-                    if let dml::FieldType::Relation(rel_info) = &field.field_type {
-                        for underlying_field in &rel_info.fields {
-                            suggested_fields.push(underlying_field.to_owned());
-                            had_successful_replacement = true;
-                        }
-                    } else {
-                        suggested_fields.push(field.name.clone());
+                if let Some(rf) = obj.find_relation_field(&f) {
+                    for underlying_field in &rf.relation_info.fields {
+                        suggested_fields.push(underlying_field.to_owned());
+                        had_successful_replacement = true;
                     }
+                }
+
+                if let Some(sf) = obj.find_scalar_field(&f) {
+                    suggested_fields.push(sf.name.clone());
                 }
             }
 
@@ -273,7 +276,7 @@ fn directive_name(index_type: dml::IndexType) -> &'static str {
 }
 
 // returns the items that are contained multiple times in the provided vector
-fn find_duplicates(items: &Vec<String>) -> Vec<String> {
+fn find_duplicates(items: &[String]) -> Vec<String> {
     let mut counts = HashMap::new();
     for item in items.iter() {
         let entry = counts.entry(item).or_insert(0);

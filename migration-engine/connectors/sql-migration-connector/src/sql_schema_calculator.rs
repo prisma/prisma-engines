@@ -1,5 +1,5 @@
 use crate::{
-    datamodel_helpers::{self, FieldRef, ModelRef, TypeRef},
+    datamodel_helpers::{self, ModelRef, ScalarFieldRef, TypeRef},
     error::SqlError,
     sql_renderer::IteratorJoin,
     DatabaseInfo, SqlResult,
@@ -64,7 +64,7 @@ impl<'a> SqlSchemaCalculator<'a> {
                 // used at least once).
                 let mut enums = Vec::with_capacity(self.data_model.enums.len());
 
-                let enum_fields = datamodel_helpers::walk_fields(&self.data_model)
+                let enum_fields = datamodel_helpers::walk_scalar_fields(&self.data_model)
                     .filter_map(|field| field.field_type().as_enum().map(|enum_ref| (field, enum_ref)));
 
                 for (field, enum_tpe) in enum_fields {
@@ -91,7 +91,7 @@ impl<'a> SqlSchemaCalculator<'a> {
     ) -> impl Iterator<Item = SqlResult<(ModelRef<'a>, sql::Table)>> + 'iter {
         datamodel_helpers::walk_models(self.data_model).map(move |model| {
             let columns = model
-                .fields()
+                .scalar_fields()
                 .flat_map(|f| match f.field_type() {
                     TypeRef::Base(_) => Some(sql::Column {
                         name: f.db_name().to_owned(),
@@ -121,7 +121,7 @@ impl<'a> SqlSchemaCalculator<'a> {
                 constraint_name: None,
             }).filter(|pk| !pk.columns.is_empty());
 
-            let single_field_indexes = model.fields().filter_map(|f| {
+            let single_field_indexes = model.scalar_fields().filter_map(|f| {
                 if f.is_unique() {
                     Some(sql::Index {
                         name: format!("{}.{}", &model.db_name(), &f.db_name()),
@@ -134,10 +134,10 @@ impl<'a> SqlSchemaCalculator<'a> {
             });
 
             let multiple_field_indexes = model.indexes().map(|index_definition: &IndexDefinition| {
-                let referenced_fields: Vec<FieldRef<'_>> = index_definition
+                let referenced_fields: Vec<ScalarFieldRef<'_>> = index_definition
                     .fields
                     .iter()
-                    .map(|field_name| model.find_field(field_name).expect("Unknown field in index directive."))
+                    .map(|field_name| model.find_scalar_field(field_name).expect("Unknown field in index directive."))
                     .collect();
 
                 sql::Index {
@@ -176,8 +176,7 @@ impl<'a> SqlSchemaCalculator<'a> {
 
     fn add_inline_relations_to_model_tables(&self, model: ModelRef<'a>, table: &mut sql::Table) {
         let relation_fields = model
-            .fields()
-            .filter_map(|field| field.as_relation_field())
+            .relation_fields()
             .filter(|relation_field| !relation_field.is_virtual());
 
         for relation_field in relation_fields {
@@ -279,8 +278,8 @@ impl<'a> SqlSchemaCalculator<'a> {
 }
 
 fn relation_table_column(referenced_model: &ModelRef<'_>, reference_field_name: String) -> Vec<sql::Column> {
-    let unique_field = referenced_model.fields().find(|f| f.is_unique());
-    let id_field = referenced_model.fields().find(|f| f.is_id());
+    let unique_field = referenced_model.scalar_fields().find(|f| f.is_unique());
+    let id_field = referenced_model.scalar_fields().find(|f| f.is_id());
 
     let unique_field = id_field.or(unique_field).expect(&format!(
         "No unique criteria found in model {}",
@@ -295,7 +294,7 @@ fn relation_table_column(referenced_model: &ModelRef<'_>, reference_field_name: 
     }]
 }
 
-fn migration_value_new(field: &FieldRef<'_>) -> Option<sql_schema_describer::DefaultValue> {
+fn migration_value_new(field: &ScalarFieldRef<'_>) -> Option<sql_schema_describer::DefaultValue> {
     if field.is_id() {
         return None;
     }
@@ -325,7 +324,7 @@ fn migration_value_new(field: &FieldRef<'_>) -> Option<sql_schema_describer::Def
     Some(sql_schema_describer::DefaultValue::VALUE(value.clone()))
 }
 
-fn enum_column_type(field: &FieldRef<'_>, database_info: &DatabaseInfo, db_name: &str) -> sql::ColumnType {
+fn enum_column_type(field: &ScalarFieldRef<'_>, database_info: &DatabaseInfo, db_name: &str) -> sql::ColumnType {
     let arity = column_arity(field.arity());
     match database_info.sql_family() {
         SqlFamily::Postgres => sql::ColumnType::pure(sql::ColumnTypeFamily::Enum(db_name.to_owned()), arity),
@@ -337,11 +336,11 @@ fn enum_column_type(field: &FieldRef<'_>, database_info: &DatabaseInfo, db_name:
     }
 }
 
-fn column_type(field: &FieldRef<'_>) -> sql::ColumnType {
+fn column_type(field: &ScalarFieldRef<'_>) -> sql::ColumnType {
     column_type_for_scalar_type(&scalar_type_for_field(field), column_arity(field.arity()))
 }
 
-fn scalar_type_for_field(field: &FieldRef<'_>) -> ScalarType {
+fn scalar_type_for_field(field: &ScalarFieldRef<'_>) -> ScalarType {
     match field.field_type() {
         TypeRef::Base(ref scalar) => *scalar,
         TypeRef::Enum(_) => ScalarType::String,
@@ -393,7 +392,7 @@ fn add_one_to_one_relation_unique_index(table: &mut sql::Table, column_names: &[
 }
 
 /// This should match the logic in `prisma_models::Model::primary_identifier`.
-fn first_unique_criterion(model: ModelRef<'_>) -> anyhow::Result<Vec<FieldRef<'_>>> {
+fn first_unique_criterion(model: ModelRef<'_>) -> anyhow::Result<Vec<ScalarFieldRef<'_>>> {
     // First candidate: the primary key.
     {
         let id_fields: Vec<_> = model.id_fields().collect();
@@ -405,7 +404,9 @@ fn first_unique_criterion(model: ModelRef<'_>) -> anyhow::Result<Vec<FieldRef<'_
 
     // Second candidate: a required scalar field with a unique index.
     {
-        let first_scalar_unique_required_field = model.fields().find(|field| field.is_unique() && field.is_required());
+        let first_scalar_unique_required_field = model
+            .scalar_fields()
+            .find(|field| field.is_unique() && field.is_required());
 
         if let Some(field) = first_scalar_unique_required_field {
             return Ok(vec![field]);

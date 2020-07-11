@@ -1,8 +1,4 @@
 mod to_dmmf;
-
-use serde;
-use serde_json;
-
 pub use to_dmmf::render_to_dmmf;
 pub use to_dmmf::render_to_dmmf_value;
 

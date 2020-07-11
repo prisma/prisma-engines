@@ -20,7 +20,7 @@ fn should_treat_single_values_as_arrays_of_length_one() {
 
     let post_model = schema.assert_has_model("Post");
     post_model
-        .assert_has_field("user")
+        .assert_has_relation_field("user")
         .assert_relation_to("User")
         .assert_relation_to_fields(&["id"]);
 }

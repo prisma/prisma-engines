@@ -6,6 +6,14 @@ pub struct Model {
     pub(crate) model: String,
 }
 
+impl Model {
+    pub fn new(model_name: &str) -> Self {
+        Model {
+            model: model_name.to_owned(),
+        }
+    }
+}
+
 #[derive(Serialize, Debug, Clone)]
 pub struct Enum {
     pub(crate) enm: String,

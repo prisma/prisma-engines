@@ -5,7 +5,7 @@ use crate::misc_helpers::{
 };
 use crate::version_checker::VersionChecker;
 use crate::SqlError;
-use datamodel::{dml, Datamodel, FieldType, Model};
+use datamodel::{dml, Datamodel, Field, FieldType, Model};
 use sql_schema_describer::SqlSchema;
 use tracing::debug;
 
@@ -28,7 +28,7 @@ pub fn introspect(
         for column in &table.columns {
             version_check.check_column_for_type_and_default_value(&column);
             let field = calculate_scalar_field(&table, &column);
-            model.add_field(field);
+            model.add_field(Field::ScalarField(field));
         }
 
         let mut foreign_keys_copy = table.foreign_keys.clone();
@@ -36,13 +36,20 @@ pub fn introspect(
         foreign_keys_copy.clear_duplicates();
 
         for foreign_key in foreign_keys_copy.iter().filter(|fk| {
-            !fk.columns
-                .iter()
-                .any(|c| matches!(model_copy.find_field(c).unwrap().field_type, FieldType::Unsupported(_)))
+            !fk.columns.iter().any(|c| {
+                matches!(
+                    model_copy.find_scalar_field(c).unwrap().field_type,
+                    FieldType::Unsupported(_)
+                )
+            })
         }) {
             version_check.has_inline_relations(table);
             version_check.uses_on_delete(foreign_key, table);
-            model.add_field(calculate_relation_field(schema, table, foreign_key)?);
+            model.add_field(Field::RelationField(calculate_relation_field(
+                schema,
+                table,
+                foreign_key,
+            )?));
         }
 
         for index in table
@@ -76,23 +83,16 @@ pub fn introspect(
 
     // add backrelation fields
     for model in data_model.models.iter() {
-        for relation_field in model.fields.iter() {
-            if let FieldType::Relation(relation_info) = &relation_field.field_type {
-                if data_model
-                    .related_field(
-                        &model.name,
-                        &relation_info.to,
-                        &relation_info.name,
-                        &relation_field.name,
-                    )
-                    .is_none()
-                {
-                    let other_model = data_model.find_model(relation_info.to.as_str()).unwrap();
-                    let field =
-                        calculate_backrelation_field(schema, model, other_model, relation_field, relation_info)?;
+        for relation_field in model.relation_fields() {
+            let relation_info = &relation_field.relation_info;
+            if data_model
+                .find_related_field_for_info(&relation_info, &relation_field.name)
+                .is_none()
+            {
+                let other_model = data_model.find_model(relation_info.to.as_str()).unwrap();
+                let field = calculate_backrelation_field(schema, model, other_model, relation_field, relation_info)?;
 
-                    fields_to_be_added.push((other_model.name.clone(), field));
-                }
+                fields_to_be_added.push((other_model.name.clone(), field));
             }
         }
     }
@@ -118,8 +118,7 @@ pub fn introspect(
     }
 
     for (model, field) in fields_to_be_added {
-        let model = data_model.find_model_mut(&model).unwrap();
-        model.add_field(field);
+        data_model.find_model_mut(&model).add_field(Field::RelationField(field));
     }
 
     Ok(())
