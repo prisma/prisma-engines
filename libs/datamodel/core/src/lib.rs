@@ -58,6 +58,7 @@ pub mod dml;
 pub mod error;
 pub mod json;
 pub mod validator;
+pub mod walkers;
 
 pub use common::DefaultNames;
 pub use configuration::*;

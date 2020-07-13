@@ -1,11 +1,9 @@
 use crate::{
-    datamodel_helpers::{self, ModelRef, ScalarFieldRef, TypeRef},
     error::SqlError,
     sql_renderer::IteratorJoin,
     DatabaseInfo, SqlResult,
 };
-use datamodel::common::*;
-use datamodel::*;
+use datamodel::{walkers::{ModelRef, ScalarFieldRef, TypeRef, walk_scalar_fields, walk_models}, common::*, Datamodel, WithDatabaseName, DefaultValue, ValueGenerator, ValueGeneratorFn, IndexDefinition, IndexType, FieldArity};
 use prisma_models::{DatamodelConverter, TempManifestationHolder, TempRelationHolder};
 use prisma_value::PrismaValue;
 use quaint::prelude::SqlFamily;
@@ -64,7 +62,7 @@ impl<'a> SqlSchemaCalculator<'a> {
                 // used at least once).
                 let mut enums = Vec::with_capacity(self.data_model.enums.len());
 
-                let enum_fields = datamodel_helpers::walk_scalar_fields(&self.data_model)
+                let enum_fields = walk_scalar_fields(&self.data_model)
                     .filter_map(|field| field.field_type().as_enum().map(|enum_ref| (field, enum_ref)));
 
                 for (field, enum_tpe) in enum_fields {
@@ -89,7 +87,7 @@ impl<'a> SqlSchemaCalculator<'a> {
     fn calculate_model_tables<'iter>(
         &'iter self,
     ) -> impl Iterator<Item = SqlResult<(ModelRef<'a>, sql::Table)>> + 'iter {
-        datamodel_helpers::walk_models(self.data_model).map(move |model| {
+        walk_models(self.data_model).map(move |model| {
             let columns = model
                 .scalar_fields()
                 .flat_map(|f| match f.field_type() {
@@ -296,7 +294,7 @@ fn migration_value_new(field: &ScalarFieldRef<'_>) -> Option<sql_schema_describe
     }
 
     let value = match &field.default_value()? {
-        dml::DefaultValue::Single(s) => match field.field_type() {
+        datamodel::DefaultValue::Single(s) => match field.field_type() {
             TypeRef::Enum(inum) => {
                 let corresponding_value = inum
                     .r#enum
@@ -308,13 +306,13 @@ fn migration_value_new(field: &ScalarFieldRef<'_>) -> Option<sql_schema_describe
             }
             _ => s.clone(),
         },
-        dml::DefaultValue::Expression(expression) if expression.name == "now" && expression.args.is_empty() => {
+        datamodel::DefaultValue::Expression(expression) if expression.name == "now" && expression.args.is_empty() => {
             return Some(sql_schema_describer::DefaultValue::NOW)
         }
-        dml::DefaultValue::Expression(expression) if expression.name == "dbgenerated" && expression.args.is_empty() => {
+        datamodel::DefaultValue::Expression(expression) if expression.name == "dbgenerated" && expression.args.is_empty() => {
             return Some(sql_schema_describer::DefaultValue::DBGENERATED(String::new()))
         }
-        dml::DefaultValue::Expression(_) => return None,
+        datamodel::DefaultValue::Expression(_) => return None,
     };
 
     Some(sql_schema_describer::DefaultValue::VALUE(value))
