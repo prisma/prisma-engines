@@ -201,7 +201,7 @@ fn copy_current_table_into_new_table(
 
     let mut destination_columns = intersection_columns
         .iter()
-        .map(|s| *s)
+        .copied()
         .chain(
             columns_that_became_required_with_a_default
                 .iter()

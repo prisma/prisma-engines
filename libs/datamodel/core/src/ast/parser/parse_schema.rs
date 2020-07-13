@@ -1,6 +1,7 @@
 use pest::Parser;
 
 use super::{
+    helpers::{parsing_catch_all, TokenExtensions},
     parse_enum::parse_enum,
     parse_model::parse_model,
     parse_source_and_generator::{parse_generator, parse_source},
@@ -20,39 +21,37 @@ pub fn parse_schema(datamodel_string: &str) -> Result<SchemaAst, ErrorCollection
             let datamodel = datamodel_wrapped.next().unwrap();
             let mut top_level_definitions: Vec<Top> = vec![];
 
-            match_children! { datamodel, current,
-                Rule::model_declaration => match parse_model(&current) {
-                    Ok(model) => top_level_definitions.push(Top::Model(model)),
-                    Err(mut err) => errors.append(&mut err)
-                },
-                Rule::enum_declaration => match parse_enum(&current){
-                    Ok(enm) => top_level_definitions.push(Top::Enum(enm)),
-                    Err(mut err) => errors.append(&mut err)
-                },
-                Rule::source_block => match parse_source(&current) {
-                    Ok(source) => top_level_definitions.push(Top::Source(source)),
-                    Err(mut err) => errors.append(&mut err)
-                },
-                Rule::generator_block => match parse_generator(&current) {
-                    Ok(generator) => top_level_definitions.push(Top::Generator(generator)),
-                    Err(mut err) => errors.append(&mut err)
-                },
-                Rule::type_alias => top_level_definitions.push(Top::Type(parse_type_alias(&current))),
-                Rule::comment_block => (),
-                Rule::EOI => {},
-                Rule::CATCH_ALL => {
-                    errors.push(DatamodelError::new_validation_error(
+            for current in datamodel.relevant_children() {
+                match current.as_rule() {
+                    Rule::model_declaration => match parse_model(&current) {
+                        Ok(model) => top_level_definitions.push(Top::Model(model)),
+                        Err(mut err) => errors.append(&mut err),
+                    },
+                    Rule::enum_declaration => match parse_enum(&current) {
+                        Ok(enm) => top_level_definitions.push(Top::Enum(enm)),
+                        Err(mut err) => errors.append(&mut err),
+                    },
+                    Rule::source_block => match parse_source(&current) {
+                        Ok(source) => top_level_definitions.push(Top::Source(source)),
+                        Err(mut err) => errors.append(&mut err),
+                    },
+                    Rule::generator_block => match parse_generator(&current) {
+                        Ok(generator) => top_level_definitions.push(Top::Generator(generator)),
+                        Err(mut err) => errors.append(&mut err),
+                    },
+                    Rule::type_alias => top_level_definitions.push(Top::Type(parse_type_alias(&current))),
+                    Rule::comment_block => (),
+                    Rule::EOI => {}
+                    Rule::CATCH_ALL => errors.push(DatamodelError::new_validation_error(
                         &format!("This line is invalid. It does not start with any known Prisma schema keyword."),
-                        Span::from_pest(current.as_span()))
-                    )
-                },
-                Rule::arbitrary_block => {
-                    errors.push(DatamodelError::new_validation_error(
+                        Span::from_pest(current.as_span()),
+                    )),
+                    Rule::arbitrary_block => errors.push(DatamodelError::new_validation_error(
                         &format!("This block is invalid. It does not start with any known Prisma schema keyword."),
-                        Span::from_pest(current.as_span()))
-                    )
-                },
-                _ => panic!("Encountered impossible datamodel declaration during parsing: {:?}", current.tokens())
+                        Span::from_pest(current.as_span()),
+                    )),
+                    _ => parsing_catch_all(&current, "datamodel"),
+                }
             }
 
             errors.ok()?;

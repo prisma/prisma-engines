@@ -2,33 +2,38 @@ use once_cell::sync::Lazy;
 use regex::Regex;
 use std::borrow::Cow;
 
+use super::helpers::{parsing_catch_all, Token, TokenExtensions};
 use super::Rule;
 use crate::ast::*;
 
-// Expressions
-
-/// Parses an expression, given a Pest parser token.
-pub fn parse_expression(token: &pest::iterators::Pair<'_, Rule>) -> Expression {
-    return match_first! { token, current,
-        Rule::numeric_literal => Expression::NumericValue(current.as_str().to_string(), Span::from_pest(current.as_span())),
-        Rule::string_literal => Expression::StringValue(parse_string_literal(&current), Span::from_pest(current.as_span())),
-        Rule::boolean_literal => Expression::BooleanValue(current.as_str().to_string(), Span::from_pest(current.as_span())),
-        Rule::constant_literal => Expression::ConstantValue(current.as_str().to_string(), Span::from_pest(current.as_span())),
-        Rule::function => parse_function(&current),
-        Rule::array_expression => parse_array(&current),
-        _ => unreachable!("Encountered impossible literal during parsing: {:?}", current.tokens())
-    };
+pub fn parse_expression(token: &Token) -> Expression {
+    let first_child = token.first_relevant_child();
+    let span = Span::from_pest(first_child.as_span());
+    match first_child.as_rule() {
+        Rule::numeric_literal => Expression::NumericValue(first_child.as_str().to_string(), span),
+        Rule::string_literal => Expression::StringValue(parse_string_literal(&first_child), span),
+        Rule::boolean_literal => Expression::BooleanValue(first_child.as_str().to_string(), span),
+        Rule::constant_literal => Expression::ConstantValue(first_child.as_str().to_string(), span),
+        Rule::function => parse_function(&first_child),
+        Rule::array_expression => parse_array(&first_child),
+        _ => unreachable!(
+            "Encountered impossible literal during parsing: {:?}",
+            first_child.tokens()
+        ),
+    }
 }
 
-fn parse_function(token: &pest::iterators::Pair<'_, Rule>) -> Expression {
+fn parse_function(token: &Token) -> Expression {
     let mut name: Option<String> = None;
     let mut arguments: Vec<Expression> = vec![];
 
-    match_children! { token, current,
-        Rule::non_empty_identifier => name = Some(current.as_str().to_string()),
-        Rule::expression => arguments.push(parse_expression(&current)),
-        _ => unreachable!("Encountered impossible function during parsing: {:?}", current.tokens())
-    };
+    for current in token.relevant_children() {
+        match current.as_rule() {
+            Rule::non_empty_identifier => name = Some(current.as_str().to_string()),
+            Rule::expression => arguments.push(parse_expression(&current)),
+            _ => parsing_catch_all(&current, "function"),
+        }
+    }
 
     match name {
         Some(name) => Expression::Function(name, arguments, Span::from_pest(token.as_span())),
@@ -36,29 +41,36 @@ fn parse_function(token: &pest::iterators::Pair<'_, Rule>) -> Expression {
     }
 }
 
-fn parse_array(token: &pest::iterators::Pair<'_, Rule>) -> Expression {
+fn parse_array(token: &Token) -> Expression {
     let mut elements: Vec<Expression> = vec![];
 
-    match_children! { token, current,
-        Rule::expression => elements.push(parse_expression(&current)),
-        _ => unreachable!("Encountered impossible array during parsing: {:?}", current.tokens())
-    };
+    for current in token.relevant_children() {
+        match current.as_rule() {
+            Rule::expression => elements.push(parse_expression(&current)),
+            _ => parsing_catch_all(&current, "array"),
+        }
+    }
 
     Expression::Array(elements, Span::from_pest(token.as_span()))
 }
 
-pub fn parse_arg_value(token: &pest::iterators::Pair<'_, Rule>) -> Expression {
-    match_first! { token, current,
+pub fn parse_arg_value(token: &Token) -> Expression {
+    let current = token.first_relevant_child();
+    match current.as_rule() {
         Rule::expression => parse_expression(&current),
-        _ => unreachable!("Encountered impossible value during parsing: {:?}", current.tokens())
+        _ => unreachable!("Encountered impossible value during parsing: {:?}", current.tokens()),
     }
 }
 
-fn parse_string_literal(token: &pest::iterators::Pair<'_, Rule>) -> String {
-    return match_first! { token, current,
+fn parse_string_literal(token: &Token) -> String {
+    let current = token.first_relevant_child();
+    match current.as_rule() {
         Rule::string_content => unescape_string_literal(current.as_str()).into_owned(),
-        _ => unreachable!("Encountered impossible string content during parsing: {:?}", current.tokens())
-    };
+        _ => unreachable!(
+            "Encountered impossible string content during parsing: {:?}",
+            current.tokens()
+        ),
+    }
 }
 
 fn unescape_string_literal(original: &str) -> Cow<'_, str> {

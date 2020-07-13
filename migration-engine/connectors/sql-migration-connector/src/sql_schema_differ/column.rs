@@ -151,7 +151,7 @@ pub(crate) struct ColumnChanges {
 
 impl ColumnChanges {
     pub(crate) fn iter<'a>(&'a self) -> impl Iterator<Item = ColumnChange> + 'a {
-        self.changes.iter().filter_map(|c| c.as_ref().map(|c| c.clone()))
+        self.changes.iter().filter_map(|c| c.as_ref().cloned())
     }
 
     pub(crate) fn type_changed(&self) -> bool {

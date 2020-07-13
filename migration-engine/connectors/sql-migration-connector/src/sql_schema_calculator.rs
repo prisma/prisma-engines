@@ -1,11 +1,10 @@
-use crate::{
-    datamodel_helpers::{self, ModelRef, ScalarFieldRef, TypeRef},
-    error::SqlError,
-    sql_renderer::IteratorJoin,
-    DatabaseInfo, SqlResult,
+use crate::{error::SqlError, sql_renderer::IteratorJoin, DatabaseInfo, SqlResult};
+use datamodel::{
+    common::*,
+    walkers::{walk_models, walk_scalar_fields, ModelWalker, ScalarFieldWalker, TypeWalker},
+    Datamodel, DefaultValue, FieldArity, IndexDefinition, IndexType, ValueGenerator, ValueGeneratorFn,
+    WithDatabaseName,
 };
-use datamodel::common::*;
-use datamodel::*;
 use prisma_models::{DatamodelConverter, TempManifestationHolder, TempRelationHolder};
 use prisma_value::PrismaValue;
 use quaint::prelude::SqlFamily;
@@ -64,7 +63,7 @@ impl<'a> SqlSchemaCalculator<'a> {
                 // used at least once).
                 let mut enums = Vec::with_capacity(self.data_model.enums().len());
 
-                let enum_fields = datamodel_helpers::walk_scalar_fields(&self.data_model)
+                let enum_fields = walk_scalar_fields(&self.data_model)
                     .filter_map(|field| field.field_type().as_enum().map(|enum_ref| (field, enum_ref)));
 
                 for (field, enum_tpe) in enum_fields {
@@ -88,18 +87,18 @@ impl<'a> SqlSchemaCalculator<'a> {
 
     fn calculate_model_tables<'iter>(
         &'iter self,
-    ) -> impl Iterator<Item = SqlResult<(ModelRef<'a>, sql::Table)>> + 'iter {
-        datamodel_helpers::walk_models(self.data_model).map(move |model| {
+    ) -> impl Iterator<Item = SqlResult<(ModelWalker<'a>, sql::Table)>> + 'iter {
+        walk_models(self.data_model).map(move |model| {
             let columns = model
                 .scalar_fields()
                 .flat_map(|f| match f.field_type() {
-                    TypeRef::Base(_) => Some(sql::Column {
+                    TypeWalker::Base(_) => Some(sql::Column {
                         name: f.db_name().to_owned(),
                         tpe: column_type(&f),
                         default: migration_value_new(&f),
                         auto_increment: matches!(f.default_value(), Some(DefaultValue::Expression(ValueGenerator { generator: ValueGeneratorFn::Autoincrement, .. }))),
                     }),
-                    TypeRef::Enum(r#enum) => {
+                    TypeWalker::Enum(r#enum) => {
                         let enum_db_name = r#enum.db_name();
                         Some(sql::Column {
                             name: f.db_name().to_owned(),
@@ -134,7 +133,7 @@ impl<'a> SqlSchemaCalculator<'a> {
             });
 
             let multiple_field_indexes = model.indexes().map(|index_definition: &IndexDefinition| {
-                let referenced_fields: Vec<ScalarFieldRef<'_>> = index_definition
+                let referenced_fields: Vec<ScalarFieldWalker<'_>> = index_definition
                     .fields
                     .iter()
                     .map(|field_name| model.find_scalar_field(field_name).expect("Unknown field in index directive."))
@@ -174,7 +173,7 @@ impl<'a> SqlSchemaCalculator<'a> {
         })
     }
 
-    fn add_inline_relations_to_model_tables(&self, model: ModelRef<'a>, table: &mut sql::Table) {
+    fn add_inline_relations_to_model_tables(&self, model: ModelWalker<'a>, table: &mut sql::Table) {
         let relation_fields = model
             .relation_fields()
             .filter(|relation_field| !relation_field.is_virtual());
@@ -208,65 +207,62 @@ impl<'a> SqlSchemaCalculator<'a> {
     fn calculate_relation_tables(&self) -> SqlResult<Vec<sql::Table>> {
         let mut result = Vec::new();
         for relation in self.calculate_relations().iter() {
-            match &relation.manifestation {
-                TempManifestationHolder::Table => {
-                    let model_a = ModelRef::new(&relation.model_a, self.data_model);
-                    let model_b = ModelRef::new(&relation.model_b, self.data_model);
+            if let TempManifestationHolder::Table = &relation.manifestation {
+                let model_a = ModelWalker::new(&relation.model_a, self.data_model);
+                let model_b = ModelWalker::new(&relation.model_b, self.data_model);
 
-                    let a_columns = relation_table_column(&model_a, relation.model_a_column());
-                    let b_columns = relation_table_column(&model_b, relation.model_b_column());
+                let a_columns = relation_table_column(&model_a, relation.model_a_column());
+                let b_columns = relation_table_column(&model_b, relation.model_b_column());
 
-                    let foreign_keys = vec![
-                        sql::ForeignKey {
-                            constraint_name: None,
-                            columns: a_columns.iter().map(|col| col.name.clone()).collect(),
-                            referenced_table: model_a.db_name().to_owned(),
-                            referenced_columns: first_unique_criterion(model_a)
-                                .map_err(SqlError::Generic)?
-                                .into_iter()
-                                .map(|field| field.db_name().to_owned())
-                                .collect(),
-                            on_delete_action: sql::ForeignKeyAction::Cascade,
-                        },
-                        sql::ForeignKey {
-                            constraint_name: None,
-                            columns: b_columns.iter().map(|col| col.name.clone()).collect(),
-                            referenced_table: model_b.db_name().to_owned(),
-                            referenced_columns: first_unique_criterion(model_b)
-                                .map_err(SqlError::Generic)?
-                                .into_iter()
-                                .map(|field| field.db_name().to_owned())
-                                .collect(),
-                            on_delete_action: sql::ForeignKeyAction::Cascade,
-                        },
-                    ];
+                let foreign_keys = vec![
+                    sql::ForeignKey {
+                        constraint_name: None,
+                        columns: a_columns.iter().map(|col| col.name.clone()).collect(),
+                        referenced_table: model_a.db_name().to_owned(),
+                        referenced_columns: first_unique_criterion(model_a)
+                            .map_err(SqlError::Generic)?
+                            .into_iter()
+                            .map(|field| field.db_name().to_owned())
+                            .collect(),
+                        on_delete_action: sql::ForeignKeyAction::Cascade,
+                    },
+                    sql::ForeignKey {
+                        constraint_name: None,
+                        columns: b_columns.iter().map(|col| col.name.clone()).collect(),
+                        referenced_table: model_b.db_name().to_owned(),
+                        referenced_columns: first_unique_criterion(model_b)
+                            .map_err(SqlError::Generic)?
+                            .into_iter()
+                            .map(|field| field.db_name().to_owned())
+                            .collect(),
+                        on_delete_action: sql::ForeignKeyAction::Cascade,
+                    },
+                ];
 
-                    let mut columns = a_columns;
-                    columns.extend(b_columns.iter().map(|col| col.to_owned()));
+                let mut columns = a_columns;
+                columns.extend(b_columns.iter().map(|col| col.to_owned()));
 
-                    let indexes = vec![
-                        sql::Index {
-                            name: format!("{}_AB_unique", relation.table_name()),
-                            columns: columns.iter().map(|col| col.name.clone()).collect(),
-                            tpe: sql::IndexType::Unique,
-                        },
-                        sql::Index {
-                            name: format!("{}_B_index", relation.table_name()),
-                            columns: b_columns.into_iter().map(|col| col.name).collect(),
-                            tpe: sql::IndexType::Normal,
-                        },
-                    ];
+                let indexes = vec![
+                    sql::Index {
+                        name: format!("{}_AB_unique", relation.table_name()),
+                        columns: columns.iter().map(|col| col.name.clone()).collect(),
+                        tpe: sql::IndexType::Unique,
+                    },
+                    sql::Index {
+                        name: format!("{}_B_index", relation.table_name()),
+                        columns: b_columns.into_iter().map(|col| col.name).collect(),
+                        tpe: sql::IndexType::Normal,
+                    },
+                ];
 
-                    let table = sql::Table {
-                        name: relation.table_name(),
-                        columns,
-                        indices: indexes,
-                        primary_key: None,
-                        foreign_keys,
-                    };
-                    result.push(table);
-                }
-                _ => (),
+                let table = sql::Table {
+                    name: relation.table_name(),
+                    columns,
+                    indices: indexes,
+                    primary_key: None,
+                    foreign_keys,
+                };
+                result.push(table);
             }
         }
         Ok(result)
@@ -277,14 +273,13 @@ impl<'a> SqlSchemaCalculator<'a> {
     }
 }
 
-fn relation_table_column(referenced_model: &ModelRef<'_>, reference_field_name: String) -> Vec<sql::Column> {
+fn relation_table_column(referenced_model: &ModelWalker<'_>, reference_field_name: String) -> Vec<sql::Column> {
     let unique_field = referenced_model.scalar_fields().find(|f| f.is_unique());
     let id_field = referenced_model.scalar_fields().find(|f| f.is_id());
 
-    let unique_field = id_field.or(unique_field).expect(&format!(
-        "No unique criteria found in model {}",
-        &referenced_model.name()
-    ));
+    let unique_field = id_field
+        .or(unique_field)
+        .unwrap_or_else(|| panic!("No unique criteria found in model {}", &referenced_model.name()));
 
     vec![sql::Column {
         name: reference_field_name,
@@ -294,14 +289,14 @@ fn relation_table_column(referenced_model: &ModelRef<'_>, reference_field_name: 
     }]
 }
 
-fn migration_value_new(field: &ScalarFieldRef<'_>) -> Option<sql_schema_describer::DefaultValue> {
+fn migration_value_new(field: &ScalarFieldWalker<'_>) -> Option<sql_schema_describer::DefaultValue> {
     if field.is_id() {
         return None;
     }
 
     let value = match &field.default_value()? {
-        dml::DefaultValue::Single(s) => match field.field_type() {
-            TypeRef::Enum(inum) => {
+        datamodel::DefaultValue::Single(s) => match field.field_type() {
+            TypeWalker::Enum(inum) => {
                 let corresponding_value = inum
                     .r#enum
                     .values()
@@ -312,19 +307,21 @@ fn migration_value_new(field: &ScalarFieldRef<'_>) -> Option<sql_schema_describe
             }
             _ => s.clone(),
         },
-        dml::DefaultValue::Expression(expression) if expression.name == "now" && expression.args.is_empty() => {
+        datamodel::DefaultValue::Expression(expression) if expression.name == "now" && expression.args.is_empty() => {
             return Some(sql_schema_describer::DefaultValue::NOW)
         }
-        dml::DefaultValue::Expression(expression) if expression.name == "dbgenerated" && expression.args.is_empty() => {
+        datamodel::DefaultValue::Expression(expression)
+            if expression.name == "dbgenerated" && expression.args.is_empty() =>
+        {
             return Some(sql_schema_describer::DefaultValue::DBGENERATED(String::new()))
         }
-        dml::DefaultValue::Expression(_) => return None,
+        datamodel::DefaultValue::Expression(_) => return None,
     };
 
-    Some(sql_schema_describer::DefaultValue::VALUE(value.clone()))
+    Some(sql_schema_describer::DefaultValue::VALUE(value))
 }
 
-fn enum_column_type(field: &ScalarFieldRef<'_>, database_info: &DatabaseInfo, db_name: &str) -> sql::ColumnType {
+fn enum_column_type(field: &ScalarFieldWalker<'_>, database_info: &DatabaseInfo, db_name: &str) -> sql::ColumnType {
     let arity = column_arity(field.arity());
     match database_info.sql_family() {
         SqlFamily::Postgres => sql::ColumnType::pure(sql::ColumnTypeFamily::Enum(db_name.to_owned()), arity),
@@ -336,14 +333,14 @@ fn enum_column_type(field: &ScalarFieldRef<'_>, database_info: &DatabaseInfo, db
     }
 }
 
-fn column_type(field: &ScalarFieldRef<'_>) -> sql::ColumnType {
+fn column_type(field: &ScalarFieldWalker<'_>) -> sql::ColumnType {
     column_type_for_scalar_type(&scalar_type_for_field(field), column_arity(field.arity()))
 }
 
-fn scalar_type_for_field(field: &ScalarFieldRef<'_>) -> ScalarType {
+fn scalar_type_for_field(field: &ScalarFieldWalker<'_>) -> ScalarType {
     match field.field_type() {
-        TypeRef::Base(ref scalar) => *scalar,
-        TypeRef::Enum(_) => ScalarType::String,
+        TypeWalker::Base(ref scalar) => *scalar,
+        TypeWalker::Enum(_) => ScalarType::String,
         x => panic!(format!(
             "This field type is not suported here. Field type is {:?} on field {}",
             x,
@@ -392,7 +389,7 @@ fn add_one_to_one_relation_unique_index(table: &mut sql::Table, column_names: &[
 }
 
 /// This should match the logic in `prisma_models::Model::primary_identifier`.
-fn first_unique_criterion(model: ModelRef<'_>) -> anyhow::Result<Vec<ScalarFieldRef<'_>>> {
+fn first_unique_criterion(model: ModelWalker<'_>) -> anyhow::Result<Vec<ScalarFieldWalker<'_>>> {
     // First candidate: the primary key.
     {
         let id_fields: Vec<_> = model.id_fields().collect();

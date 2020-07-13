@@ -126,9 +126,9 @@ impl MigrationPersistence for SqlMigrationPersistence<'_> {
                 let returning_insert = Insert::from(insert).returning(&["revision"]);
                 let result_set = self.conn().query(returning_insert.into()).await.unwrap();
 
-                result_set.into_iter().next().map(|row| {
+                if let Some(row) = result_set.into_iter().next() {
                     cloned.revision = row["revision"].as_i64().unwrap() as usize;
-                });
+                }
             }
             SqlFamily::Mssql => todo!("Greetings from Redmond"),
         }
@@ -207,9 +207,9 @@ fn migration_table_setup(
     t.add_column(ROLLED_BACK_COLUMN, types::integer());
     t.add_column(DATAMODEL_STEPS_COLUMN, unlimited_text_type.clone());
     t.add_column(DATABASE_MIGRATION_COLUMN, unlimited_text_type.clone());
-    t.add_column(ERRORS_COLUMN, unlimited_text_type.clone());
+    t.add_column(ERRORS_COLUMN, unlimited_text_type);
     t.add_column(STARTED_AT_COLUMN, datetime_type.clone());
-    t.add_column(FINISHED_AT_COLUMN, datetime_type.clone().nullable(true));
+    t.add_column(FINISHED_AT_COLUMN, datetime_type.nullable(true));
 }
 
 impl<'a> SqlMigrationPersistence<'a> {
@@ -236,7 +236,7 @@ impl<'a> SqlMigrationPersistence<'a> {
 fn convert_parameterized_date_value(db_value: &Value<'_>) -> DateTime<Utc> {
     match db_value {
         Value::Integer(Some(x)) => timestamp_to_datetime(*x),
-        Value::DateTime(Some(x)) => x.clone(),
+        Value::DateTime(Some(x)) => *x,
         x => unimplemented!("Got unsupported value {:?} in date conversion", x),
     }
 }

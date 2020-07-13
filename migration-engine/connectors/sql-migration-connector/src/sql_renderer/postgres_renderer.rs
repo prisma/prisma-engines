@@ -86,7 +86,7 @@ pub(crate) fn render_column_type(t: &ColumnType) -> String {
 }
 
 fn escape_string_literal(s: &str) -> Cow<'_, str> {
-    const STRING_LITERAL_CHARACTER_TO_ESCAPE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"'|\\"#).unwrap());
+    static STRING_LITERAL_CHARACTER_TO_ESCAPE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"'|\\"#).unwrap());
 
     STRING_LITERAL_CHARACTER_TO_ESCAPE_RE.replace_all(s, "\\$0")
 }
