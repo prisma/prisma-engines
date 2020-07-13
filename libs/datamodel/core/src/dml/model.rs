@@ -184,6 +184,8 @@ impl Model {
     }
 
     /// returns the order of unique criterias ordered based on their precedence
+    ///
+    /// todo needs to take into consideration commenting out
     fn unique_criterias(&self, allow_optional: bool) -> Vec<UniqueCriteria> {
         let mut result = Vec::new();
         // first candidate: the singular id field

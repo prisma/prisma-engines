@@ -91,19 +91,10 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
 
     // models without uniques / ids
     for model in &mut datamodel.models {
-
-        model.strict_unique_criterias().is_empty()
-        if model.id_fields.is_empty()
-            && !model
-                .fields
-                .iter()
-                .any(|f| (f.is_id() || f.is_unique()) && !f.is_commented_out())
-            && !model.indices.iter().any(|i| i.is_unique())
-            && !models_with_one_to_one_relation.contains(&model.name)
-        {
+        if model.strict_unique_criterias().is_empty() && !models_with_one_to_one_relation.contains(&model.name) {
             model.is_commented_out = true;
             model.documentation = Some(
-                "The underlying table does not contain a unique identifier and can therefore currently not be handled."
+                "The underlying table does not contain a valid unique identifier and can therefore currently not be handled."
                     .to_string(),
             );
             models_without_identifiers.push(Model {
