@@ -6,14 +6,14 @@ use crate::{
     RelationField,
 };
 
-pub fn walk_models<'a>(datamodel: &'a Datamodel) -> impl Iterator<Item = ModelRef<'a>> + 'a {
-    datamodel.models.iter().map(move |model| ModelRef { datamodel, model })
+pub fn walk_models<'a>(datamodel: &'a Datamodel) -> impl Iterator<Item = ModelWalker<'a>> + 'a {
+    datamodel.models.iter().map(move |model| ModelWalker { datamodel, model })
 }
 
 /// Iterator to walk all the scalar fields in the schema, associating them with their parent model.
-pub fn walk_scalar_fields<'a>(datamodel: &'a Datamodel) -> impl Iterator<Item = ScalarFieldRef<'a>> + 'a {
+pub fn walk_scalar_fields<'a>(datamodel: &'a Datamodel) -> impl Iterator<Item = ScalarFieldWalker<'a>> + 'a {
     datamodel.models().flat_map(move |model| {
-        model.scalar_fields().map(move |field| ScalarFieldRef {
+        model.scalar_fields().map(move |field| ScalarFieldWalker {
             datamodel,
             model,
             field,
@@ -22,14 +22,14 @@ pub fn walk_scalar_fields<'a>(datamodel: &'a Datamodel) -> impl Iterator<Item = 
 }
 
 #[derive(Debug, Copy, Clone)]
-pub struct ModelRef<'a> {
+pub struct ModelWalker<'a> {
     datamodel: &'a Datamodel,
     model: &'a Model,
 }
 
-impl<'a> ModelRef<'a> {
+impl<'a> ModelWalker<'a> {
     pub fn new(model: &'a Model, datamodel: &'a Datamodel) -> Self {
-        ModelRef { datamodel, model }
+        ModelWalker { datamodel, model }
     }
 
     pub fn database_name(&self) -> &'a str {
@@ -40,24 +40,24 @@ impl<'a> ModelRef<'a> {
         self.model.final_database_name()
     }
 
-    pub fn relation_fields<'b>(&'b self) -> impl Iterator<Item = RelationFieldRef<'a>> + 'b {
-        self.model.relation_fields().map(move |field| RelationFieldRef {
+    pub fn relation_fields<'b>(&'b self) -> impl Iterator<Item = RelationFieldWalker<'a>> + 'b {
+        self.model.relation_fields().map(move |field| RelationFieldWalker {
             datamodel: self.datamodel,
             model: self.model,
             field,
         })
     }
 
-    pub fn scalar_fields<'b>(&'b self) -> impl Iterator<Item = ScalarFieldRef<'a>> + 'b {
-        self.model.scalar_fields().map(move |field| ScalarFieldRef {
+    pub fn scalar_fields<'b>(&'b self) -> impl Iterator<Item = ScalarFieldWalker<'a>> + 'b {
+        self.model.scalar_fields().map(move |field| ScalarFieldWalker {
             datamodel: self.datamodel,
             model: self.model,
             field,
         })
     }
 
-    pub fn find_scalar_field(&self, name: &str) -> Option<ScalarFieldRef<'a>> {
-        self.model.find_scalar_field(name).map(|field| ScalarFieldRef {
+    pub fn find_scalar_field(&self, name: &str) -> Option<ScalarFieldWalker<'a>> {
+        self.model.find_scalar_field(name).map(|field| ScalarFieldWalker {
             datamodel: self.datamodel,
             field,
             model: self.model,
@@ -72,7 +72,7 @@ impl<'a> ModelRef<'a> {
         &self.model.name
     }
 
-    pub fn id_fields<'b>(&'b self) -> impl Iterator<Item = ScalarFieldRef<'a>> + 'b {
+    pub fn id_fields<'b>(&'b self) -> impl Iterator<Item = ScalarFieldWalker<'a>> + 'b {
         // Single-id models
         self.model
             .scalar_fields()
@@ -84,19 +84,19 @@ impl<'a> ModelRef<'a> {
                     .iter()
                     .filter_map(move |field_name| self.model.find_scalar_field(field_name)),
             )
-            .map(move |field| ScalarFieldRef {
+            .map(move |field| ScalarFieldWalker {
                 datamodel: self.datamodel,
                 model: self.model,
                 field,
             })
     }
 
-    pub fn unique_indexes<'b>(&'b self) -> impl Iterator<Item = IndexRef<'a>> + 'b {
+    pub fn unique_indexes<'b>(&'b self) -> impl Iterator<Item = IndexWalker<'a>> + 'b {
         self.model
             .indices
             .iter()
             .filter(|index| index.is_unique())
-            .map(move |index| IndexRef {
+            .map(move |index| IndexWalker {
                 model: *self,
                 index,
                 datamodel: &self.datamodel,
@@ -105,13 +105,13 @@ impl<'a> ModelRef<'a> {
 }
 
 #[derive(Debug, Clone, Copy)]
-pub struct ScalarFieldRef<'a> {
+pub struct ScalarFieldWalker<'a> {
     datamodel: &'a Datamodel,
     model: &'a Model,
     field: &'a ScalarField,
 }
 
-impl<'a> ScalarFieldRef<'a> {
+impl<'a> ScalarFieldWalker<'a> {
     pub fn arity(&self) -> FieldArity {
         self.field.arity
     }
@@ -124,14 +124,14 @@ impl<'a> ScalarFieldRef<'a> {
         self.field.default_value.as_ref()
     }
 
-    pub fn field_type(&self) -> TypeRef<'a> {
+    pub fn field_type(&self) -> TypeWalker<'a> {
         match &self.field.field_type {
-            FieldType::Enum(name) => TypeRef::Enum(EnumRef {
+            FieldType::Enum(name) => TypeWalker::Enum(EnumWalker {
                 datamodel: self.datamodel,
                 r#enum: self.datamodel.find_enum(name).unwrap(),
             }),
-            FieldType::Base(scalar_type, _) => TypeRef::Base(*scalar_type),
-            _ => TypeRef::Other,
+            FieldType::Base(scalar_type, _) => TypeWalker::Base(*scalar_type),
+            _ => TypeWalker::Other,
         }
     }
 
@@ -150,8 +150,8 @@ impl<'a> ScalarFieldRef<'a> {
         self.field.is_unique
     }
 
-    pub fn model(&self) -> ModelRef<'a> {
-        ModelRef {
+    pub fn model(&self) -> ModelWalker<'a> {
+        ModelWalker {
             model: self.model,
             datamodel: self.datamodel,
         }
@@ -163,33 +163,33 @@ impl<'a> ScalarFieldRef<'a> {
 }
 
 #[derive(Debug)]
-pub enum TypeRef<'a> {
-    Enum(EnumRef<'a>),
+pub enum TypeWalker<'a> {
+    Enum(EnumWalker<'a>),
     Base(ScalarType),
     Other,
 }
 
-impl<'a> TypeRef<'a> {
-    pub fn as_enum(&self) -> Option<EnumRef<'a>> {
+impl<'a> TypeWalker<'a> {
+    pub fn as_enum(&self) -> Option<EnumWalker<'a>> {
         match self {
-            TypeRef::Enum(r) => Some(*r),
+            TypeWalker::Enum(r) => Some(*r),
             _ => None,
         }
     }
 
     pub fn is_json(&self) -> bool {
-        matches!(self, TypeRef::Base(ScalarType::Json))
+        matches!(self, TypeWalker::Base(ScalarType::Json))
     }
 }
 
 #[derive(Debug)]
-pub struct RelationFieldRef<'a> {
+pub struct RelationFieldWalker<'a> {
     datamodel: &'a Datamodel,
     model: &'a Model,
     field: &'a RelationField,
 }
 
-impl<'a> RelationFieldRef<'a> {
+impl<'a> RelationFieldWalker<'a> {
     pub fn arity(&self) -> FieldArity {
         self.field.arity
     }
@@ -202,7 +202,7 @@ impl<'a> RelationFieldRef<'a> {
         self.field.relation_info.fields.is_empty()
     }
 
-    pub fn opposite_side(&self) -> Option<RelationFieldRef<'a>> {
+    pub fn opposite_side(&self) -> Option<RelationFieldWalker<'a>> {
         self.referenced_model_ref().relation_fields().find(|relation_field| {
             relation_field.relation_name() == self.relation_name()
                     && relation_field.referenced_model().name.as_str() == self.model.name
@@ -260,8 +260,8 @@ impl<'a> RelationFieldRef<'a> {
             })
     }
 
-    fn referenced_model_ref(&self) -> ModelRef<'a> {
-        ModelRef {
+    fn referenced_model_ref(&self) -> ModelWalker<'a> {
+        ModelWalker {
             model: self.referenced_model(),
             datamodel: self.datamodel,
         }
@@ -269,26 +269,26 @@ impl<'a> RelationFieldRef<'a> {
 }
 
 #[derive(Debug, Clone, Copy)]
-pub struct EnumRef<'a> {
+pub struct EnumWalker<'a> {
     pub r#enum: &'a Enum,
     datamodel: &'a Datamodel,
 }
 
-impl<'a> EnumRef<'a> {
+impl<'a> EnumWalker<'a> {
     pub fn db_name(&self) -> &'a str {
         self.r#enum.final_database_name()
     }
 }
 
 #[derive(Debug)]
-pub struct IndexRef<'a> {
+pub struct IndexWalker<'a> {
     index: &'a IndexDefinition,
-    model: ModelRef<'a>,
+    model: ModelWalker<'a>,
     datamodel: &'a Datamodel,
 }
 
-impl<'a> IndexRef<'a> {
-    pub fn fields<'b>(&'b self) -> impl Iterator<Item = ScalarFieldRef<'a>> + 'b {
+impl<'a> IndexWalker<'a> {
+    pub fn fields<'b>(&'b self) -> impl Iterator<Item = ScalarFieldWalker<'a>> + 'b {
         self.index.fields.iter().map(move |field_name| {
             self.model
                 .scalar_fields()
