@@ -1,3 +1,4 @@
+use crate::misc_helpers::replace_field_names;
 use crate::warnings::{
     warning_enriched_with_map_on_enum, warning_enriched_with_map_on_enum_value, warning_enriched_with_map_on_field,
     warning_enriched_with_map_on_model, Enum, EnumAndValue, Model, ModelAndField,
@@ -339,15 +340,4 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
             .warnings
             .push(warning_enriched_with_map_on_enum_value(&enums_and_values));
     }
-}
-
-fn replace_field_names(target: &mut Vec<String>, old_name: &str, new_name: &str) {
-    target
-        .iter_mut()
-        .map(|v| {
-            if v == old_name {
-                *v = new_name.to_string()
-            }
-        })
-        .count();
 }

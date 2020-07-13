@@ -1,3 +1,4 @@
+use crate::misc_helpers::replace_field_names;
 use datamodel::{Datamodel, DefaultValue, Field, FieldType, WithName};
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
@@ -16,7 +17,7 @@ pub fn sanitize_datamodel_names(datamodel: &mut Datamodel) {
 
         for field in &mut model.fields {
             let (sanitized_field_name, field_db_name) = sanitize_name(field.name().to_string());
-            let id_field_option = model.id_fields.iter_mut().find(|name| **name == field.name());
+            replace_field_names(&mut model.id_fields, field.name(), &sanitized_field_name);
 
             match field {
                 Field::RelationField(rf) => {
@@ -78,7 +79,6 @@ pub fn sanitize_datamodel_names(datamodel: &mut Datamodel) {
                 }
             }
             field.set_name(&sanitized_field_name);
-            id_field_option.map(|id_field| *id_field = sanitized_field_name.clone());
         }
 
         for index in &mut model.indices {
