@@ -15,7 +15,7 @@ pub fn parse_model(token: &Token) -> Result<Model, ErrorCollection> {
     let mut fields: Vec<Field> = vec![];
     let mut comment: Option<Comment> = None;
 
-    for current in token.filtered_children() {
+    for current in token.relevant_children() {
         match current.as_rule() {
             Rule::TYPE_KEYWORD => errors.push(DatamodelError::new_legacy_parser_error(
                 "Model declarations have to be indicated with the `model` keyword.",

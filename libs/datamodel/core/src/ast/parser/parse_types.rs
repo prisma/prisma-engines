@@ -13,7 +13,7 @@ pub fn parse_type_alias(token: &Token) -> Field {
     let mut base_type: Option<(String, Span)> = None;
     let mut comment: Option<Comment> = None;
 
-    for current in token.filtered_children() {
+    for current in token.relevant_children() {
         match current.as_rule() {
             Rule::TYPE_KEYWORD => {}
             Rule::non_empty_identifier => name = Some(current.to_id()),
@@ -45,7 +45,7 @@ pub fn parse_type_alias(token: &Token) -> Field {
 }
 
 pub fn parse_field_type(token: &Token) -> Result<(FieldArity, String), DatamodelError> {
-    let current = token.first_child();
+    let current = token.first_relevant_child();
     match current.as_rule() {
         Rule::optional_type => Ok((FieldArity::Optional, parse_base_type(&current))),
         Rule::base_type => Ok((FieldArity::Required, parse_base_type(&current))),
@@ -67,7 +67,7 @@ pub fn parse_field_type(token: &Token) -> Result<(FieldArity, String), Datamodel
 }
 
 fn parse_base_type(token: &Token) -> String {
-    let current = token.first_child();
+    let current = token.first_relevant_child();
     match current.as_rule() {
         Rule::non_empty_identifier => current.as_str().to_string(),
         _ => unreachable!("Encountered impossible type during parsing: {:?}", current.tokens()),

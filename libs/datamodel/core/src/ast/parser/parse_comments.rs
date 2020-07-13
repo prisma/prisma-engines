@@ -20,7 +20,7 @@ pub fn parse_comment_block(token: &Token) -> Comment {
 }
 
 pub fn parse_doc_comment(token: &Token) -> String {
-    let child = token.first_child();
+    let child = token.first_relevant_child();
     match child.as_rule() {
         Rule::doc_content => String::from(child.as_str().trim()),
         Rule::doc_comment => parse_doc_comment(&child),

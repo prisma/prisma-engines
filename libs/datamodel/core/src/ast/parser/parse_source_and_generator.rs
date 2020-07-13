@@ -13,7 +13,7 @@ pub fn parse_source(token: &Token) -> Result<SourceConfig, ErrorCollection> {
     let mut properties: Vec<Argument> = vec![];
     let mut comment: Option<Comment> = None;
 
-    for current in token.filtered_children() {
+    for current in token.relevant_children() {
         match current.as_rule() {
             Rule::non_empty_identifier => name = Some(current.to_id()),
             Rule::key_value => properties.push(parse_key_value(&current)),
@@ -48,7 +48,7 @@ pub fn parse_generator(token: &Token) -> Result<GeneratorConfig, ErrorCollection
     let mut properties: Vec<Argument> = vec![];
     let mut comments: Vec<String> = Vec::new();
 
-    for current in token.filtered_children() {
+    for current in token.relevant_children() {
         match current.as_rule() {
             Rule::non_empty_identifier => name = Some(current.to_id()),
             Rule::key_value => properties.push(parse_key_value(&current)),
@@ -82,7 +82,7 @@ fn parse_key_value(token: &Token) -> Argument {
     let mut name: Option<Identifier> = None;
     let mut value: Option<Expression> = None;
 
-    for current in token.filtered_children() {
+    for current in token.relevant_children() {
         match current.as_rule() {
             Rule::non_empty_identifier => name = Some(current.to_id()),
             Rule::expression => value = Some(parse_expression(&current)),

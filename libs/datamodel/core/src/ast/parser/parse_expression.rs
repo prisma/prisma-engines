@@ -7,7 +7,7 @@ use super::Rule;
 use crate::ast::*;
 
 pub fn parse_expression(token: &Token) -> Expression {
-    let first_child = token.first_child();
+    let first_child = token.first_relevant_child();
     let span = Span::from_pest(first_child.as_span());
     match first_child.as_rule() {
         Rule::numeric_literal => Expression::NumericValue(first_child.as_str().to_string(), span),
@@ -27,7 +27,7 @@ fn parse_function(token: &Token) -> Expression {
     let mut name: Option<String> = None;
     let mut arguments: Vec<Expression> = vec![];
 
-    for current in token.filtered_children() {
+    for current in token.relevant_children() {
         match current.as_rule() {
             Rule::non_empty_identifier => name = Some(current.as_str().to_string()),
             Rule::expression => arguments.push(parse_expression(&current)),
@@ -44,7 +44,7 @@ fn parse_function(token: &Token) -> Expression {
 fn parse_array(token: &Token) -> Expression {
     let mut elements: Vec<Expression> = vec![];
 
-    for current in token.filtered_children() {
+    for current in token.relevant_children() {
         match current.as_rule() {
             Rule::expression => elements.push(parse_expression(&current)),
             _ => parsing_catch_all(&current, "array"),
@@ -55,7 +55,7 @@ fn parse_array(token: &Token) -> Expression {
 }
 
 pub fn parse_arg_value(token: &Token) -> Expression {
-    let current = token.first_child();
+    let current = token.first_relevant_child();
     match current.as_rule() {
         Rule::expression => parse_expression(&current),
         _ => unreachable!("Encountered impossible value during parsing: {:?}", current.tokens()),
@@ -63,7 +63,7 @@ pub fn parse_arg_value(token: &Token) -> Expression {
 }
 
 fn parse_string_literal(token: &Token) -> String {
-    let current = token.first_child();
+    let current = token.first_relevant_child();
     match current.as_rule() {
         Rule::string_content => unescape_string_literal(current.as_str()).into_owned(),
         _ => unreachable!(
