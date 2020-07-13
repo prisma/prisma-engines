@@ -312,7 +312,7 @@ pub(crate) fn calculate_scalar_field_type(column: &Column) -> FieldType {
 
 // misc
 
-pub fn deduplicate_field_names(datamodel: &mut Datamodel) {
+pub fn deduplicate_relation_field_names(datamodel: &mut Datamodel) {
     let mut duplicated_relation_fields = vec![];
 
     for model in datamodel.models() {

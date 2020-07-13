@@ -89,7 +89,7 @@ pub fn sanitize_datamodel_names(datamodel: &mut Datamodel) {
         model.database_name = model_db_name;
     }
 
-    for enm in &mut datamodel.enums {
+    for enm in datamodel.enums_mut() {
         if let Some((sanitized_enum_name, enum_db_name)) = enum_renames.get(&enm.name) {
             enm.name = sanitized_enum_name.to_owned();
             enm.database_name = enum_db_name.to_owned();

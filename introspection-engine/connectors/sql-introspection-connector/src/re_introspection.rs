@@ -45,7 +45,7 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
     // println!("{:#?}", old_data_model);
     // println!("{:#?}", introspection_result.datamodel);
 
-    let new_data_model = &mut introspection_result.datamodel;
+    let new_data_model = &mut introspection_result.data_model;
 
     //@@map on models
     let mut changed_model_names = vec![];
@@ -199,7 +199,7 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
     // @@map on enums
     let mut changed_enum_names = vec![];
     {
-        for enm in &new_data_model.enums {
+        for enm in new_data_model.enums() {
             if let Some(old_enum) = old_data_model.find_enum_db_name(&enm.database_name.as_ref().unwrap_or(&enm.name)) {
                 if new_data_model.find_enum(&old_enum.name).is_none() {
                     changed_enum_names.push((Enum { enm: enm.name.clone() }, old_enum.name.clone()))
@@ -207,7 +207,7 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
             }
         }
         for changed_enum_name in &changed_enum_names {
-            let enm = new_data_model.find_enum_mut(&changed_enum_name.0.enm).unwrap();
+            let enm = new_data_model.find_enum_mut(&changed_enum_name.0.enm);
             enm.name = changed_enum_name.1.clone();
             if enm.database_name.is_none() {
                 enm.database_name = Some(changed_enum_name.0.enm.clone());
@@ -227,7 +227,7 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
     // @map on enum values
     let mut changed_enum_values = vec![];
     {
-        for enm in &new_data_model.enums {
+        for enm in new_data_model.enums() {
             if let Some(old_enum) = old_data_model.find_enum(&enm.name) {
                 for value in &enm.values {
                     if let Some(old_value) =
@@ -242,8 +242,8 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
             }
         }
         for changed_enum_value in &changed_enum_values {
-            let enm = new_data_model.find_enum_mut(&changed_enum_value.0.enm).unwrap();
-            let value = enm.find_value_mut(&changed_enum_value.0.value).unwrap();
+            let enm = new_data_model.find_enum_mut(&changed_enum_value.0.enm);
+            let value = enm.find_value_mut(&changed_enum_value.0.value);
             value.name = changed_enum_value.1.clone();
             if value.database_name.is_none() {
                 value.database_name = Some(changed_enum_value.0.value.clone());

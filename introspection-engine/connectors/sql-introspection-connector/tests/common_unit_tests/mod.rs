@@ -96,7 +96,7 @@ fn a_data_model_can_be_generated_from_a_schema() {
     };
     let introspection_result = calculate_datamodel(&schema, &SqlFamily::Postgres).expect("calculate data model");
 
-    assert_eq!(introspection_result.datamodel, ref_data_model);
+    assert_eq!(introspection_result.data_model, ref_data_model);
 }
 
 #[test]
@@ -176,7 +176,7 @@ fn arity_is_preserved_when_generating_data_model_from_a_schema() {
     };
     let introspection_result = calculate_datamodel(&schema, &SqlFamily::Postgres).expect("calculate data model");
 
-    assert_eq!(introspection_result.datamodel, ref_data_model);
+    assert_eq!(introspection_result.data_model, ref_data_model);
 }
 
 #[test]
@@ -306,7 +306,7 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
     };
     let introspection_result = calculate_datamodel(&schema, &SqlFamily::Postgres).expect("calculate data model");
 
-    assert_eq!(introspection_result.datamodel, ref_data_model);
+    assert_eq!(introspection_result.data_model, ref_data_model);
 }
 
 #[test]
@@ -468,7 +468,7 @@ fn primary_key_is_preserved_when_generating_data_model_from_a_schema() {
     };
     let introspection_result = calculate_datamodel(&schema, &SqlFamily::Postgres).expect("calculate data model");
 
-    assert_eq!(introspection_result.datamodel, ref_data_model);
+    assert_eq!(introspection_result.data_model, ref_data_model);
 }
 
 #[test]
@@ -537,7 +537,7 @@ fn uniqueness_is_preserved_when_generating_data_model_from_a_schema() {
     };
     let introspection_result = calculate_datamodel(&schema, &SqlFamily::Postgres).expect("calculate data model");
 
-    assert_eq!(introspection_result.datamodel, ref_data_model);
+    assert_eq!(introspection_result.data_model, ref_data_model);
 }
 
 #[test]
@@ -755,7 +755,7 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
     };
     let introspection_result = calculate_datamodel(&schema, &SqlFamily::Postgres).expect("calculate data model");
 
-    assert_eq!(introspection_result.datamodel, expected_data_model);
+    assert_eq!(introspection_result.data_model, expected_data_model);
 }
 
 #[test]
@@ -864,7 +864,7 @@ fn multi_field_uniques_are_preserved_when_generating_data_model_from_a_schema() 
     };
     let introspection_result = calculate_datamodel(&schema, &SqlFamily::Postgres).expect("calculate data model");
 
-    assert_eq!(introspection_result.datamodel, ref_data_model);
+    assert_eq!(introspection_result.data_model, ref_data_model);
 }
 
 #[test]
@@ -1047,7 +1047,7 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
     };
     let introspection_result = calculate_datamodel(&schema, &SqlFamily::Postgres).expect("calculate data model");
 
-    assert_eq!(introspection_result.datamodel, ref_data_model);
+    assert_eq!(introspection_result.data_model, ref_data_model);
 }
 
 #[test]
@@ -1086,5 +1086,5 @@ fn enums_are_preserved_when_generating_data_model_from_a_schema() {
     };
     let introspection_result = calculate_datamodel(&schema, &SqlFamily::Postgres).expect("calculate data model");
 
-    assert_eq!(introspection_result.datamodel, ref_data_model);
+    assert_eq!(introspection_result.data_model, ref_data_model);
 }

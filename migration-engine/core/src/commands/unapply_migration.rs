@@ -39,7 +39,7 @@ impl<'a> MigrationCommand for UnapplyMigrationCommand<'a> {
                 let schema_before_last_migration = second_to_last
                     .as_ref()
                     .map(|migration| migration.parse_datamodel())
-                    .unwrap_or_else(|| Ok(Datamodel::empty()))
+                    .unwrap_or_else(|| Ok(Datamodel::new()))
                     .map_err(|(err, schema)| CommandError::InvalidPersistedDatamodel(err, schema))?;
 
                 let last_schema_ast = migration_to_rollback

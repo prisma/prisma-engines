@@ -40,7 +40,7 @@ pub enum Version {
 #[derive(Debug)]
 pub struct IntrospectionResult {
     /// Datamodel
-    pub datamodel: Datamodel,
+    pub data_model: Datamodel,
     /// warnings
     pub warnings: Vec<Warning>,
     /// version

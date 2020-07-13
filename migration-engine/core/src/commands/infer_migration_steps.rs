@@ -83,7 +83,7 @@ impl<'a> MigrationCommand for InferMigrationStepsCommand<'a> {
                     .map_err(|(err, schema)| CommandError::InvalidPersistedDatamodel(err, schema))?;
                 let last_non_watch_datamodel = last_non_watch_applied_migration
                     .map(|m| m.parse_datamodel())
-                    .unwrap_or_else(|| Ok(Datamodel::empty()))
+                    .unwrap_or_else(|| Ok(Datamodel::new()))
                     .map_err(|(err, schema)| CommandError::InvalidPersistedDatamodel(err, schema))?;
                 let datamodel_steps = engine
                     .datamodel_migration_steps_inferrer()

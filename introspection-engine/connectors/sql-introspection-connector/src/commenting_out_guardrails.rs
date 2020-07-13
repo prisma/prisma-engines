@@ -38,7 +38,7 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
     }
 
     //empty enum values
-    for enm in &mut datamodel.enums {
+    for enm in datamodel.enums_mut() {
         for enum_value in &mut enm.values {
             if let Some(name) = &enum_value.database_name {
                 if enum_value.name == "".to_string() {

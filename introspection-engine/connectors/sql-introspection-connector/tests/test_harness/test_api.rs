@@ -32,7 +32,7 @@ impl TestApi {
             .introspect(&Datamodel::new(), false)
             .await
             .unwrap();
-        datamodel::render_datamodel_to_string(&introspection_result.datamodel).expect("Datamodel rendering failed")
+        datamodel::render_datamodel_to_string(&introspection_result.data_model).expect("Datamodel rendering failed")
     }
 
     pub async fn re_introspect(&self, data_model_string: &str) -> String {
@@ -42,7 +42,7 @@ impl TestApi {
             .introspect(&data_model, true)
             .await
             .unwrap();
-        datamodel::render_datamodel_to_string(&introspection_result.datamodel).expect("Datamodel rendering failed")
+        datamodel::render_datamodel_to_string(&introspection_result.data_model).expect("Datamodel rendering failed")
     }
 
     pub async fn re_introspect_warnings(&self, data_model_string: &str) -> String {
