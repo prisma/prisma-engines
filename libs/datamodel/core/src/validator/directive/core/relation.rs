@@ -12,7 +12,7 @@ impl DirectiveValidator<dml::Field> for RelationDirectiveValidator {
         &"relation"
     }
     fn validate_and_apply(&self, args: &mut Args, field: &mut dml::Field) -> Result<(), DatamodelError> {
-        if let dml::FieldType::Relation(relation_info) = &mut field.field_type {
+        if let dml::Field::RelationField(rf) = field {
             if let Ok(name_arg) = args.default_arg("name") {
                 let name = name_arg.as_str()?;
 
@@ -21,15 +21,15 @@ impl DirectiveValidator<dml::Field> for RelationDirectiveValidator {
                         .new_directive_validation_error("A relation cannot have an empty name.", name_arg.span());
                 }
 
-                relation_info.name = name;
+                rf.relation_info.name = name;
             }
 
             if let Ok(related_fields) = args.arg("references") {
-                relation_info.to_fields = related_fields.as_array().to_literal_vec()?;
+                rf.relation_info.to_fields = related_fields.as_array().to_literal_vec()?;
             }
 
             if let Ok(base_fields) = args.arg("fields") {
-                relation_info.fields = base_fields.as_array().to_literal_vec()?;
+                rf.relation_info.fields = base_fields.as_array().to_literal_vec()?;
             }
 
             // TODO: bring `onDelete` back once `prisma migrate` is a thing
@@ -44,11 +44,12 @@ impl DirectiveValidator<dml::Field> for RelationDirectiveValidator {
     }
 
     fn serialize(&self, field: &dml::Field, datamodel: &dml::Datamodel) -> Result<Vec<ast::Directive>, DatamodelError> {
-        if let dml::FieldType::Relation(relation_info) = &field.field_type {
+        if let dml::Field::RelationField(rf) = field {
             let mut args = Vec::new();
 
-            // These unwraps must be safe.
-            let parent_model = datamodel.find_model_by_field_ref(field).unwrap();
+            let relation_info = &rf.relation_info;
+
+            let parent_model = datamodel.find_model_by_relation_field_ref(rf).unwrap();
 
             let related_model = datamodel
                 .find_model(&relation_info.to)
@@ -100,7 +101,6 @@ impl DirectiveValidator<dml::Field> for RelationDirectiveValidator {
                 return Ok(vec![ast::Directive::new(self.directive_name(), args)]);
             }
         }
-
         Ok(vec![])
     }
 }

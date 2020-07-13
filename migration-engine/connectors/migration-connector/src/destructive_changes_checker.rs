@@ -19,7 +19,7 @@ where
 }
 
 /// The errors and warnings emitted by the [DestructiveChangesChecker](trait.DestructiveChangesChecker.html).
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct DestructiveChangeDiagnostics {
     pub errors: Vec<MigrationError>,
     pub warnings: Vec<MigrationWarning>,
@@ -28,11 +28,7 @@ pub struct DestructiveChangeDiagnostics {
 
 impl DestructiveChangeDiagnostics {
     pub fn new() -> DestructiveChangeDiagnostics {
-        DestructiveChangeDiagnostics {
-            errors: Vec::new(),
-            warnings: Vec::new(),
-            unexecutable_migrations: Vec::new(),
-        }
+        Default::default()
     }
 
     pub fn add_warning<T: Into<Option<MigrationWarning>>>(&mut self, warning: T) {
@@ -70,22 +66,15 @@ pub struct MigrationError {
     pub field: Option<String>,
 }
 
-#[derive(Debug, Serialize, PartialEq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq)]
 pub struct UnexecutableMigration {
     pub description: String,
 }
 
 /// An implementor of [DestructiveChangesChecker](trait.DestructiveChangesChecker.html) that performs no check.
+#[derive(Default)]
 pub struct EmptyDestructiveChangesChecker<T> {
     database_migration: PhantomData<T>,
-}
-
-impl<T> EmptyDestructiveChangesChecker<T> {
-    pub fn new() -> EmptyDestructiveChangesChecker<T> {
-        EmptyDestructiveChangesChecker {
-            database_migration: PhantomData,
-        }
-    }
 }
 
 #[async_trait::async_trait]

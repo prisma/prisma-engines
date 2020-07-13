@@ -23,11 +23,13 @@ fn map_directive() {
     let schema = parse(dml);
     let user_model = schema.assert_has_model("User").assert_with_db_name("user");
     user_model
-        .assert_has_field("firstName")
+        .assert_has_scalar_field("firstName")
         .assert_with_db_name("first_name");
 
     let post_model = schema.assert_has_model("Post").assert_with_db_name("posti");
-    post_model.assert_has_field("text").assert_with_db_name("post_text");
+    post_model
+        .assert_has_scalar_field("text")
+        .assert_with_db_name("post_text");
 }
 
 #[test]

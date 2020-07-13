@@ -6,7 +6,7 @@ use crate::{ast, dml, Datamodel, WithDatabaseName};
 /// Prismas builtin `@map` directive.
 pub struct MapDirectiveValidator {}
 
-const DIRECTIVE_NAME: &'static str = "map";
+const DIRECTIVE_NAME: &str = "map";
 
 impl DirectiveValidator<dml::Model> for MapDirectiveValidator {
     fn directive_name(&self) -> &str {
@@ -29,7 +29,7 @@ impl DirectiveValidator<dml::Field> for MapDirectiveValidatorForField {
     }
 
     fn validate_and_apply(&self, args: &mut Args, obj: &mut dml::Field) -> Result<(), DatamodelError> {
-        if obj.field_type.is_relation() {
+        if obj.is_relation() {
             return self.new_directive_validation_error(
                 &format!(
                     "The directive `@{}` can not be used on relation fields.",

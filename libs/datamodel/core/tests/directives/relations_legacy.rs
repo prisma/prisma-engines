@@ -25,13 +25,13 @@ fn succeed_without_directive_if_unambigous() {
     let schema = parse(dml);
     let todo_model = schema.assert_has_model("Todo");
     todo_model
-        .assert_has_field("comments")
+        .assert_has_relation_field("comments")
         .assert_relation_to("Comment")
         .assert_arity(&dml::FieldArity::List);
 
     let comment_model = schema.assert_has_model("Comment");
     comment_model
-        .assert_has_field("Todo")
+        .assert_has_relation_field("Todo")
         .assert_arity(&dml::FieldArity::Optional)
         .assert_relation_to("Todo");
 }
@@ -79,7 +79,7 @@ fn settings_must_be_deteced() {
 
     let todo_model = schema.assert_has_model("Todo");
     todo_model
-        .assert_has_field("parent_todo")
+        .assert_has_relation_field("parent_todo")
         .assert_relation_to("Todo")
         .assert_relation_to_fields(&["id"])
         .assert_arity(&dml::FieldArity::Optional);

@@ -23,7 +23,7 @@ fn relation_happy_path() {
     let schema = parse(dml);
     let user_model = schema.assert_has_model("User");
     user_model
-        .assert_has_field("posts")
+        .assert_has_relation_field("posts")
         .assert_arity(&dml::FieldArity::List)
         .assert_relation_to("Post")
         .assert_relation_base_fields(&[])
@@ -31,7 +31,7 @@ fn relation_happy_path() {
 
     let post_model = schema.assert_has_model("Post");
     post_model
-        .assert_has_field("user")
+        .assert_has_relation_field("user")
         .assert_arity(&dml::FieldArity::Required)
         .assert_relation_to("User")
         .assert_relation_base_fields(&["userId"])

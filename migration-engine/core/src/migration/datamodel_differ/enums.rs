@@ -97,7 +97,7 @@ fn enum_directives_match(previous: &ast::Directive, next: &ast::Directive) -> bo
 mod tests {
     use super::super::TopDiffer;
     use super::*;
-    use datamodel::ast::parser::parse;
+    use datamodel::ast::parser::parse_schema;
 
     #[test]
     fn datamodel_differ_enum_differ_works() {
@@ -109,7 +109,7 @@ mod tests {
             DefinitelyFalse
         }
         "#;
-        let previous = parse(previous).unwrap();
+        let previous = parse_schema(previous).unwrap();
         let next = r#"
         enum BetterBoolean {
             True
@@ -117,7 +117,7 @@ mod tests {
             MostlyTrue
         }
         "#;
-        let next = parse(next).unwrap();
+        let next = parse_schema(next).unwrap();
 
         let differ = TopDiffer {
             previous: &previous,

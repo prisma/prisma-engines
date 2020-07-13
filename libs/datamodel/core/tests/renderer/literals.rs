@@ -24,7 +24,7 @@ fn strings_with_quotes_render_as_escaped_literals() {
 
     let mut dml = datamodel::parse_datamodel(input).unwrap();
     let cat = dml.models_mut().find(|m| m.name == "Category").unwrap();
-    let name = cat.fields.iter_mut().find(|f| f.name == "name").unwrap();
+    let name = cat.scalar_fields_mut().find(|f| f.name == "name").unwrap();
     name.default_value = Some(DefaultValue::Single(PrismaValue::String("a \" b\"c d".into())));
 
     let rendered = datamodel::render_datamodel_to_string(&dml).unwrap();
@@ -70,7 +70,7 @@ fn strings_with_newlines_render_as_escaped_literals() {
 
     let mut dml = datamodel::parse_datamodel(input).unwrap();
     let cat = dml.models_mut().find(|m| m.name == "Category").unwrap();
-    let name = cat.fields.iter_mut().find(|f| f.name == "name").unwrap();
+    let name = cat.scalar_fields_mut().find(|f| f.name == "name").unwrap();
     name.default_value = Some(DefaultValue::Single(PrismaValue::String(
         "Jean\nClaude\nVan\nDamme".into(),
     )));
@@ -150,7 +150,9 @@ fn internal_escaped_values_are_rendered_correctly() {
 
     let mut dml = datamodel::parse_datamodel(dm).unwrap();
 
-    dml.models[0].fields[0].default_value = Some(DefaultValue::Single(PrismaValue::String(
+    let model = dml.models_mut().find(|m| m.name == "FilmQuote").unwrap();
+    let field = model.scalar_fields_mut().find(|f| f.name == "id").unwrap();
+    field.default_value = Some(DefaultValue::Single(PrismaValue::String(
         "xyz\\Datasource\\Model".to_string(),
     )));
 

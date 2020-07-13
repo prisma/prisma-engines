@@ -2,7 +2,7 @@
 
 use super::MigrationStepsResultOutput;
 use crate::{commands::command::*, migration_engine::MigrationEngine, *};
-use datamodel::ast::{parser::parse, SchemaAst};
+use datamodel::ast::{parser::parse_schema, SchemaAst};
 use migration_connector::*;
 use serde::Deserialize;
 use tracing::debug;
@@ -51,7 +51,7 @@ impl<'a> MigrationCommand for InferMigrationStepsCommand<'a> {
         let next_datamodel = parse_datamodel(&cmd.input.datamodel)?;
         let version_check_errors = connector.check_database_version_compatibility(&next_datamodel);
 
-        let next_datamodel_ast = parse(&cmd.input.datamodel).map_err(|err| {
+        let next_datamodel_ast = parse_schema(&cmd.input.datamodel).map_err(|err| {
             CommandError::Input(anyhow::anyhow!("{}", err.to_pretty_string("", &cmd.input.datamodel)))
         })?;
 

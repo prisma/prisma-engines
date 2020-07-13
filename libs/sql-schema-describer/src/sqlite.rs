@@ -55,7 +55,7 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber {
             enums: vec![],
             // There are no sequences in SQLite.
             sequences: vec![],
-            tables: tables,
+            tables,
         })
     }
 }
@@ -75,7 +75,7 @@ impl SqlSchemaDescriber {
             .map(|row| {
                 row.get("file")
                     .and_then(|x| x.to_string())
-                    .and_then(|x| x.split("/").last().map(|x| x.to_string()))
+                    .and_then(|x| x.split('/').last().map(|x| x.to_string()))
                     .expect("convert schema names")
             })
             .collect();
@@ -99,7 +99,7 @@ impl SqlSchemaDescriber {
 
     async fn get_size(&self, _schema: &str) -> usize {
         debug!("Getting db size");
-        let sql = format!(r#"SELECT page_count * page_size as size FROM pragma_page_count(), pragma_page_size();"#);
+        let sql = r#"SELECT page_count * page_size as size FROM pragma_page_count(), pragma_page_size();"#;
         let result = self.conn.query_raw(&sql, &[]).await.expect("get db size ");
         let size: i64 = result
             .first()
@@ -170,13 +170,11 @@ impl SqlSchemaDescriber {
                                 ColumnTypeFamily::String => DefaultValue::VALUE(PrismaValue::String(
                                     unquote_sqlite_string_default(&default_string).into(),
                                 )),
-                                ColumnTypeFamily::DateTime => match default_string.to_lowercase()
-                                    == "current_timestamp".to_string()
-                                    || default_string.to_lowercase() == "datetime(\'now\')".to_string()
-                                    || default_string.to_lowercase() == "datetime(\'now\', \'localtime\')".to_string()
-                                {
-                                    true => DefaultValue::NOW,
-                                    false => DefaultValue::DBGENERATED(default_string),
+                                ColumnTypeFamily::DateTime => match default_string.to_lowercase().as_str() {
+                                    "current_timestamp" | "datetime(\'now\')" | "datetime(\'now\', \'localtime\')" => {
+                                        DefaultValue::NOW
+                                    }
+                                    _ => DefaultValue::DBGENERATED(default_string),
                                 },
                                 ColumnTypeFamily::Binary => DefaultValue::DBGENERATED(default_string),
                                 ColumnTypeFamily::Json => DefaultValue::DBGENERATED(default_string),
@@ -216,40 +214,37 @@ impl SqlSchemaDescriber {
             })
             .collect();
 
-        let primary_key = match pk_cols.is_empty() {
-            true => {
-                debug!("Determined that table has no primary key");
-                None
+        let primary_key = if pk_cols.is_empty() {
+            debug!("Determined that table has no primary key");
+            None
+        } else {
+            let mut columns: Vec<String> = vec![];
+            let mut col_idxs: Vec<&i64> = pk_cols.keys().collect();
+            col_idxs.sort_unstable();
+            for i in col_idxs {
+                columns.push(pk_cols[i].clone());
             }
-            false => {
-                let mut columns: Vec<String> = vec![];
-                let mut col_idxs: Vec<&i64> = pk_cols.keys().collect();
-                col_idxs.sort_unstable();
-                for i in col_idxs {
-                    columns.push(pk_cols[i].clone());
-                }
 
-                //Integer Id columns are always implemented with either row id or autoincrement
-                if pk_cols.len() == 1 {
-                    let pk_col = &columns[0];
-                    for col in cols.iter_mut() {
-                        if &col.name == pk_col && &col.tpe.data_type.to_lowercase() == "integer" {
-                            debug!(
-                                "Detected that the primary key column corresponds to rowid and \
+            //Integer Id columns are always implemented with either row id or autoincrement
+            if pk_cols.len() == 1 {
+                let pk_col = &columns[0];
+                for col in cols.iter_mut() {
+                    if &col.name == pk_col && &col.tpe.data_type.to_lowercase() == "integer" {
+                        debug!(
+                            "Detected that the primary key column corresponds to rowid and \
                                  is auto incrementing"
-                            );
-                            col.auto_increment = true;
-                        }
+                        );
+                        col.auto_increment = true;
                     }
                 }
-
-                debug!("Determined that table has primary key with columns {:?}", columns);
-                Some(PrimaryKey {
-                    columns,
-                    sequence: None,
-                    constraint_name: None,
-                })
             }
+
+            debug!("Determined that table has primary key with columns {:?}", columns);
+            Some(PrimaryKey {
+                columns,
+                sequence: None,
+                constraint_name: None,
+            })
         };
 
         (cols, primary_key)
@@ -306,7 +301,7 @@ impl SqlSchemaDescriber {
                         "set null" => ForeignKeyAction::SetNull,
                         "set default" => ForeignKeyAction::SetDefault,
                         "cascade" => ForeignKeyAction::Cascade,
-                        s @ _ => panic!(format!("Unrecognized on delete action '{}'", s)),
+                        s => panic!(format!("Unrecognized on delete action '{}'", s)),
                     };
                     let fk = IntermediateForeignKey {
                         columns,
@@ -321,7 +316,6 @@ impl SqlSchemaDescriber {
 
         let mut fks: Vec<ForeignKey> = intermediate_fks
             .values()
-            .into_iter()
             .map(|intermediate_fk| {
                 let mut column_keys: Vec<&i64> = intermediate_fk.columns.keys().collect();
                 column_keys.sort();
@@ -451,8 +445,8 @@ fn get_column_type(tpe: &str, arity: ColumnArity) -> ColumnType {
 //
 // - https://www.sqlite.org/lang_expr.html
 fn unquote_sqlite_string_default(s: &str) -> Cow<'_, str> {
-    const SQLITE_STRING_DEFAULT_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"(?ms)^'(.*)'$|^"(.*)"$"#).unwrap());
-    const SQLITE_ESCAPED_CHARACTER_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"''"#).unwrap());
+    static SQLITE_STRING_DEFAULT_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"(?ms)^'(.*)'$|^"(.*)"$"#).unwrap());
+    static SQLITE_ESCAPED_CHARACTER_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"''"#).unwrap());
 
     match SQLITE_STRING_DEFAULT_RE.replace(s, "$1$2") {
         Cow::Borrowed(s) => SQLITE_ESCAPED_CHARACTER_RE.replace_all(s, "'"),

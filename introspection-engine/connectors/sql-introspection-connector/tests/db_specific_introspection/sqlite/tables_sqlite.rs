@@ -257,7 +257,6 @@ async fn introspecting_a_table_with_optional_autoincrement_should_work(api: &Tes
     custom_assert(&result, dm);
 }
 
-#[test_each_connector(tags("sqlite"))]
 async fn introspecting_a_default_value_as_dbgenerated_should_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel

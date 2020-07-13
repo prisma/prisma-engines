@@ -122,7 +122,7 @@ pub struct UpdateEnum {
 
 impl UpdateEnum {
     pub fn is_any_option_set(&self) -> bool {
-        self.new_name.is_some() || self.created_values.len() > 0 || self.deleted_values.len() > 0
+        self.new_name.is_some() || !self.created_values.is_empty() || !self.deleted_values.is_empty()
     }
 }
 
@@ -207,8 +207,7 @@ impl DirectiveLocation {
                 directive.arguments.iter().all(|directive_argument| {
                     arguments
                         .iter()
-                        .find(|self_argument| self_argument.matches_ast_argument(directive_argument))
-                        .is_some()
+                        .any(|self_argument| self_argument.matches_ast_argument(directive_argument))
                 })
             }
             _ => true,

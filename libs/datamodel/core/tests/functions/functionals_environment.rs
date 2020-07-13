@@ -52,7 +52,7 @@ fn interpolate_environment_variables() {
     let user_model = schema.assert_has_model("User");
     user_model.assert_is_embedded(false);
     user_model
-        .assert_has_field("firstName")
+        .assert_has_scalar_field("firstName")
         .assert_base_type(&ScalarType::String)
         .assert_default_value(DefaultValue::Single(PrismaValue::String(String::from("prisma-user"))));
 }
@@ -76,7 +76,7 @@ fn interpolate_nested_environment_variables() {
     let user_model = schema.assert_has_model("User");
     user_model.assert_is_embedded(false);
     user_model
-        .assert_has_field("firstName")
+        .assert_has_scalar_field("firstName")
         .assert_base_type(&ScalarType::String)
         .assert_default_value(DefaultValue::Single(PrismaValue::String(String::from("prisma-user"))));
 }
@@ -98,7 +98,7 @@ fn ducktype_environment_variables() {
     let user_model = schema.assert_has_model("User");
     user_model.assert_is_embedded(false);
     user_model
-        .assert_has_field("age")
+        .assert_has_scalar_field("age")
         .assert_base_type(&ScalarType::Int)
         .assert_default_value(DefaultValue::Single(PrismaValue::Int(18)));
 }

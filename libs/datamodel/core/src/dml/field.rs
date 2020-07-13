@@ -11,16 +11,8 @@ pub enum FieldArity {
 }
 
 impl FieldArity {
-    pub fn is_singular(&self) -> bool {
-        self == &FieldArity::Required || self == &FieldArity::Optional
-    }
-
-    pub fn verbal_display(&self) -> &'static str {
-        match self {
-            FieldArity::Required => "required",
-            FieldArity::Optional => "optional",
-            FieldArity::List => "list",
-        }
+    pub fn is_list(&self) -> bool {
+        self == &Self::List
     }
 
     pub fn is_required(&self) -> bool {
@@ -29,10 +21,6 @@ impl FieldArity {
 
     pub fn is_optional(&self) -> bool {
         self == &Self::Optional
-    }
-
-    pub fn is_list(&self) -> bool {
-        self == &Self::List
     }
 }
 
@@ -52,13 +40,6 @@ pub enum FieldType {
 }
 
 impl FieldType {
-    pub fn is_relation(&self) -> bool {
-        match self {
-            Self::Relation(_) => true,
-            _ => false,
-        }
-    }
-
     pub fn is_compatible_with(&self, other: &Self) -> bool {
         match (self, other) {
             (Self::Base(a, _), Self::Base(b, _)) => a == b, // the name of the type alias is not important for the comparison
@@ -75,9 +56,195 @@ impl FieldType {
     }
 }
 
+#[derive(Debug, PartialEq, Clone)]
+pub enum Field {
+    ScalarField(ScalarField),
+    RelationField(RelationField),
+}
+
+impl Field {
+    pub fn is_relation(&self) -> bool {
+        match self {
+            Field::ScalarField(_) => false,
+            Field::RelationField(_) => true,
+        }
+    }
+
+    pub fn name(&self) -> &str {
+        match &self {
+            Field::ScalarField(sf) => &sf.name,
+            Field::RelationField(rf) => &rf.name,
+        }
+    }
+
+    pub fn documentation(&self) -> Option<&str> {
+        match self {
+            Field::ScalarField(sf) => sf.documentation.as_deref(),
+            Field::RelationField(rf) => rf.documentation.as_deref(),
+        }
+    }
+
+    pub fn is_commented_out(&self) -> bool {
+        match self {
+            Field::ScalarField(sf) => sf.is_commented_out,
+            Field::RelationField(rf) => rf.is_commented_out,
+        }
+    }
+
+    pub fn arity(&self) -> &FieldArity {
+        match &self {
+            Field::ScalarField(sf) => &sf.arity,
+            Field::RelationField(rf) => &rf.arity,
+        }
+    }
+
+    pub fn field_type(&self) -> FieldType {
+        match &self {
+            Field::ScalarField(sf) => sf.field_type.clone(),
+            Field::RelationField(rf) => FieldType::Relation(rf.relation_info.clone()),
+        }
+    }
+
+    pub fn default_value(&self) -> Option<&DefaultValue> {
+        match &self {
+            Field::ScalarField(sf) => sf.default_value.as_ref(),
+            Field::RelationField(_) => None,
+        }
+    }
+
+    pub fn is_updated_at(&self) -> bool {
+        match &self {
+            Field::ScalarField(sf) => sf.is_updated_at,
+            Field::RelationField(_) => false,
+        }
+    }
+
+    pub fn is_unique(&self) -> bool {
+        match &self {
+            Field::ScalarField(sf) => sf.is_unique,
+            Field::RelationField(_) => false,
+        }
+    }
+
+    pub fn is_id(&self) -> bool {
+        match &self {
+            Field::ScalarField(sf) => sf.is_id,
+            Field::RelationField(_) => false,
+        }
+    }
+
+    pub fn is_generated(&self) -> bool {
+        match &self {
+            Field::ScalarField(sf) => sf.is_generated,
+            Field::RelationField(rf) => rf.is_generated,
+        }
+    }
+
+    pub fn points_to_model(&self, name: &str) -> bool {
+        match self {
+            Field::ScalarField(_) => false,
+            Field::RelationField(rf) => rf.points_to_model(name),
+        }
+    }
+}
+
+impl WithName for Field {
+    fn name(&self) -> &String {
+        match self {
+            Field::ScalarField(sf) => sf.name(),
+            Field::RelationField(rf) => rf.name(),
+        }
+    }
+    fn set_name(&mut self, name: &str) {
+        match self {
+            Field::ScalarField(sf) => sf.set_name(name),
+            Field::RelationField(rf) => rf.set_name(name),
+        }
+    }
+}
+
+impl WithDatabaseName for Field {
+    fn database_name(&self) -> Option<&str> {
+        match self {
+            Field::ScalarField(sf) => sf.database_name.as_deref(),
+            Field::RelationField(_) => None,
+        }
+    }
+
+    fn set_database_name(&mut self, database_name: Option<String>) {
+        match self {
+            Field::ScalarField(sf) => sf.set_database_name(database_name),
+            Field::RelationField(_) => (),
+        }
+    }
+}
+
+/// Represents a relation field in a model.
+#[derive(Debug, PartialEq, Clone)]
+pub struct RelationField {
+    /// Name of the field.
+    pub name: String,
+
+    /// The field's type.
+    pub relation_info: RelationInfo,
+
+    /// The field's arity.
+    pub arity: FieldArity,
+
+    /// Comments associated with this field.
+    pub documentation: Option<String>,
+
+    /// signals that this field was internally generated (only back relation fields as of now)
+    pub is_generated: bool,
+
+    /// Indicates if this field has to be commented out.
+    pub is_commented_out: bool,
+}
+
+impl RelationField {
+    /// Creates a new field with the given name and type.
+    pub fn new(name: &str, arity: FieldArity, relation_info: RelationInfo) -> Self {
+        RelationField {
+            name: String::from(name),
+            arity,
+            relation_info,
+            documentation: None,
+            is_generated: false,
+            is_commented_out: false,
+        }
+    }
+    /// Creates a new field with the given name and type, marked as generated and optional.
+    pub fn new_generated(name: &str, info: RelationInfo) -> Self {
+        let mut field = Self::new(name, FieldArity::Optional, info);
+        field.is_generated = true;
+
+        field
+    }
+
+    pub fn points_to_model(&self, name: &str) -> bool {
+        self.relation_info.to == name
+    }
+
+    pub fn is_required(&self) -> bool {
+        self.arity.is_required()
+    }
+
+    pub fn is_list(&self) -> bool {
+        self.arity.is_list()
+    }
+
+    pub fn is_singular(&self) -> bool {
+        !self.is_list()
+    }
+
+    pub fn is_optional(&self) -> bool {
+        self.arity.is_optional()
+    }
+}
+
 /// Represents a field in a model.
 #[derive(Debug, PartialEq, Clone)]
-pub struct Field {
+pub struct ScalarField {
     /// Name of the field.
     pub name: String,
 
@@ -113,51 +280,12 @@ pub struct Field {
     pub is_commented_out: bool,
 }
 
-impl Field {
-    pub fn points_to_model(&self, name: &str) -> bool {
-        match &self.field_type {
-            FieldType::Relation(rel_info) if rel_info.to == name => true,
-            _ => false,
-        }
-    }
-
-    pub fn db_name(&self) -> &str {
-        self.database_name.as_ref().unwrap_or(&self.name)
-    }
-
-    pub fn is_relation(&self) -> bool {
-        match self.field_type {
-            FieldType::Relation(_) => true,
-            _ => false,
-        }
-    }
-}
-
-impl WithName for Field {
-    fn name(&self) -> &String {
-        &self.name
-    }
-    fn set_name(&mut self, name: &str) {
-        self.name = String::from(name)
-    }
-}
-
-impl WithDatabaseName for Field {
-    fn database_name(&self) -> Option<&str> {
-        self.database_name.as_deref()
-    }
-
-    fn set_database_name(&mut self, database_name: Option<String>) {
-        self.database_name = database_name;
-    }
-}
-
-impl Field {
+impl ScalarField {
     /// Creates a new field with the given name and type.
-    pub fn new(name: &str, field_type: FieldType) -> Field {
-        Field {
+    pub fn new(name: &str, arity: FieldArity, field_type: FieldType) -> ScalarField {
+        ScalarField {
             name: String::from(name),
-            arity: FieldArity::Required,
+            arity,
             field_type,
             database_name: None,
             default_value: None,
@@ -170,11 +298,58 @@ impl Field {
         }
     }
     /// Creates a new field with the given name and type, marked as generated and optional.
-    pub fn new_generated(name: &str, field_type: FieldType) -> Field {
-        let mut field = Self::new(name, field_type);
-        field.arity = FieldArity::Optional;
+    pub fn new_generated(name: &str, field_type: FieldType) -> ScalarField {
+        let mut field = Self::new(name, FieldArity::Optional, field_type);
         field.is_generated = true;
 
         field
+    }
+
+    //todo use withdatabasename::final_database_name instead
+    pub fn db_name(&self) -> &str {
+        self.database_name.as_ref().unwrap_or(&self.name)
+    }
+
+    pub fn is_required(&self) -> bool {
+        self.arity.is_required()
+    }
+
+    pub fn is_list(&self) -> bool {
+        self.arity.is_list()
+    }
+
+    pub fn is_singular(&self) -> bool {
+        !self.is_list()
+    }
+
+    pub fn is_optional(&self) -> bool {
+        self.arity.is_optional()
+    }
+}
+
+impl WithName for ScalarField {
+    fn name(&self) -> &String {
+        &self.name
+    }
+    fn set_name(&mut self, name: &str) {
+        self.name = String::from(name)
+    }
+}
+
+impl WithName for RelationField {
+    fn name(&self) -> &String {
+        &self.name
+    }
+    fn set_name(&mut self, name: &str) {
+        self.name = String::from(name)
+    }
+}
+
+impl WithDatabaseName for ScalarField {
+    fn database_name(&self) -> Option<&str> {
+        self.database_name.as_deref()
+    }
+    fn set_database_name(&mut self, database_name: Option<String>) {
+        self.database_name = database_name;
     }
 }

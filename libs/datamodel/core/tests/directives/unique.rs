@@ -141,7 +141,7 @@ fn single_field_unique_on_enum_field_must_work() {
     let schema = parse(dml);
     schema
         .assert_has_model("User")
-        .assert_has_field("role")
+        .assert_has_scalar_field("role")
         .assert_is_unique(true);
 }
 

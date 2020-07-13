@@ -11,25 +11,24 @@ impl DirectiveValidator<dml::Field> for UpdatedAtDirectiveValidator {
     }
 
     fn validate_and_apply(&self, args: &mut Args, obj: &mut dml::Field) -> Result<(), DatamodelError> {
-        if let dml::FieldType::Base(dml::ScalarType::DateTime, _) = obj.field_type {
-            // everything good
-        } else {
-            return self.new_directive_validation_error(
-                "Fields that are marked with @updatedAt must be of type DateTime.",
-                args.span(),
-            );
+        if let dml::Field::ScalarField(sf) = obj {
+            if sf.field_type.scalar_type() == Some(dml::ScalarType::DateTime) {
+                if sf.arity == dml::FieldArity::List {
+                    return self.new_directive_validation_error(
+                        "Fields that are marked with @updatedAt can not be lists.",
+                        args.span(),
+                    );
+                }
+
+                sf.is_updated_at = true;
+
+                return Ok(());
+            }
         }
-
-        if obj.arity == dml::FieldArity::List {
-            return self.new_directive_validation_error(
-                "Fields that are marked with @updatedAt can not be lists.",
-                args.span(),
-            );
-        }
-
-        obj.is_updated_at = true;
-
-        Ok(())
+        self.new_directive_validation_error(
+            "Fields that are marked with @updatedAt must be of type DateTime.",
+            args.span(),
+        )
     }
 
     fn serialize(
@@ -37,7 +36,7 @@ impl DirectiveValidator<dml::Field> for UpdatedAtDirectiveValidator {
         field: &dml::Field,
         _datamodel: &dml::Datamodel,
     ) -> Result<Vec<ast::Directive>, DatamodelError> {
-        if field.is_updated_at {
+        if field.is_updated_at() {
             Ok(vec![ast::Directive::new(self.directive_name(), Vec::new())])
         } else {
             Ok(vec![])

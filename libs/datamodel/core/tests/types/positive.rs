@@ -16,7 +16,7 @@ fn should_apply_a_custom_type() {
     let datamodel = parse(dml);
     let user_model = datamodel.assert_has_model("Model");
     user_model
-        .assert_has_field("id")
+        .assert_has_scalar_field("id")
         .assert_is_id()
         .assert_base_type(&ScalarType::String)
         .assert_default_value(DefaultValue::Expression(ValueGenerator::new_cuid()));
@@ -37,7 +37,7 @@ fn should_recursively_apply_a_custom_type() {
     let datamodel = parse(dml);
     let user_model = datamodel.assert_has_model("Model");
     user_model
-        .assert_has_field("id")
+        .assert_has_scalar_field("id")
         .assert_is_id()
         .assert_base_type(&ScalarType::String)
         .assert_default_value(DefaultValue::Expression(ValueGenerator::new_cuid()));
@@ -60,18 +60,18 @@ fn should_be_able_to_handle_multiple_types() {
     let datamodel = parse(dml);
     let user_model = datamodel.assert_has_model("User");
     user_model
-        .assert_has_field("id")
+        .assert_has_scalar_field("id")
         .assert_is_id()
         .assert_base_type(&ScalarType::String)
         .assert_default_value(DefaultValue::Expression(ValueGenerator::new_cuid()));
 
     user_model
-        .assert_has_field("email")
+        .assert_has_scalar_field("email")
         .assert_is_unique(true)
         .assert_base_type(&ScalarType::String);
 
     user_model
-        .assert_has_field("balance")
+        .assert_has_scalar_field("balance")
         .assert_base_type(&ScalarType::Int)
         .assert_default_value(DefaultValue::Single(PrismaValue::Int(0)));
 }
@@ -98,7 +98,7 @@ fn should_be_able_to_define_custom_enum_types() {
     let user_model = datamodel.assert_has_model("User");
 
     user_model
-        .assert_has_field("role")
+        .assert_has_scalar_field("role")
         .assert_enum_type("Role")
         .assert_default_value(DefaultValue::Single(PrismaValue::Enum(String::from("USER"))));
 }
@@ -118,7 +118,7 @@ fn should_handle_type_mappings() {
     let user_model = datamodel.assert_has_model("Blog");
 
     user_model
-        .assert_has_field("bigInt")
+        .assert_has_scalar_field("bigInt")
         .assert_connector_type(&ScalarFieldType::new("BigInt", ScalarType::Int, "bigint"));
 }
 
@@ -142,6 +142,6 @@ fn should_handle_type_specifications() {
     let user_model = datamodel.assert_has_model("Blog");
 
     user_model
-        .assert_has_field("bigInt")
+        .assert_has_scalar_field("bigInt")
         .assert_connector_type(&ScalarFieldType::new("BigInt", ScalarType::Int, "bigint"));
 }

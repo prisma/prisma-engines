@@ -21,26 +21,26 @@ fn should_set_default_for_all_scalar_types() {
     let datamodel = parse(dml);
     let user_model = datamodel.assert_has_model("Model");
     user_model
-        .assert_has_field("int")
+        .assert_has_scalar_field("int")
         .assert_base_type(&ScalarType::Int)
         .assert_default_value(DefaultValue::Single(PrismaValue::Int(3)));
     user_model
-        .assert_has_field("float")
+        .assert_has_scalar_field("float")
         .assert_base_type(&ScalarType::Float)
         .assert_default_value(DefaultValue::Single(PrismaValue::Float(
             Decimal::from_f64(3.14.into()).unwrap(),
         )));
 
     user_model
-        .assert_has_field("string")
+        .assert_has_scalar_field("string")
         .assert_base_type(&ScalarType::String)
         .assert_default_value(DefaultValue::Single(PrismaValue::String(String::from("String"))));
     user_model
-        .assert_has_field("boolean")
+        .assert_has_scalar_field("boolean")
         .assert_base_type(&ScalarType::Boolean)
         .assert_default_value(DefaultValue::Single(PrismaValue::Boolean(false)));
     user_model
-        .assert_has_field("dateTime")
+        .assert_has_scalar_field("dateTime")
         .assert_base_type(&ScalarType::DateTime)
         .assert_default_value(DefaultValue::Single(PrismaValue::DateTime(
             "2019-06-17T14:20:57Z".parse::<DateTime<Utc>>().unwrap(),
@@ -65,7 +65,7 @@ fn should_set_default_an_enum_type() {
     let datamodel = parse(dml);
     let user_model = datamodel.assert_has_model("Model");
     user_model
-        .assert_has_field("role")
+        .assert_has_scalar_field("role")
         .assert_enum_type("Role")
         .assert_default_value(DefaultValue::Single(PrismaValue::Enum(String::from(
             "A_VARIANT_WITH_UNDERSCORES",
@@ -90,7 +90,7 @@ fn should_set_default_on_remapped_enum_type() {
     let datamodel = parse(dml);
     let user_model = datamodel.assert_has_model("Model");
     user_model
-        .assert_has_field("role")
+        .assert_has_scalar_field("role")
         .assert_enum_type("Role")
         .assert_default_value(DefaultValue::Single(PrismaValue::Enum(String::from(
             "A_VARIANT_WITH_UNDERSCORES",
@@ -114,7 +114,7 @@ fn db_generated_function_must_work_for_enum_fields() {
     let datamodel = parse(dml);
     let user_model = datamodel.assert_has_model("Model");
     user_model
-        .assert_has_field("role")
+        .assert_has_scalar_field("role")
         .assert_enum_type("Role")
         .assert_default_value(DefaultValue::Expression(ValueGenerator::new_dbgenerated()));
 }

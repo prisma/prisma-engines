@@ -14,12 +14,12 @@ fn unique_directive() {
     let test_model = schema.assert_has_model("Test");
 
     test_model
-        .assert_has_field("id")
+        .assert_has_scalar_field("id")
         .assert_base_type(&ScalarType::Int)
         .assert_is_unique(false)
         .assert_is_id();
     test_model
-        .assert_has_field("unique")
+        .assert_has_scalar_field("unique")
         .assert_base_type(&ScalarType::String)
         .assert_is_unique(true);
 }

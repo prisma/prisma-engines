@@ -1,4 +1,7 @@
-//! Database description.
+#![allow(clippy::trivial_regex)] // this is allowed, because we want to do CoW replaces and these regexes will grow.
+#![allow(clippy::match_bool)] // we respectfully disagree that it makes the code less readable.
+
+//! Database description. This crate is used heavily in the introspection and migration engines.
 
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
@@ -71,7 +74,7 @@ impl SqlSchema {
     pub fn table(&self, name: &str) -> core::result::Result<&Table, String> {
         match self.tables.iter().find(|t| t.name == name) {
             Some(t) => Ok(t),
-            None => Err(format!("{}", name)),
+            None => Err(name.to_string()),
         }
     }
 
@@ -112,7 +115,7 @@ pub struct Table {
 impl Table {
     pub fn column_bang(&self, name: &str) -> &Column {
         self.column(name)
-            .expect(&format!("Column {} not found in Table {}", name, self.name))
+            .unwrap_or_else(|| panic!("Column {} not found in Table {}", name, self.name))
     }
 
     pub fn column(&self, name: &str) -> Option<&Column> {
@@ -205,8 +208,8 @@ pub struct PrimaryKey {
 }
 
 impl PrimaryKey {
-    pub fn is_single_primary_key(&self, column: &String) -> bool {
-        self.columns.len() == 1 && self.columns.contains(column)
+    pub fn is_single_primary_key(&self, column: &str) -> bool {
+        self.columns.len() == 1 && self.columns.iter().any(|col| col == column)
     }
 }
 
@@ -437,12 +440,7 @@ static RE_NUM: Lazy<Regex> = Lazy::new(|| Regex::new(r"^'?(\d+)'?$").expect("com
 static RE_FLOAT: Lazy<Regex> = Lazy::new(|| Regex::new(r"^'?([^']+)'?$").expect("compile regex"));
 
 pub fn parse_int(value: &str) -> Option<PrismaValue> {
-    let rslt = RE_NUM.captures(value);
-    if rslt.is_none() {
-        return None;
-    }
-
-    let captures = rslt.expect("get captures");
+    let captures = RE_NUM.captures(value)?;
     let num_str = captures.get(1).expect("get capture").as_str();
     let num_rslt = num_str.parse::<i64>();
     match num_rslt {
@@ -459,12 +457,7 @@ pub fn parse_bool(value: &str) -> Option<PrismaValue> {
 }
 
 pub fn parse_float(value: &str) -> Option<PrismaValue> {
-    let rslt = RE_FLOAT.captures(value);
-    if rslt.is_none() {
-        return None;
-    }
-
-    let captures = rslt.expect("get captures");
+    let captures = RE_FLOAT.captures(value)?;
     let num_str = captures.get(1).expect("get capture").as_str();
     match Decimal::from_str(num_str) {
         Ok(num) => Some(PrismaValue::Float(num)),

@@ -87,11 +87,9 @@ impl Datamodel {
             .find(|model| model.database_name.as_deref() == Some(db_name))
     }
 
-    /// Finds a model for a field reference by using reference comparison.
-    pub fn find_model_by_field_ref(&self, field: &Field) -> Option<&Model> {
-        // This uses the memory location of field for equality.
-        self.models()
-            .find(|m| m.fields().any(|f| f as *const Field == field as *const Field))
+    /// Finds parent  model for a field reference.
+    pub fn find_model_by_relation_field_ref(&self, field: &RelationField) -> Option<&Model> {
+        self.find_model(&self.find_related_field_bang(&field).relation_info.to)
     }
 
     /// Finds a field reference by a model and field name.
@@ -100,10 +98,15 @@ impl Datamodel {
         self.find_model(&field.0)?.find_field(&field.1)
     }
 
-    /// Finds a mutable field reference by a model and field name.
-    pub fn find_field_mut(&mut self, model: &str, field: &str) -> Option<&mut Field> {
+    /// Finds a mutable scalar field reference by a model and field name.
+    pub fn find_scalar_field_mut(&mut self, model: &str, field: &str) -> &mut ScalarField {
         // This uses the memory location of field for equality.
-        self.find_model_mut(model)?.find_field_mut(field)
+        self.find_model_mut(model).find_scalar_field_mut(field)
+    }
+
+    /// Finds a mutable relation field reference by a model and field name.
+    pub fn find_relation_field_mut(&mut self, model: &str, field: &str) -> &mut RelationField {
+        self.find_model_mut(model).find_relation_field_mut(field)
     }
 
     /// Finds an enum by name.
@@ -117,8 +120,10 @@ impl Datamodel {
     }
 
     /// Finds a model by name and returns a mutable reference.
-    pub fn find_model_mut(&mut self, name: &str) -> Option<&mut Model> {
-        self.models_mut().find(|m| m.name == *name)
+    pub fn find_model_mut(&mut self, name: &str) -> &mut Model {
+        self.models_mut()
+            .find(|m| m.name == *name)
+            .expect("We assume an internally valid datamodel before mutating.")
     }
 
     /// Finds an enum by name and returns a mutable reference.
@@ -126,26 +131,12 @@ impl Datamodel {
         self.enums_mut().find(|m| m.name == *name)
     }
 
-    /// Finds a field with a certain relation guarantee.
-    /// exclude_field are necessary to avoid corner cases with self-relations (e.g. we must not recognize a field as its own related field).
-    pub fn related_field(&self, from: &str, to: &str, name: &str, exclude_field: &str) -> Option<&Field> {
-        self.find_model(&to).and_then(|related_model| {
-            related_model.fields().find(|f| {
-                if let FieldType::Relation(rel_info) = &f.field_type {
-                    if rel_info.to == from && rel_info.name == name && f.name != exclude_field {
-                        return true;
-                    }
-                }
-                false
-            })
-        })
-    }
     /// Returns (model_name, field_name) for all fields using a specific enum.
     pub fn find_enum_fields(&mut self, enum_name: &str) -> Vec<(String, String)> {
         let mut fields = vec![];
 
         for model in &self.models {
-            for field in &model.fields {
+            for field in model.scalar_fields() {
                 if FieldType::Enum(enum_name.to_owned()) == field.field_type {
                     fields.push((model.name.clone(), field.name.clone()))
                 }
@@ -158,12 +149,9 @@ impl Datamodel {
     pub fn find_relation_fields_for_model(&mut self, model_name: &str) -> Vec<(String, String)> {
         let mut fields = vec![];
         for model in &self.models {
-            for field in &model.fields {
-                match &field.field_type {
-                    FieldType::Relation(RelationInfo { to: m_name, .. }) if model_name == m_name => {
-                        fields.push((model.name.clone(), field.name.clone()))
-                    }
-                    _ => (),
+            for field in model.relation_fields() {
+                if field.relation_info.to == model_name {
+                    fields.push((model.name.clone(), field.name.clone()))
                 }
             }
         }
@@ -171,29 +159,21 @@ impl Datamodel {
     }
 
     /// Finds a relation field related to a relation info
-    pub fn find_related_field_for_info(&self, info: &RelationInfo) -> &Field {
+    pub fn find_related_field_for_info(&self, info: &RelationInfo, exclude: &str) -> Option<&RelationField> {
         self.find_model(&info.to)
             .expect("The model referred to by a RelationInfo should always exist.")
-            .fields()
-            .find(|f| match &f.field_type {
-                FieldType::Relation(other_info) => {
-                    other_info.name == info.name
+            .relation_fields()
+            .find(|f| {
+                f.relation_info.name == info.name
+                    && (f.relation_info.to != info.to ||
                     // This is to differentiate the opposite field from self in the self relation case.
-                    && other_info.to_fields != info.to_fields
-                    && other_info.fields != info.fields
-                }
-                _ => false,
+                    f.name != exclude)
             })
-            .expect("Every RelationInfo should have a complementary RelationInfo on the opposite relation field.")
     }
 
-    /// Returns (model_name, field_name) for all relation fields pointing to a specific model.
-    pub fn find_related_info(&self, info: &RelationInfo) -> &RelationInfo {
-        let field = self.find_related_field_for_info(info);
-
-        match &field.field_type {
-            FieldType::Relation(relation_info) => return relation_info,
-            _ => unreachable!("Every relation field has a relation info."),
-        }
+    // This is used once we assume the datamodel to be internally valid
+    pub fn find_related_field_bang(&self, rf: &RelationField) -> &RelationField {
+        self.find_related_field_for_info(&rf.relation_info, &rf.name)
+            .expect("Every RelationInfo should have a complementary RelationInfo on the opposite relation field.")
     }
 }

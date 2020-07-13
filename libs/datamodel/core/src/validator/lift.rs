@@ -4,6 +4,7 @@ use crate::{
     common::ScalarType,
     configuration, dml,
     error::{DatamodelError, ErrorCollection},
+    Field, FieldType,
 };
 use datamodel_connector::{BuiltinConnectors, Connector};
 
@@ -143,9 +144,20 @@ impl<'a> LiftAstToDml<'a> {
         // If we cannot parse the field type, we exit right away.
         let (field_type, extra_attributes) = self.lift_field_type(&ast_field, None, ast_schema, &mut Vec::new())?;
 
-        let mut field = dml::Field::new(&ast_field.name.name, field_type.clone());
-        field.documentation = ast_field.documentation.clone().map(|comment| comment.text);
-        field.arity = self.lift_field_arity(&ast_field.arity);
+        let mut field = match field_type {
+            FieldType::Relation(info) => {
+                let arity = self.lift_field_arity(&ast_field.arity);
+                let mut field = dml::RelationField::new(&ast_field.name.name, arity, info);
+                field.documentation = ast_field.documentation.clone().map(|comment| comment.text);
+                Field::RelationField(field)
+            }
+            x => {
+                let arity = self.lift_field_arity(&ast_field.arity);
+                let mut field = dml::ScalarField::new(&ast_field.name.name, arity, x);
+                field.documentation = ast_field.documentation.clone().map(|comment| comment.text);
+                Field::ScalarField(field)
+            }
+        };
 
         // We merge attributes so we can fail on duplicates.
         let attributes = [&extra_attributes[..], &ast_field.directives[..]].concat();

@@ -28,7 +28,7 @@ impl<'a> Reformatter<'a> {
             let ast_model = schema_ast.find_model(&model.name).unwrap();
 
             for field in model.fields() {
-                if ast_model.fields.iter().find(|f| &f.name.name == &field.name).is_none() {
+                if ast_model.fields.iter().find(|f| f.name.name == field.name()).is_none() {
                     let ast_field = lowerer.lower_field(&field, &datamodel)?;
 
                     result.push(MissingField {

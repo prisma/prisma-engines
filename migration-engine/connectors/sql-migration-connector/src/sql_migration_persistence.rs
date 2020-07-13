@@ -276,7 +276,7 @@ fn parse_rows_new(result_set: ResultSet) -> Vec<Migration> {
                 name: row[NAME_COLUMN].to_string().unwrap(),
                 revision: row[REVISION_COLUMN].as_i64().unwrap() as usize,
                 datamodel_string,
-                status: MigrationStatus::from_str(row[STATUS_COLUMN].to_string().unwrap()),
+                status: row[STATUS_COLUMN].to_string().unwrap().parse().unwrap(),
                 applied: row[APPLIED_COLUMN].as_i64().unwrap() as usize,
                 rolled_back: row[ROLLED_BACK_COLUMN].as_i64().unwrap() as usize,
                 datamodel_steps,
