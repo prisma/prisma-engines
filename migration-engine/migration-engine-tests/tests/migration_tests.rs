@@ -163,7 +163,7 @@ async fn adding_an_id_field_of_type_int_must_work_for_sqlite(api: &TestApi) {
 }
 
 #[test_each_connector]
-async fn adding_an_id_field_of_type_int_with_autoincrement_must_work(api: &TestApi) {
+async fn adding_an_id_field_of_type_int_with_autoincrement_works(api: &TestApi) {
     let dm2 = r#"
         model Test {
             myId Int @id @default(autoincrement())
@@ -187,7 +187,8 @@ async fn adding_an_id_field_of_type_int_with_autoincrement_must_work(api: &TestA
     }
 }
 
-#[test_each_connector(log = "debug,sql_schema_describer=info")]
+// Ignoring sqlite is OK, because sqlite integer primary keys are always auto-incrementing.
+#[test_each_connector(log = "debug,sql_schema_describer=info", ignore("sqlite"))]
 async fn making_an_existing_id_field_autoincrement_works(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Post {
@@ -223,6 +224,48 @@ async fn making_an_existing_id_field_autoincrement_works(api: &TestApi) -> TestR
         model
             .debug_print()?
             .assert_pk(|pk| pk.assert_columns(&["id"])?.debug_print()?.assert_has_sequence())
+    })?;
+
+    Ok(())
+}
+
+// Ignoring sqlite is OK, because sqlite integer primary keys are always auto-incrementing.
+#[test_each_connector(log = "debug,sql_schema_describer=info", ignore("sqlite"))]
+async fn removing_autoincrement_from_an_existing_field_works(api: &TestApi) -> TestResult {
+    let dm1 = r#"
+        model Post {
+            id        Int        @id @default(autoincrement())
+            content   String?
+            createdAt DateTime
+            published Boolean     @default(false)
+            title     String      @default("")
+            updatedAt DateTime
+        }
+    "#;
+
+    api.infer_apply(dm1).send().await?.assert_green()?;
+
+    api.assert_schema().await?.assert_table("Post", |model| {
+        model.assert_pk(|pk| pk.assert_columns(&["id"])?.assert_has_sequence())
+    })?;
+
+    let dm2 = r#"
+        model Post {
+            id        Int        @id
+            content   String?
+            createdAt DateTime
+            published Boolean     @default(false)
+            title     String      @default("")
+            updatedAt DateTime
+        }
+    "#;
+
+    api.infer_apply(dm2).send().await?.assert_green()?;
+
+    api.assert_schema().await?.assert_table("Post", |model| {
+        model
+            .debug_print()?
+            .assert_pk(|pk| pk.assert_columns(&["id"])?.debug_print()?.assert_has_no_sequence())
     })?;
 
     Ok(())
