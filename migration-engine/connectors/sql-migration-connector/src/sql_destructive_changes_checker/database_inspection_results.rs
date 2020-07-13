@@ -11,7 +11,7 @@ pub(super) struct DatabaseInspectionResults {
 
 impl DatabaseInspectionResults {
     pub(super) fn get_row_count(&self, table: &str) -> Option<i64> {
-        self.row_counts.get(table).map(|count| *count)
+        self.row_counts.get(table).copied()
     }
 
     pub(super) fn set_row_count(&mut self, table: String, row_count: i64) {
@@ -20,10 +20,10 @@ impl DatabaseInspectionResults {
 
     pub(super) fn get_row_and_non_null_value_count(&self, table: &str, column: &str) -> (Option<i64>, Option<i64>) {
         (
-            self.row_counts.get(table).map(|count| *count),
+            self.row_counts.get(table).copied(),
             self.value_counts
                 .get(&(Cow::Borrowed(table), Cow::Borrowed(column)))
-                .map(|count| *count),
+                .copied(),
         )
     }
 

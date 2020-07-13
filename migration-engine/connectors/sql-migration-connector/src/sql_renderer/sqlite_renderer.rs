@@ -76,18 +76,18 @@ impl super::SqlRenderer for SqliteRenderer {
 impl SqliteRenderer {
     fn render_column_type(&self, t: &ColumnType) -> String {
         match &t.family {
-            ColumnTypeFamily::Boolean => format!("BOOLEAN"),
-            ColumnTypeFamily::DateTime => format!("DATE"),
-            ColumnTypeFamily::Float => format!("REAL"),
-            ColumnTypeFamily::Int => format!("INTEGER"),
-            ColumnTypeFamily::String => format!("TEXT"),
+            ColumnTypeFamily::Boolean => "BOOLEAN".to_string(),
+            ColumnTypeFamily::DateTime => "DATE".to_string(),
+            ColumnTypeFamily::Float => "REAL".to_string(),
+            ColumnTypeFamily::Int => "INTEGER".to_string(),
+            ColumnTypeFamily::String => "TEXT".to_string(),
             x => unimplemented!("{:?} not handled yet", x),
         }
     }
 }
 
 fn escape_quotes(s: &str) -> Cow<'_, str> {
-    const STRING_LITERAL_CHARACTER_TO_ESCAPE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"'"#).unwrap());
+    static STRING_LITERAL_CHARACTER_TO_ESCAPE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"'"#).unwrap());
 
     STRING_LITERAL_CHARACTER_TO_ESCAPE_RE.replace_all(s, "'$0")
 }

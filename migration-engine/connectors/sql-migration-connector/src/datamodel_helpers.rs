@@ -205,7 +205,7 @@ impl<'a> RelationFieldRef<'a> {
     pub(crate) fn opposite_side(&self) -> Option<RelationFieldRef<'a>> {
         self.referenced_model_ref().relation_fields().find(|relation_field| {
             relation_field.relation_name() == self.relation_name()
-                    && relation_field.referenced_model().name.as_str() == &self.model.name
+                    && relation_field.referenced_model().name.as_str() == self.model.name
                     // This is to differentiate the opposite field from self in the self relation case.
                     && relation_field.field.relation_info.to_fields != self.field.relation_info.to_fields
                     && relation_field.field.relation_info.fields != self.field.relation_info.fields
@@ -220,7 +220,7 @@ impl<'a> RelationFieldRef<'a> {
             .iter()
             .map(move |field| {
                 let field = self.model.find_scalar_field(field.as_str())
-                .expect(&format!("Unable to resolve field {} on {}, Expected relation `fields` to point to fields on the enclosing model.", field, self.model.name));
+                .unwrap_or_else(|| panic!("Unable to resolve field {} on {}, Expected relation `fields` to point to fields on the enclosing model.", field, self.model.name));
 
                 field.db_name()
             })
@@ -235,7 +235,7 @@ impl<'a> RelationFieldRef<'a> {
             .map(move |field| {
                 let model = self.referenced_model();
                 let field = model.find_scalar_field(field.as_str())
-                .expect(&format!("Unable to resolve field {} on {}, Expected relation `references` to point to fields on the related model.", field, model.name));
+                .unwrap_or_else(|| panic!("Unable to resolve field {} on {}, Expected relation `references` to point to fields on the related model.", field, model.name));
 
                 field.db_name()
             })

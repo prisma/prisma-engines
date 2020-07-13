@@ -15,7 +15,7 @@ impl From<quaint::error::DatabaseConstraint> for crate::query_engine::DatabaseCo
     fn from(other: quaint::error::DatabaseConstraint) -> Self {
         match other {
             quaint::error::DatabaseConstraint::Fields(fields) => Self::Fields(fields.to_vec()),
-            quaint::error::DatabaseConstraint::Index(index) => Self::Index(index.to_string()),
+            quaint::error::DatabaseConstraint::Index(index) => Self::Index(index),
             quaint::error::DatabaseConstraint::ForeignKey => Self::ForeignKey,
         }
     }

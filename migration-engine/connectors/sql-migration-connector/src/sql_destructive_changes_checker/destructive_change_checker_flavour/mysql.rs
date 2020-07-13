@@ -13,10 +13,10 @@ use sql_schema_describer::Table;
 impl DestructiveChangeCheckerFlavour for MysqlFlavour {
     fn check_alter_column(&self, previous_table: &Table, columns: &ColumnDiffer<'_>, plan: &mut DestructiveCheckPlan) {
         match expand_mysql_alter_column(columns) {
-            MysqlAlterColumn::DropDefault => return, // dropping a default is safe
+            MysqlAlterColumn::DropDefault => (), // dropping a default is safe
 
             // If only the default changed, the step is safe.
-            MysqlAlterColumn::Modify { changes, .. } if changes.only_default_changed() => return,
+            MysqlAlterColumn::Modify { changes, .. } if changes.only_default_changed() => (),
 
             // Otherwise, case by case.
             MysqlAlterColumn::Modify { .. } => {

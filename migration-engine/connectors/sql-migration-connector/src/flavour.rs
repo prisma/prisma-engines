@@ -60,7 +60,7 @@ pub(crate) struct MysqlFlavour(MysqlUrl);
 #[async_trait::async_trait]
 impl SqlFlavour for MysqlFlavour {
     fn check_database_info(&self, database_info: &DatabaseInfo) -> CheckDatabaseInfoResult {
-        const MYSQL_SYSTEM_DATABASES: Lazy<regex::RegexSet> = Lazy::new(|| {
+        static MYSQL_SYSTEM_DATABASES: Lazy<regex::RegexSet> = Lazy::new(|| {
             RegexSet::new(&[
                 "(?i)^mysql$",
                 "(?i)^information_schema$",
@@ -136,7 +136,7 @@ impl SqlFlavour for SqliteFlavour {
         if let Some((dir, false)) = dir.map(|dir| (dir, dir.exists())) {
             std::fs::create_dir_all(dir)
                 .context("Creating SQLite database parent directory.")
-                .map_err(|io_err| ConnectorError::from_kind(migration_connector::ErrorKind::Generic(io_err.into())))?;
+                .map_err(|io_err| ConnectorError::from_kind(migration_connector::ErrorKind::Generic(io_err)))?;
         }
 
         connect(database_str).await?;
@@ -156,11 +156,9 @@ impl SqlFlavour for SqliteFlavour {
 
     async fn initialize(&self, _conn: &dyn Queryable, _database_info: &DatabaseInfo) -> SqlResult<()> {
         let path_buf = PathBuf::from(&self.file_path);
-        match path_buf.parent() {
-            Some(parent_directory) => {
-                fs::create_dir_all(parent_directory).expect("creating the database folders failed")
-            }
-            None => {}
+
+        if let Some(parent_directory) = path_buf.parent() {
+            fs::create_dir_all(parent_directory).expect("creating the database folders failed")
         }
 
         Ok(())
