@@ -98,8 +98,8 @@ impl Fields {
         self.scalar_weak().iter().map(|f| f.upgrade().unwrap()).collect()
     }
 
-    pub fn scalar_writable(&self) -> Vec<ScalarFieldRef> {
-        self.scalar().into_iter().filter(|sf| !sf.is_read_only()).collect()
+    pub fn scalar_writable(&self) -> impl Iterator<Item = ScalarFieldRef> {
+        self.scalar().into_iter().filter(|sf| !sf.is_read_only())
     }
 
     pub fn scalar_list(&self) -> Vec<ScalarFieldRef> {

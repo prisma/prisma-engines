@@ -36,7 +36,11 @@ pub trait UpdateInputTypeBuilderExtension<'a>: InputTypeBuilderBase<'a> + Create
         self.scalar_input_fields(
             model.name.clone(),
             "Update",
-            model.fields().scalar_writable(),
+            model
+                .fields()
+                .scalar_writable()
+                .filter(Self::field_should_be_kept_for_update_input_type)
+                .collect(),
             |f: ScalarFieldRef| self.map_optional_input_type(&f),
             false,
         )
@@ -364,5 +368,15 @@ pub trait UpdateInputTypeBuilderExtension<'a>: InputTypeBuilderBase<'a> + Create
 
         input_object.set_fields(fields);
         Arc::downgrade(&input_object)
+    }
+
+    fn field_should_be_kept_for_update_input_type(field: &ScalarFieldRef) -> bool {
+        // We forbid updating auto-increment integer unique fields as this can create problems with the
+        // underlying sequences.
+        !field.is_auto_generated_int_id
+            && !matches!(
+                (&field.type_identifier, field.unique(), field.is_autoincrement),
+                (TypeIdentifier::Int, true, true)
+            )
     }
 }
