@@ -82,7 +82,7 @@ pub(crate) fn render_column_type(column: &ColumnRef<'_>) -> anyhow::Result<Cow<'
         ColumnTypeFamily::DateTime => {
             // CURRENT_TIMESTAMP has up to second precision, not more.
             if let Some(DefaultValue::NOW) = column.default() {
-                return Ok("datetime".into());
+                Ok("datetime".into())
             } else {
                 Ok("datetime(3)".into())
             }
@@ -108,7 +108,7 @@ pub(crate) fn render_column_type(column: &ColumnRef<'_>) -> anyhow::Result<Cow<'
 }
 
 fn escape_string_literal(s: &str) -> Cow<'_, str> {
-    const STRING_LITERAL_CHARACTER_TO_ESCAPE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"'"#).unwrap());
+    static STRING_LITERAL_CHARACTER_TO_ESCAPE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r#"'"#).unwrap());
 
     STRING_LITERAL_CHARACTER_TO_ESCAPE_RE.replace_all(s, "'$0")
 }

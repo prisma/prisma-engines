@@ -80,7 +80,7 @@ impl SqlDatabaseStepApplier<'_> {
         tracing::debug!(?step);
 
         for sql_string in render_raw_sql(&step, renderer, self.database_info(), current_schema, next_schema)
-            .map_err(|err: anyhow::Error| SqlError::Generic(err))?
+            .map_err(SqlError::Generic)?
         {
             tracing::debug!(index, %sql_string);
 
@@ -107,9 +107,7 @@ fn render_steps_pretty(
 
     for step in &database_migration.corrected_steps {
         let sql = render_raw_sql(&step, renderer, database_info, current_schema, next_schema)
-            .map_err(|err: anyhow::Error| {
-                ConnectorError::from_kind(migration_connector::ErrorKind::Generic(err.into()))
-            })?
+            .map_err(|err: anyhow::Error| ConnectorError::from_kind(migration_connector::ErrorKind::Generic(err)))?
             .join(";\n");
 
         if !sql.is_empty() {
@@ -164,7 +162,7 @@ fn render_raw_sql(
             let primary_key_is_already_set = create_table.contains("PRIMARY KEY");
             let primary_columns = table.primary_key_columns();
 
-            if primary_columns.len() > 0 && !primary_key_is_already_set {
+            if !primary_columns.is_empty() && !primary_key_is_already_set {
                 let column_names = primary_columns.iter().map(|col| renderer.quote(&col)).join(",");
                 write!(create_table, ",\n    PRIMARY KEY ({})", column_names)?;
             }
@@ -262,7 +260,7 @@ fn render_raw_sql(
             for change in changes {
                 match change {
                     TableChange::DropPrimaryKey { constraint_name } => match renderer.sql_family() {
-                        SqlFamily::Mysql => lines.push(format!("DROP PRIMARY KEY")),
+                        SqlFamily::Mysql => lines.push("DROP PRIMARY KEY".to_owned()),
                         SqlFamily::Postgres => lines.push(format!(
                             "DROP CONSTRAINT {}",
                             Quoted::postgres_ident(

@@ -18,7 +18,7 @@ use sql_schema_helpers::TableRef;
 pub(crate) struct DiffingOptions {
     is_mariadb: bool,
     sql_family: SqlFamily,
-    ignore_tables: Lazy<RegexSet>,
+    ignore_tables: &'static RegexSet,
 }
 
 impl DiffingOptions {
@@ -30,8 +30,8 @@ impl DiffingOptions {
         DiffingOptions {
             is_mariadb: database_info.is_mariadb(),
             ignore_tables: match database_info.sql_family() {
-                SqlFamily::Postgres => POSTGRES_IGNORED_TABLES,
-                _ => EMPTY_REGEXSET,
+                SqlFamily::Postgres => &POSTGRES_IGNORED_TABLES,
+                _ => &EMPTY_REGEXSET,
             },
             sql_family: database_info.sql_family(),
         }
@@ -43,7 +43,7 @@ impl Default for DiffingOptions {
     fn default() -> Self {
         DiffingOptions {
             is_mariadb: false,
-            ignore_tables: EMPTY_REGEXSET,
+            ignore_tables: &EMPTY_REGEXSET,
             sql_family: SqlFamily::Postgres,
         }
     }
@@ -369,7 +369,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
         })
     }
 
-    fn alter_indexes<'a>(&'a self) -> Vec<AlterIndex> {
+    fn alter_indexes(&self) -> Vec<AlterIndex> {
         let mut alter_indexes = Vec::new();
         self.table_pairs().for_each(|differ| {
             differ.index_pairs().for_each(|(previous_index, renamed_index)| {
@@ -504,7 +504,7 @@ fn enums_match(previous: &Enum, next: &Enum) -> bool {
     previous.name == next.name
 }
 
-const POSTGRES_IGNORED_TABLES: Lazy<RegexSet> = Lazy::new(|| {
+static POSTGRES_IGNORED_TABLES: Lazy<RegexSet> = Lazy::new(|| {
     RegexSet::new(&[
         // PostGIS. Reference: https://postgis.net/docs/manual-1.4/ch04.html#id418599
         "(?i)^spatial_ref_sys$",
@@ -513,4 +513,4 @@ const POSTGRES_IGNORED_TABLES: Lazy<RegexSet> = Lazy::new(|| {
     .unwrap()
 });
 
-const EMPTY_REGEXSET: Lazy<RegexSet> = Lazy::new(|| RegexSet::new::<_, &&str>(&[]).unwrap());
+static EMPTY_REGEXSET: Lazy<RegexSet> = Lazy::new(|| RegexSet::new::<_, &&str>(&[]).unwrap());

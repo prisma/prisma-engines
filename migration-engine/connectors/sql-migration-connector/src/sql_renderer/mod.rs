@@ -21,7 +21,7 @@ pub(crate) trait SqlRenderer {
 
     fn quote_with_schema<'a, 'b>(&'a self, schema_name: &'a str, name: &'b str) -> QuotedWithSchema<'a, &'b str> {
         QuotedWithSchema {
-            schema_name: schema_name,
+            schema_name,
             name: self.quote(name),
         }
     }

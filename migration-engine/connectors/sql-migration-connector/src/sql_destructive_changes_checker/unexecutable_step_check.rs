@@ -88,8 +88,8 @@ impl Check for UnexecutableStepCheck {
                 let message = |details| format!("Changed the column `{column}` on the `{table}` table from a scalar field to a list field. {details}", column = column, table = table, details = details);
 
                 match database_checks.get_row_and_non_null_value_count(table, column) {
-                    (Some(0), _) => return None,
-                    (_, Some(0)) => return None,
+                    (Some(0), _) => None,
+                    (_, Some(0)) => None,
                     (_, Some(value_count)) => Some(message(format_args!(
                         "There are {} existing non-null values in that column, this migration step cannot be executed.", value_count
                     ))),

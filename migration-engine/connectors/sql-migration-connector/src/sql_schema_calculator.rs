@@ -208,65 +208,62 @@ impl<'a> SqlSchemaCalculator<'a> {
     fn calculate_relation_tables(&self) -> SqlResult<Vec<sql::Table>> {
         let mut result = Vec::new();
         for relation in self.calculate_relations().iter() {
-            match &relation.manifestation {
-                TempManifestationHolder::Table => {
-                    let model_a = ModelRef::new(&relation.model_a, self.data_model);
-                    let model_b = ModelRef::new(&relation.model_b, self.data_model);
+            if let TempManifestationHolder::Table = &relation.manifestation {
+                let model_a = ModelRef::new(&relation.model_a, self.data_model);
+                let model_b = ModelRef::new(&relation.model_b, self.data_model);
 
-                    let a_columns = relation_table_column(&model_a, relation.model_a_column());
-                    let b_columns = relation_table_column(&model_b, relation.model_b_column());
+                let a_columns = relation_table_column(&model_a, relation.model_a_column());
+                let b_columns = relation_table_column(&model_b, relation.model_b_column());
 
-                    let foreign_keys = vec![
-                        sql::ForeignKey {
-                            constraint_name: None,
-                            columns: a_columns.iter().map(|col| col.name.clone()).collect(),
-                            referenced_table: model_a.db_name().to_owned(),
-                            referenced_columns: first_unique_criterion(model_a)
-                                .map_err(SqlError::Generic)?
-                                .into_iter()
-                                .map(|field| field.db_name().to_owned())
-                                .collect(),
-                            on_delete_action: sql::ForeignKeyAction::Cascade,
-                        },
-                        sql::ForeignKey {
-                            constraint_name: None,
-                            columns: b_columns.iter().map(|col| col.name.clone()).collect(),
-                            referenced_table: model_b.db_name().to_owned(),
-                            referenced_columns: first_unique_criterion(model_b)
-                                .map_err(SqlError::Generic)?
-                                .into_iter()
-                                .map(|field| field.db_name().to_owned())
-                                .collect(),
-                            on_delete_action: sql::ForeignKeyAction::Cascade,
-                        },
-                    ];
+                let foreign_keys = vec![
+                    sql::ForeignKey {
+                        constraint_name: None,
+                        columns: a_columns.iter().map(|col| col.name.clone()).collect(),
+                        referenced_table: model_a.db_name().to_owned(),
+                        referenced_columns: first_unique_criterion(model_a)
+                            .map_err(SqlError::Generic)?
+                            .into_iter()
+                            .map(|field| field.db_name().to_owned())
+                            .collect(),
+                        on_delete_action: sql::ForeignKeyAction::Cascade,
+                    },
+                    sql::ForeignKey {
+                        constraint_name: None,
+                        columns: b_columns.iter().map(|col| col.name.clone()).collect(),
+                        referenced_table: model_b.db_name().to_owned(),
+                        referenced_columns: first_unique_criterion(model_b)
+                            .map_err(SqlError::Generic)?
+                            .into_iter()
+                            .map(|field| field.db_name().to_owned())
+                            .collect(),
+                        on_delete_action: sql::ForeignKeyAction::Cascade,
+                    },
+                ];
 
-                    let mut columns = a_columns;
-                    columns.extend(b_columns.iter().map(|col| col.to_owned()));
+                let mut columns = a_columns;
+                columns.extend(b_columns.iter().map(|col| col.to_owned()));
 
-                    let indexes = vec![
-                        sql::Index {
-                            name: format!("{}_AB_unique", relation.table_name()),
-                            columns: columns.iter().map(|col| col.name.clone()).collect(),
-                            tpe: sql::IndexType::Unique,
-                        },
-                        sql::Index {
-                            name: format!("{}_B_index", relation.table_name()),
-                            columns: b_columns.into_iter().map(|col| col.name).collect(),
-                            tpe: sql::IndexType::Normal,
-                        },
-                    ];
+                let indexes = vec![
+                    sql::Index {
+                        name: format!("{}_AB_unique", relation.table_name()),
+                        columns: columns.iter().map(|col| col.name.clone()).collect(),
+                        tpe: sql::IndexType::Unique,
+                    },
+                    sql::Index {
+                        name: format!("{}_B_index", relation.table_name()),
+                        columns: b_columns.into_iter().map(|col| col.name).collect(),
+                        tpe: sql::IndexType::Normal,
+                    },
+                ];
 
-                    let table = sql::Table {
-                        name: relation.table_name(),
-                        columns,
-                        indices: indexes,
-                        primary_key: None,
-                        foreign_keys,
-                    };
-                    result.push(table);
-                }
-                _ => (),
+                let table = sql::Table {
+                    name: relation.table_name(),
+                    columns,
+                    indices: indexes,
+                    primary_key: None,
+                    foreign_keys,
+                };
+                result.push(table);
             }
         }
         Ok(result)
@@ -281,10 +278,9 @@ fn relation_table_column(referenced_model: &ModelRef<'_>, reference_field_name: 
     let unique_field = referenced_model.scalar_fields().find(|f| f.is_unique());
     let id_field = referenced_model.scalar_fields().find(|f| f.is_id());
 
-    let unique_field = id_field.or(unique_field).expect(&format!(
-        "No unique criteria found in model {}",
-        &referenced_model.name()
-    ));
+    let unique_field = id_field
+        .or(unique_field)
+        .unwrap_or_else(|| panic!("No unique criteria found in model {}", &referenced_model.name()));
 
     vec![sql::Column {
         name: reference_field_name,
@@ -321,7 +317,7 @@ fn migration_value_new(field: &ScalarFieldRef<'_>) -> Option<sql_schema_describe
         dml::DefaultValue::Expression(_) => return None,
     };
 
-    Some(sql_schema_describer::DefaultValue::VALUE(value.clone()))
+    Some(sql_schema_describer::DefaultValue::VALUE(value))
 }
 
 fn enum_column_type(field: &ScalarFieldRef<'_>, database_info: &DatabaseInfo, db_name: &str) -> sql::ColumnType {
