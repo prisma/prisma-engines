@@ -36,6 +36,7 @@ impl DatabaseMigrationInferrer<SqlMigration> for SqlDatabaseMigrationInferrer<'_
                 self.schema_name(),
                 self.sql_family(),
                 self.database_info(),
+                self.flavour(),
             )
         };
 
@@ -57,6 +58,7 @@ impl DatabaseMigrationInferrer<SqlMigration> for SqlDatabaseMigrationInferrer<'_
                 self.schema_name(),
                 self.sql_family(),
                 self.database_info(),
+                self.flavour(),
             )
         })();
 
@@ -70,6 +72,7 @@ fn infer(
     schema_name: &str,
     sql_family: SqlFamily,
     database_info: &DatabaseInfo,
+    flavour: &dyn SqlFlavour,
 ) -> SqlResult<SqlMigration> {
     let (original_steps, corrected_steps) = infer_database_migration_steps_and_fix(
         &current_database_schema,
@@ -77,6 +80,7 @@ fn infer(
         &schema_name,
         sql_family,
         database_info,
+        flavour,
     )?;
     let (_, rollback) = infer_database_migration_steps_and_fix(
         &expected_database_schema,
@@ -84,6 +88,7 @@ fn infer(
         &schema_name,
         sql_family,
         database_info,
+        flavour,
     )?;
     Ok(SqlMigration {
         before: current_database_schema.clone(),
@@ -100,6 +105,7 @@ fn infer_database_migration_steps_and_fix(
     schema_name: &str,
     sql_family: SqlFamily,
     database_info: &DatabaseInfo,
+    flavour: &dyn SqlFlavour,
 ) -> SqlResult<(Vec<SqlMigrationStep>, Vec<SqlMigrationStep>)> {
     let diff: SqlSchemaDiff = SqlSchemaDiffer::diff(
         &from,
@@ -109,7 +115,7 @@ fn infer_database_migration_steps_and_fix(
     );
 
     let corrected_steps = if sql_family.is_sqlite() {
-        sqlite::fix(diff, &from, &to, &schema_name, database_info)?
+        sqlite::fix(diff, &from, &to, &schema_name, database_info, flavour)?
     } else {
         diff.into_steps()
     };

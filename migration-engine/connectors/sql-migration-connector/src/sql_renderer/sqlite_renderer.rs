@@ -1,25 +1,19 @@
-use super::common::*;
-use crate::{sql_schema_helpers::*, SqlFamily};
+use super::{common::*, SqlRenderer};
+use crate::{flavour::SqliteFlavour, sql_schema_helpers::*};
 use once_cell::sync::Lazy;
 use prisma_models::PrismaValue;
 use regex::Regex;
 use sql_schema_describer::*;
 use std::borrow::Cow;
 
-pub struct SqliteRenderer;
-
-impl super::SqlRenderer for SqliteRenderer {
-    fn sql_family(&self) -> SqlFamily {
-        SqlFamily::Sqlite
-    }
-
+impl SqlRenderer for SqliteFlavour {
     fn quote<'a>(&self, name: &'a str) -> Quoted<&'a str> {
         Quoted::Double(name)
     }
 
     fn render_column(&self, _schema_name: &str, column: ColumnRef<'_>, _add_fk_prefix: bool) -> String {
         let column_name = self.quote(column.name());
-        let tpe_str = self.render_column_type(column.column_type());
+        let tpe_str = render_column_type(column.column_type());
         let nullability_str = render_nullability(&column);
         let default_str = column
             .default()
@@ -73,16 +67,14 @@ impl super::SqlRenderer for SqliteRenderer {
     }
 }
 
-impl SqliteRenderer {
-    fn render_column_type(&self, t: &ColumnType) -> String {
-        match &t.family {
-            ColumnTypeFamily::Boolean => "BOOLEAN".to_string(),
-            ColumnTypeFamily::DateTime => "DATE".to_string(),
-            ColumnTypeFamily::Float => "REAL".to_string(),
-            ColumnTypeFamily::Int => "INTEGER".to_string(),
-            ColumnTypeFamily::String => "TEXT".to_string(),
-            x => unimplemented!("{:?} not handled yet", x),
-        }
+fn render_column_type(t: &ColumnType) -> String {
+    match &t.family {
+        ColumnTypeFamily::Boolean => "BOOLEAN".to_string(),
+        ColumnTypeFamily::DateTime => "DATE".to_string(),
+        ColumnTypeFamily::Float => "REAL".to_string(),
+        ColumnTypeFamily::Int => "INTEGER".to_string(),
+        ColumnTypeFamily::String => "TEXT".to_string(),
+        x => unimplemented!("{:?} not handled yet", x),
     }
 }
 

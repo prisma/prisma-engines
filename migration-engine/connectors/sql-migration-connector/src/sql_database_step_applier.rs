@@ -1,10 +1,11 @@
 use crate::*;
-use sql_renderer::{postgres_render_column_type, rendered_step::RenderedStep, IteratorJoin, Quoted, SqlRenderer};
+use sql_renderer::{postgres_render_column_type, rendered_step::RenderedStep, IteratorJoin, Quoted};
 use sql_schema_describer::*;
 use sql_schema_differ::{ColumnDiffer, DiffingOptions};
 use sql_schema_helpers::{find_column, walk_columns, ColumnRef, SqlSchemaExt};
 use std::fmt::Write as _;
 use tracing_futures::Instrument;
+use SqlFlavour;
 
 pub struct SqlDatabaseStepApplier<'a> {
     pub connector: &'a crate::SqlMigrationConnector,
@@ -19,12 +20,11 @@ impl crate::component::Component for SqlDatabaseStepApplier<'_> {
 #[async_trait::async_trait]
 impl DatabaseMigrationStepApplier<SqlMigration> for SqlDatabaseStepApplier<'_> {
     async fn apply_step(&self, database_migration: &SqlMigration, index: usize) -> ConnectorResult<bool> {
-        let renderer = self.renderer();
         let fut = self
             .apply_next_step(
                 &database_migration.corrected_steps,
                 index,
-                renderer.as_ref(),
+                self.flavour(),
                 &database_migration.before,
                 &database_migration.after,
             )
@@ -34,12 +34,11 @@ impl DatabaseMigrationStepApplier<SqlMigration> for SqlDatabaseStepApplier<'_> {
     }
 
     async fn unapply_step(&self, database_migration: &SqlMigration, index: usize) -> ConnectorResult<bool> {
-        let renderer = self.renderer();
         let fut = self
             .apply_next_step(
                 &database_migration.rollback,
                 index,
-                renderer.as_ref(),
+                self.flavour(),
                 &database_migration.after,
                 &database_migration.before,
             )
@@ -54,7 +53,7 @@ impl DatabaseMigrationStepApplier<SqlMigration> for SqlDatabaseStepApplier<'_> {
     ) -> ConnectorResult<Vec<PrettyDatabaseMigrationStep>> {
         render_steps_pretty(
             &database_migration,
-            self.renderer().as_ref(),
+            self.flavour(),
             self.database_info(),
             &database_migration.before,
             &database_migration.after,
@@ -67,7 +66,7 @@ impl SqlDatabaseStepApplier<'_> {
         &self,
         steps: &[SqlMigrationStep],
         index: usize,
-        renderer: &(dyn SqlRenderer + Send + Sync),
+        renderer: &(dyn SqlFlavour + Send + Sync),
         current_schema: &SqlSchema,
         next_schema: &SqlSchema,
     ) -> SqlResult<bool> {
@@ -90,15 +89,11 @@ impl SqlDatabaseStepApplier<'_> {
         let has_more = steps.get(index + 1).is_some();
         Ok(has_more)
     }
-
-    fn renderer<'a>(&'a self) -> Box<dyn SqlRenderer + Send + Sync + 'a> {
-        SqlRenderer::for_family(&self.sql_family())
-    }
 }
 
 fn render_steps_pretty(
     database_migration: &SqlMigration,
-    renderer: &(dyn SqlRenderer + Send + Sync),
+    renderer: &(dyn SqlFlavour + Send + Sync),
     database_info: &DatabaseInfo,
     current_schema: &SqlSchema,
     next_schema: &SqlSchema,
@@ -123,7 +118,7 @@ fn render_steps_pretty(
 
 fn render_raw_sql(
     step: &SqlMigrationStep,
-    renderer: &(dyn SqlRenderer + Send + Sync),
+    renderer: &(dyn SqlFlavour + Send + Sync),
     database_info: &DatabaseInfo,
     current_schema: &SqlSchema,
     next_schema: &SqlSchema,
@@ -398,7 +393,7 @@ fn render_raw_sql(
 }
 
 fn render_create_index(
-    renderer: &dyn SqlRenderer,
+    renderer: &dyn SqlFlavour,
     database_info: &DatabaseInfo,
     table_name: &str,
     index: &Index,
@@ -433,7 +428,7 @@ fn render_create_index(
 }
 
 fn mysql_drop_index(
-    renderer: &dyn SqlRenderer,
+    renderer: &dyn SqlFlavour,
     schema_name: &str,
     table_name: &str,
     index_name: &str,
@@ -455,7 +450,7 @@ fn create_table_suffix(sql_family: SqlFamily) -> &'static str {
 }
 
 fn safe_alter_column(
-    renderer: &dyn SqlRenderer,
+    renderer: &dyn SqlFlavour,
     previous_column: ColumnRef<'_>,
     next_column: ColumnRef<'_>,
     diffing_options: &DiffingOptions,
@@ -536,7 +531,7 @@ fn safe_alter_column(
 }
 
 fn render_create_enum(
-    renderer: &(dyn SqlRenderer + Send + Sync),
+    renderer: &(dyn SqlFlavour + Send + Sync),
     create_enum: &CreateEnum,
 ) -> Result<Vec<String>, anyhow::Error> {
     match renderer.sql_family() {
@@ -553,7 +548,7 @@ fn render_create_enum(
 }
 
 fn render_drop_enum(
-    renderer: &(dyn SqlRenderer + Send + Sync),
+    renderer: &(dyn SqlFlavour + Send + Sync),
     drop_enum: &DropEnum,
 ) -> Result<Vec<String>, anyhow::Error> {
     match renderer.sql_family() {

@@ -1,5 +1,5 @@
 use super::{common::*, SqlRenderer};
-use crate::{sql_schema_helpers::ColumnRef, SqlFamily};
+use crate::{flavour::MysqlFlavour, sql_schema_helpers::ColumnRef};
 use once_cell::sync::Lazy;
 use prisma_models::PrismaValue;
 use regex::Regex;
@@ -8,13 +8,7 @@ use std::borrow::Cow;
 
 const VARCHAR_LENGTH_PREFIX: &str = "(191)";
 
-pub struct MySqlRenderer {}
-
-impl SqlRenderer for MySqlRenderer {
-    fn sql_family(&self) -> SqlFamily {
-        SqlFamily::Mysql
-    }
-
+impl SqlRenderer for MysqlFlavour {
     fn quote<'a>(&self, name: &'a str) -> Quoted<&'a str> {
         Quoted::Backticks(name)
     }

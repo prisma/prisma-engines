@@ -4,13 +4,14 @@
 
 use crate::{
     catch, connect, database_info::DatabaseInfo, sql_destructive_changes_checker::DestructiveChangeCheckerFlavour,
-    CheckDatabaseInfoResult, SqlError, SqlResult, SystemDatabase,
+    sql_renderer::SqlRenderer, CheckDatabaseInfoResult, SqlError, SqlResult, SystemDatabase,
 };
 use futures::future::TryFutureExt;
 use migration_connector::{ConnectorError, ConnectorResult};
 use once_cell::sync::Lazy;
 use quaint::{
     connector::{ConnectionInfo, MysqlUrl, PostgresUrl, Queryable},
+    prelude::SqlFamily,
     single::Quaint,
 };
 use regex::RegexSet;
@@ -35,7 +36,12 @@ pub(crate) fn from_connection_info(connection_info: &ConnectionInfo) -> Box<dyn 
 }
 
 #[async_trait::async_trait]
-pub(crate) trait SqlFlavour: DestructiveChangeCheckerFlavour {
+pub(crate) trait SqlFlavour: DestructiveChangeCheckerFlavour + SqlRenderer {
+    /// This method should be considered deprecated. Prefer extending SqlFlavour
+    /// with methods expressing clearly what is being specialized by database
+    /// backend.
+    fn sql_family(&self) -> SqlFamily;
+
     /// Optionally validate the database info.
     fn check_database_info(&self, _database_info: &DatabaseInfo) -> CheckDatabaseInfoResult {
         Ok(())
@@ -115,6 +121,10 @@ impl SqlFlavour for MysqlFlavour {
 
         Ok(())
     }
+
+    fn sql_family(&self) -> SqlFamily {
+        SqlFamily::Mysql
+    }
 }
 
 pub(crate) struct SqliteFlavour {
@@ -163,6 +173,10 @@ impl SqlFlavour for SqliteFlavour {
 
         Ok(())
     }
+
+    fn sql_family(&self) -> SqlFamily {
+        SqlFamily::Sqlite
+    }
 }
 
 pub(crate) struct PostgresFlavour(PostgresUrl);
@@ -200,6 +214,10 @@ impl SqlFlavour for PostgresFlavour {
         conn.raw_cmd(&schema_sql).await?;
 
         Ok(())
+    }
+
+    fn sql_family(&self) -> SqlFamily {
+        SqlFamily::Postgres
     }
 }
 
