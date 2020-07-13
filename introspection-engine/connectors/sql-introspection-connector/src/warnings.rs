@@ -65,7 +65,7 @@ impl EnumAndValue {
 pub fn warning_models_without_identifier(affected: &Vec<Model>) -> Warning {
     Warning {
         code: 1,
-        message: "The following models were commented out as they do not have a unique identifier or id. This is currently not supported by Prisma.".into(),
+        message: "The following models were commented out as they do not have a valid unique identifier or id. This is currently not supported by Prisma.".into(),
         affected: serde_json::to_value(&affected).unwrap(),
     }
 }

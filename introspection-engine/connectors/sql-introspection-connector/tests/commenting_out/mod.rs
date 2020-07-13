@@ -20,7 +20,43 @@ async fn introspecting_a_table_without_uniques_should_comment_it_out_sqlite(api:
         })
         .await;
 
-    let dm = "model User {\n  id Int @default(autoincrement()) @id\n}\n\n// The underlying table does not contain a unique identifier and can therefore currently not be handled.\n// model Post {\n  // id      Int\n  // user_id Int\n  // User    User @relation(fields: [user_id], references: [id])\n// }\n";
+    let dm = "model User {\n  id      Int    @default(autoincrement()) @id\n  // Post Post[]\n}\n\n// The underlying table does not contain a valid unique identifier and can therefore currently not be handled.\n// model Post {\n  // id      Int\n  // user_id Int\n  // User    User @relation(fields: [user_id], references: [id])\n// }\n";
+
+    let result = dbg!(api.introspect().await);
+    assert_eq!(&result, dm);
+}
+
+#[test_each_connector(tags("sqlite"))]
+async fn introspecting_a_table_without_required_uniques_should_comment_it_out_sqlite(api: &TestApi) {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("Post", |t| {
+                t.add_column("id", types::integer());
+                t.add_column("opt_unique", types::integer().unique(true).nullable(true));
+            });
+        })
+        .await;
+
+    let dm = "// The underlying table does not contain a valid unique identifier and can therefore currently not be handled.\n// model Post {\n  // id         Int\n  // opt_unique Int? @unique\n// }\n";
+
+    let result = dbg!(api.introspect().await);
+    assert_eq!(&result, dm);
+}
+
+#[test_each_connector(tags("sqlite"))]
+async fn introspecting_a_table_without_fully_required_compound_unique_should_comment_it_out_sqlite(api: &TestApi) {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("Post", |t| {
+                t.add_column("id", types::integer());
+                t.add_column("opt_unique", types::integer().nullable(true));
+                t.add_column("req_unique", types::integer().nullable(false));
+                t.inject_custom("Unique(opt_unique, req_unique)")
+            });
+        })
+        .await;
+
+    let dm = "// The underlying table does not contain a valid unique identifier and can therefore currently not be handled.\n// model Post {\n  // id         Int\n  // opt_unique Int?\n  // req_unique Int\n\n  // @@unique([opt_unique, req_unique], name: \"sqlite_autoindex_Post_1\")\n// }\n";
 
     let result = dbg!(api.introspect().await);
     assert_eq!(&result, dm);
@@ -43,7 +79,7 @@ async fn introspecting_a_table_without_uniques_should_comment_it_out_mysql(api: 
         })
         .await;
 
-    let dm = "// The underlying table does not contain a unique identifier and can therefore currently not be handled.\n// model Post {\n  // id      Int\n  // user_id Int\n  // User    User @relation(fields: [user_id], references: [id])\n\n  // @@index([user_id], name: \"user_id\")\n// }\n\nmodel User {\n  id Int @default(autoincrement()) @id\n}\n";
+    let dm = "// The underlying table does not contain a valid unique identifier and can therefore currently not be handled.\n// model Post {\n  // id      Int\n  // user_id Int\n  // User    User @relation(fields: [user_id], references: [id])\n\n  // @@index([user_id], name: \"user_id\")\n// }\n\nmodel User {\n  id      Int    @default(autoincrement()) @id\n  // Post Post[]\n}\n";
 
     let result = dbg!(api.introspect().await);
     assert_eq!(&result, dm);
@@ -134,11 +170,11 @@ async fn introspecting_a_table_with_only_an_unsupported_id_type_should_comment_i
     let warnings = dbg!(api.introspection_warnings().await);
     assert_eq!(
         &warnings,
-        "[{\"code\":1,\"message\":\"The following models were commented out as they do not have a unique identifier or id. This is currently not supported by Prisma.\",\"affected\":[{\"model\":\"Test\"}]},{\"code\":3,\"message\":\"These fields were commented out because Prisma currently does not support their types.\",\"affected\":[{\"model\":\"Test\",\"field\":\"network_mac\",\"tpe\":\"macaddr\"}]}]"
+        "[{\"code\":1,\"message\":\"The following models were commented out as they do not have a valid unique identifier or id. This is currently not supported by Prisma.\",\"affected\":[{\"model\":\"Test\"}]},{\"code\":3,\"message\":\"These fields were commented out because Prisma currently does not support their types.\",\"affected\":[{\"model\":\"Test\",\"field\":\"network_mac\",\"tpe\":\"macaddr\"}]}]"
     );
 
     let result = dbg!(api.introspect().await);
-    assert_eq!(&result, "// The underlying table does not contain a unique identifier and can therefore currently not be handled.\n// model Test {\n  // dummy       Int\n  // This type is currently not supported.\n  // network_mac macaddr @id\n// }\n");
+    assert_eq!(&result, "// The underlying table does not contain a valid unique identifier and can therefore currently not be handled.\n// model Test {\n  // dummy       Int\n  // This type is currently not supported.\n  // network_mac macaddr @id\n// }\n");
 }
 
 #[test_each_connector(tags("postgres"))]

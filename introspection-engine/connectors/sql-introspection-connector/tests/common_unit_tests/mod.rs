@@ -191,12 +191,12 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
             fields: vec![
                 Field::ScalarField(ScalarField::new(
                     "no_default",
-                    FieldArity::Optional,
+                    FieldArity::Required,
                     FieldType::Base(ScalarType::Int, None),
                 )),
                 Field::ScalarField(ScalarField {
                     name: "int_default".to_string(),
-                    arity: FieldArity::Optional,
+                    arity: FieldArity::Required,
                     field_type: FieldType::Base(ScalarType::Int, None),
                     database_name: None,
                     default_value: Some(dml::DefaultValue::Single(PrismaValue::Int(1))),
@@ -264,13 +264,13 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
             columns: vec![
                 Column {
                     name: "no_default".to_string(),
-                    tpe: ColumnType::pure(ColumnTypeFamily::Int, ColumnArity::Nullable),
+                    tpe: ColumnType::pure(ColumnTypeFamily::Int, ColumnArity::Required),
                     default: None,
                     auto_increment: false,
                 },
                 Column {
                     name: "int_default".to_string(),
-                    tpe: ColumnType::pure(ColumnTypeFamily::Int, ColumnArity::Nullable),
+                    tpe: ColumnType::pure(ColumnTypeFamily::Int, ColumnArity::Required),
                     default: Some(DefaultValue::VALUE(PrismaValue::Int(1))),
                     auto_increment: false,
                 },
