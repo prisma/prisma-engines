@@ -4,7 +4,6 @@
 
 mod component;
 mod database_info;
-mod datamodel_helpers;
 mod error;
 mod flavour;
 mod sql_database_migration_inferrer;

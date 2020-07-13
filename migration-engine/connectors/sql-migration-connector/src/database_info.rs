@@ -1,5 +1,5 @@
 use super::SqlResult;
-use datamodel::Datamodel;
+use datamodel::{walkers::walk_scalar_fields, Datamodel};
 use migration_connector::MigrationError;
 use quaint::{
     prelude::{ConnectionInfo, Queryable, SqlFamily},
@@ -77,7 +77,7 @@ async fn get_database_version(connection: &Quaint, connection_info: &ConnectionI
 }
 
 fn check_datamodel_for_mysql_5_6(datamodel: &Datamodel, errors: &mut Vec<MigrationError>) {
-    crate::datamodel_helpers::walk_scalar_fields(datamodel).for_each(|field| {
+    walk_scalar_fields(datamodel).for_each(|field| {
         if field.field_type().is_json() {
             errors.push(MigrationError {
                 description: format!(
