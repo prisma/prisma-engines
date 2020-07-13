@@ -1,5 +1,5 @@
 use super::SqlResult;
-use datamodel::{Datamodel, walkers::walk_scalar_fields};
+use datamodel::{walkers::walk_scalar_fields, Datamodel};
 use migration_connector::MigrationError;
 use quaint::{
     prelude::{ConnectionInfo, Queryable, SqlFamily},

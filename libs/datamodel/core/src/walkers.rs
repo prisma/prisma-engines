@@ -7,7 +7,10 @@ use crate::{
 };
 
 pub fn walk_models<'a>(datamodel: &'a Datamodel) -> impl Iterator<Item = ModelWalker<'a>> + 'a {
-    datamodel.models.iter().map(move |model| ModelWalker { datamodel, model })
+    datamodel
+        .models
+        .iter()
+        .map(move |model| ModelWalker { datamodel, model })
 }
 
 /// Iterator to walk all the scalar fields in the schema, associating them with their parent model.

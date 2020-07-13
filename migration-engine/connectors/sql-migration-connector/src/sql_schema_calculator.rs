@@ -1,9 +1,10 @@
-use crate::{
-    error::SqlError,
-    sql_renderer::IteratorJoin,
-    DatabaseInfo, SqlResult,
+use crate::{error::SqlError, sql_renderer::IteratorJoin, DatabaseInfo, SqlResult};
+use datamodel::{
+    common::*,
+    walkers::{walk_models, walk_scalar_fields, ModelWalker, ScalarFieldWalker, TypeWalker},
+    Datamodel, DefaultValue, FieldArity, IndexDefinition, IndexType, ValueGenerator, ValueGeneratorFn,
+    WithDatabaseName,
 };
-use datamodel::{walkers::{ModelWalker, ScalarFieldWalker, TypeWalker, walk_scalar_fields, walk_models}, common::*, Datamodel, WithDatabaseName, DefaultValue, ValueGenerator, ValueGeneratorFn, IndexDefinition, IndexType, FieldArity};
 use prisma_models::{DatamodelConverter, TempManifestationHolder, TempRelationHolder};
 use prisma_value::PrismaValue;
 use quaint::prelude::SqlFamily;
@@ -309,7 +310,9 @@ fn migration_value_new(field: &ScalarFieldWalker<'_>) -> Option<sql_schema_descr
         datamodel::DefaultValue::Expression(expression) if expression.name == "now" && expression.args.is_empty() => {
             return Some(sql_schema_describer::DefaultValue::NOW)
         }
-        datamodel::DefaultValue::Expression(expression) if expression.name == "dbgenerated" && expression.args.is_empty() => {
+        datamodel::DefaultValue::Expression(expression)
+            if expression.name == "dbgenerated" && expression.args.is_empty() =>
+        {
             return Some(sql_schema_describer::DefaultValue::DBGENERATED(String::new()))
         }
         datamodel::DefaultValue::Expression(_) => return None,
