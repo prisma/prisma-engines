@@ -68,7 +68,20 @@ pub async fn listen(opts: PrismaOpt) -> PrismaResult<()> {
     info!("Started http server");
 
     // Start the Tide server and log the server details.
-    app.listen((&*opts.host, opts.port)).await?;
+    // TODO: Tide should have a panicking listen_unix impl.
+    #[allow(unused_variables)]
+    if let Some(path) = opts.unix_path() {
+        #[cfg(unix)]
+        {
+            app.listen_unix(path).await?;
+        }
+        #[cfg(not(unix))]
+        {
+            panic!("Unix domain sockets are only supported on Unix; please use TCP instead.")
+        }
+    } else {
+        app.listen((&*opts.host, opts.port)).await?;
+    }
     Ok(())
 }
 
