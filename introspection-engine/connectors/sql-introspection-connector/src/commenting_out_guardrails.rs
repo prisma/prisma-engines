@@ -11,17 +11,6 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
     let mut enum_values_with_empty_names = vec![];
     let mut unsupported_types = vec![];
 
-    // find models with 1to1 relations
-    let mut models_with_one_to_one_relation = vec![];
-    for model in &datamodel.models {
-        if model
-            .relation_fields()
-            .any(|f| !f.is_list() && !datamodel.find_related_field_bang(&f).is_list())
-        {
-            models_with_one_to_one_relation.push(model.name.clone())
-        }
-    }
-
     //todo more stuff to handle when commenting out. (Maybe it is easier to just work on supporting it.)
     // models with empty names?
     // also needs to follow the field references (relations, indexes, ids...)
@@ -91,7 +80,7 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
 
     // models without uniques / ids
     for model in &mut datamodel.models {
-        if model.strict_unique_criterias().is_empty() && !models_with_one_to_one_relation.contains(&model.name) {
+        if model.strict_unique_criterias().is_empty() {
             model.is_commented_out = true;
             model.documentation = Some(
                 "The underlying table does not contain a valid unique identifier and can therefore currently not be handled."
