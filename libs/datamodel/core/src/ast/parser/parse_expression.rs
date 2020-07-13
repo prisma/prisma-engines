@@ -27,7 +27,7 @@ fn parse_function(token: &Token) -> Expression {
     let mut name: Option<String> = None;
     let mut arguments: Vec<Expression> = vec![];
 
-    for current in token.filtered_children().into_iter() {
+    for current in token.filtered_children() {
         match current.as_rule() {
             Rule::non_empty_identifier => name = Some(current.as_str().to_string()),
             Rule::expression => arguments.push(parse_expression(&current)),
@@ -44,7 +44,7 @@ fn parse_function(token: &Token) -> Expression {
 fn parse_array(token: &Token) -> Expression {
     let mut elements: Vec<Expression> = vec![];
 
-    for current in token.filtered_children().into_iter() {
+    for current in token.filtered_children() {
         match current.as_rule() {
             Rule::expression => elements.push(parse_expression(&current)),
             _ => parsing_catch_all(&current, "array"),

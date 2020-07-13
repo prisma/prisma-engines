@@ -9,7 +9,7 @@ pub fn parse_directive(token: &Token) -> Directive {
     let mut name: Option<Identifier> = None;
     let mut arguments: Vec<Argument> = vec![];
 
-    for current in token.filtered_children().into_iter() {
+    for current in token.filtered_children() {
         match current.as_rule() {
             Rule::directive => return parse_directive(&current),
             Rule::directive_name => name = Some(current.to_id()),
@@ -29,7 +29,7 @@ pub fn parse_directive(token: &Token) -> Directive {
 }
 
 fn parse_directive_args(token: &Token, arguments: &mut Vec<Argument>) {
-    for current in token.filtered_children().into_iter() {
+    for current in token.filtered_children() {
         match current.as_rule() {
             // This is a named arg.
             Rule::argument => arguments.push(parse_directive_arg(&current)),
@@ -48,7 +48,7 @@ fn parse_directive_arg(token: &Token) -> Argument {
     let mut name: Option<Identifier> = None;
     let mut argument: Option<Expression> = None;
 
-    for current in token.filtered_children().into_iter() {
+    for current in token.filtered_children() {
         match current.as_rule() {
             Rule::argument_name => name = Some(current.to_id()),
             Rule::argument_value => argument = Some(parse_arg_value(&current)),

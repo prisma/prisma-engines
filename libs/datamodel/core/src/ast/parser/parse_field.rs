@@ -14,7 +14,7 @@ pub fn parse_field(model_name: &str, token: &Token) -> Result<Field, DatamodelEr
     let mut field_type: Option<((FieldArity, String), Span)> = None;
     let mut comments: Vec<String> = Vec::new();
 
-    for current in token.filtered_children().into_iter() {
+    for current in token.filtered_children() {
         match current.as_rule() {
             Rule::non_empty_identifier => name = Some(current.to_id()),
             Rule::field_type => field_type = Some((parse_field_type(&current)?, Span::from_pest(current.as_span()))),

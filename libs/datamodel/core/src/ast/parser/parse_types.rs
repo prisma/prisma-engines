@@ -13,7 +13,7 @@ pub fn parse_type_alias(token: &Token) -> Field {
     let mut base_type: Option<(String, Span)> = None;
     let mut comment: Option<Comment> = None;
 
-    for current in token.filtered_children().into_iter() {
+    for current in token.filtered_children() {
         match current.as_rule() {
             Rule::TYPE_KEYWORD => {}
             Rule::non_empty_identifier => name = Some(current.to_id()),

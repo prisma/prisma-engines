@@ -15,7 +15,7 @@ pub fn parse_enum(token: &Token) -> Result<Enum, ErrorCollection> {
     let mut values: Vec<EnumValue> = vec![];
     let mut comment: Option<Comment> = None;
 
-    for current in token.filtered_children().into_iter() {
+    for current in token.filtered_children() {
         match current.as_rule() {
             Rule::non_empty_identifier => name = Some(current.to_id()),
             Rule::block_level_directive => directives.push(parse_directive(&current)),
@@ -55,7 +55,7 @@ fn parse_enum_value(enum_name: &str, token: &Token) -> Result<EnumValue, Datamod
     let mut comments: Vec<String> = vec![];
 
     // todo validate that the identifier is valid???
-    for current in token.filtered_children().into_iter() {
+    for current in token.filtered_children() {
         match current.as_rule() {
             Rule::non_empty_identifier => name = Some(current.to_id()),
             Rule::maybe_empty_identifier => name = Some(current.to_id()),
