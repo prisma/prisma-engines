@@ -48,8 +48,14 @@ impl<'a> ColumnDiffer<'a> {
             None
         };
 
+        let sequence = if self.previous.auto_increment() != self.next.auto_increment() {
+            Some(ColumnChange::Sequence)
+        } else {
+            None
+        };
+
         ColumnChanges {
-            changes: [renaming, r#type, arity, default],
+            changes: [renaming, r#type, arity, default, sequence],
         }
     }
 
@@ -142,11 +148,12 @@ pub(crate) enum ColumnChange {
     Arity,
     Default,
     Type,
+    Sequence,
 }
 
 #[derive(Debug, Clone)]
 pub(crate) struct ColumnChanges {
-    changes: [Option<ColumnChange>; 4],
+    changes: [Option<ColumnChange>; 5],
 }
 
 impl ColumnChanges {
@@ -163,10 +170,10 @@ impl ColumnChanges {
     }
 
     pub(crate) fn only_default_changed(&self) -> bool {
-        matches!(self.changes, [None, None, None, Some(ColumnChange::Default)])
+        matches!(self.changes, [None, None, None, Some(ColumnChange::Default), None])
     }
 
     pub(crate) fn column_was_renamed(&self) -> bool {
-        matches!(self.changes, [Some(ColumnChange::Renaming), _, _, _])
+        matches!(self.changes, [Some(ColumnChange::Renaming), _, _, _, _])
     }
 }

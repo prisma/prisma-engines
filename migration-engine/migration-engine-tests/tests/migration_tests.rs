@@ -187,6 +187,47 @@ async fn adding_an_id_field_of_type_int_with_autoincrement_must_work(api: &TestA
     }
 }
 
+#[test_each_connector(log = "debug,sql_schema_describer=info")]
+async fn making_an_existing_id_field_autoincrement_works(api: &TestApi) -> TestResult {
+    let dm1 = r#"
+        model Post {
+            id        Int        @id
+            content   String?
+            createdAt DateTime
+            published Boolean     @default(false)
+            title     String      @default("")
+            updatedAt DateTime
+        }
+    "#;
+
+    api.infer_apply(dm1).send().await?.assert_green()?;
+
+    api.assert_schema().await?.assert_table("Post", |model| {
+        model.assert_pk(|pk| pk.assert_columns(&["id"])?.assert_has_no_sequence())
+    })?;
+
+    let dm2 = r#"
+        model Post {
+            id        Int        @id @default(autoincrement())
+            content   String?
+            createdAt DateTime
+            published Boolean     @default(false)
+            title     String      @default("")
+            updatedAt DateTime
+        }
+    "#;
+
+    api.infer_apply(dm2).send().await?.assert_green()?;
+
+    api.assert_schema().await?.assert_table("Post", |model| {
+        model
+            .debug_print()?
+            .assert_pk(|pk| pk.assert_columns(&["id"])?.debug_print()?.assert_has_sequence())
+    })?;
+
+    Ok(())
+}
+
 #[test_each_connector]
 async fn removing_a_scalar_field_must_work(api: &TestApi) {
     let dm1 = r#"

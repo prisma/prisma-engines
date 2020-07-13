@@ -83,6 +83,7 @@ pub(crate) fn expand_postgres_alter_column(columns: &ColumnDiffer<'_>) -> Option
                 }
                 _ => return None,
             },
+            ColumnChange::Sequence => todo!("Sequence migrations on postgres"),
             ColumnChange::Renaming => unreachable!("column renaming"),
         }
     }

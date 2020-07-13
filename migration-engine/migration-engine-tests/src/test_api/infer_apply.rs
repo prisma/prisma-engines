@@ -74,6 +74,7 @@ pub struct InferApplyAssertion<'a> {
 }
 
 impl<'a> InferApplyAssertion<'a> {
+    /// Asserts that the command produced no warning, no error, and no unexecutable migration message.
     pub fn assert_green(self) -> AssertionResult<Self> {
         self.assert_no_warning()?.assert_no_error()?.assert_executable()
     }

@@ -219,7 +219,7 @@ impl<'a> TableAssertion<'a> {
             .as_ref()
             .ok_or_else(|| anyhow::anyhow!("Primary key not found on {}.", self.0.name))?;
 
-        pk_assertions(PrimaryKeyAssertion(pk))?;
+        pk_assertions(PrimaryKeyAssertion { pk, table: self.0 })?;
 
         Ok(self)
     }
@@ -244,6 +244,11 @@ impl<'a> TableAssertion<'a> {
             anyhow::bail!("Could not find index on {}.{:?}", self.0.name, columns);
         }
 
+        Ok(self)
+    }
+
+    pub fn debug_print(self) -> AssertionResult<Self> {
+        dbg!(&self.0);
         Ok(self)
     }
 }
@@ -370,21 +375,48 @@ impl<'a> ColumnAssertion<'a> {
     }
 }
 
-pub struct PrimaryKeyAssertion<'a>(&'a PrimaryKey);
+pub struct PrimaryKeyAssertion<'a> {
+    pk: &'a PrimaryKey,
+    table: &'a Table,
+}
 
 impl<'a> PrimaryKeyAssertion<'a> {
     pub fn assert_columns(self, column_names: &[&str]) -> AssertionResult<Self> {
-        assert_eq!(self.0.columns, column_names);
+        assert_eq!(self.pk.columns, column_names);
 
         Ok(self)
     }
 
     pub fn assert_has_sequence(self) -> AssertionResult<Self> {
         anyhow::ensure!(
-            self.0.sequence.is_some(),
-            "Assertion failed: expected a sequence on the primary, found none."
+            self.pk.sequence.is_some()
+                || self
+                    .table
+                    .columns
+                    .iter()
+                    .any(|column| self.pk.columns.contains(&column.name) && column.auto_increment),
+            "Assertion failed: expected a sequence on the primary key, found none."
         );
 
+        Ok(self)
+    }
+
+    pub fn assert_has_no_sequence(self) -> AssertionResult<Self> {
+        anyhow::ensure!(
+            self.pk.sequence.is_none()
+                && !self
+                    .table
+                    .columns
+                    .iter()
+                    .any(|column| self.pk.columns.contains(&column.name) && column.auto_increment),
+            "Assertion failed: expected no sequence on the primary key, but found one."
+        );
+
+        Ok(self)
+    }
+
+    pub fn debug_print(self) -> AssertionResult<Self> {
+        dbg!(&self.pk);
         Ok(self)
     }
 }

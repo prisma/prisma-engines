@@ -1,7 +1,7 @@
 use crate::*;
 use sql_renderer::{postgres_render_column_type, rendered_step::RenderedStep, IteratorJoin, Quoted};
 use sql_schema_describer::*;
-use sql_schema_differ::{ColumnDiffer, DiffingOptions};
+use sql_schema_differ::{ColumnChanges, ColumnDiffer, DiffingOptions};
 use sql_schema_helpers::{find_column, walk_columns, ColumnRef, SqlSchemaExt};
 use std::fmt::Write as _;
 use tracing_futures::Instrument;
@@ -488,46 +488,62 @@ fn safe_alter_column(
             .collect(),
         Some(ExpandedAlterColumn::Mysql(step)) => match step {
             MysqlAlterColumn::DropDefault => vec![format!("{} DROP DEFAULT", &alter_column_prefix)],
-            MysqlAlterColumn::Modify { new_default, changes } => {
-                let column_type: Option<String> = if changes.type_changed() {
-                    Some(next_column.column_type().full_data_type.clone())
-                        .filter(|r| !r.is_empty() || r.contains("datetime")) // @default(now()) does not work with datetimes of certain sizes
-                } else {
-                    Some(next_column.column.tpe.full_data_type.clone()).filter(|r| !r.is_empty())
-                    // Some(previous_column.tpe.full_data_type.clone()).filter(|r| !r.is_empty())
-                };
-
-                let column_type = column_type
-                    .map(Ok)
-                    .unwrap_or_else(|| sql_renderer::mysql_render_column_type(&next_column).map(String::from))?;
-
-                let default = new_default
-                    .map(|default| {
-                        format!(
-                            "DEFAULT {}",
-                            renderer.render_default(&default, &next_column.column_type().family)
-                        )
-                    })
-                    .unwrap_or_else(String::new);
-
-                vec![format!(
-                    "MODIFY {column_name} {column_type} {nullability} {default}",
-                    column_name = Quoted::mysql_ident(&next_column.name()),
-                    column_type = column_type,
-                    nullability = if next_column.arity().is_required() {
-                        "NOT NULL "
-                    } else {
-                        ""
-                    },
-                    default = default,
-                )]
-            }
+            MysqlAlterColumn::Modify { new_default, changes } => vec![render_mysql_modify(
+                &changes,
+                new_default.as_ref(),
+                next_column,
+                renderer,
+            )?],
         },
         Some(ExpandedAlterColumn::Sqlite(_steps)) => vec![],
         None => return Ok(None),
     };
 
     Ok(Some(steps))
+}
+
+fn render_mysql_modify(
+    changes: &ColumnChanges,
+    new_default: Option<&sql_schema_describer::DefaultValue>,
+    next_column: ColumnRef<'_>,
+    renderer: &dyn SqlRenderer,
+) -> anyhow::Result<String> {
+    let column_type: Option<String> = if changes.type_changed() {
+        Some(next_column.column_type().full_data_type.clone()).filter(|r| !r.is_empty() || r.contains("datetime"))
+    // @default(now()) does not work with datetimes of certain sizes
+    } else {
+        Some(next_column.column.tpe.full_data_type.clone()).filter(|r| !r.is_empty())
+    };
+
+    let column_type = column_type
+        .map(Ok)
+        .unwrap_or_else(|| sql_renderer::mysql_render_column_type(&next_column).map(String::from))?;
+
+    let default = new_default
+        .map(|default| {
+            format!(
+                " DEFAULT {}",
+                renderer.render_default(&default, &next_column.column_type().family)
+            )
+        })
+        .unwrap_or_else(String::new);
+
+    Ok(format!(
+        "MODIFY {column_name} {column_type}{nullability}{default}{sequence}",
+        column_name = Quoted::mysql_ident(&next_column.name()),
+        column_type = column_type,
+        nullability = if next_column.arity().is_required() {
+            " NOT NULL"
+        } else {
+            ""
+        },
+        default = default,
+        sequence = if next_column.auto_increment() {
+            " AUTO_INCREMENT"
+        } else {
+            ""
+        },
+    ))
 }
 
 fn render_create_enum(
