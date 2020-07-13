@@ -258,16 +258,6 @@ impl Model {
         self.singular_id_fields().count() == 1
     }
 
-    /// Finds a field with a certain relation guarantee.
-    /// exclude_field are necessary to avoid corner cases with self-relations (e.g. we must not recognize a field as its own related field).
-    pub fn related_field(&self, to: &str, relation_name: &str, exclude_field: &str) -> Option<&RelationField> {
-        self.relation_fields().find(|rf| {
-            rf.relation_info.to == to
-                && rf.relation_info.name == relation_name
-                && (self.name != to || rf.name != exclude_field)
-        })
-    }
-
     pub fn add_index(&mut self, index: IndexDefinition) {
         self.indices.push(index)
     }

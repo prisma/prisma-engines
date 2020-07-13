@@ -229,7 +229,7 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
     {
         for enm in new_data_model.enums() {
             if let Some(old_enum) = old_data_model.find_enum(&enm.name) {
-                for value in &enm.values {
+                for value in enm.values() {
                     if let Some(old_value) =
                         old_enum.find_value_db_name(value.database_name.as_ref().unwrap_or(&value.name.to_owned()))
                     {

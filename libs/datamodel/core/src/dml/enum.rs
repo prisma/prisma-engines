@@ -43,8 +43,7 @@ impl Enum {
 
     /// Gets an iterator over all database values.
     pub fn database_values(&self) -> Vec<String> {
-        self.values
-            .iter()
+        self.values()
             .map(|v| v.database_name.as_ref().unwrap_or(&v.name).to_owned())
             .collect()
     }

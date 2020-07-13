@@ -161,10 +161,8 @@ impl Standardiser {
             let mut back_field_exists = false;
 
             let related_model = schema.find_model(&rel_info.to).expect(STATE_ERROR);
-            if related_model
-                .related_field(&model.name, &rel_info.name, &field.name)
-                .is_some()
-            {
+
+            if schema.find_related_field(&field).is_some() {
                 back_field_exists = true;
             }
 

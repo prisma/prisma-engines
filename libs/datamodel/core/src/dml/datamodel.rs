@@ -162,9 +162,14 @@ impl Datamodel {
             })
     }
 
-    // This is used once we assume the datamodel to be internally valid
-    pub fn find_related_field_bang(&self, rf: &RelationField) -> &RelationField {
+    /// This finds the related field for a relationfield if available
+    pub fn find_related_field(&self, rf: &RelationField) -> Option<&RelationField> {
         self.find_related_field_for_info(&rf.relation_info, &rf.name)
+    }
+
+    /// This is used once we assume the datamodel to be internally valid
+    pub fn find_related_field_bang(&self, rf: &RelationField) -> &RelationField {
+        self.find_related_field(rf)
             .expect("Every RelationInfo should have a complementary RelationInfo on the opposite relation field.")
     }
 }

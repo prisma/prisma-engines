@@ -39,7 +39,7 @@ fn enum_to_dmmf(en: &dml::Enum) -> Enum {
         documentation: en.documentation.clone(),
     };
 
-    for enum_value in &en.values {
+    for enum_value in en.values() {
         enm.values.push(enum_value_to_dmmf(enum_value));
     }
 

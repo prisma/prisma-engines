@@ -99,7 +99,7 @@ pub fn sanitize_datamodel_names(datamodel: &mut Datamodel) {
             enm.database_name = enum_db_name.to_owned();
         }
 
-        for enum_value in &mut enm.values {
+        for enum_value in enm.values_mut() {
             if &enum_value.name == EMPTY_STRING {
                 enum_value.name = EMPTY_ENUM_PLACEHOLDER.to_string();
                 enum_value.database_name = Some(EMPTY_STRING.to_string());
