@@ -484,6 +484,7 @@ fn safe_alter_column(
                     &alter_column_prefix,
                     postgres_render_column_type(&ty)
                 ),
+                PostgresAlterColumn::AddSequence => todo!("postgres AddSequence"),
             })
             .collect(),
         Some(ExpandedAlterColumn::Mysql(step)) => match step {
@@ -538,7 +539,7 @@ fn render_mysql_modify(
             ""
         },
         default = default,
-        sequence = if next_column.auto_increment() {
+        sequence = if next_column.is_autoincrement() {
             " AUTO_INCREMENT"
         } else {
             ""

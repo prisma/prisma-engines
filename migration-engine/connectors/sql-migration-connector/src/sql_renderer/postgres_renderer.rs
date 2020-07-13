@@ -20,7 +20,7 @@ impl super::SqlRenderer for PostgresFlavour {
             .filter(|default| !matches!(default, DefaultValue::DBGENERATED(_)))
             .map(|default| format!("DEFAULT {}", self.render_default(default, &column.column.tpe.family)))
             .unwrap_or_else(String::new);
-        let is_serial = column.auto_increment();
+        let is_serial = column.is_autoincrement();
 
         if is_serial {
             format!("{} SERIAL", column_name)

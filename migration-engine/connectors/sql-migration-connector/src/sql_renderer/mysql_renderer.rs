@@ -27,12 +27,16 @@ impl SqlRenderer for MysqlFlavour {
             .map(|default| format!("DEFAULT {}", self.render_default(default, &column.column.tpe.family)))
             .unwrap_or_else(String::new);
         let foreign_key = column.table().foreign_key_for_column(column.name());
-        let auto_increment_str = if column.auto_increment() { "AUTO_INCREMENT" } else { "" };
+        let auto_increment_str = if column.is_autoincrement() {
+            " AUTO_INCREMENT"
+        } else {
+            ""
+        };
 
         match foreign_key {
             Some(_) => format!("{} {} {} {}", column_name, tpe_str, nullability_str, default_str),
             None => format!(
-                "{} {} {} {} {}",
+                "{} {} {} {}{}",
                 column_name, tpe_str, nullability_str, default_str, auto_increment_str
             ),
         }

@@ -48,7 +48,7 @@ impl<'a> ColumnDiffer<'a> {
             None
         };
 
-        let sequence = if self.previous.auto_increment() != self.next.auto_increment() {
+        let sequence = if self.previous.is_autoincrement() != self.next.is_autoincrement() {
             Some(ColumnChange::Sequence)
         } else {
             None
@@ -78,7 +78,7 @@ impl<'a> ColumnDiffer<'a> {
     ///
     /// - We bail on a number of cases that are too complex to deal with right now or underspecified.
     fn defaults_match(&self) -> bool {
-        if self.previous.auto_increment() {
+        if self.previous.is_autoincrement() {
             return true;
         }
 

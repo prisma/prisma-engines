@@ -40,6 +40,7 @@ impl DestructiveChangeCheckerFlavour for PostgresFlavour {
                         }
                     }
                     PostgresAlterColumn::SetDefault(_)
+                    | PostgresAlterColumn::AddSequence
                     | PostgresAlterColumn::DropDefault
                     | PostgresAlterColumn::DropNotNull => (),
                 }

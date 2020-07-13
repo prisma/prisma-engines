@@ -83,7 +83,15 @@ pub(crate) fn expand_postgres_alter_column(columns: &ColumnDiffer<'_>) -> Option
                 }
                 _ => return None,
             },
-            ColumnChange::Sequence => todo!("Sequence migrations on postgres"),
+            ColumnChange::Sequence => {
+                if columns.previous.is_autoincrement() {
+                    // // The sequence should be dropped.
+                    // changes.push(PostgresAlterColumn::DropDefault)
+                } else {
+                    // The sequence should be created.
+                    changes.push(PostgresAlterColumn::AddSequence)
+                }
+            }
             ColumnChange::Renaming => unreachable!("column renaming"),
         }
     }
@@ -106,6 +114,8 @@ pub(crate) enum PostgresAlterColumn {
     DropNotNull,
     SetType(ColumnType),
     SetNotNull,
+    // Add an auto-incrementing sequence as a default on the column.
+    AddSequence,
 }
 
 /// https://dev.mysql.com/doc/refman/8.0/en/alter-table.html

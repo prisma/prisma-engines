@@ -20,7 +20,7 @@ impl SqlRenderer for SqliteFlavour {
             .filter(|default| !matches!(default, DefaultValue::DBGENERATED(_)))
             .map(|default| format!(" DEFAULT {}", self.render_default(default, &column.column.tpe.family)))
             .unwrap_or_else(String::new);
-        let auto_increment_str = if column.auto_increment() {
+        let auto_increment_str = if column.is_autoincrement() {
             " PRIMARY KEY AUTOINCREMENT"
         } else {
             ""
