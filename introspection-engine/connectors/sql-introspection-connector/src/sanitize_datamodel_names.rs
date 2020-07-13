@@ -1,4 +1,3 @@
-use crate::misc_helpers::replace_field_names;
 use datamodel::{Datamodel, DefaultValue, Field, FieldType, WithName};
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
@@ -14,30 +13,23 @@ pub fn sanitize_datamodel_names(datamodel: &mut Datamodel) {
 
     for model in datamodel.models_mut() {
         let (sanitized_model_name, model_db_name) = sanitize_name(model.name.clone());
+        let model_name = model.name.clone();
+        sanitize_names(&mut model.id_fields);
 
-        for field in &mut model.fields {
+        for field in model.fields_mut() {
             let (sanitized_field_name, field_db_name) = sanitize_name(field.name().to_string());
-            replace_field_names(&mut model.id_fields, field.name(), &sanitized_field_name);
 
             match field {
                 Field::RelationField(rf) => {
                     let info = &mut rf.relation_info;
                     info.name = sanitize_name(info.name.clone()).0;
                     info.to = sanitize_name(info.to.clone()).0;
-                    info.to_fields = info
-                        .to_fields
-                        .iter()
-                        .map(|f: &std::string::String| sanitize_name(f.clone()).0)
-                        .collect();
-                    info.fields = info
-                        .fields
-                        .iter()
-                        .map(|f: &std::string::String| sanitize_name(f.clone()).0)
-                        .collect();
+                    sanitize_names(&mut info.to_fields);
+                    sanitize_names(&mut info.fields);
                 }
                 Field::ScalarField(sf) => {
                     if let FieldType::Enum(enum_name) = &sf.field_type {
-                        let (sanitized_enum_name, enum_db_name) = if *enum_name == format!("{}_{}", model.name, sf.name)
+                        let (sanitized_enum_name, enum_db_name) = if *enum_name == format!("{}_{}", model_name, sf.name)
                         {
                             //MySql
                             if model_db_name.is_none() && field_db_name.is_none() {
@@ -82,7 +74,7 @@ pub fn sanitize_datamodel_names(datamodel: &mut Datamodel) {
         }
 
         for index in &mut model.indices {
-            index.fields = index.fields.iter().map(|f| sanitize_name(f.clone()).0).collect();
+            sanitize_names(&mut index.fields);
         }
 
         model.name = sanitized_model_name;
@@ -130,4 +122,8 @@ fn sanitize_name(name: String) -> (String, Option<String>) {
     } else {
         (name, None)
     }
+}
+
+fn sanitize_names(names: &mut [String]) {
+    names.iter().map(|f| sanitize_name(f.clone()).0).count();
 }
