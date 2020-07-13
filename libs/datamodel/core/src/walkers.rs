@@ -7,10 +7,7 @@ use crate::{
 };
 
 pub fn walk_models<'a>(datamodel: &'a Datamodel) -> impl Iterator<Item = ModelWalker<'a>> + 'a {
-    datamodel
-        .models
-        .iter()
-        .map(move |model| ModelWalker { datamodel, model })
+    datamodel.models().map(move |model| ModelWalker { datamodel, model })
 }
 
 /// Iterator to walk all the scalar fields in the schema, associating them with their parent model.
@@ -143,10 +140,7 @@ impl<'a> ScalarFieldWalker<'a> {
     }
 
     pub fn is_required(&self) -> bool {
-        match self.arity() {
-            FieldArity::Required => true,
-            _ => false,
-        }
+        self.field.is_required()
     }
 
     pub fn is_unique(&self) -> bool {
@@ -198,21 +192,19 @@ impl<'a> RelationFieldWalker<'a> {
     }
 
     pub fn is_one_to_one(&self) -> bool {
-        self.field.is_singular() && self.opposite_side().map(|rel| rel.field.is_singular()).unwrap_or(false)
+        self.field.is_singular() && self.opposite_side().field.is_singular()
     }
 
     pub fn is_virtual(&self) -> bool {
         self.field.relation_info.fields.is_empty()
     }
 
-    pub fn opposite_side(&self) -> Option<RelationFieldWalker<'a>> {
-        self.referenced_model_ref().relation_fields().find(|relation_field| {
-            relation_field.relation_name() == self.relation_name()
-                    && relation_field.referenced_model().name.as_str() == self.model.name
-                    // This is to differentiate the opposite field from self in the self relation case.
-                    && relation_field.field.relation_info.to_fields != self.field.relation_info.to_fields
-                    && relation_field.field.relation_info.fields != self.field.relation_info.fields
-        })
+    pub fn opposite_side(&self) -> RelationFieldWalker<'a> {
+        RelationFieldWalker {
+            datamodel: self.datamodel,
+            model: self.referenced_model(),
+            field: self.datamodel.find_related_field_bang(self.field),
+        }
     }
 
     pub fn referencing_columns<'b>(&'b self) -> impl Iterator<Item = &'a str> + 'b {
@@ -261,13 +253,6 @@ impl<'a> RelationFieldWalker<'a> {
                     self.field.relation_info.to
                 )
             })
-    }
-
-    fn referenced_model_ref(&self) -> ModelWalker<'a> {
-        ModelWalker {
-            model: self.referenced_model(),
-            datamodel: self.datamodel,
-        }
     }
 }
 
