@@ -30,7 +30,7 @@ fn a_data_model_can_be_generated_from_a_schema() {
             database_name: None,
             name: "Table1".to_string(),
             documentation: Some(
-                "The underlying table does not contain a unique identifier and can therefore currently not be handled."
+                "The underlying table does not contain a valid unique identifier and can therefore currently not be handled."
                     .to_string(),
             ),
             is_embedded: false,
