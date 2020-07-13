@@ -315,9 +315,9 @@ pub(crate) fn calculate_scalar_field_type(column: &Column) -> FieldType {
 pub fn deduplicate_field_names(datamodel: &mut Datamodel) {
     let mut duplicated_relation_fields = vec![];
 
-    for model in &datamodel.models {
+    for model in datamodel.models() {
         for field in model.relation_fields() {
-            if model.fields.iter().filter(|f| field.name == f.name()).count() > 1 {
+            if model.fields().filter(|f| field.name == f.name()).count() > 1 {
                 duplicated_relation_fields.push((
                     model.name.clone(),
                     field.name.clone(),

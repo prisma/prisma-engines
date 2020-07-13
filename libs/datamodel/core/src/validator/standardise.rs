@@ -38,7 +38,7 @@ impl Standardiser {
             let unique_criteria = self.unique_criteria(&cloned_model);
             let model = &mut schema.models[model_idx];
 
-            for field_index in 0..model.fields.len() {
+            for field_index in 0..model.fields().len() {
                 let field = &mut model.fields[field_index];
 
                 if let Field::RelationField(field) = field {

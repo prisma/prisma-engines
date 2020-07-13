@@ -82,7 +82,7 @@ pub fn introspect(
     let mut fields_to_be_added = Vec::new();
 
     // add backrelation fields
-    for model in data_model.models.iter() {
+    for model in data_model.models() {
         for relation_field in model.relation_fields() {
             let relation_info = &relation_field.relation_info;
             if data_model

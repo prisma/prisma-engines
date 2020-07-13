@@ -50,7 +50,7 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
     //@@map on models
     let mut changed_model_names = vec![];
     {
-        for model in &new_data_model.models {
+        for model in new_data_model.models() {
             if let Some(old_model) =
                 old_data_model.find_model_db_name(&model.database_name.as_ref().unwrap_or(&model.name))
             {
@@ -83,7 +83,7 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
     // @map on fields
     let mut changed_scalar_field_names = vec![];
     {
-        for model in &new_data_model.models {
+        for model in new_data_model.models() {
             if let Some(old_model) = &old_data_model.find_model(&model.name) {
                 for field in model.scalar_fields() {
                     if let Some(old_field) =
@@ -269,7 +269,7 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
     //virtual relationfield names
     let mut changed_relation_field_names = vec![];
     {
-        for model in &new_data_model.models {
+        for model in new_data_model.models() {
             for field in model.relation_fields() {
                 if let Some(old_model) = old_data_model.find_model(&model.name) {
                     for old_field in old_model.relation_fields() {

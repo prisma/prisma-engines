@@ -17,7 +17,7 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
     // also needs to drop usages of removed enum values
 
     // fields with an empty name
-    for model in &mut datamodel.models {
+    for model in datamodel.models_mut() {
         let model_name = model.name.clone();
 
         for field in model.scalar_fields_mut() {
@@ -54,7 +54,7 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
     }
 
     // fields with unsupported as datatype
-    for model in &mut datamodel.models {
+    for model in datamodel.models_mut() {
         let model_name = model.name.clone();
 
         for field in model.scalar_fields_mut() {
@@ -79,7 +79,7 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
     }
 
     // models without uniques / ids
-    for model in &mut datamodel.models {
+    for model in datamodel.models_mut() {
         if model.strict_unique_criterias().is_empty() {
             model.is_commented_out = true;
             model.documentation = Some(
@@ -94,7 +94,7 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
 
     // remove their backrelations
     for model_without_identifier in &models_without_identifiers {
-        for model in &mut datamodel.models {
+        for model in datamodel.models_mut() {
             for field in model.relation_fields_mut() {
                 if field.points_to_model(&model_without_identifier.model) {
                     field.is_commented_out = true;

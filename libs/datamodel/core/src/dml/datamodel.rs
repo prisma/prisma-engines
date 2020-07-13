@@ -78,7 +78,7 @@ impl Datamodel {
 
     /// Finds a model by name.
     pub fn find_model(&self, name: &str) -> Option<&Model> {
-        self.models.iter().find(|model| model.name == name)
+        self.models().find(|model| model.name == name)
     }
 
     /// Finds a model by database name.
@@ -135,7 +135,7 @@ impl Datamodel {
     pub fn find_enum_fields(&mut self, enum_name: &str) -> Vec<(String, String)> {
         let mut fields = vec![];
 
-        for model in &self.models {
+        for model in self.models() {
             for field in model.scalar_fields() {
                 if FieldType::Enum(enum_name.to_owned()) == field.field_type {
                     fields.push((model.name.clone(), field.name.clone()))
@@ -148,7 +148,7 @@ impl Datamodel {
     /// Returns (model_name, field_name) for all relation fields pointing to a specific model.
     pub fn find_relation_fields_for_model(&mut self, model_name: &str) -> Vec<(String, String)> {
         let mut fields = vec![];
-        for model in &self.models {
+        for model in self.models() {
             for field in model.relation_fields() {
                 if field.relation_info.to == model_name {
                     fields.push((model.name.clone(), field.name.clone()))

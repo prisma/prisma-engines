@@ -11,7 +11,7 @@ static EMPTY_STRING: &'static str = "";
 pub fn sanitize_datamodel_names(datamodel: &mut Datamodel) {
     let mut enum_renames = HashMap::new();
 
-    for model in &mut datamodel.models {
+    for model in datamodel.models_mut() {
         let (sanitized_model_name, model_db_name) = sanitize_name(model.name.clone());
 
         for field in &mut model.fields {
