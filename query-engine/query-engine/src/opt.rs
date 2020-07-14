@@ -50,8 +50,14 @@ pub struct PrismaOpt {
     pub host: String,
 
     /// The port the query engine should bind to.
-    #[structopt(long, short, env, default_value = "4466")]
+    // NOTE: this is mutually exclusive with path
+    #[structopt(long, short, env, default_value = "4466", group = "port")]
     pub port: u16,
+
+    /// The unix socket path to listen on
+    // NOTE: this is mutually exclusive with port.
+    #[structopt(long, short, env, group = "port")]
+    unix_path: Option<String>,
 
     /// Path to the Prisma datamodel file
     #[structopt(long, env = "PRISMA_DML_PATH", parse(from_os_str = load_datamodel_file))]
@@ -154,6 +160,11 @@ impl PrismaOpt {
             Some("devel") => crate::LogFormat::Text,
             _ => crate::LogFormat::Json,
         }
+    }
+
+    /// The unix path to listen on.
+    pub(crate) fn unix_path(&self) -> Option<&String> {
+        self.unix_path.as_ref()
     }
 }
 
