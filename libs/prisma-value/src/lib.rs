@@ -63,7 +63,7 @@ impl TryFrom<serde_json::Value> for PrismaValue {
     fn try_from(v: serde_json::Value) -> PrismaValueResult<Self> {
         match v {
             serde_json::Value::String(s) => Ok(serde_json::from_str(&s)
-                .map(|val| PrismaValue::Json(val))
+                .map(PrismaValue::Json)
                 .unwrap_or(PrismaValue::String(s))),
             serde_json::Value::Array(v) => {
                 let vals: PrismaValueResult<Vec<PrismaValue>> = v.into_iter().map(PrismaValue::try_from).collect();
@@ -104,7 +104,7 @@ fn serialize_date<S>(date: &DateTime<Utc>, serializer: S) -> Result<S::Ok, S::Er
 where
     S: Serializer,
 {
-    format!("{}", stringify_date(date)).serialize(serializer)
+    stringify_date(date).serialize(serializer)
 }
 
 fn serialize_null<S>(_: &TypeHint, serializer: S) -> Result<S::Ok, S::Error>
@@ -198,8 +198,8 @@ impl TryFrom<f64> for PrismaValue {
         // Decimal::from_f64 is buggy. Issue: https://github.com/paupino/rust-decimal/issues/228
         Decimal::from_str(&f.to_string())
             .ok()
-            .map(|d| PrismaValue::Float(d))
-            .ok_or(ConversionFailure::new("f64", "Decimal"))
+            .map(PrismaValue::Float)
+            .ok_or_else(|| ConversionFailure::new("f64", "Decimal"))
     }
 }
 

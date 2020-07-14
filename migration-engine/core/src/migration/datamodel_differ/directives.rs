@@ -61,8 +61,7 @@ pub(crate) fn directives_are_identical(previous: &ast::Directive, next: &ast::Di
     previous.arguments.iter().all(move |previous_argument| {
         next.arguments
             .iter()
-            .find(|next_argument| arguments_are_identical(previous_argument, next_argument))
-            .is_some()
+            .any(|next_argument| arguments_are_identical(previous_argument, next_argument))
     })
 }
 

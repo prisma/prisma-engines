@@ -242,7 +242,7 @@ fn push_created_sources<'a>(steps: &mut Steps, sources: impl Iterator<Item = &'a
     }
 }
 
-fn push_created_source_argument<'a>(steps: &mut Steps, location: &steps::ArgumentLocation, argument: &ast::Argument) {
+fn push_created_source_argument(steps: &mut Steps, location: &steps::ArgumentLocation, argument: &ast::Argument) {
     // Datasource URLs should always be masked here. Otherwise they will end up in clear text in `steps.json` or the Readme in the migrations folder.
     if argument.name.name == "url" {
         let mut cloned = argument.clone();

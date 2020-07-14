@@ -126,7 +126,7 @@ impl InferMigrationStepsCommand<'_> {
             .or_else(|| {
                 self.input.assume_applied_migrations.as_ref().map(|migrations| {
                     migrations
-                        .into_iter()
+                        .iter()
                         .flat_map(|migration| migration.datamodel_steps.clone().into_iter())
                         .collect()
                 })
