@@ -125,5 +125,5 @@ fn sanitize_name(name: String) -> (String, Option<String>) {
 }
 
 fn sanitize_names(names: &mut [String]) {
-    names.iter().map(|f| sanitize_name(f.clone()).0).count();
+    names.iter_mut().map(|f| *f = sanitize_name(f.to_string()).0).count();
 }

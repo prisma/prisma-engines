@@ -1,5 +1,12 @@
 use super::*;
 
+/// Entities in the datamodel can be flagged as `is_commented_out`. This let's the renderer
+/// know that introspection encountered unsupported names or features and these are supposed
+/// to be rendered as comments. Since the parser will not set these flags when reading a schema
+/// string, only introspection and the lowering of the datamodel to the ast care about these flags.
+/// The FieldType: Unsupported behaves in the same way.
+/// Both of these are never converted into the internal datamodel.
+
 /// Represents a prisma-datamodel.
 #[derive(Debug, PartialEq, Clone)]
 pub struct Datamodel {
