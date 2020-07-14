@@ -1,5 +1,10 @@
 use super::{common::*, SqlRenderer};
-use crate::{flavour::MysqlFlavour, sql_schema_helpers::ColumnRef};
+use crate::{
+    expanded_alter_column::{expand_mysql_alter_column, MysqlAlterColumn},
+    flavour::{MysqlFlavour, SqlFlavour},
+    sql_schema_differ::{ColumnChanges, ColumnDiffer},
+    sql_schema_helpers::ColumnRef,
+};
 use once_cell::sync::Lazy;
 use prisma_models::PrismaValue;
 use regex::Regex;
@@ -15,7 +20,7 @@ impl SqlRenderer for MysqlFlavour {
 
     fn render_column(&self, _schema_name: &str, column: ColumnRef<'_>, _add_fk_prefix: bool) -> String {
         let column_name = self.quote(column.name());
-        let tpe_str = render_column_type(&column).unwrap();
+        let tpe_str = render_column_type(&column);
         let nullability_str = render_nullability(&column);
         let default_str = column
             .default()
@@ -72,35 +77,95 @@ impl SqlRenderer for MysqlFlavour {
             (DefaultValue::SEQUENCE(_), _) => todo!("rendering of sequence defaults"),
         }
     }
+
+    fn render_alter_column<'a>(&self, differ: &ColumnDiffer<'_>) -> Option<Vec<String>> {
+        let expanded = expand_mysql_alter_column(differ);
+
+        let sql = match expanded {
+            MysqlAlterColumn::DropDefault => vec![format!(
+                "ALTER COLUMN {column} DROP DEFAULT",
+                column = Quoted::mysql_ident(differ.previous.name())
+            )],
+            MysqlAlterColumn::Modify { new_default, changes } => {
+                vec![render_mysql_modify(&changes, new_default.as_ref(), differ.next, self)]
+            }
+        };
+
+        Some(sql)
+    }
 }
 
-pub(crate) fn render_column_type(column: &ColumnRef<'_>) -> anyhow::Result<Cow<'static, str>> {
+fn render_mysql_modify(
+    changes: &ColumnChanges,
+    new_default: Option<&sql_schema_describer::DefaultValue>,
+    next_column: ColumnRef<'_>,
+    renderer: &dyn SqlFlavour,
+) -> String {
+    let column_type: Option<String> = if changes.type_changed() {
+        Some(next_column.column_type().full_data_type.clone()).filter(|r| !r.is_empty() || r.contains("datetime"))
+    // @default(now()) does not work with datetimes of certain sizes
+    } else {
+        Some(next_column.column.tpe.full_data_type.clone()).filter(|r| !r.is_empty())
+    };
+
+    let column_type = column_type
+        .map(Cow::Owned)
+        .unwrap_or_else(|| render_column_type(&next_column));
+
+    let default = new_default
+        .map(|default| {
+            format!(
+                " DEFAULT {}",
+                renderer.render_default(&default, &next_column.column_type().family)
+            )
+        })
+        .unwrap_or_else(String::new);
+
+    format!(
+        "MODIFY {column_name} {column_type}{nullability}{default}{sequence}",
+        column_name = Quoted::mysql_ident(&next_column.name()),
+        column_type = column_type,
+        nullability = if next_column.arity().is_required() {
+            " NOT NULL"
+        } else {
+            ""
+        },
+        default = default,
+        sequence = if next_column.is_autoincrement() {
+            " AUTO_INCREMENT"
+        } else {
+            ""
+        },
+    )
+}
+
+pub(crate) fn render_column_type(column: &ColumnRef<'_>) -> Cow<'static, str> {
     match &column.column_type().family {
-        ColumnTypeFamily::Boolean => Ok("boolean".into()),
+        ColumnTypeFamily::Boolean => "boolean".into(),
         ColumnTypeFamily::DateTime => {
             // CURRENT_TIMESTAMP has up to second precision, not more.
             if let Some(DefaultValue::NOW) = column.default() {
-                Ok("datetime".into())
+                "datetime".into()
             } else {
-                Ok("datetime(3)".into())
+                "datetime(3)".into()
             }
         }
-        ColumnTypeFamily::Float => Ok("Decimal(65,30)".into()),
-        ColumnTypeFamily::Int => Ok("int".into()),
+        ColumnTypeFamily::Float => "Decimal(65,30)".into(),
+        ColumnTypeFamily::Int => "int".into(),
         // we use varchar right now as mediumtext doesn't allow default values
         // a bigger length would not allow to use such a column as primary key
-        ColumnTypeFamily::String => Ok(format!("varchar{}", VARCHAR_LENGTH_PREFIX).into()),
+        ColumnTypeFamily::String => format!("varchar{}", VARCHAR_LENGTH_PREFIX).into(),
         ColumnTypeFamily::Enum(enum_name) => {
             let r#enum = column
                 .schema()
                 .get_enum(&enum_name)
-                .ok_or_else(|| anyhow::anyhow!("Could not render the variants of enum `{}`", enum_name))?;
+                .unwrap_or_else(|| panic!("Could not render the variants of enum `{}`", enum_name));
 
             let variants: String = r#enum.values.iter().map(Quoted::mysql_string).join(", ");
 
-            Ok(format!("ENUM({})", variants).into())
+            format!("ENUM({})", variants).into()
         }
-        ColumnTypeFamily::Json => Ok("json".into()),
+        ColumnTypeFamily::Json => "json".into(),
         x => unimplemented!("{:?} not handled yet", x),
     }
 }

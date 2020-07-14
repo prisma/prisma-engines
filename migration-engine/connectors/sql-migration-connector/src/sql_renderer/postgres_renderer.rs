@@ -1,5 +1,9 @@
 use super::common::*;
-use crate::{flavour::PostgresFlavour, sql_schema_helpers::*};
+use crate::{
+    expanded_alter_column::{expand_postgres_alter_column, PostgresAlterColumn},
+    flavour::PostgresFlavour,
+    sql_schema_helpers::*,
+};
 use once_cell::sync::Lazy;
 use prisma_models::PrismaValue;
 use regex::Regex;
@@ -58,6 +62,32 @@ impl super::SqlRenderer for PostgresFlavour {
             (DefaultValue::VALUE(val), _) => val.to_string().into(),
             (DefaultValue::SEQUENCE(_), _) => todo!("rendering of sequence defaults"),
         }
+    }
+
+    fn render_alter_column(&self, differ: &crate::sql_schema_differ::ColumnDiffer<'_>) -> Option<Vec<String>> {
+        let steps = expand_postgres_alter_column(differ)?;
+
+        let alter_column_prefix = format!("ALTER COLUMN {}", Quoted::postgres_ident(differ.previous.name()));
+
+        let rendered_steps = steps
+            .into_iter()
+            .map(|step| match step {
+                PostgresAlterColumn::DropDefault => format!("{} DROP DEFAULT", &alter_column_prefix),
+                PostgresAlterColumn::SetDefault(new_default) => format!(
+                    "{} SET DEFAULT {}",
+                    &alter_column_prefix,
+                    self.render_default(&new_default, differ.next.column_type_family())
+                ),
+                PostgresAlterColumn::DropNotNull => format!("{} DROP NOT NULL", &alter_column_prefix),
+                PostgresAlterColumn::SetNotNull => format!("{} SET NOT NULL", &alter_column_prefix),
+                PostgresAlterColumn::SetType(ty) => {
+                    format!("{} SET DATA TYPE {}", &alter_column_prefix, render_column_type(&ty))
+                }
+                PostgresAlterColumn::AddSequence => todo!("postgres AddSequence"),
+            })
+            .collect();
+
+        Some(rendered_steps)
     }
 }
 

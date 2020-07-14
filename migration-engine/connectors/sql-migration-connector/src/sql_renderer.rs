@@ -6,10 +6,8 @@ mod postgres_renderer;
 mod sqlite_renderer;
 
 pub(crate) use common::{IteratorJoin, Quoted, QuotedWithSchema};
-pub(crate) use mysql_renderer::render_column_type as mysql_render_column_type;
-pub(crate) use postgres_renderer::render_column_type as postgres_render_column_type;
 
-use crate::sql_schema_helpers::ColumnRef;
+use crate::{sql_schema_differ::ColumnDiffer, sql_schema_helpers::ColumnRef};
 use sql_schema_describer::*;
 use std::borrow::Cow;
 
@@ -28,4 +26,6 @@ pub(crate) trait SqlRenderer {
     fn render_references(&self, schema_name: &str, foreign_key: &ForeignKey) -> String;
 
     fn render_default<'a>(&self, default: &'a DefaultValue, family: &ColumnTypeFamily) -> Cow<'a, str>;
+
+    fn render_alter_column(&self, differ: &ColumnDiffer<'_>) -> Option<Vec<String>>;
 }

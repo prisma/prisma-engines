@@ -65,6 +65,10 @@ impl SqlRenderer for SqliteFlavour {
             (DefaultValue::SEQUENCE(_), _) => unreachable!("rendering of sequence defaults"),
         }
     }
+
+    fn render_alter_column(&self, _differ: &crate::sql_schema_differ::ColumnDiffer<'_>) -> Option<Vec<String>> {
+        None
+    }
 }
 
 fn render_column_type(t: &ColumnType) -> String {

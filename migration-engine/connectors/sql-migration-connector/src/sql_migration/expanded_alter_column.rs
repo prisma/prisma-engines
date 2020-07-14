@@ -1,22 +1,5 @@
 use crate::sql_schema_differ::{ColumnChange, ColumnChanges, ColumnDiffer};
-use quaint::prelude::SqlFamily;
 use sql_schema_describer::{ColumnArity, ColumnType, ColumnTypeFamily, DefaultValue};
-
-pub(crate) fn expand_alter_column(
-    column_differ: &ColumnDiffer<'_>,
-    sql_family: &SqlFamily,
-) -> Option<ExpandedAlterColumn> {
-    match sql_family {
-        SqlFamily::Sqlite => expand_sqlite_alter_column(&column_differ).map(ExpandedAlterColumn::Sqlite),
-        SqlFamily::Mysql => Some(ExpandedAlterColumn::Mysql(expand_mysql_alter_column(&column_differ))),
-        SqlFamily::Postgres => expand_postgres_alter_column(&column_differ).map(ExpandedAlterColumn::Postgres),
-        SqlFamily::Mssql => todo!("Greetings from Redmond"),
-    }
-}
-
-pub(crate) fn expand_sqlite_alter_column(_columns: &ColumnDiffer<'_>) -> Option<Vec<SqliteAlterColumn>> {
-    None
-}
 
 pub(crate) fn expand_mysql_alter_column(columns: &ColumnDiffer<'_>) -> MysqlAlterColumn {
     let column_changes = columns.all_changes();
@@ -100,13 +83,6 @@ pub(crate) fn expand_postgres_alter_column(columns: &ColumnDiffer<'_>) -> Option
 }
 
 #[derive(Debug)]
-pub(crate) enum ExpandedAlterColumn {
-    Postgres(Vec<PostgresAlterColumn>),
-    Mysql(MysqlAlterColumn),
-    Sqlite(Vec<SqliteAlterColumn>),
-}
-
-#[derive(Debug)]
 /// https://www.postgresql.org/docs/9.1/sql-altertable.html
 pub(crate) enum PostgresAlterColumn {
     SetDefault(sql_schema_describer::DefaultValue),
@@ -114,7 +90,7 @@ pub(crate) enum PostgresAlterColumn {
     DropNotNull,
     SetType(ColumnType),
     SetNotNull,
-    // Add an auto-incrementing sequence as a default on the column.
+    /// Add an auto-incrementing sequence as a default on the column.
     AddSequence,
 }
 
