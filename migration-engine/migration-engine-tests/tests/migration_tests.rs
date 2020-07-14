@@ -267,6 +267,32 @@ async fn removing_autoincrement_from_an_existing_field_works(api: &TestApi) -> T
     Ok(())
 }
 
+// Ignoring sqlite is OK, because sqlite integer primary keys are always auto-incrementing.
+#[test_each_connector(ignore("sqlite"))]
+async fn flipping_autoincrement_on_and_off_works(api: &TestApi) -> TestResult {
+    let dm_without = r#"
+        model Post {
+            id        Int        @id
+            title     String     @default("")
+        }
+    "#;
+
+    let dm_with = r#"
+        model Post {
+            id        Int        @id @default(autoincrement())
+            updatedAt DateTime
+        }
+    "#;
+
+    api.infer_apply(dm_with).send().await?.assert_green()?;
+    api.infer_apply(dm_without).send().await?.assert_green()?;
+    api.infer_apply(dm_with).send().await?.assert_green()?;
+    api.infer_apply(dm_without).send().await?.assert_green()?;
+    api.infer_apply(dm_with).send().await?.assert_green()?;
+
+    Ok(())
+}
+
 #[test_each_connector]
 async fn removing_a_scalar_field_must_work(api: &TestApi) {
     let dm1 = r#"
