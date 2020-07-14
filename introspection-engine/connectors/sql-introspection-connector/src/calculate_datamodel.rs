@@ -36,9 +36,7 @@ pub fn calculate_datamodel(schema: &SqlSchema, family: &SqlFamily) -> SqlIntrosp
     // if based on a previous Prisma version add id default opinionations
     add_prisma_1_id_defaults(family, &version, &mut data_model, schema, &mut warnings);
 
-    // who is the recipient here?
-    // the validator in a next step?
-    // Or the renderer and then the validator?
+    // renderer -> parser -> validator, is_commented_out gets lost between renderer and parser
     debug!("Done calculating data model {:?}", data_model);
     Ok(IntrospectionResult {
         data_model,

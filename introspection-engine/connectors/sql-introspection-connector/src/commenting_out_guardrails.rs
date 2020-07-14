@@ -29,25 +29,20 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
                 field.name = field.database_name.as_ref().unwrap().to_string();
                 field.is_commented_out = true;
 
-                fields_with_empty_names.push(ModelAndField {
-                    model: model_name.clone(),
-                    field: field.name.clone(),
-                })
+                fields_with_empty_names.push(ModelAndField::new(&model_name, &field.name))
             }
         }
     }
 
     //empty enum values
     for enm in datamodel.enums_mut() {
-        for enum_value in &mut enm.values {
+        let enum_name = enm.name.clone();
+        for enum_value in enm.values_mut() {
             if let Some(name) = &enum_value.database_name {
                 if enum_value.name == "".to_string() {
                     enum_value.name = name.clone();
                     enum_value.commented_out = true;
-                    enum_values_with_empty_names.push(EnumAndValue {
-                        enm: enm.name.clone(),
-                        value: enum_value.name.clone(),
-                    })
+                    enum_values_with_empty_names.push(EnumAndValue::new(&enum_name, &enum_value.name))
                 }
             }
         }
