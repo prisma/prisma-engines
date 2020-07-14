@@ -97,7 +97,7 @@ impl CalculateDatabaseStepsCommand<'_> {
 
                 all_steps
             }
-            None => return &[],
+            None => &[],
         }
     }
 }

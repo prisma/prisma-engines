@@ -89,7 +89,6 @@ impl RpcApi {
         let executor = Arc::clone(&self.executor);
 
         self.io_handler.add_method(cmd.name(), move |params: Params| {
-            let cmd = cmd.clone();
             let executor = Arc::clone(&executor);
             let fut = async move { Self::create_handler(&executor, cmd, &params).await };
 

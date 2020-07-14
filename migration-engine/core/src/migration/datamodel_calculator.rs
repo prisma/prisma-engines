@@ -1,3 +1,5 @@
+#![allow(clippy::ptr_arg)] // some of the helpers take closures with references to strings
+
 use anyhow::format_err;
 use datamodel::ast::{self, ArgumentContainer, Identifier, SchemaAst};
 use migration_connector::steps::{self, CreateSource, DeleteSource, MigrationStep};
@@ -68,7 +70,7 @@ fn apply_step(datamodel: &mut ast::SchemaAst, step: &MigrationStep) -> Result<()
 
 fn apply_create_source(datamodel: &mut ast::SchemaAst, step: &CreateSource) -> Result<(), CalculatorError> {
     let steps::CreateSource { source: name } = step;
-    if let Some(_) = datamodel.find_source(name) {
+    if datamodel.find_source(name).is_some() {
         return Err(format_err!(
             "The datasource {} already exists in this Schema. It is not possible to create it once more.",
             name
@@ -113,7 +115,7 @@ fn apply_delete_source(datamodel: &mut ast::SchemaAst, step: &DeleteSource) -> R
 fn apply_create_enum(datamodel: &mut ast::SchemaAst, step: &steps::CreateEnum) -> Result<(), CalculatorError> {
     let steps::CreateEnum { r#enum: name, values } = step;
 
-    if let Some(_) = datamodel.find_enum(&name) {
+    if datamodel.find_enum(&name).is_some() {
         return Err(format_err!(
             "The enum {} already exists in this Datamodel. It is not possible to create it once more.",
             name
@@ -146,7 +148,7 @@ fn apply_create_enum(datamodel: &mut ast::SchemaAst, step: &steps::CreateEnum) -
 }
 
 fn apply_create_field(datamodel: &mut ast::SchemaAst, step: &steps::CreateField) -> Result<(), CalculatorError> {
-    if let Some(_) = datamodel.find_field(&step.model, &step.field) {
+    if datamodel.find_field(&step.model, &step.field).is_some() {
         return Err(format_err!(
             "The field {} on model {} already exists in this Datamodel. It is not possible to create it once more.",
             &step.field,
@@ -181,7 +183,7 @@ fn apply_create_field(datamodel: &mut ast::SchemaAst, step: &steps::CreateField)
 }
 
 fn apply_create_model(datamodel: &mut ast::SchemaAst, step: &steps::CreateModel) -> Result<(), CalculatorError> {
-    if let Some(_) = datamodel.find_model(&step.model) {
+    if datamodel.find_model(&step.model).is_some() {
         return Err(format_err!(
             "The model {} already exists in this Datamodel. It is not possible to create it once more.",
             &step.model
@@ -249,7 +251,7 @@ fn apply_delete_model(datamodel: &mut ast::SchemaAst, step: &steps::DeleteModel)
 }
 
 fn apply_update_field(datamodel: &mut ast::SchemaAst, step: &steps::UpdateField) -> Result<(), CalculatorError> {
-    if let None = datamodel.find_model(&step.model) {
+    if datamodel.find_model(&step.model).is_none() {
         return Err(format_err!(
             "The model {} does not exist in this Datamodel. It is not possible to update a field in it.",
             &step.model
@@ -279,7 +281,7 @@ fn apply_field_update<T, F: Fn(&mut ast::Field, &T)>(field: &mut ast::Field, upd
 }
 
 fn update_field_arity(field: &mut ast::Field, new_arity: &ast::FieldArity) {
-    field.arity = new_arity.clone();
+    field.arity = *new_arity;
 }
 
 fn update_field_type(field: &mut ast::Field, new_type: &String) {
@@ -470,7 +472,7 @@ fn apply_create_type_alias(
     datamodel: &mut ast::SchemaAst,
     step: &steps::CreateTypeAlias,
 ) -> Result<(), CalculatorError> {
-    if let Some(_) = datamodel.find_type_alias(&step.type_alias) {
+    if datamodel.find_type_alias(&step.type_alias).is_some() {
         return Err(format_err!(
             "The type {} already exists in this Datamodel. It is not possible to create it once more.",
             &step.type_alias
