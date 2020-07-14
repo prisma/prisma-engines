@@ -27,5 +27,9 @@ pub(crate) trait SqlRenderer {
 
     fn render_default<'a>(&self, default: &'a DefaultValue, family: &ColumnTypeFamily) -> Cow<'a, str>;
 
+    /// Attempt to render a database-specific ALTER COLUMN based on the
+    /// passed-in differ. `None` means that we could not generate a good (set
+    /// of) ALTER COLUMN(s), and we should fall back to dropping and recreating
+    /// the column.
     fn render_alter_column(&self, differ: &ColumnDiffer<'_>) -> Option<Vec<String>>;
 }
