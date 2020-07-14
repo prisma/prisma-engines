@@ -348,5 +348,5 @@ pub fn replace_field_names(target: &mut Vec<String>, old_name: &str, new_name: &
                 *v = new_name.to_string()
             }
         })
-        .count();
+        .for_each(drop);
 }
