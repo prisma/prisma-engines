@@ -225,8 +225,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
 
     fn alter_columns<'a>(table_differ: &'a TableDiffer<'schema>) -> impl Iterator<Item = TableChange> + 'a {
         table_differ.column_pairs().filter_map(move |column_differ| {
-            dbg!(column_differ.previous.name());
-            if dbg!(column_differ.differs_in_something()) {
+            if column_differ.differs_in_something() {
                 let change = AlterColumn {
                     name: column_differ.previous.name().to_owned(),
                     column: column_differ.next.column.clone(),

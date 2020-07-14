@@ -507,7 +507,7 @@ fn render_mysql_modify(
     changes: &ColumnChanges,
     new_default: Option<&sql_schema_describer::DefaultValue>,
     next_column: ColumnRef<'_>,
-    renderer: &dyn SqlRenderer,
+    renderer: &dyn SqlFlavour,
 ) -> anyhow::Result<String> {
     let column_type: Option<String> = if changes.type_changed() {
         Some(next_column.column_type().full_data_type.clone()).filter(|r| !r.is_empty() || r.contains("datetime"))
