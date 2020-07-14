@@ -11,32 +11,25 @@ static EMPTY_STRING: &'static str = "";
 pub fn sanitize_datamodel_names(datamodel: &mut Datamodel) {
     let mut enum_renames = HashMap::new();
 
-    for model in &mut datamodel.models {
+    for model in datamodel.models_mut() {
         let (sanitized_model_name, model_db_name) = sanitize_name(model.name.clone());
+        let model_name = model.name.clone();
+        sanitize_names(&mut model.id_fields);
 
-        for field in &mut model.fields {
+        for field in model.fields_mut() {
             let (sanitized_field_name, field_db_name) = sanitize_name(field.name().to_string());
-            let id_field_option = model.id_fields.iter_mut().find(|name| **name == field.name());
 
             match field {
                 Field::RelationField(rf) => {
                     let info = &mut rf.relation_info;
                     info.name = sanitize_name(info.name.clone()).0;
                     info.to = sanitize_name(info.to.clone()).0;
-                    info.to_fields = info
-                        .to_fields
-                        .iter()
-                        .map(|f: &std::string::String| sanitize_name(f.clone()).0)
-                        .collect();
-                    info.fields = info
-                        .fields
-                        .iter()
-                        .map(|f: &std::string::String| sanitize_name(f.clone()).0)
-                        .collect();
+                    sanitize_names(&mut info.to_fields);
+                    sanitize_names(&mut info.fields);
                 }
                 Field::ScalarField(sf) => {
                     if let FieldType::Enum(enum_name) = &sf.field_type {
-                        let (sanitized_enum_name, enum_db_name) = if *enum_name == format!("{}_{}", model.name, sf.name)
+                        let (sanitized_enum_name, enum_db_name) = if *enum_name == format!("{}_{}", model_name, sf.name)
                         {
                             //MySql
                             if model_db_name.is_none() && field_db_name.is_none() {
@@ -78,18 +71,17 @@ pub fn sanitize_datamodel_names(datamodel: &mut Datamodel) {
                 }
             }
             field.set_name(&sanitized_field_name);
-            id_field_option.map(|id_field| *id_field = sanitized_field_name.clone());
         }
 
         for index in &mut model.indices {
-            index.fields = index.fields.iter().map(|f| sanitize_name(f.clone()).0).collect();
+            sanitize_names(&mut index.fields);
         }
 
         model.name = sanitized_model_name;
         model.database_name = model_db_name;
     }
 
-    for enm in &mut datamodel.enums {
+    for enm in datamodel.enums_mut() {
         if let Some((sanitized_enum_name, enum_db_name)) = enum_renames.get(&enm.name) {
             enm.name = sanitized_enum_name.to_owned();
             enm.database_name = enum_db_name.to_owned();
@@ -99,7 +91,7 @@ pub fn sanitize_datamodel_names(datamodel: &mut Datamodel) {
             enm.database_name = enum_db_name.to_owned();
         }
 
-        for enum_value in &mut enm.values {
+        for enum_value in enm.values_mut() {
             if &enum_value.name == EMPTY_STRING {
                 enum_value.name = EMPTY_ENUM_PLACEHOLDER.to_string();
                 enum_value.database_name = Some(EMPTY_STRING.to_string());
@@ -130,4 +122,11 @@ fn sanitize_name(name: String) -> (String, Option<String>) {
     } else {
         (name, None)
     }
+}
+
+fn sanitize_names(names: &mut [String]) {
+    names
+        .iter_mut()
+        .map(|f| *f = sanitize_name(f.to_string()).0)
+        .for_each(drop);
 }

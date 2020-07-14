@@ -67,8 +67,7 @@ impl LowerDmlToAst {
         Ok(ast::Enum {
             name: ast::Identifier::new(&enm.name),
             values: enm
-                .values
-                .iter()
+                .values()
                 .map(|v| ast::EnumValue {
                     name: ast::Identifier::new(&v.name),
                     directives: self.directives.enm_value.serialize(v, datamodel).unwrap(),

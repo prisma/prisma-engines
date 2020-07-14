@@ -83,6 +83,11 @@ impl Model {
         self.fields.iter()
     }
 
+    /// Gets a mutable  iterator over all fields.
+    pub fn fields_mut<'a>(&'a mut self) -> impl Iterator<Item = &'a mut Field> + 'a {
+        self.fields.iter_mut()
+    }
+
     /// Gets an iterator over all scalar fields.
     pub fn scalar_fields<'a>(&'a self) -> impl Iterator<Item = &'a ScalarField> + 'a {
         self.fields().filter_map(|fw| match fw {
@@ -101,7 +106,7 @@ impl Model {
 
     /// Gets a mutable iterator over all scalar fields.
     pub fn scalar_fields_mut<'a>(&'a mut self) -> impl Iterator<Item = &'a mut ScalarField> + 'a {
-        self.fields.iter_mut().filter_map(|fw| match fw {
+        self.fields_mut().filter_map(|fw| match fw {
             Field::RelationField(_) => None,
             Field::ScalarField(sf) => Some(sf),
         })
@@ -109,7 +114,7 @@ impl Model {
 
     /// Gets a mutable iterator over all relation fields.
     pub fn relation_fields_mut<'a>(&'a mut self) -> impl Iterator<Item = &'a mut RelationField> + 'a {
-        self.fields.iter_mut().filter_map(|fw| match fw {
+        self.fields_mut().filter_map(|fw| match fw {
             Field::RelationField(rf) => Some(rf),
             Field::ScalarField(_) => None,
         })
@@ -189,7 +194,9 @@ impl Model {
         // first candidate: the singular id field
         {
             if let Some(x) = self.singular_id_fields().next() {
-                result.push(UniqueCriteria::new(vec![x]))
+                if !x.is_commented_out {
+                    result.push(UniqueCriteria::new(vec![x]))
+                }
             }
         }
 
@@ -201,7 +208,7 @@ impl Model {
                 .map(|f| self.find_scalar_field(&f).unwrap())
                 .collect();
 
-            if !id_fields.is_empty() {
+            if !id_fields.is_empty() && !id_fields.iter().any(|f| f.is_commented_out) {
                 result.push(UniqueCriteria::new(id_fields));
             }
         }
@@ -210,7 +217,7 @@ impl Model {
         {
             let mut unique_required_fields: Vec<_> = self
                 .scalar_fields()
-                .filter(|field| field.is_unique && (field.is_required() || allow_optional))
+                .filter(|field| field.is_unique && (field.is_required() || allow_optional) && !field.is_commented_out)
                 .map(|f| UniqueCriteria::new(vec![f]))
                 .collect();
 
@@ -225,8 +232,9 @@ impl Model {
                 .filter(|id| id.tpe == IndexType::Unique)
                 .filter_map(|id| {
                     let fields: Vec<_> = id.fields.iter().map(|f| self.find_scalar_field(&f).unwrap()).collect();
+                    let no_fields_are_commented_out = !fields.iter().any(|f| f.is_commented_out);
                     let all_fields_are_required = fields.iter().all(|f| f.is_required());
-                    if all_fields_are_required || allow_optional {
+                    if (all_fields_are_required || allow_optional) && no_fields_are_commented_out {
                         Some(UniqueCriteria::new(fields))
                     } else {
                         None
@@ -248,16 +256,6 @@ impl Model {
     /// Determines whether there is a singular primary key
     pub fn has_single_id_field(&self) -> bool {
         self.singular_id_fields().count() == 1
-    }
-
-    /// Finds a field with a certain relation guarantee.
-    /// exclude_field are necessary to avoid corner cases with self-relations (e.g. we must not recognize a field as its own related field).
-    pub fn related_field(&self, to: &str, relation_name: &str, exclude_field: &str) -> Option<&RelationField> {
-        self.relation_fields().find(|rf| {
-            rf.relation_info.to == to
-                && rf.relation_info.name == relation_name
-                && (self.name != to || rf.name != exclude_field)
-        })
     }
 
     pub fn add_index(&mut self, index: IndexDefinition) {

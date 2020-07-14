@@ -49,7 +49,7 @@ impl<'a> ApplyMigrationCommand<'a> {
         let last_migration = migration_persistence.last().await?;
         let current_datamodel = last_migration
             .map(|migration| migration.parse_datamodel())
-            .unwrap_or_else(|| Ok(Datamodel::empty()))
+            .unwrap_or_else(|| Ok(Datamodel::new()))
             .map_err(|(err, schema)| CommandError::InvalidPersistedDatamodel(err, schema))?;
 
         let last_non_watch_datamodel = migration_persistence
@@ -95,7 +95,7 @@ impl<'a> ApplyMigrationCommand<'a> {
             .map_err(|(err, schema)| CommandError::InvalidPersistedDatamodel(err, schema))?;
         let current_datamodel = last_migration
             .map(|migration| migration.parse_datamodel())
-            .unwrap_or_else(|| Ok(Datamodel::empty()))
+            .unwrap_or_else(|| Ok(Datamodel::new()))
             .map_err(|(err, schema)| CommandError::InvalidPersistedDatamodel(err, schema))?;
 
         let next_datamodel_ast = engine

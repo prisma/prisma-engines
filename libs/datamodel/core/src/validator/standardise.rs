@@ -33,14 +33,12 @@ impl Standardiser {
         let schema_copy = schema.clone();
 
         // Iterate and mutate models.
-        for model_idx in 0..schema.models.len() {
-            let cloned_model = schema.models[model_idx].clone();
+        for model in schema.models_mut() {
+            let cloned_model = model.clone();
             let unique_criteria = self.unique_criteria(&cloned_model);
-            let model = &mut schema.models[model_idx];
 
-            for field_index in 0..model.fields.len() {
-                let field = &mut model.fields[field_index];
-
+            let mut fields_to_add = vec![];
+            for field in model.fields_mut() {
                 if let Field::RelationField(field) = field {
                     let related_model = schema_copy.find_model(&field.relation_info.to).expect(STATE_ERROR);
                     let related_field = schema_copy.find_related_field_bang(field);
@@ -57,7 +55,7 @@ impl Standardiser {
                         // many to one
                         (dml::FieldArity::List, _) => false,
                         // one to one
-                        (_, _) => match (&model.name, related_model_name) {
+                        (_, _) => match (&cloned_model.name, related_model_name) {
                             (x, y) if x < y => true,
                             (x, y) if x > y => false,
                             // SELF RELATIONS
@@ -65,7 +63,8 @@ impl Standardiser {
                         },
                     };
 
-                    let underlying_fields = self.underlying_fields_for_unique_criteria(&unique_criteria, &model.name);
+                    let underlying_fields =
+                        self.underlying_fields_for_unique_criteria(&unique_criteria, &cloned_model.name);
 
                     if embed_here {
                         // user input has precedence
@@ -84,11 +83,15 @@ impl Standardiser {
                         {
                             rel_info.fields = underlying_fields.iter().map(|f| f.name.clone()).collect();
                             for underlying_field in underlying_fields {
-                                model.add_field(Field::ScalarField(underlying_field));
+                                fields_to_add.push(Field::ScalarField(underlying_field));
                             }
                         }
                     }
                 }
+            }
+
+            for field in fields_to_add {
+                model.add_field(field);
             }
         }
     }
@@ -103,7 +106,7 @@ impl Standardiser {
         let mut errors = ErrorCollection::new();
 
         let mut missing_back_relation_fields = Vec::new();
-        for model in &schema.models {
+        for model in schema.models() {
             let mut missing_for_model = self.find_missing_back_relation_fields(&model, schema, ast_schema)?;
             missing_back_relation_fields.append(&mut missing_for_model);
         }
@@ -161,10 +164,8 @@ impl Standardiser {
             let mut back_field_exists = false;
 
             let related_model = schema.find_model(&rel_info.to).expect(STATE_ERROR);
-            if related_model
-                .related_field(&model.name, &rel_info.name, &field.name)
-                .is_some()
-            {
+
+            if schema.find_related_field(&field).is_some() {
                 back_field_exists = true;
             }
 

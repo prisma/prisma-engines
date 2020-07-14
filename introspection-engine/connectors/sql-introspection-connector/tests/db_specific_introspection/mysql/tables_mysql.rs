@@ -1,6 +1,5 @@
 use crate::*;
 use barrel::types;
-use pretty_assertions::assert_eq;
 use test_harness::*;
 
 #[test_each_connector(tags("mysql"))]
@@ -173,33 +172,6 @@ async fn introspecting_a_table_with_required_and_optional_columns_must_work(api:
     custom_assert(&result, dm);
 }
 
-// #[test_each_connector(tags("mysql"))]
-// async fn introspecting_a_table_with_datetime_default_values_should_work(api: &TestApi) {
-//     let barrel = api.barrel();
-//     let _setup_schema = barrel
-//         .execute_with_schema(
-//             |migration| {
-//                 migration.create_table("User", |t| {
-//                     t.add_column("id", types::primary());
-//                     t.add_column("name", types::text());
-//                     t.inject_custom("`joined` date DEFAULT CURRENT_DATE")
-//                 });
-//             },
-//             api.db_name(),
-//         )
-//         .await;
-//
-//     let dm = r#"
-//             model User {
-//                 id      Int @id
-//                 joined DateTime? @default(now())
-//                 name String
-//             }
-//         "#;
-//     let result = dbg!(api.introspect().await);
-//     custom_assert(&result, dm);
-// }
-
 #[test_each_connector(tags("mysql"))]
 async fn introspecting_a_table_with_default_values_should_work(api: &TestApi) {
     let barrel = api.barrel();
@@ -289,29 +261,6 @@ async fn introspecting_a_table_with_a_multi_column_non_unique_index_should_work(
         "#;
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
-}
-
-#[test_each_connector(tags("mysql"))]
-async fn introspecting_a_table_without_uniques_should_comment_it_out(api: &TestApi) {
-    api.barrel()
-        .execute(|migration| {
-            migration.create_table("User", |t| {
-                t.add_column("id", types::primary());
-            });
-            migration.create_table("Post", |t| {
-                t.add_column("id", types::integer());
-                t.inject_custom(
-                    "user_id INTEGER NOT NULL,
-                FOREIGN KEY (`user_id`) REFERENCES `User`(`id`)",
-                )
-            });
-        })
-        .await;
-
-    let dm = "// The underlying table does not contain a unique identifier and can therefore currently not be handled.\n// model Post {\n  // id      Int\n  // user_id Int\n  // User    User @relation(fields: [user_id], references: [id])\n\n  // @@index([user_id], name: \"user_id\")\n// }\n\nmodel User {\n  id      Int    @default(autoincrement()) @id\n  // Post Post[]\n}\n";
-
-    let result = dbg!(api.introspect().await);
-    assert_eq!(&result, dm);
 }
 
 //todo maybe need to split due to

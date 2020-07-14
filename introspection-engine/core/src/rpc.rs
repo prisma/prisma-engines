@@ -98,14 +98,14 @@ impl RpcImpl {
 
         let result = match connector.introspect(&input_data_model, reintrospect).await {
             Ok(mut introspection_result) => {
-                if introspection_result.datamodel.models.is_empty() && introspection_result.datamodel.enums.is_empty() {
+                if introspection_result.data_model.is_empty() {
                     Err(Error::from(CommandError::IntrospectionResultEmpty(url.to_string())))
                 } else {
                     if could_not_parse_input_data_model && reintrospect {
                         introspection_result.warnings.push(Warning::new_datamodel_parsing())
                     };
 
-                    match datamodel::render_datamodel_and_config_to_string(&introspection_result.datamodel, &config) {
+                    match datamodel::render_datamodel_and_config_to_string(&introspection_result.data_model, &config) {
                         Err(e) => Err(Error::from(e)),
                         Ok(dm) => Ok(IntrospectionResultOutput {
                             datamodel: dm,

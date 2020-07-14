@@ -252,11 +252,8 @@ impl ModelAsserts for dml::Model {
 
 impl EnumAsserts for dml::Enum {
     fn assert_has_value(&self, t: &str) -> &dml::EnumValue {
-        let pred = t.to_owned();
-
-        self.values
-            .iter()
-            .find(|x| *x.name == pred)
+        self.values()
+            .find(|x| *x.name == t.to_owned())
             .expect(format!("Enum Value {} not found", t).as_str())
     }
 

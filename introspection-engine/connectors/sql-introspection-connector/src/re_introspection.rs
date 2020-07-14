@@ -1,3 +1,4 @@
+use crate::misc_helpers::replace_field_names;
 use crate::warnings::{
     warning_enriched_with_map_on_enum, warning_enriched_with_map_on_enum_value, warning_enriched_with_map_on_field,
     warning_enriched_with_map_on_model, Enum, EnumAndValue, Model, ModelAndField,
@@ -45,12 +46,12 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
     // println!("{:#?}", old_data_model);
     // println!("{:#?}", introspection_result.datamodel);
 
-    let new_data_model = &mut introspection_result.datamodel;
+    let new_data_model = &mut introspection_result.data_model;
 
     //@@map on models
     let mut changed_model_names = vec![];
     {
-        for model in &new_data_model.models {
+        for model in new_data_model.models() {
             if let Some(old_model) =
                 old_data_model.find_model_db_name(&model.database_name.as_ref().unwrap_or(&model.name))
             {
@@ -83,7 +84,7 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
     // @map on fields
     let mut changed_scalar_field_names = vec![];
     {
-        for model in &new_data_model.models {
+        for model in new_data_model.models() {
             if let Some(old_model) = &old_data_model.find_model(&model.name) {
                 for field in model.scalar_fields() {
                     if let Some(old_field) =
@@ -199,7 +200,7 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
     // @@map on enums
     let mut changed_enum_names = vec![];
     {
-        for enm in &new_data_model.enums {
+        for enm in new_data_model.enums() {
             if let Some(old_enum) = old_data_model.find_enum_db_name(&enm.database_name.as_ref().unwrap_or(&enm.name)) {
                 if new_data_model.find_enum(&old_enum.name).is_none() {
                     changed_enum_names.push((Enum { enm: enm.name.clone() }, old_enum.name.clone()))
@@ -207,7 +208,7 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
             }
         }
         for changed_enum_name in &changed_enum_names {
-            let enm = new_data_model.find_enum_mut(&changed_enum_name.0.enm).unwrap();
+            let enm = new_data_model.find_enum_mut(&changed_enum_name.0.enm);
             enm.name = changed_enum_name.1.clone();
             if enm.database_name.is_none() {
                 enm.database_name = Some(changed_enum_name.0.enm.clone());
@@ -227,9 +228,9 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
     // @map on enum values
     let mut changed_enum_values = vec![];
     {
-        for enm in &new_data_model.enums {
+        for enm in new_data_model.enums() {
             if let Some(old_enum) = old_data_model.find_enum(&enm.name) {
-                for value in &enm.values {
+                for value in enm.values() {
                     if let Some(old_value) =
                         old_enum.find_value_db_name(value.database_name.as_ref().unwrap_or(&value.name.to_owned()))
                     {
@@ -242,8 +243,8 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
             }
         }
         for changed_enum_value in &changed_enum_values {
-            let enm = new_data_model.find_enum_mut(&changed_enum_value.0.enm).unwrap();
-            let value = enm.find_value_mut(&changed_enum_value.0.value).unwrap();
+            let enm = new_data_model.find_enum_mut(&changed_enum_value.0.enm);
+            let value = enm.find_value_mut(&changed_enum_value.0.value);
             value.name = changed_enum_value.1.clone();
             if value.database_name.is_none() {
                 value.database_name = Some(changed_enum_value.0.value.clone());
@@ -269,7 +270,7 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
     //virtual relationfield names
     let mut changed_relation_field_names = vec![];
     {
-        for model in &new_data_model.models {
+        for model in new_data_model.models() {
             for field in model.relation_fields() {
                 if let Some(old_model) = old_data_model.find_model(&model.name) {
                     for old_field in old_model.relation_fields() {
@@ -339,15 +340,4 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
             .warnings
             .push(warning_enriched_with_map_on_enum_value(&enums_and_values));
     }
-}
-
-fn replace_field_names(target: &mut Vec<String>, old_name: &str, new_name: &str) {
-    target
-        .iter_mut()
-        .map(|v| {
-            if v == old_name {
-                *v = new_name.to_string()
-            }
-        })
-        .count();
 }

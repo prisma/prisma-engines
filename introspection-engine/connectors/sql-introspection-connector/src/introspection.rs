@@ -71,18 +71,16 @@ pub fn introspect(
     }
 
     for e in schema.enums.iter() {
-        data_model.add_enum(dml::Enum {
-            name: e.name.clone(),
-            values: e.values.iter().map(|v| dml::EnumValue::new(v, None)).collect(),
-            database_name: None,
-            documentation: None,
-        });
+        data_model.add_enum(dml::Enum::new(
+            &e.name,
+            e.values.iter().map(|v| dml::EnumValue::new(v)).collect(),
+        ));
     }
 
     let mut fields_to_be_added = Vec::new();
 
     // add backrelation fields
-    for model in data_model.models.iter() {
+    for model in data_model.models() {
         for relation_field in model.relation_fields() {
             let relation_info = &relation_field.relation_info;
             if data_model

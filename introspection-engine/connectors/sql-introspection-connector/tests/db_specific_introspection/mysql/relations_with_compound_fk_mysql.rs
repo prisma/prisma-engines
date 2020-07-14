@@ -276,50 +276,54 @@ async fn compound_foreign_keys_should_work_with_defaults(api: &TestApi) {
     custom_assert(&result, dm);
 }
 
-//todo decide on this,
-// this can at most be a one:one relation, but with a more limited subset of available connections
-// fetch this from indexes
-// what about separate uniques? all @unique == @@unique ?? No! separate ones do not fully work since you can only connect to a subset of the @@unique case
-// model.indexes contains a multi-field unique index that matches the colums exactly, then it is unique
-// if there are separate uniques it probably should not become a relation
-// what breaks by having an @@unique that refers to fields that do not have a representation on the model anymore due to the merged relation field?
-//#[test_each_connector(tags("mysql"))]
-//#[test]
-//async fn compound_foreign_keys_should_work_for_one_to_one_relations_with_separate_uniques(api: &TestApi) {
-//    let barrel = api.barrel();
-//    let _setup_schema = barrel
-//        .execute(|migration| {
-//            migration.create_table("User", |t| {
-//                t.add_column("id", types::primary());
-//                t.add_column("age", types::integer());
-//                t.inject_custom("CONSTRAINT user_unique UNIQUE(`id`, `age`)");
-//            });
-//            migration.create_table("Post", |t| {
-//                t.add_column("id", types::primary());
-//                t.add_column("user_id", types::integer().unique(true));
-//                t.add_column("user_age", types::integer().unique(true));
-//                t.inject_custom("FOREIGN KEY (`user_id`,`user_age`) REFERENCES `User`(`id`, `age`)");
-//            });
-//        })
-//        .await;
+// //todo decide on this,
+// // this can at most be a one:one relation, but with a more limited subset of available connections
+// // fetch this from indexes
+// // what about separate uniques? all @unique == @@unique ?? No! separate ones do not fully work since you can only connect to a subset of the @@unique case
+// // model.indexes contains a multi-field unique index that matches the colums exactly, then it is unique
+// // if there are separate uniques it probably should not become a relation
+// // what breaks by having an @@unique that refers to fields that do not have a representation on the model anymore due to the merged relation field?
+// #[test_each_connector(tags("mysql"))]
+// async fn compound_foreign_keys_should_work_for_one_to_one_relations_with_separate_uniques(api: &TestApi) {
+//     let barrel = api.barrel();
+//     let _setup_schema = barrel
+//         .execute(|migration| {
+//             migration.create_table("User", |t| {
+//                 t.add_column("id", types::primary());
+//                 t.add_column("age", types::integer());
+//                 t.inject_custom("CONSTRAINT user_unique UNIQUE(`id`, `age`)");
+//             });
+//             migration.create_table("Post", |t| {
+//                 t.add_column("id", types::primary());
+//                 t.add_column("user_id", types::integer().unique(true));
+//                 t.add_column("user_age", types::integer().unique(true));
+//                 t.inject_custom("FOREIGN KEY (`user_id`,`user_age`) REFERENCES `User`(`id`, `age`)");
+//             });
+//         })
+//         .await;
 //
-//    let dm = r#"
-//            model Post {
-//                id      Int                 @id
-//                user    User                @map(["user_id", "user_age"]) @relation(references:[id, age])
-//            }
+//     let dm = r#"
+//     model Post {
+//       id       Int  @default(autoincrement()) @id
+//       user_id  Int  @unique
+//       user_age Int  @unique
+//       User     User @relation(fields: [user_id, user_age], references: [id, age])
 //
-//            model User {
-//               age      Int
-//               id       Int                 @id
-//               post     Post?
+//       @@index([user_id, user_age], name: \"user_id_2\")
+//     }
 //
-//               @@unique([id, age], name: "user_unique")
-//            }
-//        "#;
-//    let result = dbg!(api.introspect().await);
-//    custom_assert(&result, dm);
-//}
+//     model User {
+//       id   Int    @default(autoincrement()) @id
+//       age  Int
+//       Post Post[]
+//
+//       @@unique([id, age], name: \"user_unique\")
+//     }
+//     "#;
+//
+//     let result = dbg!(api.introspect().await);
+//     custom_assert(&result, dm);
+// }
 
 #[test_each_connector(tags("mysql"))]
 #[test]

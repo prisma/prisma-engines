@@ -186,7 +186,7 @@ impl VersionChecker {
     pub fn version(&self, warnings: &Vec<Warning>, data_model: &Datamodel) -> Version {
         debug!("{:?}", &self);
         match self.sql_family {
-            _ if data_model.enums.is_empty() && data_model.models.is_empty() => Version::NonPrisma,
+            _ if data_model.is_empty() => Version::NonPrisma,
             SqlFamily::Sqlite if self.is_prisma_2(warnings) => Version::Prisma2,
             SqlFamily::Sqlite => Version::NonPrisma,
             SqlFamily::Mysql if self.is_prisma_2(warnings) => Version::Prisma2,

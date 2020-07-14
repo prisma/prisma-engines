@@ -11,24 +11,13 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
     let mut enum_values_with_empty_names = vec![];
     let mut unsupported_types = vec![];
 
-    // find models with 1to1 relations
-    let mut models_with_one_to_one_relation = vec![];
-    for model in &datamodel.models {
-        if model
-            .relation_fields()
-            .any(|f| !f.is_list() && !datamodel.find_related_field_bang(&f).is_list())
-        {
-            models_with_one_to_one_relation.push(model.name.clone())
-        }
-    }
-
     //todo more stuff to handle when commenting out. (Maybe it is easier to just work on supporting it.)
     // models with empty names?
     // also needs to follow the field references (relations, indexes, ids...)
     // also needs to drop usages of removed enum values
 
     // fields with an empty name
-    for model in &mut datamodel.models {
+    for model in datamodel.models_mut() {
         let model_name = model.name.clone();
 
         for field in model.scalar_fields_mut() {
@@ -40,32 +29,27 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
                 field.name = field.database_name.as_ref().unwrap().to_string();
                 field.is_commented_out = true;
 
-                fields_with_empty_names.push(ModelAndField {
-                    model: model_name.clone(),
-                    field: field.name.clone(),
-                })
+                fields_with_empty_names.push(ModelAndField::new(&model_name, &field.name))
             }
         }
     }
 
     //empty enum values
-    for enm in &mut datamodel.enums {
-        for enum_value in &mut enm.values {
+    for enm in datamodel.enums_mut() {
+        let enum_name = enm.name.clone();
+        for enum_value in enm.values_mut() {
             if let Some(name) = &enum_value.database_name {
                 if enum_value.name == "".to_string() {
                     enum_value.name = name.clone();
                     enum_value.commented_out = true;
-                    enum_values_with_empty_names.push(EnumAndValue {
-                        enm: enm.name.clone(),
-                        value: enum_value.name.clone(),
-                    })
+                    enum_values_with_empty_names.push(EnumAndValue::new(&enum_name, &enum_value.name))
                 }
             }
         }
     }
 
     // fields with unsupported as datatype
-    for model in &mut datamodel.models {
+    for model in datamodel.models_mut() {
         let model_name = model.name.clone();
 
         for field in model.scalar_fields_mut() {
@@ -90,18 +74,11 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
     }
 
     // models without uniques / ids
-    for model in &mut datamodel.models {
-        if model.id_fields.is_empty()
-            && !model
-                .fields
-                .iter()
-                .any(|f| (f.is_id() || f.is_unique()) && !f.is_commented_out())
-            && !model.indices.iter().any(|i| i.is_unique())
-            && !models_with_one_to_one_relation.contains(&model.name)
-        {
+    for model in datamodel.models_mut() {
+        if model.strict_unique_criterias().is_empty() {
             model.is_commented_out = true;
             model.documentation = Some(
-                "The underlying table does not contain a unique identifier and can therefore currently not be handled."
+                "The underlying table does not contain a valid unique identifier and can therefore currently not be handled."
                     .to_string(),
             );
             models_without_identifiers.push(Model {
@@ -112,7 +89,7 @@ pub fn commenting_out_guardrails(datamodel: &mut Datamodel) -> Vec<Warning> {
 
     // remove their backrelations
     for model_without_identifier in &models_without_identifiers {
-        for model in &mut datamodel.models {
+        for model in datamodel.models_mut() {
             for field in model.relation_fields_mut() {
                 if field.points_to_model(&model_without_identifier.model) {
                     field.is_commented_out = true;

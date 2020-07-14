@@ -1,5 +1,12 @@
 use super::*;
 
+/// Entities in the datamodel can be flagged as `is_commented_out`. This let's the renderer
+/// know that introspection encountered unsupported names or features and these are supposed
+/// to be rendered as comments. Since the parser will not set these flags when reading a schema
+/// string, only introspection and the lowering of the datamodel to the ast care about these flags.
+/// The FieldType: Unsupported behaves in the same way.
+/// Both of these are never converted into the internal datamodel.
+
 /// Represents a prisma-datamodel.
 #[derive(Debug, PartialEq, Clone)]
 pub struct Datamodel {
@@ -21,9 +28,9 @@ impl Datamodel {
         }
     }
 
-    /// Creates a new, empty schema.
-    pub fn empty() -> Datamodel {
-        Self::new()
+    /// Checks if a datamodel contains neither enums nor models.
+    pub fn is_empty(&self) -> bool {
+        self.enums.is_empty() && self.models.is_empty()
     }
 
     /// Checks if a model with the given name exists.
@@ -41,19 +48,9 @@ impl Datamodel {
         self.enums.push(en);
     }
 
-    /// Removes an enum from this datamodel.
-    pub fn remove_enum(&mut self, name: &str) {
-        self.enums.retain(|m| m.name != name);
-    }
-
     /// Adds a model to this datamodel.
     pub fn add_model(&mut self, model: Model) {
         self.models.push(model);
-    }
-
-    /// Removes a model from this datamodel.
-    pub fn remove_model(&mut self, name: &str) {
-        self.models.retain(|m| m.name != name);
     }
 
     /// Gets an iterator over all models.
@@ -78,7 +75,7 @@ impl Datamodel {
 
     /// Finds a model by name.
     pub fn find_model(&self, name: &str) -> Option<&Model> {
-        self.models.iter().find(|model| model.name == name)
+        self.models().find(|model| model.name == name)
     }
 
     /// Finds a model by database name.
@@ -127,15 +124,16 @@ impl Datamodel {
     }
 
     /// Finds an enum by name and returns a mutable reference.
-    pub fn find_enum_mut(&mut self, name: &str) -> Option<&mut Enum> {
-        self.enums_mut().find(|m| m.name == *name)
+    pub fn find_enum_mut(&mut self, name: &str) -> &mut Enum {
+        self.enums_mut()
+            .find(|m| m.name == *name)
+            .expect("We assume an internally valid datamodel before mutating.")
     }
 
     /// Returns (model_name, field_name) for all fields using a specific enum.
     pub fn find_enum_fields(&mut self, enum_name: &str) -> Vec<(String, String)> {
         let mut fields = vec![];
-
-        for model in &self.models {
+        for model in self.models() {
             for field in model.scalar_fields() {
                 if FieldType::Enum(enum_name.to_owned()) == field.field_type {
                     fields.push((model.name.clone(), field.name.clone()))
@@ -148,7 +146,7 @@ impl Datamodel {
     /// Returns (model_name, field_name) for all relation fields pointing to a specific model.
     pub fn find_relation_fields_for_model(&mut self, model_name: &str) -> Vec<(String, String)> {
         let mut fields = vec![];
-        for model in &self.models {
+        for model in self.models() {
             for field in model.relation_fields() {
                 if field.relation_info.to == model_name {
                     fields.push((model.name.clone(), field.name.clone()))
@@ -171,9 +169,14 @@ impl Datamodel {
             })
     }
 
-    // This is used once we assume the datamodel to be internally valid
-    pub fn find_related_field_bang(&self, rf: &RelationField) -> &RelationField {
+    /// This finds the related field for a relationfield if available
+    pub fn find_related_field(&self, rf: &RelationField) -> Option<&RelationField> {
         self.find_related_field_for_info(&rf.relation_info, &rf.name)
+    }
+
+    /// This is used once we assume the datamodel to be internally valid
+    pub fn find_related_field_bang(&self, rf: &RelationField) -> &RelationField {
+        self.find_related_field(rf)
             .expect("Every RelationInfo should have a complementary RelationInfo on the opposite relation field.")
     }
 }

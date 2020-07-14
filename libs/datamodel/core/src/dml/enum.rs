@@ -6,12 +6,13 @@ pub struct Enum {
     /// Name of the enum.
     pub name: String,
     /// Values of the enum.
-    //    todo this needs to be able to hold database names for enum values
     pub values: Vec<EnumValue>,
     /// Comments for this enum.
     pub documentation: Option<String>,
     /// Database internal name of this enum.
     pub database_name: Option<String>,
+    /// Has to be commented out.
+    pub commented_out: bool,
 }
 
 impl Enum {
@@ -22,6 +23,7 @@ impl Enum {
             values,
             documentation: None,
             database_name: None,
+            commented_out: false,
         }
     }
 
@@ -29,20 +31,19 @@ impl Enum {
         self.values.push(value)
     }
 
-    /// Gets an iterator over all fields.
+    /// Gets an iterator over all values.
     pub fn values(&self) -> std::slice::Iter<EnumValue> {
         self.values.iter()
     }
 
-    /// Gets a mutable iterator over all fields.
+    /// Gets a mutable iterator over all values.
     pub fn values_mut(&mut self) -> std::slice::IterMut<EnumValue> {
         self.values.iter_mut()
     }
 
-    /// Gets an iterator over all fields.
+    /// Gets an iterator over all database values.
     pub fn database_values(&self) -> Vec<String> {
-        self.values
-            .iter()
+        self.values()
             .map(|v| v.database_name.as_ref().unwrap_or(&v.name).to_owned())
             .collect()
     }
@@ -56,8 +57,10 @@ impl Enum {
         self.values().find(|v| v.database_name == Some(db_name.to_owned()))
     }
 
-    pub fn find_value_mut(&mut self, value: &str) -> Option<&mut EnumValue> {
-        self.values_mut().find(|ev| ev.name == value)
+    pub fn find_value_mut(&mut self, value: &str) -> &mut EnumValue {
+        self.values_mut()
+            .find(|ev| ev.name == value)
+            .expect("We assume an internally valid datamodel before mutating.")
     }
 }
 
@@ -87,17 +90,18 @@ pub struct EnumValue {
     pub name: String,
     /// Actual value as defined in the database
     pub database_name: Option<String>,
+    /// Comments for this enum value.
     pub documentation: Option<String>,
     /// Has to be commented out.
     pub commented_out: bool,
 }
 
 impl EnumValue {
-    /// Creates a new enum value with the given name and database name.
-    pub fn new(name: &str, database_name: Option<&str>) -> EnumValue {
+    /// Creates a new enum value with the given name
+    pub fn new(name: &str) -> EnumValue {
         EnumValue {
             name: String::from(name),
-            database_name: database_name.map(String::from),
+            database_name: None,
             documentation: None,
             commented_out: false,
         }

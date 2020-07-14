@@ -30,7 +30,7 @@ fn a_data_model_can_be_generated_from_a_schema() {
             database_name: None,
             name: "Table1".to_string(),
             documentation: Some(
-                "The underlying table does not contain a unique identifier and can therefore currently not be handled."
+                "The underlying table does not contain a valid unique identifier and can therefore currently not be handled."
                     .to_string(),
             ),
             is_embedded: false,
@@ -96,7 +96,7 @@ fn a_data_model_can_be_generated_from_a_schema() {
     };
     let introspection_result = calculate_datamodel(&schema, &SqlFamily::Postgres).expect("calculate data model");
 
-    assert_eq!(introspection_result.datamodel, ref_data_model);
+    assert_eq!(introspection_result.data_model, ref_data_model);
 }
 
 #[test]
@@ -176,7 +176,7 @@ fn arity_is_preserved_when_generating_data_model_from_a_schema() {
     };
     let introspection_result = calculate_datamodel(&schema, &SqlFamily::Postgres).expect("calculate data model");
 
-    assert_eq!(introspection_result.datamodel, ref_data_model);
+    assert_eq!(introspection_result.data_model, ref_data_model);
 }
 
 #[test]
@@ -191,12 +191,12 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
             fields: vec![
                 Field::ScalarField(ScalarField::new(
                     "no_default",
-                    FieldArity::Optional,
+                    FieldArity::Required,
                     FieldType::Base(ScalarType::Int, None),
                 )),
                 Field::ScalarField(ScalarField {
                     name: "int_default".to_string(),
-                    arity: FieldArity::Optional,
+                    arity: FieldArity::Required,
                     field_type: FieldType::Base(ScalarType::Int, None),
                     database_name: None,
                     default_value: Some(dml::DefaultValue::Single(PrismaValue::Int(1))),
@@ -264,13 +264,13 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
             columns: vec![
                 Column {
                     name: "no_default".to_string(),
-                    tpe: ColumnType::pure(ColumnTypeFamily::Int, ColumnArity::Nullable),
+                    tpe: ColumnType::pure(ColumnTypeFamily::Int, ColumnArity::Required),
                     default: None,
                     auto_increment: false,
                 },
                 Column {
                     name: "int_default".to_string(),
-                    tpe: ColumnType::pure(ColumnTypeFamily::Int, ColumnArity::Nullable),
+                    tpe: ColumnType::pure(ColumnTypeFamily::Int, ColumnArity::Required),
                     default: Some(DefaultValue::VALUE(PrismaValue::Int(1))),
                     auto_increment: false,
                 },
@@ -306,7 +306,7 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
     };
     let introspection_result = calculate_datamodel(&schema, &SqlFamily::Postgres).expect("calculate data model");
 
-    assert_eq!(introspection_result.datamodel, ref_data_model);
+    assert_eq!(introspection_result.data_model, ref_data_model);
 }
 
 #[test]
@@ -468,7 +468,7 @@ fn primary_key_is_preserved_when_generating_data_model_from_a_schema() {
     };
     let introspection_result = calculate_datamodel(&schema, &SqlFamily::Postgres).expect("calculate data model");
 
-    assert_eq!(introspection_result.datamodel, ref_data_model);
+    assert_eq!(introspection_result.data_model, ref_data_model);
 }
 
 #[test]
@@ -537,7 +537,7 @@ fn uniqueness_is_preserved_when_generating_data_model_from_a_schema() {
     };
     let introspection_result = calculate_datamodel(&schema, &SqlFamily::Postgres).expect("calculate data model");
 
-    assert_eq!(introspection_result.datamodel, ref_data_model);
+    assert_eq!(introspection_result.data_model, ref_data_model);
 }
 
 #[test]
@@ -755,7 +755,7 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
     };
     let introspection_result = calculate_datamodel(&schema, &SqlFamily::Postgres).expect("calculate data model");
 
-    assert_eq!(introspection_result.datamodel, expected_data_model);
+    assert_eq!(introspection_result.data_model, expected_data_model);
 }
 
 #[test]
@@ -864,7 +864,7 @@ fn multi_field_uniques_are_preserved_when_generating_data_model_from_a_schema() 
     };
     let introspection_result = calculate_datamodel(&schema, &SqlFamily::Postgres).expect("calculate data model");
 
-    assert_eq!(introspection_result.datamodel, ref_data_model);
+    assert_eq!(introspection_result.data_model, ref_data_model);
 }
 
 #[test]
@@ -1047,7 +1047,7 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
     };
     let introspection_result = calculate_datamodel(&schema, &SqlFamily::Postgres).expect("calculate data model");
 
-    assert_eq!(introspection_result.datamodel, ref_data_model);
+    assert_eq!(introspection_result.data_model, ref_data_model);
 }
 
 #[test]
@@ -1058,6 +1058,7 @@ fn enums_are_preserved_when_generating_data_model_from_a_schema() {
             name: "Enum".to_string(),
             database_name: None,
             documentation: None,
+            commented_out: false,
             values: vec![
                 datamodel::dml::EnumValue {
                     name: "a".to_string(),
@@ -1086,5 +1087,5 @@ fn enums_are_preserved_when_generating_data_model_from_a_schema() {
     };
     let introspection_result = calculate_datamodel(&schema, &SqlFamily::Postgres).expect("calculate data model");
 
-    assert_eq!(introspection_result.datamodel, ref_data_model);
+    assert_eq!(introspection_result.data_model, ref_data_model);
 }

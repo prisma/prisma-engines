@@ -25,7 +25,7 @@ impl<'a> SqlSchemaCalculator<'a> {
     }
 
     fn calculate_internal(&self) -> SqlResult<sql::SqlSchema> {
-        let mut tables = Vec::with_capacity(self.data_model.models.len());
+        let mut tables = Vec::with_capacity(self.data_model.models().len());
         let model_tables_without_inline_relations = self.calculate_model_tables();
 
         for result in model_tables_without_inline_relations {
@@ -61,7 +61,7 @@ impl<'a> SqlSchemaCalculator<'a> {
             SqlFamily::Mysql => {
                 // This is a lower bound for the size of the generated enums (we assume each enum is
                 // used at least once).
-                let mut enums = Vec::with_capacity(self.data_model.enums.len());
+                let mut enums = Vec::with_capacity(self.data_model.enums().len());
 
                 let enum_fields = walk_scalar_fields(&self.data_model)
                     .filter_map(|field| field.field_type().as_enum().map(|enum_ref| (field, enum_ref)));

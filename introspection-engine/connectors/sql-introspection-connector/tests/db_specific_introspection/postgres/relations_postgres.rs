@@ -292,27 +292,27 @@ async fn introspecting_a_prisma_many_to_many_relation_should_work(api: &TestApi)
 }
 
 // currently disallowed by the validator since the relation tables do not have ids
-//#[test_one_connector(connector = "postgres")]
-//async fn introspecting_a_many_to_many_relation_should_work(api: &TestApi) {
-//    let barrel = api.barrel();
-//    let _setup_schema = barrel
-//        .execute(|migration| {
-//            migration.create_table("User", |t| {
-//                t.add_column("id", types::primary());
-//            });
-//            migration.create_table("Post", |t| {
-//                t.add_column("id", types::primary());
-//            });
-//            migration.create_table("PostsToUsers", |t| {
-//                t.inject_custom(
-//                    "user_id INTEGER NOT NULL REFERENCES  \"User\"(\"id\") ON DELETE CASCADE,
+// #[test_each_connector(tags("postgres"))]
+// async fn introspecting_a_many_to_many_relation_should_work(api: &TestApi) {
+//     let barrel = api.barrel();
+//     let _setup_schema = barrel
+//         .execute(|migration| {
+//             migration.create_table("User", |t| {
+//                 t.add_column("id", types::primary());
+//             });
+//             migration.create_table("Post", |t| {
+//                 t.add_column("id", types::primary());
+//             });
+//             migration.create_table("PostsToUsers", |t| {
+//                 t.inject_custom(
+//                     "user_id INTEGER NOT NULL REFERENCES  \"User\"(\"id\") ON DELETE CASCADE,
 //                    post_id INTEGER NOT NULL REFERENCES  \"Post\"(\"id\") ON DELETE CASCADE",
-//                )
-//            });
-//        })
-//        .await;
+//                 )
+//             });
+//         })
+//         .await;
 //
-//    let dm = r#"
+//     let dm = r#"
 //            model Post {
 //               id      Int @id @default(autoincrement())
 //               postsToUserses PostsToUsers[] @relation(references: [post_id])
@@ -328,9 +328,9 @@ async fn introspecting_a_prisma_many_to_many_relation_should_work(api: &TestApi)
 //               postsToUserses PostsToUsers[]
 //            }
 //        "#;
-//    let result = dbg!(api.introspect().await);
-//    custom_assert(&result, dm);
-//}
+//     let result = dbg!(api.introspect().await);
+//     custom_assert(&result, dm);
+// }
 //
 //#[test_one_connector(connector = "postgres")]
 //async fn introspecting_a_many_to_many_relation_with_extra_fields_should_work(api: &TestApi) {
@@ -630,26 +630,6 @@ async fn introspecting_relations_should_avoid_name_clashes(api: &TestApi) {
     custom_assert(&result, dm);
 }
 
-//
-// CREATE TABLE IF NOT EXISTS `x` (
-// `y` int(11) DEFAULT NULL,
-// `id` int(11) DEFAULT NULL,
-// UNIQUE KEY `unique_id` (`id`) USING BTREE,
-// UNIQUE KEY `unique_y_id` (`y`,`id`) USING BTREE,
-// KEY `FK__y` (`y`),
-// CONSTRAINT `FK__y` FOREIGN KEY (`y`) REFERENCES `y` (`id`)
-// ) ENGINE=InnoDB DEFAULT;
-//
-// CREATE TABLE IF NOT EXISTS `y` (
-// `id` int(11) DEFAULT NULL,
-// `x` int(11) DEFAULT NULL,
-// `fk_x_1` int(11) DEFAULT NULL,
-// `fk_x_2` int(11) DEFAULT NULL,
-// UNIQUE KEY `unique_id` (`id`) USING BTREE,
-// KEY `FK_y_x` (`fk_x_1`,`fk_x_2`) USING BTREE,
-// CONSTRAINT `FK_y_x` FOREIGN KEY (`fk_x_1`, `fk_x_2`) REFERENCES `x` (`y`, `id`)
-// ) ENGINE=InnoDB DEFAULT;
-
 #[test_each_connector(tags("postgres"))]
 async fn introspecting_relations_should_avoid_name_clashes_2(api: &TestApi) {
     let barrel = api.barrel();
@@ -724,55 +704,3 @@ async fn introspecting_relations_should_avoid_name_clashes_2(api: &TestApi) {
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
-
-#[test_each_connector(tags("postgres"))]
-async fn introspecting_a_relation_based_on_an_unsupported_type_should_drop_it(api: &TestApi) {
-    let barrel = api.barrel();
-    let _setup_schema = barrel
-        .execute(|migration| {
-            migration.create_table("User", |t| {
-                t.add_column("id", types::primary());
-                t.inject_custom("network_mac  macaddr Not null Unique");
-            });
-            migration.create_table("Post", |t| {
-                t.add_column("id", types::primary());
-                t.inject_custom("user_network_mac macaddr REFERENCES \"User\"(\"network_mac\")");
-            });
-        })
-        .await;
-
-    let warnings = dbg!(api.introspection_warnings().await);
-    assert_eq!(
-        &warnings,
-        "[{\"code\":3,\"message\":\"These fields were commented out because Prisma currently does not support their types.\",\"affected\":[{\"model\":\"Post\",\"field\":\"user_network_mac\",\"tpe\":\"macaddr\"},{\"model\":\"User\",\"field\":\"network_mac\",\"tpe\":\"macaddr\"}]}]"
-    );
-
-    let result = dbg!(api.introspect().await);
-    assert_eq!(&result, "model Post {\n  id                  Int      @default(autoincrement()) @id\n  // This type is currently not supported.\n  // user_network_mac macaddr?\n}\n\nmodel User {\n  id             Int     @default(autoincrement()) @id\n  // This type is currently not supported.\n  // network_mac macaddr @unique\n}\n");
-}
-
-// #[test_each_connector(tags("postgres"))]
-// async fn introspecting_a_relation_based_on_an_unsupported_field_name_should_drop_it(api: &TestApi) {
-//     let barrel = api.barrel();
-//     let _setup_schema = barrel
-//         .execute(|migration| {
-//             migration.create_table("User", |t| {
-//                 t.add_column("id", types::primary());
-//                 t.inject_custom("\"1\"  integer Not null Unique");
-//             });
-//             migration.create_table("Post", |t| {
-//                 t.add_column("id", types::primary());
-//                 t.inject_custom("user_1 integer REFERENCES \"User\"(\"1\")");
-//             });
-//         })
-//         .await;
-//
-//     let warnings = dbg!(api.introspection_warnings().await);
-//     assert_eq!(
-//         &warnings,
-//         "[{\"code\":2,\"message\":\"These fields were commented out because of invalid names. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]*.\",\"affected\":[{\"model\":\"User\",\"field\":\"1\"}]}]"
-//     );
-//
-//     let result = dbg!(api.introspect().await);
-//     assert_eq!(&result, "model Post {\n  id                  Int      @default(autoincrement()) @id\n  // This type is currently not supported.\n  // user_network_mac macaddr?\n}\n\nmodel User {\n  id             Int     @default(autoincrement()) @id\n  // This type is currently not supported.\n  // network_mac macaddr @unique\n}");
-// }
