@@ -31,5 +31,15 @@ pub(crate) trait SqlRenderer {
     /// passed-in differ. `None` means that we could not generate a good (set
     /// of) ALTER COLUMN(s), and we should fall back to dropping and recreating
     /// the column.
-    fn render_alter_column(&self, differ: &ColumnDiffer<'_>) -> Option<Vec<String>>;
+    ///
+    /// The return type should be interpreted as (alter table lines, (statement before, statement after))
+    fn render_alter_column(&self, differ: &ColumnDiffer<'_>) -> Option<RenderedAlterColumn>;
+}
+
+#[derive(Default)]
+pub(crate) struct RenderedAlterColumn {
+    /// The statements that will be included in the ALTER TABLE
+    pub(crate) alter_columns: Vec<String>,
+    /// The statements to be run before and after the ALTER TABLE.
+    pub(crate) before_and_after: Option<(String, String)>,
 }

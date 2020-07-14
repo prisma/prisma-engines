@@ -1,5 +1,5 @@
 use crate::*;
-use sql_renderer::{rendered_step::RenderedStep, IteratorJoin, Quoted};
+use sql_renderer::{rendered_step::RenderedStep, IteratorJoin, Quoted, RenderedAlterColumn};
 use sql_schema_describer::*;
 use sql_schema_differ::{ColumnDiffer, DiffingOptions};
 use sql_schema_helpers::{find_column, walk_columns, ColumnRef, SqlSchemaExt};
@@ -11,7 +11,7 @@ pub struct SqlDatabaseStepApplier<'a> {
     pub connector: &'a crate::SqlMigrationConnector,
 }
 
-impl crate::component::Component for SqlDatabaseStepApplier<'_> {
+impl Component for SqlDatabaseStepApplier<'_> {
     fn connector(&self) -> &crate::SqlMigrationConnector {
         self.connector
     }
@@ -252,6 +252,9 @@ fn render_raw_sql(
 
         SqlMigrationStep::AlterTable(AlterTable { table, changes }) => {
             let mut lines = Vec::new();
+            let mut before_statements = Vec::new();
+            let mut after_statements = Vec::new();
+
             for change in changes {
                 match change {
                     TableChange::DropPrimaryKey { constraint_name } => match renderer.sql_family() {
@@ -291,9 +294,17 @@ fn render_raw_sql(
                                 .expect("Invariant violation: could not find column referred to in AlterColumn."),
                             &DiffingOptions::from_database_info(database_info),
                         ) {
-                            Some(safe_sql) => {
-                                for line in safe_sql {
-                                    lines.push(line)
+                            Some(RenderedAlterColumn {
+                                alter_columns,
+                                before_and_after,
+                            }) => {
+                                for statement in alter_columns {
+                                    lines.push(statement);
+                                }
+
+                                if let Some((before, after)) = before_and_after {
+                                    before_statements.push(before);
+                                    after_statements.push(after);
                                 }
                             }
                             None => {
@@ -316,11 +327,19 @@ fn render_raw_sql(
                 return Ok(Vec::new());
             }
 
-            Ok(vec![format!(
+            let alter_table = format!(
                 "ALTER TABLE {} {};",
                 renderer.quote_with_schema(&schema_name, &table.name),
                 lines.join(",\n")
-            )])
+            );
+
+            let statements = before_statements
+                .into_iter()
+                .chain(std::iter::once(alter_table))
+                .chain(after_statements.into_iter())
+                .collect();
+
+            Ok(statements)
         }
         SqlMigrationStep::CreateIndex(CreateIndex { table, index }) => {
             Ok(vec![render_create_index(renderer, database_info, table, index)])
@@ -454,7 +473,7 @@ fn safe_alter_column(
     previous_column: ColumnRef<'_>,
     next_column: ColumnRef<'_>,
     diffing_options: &DiffingOptions,
-) -> Option<Vec<String>> {
+) -> Option<RenderedAlterColumn> {
     let differ = ColumnDiffer {
         previous: previous_column,
         next: next_column,

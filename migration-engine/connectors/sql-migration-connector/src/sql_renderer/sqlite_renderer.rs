@@ -1,4 +1,4 @@
-use super::{common::*, SqlRenderer};
+use super::{common::*, RenderedAlterColumn, SqlRenderer};
 use crate::{flavour::SqliteFlavour, sql_schema_helpers::*};
 use once_cell::sync::Lazy;
 use prisma_models::PrismaValue;
@@ -66,7 +66,7 @@ impl SqlRenderer for SqliteFlavour {
         }
     }
 
-    fn render_alter_column(&self, _differ: &crate::sql_schema_differ::ColumnDiffer<'_>) -> Option<Vec<String>> {
+    fn render_alter_column(&self, _differ: &crate::sql_schema_differ::ColumnDiffer<'_>) -> Option<RenderedAlterColumn> {
         None
     }
 }

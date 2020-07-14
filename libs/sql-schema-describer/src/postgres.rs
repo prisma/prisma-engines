@@ -714,7 +714,8 @@ fn is_autoincrement(value: &str, schema_name: &str, table_name: &str, column_nam
                         let matched_segments = matched.as_str().split('_');
                         matched_segments
                             .zip(table_name_segments.chain(column_name_segments))
-                            .all(|(found, expected)| found == expected)
+                            // postgres automatically lower-cases table/column names when generating sequence names
+                            .all(|(found, expected)| found == expected || found == expected.to_lowercase())
                     })
                 })
                 .map(|_| true)

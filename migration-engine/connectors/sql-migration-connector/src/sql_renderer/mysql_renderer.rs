@@ -1,4 +1,4 @@
-use super::{common::*, SqlRenderer};
+use super::{common::*, RenderedAlterColumn, SqlRenderer};
 use crate::{
     expanded_alter_column::{expand_mysql_alter_column, MysqlAlterColumn},
     flavour::{MysqlFlavour, SqlFlavour},
@@ -78,7 +78,7 @@ impl SqlRenderer for MysqlFlavour {
         }
     }
 
-    fn render_alter_column<'a>(&self, differ: &ColumnDiffer<'_>) -> Option<Vec<String>> {
+    fn render_alter_column<'a>(&self, differ: &ColumnDiffer<'_>) -> Option<RenderedAlterColumn> {
         let expanded = expand_mysql_alter_column(differ);
 
         let sql = match expanded {
@@ -91,7 +91,10 @@ impl SqlRenderer for MysqlFlavour {
             }
         };
 
-        Some(sql)
+        Some(RenderedAlterColumn {
+            alter_columns: sql,
+            before_and_after: None,
+        })
     }
 }
 
