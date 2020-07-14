@@ -1,10 +1,11 @@
 use crate::{
     database_info::DatabaseInfo,
+    flavour::SqlFlavour,
     sql_migration::*,
-    sql_renderer::{Quoted, SqlRenderer},
+    sql_renderer::Quoted,
     sql_schema_differ::{ColumnDiffer, DiffingOptions, SqlSchemaDiff, TableDiffer},
     sql_schema_helpers::{SqlSchemaExt, TableRef},
-    SqlFamily, SqlResult,
+    SqlResult,
 };
 use sql_schema_describer::{ColumnArity, SqlSchema};
 
@@ -14,6 +15,7 @@ pub(super) fn fix(
     next_database_schema: &SqlSchema,
     schema_name: &str,
     database_info: &DatabaseInfo,
+    flavour: &dyn SqlFlavour,
 ) -> SqlResult<Vec<SqlMigrationStep>> {
     let steps = diff.into_steps();
 
@@ -35,6 +37,7 @@ pub(super) fn fix(
                     &alter_table.table.name,
                     schema_name,
                     database_info,
+                    flavour,
                 )?);
                 fixed_tables.push(alter_table.table.name.clone());
             }
@@ -54,6 +57,7 @@ pub(super) fn fix(
                     &table,
                     schema_name,
                     database_info,
+                    flavour,
                 )?);
                 fixed_tables.push(table.clone());
             }
@@ -100,6 +104,7 @@ fn sqlite_fix_table(
     table_name: &str,
     schema_name: &str,
     database_info: &DatabaseInfo,
+    flavour: &dyn SqlFlavour,
 ) -> SqlResult<impl Iterator<Item = SqlMigrationStep>> {
     let current_table = current_database_schema
         .table_ref(table_name)
@@ -107,7 +112,7 @@ fn sqlite_fix_table(
     let next_table = next_database_schema
         .table_ref(table_name)
         .expect("SQLite table referenced in migration not found.");
-    Ok(fix_table(current_table, next_table, &schema_name, database_info).into_iter())
+    Ok(fix_table(current_table, next_table, &schema_name, database_info, flavour).into_iter())
 }
 
 fn fix_table(
@@ -115,6 +120,7 @@ fn fix_table(
     next: TableRef<'_>,
     schema_name: &str,
     database_info: &DatabaseInfo,
+    flavour: &dyn SqlFlavour,
 ) -> Vec<SqlMigrationStep> {
     // based on 'Making Other Kinds Of Table Schema Changes' from https://www.sqlite.org/lang_altertable.html
     let name_of_temporary_table = format!("new_{}", &next.name());
@@ -138,6 +144,7 @@ fn fix_table(
             next: TableRef::new(next.schema, &temporary_table),
         },
         schema_name,
+        flavour,
     )
     .unwrap();
 
@@ -170,6 +177,7 @@ fn copy_current_table_into_new_table(
     steps: &mut Vec<SqlMigrationStep>,
     differ: TableDiffer<'_>,
     schema_name: &str,
+    flavour: &dyn SqlFlavour,
 ) -> std::fmt::Result {
     use std::fmt::Write as _;
     let columns_that_became_required_with_a_default: Vec<ColumnDiffer<'_>> = differ
@@ -226,7 +234,7 @@ fn copy_current_table_into_new_table(
             format!(
                 "coalesce({column_name}, {default_value}) AS {column_name}",
                 column_name = Quoted::sqlite_ident(columns.name()),
-                default_value = SqlRenderer::for_family(&SqlFamily::Sqlite).render_default(
+                default_value = flavour.render_default(
                     columns
                         .next
                         .column

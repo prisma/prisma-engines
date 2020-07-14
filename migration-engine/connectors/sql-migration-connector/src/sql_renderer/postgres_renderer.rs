@@ -1,18 +1,12 @@
 use super::common::*;
-use crate::{sql_schema_helpers::*, SqlFamily};
+use crate::{flavour::PostgresFlavour, sql_schema_helpers::*};
 use once_cell::sync::Lazy;
 use prisma_models::PrismaValue;
 use regex::Regex;
 use sql_schema_describer::*;
 use std::borrow::Cow;
 
-pub struct PostgresRenderer {}
-
-impl super::SqlRenderer for PostgresRenderer {
-    fn sql_family(&self) -> SqlFamily {
-        SqlFamily::Postgres
-    }
-
+impl super::SqlRenderer for PostgresFlavour {
     fn quote<'a>(&self, name: &'a str) -> Quoted<&'a str> {
         Quoted::postgres_ident(name)
     }
