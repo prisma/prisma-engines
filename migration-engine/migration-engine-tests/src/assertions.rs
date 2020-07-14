@@ -387,28 +387,25 @@ impl<'a> PrimaryKeyAssertion<'a> {
         Ok(self)
     }
 
-    pub fn assert_has_sequence(self) -> AssertionResult<Self> {
+    pub fn assert_has_autoincrement(self) -> AssertionResult<Self> {
         anyhow::ensure!(
-            self.pk.sequence.is_some()
-                || self
-                    .table
-                    .columns
-                    .iter()
-                    .any(|column| self.pk.columns.contains(&column.name) && column.auto_increment),
+            self.table
+                .columns
+                .iter()
+                .any(|column| self.pk.columns.contains(&column.name) && column.auto_increment),
             "Assertion failed: expected a sequence on the primary key, found none."
         );
 
         Ok(self)
     }
 
-    pub fn assert_has_no_sequence(self) -> AssertionResult<Self> {
+    pub fn assert_has_no_autoincrement(self) -> AssertionResult<Self> {
         anyhow::ensure!(
-            self.pk.sequence.is_none()
-                && !self
-                    .table
-                    .columns
-                    .iter()
-                    .any(|column| self.pk.columns.contains(&column.name) && column.auto_increment),
+            !self
+                .table
+                .columns
+                .iter()
+                .any(|column| self.pk.columns.contains(&column.name) && column.auto_increment),
             "Assertion failed: expected no sequence on the primary key, but found one."
         );
 

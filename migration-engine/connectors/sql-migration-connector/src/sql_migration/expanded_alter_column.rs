@@ -85,8 +85,8 @@ pub(crate) fn expand_postgres_alter_column(columns: &ColumnDiffer<'_>) -> Option
             },
             ColumnChange::Sequence => {
                 if columns.previous.is_autoincrement() {
-                    // // The sequence should be dropped.
-                    // changes.push(PostgresAlterColumn::DropDefault)
+                    // The sequence should be dropped.
+                    changes.push(PostgresAlterColumn::DropDefault)
                 } else {
                     // The sequence should be created.
                     changes.push(PostgresAlterColumn::AddSequence)

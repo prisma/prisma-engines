@@ -204,7 +204,7 @@ async fn making_an_existing_id_field_autoincrement_works(api: &TestApi) -> TestR
     api.infer_apply(dm1).send().await?.assert_green()?;
 
     api.assert_schema().await?.assert_table("Post", |model| {
-        model.assert_pk(|pk| pk.assert_columns(&["id"])?.assert_has_no_sequence())
+        model.assert_pk(|pk| pk.assert_columns(&["id"])?.assert_has_no_autoincrement())
     })?;
 
     let dm2 = r#"
@@ -221,9 +221,7 @@ async fn making_an_existing_id_field_autoincrement_works(api: &TestApi) -> TestR
     api.infer_apply(dm2).send().await?.assert_green()?;
 
     api.assert_schema().await?.assert_table("Post", |model| {
-        model
-            .debug_print()?
-            .assert_pk(|pk| pk.assert_columns(&["id"])?.debug_print()?.assert_has_sequence())
+        model.assert_pk(|pk| pk.assert_columns(&["id"])?.assert_has_autoincrement())
     })?;
 
     Ok(())
@@ -246,7 +244,7 @@ async fn removing_autoincrement_from_an_existing_field_works(api: &TestApi) -> T
     api.infer_apply(dm1).send().await?.assert_green()?;
 
     api.assert_schema().await?.assert_table("Post", |model| {
-        model.assert_pk(|pk| pk.assert_columns(&["id"])?.assert_has_sequence())
+        model.assert_pk(|pk| pk.assert_columns(&["id"])?.assert_has_autoincrement())
     })?;
 
     let dm2 = r#"
@@ -263,9 +261,7 @@ async fn removing_autoincrement_from_an_existing_field_works(api: &TestApi) -> T
     api.infer_apply(dm2).send().await?.assert_green()?;
 
     api.assert_schema().await?.assert_table("Post", |model| {
-        model
-            .debug_print()?
-            .assert_pk(|pk| pk.assert_columns(&["id"])?.debug_print()?.assert_has_no_sequence())
+        model.assert_pk(|pk| pk.assert_columns(&["id"])?.assert_has_no_autoincrement())
     })?;
 
     Ok(())
