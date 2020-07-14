@@ -287,7 +287,7 @@ impl<'a> Validator<'a> {
         if super::invalid_model_names::RESERVED_MODEL_NAMES.contains(&model.name.as_str()) {
             Err(DatamodelError::new_model_validation_error(
                 &format!(
-                    "The model name `{}` is invalid. It is a reserved name. Please change it.",
+                    "The model name `{}` is invalid. It is a reserved name. Please change it. Read more at https://pris.ly/d/naming-models",
                     &model.name
                 ),
                 &model.name,
