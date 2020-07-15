@@ -1,4 +1,4 @@
-pub const RESERVED_MODEL_NAMES: [&str; 108] = [
+pub const RESERVED_MODEL_NAMES: &[&str] = &[
     // reserved GraphQL words
     "Query",
     "Mutation",

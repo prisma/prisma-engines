@@ -80,7 +80,7 @@ fn must_error_for_invalid_model_names() {
 
     let errors = parse_error(dml);
     errors.assert_is(DatamodelError::new_model_validation_error(
-        "The model name `DateTimeFilter` is invalid. It is a reserved name. Please change it.",
+        "The model name `DateTimeFilter` is invalid. It is a reserved name. Please change it. Read more at https://pris.ly/d/naming-models",
         "DateTimeFilter",
         Span::new(5, 52),
     ));
@@ -107,7 +107,7 @@ fn must_return_good_error_messages_for_numbers_in_enums() {
 fn invalid_line_must_not_break() {
     let dml = r#"
     $ /a/b/c:.
-    
+
     model Blog {
       id Int @id
     }
