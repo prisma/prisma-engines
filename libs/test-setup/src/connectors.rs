@@ -78,6 +78,10 @@ impl Connectors {
     pub fn len(&self) -> usize {
         self.connectors.len()
     }
+
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
 }
 
 /// Represents a connector to be tested.

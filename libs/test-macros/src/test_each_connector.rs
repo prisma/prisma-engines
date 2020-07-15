@@ -7,7 +7,7 @@ use std::str::FromStr;
 use syn::{parse_macro_input, spanned::Spanned, AttributeArgs, Ident, ItemFn};
 use test_setup::connectors::{Capabilities, Connector, Tags, CONNECTORS};
 
-const TAGS_FILTER: Lazy<Tags> = Lazy::new(|| {
+static TAGS_FILTER: Lazy<Tags> = Lazy::new(|| {
     let tags_str = std::env::var("TEST_EACH_CONNECTOR_TAGS").ok();
     let mut tags = Tags::empty();
 
@@ -115,7 +115,7 @@ impl TestEachConnectorArgs {
         CONNECTORS
             .all()
             .filter(move |connector| connector.capabilities.contains(self.capabilities.0))
-            .filter(move |connector| TAGS_FILTER.is_empty() || connector.tags.contains(**&TAGS_FILTER))
+            .filter(move |connector| TAGS_FILTER.is_empty() || connector.tags.contains(*TAGS_FILTER))
             .filter(move |connector| self.tags.0.is_empty() || connector.tags.intersects(self.tags.0))
             .filter(move |connector| !connector.tags.intersects(self.ignore.0))
     }
@@ -191,8 +191,7 @@ fn test_each_connector_async_wrapper_functions(
     if tests.is_empty() && TAGS_FILTER.is_empty() {
         return vec![
             syn::Error::new_spanned(test_function, "All connectors were filtered out for this test.")
-                .to_compile_error()
-                .into(),
+                .to_compile_error(),
         ];
     }
 

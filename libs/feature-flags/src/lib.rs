@@ -37,7 +37,7 @@ macro_rules! flags {
                     $(
                         stringify!($field) => self.$field = true,
                     )*
-                    _ => Err(FeatureFlagError::InvalidFlag(flag.to_owned()))?,
+                    _ => return Err(FeatureFlagError::InvalidFlag(flag.to_owned())),
                 };
 
                 Ok(())
@@ -63,7 +63,7 @@ flags!(transaction, connectOrCreate, distinct, aggregations);
 pub fn initialize(from: &[String]) -> Result<()> {
     FEATURE_FLAGS
         .get_or_try_init(|| {
-            from.into_iter().try_fold(FeatureFlags::default(), |mut acc, flag| {
+            from.iter().try_fold(FeatureFlags::default(), |mut acc, flag| {
                 acc.add_flag(&flag)?;
                 Ok(acc)
             })
