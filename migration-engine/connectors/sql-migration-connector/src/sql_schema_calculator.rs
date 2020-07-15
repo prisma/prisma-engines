@@ -315,6 +315,11 @@ fn migration_value_new(field: &ScalarFieldWalker<'_>) -> Option<sql_schema_descr
         {
             return Some(sql_schema_describer::DefaultValue::DBGENERATED(String::new()))
         }
+        datamodel::DefaultValue::Expression(expression)
+            if expression.name == "autoincrement" && expression.args.is_empty() =>
+        {
+            return Some(sql_schema_describer::DefaultValue::SEQUENCE(String::new()))
+        }
         datamodel::DefaultValue::Expression(_) => return None,
     };
 

@@ -277,17 +277,13 @@ impl SqlSchemaDescriber {
                 },
             };
 
-            let is_auto_increment = is_identity
-                || match default {
-                    Some(DefaultValue::SEQUENCE(_)) => true,
-                    _ => false,
-                };
+            let auto_increment = is_identity || matches!(default, Some(DefaultValue::SEQUENCE(_)));
 
             let col = Column {
                 name: col_name,
                 tpe,
                 default,
-                auto_increment: is_auto_increment,
+                auto_increment,
             };
 
             columns.entry(table_name).or_default().push(col);

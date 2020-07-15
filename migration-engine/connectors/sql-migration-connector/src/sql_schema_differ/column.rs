@@ -48,7 +48,8 @@ impl<'a> ColumnDiffer<'a> {
             None
         };
 
-        let sequence = if self.previous.is_autoincrement() != self.next.is_autoincrement() {
+        dbg!(self.previous.name());
+        let sequence = if dbg!(self.previous.is_autoincrement()) != dbg!(self.next.is_autoincrement()) {
             Some(ColumnChange::Sequence)
         } else {
             None

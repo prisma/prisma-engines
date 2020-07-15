@@ -54,15 +54,15 @@ impl<'a> ColumnRef<'a> {
     }
 
     pub(crate) fn is_autoincrement(&self) -> bool {
-        if self.column.auto_increment {
-            return true;
-        }
+        self.column.auto_increment
+        //     return true;
+        // }
 
-        let pk = self.table().primary_key();
+        // let pk = self.table().primary_key();
 
-        pk.as_ref()
-            .map(|pk| pk.sequence.is_some() && pk.columns.contains(&self.column.name))
-            .unwrap_or(false)
+        // pk.as_ref()
+        //     .map(|pk| pk.sequence.is_some() && pk.columns.contains(&self.column.name))
+        //     .unwrap_or(false)
     }
 
     pub(crate) fn is_required(&self) -> bool {

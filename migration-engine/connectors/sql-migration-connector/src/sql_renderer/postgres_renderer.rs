@@ -41,7 +41,7 @@ impl super::SqlRenderer for PostgresFlavour {
             .join(",");
 
         format!(
-            "REFERENCES {}({}) {}  ON UPDATE CASCADE",
+            "REFERENCES {}({}) {} ON UPDATE CASCADE",
             self.quote_with_schema(schema_name, &foreign_key.referenced_table),
             referenced_columns,
             render_on_delete(&foreign_key.on_delete_action)
