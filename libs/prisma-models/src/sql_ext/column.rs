@@ -1,4 +1,5 @@
 use crate::{Field, ModelProjection, RelationField, RelationLinkManifestation, ScalarField};
+use itertools::Itertools;
 use quaint::ast::{Column, Row};
 use std::convert::AsRef;
 
@@ -60,7 +61,11 @@ impl AsColumns for &[Field] {
 
 impl AsColumns for ModelProjection {
     fn as_columns(&self) -> ColumnIterator {
-        let cols: Vec<Column<'static>> = self.fields().flat_map(|f| f.as_columns()).collect();
+        let cols: Vec<Column<'static>> = self
+            .fields()
+            .flat_map(|f| f.as_columns())
+            .unique_by(|c| c.name.clone())
+            .collect();
         ColumnIterator::from(cols)
     }
 }

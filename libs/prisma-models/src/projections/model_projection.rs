@@ -23,7 +23,9 @@ impl ModelProjection {
     }
 
     pub fn new(fields: Vec<Field>) -> Self {
-        Self { fields }
+        Self {
+            fields: fields.into_iter().unique_by(|f| f.name().to_owned()).collect(),
+        }
     }
 
     /// Returns all field names (NOT database level column names!) of contained fields.
@@ -65,7 +67,6 @@ impl ModelProjection {
             .unique_by(|field| field.name.clone())
     }
 
-    ///
     pub fn map_db_name(&self, name: &str) -> Option<ScalarFieldRef> {
         self.fields().find_map(|field| match field {
             Field::Scalar(sf) if sf.db_name() == name => Some(sf.clone()),
