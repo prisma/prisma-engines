@@ -2652,7 +2652,6 @@ dependencies = [
  "migration-core",
  "once_cell",
  "pretty_assertions",
- "prisma-inflector",
  "prisma-models",
  "quaint",
  "query-connector",
