@@ -4,6 +4,7 @@ use crate::{
 };
 use connector_interface::*;
 use futures::stream::{FuturesUnordered, StreamExt};
+use itertools::Itertools;
 use prisma_models::*;
 use quaint::ast::*;
 
@@ -13,7 +14,11 @@ pub async fn get_single_record(
     filter: &Filter,
     selected_fields: &ModelProjection,
 ) -> crate::Result<Option<SingleRecord>> {
-    let query = read::get_records(&model, selected_fields.as_columns(), filter);
+    let query = read::get_records(
+        &model,
+        selected_fields.as_columns().unique_by(|c| c.name.clone()),
+        filter,
+    );
     let field_names = selected_fields.db_names().map(String::from).collect();
     let idents: Vec<_> = selected_fields.type_identifiers_with_arities();
 
@@ -48,7 +53,7 @@ pub async fn get_many_records(
         let mut futures = FuturesUnordered::new();
 
         for args in batches.into_iter() {
-            let query = read::get_records(model, selected_fields.as_columns(), args);
+            let query = read::get_records(model, selected_fields.as_columns().unique_by(|c| c.name.clone()), args);
             futures.push(conn.filter(query.into(), idents.as_slice()));
         }
 
@@ -62,7 +67,11 @@ pub async fn get_many_records(
             records.order_by(order_by)
         }
     } else {
-        let query = read::get_records(model, selected_fields.as_columns(), query_arguments);
+        let query = read::get_records(
+            model,
+            selected_fields.as_columns().unique_by(|c| c.name.clone()),
+            query_arguments,
+        );
 
         for item in conn.filter(query.into(), idents.as_slice()).await?.into_iter() {
             records.push(Record::from(item))
