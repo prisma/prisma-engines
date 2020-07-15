@@ -597,6 +597,50 @@ async fn re_introspecting_custom_virtual_relation_field_names(api: &TestApi) {
     custom_assert(&result, final_dm);
 }
 
+#[test_each_connector(tags("postgres"))]
+async fn re_introspecting_custom_model_order(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("A", |t| {
+                t.add_column("id", types::primary());
+            });
+            migration.create_table("B", |t| {
+                t.add_column("id", types::primary());
+            });
+            migration.create_table("Unrelated", |t| {
+                t.add_column("id", types::primary());
+            });
+        })
+        .await;
+
+    let input_dm = r#"
+            model B {
+               id               Int @id @default(autoincrement())
+            }
+             
+            model A {
+               id               Int @id @default(autoincrement())
+            }
+        "#;
+
+    let final_dm = r#"
+             model B {
+               id               Int @id @default(autoincrement())
+            }
+
+            model A {
+               id               Int @id @default(autoincrement())
+            }
+            
+            model Unrelated {
+               id               Int @id @default(autoincrement())
+            }
+        "#;
+    let result = dbg!(api.re_introspect(input_dm).await);
+    custom_assert(&result, final_dm);
+}
+
 // #[test_each_connector(tags("postgres"))]
 // async fn re_introspecting_virtual_default(api: &TestApi) {
 //     let barrel = api.barrel();

@@ -302,10 +302,26 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
     // potential error: what if there was a db default before and then it got removed, now re-introspection makes it virtual
     // you could not get rid of it
 
+    // restore old model order
+    let mut re_ordered_data_model = Datamodel::new();
+
+    for old_model in old_data_model.models() {
+        if let Some(new_model) = new_data_model.find_model(&old_model.name) {
+            re_ordered_data_model.add_model(new_model.clone());
+        }
+    }
+
+    for new_model in new_data_model.models() {
+        if old_data_model.find_model(&new_model.name).is_none() {
+            re_ordered_data_model.add_model(new_model.clone());
+        }
+    }
+
+    *new_data_model = re_ordered_data_model;
+
     // println!("{:#?}", new_data_model);
 
     //warnings
-    //todo adjust them to use the new names
 
     if !changed_model_names.is_empty() {
         let models = changed_model_names.iter().map(|c| c.1.clone()).collect();
