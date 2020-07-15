@@ -69,6 +69,10 @@ impl<'a> ColumnRef<'a> {
         self.column.is_required()
     }
 
+    pub(crate) fn is_same_column(&self, other: &ColumnRef<'_>) -> bool {
+        self.name() == other.name() && self.table().name() == other.table().name()
+    }
+
     pub(crate) fn table(&self) -> TableRef<'a> {
         TableRef {
             schema: self.schema,

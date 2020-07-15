@@ -273,7 +273,7 @@ async fn deleting_a_scalar_list_field_for_a_non_existent_column_must_work(api: &
     Ok(())
 }
 
-#[test_each_connector(tags("sql"))]
+#[test_each_connector(log = "debug,sql-schema-describer=info", tags("sql"))]
 async fn updating_a_field_for_a_non_existent_column(api: &TestApi) -> TestResult {
     let dm1 = r#"
             model Blog {

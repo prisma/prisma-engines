@@ -40,6 +40,8 @@ pub(crate) trait SqlRenderer {
 pub(crate) struct RenderedAlterColumn {
     /// The statements that will be included in the ALTER TABLE
     pub(crate) alter_columns: Vec<String>,
-    /// The statements to be run before and after the ALTER TABLE.
-    pub(crate) before_and_after: Option<(String, String)>,
+    /// The statements to be run before the ALTER TABLE.
+    pub(crate) before: Option<String>,
+    /// The statements to be run after the ALTER TABLE.
+    pub(crate) after: Option<String>,
 }

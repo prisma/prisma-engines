@@ -296,14 +296,18 @@ fn render_raw_sql(
                         ) {
                             Some(RenderedAlterColumn {
                                 alter_columns,
-                                before_and_after,
+                                before,
+                                after,
                             }) => {
                                 for statement in alter_columns {
                                     lines.push(statement);
                                 }
 
-                                if let Some((before, after)) = before_and_after {
+                                if let Some(before) = before {
                                     before_statements.push(before);
+                                }
+
+                                if let Some(after) = after {
                                     after_statements.push(after);
                                 }
                             }

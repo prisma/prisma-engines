@@ -93,7 +93,8 @@ impl SqlRenderer for MysqlFlavour {
 
         Some(RenderedAlterColumn {
             alter_columns: sql,
-            before_and_after: None,
+            before: None,
+            after: None,
         })
     }
 }

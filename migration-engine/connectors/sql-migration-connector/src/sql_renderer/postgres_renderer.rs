@@ -2,6 +2,7 @@ use super::{common::*, RenderedAlterColumn};
 use crate::{
     expanded_alter_column::{expand_postgres_alter_column, PostgresAlterColumn},
     flavour::PostgresFlavour,
+    sql_schema_differ::ColumnDiffer,
     sql_schema_helpers::*,
 };
 use once_cell::sync::Lazy;
@@ -64,7 +65,11 @@ impl super::SqlRenderer for PostgresFlavour {
         }
     }
 
-    fn render_alter_column(&self, differ: &crate::sql_schema_differ::ColumnDiffer<'_>) -> Option<RenderedAlterColumn> {
+    fn render_alter_column(&self, differ: &ColumnDiffer<'_>) -> Option<RenderedAlterColumn> {
+        // Matches the sequence name from inside an autoincrement default expression.
+        static SEQUENCE_DEFAULT_RE: Lazy<Regex> =
+            Lazy::new(|| Regex::new(r#"nextval\('"?([^"]+)"?'::regclass\)"#).unwrap());
+
         let steps = expand_postgres_alter_column(differ)?;
         let table_name = Quoted::postgres_ident(differ.previous.table().name());
         let column_name = Quoted::postgres_ident(differ.previous.name());
@@ -75,9 +80,30 @@ impl super::SqlRenderer for PostgresFlavour {
 
         for step in steps {
             match step {
-                PostgresAlterColumn::DropDefault => rendered_steps
-                    .alter_columns
-                    .push(format!("{} DROP DEFAULT", &alter_column_prefix)),
+                PostgresAlterColumn::DropDefault => {
+                    rendered_steps
+                        .alter_columns
+                        .push(format!("{} DROP DEFAULT", &alter_column_prefix));
+
+                    // We may also need to drop the sequence, in case it isn't used by any other column.
+                    if let Some(DefaultValue::SEQUENCE(sequence_expression)) = differ.previous.default() {
+                        let sequence_name = SEQUENCE_DEFAULT_RE
+                            .captures(sequence_expression)
+                            .and_then(|captures| captures.get(1))
+                            .map(|capture| capture.as_str())
+                            .unwrap_or_else(|| {
+                                panic!("Failed to extract sequence name from `{}`", sequence_expression)
+                            });
+
+                        let sequence_is_still_used = walk_columns(differ.next.schema()).any(|column| matches!(column.default(), Some(DefaultValue::SEQUENCE(other_sequence)) if other_sequence == sequence_expression) && !column.is_same_column(&differ.next));
+
+                        if !sequence_is_still_used {
+                            rendered_steps.after =
+                                Some(format!("DROP SEQUENCE {};", Quoted::postgres_ident(sequence_name)));
+                        }
+                    }
+                }
+                // TODO: change sequence to default, then back to sequence
                 PostgresAlterColumn::SetDefault(new_default) => rendered_steps.alter_columns.push(format!(
                     "{} SET DEFAULT {}",
                     &alter_column_prefix,
@@ -121,7 +147,8 @@ impl super::SqlRenderer for PostgresFlavour {
                     );
 
                     rendered_steps.alter_columns.push(set_default);
-                    rendered_steps.before_and_after = Some((create_sequence, alter_sequence))
+                    rendered_steps.before = Some(create_sequence);
+                    rendered_steps.after = Some(alter_sequence);
                 }
             }
         }
