@@ -3,8 +3,8 @@ package queries.relations
 import org.scalatest.{FlatSpec, Matchers}
 import util.{ApiSpecBase, ProjectDsl}
 
-class Repro extends FlatSpec with Matchers with ApiSpecBase {
-  "Querying a single-field 1:n relation with nulls" should "ignore related records connected with null" in {
+class DuplicateColumnRegressionSpec extends FlatSpec with Matchers with ApiSpecBase {
+  "Querying a scalarfield that would already be included since it backs a relationfield" should "only request the underlying column once" in {
     val project = ProjectDsl.fromString {
       s"""
          |model Transcriber {
