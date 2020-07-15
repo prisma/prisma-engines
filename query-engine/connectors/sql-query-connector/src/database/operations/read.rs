@@ -4,7 +4,6 @@ use crate::{
 };
 use connector_interface::*;
 use futures::stream::{FuturesUnordered, StreamExt};
-use itertools::Itertools;
 use prisma_models::*;
 use quaint::ast::*;
 
