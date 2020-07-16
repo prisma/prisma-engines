@@ -1,4 +1,15 @@
+mod apply_migration;
+mod calculate_database_steps;
+mod datamodel_calculator;
+mod datamodel_steps_inferrer;
+mod errors;
+mod existing_data;
+mod existing_databases;
+mod infer_migration_steps;
+mod migration_persistence;
 mod migrations;
+mod multi_user;
+mod unapply_migration;
 
 use migration_engine_tests::sql::*;
 use pretty_assertions::assert_eq;
