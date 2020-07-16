@@ -1,4 +1,4 @@
-use super::{Args, DirectiveValidator};
+use super::{super::helpers::Arguments, DirectiveValidator};
 use crate::error::DatamodelError;
 use crate::{ast, dml};
 
@@ -10,7 +10,7 @@ impl DirectiveValidator<dml::Field> for IdDirectiveValidator {
         &"id"
     }
 
-    fn validate_and_apply(&self, args: &mut Args, obj: &mut dml::Field) -> Result<(), DatamodelError> {
+    fn validate_and_apply(&self, args: &mut Arguments, obj: &mut dml::Field) -> Result<(), DatamodelError> {
         if let dml::Field::ScalarField(sf) = obj {
             if sf.arity == dml::FieldArity::Required {
                 sf.is_id = true;
@@ -51,7 +51,7 @@ impl DirectiveValidator<dml::Model> for ModelLevelIdDirectiveValidator {
         "id"
     }
 
-    fn validate_and_apply(&self, args: &mut Args, obj: &mut dml::Model) -> Result<(), DatamodelError> {
+    fn validate_and_apply(&self, args: &mut Arguments, obj: &mut dml::Model) -> Result<(), DatamodelError> {
         let fields = args
             .default_arg("fields")?
             .as_array()

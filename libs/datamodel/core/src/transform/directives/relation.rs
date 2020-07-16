@@ -1,4 +1,4 @@
-use super::{Args, DirectiveValidator};
+use super::{super::helpers::Arguments, DirectiveValidator};
 use crate::common::names::DefaultNames;
 use crate::common::value_validator::ValueListValidator;
 use crate::error::DatamodelError;
@@ -11,7 +11,7 @@ impl DirectiveValidator<dml::Field> for RelationDirectiveValidator {
     fn directive_name(&self) -> &'static str {
         &"relation"
     }
-    fn validate_and_apply(&self, args: &mut Args, field: &mut dml::Field) -> Result<(), DatamodelError> {
+    fn validate_and_apply(&self, args: &mut Arguments, field: &mut dml::Field) -> Result<(), DatamodelError> {
         if let dml::Field::RelationField(rf) = field {
             if let Ok(name_arg) = args.default_arg("name") {
                 let name = name_arg.as_str()?;

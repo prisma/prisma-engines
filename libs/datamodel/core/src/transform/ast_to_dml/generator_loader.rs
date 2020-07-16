@@ -1,9 +1,5 @@
-use crate::{
-    ast,
-    common::{arguments::Arguments, value_validator::ValueListValidator},
-    configuration::Generator,
-    error::*,
-};
+use super::super::helpers::Arguments;
+use crate::{ast, common::value_validator::ValueListValidator, configuration::Generator, error::*};
 use std::collections::HashMap;
 
 const PROVIDER_KEY: &str = "provider";

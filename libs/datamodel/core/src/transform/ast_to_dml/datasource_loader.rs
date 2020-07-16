@@ -1,8 +1,8 @@
 use super::{
+    super::helpers::Arguments,
     builtin_datasource_providers::{MySqlDatasourceProvider, PostgresDatasourceProvider, SqliteDatasourceProvider},
     datasource_provider::DatasourceProvider,
 };
-use crate::common::arguments::Arguments;
 use crate::common::value_validator::ValueListValidator;
 use crate::configuration::StringFromEnvVar;
 use crate::error::{DatamodelError, ErrorCollection};

@@ -1,4 +1,4 @@
-use super::{Args, DirectiveValidator};
+use super::{super::helpers::Arguments, DirectiveValidator};
 use crate::error::DatamodelError;
 use crate::{ast, dml};
 
@@ -10,7 +10,7 @@ impl DirectiveValidator<dml::Field> for UpdatedAtDirectiveValidator {
         &"updatedAt"
     }
 
-    fn validate_and_apply(&self, args: &mut Args, obj: &mut dml::Field) -> Result<(), DatamodelError> {
+    fn validate_and_apply(&self, args: &mut Arguments, obj: &mut dml::Field) -> Result<(), DatamodelError> {
         if let dml::Field::ScalarField(sf) = obj {
             if sf.field_type.scalar_type() == Some(dml::ScalarType::DateTime) {
                 if sf.arity == dml::FieldArity::List {

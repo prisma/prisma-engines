@@ -4,9 +4,6 @@ use crate::error::{DatamodelError, ErrorCollection};
 use std::collections::HashSet;
 
 /// Represents a list of arguments.
-///
-/// This class makes it more convenient to implement
-/// custom directives.
 #[derive(Debug)]
 pub struct Arguments<'a> {
     arguments: &'a [ast::Argument],

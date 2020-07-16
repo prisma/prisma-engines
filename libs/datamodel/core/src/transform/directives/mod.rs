@@ -1,7 +1,6 @@
 mod default;
 mod directive_list_validator;
 mod directive_validator;
-mod embedded;
 mod id;
 mod map;
 mod relation;
@@ -11,9 +10,6 @@ mod updated_at;
 use crate::dml;
 use directive_list_validator::DirectiveListValidator;
 use directive_validator::DirectiveValidator;
-
-/// The argument type for directive validators.
-type Args<'a> = crate::common::arguments::Arguments<'a>;
 
 /// convenience struct that contains all available directive validators
 pub struct AllDirectives {
@@ -51,7 +47,6 @@ fn new_builtin_model_directives() -> DirectiveListValidator<dml::Model> {
     let mut validator = DirectiveListValidator::<dml::Model>::new();
 
     validator.add(Box::new(map::MapDirectiveValidator {}));
-    validator.add(Box::new(embedded::EmbeddedDirectiveValidator {}));
     validator.add(Box::new(unique_and_index::ModelLevelUniqueDirectiveValidator {}));
     validator.add(Box::new(unique_and_index::ModelLevelIndexDirectiveValidator {}));
     validator.add(Box::new(id::ModelLevelIdDirectiveValidator {}));

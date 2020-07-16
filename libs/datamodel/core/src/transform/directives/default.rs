@@ -1,4 +1,4 @@
-use super::{Args, DirectiveValidator};
+use super::{super::helpers::Arguments, DirectiveValidator};
 use crate::error::DatamodelError;
 use crate::{ast, dml, ValueGenerator};
 use prisma_value::PrismaValue;
@@ -11,7 +11,7 @@ impl DirectiveValidator<dml::Field> for DefaultDirectiveValidator {
         &"default"
     }
 
-    fn validate_and_apply(&self, args: &mut Args, field: &mut dml::Field) -> Result<(), DatamodelError> {
+    fn validate_and_apply(&self, args: &mut Arguments, field: &mut dml::Field) -> Result<(), DatamodelError> {
         if let dml::Field::RelationField(_) = field {
             return self.new_directive_validation_error("Cannot set a default value on a relation field.", args.span());
         } else if let dml::Field::ScalarField(sf) = field {
