@@ -81,8 +81,6 @@ impl<'a> ColumnDiffer<'a> {
             return true;
         }
 
-        dbg!(&self.previous.name(), &self.previous.default(), &self.next.default());
-
         match (&self.previous.default(), &self.next.default()) {
             // Avoid naive string comparisons for JSON defaults.
             (

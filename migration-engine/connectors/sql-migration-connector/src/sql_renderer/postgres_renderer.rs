@@ -85,7 +85,7 @@ impl super::SqlRenderer for PostgresFlavour {
                         .alter_columns
                         .push(format!("{} DROP DEFAULT", &alter_column_prefix));
 
-                    // We may also need to drop the sequence, in case it isn't used by any other column.
+                    // We also need to drop the sequence, in case it isn't used by any other column.
                     if let Some(DefaultValue::SEQUENCE(sequence_expression)) = differ.previous.default() {
                         let sequence_name = SEQUENCE_DEFAULT_RE
                             .captures(sequence_expression)
@@ -103,7 +103,6 @@ impl super::SqlRenderer for PostgresFlavour {
                         }
                     }
                 }
-                // TODO: change sequence to default, then back to sequence
                 PostgresAlterColumn::SetDefault(new_default) => rendered_steps.alter_columns.push(format!(
                     "{} SET DEFAULT {}",
                     &alter_column_prefix,
