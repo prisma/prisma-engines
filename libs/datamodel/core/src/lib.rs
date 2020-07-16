@@ -22,8 +22,8 @@ pub use dml::*;
 use crate::ast::SchemaAst;
 use std::io::Write;
 use transform::{
-    ast_to_dml::{GeneratorLoader, ValidationPipeline},
-    dml_to_ast::{GeneratorSerializer, LowerDmlToAst},
+    ast_to_dml::{DatasourceLoader, GeneratorLoader, ValidationPipeline},
+    dml_to_ast::{DatasourceSerializer, GeneratorSerializer, LowerDmlToAst},
 };
 
 /// Parses and validates a datamodel string, using core attributes only.
@@ -132,7 +132,7 @@ fn load_sources(
     ignore_datasource_urls: bool,
     datasource_url_overrides: Vec<(String, String)>,
 ) -> Result<Vec<Datasource>, error::ErrorCollection> {
-    let source_loader = SourceLoader::new();
+    let source_loader = DatasourceLoader::new();
     source_loader.load_sources(&schema_ast, ignore_datasource_urls, datasource_url_overrides)
 }
 
@@ -182,7 +182,7 @@ pub fn render_datamodel_and_config_to(
 ) -> Result<(), error::ErrorCollection> {
     let mut lowered = LowerDmlToAst::new().lower(datamodel)?;
 
-    SourceSerializer::add_sources_to_ast(config.datasources.as_slice(), &mut lowered);
+    DatasourceSerializer::add_sources_to_ast(config.datasources.as_slice(), &mut lowered);
     GeneratorSerializer::add_generators_to_ast(&config.generators, &mut lowered);
 
     render_schema_ast_to(stream, &lowered, 2);

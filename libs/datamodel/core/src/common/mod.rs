@@ -1,5 +1,6 @@
 pub mod arguments;
 pub mod names;
+pub mod provider_names;
 pub mod value_validator;
 
 mod string_helper;

@@ -1,9 +1,9 @@
-use super::Datasource;
 use crate::ast;
+use crate::configuration::Datasource;
 
-pub struct SourceSerializer {}
+pub struct DatasourceSerializer {}
 
-impl SourceSerializer {
+impl DatasourceSerializer {
     pub fn add_sources_to_ast(sources: &[Datasource], ast_datamodel: &mut ast::SchemaAst) {
         let mut tops: Vec<ast::Top> = Vec::new();
 

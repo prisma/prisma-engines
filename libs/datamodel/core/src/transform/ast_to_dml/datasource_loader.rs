@@ -4,16 +4,16 @@ use super::{
 };
 use crate::common::arguments::Arguments;
 use crate::common::value_validator::ValueListValidator;
+use crate::configuration::StringFromEnvVar;
 use crate::error::{DatamodelError, ErrorCollection};
-use crate::StringFromEnvVar;
 use crate::{ast, Datasource};
 use datamodel_connector::{BuiltinConnectors, Connector};
 
-pub struct SourceLoader {
+pub struct DatasourceLoader {
     source_definitions: Vec<Box<dyn DatasourceProvider>>,
 }
 
-impl SourceLoader {
+impl DatasourceLoader {
     pub fn new() -> Self {
         Self {
             source_definitions: get_builtin_datasource_providers(),
