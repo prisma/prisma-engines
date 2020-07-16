@@ -1,4 +1,4 @@
-use super::{DirectiveScope, DirectiveValidator};
+use super::DirectiveValidator;
 use crate::ast;
 use crate::dml;
 use crate::error::{DatamodelError, ErrorCollection};
@@ -34,24 +34,11 @@ impl<T: 'static> DirectiveListValidator<T> {
         self.known_directives.insert(String::from(name), validator);
     }
 
-    /// Adds a directive validator with a namespace scope.
-    fn add_scoped(&mut self, validator: Box<dyn DirectiveValidator<T>>, scope: &str) {
-        let boxed: Box<dyn DirectiveValidator<T>> = Box::new(DirectiveScope::new(validator, scope));
-        self.add(boxed)
-    }
-
     /// Adds all directive validators from the given list.
     #[allow(unused)]
     fn add_all(&mut self, validators: Vec<Box<dyn DirectiveValidator<T>>>) {
         for validator in validators {
             self.add(validator);
-        }
-    }
-
-    /// Adds all directive validators from the given list, with a namespace scope.
-    pub fn add_all_scoped(&mut self, validators: Vec<Box<dyn DirectiveValidator<T>>>, scope: &str) {
-        for validator in validators {
-            self.add_scoped(validator, scope);
         }
     }
 
