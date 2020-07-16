@@ -21,7 +21,10 @@ pub use dml::*;
 
 use crate::ast::SchemaAst;
 use std::io::Write;
-use transform::{ast_to_dml::ValidationPipeline, dml_to_ast::LowerDmlToAst};
+use transform::{
+    ast_to_dml::{GeneratorLoader, ValidationPipeline},
+    dml_to_ast::{GeneratorSerializer, LowerDmlToAst},
+};
 
 /// Parses and validates a datamodel string, using core attributes only.
 pub fn parse_datamodel(datamodel_string: &str) -> Result<Datamodel, error::ErrorCollection> {
@@ -180,7 +183,7 @@ pub fn render_datamodel_and_config_to(
     let mut lowered = LowerDmlToAst::new().lower(datamodel)?;
 
     SourceSerializer::add_sources_to_ast(config.datasources.as_slice(), &mut lowered);
-    GeneratorLoader::add_generators_to_ast(&config.generators, &mut lowered);
+    GeneratorSerializer::add_generators_to_ast(&config.generators, &mut lowered);
 
     render_schema_ast_to(stream, &lowered, 2);
 

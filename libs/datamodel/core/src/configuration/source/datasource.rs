@@ -20,11 +20,4 @@ impl Datasource {
     pub fn url(&self) -> &StringFromEnvVar {
         &self.url
     }
-
-    pub fn set_url(&mut self, url: &str) {
-        self.url = StringFromEnvVar {
-            from_env_var: None,
-            value: url.to_string(),
-        };
-    }
 }
