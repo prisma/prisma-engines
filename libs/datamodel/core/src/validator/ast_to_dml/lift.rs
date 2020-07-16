@@ -1,4 +1,4 @@
-use super::directive::AllDirectives;
+use super::super::directive::AllDirectives;
 use crate::{
     ast,
     common::ScalarType,

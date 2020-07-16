@@ -21,7 +21,7 @@ pub use dml::*;
 
 use crate::ast::SchemaAst;
 use std::io::Write;
-use validator::ValidationPipeline;
+use validator::ast_to_dml::ValidationPipeline;
 
 /// Parses and validates a datamodel string, using core attributes only.
 pub fn parse_datamodel(datamodel_string: &str) -> Result<Datamodel, error::ErrorCollection> {
