@@ -13,9 +13,3 @@ pub trait WithDatabaseName: WithName {
 
     fn set_database_name(&mut self, database_name: Option<String>);
 }
-
-pub trait Parsable: Sized {
-    fn parse(s: &str) -> Option<Self>;
-
-    fn descriptor() -> &'static str;
-}

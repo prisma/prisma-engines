@@ -1,4 +1,4 @@
-use super::DirectiveBox;
+use super::directive::{all_directives, AllDirectives};
 use crate::{
     ast,
     common::ScalarType,
@@ -14,7 +14,7 @@ use datamodel_connector::{BuiltinConnectors, Connector};
 /// AST is converted to the real datamodel, and
 /// additional semantics are attached.
 pub struct LiftAstToDml<'a> {
-    directives: DirectiveBox,
+    directives: AllDirectives,
     source: Option<&'a configuration::Datasource>,
 }
 
@@ -27,7 +27,7 @@ impl<'a> LiftAstToDml<'a> {
     /// The directives defined by the given sources will be namespaced.
     pub fn new(source: Option<&'a configuration::Datasource>) -> LiftAstToDml {
         LiftAstToDml {
-            directives: DirectiveBox::new(),
+            directives: all_directives(),
             source,
         }
     }

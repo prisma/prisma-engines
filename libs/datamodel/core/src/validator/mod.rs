@@ -1,4 +1,3 @@
-mod directive_box;
 mod invalid_model_names;
 mod lift;
 mod lower;
@@ -9,8 +8,6 @@ mod validation_pipeline;
 
 mod common;
 pub mod directive;
-
-use directive_box::*;
 
 use lift::*;
 pub use lower::*;

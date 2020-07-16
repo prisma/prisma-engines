@@ -1,4 +1,3 @@
-use super::FromStrAndSpan;
 use super::ScalarType;
 use crate::error::DatamodelError;
 use crate::ValueGenerator;
@@ -60,11 +59,6 @@ impl ValueValidator {
             ScalarType::String => self.as_str().map(PrismaValue::String),
             ScalarType::Json => self.as_str().map(PrismaValue::String),
         }
-    }
-
-    /// Parses the wrapped value as a given literal type.
-    pub fn parse_literal<T: FromStrAndSpan>(&self) -> Result<T, DatamodelError> {
-        T::from_str_and_span(&self.as_constant_literal()?, self.span())
     }
 
     /// Accesses the raw string representation
