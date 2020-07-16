@@ -6,6 +6,8 @@ use crate::warnings::{
 use datamodel::{Datamodel, DefaultNames, DefaultValue, FieldType};
 use introspection_connector::IntrospectionResult;
 use prisma_value::PrismaValue;
+use std::cmp::Ordering;
+use std::cmp::Ordering::{Equal, Greater, Less};
 
 pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut IntrospectionResult) {
     // Notes
@@ -302,23 +304,20 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
     // potential error: what if there was a db default before and then it got removed, now re-introspection makes it virtual
     // you could not get rid of it
 
-    // restore old model order
-    let mut re_ordered_data_model = Datamodel::new();
+    // // restore old model order
+    new_data_model.models.sort_by(|model_a, model_b| {
+        let model_a_idx = old_data_model.models().position(|model| model.name == model_a.name);
+        let model_b_idx = old_data_model.models().position(|model| model.name == model_b.name);
 
-    for old_model in old_data_model.models() {
-        if let Some(new_model) = new_data_model.find_model(&old_model.name) {
-            re_ordered_data_model.add_model(new_model.clone());
-        }
-    }
+        re_order_putting_new_ones_last(model_a_idx, model_b_idx)
+    });
 
-    for new_model in new_data_model.models() {
-        if old_data_model.find_model(&new_model.name).is_none() {
-            re_ordered_data_model.add_model(new_model.clone());
-        }
-    }
+    new_data_model.enums.sort_by(|enum_a, enum_b| {
+        let enum_a_idx = old_data_model.enums().position(|enm| enm.name == enum_a.name);
+        let enum_b_idx = old_data_model.enums().position(|enm| enm.name == enum_b.name);
 
-    re_ordered_data_model.enums = new_data_model.enums.clone();
-    *new_data_model = re_ordered_data_model;
+        re_order_putting_new_ones_last(enum_a_idx, enum_b_idx)
+    });
 
     // println!("{:#?}", new_data_model);
 
@@ -356,5 +355,14 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
         introspection_result
             .warnings
             .push(warning_enriched_with_map_on_enum_value(&enums_and_values));
+    }
+}
+
+fn re_order_putting_new_ones_last(enum_a_idx: Option<usize>, enum_b_idx: Option<usize>) -> Ordering {
+    match (enum_a_idx, enum_b_idx) {
+        (None, None) => Equal,
+        (None, Some(_)) => Greater,
+        (Some(_), None) => Less,
+        (Some(a_idx), Some(b_idx)) => a_idx.cmp(&b_idx),
     }
 }

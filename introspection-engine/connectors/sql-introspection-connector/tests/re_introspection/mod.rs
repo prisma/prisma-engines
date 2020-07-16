@@ -690,6 +690,92 @@ async fn re_introspecting_custom_model_order(api: &TestApi) {
     custom_assert(&result, final_dm);
 }
 
+#[test_each_connector(tags("postgres"))]
+async fn re_introspecting_custom_enum_order(api: &TestApi) {
+    let sql = format!("CREATE Type a as ENUM ( 'id')");
+    api.database().execute_raw(&sql, &[]).await.unwrap();
+
+    let sql = format!("CREATE Type b as ENUM ( 'id')");
+    api.database().execute_raw(&sql, &[]).await.unwrap();
+
+    let sql = format!("CREATE Type j as ENUM ( 'id')");
+    api.database().execute_raw(&sql, &[]).await.unwrap();
+
+    let sql = format!("CREATE Type f as ENUM ( 'id')");
+    api.database().execute_raw(&sql, &[]).await.unwrap();
+
+    let sql = format!("CREATE Type z as ENUM ( 'id')");
+    api.database().execute_raw(&sql, &[]).await.unwrap();
+
+    let sql = format!("CREATE Type m as ENUM ( 'id')");
+    api.database().execute_raw(&sql, &[]).await.unwrap();
+
+    let sql = format!("CREATE Type l as ENUM ( 'id')");
+    api.database().execute_raw(&sql, &[]).await.unwrap();
+
+    let input_dm = r#"
+            enum b {
+               id
+            }
+             
+            enum a {
+               id
+            }
+            
+            enum f {
+               id
+            }
+             
+            enum c {
+               id
+            }
+            
+            enum j {
+               id
+            }
+             
+            enum z {
+               id
+            }
+            
+            enum k {
+               id
+            }
+        "#;
+
+    let final_dm = r#"
+            enum b {
+               id
+            }
+             
+            enum a {
+               id
+            }
+            
+            enum f {
+               id
+            }
+             
+            enum j {
+               id
+            }
+            
+            enum z {
+               id
+            }
+             
+            enum l {
+               id
+            }
+            
+            enum m {
+               id
+            }
+        "#;
+    let result = dbg!(api.re_introspect(input_dm).await);
+    custom_assert(&result, final_dm);
+}
+
 // #[test_each_connector(tags("postgres"))]
 // async fn re_introspecting_virtual_default(api: &TestApi) {
 //     let barrel = api.barrel();
