@@ -27,15 +27,15 @@ async fn re_introspecting_manually_overwritten_mapped_model_name(api: &TestApi) 
         "#;
 
     let final_dm = r#"  
-            model Unrelated {
-               id               Int         @id @default(autoincrement())
-            }
-            
             model Custom_User {
                id               Int         @id @default(autoincrement()) 
                
                @@map(name: "_User")
-            }  
+            }
+              
+            model Unrelated {
+               id               Int         @id @default(autoincrement())
+            }
         "#;
     let result = dbg!(api.re_introspect(input_dm).await);
     custom_assert(&result, final_dm);
@@ -67,15 +67,15 @@ async fn re_introspecting_manually_overwritten_mapped_field_name(api: &TestApi) 
             }
         "#;
 
-    let final_dm = r#"  
-            model Unrelated {
-               id               Int         @id @default(autoincrement())
-            }
-            
+    let final_dm = r#"
             model User {
                id               Int         @id @default(autoincrement()) 
                custom_test      Int         @map("_test")
             }  
+            
+            model Unrelated {
+               id               Int         @id @default(autoincrement())
+            }
         "#;
     let result = dbg!(api.re_introspect(input_dm).await);
     custom_assert(&result, final_dm);
@@ -124,18 +124,18 @@ async fn re_introspecting_mapped_model_and_field_name(api: &TestApi) {
                id               Int         @id @default(autoincrement())
                c_user_id        Int         @map("user_id")
                Custom_User      Custom_User @relation(fields: [c_user_id], references: [c_id])
-            }    
-            
-            model Unrelated {
-               id               Int         @id @default(autoincrement())
             }
-            
+
             model Custom_User {
                c_id             Int         @id @default(autoincrement()) @map("id")
                Post             Post[]
                
                @@map(name: "User")
             }  
+            
+            model Unrelated {
+               id               Int         @id @default(autoincrement())
+            }          
         "#;
     let result = dbg!(api.re_introspect(input_dm).await);
     custom_assert(&result, final_dm);
@@ -184,10 +184,6 @@ async fn re_introspecting_manually_mapped_model_and_field_name(api: &TestApi) {
                id               Int         @id @default(autoincrement())
                c_user_id        Int         @map("user_id")
                Custom_User      Custom_User @relation(fields: [c_user_id], references: [c_id])
-            }    
-            
-            model Unrelated {
-               id               Int         @id @default(autoincrement())
             }
             
             model Custom_User {
@@ -196,6 +192,10 @@ async fn re_introspecting_manually_mapped_model_and_field_name(api: &TestApi) {
                
                @@map(name: "_User")
             }  
+                        
+            model Unrelated {
+               id               Int         @id @default(autoincrement())
+            }
         "#;
     let result = dbg!(api.re_introspect(input_dm).await);
     custom_assert(&result, final_dm);
@@ -248,10 +248,6 @@ async fn re_introspecting_mapped_field_name(api: &TestApi) {
         "#;
 
     let final_dm = r#"
-            model Unrelated {
-               id               Int @id @default(autoincrement())
-            }
-            
             model User { 
                 c_id_1      Int     @map("id_1")
                 id_2        Int
@@ -262,6 +258,10 @@ async fn re_introspecting_mapped_field_name(api: &TestApi) {
                 @@id([c_id_1, id_2])
                 @@index([c_index], name: "test2")
                 @@unique([c_unique_1, unique_2], name: "User_unique_1_unique_2_key")
+            }
+            
+            model Unrelated {
+               id               Int @id @default(autoincrement())
             }
         "#;
     let result = dbg!(api.re_introspect(input_dm).await);
@@ -305,13 +305,13 @@ async fn re_introspecting_mapped_enum_name(api: &TestApi) {
         "#;
 
     let final_dm = r#"
-            model Unrelated {
-               id               Int @id @default(autoincrement())
-            }
-            
              model User {
                id               Int @id @default(autoincrement())
                color            BlackNWhite            
+            }
+            
+            model Unrelated {
+               id               Int @id @default(autoincrement())
             }
             
             enum BlackNWhite{
@@ -359,15 +359,15 @@ async fn re_introspecting_mapped_enum_value_name(api: &TestApi) {
         "#;
 
     let final_dm = r#"
-            model Unrelated {
-               id               Int @id @default(autoincrement())
-            }
-            
              model User {
                id               Int @id @default(autoincrement())
                color            color @default(BLACK)            
             }
             
+            model Unrelated {
+               id               Int @id @default(autoincrement())
+            }
+
             enum color{
                 BLACK @map("black")
                 white
@@ -411,13 +411,13 @@ async fn re_introspecting_manually_remapped_enum_value_name(api: &TestApi) {
         "#;
 
     let final_dm = r#"
-            model Unrelated {
-               id               Int @id @default(autoincrement())
-            }
-            
              model User {
                id               Int @id @default(autoincrement())
                color            color @default(BLACK)            
+            }
+            
+            model Unrelated {
+               id               Int @id @default(autoincrement())
             }
             
             enum color{
@@ -464,14 +464,14 @@ async fn re_introspecting_manually_re_mapped_enum_name(api: &TestApi) {
             }
         "#;
 
-    let final_dm = r#"
-            model Unrelated {
-               id               Int @id @default(autoincrement())
-            }
-            
+    let final_dm = r#" 
              model User {
                id               Int @id @default(autoincrement())
                color            BlackNWhite            
+            }
+            
+            model Unrelated {
+               id               Int @id @default(autoincrement())
             }
             
             enum BlackNWhite{
@@ -583,15 +583,16 @@ async fn re_introspecting_custom_virtual_relation_field_names(api: &TestApi) {
                user_id          Int  @unique
                custom_User      User @relation(fields: [user_id], references: [id])
             }
-
-            model Unrelated {
-               id               Int @id @default(autoincrement())
-            }
-            
+ 
             model User {
                id               Int @id @default(autoincrement())
                custom_Post      Post?
             }
+            
+            model Unrelated {
+               id               Int @id @default(autoincrement())
+            }
+           
         "#;
     let result = dbg!(api.re_introspect(input_dm).await);
     custom_assert(&result, final_dm);

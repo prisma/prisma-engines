@@ -317,6 +317,7 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
         }
     }
 
+    re_ordered_data_model.enums = new_data_model.enums.clone();
     *new_data_model = re_ordered_data_model;
 
     // println!("{:#?}", new_data_model);
