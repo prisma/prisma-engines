@@ -8,7 +8,6 @@ mod map;
 mod relation;
 mod unique_and_index;
 mod updated_at;
-mod utils;
 
 /// Returns a directive list validator containing all builtin field directives.
 pub fn new_builtin_field_directives() -> DirectiveListValidator<dml::Field> {

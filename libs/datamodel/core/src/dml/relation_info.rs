@@ -1,5 +1,3 @@
-use super::Parsable;
-
 /// Holds information about a relation field.
 #[derive(Debug, Clone)]
 pub struct RelationInfo {
@@ -46,20 +44,6 @@ impl RelationInfo {
 pub enum OnDeleteStrategy {
     Cascade,
     None,
-}
-
-impl Parsable for OnDeleteStrategy {
-    fn parse(s: &str) -> Option<Self> {
-        match s {
-            "CASCADE" => Some(OnDeleteStrategy::Cascade),
-            "NONE" => Some(OnDeleteStrategy::None),
-            _ => None,
-        }
-    }
-
-    fn descriptor() -> &'static str {
-        "onDelete strategy"
-    }
 }
 
 impl ToString for OnDeleteStrategy {
