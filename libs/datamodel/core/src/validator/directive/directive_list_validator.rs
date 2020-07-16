@@ -5,7 +5,6 @@ use crate::error::{DatamodelError, ErrorCollection};
 
 // BTreeMap has a strictly defined order.
 // That's important since rendering depends on that order.
-use failure::_core::cmp::Ordering;
 use std::collections::{BTreeMap, HashMap};
 
 /// Struct which holds a list of directive validators and automatically
@@ -15,8 +14,6 @@ pub struct DirectiveListValidator<T> {
 }
 
 impl<T: 'static> DirectiveListValidator<T> {
-    /// Creates a new instance.
-    #[allow(unused)]
     pub fn new() -> Self {
         DirectiveListValidator {
             known_directives: BTreeMap::new(),
@@ -32,14 +29,6 @@ impl<T: 'static> DirectiveListValidator<T> {
         }
 
         self.known_directives.insert(String::from(name), validator);
-    }
-
-    /// Adds all directive validators from the given list.
-    #[allow(unused)]
-    fn add_all(&mut self, validators: Vec<Box<dyn DirectiveValidator<T>>>) {
-        for validator in validators {
-            self.add(validator);
-        }
     }
 
     /// For each directive in the given object, picks the correct
@@ -60,19 +49,7 @@ impl<T: 'static> DirectiveListValidator<T> {
 
         errors.ok()?;
 
-        // validation orders:
-        // @default before @id -> @id needs access to the default value on the field.
-        // @relation before @map -> @map needs access to the relation info
-        let mut cloned_directives = ast.directives().clone();
-        cloned_directives.sort_by(|a, b| match (a.name.name.as_ref(), b.name.name.as_ref()) {
-            ("default", "id") => Ordering::Less,
-            ("id", "default") => Ordering::Greater,
-            ("relation", "map") => Ordering::Less,
-            ("map", "relation") => Ordering::Greater,
-            _ => a.name.name.partial_cmp(&b.name.name).unwrap(),
-        });
-
-        for directive in cloned_directives {
+        for directive in ast.directives() {
             match self.known_directives.get(&directive.name.name) {
                 Some(validator) => {
                     let mut arguments = super::Args::new(&directive.arguments, directive.span);
