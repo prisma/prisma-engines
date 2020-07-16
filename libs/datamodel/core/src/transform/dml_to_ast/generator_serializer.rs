@@ -10,7 +10,7 @@ impl GeneratorSerializer {
             tops.push(ast::Top::Generator(Self::lower_generator(&generator)))
         }
 
-        // Prepend generators.
+        // Do this dance so that generators come before other top elements
         tops.append(&mut ast_datamodel.tops);
 
         ast_datamodel.tops = tops;
