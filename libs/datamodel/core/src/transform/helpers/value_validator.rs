@@ -1,8 +1,9 @@
-use super::ScalarType;
+use super::env_function::EnvFunction;
 use crate::error::DatamodelError;
 use crate::ValueGenerator;
-use crate::{ast, DefaultValue, EnvFunction};
+use crate::{ast, DefaultValue};
 use chrono::{DateTime, Utc};
+use datamodel_connector::scalars::ScalarType;
 use prisma_value::PrismaValue;
 use rust_decimal::Decimal;
 use std::error;
@@ -126,29 +127,6 @@ impl ValueValidator {
             // this case is just here because `as_bool_from_env` passes a StringValue
             ast::Expression::StringValue(value, _) => self.wrap_error_from_result(value.parse::<bool>(), "boolean"),
             _ => Err(self.construct_type_mismatch_error("boolean")),
-        }
-    }
-
-    /// returns a (Some(a), _) if the value comes from an env var
-    /// returns a (_, Some(b)) if the value could be parsed into a bool
-    pub fn as_bool_from_env(&self) -> Result<(Option<String>, Option<bool>), DatamodelError> {
-        match &self.value {
-            ast::Expression::Function(name, _, _) if name == "env" => {
-                let env_function = self.as_env_function()?;
-                let var_name = if env_function.is_var_defined() {
-                    Some(env_function.var_name().to_string())
-                } else {
-                    None
-                };
-
-                let value = env_function.evaluate().and_then(|x| x.as_bool()).ok();
-                Ok((var_name, value))
-            }
-            ast::Expression::BooleanValue(value, _) => Ok((
-                None,
-                Some(self.wrap_error_from_result(value.parse::<bool>(), "boolean")?),
-            )),
-            _ => Err(self.construct_type_mismatch_error("String")),
         }
     }
 

@@ -1,4 +1,4 @@
-use super::super::helpers::Arguments;
+use super::super::helpers::*;
 use crate::ast;
 use crate::dml;
 use crate::error::DatamodelError;

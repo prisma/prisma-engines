@@ -1,4 +1,4 @@
-use super::{super::helpers::Arguments, DirectiveValidator};
+use super::{super::helpers::*, DirectiveValidator};
 use crate::error::DatamodelError;
 use crate::{ast, dml, IndexDefinition, IndexType};
 use std::collections::HashMap;

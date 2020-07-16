@@ -1,12 +1,6 @@
 use crate::ast;
-use crate::common::value_validator::ValueValidator;
 use crate::error::DatamodelError;
-
-//pub trait Function {
-//    fn name(&self) -> &str;
-//
-//    fn apply(&self, args: &[ast::Expression], span: ast::Span) -> Result<MaybeExpression, DatamodelError>;
-//}
+use crate::transform::helpers::ValueValidator;
 
 pub struct EnvFunction {
     var_name: String,
@@ -48,10 +42,6 @@ impl EnvFunction {
 
     pub fn var_name(&self) -> &str {
         &self.var_name
-    }
-
-    pub fn is_var_defined(&self) -> bool {
-        std::env::var(&self.var_name).is_ok()
     }
 
     pub fn evaluate(&self) -> Result<ValueValidator, DatamodelError> {

@@ -1,4 +1,4 @@
-use super::{super::helpers::Arguments, DirectiveValidator};
+use super::{super::helpers::*, DirectiveValidator};
 use crate::ast::{Directive, Span};
 use crate::error::DatamodelError;
 use crate::{ast, dml, Datamodel, WithDatabaseName};
