@@ -1,4 +1,4 @@
-use super::DirectiveValidator;
+use super::{super::helpers::*, DirectiveValidator};
 use crate::ast;
 use crate::dml;
 use crate::error::{DatamodelError, ErrorCollection};
@@ -52,7 +52,7 @@ impl<T: 'static> DirectiveListValidator<T> {
         for directive in ast.directives() {
             match self.known_directives.get(&directive.name.name) {
                 Some(validator) => {
-                    let mut arguments = super::Args::new(&directive.arguments, directive.span);
+                    let mut arguments = Arguments::new(&directive.arguments, directive.span);
 
                     let directive_count = directive_counts.get(&directive.name.name).unwrap();
                     if *directive_count > 1 && !validator.is_duplicate_definition_allowed() {

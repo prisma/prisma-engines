@@ -13,7 +13,7 @@ pub use error::CoreResult;
 
 use commands::{CommandError, CommandResult};
 use datamodel::{
-    configuration::{MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME},
+    common::provider_names::{MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME},
     dml::Datamodel,
 };
 use error::Error;

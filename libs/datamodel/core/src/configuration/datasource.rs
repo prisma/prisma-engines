@@ -1,5 +1,5 @@
-use crate::StringFromEnvVar;
 use datamodel_connector::Connector;
+use serde::Serialize;
 
 /// a `datasource` from the prisma schema.
 pub struct Datasource {
@@ -20,11 +20,12 @@ impl Datasource {
     pub fn url(&self) -> &StringFromEnvVar {
         &self.url
     }
+}
 
-    pub fn set_url(&mut self, url: &str) {
-        self.url = StringFromEnvVar {
-            from_env_var: None,
-            value: url.to_string(),
-        };
-    }
+#[serde(rename_all = "camelCase")]
+#[derive(Clone, Debug, Serialize, PartialEq)]
+pub struct StringFromEnvVar {
+    /// contains the name of env var if the value was read from one
+    pub from_env_var: Option<String>,
+    pub value: String,
 }

@@ -2,7 +2,7 @@ use crate::{PrismaError, PrismaResult};
 use connector::Connector;
 
 use datamodel::{
-    configuration::{MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME},
+    common::provider_names::{MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME},
     Datasource,
 };
 use query_core::executor::{InterpretingExecutor, QueryExecutor};

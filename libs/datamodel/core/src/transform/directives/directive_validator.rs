@@ -1,4 +1,4 @@
-use super::Args;
+use super::super::helpers::*;
 use crate::ast;
 use crate::dml;
 use crate::error::DatamodelError;
@@ -16,7 +16,7 @@ pub trait DirectiveValidator<T> {
 
     /// Validates a directive and applies the directive
     /// to the given object.
-    fn validate_and_apply(&self, args: &mut Args, obj: &mut T) -> Result<(), DatamodelError>;
+    fn validate_and_apply(&self, args: &mut Arguments, obj: &mut T) -> Result<(), DatamodelError>;
 
     /// Serializes the given directive's arguments for rendering.
     fn serialize(&self, obj: &T, datamodel: &dml::Datamodel) -> Result<Vec<ast::Directive>, DatamodelError>;

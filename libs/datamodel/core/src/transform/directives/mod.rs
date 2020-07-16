@@ -1,7 +1,6 @@
 mod default;
 mod directive_list_validator;
 mod directive_validator;
-mod embedded;
 mod id;
 mod map;
 mod relation;
@@ -12,24 +11,23 @@ use crate::dml;
 use directive_list_validator::DirectiveListValidator;
 use directive_validator::DirectiveValidator;
 
-/// The argument type for directive validators.
-type Args<'a> = crate::common::arguments::Arguments<'a>;
-
-pub fn all_directives() -> AllDirectives {
-    AllDirectives {
-        field: new_builtin_field_directives(),
-        model: new_builtin_model_directives(),
-        enm: new_builtin_enum_directives(),
-        enm_value: new_builtin_enum_value_directives(),
-    }
-}
-
 /// convenience struct that contains all available directive validators
 pub struct AllDirectives {
     pub field: DirectiveListValidator<dml::Field>,
     pub model: DirectiveListValidator<dml::Model>,
     pub enm: DirectiveListValidator<dml::Enum>,
     pub enm_value: DirectiveListValidator<dml::EnumValue>,
+}
+
+impl AllDirectives {
+    pub fn new() -> AllDirectives {
+        AllDirectives {
+            field: new_builtin_field_directives(),
+            model: new_builtin_model_directives(),
+            enm: new_builtin_enum_directives(),
+            enm_value: new_builtin_enum_value_directives(),
+        }
+    }
 }
 
 fn new_builtin_field_directives() -> DirectiveListValidator<dml::Field> {
@@ -49,7 +47,6 @@ fn new_builtin_model_directives() -> DirectiveListValidator<dml::Model> {
     let mut validator = DirectiveListValidator::<dml::Model>::new();
 
     validator.add(Box::new(map::MapDirectiveValidator {}));
-    validator.add(Box::new(embedded::EmbeddedDirectiveValidator {}));
     validator.add(Box::new(unique_and_index::ModelLevelUniqueDirectiveValidator {}));
     validator.add(Box::new(unique_and_index::ModelLevelIndexDirectiveValidator {}));
     validator.add(Box::new(id::ModelLevelIdDirectiveValidator {}));

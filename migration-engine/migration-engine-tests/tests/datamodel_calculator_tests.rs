@@ -51,7 +51,7 @@ fn add_UpdateModel_to_existing_schema() {
         model Post {
             id String @id @default(cuid())
 
-            @@embedded
+            @@map("post")
         }
     "#,
     );

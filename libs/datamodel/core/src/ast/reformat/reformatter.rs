@@ -21,7 +21,7 @@ impl<'a> Reformatter<'a> {
     fn find_all_missing_fields(schema_string: &str) -> Result<Vec<MissingField>, crate::error::ErrorCollection> {
         let schema_ast = crate::parse_schema_ast(&schema_string)?;
         let datamodel = crate::parse_datamodel_and_ignore_datasource_urls(&schema_string)?;
-        let lowerer = crate::validator::LowerDmlToAst::new();
+        let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new();
         let mut result = Vec::new();
 
         for model in datamodel.models() {

@@ -12,7 +12,7 @@ pub mod configuration;
 pub mod dml;
 pub mod error;
 pub mod json;
-pub mod validator;
+pub mod transform;
 pub mod walkers;
 
 pub use common::DefaultNames;
@@ -21,7 +21,10 @@ pub use dml::*;
 
 use crate::ast::SchemaAst;
 use std::io::Write;
-use validator::ValidationPipeline;
+use transform::{
+    ast_to_dml::{DatasourceLoader, GeneratorLoader, ValidationPipeline},
+    dml_to_ast::{DatasourceSerializer, GeneratorSerializer, LowerDmlToAst},
+};
 
 /// Parses and validates a datamodel string, using core attributes only.
 pub fn parse_datamodel(datamodel_string: &str) -> Result<Datamodel, error::ErrorCollection> {
@@ -129,7 +132,7 @@ fn load_sources(
     ignore_datasource_urls: bool,
     datasource_url_overrides: Vec<(String, String)>,
 ) -> Result<Vec<Datasource>, error::ErrorCollection> {
-    let source_loader = SourceLoader::new();
+    let source_loader = DatasourceLoader::new();
     source_loader.load_sources(&schema_ast, ignore_datasource_urls, datasource_url_overrides)
 }
 
@@ -156,7 +159,7 @@ pub fn render_datamodel_to(
     stream: &mut dyn std::io::Write,
     datamodel: &dml::Datamodel,
 ) -> Result<(), error::ErrorCollection> {
-    let lowered = validator::LowerDmlToAst::new().lower(datamodel)?;
+    let lowered = LowerDmlToAst::new().lower(datamodel)?;
     render_schema_ast_to(stream, &lowered, 2);
     Ok(())
 }
@@ -177,10 +180,10 @@ pub fn render_datamodel_and_config_to(
     datamodel: &dml::Datamodel,
     config: &configuration::Configuration,
 ) -> Result<(), error::ErrorCollection> {
-    let mut lowered = validator::LowerDmlToAst::new().lower(datamodel)?;
+    let mut lowered = LowerDmlToAst::new().lower(datamodel)?;
 
-    SourceSerializer::add_sources_to_ast(config.datasources.as_slice(), &mut lowered);
-    GeneratorLoader::add_generators_to_ast(&config.generators, &mut lowered);
+    DatasourceSerializer::add_sources_to_ast(config.datasources.as_slice(), &mut lowered);
+    GeneratorSerializer::add_generators_to_ast(&config.generators, &mut lowered);
 
     render_schema_ast_to(stream, &lowered, 2);
 

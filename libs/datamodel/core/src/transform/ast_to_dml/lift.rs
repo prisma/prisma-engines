@@ -1,4 +1,4 @@
-use super::directive::{all_directives, AllDirectives};
+use super::super::directives::AllDirectives;
 use crate::{
     ast,
     common::ScalarType,
@@ -27,7 +27,7 @@ impl<'a> LiftAstToDml<'a> {
     /// The directives defined by the given sources will be namespaced.
     pub fn new(source: Option<&'a configuration::Datasource>) -> LiftAstToDml {
         LiftAstToDml {
-            directives: all_directives(),
+            directives: AllDirectives::new(),
             source,
         }
     }

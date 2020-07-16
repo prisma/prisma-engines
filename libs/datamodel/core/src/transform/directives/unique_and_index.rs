@@ -1,5 +1,5 @@
+use super::{super::helpers::*, DirectiveValidator};
 use crate::error::DatamodelError;
-use crate::validator::directive::{Args, DirectiveValidator};
 use crate::{ast, dml, IndexDefinition, IndexType};
 use std::collections::HashMap;
 
@@ -11,7 +11,7 @@ impl DirectiveValidator<dml::Field> for FieldLevelUniqueDirectiveValidator {
         &"unique"
     }
 
-    fn validate_and_apply(&self, args: &mut Args, obj: &mut dml::Field) -> Result<(), DatamodelError> {
+    fn validate_and_apply(&self, args: &mut Arguments, obj: &mut dml::Field) -> Result<(), DatamodelError> {
         if let dml::Field::RelationField(rf) = obj {
             let suggestion = if rf.relation_info.fields.len() == 1 {
                 format!(
@@ -77,7 +77,7 @@ impl DirectiveValidator<dml::Model> for ModelLevelUniqueDirectiveValidator {
         true
     }
 
-    fn validate_and_apply(&self, args: &mut Args, obj: &mut dml::Model) -> Result<(), DatamodelError> {
+    fn validate_and_apply(&self, args: &mut Arguments, obj: &mut dml::Model) -> Result<(), DatamodelError> {
         let index_def = self.validate_index(args, obj, IndexType::Unique)?;
         obj.indices.push(index_def);
 
@@ -106,7 +106,7 @@ impl DirectiveValidator<dml::Model> for ModelLevelIndexDirectiveValidator {
         true
     }
 
-    fn validate_and_apply(&self, args: &mut Args, obj: &mut dml::Model) -> Result<(), DatamodelError> {
+    fn validate_and_apply(&self, args: &mut Arguments, obj: &mut dml::Model) -> Result<(), DatamodelError> {
         let index_def = self.validate_index(args, obj, IndexType::Normal)?;
         obj.indices.push(index_def);
 
@@ -126,7 +126,7 @@ impl DirectiveValidator<dml::Model> for ModelLevelIndexDirectiveValidator {
 trait IndexDirectiveBase<T>: DirectiveValidator<T> {
     fn validate_index(
         &self,
-        args: &mut Args,
+        args: &mut Arguments,
         obj: &mut dml::Model,
         index_type: IndexType,
     ) -> Result<IndexDefinition, DatamodelError> {

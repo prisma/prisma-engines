@@ -1,12 +1,7 @@
-use super::DatasourceProvider;
+use super::datasource_provider::DatasourceProvider;
+use crate::common::provider_names::*;
 use crate::StringFromEnvVar;
 use datamodel_connector::{BuiltinConnectors, Connector};
-
-pub const SQLITE_SOURCE_NAME: &str = "sqlite";
-pub const POSTGRES_SOURCE_NAME: &str = "postgresql";
-const POSTGRES_SOURCE_NAME_HEROKU: &str = "postgres";
-pub const MYSQL_SOURCE_NAME: &str = "mysql";
-pub const MSSQL_SOURCE_NAME: &str = "sqlserver";
 
 pub struct SqliteDatasourceProvider {}
 
@@ -92,6 +87,7 @@ impl DatasourceProvider for MySqlDatasourceProvider {
 
 pub struct MsSqlDatasourceProvider {}
 impl MsSqlDatasourceProvider {
+    #[allow(unused)]
     pub fn new() -> Self {
         Self {}
     }

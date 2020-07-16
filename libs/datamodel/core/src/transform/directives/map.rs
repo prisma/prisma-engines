@@ -1,6 +1,6 @@
+use super::{super::helpers::*, DirectiveValidator};
 use crate::ast::{Directive, Span};
 use crate::error::DatamodelError;
-use crate::validator::directive::{Args, DirectiveValidator};
 use crate::{ast, dml, Datamodel, WithDatabaseName};
 
 /// Prismas builtin `@map` directive.
@@ -13,7 +13,7 @@ impl DirectiveValidator<dml::Model> for MapDirectiveValidator {
         DIRECTIVE_NAME
     }
 
-    fn validate_and_apply(&self, args: &mut Args, obj: &mut dml::Model) -> Result<(), DatamodelError> {
+    fn validate_and_apply(&self, args: &mut Arguments, obj: &mut dml::Model) -> Result<(), DatamodelError> {
         internal_validate_and_apply(args, obj)
     }
 
@@ -28,7 +28,7 @@ impl DirectiveValidator<dml::Field> for MapDirectiveValidatorForField {
         DIRECTIVE_NAME
     }
 
-    fn validate_and_apply(&self, args: &mut Args, obj: &mut dml::Field) -> Result<(), DatamodelError> {
+    fn validate_and_apply(&self, args: &mut Arguments, obj: &mut dml::Field) -> Result<(), DatamodelError> {
         if obj.is_relation() {
             return self.new_directive_validation_error(
                 &format!(
@@ -51,7 +51,7 @@ impl DirectiveValidator<dml::Enum> for MapDirectiveValidator {
         DIRECTIVE_NAME
     }
 
-    fn validate_and_apply(&self, args: &mut Args, obj: &mut dml::Enum) -> Result<(), DatamodelError> {
+    fn validate_and_apply(&self, args: &mut Arguments, obj: &mut dml::Enum) -> Result<(), DatamodelError> {
         internal_validate_and_apply(args, obj)
     }
 
@@ -65,7 +65,7 @@ impl DirectiveValidator<dml::EnumValue> for MapDirectiveValidator {
         DIRECTIVE_NAME
     }
 
-    fn validate_and_apply(&self, args: &mut Args, obj: &mut dml::EnumValue) -> Result<(), DatamodelError> {
+    fn validate_and_apply(&self, args: &mut Arguments, obj: &mut dml::EnumValue) -> Result<(), DatamodelError> {
         internal_validate_and_apply(args, obj)
     }
 
@@ -74,7 +74,7 @@ impl DirectiveValidator<dml::EnumValue> for MapDirectiveValidator {
     }
 }
 
-fn internal_validate_and_apply(args: &mut Args, obj: &mut dyn WithDatabaseName) -> Result<(), DatamodelError> {
+fn internal_validate_and_apply(args: &mut Arguments, obj: &mut dyn WithDatabaseName) -> Result<(), DatamodelError> {
     let db_name = args.default_arg("name")?.as_str().map_err(|err| {
         DatamodelError::new_directive_validation_error(&format!("{}", err), DIRECTIVE_NAME, err.span())
     })?;
