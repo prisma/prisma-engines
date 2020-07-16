@@ -1,7 +1,6 @@
-use super::directive::AllDirectives;
+use super::super::directive::AllDirectives;
 use crate::error::ErrorCollection;
 use crate::{ast, dml};
-use prisma_value::PrismaValue;
 
 pub struct LowerDmlToAst {
     directives: AllDirectives,
@@ -102,35 +101,6 @@ impl LowerDmlToAst {
             dml::FieldArity::Required => ast::FieldArity::Required,
             dml::FieldArity::Optional => ast::FieldArity::Optional,
             dml::FieldArity::List => ast::FieldArity::List,
-        }
-    }
-
-    pub fn lower_default_value(dv: dml::DefaultValue) -> ast::Expression {
-        match dv {
-            dml::DefaultValue::Single(v) => Self::lower_prisma_value(&v),
-            dml::DefaultValue::Expression(e) => {
-                let exprs = e.args.iter().map(Self::lower_prisma_value).collect();
-                ast::Expression::Function(e.name, exprs, ast::Span::empty())
-            }
-        }
-    }
-
-    pub fn lower_prisma_value(pv: &PrismaValue) -> ast::Expression {
-        match pv {
-            PrismaValue::Boolean(true) => ast::Expression::BooleanValue(String::from("true"), ast::Span::empty()),
-            PrismaValue::Boolean(false) => ast::Expression::BooleanValue(String::from("false"), ast::Span::empty()),
-            PrismaValue::String(value) => ast::Expression::StringValue(value.clone(), ast::Span::empty()),
-            PrismaValue::Enum(value) => ast::Expression::ConstantValue(value.clone(), ast::Span::empty()),
-            PrismaValue::DateTime(value) => ast::Expression::StringValue(value.to_rfc3339(), ast::Span::empty()),
-            PrismaValue::Float(value) => ast::Expression::NumericValue(value.to_string(), ast::Span::empty()),
-            PrismaValue::Int(value) => ast::Expression::NumericValue(value.to_string(), ast::Span::empty()),
-            PrismaValue::Null(_) => ast::Expression::ConstantValue("null".to_string(), ast::Span::empty()),
-            PrismaValue::Uuid(val) => ast::Expression::StringValue(val.to_string(), ast::Span::empty()),
-            PrismaValue::Json(val) => ast::Expression::StringValue(val.to_string(), ast::Span::empty()),
-            PrismaValue::List(vec) => ast::Expression::Array(
-                vec.iter().map(|pv| Self::lower_prisma_value(pv)).collect(),
-                ast::Span::empty(),
-            ),
         }
     }
 
