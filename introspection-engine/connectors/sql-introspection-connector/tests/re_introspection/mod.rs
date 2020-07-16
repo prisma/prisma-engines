@@ -608,7 +608,19 @@ async fn re_introspecting_custom_model_order(api: &TestApi) {
             migration.create_table("B", |t| {
                 t.add_column("id", types::primary());
             });
-            migration.create_table("Unrelated", |t| {
+            migration.create_table("J", |t| {
+                t.add_column("id", types::primary());
+            });
+            migration.create_table("F", |t| {
+                t.add_column("id", types::primary());
+            });
+            migration.create_table("Z", |t| {
+                t.add_column("id", types::primary());
+            });
+            migration.create_table("M", |t| {
+                t.add_column("id", types::primary());
+            });
+            migration.create_table("L", |t| {
                 t.add_column("id", types::primary());
             });
         })
@@ -622,18 +634,54 @@ async fn re_introspecting_custom_model_order(api: &TestApi) {
             model A {
                id               Int @id @default(autoincrement())
             }
+            
+            model F {
+               id               Int @id @default(autoincrement())
+            }
+             
+            model C {
+               id               Int @id @default(autoincrement())
+            }
+            
+            model J {
+               id               Int @id @default(autoincrement())
+            }
+             
+            model Z {
+               id               Int @id @default(autoincrement())
+            }
+            
+            model K {
+               id               Int @id @default(autoincrement())
+            }
         "#;
 
     let final_dm = r#"
-             model B {
+            model B {
                id               Int @id @default(autoincrement())
             }
-
+             
             model A {
                id               Int @id @default(autoincrement())
             }
             
-            model Unrelated {
+            model F {
+               id               Int @id @default(autoincrement())
+            }
+             
+            model J {
+               id               Int @id @default(autoincrement())
+            }
+            
+            model Z {
+               id               Int @id @default(autoincrement())
+            }
+             
+            model L {
+               id               Int @id @default(autoincrement())
+            }
+            
+            model M {
                id               Int @id @default(autoincrement())
             }
         "#;
