@@ -37,6 +37,7 @@ fn succeed_without_directive_if_unambigous() {
 }
 
 #[test]
+#[ignore] // bring back when we work on embeds
 fn fail_if_back_relation_for_embedded_type() {
     let dml = r#"
     model Todo {
