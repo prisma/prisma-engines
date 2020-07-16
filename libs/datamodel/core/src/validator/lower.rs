@@ -1,4 +1,4 @@
-use super::directive::{all_directives, AllDirectives};
+use super::directive::AllDirectives;
 use crate::error::ErrorCollection;
 use crate::{ast, dml};
 use prisma_value::PrismaValue;
@@ -11,7 +11,7 @@ impl LowerDmlToAst {
     /// Creates a new instance, with all builtin directives registered.
     pub fn new() -> Self {
         Self {
-            directives: all_directives(),
+            directives: AllDirectives::new(),
         }
     }
 

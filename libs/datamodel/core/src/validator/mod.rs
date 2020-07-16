@@ -1,3 +1,4 @@
+mod dml_to_ast;
 mod invalid_model_names;
 mod lift;
 mod lower;
