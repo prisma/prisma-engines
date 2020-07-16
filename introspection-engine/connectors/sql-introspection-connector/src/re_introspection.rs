@@ -6,6 +6,8 @@ use crate::warnings::{
 use datamodel::{Datamodel, DefaultNames, DefaultValue, FieldType};
 use introspection_connector::IntrospectionResult;
 use prisma_value::PrismaValue;
+use std::cmp::Ordering;
+use std::cmp::Ordering::{Equal, Greater, Less};
 
 pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut IntrospectionResult) {
     // Notes
@@ -302,10 +304,24 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
     // potential error: what if there was a db default before and then it got removed, now re-introspection makes it virtual
     // you could not get rid of it
 
+    // // restore old model order
+    new_data_model.models.sort_by(|model_a, model_b| {
+        let model_a_idx = old_data_model.models().position(|model| model.name == model_a.name);
+        let model_b_idx = old_data_model.models().position(|model| model.name == model_b.name);
+
+        re_order_putting_new_ones_last(model_a_idx, model_b_idx)
+    });
+
+    new_data_model.enums.sort_by(|enum_a, enum_b| {
+        let enum_a_idx = old_data_model.enums().position(|enm| enm.name == enum_a.name);
+        let enum_b_idx = old_data_model.enums().position(|enm| enm.name == enum_b.name);
+
+        re_order_putting_new_ones_last(enum_a_idx, enum_b_idx)
+    });
+
     // println!("{:#?}", new_data_model);
 
     //warnings
-    //todo adjust them to use the new names
 
     if !changed_model_names.is_empty() {
         let models = changed_model_names.iter().map(|c| c.1.clone()).collect();
@@ -339,5 +355,14 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
         introspection_result
             .warnings
             .push(warning_enriched_with_map_on_enum_value(&enums_and_values));
+    }
+}
+
+fn re_order_putting_new_ones_last(enum_a_idx: Option<usize>, enum_b_idx: Option<usize>) -> Ordering {
+    match (enum_a_idx, enum_b_idx) {
+        (None, None) => Equal,
+        (None, Some(_)) => Greater,
+        (Some(_), None) => Less,
+        (Some(a_idx), Some(b_idx)) => a_idx.cmp(&b_idx),
     }
 }
