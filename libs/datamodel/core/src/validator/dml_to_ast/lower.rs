@@ -1,4 +1,4 @@
-use super::super::directive::AllDirectives;
+use super::super::directives::AllDirectives;
 use crate::error::ErrorCollection;
 use crate::{ast, dml};
 

@@ -1,5 +1,5 @@
+use super::{Args, DirectiveValidator};
 use crate::error::DatamodelError;
-use crate::validator::directive::{Args, DirectiveValidator};
 use crate::{ast, dml, IndexDefinition, IndexType};
 use std::collections::HashMap;
 

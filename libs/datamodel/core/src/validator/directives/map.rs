@@ -1,6 +1,6 @@
+use super::{Args, DirectiveValidator};
 use crate::ast::{Directive, Span};
 use crate::error::DatamodelError;
-use crate::validator::directive::{Args, DirectiveValidator};
 use crate::{ast, dml, Datamodel, WithDatabaseName};
 
 /// Prismas builtin `@map` directive.
