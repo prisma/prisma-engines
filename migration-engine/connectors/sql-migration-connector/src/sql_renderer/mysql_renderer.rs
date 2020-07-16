@@ -25,7 +25,7 @@ impl SqlRenderer for MysqlFlavour {
         let default_str = column
             .default()
             .filter(|default| {
-                !matches!(default, DefaultValue::DBGENERATED(_))
+                !matches!(default, DefaultValue::DBGENERATED(_) | DefaultValue::SEQUENCE(_))
                     // We do not want to render JSON defaults because they are not supported by MySQL.
                     && !matches!(column.column_type_family(), ColumnTypeFamily::Json)
             })
@@ -74,7 +74,7 @@ impl SqlRenderer for MysqlFlavour {
             (DefaultValue::NOW, _) => unreachable!("NOW default on non-datetime column"),
             (DefaultValue::VALUE(val), ColumnTypeFamily::DateTime) => format!("'{}'", val).into(),
             (DefaultValue::VALUE(val), _) => format!("{}", val).into(),
-            (DefaultValue::SEQUENCE(_), _) => todo!("rendering of sequence defaults"),
+            (DefaultValue::SEQUENCE(_), _) => "".into(),
         }
     }
 
@@ -117,12 +117,9 @@ fn render_mysql_modify(
         .unwrap_or_else(|| render_column_type(&next_column));
 
     let default = new_default
-        .map(|default| {
-            format!(
-                " DEFAULT {}",
-                renderer.render_default(&default, &next_column.column_type().family)
-            )
-        })
+        .map(|default| renderer.render_default(&default, &next_column.column_type().family))
+        .filter(|expr| !expr.is_empty())
+        .map(|expression| format!(" DEFAULT {}", expression))
         .unwrap_or_else(String::new);
 
     format!(

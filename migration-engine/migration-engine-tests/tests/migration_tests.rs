@@ -304,6 +304,61 @@ async fn flipping_autoincrement_on_and_off_works(api: &TestApi) -> TestResult {
     Ok(())
 }
 
+// Ignoring sqlite is OK, because sqlite integer primary keys are always auto-incrementing.
+#[test_each_connector(ignore("sqlite"), log = "debug,sql_schema_describer=info")]
+async fn making_an_autoincrement_default_an_expression_then_autoincrement_again_works(api: &TestApi) -> TestResult {
+    let dm1 = r#"
+        model Post {
+            id        Int        @id @default(autoincrement())
+            title     String     @default("")
+        }
+    "#;
+
+    api.infer_apply(dm1)
+        .migration_id(Some("apply_dm1"))
+        .send()
+        .await?
+        .assert_green()?;
+
+    api.assert_schema().await?.assert_table("Post", |model| {
+        model.assert_pk(|pk| pk.assert_columns(&["id"])?.assert_has_autoincrement())
+    })?;
+
+    let dm2 = r#"
+        model Post {
+            id        Int       @id @default(3)
+            title     String    @default("")
+        }
+    "#;
+
+    api.infer_apply(dm2)
+        .migration_id(Some("apply_dm2"))
+        .send()
+        .await?
+        .assert_green()?;
+
+    api.assert_schema().await?.assert_table("Post", |model| {
+        model
+            .assert_pk(|pk| pk.assert_columns(&["id"])?.assert_has_no_autoincrement())?
+            .assert_column("id", |column| {
+                column.assert_default(Some(DefaultValue::VALUE(PrismaValue::Int(3))))
+            })
+    })?;
+
+    // Now re-apply the sequence.
+    api.infer_apply(dm1)
+        .migration_id(Some("apply_dm1_again"))
+        .send()
+        .await?
+        .assert_green()?;
+
+    api.assert_schema().await?.assert_table("Post", |model| {
+        model.assert_pk(|pk| pk.assert_columns(&["id"])?.assert_has_autoincrement())
+    })?;
+
+    Ok(())
+}
+
 #[test_each_connector]
 async fn removing_a_scalar_field_must_work(api: &TestApi) {
     let dm1 = r#"

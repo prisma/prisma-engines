@@ -17,7 +17,7 @@ impl SqlRenderer for SqliteFlavour {
         let nullability_str = render_nullability(&column);
         let default_str = column
             .default()
-            .filter(|default| !matches!(default, DefaultValue::DBGENERATED(_)))
+            .filter(|default| !matches!(default, DefaultValue::DBGENERATED(_) | DefaultValue::SEQUENCE(_)))
             .map(|default| format!(" DEFAULT {}", self.render_default(default, &column.column.tpe.family)))
             .unwrap_or_else(String::new);
         let auto_increment_str = if column.is_autoincrement() {
@@ -62,7 +62,7 @@ impl SqlRenderer for SqliteFlavour {
             (DefaultValue::NOW, _) => unreachable!("NOW default on non-datetime column"),
             (DefaultValue::VALUE(val), ColumnTypeFamily::DateTime) => format!("'{}'", val).into(),
             (DefaultValue::VALUE(val), _) => format!("{}", val).into(),
-            (DefaultValue::SEQUENCE(_), _) => unreachable!("rendering of sequence defaults"),
+            (DefaultValue::SEQUENCE(_), _) => "".into(),
         }
     }
 

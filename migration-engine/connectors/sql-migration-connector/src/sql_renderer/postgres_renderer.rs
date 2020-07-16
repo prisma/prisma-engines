@@ -61,7 +61,7 @@ impl super::SqlRenderer for PostgresFlavour {
             (DefaultValue::VALUE(val), ColumnTypeFamily::DateTime) => format!("'{}'", val).into(),
             (DefaultValue::VALUE(PrismaValue::String(val)), ColumnTypeFamily::Json) => format!("'{}'", val).into(),
             (DefaultValue::VALUE(val), _) => val.to_string().into(),
-            (DefaultValue::SEQUENCE(_), _) => todo!("rendering of sequence defaults"),
+            (DefaultValue::SEQUENCE(_), _) => "".into(),
         }
     }
 

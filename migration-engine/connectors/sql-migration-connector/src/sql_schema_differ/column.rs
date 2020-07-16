@@ -48,8 +48,7 @@ impl<'a> ColumnDiffer<'a> {
             None
         };
 
-        dbg!(self.previous.name());
-        let sequence = if dbg!(self.previous.is_autoincrement()) != dbg!(self.next.is_autoincrement()) {
+        let sequence = if self.previous.is_autoincrement() != self.next.is_autoincrement() {
             Some(ColumnChange::Sequence)
         } else {
             None
@@ -73,22 +72,16 @@ impl<'a> ColumnDiffer<'a> {
 
     /// There are workarounds to cope with current migration and introspection limitations.
     ///
-    /// - Since the values we set and introspect for timestamps are stringly typed, matching exactly the default value strings does not work on any database. Therefore we consider all datetime defaults as the same.
-    ///
-    /// - Postgres autoincrement fields get inferred with a default, which we want to ignore.
-    ///
     /// - We bail on a number of cases that are too complex to deal with right now or underspecified.
     fn defaults_match(&self) -> bool {
-        if self.previous.is_autoincrement() {
-            return true;
-        }
-
         // JSON defaults on MySQL should be ignored.
         if self.diffing_options.sql_family().is_mysql()
             && (self.previous.column_type_family().is_json() || self.next.column_type_family().is_json())
         {
             return true;
         }
+
+        dbg!(&self.previous.name(), &self.previous.default(), &self.next.default());
 
         match (&self.previous.default(), &self.next.default()) {
             // Avoid naive string comparisons for JSON defaults.

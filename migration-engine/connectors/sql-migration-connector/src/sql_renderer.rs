@@ -31,8 +31,6 @@ pub(crate) trait SqlRenderer {
     /// passed-in differ. `None` means that we could not generate a good (set
     /// of) ALTER COLUMN(s), and we should fall back to dropping and recreating
     /// the column.
-    ///
-    /// The return type should be interpreted as (alter table lines, (statement before, statement after))
     fn render_alter_column(&self, differ: &ColumnDiffer<'_>) -> Option<RenderedAlterColumn>;
 }
 
