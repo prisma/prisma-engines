@@ -1,4 +1,13 @@
-pub const RESERVED_MODEL_NAMES: &[&str] = &[
+/// Checks if the given model name is reserved (case-sensitive check).
+pub fn is_reserved<T>(name: T) -> bool
+where
+    T: AsRef<str>,
+{
+    RESERVED_MODEL_NAMES.contains(&name.as_ref())
+}
+
+/// Contains all model names that are reserved.
+const RESERVED_MODEL_NAMES: &[&str] = &[
     // reserved GraphQL words
     "Query",
     "Mutation",

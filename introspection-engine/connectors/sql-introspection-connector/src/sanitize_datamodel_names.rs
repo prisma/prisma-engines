@@ -1,4 +1,6 @@
-use datamodel::{Datamodel, DefaultValue, Field, FieldType, WithName};
+use datamodel::{
+    transform::ast_to_dml::reserved_model_names, Datamodel, DefaultValue, Field, FieldType, Model, WithName,
+};
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
 use regex::Regex;
@@ -12,8 +14,11 @@ pub fn sanitize_datamodel_names(datamodel: &mut Datamodel) {
     let mut enum_renames = HashMap::new();
 
     for model in datamodel.models_mut() {
+        rename_denied(model);
+
         let (sanitized_model_name, model_db_name) = sanitize_name(model.name.clone());
         let model_name = model.name.clone();
+
         sanitize_names(&mut model.id_fields);
 
         for field in model.fields_mut() {
@@ -129,4 +134,26 @@ fn sanitize_names(names: &mut [String]) {
         .iter_mut()
         .map(|f| *f = sanitize_name(f.to_string()).0)
         .for_each(drop);
+}
+
+fn rename_denied(model: &mut Model) {
+    if reserved_model_names::is_reserved(model.name()) {
+        let name = format!("Renamed{}", model.name);
+        let comment = format!(
+            "This model has been renamed to '{}' during introspection, because the original name '{}' is reserved.",
+            name, model.name,
+        );
+
+        match model.documentation {
+            Some(ref docs) => model.documentation = Some(format!("{}\n{}", docs, comment)),
+            None => model.documentation = Some(comment.to_owned()),
+        }
+
+        // Only set @@map if there's no @@map already set.
+        if let None = model.database_name {
+            model.database_name = Some(model.name.clone());
+        }
+
+        model.name = name;
+    }
 }
