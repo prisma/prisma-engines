@@ -9,7 +9,7 @@ class RelationDefaultsSpec extends FlatSpec with Matchers with ApiSpecBase with 
       """
         | model List {
         |   id     Int  @id @default(autoincrement())
-        |   uList  String? @unique
+        |   name  String? @unique
         |   todoId Int @default(1)
         |
         |   todo  Todo   @relation(fields: [todoId], references: [id])
@@ -17,7 +17,7 @@ class RelationDefaultsSpec extends FlatSpec with Matchers with ApiSpecBase with 
         |
         | model Todo{
         |   id    Int  @id @default(autoincrement())
-        |   uTodo String? @unique
+        |   name String?
         |   lists  List[]
         | }
         """
@@ -29,7 +29,7 @@ class RelationDefaultsSpec extends FlatSpec with Matchers with ApiSpecBase with 
     // Setup
     server.query("""
     | mutation {
-    |   createList(data: { uList: "A", todo: { create: { uTodo: "B" } } }) {
+    |   createList(data: { name: "A", todo: { create: { name: "B" } } }) {
     |     id
     |   }
     | }
@@ -38,16 +38,16 @@ class RelationDefaultsSpec extends FlatSpec with Matchers with ApiSpecBase with 
     val result = server.query("""
     | query {
     |   lists {
-    |     uList
+    |     name
     |     todo {
-    |       uTodo
+    |       name
     |     }
     |   }
     | }
     """, project)
-    result.toString should equal("""{"data":{"lists":[{"uList":"A","todo":{"uTodo":"B"}}]}}""")
+    result.toString should equal("""{"data":{"lists":[{"name":"A","todo":{"name":"B"}}]}}""")
 
-    server.query(s"""query { todoes { uTodo } }""", project).toString should be("""{"data":{"todoes":[{"uTodo":"B"}]}}""")
+    server.query(s"""query { todoes { name } }""", project).toString should be("""{"data":{"todoes":[{"name":"B"}]}}""")
 
     countItems(project, "lists") should be(1)
     countItems(project, "todoes") should be(1)
@@ -55,7 +55,7 @@ class RelationDefaultsSpec extends FlatSpec with Matchers with ApiSpecBase with 
     // Check that we can implicitly connect with the default value
     val result2 = server.query("""
     | mutation {
-    |   createList(data: { uList: "listWithTodoOne" }) {
+    |   createList(data: { name: "listWithTodoOne" }) {
     |     id
     |     todo {
     |       id
@@ -74,18 +74,18 @@ class RelationDefaultsSpec extends FlatSpec with Matchers with ApiSpecBase with 
       """
         | model List {
         |    id        Int  @id @default(autoincrement())
-        |    uList     String? @unique
+        |    name     String? @unique
         |    todoId    Int @default(1)
         |    todoName  String
-        |    todo      Todo   @relation(fields: [todoId, todoName], references: [id, uTodo])
+        |    todo      Todo   @relation(fields: [todoId, todoName], references: [id, name])
         | }
         |
         | model Todo {
         |    id     Int @default(autoincrement())
-        |    uTodo  String
+        |    name  String
         |    lists  List[]
         |
-        |    @@id([id, uTodo])
+        |    @@id([id, name])
         | }
       """
 
@@ -95,20 +95,20 @@ class RelationDefaultsSpec extends FlatSpec with Matchers with ApiSpecBase with 
 
     // Setup
     server.query("""
-      mutation {createList(data: {uList: "A", todo : { create: {uTodo: "B"}}}){id}}
+      mutation {createList(data: {name: "A", todo : { create: {name: "B"}}}){id}}
     """, project)
 
-    val result = server.query(s"""query { lists { uList, todo { uTodo } } }""", project)
-    result.toString should equal("""{"data":{"lists":[{"uList":"A","todo":{"uTodo":"B"}}]}}""")
+    val result = server.query(s"""query { lists { name, todo { name } } }""", project)
+    result.toString should equal("""{"data":{"lists":[{"name":"A","todo":{"name":"B"}}]}}""")
 
-    server.query("""query { todoes { uTodo } }""", project).toString should be("""{"data":{"todoes":[{"uTodo":"B"}]}}""")
+    server.query("""query { todoes { name } }""", project).toString should be("""{"data":{"todoes":[{"name":"B"}]}}""")
 
     countItems(project, "lists") should be(1)
     countItems(project, "todoes") should be(1)
 
     // Check that we still need to provide the name
     server.queryThatMustFail(
-      s"""mutation { createList(data: { uList: "listWithTodoOne" }) { id todo { id } } }""",
+      s"""mutation { createList(data: { name: "listWithTodoOne" }) { id todo { id } } }""",
       project,
       errorCode = 2012,
       errorContains = "Missing a required value at `Mutation.createList.data.ListCreateInput.todo`",
@@ -123,18 +123,18 @@ class RelationDefaultsSpec extends FlatSpec with Matchers with ApiSpecBase with 
       """
         | model List {
         |    id        Int  @id @default(autoincrement())
-        |    uList     String? @unique
+        |    name     String? @unique
         |    todoId    Int @default(1)
         |    todoName  String
-        |    todo      Todo   @relation(fields: [todoId, todoName], references: [id, uTodo])
+        |    todo      Todo   @relation(fields: [todoId, todoName], references: [id, name])
         | }
         |
         | model Todo {
         |    id     Int @default(autoincrement())
-        |    uTodo  String
+        |    name  String
         |    lists  List[]
         |
-        |     @@id([id, uTodo])
+        |     @@id([id, name])
         | }
       """
 
@@ -146,7 +146,7 @@ class RelationDefaultsSpec extends FlatSpec with Matchers with ApiSpecBase with 
     val result2 = server.query("""
       | mutation {
       |   createList(
-      |     data: { uList: "listWithTodoOne", todo: { create: { uTodo: "abcd" } } }
+      |     data: { name: "listWithTodoOne", todo: { create: { name: "abcd" } } }
       |   ) {
       |     id
       |     todo {
@@ -161,12 +161,12 @@ class RelationDefaultsSpec extends FlatSpec with Matchers with ApiSpecBase with 
     countItems(project, "todoes") should be(1)
   }
 
-    "Not providing a value for required relation fields with a default values" should "work" in {
+    "Not providing a value for required relation fields with default values" should "work" in {
     val schema =
       """
         | model List {
         |   id       Int     @id @default(autoincrement())
-        |   uList    String? @unique
+        |   name    String? @unique
         |   todoId   Int     @default(1)
         |   todoName String  @default("theTodo")
         |   todo     Todo    @relation(fields: [todoId, todoName], references: [id, name])
@@ -174,9 +174,9 @@ class RelationDefaultsSpec extends FlatSpec with Matchers with ApiSpecBase with 
         |
         | model Todo{
         |   id     Int     @default(1)
-        |   name   String? @unique
+        |   name   String
         |   lists  List[]
-        |   @@id([id, uTodo])
+        |   @@id([id, name])
         | }
         """
 
@@ -187,7 +187,7 @@ class RelationDefaultsSpec extends FlatSpec with Matchers with ApiSpecBase with 
     // Setup
     server.query("""
     | mutation {
-    |   createList(data: { uList: "A", todo: { create: { id: 1, name: "theTodo" } } }) {
+    |   createList(data: { name: "A", todo: { create: { id: 1, name: "theTodo" } } }) {
     |     id
     |   }
     | }
@@ -196,14 +196,14 @@ class RelationDefaultsSpec extends FlatSpec with Matchers with ApiSpecBase with 
     val result = server.query("""
     | query {
     |   lists {
-    |     uList
+    |     name
     |     todo {
     |       name
     |     }
     |   }
     | }
     """, project)
-    result.toString should equal("""{"data":{"lists":[{"uList":"A","todo":{"name":"B"}}]}}""")
+    result.toString should equal("""{"data":{"lists":[{"name":"A","todo":{"name":"theTodo"}}]}}""")
 
     server.query(s"""query { todoes { name } }""", project).toString should be("""{"data":{"todoes":[{"name":"theTodo"}]}}""")
 
@@ -213,16 +213,16 @@ class RelationDefaultsSpec extends FlatSpec with Matchers with ApiSpecBase with 
     // Check that we can implicitly connect with the default value
     val result2 = server.query("""
     | mutation {
-    |   createList(data: { uList: "listWithTheTodo" }) {
+    |   createList(data: { name: "listWithTheTodo" }) {
     |     id
     |     todo {
     |       id
-    |       title
+    |       name
     |     }
     |   }
     | }
     """, project)
-    result2.toString should equal("""{"data":{"createList":{"id":2,"todo":{"id":1,"title": "theTodo"}}}}""")
+    result2.toString should equal("""{"data":{"createList":{"id":2,"todo":{"id":1,"name":"theTodo"}}}}""")
 
     countItems(project, "lists") should be(2)
   }
