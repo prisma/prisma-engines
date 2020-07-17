@@ -140,6 +140,10 @@ fn test_relations_over_non_unique_criteria_support(providers: &[&str], must_erro
 fn test_capability_support(providers: &[&str], must_error: bool, datamodel: &str, error_msg: &str) {
     let provider_strings: Vec<_> = providers.iter().map(|x| format!("\"{}\"", x)).collect();
     let first_provider = providers.first().unwrap();
+    let protocol = match first_provider {
+        &"sqlite" => "file:",
+        x => x,
+    };
     let dml = format!(
         r#"
     datasource db {{
@@ -150,7 +154,7 @@ fn test_capability_support(providers: &[&str], must_error: bool, datamodel: &str
     {datamodel}    
     "#,
         provider_strings = provider_strings.join(","),
-        url = format!("{}://", first_provider),
+        url = format!("{}://", protocol),
         datamodel = datamodel,
     );
 
