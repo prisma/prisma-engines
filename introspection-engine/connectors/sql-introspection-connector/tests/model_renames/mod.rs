@@ -13,7 +13,7 @@ async fn introspecting_a_table_with_reserved_name_should_rename(api: &TestApi) {
         .await;
 
     let dm = "/// This model has been renamed to 'RenamedTransaction' during introspection, because the original name 'Transaction' is reserved.\nmodel RenamedTransaction {\n  id Int @default(autoincrement()) @id\n}\n";
-    let result = dbg!(api.introspect().await);
+    let result = api.introspect().await;
 
     assert_eq!(&result, dm);
 }

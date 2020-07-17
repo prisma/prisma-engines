@@ -1,5 +1,6 @@
 use datamodel::{
-    transform::ast_to_dml::reserved_model_names, Datamodel, DefaultValue, Field, FieldType, Model, WithName,
+    transform::ast_to_dml::reserved_model_names, Datamodel, DefaultValue, Field, FieldType, Model, WithDatabaseName,
+    WithName,
 };
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
@@ -9,34 +10,43 @@ use std::collections::HashMap;
 static EMPTY_ENUM_PLACEHOLDER: &'static str = "EMPTY_ENUM_VALUE";
 static EMPTY_STRING: &'static str = "";
 
-//todo sanitizing might need to be adjusted to also change the fields in the RelationInfo
-pub fn sanitize_datamodel_names(datamodel: &mut Datamodel) {
+static RE_START: Lazy<Regex> = Lazy::new(|| Regex::new("^[^a-zA-Z]+").unwrap());
+static RE: Lazy<Regex> = Lazy::new(|| Regex::new("[^_a-zA-Z0-9]").unwrap());
+
+// Todo: Sanitizing might need to be adjusted to also change the fields in the RelationInfo
+pub fn sanitize_datamodel_names(datamodel: &mut Datamodel, family: &SqlFamily) {
     let mut enum_renames = HashMap::new();
 
     for model in datamodel.models_mut() {
+        let original_model_name = field.name().to_owned();
+
         rename_denied(model);
+        sanitize_name(model);
 
-        let (sanitized_model_name, model_db_name) = sanitize_name(model.name.clone());
         let model_name = model.name.clone();
-
-        sanitize_names(&mut model.id_fields);
+        model.id_fields = sanitize_strings(model.id_fields.as_slice());
 
         for field in model.fields_mut() {
-            let (sanitized_field_name, field_db_name) = sanitize_name(field.name().to_string());
+            let original_field_name = field.name().to_owned();
+            sanitize_name(field);
 
             match field {
                 Field::RelationField(rf) => {
                     let info = &mut rf.relation_info;
-                    info.name = sanitize_name(info.name.clone()).0;
-                    info.to = sanitize_name(info.to.clone()).0;
-                    sanitize_names(&mut info.to_fields);
-                    sanitize_names(&mut info.fields);
+
+                    info.name = sanitize_string(&info.name);
+                    info.to = sanitize_string(&info.to);
+
+                    info.to_fields = sanitize_strings(&info.to_fields);
+                    info.fields = sanitize_strings(&info.fields);
                 }
+
                 Field::ScalarField(sf) => {
                     if let FieldType::Enum(enum_name) = &sf.field_type {
+                        if
                         let (sanitized_enum_name, enum_db_name) = if *enum_name == format!("{}_{}", model_name, sf.name)
                         {
-                            //MySql
+                            // MySql
                             if model_db_name.is_none() && field_db_name.is_none() {
                                 (enum_name.clone(), None)
                             } else {
@@ -75,68 +85,100 @@ pub fn sanitize_datamodel_names(datamodel: &mut Datamodel) {
                     }
                 }
             }
+
             field.set_name(&sanitized_field_name);
         }
 
-        for index in &mut model.indices {
-            sanitize_names(&mut index.fields);
+        // for index in &mut model.indices {
+        //     sanitize_names(&mut index.fields);
         }
 
-        model.name = sanitized_model_name;
-        model.database_name = model_db_name;
+        // model.name = sanitized_model_name;
+        // model.database_name = model_db_name;
     }
 
-    for enm in datamodel.enums_mut() {
-        if let Some((sanitized_enum_name, enum_db_name)) = enum_renames.get(&enm.name) {
-            enm.name = sanitized_enum_name.to_owned();
-            enm.database_name = enum_db_name.to_owned();
-        } else {
-            let (sanitized_enum_name, enum_db_name) = sanitize_name(enm.name.clone());
-            enm.name = sanitized_enum_name.to_owned();
-            enm.database_name = enum_db_name.to_owned();
-        }
+    // for enm in datamodel.enums_mut() {
+    //     if let Some((sanitized_enum_name, enum_db_name)) = enum_renames.get(&enm.name) {
+    //         enm.name = sanitized_enum_name.to_owned();
+    //         enm.database_name = enum_db_name.to_owned();
+    //     } else {
+    //         sanitize_name(&mut enm);
+    //         // let (sanitized_enum_name, enum_db_name) = sanitize_name(enm.name.clone());
+    //         // enm.name = sanitized_enum_name.to_owned();
+    //         // enm.database_name = enum_db_name.to_owned();
+    //     }
 
-        for enum_value in enm.values_mut() {
-            if &enum_value.name == EMPTY_STRING {
-                enum_value.name = EMPTY_ENUM_PLACEHOLDER.to_string();
-                enum_value.database_name = Some(EMPTY_STRING.to_string());
-            } else {
-                let (sanitized_name, db_name) = sanitize_name(enum_value.name.clone());
-                enum_value.name = sanitized_name;
-                enum_value.database_name = db_name;
-            }
-        }
-    }
+    //     for enum_value in enm.values_mut() {
+    //         if &enum_value.name == EMPTY_STRING {
+    //             enum_value.name = EMPTY_ENUM_PLACEHOLDER.to_string();
+    //             enum_value.database_name = Some(EMPTY_STRING.to_string());
+    //         } else {
+    //             sanitize_name(&mut enum_value);
+    //             // let (sanitized_name, db_name) = sanitize_name(enum_value.name.clone());
+    //             // enum_value.name = sanitized_name;
+    //             // enum_value.database_name = db_name;
+    //         }
+    //     }
+    // }
 }
 
-static RE_START: Lazy<Regex> = Lazy::new(|| Regex::new("^[^a-zA-Z]+").unwrap());
+fn sanitize_names<T>(renameables: &[&mut T])
+where
+    T: WithDatabaseName + WithName,
+{
+    // names
+    //     .iter_mut()
+    //     .map(|f| *f = sanitize_name(f.to_string()).0)
+    //     .for_each(drop);
+    todo!()
+}
 
-static RE: Lazy<Regex> = Lazy::new(|| Regex::new("[^_a-zA-Z0-9]").unwrap());
 
-//todo this is now widely used, we can make this smarter at some point
-//ideas:
-// numbers only -> spell out first digit?   100 -> one00
-// Only invalid characters??
-// Underscore at start
-fn sanitize_name(name: String) -> (String, Option<String>) {
-    let needs_sanitation = RE_START.is_match(name.as_str()) || RE.is_match(name.as_str());
+fn sanitize_strings(strings: &[String]) -> Vec<String>
+{
+    // names
+    //     .iter_mut()
+    //     .map(|f| *f = sanitize_name(f.to_string()).0)
+    //     .for_each(drop);
+    todo!()
+}
+
+// Todo: This is now widely used, we can make this smarter at some point.
+// Ideas:
+// - Numbers only -> spell out first digit? 100 -> one00
+// - Only invalid characters?
+// - Underscore at start
+fn sanitize_name<T>(renameable: &mut T)
+where
+    T: WithDatabaseName + WithName,
+{
+    let name = renameable.name();
+    let db_name = renameable.database_name();
+    let sanitized = sanitize_string(name.as_str());
+
+    if &sanitized != name {
+        // Only set the db name if there's none already set (or else this would invalidate the model).
+        if let None = db_name {
+            renameable.set_database_name(Some(name.to_owned()));
+        }
+
+        renameable.set_name(&sanitized);
+    };
+}
+
+fn sanitize_string(s: &str) -> String {
+    let needs_sanitation = RE_START.is_match(s) || RE.is_match(s);
 
     if needs_sanitation {
-        let start_cleaned: String = RE_START.replace_all(name.as_str(), "").parse().unwrap();
-        (RE.replace_all(start_cleaned.as_str(), "_").parse().unwrap(), Some(name))
+        let start_cleaned: String = RE_START.replace_all(s, "").parse().unwrap();
+        let sanitized: String = RE.replace_all(start_cleaned.as_str(), "_").parse().unwrap();
+
+        sanitized
     } else {
-        (name, None)
+        s.to_owned()
     }
 }
 
-fn sanitize_names(names: &mut [String]) {
-    names
-        .iter_mut()
-        .map(|f| *f = sanitize_name(f.to_string()).0)
-        .for_each(drop);
-}
-
-/// Renames models which name match an entry on the deny list.
 fn rename_denied(model: &mut Model) {
     if reserved_model_names::is_reserved(model.name()) {
         let name = format!("Renamed{}", model.name);
@@ -150,14 +192,10 @@ fn rename_denied(model: &mut Model) {
             None => model.documentation = Some(comment.to_owned()),
         }
 
-        dbg!(&model.database_name);
-
         // Only set @@map if there's no @@map already set.
         if let None = model.database_name {
             model.database_name = Some(model.name.clone());
         }
-
-        dbg!(&model.database_name);
 
         model.name = name;
     }

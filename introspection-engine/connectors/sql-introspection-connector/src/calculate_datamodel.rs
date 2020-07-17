@@ -24,6 +24,8 @@ pub fn calculate_datamodel(schema: &SqlSchema, family: &SqlFamily) -> SqlIntrosp
     // our opinionation about valid names
     sanitize_datamodel_names(&mut data_model);
 
+    dbg!(&data_model);
+
     // commenting out models, fields, enums, enum values
     let mut warnings: Vec<Warning> = commenting_out_guardrails(&mut data_model);
 
