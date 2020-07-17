@@ -111,13 +111,7 @@ pub trait CreateInputTypeBuilderExtension<'a>: InputTypeBuilderBase<'a> {
                 let input_name = format!("{}Create{}{}Input", related_model.name, arity_part, without_part);
                 let field_is_opposite_relation_field = parent_field
                     .as_ref()
-                    .and_then(|pf| {
-                        if pf.related_field().name == rf.name {
-                            Some(pf)
-                        } else {
-                            None
-                        }
-                    })
+                    .filter(|pf| pf.related_field().name == rf.name)
                     .is_some();
 
                 if field_is_opposite_relation_field {
@@ -143,8 +137,13 @@ pub trait CreateInputTypeBuilderExtension<'a>: InputTypeBuilderBase<'a> {
                         }
                     };
 
+                    let all_required_scalar_fields_have_defaults = rf
+                        .linking_fields()
+                        .scalar_fields()
+                        .all(|scalar_field| scalar_field.default_value.is_some());
+
                     let input_type = InputType::object(input_object);
-                    let input_field = if rf.is_required {
+                    let input_field = if rf.is_required && !all_required_scalar_fields_have_defaults {
                         input_field(rf.name.clone(), input_type, None)
                     } else {
                         input_field(rf.name.clone(), InputType::opt(InputType::null(input_type)), None)
