@@ -249,7 +249,7 @@ async fn bad_datasource_url_and_provider_combinations_must_return_a_proper_error
 
     let expected = json!({
         "is_panic": false,
-        "message": "Error in datamodel: Error validating datasource `db`: The URL for datasource `db` must start with the protocol `sqlite://`.",
+        "message": "Error in datamodel: Error validating datasource `db`: The URL for datasource `db` must start with the protocol `file:`.",
         "backtrace": null,
     });
 
