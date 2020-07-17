@@ -6,7 +6,14 @@ const PROVIDER_KEY: &str = "provider";
 const OUTPUT_KEY: &str = "output";
 const BINARY_TARGETS_KEY: &str = "binaryTargets";
 const EXPERIMENTAL_FEATURES_KEY: &str = "experimentalFeatures";
-const FIRST_CLASS_PROPERTIES: &[&str] = &[PROVIDER_KEY, OUTPUT_KEY, BINARY_TARGETS_KEY, EXPERIMENTAL_FEATURES_KEY];
+const PREVIEW_FEATURES_KEY: &str = "previewFeatures";
+const FIRST_CLASS_PROPERTIES: &[&str] = &[
+    PROVIDER_KEY,
+    OUTPUT_KEY,
+    BINARY_TARGETS_KEY,
+    EXPERIMENTAL_FEATURES_KEY,
+    PREVIEW_FEATURES_KEY,
+];
 
 pub struct GeneratorLoader {}
 
@@ -50,7 +57,9 @@ impl GeneratorLoader {
             None => Vec::new(),
         };
 
-        let experimental_features = match args.arg(EXPERIMENTAL_FEATURES_KEY).ok() {
+        // for compatibility reasons we still accept the old experimental key
+        let preview_features_arg = args.arg(PREVIEW_FEATURES_KEY).or(args.arg(EXPERIMENTAL_FEATURES_KEY));
+        let preview_features = match preview_features_arg.ok() {
             Some(x) => x.as_array().to_str_vec()?,
             None => Vec::new(),
         };
@@ -69,7 +78,7 @@ impl GeneratorLoader {
             provider,
             output,
             binary_targets,
-            experimental_features,
+            preview_features,
             config: properties,
             documentation: ast_generator.documentation.clone().map(|comment| comment.text),
         })

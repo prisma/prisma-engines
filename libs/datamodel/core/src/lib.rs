@@ -175,7 +175,7 @@ pub fn render_datamodel_and_config_to_string(
 }
 
 /// Renders a datamodel, generators and sources to a stream as a string.
-pub fn render_datamodel_and_config_to(
+fn render_datamodel_and_config_to(
     stream: &mut dyn std::io::Write,
     datamodel: &dml::Datamodel,
     config: &configuration::Configuration,
