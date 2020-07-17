@@ -65,6 +65,14 @@ impl<'a> ColumnRef<'a> {
         self.name() == other.name() && self.table().name() == other.table().name()
     }
 
+    /// Returns whether this column is the primary key. If it is only part of the primary key, this will return false.
+    pub(crate) fn is_single_primary_key(&self) -> bool {
+        self.table()
+            .primary_key()
+            .map(|pk| pk.columns == &[self.name()])
+            .unwrap_or(false)
+    }
+
     pub(crate) fn table(&self) -> TableRef<'a> {
         TableRef {
             schema: self.schema,

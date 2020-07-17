@@ -2315,3 +2315,40 @@ async fn schemas_with_dbgenerated_work(api: &TestApi) -> TestResult {
 
     Ok(())
 }
+
+#[test_each_connector(log = "debug,sql_schema_describer=info")]
+async fn models_with_an_autoincrement_field_as_part_of_a_multi_field_id_can_be_created(api: &TestApi) -> TestResult {
+    let dm = r#"
+        model List {
+            id        Int  @id @default(autoincrement())
+            uList     String? @unique
+            todoId    Int @default(1)
+            todoName  String
+            todo      Todo   @relation(fields: [todoId, todoName], references: [id, uTodo])
+        }
+
+        model Todo {
+            id     Int @default(autoincrement())
+            uTodo  String
+            lists  List[]
+
+            @@id([id, uTodo])
+        }
+    "#;
+
+    api.infer_apply(dm).send().await?.assert_green()?;
+
+    api.assert_schema().await?.assert_table("Todo", |table| {
+        table
+            .assert_pk(|pk| pk.assert_columns(&["id", "uTodo"]))?
+            .assert_column("id", |col| {
+                if api.is_sqlite() {
+                    Ok(col)
+                } else {
+                    col.assert_auto_increments()
+                }
+            })
+    })?;
+
+    Ok(())
+}
