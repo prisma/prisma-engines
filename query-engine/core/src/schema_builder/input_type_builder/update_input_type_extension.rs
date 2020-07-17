@@ -72,16 +72,8 @@ pub trait UpdateInputTypeBuilderExtension<'a>: InputTypeBuilderBase<'a> + Create
                 let without_part = format!("Without{}", capitalize(related_field.name.clone()));
 
                 let input_name = format!("{}Update{}{}Input", related_model.name, arity_part, without_part);
-                let field_is_opposite_relation_field = parent_field
-                    .as_ref()
-                    .and_then(|pf| {
-                        if pf.related_field().name == rf.name {
-                            Some(pf)
-                        } else {
-                            None
-                        }
-                    })
-                    .is_some();
+                let field_is_opposite_relation_field =
+                    parent_field.filter(|pf| pf.related_field().name == rf.name).is_some();
 
                 if field_is_opposite_relation_field {
                     None
@@ -112,11 +104,14 @@ pub trait UpdateInputTypeBuilderExtension<'a>: InputTypeBuilderBase<'a> + Create
                         }
                     };
 
-                    Some(input_field(
-                        rf.name.clone(),
-                        InputType::opt(InputType::null(InputType::object(input_object))),
-                        None,
-                    ))
+                    let field_type = InputType::object(input_object);
+                    let field_type = if rf.is_optional() {
+                        InputType::opt(InputType::null(field_type))
+                    } else {
+                        InputType::opt(field_type)
+                    };
+
+                    Some(input_field(rf.name.clone(), field_type, None))
                 }
             })
             .collect()
