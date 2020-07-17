@@ -21,9 +21,7 @@ impl DatasourceProvider for SqliteDatasourceProvider {
     }
 
     fn can_handle_url(&self, name: &str, url: &StringFromEnvVar) -> Result<(), String> {
-        let validation_with_file_protocol = validate_url(name, "file:", url);
-        let validation_with_sqlite_protocol = validate_url(name, "sqlite://", url);
-        validation_with_file_protocol.or(validation_with_sqlite_protocol)
+        validate_url(name, "file:", url)
     }
 
     fn connector(&self) -> Box<dyn Connector> {

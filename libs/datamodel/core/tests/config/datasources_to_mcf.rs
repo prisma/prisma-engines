@@ -43,7 +43,7 @@ fn serialize_builtin_sources_to_dmmf() {
 
     let schema3 = r#"datasource sqlite1 {
             provider = "sqlite"
-            url = "sqlite://file.db"
+            url = "file:file.db"
         }"#;
 
     let expected_dmmf_3 = r#"[
@@ -53,7 +53,7 @@ fn serialize_builtin_sources_to_dmmf() {
     "activeProvider": "sqlite",
     "url": {
       "fromEnvVar": null,
-      "value": "sqlite://file.db"
+      "value": "file:file.db"
     }
   }
 ]"#;
