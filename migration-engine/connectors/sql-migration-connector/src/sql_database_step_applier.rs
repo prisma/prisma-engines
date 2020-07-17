@@ -159,16 +159,16 @@ fn render_raw_sql(
 
             if !primary_columns.is_empty() && !primary_key_is_already_set {
                 let column_names = primary_columns.iter().map(|col| renderer.quote(&col)).join(",");
-                write!(create_table, ",\n    PRIMARY KEY ({})", column_names)?;
+                write!(create_table, ",\nPRIMARY KEY ({})", column_names)?;
             }
 
             if sql_family == SqlFamily::Sqlite && !table.foreign_keys.is_empty() {
-                write!(create_table, ",")?;
+                writeln!(create_table, ",")?;
 
                 let mut fks = table.foreign_keys.iter().peekable();
 
                 while let Some(fk) = fks.next() {
-                    write!(
+                    writeln!(
                         create_table,
                         "FOREIGN KEY ({constrained_columns}) {references}{comma}",
                         constrained_columns = fk.columns.iter().map(|col| format!(r#""{}""#, col)).join(","),
