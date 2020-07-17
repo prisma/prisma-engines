@@ -179,7 +179,7 @@ impl SqlFlavour for SqliteFlavour {
     }
 }
 
-pub(crate) struct PostgresFlavour(PostgresUrl);
+pub(crate) struct PostgresFlavour(pub(crate) PostgresUrl);
 
 #[async_trait::async_trait]
 impl SqlFlavour for PostgresFlavour {

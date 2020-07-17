@@ -290,10 +290,6 @@ fn relation_table_column(referenced_model: &ModelWalker<'_>, reference_field_nam
 }
 
 fn migration_value_new(field: &ScalarFieldWalker<'_>) -> Option<sql_schema_describer::DefaultValue> {
-    if field.is_id() {
-        return None;
-    }
-
     let value = match &field.default_value()? {
         datamodel::DefaultValue::Single(s) => match field.field_type() {
             TypeWalker::Enum(inum) => {
@@ -314,6 +310,11 @@ fn migration_value_new(field: &ScalarFieldWalker<'_>) -> Option<sql_schema_descr
             if expression.name == "dbgenerated" && expression.args.is_empty() =>
         {
             return Some(sql_schema_describer::DefaultValue::DBGENERATED(String::new()))
+        }
+        datamodel::DefaultValue::Expression(expression)
+            if expression.name == "autoincrement" && expression.args.is_empty() =>
+        {
+            return Some(sql_schema_describer::DefaultValue::SEQUENCE(String::new()))
         }
         datamodel::DefaultValue::Expression(_) => return None,
     };

@@ -53,12 +53,16 @@ impl<'a> ColumnRef<'a> {
         &self.column.tpe
     }
 
-    pub(crate) fn auto_increment(&self) -> bool {
+    pub(crate) fn is_autoincrement(&self) -> bool {
         self.column.auto_increment
     }
 
     pub(crate) fn is_required(&self) -> bool {
         self.column.is_required()
+    }
+
+    pub(crate) fn is_same_column(&self, other: &ColumnRef<'_>) -> bool {
+        self.name() == other.name() && self.table().name() == other.table().name()
     }
 
     pub(crate) fn table(&self) -> TableRef<'a> {

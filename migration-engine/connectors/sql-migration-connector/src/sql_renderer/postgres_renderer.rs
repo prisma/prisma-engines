@@ -1,5 +1,10 @@
-use super::common::*;
-use crate::{flavour::PostgresFlavour, sql_schema_helpers::*};
+use super::{common::*, RenderedAlterColumn};
+use crate::{
+    expanded_alter_column::{expand_postgres_alter_column, PostgresAlterColumn},
+    flavour::PostgresFlavour,
+    sql_schema_differ::ColumnDiffer,
+    sql_schema_helpers::*,
+};
 use once_cell::sync::Lazy;
 use prisma_models::PrismaValue;
 use regex::Regex;
@@ -20,7 +25,7 @@ impl super::SqlRenderer for PostgresFlavour {
             .filter(|default| !matches!(default, DefaultValue::DBGENERATED(_)))
             .map(|default| format!("DEFAULT {}", self.render_default(default, &column.column.tpe.family)))
             .unwrap_or_else(String::new);
-        let is_serial = column.auto_increment();
+        let is_serial = column.is_autoincrement();
 
         if is_serial {
             format!("{} SERIAL", column_name)
@@ -37,7 +42,7 @@ impl super::SqlRenderer for PostgresFlavour {
             .join(",");
 
         format!(
-            "REFERENCES {}({}) {}  ON UPDATE CASCADE",
+            "REFERENCES {}({}) {} ON UPDATE CASCADE",
             self.quote_with_schema(schema_name, &foreign_key.referenced_table),
             referenced_columns,
             render_on_delete(&foreign_key.on_delete_action)
@@ -56,8 +61,98 @@ impl super::SqlRenderer for PostgresFlavour {
             (DefaultValue::VALUE(val), ColumnTypeFamily::DateTime) => format!("'{}'", val).into(),
             (DefaultValue::VALUE(PrismaValue::String(val)), ColumnTypeFamily::Json) => format!("'{}'", val).into(),
             (DefaultValue::VALUE(val), _) => val.to_string().into(),
-            (DefaultValue::SEQUENCE(_), _) => todo!("rendering of sequence defaults"),
+            (DefaultValue::SEQUENCE(_), _) => "".into(),
         }
+    }
+
+    fn render_alter_column(&self, differ: &ColumnDiffer<'_>) -> Option<RenderedAlterColumn> {
+        // Matches the sequence name from inside an autoincrement default expression.
+        static SEQUENCE_DEFAULT_RE: Lazy<Regex> =
+            Lazy::new(|| Regex::new(r#"nextval\('"?([^"]+)"?'::regclass\)"#).unwrap());
+
+        let steps = expand_postgres_alter_column(differ)?;
+        let table_name = Quoted::postgres_ident(differ.previous.table().name());
+        let column_name = Quoted::postgres_ident(differ.previous.name());
+
+        let alter_column_prefix = format!("ALTER COLUMN {}", column_name);
+
+        let mut rendered_steps = RenderedAlterColumn::default();
+
+        for step in steps {
+            match step {
+                PostgresAlterColumn::DropDefault => {
+                    rendered_steps
+                        .alter_columns
+                        .push(format!("{} DROP DEFAULT", &alter_column_prefix));
+
+                    // We also need to drop the sequence, in case it isn't used by any other column.
+                    if let Some(DefaultValue::SEQUENCE(sequence_expression)) = differ.previous.default() {
+                        let sequence_name = SEQUENCE_DEFAULT_RE
+                            .captures(sequence_expression)
+                            .and_then(|captures| captures.get(1))
+                            .map(|capture| capture.as_str())
+                            .unwrap_or_else(|| {
+                                panic!("Failed to extract sequence name from `{}`", sequence_expression)
+                            });
+
+                        let sequence_is_still_used = walk_columns(differ.next.schema()).any(|column| matches!(column.default(), Some(DefaultValue::SEQUENCE(other_sequence)) if other_sequence == sequence_expression) && !column.is_same_column(&differ.next));
+
+                        if !sequence_is_still_used {
+                            rendered_steps.after =
+                                Some(format!("DROP SEQUENCE {};", Quoted::postgres_ident(sequence_name)));
+                        }
+                    }
+                }
+                PostgresAlterColumn::SetDefault(new_default) => rendered_steps.alter_columns.push(format!(
+                    "{} SET DEFAULT {}",
+                    &alter_column_prefix,
+                    self.render_default(&new_default, differ.next.column_type_family())
+                )),
+                PostgresAlterColumn::DropNotNull => rendered_steps
+                    .alter_columns
+                    .push(format!("{} DROP NOT NULL", &alter_column_prefix)),
+                PostgresAlterColumn::SetNotNull => rendered_steps
+                    .alter_columns
+                    .push(format!("{} SET NOT NULL", &alter_column_prefix)),
+                PostgresAlterColumn::SetType(ty) => rendered_steps.alter_columns.push(format!(
+                    "{} SET DATA TYPE {}",
+                    &alter_column_prefix,
+                    render_column_type(&ty)
+                )),
+                PostgresAlterColumn::AddSequence => {
+                    // We imitate the sequence that would be automatically created on a `SERIAL` column.
+                    //
+                    // See the postgres docs for more details:
+                    // https://www.postgresql.org/docs/12/datatype-numeric.html#DATATYPE-SERIAL
+                    let sequence_name = format!(
+                        "{table_name}_{column_name}_seq",
+                        table_name = differ.next.table().name(),
+                        column_name = differ.next.name()
+                    )
+                    .to_lowercase();
+
+                    let create_sequence = format!("CREATE SEQUENCE {};", Quoted::postgres_ident(&sequence_name));
+                    let set_default = format!(
+                        "{prefix} SET DEFAULT {default};",
+                        prefix = alter_column_prefix,
+                        default = format_args!("nextval({})", Quoted::postgres_string(&sequence_name))
+                    );
+                    let alter_sequence = format!(
+                        "ALTER SEQUENCE {sequence_name} OWNED BY {schema_name}.{table_name}.{column_name};",
+                        sequence_name = Quoted::postgres_ident(sequence_name),
+                        schema_name = Quoted::postgres_ident(self.0.schema()),
+                        table_name = table_name,
+                        column_name = column_name,
+                    );
+
+                    rendered_steps.alter_columns.push(set_default);
+                    rendered_steps.before = Some(create_sequence);
+                    rendered_steps.after = Some(alter_sequence);
+                }
+            }
+        }
+
+        Some(rendered_steps)
     }
 }
 

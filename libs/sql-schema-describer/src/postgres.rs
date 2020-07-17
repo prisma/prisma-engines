@@ -277,17 +277,13 @@ impl SqlSchemaDescriber {
                 },
             };
 
-            let is_auto_increment = is_identity
-                || match default {
-                    Some(DefaultValue::SEQUENCE(_)) => true,
-                    _ => false,
-                };
+            let auto_increment = is_identity || matches!(default, Some(DefaultValue::SEQUENCE(_)));
 
             let col = Column {
                 name: col_name,
                 tpe,
                 default,
-                auto_increment: is_auto_increment,
+                auto_increment,
             };
 
             columns.entry(table_name).or_default().push(col);
@@ -714,7 +710,8 @@ fn is_autoincrement(value: &str, schema_name: &str, table_name: &str, column_nam
                         let matched_segments = matched.as_str().split('_');
                         matched_segments
                             .zip(table_name_segments.chain(column_name_segments))
-                            .all(|(found, expected)| found == expected)
+                            // postgres automatically lower-cases table/column names when generating sequence names
+                            .all(|(found, expected)| found == expected || found == expected.to_lowercase())
                     })
                 })
                 .map(|_| true)

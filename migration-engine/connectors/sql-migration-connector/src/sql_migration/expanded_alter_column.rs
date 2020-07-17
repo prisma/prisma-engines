@@ -1,22 +1,5 @@
 use crate::sql_schema_differ::{ColumnChange, ColumnChanges, ColumnDiffer};
-use quaint::prelude::SqlFamily;
 use sql_schema_describer::{ColumnArity, ColumnType, ColumnTypeFamily, DefaultValue};
-
-pub(crate) fn expand_alter_column(
-    column_differ: &ColumnDiffer<'_>,
-    sql_family: &SqlFamily,
-) -> Option<ExpandedAlterColumn> {
-    match sql_family {
-        SqlFamily::Sqlite => expand_sqlite_alter_column(&column_differ).map(ExpandedAlterColumn::Sqlite),
-        SqlFamily::Mysql => Some(ExpandedAlterColumn::Mysql(expand_mysql_alter_column(&column_differ))),
-        SqlFamily::Postgres => expand_postgres_alter_column(&column_differ).map(ExpandedAlterColumn::Postgres),
-        SqlFamily::Mssql => todo!("Greetings from Redmond"),
-    }
-}
-
-pub(crate) fn expand_sqlite_alter_column(_columns: &ColumnDiffer<'_>) -> Option<Vec<SqliteAlterColumn>> {
-    None
-}
 
 pub(crate) fn expand_mysql_alter_column(columns: &ColumnDiffer<'_>) -> MysqlAlterColumn {
     let column_changes = columns.all_changes();
@@ -83,18 +66,20 @@ pub(crate) fn expand_postgres_alter_column(columns: &ColumnDiffer<'_>) -> Option
                 }
                 _ => return None,
             },
+            ColumnChange::Sequence => {
+                if columns.previous.is_autoincrement() {
+                    // The sequence should be dropped.
+                    changes.push(PostgresAlterColumn::DropDefault)
+                } else {
+                    // The sequence should be created.
+                    changes.push(PostgresAlterColumn::AddSequence)
+                }
+            }
             ColumnChange::Renaming => unreachable!("column renaming"),
         }
     }
 
     Some(changes)
-}
-
-#[derive(Debug)]
-pub(crate) enum ExpandedAlterColumn {
-    Postgres(Vec<PostgresAlterColumn>),
-    Mysql(MysqlAlterColumn),
-    Sqlite(Vec<SqliteAlterColumn>),
 }
 
 #[derive(Debug)]
@@ -105,6 +90,8 @@ pub(crate) enum PostgresAlterColumn {
     DropNotNull,
     SetType(ColumnType),
     SetNotNull,
+    /// Add an auto-incrementing sequence as a default on the column.
+    AddSequence,
 }
 
 /// https://dev.mysql.com/doc/refman/8.0/en/alter-table.html
@@ -120,7 +107,8 @@ pub(crate) enum MysqlAlterColumn {
     },
 }
 
+// Not used yet: SQLite only supports column renamings, which we don't. All
+// other transformations will involve redefining the table.
+// https://www.sqlite.org/lang_altertable.html
 #[derive(Debug)]
-pub(crate) enum SqliteAlterColumn {
-    // Not used yet
-}
+pub(crate) enum SqliteAlterColumn {}

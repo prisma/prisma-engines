@@ -1,5 +1,5 @@
 use crate::*;
-use sql_renderer::{postgres_render_column_type, rendered_step::RenderedStep, IteratorJoin, Quoted};
+use sql_renderer::{rendered_step::RenderedStep, IteratorJoin, Quoted, RenderedAlterColumn};
 use sql_schema_describer::*;
 use sql_schema_differ::{ColumnDiffer, DiffingOptions};
 use sql_schema_helpers::{find_column, walk_columns, ColumnRef, SqlSchemaExt};
@@ -11,7 +11,7 @@ pub struct SqlDatabaseStepApplier<'a> {
     pub connector: &'a crate::SqlMigrationConnector,
 }
 
-impl crate::component::Component for SqlDatabaseStepApplier<'_> {
+impl Component for SqlDatabaseStepApplier<'_> {
     fn connector(&self) -> &crate::SqlMigrationConnector {
         self.connector
     }
@@ -252,6 +252,9 @@ fn render_raw_sql(
 
         SqlMigrationStep::AlterTable(AlterTable { table, changes }) => {
             let mut lines = Vec::new();
+            let mut before_statements = Vec::new();
+            let mut after_statements = Vec::new();
+
             for change in changes {
                 match change {
                     TableChange::DropPrimaryKey { constraint_name } => match renderer.sql_family() {
@@ -290,10 +293,22 @@ fn render_raw_sql(
                             find_column(next_schema, &table.name, &column.name)
                                 .expect("Invariant violation: could not find column referred to in AlterColumn."),
                             &DiffingOptions::from_database_info(database_info),
-                        )? {
-                            Some(safe_sql) => {
-                                for line in safe_sql {
-                                    lines.push(line)
+                        ) {
+                            Some(RenderedAlterColumn {
+                                alter_columns,
+                                before,
+                                after,
+                            }) => {
+                                for statement in alter_columns {
+                                    lines.push(statement);
+                                }
+
+                                if let Some(before) = before {
+                                    before_statements.push(before);
+                                }
+
+                                if let Some(after) = after {
+                                    after_statements.push(after);
                                 }
                             }
                             None => {
@@ -316,11 +331,19 @@ fn render_raw_sql(
                 return Ok(Vec::new());
             }
 
-            Ok(vec![format!(
+            let alter_table = format!(
                 "ALTER TABLE {} {};",
                 renderer.quote_with_schema(&schema_name, &table.name),
                 lines.join(",\n")
-            )])
+            );
+
+            let statements = before_statements
+                .into_iter()
+                .chain(std::iter::once(alter_table))
+                .chain(after_statements.into_iter())
+                .collect();
+
+            Ok(statements)
         }
         SqlMigrationStep::CreateIndex(CreateIndex { table, index }) => {
             Ok(vec![render_create_index(renderer, database_info, table, index)])
@@ -454,80 +477,14 @@ fn safe_alter_column(
     previous_column: ColumnRef<'_>,
     next_column: ColumnRef<'_>,
     diffing_options: &DiffingOptions,
-) -> anyhow::Result<Option<Vec<String>>> {
-    use crate::sql_migration::expanded_alter_column::*;
-
+) -> Option<RenderedAlterColumn> {
     let differ = ColumnDiffer {
         previous: previous_column,
         next: next_column,
         diffing_options,
     };
 
-    let expanded = expand_alter_column(&differ, &renderer.sql_family());
-
-    let alter_column_prefix = format!("ALTER COLUMN {}", renderer.quote(differ.previous.name()));
-
-    let steps = match expanded {
-        Some(ExpandedAlterColumn::Postgres(steps)) => steps
-            .into_iter()
-            .map(|step| match step {
-                PostgresAlterColumn::DropDefault => format!("{} DROP DEFAULT", &alter_column_prefix),
-                PostgresAlterColumn::SetDefault(new_default) => format!(
-                    "{} SET DEFAULT {}",
-                    &alter_column_prefix,
-                    renderer.render_default(&new_default, &next_column.column.tpe.family)
-                ),
-                PostgresAlterColumn::DropNotNull => format!("{} DROP NOT NULL", &alter_column_prefix),
-                PostgresAlterColumn::SetNotNull => format!("{} SET NOT NULL", &alter_column_prefix),
-                PostgresAlterColumn::SetType(ty) => format!(
-                    "{} SET DATA TYPE {}",
-                    &alter_column_prefix,
-                    postgres_render_column_type(&ty)
-                ),
-            })
-            .collect(),
-        Some(ExpandedAlterColumn::Mysql(step)) => match step {
-            MysqlAlterColumn::DropDefault => vec![format!("{} DROP DEFAULT", &alter_column_prefix)],
-            MysqlAlterColumn::Modify { new_default, changes } => {
-                let column_type: Option<String> = if changes.type_changed() {
-                    Some(next_column.column_type().full_data_type.clone())
-                        .filter(|r| !r.is_empty() || r.contains("datetime")) // @default(now()) does not work with datetimes of certain sizes
-                } else {
-                    Some(next_column.column.tpe.full_data_type.clone()).filter(|r| !r.is_empty())
-                    // Some(previous_column.tpe.full_data_type.clone()).filter(|r| !r.is_empty())
-                };
-
-                let column_type = column_type
-                    .map(Ok)
-                    .unwrap_or_else(|| sql_renderer::mysql_render_column_type(&next_column).map(String::from))?;
-
-                let default = new_default
-                    .map(|default| {
-                        format!(
-                            "DEFAULT {}",
-                            renderer.render_default(&default, &next_column.column_type().family)
-                        )
-                    })
-                    .unwrap_or_else(String::new);
-
-                vec![format!(
-                    "MODIFY {column_name} {column_type} {nullability} {default}",
-                    column_name = Quoted::mysql_ident(&next_column.name()),
-                    column_type = column_type,
-                    nullability = if next_column.arity().is_required() {
-                        "NOT NULL "
-                    } else {
-                        ""
-                    },
-                    default = default,
-                )]
-            }
-        },
-        Some(ExpandedAlterColumn::Sqlite(_steps)) => vec![],
-        None => return Ok(None),
-    };
-
-    Ok(Some(steps))
+    renderer.render_alter_column(&differ)
 }
 
 fn render_create_enum(

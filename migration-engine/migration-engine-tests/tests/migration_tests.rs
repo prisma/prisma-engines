@@ -163,7 +163,7 @@ async fn adding_an_id_field_of_type_int_must_work_for_sqlite(api: &TestApi) {
 }
 
 #[test_each_connector]
-async fn adding_an_id_field_of_type_int_with_autoincrement_must_work(api: &TestApi) {
+async fn adding_an_id_field_of_type_int_with_autoincrement_works(api: &TestApi) {
     let dm2 = r#"
         model Test {
             myId Int @id @default(autoincrement())
@@ -185,6 +185,178 @@ async fn adding_an_id_field_of_type_int_with_autoincrement_must_work(api: &TestA
         }
         _ => assert_eq!(column.auto_increment, true),
     }
+}
+
+// Ignoring sqlite is OK, because sqlite integer primary keys are always auto-incrementing.
+#[test_each_connector(log = "debug,sql_schema_describer=info", ignore("sqlite"))]
+async fn making_an_existing_id_field_autoincrement_works(api: &TestApi) -> TestResult {
+    let dm1 = r#"
+        model Post {
+            id        Int        @id
+            content   String?
+            createdAt DateTime
+            published Boolean     @default(false)
+            title     String      @default("")
+            updatedAt DateTime
+        }
+    "#;
+
+    api.infer_apply(dm1).send().await?.assert_green()?;
+
+    api.assert_schema().await?.assert_table("Post", |model| {
+        model.assert_pk(|pk| pk.assert_columns(&["id"])?.assert_has_no_autoincrement())
+    })?;
+
+    let dm2 = r#"
+        model Post {
+            id        Int        @id @default(autoincrement())
+            content   String?
+            createdAt DateTime
+            published Boolean     @default(false)
+            title     String      @default("")
+            updatedAt DateTime
+        }
+    "#;
+
+    api.infer_apply(dm2).send().await?.assert_green()?;
+
+    api.assert_schema().await?.assert_table("Post", |model| {
+        model.assert_pk(|pk| pk.assert_columns(&["id"])?.assert_has_autoincrement())
+    })?;
+
+    // Check that the migration is idempotent.
+    api.infer_apply(dm2).send().await?.assert_green()?.assert_no_steps()?;
+
+    Ok(())
+}
+
+// Ignoring sqlite is OK, because sqlite integer primary keys are always auto-incrementing.
+#[test_each_connector(log = "debug,sql_schema_describer=info", ignore("sqlite"))]
+async fn removing_autoincrement_from_an_existing_field_works(api: &TestApi) -> TestResult {
+    let dm1 = r#"
+        model Post {
+            id        Int        @id @default(autoincrement())
+            content   String?
+            createdAt DateTime
+            published Boolean     @default(false)
+            title     String      @default("")
+            updatedAt DateTime
+        }
+    "#;
+
+    api.infer_apply(dm1).send().await?.assert_green()?;
+
+    api.assert_schema().await?.assert_table("Post", |model| {
+        model.assert_pk(|pk| pk.assert_columns(&["id"])?.assert_has_autoincrement())
+    })?;
+
+    let dm2 = r#"
+        model Post {
+            id        Int        @id
+            content   String?
+            createdAt DateTime
+            published Boolean     @default(false)
+            title     String      @default("")
+            updatedAt DateTime
+        }
+    "#;
+
+    api.infer_apply(dm2).send().await?.assert_green()?;
+
+    api.assert_schema().await?.assert_table("Post", |model| {
+        model.assert_pk(|pk| pk.assert_columns(&["id"])?.assert_has_no_autoincrement())
+    })?;
+
+    // Check that the migration is idempotent.
+    api.infer_apply(dm2)
+        .migration_id(Some("idempotency-check"))
+        .send()
+        .await?
+        .assert_green()?
+        .assert_no_steps()?;
+
+    Ok(())
+}
+
+// Ignoring sqlite is OK, because sqlite integer primary keys are always auto-incrementing.
+#[test_each_connector(ignore("sqlite"))]
+async fn flipping_autoincrement_on_and_off_works(api: &TestApi) -> TestResult {
+    let dm_without = r#"
+        model Post {
+            id        Int        @id
+            title     String     @default("")
+        }
+    "#;
+
+    let dm_with = r#"
+        model Post {
+            id        Int        @id @default(autoincrement())
+            updatedAt DateTime
+        }
+    "#;
+
+    api.infer_apply(dm_with).send().await?.assert_green()?;
+    api.infer_apply(dm_without).send().await?.assert_green()?;
+    api.infer_apply(dm_with).send().await?.assert_green()?;
+    api.infer_apply(dm_without).send().await?.assert_green()?;
+    api.infer_apply(dm_with).send().await?.assert_green()?;
+
+    Ok(())
+}
+
+// Ignoring sqlite is OK, because sqlite integer primary keys are always auto-incrementing.
+#[test_each_connector(ignore("sqlite"), log = "debug,sql_schema_describer=info")]
+async fn making_an_autoincrement_default_an_expression_then_autoincrement_again_works(api: &TestApi) -> TestResult {
+    let dm1 = r#"
+        model Post {
+            id        Int        @id @default(autoincrement())
+            title     String     @default("")
+        }
+    "#;
+
+    api.infer_apply(dm1)
+        .migration_id(Some("apply_dm1"))
+        .send()
+        .await?
+        .assert_green()?;
+
+    api.assert_schema().await?.assert_table("Post", |model| {
+        model.assert_pk(|pk| pk.assert_columns(&["id"])?.assert_has_autoincrement())
+    })?;
+
+    let dm2 = r#"
+        model Post {
+            id        Int       @id @default(3)
+            title     String    @default("")
+        }
+    "#;
+
+    api.infer_apply(dm2)
+        .migration_id(Some("apply_dm2"))
+        .send()
+        .await?
+        .assert_green()?;
+
+    api.assert_schema().await?.assert_table("Post", |model| {
+        model
+            .assert_pk(|pk| pk.assert_columns(&["id"])?.assert_has_no_autoincrement())?
+            .assert_column("id", |column| {
+                column.assert_default(Some(DefaultValue::VALUE(PrismaValue::Int(3))))
+            })
+    })?;
+
+    // Now re-apply the sequence.
+    api.infer_apply(dm1)
+        .migration_id(Some("apply_dm1_again"))
+        .send()
+        .await?
+        .assert_green()?;
+
+    api.assert_schema().await?.assert_table("Post", |model| {
+        model.assert_pk(|pk| pk.assert_columns(&["id"])?.assert_has_autoincrement())
+    })?;
+
+    Ok(())
 }
 
 #[test_each_connector]

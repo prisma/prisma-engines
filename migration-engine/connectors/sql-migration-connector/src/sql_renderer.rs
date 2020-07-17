@@ -6,10 +6,8 @@ mod postgres_renderer;
 mod sqlite_renderer;
 
 pub(crate) use common::{IteratorJoin, Quoted, QuotedWithSchema};
-pub(crate) use mysql_renderer::render_column_type as mysql_render_column_type;
-pub(crate) use postgres_renderer::render_column_type as postgres_render_column_type;
 
-use crate::sql_schema_helpers::ColumnRef;
+use crate::{sql_schema_differ::ColumnDiffer, sql_schema_helpers::ColumnRef};
 use sql_schema_describer::*;
 use std::borrow::Cow;
 
@@ -28,4 +26,20 @@ pub(crate) trait SqlRenderer {
     fn render_references(&self, schema_name: &str, foreign_key: &ForeignKey) -> String;
 
     fn render_default<'a>(&self, default: &'a DefaultValue, family: &ColumnTypeFamily) -> Cow<'a, str>;
+
+    /// Attempt to render a database-specific ALTER COLUMN based on the
+    /// passed-in differ. `None` means that we could not generate a good (set
+    /// of) ALTER COLUMN(s), and we should fall back to dropping and recreating
+    /// the column.
+    fn render_alter_column(&self, differ: &ColumnDiffer<'_>) -> Option<RenderedAlterColumn>;
+}
+
+#[derive(Default)]
+pub(crate) struct RenderedAlterColumn {
+    /// The statements that will be included in the ALTER TABLE
+    pub(crate) alter_columns: Vec<String>,
+    /// The statements to be run before the ALTER TABLE.
+    pub(crate) before: Option<String>,
+    /// The statements to be run after the ALTER TABLE.
+    pub(crate) after: Option<String>,
 }

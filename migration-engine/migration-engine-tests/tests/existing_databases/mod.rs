@@ -17,7 +17,7 @@ async fn adding_a_model_for_an_existing_table_must_work(api: &TestApi) -> TestRe
 
     let dm = r#"
             model Blog {
-                id Int @id
+                id Int @id @default(autoincrement())
             }
         "#;
     let result = api.infer_and_apply(&dm).await.sql_schema;
@@ -78,8 +78,8 @@ async fn creating_a_field_for_an_existing_column_with_a_compatible_type_must_wor
 
     let dm = r#"
         model Blog {
-            id Int @id
-            title String
+            id      Int @id @default(autoincrement())
+            title   String
         }
     "#;
 
@@ -198,12 +198,14 @@ async fn creating_a_scalar_list_field_for_an_existing_table_must_work(api: &Test
 async fn delete_a_field_for_a_non_existent_column_must_work(api: &TestApi) -> TestResult {
     let dm1 = r#"
             model Blog {
-                id Int @id
-                title String
+                id      Int @id
+                title   String
             }
         "#;
-    let initial_result = api.infer_and_apply(&dm1).await.sql_schema;
-    assert_eq!(initial_result.table_bang("Blog").column("title").is_some(), true);
+
+    api.infer_apply(&dm1).send().await?.into_inner();
+    let initial_result = api.describe_database().await?;
+    assert!(initial_result.table_bang("Blog").column("title").is_some());
 
     let result = api
         .barrel()
@@ -215,11 +217,11 @@ async fn delete_a_field_for_a_non_existent_column_must_work(api: &TestApi) -> Te
             });
         })
         .await?;
-    assert_eq!(result.table_bang("Blog").column("title").is_some(), false);
+    assert!(result.table_bang("Blog").column("title").is_none());
 
     let dm2 = r#"
             model Blog {
-                id Int @id
+                id Int @id @default(autoincrement())
             }
         "#;
     let final_result = api.infer_and_apply(&dm2).await.sql_schema;
@@ -271,7 +273,7 @@ async fn deleting_a_scalar_list_field_for_a_non_existent_column_must_work(api: &
     Ok(())
 }
 
-#[test_each_connector(tags("sql"))]
+#[test_each_connector(log = "debug,sql-schema-describer=info", tags("sql"))]
 async fn updating_a_field_for_a_non_existent_column(api: &TestApi) -> TestResult {
     let dm1 = r#"
             model Blog {

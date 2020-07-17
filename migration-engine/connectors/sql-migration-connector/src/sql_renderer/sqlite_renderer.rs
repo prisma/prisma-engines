@@ -1,4 +1,4 @@
-use super::{common::*, SqlRenderer};
+use super::{common::*, RenderedAlterColumn, SqlRenderer};
 use crate::{flavour::SqliteFlavour, sql_schema_helpers::*};
 use once_cell::sync::Lazy;
 use prisma_models::PrismaValue;
@@ -17,10 +17,10 @@ impl SqlRenderer for SqliteFlavour {
         let nullability_str = render_nullability(&column);
         let default_str = column
             .default()
-            .filter(|default| !matches!(default, DefaultValue::DBGENERATED(_)))
+            .filter(|default| !matches!(default, DefaultValue::DBGENERATED(_) | DefaultValue::SEQUENCE(_)))
             .map(|default| format!(" DEFAULT {}", self.render_default(default, &column.column.tpe.family)))
             .unwrap_or_else(String::new);
-        let auto_increment_str = if column.auto_increment() {
+        let auto_increment_str = if column.is_autoincrement() {
             " PRIMARY KEY AUTOINCREMENT"
         } else {
             ""
@@ -62,8 +62,12 @@ impl SqlRenderer for SqliteFlavour {
             (DefaultValue::NOW, _) => unreachable!("NOW default on non-datetime column"),
             (DefaultValue::VALUE(val), ColumnTypeFamily::DateTime) => format!("'{}'", val).into(),
             (DefaultValue::VALUE(val), _) => format!("{}", val).into(),
-            (DefaultValue::SEQUENCE(_), _) => unreachable!("rendering of sequence defaults"),
+            (DefaultValue::SEQUENCE(_), _) => "".into(),
         }
+    }
+
+    fn render_alter_column(&self, _differ: &crate::sql_schema_differ::ColumnDiffer<'_>) -> Option<RenderedAlterColumn> {
+        None
     }
 }
 
