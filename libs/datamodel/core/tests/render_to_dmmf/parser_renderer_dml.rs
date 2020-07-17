@@ -146,8 +146,9 @@ model User {
 }
 
 #[test]
-fn experimental_features_roundtrip() {
-    let input = r#"generator client {
+fn preview_features_roundtrip() {
+    // we keep the support for `experimentalFeatures` for backwards compatibility reasons
+    let input_with_experimental = r#"generator client {
   provider             = "prisma-client-js"
   experimentalFeatures = ["connectOrCreate", "transactionApi"]
 }
@@ -158,9 +159,29 @@ datasource db {
 }
 "#;
 
-    let dml = datamodel::parse_configuration(input).unwrap();
-    let rendered = datamodel::render_datamodel_and_config_to_string(&Datamodel::new(), &dml).unwrap();
+    let input_with_preview = r#"generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["connectOrCreate", "transactionApi"]
+}
 
-    print!("{}", rendered);
-    assert_eq!(input, rendered);
+datasource db {
+  provider = "postgresql"
+  url      = "postgresql://test"
+}
+"#;
+
+    // check that `experimentalFeatures` is turned into `previewFeatures`.
+    {
+        let config = datamodel::parse_configuration(input_with_experimental).unwrap();
+        let rendered = datamodel::render_datamodel_and_config_to_string(&Datamodel::new(), &config).unwrap();
+        assert_eq!(rendered, input_with_preview);
+    }
+
+    // check that `previewFeatures` stays as is.
+    {
+        let config = datamodel::parse_configuration(input_with_preview).unwrap();
+        let rendered = datamodel::render_datamodel_and_config_to_string(&Datamodel::new(), &config).unwrap();
+        println!("{}", rendered);
+        assert_eq!(rendered, input_with_preview);
+    }
 }

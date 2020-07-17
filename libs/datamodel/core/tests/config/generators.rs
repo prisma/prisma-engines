@@ -20,7 +20,7 @@ generator go {
     "provider": "javascript",
     "output": "../../js",
     "binaryTargets": [],
-    "experimentalFeatures": [],
+    "previewFeatures": [],
     "config": {}
   },
   {
@@ -28,7 +28,7 @@ generator go {
     "provider": "go",
     "output": null,
     "binaryTargets": ["a","b"],
-    "experimentalFeatures": [],
+    "previewFeatures": [],
     "config": {}
   }
 ]"#;
@@ -37,17 +37,17 @@ generator go {
 }
 
 #[test]
-fn experimental_features_setting_must_work() {
+fn preview_features_setting_must_work() {
     // make sure both single value and array syntax work
     let schema = r#"
         generator js {
             provider = "javascript"
-            experimentalFeatures = "foo"
+            previewFeatures = "foo"
         }
         
         generator go {
             provider = "go"
-            experimentalFeatures = ["foo", "bar"]
+            previewFeatures = ["foo", "bar"]
         } 
     "#;
 
@@ -57,7 +57,7 @@ fn experimental_features_setting_must_work() {
     "provider": "javascript",
     "output":null,
     "binaryTargets": [],
-    "experimentalFeatures": ["foo"],
+    "previewFeatures": ["foo"],
     "config": {}
   },
   {
@@ -65,7 +65,7 @@ fn experimental_features_setting_must_work() {
     "provider": "go",
     "output":null,
     "binaryTargets": [],
-    "experimentalFeatures": ["foo", "bar"],
+    "previewFeatures": ["foo", "bar"],
     "config": {}
   }
 ]"#;
@@ -87,7 +87,7 @@ fn back_slashes_in_providers_must_work() {
           "provider": "../folder\\ with\\ space/my\\ generator.js",
           "output": null,
           "binaryTargets": [],
-          "experimentalFeatures": [],
+          "previewFeatures": [],
           "config": {}
         }
     ]"#;
@@ -111,7 +111,7 @@ fn new_lines_in_generator_must_work() {
           "provider": "go",
           "output": null,
           "binaryTargets": ["b","c"],
-          "experimentalFeatures": [],
+          "previewFeatures": [],
           "config": {}
         }
     ]"#;
