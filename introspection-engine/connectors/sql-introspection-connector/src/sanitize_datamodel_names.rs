@@ -136,6 +136,7 @@ fn sanitize_names(names: &mut [String]) {
         .for_each(drop);
 }
 
+/// Renames models which name match an entry on the deny list.
 fn rename_denied(model: &mut Model) {
     if reserved_model_names::is_reserved(model.name()) {
         let name = format!("Renamed{}", model.name);
@@ -149,10 +150,14 @@ fn rename_denied(model: &mut Model) {
             None => model.documentation = Some(comment.to_owned()),
         }
 
+        dbg!(&model.database_name);
+
         // Only set @@map if there's no @@map already set.
         if let None = model.database_name {
             model.database_name = Some(model.name.clone());
         }
+
+        dbg!(&model.database_name);
 
         model.name = name;
     }
