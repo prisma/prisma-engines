@@ -10,7 +10,7 @@ pub(crate) use destructive_change_checker_flavour::DestructiveChangeCheckerFlavo
 use crate::{
     sql_schema_differ::{ColumnDiffer, DiffingOptions},
     sql_schema_helpers::SqlSchemaExt,
-    AddColumn, AlterColumn, Component, DropColumn, DropTable, SqlMigration, SqlMigrationStep, SqlResult, TableChange,
+    AddColumn, Component, DropColumn, DropTable, SqlMigration, SqlMigrationStep, SqlResult, TableChange,
 };
 use destructive_check_plan::DestructiveCheckPlan;
 use migration_connector::{ConnectorResult, DestructiveChangeDiagnostics, DestructiveChangesChecker};
@@ -95,24 +95,10 @@ impl SqlDestructiveChangesChecker<'_> {
     /// Are considered unexecutable:
     ///
     /// - Making an optional column required without a default, when there are existing rows in the table.
-    fn check_alter_column(
-        &self,
-        alter_column: &AlterColumn,
-        differ: ColumnDiffer<'_>,
-        plan: &mut DestructiveCheckPlan,
-    ) {
+    fn check_alter_column(&self, differ: ColumnDiffer<'_>, plan: &mut DestructiveCheckPlan) {
         let previous_table = &differ.previous.table().table;
-        self.flavour().check_alter_column(&previous_table, &differ, plan);
 
-        if previous_table.is_part_of_foreign_key(&alter_column.column.name)
-            && alter_column.column.default.is_none()
-            && differ.previous.default().is_some()
-        {
-            plan.push_warning(SqlMigrationWarningCheck::ForeignKeyDefaultValueRemoved {
-                table: previous_table.name.clone(),
-                column: alter_column.name.clone(),
-            });
-        }
+        self.flavour().check_alter_column(&previous_table, &differ, plan);
     }
 
     #[tracing::instrument(skip(self, steps, before), target = "SqlDestructiveChangeChecker::check")]
@@ -154,7 +140,7 @@ impl SqlDestructiveChangesChecker<'_> {
                                         next: next_column,
                                     };
 
-                                    self.check_alter_column(alter_column, differ, &mut plan)
+                                    self.check_alter_column(differ, &mut plan)
                                 }
                                 TableChange::AddColumn(ref add_column) => {
                                     self.check_add_column(add_column, &before_table.table, &mut plan)
