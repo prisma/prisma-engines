@@ -243,7 +243,7 @@ impl QueryDocumentParser {
         let raw = match val {
             QueryValue::Enum(s) => s,
             QueryValue::String(s) => s,
-            QueryValue::Boolean(b) => if b { "true" } else { "false " }.to_owned(), // Case where a bool was misinterpreted as constant literal
+            QueryValue::Boolean(b) => if b { "true" } else { "false" }.to_owned(), // Case where a bool was misinterpreted as constant literal
             _ => {
                 return Err(QueryParserError::ValueParseError(format!(
                     "Unexpected Enum value type {:?} for enum {}",
