@@ -22,7 +22,7 @@ pub fn calculate_datamodel(schema: &SqlSchema, family: &SqlFamily) -> SqlIntrosp
     introspect(schema, &mut version_check, &mut data_model)?;
 
     // our opinionation about valid names
-    sanitize_datamodel_names(&mut data_model);
+    sanitize_datamodel_names(&mut data_model, family);
 
     // commenting out models, fields, enums, enum values
     let mut warnings: Vec<Warning> = commenting_out_guardrails(&mut data_model);

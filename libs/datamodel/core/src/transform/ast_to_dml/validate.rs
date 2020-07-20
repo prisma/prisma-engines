@@ -284,7 +284,7 @@ impl<'a> Validator<'a> {
     }
 
     fn validate_model_name(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), DatamodelError> {
-        if super::invalid_model_names::RESERVED_MODEL_NAMES.contains(&model.name.as_str()) {
+        if super::reserved_model_names::is_reserved(&model.name) {
             Err(DatamodelError::new_model_validation_error(
                 &format!(
                     "The model name `{}` is invalid. It is a reserved name. Please change it. Read more at https://pris.ly/d/naming-models",
