@@ -173,7 +173,7 @@ fn must_error_if_wrong_protocol_is_used_for_sqlite() {
     assert!(config.is_err());
     let errors = config.err().expect("This must error");
     errors.assert_is(DatamodelError::new_source_validation_error(
-        "The URL for datasource `myds` must start with the protocol `file:`.",
+        "The URL for datasource `myds` must start with the protocol `sqlite://`.",
         "myds",
         Span::new(77, 87),
     ));

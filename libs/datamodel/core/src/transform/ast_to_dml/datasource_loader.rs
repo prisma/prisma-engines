@@ -94,11 +94,7 @@ impl DatasourceLoader {
         let (env_var_for_url, url) = match (url_args.as_str_from_env(), override_url) {
             (_, _) if ignore_datasource_urls => {
                 // glorious hack. ask marcus
-                let protocol = match providers.first().unwrap().as_str() {
-                    "sqlite" => "file:",
-                    x => x,
-                };
-                (None, format!("{}://", protocol))
+                (None, format!("{}://", providers.first().unwrap()))
             }
             (_, Some(url)) => {
                 debug!("overwriting datasource `{}` with url '{}'", &source_name, &url);
