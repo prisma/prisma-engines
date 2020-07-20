@@ -140,8 +140,6 @@ impl SqlDestructiveChangesChecker<'_> {
                         }
                     }
                 }
-                // Here, check for each table we are going to delete if it is empty. If
-                // not, return a warning.
                 SqlMigrationStep::DropTable(DropTable { name }) => {
                     self.check_table_drop(name, &mut plan);
                 }
