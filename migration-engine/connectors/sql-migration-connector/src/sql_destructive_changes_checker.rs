@@ -96,9 +96,7 @@ impl SqlDestructiveChangesChecker<'_> {
     ///
     /// - Making an optional column required without a default, when there are existing rows in the table.
     fn check_alter_column(&self, differ: ColumnDiffer<'_>, plan: &mut DestructiveCheckPlan) {
-        let previous_table = &differ.previous.table().table;
-
-        self.flavour().check_alter_column(&previous_table, &differ, plan);
+        self.flavour().check_alter_column(&differ, plan);
     }
 
     #[tracing::instrument(skip(self, steps, before), target = "SqlDestructiveChangeChecker::check")]
