@@ -4,6 +4,7 @@ use datamodel::{
 };
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
+use quaint::prelude::SqlFamily;
 use regex::Regex;
 use std::collections::HashMap;
 
@@ -13,21 +14,25 @@ static EMPTY_STRING: &'static str = "";
 static RE_START: Lazy<Regex> = Lazy::new(|| Regex::new("^[^a-zA-Z]+").unwrap());
 static RE: Lazy<Regex> = Lazy::new(|| Regex::new("[^_a-zA-Z0-9]").unwrap());
 
-// Todo: Sanitizing might need to be adjusted to also change the fields in the RelationInfo
 pub fn sanitize_datamodel_names(datamodel: &mut Datamodel, family: &SqlFamily) {
+    let enum_renames = sanitize_models(datamodel, family);
+    sanitize_enums(datamodel, &enum_renames);
+}
+
+// Todo: Sanitizing might need to be adjusted to also change the fields in the RelationInfo
+fn sanitize_models(datamodel: &mut Datamodel, family: &SqlFamily) -> HashMap<String, (String, Option<String>)> {
     let mut enum_renames = HashMap::new();
 
     for model in datamodel.models_mut() {
-        let original_model_name = field.name().to_owned();
-
-        rename_denied(model);
+        rename_reserved(model);
         sanitize_name(model);
 
-        let model_name = model.name.clone();
+        let model_name = model.name().to_owned();
+        let model_db_name = model.database_name().map(|s| s.to_owned());
+
         model.id_fields = sanitize_strings(model.id_fields.as_slice());
 
         for field in model.fields_mut() {
-            let original_field_name = field.name().to_owned();
             sanitize_name(field);
 
             match field {
@@ -43,104 +48,85 @@ pub fn sanitize_datamodel_names(datamodel: &mut Datamodel, family: &SqlFamily) {
 
                 Field::ScalarField(sf) => {
                     if let FieldType::Enum(enum_name) = &sf.field_type {
-                        if
-                        let (sanitized_enum_name, enum_db_name) = if *enum_name == format!("{}_{}", model_name, sf.name)
-                        {
-                            // MySql
-                            if model_db_name.is_none() && field_db_name.is_none() {
-                                (enum_name.clone(), None)
+                        // Enums in MySQL are defined on the column and do not have a separate name.
+                        // Introspection generates an enum name for MySQL as `<model_name>_<field_type>`.
+                        // If the sanitization changes the enum name, we need to make sure it's changed everywhere.
+                        let (sanitized_enum_name, db_name) = if let SqlFamily::Mysql = family {
+                            if model_db_name.is_none() && sf.database_name.is_none() {
+                                (enum_name.to_owned(), None)
                             } else {
-                                (
-                                    format!("{}_{}", sanitized_model_name, sanitized_field_name),
-                                    Some(enum_name.clone()),
-                                )
+                                (format!("{}_{}", model_name, sf.name()), Some(enum_name.to_owned()))
                             }
                         } else {
-                            sanitize_name(enum_name.clone())
+                            let sanitized = sanitize_string(&enum_name);
+
+                            if &sanitized != enum_name {
+                                (sanitized, Some(enum_name.to_owned()))
+                            } else {
+                                (sanitized, None)
+                            }
                         };
 
-                        if let Some(old_name) = enum_db_name {
-                            enum_renames
-                                .insert(old_name.clone(), (sanitized_enum_name.clone(), Some(old_name.clone())));
-                        };
+                        if db_name.is_some() {
+                            enum_renames.insert(enum_name.to_owned(), (sanitized_enum_name.clone(), db_name));
+                        }
 
                         sf.field_type = FieldType::Enum(sanitized_enum_name);
 
+                        // If the field also has an associated default enum value, we need to sanitize that enum value.
+                        // The actual enum value renames _in the enum itself_ are done at a later stage.
                         if let Some(DefaultValue::Single(PrismaValue::Enum(value))) = &mut sf.default_value {
-                            if EMPTY_STRING == value {
-                                *value = EMPTY_ENUM_PLACEHOLDER.to_string();
+                            let new_default = if EMPTY_STRING == value {
+                                DefaultValue::Single(PrismaValue::Enum(EMPTY_ENUM_PLACEHOLDER.to_string()))
                             } else {
-                                let (sanitized_value, _) = sanitize_name(value.to_string());
+                                let sanitized_value = sanitize_string(value);
 
-                                sf.default_value = Some(match sanitized_value {
+                                match sanitized_value {
                                     x if x == EMPTY_STRING => DefaultValue::new_db_generated(),
                                     _ => DefaultValue::Single(PrismaValue::Enum(sanitized_value)),
-                                });
-                            }
-                        };
-                    }
+                                }
+                            };
 
-                    if sf.database_name.is_none() {
-                        sf.database_name = field_db_name;
+                            sf.default_value.replace(new_default);
+                        };
                     }
                 }
             }
-
-            field.set_name(&sanitized_field_name);
         }
 
-        // for index in &mut model.indices {
-        //     sanitize_names(&mut index.fields);
+        for index in &mut model.indices {
+            index.fields = sanitize_strings(&index.fields);
         }
-
-        // model.name = sanitized_model_name;
-        // model.database_name = model_db_name;
     }
 
-    // for enm in datamodel.enums_mut() {
-    //     if let Some((sanitized_enum_name, enum_db_name)) = enum_renames.get(&enm.name) {
-    //         enm.name = sanitized_enum_name.to_owned();
-    //         enm.database_name = enum_db_name.to_owned();
-    //     } else {
-    //         sanitize_name(&mut enm);
-    //         // let (sanitized_enum_name, enum_db_name) = sanitize_name(enm.name.clone());
-    //         // enm.name = sanitized_enum_name.to_owned();
-    //         // enm.database_name = enum_db_name.to_owned();
-    //     }
-
-    //     for enum_value in enm.values_mut() {
-    //         if &enum_value.name == EMPTY_STRING {
-    //             enum_value.name = EMPTY_ENUM_PLACEHOLDER.to_string();
-    //             enum_value.database_name = Some(EMPTY_STRING.to_string());
-    //         } else {
-    //             sanitize_name(&mut enum_value);
-    //             // let (sanitized_name, db_name) = sanitize_name(enum_value.name.clone());
-    //             // enum_value.name = sanitized_name;
-    //             // enum_value.database_name = db_name;
-    //         }
-    //     }
-    // }
+    enum_renames
 }
 
-fn sanitize_names<T>(renameables: &[&mut T])
-where
-    T: WithDatabaseName + WithName,
-{
-    // names
-    //     .iter_mut()
-    //     .map(|f| *f = sanitize_name(f.to_string()).0)
-    //     .for_each(drop);
-    todo!()
+fn sanitize_enums(datamodel: &mut Datamodel, enum_renames: &HashMap<String, (String, Option<String>)>) {
+    for enm in datamodel.enums_mut() {
+        if let Some((sanitized_name, db_name)) = enum_renames.get(&enm.name) {
+            if let None = enm.database_name() {
+                enm.set_database_name(db_name.clone());
+            }
+
+            enm.set_name(sanitized_name);
+        } else {
+            sanitize_name(enm);
+        }
+
+        for enum_value in enm.values_mut() {
+            if &enum_value.name == EMPTY_STRING {
+                enum_value.name = EMPTY_ENUM_PLACEHOLDER.to_string();
+                enum_value.database_name = Some(EMPTY_STRING.to_string());
+            } else {
+                sanitize_name(enum_value);
+            }
+        }
+    }
 }
 
-
-fn sanitize_strings(strings: &[String]) -> Vec<String>
-{
-    // names
-    //     .iter_mut()
-    //     .map(|f| *f = sanitize_name(f.to_string()).0)
-    //     .for_each(drop);
-    todo!()
+fn sanitize_strings(strings: &[String]) -> Vec<String> {
+    strings.into_iter().map(|f| sanitize_string(f)).collect()
 }
 
 // Todo: This is now widely used, we can make this smarter at some point.
@@ -152,11 +138,11 @@ fn sanitize_name<T>(renameable: &mut T)
 where
     T: WithDatabaseName + WithName,
 {
-    let name = renameable.name();
-    let db_name = renameable.database_name();
+    let name = renameable.name().clone();
+    let db_name = renameable.database_name().map(|s| s.to_owned());
     let sanitized = sanitize_string(name.as_str());
 
-    if &sanitized != name {
+    if sanitized != name {
         // Only set the db name if there's none already set (or else this would invalidate the model).
         if let None = db_name {
             renameable.set_database_name(Some(name.to_owned()));
@@ -179,7 +165,7 @@ fn sanitize_string(s: &str) -> String {
     }
 }
 
-fn rename_denied(model: &mut Model) {
+fn rename_reserved(model: &mut Model) {
     if reserved_model_names::is_reserved(model.name()) {
         let name = format!("Renamed{}", model.name);
         let comment = format!(
