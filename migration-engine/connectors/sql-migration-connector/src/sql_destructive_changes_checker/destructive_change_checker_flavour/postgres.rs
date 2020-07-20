@@ -8,10 +8,10 @@ use crate::{
     },
     sql_schema_differ::ColumnDiffer,
 };
-use sql_schema_describer::{ColumnArity, DefaultValue, Table};
+use sql_schema_describer::{ColumnArity, DefaultValue};
 
 impl DestructiveChangeCheckerFlavour for PostgresFlavour {
-    fn check_alter_column(&self, previous_table: &Table, columns: &ColumnDiffer<'_>, plan: &mut DestructiveCheckPlan) {
+    fn check_alter_column(&self, columns: &ColumnDiffer<'_>, plan: &mut DestructiveCheckPlan) {
         let expanded = expand_postgres_alter_column(columns);
 
         if let Some(steps) = expanded {
@@ -21,7 +21,7 @@ impl DestructiveChangeCheckerFlavour for PostgresFlavour {
                     PostgresAlterColumn::SetNotNull => {
                         plan.push_unexecutable(UnexecutableStepCheck::MadeOptionalFieldRequired {
                             column: columns.previous.name().to_owned(),
-                            table: previous_table.name.clone(),
+                            table: columns.previous.table().name().to_owned(),
                         })
                     }
                     PostgresAlterColumn::SetType(_) => {
@@ -29,12 +29,12 @@ impl DestructiveChangeCheckerFlavour for PostgresFlavour {
                             && matches!(columns.next.column.tpe.arity, ColumnArity::List)
                         {
                             plan.push_unexecutable(UnexecutableStepCheck::MadeScalarFieldIntoArrayField {
-                                table: previous_table.name.clone(),
+                                table: columns.previous.table().name().to_owned(),
                                 column: columns.previous.name().to_owned(),
                             })
                         } else {
                             plan.push_warning(SqlMigrationWarningCheck::AlterColumn {
-                                table: previous_table.name.clone(),
+                                table: columns.previous.table().name().to_owned(),
                                 column: columns.previous.name().to_owned(),
                             });
                         }
@@ -54,12 +54,12 @@ impl DestructiveChangeCheckerFlavour for PostgresFlavour {
             {
                 plan.push_unexecutable(UnexecutableStepCheck::AddedRequiredFieldToTable {
                     column: columns.previous.name().to_owned(),
-                    table: previous_table.name.clone(),
+                    table: columns.previous.table().name().to_owned(),
                 })
             } else {
                 // Executable drop and recreate.
                 plan.push_warning(SqlMigrationWarningCheck::AlterColumn {
-                    table: previous_table.name.clone(),
+                    table: columns.previous.table().name().to_owned(),
                     column: columns.next.name().to_owned(),
                 });
             }

@@ -1,7 +1,6 @@
 use barrel::types;
 use migration_engine_tests::sql::*;
 use pretty_assertions::assert_eq;
-use quaint::prelude::SqlFamily;
 use sql_schema_describer::*;
 
 #[test_each_connector]

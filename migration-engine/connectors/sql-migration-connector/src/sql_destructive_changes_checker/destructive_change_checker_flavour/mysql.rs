@@ -8,10 +8,9 @@ use crate::{
     },
     sql_schema_differ::ColumnDiffer,
 };
-use sql_schema_describer::Table;
 
 impl DestructiveChangeCheckerFlavour for MysqlFlavour {
-    fn check_alter_column(&self, previous_table: &Table, columns: &ColumnDiffer<'_>, plan: &mut DestructiveCheckPlan) {
+    fn check_alter_column(&self, columns: &ColumnDiffer<'_>, plan: &mut DestructiveCheckPlan) {
         match expand_mysql_alter_column(columns) {
             MysqlAlterColumn::DropDefault => (), // dropping a default is safe
 
@@ -25,11 +24,11 @@ impl DestructiveChangeCheckerFlavour for MysqlFlavour {
                 if columns.all_changes().arity_changed() && columns.next.column.tpe.arity.is_required() {
                     plan.push_unexecutable(UnexecutableStepCheck::MadeOptionalFieldRequired {
                         column: columns.previous.name().to_owned(),
-                        table: previous_table.name.clone(),
+                        table: columns.previous.table().name().to_owned(),
                     });
                 } else {
                     plan.push_warning(SqlMigrationWarningCheck::AlterColumn {
-                        table: previous_table.name.clone(),
+                        table: columns.previous.table().name().to_owned(),
                         column: columns.next.name().to_owned(),
                     });
                 }

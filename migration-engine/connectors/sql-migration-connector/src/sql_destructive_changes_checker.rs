@@ -86,21 +86,6 @@ impl SqlDestructiveChangesChecker<'_> {
         plan.push_unexecutable(typed_unexecutable);
     }
 
-    /// Are considered safe at the moment:
-    ///
-    /// - renamings on SQLite
-    /// - default changes on SQLite
-    /// - Arity changes from required to optional on SQLite
-    ///
-    /// Are considered unexecutable:
-    ///
-    /// - Making an optional column required without a default, when there are existing rows in the table.
-    fn check_alter_column(&self, differ: ColumnDiffer<'_>, plan: &mut DestructiveCheckPlan) {
-        let previous_table = &differ.previous.table().table;
-
-        self.flavour().check_alter_column(&previous_table, &differ, plan);
-    }
-
     #[tracing::instrument(skip(self, steps, before), target = "SqlDestructiveChangeChecker::check")]
     async fn check_impl(
         &self,
@@ -140,7 +125,7 @@ impl SqlDestructiveChangesChecker<'_> {
                                         next: next_column,
                                     };
 
-                                    self.check_alter_column(differ, &mut plan)
+                                    self.flavour().check_alter_column(&differ, &mut plan)
                                 }
                                 TableChange::AddColumn(ref add_column) => {
                                     self.check_add_column(add_column, &before_table.table, &mut plan)
@@ -155,8 +140,6 @@ impl SqlDestructiveChangesChecker<'_> {
                         }
                     }
                 }
-                // Here, check for each table we are going to delete if it is empty. If
-                // not, return a warning.
                 SqlMigrationStep::DropTable(DropTable { name }) => {
                     self.check_table_drop(name, &mut plan);
                 }
