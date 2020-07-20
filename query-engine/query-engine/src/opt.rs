@@ -4,12 +4,6 @@ use serde::Deserialize;
 use std::{ffi::OsStr, fs::File, io::Read};
 use structopt::StructOpt;
 
-#[derive(Debug, StructOpt, Clone)]
-pub enum Subcommand {
-    /// Doesn't start a server, but allows running specific commands against Prisma.
-    Cli(CliOpt),
-}
-
 #[derive(Debug, Clone, StructOpt)]
 pub struct DmmfToDmlInput {
     #[structopt(name = "path")]
@@ -92,7 +86,7 @@ pub struct PrismaOpt {
     log_format: Option<String>,
 
     #[structopt(subcommand)]
-    pub subcommand: Option<Subcommand>,
+    pub subcommand: Option<CliOpt>,
 
     #[structopt(long = "enable-experimental", use_delimiter = true)]
     pub raw_feature_flags: Vec<String>,

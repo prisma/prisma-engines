@@ -208,7 +208,6 @@ async fn generate_dmmf(cmd: &DmmfCommand) -> anyhow::Result<()> {
     );
 
     let cmd = std::process::Command::new(&cmd.query_engine_binary_path)
-        .arg("cli")
         .arg("dmmf")
         .env("PRISMA_DML_PATH", schema_path)
         .spawn()?;

@@ -1,18 +1,14 @@
+use crate::context::PrismaContext;
+use crate::dmmf;
+use crate::opt::{CliOpt, PrismaOpt};
 use crate::request_handlers::graphql::{self, GraphQlBody};
-
-use crate::{
-    context::PrismaContext,
-    dmmf,
-    opt::{CliOpt, PrismaOpt, Subcommand},
-    PrismaResult,
-};
+use crate::PrismaResult;
 
 use datamodel::{Configuration, Datamodel};
 use prisma_models::DatamodelConverter;
-use query_core::{
-    schema::{QuerySchemaRef, SupportedCapabilities},
-    BuildMode, QuerySchemaBuilder,
-};
+use query_core::schema::{QuerySchemaRef, SupportedCapabilities};
+use query_core::{BuildMode, QuerySchemaBuilder};
+
 use std::sync::Arc;
 
 pub struct ExecuteRequest {
@@ -49,31 +45,29 @@ impl CliCommand {
         };
 
         match subcommand {
-            Subcommand::Cli(ref cliopts) => match cliopts {
-                CliOpt::Dmmf => {
-                    let build_mode = if opts.legacy {
-                        BuildMode::Legacy
-                    } else {
-                        BuildMode::Modern
-                    };
+            CliOpt::Dmmf => {
+                let build_mode = if opts.legacy {
+                    BuildMode::Legacy
+                } else {
+                    BuildMode::Modern
+                };
 
-                    Ok(Some(CliCommand::Dmmf(DmmfRequest {
-                        datamodel: opts.datamodel(true)?,
-                        build_mode,
-                        enable_raw_queries: opts.enable_raw_queries,
-                    })))
-                }
-                CliOpt::GetConfig(input) => Ok(Some(CliCommand::GetConfig(GetConfigRequest {
-                    config: opts.configuration(input.ignore_env_var_errors)?,
-                }))),
-                CliOpt::ExecuteRequest(input) => Ok(Some(CliCommand::ExecuteRequest(ExecuteRequest {
-                    query: input.query.clone(),
+                Ok(Some(CliCommand::Dmmf(DmmfRequest {
+                    datamodel: opts.datamodel(true)?,
+                    build_mode,
                     enable_raw_queries: opts.enable_raw_queries,
-                    legacy: input.legacy,
-                    datamodel: opts.datamodel(false)?,
-                    config: opts.configuration(false)?,
-                }))),
-            },
+                })))
+            }
+            CliOpt::GetConfig(input) => Ok(Some(CliCommand::GetConfig(GetConfigRequest {
+                config: opts.configuration(input.ignore_env_var_errors)?,
+            }))),
+            CliOpt::ExecuteRequest(input) => Ok(Some(CliCommand::ExecuteRequest(ExecuteRequest {
+                query: input.query.clone(),
+                enable_raw_queries: opts.enable_raw_queries,
+                legacy: input.legacy,
+                datamodel: opts.datamodel(false)?,
+                config: opts.configuration(false)?,
+            }))),
         }
     }
 

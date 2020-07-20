@@ -87,7 +87,6 @@ case class TestServer() extends PlayJsonExtensions with LogSupport {
             EnvVars.prismaBinaryPath,
             "--enable-experimental=all",
             "--enable-raw-queries",
-            "cli",
             "execute-request",
             "--legacy",
             encoded_query
@@ -104,7 +103,6 @@ case class TestServer() extends PlayJsonExtensions with LogSupport {
             EnvVars.prismaBinaryPath,
             "--enable-experimental=all",
             "--enable-raw-queries",
-            "cli",
             "execute-request",
             encoded_query
           ),
@@ -120,7 +118,6 @@ case class TestServer() extends PlayJsonExtensions with LogSupport {
             EnvVars.prismaBinaryPath,
             "--enable-experimental=all",
             "--enable-raw-queries",
-            "cli",
             "execute-request",
             "--legacy",
             encoded_query
@@ -137,7 +134,6 @@ case class TestServer() extends PlayJsonExtensions with LogSupport {
             EnvVars.prismaBinaryPath,
             "--enable-experimental=all",
             "--enable-raw-queries",
-            "cli",
             "execute-request",
             encoded_query
           ),

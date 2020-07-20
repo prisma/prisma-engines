@@ -86,22 +86,7 @@ OPTIONS:
     -p, --port <port>    The port the query engine should bind to [env: PORT=]  [default: 4466]
 
 SUBCOMMANDS:
-    cli     Doesn't start a server, but allows running specific commands against Prisma
-    help    Prints this message or the help of the given subcommand(s)
-
-> ./target/release/query-engine cli --help
-Doesn't start a server, but allows running specific commands against Prisma
-
-USAGE:
-    query-engine cli <SUBCOMMAND>
-
-FLAGS:
-    -h, --help       Prints help information
-    -V, --version    Prints version information
-
-SUBCOMMANDS:
     dmmf               Output the DMMF from the loaded data model
-    dmmf-to-dml        Convert the given DMMF JSON file to a data model
     execute-request    Executes one request and then terminates
     get-config         Get the configuration from the given data model
     help               Prints this message or the help of the given subcommand(s)
