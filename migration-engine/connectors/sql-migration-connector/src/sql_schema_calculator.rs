@@ -1,4 +1,4 @@
-use crate::{sql_renderer::IteratorJoin, DatabaseInfo, SqlResult};
+use crate::{sql_renderer::IteratorJoin, DatabaseInfo};
 use datamodel::{
     common::*,
     walkers::{walk_models, walk_relations, walk_scalar_fields, ModelWalker, ScalarFieldWalker, TypeWalker},
@@ -15,7 +15,7 @@ pub struct SqlSchemaCalculator<'a> {
 }
 
 impl<'a> SqlSchemaCalculator<'a> {
-    pub fn calculate(data_model: &Datamodel, database_info: &DatabaseInfo) -> SqlResult<sql::SqlSchema> {
+    pub fn calculate(data_model: &Datamodel, database_info: &DatabaseInfo) -> sql::SqlSchema {
         let calculator = SqlSchemaCalculator {
             data_model,
             database_info,
@@ -23,12 +23,11 @@ impl<'a> SqlSchemaCalculator<'a> {
         calculator.calculate_internal()
     }
 
-    fn calculate_internal(&self) -> SqlResult<sql::SqlSchema> {
+    fn calculate_internal(&self) -> sql::SqlSchema {
         let mut tables = Vec::with_capacity(self.data_model.models().len());
         let model_tables_without_inline_relations = self.calculate_model_tables();
 
-        for result in model_tables_without_inline_relations {
-            let (model, mut table) = result?;
+        for (model, mut table) in model_tables_without_inline_relations {
             self.add_inline_relations_to_model_tables(model, &mut table);
             tables.push(table);
         }
@@ -38,11 +37,11 @@ impl<'a> SqlSchemaCalculator<'a> {
         let enums = self.calculate_enums();
         let sequences = Vec::new();
 
-        Ok(sql::SqlSchema {
+        sql::SqlSchema {
             tables,
             enums,
             sequences,
-        })
+        }
     }
 
     fn calculate_enums(&self) -> Vec<sql::Enum> {
@@ -82,9 +81,7 @@ impl<'a> SqlSchemaCalculator<'a> {
         }
     }
 
-    fn calculate_model_tables<'iter>(
-        &'iter self,
-    ) -> impl Iterator<Item = SqlResult<(ModelWalker<'a>, sql::Table)>> + 'iter {
+    fn calculate_model_tables<'iter>(&'iter self) -> impl Iterator<Item = (ModelWalker<'a>, sql::Table)> + 'iter {
         walk_models(self.data_model).map(move |model| {
             let columns = model
                 .scalar_fields()
@@ -166,7 +163,7 @@ impl<'a> SqlSchemaCalculator<'a> {
                 foreign_keys: Vec::new(),
             };
 
-            Ok((model, table))
+            (model, table)
         })
     }
 
