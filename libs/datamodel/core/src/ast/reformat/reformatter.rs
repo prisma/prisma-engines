@@ -6,7 +6,6 @@ use pest::Parser;
 use super::helpers::*;
 use crate::ast::WithDirectives;
 use crate::common::WritableString;
-use serde::private::de::missing_field;
 
 pub struct Reformatter<'a> {
     input: &'a str,
@@ -64,18 +63,13 @@ impl<'a> Reformatter<'a> {
                 let new_ast_field = lowerer.lower_field(&field, &datamodel)?;
                 if original_ast_field.is_some() {
                     for directive in new_ast_field.directives {
-                        if original_ast_field
-                            .unwrap()
-                            .directives
-                            .iter()
-                            .find(|d| d.name.name == directive.name.name)
-                            .is_none()
-                        {
+                        if let Some(original_field) = original_ast_field {
+                            if original_field.directives.iter().find(|d| d.name.name == directive.name.name).is_none() {
                             missing_field_directives.push(MissingFieldDirective {
                                 model: model.name.clone(),
                                 field: field.name().to_string(),
                                 directive,
-                            })
+                            }) }
                         }
                     }
                 }
