@@ -17,7 +17,7 @@ pub struct Reformatter<'a> {
 impl<'a> Reformatter<'a> {
     pub fn new(input: &'a str) -> Self {
         let missing_fields = Self::find_all_missing_fields(&input);
-        let missing_field_directives = dbg!(Self::find_all_missing_directives(&input));
+        let missing_field_directives = Self::find_all_missing_directives(&input);
         Reformatter { input, missing_fields, missing_field_directives }
     }
 
