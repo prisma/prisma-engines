@@ -212,6 +212,11 @@ impl PostgresUrl {
         &self.query_params.schema
     }
 
+    /// Whether the pgbouncer mode is enabled.
+    pub fn pg_bouncer(&self) -> bool {
+        self.query_params.pg_bouncer
+    }
+
     pub(crate) fn connect_timeout(&self) -> Option<Duration> {
         self.query_params.connect_timeout
     }

@@ -2,7 +2,7 @@
 
 use crate::{
     ast,
-    connector::{self, ConnectionInfo, Queryable, SqlFamily, TransactionCapable},
+    connector::{self, ConnectionInfo, Queryable, TransactionCapable},
 };
 use async_trait::async_trait;
 use std::{fmt, sync::Arc};
@@ -119,7 +119,6 @@ impl Quaint {
             s if s.starts_with("postgres") || s.starts_with("postgresql") => {
                 let url = connector::PostgresUrl::new(Url::parse(s)?)?;
                 let psql = connector::PostgreSql::new(url).await?;
-
                 Arc::new(psql) as Arc<dyn Queryable>
             }
             #[cfg(feature = "mssql")]
@@ -133,7 +132,7 @@ impl Quaint {
         };
 
         let connection_info = Arc::new(ConnectionInfo::from_url(url_str)?);
-        Self::log_start(connection_info.sql_family(), 1);
+        Self::log_start(&connection_info);
 
         Ok(Self { inner, connection_info })
     }
@@ -143,14 +142,17 @@ impl Quaint {
         &self.connection_info
     }
 
-    fn log_start(family: SqlFamily, connection_limit: u32) {
+    fn log_start(info: &ConnectionInfo) {
+        let family = info.sql_family();
+        let pg_bouncer = if info.pg_bouncer() { " in PgBouncer mode" } else { "" };
+
         #[cfg(not(feature = "tracing-log"))]
         {
-            info!("Starting a {} pool with {} connections.", family, connection_limit);
+            info!("Starting a {} connection{}.", family, pg_bouncer);
         }
         #[cfg(feature = "tracing-log")]
         {
-            tracing::info!("Starting a {} pool with {} connections.", family, connection_limit);
+            tracing::info!("Starting a {} connection{}.", family, pg_bouncer);
         }
     }
 }

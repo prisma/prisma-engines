@@ -269,23 +269,7 @@ impl Builder {
     /// Consume the builder and create a new instance of a pool.
     pub fn build(self) -> Quaint {
         let connection_info = Arc::new(self.connection_info);
-        let family = connection_info.sql_family();
-
-        #[cfg(not(feature = "tracing-log"))]
-        {
-            info!(
-                "Starting a {} pool with up to {} connections.",
-                family, self.connection_limit
-            );
-        }
-        #[cfg(feature = "tracing-log")]
-        {
-            tracing::info!(
-                "Starting a {} pool with up to {} connections.",
-                family,
-                self.connection_limit
-            );
-        }
+        Self::log_start(&connection_info, self.connection_limit);
 
         let inner = Pool::builder()
             .max_open(self.connection_limit as u64)
@@ -299,6 +283,27 @@ impl Builder {
             inner,
             connection_info,
             connect_timeout: self.connect_timeout,
+        }
+    }
+
+    fn log_start(info: &ConnectionInfo, connection_limit: usize) {
+        let family = info.sql_family();
+        let pg_bouncer = if info.pg_bouncer() { " in PgBouncer mode" } else { "" };
+        #[cfg(not(feature = "tracing-log"))]
+        {
+            info!(
+                "Starting a {} pool with {} connections{}.",
+                family, connection_limit, pg_bouncer
+            );
+        }
+        #[cfg(feature = "tracing-log")]
+        {
+            tracing::info!(
+                "Starting a {} pool with {} connections{}.",
+                family,
+                connection_limit,
+                pg_bouncer
+            );
         }
     }
 }
