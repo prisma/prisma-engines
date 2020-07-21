@@ -35,12 +35,12 @@ impl Standardiser {
         // Iterate and mutate models.
         for model in schema.models_mut() {
             let cloned_model = model.clone();
-            let unique_criteria = self.unique_criteria(&cloned_model);
 
             let mut fields_to_add = vec![];
             for field in model.fields_mut() {
                 if let Field::RelationField(field) = field {
                     let related_model = schema_copy.find_model(&field.relation_info.to).expect(STATE_ERROR);
+                    let unique_criteria = self.unique_criteria(&related_model);
                     let related_field = schema_copy.find_related_field_bang(field);
                     let related_model_name = &related_model.name;
                     let is_m2m = field.is_list() && related_field.is_list();
@@ -64,7 +64,7 @@ impl Standardiser {
                     };
 
                     let underlying_fields =
-                        self.underlying_fields_for_unique_criteria(&unique_criteria, &cloned_model.name);
+                        self.underlying_fields_for_unique_criteria(&unique_criteria, &related_model.name);
 
                     if embed_here {
                         // user input has precedence
@@ -79,7 +79,6 @@ impl Standardiser {
                         // user input has precedence
                         if !is_m2m
                             && (rel_info.fields.is_empty() && related_field_rel_info.fields.is_empty())
-                            && field.is_generated
                         {
                             rel_info.fields = underlying_fields.iter().map(|f| f.name.clone()).collect();
                             for underlying_field in underlying_fields {
@@ -110,6 +109,7 @@ impl Standardiser {
             let mut missing_for_model = self.find_missing_back_relation_fields(&model, schema, ast_schema)?;
             missing_back_relation_fields.append(&mut missing_for_model);
         }
+        println!("{:?}", missing_back_relation_fields);
 
         for missing_back_relation_field in missing_back_relation_fields {
             let model = schema

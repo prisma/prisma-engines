@@ -388,14 +388,9 @@ fn must_error_when_fields_argument_is_missing_for_one_to_many() {
     }
     "#;
 
-    let errors = parse_error(dml);
-    errors.assert_is(DatamodelError::new_directive_validation_error(
-        &message_with_format_hint(
-            "The relation field `user` on Model `Post` must specify the `fields` argument in the @relation directive.",
-        ),
-        "relation",
-        Span::new(172, 215),
-    ));
+    let result = parse(dml);
+    result.assert_has_model("Post").assert_has_relation_field("user").assert_relation_base_fields(&["userId"]);
+    result.assert_has_model("User");
 }
 
 #[test]
@@ -502,21 +497,10 @@ fn must_error_when_fields_argument_is_missing_for_one_to_one() {
     }
     "#;
 
-    let errors = parse_error(dml);
-    errors.assert_is_at(
-        0,
-        DatamodelError::new_directive_validation_error(
-            "The relation fields `post` on Model `User` and `user` on Model `Post` do not provide the `fields` argument in the @relation directive. You have to provide it on one of the two fields.", 
-            "relation", Span::new(77, 92)
-        ),
-    );
-    errors.assert_is_at(
-        1,
-        DatamodelError::new_directive_validation_error(
-            "The relation fields `user` on Model `Post` and `post` on Model `User` do not provide the `fields` argument in the @relation directive. You have to provide it on one of the two fields.", 
-       "relation", Span::new(170, 213)
-        ),
-    );
+    let result = parse(dml);
+    result.assert_has_model("Post").assert_has_relation_field("user").assert_relation_base_fields(&["userId"]);
+    result.assert_has_model("User").assert_has_relation_field("post").assert_relation_base_fields(&[]);
+
 }
 
 #[test]

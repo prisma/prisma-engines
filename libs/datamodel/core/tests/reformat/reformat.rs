@@ -294,6 +294,33 @@ model a {
 }
 
 #[test]
+fn reformatting_must_add_backrelation() {
+    let input = r#"model User {
+  id Int @id
+  post Post
+}
+
+model Post {
+  id Int @id
+}
+"#;
+
+    let expected =r#"model User {
+  id     Int  @id
+  post   Post @relation(fields: [postId], references: [id])
+  postId Int?
+}
+
+model Post {
+  id   Int    @id
+  User User[]
+}
+"#;
+
+    assert_reformat(input, expected);
+}
+
+#[test]
 fn reformatting_enums_must_work() {
     let input = r#"enum Colors {
   RED @map("rett")
