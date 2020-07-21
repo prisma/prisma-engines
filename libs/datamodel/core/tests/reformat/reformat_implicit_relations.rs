@@ -42,6 +42,33 @@ model Post2 {
 }
 
 #[test]
+fn back_relation_fields_and_directive_must_be_added_even_when_directive_is_missing() {
+    let input = r#"model User {
+  id Int @id
+  post Post
+}
+
+model Post {
+  id Int @id
+}
+"#;
+
+    let expected = r#"model User {
+  id     Int  @id
+  post   Post @relation(fields: [postId], references: [id])
+  postId Int?
+}
+
+model Post {
+  id   Int    @id
+  User User[]
+}
+"#;
+
+    assert_reformat(input, expected);
+}
+
+#[test]
 fn back_relations_must_be_added_even_when_env_vars_are_missing() {
     // missing env vars led to errors in datamodel validation. A successful validation is prerequisite to find missing back relation fields though.
     // I changed the Reformatter to ignore env var errors.
