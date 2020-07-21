@@ -1,6 +1,8 @@
 use crate::ast::WithDirectives;
 use crate::{
-    ast, configuration, dml,
+    ast, configuration,
+    configuration::PreviewFeatures,
+    dml,
     error::{DatamodelError, ErrorCollection},
 };
 
@@ -9,6 +11,7 @@ use crate::{
 /// When validating, we check if the datamodel is valid, and generate errors otherwise.
 pub struct Validator<'a> {
     source: Option<&'a configuration::Datasource>,
+    generator: Option<&'a configuration::Generator>,
 }
 
 /// State error message. Seeing this error means something went really wrong internally. It's the datamodel equivalent of a bluescreen.
@@ -19,8 +22,11 @@ const PRISMA_FORMAT_HINT: &str = "You can run `prisma format` to fix this automa
 
 impl<'a> Validator<'a> {
     /// Creates a new instance, with all builtin directives registered.
-    pub fn new(source: Option<&'a configuration::Datasource>) -> Validator {
-        Self { source }
+    pub fn new(
+        source: Option<&'a configuration::Datasource>,
+        generator: Option<&'a configuration::Generator>,
+    ) -> Validator<'a> {
+        Self { source, generator }
     }
 
     pub fn validate(&self, ast_schema: &ast::SchemaAst, schema: &mut dml::Datamodel) -> Result<(), ErrorCollection> {
@@ -284,7 +290,13 @@ impl<'a> Validator<'a> {
     }
 
     fn validate_model_name(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), DatamodelError> {
-        if super::reserved_model_names::is_reserved(&model.name) {
+        let mut validator = super::reserved_model_names::ReservedModelNameValidator::new();
+
+        if self.generator.has_preview_feature("transactionApi") {
+            validator.disallow_transaction_name();
+        }
+
+        if validator.is_reserved(&model.name) {
             Err(DatamodelError::new_model_validation_error(
                 &format!(
                     "The model name `{}` is invalid. It is a reserved name. Please change it. Read more at https://pris.ly/d/naming-models",
