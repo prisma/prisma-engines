@@ -64,12 +64,18 @@ impl<'a> Reformatter<'a> {
                 if original_ast_field.is_some() {
                     for directive in new_ast_field.directives {
                         if let Some(original_field) = original_ast_field {
-                            if original_field.directives.iter().find(|d| d.name.name == directive.name.name).is_none() {
-                            missing_field_directives.push(MissingFieldDirective {
-                                model: model.name.clone(),
-                                field: field.name().to_string(),
-                                directive,
-                            }) }
+                            if original_field
+                                .directives
+                                .iter()
+                                .find(|d| d.name.name == directive.name.name)
+                                .is_none()
+                            {
+                                missing_field_directives.push(MissingFieldDirective {
+                                    model: model.name.clone(),
+                                    field: field.name().to_string(),
+                                    directive,
+                                })
+                            }
                         }
                     }
                 }
