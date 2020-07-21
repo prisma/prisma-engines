@@ -123,7 +123,7 @@ The Connector TestKit is a separate Scala project found at
 `./query-engine/connector-test-kit` that runs GraphQL queries against isolated
 instances of the query engine and asserts that the responses are correct.
 
-### Set up & run integration tests
+### Set up & run integration tests:
 
 **Prerequisites:**
 - Installed Rust toolchain.
