@@ -109,7 +109,6 @@ impl Standardiser {
             let mut missing_for_model = self.find_missing_back_relation_fields(&model, schema, ast_schema)?;
             missing_back_relation_fields.append(&mut missing_for_model);
         }
-        println!("{:?}", missing_back_relation_fields);
 
         for missing_back_relation_field in missing_back_relation_fields {
             let model = schema
