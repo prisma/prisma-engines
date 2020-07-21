@@ -40,7 +40,7 @@ fn sanitize_models(datamodel: &mut Datamodel, family: &SqlFamily) -> HashMap<Str
                     let info = &mut rf.relation_info;
 
                     info.name = sanitize_string(&info.name);
-                    info.to = sanitize_string(&info.to);
+                    info.to = sanitize_string(&reformat_reserved_string(&info.to));
 
                     info.to_fields = sanitize_strings(&info.to_fields);
                     info.fields = sanitize_strings(&info.fields);
@@ -166,9 +166,9 @@ fn sanitize_string(s: &str) -> String {
 }
 
 fn rename_reserved(model: &mut Model) {
-    let validator = reserved_model_names::ReservedModelNameValidator::new();
-    if validator.is_reserved(model.name()) {
-        let name = format!("Renamed{}", model.name);
+    let name = reformat_reserved_string(model.name());
+
+    if &name != model.name() {
         let comment = format!(
             "This model has been renamed to '{}' during introspection, because the original name '{}' is reserved.",
             name, model.name,
@@ -185,5 +185,16 @@ fn rename_reserved(model: &mut Model) {
         }
 
         model.name = name;
+    }
+}
+
+/// Reformats a reserved string as "Renamed{}"
+fn reformat_reserved_string(s: &str) -> String {
+    let validator = reserved_model_names::ReservedModelNameValidator::new();
+
+    if validator.is_reserved(s) {
+        format!("Renamed{}", s)
+    } else {
+        s.to_owned()
     }
 }
