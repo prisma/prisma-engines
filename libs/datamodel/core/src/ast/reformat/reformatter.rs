@@ -234,7 +234,7 @@ impl<'a> Reformatter<'a> {
                         table.render(renderer);
                         Self::reformat_directive(renderer, &token, "@@");
                     }
-                    Rule::field_declaration => Self::reformat_field(table, &token),
+                    Rule::field_declaration => self.reformat_field(table, &token),
                     _ => Self::reformat_generic_token(table, &token),
                 }
             }),
