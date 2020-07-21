@@ -9,7 +9,8 @@ impl<'a> From<Value<'a>> for PrismaValue {
                 .map(|i| PrismaValue::Int(i))
                 .unwrap_or(PrismaValue::null(TypeHint::Int)),
             Value::Real(d) => d
-                .map(|d| PrismaValue::Float(d))
+                // chop the trailing zeroes off so javascript doesn't start rounding things wrong
+                .map(|d| PrismaValue::Float(d.normalize()))
                 .unwrap_or(PrismaValue::null(TypeHint::Float)),
             Value::Text(s) => s
                 .map(|s| PrismaValue::String(s.into_owned()))
