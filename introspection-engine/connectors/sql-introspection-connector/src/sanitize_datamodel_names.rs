@@ -166,7 +166,8 @@ fn sanitize_string(s: &str) -> String {
 }
 
 fn rename_reserved(model: &mut Model) {
-    if reserved_model_names::is_reserved(model.name()) {
+    let validator = reserved_model_names::ReservedModelNameValidator::new();
+    if validator.is_reserved(model.name()) {
         let name = format!("Renamed{}", model.name);
         let comment = format!(
             "This model has been renamed to '{}' during introspection, because the original name '{}' is reserved.",

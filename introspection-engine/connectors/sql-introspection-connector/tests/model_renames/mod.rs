@@ -6,13 +6,13 @@ use pretty_assertions::assert_eq;
 async fn introspecting_a_table_with_reserved_name_should_rename(api: &TestApi) {
     api.barrel()
         .execute(|migration| {
-            migration.create_table("Transaction", |t| {
+            migration.create_table("StringFilter", |t| {
                 t.add_column("id", types::primary());
             });
         })
         .await;
 
-    let dm = "/// This model has been renamed to \'RenamedTransaction\' during introspection, because the original name \'Transaction\' is reserved.\nmodel RenamedTransaction {\n  id Int @default(autoincrement()) @id\n\n  @@map(\"Transaction\")\n}\n";
+    let dm = "/// This model has been renamed to \'RenamedStringFilter\' during introspection, because the original name \'StringFilter\' is reserved.\nmodel RenamedStringFilter {\n  id Int @default(autoincrement()) @id\n\n  @@map(\"StringFilter\")\n}\n";
     let result = api.introspect().await;
 
     assert_eq!(&result, dm);

@@ -9,15 +9,15 @@ pub struct ValidationPipeline<'a> {
 }
 
 impl<'a> ValidationPipeline<'a> {
-    /// Creates a new instance, with all builtin directives and
-    /// the directives defined by the given sources registered.
-    ///
-    /// The directives defined by the given sources will be namespaced.
-    pub fn with_sources(sources: &'a [configuration::Datasource]) -> ValidationPipeline<'a> {
+    pub fn new(
+        sources: &'a [configuration::Datasource],
+        generators: &'a [configuration::Generator],
+    ) -> ValidationPipeline<'a> {
         let source = sources.first();
+        let generator = generators.first();
         ValidationPipeline {
             lifter: LiftAstToDml::new(source),
-            validator: Validator::new(source),
+            validator: Validator::new(source, generator),
             standardiser: Standardiser::new(),
         }
     }
