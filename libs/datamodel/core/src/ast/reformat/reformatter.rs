@@ -4,9 +4,9 @@ use pest::Parser;
 // We have to use RefCell as rust cannot
 // do multiple mutable borrows inside a match statement.
 use super::helpers::*;
+use crate::ast::WithDirectives;
 use crate::common::WritableString;
 use serde::private::de::missing_field;
-use crate::ast::WithDirectives;
 
 pub struct Reformatter<'a> {
     input: &'a str,
@@ -18,7 +18,11 @@ impl<'a> Reformatter<'a> {
     pub fn new(input: &'a str) -> Self {
         let missing_fields = Self::find_all_missing_fields(&input);
         let missing_field_directives = Self::find_all_missing_directives(&input);
-        Reformatter { input, missing_fields, missing_field_directives }
+        Reformatter {
+            input,
+            missing_fields,
+            missing_field_directives,
+        }
     }
 
     // this finds all auto generated fields, that are added during auto generation AND are missing from the original input.
@@ -46,7 +50,9 @@ impl<'a> Reformatter<'a> {
         Ok(result)
     }
 
-    fn find_all_missing_directives(schema_string: &str) -> Result<Vec<MissingFieldDirective>, crate::error::ErrorCollection> {
+    fn find_all_missing_directives(
+        schema_string: &str,
+    ) -> Result<Vec<MissingFieldDirective>, crate::error::ErrorCollection> {
         let schema_ast = crate::parse_schema_ast(&schema_string)?;
         let datamodel = crate::parse_datamodel_and_ignore_datasource_urls(&schema_string)?;
         let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new();
@@ -58,7 +64,13 @@ impl<'a> Reformatter<'a> {
                 let new_ast_field = lowerer.lower_field(&field, &datamodel)?;
                 if original_ast_field.is_some() {
                     for directive in new_ast_field.directives {
-                        if original_ast_field.unwrap().directives.iter().find(|d | d.name.name == directive.name.name).is_none() {
+                        if original_ast_field
+                            .unwrap()
+                            .directives
+                            .iter()
+                            .find(|d| d.name.name == directive.name.name)
+                            .is_none()
+                        {
                             missing_field_directives.push(MissingFieldDirective {
                                 model: model.name.clone(),
                                 field: field.name().to_string(),
@@ -355,7 +367,6 @@ impl<'a> Reformatter<'a> {
         let field_name = &Self::get_identifier(token);
         for current in token.clone().into_inner() {
             match current.as_rule() {
-
                 Rule::non_empty_identifier | Rule::maybe_empty_identifier => {
                     target.write(current.as_str());
                 }
@@ -374,7 +385,10 @@ impl<'a> Reformatter<'a> {
         if let Ok(missing_field_directives) = self.missing_field_directives.as_ref() {
             for missing_field_directive in missing_field_directives.iter() {
                 if &missing_field_directive.field == field_name {
-                    Renderer::render_field_directive( &mut target.column_locked_writer_for(2), &missing_field_directive.directive)
+                    Renderer::render_field_directive(
+                        &mut target.column_locked_writer_for(2),
+                        &missing_field_directive.directive,
+                    )
                 }
             }
         }
@@ -635,5 +649,5 @@ pub struct MissingField {
 pub struct MissingFieldDirective {
     pub model: String,
     pub field: String,
-    pub directive: crate::ast::Directive
+    pub directive: crate::ast::Directive,
 }

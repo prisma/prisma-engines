@@ -77,9 +77,7 @@ impl Standardiser {
                         }
 
                         // user input has precedence
-                        if !is_m2m
-                            && (rel_info.fields.is_empty() && related_field_rel_info.fields.is_empty())
-                        {
+                        if !is_m2m && (rel_info.fields.is_empty() && related_field_rel_info.fields.is_empty()) {
                             rel_info.fields = underlying_fields.iter().map(|f| f.name.clone()).collect();
                             for underlying_field in underlying_fields {
                                 fields_to_add.push(Field::ScalarField(underlying_field));

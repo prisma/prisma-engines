@@ -389,7 +389,10 @@ fn must_error_when_fields_argument_is_missing_for_one_to_many() {
     "#;
 
     let result = parse(dml);
-    result.assert_has_model("Post").assert_has_relation_field("user").assert_relation_base_fields(&["userId"]);
+    result
+        .assert_has_model("Post")
+        .assert_has_relation_field("user")
+        .assert_relation_base_fields(&["userId"]);
     result.assert_has_model("User");
 }
 
@@ -498,9 +501,14 @@ fn must_error_when_fields_argument_is_missing_for_one_to_one() {
     "#;
 
     let result = parse(dml);
-    result.assert_has_model("Post").assert_has_relation_field("user").assert_relation_base_fields(&["userId"]);
-    result.assert_has_model("User").assert_has_relation_field("post").assert_relation_base_fields(&[]);
-
+    result
+        .assert_has_model("Post")
+        .assert_has_relation_field("user")
+        .assert_relation_base_fields(&["userId"]);
+    result
+        .assert_has_model("User")
+        .assert_has_relation_field("post")
+        .assert_relation_base_fields(&[]);
 }
 
 #[test]
