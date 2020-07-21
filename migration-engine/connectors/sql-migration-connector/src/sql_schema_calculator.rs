@@ -1,11 +1,10 @@
-use crate::{error::SqlError, sql_renderer::IteratorJoin, DatabaseInfo, SqlResult};
+use crate::{sql_renderer::IteratorJoin, DatabaseInfo, SqlResult};
 use datamodel::{
     common::*,
-    walkers::{walk_models, walk_scalar_fields, ModelWalker, ScalarFieldWalker, TypeWalker},
+    walkers::{walk_models, walk_relations, walk_scalar_fields, ModelWalker, ScalarFieldWalker, TypeWalker},
     Datamodel, DefaultValue, FieldArity, IndexDefinition, IndexType, ValueGenerator, ValueGeneratorFn,
     WithDatabaseName,
 };
-use prisma_models::{DatamodelConverter, TempManifestationHolder, TempRelationHolder};
 use prisma_value::PrismaValue;
 use quaint::prelude::SqlFamily;
 use sql_schema_describer::{self as sql, ColumnArity};
@@ -34,9 +33,7 @@ impl<'a> SqlSchemaCalculator<'a> {
             tables.push(table);
         }
 
-        let mut relation_tables = self.calculate_relation_tables()?;
-
-        tables.append(&mut relation_tables);
+        tables.extend(self.calculate_relation_tables());
 
         let enums = self.calculate_enums();
         let sequences = Vec::new();
@@ -204,89 +201,70 @@ impl<'a> SqlSchemaCalculator<'a> {
         }
     }
 
-    fn calculate_relation_tables(&self) -> SqlResult<Vec<sql::Table>> {
-        let mut result = Vec::new();
-        for relation in self.calculate_relations().iter() {
-            if let TempManifestationHolder::Table = &relation.manifestation {
-                let model_a = ModelWalker::new(&relation.model_a, self.data_model);
-                let model_b = ModelWalker::new(&relation.model_b, self.data_model);
-
-                let a_columns = relation_table_column(&model_a, relation.model_a_column());
-                let b_columns = relation_table_column(&model_b, relation.model_b_column());
+    fn calculate_relation_tables<'b>(&'b self) -> impl Iterator<Item = sql::Table> + 'b {
+        walk_relations(self.data_model)
+            .filter_map(|relation| relation.as_m2m())
+            .map(|m2m| {
+                let table_name = m2m.table_name();
+                let model_a_id = m2m.model_a_id();
+                let model_b_id = m2m.model_b_id();
+                let model_a = model_a_id.model();
+                let model_b = model_b_id.model();
 
                 let foreign_keys = vec![
                     sql::ForeignKey {
                         constraint_name: None,
-                        columns: a_columns.iter().map(|col| col.name.clone()).collect(),
-                        referenced_table: model_a.db_name().to_owned(),
-                        referenced_columns: first_unique_criterion(model_a)
-                            .map_err(SqlError::Generic)?
-                            .into_iter()
-                            .map(|field| field.db_name().to_owned())
-                            .collect(),
+                        columns: vec![m2m.model_a_column().into()],
+                        referenced_table: model_a.db_name().into(),
+                        referenced_columns: vec![model_a_id.db_name().into()],
                         on_delete_action: sql::ForeignKeyAction::Cascade,
                     },
                     sql::ForeignKey {
                         constraint_name: None,
-                        columns: b_columns.iter().map(|col| col.name.clone()).collect(),
-                        referenced_table: model_b.db_name().to_owned(),
-                        referenced_columns: first_unique_criterion(model_b)
-                            .map_err(SqlError::Generic)?
-                            .into_iter()
-                            .map(|field| field.db_name().to_owned())
-                            .collect(),
+                        columns: vec![m2m.model_b_column().into()],
+                        referenced_table: model_b.db_name().into(),
+                        referenced_columns: vec![model_b_id.db_name().into()],
                         on_delete_action: sql::ForeignKeyAction::Cascade,
                     },
                 ];
 
-                let mut columns = a_columns;
-                columns.extend(b_columns.iter().map(|col| col.to_owned()));
-
                 let indexes = vec![
                     sql::Index {
-                        name: format!("{}_AB_unique", relation.table_name()),
-                        columns: columns.iter().map(|col| col.name.clone()).collect(),
+                        name: format!("{}_AB_unique", &table_name),
+                        columns: vec![m2m.model_a_column().into(), m2m.model_b_column().into()],
                         tpe: sql::IndexType::Unique,
                     },
                     sql::Index {
-                        name: format!("{}_B_index", relation.table_name()),
-                        columns: b_columns.into_iter().map(|col| col.name).collect(),
+                        name: format!("{}_B_index", &table_name),
+                        columns: vec![m2m.model_b_column().into()],
                         tpe: sql::IndexType::Normal,
                     },
                 ];
 
-                let table = sql::Table {
-                    name: relation.table_name(),
+                let columns = vec![
+                    sql::Column {
+                        name: m2m.model_a_column().into(),
+                        tpe: column_type(&model_a_id),
+                        default: None,
+                        auto_increment: false,
+                    },
+                    sql::Column {
+                        name: m2m.model_b_column().into(),
+                        tpe: column_type(&model_b_id),
+                        default: None,
+                        auto_increment: false,
+                    },
+                ];
+
+                sql::Table {
+                    name: table_name,
                     columns,
                     indices: indexes,
                     primary_key: None,
                     foreign_keys,
-                };
-                result.push(table);
-            }
-        }
-        Ok(result)
+                }
+            })
     }
-
-    fn calculate_relations(&self) -> Vec<TempRelationHolder> {
-        DatamodelConverter::calculate_relations(&self.data_model)
-    }
-}
-
-fn relation_table_column(referenced_model: &ModelWalker<'_>, reference_field_name: String) -> Vec<sql::Column> {
-    let unique_field = referenced_model.scalar_fields().find(|f| f.is_unique());
-    let id_field = referenced_model.scalar_fields().find(|f| f.is_id());
-
-    let unique_field = id_field
-        .or(unique_field)
-        .unwrap_or_else(|| panic!("No unique criteria found in model {}", &referenced_model.name()));
-
-    vec![sql::Column {
-        name: reference_field_name,
-        tpe: column_type(&unique_field),
-        default: None,
-        auto_increment: false,
-    }]
 }
 
 fn migration_value_new(field: &ScalarFieldWalker<'_>) -> Option<sql_schema_describer::DefaultValue> {
@@ -387,38 +365,4 @@ fn add_one_to_one_relation_unique_index(table: &mut sql::Table, column_names: &[
     };
 
     table.indices.push(index);
-}
-
-/// This should match the logic in `prisma_models::Model::primary_identifier`.
-fn first_unique_criterion(model: ModelWalker<'_>) -> anyhow::Result<Vec<ScalarFieldWalker<'_>>> {
-    // First candidate: the primary key.
-    {
-        let id_fields: Vec<_> = model.id_fields().collect();
-
-        if !id_fields.is_empty() {
-            return Ok(id_fields);
-        }
-    }
-
-    // Second candidate: a required scalar field with a unique index.
-    {
-        let first_scalar_unique_required_field = model
-            .scalar_fields()
-            .find(|field| field.is_unique() && field.is_required());
-
-        if let Some(field) = first_scalar_unique_required_field {
-            return Ok(vec![field]);
-        }
-    }
-
-    // Third candidate: any multi-field unique constraint.
-    {
-        let first_multi_field_unique = model.unique_indexes().next();
-
-        if let Some(index) = first_multi_field_unique {
-            return Ok(index.fields().collect());
-        }
-    }
-
-    anyhow::bail!("Could not find the first unique criteria on model {}", model.name());
 }

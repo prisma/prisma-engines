@@ -1,5 +1,5 @@
 use crate::sql_schema_helpers::ColumnRef;
-use prisma_models::PrismaValue;
+use prisma_value::PrismaValue;
 use sql_schema_describer::{ColumnTypeFamily, DefaultValue};
 
 #[derive(Debug)]
