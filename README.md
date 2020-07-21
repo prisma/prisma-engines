@@ -40,7 +40,9 @@ compiled binaries inside the repository root in the `target/debug` (without
 | Introspection Engine       | `./target/[debug\|release]/introspection-engine`           |
 | Prisma Format              | `./target/[debug\|release]/prisma-fmt`                     |
 
-## Usage
+## Query Engine
+
+### Usage
 
 The Query Engine can be run as a graphql server without using the Prisma Client.
 If using it on production please be aware the api and the query language can
@@ -122,6 +124,7 @@ The Connector TestKit is a separate Scala project found at
 instances of the query engine and asserts that the responses are correct.
 
 ### Set up & run integration tests:
+
 **Prerequisites:**
 - Installed Rust toolchain.
 - Installed Docker and Docker-Compose.
@@ -129,7 +132,7 @@ instances of the query engine and asserts that the responses are correct.
 - Installed `direnv`, then `direnv allow` on the repository root.
     - Alternatively: Load the defined environment in `./.envrc` manually in your shell.
 
-**Setup**:
+**Setup:**
 There are helper `make` commands to set up a test environment for a specific
 database connector you want to test. The commands set up a container (if needed)
 and write the `current_connector` file, which is picked up by the integration
