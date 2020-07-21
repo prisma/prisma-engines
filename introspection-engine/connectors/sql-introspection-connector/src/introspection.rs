@@ -32,8 +32,8 @@ pub fn introspect(
         }
 
         let mut foreign_keys_copy = table.foreign_keys.clone();
-        let model_copy = model.clone();
         foreign_keys_copy.clear_duplicates();
+        let model_copy = model.clone();
 
         for foreign_key in foreign_keys_copy.iter().filter(|fk| {
             !fk.columns.iter().any(|c| {
@@ -45,11 +45,8 @@ pub fn introspect(
         }) {
             version_check.has_inline_relations(table);
             version_check.uses_on_delete(foreign_key, table);
-            model.add_field(Field::RelationField(calculate_relation_field(
-                schema,
-                table,
-                foreign_key,
-            )?));
+            let relation_field = calculate_relation_field(schema, table, foreign_key)?;
+            model.add_field(Field::RelationField(relation_field));
         }
 
         for index in table
@@ -71,10 +68,8 @@ pub fn introspect(
     }
 
     for e in schema.enums.iter() {
-        data_model.add_enum(dml::Enum::new(
-            &e.name,
-            e.values.iter().map(|v| dml::EnumValue::new(v)).collect(),
-        ));
+        let values = e.values.iter().map(|v| dml::EnumValue::new(v)).collect();
+        data_model.add_enum(dml::Enum::new(&e.name, values));
     }
 
     let mut fields_to_be_added = Vec::new();
@@ -87,7 +82,7 @@ pub fn introspect(
                 .find_related_field_for_info(&relation_info, &relation_field.name)
                 .is_none()
             {
-                let other_model = data_model.find_model(relation_info.to.as_str()).unwrap();
+                let other_model = data_model.find_model(&relation_info.to).unwrap();
                 let field = calculate_backrelation_field(schema, model, other_model, relation_field, relation_info)?;
 
                 fields_to_be_added.push((other_model.name.clone(), field));

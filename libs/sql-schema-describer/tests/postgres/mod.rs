@@ -19,10 +19,7 @@ pub async fn get_postgres_describer(sql: &str, db_name: &str) -> postgres::SqlSc
         .unwrap();
 
     let drop_schema = format!("DROP SCHEMA IF EXISTS \"{}\" CASCADE;", SCHEMA);
-    client
-        .query_raw(drop_schema.as_str(), &[])
-        .await
-        .expect("dropping schema");
+    client.query_raw(&drop_schema, &[]).await.expect("dropping schema");
 
     debug!("Creating Postgres schema '{}'", SCHEMA);
     client

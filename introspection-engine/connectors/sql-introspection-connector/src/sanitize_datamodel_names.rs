@@ -114,7 +114,7 @@ static RE: Lazy<Regex> = Lazy::new(|| Regex::new("[^_a-zA-Z0-9]").unwrap());
 // Only invalid characters??
 // Underscore at start
 fn sanitize_name(name: String) -> (String, Option<String>) {
-    let needs_sanitation = RE_START.is_match(name.as_str()) || RE.is_match(name.as_str());
+    let needs_sanitation = RE_START.is_match(&name) || RE.is_match(name.as_str());
 
     if needs_sanitation {
         let start_cleaned: String = RE_START.replace_all(name.as_str(), "").parse().unwrap();
