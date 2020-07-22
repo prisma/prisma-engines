@@ -7,13 +7,14 @@ use bit_vec::BitVec;
 use bytes::BytesMut;
 #[cfg(feature = "chrono-0_4")]
 use chrono::{DateTime, NaiveDateTime, Utc};
+use postgres_types::{FromSql, ToSql};
 use rust_decimal::{
     prelude::{FromPrimitive, ToPrimitive},
     Decimal,
 };
 use std::{error::Error as StdError, str::FromStr};
 use tokio_postgres::{
-    types::{self, FromSql, IsNull, Kind, ToSql, Type as PostgresType},
+    types::{self, IsNull, Kind, Type as PostgresType},
     Row as PostgresRow, Statement as PostgresStatement,
 };
 

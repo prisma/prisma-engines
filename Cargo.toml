@@ -40,6 +40,7 @@ postgresql = [
     "rust_decimal/tokio-pg",
     "native-tls",
     "tokio-postgres",
+    "postgres-types",
     "postgres-native-tls",
     "array",
     "bytes",
@@ -65,7 +66,7 @@ metrics = "0.12"
 percent-encoding = "2"
 once_cell = "1.3"
 num_cpus = "1.12"
-rust_decimal = "1.6"
+rust_decimal = { git = "https://github.com/pimeys/rust-decimal", branch = "pgbouncer-mode" }
 futures = "0.3"
 thiserror = "1.0"
 async-trait = "0.1"
@@ -80,13 +81,9 @@ lru-cache = { version = "0.1", optional = true }
 rusqlite = { version = "0.21", features = ["chrono", "bundled"], optional = true }
 libsqlite3-sys = { version = "0.17", default-features = false, features = ["bundled"], optional = true }
 
-tokio-postgres = { version = "0.5", features = ["with-uuid-0_8", "with-chrono-0_4", "with-serde_json-1", "with-bit-vec-0_6"], optional = true }
-postgres-native-tls = { version = "0.3", optional = true }
 native-tls = { version = "0.2", optional = true }
 
 mysql_async = { version = "0.23", optional = true }
-
-tiberius = { version = "0.4", optional = true, features = ["rust_decimal", "sql-browser-tokio", "chrono"] }
 
 log = { version = "0.4", features = ["release_max_level_trace"] }
 tracing = { version = "0.1", optional = true }
@@ -104,3 +101,26 @@ tokio = { version = "0.2", features = ["rt-threaded", "macros"]}
 serde = { version = "1.0", features = ["derive"] }
 indoc = "0.3"
 names = "0.11"
+
+[dependencies.tiberius]
+git = "https://github.com/prisma/tiberius"
+optional = true
+features = ["rust_decimal", "sql-browser-tokio", "chrono"]
+branch = "pgbouncer-mode-hack"
+
+[dependencies.tokio-postgres]
+git = "https://github.com/pimeys/rust-postgres"
+features = ["with-uuid-0_8", "with-chrono-0_4", "with-serde_json-1", "with-bit-vec-0_6"]
+branch = "pgbouncer-mode"
+optional = true
+
+[dependencies.postgres-types]
+git = "https://github.com/pimeys/rust-postgres"
+features = ["with-uuid-0_8", "with-chrono-0_4", "with-serde_json-1", "with-bit-vec-0_6"]
+branch = "pgbouncer-mode"
+optional = true
+
+[dependencies.postgres-native-tls]
+git = "https://github.com/pimeys/rust-postgres"
+optional = true
+branch = "pgbouncer-mode"
