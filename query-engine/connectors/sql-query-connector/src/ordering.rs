@@ -3,7 +3,7 @@ use prisma_models::*;
 use quaint::ast::*;
 
 /// Builds
-pub fn build<'a>(query_arguments: &QueryArguments, model: &ModelRef) -> Vec<OrderDefinition<'a>> {
+pub fn build(query_arguments: &QueryArguments, model: &ModelRef) -> Vec<OrderDefinition<'static>> {
     todo!()
 }
 

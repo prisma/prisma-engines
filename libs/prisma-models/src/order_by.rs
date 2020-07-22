@@ -25,3 +25,12 @@ impl ToString for SortOrder {
         }
     }
 }
+
+impl From<ScalarFieldRef> for OrderBy {
+    fn from(field: ScalarFieldRef) -> Self {
+        Self {
+            field,
+            sort_order: SortOrder::Ascending,
+        }
+    }
+}

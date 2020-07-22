@@ -21,7 +21,7 @@ pub struct QueryArguments {
     pub take: Option<i64>,
     pub skip: Option<i64>,
     pub filter: Option<Filter>,
-    pub order_by: Option<OrderBy>,
+    pub order_by: Vec<OrderBy>,
     pub distinct: Option<ModelProjection>,
     pub ignore_skip: bool,
     pub ignore_take: bool,

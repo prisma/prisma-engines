@@ -4,6 +4,7 @@ use crate::{
     QueryGraphBuilderError, QueryGraphBuilderResult,
 };
 use connector::QueryArguments;
+use itertools::Itertools;
 use prisma_models::{Field, ModelProjection, ModelRef, PrismaValue, RecordProjection, ScalarFieldRef};
 use std::convert::TryInto;
 
@@ -60,7 +61,7 @@ pub fn extract_query_args(arguments: Vec<ParsedArgument>, model: &ModelRef) -> Q
         },
     )?;
 
-    Ok(finalize_arguments(query_args))
+    Ok(finalize_arguments(query_args, model))
 }
 
 fn extract_distinct(value: ParsedInputValue) -> QueryGraphBuilderResult<ModelProjection> {
@@ -140,11 +141,26 @@ fn extract_compound_cursor_field(
     Ok(pairs)
 }
 
-fn finalize_arguments(args: QueryArguments) -> QueryArguments {
-    // Check if the query requires implicit ordering by primary ID
-    if args.skip.is_some() || args.cursor.is_some() || args.take.is_some() || args.order_by.is_some() {
-        todo!()
+/// Runs final transformations on the QueryArguments.
+fn finalize_arguments(mut args: QueryArguments, model: &ModelRef) -> QueryArguments {
+    // Check if the query requires an implicit ordering added to the arguments.
+    // An implicit ordering is required to guarantee stable ordering of rows to enable stable pagination.
+    let needs_implicit_ordering =
+        args.skip.is_some() || args.cursor.is_some() || args.take.is_some() || !args.order_by.is_empty();
+
+    // If we need implicit ordering, we need to check that any order-by field of the query is unique, because if there's none,
+    // there's no guarantee that the row ordering will be stable, so we add the primary identifier of the model as the
+    // last order by. If the primary identifier is a compound, we add all of the compound fields last (in order) that are not
+    // yet contained in the order_by, because we know that this field combination will end up being unique.
+    let no_orderby_is_unique = !args.order_by.iter().any(|o| o.field.unique());
+
+    if needs_implicit_ordering && no_orderby_is_unique {
+        let primary_identifier = model.primary_identifier();
+        let additional_orderings = primary_identifier.into_iter().map(|f| f.into());
+
+        args.order_by.extend(additional_orderings);
+        args.order_by = args.order_by.into_iter().unique_by(|o| o.field.name).collect();
     }
 
-    todo!()
+    args
 }
