@@ -127,8 +127,8 @@ fn render_raw_sql(
     let schema_name = database_info.connection_info().schema_name().to_string();
 
     match step {
-        SqlMigrationStep::CreateEnum(create_enum) => render_create_enum(renderer, create_enum),
-        SqlMigrationStep::DropEnum(drop_enum) => render_drop_enum(renderer, drop_enum),
+        SqlMigrationStep::CreateEnum(create_enum) => Ok(renderer.render_create_enum(create_enum)),
+        SqlMigrationStep::DropEnum(drop_enum) => Ok(renderer.render_drop_enum(drop_enum)),
         SqlMigrationStep::AlterEnum(alter_enum) => match renderer.sql_family() {
             SqlFamily::Postgres => postgres_alter_enum(alter_enum, next_schema, &schema_name)?.into(),
             SqlFamily::Mysql => mysql_alter_enum(alter_enum, next_schema, &schema_name),
@@ -485,40 +485,6 @@ fn safe_alter_column(
     };
 
     renderer.render_alter_column(&differ)
-}
-
-fn render_create_enum(
-    renderer: &(dyn SqlFlavour + Send + Sync),
-    create_enum: &CreateEnum,
-) -> Result<Vec<String>, anyhow::Error> {
-    match renderer.sql_family() {
-        SqlFamily::Postgres => {
-            let sql = format!(
-                r#"CREATE TYPE {enum_name} AS ENUM ({variants});"#,
-                enum_name = Quoted::postgres_ident(&create_enum.name),
-                variants = create_enum.variants.iter().map(Quoted::postgres_string).join(", "),
-            );
-            Ok(vec![sql])
-        }
-        _ => Ok(Vec::new()),
-    }
-}
-
-fn render_drop_enum(
-    renderer: &(dyn SqlFlavour + Send + Sync),
-    drop_enum: &DropEnum,
-) -> Result<Vec<String>, anyhow::Error> {
-    match renderer.sql_family() {
-        SqlFamily::Postgres => {
-            let sql = format!(
-                "DROP TYPE {enum_name}",
-                enum_name = Quoted::postgres_ident(&drop_enum.name),
-            );
-
-            Ok(vec![sql])
-        }
-        _ => Ok(Vec::new()),
-    }
 }
 
 fn postgres_alter_enum(
