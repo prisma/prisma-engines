@@ -182,7 +182,7 @@ impl<'a> Reformatter<'a> {
             "datasource",
             target,
             token,
-            Box::new(|table, _, token| match token.as_rule() {
+            Box::new(|table, _, token, _| match token.as_rule() {
                 Rule::key_value => Self::reformat_key_value(table, &token),
                 _ => Self::reformat_generic_token(table, &token),
             }),
@@ -194,7 +194,7 @@ impl<'a> Reformatter<'a> {
             "generator",
             target,
             token,
-            Box::new(|table, _, token| {
+            Box::new(|table, _, token, _| {
                 //
                 match token.as_rule() {
                     Rule::key_value => Self::reformat_key_value(table, &token),
@@ -227,14 +227,14 @@ impl<'a> Reformatter<'a> {
             "model",
             target,
             &token,
-            Box::new(|table, renderer, token| {
+            Box::new(|table, renderer, token, model_name | {
                 match token.as_rule() {
                     Rule::directive => {
                         // model level Directives reset the table. -> .render() does that
                         table.render(renderer);
                         Self::reformat_directive(renderer, &token, "@@");
                     }
-                    Rule::field_declaration => self.reformat_field(table, &token),
+                    Rule::field_declaration => self.reformat_field(table, &token, model_name),
                     _ => Self::reformat_generic_token(table, &token),
                 }
             }),
@@ -256,7 +256,7 @@ impl<'a> Reformatter<'a> {
         block_type: &'static str,
         renderer: &'a mut Renderer,
         token: &'a Token,
-        the_fn: Box<dyn Fn(&mut TableFormat, &mut Renderer, &Token) -> () + 'a>,
+        the_fn: Box<dyn Fn(&mut TableFormat, &mut Renderer, &Token, &str) -> () + 'a>,
     ) {
         self.reformat_block_element_internal(block_type, renderer, token, the_fn, {
             // a no op
@@ -269,7 +269,7 @@ impl<'a> Reformatter<'a> {
         block_type: &'static str,
         renderer: &'a mut Renderer,
         token: &'a Token,
-        the_fn: Box<dyn Fn(&mut TableFormat, &mut Renderer, &Token) -> () + 'a>,
+        the_fn: Box<dyn Fn(&mut TableFormat, &mut Renderer, &Token, &str) -> () + 'a>,
         after_fn: Box<dyn Fn(&mut TableFormat, &mut Renderer, &str) -> () + 'a>,
     ) {
         let mut table = TableFormat::new();
@@ -319,7 +319,7 @@ impl<'a> Reformatter<'a> {
                 Rule::BLOCK_LEVEL_CATCH_ALL => {
                     table.interleave(strip_new_line(current.as_str()));
                 }
-                _ => the_fn(&mut table, renderer, &current),
+                _ => the_fn(&mut table, renderer, &current, block_name),
             }
         }
 
@@ -337,7 +337,7 @@ impl<'a> Reformatter<'a> {
             "enum",
             target,
             token,
-            Box::new(|table, target, token| {
+            Box::new(|table, target, token, _| {
                 //
                 match token.as_rule() {
                     Rule::block_level_directive => {
@@ -363,7 +363,7 @@ impl<'a> Reformatter<'a> {
         }
     }
 
-    fn reformat_field(&self, target: &mut TableFormat, token: &Token) {
+    fn reformat_field(&self, target: &mut TableFormat, token: &Token, model_name: &str) {
         let field_name = &Self::get_identifier(token);
         for current in token.clone().into_inner() {
             match current.as_rule() {
@@ -384,7 +384,7 @@ impl<'a> Reformatter<'a> {
         }
         if let Ok(missing_field_directives) = self.missing_field_directives.as_ref() {
             for missing_field_directive in missing_field_directives.iter() {
-                if &missing_field_directive.field == field_name {
+                if &missing_field_directive.field == field_name && missing_field_directive.model.as_str() == model_name {
                     Renderer::render_field_directive(
                         &mut target.column_locked_writer_for(2),
                         &missing_field_directive.directive,
