@@ -373,7 +373,7 @@ fn relation_must_succeed_when_type_alias_is_used_for_referenced_field() {
 }
 
 #[test]
-fn must_error_when_fields_argument_is_missing_for_one_to_many() {
+fn must_succeed_when_fields_argument_is_missing_for_one_to_many() {
     let dml = r#"
     model User {
         id        Int @id
