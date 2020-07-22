@@ -21,6 +21,6 @@ failure = { version = "0.1", features = ["derive"] }
 rand = "0.7"
 datamodel = { path = "../datamodel/core" }
 itertools = "0.8"
-rust_decimal = "1.6"
+rust_decimal = { git = "https://github.com/pimeys/rust-decimal", branch = "pgbouncer-mode" }
 quaint = { git = "https://github.com/prisma/quaint", optional = true, features = ["uuid-0_8"] }
 prisma-value = { path = "../prisma-value", features = ["sql-ext"] }

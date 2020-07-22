@@ -6,7 +6,7 @@ edition = "2018"
 
 [dependencies]
 prisma-value = { path = "../../prisma-value" }
-rust_decimal = "1.6"
+rust_decimal = { git = "https://github.com/pimeys/rust-decimal", branch = "pgbouncer-mode" }
 datamodel-connector = { path = "../connectors/datamodel-connector" }
 # Temporary until PR is accepted.
 pest = { version = "2.1.0", package = 'pest_tmp' }
