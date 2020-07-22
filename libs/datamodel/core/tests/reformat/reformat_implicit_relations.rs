@@ -69,6 +69,45 @@ model Post {
 }
 
 #[test]
+fn back_relation_fields_missing_directives_should_not_add_directives_multiple_times() {
+    let input = r#"model User {
+  id Int @id
+  post Post
+}
+
+model Post {
+  id Int @id
+}
+
+model Cat {
+  id Int @id
+  post Post
+}
+"#;
+
+    let expected = r#"model User {
+  id     Int  @id
+  post   Post @relation(fields: [postId], references: [id])
+  postId Int?
+}
+
+model Post {
+  id   Int    @id
+  User User[]
+  Cat  Cat[]
+}
+
+model Cat {
+  id     Int  @id
+  post   Post @relation(fields: [postId], references: [id])
+  postId Int?
+}
+"#;
+
+    assert_reformat(input, expected);
+}
+
+#[test]
 fn back_relations_must_be_added_even_when_env_vars_are_missing() {
     // missing env vars led to errors in datamodel validation. A successful validation is prerequisite to find missing back relation fields though.
     // I changed the Reformatter to ignore env var errors.
