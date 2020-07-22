@@ -370,14 +370,12 @@ async fn get_all_indexes(
                 }
                 None => {
                     debug!("Instantiating primary key");
-                    std::mem::replace(
-                        primary_key,
-                        Some(PrimaryKey {
-                            columns: vec![column_name],
-                            sequence: None,
-                            constraint_name: None,
-                        }),
-                    );
+
+                    primary_key.replace(PrimaryKey {
+                        columns: vec![column_name],
+                        sequence: None,
+                        constraint_name: None,
+                    });
                 }
             };
         } else if indexes_map.contains_key(&index_name) {
