@@ -3,8 +3,6 @@ use pretty_assertions::assert_eq;
 use quaint::connector::Queryable;
 use std::sync::Arc;
 
-//todo split into barrel and assert???
-
 pub(crate) fn custom_assert(left: &str, right: &str) {
     let parsed_expected = datamodel::parse_datamodel(&right).unwrap();
     let reformatted_expected =

@@ -27,11 +27,7 @@ pub fn add_prisma_1_id_defaults(
                 let table = schema.table(table_name).unwrap();
                 let column_name = id_field.database_name.as_ref().unwrap_or(&id_field.name);
                 let column = table.column(column_name).unwrap();
-
-                let model_and_field = ModelAndField {
-                    model: model.name.clone(),
-                    field: id_field.name.clone(),
-                };
+                let model_and_field = ModelAndField::new(&model.name, &id_field.name);
 
                 match (
                     &column.tpe.data_type,
