@@ -5,6 +5,7 @@ use crate::{
     },
     RelationField,
 };
+use itertools::Itertools;
 
 pub fn walk_models<'a>(datamodel: &'a Datamodel) -> impl Iterator<Item = ModelWalker<'a>> + 'a {
     datamodel.models().map(move |model| ModelWalker { datamodel, model })
@@ -19,6 +20,24 @@ pub fn walk_scalar_fields<'a>(datamodel: &'a Datamodel) -> impl Iterator<Item = 
             field,
         })
     })
+}
+
+/// Iterator over all the relations in the schema. Each relation will only occur
+/// once.
+pub fn walk_relations(datamodel: &Datamodel) -> impl Iterator<Item = RelationWalker<'_>> {
+    walk_models(datamodel)
+        .flat_map(move |model| model.into_relation_fields())
+        .map(|relation_field| {
+            let opposite_field = relation_field.opposite_side();
+            let (field_a, field_b) = if relation_field.model().name() < opposite_field.model().name() {
+                (relation_field, opposite_field)
+            } else {
+                (opposite_field, relation_field)
+            };
+
+            RelationWalker { field_a, field_b }
+        })
+        .unique_by(|walker| walker.field_a.relation_name())
 }
 
 #[derive(Debug, Copy, Clone)]
@@ -38,6 +57,14 @@ impl<'a> ModelWalker<'a> {
 
     pub fn db_name(&self) -> &str {
         self.model.final_database_name()
+    }
+
+    pub fn into_relation_fields(self) -> impl Iterator<Item = RelationFieldWalker<'a>> + 'a {
+        self.model.relation_fields().map(move |field| RelationFieldWalker {
+            datamodel: self.datamodel,
+            model: self.model,
+            field,
+        })
     }
 
     pub fn relation_fields<'b>(&'b self) -> impl Iterator<Item = RelationFieldWalker<'a>> + 'b {
@@ -179,7 +206,7 @@ impl<'a> TypeWalker<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct RelationFieldWalker<'a> {
     datamodel: &'a Datamodel,
     model: &'a Model,
@@ -197,6 +224,13 @@ impl<'a> RelationFieldWalker<'a> {
 
     pub fn is_virtual(&self) -> bool {
         self.field.relation_info.fields.is_empty()
+    }
+
+    pub fn model(&self) -> ModelWalker<'a> {
+        ModelWalker {
+            datamodel: self.datamodel,
+            model: self.model,
+        }
     }
 
     pub fn opposite_side(&self) -> RelationFieldWalker<'a> {
@@ -283,5 +317,63 @@ impl<'a> IndexWalker<'a> {
                 .find(|f| f.name() == field_name.as_str())
                 .expect("index on unknown model field")
         })
+    }
+}
+
+#[derive(Debug)]
+pub struct RelationWalker<'a> {
+    field_a: RelationFieldWalker<'a>,
+    field_b: RelationFieldWalker<'a>,
+}
+
+impl<'a> RelationWalker<'a> {
+    pub fn as_m2m(&self) -> Option<ManyToManyRelationWalker<'a>> {
+        match (self.field_a.arity(), self.field_b.arity()) {
+            (FieldArity::List, FieldArity::List) => Some(ManyToManyRelationWalker {
+                field_a: self.field_a.clone(),
+                field_b: self.field_b.clone(),
+            }),
+            _ => None,
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct ManyToManyRelationWalker<'a> {
+    field_a: RelationFieldWalker<'a>,
+    field_b: RelationFieldWalker<'a>,
+}
+
+impl<'a> ManyToManyRelationWalker<'a> {
+    pub fn model_a_column(&self) -> &str {
+        "A"
+    }
+
+    pub fn model_a_id(&self) -> ScalarFieldWalker<'a> {
+        self.field_a
+            .model()
+            .id_fields()
+            .next()
+            .expect("Missing id field on a model in a M2M relation.")
+    }
+
+    pub fn model_b_column(&self) -> &str {
+        "B"
+    }
+
+    pub fn model_b_id(&self) -> ScalarFieldWalker<'a> {
+        self.field_b
+            .model()
+            .id_fields()
+            .next()
+            .expect("Missing id field on a model in a M2M relation.")
+    }
+
+    pub fn relation_name(&self) -> &str {
+        self.field_a.relation_name()
+    }
+
+    pub fn table_name(&self) -> String {
+        format!("_{}", self.relation_name())
     }
 }

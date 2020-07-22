@@ -6,7 +6,7 @@ use crate::{
     sql_schema_helpers::*,
 };
 use once_cell::sync::Lazy;
-use prisma_models::PrismaValue;
+use prisma_value::PrismaValue;
 use regex::Regex;
 use sql_schema_describer::*;
 use std::borrow::Cow;

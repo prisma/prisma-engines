@@ -5,7 +5,6 @@ pub(super) enum SqlMigrationWarningCheck {
     NonEmptyColumnDrop { table: String, column: String },
     NonEmptyTableDrop { table: String },
     AlterColumn { table: String, column: String },
-    ForeignKeyDefaultValueRemoved { table: String, column: String },
     PrimaryKeyChange { table: String },
 }
 
@@ -14,9 +13,7 @@ impl Check for SqlMigrationWarningCheck {
         match self {
             SqlMigrationWarningCheck::NonEmptyTableDrop { table }
             | SqlMigrationWarningCheck::PrimaryKeyChange { table } => Some(table),
-            SqlMigrationWarningCheck::NonEmptyColumnDrop { .. }
-            | SqlMigrationWarningCheck::AlterColumn { .. }
-            | SqlMigrationWarningCheck::ForeignKeyDefaultValueRemoved { .. } => None,
+            SqlMigrationWarningCheck::NonEmptyColumnDrop { .. } | SqlMigrationWarningCheck::AlterColumn { .. } => None,
         }
     }
 
@@ -24,9 +21,10 @@ impl Check for SqlMigrationWarningCheck {
         match self {
             SqlMigrationWarningCheck::NonEmptyColumnDrop { table, column }
             | SqlMigrationWarningCheck::AlterColumn { table, column } => Some((table, column)),
-            SqlMigrationWarningCheck::ForeignKeyDefaultValueRemoved { .. }
-            | SqlMigrationWarningCheck::NonEmptyTableDrop { .. }
-            | SqlMigrationWarningCheck::PrimaryKeyChange { .. } => None,
+
+            SqlMigrationWarningCheck::NonEmptyTableDrop { .. } | SqlMigrationWarningCheck::PrimaryKeyChange { .. } => {
+                None
+            }
         }
     }
 
@@ -50,7 +48,6 @@ impl Check for SqlMigrationWarningCheck {
                 (_, _) => Some(format!("You are about to alter the column `{column_name}` on the `{table_name}` table. The data in that column could be lost.", column_name = column, table_name = table)),
 
             },
-            SqlMigrationWarningCheck::ForeignKeyDefaultValueRemoved { table, column } => Some(format!("The migration is about to remove a default value on the foreign key field `{}.{}`.", table, column)),
             SqlMigrationWarningCheck::PrimaryKeyChange { table } => match database_check_results.get_row_count(table) {
                 Some(0) => None,
                 _ => Some(format!("The migration will change the primary key for the `{table}` table. If it partially fails, the table could be left without primary key constraint.", table = table)),

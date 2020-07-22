@@ -7,10 +7,10 @@ use crate::{
     },
     sql_schema_differ::ColumnDiffer,
 };
-use sql_schema_describer::{ColumnArity, Table};
+use sql_schema_describer::ColumnArity;
 
 impl DestructiveChangeCheckerFlavour for SqliteFlavour {
-    fn check_alter_column(&self, previous_table: &Table, columns: &ColumnDiffer<'_>, plan: &mut DestructiveCheckPlan) {
+    fn check_alter_column(&self, columns: &ColumnDiffer<'_>, plan: &mut DestructiveCheckPlan) {
         let arity_change_is_safe = match (&columns.previous.arity(), &columns.next.arity()) {
             // column became required
             (ColumnArity::Nullable, ColumnArity::Required) => false,
@@ -31,13 +31,13 @@ impl DestructiveChangeCheckerFlavour for SqliteFlavour {
             && columns.next.default().is_none()
         {
             plan.push_unexecutable(UnexecutableStepCheck::MadeOptionalFieldRequired {
-                table: previous_table.name.clone(),
+                table: columns.previous.table().name().to_owned(),
                 column: columns.previous.name().to_owned(),
             });
         }
 
         plan.push_warning(SqlMigrationWarningCheck::AlterColumn {
-            table: previous_table.name.clone(),
+            table: columns.previous.table().name().to_owned(),
             column: columns.next.name().to_owned(),
         });
     }

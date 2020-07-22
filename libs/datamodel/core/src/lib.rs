@@ -61,7 +61,8 @@ fn parse_datamodel_internal(
 ) -> Result<Datamodel, error::ErrorCollection> {
     let ast = ast::parser::parse_schema(datamodel_string)?;
     let sources = load_sources(&ast, ignore_datasource_urls, vec![])?;
-    let validator = ValidationPipeline::with_sources(&sources);
+    let generators = GeneratorLoader::load_generators_from_ast(&ast)?;
+    let validator = ValidationPipeline::new(&sources, &generators);
 
     validator.validate(&ast)
 }
@@ -72,7 +73,8 @@ pub fn lift_ast_to_datamodel(ast: &ast::SchemaAst) -> Result<Datamodel, error::E
     let mut errors = error::ErrorCollection::new();
     // we are not interested in the sources in this case. Hence we can ignore the datasource urls.
     let sources = load_sources(ast, true, vec![])?;
-    let validator = ValidationPipeline::with_sources(&sources);
+    let generators = GeneratorLoader::load_generators_from_ast(&ast)?;
+    let validator = ValidationPipeline::new(&sources, &generators);
 
     match validator.validate(&ast) {
         Ok(src) => Ok(src),
@@ -175,7 +177,7 @@ pub fn render_datamodel_and_config_to_string(
 }
 
 /// Renders a datamodel, generators and sources to a stream as a string.
-pub fn render_datamodel_and_config_to(
+fn render_datamodel_and_config_to(
     stream: &mut dyn std::io::Write,
     datamodel: &dml::Datamodel,
     config: &configuration::Configuration,
