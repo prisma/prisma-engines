@@ -227,7 +227,7 @@ impl<'a> Reformatter<'a> {
             "model",
             target,
             &token,
-            Box::new(|table, renderer, token, model_name | {
+            Box::new(|table, renderer, token, model_name| {
                 match token.as_rule() {
                     Rule::directive => {
                         // model level Directives reset the table. -> .render() does that
@@ -384,7 +384,8 @@ impl<'a> Reformatter<'a> {
         }
         if let Ok(missing_field_directives) = self.missing_field_directives.as_ref() {
             for missing_field_directive in missing_field_directives.iter() {
-                if &missing_field_directive.field == field_name && missing_field_directive.model.as_str() == model_name {
+                if &missing_field_directive.field == field_name && missing_field_directive.model.as_str() == model_name
+                {
                     Renderer::render_field_directive(
                         &mut target.column_locked_writer_for(2),
                         &missing_field_directive.directive,
