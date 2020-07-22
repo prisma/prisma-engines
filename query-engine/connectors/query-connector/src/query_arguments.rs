@@ -28,22 +28,16 @@ pub struct QueryArguments {
 }
 
 impl QueryArguments {
-    // [DTODO] This is a SQL implementation detail leaking into the core abstractions. Needs to move into the SQL connector.
-    pub fn needs_reversed_order(&self) -> bool {
-        self.take.map(|t| t < 0).unwrap_or(false)
-    }
+    // fn needs_implicit_ordering(&self) -> bool {
+    //     self.skip.is_some() || self.cursor.is_some() || self.take.is_some() || self.order_by.is_some()
+    // }
 
-    fn needs_implicit_ordering(&self) -> bool {
-        self.skip.is_some() || self.cursor.is_some() || self.take.is_some() || self.order_by.is_some()
-    }
-
-    pub fn ordering_directions(&self) -> OrderDirections {
-        OrderDirections {
-            needs_to_be_reverse_order: self.needs_reversed_order(),
-            needs_implicit_id_ordering: self.needs_implicit_ordering(),
-            primary_order_by: self.order_by.clone(),
-        }
-    }
+    // pub fn ordering_directions(&self) -> OrderDirections {
+    //     OrderDirections {
+    //         needs_implicit_id_ordering: self.needs_implicit_ordering(),
+    //         primary_order_by: self.order_by.clone(),
+    //     }
+    // }
 
     pub fn take_abs(&self) -> Option<i64> {
         self.take.clone().map(|t| if t < 0 { t * -1 } else { t })
@@ -95,8 +89,7 @@ where
     }
 }
 
-pub struct OrderDirections {
-    pub needs_implicit_id_ordering: bool,
-    pub needs_to_be_reverse_order: bool,
-    pub primary_order_by: Option<OrderBy>,
-}
+// pub struct OrderDirections {
+//     pub needs_implicit_id_ordering: bool,
+//     pub primary_order_by: Option<OrderBy>,
+// }

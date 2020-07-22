@@ -11,9 +11,9 @@ use std::convert::TryInto;
 /// e.g. that the query schema guarantees that required fields are present.
 /// Errors occur if conversions fail.
 pub fn extract_query_args(arguments: Vec<ParsedArgument>, model: &ModelRef) -> QueryGraphBuilderResult<QueryArguments> {
-    arguments
-        .into_iter()
-        .fold(Ok(QueryArguments::default()), |result, arg| {
+    let query_args = arguments.into_iter().fold(
+        Ok(QueryArguments::default()),
+        |result: QueryGraphBuilderResult<QueryArguments>, arg| {
             if let Ok(res) = result {
                 match arg.name.as_str() {
                     "cursor" => Ok(QueryArguments {
@@ -57,7 +57,10 @@ pub fn extract_query_args(arguments: Vec<ParsedArgument>, model: &ModelRef) -> Q
             } else {
                 result
             }
-        })
+        },
+    )?;
+
+    Ok(finalize_arguments(query_args))
 }
 
 fn extract_distinct(value: ParsedInputValue) -> QueryGraphBuilderResult<ModelProjection> {
@@ -135,4 +138,13 @@ fn extract_compound_cursor_field(
     }
 
     Ok(pairs)
+}
+
+fn finalize_arguments(args: QueryArguments) -> QueryArguments {
+    // Check if the query requires implicit ordering by primary ID
+    if args.skip.is_some() || args.cursor.is_some() || args.take.is_some() || args.order_by.is_some() {
+        todo!()
+    }
+
+    todo!()
 }

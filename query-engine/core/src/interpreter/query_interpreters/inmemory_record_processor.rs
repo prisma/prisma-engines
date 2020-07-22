@@ -7,7 +7,6 @@ pub struct InMemoryRecordProcessor {
     skip: Option<i64>,
     take: Option<i64>,
     cursor: Option<RecordProjection>,
-    needs_reversing: bool,
     distinct: Option<ModelProjection>,
 }
 
@@ -17,7 +16,6 @@ impl InMemoryRecordProcessor {
             skip: args.skip.clone(),
             take: args.take_abs(),
             cursor: args.cursor.clone(),
-            needs_reversing: args.needs_reversed_order(),
             distinct: args.distinct.clone(),
         };
 
@@ -28,8 +26,14 @@ impl InMemoryRecordProcessor {
         processor
     }
 
+    /// Checks whether or not we need to take records going backwards in the record list,
+    /// which requires reversing the list of records at some point.
+    fn needs_reversed_order(&self) -> bool {
+        self.take.map(|t| t < 0).unwrap_or(false)
+    }
+
     pub fn apply(&self, mut records: ManyRecords) -> ManyRecords {
-        if self.needs_reversing {
+        if self.needs_reversed_order() {
             records.records.reverse();
         }
 
@@ -156,7 +160,7 @@ impl InMemoryRecordProcessor {
             is_beyond_skip_range && is_within_take_range
         });
 
-        if self.needs_reversing {
+        if self.needs_reversed_order() {
             many_records.records.reverse();
         }
 
