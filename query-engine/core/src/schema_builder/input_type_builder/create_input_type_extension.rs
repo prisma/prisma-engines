@@ -144,7 +144,7 @@ pub trait CreateInputTypeBuilderExtension<'a>: InputTypeBuilderBase<'a> {
                     let input_field = if rf.is_required && !all_required_scalar_fields_have_defaults {
                         input_field(rf.name.clone(), input_type, None)
                     } else {
-                        input_field(rf.name.clone(), InputType::opt(InputType::null(input_type)), None)
+                        input_field(rf.name.clone(), InputType::opt(input_type), None)
                     };
 
                     Some(input_field)

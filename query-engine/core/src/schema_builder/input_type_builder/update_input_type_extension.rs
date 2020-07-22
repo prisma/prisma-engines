@@ -104,12 +104,7 @@ pub trait UpdateInputTypeBuilderExtension<'a>: InputTypeBuilderBase<'a> + Create
                         }
                     };
 
-                    let field_type = InputType::object(input_object);
-                    let field_type = if rf.is_optional() {
-                        InputType::opt(InputType::null(field_type))
-                    } else {
-                        InputType::opt(field_type)
-                    };
+                    let field_type = InputType::opt(InputType::object(input_object));
 
                     Some(input_field(rf.name.clone(), field_type, None))
                 }
