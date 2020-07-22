@@ -5,7 +5,7 @@ use crate::{
 };
 use connector::QueryArguments;
 use itertools::Itertools;
-use prisma_models::{Field, ModelProjection, ModelRef, PrismaValue, RecordProjection, ScalarFieldRef};
+use prisma_models::{Field, ModelProjection, ModelRef, OrderBy, PrismaValue, RecordProjection, ScalarFieldRef};
 use std::convert::TryInto;
 
 /// Expects the caller to know that it is structurally guaranteed that query arguments can be extracted,
@@ -33,7 +33,7 @@ pub fn extract_query_args(arguments: Vec<ParsedArgument>, model: &ModelRef) -> Q
                     }),
 
                     "orderBy" => Ok(QueryArguments {
-                        order_by: Some(arg.value.try_into()?),
+                        order_by: extract_order_by(arg.value)?,
                         ..res
                     }),
 
@@ -62,6 +62,10 @@ pub fn extract_query_args(arguments: Vec<ParsedArgument>, model: &ModelRef) -> Q
     )?;
 
     Ok(finalize_arguments(query_args, model))
+}
+
+fn extract_order_by(value: ParsedInputValue) -> QueryGraphBuilderResult<Vec<OrderBy>> {
+    todo!()
 }
 
 fn extract_distinct(value: ParsedInputValue) -> QueryGraphBuilderResult<ModelProjection> {
@@ -156,10 +160,13 @@ fn finalize_arguments(mut args: QueryArguments, model: &ModelRef) -> QueryArgume
 
     if needs_implicit_ordering && no_orderby_is_unique {
         let primary_identifier = model.primary_identifier();
-        let additional_orderings = primary_identifier.into_iter().map(|f| f.into());
+        let additional_orderings = primary_identifier.into_iter().map(|f| match f {
+            Field::Scalar(f) => f.into(),
+            _ => unreachable!(),
+        });
 
         args.order_by.extend(additional_orderings);
-        args.order_by = args.order_by.into_iter().unique_by(|o| o.field.name).collect();
+        args.order_by = args.order_by.into_iter().unique_by(|o| o.field.name.clone()).collect();
     }
 
     args

@@ -28,10 +28,6 @@ pub struct QueryArguments {
 }
 
 impl QueryArguments {
-    // fn needs_implicit_ordering(&self) -> bool {
-    //     self.skip.is_some() || self.cursor.is_some() || self.take.is_some() || self.order_by.is_some()
-    // }
-
     // pub fn ordering_directions(&self) -> OrderDirections {
     //     OrderDirections {
     //         needs_implicit_id_ordering: self.needs_implicit_ordering(),
