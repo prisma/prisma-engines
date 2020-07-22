@@ -27,17 +27,15 @@ pub fn walk_scalar_fields<'a>(datamodel: &'a Datamodel) -> impl Iterator<Item = 
 pub fn walk_relations(datamodel: &Datamodel) -> impl Iterator<Item = RelationWalker<'_>> {
     walk_models(datamodel)
         .flat_map(move |model| model.into_relation_fields())
+        .unique_by(|walker| walker.relation_name())
         .map(|relation_field| {
-            let opposite_field = relation_field.opposite_side();
-            let (field_a, field_b) = if relation_field.model().name() < opposite_field.model().name() {
-                (relation_field, opposite_field)
-            } else {
-                (opposite_field, relation_field)
-            };
+            let field_b = relation_field.opposite_side();
 
-            RelationWalker { field_a, field_b }
+            RelationWalker {
+                field_a: relation_field,
+                field_b,
+            }
         })
-        .unique_by(|walker| walker.field_a.relation_name())
 }
 
 #[derive(Debug, Copy, Clone)]
@@ -329,10 +327,18 @@ pub struct RelationWalker<'a> {
 impl<'a> RelationWalker<'a> {
     pub fn as_m2m(&self) -> Option<ManyToManyRelationWalker<'a>> {
         match (self.field_a.arity(), self.field_b.arity()) {
-            (FieldArity::List, FieldArity::List) => Some(ManyToManyRelationWalker {
-                field_a: self.field_a.clone(),
-                field_b: self.field_b.clone(),
-            }),
+            (FieldArity::List, FieldArity::List) => {
+                let (field_a, field_b) = if self.field_a.model().name() < self.field_b.model().name() {
+                    (&self.field_a, &self.field_b)
+                } else {
+                    (&self.field_b, &self.field_a)
+                };
+
+                Some(ManyToManyRelationWalker {
+                    field_a: field_a.clone(),
+                    field_b: field_b.clone(),
+                })
+            }
             _ => None,
         }
     }

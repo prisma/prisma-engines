@@ -280,8 +280,8 @@ async fn get_all_columns(
                             unescape_and_unquote_default_string(default_string, flavour),
                         )),
                         //todo check other now() definitions
-                        ColumnTypeFamily::DateTime => match default_string.to_lowercase().as_str() {
-                            "current_timestamp" | "current_timestamp()" => DefaultValue::NOW,
+                        ColumnTypeFamily::DateTime => match default_is_current_timestamp(&default_string) {
+                            true => DefaultValue::NOW,
                             _ => DefaultValue::DBGENERATED(default_string),
                         },
                         ColumnTypeFamily::Binary => DefaultValue::DBGENERATED(default_string),
@@ -370,14 +370,12 @@ async fn get_all_indexes(
                 }
                 None => {
                     debug!("Instantiating primary key");
-                    std::mem::replace(
-                        primary_key,
-                        Some(PrimaryKey {
-                            columns: vec![column_name],
-                            sequence: None,
-                            constraint_name: None,
-                        }),
-                    );
+
+                    primary_key.replace(PrimaryKey {
+                        columns: vec![column_name],
+                        sequence: None,
+                        constraint_name: None,
+                    });
                 }
             };
         } else if indexes_map.contains_key(&index_name) {
@@ -615,4 +613,12 @@ fn unescape_and_unquote_default_string(default: String, flavour: &Flavour) -> St
     };
 
     MYSQL_ESCAPING_RE.replace_all(maybe_unquoted.as_ref(), "$1$2").into()
+}
+
+/// Tests whether an introspected default value should be categorized as current_timestamp.
+fn default_is_current_timestamp(default_str: &str) -> bool {
+    static MYSQL_CURRENT_TIMESTAMP_RE: Lazy<Regex> =
+        Lazy::new(|| Regex::new(r#"(?i)current_timestamp(\([0-9]*\))?"#).unwrap());
+
+    MYSQL_CURRENT_TIMESTAMP_RE.is_match(default_str)
 }
