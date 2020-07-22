@@ -97,6 +97,14 @@ impl SqlRenderer for MysqlFlavour {
             after: None,
         })
     }
+
+    fn render_create_enum(&self, _create_enum: &crate::CreateEnum) -> Vec<String> {
+        Vec::new() // enums are defined on each column that uses them on MySQL
+    }
+
+    fn render_drop_enum(&self, _drop_enum: &crate::DropEnum) -> Vec<String> {
+        Vec::new()
+    }
 }
 
 fn render_mysql_modify(

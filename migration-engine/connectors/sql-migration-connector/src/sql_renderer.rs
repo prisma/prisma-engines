@@ -7,7 +7,7 @@ mod sqlite_renderer;
 
 pub(crate) use common::{IteratorJoin, Quoted, QuotedWithSchema};
 
-use crate::{sql_schema_differ::ColumnDiffer, sql_schema_helpers::ColumnRef};
+use crate::{sql_schema_differ::ColumnDiffer, sql_schema_helpers::ColumnRef, CreateEnum, DropEnum};
 use sql_schema_describer::*;
 use std::borrow::Cow;
 
@@ -32,6 +32,12 @@ pub(crate) trait SqlRenderer {
     /// of) ALTER COLUMN(s), and we should fall back to dropping and recreating
     /// the column.
     fn render_alter_column(&self, differ: &ColumnDiffer<'_>) -> Option<RenderedAlterColumn>;
+
+    /// Render a `CreateEnum` step.
+    fn render_create_enum(&self, create_enum: &CreateEnum) -> Vec<String>;
+
+    /// Render a `DropEnum` step.
+    fn render_drop_enum(&self, drop_enum: &DropEnum) -> Vec<String>;
 }
 
 #[derive(Default)]

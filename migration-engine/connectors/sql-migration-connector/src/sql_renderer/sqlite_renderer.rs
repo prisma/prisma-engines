@@ -69,6 +69,14 @@ impl SqlRenderer for SqliteFlavour {
     fn render_alter_column(&self, _differ: &crate::sql_schema_differ::ColumnDiffer<'_>) -> Option<RenderedAlterColumn> {
         None
     }
+
+    fn render_create_enum(&self, _create_enum: &crate::CreateEnum) -> Vec<String> {
+        Vec::new()
+    }
+
+    fn render_drop_enum(&self, _drop_enum: &crate::DropEnum) -> Vec<String> {
+        Vec::new()
+    }
 }
 
 fn render_column_type(t: &ColumnType) -> String {
