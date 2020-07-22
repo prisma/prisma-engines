@@ -125,96 +125,14 @@ impl<'a> ObjectTypeBuilder<'a> {
         }
     }
 
-    /// Builds "many records where" arguments based on the given model and field.
-    pub fn many_records_field_arguments(&self, field: &ModelField) -> Vec<Argument> {
-        match field {
-            ModelField::Scalar(_) => vec![],
-            ModelField::Relation(rf) if rf.is_list && !rf.related_model().is_embedded => {
-                self.many_records_arguments(&rf.related_model())
-            }
-            ModelField::Relation(rf) if rf.is_list && rf.related_model().is_embedded => vec![],
-            ModelField::Relation(rf) if !rf.is_list => vec![],
-            _ => unreachable!(),
-        }
-    }
+    /// Builds "<Model>OrderByInput" object types.
+    fn order_by_object_type(&self, model: &ModelRef) -> ObjectTypeRef {
+        let enum_type = string_enum_type("SortOrder", vec!["ASC".to_owned(), "DESC".to_owned()]);
+        let name = format!("{}OrderByInput", model.name);
 
-    /// Builds "many records where" arguments solely based on the given model.
-    pub fn many_records_arguments(&self, model: &ModelRef) -> Vec<Argument> {
-        let unique_input_type = InputType::opt(InputType::object(
-            self.input_type_builder.into_arc().where_unique_object_type(model),
-        ));
+        return_cached!(self.get_cache(), &name);
 
-        let mut args = vec![
-            self.where_argument(&model),
-            self.order_by_argument(&model),
-            argument("cursor", unique_input_type.clone(), None),
-            argument("take", InputType::opt(InputType::int()), None),
-            argument("skip", InputType::opt(InputType::int()), None),
-        ];
-
-        if feature_flags::get().distinct {
-            let enum_type = Arc::new(EnumType::FieldRef(FieldRefEnumType {
-                name: format!("{}DistinctFieldEnum", capitalize(&model.name)),
-                values: model
-                    .fields()
-                    .scalar()
-                    .into_iter()
-                    .map(|field| (field.name.clone(), field))
-                    .collect(),
-            }));
-
-            args.push(argument(
-                "distinct",
-                InputType::opt(InputType::list(InputType::Enum(enum_type))),
-                None,
-            ));
-        }
-
-        args
-    }
-
-    /// Builds "where" argument.
-    pub fn where_argument(&self, model: &ModelRef) -> Argument {
-        let where_object = self
-            .filter_object_type_builder
-            .into_arc()
-            .filter_object_type(Arc::clone(model));
-
-        argument("where", InputType::opt(InputType::object(where_object)), None)
-    }
-
-    // Builds "orderBy" argument.
-    pub fn order_by_argument(&self, model: &ModelRef) -> Argument {
-        let enum_values: Vec<_> = model
-            .fields()
-            .scalar()
-            .into_iter()
-            .filter(|field| !field.is_list)
-            .map(|field| {
-                vec![
-                    (
-                        format!("{}_{}", field.name, SortOrder::Ascending.to_string()),
-                        OrderBy {
-                            field: field.clone(),
-                            sort_order: SortOrder::Ascending,
-                        },
-                    ),
-                    (
-                        format!("{}_{}", field.name, SortOrder::Descending.to_string()),
-                        OrderBy {
-                            field: field.clone(),
-                            sort_order: SortOrder::Descending,
-                        },
-                    ),
-                ]
-            })
-            .flatten()
-            .collect();
-
-        let enum_name = format!("{}OrderByInput", model.name);
-        let enum_type = order_by_enum_type(enum_name, enum_values);
-
-        argument("orderBy", InputType::opt(enum_type.into()), None)
+        todo!()
     }
 
     pub fn map_enum_field(scalar_field: &Arc<ScalarField>) -> EnumType {

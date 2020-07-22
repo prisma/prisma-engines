@@ -173,4 +173,12 @@ impl InternalDataModel {
             })
             .as_slice()
     }
+
+    pub fn non_embedded_models(&self) -> Vec<ModelRef> {
+        self.models()
+            .iter()
+            .filter(|m| !m.is_embedded)
+            .map(|m| Arc::clone(m))
+            .collect()
+    }
 }

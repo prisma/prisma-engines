@@ -265,9 +265,9 @@ impl QueryDocumentParser {
                 Some(value) => Ok(ParsedInputValue::Single(value)),
                 None => err(&i.name),
             },
-            EnumType::OrderBy(ord) => match ord.value_for(raw.as_str()) {
-                Some(val) => Ok(ParsedInputValue::OrderBy(val.clone())),
-                None => err(&ord.name),
+            EnumType::String(s) => match s.value_for(raw.as_str()) {
+                Some(val) => Ok(ParsedInputValue::Single(PrismaValue::String(val.to_owned()))),
+                None => err(&s.name),
             },
             EnumType::FieldRef(f) => match f.value_for(raw.as_str()) {
                 Some(value) => Ok(ParsedInputValue::ScalarField(value.clone())),
