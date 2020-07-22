@@ -179,18 +179,20 @@ pub fn row_value_to_prisma_value(p_value: Value, type_identifier: &TypeIdentifie
         },
         TypeIdentifier::Float => match p_value {
             value if value.is_null() => PrismaValue::null(type_identifier.clone()),
-            Value::Real(Some(f)) => PrismaValue::Float(f),
+            Value::Real(Some(f)) => PrismaValue::Float(f.normalize()),
             Value::Integer(Some(i)) => {
                 // Decimal::from_f64 is buggy. Issue: https://github.com/paupino/rust-decimal/issues/228
                 PrismaValue::Float(Decimal::from_str(&(i as f64).to_string()).expect("f64 was not a Decimal."))
             }
-            Value::Text(_) | Value::Bytes(_) => PrismaValue::Float(
-                p_value
+            Value::Text(_) | Value::Bytes(_) => {
+                let dec: Decimal = p_value
                     .as_str()
                     .expect("text/bytes as str")
                     .parse()
-                    .map_err(|err: rust_decimal::Error| SqlError::ColumnReadFailure(err.into()))?,
-            ),
+                    .map_err(|err: rust_decimal::Error| SqlError::ColumnReadFailure(err.into()))?;
+
+                PrismaValue::Float(dec.normalize())
+            }
             _ => {
                 let error = io::Error::new(
                     io::ErrorKind::InvalidData,
