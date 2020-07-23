@@ -109,10 +109,8 @@ pub trait CreateInputTypeBuilderExtension<'a>: InputTypeBuilderBase<'a> {
                 let arity_part = if rf.is_list { "Many" } else { "One" };
                 let without_part = format!("Without{}", capitalize(&related_field.name));
                 let input_name = format!("{}Create{}{}Input", related_model.name, arity_part, without_part);
-                let field_is_opposite_relation_field = parent_field
-                    .as_ref()
-                    .filter(|pf| pf.related_field().name == rf.name)
-                    .is_some();
+                let field_is_opposite_relation_field =
+                    parent_field.filter(|pf| pf.related_field().name == rf.name).is_some();
 
                 if field_is_opposite_relation_field {
                     None
@@ -146,7 +144,7 @@ pub trait CreateInputTypeBuilderExtension<'a>: InputTypeBuilderBase<'a> {
                     let input_field = if rf.is_required && !all_required_scalar_fields_have_defaults {
                         input_field(rf.name.clone(), input_type, None)
                     } else {
-                        input_field(rf.name.clone(), InputType::opt(InputType::null(input_type)), None)
+                        input_field(rf.name.clone(), InputType::opt(input_type), None)
                     };
 
                     Some(input_field)
