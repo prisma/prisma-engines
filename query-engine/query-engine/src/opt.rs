@@ -51,12 +51,12 @@ pub struct PrismaOpt {
 
     /// The port the query engine should bind to.
     // NOTE: this is mutually exclusive with path
-    #[structopt(long, short, env, default_value = "4466", group = "port")]
+    #[structopt(long, short, env, default_value = "4466")]
     pub port: u16,
 
     /// The unix socket path to listen on
     // NOTE: this is mutually exclusive with port.
-    #[structopt(long, short, env, group = "port")]
+    #[structopt(long, short, env)]
     unix_path: Option<String>,
 
     /// Path to the Prisma datamodel file
