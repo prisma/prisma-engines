@@ -16,7 +16,7 @@ pub(crate) fn nested_connect_or_create_input_object(
 
     let type_name = format!(
         "{}CreateOrConnectWithout{}Input",
-        related_model.name.clone(),
+        related_model.name,
         parent_field.model().name
     );
 
@@ -120,7 +120,7 @@ fn relation_input_fields_for_create(
                     Some(t) => t,
                     None => {
                         let input_object = Arc::new(init_input_object_type(input_name.clone()));
-                        ctx.cache_input_type(input_name, Arc::clone(&input_object));
+                        ctx.cache_input_type(input_name, input_object.clone());
 
                         let mut fields = vec![input_fields::nested_create_input_field(ctx, &rf)];
                         let nested_connect = input_fields::nested_connect_input_field(ctx, &rf);

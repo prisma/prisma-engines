@@ -49,10 +49,7 @@ fn single_item_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<Field
 /// Builds a "multiple" query arity items field (e.g. "users", "posts", ...) for given model.
 fn all_items_field(ctx: &mut BuilderContext, model: &ModelRef) -> Field {
     let args = arguments::many_records_arguments(ctx, &model);
-    let field_name = ctx.pluralize_internal(
-        camel_case(pluralize(model.name.clone())),
-        format!("findMany{}", model.name.clone()),
-    );
+    let field_name = ctx.pluralize_internal(camel_case(pluralize(&model.name)), format!("findMany{}", model.name));
 
     field(
         field_name,
@@ -76,8 +73,8 @@ fn all_items_field(ctx: &mut BuilderContext, model: &ModelRef) -> Field {
 fn aggregation_field(ctx: &mut BuilderContext, model: &ModelRef) -> Field {
     let args = arguments::many_records_arguments(ctx, &model);
     let field_name = ctx.pluralize_internal(
-        format!("aggregate{}", model.name.clone()), // Has no legacy counterpart.
-        format!("aggregate{}", model.name.clone()),
+        format!("aggregate{}", model.name), // Has no legacy counterpart.
+        format!("aggregate{}", model.name),
     );
 
     field(

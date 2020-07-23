@@ -2,7 +2,7 @@ use super::*;
 
 /// Builds "<x>UpdateInput" input object type.
 pub(crate) fn update_input_type(ctx: &mut BuilderContext, model: &ModelRef) -> InputObjectTypeWeakRef {
-    let name = format!("{}UpdateInput", model.name.clone());
+    let name = format!("{}UpdateInput", model.name);
     return_cached_input!(ctx, &name);
 
     let input_object = Arc::new(init_input_object_type(name.clone()));
@@ -69,7 +69,7 @@ fn relation_input_fields_for_update(
                 (false, false) => "One",
             };
 
-            let without_part = format!("Without{}", capitalize(related_field.name.clone()));
+            let without_part = format!("Without{}", capitalize(&related_field.name));
 
             let input_name = format!("{}Update{}{}Input", related_model.name, arity_part, without_part);
             let field_is_opposite_relation_field = parent_field
@@ -151,8 +151,8 @@ fn nested_upsert_list_input_object(
 
     let type_name = format!(
         "{}UpsertWithWhereUniqueWithout{}Input",
-        related_model.name.clone(),
-        capitalize(parent_field.related_field().name.clone())
+        related_model.name,
+        capitalize(&parent_field.related_field().name)
     );
 
     match ctx.get_input_type(&type_name) {
@@ -188,8 +188,8 @@ fn nested_upsert_nonlist_input_object(
 
     let type_name = format!(
         "{}UpsertWithout{}Input",
-        related_model.name.clone(),
-        capitalize(parent_field.related_field().name.clone())
+        related_model.name,
+        capitalize(&parent_field.related_field().name)
     );
 
     match ctx.get_input_type(&type_name) {

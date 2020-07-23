@@ -27,7 +27,7 @@ fn map_required_input_type(ctx: &BuilderContext, field: &ScalarFieldRef) -> Inpu
         TypeIdentifier::UUID => InputType::uuid(),
         TypeIdentifier::DateTime => InputType::date_time(),
         TypeIdentifier::Json => InputType::json(),
-        TypeIdentifier::Enum(_) => map_enum_input_type(ctx, &field),
+        TypeIdentifier::Enum(_) => map_enum_input_type(&field),
     };
 
     let typ = if field.is_list { InputType::list(typ) } else { typ };
@@ -36,7 +36,7 @@ fn map_required_input_type(ctx: &BuilderContext, field: &ScalarFieldRef) -> Inpu
     typ
 }
 
-fn map_enum_input_type(ctx: &BuilderContext, field: &ScalarFieldRef) -> InputType {
+fn map_enum_input_type(field: &ScalarFieldRef) -> InputType {
     let internal_enum = field
         .internal_enum
         .as_ref()

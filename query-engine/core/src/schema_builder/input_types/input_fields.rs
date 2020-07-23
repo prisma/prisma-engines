@@ -127,7 +127,7 @@ where
         .filter(|f| !f.is_list)
         .map(|f| {
             let default = if with_defaults { f.default_value.clone() } else { None };
-            input_field(f.name.clone(), field_mapper(Arc::clone(f), ctx), default)
+            input_field(f.name.clone(), field_mapper(f.clone(), ctx), default)
         })
         .collect();
 
@@ -143,7 +143,7 @@ where
                     let set_fields = vec![input_field("set", map_optional_input_type(ctx, &f), None)];
                     let input_object = Arc::new(input_object_type(set_name.clone(), set_fields));
 
-                    ctx.cache_input_type(set_name, Arc::clone(&input_object));
+                    ctx.cache_input_type(set_name, input_object.clone());
                     Arc::downgrade(&input_object)
                 }
             };

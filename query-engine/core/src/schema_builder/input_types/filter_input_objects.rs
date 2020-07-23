@@ -96,13 +96,7 @@ pub(crate) fn where_unique_object_type(ctx: &mut BuilderContext, model: &ModelRe
     ctx.cache_input_type(name, input_object.clone());
 
     // Single unique or ID fields.
-    let unique_fields: Vec<ScalarFieldRef> = model
-        .fields()
-        .scalar()
-        .iter()
-        .filter(|f| f.unique())
-        .map(|f| f.clone())
-        .collect();
+    let unique_fields: Vec<ScalarFieldRef> = model.fields().scalar().into_iter().filter(|f| f.unique()).collect();
 
     let mut fields: Vec<InputField> = unique_fields
         .into_iter()

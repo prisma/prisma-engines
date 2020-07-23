@@ -127,7 +127,7 @@ pub(crate) fn batch_payload_object_type(ctx: &mut BuilderContext) -> ObjectTypeW
         None,
     ));
 
-    ctx.cache_output_type("BatchPayload".into(), Arc::clone(&object_type));
+    ctx.cache_output_type("BatchPayload".into(), object_type.clone());
     Arc::downgrade(&object_type)
 }
 
