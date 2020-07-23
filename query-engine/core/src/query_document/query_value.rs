@@ -1,8 +1,9 @@
+use indexmap::IndexMap;
 use prisma_value::{stringify_date, PrismaValue};
 use rust_decimal::Decimal;
-use std::collections::BTreeMap;
+use std::hash::Hash;
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum QueryValue {
     Int(i64),
     Float(Decimal),
@@ -11,11 +12,29 @@ pub enum QueryValue {
     Null,
     Enum(String),
     List(Vec<QueryValue>),
-    Object(BTreeMap<String, QueryValue>),
+    Object(IndexMap<String, QueryValue>),
+}
+
+impl Hash for QueryValue {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        match self {
+            Self::Int(i) => i.hash(state),
+            Self::Float(f) => f.hash(state),
+            Self::String(s) => s.hash(state),
+            Self::Boolean(b) => b.hash(state),
+            Self::Null => (),
+            Self::Enum(s) => s.hash(state),
+            Self::List(l) => l.hash(state),
+            Self::Object(map) => {
+                let converted: std::collections::BTreeMap<&String, &QueryValue> = map.into_iter().collect();
+                converted.hash(state);
+            }
+        }
+    }
 }
 
 impl QueryValue {
-    pub fn into_object(self) -> Option<BTreeMap<String, QueryValue>> {
+    pub fn into_object(self) -> Option<IndexMap<String, QueryValue>> {
         match self {
             Self::Object(map) => Some(map),
             _ => None,
