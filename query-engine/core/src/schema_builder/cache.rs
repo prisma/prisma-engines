@@ -67,10 +67,20 @@ impl<T> From<Vec<(String, Arc<T>)>> for TypeRefCache<T> {
     }
 }
 
-/// Convenience cache utility to load and return immediately if a type is already cached.
-macro_rules! return_cached {
-    ($cache:expr, $name:expr) => {
-        let existing_type = $cache.get($name);
+/// Convenience cache utility to load and return immediately if an input object type is already cached.
+macro_rules! return_cached_input {
+    ($ctx:expr, $name:expr) => {
+        let existing_type = $ctx.get_input_type($name);
+        if existing_type.is_some() {
+            return existing_type.unwrap();
+        }
+    };
+}
+
+/// Convenience cache utility to load and return immediately if an output object type is already cached.
+macro_rules! return_cached_output {
+    ($ctx:ident, $name:expr) => {
+        let existing_type = $ctx.get_output_type($name);
         if existing_type.is_some() {
             return existing_type.unwrap();
         }

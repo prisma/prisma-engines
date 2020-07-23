@@ -35,6 +35,7 @@ mod cache;
 mod arguments;
 mod filter_arguments;
 mod mutation_type;
+mod output_objects;
 mod query_type;
 mod utils;
 
@@ -61,7 +62,7 @@ pub(crate) struct BuilderContext {
     mode: BuildMode,
     internal_data_model: InternalDataModelRef,
     enable_raw_queries: bool,
-    cache: TypeCaches,
+    cache: TypeCache,
 }
 
 impl BuilderContext {
@@ -70,7 +71,7 @@ impl BuilderContext {
             mode,
             internal_data_model,
             enable_raw_queries,
-            cache: TypeCaches::new(),
+            cache: TypeCache::new(),
         }
     }
 
@@ -81,15 +82,35 @@ impl BuilderContext {
             BuildMode::Modern => modern,
         }
     }
+
+    /// Get an input (object) type.
+    pub fn get_input_type(&mut self, name: &str) -> Option<InputObjectTypeWeakRef> {
+        self.cache.input_types.get(name)
+    }
+
+    /// Get an output (object) type.
+    pub fn get_output_type(&mut self, name: &str) -> Option<ObjectTypeWeakRef> {
+        self.cache.output_types.get(name)
+    }
+
+    /// Caches an input (object) type.
+    pub fn cache_input_type(&mut self, name: String, typ: InputObjectTypeStrongRef) {
+        self.cache.input_types.insert(name, typ);
+    }
+
+    /// Caches an output (object) type.
+    pub fn cache_output_type(&mut self, name: String, typ: ObjectTypeStrongRef) {
+        self.cache.output_types.insert(name, typ);
+    }
 }
 
 #[derive(Debug)]
-struct TypeCaches {
+struct TypeCache {
     input_types: TypeRefCache<InputObjectType>,
     output_types: TypeRefCache<ObjectType>,
 }
 
-impl TypeCaches {
+impl TypeCache {
     pub fn new() -> Self {
         Self {
             input_types: TypeRefCache::new(),
@@ -111,6 +132,8 @@ impl TypeCaches {
 
 pub fn build(internal_data_model: InternalDataModelRef, mode: BuildMode, enable_raw_queries: bool) -> QuerySchema {
     let mut ctx = BuilderContext::new(mode, internal_data_model, enable_raw_queries);
+    output_objects::initialize_model_object_type_cache(&mut ctx);
+
     let (query_type, query_object_ref) = query_type::build(&mut ctx);
     let (mutation_type, mutation_object_ref) = mutation_type::build(&mut ctx);
     let (input_objects, mut output_objects) = ctx.cache.collect_types();
