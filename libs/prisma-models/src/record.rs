@@ -44,7 +44,7 @@ impl ManyRecords {
         }
     }
 
-    pub fn order_by(&mut self, order_by: &OrderBy) {
+    pub fn order_by(&mut self, order_bys: &[OrderBy]) {
         let field_indices: HashMap<&str, usize> = self
             .field_names
             .iter()
@@ -53,12 +53,18 @@ impl ManyRecords {
             .collect();
 
         self.records.sort_by(|a, b| {
-            let index = field_indices[order_by.field.db_name()];
+            let mut orderings = order_bys.into_iter().map(|o| {
+                let index = field_indices[o.field.db_name()];
+                match o.sort_order {
+                    SortOrder::Ascending => a.values[index].cmp(&b.values[index]),
+                    SortOrder::Descending => b.values[index].cmp(&a.values[index]),
+                }
+            });
 
-            match order_by.sort_order {
-                SortOrder::Ascending => a.values[index].cmp(&b.values[index]),
-                SortOrder::Descending => b.values[index].cmp(&a.values[index]),
-            }
+            orderings
+                .next()
+                .map(|first| orderings.fold(first, |acc, ord| acc.then(ord)))
+                .unwrap()
         })
     }
 

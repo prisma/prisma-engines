@@ -7,6 +7,12 @@ pub struct OrderBy {
     pub sort_order: SortOrder,
 }
 
+impl OrderBy {
+    pub fn new(field: ScalarFieldRef, sort_order: SortOrder) -> Self {
+        Self { field, sort_order }
+    }
+}
+
 pub trait IntoOrderBy {
     fn into_order_by(self, model: ModelRef) -> OrderBy;
 }

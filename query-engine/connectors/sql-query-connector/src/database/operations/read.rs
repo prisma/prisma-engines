@@ -43,7 +43,7 @@ pub async fn get_many_records(
     // [DTODO] Absolutely no idea what the reasoning here is.
     if query_arguments.can_batch() {
         // We don't need to order in the database due to us ordering in this function.
-        let order = query_arguments.order_by.take();
+        let order = std::mem::replace(&mut query_arguments.order_by, vec![]);
 
         let batches = query_arguments.batched();
         let mut futures = FuturesUnordered::new();
@@ -59,8 +59,8 @@ pub async fn get_many_records(
             }
         }
 
-        if let Some(ref order_by) = order {
-            records.order_by(order_by)
+        if !order.is_empty() {
+            records.order_by(&order)
         }
     } else {
         let query = read::get_records(model, selected_fields.as_columns(), query_arguments);

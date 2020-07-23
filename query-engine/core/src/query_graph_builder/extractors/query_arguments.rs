@@ -5,7 +5,9 @@ use crate::{
 };
 use connector::QueryArguments;
 use itertools::Itertools;
-use prisma_models::{Field, ModelProjection, ModelRef, OrderBy, PrismaValue, RecordProjection, ScalarFieldRef};
+use prisma_models::{
+    Field, ModelProjection, ModelRef, OrderBy, PrismaValue, RecordProjection, ScalarFieldRef, SortOrder,
+};
 use std::convert::TryInto;
 
 /// Expects the caller to know that it is structurally guaranteed that query arguments can be extracted,
@@ -33,7 +35,7 @@ pub fn extract_query_args(arguments: Vec<ParsedArgument>, model: &ModelRef) -> Q
                     }),
 
                     "orderBy" => Ok(QueryArguments {
-                        order_by: extract_order_by(arg.value)?,
+                        order_by: extract_order_by(model, arg.value)?,
                         ..res
                     }),
 
@@ -64,8 +66,25 @@ pub fn extract_query_args(arguments: Vec<ParsedArgument>, model: &ModelRef) -> Q
     Ok(finalize_arguments(query_args, model))
 }
 
-fn extract_order_by(value: ParsedInputValue) -> QueryGraphBuilderResult<Vec<OrderBy>> {
-    todo!()
+/// Extracts order by conditions in order of appearance, as defined in
+fn extract_order_by(model: &ModelRef, value: ParsedInputValue) -> QueryGraphBuilderResult<Vec<OrderBy>> {
+    match value {
+        ParsedInputValue::Map(map) => map
+            .into_iter()
+            .map(|(field_name, sort_order)| {
+                let field = model.fields().find_from_scalar(&field_name)?;
+                let value: PrismaValue = sort_order.try_into()?;
+                let sort_order = match value.into_string().unwrap().to_lowercase().as_str() {
+                    "asc" => SortOrder::Ascending,
+                    "desc" => SortOrder::Descending,
+                    _ => unreachable!(),
+                };
+
+                Ok(OrderBy::new(field, sort_order))
+            })
+            .collect::<QueryGraphBuilderResult<Vec<_>>>(),
+        _ => unreachable!(),
+    }
 }
 
 fn extract_distinct(value: ParsedInputValue) -> QueryGraphBuilderResult<ModelProjection> {
