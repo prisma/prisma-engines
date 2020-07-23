@@ -33,7 +33,7 @@
 #[macro_use]
 mod cache;
 mod arguments;
-mod filter_arguments;
+mod input_types;
 mod mutation_type;
 mod output_objects;
 mod query_type;

@@ -137,7 +137,7 @@ pub(crate) fn aggregation_object_type(ctx: &mut BuilderContext, model: &ModelRef
     return_cached_output!(ctx, &name);
 
     let object = ObjectTypeStrongRef::new(ObjectType::new(&name, Some(ModelRef::clone(model))));
-    let mut fields = vec![count_field(ctx)];
+    let mut fields = vec![count_field()];
 
     if feature_flags::get().aggregations {
         append_opt(
@@ -156,7 +156,7 @@ pub(crate) fn aggregation_object_type(ctx: &mut BuilderContext, model: &ModelRef
     ObjectTypeStrongRef::downgrade(&object)
 }
 
-pub(crate) fn count_field(ctx: &mut BuilderContext) -> Field {
+pub(crate) fn count_field() -> Field {
     field("count", vec![], OutputType::int(), None)
 }
 

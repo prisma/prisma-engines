@@ -7,12 +7,9 @@ pub(crate) fn build(ctx: &mut BuilderContext) -> (OutputType, ObjectTypeStrongRe
     let fields = non_embedded_models
         .into_iter()
         .map(|model| {
-            let mut vec = vec![
-                all_items_field(ctx, model.clone()),
-                aggregation_field(ctx, model.clone()),
-            ];
+            let mut vec = vec![all_items_field(ctx, &model), aggregation_field(ctx, &model)];
 
-            append_opt(&mut vec, single_item_field(ctx, model.clone()));
+            append_opt(&mut vec, single_item_field(ctx, &model));
             vec
         })
         .flatten()
@@ -24,10 +21,9 @@ pub(crate) fn build(ctx: &mut BuilderContext) -> (OutputType, ObjectTypeStrongRe
 }
 
 /// Builds a "single" query arity item field (e.g. "user", "post" ...) for given model.
-fn single_item_field(ctx: &mut BuilderContext, model: ModelRef) -> Option<Field> {
-    arguments::where_unique_argument(ctx, model.clone()).map(|arg| {
-        let field_name =
-            ctx.pluralize_internal(camel_case(model.name.clone()), format!("findOne{}", model.name.clone()));
+fn single_item_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<Field> {
+    arguments::where_unique_argument(ctx, model).map(|arg| {
+        let field_name = ctx.pluralize_internal(camel_case(&model.name), format!("findOne{}", model.name));
 
         field(
             field_name,
@@ -51,7 +47,7 @@ fn single_item_field(ctx: &mut BuilderContext, model: ModelRef) -> Option<Field>
 }
 
 /// Builds a "multiple" query arity items field (e.g. "users", "posts", ...) for given model.
-fn all_items_field(ctx: &mut BuilderContext, model: ModelRef) -> Field {
+fn all_items_field(ctx: &mut BuilderContext, model: &ModelRef) -> Field {
     let args = arguments::many_records_arguments(ctx, &model);
     let field_name = ctx.pluralize_internal(
         camel_case(pluralize(model.name.clone())),
@@ -77,7 +73,7 @@ fn all_items_field(ctx: &mut BuilderContext, model: ModelRef) -> Field {
 }
 
 /// Builds an "aggregate" query field (e.g. "aggregateUser") for given model.
-fn aggregation_field(ctx: &mut BuilderContext, model: ModelRef) -> Field {
+fn aggregation_field(ctx: &mut BuilderContext, model: &ModelRef) -> Field {
     let args = arguments::many_records_arguments(ctx, &model);
     let field_name = ctx.pluralize_internal(
         format!("aggregate{}", model.name.clone()), // Has no legacy counterpart.
