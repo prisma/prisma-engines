@@ -30,15 +30,16 @@
 //! The cache can be consumed to produce a list of strong references to the individual input and output
 //! object types, which are then moved to the query schema to keep weak references alive (see TypeRefCache for additional infos).
 
+#[macro_use]
+mod cache;
 mod arguments;
 mod filter_arguments;
 mod mutation_type;
 mod query_type;
 mod utils;
 
-use std::collections::HashMap;
-
 use crate::schema::*;
+use cache::TypeRefCache;
 use prisma_models::{Field as ModelField, Index, InternalDataModelRef, ModelRef, TypeIdentifier};
 use std::sync::Arc;
 
@@ -60,7 +61,7 @@ pub(crate) struct BuilderContext {
     mode: BuildMode,
     internal_data_model: InternalDataModelRef,
     enable_raw_queries: bool,
-    cache: TypeCache,
+    cache: TypeCaches,
 }
 
 impl BuilderContext {
@@ -69,7 +70,7 @@ impl BuilderContext {
             mode,
             internal_data_model,
             enable_raw_queries,
-            cache: TypeCache::default(),
+            cache: TypeCaches::new(),
         }
     }
 
@@ -82,20 +83,27 @@ impl BuilderContext {
     }
 }
 
-#[derive(Default)]
-struct TypeCache {
-    input_types: HashMap<String, InputObjectTypeStrongRef>,
-    output_types: HashMap<String, ObjectTypeStrongRef>,
+#[derive(Debug)]
+struct TypeCaches {
+    input_types: TypeRefCache<InputObjectType>,
+    output_types: TypeRefCache<ObjectType>,
 }
 
-impl TypeCache {
+impl TypeCaches {
+    pub fn new() -> Self {
+        Self {
+            input_types: TypeRefCache::new(),
+            output_types: TypeRefCache::new(),
+        }
+    }
+
     /// Consumes the cache and collects all types to merge them into the vectors required to
     /// finalize the query schema building.
     /// Unwraps are safe because the cache is required to be the only strong Arc ref holder,
     /// which makes the Arc counter 1, all other refs contained in the schema are weak refs.
     pub fn collect_types(self) -> (Vec<InputObjectTypeStrongRef>, Vec<ObjectTypeStrongRef>) {
-        let input_objects = self.input_types.into_iter().map(|(_, v)| v).collect();
-        let output_objects = self.output_types.into_iter().map(|(_, v)| v).collect();
+        let input_objects = self.input_types.into();
+        let output_objects = self.output_types.into();
 
         (input_objects, output_objects)
     }
