@@ -1,6 +1,6 @@
-use prisma_models::{InternalEnum, OrderBy, ScalarFieldRef};
+use prisma_models::{InternalEnum, ScalarFieldRef};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum EnumType {
     /// Generic, prisma-application specific string enum.
     /// Semantics are defined by the component interpreting the contents.

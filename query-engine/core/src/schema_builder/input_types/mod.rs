@@ -1,24 +1,39 @@
-mod create_input_objects;
-mod filter_arguments;
-mod filter_input_objects;
-mod input_fields;
-mod update_input_objects;
-
-pub use create_input_objects::*;
-pub use filter_arguments::*;
-pub use filter_input_objects::*;
-pub use input_fields::*;
-pub use update_input_objects::*;
+pub(crate) mod create_input_objects;
+pub(crate) mod filter_arguments;
+pub(crate) mod filter_input_objects;
+pub(crate) mod input_fields;
+pub(crate) mod update_input_objects;
 
 use super::*;
 use crate::schema::*;
 use prisma_models::{RelationFieldRef, ScalarFieldRef};
 
-fn map_optional_input_type(ctx: &BuilderContext, field: &ScalarFieldRef) -> InputType {
-    InputType::opt(map_required_input_type(ctx, field))
+/// Builds "<Model>OrderByInput" object types.
+pub(crate) fn order_by_object_type(ctx: &mut BuilderContext, model: &ModelRef) -> InputObjectTypeWeakRef {
+    let enum_type = Arc::new(string_enum_type("SortOrder", vec!["ASC".to_owned(), "DESC".to_owned()]));
+    let name = format!("{}OrderByInput", model.name);
+
+    return_cached_input!(ctx, &name);
+
+    let input_object = Arc::new(init_input_object_type(name.clone()));
+    ctx.cache_input_type(name, input_object.clone());
+
+    let fields = model
+        .fields()
+        .scalar()
+        .iter()
+        .map(|sf| input_field(sf.name.clone(), InputType::Enum(enum_type.clone()), None))
+        .collect();
+
+    input_object.set_fields(fields);
+    Arc::downgrade(&input_object)
 }
 
-fn map_required_input_type(ctx: &BuilderContext, field: &ScalarFieldRef) -> InputType {
+fn map_optional_input_type(field: &ScalarFieldRef) -> InputType {
+    InputType::opt(map_required_input_type(field))
+}
+
+fn map_required_input_type(field: &ScalarFieldRef) -> InputType {
     let typ = match field.type_identifier {
         TypeIdentifier::String => InputType::string(),
         TypeIdentifier::Int => InputType::int(),

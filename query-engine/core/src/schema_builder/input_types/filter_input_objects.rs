@@ -28,7 +28,7 @@ pub(crate) fn scalar_filter_object_type(ctx: &mut BuilderContext, model: &ModelR
     ];
 
     let fields: Vec<ScalarFieldRef> = model.fields().scalar();
-    let mut fields: Vec<InputField> = fields.iter().flat_map(|f| map_input_field(ctx, f)).collect();
+    let mut fields: Vec<InputField> = fields.iter().flat_map(|f| map_input_field(f)).collect();
 
     input_fields.append(&mut fields);
     input_object.set_fields(input_fields);
@@ -66,7 +66,7 @@ pub(crate) fn where_object_type(ctx: &mut BuilderContext, model: &ModelRef) -> I
         .fields()
         .scalar()
         .iter()
-        .map(|sf| map_input_field(ctx, sf))
+        .map(|sf| map_input_field(sf))
         .flatten()
         .collect();
 
@@ -74,7 +74,7 @@ pub(crate) fn where_object_type(ctx: &mut BuilderContext, model: &ModelRef) -> I
         .fields()
         .relation()
         .iter()
-        .map(|rf| map_relation_filter_input_field(ctx, rf))
+        .map(|rf| input_fields::map_relation_filter_input_field(ctx, rf))
         .flatten()
         .collect();
 
@@ -102,7 +102,7 @@ pub(crate) fn where_unique_object_type(ctx: &mut BuilderContext, model: &ModelRe
         .into_iter()
         .map(|sf| {
             let name = sf.name.clone();
-            let typ = map_optional_input_type(ctx, &sf);
+            let typ = map_optional_input_type(&sf);
 
             input_field(name, typ, None)
         })
@@ -157,7 +157,7 @@ fn compound_field_unique_object_type(
         .into_iter()
         .map(|field| {
             let name = field.name.clone();
-            let typ = map_required_input_type(ctx, &field);
+            let typ = map_required_input_type(&field);
 
             input_field(name, typ, None)
         })
@@ -167,12 +167,12 @@ fn compound_field_unique_object_type(
     Arc::downgrade(&input_object)
 }
 
-fn map_input_field(ctx: &mut BuilderContext, field: &ScalarFieldRef) -> Vec<InputField> {
+fn map_input_field(field: &ScalarFieldRef) -> Vec<InputField> {
     filter_arguments::get_field_filters(&ModelField::Scalar(field.clone()))
         .into_iter()
         .map(|arg| {
             let field_name = format!("{}{}", field.name, arg.suffix);
-            let mapped = map_required_input_type(ctx, &field);
+            let mapped = map_required_input_type(&field);
 
             if arg.is_list && field.is_required {
                 input_field(field_name, InputType::opt(InputType::list(mapped)), None)

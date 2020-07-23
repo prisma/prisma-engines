@@ -1,5 +1,4 @@
 use super::*;
-use prisma_models::OrderBy;
 use prisma_models::ScalarFieldRef;
 
 /// Initializes model output object type cache on the context.
@@ -91,17 +90,6 @@ pub(crate) fn map_output_type(ctx: &mut BuilderContext, model_field: &ModelField
     } else {
         output_type
     }
-}
-
-// wip
-/// Builds "<Model>OrderByInput" object types.
-pub(crate) fn order_by_object_type(ctx: &mut BuilderContext, model: &ModelRef) -> ObjectTypeWeakRef {
-    let enum_type = string_enum_type("SortOrder", vec!["ASC".to_owned(), "DESC".to_owned()]);
-    let name = format!("{}OrderByInput", model.name);
-
-    return_cached_output!(ctx, &name);
-
-    todo!()
 }
 
 pub(crate) fn map_enum_field(scalar_field: &ScalarFieldRef) -> EnumType {

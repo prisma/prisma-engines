@@ -2,14 +2,14 @@ use super::*;
 
 /// Builds "where" argument.
 pub(crate) fn where_argument(ctx: &mut BuilderContext, model: &ModelRef) -> Argument {
-    let where_object = input_types::where_object_type(ctx, model);
+    let where_object = input_types::filter_input_objects::where_object_type(ctx, model);
 
     argument("where", InputType::opt(InputType::object(where_object)), None)
 }
 
 /// Builds "where" argument which input type is the where unique type of the input builder.
 pub(crate) fn where_unique_argument(ctx: &mut BuilderContext, model: &ModelRef) -> Option<Argument> {
-    let input_object_type = input_types::where_unique_object_type(ctx, &model);
+    let input_object_type = input_types::filter_input_objects::where_unique_object_type(ctx, &model);
 
     if input_object_type.into_arc().is_empty() {
         None
@@ -20,7 +20,7 @@ pub(crate) fn where_unique_argument(ctx: &mut BuilderContext, model: &ModelRef) 
 
 /// Builds "data" argument intended for the create field.
 pub(crate) fn create_arguments(ctx: &mut BuilderContext, model: &ModelRef) -> Option<Vec<Argument>> {
-    let input_object_type = input_types::create_input_type(ctx, model, None);
+    let input_object_type = input_types::create_input_objects::create_input_type(ctx, model, None);
 
     if input_object_type.into_arc().is_empty() {
         None
@@ -37,7 +37,7 @@ pub(crate) fn delete_arguments(ctx: &mut BuilderContext, model: &ModelRef) -> Op
 /// Builds "where" (unique) and "data" arguments intended for the update field.
 pub(crate) fn update_arguments(ctx: &mut BuilderContext, model: &ModelRef) -> Option<Vec<Argument>> {
     where_unique_argument(ctx, model).map(|unique_arg| {
-        let input_object = input_types::update_input_type(ctx, model);
+        let input_object = input_types::update_input_objects::update_input_type(ctx, model);
         let input_object_type = InputType::object(input_object);
 
         vec![argument("data", input_object_type, None), unique_arg]
@@ -47,8 +47,8 @@ pub(crate) fn update_arguments(ctx: &mut BuilderContext, model: &ModelRef) -> Op
 /// Builds "where" (unique), "create", and "update" arguments intended for the upsert field.
 pub(crate) fn upsert_arguments(ctx: &mut BuilderContext, model: &ModelRef) -> Option<Vec<Argument>> {
     where_unique_argument(ctx, model).and_then(|where_unique_arg| {
-        let update_type = input_types::update_input_type(ctx, model);
-        let create_type = input_types::create_input_type(ctx, model, None);
+        let update_type = input_types::update_input_objects::update_input_type(ctx, model);
+        let create_type = input_types::create_input_objects::create_input_type(ctx, model, None);
 
         if update_type.into_arc().is_empty() || create_type.into_arc().is_empty() {
             None
@@ -64,7 +64,7 @@ pub(crate) fn upsert_arguments(ctx: &mut BuilderContext, model: &ModelRef) -> Op
 
 /// Builds "where" and "data" arguments intended for the update many field.
 pub(crate) fn update_many_arguments(ctx: &mut BuilderContext, model: &ModelRef) -> Vec<Argument> {
-    let update_object = input_types::update_many_input_type(ctx, model);
+    let update_object = input_types::update_input_objects::update_many_input_type(ctx, model);
     let where_arg = where_argument(ctx, model);
 
     vec![argument("data", InputType::object(update_object), None), where_arg]
@@ -92,7 +92,9 @@ pub(crate) fn many_records_field_arguments(ctx: &mut BuilderContext, field: &Mod
 
 /// Builds "many records where" arguments solely based on the given model.
 pub(crate) fn many_records_arguments(ctx: &mut BuilderContext, model: &ModelRef) -> Vec<Argument> {
-    let unique_input_type = InputType::opt(InputType::object(input_types::where_unique_object_type(ctx, model)));
+    let unique_input_type = InputType::opt(InputType::object(
+        input_types::filter_input_objects::where_unique_object_type(ctx, model),
+    ));
 
     let mut args = vec![
         where_argument(ctx, &model),
@@ -125,37 +127,7 @@ pub(crate) fn many_records_arguments(ctx: &mut BuilderContext, model: &ModelRef)
 
 // Builds "orderBy" argument.
 pub(crate) fn order_by_argument(ctx: &mut BuilderContext, model: &ModelRef) -> Argument {
-    // enum_type.into()
-    // todo object type
+    let object_type = input_types::order_by_object_type(ctx, model);
 
-    // let enum_values: Vec<_> = model
-    //     .fields()
-    //     .scalar()
-    //     .into_iter()
-    //     .filter(|field| !field.is_list)
-    //     .map(|field| {
-    //         vec![
-    //             (
-    //                 format!("{}_{}", field.name, SortOrder::Ascending.to_string()),
-    //                 OrderBy {
-    //                     field: field.clone(),
-    //                     sort_order: SortOrder::Ascending,
-    //                 },
-    //             ),
-    //             (
-    //                 format!("{}_{}", field.name, SortOrder::Descending.to_string()),
-    //                 OrderBy {
-    //                     field: field.clone(),
-    //                     sort_order: SortOrder::Descending,
-    //                 },
-    //             ),
-    //         ]
-    //     })
-    //     .flatten()
-    //     .collect();
-
-    // let object_type = self.order_by_object_type(model);
-
-    // argument("orderBy", InputType::opt(InputType::object(object_type)), None)
-    todo!()
+    argument("orderBy", InputType::opt(InputType::object(object_type)), None)
 }

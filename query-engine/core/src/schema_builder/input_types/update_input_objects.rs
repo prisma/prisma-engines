@@ -41,7 +41,7 @@ fn scalar_input_fields_for_update(ctx: &mut BuilderContext, model: &ModelRef) ->
             .scalar_writable()
             .filter(field_should_be_kept_for_update_input_type)
             .collect(),
-        |f: ScalarFieldRef, ctx: &mut BuilderContext| map_optional_input_type(ctx, &f),
+        |f: ScalarFieldRef| map_optional_input_type(&f),
         false,
     )
 }
@@ -104,7 +104,7 @@ fn relation_input_fields_for_update(
                         append_opt(&mut fields, input_fields::nested_upsert_field(ctx, rf));
 
                         if feature_flags::get().connectOrCreate {
-                            append_opt(&mut fields, nested_connect_or_create_field(ctx, rf));
+                            append_opt(&mut fields, input_fields::nested_connect_or_create_field(ctx, rf));
                         }
 
                         input_object.set_fields(fields);
@@ -142,8 +142,8 @@ fn nested_upsert_list_input_object(
     update_object: InputObjectTypeWeakRef,
 ) -> Option<InputObjectTypeWeakRef> {
     let related_model = parent_field.related_model();
-    let where_object = where_unique_object_type(ctx, &related_model);
-    let create_object = create_input_type(ctx, &related_model, Some(parent_field));
+    let where_object = filter_input_objects::where_unique_object_type(ctx, &related_model);
+    let create_object = create_input_objects::create_input_type(ctx, &related_model, Some(parent_field));
 
     if where_object.into_arc().is_empty() || create_object.into_arc().is_empty() {
         return None;
@@ -180,7 +180,7 @@ fn nested_upsert_nonlist_input_object(
     update_object: InputObjectTypeWeakRef,
 ) -> Option<InputObjectTypeWeakRef> {
     let related_model = parent_field.related_model();
-    let create_object = create_input_type(ctx, &related_model, Some(parent_field));
+    let create_object = create_input_objects::create_input_type(ctx, &related_model, Some(parent_field));
 
     if create_object.into_arc().is_empty() {
         return None;

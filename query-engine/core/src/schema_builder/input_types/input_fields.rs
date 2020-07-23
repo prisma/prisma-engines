@@ -119,7 +119,7 @@ pub(crate) fn scalar_input_fields<T, F>(
 ) -> Vec<InputField>
 where
     T: Into<String>,
-    F: Fn(ScalarFieldRef, &mut BuilderContext) -> InputType,
+    F: Fn(ScalarFieldRef) -> InputType,
 {
     let input_object_name = input_object_name.into();
     let mut non_list_fields: Vec<InputField> = prefiltered_fields
@@ -127,7 +127,7 @@ where
         .filter(|f| !f.is_list)
         .map(|f| {
             let default = if with_defaults { f.default_value.clone() } else { None };
-            input_field(f.name.clone(), field_mapper(f.clone(), ctx), default)
+            input_field(f.name.clone(), field_mapper(f.clone()), default)
         })
         .collect();
 
@@ -140,7 +140,7 @@ where
             let input_object = match ctx.get_input_type(&set_name) {
                 Some(t) => t,
                 None => {
-                    let set_fields = vec![input_field("set", map_optional_input_type(ctx, &f), None)];
+                    let set_fields = vec![input_field("set", map_optional_input_type(&f), None)];
                     let input_object = Arc::new(input_object_type(set_name.clone(), set_fields));
 
                     ctx.cache_input_type(set_name, input_object.clone());
@@ -161,7 +161,7 @@ fn where_input_field<T>(ctx: &mut BuilderContext, name: T, field: &RelationField
 where
     T: Into<String>,
 {
-    let input_type = where_unique_object_type(ctx, &field.related_model());
+    let input_type = filter_input_objects::where_unique_object_type(ctx, &field.related_model());
     let input_type = wrap_list_input_object_type(input_type, field.is_list);
 
     input_field(name.into(), input_type, None)

@@ -34,9 +34,7 @@
 mod cache;
 mod arguments;
 mod input_types;
-mod mutation_type;
-mod output_objects;
-mod query_type;
+mod output_types;
 mod utils;
 
 use crate::schema::*;
@@ -132,10 +130,10 @@ impl TypeCache {
 
 pub fn build(internal_data_model: InternalDataModelRef, mode: BuildMode, enable_raw_queries: bool) -> QuerySchema {
     let mut ctx = BuilderContext::new(mode, internal_data_model, enable_raw_queries);
-    output_objects::initialize_model_object_type_cache(&mut ctx);
+    output_types::output_objects::initialize_model_object_type_cache(&mut ctx);
 
-    let (query_type, query_object_ref) = query_type::build(&mut ctx);
-    let (mutation_type, mutation_object_ref) = mutation_type::build(&mut ctx);
+    let (query_type, query_object_ref) = output_types::query_type::build(&mut ctx);
+    let (mutation_type, mutation_object_ref) = output_types::mutation_type::build(&mut ctx);
     let (input_objects, mut output_objects) = ctx.cache.collect_types();
 
     // The mutation and query object types need to be part of the strong refs.
