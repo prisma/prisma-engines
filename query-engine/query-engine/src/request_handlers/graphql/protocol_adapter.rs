@@ -2,9 +2,10 @@ use crate::{error::PrismaError, PrismaResult};
 use graphql_parser::query::{
     Definition, Document, OperationDefinition, Selection as GqlSelection, SelectionSet, Value,
 };
+use indexmap::IndexMap;
 use query_core::query_document::*;
 use rust_decimal::Decimal;
-use std::{collections::BTreeMap, str::FromStr};
+use std::str::FromStr;
 
 /// Protocol adapter for GraphQL -> Query Document.
 ///
@@ -170,7 +171,7 @@ impl GraphQLProtocolAdapter {
                 let values = map
                     .into_iter()
                     .map(|(k, v)| Self::convert_value(v).map(|v| (k, v)))
-                    .collect::<PrismaResult<BTreeMap<String, QueryValue>>>()?;
+                    .collect::<PrismaResult<IndexMap<String, QueryValue>>>()?;
 
                 Ok(QueryValue::Object(values))
             }
