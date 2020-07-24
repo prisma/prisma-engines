@@ -88,7 +88,7 @@ model Cat {
     let expected = r#"model User {
   id     Int  @id
   post   Post @relation(fields: [postId], references: [id])
-  postId Int?
+  postId Int
 }
 
 model Post {
@@ -100,7 +100,7 @@ model Post {
 model Cat {
   id     Int  @id
   post   Post @relation(fields: [postId], references: [id])
-  postId Int?
+  postId Int
 }
 "#;
 
@@ -220,7 +220,7 @@ model Post {
 }
 
 #[test]
-fn scalar_field_and_directive_must_be_added_even_when_directive_is_missing_and_only_one_relation_fields_present() {
+fn scalar_field_and_directive_must_be_added_even_when_directive_is_missing_and_only_one_relation_field_present() {
     let input = r#"model User {
   id Int @id
 }
@@ -251,7 +251,7 @@ model Post {
 model Cat {
   id     Int  @id
   post   Post @relation(fields: [postId], references: [id])
-  postId Int?
+  postId Int
 }
 "#;
 
