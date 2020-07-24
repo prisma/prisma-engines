@@ -6,6 +6,7 @@ mod infer_migration_steps;
 mod list_migrations;
 mod migration_progress;
 mod reset;
+mod schema_push;
 mod unapply_migration;
 
 pub use apply_migration::*;
@@ -16,6 +17,7 @@ pub use infer_migration_steps::*;
 pub use list_migrations::*;
 pub use migration_progress::*;
 pub use reset::*;
+pub use schema_push::*;
 pub use unapply_migration::*;
 
 use migration_connector::{

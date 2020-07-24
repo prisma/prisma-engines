@@ -6,11 +6,11 @@ use serde::{Deserialize, Serialize};
 #[async_trait::async_trait]
 pub trait DatabaseMigrationStepApplier<T>: Send + Sync {
     /// Applies the step to the database
-    /// Returns true to signal to the caller that there are more steps to apply.
+    /// Returns true to signal to the caller that the step was applied, and there could be a next one.
     async fn apply_step(&self, database_migration: &T, step: usize) -> ConnectorResult<bool>;
 
     /// Applies the step to the database.
-    /// Returns true to signal to the caller that there are more steps to unapply.
+    /// Returns true to signal to the caller that the step was unapplied, and there could be a next one.
     async fn unapply_step(&self, database_migration: &T, step: usize) -> ConnectorResult<bool>;
 
     /// Render steps for the CLI. Each step will contain the raw field.

@@ -1,5 +1,7 @@
 use anyhow::Context;
 use colored::Colorize;
+use migration_core::commands::SchemaPushInput;
+use std::{fs::File, io::Read};
 use structopt::*;
 
 #[derive(StructOpt)]
@@ -28,6 +30,8 @@ enum Command {
     },
     /// Generate DMMF from a schema, or directly from a database URl.
     Dmmf(DmmfCommand),
+    /// Push a prisma schema directly to the database, without interacting with migrations.
+    SchemaPush(SchemaPush),
 }
 
 #[derive(StructOpt)]
@@ -44,12 +48,20 @@ struct DmmfCommand {
     file_path: Option<String>,
 }
 
+#[derive(StructOpt)]
+struct SchemaPush {
+    schema_path: String,
+    #[structopt(long)]
+    force: bool,
+}
+
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     init_logger();
 
     match Command::from_args() {
         Command::Dmmf(cmd) => generate_dmmf(&cmd).await?,
+        Command::SchemaPush(cmd) => schema_push(&cmd).await?,
         Command::Introspect { url, file_path } => {
             if url.as_ref().xor(file_path.as_ref()).is_none() {
                 anyhow::bail!(
@@ -126,7 +138,7 @@ async fn main() -> anyhow::Result<()> {
 }
 
 fn read_datamodel_from_file(path: &str) -> std::io::Result<String> {
-    use std::{fs::File, io::Read, path::Path};
+    use std::path::Path;
 
     eprintln!("{} {}", "reading the prisma schema from".bold(), path.yellow());
 
@@ -140,8 +152,6 @@ fn read_datamodel_from_file(path: &str) -> std::io::Result<String> {
 }
 
 fn read_datamodel_from_stdin() -> std::io::Result<String> {
-    use std::io::Read;
-
     eprintln!("{} {}", "reading the prisma schema from".bold(), "stdin".yellow());
 
     let mut stdin = std::io::stdin();
@@ -214,6 +224,59 @@ async fn generate_dmmf(cmd: &DmmfCommand) -> anyhow::Result<()> {
         .spawn()?;
 
     cmd.wait_with_output()?;
+
+    Ok(())
+}
+
+async fn schema_push(cmd: &SchemaPush) -> anyhow::Result<()> {
+    let schema = read_datamodel_from_file(&cmd.schema_path).context("Error reading the schema from file")?;
+    let api = migration_core::migration_api(&schema).await?;
+
+    let response = api
+        .schema_push(&SchemaPushInput {
+            schema,
+            force: cmd.force,
+        })
+        .await?;
+
+    if response.warnings.len() > 0 {
+        eprintln!("⚠️  {}", "Warnings".bright_yellow().bold());
+
+        for warning in &response.warnings {
+            eprintln!("- {}", warning.bright_yellow())
+        }
+    }
+
+    if response.unexecutable.len() > 0 {
+        eprintln!("☢️  {}", "Unexecutable steps".bright_red().bold());
+
+        for unexecutable in &response.unexecutable {
+            eprintln!("- {}", unexecutable.bright_red())
+        }
+    }
+
+    if response.executed_steps > 0 {
+        eprintln!(
+            "{}  {}",
+            "✔️".bold(),
+            format!("Schema pushed to database. ({} steps)", response.executed_steps).green()
+        );
+    } else {
+        if response.had_no_changes_to_push() {
+            eprintln!(
+                "{}  {}",
+                "✔️".bold(),
+                "No changes to push. Prisma schema and database are in sync.".green()
+            );
+        } else {
+            eprintln!(
+                "{}  {}",
+                "❌".bold(),
+                "The schema was not pushed. Pass the --force flag to ignore warnings."
+            );
+            std::process::exit(1);
+        }
+    }
 
     Ok(())
 }

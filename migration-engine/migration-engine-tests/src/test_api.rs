@@ -2,12 +2,14 @@ mod apply;
 mod calculate_database_steps;
 mod infer;
 mod infer_apply;
+mod schema_push;
 mod unapply_migration;
 
 pub use apply::Apply;
 pub use calculate_database_steps::CalculateDatabaseSteps;
 pub use infer::Infer;
 pub use infer_apply::InferApply;
+pub use schema_push::SchemaPush;
 pub use unapply_migration::UnapplyMigration;
 
 use super::assertions::SchemaAssertion;
@@ -137,6 +139,10 @@ impl TestApi {
             api: &self.api,
             force: None,
         }
+    }
+
+    pub fn schema_push<'a>(&'a self, dm: impl Into<String>) -> SchemaPush<'a> {
+        SchemaPush::new(&self.api, dm.into())
     }
 
     pub fn barrel(&self) -> BarrelMigrationExecutor<'_> {
