@@ -403,6 +403,48 @@ fn incomplete_field_definitions_in_a_model_must_not_get_removed() {
 }
 
 #[test]
+fn new_lines_inside_block_above_field_must_stay() {
+    let input = r#"model Post {
+
+
+
+
+  id                    Int                               @default(autoincrement()) @id
+}"#;
+
+    let exptected = r#"model Post {
+
+
+
+
+  id Int @default(autoincrement()) @id
+}
+"#;
+
+    assert_reformat(input, exptected);
+}
+
+#[test]
+fn new_lines_inside_block_below_field_must_stay() {
+    let input = r#"model Post {
+  id                    Int                               @default(autoincrement()) @id
+
+
+
+}"#;
+
+    let exptected = r#"model Post {
+  id Int @default(autoincrement()) @id
+
+
+
+}
+"#;
+
+    assert_reformat(input, exptected);
+}
+
+#[test]
 fn new_lines_before_first_block_must_be_removed() {
     let input = r#"
 
