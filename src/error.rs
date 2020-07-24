@@ -129,7 +129,7 @@ pub enum ErrorKind {
     #[error("Error accessing result set, type mismatch, expected: {}", _0)]
     ResultTypeMismatch(&'static str),
 
-    #[error("The specified database url {} is invalid", _0)]
+    #[error("Error parsing connection string: {}", _0)]
     DatabaseUrlIsInvalid(String),
 
     #[error("Conversion failed: {}", _0)]
@@ -230,8 +230,8 @@ impl From<tokio::time::Elapsed> for Error {
 }
 
 impl From<url::ParseError> for Error {
-    fn from(_: url::ParseError) -> Error {
-        let kind = ErrorKind::DatabaseUrlIsInvalid("Error parsing database connection string.".to_string());
+    fn from(e: url::ParseError) -> Error {
+        let kind = ErrorKind::DatabaseUrlIsInvalid(e.to_string());
         Error::builder(kind).build()
     }
 }
