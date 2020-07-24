@@ -31,6 +31,37 @@ async fn schema_push_happy_path(api: &TestApi) -> TestResult {
             table.assert_column("material", |col| col.assert_type_family(ColumnTypeFamily::String))
         })?;
 
+    let dm2 = r#"
+    model Cat {
+        id Int @id
+        boxId Int?
+        residence Box? @relation(fields: [boxId], references: [id])
+    }
+
+    model Box {
+        id Int @id
+        texture String
+        waterProof Boolean
+    }
+    "#;
+
+    api.schema_push(dm2)
+        .send()
+        .await?
+        .assert_green()?
+        .assert_has_executed_steps()?;
+
+    api.assert_schema()
+        .await?
+        .assert_table("Cat", |table| {
+            table.assert_column("boxId", |col| col.assert_type_family(ColumnTypeFamily::Int))
+        })?
+        .assert_table("Box", |table| {
+            table
+                .assert_columns_count(3)?
+                .assert_column("texture", |col| col.assert_type_family(ColumnTypeFamily::String))
+        })?;
+
     Ok(())
 }
 
