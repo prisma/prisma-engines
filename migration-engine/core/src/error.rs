@@ -1,6 +1,6 @@
 use crate::commands::CommandError;
 use datamodel::error::ErrorCollection;
-use migration_connector::ConnectorError;
+use migration_connector::{ConnectorError, ErrorKind};
 use thiserror::Error;
 
 pub type CoreResult<T> = Result<T, Error>;
@@ -18,11 +18,17 @@ pub enum Error {
 
     #[error("Error performing IO: {:?}", .0)]
     IOError(anyhow::Error),
+
+    #[error("{}", _0)]
+    InvalidDatabaseUrl(String),
 }
 
 impl From<ConnectorError> for Error {
     fn from(e: ConnectorError) -> Self {
-        Error::ConnectorError(e)
+        match e.kind {
+            ErrorKind::InvalidDatabaseUrl(reason) => Self::InvalidDatabaseUrl(reason),
+            _ => Error::ConnectorError(e),
+        }
     }
 }
 
