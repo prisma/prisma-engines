@@ -164,6 +164,7 @@ model Post {
 }
 
 #[test]
+#[ignore]
 fn back_relations_must_be_added_when_directive_is_present_with_both_arguments() {
     let input = r#"model User {
   id Int @id
