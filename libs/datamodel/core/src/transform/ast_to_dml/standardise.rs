@@ -275,7 +275,7 @@ impl Standardiser {
         &self,
         unique_criteria: &dml::UniqueCriteria,
         model_name: &str,
-        field_arity: dml::FieldArity
+        field_arity: dml::FieldArity,
     ) -> Vec<ScalarField> {
         let model_name = model_name.to_owned();
         unique_criteria
