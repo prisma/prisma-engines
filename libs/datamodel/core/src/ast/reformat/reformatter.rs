@@ -235,7 +235,7 @@ impl<'a> Reformatter<'a> {
         let mut block_has_opened = false;
 
         for current in token.clone().into_inner() {
-            //println!("block: {:?} |{:?}|", current.as_rule(), current.as_str());
+            println!("block: {:?} |{:?}|", current.as_rule(), current.as_str());
             match current.as_rule() {
                 Rule::BLOCK_OPEN => {
                     block_has_opened = true;
