@@ -9,6 +9,7 @@ mod infer_migration_steps;
 mod migration_persistence;
 mod migrations;
 mod multi_user;
+mod schema_push;
 mod unapply_migration;
 
 use migration_engine_tests::sql::*;
