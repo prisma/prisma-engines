@@ -108,6 +108,7 @@ model Cat {
 }
 
 #[test]
+#[ignore]
 fn back_relations_must_be_added_when_directive_is_present_with_no_arguments() {
     let input = r#"model User {
   id Int @id
@@ -135,6 +136,7 @@ model Post {
 }
 
 #[test]
+#[ignore]
 fn back_relations_must_be_added_when_directive_is_present_with_only_one_argument() {
     let input = r#"model User {
   id Int @id
