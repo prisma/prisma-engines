@@ -335,35 +335,6 @@ model Post {
 }
 
 #[test]
-fn relation_directive_must_be_added_for_many_to_many_with_multi_field_id() {
-    let input = r#"model User {
-  id     Int   @id
-  Post   Post[]
-}
-
-model Post {
-  name String
-  position Int
-  User  User[]
-  @@id([name, position])
-}
-"#;
-    let expected = r#"model User {
-  id     Int    @id
-  Post   Post[] @relation(references: [name, position])
-}
-
-model Post {
-  name     String
-  position Int
-  User     User[] @relation(references: [id])
-  @@id([name, position])
-}
-"#;
-    assert_reformat(input, expected);
-}
-
-#[test]
 fn back_relations_must_be_added_even_when_env_vars_are_missing() {
     // missing env vars led to errors in datamodel validation. A successful validation is prerequisite to find missing back relation fields though.
     // I changed the Reformatter to ignore env var errors.
