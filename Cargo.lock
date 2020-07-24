@@ -737,7 +737,6 @@ dependencies = [
  "colored",
  "cuid",
  "datamodel-connector",
- "failure",
  "indoc",
  "itertools",
  "once_cell",
@@ -750,6 +749,7 @@ dependencies = [
  "serde",
  "serde_json",
  "serial_test",
+ "thiserror",
  "tracing",
  "uuid",
 ]
@@ -943,8 +943,8 @@ checksum = "36a9cb09840f81cd211e435d00a4e487edd263dc3c8ff815c32dd76ad668ebed"
 name = "feature-flags"
 version = "0.1.0"
 dependencies = [
- "failure",
  "once_cell",
+ "thiserror",
 ]
 
 [[package]]
@@ -2447,7 +2447,6 @@ dependencies = [
  "cuid",
  "datamodel",
  "debug_stub_derive",
- "failure",
  "itertools",
  "once_cell",
  "prisma-value",
@@ -2457,6 +2456,7 @@ dependencies = [
  "serde",
  "serde_derive",
  "serde_json",
+ "thiserror",
  "uuid",
 ]
 
@@ -2583,9 +2583,9 @@ dependencies = [
 name = "query-connector"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "async-trait",
  "chrono",
- "failure",
  "futures 0.3.5",
  "itertools",
  "once_cell",
@@ -2593,6 +2593,7 @@ dependencies = [
  "prisma-value",
  "serde",
  "serde_json",
+ "thiserror",
  "user-facing-errors",
  "uuid",
 ]
@@ -2605,7 +2606,6 @@ dependencies = [
  "chrono",
  "crossbeam-queue",
  "debug_stub_derive",
- "failure",
  "feature-flags",
  "futures 0.3.5",
  "im",
@@ -2620,6 +2620,7 @@ dependencies = [
  "rust_decimal 1.7.0 (git+https://github.com/pimeys/rust-decimal?branch=pgbouncer-mode)",
  "serde",
  "serde_json",
+ "thiserror",
  "tokio",
  "tracing",
  "user-facing-errors",
@@ -2636,7 +2637,6 @@ dependencies = [
  "base64 0.10.1",
  "chrono",
  "datamodel",
- "failure",
  "feature-flags",
  "futures 0.3.5",
  "graphql-parser",
@@ -2662,6 +2662,7 @@ dependencies = [
  "structopt",
  "test-macros",
  "test-setup",
+ "thiserror",
  "tide",
  "tokio",
  "tracing",
@@ -3161,11 +3162,11 @@ dependencies = [
 name = "sql-query-connector"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "async-trait",
  "chrono",
  "cuid",
  "datamodel",
- "failure",
  "futures 0.3.5",
  "itertools",
  "prisma-models",
@@ -3176,6 +3177,7 @@ dependencies = [
  "rust_decimal 1.7.0 (git+https://github.com/pimeys/rust-decimal?branch=pgbouncer-mode)",
  "serde",
  "serde_json",
+ "thiserror",
  "tokio",
  "user-facing-errors",
  "uuid",

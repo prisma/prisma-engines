@@ -1,10 +1,10 @@
 use crate::filter::Filter;
-use failure::{Error, Fail};
 use prisma_models::prelude::DomainError;
+use thiserror::Error;
 use user_facing_errors::{query_engine::DatabaseConstraint, KnownError};
 
-#[derive(Debug, Fail)]
-#[fail(display = "{}", kind)]
+#[derive(Debug, Error)]
+#[error("{}", kind)]
 pub struct ConnectorError {
     /// An optional error already rendered for users in case the migration core does not handle it.
     pub user_facing_error: Option<KnownError>,
@@ -31,47 +31,49 @@ impl ConnectorError {
     }
 }
 
-#[derive(Debug, Fail)]
+#[derive(Debug, Error)]
 pub enum ErrorKind {
-    #[fail(display = "Unique constraint failed: {}", constraint)]
+    #[error("Unique constraint failed: {}", constraint)]
     UniqueConstraintViolation { constraint: DatabaseConstraint },
 
-    #[fail(display = "Null constraint failed: {}", constraint)]
+    #[error("Null constraint failed: {}", constraint)]
     NullConstraintViolation { constraint: DatabaseConstraint },
 
-    #[fail(display = "Foreign key constraint failed")]
+    #[error("Foreign key constraint failed")]
     ForeignKeyConstraintViolation { constraint: DatabaseConstraint },
 
-    #[fail(display = "Record does not exist.")]
+    #[error("Record does not exist.")]
     RecordDoesNotExist,
 
-    #[fail(display = "Column does not exist")]
+    #[error("Column does not exist")]
     ColumnDoesNotExist,
 
-    #[fail(display = "Error creating a database connection. ({})", _0)]
-    ConnectionError(Error),
+    #[error("Error creating a database connection. ({})", _0)]
+    ConnectionError(anyhow::Error),
 
-    #[fail(display = "Error querying the database: {}", _0)]
+    #[error("Error querying the database: {}", _0)]
     QueryError(Box<dyn std::error::Error + Send + Sync>),
 
-    #[fail(display = "The provided arguments are not supported.")]
+    #[error("The provided arguments are not supported.")]
     InvalidConnectionArguments,
 
-    #[fail(display = "The column value was different from the model")]
+    #[error("The column value was different from the model")]
     ColumnReadFailure(Box<dyn std::error::Error + Send + Sync>),
 
-    #[fail(display = "Field cannot be null: {}", field)]
+    #[error("Field cannot be null: {}", field)]
     FieldCannotBeNull { field: String },
 
-    #[fail(display = "{}", _0)]
+    #[error("{}", _0)]
     DomainError(DomainError),
 
-    #[fail(display = "Record not found: {:?}", _0)]
+    #[error("Record not found: {:?}", _0)]
     RecordNotFoundForWhere(Filter),
 
-    #[fail(
-        display = "Violating a relation {} between {} and {}",
-        relation_name, model_a_name, model_b_name
+    #[error(
+        "Violating a relation {} between {} and {}",
+        relation_name,
+        model_a_name,
+        model_b_name
     )]
     RelationViolation {
         relation_name: String,
@@ -79,9 +81,11 @@ pub enum ErrorKind {
         model_b_name: String,
     },
 
-    #[fail(
-        display = "The relation {} has no record for the model {} connected to a record for the model {} on your write path.",
-        relation_name, parent_name, child_name
+    #[error(
+        "The relation {} has no record for the model {} connected to a record for the model {} on your write path.",
+        relation_name,
+        parent_name,
+        child_name
     )]
     RecordsNotConnected {
         relation_name: String,
@@ -89,25 +93,25 @@ pub enum ErrorKind {
         child_name: String,
     },
 
-    #[fail(display = "Conversion error: {}", _0)]
-    ConversionError(Error),
+    #[error("Conversion error: {}", _0)]
+    ConversionError(anyhow::Error),
 
-    #[fail(display = "Conversion error: {}", _0)]
+    #[error("Conversion error: {}", _0)]
     InternalConversionError(String),
 
-    #[fail(display = "Database creation error: {}", _0)]
+    #[error("Database creation error: {}", _0)]
     DatabaseCreationError(&'static str),
 
-    #[fail(display = "Database '{}' does not exist.", db_name)]
+    #[error("Database '{}' does not exist.", db_name)]
     DatabaseDoesNotExist { db_name: String },
 
-    #[fail(display = "Access denied to database '{}'", db_name)]
+    #[error("Access denied to database '{}'", db_name)]
     DatabaseAccessDenied { db_name: String },
 
-    #[fail(display = "Authentication failed for user '{}'", user)]
+    #[error("Authentication failed for user '{}'", user)]
     AuthenticationFailed { user: String },
 
-    #[fail(display = "Database error. error code: {}, error message: {}", code, message)]
+    #[error("Database error. error code: {}, error message: {}", code, message)]
     RawError { code: String, message: String },
 }
 
