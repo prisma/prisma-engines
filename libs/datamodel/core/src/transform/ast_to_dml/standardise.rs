@@ -283,7 +283,7 @@ impl Standardiser {
             .map(|f| {
                 ScalarField::new(
                     &format!("{}{}", model_name.camel_case(), f.name.pascal_case()),
-                    dml::FieldArity::Optional,
+                    f.arity.clone(),
                     f.field_type.clone(),
                 )
             })
