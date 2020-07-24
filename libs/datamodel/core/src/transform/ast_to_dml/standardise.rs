@@ -64,7 +64,7 @@ impl Standardiser {
                     };
 
                     let underlying_fields =
-                        self.underlying_fields_for_unique_criteria(&unique_criteria, &related_model.name);
+                        self.underlying_fields_for_unique_criteria(&unique_criteria, &related_model.name, field.arity);
 
                     if embed_here {
                         // user input has precedence
@@ -191,7 +191,7 @@ impl Standardiser {
                         unique_criteria.fields.iter().map(|f| f.name.to_owned()).collect();
 
                     let underlying_fields: Vec<ScalarField> = self
-                        .underlying_fields_for_unique_criteria(&unique_criteria, &model.name)
+                        .underlying_fields_for_unique_criteria(&unique_criteria, &model.name, dml::FieldArity::Optional)
                         .into_iter()
                         .map(|f| {
                             // This prevents name conflicts with existing fields on the model
@@ -275,6 +275,7 @@ impl Standardiser {
         &self,
         unique_criteria: &dml::UniqueCriteria,
         model_name: &str,
+        field_arity: dml::FieldArity
     ) -> Vec<ScalarField> {
         let model_name = model_name.to_owned();
         unique_criteria
@@ -283,7 +284,7 @@ impl Standardiser {
             .map(|f| {
                 ScalarField::new(
                     &format!("{}{}", model_name.camel_case(), f.name.pascal_case()),
-                    f.arity.clone(),
+                    field_arity,
                     f.field_type.clone(),
                 )
             })
