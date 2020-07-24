@@ -323,8 +323,7 @@ impl<'a> Reformatter<'a> {
     }
 
     fn reformat_field(target: &mut TableFormat, token: &Token) {
-        for current in token.clone().into_inner(
-        ) {
+        for current in token.clone().into_inner() {
             match current.as_rule() {
                 Rule::non_empty_identifier | Rule::maybe_empty_identifier => {
                     target.write(current.as_str());

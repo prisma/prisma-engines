@@ -446,7 +446,6 @@ fn new_lines_inside_block_below_field_must_stay() {
     assert_reformat(input, expected);
 }
 
-
 #[test]
 fn new_lines_inside_block_in_between_fields_must_stay() {
     let input = r#"model Post {
