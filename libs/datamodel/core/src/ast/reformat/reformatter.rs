@@ -5,6 +5,7 @@ use pest::Parser;
 // do multiple mutable borrows inside a match statement.
 use super::helpers::*;
 use crate::common::WritableString;
+use std::thread::current;
 
 pub struct Reformatter<'a> {
     input: &'a str,
@@ -235,7 +236,7 @@ impl<'a> Reformatter<'a> {
         let mut block_has_opened = false;
 
         for current in token.clone().into_inner() {
-            //println!("block: {:?} |{:?}|", current.as_rule(), current.as_str());
+            // println!("block: {:?} |{:?}|", current.as_rule(), current.as_str());
             match current.as_rule() {
                 Rule::BLOCK_OPEN => {
                     block_has_opened = true;
@@ -246,7 +247,7 @@ impl<'a> Reformatter<'a> {
                     // Begin.
                     block_name = current.as_str();
                     renderer.write(&format!("{} {} {{", block_type, block_name));
-                    renderer.maybe_end_line();
+                    renderer.end_line();
                     renderer.indent_up();
                 }
                 Rule::comment_block => {
