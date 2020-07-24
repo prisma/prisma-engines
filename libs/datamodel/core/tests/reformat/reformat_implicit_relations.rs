@@ -56,7 +56,7 @@ model Post {
     let expected = r#"model User {
   id     Int  @id
   post   Post @relation(fields: [postId], references: [id])
-  postId Int?
+  postId Int
 }
 
 model Post {
