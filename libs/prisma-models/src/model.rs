@@ -1,6 +1,7 @@
 use crate::prelude::*;
 use once_cell::sync::OnceCell;
 use std::{
+    fmt::Debug,
     hash::{Hash, Hasher},
     sync::{Arc, Weak},
 };
@@ -19,7 +20,6 @@ pub struct ModelTemplate {
     pub dml_model: datamodel::Model,
 }
 
-#[derive(DebugStub)]
 pub struct Model {
     pub name: String,
     pub is_embedded: bool,
@@ -30,8 +30,22 @@ pub struct Model {
     primary_identifier: OnceCell<ModelProjection>,
     dml_model: datamodel::Model,
 
-    #[debug_stub = "#InternalDataModelWeakRef#"]
     pub internal_data_model: InternalDataModelWeakRef,
+}
+
+impl Debug for Model {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Model")
+            .field("name", &self.name)
+            .field("is_embedded", &self.is_embedded)
+            .field("manifestation", &self.manifestation)
+            .field("fields", &self.fields)
+            .field("indexes", &self.indexes)
+            .field("primary_identifier", &self.primary_identifier)
+            .field("dml_model", &self.dml_model)
+            .field("internal_data_model", &"#InternalDataModelWeakRef#")
+            .finish()
+    }
 }
 
 impl ModelTemplate {
