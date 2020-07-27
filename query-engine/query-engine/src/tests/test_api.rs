@@ -235,6 +235,22 @@ pub async fn postgres12_test_api(db_name: &str) -> TestApi {
     }
 }
 
+pub async fn postgres13_test_api(db_name: &str) -> TestApi {
+    let url = postgres_13_url(db_name);
+    let connection_info = ConnectionInfo::from_url(&url).unwrap();
+
+    let connector = postgres_migration_connector(&url).await;
+    let migration_api = migration_api(connector).await;
+
+    let config = postgres_13_test_config(db_name);
+
+    TestApi {
+        connection_info,
+        migration_api,
+        config,
+    }
+}
+
 pub async fn sqlite_test_api(db_name: &str) -> TestApi {
     let url = sqlite_test_url(db_name);
     let connection_info = ConnectionInfo::from_url(&url).unwrap();

@@ -67,6 +67,19 @@ services:
       - databases
     tmpfs: /pgtmpfs12
 
+  postgres13:
+    image: postgres:13
+    restart: always
+    command: postgres -c 'max_connections=1000'
+    environment:
+      POSTGRES_PASSWORD: "prisma"
+      PGDATA: "/pgtmpfs13"
+    ports:
+      - "5435:5432"
+    networks:
+      - databases
+    tmpfs: /pgtmpfs12
+
   mysql-5-6:
     image: mysql:5.6
     command: mysqld

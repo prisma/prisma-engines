@@ -35,6 +35,8 @@ object ConnectorConfig {
         ConnectorConfig("postgresql", s"postgresql://postgres:prisma@$postgres_11_Host:$postgres_11_Port/db?schema=$$DB&connection_limit=1", false, "postgres11")
       case "postgres12" | "postgresql12" =>
         ConnectorConfig("postgresql", s"postgresql://postgres:prisma@$postgres_12_Host:$postgres_12_Port/db?schema=$$DB&connection_limit=1", false, "postgres12")
+      case "postgres13" | "postgresql13" =>
+        ConnectorConfig("postgresql", s"postgresql://postgres:prisma@$postgres_13_Host:$postgres_13_Port/db?schema=$$DB&connection_limit=1", false, "postgres13")
       case "pgbouncer" =>
         ConnectorConfig("postgresql", s"postgresql://postgres:prisma@$postgres_11_Host:$postgres_11_Port/db?schema=$$DB&connection_limit=1", true, "pgbouncer")
       case "mysql"   => ConnectorConfig("mysql", s"mysql://root:prisma@$mysql_5_7_Host:3306/$$DB?connection_limit=1", false, "mysql")
@@ -102,6 +104,22 @@ object ConnectorConfig {
       5432
     } else {
       5434
+    }
+  }
+
+  lazy val postgres_13_Host = {
+    if (EnvVars.isBuildkite) {
+      "test-db-postgres-13"
+    } else {
+      "127.0.0.1"
+    }
+  }
+
+  lazy val postgres_13_Port = {
+    if (EnvVars.isBuildkite) {
+      5432
+    } else {
+      5435
     }
   }
 
