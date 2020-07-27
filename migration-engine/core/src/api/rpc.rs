@@ -13,6 +13,7 @@ pub struct RpcApi {
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 enum RpcCommand {
+    DebugPanic,
     InferMigrationSteps,
     ListMigrations,
     MigrationProgress,
@@ -27,6 +28,7 @@ enum RpcCommand {
 impl RpcCommand {
     fn name(&self) -> &'static str {
         match self {
+            RpcCommand::DebugPanic => "debugPanic",
             RpcCommand::InferMigrationSteps => "inferMigrationSteps",
             RpcCommand::ListMigrations => "listMigrations",
             RpcCommand::MigrationProgress => "migrationProgress",
@@ -42,6 +44,7 @@ impl RpcCommand {
 
 static AVAILABLE_COMMANDS: &[RpcCommand] = &[
     RpcCommand::ApplyMigration,
+    RpcCommand::DebugPanic,
     RpcCommand::InferMigrationSteps,
     RpcCommand::ListMigrations,
     RpcCommand::MigrationProgress,
@@ -120,6 +123,7 @@ impl RpcApi {
     ) -> Result<serde_json::Value, RunCommandError> {
         tracing::debug!(?cmd, "running the command");
         match cmd {
+            RpcCommand::DebugPanic => render(executor.debug_panic(&()).await?),
             RpcCommand::InferMigrationSteps => {
                 let input: InferMigrationStepsInput = params.clone().parse()?;
                 render(executor.infer_migration_steps(&input).await?)

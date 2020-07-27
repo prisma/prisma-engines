@@ -49,6 +49,7 @@ pub trait GenericApi: Send + Sync + 'static {
         input: &CalculateDatabaseStepsInput,
     ) -> CoreResult<MigrationStepsResultOutput>;
     async fn calculate_datamodel(&self, input: &CalculateDatamodelInput) -> CoreResult<CalculateDatamodelOutput>;
+    async fn debug_panic(&self, input: &()) -> CoreResult<()>;
     async fn infer_migration_steps(&self, input: &InferMigrationStepsInput) -> CoreResult<MigrationStepsResultOutput>;
     async fn list_migrations(&self, input: &serde_json::Value) -> CoreResult<Vec<ListMigrationsOutput>>;
     async fn migration_progress(&self, input: &MigrationProgressInput) -> CoreResult<MigrationProgressOutput>;
@@ -94,6 +95,12 @@ where
     async fn calculate_datamodel(&self, input: &CalculateDatamodelInput) -> CoreResult<CalculateDatamodelOutput> {
         self.handle_command::<CalculateDatamodelCommand<'_>>(input)
             .instrument(tracing::info_span!("CalculateDatamodel"))
+            .await
+    }
+
+    async fn debug_panic(&self, input: &()) -> CoreResult<()> {
+        self.handle_command::<DebugPanicCommand>(input)
+            .instrument(tracing::info_span!("DebugPanic"))
             .await
     }
 
