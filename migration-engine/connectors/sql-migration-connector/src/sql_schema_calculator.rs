@@ -114,17 +114,13 @@ impl<'a> SqlSchemaCalculator<'a> {
                 constraint_name: None,
             }).filter(|pk| !pk.columns.is_empty());
 
-            let single_field_indexes = model.scalar_fields().filter_map(|f| {
-                if f.is_unique() {
-                    Some(sql::Index {
-                        name: format!("{}.{}", &model.db_name(), &f.db_name()),
-                        columns: vec![f.db_name().to_owned()],
-                        tpe: sql::IndexType::Unique,
-                    })
-                } else {
-                    None
+            let single_field_indexes = model.scalar_fields().filter(|f| f.is_unique()).map(|f|
+                sql::Index {
+                    name: format!("{}.{}_unique", &model.db_name(), &f.db_name()),
+                    columns: vec![f.db_name().to_owned()],
+                    tpe: sql::IndexType::Unique,
                 }
-            });
+            );
 
             let multiple_field_indexes = model.indexes().map(|index_definition: &IndexDefinition| {
                 let referenced_fields: Vec<ScalarFieldWalker<'_>> = index_definition
@@ -133,25 +129,29 @@ impl<'a> SqlSchemaCalculator<'a> {
                     .map(|field_name| model.find_scalar_field(field_name).expect("Unknown field in index directive."))
                     .collect();
 
+                let index_type = match index_definition.tpe {
+                    IndexType::Unique => sql::IndexType::Unique,
+                    IndexType::Normal => sql::IndexType::Normal,
+                };
+
+                let index_name = index_definition.name.clone().unwrap_or_else(|| {
+                    format!(
+                        "{table}.{fields}_{qualifier}",
+                        table = &model.db_name(),
+                        fields = referenced_fields.iter().map(|field| field.db_name()).join("_"),
+                        qualifier = if index_type.is_unique() { "unique" } else { "index" },
+                    )
+                });
+
                 sql::Index {
-                    name: index_definition.name.clone().unwrap_or_else(|| {
-                        format!(
-                            "{}.{}",
-                            &model.db_name(),
-                            referenced_fields.iter().map(|field| field.db_name()).join("_")
-                        )
-                    }),
+                    name: index_name,
                     // The model index definition uses the model field names, but the SQL Index
                     // wants the column names.
                     columns: referenced_fields
                         .iter()
                         .map(|field| field.db_name().to_owned())
                         .collect(),
-                    tpe: if index_definition.tpe == IndexType::Unique {
-                        sql::IndexType::Unique
-                    } else {
-                        sql::IndexType::Normal
-                    },
+                    tpe: index_type,
                 }
             });
 
