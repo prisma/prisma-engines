@@ -199,7 +199,6 @@ impl<'a> Validator<'a> {
                         }
                         index_names.insert(index_name);
                     }
-                    // TODO also check for non-composite indices?
                 }
             }
         }
