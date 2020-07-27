@@ -4,17 +4,24 @@ use pest::Parser;
 // We have to use RefCell as rust cannot
 // do multiple mutable borrows inside a match statement.
 use super::helpers::*;
+use crate::ast::WithDirectives;
 use crate::common::WritableString;
 
 pub struct Reformatter<'a> {
     input: &'a str,
     missing_fields: Result<Vec<MissingField>, crate::error::ErrorCollection>,
+    missing_field_directives: Result<Vec<MissingFieldDirective>, crate::error::ErrorCollection>,
 }
 
 impl<'a> Reformatter<'a> {
     pub fn new(input: &'a str) -> Self {
         let missing_fields = Self::find_all_missing_fields(&input);
-        Reformatter { input, missing_fields }
+        let missing_field_directives = Self::find_all_missing_directives(&input);
+        Reformatter {
+            input,
+            missing_fields,
+            missing_field_directives,
+        }
     }
 
     // this finds all auto generated fields, that are added during auto generation AND are missing from the original input.
@@ -40,6 +47,41 @@ impl<'a> Reformatter<'a> {
         }
 
         Ok(result)
+    }
+
+    fn find_all_missing_directives(
+        schema_string: &str,
+    ) -> Result<Vec<MissingFieldDirective>, crate::error::ErrorCollection> {
+        let schema_ast = crate::parse_schema_ast(&schema_string)?;
+        let datamodel = crate::parse_datamodel_and_ignore_datasource_urls(&schema_string)?;
+        let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new();
+        let mut missing_field_directives = Vec::new();
+        for model in datamodel.models() {
+            let ast_model = schema_ast.find_model(&model.name).unwrap();
+            for field in model.fields() {
+                let original_ast_field = ast_model.fields.iter().find(|f| f.name.name == field.name());
+                let new_ast_field = lowerer.lower_field(&field, &datamodel)?;
+                if original_ast_field.is_some() {
+                    for directive in new_ast_field.directives {
+                        if let Some(original_field) = original_ast_field {
+                            if original_field
+                                .directives
+                                .iter()
+                                .find(|d| d.name.name == directive.name.name)
+                                .is_none()
+                            {
+                                missing_field_directives.push(MissingFieldDirective {
+                                    model: model.name.clone(),
+                                    field: field.name().to_string(),
+                                    directive,
+                                })
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        Ok(missing_field_directives)
     }
 
     pub fn reformat_to(&self, output: &mut dyn std::io::Write, ident_width: usize) {
@@ -140,7 +182,7 @@ impl<'a> Reformatter<'a> {
             "datasource",
             target,
             token,
-            Box::new(|table, _, token| match token.as_rule() {
+            Box::new(|table, _, token, _| match token.as_rule() {
                 Rule::key_value => Self::reformat_key_value(table, &token),
                 _ => Self::reformat_generic_token(table, &token),
             }),
@@ -152,7 +194,7 @@ impl<'a> Reformatter<'a> {
             "generator",
             target,
             token,
-            Box::new(|table, _, token| {
+            Box::new(|table, _, token, _| {
                 //
                 match token.as_rule() {
                     Rule::key_value => Self::reformat_key_value(table, &token),
@@ -185,14 +227,14 @@ impl<'a> Reformatter<'a> {
             "model",
             target,
             &token,
-            Box::new(|table, renderer, token| {
+            Box::new(|table, renderer, token, model_name| {
                 match token.as_rule() {
                     Rule::directive => {
                         // model level Directives reset the table. -> .render() does that
                         table.render(renderer);
                         Self::reformat_directive(renderer, &token, "@@");
                     }
-                    Rule::field_declaration => Self::reformat_field(table, &token),
+                    Rule::field_declaration => self.reformat_field(table, &token, model_name),
                     _ => Self::reformat_generic_token(table, &token),
                 }
             }),
@@ -214,7 +256,7 @@ impl<'a> Reformatter<'a> {
         block_type: &'static str,
         renderer: &'a mut Renderer,
         token: &'a Token,
-        the_fn: Box<dyn Fn(&mut TableFormat, &mut Renderer, &Token) -> () + 'a>,
+        the_fn: Box<dyn Fn(&mut TableFormat, &mut Renderer, &Token, &str) -> () + 'a>,
     ) {
         self.reformat_block_element_internal(block_type, renderer, token, the_fn, {
             // a no op
@@ -227,7 +269,7 @@ impl<'a> Reformatter<'a> {
         block_type: &'static str,
         renderer: &'a mut Renderer,
         token: &'a Token,
-        the_fn: Box<dyn Fn(&mut TableFormat, &mut Renderer, &Token) -> () + 'a>,
+        the_fn: Box<dyn Fn(&mut TableFormat, &mut Renderer, &Token, &str) -> () + 'a>,
         after_fn: Box<dyn Fn(&mut TableFormat, &mut Renderer, &str) -> () + 'a>,
     ) {
         let mut table = TableFormat::new();
@@ -277,7 +319,7 @@ impl<'a> Reformatter<'a> {
                 Rule::BLOCK_LEVEL_CATCH_ALL => {
                     table.interleave(strip_new_line(current.as_str()));
                 }
-                _ => the_fn(&mut table, renderer, &current),
+                _ => the_fn(&mut table, renderer, &current, block_name),
             }
         }
 
@@ -295,7 +337,7 @@ impl<'a> Reformatter<'a> {
             "enum",
             target,
             token,
-            Box::new(|table, target, token| {
+            Box::new(|table, target, token, _| {
                 //
                 match token.as_rule() {
                     Rule::block_level_directive => {
@@ -321,7 +363,8 @@ impl<'a> Reformatter<'a> {
         }
     }
 
-    fn reformat_field(target: &mut TableFormat, token: &Token) {
+    fn reformat_field(&self, target: &mut TableFormat, token: &Token, model_name: &str) {
+        let field_name = &Self::get_identifier(token);
         for current in token.clone().into_inner() {
             match current.as_rule() {
                 Rule::non_empty_identifier | Rule::maybe_empty_identifier => {
@@ -337,6 +380,17 @@ impl<'a> Reformatter<'a> {
                 Rule::doc_comment_and_new_line => comment(&mut target.interleave_writer(), current.as_str()),
                 Rule::NEWLINE => {} // we do the new lines ourselves
                 _ => Self::reformat_generic_token(target, &current),
+            }
+        }
+        if let Ok(missing_field_directives) = self.missing_field_directives.as_ref() {
+            for missing_field_directive in missing_field_directives.iter() {
+                if &missing_field_directive.field == field_name && missing_field_directive.model.as_str() == model_name
+                {
+                    Renderer::render_field_directive(
+                        &mut target.column_locked_writer_for(2),
+                        &missing_field_directive.directive,
+                    )
+                }
             }
         }
 
@@ -590,4 +644,11 @@ impl<'a> Reformatter<'a> {
 pub struct MissingField {
     pub model: String,
     pub field: crate::ast::Field,
+}
+
+#[derive(Debug)]
+pub struct MissingFieldDirective {
+    pub model: String,
+    pub field: String,
+    pub directive: crate::ast::Directive,
 }
