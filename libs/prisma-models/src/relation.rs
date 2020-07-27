@@ -1,6 +1,9 @@
 use crate::prelude::*;
 use once_cell::sync::OnceCell;
-use std::sync::{Arc, Weak};
+use std::{
+    fmt::Debug,
+    sync::{Arc, Weak},
+};
 
 pub type RelationRef = Arc<Relation>;
 pub type RelationWeakRef = Weak<Relation>;
@@ -17,7 +20,6 @@ pub struct RelationTemplate {
 
 /// A relation between two models. Can be either using a `RelationTable` or
 /// model a direct link between two `RelationField`s.
-#[derive(DebugStub)]
 pub struct Relation {
     pub name: String,
 
@@ -35,8 +37,25 @@ pub struct Relation {
 
     pub manifestation: RelationLinkManifestation,
 
-    #[debug_stub = "#InternalDataModelWeakRef#"]
     pub internal_data_model: InternalDataModelWeakRef,
+}
+
+impl Debug for Relation {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Relation")
+            .field("name", &self.name)
+            .field("model_a_name", &self.model_a_name)
+            .field("model_b_name", &self.model_b_name)
+            .field("model_a_on_delete", &self.model_a_on_delete)
+            .field("model_b_on_delete", &self.model_b_on_delete)
+            .field("model_a", &self.model_a)
+            .field("model_b", &self.model_b)
+            .field("field_a", &self.field_a)
+            .field("field_b", &self.field_b)
+            .field("manifestation", &self.manifestation)
+            .field("internal_data_model", &"#InternalDataModelWeakRef#")
+            .finish()
+    }
 }
 
 #[derive(Debug, Clone, PartialEq)]

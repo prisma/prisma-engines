@@ -1,5 +1,6 @@
 use super::*;
 use crate::{ParsedField, QueryGraph, QueryGraphBuilderResult};
+use fmt::Debug;
 use once_cell::sync::OnceCell;
 use prisma_models::{dml, InternalDataModelRef, ModelRef, TypeHint};
 use std::{
@@ -101,15 +102,23 @@ impl QuerySchema {
     }
 }
 
-#[derive(DebugStub)]
 pub struct ObjectType {
     name: String,
 
-    #[debug_stub = "#Fields Cell#"]
     fields: OnceCell<Vec<FieldRef>>,
 
     // Object types can directly map to models.
     model: Option<ModelRef>,
+}
+
+impl Debug for ObjectType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("ObjectType")
+            .field("name", &self.name)
+            .field("fields", &"#Fields Cell#")
+            .field("model", &self.model)
+            .finish()
+    }
 }
 
 impl ObjectType {
@@ -187,7 +196,6 @@ impl SchemaQueryBuilder {
 pub type QueryBuilderFn = dyn (Fn(ModelRef, ParsedField) -> QueryGraphBuilderResult<QueryGraph>) + Send + Sync;
 
 /// Designates a specific top-level operation on a corresponding model.
-#[derive(DebugStub)]
 pub struct ModelQueryBuilder {
     pub model: ModelRef,
     pub tag: QueryTag,
@@ -195,8 +203,17 @@ pub struct ModelQueryBuilder {
     /// An associated builder is responsible for building queries
     /// that the executer will execute. The result info is required
     /// by the serialization to correctly build the response.
-    #[debug_stub = "#BuilderFn#"]
     pub builder_fn: Box<QueryBuilderFn>,
+}
+
+impl Debug for ModelQueryBuilder {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("ModelQueryBuilder")
+            .field("model", &self.model)
+            .field("tag", &self.tag)
+            .field("builder_fn", &"#BuilderFn")
+            .finish()
+    }
 }
 
 impl ModelQueryBuilder {
@@ -237,7 +254,7 @@ impl fmt::Display for QueryTag {
             QueryTag::Aggregate => "aggregate",
         };
 
-        s.fmt(f)
+        write!(f, "{}", s)
     }
 }
 
@@ -253,15 +270,23 @@ pub struct Argument {
     pub default_value: Option<dml::DefaultValue>,
 }
 
-#[derive(DebugStub)]
 pub struct InputObjectType {
     pub name: String,
     /// If true this means that _exactly_ one of the contained fields must be specified in an incoming query.
     /// This allows clients to handle this input type in a special way and ensure this invariant in a typesafe way.
     pub is_one_of: bool,
 
-    #[debug_stub = "#Input Fields Cell#"]
     pub fields: OnceCell<Vec<InputFieldRef>>,
+}
+
+impl Debug for InputObjectType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("InputObjectType")
+            .field("name", &self.name)
+            .field("is_one_of", &self.is_one_of)
+            .field("fields", &"#Input Fields Cell#")
+            .finish()
+    }
 }
 
 impl InputObjectType {

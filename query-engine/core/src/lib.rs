@@ -3,9 +3,6 @@
 #[macro_use]
 extern crate tracing;
 
-#[macro_use]
-extern crate debug_stub_derive;
-
 pub mod error;
 pub mod executor;
 pub mod interpreter;
