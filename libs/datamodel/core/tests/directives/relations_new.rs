@@ -725,7 +725,3 @@ fn must_error_when_many_to_many_is_not_possible_due_to_missing_id() {
         ),
     );
 }
-
-fn message_with_format_hint(msg: &str) -> String {
-    format!("{} You can run `prisma format` to fix this automatically.", msg)
-}

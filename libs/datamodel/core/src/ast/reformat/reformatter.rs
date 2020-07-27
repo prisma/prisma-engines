@@ -4,7 +4,6 @@ use pest::Parser;
 // We have to use RefCell as rust cannot
 // do multiple mutable borrows inside a match statement.
 use super::helpers::*;
-use crate::ast::WithDirectives;
 use crate::common::WritableString;
 
 pub struct Reformatter<'a> {
