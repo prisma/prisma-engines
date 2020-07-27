@@ -1,29 +1,22 @@
+use crate::query_arguments_ext::QueryArgumentsExt;
 use connector_interface::QueryArguments;
 use prisma_models::*;
 use quaint::ast::*;
 
 /// Builds
-pub fn build(query_arguments: &QueryArguments, model: &ModelRef) -> Vec<OrderDefinition<'static>> {
-    let needs_reversed_order = needs_reversed_order(query_arguments);
+pub fn build(query_arguments: &QueryArguments) -> Vec<OrderDefinition<'static>> {
+    let needs_reversed_order = query_arguments.needs_reversed_order();
 
-    for order in query_arguments.order_by.iter() {
-        match (order_by.sort_order, needs_reversed_order) {
-            (SortOrder::Ascending, true) => {
-                Self::merge_columns(first.descend(), identifier.into_iter().map(|c| c.descend()), size_hint)
-            }
-            (SortOrder::Descending, true) => {
-                Self::merge_columns(first.ascend(), identifier.into_iter().map(|c| c.descend()), size_hint)
-            }
-            (SortOrder::Ascending, false) => {
-                Self::merge_columns(first.ascend(), identifier.into_iter().map(|c| c.ascend()), size_hint)
-            }
-            (SortOrder::Descending, false) => {
-                Self::merge_columns(first.descend(), identifier.into_iter().map(|c| c.ascend()), size_hint)
-            }
+    query_arguments.order_by.iter().fold(vec![], |mut acc, next_order_by| {
+        match (next_order_by.sort_order, needs_reversed_order) {
+            (SortOrder::Ascending, true) => acc.push(next_order_by.field.as_column().descend()),
+            (SortOrder::Descending, true) => acc.push(next_order_by.field.as_column().ascend()),
+            (SortOrder::Ascending, false) => acc.push(next_order_by.field.as_column().ascend()),
+            (SortOrder::Descending, false) => acc.push(next_order_by.field.as_column().descend()),
         }
-    }
 
-    todo!()
+        acc
+    })
 }
 
 // -------------
@@ -35,11 +28,6 @@ pub fn build(query_arguments: &QueryArguments, model: &ModelRef) -> Vec<OrderDef
 //         primary_order_by: self.order_by.clone(),
 //     }
 // }
-
-/// If we need to take rows before a cursor position, then we need to reverse the order in SQL.
-fn needs_reversed_order(args: &QueryArguments) -> bool {
-    args.take.map(|t| t < 0).unwrap_or(false)
-}
 
 type OrderVec<'a> = Vec<(Expression<'a>, Option<Order>)>;
 

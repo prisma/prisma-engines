@@ -31,7 +31,7 @@ impl SelectDefinition for Select<'static> {
 impl SelectDefinition for QueryArguments {
     fn into_select(self, model: &ModelRef) -> Select<'static> {
         let cursor: ConditionTree = cursor_condition::build(&self, Arc::clone(&model));
-        let orderings = ordering::build(&self, model); //Ordering::for_model(&model, ordering_directions);
+        let orderings = ordering::build(&self);
 
         let limit = if self.ignore_take { None } else { self.take_abs() };
         let skip = if self.ignore_skip { 0 } else { self.skip.unwrap_or(0) };

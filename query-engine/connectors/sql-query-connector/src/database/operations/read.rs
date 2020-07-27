@@ -1,4 +1,5 @@
 use crate::{
+    query_arguments_ext::QueryArgumentsExt,
     query_builder::{self, read},
     QueryExt, SqlError,
 };
@@ -35,12 +36,11 @@ pub async fn get_many_records(
     mut query_arguments: QueryArguments,
     selected_fields: &ModelProjection,
 ) -> crate::Result<ManyRecords> {
-    // let reversed = query_arguments.needs_reversed_order();
+    let reversed = query_arguments.needs_reversed_order();
     let field_names = selected_fields.db_names().map(String::from).collect();
     let idents: Vec<_> = selected_fields.type_identifiers_with_arities();
     let mut records = ManyRecords::new(field_names);
 
-    // [DTODO] Absolutely no idea what the reasoning here is.
     if query_arguments.can_batch() {
         // We don't need to order in the database due to us ordering in this function.
         let order = std::mem::replace(&mut query_arguments.order_by, vec![]);
@@ -70,9 +70,9 @@ pub async fn get_many_records(
         }
     }
 
-    // if reversed {
-    //     records.reverse();
-    // }
+    if reversed {
+        records.reverse();
+    }
 
     Ok(records)
 }
