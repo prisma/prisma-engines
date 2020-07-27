@@ -60,6 +60,9 @@ pub enum DatamodelError {
     #[error("Field \"{}\" in model \"{}\" can't be a list. The current connector does not support lists of primitive types.", field_name, model_name)]
     ScalarListFieldsAreNotSupported { model_name: String, field_name: String, span: Span },
 
+    #[error("The index name `{}` is declared multiple times. With the current connector index names have to be globally unique.", index_name)]
+    MultipleIndexesWithSameNameAreNotSupported { index_name: String, span: Span },
+
     #[error("Value \"{}\" is already defined on enum \"{}\".", value_name, enum_name)]
     DuplicateEnumValueError { enum_name: String, value_name: String, span: Span },
 
@@ -246,6 +249,13 @@ impl DatamodelError {
         }
     }
 
+    pub fn new_multiple_indexes_with_same_name_are_not_supported(index_name: &str, span: Span) -> DatamodelError {
+        DatamodelError::MultipleIndexesWithSameNameAreNotSupported {
+            index_name: String::from(index_name),
+            span
+        }
+    }
+
 
     pub fn new_model_validation_error(message: &str, model_name: &str, span: Span) -> DatamodelError {
         DatamodelError::ModelValidationError {
@@ -370,6 +380,7 @@ impl DatamodelError {
             DatamodelError::DuplicateDefaultArgumentError { span, .. } => *span,
             DatamodelError::UnusedArgumentError { span, .. } => *span,
             DatamodelError::ScalarListFieldsAreNotSupported {span, ..} => *span,
+            DatamodelError::MultipleIndexesWithSameNameAreNotSupported {span, ..} => *span,
             DatamodelError::FieldValidationError {span , ..} => *span,
             DatamodelError::SourceValidationError {span, ..} => *span,
             DatamodelError::EnumValidationError {span, ..} => *span,

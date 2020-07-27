@@ -95,6 +95,114 @@ fn the_name_argument_must_work() {
 }
 
 #[test]
+fn multiple_indexes_with_same_name_are_supported_by_mysql() {
+    let dml = r#"
+    datasource mysql {
+        provider = "mysql"
+        url = "mysql://asdlj"
+    }
+
+    model User {
+        id         Int @id
+        neighborId Int
+
+        @@index([id], name: "MyIndexName")
+     }
+
+     model Post {
+        id Int @id
+        optionId Int
+
+        @@index([id], name: "MyIndexName")
+     }
+    "#;
+
+    let schema = parse(dml);
+
+    let user_model = schema.assert_has_model("User");
+    let post_model = schema.assert_has_model("Post");
+
+    user_model.assert_has_index(IndexDefinition {
+        name: Some("MyIndexName".to_string()),
+        fields: vec!["id".to_string()],
+        tpe: IndexType::Normal,
+    });
+
+    post_model.assert_has_index(IndexDefinition {
+        name: Some("MyIndexName".to_string()),
+        fields: vec!["id".to_string()],
+        tpe: IndexType::Normal,
+    });
+}
+
+#[test]
+fn multiple_indexes_with_same_name_are_not_supported_by_sqlite() {
+    let dml = r#"
+    datasource sqlite {
+        provider = "sqlite"
+        url = "sqlite://asdlj"
+    }
+
+    model User {
+        id         Int @id
+        neighborId Int
+
+        @@index([id], name: "MyIndexName")
+     }
+
+     model Post {
+        id Int @id
+        optionId Int
+
+        @@index([id], name: "MyIndexName")
+     }
+    "#;
+
+    let errors = parse_error(dml);
+
+    errors.assert_length(1);
+    errors.assert_is_at(
+        0,
+        DatamodelError::new_multiple_indexes_with_same_name_are_not_supported("MyIndexName", Span::new(279, 311)),
+    );
+}
+
+#[test]
+fn multiple_indexes_with_same_name_are_not_supported_by_postgres() {
+    let dml = r#"
+    datasource postgres {
+        provider = "postgres"
+        url = "postgres://asdlj"
+    }
+
+    model User {
+        id         Int @id
+        neighborId Int
+
+        @@index([id], name: "MyIndexName")
+     }
+
+     model Post {
+        id Int @id
+        optionId Int
+
+        @@index([id], name: "MyIndexName")
+     }
+    "#;
+
+    let errors = parse_error(dml);
+    for error in errors.errors.iter() {
+        println!("DATAMODEL ERROR: {:?}", error);
+    }
+
+    errors.assert_length(1);
+    errors.assert_is_at(
+        0,
+        DatamodelError::new_multiple_indexes_with_same_name_are_not_supported("MyIndexName", Span::new(285, 317)),
+    );
+}
+
+#[test]
 fn multiple_index_must_work() {
     let dml = r#"
     model User {

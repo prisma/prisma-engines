@@ -49,6 +49,7 @@ impl BuiltinConnectors {
                 ConnectorCapability::RelationsOverNonUniqueCriteria,
                 ConnectorCapability::Enums,
                 ConnectorCapability::Json,
+                ConnectorCapability::MultipleIndexesWithSameName,
             ],
         }
     }
