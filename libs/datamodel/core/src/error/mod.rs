@@ -64,7 +64,6 @@ pub enum DatamodelError {
     MultipleIndexesWithSameNameAreNotSupported { index_name: String, span: Span },
 
     #[error("Value \"{}\" is already defined on enum \"{}\".", value_name, enum_name)]
-
     DuplicateEnumValueError { enum_name: String, value_name: String, span: Span },
 
     #[error("Attribute not known: \"@{}\".", directive_name)]
