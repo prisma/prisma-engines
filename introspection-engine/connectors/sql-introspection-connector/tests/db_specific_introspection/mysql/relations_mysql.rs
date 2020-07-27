@@ -276,7 +276,7 @@ async fn introspecting_a_prisma_many_to_many_relation_should_work(api: &TestApi)
 
             model User {
                id       Int @id @default(autoincrement())
-               Post     Post[]
+               Post     Post[] @relation(references: [id]
             }
         "#;
     let result = dbg!(api.introspect().await);
