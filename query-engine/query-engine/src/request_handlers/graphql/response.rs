@@ -2,7 +2,6 @@
 use indexmap::IndexMap;
 // use internal::*;
 use crate::PrismaError;
-use failure::Fail;
 use query_core::{
     response_ir::{Item, Map, ResponseData},
     CoreError,
@@ -90,7 +89,7 @@ impl From<PrismaError> for GQLError {
     fn from(other: PrismaError) -> Self {
         match other {
             PrismaError::CoreError(core_error) => GQLError::from(core_error),
-            err => GQLError::from(user_facing_errors::Error::from_dyn_error(&err.compat())),
+            err => GQLError::from(user_facing_errors::Error::from_dyn_error(&err)),
         }
     }
 }

@@ -292,7 +292,7 @@ impl<'a> Renderer<'a> {
         };
     }
 
-    fn render_field_directive(target: &mut dyn LineWriteable, directive: &ast::Directive) {
+    pub fn render_field_directive(target: &mut dyn LineWriteable, directive: &ast::Directive) {
         target.write("@");
         target.write(&directive.name.name);
 

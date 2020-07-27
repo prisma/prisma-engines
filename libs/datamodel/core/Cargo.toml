@@ -15,8 +15,8 @@ colored = "1.8.0"
 chrono = { version = "0.4.6", features = ["serde"] }
 itertools = "0.8"
 serde = { version = "1.0.90", features = ["derive"] }
-serde_json ={version =  "1.0" ,features = ["preserve_order"]}
-failure = { version = "0.1", features = ["derive"] }
+serde_json = { version =  "1.0", features = ["preserve_order"] }
+thiserror = "1.0"
 uuid = { version = "0.8", features = ["serde", "v4"] }
 cuid = { git = "https://github.com/prisma/cuid-rust" }
 bytecount = "0.5"

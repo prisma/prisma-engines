@@ -2,7 +2,7 @@ use introspection_connector::{ConnectorError, ErrorKind};
 use quaint::error::{Error as QuaintError, ErrorKind as QuaintKind};
 use thiserror::Error;
 use user_facing_errors::introspection_engine::DatabaseSchemaInconsistent;
-use user_facing_errors::{quaint::render_quaint_error, query_engine::DatabaseConstraint, KnownError};
+use user_facing_errors::{common, quaint::render_quaint_error, query_engine::DatabaseConstraint, KnownError};
 
 pub type SqlResult<T> = Result<T, SqlError>;
 
@@ -47,6 +47,9 @@ pub enum SqlError {
         #[source]
         cause: QuaintKind,
     },
+
+    #[error("{}", _0)]
+    DatabaseUrlIsInvalid(String),
 
     #[error("Connect timed out")]
     ConnectTimeout(#[source] QuaintKind),
@@ -137,6 +140,17 @@ impl SqlError {
                 .ok(),
                 kind: ErrorKind::DatabaseSchemaInconsistent { explanation },
             },
+            SqlError::DatabaseUrlIsInvalid(reason) => {
+                let user_facing_error = KnownError::new(common::InvalidDatabaseString {
+                    details: reason.clone(),
+                })
+                .ok();
+
+                ConnectorError {
+                    user_facing_error,
+                    kind: ErrorKind::InvalidDatabaseUrl(reason),
+                }
+            }
             error => ConnectorError::from_kind(ErrorKind::QueryError(error.into())),
         }
     }
@@ -161,6 +175,7 @@ impl From<QuaintKind> for SqlError {
                 user: user.clone(),
                 cause: kind,
             },
+            QuaintKind::DatabaseUrlIsInvalid(reason) => Self::DatabaseUrlIsInvalid(reason),
             e @ QuaintKind::ConnectTimeout(..) => Self::ConnectTimeout(e),
             QuaintKind::ConnectionError { .. } => Self::ConnectionError { cause: kind },
             QuaintKind::Timeout(message) => Self::Timeout(format!("quaint timeout: {}", message)),

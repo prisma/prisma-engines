@@ -19,6 +19,7 @@ enum RpcCommand {
     ApplyMigration,
     UnapplyMigration,
     Reset,
+    SchemaPush,
     CalculateDatamodel,
     CalculateDatabaseSteps,
 }
@@ -32,6 +33,7 @@ impl RpcCommand {
             RpcCommand::ApplyMigration => "applyMigration",
             RpcCommand::UnapplyMigration => "unapplyMigration",
             RpcCommand::Reset => "reset",
+            RpcCommand::SchemaPush => "schemaPush",
             RpcCommand::CalculateDatamodel => "calculateDatamodel",
             RpcCommand::CalculateDatabaseSteps => "calculateDatabaseSteps",
         }
@@ -45,6 +47,7 @@ static AVAILABLE_COMMANDS: &[RpcCommand] = &[
     RpcCommand::MigrationProgress,
     RpcCommand::UnapplyMigration,
     RpcCommand::Reset,
+    RpcCommand::SchemaPush,
     RpcCommand::CalculateDatamodel,
     RpcCommand::CalculateDatabaseSteps,
 ];
@@ -137,6 +140,11 @@ impl RpcApi {
                 render(executor.unapply_migration(&input).await?)
             }
             RpcCommand::Reset => render(executor.reset(&serde_json::Value::Null).await?),
+            RpcCommand::SchemaPush => {
+                let input: SchemaPushInput = params.clone().parse()?;
+
+                render(executor.schema_push(&input).await?)
+            }
             RpcCommand::CalculateDatamodel => {
                 let input: CalculateDatamodelInput = params.clone().parse()?;
                 render(executor.calculate_datamodel(&input).await?)

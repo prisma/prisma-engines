@@ -1,4 +1,3 @@
-use anyhow::format_err;
 use std::fmt::Display;
 use thiserror::Error;
 use tracing_error::SpanTrace;
@@ -27,11 +26,7 @@ impl ConnectorError {
     pub fn url_parse_error(err: impl Display, url: &str) -> Self {
         ConnectorError {
             user_facing_error: None,
-            kind: ErrorKind::Generic(format_err!(
-                "Could not parse the database connection string `{}`: {}",
-                url,
-                err
-            )),
+            kind: ErrorKind::InvalidDatabaseUrl(format!("{} in `{}`)", err, url)),
             context: SpanTrace::capture(),
         }
     }
@@ -60,8 +55,8 @@ pub enum ErrorKind {
     #[error("Authentication failed for user '{}'", user)]
     AuthenticationFailed { user: String },
 
-    #[error("The database URL is not valid")]
-    InvalidDatabaseUrl,
+    #[error("{}", _0)]
+    InvalidDatabaseUrl(String),
 
     #[error("Failed to connect to the database at `{}`.", host)]
     ConnectionError {

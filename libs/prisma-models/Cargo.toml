@@ -17,7 +17,7 @@ debug_stub_derive = "0.3"
 uuid = { version = "0.8", features = ["serde", "v4"] }
 cuid = { git = "https://github.com/prisma/cuid-rust" }
 chrono = { version = "0.4", features = ["serde"] }
-failure = { version = "0.1", features = ["derive"] }
+thiserror = "1.0"
 rand = "0.7"
 datamodel = { path = "../datamodel/core" }
 itertools = "0.8"

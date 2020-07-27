@@ -1,8 +1,8 @@
 use connector_interface::{error::*, Filter};
-use failure::{Error, Fail};
 use prisma_models::prelude::DomainError;
 use quaint::error::ErrorKind as QuaintKind;
 use std::{any::Any, string::FromUtf8Error};
+use thiserror::Error;
 use user_facing_errors::query_engine::DatabaseConstraint;
 
 pub struct RawError {
@@ -38,44 +38,46 @@ impl From<Box<dyn Any + Send>> for RawError {
     }
 }
 
-#[derive(Debug, Fail)]
+#[derive(Debug, Error)]
 pub enum SqlError {
-    #[fail(display = "Unique constraint failed: {:?}", constraint)]
+    #[error("Unique constraint failed: {:?}", constraint)]
     UniqueConstraintViolation { constraint: DatabaseConstraint },
 
-    #[fail(display = "Null constraint failed: {:?}", constraint)]
+    #[error("Null constraint failed: {:?}", constraint)]
     NullConstraintViolation { constraint: DatabaseConstraint },
 
-    #[fail(display = "Foreign key constraint failed")]
+    #[error("Foreign key constraint failed")]
     ForeignKeyConstraintViolation { constraint: DatabaseConstraint },
 
-    #[fail(display = "Record does not exist.")]
+    #[error("Record does not exist.")]
     RecordDoesNotExist,
 
-    #[fail(display = "Column does not exist")]
+    #[error("Column does not exist")]
     ColumnDoesNotExist,
 
-    #[fail(display = "Error creating a database connection. ({})", _0)]
+    #[error("Error creating a database connection. ({})", _0)]
     ConnectionError(QuaintKind),
 
-    #[fail(display = "Error querying the database: {}", _0)]
+    #[error("Error querying the database: {}", _0)]
     QueryError(Box<dyn std::error::Error + Send + Sync>),
 
-    #[fail(display = "The column value was different from the model")]
+    #[error("The column value was different from the model")]
     ColumnReadFailure(Box<dyn std::error::Error + Send + Sync>),
 
-    #[fail(display = "Field cannot be null: {}", field)]
+    #[error("Field cannot be null: {}", field)]
     FieldCannotBeNull { field: String },
 
-    #[fail(display = "{}", _0)]
+    #[error("{}", _0)]
     DomainError(DomainError),
 
-    #[fail(display = "Record not found: {:?}", _0)]
+    #[error("Record not found: {:?}", _0)]
     RecordNotFoundForWhere(Filter),
 
-    #[fail(
-        display = "Violating a relation {} between {} and {}",
-        relation_name, model_a_name, model_b_name
+    #[error(
+        "Violating a relation {} between {} and {}",
+        relation_name,
+        model_a_name,
+        model_b_name
     )]
     RelationViolation {
         relation_name: String,
@@ -83,9 +85,11 @@ pub enum SqlError {
         model_b_name: String,
     },
 
-    #[fail(
-        display = "The relation {} has no record for the model {} connected to a record for the model {} on your write path.",
-        relation_name, parent_name, child_name
+    #[error(
+        "The relation {} has no record for the model {} connected to a record for the model {} on your write path.",
+        relation_name,
+        parent_name,
+        child_name
     )]
     RecordsNotConnected {
         relation_name: String,
@@ -95,10 +99,10 @@ pub enum SqlError {
         // child_where: Option<Box<RecordFinderInfo>>,
     },
 
-    #[fail(display = "Conversion error: {}", _0)]
-    ConversionError(Error),
+    #[error("Conversion error: {0}")]
+    ConversionError(anyhow::Error),
 
-    #[fail(display = "Database error. error code: {}, error message: {}", code, message)]
+    #[error("Database error. error code: {}, error message: {}", code, message)]
     RawError { code: String, message: String },
 }
 

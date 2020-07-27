@@ -71,6 +71,7 @@ impl SqlDatabaseStepApplier<'_> {
         next_schema: &SqlSchema,
     ) -> SqlResult<bool> {
         let has_this_one = steps.get(index).is_some();
+
         if !has_this_one {
             return Ok(false);
         }
@@ -86,8 +87,7 @@ impl SqlDatabaseStepApplier<'_> {
             self.conn().raw_cmd(&sql_string).await?;
         }
 
-        let has_more = steps.get(index + 1).is_some();
-        Ok(has_more)
+        Ok(true)
     }
 }
 
