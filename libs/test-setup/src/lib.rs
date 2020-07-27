@@ -79,6 +79,15 @@ pub fn postgres_12_url(db_name: &str) -> String {
     )
 }
 
+pub fn postgres_13_url(db_name: &str) -> String {
+    let (host, port) = db_host_and_port_postgres_13();
+
+    format!(
+        "postgresql://postgres:prisma@{}:{}/{}?schema={}&statement_cache_size=0",
+        host, port, db_name, SCHEMA_NAME
+    )
+}
+
 pub fn mysql_url(db_name: &str) -> String {
     let db_name = mysql_safe_identifier(db_name);
 
@@ -164,6 +173,13 @@ fn db_host_and_port_postgres_12() -> (&'static str, usize) {
     match std::env::var("IS_BUILDKITE") {
         Ok(_) => ("test-db-postgres-12", 5432),
         Err(_) => ("127.0.0.1", 5434),
+    }
+}
+
+fn db_host_and_port_postgres_13() -> (&'static str, usize) {
+    match std::env::var("IS_BUILDKITE") {
+        Ok(_) => ("test-db-postgres-13", 5432),
+        Err(_) => ("127.0.0.1", 5435),
     }
 }
 
@@ -257,6 +273,19 @@ pub fn postgres_12_test_config(db_name: &str) -> String {
         }}
     "#,
         postgres_12_url(db_name)
+    )
+}
+
+pub fn postgres_13_test_config(db_name: &str) -> String {
+    format!(
+        r#"
+        datasource my_db {{
+            provider = "postgresql"
+            url = "{}"
+            default = true
+        }}
+    "#,
+        postgres_13_url(db_name)
     )
 }
 

@@ -235,3 +235,18 @@ pub async fn postgres12_test_api(db_name: &str) -> TestApi {
         provider: "postgres",
     }
 }
+
+pub async fn postgres13_test_api(db_name: &str) -> TestApi {
+    let postgres_url = test_setup::postgres_13_url(db_name);
+
+    test_setup::create_postgres_database(&postgres_url.parse().unwrap())
+        .await
+        .unwrap();
+
+    TestApi {
+        connector_name: "postgres13",
+        connection: Quaint::new(&postgres_url).await.unwrap(),
+        database_string: postgres_url,
+        provider: "postgres",
+    }
+}

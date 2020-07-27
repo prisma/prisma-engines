@@ -365,6 +365,19 @@ pub async fn postgres12_test_api(db_name: &str) -> TestApi {
     }
 }
 
+pub async fn postgres13_test_api(db_name: &str) -> TestApi {
+    let url = postgres_13_url(db_name);
+    let connection_info = ConnectionInfo::from_url(&url).unwrap();
+    let connector = postgres_migration_connector(&url).await;
+
+    TestApi {
+        connector_name: "postgres13",
+        connection_info,
+        database: Arc::clone(&connector.database),
+        api: test_api(connector).await,
+    }
+}
+
 pub async fn sqlite_test_api(db_name: &str) -> TestApi {
     let connection_info = ConnectionInfo::from_url(&sqlite_test_url(db_name)).unwrap();
     let connector = sqlite_migration_connector(db_name).await;

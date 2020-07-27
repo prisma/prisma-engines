@@ -445,6 +445,10 @@ pub fn postgres12_test_api(db_name: &'static str) -> Ready<TestApi> {
     futures::future::ready(TestApi::new(db_name, postgres_12_url, "postgresql12", "postgres"))
 }
 
+pub fn postgres13_test_api(db_name: &'static str) -> Ready<TestApi> {
+    futures::future::ready(TestApi::new(db_name, postgres_13_url, "postgresql13", "postgres"))
+}
+
 pub fn sqlite_test_api(db_name: &'static str) -> Ready<TestApi> {
     futures::future::ready(TestApi::new(db_name, sqlite_test_file, "sqlite", "sqlite"))
 }

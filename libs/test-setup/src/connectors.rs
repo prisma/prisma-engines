@@ -15,6 +15,7 @@ fn connector_names() -> Vec<(&'static str, Tags)> {
         ("postgres", Tags::POSTGRES),
         ("postgres11", Tags::POSTGRES),
         ("postgres12", Tags::POSTGRES),
+        ("postgres13", Tags::POSTGRES),
         ("mysql_mariadb", Tags::MYSQL | Tags::MARIADB),
         ("sqlite", Tags::SQLITE),
     ]
