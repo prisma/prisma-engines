@@ -22,7 +22,13 @@ pub(crate) fn order_by_object_type(ctx: &mut BuilderContext, model: &ModelRef) -
         .fields()
         .scalar()
         .iter()
-        .map(|sf| input_field(sf.name.clone(), InputType::Enum(enum_type.clone()), None))
+        .map(|sf| {
+            input_field(
+                sf.name.clone(),
+                InputType::opt(InputType::Enum(enum_type.clone())),
+                None,
+            )
+        })
         .collect();
 
     input_object.set_fields(fields);

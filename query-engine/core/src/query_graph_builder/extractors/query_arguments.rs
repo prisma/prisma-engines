@@ -68,10 +68,12 @@ pub fn extract_query_args(arguments: Vec<ParsedArgument>, model: &ModelRef) -> Q
 
 /// Extracts order by conditions in order of appearance, as defined in
 fn extract_order_by(model: &ModelRef, value: ParsedInputValue) -> QueryGraphBuilderResult<Vec<OrderBy>> {
+    dbg!(&value);
     match value {
         ParsedInputValue::Map(map) => map
             .into_iter()
             .map(|(field_name, sort_order)| {
+                dbg!(&field_name, &sort_order);
                 let field = model.fields().find_from_scalar(&field_name)?;
                 let value: PrismaValue = sort_order.try_into()?;
                 let sort_order = match value.into_string().unwrap().to_lowercase().as_str() {
