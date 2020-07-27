@@ -186,12 +186,15 @@ impl<'a> Validator<'a> {
                 for index in model.indices.iter() {
                     if let Some(index_name) = &index.name {
                         if index_names.contains(index_name) && !multiple_indexes_with_same_name_are_supported {
-                            if let Some(ast_index) = ast_model.directives.iter().find(|directive| directive.name.name == "index") {
-                                errors.push(DatamodelError::new_multiple_indexes_with_same_name_are_not_supported(
-                                    index_name,
-                                    ast_index.span,
-                                ));
-                            }
+                            let ast_index = ast_model
+                                .directives
+                                .iter()
+                                .find(|directive| directive.name.name == "index")
+                                .unwrap();
+                            errors.push(DatamodelError::new_multiple_indexes_with_same_name_are_not_supported(
+                                index_name,
+                                ast_index.span,
+                            ));
                         }
                         index_names.insert(index_name);
                     }
