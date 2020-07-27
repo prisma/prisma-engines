@@ -176,10 +176,10 @@ impl<'a> Validator<'a> {
         let mut errors = ErrorCollection::new();
         let mut index_names = HashSet::new();
 
-        let multiple_indexes_with_same_name_are_supported = match self.source {
-            Some(source) => source.combined_connector.supports_multiple_indexes_with_same_name(),
-            None => false,
-        };
+        let multiple_indexes_with_same_name_are_supported = self
+            .source
+            .map(|source| source.combined_connector.supports_multiple_indexes_with_same_name())
+            .unwrap_or(false);
 
         for model in schema.models() {
             if let Some(ast_model) = ast_schema.find_model(&model.name) {
@@ -191,7 +191,6 @@ impl<'a> Validator<'a> {
                                 .iter()
                                 .find(|directive| directive.name.name == "index")
                                 .unwrap();
-                            println!("{:?}", index_name);
                             errors.push(DatamodelError::new_multiple_indexes_with_same_name_are_not_supported(
                                 index_name,
                                 ast_index.span,
