@@ -1197,4 +1197,19 @@ mod tests {
 
         assert_eq!(Some("bar"), val);
     }
+
+    #[tokio::test]
+    async fn unknown_table_should_give_a_good_error() {
+        let conn = Quaint::new(&CONN_STR).await.unwrap();
+        let select = Select::from_table("not_there");
+
+        let err = conn.select(select).await.unwrap_err();
+
+        match err.kind() {
+            ErrorKind::TableDoesNotExist { table } => {
+                assert_eq!("not_there", table.as_str());
+            }
+            e => panic!("Expected error TableDoesNotExist, got {:?}", e),
+        }
+    }
 }

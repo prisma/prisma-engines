@@ -142,17 +142,28 @@ impl From<rusqlite::Error> for Error {
                 builder.build()
             }
 
-            rusqlite::Error::SqliteFailure(ffi::Error { extended_code, .. }, ref description) => {
-                let description = description.as_ref().map(|d| d.to_string());
-                let mut builder = Error::builder(ErrorKind::QueryError(e.into()));
-                builder.set_original_code(format!("{}", extended_code));
+            rusqlite::Error::SqliteFailure(ffi::Error { extended_code, .. }, ref description) => match description {
+                Some(d) if d.starts_with("no such table") => {
+                    let table = d.split(": ").last().unwrap().into();
 
-                if let Some(description) = description {
-                    builder.set_original_message(description);
+                    let mut builder = Error::builder(ErrorKind::TableDoesNotExist { table });
+                    builder.set_original_code(format!("{}", extended_code));
+                    builder.set_original_message(d);
+
+                    builder.build()
                 }
+                _ => {
+                    let description = description.as_ref().map(|d| d.to_string());
+                    let mut builder = Error::builder(ErrorKind::QueryError(e.into()));
+                    builder.set_original_code(format!("{}", extended_code));
 
-                builder.build()
-            }
+                    if let Some(description) = description {
+                        builder.set_original_message(description);
+                    }
+
+                    builder.build()
+                }
+            },
             e => Error::builder(ErrorKind::QueryError(e.into())).build(),
         }
     }

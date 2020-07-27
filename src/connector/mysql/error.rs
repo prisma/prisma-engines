@@ -123,6 +123,18 @@ impl From<my::error::Error> for Error {
 
                 builder.build()
             }
+            my::error::Error::Server(ServerError { ref message, code, .. }) if code == 1146 => {
+                let splitted: Vec<&str> = message.split_whitespace().collect();
+                let splitted: Vec<&str> = splitted[1].split('\'').collect();
+                let splitted: Vec<&str> = splitted[1].split('.').collect();
+                let table = splitted.last().unwrap().to_string();
+
+                let mut builder = Error::builder(ErrorKind::TableDoesNotExist { table });
+                builder.set_original_code(format!("{}", code));
+                builder.set_original_message(message);
+
+                builder.build()
+            }
             my::error::Error::Server(ServerError {
                 ref message,
                 code,

@@ -357,7 +357,7 @@ impl MssqlUrl {
 
 #[cfg(test)]
 mod tests {
-    use crate::{ast::*, pooled, prelude::*, single, val};
+    use crate::{ast::*, error::ErrorKind, pooled, prelude::*, single, val};
     use chrono::{DateTime, NaiveDate, NaiveTime, Utc};
     use names::Generator;
     use once_cell::sync::Lazy;
@@ -1876,5 +1876,20 @@ mod tests {
         let val = row.get("val").unwrap().as_str();
 
         assert_eq!(Some("bar"), val);
+    }
+
+    #[tokio::test]
+    async fn unknown_table_should_give_a_good_error() {
+        let conn = single::Quaint::new(&CONN_STR).await.unwrap();
+        let select = Select::from_table("not_there");
+
+        let err = conn.select(select).await.unwrap_err();
+
+        match err.kind() {
+            ErrorKind::TableDoesNotExist { table } => {
+                assert_eq!("not_there", table.as_str());
+            }
+            e => panic!("Expected error TableDoesNotExist, got {:?}", e),
+        }
     }
 }

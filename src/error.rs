@@ -105,6 +105,9 @@ pub enum ErrorKind {
     #[error("Query returned no data")]
     NotFound,
 
+    #[error("No such table: {}", table)]
+    TableDoesNotExist { table: String },
+
     #[error("Unique constraint failed: {}", constraint)]
     UniqueConstraintViolation { constraint: DatabaseConstraint },
 
