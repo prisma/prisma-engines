@@ -8,10 +8,11 @@ class OrderBySpec extends FlatSpec with Matchers with ApiSpecBase {
   val project = SchemaDsl.fromStringV11() {
     """
       |model OrderTest {
-      |  id            String @id
       |  uniqueField   Int    @unique
       |  nonUniqFieldA String
       |  nonUniqFieldB String
+      |
+      |  @@id([nonUniqFieldA, nonUniqFieldB])
       |}
     """
   }
@@ -27,7 +28,7 @@ class OrderBySpec extends FlatSpec with Matchers with ApiSpecBase {
       """
         |{
         |  findManyOrderTest(orderBy: { uniqueField: ASC }) {
-        |    uniqueFieldA
+        |    uniqueField
         |  }
         |}
       """,
@@ -57,12 +58,13 @@ class OrderBySpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "Ordering with on a non-unique field" should "implicitly order by ID" in {
+    // Implicitly adds the second part of the primary key (nonUniqFieldB ASC) to the order_by.
     val result = server.query(
       """
         |{
         |  findManyOrderTest(orderBy: { nonUniqFieldA: DESC }) {
-        |    id
         |    nonUniqFieldA
+        |    nonUniqFieldB
         |  }
         |}
       """,
@@ -71,10 +73,10 @@ class OrderBySpec extends FlatSpec with Matchers with ApiSpecBase {
     )
 
     result.toString should be(
-      """{"data":{"findManyOrderTest":[{"id":"5","nonUniqField":"C"},{"id":"6","nonUniqField":"C"},{"id":"3","nonUniqField":"B"},{"id":"4","nonUniqField":"B"},{"id":"1","nonUniqField":"A"},{"id":"2","nonUniqField":"A"}]}}""")
+      """{"data":{"findManyOrderTest":[{"nonUniqFieldA":"C","nonUniqFieldB":"B"},{"nonUniqFieldA":"C","nonUniqFieldB":"C"},{"nonUniqFieldA":"B","nonUniqFieldB":"A"},{"nonUniqFieldA":"B","nonUniqFieldB":"C"},{"nonUniqFieldA":"A","nonUniqFieldB":"A"},{"nonUniqFieldA":"A","nonUniqFieldB":"B"}]}}""")
   }
 
-  "Ordering by multiple fields with at least one unique" should "work" in {
+  "Ordering by multiple fields with at least one individually unique field" should "work" in {
     val result = server.query(
       """
         |{
@@ -211,11 +213,11 @@ class OrderBySpec extends FlatSpec with Matchers with ApiSpecBase {
 //  }
 
   private def createTestData(): Unit = {
-    server.query("""mutation {createOneOrderTest(data: { id: "1", uniqueField: 1, nonUniqFieldA: "A", nonUniqFieldB: "A"}){ id }}""", project, legacy = false)
-    server.query("""mutation {createOneOrderTest(data: { id: "2", uniqueField: 2, nonUniqFieldA: "A", nonUniqFieldB: "B"}){ id }}""", project, legacy = false)
-    server.query("""mutation {createOneOrderTest(data: { id: "3", uniqueField: 3, nonUniqFieldA: "B", nonUniqFieldB: "C"}){ id }}""", project, legacy = false)
-    server.query("""mutation {createOneOrderTest(data: { id: "4", uniqueField: 4, nonUniqFieldA: "B", nonUniqFieldB: "A"}){ id }}""", project, legacy = false)
-    server.query("""mutation {createOneOrderTest(data: { id: "5", uniqueField: 5, nonUniqFieldA: "C", nonUniqFieldB: "B"}){ id }}""", project, legacy = false)
-    server.query("""mutation {createOneOrderTest(data: { id: "6", uniqueField: 6, nonUniqFieldA: "C", nonUniqFieldB: "C"}){ id }}""", project, legacy = false)
+    server.query("""mutation {createOneOrderTest(data: { uniqueField: 1, nonUniqFieldA: "A", nonUniqFieldB: "A"}){ uniqueField }}""", project, legacy = false)
+    server.query("""mutation {createOneOrderTest(data: { uniqueField: 2, nonUniqFieldA: "A", nonUniqFieldB: "B"}){ uniqueField }}""", project, legacy = false)
+    server.query("""mutation {createOneOrderTest(data: { uniqueField: 3, nonUniqFieldA: "B", nonUniqFieldB: "C"}){ uniqueField }}""", project, legacy = false)
+    server.query("""mutation {createOneOrderTest(data: { uniqueField: 4, nonUniqFieldA: "B", nonUniqFieldB: "A"}){ uniqueField }}""", project, legacy = false)
+    server.query("""mutation {createOneOrderTest(data: { uniqueField: 5, nonUniqFieldA: "C", nonUniqFieldB: "B"}){ uniqueField }}""", project, legacy = false)
+    server.query("""mutation {createOneOrderTest(data: { uniqueField: 6, nonUniqFieldA: "C", nonUniqFieldB: "C"}){ uniqueField }}""", project, legacy = false)
   }
 }
