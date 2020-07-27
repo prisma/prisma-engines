@@ -10,7 +10,7 @@ pub struct SkipAndLimit {
 /// `QueryArguments` define various constraints queried data should fulfill:
 /// - `cursor`, `take`, `skip` page through the data.
 /// - `filter` scopes the data by defining conditions (akin to `WHERE` in SQL).
-/// - `order_by` defines the ordering of records.
+/// - `order_by` defines the ordering of records, from left to right.
 /// - `distinct` designates the fields on which the records should be distinct.
 /// - The `ignore_*` flags are a temporary bandaid to tell the connector to do not
 ///   include certain constraints when building queries, because the core is already
@@ -28,13 +28,6 @@ pub struct QueryArguments {
 }
 
 impl QueryArguments {
-    // pub fn ordering_directions(&self) -> OrderDirections {
-    //     OrderDirections {
-    //         needs_implicit_id_ordering: self.needs_implicit_ordering(),
-    //         primary_order_by: self.order_by.clone(),
-    //     }
-    // }
-
     pub fn take_abs(&self) -> Option<i64> {
         self.take.clone().map(|t| if t < 0 { t * -1 } else { t })
     }
@@ -84,8 +77,3 @@ where
         query_arguments
     }
 }
-
-// pub struct OrderDirections {
-//     pub needs_implicit_id_ordering: bool,
-//     pub primary_order_by: Option<OrderBy>,
-// }

@@ -3,7 +3,7 @@ use prisma_models::*;
 use quaint::ast::*;
 
 pub fn build(query_arguments: &QueryArguments, model: ModelRef) -> ConditionTree<'static> {
-    todo!()
+    ConditionTree::NoCondition
     // match (query_arguments.cursor.as_ref(), query_arguments.order_by.as_ref()) {
     //     (None, _) => ConditionTree::NoCondition,
     //     (Some(cursor), order_by) => {
