@@ -16,7 +16,7 @@ pub trait CreateInputTypeBuilderExtension<'a>: InputTypeBuilderBase<'a> {
         let where_object = self.where_unique_object_type(&related_model);
         let create_object = self.create_input_type(Arc::clone(&related_model), Some(Arc::clone(&parent_field)));
 
-        if where_object.into_arc().is_empty() || create_object.into_arc().is_empty() {
+        if where_object.into_arc().is_empty() {
             return None;
         }
 
