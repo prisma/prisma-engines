@@ -10,7 +10,7 @@ prisma-value = { path = "../../libs/prisma-value" }
 feature-flags = { path = "../../libs/feature-flags" }
 prisma-inflector = { path = "../../libs/prisma-inflector" }
 connector = { path = "../connectors/query-connector", package = "query-connector" }
-failure = { version =  "0.1", features = ["derive"] }
+thiserror = "1.0"
 uuid = "0.8"
 indexmap = { version = "1.0", features = ["serde-1"] }
 itertools = "0.8"

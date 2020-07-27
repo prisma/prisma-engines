@@ -154,7 +154,7 @@ pub fn row_value_to_prisma_value(p_value: Value, type_identifier: &TypeIdentifie
                 let dt = DateTime::parse_from_rfc3339(dt_string.borrow())
                     .or_else(|_| DateTime::parse_from_rfc2822(dt_string.borrow()))
                     .map_err(|err| {
-                        failure::format_err!("Could not parse stored DateTime string: {} ({})", dt_string, err)
+                        anyhow::format_err!("Could not parse stored DateTime string: {} ({})", dt_string, err)
                     })
                     .unwrap();
 
