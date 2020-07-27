@@ -277,7 +277,6 @@ impl QueryDocumentParser {
         object: IndexMap<String, QueryValue>,
         schema_object: InputObjectTypeStrongRef,
     ) -> QueryParserResult<ParsedInputMap> {
-        dbg!(&object);
         let left: HashSet<&str> = schema_object
             .get_fields()
             .iter()
