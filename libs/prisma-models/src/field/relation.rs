@@ -2,6 +2,7 @@ use crate::prelude::*;
 use datamodel::{FieldArity, RelationInfo};
 use once_cell::sync::OnceCell;
 use std::{
+    fmt::Debug,
     hash::{Hash, Hasher},
     sync::{Arc, Weak},
 };
@@ -22,7 +23,7 @@ pub struct RelationFieldTemplate {
     pub relation_info: RelationInfo,
 }
 
-#[derive(DebugStub, Clone)]
+#[derive(Clone)]
 pub struct RelationField {
     pub name: String,
     pub is_required: bool,
@@ -32,9 +33,24 @@ pub struct RelationField {
     pub relation: OnceCell<RelationWeakRef>,
     pub relation_info: RelationInfo,
 
-    #[debug_stub = "#ModelWeakRef#"]
     pub model: ModelWeakRef,
     pub(crate) fields: OnceCell<Vec<ScalarFieldWeak>>,
+}
+
+impl Debug for RelationField {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("RelationField")
+            .field("name", &self.name)
+            .field("is_required", &self.is_required)
+            .field("is_list", &self.is_list)
+            .field("relation_name", &self.relation_name)
+            .field("relation_side", &self.relation_side)
+            .field("relation", &self.relation)
+            .field("relation_info", &self.relation_info)
+            .field("model", &"#ModelWeakRef#")
+            .field("fields", &self.fields)
+            .finish()
+    }
 }
 
 impl Eq for RelationField {}

@@ -13,7 +13,7 @@ use url::Url;
 use sql_connector::*;
 
 #[cfg(all(feature = "sql", feature = "mssql"))]
-use datamodel::configuration::MSSQL_SOURCE_NAME;
+use datamodel::common::provider_names::MSSQL_SOURCE_NAME;
 
 pub async fn load(source: &Datasource) -> PrismaResult<(String, Box<dyn QueryExecutor + Send + Sync + 'static>)> {
     match source.active_provider.as_str() {

@@ -1277,14 +1277,14 @@ async fn index_renaming_must_work_when_renaming_to_default(api: &TestApi) {
         .table_bang("A")
         .indices
         .iter()
-        .filter(|i| i.columns == &["field", "secondField"] && i.name == "A.field_secondField");
+        .filter(|i| i.columns == &["field", "secondField"] && i.name == "A.field_secondField_unique");
     assert_eq!(indexes.count(), 1);
 
     // Test that we are not dropping and recreating the index. Except in SQLite, because there we are.
     if !api.is_sqlite() {
         let expected_steps = vec![SqlMigrationStep::AlterIndex(AlterIndex {
             table: "A".into(),
-            index_new_name: "A.field_secondField".into(),
+            index_new_name: "A.field_secondField_unique".into(),
             index_name: "customName".into(),
         })];
         let actual_steps = result.sql_migration();
@@ -1334,7 +1334,7 @@ async fn index_renaming_must_work_when_renaming_to_custom(api: &TestApi) -> Test
     if !api.is_sqlite() {
         let expected_steps = &[SqlMigrationStep::AlterIndex(AlterIndex {
             table: "A".into(),
-            index_name: "A.field_secondField".into(),
+            index_name: "A.field_secondField_unique".into(),
             index_new_name: "somethingCustom".into(),
         })];
         let actual_steps = result.sql_migration();
@@ -2145,8 +2145,8 @@ async fn join_tables_between_models_with_compound_primary_keys_must_work(api: &T
             cat Cat @relation(fields: [cat_id], references: [id])
             human Human @relation(fields: [human_firstName, human_lastName], references: [firstName, lastName])
 
-            @@unique([cat_id, human_firstName, human_lastName])
-            @@index([human_firstName, human_lastName])
+            @@unique([cat_id, human_firstName, human_lastName], name: "joinTableUnique")
+            @@index([human_firstName, human_lastName], name: "joinTableIndex")
         }
 
         model Cat {
@@ -2198,7 +2198,7 @@ async fn join_tables_between_models_with_mapped_compound_primary_keys_must_work(
             cat Cat @relation(fields: [cat_id], references: [id])
             human Human @relation(fields: [human_the_first_name, human_the_last_name], references: [firstName, lastName])
 
-            @@unique([human_the_first_name, human_the_last_name, cat_id])
+            @@unique([human_the_first_name, human_the_last_name, cat_id], name: "joinTableUnique")
             @@index([cat_id])
         }
 

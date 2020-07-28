@@ -139,3 +139,38 @@ async fn schema_push_with_an_unexecutable_migration_returns_a_message_and_aborts
 
     Ok(())
 }
+
+#[test_each_connector]
+async fn indexes_and_unique_constraints_on_the_same_field_do_not_collide(api: &TestApi) -> TestResult {
+    let dm = r#"
+        model User {
+            id     Int    @default(autoincrement()) @id
+            email  String @unique
+            name   String
+
+            @@index([email])
+        }
+    "#;
+
+    api.schema_push(dm).send().await?.assert_green()?;
+
+    Ok(())
+}
+
+#[test_each_connector]
+async fn multi_column_indexes_and_unique_constraints_on_the_same_fields_do_not_collide(api: &TestApi) -> TestResult {
+    let dm = r#"
+        model User {
+            id     Int    @default(autoincrement()) @id
+            email  String
+            name   String
+
+            @@index([email, name])
+            @@unique([email, name])
+        }
+    "#;
+
+    api.schema_push(dm).send().await?.assert_green()?;
+
+    Ok(())
+}

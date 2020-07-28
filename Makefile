@@ -32,6 +32,10 @@ dev-postgres12:
 	docker-compose -f docker-compose.yml up -d --remove-orphans postgres12
 	echo 'postgres12' > current_connector
 
+dev-postgres13:
+	docker-compose -f docker-compose.yml up -d --remove-orphans postgres13
+	echo 'postgres13' > current_connector
+
 dev-pgbouncer:
 	docker-compose -f docker-compose.yml up -d --remove-orphans pgbouncer postgres11
 	echo 'pgbouncer' > current_connector
