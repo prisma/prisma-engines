@@ -1330,8 +1330,7 @@ class NestedDeleteMutationInsideUpdateSpec extends FlatSpec with Matchers with A
       """,
       project,
       errorCode = 2016,
-      errorContains =
-        """"[Query Graph] Expected a valid parent ID to be present for a nested delete on a one-to-many relation."""
+      errorContains = """"[Query Graph] Expected a valid parent ID to be present for a nested delete on a one-to-many relation."""
     )
 
     val query = server.query("""{ todoes { title }}""", project)
@@ -1406,9 +1405,9 @@ class NestedDeleteMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |   }
          |  ) {
          |    nameTop
-         |    middles (orderBy: id_ASC){
+         |    middles (orderBy: { id: ASC }){
          |      nameMiddle
-         |      bottoms (orderBy: id_ASC){
+         |      bottoms (orderBy: { id: ASC }){
          |        nameBottom
          |      }
          |    }
@@ -1485,7 +1484,7 @@ class NestedDeleteMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |   }
          |  ) {
          |    nameTop
-         |    middles (orderBy: id_ASC){
+         |    middles (orderBy: { id: ASC }){
          |      nameMiddle
          |      bottoms {
          |        nameBottom
@@ -1563,7 +1562,7 @@ class NestedDeleteMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |   }
          |  ) {
          |    nameTop
-         |    middles (orderBy: id_ASC) {
+         |    middles (orderBy: { id: ASC }) {
          |      nameMiddle
          |      bottom {
          |        nameBottom

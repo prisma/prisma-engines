@@ -2,6 +2,7 @@ use connector::QueryArguments;
 use itertools::Itertools;
 use prisma_models::{ManyRecords, ModelProjection, Record, RecordProjection};
 
+#[derive(Debug)]
 /// Allows to manipulate a set of records in-memory instead of on the database level.
 pub struct InMemoryRecordProcessor {
     skip: Option<i64>,
@@ -14,7 +15,7 @@ impl InMemoryRecordProcessor {
     pub fn new_from_query_args(args: &mut QueryArguments) -> Self {
         let processor = Self {
             skip: args.skip.clone(),
-            take: args.take_abs(),
+            take: args.take.clone(),
             cursor: args.cursor.clone(),
             distinct: args.distinct.clone(),
         };
@@ -26,6 +27,10 @@ impl InMemoryRecordProcessor {
         processor
     }
 
+    fn take_abs(&self) -> Option<i64> {
+        self.take.clone().map(|t| if t < 0 { t * -1 } else { t })
+    }
+
     /// Checks whether or not we need to take records going backwards in the record list,
     /// which requires reversing the list of records at some point.
     fn needs_reversed_order(&self) -> bool {
@@ -34,7 +39,7 @@ impl InMemoryRecordProcessor {
 
     pub fn apply(&self, mut records: ManyRecords) -> ManyRecords {
         if self.needs_reversed_order() {
-            records.records.reverse();
+            records.reverse();
         }
 
         let records = if Self::is_nested(&records) {
@@ -44,7 +49,13 @@ impl InMemoryRecordProcessor {
         };
 
         let records = self.apply_distinct(records);
-        self.apply_pagination(records)
+        let mut records = self.apply_pagination(records);
+
+        if self.needs_reversed_order() {
+            records.reverse();
+        }
+
+        records
     }
 
     fn order_by_parent(mut records: ManyRecords) -> ManyRecords {
@@ -152,17 +163,13 @@ impl InMemoryRecordProcessor {
                 None => true,
                 Some(skip) => current_count > skip,
             };
-            let is_within_take_range = match self.take {
+            let is_within_take_range = match self.take_abs() {
                 None => true,
                 Some(take) => current_count <= take + self.skip.unwrap_or(0),
             };
 
             is_beyond_skip_range && is_within_take_range
         });
-
-        if self.needs_reversed_order() {
-            many_records.records.reverse();
-        }
 
         many_records
     }

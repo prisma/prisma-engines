@@ -43,7 +43,7 @@ class SelfRelationFilterBugSpec extends FlatSpec with Matchers with ApiSpecBase 
   "Getting all categories" should "succeed" in {
     val allCategories =
       s"""{
-         |  allCategories: categories(orderBy: id_ASC) {
+         |  allCategories: categories(orderBy: { id: ASC }) {
          |    name
          |    parent {
          |      name

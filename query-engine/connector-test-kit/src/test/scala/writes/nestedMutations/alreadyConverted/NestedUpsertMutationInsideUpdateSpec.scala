@@ -8,7 +8,7 @@ import util._
 
 class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with ApiSpecBase with SchemaBaseV11 {
   override def runOnlyForCapabilities = Set(JoinRelationLinksCapability)
-  lazy val isMySQL = connectorTag == ConnectorTag.MySqlConnectorTag
+  lazy val isMySQL                    = connectorTag == ConnectorTag.MySqlConnectorTag
 
   "a PM to C1!  relation with a child already in a relation" should "work with create" in {
     schemaWithRelation(onParent = ChildList, onChild = ParentReq).test { t =>
@@ -205,7 +205,7 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |    create :{c: "DOES NOT MATTER"}
          |    }]}
          |  }){
-         |    childrenOpt (orderBy: c_ASC){
+         |    childrenOpt (orderBy: { c: ASC }){
          |      c
          |    }
          |  }
@@ -354,7 +354,7 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
         |    }
         |  ){
         |    id
-        |    comments (orderBy: id_ASC){ id }
+        |    comments (orderBy: { id: ASC }){ id }
         |  }
         |}""",
       project
@@ -378,7 +378,7 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |      }
          |    }
          |  ){
-         |    comments (orderBy: id_ASC){
+         |    comments (orderBy: { id: ASC }){
          |      text
          |    }
          |  }
@@ -503,10 +503,9 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
     val todoId     = createResult.pathAsString("data.createTodo.id")
     val comment1Id = createResult.pathAsString("data.createTodo.comments.[0].id")
 
-
     val errorTarget = () match {
-      case _ if isMySQL    => "constraint: `uniqueComment`"
-      case _   => "fields: (`uniqueComment`)"
+      case _ if isMySQL => "constraint: `uniqueComment`"
+      case _            => "fields: (`uniqueComment`)"
     }
 
     server.queryThatMustFail(
@@ -802,9 +801,9 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |   }
          |  ) {
          |    nameTop
-         |    middles (orderBy: id_ASC){
+         |    middles (orderBy: { id: ASC }){
          |      nameMiddle
-         |      bottoms (orderBy: id_ASC){
+         |      bottoms (orderBy: { id: ASC }){
          |        nameBottom
          |      }
          |    }
@@ -817,7 +816,7 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
     result.toString should be(
       """{"data":{"updateTop":{"nameTop":"updated top","middles":[{"nameMiddle":"updated middle","bottoms":[{"nameBottom":"updated bottom"},{"nameBottom":"the second bottom"}]},{"nameMiddle":"the second middle","bottoms":[{"nameBottom":"the third bottom"},{"nameBottom":"the fourth bottom"}]}]}}}""")
 
-    server.query("query{bottoms(orderBy: id_ASC){nameBottom}}", project).toString should be(
+    server.query("query{bottoms(orderBy: { id: ASC }){nameBottom}}", project).toString should be(
       """{"data":{"bottoms":[{"nameBottom":"updated bottom"},{"nameBottom":"the second bottom"},{"nameBottom":"the third bottom"},{"nameBottom":"the fourth bottom"}]}}""")
   }
 
@@ -889,9 +888,9 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |   }
          |  ) {
          |    nameTop
-         |    middles (orderBy: id_ASC) {
+         |    middles (orderBy: { id: ASC }) {
          |      nameMiddle
-         |      bottoms (orderBy: id_ASC){
+         |      bottoms (orderBy: { id: ASC }){
          |        nameBottom
          |      }
          |    }
@@ -904,7 +903,7 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
     result.toString should be(
       """{"data":{"updateTop":{"nameTop":"updated top","middles":[{"nameMiddle":"updated middle","bottoms":[{"nameBottom":"the bottom"},{"nameBottom":"the second bottom"},{"nameBottom":"created bottom"}]},{"nameMiddle":"the second middle","bottoms":[{"nameBottom":"the third bottom"},{"nameBottom":"the fourth bottom"}]}]}}}""")
 
-    server.query("query{bottoms(orderBy: id_ASC){nameBottom}}", project).toString should be(
+    server.query("query{bottoms(orderBy: { id: ASC }){nameBottom}}", project).toString should be(
       """{"data":{"bottoms":[{"nameBottom":"the bottom"},{"nameBottom":"the second bottom"},{"nameBottom":"the third bottom"},{"nameBottom":"the fourth bottom"},{"nameBottom":"created bottom"}]}}""")
   }
 
@@ -974,9 +973,9 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |   }
          |  ) {
          |    nameTop
-         |    middles (orderBy: id_ASC){
+         |    middles (orderBy: { id: ASC }){
          |      nameMiddle
-         |      bottoms (orderBy: id_ASC){
+         |      bottoms (orderBy: { id: ASC }){
          |        nameBottom
          |      }
          |    }
@@ -989,7 +988,7 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
     result.toString should be(
       """{"data":{"updateTop":{"nameTop":"updated top","middles":[{"nameMiddle":"updated middle","bottoms":[{"nameBottom":"updated bottom"},{"nameBottom":"the second bottom"}]},{"nameMiddle":"the second middle","bottoms":[{"nameBottom":"the third bottom"},{"nameBottom":"the fourth bottom"}]}]}}}""")
 
-    server.query("query{bottoms(orderBy: id_ASC){nameBottom}}", project).toString should be(
+    server.query("query{bottoms(orderBy: { id: ASC }){nameBottom}}", project).toString should be(
       """{"data":{"bottoms":[{"nameBottom":"updated bottom"},{"nameBottom":"the second bottom"},{"nameBottom":"the third bottom"},{"nameBottom":"the fourth bottom"}]}}""")
   }
 
@@ -1059,9 +1058,9 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |   }
          |  ) {
          |    nameTop
-         |    middles (orderBy: id_ASC){
+         |    middles (orderBy: { id: ASC }){
          |      nameMiddle
-         |      bottoms (orderBy: id_ASC){
+         |      bottoms (orderBy: { id: ASC }){
          |        nameBottom
          |      }
          |    }
@@ -1074,7 +1073,7 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
     result.toString should be(
       """{"data":{"updateTop":{"nameTop":"updated top","middles":[{"nameMiddle":"updated middle","bottoms":[{"nameBottom":"the bottom"},{"nameBottom":"the second bottom"},{"nameBottom":"created bottom"}]},{"nameMiddle":"the second middle","bottoms":[{"nameBottom":"the third bottom"},{"nameBottom":"the fourth bottom"}]}]}}}""")
 
-    server.query("query{bottoms(orderBy: id_ASC){nameBottom}}", project).toString should be(
+    server.query("query{bottoms(orderBy: { id: ASC }){nameBottom}}", project).toString should be(
       """{"data":{"bottoms":[{"nameBottom":"the bottom"},{"nameBottom":"the second bottom"},{"nameBottom":"the third bottom"},{"nameBottom":"the fourth bottom"},{"nameBottom":"created bottom"}]}}""")
   }
 
@@ -1140,7 +1139,7 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |   }
          |  ) {
          |    nameTop
-         |    middles (orderBy: id_ASC){
+         |    middles (orderBy: { id: ASC }){
          |      nameMiddle
          |      bottom {
          |        nameBottom
@@ -1155,7 +1154,7 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
     result.toString should be(
       """{"data":{"updateTop":{"nameTop":"updated top","middles":[{"nameMiddle":"updated middle","bottom":{"nameBottom":"updated bottom"}},{"nameMiddle":"the second middle","bottom":{"nameBottom":"the second bottom"}}]}}}""")
 
-    server.query("query{bottoms(orderBy: id_ASC){nameBottom}}", project).toString should be(
+    server.query("query{bottoms(orderBy: { id: ASC }){nameBottom}}", project).toString should be(
       """{"data":{"bottoms":[{"nameBottom":"updated bottom"},{"nameBottom":"the second bottom"}]}}""")
   }
 
@@ -1221,7 +1220,7 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |   }
          |  ) {
          |    nameTop
-         |    middles (orderBy: id_ASC) {
+         |    middles (orderBy: { id: ASC }) {
          |      nameMiddle
          |      bottom {
          |        nameBottom
@@ -1236,7 +1235,7 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
     result should be(
       """{"data":{"updateTop":{"nameTop":"updated top","middles":[{"nameMiddle":"updated middle","bottom":{"nameBottom":"created bottom"}},{"nameMiddle":"the second middle","bottom":{"nameBottom":"the second bottom"}}]}}}""".parseJson)
 
-    server.query("query{bottoms(orderBy: id_ASC){nameBottom}}", project) should be(
+    server.query("query{bottoms(orderBy: { id: ASC }){nameBottom}}", project) should be(
       """{"data":{"bottoms":[{"nameBottom":"the second bottom"},{"nameBottom":"created bottom"}]}}""".parseJson)
   }
 
@@ -1315,7 +1314,7 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |      nameMiddle
          |      bottom {
          |        nameBottom
-         |        below (orderBy: id_ASC){
+         |        below (orderBy: { id: ASC }){
          |           nameBelow
          |        }
          |      }
@@ -1329,7 +1328,7 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
     result.toString should be(
       """{"data":{"updateTop":{"nameTop":"updated top","middle":{"nameMiddle":"updated middle","bottom":{"nameBottom":"updated bottom","below":[{"nameBelow":"updated below"},{"nameBelow":"second below"}]}}}}}""")
 
-    server.query("query{belows(orderBy: id_ASC){nameBelow}}", project).toString should be(
+    server.query("query{belows(orderBy: { id: ASC }){nameBelow}}", project).toString should be(
       """{"data":{"belows":[{"nameBelow":"updated below"},{"nameBelow":"second below"}]}}""")
   }
 
@@ -1423,7 +1422,7 @@ class NestedUpsertMutationInsideUpdateSpec extends FlatSpec with Matchers with A
     result.toString should be(
       """{"data":{"updateTop":{"nameTop":"updated top","middle":{"nameMiddle":"updated middle","bottom":{"nameBottom":"updated bottom","below":[{"nameBelow":"below"},{"nameBelow":"second below"},{"nameBelow":"created below"}]}}}}}""")
 
-    server.query("query{belows(orderBy: id_ASC){nameBelow}}", project).toString should be(
+    server.query("query{belows(orderBy: { id: ASC }){nameBelow}}", project).toString should be(
       """{"data":{"belows":[{"nameBelow":"below"},{"nameBelow":"second below"},{"nameBelow":"created below"}]}}""")
   }
 

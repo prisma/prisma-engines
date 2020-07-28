@@ -60,7 +60,7 @@ class PaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
           |query {
           |  findManyTestModel(cursor: {
           |    id: 5
-          |  }, orderBy: id_DESC) {
+          |  }, orderBy: { id: DESC }) {
           |    id
           |  }
           |}
@@ -81,7 +81,7 @@ class PaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
           |query {
           |  findManyTestModel(cursor: {
           |    id: 5
-          |  }, orderBy: field_DESC) {
+          |  }, orderBy: { field: DESC }) {
           |    id
           |    field
           |  }
@@ -104,7 +104,7 @@ class PaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
           |query {
           |  findManyTestModel(cursor: {
           |    id: 5
-          |  }, orderBy: field_ASC) {
+          |  }, orderBy: { field: ASC }) {
           |    id
           |    field
           |  }
@@ -144,7 +144,7 @@ class PaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
           |query {
           |  findManyTestModel(cursor: {
           |    id: 1
-          |  }, orderBy: id_DESC) {
+          |  }, orderBy: { id: DESC }) {
           |    id
           |  }
           |}
@@ -219,7 +219,7 @@ class PaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
       .query(
         """
           |query {
-          |  findManyTestModel(take: 1, orderBy: id_DESC) {
+          |  findManyTestModel(take: 1, orderBy: { id: DESC }) {
           |    id
           |  }
           |}
@@ -253,7 +253,7 @@ class PaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
       .query(
         """
           |query {
-          |  findManyTestModel(take: -1) {
+          |  findManyTestModel(take: -1, orderBy: { id: ASC }) {
           |    id
           |  }
           |}
@@ -273,7 +273,7 @@ class PaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
       .query(
         """
           |query {
-          |  findManyTestModel(skip: 5) {
+          |  findManyTestModel(skip: 5, orderBy: { id: ASC }) {
           |    id
           |  }
           |}
@@ -290,7 +290,7 @@ class PaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
       .query(
         """
           |query {
-          |  findManyTestModel(skip: 5, orderBy: id_DESC) {
+          |  findManyTestModel(skip: 5, orderBy: { id: DESC }) {
           |    id
           |  }
           |}
@@ -324,7 +324,7 @@ class PaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
       .query(
         """
           |query {
-          |  findManyTestModel(skip: 0) {
+          |  findManyTestModel(skip: 0, orderBy: { id: ASC }) {
           |    id
           |  }
           |}
@@ -365,7 +365,7 @@ class PaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
           |query {
           |  findManyTestModel(cursor: {
           |    id: 5
-          |  }, take: -2) {
+          |  }, take: -2, orderBy: { id: ASC }) {
           |    id
           |  }
           |}
@@ -441,7 +441,7 @@ class PaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
           |query {
           |  findManyTestModel(cursor: {
           |    id: 5
-          |  }, take: 2, orderBy: id_DESC) {
+          |  }, take: 2, orderBy: { id: DESC }) {
           |    id
           |  }
           |}
@@ -460,7 +460,7 @@ class PaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
           |query {
           |  findManyTestModel(cursor: {
           |    id: 5
-          |  }, take: -2, orderBy: id_DESC) {
+          |  }, take: -2, orderBy: { id: DESC }) {
           |    id
           |  }
           |}
@@ -501,7 +501,7 @@ class PaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
           |query {
           |  findManyTestModel(cursor: {
           |    id: 5
-          |  }, take: -2, skip: 2) {
+          |  }, take: -2, skip: 2, orderBy: { id: ASC }) {
           |    id
           |  }
           |}
@@ -558,7 +558,7 @@ class PaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
           |query {
           |  findManyTestModel(cursor: {
           |    id: 5
-          |  }, take: 2, skip: 2, orderBy: id_DESC) {
+          |  }, take: 2, skip: 2, orderBy: { id: DESC }) {
           |    id
           |  }
           |}
@@ -577,7 +577,7 @@ class PaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
           |query {
           |  findManyTestModel(cursor: {
           |    id: 5
-          |  }, take: -2, skip: 2, orderBy: id_DESC) {
+          |  }, take: -2, skip: 2, orderBy: { id: DESC }) {
           |    id
           |  }
           |}
