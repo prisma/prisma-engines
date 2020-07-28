@@ -3,61 +3,78 @@ use prisma_models::*;
 use quaint::ast::*;
 
 pub fn build(query_arguments: &QueryArguments, model: ModelRef) -> ConditionTree<'static> {
-    ConditionTree::NoCondition
-    // match (query_arguments.cursor.as_ref(), query_arguments.order_by.as_ref()) {
-    //     (None, _) => ConditionTree::NoCondition,
-    //     (Some(cursor), order_by) => {
-    //         // If there's a sort order defined for the cursor, take that one, else implicitly order by ID.
-    //         let (comparison_fields, sort_order) = match order_by {
-    //             Some(x) => (vec![x.field.clone()], x.sort_order),
-    //             None => (
-    //                 model.primary_identifier().scalar_fields().collect(),
-    //                 SortOrder::Ascending,
-    //             ),
-    //         };
+    match query_arguments.cursor {
+        None => ConditionTree::NoCondition,
+        Some(ref cursor) => {
+            let cursor_fields: Vec<_> = cursor.fields().collect();
+            let cursor_values: Vec<_> = cursor.values().collect();
+            let cursor_columns: Vec<_> = cursor_fields.as_slice().as_columns().collect();
+            let cursor_row = Row::from(cursor_columns);
 
-    //         let columns: Vec<_> = comparison_fields.as_columns().collect();
-    //         let order_row = Row::from(columns.clone());
-    //         let fields: Vec<_> = cursor.fields().collect();
-    //         let values: Vec<_> = cursor.values().collect();
+            // Cursor columns need to equal the given values.
+            let cursor_condition = cursor_row.clone().equals(cursor_values.clone());
 
-    //         let cursor_columns: Vec<_> = fields.as_slice().as_columns().collect();
-    //         let cursor_row = Row::from(cursor_columns);
+            let order_definitions = order_definitions(query_arguments, &model);
+            let table = model.as_table();
+            let conditions: Vec<_> = order_definitions
+                .into_iter()
+                .map(|(field, order)| {
+                    let order_column = field.as_column();
 
-    //         let where_condition = cursor_row.clone().equals(values.clone());
+                    // Subquery to find the value of the order field(s) that we need for comparison.
+                    let order_value_subselect = Select::from_table(table.clone())
+                        .column(order_column.clone())
+                        .so_that(cursor_condition.clone());
 
-    //         let select_query = Select::from_table(model.as_table())
-    //             .columns(columns.clone())
-    //             .so_that(where_condition);
+                    // A negative `take` value signifies that values should be taken before the cursor, requiring a sort reversal.
+                    match (query_arguments.take, order) {
+                        (Some(t), SortOrder::Ascending) if t < 0 => order_column
+                            .clone()
+                            .equals(order_value_subselect.clone())
+                            .and(cursor_row.clone().less_than_or_equals(cursor_values.clone()))
+                            .or(order_column.less_than(order_value_subselect)),
 
-    //         // A negative `take` value signifies that values should be taken before the cursor, requiring a different ordering.
-    //         let compare = match (query_arguments.take, sort_order) {
-    //             (Some(t), SortOrder::Ascending) if t < 0 => order_row
-    //                 .clone()
-    //                 .equals(select_query.clone())
-    //                 .and(cursor_row.clone().less_than_or_equals(values))
-    //                 .or(order_row.less_than(select_query)),
+                        (Some(t), SortOrder::Descending) if t < 0 => order_column
+                            .clone()
+                            .equals(order_value_subselect.clone())
+                            .and(cursor_row.clone().less_than_or_equals(cursor_values.clone()))
+                            .or(order_column.greater_than(order_value_subselect)),
 
-    //             (Some(t), SortOrder::Descending) if t < 0 => order_row
-    //                 .clone()
-    //                 .equals(select_query.clone())
-    //                 .and(cursor_row.clone().less_than_or_equals(values))
-    //                 .or(order_row.greater_than(select_query)),
+                        (_, SortOrder::Ascending) => order_column
+                            .clone()
+                            .equals(order_value_subselect.clone())
+                            .and(cursor_row.clone().greater_than_or_equals(cursor_values.clone()))
+                            .or(order_column.greater_than(order_value_subselect)),
 
-    //             (_, SortOrder::Ascending) => order_row
-    //                 .clone()
-    //                 .equals(select_query.clone())
-    //                 .and(cursor_row.clone().greater_than_or_equals(values))
-    //                 .or(order_row.greater_than(select_query)),
+                        (_, SortOrder::Descending) => order_column
+                            .clone()
+                            .equals(order_value_subselect.clone())
+                            .and(cursor_row.clone().greater_than_or_equals(cursor_values.clone()))
+                            .or(order_column.less_than(order_value_subselect)),
+                    }
+                    .into()
+                })
+                .collect();
 
-    //             (_, SortOrder::Descending) => order_row
-    //                 .clone()
-    //                 .equals(select_query.clone())
-    //                 .and(cursor_row.clone().greater_than_or_equals(values))
-    //                 .or(order_row.less_than(select_query)),
-    //         };
+            ConditionTree::And(conditions)
+        }
+    }
+}
 
-    //         ConditionTree::single(compare)
-    //     }
-    // }
+fn order_definitions(query_arguments: &QueryArguments, model: &ModelRef) -> Vec<(ScalarFieldRef, SortOrder)> {
+    let defined_ordering: Vec<_> = query_arguments
+        .order_by
+        .iter()
+        .map(|o| (o.field.clone(), o.sort_order))
+        .collect();
+
+    if defined_ordering.is_empty() {
+        model
+            .primary_identifier()
+            .scalar_fields()
+            .map(|f| (f, SortOrder::Ascending))
+            .collect()
+    } else {
+        defined_ordering
+    }
 }

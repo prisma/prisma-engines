@@ -61,12 +61,15 @@ fn read_one<'conn, 'tx>(
 }
 
 /// Queries a set of records.
+/// If the query specifies distinct, we need to lift up pagination (and distinct) processing to the core with in-memory record processing.
+/// -> Distinct can't be processed in the DB with our current query API model.
+///    We need to select IDs / uniques alongside the distincts, which doesn't work in SQL, as all records
+///    are distinct by definition if a unique is in the selection set.
 fn read_many<'a, 'b>(
     tx: &'a ConnectionLike<'a, 'b>,
     mut query: ManyRecordsQuery,
 ) -> BoxFuture<'a, InterpretationResult<QueryResult>> {
     let fut = async move {
-        // If the query specifies distinct, we need to lift up pagination and distinct processing to the core.
         let scalars = if query.args.distinct.is_some() {
             let processor = InMemoryRecordProcessor::new_from_query_args(&mut query.args);
             let scalars = tx
