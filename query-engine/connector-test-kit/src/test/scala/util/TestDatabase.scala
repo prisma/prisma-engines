@@ -9,7 +9,7 @@ case class TestDatabase() {
     val engine = MigrationEngine(project)
     engine.createDatabase()
     engine.reset()
-    engine.inferAndApply()
+    engine.schemaPush()
   }
 
   def truncateProjectTables(project: Project): Unit = {
@@ -19,33 +19,21 @@ case class TestDatabase() {
 }
 
 case class MigrationEngine(project: Project) {
-  implicit val inferMigrationStepsInputWrites  = Json.writes[InferMigrationStepsInput]
-  implicit val applyMigrationInputWrites       = Json.writes[ApplyMigrationInput]
-  implicit val dataModelWarningOrErrorReads    = Json.reads[DataModelWarningOrError]
-  implicit val migrationStepsResultOutputReads = Json.reads[MigrationStepsResultOutput]
-  implicit val rpcResultReads                  = Json.reads[RpcResult]
+  implicit val schemaPushInputWrites  = Json.writes[SchemaPushInput]
+  implicit val schemaPushOutputReads  = Json.reads[SchemaPushOutput]
+  implicit val rpcResultReads         = Json.reads[RpcResult]
 
   val migrationId = "test_migration_id"
   val logLevel    = "RUST_LOG" -> sys.env.getOrElse("LOG_LEVEL", "debug").toLowerCase
 //  val binaryLogLevel = "RUST_LOG" -> s"prisma=$logLevel,quaint=$logLevel,query_core=$logLevel,query_connector=$logLevel,sql_query_connector=$logLevel,prisma_models=$logLevel,sql_introspection_connector=$logLevel"
 
-  def inferAndApply(): Unit = {
-    val result = inferMigrationSteps()
-    applyMigration(ApplyMigrationInput(migrationId, result.datamodelSteps, force = None))
-  }
-
-  def inferMigrationSteps(): MigrationStepsResultOutput = {
-    val params = InferMigrationStepsInput(
-      migrationId = migrationId,
-      datamodel = project.dataModelWithDataSourceConfig,
-      assumeToBeApplied = Vector.empty
+  def schemaPush(): Unit = {
+    val input = SchemaPushInput(
+      schema = project.dataModelWithDataSourceConfig,
+      force = true,
     )
-    sendRpcCall[InferMigrationStepsInput, MigrationStepsResultOutput]("inferMigrationSteps", params)
-  }
 
-  def applyMigration(input: ApplyMigrationInput): Unit = {
-    val _: JsValue = sendRpcCall[ApplyMigrationInput, JsValue]("applyMigration", input)
-    ()
+    val _: JsValue = sendRpcCall[SchemaPushInput, JsValue]("schemaPush", input)
   }
 
   def reset(): Unit = {
@@ -104,34 +92,18 @@ case class MigrationEngine(project: Project) {
   }
 }
 
-case class InferMigrationStepsInput(
-    migrationId: String,
-    datamodel: String,
-    assumeToBeApplied: Vector[JsValue]
+case class SchemaPushInput(
+  schema: String,
+  force: Boolean,
 )
 
-case class ApplyMigrationInput(
-    migrationId: String,
-    steps: Vector[JsValue],
-    force: Option[Boolean]
+case class SchemaPushOutput(
+    executedSteps: Int,
+    warnings: Vector[String],
+    unexecutable: Vector[String],
 )
 
 case class RpcResult(
     id: String,
     result: JsValue
-)
-
-case class MigrationStepsResultOutput(
-    datamodel: String,
-    datamodelSteps: Vector[JsValue],
-    databaseSteps: JsValue,
-    warnings: Vector[DataModelWarningOrError],
-    errors: Vector[DataModelWarningOrError],
-    generalErrors: Vector[String]
-)
-
-case class DataModelWarningOrError(
-    `type`: String,
-    field: Option[String],
-    message: String
 )
