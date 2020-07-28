@@ -85,23 +85,21 @@ impl RenderContext {
     }
 
     pub fn add_mapping(&mut self, name: String, operation: Option<&SchemaQueryBuilder>) {
-        operation.into_iter().for_each(|op| {
-            if let SchemaQueryBuilder::ModelQueryBuilder(m) = op {
-                let model_name = m.model.name.clone();
-                let tag_str = format!("{}", m.tag);
-                let mapping = self.mappings.iter().find(|mapping| mapping.model_name == model_name);
+        if let Some(SchemaQueryBuilder::ModelQueryBuilder(m)) = operation {
+            let model_name = m.model.name.clone();
+            let tag_str = format!("{}", m.tag);
+            let mapping = self.mappings.iter().find(|mapping| mapping.model_name == model_name);
 
-                match mapping {
-                    Some(ref existing) => existing.add_operation(tag_str, name.clone()),
-                    None => {
-                        let new_mapping = DMMFMapping::new(model_name);
+            match mapping {
+                Some(ref existing) => existing.add_operation(tag_str, name.clone()),
+                None => {
+                    let new_mapping = DMMFMapping::new(model_name);
 
-                        new_mapping.add_operation(tag_str, name.clone());
-                        self.mappings.push(new_mapping);
-                    }
-                };
-            }
-        });
+                    new_mapping.add_operation(tag_str, name.clone());
+                    self.mappings.push(new_mapping);
+                }
+            };
+        }
     }
 }
 
