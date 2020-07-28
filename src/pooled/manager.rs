@@ -65,7 +65,7 @@ pub enum QuaintManager {
     Postgres(PostgresUrl),
 
     #[cfg(feature = "sqlite")]
-    Sqlite { file_path: String, db_name: String },
+    Sqlite { url: String, db_name: String },
 
     #[cfg(feature = "mssql")]
     Mssql(MssqlUrl),
@@ -79,10 +79,10 @@ impl Manager for QuaintManager {
     async fn connect(&self) -> crate::Result<Self::Connection> {
         match self {
             #[cfg(feature = "sqlite")]
-            QuaintManager::Sqlite { file_path, db_name } => {
+            QuaintManager::Sqlite { url, db_name } => {
                 use crate::connector::Sqlite;
 
-                let mut conn = Sqlite::new(&file_path)?;
+                let mut conn = Sqlite::new(&url)?;
                 conn.attach_database(db_name).await?;
 
                 Ok(Box::new(conn) as Self::Connection)

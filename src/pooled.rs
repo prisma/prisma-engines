@@ -320,7 +320,7 @@ impl Quaint {
                 let params = crate::connector::SqliteParams::try_from(s)?;
 
                 let manager = QuaintManager::Sqlite {
-                    file_path: params.file_path,
+                    url: s.to_string(),
                     db_name: params.db_name,
                 };
 

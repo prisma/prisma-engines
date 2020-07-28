@@ -22,6 +22,7 @@ pub struct Sqlite {
     pub(crate) file_path: String,
 }
 
+#[derive(Debug)]
 pub struct SqliteParams {
     pub connection_limit: Option<usize>,
     /// This is not a `PathBuf` because we need to `ATTACH` the database to the path, and this can
@@ -30,8 +31,6 @@ pub struct SqliteParams {
     pub db_name: String,
     pub socket_timeout: Option<Duration>,
 }
-
-type ConnectionParams = (Vec<(String, String)>, Vec<(String, String)>);
 
 impl TryFrom<&str> for SqliteParams {
     type Error = Error;
@@ -50,26 +49,18 @@ impl TryFrom<&str> for SqliteParams {
         if path.is_dir() {
             Err(Error::builder(ErrorKind::DatabaseUrlIsInvalid(path.to_str().unwrap().to_string())).build())
         } else {
-            let official = vec![];
             let mut connection_limit = None;
             let mut db_name = None;
             let mut socket_timeout = None;
 
             if path_parts.len() > 1 {
-                let (_, unsupported): ConnectionParams = path_parts
-                    .last()
-                    .unwrap()
-                    .split('&')
-                    .map(|kv| {
-                        let splitted: Vec<&str> = kv.split('=').collect();
-                        (String::from(splitted[0]), String::from(splitted[1]))
-                    })
-                    .collect::<Vec<(String, String)>>()
-                    .into_iter()
-                    .partition(|(k, _)| official.contains(&k.as_str()));
+                let params = path_parts.last().unwrap().split('&').map(|kv| {
+                    let splitted: Vec<&str> = kv.split('=').collect();
+                    (splitted[0], splitted[1])
+                });
 
-                for (k, v) in unsupported.into_iter() {
-                    match k.as_ref() {
+                for (k, v) in params {
+                    match k {
                         "connection_limit" => {
                             let as_int: usize = v
                                 .parse()
@@ -91,7 +82,7 @@ impl TryFrom<&str> for SqliteParams {
                             #[cfg(not(feature = "tracing-log"))]
                             trace!("Discarding connection string param: {}", k);
                             #[cfg(feature = "tracing-log")]
-                            tracing::trace!(message = "Discarding connection string param", param = k.as_str());
+                            tracing::trace!(message = "Discarding connection string param", param = k);
                         }
                     };
                 }
