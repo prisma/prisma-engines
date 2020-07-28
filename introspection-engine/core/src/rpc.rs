@@ -89,21 +89,12 @@ impl RpcImpl {
         reintrospect: bool,
         clean: bool,
     ) -> RpcResult<IntrospectionResultOutput> {
-        match (reintrospect, clean) {
-            (true, true) => RpcImpl::introspect_with_datamodel(&schema, false).await, // only introspection,
-            (true, false) => RpcImpl::introspect_with_datamodel(&schema, true).await, //reintrospection
-            (false, _) => RpcImpl::introspect_with_datamodel(&schema, false).await,   //only introspection
-        }
-    }
-
-    async fn introspect_with_datamodel(schema: &String, reintrospect: bool) -> RpcResult<IntrospectionResultOutput> {
         let (config, url, connector) = RpcImpl::load_connector(&schema)
             .await
             .map_err(|err| render_jsonrpc_error(err, &schema))?;
 
-        let input_data_model = if reintrospect {
+        let input_data_model = if reintrospect && !clean {
             datamodel::parse_datamodel(&schema).map_err(|err| render_jsonrpc_error(DatamodelError(err), &schema))?
-        // errorcollection to jsonrpcerror
         } else {
             Datamodel::new()
         };
