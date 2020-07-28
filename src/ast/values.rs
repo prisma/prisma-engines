@@ -569,7 +569,9 @@ value!(val: &'a [u8], Bytes, val.into());
 #[cfg(feature = "chrono-0_4")]
 value!(val: DateTime<Utc>, DateTime, val);
 #[cfg(feature = "chrono-0_4")]
-value!(val: chrono::NaiveTime, Text, val.to_string().into());
+value!(val: chrono::NaiveTime, Time, val);
+#[cfg(feature = "chrono-0_4")]
+value!(val: chrono::NaiveDate, Date, val);
 
 value!(
     val: f64,
