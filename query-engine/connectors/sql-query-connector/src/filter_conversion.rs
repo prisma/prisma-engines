@@ -235,11 +235,6 @@ impl AliasedSelect for RelationFilter {
         let condition = self.condition.clone();
         let relation = self.field.relation();
 
-        let these_columns = self
-            .field
-            .relation_columns(false)
-            .map(|c| c.table(alias.to_string(None)));
-
         let other_columns = self.field.opposite_columns(false);
         let other_columns_len = other_columns.len();
 
@@ -251,20 +246,26 @@ impl AliasedSelect for RelationFilter {
 
         // check whether the join would join the same table and same column
         // example: `Track` AS `t1` INNER JOIN `Track` AS `j1` ON `j1`.`id` = `t1`.`id`
-        let would_peform_needless_join = other_columns_len == id_columns_len
+        let would_perform_needless_join = other_columns_len == id_columns_len
             && table.typ == related_table.typ
             && id_columns.zip(other_columns).all(|(id, other)| id == other);
 
-        let table = table.alias(alias.to_string(Some(AliasMode::Table)));
+        let these_columns = self
+            .field
+            .relation_columns(false)
+            .map(|c| c.table(alias.to_string(None)));
 
-        if would_peform_needless_join {
+        if would_perform_needless_join {
             // Don't do the useless join
             let conditions = self
                 .nested_filter
                 .aliased_cond(Some(alias))
                 .invert_if(condition.invert_of_subselect());
 
-            let select_base = Select::from_table(relation.as_table().alias(alias.to_string(None))).so_that(conditions);
+            //find out which side has relationcolumns defined, these relationcolums have to be null??
+            //currently all the many filters should pass through here, but with mongo that might change
+
+            let select_base = Select::from_table(table.alias(alias.to_string(None))).so_that(conditions);
 
             these_columns.fold(select_base, |acc, column| acc.column(column))
         } else {
@@ -292,7 +293,9 @@ impl AliasedSelect for RelationFilter {
                 .alias(alias.to_string(Some(AliasMode::Join)))
                 .on(Row::from(identifiers).equals(Row::from(other_columns)));
 
-            let select_base = Select::from_table(table).inner_join(join).so_that(conditions);
+            let select_base = Select::from_table(table.alias(alias.to_string(Some(AliasMode::Table))))
+                .inner_join(join)
+                .so_that(conditions);
 
             these_columns.fold(select_base, |acc, column| acc.column(column))
         }
