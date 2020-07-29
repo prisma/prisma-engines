@@ -315,20 +315,31 @@ impl AliasedCondition for OneRelationIsNullFilter {
             })
         } else {
             let relation = self.field.relation();
-
-            let columns = relation
-                .columns_for_relation_side(self.field.relation_side)
-                .map(|c| c.opt_table(alias.clone()));
-
             let table = Table::from(relation.as_table());
             let relation_table = match alias {
                 Some(ref alias) => table.alias(alias.to_string()),
                 None => table,
             };
 
-            let select = columns.fold(Select::from_table(relation_table), |acc, col| {
-                acc.column(col.clone()).and_where(col.is_not_null())
-            });
+            let columns_not_null =
+                self.field
+                    .related_field()
+                    .as_columns()
+                    .fold(ConditionTree::NoCondition, |acc, column| {
+                        let column_is_not_null = column.opt_table(alias.clone()).is_not_null();
+
+                        match acc {
+                            ConditionTree::NoCondition => column_is_not_null.into(),
+                            cond => cond.and(column_is_not_null),
+                        }
+                    });
+
+            let select = self
+                .field
+                .related_field()
+                .as_columns()
+                .fold(Select::from_table(relation_table), |acc, col| acc.column(col.clone()))
+                .and_where(columns_not_null);
 
             let id_columns: Vec<Column<'static>> = self
                 .field
