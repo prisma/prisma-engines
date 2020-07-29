@@ -67,12 +67,12 @@ impl ErrorCollection {
 
 impl std::fmt::Display for ErrorCollection {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        let msg: Vec<String> = self.errors.iter().map(|e| format!("{}", e)).collect();
+        let msg: Vec<String> = self.errors.iter().map(|e| e.to_string()).collect();
         f.write_str(&msg.join("\n"))
     }
 }
 
-impl std::convert::From<DatamodelError> for ErrorCollection {
+impl From<DatamodelError> for ErrorCollection {
     fn from(error: DatamodelError) -> Self {
         let mut col = ErrorCollection::new();
         col.push(error);

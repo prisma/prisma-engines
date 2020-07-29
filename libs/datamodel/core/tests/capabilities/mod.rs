@@ -70,6 +70,43 @@ fn test_scalar_list_support(providers: &[&str], must_error: bool) {
 }
 
 #[test]
+fn multiple_indexes_with_the_same_name_only_supported_if_all_specified_providers_support_them() {
+    // Only MySQL supports multiple indexes with the same name.
+
+    validate_uniqueness_of_names_of_indexes(&["postgres", "sqlite", "mysql"], true);
+
+    validate_uniqueness_of_names_of_indexes(&["postgres", "sqlite"], true);
+    validate_uniqueness_of_names_of_indexes(&["postgres", "mysql"], true);
+    validate_uniqueness_of_names_of_indexes(&["mysql", "sqlite"], true);
+
+    validate_uniqueness_of_names_of_indexes(&["postgres"], true);
+    validate_uniqueness_of_names_of_indexes(&["mysql"], false);
+    validate_uniqueness_of_names_of_indexes(&["sqlite"], true);
+}
+
+fn validate_uniqueness_of_names_of_indexes(providers: &[&str], must_error: bool) {
+    let dml = r#"
+     model User {
+        id         Int @id
+        neighborId Int
+
+        @@index([id], name: "metaId")
+     }
+
+     model Post {
+        id Int @id
+        optionId Int
+
+        @@index([id], name: "metaId")
+     }
+    "#;
+
+    let error_msg= "The index name `metaId` is declared multiple times. With the current connector index names have to be globally unique.";
+
+    test_capability_support(providers, must_error, dml, error_msg);
+}
+
+#[test]
 fn json_must_only_be_supported_if_all_specified_providers_support_them() {
     // Only Postgres and MySQL support JSON.
     test_json_support(&["postgres", "sqlite", "mysql"], true);

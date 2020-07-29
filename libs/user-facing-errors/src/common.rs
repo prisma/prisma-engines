@@ -1,4 +1,5 @@
 use serde::Serialize;
+use std::fmt::Display;
 use user_facing_error_macros::*;
 
 #[derive(Debug, UserFacingError, Serialize)]
@@ -135,6 +136,29 @@ pub struct SchemaParserError {
 #[user_facing(code = "P1013", message = "The provided database string is invalid. ${details}")]
 pub struct InvalidDatabaseString {
     pub details: String,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Serialize)]
+pub enum ModelKind {
+    Table,
+}
+
+impl Display for ModelKind {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Table => write!(f, "table"),
+        }
+    }
+}
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = "P1014",
+    message = "The underlying ${kind} for model `${model}` does not exist."
+)]
+pub struct InvalidModel {
+    pub model: String,
+    pub kind: ModelKind,
 }
 
 #[cfg(test)]

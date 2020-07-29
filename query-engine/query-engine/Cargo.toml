@@ -14,6 +14,7 @@ mssql = ["datamodel/mssql", "sql-connector/mssql"]
 futures = "0.3"
 tokio = { version = "=0.2.13", features = ["rt-threaded", "macros"] }
 
+anyhow = "1.0"
 async-trait = "0.1"
 feature-flags = { path = "../../libs/feature-flags" }
 datamodel = { path = "../../libs/datamodel/core" }
@@ -27,7 +28,7 @@ serde_json = { version = "1.0", features = [ "preserve_order" ] }
 tide = "0.10.0"
 async-std = { version = "1.6.2", features = ["attributes", "tokio02"] }
 base64 = "0.10"
-failure = { version = "0.1" }
+thiserror = "1.0"
 indexmap = { version = "1.0", features = [ "serde-1" ] }
 itertools = "0.8"
 url = "2.1"

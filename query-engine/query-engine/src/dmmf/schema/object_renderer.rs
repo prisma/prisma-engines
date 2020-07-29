@@ -7,7 +7,7 @@ pub enum DMMFObjectRenderer {
 }
 
 impl<'a> Renderer<'a, ()> for DMMFObjectRenderer {
-    fn render(&self, ctx: &RenderContext) {
+    fn render(&self, ctx: &mut RenderContext) {
         match &self {
             DMMFObjectRenderer::Input(input) => self.render_input_object(input, ctx),
             DMMFObjectRenderer::Output(output) => self.render_output_object(output, ctx),
@@ -16,7 +16,7 @@ impl<'a> Renderer<'a, ()> for DMMFObjectRenderer {
 }
 
 impl DMMFObjectRenderer {
-    fn render_input_object(&self, input_object: &InputObjectTypeRef, ctx: &RenderContext) {
+    fn render_input_object(&self, input_object: &InputObjectTypeRef, ctx: &mut RenderContext) {
         let input_object = input_object.into_arc();
         if ctx.already_rendered(&input_object.name) {
             return;
@@ -46,7 +46,7 @@ impl DMMFObjectRenderer {
     }
 
     // WIP dedup code
-    fn render_output_object(&self, output_object: &ObjectTypeRef, ctx: &RenderContext) {
+    fn render_output_object(&self, output_object: &ObjectTypeRef, ctx: &mut RenderContext) {
         let output_object = output_object.into_arc();
         if ctx.already_rendered(output_object.name()) {
             return;

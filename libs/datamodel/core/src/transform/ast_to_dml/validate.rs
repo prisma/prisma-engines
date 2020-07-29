@@ -5,6 +5,7 @@ use crate::{
     dml,
     error::{DatamodelError, ErrorCollection},
 };
+use std::collections::HashSet;
 
 /// Helper for validating a datamodel.
 ///
@@ -33,6 +34,10 @@ impl<'a> Validator<'a> {
         let mut all_errors = ErrorCollection::new();
 
         if let Err(ref mut errs) = self.validate_names(ast_schema) {
+            all_errors.append(errs);
+        }
+
+        if let Err(ref mut errs) = self.validate_names_for_indexes(ast_schema, schema) {
             all_errors.append(errs);
         }
 
@@ -157,6 +162,43 @@ impl<'a> Validator<'a> {
             for enum_value in enum_decl.values.iter() {
                 errors.push_opt(enum_value.name.validate("Enum Value").err());
                 errors.append(&mut enum_value.validate_directives());
+            }
+        }
+
+        errors.ok()
+    }
+
+    fn validate_names_for_indexes(
+        &self,
+        ast_schema: &ast::SchemaAst,
+        schema: &dml::Datamodel,
+    ) -> Result<(), ErrorCollection> {
+        let mut errors = ErrorCollection::new();
+        let mut index_names = HashSet::new();
+
+        let multiple_indexes_with_same_name_are_supported = self
+            .source
+            .map(|source| source.combined_connector.supports_multiple_indexes_with_same_name())
+            .unwrap_or(false);
+
+        for model in schema.models() {
+            if let Some(ast_model) = ast_schema.find_model(&model.name) {
+                for index in model.indices.iter() {
+                    if let Some(index_name) = &index.name {
+                        if index_names.contains(index_name) && !multiple_indexes_with_same_name_are_supported {
+                            let ast_index = ast_model
+                                .directives
+                                .iter()
+                                .find(|directive| directive.name.name == "index")
+                                .unwrap();
+                            errors.push(DatamodelError::new_multiple_indexes_with_same_name_are_not_supported(
+                                index_name,
+                                ast_index.span,
+                            ));
+                        }
+                        index_names.insert(index_name);
+                    }
+                }
             }
         }
 

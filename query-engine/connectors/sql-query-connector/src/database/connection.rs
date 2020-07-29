@@ -8,6 +8,7 @@ use connector_interface::{
 use prisma_models::prelude::*;
 use prisma_value::PrismaValue;
 use quaint::{connector::TransactionCapable, prelude::ConnectionInfo};
+use std::future::Future;
 
 pub struct SqlConnection<C> {
     inner: C,
@@ -25,7 +26,7 @@ where
 
     async fn catch<O>(
         &self,
-        fut: impl std::future::Future<Output = Result<O, SqlError>>,
+        fut: impl Future<Output = Result<O, SqlError>>,
     ) -> Result<O, connector_interface::error::ConnectorError> {
         match fut.await {
             Ok(o) => Ok(o),

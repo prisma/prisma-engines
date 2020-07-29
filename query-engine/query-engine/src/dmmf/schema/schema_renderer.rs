@@ -5,7 +5,7 @@ pub struct DMMFSchemaRenderer {
 }
 
 impl<'a> Renderer<'a, ()> for DMMFSchemaRenderer {
-    fn render(&self, ctx: &RenderContext) {
+    fn render(&self, ctx: &mut RenderContext) {
         self.query_schema.query.into_renderer().render(ctx);
         self.query_schema.mutation.into_renderer().render(ctx);
     }

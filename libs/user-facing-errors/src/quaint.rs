@@ -1,4 +1,5 @@
 use crate::{common, query_engine, KnownError};
+use common::ModelKind;
 use quaint::{error::ErrorKind, prelude::ConnectionInfo};
 
 impl From<&quaint::error::DatabaseConstraint> for crate::query_engine::DatabaseConstraint {
@@ -157,6 +158,38 @@ pub fn render_quaint_error(kind: &ErrorKind, connection_info: &ConnectionInfo) -
             details: message.clone(),
         })
         .ok(),
+
+        (ErrorKind::TableDoesNotExist { table: model }, ConnectionInfo::Mysql(_)) => {
+            KnownError::new(common::InvalidModel {
+                model: model.into(),
+                kind: ModelKind::Table,
+            })
+            .ok()
+        }
+
+        (ErrorKind::TableDoesNotExist { table: model }, ConnectionInfo::Postgres(_)) => {
+            KnownError::new(common::InvalidModel {
+                model: model.into(),
+                kind: ModelKind::Table,
+            })
+            .ok()
+        }
+
+        (ErrorKind::TableDoesNotExist { table: model }, ConnectionInfo::Sqlite { .. }) => {
+            KnownError::new(common::InvalidModel {
+                model: model.into(),
+                kind: ModelKind::Table,
+            })
+            .ok()
+        }
+
+        (ErrorKind::TableDoesNotExist { table: model }, ConnectionInfo::Mssql(_)) => {
+            KnownError::new(common::InvalidModel {
+                model: model.into(),
+                kind: ModelKind::Table,
+            })
+            .ok()
+        }
 
         _ => None,
     }

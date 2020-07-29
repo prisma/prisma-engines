@@ -1,36 +1,36 @@
 use crate::{InterpreterError, QueryGraphBuilderError, QueryGraphError, QueryParserError, RelationViolation};
 use connector::error::ConnectorError;
-use failure::Fail;
 use prisma_models::DomainError;
+use thiserror::Error;
 
 // TODO: Cleanup unused errors after refactorings.
-#[derive(Debug, Fail)]
+#[derive(Debug, Error)]
 pub enum CoreError {
-    #[fail(display = "Error in query graph construction: {:?}", _0)]
+    #[error("Error in query graph construction: {:?}", _0)]
     QueryGraphError(QueryGraphError),
 
-    #[fail(display = "Error in query graph construction: {:?}", _0)]
+    #[error("Error in query graph construction: {:?}", _0)]
     QueryGraphBuilderError(QueryGraphBuilderError),
 
-    #[fail(display = "Error in connector: {}", _0)]
+    #[error("Error in connector: {}", _0)]
     ConnectorError(ConnectorError),
 
-    #[fail(display = "Error in domain logic: {}", _0)]
+    #[error("Error in domain logic: {}", _0)]
     DomainError(DomainError),
 
-    #[fail(display = "{}", _0)]
+    #[error("{0}")]
     QueryParserError(QueryParserError),
 
-    #[fail(display = "Unsupported feature: {}", _0)]
+    #[error("Unsupported feature: {}", _0)]
     UnsupportedFeatureError(String),
 
-    #[fail(display = "{}", _0)]
+    #[error("{}", _0)]
     ConversionError(String),
 
-    #[fail(display = "{}", _0)]
+    #[error("{}", _0)]
     SerializationError(String),
 
-    #[fail(display = "{}", _0)]
+    #[error("{}", _0)]
     InterpreterError(InterpreterError),
 }
 
@@ -171,7 +171,7 @@ impl From<CoreError> for user_facing_errors::Error {
                     .into(),
                 }
             }
-            _ => user_facing_errors::Error::from_dyn_error(&err.compat()),
+            _ => user_facing_errors::Error::from_dyn_error(&err),
         }
     }
 }

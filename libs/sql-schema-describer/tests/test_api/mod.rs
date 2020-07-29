@@ -139,6 +139,10 @@ pub async fn postgres12_test_api(db_name: &'static str) -> TestApi {
     test_api_helper_for_postgres(postgres_12_url(db_name), db_name, "postgres12").await
 }
 
+pub async fn postgres13_test_api(db_name: &'static str) -> TestApi {
+    test_api_helper_for_postgres(postgres_13_url(db_name), db_name, "postgres13").await
+}
+
 pub async fn test_api_helper_for_postgres(url: String, db_name: &'static str, connector_name: &'static str) -> TestApi {
     let database = test_setup::create_postgres_database(&url.parse().unwrap())
         .await

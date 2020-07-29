@@ -2,6 +2,7 @@ use crate::prelude::*;
 use datamodel::{DefaultValue, FieldArity};
 use once_cell::sync::OnceCell;
 use std::{
+    fmt::Debug,
     hash::{Hash, Hasher},
     sync::{Arc, Weak},
 };
@@ -31,7 +32,6 @@ pub struct ScalarFieldTemplate {
     pub default_value: Option<DefaultValue>,
 }
 
-#[derive(DebugStub)]
 pub struct ScalarField {
     pub name: String,
     pub type_identifier: TypeIdentifier,
@@ -46,10 +46,31 @@ pub struct ScalarField {
     pub db_name: Option<String>,
     pub default_value: Option<DefaultValue>,
 
-    #[debug_stub = "#ModelWeakRef#"]
     pub model: ModelWeakRef,
     pub(crate) is_unique: bool,
     pub(crate) read_only: OnceCell<bool>,
+}
+
+impl Debug for ScalarField {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("ScalarField")
+            .field("name", &self.name)
+            .field("type_identifier", &self.type_identifier)
+            .field("is_required", &self.is_required)
+            .field("is_list", &self.is_list)
+            .field("is_id", &self.is_id)
+            .field("is_auto_generated_int_id", &self.is_auto_generated_int_id)
+            .field("is_autoincrement", &self.is_autoincrement)
+            .field("internal_enum", &self.internal_enum)
+            .field("behaviour", &self.behaviour)
+            .field("arity", &self.arity)
+            .field("db_name", &self.db_name)
+            .field("default_value", &self.default_value)
+            .field("model", &"#ModelWeakRef#")
+            .field("is_unique", &self.is_unique)
+            .field("read_only", &self.read_only)
+            .finish()
+    }
 }
 
 impl Eq for ScalarField {}
