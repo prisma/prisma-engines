@@ -56,7 +56,7 @@ impl TryFrom<ColumnData<'static>> for Value<'static> {
 
     fn try_from(cd: ColumnData<'static>) -> crate::Result<Self> {
         let res = match cd {
-            ColumnData::I8(num) => Value::Integer(num.map(i64::from)),
+            ColumnData::U8(num) => Value::Integer(num.map(i64::from)),
             ColumnData::I16(num) => Value::Integer(num.map(i64::from)),
             ColumnData::I32(num) => Value::Integer(num.map(i64::from)),
             ColumnData::I64(num) => Value::Integer(num.map(i64::from)),
