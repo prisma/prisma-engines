@@ -1,6 +1,6 @@
 datasource chinook {
   provider = "sqlite"
-  url      = "file:./db/Chinook.db"
+  url      = "file:./db/Chinook.db?connection_limit=1&socket_timeout=20"
 }
 
 model Album {
