@@ -449,14 +449,6 @@ fn new_lines_inside_block_below_field_must_stay() {
 #[test]
 fn new_lines_inside_block_in_between_fields_must_stay() {
     let input = r#"model Post {
-  id                    Int                               @default(autoincrement()) @id
-
-
-  input   String
-
-}"#;
-
-    let expected = r#"model Post {
   id Int @default(autoincrement()) @id
 
 
@@ -464,6 +456,8 @@ fn new_lines_inside_block_in_between_fields_must_stay() {
 
 }
 "#;
+
+    let expected = input;
 
     assert_reformat(input, expected);
 }
