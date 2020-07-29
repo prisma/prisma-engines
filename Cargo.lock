@@ -2513,7 +2513,7 @@ dependencies = [
 [[package]]
 name = "quaint"
 version = "0.2.0-alpha.13"
-source = "git+https://github.com/prisma/quaint#e349ed042d80965ce19dc5061df7b71ced754ce0"
+source = "git+https://github.com/prisma/quaint#cd00dc22ed80e8426f89d753a38a51230c5e4361"
 dependencies = [
  "async-trait",
  "base64 0.11.0",
@@ -3433,7 +3433,7 @@ dependencies = [
 [[package]]
 name = "tiberius"
 version = "0.4.7"
-source = "git+https://github.com/prisma/tiberius?branch=pgbouncer-mode-hack#2f3e2febe924f862c028ba5425bf3606052a0aaf"
+source = "git+https://github.com/prisma/tiberius?branch=pgbouncer-mode-hack#309fc3826858d94aa1c76c25a440ae18f611e1d8"
 dependencies = [
  "async-native-tls",
  "async-stream",
