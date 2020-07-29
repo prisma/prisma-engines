@@ -69,7 +69,7 @@ test_type!(mediumblob(MySql, "mediumblob", Value::bytes(vec![1, 2, 3])));
 test_type!(blob(MySql, "blob", Value::bytes(vec![1, 2, 3])));
 test_type!(longblob(MySql, "longblob", Value::bytes(vec![1, 2, 3])));
 
-test_type!(enum(MySql, "enum('pollicle_dogs','jellicle_cats')", Value::text("jellicle_cats")));
+test_type!(enum(MySql, "enum('pollicle_dogs','jellicle_cats')", Value::text("jellicle_cats"), Value::text("pollicle_dogs")));
 
 #[cfg(feature = "json-1")]
 test_type!(json(

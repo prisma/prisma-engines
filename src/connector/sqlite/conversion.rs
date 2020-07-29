@@ -132,6 +132,18 @@ impl<'a> GetRow for SqliteRow<'a> {
                             Value::boolean(true)
                         }
                     }
+                    #[cfg(feature = "chrono-0_4")]
+                    c if c.is_date() => {
+                        let dt = chrono::NaiveDateTime::from_timestamp(i / 1000, 0);
+                        Value::date(dt.date())
+                    }
+                    #[cfg(feature = "chrono-0_4")]
+                    c if c.is_datetime() => {
+                        let sec = dbg!(dbg!(i) / 1000);
+                        let ns = dbg!(i % 1000) * 1_000_000;
+                        let dt = chrono::NaiveDateTime::from_timestamp(sec, ns as u32);
+                        Value::datetime(chrono::DateTime::from_utc(dt, chrono::Utc))
+                    }
                     _ => Value::integer(i),
                 },
                 ValueRef::Real(f) => Value::from(f),
