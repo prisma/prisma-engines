@@ -13,7 +13,6 @@ use object_renderer::*;
 use query_core::schema::*;
 use schema_renderer::*;
 use std::{
-    cell::RefCell,
     collections::HashSet,
     sync::{Arc, Weak},
 };
@@ -25,8 +24,8 @@ pub struct DMMFQuerySchemaRenderer;
 
 impl QuerySchemaRenderer<(DMMFSchema, Vec<DMMFMapping>)> for DMMFQuerySchemaRenderer {
     fn render(query_schema: QuerySchemaRef) -> (DMMFSchema, Vec<DMMFMapping>) {
-        let ctx = RenderContext::new();
-        query_schema.into_renderer().render(&ctx);
+        let mut ctx = RenderContext::new();
+        query_schema.into_renderer().render(&mut ctx);
 
         ctx.finalize()
     }
@@ -34,82 +33,78 @@ impl QuerySchemaRenderer<(DMMFSchema, Vec<DMMFMapping>)> for DMMFQuerySchemaRend
 
 pub struct RenderContext {
     /// Aggregator for query schema
-    schema: RefCell<DMMFSchema>,
+    schema: DMMFSchema,
 
     /// Aggregator for mappings
-    mappings: RefCell<Vec<DMMFMapping>>,
+    mappings: Vec<DMMFMapping>,
 
     /// Prevents double rendering of elements that are referenced multiple times.
     /// Names of input / output types / enums / models are globally unique.
-    rendered: RefCell<HashSet<String>>,
+    rendered: HashSet<String>,
 }
 
 impl RenderContext {
     pub fn new() -> Self {
         RenderContext {
-            schema: RefCell::new(DMMFSchema::new()),
-            mappings: RefCell::new(vec![]),
-            rendered: RefCell::new(HashSet::new()),
+            schema: DMMFSchema::new(),
+            mappings: vec![],
+            rendered: HashSet::new(),
         }
     }
 
     pub fn finalize(self) -> (DMMFSchema, Vec<DMMFMapping>) {
-        let mappings = self.mappings.replace(vec![]);
-        let mut schema = self.schema.into_inner();
+        let mut schema = self.schema;
 
         schema.root_query_type = "Query".into();
         schema.root_mutation_type = "Mutation".into();
 
-        (schema, mappings)
+        (schema, self.mappings)
     }
 
     pub fn already_rendered(&self, cache_key: &str) -> bool {
-        self.rendered.borrow().contains(cache_key)
+        self.rendered.contains(cache_key)
     }
 
-    pub fn mark_as_rendered(&self, cache_key: String) {
-        self.rendered.borrow_mut().insert(cache_key);
+    pub fn mark_as_rendered(&mut self, cache_key: String) {
+        self.rendered.insert(cache_key);
     }
 
-    pub fn add_enum(&self, name: String, dmmf_enum: DMMFEnum) {
-        self.schema.borrow_mut().enums.push(dmmf_enum);
+    pub fn add_enum(&mut self, name: String, dmmf_enum: DMMFEnum) {
+        self.schema.enums.push(dmmf_enum);
         self.mark_as_rendered(name);
     }
 
-    pub fn add_input_type(&self, input_type: DMMFInputType) {
+    pub fn add_input_type(&mut self, input_type: DMMFInputType) {
         self.mark_as_rendered(input_type.name.clone());
-        self.schema.borrow_mut().input_types.push(input_type);
+        self.schema.input_types.push(input_type);
     }
 
-    pub fn add_output_type(&self, output_type: DMMFOutputType) {
+    pub fn add_output_type(&mut self, output_type: DMMFOutputType) {
         self.mark_as_rendered(output_type.name.clone());
-        self.schema.borrow_mut().output_types.push(output_type);
+        self.schema.output_types.push(output_type);
     }
 
-    pub fn add_mapping(&self, name: String, operation: Option<&SchemaQueryBuilder>) {
-        operation.into_iter().for_each(|op| {
-            if let SchemaQueryBuilder::ModelQueryBuilder(m) = op {
-                let model_name = m.model.name.clone();
-                let tag_str = format!("{}", m.tag);
-                let mut mappings = self.mappings.borrow_mut();
-                let mapping = mappings.iter().find(|mapping| mapping.model_name == model_name);
+    pub fn add_mapping(&mut self, name: String, operation: Option<&SchemaQueryBuilder>) {
+        if let Some(SchemaQueryBuilder::ModelQueryBuilder(m)) = operation {
+            let model_name = m.model.name.clone();
+            let tag_str = format!("{}", m.tag);
+            let mapping = self.mappings.iter().find(|mapping| mapping.model_name == model_name);
 
-                match mapping {
-                    Some(ref existing) => existing.add_operation(tag_str, name.clone()),
-                    None => {
-                        let new_mapping = DMMFMapping::new(model_name);
+            match mapping {
+                Some(ref existing) => existing.add_operation(tag_str, name.clone()),
+                None => {
+                    let new_mapping = DMMFMapping::new(model_name);
 
-                        new_mapping.add_operation(tag_str, name.clone());
-                        mappings.push(new_mapping);
-                    }
-                };
-            }
-        });
+                    new_mapping.add_operation(tag_str, name.clone());
+                    self.mappings.push(new_mapping);
+                }
+            };
+        }
     }
 }
 
 pub trait Renderer<'a, T> {
-    fn render(&self, ctx: &RenderContext) -> T;
+    fn render(&self, ctx: &mut RenderContext) -> T;
 }
 
 trait IntoRenderer<'a, T> {
