@@ -5,7 +5,10 @@ use crate::{
 };
 #[cfg(feature = "chrono-0_4")]
 use chrono::{DateTime, Datelike, NaiveDate, NaiveDateTime, NaiveTime, Timelike, Utc};
-use mysql_async::{self as my, consts::ColumnType};
+use mysql_async::{
+    self as my,
+    consts::{ColumnFlags, ColumnType},
+};
 use rust_decimal::prelude::ToPrimitive;
 use std::convert::TryFrom;
 
@@ -151,10 +154,14 @@ impl TypeIdentifier for my::Column {
     fn is_bytes(&self) -> bool {
         use ColumnType::*;
 
-        matches!(
+        let is_a_blob = matches!(
             self.column_type(),
             MYSQL_TYPE_TINY_BLOB | MYSQL_TYPE_MEDIUM_BLOB | MYSQL_TYPE_LONG_BLOB | MYSQL_TYPE_BLOB
-        ) && self.character_set() == 63
+        ) && self.character_set() == 63;
+
+        let is_bits = self.column_type() == MYSQL_TYPE_BIT && self.column_length() > 1;
+
+        is_a_blob || is_bits
     }
 
     fn is_bool(&self) -> bool {
@@ -166,7 +173,7 @@ impl TypeIdentifier for my::Column {
     }
 
     fn is_enum(&self) -> bool {
-        self.column_type() == ColumnType::MYSQL_TYPE_ENUM
+        self.flags() == ColumnFlags::ENUM_FLAG || self.column_type() == ColumnType::MYSQL_TYPE_ENUM
     }
 
     fn is_null(&self) -> bool {
@@ -201,6 +208,10 @@ impl TakeRow for my::Row {
 
                         Error::builder(kind).build()
                     })?
+                }
+                my::Value::Bytes(b) if column.is_enum() => {
+                    let s = String::from_utf8(b)?;
+                    Value::enum_variant(s)
                 }
                 // NEWDECIMAL returned as bytes. See https://mariadb.com/kb/en/resultset-row/#decimal-binary-encoding
                 my::Value::Bytes(b) if column.is_real() => {
@@ -256,7 +267,8 @@ impl TakeRow for my::Row {
                     let time = NaiveTime::from_hms_micro(hours.into(), minutes.into(), seconds.into(), micros);
                     Value::time(time)
                 }
-                my::Value::NULL => match column {
+                my::Value::NULL => match dbg!(column) {
+                    t if t.is_enum() => Value::Enum(None),
                     t if t.is_real() => Value::Real(None),
                     t if t.is_null() => Value::Integer(None),
                     t if t.is_integer() => Value::Integer(None),
@@ -271,7 +283,6 @@ impl TakeRow for my::Row {
                     t if t.is_bool() => Value::Boolean(None),
                     #[cfg(feature = "json-1")]
                     t if t.is_json() => Value::Json(None),
-                    t if t.is_enum() => Value::Enum(None),
                     typ => {
                         let msg = format!(
                             "Value of type {:?} is not supported with the current configuration",
