@@ -242,20 +242,20 @@ impl AliasedSelect for RelationFilter {
 
         let other_columns = self.field.opposite_columns(false);
         let other_columns_len = other_columns.len();
-        let other_columns = other_columns.map(|c| c.table(alias.to_string(None)));
 
         let id_columns = self.field.related_model().primary_identifier().as_columns();
         let id_columns_len = id_columns.len();
-        let id_columns = id_columns.map(|col| col.table(alias.to_string(Some(AliasMode::Join))));
 
         let related_table = self.field.related_model().as_table();
-        let table = relation.as_table().alias(alias.to_string(Some(AliasMode::Table)));
+        let table = relation.as_table();
 
         // check whether the join would join the same table and same column
         // example: `Track` AS `t1` INNER JOIN `Track` AS `j1` ON `j1`.`id` = `t1`.`id`
         let would_peform_needless_join = other_columns_len == id_columns_len
             && table.typ == related_table.typ
             && id_columns.zip(other_columns).all(|(id, other)| id == other);
+
+        let table = table.alias(alias.to_string(Some(AliasMode::Table)));
 
         if would_peform_needless_join {
             // Don't do the useless join
