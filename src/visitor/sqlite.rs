@@ -607,6 +607,19 @@ mod tests {
         assert_eq!(expected_sql, sql);
     }
 
+    #[test]
+    fn test_from() {
+        let expected_sql = "SELECT `foo`.*, `bar`.`a` FROM `foo`, (SELECT `a` FROM `baz`) AS `bar`";
+        let query = Select::default()
+            .and_from("foo")
+            .and_from(Table::from(Select::from_table("baz").column("a")).alias("bar"))
+            .value(Table::from("foo").asterisk())
+            .column(("bar", "a"));
+
+        let (sql, _) = Sqlite::build(query).unwrap();
+        assert_eq!(expected_sql, sql);
+    }
+
     #[cfg(feature = "sqlite")]
     fn sqlite_harness() -> ::rusqlite::Connection {
         let conn = ::rusqlite::Connection::open_in_memory().unwrap();

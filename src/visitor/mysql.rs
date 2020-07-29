@@ -480,6 +480,19 @@ mod tests {
     }
 
     #[test]
+    fn test_from() {
+        let expected_sql = "SELECT `foo`.*, `bar`.`a` FROM `foo`, (SELECT `a` FROM `baz`) AS `bar`";
+        let query = Select::default()
+            .and_from("foo")
+            .and_from(Table::from(Select::from_table("baz").column("a")).alias("bar"))
+            .value(Table::from("foo").asterisk())
+            .column(("bar", "a"));
+
+        let (sql, _) = Mysql::build(query).unwrap();
+        assert_eq!(expected_sql, sql);
+    }
+
+    #[test]
     #[cfg(feature = "json-1")]
     fn test_raw_json() {
         let (sql, params) = Mysql::build(Select::default().value(serde_json::json!({ "foo": "bar" }).raw())).unwrap();

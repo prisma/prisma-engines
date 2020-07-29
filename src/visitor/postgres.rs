@@ -369,6 +369,19 @@ mod tests {
         assert_eq!(expected_sql, sql);
     }
 
+    #[test]
+    fn test_from() {
+        let expected_sql = "SELECT \"foo\".*, \"bar\".\"a\" FROM \"foo\", (SELECT \"a\" FROM \"baz\") AS \"bar\"";
+        let query = Select::default()
+            .and_from("foo")
+            .and_from(Table::from(Select::from_table("baz").column("a")).alias("bar"))
+            .value(Table::from("foo").asterisk())
+            .column(("bar", "a"));
+
+        let (sql, _) = Postgres::build(query).unwrap();
+        assert_eq!(expected_sql, sql);
+    }
+
     #[cfg(feature = "json-1")]
     #[test]
     fn equality_with_a_json_value() {

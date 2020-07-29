@@ -134,37 +134,50 @@ pub trait Visitor<'a> {
             self.write("DISTINCT ")?;
         }
 
-        if let Some(table) = select.table {
+        if !select.tables.is_empty() {
             if select.columns.is_empty() {
-                match table.typ {
-                    TableType::Query(_) | TableType::Values(_) => match table.alias {
-                        Some(ref alias) => {
-                            self.surround_with(Self::C_BACKTICK_OPEN, Self::C_BACKTICK_CLOSE, |ref mut s| {
-                                s.write(alias)
-                            })?;
-                            self.write(".*")?;
-                        }
-                        None => self.write("*")?,
-                    },
-                    TableType::Table(_) => match table.alias.clone() {
-                        Some(ref alias) => {
-                            self.surround_with(Self::C_BACKTICK_OPEN, Self::C_BACKTICK_CLOSE, |ref mut s| {
-                                s.write(alias)
-                            })?;
-                            self.write(".*")?;
-                        }
-                        None => {
-                            self.visit_table(*table.clone(), false)?;
-                            self.write(".*")?;
-                        }
-                    },
+                for (i, table) in select.tables.iter().enumerate() {
+                    if i > 0 {
+                        self.write(", ")?;
+                    }
+
+                    match table.typ {
+                        TableType::Query(_) | TableType::Values(_) => match table.alias {
+                            Some(ref alias) => {
+                                self.surround_with(Self::C_BACKTICK_OPEN, Self::C_BACKTICK_CLOSE, |ref mut s| {
+                                    s.write(alias)
+                                })?;
+                                self.write(".*")?;
+                            }
+                            None => self.write("*")?,
+                        },
+                        TableType::Table(_) => match table.alias.clone() {
+                            Some(ref alias) => {
+                                self.surround_with(Self::C_BACKTICK_OPEN, Self::C_BACKTICK_CLOSE, |ref mut s| {
+                                    s.write(alias)
+                                })?;
+                                self.write(".*")?;
+                            }
+                            None => {
+                                self.visit_table(*table.clone(), false)?;
+                                self.write(".*")?;
+                            }
+                        },
+                    }
                 }
             } else {
                 self.visit_columns(select.columns)?;
             }
 
             self.write(" FROM ")?;
-            self.visit_table(*table, true)?;
+
+            for (i, table) in select.tables.into_iter().enumerate() {
+                if i > 0 {
+                    self.write(", ")?;
+                }
+
+                self.visit_table(*table, true)?;
+            }
 
             if !select.joins.is_empty() {
                 self.visit_joins(select.joins)?;

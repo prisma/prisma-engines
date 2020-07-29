@@ -4,7 +4,7 @@ use crate::ast::*;
 #[derive(Debug, PartialEq, Clone, Default)]
 pub struct Select<'a> {
     pub(crate) distinct: bool,
-    pub(crate) table: Option<Box<Table<'a>>>,
+    pub(crate) tables: Vec<Box<Table<'a>>>,
     pub(crate) columns: Vec<Expression<'a>>,
     pub(crate) conditions: Option<ConditionTree<'a>>,
     pub(crate) ordering: Ordering<'a>,
@@ -101,9 +101,33 @@ impl<'a> Select<'a> {
         T: Into<Table<'a>>,
     {
         Select {
-            table: Some(Box::new(table.into())),
+            tables: vec![Box::new(table.into())],
             ..Default::default()
         }
+    }
+
+    /// Adds a table to be selected.
+    ///
+    /// ```rust
+    /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # fn main() -> Result<(), quaint::error::Error> {
+    /// let query = Select::from_table("users")
+    ///     .and_from(Table::from(Select::default().value(1)).alias("num"))
+    ///     .column(("users", "name"))
+    ///     .value(Table::from("num").asterisk());
+    ///
+    /// let (sql, _) = Sqlite::build(query)?;
+    ///
+    /// assert_eq!("SELECT `users`.`name`, `num`.* FROM `users`, (SELECT ?) AS `num`", sql);
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn and_from<T>(mut self, table: T) -> Self
+    where
+        T: Into<Table<'a>>,
+    {
+        self.tables.push(Box::new(table.into()));
+        self
     }
 
     /// Selects a static value as the column.
