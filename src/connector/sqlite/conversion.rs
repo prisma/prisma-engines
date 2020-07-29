@@ -139,8 +139,8 @@ impl<'a> GetRow for SqliteRow<'a> {
                     }
                     #[cfg(feature = "chrono-0_4")]
                     c if c.is_datetime() => {
-                        let sec = dbg!(dbg!(i) / 1000);
-                        let ns = dbg!(i % 1000) * 1_000_000;
+                        let sec = i / 1000;
+                        let ns = i % 1000 * 1_000_000;
                         let dt = chrono::NaiveDateTime::from_timestamp(sec, ns as u32);
                         Value::datetime(chrono::DateTime::from_utc(dt, chrono::Utc))
                     }

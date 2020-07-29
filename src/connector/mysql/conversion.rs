@@ -267,7 +267,7 @@ impl TakeRow for my::Row {
                     let time = NaiveTime::from_hms_micro(hours.into(), minutes.into(), seconds.into(), micros);
                     Value::time(time)
                 }
-                my::Value::NULL => match dbg!(column) {
+                my::Value::NULL => match column {
                     t if t.is_enum() => Value::Enum(None),
                     t if t.is_real() => Value::Real(None),
                     t if t.is_null() => Value::Integer(None),
