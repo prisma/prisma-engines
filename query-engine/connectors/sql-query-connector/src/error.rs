@@ -52,6 +52,9 @@ pub enum SqlError {
     #[fail(display = "Record does not exist.")]
     RecordDoesNotExist,
 
+    #[fail(display = "Table {} does not exist", _0)]
+    TableDoesNotExist(String),
+
     #[fail(display = "Column does not exist")]
     ColumnDoesNotExist,
 
@@ -121,6 +124,7 @@ impl SqlError {
                 ConnectorError::from_kind(ErrorKind::ForeignKeyConstraintViolation { constraint })
             }
             SqlError::RecordDoesNotExist => ConnectorError::from_kind(ErrorKind::RecordDoesNotExist),
+            SqlError::TableDoesNotExist(table) => ConnectorError::from_kind(ErrorKind::TableDoesNotExist { table }),
             SqlError::ColumnDoesNotExist => ConnectorError::from_kind(ErrorKind::ColumnDoesNotExist),
             SqlError::ConnectionError(e) => ConnectorError {
                 user_facing_error: user_facing_errors::quaint::render_quaint_error(&e, connection_info),
@@ -200,6 +204,7 @@ impl From<quaint::error::Error> for SqlError {
             e @ QuaintKind::ConnectionError(_) => Self::ConnectionError(e),
             QuaintKind::ColumnReadFailure(e) => Self::ColumnReadFailure(e),
             QuaintKind::ColumnNotFound(_) => Self::ColumnDoesNotExist,
+            QuaintKind::TableDoesNotExist { table } => SqlError::TableDoesNotExist(table),
             e @ QuaintKind::ConversionError(_) => SqlError::ConversionError(e.into()),
             e @ QuaintKind::ResultIndexOutOfBounds { .. } => SqlError::QueryError(e.into()),
             e @ QuaintKind::ResultTypeMismatch { .. } => SqlError::QueryError(e.into()),

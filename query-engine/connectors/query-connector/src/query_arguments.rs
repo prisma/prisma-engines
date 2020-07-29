@@ -33,7 +33,7 @@ impl QueryArguments {
     }
 
     pub fn can_batch(&self) -> bool {
-        self.filter.as_ref().map(|filter| filter.can_batch()).unwrap_or(false)
+        self.filter.as_ref().map(|filter| filter.can_batch()).unwrap_or(false) && self.cursor.is_none()
     }
 
     pub fn batched(self) -> Vec<Self> {

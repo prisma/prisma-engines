@@ -30,7 +30,7 @@ impl SelectDefinition for Select<'static> {
 
 impl SelectDefinition for QueryArguments {
     fn into_select(self, model: &ModelRef) -> Select<'static> {
-        let cursor: ConditionTree = cursor_condition::build(&self, Arc::clone(&model));
+        let (table_opt, cursor_condition) = cursor_condition::build(&self, &model);
         let orderings = ordering::build(&self);
 
         let limit = if self.ignore_take { None } else { self.take_abs() };
@@ -41,7 +41,7 @@ impl SelectDefinition for QueryArguments {
             .map(|f| f.aliased_cond(None))
             .unwrap_or(ConditionTree::NoCondition);
 
-        let conditions = match (filter, cursor) {
+        let conditions = match (filter, cursor_condition) {
             (ConditionTree::NoCondition, cursor) => cursor,
             (filter, ConditionTree::NoCondition) => filter,
             (filter, cursor) => ConditionTree::and(filter, cursor),
@@ -50,6 +50,12 @@ impl SelectDefinition for QueryArguments {
         let select_ast = Select::from_table(model.as_table())
             .so_that(conditions)
             .offset(skip as usize);
+
+        let select_ast = if let Some(table) = table_opt {
+            select_ast.and_from(table)
+        } else {
+            select_ast
+        };
 
         let select_ast = orderings.into_iter().fold(select_ast, |acc, ord| acc.order_by(ord));
 
