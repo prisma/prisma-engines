@@ -73,6 +73,6 @@ class FilterRegressionSpec extends FlatSpec with Matchers with ApiSpecBase {
 
     val find_1 = server.query("""query {companies(where: {locations_none: {name: "D"}}){id}}""", project)
 
-    find_1.toString should be("{\"data\":{\"companies\":[{\"id\":1},{\"id\":2},{\"id\":3}]}}")
+    find_1.toString should be("{\"data\":{\"companies\":[{\"id\":134},{\"id\":135},{\"id\":136}]}}")
   }
 }

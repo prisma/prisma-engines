@@ -256,14 +256,20 @@ impl AliasedSelect for RelationFilter {
             .map(|c| c.table(alias.to_string(None)));
 
         if would_perform_needless_join {
-            // Don't do the useless join
-            let conditions = self
+            let columns = if self.field.relation_is_inlined_in_parent() {
+                self.field.as_columns()
+            } else {
+                self.field.related_field().as_columns()
+            };
+
+            let nested_conditions = self
                 .nested_filter
                 .aliased_cond(Some(alias))
                 .invert_if(condition.invert_of_subselect());
 
-            //find out which side has relationcolumns defined, these relationcolums have to be null??
-            //currently all the many filters should pass through here, but with mongo that might change
+            let conditions = columns
+                .map(|c| c.table(alias.to_string(None)))
+                .fold(nested_conditions, |acc, column| acc.and(column.is_not_null()));
 
             let select_base = Select::from_table(table.alias(alias.to_string(None))).so_that(conditions);
 
