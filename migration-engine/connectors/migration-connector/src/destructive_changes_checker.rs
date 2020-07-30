@@ -16,6 +16,9 @@ where
 
     /// Check destructive changes resulting of reverting the provided migration.
     async fn check_unapply(&self, database_migration: &T) -> ConnectorResult<DestructiveChangeDiagnostics>;
+
+    /// Check the database migration without performing any IO.
+    fn pure_check(&self, database_migration: &T) -> ConnectorResult<DestructiveChangeDiagnostics>;
 }
 
 /// The errors and warnings emitted by the [DestructiveChangesChecker](trait.DestructiveChangesChecker.html).
@@ -87,6 +90,10 @@ where
     }
 
     async fn check_unapply(&self, _database_migration: &T) -> ConnectorResult<DestructiveChangeDiagnostics> {
+        Ok(DestructiveChangeDiagnostics::new())
+    }
+
+    fn pure_check(&self, _database_migration: &T) -> ConnectorResult<DestructiveChangeDiagnostics> {
         Ok(DestructiveChangeDiagnostics::new())
     }
 }

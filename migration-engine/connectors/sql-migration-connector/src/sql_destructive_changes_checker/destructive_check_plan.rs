@@ -41,7 +41,7 @@ impl DestructiveCheckPlan {
     /// For example, dropping a table that has 0 rows can be considered safe.
     #[tracing::instrument(skip(conn, schema_name), level = "debug")]
     pub(super) async fn execute(
-        &mut self,
+        &self,
         schema_name: &str,
         conn: &dyn Queryable,
     ) -> SqlResult<DestructiveChangeDiagnostics> {
@@ -108,6 +108,27 @@ impl DestructiveCheckPlan {
         }
 
         Ok(())
+    }
+
+    pub(super) fn pure_check(&self) -> DestructiveChangeDiagnostics {
+        let results = DatabaseInspectionResults::default();
+        let mut diagnostics = DestructiveChangeDiagnostics::new();
+
+        for unexecutable in &self.unexecutable_migrations {
+            if let Some(message) = unexecutable.evaluate(&results) {
+                diagnostics
+                    .unexecutable_migrations
+                    .push(UnexecutableMigration { description: message })
+            }
+        }
+
+        for warning in &self.warnings {
+            if let Some(message) = warning.evaluate(&results) {
+                diagnostics.warnings.push(MigrationWarning { description: message })
+            }
+        }
+
+        diagnostics
     }
 }
 
