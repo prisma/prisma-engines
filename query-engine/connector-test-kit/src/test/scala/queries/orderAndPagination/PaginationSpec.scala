@@ -693,4 +693,118 @@ class PaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
     // The result is reversed again, making it 5, 6
     data.toString() should be("""{"data":{"findManyTestModel":[{"id":5},{"id":6}]}}""")
   }
+
+  // Make sure that the cursor query from the test above works for n order-bys, not only 2.
+  "A cursor with take, skip and multiple order-bys with the orderBy combination stable" should "return the expected results generalized over more than 2 orderBys" in {
+    val project = SchemaDsl.fromStringV11() {
+      """
+        |model TestModel {
+        |  id     Int    @id
+        |  fieldA String
+        |  fieldB String
+        |  fieldC String
+        |  fieldD String
+        |}
+      """.stripMargin
+    }
+    database.setup(project)
+
+    // Test data:
+    // All fields combined are a unique combination (guarantee stable ordering).
+    //
+    // ID   fieldA fieldB fieldC fieldD
+    // 1 =>    A      B      C      D
+    // 2 =>    A      A      A      B
+    // 3 =>    B      B      B      B
+    // 4 =>    B      B      B      C
+    // 5 =>    C      C      B      A
+    // 6 =>    C      C      D      C
+    server.query("""mutation {createOneTestModel(data: { id: 1, fieldA: "A", fieldB: "B", fieldC: "C", fieldD: "D"}){ id }}""", project, legacy = false)
+    server.query("""mutation {createOneTestModel(data: { id: 2, fieldA: "A", fieldB: "A", fieldC: "A", fieldD: "B"}){ id }}""", project, legacy = false)
+    server.query("""mutation {createOneTestModel(data: { id: 3, fieldA: "B", fieldB: "B", fieldC: "B", fieldD: "B"}){ id }}""", project, legacy = false)
+    server.query("""mutation {createOneTestModel(data: { id: 4, fieldA: "B", fieldB: "B", fieldC: "B", fieldD: "C"}){ id }}""", project, legacy = false)
+    server.query("""mutation {createOneTestModel(data: { id: 5, fieldA: "C", fieldB: "C", fieldC: "B", fieldD: "A"}){ id }}""", project, legacy = false)
+    server.query("""mutation {createOneTestModel(data: { id: 6, fieldA: "C", fieldB: "C", fieldC: "D", fieldD: "C"}){ id }}""", project, legacy = false)
+
+    // >>> TEST #1
+    var data = server
+      .query(
+        """
+          |query {
+          |  findManyTestModel(cursor: { id: 4 }, take: 2, skip: 1, orderBy: { fieldA: DESC, fieldB: ASC, fieldC: ASC, fieldD: DESC }) {
+          |    id
+          |  }
+          |}
+        """,
+        project,
+        legacy = false
+      )
+
+    // Ordered: DESC, ASC, ASC, DESC
+    // 5 => C C B A
+    // 6 => C C D C
+    // 4 => B B B C <- cursor, skipped
+    // 3 => B B B B <- take
+    // 2 => A A A B <- take
+    // 1 => A B C D
+    data.toString() should be("""{"data":{"findManyTestModel":[{"id":3},{"id":2}]}}""")
+
+    // >>> TEST #2
+    data = server
+      .query(
+        """
+          |query {
+          |  findManyTestModel(cursor: { id: 2 }, take: 2, skip: 1, orderBy: { fieldB: DESC, fieldA: ASC }) {
+          |    id
+          |  }
+          |}
+        """,
+        project,
+        legacy = false
+      )
+
+    // Ordered (reverse from above): ASC, DESC, DESC, ASC
+    // 1 => A B C D
+    // 2 => A A A B
+    // 3 => B B B B
+    // 4 => B B B C <- cursor, skipped
+    // 6 => C C D C <- take
+    // 5 => C C B A <- take
+    data.toString() should be("""{"data":{"findManyTestModel":[{"id":6},{"id":5}]}}""")
+
+    // Note: Negative takes reverse the order, the following tests check that.
+
+    // >>> TEST #3, same order as 1, but gets reversed to test 2
+    data = server
+      .query(
+        """
+          |query {
+          |  findManyTestModel(cursor: { id: 4 }, take: -2, skip: 1, orderBy: { fieldA: DESC, fieldB: ASC, fieldC: ASC, fieldD: DESC }) {
+          |    id
+          |  }
+          |}
+        """,
+        project,
+        legacy = false
+      )
+
+    // Originally the query orders: DESC, ASC, ASC, DESC. With -2 instead of 2, it wants to take:
+    // 5 => C C B A <- take
+    // 6 => C C D C <- take
+    // 4 => B B B C <- cursor, skipped
+    // 3 => B B B B
+    // 2 => A A A B
+    // 1 => A B C D
+    //
+    // The connectors reverse this to (equivalent to test #2): ASC, DESC, DESC, ASC
+    // 1 => A B C D
+    // 2 => A A A B
+    // 3 => B B B B
+    // 4 => B B B C <- cursor, skipped
+    // 6 => C C D C <- take
+    // 5 => C C B A <- take
+    //
+    // Because the final result (6, 5) gets reversed again to restore original order, the result is:
+    data.toString() should be("""{"data":{"findManyTestModel":[{"id":5},{"id":6}]}}""")
+  }
 }
