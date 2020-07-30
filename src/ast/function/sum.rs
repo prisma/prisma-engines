@@ -1,27 +1,29 @@
 use super::Function;
-use crate::ast::Column;
+use crate::ast::Expression;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Sum<'a> {
-    pub(crate) column: Column<'a>,
+    pub(crate) expr: Box<Expression<'a>>,
 }
 
 /// Calculates the sum value of a numeric column.
 ///
 /// ```rust
-/// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
+/// # use quaint::{ast::*, visitor::{Visitor, Sqlite}, col};
 /// # fn main() -> Result<(), quaint::error::Error> {
-/// let query = Select::from_table("users").value(sum("age").alias("sum"));
+/// let query = Select::from_table("users").value(sum(col!("age")).alias("sum"));
 /// let (sql, _) = Sqlite::build(query)?;
 /// assert_eq!("SELECT SUM(`age`) AS `sum` FROM `users`", sql);
 /// # Ok(())
 /// # }
 /// ```
-pub fn sum<'a, C>(col: C) -> Function<'a>
+pub fn sum<'a, E>(expr: E) -> Function<'a>
 where
-    C: Into<Column<'a>>,
+    E: Into<Expression<'a>>,
 {
-    let fun = Sum { column: col.into() };
+    let fun = Sum {
+        expr: Box::new(expr.into()),
+    };
 
     fun.into()
 }

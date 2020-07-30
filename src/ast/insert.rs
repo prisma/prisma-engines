@@ -11,6 +11,7 @@ pub struct Insert<'a> {
 }
 
 /// A builder for an `INSERT` statement for a single row.
+#[derive(Clone, Debug, PartialEq)]
 pub struct SingleRowInsert<'a> {
     pub(crate) table: Option<Table<'a>>,
     pub(crate) columns: Vec<Column<'a>>,
@@ -18,14 +19,15 @@ pub struct SingleRowInsert<'a> {
 }
 
 /// A builder for an `INSERT` statement for multiple rows.
+#[derive(Clone, Debug, PartialEq)]
 pub struct MultiRowInsert<'a> {
     pub(crate) table: Option<Table<'a>>,
     pub(crate) columns: Vec<Column<'a>>,
     pub(crate) values: Vec<Row<'a>>,
 }
 
-#[derive(Clone, Copy, Debug, PartialEq)]
 /// `INSERT` conflict resolution strategies.
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum OnConflict {
     /// When a row already exists, do nothing. Works with PostgreSQL, MySQL or
     /// SQLite without schema information.

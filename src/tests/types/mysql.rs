@@ -1,5 +1,4 @@
-use super::MySql;
-use crate::tests::type_test::TypeTest;
+use crate::tests::connector::MySql;
 use std::str::FromStr;
 
 test_type!(tinyint(

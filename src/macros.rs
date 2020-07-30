@@ -158,6 +158,7 @@ macro_rules! expression {
     };
 }
 
+/// A test-generator to test types in the defined database.
 #[cfg(test)]
 macro_rules! test_type {
     ($name:ident($db:ident, $sql_type:literal, $($value:expr),+ $(,)?)) => {
@@ -166,13 +167,14 @@ macro_rules! test_type {
             fn [< test_type_ $name >] () -> crate::Result<()> {
                 use crate::ast::*;
                 use crate::connector::Queryable;
+                use crate::tests::connector::Connector;
                 use tokio::runtime::Builder;
 
                 let mut rt = Builder::new().threaded_scheduler().enable_io().enable_time().build().unwrap();
 
                 rt.block_on(async {
                     let mut setup = $db::new().await?;
-                    let table = setup.create_table($sql_type).await?;
+                    let table = setup.create_type_table($sql_type).await?;
 
                     $(
                         let value = $value;

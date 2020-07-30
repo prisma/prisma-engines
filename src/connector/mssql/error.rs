@@ -22,7 +22,9 @@ impl From<tiberius::error::Error> for Error {
                 builder.build()
             }
             tiberius::error::Error::Server(e) if e.code() == 515 => {
-                let column = e.message().split('"').nth(1).unwrap().to_string();
+                let mut splitted = e.message().split_whitespace();
+                let mut splitted = splitted.nth(7).unwrap().split('\'');
+                let column = splitted.nth(1).unwrap().to_string();
 
                 let mut builder = Error::builder(ErrorKind::NullConstraintViolation {
                     constraint: DatabaseConstraint::Fields(vec![column]),
@@ -78,9 +80,11 @@ impl From<tiberius::error::Error> for Error {
                 builder.build()
             }
             tiberius::error::Error::Server(e) if e.code() == 2601 => {
-                let index = e.message().split(' ').nth(9).unwrap().split("\"").nth(1).unwrap();
+                let mut splitted = e.message().split_whitespace();
+                let mut splitted = splitted.nth(11).unwrap().split('\'');
+                let index = splitted.nth(1).unwrap().to_string();
 
-                let mut builder = Error::builder(ErrorKind::ForeignKeyConstraintViolation {
+                let mut builder = Error::builder(ErrorKind::UniqueConstraintViolation {
                     constraint: DatabaseConstraint::Index(index.to_string()),
                 });
 

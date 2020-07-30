@@ -1,5 +1,4 @@
-use super::Sqlite;
-use crate::tests::type_test::TypeTest;
+use crate::tests::connector::Sqlite;
 use std::str::FromStr;
 
 test_type!(integer(

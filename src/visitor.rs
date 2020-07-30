@@ -826,7 +826,7 @@ pub trait Visitor<'a> {
             }
             FunctionType::Sum(sum) => {
                 self.write("SUM")?;
-                self.surround_with("(", ")", |ref mut s| s.visit_column(sum.column))?;
+                self.surround_with("(", ")", |ref mut s| s.visit_expression(*sum.expr))?;
             }
             FunctionType::Lower(lower) => {
                 self.write("LOWER")?;
