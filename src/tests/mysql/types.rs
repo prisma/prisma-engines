@@ -149,7 +149,7 @@ test_type!(datetime(MySql, "datetime", Value::DateTime(None), {
 }));
 
 #[cfg(feature = "chrono-0_4")]
-test_type!(timestamp(MySql, "timestamp", Value::DateTime(None), {
+test_type!(timestamp(MySql, "timestamp", {
     let dt = chrono::DateTime::parse_from_rfc3339("2020-02-27T19:10:22Z").unwrap();
     Value::datetime(dt.with_timezone(&chrono::Utc))
 }));

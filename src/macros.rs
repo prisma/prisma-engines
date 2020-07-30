@@ -175,13 +175,14 @@ macro_rules! test_type {
                     let table = setup.create_table($sql_type).await?;
 
                     $(
-                        let insert = Insert::single_into(&table).value("value", $value);
+                        let value = $value;
+                        let insert = Insert::single_into(&table).value("value", value.clone());
                         setup.conn().insert(insert.into()).await?;
 
                         let select = Select::from_table(&table).column("value").order_by("id".descend());
                         let res = setup.conn().select(select).await?.into_single()?;
 
-                        assert_eq!(Some(&$value), res.at(0));
+                        assert_eq!(Some(&value), res.at(0));
                     )+
 
                     Result::<(), crate::error::Error>::Ok(())
