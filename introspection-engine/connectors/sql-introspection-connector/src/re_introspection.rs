@@ -14,6 +14,11 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
     // Relationnames are similar to virtual relationfields, they can be changed arbitrarily
     // investigate keeping of old manual custom relation names
 
+    //Fixme
+    //Enriching can fix @@map on Models and Enums
+    //can fix @map on fields and enum values
+    //and all their cascading behaviour
+
     // println!("{:#?}", old_data_model);
     // println!("{:#?}", introspection_result.datamodel);
 
@@ -217,6 +222,10 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
             let enm = new_data_model.find_enum_mut(&changed_enum_value.0.enm);
             let value = enm.find_value_mut(&changed_enum_value.0.value);
             value.name = changed_enum_value.1.clone();
+            //fixme: pull out warnings for fixed values.
+            // introspection_result.warnings.retain(|w| )
+            value.commented_out = false;
+
             if value.database_name.is_none() {
                 value.database_name = Some(changed_enum_value.0.value.clone());
             }

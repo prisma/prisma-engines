@@ -101,10 +101,11 @@ impl IntrospectionConnector for SqlIntrospectionConnector {
         let mut introspection_result = calculate_datamodel::calculate_datamodel(&sql_schema, &family)
             .map_err(|sql_introspection_error| sql_introspection_error.into_connector_error(&self.connection_info))?;
 
-        tracing::debug!("Calculating datamodel is done: {:?}", sql_schema);
+        tracing::debug!("Calculating datamodel is done: {:?}", introspection_result.data_model);
 
         if reintrospect {
             enrich(&existing_data_model, &mut introspection_result);
+            tracing::debug!("Enriching datamodel is done: {:?}", introspection_result.data_model);
         }
 
         Ok(introspection_result)
