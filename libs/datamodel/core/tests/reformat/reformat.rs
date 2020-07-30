@@ -412,8 +412,8 @@ fn new_lines_inside_block_above_field_must_stay() {
   id Int @default(autoincrement()) @id
 }
 "#;
-  
-  let expected = input;
+
+    let expected = input;
 
     assert_reformat(input, expected);
 }
@@ -429,7 +429,7 @@ fn new_lines_inside_block_below_field_must_stay() {
 }
 "#;
   
-  let expected = input;
+    let expected = input;
 
     assert_reformat(input, expected);
 }
