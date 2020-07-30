@@ -245,7 +245,7 @@ impl AliasedSelect for RelationFilter {
         let table = relation.as_table();
 
         // check whether the join would join the same table and same column
-        // example: `Track` AS `t1` INNER JOIN `Track` AS `j1` ON `j1`.`id` = `t1`.`id`
+        // prevent: `Track` AS `t1` INNER JOIN `Track` AS `j1` ON `j1`.`id` = `t1`.`id`
         let would_perform_needless_join = other_columns_len == id_columns_len
             && table.typ == related_table.typ
             && id_columns.zip(other_columns).all(|(id, other)| id == other);
@@ -255,21 +255,18 @@ impl AliasedSelect for RelationFilter {
             .relation_columns(false)
             .map(|c| c.table(alias.to_string(None)));
 
-        if would_perform_needless_join {
-            let columns = if self.field.relation_is_inlined_in_parent() {
-                self.field.as_columns()
-            } else {
-                self.field.related_field().as_columns()
-            };
+        let also_these_columns = self
+            .field
+            .relation_columns(false)
+            .map(|c| c.table(alias.to_string(None)));
 
+        if would_perform_needless_join {
             let nested_conditions = self
                 .nested_filter
                 .aliased_cond(Some(alias))
                 .invert_if(condition.invert_of_subselect());
 
-            let conditions = columns
-                .map(|c| c.table(alias.to_string(None)))
-                .fold(nested_conditions, |acc, column| acc.and(column.is_not_null()));
+            let conditions = also_these_columns.fold(nested_conditions, |acc, column| acc.and(column.is_not_null()));
 
             let select_base = Select::from_table(table.alias(alias.to_string(None))).so_that(conditions);
 
