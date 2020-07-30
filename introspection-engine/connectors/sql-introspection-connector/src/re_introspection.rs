@@ -110,6 +110,37 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
         }
     }
 
+    //virtual relationfield names
+    let mut changed_relation_field_names = vec![];
+    {
+        for model in new_data_model.models() {
+            for field in model.relation_fields() {
+                if let Some(old_model) = old_data_model.find_model(&model.name) {
+                    for old_field in old_model.relation_fields() {
+                        //the relationinfos of both sides need to be compared since the relationinfo of the
+                        // non-fk side does not contain enough information to uniquely identify the correct relationfield
+                        if &old_field.relation_info == &field.relation_info
+                            && &old_data_model.find_related_field_bang(&old_field).relation_info
+                                == &new_data_model.find_related_field_bang(&field).relation_info
+                        {
+                            let mf = ModelAndField::new(&model.name, &field.name);
+                            changed_relation_field_names.push((mf, old_field.name.clone()));
+                        }
+                    }
+                }
+            }
+        }
+
+        for changed_relation_field_name in changed_relation_field_names {
+            new_data_model
+                .find_relation_field_mut(
+                    &changed_relation_field_name.0.model,
+                    &changed_relation_field_name.0.field,
+                )
+                .name = changed_relation_field_name.1;
+        }
+    }
+
     // update relation names (needs all fields and models to already be updated)
     // todo this only updates relation names where the name of a model changed.
     // the change of a field name would here not be reflected yet, but these would have been rendered already
@@ -235,37 +266,6 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
                     field.default_value = Some(DefaultValue::Single(PrismaValue::Enum(changed_enum_value.1.clone())));
                 }
             }
-        }
-    }
-
-    //virtual relationfield names
-    let mut changed_relation_field_names = vec![];
-    {
-        for model in new_data_model.models() {
-            for field in model.relation_fields() {
-                if let Some(old_model) = old_data_model.find_model(&model.name) {
-                    for old_field in old_model.relation_fields() {
-                        //the relationinfos of both sides need to be compared since the relationinfo of the
-                        // non-fk side does not contain enough information to uniquely identify the correct relationfield
-                        if &old_field.relation_info == &field.relation_info
-                            && &old_data_model.find_related_field_bang(&old_field).relation_info
-                                == &new_data_model.find_related_field_bang(&field).relation_info
-                        {
-                            let mf = ModelAndField::new(&model.name, &field.name);
-                            changed_relation_field_names.push((mf, old_field.name.clone()));
-                        }
-                    }
-                }
-            }
-        }
-
-        for changed_relation_field_name in changed_relation_field_names {
-            new_data_model
-                .find_relation_field_mut(
-                    &changed_relation_field_name.0.model,
-                    &changed_relation_field_name.0.field,
-                )
-                .name = changed_relation_field_name.1;
         }
     }
 
