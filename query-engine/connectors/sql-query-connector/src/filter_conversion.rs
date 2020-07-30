@@ -250,15 +250,11 @@ impl AliasedSelect for RelationFilter {
             && table.typ == related_table.typ
             && id_columns.zip(other_columns).all(|(id, other)| id == other);
 
-        let these_columns = self
+        let these_columns: Vec<Column> = self
             .field
             .relation_columns(false)
-            .map(|c| c.table(alias.to_string(None)));
-
-        let also_these_columns = self
-            .field
-            .relation_columns(false)
-            .map(|c| c.table(alias.to_string(None)));
+            .map(|c| c.table(alias.to_string(None)))
+            .collect();
 
         if would_perform_needless_join {
             let nested_conditions = self
@@ -266,11 +262,16 @@ impl AliasedSelect for RelationFilter {
                 .aliased_cond(Some(alias))
                 .invert_if(condition.invert_of_subselect());
 
-            let conditions = also_these_columns.fold(nested_conditions, |acc, column| acc.and(column.is_not_null()));
+            let conditions = these_columns
+                .clone()
+                .into_iter()
+                .fold(nested_conditions, |acc, column| acc.and(column.is_not_null()));
 
             let select_base = Select::from_table(table.alias(alias.to_string(None))).so_that(conditions);
 
-            these_columns.fold(select_base, |acc, column| acc.column(column))
+            these_columns
+                .into_iter()
+                .fold(select_base, |acc, column| acc.column(column))
         } else {
             let other_columns: Vec<_> = self
                 .field
@@ -300,7 +301,9 @@ impl AliasedSelect for RelationFilter {
                 .inner_join(join)
                 .so_that(conditions);
 
-            these_columns.fold(select_base, |acc, column| acc.column(column))
+            these_columns
+                .into_iter()
+                .fold(select_base, |acc, column| acc.column(column))
         }
     }
 }
