@@ -27,13 +27,16 @@ class CreateMutationListSpec extends FlatSpec with Matchers with ApiSpecBase {
 
   "A Create Mutation" should "should not accept null in set" in {
     server.queryThatMustFail(
-      s"""mutation {
-         |  createUser(data: {
-         |    id: 1, test: {set: null}}){id, test }
-         |}""".stripMargin,
+      s"""mutation {createUser(data: {id: 1, test: {set: null}}){id, test }}""",
       project = project,
       errorCode = 2012
     )
 
+    server
+      .query(
+        s"""mutation {  createUser(data: { id: 1}){id, test }}""",
+        project = project
+      )
+      .toString() should be("{\"data\":{\"createUser\":{\"id\":1,\"test\":[]}}}")
   }
 }
