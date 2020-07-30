@@ -110,6 +110,11 @@ impl DestructiveCheckPlan {
         Ok(())
     }
 
+    /// Return hypothetical warnings and errors, without performing any database
+    /// IO. This is useful when we want to return diagnostics in reference to a
+    /// database we cannot check directly. For example when we want to emit
+    /// warnings about the production database, when creating a migration in
+    /// development.
     pub(super) fn pure_check(&self) -> DestructiveChangeDiagnostics {
         let results = DatabaseInspectionResults::default();
         let mut diagnostics = DestructiveChangeDiagnostics::new();
