@@ -1,4 +1,4 @@
-package queries.relations
+package queries.filters
 
 import org.scalatest.{FlatSpec, Matchers}
 import util.{ApiSpecBase, ProjectDsl}
@@ -74,5 +74,9 @@ class FilterRegressionSpec extends FlatSpec with Matchers with ApiSpecBase {
     val find_1 = server.query("""query {companies(where: {locations_none: {name: "D"}}){id}}""", project)
 
     find_1.toString should be("{\"data\":{\"companies\":[{\"id\":134},{\"id\":135},{\"id\":136}]}}")
+
+    val find_2 = server.query("""query {companies(where: {locations_every: {name: "A"}}){id}}""", project)
+
+    find_2.toString should be("{\"data\":{\"companies\":[{\"id\":135}]}}")
   }
 }
