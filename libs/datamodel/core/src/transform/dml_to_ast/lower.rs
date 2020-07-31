@@ -1,7 +1,6 @@
 use super::super::directives::AllDirectives;
 use crate::error::ErrorCollection;
-use crate::{ast, dml, Field, FieldArity, FieldType, RelationField};
-use std::collections::HashMap;
+use crate::{ast, dml, Field, FieldArity, FieldType};
 
 pub struct LowerDmlToAst {
     directives: AllDirectives,
