@@ -1,6 +1,6 @@
 use super::super::directives::AllDirectives;
 use crate::error::ErrorCollection;
-use crate::{ast, dml, Field, FieldArity, FieldType};
+use crate::{ast, dml, Field, FieldArity};
 
 pub struct LowerDmlToAst {
     directives: AllDirectives,
@@ -42,7 +42,7 @@ impl LowerDmlToAst {
         let mut fields: Vec<ast::Field> = Vec::new();
 
         for field in model.fields() {
-            let mut removeDirectives = false;
+            let mut remove_directives = false;
 
             // check for many to many relation
             if field.is_relation() && field.arity() == &FieldArity::List {
@@ -50,14 +50,14 @@ impl LowerDmlToAst {
                     Field::RelationField(field) => {
                         let related_field = datamodel.find_related_field(field).unwrap();
                         if related_field.arity == FieldArity::List {
-                            removeDirectives = true;
+                            remove_directives = true;
                         }
                     }
                     _ => {}
                 }
             }
 
-            match self.lower_field(field, datamodel, removeDirectives) {
+            match self.lower_field(field, datamodel, remove_directives) {
                 Ok(ast_field) => fields.push(ast_field),
                 Err(mut err) => errors.append(&mut err),
             };
