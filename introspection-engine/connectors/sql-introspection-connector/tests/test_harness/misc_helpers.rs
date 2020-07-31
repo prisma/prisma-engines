@@ -5,6 +5,7 @@ use std::sync::Arc;
 
 pub(crate) fn custom_assert(left: &str, right: &str) {
     let parsed_expected = datamodel::parse_datamodel(&right).unwrap();
+    println!("{:?}", parsed_expected);
     let reformatted_expected =
         datamodel::render_datamodel_to_string(&parsed_expected).expect("Datamodel rendering failed");
 
