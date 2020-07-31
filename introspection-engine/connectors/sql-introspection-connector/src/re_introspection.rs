@@ -14,13 +14,8 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec
     // Relationnames are similar to virtual relationfields, they can be changed arbitrarily
     // investigate keeping of old manual custom relation names
 
-    //Fixme
-    //Enriching can fix @@map on Models and Enums
-    //can fix @map on fields and enum values
-    //and all their cascading behaviour
-
     // println!("{:#?}", old_data_model);
-    // println!("{:#?}", introspection_result.datamodel);
+    // println!("{:#?}", new_data_model);
 
     let mut warnings = vec![];
 
