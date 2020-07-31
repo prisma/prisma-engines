@@ -2,7 +2,6 @@ use crate::common::parse;
 
 #[test]
 fn test_must_not_render_relation_fields_with_many_to_many() {
-
     let input = r#"model Post {
   id   Int    @default(autoincrement()) @id
   User User[]
@@ -13,7 +12,6 @@ model User {
   Post Post[]
 }
 "#;
-
 
     let expected = input;
 

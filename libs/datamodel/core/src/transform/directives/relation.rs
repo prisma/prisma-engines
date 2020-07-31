@@ -1,7 +1,7 @@
 use super::{super::helpers::*, DirectiveValidator};
 use crate::common::names::DefaultNames;
 use crate::error::DatamodelError;
-use crate::{ast, dml, FieldArity, Field};
+use crate::{ast, dml, Field, FieldArity};
 
 /// Prismas builtin `@relation` directive.
 pub struct RelationDirectiveValidator {}
@@ -78,7 +78,6 @@ impl DirectiveValidator<dml::Field> for RelationDirectiveValidator {
 
             // if we are on the physical field
             if !relation_info.to_fields.is_empty() {
-
                 let mut is_many_to_many = false;
                 if field.is_relation() && field.arity() == &FieldArity::List {
                     if let Field::RelationField(relation) = &field {
