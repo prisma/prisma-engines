@@ -1,6 +1,7 @@
 use super::super::directives::AllDirectives;
 use crate::error::ErrorCollection;
 use crate::{ast, dml, Field, FieldArity};
+use std::borrow::Borrow;
 
 pub struct LowerDmlToAst {
     directives: AllDirectives,
@@ -42,22 +43,7 @@ impl LowerDmlToAst {
         let mut fields: Vec<ast::Field> = Vec::new();
 
         for field in model.fields() {
-            let mut remove_directives = false;
-
-            // check for many to many relation
-            if field.is_relation() && field.arity() == &FieldArity::List {
-                match field {
-                    Field::RelationField(field) => {
-                        let related_field = datamodel.find_related_field(field).unwrap();
-                        if related_field.arity == FieldArity::List {
-                            remove_directives = true;
-                        }
-                    }
-                    _ => {}
-                }
-            }
-
-            match self.lower_field(field, datamodel, remove_directives) {
+            match self.lower_field(field, datamodel) {
                 Ok(ast_field) => fields.push(ast_field),
                 Err(mut err) => errors.append(&mut err),
             };
@@ -96,20 +82,17 @@ impl LowerDmlToAst {
         })
     }
 
+
+
     pub fn lower_field(
         &self,
         field: &dml::Field,
         datamodel: &dml::Datamodel,
-        remove_directives: bool,
     ) -> Result<ast::Field, ErrorCollection> {
         Ok(ast::Field {
             name: ast::Identifier::new(&field.name()),
             arity: self.lower_field_arity(field.arity()),
-            directives: if remove_directives {
-                Vec::new()
-            } else {
-                self.directives.field.serialize(field, datamodel)?
-            },
+            directives: self.directives.field.serialize(&field, datamodel)?,
             field_type: self.lower_type(&field.field_type()),
             documentation: field
                 .documentation()

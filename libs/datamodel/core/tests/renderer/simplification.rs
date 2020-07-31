@@ -68,8 +68,8 @@ fn test_render_relation_name_on_self_relations() {
   id         String     @id
   name       String
   updatedAt  DateTime
-  Category_A Category[] @relation("CategoryToCategory", references: [id])
-  Category_B Category[] @relation("CategoryToCategory", references: [id])
+  Category_A Category[] @relation("CategoryToCategory")
+  Category_B Category[] @relation("CategoryToCategory")
 }
 "#;
 
