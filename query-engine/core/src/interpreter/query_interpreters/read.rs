@@ -1,6 +1,6 @@
 use super::*;
 use crate::{interpreter::InterpretationResult, query_ast::*, result_ast::*};
-use connector::{self, ConnectionLike, ReadOperations};
+use connector::{self, ConnectionLike, QueryArguments, ReadOperations};
 use futures::future::{BoxFuture, FutureExt};
 use inmemory_record_processor::InMemoryRecordProcessor;
 use prisma_models::ManyRecords;
@@ -44,7 +44,7 @@ fn read_one<'conn, 'tx>(
                     scalars: records,
                     nested,
                     model_id,
-                    ..Default::default()
+                    query_arguments: QueryArguments::new(model),
                 }))
             }
 
@@ -52,7 +52,9 @@ fn read_one<'conn, 'tx>(
                 name: query.name,
                 fields: query.selection_order,
                 model_id,
-                ..Default::default()
+                scalars: ManyRecords::default(),
+                nested: vec![],
+                query_arguments: QueryArguments::new(model),
             })),
         }
     };

@@ -14,7 +14,7 @@ use std::convert::TryInto;
 /// Errors occur if conversions fail.
 pub fn extract_query_args(arguments: Vec<ParsedArgument>, model: &ModelRef) -> QueryGraphBuilderResult<QueryArguments> {
     arguments.into_iter().fold(
-        Ok(QueryArguments::default()),
+        Ok(QueryArguments::new(model.clone())),
         |result: QueryGraphBuilderResult<QueryArguments>, arg| {
             if let Ok(res) = result {
                 match arg.name.as_str() {

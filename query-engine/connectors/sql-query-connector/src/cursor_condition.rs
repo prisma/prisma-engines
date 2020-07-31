@@ -79,12 +79,12 @@ pub fn build(query_arguments: &QueryArguments, model: &ModelRef) -> (Option<Tabl
                 let (field, order) = order_definitions.pop().unwrap();
                 ConditionTree::Single(Box::new(map_orderby_condition(&field, &order, reverse, true)))
             } else {
-                let conditions = (0..len).fold(Vec::with_capacity(len), |mut conditions_acc, i| {
+                let or_conditions = (0..len).fold(Vec::with_capacity(len), |mut conditions_acc, n| {
                     let (head, tail) = order_definitions.split_at(len - n - 1);
-                    let mut cond = Vec::with_capacity(head.len() + 1);
+                    let mut and_conditions = Vec::with_capacity(head.len() + 1);
 
                     for (field, _) in head {
-                        cond.push(Box::new(map_equality_condition(field)));
+                        and_conditions.push(map_equality_condition(field));
                     }
 
                     if head.len() == len - 1 {
@@ -114,16 +114,17 @@ pub fn build(query_arguments: &QueryArguments, model: &ModelRef) -> (Option<Tabl
                         // but everything else must come strictly "after" the cursor.
                         let (field, order) = tail.first().unwrap();
 
-                        cond.push(Box::new(map_orderby_condition(field, order, reverse, true)));
+                        and_conditions.push(map_orderby_condition(field, order, reverse, true));
                     } else {
-                        todo!()
+                        let (field, order) = tail.first().unwrap();
+                        and_conditions.push(map_orderby_condition(field, order, reverse, false));
                     }
 
-                    conditions_acc.push(cond);
+                    conditions_acc.push(ConditionTree::And(and_conditions));
                     conditions_acc
                 });
 
-                ConditionTree::And(conditions)
+                ConditionTree::Or(or_conditions.into_iter().map(Into::into).collect())
             };
 
             (Some(subquery_table), condition_tree)
@@ -176,8 +177,6 @@ fn map_orderby_condition(
         }
     }
     .into()
-    //     })
-    //     .collect();
 }
 
 fn map_equality_condition(field: &ScalarFieldRef) -> Expression<'static> {

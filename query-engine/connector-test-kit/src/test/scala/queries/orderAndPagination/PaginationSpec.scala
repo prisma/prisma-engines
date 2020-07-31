@@ -592,109 +592,6 @@ class PaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
   /*************************************************
     * Cursor + Take + Skip + Multiple OrderBy tests. *
     * ************************************************/
-  "A cursor with take, skip and multiple order-bys with the orderBy combination stable" should "return the expected results" in {
-    val project = SchemaDsl.fromStringV11() {
-      """
-        |model TestModel {
-        |  id     Int    @id
-        |  fieldA String
-        |  fieldB String
-        |  uniq   Int    @unique
-        |}
-      """.stripMargin
-    }
-    database.setup(project)
-
-    // Test data:
-    // fieldA + fieldB are a unique combination (guarantee stable ordering)
-    //
-    // ID   fieldA fieldB uniq
-    // 1 =>    A     A     6
-    // 2 =>    A     B     5
-    // 3 =>    B     C     4
-    // 4 =>    B     A     3
-    // 5 =>    C     B     2
-    // 6 =>    C     C     1
-    server.query("""mutation {createOneTestModel(data: { id: 1, uniq: 6, fieldA: "A", fieldB: "A"}){ id }}""", project, legacy = false)
-    server.query("""mutation {createOneTestModel(data: { id: 2, uniq: 5, fieldA: "A", fieldB: "B"}){ id }}""", project, legacy = false)
-    server.query("""mutation {createOneTestModel(data: { id: 3, uniq: 4, fieldA: "B", fieldB: "C"}){ id }}""", project, legacy = false)
-    server.query("""mutation {createOneTestModel(data: { id: 4, uniq: 3, fieldA: "B", fieldB: "A"}){ id }}""", project, legacy = false)
-    server.query("""mutation {createOneTestModel(data: { id: 5, uniq: 2, fieldA: "C", fieldB: "B"}){ id }}""", project, legacy = false)
-    server.query("""mutation {createOneTestModel(data: { id: 6, uniq: 1, fieldA: "C", fieldB: "C"}){ id }}""", project, legacy = false)
-
-    var data = server
-      .query(
-        """
-          |query {
-          |  findManyTestModel(cursor: { id: 4 }, take: 2, skip: 1, orderBy: { fieldA: DESC, fieldB: ASC }) {
-          |    id
-          |  }
-          |}
-        """,
-        project,
-        legacy = false
-      )
-
-    // Ordered by fieldA DESC, fieldB ASC:
-    // 5 => C  B  2
-    // 6 => C  C  1
-    // 4 => B  A  3 <- cursor, skipped
-    // 3 => B  C  4 <- take
-    // 1 => A  A  6 <- take
-    // 2 => A  B  5
-    data.toString() should be("""{"data":{"findManyTestModel":[{"id":3},{"id":1}]}}""")
-
-    data = server
-      .query(
-        """
-          |query {
-          |  findManyTestModel(cursor: { id: 2 }, take: 2, skip: 1, orderBy: { fieldB: DESC, fieldA: ASC }) {
-          |    id
-          |  }
-          |}
-        """,
-        project,
-        legacy = false
-      )
-
-    // Ordered by fieldB DESC, fieldA ASC:
-    // 3 => B  C  4
-    // 6 => C  C  1
-    // 2 => A  B  5 <- cursor, skipped
-    // 5 => C  B  2 <- take
-    // 1 => A  A  6 <- take
-    // 4 => B  A  3
-    data.toString() should be("""{"data":{"findManyTestModel":[{"id":5},{"id":1}]}}""")
-
-    // Negative takes reverse the order
-    data = server
-      .query(
-        """
-          |query {
-          |  findManyTestModel(cursor: { id: 4 }, take: -2, skip: 1, orderBy: { fieldA: DESC, fieldB: ASC }) {
-          |    id
-          |  }
-          |}
-        """,
-        project,
-        legacy = false
-      )
-
-    // Ordered by fieldA DESC, fieldB ASC, reversed to fieldA ASC, fieldB DESC:
-    // fieldA >= B
-    // fieldB <= A
-    //
-    // 2 => A  B  5
-    // 1 => A  A  6
-    // 3 => B  C  4
-    // 4 => B  A  3 <- cursor, skipped
-    // 6 => C  C  1 <- take
-    // 5 => C  B  2 <- take
-    // The result is reversed again, making it 5, 6
-    data.toString() should be("""{"data":{"findManyTestModel":[{"id":5},{"id":6}]}}""")
-  }
-
-  // Make sure that the cursor query from the test above works for n order-bys, not only 2.
   "A cursor with take, skip and multiple order-bys with the orderBy combination stable" should "return the expected results generalized over more than 2 orderBys" in {
     val project = SchemaDsl.fromStringV11() {
       """
@@ -754,7 +651,7 @@ class PaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
       .query(
         """
           |query {
-          |  findManyTestModel(cursor: { id: 2 }, take: 2, skip: 1, orderBy: { fieldB: DESC, fieldA: ASC }) {
+          |  findManyTestModel(cursor: { id: 4 }, take: 2, skip: 1, orderBy: { fieldA: ASC, fieldB: DESC, fieldC: DESC, fieldD: ASC }) {
           |    id
           |  }
           |}
@@ -763,7 +660,7 @@ class PaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
         legacy = false
       )
 
-    // Ordered (reverse from above): ASC, DESC, DESC, ASC
+    // Ordered (reverse from test #1): ASC, DESC, DESC, ASC
     // 1 => A B C D
     // 2 => A A A B
     // 3 => B B B B
@@ -807,4 +704,117 @@ class PaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
     // Because the final result (6, 5) gets reversed again to restore original order, the result is:
     data.toString() should be("""{"data":{"findManyTestModel":[{"id":5},{"id":6}]}}""")
   }
+
+  "A cursor with take, skip and multiple order-bys with the orderBy combination not stable" should "return the expected results" in {
+    val project = SchemaDsl.fromStringV11() {
+      """
+        |model TestModel {
+        |  id     Int    @id
+        |  fieldA String
+        |  fieldB String
+        |  fieldC String
+        |  fieldD String
+        |}
+      """.stripMargin
+    }
+    database.setup(project)
+
+    // Test data:
+    // No stable ordering guaranteed.
+    //
+    // ID   fieldA fieldB fieldC fieldD
+    // 1 =>    A      B      C      D
+    // 2 =>    A      A      A      B
+    // 3 =>    B      B      B      B
+    // 4 =>    B      B      B      B
+    // 5 =>    B      B      B      B
+    // 6 =>    C      C      D      C
+    server.query("""mutation {createOneTestModel(data: { id: 1, fieldA: "A", fieldB: "B", fieldC: "C", fieldD: "D"}){ id }}""", project, legacy = false)
+    server.query("""mutation {createOneTestModel(data: { id: 2, fieldA: "A", fieldB: "A", fieldC: "A", fieldD: "B"}){ id }}""", project, legacy = false)
+    server.query("""mutation {createOneTestModel(data: { id: 3, fieldA: "B", fieldB: "B", fieldC: "B", fieldD: "B"}){ id }}""", project, legacy = false)
+    server.query("""mutation {createOneTestModel(data: { id: 4, fieldA: "B", fieldB: "B", fieldC: "B", fieldD: "B"}){ id }}""", project, legacy = false)
+    server.query("""mutation {createOneTestModel(data: { id: 5, fieldA: "B", fieldB: "B", fieldC: "B", fieldD: "B"}){ id }}""", project, legacy = false)
+    server.query("""mutation {createOneTestModel(data: { id: 6, fieldA: "C", fieldB: "C", fieldC: "D", fieldD: "C"}){ id }}""", project, legacy = false)
+
+    // >>> TEST #1
+    var data = server
+      .query(
+        """
+          |query {
+          |  findManyTestModel(cursor: { id: 4 }, take: 3, skip: 1, orderBy: { fieldA: DESC, fieldB: ASC, fieldC: ASC, fieldD: DESC }) {
+          |    id
+          |  }
+          |}
+        """,
+        project,
+        legacy = false
+      )
+
+    // Ordered: DESC, ASC, ASC, DESC
+    // The order is at the discretion of the db, possible result options:
+    // - 3 and 5 are included in the result: (3, 5, 2)
+    // - Only 3 or only 5 are included in the result: (3, 2, 1) | (5, 2, 1)
+    // - None of the duplicates is included: (2, 1)
+    //
+    // One possible constellation:
+    // 6 => C C D C
+    // 5 => B B B B
+    // 4 => B B B B <- cursor, skipped
+    // 3 => B B B B <- take
+    // 2 => A A A B <- take
+    // 1 => A B C D <- take
+    data.toString() should be("""{"data":{"findManyTestModel":[{"id":3},{"id":1}]}}""")
+
+//    data = server
+//      .query(
+//        """
+//          |query {
+//          |  findManyTestModel(cursor: { id: 2 }, take: 2, skip: 1, orderBy: { fieldB: DESC, fieldA: ASC }) {
+//          |    id
+//          |  }
+//          |}
+//        """,
+//        project,
+//        legacy = false
+//      )
+//
+//    // Ordered by fieldB DESC, fieldA ASC:
+//    // 3 => B  C  4
+//    // 6 => C  C  1
+//    // 2 => A  B  5 <- cursor, skipped
+//    // 5 => C  B  2 <- take
+//    // 1 => A  A  6 <- take
+//    // 4 => B  A  3
+//    data.toString() should be("""{"data":{"findManyTestModel":[{"id":5},{"id":1}]}}""")
+//
+//    // Negative takes reverse the order
+//    data = server
+//      .query(
+//        """
+//          |query {
+//          |  findManyTestModel(cursor: { id: 4 }, take: -2, skip: 1, orderBy: { fieldA: DESC, fieldB: ASC }) {
+//          |    id
+//          |  }
+//          |}
+//        """,
+//        project,
+//        legacy = false
+//      )
+//
+//    // Ordered by fieldA DESC, fieldB ASC, reversed to fieldA ASC, fieldB DESC:
+//    // fieldA >= B
+//    // fieldB <= A
+//    //
+//    // 2 => A  B  5
+//    // 1 => A  A  6
+//    // 3 => B  C  4
+//    // 4 => B  A  3 <- cursor, skipped
+//    // 6 => C  C  1 <- take
+//    // 5 => C  B  2 <- take
+//    // The result is reversed again, making it 5, 6
+//    data.toString() should be("""{"data":{"findManyTestModel":[{"id":5},{"id":6}]}}""")
+  }
+
+  // implicit cursor ordering spec
+  // nested multiple ordering cursor spec
 }

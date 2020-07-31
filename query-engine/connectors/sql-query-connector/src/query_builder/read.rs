@@ -3,7 +3,6 @@ use connector_interface::{filter::Filter, Aggregator, QueryArguments};
 use itertools::Itertools;
 use prisma_models::*;
 use quaint::ast::*;
-use std::sync::Arc;
 
 pub trait SelectDefinition {
     fn into_select(self, _: &ModelRef) -> Select<'static>;
@@ -11,7 +10,7 @@ pub trait SelectDefinition {
 
 impl SelectDefinition for Filter {
     fn into_select(self, model: &ModelRef) -> Select<'static> {
-        let args = QueryArguments::from(self);
+        let args = QueryArguments::from((model.clone(), self));
         args.into_select(model)
     }
 }

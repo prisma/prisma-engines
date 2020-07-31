@@ -668,8 +668,8 @@ impl QueryGraph {
             let read_query = ReadQuery::ManyRecordsQuery(ManyRecordsQuery {
                 name: "reload".into(),
                 alias: None,
-                model,
-                args: QueryArguments::default(),
+                model: model.clone(),
+                args: QueryArguments::new(model),
                 selected_fields: ModelProjection::union(identifiers),
                 nested: vec![],
                 selection_order: vec![],

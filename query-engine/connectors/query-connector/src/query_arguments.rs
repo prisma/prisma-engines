@@ -15,8 +15,13 @@ pub struct SkipAndLimit {
 /// - The `ignore_*` flags are a temporary bandaid to tell the connector to do not
 ///   include certain constraints when building queries, because the core is already
 ///   performing these action in a different manner (e.g. in-memory on all records).
-#[derive(Debug, Default, Clone)]
+///
+/// A query argument struct is always valid over a single model only, meaning that all
+/// data referenced in a single query argument instance is always refering to data of
+/// a single model (e.g. the cursor projection, distinct projection, orderby, ...).
+#[derive(Debug, Clone)]
 pub struct QueryArguments {
+    pub model: ModelRef,
     pub cursor: Option<RecordProjection>,
     pub take: Option<i64>,
     pub skip: Option<i64>,
@@ -28,6 +33,29 @@ pub struct QueryArguments {
 }
 
 impl QueryArguments {
+    pub fn new(model: ModelRef) -> Self {
+        Self {
+            model,
+            cursor: None,
+            take: None,
+            skip: None,
+            filter: None,
+            order_by: vec![],
+            distinct: None,
+            ignore_take: false,
+            ignore_skip: false,
+        }
+    }
+
+    /// Checks if the orderBy provided is guaranteeing a stable ordering of records for the model. Assumes that `model`
+    /// is the same as the model used
+    /// `true` if at least one unique field is present, or contains a combination of fields that is marked as unique.
+    /// `false` otherwise.
+    pub fn is_stable_ordering(&self) -> bool {
+        // !self.order_by.is_empty() && (self.order_by.iter().any(|o| o.field.unique()) || )
+        todo!()
+    }
+
     pub fn take_abs(&self) -> Option<i64> {
         self.take.clone().map(|t| if t < 0 { t * -1 } else { t })
     }
@@ -39,6 +67,7 @@ impl QueryArguments {
     pub fn batched(self) -> Vec<Self> {
         match self.filter {
             Some(filter) => {
+                let model = self.model;
                 let cursor = self.cursor;
                 let take = self.take;
                 let skip = self.skip;
@@ -51,6 +80,7 @@ impl QueryArguments {
                     .batched()
                     .into_iter()
                     .map(|filter| QueryArguments {
+                        model: model.clone(),
                         cursor: cursor.clone(),
                         take: take.clone(),
                         skip: skip.clone(),
@@ -65,15 +95,19 @@ impl QueryArguments {
             _ => vec![self],
         }
     }
+
+    pub fn model(&self) -> &ModelRef {
+        &self.model
+    }
 }
 
-impl<T> From<T> for QueryArguments
+impl<T> From<(ModelRef, T)> for QueryArguments
 where
     T: Into<Filter>,
 {
-    fn from(filter: T) -> Self {
-        let mut query_arguments = Self::default();
-        query_arguments.filter = Some(filter.into());
+    fn from(model_filter: (ModelRef, T)) -> Self {
+        let mut query_arguments = Self::new(model_filter.0);
+        query_arguments.filter = Some(model_filter.1.into());
         query_arguments
     }
 }
