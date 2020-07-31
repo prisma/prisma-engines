@@ -47,13 +47,25 @@ impl QueryArguments {
         }
     }
 
+    /// An unstable cursor is a cursor that is used in conjunction with an unstable (non-unique) combination of orderBys.
+    pub fn contains_unstable_cursor(&self) -> bool {
+        self.cursor.is_some() && !self.is_stable_ordering()
+    }
+
     /// Checks if the orderBy provided is guaranteeing a stable ordering of records for the model. Assumes that `model`
     /// is the same as the model used
     /// `true` if at least one unique field is present, or contains a combination of fields that is marked as unique.
     /// `false` otherwise.
     pub fn is_stable_ordering(&self) -> bool {
-        // !self.order_by.is_empty() && (self.order_by.iter().any(|o| o.field.unique()) || )
-        todo!()
+        let order_fields: Vec<_> = self.order_by.iter().map(|o| &o.field).collect();
+
+        !self.order_by.is_empty()
+            && (self.order_by.iter().any(|o| o.field.unique())
+                || self
+                    .model
+                    .unique_indexes()
+                    .into_iter()
+                    .any(|index| index.fields().into_iter().all(|f| order_fields.contains(&&f))))
     }
 
     pub fn take_abs(&self) -> Option<i64> {

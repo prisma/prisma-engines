@@ -756,14 +756,21 @@ class PaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
     // - Only 3 or only 5 are included in the result: (3, 2, 1) | (5, 2, 1)
     // - None of the duplicates is included: (2, 1)
     //
-    // One possible constellation:
+    // One possible query constellation:
     // 6 => C C D C
     // 5 => B B B B
     // 4 => B B B B <- cursor, skipped
     // 3 => B B B B <- take
     // 2 => A A A B <- take
     // 1 => A B C D <- take
-    data.toString() should be("""{"data":{"findManyTestModel":[{"id":3},{"id":1}]}}""")
+    val possible_results = Seq(
+      """{"data":{"findManyTestModel":[{"id":3},{"id":5},{"id":2}]}}""",
+      """{"data":{"findManyTestModel":[{"id":3},{"id":2},{"id":1}]}}""",
+      """{"data":{"findManyTestModel":[{"id":5},{"id":2},{"id":1}]}}""",
+      """{"data":{"findManyTestModel":[{"id":2},{"id":1}]}}"""
+    )
+
+    possible_results should contain(data.toString())
 
 //    data = server
 //      .query(
@@ -817,4 +824,5 @@ class PaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
 
   // implicit cursor ordering spec
   // nested multiple ordering cursor spec
+  // aggregations rejected on unstable cursor
 }

@@ -67,12 +67,13 @@ fn read_one<'conn, 'tx>(
 /// -> Distinct can't be processed in the DB with our current query API model.
 ///    We need to select IDs / uniques alongside the distincts, which doesn't work in SQL, as all records
 ///    are distinct by definition if a unique is in the selection set.
+/// -> Unstable cursors can't be reliably fetched by the underlying datasource.
 fn read_many<'a, 'b>(
     tx: &'a ConnectionLike<'a, 'b>,
     mut query: ManyRecordsQuery,
 ) -> BoxFuture<'a, InterpretationResult<QueryResult>> {
     let fut = async move {
-        let scalars = if query.args.distinct.is_some() {
+        let scalars = if query.args.distinct.is_some() || query.args.contains_unstable_cursor() {
             let processor = InMemoryRecordProcessor::new_from_query_args(&mut query.args);
             let scalars = tx
                 .get_many_records(&query.model, query.args.clone(), &query.selected_fields)

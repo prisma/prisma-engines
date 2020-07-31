@@ -1,24 +1,27 @@
 use connector::QueryArguments;
 use itertools::Itertools;
 use prisma_models::{ManyRecords, ModelProjection, Record, RecordProjection};
+use std::ops::Deref;
 
 #[derive(Debug)]
 /// Allows to manipulate a set of records in-memory instead of on the database level.
 pub struct InMemoryRecordProcessor {
-    skip: Option<i64>,
-    take: Option<i64>,
-    cursor: Option<RecordProjection>,
-    distinct: Option<ModelProjection>,
+    args: QueryArguments,
+}
+
+impl Deref for InMemoryRecordProcessor {
+    type Target = QueryArguments;
+
+    fn deref(&self) -> &Self::Target {
+        &self.args
+    }
 }
 
 impl InMemoryRecordProcessor {
+    /// Creates a new processor from the given query args.
+    /// The original args will be modified to prevent db level processing.
     pub fn new_from_query_args(args: &mut QueryArguments) -> Self {
-        let processor = Self {
-            skip: args.skip.clone(),
-            take: args.take.clone(),
-            cursor: args.cursor.clone(),
-            distinct: args.distinct.clone(),
-        };
+        let processor = Self { args: args.clone() };
 
         args.distinct = None;
         args.ignore_take = true;
@@ -177,4 +180,25 @@ impl InMemoryRecordProcessor {
     fn must_apply_pagination(&self) -> bool {
         self.take.or(self.skip).is_some() || self.cursor.is_some()
     }
+
+    // fn process_cursor(&self, mut records: ManyRecords) -> ManyRecords {
+    //     if let Some(ref cursor) = self.cursor {
+    //         let field_names = &records.field_names;
+    //         let cursor_projection: ModelProjection = cursor.into();
+
+    //         records.records = records
+    //             .records
+    //             .into_iter()
+    //             .skip_while(|r| {
+    //                 let record_cursor = r
+    //                     .projection(field_names, &cursor_projection)
+    //                     .expect("Record cursor has to be selected.");
+
+    //                 &record_cursor != cursor
+    //             })
+    //             .collect();
+    //     }
+
+    //     records
+    // }
 }

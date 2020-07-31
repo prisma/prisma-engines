@@ -80,27 +80,6 @@ pub async fn get_many_records(
     Ok(records)
 }
 
-pub fn process_cursor(cursor: &Option<RecordProjection>, mut records: ManyRecords) -> ManyRecords {
-    if let Some(ref cursor) = cursor {
-        let field_names = &records.field_names;
-        let cursor_projection: ModelProjection = cursor.into();
-
-        records.records = records
-            .records
-            .into_iter()
-            .skip_while(|r| {
-                let record_cursor = r
-                    .projection(field_names, &cursor_projection)
-                    .expect("Record cursor has to be selected.");
-
-                &record_cursor != cursor
-            })
-            .collect();
-    }
-
-    records
-}
-
 pub async fn get_related_m2m_record_ids(
     conn: &dyn QueryExt,
     from_field: &RelationFieldRef,
