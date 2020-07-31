@@ -13,7 +13,7 @@ use std::convert::TryInto;
 /// e.g. that the query schema guarantees that required fields are present.
 /// Errors occur if conversions fail.
 pub fn extract_query_args(arguments: Vec<ParsedArgument>, model: &ModelRef) -> QueryGraphBuilderResult<QueryArguments> {
-    arguments.into_iter().fold(
+    let query_args = arguments.into_iter().fold(
         Ok(QueryArguments::new(model.clone())),
         |result: QueryGraphBuilderResult<QueryArguments>, arg| {
             if let Ok(res) = result {
@@ -60,7 +60,9 @@ pub fn extract_query_args(arguments: Vec<ParsedArgument>, model: &ModelRef) -> Q
                 result
             }
         },
-    )
+    )?;
+
+    Ok(finalize_arguments(query_args, model))
 }
 
 /// Extracts order by conditions in order of appearance, as defined in
@@ -159,4 +161,25 @@ fn extract_compound_cursor_field(
     }
 
     Ok(pairs)
+}
+
+/// Runs final transformations on the QueryArguments.
+fn finalize_arguments(mut args: QueryArguments, model: &ModelRef) -> QueryArguments {
+    // Check if the query requires an implicit ordering added to the arguments.
+    // An implicit ordering is convenient for deterministic results for take and skip, for cursor it's _required_
+    // as a cursor needs a direction to page.
+    let add_implicit_ordering =
+        (args.skip.is_some() || args.cursor.is_some() || args.take.is_some()) && args.order_by.is_empty();
+
+    if add_implicit_ordering {
+        let primary_identifier = model.primary_identifier();
+        let orderbys = primary_identifier.into_iter().map(|f| match f {
+            Field::Scalar(f) => f.into(),
+            _ => unreachable!(),
+        });
+
+        args.order_by.extend(orderbys);
+    }
+
+    args
 }
