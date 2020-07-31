@@ -59,7 +59,7 @@ impl<'a> Reformatter<'a> {
             let ast_model = schema_ast.find_model(&model.name).unwrap();
             for field in model.fields() {
                 let original_ast_field = ast_model.fields.iter().find(|f| f.name.name == field.name());
-                let new_ast_field = lowerer.lower_field(field, &datamodel)?;
+                let new_ast_field = lowerer.lower_field(&field, &datamodel)?;
                 if original_ast_field.is_some() {
                     for directive in new_ast_field.directives {
                         if let Some(original_field) = original_ast_field {
