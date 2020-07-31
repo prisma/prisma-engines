@@ -1,6 +1,7 @@
 use super::super::directives::AllDirectives;
 use crate::error::ErrorCollection;
-use crate::{ast, dml};
+use crate::{ast, dml, Field, FieldArity, FieldType, RelationField};
+use std::collections::HashMap;
 
 pub struct LowerDmlToAst {
     directives: AllDirectives,
@@ -42,7 +43,22 @@ impl LowerDmlToAst {
         let mut fields: Vec<ast::Field> = Vec::new();
 
         for field in model.fields() {
-            match self.lower_field(field, datamodel) {
+            let mut removeDirectives = false;
+
+            // check for many to many relation
+            if field.is_relation() && field.arity() == &FieldArity::List {
+                match field {
+                    Field::RelationField(field) => {
+                        let related_field = datamodel.find_related_field(field).unwrap();
+                        if related_field.arity == FieldArity::List {
+                            removeDirectives = true;
+                        }
+                    }
+                    _ => {}
+                }
+            }
+
+            match self.lower_field(field, datamodel, removeDirectives) {
                 Ok(ast_field) => fields.push(ast_field),
                 Err(mut err) => errors.append(&mut err),
             };
@@ -81,11 +97,20 @@ impl LowerDmlToAst {
         })
     }
 
-    pub fn lower_field(&self, field: &dml::Field, datamodel: &dml::Datamodel) -> Result<ast::Field, ErrorCollection> {
+    pub fn lower_field(
+        &self,
+        field: &dml::Field,
+        datamodel: &dml::Datamodel,
+        removeDirectives: bool,
+    ) -> Result<ast::Field, ErrorCollection> {
         Ok(ast::Field {
             name: ast::Identifier::new(&field.name()),
             arity: self.lower_field_arity(field.arity()),
-            directives: self.directives.field.serialize(field, datamodel)?,
+            directives: if removeDirectives {
+                Vec::new()
+            } else {
+                self.directives.field.serialize(field, datamodel)?
+            },
             field_type: self.lower_type(&field.field_type()),
             documentation: field
                 .documentation()

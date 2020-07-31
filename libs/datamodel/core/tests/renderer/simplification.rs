@@ -1,6 +1,30 @@
 use crate::common::parse;
 
 #[test]
+fn test_must_not_render_relation_fields_with_many_to_many() {
+    let input = r#"
+     model Post {
+       id      Int @id @default(autoincrement())
+       User  User[]
+     }
+
+     model User {
+       id      Int @id @default(autoincrement())
+       Post  Post[]
+     }"#;
+
+    let expected = input;
+
+    let dml = parse(input);
+    println!("{:?}", dml);
+    let rendered = datamodel::render_datamodel_to_string(&dml).unwrap();
+
+    print!("{}", rendered);
+
+    assert_eq!(rendered, expected);
+}
+
+#[test]
 fn test_exclude_default_relation_names_from_rendering() {
     let input = r#"
         model Todo {
