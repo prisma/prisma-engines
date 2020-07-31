@@ -2,9 +2,11 @@ use crate::ConnectorResult;
 use serde::{Deserialize, Serialize};
 use std::marker::PhantomData;
 
-/// Implementors of this trait are responsible for checking whether a migration could lead to data loss.
+/// Implementors of this trait are responsible for checking whether a migration
+/// could lead to data loss, or if it would be potentially unexecutable.
 ///
-/// The type parameter is the connector's [DatabaseMigration](trait.MigrationConnector.html#associatedtype.DatabaseMigration)
+/// The type parameter is the connector's
+/// [DatabaseMigration](trait.MigrationConnector.html#associatedtype.DatabaseMigration)
 /// type.
 #[async_trait::async_trait]
 pub trait DestructiveChangesChecker<T>: Send + Sync
@@ -16,6 +18,10 @@ where
 
     /// Check destructive changes resulting of reverting the provided migration.
     async fn check_unapply(&self, database_migration: &T) -> ConnectorResult<DestructiveChangeDiagnostics>;
+
+    /// Check the database migration for destructive or unexecutable steps
+    /// without performing any IO.
+    fn pure_check(&self, database_migration: &T) -> ConnectorResult<DestructiveChangeDiagnostics>;
 }
 
 /// The errors and warnings emitted by the [DestructiveChangesChecker](trait.DestructiveChangesChecker.html).
@@ -87,6 +93,10 @@ where
     }
 
     async fn check_unapply(&self, _database_migration: &T) -> ConnectorResult<DestructiveChangeDiagnostics> {
+        Ok(DestructiveChangeDiagnostics::new())
+    }
+
+    fn pure_check(&self, _database_migration: &T) -> ConnectorResult<DestructiveChangeDiagnostics> {
         Ok(DestructiveChangeDiagnostics::new())
     }
 }

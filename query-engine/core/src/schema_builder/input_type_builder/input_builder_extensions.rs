@@ -18,10 +18,11 @@ pub trait InputBuilderExtensions {
             TypeIdentifier::Enum(_) => self.map_enum_input_type(&field),
         };
 
-        let typ = if field.is_list { InputType::list(typ) } else { typ };
-        let typ = if !field.is_required { InputType::null(typ) } else { typ };
-
-        typ
+        match (field.is_list, field.is_required) {
+            (true, _) => InputType::list(typ),
+            (false, true) => typ,
+            (false, false) => InputType::null(typ),
+        }
     }
 
     fn map_enum_input_type(&self, field: &ScalarFieldRef) -> InputType {

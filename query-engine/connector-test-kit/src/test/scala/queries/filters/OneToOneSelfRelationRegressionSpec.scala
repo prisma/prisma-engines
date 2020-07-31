@@ -1,4 +1,4 @@
-package queries.relations
+package queries.filters
 
 import org.scalatest.{FlatSpec, Matchers}
 import util.{ApiSpecBase, ProjectDsl}
