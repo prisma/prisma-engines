@@ -2,16 +2,18 @@ use crate::common::parse;
 
 #[test]
 fn test_must_not_render_relation_fields_with_many_to_many() {
-    let input = r#"
-     model Post {
-       id      Int @id @default(autoincrement())
-       User  User[]
-     }
 
-     model User {
-       id      Int @id @default(autoincrement())
-       Post  Post[]
-     }"#;
+    let input = r#"model Post {
+  id   Int    @default(autoincrement()) @id
+  User User[]
+}
+
+model User {
+  id   Int    @default(autoincrement()) @id
+  Post Post[]
+}
+"#;
+
 
     let expected = input;
 

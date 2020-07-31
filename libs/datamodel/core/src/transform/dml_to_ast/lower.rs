@@ -100,12 +100,12 @@ impl LowerDmlToAst {
         &self,
         field: &dml::Field,
         datamodel: &dml::Datamodel,
-        removeDirectives: bool,
+        remove_directives: bool,
     ) -> Result<ast::Field, ErrorCollection> {
         Ok(ast::Field {
             name: ast::Identifier::new(&field.name()),
             arity: self.lower_field_arity(field.arity()),
-            directives: if removeDirectives {
+            directives: if remove_directives {
                 Vec::new()
             } else {
                 self.directives.field.serialize(field, datamodel)?
