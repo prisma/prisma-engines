@@ -2,17 +2,23 @@ use crate::commenting_out_guardrails::commenting_out_guardrails;
 use crate::introspection::introspect;
 use crate::misc_helpers::*;
 use crate::prisma_1_defaults::*;
+use crate::re_introspection::enrich;
 use crate::sanitize_datamodel_names::sanitize_datamodel_names;
 use crate::version_checker::VersionChecker;
 use crate::SqlIntrospectionResult;
 use datamodel::Datamodel;
-use introspection_connector::{IntrospectionResult, Warning};
+use introspection_connector::IntrospectionResult;
 use quaint::connector::SqlFamily;
 use sql_schema_describer::*;
 use tracing::debug;
 
 /// Calculate a data model from a database schema.
-pub fn calculate_datamodel(schema: &SqlSchema, family: &SqlFamily) -> SqlIntrospectionResult<IntrospectionResult> {
+pub fn calculate_datamodel(
+    schema: &SqlSchema,
+    family: &SqlFamily,
+    previous_data_model: &Datamodel,
+    reintrospect: bool,
+) -> SqlIntrospectionResult<IntrospectionResult> {
     debug!("Calculating data model.");
 
     let mut version_check = VersionChecker::new(family.clone(), schema);
@@ -24,11 +30,17 @@ pub fn calculate_datamodel(schema: &SqlSchema, family: &SqlFamily) -> SqlIntrosp
     // our opinionation about valid names
     sanitize_datamodel_names(&mut data_model, family);
 
-    // commenting out models, fields, enums, enum values
-    let mut warnings: Vec<Warning> = commenting_out_guardrails(&mut data_model);
-
     // deduplicating relation field names
     deduplicate_relation_field_names(&mut data_model);
+
+    let mut warnings = vec![];
+    if reintrospect {
+        warnings.append(&mut enrich(previous_data_model, &mut data_model));
+        tracing::debug!("Enriching datamodel is done: {:?}", data_model);
+    }
+
+    // commenting out models, fields, enums, enum values
+    warnings.append(&mut commenting_out_guardrails(&mut data_model));
 
     // try to identify whether the schema was created by a previous Prisma version
     let version = version_check.version(&warnings, &data_model);

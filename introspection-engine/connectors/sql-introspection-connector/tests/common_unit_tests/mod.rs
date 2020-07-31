@@ -94,7 +94,8 @@ fn a_data_model_can_be_generated_from_a_schema() {
         enums: vec![],
         sequences: vec![],
     };
-    let introspection_result = calculate_datamodel(&schema, &SqlFamily::Postgres).expect("calculate data model");
+    let introspection_result =
+        calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new(), false).expect("calculate data model");
 
     assert_eq!(introspection_result.data_model, ref_data_model);
 }
@@ -174,7 +175,8 @@ fn arity_is_preserved_when_generating_data_model_from_a_schema() {
         enums: vec![],
         sequences: vec![],
     };
-    let introspection_result = calculate_datamodel(&schema, &SqlFamily::Postgres).expect("calculate data model");
+    let introspection_result =
+        calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new(), false).expect("calculate data model");
 
     assert_eq!(introspection_result.data_model, ref_data_model);
 }
@@ -304,7 +306,8 @@ fn defaults_are_preserved_when_generating_data_model_from_a_schema() {
         enums: vec![],
         sequences: vec![],
     };
-    let introspection_result = calculate_datamodel(&schema, &SqlFamily::Postgres).expect("calculate data model");
+    let introspection_result =
+        calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new(), false).expect("calculate data model");
 
     assert_eq!(introspection_result.data_model, ref_data_model);
 }
@@ -466,7 +469,8 @@ fn primary_key_is_preserved_when_generating_data_model_from_a_schema() {
         enums: vec![],
         sequences: vec![],
     };
-    let introspection_result = calculate_datamodel(&schema, &SqlFamily::Postgres).expect("calculate data model");
+    let introspection_result =
+        calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new(), false).expect("calculate data model");
 
     assert_eq!(introspection_result.data_model, ref_data_model);
 }
@@ -535,7 +539,8 @@ fn uniqueness_is_preserved_when_generating_data_model_from_a_schema() {
         enums: vec![],
         sequences: vec![],
     };
-    let introspection_result = calculate_datamodel(&schema, &SqlFamily::Postgres).expect("calculate data model");
+    let introspection_result =
+        calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new(), false).expect("calculate data model");
 
     assert_eq!(introspection_result.data_model, ref_data_model);
 }
@@ -753,7 +758,8 @@ fn compound_foreign_keys_are_preserved_when_generating_data_model_from_a_schema(
         enums: vec![],
         sequences: vec![],
     };
-    let introspection_result = calculate_datamodel(&schema, &SqlFamily::Postgres).expect("calculate data model");
+    let introspection_result =
+        calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new(), false).expect("calculate data model");
 
     assert_eq!(introspection_result.data_model, expected_data_model);
 }
@@ -862,7 +868,8 @@ fn multi_field_uniques_are_preserved_when_generating_data_model_from_a_schema() 
         enums: vec![],
         sequences: vec![],
     };
-    let introspection_result = calculate_datamodel(&schema, &SqlFamily::Postgres).expect("calculate data model");
+    let introspection_result =
+        calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new(), false).expect("calculate data model");
 
     assert_eq!(introspection_result.data_model, ref_data_model);
 }
@@ -1045,7 +1052,8 @@ fn foreign_keys_are_preserved_when_generating_data_model_from_a_schema() {
         enums: vec![],
         sequences: vec![],
     };
-    let introspection_result = calculate_datamodel(&schema, &SqlFamily::Postgres).expect("calculate data model");
+    let introspection_result =
+        calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new(), false).expect("calculate data model");
 
     assert_eq!(introspection_result.data_model, ref_data_model);
 }
@@ -1085,7 +1093,8 @@ fn enums_are_preserved_when_generating_data_model_from_a_schema() {
         }],
         sequences: vec![],
     };
-    let introspection_result = calculate_datamodel(&schema, &SqlFamily::Postgres).expect("calculate data model");
+    let introspection_result =
+        calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new(), false).expect("calculate data model");
 
     assert_eq!(introspection_result.data_model, ref_data_model);
 }
