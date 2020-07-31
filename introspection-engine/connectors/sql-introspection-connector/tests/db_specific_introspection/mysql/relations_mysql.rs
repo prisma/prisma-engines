@@ -280,7 +280,7 @@ async fn introspecting_a_prisma_many_to_many_relation_should_work(api: &TestApi)
             }
         "#;
     let result = dbg!(api.introspect().await);
-    custom_assert(&result, dm);
+    assert_eq!(&result, dm);
 }
 
 #[test_each_connector(tags("mysql"))]
