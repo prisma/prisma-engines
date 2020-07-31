@@ -313,8 +313,8 @@ model Post {
 #[test]
 fn relation_directive_must_not_be_added_for_many_to_many() {
     let input = r#"model User {
-  id     Int   @id
-  Post   Post[]
+  id   Int    @id
+  Post Post[]
 }
 
 model Post {
