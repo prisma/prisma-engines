@@ -85,7 +85,7 @@ impl LowerDmlToAst {
         Ok(ast::Field {
             name: ast::Identifier::new(&field.name()),
             arity: self.lower_field_arity(field.arity()),
-            directives: self.directives.field.serialize(&field, datamodel)?,
+            directives: self.directives.field.serialize(field, datamodel)?,
             field_type: self.lower_type(&field.field_type()),
             documentation: field
                 .documentation()
