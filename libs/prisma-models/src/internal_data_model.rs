@@ -13,7 +13,7 @@ pub struct InternalDataModelTemplate {
     pub version: Option<String>,
 }
 
-#[derive(DebugStub)]
+#[derive(Debug)]
 pub struct InternalDataModel {
     pub enums: Vec<InternalEnum>,
     version: Option<String>,

@@ -1,53 +1,53 @@
 use connector::error::ConnectorError;
 use datamodel::error::ErrorCollection;
-use failure::{Error, Fail};
 use feature_flags::FeatureFlagError;
 use graphql_parser::query::ParseError as GqlParseError;
 use query_core::CoreError;
 use serde_json;
+use thiserror::Error;
 
-#[derive(Debug, Fail)]
+#[derive(Debug, Error)]
 pub enum PrismaError {
-    #[fail(display = "{}", _0)]
+    #[error("{}", _0)]
     SerializationError(String),
 
-    #[fail(display = "{}", _0)]
+    #[error("{}", _0)]
     CoreError(CoreError),
 
-    #[fail(display = "{}", _0)]
-    JsonDecodeError(Error),
+    #[error("{}", _0)]
+    JsonDecodeError(anyhow::Error),
 
-    #[fail(display = "{}", _0)]
+    #[error("{}", _0)]
     ConfigurationError(String),
 
-    #[fail(display = "{}", _0)]
+    #[error("{}", _0)]
     ConnectorError(ConnectorError),
 
-    #[fail(display = "{}", _0)]
+    #[error("{}", _0)]
     ConversionError(ErrorCollection, String),
 
-    #[fail(display = "{}", _0)]
-    IOError(Error),
+    #[error("{}", _0)]
+    IOError(anyhow::Error),
 
-    #[fail(display = "{}", _0)]
+    #[error("{}", _0)]
     InvocationError(String),
 
     /// (Feature name, additional error text)
-    #[fail(display = "Unsupported feature: {}. {}", _0, _1)]
+    #[error("Unsupported feature: {}. {}", _0, _1)]
     UnsupportedFeatureError(&'static str, String),
 
-    #[fail(display = "Error in data model: {}", _0)]
+    #[error("Error in data model: {}", _0)]
     DatamodelError(ErrorCollection),
 
-    #[fail(display = "{}", _0)]
+    #[error("{}", _0)]
     QueryConversionError(String),
 
-    #[fail(display = "{}", _0)]
+    #[error("{}", _0)]
     FeatureError(String),
 }
 
 impl PrismaError {
-    pub(crate) fn render_as_json(self) -> Result<(), failure::Error> {
+    pub(crate) fn render_as_json(self) -> Result<(), anyhow::Error> {
         use std::fmt::Write as _;
         use std::io::Write as _;
 

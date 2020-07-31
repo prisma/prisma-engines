@@ -2,8 +2,6 @@ extern crate pest; // Pest grammar generation on compile time.
 #[macro_use]
 extern crate pest_derive;
 #[macro_use]
-extern crate failure; // Failure enum display derivation
-#[macro_use]
 extern crate tracing;
 
 pub mod ast;

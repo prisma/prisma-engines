@@ -160,12 +160,24 @@ class CreateMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
     )
   }
 
-  "A Create Mutation" should "create with an optional relation set to null." in {
-    val res = server.query(
+  "A Create Mutation" should "reject an optional relation set to null." in {
+    server.queryThatMustFail(
       """mutation {
         |  createScalarModel(data: {
         |    optRel: null
         |  }){ relId }}""".stripMargin,
+      project = project,
+      errorCode = 2012,
+      errorContains = "Missing a required value at `Mutation.createScalarModel.data.ScalarModelCreateInput.optRel`"
+    )
+  }
+
+  "A Create Mutation" should "create with an optional relation omitted." in {
+    val res = server.query(
+      """mutation {
+        |  createScalarModel(data: {}) {
+        |    relId
+        |  }}""".stripMargin,
       project = project
     )
 

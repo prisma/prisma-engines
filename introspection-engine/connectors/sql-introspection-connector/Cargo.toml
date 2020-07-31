@@ -1,5 +1,6 @@
+
 [package]
-authors = ["Marcus Böhm <boehm@prisma.io>"]
+authors = ["Marcus Böhm <boehm@prisma.io>"]
 edition = "2018"
 name = "sql-introspection-connector"
 version = "0.1.0"

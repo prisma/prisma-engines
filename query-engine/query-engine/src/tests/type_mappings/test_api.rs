@@ -34,7 +34,7 @@ impl TestApi {
     pub async fn introspect_and_start_query_engine(&self) -> anyhow::Result<(DatamodelAssertions, QueryEngine)> {
         let datasource = self.datasource();
 
-        let introspection_result = introspection_core::RpcImpl::introspect_internal(datasource, false)
+        let introspection_result = introspection_core::RpcImpl::introspect_internal(datasource, false, false)
             .await
             .map_err(|err| anyhow::anyhow!("{:?}", err.data))?;
 
@@ -230,6 +230,21 @@ pub async fn postgres12_test_api(db_name: &str) -> TestApi {
 
     TestApi {
         connector_name: "postgres12",
+        connection: Quaint::new(&postgres_url).await.unwrap(),
+        database_string: postgres_url,
+        provider: "postgres",
+    }
+}
+
+pub async fn postgres13_test_api(db_name: &str) -> TestApi {
+    let postgres_url = test_setup::postgres_13_url(db_name);
+
+    test_setup::create_postgres_database(&postgres_url.parse().unwrap())
+        .await
+        .unwrap();
+
+    TestApi {
+        connector_name: "postgres13",
         connection: Quaint::new(&postgres_url).await.unwrap(),
         database_string: postgres_url,
         provider: "postgres",

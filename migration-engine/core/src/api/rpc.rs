@@ -13,12 +13,14 @@ pub struct RpcApi {
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 enum RpcCommand {
+    DebugPanic,
     InferMigrationSteps,
     ListMigrations,
     MigrationProgress,
     ApplyMigration,
     UnapplyMigration,
     Reset,
+    SchemaPush,
     CalculateDatamodel,
     CalculateDatabaseSteps,
 }
@@ -26,12 +28,14 @@ enum RpcCommand {
 impl RpcCommand {
     fn name(&self) -> &'static str {
         match self {
+            RpcCommand::DebugPanic => "debugPanic",
             RpcCommand::InferMigrationSteps => "inferMigrationSteps",
             RpcCommand::ListMigrations => "listMigrations",
             RpcCommand::MigrationProgress => "migrationProgress",
             RpcCommand::ApplyMigration => "applyMigration",
             RpcCommand::UnapplyMigration => "unapplyMigration",
             RpcCommand::Reset => "reset",
+            RpcCommand::SchemaPush => "schemaPush",
             RpcCommand::CalculateDatamodel => "calculateDatamodel",
             RpcCommand::CalculateDatabaseSteps => "calculateDatabaseSteps",
         }
@@ -40,11 +44,13 @@ impl RpcCommand {
 
 static AVAILABLE_COMMANDS: &[RpcCommand] = &[
     RpcCommand::ApplyMigration,
+    RpcCommand::DebugPanic,
     RpcCommand::InferMigrationSteps,
     RpcCommand::ListMigrations,
     RpcCommand::MigrationProgress,
     RpcCommand::UnapplyMigration,
     RpcCommand::Reset,
+    RpcCommand::SchemaPush,
     RpcCommand::CalculateDatamodel,
     RpcCommand::CalculateDatabaseSteps,
 ];
@@ -117,6 +123,7 @@ impl RpcApi {
     ) -> Result<serde_json::Value, RunCommandError> {
         tracing::debug!(?cmd, "running the command");
         match cmd {
+            RpcCommand::DebugPanic => render(executor.debug_panic(&()).await?),
             RpcCommand::InferMigrationSteps => {
                 let input: InferMigrationStepsInput = params.clone().parse()?;
                 render(executor.infer_migration_steps(&input).await?)
@@ -137,6 +144,11 @@ impl RpcApi {
                 render(executor.unapply_migration(&input).await?)
             }
             RpcCommand::Reset => render(executor.reset(&serde_json::Value::Null).await?),
+            RpcCommand::SchemaPush => {
+                let input: SchemaPushInput = params.clone().parse()?;
+
+                render(executor.schema_push(&input).await?)
+            }
             RpcCommand::CalculateDatamodel => {
                 let input: CalculateDatamodelInput = params.clone().parse()?;
                 render(executor.calculate_datamodel(&input).await?)

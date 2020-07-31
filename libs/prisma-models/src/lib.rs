@@ -1,8 +1,5 @@
 #![deny(warnings)]
 
-#[macro_use]
-extern crate debug_stub_derive;
-
 mod datamodel_converter;
 mod error;
 mod field;

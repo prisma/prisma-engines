@@ -154,6 +154,25 @@ impl super::SqlRenderer for PostgresFlavour {
 
         Some(rendered_steps)
     }
+
+    fn render_create_enum(&self, create_enum: &crate::CreateEnum) -> Vec<String> {
+        let sql = format!(
+            r#"CREATE TYPE {enum_name} AS ENUM ({variants});"#,
+            enum_name = Quoted::postgres_ident(&create_enum.name),
+            variants = create_enum.variants.iter().map(Quoted::postgres_string).join(", "),
+        );
+
+        vec![sql]
+    }
+
+    fn render_drop_enum(&self, drop_enum: &crate::DropEnum) -> Vec<String> {
+        let sql = format!(
+            "DROP TYPE {enum_name}",
+            enum_name = Quoted::postgres_ident(&drop_enum.name),
+        );
+
+        vec![sql]
+    }
 }
 
 pub(crate) fn render_column_type(t: &ColumnType) -> String {

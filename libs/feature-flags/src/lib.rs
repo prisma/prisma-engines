@@ -8,14 +8,14 @@
 //! - Make sure that the flags are initialized in the app stack with `feature_flags::initialize(_)`.
 //! - Use the flag in crates that have a dependency on the feature flags crate with: `feature_flags::get().<bool_flag_name>`.
 
-use failure::Fail;
 use once_cell::sync::OnceCell;
+use thiserror::Error;
 
 static FEATURE_FLAGS: OnceCell<FeatureFlags> = OnceCell::new();
 
-#[derive(Debug, Fail)]
+#[derive(Debug, Error)]
 pub enum FeatureFlagError {
-    #[fail(display = "Invalid feature flag: {}", _0)]
+    #[error("Invalid feature flag: {0}")]
     InvalidFlag(String),
 }
 

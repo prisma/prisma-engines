@@ -70,7 +70,7 @@ impl SqlRenderer for MysqlFlavour {
             | (DefaultValue::VALUE(PrismaValue::Enum(val)), ColumnTypeFamily::Enum(_)) => {
                 format!("'{}'", escape_string_literal(&val)).into()
             }
-            (DefaultValue::NOW, ColumnTypeFamily::DateTime) => "CURRENT_TIMESTAMP".into(),
+            (DefaultValue::NOW, ColumnTypeFamily::DateTime) => "CURRENT_TIMESTAMP(3)".into(),
             (DefaultValue::NOW, _) => unreachable!("NOW default on non-datetime column"),
             (DefaultValue::VALUE(val), ColumnTypeFamily::DateTime) => format!("'{}'", val).into(),
             (DefaultValue::VALUE(val), _) => format!("{}", val).into(),
@@ -96,6 +96,14 @@ impl SqlRenderer for MysqlFlavour {
             before: None,
             after: None,
         })
+    }
+
+    fn render_create_enum(&self, _create_enum: &crate::CreateEnum) -> Vec<String> {
+        Vec::new() // enums are defined on each column that uses them on MySQL
+    }
+
+    fn render_drop_enum(&self, _drop_enum: &crate::DropEnum) -> Vec<String> {
+        Vec::new()
     }
 }
 
@@ -143,15 +151,8 @@ fn render_mysql_modify(
 pub(crate) fn render_column_type(column: &ColumnRef<'_>) -> Cow<'static, str> {
     match &column.column_type().family {
         ColumnTypeFamily::Boolean => "boolean".into(),
-        ColumnTypeFamily::DateTime => {
-            // CURRENT_TIMESTAMP has up to second precision, not more.
-            if let Some(DefaultValue::NOW) = column.default() {
-                "datetime".into()
-            } else {
-                "datetime(3)".into()
-            }
-        }
-        ColumnTypeFamily::Float => "Decimal(65,30)".into(),
+        ColumnTypeFamily::DateTime => "datetime(3)".into(),
+        ColumnTypeFamily::Float => "decimal(65,30)".into(),
         ColumnTypeFamily::Int => "int".into(),
         // we use varchar right now as mediumtext doesn't allow default values
         // a bigger length would not allow to use such a column as primary key

@@ -9,8 +9,6 @@ async-trait = "0.1"
 chrono = "0.4"
 connector = {path = "../connectors/query-connector", package = "query-connector"}
 crossbeam-queue = "0.2"
-debug_stub_derive = "0.3"
-failure = {version = "0.1", features = ["derive"]}
 feature-flags = {path = "../../libs/feature-flags"}
 futures = "0.3"
 im = "13.0"
@@ -24,6 +22,7 @@ prisma-value = {path = "../../libs/prisma-value"}
 rust_decimal = {git = "https://github.com/pimeys/rust-decimal", branch = "pgbouncer-mode"}
 serde = {version = "1", features = ["derive"]}
 serde_json = "1"
+thiserror = "1.0"
 tokio = {version = "=0.2.13"}
 tracing = "0.1"
 user-facing-errors = {path = "../../libs/user-facing-errors"}

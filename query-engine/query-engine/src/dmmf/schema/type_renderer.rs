@@ -7,7 +7,7 @@ pub enum DMMFTypeRenderer<'a> {
 }
 
 impl<'a> Renderer<'a, DMMFTypeInfo> for DMMFTypeRenderer<'a> {
-    fn render(&self, ctx: &RenderContext) -> DMMFTypeInfo {
+    fn render(&self, ctx: &mut RenderContext) -> DMMFTypeInfo {
         match self {
             DMMFTypeRenderer::Input(i) => self.render_input_type(i, ctx),
             DMMFTypeRenderer::Output(o) => self.render_output_type(o, ctx),
@@ -16,7 +16,7 @@ impl<'a> Renderer<'a, DMMFTypeInfo> for DMMFTypeRenderer<'a> {
 }
 
 impl<'a> DMMFTypeRenderer<'a> {
-    fn render_input_type(&self, i: &InputType, ctx: &RenderContext) -> DMMFTypeInfo {
+    fn render_input_type(&self, i: &InputType, ctx: &mut RenderContext) -> DMMFTypeInfo {
         match i {
             InputType::Object(ref obj) => {
                 obj.into_renderer().render(ctx);
@@ -105,7 +105,7 @@ impl<'a> DMMFTypeRenderer<'a> {
     }
 
     // WIP dedup code
-    fn render_output_type(&self, o: &OutputType, ctx: &RenderContext) -> DMMFTypeInfo {
+    fn render_output_type(&self, o: &OutputType, ctx: &mut RenderContext) -> DMMFTypeInfo {
         match o {
             OutputType::Object(ref obj) => {
                 obj.into_renderer().render(ctx);

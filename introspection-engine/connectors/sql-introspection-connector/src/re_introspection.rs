@@ -12,38 +12,7 @@ use std::cmp::Ordering::{Equal, Greater, Less};
 pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut IntrospectionResult) {
     // Notes
     // Relationnames are similar to virtual relationfields, they can be changed arbitrarily
-    // investigate dmmf / schema / datamodel / internal datamodel and manual @map changes???
     // investigate keeping of old manual custom relation names
-
-    //todo What about references to changed names??? @map and @@map
-    // models       -> relationfield types, relation names, relationfield names
-    // fields       -> relations (to and from fields), indexes, id, unique
-    // enums        -> field types
-    // enum values  -> default values
-    // -
-    // Order                                    Status          Tested
-    // modelnames                               -> done         yes
-    // scalar field names                       -> done         yes
-    // scalar index                             -> done         yes
-    // scalar unique                            -> done         yes
-    // scalar id                                -> done         yes
-    // Relationinfo.to                          -> done         yes
-    // Relationinfo.fields                      -> done         yes
-    // Relationinfo.to_fields                   -> done         yes
-    // Relationinfo.name                        -> done         yes   -> what if you want to keep that from before?
-    // relation field names                     -> done         yes
-    // enum names                               -> done         yes
-    // enum types on scalar fields              -> done         yes
-    // enum values                              -> done         yes
-    // enum values in defaults                  -> done         yes
-
-    //todo introspection sometimes has to use @maps itself, which the user can then manually change
-    // this has to be handled explicitly -.-also influences the naming in the warnings
-    // Order                                    Status          Tested
-    // modelnames                               -> done         yes
-    // scalar field names                       -> done         yes
-    // enum names                               -> done         yes
-    // enum values                              -> done         yes
 
     // println!("{:#?}", old_data_model);
     // println!("{:#?}", introspection_result.datamodel);
@@ -138,6 +107,37 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
                     &changed_field_name.1,
                 );
             }
+        }
+    }
+
+    //virtual relationfield names
+    let mut changed_relation_field_names = vec![];
+    {
+        for model in new_data_model.models() {
+            for field in model.relation_fields() {
+                if let Some(old_model) = old_data_model.find_model(&model.name) {
+                    for old_field in old_model.relation_fields() {
+                        //the relationinfos of both sides need to be compared since the relationinfo of the
+                        // non-fk side does not contain enough information to uniquely identify the correct relationfield
+                        if &old_field.relation_info == &field.relation_info
+                            && &old_data_model.find_related_field_bang(&old_field).relation_info
+                                == &new_data_model.find_related_field_bang(&field).relation_info
+                        {
+                            let mf = ModelAndField::new(&model.name, &field.name);
+                            changed_relation_field_names.push((mf, old_field.name.clone()));
+                        }
+                    }
+                }
+            }
+        }
+
+        for changed_relation_field_name in changed_relation_field_names {
+            new_data_model
+                .find_relation_field_mut(
+                    &changed_relation_field_name.0.model,
+                    &changed_relation_field_name.0.field,
+                )
+                .name = changed_relation_field_name.1;
         }
     }
 
@@ -269,42 +269,11 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
         }
     }
 
-    //virtual relationfield names
-    let mut changed_relation_field_names = vec![];
-    {
-        for model in new_data_model.models() {
-            for field in model.relation_fields() {
-                if let Some(old_model) = old_data_model.find_model(&model.name) {
-                    for old_field in old_model.relation_fields() {
-                        //the relationinfos of both sides need to be compared since the relationinfo of the
-                        // non-fk side does not contain enough information to uniquely identify the correct relationfield
-                        if &old_field.relation_info == &field.relation_info
-                            && &old_data_model.find_related_field_bang(&old_field).relation_info
-                                == &new_data_model.find_related_field_bang(&field).relation_info
-                        {
-                            let mf = ModelAndField::new(&model.name, &field.name);
-                            changed_relation_field_names.push((mf, old_field.name.clone()));
-                        }
-                    }
-                }
-            }
-        }
-
-        for changed_relation_field_name in changed_relation_field_names {
-            new_data_model
-                .find_relation_field_mut(
-                    &changed_relation_field_name.0.model,
-                    &changed_relation_field_name.0.field,
-                )
-                .name = changed_relation_field_name.1;
-        }
-    }
-
     //todo @defaults
     // potential error: what if there was a db default before and then it got removed, now re-introspection makes it virtual
     // you could not get rid of it
 
-    // // restore old model order
+    // restore old model order
     new_data_model.models.sort_by(|model_a, model_b| {
         let model_a_idx = old_data_model.models().position(|model| model.name == model_a.name);
         let model_b_idx = old_data_model.models().position(|model| model.name == model_b.name);
@@ -312,6 +281,7 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
         re_order_putting_new_ones_last(model_a_idx, model_b_idx)
     });
 
+    // restore old enum order
     new_data_model.enums.sort_by(|enum_a, enum_b| {
         let enum_a_idx = old_data_model.enums().position(|enm| enm.name == enum_a.name);
         let enum_b_idx = old_data_model.enums().position(|enm| enm.name == enum_b.name);
