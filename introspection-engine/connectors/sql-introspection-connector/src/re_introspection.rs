@@ -217,10 +217,6 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec
             let enm = new_data_model.find_enum_mut(&changed_enum_value.0.enm);
             let value = enm.find_value_mut(&changed_enum_value.0.value);
             value.name = changed_enum_value.1.clone();
-            //fixme: pull out warnings for fixed values.
-            // introspection_result.warnings.retain(|w| )
-            value.commented_out = false;
-
             if value.database_name.is_none() {
                 value.database_name = Some(changed_enum_value.0.value.clone());
             }
