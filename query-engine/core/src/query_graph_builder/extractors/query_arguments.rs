@@ -167,18 +167,18 @@ fn extract_compound_cursor_field(
 fn finalize_arguments(mut args: QueryArguments, model: &ModelRef) -> QueryArguments {
     // Check if the query requires an implicit ordering added to the arguments.
     // An implicit ordering is convenient for deterministic results for take and skip, for cursor it's _required_
-    // as a cursor needs a direction to page.
+    // as a cursor needs a direction to page. We simply take the primary identifier as a default order-by.
     let add_implicit_ordering =
         (args.skip.is_some() || args.cursor.is_some() || args.take.is_some()) && args.order_by.is_empty();
 
     if add_implicit_ordering {
         let primary_identifier = model.primary_identifier();
-        let orderbys = primary_identifier.into_iter().map(|f| match f {
+        let order_bys = primary_identifier.into_iter().map(|f| match f {
             Field::Scalar(f) => f.into(),
             _ => unreachable!(),
         });
 
-        args.order_by.extend(orderbys);
+        args.order_by.extend(order_bys);
     }
 
     args

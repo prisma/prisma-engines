@@ -856,8 +856,4 @@ class PaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
 
     possible_results should contain(data.toString())
   }
-
-  // implicit cursor ordering spec
-  // nested multiple ordering cursor spec
-  // aggregations rejected on unstable cursor
 }
