@@ -428,7 +428,7 @@ fn new_lines_inside_block_below_field_must_stay() {
 
 }
 "#;
-  
+
     let expected = input;
 
     assert_reformat(input, expected);
