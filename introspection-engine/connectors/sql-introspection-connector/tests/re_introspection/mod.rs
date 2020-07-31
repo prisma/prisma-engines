@@ -537,7 +537,7 @@ async fn re_introspecting_manually_re_mapped_invalid_enum_values(api: &TestApi) 
     custom_assert(&result, final_dm);
     let warnings = api.re_introspect_warnings(input_dm).await;
 
-    assert_eq_json(&warnings, "[{\"code\":9,\"message\":\"These enums were enriched with `@@map` information taken from the previous Prisma schema.\",\"affected\":[{\"enm\":\"BlackNWhite\"}]}]");
+    assert_eq_json(&warnings, "[{\"code\":10,\"message\":\"These enum values were enriched with `@map` information taken from the previous Prisma schema.\",\"affected\":[{\"enm\":\"invalid\",\"value\":\"dash\"},{\"enm\":\"invalid\",\"value\":\"at\"}]}]");
 }
 
 #[test_each_connector(tags("postgres"))]
