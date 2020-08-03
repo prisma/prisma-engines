@@ -82,7 +82,7 @@ impl SqlRenderer for SqliteFlavour {
 fn render_column_type(t: &ColumnType) -> String {
     match &t.family {
         ColumnTypeFamily::Boolean => "BOOLEAN".to_string(),
-        ColumnTypeFamily::DateTime => "DATE".to_string(),
+        ColumnTypeFamily::DateTime => "DATETIME".to_string(),
         ColumnTypeFamily::Float => "REAL".to_string(),
         ColumnTypeFamily::Int => "INTEGER".to_string(),
         ColumnTypeFamily::String => "TEXT".to_string(),
