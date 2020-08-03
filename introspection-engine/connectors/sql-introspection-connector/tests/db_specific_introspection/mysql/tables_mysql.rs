@@ -311,3 +311,28 @@ async fn introspecting_a_default_value_as_dbgenerated_should_work(api: &TestApi)
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
+
+#[test_each_connector(tags("mysql"))]
+async fn introspecting_a_table_non_id_autoincrement_should_work(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute_with_schema(
+            |migration| {
+                migration.create_table("Test", |t| {
+                    t.inject_custom("id Integer Primary Key");
+                    t.inject_custom("authorId Integer Auto_Increment Unique");
+                });
+            },
+            api.db_name(),
+        )
+        .await;
+
+    let dm = r#"
+            model Test {
+              id       Int @id
+              authorId Int @default(autoincrement()) @unique
+            }
+        "#;
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+}
