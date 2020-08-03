@@ -237,6 +237,7 @@ fn convert_parameterized_date_value(db_value: &Value<'_>) -> DateTime<Utc> {
     match db_value {
         Value::Integer(Some(x)) => timestamp_to_datetime(*x),
         Value::DateTime(Some(x)) => *x,
+        Value::Date(Some(date)) => DateTime::from_utc(date.and_hms(0, 0, 0), Utc),
         x => unimplemented!("Got unsupported value {:?} in date conversion", x),
     }
 }
