@@ -1249,3 +1249,40 @@ async fn op_test_div_one_level(api: &mut dyn TestApi) -> crate::Result<()> {
 
     Ok(())
 }
+
+#[test_each_connector(tags("postgres"))]
+async fn enum_values(api: &mut dyn TestApi) -> crate::Result<()> {
+    let type_name = api.get_name();
+    let create_type = format!("CREATE TYPE {} AS ENUM ('A', 'B')", &type_name);
+    api.conn().raw_cmd(&create_type).await?;
+
+    let table = api
+        .create_table(&format!("id SERIAL PRIMARY KEY, value {}", &type_name))
+        .await?;
+
+    api.conn()
+        .insert(Insert::single_into(&table).value("value", "A").into())
+        .await?;
+
+    api.conn()
+        .insert(Insert::single_into(&table).value("value", "B").into())
+        .await?;
+
+    api.conn()
+        .insert(Insert::single_into(&table).value("value", Value::Enum(None)).into())
+        .await?;
+
+    let select = Select::from_table(&table).column("value").order_by("id".ascend());
+    let res = api.conn().select(select).await?;
+
+    let row = res.get(0).unwrap();
+    assert_eq!(Some(&Value::enum_variant("A")), row.at(0));
+
+    let row = res.get(1).unwrap();
+    assert_eq!(Some(&Value::enum_variant("B")), row.at(0));
+
+    let row = res.get(2).unwrap();
+    assert_eq!(Some(&Value::Enum(None)), row.at(0));
+
+    Ok(())
+}
