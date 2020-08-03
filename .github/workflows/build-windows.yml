@@ -20,6 +20,7 @@ jobs:
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: 1.43.1
+          default: true
 
       - uses: actions-rs/cargo@v1
         with:

@@ -831,17 +831,10 @@ async fn enum_variants_can_be_added_without_data_loss(api: &TestApi) -> TestResu
         let cat_data: Vec<Vec<quaint::ast::Value>> =
             cat_data.into_iter().map(|row| row.into_iter().collect()).collect();
 
-        let expected_cat_data = if api.sql_family().is_mysql() {
-            vec![
-                vec![Value::text("felix"), Value::text("HUNGRY")],
-                vec![Value::text("mittens"), Value::text("HAPPY")],
-            ]
-        } else {
-            vec![
-                vec![Value::text("felix"), Value::enum_variant("HUNGRY")],
-                vec![Value::text("mittens"), Value::enum_variant("HAPPY")],
-            ]
-        };
+        let expected_cat_data = vec![
+            vec![Value::text("felix"), Value::enum_variant("HUNGRY")],
+            vec![Value::text("mittens"), Value::enum_variant("HAPPY")],
+        ];
 
         assert_eq!(cat_data, expected_cat_data);
 
@@ -932,17 +925,10 @@ async fn enum_variants_can_be_dropped_without_data_loss(api: &TestApi) -> TestRe
         let cat_data: Vec<Vec<quaint::ast::Value>> =
             cat_data.into_iter().map(|row| row.into_iter().collect()).collect();
 
-        let expected_cat_data = if api.sql_family().is_mysql() {
-            vec![
-                vec![Value::text("felix"), Value::text("HUNGRY")],
-                vec![Value::text("mittens"), Value::text("HAPPY")],
-            ]
-        } else {
-            vec![
-                vec![Value::text("felix"), Value::enum_variant("HUNGRY")],
-                vec![Value::text("mittens"), Value::enum_variant("HAPPY")],
-            ]
-        };
+        let expected_cat_data = vec![
+            vec![Value::text("felix"), Value::enum_variant("HUNGRY")],
+            vec![Value::text("mittens"), Value::enum_variant("HAPPY")],
+        ];
 
         assert_eq!(cat_data, expected_cat_data);
 
