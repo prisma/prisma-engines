@@ -79,10 +79,10 @@ impl DirectiveValidator<dml::Field> for RelationDirectiveValidator {
             // if we are on the physical field
             if !relation_info.to_fields.is_empty() {
                 let mut is_many_to_many = false;
-                if field.is_relation() && field.arity() == &FieldArity::List {
-                    if let Field::RelationField(relation) = &field {
-                        let related_field = datamodel.find_related_field(&relation).unwrap();
-                        if related_field.arity == FieldArity::List {
+                if field.arity() == &FieldArity::List {
+                    if let Field::RelationField(relation_field) = &field {
+                        let related_field = datamodel.find_related_field(&relation_field).unwrap();
+                        if related_field.arity.is_list() {
                             is_many_to_many = true;
                         }
                     }
