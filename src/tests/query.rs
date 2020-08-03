@@ -1,24 +1,25 @@
+mod error;
+
 use super::connector::*;
-use crate::ast::*;
 use crate::{
+    ast::*,
     connector::{Queryable, TransactionCapable},
-    error::{DatabaseConstraint, ErrorKind},
 };
 use test_macros::test_each_connector;
 
-async fn mysql_test_api<'a>() -> crate::Result<MySql<'a>> {
+pub(crate) async fn mysql_test_api<'a>() -> crate::Result<MySql<'a>> {
     MySql::new().await
 }
 
-async fn mssql_test_api<'a>() -> crate::Result<MsSql<'a>> {
+pub(crate) async fn mssql_test_api<'a>() -> crate::Result<MsSql<'a>> {
     MsSql::new().await
 }
 
-async fn postgres_test_api<'a>() -> crate::Result<PostgreSql<'a>> {
+pub(crate) async fn postgres_test_api<'a>() -> crate::Result<PostgreSql<'a>> {
     PostgreSql::new().await
 }
 
-async fn sqlite_test_api<'a>() -> crate::Result<Sqlite<'a>> {
+pub(crate) async fn sqlite_test_api<'a>() -> crate::Result<Sqlite<'a>> {
     Sqlite::new().await
 }
 
@@ -964,85 +965,6 @@ async fn deletes(api: &mut dyn Connector) -> crate::Result<()> {
     Ok(())
 }
 
-#[test_each_connector]
-async fn unknown_table_should_give_a_good_error(api: &mut dyn Connector) -> crate::Result<()> {
-    let select = Select::from_table("not_there");
-
-    let err = api.conn().select(select).await.unwrap_err();
-
-    match err.kind() {
-        ErrorKind::TableDoesNotExist { table } => {
-            assert_eq!("not_there", table.as_str());
-        }
-        e => panic!("Expected error TableDoesNotExist, got {:?}", e),
-    }
-
-    Ok(())
-}
-
-#[test_each_connector]
-async fn test_uniq_constraint_violation(api: &mut dyn Connector) -> crate::Result<()> {
-    let table = api.create_table("id1 int, id2 int").await?;
-    let index = api.create_index(&table, "id1, id2").await?;
-
-    let insert = Insert::single_into(&table).value("id1", 1).value("id2", 2);
-    api.conn().insert(insert.clone().into()).await?;
-
-    let res = api.conn().insert(insert.clone().into()).await;
-
-    assert!(res.is_err());
-
-    let err = res.unwrap_err();
-
-    match &err.kind() {
-        ErrorKind::UniqueConstraintViolation { constraint } => match constraint {
-            DatabaseConstraint::Index(idx) => assert_eq!(&index, idx),
-            DatabaseConstraint::Fields(fields) => {
-                let fields = fields.iter().map(|s| s.as_str()).collect::<Vec<_>>();
-                assert_eq!(vec!["id1", "id2"], fields)
-            }
-            DatabaseConstraint::ForeignKey => assert!(false, "Expecting index or field constraints"),
-        },
-        _ => panic!(err),
-    }
-
-    Ok(())
-}
-
-#[test_each_connector]
-async fn test_null_constraint_violation(api: &mut dyn Connector) -> crate::Result<()> {
-    let table = api.create_table("id1 int not null, id2 int not null").await?;
-
-    let res = api.conn().insert(Insert::single_into(&table).into()).await;
-    let err = res.unwrap_err();
-
-    match err.kind() {
-        ErrorKind::NullConstraintViolation { constraint } => {
-            assert_eq!(&DatabaseConstraint::Fields(vec![String::from("id1")]), constraint)
-        }
-        _ => panic!(err),
-    }
-
-    let insert = Insert::single_into(&table).value("id1", 50).value("id2", 55);
-    api.conn().insert(insert.into()).await?;
-
-    let update = Update::table(&table).set("id2", Value::Integer(None));
-    let res = api.conn().update(update).await;
-
-    assert!(res.is_err());
-
-    let err = res.unwrap_err();
-
-    match err.kind() {
-        ErrorKind::NullConstraintViolation { constraint } => {
-            assert_eq!(&DatabaseConstraint::Fields(vec![String::from("id2")]), constraint);
-        }
-        _ => panic!(err),
-    }
-
-    Ok(())
-}
-
 #[test_each_connector(tags("mysql"))]
 async fn text_columns_with_non_utf8_encodings_can_be_queried(api: &mut dyn Connector) -> crate::Result<()> {
     let table = api
@@ -1141,48 +1063,6 @@ async fn unsigned_integers_are_handled(api: &mut dyn Connector) -> crate::Result
         .collect();
 
     assert_eq!(actual, expected);
-
-    Ok(())
-}
-
-#[test_each_connector(tags("mysql"))]
-async fn integer_out_of_range_errors(api: &mut dyn Connector) -> crate::Result<()> {
-    let table = api
-        .create_table("id int4 auto_increment primary key, big int4 unsigned")
-        .await?;
-
-    // Negative value
-    {
-        let insert = Insert::multi_into(&table, &["big"]).values((-22,));
-        let result = api.conn().insert(insert.into()).await;
-
-        assert!(matches!(result.unwrap_err().kind(), ErrorKind::ValueOutOfRange { .. }));
-    }
-
-    // Value too big
-    {
-        let insert = Insert::multi_into(&table, &["big"]).values((std::i64::MAX,));
-        let result = api.conn().insert(insert.into()).await;
-
-        assert!(matches!(result.unwrap_err().kind(), ErrorKind::ValueOutOfRange { .. }));
-    }
-
-    Ok(())
-}
-
-#[test_each_connector(tags("mysql"))]
-async fn bigint_unsigned_can_overflow(api: &mut dyn Connector) -> crate::Result<()> {
-    let table = api
-        .create_table("id int4 auto_increment primary key, big bigint unsigned")
-        .await?;
-
-    let insert = format!(r#"INSERT INTO `{}` (`big`) VALUES (18446744073709551615)"#, table);
-    api.conn().execute_raw(&insert, &[]).await.unwrap();
-    let result = api.conn().select(Select::from_table(&table)).await;
-
-    assert!(
-        matches!(result.unwrap_err().kind(), ErrorKind::ValueOutOfRange { message } if message == "Unsigned integers larger than 9_223_372_036_854_775_807 are currently not handled.")
-    );
 
     Ok(())
 }

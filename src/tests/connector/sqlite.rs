@@ -64,6 +64,13 @@ impl<'a> Connector for Sqlite<'a> {
         format!("UNIQUE({})", column)
     }
 
+    fn foreign_key(&mut self, parent_table: &str, parent_column: &str, child_column: &str) -> String {
+        format!(
+            "FOREIGN KEY ({}) REFERENCES {}({})",
+            child_column, parent_table, parent_column
+        )
+    }
+
     fn autogen_id(&self, name: &str) -> String {
         format!("{} INTEGER PRIMARY KEY", name)
     }

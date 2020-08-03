@@ -64,19 +64,34 @@ impl From<tokio_postgres::error::Error> for Error {
                 let error = e.into_source().unwrap(); // boom
                 let db_error = error.downcast_ref::<DbError>().unwrap(); // BOOM
 
-                let column_name = db_error
-                    .column()
-                    .expect("column on null constraint violation error")
-                    .to_owned();
+                match db_error.column() {
+                    Some(column) => {
+                        let column_name = column.to_owned();
 
-                let mut builder = Error::builder(ErrorKind::ForeignKeyConstraintViolation {
-                    constraint: DatabaseConstraint::Fields(vec![column_name]),
-                });
+                        let mut builder = Error::builder(ErrorKind::ForeignKeyConstraintViolation {
+                            constraint: DatabaseConstraint::Fields(vec![column_name]),
+                        });
 
-                builder.set_original_code(code);
-                builder.set_original_message(db_error.message());
+                        builder.set_original_code(code);
+                        builder.set_original_message(db_error.message());
 
-                builder.build()
+                        builder.build()
+                    }
+                    None => {
+                        let message = db_error.message();
+                        let mut splitted = message.split_whitespace();
+                        let constraint = splitted.nth(10).unwrap().split('"').nth(1).unwrap().to_string();
+
+                        let mut builder = Error::builder(ErrorKind::ForeignKeyConstraintViolation {
+                            constraint: DatabaseConstraint::Index(constraint),
+                        });
+
+                        builder.set_original_code(code);
+                        builder.set_original_message(message);
+
+                        builder.build()
+                    }
+                }
             }
             Some(code) if code == "3D000" => {
                 let code = code.to_string();

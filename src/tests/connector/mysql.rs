@@ -39,7 +39,7 @@ impl<'a> Connector for MySql<'a> {
             name, columns,
         );
 
-        self.conn().raw_cmd(&create).await?;
+        self.conn().raw_cmd(dbg!(&create)).await?;
 
         Ok(name)
     }
@@ -65,6 +65,15 @@ impl<'a> Connector for MySql<'a> {
 
     fn unique_constraint(&mut self, column: &str) -> String {
         format!("UNIQUE({})", column)
+    }
+
+    fn foreign_key(&mut self, parent_table: &str, parent_column: &str, child_column: &str) -> String {
+        let name = self.get_name();
+
+        format!(
+            "CONSTRAINT {} FOREIGN KEY ({}) REFERENCES {}({})",
+            &name, child_column, parent_table, parent_column
+        )
     }
 
     fn autogen_id(&self, name: &str) -> String {

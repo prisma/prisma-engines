@@ -68,7 +68,13 @@ impl From<tiberius::error::Error> for Error {
                 builder.build()
             }
             tiberius::error::Error::Server(e) if e.code() == 547 => {
-                let index = e.message().split(' ').nth(8).unwrap().split("\"").nth(1).unwrap();
+                let index = e.message()
+                    .split_whitespace()
+                    .nth(9)
+                    .unwrap()
+                    .split("\"")
+                    .nth(1)
+                    .unwrap();
 
                 let mut builder = Error::builder(ErrorKind::ForeignKeyConstraintViolation {
                     constraint: DatabaseConstraint::Index(index.to_string()),

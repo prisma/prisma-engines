@@ -21,6 +21,7 @@ pub trait Connector {
 
     fn system(&self) -> &'static str;
     fn unique_constraint(&mut self, column: &str) -> String;
+    fn foreign_key(&mut self, parent_table: &str, parent_column: &str, child_column: &str) -> String;
     fn autogen_id(&self, name: &str) -> String;
     fn conn(&self) -> &crate::single::Quaint;
     fn get_name(&mut self) -> String;
