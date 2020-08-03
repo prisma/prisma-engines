@@ -43,7 +43,7 @@ impl<'a> TestApi for MySql<'a> {
             name, columns,
         );
 
-        self.conn().raw_cmd(dbg!(&create)).await?;
+        self.conn().raw_cmd(&create).await?;
 
         Ok(name)
     }
