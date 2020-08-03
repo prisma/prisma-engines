@@ -1133,9 +1133,9 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
          |   }
          |  ) {
          |    nameTop
-         |    middles (orderBy: id_ASC){
+         |    middles (orderBy: { id: ASC }){
          |      nameMiddle
-         |      bottoms (orderBy: id_ASC){
+         |      bottoms (orderBy: { id: ASC }){
          |        nameBottom
          |      }
          |    }
@@ -1212,7 +1212,7 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
          |   }
          |  ) {
          |    nameTop
-         |    middles (orderBy: id_ASC){
+         |    middles (orderBy: { id: ASC }){
          |      nameMiddle
          |      bottoms {
          |        nameBottom
@@ -1289,7 +1289,7 @@ class NestedDeleteMutationInsideUpsertSpec extends FlatSpec with Matchers with A
          |   }
          |  ) {
          |    nameTop
-         |    middles (orderBy: id_ASC) {
+         |    middles (orderBy: { id: ASC }) {
          |      nameMiddle
          |      bottom {
          |        nameBottom

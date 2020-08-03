@@ -1,11 +1,7 @@
 use crate::{exec_loader, PrismaError, PrismaResult};
-use query_core::{
-    schema::{QuerySchemaRef, SupportedCapabilities},
-    BuildMode, QueryExecutor, QuerySchemaBuilder,
-};
-// use prisma_models::InternalDataModelRef;
 use datamodel::{Configuration, Datamodel};
 use prisma_models::DatamodelConverter;
+use query_core::{schema::QuerySchemaRef, schema_builder, BuildMode, QueryExecutor};
 use std::sync::Arc;
 
 /// Prisma request context containing all immutable state of the process.
@@ -61,13 +57,11 @@ impl PrismaContext {
 
         // Construct query schema
         let build_mode = if legacy { BuildMode::Legacy } else { BuildMode::Modern };
-
-        let capabilities = SupportedCapabilities::empty(); // todo connector capabilities.
-
-        let schema_builder =
-            QuerySchemaBuilder::new(&internal_data_model, &capabilities, build_mode, enable_raw_queries);
-
-        let query_schema: QuerySchemaRef = Arc::new(schema_builder.build());
+        let query_schema: QuerySchemaRef = Arc::new(schema_builder::build(
+            internal_data_model,
+            build_mode,
+            enable_raw_queries,
+        ));
 
         Ok(Self {
             query_schema,

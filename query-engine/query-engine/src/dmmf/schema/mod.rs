@@ -147,13 +147,13 @@ impl<'a> IntoRenderer<'a, DMMFFieldWrapper> for FieldRef {
     }
 }
 
-impl<'a> IntoRenderer<'a, ()> for InputObjectTypeRef {
+impl<'a> IntoRenderer<'a, ()> for InputObjectTypeWeakRef {
     fn into_renderer(&'a self) -> Box<dyn Renderer<'a, ()> + 'a> {
         Box::new(DMMFObjectRenderer::Input(Weak::clone(self)))
     }
 }
 
-impl<'a> IntoRenderer<'a, ()> for ObjectTypeRef {
+impl<'a> IntoRenderer<'a, ()> for ObjectTypeWeakRef {
     fn into_renderer(&'a self) -> Box<dyn Renderer<'a, ()> + 'a> {
         Box::new(DMMFObjectRenderer::Output(Weak::clone(self)))
     }

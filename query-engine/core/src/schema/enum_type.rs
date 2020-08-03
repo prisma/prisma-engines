@@ -1,12 +1,13 @@
-use prisma_models::{InternalEnum, OrderBy, ScalarFieldRef};
+use prisma_models::{InternalEnum, ScalarFieldRef};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum EnumType {
-    /// Enum from the internal data model.
-    Internal(InternalEnum),
+    /// Generic, prisma-application specific string enum.
+    /// Semantics are defined by the component interpreting the contents.
+    String(StringEnumType),
 
-    /// Enum defined for order by on fields.
-    OrderBy(OrderByEnumType),
+    /// Enum from the internal data model, representing an enum on the database level.
+    Internal(InternalEnum),
 
     /// Enum referencing fields on a model.
     FieldRef(FieldRefEnumType),
@@ -15,31 +16,29 @@ pub enum EnumType {
 impl EnumType {
     pub fn name(&self) -> &str {
         match self {
+            Self::String(s) => &s.name,
             Self::Internal(i) => &i.name,
-            Self::OrderBy(ord) => &ord.name,
             Self::FieldRef(f) => &f.name,
         }
     }
 }
 
 #[derive(Debug, Clone)]
-pub struct OrderByEnumType {
+pub struct StringEnumType {
     pub name: String,
-
-    /// E.g. id_ASC -> OrderBy(Id field, ASC sort order)
-    pub values: Vec<(String, OrderBy)>,
+    pub values: Vec<String>,
 }
 
-impl OrderByEnumType {
+impl StringEnumType {
     /// Attempts to find an enum value for the given value key.
-    pub fn value_for(&self, name: &str) -> Option<&OrderBy> {
+    pub fn value_for(&self, name: &str) -> Option<&str> {
         self.values
             .iter()
-            .find_map(|val| if &val.0 == name { Some(&val.1) } else { None })
+            .find_map(|val| if val == name { Some(val.as_str()) } else { None })
     }
 
-    pub fn values(&self) -> Vec<String> {
-        self.values.iter().map(|(name, _)| name.to_owned()).collect()
+    pub fn values(&self) -> &[String] {
+        &self.values
     }
 }
 

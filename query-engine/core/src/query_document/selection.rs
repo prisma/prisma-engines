@@ -1,6 +1,7 @@
 use super::QueryValue;
+use indexmap::IndexMap;
 use itertools::Itertools;
-use std::{borrow::Cow, collections::BTreeMap};
+use std::borrow::Cow;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct SelectionBuilder {
@@ -228,7 +229,7 @@ impl<'a> From<In<'a>> for QueryValue {
                         .into_iter()
                         .zip(vals.into_iter())
                         .fold(Conjuctive::new(), |acc, (key, val)| {
-                            let mut argument = BTreeMap::new();
+                            let mut argument = IndexMap::new();
                             argument.insert(key.into_owned(), val);
 
                             acc.and(argument)
@@ -240,7 +241,7 @@ impl<'a> From<In<'a>> for QueryValue {
                 QueryValue::from(conjuctive)
             }
             SelectionSet::Single(key, vals) => {
-                let mut argument = BTreeMap::new();
+                let mut argument = IndexMap::new();
                 argument.insert(format!("{}_in", key), QueryValue::List(vals));
 
                 QueryValue::Object(argument)
@@ -254,12 +255,12 @@ impl<'a> From<In<'a>> for QueryValue {
 pub enum Conjuctive {
     Or(Vec<Conjuctive>),
     And(Vec<Conjuctive>),
-    Single(BTreeMap<String, QueryValue>),
+    Single(IndexMap<String, QueryValue>),
     None,
 }
 
-impl From<BTreeMap<String, QueryValue>> for Conjuctive {
-    fn from(map: BTreeMap<String, QueryValue>) -> Self {
+impl From<IndexMap<String, QueryValue>> for Conjuctive {
+    fn from(map: IndexMap<String, QueryValue>) -> Self {
         Self::Single(map)
     }
 }
@@ -306,7 +307,7 @@ impl From<Conjuctive> for QueryValue {
             Conjuctive::Or(conjuctives) => {
                 let conditions: Vec<QueryValue> = conjuctives.into_iter().map(QueryValue::from).collect();
 
-                let mut map = BTreeMap::new();
+                let mut map = IndexMap::new();
                 map.insert("OR".to_string(), QueryValue::List(conditions));
 
                 QueryValue::Object(map)
@@ -314,7 +315,7 @@ impl From<Conjuctive> for QueryValue {
             Conjuctive::And(conjuctives) => {
                 let conditions: Vec<QueryValue> = conjuctives.into_iter().map(QueryValue::from).collect();
 
-                let mut map = BTreeMap::new();
+                let mut map = IndexMap::new();
                 map.insert("AND".to_string(), QueryValue::List(conditions));
 
                 QueryValue::Object(map)

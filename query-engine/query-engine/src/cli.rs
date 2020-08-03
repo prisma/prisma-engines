@@ -9,10 +9,7 @@ use crate::{
 
 use datamodel::{Configuration, Datamodel};
 use prisma_models::DatamodelConverter;
-use query_core::{
-    schema::{QuerySchemaRef, SupportedCapabilities},
-    BuildMode, QuerySchemaBuilder,
-};
+use query_core::{schema::QuerySchemaRef, schema_builder, BuildMode};
 use std::sync::Arc;
 
 pub struct ExecuteRequest {
@@ -90,16 +87,11 @@ impl CliCommand {
 
         // temporary code duplication
         let internal_data_model = template.build("".into());
-        let capabilities = SupportedCapabilities::empty();
-
-        let schema_builder = QuerySchemaBuilder::new(
-            &internal_data_model,
-            &capabilities,
+        let query_schema: QuerySchemaRef = Arc::new(schema_builder::build(
+            internal_data_model,
             request.build_mode,
             request.enable_raw_queries,
-        );
-
-        let query_schema: QuerySchemaRef = Arc::new(schema_builder.build());
+        ));
 
         let dmmf = dmmf::render_dmmf(&request.datamodel, query_schema);
         let serialized = serde_json::to_string_pretty(&dmmf)?;

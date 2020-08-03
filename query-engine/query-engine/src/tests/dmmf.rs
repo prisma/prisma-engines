@@ -1,5 +1,5 @@
 use prisma_models::DatamodelConverter;
-use query_core::{BuildMode, QuerySchema, QuerySchemaBuilder, SupportedCapabilities};
+use query_core::{schema_builder, BuildMode, QuerySchema};
 use serial_test::serial;
 use std::sync::Arc;
 
@@ -126,10 +126,6 @@ fn get_query_schema(datamodel_string: &str) -> (QuerySchema, datamodel::dml::Dat
     let dm = datamodel::parse_datamodel_and_ignore_datasource_urls(datamodel_string).unwrap();
     let internal_dm_template = DatamodelConverter::convert(&dm);
     let internal_ref = internal_dm_template.build("db".to_owned());
-    let supported_capabilities = SupportedCapabilities::empty();
 
-    (
-        QuerySchemaBuilder::new(&internal_ref, &supported_capabilities, BuildMode::Modern, false).build(),
-        dm,
-    )
+    (schema_builder::build(internal_ref, BuildMode::Modern, false), dm)
 }

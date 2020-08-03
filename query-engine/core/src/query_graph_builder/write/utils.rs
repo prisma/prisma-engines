@@ -3,7 +3,7 @@ use crate::{
     query_graph::{Flow, Node, NodeRef, QueryGraph, QueryGraphDependency},
     ParsedInputValue, QueryGraphBuilderError, QueryGraphBuilderResult,
 };
-use connector::{Filter, QueryArguments, WriteArgs};
+use connector::{Filter, WriteArgs};
 use itertools::Itertools;
 use prisma_models::{ModelProjection, ModelRef, RelationFieldRef};
 use std::sync::Arc;
@@ -36,8 +36,8 @@ where
     let read_query = ReadQuery::ManyRecordsQuery(ManyRecordsQuery {
         name: "read_ids_infallible".into(), // this name only eases debugging
         alias: None,
-        model,
-        args: filter.into(),
+        model: model.clone(),
+        args: (model, filter).into(),
         selected_fields,
         nested: vec![],
         selection_order: vec![],
@@ -93,11 +93,12 @@ pub fn insert_find_children_by_parent_node<T>(
     filter: T,
 ) -> QueryGraphBuilderResult<NodeRef>
 where
-    T: Into<QueryArguments>,
+    T: Into<Filter>,
 {
     let parent_model_id = parent_relation_field.model().primary_identifier();
     let parent_linking_fields = parent_relation_field.linking_fields();
     let projection = parent_model_id.merge(parent_linking_fields);
+    let child_model = parent_relation_field.related_model();
 
     let selected_fields = get_selected_fields(
         &parent_relation_field.related_model(),
@@ -109,7 +110,7 @@ where
         alias: None,
         parent_field: Arc::clone(parent_relation_field),
         parent_projections: None,
-        args: filter.into(),
+        args: (child_model, filter).into(),
         selected_fields,
         nested: vec![],
         selection_order: vec![],

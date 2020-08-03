@@ -2,8 +2,8 @@ use super::*;
 
 #[derive(Debug)]
 pub enum DMMFObjectRenderer {
-    Input(InputObjectTypeRef),
-    Output(ObjectTypeRef),
+    Input(InputObjectTypeWeakRef),
+    Output(ObjectTypeWeakRef),
 }
 
 impl<'a> Renderer<'a, ()> for DMMFObjectRenderer {
@@ -16,7 +16,7 @@ impl<'a> Renderer<'a, ()> for DMMFObjectRenderer {
 }
 
 impl DMMFObjectRenderer {
-    fn render_input_object(&self, input_object: &InputObjectTypeRef, ctx: &mut RenderContext) {
+    fn render_input_object(&self, input_object: &InputObjectTypeWeakRef, ctx: &mut RenderContext) {
         let input_object = input_object.into_arc();
         if ctx.already_rendered(&input_object.name) {
             return;
@@ -46,7 +46,7 @@ impl DMMFObjectRenderer {
     }
 
     // WIP dedup code
-    fn render_output_object(&self, output_object: &ObjectTypeRef, ctx: &mut RenderContext) {
+    fn render_output_object(&self, output_object: &ObjectTypeWeakRef, ctx: &mut RenderContext) {
         let output_object = output_object.into_arc();
         if ctx.already_rendered(output_object.name()) {
             return;

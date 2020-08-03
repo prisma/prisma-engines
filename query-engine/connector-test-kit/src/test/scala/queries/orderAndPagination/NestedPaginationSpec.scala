@@ -68,7 +68,7 @@ class NestedPaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
       val result = server.query(
         """
         |{
-        |  tops{t, middles{m, bottoms{b}}}
+        |  tops{t, middles{ m, bottoms {b}}}
         |}
       """,
         project
@@ -88,7 +88,7 @@ class NestedPaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
       val result = server.query(
         """
           |{
-          |  tops{t, middles(cursor: { m: "M22" }){ m }}
+          |  tops{t, middles(cursor: { m: "M22" }, orderBy: { id: ASC }){ m }}
           |
           |}
         """,
@@ -364,7 +364,7 @@ class NestedPaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
       val result = server.query(
         """
         |{
-        |  tops{t, middles(take: -1){m}}
+        |  tops{t, middles(take: -1, orderBy: { id: ASC }){m}}
         |}
       """,
         project
@@ -381,7 +381,7 @@ class NestedPaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
       val result = server.query(
         """
         |{
-        |  tops{t, middles(take: -3){m}}
+        |  tops{t, middles(take: -3, orderBy: { id: ASC }) {m}}
         |}
       """,
         project
@@ -398,7 +398,7 @@ class NestedPaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
       val result = server.query(
         """
         |{
-        |  tops{t, middles(take: -4){m}}
+        |  tops{t, middles(take: -4, orderBy: { id: ASC }){m}}
         |}
       """,
         project
@@ -415,7 +415,7 @@ class NestedPaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
       val result = server.query(
         """
         |{
-        |  tops{middles{bottoms(take:-1){b}}}
+        |  tops{middles{bottoms(take: -1, orderBy: { id: ASC }){b}}}
         |}
       """,
         project
@@ -432,7 +432,7 @@ class NestedPaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
       val result = server.query(
         """
         |{
-        |  tops{middles{bottoms(take: -3){b}}}
+        |  tops{middles{bottoms(take: -3, orderBy: { id: ASC }){b}}}
         |}
       """,
         project
@@ -449,7 +449,7 @@ class NestedPaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
       val result = server.query(
         """
         |{
-        |  tops{middles{bottoms(take: -4){b}}}
+        |  tops{middles{bottoms(take: -4, orderBy: { id: ASC }){b}}}
         |}
       """,
         project
@@ -536,7 +536,7 @@ class NestedPaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
       val result = server.query(
         """
         |{
-        |  tops(skip: 1, take: -1){t, middles{m}}
+        |  tops(skip: 1, take: -1, orderBy: { id: ASC }){t, middles{m}}
         |}
       """,
         project
@@ -552,7 +552,7 @@ class NestedPaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
       val result = server.query(
         """
         |{
-        |  tops(skip: 1, take: -3){t, middles{m}}
+        |  tops(skip: 1, take: -3, orderBy: { id: ASC }){t, middles{m}}
         |}
       """,
         project
@@ -569,7 +569,7 @@ class NestedPaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
       val result = server.query(
         """
         |{
-        |  tops{t, middles(skip: 1, take: -1){m}}
+        |  tops{t, middles(skip: 1, take: -1, orderBy: { id: ASC }){m}}
         |}
       """,
         project
@@ -586,7 +586,7 @@ class NestedPaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
       val result = server.query(
         """
         |{
-        |  tops{t, middles(skip: 1, take: -3){m}}
+        |  tops{t, middles(skip: 1, take: -3, orderBy: { id: ASC }){m}}
         |}
       """,
         project
@@ -606,7 +606,7 @@ class NestedPaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
       val result = server.query(
         """
         |{
-        |  tops{t, middles(orderBy: m_DESC, take: 1){m}}
+        |  tops{t, middles(orderBy: { m: DESC }, take: 1){m}}
         |}
       """,
         project
@@ -623,7 +623,7 @@ class NestedPaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
       val result = server.query(
         """
         |{
-        |  tops{t, middles(orderBy: m_DESC, take: 3){m}}
+        |  tops{t, middles(orderBy: { m: DESC }, take: 3){m}}
         |}
       """,
         project
@@ -853,6 +853,7 @@ class NestedPaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
     }
     database.setup(project)
 
+    // >>> Begin create test data
     var result = server.query(
       s"""mutation {
          |  createOneModelA(
@@ -933,6 +934,8 @@ class NestedPaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
 
     result.toString() should be("""{"data":{"createOneModelA":{"id":"A3","manyB":[]}}}""")
 
+    // <<< End create test data
+
     result = server.query(
       s"""{
          |  findManyModelA {
@@ -949,6 +952,10 @@ class NestedPaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
       legacy = false,
     )
 
+    // Cursor is B2. We skip 1, so B2 is not included. This makes:
+    // A1 => [B3, B4, B5, B6]
+    // A2 => [B3, B5, B7, B8]
+    // A3 => []
     result.toString() should be(
       """{"data":{"findManyModelA":[{"id":"A1","manyB":[{"id":"B3"},{"id":"B4"},{"id":"B5"},{"id":"B6"}]},{"id":"A2","manyB":[{"id":"B3"},{"id":"B5"},{"id":"B7"},{"id":"B8"}]},{"id":"A3","manyB":[]}]}}""")
 
@@ -968,6 +975,10 @@ class NestedPaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
       legacy = false,
     )
 
+    // Cursor is B2. We skip 1, so B2 is not included, and take the next 2. This makes:
+    // A1 => [B3, B4]
+    // A2 => [B3, B5]
+    // A3 => []
     result.toString() should be(
       """{"data":{"findManyModelA":[{"id":"A1","manyB":[{"id":"B3"},{"id":"B4"}]},{"id":"A2","manyB":[{"id":"B3"},{"id":"B5"}]},{"id":"A3","manyB":[]}]}}""")
 
@@ -977,7 +988,7 @@ class NestedPaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
          |    id
          |    manyB(cursor: {
          |      id: "B5"
-         |    }, skip: 1, take: -2) {
+         |    }, skip: 1, take: -2, orderBy: { id: ASC }) {
          |      id
          |    }
          |  }
@@ -987,6 +998,10 @@ class NestedPaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
       legacy = false,
     )
 
+    // Cursor is B5. We skip 1, so B5 is not included, and take the previous 2 records. This makes:
+    // A1 => [B3, B4]
+    // A2 => [B2, B3]
+    // A3 => []
     result.toString() should be(
       """{"data":{"findManyModelA":[{"id":"A1","manyB":[{"id":"B3"},{"id":"B4"}]},{"id":"A2","manyB":[{"id":"B2"},{"id":"B3"}]},{"id":"A3","manyB":[]}]}}""")
   }

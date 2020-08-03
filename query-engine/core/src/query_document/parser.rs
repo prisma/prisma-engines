@@ -1,14 +1,10 @@
 use super::*;
 use crate::schema::*;
 use chrono::prelude::*;
+use indexmap::IndexMap;
 use prisma_value::PrismaValue;
 use rust_decimal::{prelude::ToPrimitive, Decimal};
-use std::{
-    borrow::Borrow,
-    collections::{BTreeMap, HashSet},
-    convert::TryFrom,
-    sync::Arc,
-};
+use std::{borrow::Borrow, collections::HashSet, convert::TryFrom, sync::Arc};
 use uuid::Uuid;
 
 pub struct QueryDocumentParser;
@@ -265,9 +261,9 @@ impl QueryDocumentParser {
                 Some(value) => Ok(ParsedInputValue::Single(value)),
                 None => err(&i.name),
             },
-            EnumType::OrderBy(ord) => match ord.value_for(raw.as_str()) {
-                Some(val) => Ok(ParsedInputValue::OrderBy(val.clone())),
-                None => err(&ord.name),
+            EnumType::String(s) => match s.value_for(raw.as_str()) {
+                Some(val) => Ok(ParsedInputValue::Single(PrismaValue::String(val.to_owned()))),
+                None => err(&s.name),
             },
             EnumType::FieldRef(f) => match f.value_for(raw.as_str()) {
                 Some(value) => Ok(ParsedInputValue::ScalarField(value.clone())),
@@ -278,7 +274,7 @@ impl QueryDocumentParser {
 
     /// Parses and validates an input object recursively.
     pub fn parse_input_object(
-        object: BTreeMap<String, QueryValue>,
+        object: IndexMap<String, QueryValue>,
         schema_object: InputObjectTypeStrongRef,
     ) -> QueryParserResult<ParsedInputMap> {
         let left: HashSet<&str> = schema_object

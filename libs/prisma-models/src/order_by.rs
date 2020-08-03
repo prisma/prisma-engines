@@ -7,6 +7,12 @@ pub struct OrderBy {
     pub sort_order: SortOrder,
 }
 
+impl OrderBy {
+    pub fn new(field: ScalarFieldRef, sort_order: SortOrder) -> Self {
+        Self { field, sort_order }
+    }
+}
+
 pub trait IntoOrderBy {
     fn into_order_by(self, model: ModelRef) -> OrderBy;
 }
@@ -22,6 +28,15 @@ impl ToString for SortOrder {
         match self {
             SortOrder::Ascending => String::from("ASC"),
             SortOrder::Descending => String::from("DESC"),
+        }
+    }
+}
+
+impl From<ScalarFieldRef> for OrderBy {
+    fn from(field: ScalarFieldRef) -> Self {
+        Self {
+            field,
+            sort_order: SortOrder::Ascending,
         }
     }
 }

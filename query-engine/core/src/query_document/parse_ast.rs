@@ -2,10 +2,10 @@
 //! Structures represent parsed and validated parts of the query document, used by the query builders.
 use super::{QueryParserError, QueryParserResult};
 use crate::FieldRef;
+use indexmap::IndexMap;
 use prisma_models::{OrderBy, PrismaValue, ScalarFieldRef};
-use std::collections::BTreeMap;
 
-pub type ParsedInputMap = BTreeMap<String, ParsedInputValue>;
+pub type ParsedInputMap = IndexMap<String, ParsedInputValue>;
 
 #[derive(Debug, Clone)]
 pub struct ParsedObject {

@@ -281,4 +281,23 @@ class AggregationCombinationQuerySpec extends FlatSpec with Matchers with ApiSpe
     result.toString should be(
       """{"data":{"aggregateItem":{"count":2,"sum":{"float":1.5,"int":3},"avg":{"float":0.75,"int":1.5},"min":{"float":0,"int":1},"max":{"float":1.5,"int":2}}}}""")
   }
+
+  "Using any aggregation with an unstable cursor" should "fail" in {
+    createItem(5.5, 5, Some("1"))
+    createItem(4.5, 10, Some("2"))
+    createItem(1.5, 2, Some("3"))
+    createItem(0.0, 1, Some("4"))
+
+    server.queryThatMustFail(
+      s"""{
+         |  aggregateItem(cursor: { id: "3" }, orderBy: { float: ASC }) {
+         |    count
+         |  }
+         |}
+      """.stripMargin,
+      project,
+      errorCode = 2019,
+      errorContains = "The chosen cursor and orderBy combination is not stable"
+    )
+  }
 }
