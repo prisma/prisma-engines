@@ -521,23 +521,20 @@ async fn introspecting_default_values_on_lists_should_be_ignored(api: &TestApi) 
 async fn introspecting_a_table_non_id_autoincrement_should_work(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
-        .execute_with_schema(
-            |migration| {
-                migration.create_table("Test", |t| {
-                    t.inject_custom("id Integer Primary Key");
-                    t.inject_custom("authorId Serial");
-                    t.inject_custom("authorId2 Serial");
-                });
-            },
-            api.db_name(),
-        )
+        .execute(|migration| {
+            migration.create_table("Test", |t| {
+                t.inject_custom("id Integer Primary Key");
+                t.inject_custom("authorid Serial");
+                t.inject_custom("authorid2 Serial");
+            });
+        })
         .await;
 
     let dm = r#"
             model Test {
               id       Int @id
-              authorId Int @default(autoincrement())
-              authorId2 Int @default(autoincrement())
+              authorid Int @default(autoincrement())
+              authorid2 Int @default(autoincrement())
             }
         "#;
     let result = dbg!(api.introspect().await);
