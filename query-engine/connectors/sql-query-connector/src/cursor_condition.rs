@@ -6,10 +6,8 @@ use quaint::ast::*;
 static ORDER_TABLE_ALIAS: &'static str = "order_cmp";
 
 /// Builds a cursor query condition based on the cursor arguments and if necessary a table that the condition depends on.
-/// The query produced is linear in size with the amount of orderBy fields given.
 ///
-///
-/// An example query for 4 is:
+/// An example query for 4 order-by fields is:
 /// ```sql
 /// SELECT
 ///   `TestModel`.`id`
@@ -74,6 +72,7 @@ pub fn build(query_arguments: &QueryArguments, model: &ModelRef) -> (Option<Tabl
             let len = order_definitions.len();
             let reverse = query_arguments.needs_reversed_order();
 
+            // Builds part #2 of the example query.
             // If we only have one ordering, we only want a single, slightly different, condition of (orderField [<= / >=] cmp_field).
             let condition_tree = if len == 1 {
                 let (field, order) = order_definitions.pop().unwrap();

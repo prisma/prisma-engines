@@ -67,7 +67,7 @@ fn read_one<'conn, 'tx>(
 /// -> Distinct can't be processed in the DB with our current query API model.
 ///    We need to select IDs / uniques alongside the distincts, which doesn't work in SQL, as all records
 ///    are distinct by definition if a unique is in the selection set.
-/// -> Unstable cursors can't be reliably fetched by the underlying datasource.
+/// -> Unstable cursors can't reliably be fetched by the underlying datasource, so we need to process part of it in-memory.
 fn read_many<'a, 'b>(
     tx: &'a ConnectionLike<'a, 'b>,
     mut query: ManyRecordsQuery,

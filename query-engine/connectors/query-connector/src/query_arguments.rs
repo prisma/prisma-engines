@@ -10,7 +10,7 @@ pub struct SkipAndLimit {
 /// `QueryArguments` define various constraints queried data should fulfill:
 /// - `cursor`, `take`, `skip` page through the data.
 /// - `filter` scopes the data by defining conditions (akin to `WHERE` in SQL).
-/// - `order_by` defines the ordering of records, from left to right.
+/// - `order_by` defines the ordering of records, from most high to low precedence.
 /// - `distinct` designates the fields on which the records should be distinct.
 /// - The `ignore_*` flags are a temporary bandaid to tell the connector to do not
 ///   include certain constraints when building queries, because the core is already
