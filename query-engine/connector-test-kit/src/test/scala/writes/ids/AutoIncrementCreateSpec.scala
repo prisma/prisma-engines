@@ -5,12 +5,17 @@ import util._
 
 class AutoIncrementCreateSpec extends FlatSpec with Matchers with ApiSpecBase {
 
-  "Creating an item with an id field of type Int without default" should "work" in {
+  //Mysql only one, @unique or @@index
+  //postgres unlimited
+  //sqlite only id
+  "Creating an item with a non primary key autoincrement" should "work" in {
     val project = ProjectDsl.fromString {
       s"""
          |model Mail {
-         |    id Int   @default(autoincrement())  
+         |    id Int   @default(autoincrement())
          |    messageId Int @id
+         |
+         |    @@index(id)
          |}
        """.stripMargin
     }
@@ -27,6 +32,8 @@ class AutoIncrementCreateSpec extends FlatSpec with Matchers with ApiSpecBase {
       """.stripMargin,
       project
     )
+
+    result.toString() should be("{\"data\":{\"createMail\":{\"id\":1,\"messageId\":1}}}")
 
   }
 }
