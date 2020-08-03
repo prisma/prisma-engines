@@ -10,7 +10,7 @@ static TODO: &str = indoc! {"
     model Todo {
         id String @id @default(cuid())
         title String
-        dt DateTime? 
+        dt DateTime?
     }
 "};
 
@@ -178,8 +178,8 @@ async fn inserting_into_model_table(api: &TestApi) -> anyhow::Result<()> {
                 json!({
                     "data": {
                         "queryRaw": [
-                            {"id": "id1", "title": "title1", "dt": 851013597000u64},
-                            {"id": "id2", "title": "title2", "dt": 851013597000u64}
+                            {"id": "id1", "title": "title1", "dt": "1996-12-19T16:39:57+00:00"},
+                            {"id": "id2", "title": "title2", "dt": "1996-12-19T16:39:57+00:00"}
                         ]
                     }
                 }),
