@@ -162,7 +162,7 @@ fn render_raw_sql(
                 write!(create_table, ",\nPRIMARY KEY ({})", column_names)?;
             }
 
-            if !table.indices.is_empty() {
+            if sql_family == SqlFamily::Mysql && !table.indices.is_empty() {
                 let indices: String = table
                     .indices
                     .iter()
