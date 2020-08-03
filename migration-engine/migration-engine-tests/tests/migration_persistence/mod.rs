@@ -60,8 +60,9 @@ async fn load_all_must_return_all_created_migrations(api: &TestApi) {
         .unwrap();
 
     let mut result = persistence.load_all().await.unwrap();
-    if api.sql_family() == SqlFamily::Mysql {
-        // TODO: mysql currently looses milli seconds on loading
+    if matches!(api.sql_family(), SqlFamily::Mysql | SqlFamily::Sqlite) {
+        // TODO: mysql currently loses milli seconds on loading, and sqlite is
+        // the wrong column type
         result[0].started_at = migration1.started_at;
         result[1].started_at = migration2.started_at;
         result[2].started_at = migration3.started_at;
@@ -93,8 +94,9 @@ async fn create_should_allow_to_create_a_new_migration(api: &TestApi) {
     assert_eq!(result, migration);
     let mut loaded = persistence.last().await.unwrap().unwrap();
 
-    if api.sql_family() == SqlFamily::Mysql {
-        // TODO: mysql currently looses milli seconds on loading
+    if matches!(api.sql_family(), SqlFamily::Mysql | SqlFamily::Sqlite) {
+        // TODO: mysql currently loses milli seconds on loading, and sqlite is
+        // the wrong column type
         loaded.started_at = migration.started_at;
     }
 
@@ -138,8 +140,9 @@ async fn update_must_work(api: &TestApi) {
     assert_eq!(loaded.applied, params.applied);
     assert_eq!(loaded.rolled_back, params.rolled_back);
     assert_eq!(loaded.errors, params.errors);
-    if api.sql_family() != SqlFamily::Mysql {
-        // TODO: mysql currently looses milli seconds on loading
+    if !matches!(api.sql_family(), SqlFamily::Mysql | SqlFamily::Sqlite) {
+        // TODO: mysql currently loses milli seconds on loading, and sqlite is
+        // the wrong column type
         assert_eq!(loaded.finished_at, params.finished_at);
     }
     assert_eq!(loaded.name, params.new_name);

@@ -10,6 +10,8 @@ mod schema_describer_loading;
 mod version_checker;
 mod warnings;
 
+use datamodel::Datamodel;
+pub use error::*;
 use introspection_connector::{
     ConnectorError, ConnectorResult, DatabaseMetadata, IntrospectionConnector, IntrospectionResult,
 };
@@ -17,10 +19,6 @@ use quaint::prelude::ConnectionInfo;
 use sql_schema_describer::{SqlSchema, SqlSchemaDescriberBackend};
 use std::future::Future;
 use tracing_futures::Instrument;
-
-use crate::re_introspection::enrich;
-use datamodel::Datamodel;
-pub use error::*;
 
 pub type SqlIntrospectionResult<T> = core::result::Result<T, SqlError>;
 
@@ -90,7 +88,7 @@ impl IntrospectionConnector for SqlIntrospectionConnector {
 
     async fn introspect(
         &self,
-        existing_data_model: &Datamodel,
+        previous_data_model: &Datamodel,
         reintrospect: bool,
     ) -> ConnectorResult<IntrospectionResult> {
         let sql_schema = self.catch(self.describe()).await?;
@@ -98,14 +96,13 @@ impl IntrospectionConnector for SqlIntrospectionConnector {
 
         let family = self.connection_info.sql_family();
 
-        let mut introspection_result = calculate_datamodel::calculate_datamodel(&sql_schema, &family)
-            .map_err(|sql_introspection_error| sql_introspection_error.into_connector_error(&self.connection_info))?;
+        let introspection_result =
+            calculate_datamodel::calculate_datamodel(&sql_schema, &family, &previous_data_model, reintrospect)
+                .map_err(|sql_introspection_error| {
+                    sql_introspection_error.into_connector_error(&self.connection_info)
+                })?;
 
-        tracing::debug!("Calculating datamodel is done: {:?}", sql_schema);
-
-        if reintrospect {
-            enrich(&existing_data_model, &mut introspection_result);
-        }
+        tracing::debug!("Calculating datamodel is done: {:?}", introspection_result.data_model);
 
         Ok(introspection_result)
     }
