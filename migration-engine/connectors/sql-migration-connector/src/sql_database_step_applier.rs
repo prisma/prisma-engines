@@ -171,7 +171,7 @@ fn render_raw_sql(
                         format!(
                             "{}Index {}({})",
                             tpe,
-                            index.name,
+                            renderer.quote(&index.name),
                             index.columns.iter().map(|col| renderer.quote(&col)).join(",\n")
                         )
                     })
