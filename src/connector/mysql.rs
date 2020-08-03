@@ -378,4 +378,17 @@ mod tests {
             e => panic!("Expected `DatabaseDoesNotExist`, got {:?}", e),
         }
     }
+
+    #[tokio::test]
+    async fn should_map_wrong_credentials_error() {
+        let mut url = Url::parse(&CONN_STR).unwrap();
+        url.set_username("WRONG").unwrap();
+
+        let conn = Quaint::new(url.as_str()).await.unwrap();
+        let res = conn.query_raw("SELECT 1", &[]).await;
+        assert!(res.is_err());
+
+        let err = res.unwrap_err();
+        assert!(matches!(err.kind(), ErrorKind::AuthenticationFailed { user } if user == "WRONG"));
+    }
 }

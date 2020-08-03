@@ -354,3 +354,20 @@ impl MssqlUrl {
         Ok(buf)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::tests::connector::mssql::CONN_STR;
+    use crate::{error::*, single::Quaint};
+
+    #[tokio::test]
+    async fn should_map_wrong_credentials_error() {
+        let url = CONN_STR.replace("user=SA", "user=WRONG");
+
+        let res = Quaint::new(url.as_str()).await;
+        assert!(res.is_err());
+
+        let err = res.unwrap_err();
+        assert!(matches!(err.kind(), ErrorKind::AuthenticationFailed { user } if user == "WRONG"));
+    }
+}

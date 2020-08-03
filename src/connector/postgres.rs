@@ -607,7 +607,7 @@ impl Queryable for PostgreSql {
 mod tests {
     use super::*;
     use crate::tests::connector::postgres::CONN_STR;
-    use crate::{ast::*, connector::Queryable, error::*, single::Quaint};
+    use crate::{connector::Queryable, error::*, single::Quaint};
     use url::Url;
 
     #[test]
@@ -689,6 +689,18 @@ mod tests {
     }
 
     #[tokio::test]
+    async fn should_map_wrong_credentials_error() {
+        let mut url = Url::parse(&CONN_STR).unwrap();
+        url.set_username("WRONG").unwrap();
+
+        let res = Quaint::new(url.as_str()).await;
+        assert!(res.is_err());
+
+        let err = res.unwrap_err();
+        assert!(matches!(err.kind(), ErrorKind::AuthenticationFailed { user } if user == "WRONG"));
+    }
+
+    #[tokio::test]
     async fn should_map_tls_errors() {
         let mut url = Url::parse(&CONN_STR).expect("parsing url");
         url.set_query(Some("sslmode=require&sslaccept=strict"));
@@ -703,21 +715,6 @@ mod tests {
                 ErrorKind::TlsError { .. } => (),
                 other => panic!("{:#?}", other),
             },
-        }
-    }
-
-    #[tokio::test]
-    async fn unknown_table_should_give_a_good_error() {
-        let conn = Quaint::new(&CONN_STR).await.unwrap();
-        let select = Select::from_table("not_there");
-
-        let err = conn.select(select).await.unwrap_err();
-
-        match err.kind() {
-            ErrorKind::TableDoesNotExist { table } => {
-                assert_eq!("not_there", table.as_str());
-            }
-            e => panic!("Expected error TableDoesNotExist, got {:?}", e),
         }
     }
 }
