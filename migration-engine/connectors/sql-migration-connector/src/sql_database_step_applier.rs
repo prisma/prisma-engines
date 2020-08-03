@@ -162,6 +162,24 @@ fn render_raw_sql(
                 write!(create_table, ",\nPRIMARY KEY ({})", column_names)?;
             }
 
+            if !table.indices.is_empty() {
+                let indices: String = table
+                    .indices
+                    .iter()
+                    .map(|index| {
+                        let tpe = if index.is_unique() { "UNIQUE " } else { "" };
+                        format!(
+                            "{}Index {}({})",
+                            tpe,
+                            index.name,
+                            index.columns.iter().map(|col| renderer.quote(&col)).join(",\n")
+                        )
+                    })
+                    .join(",\n");
+
+                write!(create_table, ",\n{}", indices)?;
+            }
+
             if sql_family == SqlFamily::Sqlite && !table.foreign_keys.is_empty() {
                 writeln!(create_table, ",")?;
 

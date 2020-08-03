@@ -271,16 +271,16 @@ impl<'schema> SqlSchemaDiffer<'schema> {
     fn create_indexes(&self) -> Vec<CreateIndex> {
         let mut steps = Vec::new();
 
-        for table in self.created_tables() {
-            for index in &table.indices {
-                let create = CreateIndex {
-                    table: table.name.clone(),
-                    index: index.clone(),
-                };
-
-                steps.push(create)
-            }
-        }
+        // for table in self.created_tables() {
+        //     for index in &table.indices {
+        //         let create = CreateIndex {
+        //             table: table.name.clone(),
+        //             index: index.clone(),
+        //         };
+        //
+        //         steps.push(create)
+        //     }
+        // }
 
         for tables in self.table_pairs() {
             for index in tables.created_indexes() {
