@@ -357,7 +357,7 @@ impl MssqlUrl {
 
 #[cfg(test)]
 mod tests {
-    use crate::tests::connector::mssql::CONN_STR;
+    use crate::tests::test_api::mssql::CONN_STR;
     use crate::{error::*, single::Quaint};
 
     #[tokio::test]

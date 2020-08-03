@@ -1,37 +1,44 @@
-use super::Connector;
+use super::TestApi;
 use crate::{connector::Queryable, single::Quaint};
 use names::Generator;
+use once_cell::sync::Lazy;
+use std::env;
 
-pub struct Sqlite<'a> {
+pub static CONN_STR: Lazy<String> = Lazy::new(|| env::var("TEST_MSSQL").expect("TEST_MSSQL env var"));
+
+pub(crate) async fn mssql_test_api<'a>() -> crate::Result<MsSql<'a>> {
+    MsSql::new().await
+}
+
+pub struct MsSql<'a> {
     names: Generator<'a>,
     conn: Quaint,
 }
 
 #[async_trait::async_trait]
-impl<'a> Connector for Sqlite<'a> {
-    async fn new() -> crate::Result<Sqlite<'a>> {
+impl<'a> TestApi for MsSql<'a> {
+    async fn new() -> crate::Result<MsSql<'a>> {
         let names = Generator::default();
-        let conn_str = "file:db/test.db";
-        let conn = Quaint::new(&conn_str).await?;
+        let conn = Quaint::new(&*CONN_STR).await?;
 
         Ok(Self { names, conn })
     }
 
     fn system(&self) -> &'static str {
-        "sqlite"
+        "mssql"
     }
 
     async fn create_type_table(&mut self, r#type: &str) -> crate::Result<String> {
-        self.create_table(&format!("{}, `value` {}", self.autogen_id("id"), r#type))
+        self.create_table(&format!("{}, value {}", self.autogen_id("id"), r#type))
             .await
     }
 
     async fn create_table(&mut self, columns: &str) -> crate::Result<String> {
-        let name = self.get_name();
+        let name = format!("##{}", self.get_name());
 
         let create = format!(
             r##"
-            CREATE TEMPORARY TABLE `{}` ({})
+            CREATE TABLE {} ({})
             "##,
             name, columns,
         );
@@ -61,18 +68,21 @@ impl<'a> Connector for Sqlite<'a> {
     }
 
     fn unique_constraint(&mut self, column: &str) -> String {
-        format!("UNIQUE({})", column)
+        let name = format!("{}", self.names.next().unwrap().replace('-', ""));
+        format!("CONSTRAINT {} UNIQUE({})", name, column)
     }
 
     fn foreign_key(&mut self, parent_table: &str, parent_column: &str, child_column: &str) -> String {
+        let name = self.get_name();
+
         format!(
-            "FOREIGN KEY ({}) REFERENCES {}({})",
-            child_column, parent_table, parent_column
+            "CONSTRAINT {} FOREIGN KEY ({}) REFERENCES {}({})",
+            &name, child_column, parent_table, parent_column
         )
     }
 
     fn autogen_id(&self, name: &str) -> String {
-        format!("{} INTEGER PRIMARY KEY", name)
+        format!("{} INT IDENTITY(1,1) PRIMARY KEY", name)
     }
 
     fn get_name(&mut self) -> String {

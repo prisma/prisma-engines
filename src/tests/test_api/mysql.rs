@@ -1,19 +1,23 @@
-use super::Connector;
+use super::TestApi;
 use crate::{connector::Queryable, single::Quaint};
 use names::Generator;
 use once_cell::sync::Lazy;
 use std::env;
 
-pub static CONN_STR: Lazy<String> = Lazy::new(|| env::var("TEST_PSQL").expect("TEST_PSQL env var"));
+pub static CONN_STR: Lazy<String> = Lazy::new(|| env::var("TEST_MYSQL").expect("TEST_MYSQL env var"));
 
-pub struct PostgreSql<'a> {
+pub(crate) async fn mysql_test_api<'a>() -> crate::Result<MySql<'a>> {
+    MySql::new().await
+}
+
+pub struct MySql<'a> {
     names: Generator<'a>,
     conn: Quaint,
 }
 
 #[async_trait::async_trait]
-impl<'a> Connector for PostgreSql<'a> {
-    async fn new() -> crate::Result<PostgreSql<'a>> {
+impl<'a> TestApi for MySql<'a> {
+    async fn new() -> crate::Result<MySql<'a>> {
         let names = Generator::default();
         let conn = Quaint::new(&*CONN_STR).await?;
 
@@ -21,11 +25,11 @@ impl<'a> Connector for PostgreSql<'a> {
     }
 
     fn system(&self) -> &'static str {
-        "posgres"
+        "mysql"
     }
 
     async fn create_type_table(&mut self, r#type: &str) -> crate::Result<String> {
-        self.create_table(&format!("{}, value {}", self.autogen_id("id"), r#type))
+        self.create_table(&format!("{}, `value` {}", self.autogen_id("id"), r#type))
             .await
     }
 
@@ -34,12 +38,12 @@ impl<'a> Connector for PostgreSql<'a> {
 
         let create = format!(
             r##"
-            CREATE TEMPORARY TABLE "{}" ({})
+            CREATE TEMPORARY TABLE `{}` ({}) ENGINE=InnoDB DEFAULT CHARSET=latin1
             "##,
             name, columns,
         );
 
-        self.conn().raw_cmd(&create).await?;
+        self.conn().raw_cmd(dbg!(&create)).await?;
 
         Ok(name)
     }
@@ -77,7 +81,7 @@ impl<'a> Connector for PostgreSql<'a> {
     }
 
     fn autogen_id(&self, name: &str) -> String {
-        format!("{} SERIAL PRIMARY KEY", name)
+        format!("{} INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY", name)
     }
 
     fn get_name(&mut self) -> String {

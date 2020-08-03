@@ -606,7 +606,7 @@ impl Queryable for PostgreSql {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::tests::connector::postgres::CONN_STR;
+    use crate::tests::test_api::postgres::CONN_STR;
     use crate::{connector::Queryable, error::*, single::Quaint};
     use url::Url;
 

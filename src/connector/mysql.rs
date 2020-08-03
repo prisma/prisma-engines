@@ -344,7 +344,7 @@ impl Queryable for Mysql {
 #[cfg(test)]
 mod tests {
     use super::MysqlUrl;
-    use crate::tests::connector::mysql::CONN_STR;
+    use crate::tests::test_api::mysql::CONN_STR;
     use crate::{connector::Queryable, error::*, single::Quaint};
     use url::Url;
 

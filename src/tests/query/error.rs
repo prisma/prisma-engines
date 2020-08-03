@@ -7,7 +7,7 @@ use crate::{
 use test_macros::test_each_connector;
 
 #[test_each_connector]
-async fn table_does_not_exist(api: &mut dyn Connector) -> crate::Result<()> {
+async fn table_does_not_exist(api: &mut dyn TestApi) -> crate::Result<()> {
     let select = Select::from_table("not_there");
 
     let err = api.conn().select(select).await.unwrap_err();
@@ -23,7 +23,7 @@ async fn table_does_not_exist(api: &mut dyn Connector) -> crate::Result<()> {
 }
 
 #[test_each_connector]
-async fn unique_constraint_violation(api: &mut dyn Connector) -> crate::Result<()> {
+async fn unique_constraint_violation(api: &mut dyn TestApi) -> crate::Result<()> {
     let table = api.create_table("id1 int, id2 int").await?;
     let index = api.create_index(&table, "id1, id2").await?;
 
@@ -52,7 +52,7 @@ async fn unique_constraint_violation(api: &mut dyn Connector) -> crate::Result<(
 }
 
 #[test_each_connector]
-async fn null_constraint_violation(api: &mut dyn Connector) -> crate::Result<()> {
+async fn null_constraint_violation(api: &mut dyn TestApi) -> crate::Result<()> {
     let table = api.create_table("id1 int not null, id2 int not null").await?;
 
     let res = api.conn().insert(Insert::single_into(&table).into()).await;
@@ -86,7 +86,7 @@ async fn null_constraint_violation(api: &mut dyn Connector) -> crate::Result<()>
 }
 
 #[test_each_connector(tags("mysql"))]
-async fn int_unsigned_negative_value_out_of_range(api: &mut dyn Connector) -> crate::Result<()> {
+async fn int_unsigned_negative_value_out_of_range(api: &mut dyn TestApi) -> crate::Result<()> {
     let table = api
         .create_table("id int4 auto_increment primary key, big int4 unsigned")
         .await?;
@@ -111,7 +111,7 @@ async fn int_unsigned_negative_value_out_of_range(api: &mut dyn Connector) -> cr
 }
 
 #[test_each_connector(tags("mysql"))]
-async fn bigint_unsigned_positive_value_out_of_range(api: &mut dyn Connector) -> crate::Result<()> {
+async fn bigint_unsigned_positive_value_out_of_range(api: &mut dyn TestApi) -> crate::Result<()> {
     let table = api
         .create_table("id int4 auto_increment primary key, big bigint unsigned")
         .await?;
@@ -128,7 +128,7 @@ async fn bigint_unsigned_positive_value_out_of_range(api: &mut dyn Connector) ->
 }
 
 #[test_each_connector(tags("mysql", "mssql", "postgres"))]
-async fn length_mismatch(api: &mut dyn Connector) -> crate::Result<()> {
+async fn length_mismatch(api: &mut dyn TestApi) -> crate::Result<()> {
     let table = api.create_table("value varchar(3)").await?;
     let insert = Insert::single_into(&table).value("value", "fooo");
 
@@ -142,7 +142,7 @@ async fn length_mismatch(api: &mut dyn Connector) -> crate::Result<()> {
 }
 
 #[test_each_connector(tags("postgres", "sqlite"))]
-async fn foreign_key_constraint_violation(api: &mut dyn Connector) -> crate::Result<()> {
+async fn foreign_key_constraint_violation(api: &mut dyn TestApi) -> crate::Result<()> {
     let parent = api.create_table("id smallint not null primary key").await?;
     let foreign_key = api.foreign_key(&parent, "id", "parent_id");
     let child = api
@@ -163,7 +163,7 @@ async fn foreign_key_constraint_violation(api: &mut dyn Connector) -> crate::Res
 /// SQL Server and MySQL do not allow foreign keys in temporary tables, so
 /// we'll do them separately.
 #[test_each_connector(tags("mssql", "mysql"))]
-async fn ms_my_foreign_key_constraint_violation(api: &mut dyn Connector) -> crate::Result<()> {
+async fn ms_my_foreign_key_constraint_violation(api: &mut dyn TestApi) -> crate::Result<()> {
     let parent_table = api.get_name();
     let child_table = api.get_name();
     let constraint = api.get_name();

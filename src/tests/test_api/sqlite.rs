@@ -1,27 +1,28 @@
-use super::Connector;
+use super::TestApi;
 use crate::{connector::Queryable, single::Quaint};
 use names::Generator;
-use once_cell::sync::Lazy;
-use std::env;
 
-pub static CONN_STR: Lazy<String> = Lazy::new(|| env::var("TEST_MYSQL").expect("TEST_MYSQL env var"));
+pub(crate) async fn sqlite_test_api<'a>() -> crate::Result<Sqlite<'a>> {
+    Sqlite::new().await
+}
 
-pub struct MySql<'a> {
+pub struct Sqlite<'a> {
     names: Generator<'a>,
     conn: Quaint,
 }
 
 #[async_trait::async_trait]
-impl<'a> Connector for MySql<'a> {
-    async fn new() -> crate::Result<MySql<'a>> {
+impl<'a> TestApi for Sqlite<'a> {
+    async fn new() -> crate::Result<Sqlite<'a>> {
         let names = Generator::default();
-        let conn = Quaint::new(&*CONN_STR).await?;
+        let conn_str = "file:db/test.db";
+        let conn = Quaint::new(&conn_str).await?;
 
         Ok(Self { names, conn })
     }
 
     fn system(&self) -> &'static str {
-        "mysql"
+        "sqlite"
     }
 
     async fn create_type_table(&mut self, r#type: &str) -> crate::Result<String> {
@@ -34,12 +35,12 @@ impl<'a> Connector for MySql<'a> {
 
         let create = format!(
             r##"
-            CREATE TEMPORARY TABLE `{}` ({}) ENGINE=InnoDB DEFAULT CHARSET=latin1
+            CREATE TEMPORARY TABLE `{}` ({})
             "##,
             name, columns,
         );
 
-        self.conn().raw_cmd(dbg!(&create)).await?;
+        self.conn().raw_cmd(&create).await?;
 
         Ok(name)
     }
@@ -68,16 +69,14 @@ impl<'a> Connector for MySql<'a> {
     }
 
     fn foreign_key(&mut self, parent_table: &str, parent_column: &str, child_column: &str) -> String {
-        let name = self.get_name();
-
         format!(
-            "CONSTRAINT {} FOREIGN KEY ({}) REFERENCES {}({})",
-            &name, child_column, parent_table, parent_column
+            "FOREIGN KEY ({}) REFERENCES {}({})",
+            child_column, parent_table, parent_column
         )
     }
 
     fn autogen_id(&self, name: &str) -> String {
-        format!("{} INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY", name)
+        format!("{} INTEGER PRIMARY KEY", name)
     }
 
     fn get_name(&mut self) -> String {

@@ -1,19 +1,23 @@
-use super::Connector;
+use super::TestApi;
 use crate::{connector::Queryable, single::Quaint};
 use names::Generator;
 use once_cell::sync::Lazy;
 use std::env;
 
-pub static CONN_STR: Lazy<String> = Lazy::new(|| env::var("TEST_MSSQL").expect("TEST_MSSQL env var"));
+pub static CONN_STR: Lazy<String> = Lazy::new(|| env::var("TEST_PSQL").expect("TEST_PSQL env var"));
 
-pub struct MsSql<'a> {
+pub(crate) async fn postgres_test_api<'a>() -> crate::Result<PostgreSql<'a>> {
+    PostgreSql::new().await
+}
+
+pub struct PostgreSql<'a> {
     names: Generator<'a>,
     conn: Quaint,
 }
 
 #[async_trait::async_trait]
-impl<'a> Connector for MsSql<'a> {
-    async fn new() -> crate::Result<MsSql<'a>> {
+impl<'a> TestApi for PostgreSql<'a> {
+    async fn new() -> crate::Result<PostgreSql<'a>> {
         let names = Generator::default();
         let conn = Quaint::new(&*CONN_STR).await?;
 
@@ -21,7 +25,7 @@ impl<'a> Connector for MsSql<'a> {
     }
 
     fn system(&self) -> &'static str {
-        "mssql"
+        "posgres"
     }
 
     async fn create_type_table(&mut self, r#type: &str) -> crate::Result<String> {
@@ -30,11 +34,11 @@ impl<'a> Connector for MsSql<'a> {
     }
 
     async fn create_table(&mut self, columns: &str) -> crate::Result<String> {
-        let name = format!("##{}", self.get_name());
+        let name = self.get_name();
 
         let create = format!(
             r##"
-            CREATE TABLE {} ({})
+            CREATE TEMPORARY TABLE "{}" ({})
             "##,
             name, columns,
         );
@@ -64,8 +68,7 @@ impl<'a> Connector for MsSql<'a> {
     }
 
     fn unique_constraint(&mut self, column: &str) -> String {
-        let name = format!("{}", self.names.next().unwrap().replace('-', ""));
-        format!("CONSTRAINT {} UNIQUE({})", name, column)
+        format!("UNIQUE({})", column)
     }
 
     fn foreign_key(&mut self, parent_table: &str, parent_column: &str, child_column: &str) -> String {
@@ -78,7 +81,7 @@ impl<'a> Connector for MsSql<'a> {
     }
 
     fn autogen_id(&self, name: &str) -> String {
-        format!("{} INT IDENTITY(1,1) PRIMARY KEY", name)
+        format!("{} SERIAL PRIMARY KEY", name)
     }
 
     fn get_name(&mut self) -> String {

@@ -1,4 +1,4 @@
-use crate::tests::connector::PostgreSql;
+use crate::tests::test_api::PostgreSql;
 use std::str::FromStr;
 
 test_type!(boolean(

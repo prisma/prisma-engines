@@ -167,7 +167,7 @@ macro_rules! test_type {
             fn [< test_type_ $name >] () -> crate::Result<()> {
                 use crate::ast::*;
                 use crate::connector::Queryable;
-                use crate::tests::connector::Connector;
+                use crate::tests::test_api::TestApi;
                 use tokio::runtime::Builder;
 
                 let mut rt = Builder::new().threaded_scheduler().enable_io().enable_time().build().unwrap();

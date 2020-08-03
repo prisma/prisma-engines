@@ -1,4 +1,4 @@
-use crate::tests::connector::MsSql;
+use crate::tests::test_api::MsSql;
 use std::str::FromStr;
 
 test_type!(nvarchar_limited(
