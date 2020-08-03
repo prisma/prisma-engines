@@ -106,21 +106,21 @@ pub fn aggregate(model: &ModelRef, aggregators: &[Aggregator], args: QueryArgume
         .fold(Select::from_table(sub_table), |select, next_op| match next_op {
             Aggregator::Count => select.value(count(asterisk())),
 
-            Aggregator::Average(fields) => fields
-                .into_iter()
-                .fold(select, |select, next_field| select.value(avg(next_field.name.clone()))),
+            Aggregator::Average(fields) => fields.into_iter().fold(select, |select, next_field| {
+                select.value(avg(Column::from(next_field.name.clone())))
+            }),
 
-            Aggregator::Sum(fields) => fields
-                .into_iter()
-                .fold(select, |select, next_field| select.value(sum(next_field.name.clone()))),
+            Aggregator::Sum(fields) => fields.into_iter().fold(select, |select, next_field| {
+                select.value(sum(Column::from(next_field.name.clone())))
+            }),
 
-            Aggregator::Min(fields) => fields
-                .into_iter()
-                .fold(select, |select, next_field| select.value(min(next_field.name.clone()))),
+            Aggregator::Min(fields) => fields.into_iter().fold(select, |select, next_field| {
+                select.value(min(Column::from(next_field.name.clone())))
+            }),
 
-            Aggregator::Max(fields) => fields
-                .into_iter()
-                .fold(select, |select, next_field| select.value(max(next_field.name.clone()))),
+            Aggregator::Max(fields) => fields.into_iter().fold(select, |select, next_field| {
+                select.value(max(Column::from(next_field.name.clone())))
+            }),
         })
 }
 
