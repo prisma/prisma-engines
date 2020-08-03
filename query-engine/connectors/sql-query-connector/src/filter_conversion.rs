@@ -235,38 +235,43 @@ impl AliasedSelect for RelationFilter {
         let condition = self.condition.clone();
         let relation = self.field.relation();
 
-        let these_columns = self
-            .field
-            .relation_columns(false)
-            .map(|c| c.table(alias.to_string(None)));
-
         let other_columns = self.field.opposite_columns(false);
         let other_columns_len = other_columns.len();
-        let other_columns = other_columns.map(|c| c.table(alias.to_string(None)));
 
         let id_columns = self.field.related_model().primary_identifier().as_columns();
         let id_columns_len = id_columns.len();
-        let id_columns = id_columns.map(|col| col.table(alias.to_string(Some(AliasMode::Join))));
 
         let related_table = self.field.related_model().as_table();
-        let table = relation.as_table().alias(alias.to_string(Some(AliasMode::Table)));
+        let table = relation.as_table();
 
         // check whether the join would join the same table and same column
-        // example: `Track` AS `t1` INNER JOIN `Track` AS `j1` ON `j1`.`id` = `t1`.`id`
-        let would_peform_needless_join = other_columns_len == id_columns_len
+        // prevent: `Track` AS `t1` INNER JOIN `Track` AS `j1` ON `j1`.`id` = `t1`.`id`
+        let would_perform_needless_join = other_columns_len == id_columns_len
             && table.typ == related_table.typ
             && id_columns.zip(other_columns).all(|(id, other)| id == other);
 
-        if would_peform_needless_join {
-            // Don't do the useless join
-            let conditions = self
+        let these_columns: Vec<Column> = self
+            .field
+            .relation_columns(false)
+            .map(|c| c.table(alias.to_string(None)))
+            .collect();
+
+        if would_perform_needless_join {
+            let nested_conditions = self
                 .nested_filter
                 .aliased_cond(Some(alias))
                 .invert_if(condition.invert_of_subselect());
 
-            let select_base = Select::from_table(relation.as_table().alias(alias.to_string(None))).so_that(conditions);
+            let conditions = these_columns
+                .clone()
+                .into_iter()
+                .fold(nested_conditions, |acc, column| acc.and(column.is_not_null()));
 
-            these_columns.fold(select_base, |acc, column| acc.column(column))
+            let select_base = Select::from_table(table.alias(alias.to_string(None))).so_that(conditions);
+
+            these_columns
+                .into_iter()
+                .fold(select_base, |acc, column| acc.column(column))
         } else {
             let other_columns: Vec<_> = self
                 .field
@@ -292,9 +297,13 @@ impl AliasedSelect for RelationFilter {
                 .alias(alias.to_string(Some(AliasMode::Join)))
                 .on(Row::from(identifiers).equals(Row::from(other_columns)));
 
-            let select_base = Select::from_table(table).inner_join(join).so_that(conditions);
+            let select_base = Select::from_table(table.alias(alias.to_string(Some(AliasMode::Table))))
+                .inner_join(join)
+                .so_that(conditions);
 
-            these_columns.fold(select_base, |acc, column| acc.column(column))
+            these_columns
+                .into_iter()
+                .fold(select_base, |acc, column| acc.column(column))
         }
     }
 }

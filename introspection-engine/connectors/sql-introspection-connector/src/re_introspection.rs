@@ -4,20 +4,20 @@ use crate::warnings::{
     warning_enriched_with_map_on_model, Enum, EnumAndValue, Model, ModelAndField,
 };
 use datamodel::{Datamodel, DefaultNames, DefaultValue, FieldType};
-use introspection_connector::IntrospectionResult;
+use introspection_connector::Warning;
 use prisma_value::PrismaValue;
 use std::cmp::Ordering;
 use std::cmp::Ordering::{Equal, Greater, Less};
 
-pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut IntrospectionResult) {
+pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec<Warning> {
     // Notes
     // Relationnames are similar to virtual relationfields, they can be changed arbitrarily
     // investigate keeping of old manual custom relation names
 
     // println!("{:#?}", old_data_model);
-    // println!("{:#?}", introspection_result.datamodel);
+    // println!("{:#?}", new_data_model);
 
-    let new_data_model = &mut introspection_result.data_model;
+    let mut warnings = vec![];
 
     //@@map on models
     let mut changed_model_names = vec![];
@@ -107,6 +107,37 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
                     &changed_field_name.1,
                 );
             }
+        }
+    }
+
+    //virtual relationfield names
+    let mut changed_relation_field_names = vec![];
+    {
+        for model in new_data_model.models() {
+            for field in model.relation_fields() {
+                if let Some(old_model) = old_data_model.find_model(&model.name) {
+                    for old_field in old_model.relation_fields() {
+                        //the relationinfos of both sides need to be compared since the relationinfo of the
+                        // non-fk side does not contain enough information to uniquely identify the correct relationfield
+                        if &old_field.relation_info == &field.relation_info
+                            && &old_data_model.find_related_field_bang(&old_field).relation_info
+                                == &new_data_model.find_related_field_bang(&field).relation_info
+                        {
+                            let mf = ModelAndField::new(&model.name, &field.name);
+                            changed_relation_field_names.push((mf, old_field.name.clone()));
+                        }
+                    }
+                }
+            }
+        }
+
+        for changed_relation_field_name in changed_relation_field_names {
+            new_data_model
+                .find_relation_field_mut(
+                    &changed_relation_field_name.0.model,
+                    &changed_relation_field_name.0.field,
+                )
+                .name = changed_relation_field_name.1;
         }
     }
 
@@ -238,37 +269,6 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
         }
     }
 
-    //virtual relationfield names
-    let mut changed_relation_field_names = vec![];
-    {
-        for model in new_data_model.models() {
-            for field in model.relation_fields() {
-                if let Some(old_model) = old_data_model.find_model(&model.name) {
-                    for old_field in old_model.relation_fields() {
-                        //the relationinfos of both sides need to be compared since the relationinfo of the
-                        // non-fk side does not contain enough information to uniquely identify the correct relationfield
-                        if &old_field.relation_info == &field.relation_info
-                            && &old_data_model.find_related_field_bang(&old_field).relation_info
-                                == &new_data_model.find_related_field_bang(&field).relation_info
-                        {
-                            let mf = ModelAndField::new(&model.name, &field.name);
-                            changed_relation_field_names.push((mf, old_field.name.clone()));
-                        }
-                    }
-                }
-            }
-        }
-
-        for changed_relation_field_name in changed_relation_field_names {
-            new_data_model
-                .find_relation_field_mut(
-                    &changed_relation_field_name.0.model,
-                    &changed_relation_field_name.0.field,
-                )
-                .name = changed_relation_field_name.1;
-        }
-    }
-
     //todo @defaults
     // potential error: what if there was a db default before and then it got removed, now re-introspection makes it virtual
     // you could not get rid of it
@@ -295,9 +295,7 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
 
     if !changed_model_names.is_empty() {
         let models = changed_model_names.iter().map(|c| c.1.clone()).collect();
-        introspection_result
-            .warnings
-            .push(warning_enriched_with_map_on_model(&models));
+        warnings.push(warning_enriched_with_map_on_model(&models));
     }
 
     if !changed_scalar_field_names.is_empty() {
@@ -305,16 +303,12 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
             .iter()
             .map(|c| ModelAndField::new(&c.0.model, &c.1))
             .collect();
-        introspection_result
-            .warnings
-            .push(warning_enriched_with_map_on_field(&models_and_fields));
+        warnings.push(warning_enriched_with_map_on_field(&models_and_fields));
     }
 
     if !changed_enum_names.is_empty() {
         let enums = changed_enum_names.iter().map(|c| Enum::new(&c.1)).collect();
-        introspection_result
-            .warnings
-            .push(warning_enriched_with_map_on_enum(&enums));
+        warnings.push(warning_enriched_with_map_on_enum(&enums));
     }
 
     if !changed_enum_values.is_empty() {
@@ -322,10 +316,11 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
             .iter()
             .map(|c| EnumAndValue::new(&c.0.enm, &c.1))
             .collect();
-        introspection_result
-            .warnings
-            .push(warning_enriched_with_map_on_enum_value(&enums_and_values));
+
+        warnings.push(warning_enriched_with_map_on_enum_value(&enums_and_values));
     }
+
+    warnings
 }
 
 fn re_order_putting_new_ones_last(enum_a_idx: Option<usize>, enum_b_idx: Option<usize>) -> Ordering {

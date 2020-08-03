@@ -489,6 +489,58 @@ async fn re_introspecting_manually_re_mapped_enum_name(api: &TestApi) {
 }
 
 #[test_each_connector(tags("postgres"))]
+async fn re_introspecting_manually_re_mapped_invalid_enum_values(api: &TestApi) {
+    let sql = format!("CREATE Type invalid as ENUM ( '@', '-')");
+    api.database().execute_raw(&sql, &[]).await.unwrap();
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom("sign  invalid Not Null");
+            });
+
+            migration.create_table("Unrelated", |t| {
+                t.add_column("id", types::primary());
+            });
+        })
+        .await;
+
+    let input_dm = r#"
+            model User {
+               id               Int @id @default(autoincrement())
+               sign             invalid           
+            }
+            
+            enum invalid{
+                dash    @map("-")
+                at      @map("@")
+            }
+        "#;
+
+    let final_dm = r#" 
+              model User {
+               id               Int @id @default(autoincrement())
+               sign             invalid           
+            }
+            
+            model Unrelated {
+               id               Int @id @default(autoincrement())
+            }
+            
+            enum invalid{
+                dash    @map("-")
+                at      @map("@")
+            }
+        "#;
+    let result = dbg!(api.re_introspect(input_dm).await);
+    custom_assert(&result, final_dm);
+    let warnings = api.re_introspect_warnings(input_dm).await;
+
+    assert_eq_json(&warnings, "[{\"code\":10,\"message\":\"These enum values were enriched with `@map` information taken from the previous Prisma schema.\",\"affected\":[{\"enm\":\"invalid\",\"value\":\"dash\"},{\"enm\":\"invalid\",\"value\":\"at\"}]}]");
+}
+
+#[test_each_connector(tags("postgres"))]
 async fn re_introspecting_multiple_changed_relation_names(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
@@ -771,6 +823,69 @@ async fn re_introspecting_custom_enum_order(api: &TestApi) {
             enum m {
                id
             }
+        "#;
+    let result = dbg!(api.re_introspect(input_dm).await);
+    custom_assert(&result, final_dm);
+}
+
+#[test_each_connector(tags("postgres"))]
+async fn re_introspecting_multiple_changed_relation_names_due_to_mapped_models(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::primary());
+            });
+            migration.create_table("Post", |t| {
+                t.add_column("id", types::primary());
+                t.add_column("user_id", types::foreign("User", "id").nullable(false).unique(true));
+                t.add_column("user_id2", types::foreign("User", "id").nullable(false).unique(true));
+            });
+            migration.create_table("Unrelated", |t| {
+                t.add_column("id", types::primary());
+            });
+        })
+        .await;
+
+    let input_dm = r#"
+             model Post {
+               id               Int @id @default(autoincrement())
+               user_id          Int  @unique
+               user_id2         Int  @unique
+               custom_User      Custom_User @relation("OtherUserToPost_user_id", fields: [user_id], references: [id])
+               custom_User2     Custom_User @relation("OtherUserToPost_user_id2", fields: [user_id2], references: [id])
+            }
+
+            model Custom_User {
+               id               Int @id @default(autoincrement())
+               custom_Post      Post? @relation("OtherUserToPost_user_id")
+               custom_Post2     Post? @relation("OtherUserToPost_user_id2")
+               
+               @@map("User")
+            }
+        "#;
+
+    let final_dm = r#"
+             model Post {
+               id               Int @id @default(autoincrement())
+               user_id          Int  @unique
+               user_id2         Int  @unique
+               custom_User      Custom_User @relation("Custom_UserToPost_user_id", fields: [user_id], references: [id])
+               custom_User2     Custom_User @relation("Custom_UserToPost_user_id2", fields: [user_id2], references: [id])
+            }
+
+            model Custom_User {
+               id               Int @id @default(autoincrement())
+               custom_Post      Post? @relation("Custom_UserToPost_user_id")
+               custom_Post2     Post? @relation("Custom_UserToPost_user_id2")
+               
+               @@map("User")
+            }
+            
+            model Unrelated {
+               id               Int @id @default(autoincrement())
+            }
+           
         "#;
     let result = dbg!(api.re_introspect(input_dm).await);
     custom_assert(&result, final_dm);
