@@ -78,7 +78,6 @@ impl DirectiveValidator<dml::Field> for RelationDirectiveValidator {
 
             // if we are on the physical field
             if !relation_info.to_fields.is_empty() {
-
                 let is_many_to_many = match &field {
                     Field::RelationField(relation_field) => {
                         let related_field = datamodel.find_related_field(&relation_field).unwrap();
