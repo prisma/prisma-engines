@@ -3,8 +3,6 @@ package queries.orderAndPagination
 import org.scalatest.{FlatSpec, Matchers}
 import util._
 
-// Note: Removing implicit ordering also made the original issue's exact sort order impossible. Sort order has been adjusted.
-// The sort order for
 class PaginationRegressionSpec extends FlatSpec with Matchers with ApiSpecBase {
   "[prisma/2855] Duplicate ordering keys on non-sequential IDs" should "still allow paging through records predictably" in {
     // ID on ModelB is non-sequential.

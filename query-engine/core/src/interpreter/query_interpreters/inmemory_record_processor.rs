@@ -180,25 +180,4 @@ impl InMemoryRecordProcessor {
     fn must_apply_pagination(&self) -> bool {
         self.take.or(self.skip).is_some() || self.cursor.is_some()
     }
-
-    // fn process_cursor(&self, mut records: ManyRecords) -> ManyRecords {
-    //     if let Some(ref cursor) = self.cursor {
-    //         let field_names = &records.field_names;
-    //         let cursor_projection: ModelProjection = cursor.into();
-
-    //         records.records = records
-    //             .records
-    //             .into_iter()
-    //             .skip_while(|r| {
-    //                 let record_cursor = r
-    //                     .projection(field_names, &cursor_projection)
-    //                     .expect("Record cursor has to be selected.");
-
-    //                 &record_cursor != cursor
-    //             })
-    //             .collect();
-    //     }
-
-    //     records
-    // }
 }

@@ -70,7 +70,7 @@ impl Builder<ReadQuery> for AggregateRecordsBuilder {
         // Reject unstable cursors for aggregations, because we can't do post-processing on those (we haven't implemented a in-memory aggregator yet).
         if args.contains_unstable_cursor() {
             return Err(QueryGraphBuilderError::InputError(
-                "The chosen cursor and orderBy combination is not stable and can't be used for aggregations."
+                "The chosen cursor and orderBy combination is not stable (unique) and can't be used for aggregations."
                     .to_owned(),
             ));
         }
