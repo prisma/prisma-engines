@@ -1,3 +1,8 @@
+//! This module contains the data structures and parsing function for the AST of a Prisma schema.
+//! The responsibilities of the sub modules are as following:
+//! * `parser`: Exposes the parse function that turns a String input into an AST.
+//! * `reformat`: Exposes a Formatter for Prisma files. This is used e.g. by the VS Code Extension.
+//! * `renderer`: Turns an AST into a Prisma Schema String.
 mod argument;
 mod comment;
 mod directive;
@@ -16,21 +21,21 @@ pub mod parser;
 pub mod reformat;
 pub mod renderer;
 
-pub use argument::*;
-pub use comment::*;
-pub use directive::*;
-pub use expression::*;
-pub use field::*;
-pub use generator_config::*;
-pub use identifier::*;
-pub use model::*;
-pub use r#enum::*;
-pub use source_config::*;
-pub use span::*;
-pub use top::*;
-pub use traits::*;
+pub use argument::Argument;
+pub use comment::Comment;
+pub use directive::Directive;
+pub use expression::Expression;
+pub use field::{Field, FieldArity};
+pub use generator_config::GeneratorConfig;
+pub use identifier::Identifier;
+pub use model::Model;
+pub use r#enum::{Enum, EnumValue};
+pub use source_config::SourceConfig;
+pub use span::Span;
+pub use top::Top;
+pub use traits::{ArgumentContainer, WithDirectives, WithDocumentation, WithIdentifier, WithName, WithSpan};
 
-/// AST representation of a prisma datamodel
+/// AST representation of a prisma schema.
 ///
 /// This module is used internally to represent an AST. The AST's nodes can be used
 /// during validation of a schema, especially when implementing custom directives.
@@ -38,7 +43,6 @@ pub use traits::*;
 /// The AST is not validated, also fields and directives are not resolved. Every node is
 /// annotated with it's location in the text representation.
 /// Basically, the AST is an object oriented representation of the datamodel's text.
-
 /// A prisma schema.
 /// Schema = Datamodel + Generators + Datasources
 #[derive(Debug, Clone, PartialEq)]

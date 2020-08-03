@@ -15,6 +15,7 @@ const FIRST_CLASS_PROPERTIES: &[&str] = &[
     PREVIEW_FEATURES_KEY,
 ];
 
+/// Is responsible for loading and validating Generators defined in an AST.
 pub struct GeneratorLoader {}
 
 impl GeneratorLoader {

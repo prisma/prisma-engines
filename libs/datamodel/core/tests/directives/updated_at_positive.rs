@@ -1,5 +1,5 @@
 use crate::common::*;
-use datamodel::common::ScalarType;
+use datamodel::ScalarType;
 
 #[test]
 fn should_apply_updated_at_directive() {

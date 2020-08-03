@@ -1,7 +1,7 @@
 use crate::common::*;
 use datamodel::ast::Span;
-use datamodel::common::ScalarType;
 use datamodel::error::DatamodelError;
+use datamodel::ScalarType;
 
 #[test]
 fn parse_basic_model() {

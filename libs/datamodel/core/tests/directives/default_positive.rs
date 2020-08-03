@@ -1,6 +1,6 @@
 use crate::common::*;
 use chrono::{DateTime, Utc};
-use datamodel::{common::ScalarType, DefaultValue, ValueGenerator};
+use datamodel::{DefaultValue, ScalarType, ValueGenerator};
 use prisma_value::PrismaValue;
 use rust_decimal::prelude::FromPrimitive;
 use rust_decimal::Decimal;

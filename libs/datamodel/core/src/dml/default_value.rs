@@ -4,15 +4,18 @@ use prisma_value::PrismaValue;
 use std::fmt;
 use uuid::Uuid;
 
+/// Represents a default specified on a field.
 #[derive(Clone, PartialEq)]
 pub enum DefaultValue {
+    /// a static value, e.g. `@default(1)`
     Single(PrismaValue),
+    /// a dynamic value, e.g. `@default(uuid())`
     Expression(ValueGenerator),
 }
 
 impl DefaultValue {
-    // Returns either a copy of the contained value or produces a new
-    // value as defined by the expression.
+    /// Returns either a copy of the contained single value or produces a new
+    /// value as defined by the expression.
     pub fn get(&self) -> Option<PrismaValue> {
         match self {
             Self::Single(v) => Some(v.clone()),
@@ -29,7 +32,6 @@ impl DefaultValue {
 pub struct ValueGenerator {
     pub name: String,
     pub args: Vec<PrismaValue>,
-
     pub generator: ValueGeneratorFn,
 }
 

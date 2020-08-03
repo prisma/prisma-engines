@@ -1,6 +1,6 @@
 use datamodel::{
-    common::ScalarType, dml, Datamodel, DefaultValue as DMLDefault, Field, FieldArity, FieldType, IndexDefinition,
-    Model, OnDeleteStrategy, RelationField, RelationInfo, ScalarField, ValueGenerator,
+    dml, Datamodel, DefaultValue as DMLDefault, Field, FieldArity, FieldType, IndexDefinition, Model, OnDeleteStrategy,
+    RelationField, RelationInfo, ScalarField, ScalarType, ValueGenerator,
 };
 use pretty_assertions::assert_eq;
 use prisma_value::PrismaValue;

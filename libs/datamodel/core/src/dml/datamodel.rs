@@ -6,21 +6,13 @@ use super::*;
 /// string, only introspection and the lowering of the datamodel to the ast care about these flags.
 /// The FieldType: Unsupported behaves in the same way.
 /// Both of these are never converted into the internal datamodel.
-
-/// Represents a prisma-datamodel.
 #[derive(Debug, PartialEq, Clone)]
 pub struct Datamodel {
-    /// All enums.
     pub enums: Vec<Enum>,
-    /// All models.
     pub models: Vec<Model>,
 }
 
-/// Type alias for (ModelName, FieldName)
-pub type FieldRef = (String, String);
-
 impl Datamodel {
-    /// Creates a new, empty schema.
     pub fn new() -> Datamodel {
         Datamodel {
             enums: Vec::new(),
@@ -87,12 +79,6 @@ impl Datamodel {
     /// Finds parent  model for a field reference.
     pub fn find_model_by_relation_field_ref(&self, field: &RelationField) -> Option<&Model> {
         self.find_model(&self.find_related_field_bang(&field).relation_info.to)
-    }
-
-    /// Finds a field reference by a model and field name.
-    pub fn find_field(&self, field: &FieldRef) -> Option<&Field> {
-        // This uses the memory location of field for equality.
-        self.find_model(&field.0)?.find_field(&field.1)
     }
 
     /// Finds a mutable scalar field reference by a model and field name.

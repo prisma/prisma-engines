@@ -3,7 +3,7 @@ use crate::warnings::{
     warning_enriched_with_map_on_enum, warning_enriched_with_map_on_enum_value, warning_enriched_with_map_on_field,
     warning_enriched_with_map_on_model, Enum, EnumAndValue, Model, ModelAndField,
 };
-use datamodel::{Datamodel, DefaultNames, DefaultValue, FieldType};
+use datamodel::{common::RelationNames, Datamodel, DefaultValue, FieldType};
 use introspection_connector::Warning;
 use prisma_value::PrismaValue;
 use std::cmp::Ordering;
@@ -178,9 +178,9 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec
 
                 let unambiguous = number_of_relations_to_other_model_in_relation < 2;
                 let relation_name = if unambiguous {
-                    DefaultNames::name_for_unambiguous_relation(model_with_fk, referenced_model)
+                    RelationNames::name_for_unambiguous_relation(model_with_fk, referenced_model)
                 } else {
-                    DefaultNames::name_for_ambiguous_relation(model_with_fk, referenced_model, &fk_column_name)
+                    RelationNames::name_for_ambiguous_relation(model_with_fk, referenced_model, &fk_column_name)
                 };
 
                 relation_fields_to_change.push((changed_model.name.clone(), rf.name.clone(), relation_name.clone()));
