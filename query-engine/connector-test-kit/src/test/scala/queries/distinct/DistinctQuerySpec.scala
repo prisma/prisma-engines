@@ -107,7 +107,7 @@ class DistinctQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
 
     val result = server.query(
       s"""{
-         |  findManyModelA(distinct: [fieldA, fieldB], skip: 1, orderBy: fieldB_DESC) {
+         |  findManyModelA(distinct: [fieldA, fieldB], skip: 1, orderBy: { fieldB: DESC }) {
          |    fieldA
          |    fieldB
          |  }
@@ -128,7 +128,7 @@ class DistinctQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
 
     val result = server.query(
       s"""{
-         |  findManyModelA(distinct: [fieldA, fieldB], orderBy: id_DESC) {
+         |  findManyModelA(distinct: [fieldA, fieldB], orderBy: { id: DESC }) {
          |    fieldA
          |    fieldB
          |  }
@@ -156,7 +156,7 @@ class DistinctQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
          |  findManyModelA(distinct: [fieldA, fieldB]) {
          |    fieldA
          |    fieldB
-         |    b(distinct: [field], orderBy: id_ASC) {
+         |    b(distinct: [field], orderBy: { id: ASC }) {
          |      field
          |    }
          |  }
@@ -182,10 +182,10 @@ class DistinctQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
 
     val result = server.query(
       s"""{
-         |  findManyModelA(distinct: [fieldA, fieldB], orderBy: fieldB_DESC) {
+         |  findManyModelA(distinct: [fieldA, fieldB], orderBy: { fieldB: DESC}) {
          |    fieldA
          |    fieldB
-         |    b(distinct: [field], orderBy: id_DESC) {
+         |    b(distinct: [field], orderBy: { id: DESC }) {
          |      field
          |    }
          |  }

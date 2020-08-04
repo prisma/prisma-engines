@@ -159,13 +159,13 @@ impl<'a> IntoRenderer<'a> for EnumType {
     }
 }
 
-impl<'a> IntoRenderer<'a> for &'a InputObjectTypeRef {
+impl<'a> IntoRenderer<'a> for &'a InputObjectTypeWeakRef {
     fn into_renderer(&self) -> GqlRenderer<'a> {
         GqlRenderer::Object(GqlObjectRenderer::Input(Weak::clone(self)))
     }
 }
 
-impl<'a> IntoRenderer<'a> for &'a ObjectTypeRef {
+impl<'a> IntoRenderer<'a> for &'a ObjectTypeWeakRef {
     fn into_renderer(&self) -> GqlRenderer<'a> {
         GqlRenderer::Object(GqlObjectRenderer::Output(Weak::clone(self)))
     }

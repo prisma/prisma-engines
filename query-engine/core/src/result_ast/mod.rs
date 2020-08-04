@@ -12,7 +12,7 @@ pub enum QueryResult {
 }
 
 // Todo: In theory, much of this info can go into the serializer as soon as the read results are resolved in a flat tree.
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Clone)]
 pub struct RecordSelection {
     /// Name of the query.
     pub name: String,

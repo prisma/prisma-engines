@@ -1,4 +1,5 @@
 use crate::{
+    query_arguments_ext::QueryArgumentsExt,
     query_builder::{self, read},
     QueryExt, SqlError,
 };
@@ -40,9 +41,12 @@ pub async fn get_many_records(
     let idents: Vec<_> = selected_fields.type_identifiers_with_arities();
     let mut records = ManyRecords::new(field_names);
 
+    // Todo: This can't work for all cases. Cursor-based pagination will not work, because it relies on the ordering
+    // to determine the right queries to fire, and will default to incorrect orderings if no ordering is found.
+    // The can_batch has been adjusted to reflect that as a band-aid, but deeper investigation is necessary.
     if query_arguments.can_batch() {
         // We don't need to order in the database due to us ordering in this function.
-        let order = query_arguments.order_by.take();
+        let order = std::mem::replace(&mut query_arguments.order_by, vec![]);
 
         let batches = query_arguments.batched();
         let mut futures = FuturesUnordered::new();
@@ -58,8 +62,8 @@ pub async fn get_many_records(
             }
         }
 
-        if let Some(ref order_by) = order {
-            records.order_by(order_by)
+        if !order.is_empty() {
+            records.order_by(&order)
         }
     } else {
         let query = read::get_records(model, selected_fields.as_columns(), query_arguments);
@@ -67,7 +71,7 @@ pub async fn get_many_records(
         for item in conn.filter(query.into(), idents.as_slice()).await?.into_iter() {
             records.push(Record::from(item))
         }
-    }
+    };
 
     if reversed {
         records.reverse();

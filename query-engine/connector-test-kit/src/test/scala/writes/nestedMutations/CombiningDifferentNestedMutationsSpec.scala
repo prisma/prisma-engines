@@ -34,7 +34,7 @@ class CombiningDifferentNestedMutationsSpec extends FlatSpec with Matchers with 
         |      create: [{c: "c1"},{c: "c2"}]
         |    }
         |  }){
-        |    childrenOpt(orderBy: c_ASC){
+        |    childrenOpt(orderBy: { c: ASC }){
         |       c
         |    }
         |  }
@@ -54,7 +54,7 @@ class CombiningDifferentNestedMutationsSpec extends FlatSpec with Matchers with 
         |    update: [{where: {c: "c3"} data: {c: "cUpdated"}}]
         |    }
         |  }){
-        |    childrenOpt(orderBy: c_ASC){
+        |    childrenOpt(orderBy: { c: ASC }){
         |       c
         |    }
         |  }
@@ -66,7 +66,7 @@ class CombiningDifferentNestedMutationsSpec extends FlatSpec with Matchers with 
 
 //      // ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(4) }
 
-      server.query(s"""query{children(orderBy: c_ASC){c, parentsOpt(orderBy: p_ASC){p}}}""", project).toString should be(
+      server.query(s"""query{children(orderBy: { c: ASC }){c, parentsOpt(orderBy: { p: ASC }){p}}}""", project).toString should be(
         """{"data":{"children":[{"c":"c1","parentsOpt":[{"p":"p1"}]},{"c":"c2","parentsOpt":[{"p":"p1"}]},{"c":"c4","parentsOpt":[{"p":"p1"}]},{"c":"cUpdated","parentsOpt":[{"p":"p1"}]}]}}""")
 
     }
@@ -193,7 +193,7 @@ class CombiningDifferentNestedMutationsSpec extends FlatSpec with Matchers with 
         |      create: [{c: "c1"},{c: "c2"}]
         |    }
         |  }){
-        |    childrenOpt(orderBy: c_ASC){
+        |    childrenOpt(orderBy: { c: ASC }){
         |       c
         |    }
         |  }
@@ -219,7 +219,7 @@ class CombiningDifferentNestedMutationsSpec extends FlatSpec with Matchers with 
         |              ]
         |    }
         |  }){
-        |    childrenOpt(orderBy: c_ASC){
+        |    childrenOpt(orderBy: { c: ASC }){
         |       c
         |    }
         |  }
@@ -231,7 +231,7 @@ class CombiningDifferentNestedMutationsSpec extends FlatSpec with Matchers with 
 
       // ifConnectorIsActive { dataResolver(project).countByTable("_ChildToParent").await should be(5) }
 
-      server.query(s"""query{children(orderBy: c_ASC){c, parentsOpt(orderBy: p_ASC){p}}}""", project).toString should be(
+      server.query(s"""query{children(orderBy: { c: ASC }){c, parentsOpt(orderBy: { p: ASC }){p}}}""", project).toString should be(
         """{"data":{"children":[{"c":"c1","parentsOpt":[{"p":"p1"}]},{"c":"c2","parentsOpt":[{"p":"p1"}]},{"c":"c4","parentsOpt":[{"p":"p1"}]},{"c":"cNew","parentsOpt":[{"p":"p1"}]},{"c":"cUpdated","parentsOpt":[{"p":"p1"}]}]}}""")
     }
   }

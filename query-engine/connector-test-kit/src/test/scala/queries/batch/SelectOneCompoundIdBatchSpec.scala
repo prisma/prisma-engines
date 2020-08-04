@@ -72,17 +72,6 @@ class SelectOneCompoundIdBatchSpec extends FlatSpec with Matchers with ApiSpecBa
     )
   }
 
-  "two successful queries with query params in a different order" should "work" in {
-    val queries = Seq(
-      """query {findOneArtist(where:{firstName_lastName:{firstName:"Musti",lastName:"Naukio"}}) {firstName lastName}}""",
-      """query {findOneArtist(where:{firstName_lastName:{lastName:"Musti",firstName:"Naukio"}}) {firstName lastName}}""",
-    )
-
-    server.batch(queries, transaction = false, project, legacy = false).toString should be(
-      """[{"data":{"findOneArtist":{"firstName":"Musti","lastName":"Naukio"}}},{"data":{"findOneArtist":{"firstName":"Naukio","lastName":"Musti"}}}]"""
-    )
-  }
-
   "two successful queries and one failing with different selection set" should "work" in {
     val queries = Seq(
       """query {findOneArtist(where:{firstName_lastName:{firstName:"Musti",lastName:"Naukio"}}) {firstName lastName}}""",

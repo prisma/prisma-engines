@@ -1,5 +1,5 @@
 use crate::common::*;
-use datamodel::{common::ScalarType, dml};
+use datamodel::{dml, ScalarType};
 use prisma_value::PrismaValue;
 
 #[test]

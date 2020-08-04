@@ -38,8 +38,7 @@ impl RelationInfo {
     }
 }
 
-/// Describes what happens when related nodes
-/// are deleted.
+/// Describes what happens when related nodes are deleted.
 #[derive(Debug, Copy, PartialEq, Clone)]
 pub enum OnDeleteStrategy {
     Cascade,

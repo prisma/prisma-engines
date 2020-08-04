@@ -32,8 +32,6 @@ pub trait WithDocumentation {
     fn is_commented_out(&self) -> bool;
 }
 
-// generic implementations
-
 impl<T> WithName for T
 where
     T: WithIdentifier,

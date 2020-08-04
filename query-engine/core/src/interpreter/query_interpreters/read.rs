@@ -1,6 +1,6 @@
 use super::*;
 use crate::{interpreter::InterpretationResult, query_ast::*, result_ast::*};
-use connector::{self, ConnectionLike, ReadOperations};
+use connector::{self, ConnectionLike, QueryArguments, ReadOperations};
 use futures::future::{BoxFuture, FutureExt};
 use inmemory_record_processor::InMemoryRecordProcessor;
 use prisma_models::ManyRecords;
@@ -44,7 +44,7 @@ fn read_one<'conn, 'tx>(
                     scalars: records,
                     nested,
                     model_id,
-                    ..Default::default()
+                    query_arguments: QueryArguments::new(model),
                 }))
             }
 
@@ -52,7 +52,9 @@ fn read_one<'conn, 'tx>(
                 name: query.name,
                 fields: query.selection_order,
                 model_id,
-                ..Default::default()
+                scalars: ManyRecords::default(),
+                nested: vec![],
+                query_arguments: QueryArguments::new(model),
             })),
         }
     };
@@ -61,13 +63,17 @@ fn read_one<'conn, 'tx>(
 }
 
 /// Queries a set of records.
+/// If the query specifies distinct, we need to lift up pagination (and distinct) processing to the core with in-memory record processing.
+/// -> Distinct can't be processed in the DB with our current query API model.
+///    We need to select IDs / uniques alongside the distincts, which doesn't work in SQL, as all records
+///    are distinct by definition if a unique is in the selection set.
+/// -> Unstable cursors can't reliably be fetched by the underlying datasource, so we need to process part of it in-memory.
 fn read_many<'a, 'b>(
     tx: &'a ConnectionLike<'a, 'b>,
     mut query: ManyRecordsQuery,
 ) -> BoxFuture<'a, InterpretationResult<QueryResult>> {
     let fut = async move {
-        // If the query specifies distinct, we need to lift up pagination and distinct processing to the core.
-        let scalars = if query.args.distinct.is_some() {
+        let scalars = if query.args.distinct.is_some() || query.args.contains_unstable_cursor() {
             let processor = InMemoryRecordProcessor::new_from_query_args(&mut query.args);
             let scalars = tx
                 .get_many_records(&query.model, query.args.clone(), &query.selected_fields)

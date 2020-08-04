@@ -114,7 +114,7 @@ class CountAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase 
 
     val result5 = server.query(
       """{
-        |  aggregateItem(where: { name_gt: "1" } orderBy: name_DESC) {
+        |  aggregateItem(where: { name_gt: "1" } orderBy: { name: DESC }) {
         |    count
         |  }
         |}

@@ -25,8 +25,8 @@ impl<'a> GqlEnumRenderer<'a> {
 
     fn format_enum_values(&self) -> Vec<String> {
         match self.enum_type {
+            EnumType::String(s) => s.values().to_owned(),
             EnumType::Internal(i) => i.external_values(),
-            EnumType::OrderBy(ord) => ord.values(),
             EnumType::FieldRef(f) => f.values(),
         }
     }

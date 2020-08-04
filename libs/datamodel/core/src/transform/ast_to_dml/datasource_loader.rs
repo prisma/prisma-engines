@@ -10,6 +10,7 @@ use crate::error::{DatamodelError, ErrorCollection};
 use crate::{ast, Datasource};
 use datamodel_connector::{BuiltinConnectors, Connector};
 
+/// Is responsible for loading and validating Datasources defined in an AST.
 pub struct DatasourceLoader {
     source_definitions: Vec<Box<dyn DatasourceProvider>>,
 }

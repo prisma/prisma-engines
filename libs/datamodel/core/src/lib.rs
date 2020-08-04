@@ -1,3 +1,75 @@
+//! This crate is responsible for parsing, rendering and formatting a Prisma Schema.
+//! A Prisma Schema consists out of two parts:
+//! 1. The `Datamodel` part refers to the model and enum definitions.
+//! 2. The `Configuration` part refers to the generator and datasource definitions.
+//!
+//! The data structures are organized into 3 layers:
+//! * The AST layer contains the data data structures representing the schema input.
+//! * The model layer contains the data structures that are semantically rich and therefore engines can build upon.
+//! * The JSON layer contains the data structures that represent the contract for the DMMF which is the API for client generators.
+//!
+//! The responsibilities of each top level module is as following:
+//! * `common`: contains constants and generic helpers
+//! * `error`: contains the error and result types
+//! * `ast`: contains the data structures for the AST of a Prisma schema. And the parsing functions to turn an input string into an AST.
+//! * `dml`: contains the models representing the Datamodel part of a Prisma schema
+//! * `configuration`: contains the models representing the Datasources and Generators of a Prisma schema
+//! * `transform`: contains the logic to turn an AST into models and vice versa
+//! * `json`: contains the logic to turn models into their JSON/DMMF representation
+//!
+//! The flow between the layers is depicted in the following diagram.
+//!<pre>
+//!                ┌──────────────────┐
+//!                │       json       │
+//!                └────────▲─────────┘
+//!                         │
+//!                         │
+//!      ┌──────────────────┐┌──────────────────┐
+//!      │       dml        ││  configuration   │
+//!      └──────────────────┘└──────────────────┘
+//!                        │  ▲
+//!┌─────────────────────┐ │  │ ┌─────────────────────┐
+//!│transform::dml_to_ast│ │  │ │transform::ast_to_dml│
+//!└─────────────────────┘ │  │ └─────────────────────┘
+//!                        │  │
+//!                        ▼  │
+//!                ┌──────────────────┐
+//!                │       ast        │
+//!                └──────────────────┘
+//!                        │  ▲
+//!                        │  │
+//!                        │  │
+//!                        ▼  │
+//!                 ┌──────────────────┐
+//!                 │  schema string   │
+//!                 └──────────────────┘
+//!</pre>
+//!
+//! The usage dependencies between the main modules is depicted in the following diagram.
+//! The modules `error` and `common` are not shown as any module may depend on them.
+//!<pre>
+//!                       ┌──────────────────┐
+//!                       │    transform     │
+//!                       └──────────────────┘
+//!                                 │
+//!                                 │ use
+//!          ┌──────────────────────┼──────────────────────────┐
+//!          │                      │                          │
+//!          │                      │                          │
+//!          ▼                      ▼                          ▼
+//!┌──────────────────┐   ┌──────────────────┐       ┌──────────────────┐
+//!│       ast        │   │       dml        │       │  configuration   │
+//!└──────────────────┘   └──────────────────┘       └──────────────────┘
+//!                                 ▲                          ▲
+//!                                 │                          │
+//!                                 ├──────────────────────────┘
+//!                                 │ use
+//!                                 │
+//!                       ┌──────────────────┐
+//!                       │       json       │
+//!                       └──────────────────┘
+//!</pre>
+//!
 extern crate pest; // Pest grammar generation on compile time.
 #[macro_use]
 extern crate pest_derive;
@@ -13,7 +85,6 @@ pub mod json;
 pub mod transform;
 pub mod walkers;
 
-pub use common::DefaultNames;
 pub use configuration::*;
 pub use dml::*;
 
