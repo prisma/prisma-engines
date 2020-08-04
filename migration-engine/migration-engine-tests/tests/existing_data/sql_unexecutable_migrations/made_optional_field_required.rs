@@ -29,9 +29,13 @@ async fn making_an_optional_field_required_with_data_without_a_default_is_unexec
         }
     "#;
 
-    api.infer_apply(&dm2).send().await?.assert_unexecutable(&[
-        "Made the column `age` on table `Test` required, but there are 1 existing NULL values.".into(),
-    ])?;
+    api.infer_apply(&dm2)
+        .send()
+        .await?
+        .assert_no_warning()?
+        .assert_unexecutable(&[
+            "Made the column `age` on table `Test` required, but there are 1 existing NULL values.".into(),
+        ])?;
 
     api.assert_schema()
         .await?
@@ -151,10 +155,7 @@ async fn making_an_optional_field_required_with_data_with_a_default_is_unexecuta
         .assert_unexecutable(&[
             "Made the column `age` on table `Test` required, but there are 1 existing NULL values.".into(),
         ])?
-        .assert_warnings(&[
-            // TEMPORARY, until the CLI displays unexecutable migration messages.
-            "Made the column `age` on table `Test` required, but there are 1 existing NULL values.".into(),
-        ])?
+        .assert_no_warning()?
         .assert_no_error()?;
 
     api.assert_schema().await?.assert_equals(&initial_schema)?;

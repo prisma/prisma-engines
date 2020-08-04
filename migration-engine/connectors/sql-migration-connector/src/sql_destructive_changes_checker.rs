@@ -154,12 +154,8 @@ impl SqlDestructiveChangesChecker<'_> {
         after: &SqlSchema,
     ) -> SqlResult<DestructiveChangeDiagnostics> {
         let plan = self.plan(steps, before, after);
-        let mut diagnostics = plan.execute(self.schema_name(), self.conn()).await?;
 
-        // Temporary, for better reporting.
-        diagnostics.warn_about_unexecutable_migrations();
-
-        Ok(diagnostics)
+        plan.execute(self.schema_name(), self.conn()).await
     }
 }
 
@@ -191,6 +187,7 @@ impl DestructiveChangesChecker<SqlMigration> for SqlDestructiveChangesChecker<'_
             &database_migration.before,
             &database_migration.after,
         );
+
         Ok(plan.pure_check())
     }
 }

@@ -147,9 +147,16 @@ impl<'a> ApplyMigrationCommand<'a> {
             .check(&database_migration)
             .await?;
 
-        match (diagnostics.has_warnings(), self.input.force.unwrap_or(false)) {
+        match (
+            diagnostics.unexecutable_migrations.len() > 0,
+            diagnostics.has_warnings(),
+            self.input.force.unwrap_or(false),
+        ) {
+            (true, _, _) => {
+                tracing::info!("There are unexecutable migration steps, the migration will not be applied.")
+            }
             // We have no warnings, or the force flag is passed.
-            (false, _) | (true, true) => {
+            (_, false, _) | (_, true, true) => {
                 tracing::debug!("Applying the migration");
                 let saved_migration = migration_persistence.create(migration).await?;
 
@@ -161,7 +168,7 @@ impl<'a> ApplyMigrationCommand<'a> {
                 tracing::debug!("Migration applied");
             }
             // We have warnings, but no force flag was passed.
-            (true, false) => tracing::info!("The force flag was not passed, the migration will not be applied."),
+            (_, true, false) => tracing::info!("The force flag was not passed, the migration will not be applied."),
         }
 
         let DestructiveChangeDiagnostics {
