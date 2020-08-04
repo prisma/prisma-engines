@@ -11,7 +11,7 @@ use crate::dml;
 use directive_list_validator::DirectiveListValidator;
 use directive_validator::DirectiveValidator;
 
-/// convenience struct that contains all available directive validators
+/// This is the facade for all directive validations. It is used within the `ValidationPipeline`.
 pub struct AllDirectives {
     pub field: DirectiveListValidator<dml::Field>,
     pub model: DirectiveListValidator<dml::Model>,

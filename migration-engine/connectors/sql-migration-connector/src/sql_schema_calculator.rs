@@ -1,8 +1,7 @@
 use crate::{sql_renderer::IteratorJoin, DatabaseInfo};
 use datamodel::{
-    common::*,
     walkers::{walk_models, walk_relations, walk_scalar_fields, ModelWalker, ScalarFieldWalker, TypeWalker},
-    Datamodel, DefaultValue, FieldArity, IndexDefinition, IndexType, ValueGenerator, ValueGeneratorFn,
+    Datamodel, DefaultValue, FieldArity, IndexDefinition, IndexType, ScalarType, ValueGenerator, ValueGeneratorFn,
     WithDatabaseName,
 };
 use prisma_value::PrismaValue;

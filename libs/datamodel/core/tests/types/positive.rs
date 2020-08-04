@@ -1,5 +1,5 @@
 use crate::common::*;
-use datamodel::{common::ScalarType, DefaultValue, ValueGenerator};
+use datamodel::{DefaultValue, ScalarType, ValueGenerator};
 use datamodel_connector::ScalarFieldType;
 use prisma_value::PrismaValue;
 

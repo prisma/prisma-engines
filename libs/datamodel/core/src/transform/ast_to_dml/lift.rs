@@ -1,10 +1,8 @@
 use super::super::directives::AllDirectives;
 use crate::{
-    ast,
-    common::ScalarType,
-    configuration, dml,
+    ast, configuration, dml,
     error::{DatamodelError, ErrorCollection},
-    Field, FieldType,
+    Field, FieldType, ScalarType,
 };
 use datamodel_connector::{BuiltinConnectors, Connector};
 

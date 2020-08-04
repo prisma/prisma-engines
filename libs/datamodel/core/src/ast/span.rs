@@ -21,18 +21,18 @@ impl Span {
             end: s.end(),
         }
     }
+
+    /// Adds an offset to a span.
+    pub fn lift_span(&self, offset: usize) -> Span {
+        Span {
+            start: offset + self.start,
+            end: offset + self.end,
+        }
+    }
 }
 
 impl std::fmt::Display for Span {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(f, "[{} - {}]", self.start, self.end)
-    }
-}
-
-/// Adds an offset to a span.
-pub fn lift_span(span: &Span, offset: usize) -> Span {
-    Span {
-        start: offset + span.start,
-        end: offset + span.end,
     }
 }

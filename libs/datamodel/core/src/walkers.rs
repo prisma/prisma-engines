@@ -1,3 +1,5 @@
+//! This module contains convenience functions to easily traverse a Datamodel tree.
+//! The most prominent functionality is the pain free navigation of relations.
 use crate::{
     dml::{
         Datamodel, DefaultValue, Enum, FieldArity, FieldType, IndexDefinition, Model, ScalarField, ScalarType,

@@ -1,6 +1,12 @@
 use super::common::*;
 use crate::error::DatamodelError;
-use crate::{ast, common::names::*, dml, error::ErrorCollection, Field, OnDeleteStrategy, ScalarField, UniqueCriteria};
+use crate::{
+    ast,
+    common::{NameNormalizer, RelationNames},
+    dml,
+    error::ErrorCollection,
+    Field, OnDeleteStrategy, ScalarField, UniqueCriteria,
+};
 
 /// Helper for standardsing a datamodel.
 ///
@@ -297,7 +303,7 @@ impl Standardiser {
         for (model_name, field_name, rel_info) in unnamed_relations {
             // Embedding side.
             let field = datamodel.find_relation_field_mut(&model_name, &field_name);
-            field.relation_info.name = DefaultNames::name_for_unambiguous_relation(&model_name, &rel_info.to);
+            field.relation_info.name = RelationNames::name_for_unambiguous_relation(&model_name, &rel_info.to);
         }
     }
 

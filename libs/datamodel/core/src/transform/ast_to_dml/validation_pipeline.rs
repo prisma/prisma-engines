@@ -1,6 +1,7 @@
 use super::*;
 use crate::{ast, configuration, dml, error::ErrorCollection};
 
+/// Is responsible for loading and validating the Datamodel defined in an AST.
 /// Wrapper for all lift and validation steps
 pub struct ValidationPipeline<'a> {
     lifter: LiftAstToDml<'a>,

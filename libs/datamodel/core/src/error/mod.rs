@@ -8,8 +8,7 @@ use thiserror::Error;
 // No format for this file, on purpose.
 // Line breaks make the declarations very hard to read.
 #[rustfmt::skip]
-/// Enum for different errors which can happen during
-/// parsing or validation.
+/// Enum for different errors which can happen during parsing or validation.
 ///
 /// For fancy printing, please use the `pretty_print_error` function.
 #[derive(Debug, Error, Clone, PartialEq)]
