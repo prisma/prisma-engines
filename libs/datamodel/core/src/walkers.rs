@@ -201,6 +201,10 @@ impl<'a> TypeWalker<'a> {
         }
     }
 
+    pub fn is_int(&self) -> bool {
+        matches!(self, TypeWalker::Base(ScalarType::Int))
+    }
+
     pub fn is_json(&self) -> bool {
         matches!(self, TypeWalker::Base(ScalarType::Json))
     }
