@@ -143,7 +143,7 @@ impl<'a> ApplyMigrationCommand<'a> {
         });
 
         let diagnostics = connector
-            .destructive_changes_checker()
+            .destructive_change_checker()
             .check(&database_migration)
             .await?;
 

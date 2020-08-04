@@ -3,7 +3,7 @@
 //! detail of the SQL connector.
 
 use crate::{
-    catch, connect, database_info::DatabaseInfo, sql_destructive_changes_checker::DestructiveChangeCheckerFlavour,
+    catch, connect, database_info::DatabaseInfo, sql_destructive_change_checker::DestructiveChangeCheckerFlavour,
     sql_renderer::SqlRenderer, CheckDatabaseInfoResult, SqlError, SqlResult, SystemDatabase,
 };
 use futures::future::TryFutureExt;

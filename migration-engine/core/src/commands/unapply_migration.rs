@@ -58,9 +58,9 @@ impl<'a> MigrationCommand for UnapplyMigrationCommand<'a> {
                     .infer(&last_schema, &schema_before_last_migration, &datamodel_migration)
                     .await?;
 
-                let destructive_changes_checker = connector.destructive_changes_checker();
+                let destructive_change_checker = connector.destructive_change_checker();
 
-                let warnings = destructive_changes_checker.check(&database_migration).await?;
+                let warnings = destructive_change_checker.check(&database_migration).await?;
 
                 match (warnings.has_warnings(), input.force) {
                     (false, _) | (true, None) | (true, Some(true)) => {

@@ -5,7 +5,7 @@
 
 mod database_migration_inferrer;
 mod database_migration_step_applier;
-mod destructive_changes_checker;
+mod destructive_change_checker;
 mod error;
 mod migration_applier;
 mod migration_persistence;
@@ -14,7 +14,7 @@ pub mod steps;
 
 pub use database_migration_inferrer::*;
 pub use database_migration_step_applier::*;
-pub use destructive_changes_checker::*;
+pub use destructive_change_checker::*;
 pub use error::*;
 pub use migration_applier::*;
 pub use migration_persistence::*;
@@ -50,7 +50,7 @@ pub trait MigrationConnector: Send + Sync + 'static {
     fn check_database_version_compatibility(
         &self,
         _datamodel: &datamodel::dml::Datamodel,
-    ) -> Vec<destructive_changes_checker::MigrationError> {
+    ) -> Vec<destructive_change_checker::MigrationError> {
         Vec::new()
     }
 
@@ -65,8 +65,8 @@ pub trait MigrationConnector: Send + Sync + 'static {
         &'a self,
     ) -> Box<dyn DatabaseMigrationStepApplier<Self::DatabaseMigration> + 'a>;
 
-    /// See [DestructiveChangesChecker](trait.DestructiveChangesChecker.html).
-    fn destructive_changes_checker<'a>(&'a self) -> Box<dyn DestructiveChangesChecker<Self::DatabaseMigration> + 'a>;
+    /// See [DestructiveChangeChecker](trait.DestructiveChangeChecker.html).
+    fn destructive_change_checker<'a>(&'a self) -> Box<dyn DestructiveChangeChecker<Self::DatabaseMigration> + 'a>;
 
     // TODO: figure out if this is the best way to do this or move to a better place/interface
     // this is placed here so i can use the associated type

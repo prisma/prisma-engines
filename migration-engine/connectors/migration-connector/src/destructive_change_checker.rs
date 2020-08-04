@@ -9,7 +9,7 @@ use std::marker::PhantomData;
 /// [DatabaseMigration](trait.MigrationConnector.html#associatedtype.DatabaseMigration)
 /// type.
 #[async_trait::async_trait]
-pub trait DestructiveChangesChecker<T>: Send + Sync
+pub trait DestructiveChangeChecker<T>: Send + Sync
 where
     T: Send + Sync + 'static,
 {
@@ -24,7 +24,7 @@ where
     fn pure_check(&self, database_migration: &T) -> ConnectorResult<DestructiveChangeDiagnostics>;
 }
 
-/// The errors and warnings emitted by the [DestructiveChangesChecker](trait.DestructiveChangesChecker.html).
+/// The errors and warnings emitted by the [DestructiveChangeChecker](trait.DestructiveChangeChecker.html).
 #[derive(Debug, Default)]
 pub struct DestructiveChangeDiagnostics {
     pub errors: Vec<MigrationError>,
@@ -48,14 +48,14 @@ impl DestructiveChangeDiagnostics {
     }
 }
 
-/// A warning emitted by [DestructiveChangesChecker](trait.DestructiveChangesChecker.html). Warnings will
+/// A warning emitted by [DestructiveChangeChecker](trait.DestructiveChangeChecker.html). Warnings will
 /// prevent a migration from being applied, unless the `force` flag is passed.
 #[derive(Debug, Serialize, Deserialize, PartialEq, Clone)]
 pub struct MigrationWarning {
     pub description: String,
 }
 
-/// An error emitted by the [DestructiveChangesChecker](trait.DestructiveChangesChecker.html). Errors will
+/// An error emitted by the [DestructiveChangeChecker](trait.DestructiveChangeChecker.html). Errors will
 /// always prevent a migration from being applied.
 #[derive(Debug, Serialize, PartialEq, Deserialize)]
 pub struct MigrationError {
@@ -69,14 +69,14 @@ pub struct UnexecutableMigration {
     pub description: String,
 }
 
-/// An implementor of [DestructiveChangesChecker](trait.DestructiveChangesChecker.html) that performs no check.
+/// An implementor of [DestructiveChangeChecker](trait.DestructiveChangeChecker.html) that performs no check.
 #[derive(Default)]
-pub struct EmptyDestructiveChangesChecker<T> {
+pub struct EmptyDestructiveChangeChecker<T> {
     database_migration: PhantomData<T>,
 }
 
 #[async_trait::async_trait]
-impl<T> DestructiveChangesChecker<T> for EmptyDestructiveChangesChecker<T>
+impl<T> DestructiveChangeChecker<T> for EmptyDestructiveChangeChecker<T>
 where
     T: Send + Sync + 'static,
 {
