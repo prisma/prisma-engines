@@ -23,7 +23,7 @@ pub(super) fn fix(
     let mut fixed_tables = Vec::new();
 
     result.push(SqlMigrationStep::RawSql {
-        raw: "PRAGMA foreign_keys=OFF;".to_string(),
+        raw: "PRAGMA foreign_keys=OFF".to_string(),
     });
 
     for step in steps {
@@ -71,11 +71,11 @@ pub(super) fn fix(
     }
 
     result.push(SqlMigrationStep::RawSql {
-        raw: format!("PRAGMA {}.foreign_key_check;", Quoted::sqlite_ident(schema_name)),
+        raw: format!("PRAGMA {}.foreign_key_check", Quoted::sqlite_ident(schema_name)),
     });
 
     result.push(SqlMigrationStep::RawSql {
-        raw: "PRAGMA foreign_keys=ON;".to_string(),
+        raw: "PRAGMA foreign_keys=ON".to_string(),
     });
 
     Ok(result)

@@ -184,7 +184,7 @@ fn render_raw_sql(
         }
         SqlMigrationStep::DropTable(DropTable { name }) => match sql_family {
             SqlFamily::Mysql | SqlFamily::Postgres => Ok(vec![format!(
-                "DROP TABLE {};",
+                "DROP TABLE {}",
                 renderer.quote_with_schema(&schema_name, &name)
             )]),
             // Turning off the pragma is safe, because schema validation would forbid foreign keys
@@ -193,7 +193,7 @@ fn render_raw_sql(
             // constraints on SQLite.
             SqlFamily::Sqlite => Ok(vec![
                 "PRAGMA foreign_keys=off".to_string(),
-                format!("DROP TABLE {};", renderer.quote_with_schema(&schema_name, &name)),
+                format!("DROP TABLE {}", renderer.quote_with_schema(&schema_name, &name)),
                 "PRAGMA foreign_keys=on".to_string(),
             ]),
             SqlFamily::Mssql => todo!("Greetings from Redmond"),
@@ -204,7 +204,7 @@ fn render_raw_sql(
                 _ => renderer.quote_with_schema(&schema_name, &new_name).to_string(),
             };
             Ok(vec![format!(
-                "ALTER TABLE {} RENAME TO {};",
+                "ALTER TABLE {} RENAME TO {}",
                 renderer.quote_with_schema(&schema_name, &name),
                 new_name
             )])
@@ -332,7 +332,7 @@ fn render_raw_sql(
             }
 
             let alter_table = format!(
-                "ALTER TABLE {} {};",
+                "ALTER TABLE {} {}",
                 renderer.quote_with_schema(&schema_name, &table.name),
                 lines.join(",\n")
             );
