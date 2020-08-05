@@ -7,6 +7,8 @@ use rust_decimal::{prelude::ToPrimitive, Decimal};
 use std::{borrow::Borrow, collections::HashSet, convert::TryFrom, sync::Arc};
 use uuid::Uuid;
 
+// todo: validate is one of!
+
 pub struct QueryDocumentParser;
 
 // Todo:
@@ -25,7 +27,11 @@ impl QueryDocumentParser {
         if selections.is_empty() {
             return Err(QueryParserError::ObjectValidationError {
                 object_name: schema_object.name().to_string(),
-                inner: Box::new(QueryParserError::AtLeastOneSelectionError),
+                inner: Box::new(QueryParserError::FieldCountError(FieldCountError::new(
+                    Some(1),
+                    None,
+                    0,
+                ))),
             });
         }
 
@@ -330,6 +336,17 @@ impl QueryDocumentParser {
                         tuples.extend(defaults.into_iter());
                         tuples.into_iter().collect()
                     })
+            })
+            .and_then(|map: ParsedInputMap| {
+                if schema_object.is_one_of && map.len() > 1 {
+                    Err(QueryParserError::FieldCountError(FieldCountError::new(
+                        None,
+                        Some(1),
+                        map.len(),
+                    )))
+                } else {
+                    Ok(map)
+                }
             })
             .map_err(|err| QueryParserError::ObjectValidationError {
                 object_name: schema_object.name.clone(),

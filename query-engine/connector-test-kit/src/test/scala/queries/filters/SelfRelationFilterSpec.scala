@@ -201,7 +201,7 @@ class SelfRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
                                                   }
                                                 }
                                               },
-                                           orderBy: { id: ASC }
+                                           orderBy: { id: asc }
                                             ) {
                                               title
                                             }
@@ -290,7 +290,7 @@ class SelfRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
 
     val filterGroupies = s"""query{humans(
                                           where: {fans_none: {}},
-                                           orderBy: { id: ASC }
+                                           orderBy: { id: asc }
                                             ) {
                                               name
                                             }
@@ -307,7 +307,7 @@ class SelfRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
   "Filter Queries along ManyToMany self relations" should "succeed with {} filter _every" taggedAs (IgnoreMongo) in {
     val filterGroupies = s"""query{humans(
                                           where: {fans_every: {}},
-                                           orderBy: { id: ASC }
+                                           orderBy: { id: asc }
                                             ) {
                                               name
                                             }
@@ -341,7 +341,7 @@ class SelfRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
 
     val filterSingers = s"""query{humans(
                                           where: {singer:{}},
-                                           orderBy: { id: ASC }
+                                           orderBy: { id: asc }
                                             ) {
                                               name
                                             }
@@ -354,7 +354,7 @@ class SelfRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
 
     val filterSingers = s"""query{humans(
                                           where: {singer: null},
-                                           orderBy: { id: ASC }
+                                           orderBy: { id: asc }
                                             ) {
                                               name
                                             }

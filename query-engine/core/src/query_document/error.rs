@@ -1,4 +1,5 @@
 use crate::{query_document::QueryValue, schema::InputType};
+use fmt::Display;
 use std::fmt;
 
 #[derive(Debug)]
@@ -7,7 +8,7 @@ pub enum QueryParserError {
     RequiredValueNotSetError,
     FieldNotFoundError,
     ArgumentNotFoundError,
-    AtLeastOneSelectionError,
+    FieldCountError(FieldCountError),
     ValueParseError(String),
     ValueTypeMismatchError {
         have: QueryValue,
@@ -25,6 +26,38 @@ pub enum QueryParserError {
         object_name: String,
         inner: Box<QueryParserError>,
     },
+}
+
+#[derive(Debug)]
+pub struct FieldCountError {
+    pub min: Option<usize>,
+    pub max: Option<usize>,
+    pub got: usize,
+}
+
+impl FieldCountError {
+    pub fn new(min: Option<usize>, max: Option<usize>, got: usize) -> Self {
+        Self { min, max, got }
+    }
+}
+
+impl Display for FieldCountError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match (self.min, self.max) {
+            (Some(min), Some(max)) => write!(
+                f,
+                "Expected a minimum of {} and at most {} fields to be present, got {}.",
+                min, max, self.got
+            ),
+            (Some(min), None) => write!(
+                f,
+                "Expected a minimum of {} fields to be present, got {}.",
+                min, self.got
+            ),
+            (None, Some(max)) => write!(f, "Expected at most {} fields to be present, got {}.", max, self.got),
+            (None, None) => write!(f, "Expected any selection of fields, got {}.", self.got),
+        }
+    }
 }
 
 impl QueryParserError {
@@ -79,7 +112,7 @@ impl QueryParserError {
             QueryParserError::RequiredValueNotSetError => "A value is required but not set.".into(),
             QueryParserError::FieldNotFoundError => "Field does not exist on enclosing type.".into(),
             QueryParserError::ArgumentNotFoundError => "Argument does not exist on enclosing type.".into(),
-            QueryParserError::AtLeastOneSelectionError => "At least one selection is required.".into(),
+            QueryParserError::FieldCountError(err) => format!("{}", err),
             QueryParserError::ValueParseError(reason) => format!("Error parsing value: {}.", reason),
             QueryParserError::ValueTypeMismatchError { have, want } => {
                 format!("Value types mismatch. Have: {:?}, want: {:?}", have, want)

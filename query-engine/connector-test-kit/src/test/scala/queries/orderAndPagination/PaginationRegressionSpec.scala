@@ -28,7 +28,7 @@ class PaginationRegressionSpec extends FlatSpec with Matchers with ApiSpecBase {
     val page1 = server.query(
       """
       |{
-      |  findManyModelB(take: 5, orderBy: { createdAt: DESC, id: ASC }) {
+      |  findManyModelB(take: 5, orderBy: [{ createdAt: desc}, { id: asc }]) {
       |    id
       |    createdAt
       |  }
@@ -44,7 +44,7 @@ class PaginationRegressionSpec extends FlatSpec with Matchers with ApiSpecBase {
     val page2 = server.query(
       """
         |{
-        |  findManyModelB(cursor: { id: "9505b8a9-45a1-4aae-a284-5bacfe9f835c" }, skip: 1, take: 5, orderBy: { createdAt: DESC, id: ASC } ) {
+        |  findManyModelB(cursor: { id: "9505b8a9-45a1-4aae-a284-5bacfe9f835c" }, skip: 1, take: 5, orderBy: [{ createdAt: desc}, { id: asc }] ) {
         |    id
         |    createdAt
         |  }
@@ -60,7 +60,7 @@ class PaginationRegressionSpec extends FlatSpec with Matchers with ApiSpecBase {
     val page3 = server.query(
       """
         |{
-        |  findManyModelB(cursor: { id: "3c0f269f-0796-427e-af67-8c1a99f3524d" }, skip: 1, take: 5, orderBy: { createdAt: DESC, id: ASC } ) {
+        |  findManyModelB(cursor: { id: "3c0f269f-0796-427e-af67-8c1a99f3524d" }, skip: 1, take: 5, orderBy: [{ createdAt: desc}, { id: asc }] ) {
         |    id
         |    createdAt
         |  }
@@ -76,7 +76,7 @@ class PaginationRegressionSpec extends FlatSpec with Matchers with ApiSpecBase {
     val page4 = server.query(
       """
         |{
-        |  findManyModelB(cursor: { id: "8c7a3864-285c-4f06-9c9a-273e19e19a05" }, skip: 1, take: 5, orderBy: { createdAt: DESC, id: ASC } ) {
+        |  findManyModelB(cursor: { id: "8c7a3864-285c-4f06-9c9a-273e19e19a05" }, skip: 1, take: 5, orderBy: [{ createdAt: desc}, { id: asc }] ) {
         |    id
         |    createdAt
         |  }

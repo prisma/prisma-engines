@@ -272,6 +272,7 @@ pub struct Argument {
 
 pub struct InputObjectType {
     pub name: String,
+
     /// If true this means that _exactly_ one of the contained fields must be specified in an incoming query.
     /// This allows clients to handle this input type in a special way and ensure this invariant in a typesafe way.
     pub is_one_of: bool,
@@ -311,6 +312,10 @@ impl InputObjectType {
     {
         let name = name.into();
         self.get_fields().into_iter().find(|f| f.name == name).cloned()
+    }
+
+    pub fn set_one_of(&mut self, one_of: bool) {
+        self.is_one_of = one_of;
     }
 }
 
