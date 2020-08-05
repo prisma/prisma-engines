@@ -423,7 +423,7 @@ fn render_create_index(
 ) -> String {
     let Index { name, columns, tpe } = index;
     let index_type = match tpe {
-        IndexType::Unique => "UNIQUE",
+        IndexType::Unique => "UNIQUE ",
         IndexType::Normal => "",
     };
     let sql_family = database_info.sql_family();
@@ -442,11 +442,11 @@ fn render_create_index(
     let columns = columns.iter().map(|c| renderer.quote(c));
 
     format!(
-        "CREATE {} INDEX {} ON {}({})",
-        index_type,
-        index_name,
-        table_reference,
-        columns.join(",")
+        "CREATE {index_type}INDEX {index_name} ON {table_reference}({columns})",
+        index_type = index_type,
+        index_name = index_name,
+        table_reference = table_reference,
+        columns = columns.join(", ")
     )
 }
 
