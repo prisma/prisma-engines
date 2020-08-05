@@ -129,5 +129,9 @@ pub(crate) fn many_records_arguments(ctx: &mut BuilderContext, model: &ModelRef)
 pub(crate) fn order_by_argument(ctx: &mut BuilderContext, model: &ModelRef) -> Argument {
     let object_type = input_types::order_by_object_type(ctx, model);
 
-    argument("orderBy", InputType::opt(InputType::object(object_type)), None)
+    argument(
+        "orderBy",
+        InputType::opt(InputType::list(InputType::object(object_type))),
+        None,
+    )
 }
