@@ -130,3 +130,25 @@ fn must_error_if_autoincrement_function_is_used_for_fields_that_are_not_int() {
         Span::new(70, 85),
     ));
 }
+
+#[test]
+fn must_error_if_default_value_for_enum_is_not_valid() {
+    let dml = r#"
+    model Model {
+        id Int @id
+        enum A @default(B)
+    }
+
+    enum A {
+        A
+    }
+    "#;
+
+    let errors = parse_error(dml);
+
+    errors.assert_is(DatamodelError::new_directive_validation_error(
+        "The defined defaultvalue is not a valid value of the enum specified for the field.",
+        "default",
+        Span::new(46, 65),
+    ));
+}

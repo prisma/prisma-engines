@@ -4,7 +4,9 @@ use crate::{
     configuration::PreviewFeatures,
     dml,
     error::{DatamodelError, ErrorCollection},
+    DefaultValue, EnumValue, FieldType,
 };
+use prisma_value::PrismaValue;
 use std::collections::HashSet;
 
 /// Helper for validating a datamodel.
@@ -72,6 +74,12 @@ impl<'a> Validator<'a> {
 
             if let Err(ref mut the_errors) =
                 self.validate_field_types(ast_schema.find_model(&model.name).expect(STATE_ERROR), model)
+            {
+                errors_for_model.append(the_errors);
+            }
+
+            if let Err(ref mut the_errors) =
+                self.validate_enum_default_values(schema, ast_schema.find_model(&model.name).expect(STATE_ERROR), model)
             {
                 errors_for_model.append(the_errors);
             }
@@ -260,6 +268,46 @@ impl<'a> Validator<'a> {
                         &field.name,
                         ast_field.span,
                     ));
+                }
+            }
+        }
+
+        if errors.has_errors() {
+            Err(errors)
+        } else {
+            Ok(())
+        }
+    }
+    fn validate_enum_default_values(
+        &self,
+        data_model: &dml::Datamodel,
+        ast_model: &ast::Model,
+        model: &dml::Model,
+    ) -> Result<(), ErrorCollection> {
+        let mut errors = ErrorCollection::new();
+
+        for field in model.scalar_fields() {
+            let ast_field = ast_model
+                .fields
+                .iter()
+                .find(|ast_field| ast_field.name.name == field.name)
+                .unwrap();
+
+            //enum defaults are valid enum values
+            if let Some(DefaultValue::Single(PrismaValue::Enum(enum_value))) = &field.default_value {
+                if let FieldType::Enum(enum_name) = &field.field_type {
+                    if let Some(dml_enum) = data_model.find_enum(&enum_name) {
+                        if !dml_enum.values.contains(&EnumValue::new(&enum_value)) {
+                            errors.push(DatamodelError::new_directive_validation_error(
+                                &format!(
+                                "{}",
+                                "The defined defaultvalue is not a valid value of the enum specified for the field."
+                            ),
+                                "default",
+                                ast_field.span,
+                            ))
+                        }
+                    }
                 }
             }
         }
