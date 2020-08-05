@@ -1,7 +1,7 @@
 use crate::*;
 use sql_renderer::{rendered_step::RenderedStep, IteratorJoin, Quoted, RenderedAlterColumn};
 use sql_schema_describer::*;
-use sql_schema_differ::{ColumnDiffer, DiffingOptions};
+use sql_schema_differ::ColumnDiffer;
 use sql_schema_helpers::{find_column, walk_columns, ColumnRef, SqlSchemaExt};
 use std::fmt::Write as _;
 use tracing_futures::Instrument;
@@ -250,7 +250,8 @@ fn render_raw_sql(
                             current_schema.table_ref(&table.name).unwrap().column(&name).unwrap(),
                             find_column(next_schema, &table.name, &column.name)
                                 .expect("Invariant violation: could not find column referred to in AlterColumn."),
-                            &DiffingOptions::from_database_info(database_info),
+                            &database_info,
+                            renderer,
                         ) {
                             Some(RenderedAlterColumn {
                                 alter_columns,
@@ -425,12 +426,14 @@ fn safe_alter_column(
     renderer: &dyn SqlFlavour,
     previous_column: ColumnRef<'_>,
     next_column: ColumnRef<'_>,
-    diffing_options: &DiffingOptions,
+    database_info: &DatabaseInfo,
+    flavour: &dyn SqlFlavour,
 ) -> Option<RenderedAlterColumn> {
     let differ = ColumnDiffer {
         previous: previous_column,
         next: next_column,
-        diffing_options,
+        database_info,
+        flavour,
     };
 
     renderer.render_alter_column(&differ)

@@ -7,7 +7,6 @@ use datamodel::*;
 use migration_connector::steps::MigrationStep;
 use migration_connector::*;
 use sql_schema_describer::*;
-use sql_schema_differ::DiffingOptions;
 
 pub struct SqlDatabaseMigrationInferrer<'a> {
     pub connector: &'a crate::SqlMigrationConnector,
@@ -107,12 +106,7 @@ fn infer_database_migration_steps_and_fix(
     database_info: &DatabaseInfo,
     flavour: &dyn SqlFlavour,
 ) -> SqlResult<(Vec<SqlMigrationStep>, Vec<SqlMigrationStep>)> {
-    let diff: SqlSchemaDiff = SqlSchemaDiffer::diff(
-        &from,
-        &to,
-        sql_family,
-        &DiffingOptions::from_database_info(database_info),
-    );
+    let diff: SqlSchemaDiff = SqlSchemaDiffer::diff(&from, &to, flavour, &database_info);
 
     let corrected_steps = if sql_family.is_sqlite() {
         sqlite::fix(diff, &from, &to, &schema_name, database_info, flavour)?
@@ -121,13 +115,7 @@ fn infer_database_migration_steps_and_fix(
     };
 
     Ok((
-        SqlSchemaDiffer::diff(
-            &from,
-            &to,
-            sql_family,
-            &DiffingOptions::from_database_info(database_info),
-        )
-        .into_steps(),
+        SqlSchemaDiffer::diff(&from, &to, flavour, &database_info).into_steps(),
         corrected_steps,
     ))
 }

@@ -1,10 +1,15 @@
 use super::column::ColumnDiffer;
 use crate::sql_schema_helpers::ForeignKeyRef;
-use crate::sql_schema_helpers::{ColumnRef, TableRef};
+use crate::{
+    database_info::DatabaseInfo,
+    flavour::SqlFlavour,
+    sql_schema_helpers::{ColumnRef, TableRef},
+};
 use sql_schema_describer::{Index, PrimaryKey};
 
 pub(crate) struct TableDiffer<'a> {
-    pub(crate) diffing_options: &'a super::DiffingOptions,
+    pub(crate) database_info: &'a DatabaseInfo,
+    pub(crate) flavour: &'a dyn SqlFlavour,
     pub(crate) previous: TableRef<'a>,
     pub(crate) next: TableRef<'a>,
 }
@@ -18,7 +23,8 @@ impl<'schema> TableDiffer<'schema> {
                     .map(|next_column| (previous_column, next_column))
             })
             .map(move |(previous, next)| ColumnDiffer {
-                diffing_options: self.diffing_options,
+                database_info: self.database_info,
+                flavour: self.flavour,
                 previous,
                 next,
             })

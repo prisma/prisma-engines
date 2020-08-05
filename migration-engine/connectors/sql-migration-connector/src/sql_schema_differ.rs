@@ -1,60 +1,25 @@
 mod column;
 mod enums;
 mod index;
+mod sql_schema_differ_flavour;
 mod table;
 
 pub(crate) use column::{ColumnChange, ColumnChanges, ColumnDiffer};
+pub(crate) use sql_schema_differ_flavour::SqlSchemaDifferFlavour;
 pub(crate) use table::TableDiffer;
 
 use crate::*;
 use enums::EnumDiffer;
-use once_cell::sync::Lazy;
-use regex::RegexSet;
 use sql_schema_describer::*;
 use sql_schema_helpers::ForeignKeyRef;
 use sql_schema_helpers::TableRef;
 
 #[derive(Debug)]
-pub(crate) struct DiffingOptions {
-    is_mariadb: bool,
-    sql_family: SqlFamily,
-    ignore_tables: &'static RegexSet,
-}
-
-impl DiffingOptions {
-    pub(crate) fn sql_family(&self) -> SqlFamily {
-        self.sql_family
-    }
-
-    pub(crate) fn from_database_info(database_info: &DatabaseInfo) -> Self {
-        DiffingOptions {
-            is_mariadb: database_info.is_mariadb(),
-            ignore_tables: match database_info.sql_family() {
-                SqlFamily::Postgres => &POSTGRES_IGNORED_TABLES,
-                _ => &EMPTY_REGEXSET,
-            },
-            sql_family: database_info.sql_family(),
-        }
-    }
-}
-
-#[cfg(test)]
-impl Default for DiffingOptions {
-    fn default() -> Self {
-        DiffingOptions {
-            is_mariadb: false,
-            ignore_tables: &EMPTY_REGEXSET,
-            sql_family: SqlFamily::Postgres,
-        }
-    }
-}
-
-#[derive(Debug)]
 pub struct SqlSchemaDiffer<'a> {
     previous: &'a SqlSchema,
     next: &'a SqlSchema,
-    sql_family: SqlFamily,
-    diffing_options: &'a DiffingOptions,
+    database_info: &'a DatabaseInfo,
+    flavour: &'a dyn SqlFlavour,
 }
 
 #[derive(Debug, Clone)]
@@ -99,14 +64,14 @@ impl<'schema> SqlSchemaDiffer<'schema> {
     pub(crate) fn diff(
         previous: &SqlSchema,
         next: &SqlSchema,
-        sql_family: SqlFamily,
-        options: &DiffingOptions,
+        flavour: &dyn SqlFlavour,
+        database_info: &DatabaseInfo,
     ) -> SqlSchemaDiff {
         let differ = SqlSchemaDiffer {
             previous,
             next,
-            sql_family,
-            diffing_options: &options,
+            flavour,
+            database_info,
         };
         differ.diff_internal()
     }
@@ -305,7 +270,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
             for index in tables.dropped_indexes() {
                 // On MySQL, foreign keys automatically create indexes. These foreign-key-created
                 // indexes should only be dropped as part of the foreign key.
-                if self.sql_family.is_mysql() && index::index_covers_fk(&tables.previous.table, index) {
+                if self.flavour.sql_family().is_mysql() && index::index_covers_fk(&tables.previous.table, index) {
                     continue;
                 }
                 drop_indexes.push(DropIndex {
@@ -364,7 +329,8 @@ impl<'schema> SqlSchemaDiffer<'schema> {
                 .iter()
                 .find(move |next_table| tables_match(previous_table, next_table))
                 .map(move |next_table| TableDiffer {
-                    diffing_options: &self.diffing_options,
+                    flavour: self.flavour,
+                    database_info: self.database_info,
                     previous: TableRef::new(self.previous, previous_table),
                     next: TableRef::new(self.next, next_table),
                 })
@@ -414,7 +380,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
     }
 
     fn table_is_ignored(&self, table_name: &str) -> bool {
-        table_name == MIGRATION_TABLE_NAME || self.diffing_options.ignore_tables.is_match(&table_name)
+        table_name == MIGRATION_TABLE_NAME || self.flavour.table_should_be_ignored(&table_name)
     }
 
     fn enum_pairs(&self) -> impl Iterator<Item = EnumDiffer<'_>> {
@@ -505,14 +471,3 @@ fn tables_match(previous: &Table, next: &Table) -> bool {
 fn enums_match(previous: &Enum, next: &Enum) -> bool {
     previous.name == next.name
 }
-
-static POSTGRES_IGNORED_TABLES: Lazy<RegexSet> = Lazy::new(|| {
-    RegexSet::new(&[
-        // PostGIS. Reference: https://postgis.net/docs/manual-1.4/ch04.html#id418599
-        "(?i)^spatial_ref_sys$",
-        "(?i)^geometry_columns$",
-    ])
-    .unwrap()
-});
-
-static EMPTY_REGEXSET: Lazy<RegexSet> = Lazy::new(|| RegexSet::new::<_, &&str>(&[]).unwrap());

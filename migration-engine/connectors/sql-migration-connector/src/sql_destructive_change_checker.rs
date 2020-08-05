@@ -8,9 +8,8 @@ mod warning_check;
 pub(crate) use destructive_change_checker_flavour::DestructiveChangeCheckerFlavour;
 
 use crate::{
-    sql_schema_differ::{ColumnDiffer, DiffingOptions},
-    sql_schema_helpers::SqlSchemaExt,
-    AddColumn, Component, DropColumn, DropTable, SqlMigration, SqlMigrationStep, SqlResult, TableChange,
+    sql_schema_differ::ColumnDiffer, sql_schema_helpers::SqlSchemaExt, AddColumn, Component, DropColumn, DropTable,
+    SqlMigration, SqlMigrationStep, SqlResult, TableChange,
 };
 use destructive_check_plan::DestructiveCheckPlan;
 use migration_connector::{ConnectorResult, DestructiveChangeChecker, DestructiveChangeDiagnostics};
@@ -111,12 +110,11 @@ impl SqlDestructiveChangeChecker<'_> {
                                         .column(&alter_column.name)
                                         .expect("unsupported column renaming");
 
-                                    let diffing_options = DiffingOptions::from_database_info(self.database_info());
-
                                     let differ = ColumnDiffer {
-                                        diffing_options: &diffing_options,
+                                        database_info: self.database_info(),
                                         previous: previous_column,
                                         next: next_column,
+                                        flavour: self.flavour(),
                                     };
 
                                     self.flavour().check_alter_column(&differ, &mut plan)

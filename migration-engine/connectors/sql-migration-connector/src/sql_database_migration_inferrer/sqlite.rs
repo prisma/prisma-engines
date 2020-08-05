@@ -3,7 +3,7 @@ use crate::{
     flavour::SqlFlavour,
     sql_migration::*,
     sql_renderer::Quoted,
-    sql_schema_differ::{ColumnDiffer, DiffingOptions, SqlSchemaDiff, TableDiffer},
+    sql_schema_differ::{ColumnDiffer, SqlSchemaDiff, TableDiffer},
     sql_schema_helpers::{SqlSchemaExt, TableRef},
     SqlResult,
 };
@@ -134,12 +134,11 @@ fn fix_table(
         table: temporary_table.clone(),
     }));
 
-    let diffing_options = DiffingOptions::from_database_info(database_info);
-
     copy_current_table_into_new_table(
         &mut result,
         TableDiffer {
-            diffing_options: &diffing_options,
+            flavour,
+            database_info,
             previous: current,
             next: TableRef::new(next.schema, &temporary_table),
         },
