@@ -132,9 +132,9 @@ fn infer_database_migration_steps_and_fix(
     ))
 }
 
-pub fn wrap_as_step<T, F>(steps: Vec<T>, mut wrap_fn: F) -> impl Iterator<Item = SqlMigrationStep>
+pub fn wrap_as_step<T, F>(steps: Vec<T>, wrap_fn: F) -> impl Iterator<Item = SqlMigrationStep>
 where
-    F: FnMut(T) -> SqlMigrationStep,
+    F: Fn(T) -> SqlMigrationStep,
 {
-    steps.into_iter().map(move |x| wrap_fn(x))
+    steps.into_iter().map(wrap_fn)
 }

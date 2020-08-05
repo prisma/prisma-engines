@@ -73,3 +73,18 @@ async fn sqlite_must_recreate_multi_field_indexes(api: &TestApi) -> TestResult {
 
     Ok(())
 }
+
+// This is necessary because of how INTEGER PRIMARY KEY works on SQLite. This has already caused problems.
+#[test_each_connector(log = "debug,sql_schema_describer=info", tags("sqlite"))]
+async fn creating_a_model_with_a_non_autoincrement_id_column_is_idempotent(api: &TestApi) -> TestResult {
+    let dm = r#"
+        model Cat {
+            id  Int @id
+        }
+    "#;
+
+    api.infer_apply(dm).send().await?.assert_green()?;
+    api.infer_apply(dm).send().await?.assert_green()?.assert_no_steps()?;
+
+    Ok(())
+}
