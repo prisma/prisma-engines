@@ -1,7 +1,7 @@
 use crate::*;
 use sql_renderer::{rendered_step::RenderedStep, IteratorJoin, Quoted, RenderedAlterColumn};
 use sql_schema_describer::*;
-use sql_schema_differ::ColumnDiffer;
+use sql_schema_differ::{ColumnDiffer, SqlSchemaDiffer};
 use sql_schema_helpers::{find_column, walk_columns, ColumnRef, SqlSchemaExt};
 use std::fmt::Write as _;
 use tracing_futures::Instrument;
@@ -125,8 +125,15 @@ fn render_raw_sql(
 ) -> Result<Vec<String>, anyhow::Error> {
     let sql_family = renderer.sql_family();
     let schema_name = database_info.connection_info().schema_name().to_string();
+    let differ = SqlSchemaDiffer {
+        previous: current_schema,
+        next: next_schema,
+        database_info,
+        flavour: renderer,
+    };
 
     match step {
+        SqlMigrationStep::RedefineTables { names } => Ok(renderer.render_redefine_tables(names, differ, database_info)),
         SqlMigrationStep::CreateEnum(create_enum) => Ok(renderer.render_create_enum(create_enum)),
         SqlMigrationStep::DropEnum(drop_enum) => Ok(renderer.render_drop_enum(drop_enum)),
         SqlMigrationStep::AlterEnum(alter_enum) => match renderer.sql_family() {
@@ -138,7 +145,12 @@ fn render_raw_sql(
             // FIXME Temporary hack: we should be passing a TableRef, but this is not
             // possible because we sometimes create temporary tables in the
             // SQLite table redefinition process.
-            renderer.render_create_table(table, &schema_name, next_schema, sql_family)
+            Ok(vec![renderer.render_create_table(
+                table,
+                &schema_name,
+                next_schema,
+                sql_family,
+            )?])
         }
         SqlMigrationStep::DropTable(DropTable { name }) => match sql_family {
             SqlFamily::Mysql | SqlFamily::Postgres => Ok(vec![format!(
@@ -304,9 +316,13 @@ fn render_raw_sql(
 
             Ok(statements)
         }
-        SqlMigrationStep::CreateIndex(CreateIndex { table, index }) => {
-            Ok(vec![render_create_index(renderer, database_info, table, index)])
-        }
+        SqlMigrationStep::CreateIndex(CreateIndex { table, index }) => Ok(vec![render_create_index(
+            renderer,
+            database_info.connection_info().schema_name(),
+            table,
+            index,
+            database_info.sql_family(),
+        )]),
         SqlMigrationStep::DropIndex(DropIndex { table, name }) => match sql_family {
             SqlFamily::Mysql => Ok(vec![format!(
                 "DROP INDEX {} ON {}",
@@ -351,7 +367,13 @@ fn render_raw_sql(
 
                     // Order matters: dropping the old index first wouldn't work when foreign key constraints are still relying on it.
                     Ok(vec![
-                        render_create_index(renderer, database_info, table, &new_index),
+                        render_create_index(
+                            renderer,
+                            database_info.connection_info().schema_name(),
+                            table,
+                            &new_index,
+                            sql_family,
+                        ),
                         mysql_drop_index(renderer, &schema_name, table, index_name)?,
                     ])
                 } else {
@@ -370,33 +392,29 @@ fn render_raw_sql(
             )]),
             SqlFamily::Sqlite => unimplemented!("Index renaming on SQLite."),
         },
-        SqlMigrationStep::RawSql { raw } => Ok(vec![raw.to_owned()]),
+        // SqlMigrationStep::RawSql { raw } => Ok(vec![raw.to_owned()]),
     }
 }
 
-fn render_create_index(
+pub(crate) fn render_create_index(
     renderer: &dyn SqlFlavour,
-    database_info: &DatabaseInfo,
+    schema_name: &str,
     table_name: &str,
     index: &Index,
+    sql_family: SqlFamily,
 ) -> String {
     let Index { name, columns, tpe } = index;
     let index_type = match tpe {
         IndexType::Unique => "UNIQUE ",
         IndexType::Normal => "",
     };
-    let sql_family = database_info.sql_family();
     let index_name = match sql_family {
-        SqlFamily::Sqlite => renderer
-            .quote_with_schema(database_info.connection_info().schema_name(), &name)
-            .to_string(),
+        SqlFamily::Sqlite => renderer.quote_with_schema(schema_name, &name).to_string(),
         _ => renderer.quote(&name).to_string(),
     };
     let table_reference = match sql_family {
         SqlFamily::Sqlite => renderer.quote(table_name).to_string(),
-        _ => renderer
-            .quote_with_schema(database_info.connection_info().schema_name(), table_name)
-            .to_string(),
+        _ => renderer.quote_with_schema(schema_name, table_name).to_string(),
     };
     let columns = columns.iter().map(|c| renderer.quote(c));
 

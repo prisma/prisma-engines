@@ -1,15 +1,16 @@
 use super::{common::*, RenderedAlterColumn, SqlRenderer};
 use crate::{
+    database_info::DatabaseInfo,
     expanded_alter_column::{expand_mysql_alter_column, MysqlAlterColumn},
     flavour::{MysqlFlavour, SqlFlavour},
-    sql_schema_differ::{ColumnChanges, ColumnDiffer},
+    sql_schema_differ::{ColumnChanges, ColumnDiffer, SqlSchemaDiffer},
     sql_schema_helpers::ColumnRef,
 };
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
 use regex::Regex;
 use sql_schema_describer::*;
-use std::borrow::Cow;
+use std::{borrow::Cow, collections::HashSet};
 
 const VARCHAR_LENGTH_PREFIX: &str = "(191)";
 
@@ -104,6 +105,15 @@ impl SqlRenderer for MysqlFlavour {
 
     fn render_drop_enum(&self, _drop_enum: &crate::DropEnum) -> Vec<String> {
         Vec::new()
+    }
+
+    fn render_redefine_tables(
+        &self,
+        _names: &HashSet<String>,
+        _differ: SqlSchemaDiffer<'_>,
+        _database_info: &DatabaseInfo,
+    ) -> Vec<String> {
+        unreachable!("render_redefine_table on MySQL")
     }
 }
 

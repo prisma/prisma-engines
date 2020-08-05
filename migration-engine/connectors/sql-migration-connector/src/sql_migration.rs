@@ -3,6 +3,7 @@ pub(crate) mod expanded_alter_column;
 use migration_connector::DatabaseMigrationMarker;
 use serde::{Deserialize, Serialize};
 use sql_schema_describer::{Column, ForeignKey, Index, SqlSchema, Table};
+use std::collections::HashSet;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct SqlMigration {
@@ -42,7 +43,8 @@ pub enum SqlMigrationStep {
     DropForeignKey(DropForeignKey),
     DropTable(DropTable),
     RenameTable { name: String, new_name: String },
-    RawSql { raw: String },
+    RedefineTables { names: HashSet<String> },
+    // RawSql { raw: String },
     CreateIndex(CreateIndex),
     DropIndex(DropIndex),
     AlterIndex(AlterIndex),
@@ -145,4 +147,9 @@ impl AlterEnum {
     pub(crate) fn is_empty(&self) -> bool {
         self.created_variants.is_empty() && self.dropped_variants.is_empty()
     }
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
+pub struct RedefineTable {
+    pub name: String,
 }

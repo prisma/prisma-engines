@@ -1,4 +1,4 @@
-mod sqlite;
+// mod sqlite;
 
 use crate::sql_schema_calculator::SqlSchemaCalculator;
 use crate::sql_schema_differ::{SqlSchemaDiff, SqlSchemaDiffer};
@@ -32,8 +32,6 @@ impl DatabaseMigrationInferrer<SqlMigration> for SqlDatabaseMigrationInferrer<'_
             infer(
                 &current_database_schema,
                 &expected_database_schema,
-                self.schema_name(),
-                self.sql_family(),
                 self.database_info(),
                 self.flavour(),
             )
@@ -54,8 +52,6 @@ impl DatabaseMigrationInferrer<SqlMigration> for SqlDatabaseMigrationInferrer<'_
             infer(
                 &current_database_schema,
                 &expected_database_schema,
-                self.schema_name(),
-                self.sql_family(),
                 self.database_info(),
                 self.flavour(),
             )
@@ -68,24 +64,18 @@ impl DatabaseMigrationInferrer<SqlMigration> for SqlDatabaseMigrationInferrer<'_
 fn infer(
     current_database_schema: &SqlSchema,
     expected_database_schema: &SqlSchema,
-    schema_name: &str,
-    sql_family: SqlFamily,
     database_info: &DatabaseInfo,
     flavour: &dyn SqlFlavour,
 ) -> SqlResult<SqlMigration> {
     let (original_steps, corrected_steps) = infer_database_migration_steps_and_fix(
         &current_database_schema,
         &expected_database_schema,
-        &schema_name,
-        sql_family,
         database_info,
         flavour,
     )?;
     let (_, rollback) = infer_database_migration_steps_and_fix(
         &expected_database_schema,
         &current_database_schema,
-        &schema_name,
-        sql_family,
         database_info,
         flavour,
     )?;
@@ -101,22 +91,20 @@ fn infer(
 fn infer_database_migration_steps_and_fix(
     from: &SqlSchema,
     to: &SqlSchema,
-    schema_name: &str,
-    sql_family: SqlFamily,
     database_info: &DatabaseInfo,
     flavour: &dyn SqlFlavour,
 ) -> SqlResult<(Vec<SqlMigrationStep>, Vec<SqlMigrationStep>)> {
     let diff: SqlSchemaDiff = SqlSchemaDiffer::diff(&from, &to, flavour, &database_info);
 
-    let corrected_steps = if sql_family.is_sqlite() {
-        sqlite::fix(diff, &from, &to, &schema_name, database_info, flavour)?
-    } else {
-        diff.into_steps()
-    };
+    // let corrected_steps = if sql_family.is_sqlite() {
+    //     sqlite::fix(diff, &from, &to, &schema_name, database_info, flavour)?
+    // } else {
+    //     diff.into_steps()
+    // };
 
     Ok((
         SqlSchemaDiffer::diff(&from, &to, flavour, &database_info).into_steps(),
-        corrected_steps,
+        diff.into_steps(),
     ))
 }
 

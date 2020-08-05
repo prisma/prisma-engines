@@ -13,13 +13,14 @@ use enums::EnumDiffer;
 use sql_schema_describer::*;
 use sql_schema_helpers::ForeignKeyRef;
 use sql_schema_helpers::TableRef;
+use std::collections::HashSet;
 
 #[derive(Debug)]
-pub struct SqlSchemaDiffer<'a> {
-    previous: &'a SqlSchema,
-    next: &'a SqlSchema,
-    database_info: &'a DatabaseInfo,
-    flavour: &'a dyn SqlFlavour,
+pub(crate) struct SqlSchemaDiffer<'a> {
+    pub(crate) previous: &'a SqlSchema,
+    pub(crate) next: &'a SqlSchema,
+    pub(crate) database_info: &'a DatabaseInfo,
+    pub(crate) flavour: &'a dyn SqlFlavour,
 }
 
 #[derive(Debug, Clone)]
@@ -35,18 +36,24 @@ pub struct SqlSchemaDiff {
     pub create_enums: Vec<CreateEnum>,
     pub drop_enums: Vec<DropEnum>,
     pub alter_enums: Vec<AlterEnum>,
+    pub tables_to_redefine: HashSet<String>,
 }
 
 impl SqlSchemaDiff {
     /// Translate the diff into steps that should be executed in order. The general idea in the
     /// ordering of steps is to drop obsolete constraints first, alter/create tables, then add the new constraints.
     pub fn into_steps(self) -> Vec<SqlMigrationStep> {
+        let redefine_tables = Some(self.tables_to_redefine)
+            .filter(|tables| !tables.is_empty())
+            .map(|names| SqlMigrationStep::RedefineTables { names });
+
         wrap_as_step(self.create_enums, SqlMigrationStep::CreateEnum)
             .chain(wrap_as_step(self.alter_enums, SqlMigrationStep::AlterEnum))
             .chain(wrap_as_step(self.drop_indexes, SqlMigrationStep::DropIndex))
             .chain(wrap_as_step(self.drop_foreign_keys, SqlMigrationStep::DropForeignKey))
             .chain(wrap_as_step(self.create_tables, SqlMigrationStep::CreateTable))
             .chain(wrap_as_step(self.alter_tables, SqlMigrationStep::AlterTable))
+            .chain(redefine_tables.into_iter())
             // Order matters: we must create indexes after ALTER TABLEs because the indexes can be
             // on fields that are dropped/created there.
             .chain(wrap_as_step(self.create_indexes, SqlMigrationStep::CreateIndex))
@@ -77,22 +84,24 @@ impl<'schema> SqlSchemaDiffer<'schema> {
     }
 
     fn diff_internal(&self) -> SqlSchemaDiff {
-        let alter_indexes: Vec<_> = self.alter_indexes();
+        let tables_to_redefine = self.flavour.tables_to_redefine(&self);
+        let alter_indexes: Vec<_> = self.alter_indexes(&tables_to_redefine);
         let (drop_tables, mut drop_foreign_keys) = self.drop_tables();
-        self.drop_foreign_keys(&mut drop_foreign_keys);
+        self.drop_foreign_keys(&mut drop_foreign_keys, &tables_to_redefine);
 
         SqlSchemaDiff {
-            add_foreign_keys: self.add_foreign_keys(),
+            add_foreign_keys: self.add_foreign_keys(&tables_to_redefine),
             drop_foreign_keys,
             drop_tables,
             create_tables: self.create_tables(),
-            alter_tables: self.alter_tables(),
-            create_indexes: self.create_indexes(),
+            alter_tables: self.alter_tables(&tables_to_redefine),
+            create_indexes: self.create_indexes(&tables_to_redefine),
             drop_indexes: self.drop_indexes(),
             alter_indexes,
             create_enums: self.create_enums(),
             drop_enums: self.drop_enums(),
             alter_enums: self.alter_enums(),
+            tables_to_redefine,
         }
     }
 
@@ -137,17 +146,21 @@ impl<'schema> SqlSchemaDiffer<'schema> {
         (dropped_tables, dropped_foreign_keys)
     }
 
-    fn add_foreign_keys(&self) -> Vec<AddForeignKey> {
+    fn add_foreign_keys(&self, tables_to_redefine: &HashSet<String>) -> Vec<AddForeignKey> {
         let mut add_foreign_keys = Vec::new();
+        let table_pairs = self
+            .table_pairs()
+            .filter(|tables| !tables_to_redefine.contains(tables.next.name()));
 
         push_foreign_keys_from_created_tables(&mut add_foreign_keys, self.created_tables());
-        push_created_foreign_keys(&mut add_foreign_keys, self.table_pairs());
+        push_created_foreign_keys(&mut add_foreign_keys, table_pairs);
 
         add_foreign_keys
     }
 
-    fn alter_tables(&self) -> Vec<AlterTable> {
+    fn alter_tables(&self, tables_to_redefine: &HashSet<String>) -> Vec<AlterTable> {
         self.table_pairs()
+            .filter(|tables| !tables_to_redefine.contains(tables.next.name()))
             .filter_map(|tables| {
                 // Order matters.
                 let changes: Vec<TableChange> = Self::drop_primary_key(&tables)
@@ -203,8 +216,15 @@ impl<'schema> SqlSchemaDiffer<'schema> {
         })
     }
 
-    fn drop_foreign_keys<'a>(&'a self, drop_foreign_keys: &mut Vec<DropForeignKey>) {
-        for differ in self.table_pairs() {
+    fn drop_foreign_keys<'a>(
+        &'a self,
+        drop_foreign_keys: &mut Vec<DropForeignKey>,
+        tables_to_redefine: &HashSet<String>,
+    ) {
+        for differ in self
+            .table_pairs()
+            .filter(|tables| !tables_to_redefine.contains(tables.next.name()))
+        {
             let table_name = differ.previous.name();
             for dropped_foreign_key_name in differ
                 .dropped_foreign_keys()
@@ -233,10 +253,10 @@ impl<'schema> SqlSchemaDiffer<'schema> {
         })
     }
 
-    fn create_indexes(&self) -> Vec<CreateIndex> {
+    fn create_indexes(&self, tables_to_redefine: &HashSet<String>) -> Vec<CreateIndex> {
         let mut steps = Vec::new();
 
-        if !self.sql_family.is_mysql() {
+        if !self.database_info.sql_family().is_mysql() {
             for table in self.created_tables() {
                 for index in &table.indices {
                     let create = CreateIndex {
@@ -249,7 +269,10 @@ impl<'schema> SqlSchemaDiffer<'schema> {
             }
         }
 
-        for tables in self.table_pairs() {
+        for tables in self
+            .table_pairs()
+            .filter(|tables| !tables_to_redefine.contains(tables.next.name()))
+        {
             for index in tables.created_indexes() {
                 let create = CreateIndex {
                     table: tables.next.name().to_owned(),
@@ -337,17 +360,20 @@ impl<'schema> SqlSchemaDiffer<'schema> {
         })
     }
 
-    fn alter_indexes(&self) -> Vec<AlterIndex> {
+    fn alter_indexes(&self, tables_to_redefine: &HashSet<String>) -> Vec<AlterIndex> {
         let mut alter_indexes = Vec::new();
-        self.table_pairs().for_each(|differ| {
-            differ.index_pairs().for_each(|(previous_index, renamed_index)| {
-                alter_indexes.push(AlterIndex {
-                    index_name: previous_index.name.clone(),
-                    index_new_name: renamed_index.name.clone(),
-                    table: differ.next.name().to_owned(),
+
+        self.table_pairs()
+            .filter(|tables| !tables_to_redefine.contains(tables.next.name()))
+            .for_each(|differ| {
+                differ.index_pairs().for_each(|(previous_index, renamed_index)| {
+                    alter_indexes.push(AlterIndex {
+                        index_name: previous_index.name.clone(),
+                        index_new_name: renamed_index.name.clone(),
+                        table: differ.next.name().to_owned(),
+                    })
                 })
-            })
-        });
+            });
 
         alter_indexes
     }

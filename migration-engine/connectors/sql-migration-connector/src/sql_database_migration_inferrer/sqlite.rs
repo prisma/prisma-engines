@@ -122,7 +122,7 @@ fn fix_table(
     database_info: &DatabaseInfo,
     flavour: &dyn SqlFlavour,
 ) -> Vec<SqlMigrationStep> {
-    // based on 'Making Other Kinds Of Table Schema Changes' from https://www.sqlite.org/lang_altertable.html
+    // Based on 'Making Other Kinds Of Table Schema Changes' from https://www.sqlite.org/lang_altertable.html
     let name_of_temporary_table = format!("new_{}", &next.name());
     let mut temporary_table = next.table.clone();
     temporary_table.name = name_of_temporary_table.clone();

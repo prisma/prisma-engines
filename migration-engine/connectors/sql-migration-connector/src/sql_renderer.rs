@@ -7,10 +7,15 @@ mod sqlite_renderer;
 
 pub(crate) use common::{IteratorJoin, Quoted, QuotedWithSchema};
 
-use crate::{sql_schema_differ::ColumnDiffer, sql_schema_helpers::ColumnRef, CreateEnum, DropEnum};
+use crate::{
+    database_info::DatabaseInfo,
+    sql_schema_differ::{ColumnDiffer, SqlSchemaDiffer},
+    sql_schema_helpers::ColumnRef,
+    CreateEnum, DropEnum,
+};
 use quaint::prelude::SqlFamily;
 use sql_schema_describer::*;
-use std::{borrow::Cow, fmt::Write};
+use std::{borrow::Cow, collections::HashSet, fmt::Write};
 
 pub(crate) trait SqlRenderer {
     fn quote<'a>(&self, name: &'a str) -> Quoted<&'a str>;
@@ -44,7 +49,7 @@ pub(crate) trait SqlRenderer {
         schema_name: &str,
         next_schema: &SqlSchema,
         sql_family: SqlFamily,
-    ) -> anyhow::Result<Vec<String>> {
+    ) -> anyhow::Result<String> {
         let columns: String = table
             .columns
             .iter()
@@ -111,11 +116,19 @@ pub(crate) trait SqlRenderer {
 
         create_table.push_str(create_table_suffix(sql_family));
 
-        Ok(vec![create_table])
+        Ok(create_table)
     }
 
     /// Render a `DropEnum` step.
     fn render_drop_enum(&self, drop_enum: &DropEnum) -> Vec<String>;
+
+    /// Render a `RedefineTables` step.
+    fn render_redefine_tables(
+        &self,
+        tables: &HashSet<String>,
+        differ: SqlSchemaDiffer<'_>,
+        database_info: &DatabaseInfo,
+    ) -> Vec<String>;
 }
 
 #[derive(Default)]

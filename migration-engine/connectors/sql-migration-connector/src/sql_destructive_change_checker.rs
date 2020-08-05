@@ -8,8 +8,9 @@ mod warning_check;
 pub(crate) use destructive_change_checker_flavour::DestructiveChangeCheckerFlavour;
 
 use crate::{
-    sql_schema_differ::ColumnDiffer, sql_schema_helpers::SqlSchemaExt, AddColumn, Component, DropColumn, DropTable,
-    SqlMigration, SqlMigrationStep, SqlResult, TableChange,
+    sql_schema_differ::{ColumnDiffer, TableDiffer},
+    sql_schema_helpers::{find_column, ColumnRef, SqlSchemaExt},
+    Component, DropTable, SqlMigration, SqlMigrationStep, SqlResult, TableChange,
 };
 use destructive_check_plan::DestructiveCheckPlan;
 use migration_connector::{ConnectorResult, DestructiveChangeChecker, DestructiveChangeDiagnostics};
@@ -46,15 +47,10 @@ impl SqlDestructiveChangeChecker<'_> {
     }
 
     /// Emit a warning when we drop a column that contains non-null values.
-    fn check_column_drop(
-        &self,
-        drop_column: &DropColumn,
-        table: &sql_schema_describer::Table,
-        plan: &mut DestructiveCheckPlan,
-    ) {
+    fn check_column_drop(&self, column: &ColumnRef<'_>, plan: &mut DestructiveCheckPlan) {
         plan.push_warning(SqlMigrationWarningCheck::NonEmptyColumnDrop {
-            table: table.name.clone(),
-            column: drop_column.name.clone(),
+            table: column.table().name().to_owned(),
+            column: column.name().to_owned(),
         });
     }
 
@@ -63,14 +59,8 @@ impl SqlDestructiveChangeChecker<'_> {
     /// - There are existing rows
     /// - The new column is required
     /// - There is no default value for the new column
-    fn check_add_column(
-        &self,
-        add_column: &AddColumn,
-        table: &sql_schema_describer::Table,
-        plan: &mut DestructiveCheckPlan,
-    ) {
-        let column_is_required_without_default =
-            add_column.column.tpe.arity.is_required() && add_column.column.default.is_none();
+    fn check_add_column(&self, column: &ColumnRef<'_>, plan: &mut DestructiveCheckPlan) {
+        let column_is_required_without_default = column.is_required() && column.default().is_none();
 
         // Optional columns and columns with a default can safely be added.
         if !column_is_required_without_default {
@@ -78,8 +68,8 @@ impl SqlDestructiveChangeChecker<'_> {
         }
 
         let typed_unexecutable = UnexecutableStepCheck::AddedRequiredFieldToTable {
-            column: add_column.column.name.clone(),
-            table: table.name.clone(),
+            column: column.name().to_owned(),
+            table: column.table().name().to_owned(),
         };
 
         plan.push_unexecutable(typed_unexecutable);
@@ -100,7 +90,10 @@ impl SqlDestructiveChangeChecker<'_> {
                         for change in &alter_table.changes {
                             match *change {
                                 TableChange::DropColumn(ref drop_column) => {
-                                    self.check_column_drop(drop_column, &before_table.table, &mut plan)
+                                    let column = find_column(before, &alter_table.table.name, &drop_column.name)
+                                        .expect("Dropping of unknown column.");
+
+                                    self.check_column_drop(&column, &mut plan);
                                 }
                                 TableChange::AlterColumn(ref alter_column) => {
                                     let previous_column = before_table
@@ -120,7 +113,10 @@ impl SqlDestructiveChangeChecker<'_> {
                                     self.flavour().check_alter_column(&differ, &mut plan)
                                 }
                                 TableChange::AddColumn(ref add_column) => {
-                                    self.check_add_column(add_column, &before_table.table, &mut plan)
+                                    let column = find_column(after, after_table.name(), &add_column.column.name)
+                                        .expect("Could not find column in AddColumn");
+
+                                    self.check_add_column(&column, &mut plan)
                                 }
                                 TableChange::DropPrimaryKey { .. } => {
                                     plan.push_warning(SqlMigrationWarningCheck::PrimaryKeyChange {
@@ -129,6 +125,34 @@ impl SqlDestructiveChangeChecker<'_> {
                                 }
                                 _ => (),
                             }
+                        }
+                    }
+                }
+                SqlMigrationStep::RedefineTables { names } => {
+                    for name in names {
+                        let previous = before.table_ref(&name).expect("Redefining unknown table.");
+                        let next = after.table_ref(&name).expect("Redefining unknown table.");
+                        let differ = TableDiffer {
+                            database_info: self.database_info(),
+                            flavour: self.flavour(),
+                            previous,
+                            next,
+                        };
+
+                        if let Some(_) = differ.dropped_primary_key() {
+                            plan.push_warning(SqlMigrationWarningCheck::PrimaryKeyChange { table: name.clone() })
+                        }
+
+                        for added_column in differ.added_columns() {
+                            self.check_add_column(&added_column, &mut plan);
+                        }
+
+                        for dropped_column in differ.dropped_columns() {
+                            self.check_column_drop(&dropped_column, &mut plan);
+                        }
+
+                        for columns in differ.column_pairs() {
+                            self.flavour().check_alter_column(&columns, &mut plan);
                         }
                     }
                 }
