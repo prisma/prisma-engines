@@ -10,7 +10,7 @@ use prisma_models::{RelationFieldRef, ScalarFieldRef};
 
 /// Builds "<Model>OrderByInput" object types.
 pub(crate) fn order_by_object_type(ctx: &mut BuilderContext, model: &ModelRef) -> InputObjectTypeWeakRef {
-    let enum_type = Arc::new(string_enum_type("SortOrder", vec!["ASC".to_owned(), "DESC".to_owned()]));
+    let enum_type = Arc::new(string_enum_type("SortOrder", vec!["asc".to_owned(), "desc".to_owned()]));
     let name = format!("{}OrderByInput", model.name);
 
     return_cached_input!(ctx, &name);
