@@ -63,7 +63,7 @@ class NestedMultiOrderPaginationSpec extends FlatSpec with Matchers with ApiSpec
           |query {
           |  findManyTestModel {
           |    id
-          |    related(take: 1, orderBy: { fieldA: DESC, fieldB: ASC, fieldC: ASC, fieldD: DESC }) {
+          |    related(take: 1, orderBy: [{ fieldA: desc }, {fieldB: asc }, { fieldC: asc }, { fieldD: desc }]) {
           |      id
           |    }
           |  }
@@ -73,7 +73,7 @@ class NestedMultiOrderPaginationSpec extends FlatSpec with Matchers with ApiSpec
         legacy = false
       )
 
-    // Ordered: DESC, ASC, ASC, DESC
+    // Ordered: desc, ASC, ASC, DESC
     // 1 => 2 B B B B <- take
     // 1 => 1 A B C D
     // 2 => 3 B A B B <- take
@@ -90,7 +90,7 @@ class NestedMultiOrderPaginationSpec extends FlatSpec with Matchers with ApiSpec
           |query {
           |  findManyTestModel {
           |    id
-          |    related(take: -1, orderBy: { fieldA: DESC, fieldB: ASC, fieldC: ASC, fieldD: DESC }) {
+          |    related(take: -1, orderBy: [{ fieldA: desc }, { fieldB: asc }, { fieldC: asc }, { fieldD: desc }]) {
           |      id
           |    }
           |  }
@@ -100,7 +100,7 @@ class NestedMultiOrderPaginationSpec extends FlatSpec with Matchers with ApiSpec
         legacy = false
       )
 
-    // Ordered: DESC, ASC, ASC, DESC
+    // Ordered: desc, ASC, ASC, DESC
     // 1 => 2 B B B B
     // 1 => 1 A B C D <- take
     // 2 => 3 B A B B
@@ -117,7 +117,7 @@ class NestedMultiOrderPaginationSpec extends FlatSpec with Matchers with ApiSpec
           |query {
           |  findManyTestModel {
           |    id
-          |    related(cursor: { id: 3 }, orderBy: { fieldA: DESC, fieldB: ASC, fieldC: ASC, fieldD: DESC }) {
+          |    related(cursor: { id: 3 }, orderBy: [{ fieldA: desc }, { fieldB: asc }, { fieldC: asc }, { fieldD: desc }]) {
           |      id
           |    }
           |  }
@@ -127,7 +127,7 @@ class NestedMultiOrderPaginationSpec extends FlatSpec with Matchers with ApiSpec
         legacy = false
       )
 
-    // Ordered: DESC, ASC, ASC, DESC
+    // Ordered: desc, ASC, ASC, DESC
     // 1 => 2 B B B B
     // 1 => 1 A B C D
     // 2 => 3 B A B B <- take
@@ -193,7 +193,7 @@ class NestedMultiOrderPaginationSpec extends FlatSpec with Matchers with ApiSpec
           |query {
           |  findManyTestModel {
           |    id
-          |    related(take: 1, orderBy: { fieldA: DESC, fieldB: ASC, fieldC: ASC, fieldD: DESC }) {
+          |    related(take: 1, orderBy: [{ fieldA: desc }, { fieldB: asc }, { fieldC: asc }, { fieldD: desc }]) {
           |      id
           |    }
           |  }
@@ -203,7 +203,7 @@ class NestedMultiOrderPaginationSpec extends FlatSpec with Matchers with ApiSpec
         legacy = false
       )
 
-    // Ordered: DESC, ASC, ASC, DESC
+    // Ordered: desc, ASC, ASC, DESC
     // 1 => 2 B B B B <- take
     // 1 => 1 A B C D
     // 2 => 3 B B B B <- take
@@ -225,7 +225,7 @@ class NestedMultiOrderPaginationSpec extends FlatSpec with Matchers with ApiSpec
           |query {
           |  findManyTestModel {
           |    id
-          |    related(take: -1, orderBy: { fieldA: DESC, fieldB: ASC, fieldC: ASC, fieldD: DESC }) {
+          |    related(take: -1, orderBy: [{ fieldA: desc }, { fieldB: asc }, { fieldC: asc }, { fieldD: desc }]) {
           |      id
           |    }
           |  }
@@ -235,7 +235,7 @@ class NestedMultiOrderPaginationSpec extends FlatSpec with Matchers with ApiSpec
         legacy = false
       )
 
-    // Ordered: DESC, ASC, ASC, DESC
+    // Ordered: desc, ASC, ASC, DESC
     // 1 => 2 B B B B
     // 1 => 1 A B C D <- take
     // 2 => 3 B B B B <- take
@@ -257,7 +257,7 @@ class NestedMultiOrderPaginationSpec extends FlatSpec with Matchers with ApiSpec
           |query {
           |  findManyTestModel {
           |    id
-          |    related(cursor: { id: 3 }, orderBy: { fieldA: DESC, fieldB: ASC, fieldC: ASC, fieldD: DESC }) {
+          |    related(cursor: { id: 3 }, orderBy: [{ fieldA: desc }, { fieldB: asc }, { fieldC: asc }, { fieldD: desc }]) {
           |      id
           |    }
           |  }
@@ -267,7 +267,7 @@ class NestedMultiOrderPaginationSpec extends FlatSpec with Matchers with ApiSpec
         legacy = false
       )
 
-    // Ordered: DESC, ASC, ASC, DESC
+    // Ordered: desc, ASC, ASC, DESC
     // 1 => 2 B B B B
     // 1 => 1 A B C D
     // 2 => 3 B B B B <- take

@@ -314,7 +314,7 @@ class NestedSetMutationInsideUpdateSpec extends FlatSpec with Matchers with ApiS
 
       res.toString should be("""{"data":{"updateParent":{"childrenOpt":[]}}}""")
 
-      server.query(s"""query{children(orderBy: { c: ASC }){c, parentsOpt{p}}}""", project).toString should be(
+      server.query(s"""query{children(orderBy: { c: asc }){c, parentsOpt{p}}}""", project).toString should be(
         """{"data":{"children":[{"c":"c1","parentsOpt":[{"p":"p1"}]},{"c":"c2","parentsOpt":[{"p":"p1"}]},{"c":"c3","parentsOpt":[]},{"c":"c4","parentsOpt":[]}]}}""")
 
     }

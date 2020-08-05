@@ -80,7 +80,7 @@ class NonEmbeddedSettingNodeSelectorToNullSpec extends FlatSpec with Matchers wi
     val result = server.query(
       """
         |{
-        | as  (orderBy: { id: ASC }){
+        | as  (orderBy: { id: asc }){
         |   b
         |   c{
         |     c

@@ -63,7 +63,7 @@ class OrderByInMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
         |    }
         |  ) {
         |    test
-        |    bars(take: 1, orderBy: { orderField: DESC }) {
+        |    bars(take: 1, orderBy: { orderField: desc }) {
         |      quantity
         |    }
         |  }
