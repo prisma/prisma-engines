@@ -152,7 +152,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
            |        ]  
            |      }
            |  }){
-           |    childrenOpt (orderBy: { c: ASC } ){
+           |    childrenOpt (orderBy: { c: asc } ){
            |      non_unique
            |    }
            |  }
@@ -206,7 +206,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
            |        ]  
            |      }
            |  }){
-           |    childrenOpt (orderBy: { c: ASC } ){
+           |    childrenOpt (orderBy: { c: asc } ){
            |      non_unique
            |    }
            |  }
@@ -788,9 +788,9 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |   }
          |  ) {
          |    nameTop
-         |    middles (orderBy: { id: ASC }){
+         |    middles (orderBy: { id: asc }){
          |      nameMiddle
-         |      bottoms (orderBy: { id: ASC }){
+         |      bottoms (orderBy: { id: asc }){
          |        nameBottom
          |      }
          |    }
@@ -869,9 +869,9 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |   }
          |  ) {
          |    nameTop
-         |    middles  (orderBy: { id: ASC }) {
+         |    middles  (orderBy: { id: asc }) {
          |      nameMiddle
-         |      bottoms  (orderBy: { id: ASC }){
+         |      bottoms  (orderBy: { id: asc }){
          |        nameBottom
          |      }
          |    }
@@ -946,7 +946,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |   }
          |  ) {
          |    nameTop
-         |    middles (orderBy: { id: ASC }) {
+         |    middles (orderBy: { id: asc }) {
          |      nameMiddle
          |      bottom {
          |        nameBottom
@@ -1036,7 +1036,7 @@ class NestedUpdateMutationInsideUpdateSpec extends FlatSpec with Matchers with A
          |      nameMiddle
          |      bottom {
          |        nameBottom
-         |        below  (orderBy: { id: ASC }){
+         |        below  (orderBy: { id: asc }){
          |           nameBelow
          |        }
          |

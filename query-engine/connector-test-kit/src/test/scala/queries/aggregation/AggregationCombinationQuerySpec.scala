@@ -290,7 +290,7 @@ class AggregationCombinationQuerySpec extends FlatSpec with Matchers with ApiSpe
 
     server.queryThatMustFail(
       s"""{
-         |  aggregateItem(cursor: { id: "3" }, orderBy: { float: ASC }) {
+         |  aggregateItem(cursor: { id: "3" }, orderBy: { float: asc }) {
          |    count
          |  }
          |}

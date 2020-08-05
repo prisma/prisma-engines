@@ -54,7 +54,7 @@ class WhereUniqueSpec extends FlatSpec with Matchers with ApiSpecBase {
       s"""query{user(where: {id:"wrong", email: "test@test.com"}){unique}}""",
       project,
       errorCode = 2009, // 3045,
-      errorContains = """"Expected object to have exactly 1 key-value pairs, got: 2 (id, email)"""
+      errorContains = """Expected at most 1 fields to be present, got 2"""
       // """You provided more than one field for the unique selector on User. If you want that behavior you can use the many query and combine fields with AND / OR."""
     )
   }
