@@ -1288,9 +1288,9 @@ dependencies = [
 
 [[package]]
 name = "http-types"
-version = "2.3.0"
+version = "2.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4bc341c4b7a71eb0d85c760dc7363648b82ecc38fa5ead50f69b52858df708b9"
+checksum = "bb4daf8dc001485f4a32a7a17c54c67fa8a10340188f30ba87ac0fe1a9451e97"
 dependencies = [
  "anyhow",
  "async-std",
@@ -2646,6 +2646,7 @@ dependencies = [
  "test-setup",
  "thiserror",
  "tide",
+ "tide-server-timing",
  "tokio",
  "tracing",
  "tracing-attributes",
@@ -3502,6 +3503,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "tide-server-timing"
+version = "0.13.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b9168516930bba237e1e651fcbea0c0e428c7635b6c3da2fd7aeddef78c90567"
+dependencies = [
+ "async-channel",
+ "http-types",
+ "tide",
+ "tracing",
+ "tracing-core",
+ "tracing-futures",
+ "tracing-subscriber",
+]
+
+[[package]]
 name = "time"
 version = "0.1.43"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3857,6 +3873,7 @@ dependencies = [
  "idna 0.2.0",
  "matches",
  "percent-encoding 2.1.0",
+ "serde",
 ]
 
 [[package]]
