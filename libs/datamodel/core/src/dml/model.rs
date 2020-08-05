@@ -248,9 +248,19 @@ impl Model {
         result
     }
 
+    pub fn field_is_indexed(&self, field_name: &String) -> bool {
+        //Fixme
+        false
+    }
+
     /// Finds the name of all id fields
     pub fn singular_id_fields(&self) -> impl std::iter::Iterator<Item = &ScalarField> {
         self.scalar_fields().filter(|x| x.is_id)
+    }
+
+    /// Finds all fields defined as autoincrement
+    pub fn auto_increment_fields(&self) -> impl std::iter::Iterator<Item = &ScalarField> {
+        self.scalar_fields().filter(|x| x.is_auto_increment())
     }
 
     /// Determines whether there is a singular primary key

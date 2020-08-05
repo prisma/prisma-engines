@@ -174,6 +174,39 @@ fn test_relations_over_non_unique_criteria_support(providers: &[&str], must_erro
     test_capability_support(providers, must_error, dml, error_msg);
 }
 
+//Fixme autoincrement matrix tests
+
+#[test]
+fn auto_increment_on_non_primary_columns_must_only_be_supported_if_all_specified_providers_support_them() {
+    // Only MySQL supports that.
+    test_auto_increment_on_non_primary_columns(&["postgres", "sqlite", "mysql"], true);
+    test_auto_increment_on_non_primary_columns(&["postgres", "sqlite"], true);
+    test_auto_increment_on_non_primary_columns(&["postgres", "mysql"], true);
+    test_auto_increment_on_non_primary_columns(&["postgres"], false);
+
+    test_auto_increment_on_non_primary_columns(&["mysql", "sqlite", "postgres"], true);
+    test_auto_increment_on_non_primary_columns(&["mysql", "sqlite"], true);
+    test_auto_increment_on_non_primary_columns(&["mysql", "postgres"], true);
+    test_auto_increment_on_non_primary_columns(&["mysql"], true);
+
+    test_auto_increment_on_non_primary_columns(&["sqlite", "mysql", "postgres"], true);
+    test_auto_increment_on_non_primary_columns(&["sqlite", "mysql"], true);
+    test_auto_increment_on_non_primary_columns(&["sqlite", "postgres"], true);
+    test_auto_increment_on_non_primary_columns(&["sqlite"], true);
+}
+
+fn test_auto_increment_on_non_primary_columns(providers: &[&str], must_error: bool) {
+    let dml = r#"
+    model Todo {
+      id           Int    @id
+      non_primary  Int    @default(autoincrement())
+    }    
+    "#;
+
+    let error_msg = "Error validating: The argument `references` must refer to a unique criteria in the related model `User`. But it is referencing the following fields that are not a unique criteria: name";
+    test_capability_support(providers, must_error, dml, error_msg);
+}
+
 fn test_capability_support(providers: &[&str], must_error: bool, datamodel: &str, error_msg: &str) {
     let provider_strings: Vec<_> = providers.iter().map(|x| format!("\"{}\"", x)).collect();
     let first_provider = providers.first().unwrap();

@@ -4,7 +4,7 @@ use crate::{
     configuration::PreviewFeatures,
     dml,
     error::{DatamodelError, ErrorCollection},
-    DefaultValue, EnumValue, FieldType,
+    DefaultValue, FieldType,
 };
 use prisma_value::PrismaValue;
 use std::collections::HashSet;
@@ -80,6 +80,12 @@ impl<'a> Validator<'a> {
 
             if let Err(ref mut the_errors) =
                 self.validate_enum_default_values(schema, ast_schema.find_model(&model.name).expect(STATE_ERROR), model)
+            {
+                errors_for_model.append(the_errors);
+            }
+
+            if let Err(ref mut the_errors) =
+                self.validate_auto_increment(ast_schema.find_model(&model.name).expect(STATE_ERROR), model)
             {
                 errors_for_model.append(the_errors);
             }
@@ -278,6 +284,7 @@ impl<'a> Validator<'a> {
             Ok(())
         }
     }
+
     fn validate_enum_default_values(
         &self,
         data_model: &dml::Datamodel,
@@ -293,11 +300,10 @@ impl<'a> Validator<'a> {
                 .find(|ast_field| ast_field.name.name == field.name)
                 .unwrap();
 
-            //enum defaults are valid enum values
             if let Some(DefaultValue::Single(PrismaValue::Enum(enum_value))) = &field.default_value {
                 if let FieldType::Enum(enum_name) = &field.field_type {
                     if let Some(dml_enum) = data_model.find_enum(&enum_name) {
-                        if !dml_enum.values.contains(&EnumValue::new(&enum_value)) {
+                        if !dml_enum.values.iter().map(|v| &v.name).any(|value| value == enum_value) {
                             errors.push(DatamodelError::new_directive_validation_error(
                                 &format!(
                                 "{}",
@@ -308,6 +314,68 @@ impl<'a> Validator<'a> {
                             ))
                         }
                     }
+                }
+            }
+        }
+
+        if errors.has_errors() {
+            Err(errors)
+        } else {
+            Ok(())
+        }
+    }
+
+    fn validate_auto_increment(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), ErrorCollection> {
+        let mut errors = ErrorCollection::new();
+
+        if let Some(data_source) = self.source {
+            if !data_source.combined_connector.supports_multiple_auto_increment()
+                && model.auto_increment_fields().count() > 1
+            {
+                errors.push(DatamodelError::new_directive_validation_error(
+                    &format!(
+                        "{}",
+                        "The `autoincrement()` default value is used twice on this model even though the underlying database only allows one instance per table."
+                    ),
+                    "default",
+                    ast_model.span,
+                ))
+            }
+
+            // go over all fields
+            for field in model.scalar_fields() {
+                let ast_field = ast_model
+                    .fields
+                    .iter()
+                    .find(|ast_field| ast_field.name.name == field.name)
+                    .unwrap();
+
+                if field.is_id
+                    && field.is_auto_increment()
+                    && !data_source.combined_connector.supports_non_id_auto_increment()
+                {
+                    errors.push(DatamodelError::new_directive_validation_error(
+                    &format!(
+                        "{}",
+                        "The `autoincrement()` default value is used on a non-id field even though the database does not allow this. "
+                    ),
+                    "default",
+                    ast_field.span,
+                ))
+                }
+
+                if field.is_auto_increment()
+                    && !model.field_is_indexed(&field.name)
+                    && !data_source.combined_connector.supports_non_indexed_auto_increment()
+                {
+                    errors.push(DatamodelError::new_directive_validation_error(
+                    &format!(
+                        "{}",
+                        "The `autoincrement()` default value is used on a non-indexed field even though the database does not allow that."
+                    ),
+                    "default",
+                    ast_field.span,
+                ))
                 }
             }
         }

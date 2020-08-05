@@ -152,3 +152,27 @@ fn must_error_if_default_value_for_enum_is_not_valid() {
         Span::new(46, 65),
     ));
 }
+
+#[test]
+fn must_error_if_using_multiple_auto_increment_on_sqlite() {
+    let dml = r#"
+    datasource db1 {
+        provider = "sqlite"
+        url = "file://test.db"
+    }
+    
+    model Model {
+        id      Int @id
+        non_id  Int @default(autoincrement())
+        non_id2  Int @default(autoincrement())
+    }
+    "#;
+
+    let errors = parse_error(dml);
+
+    errors.assert_is(DatamodelError::new_directive_validation_error(
+        "The `autoincrement()` default value is used twice on this model even though the underlying database only allows one instance per table.",
+        "default",
+        Span::new(96, 232),
+    ));
+}
