@@ -8,6 +8,7 @@ edition = "2018"
 prisma-value = { path = "../../prisma-value" }
 rust_decimal = { git = "https://github.com/pimeys/rust-decimal", branch = "pgbouncer-mode" }
 datamodel-connector = { path = "../connectors/datamodel-connector" }
+sql-datamodel-connector = { path = "../connectors/sql-datamodel-connector" }
 # Temporary until PR is accepted.
 pest = { version = "2.1.0", package = 'pest_tmp' }
 pest_derive = { version = "2.1.0", package = 'pest_derive_tmp' }
@@ -29,6 +30,7 @@ indoc = "0.3.5"
 pretty_assertions = "0.6.1"
 clap = "2.33"
 serial_test = "*"
+native-types = { path = "../../native-types" }
 
 [features]
 default = []

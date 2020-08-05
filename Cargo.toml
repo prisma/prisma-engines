@@ -15,6 +15,7 @@ members = [
   "prisma-fmt",
   "libs/datamodel/core",
   "libs/datamodel/connectors/datamodel-connector",
+  "libs/datamodel/connectors/sql-datamodel-connector",
   "libs/json-rpc-stdio",
   "libs/prisma-inflector",
   "libs/sql-schema-describer",
@@ -23,4 +24,5 @@ members = [
   "libs/prisma-models",
   "libs/prisma-value",
   "libs/feature-flags",
+  "libs/native-types",
 ]

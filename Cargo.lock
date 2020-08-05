@@ -729,6 +729,7 @@ dependencies = [
  "datamodel-connector",
  "indoc",
  "itertools",
+ "native-types",
  "once_cell",
  "pest_derive_tmp",
  "pest_tmp",
@@ -739,6 +740,7 @@ dependencies = [
  "serde",
  "serde_json",
  "serial_test",
+ "sql-datamodel-connector",
  "thiserror",
  "tracing",
  "uuid",
@@ -748,7 +750,9 @@ dependencies = [
 name = "datamodel-connector"
 version = "0.1.0"
 dependencies = [
+ "native-types",
  "serde",
+ "serde_json",
 ]
 
 [[package]]
@@ -2000,6 +2004,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "native-types"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "net2"
 version = "0.2.34"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3065,6 +3077,15 @@ dependencies = [
  "libc",
  "redox_syscall",
  "winapi 0.3.9",
+]
+
+[[package]]
+name = "sql-datamodel-connector"
+version = "0.1.0"
+dependencies = [
+ "datamodel-connector",
+ "native-types",
+ "serde_json",
 ]
 
 [[package]]

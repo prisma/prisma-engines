@@ -8,7 +8,7 @@ use super::{
 use crate::configuration::StringFromEnvVar;
 use crate::error::{DatamodelError, ErrorCollection};
 use crate::{ast, Datasource};
-use datamodel_connector::{BuiltinConnectors, Connector};
+use datamodel_connector::{CombinedConnector, Connector};
 
 pub struct DatasourceLoader {
     source_definitions: Vec<Box<dyn DatasourceProvider>>,
@@ -155,7 +155,7 @@ impl DatasourceLoader {
 
         let combined_connector: Box<dyn Connector> = {
             let connectors = all_datasource_providers.iter().map(|sd| sd.connector()).collect();
-            BuiltinConnectors::combined(connectors)
+            CombinedConnector::new(connectors)
         };
 
         // The first provider that can handle the URL is used to construct the Datasource.

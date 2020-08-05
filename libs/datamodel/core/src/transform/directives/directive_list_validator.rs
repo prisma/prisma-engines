@@ -92,7 +92,7 @@ impl<T: 'static> DirectiveListValidator<T> {
                     }
                 }
                 None => {
-                    if !directive.name.name.is_empty() {
+                    if !directive.name.name.is_empty() && !directive.name.name.contains(".") {
                         errors.push(DatamodelError::new_directive_not_known_error(
                             &directive.name.name,
                             directive.name.span,

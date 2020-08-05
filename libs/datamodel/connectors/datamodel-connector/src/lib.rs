@@ -1,13 +1,13 @@
-use crate::scalars::ScalarType;
+mod combined_connector;
+mod declarative_connector;
 
 pub mod error;
 pub mod scalars;
 
-mod builtin_connectors;
-mod declarative_connector;
-
-pub use builtin_connectors::BuiltinConnectors;
-pub use declarative_connector::DeclarativeConnector;
+pub use combined_connector::CombinedConnector;
+pub use declarative_connector::{DeclarativeConnector, FieldTypeConstructor};
+use native_types::NativeType;
+use serde::de::DeserializeOwned;
 
 pub trait Connector: Send + Sync {
     fn capabilities(&self) -> &Vec<ConnectorCapability>;
@@ -16,7 +16,9 @@ pub trait Connector: Send + Sync {
         self.capabilities().contains(&capability)
     }
 
-    fn calculate_type(&self, name: &str, args: Vec<i32>) -> Option<ScalarFieldType>;
+    // TODO carmen: This should return a Result<ScalarFieldType, ConnectorError> instead.
+    // possible errors: unknown type name, wrong number of arguments, declared field type is not compatible with native type
+    fn calculate_native_type(&self, name: &str, args: Vec<u32>) -> Option<ScalarFieldType>;
 
     fn supports_scalar_lists(&self) -> bool {
         self.has_capability(ConnectorCapability::ScalarLists)
@@ -54,15 +56,15 @@ pub enum ConnectorCapability {
 pub struct ScalarFieldType {
     name: String,
     prisma_type: scalars::ScalarType,
-    datasource_type: String,
+    serialized_native_type: serde_json::Value,
 }
 
 impl ScalarFieldType {
-    pub fn new(name: &str, prisma_type: scalars::ScalarType, datasource_type: &str) -> Self {
+    pub fn new(name: &str, prisma_type: scalars::ScalarType, native_type: &dyn NativeType) -> Self {
         ScalarFieldType {
             name: name.to_string(),
             prisma_type,
-            datasource_type: datasource_type.to_string(),
+            serialized_native_type: native_type.to_json(),
         }
     }
 
@@ -70,7 +72,14 @@ impl ScalarFieldType {
         self.prisma_type
     }
 
-    pub fn datasource_type(&self) -> &str {
-        &self.datasource_type
+    pub fn native_type<T>(&self) -> T
+    where
+        T: DeserializeOwned,
+    {
+        let error_msg = format!(
+            "Deserializing the native type from json failed: {:?}",
+            self.serialized_native_type.as_str()
+        );
+        serde_json::from_value(self.serialized_native_type.clone()).expect(&error_msg)
     }
 }

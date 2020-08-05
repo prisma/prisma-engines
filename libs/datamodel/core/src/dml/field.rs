@@ -31,8 +31,8 @@ pub enum FieldType {
     Enum(String),
     /// This is a relation field.
     Relation(RelationInfo),
-    /// Connector specific field type.
-    ConnectorSpecific(ScalarFieldType),
+    /// native field type.
+    NativeType(ScalarFieldType),
     /// This is a field with an unsupported datatype.
     Unsupported(String),
     /// The option is Some(x) if the scalar type is based upon a type alias.
@@ -49,7 +49,7 @@ impl FieldType {
 
     pub fn scalar_type(&self) -> Option<ScalarType> {
         match self {
-            FieldType::ConnectorSpecific(sft) => Some(sft.prisma_type()),
+            FieldType::NativeType(sft) => Some(sft.prisma_type()),
             FieldType::Base(st, _) => Some(*st),
             _ => None,
         }
