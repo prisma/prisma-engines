@@ -819,7 +819,7 @@ class PaginationSpec extends FlatSpec with Matchers with ApiSpecBase {
       .query(
         """
           |query {
-          |  findManyTestModel(cursor: { id: 4 }, take: -3, skip: 1, orderBy: [{ fieldA: desc }, { fieldB: asc }, { fieldC: asc }, { fieldD: desc }) {
+          |  findManyTestModel(cursor: { id: 4 }, take: -3, skip: 1, orderBy: [{ fieldA: desc }, { fieldB: asc }, { fieldC: asc }, { fieldD: desc }]) {
           |    id
           |  }
           |}

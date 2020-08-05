@@ -61,7 +61,7 @@ class OrderBySpec extends FlatSpec with Matchers with ApiSpecBase {
     val result = server.query(
       """
         |{
-        |  findManyOrderTest(orderBy: { nonUniqFieldA: desc, uniqueField: desc}) {
+        |  findManyOrderTest(orderBy: [{ nonUniqFieldA: desc }, { uniqueField: desc}]) {
         |    nonUniqFieldA
         |    uniqueField
         |  }
@@ -79,7 +79,7 @@ class OrderBySpec extends FlatSpec with Matchers with ApiSpecBase {
     val result = server.query(
       """
         |{
-        |  findManyOrderTest(orderBy: { nonUniqFieldB: asc, nonUniqFieldA: asc, uniqueField: asc}) {
+        |  findManyOrderTest(orderBy: [{ nonUniqFieldB: asc }, { nonUniqFieldA: asc }, { uniqueField: asc}]) {
         |    nonUniqFieldB
         |    nonUniqFieldA
         |    uniqueField
