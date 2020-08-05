@@ -350,14 +350,14 @@ impl<'a> Validator<'a> {
                     .find(|ast_field| ast_field.name.name == field.name)
                     .unwrap();
 
-                if field.is_id
+                if !field.is_id
                     && field.is_auto_increment()
                     && !data_source.combined_connector.supports_non_id_auto_increment()
                 {
                     errors.push(DatamodelError::new_directive_validation_error(
                     &format!(
                         "{}",
-                        "The `autoincrement()` default value is used on a non-id field even though the database does not allow this. "
+                        "The `autoincrement()` default value is used on a non-id field even though the database does not allow this."
                     ),
                     "default",
                     ast_field.span,

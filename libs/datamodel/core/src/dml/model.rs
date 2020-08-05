@@ -249,8 +249,15 @@ impl Model {
     }
 
     pub fn field_is_indexed(&self, field_name: &String) -> bool {
-        //Fixme
-        false
+        let field = self.find_field(field_name).unwrap();
+
+        if field.is_id() || field.is_unique() {
+            return true;
+        }
+
+        self.indices
+            .iter()
+            .any(|index| index.fields.first().unwrap() == field_name)
     }
 
     /// Finds the name of all id fields

@@ -154,7 +154,7 @@ fn must_error_if_default_value_for_enum_is_not_valid() {
 }
 
 #[test]
-fn must_error_if_using_multiple_auto_increment_on_sqlite() {
+fn must_error_if_using_non_id_auto_increment_on_sqlite() {
     let dml = r#"
     datasource db1 {
         provider = "sqlite"
@@ -163,8 +163,31 @@ fn must_error_if_using_multiple_auto_increment_on_sqlite() {
     
     model Model {
         id      Int @id
-        non_id  Int @default(autoincrement())
-        non_id2  Int @default(autoincrement())
+        non_id  Int @default(autoincrement()) @unique
+    }
+    "#;
+
+    let errors = parse_error(dml);
+
+    errors.assert_is(DatamodelError::new_directive_validation_error(
+        "The `autoincrement()` default value is used on a non-id field even though the database does not allow this.",
+        "default",
+        Span::new(142, 188),
+    ));
+}
+
+#[test]
+fn must_error_if_using_multiple_auto_increment_on_mysql() {
+    let dml = r#"
+    datasource db1 {
+        provider = "mysql"
+        url = "mysql://"
+    }
+    
+    model Model {
+        id      Int @id
+        non_id  Int @default(autoincrement()) @unique
+        non_id2  Int @default(autoincrement()) @unique
     }
     "#;
 
@@ -173,6 +196,29 @@ fn must_error_if_using_multiple_auto_increment_on_sqlite() {
     errors.assert_is(DatamodelError::new_directive_validation_error(
         "The `autoincrement()` default value is used twice on this model even though the underlying database only allows one instance per table.",
         "default",
-        Span::new(96, 232),
+        Span::new(89, 241),
+    ));
+}
+
+#[test]
+fn must_error_if_using_non_indexed_auto_increment_on_mysql() {
+    let dml = r#"
+    datasource db1 {
+        provider = "mysql"
+        url = "mysql://"
+    }
+    
+    model Model {
+        id      Int @id
+        non_id  Int @default(autoincrement())
+    }
+    "#;
+
+    let errors = parse_error(dml);
+
+    errors.assert_is(DatamodelError::new_directive_validation_error(
+        "The `autoincrement()` default value is used on a non-indexed field even though the database does not allow that.",
+        "default",
+        Span::new(135, 173),
     ));
 }

@@ -29,7 +29,11 @@ impl BuiltinConnectors {
         DeclarativeConnector {
             type_aliases: vec![],
             field_type_constructors: vec![],
-            capabilities: vec![],
+            capabilities: vec![ConnectorCapability::AutoIncrement {
+                multiple_allowed: false,
+                non_id_allowed: false,
+                non_indexed_allowed: false,
+            }],
         }
     }
 
@@ -50,6 +54,11 @@ impl BuiltinConnectors {
                 ConnectorCapability::Enums,
                 ConnectorCapability::Json,
                 ConnectorCapability::MultipleIndexesWithSameName,
+                ConnectorCapability::AutoIncrement {
+                    multiple_allowed: false,
+                    non_id_allowed: true,
+                    non_indexed_allowed: false,
+                },
             ],
         }
     }
@@ -116,6 +125,11 @@ impl BuiltinConnectors {
                 ConnectorCapability::ScalarLists,
                 ConnectorCapability::Enums,
                 ConnectorCapability::Json,
+                ConnectorCapability::AutoIncrement {
+                    multiple_allowed: true,
+                    non_id_allowed: true,
+                    non_indexed_allowed: true,
+                },
             ],
         }
     }
