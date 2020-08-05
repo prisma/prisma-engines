@@ -113,7 +113,7 @@ impl SqlFlavour for MysqlFlavour {
 
     async fn initialize(&self, conn: &dyn Queryable, database_info: &DatabaseInfo) -> SqlResult<()> {
         let schema_sql = format!(
-            "CREATE SCHEMA IF NOT EXISTS `{}` DEFAULT CHARACTER SET latin1;",
+            "CREATE SCHEMA IF NOT EXISTS `{}` DEFAULT CHARACTER SET utf8mb4;",
             database_info.connection_info().schema_name()
         );
 
