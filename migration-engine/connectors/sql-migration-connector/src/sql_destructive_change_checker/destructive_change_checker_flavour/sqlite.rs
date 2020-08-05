@@ -1,7 +1,7 @@
 use super::DestructiveChangeCheckerFlavour;
 use crate::{
     flavour::SqliteFlavour,
-    sql_destructive_changes_checker::{
+    sql_destructive_change_checker::{
         destructive_check_plan::DestructiveCheckPlan, unexecutable_step_check::UnexecutableStepCheck,
         warning_check::SqlMigrationWarningCheck,
     },

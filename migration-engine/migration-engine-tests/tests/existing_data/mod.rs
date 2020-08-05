@@ -398,10 +398,7 @@ async fn changing_a_column_from_optional_to_required_is_unexecutable(api: &TestA
     api.infer_apply(&dm2)
         .send()
         .await?
-        .assert_warnings(&[
-            // This only warns temporarily: it is not executable.
-            "Made the column `age` on table `Test` required, but there are 1 existing NULL values.".into(),
-        ])?
+        .assert_no_warning()?
         .assert_unexecutable(&[
             "Made the column `age` on table `Test` required, but there are 1 existing NULL values.".into(),
         ])?
@@ -1101,8 +1098,7 @@ async fn changing_a_scalar_column_to_an_array_is_unexecutable(api: &TestApi) -> 
         .assert_unexecutable(&[
             "Changed the column `mainProtagonist` on the `Film` table from a scalar field to a list field. There are 1 existing non-null values in that column, this migration step cannot be executed.".into(),
         ])?
-        // TEMPORARY, until the CLI displays unexecutable migrations.
-        .assert_warnings(&["Changed the column `mainProtagonist` on the `Film` table from a scalar field to a list field. There are 1 existing non-null values in that column, this migration step cannot be executed.".into()])?
+        .assert_no_warning()?
         .assert_no_error()?;
 
     api.assert_schema().await?.assert_table("Film", |table| {

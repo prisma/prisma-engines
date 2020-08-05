@@ -24,7 +24,7 @@ impl<'a> MigrationCommand for SchemaPushCommand<'a> {
         let schema = parse_datamodel(&input.schema)?;
         let inferrer = connector.database_migration_inferrer();
         let applier = connector.database_migration_step_applier();
-        let checker = connector.destructive_changes_checker();
+        let checker = connector.destructive_change_checker();
 
         let database_migration = inferrer.infer(&schema, &schema, &[]).await?;
 
