@@ -1,4 +1,3 @@
-use futures::future::BoxFuture;
 use tide::{Middleware, Next, Request};
 
 use std::time::Instant;
@@ -16,14 +15,13 @@ impl ElapsedMiddleware {
     }
 }
 
-impl<State: Send + Sync + 'static> Middleware<State> for ElapsedMiddleware {
-    fn handle<'a>(&'a self, cx: Request<State>, next: Next<'a, State>) -> BoxFuture<'a, tide::Result> {
-        Box::pin(async move {
-            let start = Instant::now();
-            let mut res = next.run(cx).await?;
-            let elapsed = Instant::now().duration_since(start).as_micros() as u64;
-            res.insert_header("x-elapsed", format!("{}", elapsed));
-            Ok(res)
-        })
+#[tide::utils::async_trait]
+impl<State: Clone + Send + Sync + 'static> Middleware<State> for ElapsedMiddleware {
+    async fn handle(&self, req: Request<State>, next: Next<'_, State>) -> tide::Result {
+        let start = Instant::now();
+        let mut res = next.run(req).await;
+        let elapsed = Instant::now().duration_since(start).as_micros() as u64;
+        res.insert_header("x-elapsed", format!("{}", elapsed));
+        Ok(res)
     }
 }
