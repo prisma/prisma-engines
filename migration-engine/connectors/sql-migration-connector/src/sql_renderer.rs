@@ -49,6 +49,9 @@ pub(crate) trait SqlRenderer {
             .columns
             .iter()
             .map(|column| {
+                // FIXME Temporary hack: we should get this from a `TableRef`, but
+                // this is not possible because we sometimes create tables as
+                // part of the table redifinition process on sqlite.
                 let column = ColumnRef {
                     schema: next_schema,
                     column,

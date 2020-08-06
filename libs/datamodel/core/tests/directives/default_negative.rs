@@ -147,7 +147,7 @@ fn must_error_if_default_value_for_enum_is_not_valid() {
     let errors = parse_error(dml);
 
     errors.assert_is(DatamodelError::new_directive_validation_error(
-        "The defined defaultvalue is not a valid value of the enum specified for the field.",
+        "The defined default value is not a valid value of the enum specified for the field.",
         "default",
         Span::new(46, 65),
     ));

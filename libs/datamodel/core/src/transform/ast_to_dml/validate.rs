@@ -287,7 +287,7 @@ impl<'a> Validator<'a> {
                             errors.push(DatamodelError::new_directive_validation_error(
                                 &format!(
                                 "{}",
-                                "The defined defaultvalue is not a valid value of the enum specified for the field."
+                                "The defined default value is not a valid value of the enum specified for the field."
                             ),
                                 "default",
                                 ast_model.find_field(&field.name).span,
