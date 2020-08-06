@@ -334,10 +334,6 @@ impl<'a> Validator<'a> {
     fn validate_model_name(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), DatamodelError> {
         let mut validator = super::reserved_model_names::ReservedModelNameValidator::new();
 
-        if self.generator.has_preview_feature("transactionApi") {
-            validator.disallow_transaction_name();
-        }
-
         if validator.is_reserved(&model.name) {
             Err(DatamodelError::new_model_validation_error(
                 &format!(
