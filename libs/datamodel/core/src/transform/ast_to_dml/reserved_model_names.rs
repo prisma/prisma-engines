@@ -122,11 +122,6 @@ impl ReservedModelNameValidator {
         }
     }
 
-    pub fn disallow_transaction_name(&mut self) {
-        self.reserved_names.push("transaction");
-        self.reserved_names.push("Transaction");
-    }
-
     pub fn is_reserved<T>(&self, name: T) -> bool
     where
         T: AsRef<str>,
