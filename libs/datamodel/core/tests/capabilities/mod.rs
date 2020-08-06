@@ -175,19 +175,17 @@ fn test_relations_over_non_unique_criteria_support(providers: &[&str], must_erro
 }
 
 //Fixme autoincrement matrix tests
-
 #[test]
 fn auto_increment_on_non_primary_columns_must_only_be_supported_if_all_specified_providers_support_them() {
-    // Only MySQL supports that.
     test_auto_increment_on_non_primary_columns(&["postgres", "sqlite", "mysql"], true);
     test_auto_increment_on_non_primary_columns(&["postgres", "sqlite"], true);
-    test_auto_increment_on_non_primary_columns(&["postgres", "mysql"], true);
+    test_auto_increment_on_non_primary_columns(&["postgres", "mysql"], false);
     test_auto_increment_on_non_primary_columns(&["postgres"], false);
 
     test_auto_increment_on_non_primary_columns(&["mysql", "sqlite", "postgres"], true);
     test_auto_increment_on_non_primary_columns(&["mysql", "sqlite"], true);
-    test_auto_increment_on_non_primary_columns(&["mysql", "postgres"], true);
-    test_auto_increment_on_non_primary_columns(&["mysql"], true);
+    test_auto_increment_on_non_primary_columns(&["mysql", "postgres"], false);
+    test_auto_increment_on_non_primary_columns(&["mysql"], false);
 
     test_auto_increment_on_non_primary_columns(&["sqlite", "mysql", "postgres"], true);
     test_auto_increment_on_non_primary_columns(&["sqlite", "mysql"], true);
@@ -199,11 +197,11 @@ fn test_auto_increment_on_non_primary_columns(providers: &[&str], must_error: bo
     let dml = r#"
     model Todo {
       id           Int    @id
-      non_primary  Int    @default(autoincrement())
+      non_primary  Int    @default(autoincrement()) @unique
     }    
     "#;
 
-    let error_msg = "Error validating: The argument `references` must refer to a unique criteria in the related model `User`. But it is referencing the following fields that are not a unique criteria: name";
+    let error_msg = "Error parsing attribute \"@default\": The `autoincrement()` default value is used on a non-id field even though the database does not allow this.";
     test_capability_support(providers, must_error, dml, error_msg);
 }
 

@@ -38,39 +38,16 @@ pub trait Connector: Send + Sync {
         self.has_capability(ConnectorCapability::Json)
     }
 
-    fn supports_auto_increment(&self) -> bool {
-        self.capabilities().into_iter().any(|c| match c {
-            ConnectorCapability::AutoIncrement { .. } => true,
-            _ => false,
-        })
-    }
-
     fn supports_non_id_auto_increment(&self) -> bool {
-        self.capabilities().into_iter().any(|c| match c {
-            ConnectorCapability::AutoIncrement {
-                non_id_allowed: true, ..
-            } => true,
-            _ => false,
-        })
+        self.has_capability(ConnectorCapability::AutoIncrementAllowedOnNonId)
     }
 
     fn supports_multiple_auto_increment(&self) -> bool {
-        self.capabilities().into_iter().any(|c| match c {
-            ConnectorCapability::AutoIncrement {
-                multiple_allowed: true, ..
-            } => true,
-            _ => false,
-        })
+        self.has_capability(ConnectorCapability::AutoIncrementMultipleAllowed)
     }
 
     fn supports_non_indexed_auto_increment(&self) -> bool {
-        self.capabilities().into_iter().any(|c| match c {
-            ConnectorCapability::AutoIncrement {
-                non_indexed_allowed: true,
-                ..
-            } => true,
-            _ => false,
-        })
+        self.has_capability(ConnectorCapability::AutoIncrementNonIndexedAllowed)
     }
 }
 
@@ -83,11 +60,9 @@ pub enum ConnectorCapability {
     MultipleIndexesWithSameName,
     Enums,
     Json,
-    AutoIncrement {
-        non_id_allowed: bool,
-        multiple_allowed: bool,
-        non_indexed_allowed: bool,
-    },
+    AutoIncrementAllowedOnNonId,
+    AutoIncrementMultipleAllowed,
+    AutoIncrementNonIndexedAllowed,
 }
 
 #[derive(Debug, Clone, PartialEq)]
