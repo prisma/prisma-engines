@@ -88,25 +88,6 @@ pub(crate) fn nested_update_input_field(ctx: &mut BuilderContext, field: &Relati
     input_field("update", input_object, None)
 }
 
-/// Maps relations to (filter) input fields.
-pub(crate) fn map_relation_filter_input_field(ctx: &mut BuilderContext, field: &RelationFieldRef) -> Vec<InputField> {
-    let related_model = field.related_model();
-    let related_input_type = filter_input_objects::where_object_type(ctx, &related_model);
-
-    let input_fields: Vec<_> = filter_arguments::get_field_filters(&ModelField::Relation(field.clone()))
-        .into_iter()
-        .map(|arg| {
-            let field_name = format!("{}{}", field.name, arg.suffix);
-            let obj = InputType::object(related_input_type.clone());
-            let typ = if arg.suffix == "" { InputType::null(obj) } else { obj };
-
-            input_field(field_name, InputType::opt(typ), None)
-        })
-        .collect();
-
-    input_fields
-}
-
 /// Builds scalar input fields using the mapper and the given, prefiltered, scalar fields.
 /// The mapper is responsible for mapping the fields to input types.
 pub(crate) fn scalar_input_fields<T, F>(

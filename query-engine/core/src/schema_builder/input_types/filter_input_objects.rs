@@ -74,7 +74,7 @@ pub(crate) fn where_object_type(ctx: &mut BuilderContext, model: &ModelRef) -> I
         .fields()
         .relation()
         .iter()
-        .map(|rf| input_fields::map_relation_filter_input_field(ctx, rf))
+        .map(|rf| map_relation_filter_input_field(ctx, rf))
         .flatten()
         .collect();
 
@@ -187,4 +187,23 @@ fn map_input_field(field: &ScalarFieldRef) -> Vec<InputField> {
             }
         })
         .collect()
+}
+
+/// Maps relations to (filter) input fields.
+pub(crate) fn map_relation_filter_input_field(ctx: &mut BuilderContext, field: &RelationFieldRef) -> Vec<InputField> {
+    let related_model = field.related_model();
+    let related_input_type = filter_input_objects::where_object_type(ctx, &related_model);
+
+    let input_fields: Vec<_> = filter_arguments::get_field_filters(&ModelField::Relation(field.clone()))
+        .into_iter()
+        .map(|arg| {
+            let field_name = format!("{}{}", field.name, arg.suffix);
+            let obj = InputType::object(related_input_type.clone());
+            let typ = if arg.suffix == "" { InputType::null(obj) } else { obj };
+
+            input_field(field_name, InputType::opt(typ), None)
+        })
+        .collect();
+
+    input_fields
 }
