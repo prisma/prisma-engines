@@ -392,7 +392,6 @@ fn render_raw_sql(
             )]),
             SqlFamily::Sqlite => unimplemented!("Index renaming on SQLite."),
         },
-        // SqlMigrationStep::RawSql { raw } => Ok(vec![raw.to_owned()]),
     }
 }
 

@@ -44,7 +44,6 @@ pub enum SqlMigrationStep {
     DropTable(DropTable),
     RenameTable { name: String, new_name: String },
     RedefineTables { names: HashSet<String> },
-    // RawSql { raw: String },
     CreateIndex(CreateIndex),
     DropIndex(DropIndex),
     AlterIndex(AlterIndex),

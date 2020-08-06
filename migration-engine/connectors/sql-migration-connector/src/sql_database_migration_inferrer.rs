@@ -1,8 +1,5 @@
-// mod sqlite;
-
-use crate::sql_schema_calculator::SqlSchemaCalculator;
-use crate::sql_schema_differ::{SqlSchemaDiff, SqlSchemaDiffer};
 use crate::*;
+use crate::{sql_schema_calculator::SqlSchemaCalculator, sql_schema_differ::SqlSchemaDiffer};
 use datamodel::*;
 use migration_connector::steps::MigrationStep;
 use migration_connector::*;
@@ -67,18 +64,20 @@ fn infer(
     database_info: &DatabaseInfo,
     flavour: &dyn SqlFlavour,
 ) -> SqlResult<SqlMigration> {
-    let (original_steps, corrected_steps) = infer_database_migration_steps_and_fix(
+    let (original_steps, corrected_steps) = infer_database_migration_steps(
         &current_database_schema,
         &expected_database_schema,
         database_info,
         flavour,
     )?;
-    let (_, rollback) = infer_database_migration_steps_and_fix(
+
+    let (_, rollback) = infer_database_migration_steps(
         &expected_database_schema,
         &current_database_schema,
         database_info,
         flavour,
     )?;
+
     Ok(SqlMigration {
         before: current_database_schema.clone(),
         after: expected_database_schema.clone(),
@@ -88,24 +87,15 @@ fn infer(
     })
 }
 
-fn infer_database_migration_steps_and_fix(
+fn infer_database_migration_steps(
     from: &SqlSchema,
     to: &SqlSchema,
     database_info: &DatabaseInfo,
     flavour: &dyn SqlFlavour,
 ) -> SqlResult<(Vec<SqlMigrationStep>, Vec<SqlMigrationStep>)> {
-    let diff: SqlSchemaDiff = SqlSchemaDiffer::diff(&from, &to, flavour, &database_info);
+    let steps = SqlSchemaDiffer::diff(&from, &to, flavour, &database_info).into_steps();
 
-    // let corrected_steps = if sql_family.is_sqlite() {
-    //     sqlite::fix(diff, &from, &to, &schema_name, database_info, flavour)?
-    // } else {
-    //     diff.into_steps()
-    // };
-
-    Ok((
-        SqlSchemaDiffer::diff(&from, &to, flavour, &database_info).into_steps(),
-        diff.into_steps(),
-    ))
+    Ok((steps.clone(), steps))
 }
 
 pub fn wrap_as_step<T, F>(steps: Vec<T>, wrap_fn: F) -> impl Iterator<Item = SqlMigrationStep>
