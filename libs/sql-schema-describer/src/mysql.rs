@@ -341,59 +341,64 @@ async fn get_all_indexes(
 
     for row in rows {
         debug!("Got index row: {:#?}", row);
-        let table_name = row.get("table_name").and_then(|x| x.to_string()).expect("table_name");
-        let seq_in_index = row.get("seq_in_index").and_then(|x| x.as_i64()).expect("seq_in_index");
-        let pos = seq_in_index - 1;
-        let index_name = row.get("index_name").and_then(|x| x.to_string()).expect("index_name");
-        let is_unique = !row.get("non_unique").and_then(|x| x.as_bool()).expect("non_unique");
-        let column_name = row.get("column_name").and_then(|x| x.to_string()).expect("column_name");
 
-        // Multi-column indices will return more than one row (with different column_name values).
-        // We cannot assume that one row corresponds to one index.
-        let (ref mut indexes_map, ref mut primary_key): &mut (_, Option<PrimaryKey>) = map
-            .entry(table_name)
-            .or_insert((BTreeMap::<String, Index>::new(), None));
+        // Indexes on expressions are currently not supported and return null as column name.
+        // We are ignoring these parts of the index for now
+        // Fixme The whole index should be ignored, not just the expression parts of it
+        if let Some(column_name) = row.get("column_name").and_then(|x| x.to_string()) {
+            let table_name = row.get("table_name").and_then(|x| x.to_string()).expect("table_name");
+            let seq_in_index = row.get("seq_in_index").and_then(|x| x.as_i64()).expect("seq_in_index");
+            let pos = seq_in_index - 1;
+            let index_name = row.get("index_name").and_then(|x| x.to_string()).expect("index_name");
+            let is_unique = !row.get("non_unique").and_then(|x| x.as_bool()).expect("non_unique");
 
-        let is_pk = index_name.to_lowercase() == "primary";
-        if is_pk {
-            debug!("Column '{}' is part of the primary key", column_name);
-            match primary_key {
-                Some(pk) => {
-                    if pk.columns.len() < (pos + 1) as usize {
-                        pk.columns.resize((pos + 1) as usize, "".to_string());
+            // Multi-column indices will return more than one row (with different column_name values).
+            // We cannot assume that one row corresponds to one index.
+            let (ref mut indexes_map, ref mut primary_key): &mut (_, Option<PrimaryKey>) = map
+                .entry(table_name)
+                .or_insert((BTreeMap::<String, Index>::new(), None));
+
+            let is_pk = index_name.to_lowercase() == "primary";
+            if is_pk {
+                debug!("Column '{}' is part of the primary key", column_name);
+                match primary_key {
+                    Some(pk) => {
+                        if pk.columns.len() < (pos + 1) as usize {
+                            pk.columns.resize((pos + 1) as usize, "".to_string());
+                        }
+                        pk.columns[pos as usize] = column_name;
+                        debug!(
+                            "The primary key has already been created, added column to it: {:?}",
+                            pk.columns
+                        );
                     }
-                    pk.columns[pos as usize] = column_name;
-                    debug!(
-                        "The primary key has already been created, added column to it: {:?}",
-                        pk.columns
-                    );
-                }
-                None => {
-                    debug!("Instantiating primary key");
+                    None => {
+                        debug!("Instantiating primary key");
 
-                    primary_key.replace(PrimaryKey {
-                        columns: vec![column_name],
-                        sequence: None,
-                        constraint_name: None,
-                    });
+                        primary_key.replace(PrimaryKey {
+                            columns: vec![column_name],
+                            sequence: None,
+                            constraint_name: None,
+                        });
+                    }
+                };
+            } else if indexes_map.contains_key(&index_name) {
+                if let Some(index) = indexes_map.get_mut(&index_name) {
+                    index.columns.push(column_name);
                 }
-            };
-        } else if indexes_map.contains_key(&index_name) {
-            if let Some(index) = indexes_map.get_mut(&index_name) {
-                index.columns.push(column_name);
-            }
-        } else {
-            indexes_map.insert(
-                index_name.clone(),
-                Index {
-                    name: index_name,
-                    columns: vec![column_name],
-                    tpe: match is_unique {
-                        true => IndexType::Unique,
-                        false => IndexType::Normal,
+            } else {
+                indexes_map.insert(
+                    index_name.clone(),
+                    Index {
+                        name: index_name,
+                        columns: vec![column_name],
+                        tpe: match is_unique {
+                            true => IndexType::Unique,
+                            false => IndexType::Normal,
+                        },
                     },
-                },
-            );
+                );
+            }
         }
     }
 
