@@ -230,16 +230,10 @@ impl<'a> Validator<'a> {
 
         for field in model.scalar_fields() {
             if field.is_list() && !scalar_lists_are_supported {
-                let ast_field = ast_model
-                    .fields
-                    .iter()
-                    .find(|ast_field| ast_field.name.name == field.name)
-                    .unwrap();
-
                 errors.push(DatamodelError::new_scalar_list_fields_are_not_supported(
                     &model.name,
                     &field.name,
-                    ast_field.span,
+                    ast_model.find_field(&field.name).span,
                 ));
             }
         }
@@ -255,12 +249,6 @@ impl<'a> Validator<'a> {
         let mut errors = ErrorCollection::new();
 
         for field in model.scalar_fields() {
-            let ast_field = ast_model
-                .fields
-                .iter()
-                .find(|ast_field| ast_field.name.name == field.name)
-                .unwrap();
-
             if let Some(dml::ScalarType::Json) = field.field_type.scalar_type() {
                 // TODO: this is really ugly
                 let supports_json_type = match self.source {
@@ -272,7 +260,7 @@ impl<'a> Validator<'a> {
                         &format!("Field `{}` in model `{}` can't be of type Json. The current connector does not support the Json type.", &field.name, &model.name),
                         &model.name,
                         &field.name,
-                        ast_field.span,
+                        ast_model.find_field(&field.name).span,
                     ));
                 }
             }
@@ -294,12 +282,6 @@ impl<'a> Validator<'a> {
         let mut errors = ErrorCollection::new();
 
         for field in model.scalar_fields() {
-            let ast_field = ast_model
-                .fields
-                .iter()
-                .find(|ast_field| ast_field.name.name == field.name)
-                .unwrap();
-
             if let Some(DefaultValue::Single(PrismaValue::Enum(enum_value))) = &field.default_value {
                 if let FieldType::Enum(enum_name) = &field.field_type {
                     if let Some(dml_enum) = data_model.find_enum(&enum_name) {
@@ -310,7 +292,7 @@ impl<'a> Validator<'a> {
                                 "The defined defaultvalue is not a valid value of the enum specified for the field."
                             ),
                                 "default",
-                                ast_field.span,
+                                ast_model.find_field(&field.name).span,
                             ))
                         }
                     }
@@ -344,11 +326,7 @@ impl<'a> Validator<'a> {
 
             // go over all fields
             for field in model.scalar_fields() {
-                let ast_field = ast_model
-                    .fields
-                    .iter()
-                    .find(|ast_field| ast_field.name.name == field.name)
-                    .unwrap();
+                let ast_field = ast_model.find_field(&field.name);
 
                 if !field.is_id
                     && field.is_auto_increment()
@@ -507,11 +485,7 @@ impl<'a> Validator<'a> {
         let mut errors = ErrorCollection::new();
 
         for field in model.relation_fields() {
-            let ast_field = ast_model
-                .fields
-                .iter()
-                .find(|ast_field| ast_field.name.name == field.name)
-                .unwrap();
+            let ast_field = ast_model.find_field(&field.name);
 
             let rel_info = &field.relation_info;
             let unknown_fields: Vec<String> = rel_info
@@ -597,11 +571,7 @@ impl<'a> Validator<'a> {
         let mut errors = ErrorCollection::new();
 
         for field in model.relation_fields() {
-            let ast_field = ast_model
-                .fields
-                .iter()
-                .find(|ast_field| ast_field.name.name == field.name)
-                .unwrap();
+            let ast_field = ast_model.find_field(&field.name);
 
             let rel_info = &field.relation_info;
             let related_model = datamodel.find_model(&rel_info.to).expect(STATE_ERROR);
