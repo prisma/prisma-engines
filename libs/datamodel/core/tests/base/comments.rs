@@ -1,5 +1,5 @@
 use crate::common::*;
-use datamodel::common::ScalarType;
+use datamodel::ScalarType;
 
 #[test]
 fn comments_must_work_in_models() {

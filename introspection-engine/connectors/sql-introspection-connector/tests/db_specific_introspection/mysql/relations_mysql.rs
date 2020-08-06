@@ -268,19 +268,18 @@ async fn introspecting_a_prisma_many_to_many_relation_should_work(api: &TestApi)
         )
         .await;
 
-    let dm = r#"
-            model Post {
-               id       Int @id @default(autoincrement())
-               User     User[]
-            }
+    let dm = r#"model Post {
+  id   Int    @default(autoincrement()) @id
+  User User[]
+}
 
-            model User {
-               id       Int @id @default(autoincrement())
-               Post     Post[]
-            }
-        "#;
+model User {
+  id   Int    @default(autoincrement()) @id
+  Post Post[]
+}
+"#;
     let result = dbg!(api.introspect().await);
-    custom_assert(&result, dm);
+    assert_eq!(&result, dm);
 }
 
 #[test_each_connector(tags("mysql"))]

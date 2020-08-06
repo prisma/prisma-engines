@@ -1,7 +1,7 @@
 use crate::SqlError;
 use datamodel::{
-    Datamodel, DefaultNames, DefaultValue as DMLDef, FieldArity, FieldType, IndexDefinition, Model, OnDeleteStrategy,
-    RelationField, RelationInfo, ScalarField, ScalarType, ValueGenerator as VG,
+    common::RelationNames, Datamodel, DefaultValue as DMLDef, FieldArity, FieldType, IndexDefinition, Model,
+    OnDeleteStrategy, RelationField, RelationInfo, ScalarField, ScalarType, ValueGenerator as VG,
 };
 use sql_schema_describer::{
     Column, ColumnArity, ColumnTypeFamily, DefaultValue as SQLDef, ForeignKey, Index, IndexType, SqlSchema, Table,
@@ -284,9 +284,9 @@ pub(crate) fn calculate_relation_name(schema: &SqlSchema, fk: &ForeignKey, table
                 .collect();
 
             let name = if fk_to_same_model.len() < 2 && fk_from_other_model_to_this.is_empty() {
-                DefaultNames::name_for_unambiguous_relation(model_with_fk, referenced_model)
+                RelationNames::name_for_unambiguous_relation(model_with_fk, referenced_model)
             } else {
-                DefaultNames::name_for_ambiguous_relation(model_with_fk, referenced_model, &fk_column_name)
+                RelationNames::name_for_ambiguous_relation(model_with_fk, referenced_model, &fk_column_name)
             };
 
             Ok(name)

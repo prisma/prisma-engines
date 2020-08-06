@@ -1,8 +1,7 @@
 use crate::{sql_renderer::IteratorJoin, DatabaseInfo};
 use datamodel::{
-    common::*,
     walkers::{walk_models, walk_relations, walk_scalar_fields, ModelWalker, ScalarFieldWalker, TypeWalker},
-    Datamodel, DefaultValue, FieldArity, IndexDefinition, IndexType, ValueGenerator, ValueGeneratorFn,
+    Datamodel, DefaultValue, FieldArity, IndexDefinition, IndexType, ScalarType, ValueGenerator, ValueGeneratorFn,
     WithDatabaseName,
 };
 use prisma_value::PrismaValue;
@@ -86,12 +85,19 @@ impl<'a> SqlSchemaCalculator<'a> {
             let columns = model
                 .scalar_fields()
                 .flat_map(|f| match f.field_type() {
-                    TypeWalker::Base(_) => Some(sql::Column {
-                        name: f.db_name().to_owned(),
-                        tpe: column_type(&f),
-                        default: migration_value_new(&f),
-                        auto_increment: matches!(f.default_value(), Some(DefaultValue::Expression(ValueGenerator { generator: ValueGeneratorFn::Autoincrement, .. }))),
-                    }),
+                    TypeWalker::Base(_) => {
+                        let has_auto_increment_default = matches!(f.default_value(), Some(DefaultValue::Expression(ValueGenerator { generator: ValueGeneratorFn::Autoincrement, .. })));
+
+                        // Integer primary keys on SQLite are automatically assigned the rowid, which means they are automatically autoincrementing.
+                        let is_sqlite_integer_primary_key = self.database_info.sql_family().is_sqlite() && f.is_id() && f.field_type().is_int();
+
+                        Some(sql::Column {
+                            name: f.db_name().to_owned(),
+                            tpe: column_type(&f),
+                            default: migration_value_new(&f),
+                            auto_increment: has_auto_increment_default || is_sqlite_integer_primary_key,
+                        })
+                    },
                     TypeWalker::Enum(r#enum) => {
                         let enum_db_name = r#enum.db_name();
                         Some(sql::Column {

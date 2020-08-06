@@ -48,6 +48,9 @@ pub enum ErrorKind {
     #[error("Column does not exist")]
     ColumnDoesNotExist,
 
+    #[error("Table '{}' does not exist.", table)]
+    TableDoesNotExist { table: String },
+
     #[error("Error creating a database connection. ({})", _0)]
     ConnectionError(anyhow::Error),
 

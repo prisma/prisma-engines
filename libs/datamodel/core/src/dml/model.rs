@@ -1,7 +1,7 @@
 use super::*;
 use crate::Field;
 
-/// Represents a model in a prisma datamodel.
+/// Represents a model in a prisma schema.
 #[derive(Debug, PartialEq, Clone)]
 pub struct Model {
     /// Name of the model.
@@ -24,6 +24,7 @@ pub struct Model {
     pub is_commented_out: bool,
 }
 
+/// Represents an index defined via `@@index` or `@@unique`.
 #[derive(Debug, PartialEq, Clone)]
 pub struct IndexDefinition {
     pub name: Option<String>,
@@ -46,6 +47,7 @@ pub enum IndexType {
     Normal,
 }
 
+/// A unique criteria is a set of fields through which a record can be uniquely identified.
 #[derive(Debug)]
 pub struct UniqueCriteria<'a> {
     pub fields: Vec<&'a ScalarField>,

@@ -1,25 +1,27 @@
 use connector::QueryArguments;
 use itertools::Itertools;
 use prisma_models::{ManyRecords, ModelProjection, Record, RecordProjection};
+use std::ops::Deref;
 
+#[derive(Debug)]
 /// Allows to manipulate a set of records in-memory instead of on the database level.
 pub struct InMemoryRecordProcessor {
-    skip: Option<i64>,
-    take: Option<i64>,
-    cursor: Option<RecordProjection>,
-    needs_reversing: bool,
-    distinct: Option<ModelProjection>,
+    args: QueryArguments,
+}
+
+impl Deref for InMemoryRecordProcessor {
+    type Target = QueryArguments;
+
+    fn deref(&self) -> &Self::Target {
+        &self.args
+    }
 }
 
 impl InMemoryRecordProcessor {
+    /// Creates a new processor from the given query args.
+    /// The original args will be modified to prevent db level processing.
     pub fn new_from_query_args(args: &mut QueryArguments) -> Self {
-        let processor = Self {
-            skip: args.skip.clone(),
-            take: args.take_abs(),
-            cursor: args.cursor.clone(),
-            needs_reversing: args.needs_reversed_order(),
-            distinct: args.distinct.clone(),
-        };
+        let processor = Self { args: args.clone() };
 
         args.distinct = None;
         args.ignore_take = true;
@@ -28,9 +30,19 @@ impl InMemoryRecordProcessor {
         processor
     }
 
+    fn take_abs(&self) -> Option<i64> {
+        self.take.clone().map(|t| if t < 0 { t * -1 } else { t })
+    }
+
+    /// Checks whether or not we need to take records going backwards in the record list,
+    /// which requires reversing the list of records at some point.
+    fn needs_reversed_order(&self) -> bool {
+        self.take.map(|t| t < 0).unwrap_or(false)
+    }
+
     pub fn apply(&self, mut records: ManyRecords) -> ManyRecords {
-        if self.needs_reversing {
-            records.records.reverse();
+        if self.needs_reversed_order() {
+            records.reverse();
         }
 
         let records = if Self::is_nested(&records) {
@@ -40,7 +52,13 @@ impl InMemoryRecordProcessor {
         };
 
         let records = self.apply_distinct(records);
-        self.apply_pagination(records)
+        let mut records = self.apply_pagination(records);
+
+        if self.needs_reversed_order() {
+            records.reverse();
+        }
+
+        records
     }
 
     fn order_by_parent(mut records: ManyRecords) -> ManyRecords {
@@ -148,17 +166,13 @@ impl InMemoryRecordProcessor {
                 None => true,
                 Some(skip) => current_count > skip,
             };
-            let is_within_take_range = match self.take {
+            let is_within_take_range = match self.take_abs() {
                 None => true,
                 Some(take) => current_count <= take + self.skip.unwrap_or(0),
             };
 
             is_beyond_skip_range && is_within_take_range
         });
-
-        if self.needs_reversing {
-            many_records.records.reverse();
-        }
 
         many_records
     }

@@ -294,19 +294,18 @@ async fn introspecting_a_prisma_many_to_many_relation_should_work(api: &TestApi)
         .await
         .unwrap();
 
-    let dm = r#"
-            model User {
-               id Int @id @default(autoincrement())
-               Post Post[]
-            }
+    let dm = r#"model User {
+  id   Int    @default(autoincrement()) @id
+  Post Post[]
+}
 
-            model Post {
-               id Int @id @default(autoincrement())
-               User User[]
-            }
-        "#;
+model Post {
+  id   Int    @default(autoincrement()) @id
+  User User[]
+}
+"#;
     let result = dbg!(api.introspect().await);
-    custom_assert(&result, dm);
+    assert_eq!(&result, dm);
 }
 
 // currently disallowed by the validator since the relation tables do not have ids

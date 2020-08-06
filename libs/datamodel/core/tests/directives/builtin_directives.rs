@@ -1,5 +1,5 @@
 use crate::common::*;
-use datamodel::{ast, common::ScalarType, error::DatamodelError};
+use datamodel::{ast, error::DatamodelError, ScalarType};
 
 #[test]
 fn unique_directive() {

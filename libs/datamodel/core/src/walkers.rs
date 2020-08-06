@@ -1,3 +1,5 @@
+//! This module contains convenience functions to easily traverse a Datamodel tree.
+//! The most prominent functionality is the pain free navigation of relations.
 use crate::{
     dml::{
         Datamodel, DefaultValue, Enum, FieldArity, FieldType, IndexDefinition, Model, ScalarField, ScalarType,
@@ -197,6 +199,10 @@ impl<'a> TypeWalker<'a> {
             TypeWalker::Enum(r) => Some(*r),
             _ => None,
         }
+    }
+
+    pub fn is_int(&self) -> bool {
+        matches!(self, TypeWalker::Base(ScalarType::Int))
     }
 
     pub fn is_json(&self) -> bool {

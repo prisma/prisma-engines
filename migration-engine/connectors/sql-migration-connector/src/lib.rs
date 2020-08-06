@@ -8,7 +8,7 @@ mod error;
 mod flavour;
 mod sql_database_migration_inferrer;
 mod sql_database_step_applier;
-mod sql_destructive_changes_checker;
+mod sql_destructive_change_checker;
 mod sql_migration;
 mod sql_migration_persistence;
 mod sql_renderer;
@@ -31,7 +31,7 @@ use quaint::{
 };
 use sql_database_migration_inferrer::*;
 use sql_database_step_applier::*;
-use sql_destructive_changes_checker::*;
+use sql_destructive_change_checker::*;
 use sql_migration_persistence::*;
 use sql_schema_describer::SqlSchema;
 use std::{sync::Arc, time::Duration};
@@ -161,8 +161,8 @@ impl MigrationConnector for SqlMigrationConnector {
         Box::new(SqlDatabaseStepApplier { connector: self })
     }
 
-    fn destructive_changes_checker<'a>(&'a self) -> Box<dyn DestructiveChangesChecker<SqlMigration> + 'a> {
-        Box::new(SqlDestructiveChangesChecker { connector: self })
+    fn destructive_change_checker<'a>(&'a self) -> Box<dyn DestructiveChangeChecker<SqlMigration> + 'a> {
+        Box::new(SqlDestructiveChangeChecker { connector: self })
     }
 
     fn deserialize_database_migration(&self, json: serde_json::Value) -> Option<SqlMigration> {

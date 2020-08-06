@@ -489,6 +489,58 @@ async fn re_introspecting_manually_re_mapped_enum_name(api: &TestApi) {
 }
 
 #[test_each_connector(tags("postgres"))]
+async fn re_introspecting_manually_re_mapped_invalid_enum_values(api: &TestApi) {
+    let sql = format!("CREATE Type invalid as ENUM ( '@', '-')");
+    api.database().execute_raw(&sql, &[]).await.unwrap();
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom("sign  invalid Not Null");
+            });
+
+            migration.create_table("Unrelated", |t| {
+                t.add_column("id", types::primary());
+            });
+        })
+        .await;
+
+    let input_dm = r#"
+            model User {
+               id               Int @id @default(autoincrement())
+               sign             invalid           
+            }
+            
+            enum invalid{
+                dash    @map("-")
+                at      @map("@")
+            }
+        "#;
+
+    let final_dm = r#" 
+              model User {
+               id               Int @id @default(autoincrement())
+               sign             invalid           
+            }
+            
+            model Unrelated {
+               id               Int @id @default(autoincrement())
+            }
+            
+            enum invalid{
+                dash    @map("-")
+                at      @map("@")
+            }
+        "#;
+    let result = dbg!(api.re_introspect(input_dm).await);
+    custom_assert(&result, final_dm);
+    let warnings = api.re_introspect_warnings(input_dm).await;
+
+    assert_eq_json(&warnings, "[{\"code\":10,\"message\":\"These enum values were enriched with `@map` information taken from the previous Prisma schema.\",\"affected\":[{\"enm\":\"invalid\",\"value\":\"dash\"},{\"enm\":\"invalid\",\"value\":\"at\"}]}]");
+}
+
+#[test_each_connector(tags("postgres"))]
 async fn re_introspecting_multiple_changed_relation_names(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel

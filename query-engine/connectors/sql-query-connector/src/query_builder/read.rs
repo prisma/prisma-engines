@@ -1,9 +1,8 @@
-use crate::{cursor_condition, filter_conversion::AliasedCondition, ordering::Ordering};
+use crate::{cursor_condition, filter_conversion::AliasedCondition, ordering};
 use connector_interface::{filter::Filter, Aggregator, QueryArguments};
 use itertools::Itertools;
 use prisma_models::*;
 use quaint::ast::*;
-use std::sync::Arc;
 
 pub trait SelectDefinition {
     fn into_select(self, _: &ModelRef) -> Select<'static>;
@@ -11,7 +10,7 @@ pub trait SelectDefinition {
 
 impl SelectDefinition for Filter {
     fn into_select(self, model: &ModelRef) -> Select<'static> {
-        let args = QueryArguments::from(self);
+        let args = QueryArguments::from((model.clone(), self));
         args.into_select(model)
     }
 }
@@ -30,9 +29,8 @@ impl SelectDefinition for Select<'static> {
 
 impl SelectDefinition for QueryArguments {
     fn into_select(self, model: &ModelRef) -> Select<'static> {
-        let cursor: ConditionTree = cursor_condition::build(&self, Arc::clone(&model));
-        let ordering_directions = self.ordering_directions();
-        let ordering = Ordering::for_model(&model, ordering_directions);
+        let (table_opt, cursor_condition) = cursor_condition::build(&self, &model);
+        let orderings = ordering::build(&self);
 
         let limit = if self.ignore_take { None } else { self.take_abs() };
         let skip = if self.ignore_skip { 0 } else { self.skip.unwrap_or(0) };
@@ -42,7 +40,7 @@ impl SelectDefinition for QueryArguments {
             .map(|f| f.aliased_cond(None))
             .unwrap_or(ConditionTree::NoCondition);
 
-        let conditions = match (filter, cursor) {
+        let conditions = match (filter, cursor_condition) {
             (ConditionTree::NoCondition, cursor) => cursor,
             (filter, ConditionTree::NoCondition) => filter,
             (filter, cursor) => ConditionTree::and(filter, cursor),
@@ -52,7 +50,13 @@ impl SelectDefinition for QueryArguments {
             .so_that(conditions)
             .offset(skip as usize);
 
-        let select_ast = ordering.into_iter().fold(select_ast, |acc, ord| acc.order_by(ord));
+        let select_ast = if let Some(table) = table_opt {
+            select_ast.and_from(table)
+        } else {
+            select_ast
+        };
+
+        let select_ast = orderings.into_iter().fold(select_ast, |acc, ord| acc.order_by(ord));
 
         match limit {
             Some(limit) => select_ast.limit(limit as usize),
@@ -102,21 +106,21 @@ pub fn aggregate(model: &ModelRef, aggregators: &[Aggregator], args: QueryArgume
         .fold(Select::from_table(sub_table), |select, next_op| match next_op {
             Aggregator::Count => select.value(count(asterisk())),
 
-            Aggregator::Average(fields) => fields
-                .into_iter()
-                .fold(select, |select, next_field| select.value(avg(next_field.name.clone()))),
+            Aggregator::Average(fields) => fields.into_iter().fold(select, |select, next_field| {
+                select.value(avg(Column::from(next_field.name.clone())))
+            }),
 
-            Aggregator::Sum(fields) => fields
-                .into_iter()
-                .fold(select, |select, next_field| select.value(sum(next_field.name.clone()))),
+            Aggregator::Sum(fields) => fields.into_iter().fold(select, |select, next_field| {
+                select.value(sum(Column::from(next_field.name.clone())))
+            }),
 
-            Aggregator::Min(fields) => fields
-                .into_iter()
-                .fold(select, |select, next_field| select.value(min(next_field.name.clone()))),
+            Aggregator::Min(fields) => fields.into_iter().fold(select, |select, next_field| {
+                select.value(min(Column::from(next_field.name.clone())))
+            }),
 
-            Aggregator::Max(fields) => fields
-                .into_iter()
-                .fold(select, |select, next_field| select.value(max(next_field.name.clone()))),
+            Aggregator::Max(fields) => fields.into_iter().fold(select, |select, next_field| {
+                select.value(max(Column::from(next_field.name.clone())))
+            }),
         })
 }
 

@@ -2,7 +2,8 @@ use super::DatamodelError;
 
 /// Represents a list of validation or parser errors.
 ///
-/// This is uses to accumulate all errors and show them all at once.
+/// This is used to accumulate multiple errors during validation.
+/// It is used to not error out early and instead show multiple errors at once.
 #[derive(Debug, Clone)]
 pub struct ErrorCollection {
     pub errors: Vec<DatamodelError>,

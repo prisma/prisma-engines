@@ -49,7 +49,8 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
       """,
         project,
         errorCode = 2009,
-        errorContains = """Field does not exist on enclosing type.` at `.Mutation.updateParent.data.ParentUpdateInput.childOpt.ChildUpdateOneWithoutParentOptInput.updateMany"""
+        errorContains =
+          """Field does not exist on enclosing type.` at `.Mutation.updateParent.data.ParentUpdateInput.childOpt.ChildUpdateOneWithoutParentOptInput.updateMany"""
       )
     }
   }
@@ -306,7 +307,7 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    }
          |    ]}
          |  }){
-         |    childrenOpt (orderBy: c_ASC){
+         |    childrenOpt (orderBy: { c: asc }){
          |      c
          |      non_unique
          |    }
@@ -316,7 +317,7 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
         project
       )
 
-      server.query("query{parents{p,childrenOpt(orderBy: c_ASC){c, non_unique}}}", project).toString() should be(
+      server.query("query{parents{p,childrenOpt(orderBy: { c: asc }){c, non_unique}}}", project).toString() should be(
         """{"data":{"parents":[{"p":"p1","childrenOpt":[{"c":"c1","non_unique":"updated2"},{"c":"c2","non_unique":"updated1"}]},{"p":"p2","childrenOpt":[{"c":"c3","non_unique":null},{"c":"c4","non_unique":null}]}]}}""")
     }
   }

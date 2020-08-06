@@ -1,7 +1,7 @@
 use crate::common::*;
 use datamodel::ast::Span;
 use datamodel::error::DatamodelError;
-use datamodel::{common::ScalarType, dml};
+use datamodel::{dml, ScalarType};
 
 #[test]
 fn parse_scalar_types() {

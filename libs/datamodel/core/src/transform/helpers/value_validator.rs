@@ -27,7 +27,7 @@ impl ValueValidator {
     /// Creates a new type mismatch error for the
     /// value wrapped by this instance.
     fn construct_type_mismatch_error(&self, expected_type: &str) -> DatamodelError {
-        let description = String::from(ast::describe_value_type(&self.value));
+        let description = String::from(self.value.describe_value_type());
         DatamodelError::new_type_mismatch_error(expected_type, &description, &self.raw(), self.span())
     }
 
