@@ -174,7 +174,6 @@ fn test_relations_over_non_unique_criteria_support(providers: &[&str], must_erro
     test_capability_support(providers, must_error, dml, error_msg);
 }
 
-//Fixme autoincrement matrix tests
 #[test]
 fn auto_increment_on_non_primary_columns_must_only_be_supported_if_all_specified_providers_support_them() {
     test_auto_increment_on_non_primary_columns(&["postgres", "sqlite", "mysql"], true);
