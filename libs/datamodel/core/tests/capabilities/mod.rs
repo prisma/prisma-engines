@@ -200,7 +200,7 @@ fn test_auto_increment_on_non_primary_columns(providers: &[&str], must_error: bo
     }    
     "#;
 
-    let error_msg = "Error parsing attribute \"@default\": The `autoincrement()` default value is used on a non-id field even though the database does not allow this.";
+    let error_msg = "Error parsing attribute \"@default\": The `autoincrement()` default value is used on a non-id field even though the datasource does not support this.";
     test_capability_support(providers, must_error, dml, error_msg);
 }
 
