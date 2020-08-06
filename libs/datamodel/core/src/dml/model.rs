@@ -258,6 +258,10 @@ impl Model {
         self.indices
             .iter()
             .any(|index| index.fields.first().unwrap() == field_name)
+            || match self.id_fields.first() {
+                Some(f) if f == field_name => true,
+                _ => false,
+            }
     }
 
     /// Finds the name of all id fields
