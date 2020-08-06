@@ -257,13 +257,17 @@ impl Model {
             return true;
         }
 
-        self.indices
+        let is_first_in_index = self
+            .indices
             .iter()
-            .any(|index| index.fields.first().unwrap() == field_name)
-            || match self.id_fields.first() {
-                Some(f) if f == field_name => true,
-                _ => false,
-            }
+            .any(|index| index.fields.first().unwrap() == field_name);
+
+        let is_first_in_primary_key = match self.id_fields.first() {
+            Some(f) if f == field_name => true,
+            _ => false,
+        };
+
+        is_first_in_index || is_first_in_primary_key
     }
 
     /// Finds the name of all id fields

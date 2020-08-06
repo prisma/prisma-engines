@@ -321,11 +321,7 @@ impl ScalarField {
     }
 
     pub fn is_auto_increment(&self) -> bool {
-        let auto = ValueGenerator::new_autoincrement();
-        match &self.default_value {
-            Some(DefaultValue::Expression(gen)) if &auto == gen => true,
-            _ => false,
-        }
+        matches!(&self.default_value, Some(DefaultValue::Expression(expr)) if expr == &ValueGenerator::new_autoincrement())
     }
 }
 

@@ -283,7 +283,7 @@ impl<'a> Validator<'a> {
             if let Some(DefaultValue::Single(PrismaValue::Enum(enum_value))) = &field.default_value {
                 if let FieldType::Enum(enum_name) = &field.field_type {
                     if let Some(dml_enum) = data_model.find_enum(&enum_name) {
-                        if !dml_enum.values.iter().map(|v| &v.name).any(|value| value == enum_value) {
+                        if !dml_enum.values.iter().any(|value| &value.name == enum_value) {
                             errors.push(DatamodelError::new_directive_validation_error(
                                 &format!(
                                 "{}",
@@ -315,7 +315,7 @@ impl<'a> Validator<'a> {
                 errors.push(DatamodelError::new_directive_validation_error(
                     &format!(
                         "{}",
-                        "The `autoincrement()` default value is used twice on this model even though the underlying database only allows one instance per table."
+                        "The `autoincrement()` default value is used multiple times on this model even though the underlying datasource only supports one instance per table."
                     ),
                     "default",
                     ast_model.span,
@@ -333,7 +333,7 @@ impl<'a> Validator<'a> {
                     errors.push(DatamodelError::new_directive_validation_error(
                     &format!(
                         "{}",
-                        "The `autoincrement()` default value is used on a non-id field even though the database does not allow this."
+                        "The `autoincrement()` default value is used on a non-id field even though the datasource does not support this."
                     ),
                     "default",
                     ast_field.span,
@@ -347,7 +347,7 @@ impl<'a> Validator<'a> {
                     errors.push(DatamodelError::new_directive_validation_error(
                     &format!(
                         "{}",
-                        "The `autoincrement()` default value is used on a non-indexed field even though the database does not allow that."
+                        "The `autoincrement()` default value is used on a non-indexed field even though the datasource does not support this."
                     ),
                     "default",
                     ast_field.span,
