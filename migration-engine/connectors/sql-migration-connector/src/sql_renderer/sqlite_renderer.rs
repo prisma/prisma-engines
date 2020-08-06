@@ -109,20 +109,26 @@ impl SqlRenderer for SqliteFlavour {
             let mut temporary_table = differ.next.table.clone();
             temporary_table.name = name_of_temporary_table.clone();
 
-            // todo: start transaction now. Unclear if we really want to do that.
+            // This is a hack, just to be able to render the CREATE TABLE.
+            let temporary_table = TableRef {
+                schema: differ.next.schema,
+                table: &temporary_table,
+            };
+
+            // TODO start transaction now. Unclear if we really want to do that.
             result.push(
-                self.render_create_table(&temporary_table, schema_name, &differ.next.schema, sql_family)
+                self.render_create_table(&temporary_table, schema_name, sql_family)
                     .expect("render_create_table"),
             );
 
-            copy_current_table_into_new_table(&mut result, &differ, &temporary_table.name, schema_name, self).unwrap();
+            copy_current_table_into_new_table(&mut result, &differ, temporary_table.name(), schema_name, self).unwrap();
 
             result.push(format!("DROP TABLE \"{}\".\"{}\"", schema_name, differ.next.name()));
 
             result.push(format!(
                 "ALTER TABLE \"{schema_name}\".\"{old_name}\" RENAME TO \"{new_name}\"",
                 schema_name = schema_name,
-                old_name = temporary_table.name,
+                old_name = temporary_table.name(),
                 new_name = differ.next.name()
             ));
 

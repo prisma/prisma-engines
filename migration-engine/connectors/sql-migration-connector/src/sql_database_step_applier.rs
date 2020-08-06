@@ -142,15 +142,11 @@ fn render_raw_sql(
             _ => Ok(Vec::new()),
         },
         SqlMigrationStep::CreateTable(CreateTable { table }) => {
-            // FIXME Temporary hack: we should be passing a TableRef, but this is not
-            // possible because we sometimes create temporary tables in the
-            // SQLite table redefinition process.
-            Ok(vec![renderer.render_create_table(
-                table,
-                &schema_name,
-                next_schema,
-                sql_family,
-            )?])
+            let table = next_schema
+                .table_ref(&table.name)
+                .expect("CreateTable referring to an unknown table.");
+
+            Ok(vec![renderer.render_create_table(&table, &schema_name, sql_family)?])
         }
         SqlMigrationStep::DropTable(DropTable { name }) => match sql_family {
             SqlFamily::Mysql | SqlFamily::Postgres => Ok(vec![format!(
