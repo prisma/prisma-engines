@@ -10,7 +10,7 @@ pub use related::*;
 
 use super::*;
 use crate::{query_document::ParsedField, ReadQuery};
-use prisma_models::{Field, ModelProjection, ModelRef, RelationFieldRef};
+use prisma_models::{Field, ModelProjection, ModelRef, RecordProjection, RelationFieldRef};
 use std::sync::Arc;
 
 pub enum ReadQueryBuilder {
@@ -114,4 +114,13 @@ pub fn merge_relation_selections(
         .collect();
 
     selected_fields.merge(ModelProjection::union(nested))
+}
+
+/// Ensures that if a cursor is provided, its fields are also selected.
+/// Necessary for post-processing of unstable orderings with cursor operations.
+pub fn merge_cursor_fields(selected_fields: ModelProjection, cursor: &Option<RecordProjection>) -> ModelProjection {
+    match cursor {
+        Some(cursor) => selected_fields.clone().merge(cursor.into()),
+        None => selected_fields,
+    }
 }

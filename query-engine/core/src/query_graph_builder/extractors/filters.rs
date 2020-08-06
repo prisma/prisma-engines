@@ -5,7 +5,7 @@ use crate::{
 };
 use connector::{filter::Filter, RelationCompare, ScalarCompare};
 use prisma_models::{Field, ModelRef, PrismaValue, RelationFieldRef, ScalarFieldRef};
-use std::{collections::BTreeMap, convert::TryInto};
+use std::convert::TryInto;
 
 static FILTER_OPERATIONS: &'static [FilterOp] = &[
     FilterOp::NotIn,
@@ -95,10 +95,7 @@ impl FilterOp {
     }
 }
 
-pub fn extract_unique_filter(
-    value_map: BTreeMap<String, ParsedInputValue>,
-    model: &ModelRef,
-) -> QueryGraphBuilderResult<Filter> {
+pub fn extract_unique_filter(value_map: ParsedInputMap, model: &ModelRef) -> QueryGraphBuilderResult<Filter> {
     let filters = value_map
         .into_iter()
         .map(|(field_name, value): (String, ParsedInputValue)| {
@@ -121,10 +118,7 @@ pub fn extract_unique_filter(
     Ok(Filter::and(filters))
 }
 
-pub fn extract_filter(
-    value_map: BTreeMap<String, ParsedInputValue>,
-    model: &ModelRef,
-) -> QueryGraphBuilderResult<Filter> {
+pub fn extract_filter(value_map: ParsedInputMap, model: &ModelRef) -> QueryGraphBuilderResult<Filter> {
     let filters = value_map
         .into_iter()
         .map(|(key, value): (String, ParsedInputValue)| {
@@ -246,7 +240,7 @@ fn handle_relation_field_filter(
     value: ParsedInputValue,
     op: &FilterOp,
 ) -> QueryGraphBuilderResult<Filter> {
-    let value: Option<BTreeMap<String, ParsedInputValue>> = value.try_into()?;
+    let value: Option<ParsedInputMap> = value.try_into()?;
 
     Ok(match (op, value) {
         (FilterOp::Some, Some(value)) => field.at_least_one_related(extract_filter(value, &field.related_model())?),

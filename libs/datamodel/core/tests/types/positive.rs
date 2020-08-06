@@ -1,5 +1,5 @@
 use crate::common::*;
-use datamodel::{common::ScalarType, DefaultValue, ValueGenerator};
+use datamodel::{dml::ScalarType, DefaultValue, ValueGenerator};
 use native_types::PostgresType;
 use prisma_value::PrismaValue;
 

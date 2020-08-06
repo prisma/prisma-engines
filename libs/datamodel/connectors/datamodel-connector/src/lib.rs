@@ -57,6 +57,18 @@ pub trait Connector: Send + Sync {
     fn supports_json(&self) -> bool {
         self.has_capability(ConnectorCapability::Json)
     }
+
+    fn supports_non_id_auto_increment(&self) -> bool {
+        self.has_capability(ConnectorCapability::AutoIncrementAllowedOnNonId)
+    }
+
+    fn supports_multiple_auto_increment(&self) -> bool {
+        self.has_capability(ConnectorCapability::AutoIncrementMultipleAllowed)
+    }
+
+    fn supports_non_indexed_auto_increment(&self) -> bool {
+        self.has_capability(ConnectorCapability::AutoIncrementNonIndexedAllowed)
+    }
 }
 
 /// Not all Databases are created equal. Hence connectors for our datasources support different capabilities.
@@ -68,6 +80,9 @@ pub enum ConnectorCapability {
     MultipleIndexesWithSameName,
     Enums,
     Json,
+    AutoIncrementAllowedOnNonId,
+    AutoIncrementMultipleAllowed,
+    AutoIncrementNonIndexedAllowed,
 }
 
 /// represents an instance of a native type declared in the Prisma schema

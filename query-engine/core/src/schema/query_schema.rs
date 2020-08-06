@@ -13,10 +13,10 @@ use std::{
 pub type OutputTypeRef = Arc<OutputType>;
 
 pub type ObjectTypeStrongRef = Arc<ObjectType>;
-pub type ObjectTypeRef = Weak<ObjectType>;
+pub type ObjectTypeWeakRef = Weak<ObjectType>;
 
 pub type InputObjectTypeStrongRef = Arc<InputObjectType>;
-pub type InputObjectTypeRef = Weak<InputObjectType>;
+pub type InputObjectTypeWeakRef = Weak<InputObjectType>;
 
 pub type QuerySchemaRef = Arc<QuerySchema>;
 pub type FieldRef = Arc<Field>;
@@ -272,6 +272,7 @@ pub struct Argument {
 
 pub struct InputObjectType {
     pub name: String,
+
     /// If true this means that _exactly_ one of the contained fields must be specified in an incoming query.
     /// This allows clients to handle this input type in a special way and ensure this invariant in a typesafe way.
     pub is_one_of: bool,
@@ -312,6 +313,10 @@ impl InputObjectType {
         let name = name.into();
         self.get_fields().into_iter().find(|f| f.name == name).cloned()
     }
+
+    pub fn set_one_of(&mut self, one_of: bool) {
+        self.is_one_of = one_of;
+    }
 }
 
 #[derive(Debug)]
@@ -326,7 +331,7 @@ pub enum InputType {
     Scalar(ScalarType),
     Enum(EnumTypeRef),
     List(Box<InputType>),
-    Object(InputObjectTypeRef),
+    Object(InputObjectTypeWeakRef),
 
     /// An optional input type may be provided, meaning only that the presence
     /// of the input is required or not, but doesn't make any assumption about
@@ -364,7 +369,7 @@ impl InputType {
         InputType::Null(Box::new(containing))
     }
 
-    pub fn object(containing: InputObjectTypeRef) -> InputType {
+    pub fn object(containing: InputObjectTypeWeakRef) -> InputType {
         InputType::Object(containing)
     }
 
@@ -405,7 +410,7 @@ impl InputType {
 pub enum OutputType {
     Enum(EnumTypeRef),
     List(OutputTypeRef),
-    Object(ObjectTypeRef),
+    Object(ObjectTypeWeakRef),
     Opt(OutputTypeRef),
     Scalar(ScalarType),
 }
@@ -419,7 +424,7 @@ impl OutputType {
         OutputType::Opt(Arc::new(containing))
     }
 
-    pub fn object(containing: ObjectTypeRef) -> OutputType {
+    pub fn object(containing: ObjectTypeWeakRef) -> OutputType {
         OutputType::Object(containing)
     }
 

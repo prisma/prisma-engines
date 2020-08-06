@@ -17,6 +17,9 @@ impl PostgresDatamodelConnector {
             ConnectorCapability::ScalarLists,
             ConnectorCapability::Enums,
             ConnectorCapability::Json,
+            ConnectorCapability::AutoIncrementMultipleAllowed,
+            ConnectorCapability::AutoIncrementAllowedOnNonId,
+            ConnectorCapability::AutoIncrementNonIndexedAllowed,
         ];
 
         let bigint = NativeTypeConstructor::without_args(BIG_INT_TYPE_NAME, ScalarType::Int);

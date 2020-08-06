@@ -96,13 +96,13 @@ fn test_parser_renderer_many_to_many_via_dml() {
   name      String
   viewCount Int
   posts     Post[]
-  authors   Author[] @relation("AuthorToBlogs", references: [id])
+  authors   Author[] @relation("AuthorToBlogs")
 }
 
 model Author {
   id      Int     @id
   name    String?
-  authors Blog[]  @relation("AuthorToBlogs", references: [id])
+  authors Blog[]  @relation("AuthorToBlogs")
 }
 
 model Post {

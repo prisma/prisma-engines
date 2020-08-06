@@ -2,8 +2,8 @@ use super::*;
 
 #[derive(Debug)]
 pub enum GqlObjectRenderer {
-    Input(InputObjectTypeRef),
-    Output(ObjectTypeRef),
+    Input(InputObjectTypeWeakRef),
+    Output(ObjectTypeWeakRef),
 }
 
 impl Renderer for GqlObjectRenderer {
@@ -16,7 +16,11 @@ impl Renderer for GqlObjectRenderer {
 }
 
 impl GqlObjectRenderer {
-    fn render_input_object(&self, input_object: &InputObjectTypeRef, ctx: RenderContext) -> (String, RenderContext) {
+    fn render_input_object(
+        &self,
+        input_object: &InputObjectTypeWeakRef,
+        ctx: RenderContext,
+    ) -> (String, RenderContext) {
         let input_object = input_object.into_arc();
         if ctx.already_rendered(&input_object.name) {
             return ("".into(), ctx);
@@ -46,7 +50,7 @@ impl GqlObjectRenderer {
         (rendered, ctx)
     }
 
-    fn render_output_object(&self, output_object: &ObjectTypeRef, ctx: RenderContext) -> (String, RenderContext) {
+    fn render_output_object(&self, output_object: &ObjectTypeWeakRef, ctx: RenderContext) -> (String, RenderContext) {
         let output_object = output_object.into_arc();
 
         if ctx.already_rendered(output_object.name()) {

@@ -67,6 +67,14 @@ impl Builder<ReadQuery> for AggregateRecordsBuilder {
         let selection_order = Self::collect_selection_tree(&nested_fields);
         let args = extractors::extract_query_args(self.field.arguments, &model)?;
 
+        // Reject unstable cursors for aggregations, because we can't do post-processing on those (we haven't implemented a in-memory aggregator yet).
+        if args.contains_unstable_cursor() {
+            return Err(QueryGraphBuilderError::InputError(
+                "The chosen cursor and orderBy combination is not stable (unique) and can't be used for aggregations."
+                    .to_owned(),
+            ));
+        }
+
         let aggregators: Vec<_> = nested_fields
             .into_iter()
             .map(|field| Self::resolve_query(field, &model))

@@ -1,25 +1,30 @@
 [package]
+authors = [
+  "Dominic Petrick <petrick@prisma.io>",
+  "Julius de Bruijn <bruijn@prisma.io>",
+  "Marcus Böhm <boehm@prisma.io>",
+  "Katharina Fey <kookie@spacekookie.de>",
+]
+edition = "2018"
 name = "prisma-models"
 version = "0.0.0"
-authors = ["Dominic Petrick <petrick@prisma.io>", "Julius de Bruijn <bruijn@prisma.io>", "Marcus Böhm <boehm@prisma.io>", "Katharina Fey <kookie@spacekookie.de>" ]
-edition = "2018"
 
 [features]
 default = []
 sql-ext = ["quaint"]
 
 [dependencies]
+chrono = {version = "0.4", features = ["serde"]}
+cuid = {git = "https://github.com/prisma/cuid-rust"}
+datamodel = {path = "../datamodel/core"}
+itertools = "0.8"
 once_cell = "1.3"
+prisma-value = {path = "../prisma-value", features = ["sql-ext"]}
+quaint = {git = "https://github.com/prisma/quaint", optional = true, features = ["uuid-0_8"]}
+rand = "0.7"
+rust_decimal = {git = "https://github.com/pimeys/rust-decimal", branch = "pgbouncer-mode"}
+serde = "1.0"
 serde_derive = "1.0"
 serde_json = "1.0"
-serde = "1.0"
-uuid = { version = "0.8", features = ["serde", "v4"] }
-cuid = { git = "https://github.com/prisma/cuid-rust" }
-chrono = { version = "0.4", features = ["serde"] }
 thiserror = "1.0"
-rand = "0.7"
-datamodel = { path = "../datamodel/core" }
-itertools = "0.8"
-rust_decimal = { git = "https://github.com/pimeys/rust-decimal", branch = "pgbouncer-mode" }
-quaint = { git = "https://github.com/prisma/quaint", optional = true, features = ["uuid-0_8"] }
-prisma-value = { path = "../prisma-value", features = ["sql-ext"] }
+uuid = {version = "0.8", features = ["serde", "v4"]}

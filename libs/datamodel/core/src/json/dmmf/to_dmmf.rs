@@ -1,6 +1,5 @@
-use super::*;
-use crate::common::ScalarType;
-use crate::{dml, IndexType};
+use super::{Datamodel, Enum, EnumValue, Field, Function, Model, UniqueIndex};
+use crate::{dml, IndexType, ScalarType};
 use prisma_value::PrismaValue;
 use rust_decimal::prelude::ToPrimitive;
 

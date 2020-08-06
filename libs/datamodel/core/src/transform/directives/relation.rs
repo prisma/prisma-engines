@@ -1,7 +1,7 @@
 use super::{super::helpers::*, DirectiveValidator};
-use crate::common::names::DefaultNames;
+use crate::common::RelationNames;
 use crate::error::DatamodelError;
-use crate::{ast, dml};
+use crate::{ast, dml, Field};
 
 /// Prismas builtin `@relation` directive.
 pub struct RelationDirectiveValidator {}
@@ -56,7 +56,7 @@ impl DirectiveValidator<dml::Field> for RelationDirectiveValidator {
 
             let mut all_related_ids = related_model.id_field_names();
             let has_default_name = relation_info.name
-                == DefaultNames::name_for_unambiguous_relation(&relation_info.to, &parent_model.name);
+                == RelationNames::name_for_unambiguous_relation(&relation_info.to, &parent_model.name);
 
             if !relation_info.name.is_empty() && (!has_default_name || parent_model.name == related_model.name) {
                 args.push(ast::Argument::new_string("", &relation_info.name));
@@ -78,6 +78,14 @@ impl DirectiveValidator<dml::Field> for RelationDirectiveValidator {
 
             // if we are on the physical field
             if !relation_info.to_fields.is_empty() {
+                let is_many_to_many = match &field {
+                    Field::RelationField(relation_field) => {
+                        let related_field = datamodel.find_related_field(&relation_field).unwrap();
+                        relation_field.arity.is_list() && related_field.arity.is_list()
+                    }
+                    _ => false,
+                };
+
                 let mut related_fields: Vec<ast::Expression> = Vec::with_capacity(relation_info.to_fields.len());
                 for related_field in &relation_info.to_fields {
                     related_fields.push(ast::Expression::ConstantValue(
@@ -86,7 +94,9 @@ impl DirectiveValidator<dml::Field> for RelationDirectiveValidator {
                     ));
                 }
 
-                args.push(ast::Argument::new_array("references", related_fields));
+                if !is_many_to_many {
+                    args.push(ast::Argument::new_array("references", related_fields));
+                }
             }
 
             if relation_info.on_delete != dml::OnDeleteStrategy::None {

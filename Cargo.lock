@@ -126,9 +126,9 @@ dependencies = [
 
 [[package]]
 name = "async-channel"
-version = "1.2.0"
+version = "1.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "958a8af017616083a7c739a9c4da4b757a6816593734b4b6145adbe1421526a5"
+checksum = "43de69555a39d52918e2bc33a408d3c0a86c829b212d898f4ca25d21a6387478"
 dependencies = [
  "concurrent-queue",
  "event-listener",
@@ -394,9 +394,9 @@ checksum = "2e8c087f005730276d1096a652e92a8bacee2e2472bcc9715a74d2bec38b5820"
 
 [[package]]
 name = "byte-pool"
-version = "0.2.1"
+version = "0.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9342e102eac8b1879fbedf9a7e0572c40b0cc5805b663c4d4ca791cae0bae221"
+checksum = "1e38e98299d518ec351ca016363e0cbfc77059dcd08dfa9700d15e405536097a"
 dependencies = [
  "crossbeam-queue",
  "stable_deref_trait",
@@ -518,9 +518,9 @@ dependencies = [
 
 [[package]]
 name = "concurrent-queue"
-version = "1.1.2"
+version = "1.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1582139bb74d97ef232c30bc236646017db06f13ee7cc01fa24c9e55640f86d4"
+checksum = "e296417c8154304ac70aceda41f05318f986f7c0c767bcb0a2366fbb890e78e1"
 dependencies = [
  "cache-padded",
 ]
@@ -863,9 +863,9 @@ checksum = "a246d82be1c9d791c5dfde9a2bd045fc3cbba3fa2b11ad558f27d01712f00569"
 
 [[package]]
 name = "error-chain"
-version = "0.12.2"
+version = "0.12.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d371106cc88ffdfb1eabd7111e432da544f16f3e2d7bf1dfe8bf575f1df045cd"
+checksum = "be51ed50e75656c17216bdd4326914466db0c91b9b246b12962a00284d06566b"
 dependencies = [
  "backtrace",
  "version_check",
@@ -873,9 +873,9 @@ dependencies = [
 
 [[package]]
 name = "event-listener"
-version = "2.2.1"
+version = "2.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "829694371bd7bbc6aee17c4ff624aad8bf9f4dc06c6f9f6071eaa08c89530d10"
+checksum = "298f00c3b04c1d9b4cb86aefaaa35348af0957d98b30a5306fc635f8e718923d"
 
 [[package]]
 name = "failure"
@@ -1491,9 +1491,9 @@ dependencies = [
 
 [[package]]
 name = "jsonrpc-client-transports"
-version = "14.2.0"
+version = "14.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ecbdaacc17243168d9d1fa6b2bd7556a27e1e60a621d8a2a6e590ae2b145d158"
+checksum = "2773fa94a2a1fd51efb89a8f45b8861023dbb415d18d3c9235ae9388d780f9ec"
 dependencies = [
  "failure",
  "futures 0.1.29",
@@ -2525,7 +2525,7 @@ dependencies = [
 [[package]]
 name = "quaint"
 version = "0.2.0-alpha.13"
-source = "git+https://github.com/prisma/quaint#cd00dc22ed80e8426f89d753a38a51230c5e4361"
+source = "git+https://github.com/prisma/quaint#6fafb89c9e814c55ee351eb92e9e7ea19203a17b"
 dependencies = [
  "async-trait",
  "base64 0.11.0",
@@ -3453,8 +3453,8 @@ dependencies = [
 
 [[package]]
 name = "tiberius"
-version = "0.4.7"
-source = "git+https://github.com/prisma/tiberius?branch=pgbouncer-mode-hack#309fc3826858d94aa1c76c25a440ae18f611e1d8"
+version = "0.4.8"
+source = "git+https://github.com/prisma/tiberius?branch=pgbouncer-mode-hack#245c31750c3b39e879f509f0a470ac45db9c2e2d"
 dependencies = [
  "async-native-tls",
  "async-stream",

@@ -516,3 +516,27 @@ async fn introspecting_default_values_on_lists_should_be_ignored(api: &TestApi) 
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
+
+#[test_each_connector(tags("postgres"))]
+async fn introspecting_a_table_non_id_autoincrement_should_work(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("Test", |t| {
+                t.inject_custom("id Integer Primary Key");
+                t.inject_custom("authorid Serial");
+                t.inject_custom("authorid2 Serial");
+            });
+        })
+        .await;
+
+    let dm = r#"
+            model Test {
+              id       Int @id
+              authorid Int @default(autoincrement())
+              authorid2 Int @default(autoincrement())
+            }
+        "#;
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+}

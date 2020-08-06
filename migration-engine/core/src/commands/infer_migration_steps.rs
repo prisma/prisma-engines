@@ -68,7 +68,7 @@ impl<'a> MigrationCommand for InferMigrationStepsCommand<'a> {
             errors: _,
             unexecutable_migrations,
         } = connector
-            .destructive_changes_checker()
+            .destructive_change_checker()
             .check(&database_migration)
             .await?;
 

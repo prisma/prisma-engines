@@ -13,12 +13,12 @@ use crate::{
     AddColumn, Component, DropColumn, DropTable, SqlMigration, SqlMigrationStep, SqlResult, TableChange,
 };
 use destructive_check_plan::DestructiveCheckPlan;
-use migration_connector::{ConnectorResult, DestructiveChangeDiagnostics, DestructiveChangesChecker};
+use migration_connector::{ConnectorResult, DestructiveChangeChecker, DestructiveChangeDiagnostics};
 use sql_schema_describer::SqlSchema;
 use unexecutable_step_check::UnexecutableStepCheck;
 use warning_check::SqlMigrationWarningCheck;
 
-/// The SqlDestructiveChangesChecker is responsible for informing users about potentially
+/// The SqlDestructiveChangeChecker is responsible for informing users about potentially
 /// destructive or impossible changes that their attempted migrations contain.
 ///
 /// It proceeds in three steps:
@@ -29,17 +29,17 @@ use warning_check::SqlMigrationWarningCheck;
 /// - Execute that plan (`DestructiveCheckPlan::execute`), running queries against the database to
 ///   inspect its current state, depending on what information the checks require.
 /// - Render the final user-facing messages based on the plan and the gathered information.
-pub struct SqlDestructiveChangesChecker<'a> {
+pub struct SqlDestructiveChangeChecker<'a> {
     pub connector: &'a crate::SqlMigrationConnector,
 }
 
-impl Component for SqlDestructiveChangesChecker<'_> {
+impl Component for SqlDestructiveChangeChecker<'_> {
     fn connector(&self) -> &crate::SqlMigrationConnector {
         self.connector
     }
 }
 
-impl SqlDestructiveChangesChecker<'_> {
+impl SqlDestructiveChangeChecker<'_> {
     fn check_table_drop(&self, table_name: &str, plan: &mut DestructiveCheckPlan) {
         plan.push_warning(SqlMigrationWarningCheck::NonEmptyTableDrop {
             table: table_name.to_owned(),
@@ -154,17 +154,13 @@ impl SqlDestructiveChangesChecker<'_> {
         after: &SqlSchema,
     ) -> SqlResult<DestructiveChangeDiagnostics> {
         let plan = self.plan(steps, before, after);
-        let mut diagnostics = plan.execute(self.schema_name(), self.conn()).await?;
 
-        // Temporary, for better reporting.
-        diagnostics.warn_about_unexecutable_migrations();
-
-        Ok(diagnostics)
+        plan.execute(self.schema_name(), self.conn()).await
     }
 }
 
 #[async_trait::async_trait]
-impl DestructiveChangesChecker<SqlMigration> for SqlDestructiveChangesChecker<'_> {
+impl DestructiveChangeChecker<SqlMigration> for SqlDestructiveChangeChecker<'_> {
     async fn check(&self, database_migration: &SqlMigration) -> ConnectorResult<DestructiveChangeDiagnostics> {
         self.check_impl(
             &database_migration.original_steps,
@@ -191,6 +187,7 @@ impl DestructiveChangesChecker<SqlMigration> for SqlDestructiveChangesChecker<'_
             &database_migration.before,
             &database_migration.after,
         );
+
         Ok(plan.pure_check())
     }
 }

@@ -3,21 +3,21 @@ use crate::warnings::{
     warning_enriched_with_map_on_enum, warning_enriched_with_map_on_enum_value, warning_enriched_with_map_on_field,
     warning_enriched_with_map_on_model, Enum, EnumAndValue, Model, ModelAndField,
 };
-use datamodel::{Datamodel, DefaultNames, DefaultValue, FieldType};
-use introspection_connector::IntrospectionResult;
+use datamodel::{common::RelationNames, Datamodel, DefaultValue, FieldType};
+use introspection_connector::Warning;
 use prisma_value::PrismaValue;
 use std::cmp::Ordering;
 use std::cmp::Ordering::{Equal, Greater, Less};
 
-pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut IntrospectionResult) {
+pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec<Warning> {
     // Notes
     // Relationnames are similar to virtual relationfields, they can be changed arbitrarily
     // investigate keeping of old manual custom relation names
 
     // println!("{:#?}", old_data_model);
-    // println!("{:#?}", introspection_result.datamodel);
+    // println!("{:#?}", new_data_model);
 
-    let new_data_model = &mut introspection_result.data_model;
+    let mut warnings = vec![];
 
     //@@map on models
     let mut changed_model_names = vec![];
@@ -178,9 +178,9 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
 
                 let unambiguous = number_of_relations_to_other_model_in_relation < 2;
                 let relation_name = if unambiguous {
-                    DefaultNames::name_for_unambiguous_relation(model_with_fk, referenced_model)
+                    RelationNames::name_for_unambiguous_relation(model_with_fk, referenced_model)
                 } else {
-                    DefaultNames::name_for_ambiguous_relation(model_with_fk, referenced_model, &fk_column_name)
+                    RelationNames::name_for_ambiguous_relation(model_with_fk, referenced_model, &fk_column_name)
                 };
 
                 relation_fields_to_change.push((changed_model.name.clone(), rf.name.clone(), relation_name.clone()));
@@ -295,9 +295,7 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
 
     if !changed_model_names.is_empty() {
         let models = changed_model_names.iter().map(|c| c.1.clone()).collect();
-        introspection_result
-            .warnings
-            .push(warning_enriched_with_map_on_model(&models));
+        warnings.push(warning_enriched_with_map_on_model(&models));
     }
 
     if !changed_scalar_field_names.is_empty() {
@@ -305,16 +303,12 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
             .iter()
             .map(|c| ModelAndField::new(&c.0.model, &c.1))
             .collect();
-        introspection_result
-            .warnings
-            .push(warning_enriched_with_map_on_field(&models_and_fields));
+        warnings.push(warning_enriched_with_map_on_field(&models_and_fields));
     }
 
     if !changed_enum_names.is_empty() {
         let enums = changed_enum_names.iter().map(|c| Enum::new(&c.1)).collect();
-        introspection_result
-            .warnings
-            .push(warning_enriched_with_map_on_enum(&enums));
+        warnings.push(warning_enriched_with_map_on_enum(&enums));
     }
 
     if !changed_enum_values.is_empty() {
@@ -322,10 +316,11 @@ pub fn enrich(old_data_model: &Datamodel, introspection_result: &mut Introspecti
             .iter()
             .map(|c| EnumAndValue::new(&c.0.enm, &c.1))
             .collect();
-        introspection_result
-            .warnings
-            .push(warning_enriched_with_map_on_enum_value(&enums_and_values));
+
+        warnings.push(warning_enriched_with_map_on_enum_value(&enums_and_values));
     }
+
+    warnings
 }
 
 fn re_order_putting_new_ones_last(enum_a_idx: Option<usize>, enum_b_idx: Option<usize>) -> Ordering {

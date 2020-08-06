@@ -52,7 +52,7 @@ class OrderByInMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
     testDataModels.testV11 { project =>
       val res = server.query(
         """mutation {
-        |  createFoo(
+        |  createOneFoo(
         |    data: {
         |      bars: {
         |        create: [
@@ -63,18 +63,17 @@ class OrderByInMutationSpec extends FlatSpec with Matchers with ApiSpecBase {
         |    }
         |  ) {
         |    test
-        |    bars(take: 1, orderBy: orderField_DESC) {
+        |    bars(take: 1, orderBy: { orderField: desc }) {
         |      quantity
         |    }
         |  }
         |}
       """,
-        project
+        project,
+        legacy = false,
       )
 
-      res.toString should be("""{"data":{"createFoo":{"test":null,"bars":[{"quantity":2}]}}}""")
+      res.toString should be("""{"data":{"createOneFoo":{"test":null,"bars":[{"quantity":2}]}}}""")
     }
-
   }
-
 }

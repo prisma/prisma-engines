@@ -2,7 +2,7 @@ use super::*;
 use datamodel_connector::NativeTypeInstance;
 use std::hash::Hash;
 
-/// Datamodel field arity.
+/// Arity of a Field in a Model.
 #[derive(Debug, PartialEq, Copy, Clone, Eq, Hash)]
 pub enum FieldArity {
     Required,
@@ -34,7 +34,7 @@ pub enum FieldType {
     Relation(RelationInfo),
     /// native field type.
     NativeType(ScalarType, NativeTypeInstance),
-    /// This is a field with an unsupported datatype.
+    /// This is a field with an unsupported datatype - used by introspection only.
     Unsupported(String),
     /// The option is Some(x) if the scalar type is based upon a type alias.
     Base(ScalarType, Option<String>),
@@ -57,6 +57,7 @@ impl FieldType {
     }
 }
 
+/// Represents a Field in a Model.
 #[derive(Debug, PartialEq, Clone)]
 pub enum Field {
     ScalarField(ScalarField),
@@ -138,13 +139,6 @@ impl Field {
         match &self {
             Field::ScalarField(sf) => sf.is_generated,
             Field::RelationField(rf) => rf.is_generated,
-        }
-    }
-
-    pub fn points_to_model(&self, name: &str) -> bool {
-        match self {
-            Field::ScalarField(_) => false,
-            Field::RelationField(rf) => rf.points_to_model(name),
         }
     }
 }
@@ -243,7 +237,7 @@ impl RelationField {
     }
 }
 
-/// Represents a field in a model.
+/// Represents a scalar field in a model.
 #[derive(Debug, PartialEq, Clone)]
 pub struct ScalarField {
     /// Name of the field.
@@ -325,6 +319,10 @@ impl ScalarField {
 
     pub fn is_optional(&self) -> bool {
         self.arity.is_optional()
+    }
+
+    pub fn is_auto_increment(&self) -> bool {
+        matches!(&self.default_value, Some(DefaultValue::Expression(expr)) if expr == &ValueGenerator::new_autoincrement())
     }
 }
 

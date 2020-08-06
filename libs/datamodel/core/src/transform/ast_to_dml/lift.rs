@@ -1,11 +1,9 @@
 use super::super::directives::AllDirectives;
 use crate::transform::helpers::ValueValidator;
 use crate::{
-    ast,
-    common::ScalarType,
-    configuration, dml,
+    ast, configuration, dml,
     error::{DatamodelError, ErrorCollection},
-    Field, FieldType,
+    Field, FieldType, ScalarType,
 };
 use datamodel_connector::Connector;
 use sql_datamodel_connector::SqlDatamodelConnectors;

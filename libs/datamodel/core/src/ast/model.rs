@@ -17,6 +17,15 @@ pub struct Model {
     pub commented_out: bool,
 }
 
+impl Model {
+    pub fn find_field(&self, name: &str) -> &Field {
+        self.fields
+            .iter()
+            .find(|ast_field| ast_field.name.name == name)
+            .unwrap()
+    }
+}
+
 impl WithIdentifier for Model {
     fn identifier(&self) -> &Identifier {
         &self.name

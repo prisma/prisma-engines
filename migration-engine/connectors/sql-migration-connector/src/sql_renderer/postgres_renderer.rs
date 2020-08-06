@@ -99,7 +99,7 @@ impl super::SqlRenderer for PostgresFlavour {
 
                         if !sequence_is_still_used {
                             rendered_steps.after =
-                                Some(format!("DROP SEQUENCE {};", Quoted::postgres_ident(sequence_name)));
+                                Some(format!("DROP SEQUENCE {}", Quoted::postgres_ident(sequence_name)));
                         }
                     }
                 }
@@ -131,14 +131,14 @@ impl super::SqlRenderer for PostgresFlavour {
                     )
                     .to_lowercase();
 
-                    let create_sequence = format!("CREATE SEQUENCE {};", Quoted::postgres_ident(&sequence_name));
+                    let create_sequence = format!("CREATE SEQUENCE {}", Quoted::postgres_ident(&sequence_name));
                     let set_default = format!(
-                        "{prefix} SET DEFAULT {default};",
+                        "{prefix} SET DEFAULT {default}",
                         prefix = alter_column_prefix,
                         default = format_args!("nextval({})", Quoted::postgres_string(&sequence_name))
                     );
                     let alter_sequence = format!(
-                        "ALTER SEQUENCE {sequence_name} OWNED BY {schema_name}.{table_name}.{column_name};",
+                        "ALTER SEQUENCE {sequence_name} OWNED BY {schema_name}.{table_name}.{column_name}",
                         sequence_name = Quoted::postgres_ident(sequence_name),
                         schema_name = Quoted::postgres_ident(self.0.schema()),
                         table_name = table_name,
@@ -157,7 +157,7 @@ impl super::SqlRenderer for PostgresFlavour {
 
     fn render_create_enum(&self, create_enum: &crate::CreateEnum) -> Vec<String> {
         let sql = format!(
-            r#"CREATE TYPE {enum_name} AS ENUM ({variants});"#,
+            r#"CREATE TYPE {enum_name} AS ENUM ({variants})"#,
             enum_name = Quoted::postgres_ident(&create_enum.name),
             variants = create_enum.variants.iter().map(Quoted::postgres_string).join(", "),
         );

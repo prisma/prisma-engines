@@ -40,7 +40,7 @@ class UpdateManySpec extends FlatSpec with Matchers with ApiSpecBase {
 
     val todoes = server.query(
       """{
-        |  todoes (orderBy: id_ASC) {
+        |  todoes (orderBy: { id: asc }) {
         |    title
         |    opt
         |  }

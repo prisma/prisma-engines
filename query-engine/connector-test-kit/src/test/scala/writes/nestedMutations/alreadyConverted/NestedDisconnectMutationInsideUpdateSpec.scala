@@ -157,7 +157,8 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
       """,
         project,
         errorCode = 2014,
-        errorContains = """Error in query graph construction: RelationViolation(RelationViolation { relation_name: \"ChildToParent\", model_a_name: \"Child\", model_b_name: \"Parent\" """
+        errorContains =
+          """Error in query graph construction: RelationViolation(RelationViolation { relation_name: \"ChildToParent\", model_a_name: \"Child\", model_b_name: \"Parent\" """
       )
 
     }
@@ -991,7 +992,8 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
       """,
       project,
       errorCode = 2017,
-      errorContains = """Error occurred during query execution:\nInterpretationError(\"Error for binding \\'1\\': RecordsNotConnected { relation_name: \\\"UserFollows\\\", parent_name: \\\"User\\\", child_name: \\\"User\\\" }"""
+      errorContains =
+        """Error occurred during query execution:\nInterpretationError(\"Error for binding \\'1\\': RecordsNotConnected { relation_name: \\\"UserFollows\\\", parent_name: \\\"User\\\", child_name: \\\"User\\\" }"""
 //      errorContains =
 //        "The relation UserFollows has no Node for the model User with value `Paul` for username connected to a Node for the model User with value `Anton` for username"
     )
@@ -1062,9 +1064,9 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |   }
          |  ) {
          |    nameTop
-         |    middles (orderBy: id_ASC){
+         |    middles (orderBy: { id: asc }){
          |      nameMiddle
-         |      bottoms (orderBy: id_ASC){
+         |      bottoms (orderBy: { id: asc }){
          |        nameBottom
          |      }
          |    }
@@ -1077,7 +1079,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
     result.toString should be(
       """{"data":{"updateTop":{"nameTop":"updated top","middles":[{"nameMiddle":"updated middle","bottoms":[{"nameBottom":"the second bottom"}]},{"nameMiddle":"the second middle","bottoms":[{"nameBottom":"the third bottom"},{"nameBottom":"the fourth bottom"}]}]}}}""")
 
-    server.query("query{bottoms(orderBy: id_ASC){nameBottom}}", project).toString should be(
+    server.query("query{bottoms(orderBy: { id: asc }){nameBottom}}", project).toString should be(
       """{"data":{"bottoms":[{"nameBottom":"the bottom"},{"nameBottom":"the second bottom"},{"nameBottom":"the third bottom"},{"nameBottom":"the fourth bottom"}]}}""")
   }
 
@@ -1144,9 +1146,9 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |   }
          |  ) {
          |    nameTop
-         |    middles (orderBy: id_ASC){
+         |    middles (orderBy: { id: asc }){
          |      nameMiddle
-         |      bottoms (orderBy: id_ASC){
+         |      bottoms (orderBy: { id: asc }){
          |        nameBottom
          |      }
          |    }
@@ -1159,7 +1161,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
     result.toString should be(
       """{"data":{"updateTop":{"nameTop":"updated top","middles":[{"nameMiddle":"updated middle","bottoms":[{"nameBottom":"the second bottom"}]},{"nameMiddle":"the second middle","bottoms":[{"nameBottom":"the third bottom"},{"nameBottom":"the fourth bottom"}]}]}}}""")
 
-    server.query("query{bottoms(orderBy: id_ASC){nameBottom}}", project).toString should be(
+    server.query("query{bottoms(orderBy: { id: asc }){nameBottom}}", project).toString should be(
       """{"data":{"bottoms":[{"nameBottom":"the bottom"},{"nameBottom":"the second bottom"},{"nameBottom":"the third bottom"},{"nameBottom":"the fourth bottom"}]}}""")
   }
 
@@ -1224,7 +1226,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |   }
          |  ) {
          |    nameTop
-         |    middles (orderBy: id_ASC) {
+         |    middles (orderBy: { id: asc }) {
          |      nameMiddle
          |      bottom {
          |        nameBottom
@@ -1315,7 +1317,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |      nameMiddle
          |      bottom {
          |        nameBottom
-         |        below (orderBy: id_ASC){
+         |        below (orderBy: { id: asc }){
          |           nameBelow
          |        }
          |
@@ -1330,7 +1332,7 @@ class NestedDisconnectMutationInsideUpdateSpec extends FlatSpec with Matchers wi
     result.toString should be(
       """{"data":{"updateTop":{"nameTop":"updated top","middle":{"nameMiddle":"updated middle","bottom":{"nameBottom":"updated bottom","below":[{"nameBelow":"second below"}]}}}}}""")
 
-    server.query("query{belows(orderBy: id_ASC){nameBelow}}", project).toString should be(
+    server.query("query{belows(orderBy: { id: asc }){nameBelow}}", project).toString should be(
       """{"data":{"belows":[{"nameBelow":"below"},{"nameBelow":"second below"}]}}""")
   }
 

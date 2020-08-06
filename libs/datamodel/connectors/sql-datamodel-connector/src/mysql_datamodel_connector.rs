@@ -13,6 +13,7 @@ impl MySqlDatamodelConnector {
             ConnectorCapability::Enums,
             ConnectorCapability::Json,
             ConnectorCapability::MultipleIndexesWithSameName,
+            ConnectorCapability::AutoIncrementAllowedOnNonId,
         ];
 
         let constructors: Vec<NativeTypeConstructor> = vec![];

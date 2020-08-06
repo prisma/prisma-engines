@@ -2,7 +2,7 @@ use super::DestructiveChangeCheckerFlavour;
 use crate::{
     expanded_alter_column::{expand_postgres_alter_column, PostgresAlterColumn},
     flavour::PostgresFlavour,
-    sql_destructive_changes_checker::{
+    sql_destructive_change_checker::{
         destructive_check_plan::DestructiveCheckPlan, unexecutable_step_check::UnexecutableStepCheck,
         warning_check::SqlMigrationWarningCheck,
     },
