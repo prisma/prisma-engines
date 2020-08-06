@@ -250,9 +250,34 @@ impl Model {
         result
     }
 
+    pub fn field_is_indexed(&self, field_name: &String) -> bool {
+        let field = self.find_field(field_name).unwrap();
+
+        if field.is_id() || field.is_unique() {
+            return true;
+        }
+
+        let is_first_in_index = self
+            .indices
+            .iter()
+            .any(|index| index.fields.first().unwrap() == field_name);
+
+        let is_first_in_primary_key = match self.id_fields.first() {
+            Some(f) if f == field_name => true,
+            _ => false,
+        };
+
+        is_first_in_index || is_first_in_primary_key
+    }
+
     /// Finds the name of all id fields
     pub fn singular_id_fields(&self) -> impl std::iter::Iterator<Item = &ScalarField> {
         self.scalar_fields().filter(|x| x.is_id)
+    }
+
+    /// Finds all fields defined as autoincrement
+    pub fn auto_increment_fields(&self) -> impl std::iter::Iterator<Item = &ScalarField> {
+        self.scalar_fields().filter(|x| x.is_auto_increment())
     }
 
     /// Determines whether there is a singular primary key

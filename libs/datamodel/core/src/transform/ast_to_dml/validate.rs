@@ -1,10 +1,10 @@
 use crate::ast::WithDirectives;
 use crate::{
-    ast, configuration,
-    configuration::PreviewFeatures,
-    dml,
+    ast, configuration, dml,
     error::{DatamodelError, ErrorCollection},
+    DefaultValue, FieldType,
 };
+use prisma_value::PrismaValue;
 use std::collections::HashSet;
 
 /// Helper for validating a datamodel.
@@ -72,6 +72,18 @@ impl<'a> Validator<'a> {
 
             if let Err(ref mut the_errors) =
                 self.validate_field_types(ast_schema.find_model(&model.name).expect(STATE_ERROR), model)
+            {
+                errors_for_model.append(the_errors);
+            }
+
+            if let Err(ref mut the_errors) =
+                self.validate_enum_default_values(schema, ast_schema.find_model(&model.name).expect(STATE_ERROR), model)
+            {
+                errors_for_model.append(the_errors);
+            }
+
+            if let Err(ref mut the_errors) =
+                self.validate_auto_increment(ast_schema.find_model(&model.name).expect(STATE_ERROR), model)
             {
                 errors_for_model.append(the_errors);
             }
@@ -216,16 +228,10 @@ impl<'a> Validator<'a> {
 
         for field in model.scalar_fields() {
             if field.is_list() && !scalar_lists_are_supported {
-                let ast_field = ast_model
-                    .fields
-                    .iter()
-                    .find(|ast_field| ast_field.name.name == field.name)
-                    .unwrap();
-
                 errors.push(DatamodelError::new_scalar_list_fields_are_not_supported(
                     &model.name,
                     &field.name,
-                    ast_field.span,
+                    ast_model.find_field(&field.name).span,
                 ));
             }
         }
@@ -241,12 +247,6 @@ impl<'a> Validator<'a> {
         let mut errors = ErrorCollection::new();
 
         for field in model.scalar_fields() {
-            let ast_field = ast_model
-                .fields
-                .iter()
-                .find(|ast_field| ast_field.name.name == field.name)
-                .unwrap();
-
             if let Some(dml::ScalarType::Json) = field.field_type.scalar_type() {
                 // TODO: this is really ugly
                 let supports_json_type = match self.source {
@@ -258,8 +258,100 @@ impl<'a> Validator<'a> {
                         &format!("Field `{}` in model `{}` can't be of type Json. The current connector does not support the Json type.", &field.name, &model.name),
                         &model.name,
                         &field.name,
-                        ast_field.span,
+                        ast_model.find_field(&field.name).span,
                     ));
+                }
+            }
+        }
+
+        if errors.has_errors() {
+            Err(errors)
+        } else {
+            Ok(())
+        }
+    }
+
+    fn validate_enum_default_values(
+        &self,
+        data_model: &dml::Datamodel,
+        ast_model: &ast::Model,
+        model: &dml::Model,
+    ) -> Result<(), ErrorCollection> {
+        let mut errors = ErrorCollection::new();
+
+        for field in model.scalar_fields() {
+            if let Some(DefaultValue::Single(PrismaValue::Enum(enum_value))) = &field.default_value {
+                if let FieldType::Enum(enum_name) = &field.field_type {
+                    if let Some(dml_enum) = data_model.find_enum(&enum_name) {
+                        if !dml_enum.values.iter().any(|value| &value.name == enum_value) {
+                            errors.push(DatamodelError::new_directive_validation_error(
+                                &format!(
+                                "{}",
+                                "The defined default value is not a valid value of the enum specified for the field."
+                            ),
+                                "default",
+                                ast_model.find_field(&field.name).span,
+                            ))
+                        }
+                    }
+                }
+            }
+        }
+
+        if errors.has_errors() {
+            Err(errors)
+        } else {
+            Ok(())
+        }
+    }
+
+    fn validate_auto_increment(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), ErrorCollection> {
+        let mut errors = ErrorCollection::new();
+
+        if let Some(data_source) = self.source {
+            if !data_source.combined_connector.supports_multiple_auto_increment()
+                && model.auto_increment_fields().count() > 1
+            {
+                errors.push(DatamodelError::new_directive_validation_error(
+                    &format!(
+                        "{}",
+                        "The `autoincrement()` default value is used multiple times on this model even though the underlying datasource only supports one instance per table."
+                    ),
+                    "default",
+                    ast_model.span,
+                ))
+            }
+
+            // go over all fields
+            for field in model.scalar_fields() {
+                let ast_field = ast_model.find_field(&field.name);
+
+                if !field.is_id
+                    && field.is_auto_increment()
+                    && !data_source.combined_connector.supports_non_id_auto_increment()
+                {
+                    errors.push(DatamodelError::new_directive_validation_error(
+                    &format!(
+                        "{}",
+                        "The `autoincrement()` default value is used on a non-id field even though the datasource does not support this."
+                    ),
+                    "default",
+                    ast_field.span,
+                ))
+                }
+
+                if field.is_auto_increment()
+                    && !model.field_is_indexed(&field.name)
+                    && !data_source.combined_connector.supports_non_indexed_auto_increment()
+                {
+                    errors.push(DatamodelError::new_directive_validation_error(
+                    &format!(
+                        "{}",
+                        "The `autoincrement()` default value is used on a non-indexed field even though the datasource does not support this."
+                    ),
+                    "default",
+                    ast_field.span,
+                ))
                 }
             }
         }
@@ -332,7 +424,7 @@ impl<'a> Validator<'a> {
     }
 
     fn validate_model_name(&self, ast_model: &ast::Model, model: &dml::Model) -> Result<(), DatamodelError> {
-        let mut validator = super::reserved_model_names::ReservedModelNameValidator::new();
+        let validator = super::reserved_model_names::ReservedModelNameValidator::new();
 
         if validator.is_reserved(&model.name) {
             Err(DatamodelError::new_model_validation_error(
@@ -387,11 +479,7 @@ impl<'a> Validator<'a> {
         let mut errors = ErrorCollection::new();
 
         for field in model.relation_fields() {
-            let ast_field = ast_model
-                .fields
-                .iter()
-                .find(|ast_field| ast_field.name.name == field.name)
-                .unwrap();
+            let ast_field = ast_model.find_field(&field.name);
 
             let rel_info = &field.relation_info;
             let unknown_fields: Vec<String> = rel_info
@@ -477,11 +565,7 @@ impl<'a> Validator<'a> {
         let mut errors = ErrorCollection::new();
 
         for field in model.relation_fields() {
-            let ast_field = ast_model
-                .fields
-                .iter()
-                .find(|ast_field| ast_field.name.name == field.name)
-                .unwrap();
+            let ast_field = ast_model.find_field(&field.name);
 
             let rel_info = &field.relation_info;
             let related_model = datamodel.find_model(&rel_info.to).expect(STATE_ERROR);

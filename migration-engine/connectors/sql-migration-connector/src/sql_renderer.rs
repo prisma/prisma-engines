@@ -52,12 +52,12 @@ pub(crate) trait SqlRenderer {
                 // FIXME Temporary hack: we should get this from a `TableRef`, but
                 // this is not possible because we sometimes create tables as
                 // part of the table redifinition process on sqlite.
-                let column_ref = ColumnRef {
-                    column,
+                let column = ColumnRef {
                     schema: next_schema,
+                    column,
                     table,
                 };
-                self.render_column(&schema_name, column_ref, false)
+                self.render_column(&schema_name, column, false)
             })
             .join(",\n");
 
@@ -73,6 +73,24 @@ pub(crate) trait SqlRenderer {
         if !primary_columns.is_empty() && !primary_key_is_already_set {
             let column_names = primary_columns.iter().map(|col| self.quote(&col)).join(",");
             write!(create_table, ",\nPRIMARY KEY ({})", column_names)?;
+        }
+
+        if sql_family == SqlFamily::Mysql && !table.indices.is_empty() {
+            let indices: String = table
+                .indices
+                .iter()
+                .map(|index| {
+                    let tpe = if index.is_unique() { "UNIQUE " } else { "" };
+                    format!(
+                        "{}Index {}({})",
+                        tpe,
+                        self.quote(&index.name),
+                        index.columns.iter().map(|col| self.quote(&col)).join(",\n")
+                    )
+                })
+                .join(",\n");
+
+            write!(create_table, ",\n{}", indices)?;
         }
 
         if sql_family == SqlFamily::Sqlite && !table.foreign_keys.is_empty() {

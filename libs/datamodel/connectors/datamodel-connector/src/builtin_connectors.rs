@@ -50,6 +50,7 @@ impl BuiltinConnectors {
                 ConnectorCapability::Enums,
                 ConnectorCapability::Json,
                 ConnectorCapability::MultipleIndexesWithSameName,
+                ConnectorCapability::AutoIncrementAllowedOnNonId,
             ],
         }
     }
@@ -116,6 +117,9 @@ impl BuiltinConnectors {
                 ConnectorCapability::ScalarLists,
                 ConnectorCapability::Enums,
                 ConnectorCapability::Json,
+                ConnectorCapability::AutoIncrementMultipleAllowed,
+                ConnectorCapability::AutoIncrementAllowedOnNonId,
+                ConnectorCapability::AutoIncrementNonIndexedAllowed,
             ],
         }
     }

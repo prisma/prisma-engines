@@ -319,6 +319,10 @@ impl ScalarField {
     pub fn is_optional(&self) -> bool {
         self.arity.is_optional()
     }
+
+    pub fn is_auto_increment(&self) -> bool {
+        matches!(&self.default_value, Some(DefaultValue::Expression(expr)) if expr == &ValueGenerator::new_autoincrement())
+    }
 }
 
 impl WithName for ScalarField {
