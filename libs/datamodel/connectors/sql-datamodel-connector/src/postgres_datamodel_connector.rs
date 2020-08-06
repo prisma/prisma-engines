@@ -1,30 +1,68 @@
-use datamodel_connector::{scalars::ScalarType, ConnectorCapability, DeclarativeConnector, FieldTypeConstructor};
-use native_types::PostgresType;
+use datamodel_connector::{
+    scalars::ScalarType, Connector, ConnectorCapability, NativeTypeConstructor, NativeTypeInstance,
+};
+use native_types::{NativeType, PostgresType};
 
-pub fn new() -> DeclarativeConnector {
-    let capabilities = vec![
-        ConnectorCapability::ScalarLists,
-        ConnectorCapability::Enums,
-        ConnectorCapability::Json,
-    ];
+const BIG_INT_TYPE_NAME: &str = "BigInt";
+const VARCHAR_TYPE_NAME: &str = "VarChar";
 
-    let varchar = FieldTypeConstructor::with_args(
-        "VarChar",
-        1,
-        ScalarType::String,
-        Box::new(|args| {
-            let first_arg = *args.first().unwrap();
-            Box::new(PostgresType::VarChar(first_arg))
-        }),
-    );
+pub struct PostgresDatamodelConnector {
+    capabilities: Vec<ConnectorCapability>,
+    constructors: Vec<NativeTypeConstructor>,
+}
 
-    let bigint =
-        FieldTypeConstructor::without_args("BigInt", ScalarType::Int, Box::new(|| Box::new(PostgresType::BigInt)));
+impl PostgresDatamodelConnector {
+    pub fn new() -> PostgresDatamodelConnector {
+        let capabilities = vec![
+            ConnectorCapability::ScalarLists,
+            ConnectorCapability::Enums,
+            ConnectorCapability::Json,
+        ];
 
-    let constructors = vec![varchar, bigint];
+        let bigint = NativeTypeConstructor::without_args(BIG_INT_TYPE_NAME, ScalarType::Int);
+        let varchar = NativeTypeConstructor::with_args(VARCHAR_TYPE_NAME, 1, ScalarType::String);
+        let constructors = vec![varchar, bigint];
 
-    DeclarativeConnector {
-        capabilities,
-        field_type_constructors: constructors,
+        PostgresDatamodelConnector {
+            capabilities,
+            constructors,
+        }
+    }
+}
+
+impl Connector for PostgresDatamodelConnector {
+    fn capabilities(&self) -> &Vec<ConnectorCapability> {
+        &self.capabilities
+    }
+
+    fn available_native_type_constructors(&self) -> &Vec<NativeTypeConstructor> {
+        &self.constructors
+    }
+
+    fn parse_native_type(&self, name: &str, args: Vec<u32>) -> Option<NativeTypeInstance> {
+        let constructor = self.find_native_type_constructor(name);
+        let native_type = match name {
+            BIG_INT_TYPE_NAME => PostgresType::BigInt,
+            VARCHAR_TYPE_NAME => {
+                let length = *args.first().unwrap();
+                PostgresType::VarChar(length)
+            }
+            _ => unreachable!("This code is unreachable as the core must guarantee to just call with known names."),
+        };
+
+        Some(NativeTypeInstance::new(constructor.name.as_str(), args, &native_type))
+    }
+
+    fn introspect_native_type(&self, native_type: Box<dyn NativeType>) -> Option<NativeTypeInstance> {
+        let native_type: PostgresType = serde_json::from_value(native_type.to_json()).unwrap();
+        let (constructor_name, args) = match native_type {
+            PostgresType::BigInt => (BIG_INT_TYPE_NAME, vec![]),
+            PostgresType::VarChar(x) => (VARCHAR_TYPE_NAME, vec![x]),
+            _ => todo!("This match must be exhaustive"),
+        };
+
+        let constructor = self.find_native_type_constructor(constructor_name);
+
+        Some(NativeTypeInstance::new(constructor.name.as_str(), args, &native_type))
     }
 }

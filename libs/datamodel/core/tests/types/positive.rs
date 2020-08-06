@@ -126,11 +126,11 @@ fn should_handle_type_specifications() {
 
     let sft = user_model.assert_has_scalar_field("bigInt").assert_native_type();
 
-    let postgrestype: PostgresType = sft.native_type();
+    let postgrestype: PostgresType = sft.deserialize_native_type();
     assert_eq!(postgrestype, PostgresType::BigInt);
 
     let sft = user_model.assert_has_scalar_field("foobar").assert_native_type();
 
-    let postgrestype: PostgresType = sft.native_type();
+    let postgrestype: PostgresType = sft.deserialize_native_type();
     assert_eq!(postgrestype, PostgresType::VarChar(26));
 }

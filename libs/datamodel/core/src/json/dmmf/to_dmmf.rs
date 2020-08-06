@@ -166,7 +166,7 @@ fn get_field_type(field: &dml::Field) -> String {
         dml::FieldType::Enum(t) => t.clone(),
         dml::FieldType::Unsupported(t) => t.clone(),
         dml::FieldType::Base(t, _) => type_to_string(t),
-        dml::FieldType::NativeType(sft) => type_to_string(&sft.prisma_type()),
+        dml::FieldType::NativeType(t, _) => type_to_string(t),
     }
 }
 

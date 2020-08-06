@@ -212,8 +212,8 @@ impl<'a> LiftAstToDml<'a> {
                     })
                     .unwrap_or(vec![]);
 
-                if let Some(x) = name.and_then(|ts| pg_connector.calculate_native_type(&ts, args)) {
-                    let field_type = dml::FieldType::NativeType(x);
+                if let Some(x) = name.and_then(|ts| pg_connector.parse_native_type(&ts, args)) {
+                    let field_type = dml::FieldType::NativeType(scalar_type, x);
                     Ok((field_type, vec![]))
                 } else {
                     Ok((dml::FieldType::Base(scalar_type, type_alias), vec![]))
