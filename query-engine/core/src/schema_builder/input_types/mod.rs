@@ -87,3 +87,7 @@ fn compound_object_name(alias: Option<&String>, from_fields: &[ScalarFieldRef]) 
         field_names.join("")
     })
 }
+
+fn wrap_opt_input_object(o: InputObjectTypeWeakRef) -> InputType {
+    InputType::opt(InputType::object(o))
+}
