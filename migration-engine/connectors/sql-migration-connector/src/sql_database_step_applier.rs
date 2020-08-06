@@ -135,52 +135,10 @@ fn render_raw_sql(
             _ => Ok(Vec::new()),
         },
         SqlMigrationStep::CreateTable(CreateTable { table }) => {
-            let columns: String = table
-                .columns
-                .iter()
-                .map(|column| {
-                    let column = ColumnRef {
-                        schema: next_schema,
-                        column,
-                        table,
-                    };
-                    renderer.render_column(&schema_name, column, false)
-                })
-                .join(",\n");
-
-            let mut create_table = format!(
-                "CREATE TABLE {} (\n{}",
-                renderer.quote_with_schema(&schema_name, &table.name),
-                columns,
-            );
-
-            let primary_key_is_already_set = create_table.contains("PRIMARY KEY");
-            let primary_columns = table.primary_key_columns();
-
-            if !primary_columns.is_empty() && !primary_key_is_already_set {
-                let column_names = primary_columns.iter().map(|col| renderer.quote(&col)).join(",");
-                write!(create_table, ",\nPRIMARY KEY ({})", column_names)?;
-            }
-
-            if sql_family == SqlFamily::Sqlite && !table.foreign_keys.is_empty() {
-                writeln!(create_table, ",")?;
-
-                let mut fks = table.foreign_keys.iter().peekable();
-
-                while let Some(fk) = fks.next() {
-                    writeln!(
-                        create_table,
-                        "FOREIGN KEY ({constrained_columns}) {references}{comma}",
-                        constrained_columns = fk.columns.iter().map(|col| format!(r#""{}""#, col)).join(","),
-                        references = renderer.render_references(&schema_name, fk),
-                        comma = if fks.peek().is_some() { ",\n" } else { "" },
-                    )?;
-                }
-            }
-
-            create_table.push_str(create_table_suffix(sql_family));
-
-            Ok(vec![create_table])
+            // FIXME Temporary hack: we should be passing a TableRef, but this is not
+            // possible because we sometimes create temporary tables in the
+            // SQLite table redefinition process.
+            renderer.render_create_table(table, &schema_name, next_schema, sql_family)
         }
         SqlMigrationStep::DropTable(DropTable { name }) => match sql_family {
             SqlFamily::Mysql | SqlFamily::Postgres => Ok(vec![format!(
@@ -461,15 +419,6 @@ fn mysql_drop_index(
         renderer.quote(index_name),
         renderer.quote_with_schema(schema_name, table_name)
     ))
-}
-
-fn create_table_suffix(sql_family: SqlFamily) -> &'static str {
-    match sql_family {
-        SqlFamily::Sqlite => ")",
-        SqlFamily::Postgres => ")",
-        SqlFamily::Mysql => "\n) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci",
-        SqlFamily::Mssql => todo!("Greetings from Redmond"),
-    }
 }
 
 fn safe_alter_column(
