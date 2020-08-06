@@ -1,7 +1,6 @@
 pub(crate) mod create_input_objects;
-pub(crate) mod filter_arguments;
+pub(crate) mod field_filter_types;
 pub(crate) mod filter_input_objects;
-pub(crate) mod filter_types;
 pub(crate) mod input_fields;
 pub(crate) mod update_input_objects;
 

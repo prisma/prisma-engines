@@ -1,6 +1,9 @@
-//! Top level input fields.
-
 use super::*;
+
+pub(crate) fn filter_input_field(ctx: &mut BuilderContext, field: &ModelField) -> InputField {
+    let typ = field_filter_types::get_field_filter_type(ctx, field);
+    input_field(field.name().to_owned(), wrap_opt_input_object(typ), None)
+}
 
 pub(crate) fn nested_create_input_field(ctx: &mut BuilderContext, field: &RelationFieldRef) -> InputField {
     let input_object = create_input_objects::create_input_type(ctx, &field.related_model(), Some(field));
