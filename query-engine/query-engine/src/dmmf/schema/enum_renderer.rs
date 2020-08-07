@@ -21,7 +21,7 @@ impl Renderer for DMMFEnumRenderer {
     }
 }
 
-impl<'a> DMMFEnumRenderer {
+impl DMMFEnumRenderer {
     pub fn new(enum_type: &EnumType) -> DMMFEnumRenderer {
         DMMFEnumRenderer {
             enum_type: enum_type.clone(),
