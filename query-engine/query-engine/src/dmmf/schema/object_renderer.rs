@@ -29,11 +29,7 @@ impl DMMFObjectRenderer {
         let mut rendered_fields = Vec::with_capacity(fields.len());
 
         for field in fields {
-            let rendered_field = field.into_renderer().render(ctx);
-            match rendered_field {
-                DMMFFieldWrapper::Input(f) => rendered_fields.push(f),
-                _ => unreachable!(),
-            };
+            rendered_fields.push(render_input_field(&field, ctx));
         }
 
         let input_type = DMMFInputType {
@@ -59,12 +55,7 @@ impl DMMFObjectRenderer {
         let mut rendered_fields: Vec<DMMFField> = Vec::with_capacity(fields.len());
 
         for field in fields {
-            let rendered_field = field.into_renderer().render(ctx);
-
-            match rendered_field {
-                DMMFFieldWrapper::Output(f) => rendered_fields.push(f),
-                _ => unreachable!(),
-            }
+            rendered_fields.push(render_output_field(&field, ctx))
         }
 
         let output_type = DMMFOutputType {

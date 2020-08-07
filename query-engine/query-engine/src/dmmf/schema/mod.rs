@@ -135,18 +135,6 @@ impl<'a> IntoRenderer<'a, ()> for EnumType {
     }
 }
 
-impl<'a> IntoRenderer<'a, DMMFFieldWrapper> for InputFieldRef {
-    fn into_renderer(&'a self) -> Box<dyn Renderer<'a, DMMFFieldWrapper> + 'a> {
-        Box::new(DMMFFieldRenderer::Input(Arc::clone(self)))
-    }
-}
-
-impl<'a> IntoRenderer<'a, DMMFFieldWrapper> for FieldRef {
-    fn into_renderer(&'a self) -> Box<dyn Renderer<'a, DMMFFieldWrapper> + 'a> {
-        Box::new(DMMFFieldRenderer::Output(Arc::clone(self)))
-    }
-}
-
 impl<'a> IntoRenderer<'a, ()> for InputObjectTypeWeakRef {
     fn into_renderer(&'a self) -> Box<dyn Renderer<'a, ()> + 'a> {
         Box::new(DMMFObjectRenderer::Input(Weak::clone(self)))
