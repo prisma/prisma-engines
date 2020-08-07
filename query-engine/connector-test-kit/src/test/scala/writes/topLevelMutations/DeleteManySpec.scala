@@ -71,7 +71,7 @@ class DeleteManySpec extends FlatSpec with Matchers with ApiSpecBase {
     val result = server.query(
       """mutation {
         |  deleteManyTodoes(
-        |    where: { title_in: [ "title1", "title2" ]}
+        |    where: { title: { in: [ "title1", "title2" ] }}
         |  ){
         |    count
         |  }
@@ -93,7 +93,7 @@ class DeleteManySpec extends FlatSpec with Matchers with ApiSpecBase {
     val result = server.query(
       """mutation {
         |  deleteManyTodoes(
-        |    where: { title_not_in: [ "DoesNotExist", "AlsoDoesntExist" ]}
+        |    where: { title: { not_in: [ "DoesNotExist", "AlsoDoesntExist" ] }}
         |  ){
         |    count
         |  }
@@ -219,10 +219,10 @@ class DeleteManySpec extends FlatSpec with Matchers with ApiSpecBase {
          |   where: { name: "Dad" }
          |   data: {  children: {deleteMany:[
          |      {
-         |          name_contains: "Daughter"
+         |          name: { contains: "Daughter" }
          |      },
          |      {
-         |          name_contains: "Son"
+         |          name: { contains: "Son" }
          |      }
          |   ]
          |  }}

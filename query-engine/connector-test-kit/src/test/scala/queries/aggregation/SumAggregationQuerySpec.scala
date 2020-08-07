@@ -128,7 +128,7 @@ class SumAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
 
     result = server.query(
       """{
-        |  aggregateItem(where: { id_gt: "2" }) {
+        |  aggregateItem(where: { id: { gt: "2" }}) {
         |    sum {
         |      float
         |      int

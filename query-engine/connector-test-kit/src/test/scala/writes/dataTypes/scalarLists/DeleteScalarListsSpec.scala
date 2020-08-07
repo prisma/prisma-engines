@@ -68,7 +68,7 @@ class DeleteScalarListsSpec extends FlatSpec with Matchers with ApiSpecBase {
       server.query("""mutation {createTop(data: { name: "test2", list: {set: [1,2,3]}}){name, list}}""", project)
       server.query("""mutation {createTop(data: { name: "test3", list: {set: [1,2,3]}}){name, list}}""", project)
 
-      val res = server.query("""mutation{deleteManyTops(where:{name_contains:"2" }){count}}""", project)
+      val res = server.query("""mutation{deleteManyTops(where:{name: { contains:"2" }}){count}}""", project)
 
       res.toString should be("""{"data":{"deleteManyTops":{"count":1}}}""")
     }

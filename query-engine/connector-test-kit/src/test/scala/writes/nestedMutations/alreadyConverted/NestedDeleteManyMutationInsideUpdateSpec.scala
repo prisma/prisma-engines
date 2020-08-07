@@ -45,7 +45,8 @@ class NestedDeleteManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
       """,
         project,
         errorCode = 2009,
-        errorContains = """ ↳ ChildUpdateOneWithoutParentOptInput (object)\n            ↳ deleteMany (field)\n              ↳ Field does not exist on enclosing type.` at `.Mutation.updateParent.data.ParentUpdateInput.childOpt.ChildUpdateOneWithoutParentOptInput.deleteMany`"""
+        errorContains =
+          """ ↳ ChildUpdateOneWithoutParentOptInput (object)\n            ↳ deleteMany (field)\n              ↳ Field does not exist on enclosing type.` at `.Mutation.updateParent.data.ParentUpdateInput.childOpt.ChildUpdateOneWithoutParentOptInput.deleteMany`"""
       )
     }
   }
@@ -65,7 +66,7 @@ class NestedDeleteManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |  updateParent(
          |    where: $parent1Id
          |    data:{
-         |    childrenOpt: {deleteMany: {c_contains:"c"}
+         |    childrenOpt: {deleteMany: {c: { contains:"c"} }
          |    }
          |  }){
          |    childrenOpt {
@@ -97,7 +98,7 @@ class NestedDeleteManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |  updateParent(
          |    where: $parent1Id
          |    data:{
-         |    childrenOpt: {deleteMany: {c_contains:"c"}
+         |    childrenOpt: {deleteMany: {c: { contains:"c"} }
          |   }
          |  }){
          |    childrenOpt {
@@ -131,7 +132,7 @@ class NestedDeleteManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    where: $parent1Id
          |    data:{
          |    childrenOpt: {deleteMany: {
-         |          c_contains:"c"
+         |          c: { contains:"c" }
          |      }
          |    }
          |  }){
@@ -167,10 +168,10 @@ class NestedDeleteManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    data:{
          |    childrenOpt: {deleteMany: [
          |    {
-         |        c_contains:"1"
+         |        c: { contains:"1" }
          |    },
          |    {
-         |        c_contains:"2"
+         |        c: { contains:"2" }
          |    }
          |    ]}
          |  }){
@@ -239,10 +240,10 @@ class NestedDeleteManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    data:{
          |    childrenOpt: {deleteMany: [
          |    {
-         |        c_contains:"3"
+         |        c: { contains:"3" }
          |    },
          |    {
-         |        c_contains:"4"
+         |        c: { contains:"4" }
          |    }
          |    ]}
          |  }){

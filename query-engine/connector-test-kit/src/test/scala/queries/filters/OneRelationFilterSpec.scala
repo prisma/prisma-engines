@@ -88,10 +88,10 @@ class OneRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
     server.query(query = """{posts(where:{blog:{name: "blog 1"}}){title}}""", project = project).toString should be(
       """{"data":{"posts":[{"title":"post 1"}]}}""")
 
-    server.query(query = """{blogs(where:{post:{popularity_gte: 100}}){name}}""", project = project).toString should be(
+    server.query(query = """{blogs(where:{post:{popularity: { gte: 100 }}}){name}}""", project = project).toString should be(
       """{"data":{"blogs":[{"name":"blog 2"},{"name":"blog 3"}]}}""")
 
-    server.query(query = """{blogs(where:{post:{popularity_gte: 500}}){name}}""", project = project).toString should be(
+    server.query(query = """{blogs(where:{post:{popularity_: { gte: 500 }}}){name}}""", project = project).toString should be(
       """{"data":{"blogs":[{"name":"blog 3"}]}}""")
   }
 
@@ -112,13 +112,13 @@ class OneRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
         query = """{posts(where: {
                 |  blog: {
                 |    post: {
-                |      popularity_gte: 10
+                |      popularity: { gte: 10 }
                 |    }
-                |    name_contains: "blog 1"
+                |    name: { contains: "blog 1" }
                 |  }
                 |  comment: {
-                |    likes_gte: 5
-                |    likes_lte: 200
+                |    likes: { gte: 5 }
+                |    likes: { lte: 200 }
                 |  }
                 |}) {
                 |  title
@@ -165,7 +165,7 @@ class OneRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
     server.query("""query{posts {title, author {name}}}""", project).toString should be(
       """{"data":{"posts":[{"title":"Title1","author":{"name":"Author1"}},{"title":"Title2","author":{"name":"Author2"}}]}}""")
 
-    val res = server.query("""query{aUsers(where:{ post:{title_ends_with: "1"}, name_starts_with: "Author", int: 5}){name, post{title}}}""", project)
+    val res = server.query("""query{aUsers(where:{ post:{title: { ends_with: "1" }}, name: { starts_with: "Author" }, int: 5}){name, post{title}}}""", project)
     res.toString should be("""{"data":{"aUsers":[{"name":"Author1","post":{"title":"Title1"}}]}}""")
   }
 }

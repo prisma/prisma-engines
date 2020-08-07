@@ -27,6 +27,7 @@ impl RelationFieldFilter {
             // One-relation filters
             (Self::Is, Some(value)) => field.to_one_related(extract_filter(value, &field.related_model())?),
             (Self::Is, None) => field.one_relation_is_null(),
+
             // todo is_not
             _ => unreachable!(),
         })

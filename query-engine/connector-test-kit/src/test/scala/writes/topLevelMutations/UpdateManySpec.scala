@@ -131,11 +131,11 @@ class UpdateManySpec extends FlatSpec with Matchers with ApiSpecBase {
          |   where: { name: "Dad" }
          |   data: {  children: {updateMany:[
          |      {
-         |          where:{name_contains:"Daughter"}
+         |          where:{name: { contains:"Daughter" }}
          |          data:{test: "UpdateManyDaughters"}
          |      },
          |      {
-         |          where:{name_contains:"Son"}
+         |          where:{name: { contains:"Son" }}
          |          data:{test: "UpdateManySons"}
          |      }
          |   ]
