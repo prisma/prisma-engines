@@ -1,10 +1,10 @@
 use super::*;
 
-pub struct DMMFEnumRenderer<'a> {
-    enum_type: &'a EnumType,
+pub struct DMMFEnumRenderer {
+    enum_type: EnumType,
 }
 
-impl<'a> Renderer<'a> for DMMFEnumRenderer<'a> {
+impl Renderer for DMMFEnumRenderer {
     fn render(&self, ctx: &mut RenderContext) {
         if ctx.already_rendered(self.enum_type.name()) {
             return;
@@ -21,13 +21,15 @@ impl<'a> Renderer<'a> for DMMFEnumRenderer<'a> {
     }
 }
 
-impl<'a> DMMFEnumRenderer<'a> {
-    pub fn new(enum_type: &'a EnumType) -> DMMFEnumRenderer<'a> {
-        DMMFEnumRenderer { enum_type }
+impl<'a> DMMFEnumRenderer {
+    pub fn new(enum_type: &EnumType) -> DMMFEnumRenderer {
+        DMMFEnumRenderer {
+            enum_type: enum_type.clone(),
+        }
     }
 
     fn format_enum_values(&self) -> Vec<String> {
-        match self.enum_type {
+        match &self.enum_type {
             EnumType::String(s) => s.values().to_owned(),
             EnumType::Internal(i) => i.external_values(),
             EnumType::FieldRef(f) => f.values(),
