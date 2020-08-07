@@ -15,7 +15,7 @@ use crate::{
 };
 use quaint::prelude::SqlFamily;
 use sql_schema_describer::*;
-use std::{borrow::Cow, collections::HashSet, fmt::Write};
+use std::{borrow::Cow, fmt::Write};
 
 pub(crate) trait SqlRenderer {
     fn quote<'a>(&self, name: &'a str) -> Quoted<&'a str>;
@@ -114,7 +114,7 @@ pub(crate) trait SqlRenderer {
     /// Render a `RedefineTables` step.
     fn render_redefine_tables(
         &self,
-        tables: &HashSet<String>,
+        tables: &[String],
         differ: SqlSchemaDiffer<'_>,
         database_info: &DatabaseInfo,
     ) -> Vec<String>;

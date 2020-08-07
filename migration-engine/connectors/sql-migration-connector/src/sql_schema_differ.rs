@@ -45,7 +45,11 @@ impl SqlSchemaDiff {
     pub fn into_steps(self) -> Vec<SqlMigrationStep> {
         let redefine_tables = Some(self.tables_to_redefine)
             .filter(|tables| !tables.is_empty())
-            .map(|names| SqlMigrationStep::RedefineTables { names });
+            .map(|names| {
+                let mut names: Vec<String> = names.into_iter().collect();
+                names.sort();
+                SqlMigrationStep::RedefineTables { names }
+            });
 
         wrap_as_step(self.create_enums, SqlMigrationStep::CreateEnum)
             .chain(wrap_as_step(self.alter_enums, SqlMigrationStep::AlterEnum))

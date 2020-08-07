@@ -3,7 +3,6 @@ pub(crate) mod expanded_alter_column;
 use migration_connector::DatabaseMigrationMarker;
 use serde::{Deserialize, Serialize};
 use sql_schema_describer::{Column, ForeignKey, Index, SqlSchema, Table};
-use std::collections::HashSet;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct SqlMigration {
@@ -43,7 +42,7 @@ pub enum SqlMigrationStep {
     DropForeignKey(DropForeignKey),
     DropTable(DropTable),
     RenameTable { name: String, new_name: String },
-    RedefineTables { names: HashSet<String> },
+    RedefineTables { names: Vec<String> },
     CreateIndex(CreateIndex),
     DropIndex(DropIndex),
     AlterIndex(AlterIndex),

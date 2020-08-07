@@ -10,7 +10,7 @@ use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
 use regex::Regex;
 use sql_schema_describer::*;
-use std::{borrow::Cow, collections::HashSet};
+use std::borrow::Cow;
 
 impl SqlRenderer for PostgresFlavour {
     fn quote<'a>(&self, name: &'a str) -> Quoted<&'a str> {
@@ -177,7 +177,7 @@ impl SqlRenderer for PostgresFlavour {
 
     fn render_redefine_tables(
         &self,
-        _names: &HashSet<String>,
+        _names: &[String],
         _differ: SqlSchemaDiffer<'_>,
         _database_info: &DatabaseInfo,
     ) -> Vec<String> {

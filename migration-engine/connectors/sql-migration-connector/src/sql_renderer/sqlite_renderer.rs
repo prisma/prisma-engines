@@ -10,7 +10,7 @@ use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
 use regex::Regex;
 use sql_schema_describer::*;
-use std::{borrow::Cow, collections::HashSet};
+use std::borrow::Cow;
 
 impl SqlRenderer for SqliteFlavour {
     fn quote<'a>(&self, name: &'a str) -> Quoted<&'a str> {
@@ -86,7 +86,7 @@ impl SqlRenderer for SqliteFlavour {
 
     fn render_redefine_tables(
         &self,
-        tables: &HashSet<String>,
+        tables: &[String],
         differ: SqlSchemaDiffer<'_>,
         database_info: &DatabaseInfo,
     ) -> Vec<String> {
