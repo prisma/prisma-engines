@@ -1,11 +1,11 @@
-use super::{DMMFTypeInfo, IntoRenderer, RenderContext, TypeKind};
+use super::{DMMFTypeInfo, RenderContext, TypeKind};
 use query_core::{InputType, IntoArc, OutputType, ScalarType};
 
 // WIP dedup code
 pub(super) fn render_output_type(output_type: &OutputType, ctx: &mut RenderContext) -> DMMFTypeInfo {
     match output_type {
         OutputType::Object(ref obj) => {
-            obj.into_renderer().render(ctx);
+            ctx.mark_to_be_rendered(obj);
             let type_info = DMMFTypeInfo {
                 typ: obj.into_arc().name().to_string(),
                 kind: TypeKind::Object,
@@ -17,7 +17,7 @@ pub(super) fn render_output_type(output_type: &OutputType, ctx: &mut RenderConte
             type_info
         }
         OutputType::Enum(et) => {
-            et.into_renderer().render(ctx);
+            ctx.mark_to_be_rendered(&et.as_ref());
             let type_info = DMMFTypeInfo {
                 typ: et.name().to_owned(),
                 kind: TypeKind::Enum,
@@ -41,7 +41,7 @@ pub(super) fn render_output_type(output_type: &OutputType, ctx: &mut RenderConte
             type_info
         }
         OutputType::Scalar(ScalarType::Enum(et)) => {
-            et.into_renderer().render(ctx);
+            ctx.mark_to_be_rendered(&et.as_ref());
             let type_info = DMMFTypeInfo {
                 typ: et.name().to_owned(),
                 kind: TypeKind::Scalar,
@@ -81,7 +81,7 @@ pub(super) fn render_output_type(output_type: &OutputType, ctx: &mut RenderConte
 pub(super) fn render_input_type(input_type: &InputType, ctx: &mut RenderContext) -> DMMFTypeInfo {
     match input_type {
         InputType::Object(ref obj) => {
-            obj.into_renderer().render(ctx);
+            ctx.mark_to_be_rendered(obj);
             let type_info = DMMFTypeInfo {
                 typ: obj.into_arc().name.clone(),
                 kind: TypeKind::Object,
@@ -94,7 +94,7 @@ pub(super) fn render_input_type(input_type: &InputType, ctx: &mut RenderContext)
         }
 
         InputType::Enum(et) => {
-            et.into_renderer().render(ctx);
+            ctx.mark_to_be_rendered(&et.as_ref());
             let type_info = DMMFTypeInfo {
                 typ: et.name().to_owned(),
                 kind: TypeKind::Enum,
@@ -128,7 +128,7 @@ pub(super) fn render_input_type(input_type: &InputType, ctx: &mut RenderContext)
         }
 
         InputType::Scalar(ScalarType::Enum(et)) => {
-            et.into_renderer().render(ctx);
+            ctx.mark_to_be_rendered(&et.as_ref());
             let type_info = DMMFTypeInfo {
                 typ: et.name().to_owned(),
                 kind: TypeKind::Scalar,
