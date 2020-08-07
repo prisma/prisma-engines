@@ -224,24 +224,23 @@ class ExtendedRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase
   }
 
   "1 level 1-relation filter" should "work" in {
-    server.query(query = """{albums(where:{Artist:{Name: { equals: "CompleteArtist" }}}){AlbumId}}""", project = project).toString should be(
+    server.query(query = """{albums(where:{ Artist: { is: { Name: { equals: "CompleteArtist" }}}}){AlbumId}}""", project = project).toString should be(
       """{"data":{"albums":[{"AlbumId":1}]}}""")
   }
 
   // MySql is case insensitive and Postgres case sensitive
 
   "MySql 1 level m-relation filter" should "work for `every`, `some` and `none`" taggedAs (IgnorePostgres, IgnoreMongo) in {
-
     server.query(query = """{artists(where:{Albums: { some: { Title: { starts_with: "album" }}}}){ Name }}""", project = project).toString should be(
       """{"data":{"artists":[{"Name":"CompleteArtist"},{"Name":"CompleteArtist2"},{"Name":"CompleteArtistWith2Albums"}]}}""")
 
     server.query(query = """{artists(where:{Albums: { some: {Title: { starts_with: "t" }}}}){Name}}""", project = project).toString should be(
       """{"data":{"artists":[{"Name":"ArtistWithOneAlbumWithoutTracks"}]}}""")
 
-    server.query(query = """{artists(where:{Albums: { every: { Title: { contains: "album" }}}}}){Name}}""", project = project).toString should be(
+    server.query(query = """{artists(where:{Albums: { every: { Title: { contains: "album" }}}}){Name}}""", project = project).toString should be(
       """{"data":{"artists":[{"Name":"CompleteArtist"},{"Name":"ArtistWithoutAlbums"},{"Name":"ArtistWithOneAlbumWithoutTracks"},{"Name":"CompleteArtist2"},{"Name":"CompleteArtistWith2Albums"}]}}""")
 
-    server.query(query = """{artists(where:{Albums: { every: { Title: { not_contains: "the" }}}){Name}}""", project = project).toString should be(
+    server.query(query = """{artists(where:{Albums: { every: { Title: { not_contains: "the" }}}}){Name}}""", project = project).toString should be(
       """{"data":{"artists":[{"Name":"CompleteArtist"},{"Name":"ArtistWithoutAlbums"},{"Name":"CompleteArtist2"},{"Name":"CompleteArtistWith2Albums"}]}}""")
 
     server.query(query = """{artists(where:{Albums: { none: {Title: { contains: "the" }}}}){Name}}""", project = project).toString should be(
@@ -277,144 +276,167 @@ class ExtendedRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase
   }
 
   "2 level m-relation filter" should "work for some/some" in {
+    server
+      .query(query = """{artists(where:{Albums: { some: { Tracks: { some: {Milliseconds: { lte: 9000 }}}}}}){Name}}""", project = project)
+      .toString should be("""{"data":{"artists":[{"Name":"CompleteArtist2"},{"Name":"CompleteArtistWith2Albums"}]}}""")
 
-    // some|some
-    server.query(query = """{artists(where:{Albums: { some:{Tracks: { some: {Milliseconds: { lte: 9000 }}}}}}){Name}}""", project = project).toString should be(
-      """{"data":{"artists":[{"Name":"CompleteArtist2"},{"Name":"CompleteArtistWith2Albums"}]}}""")
-
-    server.query(query = """{artists(where:{Albums: { some:{Tracks: { some: {Bytes: 512}}}}}){Name}}""", project = project).toString should be(
+    server.query(query = """{artists(where:{Albums: { some:{Tracks: { some: {Bytes: { equals: 512 }}}}}}){Name}}""", project = project).toString should be(
       """{"data":{"artists":[{"Name":"CompleteArtist"}]}}""")
   }
 
   "2 level m-relation filter" should "work for every, some and none" taggedAs (IgnoreMongo) in {
     // some|every
-    server.query(query = """{artists(where:{Albums: { some:{Tracks: { every: {UnitPrice: { gt: 2.50 }}}}}}){Name}}""", project = project).toString should be(
+    server.query(query = """{artists(where:{Albums: { some:{ Tracks: { every: { UnitPrice: { gt: 2.50 }}}}}}){Name}}""", project = project).toString should be(
       """{"data":{"artists":[{"Name":"ArtistWithOneAlbumWithoutTracks"},{"Name":"CompleteArtist2"},{"Name":"CompleteArtistWith2Albums"}]}}""")
 
-    server.query(query = """{artists(where:{Albums: { some:{Tracks: { every: {Milliseconds: { gt: 9000 }}}}}}){Name}}""", project = project).toString should be(
+    server
+      .query(query = """{artists(where:{ Albums: { some:{ Tracks: { every: { Milliseconds: { gt: 9000 }}}}}}){Name}}""", project = project)
+      .toString should be(
       """{"data":{"artists":[{"Name":"CompleteArtist"},{"Name":"ArtistWithOneAlbumWithoutTracks"},{"Name":"CompleteArtistWith2Albums"}]}}""")
 
     // some|none
-    server.query(query = """{artists(where:{Albums: { some:{Tracks: { none: {Milliseconds: { lte: 9000 }}}}}){Name}}""", project = project).toString should be(
+    server
+      .query(query = """{artists(where:{ Albums: { some:{ Tracks: { none: { Milliseconds: { lte: 9000 }}}}}}){Name}}""", project = project)
+      .toString should be(
       """{"data":{"artists":[{"Name":"CompleteArtist"},{"Name":"ArtistWithOneAlbumWithoutTracks"},{"Name":"CompleteArtistWith2Albums"}]}}""")
 
-    server.query(query = """{artists(where:{Albums: { some:{Tracks: { none: {UnitPrice: { lt: 2.0 }}}}}}){Name}}""", project = project).toString should be(
+    server.query(query = """{artists(where:{ Albums: { some:{ Tracks: { none: { UnitPrice: { lt: 2.0 }}}}}}){Name}}""", project = project).toString should be(
       """{"data":{"artists":[{"Name":"ArtistWithOneAlbumWithoutTracks"},{"Name":"CompleteArtist2"},{"Name":"CompleteArtistWith2Albums"}]}}""")
 
     // every|some
-    server.query(query = """{artists(where:{Albums: { every:{Tracks: { some: {Bytes: { lt: 1000 }}}}}}){Name}}""", project = project).toString should be(
+    server.query(query = """{artists(where:{ Albums: { every: { Tracks: { some: { Bytes: { lt: 1000 }}}}}}){Name}}""", project = project).toString should be(
       """{"data":{"artists":[{"Name":"CompleteArtist"},{"Name":"ArtistWithoutAlbums"},{"Name":"CompleteArtist2"},{"Name":"CompleteArtistWith2Albums"}]}}""")
 
-    server.query(query = """{artists(where:{Albums: { every:{Tracks: { some: {Composer: "Composer3"}}}}}){Name}}""", project = project).toString should be(
-      """{"data":{"artists":[{"Name":"ArtistWithoutAlbums"}]}}""")
+    server
+      .query(query = """{artists(where: { Albums: { every: { Tracks: { some: { Composer: {equals: "Composer3" }}}}}}){Name}}""", project = project)
+      .toString should be("""{"data":{"artists":[{"Name":"ArtistWithoutAlbums"}]}}""")
 
     // every|every
-    server.query(query = """{artists(where:{Albums: { every:{Tracks: { every: {Bytes: { lte: 10000 }}}}}}){Name}}""", project = project).toString should be(
+    server
+      .query(query = """{artists(where: { Albums: { every: { Tracks: { every: { Bytes: { lte: 10000 }}}}}}){Name}}""", project = project)
+      .toString should be(
       """{"data":{"artists":[{"Name":"CompleteArtist"},{"Name":"ArtistWithoutAlbums"},{"Name":"ArtistWithOneAlbumWithoutTracks"},{"Name":"CompleteArtist2"}]}}""")
 
     server
-      .query(query = """{artists(where:{Albums: { every:{Tracks: { every: {TrackId: { in: [4,5,6,7] }}}}}}){Name}}""", project = project)
+      .query(query = """{artists(where: { Albums: { every: { Tracks: { every: { TrackId: { in: [4,5,6,7] }}}}}}){Name}}""", project = project)
       .toString should be(
       """{"data":{"artists":[{"Name":"ArtistWithoutAlbums"},{"Name":"ArtistWithOneAlbumWithoutTracks"},{"Name":"CompleteArtistWith2Albums"}]}}""")
 
     // every|none
-    server.query(query = """{artists(where:{Albums: { every:{Tracks: { none: {UnitPrice: { lte: 1 }}}}}}){Name}}""", project = project).toString should be(
+    server.query(query = """{artists(where: { Albums: { every: { Tracks: { none: { UnitPrice: { lte: 1 }}}}}}){Name}}""", project = project).toString should be(
       """{"data":{"artists":[{"Name":"CompleteArtist"},{"Name":"ArtistWithoutAlbums"},{"Name":"ArtistWithOneAlbumWithoutTracks"},{"Name":"CompleteArtist2"}]}}""")
 
-    server.query(query = """{artists(where:{Albums: { every:{Tracks: { none: {Composer: "Composer2"}}}}}){Name}}""", project = project).toString should be(
-      """{"data":{"artists":[{"Name":"CompleteArtist"},{"Name":"ArtistWithoutAlbums"},{"Name":"ArtistWithOneAlbumWithoutTracks"}]}}""")
+    server
+      .query(query = """{artists(where: { Albums: { every: { Tracks: { none: { Composer: { equals: "Composer2" }}}}}}){Name}}""", project = project)
+      .toString should be("""{"data":{"artists":[{"Name":"CompleteArtist"},{"Name":"ArtistWithoutAlbums"},{"Name":"ArtistWithOneAlbumWithoutTracks"}]}}""")
 
     // none|some
-    server.query(query = """{artists(where:{Albums: { none:{Tracks: { some: {UnitPrice: { lt: 1 }}}}}}){Name}}""", project = project).toString should be(
+    server.query(query = """{artists(where: { Albums: { none: { Tracks: { some: { UnitPrice: { lt: 1 }}}}}}){Name}}""", project = project).toString should be(
       """{"data":{"artists":[{"Name":"CompleteArtist"},{"Name":"ArtistWithoutAlbums"},{"Name":"ArtistWithOneAlbumWithoutTracks"},{"Name":"CompleteArtist2"}]}}""")
 
-    server.query(query = """{artists(where:{Albums: { none:{Tracks: { some: {Composer: "Composer2"}}}}}){Name}}""", project = project).toString should be(
-      """{"data":{"artists":[{"Name":"CompleteArtist"},{"Name":"ArtistWithoutAlbums"},{"Name":"ArtistWithOneAlbumWithoutTracks"}]}}""")
+    server
+      .query(query = """{artists(where: { Albums: { none: { Tracks: { some: { Composer: { equals: "Composer2" }}}}}}){Name}}""", project = project)
+      .toString should be("""{"data":{"artists":[{"Name":"CompleteArtist"},{"Name":"ArtistWithoutAlbums"},{"Name":"ArtistWithOneAlbumWithoutTracks"}]}}""")
 
     // none|every
-    server.query(query = """{artists(where:{Albums: { none:{Tracks: { every: {UnitPrice: { gte: 5 }}}}}}){Name}}""", project = project).toString should be(
+    server.query(query = """{artists(where: { Albums: { none: { Tracks: { every: { UnitPrice: { gte: 5 }}}}}}){Name}}""", project = project).toString should be(
       """{"data":{"artists":[{"Name":"CompleteArtist"},{"Name":"ArtistWithoutAlbums"},{"Name":"CompleteArtist2"}]}}""")
 
     server
-      .query(query = """{artists(where:{Albums: { none:{Tracks: { every: {Name: { starts_with: "Track" }}}}}}){Name}}""", project = project)
+      .query(query = """{artists(where: { Albums: { none: { Tracks: { every: { Name: { starts_with: "Track" }}}}}}){Name}}""", project = project)
       .toString should be("""{"data":{"artists":[{"Name":"ArtistWithoutAlbums"}]}}""")
 
     // none|none
-    server.query(query = """{artists(where:{Albums: { none:{Tracks: { none: {Bytes: { lt: 100 }}}}}}){Name}}""", project = project).toString should be(
+    server.query(query = """{artists(where: { Albums: { none: { Tracks: { none: { Bytes: { lt: 100 }}}}}}){Name}}""", project = project).toString should be(
       """{"data":{"artists":[{"Name":"ArtistWithoutAlbums"},{"Name":"CompleteArtist2"}]}}""")
 
-    server.query(query = """{artists(where:{Albums: { none:{Tracks: { none: {Bytes: { gte: 100 }}}}}}){Name}}""", project = project).toString should be(
+    server.query(query = """{artists(where: { Albums: { none: { Tracks: { none: { Bytes: { gte: 100 }}}}}}){Name}}""", project = project).toString should be(
       """{"data":{"artists":[{"Name":"CompleteArtist"},{"Name":"ArtistWithoutAlbums"},{"Name":"CompleteArtist2"},{"Name":"CompleteArtistWith2Albums"}]}}""")
   }
 
   "2 level m-relation filters that have subfilters that are connected with an implicit AND" should "work for `some`" in {
-
     server
-      .query(query = """{albums(where:{Tracks: { some:{MediaType: {Name: "MediaType1"},Genre: {Name: "Genre1"}}}}, orderBy: { id: asc }){Title}}""",
-             project = project)
+      .query(
+        query =
+          """{albums(where: { Tracks: { some: { MediaType: { is: { Name: { equals: "MediaType1" }}}, Genre: { is: { Name: { equals: "Genre1" }}}}}}, orderBy: { id: asc }){Title}}""",
+        project = project
+      )
       .toString should be("""{"data":{"albums":[{"Title":"Album1"},{"Title":"Album4"},{"Title":"Album5"}]}}""")
 
   }
 
   "2 level m-relation filters that have subfilters that are connected with an implicit AND" should "work for `every`" taggedAs (IgnoreMongo) in {
-
     server
-      .query(query = """{albums(where:{Tracks: { every: { MediaType: {Name: "MediaType1"}, Genre: {Name: "Genre1"}}}}){Title}}""", project = project)
+      .query(
+        query =
+          """{albums(where: { Tracks: { every: { MediaType: { is: { Name: { equals: "MediaType1" }}}, Genre: { is: { Name: { equals: "Genre1" }}}}}}){Title}}""",
+        project = project
+      )
       .toString should be("""{"data":{"albums":[{"Title":"Album1"},{"Title":"TheAlbumWithoutTracks"},{"Title":"Album4"}]}}""")
 
   }
 
   "2 level m-relation filters that have subfilters that are connected with an explicit AND" should "work for `some`" in {
-
     server
       .query(
-        query = """{albums(where:{Tracks: { some:{AND:[{MediaType: {Name: "MediaType1"}},{Genre: {Name: "Genre1"}}]}}}, orderBy: { id: asc }){Title}}""",
+        query =
+          """{albums(where: { Tracks: { some: { AND:[ { MediaType: { is: { Name: { equals: "MediaType1" }}}}, { Genre: { is: { Name: { equals: "Genre1" }}}}]}}}, orderBy: { id: asc }){Title}}""",
         project = project
       )
       .toString should be("""{"data":{"albums":[{"Title":"Album1"},{"Title":"Album4"},{"Title":"Album5"}]}}""")
 
     server
-      .query(query = """{albums(where:{Tracks: { some:{AND:[{MediaType: {Name: "MediaType2"}}]}}}){Title}}""", project = project)
+      .query(query = """{albums(where: { Tracks: { some: { AND: [{ MediaType: { is: { Name: { equals: "MediaType2" }}}}]}}}){Title}}""", project = project)
       .toString should be("""{"data":{"albums":[{"Title":"Album3"}]}}""")
 
     server
-      .query(query = """{albums(where:{Tracks: { some:{AND:[]}}}){Title}}""", project = project)
+      .query(query = """{albums(where:{Tracks: { some: { AND:[] }}}){Title}}""", project = project)
       .toString should be("""{"data":{"albums":[{"Title":"Album1"},{"Title":"Album3"},{"Title":"Album4"},{"Title":"Album5"}]}}""")
 
   }
 
   "2 level m-relation filters that have subfilters that are connected with an explicit AND" should "work for `every`" taggedAs (IgnoreMongo) in {
-
     server
-      .query(query = """{albums(where:{Tracks: { every:{AND:[{MediaType: {Name: "MediaType1"}},{Genre: {Name: "Genre1"}}]}}}){Title}}""", project = project)
+      .query(
+        query =
+          """{albums(where: { Tracks: { every: { AND: [{ MediaType: { is: { Name: { equals: "MediaType1" }}}}, { Genre: { is: { Name: { equals: "Genre1" }}}}]}}}){Title}}""",
+        project = project
+      )
       .toString should be("""{"data":{"albums":[{"Title":"Album1"},{"Title":"TheAlbumWithoutTracks"},{"Title":"Album4"}]}}""")
 
     server
-      .query(query = """{albums(where:{Tracks: { every:{AND:[{MediaType: {Name: "MediaType2"}}]}}}){Title}}""", project = project)
+      .query(query = """{albums(where: { Tracks: { every: { AND: [{ MediaType: { is: { Name: { equals: "MediaType2" }}}}]}}}){Title}}""", project = project)
       .toString should be("""{"data":{"albums":[{"Title":"TheAlbumWithoutTracks"}]}}""")
 
     server
-      .query(query = """{albums(where:{Tracks: { every:{AND:[]}}}){Title}}""", project = project)
+      .query(query = """{albums(where: { Tracks: { every:{ AND: []}}}){Title}}""", project = project)
       .toString should be(
       """{"data":{"albums":[{"Title":"Album1"},{"Title":"TheAlbumWithoutTracks"},{"Title":"Album3"},{"Title":"Album4"},{"Title":"Album5"}]}}""")
   }
 
   "2 level m-relation filters that have subfilters that are connected with an explicit OR" should "work" taggedAs (IgnoreMongo) in {
-
     server
-      .query(query = """{albums(where:{Tracks: { some:{OR:[{MediaType: {Name: "MediaType1"}},{Genre: {Name: "Genre2"}}]}}}){Title}}""", project = project)
+      .query(
+        query =
+          """{albums(where:{Tracks: { some:{OR:[{MediaType: {is: {Name: { equals: "MediaType1" }}}}, { Genre: { is: { Name: { equals: "Genre2" }}}}]}}}){Title}}""",
+        project = project
+      )
       .toString should be("""{"data":{"albums":[{"Title":"Album1"},{"Title":"Album3"},{"Title":"Album4"},{"Title":"Album5"}]}}""")
 
     server
-      .query(query = """{albums(where:{Tracks: { every:{OR:[{MediaType: {Name: "MediaType1"}},{Genre: {Name: "Genre2"}}]}}}){Title}}""", project = project)
+      .query(
+        query =
+          """{albums(where:{Tracks: { every:{OR:[{MediaType: { is: {Name: { equals: "MediaType1"}}}},{Genre: { is: {Name: { equals: "Genre2"}}}}]}}}){Title}}""",
+        project = project
+      )
       .toString should be("""{"data":{"albums":[{"Title":"Album1"},{"Title":"TheAlbumWithoutTracks"},{"Title":"Album4"},{"Title":"Album5"}]}}""")
 
     server
-      .query(query = """{albums(where:{Tracks: { some:{OR:[{MediaType: {Name: "MediaType2"}}]}}}){Title}}""", project = project)
+      .query(query = """{albums(where:{Tracks: { some:{OR:[{MediaType: { is: {Name: { equals: "MediaType2"}}}}]}}}){Title}}""", project = project)
       .toString should be("""{"data":{"albums":[{"Title":"Album3"}]}}""")
 
     server
-      .query(query = """{albums(where:{Tracks: { every:{OR:[{MediaType: {Name: "MediaType2"}}]}}}){Title}}""", project = project)
+      .query(query = """{albums(where:{Tracks: { every:{OR:[{MediaType: { is: {Name: { equals: "MediaType2"}}}}]}}}){Title}}""", project = project)
       .toString should be("""{"data":{"albums":[{"Title":"TheAlbumWithoutTracks"}]}}""")
 
     server
@@ -427,21 +449,28 @@ class ExtendedRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase
   }
 
   "2 level m-relation filters that have subfilters that are connected with an explicit NOT" should "work" taggedAs (IgnoreMongo) in {
-
     server
-      .query(query = """{albums(where:{Tracks: { some:{NOT:[{MediaType: {Name: "MediaType1"}},{Genre: {Name: "Genre1"}}]}}}){Title}}""", project = project)
+      .query(
+        query =
+          """{albums(where:{Tracks: { some:{NOT:[{MediaType: { is: {Name: { equals: "MediaType1"}}}},{Genre: { is: { Name: { equals: "Genre1"}}}}]}}}){Title}}""",
+        project = project
+      )
       .toString should be("""{"data":{"albums":[{"Title":"Album3"},{"Title":"Album5"}]}}""")
 
     server
-      .query(query = """{albums(where:{Tracks: { every:{NOT:[{MediaType: {Name: "MediaType1"}},{Genre: {Name: "Genre1"}}]}}}){Title}}""", project = project)
+      .query(
+        query =
+          """{albums(where:{Tracks: { every:{NOT:[{MediaType: { is: {Name: { equals: "MediaType1"}}}},{Genre: { is: {Name: { equals: "Genre1"}}}}]}}}){Title}}""",
+        project = project
+      )
       .toString should be("""{"data":{"albums":[{"Title":"TheAlbumWithoutTracks"},{"Title":"Album3"}]}}""")
 
     server
-      .query(query = """{albums(where:{Tracks: { some:{NOT:[{MediaType: {Name: "MediaType2"}}]}}}){Title}}""", project = project)
+      .query(query = """{albums(where:{Tracks: { some:{NOT:[{MediaType: { is: {Name: { equals: "MediaType2"}}}}]}}}){Title}}""", project = project)
       .toString should be("""{"data":{"albums":[{"Title":"Album1"},{"Title":"Album3"},{"Title":"Album4"},{"Title":"Album5"}]}}""")
 
     server
-      .query(query = """{albums(where:{Tracks: { every:{NOT:[{MediaType: {Name: "MediaType2"}}]}}}){Title}}""", project = project)
+      .query(query = """{albums(where:{Tracks: { every:{NOT:[{MediaType: { is: {Name: { equals: "MediaType2"}}}}]}}}){Title}}""", project = project)
       .toString should be("""{"data":{"albums":[{"Title":"Album1"},{"Title":"TheAlbumWithoutTracks"},{"Title":"Album4"},{"Title":"Album5"}]}}""")
 
     server
@@ -457,15 +486,13 @@ class ExtendedRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase
   "3 level filters" should "work" in {
     val result = server.query(
       """{
-        |  genres(where: {
-        |    Tracks: { some: {
-        |      Album: {
-        |        Artist: {
-        |          ArtistId: 1
-        |        }
+        |  genres(
+        |    where: {
+        |      Tracks: {
+        |        some: { Album: { is: { Artist: { is: { ArtistId: { equals: 1 } } } } } }
         |      }
         |    }
-        |  }}){
+        |  ) {
         |    GenreId
         |  }
         |}
@@ -481,13 +508,16 @@ class ExtendedRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase
     val result = server.query(
       """{
         |  artists(where: {
-        |      Albums: { some: {
-        |        Tracks: { some: {
-        |          Genre: { Name: "Genre1" }
-        |          TrackId: 1
+        |      Albums: {
+        |        some: {
+        |          Tracks: { some: {
+        |            Genre: { is: { Name: { equals: "Genre1" }}}
+        |            TrackId: { equals: 1 }
+        |          }
         |        }
         |      }
-        |  }}}){
+        |    }
+        |  }) {
         |    ArtistId
         |  }
         |}

@@ -12,7 +12,8 @@ pub(crate) fn get_field_filter_type(ctx: &mut BuilderContext, field: &ModelField
 fn relation_filter_type(ctx: &mut BuilderContext, rf: &RelationFieldRef) -> InputObjectTypeWeakRef {
     let related_model = rf.related_model();
     let related_input_type = filter_input_objects::where_object_type(ctx, &related_model);
-    let filter_name = format!("{}RelationFilter", capitalize(&related_model.name));
+    let list = if rf.is_list { "List" } else { "" };
+    let filter_name = format!("{}{}RelationFilter", capitalize(&related_model.name), list);
 
     return_cached_input!(ctx, &filter_name);
     let object = Arc::new(init_input_object_type(filter_name.clone()));
