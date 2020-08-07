@@ -1,8 +1,8 @@
 extern crate datamodel;
 
 use self::datamodel::{IndexDefinition, StringFromEnvVar};
-use datamodel::{dml, error::*, ScalarType};
-use datamodel_connector::ScalarFieldType;
+use datamodel::{dml, dml::ScalarType, error::*};
+use datamodel_connector::NativeTypeInstance;
 use pretty_assertions::assert_eq;
 
 pub trait DatasourceAsserts {
@@ -19,7 +19,7 @@ pub trait FieldAsserts {
 pub trait ScalarFieldAsserts {
     fn assert_base_type(&self, t: &ScalarType) -> &Self;
     fn assert_enum_type(&self, en: &str) -> &Self;
-    fn assert_connector_type(&self, sft: &ScalarFieldType) -> &Self;
+    fn assert_native_type(&self) -> &NativeTypeInstance;
     fn assert_with_db_name(&self, t: &str) -> &Self;
     fn assert_default_value(&self, t: dml::DefaultValue) -> &Self;
     fn assert_is_id(&self) -> &Self;
@@ -115,13 +115,12 @@ impl ScalarFieldAsserts for dml::ScalarField {
         self
     }
 
-    fn assert_connector_type(&self, sft: &ScalarFieldType) -> &Self {
-        if let dml::FieldType::ConnectorSpecific(t) = &self.field_type {
-            assert_eq!(t, sft);
+    fn assert_native_type(&self) -> &NativeTypeInstance {
+        if let dml::FieldType::NativeType(_, t) = &self.field_type {
+            &t
         } else {
-            panic!("Connector Specific Type expected, but found {:?}", self.field_type);
+            panic!("Native Type expected, but found {:?}", self.field_type);
         }
-        self
     }
 
     fn assert_with_db_name(&self, t: &str) -> &Self {

@@ -1,5 +1,5 @@
 use super::*;
-use datamodel_connector::ScalarFieldType;
+use datamodel_connector::NativeTypeInstance;
 use std::hash::Hash;
 
 /// Arity of a Field in a Model.
@@ -24,6 +24,7 @@ impl FieldArity {
     }
 }
 
+// TODO: when progressing with the native types implementation we should consider merging the variants `NativeType` and `Base`
 /// Datamodel field type.
 #[derive(Debug, PartialEq, Clone)]
 pub enum FieldType {
@@ -31,8 +32,8 @@ pub enum FieldType {
     Enum(String),
     /// This is a relation field.
     Relation(RelationInfo),
-    /// Connector specific field type.
-    ConnectorSpecific(ScalarFieldType),
+    /// native field type.
+    NativeType(ScalarType, NativeTypeInstance),
     /// This is a field with an unsupported datatype - used by introspection only.
     Unsupported(String),
     /// The option is Some(x) if the scalar type is based upon a type alias.
@@ -49,7 +50,7 @@ impl FieldType {
 
     pub fn scalar_type(&self) -> Option<ScalarType> {
         match self {
-            FieldType::ConnectorSpecific(sft) => Some(sft.prisma_type()),
+            FieldType::NativeType(st, _) => Some(*st),
             FieldType::Base(st, _) => Some(*st),
             _ => None,
         }

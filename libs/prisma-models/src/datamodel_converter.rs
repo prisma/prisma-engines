@@ -353,9 +353,7 @@ impl DatamodelFieldExtensions for dml::ScalarField {
                 dml::ScalarType::Json => TypeIdentifier::Json,
             },
             dml::FieldType::Unsupported(_) => panic!("These should always be commented out"),
-            dml::FieldType::ConnectorSpecific { .. } => {
-                unimplemented!("Connector Specific types are not supported here yet")
-            }
+            dml::FieldType::NativeType { .. } => unimplemented!("Connector Specific types are not supported here yet"),
         }
     }
 

@@ -1,10 +1,12 @@
 use super::super::directives::AllDirectives;
+use crate::transform::helpers::ValueValidator;
 use crate::{
     ast, configuration, dml,
     error::{DatamodelError, ErrorCollection},
     Field, FieldType, ScalarType,
 };
-use datamodel_connector::{BuiltinConnectors, Connector};
+use datamodel_connector::Connector;
+use sql_datamodel_connector::SqlDatamodelConnectors;
 
 /// Helper for lifting a datamodel.
 ///
@@ -16,6 +18,7 @@ pub struct LiftAstToDml<'a> {
     source: Option<&'a configuration::Datasource>,
 }
 
+// TODO carmen: feature flags of the Datasource must be used instead
 const USE_CONNECTORS_FOR_CUSTOM_TYPES: bool = false; // FEATURE FLAG
 
 impl<'a> LiftAstToDml<'a> {
@@ -185,7 +188,7 @@ impl<'a> LiftAstToDml<'a> {
     fn lift_field_type(
         &self,
         ast_field: &ast::Field,
-        custom_type_name: Option<String>,
+        type_alias: Option<String>,
         ast_schema: &ast::SchemaAst,
         checked_types: &mut Vec<String>,
     ) -> Result<(dml::FieldType, Vec<ast::Directive>), DatamodelError> {
@@ -193,22 +196,28 @@ impl<'a> LiftAstToDml<'a> {
 
         if let Ok(scalar_type) = ScalarType::from_str(type_name) {
             if USE_CONNECTORS_FOR_CUSTOM_TYPES {
-                let pg_connector = BuiltinConnectors::postgres();
-                let args = vec![]; // TODO: figure out args
-                let pg_type_specification = ast_field
-                    .directives
-                    .iter()
-                    .find(|dir| dir.name.name.starts_with("pg.")) // we use find because there should be at max 1.
-                    .map(|dir| dir.name.name.trim_start_matches("pg."));
+                let pg_connector = SqlDatamodelConnectors::postgres();
+                let pg_type_specification = ast_field.directives.iter().find(|dir| dir.name.name.starts_with("pg.")); // we use find because there should be at max 1.
+                let name = pg_type_specification.map(|dir| dir.name.name.trim_start_matches("pg."));
+                let args = pg_type_specification
+                    .map(|dir| {
+                        let args = dir
+                            .arguments
+                            .iter()
+                            .map(|arg| ValueValidator::new(&arg.value).as_int().unwrap() as u32)
+                            .collect();
+                        args
+                    })
+                    .unwrap_or(vec![]);
 
-                if let Some(x) = pg_type_specification.and_then(|ts| pg_connector.calculate_type(&ts, args)) {
-                    let field_type = dml::FieldType::ConnectorSpecific(x);
+                if let Some(x) = name.and_then(|ts| pg_connector.parse_native_type(&ts, args)) {
+                    let field_type = dml::FieldType::NativeType(scalar_type, x);
                     Ok((field_type, vec![]))
                 } else {
-                    Ok((dml::FieldType::Base(scalar_type, custom_type_name), vec![]))
+                    Ok((dml::FieldType::Base(scalar_type, type_alias), vec![]))
                 }
             } else {
-                Ok((dml::FieldType::Base(scalar_type, custom_type_name), vec![]))
+                Ok((dml::FieldType::Base(scalar_type, type_alias), vec![]))
             }
         } else if ast_schema.find_model(type_name).is_some() {
             Ok((dml::FieldType::Relation(dml::RelationInfo::new(type_name)), vec![]))
@@ -253,19 +262,6 @@ impl<'a> LiftAstToDml<'a> {
 
             attrs.append(&mut custom_type.directives.clone());
             Ok((field_type, attrs))
-        } else if USE_CONNECTORS_FOR_CUSTOM_TYPES {
-            let pg_connector = BuiltinConnectors::postgres();
-            let args = vec![]; // TODO: figure out args
-
-            if let Some(x) = pg_connector.calculate_type(&ast_field.field_type.name, args) {
-                let field_type = dml::FieldType::ConnectorSpecific(x);
-                Ok((field_type, vec![]))
-            } else {
-                Err(DatamodelError::new_type_not_found_error(
-                    type_name,
-                    ast_field.field_type.span,
-                ))
-            }
         } else {
             Err(DatamodelError::new_type_not_found_error(
                 type_name,

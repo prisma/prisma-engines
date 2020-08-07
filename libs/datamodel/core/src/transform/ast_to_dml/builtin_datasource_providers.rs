@@ -1,7 +1,8 @@
 use super::datasource_provider::DatasourceProvider;
 use crate::common::provider_names::*;
 use crate::StringFromEnvVar;
-use datamodel_connector::{BuiltinConnectors, Connector};
+use datamodel_connector::Connector;
+use sql_datamodel_connector::SqlDatamodelConnectors;
 
 pub struct SqliteDatasourceProvider {}
 
@@ -27,7 +28,7 @@ impl DatasourceProvider for SqliteDatasourceProvider {
     }
 
     fn connector(&self) -> Box<dyn Connector> {
-        Box::new(BuiltinConnectors::sqlite())
+        Box::new(SqlDatamodelConnectors::sqlite())
     }
 }
 
@@ -55,7 +56,7 @@ impl DatasourceProvider for PostgresDatasourceProvider {
     }
 
     fn connector(&self) -> Box<dyn Connector> {
-        Box::new(BuiltinConnectors::postgres())
+        Box::new(SqlDatamodelConnectors::postgres())
     }
 }
 
@@ -81,7 +82,7 @@ impl DatasourceProvider for MySqlDatasourceProvider {
     }
 
     fn connector(&self) -> Box<dyn Connector> {
-        Box::new(BuiltinConnectors::mysql())
+        Box::new(SqlDatamodelConnectors::mysql())
     }
 }
 
@@ -107,7 +108,7 @@ impl DatasourceProvider for MsSqlDatasourceProvider {
     }
 
     fn connector(&self) -> Box<dyn Connector> {
-        Box::new(BuiltinConnectors::mssql())
+        Box::new(SqlDatamodelConnectors::mssql())
     }
 }
 
