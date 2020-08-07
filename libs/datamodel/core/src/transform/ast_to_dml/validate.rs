@@ -479,6 +479,10 @@ impl<'a> Validator<'a> {
         let mut errors = ErrorCollection::new();
 
         for field in model.relation_fields() {
+            println!("486: {:?}", field.name);
+            println!("ast model: {:?}", ast_model);
+            println!("------------------------------------------------");
+            println!("dml model: {:?}", model);
             let ast_field = ast_model.find_field(&field.name);
 
             let rel_info = &field.relation_info;
