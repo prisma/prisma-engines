@@ -42,6 +42,11 @@ impl<'a> ValidationPipeline<'a> {
             all_errors.append(&mut err);
         }
 
+        // Early return so that the validator does not have to deal with invalid schemas
+        if all_errors.has_errors() {
+            return Err(all_errors);
+        }
+
         // Phase 3: Lift AST to DML.
         let mut schema = match self.lifter.lift(ast_schema) {
             Err(mut err) => {

@@ -68,9 +68,6 @@ impl SchemaAst {
     }
 
     pub fn find_model(&self, model: &str) -> Option<&Model> {
-        if self.models().into_iter().filter(|m| m.name.name == model).count() > 1 {
-            return None;
-        }
         self.models().into_iter().find(|m| m.name.name == model)
     }
 
