@@ -521,7 +521,6 @@ class ExtendedRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase
         |    ArtistId
         |  }
         |}
-        |
       """.stripMargin,
       project
     )

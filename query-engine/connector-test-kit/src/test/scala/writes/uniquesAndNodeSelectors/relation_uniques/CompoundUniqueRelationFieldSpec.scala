@@ -846,7 +846,7 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
         |  updateChild(where: { id: 1 } data: {
         |    parents: {
         |       updateMany: {
-        |         where: { p: "Parent1Updated" }
+        |         where: { p: { equals: "Parent1Updated" }}
         |         data: { p: "Parent2UpdatedMany" } }
         |       }
         |     }
@@ -1020,7 +1020,7 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
         |    data: {
         |      parents: {
         |        updateMany: {
-        |          where: { p: "Parent2New" }
+        |          where: { p: { equals: "Parent2New" }}
         |          data: { p: "Parent2NewUpdateMany" }
         |        }
         |      }
@@ -1049,7 +1049,7 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
         |    data: {
         |      parents: {
         |        deleteMany: {
-        |          p: "Parent2NewUpdateMany"
+        |          p: { equals: "Parent2NewUpdateMany" }
         |        }
         |      }
         |    }
@@ -1146,8 +1146,8 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
         |  updateChild(where: { id: 1 } data: {
         |    parents: {
         |       updateMany: {
-        |         where: { p: "Parent1Updated" }
-        |         data: { p: "Parent2UpdatedMany" } }
+        |         where: { p: { equals: "Parent1Updated" }}
+        |         data: { p: "Parent2UpdatedMany" }}
         |       }
         |     }
         |  ) {
@@ -1320,7 +1320,7 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
         |    data: {
         |      parents: {
         |        updateMany: {
-        |          where: { p: "Parent2New" }
+        |          where: { p: { equals: "Parent2New" }}
         |          data: { p: "Parent2NewUpdateMany" }
         |        }
         |      }
@@ -1349,7 +1349,7 @@ class CompoundUniqueRelationFieldSpec extends FlatSpec with Matchers with ApiSpe
         |    data: {
         |      parents: {
         |        deleteMany: {
-        |          p: "Parent2NewUpdateMany"
+        |          p: { equals: "Parent2NewUpdateMany" }
         |        }
         |      }
         |    }
