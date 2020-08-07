@@ -93,9 +93,9 @@ class SelfRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
     val filterFrances = s"""query{songs (
                                     where: {
                                       creator: {
-                                        daughters_some: {
+                                        daughters: { some: {
                                           name: "frances"
-                                            }
+                                            }}
                                           }
                                         }
                                       ) {
@@ -157,7 +157,7 @@ class SelfRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
        songs (
           where: {
             creator: {
-              daughters_none: null
+              daughters: { none: null }
             }
           }
         ) {
@@ -169,7 +169,7 @@ class SelfRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
       filterDaughterNull,
       project,
       errorCode = 2012,
-      errorContains = "Missing a required value at `Query.songs.where.SongWhereInput.creator.HumanWhereInput.daughters_none`"
+      errorContains = "Missing a required value at `Query.songs.where.SongWhereInput.creator.HumanWhereInput.daughters.none`"
     )
   }
 
@@ -178,8 +178,8 @@ class SelfRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
     val filterDaughter = s"""query{songs (
                                           where: {
                                             creator: {
-                                              daughters_some: {}
-                                                }
+                                              daughters: { some: {}
+                                                }}
                                               }
                                             ) {
                                               title
@@ -191,16 +191,16 @@ class SelfRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
 
   //ManyToMany
 
-  "Filter Queries along ManyToMany self relations" should "succeed with valid filter _some" in {
+  "Filter Queries along ManyToMany self relations" should "succeed with valid filter `some`" in {
 
     val filterGroupies = s"""query{songs (
                                           where: {
                                             creator: {
-                                              fans_some: {
+                                              fans: { some: {
                                                     name: "groupie1"
                                                   }
                                                 }
-                                              },
+                                              }},
                                            orderBy: { id: asc }
                                             ) {
                                               title
@@ -210,15 +210,15 @@ class SelfRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
     server.query(filterGroupies, project, dataContains = "{\"songs\":[{\"title\":\"My Girl\"},{\"title\":\"Imagine\"}]}")
   }
 
-  "Filter Queries along ManyToMany self relations" should "succeed with valid filter _none" taggedAs (IgnoreMongo) in {
+  "Filter Queries along ManyToMany self relations" should "succeed with valid filter `none`" taggedAs (IgnoreMongo) in {
 
     val filterGroupies = s"""query{songs (
                                           where: {
                                             creator: {
-                                              fans_none: {
+                                              fans: { none: {
                                                     name: "groupie1"
                                                   }
-                                                }
+                                                }}
                                               }
                                             ) {
                                               title
@@ -228,14 +228,14 @@ class SelfRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
     server.query(filterGroupies, project, dataContains = "{\"songs\":[{\"title\":\"Bicycle\"},{\"title\":\"Gasag\"}]}")
   }
 
-  "Filter Queries along ManyToMany self relations" should "succeed with valid filter _every" taggedAs (IgnoreMongo) in {
+  "Filter Queries along ManyToMany self relations" should "succeed with valid filter `every`" taggedAs (IgnoreMongo) in {
 
     val filterGroupies = s"""query{songs (
                                           where: {
                                             creator: {
-                                              fans_every: {
+                                              fans: { every: {
                                                     name: "groupie1"
-                                                  }
+                                                  }}
                                                 }
                                               }
                                             ) {
@@ -252,10 +252,10 @@ class SelfRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
           songs (
             where: {
               creator: {
-                fans_every: {
-                      fans_some: null
+                fans: { every: {
+                      fans: { some: null }
                     }
-                  }
+                  }}
                 }
               ) {
                 title
@@ -266,16 +266,16 @@ class SelfRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
       filterGroupies,
       project,
       errorCode = 2012,
-      errorContains = """Missing a required value at `Query.songs.where.SongWhereInput.creator.HumanWhereInput.fans_every.HumanWhereInput.fans_some`"""
+      errorContains = """Missing a required value at `Query.songs.where.SongWhereInput.creator.HumanWhereInput.fans.every.HumanWhereInput.fans.some`"""
     )
   }
 
-  "Filter Queries along ManyToMany self relations" should "succeed with {} filter _some" in {
+  "Filter Queries along ManyToMany self relations" should "succeed with {} filter `some`" in {
 
     val filterGroupies = s"""query{songs (
                                           where: {
                                             creator: {
-                                              fans_some: {}
+                                              fans: { some: {} }
                                                 }
                                               }
                                             ) {
@@ -286,10 +286,10 @@ class SelfRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
     server.query(filterGroupies, project, dataContains = "{\"songs\":[{\"title\":\"My Girl\"},{\"title\":\"Imagine\"}]}")
   }
 
-  "Filter Queries along ManyToMany self relations" should "succeed with {} filter _none" taggedAs (IgnoreMongo) in {
+  "Filter Queries along ManyToMany self relations" should "succeed with {} filter `none`" taggedAs (IgnoreMongo) in {
 
     val filterGroupies = s"""query{humans(
-                                          where: {fans_none: {}},
+                                          where: {fans: { none: {}}},
                                            orderBy: { id: asc }
                                             ) {
                                               name
@@ -304,9 +304,9 @@ class SelfRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
     )
   }
 
-  "Filter Queries along ManyToMany self relations" should "succeed with {} filter _every" taggedAs (IgnoreMongo) in {
+  "Filter Queries along ManyToMany self relations" should "succeed with {} filter `every`" taggedAs (IgnoreMongo) in {
     val filterGroupies = s"""query{humans(
-                                          where: {fans_every: {}},
+                                          where: {fans: { every: {}}},
                                            orderBy: { id: asc }
                                             ) {
                                               name

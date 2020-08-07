@@ -87,8 +87,8 @@ fn equality_filters(sf: &ScalarFieldRef) -> impl Iterator<Item = InputField> {
     let mapped_type = map_optional_input_type(sf);
 
     vec![
-        input_field("equal", mapped_type.clone(), None),
-        input_field("not_equal", mapped_type.clone(), None),
+        input_field("equals", mapped_type.clone(), None),
+        input_field("not_equals", mapped_type.clone(), None),
     ]
     .into_iter()
 }

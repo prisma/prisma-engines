@@ -51,7 +51,7 @@ class RelationFilterOrderingSpec extends FlatSpec with Matchers with ApiSpecBase
 
       res1.toString should be("""{"data":{"blogs":[{"title":"blog_1","score":30},{"title":"blog_1","score":20}]}}""")
 
-      val res2 = server.query("""query {blogs (take: 2, orderBy: { score: desc }, where:{labels_some: {text: "x"}}) {title, score}}""", project)
+      val res2 = server.query("""query {blogs (take: 2, orderBy: { score: desc }, where:{labels: { some: { text: "x" } }}) {title, score}}""", project)
       res2.toString should be("""{"data":{"blogs":[{"title":"blog_1","score":30},{"title":"blog_1","score":20}]}}""")
 
     }

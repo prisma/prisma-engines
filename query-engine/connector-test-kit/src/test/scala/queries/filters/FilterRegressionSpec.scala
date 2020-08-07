@@ -71,11 +71,11 @@ class FilterRegressionSpec extends FlatSpec with Matchers with ApiSpecBase {
       project
     )
 
-    val find_1 = server.query("""query {companies(where: {locations_none: {name: "D"}}){id}}""", project)
+    val find_1 = server.query("""query {companies(where: {locations: { none: {name: "D"}}}){id}}""", project)
 
     find_1.toString should be("{\"data\":{\"companies\":[{\"id\":134},{\"id\":135},{\"id\":136}]}}")
 
-    val find_2 = server.query("""query {companies(where: {locations_every: {name: "A"}}){id}}""", project)
+    val find_2 = server.query("""query {companies(where: {locations: { every: {name: "A"}}}){id}}""", project)
 
     find_2.toString should be("{\"data\":{\"companies\":[{\"id\":135}]}}")
   }
@@ -151,11 +151,11 @@ class FilterRegressionSpec extends FlatSpec with Matchers with ApiSpecBase {
       project
     )
 
-    val find_1 = server.query("""query {companies(where: {locations_none: {name: "D"}}){id}}""", project)
+    val find_1 = server.query("""query {companies(where: {locations: { none: {name: "D"}}}){id}}""", project)
 
     find_1.toString should be("{\"data\":{\"companies\":[{\"id\":134},{\"id\":135},{\"id\":136}]}}")
 
-    val find_2 = server.query("""query {companies(where: {locations_every: {name: "A"}}){id}}""", project)
+    val find_2 = server.query("""query {companies(where: {locations: { every: {name: "A"}}}){id}}""", project)
 
     find_2.toString should be("{\"data\":{\"companies\":[{\"id\":135}]}}")
   }
@@ -226,11 +226,11 @@ class FilterRegressionSpec extends FlatSpec with Matchers with ApiSpecBase {
       project
     )
 
-    val find_1 = server.query("""query {companies(where: {locations_none: {name: "D"}}){id}}""", project)
+    val find_1 = server.query("""query {companies(where: {locations: { none: {name: "D"}}}){id}}""", project)
 
     find_1.toString should be("{\"data\":{\"companies\":[{\"id\":134},{\"id\":135},{\"id\":136}]}}")
 
-    val find_2 = server.query("""query {companies(where: {locations_every: {name: "A"}}){id}}""", project)
+    val find_2 = server.query("""query {companies(where: {locations: { every: {name: "A"}}}){id}}""", project)
 
     find_2.toString should be("{\"data\":{\"companies\":[{\"id\":135}]}}")
   }
