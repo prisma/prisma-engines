@@ -117,18 +117,6 @@ impl<'a> IntoRenderer<'a, ()> for QuerySchemaRef {
     }
 }
 
-impl<'a> IntoRenderer<'a, DMMFTypeInfo> for OutputType {
-    fn into_renderer(&'a self) -> Box<dyn Renderer<'a, DMMFTypeInfo> + 'a> {
-        Box::new(DMMFTypeRenderer::Output(self))
-    }
-}
-
-impl<'a> IntoRenderer<'a, DMMFTypeInfo> for InputType {
-    fn into_renderer(&'a self) -> Box<dyn Renderer<'a, DMMFTypeInfo> + 'a> {
-        Box::new(DMMFTypeRenderer::Input(self))
-    }
-}
-
 impl<'a> IntoRenderer<'a, ()> for EnumType {
     fn into_renderer(&'a self) -> Box<dyn Renderer<'a, ()> + 'a> {
         Box::new(DMMFEnumRenderer::new(self))
