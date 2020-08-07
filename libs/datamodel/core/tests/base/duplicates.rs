@@ -49,10 +49,7 @@ fn fail_on_duplicate_models_with_relations() {
         DatamodelError::new_duplicate_top_error("Post", "model", "model", Span::new(52, 56)),
     );
 
-    errors.assert_is_at(
-        1,
-        DatamodelError::new_type_not_found_error("Post", Span::new(147, 151)),
-    );
+    errors.assert_is_at(1, DatamodelError::new_type_not_found_error("Post", Span::new(147, 151)));
 }
 
 #[test]
