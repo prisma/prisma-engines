@@ -4,7 +4,7 @@ pub struct DMMFEnumRenderer<'a> {
     enum_type: &'a EnumType,
 }
 
-impl<'a> Renderer<'a, ()> for DMMFEnumRenderer<'a> {
+impl<'a> Renderer<'a> for DMMFEnumRenderer<'a> {
     fn render(&self, ctx: &mut RenderContext) {
         if ctx.already_rendered(self.enum_type.name()) {
             return;

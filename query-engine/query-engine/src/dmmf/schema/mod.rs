@@ -103,34 +103,34 @@ impl RenderContext {
     }
 }
 
-pub trait Renderer<'a, T> {
-    fn render(&self, ctx: &mut RenderContext) -> T;
+pub trait Renderer<'a> {
+    fn render(&self, ctx: &mut RenderContext);
 }
 
-trait IntoRenderer<'a, T> {
-    fn into_renderer(&'a self) -> Box<dyn Renderer<'a, T> + 'a>;
+trait IntoRenderer<'a> {
+    fn into_renderer(&'a self) -> Box<dyn Renderer<'a> + 'a>;
 }
 
-impl<'a> IntoRenderer<'a, ()> for QuerySchemaRef {
-    fn into_renderer(&'a self) -> Box<dyn Renderer<'a, ()> + 'a> {
+impl<'a> IntoRenderer<'a> for QuerySchemaRef {
+    fn into_renderer(&'a self) -> Box<dyn Renderer<'a> + 'a> {
         Box::new(DMMFSchemaRenderer::new(Arc::clone(self)))
     }
 }
 
-impl<'a> IntoRenderer<'a, ()> for EnumType {
-    fn into_renderer(&'a self) -> Box<dyn Renderer<'a, ()> + 'a> {
+impl<'a> IntoRenderer<'a> for EnumType {
+    fn into_renderer(&'a self) -> Box<dyn Renderer<'a> + 'a> {
         Box::new(DMMFEnumRenderer::new(self))
     }
 }
 
-impl<'a> IntoRenderer<'a, ()> for InputObjectTypeWeakRef {
-    fn into_renderer(&'a self) -> Box<dyn Renderer<'a, ()> + 'a> {
+impl<'a> IntoRenderer<'a> for InputObjectTypeWeakRef {
+    fn into_renderer(&'a self) -> Box<dyn Renderer<'a> + 'a> {
         Box::new(DMMFObjectRenderer::Input(Weak::clone(self)))
     }
 }
 
-impl<'a> IntoRenderer<'a, ()> for ObjectTypeWeakRef {
-    fn into_renderer(&'a self) -> Box<dyn Renderer<'a, ()> + 'a> {
+impl<'a> IntoRenderer<'a> for ObjectTypeWeakRef {
+    fn into_renderer(&'a self) -> Box<dyn Renderer<'a> + 'a> {
         Box::new(DMMFObjectRenderer::Output(Weak::clone(self)))
     }
 }

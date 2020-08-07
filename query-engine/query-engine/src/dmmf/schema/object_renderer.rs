@@ -6,7 +6,7 @@ pub enum DMMFObjectRenderer {
     Output(ObjectTypeWeakRef),
 }
 
-impl<'a> Renderer<'a, ()> for DMMFObjectRenderer {
+impl<'a> Renderer<'a> for DMMFObjectRenderer {
     fn render(&self, ctx: &mut RenderContext) {
         match &self {
             DMMFObjectRenderer::Input(input) => self.render_input_object(input, ctx),
