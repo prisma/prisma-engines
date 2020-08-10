@@ -8,7 +8,6 @@ use field_renderer::*;
 use object_renderer::*;
 use query_core::schema::*;
 use std::{
-    cell::RefCell,
     collections::HashMap,
     sync::{Arc, Weak},
 };
@@ -23,8 +22,8 @@ pub struct GqlSchemaRenderer {
 }
 
 impl Renderer for GqlSchemaRenderer {
-    fn render(&self, ctx: RenderContext) -> (String, RenderContext) {
-        let (_, ctx) = self.query_schema.query.into_renderer().render(ctx);
+    fn render(&self, ctx: &mut RenderContext) -> String {
+        let _ = self.query_schema.query.into_renderer().render(ctx);
         self.query_schema.mutation.into_renderer().render(ctx)
     }
 }
@@ -37,24 +36,24 @@ impl GqlSchemaRenderer {
 
 impl QuerySchemaRenderer<String> for GraphQLSchemaRenderer {
     fn render(query_schema: QuerySchemaRef) -> String {
-        let context = RenderContext::new();
-        let (_, result) = query_schema.into_renderer().render(context);
+        let mut context = RenderContext::new();
+        query_schema.into_renderer().render(&mut context);
 
         // Add custom scalar types (required for graphql.js implementations)
-        format!("{}\n\nscalar DateTime\nscalar Json\nscalar UUID", result.format())
+        format!("{}\n\nscalar DateTime\nscalar Json\nscalar UUID", context.format())
     }
 }
 
 pub trait Renderer {
-    fn render(&self, ctx: RenderContext) -> (String, RenderContext);
+    fn render(&self, ctx: &mut RenderContext) -> String;
 }
 
 pub struct RenderContext {
     /// Output queue for all (top level) elements that need to be rendered,
-    output_queue: RefCell<Vec<String>>,
+    output_queue: Vec<String>,
 
     /// Prevents double rendering of elements that are referenced multiple times.
-    rendered: RefCell<HashMap<String, ()>>,
+    rendered: HashMap<String, ()>,
 
     /// General indent level in spaces.
     indent: usize,
@@ -66,30 +65,30 @@ pub struct RenderContext {
 impl RenderContext {
     pub fn new() -> RenderContext {
         RenderContext {
-            output_queue: RefCell::new(vec![]),
-            rendered: RefCell::new(HashMap::new()),
+            output_queue: vec![],
+            rendered: HashMap::new(),
             indent: 2,
             indent_str: " ",
         }
     }
 
     pub fn format(self) -> String {
-        self.output_queue.borrow().join("\n\n")
+        self.output_queue.join("\n\n")
     }
 
     pub fn already_rendered(&self, cache_key: &str) -> bool {
-        self.rendered.borrow().contains_key(cache_key)
+        self.rendered.contains_key(cache_key)
     }
 
-    pub fn mark_as_rendered(&self, cache_key: String) {
-        self.rendered.borrow_mut().insert(cache_key, ());
+    pub fn mark_as_rendered(&mut self, cache_key: String) {
+        self.rendered.insert(cache_key, ());
     }
 
-    pub fn add_output(&self, output: String) {
-        self.output_queue.borrow_mut().push(output);
+    pub fn add_output(&mut self, output: String) {
+        self.output_queue.push(output);
     }
 
-    pub fn add(&self, cache_key: String, output: String) {
+    pub fn add(&mut self, cache_key: String, output: String) {
         self.add_output(output);
         self.mark_as_rendered(cache_key);
     }
@@ -108,7 +107,7 @@ enum GqlRenderer<'a> {
 }
 
 impl<'a> Renderer for GqlRenderer<'a> {
-    fn render(&self, ctx: RenderContext) -> (String, RenderContext) {
+    fn render(&self, ctx: &mut RenderContext) -> String {
         match self {
             GqlRenderer::Schema(s) => s.render(ctx),
             GqlRenderer::Object(o) => o.render(ctx),
