@@ -204,7 +204,7 @@ fn load_sources(
     datasource_url_overrides: Vec<(String, String)>,
 ) -> Result<Vec<Datasource>, error::ErrorCollection> {
     let source_loader = DatasourceLoader::new();
-    source_loader.load_sources(&schema_ast, ignore_datasource_urls, datasource_url_overrides)
+    source_loader.load_datasources_from_ast(&schema_ast, ignore_datasource_urls, datasource_url_overrides)
 }
 
 //

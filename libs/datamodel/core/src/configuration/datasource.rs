@@ -14,11 +14,31 @@ pub struct Datasource {
     pub combined_connector: Box<dyn Connector>,
     /// the connector of the active provider
     pub active_connector: Box<dyn Connector>,
+    pub preview_features: Vec<String>,
 }
 
 impl Datasource {
     pub fn url(&self) -> &StringFromEnvVar {
         &self.url
+    }
+}
+
+pub trait PreviewFeatures {
+    fn has_preview_feature(&self, feature: &str) -> bool;
+}
+
+impl PreviewFeatures for Datasource {
+    fn has_preview_feature(&self, feature: &str) -> bool {
+        self.preview_features.contains(&feature.to_string())
+    }
+}
+
+impl PreviewFeatures for Option<&Datasource> {
+    fn has_preview_feature(&self, feature: &str) -> bool {
+        match self {
+            Some(dat) => dat.has_preview_feature(feature),
+            None => false,
+        }
     }
 }
 

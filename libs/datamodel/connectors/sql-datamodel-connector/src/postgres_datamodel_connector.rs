@@ -5,6 +5,7 @@ use native_types::{NativeType, PostgresType};
 
 const BIG_INT_TYPE_NAME: &str = "BigInt";
 const VARCHAR_TYPE_NAME: &str = "VarChar";
+const SMALL_INT_TYPE_NAME: &str = "SmallInt";
 
 pub struct PostgresDatamodelConnector {
     capabilities: Vec<ConnectorCapability>,
@@ -24,7 +25,8 @@ impl PostgresDatamodelConnector {
 
         let bigint = NativeTypeConstructor::without_args(BIG_INT_TYPE_NAME, ScalarType::Int);
         let varchar = NativeTypeConstructor::with_args(VARCHAR_TYPE_NAME, 1, ScalarType::String);
-        let constructors = vec![varchar, bigint];
+        let smallint = NativeTypeConstructor::without_args(SMALL_INT_TYPE_NAME, ScalarType::Int);
+        let constructors = vec![varchar, bigint, smallint];
 
         PostgresDatamodelConnector {
             capabilities,
@@ -61,6 +63,7 @@ impl Connector for PostgresDatamodelConnector {
         let (constructor_name, args) = match native_type {
             PostgresType::BigInt => (BIG_INT_TYPE_NAME, vec![]),
             PostgresType::VarChar(x) => (VARCHAR_TYPE_NAME, vec![x]),
+            PostgresType::SmallInt => (SMALL_INT_TYPE_NAME, vec![]),
             _ => todo!("This match must be exhaustive"),
         };
 

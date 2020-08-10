@@ -6,6 +6,7 @@ pub enum PostgresType {
     SmallInt,
     Integer,
     BigInt,
+    Decimal(u8, u8),
     Numeric(u8, u8),
     Real,
     DoublePrecision,

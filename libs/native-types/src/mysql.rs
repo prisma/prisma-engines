@@ -8,6 +8,7 @@ pub enum MySqlType {
     MediumInt,
     BigInt,
     Decimal(u8, u8),
+    Numeric(u8, u8),
     Float,
     Double,
     Bit(u32),
@@ -28,4 +29,5 @@ pub enum MySqlType {
     DateTime(Option<u32>),
     Timestamp(Option<u32>),
     Year,
+    JSON,
 }

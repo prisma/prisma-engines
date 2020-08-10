@@ -105,12 +105,12 @@ fn should_be_able_to_define_custom_enum_types() {
 
 // TODO carmen: enable this test once the feature flags are implemented
 #[test]
-#[ignore]
 fn should_handle_type_specifications() {
     let dml = r#"
         datasource pg {
           provider = "postgres"
           url = "postgresql://"
+          previewFeatures = ["nativeTypes"]
         }
 
         model Blog {
