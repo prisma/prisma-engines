@@ -31,7 +31,6 @@ impl DirectiveValidator<dml::Field> for DefaultDirectiveValidator {
                 let default_arg = args.default_arg("value")?;
 
                 match default_arg.as_constant_literal() {
-                    // TODO: We should also check if this value is a valid enum value. For this we need the enums -.-
                     Ok(value) => sf.default_value = Some(dml::DefaultValue::Single(PrismaValue::Enum(value))),
                     Err(err) => {
                         let generator = default_arg.as_value_generator()?;

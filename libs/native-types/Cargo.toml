@@ -1,0 +1,11 @@
+[package]
+name = "native-types"
+version = "0.1.0"
+authors = ["Marcus Böhm <wif.mboehm@gmx.de>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1.0"

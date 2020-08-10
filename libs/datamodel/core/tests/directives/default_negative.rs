@@ -130,3 +130,95 @@ fn must_error_if_autoincrement_function_is_used_for_fields_that_are_not_int() {
         Span::new(70, 85),
     ));
 }
+
+#[test]
+fn must_error_if_default_value_for_enum_is_not_valid() {
+    let dml = r#"
+    model Model {
+        id Int @id
+        enum A @default(B)
+    }
+
+    enum A {
+        A
+    }
+    "#;
+
+    let errors = parse_error(dml);
+
+    errors.assert_is(DatamodelError::new_directive_validation_error(
+        "The defined default value is not a valid value of the enum specified for the field.",
+        "default",
+        Span::new(46, 65),
+    ));
+}
+
+#[test]
+fn must_error_if_using_non_id_auto_increment_on_sqlite() {
+    let dml = r#"
+    datasource db1 {
+        provider = "sqlite"
+        url = "file://test.db"
+    }
+    
+    model Model {
+        id      Int @id
+        non_id  Int @default(autoincrement()) @unique
+    }
+    "#;
+
+    let errors = parse_error(dml);
+
+    errors.assert_is(DatamodelError::new_directive_validation_error(
+        "The `autoincrement()` default value is used on a non-id field even though the datasource does not support this.",
+        "default",
+        Span::new(142, 188),
+    ));
+}
+
+#[test]
+fn must_error_if_using_multiple_auto_increment_on_mysql() {
+    let dml = r#"
+    datasource db1 {
+        provider = "mysql"
+        url = "mysql://"
+    }
+    
+    model Model {
+        id      Int @id
+        non_id  Int @default(autoincrement()) @unique
+        non_id2  Int @default(autoincrement()) @unique
+    }
+    "#;
+
+    let errors = parse_error(dml);
+
+    errors.assert_is(DatamodelError::new_directive_validation_error(
+        "The `autoincrement()` default value is used multiple times on this model even though the underlying datasource only supports one instance per table.",
+        "default",
+        Span::new(89, 241),
+    ));
+}
+
+#[test]
+fn must_error_if_using_non_indexed_auto_increment_on_mysql() {
+    let dml = r#"
+    datasource db1 {
+        provider = "mysql"
+        url = "mysql://"
+    }
+    
+    model Model {
+        id      Int @id
+        non_id  Int @default(autoincrement())
+    }
+    "#;
+
+    let errors = parse_error(dml);
+
+    errors.assert_is(DatamodelError::new_directive_validation_error(
+        "The `autoincrement()` default value is used on a non-indexed field even though the datasource does not support this.",
+        "default",
+        Span::new(135, 173),
+    ));
+}

@@ -1,6 +1,6 @@
 use crate::common::*;
-use datamodel::{DefaultValue, ScalarType, ValueGenerator};
-use datamodel_connector::ScalarFieldType;
+use datamodel::{dml::ScalarType, DefaultValue, ValueGenerator};
+use native_types::PostgresType;
 use prisma_value::PrismaValue;
 
 #[test]
@@ -103,25 +103,7 @@ fn should_be_able_to_define_custom_enum_types() {
         .assert_default_value(DefaultValue::Single(PrismaValue::Enum(String::from("USER"))));
 }
 
-#[test]
-#[ignore]
-fn should_handle_type_mappings() {
-    let dml = r#"
-        model Blog {
-            id     Int    @id
-            bigInt BigInt
-        }
-    "#;
-
-    let datamodel = parse(dml);
-
-    let user_model = datamodel.assert_has_model("Blog");
-
-    user_model
-        .assert_has_scalar_field("bigInt")
-        .assert_connector_type(&ScalarFieldType::new("BigInt", ScalarType::Int, "bigint"));
-}
-
+// TODO carmen: enable this test once the feature flags are implemented
 #[test]
 #[ignore]
 fn should_handle_type_specifications() {
@@ -132,8 +114,9 @@ fn should_handle_type_specifications() {
         }
 
         model Blog {
-            id     Int @id
-            bigInt Int @pg.BigInt
+            id     Int    @id
+            bigInt Int    @pg.BigInt
+            foobar String @pg.VarChar(26)
         }
     "#;
 
@@ -141,7 +124,13 @@ fn should_handle_type_specifications() {
 
     let user_model = datamodel.assert_has_model("Blog");
 
-    user_model
-        .assert_has_scalar_field("bigInt")
-        .assert_connector_type(&ScalarFieldType::new("BigInt", ScalarType::Int, "bigint"));
+    let sft = user_model.assert_has_scalar_field("bigInt").assert_native_type();
+
+    let postgrestype: PostgresType = sft.deserialize_native_type();
+    assert_eq!(postgrestype, PostgresType::BigInt);
+
+    let sft = user_model.assert_has_scalar_field("foobar").assert_native_type();
+
+    let postgrestype: PostgresType = sft.deserialize_native_type();
+    assert_eq!(postgrestype, PostgresType::VarChar(26));
 }

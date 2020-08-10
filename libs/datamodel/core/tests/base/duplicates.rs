@@ -21,6 +21,34 @@ fn fail_on_duplicate_models() {
         Span::new(53, 57),
     ));
 }
+
+// From issue: https://github.com/prisma/prisma/issues/1988
+#[test]
+fn fail_on_duplicate_models_with_relations() {
+    let dml = r#"
+    model Post {
+      id Int @id
+    }
+
+    model Post {
+      id Int @id
+      categories Categories[]
+    }
+
+    model Categories {
+      post Post @relation(fields:[postId], references: [id])
+      postId Int
+    }
+    "#;
+
+    let errors = parse_error(dml);
+
+    errors.assert_is_at(
+        0,
+        DatamodelError::new_duplicate_top_error("Post", "model", "model", Span::new(52, 56)),
+    );
+}
+
 #[test]
 fn fail_on_model_enum_conflict() {
     let dml = r#"
