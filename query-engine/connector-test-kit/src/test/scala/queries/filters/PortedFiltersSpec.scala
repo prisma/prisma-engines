@@ -73,12 +73,38 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
     createTest("id5", "foo bar barz", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
 
     val res =
-      server.query("""{scalarModels(where: {optString: { starts_with: "foo" }, AND: [{optBoolean: false, idTest: { ends_with: "5" }}]}){idTest}}""",
-                   project = project)
+      server.query(
+        """{
+          |  scalarModels(
+          |    where: {
+          |      optString: { starts_with: "foo" }
+          |      optBoolean: { equals: false }
+          |      idTest: { ends_with: "5" }
+          |    }
+          |  ) {
+          |    idTest
+          |  }
+          |}""".stripMargin,
+        project = project
+      )
 
     val res2 =
       server.query(
-        """{scalarModels(where: {b: {int:1}, optString: { starts_with: "foo" }, AND: [{optBoolean: false, idTest: { ends_with: "5" }}]}){idTest}}""",
+        """{
+          |  scalarModels(
+          |    where: {
+          |      b: { is: { int: { equals: 1 } } }
+          |      AND: [
+          |        { optString: { starts_with: "foo" }},
+          |        { optBoolean: { equals: false }},
+          |        { idTest: { ends_with: "5" }}
+          |      ]
+          |    }
+          |  ) {
+          |    idTest
+          |  }
+          |}
+          |""",
         project = project
       )
 
