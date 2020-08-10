@@ -61,15 +61,15 @@ class UpdateManyRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBa
       project
     )
 
-    val filter = """{ bottom: null }"""
+    val filter = """{ bottom: { is: null }}"""
 
     val firstCount       = topUpdatedCount
     val filterQueryCount = server.query(s"""{tops(where: $filter){id}}""", project).pathAsSeq("data.tops").length
     val filterUpdatedCount = server
-      .query(s"""mutation {updateManyTops(where: $filter, data: { top: "updated" }){count}}""".stripMargin, project)
+      .query(s"""mutation { updateManyTops(where: $filter, data: { top: "updated" }){count}}""".stripMargin, project)
       .pathAsLong("data.updateManyTops.count")
-    val lastCount = topUpdatedCount
 
+    val lastCount = topUpdatedCount
     firstCount should be(0)
     filterQueryCount should be(2)
     firstCount + filterQueryCount should be(lastCount)
@@ -102,8 +102,8 @@ class UpdateManyRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBa
     val filterUpdatedCount = server
       .query(s"""mutation {updateManyTops(data: { top: "updated" }){count}}""".stripMargin, project)
       .pathAsLong("data.updateManyTops.count")
-    val lastCount = topUpdatedCount
 
+    val lastCount = topUpdatedCount
     firstCount should be(0)
     filterQueryCount should be(3)
     firstCount + filterQueryCount should be(lastCount)
@@ -133,15 +133,14 @@ class UpdateManyRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBa
       project
     )
 
-    val filter = """{ bottom: {veryBottom: {veryBottom: "veryBottom"}}}"""
-
+    val filter           = """{ bottom: { is: { veryBottom: { is: { veryBottom: { equals: "veryBottom" }}}}}}"""
     val firstCount       = topUpdatedCount
     val filterQueryCount = server.query(s"""{tops(where: $filter){id}}""", project).pathAsSeq("data.tops").length
     val filterUpdatedCount = server
       .query(s"""mutation {updateManyTops(where: $filter, data: { top: "updated" }){count}}""".stripMargin, project)
       .pathAsLong("data.updateManyTops.count")
-    val lastCount = topUpdatedCount
 
+    val lastCount = topUpdatedCount
     firstCount should be(0)
     filterQueryCount should be(1)
     firstCount + filterQueryCount should be(lastCount)
@@ -149,7 +148,7 @@ class UpdateManyRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBa
   }
 
   def topCount: Int        = server.query("{ tops { id } }", project).pathAsSeq("data.tops").size
-  def topUpdatedCount: Int = server.query("""{ tops(where: {top: "updated"}) { id } }""", project).pathAsSeq("data.tops").size
+  def topUpdatedCount: Int = server.query("""{ tops(where: {top: { equals: "updated" }}) { id } }""", project).pathAsSeq("data.tops").size
 
   def createTop(top: String): Unit = {
     server.query(

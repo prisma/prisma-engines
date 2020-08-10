@@ -53,11 +53,11 @@ class OneToOneSelfRelationRegressionSpec extends FlatSpec with Matchers with Api
     val find_1 = server.query(
       """
         |query {
-        |  users(where: {friend: null }){
+        |  users(where: { friend: { is: null }}){
         |    id
         |    name
-        |    friend {name}
-        |    friendOf{name}
+        |    friend { name }
+        |    friendOf { name }
         |  }
         |}
       """,
@@ -69,11 +69,11 @@ class OneToOneSelfRelationRegressionSpec extends FlatSpec with Matchers with Api
     val find_2 = server.query(
       """
         query {
-        |  users(where: {friendOf: null }){
+        |  users(where: { friendOf: { is: null }}){
         |    id
         |    name
-        |    friend {name}
-        |    friendOf{name}
+        |    friend { name }
+        |    friendOf { name }
         |  }
         |}
       """,

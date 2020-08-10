@@ -8,19 +8,20 @@ class DeleteManyMutationRelationsSpec extends FlatSpec with Matchers with ApiSpe
   override def runOnlyForCapabilities = Set(JoinRelationLinksCapability)
 
   "a P0 to C1! relation " should "error when deleting the parent" in {
-
-    val schema = """model Parent{
-                            id String @id @default(cuid())
-                            p  String @unique
-                        }
-
-                        model Child{
-                            id        String @id @default(cuid())
-                            c         String @unique
-                            parentId  String
-
-                            parentReq Parent @relation(fields: [parentId], references: [id])
-                        }"""
+    val schema =
+      """
+        |model Parent{
+        |    id String @id @default(cuid())
+        |    p  String @unique
+        |}
+        |
+        |model Child{
+        |    id        String @id @default(cuid())
+        |    c         String @unique
+        |    parentId  String
+        |    parentReq Parent @relation(fields: [parentId], references: [id])
+        |}
+      """.stripMargin
 
     val project = ProjectDsl.fromString { schema }
     database.setup(project)
@@ -44,9 +45,9 @@ class DeleteManyMutationRelationsSpec extends FlatSpec with Matchers with ApiSpe
       s"""
          |mutation {
          |  deleteManyParents(
-         |  where: {p: "p1"}
+         |    where: { p: { equals: "p1" }}
          |  ){
-         |  count
+         |    count
          |  }
          |}
       """.stripMargin,
@@ -195,7 +196,7 @@ class DeleteManyMutationRelationsSpec extends FlatSpec with Matchers with ApiSpe
          |mutation {
          |  deleteManyParents(
          |    where: {
-         |      p: "p1"
+         |      p: { equals: "p1" }
          |    }
          |  ){
          |    count
@@ -220,7 +221,7 @@ class DeleteManyMutationRelationsSpec extends FlatSpec with Matchers with ApiSpe
           |  createParent(data: {
           |    p: "p1"
           |    childOpt: {
-          |      create: {c: "c1"}
+          |      create: { c: "c1" }
           |    }
           |  }){
           |    p
@@ -237,7 +238,7 @@ class DeleteManyMutationRelationsSpec extends FlatSpec with Matchers with ApiSpe
          |mutation {
          |  deleteManyParents(
          |    where: {
-         |      p: "p1"
+         |      p: { equals: "p1" }
          |    }
          |  ){
          |    count
@@ -272,7 +273,7 @@ class DeleteManyMutationRelationsSpec extends FlatSpec with Matchers with ApiSpe
         s"""
          |mutation {
          |  deleteManyParents(
-         |    where: { p: "p1" }
+         |    where: { p: { equals: "p1" } }
          |  ){
          |    count
          |  }
@@ -313,9 +314,9 @@ class DeleteManyMutationRelationsSpec extends FlatSpec with Matchers with ApiSpe
         s"""
          |mutation {
          |  deleteManyParents(
-         |  where: {p: "p1"}
+         |    where: { p: { equals: "p1" } }
          |  ){
-         |  count
+         |    count
          |  }
          |}
       """.stripMargin,
@@ -351,9 +352,9 @@ class DeleteManyMutationRelationsSpec extends FlatSpec with Matchers with ApiSpe
         s"""
          |mutation {
          |  deleteManyParents(
-         |  where: {p: "p1"}
+         |    where: { p: { equals: "p1" } }
          |  ){
-         |  count
+         |    count
          |  }
          |}
       """.stripMargin,
@@ -393,9 +394,9 @@ class DeleteManyMutationRelationsSpec extends FlatSpec with Matchers with ApiSpe
         s"""
          |mutation {
          |  deleteManyParents(
-         |  where: {p: "p1"}
+         |    where: { p: { equals: "p1" } }
          |  ){
-         |  count
+         |    count
          |  }
          |}
       """.stripMargin,
@@ -418,7 +419,6 @@ class DeleteManyMutationRelationsSpec extends FlatSpec with Matchers with ApiSpe
         """mutation {
         |  createParent(data: {
         |    p: "p1"
-        |
         |  }){
         |    p
         |  }
@@ -430,9 +430,9 @@ class DeleteManyMutationRelationsSpec extends FlatSpec with Matchers with ApiSpe
         s"""
          |mutation {
          |  deleteManyParents(
-         |  where: {p: "p1"}
+         |    where: { p: { equals: "p1" } }
          |  ){
-         |  count
+         |    count
          |  }
          |}
       """.stripMargin,
@@ -470,7 +470,7 @@ class DeleteManyMutationRelationsSpec extends FlatSpec with Matchers with ApiSpe
         s"""
          |mutation {
          |  deleteManyParents(
-         |  where: { p: "p1"}
+         |    where: { p: { equals: "p1" } }
          |  ){
          |    count
          |  }
@@ -505,7 +505,7 @@ class DeleteManyMutationRelationsSpec extends FlatSpec with Matchers with ApiSpe
         s"""
          |mutation {
          |  deleteManyParents(
-         |  where: { p: "p1"}
+         |    where: { p: { equals: "p1" } }
          |  ){
          |    count
          |  }
@@ -548,7 +548,7 @@ class DeleteManyMutationRelationsSpec extends FlatSpec with Matchers with ApiSpe
         s"""
          |mutation {
          |  deleteManyParents(
-         |  where: {p: "p1"}
+         |   where: { p: { equals: "p1" } }
          |  ){
          |    count
          |  }
@@ -586,7 +586,7 @@ class DeleteManyMutationRelationsSpec extends FlatSpec with Matchers with ApiSpe
         s"""
          |mutation {
          |  deleteManyParents(
-         |  where: {p: "p1"}
+         |  where: { p: { equals: "p1" } }
          |  ){
          |    count
          |  }
@@ -608,7 +608,6 @@ class DeleteManyMutationRelationsSpec extends FlatSpec with Matchers with ApiSpe
         """mutation {
         |  createParent(data: {
         |    p: "p1"
-        |
         |  }){
         |    p
         |  }
@@ -620,7 +619,7 @@ class DeleteManyMutationRelationsSpec extends FlatSpec with Matchers with ApiSpe
         s"""
          |mutation {
          |  deleteManyParents(
-         |  where: {p: "p1"}
+         |    where: { p: { equals: "p1" } }
          |  ){
          |    count
          |  }
@@ -658,7 +657,7 @@ class DeleteManyMutationRelationsSpec extends FlatSpec with Matchers with ApiSpe
         s"""
          |mutation {
          |  deleteManyParents(
-         |  where: {p: "p1"}
+         |   where: { p: { equals: "p1" } }
          |  ){
          |    count
          |  }
@@ -692,7 +691,7 @@ class DeleteManyMutationRelationsSpec extends FlatSpec with Matchers with ApiSpe
         s"""
          |mutation {
          |  deleteManyParents(
-         |  where: {p: "p1"}
+         |   where: { p: { equals: "p1" } }
          |  ){
          |    count
          |  }
@@ -772,9 +771,9 @@ class DeleteManyMutationRelationsSpec extends FlatSpec with Matchers with ApiSpe
         s"""
          |mutation {
          |  deleteManyParents(
-         |  where: { p: "p1"}
-         | ){
-         |  count
+         |    where: { p: { equals: "p1" } }
+         | ) {
+         |    count
          |  }
          |}
       """.stripMargin,
