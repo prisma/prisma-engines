@@ -963,7 +963,7 @@ class SinglePKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBase 
         |    data: {
         |      parents: {
         |        updateMany: {
-        |          where: { age: 40 }
+        |          where: { age: { equals: 40 }}
         |          data: { age: 41 }
         |        }
         |      }
@@ -1276,11 +1276,11 @@ class SinglePKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBase 
       """
         |mutation {
         |  updateChild(
-        |    where: { id: 3 }
+        |    where: { id: 3}
         |    data: {
         |      parents: {
         |        deleteMany: {
-        |          age: 41
+        |          age: { equals: 41 }
         |        }
         |      }
         |    }

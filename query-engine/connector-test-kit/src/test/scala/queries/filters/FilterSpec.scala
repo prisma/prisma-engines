@@ -50,7 +50,7 @@ class FilterSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "Simple filter" should "work" in {
-    val filter = """(where: {name: "John"})"""
+    val filter = """(where: {name: { equals: "John" }})"""
 
     userUniques(filter) should be(Vector(4))
   }
@@ -70,7 +70,7 @@ class FilterSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "Relation Null filter" should "work" in {
-    val filter = "(where: { ride: null })"
+    val filter = "(where: { ride: { is: null }})"
 
     userUniques(filter) should be(Vector(4))
   }
@@ -112,13 +112,13 @@ class FilterSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "NOT filter" should "work as list" taggedAs (IgnoreMongo) in {
-    val filter = """(where: {NOT:[{name: { contains: "e" }},{unique:1}]})"""
+    val filter = """(where: { NOT:[{ name: { contains: "e" }},{unique: { equals: 1 }}]})"""
 
     userUniques(filter) should be(Vector(4))
   }
 
   "Nested filter" should "work" in {
-    val filter = """(where: {ride:{brand: { starts_with: "P" }}})"""
+    val filter = """(where: {ride:{ is: { brand: { starts_with: "P" }}}})"""
 
     userUniques(filter) should be(Vector(1))
   }

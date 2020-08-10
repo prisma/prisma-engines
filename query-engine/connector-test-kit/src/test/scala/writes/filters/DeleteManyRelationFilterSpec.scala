@@ -152,7 +152,7 @@ class DeleteManyRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBa
          |      bottom: {
          |        create: {
          |        bottom: "bottom1"
-         |        veryBottom: {create: {veryBottom: "veryBottom"}}}
+         |        veryBottom: { create: { veryBottom: "veryBottom" }}}
          |      }
          |    }
          |  ) {
@@ -163,8 +163,7 @@ class DeleteManyRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBa
       project
     )
 
-    val filter = """{ bottom: {veryBottom: {veryBottom: "veryBottom"}}}"""
-
+    val filter            = """{ bottom: { is: { veryBottom: { is: { veryBottom: { equals: "veryBottom" }}}}}}"""
     val firstCount        = topCount
     val filterQueryCount  = server.query(s"""{tops(where: $filter){id}}""", project).pathAsSeq("data.tops").length
     val filterDeleteCount = server.query(s"""mutation {deleteManyTops(where: $filter){count}}""".stripMargin, project).pathAsLong("data.deleteManyTops.count")

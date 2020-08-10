@@ -95,7 +95,11 @@ fn equality_filters(sf: &ScalarFieldRef) -> impl Iterator<Item = InputField> {
 }
 
 fn inclusion_filters(sf: &ScalarFieldRef) -> impl Iterator<Item = InputField> {
-    let mapped_type = InputType::opt(InputType::list(map_required_input_type(sf)));
+    let mapped_type = if sf.is_required {
+        InputType::opt(InputType::list(map_required_input_type(sf)))
+    } else {
+        InputType::opt(InputType::null(InputType::list(map_required_input_type(sf))))
+    };
 
     vec![
         input_field("in", mapped_type.clone(), None),
@@ -132,15 +136,16 @@ fn string_filters(sf: &ScalarFieldRef) -> impl Iterator<Item = InputField> {
 
 fn scalar_filter_name(sf: &ScalarFieldRef) -> String {
     let list = if sf.is_list { "List" } else { "" };
+    let nullable = if sf.is_required { "" } else { "Nullable" };
 
     match sf.type_identifier {
-        TypeIdentifier::UUID => format!("Uuid{}Filter", list),
-        TypeIdentifier::String => format!("String{}Filter", list),
-        TypeIdentifier::Int => format!("Int{}Filter", list),
-        TypeIdentifier::Float => format!("Float{}Filter", list),
-        TypeIdentifier::Boolean => format!("Bool{}Filter", list),
-        TypeIdentifier::DateTime => format!("DateTime{}Filter", list),
-        TypeIdentifier::Json => format!("Json{}Filter", list),
-        TypeIdentifier::Enum(ref e) => format!("Enum{}{}Filter", e, list),
+        TypeIdentifier::UUID => format!("Uuid{}{}Filter", nullable, list),
+        TypeIdentifier::String => format!("String{}{}Filter", nullable, list),
+        TypeIdentifier::Int => format!("Int{}{}Filter", nullable, list),
+        TypeIdentifier::Float => format!("Float{}{}Filter", nullable, list),
+        TypeIdentifier::Boolean => format!("Bool{}{}Filter", nullable, list),
+        TypeIdentifier::DateTime => format!("DateTime{}{}Filter", nullable, list),
+        TypeIdentifier::Json => format!("Json{}{}Filter", nullable, list),
+        TypeIdentifier::Enum(ref e) => format!("Enum{}{}{}Filter", e, nullable, list),
     }
 }
