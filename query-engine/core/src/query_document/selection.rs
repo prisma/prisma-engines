@@ -329,7 +329,6 @@ impl From<Conjuctive> for QueryValue {
 
 /// Syntax for single-record and multi-record queries
 fn single_to_multi_filter(obj: IndexMap<String, QueryValue>) -> IndexMap<String, QueryValue> {
-    dbg!(&obj);
     let mut new_obj = IndexMap::new();
 
     for (key, value) in obj {
