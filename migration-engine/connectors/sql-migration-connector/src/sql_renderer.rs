@@ -7,7 +7,12 @@ mod sqlite_renderer;
 
 pub(crate) use common::{IteratorJoin, Quoted, QuotedWithSchema};
 
-use crate::{sql_schema_differ::ColumnDiffer, sql_schema_helpers::ColumnRef, CreateEnum, DropEnum};
+use crate::{
+    database_info::DatabaseInfo,
+    sql_schema_differ::{ColumnDiffer, SqlSchemaDiffer},
+    sql_schema_helpers::{ColumnRef, TableRef},
+    CreateEnum, DropEnum,
+};
 use quaint::prelude::SqlFamily;
 use sql_schema_describer::*;
 use std::{borrow::Cow, fmt::Write};
@@ -40,43 +45,32 @@ pub(crate) trait SqlRenderer {
     /// Render a `CreateTable` step.
     fn render_create_table(
         &self,
-        table: &Table,
+        table: &TableRef<'_>,
         schema_name: &str,
-        next_schema: &SqlSchema,
         sql_family: SqlFamily,
-    ) -> anyhow::Result<Vec<String>> {
+    ) -> anyhow::Result<String> {
         let columns: String = table
-            .columns
-            .iter()
-            .map(|column| {
-                // FIXME Temporary hack: we should get this from a `TableRef`, but
-                // this is not possible because we sometimes create tables as
-                // part of the table redifinition process on sqlite.
-                let column = ColumnRef {
-                    schema: next_schema,
-                    column,
-                    table,
-                };
-                self.render_column(&schema_name, column, false)
-            })
+            .columns()
+            .map(|column| self.render_column(&schema_name, column, false))
             .join(",\n");
 
         let mut create_table = format!(
             "CREATE TABLE {} (\n{}",
-            self.quote_with_schema(&schema_name, &table.name),
+            self.quote_with_schema(&schema_name, table.name()),
             columns,
         );
 
         let primary_key_is_already_set = create_table.contains("PRIMARY KEY");
-        let primary_columns = table.primary_key_columns();
+        let primary_columns = table.table.primary_key_columns();
 
         if !primary_columns.is_empty() && !primary_key_is_already_set {
             let column_names = primary_columns.iter().map(|col| self.quote(&col)).join(",");
             write!(create_table, ",\nPRIMARY KEY ({})", column_names)?;
         }
 
-        if sql_family == SqlFamily::Mysql && !table.indices.is_empty() {
+        if sql_family == SqlFamily::Mysql && !table.table.indices.is_empty() {
             let indices: String = table
+                .table
                 .indices
                 .iter()
                 .map(|index| {
@@ -93,10 +87,10 @@ pub(crate) trait SqlRenderer {
             write!(create_table, ",\n{}", indices)?;
         }
 
-        if sql_family == SqlFamily::Sqlite && !table.foreign_keys.is_empty() {
+        if sql_family == SqlFamily::Sqlite && !table.table.foreign_keys.is_empty() {
             writeln!(create_table, ",")?;
 
-            let mut fks = table.foreign_keys.iter().peekable();
+            let mut fks = table.table.foreign_keys.iter().peekable();
 
             while let Some(fk) = fks.next() {
                 writeln!(
@@ -111,11 +105,19 @@ pub(crate) trait SqlRenderer {
 
         create_table.push_str(create_table_suffix(sql_family));
 
-        Ok(vec![create_table])
+        Ok(create_table)
     }
 
     /// Render a `DropEnum` step.
     fn render_drop_enum(&self, drop_enum: &DropEnum) -> Vec<String>;
+
+    /// Render a `RedefineTables` step.
+    fn render_redefine_tables(
+        &self,
+        tables: &[String],
+        differ: SqlSchemaDiffer<'_>,
+        database_info: &DatabaseInfo,
+    ) -> Vec<String>;
 }
 
 #[derive(Default)]

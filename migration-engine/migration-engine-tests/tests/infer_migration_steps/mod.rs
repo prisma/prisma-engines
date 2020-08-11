@@ -225,14 +225,13 @@ async fn watch_migrations_must_be_returned_when_transitioning_out_of_watch_mode(
     // applied_database_steps.extend(output.database_steps.iter().map(|s| s.clone()));
 
     // We added one field/column twice, and two models, so we should have four database steps.
-    assert_eq!(applied_database_steps.len(), if api.is_sqlite() { 16 } else { 4 });
+    assert_eq!(applied_database_steps.len(), 4);
 
     let output = api.infer(dm).migration_id(Some("mig02")).send().await?;
     let returned_steps: Vec<PrettyDatabaseMigrationStep> = output.database_steps;
 
-    let expected_steps_count = if api.is_sqlite() { 9 } else { 3 }; // one AlterTable, two CreateTables
-
-    assert_eq!(returned_steps.len(), expected_steps_count);
+    // one AlterTable, two CreateTables
+    assert_eq!(returned_steps.len(), 3);
 
     Ok(())
 }
@@ -296,7 +295,7 @@ async fn watch_migrations_must_be_returned_in_addition_to_regular_inferred_steps
     applied_database_steps.extend_from_slice(&output.database_steps);
 
     // We added one field/column twice, and two models, so we should have four database steps.
-    assert_eq!(applied_database_steps.len(), if api.is_sqlite() { 16 } else { 4 });
+    assert_eq!(applied_database_steps.len(), 4);
 
     let dm: &'static str = r#"
             model Blog {
@@ -321,11 +320,7 @@ async fn watch_migrations_must_be_returned_in_addition_to_regular_inferred_steps
     let output = api.infer(dm).migration_id(Some("mig02")).send().await?;
     let returned_steps: Vec<PrettyDatabaseMigrationStep> = output.database_steps;
 
-    let expected_steps_count = if api.is_sqlite() {
-        10
-    } else {
-        4 // three CreateModels, one AlterTable
-    };
+    let expected_steps_count = 4; // three CreateModels, one AlterTable
 
     assert_eq!(returned_steps.len(), expected_steps_count);
 

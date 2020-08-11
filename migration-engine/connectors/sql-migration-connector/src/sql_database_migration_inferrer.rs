@@ -1,13 +1,9 @@
-mod sqlite;
-
-use crate::sql_schema_calculator::SqlSchemaCalculator;
-use crate::sql_schema_differ::{SqlSchemaDiff, SqlSchemaDiffer};
 use crate::*;
+use crate::{sql_schema_calculator::SqlSchemaCalculator, sql_schema_differ::SqlSchemaDiffer};
 use datamodel::*;
 use migration_connector::steps::MigrationStep;
 use migration_connector::*;
 use sql_schema_describer::*;
-use sql_schema_differ::DiffingOptions;
 
 pub struct SqlDatabaseMigrationInferrer<'a> {
     pub connector: &'a crate::SqlMigrationConnector,
@@ -33,8 +29,6 @@ impl DatabaseMigrationInferrer<SqlMigration> for SqlDatabaseMigrationInferrer<'_
             infer(
                 &current_database_schema,
                 &expected_database_schema,
-                self.schema_name(),
-                self.sql_family(),
                 self.database_info(),
                 self.flavour(),
             )
@@ -55,8 +49,6 @@ impl DatabaseMigrationInferrer<SqlMigration> for SqlDatabaseMigrationInferrer<'_
             infer(
                 &current_database_schema,
                 &expected_database_schema,
-                self.schema_name(),
-                self.sql_family(),
                 self.database_info(),
                 self.flavour(),
             )
@@ -69,67 +61,32 @@ impl DatabaseMigrationInferrer<SqlMigration> for SqlDatabaseMigrationInferrer<'_
 fn infer(
     current_database_schema: &SqlSchema,
     expected_database_schema: &SqlSchema,
-    schema_name: &str,
-    sql_family: SqlFamily,
     database_info: &DatabaseInfo,
     flavour: &dyn SqlFlavour,
 ) -> SqlResult<SqlMigration> {
-    let (original_steps, corrected_steps) = infer_database_migration_steps_and_fix(
+    let steps = infer_database_migration_steps(
         &current_database_schema,
         &expected_database_schema,
-        &schema_name,
-        sql_family,
         database_info,
         flavour,
     )?;
-    let (_, rollback) = infer_database_migration_steps_and_fix(
-        &expected_database_schema,
-        &current_database_schema,
-        &schema_name,
-        sql_family,
-        database_info,
-        flavour,
-    )?;
+
     Ok(SqlMigration {
         before: current_database_schema.clone(),
         after: expected_database_schema.clone(),
-        original_steps,
-        corrected_steps,
-        rollback,
+        steps,
     })
 }
 
-fn infer_database_migration_steps_and_fix(
+fn infer_database_migration_steps(
     from: &SqlSchema,
     to: &SqlSchema,
-    schema_name: &str,
-    sql_family: SqlFamily,
     database_info: &DatabaseInfo,
     flavour: &dyn SqlFlavour,
-) -> SqlResult<(Vec<SqlMigrationStep>, Vec<SqlMigrationStep>)> {
-    let diff: SqlSchemaDiff = SqlSchemaDiffer::diff(
-        &from,
-        &to,
-        sql_family,
-        &DiffingOptions::from_database_info(database_info),
-    );
+) -> SqlResult<Vec<SqlMigrationStep>> {
+    let steps = SqlSchemaDiffer::diff(&from, &to, flavour, &database_info).into_steps();
 
-    let corrected_steps = if sql_family.is_sqlite() {
-        sqlite::fix(diff, &from, &to, &schema_name, database_info, flavour)?
-    } else {
-        diff.into_steps()
-    };
-
-    Ok((
-        SqlSchemaDiffer::diff(
-            &from,
-            &to,
-            sql_family,
-            &DiffingOptions::from_database_info(database_info),
-        )
-        .into_steps(),
-        corrected_steps,
-    ))
+    Ok(steps)
 }
 
 pub fn wrap_as_step<T, F>(steps: Vec<T>, wrap_fn: F) -> impl Iterator<Item = SqlMigrationStep>
