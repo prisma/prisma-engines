@@ -1,9 +1,6 @@
 on:
   workflow_dispatch:
     inputs:
-      branch:
-        description: 'Branch to build'
-        required: true
       commit:
         description: 'Commit on the given branch to build'
         required: true
