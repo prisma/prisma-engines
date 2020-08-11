@@ -22,27 +22,13 @@ impl DatabaseMigrationStepApplier<SqlMigration> for SqlDatabaseStepApplier<'_> {
     async fn apply_step(&self, database_migration: &SqlMigration, index: usize) -> ConnectorResult<bool> {
         let fut = self
             .apply_next_step(
-                &database_migration.corrected_steps,
+                &database_migration.steps,
                 index,
                 self.flavour(),
                 &database_migration.before,
                 &database_migration.after,
             )
             .instrument(tracing::debug_span!("ApplySqlStep", index));
-
-        crate::catch(self.connection_info(), fut).await
-    }
-
-    async fn unapply_step(&self, database_migration: &SqlMigration, index: usize) -> ConnectorResult<bool> {
-        let fut = self
-            .apply_next_step(
-                &database_migration.rollback,
-                index,
-                self.flavour(),
-                &database_migration.after,
-                &database_migration.before,
-            )
-            .instrument(tracing::debug_span!("UnapplySqlStep", index));
 
         crate::catch(self.connection_info(), fut).await
     }
@@ -98,9 +84,9 @@ fn render_steps_pretty(
     current_schema: &SqlSchema,
     next_schema: &SqlSchema,
 ) -> ConnectorResult<Vec<PrettyDatabaseMigrationStep>> {
-    let mut steps = Vec::with_capacity(database_migration.corrected_steps.len());
+    let mut steps = Vec::with_capacity(database_migration.steps.len());
 
-    for step in &database_migration.corrected_steps {
+    for step in &database_migration.steps {
         let sql = render_raw_sql(&step, renderer, database_info, current_schema, next_schema)
             .map_err(|err: anyhow::Error| ConnectorError::from_kind(migration_connector::ErrorKind::Generic(err)))?
             .join(";\n");

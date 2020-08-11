@@ -185,19 +185,9 @@ impl SqlDestructiveChangeChecker<'_> {
 impl DestructiveChangeChecker<SqlMigration> for SqlDestructiveChangeChecker<'_> {
     async fn check(&self, database_migration: &SqlMigration) -> ConnectorResult<DestructiveChangeDiagnostics> {
         self.check_impl(
-            &database_migration.original_steps,
+            &database_migration.steps,
             &database_migration.before,
             &database_migration.after,
-        )
-        .await
-        .map_err(|sql_error| sql_error.into_connector_error(&self.connection_info()))
-    }
-
-    async fn check_unapply(&self, database_migration: &SqlMigration) -> ConnectorResult<DestructiveChangeDiagnostics> {
-        self.check_impl(
-            &database_migration.rollback,
-            &database_migration.after,
-            &database_migration.before,
         )
         .await
         .map_err(|sql_error| sql_error.into_connector_error(&self.connection_info()))
@@ -205,7 +195,7 @@ impl DestructiveChangeChecker<SqlMigration> for SqlDestructiveChangeChecker<'_> 
 
     fn pure_check(&self, database_migration: &SqlMigration) -> ConnectorResult<DestructiveChangeDiagnostics> {
         let plan = self.plan(
-            &database_migration.original_steps,
+            &database_migration.steps,
             &database_migration.before,
             &database_migration.after,
         );

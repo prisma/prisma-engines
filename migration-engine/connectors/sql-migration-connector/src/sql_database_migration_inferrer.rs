@@ -64,16 +64,9 @@ fn infer(
     database_info: &DatabaseInfo,
     flavour: &dyn SqlFlavour,
 ) -> SqlResult<SqlMigration> {
-    let (original_steps, corrected_steps) = infer_database_migration_steps(
+    let steps = infer_database_migration_steps(
         &current_database_schema,
         &expected_database_schema,
-        database_info,
-        flavour,
-    )?;
-
-    let (_, rollback) = infer_database_migration_steps(
-        &expected_database_schema,
-        &current_database_schema,
         database_info,
         flavour,
     )?;
@@ -81,9 +74,7 @@ fn infer(
     Ok(SqlMigration {
         before: current_database_schema.clone(),
         after: expected_database_schema.clone(),
-        original_steps,
-        corrected_steps,
-        rollback,
+        steps,
     })
 }
 
@@ -92,10 +83,10 @@ fn infer_database_migration_steps(
     to: &SqlSchema,
     database_info: &DatabaseInfo,
     flavour: &dyn SqlFlavour,
-) -> SqlResult<(Vec<SqlMigrationStep>, Vec<SqlMigrationStep>)> {
+) -> SqlResult<Vec<SqlMigrationStep>> {
     let steps = SqlSchemaDiffer::diff(&from, &to, flavour, &database_info).into_steps();
 
-    Ok((steps.clone(), steps))
+    Ok(steps)
 }
 
 pub fn wrap_as_step<T, F>(steps: Vec<T>, wrap_fn: F) -> impl Iterator<Item = SqlMigrationStep>

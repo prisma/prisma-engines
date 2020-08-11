@@ -8,12 +8,7 @@ use sql_schema_describer::{Column, ForeignKey, Index, SqlSchema, Table};
 pub struct SqlMigration {
     pub before: SqlSchema,
     pub after: SqlSchema,
-    pub original_steps: Vec<SqlMigrationStep>,
-    /// The `original_steps`, but with specific corrections applied (notably for SQLite) when the
-    /// original steps cannot be applied directly, e.g. because some operations are not supported
-    /// by the database.
-    pub corrected_steps: Vec<SqlMigrationStep>,
-    pub rollback: Vec<SqlMigrationStep>,
+    pub steps: Vec<SqlMigrationStep>,
 }
 
 impl SqlMigration {
@@ -21,9 +16,7 @@ impl SqlMigration {
         SqlMigration {
             before: SqlSchema::empty(),
             after: SqlSchema::empty(),
-            original_steps: Vec::new(),
-            corrected_steps: Vec::new(),
-            rollback: Vec::new(),
+            steps: Vec::new(),
         }
     }
 }
