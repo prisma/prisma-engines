@@ -1,5 +1,5 @@
 on:
-  repository_dispatch:
+  workflow_dispatch:
 
 jobs:
   build:
@@ -9,13 +9,13 @@ jobs:
       SQLITE_MAX_EXPR_DEPTH: 10000
     runs-on: windows-latest
     steps:
-      - name: Output link to real commit
-        run: echo ${{ github.repository }}/commit/${{ github.event.client_payload.commit }}
+      - name: Output link to checkout target
+        run: echo ${{ github.repository }}/commit/${{ github.event.ref }}
 
-      - name: Checkout ${{ github.event.client_payload.commit }}
+      - name: Checkout ${{ github.event.ref }}
         uses: actions/checkout@v2
         with:
-          ref: ${{ github.event.client_payload.commit }}
+          ref: ${{ github.event.ref }}
 
       - uses: actions-rs/toolchain@v1
         with:
