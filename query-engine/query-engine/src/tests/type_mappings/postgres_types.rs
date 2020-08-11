@@ -559,32 +559,32 @@ async fn all_postgres_types_work_as_filter(api: &TestApi) -> TestResult {
         query {
             findManytypes(
                 where: {
-                    numeric_int2: 12
-                    numeric_int4: 9002
-                    numeric_int8: 100000000
-                    numeric_decimal: 49.3444
-                    numeric_float4: 12.12
-                    numeric_float8: 3.139428
-                    numeric_serial2: 8,
-                    numeric_serial4: 80,
-                    numeric_serial8: 80000,
-                    numeric_money: 3.50
-                    numeric_oid: 2000
-                    string_char: "yeet"
-                    string_varchar: "yeet variable"
-                    string_text: "to yeet or not to yeet"
-                    binary_bits: "0101110"
-                    binary_bits_varying: "0101110"
-                    binary_uuid: "111142ec-880b-4062-913d-8eac479ab957"
-                    time_timestamp: "2020-03-02T08:00:00.000"
-                    time_timestamptz: "2020-03-02T08:00:00.000"
-                    time_date: "2020-03-05T00:00:00.000"
-                    time_time: "2020-03-05T08:00:00.000"
-                    time_timetz: "2020-03-05T08:00:00.000"
-                    boolean_boolean: true
-                    network_inet: "192.168.100.14"
-                    json_json: "{ \"isJson\": true }"
-                    json_jsonb: "{ \"isJSONB\": true }"
+                    numeric_int2: { equals: 12 }
+                    numeric_int4: { equals: 9002 }
+                    numeric_int8: { equals: 100000000 }
+                    numeric_decimal: { equals: 49.3444 }
+                    numeric_float4: { equals: 12.12 }
+                    numeric_float8: { equals: 3.139428 }
+                    numeric_serial2: { equals: 8 }
+                    numeric_serial4: { equals: 80 }
+                    numeric_serial8: { equals: 80000 }
+                    numeric_money: { equals: 3.50 }
+                    numeric_oid: { equals: 2000 }
+                    string_char: { equals: "yeet" }
+                    string_varchar: { equals: "yeet variable" }
+                    string_text: { equals: "to yeet or not to yeet" }
+                    binary_bits: { equals: "0101110" }
+                    binary_bits_varying: { equals: "0101110" }
+                    binary_uuid: { equals: "111142ec-880b-4062-913d-8eac479ab957" }
+                    time_timestamp: { equals: "2020-03-02T08:00:00.000" }
+                    time_timestamptz: { equals: "2020-03-02T08:00:00.000" }
+                    time_date: { equals: "2020-03-05T00:00:00.000" }
+                    time_time: { equals: "2020-03-05T08:00:00.000" }
+                    time_timetz: { equals: "2020-03-05T08:00:00.000" }
+                    boolean_boolean: { equals: true }
+                    network_inet: { equals: "192.168.100.14" }
+                    json_json: { equals: "{ \"isJson\": true }" }
+                    json_jsonb: { equals: "{ \"isJSONB\": true }" }
                 }
             ) {
                 id
