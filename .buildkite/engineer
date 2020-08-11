@@ -13,7 +13,7 @@ fi
 if ! type "engineer" > /dev/null; then
     # Setup Prisma engine build & test tool (engineer).
     set -e
-    curl --fail -sSL "https://prisma-engineer.s3-eu-west-1.amazonaws.com/adapt-windows-build-to-use-github-actions-workflow-dispatch-try-2/e29a3976a45ca07f957361ace9d940317f24aa9c/$OS/engineer.gz" --output engineer.gz
+    curl --fail -sSL "https://prisma-engineer.s3-eu-west-1.amazonaws.com/adapt-windows-build-to-use-github-actions-workflow-dispatch-try-2/09b5b46552a6d25dec6fc8fa0f4aef6b1a42d3a4/$OS/engineer.gz" --output engineer.gz
     gzip -d engineer.gz
     chmod +x engineer
 
