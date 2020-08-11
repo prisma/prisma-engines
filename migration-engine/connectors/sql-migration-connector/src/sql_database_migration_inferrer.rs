@@ -37,7 +37,7 @@ impl DatabaseMigrationInferrer<SqlMigration> for SqlDatabaseMigrationInferrer<'_
         catch(&self.connection_info(), fut).await
     }
 
-    async fn infer_from_datamodels(
+    fn infer_from_datamodels(
         &self,
         previous: &Datamodel,
         next: &Datamodel,
