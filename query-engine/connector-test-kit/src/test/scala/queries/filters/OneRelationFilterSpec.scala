@@ -58,7 +58,7 @@ class OneRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
         |       post:{create: {title: "post 1", popularity: 10, comment:{ create: {text:"comment 1", likes: 10 }}}}
         | }
         |){name}}""",
-      project = project
+      project
     )
 
     server.query(
@@ -66,7 +66,7 @@ class OneRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
         |                         name: "blog 2",
         |                         post: {create:{title: "post 2",popularity: 100,comment:{create:{text:"comment 2", likes: 100}}}}
         |}){name}}""",
-      project = project
+      project
     )
 
     server.query(
@@ -74,34 +74,40 @@ class OneRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
         |                         name: "blog 3",
         |                         post: {create:{title: "post 3",popularity: 1000,comment:{create:{text:"comment 3", likes: 1000}}}}
         |}){name}}""",
-      project = project
+      project
     )
 
   }
 
   "Scalar filter" should "work" in {
-    server.query(query = """{posts(where:{title: {equals: "post 2"}}){title}}""", project = project).toString should be(
-      """{"data":{"posts":[{"title":"post 2"}]}}""")
+    server.query(query = """{posts(where:{title: {equals: "post 2"}}){title}}""", project).toString should be("""{"data":{"posts":[{"title":"post 2"}]}}""")
   }
 
   "1 level 1-relation filter" should "work" in {
-    server.query(query = """{posts(where:{blog:{is:{name:{equals: "blog 1"}}}}){title}}""", project = project).toString should be(
+    server.query(query = """{posts(where:{blog:{is:{name:{equals: "blog 1"}}}}){title}}""", project).toString should be(
       """{"data":{"posts":[{"title":"post 1"}]}}""")
 
-    server.query(query = """{blogs(where:{post:{is:{popularity: { gte: 100 }}}}){name}}""", project = project).toString should be(
+    server.query(query = """{blogs(where:{post:{is:{popularity: { gte: 100 }}}}){name}}""", project).toString should be(
       """{"data":{"blogs":[{"name":"blog 2"},{"name":"blog 3"}]}}""")
 
-    server.query(query = """{blogs(where:{post:{is:{popularity: { gte: 500 }}}}){name}}""", project = project).toString should be(
+    server.query(query = """{blogs(where:{post:{is:{popularity: { gte: 500 }}}}){name}}""", project).toString should be(
       """{"data":{"blogs":[{"name":"blog 3"}]}}""")
+
+    server.query(query = """{blogs(where:{post:{is_not:{popularity: { gte: 500 }}}}){name}}""", project).toString should be(
+      """{"data":{"blogs":[{"name":"blog 1"},{"name":"blog 2"}]}}""")
+
+    server.query("""mutation { createOnePost(data: { title: "Post 4" popularity: 5 }) { title } }""", project, legacy = false)
+
+    server.query(query = """{posts(where:{blog:{is_not: null}}){title}}""", project).toString should be(
+      """{"data":{"posts":[{"title":"post 1"},{"title":"post 2"},{"title":"post 3"}]}}""")
   }
 
   "2 level 1-relation filter" should "work" in {
-    server.query(query = """{blogs(where:{post:{is:{comment: {is:{likes: {equals:10}}}}}}){name}}""", project = project).toString should be(
+    server.query(query = """{blogs(where:{post:{is:{comment: {is:{likes: {equals:10}}}}}}){name}}""", project).toString should be(
       """{"data":{"blogs":[{"name":"blog 1"}]}}""")
 
-    server.query(query = """{blogs(where:{post:{is:{comment:{is:{likes:{equals:1000}}}}}}){name}}""", project = project).toString should be(
+    server.query(query = """{blogs(where:{post:{is:{comment:{is:{likes:{equals:1000}}}}}}){name}}""", project).toString should be(
       """{"data":{"blogs":[{"name":"blog 3"}]}}""")
-
   }
 
   "crazy filters" should "work" in {
@@ -121,7 +127,7 @@ class OneRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
                 |}) {
                 |  title
                 |}}""".stripMargin,
-        project = project
+        project
       )
       .toString should be("""{"data":{"posts":[{"title":"post 1"}]}}""")
   }
