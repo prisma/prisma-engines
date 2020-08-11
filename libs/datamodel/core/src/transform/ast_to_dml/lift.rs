@@ -141,7 +141,6 @@ impl<'a> LiftAstToDml<'a> {
     fn lift_field(&self, ast_field: &ast::Field, ast_schema: &ast::SchemaAst) -> Result<dml::Field, ErrorCollection> {
         let mut errors = ErrorCollection::new();
         // If we cannot parse the field type, we exit right away.
-        println!("lift field: {:?}", ast_field);
         let (field_type, extra_attributes) = self.lift_field_type(&ast_field, None, ast_schema, &mut Vec::new())?;
 
         let mut field = match field_type {
