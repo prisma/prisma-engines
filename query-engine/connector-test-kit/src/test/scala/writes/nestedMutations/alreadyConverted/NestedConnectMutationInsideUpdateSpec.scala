@@ -1362,7 +1362,7 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
 
   //todo other tests check whether already covered
 
-  "MARCUS A PM to C1 relation" should "be connectable by id through a nested mutation" ignore {
+  "A PM to C1 relation" should "be connectable by id through a nested mutation" ignore {
     val project = SchemaDsl.fromStringV11() {
       """
         |model Todo {
@@ -1407,7 +1407,7 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
     mustBeEqual(result.pathAsJsValue("data.updateTodo.comments").toString, """[{"text":"comment1"},{"text":"comment2"}]""")
   }
 
-  "MARCUS A PM to C1 relation" should "be connectable by any unique argument through a nested mutation" ignore {
+  "A PM to C1 relation" should "be connectable by any unique argument through a nested mutation" ignore {
     val project = SchemaDsl.fromStringV11() {
       """
         |model Todo {
@@ -1453,7 +1453,7 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
     mustBeEqual(result.pathAsJsValue("data.updateTodo.comments").toString, """[{"text":"comment1"},{"text":"comment2"}]""")
   }
 
-  "MARCUS A P1 to CM relation" should "be connectable by id through a nested mutation" ignore {
+  "A P1 to CM relation" should "be connectable by id through a nested mutation" ignore {
     val project = SchemaDsl.fromStringV11() {
       """model Comment {
         | id   String  @id @default(cuid())
@@ -1498,7 +1498,7 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
     mustBeEqual(result.pathAsString("data.updateComment.todo.title"), "the title")
   }
 
-  "MARCUS A P1 to C1 relation" should "be connectable by id through a nested mutation" ignore {
+  "A P1 to C1 relation" should "be connectable by id through a nested mutation" ignore {
     val project = SchemaDsl.fromStringV11() {
       """model Note {
         | id    String  @id @default(cuid())
@@ -1543,7 +1543,7 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
     mustBeEqual(result.pathAsString("data.updateNote.todo.title"), "the title")
   }
 
-  "MARCUS A P1 to C1 relation" should "connecting nodes by id through a nested mutation should not error when items are already connected" ignore {
+  "A P1 to C1 relation" should "connecting nodes by id through a nested mutation should not error when items are already connected" ignore {
     val project = SchemaDsl.fromStringV11() {
       """model Note {
         | id    String @id @default(cuid())
@@ -1611,7 +1611,7 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
     )
   }
 
-  "MARCUS A PM to C1 relation" should "be connectable by any unique argument through a nested mutation 2" ignore {
+  "A PM to C1 relation" should "be connectable by any unique argument through a nested mutation 2" ignore {
     val project = SchemaDsl.fromStringV11() {
       """
         |model Todo {
@@ -1657,7 +1657,7 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
     mustBeEqual(result.pathAsJsValue("data.updateTodo.comments").toString, """[{"text":"comment1"},{"text":"comment2"}]""")
   }
 
-  "MARCUS A PM to C1 relation" should "be connectable through a nested mutation" ignore {
+  "A PM to C1 relation" should "be connectable through a nested mutation" ignore {
     val project = SchemaDsl.fromStringV11() {
       """
         |model Todo {
@@ -1703,7 +1703,7 @@ class NestedConnectMutationInsideUpdateSpec extends FlatSpec with Matchers with 
     mustBeEqual(result.pathAsJsValue("data.updateTodo.comments").toString, """[{"text":"comment1"},{"text":"comment2"}]""")
   }
 
-  "MARCUS a PM to CM  self relation with the child not already in a relation" should "be connectable through a nested mutation" ignore {
+  "a PM to CM  self relation with the child not already in a relation" should "be connectable through a nested mutation" ignore {
     val testDataModels = {
       val s1 =
         """model Technology {
