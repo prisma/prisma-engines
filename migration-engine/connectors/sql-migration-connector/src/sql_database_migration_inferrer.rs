@@ -26,12 +26,12 @@ impl DatabaseMigrationInferrer<SqlMigration> for SqlDatabaseMigrationInferrer<'_
         let fut = async {
             let current_database_schema: SqlSchema = self.describe().await?;
             let expected_database_schema = SqlSchemaCalculator::calculate(next, self.database_info());
-            infer(
-                &current_database_schema,
-                &expected_database_schema,
+            Ok(infer(
+                current_database_schema,
+                expected_database_schema,
                 self.database_info(),
                 self.flavour(),
-            )
+            ))
         };
 
         catch(&self.connection_info(), fut).await
@@ -43,50 +43,37 @@ impl DatabaseMigrationInferrer<SqlMigration> for SqlDatabaseMigrationInferrer<'_
         next: &Datamodel,
         _steps: &[MigrationStep],
     ) -> ConnectorResult<SqlMigration> {
-        let result: SqlResult<SqlMigration> = (|| {
-            let current_database_schema: SqlSchema = SqlSchemaCalculator::calculate(previous, self.database_info());
-            let expected_database_schema = SqlSchemaCalculator::calculate(next, self.database_info());
-            infer(
-                &current_database_schema,
-                &expected_database_schema,
-                self.database_info(),
-                self.flavour(),
-            )
-        })();
+        let current_database_schema: SqlSchema = SqlSchemaCalculator::calculate(previous, self.database_info());
+        let expected_database_schema = SqlSchemaCalculator::calculate(next, self.database_info());
 
-        result.map_err(|sql_error| sql_error.into_connector_error(self.connection_info()))
+        Ok(infer(
+            current_database_schema,
+            expected_database_schema,
+            self.database_info(),
+            self.flavour(),
+        ))
     }
 }
 
 fn infer(
-    current_database_schema: &SqlSchema,
-    expected_database_schema: &SqlSchema,
+    current_database_schema: SqlSchema,
+    expected_database_schema: SqlSchema,
     database_info: &DatabaseInfo,
     flavour: &dyn SqlFlavour,
-) -> SqlResult<SqlMigration> {
-    let steps = infer_database_migration_steps(
+) -> SqlMigration {
+    let steps = SqlSchemaDiffer::diff(
         &current_database_schema,
         &expected_database_schema,
-        database_info,
         flavour,
-    )?;
+        &database_info,
+    )
+    .into_steps();
 
-    Ok(SqlMigration {
-        before: current_database_schema.clone(),
-        after: expected_database_schema.clone(),
+    SqlMigration {
+        before: current_database_schema,
+        after: expected_database_schema,
         steps,
-    })
-}
-
-fn infer_database_migration_steps(
-    from: &SqlSchema,
-    to: &SqlSchema,
-    database_info: &DatabaseInfo,
-    flavour: &dyn SqlFlavour,
-) -> SqlResult<Vec<SqlMigrationStep>> {
-    let steps = SqlSchemaDiffer::diff(&from, &to, flavour, &database_info).into_steps();
-
-    Ok(steps)
+    }
 }
 
 pub fn wrap_as_step<T, F>(steps: Vec<T>, wrap_fn: F) -> impl Iterator<Item = SqlMigrationStep>
