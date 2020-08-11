@@ -223,9 +223,9 @@ class MultiFieldUniqueQuerySpec extends FlatSpec with Matchers with ApiSpecBase 
                                                 |  v String
                                                 |  w String
                                                 |  x String
-                                                |  y String
+                                                |  _y String
                                                 |  z String
-                                                |  @@unique([a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z])
+                                                |  @@unique([a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, _y, z])
                                                 |}
                                               """.stripMargin }
     database.setup(project)
@@ -257,7 +257,7 @@ class MultiFieldUniqueQuerySpec extends FlatSpec with Matchers with ApiSpecBase 
                                  |      v: "test"
                                  |      w: "test"
                                  |      x: "test"
-                                 |      y: "test"
+                                 |      _y: "test"
                                  |      z: "test"
                                  |  }){
                                  |    id
@@ -295,7 +295,7 @@ class MultiFieldUniqueQuerySpec extends FlatSpec with Matchers with ApiSpecBase 
                       |    v: "test"
                       |    w: "test"
                       |    x: "test"
-                      |    y: "test"
+                      |    _y: "test"
                       |    z: "test"
                       |  }}){
                       |    id

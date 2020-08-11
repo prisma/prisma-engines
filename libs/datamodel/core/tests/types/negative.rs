@@ -1,5 +1,7 @@
 use crate::common::*;
+use datamodel::ast::Span;
 use datamodel::{ast, error::DatamodelError};
+use datamodel_connector::error::ConnectorError;
 
 #[test]
 fn shound_fail_on_directive_duplication() {
@@ -107,4 +109,25 @@ fn should_fail_on_custom_related_types() {
         "Only scalar types can be used for defining custom types.",
         ast::Span::new(25, 29),
     ));
+}
+
+#[test]
+fn should_error_on_invalid_type_argument() {
+    let dml = r#"
+        datasource pg {
+          provider = "postgres"
+          url = "postgresql://"
+          previewFeatures = ["nativeTypes"]
+        }
+
+        model Blog {
+            id     Int    @id
+            bigInt Int    @pg.BigInt
+            foobar String @pg.VarChar()
+        }
+    "#;
+
+    let error = parse_error(dml);
+
+    errors.assert_is(ConnectorError::new_argument_not_found_error("", ast::Span::new(23, 24)));
 }
