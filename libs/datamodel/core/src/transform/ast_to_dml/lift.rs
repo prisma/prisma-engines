@@ -3,10 +3,11 @@ use crate::transform::helpers::ValueValidator;
 use crate::{
     ast, configuration, dml,
     error::{DatamodelError, ErrorCollection},
-    Field, FieldType, ScalarType,
+    load_sources, DatasourcePreviewFeatures, Field, FieldType, ScalarType,
 };
 use datamodel_connector::Connector;
-use sql_datamodel_connector::SqlDatamodelConnectors;
+use sql_datamodel_connector::{PostgresDatamodelConnector, SqlDatamodelConnectors};
+use std::collections::HashMap;
 
 /// Helper for lifting a datamodel.
 ///
@@ -17,9 +18,6 @@ pub struct LiftAstToDml<'a> {
     directives: AllDirectives,
     source: Option<&'a configuration::Datasource>,
 }
-
-// TODO carmen: feature flags of the Datasource must be used instead
-const USE_CONNECTORS_FOR_CUSTOM_TYPES: bool = false; // FEATURE FLAG
 
 impl<'a> LiftAstToDml<'a> {
     /// Creates a new instance, with all builtin directives and
@@ -143,6 +141,7 @@ impl<'a> LiftAstToDml<'a> {
     fn lift_field(&self, ast_field: &ast::Field, ast_schema: &ast::SchemaAst) -> Result<dml::Field, ErrorCollection> {
         let mut errors = ErrorCollection::new();
         // If we cannot parse the field type, we exit right away.
+        println!("lift field: {:?}", ast_field);
         let (field_type, extra_attributes) = self.lift_field_type(&ast_field, None, ast_schema, &mut Vec::new())?;
 
         let mut field = match field_type {
@@ -194,12 +193,40 @@ impl<'a> LiftAstToDml<'a> {
     ) -> Result<(dml::FieldType, Vec<ast::Directive>), DatamodelError> {
         let type_name = &ast_field.field_type.name;
 
+        let mut supports_native_types = false;
+        let mut datasource_name = "";
+        match self.source {
+            Some(source) => {
+                supports_native_types = source.has_preview_feature("nativeTypes");
+                datasource_name = source.name.as_str();
+            }
+            _ => {}
+        };
+
         if let Ok(scalar_type) = ScalarType::from_str(type_name) {
-            if USE_CONNECTORS_FOR_CUSTOM_TYPES {
-                let pg_connector = SqlDatamodelConnectors::postgres();
-                let pg_type_specification = ast_field.directives.iter().find(|dir| dir.name.name.starts_with("pg.")); // we use find because there should be at max 1.
-                let name = pg_type_specification.map(|dir| dir.name.name.trim_start_matches("pg."));
-                let args = pg_type_specification
+            if supports_native_types {
+                let connector_string = match self.source {
+                    Some(source) => &source.active_provider,
+                    None => "",
+                };
+                let mut connectors: HashMap<&str, Box<dyn Connector>> = HashMap::new();
+                connectors.insert("postgresql", Box::new(SqlDatamodelConnectors::postgres()));
+                connectors.insert("mysql", Box::new(SqlDatamodelConnectors::mssql()));
+                connectors.insert("sqlite", Box::new(SqlDatamodelConnectors::sqlite()));
+                connectors.insert("mssql", Box::new(SqlDatamodelConnectors::mssql()));
+
+                let connector: &Box<dyn Connector> = connectors.get(connector_string).unwrap();
+
+                let mut prefix = String::with_capacity(datasource_name.len() + 1);
+                prefix.push_str(datasource_name);
+                prefix.push_str(".");
+
+                let type_specification = ast_field
+                    .directives
+                    .iter()
+                    .find(|dir| dir.name.name.starts_with(&prefix)); // we use find because there should be at max 1.
+                let name = type_specification.map(|dir| dir.name.name.trim_start_matches(&prefix));
+                let args = type_specification
                     .map(|dir| {
                         let args = dir
                             .arguments
@@ -210,7 +237,7 @@ impl<'a> LiftAstToDml<'a> {
                     })
                     .unwrap_or(vec![]);
 
-                if let Some(x) = name.and_then(|ts| pg_connector.parse_native_type(&ts, args)) {
+                if let Some(x) = name.and_then(|ts| connector.parse_native_type(&ts, args)) {
                     let field_type = dml::FieldType::NativeType(scalar_type, x);
                     Ok((field_type, vec![]))
                 } else {

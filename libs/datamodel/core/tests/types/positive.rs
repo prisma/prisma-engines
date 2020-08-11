@@ -103,7 +103,6 @@ fn should_be_able_to_define_custom_enum_types() {
         .assert_default_value(DefaultValue::Single(PrismaValue::Enum(String::from("USER"))));
 }
 
-// TODO carmen: enable this test once the feature flags are implemented
 #[test]
 fn should_handle_type_specifications() {
     let dml = r#"

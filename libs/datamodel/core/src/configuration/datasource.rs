@@ -23,17 +23,17 @@ impl Datasource {
     }
 }
 
-pub trait PreviewFeatures {
+pub trait DatasourcePreviewFeatures {
     fn has_preview_feature(&self, feature: &str) -> bool;
 }
 
-impl PreviewFeatures for Datasource {
+impl DatasourcePreviewFeatures for Datasource {
     fn has_preview_feature(&self, feature: &str) -> bool {
         self.preview_features.contains(&feature.to_string())
     }
 }
 
-impl PreviewFeatures for Option<&Datasource> {
+impl DatasourcePreviewFeatures for Option<&Datasource> {
     fn has_preview_feature(&self, feature: &str) -> bool {
         match self {
             Some(dat) => dat.has_preview_feature(feature),

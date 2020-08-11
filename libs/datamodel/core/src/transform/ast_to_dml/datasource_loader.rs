@@ -180,7 +180,7 @@ impl DatasourceLoader {
                 documentation: documentation.clone(),
                 combined_connector,
                 active_connector: first_successful_provider.connector(),
-                preview_features
+                preview_features,
             })
         } else {
             Err(errors.into_iter().next().unwrap().err().unwrap())
