@@ -1,8 +1,8 @@
-use datamodel_connector::error::ConnectorError;
-use datamodel_connector::{Connector, ConnectorCapability, NativeTypeConstructor, NativeTypeInstance};
-use native_types::{NativeType, MySqlType, PostgresType};
-use datamodel_connector::scalars::ScalarType;
 use datamodel::ast::WithName;
+use datamodel_connector::error::ConnectorError;
+use datamodel_connector::scalars::ScalarType;
+use datamodel_connector::{Connector, ConnectorCapability, NativeTypeConstructor, NativeTypeInstance};
+use native_types::{MySqlType, NativeType, PostgresType};
 
 const INT_TYPE_NAME: &str = "Int";
 const SMALL_INT_TYPE_NAME: &str = "SmallInt";
@@ -32,7 +32,6 @@ const DATETIME_TYPE_NAME: &str = "Datetime";
 const TIMESTAMP_TYPE_NAME: &str = "Timestamp";
 const YEAR_TYPE_NAME: &str = "Year";
 const JSON_TYPE_NAME: &str = "JSON";
-
 
 pub struct MySqlDatamodelConnector {
     capabilities: Vec<ConnectorCapability>,
@@ -73,10 +72,10 @@ impl MySqlDatamodelConnector {
         let long_text = NativeTypeConstructor::without_args(LONG_TEXT_TYPE_NAME, ScalarType::String);
         let date = NativeTypeConstructor::without_args(DATE_TYPE_NAME, ScalarType::DateTime);
         let time = NativeTypeConstructor::with_args(TIME_TYPE_NAME, 1, ScalarType::DateTime);
-        let datetime_with_arg = NativeTypeConstructor::without_args(DATETIME_TYPE_NAME,ScalarType::DateTime);
+        let datetime_with_arg = NativeTypeConstructor::without_args(DATETIME_TYPE_NAME, ScalarType::DateTime);
         let datetime_without_arg = NativeTypeConstructor::with_args(DATETIME_TYPE_NAME, 1, ScalarType::DateTime);
         let timestamp_with_arg = NativeTypeConstructor::with_args(TIMESTAMP_TYPE_NAME, 1, ScalarType::DateTime);
-        let timestamp_without_arg = NativeTypeConstructor::without_args(TIMESTAMP_TYPE_NAME,ScalarType::DateTime);
+        let timestamp_without_arg = NativeTypeConstructor::without_args(TIMESTAMP_TYPE_NAME, ScalarType::DateTime);
         let year = NativeTypeConstructor::without_args(YEAR_TYPE_NAME, ScalarType::Int);
         let json = NativeTypeConstructor::without_args(JSON_TYPE_NAME, ScalarType::Json);
 
@@ -101,7 +100,7 @@ impl MySqlDatamodelConnector {
             timestamp_with_arg,
             timestamp_without_arg,
             year,
-            json
+            json,
         ];
 
         MySqlDatamodelConnector {
@@ -112,7 +111,7 @@ impl MySqlDatamodelConnector {
 }
 
 fn get_argument(args: Vec<u32>) -> u32 {
-    return *args.first.unwrap()
+    return *args.first.unwrap();
 }
 
 impl Connector for MySqlDatamodelConnector {
@@ -147,14 +146,14 @@ impl Connector for MySqlDatamodelConnector {
                 } else {
                     MySqlType::Time(None)
                 }
-            },
+            }
             DATETIME_TYPE_NAME => {
                 if let Some(arg) = *args.first() {
                     MySqlType::DateTime(arg)
                 } else {
                     MySqlType::DateTime(None)
                 }
-            },
+            }
             YEAR_TYPE_NAME => MySqlType::Year,
             JSON_TYPE_NAME => MySqlType::JSON,
 
@@ -163,7 +162,7 @@ impl Connector for MySqlDatamodelConnector {
 
         match constructor {
             Some(constructor) => Ok(NativeTypeInstance::new(constructor.name.as_str(), args, &native_type)),
-            _ => panic!("",)
+            _ => panic!("",),
         }
     }
 
@@ -203,9 +202,7 @@ impl Connector for MySqlDatamodelConnector {
 
         match constructor {
             Some(constructor) => Ok(NativeTypeInstance::new(constructor.name.as_str(), args, &native_type)),
-            _ => panic!("",)
+            _ => panic!("",),
         }
-
-
     }
 }

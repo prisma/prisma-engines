@@ -109,7 +109,7 @@ impl PostgresDatamodelConnector {
 }
 
 fn get_argument(args: Vec<u32>) -> u32 {
-    return *args.first.unwrap()
+    return *args.first.unwrap();
 }
 
 impl Connector for PostgresDatamodelConnector {
@@ -120,7 +120,6 @@ impl Connector for PostgresDatamodelConnector {
     fn available_native_type_constructors(&self) -> &Vec<NativeTypeConstructor> {
         &self.constructors
     }
-
 
     fn parse_native_type(&self, name: &str, args: Vec<u32>) -> Result<NativeTypeInstance, ConnectorError> {
         let constructor = self.find_native_type_constructor(name);
