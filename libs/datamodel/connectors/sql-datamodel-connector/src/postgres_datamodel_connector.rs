@@ -186,7 +186,7 @@ impl Connector for PostgresDatamodelConnector {
                 return Err(ConnectorError::new_type_not_supported_error(
                     native_type.clone(),
                     "Postgres",
-                    Span::from_pest(), // ??
+                    Span::from_pest(), // todo carmen ??
                 ));
             }
         };

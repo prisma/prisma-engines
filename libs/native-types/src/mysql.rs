@@ -25,7 +25,7 @@ pub enum MySqlType {
     MediumText,
     LongText,
     Date,
-    Time(Option<u32>),
+    Time(Option<u32>), // todo carmen how to handle optional argument in sql connector?
     DateTime(Option<u32>),
     Timestamp(Option<u32>),
     Year,
