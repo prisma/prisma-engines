@@ -338,7 +338,7 @@ async fn introspecting_a_table_non_id_autoincrement_should_work(api: &TestApi) {
 }
 
 #[test_each_connector(tags("mysql_8"))]
-async fn introspecting_a_table_non_id_autoincrement_should_work2(api: &TestApi) {
+async fn introspecting_a_table_with_an_index_that_contains_expressions_should_ignore_it(api: &TestApi) {
     let barrel = api.barrel();
     let _setup_schema = barrel
         .execute_with_schema(
@@ -358,7 +358,7 @@ async fn introspecting_a_table_non_id_autoincrement_should_work2(api: &TestApi) 
             model Test {
               id       Int     @id
               parentId Int?
-              name     String? @unique
+              name     String?
             }      
         "#;
     let result = dbg!(api.introspect().await);
