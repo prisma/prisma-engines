@@ -11,6 +11,7 @@ use query_core::schema::QuerySchemaRenderer;
 use serde_json::json;
 use tide::http::{mime, StatusCode};
 use tide::{Body, Request, Response};
+use tide_server_timing::TimingMiddleware;
 
 use std::sync::Arc;
 
@@ -56,6 +57,10 @@ pub async fn listen(opts: PrismaOpt) -> PrismaResult<()> {
 
     let mut app = tide::with_state(State::new(cx, opts.enable_playground, opts.enable_debug_mode));
     app.with(ElapsedMiddleware::new());
+
+    if opts.enable_playground {
+        app.with(TimingMiddleware::new());
+    }
 
     app.at("/").post(graphql_handler);
     app.at("/").get(playground_handler);
