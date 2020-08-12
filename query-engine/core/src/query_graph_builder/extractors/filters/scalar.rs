@@ -9,7 +9,7 @@ pub fn parse(
     input: ParsedInputValue,
     reverse: bool,
 ) -> QueryGraphBuilderResult<Filter> {
-    let filter = match filter_key.to_lowercase().as_str() {
+    let filter = match filter_key {
         "not" => {
             let inner_object: ParsedInputMap = input.try_into()?;
 
