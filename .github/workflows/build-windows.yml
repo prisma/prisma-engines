@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    name: "NEW Windows engines build ${{ github.event.inputs.commit }}"
+    name: "Windows engines build on branch ${{ github.event.ref }} for commit ${{ github.event.inputs.commit }}"
     env:
       SQLITE_MAX_VARIABLE_NUMBER: 250000
       SQLITE_MAX_EXPR_DEPTH: 10000
