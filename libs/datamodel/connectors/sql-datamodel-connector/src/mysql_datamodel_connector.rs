@@ -110,10 +110,6 @@ impl MySqlDatamodelConnector {
     }
 }
 
-fn get_argument(args: Vec<u32>) -> u32 {
-    return *args.first.unwrap();
-}
-
 impl Connector for MySqlDatamodelConnector {
     fn capabilities(&self) -> &Vec<ConnectorCapability> {
         &self.capabilities
@@ -123,8 +119,14 @@ impl Connector for MySqlDatamodelConnector {
         &self.constructors
     }
 
-    fn parse_native_type(&self, name: &str, args: Vec<u32>) -> Result<NativeTypeInstance, ConnectorError> {
+    fn parse_native_type(
+        &self,
+        name: &str,
+        args: Vec<u32>,
+        scalar_type: ScalarType,
+    ) -> Result<NativeTypeInstance, ConnectorError> {
         let constructor = self.find_native_type_constructor(name);
+        let length = *args.len();
         let native_type = match name {
             INT_TYPE_NAME => MySqlType::Int,
             SMALL_INT_TYPE_NAME => MySqlType::SmallInt,
@@ -133,8 +135,16 @@ impl Connector for MySqlDatamodelConnector {
             BIG_INT_TYPE_NAME => MySqlType::BigInt,
             FLOAT_TYPE_NAME => MySqlType::Float,
             DOUBLE_TYPE_NAME => MySqlType::Double,
-            CHAR_TYPE_NAME => MySqlType::Char(get_argument(args)),
-            VAR_CHAR_TYPE_NAME => MySqlType::VarChar(get_argument(args)),
+            CHAR_TYPE_NAME => {
+                if let Some(arg) = *args.first() {
+                    MySqlType::Char(arg)
+                }
+            }
+            VAR_CHAR_TYPE_NAME => {
+                if let Some(arg) = *args.first() {
+                    MySqlType::VarChar(arg)
+                }
+            }
             TINY_TEXT_TYPE_NAME => MySqlType::TinyText,
             TEXT_TYPE_NAME => MySqlType::Text,
             MEDIUM_TEXT_TYPE_NAME => MySqlType::MediumText,
@@ -160,6 +170,26 @@ impl Connector for MySqlDatamodelConnector {
             _ => unreachable!("This code is unreachable as the core must guarantee to just call with known names."),
         };
 
+        let native_type_constructor = self.constructors.iter().find(|c| c.name == name)?;
+
+        if native_type_constructor._number_of_args != length {
+            return Err(ConnectorError::new_argument_count_mismatch_error(
+                name,
+                native_type_constructor._number_of_args,
+                length,
+            ));
+        }
+
+        // check for compatability with scalar type
+        let compatable_prisma_scalar_type = native_type_constructor.prisma_type;
+        if compatable_prisma_scalar_type != scalar_type {
+            return Err(ConnectorError::new_incompatible_native_type_error(
+                "MySql",
+                scalar_type,
+                compatable_prisma_scalar_type,
+            ));
+        }
+
         match constructor {
             Some(constructor) => Ok(NativeTypeInstance::new(constructor.name.as_str(), args, &native_type)),
             _ => panic!("",),
@@ -167,7 +197,7 @@ impl Connector for MySqlDatamodelConnector {
     }
 
     fn introspect_native_type(&self, native_type: Box<dyn NativeType>) -> Result<NativeTypeInstance, ConnectorError> {
-        let native_type: MySqlType = serde_json::from_value(_native_type.to_json()).unwrap();
+        let native_type: MySqlType = serde_json::from_value(native_type.to_json()).unwrap();
         let (constructor_name, args) = match native_type {
             MySqlType::Int => (INT_TYPE_NAME, vec![]),
             MySqlType::SmallInt => (SMALL_INT_TYPE_NAME, vec![]),
@@ -193,7 +223,6 @@ impl Connector for MySqlDatamodelConnector {
                 return Err(ConnectorError::new_type_name_unknown_error(
                     native_type.clone(),
                     "MySql",
-                    Span::from_pest(), // todo carmen ??
                 ));
             }
         };

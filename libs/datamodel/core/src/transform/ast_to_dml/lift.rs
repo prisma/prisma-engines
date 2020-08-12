@@ -253,8 +253,6 @@ impl<'a> LiftAstToDml<'a> {
                 } else {
                     Ok((dml::FieldType::Base(scalar_type, type_alias), vec![]))
                 }
-                }
-                }
             } else {
                 Ok((dml::FieldType::Base(scalar_type, type_alias), vec![]))
             }
