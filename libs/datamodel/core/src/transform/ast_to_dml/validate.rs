@@ -73,12 +73,6 @@ impl<'a> Validator<'a> {
             }
 
             if let Err(ref mut the_errors) =
-                self.validate_native_types(ast_schema.find_model(&model.name).expect(STATE_ERROR), model)
-            {
-                errors_for_model.append(the_errors);
-            }
-
-            if let Err(ref mut the_errors) =
                 self.validate_enum_default_values(schema, ast_schema.find_model(&model.name).expect(STATE_ERROR), model)
             {
                 errors_for_model.append(the_errors);

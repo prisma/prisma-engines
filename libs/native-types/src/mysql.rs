@@ -1,4 +1,5 @@
 use serde::*;
+use serde_json::Value;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum MySqlType {
@@ -25,9 +26,15 @@ pub enum MySqlType {
     MediumText,
     LongText,
     Date,
-    Time(Option<u32>), // todo carmen how to handle optional argument in sql connector?
+    Time(Option<u32>),
     DateTime(Option<u32>),
     Timestamp(Option<u32>),
     Year,
     JSON,
+}
+
+impl super::NativeType for MySqlType {
+    fn to_json(&self) -> Value {
+        serde_json::to_value(&self).expect(&format!("Serializing the native type to json failed: {:?}", &self))
+    }
 }

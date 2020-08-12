@@ -1,7 +1,6 @@
 use crate::common::*;
 use datamodel::ast::Span;
 use datamodel::{ast, error::DatamodelError};
-use datamodel_connector::error::ConnectorError;
 
 #[test]
 fn shound_fail_on_directive_duplication() {
@@ -112,7 +111,7 @@ fn should_fail_on_custom_related_types() {
 }
 
 #[test]
-fn should_error_on_invalid_type_argument() {
+fn should_fail_on_native_type_with_invalid_number_of_arguments() {
     let dml = r#"
         datasource pg {
           provider = "postgres"
@@ -129,5 +128,32 @@ fn should_error_on_invalid_type_argument() {
 
     let error = parse_error(dml);
 
-    errors.assert_is(ConnectorError::new_argument_not_found_error("", ast::Span::new(23, 24)));
+    error.assert_is(DatamodelError::new_connector_error(
+        "Native type VarChar takes 1 arguments, but received 0.",
+        ast::Span::new(259, 271),
+    ));
+}
+
+#[test]
+fn should_fail_on_native_type_with_invalid_arguments() {
+    let dml = r#"
+        datasource pg {
+          provider = "postgres"
+          url = "postgresql://"
+          previewFeatures = ["nativeTypes"]
+        }
+
+        model Blog {
+            id     Int    @id
+            bigInt Int    @pg.BigInt
+            foobar String @pg.VarChar(a)
+        }
+    "#;
+
+    let error = parse_error(dml);
+
+    error.assert_is(DatamodelError::new_connector_error(
+        "Native type VarChar takeks 1 arguments, but received 0.",
+        ast::Span::new(259, 271),
+    ));
 }

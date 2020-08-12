@@ -1,8 +1,8 @@
-use datamodel::ast::WithName;
+use core::option::Option::Some;
 use datamodel_connector::error::ConnectorError;
 use datamodel_connector::scalars::ScalarType;
 use datamodel_connector::{Connector, ConnectorCapability, NativeTypeConstructor, NativeTypeInstance};
-use native_types::{MySqlType, NativeType, PostgresType};
+use native_types::{MySqlType, NativeType};
 
 const INT_TYPE_NAME: &str = "Int";
 const SMALL_INT_TYPE_NAME: &str = "SmallInt";
@@ -126,7 +126,7 @@ impl Connector for MySqlDatamodelConnector {
         scalar_type: ScalarType,
     ) -> Result<NativeTypeInstance, ConnectorError> {
         let constructor = self.find_native_type_constructor(name);
-        let length = *args.len();
+        let length = args.iter().count();
         let native_type = match name {
             INT_TYPE_NAME => MySqlType::Int,
             SMALL_INT_TYPE_NAME => MySqlType::SmallInt,
@@ -136,13 +136,21 @@ impl Connector for MySqlDatamodelConnector {
             FLOAT_TYPE_NAME => MySqlType::Float,
             DOUBLE_TYPE_NAME => MySqlType::Double,
             CHAR_TYPE_NAME => {
-                if let Some(arg) = *args.first() {
-                    MySqlType::Char(arg)
+                if let Some(arg) = args.first() {
+                    MySqlType::Char(*arg)
+                } else {
+                    return Err(ConnectorError::new_argument_count_mismatch_error(CHAR_TYPE_NAME, 1, 0));
                 }
             }
             VAR_CHAR_TYPE_NAME => {
-                if let Some(arg) = *args.first() {
-                    MySqlType::VarChar(arg)
+                if let Some(arg) = args.first() {
+                    MySqlType::VarChar(*arg)
+                } else {
+                    return Err(ConnectorError::new_argument_count_mismatch_error(
+                        VAR_CHAR_TYPE_NAME,
+                        1,
+                        0,
+                    ));
                 }
             }
             TINY_TEXT_TYPE_NAME => MySqlType::TinyText,
@@ -151,15 +159,15 @@ impl Connector for MySqlDatamodelConnector {
             LONG_TEXT_TYPE_NAME => MySqlType::LongText,
             DATE_TYPE_NAME => MySqlType::Date,
             TIME_TYPE_NAME => {
-                if let Some(arg) = *args.first() {
-                    MySqlType::Time(arg)
+                if let Some(arg) = args.first() {
+                    MySqlType::Time(Option::from(*arg))
                 } else {
                     MySqlType::Time(None)
                 }
             }
             DATETIME_TYPE_NAME => {
-                if let Some(arg) = *args.first() {
-                    MySqlType::DateTime(arg)
+                if let Some(arg) = args.first() {
+                    MySqlType::DateTime(Option::from(*arg))
                 } else {
                     MySqlType::DateTime(None)
                 }
@@ -170,7 +178,7 @@ impl Connector for MySqlDatamodelConnector {
             _ => unreachable!("This code is unreachable as the core must guarantee to just call with known names."),
         };
 
-        let native_type_constructor = self.constructors.iter().find(|c| c.name == name)?;
+        let native_type_constructor = self.constructors.iter().find(|c| c.name.as_str() == name).unwrap();
 
         if native_type_constructor._number_of_args != length {
             return Err(ConnectorError::new_argument_count_mismatch_error(
@@ -190,10 +198,7 @@ impl Connector for MySqlDatamodelConnector {
             ));
         }
 
-        match constructor {
-            Some(constructor) => Ok(NativeTypeInstance::new(constructor.name.as_str(), args, &native_type)),
-            _ => panic!("",),
-        }
+        Ok(NativeTypeInstance::new(constructor.name.as_str(), args, &native_type))
     }
 
     fn introspect_native_type(&self, native_type: Box<dyn NativeType>) -> Result<NativeTypeInstance, ConnectorError> {
@@ -213,25 +218,35 @@ impl Connector for MySqlDatamodelConnector {
             MySqlType::MediumText => (MEDIUM_TEXT_TYPE_NAME, vec![]),
             MySqlType::LongText => (LONG_TEXT_TYPE_NAME, vec![]),
             MySqlType::Date => (DATE_TYPE_NAME, vec![]),
-            MySqlType::Time(x) => (TIME_TYPE_NAME, vec![x]),
-            MySqlType::DateTime(x) => (DATETIME_TYPE_NAME, vec![x]),
-            MySqlType::Timestamp(x) => (TIMESTAMP_TYPE_NAME, vec![x]),
+            MySqlType::Time(x) => {
+                if x.is_none() {
+                    (TIME_TYPE_NAME, vec![])
+                } else {
+                    (TIME_TYPE_NAME, vec![x.unwrap()])
+                }
+            }
+            MySqlType::DateTime(x) => {
+                if x.is_none() {
+                    (DATETIME_TYPE_NAME, vec![])
+                } else {
+                    (DATETIME_TYPE_NAME, vec![x.unwrap()])
+                }
+            }
+            MySqlType::Timestamp(x) => {
+                if x.is_none() {
+                    (TIMESTAMP_TYPE_NAME, vec![])
+                } else {
+                    (TIMESTAMP_TYPE_NAME, vec![x.unwrap()])
+                }
+            }
             MySqlType::Year => (YEAR_TYPE_NAME, vec![]),
             MySqlType::JSON => (JSON_TYPE_NAME, vec![]),
 
-            _ => {
-                return Err(ConnectorError::new_type_name_unknown_error(
-                    native_type.clone(),
-                    "MySql",
-                ));
-            }
+            _ => panic!(""),
         };
 
         let constructor = self.find_native_type_constructor(constructor_name);
 
-        match constructor {
-            Some(constructor) => Ok(NativeTypeInstance::new(constructor.name.as_str(), args, &native_type)),
-            _ => panic!("",),
-        }
+        Ok(NativeTypeInstance::new(constructor.name.as_str(), args, &native_type))
     }
 }

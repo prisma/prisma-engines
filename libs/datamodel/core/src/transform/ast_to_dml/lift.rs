@@ -3,11 +3,11 @@ use crate::transform::helpers::ValueValidator;
 use crate::{
     ast, configuration, dml,
     error::{DatamodelError, ErrorCollection},
-    load_sources, DatasourcePreviewFeatures, Field, FieldType, ScalarType,
+    DatasourcePreviewFeatures, Field, FieldType, ScalarType,
 };
-use datamodel_connector::error::ConnectorError;
-use datamodel_connector::{Connector, NativeTypeInstance};
-use sql_datamodel_connector::{PostgresDatamodelConnector, SqlDatamodelConnectors};
+use datamodel_connector::Connector;
+use itertools::Itertools;
+use sql_datamodel_connector::SqlDatamodelConnectors;
 use std::collections::HashMap;
 
 /// Helper for lifting a datamodel.
@@ -215,8 +215,6 @@ impl<'a> LiftAstToDml<'a> {
                 connectors.insert("sqlite", Box::new(SqlDatamodelConnectors::sqlite()));
                 connectors.insert("mssql", Box::new(SqlDatamodelConnectors::mssql()));
 
-                let connector: &Box<dyn Connector> = connectors.get(connector_string).unwrap();
-
                 let mut prefix = String::with_capacity(datasource_name.len() + 1);
                 prefix.push_str(datasource_name);
                 prefix.push_str(".");
@@ -231,7 +229,7 @@ impl<'a> LiftAstToDml<'a> {
                 if type_specifications.count() > 1 {
                     return Err(DatamodelError::new_duplicate_directive_error(
                         &prefix,
-                        type_specification.span,
+                        type_specification.unwrap().span,
                     ));
                 }
 
@@ -242,13 +240,21 @@ impl<'a> LiftAstToDml<'a> {
                             .arguments
                             .iter()
                             .map(|arg| ValueValidator::new(&arg.value).as_int().unwrap() as u32)
-                            .collect();
+                            .collect_vec();
                         args
                     })
                     .unwrap_or(vec![]);
 
-                if let Some(x) = name.and_then(|ts| -> NativeTypeInstance connector.parse_native_type(&ts, args, scalar_type)?) {
-                    let field_type = dml::FieldType::NativeType(scalar_type, x);
+                let connector: &Box<dyn Connector> = connectors.get(connector_string).unwrap();
+                if let Some(x) = name {
+                    let parse_native_type_result = connector.parse_native_type(x, args, scalar_type);
+                    if parse_native_type_result.is_err() {
+                        return Err(DatamodelError::new_connector_error(
+                            &parse_native_type_result.err().unwrap().to_string(),
+                            type_specification.unwrap().span,
+                        ));
+                    }
+                    let field_type = dml::FieldType::NativeType(scalar_type, parse_native_type_result.unwrap());
                     Ok((field_type, vec![]))
                 } else {
                     Ok((dml::FieldType::Base(scalar_type, type_alias), vec![]))

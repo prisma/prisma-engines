@@ -754,6 +754,7 @@ dependencies = [
  "native-types",
  "serde",
  "serde_json",
+ "thiserror",
 ]
 
 [[package]]
