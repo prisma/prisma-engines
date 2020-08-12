@@ -4,7 +4,8 @@
 
 use crate::{
     catch, connect, database_info::DatabaseInfo, sql_destructive_change_checker::DestructiveChangeCheckerFlavour,
-    sql_renderer::SqlRenderer, CheckDatabaseInfoResult, SqlError, SqlResult, SystemDatabase,
+    sql_renderer::SqlRenderer, sql_schema_differ::SqlSchemaDifferFlavour, CheckDatabaseInfoResult, SqlError, SqlResult,
+    SystemDatabase,
 };
 use futures::future::TryFutureExt;
 use migration_connector::{ConnectorError, ConnectorResult};
@@ -36,7 +37,9 @@ pub(crate) fn from_connection_info(connection_info: &ConnectionInfo) -> Box<dyn 
 }
 
 #[async_trait::async_trait]
-pub(crate) trait SqlFlavour: DestructiveChangeCheckerFlavour + SqlRenderer {
+pub(crate) trait SqlFlavour:
+    DestructiveChangeCheckerFlavour + SqlRenderer + SqlSchemaDifferFlavour + std::fmt::Debug
+{
     /// This method should be considered deprecated. Prefer extending SqlFlavour
     /// with methods expressing clearly what is being specialized by database
     /// backend.
@@ -61,6 +64,7 @@ pub(crate) trait SqlFlavour: DestructiveChangeCheckerFlavour + SqlRenderer {
     async fn initialize(&self, conn: &dyn Queryable, database_info: &DatabaseInfo) -> SqlResult<()>;
 }
 
+#[derive(Debug)]
 pub(crate) struct MysqlFlavour(MysqlUrl);
 
 #[async_trait::async_trait]
@@ -127,6 +131,7 @@ impl SqlFlavour for MysqlFlavour {
     }
 }
 
+#[derive(Debug)]
 pub(crate) struct SqliteFlavour {
     file_path: String,
 }
@@ -179,6 +184,7 @@ impl SqlFlavour for SqliteFlavour {
     }
 }
 
+#[derive(Debug)]
 pub(crate) struct PostgresFlavour(pub(crate) PostgresUrl);
 
 #[async_trait::async_trait]

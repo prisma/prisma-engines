@@ -130,8 +130,7 @@ fn parse_datamodel_internal(
 ) -> Result<Datamodel, error::ErrorCollection> {
     let ast = ast::parser::parse_schema(datamodel_string)?;
     let sources = load_sources(&ast, ignore_datasource_urls, vec![])?;
-    let generators = GeneratorLoader::load_generators_from_ast(&ast)?;
-    let validator = ValidationPipeline::new(&sources, &generators);
+    let validator = ValidationPipeline::new(&sources);
 
     validator.validate(&ast)
 }
@@ -142,8 +141,7 @@ pub fn lift_ast_to_datamodel(ast: &ast::SchemaAst) -> Result<Datamodel, error::E
     let mut errors = error::ErrorCollection::new();
     // we are not interested in the sources in this case. Hence we can ignore the datasource urls.
     let sources = load_sources(ast, true, vec![])?;
-    let generators = GeneratorLoader::load_generators_from_ast(&ast)?;
-    let validator = ValidationPipeline::new(&sources, &generators);
+    let validator = ValidationPipeline::new(&sources);
 
     match validator.validate(&ast) {
         Ok(src) => Ok(src),

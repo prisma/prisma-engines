@@ -336,3 +336,31 @@ async fn introspecting_a_table_non_id_autoincrement_should_work(api: &TestApi) {
     let result = dbg!(api.introspect().await);
     custom_assert(&result, dm);
 }
+
+#[test_each_connector(tags("mysql_8"))]
+async fn introspecting_a_table_with_an_index_that_contains_expressions_should_ignore_it(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute_with_schema(
+            |migration| {
+                migration.create_table("Test", |t| {
+                    t.inject_custom("id Integer  Not Null Primary Key");
+                    t.inject_custom("parentId Integer");
+                    t.inject_custom("`name` varchar(45) DEFAULT NULL");
+                    t.inject_custom("UNIQUE KEY `SampleTableUniqueIndexName` (`name`,(ifnull(`parentId`,-(1))))");
+                });
+            },
+            api.db_name(),
+        )
+        .await;
+
+    let dm = r#"
+            model Test {
+              id       Int     @id
+              parentId Int?
+              name     String?
+            }      
+        "#;
+    let result = dbg!(api.introspect().await);
+    custom_assert(&result, dm);
+}

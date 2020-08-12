@@ -1,7 +1,7 @@
 use crate::*;
 use sql_renderer::{rendered_step::RenderedStep, IteratorJoin, Quoted, RenderedAlterColumn};
 use sql_schema_describer::*;
-use sql_schema_differ::{ColumnDiffer, DiffingOptions};
+use sql_schema_differ::{ColumnDiffer, SqlSchemaDiffer};
 use sql_schema_helpers::{find_column, walk_columns, ColumnRef, SqlSchemaExt};
 use std::fmt::Write as _;
 use tracing_futures::Instrument;
@@ -22,27 +22,13 @@ impl DatabaseMigrationStepApplier<SqlMigration> for SqlDatabaseStepApplier<'_> {
     async fn apply_step(&self, database_migration: &SqlMigration, index: usize) -> ConnectorResult<bool> {
         let fut = self
             .apply_next_step(
-                &database_migration.corrected_steps,
+                &database_migration.steps,
                 index,
                 self.flavour(),
                 &database_migration.before,
                 &database_migration.after,
             )
             .instrument(tracing::debug_span!("ApplySqlStep", index));
-
-        crate::catch(self.connection_info(), fut).await
-    }
-
-    async fn unapply_step(&self, database_migration: &SqlMigration, index: usize) -> ConnectorResult<bool> {
-        let fut = self
-            .apply_next_step(
-                &database_migration.rollback,
-                index,
-                self.flavour(),
-                &database_migration.after,
-                &database_migration.before,
-            )
-            .instrument(tracing::debug_span!("UnapplySqlStep", index));
 
         crate::catch(self.connection_info(), fut).await
     }
@@ -98,9 +84,9 @@ fn render_steps_pretty(
     current_schema: &SqlSchema,
     next_schema: &SqlSchema,
 ) -> ConnectorResult<Vec<PrettyDatabaseMigrationStep>> {
-    let mut steps = Vec::with_capacity(database_migration.corrected_steps.len());
+    let mut steps = Vec::with_capacity(database_migration.steps.len());
 
-    for step in &database_migration.corrected_steps {
+    for step in &database_migration.steps {
         let sql = render_raw_sql(&step, renderer, database_info, current_schema, next_schema)
             .map_err(|err: anyhow::Error| ConnectorError::from_kind(migration_connector::ErrorKind::Generic(err)))?
             .join(";\n");
@@ -125,8 +111,15 @@ fn render_raw_sql(
 ) -> Result<Vec<String>, anyhow::Error> {
     let sql_family = renderer.sql_family();
     let schema_name = database_info.connection_info().schema_name().to_string();
+    let differ = SqlSchemaDiffer {
+        previous: current_schema,
+        next: next_schema,
+        database_info,
+        flavour: renderer,
+    };
 
     match step {
+        SqlMigrationStep::RedefineTables { names } => Ok(renderer.render_redefine_tables(names, differ, database_info)),
         SqlMigrationStep::CreateEnum(create_enum) => Ok(renderer.render_create_enum(create_enum)),
         SqlMigrationStep::DropEnum(drop_enum) => Ok(renderer.render_drop_enum(drop_enum)),
         SqlMigrationStep::AlterEnum(alter_enum) => match renderer.sql_family() {
@@ -135,10 +128,11 @@ fn render_raw_sql(
             _ => Ok(Vec::new()),
         },
         SqlMigrationStep::CreateTable(CreateTable { table }) => {
-            // FIXME Temporary hack: we should be passing a TableRef, but this is not
-            // possible because we sometimes create temporary tables in the
-            // SQLite table redefinition process.
-            renderer.render_create_table(table, &schema_name, next_schema, sql_family)
+            let table = next_schema
+                .table_ref(&table.name)
+                .expect("CreateTable referring to an unknown table.");
+
+            Ok(vec![renderer.render_create_table(&table, &schema_name, sql_family)?])
         }
         SqlMigrationStep::DropTable(DropTable { name }) => match sql_family {
             SqlFamily::Mysql | SqlFamily::Postgres => Ok(vec![format!(
@@ -250,7 +244,8 @@ fn render_raw_sql(
                             current_schema.table_ref(&table.name).unwrap().column(&name).unwrap(),
                             find_column(next_schema, &table.name, &column.name)
                                 .expect("Invariant violation: could not find column referred to in AlterColumn."),
-                            &DiffingOptions::from_database_info(database_info),
+                            &database_info,
+                            renderer,
                         ) {
                             Some(RenderedAlterColumn {
                                 alter_columns,
@@ -303,9 +298,13 @@ fn render_raw_sql(
 
             Ok(statements)
         }
-        SqlMigrationStep::CreateIndex(CreateIndex { table, index }) => {
-            Ok(vec![render_create_index(renderer, database_info, table, index)])
-        }
+        SqlMigrationStep::CreateIndex(CreateIndex { table, index }) => Ok(vec![render_create_index(
+            renderer,
+            database_info.connection_info().schema_name(),
+            table,
+            index,
+            database_info.sql_family(),
+        )]),
         SqlMigrationStep::DropIndex(DropIndex { table, name }) => match sql_family {
             SqlFamily::Mysql => Ok(vec![format!(
                 "DROP INDEX {} ON {}",
@@ -350,7 +349,13 @@ fn render_raw_sql(
 
                     // Order matters: dropping the old index first wouldn't work when foreign key constraints are still relying on it.
                     Ok(vec![
-                        render_create_index(renderer, database_info, table, &new_index),
+                        render_create_index(
+                            renderer,
+                            database_info.connection_info().schema_name(),
+                            table,
+                            &new_index,
+                            sql_family,
+                        ),
                         mysql_drop_index(renderer, &schema_name, table, index_name)?,
                     ])
                 } else {
@@ -369,33 +374,28 @@ fn render_raw_sql(
             )]),
             SqlFamily::Sqlite => unimplemented!("Index renaming on SQLite."),
         },
-        SqlMigrationStep::RawSql { raw } => Ok(vec![raw.to_owned()]),
     }
 }
 
-fn render_create_index(
+pub(crate) fn render_create_index(
     renderer: &dyn SqlFlavour,
-    database_info: &DatabaseInfo,
+    schema_name: &str,
     table_name: &str,
     index: &Index,
+    sql_family: SqlFamily,
 ) -> String {
     let Index { name, columns, tpe } = index;
     let index_type = match tpe {
         IndexType::Unique => "UNIQUE ",
         IndexType::Normal => "",
     };
-    let sql_family = database_info.sql_family();
     let index_name = match sql_family {
-        SqlFamily::Sqlite => renderer
-            .quote_with_schema(database_info.connection_info().schema_name(), &name)
-            .to_string(),
+        SqlFamily::Sqlite => renderer.quote_with_schema(schema_name, &name).to_string(),
         _ => renderer.quote(&name).to_string(),
     };
     let table_reference = match sql_family {
         SqlFamily::Sqlite => renderer.quote(table_name).to_string(),
-        _ => renderer
-            .quote_with_schema(database_info.connection_info().schema_name(), table_name)
-            .to_string(),
+        _ => renderer.quote_with_schema(schema_name, table_name).to_string(),
     };
     let columns = columns.iter().map(|c| renderer.quote(c));
 
@@ -425,12 +425,14 @@ fn safe_alter_column(
     renderer: &dyn SqlFlavour,
     previous_column: ColumnRef<'_>,
     next_column: ColumnRef<'_>,
-    diffing_options: &DiffingOptions,
+    database_info: &DatabaseInfo,
+    flavour: &dyn SqlFlavour,
 ) -> Option<RenderedAlterColumn> {
     let differ = ColumnDiffer {
         previous: previous_column,
         next: next_column,
-        diffing_options,
+        database_info,
+        flavour,
     };
 
     renderer.render_alter_column(&differ)

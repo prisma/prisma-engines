@@ -16,9 +16,6 @@ where
     /// Check destructive changes resulting of applying the provided migration.
     async fn check(&self, database_migration: &T) -> ConnectorResult<DestructiveChangeDiagnostics>;
 
-    /// Check destructive changes resulting of reverting the provided migration.
-    async fn check_unapply(&self, database_migration: &T) -> ConnectorResult<DestructiveChangeDiagnostics>;
-
     /// Check the database migration for destructive or unexecutable steps
     /// without performing any IO.
     fn pure_check(&self, database_migration: &T) -> ConnectorResult<DestructiveChangeDiagnostics>;
@@ -81,10 +78,6 @@ where
     T: Send + Sync + 'static,
 {
     async fn check(&self, _database_migration: &T) -> ConnectorResult<DestructiveChangeDiagnostics> {
-        Ok(DestructiveChangeDiagnostics::new())
-    }
-
-    async fn check_unapply(&self, _database_migration: &T) -> ConnectorResult<DestructiveChangeDiagnostics> {
         Ok(DestructiveChangeDiagnostics::new())
     }
 

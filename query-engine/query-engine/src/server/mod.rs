@@ -11,6 +11,7 @@ use query_core::schema::QuerySchemaRenderer;
 use serde_json::json;
 use tide::http::{mime, StatusCode};
 use tide::{Body, Request, Response};
+use tide_server_timing::TimingMiddleware;
 
 use std::sync::Arc;
 
@@ -55,7 +56,11 @@ pub async fn listen(opts: PrismaOpt) -> PrismaResult<()> {
         .await?;
 
     let mut app = tide::with_state(State::new(cx, opts.enable_playground, opts.enable_debug_mode));
-    app.middleware(ElapsedMiddleware::new());
+    app.with(ElapsedMiddleware::new());
+
+    if opts.enable_playground {
+        app.with(TimingMiddleware::new());
+    }
 
     app.at("/").post(graphql_handler);
     app.at("/").get(playground_handler);
@@ -69,16 +74,8 @@ pub async fn listen(opts: PrismaOpt) -> PrismaResult<()> {
 
     // Start the Tide server and log the server details.
     // TODO: Tide should have a panicking listen_unix impl.
-    #[allow(unused_variables)]
     if let Some(path) = opts.unix_path() {
-        #[cfg(unix)]
-        {
-            app.listen_unix(path).await?;
-        }
-        #[cfg(not(unix))]
-        {
-            panic!("Unix domain sockets are only supported on Unix; please use TCP instead.")
-        }
+        app.listen(&*format!("http+unix://{}", path)).await?;
     } else {
         app.listen((&*opts.host, opts.port)).await?;
     }

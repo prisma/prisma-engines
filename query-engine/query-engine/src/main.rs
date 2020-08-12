@@ -10,6 +10,9 @@ use structopt::StructOpt;
 use tracing::subscriber;
 use tracing_subscriber::{EnvFilter, FmtSubscriber};
 
+use tide_server_timing::TimingLayer;
+use tracing_subscriber::layer::SubscriberExt;
+
 mod cli;
 mod context;
 mod dmmf;
@@ -60,11 +63,19 @@ fn init_logger(log_format: LogFormat) {
 
     match log_format {
         LogFormat::Text => {
-            let subscriber = FmtSubscriber::builder().with_env_filter(filter).finish();
+            let subscriber = FmtSubscriber::builder()
+                .with_max_level(tracing::Level::TRACE)
+                .finish()
+                .with(TimingLayer::new());
+
             subscriber::set_global_default(subscriber).expect("Could not initialize logger");
         }
         LogFormat::Json => {
-            let subscriber = FmtSubscriber::builder().json().with_env_filter(filter).finish();
+            let subscriber = FmtSubscriber::builder()
+                .json()
+                .with_env_filter(filter)
+                .finish()
+                .with(TimingLayer::new());
             subscriber::set_global_default(subscriber).expect("Could not initialize logger");
         }
     }
