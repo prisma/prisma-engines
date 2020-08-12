@@ -313,7 +313,7 @@ class ManyRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
         """{"data":{"posts":[{"title":"Title1","authors":[{"name":"Author1"},{"name":"Author2"}]},{"title":"Title2","authors":[{"name":"Author1"},{"name":"Author2"}]}]}}""")
 
       val res = server.query(
-        """query{aUsers(where:{name: { starts_with: "Author2" }, posts: { some:{title: { ends_with: "1" }}}},orderBy: { id: asc }){name, posts(orderBy: { id: asc }){title}}}""",
+        """query{aUsers(where:{name: { startsWith: "Author2" }, posts: { some:{title: { endsWith: "1" }}}},orderBy: { id: asc }){name, posts(orderBy: { id: asc }){title}}}""",
         project
       )
       res.toString should be("""{"data":{"aUsers":[{"name":"Author2","posts":[{"title":"Title1"},{"title":"Title2"}]}]}}""")

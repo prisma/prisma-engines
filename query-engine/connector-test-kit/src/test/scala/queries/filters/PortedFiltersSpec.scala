@@ -77,9 +77,9 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
         """{
           |  scalarModels(
           |    where: {
-          |      optString: { starts_with: "foo" }
+          |      optString: { startsWith: "foo" }
           |      optBoolean: { equals: false }
-          |      idTest: { ends_with: "5" }
+          |      idTest: { endsWith: "5" }
           |    }
           |  ) {
           |    idTest
@@ -95,9 +95,9 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
           |    where: {
           |      b: { is: { int: { equals: 1 } } }
           |      AND: [
-          |        { optString: { starts_with: "foo" }},
+          |        { optString: { startsWith: "foo" }},
           |        { optBoolean: { equals: false }},
-          |        { idTest: { ends_with: "5" }}
+          |        { idTest: { endsWith: "5" }}
           |      ]
           |    }
           |  ) {
@@ -129,8 +129,8 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
             |      AND: [
             |        {
             |          optBoolean: { equals: false }
-            |          idTest: { ends_with: "5" }
-            |          AND: [{ optString: { starts_with: "foo" } }]
+            |          idTest: { endsWith: "5" }
+            |          AND: [{ optString: { startsWith: "foo" } }]
             |        }
             |      ]
             |    }
@@ -151,8 +151,8 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
             |      AND: [
             |        {
             |          optBoolean: { equals: false }
-            |          idTest: { ends_with: "5" }
-            |          AND: [{ optString: { starts_with: "foo" } }]
+            |          idTest: { endsWith: "5" }
+            |          AND: [{ optString: { startsWith: "foo" } }]
             |        }
             |      ]
             |    }
@@ -183,8 +183,8 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
             |    where: {
             |      optBoolean: { equals: false }
             |      OR: [
-            |        { optString: { starts_with: "foo" } }
-            |        { idTest: { ends_with: "5" } }
+            |        { optString: { startsWith: "foo" } }
+            |        { idTest: { endsWith: "5" } }
             |      ]
             |    }
             |    orderBy: { id: asc }
@@ -215,10 +215,10 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
             |    where: {
             |      OR: [
             |        {
-            |          optString: { starts_with: "foo" }
+            |          optString: { startsWith: "foo" }
             |          OR: [
             |            { optBoolean: { equals: false } }
-            |            { idTest: { ends_with: "5" } }
+            |            { idTest: { endsWith: "5" } }
             |          ]
             |        }
             |      ]
@@ -338,27 +338,27 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
     res2.toString() should be("""{"data":{"scalarModels":[{"idTest":"id2"},{"idTest":"id3"}]}}""")
   }
 
-  "A filter query" should "support the starts_with filter on strings" in {
+  "A filter query" should "support the startsWith filter on strings" in {
     createTest("id1", "bara", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342")
     createTest("id2", "foo bar", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
     createTest("id3", "foo bar barz", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
 
-    val res  = server.query("""{scalarModels(where: { optString: { starts_with: "bar" }}){idTest}}""", project = project)
-    val res2 = server.query("""{scalarModels(where: { b: { is: { int: { equals: 1 }}}, optString: { starts_with: "bar" }}){idTest}}""", project = project)
+    val res  = server.query("""{scalarModels(where: { optString: { startsWith: "bar" }}){idTest}}""", project = project)
+    val res2 = server.query("""{scalarModels(where: { b: { is: { int: { equals: 1 }}}, optString: { startsWith: "bar" }}){idTest}}""", project = project)
 
     res.toString() should be("""{"data":{"scalarModels":[{"idTest":"id1"}]}}""")
     res2.toString() should be("""{"data":{"scalarModels":[{"idTest":"id1"}]}}""")
   }
 
-  "A filter query" should "support the not starts_with filter on strings" in {
+  "A filter query" should "support the not startsWith filter on strings" in {
     createTest("id1", "bara", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342")
     createTest("id2", "foo bar", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
     createTest("id3", "foo bar barz", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
 
-    val res = server.query("""{scalarModels(where: { optString: { not: { starts_with: "bar" }}}, orderBy: { id: asc }){idTest}}""", project = project)
+    val res = server.query("""{scalarModels(where: { optString: { not: { startsWith: "bar" }}}, orderBy: { id: asc }){idTest}}""", project = project)
     val res2 =
       server.query(
-        """{scalarModels(where: {b: { is: { int: { equals: 1 }}}, optString: { not: { starts_with: "bar" }}}, orderBy: { id: asc }){idTest}}""",
+        """{scalarModels(where: {b: { is: { int: { equals: 1 }}}, optString: { not: { startsWith: "bar" }}}, orderBy: { id: asc }){idTest}}""",
         project = project
       )
 
@@ -366,28 +366,28 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
     res2.toString() should be("""{"data":{"scalarModels":[{"idTest":"id2"},{"idTest":"id3"}]}}""")
   }
 
-  "A filter query" should "support the ends_with filter on strings" in {
+  "A filter query" should "support the endsWith filter on strings" in {
     createTest("id1", "bara", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342")
     createTest("id2", "foo bar", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
     createTest("id3", "foo bar bar", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
 
-    val res = server.query("""{scalarModels(where: { optString: { ends_with: "bara" }}, orderBy: { id: asc }){idTest}}""", project = project)
-    val res2 = server.query("""{scalarModels(where: { b: { is: { int: { equals: 1 }}}, optString: { ends_with: "bara" }}, orderBy: { id: asc }){idTest}}""",
+    val res = server.query("""{scalarModels(where: { optString: { endsWith: "bara" }}, orderBy: { id: asc }){idTest}}""", project = project)
+    val res2 = server.query("""{scalarModels(where: { b: { is: { int: { equals: 1 }}}, optString: { endsWith: "bara" }}, orderBy: { id: asc }){idTest}}""",
                             project = project)
 
     res.toString() should be("""{"data":{"scalarModels":[{"idTest":"id1"}]}}""")
     res2.toString() should be("""{"data":{"scalarModels":[{"idTest":"id1"}]}}""")
   }
 
-  "A filter query" should "support the not ends_with filter on strings" in {
+  "A filter query" should "support the not endsWith filter on strings" in {
     createTest("id1", "bara", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342")
     createTest("id2", "foo bar", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
     createTest("id3", "foo bar bar", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
 
-    val res = server.query("""{scalarModels(where: { optString: { not: { ends_with: "bara" }}}, orderBy: { id: asc }){idTest}}""", project = project)
+    val res = server.query("""{scalarModels(where: { optString: { not: { endsWith: "bara" }}}, orderBy: { id: asc }){idTest}}""", project = project)
     val res2 =
       server.query(
-        """{scalarModels(where: { b: { is: { int: { equals: 1 }}}, optString: { not: { ends_with: "bara" }}}, orderBy: { id: asc }){idTest}}""",
+        """{scalarModels(where: { b: { is: { int: { equals: 1 }}}, optString: { not: { endsWith: "bara" }}}, orderBy: { id: asc }){idTest}}""",
         project = project
       )
 

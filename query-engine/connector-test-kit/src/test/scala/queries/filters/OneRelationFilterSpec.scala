@@ -93,12 +93,12 @@ class OneRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
     server.query(query = """{blogs(where:{post:{is:{popularity: { gte: 500 }}}}){name}}""", project).toString should be(
       """{"data":{"blogs":[{"name":"blog 3"}]}}""")
 
-    server.query(query = """{blogs(where:{post:{is_not:{popularity: { gte: 500 }}}}){name}}""", project).toString should be(
+    server.query(query = """{blogs(where:{post:{isNot:{popularity: { gte: 500 }}}}){name}}""", project).toString should be(
       """{"data":{"blogs":[{"name":"blog 1"},{"name":"blog 2"}]}}""")
 
     server.query("""mutation { createOnePost(data: { title: "Post 4" popularity: 5 }) { title } }""", project, legacy = false)
 
-    server.query(query = """{posts(where:{blog:{is_not: null}}){title}}""", project).toString should be(
+    server.query(query = """{posts(where:{blog:{isNot: null}}){title}}""", project).toString should be(
       """{"data":{"posts":[{"title":"post 1"},{"title":"post 2"},{"title":"post 3"}]}}""")
   }
 
@@ -169,7 +169,7 @@ class OneRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
       """{"data":{"posts":[{"title":"Title1","author":{"name":"Author1"}},{"title":"Title2","author":{"name":"Author2"}}]}}""")
 
     val res =
-      server.query("""query{aUsers(where:{ post: {is:{title: { ends_with: "1" }}}, name: { starts_with: "Author" }, int: { equals: 5}}){name, post{title}}}""",
+      server.query("""query{aUsers(where:{ post: {is:{title: { endsWith: "1" }}}, name: { startsWith: "Author" }, int: { equals: 5}}){name, post{title}}}""",
                    project)
     res.toString should be("""{"data":{"aUsers":[{"name":"Author1","post":{"title":"Title1"}}]}}""")
   }

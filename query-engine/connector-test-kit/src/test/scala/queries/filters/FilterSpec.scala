@@ -76,7 +76,7 @@ class FilterSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "AND filter" should "work" in {
-    val filter = """(where: {AND:[{unique: { gt: 2 }},{name: { starts_with: "P" }}]})"""
+    val filter = """(where: {AND:[{unique: { gt: 2 }},{name: { startsWith: "P" }}]})"""
 
     userUniques(filter) should be(Vector())
   }
@@ -88,7 +88,7 @@ class FilterSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "OR filter" should "work" taggedAs (IgnoreMongo) in {
-    val filter = """(where: {OR:[{unique: { gt: 2 }},{name: { starts_with: "P" }}]})"""
+    val filter = """(where: {OR:[{unique: { gt: 2 }},{name: { startsWith: "P" }}]})"""
 
     userUniques(filter) should be(Vector(1, 3, 4))
   }
@@ -106,7 +106,7 @@ class FilterSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "NOT filter" should "work" taggedAs (IgnoreMongo) in {
-    val filter = """(where: {NOT:{name: { starts_with: "P" }}})"""
+    val filter = """(where: {NOT:{name: { startsWith: "P" }}})"""
 
     userUniques(filter) should be(Vector(2, 3, 4))
   }
@@ -118,13 +118,13 @@ class FilterSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "Nested filter" should "work" in {
-    val filter = """(where: {ride:{ is: { brand: { starts_with: "P" }}}})"""
+    val filter = """(where: {ride:{ is: { brand: { startsWith: "P" }}}})"""
 
     userUniques(filter) should be(Vector(1))
   }
 
   "Starts with filter" should "work" in {
-    val filter = """(where: {name: { starts_with: "P"}})"""
+    val filter = """(where: {name: { startsWith: "P"}})"""
 
     userUniques(filter) should be(Vector(1))
   }
