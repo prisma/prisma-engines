@@ -23,6 +23,12 @@ pub enum ScalarProjection {
 pub struct ScalarFilter {
     pub projection: ScalarProjection,
     pub condition: ScalarCondition,
+    pub mode: Option<QueryMode>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum QueryMode {
+    Insensitive,
 }
 
 /// Number of allowed elements in query's `IN` or `NOT IN` statement.
@@ -70,6 +76,8 @@ impl ScalarFilter {
             batches
         }
 
+        let mode = self.mode;
+
         match self.condition {
             ScalarCondition::In(list) => {
                 let projection = self.projection;
@@ -79,9 +87,11 @@ impl ScalarFilter {
                     .map(|batch| ScalarFilter {
                         projection: projection.clone(),
                         condition: ScalarCondition::In(batch),
+                        mode,
                     })
                     .collect()
             }
+
             ScalarCondition::NotIn(list) => {
                 let projection = self.projection;
 
@@ -90,6 +100,7 @@ impl ScalarFilter {
                     .map(|batch| ScalarFilter {
                         projection: projection.clone(),
                         condition: ScalarCondition::NotIn(batch),
+                        mode,
                     })
                     .collect()
             }
