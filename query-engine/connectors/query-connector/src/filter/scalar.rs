@@ -76,7 +76,7 @@ impl ScalarFilter {
             batches
         }
 
-        let mode = self.mode;
+        let mode = self.mode.clone();
 
         match self.condition {
             ScalarCondition::In(list) => {
@@ -87,7 +87,7 @@ impl ScalarFilter {
                     .map(|batch| ScalarFilter {
                         projection: projection.clone(),
                         condition: ScalarCondition::In(batch),
-                        mode,
+                        mode: mode.clone(),
                     })
                     .collect()
             }
@@ -100,7 +100,7 @@ impl ScalarFilter {
                     .map(|batch| ScalarFilter {
                         projection: projection.clone(),
                         condition: ScalarCondition::NotIn(batch),
-                        mode,
+                        mode: mode.clone(),
                     })
                     .collect()
             }
@@ -136,6 +136,7 @@ impl ScalarCompare for ScalarFieldRef {
         Filter::from(ScalarFilter {
             projection: ScalarProjection::Single(Arc::clone(self)),
             condition: ScalarCondition::In(values.into_iter().map(|i| i.into()).collect()),
+            mode: None,
         })
     }
 
@@ -147,6 +148,7 @@ impl ScalarCompare for ScalarFieldRef {
         Filter::from(ScalarFilter {
             projection: ScalarProjection::Single(Arc::clone(self)),
             condition: ScalarCondition::NotIn(values.into_iter().map(|i| i.into()).collect()),
+            mode: None,
         })
     }
 
@@ -158,6 +160,7 @@ impl ScalarCompare for ScalarFieldRef {
         Filter::from(ScalarFilter {
             projection: ScalarProjection::Single(Arc::clone(self)),
             condition: ScalarCondition::Equals(val.into()),
+            mode: None,
         })
     }
 
@@ -169,6 +172,7 @@ impl ScalarCompare for ScalarFieldRef {
         Filter::from(ScalarFilter {
             projection: ScalarProjection::Single(Arc::clone(self)),
             condition: ScalarCondition::NotEquals(val.into()),
+            mode: None,
         })
     }
 
@@ -180,6 +184,7 @@ impl ScalarCompare for ScalarFieldRef {
         Filter::from(ScalarFilter {
             projection: ScalarProjection::Single(Arc::clone(self)),
             condition: ScalarCondition::Contains(val.into()),
+            mode: None,
         })
     }
 
@@ -191,6 +196,7 @@ impl ScalarCompare for ScalarFieldRef {
         Filter::from(ScalarFilter {
             projection: ScalarProjection::Single(Arc::clone(self)),
             condition: ScalarCondition::NotContains(val.into()),
+            mode: None,
         })
     }
 
@@ -202,6 +208,7 @@ impl ScalarCompare for ScalarFieldRef {
         Filter::from(ScalarFilter {
             projection: ScalarProjection::Single(Arc::clone(self)),
             condition: ScalarCondition::StartsWith(val.into()),
+            mode: None,
         })
     }
 
@@ -213,6 +220,7 @@ impl ScalarCompare for ScalarFieldRef {
         Filter::from(ScalarFilter {
             projection: ScalarProjection::Single(Arc::clone(self)),
             condition: ScalarCondition::NotStartsWith(val.into()),
+            mode: None,
         })
     }
 
@@ -224,6 +232,7 @@ impl ScalarCompare for ScalarFieldRef {
         Filter::from(ScalarFilter {
             projection: ScalarProjection::Single(Arc::clone(self)),
             condition: ScalarCondition::EndsWith(val.into()),
+            mode: None,
         })
     }
 
@@ -235,6 +244,7 @@ impl ScalarCompare for ScalarFieldRef {
         Filter::from(ScalarFilter {
             projection: ScalarProjection::Single(Arc::clone(self)),
             condition: ScalarCondition::NotEndsWith(val.into()),
+            mode: None,
         })
     }
 
@@ -246,6 +256,7 @@ impl ScalarCompare for ScalarFieldRef {
         Filter::from(ScalarFilter {
             projection: ScalarProjection::Single(Arc::clone(self)),
             condition: ScalarCondition::LessThan(val.into()),
+            mode: None,
         })
     }
 
@@ -257,6 +268,7 @@ impl ScalarCompare for ScalarFieldRef {
         Filter::from(ScalarFilter {
             projection: ScalarProjection::Single(Arc::clone(self)),
             condition: ScalarCondition::LessThanOrEquals(val.into()),
+            mode: None,
         })
     }
 
@@ -268,6 +280,7 @@ impl ScalarCompare for ScalarFieldRef {
         Filter::from(ScalarFilter {
             projection: ScalarProjection::Single(Arc::clone(self)),
             condition: ScalarCondition::GreaterThan(val.into()),
+            mode: None,
         })
     }
 
@@ -279,6 +292,7 @@ impl ScalarCompare for ScalarFieldRef {
         Filter::from(ScalarFilter {
             projection: ScalarProjection::Single(Arc::clone(self)),
             condition: ScalarCondition::GreaterThanOrEquals(val.into()),
+            mode: None,
         })
     }
 }
@@ -292,6 +306,7 @@ impl ScalarCompare for ModelProjection {
         Filter::from(ScalarFilter {
             projection: ScalarProjection::Compound(self.scalar_fields().collect()),
             condition: ScalarCondition::In(values.into_iter().map(|i| i.into()).collect()),
+            mode: None,
         })
     }
 
@@ -303,6 +318,7 @@ impl ScalarCompare for ModelProjection {
         Filter::from(ScalarFilter {
             projection: ScalarProjection::Compound(self.scalar_fields().collect()),
             condition: ScalarCondition::NotIn(values.into_iter().map(|i| i.into()).collect()),
+            mode: None,
         })
     }
 
@@ -314,6 +330,7 @@ impl ScalarCompare for ModelProjection {
         Filter::from(ScalarFilter {
             projection: ScalarProjection::Compound(self.scalar_fields().collect()),
             condition: ScalarCondition::Equals(val.into()),
+            mode: None,
         })
     }
 
@@ -325,6 +342,7 @@ impl ScalarCompare for ModelProjection {
         Filter::from(ScalarFilter {
             projection: ScalarProjection::Compound(self.scalar_fields().collect()),
             condition: ScalarCondition::NotEquals(val.into()),
+            mode: None,
         })
     }
 
@@ -336,6 +354,7 @@ impl ScalarCompare for ModelProjection {
         Filter::from(ScalarFilter {
             projection: ScalarProjection::Compound(self.scalar_fields().collect()),
             condition: ScalarCondition::Contains(val.into()),
+            mode: None,
         })
     }
 
@@ -347,6 +366,7 @@ impl ScalarCompare for ModelProjection {
         Filter::from(ScalarFilter {
             projection: ScalarProjection::Compound(self.scalar_fields().collect()),
             condition: ScalarCondition::NotContains(val.into()),
+            mode: None,
         })
     }
 
@@ -358,6 +378,7 @@ impl ScalarCompare for ModelProjection {
         Filter::from(ScalarFilter {
             projection: ScalarProjection::Compound(self.scalar_fields().collect()),
             condition: ScalarCondition::StartsWith(val.into()),
+            mode: None,
         })
     }
 
@@ -369,6 +390,7 @@ impl ScalarCompare for ModelProjection {
         Filter::from(ScalarFilter {
             projection: ScalarProjection::Compound(self.scalar_fields().collect()),
             condition: ScalarCondition::NotStartsWith(val.into()),
+            mode: None,
         })
     }
 
@@ -380,6 +402,7 @@ impl ScalarCompare for ModelProjection {
         Filter::from(ScalarFilter {
             projection: ScalarProjection::Compound(self.scalar_fields().collect()),
             condition: ScalarCondition::EndsWith(val.into()),
+            mode: None,
         })
     }
 
@@ -391,6 +414,7 @@ impl ScalarCompare for ModelProjection {
         Filter::from(ScalarFilter {
             projection: ScalarProjection::Compound(self.scalar_fields().collect()),
             condition: ScalarCondition::NotEndsWith(val.into()),
+            mode: None,
         })
     }
 
@@ -402,6 +426,7 @@ impl ScalarCompare for ModelProjection {
         Filter::from(ScalarFilter {
             projection: ScalarProjection::Compound(self.scalar_fields().collect()),
             condition: ScalarCondition::LessThan(val.into()),
+            mode: None,
         })
     }
 
@@ -413,6 +438,7 @@ impl ScalarCompare for ModelProjection {
         Filter::from(ScalarFilter {
             projection: ScalarProjection::Compound(self.scalar_fields().collect()),
             condition: ScalarCondition::LessThanOrEquals(val.into()),
+            mode: None,
         })
     }
 
@@ -424,6 +450,7 @@ impl ScalarCompare for ModelProjection {
         Filter::from(ScalarFilter {
             projection: ScalarProjection::Compound(self.scalar_fields().collect()),
             condition: ScalarCondition::GreaterThan(val.into()),
+            mode: None,
         })
     }
 
@@ -435,6 +462,7 @@ impl ScalarCompare for ModelProjection {
         Filter::from(ScalarFilter {
             projection: ScalarProjection::Compound(self.scalar_fields().collect()),
             condition: ScalarCondition::GreaterThanOrEquals(val.into()),
+            mode: None,
         })
     }
 }
