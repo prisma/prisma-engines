@@ -1,4 +1,5 @@
 use super::Connector;
+use crate::error::ConnectorError;
 use crate::{ConnectorCapability, NativeTypeConstructor, NativeTypeInstance};
 use native_types::NativeType;
 

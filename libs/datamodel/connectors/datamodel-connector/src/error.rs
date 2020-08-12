@@ -1,29 +1,23 @@
-use crate::datamodel::ast::Span;
 use colored::Colorize;
 use regex::internal::Input;
 use thiserror::Error;
+use crate::scalars::ScalarType;
 
 #[rustfmt::skip]
 /// Enum for different errors which can happen during parsing or validation.
 #[derive(Debug, Error, Clone, PartialEq)]
 pub enum ConnectorError {
-    #[error("Argument \"{}\" is missing.", argument_name)]
-    ArgumentNotFound {
-        argument_name: string,
-        span: datamodel::ast::Span,
-    },
 
     #[error(
-        "Attribute \"@{}\" takes {} arguments, but received {}.",
-        directive_name,
+        "Native type \"{}\" takes {} arguments, but received {}.",
+        native_type,
         required_count,
         given_count
     )]
     ArgumentCountMissmatch {
-        directive_name: String,
+        native_type: String,
         required_count: usize,
         given_count: usize,
-        span: datamodel::ast::Span,
     },
 
     #[error(
@@ -31,53 +25,67 @@ pub enum ConnectorError {
     native_type,
     connector
     )]
-    TypeNotSupported {
+    UnknownTypeName {
         native_type: String,
         connector: String,
-        span: datamodel::ast::Span,
     },
+
+    #[error(
+    "Attribute \"@{}\" is defined twice.",
+    directive_name
+    )]
+    DuplicateDirective {
+        directive_name: String,
+    },
+
+    #[error(
+    "Native type \"{}\" is not compatible with declared field type {}, expected field type {}.",
+    native_type,
+    field_type,
+    expected_type
+    )]
+    IncompatibleType {
+        native_type: String,
+        field_type: String,
+        expected_type: String,
+    },
+
 }
 
 #[rustfmt::skip]
 impl ConnectorError {
-    pub fn new_argument_not_found_error(argument_name: string, span: datamodel::ast::Span) -> ConnectorError {
-        ConnectorError::ArgumentNotFound {
-            argument_name: String::from(argument_name),
-            span,
-        }
-    }
 
-    pub fn new_type_not_supported_error(native_type: string, connector: string, span: datamodel::ast::Span) -> ConnectorError {
-        ConnectorError::TypeNotSupported {
+    pub fn new_type_name_unknown_error(native_type: string, connector: string) -> ConnectorError {
+        ConnectorError::UnknownTypeName {
             native_type: String::from(native_type),
             connector: String::from(connector),
-            span,
         }
     }
 
     pub fn new_argument_count_mismatch_error(
-        directive_name: string,
+        native_type: string,
         required_count: usize,
         given_count: usize,
-        span: datamodel::ast::Span,
     ) -> ConnectorError {
         ConnectorError::ArgumentCountMissmatch {
-            directive_name: String::from(directive_name),
+            native_type: String::from(native_type),
             required_count,
             given_count,
-            span,
         }
     }
 
-    pub fn span(&self) -> datamodel::ast::Span {
-        match self {
-            ConnectorError::ArgumentNotFound { span, .. } => *span,
-            ConnectorError::ArgumentCountMissmatch { span, .. } => *span,
-            ConnectorError::TypeNotSupported { span, .. } => *span,
+    pub fn new_duplicate_directive_error(directive_name: &str) -> ConnectorError {
+        ConnectorError::DuplicateDirective {
+            directive_name: String::from(directive_name),
         }
     }
 
-    pub fn description(&self) -> String {
-        format!("{}", self)
+    pub fn new_incompatible_native_type_error(native_type: &str, field_type: ScalarType, expected_type: ScalarType) -> ConnectorError {
+        ConnectorError::IncompatibleType {
+            native_type: String::from(native_type),
+            field_type: field_type.to_string(),
+            expected_type: expected_type.to_string(),
+        }
     }
+
 }

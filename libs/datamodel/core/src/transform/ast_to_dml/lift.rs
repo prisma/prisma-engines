@@ -5,7 +5,8 @@ use crate::{
     error::{DatamodelError, ErrorCollection},
     load_sources, DatasourcePreviewFeatures, Field, FieldType, ScalarType,
 };
-use datamodel_connector::Connector;
+use datamodel_connector::error::ConnectorError;
+use datamodel_connector::{Connector, NativeTypeInstance};
 use sql_datamodel_connector::{PostgresDatamodelConnector, SqlDatamodelConnectors};
 use std::collections::HashMap;
 
@@ -220,10 +221,20 @@ impl<'a> LiftAstToDml<'a> {
                 prefix.push_str(datasource_name);
                 prefix.push_str(".");
 
-                let type_specification = ast_field
+                let mut type_specifications = ast_field
                     .directives
                     .iter()
-                    .find(|dir| dir.name.name.starts_with(&prefix)); // we use find because there should be at max 1.
+                    .filter(|dir| dir.name.name.starts_with(&prefix));
+
+                let type_specification = type_specifications.next();
+
+                if type_specifications.count() > 1 {
+                    return Err(DatamodelError::new_duplicate_directive_error(
+                        &prefix,
+                        type_specification.span,
+                    ));
+                }
+
                 let name = type_specification.map(|dir| dir.name.name.trim_start_matches(&prefix));
                 let args = type_specification
                     .map(|dir| {
@@ -236,7 +247,7 @@ impl<'a> LiftAstToDml<'a> {
                     })
                     .unwrap_or(vec![]);
 
-                if let Some(x) = name.and_then(|ts| connector.parse_native_type(&ts, args)) {
+                if let Some(x) = name.and_then(|ts| -> NativeTypeInstance connector.parse_native_type(&ts, args, scalar_type)?) {
                     let field_type = dml::FieldType::NativeType(scalar_type, x);
                     Ok((field_type, vec![]))
                 } else {

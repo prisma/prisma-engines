@@ -190,7 +190,7 @@ impl Connector for MySqlDatamodelConnector {
             MySqlType::JSON => (JSON_TYPE_NAME, vec![]),
 
             _ => {
-                return Err(ConnectorError::new_type_not_supported_error(
+                return Err(ConnectorError::new_type_name_unknown_error(
                     native_type.clone(),
                     "MySql",
                     Span::from_pest(), // todo carmen ??

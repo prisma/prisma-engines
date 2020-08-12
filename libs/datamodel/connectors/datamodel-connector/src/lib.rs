@@ -9,6 +9,7 @@ pub use combined_connector::CombinedConnector;
 pub use native_type_constructor::NativeTypeConstructor;
 use native_types::NativeType;
 use serde::de::DeserializeOwned;
+use crate::scalars::ScalarType;
 
 pub trait Connector: Send + Sync {
     fn capabilities(&self) -> &Vec<ConnectorCapability>;
@@ -28,13 +29,10 @@ pub trait Connector: Send + Sync {
             .unwrap()
     }
 
-    // TODO carmen: This should return a Result<NativeTypeInstance, ConnectorError> instead.
-    // possible errors: unknown type name, wrong number of arguments, declared field type is not compatible with native type
     /// This function is used during Schema parsing to calculate the concrete native type.
     /// This powers the use of native types for QE + ME.
-    fn parse_native_type(&self, name: &str, args: Vec<u32>) -> Result<NativeTypeInstance, ConnectorError>;
+    fn parse_native_type(&self, name: &str, args: Vec<u32>, scalar_type: ScalarType) -> Result<NativeTypeInstance, ConnectorError>;
 
-    // TODO carmen: This should return a Result<NativeTypeInstance, ConnectorError> instead.
     /// This function is used during introspection to turn an introspected native type into an instance that can be put into the Prisma schema.
     /// powers IE
     fn introspect_native_type(&self, native_type: Box<dyn NativeType>) -> Result<NativeTypeInstance, ConnectorError>;

@@ -1,4 +1,5 @@
 use super::DatamodelError;
+use datamodel_connector::error::ConnectorError;
 
 /// Represents a list of validation or parser errors.
 ///
