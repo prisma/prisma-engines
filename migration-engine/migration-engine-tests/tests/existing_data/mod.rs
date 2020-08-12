@@ -1207,7 +1207,7 @@ async fn primary_key_migrations_do_not_cause_data_loss(api: &TestApi) -> TestRes
 
 //Fixme try out transaction around the ddl to prevent in between state
 
-#[test_each_connector(capabilities("enums"))]
+#[test_each_connector(capabilities("enums"), log = "DEBUG")]
 async fn failing_enum_migrations_should_not_be_partially_applied(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Cat {
@@ -1247,12 +1247,17 @@ async fn failing_enum_migrations_should_not_be_partially_applied(api: &TestApi) 
         }
     "#;
 
-    //Fixme this should warn but we still want to execute
     api.infer_apply(dm2)
         .migration_id(Some("remove-used-variant"))
+        .force(Some(true))
         .send()
-        .await?
-        .assert_executable();
+        .await?;
+
+    api.infer_apply(dm2)
+        .migration_id(Some("remove-used-variant_again"))
+        .force(Some(true))
+        .send()
+        .await?;
 
     // Assertions
     {
