@@ -231,10 +231,10 @@ class ExtendedRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase
   // MySql is case insensitive and Postgres case sensitive
 
   "MySql 1 level m-relation filter" should "work for `every`, `some` and `none`" taggedAs (IgnorePostgres, IgnoreMongo) in {
-    server.query(query = """{artists(where:{Albums: { some: { Title: { starts_with: "album" }}}}){ Name }}""", project = project).toString should be(
+    server.query(query = """{artists(where:{Albums: { some: { Title: { startsWith: "album" }}}}){ Name }}""", project = project).toString should be(
       """{"data":{"artists":[{"Name":"CompleteArtist"},{"Name":"CompleteArtist2"},{"Name":"CompleteArtistWith2Albums"}]}}""")
 
-    server.query(query = """{artists(where:{Albums: { some: {Title: { starts_with: "t" }}}}){Name}}""", project = project).toString should be(
+    server.query(query = """{artists(where:{Albums: { some: {Title: { startsWith: "t" }}}}){Name}}""", project = project).toString should be(
       """{"data":{"artists":[{"Name":"ArtistWithOneAlbumWithoutTracks"}]}}""")
 
     server.query(query = """{artists(where:{Albums: { every: { Title: { contains: "album" }}}}){Name}}""", project = project).toString should be(
@@ -252,10 +252,10 @@ class ExtendedRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase
 
   "Postgres 1 level m-relation filter" should "work for `some`" taggedAs (IgnoreMySql) in {
     server
-      .query(query = """{artists(where:{Albums: { some: {Title: { starts_with: "Album" }}}}, orderBy: { id: asc }){Name}}""", project = project)
+      .query(query = """{artists(where:{Albums: { some: {Title: { startsWith: "Album" }}}}, orderBy: { id: asc }){Name}}""", project = project)
       .toString should be("""{"data":{"artists":[{"Name":"CompleteArtist"},{"Name":"CompleteArtist2"},{"Name":"CompleteArtistWith2Albums"}]}}""")
 
-    server.query(query = """{artists(where:{Albums: { some:{Title: { starts_with: "T" }}}}){Name}}""", project = project).toString should be(
+    server.query(query = """{artists(where:{Albums: { some:{Title: { startsWith: "T" }}}}){Name}}""", project = project).toString should be(
       """{"data":{"artists":[{"Name":"ArtistWithOneAlbumWithoutTracks"}]}}""")
   }
 
@@ -343,7 +343,7 @@ class ExtendedRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase
       """{"data":{"artists":[{"Name":"CompleteArtist"},{"Name":"ArtistWithoutAlbums"},{"Name":"CompleteArtist2"}]}}""")
 
     server
-      .query(query = """{artists(where: { Albums: { none: { Tracks: { every: { Name: { starts_with: "Track" }}}}}}){Name}}""", project = project)
+      .query(query = """{artists(where: { Albums: { none: { Tracks: { every: { Name: { startsWith: "Track" }}}}}}){Name}}""", project = project)
       .toString should be("""{"data":{"artists":[{"Name":"ArtistWithoutAlbums"}]}}""")
 
     // none|none

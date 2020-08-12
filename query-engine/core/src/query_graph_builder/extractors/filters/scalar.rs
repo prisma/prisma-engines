@@ -36,13 +36,13 @@ pub fn parse(
 
         "equals" if reverse => field.not_equals(as_prisma_value(input)?),
         "contains" if reverse => field.not_contains(as_prisma_value(input)?),
-        "starts_with" if reverse => field.not_starts_with(as_prisma_value(input)?),
-        "ends_with" if reverse => field.not_ends_with(as_prisma_value(input)?),
+        "startsWith" if reverse => field.not_starts_with(as_prisma_value(input)?),
+        "endsWith" if reverse => field.not_ends_with(as_prisma_value(input)?),
 
         "equals" => field.equals(as_prisma_value(input)?),
         "contains" => field.contains(as_prisma_value(input)?),
-        "starts_with" => field.starts_with(as_prisma_value(input)?),
-        "ends_with" => field.ends_with(as_prisma_value(input)?),
+        "startsWith" => field.starts_with(as_prisma_value(input)?),
+        "endsWith" => field.ends_with(as_prisma_value(input)?),
 
         "lt" if reverse => field.greater_than_or_equals(as_prisma_value(input)?),
         "gt" if reverse => field.less_than_or_equals(as_prisma_value(input)?),

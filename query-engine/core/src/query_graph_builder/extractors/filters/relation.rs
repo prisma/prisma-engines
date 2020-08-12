@@ -16,8 +16,8 @@ pub fn parse(filter_key: &str, field: &RelationFieldRef, input: ParsedInputValue
         // One-relation filters
         ("is", Some(value)) => field.to_one_related(extract_filter(value, &field.related_model())?),
         ("is", None) => field.one_relation_is_null(),
-        ("is_not", Some(value)) => field.no_related(extract_filter(value, &field.related_model())?),
-        ("is_not", None) => Filter::not(vec![field.one_relation_is_null()]),
+        ("isNot", Some(value)) => field.no_related(extract_filter(value, &field.related_model())?),
+        ("isNot", None) => Filter::not(vec![field.one_relation_is_null()]),
 
         _ => unreachable!(),
     })

@@ -29,7 +29,7 @@ class UpdateManySpec extends FlatSpec with Matchers with ApiSpecBase {
         |  updateManyTodoes(
         |    where: { title: { equals: "title1" }}
         |    data: { title: "updated title", opt: "test" }
-        |  ){
+        |  ) {
         |    count
         |  }
         |}

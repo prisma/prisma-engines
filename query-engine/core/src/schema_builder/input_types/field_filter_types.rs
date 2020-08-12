@@ -33,7 +33,7 @@ fn relation_filter_type(ctx: &mut BuilderContext, rf: &RelationFieldRef) -> Inpu
                 None,
             ),
             input_field(
-                "is_not",
+                "isNot",
                 InputType::opt(InputType::null(InputType::object(related_input_type))),
                 None,
             ),
@@ -123,8 +123,8 @@ fn string_filters(sf: &ScalarFieldRef) -> impl Iterator<Item = InputField> {
 
     vec![
         input_field("contains", mapped_type.clone(), None),
-        input_field("starts_with", mapped_type.clone(), None),
-        input_field("ends_with", mapped_type.clone(), None),
+        input_field("startsWith", mapped_type.clone(), None),
+        input_field("endsWith", mapped_type.clone(), None),
     ]
     .into_iter()
 }
