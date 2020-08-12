@@ -1,54 +1,24 @@
 use super::extract_filter;
-use crate::{ParsedInputMap, QueryGraphBuilderError, QueryGraphBuilderResult};
+use crate::{ParsedInputMap, ParsedInputValue, QueryGraphBuilderResult};
 use connector::{Filter, RelationCompare};
 use prisma_models::RelationFieldRef;
-use std::str::FromStr;
+use std::convert::TryInto;
 
-pub enum RelationFieldFilter {
-    Some,
-    None,
-    Every,
-    Is,
-    IsNot,
-}
+pub fn parse(filter_key: &str, field: &RelationFieldRef, input: ParsedInputValue) -> QueryGraphBuilderResult<Filter> {
+    let value: Option<ParsedInputMap> = input.try_into()?;
 
-impl RelationFieldFilter {
-    pub fn into_filter(
-        self,
-        field: RelationFieldRef,
-        value: Option<ParsedInputMap>,
-    ) -> QueryGraphBuilderResult<Filter> {
-        Ok(match (self, value) {
-            // Relation list filters
-            (Self::Some, Some(value)) => field.at_least_one_related(extract_filter(value, &field.related_model())?),
-            (Self::None, Some(value)) => field.no_related(extract_filter(value, &field.related_model())?),
-            (Self::Every, Some(value)) => field.every_related(extract_filter(value, &field.related_model())?),
+    Ok(match (filter_key, value) {
+        // Relation list filters
+        ("some", Some(value)) => field.at_least_one_related(extract_filter(value, &field.related_model())?),
+        ("none", Some(value)) => field.no_related(extract_filter(value, &field.related_model())?),
+        ("every", Some(value)) => field.every_related(extract_filter(value, &field.related_model())?),
 
-            // One-relation filters
-            (Self::Is, Some(value)) => field.to_one_related(extract_filter(value, &field.related_model())?),
-            (Self::Is, None) => field.one_relation_is_null(),
-            (Self::IsNot, Some(value)) => field.no_related(extract_filter(value, &field.related_model())?),
-            (Self::IsNot, None) => Filter::not(vec![field.one_relation_is_null()]),
+        // One-relation filters
+        ("is", Some(value)) => field.to_one_related(extract_filter(value, &field.related_model())?),
+        ("is", None) => field.one_relation_is_null(),
+        ("is_not", Some(value)) => field.no_related(extract_filter(value, &field.related_model())?),
+        ("is_not", None) => Filter::not(vec![field.one_relation_is_null()]),
 
-            _ => unreachable!(),
-        })
-    }
-}
-
-impl FromStr for RelationFieldFilter {
-    type Err = QueryGraphBuilderError;
-
-    fn from_str(s: &str) -> QueryGraphBuilderResult<Self> {
-        match s.to_lowercase().as_str() {
-            "some" => Ok(Self::Some),
-            "none" => Ok(Self::None),
-            "every" => Ok(Self::Every),
-            "is" => Ok(Self::Is),
-            "is_not" => Ok(Self::IsNot),
-            _ => Err(QueryGraphBuilderError::InputError(format!(
-                "{} is not a valid scalar filter operation",
-                s
-            ))),
-        }
-    }
+        _ => unreachable!(),
+    })
 }

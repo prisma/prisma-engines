@@ -64,7 +64,7 @@ fn scalar_filter_type(ctx: &mut BuilderContext, sf: &ScalarFieldRef) -> InputObj
     let object = Arc::new(init_input_object_type(name.clone()));
     ctx.cache_input_type(name, object.clone());
 
-    let fields = match sf.type_identifier {
+    let mut fields: Vec<_> = match sf.type_identifier {
         TypeIdentifier::String | TypeIdentifier::UUID => equality_filters(sf)
             .chain(inclusion_filters(sf))
             .chain(alphanumeric_filters(sf))
@@ -80,6 +80,12 @@ fn scalar_filter_type(ctx: &mut BuilderContext, sf: &ScalarFieldRef) -> InputObj
         TypeIdentifier::Enum(_) => equality_filters(sf).chain(inclusion_filters(sf)).collect(),
     };
 
+    fields.push(input_field(
+        "not",
+        InputType::opt(InputType::object(Arc::downgrade(&object))),
+        None,
+    ));
+
     object.set_fields(fields);
     Arc::downgrade(&object)
 }
@@ -87,11 +93,7 @@ fn scalar_filter_type(ctx: &mut BuilderContext, sf: &ScalarFieldRef) -> InputObj
 fn equality_filters(sf: &ScalarFieldRef) -> impl Iterator<Item = InputField> {
     let mapped_type = map_optional_input_type(sf);
 
-    vec![
-        input_field("equals", mapped_type.clone(), None),
-        input_field("not_equals", mapped_type.clone(), None),
-    ]
-    .into_iter()
+    vec![input_field("equals", mapped_type.clone(), None)].into_iter()
 }
 
 fn inclusion_filters(sf: &ScalarFieldRef) -> impl Iterator<Item = InputField> {
@@ -101,11 +103,7 @@ fn inclusion_filters(sf: &ScalarFieldRef) -> impl Iterator<Item = InputField> {
         InputType::opt(InputType::null(InputType::list(map_required_input_type(sf))))
     };
 
-    vec![
-        input_field("in", mapped_type.clone(), None),
-        input_field("not_in", mapped_type.clone(), None),
-    ]
-    .into_iter()
+    vec![input_field("in", mapped_type.clone(), None)].into_iter()
 }
 
 fn alphanumeric_filters(sf: &ScalarFieldRef) -> impl Iterator<Item = InputField> {
@@ -125,11 +123,8 @@ fn string_filters(sf: &ScalarFieldRef) -> impl Iterator<Item = InputField> {
 
     vec![
         input_field("contains", mapped_type.clone(), None),
-        input_field("not_contains", mapped_type.clone(), None),
         input_field("starts_with", mapped_type.clone(), None),
-        input_field("not_starts_with", mapped_type.clone(), None),
         input_field("ends_with", mapped_type.clone(), None),
-        input_field("not_ends_with", mapped_type.clone(), None),
     ]
     .into_iter()
 }

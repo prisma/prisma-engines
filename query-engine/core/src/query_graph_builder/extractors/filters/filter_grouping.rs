@@ -1,13 +1,13 @@
 use crate::{QueryGraphBuilderError, QueryGraphBuilderResult};
 use std::str::FromStr;
 
-pub enum NestedFilterOperation {
+pub enum FilterGrouping {
     And,
     Or,
     Not,
 }
 
-impl FromStr for NestedFilterOperation {
+impl FromStr for FilterGrouping {
     type Err = QueryGraphBuilderError;
 
     fn from_str(s: &str) -> QueryGraphBuilderResult<Self> {
@@ -16,7 +16,7 @@ impl FromStr for NestedFilterOperation {
             "or" => Ok(Self::Or),
             "not" => Ok(Self::Not),
             _ => Err(QueryGraphBuilderError::InputError(format!(
-                "{} is not a valid nested filter operation",
+                "{} is not a valid grouping filter operation",
                 s
             ))),
         }

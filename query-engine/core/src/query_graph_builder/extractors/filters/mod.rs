@@ -1,10 +1,6 @@
-mod nested;
+mod filter_grouping;
 mod relation;
 mod scalar;
-
-use nested::*;
-use relation::*;
-use scalar::*;
 
 use super::utils;
 use crate::{
@@ -12,17 +8,21 @@ use crate::{
     QueryGraphBuilderError, QueryGraphBuilderResult,
 };
 use connector::{filter::Filter, ScalarCompare};
+use filter_grouping::*;
 use prisma_models::{Field, ModelRef, PrismaValue, ScalarFieldRef};
 use std::{convert::TryInto, str::FromStr};
 
-/// Extracts a filter for a unique selector that selects exactly one record.
+/// Extracts a filter for a unique selector, i.e. a filter that selects exactly one record.
 pub fn extract_unique_filter(value_map: ParsedInputMap, model: &ModelRef) -> QueryGraphBuilderResult<Filter> {
     let filters = value_map
         .into_iter()
         .map(|(field_name, value): (String, ParsedInputValue)| {
             // Always try to resolve regular fields first. If that fails, try to resolve compound fields.
             match model.fields().find_from_scalar(&field_name) {
-                Ok(field) => ScalarFieldFilter::Equals.into_filter(&field, value.try_into()?),
+                Ok(field) => {
+                    let value: PrismaValue = value.try_into()?;
+                    Ok(field.equals(value))
+                }
                 Err(_) => utils::resolve_compound_field(&field_name, &model)
                     .ok_or(QueryGraphBuilderError::AssertionError(format!(
                         "Unable to resolve field {} to a field or set of scalar fields on model {}",
@@ -55,8 +55,9 @@ pub fn extract_filter(value_map: ParsedInputMap, model: &ModelRef) -> QueryGraph
     let filters = value_map
         .into_iter()
         .map(|(key, value): (String, ParsedInputValue)| {
-            // 2 possibilities: Either a nested filter (and, or, not) with a vector, or a field name with another object behind.
-            if let Ok(nested) = NestedFilterOperation::from_str(&key) {
+            // 2 possibilities: Either a filter group (and, or, not) with a vector, or a field name with a filter object behind.
+            // todo not true anymore
+            if let Ok(nested) = FilterGrouping::from_str(&key) {
                 let value: QueryGraphBuilderResult<Vec<Filter>> = match value {
                     ParsedInputValue::List(values) => values
                         .into_iter()
@@ -70,9 +71,9 @@ pub fn extract_filter(value_map: ParsedInputMap, model: &ModelRef) -> QueryGraph
                 };
 
                 value.map(|value| match nested {
-                    NestedFilterOperation::And => Filter::and(value),
-                    NestedFilterOperation::Or => Filter::or(value),
-                    NestedFilterOperation::Not => Filter::not(value),
+                    FilterGrouping::And => Filter::and(value),
+                    FilterGrouping::Or => Filter::or(value),
+                    FilterGrouping::Not => Filter::not(value),
                 })
             } else {
                 let field = model.fields().find_from_all(&key)?;
@@ -81,17 +82,8 @@ pub fn extract_filter(value_map: ParsedInputMap, model: &ModelRef) -> QueryGraph
                 let filters = filter_map
                     .into_iter()
                     .map(|(k, v)| match field {
-                        Field::Relation(rf) => {
-                            let filter = RelationFieldFilter::from_str(&k).unwrap();
-
-                            filter.into_filter(rf.clone(), v.try_into().unwrap())
-                        }
-                        Field::Scalar(sf) => {
-                            let filter = ScalarFieldFilter::from_str(&k).unwrap();
-                            let value: PrismaValue = v.try_into().unwrap();
-
-                            filter.into_filter(sf, value)
-                        }
+                        Field::Relation(rf) => relation::parse(&k, rf, v),
+                        Field::Scalar(sf) => scalar::parse(&k, sf, v, false),
                     })
                     .collect::<QueryGraphBuilderResult<_>>()?;
 

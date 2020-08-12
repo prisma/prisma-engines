@@ -1,75 +1,68 @@
-use crate::{QueryGraphBuilderError, QueryGraphBuilderResult};
+use crate::{ParsedInputMap, ParsedInputValue, QueryGraphBuilderError, QueryGraphBuilderResult};
 use connector::{Filter, ScalarCompare};
 use prisma_models::{PrismaValue, ScalarFieldRef};
-use std::str::FromStr;
+use std::convert::TryInto;
 
-pub enum ScalarFieldFilter {
-    Equals,
-    NotEquals,
-    In,
-    NotIn,
-    Not,
-    Lt,
-    Lte,
-    Gt,
-    Gte,
-    Contains,
-    NotContains,
-    StartsWith,
-    NotStartsWith,
-    EndsWith,
-    NotEndsWith,
-}
+pub fn parse(
+    filter_key: &str,
+    field: &ScalarFieldRef,
+    input: ParsedInputValue,
+    reverse: bool,
+) -> QueryGraphBuilderResult<Filter> {
+    let filter = match filter_key.to_lowercase().as_str() {
+        "not" => {
+            let inner_object: ParsedInputMap = input.try_into()?;
 
-impl ScalarFieldFilter {
-    pub fn into_filter(self, field: &ScalarFieldRef, value: PrismaValue) -> QueryGraphBuilderResult<Filter> {
-        Ok(match (self, value) {
-            (Self::In, PrismaValue::Null(hint)) => field.equals(PrismaValue::Null(hint)),
-            (Self::In, PrismaValue::List(values)) => field.is_in(values),
-            (Self::NotIn, PrismaValue::Null(hint)) => field.not_equals(PrismaValue::Null(hint)),
-            (Self::NotIn, PrismaValue::List(values)) => field.not_in(values),
-            (Self::Not, val) => field.not_equals(val),
-            (Self::Lt, val) => field.less_than(val),
-            (Self::Lte, val) => field.less_than_or_equals(val),
-            (Self::Gt, val) => field.greater_than(val),
-            (Self::Gte, val) => field.greater_than_or_equals(val),
-            (Self::Contains, val) => field.contains(val),
-            (Self::NotContains, val) => field.not_contains(val),
-            (Self::StartsWith, val) => field.starts_with(val),
-            (Self::NotStartsWith, val) => field.not_starts_with(val),
-            (Self::EndsWith, val) => field.ends_with(val),
-            (Self::NotEndsWith, val) => field.not_ends_with(val),
-            (Self::Equals, val) => field.equals(val),
-            (Self::NotEquals, val) => field.not_equals(val),
-            (_, _) => unreachable!(),
-        })
-    }
-}
+            let filters = inner_object
+                .into_iter()
+                .map(|(k, v)| parse(&k, field, v, !reverse))
+                .collect::<QueryGraphBuilderResult<Vec<_>>>()?;
 
-impl FromStr for ScalarFieldFilter {
-    type Err = QueryGraphBuilderError;
-
-    fn from_str(s: &str) -> QueryGraphBuilderResult<Self> {
-        match s.to_lowercase().as_str() {
-            "in" => Ok(Self::In),
-            "not_in" => Ok(Self::NotIn),
-            "not" => Ok(Self::Not),
-            "lt" => Ok(Self::Lt),
-            "lte" => Ok(Self::Lte),
-            "gt" => Ok(Self::Gt),
-            "gte" => Ok(Self::Gte),
-            "contains" => Ok(Self::Contains),
-            "not_contains" => Ok(Self::NotContains),
-            "starts_with" => Ok(Self::StartsWith),
-            "not_starts_with" => Ok(Self::NotStartsWith),
-            "ends_with" => Ok(Self::EndsWith),
-            "not_ends_with" => Ok(Self::NotEndsWith),
-            "equals" => Ok(Self::Equals),
-            "not_equals" => Ok(Self::NotEquals),
-            _ => Err(QueryGraphBuilderError::InputError(format!(
-                "{} is not a valid scalar filter operation",
-                s
-            ))),
+            Filter::and(filters)
         }
-    }
+
+        "in" => {
+            let value: PrismaValue = input.try_into()?;
+            match value {
+                PrismaValue::Null(_) if reverse => field.not_equals(value),
+                PrismaValue::List(values) if reverse => field.is_in(values),
+
+                PrismaValue::Null(_) => field.equals(value),
+                PrismaValue::List(values) => field.not_in(values),
+
+                _ => unreachable!(), // Validation guarantees this.
+            }
+        }
+
+        "equals" if reverse => field.not_equals(as_prisma_value(input)?),
+        "contains" if reverse => field.not_contains(as_prisma_value(input)?),
+        "starts_with" if reverse => field.not_ends_with(as_prisma_value(input)?),
+        "ends_with" if reverse => field.not_ends_with(as_prisma_value(input)?),
+
+        "equals" => field.not_equals(as_prisma_value(input)?),
+        "contains" => field.contains(as_prisma_value(input)?),
+        "starts_with" => field.starts_with(as_prisma_value(input)?),
+        "ends_with" => field.ends_with(as_prisma_value(input)?),
+
+        "lt" if reverse => field.greater_than_or_equals(as_prisma_value(input)?),
+        "gt" if reverse => field.less_than_or_equals(as_prisma_value(input)?),
+        "lte" if reverse => field.greater_than(as_prisma_value(input)?),
+        "gte" if reverse => field.less_than(as_prisma_value(input)?),
+
+        "lt" => field.greater_than_or_equals(as_prisma_value(input)?),
+        "gt" => field.less_than_or_equals(as_prisma_value(input)?),
+        "lte" => field.greater_than(as_prisma_value(input)?),
+        "gte" => field.less_than(as_prisma_value(input)?),
+
+        _ => Err(QueryGraphBuilderError::InputError(format!(
+            "{} is not a valid scalar filter operation",
+            filter_key
+        )))?,
+    };
+
+    Ok(filter)
+}
+
+fn as_prisma_value(input: ParsedInputValue) -> QueryGraphBuilderResult<PrismaValue> {
+    Ok(input.try_into()?)
 }
