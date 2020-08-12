@@ -5,11 +5,11 @@ pub mod error;
 pub mod scalars;
 
 use crate::error::ConnectorError;
+use crate::scalars::ScalarType;
 pub use combined_connector::CombinedConnector;
 pub use native_type_constructor::NativeTypeConstructor;
 use native_types::NativeType;
 use serde::de::DeserializeOwned;
-use crate::scalars::ScalarType;
 
 pub trait Connector: Send + Sync {
     fn capabilities(&self) -> &Vec<ConnectorCapability>;
@@ -31,7 +31,12 @@ pub trait Connector: Send + Sync {
 
     /// This function is used during Schema parsing to calculate the concrete native type.
     /// This powers the use of native types for QE + ME.
-    fn parse_native_type(&self, name: &str, args: Vec<u32>, scalar_type: ScalarType) -> Result<NativeTypeInstance, ConnectorError>;
+    fn parse_native_type(
+        &self,
+        name: &str,
+        args: Vec<u32>,
+        scalar_type: ScalarType,
+    ) -> Result<NativeTypeInstance, ConnectorError>;
 
     /// This function is used during introspection to turn an introspected native type into an instance that can be put into the Prisma schema.
     /// powers IE

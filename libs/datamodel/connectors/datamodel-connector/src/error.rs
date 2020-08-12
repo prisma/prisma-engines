@@ -1,7 +1,7 @@
+use crate::scalars::ScalarType;
 use colored::Colorize;
 use regex::internal::Input;
 use thiserror::Error;
-use crate::scalars::ScalarType;
 
 #[rustfmt::skip]
 /// Enum for different errors which can happen during parsing or validation.

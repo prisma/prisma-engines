@@ -117,7 +117,12 @@ impl Connector for PostgresDatamodelConnector {
         &self.constructors
     }
 
-    fn parse_native_type(&self, name: &str, args: Vec<u32>, scalar_type: ScalarType) -> Result<NativeTypeInstance, ConnectorError> {
+    fn parse_native_type(
+        &self,
+        name: &str,
+        args: Vec<u32>,
+        scalar_type: ScalarType,
+    ) -> Result<NativeTypeInstance, ConnectorError> {
         let constructor = self.find_native_type_constructor(name);
         let native_type = match name {
             SMALL_INT_TYPE_NAME => PostgresType::SmallInt,
@@ -143,13 +148,9 @@ impl Connector for PostgresDatamodelConnector {
                 if let Some(arg) = *args.first() {
                     PostgresType::Char(arg)
                 } else {
-                    return Err(ConnectorError::new_argument_count_mismatch_error(
-                        CHAR_TYPE_NAME,
-                        1,
-                        0,
-                    ));
+                    return Err(ConnectorError::new_argument_count_mismatch_error(CHAR_TYPE_NAME, 1, 0));
                 }
-            },
+            }
             TEXT_TYPE_NAME => PostgresType::Text,
             TIMESTAMP_TYPE_NAME => {
                 if let Some(arg) = *args.first() {
@@ -161,7 +162,7 @@ impl Connector for PostgresDatamodelConnector {
                         0,
                     ));
                 }
-            },
+            }
             TIMESTAMP_WITH_TIMEZONE_TYPE_NAME => {
                 if let Some(arg) = *args.first() {
                     PostgresType::TimestampWithTimeZone(arg as u8)
@@ -178,13 +179,9 @@ impl Connector for PostgresDatamodelConnector {
                 if let Some(arg) = *args.first() {
                     PostgresType::Time(arg as u8)
                 } else {
-                    return Err(ConnectorError::new_argument_count_mismatch_error(
-                        TIME_TYPE_NAME,
-                        1,
-                        0,
-                    ));
+                    return Err(ConnectorError::new_argument_count_mismatch_error(TIME_TYPE_NAME, 1, 0));
                 }
-            },
+            }
             TIME_WITH_TIMEZONE_TYPE_NAME => {
                 if let Some(arg) = *args.first() {
                     PostgresType::TimeWithTimeZone(arg as u8)
@@ -195,19 +192,15 @@ impl Connector for PostgresDatamodelConnector {
                         0,
                     ));
                 }
-            },
+            }
             BOOLEAN_TYPE_NAME => PostgresType::Boolean,
             BIT_TYPE_NAME => {
                 if let Some(arg) = *args.first() {
                     PostgresType::Bit(arg)
                 } else {
-                    return Err(ConnectorError::new_argument_count_mismatch_error(
-                        BIT_TYPE_NAME,
-                        1,
-                        0,
-                    ));
+                    return Err(ConnectorError::new_argument_count_mismatch_error(BIT_TYPE_NAME, 1, 0));
                 }
-            },
+            }
             VAR_BIT_TYPE_NAME => {
                 if let Some(arg) = *args.first() {
                     PostgresType::VarBit(arg)
@@ -218,7 +211,7 @@ impl Connector for PostgresDatamodelConnector {
                         0,
                     ));
                 }
-            },
+            }
             UUID_TYPE_NAME => PostgresType::UUID,
             JSON_TYPE_NAME => PostgresType::JSON,
             JSON_B_TYPE_NAME => PostgresType::JSONB,
@@ -226,9 +219,13 @@ impl Connector for PostgresDatamodelConnector {
         };
 
         // check for compatability with scalar type
-        let compatable_prisma_scalar_type = self.constructors.iter().find(|c|c.name == name)?.prisma_type;
+        let compatable_prisma_scalar_type = self.constructors.iter().find(|c| c.name == name)?.prisma_type;
         if compatable_prisma_scalar_type != scalar_type {
-            return Err(ConnectorError::new_incompatible_native_type_error("Postgres", scalar_type, compatable_prisma_scalar_type));
+            return Err(ConnectorError::new_incompatible_native_type_error(
+                "Postgres",
+                scalar_type,
+                compatable_prisma_scalar_type,
+            ));
         }
 
         match constructor {
