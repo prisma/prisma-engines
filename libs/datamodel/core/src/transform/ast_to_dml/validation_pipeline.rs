@@ -10,15 +10,11 @@ pub struct ValidationPipeline<'a> {
 }
 
 impl<'a> ValidationPipeline<'a> {
-    pub fn new(
-        sources: &'a [configuration::Datasource],
-        generators: &'a [configuration::Generator],
-    ) -> ValidationPipeline<'a> {
+    pub fn new(sources: &'a [configuration::Datasource]) -> ValidationPipeline<'a> {
         let source = sources.first();
-        let generator = generators.first();
         ValidationPipeline {
             lifter: LiftAstToDml::new(source),
-            validator: Validator::new(source, generator),
+            validator: Validator::new(source),
             standardiser: Standardiser::new(),
         }
     }
