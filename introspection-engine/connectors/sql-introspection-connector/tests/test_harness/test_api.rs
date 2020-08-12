@@ -2,12 +2,15 @@ use super::misc_helpers::*;
 use datamodel::Datamodel;
 use introspection_connector::{DatabaseMetadata, IntrospectionConnector, Version};
 use quaint::{
-    prelude::{Queryable, SqlFamily},
+    prelude::{ConnectionInfo, Queryable, SqlFamily},
     single::Quaint,
 };
 use sql_introspection_connector::SqlIntrospectionConnector;
+use sql_schema_describer::{SqlSchema, SqlSchemaDescriberBackend};
 use std::sync::Arc;
 use test_setup::*;
+
+pub type TestResult = Result<(), anyhow::Error>;
 
 pub struct TestApi {
     db_name: &'static str,
@@ -24,6 +27,36 @@ impl TestApi {
 
     pub fn database(&self) -> &Arc<dyn Queryable + Send + Sync + 'static> {
         &self.database
+    }
+
+    pub async fn describe_schema(&self) -> anyhow::Result<SqlSchema> {
+        match &self.connection_info {
+            ConnectionInfo::Mssql(_) => todo!("implement MSSQL"),
+            ConnectionInfo::Postgres(url) => {
+                let sql_schema = sql_schema_describer::postgres::SqlSchemaDescriber::new(Arc::clone(&self.database))
+                    .describe(url.schema())
+                    .await?;
+
+                Ok(sql_schema)
+            }
+            ConnectionInfo::Mysql(_url) => {
+                let sql_schema = sql_schema_describer::mysql::SqlSchemaDescriber::new(Arc::clone(&self.database))
+                    .describe(self.connection_info.schema_name())
+                    .await?;
+
+                Ok(sql_schema)
+            }
+            ConnectionInfo::Sqlite {
+                file_path: _,
+                db_name: _,
+            } => {
+                let sql_schema = sql_schema_describer::sqlite::SqlSchemaDescriber::new(Arc::clone(&self.database))
+                    .describe(self.connection_info.schema_name())
+                    .await?;
+
+                Ok(sql_schema)
+            }
+        }
     }
 
     pub async fn introspect(&self) -> String {

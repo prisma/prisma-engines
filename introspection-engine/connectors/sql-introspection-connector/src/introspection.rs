@@ -5,8 +5,8 @@ use crate::misc_helpers::{
 };
 use crate::version_checker::VersionChecker;
 use crate::SqlError;
-use datamodel::{dml, Datamodel, Field, FieldType, Model};
-use sql_schema_describer::SqlSchema;
+use datamodel::{dml, walkers::find_model_by_db_name, Datamodel, Field, FieldType, Model, RelationField};
+use sql_schema_describer::{SqlSchema, Table};
 use tracing::debug;
 
 pub fn introspect(
@@ -96,18 +96,7 @@ pub fn introspect(
         .iter()
         .filter(|table| is_prisma_1_point_1_or_2_join_table(&table) || is_prisma_1_point_0_join_table(&table))
     {
-        if let (Some(f), Some(s)) = (table.foreign_keys.get(0), table.foreign_keys.get(1)) {
-            let is_self_relation = f.referenced_table == s.referenced_table;
-
-            fields_to_be_added.push((
-                s.referenced_table.clone(),
-                calculate_many_to_many_field(f, table.name[1..].to_string(), is_self_relation),
-            ));
-            fields_to_be_added.push((
-                f.referenced_table.clone(),
-                calculate_many_to_many_field(s, table.name[1..].to_string(), is_self_relation),
-            ));
-        }
+        calculate_fields_for_prisma_join_table(&table, &mut fields_to_be_added, data_model)
     }
 
     for (model, field) in fields_to_be_added {
@@ -115,6 +104,43 @@ pub fn introspect(
     }
 
     Ok(())
+}
+
+fn calculate_fields_for_prisma_join_table(
+    join_table: &Table,
+    fields_to_be_added: &mut Vec<(String, RelationField)>,
+    data_model: &mut Datamodel,
+) {
+    if let (Some(fk_a), Some(fk_b)) = (join_table.foreign_keys.get(0), join_table.foreign_keys.get(1)) {
+        let is_self_relation = fk_a.referenced_table == fk_b.referenced_table;
+
+        for (fk, opposite_fk) in &[(fk_a, fk_b), (fk_b, fk_a)] {
+            let referenced_model = find_model_by_db_name(&data_model, &fk.referenced_table)
+                .expect("Could not find model referenced in relation table.");
+
+            let mut existing_relations = fields_to_be_added
+                .iter()
+                .filter(|(model_name, _)| model_name.as_str() == referenced_model.name())
+                .map(|(_, relation_field)| relation_field.relation_info.name.as_str())
+                .chain(
+                    referenced_model
+                        .relation_fields()
+                        .map(|relation_field| relation_field.relation_name()),
+                );
+
+            // Avoid duplicate field names, in case a generated relation field name is the same as the M2M relation table's name.
+            let relation_name = &join_table.name[1..];
+            let relation_name = if existing_relations.any(|existing_relation| existing_relation == relation_name) {
+                format!("{}Table", relation_name)
+            } else {
+                relation_name.to_owned()
+            };
+
+            let field = calculate_many_to_many_field(opposite_fk, relation_name, is_self_relation);
+
+            fields_to_be_added.push((referenced_model.name().to_owned(), field));
+        }
+    }
 }
 
 trait Dedup<T: PartialEq + Clone> {
