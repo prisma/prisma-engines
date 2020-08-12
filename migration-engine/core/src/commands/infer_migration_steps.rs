@@ -91,9 +91,11 @@ impl<'a> MigrationCommand for InferMigrationStepsCommand<'a> {
 
                 // The database migration since the last non-watch migration, so we can render all the steps applied
                 // in watch mode to the migrations folder.
-                let full_database_migration = database_migration_inferrer
-                    .infer_from_datamodels(&last_non_watch_datamodel, &next_datamodel, &datamodel_steps)
-                    .await?;
+                let full_database_migration = database_migration_inferrer.infer_from_datamodels(
+                    &last_non_watch_datamodel,
+                    &next_datamodel,
+                    &datamodel_steps,
+                )?;
 
                 (datamodel_steps, full_database_migration)
             } else {

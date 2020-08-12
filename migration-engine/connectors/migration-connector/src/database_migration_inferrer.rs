@@ -12,7 +12,7 @@ pub trait DatabaseMigrationInferrer<T>: Send + Sync {
     /// Infer a database migration based on the previous and next datamodels. The method signature is identical to `infer`,
     /// but it is expected that this method is implemented based on the provided previous datamodel, and does not rely
     /// on the current state of the database.
-    async fn infer_from_datamodels(
+    fn infer_from_datamodels(
         &self,
         previous: &Datamodel,
         next: &Datamodel,
