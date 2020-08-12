@@ -25,10 +25,10 @@ pub fn parse(
             let value: PrismaValue = input.try_into()?;
             match value {
                 PrismaValue::Null(_) if reverse => field.not_equals(value),
-                PrismaValue::List(values) if reverse => field.is_in(values),
+                PrismaValue::List(values) if reverse => field.not_in(values),
 
                 PrismaValue::Null(_) => field.equals(value),
-                PrismaValue::List(values) => field.not_in(values),
+                PrismaValue::List(values) => field.is_in(values),
 
                 _ => unreachable!(), // Validation guarantees this.
             }
