@@ -251,15 +251,20 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
     filterOnNull2.toString() should be("""{"data":{"scalarModels":[{"idTest":"id1"},{"idTest":"id3"}]}}""")
 
     val filterOnNotNull =
-      server.query("""{scalarModels(where: { optString: { not_equals: null }}, orderBy: { id: asc }){ idTest }}""", project = project)
+      server.query("""{scalarModels(where: { optString: { not: { equals: null }}, orderBy: { id: asc }){ idTest }}""", project = project)
+
+    // Must be the same as not null
+    val filterOnNotNotNotNull =
+      server.query("""{scalarModels(where: { optString: { not: { not: { not: { equals: null }}}}}, orderBy: { id: asc }){ idTest }}""", project = project)
 
     val filterOnNotNull2 =
       server.query(
-        """{scalarModels(where: { b: { is: { int: { equals: 1 }}}, optString: { not_equals: null }}, orderBy: { id: asc }){ idTest }}""",
+        """{scalarModels(where: { b: { is: { int: { equals: 1 }}}, optString: { not: { equals: null }}}, orderBy: { id: asc }){ idTest }}""",
         project = project
       )
 
     filterOnNotNull.toString() should be("""{"data":{"scalarModels":[{"idTest":"id2"}]}}""")
+    filterOnNotNotNotNull.toString() should be("""{"data":{"scalarModels":[{"idTest":"id2"}]}}""")
     filterOnNotNull2.toString() should be("""{"data":{"scalarModels":[{"idTest":"id2"}]}}""")
 
     val filterOnInNull = server.query("""{scalarModels(where: { optString: { in: null }}, orderBy: { id: asc }){idTest}}""", project = project)
@@ -269,9 +274,10 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
     filterOnInNull.toString() should be("""{"data":{"scalarModels":[{"idTest":"id1"},{"idTest":"id3"}]}}""")
     filterOnInNull2.toString() should be("""{"data":{"scalarModels":[{"idTest":"id1"},{"idTest":"id3"}]}}""")
 
-    val filterOnNotInNull = server.query("""{scalarModels(where: { optString: { not_in: null }}, orderBy: { id: asc }){ idTest }}""", project = project)
+    val filterOnNotInNull = server.query("""{scalarModels(where: { optString: { not: { in: null }}}, orderBy: { id: asc }){ idTest }}""", project = project)
     val filterOnNotInNull2 =
-      server.query("""{scalarModels(where: {b: { is: { int: { equals: 1 }}}, optString: { not_in: null }}, orderBy: { id: asc }){idTest}}""", project = project)
+      server.query("""{scalarModels(where: {b: { is: { int: { equals: 1 }}}, optString: { not: { in: null }}}, orderBy: { id: asc }){idTest}}""",
+                   project = project)
 
     filterOnNotInNull.toString() should be("""{"data":{"scalarModels":[{"idTest":"id2"}]}}""")
     filterOnNotInNull2.toString() should be("""{"data":{"scalarModels":[{"idTest":"id2"}]}}""")
@@ -298,8 +304,8 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
     createTest("id2", "foo bar", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
     createTest("id3", "foo bar barz", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
 
-    val res = server.query("""{scalarModels(where: { optString: { not_equals: "bar" }}, orderBy: { id: asc }){idTest}}""", project = project)
-    val res2 = server.query("""{scalarModels(where: { b: { is: { int: { equals: 1 }}}, optString: { not_equals: "bar" }}, orderBy: { id: asc }){idTest}}""",
+    val res = server.query("""{scalarModels(where: { optString: { not: { equals: "bar" }}}, orderBy: { id: asc }){idTest}}""", project = project)
+    val res2 = server.query("""{scalarModels(where: { b: { is: { int: { equals: 1 }}}, optString: { not: { equals: "bar" }}}, orderBy: { id: asc }){idTest}}""",
                             project = project)
 
     res.toString() should be("""{"data":{"scalarModels":[{"idTest":"id2"},{"idTest":"id3"}]}}""")
@@ -318,14 +324,14 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
     res2.toString() should be("""{"data":{"scalarModels":[{"idTest":"id1"}]}}""")
   }
 
-  "A filter query" should "support the not_contains filter on strings" in {
+  "A filter query" should "support the not contains filter on strings" in {
     createTest("id1", "bara", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342")
     createTest("id2", "foo bar", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
     createTest("id3", "foo bar barz", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
 
-    val res = server.query("""{scalarModels(where: {optString: { not_contains: "bara" }},orderBy: { id: asc }){idTest}}""", project = project)
+    val res = server.query("""{scalarModels(where: {optString: { not: { contains: "bara" }}},orderBy: { id: asc }){idTest}}""", project = project)
     val res2 =
-      server.query("""{scalarModels(where: {b: { is: { int: { equals: 1 }}}, optString: { not_contains: "bara" }}, orderBy: { id: asc }){idTest}}""",
+      server.query("""{scalarModels(where: {b: { is: { int: { equals: 1 }}}, optString: { not: { contains: "bara" }}}, orderBy: { id: asc }){idTest}}""",
                    project = project)
 
     res.toString() should be("""{"data":{"scalarModels":[{"idTest":"id2"},{"idTest":"id3"}]}}""")
@@ -344,15 +350,17 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
     res2.toString() should be("""{"data":{"scalarModels":[{"idTest":"id1"}]}}""")
   }
 
-  "A filter query" should "support the not_starts_with filter on strings" in {
+  "A filter query" should "support the not starts_with filter on strings" in {
     createTest("id1", "bara", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342")
     createTest("id2", "foo bar", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
     createTest("id3", "foo bar barz", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
 
-    val res = server.query("""{scalarModels(where: { optString: { not_starts_with: "bar" }}, orderBy: { id: asc }){idTest}}""", project = project)
+    val res = server.query("""{scalarModels(where: { optString: { not: { starts_with: "bar" }}}, orderBy: { id: asc }){idTest}}""", project = project)
     val res2 =
-      server.query("""{scalarModels(where: {b: { is: { int: { equals: 1 }}}, optString: { not_starts_with: "bar" }}, orderBy: { id: asc }){idTest}}""",
-                   project = project)
+      server.query(
+        """{scalarModels(where: {b: { is: { int: { equals: 1 }}}, optString: { not: { starts_with: "bar" }}}, orderBy: { id: asc }){idTest}}""",
+        project = project
+      )
 
     res.toString() should be("""{"data":{"scalarModels":[{"idTest":"id2"},{"idTest":"id3"}]}}""")
     res2.toString() should be("""{"data":{"scalarModels":[{"idTest":"id2"},{"idTest":"id3"}]}}""")
@@ -371,15 +379,17 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
     res2.toString() should be("""{"data":{"scalarModels":[{"idTest":"id1"}]}}""")
   }
 
-  "A filter query" should "support the not_ends_with filter on strings" in {
+  "A filter query" should "support the not ends_with filter on strings" in {
     createTest("id1", "bara", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342")
     createTest("id2", "foo bar", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
     createTest("id3", "foo bar bar", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
 
-    val res = server.query("""{scalarModels(where: { optString: { not_ends_with: "bara" }}, orderBy: { id: asc }){idTest}}""", project = project)
+    val res = server.query("""{scalarModels(where: { optString: { not: { ends_with: "bara" }}}, orderBy: { id: asc }){idTest}}""", project = project)
     val res2 =
-      server.query("""{scalarModels(where: { b: { is: { int: { equals: 1 }}}, optString: { not_ends_with: "bara" }}, orderBy: { id: asc }){idTest}}""",
-                   project = project)
+      server.query(
+        """{scalarModels(where: { b: { is: { int: { equals: 1 }}}, optString: { not: { ends_with: "bara" }}}, orderBy: { id: asc }){idTest}}""",
+        project = project
+      )
 
     res.toString() should be("""{"data":{"scalarModels":[{"idTest":"id2"},{"idTest":"id3"}]}}""")
     res2.toString() should be("""{"data":{"scalarModels":[{"idTest":"id2"},{"idTest":"id3"}]}}""")
@@ -462,21 +472,22 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
     resD2.toString() should be("""{"data":{"scalarModels":[]}}""")
   }
 
-  "A filter query" should "support the not_in filter on strings" in {
+  "A filter query" should "support the not in filter on strings" in {
     createTest("id1", "a", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342")
     createTest("id2", "ab", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
     createTest("id3", "abc", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
 
-    val resA = server.query("""{scalarModels(where: {optString: { not_in: ["a"]}},orderBy: { id: asc }){idTest}}""", project = project)
+    val resA = server.query("""{scalarModels(where: {optString: { not: { in: ["a"] }}}, orderBy: { id: asc }){idTest}}""", project = project)
     val resA2 =
-      server.query("""{scalarModels(where: {b: { is: { int: { equals: 1 }}}, optString: { not_in: ["a"]}},orderBy: { id: asc }){idTest}}""", project = project)
+      server.query("""{scalarModels(where: {b: { is: { int: { equals: 1 }}}, optString: { not: { in: ["a"] }}},orderBy: { id: asc }){idTest}}""",
+                   project = project)
     resA.toString should be("""{"data":{"scalarModels":[{"idTest":"id2"},{"idTest":"id3"}]}}""")
 
     val resB =
-      server.query("""{scalarModels(orderBy: { idTest: asc }, where: {optString: { not_in: [] }},orderBy: { id: asc }){idTest}}""", project = project)
+      server.query("""{scalarModels(orderBy: { idTest: asc }, where: {optString: { not: { in: [] }}},orderBy: { id: asc }){idTest}}""", project = project)
     val resB2 =
       server.query(
-        """{scalarModels(orderBy: { idTest: asc }, where: {b: { is: { int: { equals: 1 }}}, optString: { not_in: [] }},orderBy: { id: asc }){idTest}}""",
+        """{scalarModels(orderBy: { idTest: asc }, where: {b: { is: { int: { equals: 1 }}}, optString: { not: { in: [] }}},orderBy: { id: asc }){idTest}}""",
         project = project
       )
     resB.toString should be("""{"data":{"scalarModels":[{"idTest":"id1"},{"idTest":"id2"},{"idTest":"id3"}]}}""")
@@ -503,9 +514,10 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
     createTest("id2", "ab", 2, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
     createTest("id3", "abc", 3, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
 
-    val res = server.query("""{scalarModels(where: {optInt: { not_equals: 1 }}, orderBy: { id: asc }){idTest}}""", project = project)
+    val res = server.query("""{scalarModels(where: {optInt: { not: { equals: 1 }}}, orderBy: { id: asc }){idTest}}""", project = project)
     val res2 =
-      server.query("""{scalarModels(where: {b: { is: { int: { equals: 1 }}}, optInt: { not_equals: 1 }},orderBy: { id: asc }){idTest}}""", project = project)
+      server.query("""{scalarModels(where: {b: { is: { int: { equals: 1 }}}, optInt: { not: { equals: 1 }}},orderBy: { id: asc }){idTest}}""",
+                   project = project)
 
     res.toString() should be("""{"data":{"scalarModels":[{"idTest":"id2"},{"idTest":"id3"}]}}""")
     res2.toString() should be("""{"data":{"scalarModels":[{"idTest":"id2"},{"idTest":"id3"}]}}""")
@@ -571,14 +583,14 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
     res2.toString() should be("""{"data":{"scalarModels":[{"idTest":"id1"}]}}""")
   }
 
-  "A filter query" should "support the not_in filter on integers" in {
+  "A filter query" should "support the not in filter on integers" in {
     createTest("id1", "a", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342")
     createTest("id2", "ab", 2, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
     createTest("id3", "abc", 3, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
 
-    val res = server.query("""{scalarModels(where: {optInt: { not_in: [1] }},orderBy: { id: asc }){idTest}}""", project = project)
+    val res = server.query("""{scalarModels(where: {optInt: { not: { in: [1] }}},orderBy: { id: asc }){idTest}}""", project = project)
     val res2 =
-      server.query("""{scalarModels(where: {b: { is: { int: { equals: 1 }}}, optInt: { not_in: [1] }},orderBy: { id: asc }){idTest}}""", project = project)
+      server.query("""{scalarModels(where: {b: { is: { int: { equals: 1 }}}, optInt: { not: { in: [1] }}},orderBy: { id: asc }){idTest}}""", project = project)
 
     res.toString() should be("""{"data":{"scalarModels":[{"idTest":"id2"},{"idTest":"id3"}]}}""")
     res2.toString() should be("""{"data":{"scalarModels":[{"idTest":"id2"},{"idTest":"id3"}]}}""")
@@ -604,9 +616,10 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
     createTest("id2", "ab", 2, 2, optBoolean = false, "A", "2016-09-23T12:29:32.342")
     createTest("id3", "abc", 3, 3, optBoolean = false, "A", "2016-09-23T12:29:32.342")
 
-    val res = server.query("""{scalarModels(where: {optFloat: { not_equals: 1 }},orderBy: { id: asc }){idTest}}""", project = project)
+    val res = server.query("""{scalarModels(where: {optFloat: { not: { equals: 1 }}},orderBy: { id: asc }){idTest}}""", project = project)
     val res2 =
-      server.query("""{scalarModels(where: {b: { is: { int: { equals: 1 }}}, optFloat: { not_equals: 1 }},orderBy: { id: asc }){idTest}}""", project = project)
+      server.query("""{scalarModels(where: {b: { is: { int: { equals: 1 }}}, optFloat: { not: { equals: 1 }}},orderBy: { id: asc }){idTest}}""",
+                   project = project)
 
     res.toString() should be("""{"data":{"scalarModels":[{"idTest":"id2"},{"idTest":"id3"}]}}""")
     res2.toString() should be("""{"data":{"scalarModels":[{"idTest":"id2"},{"idTest":"id3"}]}}""")
@@ -674,14 +687,15 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
     res2.toString() should be("""{"data":{"scalarModels":[{"idTest":"id1"}]}}""")
   }
 
-  "A filter query" should "support the not_in filter on floats" in {
+  "A filter query" should "support the not in filter on floats" in {
     createTest("id1", "a", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342")
     createTest("id2", "ab", 2, 2, optBoolean = false, "A", "2016-09-23T12:29:32.342")
     createTest("id3", "abc", 3, 3, optBoolean = false, "A", "2016-09-23T12:29:32.342")
 
-    val res = server.query("""{scalarModels(where: {optFloat: { not_in: [1] }},orderBy: { id: asc }){idTest}}""", project = project)
+    val res = server.query("""{scalarModels(where: {optFloat: { not: { in: [1] }}},orderBy: { id: asc }){idTest}}""", project = project)
     val res2 =
-      server.query("""{scalarModels(where: {b: { is: { int: { equals: 1 }}}, optFloat: { not_in: [1] }},orderBy: { id: asc }){idTest}}""", project = project)
+      server.query("""{scalarModels(where: {b: { is: { int: { equals: 1 }}}, optFloat: { not: { in: [1] }}},orderBy: { id: asc }){idTest}}""",
+                   project = project)
 
     res.toString() should be("""{"data":{"scalarModels":[{"idTest":"id2"},{"idTest":"id3"}]}}""")
     res2.toString() should be("""{"data":{"scalarModels":[{"idTest":"id2"},{"idTest":"id3"}]}}""")
@@ -707,9 +721,9 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
     createTest("id2", "foo bar", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
     createTest("id3", "foo bar barz", 1, 1, optBoolean = false, "A", "2016-09-23T12:29:32.342")
 
-    val res = server.query("""{scalarModels(where: {optBoolean: { not_equals: true }},orderBy: { id: asc }){idTest}}""", project = project)
+    val res = server.query("""{scalarModels(where: {optBoolean: { not: { equals: true }}},orderBy: { id: asc }){idTest}}""", project = project)
     val res2 =
-      server.query("""{scalarModels(where: {b: { is: { int: { equals: 1 }}}, optBoolean: { not_equals: true }},orderBy: { id: asc }){idTest}}""",
+      server.query("""{scalarModels(where: {b: { is: { int: { equals: 1 }}}, optBoolean: { not: { equals: true }}},orderBy: { id: asc }){idTest}}""",
                    project = project)
 
     res.toString() should be("""{"data":{"scalarModels":[{"idTest":"id2"},{"idTest":"id3"}]}}""")
@@ -738,10 +752,10 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
     createTest("id3", "3", 3, 3, optBoolean = false, "A", "2016-09-25T12:29:32.342")
 
     val res =
-      server.query("""{scalarModels(where: {optDateTime: { not_equals: "2016-09-24T12:29:32.342Z" }},orderBy: { id: asc }){idTest}}""", project = project)
+      server.query("""{scalarModels(where: {optDateTime: { not: { equals: "2016-09-24T12:29:32.342Z" }}},orderBy: { id: asc }){idTest}}""", project = project)
     val res2 =
       server.query(
-        """{scalarModels(where: {b: { is: { int: { equals: 1 }}}, optDateTime: { not_equals: "2016-09-24T12:29:32.342Z" }},orderBy: { id: asc }){idTest}}""",
+        """{scalarModels(where: {b: { is: { int: { equals: 1 }}}, optDateTime: { not: { equals: "2016-09-24T12:29:32.342Z" }}},orderBy: { id: asc }){idTest}}""",
         project = project
       )
 
@@ -822,15 +836,16 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
     res2.toString() should be("""{"data":{"scalarModels":[{"idTest":"id2"}]}}""")
   }
 
-  "A filter query" should "support the not_in filter on DateTime" in {
+  "A filter query" should "support the not in filter on DateTime" in {
     createTest("id1", "1", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342")
     createTest("id2", "2", 2, 2, optBoolean = false, "A", "2016-09-24T12:29:32.342")
     createTest("id3", "3", 3, 3, optBoolean = false, "A", "2016-09-25T12:29:32.342")
 
     val res =
-      server.query("""{scalarModels(where: {optDateTime: { not_in: ["2016-09-24T12:29:32.342Z"] }},orderBy: { id: asc }){idTest}}""", project = project)
+      server.query("""{scalarModels(where: {optDateTime: { not: { in: ["2016-09-24T12:29:32.342Z"] }}},orderBy: { id: asc }){idTest}}""", project = project)
     val res2 = server.query(
-      query = """{scalarModels(where: {b: { is: { int: { equals: 1 }}}, optDateTime: { not_in: ["2016-09-24T12:29:32.342Z"] }},orderBy: { id: asc }){idTest}}""",
+      query =
+        """{scalarModels(where: {b: { is: { int: { equals: 1 }}}, optDateTime: { not: { in: ["2016-09-24T12:29:32.342Z"] }}},orderBy: { id: asc }){idTest}}""",
       project = project
     )
 
@@ -858,9 +873,10 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
     createTest("id2", "2", 2, 2, optBoolean = false, "B", "2016-09-24T12:29:32.342")
     createTest("id3", "3", 3, 3, optBoolean = false, "B", "2016-09-25T12:29:32.342")
 
-    val res = server.query("""{scalarModels(where: {optEnum: { not_equals: A }},orderBy: { id: asc }){idTest}}""", project = project)
+    val res = server.query("""{scalarModels(where: {optEnum: { not: { equals: A }}},orderBy: { id: asc }){idTest}}""", project = project)
     val res2 =
-      server.query("""{scalarModels(where: {b: { is: { int: { equals: 1 }}}, optEnum: { not_equals: A }},orderBy: { id: asc }){idTest}}""", project = project)
+      server.query("""{scalarModels(where: {b: { is: { int: { equals: 1 }}}, optEnum: { not: { equals: A }}},orderBy: { id: asc }){idTest}}""",
+                   project = project)
 
     res.toString() should be("""{"data":{"scalarModels":[{"idTest":"id2"},{"idTest":"id3"}]}}""")
     res2.toString() should be("""{"data":{"scalarModels":[{"idTest":"id2"},{"idTest":"id3"}]}}""")
@@ -883,9 +899,9 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
     createTest("id2", "2", 2, 2, optBoolean = false, "B", "2016-09-24T12:29:32.342")
     createTest("id3", "3", 3, 3, optBoolean = false, "B", "2016-09-25T12:29:32.342")
 
-    val res = server.query("""{scalarModels(where: {optEnum: { not_in: [A] }},orderBy: { id: asc }){idTest}}""", project = project)
+    val res = server.query("""{scalarModels(where: {optEnum: { not: { in: [A] }}},orderBy: { id: asc }){idTest}}""", project = project)
     val res2 =
-      server.query("""{scalarModels(where: {b: { is: { int: { equals: 1 }}}, optEnum: { not_in: [A] }},orderBy: { id: asc }){idTest}}""", project = project)
+      server.query("""{scalarModels(where: {b: { is: { int: { equals: 1 }}}, optEnum: { not: { in: [A] }}},orderBy: { id: asc }){idTest}}""", project = project)
 
     res.toString() should be("""{"data":{"scalarModels":[{"idTest":"id2"},{"idTest":"id3"}]}}""")
     res2.toString() should be("""{"data":{"scalarModels":[{"idTest":"id2"},{"idTest":"id3"}]}}""")

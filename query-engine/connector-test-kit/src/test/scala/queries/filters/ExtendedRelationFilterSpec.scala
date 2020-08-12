@@ -240,7 +240,7 @@ class ExtendedRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase
     server.query(query = """{artists(where:{Albums: { every: { Title: { contains: "album" }}}}){Name}}""", project = project).toString should be(
       """{"data":{"artists":[{"Name":"CompleteArtist"},{"Name":"ArtistWithoutAlbums"},{"Name":"ArtistWithOneAlbumWithoutTracks"},{"Name":"CompleteArtist2"},{"Name":"CompleteArtistWith2Albums"}]}}""")
 
-    server.query(query = """{artists(where:{Albums: { every: { Title: { not_contains: "the" }}}}){Name}}""", project = project).toString should be(
+    server.query(query = """{artists(where:{Albums: { every: { Title: { not: { contains: "the" }}}}}){Name}}""", project = project).toString should be(
       """{"data":{"artists":[{"Name":"CompleteArtist"},{"Name":"ArtistWithoutAlbums"},{"Name":"CompleteArtist2"},{"Name":"CompleteArtistWith2Albums"}]}}""")
 
     server.query(query = """{artists(where:{Albums: { none: {Title: { contains: "the" }}}}){Name}}""", project = project).toString should be(
@@ -263,7 +263,7 @@ class ExtendedRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase
     server.query(query = """{artists(where:{Albums: { every:{Title: { contains: "Album" }}}}){Name}}""", project = project).toString should be(
       """{"data":{"artists":[{"Name":"CompleteArtist"},{"Name":"ArtistWithoutAlbums"},{"Name":"ArtistWithOneAlbumWithoutTracks"},{"Name":"CompleteArtist2"},{"Name":"CompleteArtistWith2Albums"}]}}""")
 
-    server.query(query = """{artists(where:{Albums: { every:{Title: { not_contains: "The" }}}}){Name}}""", project = project).toString should be(
+    server.query(query = """{artists(where:{Albums: { every:{Title: { not: { contains: "The" }}}}}){Name}}""", project = project).toString should be(
       """{"data":{"artists":[{"Name":"CompleteArtist"},{"Name":"ArtistWithoutAlbums"},{"Name":"CompleteArtist2"},{"Name":"CompleteArtistWith2Albums"}]}}""")
   }
 
