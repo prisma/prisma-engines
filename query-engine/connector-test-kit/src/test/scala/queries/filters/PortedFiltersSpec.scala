@@ -907,4 +907,45 @@ class PortedFiltersSpec extends FlatSpec with Matchers with ApiSpecBase {
     res2.toString() should be("""{"data":{"scalarModels":[{"idTest":"id2"},{"idTest":"id3"}]}}""")
   }
   //endregion
+
+  "A filter query" should "should treat NOT and not filters equally" in {
+    createTest("id1", "1", 1, 1, optBoolean = true, "A", "2016-09-23T12:29:32.342")
+    createTest("id2", "2", 2, 2, optBoolean = false, "B", "2016-09-24T12:29:32.342")
+    createTest("id3", "3", 3, 3, optBoolean = false, "B", "2016-09-25T12:29:32.342")
+
+    val res = server.query(
+      """
+        |{
+        |  scalarModels(
+        |    where: { optString: { not: { equals: "1", gt: "2" } } }
+        |    orderBy: { id: asc }
+        |  ) {
+        |    idTest
+        |  }
+        |}
+      """.stripMargin,
+      project = project
+    )
+
+    val res2 =
+      server.query(
+        """
+          |{
+          |  scalarModels(
+          |    where: { NOT: [
+          |      { optString: { equals: "1" }},
+          |      { optString: { gt: "2" }}
+          |    ]}
+          |    orderBy: { id: asc }
+          |  ) {
+          |    idTest
+          |  }
+          |}
+        """.stripMargin,
+        project = project
+      )
+
+    res.toString() should be("""{"data":{"scalarModels":[{"idTest":"id2"}]}}""")
+    res.toString() should be(res2.toString)
+  }
 }
