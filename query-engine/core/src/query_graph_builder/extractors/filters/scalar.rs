@@ -36,7 +36,7 @@ pub fn parse(
 
         "equals" if reverse => field.not_equals(as_prisma_value(input)?),
         "contains" if reverse => field.not_contains(as_prisma_value(input)?),
-        "starts_with" if reverse => field.not_ends_with(as_prisma_value(input)?),
+        "starts_with" if reverse => field.not_starts_with(as_prisma_value(input)?),
         "ends_with" if reverse => field.not_ends_with(as_prisma_value(input)?),
 
         "equals" => field.equals(as_prisma_value(input)?),
