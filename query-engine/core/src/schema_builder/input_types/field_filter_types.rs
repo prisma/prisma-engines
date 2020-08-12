@@ -1,4 +1,5 @@
 use super::*;
+use prisma_models::{dml::DefaultValue, PrismaValue};
 
 /// Builds filter type for the given model field.
 pub(crate) fn get_field_filter_type(ctx: &mut BuilderContext, field: &ModelField) -> InputObjectTypeWeakRef {
@@ -121,12 +122,30 @@ fn alphanumeric_filters(sf: &ScalarFieldRef) -> impl Iterator<Item = InputField>
 fn string_filters(sf: &ScalarFieldRef) -> impl Iterator<Item = InputField> {
     let mapped_type = map_optional_input_type(sf);
 
-    vec![
+    let mut fields = vec![
         input_field("contains", mapped_type.clone(), None),
         input_field("starts_with", mapped_type.clone(), None),
         input_field("ends_with", mapped_type.clone(), None),
-    ]
-    .into_iter()
+    ];
+
+    if feature_flags::get().insensitiveFilters {
+        fields.push(query_mode_field());
+    }
+
+    fields.into_iter()
+}
+
+fn query_mode_field() -> InputField {
+    let enum_type = Arc::new(string_enum_type(
+        "QueryMode",
+        vec!["default".to_owned(), "insensitive".to_owned()],
+    ));
+
+    input_field(
+        "mode",
+        InputType::Enum(enum_type),
+        Some(DefaultValue::Single(PrismaValue::Enum("default".to_owned()))),
+    )
 }
 
 fn scalar_filter_name(sf: &ScalarFieldRef) -> String {
