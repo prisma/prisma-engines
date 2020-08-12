@@ -34,6 +34,7 @@ sql-connector = {path = "../connectors/sql-query-connector", optional = true, pa
 structopt = "0.3"
 thiserror = "1.0"
 tide = { version = "0.13.0", default-features = false, features = ["h1-server", "logger"] }
+tide-server-timing = "0.13.1"
 url = "2.1"
 
 tracing = "0.1"

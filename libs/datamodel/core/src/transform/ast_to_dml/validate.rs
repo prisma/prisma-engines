@@ -12,7 +12,6 @@ use std::collections::HashSet;
 /// When validating, we check if the datamodel is valid, and generate errors otherwise.
 pub struct Validator<'a> {
     source: Option<&'a configuration::Datasource>,
-    generator: Option<&'a configuration::Generator>,
 }
 
 /// State error message. Seeing this error means something went really wrong internally. It's the datamodel equivalent of a bluescreen.
@@ -23,11 +22,8 @@ const PRISMA_FORMAT_HINT: &str = "You can run `prisma format` to fix this automa
 
 impl<'a> Validator<'a> {
     /// Creates a new instance, with all builtin directives registered.
-    pub fn new(
-        source: Option<&'a configuration::Datasource>,
-        generator: Option<&'a configuration::Generator>,
-    ) -> Validator<'a> {
-        Self { source, generator }
+    pub fn new(source: Option<&'a configuration::Datasource>) -> Validator<'a> {
+        Self { source }
     }
 
     pub fn validate(&self, ast_schema: &ast::SchemaAst, schema: &mut dml::Datamodel) -> Result<(), ErrorCollection> {

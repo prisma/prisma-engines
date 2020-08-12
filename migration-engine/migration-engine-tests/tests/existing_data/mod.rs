@@ -1184,6 +1184,7 @@ async fn primary_key_migrations_do_not_cause_data_loss(api: &TestApi) -> TestRes
 
     let dog = api.select("Dog").column("name").column("passportNumber").send().await?;
     let dog_row: Vec<quaint::Value> = dog.into_single().unwrap().into_iter().collect();
+
     assert_eq!(dog_row, &[Value::text("Marnie"), Value::text("8000")]);
 
     let puppy = api
@@ -1195,6 +1196,7 @@ async fn primary_key_migrations_do_not_cause_data_loss(api: &TestApi) -> TestRes
         .await?;
 
     let puppy_row: Vec<quaint::Value> = puppy.into_single().unwrap().into_iter().collect();
+
     assert_eq!(
         puppy_row,
         &[Value::text("12345"), Value::text("Marnie"), Value::text("8000")]

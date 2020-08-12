@@ -98,15 +98,14 @@ impl<'a> InferApplyAssertion<'a> {
             self.result.warnings
         );
 
-        for (idx, warning) in warnings.iter().enumerate() {
-            assert_eq!(
-                Some(warning.as_ref()),
-                self.result
-                    .warnings
-                    .get(idx)
-                    .map(|warning| warning.description.as_str())
-            );
-        }
+        let descriptions: Vec<Cow<'_, str>> = self
+            .result
+            .warnings
+            .iter()
+            .map(|warning| warning.description.as_str().into())
+            .collect();
+
+        assert_eq!(&descriptions, &warnings);
 
         Ok(self)
     }

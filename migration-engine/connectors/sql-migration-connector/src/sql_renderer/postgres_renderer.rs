@@ -1,8 +1,9 @@
-use super::{common::*, RenderedAlterColumn};
+use super::{common::*, RenderedAlterColumn, SqlRenderer};
 use crate::{
+    database_info::DatabaseInfo,
     expanded_alter_column::{expand_postgres_alter_column, PostgresAlterColumn},
     flavour::PostgresFlavour,
-    sql_schema_differ::ColumnDiffer,
+    sql_schema_differ::{ColumnDiffer, SqlSchemaDiffer},
     sql_schema_helpers::*,
 };
 use once_cell::sync::Lazy;
@@ -11,7 +12,7 @@ use regex::Regex;
 use sql_schema_describer::*;
 use std::borrow::Cow;
 
-impl super::SqlRenderer for PostgresFlavour {
+impl SqlRenderer for PostgresFlavour {
     fn quote<'a>(&self, name: &'a str) -> Quoted<&'a str> {
         Quoted::postgres_ident(name)
     }
@@ -172,6 +173,15 @@ impl super::SqlRenderer for PostgresFlavour {
         );
 
         vec![sql]
+    }
+
+    fn render_redefine_tables(
+        &self,
+        _names: &[String],
+        _differ: SqlSchemaDiffer<'_>,
+        _database_info: &DatabaseInfo,
+    ) -> Vec<String> {
+        unreachable!("render_redefine_table on Postgres")
     }
 }
 

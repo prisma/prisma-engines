@@ -1,10 +1,11 @@
-use crate::sql_schema_helpers::ColumnRef;
+use crate::{database_info::DatabaseInfo, flavour::SqlFlavour, sql_schema_helpers::ColumnRef};
 use prisma_value::PrismaValue;
 use sql_schema_describer::{ColumnTypeFamily, DefaultValue};
 
 #[derive(Debug)]
 pub(crate) struct ColumnDiffer<'a> {
-    pub(crate) diffing_options: &'a super::DiffingOptions,
+    pub(crate) flavour: &'a dyn SqlFlavour,
+    pub(crate) database_info: &'a DatabaseInfo,
     pub(crate) previous: ColumnRef<'a>,
     pub(crate) next: ColumnRef<'a>,
 }
@@ -60,7 +61,7 @@ impl<'a> ColumnDiffer<'a> {
     }
 
     fn column_type_changed(&self) -> bool {
-        if self.diffing_options.is_mariadb
+        if self.database_info.is_mariadb()
             && MARIADB_ALIASES.contains(&self.previous.column_type_family())
             && MARIADB_ALIASES.contains(&self.next.column_type_family())
         {
@@ -75,7 +76,7 @@ impl<'a> ColumnDiffer<'a> {
     /// - We bail on a number of cases that are too complex to deal with right now or underspecified.
     fn defaults_match(&self) -> bool {
         // JSON defaults on MySQL should be ignored.
-        if self.diffing_options.sql_family().is_mysql()
+        if self.flavour.sql_family().is_mysql()
             && (self.previous.column_type_family().is_json() || self.next.column_type_family().is_json())
         {
             return true;

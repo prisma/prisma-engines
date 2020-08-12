@@ -9,10 +9,6 @@ pub trait DatabaseMigrationStepApplier<T>: Send + Sync {
     /// Returns true to signal to the caller that the step was applied, and there could be a next one.
     async fn apply_step(&self, database_migration: &T, step: usize) -> ConnectorResult<bool>;
 
-    /// Applies the step to the database.
-    /// Returns true to signal to the caller that the step was unapplied, and there could be a next one.
-    async fn unapply_step(&self, database_migration: &T, step: usize) -> ConnectorResult<bool>;
-
     /// Render steps for the CLI. Each step will contain the raw field.
     fn render_steps_pretty(&self, database_migration: &T) -> ConnectorResult<Vec<PrettyDatabaseMigrationStep>>;
 }
