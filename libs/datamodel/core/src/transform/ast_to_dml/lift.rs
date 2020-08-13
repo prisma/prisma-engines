@@ -5,7 +5,6 @@ use crate::{
     error::{DatamodelError, ErrorCollection},
     DatasourcePreviewFeatures, Field, FieldType, ScalarType,
 };
-use datamodel_connector::error::ConnectorError;
 use datamodel_connector::Connector;
 use itertools::Itertools;
 use sql_datamodel_connector::SqlDatamodelConnectors;
