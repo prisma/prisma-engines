@@ -1,21 +1,25 @@
 on:
-  repository_dispatch:
+  workflow_dispatch:
+    inputs:
+      commit:
+        description: 'Commit on the given branch to build'
+        required: true
 
 jobs:
   build:
-    name: "Windows engines build ${{ github.event.client_payload.commit }}"
+    name: "Windows engines build on branch ${{ github.event.ref }} for commit ${{ github.event.inputs.commit }}"
     env:
       SQLITE_MAX_VARIABLE_NUMBER: 250000
       SQLITE_MAX_EXPR_DEPTH: 10000
     runs-on: windows-latest
     steps:
       - name: Output link to real commit
-        run: echo ${{ github.repository }}/commit/${{ github.event.client_payload.commit }}
+        run: echo ${{ github.repository }}/commit/${{ github.event.inputs.commit }}
 
-      - name: Checkout ${{ github.event.client_payload.commit }}
+      - name: Checkout ${{ github.event.inputs.commit }}
         uses: actions/checkout@v2
         with:
-          ref: ${{ github.event.client_payload.commit }}
+          ref: ${{ github.event.inputs.commit }}
 
       - uses: actions-rs/toolchain@v1
         with:
