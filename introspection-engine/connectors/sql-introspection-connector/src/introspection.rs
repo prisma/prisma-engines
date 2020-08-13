@@ -131,7 +131,7 @@ fn calculate_fields_for_prisma_join_table(
             // Avoid duplicate field names, in case a generated relation field name is the same as the M2M relation table's name.
             let relation_name = &join_table.name[1..];
             let relation_name = if existing_relations.any(|existing_relation| existing_relation == relation_name) {
-                format!("{}Table", relation_name)
+                format!("{}ManyToMany", relation_name)
             } else {
                 relation_name.to_owned()
             };

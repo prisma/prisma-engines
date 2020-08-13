@@ -1159,14 +1159,14 @@ async fn one_to_many_relation_field_names_do_not_conflict_with_many_to_many_rela
         model User {
             id                      Int     @default(autoincrement()) @id
             Event_EventToUser       Event[]
-            Event_EventToUserTable  Event[] @relation("EventToUserTable")
+            Event_EventToUserManyToMany  Event[] @relation("EventToUserManyToMany")
         }
 
         model Event {
             id                      Int    @default(autoincrement()) @id
             hostId                  Int
             User_EventToUser        User   @relation(fields: [hostId], references: [id])
-            User_EventToUserTable   User[] @relation("EventToUserTable")
+            User_EventToUserManyToMany   User[] @relation("EventToUserManyToMany")
 
             @@index([hostId], name: "hostId")
         }
@@ -1176,14 +1176,14 @@ async fn one_to_many_relation_field_names_do_not_conflict_with_many_to_many_rela
         model User {
             id                      Int     @default(autoincrement()) @id
             Event_EventToUser       Event[]
-            Event_EventToUserTable  Event[] @relation("EventToUserTable")
+            Event_EventToUserManyToMany  Event[] @relation("EventToUserManyToMany")
         }
 
         model Event {
             id                      Int    @default(autoincrement()) @id
             hostId                  Int
             User_EventToUser        User   @relation(fields: [hostId], references: [id])
-            User_EventToUserTable   User[] @relation("EventToUserTable")
+            User_EventToUserManyToMany   User[] @relation("EventToUserManyToMany")
         }
         "#
     };
