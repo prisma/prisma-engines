@@ -60,6 +60,9 @@ pub(crate) trait SqlFlavour:
         conn: Arc<dyn Queryable + Send + Sync>,
     ) -> SqlResult<SqlSchema>;
 
+    /// Drop the current database.
+    async fn drop_database(&self, conn: &dyn Queryable, schema_name: &str) -> SqlResult<()>;
+
     /// Create the database schema.
     async fn initialize(&self, conn: &dyn Queryable, database_info: &DatabaseInfo) -> SqlResult<()>;
 }
@@ -113,6 +116,15 @@ impl SqlFlavour for MysqlFlavour {
         Ok(sql_schema_describer::mysql::SqlSchemaDescriber::new(conn)
             .describe(schema_name)
             .await?)
+    }
+
+    #[tracing::instrument(skip(conn))]
+    async fn drop_database(&self, conn: &dyn Queryable, schema_name: &str) -> SqlResult<()> {
+        let sql_str = format!(r#"DROP SCHEMA `{}`;"#, schema_name);
+
+        conn.raw_cmd(&sql_str).await?;
+
+        Ok(())
     }
 
     async fn initialize(&self, conn: &dyn Queryable, database_info: &DatabaseInfo) -> SqlResult<()> {
@@ -169,6 +181,24 @@ impl SqlFlavour for SqliteFlavour {
             .await?)
     }
 
+    async fn drop_database(&self, conn: &dyn Queryable, schema_name: &str) -> SqlResult<()> {
+        use quaint::prelude::Value;
+
+        conn.query_raw("DETACH DATABASE ?", &[Value::from(schema_name)])
+            .await
+            .ok();
+
+        std::fs::remove_file(&self.file_path).ok(); // ignore potential errors
+
+        conn.query_raw(
+            "ATTACH DATABASE ? AS ?",
+            &[Value::from(self.file_path.as_str()), Value::from(schema_name)],
+        )
+        .await?;
+
+        Ok(())
+    }
+
     async fn initialize(&self, _conn: &dyn Queryable, _database_info: &DatabaseInfo) -> SqlResult<()> {
         let path_buf = PathBuf::from(&self.file_path);
 
@@ -218,6 +248,14 @@ impl SqlFlavour for PostgresFlavour {
         );
 
         conn.raw_cmd(&schema_sql).await?;
+
+        Ok(())
+    }
+
+    async fn drop_database(&self, conn: &dyn Queryable, schema_name: &str) -> SqlResult<()> {
+        let sql_str = format!(r#"DROP SCHEMA "{}" CASCADE;"#, schema_name);
+
+        conn.raw_cmd(&sql_str).await.ok();
 
         Ok(())
     }
