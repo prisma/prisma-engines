@@ -7,7 +7,7 @@ use crate::{
     query_document::{ParsedInputMap, ParsedInputValue},
     QueryGraphBuilderError, QueryGraphBuilderResult,
 };
-use connector::{filter::Filter, ScalarCompare};
+use connector::{filter::Filter, QueryMode, ScalarCompare};
 use filter_grouping::*;
 use prisma_models::{Field, ModelRef, PrismaValue, ScalarFieldRef};
 use std::{convert::TryInto, str::FromStr};
@@ -77,15 +77,22 @@ pub fn extract_filter(value_map: ParsedInputMap, model: &ModelRef) -> QueryGraph
                 })
             } else {
                 let field = model.fields().find_from_all(&key)?;
-                let filter_map: ParsedInputMap = value.try_into()?;
+                let mut filter_map: ParsedInputMap = value.try_into()?;
 
-                let filters = filter_map
+                let mode = match filter_map.remove("mode") {
+                    Some(i) => Some(parse_query_mode(i)?),
+                    None => None,
+                };
+
+                let mut filters = filter_map
                     .into_iter()
                     .map(|(k, v)| match field {
                         Field::Relation(rf) => relation::parse(&k, rf, v),
                         Field::Scalar(sf) => scalar::parse(&k, sf, v, false),
                     })
-                    .collect::<QueryGraphBuilderResult<_>>()?;
+                    .collect::<QueryGraphBuilderResult<Vec<_>>>()?;
+
+                filters.iter_mut().for_each(|f| f.set_mode(mode.clone()));
 
                 Ok(Filter::And(filters))
             }
@@ -93,4 +100,16 @@ pub fn extract_filter(value_map: ParsedInputMap, model: &ModelRef) -> QueryGraph
         .collect::<QueryGraphBuilderResult<Vec<Filter>>>()?;
 
     Ok(Filter::and(filters))
+}
+
+fn parse_query_mode(input: ParsedInputValue) -> QueryGraphBuilderResult<QueryMode> {
+    let value: PrismaValue = input.try_into()?;
+    Ok(match value {
+        PrismaValue::Enum(s) => match s.as_str() {
+            "default" => QueryMode::Default,
+            "insensitive" => QueryMode::Insensitive,
+            _ => unreachable!(),
+        },
+        _ => unreachable!(),
+    })
 }

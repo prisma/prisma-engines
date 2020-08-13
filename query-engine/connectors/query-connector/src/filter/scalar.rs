@@ -28,6 +28,7 @@ pub struct ScalarFilter {
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum QueryMode {
+    Default,
     Insensitive,
 }
 

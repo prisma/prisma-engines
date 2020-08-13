@@ -69,7 +69,8 @@ fn scalar_filter_type(ctx: &mut BuilderContext, sf: &ScalarFieldRef, nested: boo
         TypeIdentifier::String | TypeIdentifier::UUID => equality_filters(sf)
             .chain(inclusion_filters(sf))
             .chain(alphanumeric_filters(sf))
-            .chain(string_filters(sf, nested))
+            .chain(string_filters(sf))
+            .chain(query_mode_field(nested))
             .collect(),
 
         TypeIdentifier::Int | TypeIdentifier::Float | TypeIdentifier::DateTime => equality_filters(sf)
@@ -119,34 +120,37 @@ fn alphanumeric_filters(sf: &ScalarFieldRef) -> impl Iterator<Item = InputField>
     .into_iter()
 }
 
-fn string_filters(sf: &ScalarFieldRef, nested: bool) -> impl Iterator<Item = InputField> {
+fn string_filters(sf: &ScalarFieldRef) -> impl Iterator<Item = InputField> {
     let mapped_type = map_optional_input_type(sf);
 
-    let mut fields = vec![
+    vec![
         input_field("contains", mapped_type.clone(), None),
         input_field("startsWith", mapped_type.clone(), None),
         input_field("endsWith", mapped_type.clone(), None),
-    ];
-
-    // Limit query mode field to the topmost filter level.
-    if feature_flags::get().insensitiveFilters && !nested {
-        fields.push(query_mode_field());
-    }
-
-    fields.into_iter()
+    ]
+    .into_iter()
 }
 
-fn query_mode_field() -> InputField {
-    let enum_type = Arc::new(string_enum_type(
-        "QueryMode",
-        vec!["default".to_owned(), "insensitive".to_owned()],
-    ));
+fn query_mode_field(nested: bool) -> impl Iterator<Item = InputField> {
+    // Limit query mode field to the topmost filter level.
+    let fields = if feature_flags::get().insensitiveFilters && !nested {
+        let enum_type = Arc::new(string_enum_type(
+            "QueryMode",
+            vec!["default".to_owned(), "insensitive".to_owned()],
+        ));
 
-    input_field(
-        "mode",
-        InputType::Enum(enum_type),
-        Some(DefaultValue::Single(PrismaValue::Enum("default".to_owned()))),
-    )
+        let field = input_field(
+            "mode",
+            InputType::Enum(enum_type),
+            Some(DefaultValue::Single(PrismaValue::Enum("default".to_owned()))),
+        );
+
+        vec![field]
+    } else {
+        vec![]
+    };
+
+    fields.into_iter()
 }
 
 fn scalar_filter_name(sf: &ScalarFieldRef, nested: bool) -> String {
