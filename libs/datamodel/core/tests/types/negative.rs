@@ -135,6 +135,55 @@ fn should_fail_on_native_type_with_invalid_number_of_arguments() {
 }
 
 #[test]
+fn should_fail_on_native_type_with_unknown_type() {
+    let dml = r#"
+        datasource pg {
+          provider = "postgres"
+          url = "postgresql://"
+          previewFeatures = ["nativeTypes"]
+        }
+
+        model Blog {
+            id     Int    @id
+            bigInt Int    @pg.Numeric(3, 4)
+            foobar String @pg.VarChar(5)
+        }
+    "#;
+
+    let error = parse_error(dml);
+
+    error.assert_is(DatamodelError::new_connector_error(
+        "Native type Numeric is not supported for Postgres connector.",
+        ast::Span::new(222, 238),
+    ));
+}
+
+#[test]
+fn should_fail_on_native_type_with_incompatible_type() {
+    let dml = r#"
+        datasource pg {
+          provider = "postgres"
+          url = "postgresql://"
+          previewFeatures = ["nativeTypes"]
+        }
+
+        model Blog {
+            id     Int    @id
+            bigInt Int    @pg.BigInt
+            foobar Boolean @pg.VarChar(5)
+        }
+    "#;
+
+    let error = parse_error(dml);
+
+    error.assert_is(DatamodelError::new_connector_error(
+        "Native type Postgres is not compatible with declared field type Boolean, expected field type String.",
+        ast::Span::new(260, 273),
+    ));
+}
+
+#[test]
+#[ignore]
 fn should_fail_on_native_type_with_invalid_arguments() {
     let dml = r#"
         datasource pg {

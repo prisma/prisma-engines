@@ -22,11 +22,10 @@ pub trait Connector: Send + Sync {
     /// Powers the auto completion of the vs code plugin.
     fn available_native_type_constructors(&self) -> &Vec<NativeTypeConstructor>;
 
-    fn find_native_type_constructor(&self, name: &str) -> &NativeTypeConstructor {
+    fn find_native_type_constructor(&self, name: &str) -> Option<&NativeTypeConstructor> {
         self.available_native_type_constructors()
             .iter()
             .find(|constructor| constructor.name.as_str() == name)
-            .unwrap()
     }
 
     /// This function is used during Schema parsing to calculate the concrete native type.
