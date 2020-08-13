@@ -161,7 +161,7 @@ fn test_each_connector_async_wrapper_functions(
     });
 
     let optional_unwrap = if super::function_returns_result(&test_function) {
-        Some(quote!(.unwrap()))
+        Some(quote!(.expect("The test function returned an Err.")))
     } else {
         None
     };
