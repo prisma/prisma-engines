@@ -70,7 +70,8 @@ impl Datamodel {
         self.models().find(|model| model.name == name)
     }
 
-    /// Finds a model by database name.
+    /// Finds a model by database name. This will only find models with a name
+    /// remapped to the provided `db_name`.
     pub fn find_model_db_name(&self, db_name: &str) -> Option<&Model> {
         self.models()
             .find(|model| model.database_name.as_deref() == Some(db_name))
