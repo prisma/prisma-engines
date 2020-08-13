@@ -55,8 +55,12 @@ impl SqlSchemaDiff {
             .chain(wrap_as_step(self.alter_enums, SqlMigrationStep::AlterEnum))
             .chain(wrap_as_step(self.drop_indexes, SqlMigrationStep::DropIndex))
             .chain(wrap_as_step(self.drop_foreign_keys, SqlMigrationStep::DropForeignKey))
-            .chain(wrap_as_step(self.create_tables, SqlMigrationStep::CreateTable))
             .chain(wrap_as_step(self.alter_tables, SqlMigrationStep::AlterTable))
+            // Order matters: we must drop enums before we create tables,
+            // because the new tables might be named the same as the dropped
+            // enum, and that conflicts on postgres.
+            .chain(wrap_as_step(self.drop_enums, SqlMigrationStep::DropEnum))
+            .chain(wrap_as_step(self.create_tables, SqlMigrationStep::CreateTable))
             .chain(redefine_tables.into_iter())
             // Order matters: we must create indexes after ALTER TABLEs because the indexes can be
             // on fields that are dropped/created there.
@@ -65,7 +69,6 @@ impl SqlSchemaDiff {
             // indexes created there.
             .chain(wrap_as_step(self.add_foreign_keys, SqlMigrationStep::AddForeignKey))
             .chain(wrap_as_step(self.drop_tables, SqlMigrationStep::DropTable))
-            .chain(wrap_as_step(self.drop_enums, SqlMigrationStep::DropEnum))
             .chain(wrap_as_step(self.alter_indexes, SqlMigrationStep::AlterIndex))
             .collect()
     }
