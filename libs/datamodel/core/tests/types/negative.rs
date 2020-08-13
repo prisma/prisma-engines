@@ -1,5 +1,4 @@
 use crate::common::*;
-use datamodel::ast::Span;
 use datamodel::{ast, error::DatamodelError};
 
 #[test]
@@ -183,7 +182,6 @@ fn should_fail_on_native_type_with_incompatible_type() {
 }
 
 #[test]
-#[ignore]
 fn should_fail_on_native_type_with_invalid_arguments() {
     let dml = r#"
         datasource pg {
@@ -201,8 +199,10 @@ fn should_fail_on_native_type_with_invalid_arguments() {
 
     let error = parse_error(dml);
 
-    error.assert_is(DatamodelError::new_connector_error(
-        "Native type VarChar takeks 1 arguments, but received 0.",
-        ast::Span::new(259, 271),
+    error.assert_is(DatamodelError::new_type_mismatch_error(
+        "numeric",
+        "literal",
+        "a",
+        ast::Span::new(270, 271),
     ));
 }

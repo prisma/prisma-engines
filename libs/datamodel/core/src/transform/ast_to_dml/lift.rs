@@ -9,6 +9,7 @@ use datamodel_connector::Connector;
 use itertools::Itertools;
 use sql_datamodel_connector::SqlDatamodelConnectors;
 use std::collections::HashMap;
+use datamodel_connector::error::ConnectorError;
 
 /// Helper for lifting a datamodel.
 ///
@@ -234,16 +235,21 @@ impl<'a> LiftAstToDml<'a> {
                 }
 
                 let name = type_specification.map(|dir| dir.name.name.trim_start_matches(&prefix));
-                let args = type_specification
-                    .map(|dir| {
-                        let args = dir
-                            .arguments
-                            .iter()
-                            .map(|arg| ValueValidator::new(&arg.value).as_int().unwrap() as u32)
-                            .collect_vec();
-                        args
-                    })
-                    .unwrap_or(vec![]);
+
+                // convert arguments to u32 if possible
+                // todo carmen this is really ugly
+                let number_args = type_specification.map(|dir|dir.arguments.clone());
+                let args = if let Some(number) = number_args {
+                    let p = number.iter()
+                        .map(|arg| ValueValidator::new(&arg.value).as_int())
+                        .collect_vec();
+                    if let Some(error) = p.iter().find(|arg|arg.is_err()) {
+                        return Err(error.clone().err().unwrap());
+                    }
+                    p.iter().map(|arg|*arg.as_ref().unwrap() as u32).collect_vec()
+                } else {
+                    vec![]
+                };
 
                 let connector: &Box<dyn Connector> = connectors.get(connector_string).unwrap();
                 if let Some(x) = name {
