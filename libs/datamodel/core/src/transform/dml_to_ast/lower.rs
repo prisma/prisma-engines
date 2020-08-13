@@ -113,7 +113,7 @@ impl LowerDmlToAst {
             dml::FieldType::Enum(tpe) => ast::Identifier::new(&tpe.to_string()),
             dml::FieldType::Unsupported(tpe) => ast::Identifier::new(&tpe.to_string()),
             dml::FieldType::Relation(rel) => ast::Identifier::new(&rel.to),
-            _ => unimplemented!("Connector specific types are not supported atm."),
+            dml::FieldType::NativeType(prisma_tpe, _native_tpe) => ast::Identifier::new(&prisma_tpe.to_string()),
         }
     }
 }
