@@ -120,7 +120,7 @@ impl Filter {
         }
     }
 
-    pub fn set_mode(&mut self, mode: Option<QueryMode>) {
+    pub fn set_mode(&mut self, mode: QueryMode) {
         match self {
             Filter::And(inner) => inner.iter_mut().for_each(|f| f.set_mode(mode.clone())),
             Filter::Or(inner) => inner.iter_mut().for_each(|f| f.set_mode(mode.clone())),
