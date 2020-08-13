@@ -1430,35 +1430,24 @@ async fn dropping_a_model_with_a_multi_field_unique_index_must_work(api: &TestAp
 }
 
 #[test_each_connector]
-async fn reserved_sql_key_words_must_work(api: &TestApi) {
+async fn reserved_sql_key_words_must_work(api: &TestApi) -> TestResult {
     // Group is a reserved keyword
-    let sql_family = api.sql_family();
     let dm = r#"
             model Group {
-                id    String  @default(cuid()) @id
-                parent_id String?
-                parent Group? @relation(name: "ChildGroups", fields: [parent_id], references: id)
+                id          String  @default(cuid()) @id
+                parent_id   String?
+                parent      Group? @relation(name: "ChildGroups", fields: [parent_id], references: id)
                 childGroups Group[] @relation(name: "ChildGroups")
             }
         "#;
-    let result = api.infer_and_apply(&dm).await.sql_schema;
 
-    let table = result.table_bang("Group");
-    assert_eq!(
-        table.foreign_keys,
-        vec![ForeignKey {
-            constraint_name: match sql_family {
-                SqlFamily::Postgres => Some("Group_parent_id_fkey".to_owned()),
-                SqlFamily::Mysql => Some("Group_ibfk_1".to_owned()),
-                SqlFamily::Sqlite => None,
-                SqlFamily::Mssql => todo!("Greetings from Redmond"),
-            },
-            columns: vec!["parent_id".to_string()],
-            referenced_table: "Group".to_string(),
-            referenced_columns: vec!["id".to_string()],
-            on_delete_action: ForeignKeyAction::SetNull,
-        }]
-    );
+    api.infer_apply(&dm).send().await?.assert_green()?;
+
+    api.assert_schema().await?.assert_table("Group", |table| {
+        table.assert_fk_on_columns(&["parent_id"], |fk| fk.assert_references("Group", &["id"]))
+    })?;
+
+    Ok(())
 }
 
 #[test_each_connector]
