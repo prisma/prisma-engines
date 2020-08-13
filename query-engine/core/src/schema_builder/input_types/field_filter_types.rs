@@ -6,7 +6,7 @@ pub(crate) fn get_field_filter_type(ctx: &mut BuilderContext, field: &ModelField
     match field {
         ModelField::Relation(rf) => relation_filter_type(ctx, rf),
         ModelField::Scalar(sf) if field.is_list() => scalar_list_filter_type(ctx, sf),
-        ModelField::Scalar(sf) => scalar_filter_type(ctx, sf),
+        ModelField::Scalar(sf) => scalar_filter_type(ctx, sf, false),
     }
 }
 
@@ -46,7 +46,7 @@ fn relation_filter_type(ctx: &mut BuilderContext, rf: &RelationFieldRef) -> Inpu
 }
 
 fn scalar_list_filter_type(ctx: &mut BuilderContext, sf: &ScalarFieldRef) -> InputObjectTypeWeakRef {
-    let name = scalar_filter_name(sf);
+    let name = scalar_filter_name(sf, false);
     return_cached_input!(ctx, &name);
 
     let object = Arc::new(init_input_object_type(name.clone()));
@@ -58,8 +58,8 @@ fn scalar_list_filter_type(ctx: &mut BuilderContext, sf: &ScalarFieldRef) -> Inp
     Arc::downgrade(&object)
 }
 
-fn scalar_filter_type(ctx: &mut BuilderContext, sf: &ScalarFieldRef) -> InputObjectTypeWeakRef {
-    let name = scalar_filter_name(sf);
+fn scalar_filter_type(ctx: &mut BuilderContext, sf: &ScalarFieldRef, nested: bool) -> InputObjectTypeWeakRef {
+    let name = scalar_filter_name(sf, nested);
     return_cached_input!(ctx, &name);
 
     let object = Arc::new(init_input_object_type(name.clone()));
@@ -69,7 +69,7 @@ fn scalar_filter_type(ctx: &mut BuilderContext, sf: &ScalarFieldRef) -> InputObj
         TypeIdentifier::String | TypeIdentifier::UUID => equality_filters(sf)
             .chain(inclusion_filters(sf))
             .chain(alphanumeric_filters(sf))
-            .chain(string_filters(sf))
+            .chain(string_filters(sf, nested))
             .collect(),
 
         TypeIdentifier::Int | TypeIdentifier::Float | TypeIdentifier::DateTime => equality_filters(sf)
@@ -83,7 +83,7 @@ fn scalar_filter_type(ctx: &mut BuilderContext, sf: &ScalarFieldRef) -> InputObj
 
     fields.push(input_field(
         "not",
-        InputType::opt(InputType::object(Arc::downgrade(&object))),
+        InputType::opt(InputType::object(scalar_filter_type(ctx, sf, true))),
         None,
     ));
 
@@ -119,7 +119,7 @@ fn alphanumeric_filters(sf: &ScalarFieldRef) -> impl Iterator<Item = InputField>
     .into_iter()
 }
 
-fn string_filters(sf: &ScalarFieldRef) -> impl Iterator<Item = InputField> {
+fn string_filters(sf: &ScalarFieldRef, nested: bool) -> impl Iterator<Item = InputField> {
     let mapped_type = map_optional_input_type(sf);
 
     let mut fields = vec![
@@ -128,7 +128,8 @@ fn string_filters(sf: &ScalarFieldRef) -> impl Iterator<Item = InputField> {
         input_field("endsWith", mapped_type.clone(), None),
     ];
 
-    if feature_flags::get().insensitiveFilters {
+    // Limit query mode field to the topmost filter level.
+    if feature_flags::get().insensitiveFilters && !nested {
         fields.push(query_mode_field());
     }
 
@@ -148,18 +149,19 @@ fn query_mode_field() -> InputField {
     )
 }
 
-fn scalar_filter_name(sf: &ScalarFieldRef) -> String {
+fn scalar_filter_name(sf: &ScalarFieldRef, nested: bool) -> String {
     let list = if sf.is_list { "List" } else { "" };
     let nullable = if sf.is_required { "" } else { "Nullable" };
+    let nested = if nested { "Nested" } else { "" };
 
     match sf.type_identifier {
-        TypeIdentifier::UUID => format!("Uuid{}{}Filter", nullable, list),
-        TypeIdentifier::String => format!("String{}{}Filter", nullable, list),
-        TypeIdentifier::Int => format!("Int{}{}Filter", nullable, list),
-        TypeIdentifier::Float => format!("Float{}{}Filter", nullable, list),
-        TypeIdentifier::Boolean => format!("Bool{}{}Filter", nullable, list),
-        TypeIdentifier::DateTime => format!("DateTime{}{}Filter", nullable, list),
-        TypeIdentifier::Json => format!("Json{}{}Filter", nullable, list),
-        TypeIdentifier::Enum(ref e) => format!("Enum{}{}{}Filter", e, nullable, list),
+        TypeIdentifier::UUID => format!("{}Uuid{}{}Filter", nested, nullable, list),
+        TypeIdentifier::String => format!("{}String{}{}Filter", nested, nullable, list),
+        TypeIdentifier::Int => format!("{}Int{}{}Filter", nested, nullable, list),
+        TypeIdentifier::Float => format!("{}Float{}{}Filter", nested, nullable, list),
+        TypeIdentifier::Boolean => format!("{}Bool{}{}Filter", nested, nullable, list),
+        TypeIdentifier::DateTime => format!("{}DateTime{}{}Filter", nested, nullable, list),
+        TypeIdentifier::Json => format!("{}Json{}{}Filter", nested, nullable, list),
+        TypeIdentifier::Enum(ref e) => format!("{}Enum{}{}{}Filter", nested, e, nullable, list),
     }
 }
