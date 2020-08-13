@@ -211,7 +211,7 @@ impl<'a> LiftAstToDml<'a> {
                 };
                 let mut connectors: HashMap<&str, Box<dyn Connector>> = HashMap::new();
                 connectors.insert("postgresql", Box::new(SqlDatamodelConnectors::postgres()));
-                connectors.insert("mysql", Box::new(SqlDatamodelConnectors::mssql()));
+                connectors.insert("mysql", Box::new(SqlDatamodelConnectors::mysql()));
                 connectors.insert("sqlite", Box::new(SqlDatamodelConnectors::sqlite()));
                 connectors.insert("mssql", Box::new(SqlDatamodelConnectors::mssql()));
 

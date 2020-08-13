@@ -1,7 +1,7 @@
 use serde::*;
 use serde_json::Value;
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum MySqlType {
     Int,
     SmallInt,

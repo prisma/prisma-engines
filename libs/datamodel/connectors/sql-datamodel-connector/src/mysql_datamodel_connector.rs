@@ -72,10 +72,8 @@ impl MySqlDatamodelConnector {
         let long_text = NativeTypeConstructor::without_args(LONG_TEXT_TYPE_NAME, ScalarType::String);
         let date = NativeTypeConstructor::without_args(DATE_TYPE_NAME, ScalarType::DateTime);
         let time = NativeTypeConstructor::with_args(TIME_TYPE_NAME, 1, ScalarType::DateTime);
-        let datetime_with_arg = NativeTypeConstructor::without_args(DATETIME_TYPE_NAME, ScalarType::DateTime);
-        let datetime_without_arg = NativeTypeConstructor::with_args(DATETIME_TYPE_NAME, 1, ScalarType::DateTime);
-        let timestamp_with_arg = NativeTypeConstructor::with_args(TIMESTAMP_TYPE_NAME, 1, ScalarType::DateTime);
-        let timestamp_without_arg = NativeTypeConstructor::without_args(TIMESTAMP_TYPE_NAME, ScalarType::DateTime);
+        let datetime = NativeTypeConstructor::with_optional_args(DATETIME_TYPE_NAME, 1, ScalarType::DateTime);
+        let timestamp = NativeTypeConstructor::with_optional_args(TIMESTAMP_TYPE_NAME, 1, ScalarType::DateTime);
         let year = NativeTypeConstructor::without_args(YEAR_TYPE_NAME, ScalarType::Int);
         let json = NativeTypeConstructor::without_args(JSON_TYPE_NAME, ScalarType::Json);
 
@@ -95,10 +93,8 @@ impl MySqlDatamodelConnector {
             long_text,
             date,
             time,
-            datetime_with_arg,
-            datetime_without_arg,
-            timestamp_with_arg,
-            timestamp_without_arg,
+            datetime,
+            timestamp,
             year,
             json,
         ];
@@ -183,7 +179,9 @@ impl Connector for MySqlDatamodelConnector {
 
         let native_type_constructor = self.constructors.iter().find(|c| c.name.as_str() == name).unwrap();
 
-        if native_type_constructor._number_of_args != length {
+        if native_type_constructor._number_of_args != length
+            && native_type_constructor._number_of_optional_args != length
+        {
             return Err(ConnectorError::new_argument_count_mismatch_error(
                 name,
                 native_type_constructor._number_of_args,
