@@ -242,7 +242,11 @@ impl Connector for PostgresDatamodelConnector {
             ));
         }
 
-        Ok(NativeTypeInstance::new(constructor.unwrap().name.as_str(), args, &native_type))
+        Ok(NativeTypeInstance::new(
+            constructor.unwrap().name.as_str(),
+            args,
+            &native_type,
+        ))
     }
 
     fn introspect_native_type(&self, native_type: Box<dyn NativeType>) -> Result<NativeTypeInstance, ConnectorError> {
@@ -277,7 +281,10 @@ impl Connector for PostgresDatamodelConnector {
         if let Some(constructor) = self.find_native_type_constructor(constructor_name) {
             Ok(NativeTypeInstance::new(constructor.name.as_str(), args, &native_type))
         } else {
-            Err(ConnectorError::new_type_name_unknown_error(constructor_name, "Postgres"))
+            Err(ConnectorError::new_type_name_unknown_error(
+                constructor_name,
+                "Postgres",
+            ))
         }
     }
 }

@@ -201,7 +201,11 @@ impl Connector for MySqlDatamodelConnector {
             ));
         }
 
-        Ok(NativeTypeInstance::new(constructor.unwrap().name.as_str(), args, &native_type))
+        Ok(NativeTypeInstance::new(
+            constructor.unwrap().name.as_str(),
+            args,
+            &native_type,
+        ))
     }
 
     fn introspect_native_type(&self, native_type: Box<dyn NativeType>) -> Result<NativeTypeInstance, ConnectorError> {
@@ -253,6 +257,5 @@ impl Connector for MySqlDatamodelConnector {
         } else {
             Err(ConnectorError::new_type_name_unknown_error(constructor_name, "Mysql"))
         }
-
     }
 }
