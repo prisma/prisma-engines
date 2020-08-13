@@ -17,6 +17,7 @@ use datamodel::{
     dml::Datamodel,
 };
 use error::Error;
+use migration_connector::ConnectorError;
 use sql_migration_connector::SqlMigrationConnector;
 use std::sync::Arc;
 
@@ -31,7 +32,9 @@ pub async fn migration_api(datamodel: &str) -> CoreResult<Arc<dyn api::GenericAp
     let connector = match &source.active_provider {
         #[cfg(feature = "sql")]
         provider if POSTGRES_SOURCE_NAME == provider => {
-            let mut u = url::Url::parse(&source.url().value).unwrap();
+            let mut u = url::Url::parse(&source.url().value).map_err(|url_error| {
+                Error::ConnectorError(ConnectorError::url_parse_error(url_error, &source.url().value))
+            })?;
 
             let params: Vec<(String, String)> = u.query_pairs().map(|(k, v)| (k.to_string(), v.to_string())).collect();
 
