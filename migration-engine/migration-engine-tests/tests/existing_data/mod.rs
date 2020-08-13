@@ -1205,9 +1205,7 @@ async fn primary_key_migrations_do_not_cause_data_loss(api: &TestApi) -> TestRes
     Ok(())
 }
 
-//Fixme try out transaction around the ddl to prevent in between state
-
-#[test_each_connector(capabilities("enums"), log = "DEBUG")]
+#[test_each_connector(tags("postgres"))]
 async fn failing_enum_migrations_should_not_be_partially_applied(api: &TestApi) -> TestResult {
     let dm1 = r#"
         model Cat {
@@ -1238,7 +1236,6 @@ async fn failing_enum_migrations_should_not_be_partially_applied(api: &TestApi) 
     let dm2 = r#"
         model Cat {
             id   String @id
-            test Int
             mood Mood
         }
 
@@ -1247,40 +1244,44 @@ async fn failing_enum_migrations_should_not_be_partially_applied(api: &TestApi) 
         }
     "#;
 
-    api.infer_apply(dm2)
+    let res = api
+        .infer_apply(dm2)
         .migration_id(Some("remove-used-variant"))
         .force(Some(true))
         .send()
-        .await?;
-
-    api.infer_apply(dm2)
-        .migration_id(Some("remove-used-variant_again"))
-        .force(Some(true))
-        .send()
-        .await?;
+        .await;
 
     // Assertions
     {
-        let cat_data = api.dump_table("Cat").await?;
-        let cat_data: Vec<Vec<quaint::ast::Value>> =
-            cat_data.into_iter().map(|row| row.into_iter().collect()).collect();
+        match res {
+            Ok(_) => assert_eq!(1, 0),
+            Err(_) => {
+                let cat_data = api.dump_table("Cat").await?;
+                let cat_data: Vec<Vec<quaint::ast::Value>> =
+                    cat_data.into_iter().map(|row| row.into_iter().collect()).collect();
 
-        let expected_cat_data = vec![
-            vec![Value::text("felix"), Value::enum_variant("HUNGRY")],
-            vec![Value::text("mittens"), Value::enum_variant("HAPPY")],
-        ];
+                let expected_cat_data = vec![
+                    vec![Value::text("felix"), Value::enum_variant("HUNGRY")],
+                    vec![Value::text("mittens"), Value::enum_variant("HAPPY")],
+                ];
 
-        assert_eq!(cat_data, expected_cat_data);
+                assert_eq!(cat_data, expected_cat_data);
 
-        if api.sql_family().is_mysql() {
-            api.assert_schema()
-                .await?
-                .assert_enum("Cat_mood", |enm| enm.assert_values(&["HUNGRY"]))?
-        } else {
-            api.assert_schema()
-                .await?
-                .assert_enum("Mood", |enm| enm.assert_values(&["HUNGRY"]))?
-        };
+                if api.sql_family().is_mysql() {
+                    api.assert_schema()
+                        .await?
+                        .assert_enum("Cat_mood", |enm| enm.assert_values(&["HUNGRY"]))?
+                } else {
+                    api.assert_schema()
+                        .await?
+                        .assert_enum("Mood", |enm| enm.assert_values(&["HAPPY", "HUNGRY"]))?;
+
+                    api.assert_schema()
+                        .await?
+                        .assert_enum("Mood_new", |enm| enm.assert_values(&["HUNGRY"]))?
+                };
+            }
+        }
     }
 
     Ok(())
