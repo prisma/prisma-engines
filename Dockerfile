@@ -3,8 +3,8 @@ MAINTAINER Julius de Bruijn <bruijn@prisma.io>
 
 ENV USER root
 
-RUN apt-get -_y update
-RUN apt-get -_y install libssl-dev build-essential
+RUN apt-get -y update
+RUN apt-get -y install libssl-dev build-essential
 
 ENV SERVER_ROOT=/usr/src/query-engine
 ENV RUST_LOG_FORMAT=devel
