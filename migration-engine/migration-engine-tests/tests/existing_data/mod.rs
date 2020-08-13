@@ -1256,6 +1256,8 @@ async fn failing_enum_migrations_should_not_be_partially_applied(api: &TestApi) 
         match res {
             Ok(_) => assert_eq!(1, 0),
             Err(_) => {
+                api.database().raw_cmd("Rollback").await.expect("Did not work");
+
                 let cat_data = api.dump_table("Cat").await?;
                 let cat_data: Vec<Vec<quaint::ast::Value>> =
                     cat_data.into_iter().map(|row| row.into_iter().collect()).collect();
@@ -1270,15 +1272,11 @@ async fn failing_enum_migrations_should_not_be_partially_applied(api: &TestApi) 
                 if api.sql_family().is_mysql() {
                     api.assert_schema()
                         .await?
-                        .assert_enum("Cat_mood", |enm| enm.assert_values(&["HUNGRY"]))?
+                        .assert_enum("Cat_mood", |enm| enm.assert_values(&["HAPPY", "HUNGRY"]))?;
                 } else {
                     api.assert_schema()
                         .await?
                         .assert_enum("Mood", |enm| enm.assert_values(&["HAPPY", "HUNGRY"]))?;
-
-                    api.assert_schema()
-                        .await?
-                        .assert_enum("Mood_new", |enm| enm.assert_values(&["HUNGRY"]))?
                 };
             }
         }
