@@ -1,8 +1,8 @@
 use crate::*;
 use sql_renderer::{rendered_step::RenderedStep, IteratorJoin, Quoted, RenderedAlterColumn};
-use sql_schema_describer::*;
+use sql_schema_describer::walkers::{find_column, walk_columns, ColumnRef, SqlSchemaExt};
+use sql_schema_describer::{ColumnTypeFamily, Index, IndexType, SqlSchema};
 use sql_schema_differ::{ColumnDiffer, SqlSchemaDiffer};
-use sql_schema_helpers::{find_column, walk_columns, ColumnRef, SqlSchemaExt};
 use std::fmt::Write as _;
 use tracing_futures::Instrument;
 use SqlFlavour;
@@ -544,7 +544,7 @@ fn postgres_alter_enum(
 }
 
 fn mysql_alter_enum(alter_enum: &AlterEnum, next_schema: &SqlSchema, schema_name: &str) -> anyhow::Result<Vec<String>> {
-    let column = sql_schema_helpers::walk_columns(next_schema)
+    let column = walk_columns(next_schema)
         .find(|col| match &col.column_type().family {
             ColumnTypeFamily::Enum(enum_name) if enum_name.as_str() == alter_enum.name.as_str() => true,
             _ => false,

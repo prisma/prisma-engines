@@ -4,11 +4,11 @@ use crate::{
     expanded_alter_column::{expand_postgres_alter_column, PostgresAlterColumn},
     flavour::PostgresFlavour,
     sql_schema_differ::{ColumnDiffer, SqlSchemaDiffer},
-    sql_schema_helpers::*,
 };
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
 use regex::Regex;
+use sql_schema_describer::walkers::*;
 use sql_schema_describer::*;
 use std::borrow::Cow;
 

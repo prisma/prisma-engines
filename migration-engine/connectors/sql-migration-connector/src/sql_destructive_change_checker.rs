@@ -9,12 +9,14 @@ pub(crate) use destructive_change_checker_flavour::DestructiveChangeCheckerFlavo
 
 use crate::{
     sql_schema_differ::{ColumnDiffer, TableDiffer},
-    sql_schema_helpers::{find_column, ColumnRef, SqlSchemaExt},
     Component, DropTable, SqlMigration, SqlMigrationStep, SqlResult, TableChange,
 };
 use destructive_check_plan::DestructiveCheckPlan;
 use migration_connector::{ConnectorResult, DestructiveChangeChecker, DestructiveChangeDiagnostics};
-use sql_schema_describer::SqlSchema;
+use sql_schema_describer::{
+    walkers::{find_column, ColumnRef, SqlSchemaExt},
+    SqlSchema,
+};
 use unexecutable_step_check::UnexecutableStepCheck;
 use warning_check::SqlMigrationWarningCheck;
 

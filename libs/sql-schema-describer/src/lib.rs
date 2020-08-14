@@ -15,6 +15,7 @@ use tracing::debug;
 pub mod mysql;
 pub mod postgres;
 pub mod sqlite;
+pub mod walkers;
 
 /// description errors.
 #[derive(Debug, Error)]

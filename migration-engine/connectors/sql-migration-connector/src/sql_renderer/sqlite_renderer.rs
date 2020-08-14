@@ -4,12 +4,11 @@ use crate::{
     flavour::{SqlFlavour, SqliteFlavour},
     sql_database_step_applier::render_create_index,
     sql_schema_differ::{ColumnDiffer, SqlSchemaDiffer, TableDiffer},
-    sql_schema_helpers::*,
 };
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
 use regex::Regex;
-use sql_schema_describer::*;
+use sql_schema_describer::{walkers::*, *};
 use std::borrow::Cow;
 
 impl SqlRenderer for SqliteFlavour {

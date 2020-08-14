@@ -10,9 +10,9 @@ pub(crate) use table::TableDiffer;
 
 use crate::*;
 use enums::EnumDiffer;
+use sql_schema_describer::walkers::ForeignKeyRef;
+use sql_schema_describer::walkers::TableRef;
 use sql_schema_describer::*;
-use sql_schema_helpers::ForeignKeyRef;
-use sql_schema_helpers::TableRef;
 use std::collections::HashSet;
 
 #[derive(Debug)]

@@ -10,10 +10,10 @@ pub(crate) use common::{IteratorJoin, Quoted, QuotedWithSchema};
 use crate::{
     database_info::DatabaseInfo,
     sql_schema_differ::{ColumnDiffer, SqlSchemaDiffer},
-    sql_schema_helpers::{ColumnRef, TableRef},
     CreateEnum, DropEnum,
 };
 use quaint::prelude::SqlFamily;
+use sql_schema_describer::walkers::{ColumnRef, TableRef};
 use sql_schema_describer::*;
 use std::{borrow::Cow, fmt::Write};
 

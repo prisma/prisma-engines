@@ -4,11 +4,11 @@ use crate::{
     expanded_alter_column::{expand_mysql_alter_column, MysqlAlterColumn},
     flavour::{MysqlFlavour, SqlFlavour},
     sql_schema_differ::{ColumnChanges, ColumnDiffer, SqlSchemaDiffer},
-    sql_schema_helpers::ColumnRef,
 };
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
 use regex::Regex;
+use sql_schema_describer::walkers::ColumnRef;
 use sql_schema_describer::*;
 use std::borrow::Cow;
 

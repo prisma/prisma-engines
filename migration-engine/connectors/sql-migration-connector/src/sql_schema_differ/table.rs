@@ -1,11 +1,9 @@
 use super::column::ColumnDiffer;
-use crate::sql_schema_helpers::ForeignKeyRef;
-use crate::{
-    database_info::DatabaseInfo,
-    flavour::SqlFlavour,
-    sql_schema_helpers::{ColumnRef, TableRef},
+use crate::{database_info::DatabaseInfo, flavour::SqlFlavour};
+use sql_schema_describer::{
+    walkers::{ColumnRef, ForeignKeyRef, TableRef},
+    Index, PrimaryKey,
 };
-use sql_schema_describer::{Index, PrimaryKey};
 
 pub(crate) struct TableDiffer<'a> {
     pub(crate) database_info: &'a DatabaseInfo,

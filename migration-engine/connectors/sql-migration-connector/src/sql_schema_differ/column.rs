@@ -1,6 +1,6 @@
-use crate::{database_info::DatabaseInfo, flavour::SqlFlavour, sql_schema_helpers::ColumnRef};
+use crate::{database_info::DatabaseInfo, flavour::SqlFlavour};
 use prisma_value::PrismaValue;
-use sql_schema_describer::{ColumnTypeFamily, DefaultValue};
+use sql_schema_describer::{walkers::ColumnRef, ColumnTypeFamily, DefaultValue};
 
 #[derive(Debug)]
 pub(crate) struct ColumnDiffer<'a> {

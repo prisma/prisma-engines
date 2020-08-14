@@ -1,4 +1,4 @@
-use crate::sql_schema_helpers::*;
+use sql_schema_describer::walkers::*;
 use sql_schema_describer::*;
 use std::fmt::{Display, Write as _};
 
