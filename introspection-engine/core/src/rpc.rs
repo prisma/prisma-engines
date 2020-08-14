@@ -1,6 +1,5 @@
 use crate::command_error::CommandError;
 use crate::error::Error;
-use crate::error::Error::DatamodelError;
 use crate::error_rendering::render_jsonrpc_error;
 use datamodel::{Configuration, Datamodel};
 use futures::{FutureExt, TryFutureExt};
@@ -94,7 +93,8 @@ impl RpcImpl {
             .map_err(|err| render_jsonrpc_error(err, &schema))?;
 
         let input_data_model = if reintrospect && !clean {
-            datamodel::parse_datamodel(&schema).map_err(|err| render_jsonrpc_error(DatamodelError(err), &schema))?
+            datamodel::parse_datamodel(&schema)
+                .map_err(|err| render_jsonrpc_error(Error::from(CommandError::InputSchemaInvalid(err)), &schema))?
         } else {
             Datamodel::new()
         };

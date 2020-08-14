@@ -2,6 +2,7 @@ use crate::command_error::CommandError;
 use crate::error::Error;
 use introspection_connector::ConnectorError;
 use jsonrpc_core::types::Error as JsonRpcError;
+use user_facing_errors::introspection_engine::PrismaSchemaInconsistent;
 use user_facing_errors::{introspection_engine::IntrospectionResultEmpty, Error as UserFacingError, KnownError};
 
 pub fn render_error(crate_error: Error, schema: &str) -> UserFacingError {
@@ -11,12 +12,15 @@ pub fn render_error(crate_error: Error, schema: &str) -> UserFacingError {
             ..
         }) => user_facing_error.into(),
         Error::CommandError(CommandError::IntrospectionResultEmpty(connection_string)) => {
-            KnownError::new(IntrospectionResultEmpty {
-                connection_string: connection_string,
-            })
-            .unwrap()
-            .into()
+            KnownError::new(IntrospectionResultEmpty { connection_string })
+                .unwrap()
+                .into()
         }
+        Error::CommandError(CommandError::InputSchemaInvalid(errors)) => KnownError::new(PrismaSchemaInconsistent {
+            explanation: errors.to_pretty_string("schema.prisma", schema),
+        })
+        .unwrap()
+        .into(),
         Error::DatamodelError(errors) => {
             UserFacingError::new_non_panic_with_current_backtrace(errors.to_pretty_string("schema.prisma", schema))
         }
