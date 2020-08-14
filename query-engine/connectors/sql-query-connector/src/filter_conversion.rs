@@ -135,11 +135,14 @@ impl AliasedCondition for ScalarFilter {
     /// Conversion from a `ScalarFilter` to a query condition tree. Aliased when in a nested `SELECT`.
     fn aliased_cond(self, alias: Option<Alias>) -> ConditionTree<'static> {
         match (alias, self.projection) {
-            (Some(alias), ScalarProjection::Single(field)) => convert_scalar_filter(
-                field.as_column().table(alias.to_string(None)),
-                self.condition,
-                self.mode,
-            ),
+            (Some(alias), ScalarProjection::Single(field)) => {
+                let comparable: Expression = match self.mode {
+                    QueryMode::Default => field.as_column().table(alias.to_string(None)).into(),
+                    QueryMode::Insensitive => lower(field.as_column().table(alias.to_string(None))).into(),
+                };
+
+                convert_scalar_filter(comparable, self.condition, self.mode)
+            }
             (Some(alias), ScalarProjection::Compound(fields)) => {
                 let columns: Vec<Column<'static>> = fields
                     .into_iter()
@@ -149,7 +152,12 @@ impl AliasedCondition for ScalarFilter {
                 convert_scalar_filter(Row::from(columns), self.condition, self.mode)
             }
             (None, ScalarProjection::Single(field)) => {
-                convert_scalar_filter(field.as_column(), self.condition, self.mode)
+                let comparable: Expression = match self.mode {
+                    QueryMode::Default => field.as_column().into(),
+                    QueryMode::Insensitive => lower(field.as_column()).into(),
+                };
+
+                convert_scalar_filter(comparable, self.condition, self.mode)
             }
             (None, ScalarProjection::Compound(fields)) => {
                 let columns: Vec<Column<'static>> = fields.into_iter().map(|field| field.as_column()).collect();
@@ -325,8 +333,15 @@ impl AliasedCondition for OneRelationIsNullFilter {
 fn convert_scalar_filter(
     comparable: impl Comparable<'static>,
     cond: ScalarCondition,
-    _mode: QueryMode,
+    mode: QueryMode,
 ) -> ConditionTree<'static> {
+    match mode {
+        QueryMode::Default => default_scalar_filter(comparable, cond),
+        QueryMode::Insensitive => insensitive_scalar_filter(comparable, cond),
+    }
+}
+
+fn default_scalar_filter(comparable: impl Comparable<'static>, cond: ScalarCondition) -> ConditionTree<'static> {
     let condition = match cond {
         ScalarCondition::Equals(PrismaValue::Null(_)) => comparable.is_null(),
         ScalarCondition::NotEquals(PrismaValue::Null(_)) => comparable.is_not_null(),
@@ -342,6 +357,55 @@ fn convert_scalar_filter(
         ScalarCondition::LessThanOrEquals(value) => comparable.less_than_or_equals(value),
         ScalarCondition::GreaterThan(value) => comparable.greater_than(value),
         ScalarCondition::GreaterThanOrEquals(value) => comparable.greater_than_or_equals(value),
+        ScalarCondition::In(values) => match values.split_first() {
+            Some((PrismaValue::List(_), _)) => {
+                let mut sql_values = Values::with_capacity(values.len());
+
+                for pv in values {
+                    let list_value = pv.into_list().unwrap();
+                    sql_values.push(list_value);
+                }
+
+                comparable.in_selection(sql_values)
+            }
+            _ => comparable.in_selection(values),
+        },
+        ScalarCondition::NotIn(values) => match values.split_first() {
+            Some((PrismaValue::List(_), _)) => {
+                let mut sql_values = Values::with_capacity(values.len());
+
+                for pv in values {
+                    let list_value = pv.into_list().unwrap();
+                    sql_values.push(list_value);
+                }
+
+                comparable.not_in_selection(sql_values)
+            }
+            _ => comparable.not_in_selection(values),
+        },
+    };
+
+    ConditionTree::single(condition)
+}
+
+fn insensitive_scalar_filter(comparable: impl Comparable<'static>, cond: ScalarCondition) -> ConditionTree<'static> {
+    // Current workaround: We assume we can use ILIKE when we see `mode: insensitive`, because postgres is the only DB that has
+    // insensitive. We need a connector context for filter building that is unexpectedly complicated to integrate.
+    let condition = match cond {
+        ScalarCondition::Equals(PrismaValue::Null(_)) => comparable.is_null(),
+        ScalarCondition::NotEquals(PrismaValue::Null(_)) => comparable.is_not_null(),
+        ScalarCondition::Equals(value) => comparable.equals(lower(value)),
+        ScalarCondition::NotEquals(value) => comparable.not_equals(value),
+        ScalarCondition::Contains(value) => comparable.compare_raw("ILIKE", format!("%{}%", value)),
+        ScalarCondition::NotContains(value) => comparable.compare_raw("NOT ILIKE", format!("%{}%", value)),
+        ScalarCondition::StartsWith(value) => comparable.compare_raw("ILIKE", format!("{}%", value)),
+        ScalarCondition::NotStartsWith(value) => comparable.compare_raw("NOT ILIKE", format!("{}%", value)),
+        ScalarCondition::EndsWith(value) => comparable.compare_raw("ILIKE", format!("%{}", value)),
+        ScalarCondition::NotEndsWith(value) => comparable.compare_raw("NOT ILIKE", format!("%{}", value)),
+        ScalarCondition::LessThan(value) => comparable.less_than(lower(value)),
+        ScalarCondition::LessThanOrEquals(value) => comparable.less_than_or_equals(lower(value)),
+        ScalarCondition::GreaterThan(value) => comparable.greater_than(lower(value)),
+        ScalarCondition::GreaterThanOrEquals(value) => comparable.greater_than_or_equals(lower(value)),
         ScalarCondition::In(values) => match values.split_first() {
             Some((PrismaValue::List(_), _)) => {
                 let mut sql_values = Values::with_capacity(values.len());
