@@ -462,10 +462,12 @@ fn postgres_alter_enum(
             .get_enum(&alter_enum.name)
             .ok_or_else(|| anyhow::anyhow!("Enum `{}` not found in target schema.", alter_enum.name))?;
 
-        let mut stmts = Vec::with_capacity(8);
+        let mut stmts = Vec::with_capacity(10);
 
         let tmp_name = format!("{}_new", &new_enum.name);
         let tmp_old_name = format!("{}_old", &alter_enum.name);
+
+        stmts.push("Begin".to_string());
 
         // create the new enum with tmp name
         {
@@ -535,7 +537,9 @@ fn postgres_alter_enum(
             stmts.push(sql)
         }
 
-        Ok(RenderedStep::new(stmts).with_transaction(true))
+        stmts.push("Commit".to_string());
+
+        Ok(RenderedStep::new(stmts))
     }
 }
 
