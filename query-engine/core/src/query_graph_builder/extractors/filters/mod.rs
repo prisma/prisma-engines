@@ -103,12 +103,15 @@ pub fn extract_filter(value_map: ParsedInputMap, model: &ModelRef) -> QueryGraph
 
 fn parse_query_mode(input: ParsedInputValue) -> QueryGraphBuilderResult<QueryMode> {
     let value: PrismaValue = input.try_into()?;
-    Ok(match value {
-        PrismaValue::Enum(s) => match s.as_str() {
-            "default" => QueryMode::Default,
-            "insensitive" => QueryMode::Insensitive,
-            _ => unreachable!(),
-        },
+    let s = match value {
+        PrismaValue::Enum(s) => s,
+        PrismaValue::String(s) => s,
+        _ => unreachable!(),
+    };
+
+    Ok(match s.as_str() {
+        "default" => QueryMode::Default,
+        "insensitive" => QueryMode::Insensitive,
         _ => unreachable!(),
     })
 }
