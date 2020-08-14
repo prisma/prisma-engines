@@ -111,7 +111,7 @@ async fn mssql(source: &Datasource) -> PrismaResult<(String, Box<dyn QueryExecut
     let db_name = params.remove("database").unwrap_or_else(|| String::from("master"));
 
     trace!("Loaded SQL Server connector.");
-    Ok((db_name, sql_executor("mssql", mssql, false)))
+    Ok((db_name, sql_executor(mssql, false)))
 }
 
 #[cfg(feature = "sql")]
