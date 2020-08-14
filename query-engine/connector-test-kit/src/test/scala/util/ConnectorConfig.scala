@@ -124,6 +124,22 @@ object ConnectorConfig {
     }
   }
 
+  lazy val $cockroachdb_Host = {
+    if (EnvVars.isBuildkite) {
+      "test-db-cockroachdb"
+    } else {
+      "127.0.0.1"
+    }
+  }
+
+  lazy val $cockroachdb_Port = {
+    if (EnvVars.isBuildkite) {
+      5432
+    } else {
+      5436
+    }
+  }
+
   lazy val mysql_5_7_Host = {
     if (EnvVars.isBuildkite) {
       "test-db-mysql-5-7"
