@@ -49,7 +49,7 @@ impl Connector for Mssql {
     }
 
     fn capabilities(&self) -> ConnectorCapabilities {
-        ConnectorCapabilities::dafault()
+        ConnectorCapabilities::default()
     }
 
     fn name(&self) -> String {
