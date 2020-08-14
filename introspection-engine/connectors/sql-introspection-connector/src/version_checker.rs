@@ -25,6 +25,7 @@ pub struct VersionChecker {
 
 const CHAR: &str = "char";
 const CHAR_25: &str = "char(25)";
+const CHAR_30: &str = "char(30)";
 const CHAR_36: &str = "char(36)";
 const INT: &str = "int";
 const INT_11: &str = "int(11)";
@@ -51,7 +52,7 @@ const POSTGRES_TYPES: &'static [(&'static str, &'static str)] = &[
 ];
 
 const POSTGRES_VAR_CHAR: &'static [(&'static str, &'static str)] = &[("character varying", "varchar")];
-const POSTGRES_VAR_CHAR_LENGTHS: &'static [i64] = &[25, 36, 191];
+const POSTGRES_VAR_CHAR_LENGTHS: &'static [i64] = &[25, 30, 36, 191];
 
 const MYSQL_TYPES: &'static [(&'static str, &'static str)] = &[
     ("tinyint", "tinyint(1)"),
@@ -63,6 +64,7 @@ const MYSQL_TYPES: &'static [(&'static str, &'static str)] = &[
     ("mediumtext", "mediumtext"),
     ("varchar", "varchar(191)"),
     ("char", "char(25)"),
+    ("char", "char(30)"),
     ("char", "char(36)"),
 ];
 
@@ -139,9 +141,11 @@ impl VersionChecker {
                         self.sql_family,
                     ) {
                         (dt, fdt, Some(25), SqlFamily::Mysql) if dt == CHAR && fdt == CHAR_25 => (),
+                        (dt, fdt, Some(30), SqlFamily::Mysql) if dt == CHAR && fdt == CHAR_30 => (),
                         (dt, fdt, Some(36), SqlFamily::Mysql) if dt == CHAR && fdt == CHAR_36 => (),
                         (dt, fdt, None, SqlFamily::Mysql) if dt == INT && (fdt == INT_11 || fdt == INT) => (),
                         (dt, fdt, Some(25), SqlFamily::Postgres) if dt == CHARACTER_VARYING && fdt == VARCHAR => (),
+                        (dt, fdt, Some(30), SqlFamily::Postgres) if dt == CHARACTER_VARYING && fdt == VARCHAR => (),
                         (dt, fdt, Some(36), SqlFamily::Postgres) if dt == CHARACTER_VARYING && fdt == VARCHAR => (),
                         (dt, fdt, None, SqlFamily::Postgres) if dt == INTEGER && fdt == INT_4 => (),
                         _ => self.always_has_p1_or_p_1_1_compatible_id = false,
