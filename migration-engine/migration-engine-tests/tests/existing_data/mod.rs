@@ -1204,3 +1204,83 @@ async fn primary_key_migrations_do_not_cause_data_loss(api: &TestApi) -> TestRes
 
     Ok(())
 }
+
+#[test_each_connector(tags("postgres"))]
+async fn failing_enum_migrations_should_not_be_partially_applied(api: &TestApi) -> TestResult {
+    let dm1 = r#"
+        model Cat {
+            id String @id
+            mood Mood
+        }
+
+        enum Mood {
+            HAPPY
+            HUNGRY
+        }
+    "#;
+
+    api.infer_apply(dm1)
+        .migration_id(Some("initial-setup"))
+        .send()
+        .await?
+        .assert_green()?;
+
+    {
+        let cat_inserts = quaint::ast::Insert::multi_into(api.render_table_name("Cat"), &["id", "mood"])
+            .values((Value::text("felix"), Value::enum_variant("HUNGRY")))
+            .values((Value::text("mittens"), Value::enum_variant("HAPPY")));
+
+        api.database().query(cat_inserts.into()).await?;
+    }
+
+    let dm2 = r#"
+        model Cat {
+            id   String @id
+            mood Mood
+        }
+
+        enum Mood {
+            HUNGRY
+        }
+    "#;
+
+    let res = api
+        .infer_apply(dm2)
+        .migration_id(Some("remove-used-variant"))
+        .force(Some(true))
+        .send()
+        .await;
+
+    // Assertions
+    {
+        match res {
+            Ok(_) => assert_eq!(1, 0),
+            Err(_) => {
+                api.database().raw_cmd("Rollback").await.expect("Did not work");
+
+                let cat_data = api.dump_table("Cat").await?;
+                let cat_data: Vec<Vec<quaint::ast::Value>> =
+                    cat_data.into_iter().map(|row| row.into_iter().collect()).collect();
+
+                let expected_cat_data = vec![
+                    vec![Value::text("felix"), Value::enum_variant("HUNGRY")],
+                    vec![Value::text("mittens"), Value::enum_variant("HAPPY")],
+                ];
+
+                assert_eq!(cat_data, expected_cat_data);
+
+                if api.sql_family().is_mysql() {
+                    api.assert_schema()
+                        .await?
+                        .assert_enum("Cat_mood", |enm| enm.assert_values(&["HAPPY", "HUNGRY"]))?;
+                } else {
+                    api.assert_schema()
+                        .await?
+                        .assert_enum("Mood", |enm| enm.assert_values(&["HAPPY", "HUNGRY"]))?;
+                };
+            }
+        }
+    }
+
+    Ok(())
+}

@@ -40,6 +40,23 @@ async fn database_already_exists_must_return_a_proper_error() {
 }
 
 #[tokio::test]
+async fn bad_postgres_url_must_return_a_good_error() {
+    let url = "postgresql://postgres:prisma@localhost:543`/mydb?schema=public";
+
+    let error = get_cli_error(&["migration-engine", "cli", "--datasource", &url, "create-database"]).await;
+
+    let json_error = serde_json::to_value(&error).unwrap();
+
+    let expected = json!({
+        "is_panic": false,
+        "message": "Error parsing connection string: invalid port number in `postgresql://postgres:prisma@localhost:543`/mydb?schema=public`)\n",
+        "backtrace": null,
+    });
+
+    assert_eq!(json_error, expected);
+}
+
+#[tokio::test]
 async fn database_access_denied_must_return_a_proper_error_in_cli() {
     let db_name = "dbaccessdeniedincli";
     let url: Url = mysql_url(db_name).parse().unwrap();

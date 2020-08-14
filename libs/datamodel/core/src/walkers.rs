@@ -40,6 +40,13 @@ pub fn walk_relations(datamodel: &Datamodel) -> impl Iterator<Item = RelationWal
         })
 }
 
+pub fn find_model_by_db_name<'a>(datamodel: &'a Datamodel, db_name: &str) -> Option<ModelWalker<'a>> {
+    datamodel
+        .models()
+        .find(|model| model.database_name() == Some(db_name) || model.name == db_name)
+        .map(|model| ModelWalker { datamodel, model })
+}
+
 #[derive(Debug, Copy, Clone)]
 pub struct ModelWalker<'a> {
     datamodel: &'a Datamodel,

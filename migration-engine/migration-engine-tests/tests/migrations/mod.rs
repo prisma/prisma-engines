@@ -1,3 +1,4 @@
+mod enums;
 mod indexes;
 mod json;
 mod mariadb;

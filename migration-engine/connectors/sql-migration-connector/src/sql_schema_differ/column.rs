@@ -1,13 +1,13 @@
-use crate::{database_info::DatabaseInfo, flavour::SqlFlavour, sql_schema_helpers::ColumnRef};
+use crate::{database_info::DatabaseInfo, flavour::SqlFlavour};
 use prisma_value::PrismaValue;
-use sql_schema_describer::{ColumnTypeFamily, DefaultValue};
+use sql_schema_describer::{walkers::ColumnWalker, ColumnTypeFamily, DefaultValue};
 
 #[derive(Debug)]
 pub(crate) struct ColumnDiffer<'a> {
     pub(crate) flavour: &'a dyn SqlFlavour,
     pub(crate) database_info: &'a DatabaseInfo,
-    pub(crate) previous: ColumnRef<'a>,
-    pub(crate) next: ColumnRef<'a>,
+    pub(crate) previous: ColumnWalker<'a>,
+    pub(crate) next: ColumnWalker<'a>,
 }
 
 /// On MariaDB, JSON is an alias for LONGTEXT. https://mariadb.com/kb/en/json-data-type/

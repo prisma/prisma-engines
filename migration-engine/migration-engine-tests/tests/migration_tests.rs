@@ -1430,35 +1430,24 @@ async fn dropping_a_model_with_a_multi_field_unique_index_must_work(api: &TestAp
 }
 
 #[test_each_connector]
-async fn reserved_sql_key_words_must_work(api: &TestApi) {
+async fn reserved_sql_key_words_must_work(api: &TestApi) -> TestResult {
     // Group is a reserved keyword
-    let sql_family = api.sql_family();
     let dm = r#"
             model Group {
-                id    String  @default(cuid()) @id
-                parent_id String?
-                parent Group? @relation(name: "ChildGroups", fields: [parent_id], references: id)
+                id          String  @default(cuid()) @id
+                parent_id   String?
+                parent      Group? @relation(name: "ChildGroups", fields: [parent_id], references: id)
                 childGroups Group[] @relation(name: "ChildGroups")
             }
         "#;
-    let result = api.infer_and_apply(&dm).await.sql_schema;
 
-    let table = result.table_bang("Group");
-    assert_eq!(
-        table.foreign_keys,
-        vec![ForeignKey {
-            constraint_name: match sql_family {
-                SqlFamily::Postgres => Some("Group_parent_id_fkey".to_owned()),
-                SqlFamily::Mysql => Some("Group_ibfk_1".to_owned()),
-                SqlFamily::Sqlite => None,
-                SqlFamily::Mssql => todo!("Greetings from Redmond"),
-            },
-            columns: vec!["parent_id".to_string()],
-            referenced_table: "Group".to_string(),
-            referenced_columns: vec!["id".to_string()],
-            on_delete_action: ForeignKeyAction::SetNull,
-        }]
-    );
+    api.infer_apply(&dm).send().await?.assert_green()?;
+
+    api.assert_schema().await?.assert_table("Group", |table| {
+        table.assert_fk_on_columns(&["parent_id"], |fk| fk.assert_references("Group", &["id"]))
+    })?;
+
+    Ok(())
 }
 
 #[test_each_connector]
@@ -2349,6 +2338,61 @@ async fn models_with_an_autoincrement_field_as_part_of_a_multi_field_id_can_be_c
                     col.assert_auto_increments()
                 }
             })
+    })?;
+
+    Ok(())
+}
+
+#[test_each_connector]
+async fn migrating_a_unique_constraint_to_a_primary_key_works(api: &TestApi) -> TestResult {
+    let dm = r#"
+        model model1 {
+            id              String        @default(cuid()) @id
+            a               String
+            b               String
+            c               String
+
+            @@unique([a, b, c])
+
+        }
+    "#;
+
+    api.schema_push(dm).send().await?.assert_green()?;
+
+    api.assert_schema().await?.assert_table("model1", |table| {
+        table
+            .assert_pk(|pk| pk.assert_columns(&["id"]))?
+            .assert_index_on_columns(&["a", "b", "c"], |idx| idx.assert_is_unique())
+    })?;
+
+    api.insert("model1")
+        .value("id", "the-id")
+        .value("a", "the-a")
+        .value("b", "the-b")
+        .value("c", "the-c")
+        .result_raw()
+        .await?;
+
+    let dm2 = r#"
+        model model1 {
+            a               String
+            b               String
+            c               String
+
+            @@id([a, b, c])
+
+        }
+    "#;
+
+    api.schema_push(dm2)
+        .force(true)
+        .send()
+        .await?
+        .assert_executable()?
+        .assert_warnings(&["The migration will change the primary key for the `model1` table. If it partially fails, the table could be left without primary key constraint.".into(), "You are about to drop the column `id` on the `model1` table, which still contains 1 non-null values.".into()])?;
+
+    api.assert_schema().await?.assert_table("model1", |table| {
+        table.assert_pk(|pk| pk.assert_columns(&["a", "b", "c"]))
     })?;
 
     Ok(())
