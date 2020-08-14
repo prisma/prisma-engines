@@ -54,9 +54,7 @@ macro_rules! flags {
 
 // `transaction`: Transactional batches support in the QE.
 // `connectOrCreate`: `connectOrCreate` nested query in the QE.
-// `distinct: Distinct select query support.
-// `aggregations`: Basic aggregation support.
-flags!(transaction, connectOrCreate, distinct, aggregations);
+flags!(transaction, connectOrCreate);
 
 /// Initializes the feature flags with given flags.
 /// Noop if already initialized.
