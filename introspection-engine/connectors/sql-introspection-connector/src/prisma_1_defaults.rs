@@ -8,6 +8,7 @@ const CHAR: &str = "char";
 const VARCHAR: &str = "varchar";
 const CHARACTER_VARYING: &str = "character varying";
 const CHAR_25: &str = "char(25)";
+const CHAR_30: &str = "char(30)";
 const CHAR_36: &str = "char(36)";
 
 pub fn add_prisma_1_id_defaults(
@@ -38,10 +39,16 @@ pub fn add_prisma_1_id_defaults(
                     (dt, fdt, Some(25), SqlFamily::Postgres) if dt == CHARACTER_VARYING && fdt == VARCHAR => {
                         needs_to_be_changed.push((model_and_field, true))
                     }
+                    (dt, fdt, Some(30), SqlFamily::Postgres) if dt == CHARACTER_VARYING && fdt == VARCHAR => {
+                        needs_to_be_changed.push((model_and_field, true))
+                    }
                     (dt, fdt, Some(36), SqlFamily::Postgres) if dt == CHARACTER_VARYING && fdt == VARCHAR => {
                         needs_to_be_changed.push((model_and_field, false))
                     }
                     (dt, fdt, Some(25), SqlFamily::Mysql) if dt == CHAR && fdt == CHAR_25 => {
+                        needs_to_be_changed.push((model_and_field, true))
+                    }
+                    (dt, fdt, Some(30), SqlFamily::Mysql) if dt == CHAR && fdt == CHAR_30 => {
                         needs_to_be_changed.push((model_and_field, true))
                     }
                     (dt, fdt, Some(36), SqlFamily::Mysql) if dt == CHAR && fdt == CHAR_36 => {
