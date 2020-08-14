@@ -10,9 +10,9 @@ pub(crate) use table::TableDiffer;
 
 use crate::*;
 use enums::EnumDiffer;
+use sql_schema_describer::walkers::ForeignKeyWalker;
+use sql_schema_describer::walkers::TableWalker;
 use sql_schema_describer::*;
-use sql_schema_helpers::ForeignKeyRef;
-use sql_schema_helpers::TableRef;
 use std::collections::HashSet;
 
 #[derive(Debug)]
@@ -361,8 +361,8 @@ impl<'schema> SqlSchemaDiffer<'schema> {
                 .map(move |next_table| TableDiffer {
                     flavour: self.flavour,
                     database_info: self.database_info,
-                    previous: TableRef::new(self.previous, previous_table),
-                    next: TableRef::new(self.next, next_table),
+                    previous: TableWalker::new(self.previous, previous_table),
+                    next: TableWalker::new(self.next, next_table),
                 })
         })
     }
@@ -469,7 +469,7 @@ fn push_foreign_keys_from_created_tables<'a>(
 
 /// Compare two [ForeignKey](/sql-schema-describer/struct.ForeignKey.html)s and return whether they
 /// should be considered equivalent for schema diffing purposes.
-fn foreign_keys_match(previous: &ForeignKeyRef<'_, '_>, next: &ForeignKeyRef<'_, '_>) -> bool {
+fn foreign_keys_match(previous: &ForeignKeyWalker<'_, '_>, next: &ForeignKeyWalker<'_, '_>) -> bool {
     // Foreign keys point to different tables.
     if previous.referenced_table().name() != next.referenced_table().name() {
         return false;

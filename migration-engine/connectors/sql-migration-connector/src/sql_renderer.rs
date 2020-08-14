@@ -10,10 +10,10 @@ pub(crate) use common::{IteratorJoin, Quoted, QuotedWithSchema};
 use crate::{
     database_info::DatabaseInfo,
     sql_schema_differ::{ColumnDiffer, SqlSchemaDiffer},
-    sql_schema_helpers::{ColumnRef, TableRef},
     CreateEnum, DropEnum,
 };
 use quaint::prelude::SqlFamily;
+use sql_schema_describer::walkers::{ColumnWalker, TableWalker};
 use sql_schema_describer::*;
 use std::{borrow::Cow, fmt::Write};
 
@@ -27,7 +27,7 @@ pub(crate) trait SqlRenderer {
         }
     }
 
-    fn render_column(&self, schema_name: &str, column: ColumnRef<'_>, add_fk_prefix: bool) -> String;
+    fn render_column(&self, schema_name: &str, column: ColumnWalker<'_>, add_fk_prefix: bool) -> String;
 
     fn render_references(&self, schema_name: &str, foreign_key: &ForeignKey) -> String;
 
@@ -45,7 +45,7 @@ pub(crate) trait SqlRenderer {
     /// Render a `CreateTable` step.
     fn render_create_table(
         &self,
-        table: &TableRef<'_>,
+        table: &TableWalker<'_>,
         schema_name: &str,
         sql_family: SqlFamily,
     ) -> anyhow::Result<String> {
