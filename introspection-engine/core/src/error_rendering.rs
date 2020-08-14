@@ -23,20 +23,22 @@ pub fn render_error(crate_error: Error) -> UserFacingError {
     }
 }
 
-pub(super) fn render_jsonrpc_error(crate_error: Error) -> JsonRpcError {
-    let prisma_error = render_error(crate_error);
+impl From<Error> for JsonRpcError {
+    fn from(e: Error) -> Self {
+        let prisma_error = render_error(e);
 
-    let error_rendering_result: Result<_, _> = serde_json::to_value(&prisma_error).map(|data| JsonRpcError {
-        // We separate the JSON-RPC error code (defined by the JSON-RPC spec) from the
-        // prisma error code, which is located in `data`.
-        code: jsonrpc_core::types::error::ErrorCode::ServerError(4466),
-        message: "An error happened. Check the data field for details.".to_string(),
-        data: Some(data),
-    });
+        let error_rendering_result: Result<_, _> = serde_json::to_value(&prisma_error).map(|data| JsonRpcError {
+            // We separate the JSON-RPC error code (defined by the JSON-RPC spec) from the
+            // prisma error code, which is located in `data`.
+            code: jsonrpc_core::types::error::ErrorCode::ServerError(4466),
+            message: "An error happened. Check the data field for details.".to_string(),
+            data: Some(data),
+        });
 
-    match error_rendering_result {
-        Ok(err) => err,
-        Err(err) => fallback_jsonrpc_error(err),
+        match error_rendering_result {
+            Ok(err) => err,
+            Err(err) => fallback_jsonrpc_error(err),
+        }
     }
 }
 
