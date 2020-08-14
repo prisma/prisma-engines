@@ -744,6 +744,13 @@ pub trait Visitor<'a> {
                 self.write(" AND ")?;
                 self.visit_expression(*right)
             }
+            Compare::Raw(left, comp, right) => {
+                self.visit_expression(*left)?;
+                self.write(" ")?;
+                self.write(comp)?;
+                self.write(" ")?;
+                self.visit_expression(*right)
+            }
         }
     }
 

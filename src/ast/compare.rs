@@ -2,7 +2,7 @@ use super::ExpressionKind;
 use crate::ast::{Column, ConditionTree, Expression};
 use std::borrow::Cow;
 
-/// For modeling comparison expression
+/// For modeling comparison expressions.
 #[derive(Debug, Clone, PartialEq)]
 pub enum Compare<'a> {
     /// `left = right`
@@ -41,6 +41,9 @@ pub enum Compare<'a> {
     Between(Box<Expression<'a>>, Box<Expression<'a>>, Box<Expression<'a>>),
     /// `value` NOT BETWEEN `left` AND `right`
     NotBetween(Box<Expression<'a>>, Box<Expression<'a>>, Box<Expression<'a>>),
+    /// Raw comparator, allows to use an operator `left <raw> right` as is,
+    /// without visitor transformation in between.
+    Raw(Box<Expression<'a>>, Cow<'a, str>, Box<Expression<'a>>),
 }
 
 impl<'a> From<Compare<'a>> for ConditionTree<'a> {
@@ -448,6 +451,27 @@ pub trait Comparable<'a> {
     where
         T: Into<Expression<'a>>,
         V: Into<Expression<'a>>;
+
+    /// Compares two expressions with a custom operator.
+    ///
+    /// ```rust
+    /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # fn main() -> Result<(), quaint::error::Error> {
+    /// let query = Select::from_table("users").so_that("foo".compare_raw("ILIKE", "%bar%"));
+    /// let (sql, params) = Sqlite::build(query)?;
+    ///
+    /// assert_eq!("SELECT `users`.* FROM `users` WHERE `foo` ILIKE ?", sql);
+    ///
+    /// assert_eq!(vec![
+    ///     Value::from("%bar%"),
+    /// ], params);
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn compare_raw<T, V>(self, raw_comparator: T, right: V) -> Compare<'a>
+    where
+        T: Into<Cow<'a, str>>,
+        V: Into<Expression<'a>>;
 }
 
 impl<'a, U> Comparable<'a> for U
@@ -611,5 +635,17 @@ where
         let col: Column<'a> = self.into();
         let val: Expression<'a> = col.into();
         val.not_between(left, right)
+    }
+
+    fn compare_raw<T, V>(self, raw_comparator: T, right: V) -> Compare<'a>
+    where
+        T: Into<Cow<'a, str>>,
+        V: Into<Expression<'a>>,
+    {
+        let left: Column<'a> = self.into();
+        let left: Expression<'a> = left.into();
+        let right: Expression<'a> = right.into();
+
+        left.compare_raw(raw_comparator.into(), right)
     }
 }

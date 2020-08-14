@@ -285,4 +285,13 @@ impl<'a> Comparable<'a> for Row<'a> {
         let value: Expression<'a> = self.into();
         value.not_between(left, right)
     }
+
+    fn compare_raw<T, V>(self, raw_comparator: T, right: V) -> Compare<'a>
+    where
+        T: Into<Cow<'a, str>>,
+        V: Into<Expression<'a>>,
+    {
+        let value: Expression<'a> = self.into();
+        value.compare_raw(raw_comparator, right)
+    }
 }

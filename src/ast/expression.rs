@@ -241,4 +241,12 @@ impl<'a> Comparable<'a> for Expression<'a> {
     {
         Compare::NotBetween(Box::new(self), Box::new(left.into()), Box::new(right.into()))
     }
+
+    fn compare_raw<T, V>(self, raw_comparator: T, right: V) -> Compare<'a>
+    where
+        T: Into<Cow<'a, str>>,
+        V: Into<Expression<'a>>,
+    {
+        Compare::Raw(Box::new(self), raw_comparator.into(), Box::new(right.into()))
+    }
 }

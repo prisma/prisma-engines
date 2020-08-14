@@ -495,4 +495,12 @@ mod tests {
         assert_eq!(format!("SELECT '{}'", dt.to_rfc3339(),), sql);
         assert!(params.is_empty());
     }
+
+    #[test]
+    fn test_raw_comparator() {
+        let (sql, params) =
+            Postgres::build(Select::from_table("foo").so_that("bar".compare_raw("ILIKE", "baz%"))).unwrap();
+
+        assert_eq!(r#"SELECT "foo".* FROM "foo" WHERE "bar" ILIKE $1"#, sql);
+    }
 }
