@@ -417,7 +417,15 @@ fn insensitive_scalar_filter(comparable: impl Comparable<'static>, cond: ScalarC
 
                 comparable.in_selection(sql_values)
             }
-            _ => comparable.in_selection(values),
+            _ => comparable.in_selection(
+                values
+                    .into_iter()
+                    .map(|v| {
+                        let val: Expression = lower(v).into();
+                        val
+                    })
+                    .collect::<Vec<_>>(),
+            ),
         },
         ScalarCondition::NotIn(values) => match values.split_first() {
             Some((PrismaValue::List(_), _)) => {
@@ -430,7 +438,15 @@ fn insensitive_scalar_filter(comparable: impl Comparable<'static>, cond: ScalarC
 
                 comparable.not_in_selection(sql_values)
             }
-            _ => comparable.not_in_selection(values),
+            _ => comparable.not_in_selection(
+                values
+                    .into_iter()
+                    .map(|v| {
+                        let val: Expression = lower(v).into();
+                        val
+                    })
+                    .collect::<Vec<_>>(),
+            ),
         },
     };
 

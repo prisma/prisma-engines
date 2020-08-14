@@ -1,7 +1,6 @@
 package queries.filters
 
 import org.scalatest.{FlatSpec, Matchers}
-import util.ConnectorCapability.JoinRelationLinksCapability
 import util._
 
 class InsensitiveFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
@@ -213,6 +212,48 @@ class InsensitiveFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
       legacy = false
     )
 
+    res.toString() should be("""{"data":{"findManyTestModel":[{"str":"A"}]}}""")
+  }
+
+  "Case insensitive filters" should "work with list containment operations" taggedAs (IgnoreSQLite, IgnoreMongo, IgnoreMySql) in {
+    // Note: Postgres collations order characters differently than, say, using .sort in most programming languages,
+    // which is why the results of <, >, etc. are non-obvious at a glance.
+    create("A")
+    create("æ")
+    create("Æ")
+    create("b")
+    create("B")
+
+    var res = server.query(
+      """{
+        |findManyTestModel(where: {
+        |  str: {
+        |    in: ["æ", "b"]
+        |    mode: insensitive
+        |  }
+        |}) {
+        |  str
+        |}}
+      """.stripMargin,
+      project,
+      legacy = false
+    )
+    res.toString() should be("""{"data":{"findManyTestModel":[{"str":"æ"},{"str":"Æ"},{"str":"b"},{"str":"B"}]}}""")
+
+    res = server.query(
+      """{
+        |findManyTestModel(where: {
+        |  str: {
+        |    not: { in: ["æ", "b"] }
+        |    mode: insensitive
+        |  }
+        |}) {
+        |  str
+        |}}
+      """.stripMargin,
+      project,
+      legacy = false
+    )
     res.toString() should be("""{"data":{"findManyTestModel":[{"str":"A"}]}}""")
   }
 
