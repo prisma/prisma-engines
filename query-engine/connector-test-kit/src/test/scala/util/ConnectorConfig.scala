@@ -39,6 +39,7 @@ object ConnectorConfig {
         ConnectorConfig("postgresql", s"postgresql://postgres:prisma@$postgres_13_Host:$postgres_13_Port/db?schema=$$DB&connection_limit=1", false, "postgres13")
       case "pgbouncer" =>
         ConnectorConfig("postgresql", s"postgresql://postgres:prisma@$postgres_11_Host:$postgres_11_Port/db?schema=$$DB&connection_limit=1", true, "pgbouncer")
+      case "cockroachdb" => ConnectorConfig("postgresql", s"postgresql://postgres:prisma@$cockroachdb_Host:$cockroachdb_Port/db?schema=$$DB&connection_limit=1", false, "cockroachdb")
       case "mysql"   => ConnectorConfig("mysql", s"mysql://root:prisma@$mysql_5_7_Host:3306/$$DB?connection_limit=1", false, "mysql")
       case "mysql8"  => ConnectorConfig("mysql", s"mysql://root:prisma@$mysql_8_0_Host:$mysql_8_0_Port/$$DB?connection_limit=1", false, "mysql8")
       case "mysql56"  => ConnectorConfig("mysql", s"mysql://root:prisma@$mysql_5_6_Host:$mysql_5_6_Port/$$DB?connection_limit=1", false, "mysql56")

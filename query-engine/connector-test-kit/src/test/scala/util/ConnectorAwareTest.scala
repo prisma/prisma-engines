@@ -49,6 +49,7 @@ trait ConnectorAwareTest extends SuiteMixin { self: Suite with ApiSpecBase =>
   lazy val connectorTag = connector match {
     case "mongo"                                                 => ConnectorTag.MongoConnectorTag
     case "mysql" | "mysql-native"                                => ConnectorTag.MySqlConnectorTag
+    case "cockroachdb" | "cockroach"                             => ConnectorTag.PostgresConnectorTag
     case "postgres" | "postgres-native" | "postgresql"           => ConnectorTag.PostgresConnectorTag
     case "sqlite" | "sqlite-native" | "native-integration-tests" => ConnectorTag.SQLiteConnectorTag
   }
