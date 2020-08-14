@@ -49,23 +49,3 @@ fn fallback_jsonrpc_error(err: impl std::error::Error) -> JsonRpcError {
         data: Some(serde_json::json!({ "backtrace": null, "message": format!("{}", err) })),
     }
 }
-
-pub fn pretty_print_datamodel_errors(
-    errors: &datamodel::error::ErrorCollection,
-    datamodel: &str,
-) -> std::io::Result<String> {
-    use std::io::Write as _;
-
-    let file_name = "schema.prisma";
-
-    let mut message: Vec<u8> = Vec::new();
-
-    for error in errors.to_iter() {
-        writeln!(&mut message)?;
-        error
-            .pretty_print(&mut message, file_name, datamodel)
-            .expect("Failed to write errors to stderr");
-    }
-
-    Ok(String::from_utf8_lossy(&message).into_owned())
-}

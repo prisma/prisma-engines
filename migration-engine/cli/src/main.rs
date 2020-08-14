@@ -84,8 +84,7 @@ async fn start_engine(datamodel_location: &str, single_cmd: bool) -> ! {
                 let (error, exit_code) = match &err {
                     CoreError::DatamodelError(errors) => {
                         let error = user_facing_errors::UnknownError {
-                            message: migration_core::api::pretty_print_datamodel_errors(errors, &datamodel)
-                                .expect("rendering error"),
+                            message: errors.to_pretty_string("schema.prisma", &datamodel),
                             backtrace: Some(format!("{:?}", user_facing_errors::new_backtrace())),
                         };
 
