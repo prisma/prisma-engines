@@ -2,10 +2,10 @@ use crate::command_error::CommandError;
 use crate::error::Error;
 use introspection_connector::ConnectorError;
 use jsonrpc_core::types::Error as JsonRpcError;
-use user_facing_errors::introspection_engine::PrismaSchemaInconsistent;
+use user_facing_errors::common::SchemaParserError;
 use user_facing_errors::{introspection_engine::IntrospectionResultEmpty, Error as UserFacingError, KnownError};
 
-pub fn render_error(crate_error: Error, schema: &str) -> UserFacingError {
+pub fn render_error(crate_error: Error) -> UserFacingError {
     match crate_error {
         Error::ConnectorError(ConnectorError {
             user_facing_error: Some(user_facing_error),
@@ -16,20 +16,15 @@ pub fn render_error(crate_error: Error, schema: &str) -> UserFacingError {
                 .unwrap()
                 .into()
         }
-        Error::CommandError(CommandError::InputSchemaInvalid(errors)) => KnownError::new(PrismaSchemaInconsistent {
-            explanation: errors.to_pretty_string("schema.prisma", schema),
-        })
-        .unwrap()
-        .into(),
-        Error::DatamodelError(errors) => {
-            UserFacingError::new_non_panic_with_current_backtrace(errors.to_pretty_string("schema.prisma", schema))
+        Error::CommandError(CommandError::ReceivedBadDatamodel(full_error)) => {
+            KnownError::new(SchemaParserError { full_error }).unwrap().into()
         }
         _ => UserFacingError::from_dyn_error(&crate_error),
     }
 }
 
-pub(super) fn render_jsonrpc_error(crate_error: Error, schema: &str) -> JsonRpcError {
-    let prisma_error = render_error(crate_error, schema);
+pub(super) fn render_jsonrpc_error(crate_error: Error) -> JsonRpcError {
+    let prisma_error = render_error(crate_error);
 
     let error_rendering_result: Result<_, _> = serde_json::to_value(&prisma_error).map(|data| JsonRpcError {
         // We separate the JSON-RPC error code (defined by the JSON-RPC spec) from the

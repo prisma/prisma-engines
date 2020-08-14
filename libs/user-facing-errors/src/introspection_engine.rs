@@ -30,13 +30,3 @@ pub struct DatabaseSchemaInconsistent {
     /// The schema was inconsistent and therefore introspection failed.
     pub explanation: String,
 }
-
-#[derive(Debug, UserFacingError, Serialize)]
-#[user_facing(
-    code = "P4003",
-    message = "The Prisma schema provided for introspection was invalid. ${explanation}"
-)]
-pub struct PrismaSchemaInconsistent {
-    /// The schema was inconsistent and therefore introspection failed.
-    pub explanation: String,
-}
