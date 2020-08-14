@@ -144,7 +144,6 @@ impl AliasedCondition for ScalarFilter {
                 convert_scalar_filter(comparable, self.condition, self.mode)
             }
             (Some(alias), ScalarProjection::Compound(fields)) => {
-                dbg!("COMPOUND 1");
                 let columns: Vec<Column<'static>> = fields
                     .into_iter()
                     .map(|field| field.as_column().table(alias.to_string(None)))
@@ -161,7 +160,6 @@ impl AliasedCondition for ScalarFilter {
                 convert_scalar_filter(comparable, self.condition, self.mode)
             }
             (None, ScalarProjection::Compound(fields)) => {
-                dbg!("COMPOUND 2");
                 let columns: Vec<Column<'static>> = fields.into_iter().map(|field| field.as_column()).collect();
 
                 convert_scalar_filter(Row::from(columns), self.condition, self.mode)
