@@ -60,21 +60,22 @@ class WhereUniqueSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "Using two unique fields with the many query" should "work with an implicit AND" in {
-    server.query(s"""query{users(where: {unique:2, email: "test@test.com"}){unique}}""", project).toString should be("""{"data":{"users":[{"unique":2}]}}""")
+    server.query(s"""query{users(where: {unique: { equals: 2 }, email: { equals: "test@test.com" }}){unique}}""", project).toString should be(
+      """{"data":{"users":[{"unique":2}]}}""")
   }
 
   "Using two unique fields with the many query" should "work with an explicit AND" in {
-    server.query(s"""query{users(where: {AND: [{unique:2}, {email: "test@test.com"}]}){unique}}""", project).toString should be(
+    server.query(s"""query{users(where: {AND: [{ unique: { equals: 2 }}, { email: { equals: "test@test.com" }}]}){unique}}""", project).toString should be(
       """{"data":{"users":[{"unique":2}]}}""")
   }
 
   "Using two unique fields with the many query" should "work with an explicit OR" taggedAs (IgnoreMongo) in {
-    server.query(s"""query{users(where: {OR: [{unique:2}, {email: "does not exist"}]}){unique}}""", project).toString should be(
+    server.query(s"""query{users(where: {OR: [{ unique: { equals: 2 }}, { email: { equals: "does not exist" }}]}){unique}}""", project).toString should be(
       """{"data":{"users":[{"unique":2}]}}""")
   }
 
   "Using two unique fields with the many query" should "work with an explicit OR 2" taggedAs (IgnoreMongo) in {
-    server.query(s"""query{users(where: {OR: [{unique:24235}, {email: "test@test.com"}]}){unique}}""", project).toString should be(
+    server.query(s"""query{users(where: {OR: [{ unique: { equals: 24235 }}, { email: { equals: "test@test.com" }}]}){unique}}""", project).toString should be(
       """{"data":{"users":[{"unique":2}]}}""")
   }
 }

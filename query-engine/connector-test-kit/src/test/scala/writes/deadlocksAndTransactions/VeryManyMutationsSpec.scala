@@ -107,12 +107,12 @@ class VeryManyMutationsSpec extends FlatSpec with Matchers with ApiSpecBase with
   }
 
   "The update many Mutation" should "work" in {
-    val update = server.query("""mutation {updateManyMiddles(where: { int_gt: 100 } data:{int: 500}){count}}""", project)
+    val update = server.query("""mutation {updateManyMiddles(where: { int: { gt: 100 }} data:{int: 500}){count}}""", project)
     update.pathAsLong("data.updateManyMiddles.count") should equal(36291)
   }
 
   "The delete many Mutation" should "work" in {
-    val result = server.query("""mutation {deleteManyMiddles(where: { int_gt: 100 }){count}}""", project)
+    val result = server.query("""mutation {deleteManyMiddles(where: { int: { gt: 100 }}){count}}""", project)
     result.pathAsLong("data.deleteManyMiddles.count") should equal(36291)
   }
 }

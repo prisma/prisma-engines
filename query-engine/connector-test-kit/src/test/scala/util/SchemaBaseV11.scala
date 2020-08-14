@@ -102,7 +102,7 @@ trait SchemaBaseV11 extends PlayJsonExtensions {
   }
 
   def parseMulti(field: String)(json: JsValue, path: String): Vector[String] = {
-    json.pathAsJsArray(path).value.map(json => parseIdentifer(field)(json, "")).toVector
+    json.pathAsJsArray(path).value.map(json => parseIdentifier(field)(json, "")).toVector
   }
 
   def parseCompoundIdentifier(fields: Vector[String], argName: String)(json: JsValue, path: String): String = {
@@ -119,7 +119,7 @@ trait SchemaBaseV11 extends PlayJsonExtensions {
        """.stripMargin
   }
 
-  def parseIdentifer(field: String)(json: JsValue, path: String): String = {
+  def parseIdentifier(field: String)(json: JsValue, path: String): String = {
     val finalPath = if (path == "") field else path + "." + field
     val value     = json.pathAsJsValue(finalPath).toString()
     s"{ $field: $value }"
@@ -155,7 +155,7 @@ trait SchemaBaseV11 extends PlayJsonExtensions {
     //Query Params
     val idParams = QueryParams(
       selection = "id",
-      where = parseIdentifer("id"),
+      where = parseIdentifier("id"),
       whereMulti = parseMulti("id")
     )
 
@@ -172,7 +172,7 @@ trait SchemaBaseV11 extends PlayJsonExtensions {
     val parentUniqueParams = Vector(
       QueryParams(
         selection = "p",
-        where = parseIdentifer("p"),
+        where = parseIdentifier("p"),
         whereMulti = parseMulti("p")
       ), {
         val fields  = Vector("p_1", "p_2")
@@ -188,7 +188,7 @@ trait SchemaBaseV11 extends PlayJsonExtensions {
     val childUniqueParams = Vector(
       QueryParams(
         selection = "c",
-        where = parseIdentifer("c"),
+        where = parseIdentifier("c"),
         whereMulti = parseMulti("c")
       ), {
         val fields  = Vector("c_1", "c_2")

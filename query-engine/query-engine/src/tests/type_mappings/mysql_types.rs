@@ -413,29 +413,29 @@ async fn all_mysql_types_work_as_filter(api: &TestApi) -> TestResult {
         query {
             findManytypes(
                 where: {
-                    numeric_integer_tinyint: 12,
-                    numeric_integer_smallint: 350,
-                    numeric_integer_int: 9002,
-                    numeric_integer_bigint: 30000,
-                    numeric_floating_decimal: 3.14
-                    # numeric_floating_float: -32.0
-                    numeric_fixed_double: 0.14
-                    numeric_fixed_real: 12.12
-                    numeric_bit: 4
-                    numeric_boolean: true
-                    date_date: \"2020-02-27T00:00:00Z\"
-                    date_datetime: \"2020-02-27T19:10:22Z\"
-                    date_timestamp: \"2020-02-27T19:11:22Z\"
-                    # date_time: \"2020-02-20T12:50:01Z\"
-                    date_year: 2012
-                    string_char: \"make dolphins easy\"
-                    string_varchar: \"dolphins of varying characters\"
-                    string_text_tinytext: \"tiny dolphins\"
-                    string_text_text: \"dolphins\"
-                    string_text_mediumtext: \"medium dolphins\"
-                    string_text_longtext: \"long dolphins\"
-                    string_enum: \"jellicle_cats\"
-                    json: \"{\\\"name\\\": null}\"
+                    numeric_integer_tinyint: { equals: 12 }
+                    numeric_integer_smallint: { equals: 350 }
+                    numeric_integer_int: { equals: 9002 }
+                    numeric_integer_bigint: { equals: 30000 }
+                    numeric_floating_decimal: { equals: 3.14 }
+                    # numeric_floating_float: { equals: -32.0 }
+                    numeric_fixed_double: { equals: 0.14 }
+                    numeric_fixed_real: { equals: 12.12 }
+                    numeric_bit: { equals: 4 }
+                    numeric_boolean: { equals: true }
+                    date_date: { equals: \"2020-02-27T00:00:00Z\" }
+                    date_datetime: { equals: \"2020-02-27T19:10:22Z\" }
+                    date_timestamp: { equals: \"2020-02-27T19:11:22Z\" }
+                    # date_time: { equals: \"2020-02-20T12:50:01Z\" }
+                    date_year: { equals: 2012 }
+                    string_char: { equals: \"make dolphins easy\" }
+                    string_varchar: { equals: \"dolphins of varying characters\" }
+                    string_text_tinytext: { equals: \"tiny dolphins\" }
+                    string_text_text: { equals: \"dolphins\" }
+                    string_text_mediumtext: { equals: \"medium dolphins\" }
+                    string_text_longtext: { equals: \"long dolphins\" }
+                    string_enum: { equals: \"jellicle_cats\" }
+                    json: { equals: \"{\\\"name\\\": null}\" }
                 }
             ) {
                 id
@@ -464,28 +464,28 @@ async fn all_mysql_types_work_as_filter_56(api: &TestApi) -> TestResult {
         query {
             findManytypes(
                 where: {
-                    numeric_integer_tinyint: 12,
-                    numeric_integer_smallint: 350,
-                    numeric_integer_int: 9002,
-                    numeric_integer_bigint: 30000,
-                    numeric_floating_decimal: 3.14
-                    # numeric_floating_float: -32.0
-                    numeric_fixed_double: 0.14
-                    numeric_fixed_real: 12.12
-                    numeric_bit: 4
-                    numeric_boolean: true
-                    date_date: \"2020-02-27T00:00:00Z\"
-                    date_datetime: \"2020-02-27T19:10:22Z\"
-                    date_timestamp: \"2020-02-27T19:11:22Z\"
-                    # date_time: \"2020-02-20T12:50:01Z\"
-                    date_year: 2012
-                    string_char: \"make dolphins easy\"
-                    string_varchar: \"dolphins of varying characters\"
-                    string_text_tinytext: \"tiny dolphins\"
-                    string_text_text: \"dolphins\"
-                    string_text_mediumtext: \"medium dolphins\"
-                    string_text_longtext: \"long dolphins\"
-                    string_enum: \"jellicle_cats\"
+                    numeric_integer_tinyint: { equals: 12 }
+                    numeric_integer_smallint: { equals: 350 }
+                    numeric_integer_int: { equals: 9002 }
+                    numeric_integer_bigint: { equals: 30000 }
+                    numeric_floating_decimal: { equals: 3.14 }
+                    # numeric_floating_float: { equals: -32.0 }
+                    numeric_fixed_double: { equals: 0.14 }
+                    numeric_fixed_real: { equals: 12.12 }
+                    numeric_bit: { equals: 4 }
+                    numeric_boolean: { equals: true }
+                    date_date: { equals: \"2020-02-27T00:00:00Z\" }
+                    date_datetime: { equals: \"2020-02-27T19:10:22Z\" }
+                    date_timestamp: { equals: \"2020-02-27T19:11:22Z\" }
+                    # date_time: { equals: \"2020-02-20T12:50:01Z\" }
+                    date_year: { equals: 2012 }
+                    string_char: { equals: \"make dolphins easy\" }
+                    string_varchar: { equals: \"dolphins of varying characters\" }
+                    string_text_tinytext: { equals: \"tiny dolphins\" }
+                    string_text_text: { equals: \"dolphins\" }
+                    string_text_mediumtext: { equals: \"medium dolphins\" }
+                    string_text_longtext: { equals: \"long dolphins\" }
+                    string_enum: { equals: \"jellicle_cats\" }
                 }
             ) {
                 id
@@ -514,29 +514,29 @@ async fn all_mysql_types_work_as_filter_mariadb(api: &TestApi) -> TestResult {
         query {
             findManytypes(
                 where: {
-                    numeric_integer_tinyint: 12,
-                    numeric_integer_smallint: 350,
-                    numeric_integer_int: 9002,
-                    numeric_integer_bigint: 30000,
-                    numeric_floating_decimal: 3.14
-                    # numeric_floating_float: -32.0
-                    numeric_fixed_double: 0.14
-                    numeric_fixed_real: 12.12
-                    numeric_bit: 4
-                    numeric_boolean: true
-                    date_date: \"2020-02-27T00:00:00Z\"
-                    date_datetime: \"2020-02-27T19:10:22Z\"
-                    date_timestamp: \"2020-02-27T19:11:22Z\"
-                    # date_time: \"2020-02-20T12:50:01Z\"
-                    date_year: 2012
-                    string_char: \"make dolphins easy\"
-                    string_varchar: \"dolphins of varying characters\"
-                    string_text_tinytext: \"tiny dolphins\"
-                    string_text_text: \"dolphins\"
-                    string_text_mediumtext: \"medium dolphins\"
-                    string_text_longtext: \"long dolphins\"
-                    string_enum: \"jellicle_cats\"
-                    json: \"{\\\"name\\\":null}\"
+                    numeric_integer_tinyint: { equals: 12 }
+                    numeric_integer_smallint: { equals: 350 }
+                    numeric_integer_int: { equals: 9002 }
+                    numeric_integer_bigint: { equals: 30000 }
+                    numeric_floating_decimal: { equals: 3.14 }
+                    # numeric_floating_float: { equals: -32.0 }
+                    numeric_fixed_double: { equals: 0.14 }
+                    numeric_fixed_real: { equals: 12.12 }
+                    numeric_bit: { equals: 4 }
+                    numeric_boolean: { equals: true }
+                    date_date: { equals: \"2020-02-27T00:00:00Z\" }
+                    date_datetime: { equals: \"2020-02-27T19:10:22Z\" }
+                    date_timestamp: { equals: \"2020-02-27T19:11:22Z\" }
+                    # date_time: { equals: \"2020-02-20T12:50:01Z\" }
+                    date_year: { equals: 2012 }
+                    string_char: { equals: \"make dolphins easy\" }
+                    string_varchar: { equals: \"dolphins of varying characters\" }
+                    string_text_tinytext: { equals: \"tiny dolphins\" }
+                    string_text_text: { equals: \"dolphins\" }
+                    string_text_mediumtext: { equals: \"medium dolphins\" }
+                    string_text_longtext: { equals: \"long dolphins\" }
+                    string_enum: { equals: \"jellicle_cats\" }
+                    json: { equals: \"{\\\"name\\\":null}\" }
                 }
             ) {
                 id

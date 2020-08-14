@@ -34,7 +34,7 @@ class FilterUnwrapSomeSpec extends FlatSpec with Matchers with ApiSpecBase {
                   |    data: {
                   |      subItems: {
                   |        deleteMany: {
-                  |          name_in: ["TEST1", "TEST2"]
+                  |          name: { in: ["TEST1", "TEST2"] }
                   |        }
                   |      }
                   |    }

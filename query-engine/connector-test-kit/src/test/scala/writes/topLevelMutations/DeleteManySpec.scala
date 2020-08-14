@@ -28,7 +28,7 @@ class DeleteManySpec extends FlatSpec with Matchers with ApiSpecBase {
     val result = server.query(
       """mutation {
         |  deleteManyTodoes(
-        |    where: { title: "title1" }
+        |    where: { title: { equals: "title1" }}
         |  ){
         |    count
         |  }
@@ -71,7 +71,7 @@ class DeleteManySpec extends FlatSpec with Matchers with ApiSpecBase {
     val result = server.query(
       """mutation {
         |  deleteManyTodoes(
-        |    where: { title_in: [ "title1", "title2" ]}
+        |    where: { title: { in: [ "title1", "title2" ] }}
         |  ){
         |    count
         |  }
@@ -93,7 +93,7 @@ class DeleteManySpec extends FlatSpec with Matchers with ApiSpecBase {
     val result = server.query(
       """mutation {
         |  deleteManyTodoes(
-        |    where: { title_not_in: [ "DoesNotExist", "AlsoDoesntExist" ]}
+        |    where: { title: { not: { in: [ "DoesNotExist", "AlsoDoesntExist" ] }}}
         |  ){
         |    count
         |  }
@@ -114,8 +114,8 @@ class DeleteManySpec extends FlatSpec with Matchers with ApiSpecBase {
     val query = server.query(
       """query {
         |  todoes(
-        |    where: { OR: [{title: "title1"}, {title: "title2"}]}
-        |  ){
+        |    where: { OR: [{title: { equals: "title1" }}, { title: { equals: "title2" }}]}
+        |  ) {
         |    title
         |  }
         |}
@@ -128,7 +128,7 @@ class DeleteManySpec extends FlatSpec with Matchers with ApiSpecBase {
     val result = server.query(
       """mutation {
         |  deleteManyTodoes(
-        |    where: { OR: [{title: "title1"}, {title: "title2"}]}
+        |    where: { OR: [{ title: { equals: "title1" }}, { title: { equals: "title2" }}]}
         |  ){
         |    count
         |  }
@@ -149,7 +149,7 @@ class DeleteManySpec extends FlatSpec with Matchers with ApiSpecBase {
     val query = server.query(
       """query {
         |  todoes(
-        |    where: { AND: [{title: "title1"}, {title: "title2"}]}
+        |    where: { AND: [{ title: { equals: "title1" }}, { title: { equals: "title2" }}]}
         |  ){
         |    title
         |  }
@@ -163,7 +163,7 @@ class DeleteManySpec extends FlatSpec with Matchers with ApiSpecBase {
     val result = server.query(
       """mutation {
         |  deleteManyTodoes(
-        |    where: { AND: [{title: "title1"}, {title: "title2"}]}
+        |    where: { AND: [{ title: { equals: "title1" }}, { title: { equals: "title2" }}]}
         |  ){
         |    count
         |  }
@@ -219,10 +219,10 @@ class DeleteManySpec extends FlatSpec with Matchers with ApiSpecBase {
          |   where: { name: "Dad" }
          |   data: {  children: {deleteMany:[
          |      {
-         |          name_contains: "Daughter"
+         |          name: { contains: "Daughter" }
          |      },
          |      {
-         |          name_contains: "Son"
+         |          name: { contains: "Son" }
          |      }
          |   ]
          |  }}

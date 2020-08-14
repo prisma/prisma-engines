@@ -885,11 +885,11 @@ class CompoundPKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBas
         |  updateChild(where: { id: 1 } data: {
         |    parents: {
         |       updateMany: {
-        |         where: { age: 41 }
-        |         data: { age: 42 } }
+        |         where: { age: { equals: 41 }}
+        |         data: { age: 42 }
         |       }
         |     }
-        |  ) {
+        |  }) {
         |    parents { name age }
         |  }
         |}
@@ -1053,7 +1053,7 @@ class CompoundPKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBas
         |    data: {
         |      parents: {
         |        updateMany: {
-        |          where: { age: 40 }
+        |          where: { age: { equals: 40 }}
         |          data: { age: 41 }
         |        }
         |      }
@@ -1082,7 +1082,7 @@ class CompoundPKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBas
         |    data: {
         |      parents: {
         |        deleteMany: {
-        |          age: 41
+        |          age: { equals: 41 }
         |        }
         |      }
         |    }
@@ -1191,7 +1191,7 @@ class CompoundPKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBas
         |  updateChild(where: { id: 1 } data: {
         |    parents: {
         |       updateMany: {
-        |         where: { age: 41 }
+        |         where: { age: { equals: 41 }}
         |         data: { age: 42 } }
         |       }
         |     }
@@ -1368,7 +1368,7 @@ class CompoundPKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBas
         |    data: {
         |      parents: {
         |        updateMany: {
-        |          where: { age: 40 }
+        |          where: { age: { equals: 40 }}
         |          data: { age: 41 }
         |        }
         |      }
@@ -1397,7 +1397,7 @@ class CompoundPKRelationFieldSpec extends FlatSpec with Matchers with ApiSpecBas
         |    data: {
         |      parents: {
         |        deleteMany: {
-        |          age: 41
+        |          age: { equals: 41 }
         |        }
         |      }
         |    }

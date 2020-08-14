@@ -79,7 +79,7 @@ class InSelectionBatching extends FlatSpec with Matchers with ApiSpecBase {
   "batching of IN queries" should "work when having more than the specified amount of items" in {
     val res = server.query(
       """query idInTest {
-        |   findManyA(where: { id_in: [5,4,3,2,1,1,1,2,3,4,5,6,7,6,5,4,3,2,1,2,3,4,5,6] }) { id }
+        |   findManyA(where: { id: { in: [5,4,3,2,1,1,1,2,3,4,5,6,7,6,5,4,3,2,1,2,3,4,5,6] }}) { id }
         |}
         |""".stripMargin,
       project = project,
@@ -95,7 +95,7 @@ class InSelectionBatching extends FlatSpec with Matchers with ApiSpecBase {
   "ascending ordering of batched IN queries" should "work when having more than the specified amount of items" in {
     val res = server.query(
       """query idInTest {
-        |   findManyA(where: { id_in: [5,4,3,2,1,2,1,1,3,4,5,6,7,6,5,4,3,2,1,2,3,4,5,6] }, orderBy: { id: asc }) { id }
+        |   findManyA(where: { id: { in: [5,4,3,2,1,2,1,1,3,4,5,6,7,6,5,4,3,2,1,2,3,4,5,6] }}, orderBy: { id: asc }) { id }
         |}
         |""".stripMargin,
       project = project,
@@ -111,7 +111,7 @@ class InSelectionBatching extends FlatSpec with Matchers with ApiSpecBase {
   "descending ordering of batched IN queries" should "work when having more than the specified amount of items" in {
     val res = server.query(
       """query idInTest {
-        |   findManyA(where: {id_in: [5,4,3,2,1,1,1,2,3,4,5,6,7,6,5,4,3,2,1,2,3,4,5,6] }, orderBy: { id: desc }) { id }
+        |   findManyA(where: {id: { in: [5,4,3,2,1,1,1,2,3,4,5,6,7,6,5,4,3,2,1,2,3,4,5,6] }}, orderBy: { id: desc }) { id }
         |}
         |""".stripMargin,
       project = project,

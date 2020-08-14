@@ -27,9 +27,9 @@ class UpdateManySpec extends FlatSpec with Matchers with ApiSpecBase {
     val result = server.query(
       """mutation {
         |  updateManyTodoes(
-        |    where: { title: "title1" }
+        |    where: { title: { equals: "title1" }}
         |    data: { title: "updated title", opt: "test" }
-        |  ){
+        |  ) {
         |    count
         |  }
         |}
@@ -131,11 +131,11 @@ class UpdateManySpec extends FlatSpec with Matchers with ApiSpecBase {
          |   where: { name: "Dad" }
          |   data: {  children: {updateMany:[
          |      {
-         |          where:{name_contains:"Daughter"}
+         |          where:{name: { contains:"Daughter" }}
          |          data:{test: "UpdateManyDaughters"}
          |      },
          |      {
-         |          where:{name_contains:"Son"}
+         |          where:{name: { contains:"Son" }}
          |          data:{test: "UpdateManySons"}
          |      }
          |   ]

@@ -56,10 +56,9 @@ class SelfRelationFilterBugSpec extends FlatSpec with Matchers with ApiSpecBase 
   }
 
   "Getting root categories categories" should "succeed" in {
-
     val rootCategories =
       s"""{
-         |  allRootCategories: categories(where: { parent: null }) {
+         |  allRootCategories: categories(where: { parent: { is: null }}) {
          |    name
          |    parent {
          |      name
@@ -72,10 +71,9 @@ class SelfRelationFilterBugSpec extends FlatSpec with Matchers with ApiSpecBase 
   }
 
   "Getting subcategories with not" should "succeed" taggedAs (IgnoreMongo) in {
-
     val subCategories = s"""{
                                |  allSubCategories: categories(
-                               |    where: {NOT:[{parent: null}] }
+                               |    where: { NOT: [{parent: { is: null }}] }
                                |  ) {
                                |    name
                                |    parent {
@@ -89,10 +87,9 @@ class SelfRelationFilterBugSpec extends FlatSpec with Matchers with ApiSpecBase 
   }
 
   "Getting subcategories with value" should "succeed" in {
-
     val subCategories2 = s"""{
                            |  allSubCategories2: categories(
-                           |    where: {parent: {name: "Root"} }
+                           |    where: { parent: { is: { name: { equals: "Root" }}}}
                            |  ) {
                            |    name
                            |    parent {

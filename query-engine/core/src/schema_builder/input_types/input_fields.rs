@@ -1,6 +1,9 @@
-//! Top level input fields.
-
 use super::*;
+
+pub(crate) fn filter_input_field(ctx: &mut BuilderContext, field: &ModelField) -> InputField {
+    let typ = field_filter_types::get_field_filter_type(ctx, field);
+    input_field(field.name().to_owned(), wrap_opt_input_object(typ), None)
+}
 
 pub(crate) fn nested_create_input_field(ctx: &mut BuilderContext, field: &RelationFieldRef) -> InputField {
     let input_object = create_input_objects::create_input_type(ctx, &field.related_model(), Some(field));
@@ -86,25 +89,6 @@ pub(crate) fn nested_update_input_field(ctx: &mut BuilderContext, field: &Relati
     let input_object = wrap_list_input_object_type(input_object, field.is_list);
 
     input_field("update", input_object, None)
-}
-
-/// Maps relations to (filter) input fields.
-pub(crate) fn map_relation_filter_input_field(ctx: &mut BuilderContext, field: &RelationFieldRef) -> Vec<InputField> {
-    let related_model = field.related_model();
-    let related_input_type = filter_input_objects::where_object_type(ctx, &related_model);
-
-    let input_fields: Vec<_> = filter_arguments::get_field_filters(&ModelField::Relation(field.clone()))
-        .into_iter()
-        .map(|arg| {
-            let field_name = format!("{}{}", field.name, arg.suffix);
-            let obj = InputType::object(related_input_type.clone());
-            let typ = if arg.suffix == "" { InputType::null(obj) } else { obj };
-
-            input_field(field_name, InputType::opt(typ), None)
-        })
-        .collect();
-
-    input_fields
 }
 
 /// Builds scalar input fields using the mapper and the given, prefiltered, scalar fields.

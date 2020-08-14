@@ -105,9 +105,9 @@ class SelectOneSingularIdBatchSpec extends FlatSpec with Matchers with ApiSpecBa
 
   "joins with same conditions" should "just work" in {
     val queries = Seq(
-      """query {findOneArtist(where:{ArtistId:2}) {Albums(where:{AlbumId:2}) { AlbumId, Title }}}""",
-      """query {findOneArtist(where:{ArtistId:1}) {Albums(where:{AlbumId:2}) { Title, AlbumId }}}""",
-      """query {findOneArtist(where:{ArtistId:420}) {Albums(where:{AlbumId:2}) { AlbumId, Title }}}""",
+      """query {findOneArtist(where:{ArtistId:2}) {Albums(where:{AlbumId: { equals: 2 }}) { AlbumId, Title }}}""",
+      """query {findOneArtist(where:{ArtistId:1}) {Albums(where:{AlbumId: { equals: 2 }}) { Title, AlbumId }}}""",
+      """query {findOneArtist(where:{ArtistId:420}) {Albums(where:{AlbumId: { equals: 2 }}) { AlbumId, Title }}}""",
     )
 
     server.batch(queries, transaction = false, project, legacy = false).toString should be(
@@ -117,9 +117,9 @@ class SelectOneSingularIdBatchSpec extends FlatSpec with Matchers with ApiSpecBa
 
   "joins with different conditions" should "just work" in {
     val queries = Seq(
-      """query {findOneArtist(where:{ArtistId:2}) {Albums(where:{AlbumId:2}) { AlbumId, Title }}}""",
-      """query {findOneArtist(where:{ArtistId:1}) {Albums(where:{AlbumId:1}) { Title, AlbumId }}}""",
-      """query {findOneArtist(where:{ArtistId:420}) {Albums(where:{AlbumId:2}) { AlbumId, Title }}}""",
+      """query {findOneArtist(where:{ArtistId:2}) {Albums(where:{AlbumId: { equals: 2 }}) { AlbumId, Title }}}""",
+      """query {findOneArtist(where:{ArtistId:1}) {Albums(where:{AlbumId: { equals: 1 }}) { Title, AlbumId }}}""",
+      """query {findOneArtist(where:{ArtistId:420}) {Albums(where:{AlbumId: { equals: 2 }}) { AlbumId, Title }}}""",
     )
 
     server.batch(queries, transaction = false, project, legacy = false).toString should be(

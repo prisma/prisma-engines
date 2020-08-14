@@ -202,8 +202,8 @@ class DefaultValueSpec extends FlatSpec with Matchers with ApiSpecBase {
       s"""query {
          |  users(
          |    where:{
-         |      name_in: [Spiderman, Superman]
-         |      }
+         |      name: { in: [Spiderman, Superman] }
+         |    }
          |    orderBy: { age: asc }
          |  ){
          |    name,
