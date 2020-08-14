@@ -1,0 +1,1366 @@
+model building_building {
+    building_capacity                              Int
+    building_desc                                  String?
+    building_location                              String?
+    building_name                                  String        @unique
+    building_type                                  Int
+    create_uid                                     Int?
+    id                                             Int           @default(autoincrement()) @id
+    sequence                                       Int?
+    write_date                                     DateTime?
+    write_uid                                      Int?
+    building_type_building_buildingTobuilding_type building_type @relation(fields: [building_type], references: [id])
+}
+
+model building_type {
+    building_type     String              @unique
+    buildingtype_desc String
+    create_uid        Int?
+    id                Int                 @default(autoincrement()) @id
+    write_date        DateTime?
+    write_uid         Int?
+    building_building building_building[]
+}
+
+model bus_bus {
+    channel    String?
+    create_uid Int?
+    id         Int       @default(autoincrement()) @id
+    message    String?
+    write_date DateTime?
+    write_uid  Int?
+}
+
+model bus_presence {
+    id            Int       @default(autoincrement()) @id
+    last_poll     DateTime?
+    last_presence DateTime?
+    status        String?
+    user_id       Int       @unique
+
+}
+
+model cash_box_out {
+    amount     Float
+    create_uid Int?
+    id         Int       @default(autoincrement()) @id
+    name       String
+    write_date DateTime?
+    write_uid  Int?
+}
+
+model change_password_user {
+    create_uid             Int?
+    id                     Int                    @default(autoincrement()) @id
+    new_passwd             String?
+    user_id                Int
+    user_login             String?
+    wizard_id              Int
+    write_date             DateTime?
+    write_uid              Int?
+    change_password_wizard change_password_wizard @relation(fields: [wizard_id], references: [id])
+}
+
+model change_password_wizard {
+    create_uid           Int?
+    id                   Int                    @default(autoincrement()) @id
+    write_date           DateTime?
+    write_uid            Int?
+    change_password_user change_password_user[]
+}
+
+model closing_balance_confirm_wizard {
+    create_uid Int?
+    id         Int       @default(autoincrement()) @id
+    write_date DateTime?
+    write_uid  Int?
+}
+
+model color_attribute {
+    create_uid            Int?
+    create_variant        String
+    id                    Int                     @default(autoincrement()) @id
+    name                  String
+    sequence              Int?
+    write_date            DateTime?
+    write_uid             Int?
+    color_attribute_value color_attribute_value[]
+
+}
+
+model color_attribute_value {
+    attribute_id    Int
+    create_uid      Int?
+    html_color      String?
+    id              Int             @default(autoincrement()) @id
+    name            String
+    sequence        Int?
+    write_date      DateTime?
+    write_uid       Int?
+    color_attribute color_attribute @relation(fields: [attribute_id], references: [id])
+
+    @@unique([name, attribute_id], name: "color_attribute_value_value_company_uniq")
+}
+
+model procurement_group {
+    create_uid                 Int?
+    id                         Int                          @default(autoincrement()) @id
+    move_type                  String
+    name                       String
+    partner_id                 Int?
+    write_date                 DateTime?
+    write_uid                  Int?
+    stock_move                 stock_move[]
+    stock_picking              stock_picking[]
+    stock_rule                 stock_rule[]
+    stock_warehouse_orderpoint stock_warehouse_orderpoint[]
+}
+
+model product_attr_exclusion_value_ids_rel {
+    product_template_attribute_exclusion_id Int
+    product_template_attribute_value_id     Int
+    product_template_attribute_exclusion    product_template_attribute_exclusion @relation(fields: [product_template_attribute_exclusion_id], references: [id])
+    product_template_attribute_value        product_template_attribute_value     @relation(fields: [product_template_attribute_value_id], references: [id])
+
+    @@unique([product_template_attribute_exclusion_id, product_template_attribute_value_id], name: "product_attr_exclusion_value__product_template_attribute_ex_key")
+}
+
+model product_attribute {
+    create_uid                             Int?
+    create_variant                         String
+    id                                     Int                                      @default(autoincrement()) @id
+    name                                   String
+    sequence                               Int?
+    write_date                             DateTime?
+    write_uid                              Int?
+    product_attribute_product_template_rel product_attribute_product_template_rel[]
+    product_attribute_value                product_attribute_value[]
+    product_template_attribute_line        product_template_attribute_line[]
+    product_template_attribute_value       product_template_attribute_value[]
+
+}
+
+model product_attribute_product_template_rel {
+    product_attribute_id Int
+    product_template_id  Int
+    product_attribute    product_attribute @relation(fields: [product_attribute_id], references: [id])
+    product_template     product_template  @relation(fields: [product_template_id], references: [id])
+
+    @@unique([product_attribute_id, product_template_id], name: "product_attribute_product_tem_product_attribute_id_product__key")
+}
+
+model product_attribute_value {
+    attribute_id                                                Int
+    create_uid                                                  Int?
+    id                                                          Int                                                           @default(autoincrement()) @id
+    name                                                        String
+    sequence                                                    Int?
+    write_date                                                  DateTime?
+    write_uid                                                   Int?
+    product_attribute                                           product_attribute                                             @relation(fields: [attribute_id], references: [id])
+    product_attribute_value_product_template_attribute_line_rel product_attribute_value_product_template_attribute_line_rel[]
+    product_template_attribute_value                            product_template_attribute_value[]
+
+    @@unique([name, attribute_id], name: "product_attribute_value_value_company_uniq")
+}
+
+model product_attribute_value_product_template_attribute_line_rel {
+    product_attribute_value_id         Int
+    product_template_attribute_line_id Int
+    product_attribute_value            product_attribute_value         @relation(fields: [product_attribute_value_id], references: [id])
+    product_template_attribute_line    product_template_attribute_line @relation(fields: [product_template_attribute_line_id], references: [id])
+
+    @@unique([product_attribute_value_id, product_template_attribute_line_id], name: "product_attribute_value_produ_product_attribute_value_id_pr_key")
+}
+
+model product_category {
+    complete_name          String?
+    create_uid             Int?
+    id                     Int                      @default(autoincrement()) @id
+    name                   String
+    parent_id              Int?
+    parent_path            String?
+    removal_strategy_id    Int?
+    write_date             DateTime?
+    write_uid              Int?
+    product_category       product_category?        @relation("product_categoryToproduct_category_parent_id", fields: [parent_id], references: [id])
+    product_removal        product_removal?         @relation(fields: [removal_strategy_id], references: [id])
+    other_product_category product_category[]       @relation("product_categoryToproduct_category_parent_id")
+    product_pricelist_item product_pricelist_item[]
+    product_template       product_template[]
+    stock_inventory_line   stock_inventory_line[]
+    stock_putaway_rule     stock_putaway_rule[]
+
+}
+
+model product_packaging {
+    barcode             String?
+    company_id          Int?
+    create_uid          Int?
+    id                  Int                   @default(autoincrement()) @id
+    name                String
+    product_id          Int?
+    qty                 Float?
+    sequence            Int?
+    write_date          DateTime?
+    write_uid           Int?
+    product_product     product_product?      @relation(fields: [product_id], references: [id])
+    stock_quant_package stock_quant_package[]
+
+}
+
+model product_price_list {
+    create_uid        Int?
+    id                Int               @default(autoincrement()) @id
+    price_list        Int
+    qty1              Int?
+    qty2              Int?
+    qty3              Int?
+    qty4              Int?
+    qty5              Int?
+    write_date        DateTime?
+    write_uid         Int?
+    product_pricelist product_pricelist @relation(fields: [price_list], references: [id])
+}
+
+model product_pricelist {
+    active                                                                             Boolean?
+    company_id                                                                         Int?
+    create_uid                                                                         Int?
+    currency_id                                                                        Int
+    discount_policy                                                                    String?
+    id                                                                                 Int                      @default(autoincrement()) @id
+    name                                                                               String
+    sequence                                                                           Int?
+    write_date                                                                         DateTime?
+    write_uid                                                                          Int?
+    product_price_list                                                                 product_price_list[]
+    product_pricelist_item_product_pricelistToproduct_pricelist_item_base_pricelist_id product_pricelist_item[] @relation("product_pricelistToproduct_pricelist_item_base_pricelist_id")
+    product_pricelist_item_product_pricelistToproduct_pricelist_item_pricelist_id      product_pricelist_item[] @relation("product_pricelistToproduct_pricelist_item_pricelist_id")
+}
+
+model product_pricelist_item {
+    active                                                                        Boolean?
+    applied_on                                                                    String
+    base                                                                          String
+    base_pricelist_id                                                             Int?
+    categ_id                                                                      Int?
+    company_id                                                                    Int?
+    compute_price                                                                 String
+    create_uid                                                                    Int?
+    currency_id                                                                   Int?
+    date_end                                                                      DateTime?
+    date_start                                                                    DateTime?
+    fixed_price                                                                   Float?
+    id                                                                            Int                @default(autoincrement()) @id
+    min_quantity                                                                  Int?
+    percent_price                                                                 Float?
+    price_discount                                                                Float?
+    price_max_margin                                                              Float?
+    price_min_margin                                                              Float?
+    price_round                                                                   Float?
+    price_surcharge                                                               Float?
+    pricelist_id                                                                  Int
+    product_id                                                                    Int?
+    product_tmpl_id                                                               Int?
+    write_date                                                                    DateTime?
+    write_uid                                                                     Int?
+    product_pricelist_product_pricelistToproduct_pricelist_item_base_pricelist_id product_pricelist? @relation("product_pricelistToproduct_pricelist_item_base_pricelist_id", fields: [base_pricelist_id], references: [id])
+    product_category                                                              product_category?  @relation(fields: [categ_id], references: [id])
+    product_pricelist_product_pricelistToproduct_pricelist_item_pricelist_id      product_pricelist  @relation("product_pricelistToproduct_pricelist_item_pricelist_id", fields: [pricelist_id], references: [id])
+    product_product                                                               product_product?   @relation(fields: [product_id], references: [id])
+    product_template                                                              product_template?  @relation(fields: [product_tmpl_id], references: [id])
+
+}
+
+model product_product {
+    active                              Boolean?
+    barcode                             String?                               @unique
+    can_image_variant_1024_be_zoomed    Boolean?
+    combination_indices                 String?
+    create_uid                          Int?
+    default_code                        String?
+    id                                  Int                                   @default(autoincrement()) @id
+    message_main_attachment_id          Int?
+    product_tmpl_id                     Int
+    volume                              Float?
+    weight                              Float?
+    write_date                          DateTime?
+    write_uid                           Int?
+    product_template                    product_template                      @relation(fields: [product_tmpl_id], references: [id])
+    product_packaging                   product_packaging[]
+    product_pricelist_item              product_pricelist_item[]
+    product_product_stock_inventory_rel product_product_stock_inventory_rel[]
+    product_replenish                   product_replenish[]
+    product_supplierinfo                product_supplierinfo[]
+    product_variant_combination         product_variant_combination[]
+    stock_change_product_qty            stock_change_product_qty[]
+    stock_inventory_line                stock_inventory_line[]
+    stock_move                          stock_move[]
+    stock_move_line                     stock_move_line[]
+    stock_production_lot                stock_production_lot[]
+    stock_putaway_rule                  stock_putaway_rule[]
+    stock_quant                         stock_quant[]
+    stock_return_picking_line           stock_return_picking_line[]
+    stock_rules_report                  stock_rules_report[]
+    stock_scrap                         stock_scrap[]
+    stock_warehouse_orderpoint          stock_warehouse_orderpoint[]
+    stock_warn_insufficient_qty_scrap   stock_warn_insufficient_qty_scrap[]
+
+    @@unique([product_tmpl_id, combination_indices], name: "product_product_combination_unique")
+}
+
+model product_product_stock_inventory_rel {
+    product_product_id Int
+    stock_inventory_id Int
+    product_product    product_product @relation(fields: [product_product_id], references: [id])
+    stock_inventory    stock_inventory @relation(fields: [stock_inventory_id], references: [id])
+
+    @@unique([stock_inventory_id, product_product_id], name: "product_product_stock_invento_stock_inventory_id_product_pr_key")
+}
+
+model product_removal {
+    create_uid       Int?
+    id               Int                @default(autoincrement()) @id
+    method           String
+    name             String
+    write_date       DateTime?
+    write_uid        Int?
+    product_category product_category[]
+    stock_location   stock_location[]
+}
+
+model product_replenish {
+    company_id                                 Int?
+    create_uid                                 Int?
+    date_planned                               DateTime
+    id                                         Int                                          @default(autoincrement()) @id
+    product_has_variants                       Boolean
+    product_id                                 Int
+    product_tmpl_id                            Int
+    quantity                                   Float
+    warehouse_id                               Int
+    write_date                                 DateTime?
+    write_uid                                  Int?
+    product_product                            product_product                              @relation(fields: [product_id], references: [id])
+    product_template                           product_template                             @relation(fields: [product_tmpl_id], references: [id])
+    stock_warehouse                            stock_warehouse                              @relation(fields: [warehouse_id], references: [id])
+    product_replenish_stock_location_route_rel product_replenish_stock_location_route_rel[]
+}
+
+model product_replenish_stock_location_route_rel {
+    product_replenish_id    Int
+    stock_location_route_id Int
+    product_replenish       product_replenish    @relation(fields: [product_replenish_id], references: [id])
+    stock_location_route    stock_location_route @relation(fields: [stock_location_route_id], references: [id])
+
+    @@unique([product_replenish_id, stock_location_route_id], name: "product_replenish_stock_locat_product_replenish_id_stock_lo_key")
+}
+
+model product_supplier_taxes_rel {
+    prod_id          Int
+    tax_id           Int
+    product_template product_template @relation(fields: [prod_id], references: [id])
+
+    @@unique([prod_id, tax_id], name: "product_supplier_taxes_rel_prod_id_tax_id_key")
+}
+
+model product_supplierinfo {
+    company_id       Int?
+    create_uid       Int?
+    currency_id      Int
+    date_end         DateTime?
+    date_start       DateTime?
+    delay            Int
+    id               Int               @default(autoincrement()) @id
+    min_qty          Float
+    name             Int
+    price            Float
+    product_code     String?
+    product_id       Int?
+    product_name     String?
+    product_tmpl_id  Int?
+    sequence         Int?
+    write_date       DateTime?
+    write_uid        Int?
+    product_product  product_product?  @relation(fields: [product_id], references: [id])
+    product_template product_template? @relation(fields: [product_tmpl_id], references: [id])
+
+}
+
+model product_template {
+    active                                 Boolean?
+    available_in_pos                       Boolean?
+    can_image_1024_be_zoomed               Boolean?
+    categ_id                               Int
+    color                                  Int?
+    company_id                             Int?
+    create_uid                             Int?
+    default_code                           String?
+    has_configurable_attributes            Boolean?
+    id                                     Int                                      @default(autoincrement()) @id
+    list_price                             Float?
+    message_main_attachment_id             Int?
+    name                                   String
+    purchase_ok                            Boolean?
+    rental                                 Boolean?
+    sale_delay                             Float?
+    sale_ok                                Boolean?
+    sequence                               Int?
+    to_weight                              Boolean?
+    tracking                               String
+    type                                   String
+    volume                                 Float?
+    weight                                 Float?
+    write_date                             DateTime?
+    write_uid                              Int?
+    product_category                       product_category                         @relation(fields: [categ_id], references: [id])
+    product_attribute_product_template_rel product_attribute_product_template_rel[]
+    product_pricelist_item                 product_pricelist_item[]
+    product_product                        product_product[]
+    product_replenish                      product_replenish[]
+    product_supplier_taxes_rel             product_supplier_taxes_rel[]
+    product_supplierinfo                   product_supplierinfo[]
+    product_template_attribute_exclusion   product_template_attribute_exclusion[]
+    product_template_attribute_line        product_template_attribute_line[]
+    product_template_attribute_value       product_template_attribute_value[]
+    stock_change_product_qty               stock_change_product_qty[]
+    stock_route_product                    stock_route_product[]
+    stock_rules_report                     stock_rules_report[]
+
+}
+
+model product_template_attribute_exclusion {
+    create_uid                           Int?
+    id                                   Int                                    @default(autoincrement()) @id
+    product_template_attribute_value_id  Int?
+    product_tmpl_id                      Int
+    write_date                           DateTime?
+    write_uid                            Int?
+    product_template_attribute_value     product_template_attribute_value?      @relation(fields: [product_template_attribute_value_id], references: [id])
+    product_template                     product_template                       @relation(fields: [product_tmpl_id], references: [id])
+    product_attr_exclusion_value_ids_rel product_attr_exclusion_value_ids_rel[]
+
+}
+
+model product_template_attribute_line {
+    active                                                      Boolean?
+    attribute_id                                                Int
+    create_uid                                                  Int?
+    id                                                          Int                                                           @default(autoincrement()) @id
+    product_tmpl_id                                             Int
+    write_date                                                  DateTime?
+    write_uid                                                   Int?
+    product_attribute                                           product_attribute                                             @relation(fields: [attribute_id], references: [id])
+    product_template                                            product_template                                              @relation(fields: [product_tmpl_id], references: [id])
+    product_attribute_value_product_template_attribute_line_rel product_attribute_value_product_template_attribute_line_rel[]
+    product_template_attribute_value                            product_template_attribute_value[]
+
+}
+
+model product_template_attribute_value {
+    attribute_id                         Int?
+    attribute_line_id                    Int
+    create_uid                           Int?
+    id                                   Int                                    @default(autoincrement()) @id
+    price_extra                          Float?
+    product_attribute_value_id           Int
+    product_tmpl_id                      Int?
+    ptav_active                          Boolean?
+    write_date                           DateTime?
+    write_uid                            Int?
+    product_attribute                    product_attribute?                     @relation(fields: [attribute_id], references: [id])
+    product_template_attribute_line      product_template_attribute_line        @relation(fields: [attribute_line_id], references: [id])
+    product_attribute_value              product_attribute_value                @relation(fields: [product_attribute_value_id], references: [id])
+    product_template                     product_template?                      @relation(fields: [product_tmpl_id], references: [id])
+    product_attr_exclusion_value_ids_rel product_attr_exclusion_value_ids_rel[]
+    product_template_attribute_exclusion product_template_attribute_exclusion[]
+    product_variant_combination          product_variant_combination[]
+
+    @@unique([attribute_line_id, product_attribute_value_id], name: "product_template_attribute_value_attribute_value_unique")
+}
+
+model product_variant_combination {
+    product_product_id                  Int
+    product_template_attribute_value_id Int
+    product_product                     product_product                  @relation(fields: [product_product_id], references: [id])
+    product_template_attribute_value    product_template_attribute_value @relation(fields: [product_template_attribute_value_id], references: [id])
+
+    @@unique([product_product_id, product_template_attribute_value_id], name: "product_variant_combination_product_product_id_product_temp_key")
+}
+
+model rate_categories {
+    active          Boolean?
+    categories      String
+    code            String
+    create_uid      Int?
+    end_date        DateTime?
+    id              Int               @default(autoincrement()) @id
+    sequence        Int?
+    start_date      DateTime
+    write_date      DateTime?
+    write_uid       Int?
+    ratecode_head   ratecode_head[]
+    ratecode_header ratecode_header[]
+}
+
+model rate_code {
+    create_uid       Int?
+    discount_amount  Float?
+    discount_percent Float?
+    end_date         DateTime
+    id               Int       @default(autoincrement()) @id
+    normal_price1    Float?
+    normal_price2    Float?
+    normal_price3    Float?
+    normal_price4    Float?
+    rate_code        String
+    ratecode_name    String
+    ratecode_type    String
+    roomtype_id      Int
+    special_price1   Float?
+    special_price2   Float?
+    special_price3   Float?
+    special_price4   Float?
+    start_date       DateTime
+    transcation_id   Int
+    weekend_price1   Float?
+    weekend_price2   Float?
+    weekend_price3   Float?
+    weekend_price4   Float?
+    write_date       DateTime?
+    write_uid        Int?
+}
+
+model ratecode_details {
+    create_uid       Int?
+    discount_amount  Float?
+    discount_percent Float?
+    end_date         DateTime
+    id               Int              @default(autoincrement()) @id
+    normal_extra     Float?
+    normal_price1    Float?
+    normal_price2    Float?
+    normal_price3    Float?
+    normal_price4    Float?
+    ratehead_id      Int?
+    roomtype_id      Int
+    season_code      String
+    special_extra    Float?
+    special_price1   Float?
+    special_price2   Float?
+    special_price3   Float?
+    special_price4   Float?
+    start_date       DateTime
+    weekend_extra    Float?
+    weekend_price1   Float?
+    weekend_price2   Float?
+    weekend_price3   Float?
+    weekend_price4   Float?
+    write_date       DateTime?
+    write_uid        Int?
+    ratecode_header  ratecode_header? @relation(fields: [ratehead_id], references: [id])
+}
+
+model ratecode_head {
+    create_uid       Int?
+    end_date         DateTime
+    head_create      Boolean?
+    id               Int              @default(autoincrement()) @id
+    rate_category_id Int?
+    rate_code        String
+    ratecode_name    String
+    start_date       DateTime
+    write_date       DateTime?
+    write_uid        Int?
+    rate_categories  rate_categories? @relation(fields: [rate_category_id], references: [id])
+}
+
+model ratecode_header {
+    create_uid       Int?
+    end_date         DateTime
+    header_create    Boolean?
+    id               Int                @default(autoincrement()) @id
+    rate_category_id Int
+    rate_code        String
+    ratecode_name    String
+    ratecode_type    String
+    start_date       DateTime
+    write_date       DateTime?
+    write_uid        Int?
+    rate_categories  rate_categories    @relation(fields: [rate_category_id], references: [id])
+    ratecode_details ratecode_details[]
+}
+
+model report_layout {
+    create_uid Int?
+    id         Int       @default(autoincrement()) @id
+    image      String?
+    name       String?
+    pdf        String?
+    view_id    Int
+    write_date DateTime?
+    write_uid  Int?
+}
+
+model revenue_type {
+    create_uid   Int?
+    id           Int         @default(autoincrement()) @id
+    rev_code     String      @unique
+    rev_subgroup Boolean?
+    rev_type     String
+    revtype_name String?
+    write_date   DateTime?
+    write_uid    Int?
+    sub_group    sub_group[]
+}
+
+model stock_change_product_qty {
+    create_uid       Int?
+    id               Int              @default(autoincrement()) @id
+    new_quantity     Float
+    product_id       Int
+    product_tmpl_id  Int
+    write_date       DateTime?
+    write_uid        Int?
+    product_product  product_product  @relation(fields: [product_id], references: [id])
+    product_template product_template @relation(fields: [product_tmpl_id], references: [id])
+}
+
+model stock_change_standard_price {
+    create_uid Int?
+    id         Int       @default(autoincrement()) @id
+    new_price  Float
+    write_date DateTime?
+    write_uid  Int?
+}
+
+model stock_inventory {
+    company_id                          Int
+    create_uid                          Int?
+    date                                DateTime
+    id                                  Int                                   @default(autoincrement()) @id
+    name                                String
+    prefill_counted_quantity            String?
+    start_empty                         Boolean?
+    state                               String?
+    write_date                          DateTime?
+    write_uid                           Int?
+    product_product_stock_inventory_rel product_product_stock_inventory_rel[]
+    stock_inventory_line                stock_inventory_line[]
+    stock_inventory_stock_location_rel  stock_inventory_stock_location_rel[]
+    stock_move                          stock_move[]
+
+}
+
+model stock_inventory_line {
+    categ_id             Int?
+    company_id           Int?
+    create_uid           Int?
+    id                   Int                   @default(autoincrement()) @id
+    inventory_date       DateTime?
+    inventory_id         Int?
+    is_editable          Boolean?
+    location_id          Int
+    package_id           Int?
+    partner_id           Int?
+    prod_lot_id          Int?
+    product_id           Int
+    product_qty          Float?
+    theoretical_qty      Float?
+    write_date           DateTime?
+    write_uid            Int?
+    product_category     product_category?     @relation(fields: [categ_id], references: [id])
+    stock_inventory      stock_inventory?      @relation(fields: [inventory_id], references: [id])
+    stock_location       stock_location        @relation(fields: [location_id], references: [id])
+    stock_quant_package  stock_quant_package?  @relation(fields: [package_id], references: [id])
+    stock_production_lot stock_production_lot? @relation(fields: [prod_lot_id], references: [id])
+    product_product      product_product       @relation(fields: [product_id], references: [id])
+
+}
+
+model stock_inventory_stock_location_rel {
+    stock_inventory_id Int
+    stock_location_id  Int
+    stock_inventory    stock_inventory @relation(fields: [stock_inventory_id], references: [id])
+    stock_location     stock_location  @relation(fields: [stock_location_id], references: [id])
+
+    @@unique([stock_inventory_id, stock_location_id], name: "stock_inventory_stock_locatio_stock_inventory_id_stock_loca_key")
+}
+
+model stock_location {
+    active                                                                         Boolean?
+    barcode                                                                        String?
+    comment                                                                        String?
+    company_id                                                                     Int?
+    complete_name                                                                  String?
+    create_uid                                                                     Int?
+    id                                                                             Int                                  @default(autoincrement()) @id
+    location_id                                                                    Int?
+    name                                                                           String
+    parent_path                                                                    String?
+    posx                                                                           Int?
+    posy                                                                           Int?
+    posz                                                                           Int?
+    removal_strategy_id                                                            Int?
+    return_location                                                                Boolean?
+    scrap_location                                                                 Boolean?
+    usage                                                                          String
+    write_date                                                                     DateTime?
+    write_uid                                                                      Int?
+    stock_location                                                                 stock_location?                      @relation("stock_locationTostock_location_location_id", fields: [location_id], references: [id])
+    product_removal                                                                product_removal?                     @relation(fields: [removal_strategy_id], references: [id])
+    stock_inventory_line                                                           stock_inventory_line[]
+    stock_inventory_stock_location_rel                                             stock_inventory_stock_location_rel[]
+    other_stock_location                                                           stock_location[]                     @relation("stock_locationTostock_location_location_id")
+    stock_move_stock_locationTostock_move_location_dest_id                         stock_move[]                         @relation("stock_locationTostock_move_location_dest_id")
+    stock_move_stock_locationTostock_move_location_id                              stock_move[]                         @relation("stock_locationTostock_move_location_id")
+    stock_move_line_stock_locationTostock_move_line_location_dest_id               stock_move_line[]                    @relation("stock_locationTostock_move_line_location_dest_id")
+    stock_move_line_stock_locationTostock_move_line_location_id                    stock_move_line[]                    @relation("stock_locationTostock_move_line_location_id")
+    stock_package_destination                                                      stock_package_destination[]
+    stock_package_level                                                            stock_package_level[]
+    stock_picking_stock_locationTostock_picking_location_dest_id                   stock_picking[]                      @relation("stock_locationTostock_picking_location_dest_id")
+    stock_picking_stock_locationTostock_picking_location_id                        stock_picking[]                      @relation("stock_locationTostock_picking_location_id")
+    stock_picking_type_stock_locationTostock_picking_type_default_location_dest_id stock_picking_type[]                 @relation("stock_locationTostock_picking_type_default_location_dest_id")
+    stock_picking_type_stock_locationTostock_picking_type_default_location_src_id  stock_picking_type[]                 @relation("stock_locationTostock_picking_type_default_location_src_id")
+    stock_putaway_rule_stock_locationTostock_putaway_rule_location_in_id           stock_putaway_rule[]                 @relation("stock_locationTostock_putaway_rule_location_in_id")
+    stock_putaway_rule_stock_locationTostock_putaway_rule_location_out_id          stock_putaway_rule[]                 @relation("stock_locationTostock_putaway_rule_location_out_id")
+    stock_quant                                                                    stock_quant[]
+    stock_quant_package                                                            stock_quant_package[]
+    stock_return_picking_stock_locationTostock_return_picking_location_id          stock_return_picking[]               @relation("stock_locationTostock_return_picking_location_id")
+    stock_return_picking_stock_locationTostock_return_picking_original_location_id stock_return_picking[]               @relation("stock_locationTostock_return_picking_original_location_id")
+    stock_return_picking_stock_locationTostock_return_picking_parent_location_id   stock_return_picking[]               @relation("stock_locationTostock_return_picking_parent_location_id")
+    stock_rule_stock_locationTostock_rule_location_id                              stock_rule[]                         @relation("stock_locationTostock_rule_location_id")
+    stock_rule_stock_locationTostock_rule_location_src_id                          stock_rule[]                         @relation("stock_locationTostock_rule_location_src_id")
+    stock_scrap_stock_locationTostock_scrap_location_id                            stock_scrap[]                        @relation("stock_locationTostock_scrap_location_id")
+    stock_scrap_stock_locationTostock_scrap_scrap_location_id                      stock_scrap[]                        @relation("stock_locationTostock_scrap_scrap_location_id")
+    stock_warehouse_stock_locationTostock_warehouse_lot_stock_id                   stock_warehouse[]                    @relation("stock_locationTostock_warehouse_lot_stock_id")
+    stock_warehouse_stock_locationTostock_warehouse_view_location_id               stock_warehouse[]                    @relation("stock_locationTostock_warehouse_view_location_id")
+    stock_warehouse_stock_locationTostock_warehouse_wh_input_stock_loc_id          stock_warehouse[]                    @relation("stock_locationTostock_warehouse_wh_input_stock_loc_id")
+    stock_warehouse_stock_locationTostock_warehouse_wh_output_stock_loc_id         stock_warehouse[]                    @relation("stock_locationTostock_warehouse_wh_output_stock_loc_id")
+    stock_warehouse_stock_locationTostock_warehouse_wh_pack_stock_loc_id           stock_warehouse[]                    @relation("stock_locationTostock_warehouse_wh_pack_stock_loc_id")
+    stock_warehouse_stock_locationTostock_warehouse_wh_qc_stock_loc_id             stock_warehouse[]                    @relation("stock_locationTostock_warehouse_wh_qc_stock_loc_id")
+    stock_warehouse_orderpoint                                                     stock_warehouse_orderpoint[]
+    stock_warn_insufficient_qty_scrap                                              stock_warn_insufficient_qty_scrap[]
+
+    @@unique([barcode, company_id], name: "stock_location_barcode_company_uniq")
+}
+
+model stock_location_route {
+    active                                                                   Boolean?
+    company_id                                                               Int?
+    create_uid                                                               Int?
+    id                                                                       Int                                          @default(autoincrement()) @id
+    name                                                                     String
+    product_categ_selectable                                                 Boolean?
+    product_selectable                                                       Boolean?
+    sequence                                                                 Int?
+    supplied_wh_id                                                           Int?
+    supplier_wh_id                                                           Int?
+    warehouse_selectable                                                     Boolean?
+    write_date                                                               DateTime?
+    write_uid                                                                Int?
+    stock_warehouse_stock_location_route_supplied_wh_idTostock_warehouse     stock_warehouse?                             @relation("stock_location_route_supplied_wh_idTostock_warehouse", fields: [supplied_wh_id], references: [id])
+    stock_warehouse_stock_location_route_supplier_wh_idTostock_warehouse     stock_warehouse?                             @relation("stock_location_route_supplier_wh_idTostock_warehouse", fields: [supplier_wh_id], references: [id])
+    product_replenish_stock_location_route_rel                               product_replenish_stock_location_route_rel[]
+    stock_route_product                                                      stock_route_product[]
+    stock_route_warehouse                                                    stock_route_warehouse[]
+    stock_rule                                                               stock_rule[]
+    stock_warehouse_stock_location_routeTostock_warehouse_crossdock_route_id stock_warehouse[]                            @relation("stock_location_routeTostock_warehouse_crossdock_route_id")
+    stock_warehouse_stock_location_routeTostock_warehouse_delivery_route_id  stock_warehouse[]                            @relation("stock_location_routeTostock_warehouse_delivery_route_id")
+    stock_warehouse_stock_location_routeTostock_warehouse_reception_route_id stock_warehouse[]                            @relation("stock_location_routeTostock_warehouse_reception_route_id")
+
+}
+
+model stock_move {
+    additional                                                       Boolean?
+    company_id                                                       Int
+    create_uid                                                       Int?
+    date                                                             DateTime
+    date_expected                                                    DateTime
+    delay_alert                                                      Boolean?
+    description_picking                                              String?
+    group_id                                                         Int?
+    id                                                               Int                         @default(autoincrement()) @id
+    inventory_id                                                     Int?
+    location_dest_id                                                 Int
+    location_id                                                      Int
+    name                                                             String
+    next_serial                                                      String?
+    next_serial_count                                                Int?
+    note                                                             String?
+    origin                                                           String?
+    origin_returned_move_id                                          Int?
+    package_level_id                                                 Int?
+    partner_id                                                       Int?
+    picking_id                                                       Int?
+    picking_type_id                                                  Int?
+    price_unit                                                       Float?
+    priority                                                         String?
+    procure_method                                                   String
+    procurement_group                                                procurement_group?          @relation(fields: [group_id], references: [id])
+    stock_inventory                                                  stock_inventory?            @relation(fields: [inventory_id], references: [id])
+    stock_location_stock_locationTostock_move_location_dest_id       stock_location              @relation("stock_locationTostock_move_location_dest_id", fields: [location_dest_id], references: [id])
+    stock_location_stock_locationTostock_move_location_id            stock_location              @relation("stock_locationTostock_move_location_id", fields: [location_id], references: [id])
+    stock_move                                                       stock_move?                 @relation("stock_moveTostock_move_origin_returned_move_id", fields: [origin_returned_move_id], references: [id])
+    stock_package_level                                              stock_package_level?        @relation(fields: [package_level_id], references: [id])
+    stock_picking                                                    stock_picking?              @relation(fields: [picking_id], references: [id])
+    stock_picking_type                                               stock_picking_type?         @relation(fields: [picking_type_id], references: [id])
+    other_stock_move                                                 stock_move[]                @relation("stock_moveTostock_move_origin_returned_move_id")
+    stock_move_line                                                  stock_move_line[]
+    stock_move_move_rel_stock_moveTostock_move_move_rel_move_dest_id stock_move_move_rel[]       @relation("stock_moveTostock_move_move_rel_move_dest_id")
+    stock_move_move_rel_stock_moveTostock_move_move_rel_move_orig_id stock_move_move_rel[]       @relation("stock_moveTostock_move_move_rel_move_orig_id")
+    stock_return_picking_line                                        stock_return_picking_line[]
+    stock_scrap                                                      stock_scrap[]
+
+    product_product   product_product? @relation(fields: [product_productId], references: [id])
+    product_productId Int?
+    stock_rule        stock_rule?      @relation(fields: [stock_ruleId], references: [id])
+    stock_ruleId      Int?
+    stock_warehouse   stock_warehouse? @relation(fields: [stock_warehouseId], references: [id])
+    stock_warehouseId Int?
+}
+
+model stock_move_line {
+    company_id                                                                               Int
+    create_uid                                                                               Int?
+    date                                                                                     DateTime
+    description_picking                                                                      String?
+    id                                                                                       Int                           @default(autoincrement()) @id
+    location_dest_id                                                                         Int
+    location_id                                                                              Int
+    lot_id                                                                                   Int?
+    lot_name                                                                                 String?
+    move_id                                                                                  Int?
+    owner_id                                                                                 Int?
+    package_id                                                                               Int?
+    package_level_id                                                                         Int?
+    picking_id                                                                               Int?
+    product_id                                                                               Int?
+    product_qty                                                                              Float?
+    qty_done                                                                                 Float?
+    reference                                                                                String?
+    result_package_id                                                                        Int?
+    state                                                                                    String?
+    write_date                                                                               DateTime?
+    write_uid                                                                                Int?
+    stock_location_stock_locationTostock_move_line_location_dest_id                          stock_location                @relation("stock_locationTostock_move_line_location_dest_id", fields: [location_dest_id], references: [id])
+    stock_location_stock_locationTostock_move_line_location_id                               stock_location                @relation("stock_locationTostock_move_line_location_id", fields: [location_id], references: [id])
+    stock_production_lot                                                                     stock_production_lot?         @relation(fields: [lot_id], references: [id])
+    stock_move                                                                               stock_move?                   @relation(fields: [move_id], references: [id])
+    stock_quant_package_stock_move_line_package_idTostock_quant_package                      stock_quant_package?          @relation("stock_move_line_package_idTostock_quant_package", fields: [package_id], references: [id])
+    stock_package_level                                                                      stock_package_level?          @relation(fields: [package_level_id], references: [id])
+    stock_picking                                                                            stock_picking?                @relation(fields: [picking_id], references: [id])
+    product_product                                                                          product_product?              @relation(fields: [product_id], references: [id])
+    stock_quant_package_stock_move_line_result_package_idTostock_quant_package               stock_quant_package?          @relation("stock_move_line_result_package_idTostock_quant_package", fields: [result_package_id], references: [id])
+    stock_move_line_consume_rel_stock_move_lineTostock_move_line_consume_rel_consume_line_id stock_move_line_consume_rel[] @relation("stock_move_lineTostock_move_line_consume_rel_consume_line_id")
+    stock_move_line_consume_rel_stock_move_lineTostock_move_line_consume_rel_produce_line_id stock_move_line_consume_rel[] @relation("stock_move_lineTostock_move_line_consume_rel_produce_line_id")
+
+}
+
+model stock_move_line_consume_rel {
+    consume_line_id                                                              Int
+    produce_line_id                                                              Int
+    stock_move_line_stock_move_lineTostock_move_line_consume_rel_consume_line_id stock_move_line @relation("stock_move_lineTostock_move_line_consume_rel_consume_line_id", fields: [consume_line_id], references: [id])
+    stock_move_line_stock_move_lineTostock_move_line_consume_rel_produce_line_id stock_move_line @relation("stock_move_lineTostock_move_line_consume_rel_produce_line_id", fields: [produce_line_id], references: [id])
+
+    @@unique([consume_line_id, produce_line_id], name: "stock_move_line_consume_rel_consume_line_id_produce_line_id_key")
+}
+
+model stock_move_move_rel {
+    move_dest_id                                            Int
+    move_orig_id                                            Int
+    stock_move_stock_moveTostock_move_move_rel_move_dest_id stock_move @relation("stock_moveTostock_move_move_rel_move_dest_id", fields: [move_dest_id], references: [id])
+    stock_move_stock_moveTostock_move_move_rel_move_orig_id stock_move @relation("stock_moveTostock_move_move_rel_move_orig_id", fields: [move_orig_id], references: [id])
+
+    @@unique([move_orig_id, move_dest_id], name: "stock_move_move_rel_move_orig_id_move_dest_id_key")
+}
+
+model stock_overprocessed_transfer {
+    create_uid    Int?
+    id            Int            @default(autoincrement()) @id
+    picking_id    Int?
+    write_date    DateTime?
+    write_uid     Int?
+    stock_picking stock_picking? @relation(fields: [picking_id], references: [id])
+}
+
+model stock_package_destination {
+    create_uid       Int?
+    id               Int            @default(autoincrement()) @id
+    location_dest_id Int
+    picking_id       Int
+    write_date       DateTime?
+    write_uid        Int?
+    stock_location   stock_location @relation(fields: [location_dest_id], references: [id])
+    stock_picking    stock_picking  @relation(fields: [picking_id], references: [id])
+}
+
+model stock_package_level {
+    company_id          Int
+    create_uid          Int?
+    id                  Int                 @default(autoincrement()) @id
+    location_dest_id    Int?
+    package_id          Int
+    picking_id          Int?
+    write_date          DateTime?
+    write_uid           Int?
+    stock_location      stock_location?     @relation(fields: [location_dest_id], references: [id])
+    stock_quant_package stock_quant_package @relation(fields: [package_id], references: [id])
+    stock_picking       stock_picking?      @relation(fields: [picking_id], references: [id])
+    stock_move          stock_move[]
+    stock_move_line     stock_move_line[]
+
+}
+
+model stock_picking {
+    backorder_id                                                  Int?
+    company_id                                                    Int?
+    create_uid                                                    Int?
+    date                                                          DateTime?
+    date_done                                                     DateTime?
+    group_id                                                      Int?
+    id                                                            Int                            @default(autoincrement()) @id
+    immediate_transfer                                            Boolean?
+    is_locked                                                     Boolean?
+    location_dest_id                                              Int
+    location_id                                                   Int
+    message_main_attachment_id                                    Int?
+    move_type                                                     String
+    name                                                          String?
+    note                                                          String?
+    origin                                                        String?
+    owner_id                                                      Int?
+    partner_id                                                    Int?
+    picking_type_id                                               Int
+    printed                                                       Boolean?
+    priority                                                      String?
+    scheduled_date                                                DateTime?
+    state                                                         String?
+    user_id                                                       Int?
+    write_date                                                    DateTime?
+    write_uid                                                     Int?
+    stock_picking                                                 stock_picking?                 @relation("stock_pickingTostock_picking_backorder_id", fields: [backorder_id], references: [id])
+    procurement_group                                             procurement_group?             @relation(fields: [group_id], references: [id])
+    stock_location_stock_locationTostock_picking_location_dest_id stock_location                 @relation("stock_locationTostock_picking_location_dest_id", fields: [location_dest_id], references: [id])
+    stock_location_stock_locationTostock_picking_location_id      stock_location                 @relation("stock_locationTostock_picking_location_id", fields: [location_id], references: [id])
+    stock_picking_type                                            stock_picking_type             @relation(fields: [picking_type_id], references: [id])
+    stock_move                                                    stock_move[]
+    stock_move_line                                               stock_move_line[]
+    stock_overprocessed_transfer                                  stock_overprocessed_transfer[]
+    stock_package_destination                                     stock_package_destination[]
+    stock_package_level                                           stock_package_level[]
+    other_stock_picking                                           stock_picking[]                @relation("stock_pickingTostock_picking_backorder_id")
+    stock_return_picking                                          stock_return_picking[]
+    stock_scrap                                                   stock_scrap[]
+
+    @@unique([name, company_id], name: "stock_picking_name_uniq")
+}
+
+model stock_picking_type {
+    active                                                                     Boolean?
+    barcode                                                                    String?
+    code                                                                       String
+    color                                                                      Int?
+    company_id                                                                 Int
+    create_uid                                                                 Int?
+    default_location_dest_id                                                   Int?
+    default_location_src_id                                                    Int?
+    id                                                                         Int                  @default(autoincrement()) @id
+    name                                                                       String
+    return_picking_type_id                                                     Int?
+    sequence                                                                   Int?
+    sequence_code                                                              String
+    sequence_id                                                                Int?
+    show_entire_packs                                                          Boolean?
+    show_operations                                                            Boolean?
+    show_reserved                                                              Boolean?
+    use_create_lots                                                            Boolean?
+    use_existing_lots                                                          Boolean?
+    warehouse_id                                                               Int?
+    write_date                                                                 DateTime?
+    write_uid                                                                  Int?
+    stock_location_stock_locationTostock_picking_type_default_location_dest_id stock_location?      @relation("stock_locationTostock_picking_type_default_location_dest_id", fields: [default_location_dest_id], references: [id])
+    stock_location_stock_locationTostock_picking_type_default_location_src_id  stock_location?      @relation("stock_locationTostock_picking_type_default_location_src_id", fields: [default_location_src_id], references: [id])
+    stock_picking_type                                                         stock_picking_type?  @relation("stock_picking_typeTostock_picking_type_return_picking_type_id", fields: [return_picking_type_id], references: [id])
+    stock_warehouse_stock_picking_type_warehouse_idTostock_warehouse           stock_warehouse?     @relation("stock_picking_type_warehouse_idTostock_warehouse", fields: [warehouse_id], references: [id])
+    stock_move                                                                 stock_move[]
+    stock_picking                                                              stock_picking[]
+    other_stock_picking_type                                                   stock_picking_type[] @relation("stock_picking_typeTostock_picking_type_return_picking_type_id")
+    stock_rule                                                                 stock_rule[]
+    stock_warehouse_stock_picking_typeTostock_warehouse_in_type_id             stock_warehouse[]    @relation("stock_picking_typeTostock_warehouse_in_type_id")
+    stock_warehouse_stock_picking_typeTostock_warehouse_int_type_id            stock_warehouse[]    @relation("stock_picking_typeTostock_warehouse_int_type_id")
+    stock_warehouse_stock_picking_typeTostock_warehouse_out_type_id            stock_warehouse[]    @relation("stock_picking_typeTostock_warehouse_out_type_id")
+    stock_warehouse_stock_picking_typeTostock_warehouse_pack_type_id           stock_warehouse[]    @relation("stock_picking_typeTostock_warehouse_pack_type_id")
+    stock_warehouse_stock_picking_typeTostock_warehouse_pick_type_id           stock_warehouse[]    @relation("stock_picking_typeTostock_warehouse_pick_type_id")
+
+}
+
+model stock_production_lot {
+    company_id                 Int
+    create_uid                 Int?
+    id                         Int                    @default(autoincrement()) @id
+    message_main_attachment_id Int?
+    name                       String
+    note                       String?
+    product_id                 Int
+    ref                        String?
+    write_date                 DateTime?
+    write_uid                  Int?
+    product_product            product_product        @relation(fields: [product_id], references: [id])
+    stock_inventory_line       stock_inventory_line[]
+    stock_move_line            stock_move_line[]
+    stock_quant                stock_quant[]
+    stock_scrap                stock_scrap[]
+
+    @@unique([name, product_id, company_id], name: "stock_production_lot_name_ref_uniq")
+}
+
+model stock_putaway_rule {
+    category_id                                                       Int?
+    company_id                                                        Int
+    create_uid                                                        Int?
+    id                                                                Int               @default(autoincrement()) @id
+    location_in_id                                                    Int
+    location_out_id                                                   Int
+    product_id                                                        Int?
+    sequence                                                          Int?
+    write_date                                                        DateTime?
+    write_uid                                                         Int?
+    product_category                                                  product_category? @relation(fields: [category_id], references: [id])
+    stock_location_stock_locationTostock_putaway_rule_location_in_id  stock_location    @relation("stock_locationTostock_putaway_rule_location_in_id", fields: [location_in_id], references: [id])
+    stock_location_stock_locationTostock_putaway_rule_location_out_id stock_location    @relation("stock_locationTostock_putaway_rule_location_out_id", fields: [location_out_id], references: [id])
+    product_product                                                   product_product?  @relation(fields: [product_id], references: [id])
+
+}
+
+model stock_quant {
+    company_id           Int?
+    create_uid           Int?
+    id                   Int                   @default(autoincrement()) @id
+    in_date              DateTime?
+    location_id          Int
+    lot_id               Int?
+    owner_id             Int?
+    package_id           Int?
+    product_id           Int
+    quantity             Float?
+    reserved_quantity    Float
+    write_date           DateTime?
+    write_uid            Int?
+    stock_location       stock_location        @relation(fields: [location_id], references: [id])
+    stock_production_lot stock_production_lot? @relation(fields: [lot_id], references: [id])
+    stock_quant_package  stock_quant_package?  @relation(fields: [package_id], references: [id])
+    product_product      product_product       @relation(fields: [product_id], references: [id])
+
+}
+
+model stock_quant_package {
+    company_id                                                             Int?
+    create_uid                                                             Int?
+    id                                                                     Int                    @default(autoincrement()) @id
+    location_id                                                            Int?
+    name                                                                   String?
+    packaging_id                                                           Int?
+    write_date                                                             DateTime?
+    write_uid                                                              Int?
+    stock_location                                                         stock_location?        @relation(fields: [location_id], references: [id])
+    product_packaging                                                      product_packaging?     @relation(fields: [packaging_id], references: [id])
+    stock_inventory_line                                                   stock_inventory_line[]
+    stock_move_line_stock_move_line_package_idTostock_quant_package        stock_move_line[]      @relation("stock_move_line_package_idTostock_quant_package")
+    stock_move_line_stock_move_line_result_package_idTostock_quant_package stock_move_line[]      @relation("stock_move_line_result_package_idTostock_quant_package")
+    stock_package_level                                                    stock_package_level[]
+    stock_quant                                                            stock_quant[]
+    stock_scrap                                                            stock_scrap[]
+
+}
+
+model stock_quantity_history {
+    create_uid         Int?
+    id                 Int       @default(autoincrement()) @id
+    inventory_datetime DateTime?
+    write_date         DateTime?
+    write_uid          Int?
+}
+
+model stock_return_picking {
+    create_uid                                                               Int?
+    id                                                                       Int                         @default(autoincrement()) @id
+    location_id                                                              Int?
+    move_dest_exists                                                         Boolean?
+    original_location_id                                                     Int?
+    parent_location_id                                                       Int?
+    picking_id                                                               Int?
+    write_date                                                               DateTime?
+    write_uid                                                                Int?
+    stock_location_stock_locationTostock_return_picking_location_id          stock_location?             @relation("stock_locationTostock_return_picking_location_id", fields: [location_id], references: [id])
+    stock_location_stock_locationTostock_return_picking_original_location_id stock_location?             @relation("stock_locationTostock_return_picking_original_location_id", fields: [original_location_id], references: [id])
+    stock_location_stock_locationTostock_return_picking_parent_location_id   stock_location?             @relation("stock_locationTostock_return_picking_parent_location_id", fields: [parent_location_id], references: [id])
+    stock_picking                                                            stock_picking?              @relation(fields: [picking_id], references: [id])
+    stock_return_picking_line                                                stock_return_picking_line[]
+}
+
+model stock_return_picking_line {
+    create_uid           Int?
+    id                   Int                   @default(autoincrement()) @id
+    move_id              Int?
+    product_id           Int
+    quantity             Float
+    to_refund            Boolean?
+    wizard_id            Int?
+    write_date           DateTime?
+    write_uid            Int?
+    stock_move           stock_move?           @relation(fields: [move_id], references: [id])
+    product_product      product_product       @relation(fields: [product_id], references: [id])
+    stock_return_picking stock_return_picking? @relation(fields: [wizard_id], references: [id])
+}
+
+model stock_route_product {
+    product_id           Int
+    route_id             Int
+    product_template     product_template     @relation(fields: [product_id], references: [id])
+    stock_location_route stock_location_route @relation(fields: [route_id], references: [id])
+
+    @@unique([route_id, product_id], name: "stock_route_product_route_id_product_id_key")
+}
+
+model stock_route_warehouse {
+    route_id             Int
+    warehouse_id         Int
+    stock_location_route stock_location_route @relation(fields: [route_id], references: [id])
+    stock_warehouse      stock_warehouse      @relation(fields: [warehouse_id], references: [id])
+
+    @@unique([route_id, warehouse_id], name: "stock_route_warehouse_route_id_warehouse_id_key")
+}
+
+model stock_rule {
+    action                                                             String
+    active                                                             Boolean?
+    auto                                                               String
+    company_id                                                         Int?
+    create_uid                                                         Int?
+    delay                                                              Int?
+    delay_alert                                                        Boolean?
+    group_id                                                           Int?
+    group_propagation_option                                           String?
+    id                                                                 Int                  @default(autoincrement()) @id
+    location_id                                                        Int
+    location_src_id                                                    Int?
+    name                                                               String
+    partner_address_id                                                 Int?
+    picking_type_id                                                    Int
+    procure_method                                                     String
+    propagate_cancel                                                   Boolean?
+    propagate_date                                                     Boolean?
+    propagate_date_minimum_delta                                       Int?
+    propagate_warehouse_id                                             Int?
+    route_id                                                           Int
+    route_sequence                                                     Int?
+    sequence                                                           Int?
+    warehouse_id                                                       Int?
+    write_date                                                         DateTime?
+    write_uid                                                          Int?
+    procurement_group                                                  procurement_group?   @relation(fields: [group_id], references: [id])
+    stock_location_stock_locationTostock_rule_location_id              stock_location       @relation("stock_locationTostock_rule_location_id", fields: [location_id], references: [id])
+    stock_location_stock_locationTostock_rule_location_src_id          stock_location?      @relation("stock_locationTostock_rule_location_src_id", fields: [location_src_id], references: [id])
+    stock_picking_type                                                 stock_picking_type   @relation(fields: [picking_type_id], references: [id])
+    stock_warehouse_stock_rule_propagate_warehouse_idTostock_warehouse stock_warehouse?     @relation("stock_rule_propagate_warehouse_idTostock_warehouse", fields: [propagate_warehouse_id], references: [id])
+    stock_location_route                                               stock_location_route @relation(fields: [route_id], references: [id])
+    stock_warehouse_stock_rule_warehouse_idTostock_warehouse           stock_warehouse?     @relation("stock_rule_warehouse_idTostock_warehouse", fields: [warehouse_id], references: [id])
+    stock_move                                                         stock_move[]
+    stock_warehouse_stock_ruleTostock_warehouse_mto_pull_id            stock_warehouse[]    @relation("stock_ruleTostock_warehouse_mto_pull_id")
+
+}
+
+model stock_rules_report {
+    create_uid                             Int?
+    id                                     Int                                      @default(autoincrement()) @id
+    product_has_variants                   Boolean
+    product_id                             Int
+    product_tmpl_id                        Int
+    write_date                             DateTime?
+    write_uid                              Int?
+    product_product                        product_product                          @relation(fields: [product_id], references: [id])
+    product_template                       product_template                         @relation(fields: [product_tmpl_id], references: [id])
+    stock_rules_report_stock_warehouse_rel stock_rules_report_stock_warehouse_rel[]
+}
+
+model stock_rules_report_stock_warehouse_rel {
+    stock_rules_report_id Int
+    stock_warehouse_id    Int
+    stock_rules_report    stock_rules_report @relation(fields: [stock_rules_report_id], references: [id])
+    stock_warehouse       stock_warehouse    @relation(fields: [stock_warehouse_id], references: [id])
+
+    @@unique([stock_rules_report_id, stock_warehouse_id], name: "stock_rules_report_stock_ware_stock_rules_report_id_stock_w_key")
+}
+
+model stock_scheduler_compute {
+    create_uid Int?
+    id         Int       @default(autoincrement()) @id
+    write_date DateTime?
+    write_uid  Int?
+}
+
+model stock_scrap {
+    company_id                                                   Int
+    create_uid                                                   Int?
+    date_done                                                    DateTime?
+    id                                                           Int                                 @default(autoincrement()) @id
+    location_id                                                  Int
+    lot_id                                                       Int?
+    message_main_attachment_id                                   Int?
+    move_id                                                      Int?
+    name                                                         String
+    origin                                                       String?
+    owner_id                                                     Int?
+    package_id                                                   Int?
+    picking_id                                                   Int?
+    product_id                                                   Int
+    scrap_location_id                                            Int
+    scrap_qty                                                    Float
+    state                                                        String?
+    write_date                                                   DateTime?
+    write_uid                                                    Int?
+    stock_location_stock_locationTostock_scrap_location_id       stock_location                      @relation("stock_locationTostock_scrap_location_id", fields: [location_id], references: [id])
+    stock_production_lot                                         stock_production_lot?               @relation(fields: [lot_id], references: [id])
+    stock_move                                                   stock_move?                         @relation(fields: [move_id], references: [id])
+    stock_quant_package                                          stock_quant_package?                @relation(fields: [package_id], references: [id])
+    stock_picking                                                stock_picking?                      @relation(fields: [picking_id], references: [id])
+    product_product                                              product_product                     @relation(fields: [product_id], references: [id])
+    stock_location_stock_locationTostock_scrap_scrap_location_id stock_location                      @relation("stock_locationTostock_scrap_scrap_location_id", fields: [scrap_location_id], references: [id])
+    stock_warn_insufficient_qty_scrap                            stock_warn_insufficient_qty_scrap[]
+
+}
+
+model stock_warehouse {
+    active                                                                          Boolean?
+    code                                                                            String
+    company_id                                                                      Int
+    create_uid                                                                      Int?
+    crossdock_route_id                                                              Int?
+    delivery_route_id                                                               Int?
+    delivery_steps                                                                  String
+    id                                                                              Int                                      @default(autoincrement()) @id
+    in_type_id                                                                      Int?
+    int_type_id                                                                     Int?
+    lot_stock_id                                                                    Int
+    mto_pull_id                                                                     Int?
+    name                                                                            String
+    out_type_id                                                                     Int?
+    pack_type_id                                                                    Int?
+    partner_id                                                                      Int?
+    pick_type_id                                                                    Int?
+    reception_route_id                                                              Int?
+    reception_steps                                                                 String
+    sequence                                                                        Int?
+    view_location_id                                                                Int
+    wh_input_stock_loc_id                                                           Int?
+    wh_output_stock_loc_id                                                          Int?
+    wh_pack_stock_loc_id                                                            Int?
+    wh_qc_stock_loc_id                                                              Int?
+    write_date                                                                      DateTime?
+    write_uid                                                                       Int?
+    stock_location_route_stock_location_routeTostock_warehouse_crossdock_route_id   stock_location_route?                    @relation("stock_location_routeTostock_warehouse_crossdock_route_id", fields: [crossdock_route_id], references: [id])
+    stock_location_route_stock_location_routeTostock_warehouse_delivery_route_id    stock_location_route?                    @relation("stock_location_routeTostock_warehouse_delivery_route_id", fields: [delivery_route_id], references: [id])
+    stock_picking_type_stock_picking_typeTostock_warehouse_in_type_id               stock_picking_type?                      @relation("stock_picking_typeTostock_warehouse_in_type_id", fields: [in_type_id], references: [id])
+    stock_picking_type_stock_picking_typeTostock_warehouse_int_type_id              stock_picking_type?                      @relation("stock_picking_typeTostock_warehouse_int_type_id", fields: [int_type_id], references: [id])
+    stock_location_stock_locationTostock_warehouse_lot_stock_id                     stock_location                           @relation("stock_locationTostock_warehouse_lot_stock_id", fields: [lot_stock_id], references: [id])
+    stock_rule_stock_ruleTostock_warehouse_mto_pull_id                              stock_rule?                              @relation("stock_ruleTostock_warehouse_mto_pull_id", fields: [mto_pull_id], references: [id])
+    stock_picking_type_stock_picking_typeTostock_warehouse_out_type_id              stock_picking_type?                      @relation("stock_picking_typeTostock_warehouse_out_type_id", fields: [out_type_id], references: [id])
+    stock_picking_type_stock_picking_typeTostock_warehouse_pack_type_id             stock_picking_type?                      @relation("stock_picking_typeTostock_warehouse_pack_type_id", fields: [pack_type_id], references: [id])
+    stock_picking_type_stock_picking_typeTostock_warehouse_pick_type_id             stock_picking_type?                      @relation("stock_picking_typeTostock_warehouse_pick_type_id", fields: [pick_type_id], references: [id])
+    stock_location_route_stock_location_routeTostock_warehouse_reception_route_id   stock_location_route?                    @relation("stock_location_routeTostock_warehouse_reception_route_id", fields: [reception_route_id], references: [id])
+    stock_location_stock_locationTostock_warehouse_view_location_id                 stock_location                           @relation("stock_locationTostock_warehouse_view_location_id", fields: [view_location_id], references: [id])
+    stock_location_stock_locationTostock_warehouse_wh_input_stock_loc_id            stock_location?                          @relation("stock_locationTostock_warehouse_wh_input_stock_loc_id", fields: [wh_input_stock_loc_id], references: [id])
+    stock_location_stock_locationTostock_warehouse_wh_output_stock_loc_id           stock_location?                          @relation("stock_locationTostock_warehouse_wh_output_stock_loc_id", fields: [wh_output_stock_loc_id], references: [id])
+    stock_location_stock_locationTostock_warehouse_wh_pack_stock_loc_id             stock_location?                          @relation("stock_locationTostock_warehouse_wh_pack_stock_loc_id", fields: [wh_pack_stock_loc_id], references: [id])
+    stock_location_stock_locationTostock_warehouse_wh_qc_stock_loc_id               stock_location?                          @relation("stock_locationTostock_warehouse_wh_qc_stock_loc_id", fields: [wh_qc_stock_loc_id], references: [id])
+    product_replenish                                                               product_replenish[]
+    stock_location_route_stock_location_route_supplied_wh_idTostock_warehouse       stock_location_route[]                   @relation("stock_location_route_supplied_wh_idTostock_warehouse")
+    stock_location_route_stock_location_route_supplier_wh_idTostock_warehouse       stock_location_route[]                   @relation("stock_location_route_supplier_wh_idTostock_warehouse")
+    stock_move                                                                      stock_move[]
+    stock_picking_type_stock_picking_type_warehouse_idTostock_warehouse             stock_picking_type[]                     @relation("stock_picking_type_warehouse_idTostock_warehouse")
+    stock_route_warehouse                                                           stock_route_warehouse[]
+    stock_rule_stock_rule_propagate_warehouse_idTostock_warehouse                   stock_rule[]                             @relation("stock_rule_propagate_warehouse_idTostock_warehouse")
+    stock_rule_stock_rule_warehouse_idTostock_warehouse                             stock_rule[]                             @relation("stock_rule_warehouse_idTostock_warehouse")
+    stock_rules_report_stock_warehouse_rel                                          stock_rules_report_stock_warehouse_rel[]
+    stock_warehouse_orderpoint                                                      stock_warehouse_orderpoint[]
+    stock_wh_resupply_table_stock_warehouseTostock_wh_resupply_table_supplied_wh_id stock_wh_resupply_table[]                @relation("stock_warehouseTostock_wh_resupply_table_supplied_wh_id")
+    stock_wh_resupply_table_stock_warehouseTostock_wh_resupply_table_supplier_wh_id stock_wh_resupply_table[]                @relation("stock_warehouseTostock_wh_resupply_table_supplier_wh_id")
+
+    @@unique([code, company_id], name: "stock_warehouse_warehouse_code_uniq")
+    @@unique([name, company_id], name: "stock_warehouse_warehouse_name_uniq")
+}
+
+model stock_warehouse_orderpoint {
+    active            Boolean?
+    company_id        Int
+    create_uid        Int?
+    group_id          Int?
+    id                Int                @default(autoincrement()) @id
+    lead_days         Int?
+    lead_type         String
+    location_id       Int
+    name              String
+    product_id        Int
+    product_max_qty   Float
+    product_min_qty   Float
+    qty_multiple      Float
+    warehouse_id      Int
+    write_date        DateTime?
+    write_uid         Int?
+    procurement_group procurement_group? @relation(fields: [group_id], references: [id])
+    stock_location    stock_location     @relation(fields: [location_id], references: [id])
+    product_product   product_product    @relation(fields: [product_id], references: [id])
+    stock_warehouse   stock_warehouse    @relation(fields: [warehouse_id], references: [id])
+
+}
+
+model stock_warn_insufficient_qty_scrap {
+    create_uid      Int?
+    id              Int             @default(autoincrement()) @id
+    location_id     Int
+    product_id      Int
+    scrap_id        Int?
+    write_date      DateTime?
+    write_uid       Int?
+    stock_location  stock_location  @relation(fields: [location_id], references: [id])
+    product_product product_product @relation(fields: [product_id], references: [id])
+    stock_scrap     stock_scrap?    @relation(fields: [scrap_id], references: [id])
+}
+
+model stock_wh_resupply_table {
+    supplied_wh_id                                                          Int
+    supplier_wh_id                                                          Int
+    stock_warehouse_stock_warehouseTostock_wh_resupply_table_supplied_wh_id stock_warehouse @relation("stock_warehouseTostock_wh_resupply_table_supplied_wh_id", fields: [supplied_wh_id], references: [id])
+    stock_warehouse_stock_warehouseTostock_wh_resupply_table_supplier_wh_id stock_warehouse @relation("stock_warehouseTostock_wh_resupply_table_supplier_wh_id", fields: [supplier_wh_id], references: [id])
+
+    @@unique([supplied_wh_id, supplier_wh_id], name: "stock_wh_resupply_table_supplied_wh_id_supplier_wh_id_key")
+}
+
+model sub_group {
+    create_uid   Int?
+    id           Int          @default(autoincrement()) @id
+    revtype_id   Int
+    sub_desc     String
+    sub_group    String
+    transsub_id  Int?
+    write_date   DateTime?
+    write_uid    Int?
+    revenue_type revenue_type @relation(fields: [revtype_id], references: [id])
+
+}
+
+model weekend_weekend {
+    create_uid Int?
+    friday     Boolean?
+    id         Int       @default(autoincrement()) @id
+    monday     Boolean?
+    saturday   Boolean?
+    sunday     Boolean?
+    thursday   Boolean?
+    tuesday    Boolean?
+    wednesday  Boolean?
+    write_date DateTime?
+    write_uid  Int?
+}
