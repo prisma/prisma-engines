@@ -16,7 +16,7 @@ impl SqlRenderer for SqliteFlavour {
         Quoted::Double(name)
     }
 
-    fn render_column(&self, _schema_name: &str, column: ColumnRef<'_>, _add_fk_prefix: bool) -> String {
+    fn render_column(&self, _schema_name: &str, column: ColumnWalker<'_>, _add_fk_prefix: bool) -> String {
         let column_name = self.quote(column.name());
         let tpe_str = render_column_type(column.column_type());
         let nullability_str = render_nullability(&column);
@@ -100,8 +100,8 @@ impl SqlRenderer for SqliteFlavour {
             let differ = TableDiffer {
                 database_info,
                 flavour: self,
-                previous: differ.previous.table_ref(table).expect(""),
-                next: differ.next.table_ref(table).expect(""),
+                previous: differ.previous.table_walker(table).expect(""),
+                next: differ.next.table_walker(table).expect(""),
             };
 
             let name_of_temporary_table = format!("new_{}", &differ.next.name());
@@ -109,7 +109,7 @@ impl SqlRenderer for SqliteFlavour {
             temporary_table.name = name_of_temporary_table.clone();
 
             // This is a hack, just to be able to render the CREATE TABLE.
-            let temporary_table = TableRef {
+            let temporary_table = TableWalker {
                 schema: differ.next.schema,
                 table: &temporary_table,
             };

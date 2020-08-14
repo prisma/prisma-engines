@@ -17,7 +17,7 @@ impl SqlRenderer for PostgresFlavour {
         Quoted::postgres_ident(name)
     }
 
-    fn render_column(&self, _schema_name: &str, column: ColumnRef<'_>, _add_fk_prefix: bool) -> String {
+    fn render_column(&self, _schema_name: &str, column: ColumnWalker<'_>, _add_fk_prefix: bool) -> String {
         let column_name = self.quote(column.name());
         let tpe_str = render_column_type(column.column_type());
         let nullability_str = render_nullability(&column);

@@ -8,7 +8,7 @@ use crate::{
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
 use regex::Regex;
-use sql_schema_describer::walkers::ColumnRef;
+use sql_schema_describer::walkers::ColumnWalker;
 use sql_schema_describer::*;
 use std::borrow::Cow;
 
@@ -19,7 +19,7 @@ impl SqlRenderer for MysqlFlavour {
         Quoted::Backticks(name)
     }
 
-    fn render_column(&self, _schema_name: &str, column: ColumnRef<'_>, _add_fk_prefix: bool) -> String {
+    fn render_column(&self, _schema_name: &str, column: ColumnWalker<'_>, _add_fk_prefix: bool) -> String {
         let column_name = self.quote(column.name());
         let tpe_str = render_column_type(&column);
         let nullability_str = render_nullability(&column);
@@ -120,7 +120,7 @@ impl SqlRenderer for MysqlFlavour {
 fn render_mysql_modify(
     changes: &ColumnChanges,
     new_default: Option<&sql_schema_describer::DefaultValue>,
-    next_column: ColumnRef<'_>,
+    next_column: ColumnWalker<'_>,
     renderer: &dyn SqlFlavour,
 ) -> String {
     let column_type: Option<String> = if changes.type_changed() {
@@ -158,7 +158,7 @@ fn render_mysql_modify(
     )
 }
 
-pub(crate) fn render_column_type(column: &ColumnRef<'_>) -> Cow<'static, str> {
+pub(crate) fn render_column_type(column: &ColumnWalker<'_>) -> Cow<'static, str> {
     match &column.column_type().family {
         ColumnTypeFamily::Boolean => "boolean".into(),
         ColumnTypeFamily::DateTime => "datetime(3)".into(),

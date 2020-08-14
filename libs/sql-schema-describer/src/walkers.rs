@@ -2,16 +2,16 @@ use crate::{
     Column, ColumnArity, ColumnType, ColumnTypeFamily, DefaultValue, ForeignKey, PrimaryKey, SqlSchema, Table,
 };
 
-pub fn walk_columns<'a>(schema: &'a SqlSchema) -> impl Iterator<Item = ColumnRef<'a>> + 'a {
+pub fn walk_columns<'a>(schema: &'a SqlSchema) -> impl Iterator<Item = ColumnWalker<'a>> + 'a {
     schema.tables.iter().flat_map(move |table| {
         table
             .columns
             .iter()
-            .map(move |column| ColumnRef { schema, column, table })
+            .map(move |column| ColumnWalker { schema, column, table })
     })
 }
 
-pub fn find_column<'a>(schema: &'a SqlSchema, table_name: &str, column_name: &str) -> Option<ColumnRef<'a>> {
+pub fn find_column<'a>(schema: &'a SqlSchema, table_name: &str, column_name: &str) -> Option<ColumnWalker<'a>> {
     schema
         .tables
         .iter()
@@ -21,18 +21,18 @@ pub fn find_column<'a>(schema: &'a SqlSchema, table_name: &str, column_name: &st
                 .columns
                 .iter()
                 .find(|column| column.name == column_name)
-                .map(|column| ColumnRef { schema, table, column })
+                .map(|column| ColumnWalker { schema, table, column })
         })
 }
 
 #[derive(Debug, Clone, Copy)]
-pub struct ColumnRef<'a> {
+pub struct ColumnWalker<'a> {
     pub schema: &'a SqlSchema,
     pub column: &'a Column,
     pub table: &'a Table,
 }
 
-impl<'a> ColumnRef<'a> {
+impl<'a> ColumnWalker<'a> {
     pub fn arity(&self) -> &ColumnArity {
         &self.column.tpe.arity
     }
@@ -61,7 +61,7 @@ impl<'a> ColumnRef<'a> {
         self.column.is_required()
     }
 
-    pub fn is_same_column(&self, other: &ColumnRef<'_>) -> bool {
+    pub fn is_same_column(&self, other: &ColumnWalker<'_>) -> bool {
         self.name() == other.name() && self.table().name() == other.table().name()
     }
 
@@ -73,8 +73,8 @@ impl<'a> ColumnRef<'a> {
             .unwrap_or(false)
     }
 
-    pub fn table(&self) -> TableRef<'a> {
-        TableRef {
+    pub fn table(&self) -> TableWalker<'a> {
+        TableWalker {
             schema: self.schema,
             table: self.table,
         }
@@ -86,30 +86,30 @@ impl<'a> ColumnRef<'a> {
 }
 
 #[derive(Clone, Copy)]
-pub struct TableRef<'a> {
+pub struct TableWalker<'a> {
     pub schema: &'a SqlSchema,
     pub table: &'a Table,
 }
 
-impl<'a> TableRef<'a> {
+impl<'a> TableWalker<'a> {
     pub fn new(schema: &'a SqlSchema, table: &'a Table) -> Self {
         Self { schema, table }
     }
 
-    pub fn column(&self, column_name: &str) -> Option<ColumnRef<'a>> {
+    pub fn column(&self, column_name: &str) -> Option<ColumnWalker<'a>> {
         self.columns().find(|column| column.name() == column_name)
     }
 
-    pub fn columns<'b>(&'b self) -> impl Iterator<Item = ColumnRef<'a>> + 'b {
-        self.table.columns.iter().map(move |column| ColumnRef {
+    pub fn columns<'b>(&'b self) -> impl Iterator<Item = ColumnWalker<'a>> + 'b {
+        self.table.columns.iter().map(move |column| ColumnWalker {
             column,
             schema: self.schema,
             table: self.table,
         })
     }
 
-    pub fn foreign_keys<'b>(&'b self) -> impl Iterator<Item = ForeignKeyRef<'b, 'a>> + 'b {
-        self.table.foreign_keys.iter().map(move |foreign_key| ForeignKeyRef {
+    pub fn foreign_keys<'b>(&'b self) -> impl Iterator<Item = ForeignKeyWalker<'b, 'a>> + 'b {
+        self.table.foreign_keys.iter().map(move |foreign_key| ForeignKeyWalker {
             foreign_key,
             table: self,
         })
@@ -128,13 +128,13 @@ impl<'a> TableRef<'a> {
     }
 }
 
-pub struct ForeignKeyRef<'a, 'schema> {
-    table: &'a TableRef<'schema>,
+pub struct ForeignKeyWalker<'a, 'schema> {
+    table: &'a TableWalker<'schema>,
     foreign_key: &'schema ForeignKey,
 }
 
-impl<'a, 'schema> ForeignKeyRef<'a, 'schema> {
-    pub fn constrained_columns<'b>(&'b self) -> impl Iterator<Item = ColumnRef<'a>> + 'b {
+impl<'a, 'schema> ForeignKeyWalker<'a, 'schema> {
+    pub fn constrained_columns<'b>(&'b self) -> impl Iterator<Item = ColumnWalker<'a>> + 'b {
         self.table()
             .columns()
             .filter(move |column| self.foreign_key.columns.contains(&column.column.name))
@@ -152,8 +152,8 @@ impl<'a, 'schema> ForeignKeyRef<'a, 'schema> {
         self.foreign_key.referenced_columns.len()
     }
 
-    pub fn referenced_table(&self) -> TableRef<'a> {
-        TableRef {
+    pub fn referenced_table(&self) -> TableWalker<'a> {
+        TableWalker {
             schema: self.table.schema,
             table: self
                 .table
@@ -163,18 +163,18 @@ impl<'a, 'schema> ForeignKeyRef<'a, 'schema> {
         }
     }
 
-    pub fn table(&self) -> &'a TableRef<'schema> {
+    pub fn table(&self) -> &'a TableWalker<'schema> {
         self.table
     }
 }
 
 pub trait SqlSchemaExt {
-    fn table_ref<'a>(&'a self, name: &str) -> Option<TableRef<'a>>;
+    fn table_walker<'a>(&'a self, name: &str) -> Option<TableWalker<'a>>;
 }
 
 impl SqlSchemaExt for SqlSchema {
-    fn table_ref<'a>(&'a self, name: &str) -> Option<TableRef<'a>> {
-        Some(TableRef {
+    fn table_walker<'a>(&'a self, name: &str) -> Option<TableWalker<'a>> {
+        Some(TableWalker {
             table: self.table(name).ok()?,
             schema: self,
         })

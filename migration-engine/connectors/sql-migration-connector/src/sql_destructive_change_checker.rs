@@ -14,7 +14,7 @@ use crate::{
 use destructive_check_plan::DestructiveCheckPlan;
 use migration_connector::{ConnectorResult, DestructiveChangeChecker, DestructiveChangeDiagnostics};
 use sql_schema_describer::{
-    walkers::{find_column, ColumnRef, SqlSchemaExt},
+    walkers::{find_column, ColumnWalker, SqlSchemaExt},
     SqlSchema,
 };
 use unexecutable_step_check::UnexecutableStepCheck;
@@ -49,7 +49,7 @@ impl SqlDestructiveChangeChecker<'_> {
     }
 
     /// Emit a warning when we drop a column that contains non-null values.
-    fn check_column_drop(&self, column: &ColumnRef<'_>, plan: &mut DestructiveCheckPlan) {
+    fn check_column_drop(&self, column: &ColumnWalker<'_>, plan: &mut DestructiveCheckPlan) {
         plan.push_warning(SqlMigrationWarningCheck::NonEmptyColumnDrop {
             table: column.table().name().to_owned(),
             column: column.name().to_owned(),
@@ -61,7 +61,7 @@ impl SqlDestructiveChangeChecker<'_> {
     /// - There are existing rows
     /// - The new column is required
     /// - There is no default value for the new column
-    fn check_add_column(&self, column: &ColumnRef<'_>, plan: &mut DestructiveCheckPlan) {
+    fn check_add_column(&self, column: &ColumnWalker<'_>, plan: &mut DestructiveCheckPlan) {
         let column_is_required_without_default = column.is_required() && column.default().is_none();
 
         // Optional columns and columns with a default can safely be added.
@@ -85,8 +85,8 @@ impl SqlDestructiveChangeChecker<'_> {
                 SqlMigrationStep::AlterTable(alter_table) => {
                     // The table in alter_table is the updated table, but we want to
                     // check against the current state of the table.
-                    let before_table = before.table_ref(&alter_table.table.name);
-                    let after_table = after.table_ref(&alter_table.table.name);
+                    let before_table = before.table_walker(&alter_table.table.name);
+                    let after_table = after.table_walker(&alter_table.table.name);
 
                     if let (Some(before_table), Some(after_table)) = (before_table, after_table) {
                         for change in &alter_table.changes {
@@ -132,8 +132,8 @@ impl SqlDestructiveChangeChecker<'_> {
                 }
                 SqlMigrationStep::RedefineTables { names } => {
                     for name in names {
-                        let previous = before.table_ref(&name).expect("Redefining unknown table.");
-                        let next = after.table_ref(&name).expect("Redefining unknown table.");
+                        let previous = before.table_walker(&name).expect("Redefining unknown table.");
+                        let next = after.table_walker(&name).expect("Redefining unknown table.");
                         let differ = TableDiffer {
                             database_info: self.database_info(),
                             flavour: self.flavour(),

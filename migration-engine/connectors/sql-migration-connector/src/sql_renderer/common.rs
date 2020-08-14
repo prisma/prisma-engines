@@ -69,7 +69,7 @@ where
     }
 }
 
-pub(crate) fn render_nullability(column: &ColumnRef<'_>) -> &'static str {
+pub(crate) fn render_nullability(column: &ColumnWalker<'_>) -> &'static str {
     if column.is_required() {
         "NOT NULL"
     } else {

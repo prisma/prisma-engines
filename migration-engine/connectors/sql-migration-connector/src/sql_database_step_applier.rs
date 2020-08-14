@@ -1,6 +1,6 @@
 use crate::*;
 use sql_renderer::{rendered_step::RenderedStep, IteratorJoin, Quoted, RenderedAlterColumn};
-use sql_schema_describer::walkers::{find_column, walk_columns, ColumnRef, SqlSchemaExt};
+use sql_schema_describer::walkers::{find_column, walk_columns, ColumnWalker, SqlSchemaExt};
 use sql_schema_describer::{ColumnTypeFamily, Index, IndexType, SqlSchema};
 use sql_schema_differ::{ColumnDiffer, SqlSchemaDiffer};
 use std::fmt::Write as _;
@@ -129,7 +129,7 @@ fn render_raw_sql(
         },
         SqlMigrationStep::CreateTable(CreateTable { table }) => {
             let table = next_schema
-                .table_ref(&table.name)
+                .table_walker(&table.name)
                 .expect("CreateTable referring to an unknown table.");
 
             Ok(vec![renderer.render_create_table(&table, &schema_name, sql_family)?])
@@ -226,7 +226,7 @@ fn render_raw_sql(
                         columns.iter().map(|colname| renderer.quote(colname)).join(", ")
                     )),
                     TableChange::AddColumn(AddColumn { column }) => {
-                        let column = ColumnRef {
+                        let column = ColumnWalker {
                             table,
                             schema: next_schema,
                             column,
@@ -241,7 +241,7 @@ fn render_raw_sql(
                     TableChange::AlterColumn(AlterColumn { name, column }) => {
                         match safe_alter_column(
                             renderer,
-                            current_schema.table_ref(&table.name).unwrap().column(&name).unwrap(),
+                            current_schema.table_walker(&table.name).unwrap().column(&name).unwrap(),
                             find_column(next_schema, &table.name, &column.name)
                                 .expect("Invariant violation: could not find column referred to in AlterColumn."),
                             &database_info,
@@ -267,7 +267,7 @@ fn render_raw_sql(
                             None => {
                                 let name = renderer.quote(&name);
                                 lines.push(format!("DROP COLUMN {}", name));
-                                let column = ColumnRef {
+                                let column = ColumnWalker {
                                     schema: next_schema,
                                     table,
                                     column,
@@ -423,8 +423,8 @@ fn mysql_drop_index(
 
 fn safe_alter_column(
     renderer: &dyn SqlFlavour,
-    previous_column: ColumnRef<'_>,
-    next_column: ColumnRef<'_>,
+    previous_column: ColumnWalker<'_>,
+    next_column: ColumnWalker<'_>,
     database_info: &DatabaseInfo,
     flavour: &dyn SqlFlavour,
 ) -> Option<RenderedAlterColumn> {
