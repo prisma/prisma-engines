@@ -95,7 +95,6 @@ impl<'a> Reformatter<'a> {
     fn reformat_internal(&self, ident_width: usize) -> String {
         let mut ast = PrismaDatamodelParser::parse(Rule::schema, self.input).unwrap(); // TODO: Handle error.
         let mut target_string = WritableString::new();
-        println!("ast: {:?}", ast);
         let mut renderer = Renderer::new(&mut target_string, ident_width);
         self.reformat_top(&mut renderer, &ast.next().unwrap());
         let result = target_string.into();

@@ -215,9 +215,7 @@ impl<'a> LiftAstToDml<'a> {
                 connectors.insert("sqlite", Box::new(SqlDatamodelConnectors::sqlite()));
                 connectors.insert("mssql", Box::new(SqlDatamodelConnectors::mssql()));
 
-                let mut prefix = String::with_capacity(datasource_name.len() + 1);
-                prefix.push_str(datasource_name);
-                prefix.push_str(".");
+                let prefix = format!("{}{}", datasource_name, ".");
 
                 let mut type_specifications = ast_field
                     .directives
