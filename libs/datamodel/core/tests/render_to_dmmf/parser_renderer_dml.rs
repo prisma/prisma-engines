@@ -146,6 +146,26 @@ model User {
 }
 
 #[test]
+fn test_parser_renderer_native_types_via_dml() {
+    let input = r#"model Blog {
+  id     Int    @id
+  bigInt Int    @pg.BigInt
+  foobar String @pg.VarChar(12)
+}
+"#;
+
+    let dml = parse(input);
+
+    println!("dml: {:?}", dml);
+
+    let rendered = datamodel::render_datamodel_to_string(&dml).unwrap();
+
+    print!("{}", rendered);
+
+    assert_eq!(rendered, input);
+}
+
+#[test]
 fn preview_features_roundtrip() {
     // we keep the support for `experimentalFeatures` for backwards compatibility reasons
     let input_with_experimental = r#"generator client {

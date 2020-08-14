@@ -116,7 +116,7 @@ model Author {
 #[test]
 fn test_parser_renderer_native_types_via_ast() {
     let input = r#"datasource pg {
-  provider        = "postgres"
+  provider        = "postgresql"
   url             = "postgresql://"
   previewFeatures = ["nativeTypes"]
 }
