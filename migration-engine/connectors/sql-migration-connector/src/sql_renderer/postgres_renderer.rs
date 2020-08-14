@@ -7,7 +7,6 @@ use crate::{
 };
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
-use quaint::prelude::SqlFamily;
 use regex::Regex;
 use sql_schema_describer::walkers::*;
 use sql_schema_describer::*;
@@ -167,12 +166,7 @@ impl SqlRenderer for PostgresFlavour {
         vec![sql]
     }
 
-    fn render_create_table(
-        &self,
-        table: &TableWalker<'_>,
-        schema_name: &str,
-        _sql_family: SqlFamily,
-    ) -> anyhow::Result<String> {
+    fn render_create_table(&self, table: &TableWalker<'_>, schema_name: &str) -> anyhow::Result<String> {
         let columns: String = table
             .columns()
             .map(|column| self.render_column(&schema_name, column, false))
