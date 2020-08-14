@@ -18,6 +18,10 @@ class InsensitiveFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
     database.setup(project)
   }
 
+  override def beforeEach(): Unit = {
+    database.truncateProjectTables(project)
+  }
+
   def create(str: String): String = {
     val res = server.query(
       s"""mutation {
@@ -56,7 +60,6 @@ class InsensitiveFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
       project,
       legacy = false
     )
-
     res.toString() should be("""{"data":{"findManyTestModel":[{"str":"a test"},{"str":"A Test"}]}}""")
 
     res = server.query(
@@ -75,7 +78,6 @@ class InsensitiveFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
     )
 
     res.toString() should be("""{"data":{"findManyTestModel":[{"str":"a test"},{"str":"A Test"},{"str":"b test"}]}}""")
-
     res = server.query(
       """{
         |findManyTestModel(where: {
