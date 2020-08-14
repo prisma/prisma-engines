@@ -6,8 +6,8 @@ use futures::future;
 
 /// Central query executor and main entry point into the query core.
 pub struct InterpretingExecutor<C> {
+    /// The loaded connector
     connector: C,
-    primary_connector: &'static str,
 
     /// Flag that forces individual operations to run in a transaction.
     /// Does _not_ force batches to use transactions.
@@ -18,10 +18,9 @@ impl<C> InterpretingExecutor<C>
 where
     C: Connector + Send + Sync,
 {
-    pub fn new(connector: C, primary_connector: &'static str, force_transactions: bool) -> Self {
+    pub fn new(connector: C, force_transactions: bool) -> Self {
         InterpretingExecutor {
             connector,
-            primary_connector,
             force_transactions,
         }
     }
@@ -137,7 +136,7 @@ where
         Self::execute_single_operation(operation, conn, self.force_transactions, query_schema.clone()).await
     }
 
-    fn primary_connector(&self) -> &'static str {
-        self.primary_connector
+    fn primary_connector(&self) -> &dyn Connector {
+        &self.connector
     }
 }

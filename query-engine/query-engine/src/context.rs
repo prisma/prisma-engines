@@ -61,6 +61,7 @@ impl PrismaContext {
             internal_data_model,
             build_mode,
             enable_raw_queries,
+            executor.primary_connector().capabilities(),
         ));
 
         Ok(Self {
@@ -87,7 +88,7 @@ impl PrismaContext {
         &self.dm
     }
 
-    pub fn primary_connector(&self) -> &'static str {
-        self.executor.primary_connector()
+    pub fn primary_connector(&self) -> String {
+        self.executor.primary_connector().name()
     }
 }

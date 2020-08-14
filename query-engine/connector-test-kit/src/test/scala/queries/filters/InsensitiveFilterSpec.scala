@@ -215,4 +215,22 @@ class InsensitiveFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
 
     res.toString() should be("""{"data":{"findManyTestModel":[{"str":"A"}]}}""")
   }
+
+  "Connectors without support for insensitive filters" should "not work" taggedAs (IgnorePostgres) in {
+    server.queryThatMustFail(
+      """{
+        |findManyTestModel(where: {
+        |  str: {
+        |    lt: "doesn't matter"
+        |    mode: insensitive
+        |  }
+        |}) {
+        |  str
+        |}}
+      """.stripMargin,
+      project,
+      errorCode = 2009,
+      legacy = false
+    )
+  }
 }

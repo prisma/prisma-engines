@@ -7,6 +7,7 @@ use crate::{
     PrismaResult,
 };
 
+use connector::ConnectorCapabilities;
 use datamodel::{Configuration, Datamodel};
 use prisma_models::DatamodelConverter;
 use query_core::{schema::QuerySchemaRef, schema_builder, BuildMode};
@@ -85,12 +86,22 @@ impl CliCommand {
     fn dmmf(request: DmmfRequest) -> PrismaResult<()> {
         let template = DatamodelConverter::convert(&request.datamodel);
 
+        // Todo need to bring capabilities in here somehow
+        // let data_source = config
+        //     .datasources
+        //     .first()
+        //     .ok_or_else(|| PrismaError::ConfigurationError("No valid data source found".into()))?;
+
+        // // Load executor
+        // let (db_name, executor) = exec_loader::load(&data_source).await?;
+
         // temporary code duplication
         let internal_data_model = template.build("".into());
         let query_schema: QuerySchemaRef = Arc::new(schema_builder::build(
             internal_data_model,
             request.build_mode,
             request.enable_raw_queries,
+            ConnectorCapabilities::default(),
         ));
 
         let dmmf = dmmf::render_dmmf(&request.datamodel, query_schema);

@@ -1,6 +1,7 @@
 use super::connection::SqlConnection;
 use crate::{FromSource, SqlError};
 use async_trait::async_trait;
+use connector::ConnectorCapabilities;
 use connector_interface::{
     self as connector,
     error::{ConnectorError, ErrorKind},
@@ -91,5 +92,13 @@ impl Connector for Sqlite {
             Ok(Box::new(conn) as Box<dyn Connection>)
         })
         .await
+    }
+
+    fn capabilities(&self) -> ConnectorCapabilities {
+        ConnectorCapabilities::default()
+    }
+
+    fn name(&self) -> String {
+        "sqlite".to_owned()
     }
 }

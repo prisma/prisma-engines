@@ -1,4 +1,5 @@
 use super::*;
+use connector::ConnectorCapability;
 use prisma_models::{dml::DefaultValue, PrismaValue};
 
 /// Builds filter type for the given model field.
@@ -70,7 +71,7 @@ fn scalar_filter_type(ctx: &mut BuilderContext, sf: &ScalarFieldRef, nested: boo
             .chain(inclusion_filters(sf))
             .chain(alphanumeric_filters(sf))
             .chain(string_filters(sf))
-            .chain(query_mode_field(nested))
+            .chain(query_mode_field(ctx, nested))
             .collect(),
 
         TypeIdentifier::Int | TypeIdentifier::Float | TypeIdentifier::DateTime => equality_filters(sf)
@@ -131,9 +132,13 @@ fn string_filters(sf: &ScalarFieldRef) -> impl Iterator<Item = InputField> {
     .into_iter()
 }
 
-fn query_mode_field(nested: bool) -> impl Iterator<Item = InputField> {
+fn query_mode_field(ctx: &BuilderContext, nested: bool) -> impl Iterator<Item = InputField> {
     // Limit query mode field to the topmost filter level.
-    let fields = if feature_flags::get().insensitiveFilters && !nested {
+    // Only build mode field for connectors with insensitive filter support.
+    let fields = if feature_flags::get().insensitiveFilters
+        && !nested
+        && ctx.capabilities.contains(ConnectorCapability::InsensitiveFilters)
+    {
         let enum_type = Arc::new(string_enum_type(
             "QueryMode",
             vec!["default".to_owned(), "insensitive".to_owned()],

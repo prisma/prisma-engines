@@ -39,6 +39,7 @@ mod utils;
 
 use crate::schema::*;
 use cache::TypeRefCache;
+use connector::ConnectorCapabilities;
 use prisma_models::{Field as ModelField, Index, InternalDataModelRef, ModelRef, TypeIdentifier};
 use std::sync::Arc;
 
@@ -61,15 +62,22 @@ pub(crate) struct BuilderContext {
     internal_data_model: InternalDataModelRef,
     enable_raw_queries: bool,
     cache: TypeCache,
+    capabilities: ConnectorCapabilities,
 }
 
 impl BuilderContext {
-    pub fn new(mode: BuildMode, internal_data_model: InternalDataModelRef, enable_raw_queries: bool) -> Self {
+    pub fn new(
+        mode: BuildMode,
+        internal_data_model: InternalDataModelRef,
+        enable_raw_queries: bool,
+        capabilities: ConnectorCapabilities,
+    ) -> Self {
         Self {
             mode,
             internal_data_model,
             enable_raw_queries,
             cache: TypeCache::new(),
+            capabilities,
         }
     }
 
@@ -128,8 +136,13 @@ impl TypeCache {
     }
 }
 
-pub fn build(internal_data_model: InternalDataModelRef, mode: BuildMode, enable_raw_queries: bool) -> QuerySchema {
-    let mut ctx = BuilderContext::new(mode, internal_data_model, enable_raw_queries);
+pub fn build(
+    internal_data_model: InternalDataModelRef,
+    mode: BuildMode,
+    enable_raw_queries: bool,
+    capabilities: ConnectorCapabilities,
+) -> QuerySchema {
+    let mut ctx = BuilderContext::new(mode, internal_data_model, enable_raw_queries, capabilities);
     output_types::output_objects::initialize_model_object_type_cache(&mut ctx);
 
     let (query_type, query_object_ref) = output_types::query_type::build(&mut ctx);
