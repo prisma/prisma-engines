@@ -132,7 +132,7 @@ fn render_raw_sql(
                 .table_walker(&table.name)
                 .expect("CreateTable referring to an unknown table.");
 
-            Ok(vec![renderer.render_create_table(&table, &schema_name, sql_family)?])
+            Ok(vec![renderer.render_create_table(&table, &schema_name)?])
         }
         SqlMigrationStep::DropTable(DropTable { name }) => match sql_family {
             SqlFamily::Mysql | SqlFamily::Postgres => Ok(vec![format!(

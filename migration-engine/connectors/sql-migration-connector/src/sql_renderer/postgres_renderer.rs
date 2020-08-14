@@ -166,6 +166,28 @@ impl SqlRenderer for PostgresFlavour {
         vec![sql]
     }
 
+    fn render_create_table(&self, table: &TableWalker<'_>, schema_name: &str) -> anyhow::Result<String> {
+        let columns: String = table
+            .columns()
+            .map(|column| self.render_column(&schema_name, column, false))
+            .join(",\n");
+
+        let primary_columns = table.table.primary_key_columns();
+        let pk_column_names = primary_columns.iter().map(|col| self.quote(&col)).join(",");
+        let pk = if pk_column_names.len() > 0 {
+            format!(",\nPRIMARY KEY ({})", pk_column_names)
+        } else {
+            String::new()
+        };
+
+        Ok(format!(
+            "CREATE TABLE {table_name} (\n{columns}{primary_key}\n)",
+            table_name = self.quote_with_schema(&schema_name, table.name()),
+            columns = columns,
+            primary_key = pk,
+        ))
+    }
+
     fn render_drop_enum(&self, drop_enum: &crate::DropEnum) -> Vec<String> {
         let sql = format!(
             "DROP TYPE {enum_name}",
