@@ -4,6 +4,7 @@ use crate::{
     flavour::{SqlFlavour, SqliteFlavour},
     sql_database_step_applier::render_create_index,
     sql_schema_differ::{ColumnDiffer, SqlSchemaDiffer, TableDiffer},
+    AlterEnum,
 };
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
@@ -14,6 +15,15 @@ use std::borrow::Cow;
 impl SqlRenderer for SqliteFlavour {
     fn quote<'a>(&self, name: &'a str) -> Quoted<&'a str> {
         Quoted::Double(name)
+    }
+
+    fn render_alter_enum(
+        &self,
+        _alter_enum: &AlterEnum,
+        _differ: &SqlSchemaDiffer<'_>,
+        _schema_name: &str,
+    ) -> anyhow::Result<Vec<String>> {
+        unreachable!("render_alter_enum on sqlite")
     }
 
     fn render_column(&self, _schema_name: &str, column: ColumnWalker<'_>, _add_fk_prefix: bool) -> String {
