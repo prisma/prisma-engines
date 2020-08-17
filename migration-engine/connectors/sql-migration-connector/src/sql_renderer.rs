@@ -1,5 +1,3 @@
-pub(crate) mod rendered_step;
-
 mod common;
 mod mysql_renderer;
 mod postgres_renderer;
@@ -10,7 +8,7 @@ pub(crate) use common::{IteratorJoin, Quoted, QuotedWithSchema};
 use crate::{
     database_info::DatabaseInfo,
     sql_schema_differ::{ColumnDiffer, SqlSchemaDiffer},
-    CreateEnum, DropEnum,
+    AlterEnum, CreateEnum, DropEnum,
 };
 use sql_schema_describer::walkers::{ColumnWalker, TableWalker};
 use sql_schema_describer::*;
@@ -25,6 +23,13 @@ pub(crate) trait SqlRenderer {
             name: self.quote(name),
         }
     }
+
+    fn render_alter_enum(
+        &self,
+        alter_enum: &AlterEnum,
+        differ: &SqlSchemaDiffer<'_>,
+        schema_name: &str,
+    ) -> anyhow::Result<Vec<String>>;
 
     fn render_column(&self, schema_name: &str, column: ColumnWalker<'_>, add_fk_prefix: bool) -> String;
 

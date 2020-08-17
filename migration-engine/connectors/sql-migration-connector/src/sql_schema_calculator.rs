@@ -362,7 +362,7 @@ fn add_one_to_one_relation_unique_index(table: &mut sql::Table, column_names: &[
 
     let columns_suffix = column_names.join("_");
     let index = sql::Index {
-        name: format!("{}_{}", table.name, columns_suffix),
+        name: format!("{}_{}_unique", table.name, columns_suffix),
         columns: column_names.to_owned(),
         tpe: sql::IndexType::Unique,
     };
