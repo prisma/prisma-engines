@@ -1,4 +1,4 @@
-use crate::error::DatamodelError;
+use super::DatamodelError;
 
 /// Represents a list of validation or parser errors.
 ///
