@@ -147,7 +147,13 @@ model User {
 
 #[test]
 fn test_parser_renderer_native_types_via_dml() {
-    let input = r#"model Blog {
+    let input = r#"datasource pg {
+  provider        = "postgresql"
+  url             = "postgresql://"
+  previewFeatures = ["nativeTypes"]
+}
+
+model Blog {
   id     Int    @id
   bigInt Int    @pg.BigInt
   foobar String @pg.VarChar(12)
@@ -155,8 +161,6 @@ fn test_parser_renderer_native_types_via_dml() {
 "#;
 
     let dml = parse(input);
-
-    println!("dml: {:?}", dml);
 
     let rendered = datamodel::render_datamodel_to_string(&dml).unwrap();
 
