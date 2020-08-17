@@ -1,5 +1,5 @@
 use core::option::Option::Some;
-use datamodel_connector::error::ConnectorError;
+use datamodel_connector::error::{ConnectorError, ErrorKind};
 use datamodel_connector::scalars::ScalarType;
 use datamodel_connector::{Connector, ConnectorCapability, NativeTypeConstructor, NativeTypeInstance};
 use native_types::{MySqlType, NativeType};
@@ -129,18 +129,22 @@ impl Connector for MySqlDatamodelConnector {
                 if let Some(arg) = args.first() {
                     MySqlType::Char(*arg)
                 } else {
-                    return Err(ConnectorError::new_argument_count_mismatch_error(CHAR_TYPE_NAME, 1, 0));
+                    return Err(ConnectorError::from_kind(ErrorKind::ArgumentCountMisMatchError {
+                        native_type: CHAR_TYPE_NAME.parse().unwrap(),
+                        required_count: 1,
+                        given_count: 0,
+                    }));
                 }
             }
             VAR_CHAR_TYPE_NAME => {
                 if let Some(arg) = args.first() {
                     MySqlType::VarChar(*arg)
                 } else {
-                    return Err(ConnectorError::new_argument_count_mismatch_error(
-                        VAR_CHAR_TYPE_NAME,
-                        1,
-                        0,
-                    ));
+                    return Err(ConnectorError::from_kind(ErrorKind::ArgumentCountMisMatchError {
+                        native_type: VAR_CHAR_TYPE_NAME.parse().unwrap(),
+                        required_count: 1,
+                        given_count: 0,
+                    }));
                 }
             }
             TINY_TEXT_TYPE_NAME => MySqlType::TinyText,
@@ -222,7 +226,10 @@ impl Connector for MySqlDatamodelConnector {
         if let Some(constructor) = self.find_native_type_constructor(constructor_name) {
             Ok(NativeTypeInstance::new(constructor.name.as_str(), args, &native_type))
         } else {
-            Err(ConnectorError::new_type_name_unknown_error(constructor_name, "Mysql"))
+            Err(ConnectorError::from_kind(ErrorKind::NativeTypeNameUnknown {
+                native_type: constructor_name.parse().unwrap(),
+                connector_name: "Mysql".parse().unwrap(),
+            }))
         }
     }
 }

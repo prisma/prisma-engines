@@ -1,4 +1,4 @@
-use datamodel_connector::error::ConnectorError;
+use datamodel_connector::error::{ConnectorError, ErrorKind};
 use datamodel_connector::scalars::ScalarType;
 use datamodel_connector::{Connector, ConnectorCapability, NativeTypeConstructor, NativeTypeInstance};
 use native_types::{NativeType, PostgresType};
@@ -131,18 +131,22 @@ impl Connector for PostgresDatamodelConnector {
                 if let Some(arg) = args.first() {
                     PostgresType::VarChar(*arg)
                 } else {
-                    return Err(ConnectorError::new_argument_count_mismatch_error(
-                        VARCHAR_TYPE_NAME,
-                        1,
-                        0,
-                    ));
+                    return Err(ConnectorError::from_kind(ErrorKind::ArgumentCountMisMatchError {
+                        native_type: String::from(VARCHAR_TYPE_NAME),
+                        given_count: 0,
+                        required_count: 1,
+                    }));
                 }
             }
             CHAR_TYPE_NAME => {
                 if let Some(arg) = args.first() {
                     PostgresType::Char(*arg)
                 } else {
-                    return Err(ConnectorError::new_argument_count_mismatch_error(CHAR_TYPE_NAME, 1, 0));
+                    return Err(ConnectorError::from_kind(ErrorKind::ArgumentCountMisMatchError {
+                        native_type: String::from(CHAR_TYPE_NAME),
+                        given_count: 0,
+                        required_count: 1,
+                    }));
                 }
             }
             TEXT_TYPE_NAME => PostgresType::Text,
@@ -150,22 +154,22 @@ impl Connector for PostgresDatamodelConnector {
                 if let Some(arg) = args.first() {
                     PostgresType::Timestamp(*arg as u8)
                 } else {
-                    return Err(ConnectorError::new_argument_count_mismatch_error(
-                        TIMESTAMP_TYPE_NAME,
-                        1,
-                        0,
-                    ));
+                    return Err(ConnectorError::from_kind(ErrorKind::ArgumentCountMisMatchError {
+                        native_type: String::from(TIMESTAMP_TYPE_NAME),
+                        given_count: 0,
+                        required_count: 1,
+                    }));
                 }
             }
             TIMESTAMP_WITH_TIMEZONE_TYPE_NAME => {
                 if let Some(arg) = args.first() {
                     PostgresType::TimestampWithTimeZone(*arg as u8)
                 } else {
-                    return Err(ConnectorError::new_argument_count_mismatch_error(
-                        TIMESTAMP_WITH_TIMEZONE_TYPE_NAME,
-                        1,
-                        0,
-                    ));
+                    return Err(ConnectorError::from_kind(ErrorKind::ArgumentCountMisMatchError {
+                        native_type: String::from(TIMESTAMP_WITH_TIMEZONE_TYPE_NAME),
+                        given_count: 0,
+                        required_count: 1,
+                    }));
                 }
             }
             DATE_TYPE_NAME => PostgresType::Date,
@@ -173,18 +177,22 @@ impl Connector for PostgresDatamodelConnector {
                 if let Some(arg) = args.first() {
                     PostgresType::Time(*arg as u8)
                 } else {
-                    return Err(ConnectorError::new_argument_count_mismatch_error(TIME_TYPE_NAME, 1, 0));
+                    return Err(ConnectorError::from_kind(ErrorKind::ArgumentCountMisMatchError {
+                        native_type: String::from(TIME_TYPE_NAME),
+                        given_count: 0,
+                        required_count: 1,
+                    }));
                 }
             }
             TIME_WITH_TIMEZONE_TYPE_NAME => {
                 if let Some(arg) = args.first() {
                     PostgresType::TimeWithTimeZone(*arg as u8)
                 } else {
-                    return Err(ConnectorError::new_argument_count_mismatch_error(
-                        TIME_WITH_TIMEZONE_TYPE_NAME,
-                        1,
-                        0,
-                    ));
+                    return Err(ConnectorError::from_kind(ErrorKind::ArgumentCountMisMatchError {
+                        native_type: String::from(TIME_WITH_TIMEZONE_TYPE_NAME),
+                        given_count: 0,
+                        required_count: 1,
+                    }));
                 }
             }
             BOOLEAN_TYPE_NAME => PostgresType::Boolean,
@@ -192,18 +200,22 @@ impl Connector for PostgresDatamodelConnector {
                 if let Some(arg) = args.first() {
                     PostgresType::Bit(*arg)
                 } else {
-                    return Err(ConnectorError::new_argument_count_mismatch_error(BIT_TYPE_NAME, 1, 0));
+                    return Err(ConnectorError::from_kind(ErrorKind::ArgumentCountMisMatchError {
+                        native_type: String::from(BIT_TYPE_NAME),
+                        given_count: 0,
+                        required_count: 1,
+                    }));
                 }
             }
             VAR_BIT_TYPE_NAME => {
                 if let Some(arg) = args.first() {
                     PostgresType::VarBit(*arg)
                 } else {
-                    return Err(ConnectorError::new_argument_count_mismatch_error(
-                        VAR_BIT_TYPE_NAME,
-                        1,
-                        0,
-                    ));
+                    return Err(ConnectorError::from_kind(ErrorKind::ArgumentCountMisMatchError {
+                        native_type: String::from(VAR_BIT_TYPE_NAME),
+                        given_count: 0,
+                        required_count: 1,
+                    }));
                 }
             }
             UUID_TYPE_NAME => PostgresType::UUID,
@@ -251,10 +263,10 @@ impl Connector for PostgresDatamodelConnector {
         if let Some(constructor) = self.find_native_type_constructor(constructor_name) {
             Ok(NativeTypeInstance::new(constructor.name.as_str(), args, &native_type))
         } else {
-            Err(ConnectorError::new_type_name_unknown_error(
-                constructor_name,
-                "Postgres",
-            ))
+            Err(ConnectorError::from_kind(ErrorKind::NativeTypeNameUnknown {
+                native_type: constructor_name.parse().unwrap(),
+                connector_name: "Postgres".parse().unwrap(),
+            }))
         }
     }
 }

@@ -6,7 +6,7 @@ use crate::{
     error::{DatamodelError, ErrorCollection},
     Field, FieldType, ScalarType,
 };
-use datamodel_connector::error::ConnectorError;
+use datamodel_connector::error::{ConnectorError, ErrorKind};
 use datamodel_connector::Connector;
 use itertools::Itertools;
 use sql_datamodel_connector::SqlDatamodelConnectors;
@@ -250,7 +250,11 @@ impl<'a> LiftAstToDml<'a> {
                     let constructor = connector.find_native_type_constructor(x);
                     if constructor.is_none() {
                         return Err(DatamodelError::new_connector_error(
-                            &ConnectorError::new_type_name_unknown_error(x, connector_string).to_string(),
+                            &ConnectorError::from_kind(ErrorKind::NativeTypeNameUnknown {
+                                native_type: x.parse().unwrap(),
+                                connector_name: connector_string.clone(),
+                            })
+                            .to_string(),
                             type_specifications.first().unwrap().span,
                         ));
                     }
@@ -277,11 +281,11 @@ impl<'a> LiftAstToDml<'a> {
                     let compatable_prisma_scalar_type = native_type_constructor.prisma_type;
                     if compatable_prisma_scalar_type != scalar_type {
                         return Err(DatamodelError::new_connector_error(
-                            &ConnectorError::new_incompatible_native_type_error(
-                                connector_string,
-                                scalar_type,
-                                compatable_prisma_scalar_type,
-                            )
+                            &ConnectorError::from_kind(ErrorKind::IncompatibleNativeType {
+                                native_type: connector_string.clone(),
+                                field_type: scalar_type.to_string(),
+                                expected_type: compatable_prisma_scalar_type.to_string(),
+                            })
                             .to_string(),
                             type_specifications.first().unwrap().span,
                         ));
