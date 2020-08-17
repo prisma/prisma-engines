@@ -126,11 +126,14 @@ impl SqlRenderer for SqliteFlavour {
             String::new()
         };
 
+        let uniques = self.render_unique_indexes_in_create_table(table);
+
         Ok(format!(
-            "CREATE TABLE {table_name} (\n{columns}{foreign_keys}{primary_key}\n)",
+            "CREATE TABLE {table_name} (\n{columns}{foreign_keys}{uniques}{primary_key}\n)",
             table_name = self.quote_with_schema(&schema_name, table.name()),
             columns = columns,
             foreign_keys = foreign_keys,
+            uniques = uniques,
             primary_key = primary_key,
         ))
     }
