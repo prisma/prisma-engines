@@ -196,14 +196,14 @@ impl<'a> LiftAstToDml<'a> {
 
         let (supports_native_types, datasource_name) = match self.source {
             Some(source) => (source.has_preview_feature("nativeTypes"), source.name.as_str()),
-            _ => {}
+            _ => panic!(""),
         };
 
         if let Ok(scalar_type) = ScalarType::from_str(type_name) {
             if supports_native_types {
                 let (connector_string, connector) = match self.source {
                     Some(source) => (&source.active_provider, &source.active_connector),
-                    None => "",
+                    None => panic!(""),
                 };
                 let mut connectors: HashMap<&str, Box<dyn Connector>> = HashMap::new();
                 connectors.insert("postgresql", Box::new(SqlDatamodelConnectors::postgres()));
@@ -230,7 +230,6 @@ impl<'a> LiftAstToDml<'a> {
                 let name = type_specification.map(|dir| dir.name.name.trim_start_matches(&prefix));
 
                 // convert arguments to u32 if possible
-                // todo carmen this is really ugly
                 let number_args = type_specification.map(|dir| dir.arguments.clone());
                 let args = if let Some(number) = number_args {
                     let p = number
@@ -254,10 +253,14 @@ impl<'a> LiftAstToDml<'a> {
                         ));
                     }
 
-                    let native_type_constructor = self.constructors.iter().find(|c| c.name.as_str() == x).unwrap();
+                    let native_type_constructor = connector
+                        .available_native_type_constructors()
+                        .iter()
+                        .find(|c| c.name.as_str() == x)
+                        .unwrap();
                     let length = args.iter().count();
 
-                    if constructor._number_of_args != length
+                    if constructor.unwrap()._number_of_args != length
                         && native_type_constructor._number_of_optional_args != length
                     {
                         return Err(DatamodelError::new_argument_count_missmatch_error(

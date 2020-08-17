@@ -1,7 +1,6 @@
 use datamodel_connector::error::ConnectorError;
-use datamodel_connector::{
-    scalars::ScalarType, Connector, ConnectorCapability, NativeTypeConstructor, NativeTypeInstance,
-};
+use datamodel_connector::scalars::ScalarType;
+use datamodel_connector::{Connector, ConnectorCapability, NativeTypeConstructor, NativeTypeInstance};
 use native_types::{NativeType, PostgresType};
 
 const SMALL_INT_TYPE_NAME: &str = "SmallInt";

@@ -5,7 +5,6 @@ pub mod error;
 pub mod scalars;
 
 use crate::error::ConnectorError;
-use crate::scalars::ScalarType;
 pub use combined_connector::CombinedConnector;
 pub use native_type_constructor::NativeTypeConstructor;
 use native_types::NativeType;

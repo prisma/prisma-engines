@@ -1,5 +1,4 @@
 use datamodel_connector::error::ConnectorError;
-use datamodel_connector::scalars::ScalarType;
 use datamodel_connector::{Connector, ConnectorCapability, NativeTypeConstructor, NativeTypeInstance};
 use native_types::NativeType;
 
