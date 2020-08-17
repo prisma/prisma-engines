@@ -1,9 +1,6 @@
 use crate::misc_helpers::replace_field_names;
-use crate::warnings::{
-    warning_enriched_with_map_on_enum, warning_enriched_with_map_on_enum_value, warning_enriched_with_map_on_field,
-    warning_enriched_with_map_on_model, Enum, EnumAndValue, Model, ModelAndField,
-};
-use datamodel::{common::RelationNames, Datamodel, DefaultValue, FieldType};
+use crate::warnings::*;
+use datamodel::{common::RelationNames, Datamodel, DefaultValue, FieldType, ScalarType, ValueGenerator};
 use introspection_connector::Warning;
 use prisma_value::PrismaValue;
 use std::cmp::Ordering;
@@ -272,6 +269,45 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec
     //todo @defaults
     // potential error: what if there was a db default before and then it got removed, now re-introspection makes it virtual
     // you could not get rid of it
+    //for every singular string id field, if you can find it in the old datamodel and it has a cuid/uuid reapply it
+    let mut re_introspected_prisma_level_cuids = vec![];
+    let mut re_introspected_prisma_level_uuids = vec![];
+    {
+        for model in new_data_model.models() {
+            for field in model
+                .scalar_fields()
+                .filter(|f| f.is_id && f.field_type == FieldType::Base(ScalarType::String, None))
+            {
+                if let Some(old_model) = old_data_model.find_model(&model.name) {
+                    if let Some(old_field) = old_model.find_scalar_field(&field.name) {
+                        if field.default_value.is_none() {
+                            if old_field.default_value == Some(DefaultValue::Expression(ValueGenerator::new_cuid())) {
+                                let mf = ModelAndField::new(&model.name, &field.name);
+                                re_introspected_prisma_level_cuids.push((mf, old_field.name.clone()));
+                            }
+
+                            if old_field.default_value == Some(DefaultValue::Expression(ValueGenerator::new_uuid())) {
+                                let mf = ModelAndField::new(&model.name, &field.name);
+                                re_introspected_prisma_level_uuids.push((mf, old_field.name.clone()));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        for cuid in &re_introspected_prisma_level_cuids {
+            new_data_model
+                .find_scalar_field_mut(&cuid.0.model, &cuid.0.field)
+                .default_value = Some(DefaultValue::Expression(ValueGenerator::new_cuid()));
+        }
+
+        for uuid in &re_introspected_prisma_level_uuids {
+            new_data_model
+                .find_scalar_field_mut(&uuid.0.model, &uuid.0.field)
+                .default_value = Some(DefaultValue::Expression(ValueGenerator::new_uuid()));
+        }
+    }
 
     // restore old model order
     new_data_model.models.sort_by(|model_a, model_b| {
@@ -318,6 +354,22 @@ pub fn enrich(old_data_model: &Datamodel, new_data_model: &mut Datamodel) -> Vec
             .collect();
 
         warnings.push(warning_enriched_with_map_on_enum_value(&enums_and_values));
+    }
+
+    if !re_introspected_prisma_level_cuids.is_empty() {
+        let models_and_fields = re_introspected_prisma_level_cuids
+            .iter()
+            .map(|c| ModelAndField::new(&c.0.model, &c.1))
+            .collect();
+        warnings.push(warning_enriched_with_cuid(&models_and_fields));
+    }
+
+    if !re_introspected_prisma_level_uuids.is_empty() {
+        let models_and_fields = re_introspected_prisma_level_uuids
+            .iter()
+            .map(|c| ModelAndField::new(&c.0.model, &c.1))
+            .collect();
+        warnings.push(warning_enriched_with_uuid(&models_and_fields));
     }
 
     warnings

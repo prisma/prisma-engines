@@ -891,38 +891,48 @@ async fn re_introspecting_multiple_changed_relation_names_due_to_mapped_models(a
     custom_assert(&result, final_dm);
 }
 
-// #[test_each_connector(tags("postgres"))]
-// async fn re_introspecting_virtual_default(api: &TestApi) {
-//     let barrel = api.barrel();
-//     let _setup_schema = barrel
-//         .execute(|migration| {
-//             migration.create_table("User", |t| {
-//                 t.add_column("id", types::primary());
-//                 t.add_column("text", types::text());
-//             });
-//             migration.create_table("Unrelated", |t| {
-//                 t.add_column("id", types::primary());
-//             });
-//         })
-//         .await;
-//
-//     let input_dm = r#"
-//             model User {
-//                id        Int    @id @default(autoincrement())
-//                text      String @default("virtual_default")
-//             }
-//         "#;
-//
-//     let final_dm = r#"
-//             model Unrelated {
-//                id               Int @id @default(autoincrement())
-//             }
-//
-//              model User {
-//                id        Int    @id @default(autoincrement())
-//                text      String @default("virtual_default")
-//             }
-//         "#;
-//     let result = dbg!(api.re_introspect(input_dm).await);
-//     custom_assert(&result, final_dm);
-// }
+#[test_each_connector(tags("postgres"))]
+async fn re_introspecting_virtual_cuid_default(api: &TestApi) {
+    let barrel = api.barrel();
+    let _setup_schema = barrel
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::varchar(30).primary(true));
+            });
+
+            migration.create_table("User2", |t| {
+                t.add_column("id", types::varchar(30).primary(true));
+            });
+
+            migration.create_table("Unrelated", |t| {
+                t.add_column("id", types::primary());
+            });
+        })
+        .await;
+
+    let input_dm = r#"
+            model User {
+               id        String    @id @default(cuid())
+            }
+            
+            model User2 {
+               id        String    @id @default(uuid())
+            }
+        "#;
+
+    let final_dm = r#"
+            model User {
+               id        String    @id @default(cuid())
+            }
+            
+            model User2 {
+               id        String    @id @default(uuid())
+            }
+            
+            model Unrelated {
+               id               Int @id @default(autoincrement())
+            }
+        "#;
+    let result = dbg!(api.re_introspect(input_dm).await);
+    custom_assert(&result, final_dm);
+}
