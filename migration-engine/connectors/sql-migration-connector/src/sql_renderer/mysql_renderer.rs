@@ -152,17 +152,17 @@ impl SqlRenderer for MysqlFlavour {
             String::new()
         };
 
-        let uniques = self.render_unique_indexes_in_create_table(table);
-
-        let non_uniques = if table.table.indices.iter().any(|i| !i.is_unique()) {
+        let indexes = if !table.table.indices.is_empty() {
             let indices: String = table
                 .table
                 .indices
                 .iter()
-                .filter(|i| !i.is_unique())
                 .map(|index| {
+                    let tpe = if index.is_unique() { "UNIQUE " } else { "" };
+
                     format!(
-                        "Index {}({})",
+                        "{}Index {}({})",
+                        tpe,
                         self.quote(&index.name),
                         index.columns.iter().map(|col| self.quote(&col)).join(",\n")
                     )
@@ -175,11 +175,10 @@ impl SqlRenderer for MysqlFlavour {
         };
 
         Ok(format!(
-            "CREATE TABLE {} (\n{columns}{non_uniques}{uniques}{primary_key}\n) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci",
+            "CREATE TABLE {} (\n{columns}{indexes}{primary_key}\n) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci",
             table_name = self.quote_with_schema(&schema_name, table.name()),
             columns = columns,
-            non_uniques= non_uniques,
-            uniques = uniques,
+            indexes= indexes,
             primary_key = primary_key,
         ))
     }

@@ -265,10 +265,11 @@ impl<'schema> SqlSchemaDiffer<'schema> {
 
         if !self.database_info.sql_family().is_mysql() {
             for table in self.created_tables() {
-                for index in table.indices.iter().filter(|i| !i.is_unique()) {
+                for index in &table.indices {
                     let create = CreateIndex {
                         table: table.name.clone(),
                         index: index.clone(),
+                        caused_by_create_table: true,
                     };
 
                     steps.push(create)
@@ -284,6 +285,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
                 let create = CreateIndex {
                     table: tables.next.name().to_owned(),
                     index: index.clone(),
+                    caused_by_create_table: false,
                 };
 
                 steps.push(create)

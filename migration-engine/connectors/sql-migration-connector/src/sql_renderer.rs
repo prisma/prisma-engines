@@ -59,28 +59,6 @@ pub(crate) trait SqlRenderer {
         differ: SqlSchemaDiffer<'_>,
         database_info: &DatabaseInfo,
     ) -> Vec<String>;
-
-    fn render_unique_indexes_in_create_table(&self, table: &TableWalker<'_>) -> String {
-        if table.table.indices.iter().any(|i| i.is_unique()) {
-            let indices: String = table
-                .table
-                .indices
-                .iter()
-                .filter(|i| i.is_unique())
-                .map(|index| {
-                    format!(
-                        "Constraint {} Unique ({})",
-                        self.quote(&index.name),
-                        index.columns.iter().map(|col| self.quote(&col)).join(",\n")
-                    )
-                })
-                .join(",\n");
-
-            format!(",\n{}", indices)
-        } else {
-            String::new()
-        }
-    }
 }
 
 #[derive(Default)]

@@ -161,12 +161,14 @@ impl SqlDestructiveChangeChecker<'_> {
                 SqlMigrationStep::DropTable(DropTable { name }) => {
                     self.check_table_drop(name, &mut plan);
                 }
-                SqlMigrationStep::CreateIndex(CreateIndex { table, index }) if index.is_unique() => {
-                    plan.push_warning(SqlMigrationWarningCheck::UniqueConstraintAddition {
-                        table: table.clone(),
-                        columns: index.columns.clone(),
-                    })
-                }
+                SqlMigrationStep::CreateIndex(CreateIndex {
+                    table,
+                    index,
+                    caused_by_create_table: false,
+                }) if index.is_unique() => plan.push_warning(SqlMigrationWarningCheck::UniqueConstraintAddition {
+                    table: table.clone(),
+                    columns: index.columns.clone(),
+                }),
                 SqlMigrationStep::AlterEnum(AlterEnum {
                     name,
                     created_variants: _,
