@@ -200,8 +200,8 @@ impl<'a> LiftAstToDml<'a> {
 
         if let Ok(scalar_type) = ScalarType::from_str(type_name) {
             if supports_native_types {
-                let connector_string = match self.source {
-                    Some(source) => &source.active_provider,
+                let (connector_string, connector) = match self.source {
+                    Some(source) => (&source.active_provider, &source.active_connector),
                     None => "",
                 };
                 let mut connectors: HashMap<&str, Box<dyn Connector>> = HashMap::new();
@@ -244,7 +244,7 @@ impl<'a> LiftAstToDml<'a> {
                     vec![]
                 };
 
-                let connector: &Box<dyn Connector> = connectors.get(connector_string).unwrap();
+
                 if let Some(x) = name {
                     let parse_native_type_result = connector.parse_native_type(x, args, scalar_type);
                     if parse_native_type_result.is_err() {
