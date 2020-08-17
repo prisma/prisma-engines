@@ -119,6 +119,21 @@ impl Filter {
             _ => vec![self],
         }
     }
+
+    pub fn set_mode(&mut self, mode: QueryMode) {
+        match self {
+            Filter::And(inner) => inner.iter_mut().for_each(|f| f.set_mode(mode.clone())),
+            Filter::Or(inner) => inner.iter_mut().for_each(|f| f.set_mode(mode.clone())),
+            Filter::Not(inner) => inner.iter_mut().for_each(|f| f.set_mode(mode.clone())),
+            Filter::Scalar(sf) => sf.mode = mode,
+            Filter::ScalarList(_) => {}
+            Filter::OneRelationIsNull(_) => {}
+            Filter::Relation(_) => {}
+            Filter::NodeSubscription => {}
+            Filter::BoolFilter(_) => {}
+            Filter::Empty => {}
+        }
+    }
 }
 
 impl From<ScalarFilter> for Filter {

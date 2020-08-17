@@ -1,5 +1,7 @@
+mod capabilities;
 mod dispatch;
 
+pub use capabilities::*;
 pub use dispatch::*;
 
 use crate::{Filter, QueryArguments, WriteArgs};
@@ -10,7 +12,14 @@ use prisma_value::PrismaValue;
 
 #[async_trait]
 pub trait Connector {
+    /// Returns a connection to a data source.
     async fn get_connection(&self) -> crate::Result<Box<dyn Connection>>;
+
+    /// Returns supported capabilities of the connector.
+    fn capabilities(&self) -> ConnectorCapabilities;
+
+    /// Returns name of the connector.
+    fn name(&self) -> String;
 }
 
 #[async_trait]

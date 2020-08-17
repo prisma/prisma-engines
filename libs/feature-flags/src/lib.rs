@@ -54,7 +54,8 @@ macro_rules! flags {
 
 // `transaction`: Transactional batches support in the QE.
 // `connectOrCreate`: `connectOrCreate` nested query in the QE.
-flags!(transaction, connectOrCreate);
+// `insensitiveFilters`: Case insensitive scalar filters for supported DBs.
+flags!(transaction, connectOrCreate, insensitiveFilters);
 
 /// Initializes the feature flags with given flags.
 /// Noop if already initialized.

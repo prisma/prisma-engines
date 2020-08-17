@@ -2,7 +2,7 @@ use crate::request_handlers::graphql::{self, GraphQlBody};
 
 use crate::{
     context::PrismaContext,
-    dmmf,
+    dmmf, exec_loader,
     opt::{CliOpt, PrismaOpt, Subcommand},
     PrismaResult,
 };
@@ -24,6 +24,7 @@ pub struct DmmfRequest {
     datamodel: Datamodel,
     build_mode: BuildMode,
     enable_raw_queries: bool,
+    config: Configuration,
 }
 
 pub struct GetConfigRequest {
@@ -58,6 +59,7 @@ impl CliCommand {
                         datamodel: opts.datamodel(true)?,
                         build_mode,
                         enable_raw_queries: opts.enable_raw_queries,
+                        config: opts.configuration(true)?,
                     })))
                 }
                 CliOpt::GetConfig(input) => Ok(Some(CliCommand::GetConfig(GetConfigRequest {
@@ -76,14 +78,17 @@ impl CliCommand {
 
     pub async fn execute(self) -> PrismaResult<()> {
         match self {
-            CliCommand::Dmmf(request) => Self::dmmf(request),
+            CliCommand::Dmmf(request) => Self::dmmf(request).await,
             CliCommand::GetConfig(input) => Self::get_config(input.config),
             CliCommand::ExecuteRequest(request) => Self::execute_request(request).await,
         }
     }
 
-    fn dmmf(request: DmmfRequest) -> PrismaResult<()> {
+    async fn dmmf(request: DmmfRequest) -> PrismaResult<()> {
         let template = DatamodelConverter::convert(&request.datamodel);
+
+        // Load executor
+        let (_, executor) = exec_loader::load(&request.config.datasources.first().unwrap()).await?;
 
         // temporary code duplication
         let internal_data_model = template.build("".into());
@@ -91,6 +96,7 @@ impl CliCommand {
             internal_data_model,
             request.build_mode,
             request.enable_raw_queries,
+            executor.primary_connector().capabilities(),
         ));
 
         let dmmf = dmmf::render_dmmf(&request.datamodel, query_schema);
