@@ -42,7 +42,8 @@ impl SqlRenderer for SqliteFlavour {
         };
 
         format!(
-            "{column_name} {tpe_str} {nullability_str}{default_str}{auto_increment}",
+            "{indentation}{column_name} {tpe_str}{nullability_str}{default_str}{auto_increment}",
+            indentation = SQL_INDENTATION,
             column_name = column_name,
             tpe_str = tpe_str,
             nullability_str = nullability_str,
@@ -112,7 +113,7 @@ impl SqlRenderer for SqliteFlavour {
             let mut rendered_fks = String::new();
 
             while let Some(fk) = fks.next() {
-                writeln!(
+                write!(
                     rendered_fks,
                     "FOREIGN KEY ({constrained_columns}) {references}{comma}",
                     constrained_columns = fk.columns.iter().map(|col| format!(r#""{}""#, col)).join(","),
@@ -121,7 +122,7 @@ impl SqlRenderer for SqliteFlavour {
                 )?;
             }
 
-            format!(",\n{fks}", fks = rendered_fks)
+            format!(",\n\n{fks}", fks = rendered_fks)
         } else {
             String::new()
         };
