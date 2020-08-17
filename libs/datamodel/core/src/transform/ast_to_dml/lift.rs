@@ -247,8 +247,9 @@ impl<'a> LiftAstToDml<'a> {
                 };
 
                 if let Some(x) = name {
-                    let constructor = connector.find_native_type_constructor(x);
-                    if constructor.is_none() {
+                    let constructor = if let Some(cons) = connector.find_native_type_constructor(x) {
+                        cons
+                    } else {
                         return Err(DatamodelError::new_connector_error(
                             &ConnectorError::from_kind(ErrorKind::NativeTypeNameUnknown {
                                 native_type: x.parse().unwrap(),
@@ -257,7 +258,7 @@ impl<'a> LiftAstToDml<'a> {
                             .to_string(),
                             type_specifications.first().unwrap().span,
                         ));
-                    }
+                    };
 
                     let native_type_constructor = connector
                         .available_native_type_constructors()
@@ -266,7 +267,7 @@ impl<'a> LiftAstToDml<'a> {
                         .unwrap();
                     let length = args.iter().count();
 
-                    if constructor.unwrap()._number_of_args != length
+                    if constructor._number_of_args != length
                         && native_type_constructor._number_of_optional_args != length
                     {
                         return Err(DatamodelError::new_argument_count_missmatch_error(
@@ -282,7 +283,7 @@ impl<'a> LiftAstToDml<'a> {
                     if compatable_prisma_scalar_type != scalar_type {
                         return Err(DatamodelError::new_connector_error(
                             &ConnectorError::from_kind(ErrorKind::IncompatibleNativeType {
-                                native_type: connector_string.clone(),
+                                native_type: x.parse().unwrap(),
                                 field_type: scalar_type.to_string(),
                                 expected_type: compatable_prisma_scalar_type.to_string(),
                             })

@@ -152,7 +152,7 @@ fn should_fail_on_native_type_with_unknown_type() {
     let error = parse_error(dml);
 
     error.assert_is(DatamodelError::new_connector_error(
-        "Native type Numeric is not supported for Postgres connector.",
+        "Native type Numeric is not supported for postgresql connector.",
         ast::Span::new(222, 238),
     ));
 }
@@ -176,7 +176,7 @@ fn should_fail_on_native_type_with_incompatible_type() {
     let error = parse_error(dml);
 
     error.assert_is(DatamodelError::new_connector_error(
-        "Native type Postgres is not compatible with declared field type Boolean, expected field type String.",
+        "Native type VarChar is not compatible with declared field type Boolean, expected field type String.",
         ast::Span::new(260, 273),
     ));
 }
