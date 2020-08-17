@@ -5,6 +5,7 @@ use crate::{
     error::{DatamodelError, ErrorCollection},
     DatasourcePreviewFeatures, Field, FieldType, ScalarType,
 };
+use datamodel_connector::error::ConnectorError;
 use datamodel_connector::Connector;
 use itertools::Itertools;
 use sql_datamodel_connector::SqlDatamodelConnectors;
@@ -244,9 +245,44 @@ impl<'a> LiftAstToDml<'a> {
                     vec![]
                 };
 
-
                 if let Some(x) = name {
-                    let parse_native_type_result = connector.parse_native_type(x, args, scalar_type);
+                    let constructor = connector.find_native_type_constructor(x);
+                    if constructor.is_none() {
+                        return Err(DatamodelError::new_connector_error(
+                            &ConnectorError::new_type_name_unknown_error(x, connector_string).to_string(),
+                            type_specification.unwrap().span,
+                        ));
+                    }
+
+                    let native_type_constructor = self.constructors.iter().find(|c| c.name.as_str() == x).unwrap();
+                    let length = args.iter().count();
+
+                    if constructor._number_of_args != length
+                        && native_type_constructor._number_of_optional_args != length
+                    {
+                        return Err(DatamodelError::new_argument_count_missmatch_error(
+                            x,
+                            native_type_constructor._number_of_args,
+                            length,
+                            type_specification.unwrap().span,
+                        ));
+                    }
+
+                    // check for compatability with scalar type
+                    let compatable_prisma_scalar_type = native_type_constructor.prisma_type;
+                    if compatable_prisma_scalar_type != scalar_type {
+                        return Err(DatamodelError::new_connector_error(
+                            &ConnectorError::new_incompatible_native_type_error(
+                                connector_string,
+                                scalar_type,
+                                compatable_prisma_scalar_type,
+                            )
+                            .to_string(),
+                            type_specification.unwrap().span,
+                        ));
+                    }
+
+                    let parse_native_type_result = connector.parse_native_type(x, args);
                     if parse_native_type_result.is_err() {
                         return Err(DatamodelError::new_connector_error(
                             &parse_native_type_result.err().unwrap().to_string(),

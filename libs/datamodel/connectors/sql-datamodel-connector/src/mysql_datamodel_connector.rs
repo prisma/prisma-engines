@@ -115,17 +115,8 @@ impl Connector for MySqlDatamodelConnector {
         &self.constructors
     }
 
-    fn parse_native_type(
-        &self,
-        name: &str,
-        args: Vec<u32>,
-        scalar_type: ScalarType,
-    ) -> Result<NativeTypeInstance, ConnectorError> {
+    fn parse_native_type(&self, name: &str, args: Vec<u32>) -> Result<NativeTypeInstance, ConnectorError> {
         let constructor = self.find_native_type_constructor(name);
-        if constructor.is_none() {
-            return Err(ConnectorError::new_type_name_unknown_error(name, "Mysql"));
-        }
-        let length = args.iter().count();
         let native_type = match name {
             INT_TYPE_NAME => MySqlType::Int,
             SMALL_INT_TYPE_NAME => MySqlType::SmallInt,
@@ -176,28 +167,6 @@ impl Connector for MySqlDatamodelConnector {
 
             _ => unreachable!("This code is unreachable as the core must guarantee to just call with known names."),
         };
-
-        let native_type_constructor = self.constructors.iter().find(|c| c.name.as_str() == name).unwrap();
-
-        if native_type_constructor._number_of_args != length
-            && native_type_constructor._number_of_optional_args != length
-        {
-            return Err(ConnectorError::new_argument_count_mismatch_error(
-                name,
-                native_type_constructor._number_of_args,
-                length,
-            ));
-        }
-
-        // check for compatability with scalar type
-        let compatable_prisma_scalar_type = native_type_constructor.prisma_type;
-        if compatable_prisma_scalar_type != scalar_type {
-            return Err(ConnectorError::new_incompatible_native_type_error(
-                "MySql",
-                scalar_type,
-                compatable_prisma_scalar_type,
-            ));
-        }
 
         Ok(NativeTypeInstance::new(
             constructor.unwrap().name.as_str(),

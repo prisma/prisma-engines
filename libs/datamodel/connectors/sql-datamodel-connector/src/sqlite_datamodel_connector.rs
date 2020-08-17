@@ -29,12 +29,7 @@ impl Connector for SqliteDatamodelConnector {
         &self.constructors
     }
 
-    fn parse_native_type(
-        &self,
-        _name: &str,
-        _args: Vec<u32>,
-        _scalar_type: ScalarType,
-    ) -> Result<NativeTypeInstance, ConnectorError> {
+    fn parse_native_type(&self, _name: &str, _args: Vec<u32>) -> Result<NativeTypeInstance, ConnectorError> {
         return Err(ConnectorError::new_connector_not_supported_for_native_types("sqlite"));
     }
 
