@@ -6,6 +6,8 @@ pub(super) enum SqlMigrationWarningCheck {
     NonEmptyTableDrop { table: String },
     AlterColumn { table: String, column: String },
     PrimaryKeyChange { table: String },
+    UniqueConstraintAddition { table: String, columns: Vec<String> },
+    EnumValueRemoval { enm: String, values: Vec<String> },
 }
 
 impl Check for SqlMigrationWarningCheck {
@@ -14,6 +16,7 @@ impl Check for SqlMigrationWarningCheck {
             SqlMigrationWarningCheck::NonEmptyTableDrop { table }
             | SqlMigrationWarningCheck::PrimaryKeyChange { table } => Some(table),
             SqlMigrationWarningCheck::NonEmptyColumnDrop { .. } | SqlMigrationWarningCheck::AlterColumn { .. } => None,
+            _ => None,
         }
     }
 
@@ -25,6 +28,7 @@ impl Check for SqlMigrationWarningCheck {
             SqlMigrationWarningCheck::NonEmptyTableDrop { .. } | SqlMigrationWarningCheck::PrimaryKeyChange { .. } => {
                 None
             }
+            _ => None,
         }
     }
 
@@ -51,7 +55,10 @@ impl Check for SqlMigrationWarningCheck {
             SqlMigrationWarningCheck::PrimaryKeyChange { table } => match database_check_results.get_row_count(table) {
                 Some(0) => None,
                 _ => Some(format!("The migration will change the primary key for the `{table}` table. If it partially fails, the table could be left without primary key constraint.", table = table)),
-            }
+            },
+            SqlMigrationWarningCheck::UniqueConstraintAddition { table, columns } =>  Some(format!("The migration will add a unique constraint covering the columns `{columns}` on the table `{table}`. If there are existing duplicate values, the migration will fail.", table = table, columns = format!("[{}]",columns.join(",")))),
+            SqlMigrationWarningCheck::EnumValueRemoval { enm, values } =>  Some(format!("The migration will remove the values {values} on the enum `{enm}`. If these variants are still used in the database, the migration will fail.", enm = enm, values = format!("[{}]",values.join(",")))),
+
         }
     }
 }
