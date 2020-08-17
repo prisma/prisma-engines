@@ -37,7 +37,7 @@ macro_rules! flags {
                     $(
                         stringify!($field) => self.$field = true,
                     )*
-                    _ => return Err(FeatureFlagError::InvalidFlag(flag.to_owned())),
+                    _ => {}, // we don't fail here because users can override the binary used by the Client - hence we might get called with unknown feature flags
                 };
 
                 Ok(())
