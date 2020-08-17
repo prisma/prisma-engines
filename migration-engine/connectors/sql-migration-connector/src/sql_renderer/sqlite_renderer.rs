@@ -4,12 +4,11 @@ use crate::{
     flavour::{SqlFlavour, SqliteFlavour},
     sql_database_step_applier::render_create_index,
     sql_schema_differ::{ColumnDiffer, SqlSchemaDiffer, TableDiffer},
-    sql_schema_helpers::*,
 };
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
 use regex::Regex;
-use sql_schema_describer::*;
+use sql_schema_describer::{walkers::*, *};
 use std::borrow::Cow;
 
 impl SqlRenderer for SqliteFlavour {
@@ -17,7 +16,7 @@ impl SqlRenderer for SqliteFlavour {
         Quoted::Double(name)
     }
 
-    fn render_column(&self, _schema_name: &str, column: ColumnRef<'_>, _add_fk_prefix: bool) -> String {
+    fn render_column(&self, _schema_name: &str, column: ColumnWalker<'_>, _add_fk_prefix: bool) -> String {
         let column_name = self.quote(column.name());
         let tpe_str = render_column_type(column.column_type());
         let nullability_str = render_nullability(&column);
@@ -80,6 +79,52 @@ impl SqlRenderer for SqliteFlavour {
         Vec::new()
     }
 
+    fn render_create_table(&self, table: &TableWalker<'_>, schema_name: &str) -> anyhow::Result<String> {
+        use std::fmt::Write;
+
+        let columns: String = table
+            .columns()
+            .map(|column| self.render_column(&schema_name, column, false))
+            .join(",\n");
+
+        let primary_key_is_already_set = columns.contains("PRIMARY KEY");
+        let primary_columns = table.table.primary_key_columns();
+
+        let primary_key = if !primary_columns.is_empty() && !primary_key_is_already_set {
+            let column_names = primary_columns.iter().map(|col| self.quote(&col)).join(",");
+            format!(",\nPRIMARY KEY ({})", column_names)
+        } else {
+            String::new()
+        };
+
+        let foreign_keys = if !table.table.foreign_keys.is_empty() {
+            let mut fks = table.table.foreign_keys.iter().peekable();
+            let mut rendered_fks = String::new();
+
+            while let Some(fk) = fks.next() {
+                writeln!(
+                    rendered_fks,
+                    "FOREIGN KEY ({constrained_columns}) {references}{comma}",
+                    constrained_columns = fk.columns.iter().map(|col| format!(r#""{}""#, col)).join(","),
+                    references = self.render_references(&schema_name, fk),
+                    comma = if fks.peek().is_some() { ",\n" } else { "" },
+                )?;
+            }
+
+            format!(",\n{fks}", fks = rendered_fks)
+        } else {
+            String::new()
+        };
+
+        Ok(format!(
+            "CREATE TABLE {table_name} (\n{columns}{foreign_keys}{primary_key}\n)",
+            table_name = self.quote_with_schema(&schema_name, table.name()),
+            columns = columns,
+            foreign_keys = foreign_keys,
+            primary_key = primary_key,
+        ))
+    }
+
     fn render_drop_enum(&self, _drop_enum: &crate::DropEnum) -> Vec<String> {
         Vec::new()
     }
@@ -101,8 +146,8 @@ impl SqlRenderer for SqliteFlavour {
             let differ = TableDiffer {
                 database_info,
                 flavour: self,
-                previous: differ.previous.table_ref(table).expect(""),
-                next: differ.next.table_ref(table).expect(""),
+                previous: differ.previous.table_walker(table).expect(""),
+                next: differ.next.table_walker(table).expect(""),
             };
 
             let name_of_temporary_table = format!("new_{}", &differ.next.name());
@@ -110,14 +155,14 @@ impl SqlRenderer for SqliteFlavour {
             temporary_table.name = name_of_temporary_table.clone();
 
             // This is a hack, just to be able to render the CREATE TABLE.
-            let temporary_table = TableRef {
+            let temporary_table = TableWalker {
                 schema: differ.next.schema,
                 table: &temporary_table,
             };
 
             // TODO start transaction now. Unclear if we really want to do that.
             result.push(
-                self.render_create_table(&temporary_table, schema_name, sql_family)
+                self.render_create_table(&temporary_table, schema_name)
                     .expect("render_create_table"),
             );
 

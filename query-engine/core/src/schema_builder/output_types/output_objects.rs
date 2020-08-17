@@ -127,16 +127,14 @@ pub(crate) fn aggregation_object_type(ctx: &mut BuilderContext, model: &ModelRef
     let object = ObjectTypeStrongRef::new(ObjectType::new(&name, Some(ModelRef::clone(model))));
     let mut fields = vec![count_field()];
 
-    if feature_flags::get().aggregations {
-        append_opt(
-            &mut fields,
-            numeric_aggregation_field(ctx, "avg", &model, Some(OutputType::float())),
-        );
+    append_opt(
+        &mut fields,
+        numeric_aggregation_field(ctx, "avg", &model, Some(OutputType::float())),
+    );
 
-        append_opt(&mut fields, numeric_aggregation_field(ctx, "sum", &model, None));
-        append_opt(&mut fields, numeric_aggregation_field(ctx, "min", &model, None));
-        append_opt(&mut fields, numeric_aggregation_field(ctx, "max", &model, None));
-    }
+    append_opt(&mut fields, numeric_aggregation_field(ctx, "sum", &model, None));
+    append_opt(&mut fields, numeric_aggregation_field(ctx, "min", &model, None));
+    append_opt(&mut fields, numeric_aggregation_field(ctx, "max", &model, None));
 
     object.set_fields(fields);
     ctx.cache_output_type(name, ObjectTypeStrongRef::clone(&object));

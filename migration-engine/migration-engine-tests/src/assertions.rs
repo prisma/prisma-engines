@@ -122,6 +122,22 @@ impl<'a> EnumAssertion<'a> {
 pub struct TableAssertion<'a>(&'a Table);
 
 impl<'a> TableAssertion<'a> {
+    pub fn assert_column_count(self, n: usize) -> AssertionResult<Self> {
+        let columns_count = self.0.columns.len();
+
+        anyhow::ensure!(
+            columns_count == n,
+            anyhow::anyhow!(
+                "Assertion failed. Expected {n} columns, found {columns_count}. {columns:#?}",
+                n = n,
+                columns_count = columns_count,
+                columns = &self.0.columns,
+            )
+        );
+
+        Ok(self)
+    }
+
     pub fn assert_foreign_keys_count(self, n: usize) -> AssertionResult<Self> {
         let fk_count = self.0.foreign_keys.len();
         anyhow::ensure!(

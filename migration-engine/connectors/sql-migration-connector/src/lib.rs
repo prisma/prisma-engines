@@ -14,7 +14,6 @@ mod sql_migration_persistence;
 mod sql_renderer;
 mod sql_schema_calculator;
 mod sql_schema_differ;
-mod sql_schema_helpers;
 
 pub use error::*;
 pub use sql_migration::*;
@@ -35,7 +34,6 @@ use sql_destructive_change_checker::*;
 use sql_migration_persistence::*;
 use sql_schema_describer::SqlSchema;
 use std::{sync::Arc, time::Duration};
-use tracing::debug;
 
 const CONNECTION_TIMEOUT: Duration = Duration::from_secs(10);
 
@@ -66,42 +64,11 @@ impl SqlMigrationConnector {
     }
 
     async fn drop_database(&self) -> ConnectorResult<()> {
-        use quaint::ast::Value;
-
-        catch(self.database_info.connection_info(), async {
-            match &self.database_info.connection_info() {
-                ConnectionInfo::Postgres(_) => {
-                    let sql_str = format!(r#"DROP SCHEMA "{}" CASCADE;"#, self.schema_name());
-                    debug!("{}", sql_str);
-
-                    self.conn().raw_cmd(&sql_str).await.ok();
-                }
-                ConnectionInfo::Sqlite { file_path, .. } => {
-                    self.conn()
-                        .query_raw("DETACH DATABASE ?", &[Value::from(self.schema_name())])
-                        .await
-                        .ok();
-                    std::fs::remove_file(file_path).ok(); // ignore potential errors
-                    self.conn()
-                        .query_raw(
-                            "ATTACH DATABASE ? AS ?",
-                            &[Value::from(file_path.as_str()), Value::from(self.schema_name())],
-                        )
-                        .await?;
-                }
-                ConnectionInfo::Mysql(_) => {
-                    let sql_str = format!(r#"DROP SCHEMA `{}`;"#, self.schema_name());
-                    debug!("{}", sql_str);
-                    self.conn().raw_cmd(&sql_str).await?;
-                }
-                ConnectionInfo::Mssql(_) => todo!("Greetings from Redmond"),
-            };
-
-            Ok(())
-        })
-        .await?;
-
-        Ok(())
+        catch(
+            self.database_info().connection_info(),
+            self.flavour().drop_database(self.conn(), self.schema_name()),
+        )
+        .await
     }
 
     async fn describe_schema(&self) -> SqlResult<SqlSchema> {

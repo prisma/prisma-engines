@@ -42,16 +42,15 @@ class RelationFilterOrderingSpec extends FlatSpec with Matchers with ApiSpecBase
   "Using relational filters" should "return items in the specified order" in {
     datamodels.testV11 { project =>
       server.query(s"""mutation {createLabel(data: {text: "x"}) {text }}""", project)
-
       server.query(s"""mutation {createBlog(data: {title: "blog_1", score: 10,labels: {connect: {text: "x"}}}) {title}}""", project)
       server.query(s"""mutation {createBlog(data: {title: "blog_1", score: 20,labels: {connect: {text: "x"}}}) {title}}""", project)
       server.query(s"""mutation {createBlog(data: {title: "blog_1", score: 30,labels: {connect: {text: "x"}}}) {title}}""", project)
 
-      val res1 = server.query("""query {blogs(take: 2, orderBy: { score: desc }) {title, score}}""", project)
-
+      val res1 = server.query("""query { blogs(take: 2, orderBy: { score: desc }) { title, score }}""", project)
       res1.toString should be("""{"data":{"blogs":[{"title":"blog_1","score":30},{"title":"blog_1","score":20}]}}""")
 
-      val res2 = server.query("""query {blogs (take: 2, orderBy: { score: desc }, where:{labels_some: {text: "x"}}) {title, score}}""", project)
+      val res2 =
+        server.query("""query { blogs (take: 2, orderBy: { score: desc }, where:{ labels: { some: { text: { equals: "x" }}}}) { title, score }}""", project)
       res2.toString should be("""{"data":{"blogs":[{"title":"blog_1","score":30},{"title":"blog_1","score":20}]}}""")
 
     }

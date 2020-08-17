@@ -104,23 +104,21 @@ pub(crate) fn many_records_arguments(ctx: &mut BuilderContext, model: &ModelRef)
         argument("skip", InputType::opt(InputType::int()), None),
     ];
 
-    if feature_flags::get().distinct {
-        let enum_type = Arc::new(EnumType::FieldRef(FieldRefEnumType {
-            name: format!("{}DistinctFieldEnum", capitalize(&model.name)),
-            values: model
-                .fields()
-                .scalar()
-                .into_iter()
-                .map(|field| (field.name.clone(), field))
-                .collect(),
-        }));
+    let enum_type = Arc::new(EnumType::FieldRef(FieldRefEnumType {
+        name: format!("{}DistinctFieldEnum", capitalize(&model.name)),
+        values: model
+            .fields()
+            .scalar()
+            .into_iter()
+            .map(|field| (field.name.clone(), field))
+            .collect(),
+    }));
 
-        args.push(argument(
-            "distinct",
-            InputType::opt(InputType::list(InputType::Enum(enum_type))),
-            None,
-        ));
-    }
+    args.push(argument(
+        "distinct",
+        InputType::opt(InputType::list(InputType::Enum(enum_type))),
+        None,
+    ));
 
     args
 }

@@ -50,33 +50,33 @@ class FilterSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "Simple filter" should "work" in {
-    val filter = """(where: {name: "John"})"""
+    val filter = """(where: {name: { equals: "John" }})"""
 
     userUniques(filter) should be(Vector(4))
   }
 
   // todo Null and lists is weird
 
-  "Using _in with null" should "return all nodes with null for that field" in {
-    val filter = """(where: {optional_in: null})"""
+  "Using in with null" should "return all nodes with null for that field" in {
+    val filter = """(where: {optional: { in: null }})"""
 
     userUniques(filter) should be(Vector(1, 2, 3, 4))
   }
 
-  "Using _in with [null]" should "return all nodes with null for that field" ignore {
-    val filter = """(where: {optional_in: ["test", null]})"""
+  "Using in with [null]" should "return all nodes with null for that field" ignore {
+    val filter = """(where: {optional: { in: ["test", null] }})"""
 
     userUniques(filter) should be(Vector(1, 2, 3, 4))
   }
 
   "Relation Null filter" should "work" in {
-    val filter = "(where: { ride: null })"
+    val filter = "(where: { ride: { is: null }})"
 
     userUniques(filter) should be(Vector(4))
   }
 
   "AND filter" should "work" in {
-    val filter = """(where: {AND:[{unique_gt: 2},{name_starts_with: "P"}]})"""
+    val filter = """(where: {AND:[{unique: { gt: 2 }},{name: { startsWith: "P" }}]})"""
 
     userUniques(filter) should be(Vector())
   }
@@ -88,7 +88,7 @@ class FilterSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "OR filter" should "work" taggedAs (IgnoreMongo) in {
-    val filter = """(where: {OR:[{unique_gt: 2},{name_starts_with: "P"}]})"""
+    val filter = """(where: {OR:[{unique: { gt: 2 }},{name: { startsWith: "P" }}]})"""
 
     userUniques(filter) should be(Vector(1, 3, 4))
   }
@@ -106,37 +106,37 @@ class FilterSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "NOT filter" should "work" taggedAs (IgnoreMongo) in {
-    val filter = """(where: {NOT:{name_starts_with: "P"}})"""
+    val filter = """(where: {NOT:{name: { startsWith: "P" }}})"""
 
     userUniques(filter) should be(Vector(2, 3, 4))
   }
 
   "NOT filter" should "work as list" taggedAs (IgnoreMongo) in {
-    val filter = """(where: {NOT:[{name_contains: "e"},{unique:1}]})"""
+    val filter = """(where: { NOT:[{ name: { contains: "e" }},{unique: { equals: 1 }}]})"""
 
     userUniques(filter) should be(Vector(4))
   }
 
   "Nested filter" should "work" in {
-    val filter = """(where: {ride:{brand_starts_with: "P"}})"""
+    val filter = """(where: {ride:{ is: { brand: { startsWith: "P" }}}})"""
 
     userUniques(filter) should be(Vector(1))
   }
 
   "Starts with filter" should "work" in {
-    val filter = """(where: {name_starts_with: "P"})"""
+    val filter = """(where: {name: { startsWith: "P"}})"""
 
     userUniques(filter) should be(Vector(1))
   }
 
   "Contains filter" should "work" in {
-    val filter = """(where: {name_contains: "n"})"""
+    val filter = """(where: {name: { contains: "n" }})"""
 
     userUniques(filter) should be(Vector(2, 4))
   }
 
   "Greater than filter" should "work with floats" in {
-    val filter = """(where: {size_gt: 100.500000000001})"""
+    val filter = """(where: {size: { gt: 100.500000000001 }})"""
 
     lotUniques(filter) should be(Vector(1))
   }

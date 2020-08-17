@@ -71,8 +71,8 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    where: $parent1Id
          |    data:{
          |    childrenOpt: {updateMany: {
-         |        where: {c_contains:"c"}
-         |        data: {non_unique: "updated"}
+         |        where: { c: { contains:"c"} }
+         |        data: { non_unique: "updated" }
          |    }}
          |  }){
          |    childrenOpt {
@@ -106,8 +106,8 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    where: $parent1Id
          |    data:{
          |    childrenOpt: {updateMany: {
-         |        where: {c_contains:"c"}
-         |        data: {non_unique: "updated"}
+         |        where: { c: { contains:"c" } }
+         |        data: { non_unique: "updated" }
          |    }}
          |  }){
          |    childrenOpt {
@@ -141,7 +141,7 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    where: $parent1Id
          |    data:{
          |    childrenOpt: {updateMany: {
-         |        where: {c_contains:"c"}
+         |        where: {c: { contains:"c" } }
          |        data: {non_unique: "updated"}
          |    }}
          |  }){
@@ -177,11 +177,11 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    data:{
          |    childrenOpt: {updateMany: [
          |    {
-         |        where: {c_contains:"1"}
+         |        where: {c: { contains:"1" } }
          |        data: {non_unique: "updated1"}
          |    },
          |    {
-         |        where: {c_contains:"2"}
+         |        where: {c: { contains:"2" } }
          |        data: {non_unique: "updated2"}
          |    }
          |    ]}
@@ -255,11 +255,11 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    data:{
          |    childrenOpt: {updateMany: [
          |    {
-         |        where: {c_contains:"3"}
+         |        where: {c: { contains:"3" } }
          |        data: {non_unique: "updated3"}
          |    },
          |    {
-         |        where: {c_contains:"4"}
+         |        where: {c: { contains:"4" } }
          |        data: {non_unique: "updated4"}
          |    }
          |    ]}
@@ -298,11 +298,11 @@ class NestedUpdateManyMutationInsideUpdateSpec extends FlatSpec with Matchers wi
          |    data:{
          |    childrenOpt: {updateMany: [
          |    {
-         |        where: {c_contains:"c"}
+         |        where: {c: { contains:"c" } }
          |        data: {non_unique: "updated1"}
          |    },
          |    {
-         |        where: {c_contains:"c1"}
+         |        where: {c: { contains:"c1" } }
          |        data: {non_unique: "updated2"}
          |    }
          |    ]}

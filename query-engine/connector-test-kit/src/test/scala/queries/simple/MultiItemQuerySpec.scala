@@ -72,7 +72,7 @@ class MultiItemQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     server
       .query(
         s"""{
-           |  todoes(where: {title: "INVALID"}) {
+           |  todoes(where: {title: { equals: "INVALID" }}) {
            |    title
            |  }
            |}""".stripMargin,
@@ -83,7 +83,7 @@ class MultiItemQuerySpec extends FlatSpec with Matchers with ApiSpecBase {
     server
       .query(
         s"""{
-           |  todoes(where: {title: "${title}"}) {
+           |  todoes(where: {title: { equals: "${title}" }}) {
            |    title
            |  }
            |}""".stripMargin,

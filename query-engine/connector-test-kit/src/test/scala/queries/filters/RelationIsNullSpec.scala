@@ -70,7 +70,7 @@ class RelationIsNullSpec extends FlatSpec with Matchers with ApiSpecBase {
     server
       .query(
         query = """query {
-                  |  images(where: { message: null }) {
+                  |  images(where: { message: { is: null }}) {
                   |    imageName
                   |  }
                   |}""",
@@ -83,7 +83,7 @@ class RelationIsNullSpec extends FlatSpec with Matchers with ApiSpecBase {
     server
       .query(
         query = """query {
-                  |  messages(where: { image: null }) {
+                  |  messages(where: { image: { is: null }}) {
                   |    messageName
                   |  }
                   |}""",

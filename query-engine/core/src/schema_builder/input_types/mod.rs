@@ -1,5 +1,5 @@
 pub(crate) mod create_input_objects;
-pub(crate) mod filter_arguments;
+pub(crate) mod field_filter_types;
 pub(crate) mod filter_input_objects;
 pub(crate) mod input_fields;
 pub(crate) mod update_input_objects;
@@ -85,4 +85,8 @@ fn compound_object_name(alias: Option<&String>, from_fields: &[ScalarFieldRef]) 
         let field_names: Vec<String> = from_fields.iter().map(|field| capitalize(&field.name)).collect();
         field_names.join("")
     })
+}
+
+fn wrap_opt_input_object(o: InputObjectTypeWeakRef) -> InputType {
+    InputType::opt(InputType::object(o))
 }

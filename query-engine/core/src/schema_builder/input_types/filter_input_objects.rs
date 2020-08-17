@@ -27,10 +27,11 @@ pub(crate) fn scalar_filter_object_type(ctx: &mut BuilderContext, model: &ModelR
         ),
     ];
 
-    let fields: Vec<ScalarFieldRef> = model.fields().scalar();
-    let mut fields: Vec<InputField> = fields.iter().flat_map(|f| map_input_field(f)).collect();
+    input_fields.extend(model.fields().all.iter().filter_map(|f| match f {
+        ModelField::Scalar(_) => Some(input_fields::filter_input_field(ctx, f)),
+        ModelField::Relation(_) => None,
+    }));
 
-    input_fields.append(&mut fields);
     input_object.set_fields(input_fields);
 
     weak_ref
@@ -62,25 +63,13 @@ pub(crate) fn where_object_type(ctx: &mut BuilderContext, model: &ModelRef) -> I
         ),
     ];
 
-    let mut scalar_input_fields: Vec<InputField> = model
-        .fields()
-        .scalar()
-        .iter()
-        .map(|sf| map_input_field(sf))
-        .flatten()
-        .collect();
-
-    let mut relational_input_fields: Vec<InputField> = model
-        .fields()
-        .relation()
-        .iter()
-        .map(|rf| input_fields::map_relation_filter_input_field(ctx, rf))
-        .flatten()
-        .collect();
-
-    fields.append(&mut scalar_input_fields);
-    fields.append(&mut relational_input_fields);
-
+    fields.extend(
+        model
+            .fields()
+            .all
+            .iter()
+            .map(|f| input_fields::filter_input_field(ctx, f)),
+    );
     input_object.set_fields(fields);
     weak_ref
 }
@@ -165,26 +154,4 @@ fn compound_field_unique_object_type(
 
     input_object.set_fields(object_fields);
     Arc::downgrade(&input_object)
-}
-
-fn map_input_field(field: &ScalarFieldRef) -> Vec<InputField> {
-    filter_arguments::get_field_filters(&ModelField::Scalar(field.clone()))
-        .into_iter()
-        .map(|arg| {
-            let field_name = format!("{}{}", field.name, arg.suffix);
-            let mapped = map_required_input_type(&field);
-
-            if arg.is_list && field.is_required {
-                input_field(field_name, InputType::opt(InputType::list(mapped)), None)
-            } else if arg.is_list && !field.is_required {
-                input_field(
-                    field_name,
-                    InputType::opt(InputType::null(InputType::list(mapped))),
-                    None,
-                )
-            } else {
-                input_field(field_name, InputType::opt(mapped), None)
-            }
-        })
-        .collect()
 }

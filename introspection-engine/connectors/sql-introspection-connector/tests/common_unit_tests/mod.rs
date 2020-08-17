@@ -1,3 +1,4 @@
+use crate::test_harness::*;
 use datamodel::{
     dml, Datamodel, DefaultValue as DMLDefault, Field, FieldArity, FieldType, IndexDefinition, Model, OnDeleteStrategy,
     RelationField, RelationInfo, ScalarField, ScalarType, ValueGenerator,
@@ -7,6 +8,7 @@ use prisma_value::PrismaValue;
 use quaint::connector::SqlFamily;
 use sql_introspection_connector::calculate_datamodel::calculate_datamodel;
 use sql_schema_describer::*;
+use test_macros::test_each_connector;
 
 #[test]
 fn a_data_model_can_be_generated_from_a_schema() {
@@ -1097,4 +1099,107 @@ fn enums_are_preserved_when_generating_data_model_from_a_schema() {
         calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new(), false).expect("calculate data model");
 
     assert_eq!(introspection_result.data_model, ref_data_model);
+}
+
+#[test_each_connector]
+async fn one_to_many_relation_field_names_do_not_conflict_with_many_to_many_relation_field_names(
+    api: &TestApi,
+) -> TestResult {
+    let sql_family = api.sql_family();
+    api.barrel()
+        .execute(move |migration| {
+            if sql_family.is_mysql() {
+                migration.create_table("User", |table| {
+                    table.inject_custom("id INTEGER AUTO_INCREMENT PRIMARY KEY");
+                });
+
+                migration.create_table("Event", |table| {
+                    table.inject_custom("id INTEGER AUTO_INCREMENT PRIMARY KEY");
+                    table.inject_custom("`hostId` INTEGER NOT NULL, FOREIGN KEY (`hostId`) REFERENCES `User`(`id`)");
+                });
+
+                migration.create_table("_EventToUser", |table| {
+                    table.inject_custom("`A` INTEGER NOT NULL, FOREIGN KEY (`A`) REFERENCES `Event`(`id`)");
+                    table.inject_custom("`B` INTEGER NOT NULL, FOREIGN KEY (`B`) REFERENCES `User`(`id`)");
+
+                    table.add_index(
+                        "_EventToUser_AB_unique",
+                        barrel::types::index(vec!["A", "B"]).unique(true),
+                    );
+                    table.add_index("_EventToUser_B_index", barrel::types::index(vec!["B"]));
+                });
+            } else {
+                migration.create_table("User", |table| {
+                    table.add_column("id", barrel::types::primary().nullable(true));
+                });
+
+                migration.create_table("Event", |table| {
+                    table.add_column("id", barrel::types::primary().nullable(true));
+                    table.add_column("hostId", barrel::types::foreign("User", vec!["id".to_owned()]));
+                });
+
+                migration.create_table("_EventToUser", |table| {
+                    table.add_column("A", barrel::types::foreign("Event", vec!["id".to_owned()]));
+                    table.add_column("B", barrel::types::foreign("User", vec!["id".to_owned()]));
+
+                    table.add_index(
+                        "_EventToUser_AB_unique",
+                        barrel::types::index(vec!["A", "B"]).unique(true),
+                    );
+                    table.add_index("_EventToUser_B_index", barrel::types::index(vec!["B"]));
+                });
+            }
+        })
+        .await;
+
+    let schema = api.describe_schema().await?;
+
+    let expected_dm = if sql_family.is_mysql() {
+        r#"
+        model User {
+            id                      Int     @default(autoincrement()) @id
+            Event_EventToUser       Event[]
+            Event_EventToUserManyToMany  Event[] @relation("EventToUserManyToMany")
+        }
+
+        model Event {
+            id                      Int    @default(autoincrement()) @id
+            hostId                  Int
+            User_EventToUser        User   @relation(fields: [hostId], references: [id])
+            User_EventToUserManyToMany   User[] @relation("EventToUserManyToMany")
+
+            @@index([hostId], name: "hostId")
+        }
+        "#
+    } else {
+        r#"
+        model User {
+            id                      Int     @default(autoincrement()) @id
+            Event_EventToUser       Event[]
+            Event_EventToUserManyToMany  Event[] @relation("EventToUserManyToMany")
+        }
+
+        model Event {
+            id                      Int    @default(autoincrement()) @id
+            hostId                  Int
+            User_EventToUser        User   @relation(fields: [hostId], references: [id])
+            User_EventToUserManyToMany   User[] @relation("EventToUserManyToMany")
+        }
+        "#
+    };
+
+    // Align formatting
+    let expected_dm =
+        datamodel::render_datamodel_to_string(&datamodel::parse_datamodel(&expected_dm).unwrap()).unwrap();
+
+    let mut introspected_dm = calculate_datamodel(&schema, &SqlFamily::Postgres, &Datamodel::new(), false)?.data_model;
+    introspected_dm.models.sort_by(|a, b| b.name.cmp(&a.name));
+
+    let introspected_dm_string = datamodel::render_datamodel_to_string(&introspected_dm).unwrap();
+
+    println!("{}", introspected_dm_string);
+
+    assert_eq!(introspected_dm_string, expected_dm);
+
+    Ok(())
 }

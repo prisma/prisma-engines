@@ -83,22 +83,22 @@ fn common_prisma_m_to_n_relation_conditions(table: &Table) -> bool {
 //calculators
 
 pub fn calculate_many_to_many_field(
-    foreign_key: &ForeignKey,
+    opposite_foreign_key: &ForeignKey,
     relation_name: String,
     is_self_relation: bool,
 ) -> RelationField {
     let relation_info = RelationInfo {
         name: relation_name,
         fields: vec![],
-        to: foreign_key.referenced_table.clone(),
-        to_fields: foreign_key.referenced_columns.clone(),
+        to: opposite_foreign_key.referenced_table.clone(),
+        to_fields: opposite_foreign_key.referenced_columns.clone(),
         on_delete: OnDeleteStrategy::None,
     };
 
-    let basename = foreign_key.referenced_table.clone();
+    let basename = opposite_foreign_key.referenced_table.clone();
 
     let name = match is_self_relation {
-        true => format!("{}_{}", basename, foreign_key.columns[0]),
+        true => format!("{}_{}", basename, opposite_foreign_key.columns[0]),
         false => basename,
     };
 

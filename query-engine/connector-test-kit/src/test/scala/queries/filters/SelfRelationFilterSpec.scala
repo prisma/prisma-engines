@@ -65,8 +65,6 @@ class SelfRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
     }
   }
 
-  //All Queries run against the same data that is only set up once before all testcases
-
   override protected def beforeAll(): Unit = {
     super.beforeAll()
     database.setup(project)
@@ -74,51 +72,72 @@ class SelfRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "Filter Queries along self relations" should "succeed with one level " in {
-    val filterKurt = s"""query{songs (
-                                    where: {
-                                      creator: {
-                                          name: "kurt"
-                                            }
-                                        }
-                                      ) {
-                                        title
-                                      }
-                                    }""".stripMargin
+    val filterKurt =
+      s"""
+         |query {
+         |  songs(
+         |    where: {
+         |      creator: {
+         |        is: {
+         |          name: { equals: "kurt" }
+         |        }
+         |      }
+         |    }
+         |  ) {
+         |    title
+         |  }
+         |}
+       """.stripMargin
 
     server.query(filterKurt, project, dataContains = "{\"songs\":[{\"title\":\"My Girl\"},{\"title\":\"Gasag\"}]}")
   }
 
   "Filter Queries along self relations" should "succeed with two levels" in {
-
-    val filterFrances = s"""query{songs (
-                                    where: {
-                                      creator: {
-                                        daughters_some: {
-                                          name: "frances"
-                                            }
-                                          }
-                                        }
-                                      ) {
-                                        title
-                                      }
-                                    }""".stripMargin
+    val filterFrances =
+      s"""
+         |query {
+         |  songs(
+         |    where: {
+         |      creator: {
+         |        is: {
+         |          daughters: {
+         |            some: {
+         |              name: { equals: "frances" }
+         |            }
+         |          }
+         |        }
+         |      }
+         |    }
+         |  ) {
+         |    title
+         |  }
+         |}
+       """.stripMargin
 
     server.query(filterFrances, project, dataContains = "{\"songs\":[{\"title\":\"My Girl\"}]}")
   }
 
   "Filter Queries along OneToOne self relations" should "succeed with two levels 2" in {
-
-    val filterWife = s"""query{songs (where: {
-                                          creator :{
-                                              wife: {
-                                                    name: "yoko"
-                                                  }
-                                                }
-                                              }
-                                            ) {
-                                              title
-                                            }
-                                          }""".stripMargin
+    val filterWife =
+      s"""
+         |query {
+         |  songs(
+         |    where: {
+         |      creator: {
+         |        is: {
+         |          wife: {
+         |            is: {
+         |              name: { equals: "yoko" }
+         |            }
+         |          }
+         |        }
+         |      }
+         |    }
+         |  ) {
+         |    title
+         |  }
+         |}
+       """.stripMargin
 
     server.query(filterWife, project, dataContains = "{\"songs\":[{\"title\":\"Imagine\"}]}")
   }
@@ -127,7 +146,7 @@ class SelfRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
     val filterWifeNull =
       s"""
          |query {
-         |  songs(where: { creator: { wife: null } }) {
+         |  songs(where: { creator: { is: { wife: { is: null }}}}) {
          |    title
          |  }
          |}
@@ -137,164 +156,164 @@ class SelfRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
   }
 
   "Filter Queries along OneToOne self relations" should "succeed with {} filter" in {
-
-    val filterWifeNull = s"""query{songs (
-                                          where: {
-                                            creator: {
-                                              wife: {}
-                                                }
-                                              }
-                                            ) {
-                                              title
-                                            }
-                                          }""".stripMargin
+    val filterWifeNull =
+      s"""
+         |query {
+         |  songs(
+         |    where: {
+         |      creator: {
+         |        is: {
+         |          wife: { is: {} }
+         |        }
+         |      }
+         |    }
+         |  ) {
+         |    title
+         |  }
+         |}
+       """.stripMargin
 
     server.query(filterWifeNull, project, dataContains = "{\"songs\":[{\"title\":\"My Girl\"},{\"title\":\"Imagine\"}]}")
   }
 
   "Filter Queries along OneToMany self relations" should "fail with null filter" taggedAs (IgnoreMongo) in {
-    val filterDaughterNull = s"""query {
-       songs (
-          where: {
-            creator: {
-              daughters_none: null
-            }
-          }
-        ) {
-          title
-        }
-    }"""
+    val filterDaughterNull =
+      s"""
+         | query {
+         |   songs(
+         |     where: {
+         |       creator: {
+         |         is: {
+         |           daughters: { none: null }
+         |         }
+         |       }
+         |     }
+         |   ) {
+         |     title
+         |  }
+         |}
+       """.stripMargin
 
     server.queryThatMustFail(
       filterDaughterNull,
       project,
       errorCode = 2012,
-      errorContains = "Missing a required value at `Query.songs.where.SongWhereInput.creator.HumanWhereInput.daughters_none`"
+      errorContains =
+        "Missing a required value at `Query.songs.where.SongWhereInput.creator.HumanRelationFilter.is.HumanWhereInput.daughters.HumanListRelationFilter.none`"
     )
   }
 
   "Filter Queries along OneToMany self relations" should "succeed with empty filter {}" in {
-
-    val filterDaughter = s"""query{songs (
-                                          where: {
-                                            creator: {
-                                              daughters_some: {}
-                                                }
-                                              }
-                                            ) {
-                                              title
-                                            }
-                                          }""".stripMargin
+    val filterDaughter =
+      s"""
+         |query {
+         |  songs(
+         |    where: {
+         |      creator: {
+         |        is: {
+         |          daughters: { some: {} }
+         |        }
+         |      }
+         |    }
+         |  ) {
+         |    title
+         |  }
+         |}
+       """.stripMargin
 
     server.query(filterDaughter, project, dataContains = "{\"songs\":[{\"title\":\"My Girl\"}]}")
   }
 
-  //ManyToMany
+  // ManyToMany
 
-  "Filter Queries along ManyToMany self relations" should "succeed with valid filter _some" in {
-
-    val filterGroupies = s"""query{songs (
-                                          where: {
-                                            creator: {
-                                              fans_some: {
-                                                    name: "groupie1"
-                                                  }
-                                                }
-                                              },
-                                           orderBy: { id: asc }
-                                            ) {
-                                              title
-                                            }
-                                          }""".stripMargin
+  "Filter Queries along ManyToMany self relations" should "succeed with valid filter `some`" in {
+    val filterGroupies =
+      s"""
+         |query {
+         |  songs(
+         |    where: { creator: { is: { fans: { some: { name: { equals: "groupie1" }}}}}}
+         |    orderBy: { id: asc }
+         |  ) {
+         |    title
+         |  }
+         |}
+       """.stripMargin
 
     server.query(filterGroupies, project, dataContains = "{\"songs\":[{\"title\":\"My Girl\"},{\"title\":\"Imagine\"}]}")
   }
 
-  "Filter Queries along ManyToMany self relations" should "succeed with valid filter _none" taggedAs (IgnoreMongo) in {
-
-    val filterGroupies = s"""query{songs (
-                                          where: {
-                                            creator: {
-                                              fans_none: {
-                                                    name: "groupie1"
-                                                  }
-                                                }
-                                              }
-                                            ) {
-                                              title
-                                            }
-                                          }""".stripMargin
+  "Filter Queries along ManyToMany self relations" should "succeed with valid filter `none`" taggedAs (IgnoreMongo) in {
+    val filterGroupies =
+      s"""
+         |query {
+         |  songs(where: { creator: { is: { fans: { none: { name: { equals: "groupie1" }}}}}}) {
+         |    title
+         |  }
+         |}
+         |
+       """.stripMargin
 
     server.query(filterGroupies, project, dataContains = "{\"songs\":[{\"title\":\"Bicycle\"},{\"title\":\"Gasag\"}]}")
   }
 
-  "Filter Queries along ManyToMany self relations" should "succeed with valid filter _every" taggedAs (IgnoreMongo) in {
+  "Filter Queries along ManyToMany self relations" should "succeed with valid filter `every`" taggedAs (IgnoreMongo) in {
 
-    val filterGroupies = s"""query{songs (
-                                          where: {
-                                            creator: {
-                                              fans_every: {
-                                                    name: "groupie1"
-                                                  }
-                                                }
-                                              }
-                                            ) {
-                                              title
-                                            }
-                                          }""".stripMargin
+    val filterGroupies =
+      s"""
+         |query {
+         |  songs(where: { creator: { is: { fans: { every: { name: { equals: "groupie1" }}}}}}) {
+         |    title
+         |  }
+         |}
+       """.stripMargin
 
     server.query(filterGroupies, project, dataContains = "{\"songs\":[{\"title\":\"Imagine\"},{\"title\":\"Bicycle\"},{\"title\":\"Gasag\"}]}")
   }
 
   "Filter Queries along ManyToMany self relations" should "give an error with null" taggedAs (IgnoreMongo) in {
-    val filterGroupies = s"""
-       query {
-          songs (
-            where: {
-              creator: {
-                fans_every: {
-                      fans_some: null
-                    }
-                  }
-                }
-              ) {
-                title
-              }
-            }"""
+    val filterGroupies =
+      s"""
+         |query {
+         |  songs(
+         |    where: { creator: { is: { fans: { every: { fans: { some: null } } } } } }
+         |  ) {
+         |    title
+         |  }
+         |}
+       """.stripMargin
 
     server.queryThatMustFail(
       filterGroupies,
       project,
       errorCode = 2012,
-      errorContains = """Missing a required value at `Query.songs.where.SongWhereInput.creator.HumanWhereInput.fans_every.HumanWhereInput.fans_some`"""
+      errorContains =
+        """Missing a required value at `Query.songs.where.SongWhereInput.creator.HumanRelationFilter.is.HumanWhereInput.fans.HumanListRelationFilter.every.HumanWhereInput.fans.HumanListRelationFilter.some`"""
     )
   }
 
-  "Filter Queries along ManyToMany self relations" should "succeed with {} filter _some" in {
-
-    val filterGroupies = s"""query{songs (
-                                          where: {
-                                            creator: {
-                                              fans_some: {}
-                                                }
-                                              }
-                                            ) {
-                                              title
-                                            }
-                                          }""".stripMargin
+  "Filter Queries along ManyToMany self relations" should "succeed with {} filter `some`" in {
+    val filterGroupies =
+      s"""
+         |query {
+         |  songs(where: { creator: { is: { fans: { some: {} } } } }) {
+         |    title
+         |  }
+         |}
+         |
+       """.stripMargin
 
     server.query(filterGroupies, project, dataContains = "{\"songs\":[{\"title\":\"My Girl\"},{\"title\":\"Imagine\"}]}")
   }
 
-  "Filter Queries along ManyToMany self relations" should "succeed with {} filter _none" taggedAs (IgnoreMongo) in {
-
-    val filterGroupies = s"""query{humans(
-                                          where: {fans_none: {}},
-                                           orderBy: { id: asc }
-                                            ) {
-                                              name
-                                            }
-                                          }""".stripMargin
+  "Filter Queries along ManyToMany self relations" should "succeed with {} filter `none`" taggedAs (IgnoreMongo) in {
+    val filterGroupies =
+      s"""
+         |query {
+         |  humans(where: { fans: { none: {} } }, orderBy: { id: asc }) {
+         |    name
+         |  }
+         |}
+       """.stripMargin
 
     server.query(
       filterGroupies,
@@ -304,14 +323,15 @@ class SelfRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
     )
   }
 
-  "Filter Queries along ManyToMany self relations" should "succeed with {} filter _every" taggedAs (IgnoreMongo) in {
-    val filterGroupies = s"""query{humans(
-                                          where: {fans_every: {}},
-                                           orderBy: { id: asc }
-                                            ) {
-                                              name
-                                            }
-                                          }""".stripMargin
+  "Filter Queries along ManyToMany self relations" should "succeed with {} filter `every`" taggedAs (IgnoreMongo) in {
+    val filterGroupies =
+      s"""
+         |query {
+         |  humans(where: { fans: { every: {} } }, orderBy: { id: asc }) {
+         |    name
+         |  }
+         |}
+       """.stripMargin
 
     server.query(
       filterGroupies,
@@ -321,44 +341,44 @@ class SelfRelationFilterSpec extends FlatSpec with Matchers with ApiSpecBase {
     )
   }
 
-  //Many to one
+  // Many to one
 
   "Filter Queries along ManyToOne self relations" should "succeed valid filter" in {
-    val filterSingers = s"""query{humans(
-                                          where: {singer:{
-                                                     name: "kurt"
-                                                  }
-                                                }
-                                            ) {
-                                              name
-                                            }
-                                          }""".stripMargin
+    val filterSingers =
+      s"""
+         |query {
+         |  humans(where: { singer: { is: { name: { equals: "kurt" } } } }) {
+         |    name
+         |  }
+         |}
+       """.stripMargin
 
     server.query(filterSingers, project, dataContains = "{\"humans\":[{\"name\":\"dave\"}]}")
   }
 
   "Filter Queries along ManyToOne self relations" should "succeed with {} filter" in {
-
-    val filterSingers = s"""query{humans(
-                                          where: {singer:{}},
-                                           orderBy: { id: asc }
-                                            ) {
-                                              name
-                                            }
-                                          }""".stripMargin
+    val filterSingers =
+      s"""
+         |query {
+         |  humans(where: { singer: { is: {} } }, orderBy: { id: asc }) {
+         |    name
+         |  }
+         |}
+       """.stripMargin
 
     server.query(filterSingers, project, dataContains = "{\"humans\":[{\"name\":\"paul\"},{\"name\":\"dave\"}]}")
   }
 
   "Filter Queries along ManyToOne self relations" should "succeed with null filter" in {
 
-    val filterSingers = s"""query{humans(
-                                          where: {singer: null},
-                                           orderBy: { id: asc }
-                                            ) {
-                                              name
-                                            }
-                                          }""".stripMargin
+    val filterSingers =
+      s"""
+         |query {
+         |  humans(where: { singer: { is: null } }, orderBy: { id: asc }) {
+         |    name
+         |  }
+         |}
+       """.stripMargin
 
     server.query(
       filterSingers,

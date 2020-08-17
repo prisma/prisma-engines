@@ -242,7 +242,10 @@ impl<'a> From<In<'a>> for QueryValue {
             }
             SelectionSet::Single(key, vals) => {
                 let mut argument = IndexMap::new();
-                argument.insert(format!("{}_in", key), QueryValue::List(vals));
+                argument.insert(
+                    key.to_string(),
+                    QueryValue::Object(vec![("in".to_owned(), QueryValue::List(vals))].into_iter().collect()),
+                );
 
                 QueryValue::Object(argument)
             }
@@ -303,7 +306,7 @@ impl From<Conjuctive> for QueryValue {
     fn from(conjuctive: Conjuctive) -> Self {
         match conjuctive {
             Conjuctive::None => Self::Null,
-            Conjuctive::Single(obj) => QueryValue::Object(obj),
+            Conjuctive::Single(obj) => QueryValue::Object(single_to_multi_filter(obj)), // QueryValue::Object(obj),
             Conjuctive::Or(conjuctives) => {
                 let conditions: Vec<QueryValue> = conjuctives.into_iter().map(QueryValue::from).collect();
 
@@ -322,4 +325,16 @@ impl From<Conjuctive> for QueryValue {
             }
         }
     }
+}
+
+/// Syntax for single-record and multi-record queries
+fn single_to_multi_filter(obj: IndexMap<String, QueryValue>) -> IndexMap<String, QueryValue> {
+    let mut new_obj = IndexMap::new();
+
+    for (key, value) in obj {
+        let equality_obj = IndexMap::from(vec![("equals".to_owned(), value)].into_iter().collect());
+        new_obj.insert(key, QueryValue::Object(equality_obj));
+    }
+
+    new_obj
 }

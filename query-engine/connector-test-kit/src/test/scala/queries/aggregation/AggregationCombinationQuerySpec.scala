@@ -196,7 +196,7 @@ class AggregationCombinationQuerySpec extends FlatSpec with Matchers with ApiSpe
 
     result = server.query(
       """{
-        |  aggregateItem(where: { id_gt: "2" }) {
+        |  aggregateItem(where: { id: { gt: "2" }}) {
         |    count
         |    sum {
         |      float

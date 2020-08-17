@@ -148,7 +148,7 @@ impl From<Vec<Operation>> for CompactedDocument {
                 }
             });
 
-            // We must select all unique fields in the query so later on we can
+            // We must select all unique fields in the query so we can
             // match the right response back to the right request later on.
             for key in selection_set.keys() {
                 if !builder.contains_nested_selection(key) {

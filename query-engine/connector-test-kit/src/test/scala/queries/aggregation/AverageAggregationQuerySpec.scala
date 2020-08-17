@@ -128,7 +128,7 @@ class AverageAggregationQuerySpec extends FlatSpec with Matchers with ApiSpecBas
 
     result = server.query(
       """{
-        |  aggregateItem(where: { id_gt: "2" }) {
+        |  aggregateItem(where: { id: { gt: "2" }}) {
         |    avg {
         |      float
         |      int
