@@ -1,3 +1,4 @@
+use crate::configuration::preview_features::PreviewFeatures;
 use datamodel_connector::Connector;
 use serde::Serialize;
 
@@ -23,29 +24,32 @@ impl Datasource {
     }
 }
 
-pub trait DatasourcePreviewFeatures {
-    fn has_preview_feature(&self, feature: &str) -> bool;
-}
-
-impl DatasourcePreviewFeatures for Datasource {
-    fn has_preview_feature(&self, feature: &str) -> bool {
-        self.preview_features.contains(&feature.to_string())
-    }
-}
-
-impl DatasourcePreviewFeatures for Option<&Datasource> {
-    fn has_preview_feature(&self, feature: &str) -> bool {
-        match self {
-            Some(dat) => dat.has_preview_feature(feature),
-            None => false,
-        }
-    }
-}
-
 #[serde(rename_all = "camelCase")]
 #[derive(Clone, Debug, Serialize, PartialEq)]
 pub struct StringFromEnvVar {
     /// contains the name of env var if the value was read from one
     pub from_env_var: Option<String>,
     pub value: String,
+}
+
+impl PreviewFeatures for Datasource {
+    fn preview_features(&self) -> &Vec<String> {
+        &self.preview_features
+    }
+}
+
+impl PreviewFeatures for Option<&Datasource> {
+    fn preview_features(&self) -> &Vec<String> {
+        match self {
+            Some(dat) => &dat.preview_features,
+            _ => panic!(""),
+        }
+    }
+
+    fn has_preview_feature(&self, feature: &str) -> bool {
+        match self {
+            Some(dat) => dat.has_preview_feature(feature),
+            None => false,
+        }
+    }
 }

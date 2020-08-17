@@ -1,9 +1,10 @@
 use super::super::directives::AllDirectives;
+use crate::preview_features::PreviewFeatures;
 use crate::transform::helpers::ValueValidator;
 use crate::{
     ast, configuration, dml,
     error::{DatamodelError, ErrorCollection},
-    DatasourcePreviewFeatures, Field, FieldType, ScalarType,
+    Field, FieldType, ScalarType,
 };
 use datamodel_connector::error::ConnectorError;
 use datamodel_connector::Connector;
@@ -213,23 +214,25 @@ impl<'a> LiftAstToDml<'a> {
 
                 let prefix = format!("{}{}", datasource_name, ".");
 
-                let mut type_specifications = ast_field
+                let type_specifications = ast_field
                     .directives
                     .iter()
-                    .filter(|dir| dir.name.name.starts_with(&prefix));
+                    .filter(|dir| dir.name.name.starts_with(&prefix))
+                    .collect_vec();
 
-                if type_specifications.count() > 1 {
+                if type_specifications.len() > 1 {
                     return Err(DatamodelError::new_duplicate_directive_error(
                         &prefix,
-                        type_specifications.next().unwrap().span,
+                        type_specifications.first().unwrap().span,
                     ));
                 }
 
-                let type_specification = type_specifications.next();
-                let name = type_specification.map(|dir| dir.name.name.trim_start_matches(&prefix));
+                let name = type_specifications
+                    .first()
+                    .map(|dir| dir.name.name.trim_start_matches(&prefix));
 
                 // convert arguments to u32 if possible
-                let number_args = type_specification.map(|dir| dir.arguments.clone());
+                let number_args = type_specifications.first().map(|dir| dir.arguments.clone());
                 let args = if let Some(number) = number_args {
                     let p = number
                         .iter()
@@ -248,7 +251,7 @@ impl<'a> LiftAstToDml<'a> {
                     if constructor.is_none() {
                         return Err(DatamodelError::new_connector_error(
                             &ConnectorError::new_type_name_unknown_error(x, connector_string).to_string(),
-                            type_specification.unwrap().span,
+                            type_specifications.first().unwrap().span,
                         ));
                     }
 
@@ -266,7 +269,7 @@ impl<'a> LiftAstToDml<'a> {
                             x,
                             native_type_constructor._number_of_args,
                             length,
-                            type_specification.unwrap().span,
+                            type_specifications.first().unwrap().span,
                         ));
                     }
 
@@ -280,7 +283,7 @@ impl<'a> LiftAstToDml<'a> {
                                 compatable_prisma_scalar_type,
                             )
                             .to_string(),
-                            type_specification.unwrap().span,
+                            type_specifications.first().unwrap().span,
                         ));
                     }
 
@@ -288,7 +291,7 @@ impl<'a> LiftAstToDml<'a> {
                     if parse_native_type_result.is_err() {
                         return Err(DatamodelError::new_connector_error(
                             &parse_native_type_result.err().unwrap().to_string(),
-                            type_specification.unwrap().span,
+                            type_specifications.first().unwrap().span,
                         ));
                     }
                     let field_type = dml::FieldType::NativeType(scalar_type, parse_native_type_result.unwrap());

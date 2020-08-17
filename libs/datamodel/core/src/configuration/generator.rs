@@ -1,3 +1,4 @@
+use crate::configuration::preview_features::PreviewFeatures;
 use serde::Serialize;
 use std::collections::HashMap;
 
@@ -16,17 +17,19 @@ pub struct Generator {
     pub documentation: Option<String>,
 }
 
-pub trait PreviewFeatures {
-    fn has_preview_feature(&self, feature: &str) -> bool;
-}
-
 impl PreviewFeatures for Generator {
-    fn has_preview_feature(&self, feature: &str) -> bool {
-        self.preview_features.contains(&feature.to_string())
+    fn preview_features(&self) -> &Vec<String> {
+        &self.preview_features
     }
 }
 
 impl PreviewFeatures for Option<&Generator> {
+    fn preview_features(&self) -> &Vec<String> {
+        match self {
+            Some(dat) => &dat.preview_features,
+            _ => panic!(""),
+        }
+    }
     fn has_preview_feature(&self, feature: &str) -> bool {
         match self {
             Some(gen) => gen.has_preview_feature(feature),
