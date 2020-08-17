@@ -197,7 +197,7 @@ impl<'a> LiftAstToDml<'a> {
 
         let (supports_native_types, datasource_name) = match self.source {
             Some(source) => (source.has_preview_feature("nativeTypes"), source.name.as_str()),
-            _ => panic!(""),
+            _ => (false, ""),
         };
 
         if let Ok(scalar_type) = ScalarType::from_str(type_name) {
