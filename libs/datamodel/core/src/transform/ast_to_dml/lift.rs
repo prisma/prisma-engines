@@ -193,13 +193,8 @@ impl<'a> LiftAstToDml<'a> {
     ) -> Result<(dml::FieldType, Vec<ast::Directive>), DatamodelError> {
         let type_name = &ast_field.field_type.name;
 
-        let mut supports_native_types = false;
-        let mut datasource_name = "";
-        match self.source {
-            Some(source) => {
-                supports_native_types = source.has_preview_feature("nativeTypes");
-                datasource_name = source.name.as_str();
-            }
+        let (supports_native_types, datasource_name) = match self.source {
+            Some(source) => (source.has_preview_feature("nativeTypes"), source.name.as_str()),
             _ => {}
         };
 
