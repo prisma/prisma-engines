@@ -218,15 +218,14 @@ impl<'a> LiftAstToDml<'a> {
                     .iter()
                     .filter(|dir| dir.name.name.starts_with(&prefix));
 
-                let type_specification = type_specifications.next();
-
                 if type_specifications.count() > 1 {
                     return Err(DatamodelError::new_duplicate_directive_error(
                         &prefix,
-                        type_specification.unwrap().span,
+                        type_specifications.next().unwrap().span,
                     ));
                 }
 
+                let type_specification = type_specifications.next();
                 let name = type_specification.map(|dir| dir.name.name.trim_start_matches(&prefix));
 
                 // convert arguments to u32 if possible
