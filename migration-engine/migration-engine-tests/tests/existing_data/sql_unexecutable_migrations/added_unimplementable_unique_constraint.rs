@@ -39,13 +39,24 @@ async fn adding_a_unique_constraint_should_warn(api: &TestApi) -> TestResult {
         .assert_warnings(&["The migration will add a unique constraint covering the columns `[name]` on the table `Test`. If there are existing duplicate values, the migration will fail.".into()])?;
 
     let rows = api.select("Test").column("id").column("name").send_debug().await?;
-    assert_eq!(
-        rows,
-        &[
-            &[r#"Text("abc")"#, r#"Text("george")"#],
-            &[r#"Text("def")"#, r#"Text("george")"#]
-        ]
-    );
+
+    if api.is_mysql() {
+        assert_eq!(
+            rows,
+            &[
+                &[r#"Text(Some("abc"))"#, r#"Text(Some("george"))"#],
+                &[r#"Text(Some("def"))"#, r#"Text(Some("george"))"#]
+            ]
+        );
+    } else {
+        assert_eq!(
+            rows,
+            &[
+                &[r#"Text(Some("abc"))"#, r#"Text(Some("george"))"#],
+                &[r#"Text(Some("def"))"#, r#"Text(Some("george"))"#]
+            ]
+        );
+    }
 
     Ok(())
 }
@@ -154,7 +165,11 @@ async fn adding_a_unique_constraint_when_existing_data_respects_it_works(api: &T
         }
     "#;
 
-    api.infer_apply(&dm2).send().await?.assert_green()?;
+    api.infer_apply(&dm2)
+        .force(Some(true))
+        .send()
+        .await?
+        .assert_warnings(&["The migration will add a unique constraint covering the columns `[name]` on the table `Test`. If there are existing duplicate values, the migration will fail.".into()])?;
 
     let rows = api.select("Test").column("id").column("name").send_debug().await?;
     assert_eq!(

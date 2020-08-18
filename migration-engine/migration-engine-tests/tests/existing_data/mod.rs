@@ -910,11 +910,18 @@ async fn enum_variants_can_be_dropped_without_data_loss(api: &TestApi) -> TestRe
         }
     "#;
 
-    api.infer_apply(dm2)
+    let res = api
+        .infer_apply(dm2)
         .migration_id(Some("add-absolutely-fabulous-variant"))
+        .force(Some(true))
         .send()
-        .await?
-        .assert_green()?;
+        .await?;
+
+    if api.sql_family().is_mysql() {
+        res.assert_warnings(&["The migration will remove the values [OUTRAGED] on the enum `Cat_mood`. If these variants are still used in the database, the migration will fail.".into(), "The migration will remove the values [OUTRAGED] on the enum `Human_mood`. If these variants are still used in the database, the migration will fail.".into()])?;
+    } else {
+        res.assert_warnings(&["The migration will remove the values [OUTRAGED] on the enum `Mood`. If these variants are still used in the database, the migration will fail.".into()])?;
+    }
 
     // Assertions
     {
