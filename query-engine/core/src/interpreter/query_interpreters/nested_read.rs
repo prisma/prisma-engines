@@ -121,46 +121,51 @@ pub async fn one2m<'a, 'b>(
         }
     };
 
+    println!("{:?}", joined_projections);
+
     // Maps the identifying link values to all primary IDs they are tied to.
     // Only the values are hashed for easier comparison.
     let mut link_mapping: HashMap<Vec<PrismaValue>, Vec<RecordProjection>> = HashMap::new();
     let idents = vec![parent_model_id, parent_link_id];
     let mut uniq_projections = Vec::new();
 
-    for projection in joined_projections {
-        let mut split = projection.split_into(&idents);
-        let link_id = split.pop().unwrap();
-        let id = split.pop().unwrap();
-        let link_values: Vec<PrismaValue> = link_id.pairs.into_iter().map(|(_, v)| v).collect();
+    let mut scalars = if !joined_projections.is_empty() {
+        for projection in joined_projections {
+            let mut split = projection.split_into(&idents);
+            let link_id = split.pop().unwrap();
+            let id = split.pop().unwrap();
+            let link_values: Vec<PrismaValue> = link_id.pairs.into_iter().map(|(_, v)| v).collect();
 
-        match link_mapping.get_mut(&link_values) {
-            Some(records) => records.push(id),
-            None => {
-                let mut ids = Vec::new();
+            match link_mapping.get_mut(&link_values) {
+                Some(records) => records.push(id),
+                None => {
+                    let mut ids = Vec::new();
 
-                ids.push(id);
-                uniq_projections.push(link_values.clone());
-                link_mapping.insert(link_values, ids);
+                    ids.push(id);
+                    uniq_projections.push(link_values.clone());
+                    link_mapping.insert(link_values, ids);
+                }
             }
         }
-    }
 
-    let uniq_projections = uniq_projections
-        .into_iter()
-        .filter(|p| !p.iter().any(|v| v.is_null()))
-        .collect();
+        let uniq_projections = uniq_projections
+            .into_iter()
+            .filter(|p| !p.iter().any(|v| v.is_null()))
+            .collect();
 
-    let filter = child_link_id.is_in(uniq_projections);
-    let mut args = query_args;
+        let filter = child_link_id.is_in(uniq_projections);
+        let mut args = query_args;
 
-    args.filter = match args.filter {
-        Some(existing_filter) => Some(Filter::and(vec![existing_filter, filter])),
-        None => Some(filter),
+        args.filter = match args.filter {
+            Some(existing_filter) => Some(Filter::and(vec![existing_filter, filter])),
+            None => Some(filter),
+        };
+
+        tx.get_many_records(&parent_field.related_model(), args, selected_fields)
+            .await?
+    } else {
+        ManyRecords::new(selected_fields.names().map(|n| n.to_string()).collect())
     };
-
-    let mut scalars = tx
-        .get_many_records(&parent_field.related_model(), args, selected_fields)
-        .await?;
 
     // Inlining is done on the parent, this means that we need to write the primary parent ID
     // into the child records that we retrieved. The matching is done based on the parent link values.
