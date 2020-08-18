@@ -40,7 +40,7 @@ pub enum ErrorKind {
     },
 
     #[error(
-        "Native type {} takes {} arguments, but found {}.",
+        "Native type {} takes {} arguments, but received {}.",
         native_type,
         required_count,
         given_count

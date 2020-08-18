@@ -9,6 +9,10 @@ pub enum ScalarType {
     String,
     DateTime,
     Json,
+    XML,
+    Bytes,
+    Decimal,
+    Duration,
 }
 
 impl ScalarType {
@@ -20,6 +24,10 @@ impl ScalarType {
             "String" => Ok(ScalarType::String),
             "DateTime" => Ok(ScalarType::DateTime),
             "Json" => Ok(ScalarType::Json),
+            "XML" => Ok(ScalarType::XML),
+            "Bytes" => Ok(ScalarType::Bytes),
+            "Decimal" => Ok(ScalarType::Decimal),
+            "Duration" => Ok(ScalarType::Duration),
             _ => Err(format!("type {} is not a known scalar type.", s)),
         }
     }
@@ -34,6 +42,10 @@ impl ToString for ScalarType {
             ScalarType::String => String::from("String"),
             ScalarType::DateTime => String::from("DateTime"),
             ScalarType::Json => String::from("Json"),
+            ScalarType::XML => String::from("XML"),
+            ScalarType::Bytes => String::from("Bytes"),
+            ScalarType::Decimal => String::from("Decimal"),
+            ScalarType::Duration => String::from("Duration"),
         }
     }
 }

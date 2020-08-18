@@ -1,3 +1,4 @@
+use core::num::flt2dec::Part::Num;
 use core::option::Option::Some;
 use datamodel_connector::error::{ConnectorError, ErrorKind};
 use datamodel_connector::scalars::ScalarType;
@@ -9,19 +10,19 @@ const SMALL_INT_TYPE_NAME: &str = "SmallInt";
 const TINY_INT_TYPE_NAME: &str = "TinyInt";
 const MEDIUM_INT_TYPE_NAME: &str = "MediumInt";
 const BIG_INT_TYPE_NAME: &str = "BigInt";
-// const DECIMAL_TYPE_NAME: &str = "Decimal";
-// const NUMERIC_TYPE_NAME: &str = "Numeric";
+const DECIMAL_TYPE_NAME: &str = "Decimal";
+const NUMERIC_TYPE_NAME: &str = "Numeric";
 const FLOAT_TYPE_NAME: &str = "Float";
 const DOUBLE_TYPE_NAME: &str = "Double";
-// const BIT_TYPE_NAME: &str = "Bit";
+const BIT_TYPE_NAME: &str = "Bit";
 const CHAR_TYPE_NAME: &str = "Char";
 const VAR_CHAR_TYPE_NAME: &str = "VarChar";
-// const BINARY_TYPE_NAME: &str = "Binary";
-// const VAR_BINARY_TYPE_NAME: &str = "VarBinary";
-// const TINY_BLOB_TYPE_NAME: &str = "TinyBlob";
-// const BLOB_TYPE_NAME: &str = "Blob";
-// const MEDIUM_BLOB_TYPE_NAME: &str = "MediumBlob";
-// const LONG_BLOB_TYPE_NAME: &str = "LongBlob";
+const BINARY_TYPE_NAME: &str = "Binary";
+const VAR_BINARY_TYPE_NAME: &str = "VarBinary";
+const TINY_BLOB_TYPE_NAME: &str = "TinyBlob";
+const BLOB_TYPE_NAME: &str = "Blob";
+const MEDIUM_BLOB_TYPE_NAME: &str = "MediumBlob";
+const LONG_BLOB_TYPE_NAME: &str = "LongBlob";
 const TINY_TEXT_TYPE_NAME: &str = "TinyText";
 const TEXT_TYPE_NAME: &str = "Text";
 const MEDIUM_TEXT_TYPE_NAME: &str = "MediumText";
@@ -53,19 +54,19 @@ impl MySqlDatamodelConnector {
         let tiny_int = NativeTypeConstructor::without_args(TINY_INT_TYPE_NAME, ScalarType::Int);
         let medium_int = NativeTypeConstructor::without_args(MEDIUM_INT_TYPE_NAME, ScalarType::Int);
         let big_int = NativeTypeConstructor::without_args(BIG_INT_TYPE_NAME, ScalarType::Int);
-        // let decimal = NativeTypeConstructor::with_args(DECIMAL_TYPE_NAME, 2, ScalarType::Decimal);
-        // let numeric = NativeTypeConstructor::with_args(NUMERIC_TYPE_NAME, 2, ScalarType::Decimal);
+        let decimal = NativeTypeConstructor::with_args(DECIMAL_TYPE_NAME, 2, ScalarType::Decimal);
+        let numeric = NativeTypeConstructor::with_args(NUMERIC_TYPE_NAME, 2, ScalarType::Decimal);
         let float = NativeTypeConstructor::without_args(FLOAT_TYPE_NAME, ScalarType::Float);
         let double = NativeTypeConstructor::without_args(DOUBLE_TYPE_NAME, ScalarType::Float);
-        // let bit = NativeTypeConstructor::with_args(BIT_TYPE_NAME, 1, ScalarType::Bit);
+        let bit = NativeTypeConstructor::with_args(BIT_TYPE_NAME, 1, ScalarType::Bytes);
         let char = NativeTypeConstructor::with_args(CHAR_TYPE_NAME, 1, ScalarType::String);
         let var_char = NativeTypeConstructor::with_args(VAR_CHAR_TYPE_NAME, 1, ScalarType::String);
-        // let binary = NativeTypeConstructor::with_args(BINARY_TYPE_NAME, 1, ScalarType::Bytes);
-        // let var_binary = NativeTypeConstructor::with_args(VAR_BINARY_TYPE_NAME, 1, ScalarType::Bytes);
-        // let tiny_blob = NativeTypeConstructor::without_args(TINY_BLOB_TYPE_NAME, ScalarType::Bytes);
-        // let blob = NativeTypeConstructor::without_args(BLOB_TYPE_NAME, ScalarType::Bytes);
-        // let medium_blob = NativeTypeConstructor::without_args(MEDIUM_BLOB_TYPE_NAME, ScalarType::Bytes);
-        // let long_blob = NativeTypeConstructor::without_args(LONG_BLOB_TYPE_NAME, ScalarType::Bytes);
+        let binary = NativeTypeConstructor::with_args(BINARY_TYPE_NAME, 1, ScalarType::Bytes);
+        let var_binary = NativeTypeConstructor::with_args(VAR_BINARY_TYPE_NAME, 1, ScalarType::Bytes);
+        let tiny_blob = NativeTypeConstructor::without_args(TINY_BLOB_TYPE_NAME, ScalarType::Bytes);
+        let blob = NativeTypeConstructor::without_args(BLOB_TYPE_NAME, ScalarType::Bytes);
+        let medium_blob = NativeTypeConstructor::without_args(MEDIUM_BLOB_TYPE_NAME, ScalarType::Bytes);
+        let long_blob = NativeTypeConstructor::without_args(LONG_BLOB_TYPE_NAME, ScalarType::Bytes);
         let tiny_text = NativeTypeConstructor::without_args(TINY_TEXT_TYPE_NAME, ScalarType::String);
         let text = NativeTypeConstructor::without_args(TEXT_TYPE_NAME, ScalarType::String);
         let medium_text = NativeTypeConstructor::without_args(MEDIUM_TEXT_TYPE_NAME, ScalarType::String);
@@ -83,10 +84,19 @@ impl MySqlDatamodelConnector {
             tiny_int,
             medium_int,
             big_int,
+            decimal,
+            numeric,
             float,
             double,
+            bit,
             char,
             var_char,
+            binary,
+            var_binary,
+            tiny_blob,
+            blob,
+            medium_blob,
+            long_blob,
             tiny_text,
             text,
             medium_text,
@@ -123,8 +133,41 @@ impl Connector for MySqlDatamodelConnector {
             TINY_INT_TYPE_NAME => MySqlType::TinyInt,
             MEDIUM_INT_TYPE_NAME => MySqlType::MediumInt,
             BIG_INT_TYPE_NAME => MySqlType::BigInt,
+            DECIMAL_TYPE_NAME => {
+                if let (Some(first_arg), Some(second_arg)) = (args.get(0), args.get(1)) {
+                    MySqlType::Decimal(*first_arg as u8, *second_arg as u8)
+                } else {
+                    return Err(ConnectorError::from_kind(ErrorKind::ArgumentCountMisMatchError {
+                        native_type: DECIMAL_TYPE_NAME.parse().unwrap(),
+                        required_count: 2,
+                        given_count: args.len(),
+                    }));
+                }
+            }
+            NUMERIC_TYPE_NAME => {
+                if let (Some(first_arg), Some(second_arg)) = (args.get(0), args.get(1)) {
+                    MySqlType::Numeric(*first_arg as u8, *second_arg as u8)
+                } else {
+                    return Err(ConnectorError::from_kind(ErrorKind::ArgumentCountMisMatchError {
+                        native_type: NUMERIC_TYPE_NAME.parse().unwrap(),
+                        required_count: 2,
+                        given_count: args.len(),
+                    }));
+                }
+            }
             FLOAT_TYPE_NAME => MySqlType::Float,
             DOUBLE_TYPE_NAME => MySqlType::Double,
+            BIT_TYPE_NAME => {
+                if let Some(arg) = args.first() {
+                    MySqlType::Bit(*arg)
+                } else {
+                    return Err(ConnectorError::from_kind(ErrorKind::ArgumentCountMisMatchError {
+                        native_type: BIT_TYPE_NAME.parse().unwrap(),
+                        required_count: 1,
+                        given_count: 0,
+                    }));
+                }
+            }
             CHAR_TYPE_NAME => {
                 if let Some(arg) = args.first() {
                     MySqlType::Char(*arg)
@@ -147,6 +190,32 @@ impl Connector for MySqlDatamodelConnector {
                     }));
                 }
             }
+            BINARY_TYPE_NAME => {
+                if let Some(arg) = args.first() {
+                    MySqlType::Binary(*arg)
+                } else {
+                    return Err(ConnectorError::from_kind(ErrorKind::ArgumentCountMisMatchError {
+                        native_type: BINARY_TYPE_NAME.parse().unwrap(),
+                        required_count: 1,
+                        given_count: 0,
+                    }));
+                }
+            }
+            VAR_BINARY_TYPE_NAME => {
+                if let Some(arg) = args.first() {
+                    MySqlType::VarBinary(*arg)
+                } else {
+                    return Err(ConnectorError::from_kind(ErrorKind::ArgumentCountMisMatchError {
+                        native_type: VAR_BINARY_TYPE_NAME.parse().unwrap(),
+                        required_count: 1,
+                        given_count: 0,
+                    }));
+                }
+            }
+            TINY_BLOB_TYPE_NAME => MySqlType::TinyBlob,
+            BLOB_TYPE_NAME => MySqlType::Blob,
+            MEDIUM_BLOB_TYPE_NAME => MySqlType::MediumBlob,
+            LONG_BLOB_TYPE_NAME => MySqlType::LongBlob,
             TINY_TEXT_TYPE_NAME => MySqlType::TinyText,
             TEXT_TYPE_NAME => MySqlType::Text,
             MEDIUM_TEXT_TYPE_NAME => MySqlType::MediumText,
@@ -187,10 +256,19 @@ impl Connector for MySqlDatamodelConnector {
             MySqlType::TinyInt => (TINY_INT_TYPE_NAME, vec![]),
             MySqlType::MediumInt => (MEDIUM_INT_TYPE_NAME, vec![]),
             MySqlType::BigInt => (BIG_INT_TYPE_NAME, vec![]),
+            MySqlType::Decimal(x, y) => (DECIMAL_TYPE_NAME, vec![x as u32, y as u32]),
+            MySqlType::Numeric(x, y) => (NUMERIC_TYPE_NAME, vec![x as u32, y as u32]),
             MySqlType::Float => (FLOAT_TYPE_NAME, vec![]),
             MySqlType::Double => (DOUBLE_TYPE_NAME, vec![]),
+            MySqlType::Bit(x) => (BIT_TYPE_NAME, vec![x]),
             MySqlType::Char(x) => (CHAR_TYPE_NAME, vec![x]),
             MySqlType::VarChar(x) => (VAR_CHAR_TYPE_NAME, vec![x]),
+            MySqlType::Binary(x) => (BINARY_TYPE_NAME, vec![x]),
+            MySqlType::VarBinary(x) => (VAR_BINARY_TYPE_NAME, vec![x]),
+            MySqlType::TinyBlob => (TINY_BLOB_TYPE_NAME, vec![]),
+            MySqlType::Blob => (BLOB_TYPE_NAME, vec![]),
+            MySqlType::MediumBlob => (MEDIUM_BLOB_TYPE_NAME, vec![]),
+            MySqlType::LongBlob => (LONG_BLOB_TYPE_NAME, vec![]),
             MySqlType::TinyText => (TINY_TEXT_TYPE_NAME, vec![]),
             MySqlType::Text => (TEXT_TYPE_NAME, vec![]),
             MySqlType::MediumText => (MEDIUM_TEXT_TYPE_NAME, vec![]),

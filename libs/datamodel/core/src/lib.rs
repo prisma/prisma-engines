@@ -228,7 +228,7 @@ pub fn render_datamodel_to(
     stream: &mut dyn std::io::Write,
     datamodel: &dml::Datamodel,
 ) -> Result<(), error::ErrorCollection> {
-    let lowered = LowerDmlToAst::new().lower(datamodel)?;
+    let lowered = LowerDmlToAst::new(None).lower(datamodel)?;
     render_schema_ast_to(stream, &lowered, 2);
     Ok(())
 }
@@ -249,9 +249,10 @@ fn render_datamodel_and_config_to(
     datamodel: &dml::Datamodel,
     config: &configuration::Configuration,
 ) -> Result<(), error::ErrorCollection> {
-    let mut lowered = LowerDmlToAst::new().lower(datamodel)?;
+    let sources = config.datasources.as_slice();
+    let mut lowered = LowerDmlToAst::new(sources).lower(datamodel)?;
 
-    DatasourceSerializer::add_sources_to_ast(config.datasources.as_slice(), &mut lowered);
+    DatasourceSerializer::add_sources_to_ast(sources, &mut lowered);
     GeneratorSerializer::add_generators_to_ast(&config.generators, &mut lowered);
 
     render_schema_ast_to(stream, &lowered, 2);

@@ -1,16 +1,20 @@
 use super::super::directives::AllDirectives;
+use crate::configuration::preview_features::PreviewFeatures;
 use crate::error::ErrorCollection;
-use crate::{ast, dml};
+use crate::FieldType::NativeType;
+use crate::{ast, dml, Datasource};
 
 pub struct LowerDmlToAst {
     directives: AllDirectives,
+    datasource: Option<Datasource>,
 }
 
 impl LowerDmlToAst {
     /// Creates a new instance, with all builtin directives registered.
-    pub fn new() -> Self {
+    pub fn new(datasource: Option<Datasource>) -> Self {
         Self {
             directives: AllDirectives::new(),
+            datasource,
         }
     }
 
@@ -82,10 +86,30 @@ impl LowerDmlToAst {
     }
 
     pub fn lower_field(&self, field: &dml::Field, datamodel: &dml::Datamodel) -> Result<ast::Field, ErrorCollection> {
+        println!("{:?}", field);
+        /*let (is_native_type_field: bool, native_directive: Option<ast::Directive>) = if let dml::Field::ScalarField(sf) = field {
+            let rr = self.datasource.unwrap();
+            if let NativeType(prismaT, nativeT) = sf.clone().field_type {
+                if rr.has_preview_feature("nativeTypes") {
+                    let name = format!("{}.{}", rr.name, sf.name);
+                }
+                println!("datamodel: {:?}", datamodel);
+                (true, ast::Directive::new(name, vec![]))
+            }
+        } else {
+            (false, None)
+        };*/
+        let is_native_type_field = true;
+        let directives: Vec<ast::Directive> = if is_native_type_field {
+            vec![ast::Directive::new("test", vec![])]
+        } else {
+            self.directives.field.serialize(field, datamodel)?
+        };
+
         Ok(ast::Field {
             name: ast::Identifier::new(&field.name()),
             arity: self.lower_field_arity(field.arity()),
-            directives: self.directives.field.serialize(field, datamodel)?,
+            directives,
             field_type: self.lower_type(&field.field_type()),
             documentation: field
                 .documentation()
@@ -113,7 +137,7 @@ impl LowerDmlToAst {
             dml::FieldType::Enum(tpe) => ast::Identifier::new(&tpe.to_string()),
             dml::FieldType::Unsupported(tpe) => ast::Identifier::new(&tpe.to_string()),
             dml::FieldType::Relation(rel) => ast::Identifier::new(&rel.to),
-            dml::FieldType::NativeType(_prisma_tpe, native_tpe) => ast::Identifier::new(&native_tpe.name),
+            dml::FieldType::NativeType(prisma_tpe, _native_tpe) => ast::Identifier::new(&prisma_tpe.to_string()),
         }
     }
 }
