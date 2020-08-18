@@ -2282,11 +2282,13 @@ async fn adding_mutual_references_on_existing_tables_works(api: &TestApi) -> Tes
         }
     "#;
 
-    api.infer_apply(dm2)
-        .force(Some(true))
-        .send()
-        .await?
-        .assert_warnings(&["The migration will add a unique constraint covering the columns `[name]` on the table `A`. If there are existing duplicate values, the migration will fail.".into(), "The migration will add a unique constraint covering the columns `[email]` on the table `B`. If there are existing duplicate values, the migration will fail.".into()])?;
+    let res = api.infer_apply(dm2).force(Some(true)).send().await?;
+
+    if api.sql_family().is_sqlite() {
+        res.assert_green()?;
+    } else {
+        res.assert_warnings(&["The migration will add a unique constraint covering the columns `[name]` on the table `A`. If there are existing duplicate values, the migration will fail.".into(), "The migration will add a unique constraint covering the columns `[email]` on the table `B`. If there are existing duplicate values, the migration will fail.".into()])?;
+    };
 
     Ok(())
 }
