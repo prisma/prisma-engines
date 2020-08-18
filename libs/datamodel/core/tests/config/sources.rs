@@ -316,6 +316,22 @@ fn fail_to_load_sources_for_invalid_source() {
     }
 }
 
+#[test]
+#[serial]
+fn fail_when_no_source_is_declared() {
+    let invalid_datamodel: &str = r#"        "#;
+    let res = datamodel::parse_configuration(invalid_datamodel).unwrap();
+
+    if let Err(error) = res.validate_that_one_datasource_is_provided() {
+        error.assert_is(DatamodelError::ValidationError {
+            message: "You defined no datasource. You must define exactly one datasource.".to_string(),
+            span: datamodel::ast::Span::new(0, 5),
+        });
+    } else {
+        panic!("Expected error.")
+    }
+}
+
 fn assert_eq_json(a: &str, b: &str) {
     let json_a: serde_json::Value = serde_json::from_str(a).expect("The String a was not valid JSON.");
     let json_b: serde_json::Value = serde_json::from_str(b).expect("The String b was not valid JSON.");
