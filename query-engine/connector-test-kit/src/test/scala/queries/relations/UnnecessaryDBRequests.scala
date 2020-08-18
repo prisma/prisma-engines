@@ -169,7 +169,7 @@ class UnnecessaryDBRequests extends FlatSpec with Matchers with ApiSpecBase {
     //lonely top
     // todo
     //  Start:    5 request
-    //  Current:  2 request
+    //  Current:  3 request
     //  Goal:     2 request
     val lonely = server.query(
       """

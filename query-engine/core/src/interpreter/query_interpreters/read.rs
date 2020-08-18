@@ -30,6 +30,7 @@ fn read_one<'conn, 'tx>(
     let fut = async move {
         let model = query.model;
         let model_id = model.primary_identifier();
+        println!("Read One: {:?}", &query.filter);
         let filter = query.filter.expect("Expected filter to be set for ReadOne query.");
         let scalars = tx.get_single_record(&model, &filter, &query.selected_fields).await?;
 
@@ -73,6 +74,11 @@ fn read_many<'a, 'b>(
     mut query: ManyRecordsQuery,
 ) -> BoxFuture<'a, InterpretationResult<QueryResult>> {
     let fut = async move {
+        println!("Read many: {:?}", query.args.filter);
+
+        // let scalars = if query.args.returns_nothing() {
+        //     ManyRecords::new(query.selected_fields.names().map(|n| n.to_string()).collect())
+        // } else
         let scalars = if query.args.distinct.is_some() || query.args.contains_unstable_cursor() {
             let processor = InMemoryRecordProcessor::new_from_query_args(&mut query.args);
             let scalars = tx
@@ -108,6 +114,8 @@ fn read_related<'a, 'b>(
     parent_result: Option<&'a ManyRecords>,
 ) -> BoxFuture<'a, InterpretationResult<QueryResult>> {
     let fut = async move {
+        println!("Read related: {:?}", parent_result);
+
         let relation = query.parent_field.relation();
         let is_m2m = relation.is_many_to_many();
         let processor = InMemoryRecordProcessor::new_from_query_args(&mut query.args);
@@ -129,6 +137,12 @@ fn read_related<'a, 'b>(
 
         let model = query.parent_field.related_model();
         let model_id = model.primary_identifier();
+
+        // let nested: Vec<QueryResult> = if scalars.records.is_empty() {
+        //     vec![]
+        // } else {
+        //     process_nested(tx, query.nested, Some(&scalars)).await?
+        // };
         let nested: Vec<QueryResult> = process_nested(tx, query.nested, Some(&scalars)).await?;
 
         Ok(QueryResult::RecordSelection(RecordSelection {
@@ -165,14 +179,19 @@ fn process_nested<'a, 'b>(
     parent_result: Option<&'a ManyRecords>,
 ) -> BoxFuture<'a, InterpretationResult<Vec<QueryResult>>> {
     let fut = async move {
-        let mut results = Vec::with_capacity(nested.len());
+        println!("Process nested: {:?}", parent_result);
+        if matches!(parent_result, Some(records) if records.is_empty()) {
+            Ok(vec![])
+        } else {
+            let mut results = Vec::with_capacity(nested.len());
 
-        for query in nested {
-            let result = execute(tx, query, parent_result).await?;
-            results.push(result);
+            for query in nested {
+                let result = execute(tx, query, parent_result).await?;
+                results.push(result);
+            }
+
+            Ok(results)
         }
-
-        Ok(results)
     };
 
     fut.boxed()

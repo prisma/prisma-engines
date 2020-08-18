@@ -14,6 +14,8 @@ pub async fn m2m<'a, 'b>(
     let parent_field = &query.parent_field;
     let child_link_id = parent_field.related_field().linking_fields();
 
+    println!("m2m: {:?}", parent_result);
+
     // We know that in a m2m scenario, we always require the ID of the parent, nothing else.
     let parent_ids = match query.parent_projections {
         Some(ref links) => links.clone(),
@@ -25,12 +27,12 @@ pub async fn m2m<'a, 'b>(
         }
     };
 
-    if parent_ids.is_empty() {
+    let ids = tx.get_related_m2m_record_ids(&query.parent_field, &parent_ids).await?;
+    if ids.is_empty() {
         return Ok(ManyRecords::new(
             query.selected_fields.names().map(|n| n.to_string()).collect(),
         ));
     }
-    let ids = tx.get_related_m2m_record_ids(&query.parent_field, &parent_ids).await?;
 
     let child_model_id = query.parent_field.related_model().primary_identifier();
 
@@ -116,6 +118,8 @@ pub async fn one2m<'a, 'b>(
     let parent_link_id = parent_field.linking_fields();
     let child_link_id = parent_field.related_field().linking_fields();
 
+    println!("one2m: {:?}", parent_projections);
+
     // Primary ID to link ID
     let joined_projections = match parent_projections {
         Some(projections) => projections,
@@ -127,11 +131,6 @@ pub async fn one2m<'a, 'b>(
         }
     };
 
-    if joined_projections.is_empty() {
-        return Ok(ManyRecords::new(
-            selected_fields.names().map(|n| n.to_string()).collect(),
-        ));
-    }
     // Maps the identifying link values to all primary IDs they are tied to.
     // Only the values are hashed for easier comparison.
     let mut link_mapping: HashMap<Vec<PrismaValue>, Vec<RecordProjection>> = HashMap::new();
