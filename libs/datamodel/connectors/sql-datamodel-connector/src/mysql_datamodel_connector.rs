@@ -1,4 +1,3 @@
-use core::num::flt2dec::Part::Num;
 use core::option::Option::Some;
 use datamodel_connector::error::{ConnectorError, ErrorKind};
 use datamodel_connector::scalars::ScalarType;
@@ -297,8 +296,6 @@ impl Connector for MySqlDatamodelConnector {
             }
             MySqlType::Year => (YEAR_TYPE_NAME, vec![]),
             MySqlType::JSON => (JSON_TYPE_NAME, vec![]),
-
-            _ => panic!(""),
         };
 
         if let Some(constructor) = self.find_native_type_constructor(constructor_name) {

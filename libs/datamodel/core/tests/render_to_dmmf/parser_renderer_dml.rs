@@ -171,9 +171,10 @@ model Blog {
 
     println!("{:?}", dml);
 
-    let rendered = datamodel::render_datamodel_to_string(&dml).unwrap();
+    let config = datamodel::parse_configuration(input_with_experimental).unwrap();
+    let dml = parse(input);
+    let rendered = datamodel::render_datamodel_and_config_to_string(&dml, &config).unwrap();
 
-    print!("{}", rendered);
 
     assert_eq!(rendered, expected);
 }

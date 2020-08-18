@@ -6,12 +6,12 @@ use crate::{ast, dml, Datasource};
 
 pub struct LowerDmlToAst {
     directives: AllDirectives,
-    datasource: Option<Datasource>,
+    datasource: Option<&'static Datasource>,
 }
 
 impl LowerDmlToAst {
     /// Creates a new instance, with all builtin directives registered.
-    pub fn new(datasource: Option<Datasource>) -> Self {
+    pub fn new(datasource: Option<&'static Datasource>) -> Self {
         Self {
             directives: AllDirectives::new(),
             datasource,
