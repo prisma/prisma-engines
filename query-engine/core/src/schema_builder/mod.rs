@@ -39,7 +39,7 @@ mod utils;
 
 use crate::schema::*;
 use cache::TypeRefCache;
-use connector::ConnectorCapabilities;
+use datamodel_connector::ConnectorCapabilities;
 use prisma_models::{Field as ModelField, Index, InternalDataModelRef, ModelRef, TypeIdentifier};
 use std::sync::Arc;
 

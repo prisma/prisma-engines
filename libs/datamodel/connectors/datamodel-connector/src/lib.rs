@@ -75,6 +75,7 @@ pub trait Connector: Send + Sync {
 /// These are used during schema validation. E.g. if a connector does not support enums an error will be raised.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum ConnectorCapability {
+    // start of General Schema Capabilities
     ScalarLists,
     RelationsOverNonUniqueCriteria,
     MultipleIndexesWithSameName,
@@ -83,6 +84,28 @@ pub enum ConnectorCapability {
     AutoIncrementAllowedOnNonId,
     AutoIncrementMultipleAllowed,
     AutoIncrementNonIndexedAllowed,
+    // start of Query Engine Capabilities
+    InsensitiveFilters,
+}
+
+/// Contains all capabilities that the connector is able to serve.
+#[derive(Debug)]
+pub struct ConnectorCapabilities {
+    capabilities: Vec<ConnectorCapability>,
+}
+
+impl ConnectorCapabilities {
+    pub fn empty() -> Self {
+        Self { capabilities: vec![] }
+    }
+
+    pub fn new(capabilities: Vec<ConnectorCapability>) -> Self {
+        Self { capabilities }
+    }
+
+    pub fn contains(&self, capability: ConnectorCapability) -> bool {
+        self.capabilities.contains(&capability)
+    }
 }
 
 /// represents an instance of a native type declared in the Prisma schema

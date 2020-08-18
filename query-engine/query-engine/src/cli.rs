@@ -2,7 +2,7 @@ use crate::request_handlers::graphql::{self, GraphQlBody};
 
 use crate::{
     context::PrismaContext,
-    dmmf, exec_loader,
+    dmmf,
     opt::{CliOpt, PrismaOpt, Subcommand},
     PrismaResult,
 };
@@ -87,8 +87,7 @@ impl CliCommand {
     async fn dmmf(request: DmmfRequest) -> PrismaResult<()> {
         let template = DatamodelConverter::convert(&request.datamodel);
 
-        // Load executor
-        let (_, executor) = exec_loader::load(&request.config.datasources.first().unwrap()).await?;
+        let datasource = request.config.datasources.first().unwrap();
 
         // temporary code duplication
         let internal_data_model = template.build("".into());
@@ -96,7 +95,7 @@ impl CliCommand {
             internal_data_model,
             request.build_mode,
             request.enable_raw_queries,
-            executor.primary_connector().capabilities(),
+            datasource.capabilities(),
         ));
 
         let dmmf = dmmf::render_dmmf(&request.datamodel, query_schema);

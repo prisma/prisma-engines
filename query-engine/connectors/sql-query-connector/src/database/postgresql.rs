@@ -3,7 +3,7 @@ use crate::{FromSource, SqlError};
 use async_trait::async_trait;
 use connector_interface::{
     error::{ConnectorError, ErrorKind},
-    Connection, Connector, ConnectorCapabilities, ConnectorCapability,
+    Connection, Connector,
 };
 use datamodel::Datasource;
 use quaint::{pooled::Quaint, prelude::ConnectionInfo};
@@ -43,11 +43,6 @@ impl Connector for PostgreSql {
             Ok(Box::new(conn) as Box<dyn Connection>)
         })
         .await
-    }
-
-    fn capabilities(&self) -> ConnectorCapabilities {
-        let capabilities = ConnectorCapabilities::default();
-        capabilities.add(ConnectorCapability::InsensitiveFilters)
     }
 
     fn name(&self) -> String {
