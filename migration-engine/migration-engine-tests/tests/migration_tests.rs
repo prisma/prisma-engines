@@ -648,7 +648,7 @@ async fn changing_a_scalar_field_to_a_relation_field_must_work(api: &TestApi) {
                 a A // remove this once the implicit back relation field is implemented
             }
         "#;
-    let result = api.infer_and_apply(&dm2).await.sql_schema;
+    let result = api.infer_and_apply_forcefully(&dm2).await.sql_schema;
     let table = result.table_bang("A");
     let column = result.table_bang("A").column_bang("b");
     assert_eq!(column.tpe.family, ColumnTypeFamily::Int);
@@ -1121,7 +1121,7 @@ async fn adding_unique_to_an_existing_field_must_work(api: &TestApi) {
                 field String @unique
             }
         "#;
-    let result = api.infer_and_apply(&dm2).await.sql_schema;
+    let result = api.infer_and_apply_forcefully(&dm2).await.sql_schema;
     let index = result
         .table_bang("A")
         .indices
@@ -1373,7 +1373,7 @@ async fn index_updates_with_rename_must_work(api: &TestApi) {
                 @@unique([field, id], name: "customNameA")
             }
         "#;
-    let result = api.infer_and_apply(&dm2).await;
+    let result = api.infer_and_apply_forcefully(&dm2).await;
     let indexes = result
         .sql_schema
         .table_bang("A")
@@ -1396,6 +1396,7 @@ async fn index_updates_with_rename_must_work(api: &TestApi) {
                     columns: vec!["field".into(), "id".into()],
                     tpe: IndexType::Unique,
                 },
+                caused_by_create_table: false,
             }),
         ];
         let actual_steps = result.sql_migration();
@@ -2281,7 +2282,13 @@ async fn adding_mutual_references_on_existing_tables_works(api: &TestApi) -> Tes
         }
     "#;
 
-    api.infer_apply(dm2).send().await?.assert_green()?;
+    let res = api.infer_apply(dm2).force(Some(true)).send().await?;
+
+    if api.sql_family().is_sqlite() {
+        res.assert_green()?;
+    } else {
+        res.assert_warnings(&["The migration will add a unique constraint covering the columns `[name]` on the table `A`. If there are existing duplicate values, the migration will fail.".into(), "The migration will add a unique constraint covering the columns `[email]` on the table `B`. If there are existing duplicate values, the migration will fail.".into()])?;
+    };
 
     Ok(())
 }

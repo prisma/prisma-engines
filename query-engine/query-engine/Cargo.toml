@@ -60,3 +60,4 @@ serial_test = "*"
 sql-migration-connector = {path = "../../migration-engine/connectors/sql-migration-connector"}
 test-macros = {path = "../../libs/test-macros"}
 test-setup = {path = "../../libs/test-setup"}
+datamodel-connector = {path = "../../libs/datamodel/connectors/datamodel-connector"}

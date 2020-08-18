@@ -9,7 +9,7 @@ pub(crate) use destructive_change_checker_flavour::DestructiveChangeCheckerFlavo
 
 use crate::{
     sql_schema_differ::{ColumnDiffer, TableDiffer},
-    Component, DropTable, SqlMigration, SqlMigrationStep, SqlResult, TableChange,
+    AlterEnum, Component, CreateIndex, DropTable, SqlMigration, SqlMigrationStep, SqlResult, TableChange,
 };
 use destructive_check_plan::DestructiveCheckPlan;
 use migration_connector::{ConnectorResult, DestructiveChangeChecker, DestructiveChangeDiagnostics};
@@ -161,7 +161,22 @@ impl SqlDestructiveChangeChecker<'_> {
                 SqlMigrationStep::DropTable(DropTable { name }) => {
                     self.check_table_drop(name, &mut plan);
                 }
-                // SqlMigrationStep::CreateIndex(CreateIndex { table, index }) if index.is_unique() => todo!(),
+                SqlMigrationStep::CreateIndex(CreateIndex {
+                    table,
+                    index,
+                    caused_by_create_table: false,
+                }) if index.is_unique() => plan.push_warning(SqlMigrationWarningCheck::UniqueConstraintAddition {
+                    table: table.clone(),
+                    columns: index.columns.clone(),
+                }),
+                SqlMigrationStep::AlterEnum(AlterEnum {
+                    name,
+                    created_variants: _,
+                    dropped_variants,
+                }) if !dropped_variants.is_empty() => plan.push_warning(SqlMigrationWarningCheck::EnumValueRemoval {
+                    enm: name.clone(),
+                    values: dropped_variants.clone(),
+                }),
                 // do nothing
                 _ => (),
             }

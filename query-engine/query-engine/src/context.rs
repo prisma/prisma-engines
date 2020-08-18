@@ -61,7 +61,7 @@ impl PrismaContext {
             internal_data_model,
             build_mode,
             enable_raw_queries,
-            executor.primary_connector().capabilities(),
+            data_source.capabilities(),
         ));
 
         Ok(Self {

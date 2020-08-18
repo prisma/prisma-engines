@@ -159,6 +159,7 @@ impl SqlRenderer for MysqlFlavour {
                 .iter()
                 .map(|index| {
                     let tpe = if index.is_unique() { "UNIQUE " } else { "" };
+
                     format!(
                         "{}Index {}({})",
                         tpe,
@@ -177,8 +178,8 @@ impl SqlRenderer for MysqlFlavour {
             "CREATE TABLE {} (\n{columns}{indexes}{primary_key}\n) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci",
             table_name = self.quote_with_schema(&schema_name, table.name()),
             columns = columns,
+            indexes= indexes,
             primary_key = primary_key,
-            indexes = indexes
         ))
     }
 

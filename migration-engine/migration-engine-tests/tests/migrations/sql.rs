@@ -131,13 +131,13 @@ async fn enum_value_with_database_names_must_work(api: &TestApi) -> TestResult {
         }
     "##;
 
-    api.infer_apply(dm).send().await?.assert_green()?;
-
     if api.is_mysql() {
+        api.infer_apply(dm).force(Some(true)).send().await?.assert_warnings(&["The migration will remove the values [hongry] on the enum `Cat_mood`. If these variants are still used in the database, the migration will fail.".into()])?;
         api.assert_schema()
             .await?
             .assert_enum("Cat_mood", |enm| enm.assert_values(&["ANGRY", "hongery"]))?;
     } else {
+        api.infer_apply(dm).force(Some(true)).send().await?.assert_warnings(&["The migration will remove the values [hongry] on the enum `CatMood`. If these variants are still used in the database, the migration will fail.".into()])?;
         api.assert_schema()
             .await?
             .assert_enum("CatMood", |enm| enm.assert_values(&["ANGRY", "hongery"]))?;

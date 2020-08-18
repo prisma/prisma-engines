@@ -1,5 +1,5 @@
 use crate::configuration::preview_features::PreviewFeatures;
-use datamodel_connector::Connector;
+use datamodel_connector::{Connector, ConnectorCapabilities};
 use serde::Serialize;
 
 /// a `datasource` from the prisma schema.
@@ -21,6 +21,11 @@ pub struct Datasource {
 impl Datasource {
     pub fn url(&self) -> &StringFromEnvVar {
         &self.url
+    }
+
+    pub fn capabilities(&self) -> ConnectorCapabilities {
+        let capabilities = self.active_connector.capabilities().clone();
+        ConnectorCapabilities::new(capabilities)
     }
 }
 

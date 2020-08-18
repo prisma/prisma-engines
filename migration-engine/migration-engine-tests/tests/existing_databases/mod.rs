@@ -112,7 +112,7 @@ async fn creating_a_field_for_an_existing_column_and_changing_its_type_must_work
                 title String @unique
             }
         "#;
-    let result = api.infer_and_apply(&dm).await.sql_schema;
+    let result = api.infer_and_apply_forcefully(&dm).await.sql_schema;
     let table = result.table_bang("Blog");
     let column = table.column_bang("title");
     assert_eq!(column.tpe.family, ColumnTypeFamily::String);
@@ -302,7 +302,7 @@ async fn updating_a_field_for_a_non_existent_column(api: &TestApi) -> TestResult
                 title Int @unique
             }
         "#;
-    let final_result = api.infer_and_apply(&dm2).await.sql_schema;
+    let final_result = api.infer_and_apply_forcefully(&dm2).await.sql_schema;
     let final_column = final_result.table_bang("Blog").column_bang("title");
     assert_eq!(final_column.tpe.family, ColumnTypeFamily::Int);
     let index = final_result
