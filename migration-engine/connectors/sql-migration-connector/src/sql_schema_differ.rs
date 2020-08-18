@@ -269,6 +269,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
                     let create = CreateIndex {
                         table: table.name.clone(),
                         index: index.clone(),
+                        caused_by_create_table: true,
                     };
 
                     steps.push(create)
@@ -284,6 +285,7 @@ impl<'schema> SqlSchemaDiffer<'schema> {
                 let create = CreateIndex {
                     table: tables.next.name().to_owned(),
                     index: index.clone(),
+                    caused_by_create_table: false,
                 };
 
                 steps.push(create)

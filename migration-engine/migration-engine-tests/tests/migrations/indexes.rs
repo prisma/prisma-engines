@@ -63,7 +63,11 @@ async fn index_settings_must_be_migrated(api: &TestApi) -> TestResult {
         }
     "#;
 
-    api.infer_apply(dm2).send().await?.assert_green()?;
+    api.infer_apply(dm2)
+        .force(Some(true))
+        .send()
+        .await?
+        .assert_warnings(&["The migration will add a unique constraint covering the columns `[name,followersCount]` on the table `Test`. If there are existing duplicate values, the migration will fail.".into()])?;
 
     api.assert_schema().await?.assert_table("Test", |table| {
         table

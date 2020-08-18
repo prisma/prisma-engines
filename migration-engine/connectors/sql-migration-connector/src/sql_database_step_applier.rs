@@ -294,7 +294,11 @@ fn render_raw_sql(
 
             Ok(statements)
         }
-        SqlMigrationStep::CreateIndex(CreateIndex { table, index }) => Ok(vec![render_create_index(
+        SqlMigrationStep::CreateIndex(CreateIndex {
+            table,
+            index,
+            caused_by_create_table: _,
+        }) => Ok(vec![render_create_index(
             renderer,
             database_info.connection_info().schema_name(),
             table,
