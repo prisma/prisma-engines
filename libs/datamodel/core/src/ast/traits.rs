@@ -22,7 +22,7 @@ pub trait WithDirectives {
         for directive in self.directives() {
             errors.push_opt(directive.name.validate("Directive").err());
         }
-        return errors;
+        errors
     }
 }
 
