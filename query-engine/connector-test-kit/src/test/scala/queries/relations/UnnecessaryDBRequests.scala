@@ -4,7 +4,7 @@ import org.scalatest.{FlatSpec, Matchers}
 import util.{ApiSpecBase, ProjectDsl}
 
 class UnnecessaryDBRequests extends FlatSpec with Matchers with ApiSpecBase {
-  "One to Many relations" should "not create unnecessary requests" in {
+  "One to Many relations" should "not create unnecessary roundtrips" in {
     val project = ProjectDsl.fromString {
       s"""
          |model Top {
@@ -61,31 +61,9 @@ class UnnecessaryDBRequests extends FlatSpec with Matchers with ApiSpecBase {
       project
     )
 
-    //lonely top
-    // todo
-    //  Start:    3 request
-    //  Current:  1 request
-    //  Goal:     1 request
-    val lonely = server.query(
-      """
-                   |query {
-                   |  tops(where: { id: { equals: "lonely_top" }}){
-                   |     id,
-                   |  middle{
-                   |     id
-                   |     bottom {
-                   |       id
-                   |     }
-                   |  }
-                   |  }
-                   |}
-      """,
-      project
-    )
-
-    lonely.toString() should be("{\"data\":{\"tops\":[{\"id\":\"lonely_top\",\"middle\":null}]}}")
-
     //family top
+    //  Start:    3 roundtrip
+    //  Current:  3 roundtrip
     val family = server.query(
       """
         |query {
@@ -105,9 +83,53 @@ class UnnecessaryDBRequests extends FlatSpec with Matchers with ApiSpecBase {
 
     family.toString() should be("{\"data\":{\"tops\":[{\"id\":\"family_top\",\"middle\":{\"id\":\"middle\",\"bottom\":{\"id\":\"bottom\"}}}]}}")
 
+    //lonely top
+    //  Start:    3 roundtrip
+    //  Current:  1 roundtrip
+    val lonely = server.query(
+      """
+                   |query {
+                   |  tops(where: { id: { equals: "lonely_top" }}){
+                   |     id,
+                   |  middle{
+                   |     id
+                   |     bottom {
+                   |       id
+                   |     }
+                   |  }
+                   |  }
+                   |}
+      """,
+      project
+    )
+
+    lonely.toString() should be("{\"data\":{\"tops\":[{\"id\":\"lonely_top\",\"middle\":null}]}}")
+
+    //no top
+    //  Start:    3 roundtrip
+    //  Current:  1 roundtrip
+    val no = server.query(
+      """
+        |query {
+        |  tops(where: { id: { equals: "does not exist" }}){
+        |     id,
+        |  middle{
+        |     id
+        |     bottom {
+        |       id
+        |     }
+        |  }
+        |  }
+        |}
+      """,
+      project
+    )
+
+    no.toString() should be("{\"data\":{\"tops\":[]}}")
+
   }
 
-  "Many to Many relations" should "not create unnecessary requests" in {
+  "Many to Many relations" should "not create unnecessary roundtrips" in {
     val project = ProjectDsl.fromString {
       s"""
          |model Top {
@@ -166,31 +188,10 @@ class UnnecessaryDBRequests extends FlatSpec with Matchers with ApiSpecBase {
       project
     )
 
-    //lonely top
-    // todo
-    //  Start:    5 request
-    //  Current:  2 request
-    //  Goal:     2 request
-    val lonely = server.query(
-      """
-        |query {
-        |  tops(where: { id: { equals: "lonely_top" }}){
-        |     id,
-        |  middle{
-        |     id
-        |     bottom {
-        |       id
-        |     }
-        |  }
-        |  }
-        |}
-      """,
-      project
-    )
-
-    lonely.toString() should be("{\"data\":{\"tops\":[{\"id\":\"lonely_top\",\"middle\":[]}]}}")
-
     //family top
+    //lonely top
+    //  Start:    5 roundtrip
+    //  Current:  5 roundtrip
     val family = server.query(
       """
         |query {
@@ -210,13 +211,49 @@ class UnnecessaryDBRequests extends FlatSpec with Matchers with ApiSpecBase {
 
     family.toString() should be("{\"data\":{\"tops\":[{\"id\":\"family_top\",\"middle\":[{\"id\":\"middle\",\"bottom\":[{\"id\":\"bottom\"}]}]}]}}")
 
-  }
+    //lonely top
+    //  Start:    5 roundtrip
+    //  Current:  2 roundtrip
+    val lonely = server.query(
+      """
+        |query {
+        |  tops(where: { id: { equals: "lonely_top" }}){
+        |     id,
+        |  middle{
+        |     id
+        |     bottom {
+        |       id
+        |     }
+        |  }
+        |  }
+        |}
+      """,
+      project
+    )
 
-  //Todo
-  // how to test this??
-  // what about 1:1
-  // the unnecessary second level request for one2many is still generated
-  // relation{id} extra request for id
-  // fetching related id when resolving m2m (its already in the relation table)
-  //
+    lonely.toString() should be("{\"data\":{\"tops\":[{\"id\":\"lonely_top\",\"middle\":[]}]}}")
+
+    //no top
+    //  Start:    5 roundtrip
+    //  Current:  1 roundtrip
+    val no = server.query(
+      """
+        |query {
+        |  tops(where: { id: { equals: "does not exist" }}){
+        |     id,
+        |  middle{
+        |     id
+        |     bottom {
+        |       id
+        |     }
+        |  }
+        |  }
+        |}
+      """,
+      project
+    )
+
+    no.toString() should be("{\"data\":{\"tops\":[]}}")
+
+  }
 }

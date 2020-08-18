@@ -26,17 +26,17 @@ pub async fn m2m<'a, 'b>(
                 .projections(&parent_model_id)?
         }
     };
-    if parent_ids.is_empty() {
-        return Ok(ManyRecords::new(
-            query.selected_fields.names().map(|n| n.to_string()).collect(),
-        ));
-    }
+    // if parent_ids.is_empty() {
+    //     return Ok(ManyRecords::new(
+    //         query.selected_fields.names().map(|n| n.to_string()).collect(),
+    //     ));
+    // }
     let ids = tx.get_related_m2m_record_ids(&query.parent_field, &parent_ids).await?;
-    if ids.is_empty() {
-        return Ok(ManyRecords::new(
-            query.selected_fields.names().map(|n| n.to_string()).collect(),
-        ));
-    }
+    // if ids.is_empty() {
+    //     return Ok(ManyRecords::new(
+    //         query.selected_fields.names().map(|n| n.to_string()).collect(),
+    //     ));
+    // }
 
     let child_model_id = query.parent_field.related_model().primary_identifier();
 
@@ -164,11 +164,11 @@ pub async fn one2m<'a, 'b>(
         .filter(|p| !p.iter().any(|v| v.is_null()))
         .collect();
 
-    if uniq_projections.is_empty() {
-        return Ok(ManyRecords::new(
-            selected_fields.names().map(|n| n.to_string()).collect(),
-        ));
-    }
+    // if uniq_projections.is_empty() {
+    //     return Ok(ManyRecords::new(
+    //         selected_fields.names().map(|n| n.to_string()).collect(),
+    //     ));
+    // }
 
     let filter = child_link_id.is_in(uniq_projections);
     let mut args = query_args;
