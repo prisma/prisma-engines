@@ -26,7 +26,11 @@ pub async fn m2m<'a, 'b>(
                 .projections(&parent_model_id)?
         }
     };
-
+    if parent_ids.is_empty() {
+        return Ok(ManyRecords::new(
+            query.selected_fields.names().map(|n| n.to_string()).collect(),
+        ));
+    }
     let ids = tx.get_related_m2m_record_ids(&query.parent_field, &parent_ids).await?;
     if ids.is_empty() {
         return Ok(ManyRecords::new(
@@ -118,7 +122,7 @@ pub async fn one2m<'a, 'b>(
     let parent_link_id = parent_field.linking_fields();
     let child_link_id = parent_field.related_field().linking_fields();
 
-    println!("one2m: {:?}", parent_projections);
+    println!("one2m: {:?}", parent_result);
 
     // Primary ID to link ID
     let joined_projections = match parent_projections {
@@ -155,10 +159,16 @@ pub async fn one2m<'a, 'b>(
         }
     }
 
-    let uniq_projections = uniq_projections
+    let uniq_projections: Vec<Vec<PrismaValue>> = uniq_projections
         .into_iter()
         .filter(|p| !p.iter().any(|v| v.is_null()))
         .collect();
+
+    if uniq_projections.is_empty() {
+        return Ok(ManyRecords::new(
+            selected_fields.names().map(|n| n.to_string()).collect(),
+        ));
+    }
 
     let filter = child_link_id.is_in(uniq_projections);
     let mut args = query_args;

@@ -138,11 +138,8 @@ fn read_related<'a, 'b>(
         let model = query.parent_field.related_model();
         let model_id = model.primary_identifier();
 
-        // let nested: Vec<QueryResult> = if scalars.records.is_empty() {
-        //     vec![]
-        // } else {
-        //     process_nested(tx, query.nested, Some(&scalars)).await?
-        // };
+        println!("Read related scalars: {:?}", scalars);
+
         let nested: Vec<QueryResult> = process_nested(tx, query.nested, Some(&scalars)).await?;
 
         Ok(QueryResult::RecordSelection(RecordSelection {
@@ -180,18 +177,15 @@ fn process_nested<'a, 'b>(
 ) -> BoxFuture<'a, InterpretationResult<Vec<QueryResult>>> {
     let fut = async move {
         println!("Process nested: {:?}", parent_result);
-        if matches!(parent_result, Some(records) if records.is_empty()) {
-            Ok(vec![])
-        } else {
-            let mut results = Vec::with_capacity(nested.len());
 
-            for query in nested {
-                let result = execute(tx, query, parent_result).await?;
-                results.push(result);
-            }
+        let mut results = Vec::with_capacity(nested.len());
 
-            Ok(results)
+        for query in nested {
+            let result = execute(tx, query, parent_result).await?;
+            results.push(result);
         }
+
+        Ok(results)
     };
 
     fut.boxed()
